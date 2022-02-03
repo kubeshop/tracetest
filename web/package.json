@@ -17,6 +17,7 @@
     "react-dom": "^17.0.2",
     "react-flow-renderer": "^9.7.3",
     "react-redux": "^7.2.6",
+    "react-router-dom": "^6.2.1",
     "react-scripts": "5.0.0",
     "styled-components": "^5.3.3",
     "typescript": "~4.1.5"
@@ -47,7 +48,19 @@
       "/node_modules/(?!antd|@ant-design|rc-.+?|@babel/runtime).+(js|jsx)$"
     ]
   },
-    "resolutions": {
-      "styled-components": "^5"
-    }
+  "resolutions": {
+    "styled-components": "^5"
+  },
+  "devDependencies": {
+    "eslint": "^8.8.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-jsx-a11y": "^6.5.1",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-react": "^7.28.0",
+    "eslint-plugin-react-hooks": "^4.3.0",
+    "eslint-plugin-unused-imports": "^2.0.0",
+    "prettier": "^2.5.1"
+  }
 }
