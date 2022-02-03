@@ -10,6 +10,10 @@
 package openapi
 
 type Assertion struct {
+
+	// ID
+	Id string `json:"id,omitempty"`
+
 	OperationName string `json:"operationName,omitempty"`
 
 	Duration string `json:"duration,omitempty"`
