@@ -98,6 +98,7 @@ components:
         repeats: 6
         name: name
         description: description
+        id: id
         assertions:
         - duration: duration
           operationName: operationName
@@ -118,6 +119,10 @@ components:
           id: id
           url: url
       properties:
+        id:
+          description: ID
+          readOnly: true
+          type: string
         name:
           type: string
         description:
