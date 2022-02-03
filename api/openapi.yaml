@@ -157,7 +157,7 @@ components:
         attributes:
           type: array
           items:
-            type: string
+            $ref: "#/components/schemas/Attribute"
     Result:
       type: object
       properties:
@@ -172,3 +172,14 @@ components:
         timeStamp:
           type: string
           format: date-time
+    Attribute:
+      type: object
+      properties:
+        id: 
+          type: string
+          description: ID
+          readOnly: true
+        key: 
+          type: string
+        value: 
+          type: string

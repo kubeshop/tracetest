@@ -20,11 +20,16 @@ type Assertion struct {
 
 	NumOfSPans int32 `json:"numOfSPans,omitempty"`
 
-	Attributes []string `json:"attributes,omitempty"`
+	Attributes []Attribute `json:"attributes,omitempty"`
 }
 
 // AssertAssertionRequired checks if the required fields are not zero-ed
 func AssertAssertionRequired(obj Assertion) error {
+	for _, el := range obj.Attributes {
+		if err := AssertAttributeRequired(el); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 

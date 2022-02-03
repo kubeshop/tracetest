@@ -103,15 +103,23 @@ components:
         - duration: duration
           operationName: operationName
           attributes:
-          - attributes
-          - attributes
+          - id: id
+            value: value
+            key: key
+          - id: id
+            value: value
+            key: key
           id: id
           numOfSPans: 0
         - duration: duration
           operationName: operationName
           attributes:
-          - attributes
-          - attributes
+          - id: id
+            value: value
+            key: key
+          - id: id
+            value: value
+            key: key
           id: id
           numOfSPans: 0
         serviceUnderTest:
@@ -142,8 +150,12 @@ components:
         duration: duration
         operationName: operationName
         attributes:
-        - attributes
-        - attributes
+        - id: id
+          value: value
+          key: key
+        - id: id
+          value: value
+          key: key
         id: id
         numOfSPans: 0
       properties:
@@ -160,7 +172,7 @@ components:
           type: integer
         attributes:
           items:
-            type: string
+            $ref: '#/components/schemas/Attribute'
           type: array
       type: object
     Result:
@@ -171,16 +183,24 @@ components:
           duration: duration
           operationName: operationName
           attributes:
-          - attributes
-          - attributes
+          - id: id
+            value: value
+            key: key
+          - id: id
+            value: value
+            key: key
           id: id
           numOfSPans: 0
         successful:
           duration: duration
           operationName: operationName
           attributes:
-          - attributes
-          - attributes
+          - id: id
+            value: value
+            key: key
+          - id: id
+            value: value
+            key: key
           id: id
           numOfSPans: 0
       properties:
@@ -194,6 +214,21 @@ components:
           $ref: '#/components/schemas/Assertion'
         timeStamp:
           format: date-time
+          type: string
+      type: object
+    Attribute:
+      example:
+        id: id
+        value: value
+        key: key
+      properties:
+        id:
+          description: ID
+          readOnly: true
+          type: string
+        key:
+          type: string
+        value:
           type: string
       type: object
     Test_serviceUnderTest:
