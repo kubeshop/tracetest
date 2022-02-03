@@ -28,6 +28,11 @@ paths:
     post:
       description: Create new test action
       operationId: createTest
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Test'
       responses:
         "200":
           content:

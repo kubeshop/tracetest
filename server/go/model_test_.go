@@ -10,7 +10,6 @@
 package openapi
 
 type Test struct {
-
 	Name string `json:"name,omitempty"`
 
 	Description string `json:"description,omitempty"`
