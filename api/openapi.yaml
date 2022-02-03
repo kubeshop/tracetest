@@ -1,0 +1,153 @@
+openapi: 3.0.0
+info:
+  version: 0.0.1
+  title: Project X
+  description: OpenAPI definition for project X endpoint and resources
+paths:
+  /tests:
+    get:
+      tags:
+        - tests
+        - api
+      summary: "Create new test"
+      description: "get tests"
+      operationId: getTests
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Test"
+        500:
+          description: "problem with creating test"
+          # content:
+          #   application/problem+json:
+          #     schema:
+          #       type: array
+          #       items:
+          #         $ref: "#/components/schemas/Problem"
+    post:
+      tags:
+        - tests
+        - api
+      summary: "Create new test"
+      description: "Create new test action"
+      operationId: createTest
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Test"
+        500:
+          description: "problem with creating test"
+          # content:
+          #   application/problem+json:
+          #     schema:
+          #       type: array
+          #       items:
+          #         $ref: "#/components/schemas/Problem"
+  /tests/{testid}/results/{id}:
+    get:
+      parameters:
+        - in: path
+          name: testid
+          schema:
+            type: string
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Result"
+
+  /tests/{id}/results:
+    get:
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Result"
+
+components:
+  schemas:
+    # ObjectRef:
+    #   required:
+    #   type: object
+    #   properties:
+    #     namespace:
+    #       type: string
+    #       description: object kubernetes namespace
+    #     name:
+    #       type: string
+    #       description: object name
+    Test:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        serviceUnderTest:
+          type: object
+          properties:
+            url:
+              type: string
+              description: URL of the service under test
+            auth:
+              type: string
+              description: authorization data for the request
+        assertions:
+          type: array
+          items:
+            $ref: "#/components/schemas/Assertion"
+          description: Definition of assertions that are going to be made
+        repeats:
+          type: integer
+    Assertion:
+      type: object
+      properties:
+        operationName:
+          type: string
+        duration:
+          type: string
+          format: duration
+        numOfSPans:
+          type: integer
+        attributes:
+          type: array
+          items:
+            type: string
+    Result:
+      type: object
+      properties:
+        successful:
+          $ref: "#/components/schemas/Assertion"
+        failed:
+          $ref: "#/components/schemas/Assertion"
+        timeStamp:
+          type: string
+          format: date-time

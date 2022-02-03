@@ -1,0 +1,185 @@
+openapi: 3.0.0
+info:
+  description: OpenAPI definition for project X endpoint and resources
+  title: Project X
+  version: 0.0.1
+servers:
+- url: /
+paths:
+  /tests:
+    get:
+      description: get tests
+      operationId: getTests
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Test'
+                type: array
+          description: successful operation
+        "500":
+          description: problem with creating test
+      summary: Create new test
+      tags:
+      - tests
+      - api
+    post:
+      description: Create new test action
+      operationId: createTest
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Test'
+          description: successful operation
+        "500":
+          description: problem with creating test
+      summary: Create new test
+      tags:
+      - tests
+      - api
+  /tests/{testid}/results/{id}:
+    get:
+      parameters:
+      - explode: false
+        in: path
+        name: testid
+        required: true
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Result'
+                type: array
+          description: successful operation
+  /tests/{id}/results:
+    get:
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Result'
+                type: array
+          description: successful operation
+components:
+  schemas:
+    Test:
+      example:
+        repeats: 6
+        name: name
+        description: description
+        assertions:
+        - duration: duration
+          operationName: operationName
+          attributes:
+          - attributes
+          - attributes
+          numOfSPans: 0
+        - duration: duration
+          operationName: operationName
+          attributes:
+          - attributes
+          - attributes
+          numOfSPans: 0
+        serviceUnderTest:
+          auth: auth
+          url: url
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        serviceUnderTest:
+          $ref: '#/components/schemas/Test_serviceUnderTest'
+        assertions:
+          description: Definition of assertions that are going to be made
+          items:
+            $ref: '#/components/schemas/Assertion'
+          type: array
+        repeats:
+          type: integer
+      type: object
+    Assertion:
+      example:
+        duration: duration
+        operationName: operationName
+        attributes:
+        - attributes
+        - attributes
+        numOfSPans: 0
+      properties:
+        operationName:
+          type: string
+        duration:
+          format: duration
+          type: string
+        numOfSPans:
+          type: integer
+        attributes:
+          items:
+            type: string
+          type: array
+      type: object
+    Result:
+      example:
+        timeStamp: 2000-01-23T04:56:07.000+00:00
+        failed:
+          duration: duration
+          operationName: operationName
+          attributes:
+          - attributes
+          - attributes
+          numOfSPans: 0
+        successful:
+          duration: duration
+          operationName: operationName
+          attributes:
+          - attributes
+          - attributes
+          numOfSPans: 0
+      properties:
+        successful:
+          $ref: '#/components/schemas/Assertion'
+        failed:
+          $ref: '#/components/schemas/Assertion'
+        timeStamp:
+          format: date-time
+          type: string
+      type: object
+    Test_serviceUnderTest:
+      example:
+        auth: auth
+        url: url
+      properties:
+        url:
+          description: URL of the service under test
+          type: string
+        auth:
+          description: authorization data for the request
+          type: string
+      type: object
