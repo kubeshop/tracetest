@@ -104,15 +104,18 @@ components:
           attributes:
           - attributes
           - attributes
+          id: id
           numOfSPans: 0
         - duration: duration
           operationName: operationName
           attributes:
           - attributes
           - attributes
+          id: id
           numOfSPans: 0
         serviceUnderTest:
           auth: auth
+          id: id
           url: url
       properties:
         name:
@@ -136,8 +139,13 @@ components:
         attributes:
         - attributes
         - attributes
+        id: id
         numOfSPans: 0
       properties:
+        id:
+          description: ID
+          readOnly: true
+          type: string
         operationName:
           type: string
         duration:
@@ -153,12 +161,14 @@ components:
     Result:
       example:
         timeStamp: 2000-01-23T04:56:07.000+00:00
+        id: id
         failed:
           duration: duration
           operationName: operationName
           attributes:
           - attributes
           - attributes
+          id: id
           numOfSPans: 0
         successful:
           duration: duration
@@ -166,8 +176,13 @@ components:
           attributes:
           - attributes
           - attributes
+          id: id
           numOfSPans: 0
       properties:
+        id:
+          description: ID
+          readOnly: true
+          type: string
         successful:
           $ref: '#/components/schemas/Assertion'
         failed:
@@ -179,8 +194,13 @@ components:
     Test_serviceUnderTest:
       example:
         auth: auth
+        id: id
         url: url
       properties:
+        id:
+          description: ID
+          readOnly: true
+          type: string
         url:
           description: URL of the service under test
           type: string

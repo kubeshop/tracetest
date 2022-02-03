@@ -14,6 +14,10 @@ import (
 )
 
 type Result struct {
+
+	// ID
+	Id string `json:"id,omitempty"`
+
 	Successful Assertion `json:"successful,omitempty"`
 
 	Failed Assertion `json:"failed,omitempty"`

@@ -119,6 +119,10 @@ components:
         serviceUnderTest:
           type: object
           properties:
+            id: 
+              type: string
+              description: ID
+              readOnly: true
             url:
               type: string
               description: URL of the service under test
@@ -135,6 +139,10 @@ components:
     Assertion:
       type: object
       properties:
+        id: 
+          type: string
+          description: ID
+          readOnly: true
         operationName:
           type: string
         duration:
@@ -149,6 +157,10 @@ components:
     Result:
       type: object
       properties:
+        id: 
+          type: string
+          description: ID
+          readOnly: true
         successful:
           $ref: "#/components/schemas/Assertion"
         failed:
