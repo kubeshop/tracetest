@@ -19,7 +19,7 @@ import (
 
 // DefaultApiController binds http requests to an api service and writes the service results to the http response
 type DefaultApiController struct {
-	service DefaultApiServicer
+	service      DefaultApiServicer
 	errorHandler ErrorHandler
 }
 
@@ -49,7 +49,7 @@ func NewDefaultApiController(s DefaultApiServicer, opts ...DefaultApiOption) Rou
 
 // Routes returns all of the api route for the DefaultApiController
 func (c *DefaultApiController) Routes() Routes {
-	return Routes{ 
+	return Routes{
 		{
 			"TestsIdResultsGet",
 			strings.ToUpper("Get"),
@@ -65,11 +65,11 @@ func (c *DefaultApiController) Routes() Routes {
 	}
 }
 
-// TestsIdResultsGet - 
+// TestsIdResultsGet -
 func (c *DefaultApiController) TestsIdResultsGet(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	idParam := params["id"]
-	
+
 	result, err := c.service.TestsIdResultsGet(r.Context(), idParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
@@ -81,13 +81,13 @@ func (c *DefaultApiController) TestsIdResultsGet(w http.ResponseWriter, r *http.
 
 }
 
-// TestsTestidResultsIdGet - 
+// TestsTestidResultsIdGet -
 func (c *DefaultApiController) TestsTestidResultsIdGet(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	testidParam := params["testid"]
-	
+
 	idParam := params["id"]
-	
+
 	result, err := c.service.TestsTestidResultsIdGet(r.Context(), testidParam, idParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {

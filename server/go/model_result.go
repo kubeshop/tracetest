@@ -14,7 +14,6 @@ import (
 )
 
 type Result struct {
-
 	Successful Assertion `json:"successful,omitempty"`
 
 	Failed Assertion `json:"failed,omitempty"`

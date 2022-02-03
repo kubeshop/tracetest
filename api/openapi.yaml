@@ -36,6 +36,11 @@ paths:
       summary: "Create new test"
       description: "Create new test action"
       operationId: createTest
+      requestBody:
+        content:
+          application/json:
+           schema:
+             $ref: "#/components/schemas/Test"
       responses:
         200:
           description: successful operation

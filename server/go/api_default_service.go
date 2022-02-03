@@ -11,8 +11,8 @@ package openapi
 
 import (
 	"context"
-	"net/http"
 	"errors"
+	"net/http"
 )
 
 // DefaultApiService is a service that implements the logic for the DefaultApiServicer
@@ -26,7 +26,7 @@ func NewDefaultApiService() DefaultApiServicer {
 	return &DefaultApiService{}
 }
 
-// TestsIdResultsGet - 
+// TestsIdResultsGet -
 func (s *DefaultApiService) TestsIdResultsGet(ctx context.Context, id string) (ImplResponse, error) {
 	// TODO - update TestsIdResultsGet with the required logic for this service method.
 	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
@@ -37,7 +37,7 @@ func (s *DefaultApiService) TestsIdResultsGet(ctx context.Context, id string) (I
 	return Response(http.StatusNotImplemented, nil), errors.New("TestsIdResultsGet method not implemented")
 }
 
-// TestsTestidResultsIdGet - 
+// TestsTestidResultsIdGet -
 func (s *DefaultApiService) TestsTestidResultsIdGet(ctx context.Context, testid string, id string) (ImplResponse, error) {
 	// TODO - update TestsTestidResultsIdGet with the required logic for this service method.
 	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.

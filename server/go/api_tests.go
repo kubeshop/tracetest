@@ -19,7 +19,7 @@ import (
 
 // TestsApiController binds http requests to an api service and writes the service results to the http response
 type TestsApiController struct {
-	service TestsApiServicer
+	service      TestsApiServicer
 	errorHandler ErrorHandler
 }
 
@@ -49,7 +49,7 @@ func NewTestsApiController(s TestsApiServicer, opts ...TestsApiOption) Router {
 
 // Routes returns all of the api route for the TestsApiController
 func (c *TestsApiController) Routes() Routes {
-	return Routes{ 
+	return Routes{
 		{
 			"CreateTest",
 			strings.ToUpper("Post"),
@@ -67,7 +67,18 @@ func (c *TestsApiController) Routes() Routes {
 
 // CreateTest - Create new test
 func (c *TestsApiController) CreateTest(w http.ResponseWriter, r *http.Request) {
-	result, err := c.service.CreateTest(r.Context())
+	testParam := Test{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&testParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertTestRequired(testParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.CreateTest(r.Context(), testParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

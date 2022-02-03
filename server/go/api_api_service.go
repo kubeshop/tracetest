@@ -11,8 +11,8 @@ package openapi
 
 import (
 	"context"
-	"net/http"
 	"errors"
+	"net/http"
 )
 
 // ApiApiService is a service that implements the logic for the ApiApiServicer
@@ -27,7 +27,7 @@ func NewApiApiService() ApiApiServicer {
 }
 
 // CreateTest - Create new test
-func (s *ApiApiService) CreateTest(ctx context.Context) (ImplResponse, error) {
+func (s *ApiApiService) CreateTest(ctx context.Context, test Test) (ImplResponse, error) {
 	// TODO - update CreateTest with the required logic for this service method.
 	// Add api_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 
