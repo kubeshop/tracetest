@@ -75,7 +75,39 @@ func (td *TestDB) GetTest(ctx context.Context, id string) (*openapi.Test, error)
 	}
 	return &test, nil
 }
+func (td *TestDB) GetTests(ctx context.Context) ([]openapi.Test, error) {
+	stmt, err := td.db.Prepare("SELECT test FROM tests")
+	if err != nil {
+		return nil, err
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.QueryContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	var tests []openapi.Test
+	for rows.Next() {
+		var b []byte
+		if err := rows.Scan(&b); err != nil {
+			return nil, err
+		}
+		var test openapi.Test
+		err = json.Unmarshal(b, &test)
+		if err != nil {
+			return nil, err
+		}
+		tests = append(tests, test)
+	}
+	return tests, nil
+}
 
 func (td *TestDB) Drop() error {
+	_, err := td.db.Exec(`
+DROP TABLE IF EXISTS tests;
+`)
+	if err != nil {
+		return err
+	}
 	return nil
 }

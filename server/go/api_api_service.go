@@ -9,47 +9,52 @@
 
 package openapi
 
+//go:generate mockgen -package=mocks -destination=mocks/testdb.go . TestDB
 import (
 	"context"
-	"errors"
 	"net/http"
+
+	"github.com/GIT_USER_ID/GIT_REPO_ID/go/tracedb"
 )
+
+type TestDB interface {
+	CreateTest(ctx context.Context, test *Test) (string, error)
+	GetTests(ctx context.Context) ([]Test, error)
+}
 
 // ApiApiService is a service that implements the logic for the ApiApiServicer
 // This service should implement the business logic for every endpoint for the ApiApi API.
 // Include any external packages or services that will be required by this service.
 type ApiApiService struct {
+	traceDB tracedb.TraceDB
+	testDB  TestDB
 }
 
 // NewApiApiService creates a default api service
-func NewApiApiService() ApiApiServicer {
-	return &ApiApiService{}
+func NewApiApiService(traceDB tracedb.TraceDB, testDB TestDB) ApiApiServicer {
+	return &ApiApiService{
+		traceDB: traceDB,
+		testDB:  testDB,
+	}
 }
 
 // CreateTest - Create new test
 func (s *ApiApiService) CreateTest(ctx context.Context, test Test) (ImplResponse, error) {
-	// TODO - update CreateTest with the required logic for this service method.
-	// Add api_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+	id, err := s.testDB.CreateTest(ctx, &test)
+	if err != nil {
+		return Response(http.StatusInternalServerError, err.Error()), err
+	}
 
-	//TODO: Uncomment the next line to return response Response(200, Test{}) or use other options such as http.Ok ...
-	//return Response(200, Test{}), nil
-
-	//TODO: Uncomment the next line to return response Response(500, {}) or use other options such as http.Ok ...
-	//return Response(500, nil),nil
-
-	return Response(http.StatusNotImplemented, nil), errors.New("CreateTest method not implemented")
+	test.Id = id
+	return Response(200, test), nil
 }
 
 // GetTests - Create new test
 func (s *ApiApiService) GetTests(ctx context.Context) (ImplResponse, error) {
-	// TODO - update GetTests with the required logic for this service method.
-	// Add api_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+	tests, err := s.testDB.GetTests(ctx)
+	if err != nil {
+		return Response(http.StatusInternalServerError, err.Error()), err
+	}
 
-	//TODO: Uncomment the next line to return response Response(200, []Test{}) or use other options such as http.Ok ...
-	//return Response(200, []Test{}), nil
-
-	//TODO: Uncomment the next line to return response Response(500, {}) or use other options such as http.Ok ...
-	//return Response(500, nil),nil
-
-	return Response(http.StatusNotImplemented, nil), errors.New("GetTests method not implemented")
+	return Response(200, tests), nil
 }
