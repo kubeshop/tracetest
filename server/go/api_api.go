@@ -32,7 +32,7 @@ func WithApiApiErrorHandler(h ErrorHandler) ApiApiOption {
 }
 
 // NewApiApiController creates a default api controller
-func NewApiApiController(s ApiApiServicer, opts ...ApiApiOption) Router {
+func NewApiApiController(s ApiApiServicer, opts ...ApiApiOption) *ApiApiController {
 	controller := &ApiApiController{
 		service:      s,
 		errorHandler: DefaultErrorHandler,

@@ -14,12 +14,24 @@ import (
 	"net/http"
 
 	openapi "github.com/GIT_USER_ID/GIT_REPO_ID/go"
+	"github.com/GIT_USER_ID/GIT_REPO_ID/go/testdb"
+	"github.com/GIT_USER_ID/GIT_REPO_ID/go/tracedb/jaegerdb"
 )
 
 func main() {
 	log.Printf("Server started")
 
-	ApiApiService := openapi.NewApiApiService()
+	testDB, err := testdb.New("")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	traceDB, err := jaegerdb.New(nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	ApiApiService := openapi.NewApiApiService(traceDB, testDB)
 	ApiApiController := openapi.NewApiApiController(ApiApiService)
 
 	DefaultApiService := openapi.NewDefaultApiService()
