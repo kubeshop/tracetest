@@ -23,7 +23,6 @@ paths:
           description: problem with creating test
       summary: Create new test
       tags:
-      - tests
       - api
     post:
       description: Create new test action
@@ -44,7 +43,25 @@ paths:
           description: problem with creating test
       summary: Create new test
       tags:
-      - tests
+      - api
+  /tests/{testid}/run:
+    post:
+      parameters:
+      - explode: false
+        in: path
+        name: testid
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestRun'
+          description: successful operation
+      tags:
       - api
   /tests/{testid}/results/{id}:
     get:
@@ -72,6 +89,8 @@ paths:
                   $ref: '#/components/schemas/Result'
                 type: array
           description: successful operation
+      tags:
+      - api
   /tests/{id}/results:
     get:
       parameters:
@@ -91,6 +110,8 @@ paths:
                   $ref: '#/components/schemas/Result'
                 type: array
           description: successful operation
+      tags:
+      - api
 components:
   schemas:
     Test:
@@ -174,6 +195,15 @@ components:
           items:
             $ref: '#/components/schemas/Attribute'
           type: array
+      type: object
+    TestRun:
+      example:
+        id: id
+      properties:
+        id:
+          description: ID
+          readOnly: true
+          type: string
       type: object
     Result:
       example:

@@ -12,6 +12,7 @@ package openapi
 //go:generate mockgen -package=mocks -destination=mocks/testdb.go . TestDB
 import (
 	"context"
+	"errors"
 	"net/http"
 
 	"github.com/GIT_USER_ID/GIT_REPO_ID/go/tracedb"
@@ -57,4 +58,36 @@ func (s *ApiApiService) GetTests(ctx context.Context) (ImplResponse, error) {
 	}
 
 	return Response(200, tests), nil
+}
+
+func (s *ApiApiService) TestsTestidRunPost(ctx context.Context, testid string) (ImplResponse, error) {
+	// TODO - update TestsTestidRunPost with the required logic for this service method.
+	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+
+	//TODO: Uncomment the next line to return response Response(200, TestRun{}) or use other options such as http.Ok ...
+	//return Response(200, TestRun{}), nil
+
+	return Response(http.StatusNotImplemented, nil), errors.New("TestsTestidRunPost method not implemented")
+}
+
+// TestsIdResultsGet -
+func (s *ApiApiService) TestsIdResultsGet(ctx context.Context, id string) (ImplResponse, error) {
+	// TODO - update TestsIdResultsGet with the required logic for this service method.
+	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+
+	//TODO: Uncomment the next line to return response Response(200, []Result{}) or use other options such as http.Ok ...
+	//return Response(200, []Result{}), nil
+
+	return Response(http.StatusNotImplemented, nil), errors.New("TestsIdResultsGet method not implemented")
+}
+
+// TestsTestidResultsIdGet -
+func (s *ApiApiService) TestsTestidResultsIdGet(ctx context.Context, testid string, id string) (ImplResponse, error) {
+	// TODO - update TestsTestidResultsIdGet with the required logic for this service method.
+	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+
+	//TODO: Uncomment the next line to return response Response(200, []Result{}) or use other options such as http.Ok ...
+	//return Response(200, []Result{}), nil
+
+	return Response(http.StatusNotImplemented, nil), errors.New("TestsTestidResultsIdGet method not implemented")
 }
