@@ -34,13 +34,7 @@ func main() {
 	ApiApiService := openapi.NewApiApiService(traceDB, testDB)
 	ApiApiController := openapi.NewApiApiController(ApiApiService)
 
-	DefaultApiService := openapi.NewDefaultApiService()
-	DefaultApiController := openapi.NewDefaultApiController(DefaultApiService)
-
-	TestsApiService := openapi.NewTestsApiService()
-	TestsApiController := openapi.NewTestsApiController(TestsApiService)
-
-	router := openapi.NewRouter(ApiApiController, DefaultApiController, TestsApiController)
+	router := openapi.NewRouter(ApiApiController)
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
