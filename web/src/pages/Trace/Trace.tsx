@@ -49,7 +49,7 @@ const Trace = () => {
         <Title level={3}>{data.data[0].spans[0].operationName}</Title>
       </Header>
       <Grid>
-        <ReflexContainer orientation="horizontal">
+        <ReflexContainer style={{height: '100%'}} orientation="horizontal">
           <ReflexElement size={500} maxSize={500}>
             <ReflexContainer orientation="vertical">
               <ReflexElement flex={0.5} className="left-pane">
