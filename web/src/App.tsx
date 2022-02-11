@@ -1,10 +1,8 @@
 import Router from './navigation';
 import './App.css';
 
-function App() {
-  return (
-    <Router />
-  );
-}
+const App = () => {
+  return <Router />;
+};
 
 export default App;
