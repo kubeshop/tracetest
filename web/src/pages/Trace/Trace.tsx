@@ -49,9 +49,9 @@ const Trace = () => {
         <Title level={3}>{data.data[0].spans[0].operationName}</Title>
       </Header>
       <Grid>
-        <ReflexContainer style={{height: '100%'}} orientation="horizontal">
+        <ReflexContainer style={{minHeight: 1000, height: '100%'}} orientation="horizontal">
           <ReflexElement size={500} maxSize={500}>
-            <ReflexContainer orientation="vertical">
+            <ReflexContainer style={{height: 500}} orientation="vertical">
               <ReflexElement flex={0.5} className="left-pane">
                 <div className="pane-content">
                   <TraceDiagram spanMap={spanMap} onSelectSpan={handleSelectSpan} selectedSpan={selectedSpan} />
