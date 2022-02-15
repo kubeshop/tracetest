@@ -49,15 +49,15 @@ const Trace = () => {
         <Title level={3}>{data.data[0].spans[0].operationName}</Title>
       </Header>
       <Grid>
-        <ReflexContainer style={{minHeight: 1000, height: '100%'}} orientation="horizontal">
-          <ReflexElement size={500} maxSize={500}>
-            <ReflexContainer style={{height: '100%'}} orientation="vertical">
+        <ReflexContainer style={{height: '100vh'}} orientation="horizontal">
+          <ReflexElement flex={0.6}>
+            <ReflexContainer orientation="vertical">
               <ReflexElement flex={0.5} className="left-pane">
                 <div className="pane-content">
                   <TraceDiagram spanMap={spanMap} onSelectSpan={handleSelectSpan} selectedSpan={selectedSpan} />
                 </div>
               </ReflexElement>
-              <ReflexSplitter />
+
               <ReflexElement flex={0.5} className="right-pane">
                 <div className="pane-content">
                   <TraceData json={JSON.parse(JSON.stringify(selectedSpan))} />
