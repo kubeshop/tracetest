@@ -9,7 +9,6 @@
 
 package openapi
 
-//go:generate mockgen -package=mocks -destination=mocks/testdb.go . TestDB
 import (
 	"context"
 	"errors"
@@ -18,24 +17,33 @@ import (
 	"github.com/GIT_USER_ID/GIT_REPO_ID/go/tracedb"
 )
 
+//go:generate mockgen -package=mocks -destination=mocks/testdb.go . TestDB
 type TestDB interface {
 	CreateTest(ctx context.Context, test *Test) (string, error)
 	GetTests(ctx context.Context) ([]Test, error)
+	GetTest(ctx context.Context, id string) (*Test, error)
+}
+
+//go:generate mockgen -package=mocks -destination=mocks/executor.go . TestExecutor
+type TestExecutor interface {
+	Execute(test *Test) (*Result, error)
 }
 
 // ApiApiService is a service that implements the logic for the ApiApiServicer
 // This service should implement the business logic for every endpoint for the ApiApi API.
 // Include any external packages or services that will be required by this service.
 type ApiApiService struct {
-	traceDB tracedb.TraceDB
-	testDB  TestDB
+	traceDB  tracedb.TraceDB
+	testDB   TestDB
+	executor TestExecutor
 }
 
 // NewApiApiService creates a default api service
-func NewApiApiService(traceDB tracedb.TraceDB, testDB TestDB) ApiApiServicer {
+func NewApiApiService(traceDB tracedb.TraceDB, testDB TestDB, executor TestExecutor) ApiApiServicer {
 	return &ApiApiService{
-		traceDB: traceDB,
-		testDB:  testDB,
+		traceDB:  traceDB,
+		testDB:   testDB,
+		executor: executor,
 	}
 }
 
@@ -61,13 +69,19 @@ func (s *ApiApiService) GetTests(ctx context.Context) (ImplResponse, error) {
 }
 
 func (s *ApiApiService) TestsTestidRunPost(ctx context.Context, testid string) (ImplResponse, error) {
-	// TODO - update TestsTestidRunPost with the required logic for this service method.
-	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+	t, err := s.testDB.GetTest(ctx, testid)
+	//TODO switch on notFound
+	if err != nil {
+		return Response(http.StatusNotFound, err.Error()), err
+	}
+	resp, err := s.executor.Execute(t)
+	if err != nil {
+		return Response(http.StatusInternalServerError, err.Error()), err
+	}
 
-	//TODO: Uncomment the next line to return response Response(200, TestRun{}) or use other options such as http.Ok ...
-	//return Response(200, TestRun{}), nil
-
-	return Response(http.StatusNotImplemented, nil), errors.New("TestsTestidRunPost method not implemented")
+	return Response(200, TestRun{
+		Id: resp.Id,
+	}), nil
 }
 
 // TestsIdResultsGet -
