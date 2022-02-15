@@ -19,7 +19,7 @@ import (
 
 // ApiApiController binds http requests to an api service and writes the service results to the http response
 type ApiApiController struct {
-	service ApiApiServicer
+	service      ApiApiServicer
 	errorHandler ErrorHandler
 }
 
@@ -49,7 +49,7 @@ func NewApiApiController(s ApiApiServicer, opts ...ApiApiOption) Router {
 
 // Routes returns all of the api route for the ApiApiController
 func (c *ApiApiController) Routes() Routes {
-	return Routes{ 
+	return Routes{
 		{
 			"CreateTest",
 			strings.ToUpper("Post"),
@@ -120,11 +120,11 @@ func (c *ApiApiController) GetTests(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// TestsIdResultsGet - 
+// TestsIdResultsGet -
 func (c *ApiApiController) TestsIdResultsGet(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	idParam := params["id"]
-	
+
 	result, err := c.service.TestsIdResultsGet(r.Context(), idParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
@@ -136,13 +136,13 @@ func (c *ApiApiController) TestsIdResultsGet(w http.ResponseWriter, r *http.Requ
 
 }
 
-// TestsTestidResultsIdGet - 
+// TestsTestidResultsIdGet -
 func (c *ApiApiController) TestsTestidResultsIdGet(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	testidParam := params["testid"]
-	
+
 	idParam := params["id"]
-	
+
 	result, err := c.service.TestsTestidResultsIdGet(r.Context(), testidParam, idParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
@@ -154,11 +154,11 @@ func (c *ApiApiController) TestsTestidResultsIdGet(w http.ResponseWriter, r *htt
 
 }
 
-// TestsTestidRunPost - 
+// TestsTestidRunPost -
 func (c *ApiApiController) TestsTestidRunPost(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	testidParam := params["testid"]
-	
+
 	result, err := c.service.TestsTestidRunPost(r.Context(), testidParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {

@@ -14,27 +14,41 @@ import (
 	"net/http"
 
 	openapi "github.com/GIT_USER_ID/GIT_REPO_ID/go"
+	"github.com/GIT_USER_ID/GIT_REPO_ID/go/executor"
 	"github.com/GIT_USER_ID/GIT_REPO_ID/go/testdb"
 	"github.com/GIT_USER_ID/GIT_REPO_ID/go/tracedb/jaegerdb"
+	"go.opentelemetry.io/collector/config/configgrpc"
+	"go.opentelemetry.io/collector/config/configtls"
 )
 
 func main() {
 	log.Printf("Server started")
 
-	testDB, err := testdb.New("")
+	testDB, err := testdb.New("host=postgres user=postgres password=postgres port=5432 sslmode=disable")
+	if err != nil {
+		log.Fatal(err)
+	}
+	cfg := &jaegerdb.JaegerConnConfig{
+		GRPCClientSettings: configgrpc.GRPCClientSettings{
+			Endpoint:   "jaeger-query:80",
+			TLSSetting: configtls.TLSClientSetting{Insecure: true},
+		},
+	}
+
+	traceDB, err := jaegerdb.New(cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	traceDB, err := jaegerdb.New(nil)
+	ex, err := executor.New()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	ApiApiService := openapi.NewApiApiService(traceDB, testDB)
-	ApiApiController := openapi.NewApiApiController(ApiApiService)
+	apiApiService := openapi.NewApiApiService(traceDB, testDB, ex)
+	apiApiController := openapi.NewApiApiController(apiApiService)
 
-	router := openapi.NewRouter(ApiApiController)
+	router := openapi.NewRouter(apiApiController)
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }

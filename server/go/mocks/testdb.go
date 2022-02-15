@@ -50,6 +50,21 @@ func (mr *MockTestDBMockRecorder) CreateTest(arg0, arg1 interface{}) *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateTest", reflect.TypeOf((*MockTestDB)(nil).CreateTest), arg0, arg1)
 }
 
+// GetTest mocks base method.
+func (m *MockTestDB) GetTest(arg0 context.Context, arg1 string) (*openapi.Test, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetTest", arg0, arg1)
+	ret0, _ := ret[0].(*openapi.Test)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetTest indicates an expected call of GetTest.
+func (mr *MockTestDBMockRecorder) GetTest(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTest", reflect.TypeOf((*MockTestDB)(nil).GetTest), arg0, arg1)
+}
+
 // GetTests mocks base method.
 func (m *MockTestDB) GetTests(arg0 context.Context) ([]openapi.Test, error) {
 	m.ctrl.T.Helper()
