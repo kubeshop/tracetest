@@ -11,8 +11,11 @@ export const useDAGChart = (spanMap: ISpanMap) => {
 
   const layout = d3DAG
     .sugiyama()
+    .layering(d3DAG.layeringSimplex())
     .decross(d3DAG.decrossOpt())
-    .nodeSize(() => [250, 100]);
+    .coord(d3DAG.coordCenter())
+    .nodeSize(() => [300, 150]);
+
   const {width, height} = layout(dag as any);
 
   return {dag, layout: {width, height}};
