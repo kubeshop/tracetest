@@ -23,6 +23,7 @@ paths:
           description: problem with creating test
       summary: Create new test
       tags:
+      - tests
       - api
     post:
       description: Create new test action
@@ -43,25 +44,7 @@ paths:
           description: problem with creating test
       summary: Create new test
       tags:
-      - api
-  /tests/{testid}/run:
-    post:
-      parameters:
-      - explode: false
-        in: path
-        name: testid
-        required: true
-        schema:
-          type: string
-        style: simple
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TestRun'
-          description: successful operation
-      tags:
+      - tests
       - api
   /tests/{testid}/results/{id}:
     get:
@@ -89,8 +72,6 @@ paths:
                   $ref: '#/components/schemas/Result'
                 type: array
           description: successful operation
-      tags:
-      - api
   /tests/{id}/results:
     get:
       parameters:
@@ -110,39 +91,27 @@ paths:
                   $ref: '#/components/schemas/Result'
                 type: array
           description: successful operation
-      tags:
-      - api
 components:
   schemas:
     Test:
       example:
-        repeats: 6
+        repeats: 0
         name: name
         description: description
         id: id
         assertions:
-        - duration: duration
-          operationName: operationName
-          attributes:
-          - id: id
-            value: value
-            key: key
-          - id: id
-            value: value
-            key: key
+        - propertyName: propertyName
+          selector: selector
           id: id
-          numOfSPans: 0
-        - duration: duration
-          operationName: operationName
-          attributes:
-          - id: id
-            value: value
-            key: key
-          - id: id
-            value: value
-            key: key
+          comparable: comparable
+          operator: operator
+          successful: true
+        - propertyName: propertyName
+          selector: selector
           id: id
-          numOfSPans: 0
+          comparable: comparable
+          operator: operator
+          successful: true
         serviceUnderTest:
           auth: auth
           id: id
@@ -168,71 +137,53 @@ components:
       type: object
     Assertion:
       example:
-        duration: duration
-        operationName: operationName
-        attributes:
-        - id: id
-          value: value
-          key: key
-        - id: id
-          value: value
-          key: key
+        propertyName: propertyName
+        selector: selector
         id: id
-        numOfSPans: 0
+        comparable: comparable
+        operator: operator
+        successful: true
       properties:
         id:
           description: ID
           readOnly: true
           type: string
-        operationName:
+        selector:
+          description: Defines the scope where the sought property/ies is located
           type: string
-        duration:
-          format: duration
+        propertyName:
+          description: Defines the name of the one or multiple properties that needs
+            to be found in the given selector
           type: string
-        numOfSPans:
-          type: integer
-        attributes:
-          items:
-            $ref: '#/components/schemas/Attribute'
-          type: array
-      type: object
-    TestRun:
-      example:
-        id: id
-      properties:
-        id:
-          description: ID
-          readOnly: true
+        comparable:
+          description: Defines the expected value of the property/ies
           type: string
+        operator:
+          description: |
+            Defines how the value of sought property/ies should be compared
+            For example lt (less then), gt (greater then), eq (equals), in (contains)
+          type: string
+        successful:
+          type: boolean
       type: object
     Result:
       example:
         timeStamp: 2000-01-23T04:56:07.000+00:00
         id: id
         failed:
-          duration: duration
-          operationName: operationName
-          attributes:
-          - id: id
-            value: value
-            key: key
-          - id: id
-            value: value
-            key: key
+          propertyName: propertyName
+          selector: selector
           id: id
-          numOfSPans: 0
+          comparable: comparable
+          operator: operator
+          successful: true
         successful:
-          duration: duration
-          operationName: operationName
-          attributes:
-          - id: id
-            value: value
-            key: key
-          - id: id
-            value: value
-            key: key
+          propertyName: propertyName
+          selector: selector
           id: id
-          numOfSPans: 0
+          comparable: comparable
+          operator: operator
+          successful: true
       properties:
         id:
           description: ID
@@ -247,10 +198,6 @@ components:
           type: string
       type: object
     Attribute:
-      example:
-        id: id
-        value: value
-        key: key
       properties:
         id:
           description: ID

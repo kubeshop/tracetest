@@ -13,8 +13,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"strings"
-
-	"github.com/gorilla/mux"
 )
 
 // ApiApiController binds http requests to an api service and writes the service results to the http response
@@ -62,24 +60,6 @@ func (c *ApiApiController) Routes() Routes {
 			"/tests",
 			c.GetTests,
 		},
-		{
-			"TestsIdResultsGet",
-			strings.ToUpper("Get"),
-			"/tests/{id}/results",
-			c.TestsIdResultsGet,
-		},
-		{
-			"TestsTestidResultsIdGet",
-			strings.ToUpper("Get"),
-			"/tests/{testid}/results/{id}",
-			c.TestsTestidResultsIdGet,
-		},
-		{
-			"TestsTestidRunPost",
-			strings.ToUpper("Post"),
-			"/tests/{testid}/run",
-			c.TestsTestidRunPost,
-		},
 	}
 }
 
@@ -110,56 +90,6 @@ func (c *ApiApiController) CreateTest(w http.ResponseWriter, r *http.Request) {
 // GetTests - Create new test
 func (c *ApiApiController) GetTests(w http.ResponseWriter, r *http.Request) {
 	result, err := c.service.GetTests(r.Context())
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
-// TestsIdResultsGet -
-func (c *ApiApiController) TestsIdResultsGet(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	idParam := params["id"]
-
-	result, err := c.service.TestsIdResultsGet(r.Context(), idParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
-// TestsTestidResultsIdGet -
-func (c *ApiApiController) TestsTestidResultsIdGet(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	testidParam := params["testid"]
-
-	idParam := params["id"]
-
-	result, err := c.service.TestsTestidResultsIdGet(r.Context(), testidParam, idParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
-// TestsTestidRunPost -
-func (c *ApiApiController) TestsTestidRunPost(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	testidParam := params["testid"]
-
-	result, err := c.service.TestsTestidRunPost(r.Context(), testidParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

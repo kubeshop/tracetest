@@ -14,22 +14,23 @@ type Assertion struct {
 	// ID
 	Id string `json:"id,omitempty"`
 
-	OperationName string `json:"operationName,omitempty"`
+	// Defines the scope where the sought property/ies is located
+	Selector string `json:"selector,omitempty"`
 
-	Duration string `json:"duration,omitempty"`
+	// Defines the name of the one or multiple properties that needs to be found in the given selector
+	PropertyName string `json:"propertyName,omitempty"`
 
-	NumOfSPans int32 `json:"numOfSPans,omitempty"`
+	// Defines the expected value of the property/ies
+	Comparable string `json:"comparable,omitempty"`
 
-	Attributes []Attribute `json:"attributes,omitempty"`
+	// Defines how the value of sought property/ies should be compared For example lt (less then), gt (greater then), eq (equals), in (contains)
+	Operator string `json:"operator,omitempty"`
+
+	Successful bool `json:"successful,omitempty"`
 }
 
 // AssertAssertionRequired checks if the required fields are not zero-ed
 func AssertAssertionRequired(obj Assertion) error {
-	for _, el := range obj.Attributes {
-		if err := AssertAttributeRequired(el); err != nil {
-			return err
-		}
-	}
 	return nil
 }
 

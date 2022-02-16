@@ -1,15 +1,14 @@
-FROM golang:1.17 AS build
+FROM golang:1.10 AS build
 WORKDIR /go/src
-
-COPY go.mod go.sum ./
-RUN go mod download
 COPY go ./go
-COPY main.go ./main.go
+COPY main.go .
 
-RUN go build -o openapi .
+ENV CGO_ENABLED=0
+RUN go get -d -v ./...
 
-FROM ubuntu AS release
-WORKDIR /app
+RUN go build -a -installsuffix cgo -o openapi .
+
+FROM scratch AS runtime
 COPY --from=build /go/src/openapi ./
 EXPOSE 8080/tcp
-ENTRYPOINT ["/app/openapi"]
+ENTRYPOINT ["./openapi"]

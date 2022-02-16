@@ -7,6 +7,7 @@ paths:
   /tests:
     get:
       tags:
+        - tests
         - api
       summary: "Create new test"
       description: "get tests"
@@ -30,6 +31,7 @@ paths:
           #         $ref: "#/components/schemas/Problem"
     post:
       tags:
+        - tests
         - api
       summary: "Create new test"
       description: "Create new test action"
@@ -37,8 +39,8 @@ paths:
       requestBody:
         content:
           application/json:
-           schema:
-             $ref: "#/components/schemas/Test"
+            schema:
+              $ref: "#/components/schemas/Test"
       responses:
         200:
           description: successful operation
@@ -54,27 +56,8 @@ paths:
           #       type: array
           #       items:
           #         $ref: "#/components/schemas/Problem"
-  /tests/{testid}/run:
-    post:
-      tags:
-        - api
-      parameters:
-        - in: path
-          name: testid
-          schema:
-            type: string
-          required: true
-      responses:
-        200:
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/TestRun"
   /tests/{testid}/results/{id}:
     get:
-      tags:
-        - api
       parameters:
         - in: path
           name: testid
@@ -98,8 +81,6 @@ paths:
 
   /tests/{id}/results:
     get:
-      tags:
-        - api
       parameters:
         - in: path
           name: id
@@ -118,16 +99,6 @@ paths:
 
 components:
   schemas:
-    # ObjectRef:
-    #   required:
-    #   type: object
-    #   properties:
-    #     namespace:
-    #       type: string
-    #       description: object kubernetes namespace
-    #     name:
-    #       type: string
-    #       description: object name
     Test:
       type: object
       properties:
@@ -166,24 +137,22 @@ components:
           type: string
           description: ID
           readOnly: true
-        operationName:
+        selector:
+          description: Defines the scope where the sought property/ies is located
           type: string
-        duration:
+        propertyName:
+          description: Defines the name of the one or multiple properties that needs to be found in the given selector
           type: string
-          format: duration
-        numOfSPans:
-          type: integer
-        attributes:
-          type: array
-          items:
-            $ref: "#/components/schemas/Attribute"
-    TestRun:
-      type: object
-      properties:
-        id:
+        comparable:
+          description: Defines the expected value of the property/ies
           type: string
-          description: ID
-          readOnly: true
+        operator:
+          description: |
+            Defines how the value of sought property/ies should be compared
+            For example lt (less then), gt (greater then), eq (equals), in (contains)
+          type: string
+        successful:
+          type: boolean
     Result:
       type: object
       properties:
@@ -201,11 +170,11 @@ components:
     Attribute:
       type: object
       properties:
-        id: 
+        id:
           type: string
           description: ID
           readOnly: true
-        key: 
+        key:
           type: string
-        value: 
+        value:
           type: string
