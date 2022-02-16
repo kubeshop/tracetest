@@ -26,6 +26,8 @@ type ApiApiRouter interface {
 // The DefaultApiRouter implementation should parse necessary information from the http request,
 // pass the data to a DefaultApiServicer to perform the required actions, then write the service results to the http response.
 type DefaultApiRouter interface {
+	CreateAssertion(http.ResponseWriter, *http.Request)
+	GetAssertions(http.ResponseWriter, *http.Request)
 	TestsIdResultsGet(http.ResponseWriter, *http.Request)
 	TestsTestidResultsIdGet(http.ResponseWriter, *http.Request)
 }
@@ -52,6 +54,8 @@ type ApiApiServicer interface {
 // while the service implementation can ignored with the .openapi-generator-ignore file
 // and updated with the logic required for the API.
 type DefaultApiServicer interface {
+	CreateAssertion(context.Context, string, Assertion) (ImplResponse, error)
+	GetAssertions(context.Context, string) (ImplResponse, error)
 	TestsIdResultsGet(context.Context, string) (ImplResponse, error)
 	TestsTestidResultsIdGet(context.Context, string, string) (ImplResponse, error)
 }

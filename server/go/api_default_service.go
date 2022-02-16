@@ -26,6 +26,28 @@ func NewDefaultApiService() DefaultApiServicer {
 	return &DefaultApiService{}
 }
 
+// CreateAssertion -
+func (s *DefaultApiService) CreateAssertion(ctx context.Context, id string, assertion Assertion) (ImplResponse, error) {
+	// TODO - update CreateAssertion with the required logic for this service method.
+	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+
+	//TODO: Uncomment the next line to return response Response(200, {}) or use other options such as http.Ok ...
+	//return Response(200, nil),nil
+
+	return Response(http.StatusNotImplemented, nil), errors.New("CreateAssertion method not implemented")
+}
+
+// GetAssertions -
+func (s *DefaultApiService) GetAssertions(ctx context.Context, id string) (ImplResponse, error) {
+	// TODO - update GetAssertions with the required logic for this service method.
+	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+
+	//TODO: Uncomment the next line to return response Response(200, []Assertion{}) or use other options such as http.Ok ...
+	//return Response(200, []Assertion{}), nil
+
+	return Response(http.StatusNotImplemented, nil), errors.New("GetAssertions method not implemented")
+}
+
 // TestsIdResultsGet -
 func (s *DefaultApiService) TestsIdResultsGet(ctx context.Context, id string) (ImplResponse, error) {
 	// TODO - update TestsIdResultsGet with the required logic for this service method.

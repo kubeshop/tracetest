@@ -10,6 +10,7 @@
 package openapi
 
 import (
+	"encoding/json"
 	"net/http"
 	"strings"
 
@@ -50,6 +51,18 @@ func NewDefaultApiController(s DefaultApiServicer, opts ...DefaultApiOption) Rou
 func (c *DefaultApiController) Routes() Routes {
 	return Routes{
 		{
+			"CreateAssertion",
+			strings.ToUpper("Post"),
+			"/test/{id}/asssertions",
+			c.CreateAssertion,
+		},
+		{
+			"GetAssertions",
+			strings.ToUpper("Get"),
+			"/test/{id}/asssertions",
+			c.GetAssertions,
+		},
+		{
 			"TestsIdResultsGet",
 			strings.ToUpper("Get"),
 			"/tests/{id}/results",
@@ -62,6 +75,49 @@ func (c *DefaultApiController) Routes() Routes {
 			c.TestsTestidResultsIdGet,
 		},
 	}
+}
+
+// CreateAssertion -
+func (c *DefaultApiController) CreateAssertion(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	idParam := params["id"]
+
+	assertionParam := Assertion{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&assertionParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertAssertionRequired(assertionParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.CreateAssertion(r.Context(), idParam, assertionParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// GetAssertions -
+func (c *DefaultApiController) GetAssertions(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	idParam := params["id"]
+
+	result, err := c.service.GetAssertions(r.Context(), idParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
 }
 
 // TestsIdResultsGet -

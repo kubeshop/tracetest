@@ -96,6 +96,42 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Result"
+  /test/{id}/asssertions:
+    get:
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      operationId: getAssertions
+      description: "Gets all assertions associated to the test"
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Assertion"
+    post:
+      description: ""
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      operationId: createAssertion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Assertion"
+      responses:
+        "200":
+          description: OK
 
 components:
   schemas:
