@@ -18,11 +18,16 @@ type Result struct {
 	// ID
 	Id string `json:"id,omitempty"`
 
+	// trace ID
+	Traceid string `json:"traceid,omitempty"`
+
 	Successful Assertion `json:"successful,omitempty"`
 
 	Failed Assertion `json:"failed,omitempty"`
 
-	TimeStamp time.Time `json:"timeStamp,omitempty"`
+	CreatedAt time.Time `json:"createdAt,omitempty"`
+
+	CompletedAt time.Time `json:"completedAt,omitempty"`
 }
 
 // AssertResultRequired checks if the required fields are not zero-ed

@@ -53,7 +53,7 @@ func (c *ApiApiController) Routes() Routes {
 		{
 			"CreateAssertion",
 			strings.ToUpper("Post"),
-			"/test/{id}/asssertions",
+			"/test/{id}/assertions",
 			c.CreateAssertion,
 		},
 		{
@@ -65,7 +65,7 @@ func (c *ApiApiController) Routes() Routes {
 		{
 			"GetAssertions",
 			strings.ToUpper("Get"),
-			"/test/{id}/asssertions",
+			"/test/{id}/assertions",
 			c.GetAssertions,
 		},
 		{
