@@ -37,8 +37,8 @@ paths:
       requestBody:
         content:
           application/json:
-           schema:
-             $ref: "#/components/schemas/Test"
+            schema:
+              $ref: "#/components/schemas/Test"
       responses:
         200:
           description: successful operation
@@ -71,6 +71,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TestRun"
+
   /tests/{testid}/results/{id}:
     get:
       tags:
@@ -115,19 +116,49 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Result"
+  /test/{id}/asssertions:
+    get:
+      tags:
+        - api
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      operationId: getAssertions
+      description: "Gets all assertions associated to the test"
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Assertion"
+    post:
+      tags:
+        - api
+      description: ""
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      operationId: createAssertion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Assertion"
+      responses:
+        "200":
+          description: OK
 
 components:
   schemas:
-    # ObjectRef:
-    #   required:
-    #   type: object
-    #   properties:
-    #     namespace:
-    #       type: string
-    #       description: object kubernetes namespace
-    #     name:
-    #       type: string
-    #       description: object name
     Test:
       type: object
       properties:
@@ -166,24 +197,19 @@ components:
           type: string
           description: ID
           readOnly: true
-        operationName:
+        selector:
+          description: Defines the scope where the sought property/ies is located
           type: string
-        duration:
+        comparable:
+          description: Defines the expected value of the property/ies
           type: string
-          format: duration
-        numOfSPans:
-          type: integer
-        attributes:
-          type: array
-          items:
-            $ref: "#/components/schemas/Attribute"
-    TestRun:
-      type: object
-      properties:
-        id:
+        operator:
+          description: |
+            Defines how the value of sought property/ies should be compared
+            For example lt (less then), gt (greater then), eq (equals), in (contains)
           type: string
-          description: ID
-          readOnly: true
+        successful:
+          type: boolean
     Result:
       type: object
       properties:
@@ -201,11 +227,18 @@ components:
     Attribute:
       type: object
       properties:
-        id: 
+        id:
           type: string
           description: ID
           readOnly: true
-        key: 
+        key:
           type: string
-        value: 
+        value:
           type: string
+    TestRun:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID
+          readOnly: true

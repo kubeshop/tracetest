@@ -24,7 +24,7 @@ import (
 func main() {
 	log.Printf("Server started")
 
-	testDB, err := testdb.New("host=postgres user=postgres password=postgres port=5432 sslmode=disable")
+	testDB, err := testdb.New("host=localhost user=postgres password=postgres port=5432 sslmode=disable")
 	if err != nil {
 		log.Fatal(err)
 	}
