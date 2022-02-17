@@ -1,6 +1,9 @@
 import styled from 'styled-components';
 import {ReflexContainer, ReflexSplitter, ReflexElement} from 'react-reflex';
+import {Tabs} from 'antd';
+
 import Title from 'antd/lib/typography/Title';
+import Text from 'antd/lib/typography/Text';
 
 import 'react-reflex/styles.css';
 
@@ -11,6 +14,7 @@ import TraceTimeline from './TraceTimeline';
 import TraceData from './TraceData';
 
 import data from './data.json';
+import AssertionList from './AssertionsList';
 
 const spanMap = data.data
   .map(i => i.spans)
@@ -59,8 +63,18 @@ const Trace = () => {
               </ReflexElement>
 
               <ReflexElement flex={0.5} className="right-pane">
-                <div className="pane-content">
-                  <TraceData json={JSON.parse(JSON.stringify(selectedSpan))} />
+                <div className="pane-content" style={{paddingLeft: 8}}>
+                  <div>
+                    <Text>Service</Text>
+                  </div>
+                  <Tabs>
+                    <Tabs.TabPane tab="Raw Data" key="1">
+                      <TraceData json={JSON.parse(JSON.stringify(selectedSpan))} />
+                    </Tabs.TabPane>
+                    <Tabs.TabPane tab="Assertions" key="2">
+                      <AssertionList targetSpan={spanMap[selectedSpan.id]?.data} />
+                    </Tabs.TabPane>
+                  </Tabs>
                 </div>
               </ReflexElement>
             </ReflexContainer>

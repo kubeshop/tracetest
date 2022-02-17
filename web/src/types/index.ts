@@ -1,4 +1,10 @@
 type RefType = 'CHILD_OF';
+
+export interface ISpanTag {
+  key: string;
+  type: string;
+  value: unknown;
+}
 export interface ISpan {
   traceID: string;
   spanID: string;
@@ -10,11 +16,7 @@ export interface ISpan {
   }>;
   startTime: number;
   duration: number;
-  tags: Array<{
-    key: string;
-    type: string;
-    value: unknown;
-  }>;
+  tags: Array<ISpanTag>;
   logs: Array<{
     timestamp: number;
     fields: Array<{
