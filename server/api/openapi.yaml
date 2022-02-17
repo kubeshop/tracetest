@@ -43,7 +43,6 @@ paths:
           description: problem with creating test
       summary: Create new test
       tags:
-      - tests
       - api
   /tests/{testid}/run:
     post:
@@ -90,6 +89,8 @@ paths:
                   $ref: '#/components/schemas/Result'
                 type: array
           description: successful operation
+      tags:
+      - api
   /tests/{id}/results:
     get:
       parameters:
@@ -109,6 +110,8 @@ paths:
                   $ref: '#/components/schemas/Result'
                 type: array
           description: successful operation
+      tags:
+      - api
   /test/{id}/asssertions:
     get:
       description: Gets all assertions associated to the test
@@ -130,6 +133,8 @@ paths:
                   $ref: '#/components/schemas/Assertion'
                 type: array
           description: successful operation
+      tags:
+      - api
     post:
       operationId: createAssertion
       parameters:
@@ -148,6 +153,8 @@ paths:
       responses:
         "200":
           description: OK
+      tags:
+      - api
 components:
   schemas:
     Test:

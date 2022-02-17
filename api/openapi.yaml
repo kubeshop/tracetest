@@ -30,7 +30,6 @@ paths:
           #         $ref: "#/components/schemas/Problem"
     post:
       tags:
-        - tests
         - api
       summary: "Create new test"
       description: "Create new test action"
@@ -75,6 +74,8 @@ paths:
 
   /tests/{testid}/results/{id}:
     get:
+      tags:
+        - api
       parameters:
         - in: path
           name: testid
@@ -98,6 +99,8 @@ paths:
 
   /tests/{id}/results:
     get:
+      tags:
+        - api
       parameters:
         - in: path
           name: id
@@ -115,6 +118,8 @@ paths:
                   $ref: "#/components/schemas/Result"
   /test/{id}/asssertions:
     get:
+      tags:
+        - api
       parameters:
         - in: path
           name: id
@@ -133,6 +138,8 @@ paths:
                 items:
                   $ref: "#/components/schemas/Assertion"
     post:
+      tags:
+        - api
       description: ""
       parameters:
         - in: path

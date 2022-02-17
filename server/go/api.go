@@ -20,24 +20,13 @@ import (
 // The ApiApiRouter implementation should parse necessary information from the http request,
 // pass the data to a ApiApiServicer to perform the required actions, then write the service results to the http response.
 type ApiApiRouter interface { 
-	CreateTest(http.ResponseWriter, *http.Request)
-	GetTests(http.ResponseWriter, *http.Request)
-	TestsTestidRunPost(http.ResponseWriter, *http.Request)
-}
-// DefaultApiRouter defines the required methods for binding the api requests to a responses for the DefaultApi
-// The DefaultApiRouter implementation should parse necessary information from the http request,
-// pass the data to a DefaultApiServicer to perform the required actions, then write the service results to the http response.
-type DefaultApiRouter interface { 
 	CreateAssertion(http.ResponseWriter, *http.Request)
+	CreateTest(http.ResponseWriter, *http.Request)
 	GetAssertions(http.ResponseWriter, *http.Request)
+	GetTests(http.ResponseWriter, *http.Request)
 	TestsIdResultsGet(http.ResponseWriter, *http.Request)
 	TestsTestidResultsIdGet(http.ResponseWriter, *http.Request)
-}
-// TestsApiRouter defines the required methods for binding the api requests to a responses for the TestsApi
-// The TestsApiRouter implementation should parse necessary information from the http request,
-// pass the data to a TestsApiServicer to perform the required actions, then write the service results to the http response.
-type TestsApiRouter interface { 
-	CreateTest(http.ResponseWriter, *http.Request)
+	TestsTestidRunPost(http.ResponseWriter, *http.Request)
 }
 
 
@@ -46,28 +35,11 @@ type TestsApiRouter interface {
 // while the service implementation can ignored with the .openapi-generator-ignore file
 // and updated with the logic required for the API.
 type ApiApiServicer interface { 
-	CreateTest(context.Context, Test) (ImplResponse, error)
-	GetTests(context.Context) (ImplResponse, error)
-	TestsTestidRunPost(context.Context, string) (ImplResponse, error)
-}
-
-
-// DefaultApiServicer defines the api actions for the DefaultApi service
-// This interface intended to stay up to date with the openapi yaml used to generate it,
-// while the service implementation can ignored with the .openapi-generator-ignore file
-// and updated with the logic required for the API.
-type DefaultApiServicer interface { 
 	CreateAssertion(context.Context, string, Assertion) (ImplResponse, error)
+	CreateTest(context.Context, Test) (ImplResponse, error)
 	GetAssertions(context.Context, string) (ImplResponse, error)
+	GetTests(context.Context) (ImplResponse, error)
 	TestsIdResultsGet(context.Context, string) (ImplResponse, error)
 	TestsTestidResultsIdGet(context.Context, string, string) (ImplResponse, error)
-}
-
-
-// TestsApiServicer defines the api actions for the TestsApi service
-// This interface intended to stay up to date with the openapi yaml used to generate it,
-// while the service implementation can ignored with the .openapi-generator-ignore file
-// and updated with the logic required for the API.
-type TestsApiServicer interface { 
-	CreateTest(context.Context, Test) (ImplResponse, error)
+	TestsTestidRunPost(context.Context, string) (ImplResponse, error)
 }
