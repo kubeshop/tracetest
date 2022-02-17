@@ -1,4 +1,3 @@
-Dockerfile
 README.md
 api/openapi.yaml
 go/api.go

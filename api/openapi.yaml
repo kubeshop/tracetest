@@ -200,9 +200,6 @@ components:
         selector:
           description: Defines the scope where the sought property/ies is located
           type: string
-        propertyName:
-          description: Defines the name of the one or multiple properties that needs to be found in the given selector
-          type: string
         comparable:
           description: Defines the expected value of the property/ies
           type: string

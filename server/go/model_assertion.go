@@ -17,9 +17,6 @@ type Assertion struct {
 	// Defines the scope where the sought property/ies is located
 	Selector string `json:"selector,omitempty"`
 
-	// Defines the name of the one or multiple properties that needs to be found in the given selector
-	PropertyName string `json:"propertyName,omitempty"`
-
 	// Defines the expected value of the property/ies
 	Comparable string `json:"comparable,omitempty"`
 

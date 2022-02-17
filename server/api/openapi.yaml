@@ -164,14 +164,12 @@ components:
         description: description
         id: id
         assertions:
-        - propertyName: propertyName
-          selector: selector
+        - selector: selector
           id: id
           comparable: comparable
           operator: operator
           successful: true
-        - propertyName: propertyName
-          selector: selector
+        - selector: selector
           id: id
           comparable: comparable
           operator: operator
@@ -201,7 +199,6 @@ components:
       type: object
     Assertion:
       example:
-        propertyName: propertyName
         selector: selector
         id: id
         comparable: comparable
@@ -214,10 +211,6 @@ components:
           type: string
         selector:
           description: Defines the scope where the sought property/ies is located
-          type: string
-        propertyName:
-          description: Defines the name of the one or multiple properties that needs
-            to be found in the given selector
           type: string
         comparable:
           description: Defines the expected value of the property/ies
@@ -235,14 +228,12 @@ components:
         timeStamp: 2000-01-23T04:56:07.000+00:00
         id: id
         failed:
-          propertyName: propertyName
           selector: selector
           id: id
           comparable: comparable
           operator: operator
           successful: true
         successful:
-          propertyName: propertyName
           selector: selector
           id: id
           comparable: comparable
