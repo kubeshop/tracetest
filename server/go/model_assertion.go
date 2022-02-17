@@ -23,7 +23,7 @@ type Assertion struct {
 	// Defines the expected value of the property/ies
 	Comparable string `json:"comparable,omitempty"`
 
-	// Defines how the value of sought property/ies should be compared For example lt (less then), gt (greater then), eq (equals), in (contains)
+	// Defines how the value of sought property/ies should be compared For example lt (less then), gt (greater then), eq (equals), in (contains) 
 	Operator string `json:"operator,omitempty"`
 
 	Successful bool `json:"successful,omitempty"`

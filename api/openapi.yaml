@@ -7,7 +7,6 @@ paths:
   /tests:
     get:
       tags:
-        - tests
         - api
       summary: "Create new test"
       description: "get tests"
@@ -56,6 +55,24 @@ paths:
           #       type: array
           #       items:
           #         $ref: "#/components/schemas/Problem"
+  /tests/{testid}/run:
+    post:
+      tags:
+        - api
+      parameters:
+        - in: path
+          name: testid
+          schema:
+            type: string
+          required: true
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TestRun"
+
   /tests/{testid}/results/{id}:
     get:
       parameters:
@@ -214,3 +231,10 @@ components:
           type: string
         value:
           type: string
+    TestRun:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID
+          readOnly: true

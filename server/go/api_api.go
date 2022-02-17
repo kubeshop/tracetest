@@ -13,11 +13,13 @@ import (
 	"encoding/json"
 	"net/http"
 	"strings"
+
+	"github.com/gorilla/mux"
 )
 
 // ApiApiController binds http requests to an api service and writes the service results to the http response
 type ApiApiController struct {
-	service      ApiApiServicer
+	service ApiApiServicer
 	errorHandler ErrorHandler
 }
 
@@ -47,7 +49,7 @@ func NewApiApiController(s ApiApiServicer, opts ...ApiApiOption) Router {
 
 // Routes returns all of the api route for the ApiApiController
 func (c *ApiApiController) Routes() Routes {
-	return Routes{
+	return Routes{ 
 		{
 			"CreateTest",
 			strings.ToUpper("Post"),
@@ -59,6 +61,12 @@ func (c *ApiApiController) Routes() Routes {
 			strings.ToUpper("Get"),
 			"/tests",
 			c.GetTests,
+		},
+		{
+			"TestsTestidRunPost",
+			strings.ToUpper("Post"),
+			"/tests/{testid}/run",
+			c.TestsTestidRunPost,
 		},
 	}
 }
@@ -90,6 +98,22 @@ func (c *ApiApiController) CreateTest(w http.ResponseWriter, r *http.Request) {
 // GetTests - Create new test
 func (c *ApiApiController) GetTests(w http.ResponseWriter, r *http.Request) {
 	result, err := c.service.GetTests(r.Context())
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// TestsTestidRunPost - 
+func (c *ApiApiController) TestsTestidRunPost(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	testidParam := params["testid"]
+	
+	result, err := c.service.TestsTestidRunPost(r.Context(), testidParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

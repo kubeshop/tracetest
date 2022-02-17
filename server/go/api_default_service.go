@@ -11,8 +11,8 @@ package openapi
 
 import (
 	"context"
-	"errors"
 	"net/http"
+	"errors"
 )
 
 // DefaultApiService is a service that implements the logic for the DefaultApiServicer
@@ -26,7 +26,7 @@ func NewDefaultApiService() DefaultApiServicer {
 	return &DefaultApiService{}
 }
 
-// CreateAssertion -
+// CreateAssertion - 
 func (s *DefaultApiService) CreateAssertion(ctx context.Context, id string, assertion Assertion) (ImplResponse, error) {
 	// TODO - update CreateAssertion with the required logic for this service method.
 	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
@@ -37,7 +37,7 @@ func (s *DefaultApiService) CreateAssertion(ctx context.Context, id string, asse
 	return Response(http.StatusNotImplemented, nil), errors.New("CreateAssertion method not implemented")
 }
 
-// GetAssertions -
+// GetAssertions - 
 func (s *DefaultApiService) GetAssertions(ctx context.Context, id string) (ImplResponse, error) {
 	// TODO - update GetAssertions with the required logic for this service method.
 	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
@@ -48,7 +48,7 @@ func (s *DefaultApiService) GetAssertions(ctx context.Context, id string) (ImplR
 	return Response(http.StatusNotImplemented, nil), errors.New("GetAssertions method not implemented")
 }
 
-// TestsIdResultsGet -
+// TestsIdResultsGet - 
 func (s *DefaultApiService) TestsIdResultsGet(ctx context.Context, id string) (ImplResponse, error) {
 	// TODO - update TestsIdResultsGet with the required logic for this service method.
 	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
@@ -59,7 +59,7 @@ func (s *DefaultApiService) TestsIdResultsGet(ctx context.Context, id string) (I
 	return Response(http.StatusNotImplemented, nil), errors.New("TestsIdResultsGet method not implemented")
 }
 
-// TestsTestidResultsIdGet -
+// TestsTestidResultsIdGet - 
 func (s *DefaultApiService) TestsTestidResultsIdGet(ctx context.Context, testid string, id string) (ImplResponse, error) {
 	// TODO - update TestsTestidResultsIdGet with the required logic for this service method.
 	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.

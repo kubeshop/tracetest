@@ -15,5 +15,6 @@ go/model_assertion.go
 go/model_attribute.go
 go/model_result.go
 go/model_test_.go
+go/model_test_run.go
 go/model_test_service_under_test_.go
 go/routers.go

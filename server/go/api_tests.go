@@ -54,12 +54,6 @@ func (c *TestsApiController) Routes() Routes {
 			"/tests",
 			c.CreateTest,
 		},
-		{
-			"GetTests",
-			strings.ToUpper("Get"),
-			"/tests",
-			c.GetTests,
-		},
 	}
 }
 
@@ -77,19 +71,6 @@ func (c *TestsApiController) CreateTest(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 	result, err := c.service.CreateTest(r.Context(), testParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
-// GetTests - Create new test
-func (c *TestsApiController) GetTests(w http.ResponseWriter, r *http.Request) {
-	result, err := c.service.GetTests(r.Context())
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
