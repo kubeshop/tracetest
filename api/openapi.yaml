@@ -116,7 +116,7 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Result"
-  /test/{id}/asssertions:
+  /test/{id}/assertions:
     get:
       tags:
         - api
@@ -217,11 +217,18 @@ components:
           type: string
           description: ID
           readOnly: true
+        traceid:
+          type: string
+          description: trace ID
+          readOnly: true
         successful:
           $ref: "#/components/schemas/Assertion"
         failed:
           $ref: "#/components/schemas/Assertion"
-        timeStamp:
+        createdAt:
+          type: string
+          format: date-time
+        completedAt:
           type: string
           format: date-time
     Attribute:
