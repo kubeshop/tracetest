@@ -2,7 +2,6 @@ package executor
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"math/rand"
 	"net/http"
@@ -35,19 +34,16 @@ func New() (*TestExecutor, error) {
 	}, nil
 }
 
-func (te *TestExecutor) Execute(test *openapi.Test) (*openapi.Result, error) {
+func (te *TestExecutor) Execute(test *openapi.Test, tid trace.TraceID) (*openapi.Result, error) {
 	client := http.Client{
 		Transport: otelhttp.NewTransport(http.DefaultTransport,
 			otelhttp.WithTracerProvider(te.traceProvider),
 		),
 	}
 
-	tid := trace.TraceID{}
-	te.rand.Read(tid[:])
 	sid := trace.SpanID{}
 	te.rand.Read(sid[:])
 
-	fmt.Printf("gen trace id: %v\n", tid)
 	var tf trace.TraceFlags
 	sc := trace.NewSpanContext(trace.SpanContextConfig{
 		TraceID:    tid,

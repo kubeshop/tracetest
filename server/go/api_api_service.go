@@ -12,9 +12,14 @@ package openapi
 import (
 	"context"
 	"errors"
+	"fmt"
+	"math/rand"
 	"net/http"
+	"time"
 
 	"github.com/GIT_USER_ID/GIT_REPO_ID/go/tracedb"
+	"github.com/google/uuid"
+	"go.opentelemetry.io/otel/trace"
 )
 
 //go:generate mockgen -package=mocks -destination=mocks/testdb.go . TestDB
@@ -22,11 +27,15 @@ type TestDB interface {
 	CreateTest(ctx context.Context, test *Test) (string, error)
 	GetTests(ctx context.Context) ([]Test, error)
 	GetTest(ctx context.Context, id string) (*Test, error)
+
+	CreateResult(ctx context.Context, run *Result) error
+	UpdateResult(ctx context.Context, run *Result) error
+	GetResult(ctx context.Context, id string) (*Result, error)
 }
 
 //go:generate mockgen -package=mocks -destination=mocks/executor.go . TestExecutor
 type TestExecutor interface {
-	Execute(test *Test) (*Result, error)
+	Execute(test *Test, tid trace.TraceID) (*Result, error)
 }
 
 // ApiApiService is a service that implements the logic for the ApiApiServicer
@@ -36,6 +45,7 @@ type ApiApiService struct {
 	traceDB  tracedb.TraceDB
 	testDB   TestDB
 	executor TestExecutor
+	rand     *rand.Rand
 }
 
 // NewApiApiService creates a default api service
@@ -44,6 +54,7 @@ func NewApiApiService(traceDB tracedb.TraceDB, testDB TestDB, executor TestExecu
 		traceDB:  traceDB,
 		testDB:   testDB,
 		executor: executor,
+		rand:     rand.New(rand.NewSource(0)),
 	}
 }
 
@@ -58,7 +69,7 @@ func (s *ApiApiService) CreateTest(ctx context.Context, test Test) (ImplResponse
 	return Response(200, test), nil
 }
 
-// GetTests - Create new test
+// GetTests - Gets all tests
 func (s *ApiApiService) GetTests(ctx context.Context) (ImplResponse, error) {
 	tests, err := s.testDB.GetTests(ctx)
 	if err != nil {
@@ -74,34 +85,85 @@ func (s *ApiApiService) TestsTestidRunPost(ctx context.Context, testid string) (
 	if err != nil {
 		return Response(http.StatusNotFound, err.Error()), err
 	}
-	resp, err := s.executor.Execute(t)
+
+	id := uuid.New().String()
+	tid := trace.TraceID{}
+	s.rand.Read(tid[:])
+	fmt.Printf("gen trace id: %v\n", tid)
+
+	run := &Result{
+		Id:        id,
+		CreatedAt: time.Now(),
+		Traceid:   tid.String(),
+	}
+
+	err = s.testDB.CreateResult(ctx, run)
 	if err != nil {
 		return Response(http.StatusInternalServerError, err.Error()), err
 	}
 
+	go func(t *Test, tid trace.TraceID) {
+		fmt.Println("executing test")
+		resp, err := s.executor.Execute(t, tid)
+		if err != nil {
+			fmt.Printf("exec err: %s", err)
+			return
+		}
+		fmt.Println(resp)
+
+		run.CompletedAt = time.Now()
+		err = s.testDB.UpdateResult(ctx, run)
+		if err != nil {
+			fmt.Printf("update result err: %s", err)
+			return
+		}
+	}(t, tid)
+
 	return Response(200, TestRun{
-		Id: resp.Id,
+		Id: id,
 	}), nil
 }
 
 // TestsIdResultsGet -
 func (s *ApiApiService) TestsIdResultsGet(ctx context.Context, id string) (ImplResponse, error) {
-	// TODO - update TestsIdResultsGet with the required logic for this service method.
-	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+	return Response(http.StatusNotImplemented, nil), errors.New("TestsTestidResultsIdGet method not implemented")
+}
 
-	//TODO: Uncomment the next line to return response Response(200, []Result{}) or use other options such as http.Ok ...
-	//return Response(200, []Result{}), nil
+func (s *ApiApiService) TestsTestidResultsIdTraceGet(ctx context.Context, testID string, resultsID string) (ImplResponse, error) {
+	res, err := s.testDB.GetResult(ctx, resultsID)
+	if err != nil {
+		return Response(http.StatusInternalServerError, err.Error()), err
+	}
 
-	return Response(http.StatusNotImplemented, nil), errors.New("TestsIdResultsGet method not implemented")
+	/*
+		tid, err := trace.TraceIDFromHex(res.Traceid)
+		if err != nil {
+			return Response(http.StatusInternalServerError, err.Error()), err
+		}
+	*/
+
+	tr, err := s.traceDB.GetTraceByID(ctx, res.Traceid)
+	if err != nil {
+		return Response(http.StatusInternalServerError, err.Error()), err
+	}
+	return Response(http.StatusOK, tr), nil
 }
 
 // TestsTestidResultsIdGet -
 func (s *ApiApiService) TestsTestidResultsIdGet(ctx context.Context, testid string, id string) (ImplResponse, error) {
-	// TODO - update TestsTestidResultsIdGet with the required logic for this service method.
-	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+	res, err := s.testDB.GetResult(ctx, id)
+	if err != nil {
+		return Response(http.StatusInternalServerError, err.Error()), err
+	}
 
-	//TODO: Uncomment the next line to return response Response(200, []Result{}) or use other options such as http.Ok ...
-	//return Response(200, []Result{}), nil
+	return Response(http.StatusOK, []Result{*res}), nil
 
+}
+
+func (s *ApiApiService) CreateAssertion(context.Context, string, Assertion) (ImplResponse, error) {
+	return Response(http.StatusNotImplemented, nil), errors.New("TestsTestidResultsIdGet method not implemented")
+}
+
+func (s *ApiApiService) GetAssertions(context.Context, string) (ImplResponse, error) {
 	return Response(http.StatusNotImplemented, nil), errors.New("TestsTestidResultsIdGet method not implemented")
 }
