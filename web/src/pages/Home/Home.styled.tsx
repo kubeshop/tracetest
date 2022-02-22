@@ -1,3 +1,4 @@
+import {Button} from 'antd';
 import styled from 'styled-components';
 
 export const Header = styled.div`
@@ -20,4 +21,9 @@ export const SideMenu = styled.div`
 
 export const TestsContainer = styled.div`
   flex: 0.8;
+`;
+
+export const CreateTestButton = styled(Button)`
+  border-radius: 16px;
+  align-self: flex-start;
 `;

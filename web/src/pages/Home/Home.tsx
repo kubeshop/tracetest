@@ -1,4 +1,3 @@
-import {Button} from 'antd';
 import Title from 'antd/lib/typography/Title';
 import {useState} from 'react';
 import CreateTestModal from '../../components/CreateTestModal';
@@ -18,7 +17,9 @@ const Home = (): JSX.Element => {
       </S.Header>
       <S.Content>
         <S.SideMenu>
-          <Button onClick={handleCreateTest}>Create Test</Button>
+          <S.CreateTestButton type="primary" size="large" onClick={handleCreateTest}>
+            Create Test
+          </S.CreateTestButton>
         </S.SideMenu>
         <S.TestsContainer>
           <TestList />
