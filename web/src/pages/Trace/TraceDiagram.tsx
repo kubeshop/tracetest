@@ -14,7 +14,7 @@ interface IPropsTraceDiagram {
 }
 
 const TraceNode = ({id, data, selected, ...rest}: IPropsTraceNode) => {
-  const systemTag = data.tags.find(el => {
+  const systemTag = data.attributes.find(el => {
     if (el.key.startsWith('http')) {
       return el;
     }
@@ -33,11 +33,11 @@ const TraceNode = ({id, data, selected, ...rest}: IPropsTraceNode) => {
   return (
     <S.TraceNode selected={selected}>
       <S.TraceNotch system={systemTag?.key || ''}>
-        <Text>{(systemTag?.value as string) || 'Service'}</Text>
+        <Text>{systemTag?.value?.stringValue || 'Service'}</Text>
       </S.TraceNotch>
       <Handle type="target" id={id} position={Position.Top} style={{top: 0, borderRadius: 0, visibility: 'hidden'}} />
 
-      <Text>{`/${data?.operationName?.split('/')?.pop()}`}</Text>
+      <Text>{`/${data?.name?.split('/')?.pop()}`}</Text>
       <Handle
         type="source"
         position={Position.Bottom}
