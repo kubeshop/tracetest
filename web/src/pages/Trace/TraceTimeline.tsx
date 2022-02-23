@@ -70,7 +70,11 @@ const TraceTimeline = ({selectedSpan, onSelectSpan}: IProps) => {
 
   const scaleTime = d3
     .scaleLinear()
-    .domain([minNano, d3.max(spanDates, s => Number(s.span.endTimeUnixNano))! as number])
+    .domain([
+      0,
+      (d3.max(spanDates, s => Number(s.span.endTimeUnixNano))! -
+        d3.min(spanDates, s => Number(s.span.startTimeUnixNano))!) as number,
+    ])
     .range([250, 800]);
 
   const barHeight = 20;
@@ -94,11 +98,12 @@ const TraceTimeline = ({selectedSpan, onSelectSpan}: IProps) => {
     const xAxis = d3
       .axisTop(scaleTime)
       .ticks(5)
-      .tickFormat(d => `${(Number(d) - minNano) / 1000000}ms`);
+      .tickFormat(d => `${Number(d) / 1000000}ms`);
 
     const milliTicks = d3.ticks(
-      d3.min(spanDates, d => Number(d.span.startTimeUnixNano)) as number,
-      d3.max(spanDates, d => Number(d.span.endTimeUnixNano)) as number,
+      0,
+      (d3.max(spanDates, d => Number(d.span.endTimeUnixNano))! -
+        d3.min(spanDates, d => Number(d.span.startTimeUnixNano))!) as number,
       5
     );
 
@@ -196,9 +201,9 @@ const TraceTimeline = ({selectedSpan, onSelectSpan}: IProps) => {
       .append('rect')
       .attr('rx', 3)
       .attr('ry', 3)
-      .attr('x', d => scaleTime(Number(d.data.data.startTimeUnixNano)))
+      .attr('x', d => scaleTime(Number(d.data.data.startTimeUnixNano) - minNano))
       .attr('y', 5)
-      .attr('width', (d: any) => scaleTime(Number(d.data.data.endTimeUnixNano)))
+      .attr('width', (d: any) => scaleTime(Number(d.data.data.endTimeUnixNano) - Number(d.data.data.startTimeUnixNano)))
       .attr('height', theBarHeight / 2)
       .attr('stroke', 'none')
       .attr('fill', e => (e.depth < 2 ? 'rgb(70, 74, 102)' : 'rgb(29, 233, 182)'))
