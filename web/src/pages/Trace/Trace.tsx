@@ -1,7 +1,5 @@
 import styled from 'styled-components';
 import {ReflexContainer, ReflexSplitter, ReflexElement} from 'react-reflex';
-import Title from 'antd/lib/typography/Title';
-
 import 'react-reflex/styles.css';
 
 import {useState} from 'react';
@@ -27,15 +25,6 @@ const Grid = styled.div`
   display: grid;
 `;
 
-const Header = styled.div`
-  display: flex;
-  align-items: center;
-  width: 100%;
-  height: 64px;
-  padding: 0 32px;
-  border-bottom: 1px solid rgb(213, 215, 224);
-`;
-
 const Trace = () => {
   const [selectedSpan, setSelectedSpan] = useState<any>({});
 
@@ -45,9 +34,6 @@ const Trace = () => {
 
   return (
     <main>
-      <Header>
-        <Title level={3}>{data.data[0].spans[0].operationName}</Title>
-      </Header>
       <Grid>
         <ReflexContainer style={{height: '100vh'}} orientation="horizontal">
           <ReflexElement flex={0.6}>
