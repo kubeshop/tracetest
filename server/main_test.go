@@ -56,7 +56,7 @@ func TestRunTest(t *testing.T) {
 
 	db := mocks.NewMockTestDB(ctrl)
 	db.EXPECT().GetTest(gomock.Any(), gomock.Any()).Return(&openapi.Test{}, nil)
-	db.EXPECT().CreateResult(gomock.Any(), gomock.Any()).Return(nil)
+	db.EXPECT().CreateResult(gomock.Any(), "1", gomock.Any()).Return(nil)
 	db.EXPECT().UpdateResult(gomock.Any(), gomock.Any()).Return(nil)
 	ex := mocks.NewMockTestExecutor(ctrl)
 
@@ -81,4 +81,38 @@ func TestRunTest(t *testing.T) {
 	t.Logf("response: %s\n", string(data))
 	//TODO: test executed in seperate goroutine
 	time.Sleep(100 * time.Millisecond)
+}
+
+func TestCreateNewAssertion(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	assertion := openapi.Assertion{
+		Selector:   "resourceSpans[?resource.attributes[?key=='service.name' && value.stringValue=='productcatalog']]",
+		Comparable: "Comparable",
+		Operator:   "Operator",
+	}
+	b, err := json.Marshal(assertion)
+	assert.NoError(t, err)
+	t.Logf("request: %s\n", b)
+
+	db := mocks.NewMockTestDB(ctrl)
+	db.EXPECT().CreateAssertion(gomock.Any(), "", &assertion).Return("id", nil)
+
+	req := httptest.NewRequest(http.MethodPost, "/tests/testid/assertions", bytes.NewBuffer(b))
+	w := httptest.NewRecorder()
+
+	ApiApiService := openapi.NewApiApiService(nil, db, nil)
+	controller := openapi.NewApiApiController(ApiApiService)
+
+	ctr := controller.(*openapi.ApiApiController)
+	ctr.CreateAssertion(w, req)
+	res := w.Result()
+	defer res.Body.Close()
+
+	data, err := ioutil.ReadAll(res.Body)
+	assert.NoError(t, err)
+	assert.Equal(t, w.Code, http.StatusOK)
+
+	t.Logf("response: %s\n", string(data))
 }

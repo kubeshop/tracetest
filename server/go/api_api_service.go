@@ -11,7 +11,6 @@ package openapi
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"math/rand"
 	"net/http"
@@ -28,9 +27,14 @@ type TestDB interface {
 	GetTests(ctx context.Context) ([]Test, error)
 	GetTest(ctx context.Context, id string) (*Test, error)
 
-	CreateResult(ctx context.Context, run *Result) error
+	CreateResult(ctx context.Context, testID string, run *Result) error
 	UpdateResult(ctx context.Context, run *Result) error
 	GetResult(ctx context.Context, id string) (*Result, error)
+	GetResultsByTestID(ctx context.Context, testid string) ([]Result, error)
+
+	CreateAssertion(ctx context.Context, testid string, assertion *Assertion) (string, error)
+	GetAssertion(ctx context.Context, id string) (*Assertion, error)
+	GetAssertionsByTestID(ctx context.Context, testID string) ([]Assertion, error)
 }
 
 //go:generate mockgen -package=mocks -destination=mocks/executor.go . TestExecutor
@@ -101,7 +105,7 @@ func (s *ApiApiService) TestsTestidRunPost(ctx context.Context, testid string) (
 		Spanid:    sid.String(),
 	}
 
-	err = s.testDB.CreateResult(ctx, run)
+	err = s.testDB.CreateResult(ctx, testid, run)
 	if err != nil {
 		return Response(http.StatusInternalServerError, err.Error()), err
 	}
@@ -131,7 +135,13 @@ func (s *ApiApiService) TestsTestidRunPost(ctx context.Context, testid string) (
 
 // TestsIdResultsGet -
 func (s *ApiApiService) TestsIdResultsGet(ctx context.Context, id string) (ImplResponse, error) {
-	return Response(http.StatusNotImplemented, nil), errors.New("TestsTestidResultsIdGet method not implemented")
+	res, err := s.testDB.GetResultsByTestID(ctx, id)
+	if err != nil {
+		return Response(http.StatusInternalServerError, err.Error()), err
+	}
+
+	return Response(http.StatusOK, res), nil
+
 }
 
 func (s *ApiApiService) TestsTestidResultsIdTraceGet(ctx context.Context, testID string, resultsID string) (ImplResponse, error) {
@@ -166,13 +176,23 @@ func (s *ApiApiService) TestsTestidResultsIdGet(ctx context.Context, testid stri
 	}
 
 	return Response(http.StatusOK, []Result{*res}), nil
-
 }
 
-func (s *ApiApiService) CreateAssertion(context.Context, string, Assertion) (ImplResponse, error) {
-	return Response(http.StatusNotImplemented, nil), errors.New("TestsTestidResultsIdGet method not implemented")
+func (s *ApiApiService) CreateAssertion(ctx context.Context, testID string, assertion Assertion) (ImplResponse, error) {
+	id, err := s.testDB.CreateAssertion(ctx, testID, &assertion)
+	if err != nil {
+		return Response(http.StatusInternalServerError, err.Error()), err
+	}
+
+	assertion.Id = id
+	return Response(http.StatusOK, assertion), nil
 }
 
-func (s *ApiApiService) GetAssertions(context.Context, string) (ImplResponse, error) {
-	return Response(http.StatusNotImplemented, nil), errors.New("TestsTestidResultsIdGet method not implemented")
+func (s *ApiApiService) GetAssertions(ctx context.Context, testID string) (ImplResponse, error) {
+	assertions, err := s.testDB.GetAssertionsByTestID(ctx, testID)
+	if err != nil {
+		return Response(http.StatusInternalServerError, err.Error()), err
+	}
+
+	return Response(http.StatusOK, assertions), nil
 }
