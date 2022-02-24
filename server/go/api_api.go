@@ -229,7 +229,7 @@ func (c *ApiApiController) TestsTestidResultsIdTraceGet(w http.ResponseWriter, r
 		return
 	}
 	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
+	EncodeJSONPBResponse(result.Body, &result.Code, w)
 
 }
 
