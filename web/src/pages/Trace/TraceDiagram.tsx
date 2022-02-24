@@ -14,7 +14,7 @@ interface IPropsTraceDiagram {
 }
 
 const TraceNode = ({id, data, selected, ...rest}: IPropsTraceNode) => {
-  const systemTag = data.attributes.find(el => {
+  const systemTag = data?.attributes?.find(el => {
     if (el.key.startsWith('http')) {
       return el;
     }

@@ -35,12 +35,6 @@ const TraceTimeline = ({selectedSpan, onSelectSpan}: IProps) => {
       span,
     }));
 
-  const rootNode = data.resourceSpans
-    .map((i: any) => i.instrumentationLibrarySpans.map((el: any) => el.spans))
-    .flat(2)
-    .sort((el1, el2) => Number(el1.startTimeUnixNano) - Number(el2.startTimeUnixNano))
-    .shift();
-
   const spanMap = data.resourceSpans
     .map((i: any) => i.instrumentationLibrarySpans.map((el: any) => el.spans))
     .flat(2)
@@ -58,23 +52,17 @@ const TraceTimeline = ({selectedSpan, onSelectSpan}: IProps) => {
 
   const dagData = Object.values(spanMap).map(({id, parentIds, ...rest}) => {
     const parents = parentIds.filter(el => spanMap[el]);
-    if ((!parents || parents.length === 0) && id !== rootNode.spanId) {
-      parents.push(rootNode.spanId);
-    }
 
     return {id, parentId: parents[0], ...rest};
   });
 
   const root = d3.stratify()(dagData);
   const minNano = d3.min(spanDates, s => Number(s.span.startTimeUnixNano))! as number;
+  const maxNano = d3.max(spanDates, s => Number(s.span.endTimeUnixNano))! as number;
 
   const scaleTime = d3
     .scaleLinear()
-    .domain([
-      0,
-      (d3.max(spanDates, s => Number(s.span.endTimeUnixNano))! -
-        d3.min(spanDates, s => Number(s.span.startTimeUnixNano))!) as number,
-    ])
+    .domain([0, maxNano - minNano])
     .range([250, 800]);
 
   const barHeight = 20;
@@ -83,7 +71,7 @@ const TraceTimeline = ({selectedSpan, onSelectSpan}: IProps) => {
   useEffect(() => {
     let nodes = treeFactory(root);
     let nodesSort: any[] = [];
-    console.log('@@nodes', nodes);
+
     nodes.sort((a: any, b: any) =>
       a.depth === b.depth ? a.data.startTime.getTime() - b.data.startTime.getTime() : a.depth - b.depth
     );
@@ -93,19 +81,14 @@ const TraceTimeline = ({selectedSpan, onSelectSpan}: IProps) => {
       n.x = i * barHeight;
     });
     const height = barHeight * nodes.descendants().length + 50;
-    const chart = d3.select(svgRef.current).attr('viewBox', `0 0 800 ${height}`);
+    const chart = d3.select(svgRef.current).attr('viewBox', `0 0 810 ${height}`);
 
     const xAxis = d3
       .axisTop(scaleTime)
       .ticks(5)
       .tickFormat(d => `${Number(d) / 1000000}ms`);
 
-    const milliTicks = d3.ticks(
-      0,
-      (d3.max(spanDates, d => Number(d.span.endTimeUnixNano))! -
-        d3.min(spanDates, d => Number(d.span.startTimeUnixNano))!) as number,
-      5
-    );
+    const milliTicks = d3.ticks(0, maxNano - minNano, 5);
 
     const ticks = chart.append('g').attr('transform', 'translate(0,20)').call(xAxis);
 
@@ -201,9 +184,16 @@ const TraceTimeline = ({selectedSpan, onSelectSpan}: IProps) => {
       .append('rect')
       .attr('rx', 3)
       .attr('ry', 3)
-      .attr('x', d => scaleTime(Number(d.data.data.startTimeUnixNano) - minNano))
+      .attr('x', d => {
+        return scaleTime(Number(d.data.data.startTimeUnixNano || minNano) - minNano);
+      })
       .attr('y', 5)
-      .attr('width', (d: any) => scaleTime(Number(d.data.data.endTimeUnixNano) - Number(d.data.data.startTimeUnixNano)))
+      .attr('width', (d: any) => {
+        return (
+          scaleTime(Number(d.data.data.endTimeUnixNano || maxNano) - Number(d.data.data.startTimeUnixNano || minNano)) -
+          250
+        );
+      })
       .attr('height', theBarHeight / 2)
       .attr('stroke', 'none')
       .attr('fill', e => (e.depth < 2 ? 'rgb(70, 74, 102)' : 'rgb(29, 233, 182)'))
@@ -219,7 +209,7 @@ const TraceTimeline = ({selectedSpan, onSelectSpan}: IProps) => {
       .attr('pointer-events', 'none')
       .attr('alignment-baseline', 'middle')
       .attr('dominant-baseline', 'middle')
-      .text((d: any) => d.data.data.operationName);
+      .text((d: any) => d.data.data?.name?.split('/')?.pop());
 
     let nodeUpdate = node.merge(nodeEnter as any);
 
