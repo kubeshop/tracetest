@@ -35,7 +35,7 @@ type TestDB interface {
 
 //go:generate mockgen -package=mocks -destination=mocks/executor.go . TestExecutor
 type TestExecutor interface {
-	Execute(test *Test, tid trace.TraceID) (*Result, error)
+	Execute(test *Test, tid trace.TraceID, sid trace.SpanID) (*Result, error)
 }
 
 // ApiApiService is a service that implements the logic for the ApiApiServicer
@@ -54,7 +54,7 @@ func NewApiApiService(traceDB tracedb.TraceDB, testDB TestDB, executor TestExecu
 		traceDB:  traceDB,
 		testDB:   testDB,
 		executor: executor,
-		rand:     rand.New(rand.NewSource(0)),
+		rand:     rand.New(rand.NewSource(time.Now().UnixNano())),
 	}
 }
 
@@ -91,10 +91,14 @@ func (s *ApiApiService) TestsTestidRunPost(ctx context.Context, testid string) (
 	s.rand.Read(tid[:])
 	fmt.Printf("gen trace id: %v\n", tid)
 
+	sid := trace.SpanID{}
+	s.rand.Read(sid[:])
+	fmt.Printf("gen span id: %v\n", sid)
 	run := &Result{
 		Id:        id,
 		CreatedAt: time.Now(),
 		Traceid:   tid.String(),
+		Spanid:    sid.String(),
 	}
 
 	err = s.testDB.CreateResult(ctx, run)
@@ -102,9 +106,10 @@ func (s *ApiApiService) TestsTestidRunPost(ctx context.Context, testid string) (
 		return Response(http.StatusInternalServerError, err.Error()), err
 	}
 
-	go func(t *Test, tid trace.TraceID) {
+	go func(t *Test, tid trace.TraceID, sid trace.SpanID) {
+		ctx := context.Background()
 		fmt.Println("executing test")
-		resp, err := s.executor.Execute(t, tid)
+		resp, err := s.executor.Execute(t, tid, sid)
 		if err != nil {
 			fmt.Printf("exec err: %s", err)
 			return
@@ -117,7 +122,7 @@ func (s *ApiApiService) TestsTestidRunPost(ctx context.Context, testid string) (
 			fmt.Printf("update result err: %s", err)
 			return
 		}
-	}(t, tid)
+	}(t, tid, sid)
 
 	return Response(200, TestRun{
 		Id: id,
@@ -135,18 +140,22 @@ func (s *ApiApiService) TestsTestidResultsIdTraceGet(ctx context.Context, testID
 		return Response(http.StatusInternalServerError, err.Error()), err
 	}
 
-	/*
-		tid, err := trace.TraceIDFromHex(res.Traceid)
-		if err != nil {
-			return Response(http.StatusInternalServerError, err.Error()), err
-		}
-	*/
-
 	tr, err := s.traceDB.GetTraceByID(ctx, res.Traceid)
 	if err != nil {
 		return Response(http.StatusInternalServerError, err.Error()), err
 	}
-	return Response(http.StatusOK, tr), nil
+	sid, err := trace.SpanIDFromHex(res.Spanid)
+	if err != nil {
+		return Response(http.StatusInternalServerError, err.Error()), err
+	}
+
+	tid, err := trace.TraceIDFromHex(res.Traceid)
+	if err != nil {
+		return Response(http.StatusInternalServerError, err.Error()), err
+	}
+
+	ttr := FixParent(tr, string(tid[:]), string(sid[:]))
+	return Response(http.StatusOK, ttr), nil
 }
 
 // TestsTestidResultsIdGet -
