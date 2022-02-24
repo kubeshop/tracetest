@@ -35,6 +35,20 @@ func (m *MockTestDB) EXPECT() *MockTestDBMockRecorder {
 	return m.recorder
 }
 
+// CreateResult mocks base method.
+func (m *MockTestDB) CreateResult(arg0 context.Context, arg1 *openapi.Result) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateResult", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateResult indicates an expected call of CreateResult.
+func (mr *MockTestDBMockRecorder) CreateResult(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateResult", reflect.TypeOf((*MockTestDB)(nil).CreateResult), arg0, arg1)
+}
+
 // CreateTest mocks base method.
 func (m *MockTestDB) CreateTest(arg0 context.Context, arg1 *openapi.Test) (string, error) {
 	m.ctrl.T.Helper()
@@ -48,6 +62,21 @@ func (m *MockTestDB) CreateTest(arg0 context.Context, arg1 *openapi.Test) (strin
 func (mr *MockTestDBMockRecorder) CreateTest(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateTest", reflect.TypeOf((*MockTestDB)(nil).CreateTest), arg0, arg1)
+}
+
+// GetResult mocks base method.
+func (m *MockTestDB) GetResult(arg0 context.Context, arg1 string) (*openapi.Result, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetResult", arg0, arg1)
+	ret0, _ := ret[0].(*openapi.Result)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetResult indicates an expected call of GetResult.
+func (mr *MockTestDBMockRecorder) GetResult(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetResult", reflect.TypeOf((*MockTestDB)(nil).GetResult), arg0, arg1)
 }
 
 // GetTest mocks base method.
@@ -78,4 +107,18 @@ func (m *MockTestDB) GetTests(arg0 context.Context) ([]openapi.Test, error) {
 func (mr *MockTestDBMockRecorder) GetTests(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTests", reflect.TypeOf((*MockTestDB)(nil).GetTests), arg0)
+}
+
+// UpdateResult mocks base method.
+func (m *MockTestDB) UpdateResult(arg0 context.Context, arg1 *openapi.Result) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateResult", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateResult indicates an expected call of UpdateResult.
+func (mr *MockTestDBMockRecorder) UpdateResult(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateResult", reflect.TypeOf((*MockTestDB)(nil).UpdateResult), arg0, arg1)
 }

@@ -228,9 +228,9 @@ func (c *ApiApiController) TestsTestidResultsIdTraceGet(w http.ResponseWriter, r
 		c.errorHandler(w, r, err, &result)
 		return
 	}
-
 	// If no error, encode the body and the result code
-	EncodeJSONPBResponse(result.Body, &result.Code, w)
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
 }
 
 // TestsTestidRunPost -
