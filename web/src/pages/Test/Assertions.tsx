@@ -1,9 +1,8 @@
-import {Table} from 'antd';
+import {Button, Table} from 'antd';
 import {ColumnsType} from 'antd/lib/table';
+import Title from 'antd/lib/typography/Title';
 
 const Assertions = () => {
-  let sameKey: string;
-
   const dataSource = [
     {
       key: '1',
@@ -103,7 +102,15 @@ const Assertions = () => {
     },
   ];
 
-  return <Table dataSource={dataSource} columns={columns} />;
+  return (
+    <>
+      <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: 16}}>
+        <Title level={4}>Assertions</Title>
+        <Button>New Assertion</Button>
+      </div>
+      <Table dataSource={dataSource} columns={columns} />
+    </>
+  );
 };
 
 export default Assertions;
