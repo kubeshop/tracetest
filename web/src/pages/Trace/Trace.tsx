@@ -10,14 +10,13 @@ import TraceData from './TraceData';
 
 import data from './data.json';
 
-const spanMap = data.data
-  .map(i => i.spans)
-  .flat()
+const spanMap = data.resourceSpans
+  .map((i: any) => i.instrumentationLibrarySpans.map((el: any) => el.spans))
+  .flat(2)
   .reduce((acc: {[key: string]: {id: string; parentIds: string[]; data: any}}, span) => {
-    acc[span.spanID] = acc[span.spanID] || {id: span.spanID, parentIds: [], data: span};
-    span.references.forEach(p => {
-      acc[span.spanID].parentIds.push(p.spanID);
-    });
+    acc[span.spanId] = acc[span.spanId] || {id: span.spanId, parentIds: [], data: span};
+    acc[span.spanId].parentIds.push(span.parentSpanId);
+
     return acc;
   }, {});
 

@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	openapi "github.com/GIT_USER_ID/GIT_REPO_ID/go"
 	"github.com/GIT_USER_ID/GIT_REPO_ID/go/mocks"
@@ -55,9 +56,11 @@ func TestRunTest(t *testing.T) {
 
 	db := mocks.NewMockTestDB(ctrl)
 	db.EXPECT().GetTest(gomock.Any(), gomock.Any()).Return(&openapi.Test{}, nil)
+	db.EXPECT().CreateResult(gomock.Any(), gomock.Any()).Return(nil)
+	db.EXPECT().UpdateResult(gomock.Any(), gomock.Any()).Return(nil)
 	ex := mocks.NewMockTestExecutor(ctrl)
 
-	ex.EXPECT().Execute(gomock.Any()).Return(&openapi.Result{Id: "2"}, nil)
+	ex.EXPECT().Execute(gomock.Any(), gomock.Any(), gomock.Any()).Return(&openapi.Result{Id: "2"}, nil)
 	req := httptest.NewRequest(http.MethodPost, "/tests/1/run", nil)
 	w := httptest.NewRecorder()
 
@@ -65,7 +68,9 @@ func TestRunTest(t *testing.T) {
 	controller := openapi.NewApiApiController(ApiApiService)
 
 	ctr := controller.(*openapi.ApiApiController)
+
 	ctr.TestsTestidRunPost(w, req)
+
 	res := w.Result()
 	defer res.Body.Close()
 
@@ -74,4 +79,6 @@ func TestRunTest(t *testing.T) {
 	assert.Equal(t, w.Code, http.StatusOK)
 
 	t.Logf("response: %s\n", string(data))
+	//TODO: test executed in seperate goroutine
+	time.Sleep(100 * time.Millisecond)
 }

@@ -21,6 +21,9 @@ type Result struct {
 	// trace ID
 	Traceid string `json:"traceid,omitempty"`
 
+	// parent span ID
+	Spanid string `json:"spanid,omitempty"`
+
 	Successful Assertion `json:"successful,omitempty"`
 
 	Failed Assertion `json:"failed,omitempty"`

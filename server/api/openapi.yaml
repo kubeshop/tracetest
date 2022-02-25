@@ -252,6 +252,7 @@ components:
     Result:
       example:
         traceid: traceid
+        spanid: spanid
         createdAt: 2000-01-23T04:56:07.000+00:00
         completedAt: 2000-01-23T04:56:07.000+00:00
         id: id
@@ -274,6 +275,10 @@ components:
           type: string
         traceid:
           description: trace ID
+          readOnly: true
+          type: string
+        spanid:
+          description: parent span ID
           readOnly: true
           type: string
         successful:
