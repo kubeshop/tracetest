@@ -86,7 +86,12 @@ const TraceDiagram = ({spanMap, selectedSpan, onSelectSpan}: IPropsTraceDiagram)
 
   return (
     <div style={{height: height + 100}}>
-      <ReactFlow nodeTypes={{TraceNode}} elements={dagElements as any} onElementClick={handleElementClick}>
+      <ReactFlow
+        nodeTypes={{TraceNode}}
+        defaultZoom={0.5}
+        elements={dagElements as any}
+        onElementClick={handleElementClick}
+      >
         <Background variant={BackgroundVariant.Lines} gap={4} size={1} />
       </ReactFlow>
     </div>

@@ -14,7 +14,7 @@ export const useDAGChart = (spanMap: ISpanMap) => {
     .layering(d3DAG.layeringSimplex())
     .decross(d3DAG.decrossOpt())
     .coord(d3DAG.coordCenter())
-    .nodeSize(() => [300, 150]);
+    .nodeSize(() => [200, 150]);
 
   const {width, height} = layout(dag as any);
 
