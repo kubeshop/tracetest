@@ -97,6 +97,7 @@ func TestCreateResults(t *testing.T) {
 	}()
 	ti := time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC)
 	id := uuid.New().String()
+	testID := uuid.New().String()
 	res := openapi.Result{
 		Id:          id,
 		CreatedAt:   ti,
@@ -104,7 +105,7 @@ func TestCreateResults(t *testing.T) {
 		Traceid:     "123",
 	}
 	ctx := context.Background()
-	err = db.CreateResult(ctx, &res)
+	err = db.CreateResult(ctx, testID, &res)
 	assert.NoError(t, err)
 
 	gotRes, err := db.GetResult(ctx, id)
@@ -124,4 +125,42 @@ func TestCreateResults(t *testing.T) {
 	gotRes, err = db.GetResult(ctx, id)
 	assert.NoError(t, err)
 	assert.Equal(t, &res2, gotRes)
+
+	gotResults, err := db.GetResultsByTestID(ctx, testID)
+	assert.NoError(t, err)
+	assert.Equal(t, res2, gotResults[0])
+}
+
+func TestCreateAssertions(t *testing.T) {
+	dsn := "host=localhost user=postgres password=postgres port=5432 sslmode=disable"
+	db, err := testdb.New(dsn)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		err = db.Drop()
+		if err != nil {
+			t.Fatal(err)
+		}
+	}()
+	res := openapi.Assertion{
+		Selector:   "Selector",
+		Comparable: "Comperable",
+		Operator:   "Operator",
+		Successful: false,
+	}
+
+	testid := uuid.New().String()
+	ctx := context.Background()
+	id, err := db.CreateAssertion(ctx, testid, &res)
+	assert.NoError(t, err)
+	res.Id = id
+
+	gotRes, err := db.GetAssertion(ctx, id)
+	assert.NoError(t, err)
+	assert.Equal(t, &res, gotRes)
+
+	gotAssertions, err := db.GetAssertionsByTestID(ctx, testid)
+	assert.NoError(t, err)
+	assert.Equal(t, res, gotAssertions[0])
 }
