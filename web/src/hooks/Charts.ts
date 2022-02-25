@@ -5,7 +5,7 @@ interface ISpanMap {
 }
 
 export const useDAGChart = (spanMap: ISpanMap) => {
-  const dagData = Object.values(spanMap).map(({id, parentIds}) => ({id, parentIds}));
+  const dagData = Object.values(spanMap).map(({id, parentIds}) => ({id, parentIds: parentIds.filter(el => el)}));
   const stratify = d3DAG.dagStratify();
   const dag = stratify(dagData);
 
@@ -14,7 +14,7 @@ export const useDAGChart = (spanMap: ISpanMap) => {
     .layering(d3DAG.layeringSimplex())
     .decross(d3DAG.decrossOpt())
     .coord(d3DAG.coordCenter())
-    .nodeSize(() => [300, 150]);
+    .nodeSize(() => [200, 150]);
 
   const {width, height} = layout(dag as any);
 

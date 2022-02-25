@@ -1,28 +1,20 @@
-type RefType = 'CHILD_OF';
 export interface ISpan {
-  traceID: string;
-  spanID: string;
-  operationName: string;
-  references: Array<{
-    refType: RefType;
-    traceID: string;
-    spanID: string;
-  }>;
+  traceId: string;
+  spanId: string;
+  name: string;
+  kind: string;
   startTime: number;
   duration: number;
-  tags: Array<{
+  attributes: Array<{
     key: string;
-    type: string;
-    value: unknown;
+    value: {[key: string]: any};
   }>;
-  logs: Array<{
-    timestamp: number;
-    fields: Array<{
+  events: Array<{
+    timeUnixNano: string;
+    name: string;
+    attributes: Array<{
       key: string;
-      type: string;
-      value: unknown;
+      value: {[key: string]: any};
     }>;
   }>;
-  processID: string;
-  warnings: null;
 }
