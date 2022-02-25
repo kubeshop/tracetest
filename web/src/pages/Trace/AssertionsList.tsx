@@ -10,7 +10,7 @@ interface IProps {
 const AssertionList = ({targetSpan}: IProps) => {
   const [openCreateAssertion, setOpenCreateAssertion] = useState(false);
   return (
-    <div key={`key_${targetSpan?.spanID}`}>
+    <div>
       <Button onClick={() => setOpenCreateAssertion(true)}>New Assertion</Button>
       <CreateAssertionModal
         span={targetSpan}

@@ -18,10 +18,13 @@ import (
 // The ApiApiRouter implementation should parse necessary information from the http request,
 // pass the data to a ApiApiServicer to perform the required actions, then write the service results to the http response.
 type ApiApiRouter interface {
+	CreateAssertion(http.ResponseWriter, *http.Request)
 	CreateTest(http.ResponseWriter, *http.Request)
+	GetAssertions(http.ResponseWriter, *http.Request)
 	GetTests(http.ResponseWriter, *http.Request)
 	TestsIdResultsGet(http.ResponseWriter, *http.Request)
 	TestsTestidResultsIdGet(http.ResponseWriter, *http.Request)
+	TestsTestidResultsIdTraceGet(http.ResponseWriter, *http.Request)
 	TestsTestidRunPost(http.ResponseWriter, *http.Request)
 }
 
@@ -30,9 +33,12 @@ type ApiApiRouter interface {
 // while the service implementation can ignored with the .openapi-generator-ignore file
 // and updated with the logic required for the API.
 type ApiApiServicer interface {
+	CreateAssertion(context.Context, string, Assertion) (ImplResponse, error)
 	CreateTest(context.Context, Test) (ImplResponse, error)
+	GetAssertions(context.Context, string) (ImplResponse, error)
 	GetTests(context.Context) (ImplResponse, error)
 	TestsIdResultsGet(context.Context, string) (ImplResponse, error)
 	TestsTestidResultsIdGet(context.Context, string, string) (ImplResponse, error)
+	TestsTestidResultsIdTraceGet(context.Context, string, string) (ImplResponse, error)
 	TestsTestidRunPost(context.Context, string) (ImplResponse, error)
 }

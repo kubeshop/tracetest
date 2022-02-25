@@ -1,8 +1,7 @@
 import styled from 'styled-components';
 import {ReflexContainer, ReflexSplitter, ReflexElement} from 'react-reflex';
-import {Tabs} from 'antd';
 
-import Title from 'antd/lib/typography/Title';
+import {Tabs} from 'antd';
 import Text from 'antd/lib/typography/Text';
 
 import 'react-reflex/styles.css';
@@ -16,28 +15,18 @@ import TraceData from './TraceData';
 import data from './data.json';
 import AssertionList from './AssertionsList';
 
-const spanMap = data.data
-  .map(i => i.spans)
-  .flat()
+const spanMap = data.resourceSpans
+  .map((i: any) => i.instrumentationLibrarySpans.map((el: any) => el.spans))
+  .flat(2)
   .reduce((acc: {[key: string]: {id: string; parentIds: string[]; data: any}}, span) => {
-    acc[span.spanID] = acc[span.spanID] || {id: span.spanID, parentIds: [], data: span};
-    span.references.forEach(p => {
-      acc[span.spanID].parentIds.push(p.spanID);
-    });
+    acc[span.spanId] = acc[span.spanId] || {id: span.spanId, parentIds: [], data: span};
+    acc[span.spanId].parentIds.push(span.parentSpanId);
+
     return acc;
   }, {});
 
 const Grid = styled.div`
   display: grid;
-`;
-
-const Header = styled.div`
-  display: flex;
-  align-items: center;
-  width: 100%;
-  height: 64px;
-  padding: 0 32px;
-  border-bottom: 1px solid rgb(213, 215, 224);
 `;
 
 const Trace = () => {
@@ -49,9 +38,6 @@ const Trace = () => {
 
   return (
     <main>
-      <Header>
-        <Title level={3}>{data.data[0].spans[0].operationName}</Title>
-      </Header>
       <Grid>
         <ReflexContainer style={{height: '100vh'}} orientation="horizontal">
           <ReflexElement flex={0.6}>
@@ -71,9 +57,11 @@ const Trace = () => {
                     <Tabs.TabPane tab="Raw Data" key="1">
                       <TraceData json={JSON.parse(JSON.stringify(selectedSpan))} />
                     </Tabs.TabPane>
-                    <Tabs.TabPane tab="Assertions" key="2">
-                      <AssertionList targetSpan={spanMap[selectedSpan.id]?.data} />
-                    </Tabs.TabPane>
+                    {spanMap[selectedSpan.id]?.data && (
+                      <Tabs.TabPane tab="Assertions" key="2">
+                        <AssertionList targetSpan={spanMap[selectedSpan.id]?.data} />
+                      </Tabs.TabPane>
+                    )}
                   </Tabs>
                 </div>
               </ReflexElement>

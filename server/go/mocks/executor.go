@@ -9,6 +9,7 @@ import (
 
 	openapi "github.com/GIT_USER_ID/GIT_REPO_ID/go"
 	gomock "github.com/golang/mock/gomock"
+	trace "go.opentelemetry.io/otel/trace"
 )
 
 // MockTestExecutor is a mock of TestExecutor interface.
@@ -35,16 +36,16 @@ func (m *MockTestExecutor) EXPECT() *MockTestExecutorMockRecorder {
 }
 
 // Execute mocks base method.
-func (m *MockTestExecutor) Execute(arg0 *openapi.Test) (*openapi.Result, error) {
+func (m *MockTestExecutor) Execute(arg0 *openapi.Test, arg1 trace.TraceID, arg2 trace.SpanID) (*openapi.Result, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Execute", arg0)
+	ret := m.ctrl.Call(m, "Execute", arg0, arg1, arg2)
 	ret0, _ := ret[0].(*openapi.Result)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Execute indicates an expected call of Execute.
-func (mr *MockTestExecutorMockRecorder) Execute(arg0 interface{}) *gomock.Call {
+func (mr *MockTestExecutorMockRecorder) Execute(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Execute", reflect.TypeOf((*MockTestExecutor)(nil).Execute), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Execute", reflect.TypeOf((*MockTestExecutor)(nil).Execute), arg0, arg1, arg2)
 }

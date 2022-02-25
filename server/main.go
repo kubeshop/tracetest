@@ -30,7 +30,7 @@ func main() {
 	}
 	cfg := &jaegerdb.JaegerConnConfig{
 		GRPCClientSettings: configgrpc.GRPCClientSettings{
-			Endpoint:   "jaeger-query:80",
+			Endpoint:   "jaeger-query:16685",
 			TLSSetting: configtls.TLSClientSetting{Insecure: true},
 		},
 	}
@@ -49,6 +49,7 @@ func main() {
 	apiApiController := openapi.NewApiApiController(apiApiService)
 
 	router := openapi.NewRouter(apiApiController)
-
+	dir := "./html"
+	router.PathPrefix("/").Handler(http.FileServer(http.Dir(dir)))
 	log.Fatal(http.ListenAndServe(":8080", router))
 }

@@ -2,7 +2,7 @@ import {useState} from 'react';
 import styled from 'styled-components';
 import {Button, Input, List, Modal, Select as AntSelect, AutoComplete, Typography} from 'antd';
 
-import {ISpan, ISpanTag} from '../../types';
+import {ISpan} from '../../types';
 
 const {Title} = Typography;
 interface IProps {
@@ -21,7 +21,7 @@ const Select = styled(AntSelect)`
 const CreateAssertionModal = ({span, open, onClose}: IProps) => {
   const [assertionList, setAssertionList] = useState<any>(Array(3).fill({}));
 
-  const spanTagsMap = span.tags.reduce<{[key: string]: ISpanTag[]}>((acc, item) => {
+  const spanTagsMap = span.attributes.reduce((acc: any, item: any) => {
     const keyPrefix = item.key.split('.').shift();
     if (!keyPrefix) {
       return acc;
@@ -54,10 +54,10 @@ const CreateAssertionModal = ({span, open, onClose}: IProps) => {
 
   const keysOptions = Object.keys(spanTagsMap)
     .sort((el1, el2) => el1.charCodeAt(0) - el2.charCodeAt(0))
-    .map(tagKey => {
+    .map((tagKey: string) => {
       return {
         label: renderTitle(tagKey),
-        options: spanTagsMap[tagKey].map(el => renderItem(el.key)),
+        options: spanTagsMap[tagKey].map((el: any) => renderItem(el.key)),
       };
     });
 

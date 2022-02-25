@@ -2,3 +2,4 @@ go/api_api_service.go
 api_api_service.go
 main.go
 go.mod
+Dockerfile

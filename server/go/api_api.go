@@ -51,10 +51,22 @@ func NewApiApiController(s ApiApiServicer, opts ...ApiApiOption) Router {
 func (c *ApiApiController) Routes() Routes {
 	return Routes{
 		{
+			"CreateAssertion",
+			strings.ToUpper("Post"),
+			"/test/{id}/assertions",
+			c.CreateAssertion,
+		},
+		{
 			"CreateTest",
 			strings.ToUpper("Post"),
 			"/tests",
 			c.CreateTest,
+		},
+		{
+			"GetAssertions",
+			strings.ToUpper("Get"),
+			"/test/{id}/assertions",
+			c.GetAssertions,
 		},
 		{
 			"GetTests",
@@ -75,12 +87,45 @@ func (c *ApiApiController) Routes() Routes {
 			c.TestsTestidResultsIdGet,
 		},
 		{
+			"TestsTestidResultsIdTraceGet",
+			strings.ToUpper("Get"),
+			"/tests/{testid}/results/{id}/trace",
+			c.TestsTestidResultsIdTraceGet,
+		},
+		{
 			"TestsTestidRunPost",
 			strings.ToUpper("Post"),
 			"/tests/{testid}/run",
 			c.TestsTestidRunPost,
 		},
 	}
+}
+
+// CreateAssertion -
+func (c *ApiApiController) CreateAssertion(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	idParam := params["id"]
+
+	assertionParam := Assertion{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&assertionParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertAssertionRequired(assertionParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.CreateAssertion(r.Context(), idParam, assertionParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
 }
 
 // CreateTest - Create new test
@@ -97,6 +142,22 @@ func (c *ApiApiController) CreateTest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	result, err := c.service.CreateTest(r.Context(), testParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// GetAssertions -
+func (c *ApiApiController) GetAssertions(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	idParam := params["id"]
+
+	result, err := c.service.GetAssertions(r.Context(), idParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -151,6 +212,24 @@ func (c *ApiApiController) TestsTestidResultsIdGet(w http.ResponseWriter, r *htt
 	}
 	// If no error, encode the body and the result code
 	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// TestsTestidResultsIdTraceGet -
+func (c *ApiApiController) TestsTestidResultsIdTraceGet(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	testidParam := params["testid"]
+
+	idParam := params["id"]
+
+	result, err := c.service.TestsTestidResultsIdTraceGet(r.Context(), testidParam, idParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONPBResponse(result.Body, &result.Code, w)
 
 }
 

@@ -91,6 +91,32 @@ paths:
           description: successful operation
       tags:
       - api
+  /tests/{testid}/results/{id}/trace:
+    get:
+      parameters:
+      - explode: false
+        in: path
+        name: testid
+        required: true
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: trace
+      tags:
+      - api
   /tests/{id}/results:
     get:
       parameters:
@@ -112,37 +138,68 @@ paths:
           description: successful operation
       tags:
       - api
+  /test/{id}/assertions:
+    get:
+      description: Gets all assertions associated to the test
+      operationId: getAssertions
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Assertion'
+                type: array
+          description: successful operation
+      tags:
+      - api
+    post:
+      operationId: createAssertion
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Assertion'
+      responses:
+        "200":
+          description: OK
+      tags:
+      - api
 components:
   schemas:
     Test:
       example:
-        repeats: 6
+        repeats: 0
         name: name
         description: description
         id: id
         assertions:
-        - duration: duration
-          operationName: operationName
-          attributes:
-          - id: id
-            value: value
-            key: key
-          - id: id
-            value: value
-            key: key
+        - selector: selector
           id: id
-          numOfSPans: 0
-        - duration: duration
-          operationName: operationName
-          attributes:
-          - id: id
-            value: value
-            key: key
-          - id: id
-            value: value
-            key: key
+          comparable: comparable
+          operator: operator
+          successful: true
+        - selector: selector
           id: id
-          numOfSPans: 0
+          comparable: comparable
+          operator: operator
+          successful: true
         serviceUnderTest:
           auth: auth
           id: id
@@ -168,89 +225,74 @@ components:
       type: object
     Assertion:
       example:
-        duration: duration
-        operationName: operationName
-        attributes:
-        - id: id
-          value: value
-          key: key
-        - id: id
-          value: value
-          key: key
+        selector: selector
         id: id
-        numOfSPans: 0
+        comparable: comparable
+        operator: operator
+        successful: true
       properties:
         id:
           description: ID
           readOnly: true
           type: string
-        operationName:
+        selector:
+          description: Defines the scope where the sought property/ies is located
           type: string
-        duration:
-          format: duration
+        comparable:
+          description: Defines the expected value of the property/ies
           type: string
-        numOfSPans:
-          type: integer
-        attributes:
-          items:
-            $ref: '#/components/schemas/Attribute'
-          type: array
-      type: object
-    TestRun:
-      example:
-        id: id
-      properties:
-        id:
-          description: ID
-          readOnly: true
+        operator:
+          description: |
+            Defines how the value of sought property/ies should be compared
+            For example lt (less then), gt (greater then), eq (equals), in (contains)
           type: string
+        successful:
+          type: boolean
       type: object
     Result:
       example:
-        timeStamp: 2000-01-23T04:56:07.000+00:00
+        traceid: traceid
+        spanid: spanid
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        completedAt: 2000-01-23T04:56:07.000+00:00
         id: id
         failed:
-          duration: duration
-          operationName: operationName
-          attributes:
-          - id: id
-            value: value
-            key: key
-          - id: id
-            value: value
-            key: key
+          selector: selector
           id: id
-          numOfSPans: 0
+          comparable: comparable
+          operator: operator
+          successful: true
         successful:
-          duration: duration
-          operationName: operationName
-          attributes:
-          - id: id
-            value: value
-            key: key
-          - id: id
-            value: value
-            key: key
+          selector: selector
           id: id
-          numOfSPans: 0
+          comparable: comparable
+          operator: operator
+          successful: true
       properties:
         id:
           description: ID
+          readOnly: true
+          type: string
+        traceid:
+          description: trace ID
+          readOnly: true
+          type: string
+        spanid:
+          description: parent span ID
           readOnly: true
           type: string
         successful:
           $ref: '#/components/schemas/Assertion'
         failed:
           $ref: '#/components/schemas/Assertion'
-        timeStamp:
+        createdAt:
+          format: date-time
+          type: string
+        completedAt:
           format: date-time
           type: string
       type: object
     Attribute:
-      example:
-        id: id
-        value: value
-        key: key
       properties:
         id:
           description: ID
@@ -259,6 +301,15 @@ components:
         key:
           type: string
         value:
+          type: string
+      type: object
+    TestRun:
+      example:
+        id: id
+      properties:
+        id:
+          description: ID
+          readOnly: true
           type: string
       type: object
     Test_serviceUnderTest:

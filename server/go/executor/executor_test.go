@@ -1,6 +1,7 @@
 package executor_test
 
 import (
+	"math/rand"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -8,6 +9,7 @@ import (
 	openapi "github.com/GIT_USER_ID/GIT_REPO_ID/go"
 	"github.com/GIT_USER_ID/GIT_REPO_ID/go/executor"
 	"github.com/stretchr/testify/assert"
+	"go.opentelemetry.io/otel/trace"
 )
 
 func TestExecute(t *testing.T) {
@@ -33,7 +35,12 @@ func TestExecute(t *testing.T) {
 		},
 	}
 
-	resp, err := ex.Execute(test)
+	rnd := rand.New(rand.NewSource(0))
+	tid := trace.TraceID{}
+	rnd.Read(tid[:])
+	sid := trace.SpanID{}
+	rnd.Read(sid[:])
+
+	_, err = ex.Execute(test, tid, sid)
 	assert.NoError(t, err)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
 }
