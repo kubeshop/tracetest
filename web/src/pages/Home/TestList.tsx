@@ -1,7 +1,9 @@
 import {Table} from 'antd';
+import {useNavigate} from 'react-router-dom';
 import {useGetTestsQuery} from '../../services/TestService';
 
 const TestList = () => {
+  const navigate = useNavigate();
   const {data: tests, isLoading} = useGetTestsQuery();
 
   const columns = [
@@ -22,6 +24,11 @@ const TestList = () => {
       rowKey={test => test.id}
       loading={isLoading}
       columns={columns}
+      onRow={() => {
+        return {
+          onClick: () => navigate('/test'),
+        };
+      }}
     />
   );
 };
