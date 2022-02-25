@@ -20,7 +20,7 @@ const TestList = () => {
   ];
   return (
     <Table
-      dataSource={tests?.map(el => ({...el, url: el.serviceUnderTest.url}))}
+      dataSource={tests?.map(el => ({...el, url: el.serviceUnderTest.url})).reverse()}
       rowKey={test => test.id}
       loading={isLoading}
       columns={columns}
