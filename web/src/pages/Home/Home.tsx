@@ -11,7 +11,7 @@ const Home = (): JSX.Element => {
   };
 
   return (
-    <div>
+    <>
       <S.Header>
         <Title level={2}>Tracetest</Title>
       </S.Header>
@@ -26,7 +26,7 @@ const Home = (): JSX.Element => {
         </S.TestsContainer>
       </S.Content>
       <CreateTestModal visible={openCreateTestModal} onClose={() => setOpenCreateTestModal(false)} />
-    </div>
+    </>
   );
 };
 
