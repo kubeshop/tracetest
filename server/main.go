@@ -49,6 +49,7 @@ func main() {
 	apiApiController := openapi.NewApiApiController(apiApiService)
 
 	router := openapi.NewRouter(apiApiController)
-
+	dir := "./html"
+	router.PathPrefix("/").Handler(http.FileServer(http.Dir(dir)))
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
