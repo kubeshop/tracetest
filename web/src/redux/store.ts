@@ -5,6 +5,7 @@ export const store = configureStore({
   reducer: {
     [testAPI.reducerPath]: testAPI.reducer,
   },
+  middleware: getDefaultMiddleware => getDefaultMiddleware().concat(testAPI.middleware),
 });
 
 export type AppDispatch = typeof store.dispatch;

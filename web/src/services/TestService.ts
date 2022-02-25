@@ -4,7 +4,7 @@ import {Assertion, Test} from '../types';
 export const testAPI = createApi({
   reducerPath: 'testsAPI',
   baseQuery: fetchBaseQuery({
-    baseUrl: '/',
+    baseUrl: '/api/',
   }),
   tagTypes: ['Test'],
   endpoints: build => ({
@@ -14,6 +14,7 @@ export const testAPI = createApi({
         method: 'POST',
         body: newTest,
       }),
+      invalidatesTags: [{type: 'Test', id: 'LIST'}],
     }),
     runTest: build.mutation<{id: string}, string>({
       query: testId => ({
@@ -23,6 +24,7 @@ export const testAPI = createApi({
     }),
     getTests: build.query<Test[], void>({
       query: () => `/tests`,
+      providesTags: [{type: 'Test', id: 'LIST'}],
     }),
     getTestById: build.query<Test, string>({
       query: id => `/tests/${id}`,

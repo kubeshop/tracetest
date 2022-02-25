@@ -3,6 +3,7 @@ import {useGetTestsQuery} from '../../services/TestService';
 
 const TestList = () => {
   const {data: tests, isLoading} = useGetTestsQuery();
+
   const columns = [
     {
       title: 'Name',

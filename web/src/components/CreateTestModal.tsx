@@ -34,7 +34,7 @@ const CreateTestModal = ({visible, onClose}: IProps): JSX.Element => {
 
   return (
     <Modal title="" visible={visible} footer={null} closable onCancel={onClose}>
-      <h1 style={{height: '100%', width: '100%'}}>Create A New Test</h1>
+      <h1 style={{height: '100%', width: '100%'}}>Create New Test</h1>
       <Form
         name="newTest"
         labelCol={{span: 8}}

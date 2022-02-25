@@ -21,6 +21,7 @@ export const SideMenu = styled.div`
 
 export const TestsContainer = styled.div`
   flex: 0.8;
+  padding: 0 8px;
 `;
 
 export const CreateTestButton = styled(Button)`
