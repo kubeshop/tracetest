@@ -9,9 +9,9 @@ import (
 	"testing"
 	"time"
 
-	openapi "github.com/GIT_USER_ID/GIT_REPO_ID/go"
-	"github.com/GIT_USER_ID/GIT_REPO_ID/go/mocks"
 	"github.com/golang/mock/gomock"
+	openapi "github.com/kubeshop/tracetest/server/go"
+	"github.com/kubeshop/tracetest/server/go/mocks"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -56,12 +56,12 @@ func TestRunTest(t *testing.T) {
 
 	db := mocks.NewMockTestDB(ctrl)
 	db.EXPECT().GetTest(gomock.Any(), gomock.Any()).Return(&openapi.Test{}, nil)
-	db.EXPECT().CreateResult(gomock.Any(), "1", gomock.Any()).Return(nil)
+	db.EXPECT().CreateResult(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil)
 	db.EXPECT().UpdateResult(gomock.Any(), gomock.Any()).Return(nil)
 	ex := mocks.NewMockTestExecutor(ctrl)
 
 	ex.EXPECT().Execute(gomock.Any(), gomock.Any(), gomock.Any()).Return(&openapi.Result{Id: "2"}, nil)
-	req := httptest.NewRequest(http.MethodPost, "/tests/1/run", nil)
+	req := httptest.NewRequest(http.MethodPost, "/api/tests/1/run", nil)
 	w := httptest.NewRecorder()
 
 	ApiApiService := openapi.NewApiApiService(nil, db, ex)
@@ -99,7 +99,7 @@ func TestCreateNewAssertion(t *testing.T) {
 	db := mocks.NewMockTestDB(ctrl)
 	db.EXPECT().CreateAssertion(gomock.Any(), "", &assertion).Return("id", nil)
 
-	req := httptest.NewRequest(http.MethodPost, "/tests/testid/assertions", bytes.NewBuffer(b))
+	req := httptest.NewRequest(http.MethodPost, "/api/tests/testid/assertions", bytes.NewBuffer(b))
 	w := httptest.NewRecorder()
 
 	ApiApiService := openapi.NewApiApiService(nil, db, nil)

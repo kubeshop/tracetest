@@ -6,8 +6,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	openapi "github.com/GIT_USER_ID/GIT_REPO_ID/go"
-	"github.com/GIT_USER_ID/GIT_REPO_ID/go/executor"
+	openapi "github.com/kubeshop/tracetest/server/go"
+	"github.com/kubeshop/tracetest/server/go/executor"
 	"github.com/stretchr/testify/assert"
 	"go.opentelemetry.io/otel/trace"
 )

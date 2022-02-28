@@ -5,8 +5,8 @@ import (
 	"io"
 	"net/http"
 
-	openapi "github.com/GIT_USER_ID/GIT_REPO_ID/go"
 	"github.com/google/uuid"
+	openapi "github.com/kubeshop/tracetest/server/go"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"

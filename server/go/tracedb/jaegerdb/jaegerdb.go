@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"io"
 
-	pb "github.com/GIT_USER_ID/GIT_REPO_ID/go/internal/proto-gen-go/api_v3"
-	"github.com/GIT_USER_ID/GIT_REPO_ID/go/tracedb"
+	pb "github.com/kubeshop/tracetest/server/go/internal/proto-gen-go/api_v3"
+	"github.com/kubeshop/tracetest/server/go/tracedb"
 	"go.opentelemetry.io/collector/component/componenttest"
 	"go.opentelemetry.io/collector/config/configgrpc"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"

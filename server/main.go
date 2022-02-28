@@ -13,10 +13,10 @@ import (
 	"log"
 	"net/http"
 
-	openapi "github.com/GIT_USER_ID/GIT_REPO_ID/go"
-	"github.com/GIT_USER_ID/GIT_REPO_ID/go/executor"
-	"github.com/GIT_USER_ID/GIT_REPO_ID/go/testdb"
-	"github.com/GIT_USER_ID/GIT_REPO_ID/go/tracedb/jaegerdb"
+	openapi "github.com/kubeshop/tracetest/server/go"
+	"github.com/kubeshop/tracetest/server/go/executor"
+	"github.com/kubeshop/tracetest/server/go/testdb"
+	"github.com/kubeshop/tracetest/server/go/tracedb/jaegerdb"
 	"go.opentelemetry.io/collector/config/configgrpc"
 	"go.opentelemetry.io/collector/config/configtls"
 )
