@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/GIT_USER_ID/GIT_REPO_ID/go/tracedb/jaegerdb"
 	"github.com/gogo/protobuf/jsonpb"
+	"github.com/kubeshop/tracetest/server/go/tracedb/jaegerdb"
 	"github.com/stretchr/testify/assert"
 	"go.opentelemetry.io/collector/config/configgrpc"
 	"go.opentelemetry.io/collector/config/configtls"

@@ -6,8 +6,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	openapi "github.com/GIT_USER_ID/GIT_REPO_ID/go"
 	"github.com/google/uuid"
+	openapi "github.com/kubeshop/tracetest/server/go"
 	_ "github.com/lib/pq"
 )
 

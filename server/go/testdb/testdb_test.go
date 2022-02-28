@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	openapi "github.com/GIT_USER_ID/GIT_REPO_ID/go"
-	"github.com/GIT_USER_ID/GIT_REPO_ID/go/testdb"
 	"github.com/google/uuid"
+	openapi "github.com/kubeshop/tracetest/server/go"
+	"github.com/kubeshop/tracetest/server/go/testdb"
 	"github.com/stretchr/testify/assert"
 )
 

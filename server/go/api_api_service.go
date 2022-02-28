@@ -16,8 +16,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/GIT_USER_ID/GIT_REPO_ID/go/tracedb"
 	"github.com/google/uuid"
+	"github.com/kubeshop/tracetest/server/go/tracedb"
 	"go.opentelemetry.io/otel/trace"
 )
 
