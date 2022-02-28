@@ -4,7 +4,7 @@ info:
   title: Project X
   version: 0.0.1
 servers:
-- url: /
+- url: /api
 paths:
   /tests:
     get:
@@ -138,7 +138,7 @@ paths:
           description: successful operation
       tags:
       - api
-  /test/{id}/assertions:
+  /tests/{id}/assertions:
     get:
       description: Gets all assertions associated to the test
       operationId: getAssertions

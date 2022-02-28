@@ -3,6 +3,8 @@ info:
   version: 0.0.1
   title: Project X
   description: OpenAPI definition for project X endpoint and resources
+servers:
+  - url: /api
 paths:
   /tests:
     get:
@@ -139,7 +141,7 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Result"
-  /test/{id}/assertions:
+  /tests/{id}/assertions:
     get:
       tags:
         - api
