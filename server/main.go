@@ -10,6 +10,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"net/http"
 
@@ -17,25 +18,22 @@ import (
 	"github.com/kubeshop/tracetest/server/go/executor"
 	"github.com/kubeshop/tracetest/server/go/testdb"
 	"github.com/kubeshop/tracetest/server/go/tracedb/jaegerdb"
-	"go.opentelemetry.io/collector/config/configgrpc"
-	"go.opentelemetry.io/collector/config/configtls"
 )
 
-func main() {
-	log.Printf("Server started")
+var cfg = flag.String("config", "config.yaml", "path to the config file")
 
-	testDB, err := testdb.New("host=postgres user=postgres password=postgres port=5432 sslmode=disable")
+func main() {
+	flag.Parse()
+	c, err := LoadConfig(*cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
-	cfg := &jaegerdb.JaegerConnConfig{
-		GRPCClientSettings: configgrpc.GRPCClientSettings{
-			Endpoint:   "jaeger-query:16685",
-			TLSSetting: configtls.TLSClientSetting{Insecure: true},
-		},
+	testDB, err := testdb.New(c.PostgresConnString)
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	traceDB, err := jaegerdb.New(cfg)
+	traceDB, err := jaegerdb.New(&c.JaegerConnectionConfig)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -51,5 +49,7 @@ func main() {
 	router := openapi.NewRouter(apiApiController)
 	dir := "./html"
 	router.PathPrefix("/").Handler(http.FileServer(http.Dir(dir)))
+
+	log.Printf("Server started")
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
