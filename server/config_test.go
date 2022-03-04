@@ -14,8 +14,22 @@ func TestLoadConfig(t *testing.T) {
 
 	expected := &Config{
 		PostgresConnString: "host=postgres user=postgres password=postgres port=5432 sslmode=disable",
-		JaegerConnectionConfig: configgrpc.GRPCClientSettings{
+		JaegerConnectionConfig: &configgrpc.GRPCClientSettings{
 			Endpoint:   "jaeger-query:16685",
+			TLSSetting: configtls.TLSClientSetting{Insecure: true},
+		},
+	}
+	assert.Equal(t, expected, got)
+}
+
+func TestLoadConfigTempo(t *testing.T) {
+	got, err := LoadConfig("testdata/tempo-config.yaml")
+	assert.NoError(t, err)
+
+	expected := &Config{
+		PostgresConnString: "host=postgres user=postgres password=postgres port=5432 sslmode=disable",
+		TempoConnectionConfig: &configgrpc.GRPCClientSettings{
+			Endpoint:   "tempo:9095",
 			TLSSetting: configtls.TLSClientSetting{Insecure: true},
 		},
 	}

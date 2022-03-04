@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
-  description: OpenAPI definition for project X endpoint and resources
-  title: Project X
+  description: OpenAPI definition for TraceTest endpoint and resources
+  title: TraceTest
   version: 0.0.1
 servers:
 - url: /api
@@ -42,6 +42,30 @@ paths:
         "500":
           description: problem with creating test
       summary: Create new test
+      tags:
+      - api
+  /tests/{testid}:
+    get:
+      description: get test
+      operationId: getTest
+      parameters:
+      - explode: false
+        in: path
+        name: testid
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Test'
+          description: successful operation
+        "500":
+          description: problem with creating test
+      summary: get test
       tags:
       - api
   /tests/{testid}/run:
