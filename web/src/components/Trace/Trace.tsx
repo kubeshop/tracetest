@@ -7,6 +7,7 @@ import Text from 'antd/lib/typography/Text';
 import 'react-reflex/styles.css';
 
 import {useState} from 'react';
+import {Test} from 'types';
 
 import TraceDiagram from './TraceDiagram';
 import TraceTimeline from './TraceTimeline';
@@ -14,7 +15,6 @@ import TraceData from './TraceData';
 
 import data from './data.json';
 import AssertionList from './AssertionsList';
-import {Test} from '../../types';
 
 const spanMap = data.resourceSpans
   .map((i: any) => i.instrumentationLibrarySpans.map((el: any) => el.spans))

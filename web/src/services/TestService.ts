@@ -1,5 +1,5 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
-import {Assertion, Test} from '../types';
+import {Assertion, Test} from 'types';
 
 export const testAPI = createApi({
   reducerPath: 'testsAPI',

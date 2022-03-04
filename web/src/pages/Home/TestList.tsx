@@ -1,6 +1,6 @@
 import {Table} from 'antd';
 import {useNavigate} from 'react-router-dom';
-import {useGetTestsQuery} from '../../services/TestService';
+import {useGetTestsQuery} from 'services/TestService';
 
 const TestList = () => {
   const navigate = useNavigate();

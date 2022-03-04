@@ -1,8 +1,8 @@
 import Text from 'antd/lib/typography/Text';
 import {useMemo} from 'react';
 import ReactFlow, {Background, BackgroundVariant, Handle, NodeProps, Position} from 'react-flow-renderer';
-import {useDAGChart} from '../../hooks/Charts';
-import {ISpan} from '../../types';
+import {useDAGChart} from 'hooks/Charts';
+import {ISpan} from 'types';
 import * as S from './TraceDiagram.styled';
 
 interface IPropsTraceNode extends NodeProps<ISpan> {}

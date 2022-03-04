@@ -1,6 +1,6 @@
 import Title from 'antd/lib/typography/Title';
 import {useState} from 'react';
-import CreateTestModal from '../../components/CreateTestModal';
+import CreateTestModal from 'components/CreateTestModal';
 import TestList from './TestList';
 import * as S from './Home.styled';
 
