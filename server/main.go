@@ -17,7 +17,9 @@ import (
 	openapi "github.com/kubeshop/tracetest/server/go"
 	"github.com/kubeshop/tracetest/server/go/executor"
 	"github.com/kubeshop/tracetest/server/go/testdb"
+	"github.com/kubeshop/tracetest/server/go/tracedb"
 	"github.com/kubeshop/tracetest/server/go/tracedb/jaegerdb"
+	"github.com/kubeshop/tracetest/server/go/tracedb/tempodb"
 )
 
 var cfg = flag.String("config", "config.yaml", "path to the config file")
@@ -33,9 +35,20 @@ func main() {
 		log.Fatal(err)
 	}
 
-	traceDB, err := jaegerdb.New(&c.JaegerConnectionConfig)
-	if err != nil {
-		log.Fatal(err)
+	var traceDB tracedb.TraceDB
+	switch {
+	case c.JaegerConnectionConfig != nil:
+		log.Printf("connecting to Jaeger: %s\n", c.JaegerConnectionConfig.Endpoint)
+		traceDB, err = jaegerdb.New(c.JaegerConnectionConfig)
+		if err != nil {
+			log.Fatal(err)
+		}
+	case c.TempoConnectionConfig != nil:
+		log.Printf("connecting to tempo: %s\n", c.TempoConnectionConfig.Endpoint)
+		traceDB, err = tempodb.New(c.TempoConnectionConfig)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	ex, err := executor.New()

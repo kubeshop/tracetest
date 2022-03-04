@@ -13,7 +13,7 @@ WORKDIR /go/src
 COPY ./server/go.mod ./server/go.sum ./
 RUN go mod download
 COPY ./server/go ./go
-COPY ./server/main.go ./main.go
+COPY ./server/*.go ./
 RUN go build -o openapi .
 
 FROM ubuntu AS release

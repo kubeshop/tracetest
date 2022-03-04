@@ -16,7 +16,8 @@ PROTOC=docker run --rm -u ${shell id -u} -v "${PWD}:${PWD}" -w ${PWD} ${PROTOC_I
 PROTO_INCLUDES := \
 	-Ijaeger-idl/proto \
 	-I/usr/include/github.com/gogo/protobuf \
-	-Iopentelemetry-proto
+	-Iopentelemetry-proto \
+	-Iopentelemetry-proto/opentelemetry/proto
 
 PROTO_GOGO_MAPPINGS := $(shell echo \
 		Mgoogle/protobuf/descriptor.proto=github.com/gogo/protobuf/types, \
@@ -26,6 +27,7 @@ PROTO_GOGO_MAPPINGS := $(shell echo \
 		Mgoogle/api/annotations.proto=github.com/gogo/googleapis/google/api, \
 		Mgoogle/api/annotations.proto=github.com/gogo/googleapis/google/api, \
 		Mopentelemetry/proto/trace/v1/trace.proto=go.opentelemetry.io/proto/otlp/trace/v1, \
+		Mtrace/v1/trace.proto=go.opentelemetry.io/proto/otlp/trace/v1, \
 		Mmodel.proto=github.com/jaegertracing/jaeger/model \
 	| sed 's/ //g')
 
@@ -52,4 +54,8 @@ proto:
 		protoc-gen-swagger/options/annotations.proto \
 		protoc-gen-swagger/options/openapiv2.proto \
 		gogoproto/gogo.proto
+
+	$(PROTOC_WITH_GRPC) \
+		tempo-idl/tempo.proto
+	cp tempo-idl/prealloc.go server/go/internal/proto-gen-go/tempo-idl/
 
