@@ -14,6 +14,7 @@ import TraceData from './TraceData';
 
 import data from './data.json';
 import AssertionList from './AssertionsList';
+import {Test} from '../../types';
 
 const spanMap = data.resourceSpans
   .map((i: any) => i.instrumentationLibrarySpans.map((el: any) => el.spans))
@@ -29,7 +30,7 @@ const Grid = styled.div`
   display: grid;
 `;
 
-const Trace = () => {
+const Trace = ({test}: {test: Test}) => {
   const [selectedSpan, setSelectedSpan] = useState<any>({});
 
   const handleSelectSpan = (span: any) => {
@@ -59,7 +60,7 @@ const Trace = () => {
                     </Tabs.TabPane>
                     {spanMap[selectedSpan.id]?.data && (
                       <Tabs.TabPane tab="Assertions" key="2">
-                        <AssertionList targetSpan={spanMap[selectedSpan.id]?.data} />
+                        <AssertionList testId={test.id} targetSpan={spanMap[selectedSpan.id]?.data} />
                       </Tabs.TabPane>
                     )}
                   </Tabs>

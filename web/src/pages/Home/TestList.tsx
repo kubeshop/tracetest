@@ -24,9 +24,9 @@ const TestList = () => {
       rowKey={test => test.id}
       loading={isLoading}
       columns={columns}
-      onRow={() => {
+      onRow={(record, rowIndex) => {
         return {
-          onClick: () => navigate('/test'),
+          onClick: () => navigate(`/test/${record.id}`),
         };
       }}
     />
