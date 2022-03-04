@@ -1,9 +1,9 @@
 import {Tabs} from 'antd';
 import Title from 'antd/lib/typography/Title';
 import {useParams} from 'react-router-dom';
-import {useGetTestByIdQuery} from '../../services/TestService';
+import {useGetTestByIdQuery} from 'services/TestService';
 
-import Trace from '../../components/Trace';
+import Trace from 'components/Trace';
 import Assertions from './Assertions';
 import * as S from './Test.styled';
 

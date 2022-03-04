@@ -1,6 +1,6 @@
 import {Modal as AntModal, Form, Input, Button} from 'antd';
 import styled from 'styled-components';
-import {useCreateTestMutation} from '../services/TestService';
+import {useCreateTestMutation} from 'services/TestService';
 
 const Modal = styled(AntModal)`
   .ant-modal {

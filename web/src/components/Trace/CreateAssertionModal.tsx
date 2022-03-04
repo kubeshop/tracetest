@@ -4,9 +4,9 @@ import {Button, Input, List, Modal, Select as AntSelect, AutoComplete, Typograph
 import jemsPath from 'jmespath';
 import Text from 'antd/lib/typography/Text';
 
+import {IAttribute, ISpan} from 'types';
+import {useCreateAssertionMutation} from 'services/TestService';
 import data from './data.json';
-import {IAttribute, ISpan} from '../../types';
-import {useCreateAssertionMutation} from '../../services/TestService';
 
 const {Title} = Typography;
 interface IProps {

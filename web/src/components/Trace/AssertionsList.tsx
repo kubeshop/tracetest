@@ -1,8 +1,9 @@
 import {useState} from 'react';
 import {Button} from 'antd';
-import {ISpan} from '../../types';
+import {ISpan} from 'types';
+import {useGetTestAssertionsQuery} from 'services/TestService';
+
 import CreateAssertionModal from './CreateAssertionModal';
-import {useGetTestAssertionsQuery} from '../../services/TestService';
 
 interface IProps {
   testId: string;
