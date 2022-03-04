@@ -19,10 +19,11 @@ export interface ISpan {
   }>;
 }
 
-interface IAttribute {
-  id: string;
+export interface IAttribute {
+  id?: string;
   key: string;
   value: string;
+  type: 'span' | 'resource';
 }
 
 export interface Test {
@@ -39,10 +40,10 @@ export interface Test {
 }
 export interface Assertion {
   id: string;
-  operationName: string;
-  duration: string;
-  numOfSPans: number;
-  attributes: Array<IAttribute>;
+  selector: string;
+  comparable: string;
+  operator: string;
+  successful?: string;
 }
 
 export interface TestResult {
