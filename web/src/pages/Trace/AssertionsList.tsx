@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {Button, List, Typography} from 'antd';
+import {Button} from 'antd';
 import {ISpan} from '../../types';
 import CreateAssertionModal from './CreateAssertionModal';
 import {useGetTestAssertionsQuery} from '../../services/TestService';
