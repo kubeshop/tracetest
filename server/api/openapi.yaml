@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
-  description: OpenAPI definition for project X endpoint and resources
-  title: Project X
+  description: OpenAPI definition for TraceTest endpoint and resources
+  title: TraceTest
   version: 0.0.1
 servers:
 - url: /api
