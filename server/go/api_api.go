@@ -69,6 +69,12 @@ func (c *ApiApiController) Routes() Routes {
 			c.GetAssertions,
 		},
 		{
+			"GetTest",
+			strings.ToUpper("Get"),
+			"/api/tests/{testid}",
+			c.GetTest,
+		},
+		{
 			"GetTests",
 			strings.ToUpper("Get"),
 			"/api/tests",
@@ -158,6 +164,22 @@ func (c *ApiApiController) GetAssertions(w http.ResponseWriter, r *http.Request)
 	idParam := params["id"]
 	
 	result, err := c.service.GetAssertions(r.Context(), idParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// GetTest - get test
+func (c *ApiApiController) GetTest(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	testidParam := params["testid"]
+	
+	result, err := c.service.GetTest(r.Context(), testidParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

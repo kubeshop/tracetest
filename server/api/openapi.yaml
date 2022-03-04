@@ -44,6 +44,30 @@ paths:
       summary: Create new test
       tags:
       - api
+  /tests/{testid}:
+    get:
+      description: get test
+      operationId: getTest
+      parameters:
+      - explode: false
+        in: path
+        name: testid
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Test'
+          description: successful operation
+        "500":
+          description: problem with creating test
+      summary: get test
+      tags:
+      - api
   /tests/{testid}/run:
     post:
       parameters:

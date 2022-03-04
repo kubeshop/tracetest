@@ -56,6 +56,28 @@ paths:
           #       type: array
           #       items:
           #         $ref: "#/components/schemas/Problem"
+  /tests/{testid}:
+    get:
+      tags:
+        - api
+      parameters:
+        - in: path
+          name: testid
+          schema:
+            type: string
+          required: true
+      summary: "get test"
+      description: "get test"
+      operationId: getTest
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Test"
+        500:
+          description: "problem with creating test"
   /tests/{testid}/run:
     post:
       tags:
