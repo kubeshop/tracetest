@@ -54,10 +54,10 @@ func (ttd *TempoTraceDB) GetTraceByID(ctx context.Context, traceID string) (*v1.
 		return nil, fmt.Errorf("tempo err: %w", err)
 	}
 
+	fmt.Printf("tempo resp: %#v\n", resp.Trace.Batches)
 	if len(resp.Trace.Batches) == 0 {
 		return nil, tracedb.ErrTraceNotFound
 	}
-	fmt.Printf("tempo resp: %#v\n", resp.Trace.Batches)
 	return &v1.TracesData{
 		ResourceSpans: resp.GetTrace().GetBatches(),
 	}, nil

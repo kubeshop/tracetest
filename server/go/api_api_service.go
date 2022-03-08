@@ -120,7 +120,7 @@ func (s *ApiApiService) TestsTestidRunPost(ctx context.Context, testid string) (
 		return Response(http.StatusInternalServerError, err.Error()), err
 	}
 
-	go func(t *Test, tid trace.TraceID, sid trace.SpanID) {
+	go func(t *Test, tid trace.TraceID, sid trace.SpanID, run *Result) {
 		ctx := context.Background()
 		fmt.Println("executing test")
 		resp, err := s.executor.Execute(t, tid, sid)
@@ -136,7 +136,8 @@ func (s *ApiApiService) TestsTestidRunPost(ctx context.Context, testid string) (
 			fmt.Printf("update result err: %s", err)
 			return
 		}
-	}(t, tid, sid)
+		fmt.Println("executed successfully")
+	}(t, tid, sid, run)
 
 	return Response(200, TestRun{
 		Id: id,
