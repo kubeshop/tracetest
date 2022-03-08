@@ -27,8 +27,8 @@ type TestDB interface {
 	GetTests(ctx context.Context) ([]Test, error)
 	GetTest(ctx context.Context, id string) (*Test, error)
 
-	CreateResult(ctx context.Context, testID string, run *Result) error
-	UpdateResult(ctx context.Context, run *Result) error
+	CreateResult(ctx context.Context, testID string, res *Result) error
+	UpdateResult(ctx context.Context, res *Result) error
 	GetResult(ctx context.Context, id string) (*Result, error)
 	GetResultsByTestID(ctx context.Context, testid string) ([]Result, error)
 
@@ -108,19 +108,19 @@ func (s *ApiApiService) TestsTestidRunPost(ctx context.Context, testid string) (
 	sid := trace.SpanID{}
 	s.rand.Read(sid[:])
 	fmt.Printf("gen span id: %v\n", sid)
-	run := &Result{
+	res := &Result{
 		Id:        id,
 		CreatedAt: time.Now(),
 		Traceid:   tid.String(),
 		Spanid:    sid.String(),
 	}
 
-	err = s.testDB.CreateResult(ctx, testid, run)
+	err = s.testDB.CreateResult(ctx, testid, res)
 	if err != nil {
 		return Response(http.StatusInternalServerError, err.Error()), err
 	}
 
-	go func(t *Test, tid trace.TraceID, sid trace.SpanID) {
+	go func(t *Test, tid trace.TraceID, sid trace.SpanID, res *Result) {
 		ctx := context.Background()
 		fmt.Println("executing test")
 		resp, err := s.executor.Execute(t, tid, sid)
@@ -130,13 +130,14 @@ func (s *ApiApiService) TestsTestidRunPost(ctx context.Context, testid string) (
 		}
 		fmt.Println(resp)
 
-		run.CompletedAt = time.Now()
-		err = s.testDB.UpdateResult(ctx, run)
+		res.CompletedAt = time.Now()
+		err = s.testDB.UpdateResult(ctx, res)
 		if err != nil {
 			fmt.Printf("update result err: %s", err)
 			return
 		}
-	}(t, tid, sid)
+		fmt.Println("executed successfully")
+	}(t, tid, sid, res)
 
 	return Response(200, TestRun{
 		Id: id,
