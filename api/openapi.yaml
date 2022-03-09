@@ -242,6 +242,12 @@ components:
           items:
             $ref: "#/components/schemas/Result"
           description: Test results
+        version:
+          type: string
+          description: version of the test
+        parent_test: 
+          type: string
+          description: refernece to the previous version of test
     Assertion:
       type: object
       properties:
