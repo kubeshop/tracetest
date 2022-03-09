@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS tests  (
 	_, err = db.Exec(`
 CREATE TABLE IF NOT EXISTS results  (
 	id UUID NOT NULL PRIMARY KEY,
-	testid UUID NOT NULL,
+	test_id UUID NOT NULL,
 	result json NOT NULL
 );
 `)

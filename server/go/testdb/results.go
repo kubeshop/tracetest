@@ -9,7 +9,7 @@ import (
 )
 
 func (td *TestDB) CreateResult(ctx context.Context, testid string, run *openapi.Result) error {
-	stmt, err := td.db.Prepare("INSERT INTO results(id, testid, result) VALUES( $1, $2, $3 )")
+	stmt, err := td.db.Prepare("INSERT INTO results(id, test_id, result) VALUES( $1, $2, $3 )")
 	if err != nil {
 		return fmt.Errorf("sql prepare: %w", err)
 	}
@@ -48,7 +48,7 @@ func (td *TestDB) GetResult(ctx context.Context, id string) (*openapi.Result, er
 }
 
 func (td *TestDB) GetResultsByTestID(ctx context.Context, testID string) ([]openapi.Result, error) {
-	stmt, err := td.db.Prepare("SELECT result FROM results WHERE testid = $1")
+	stmt, err := td.db.Prepare("SELECT result FROM results WHERE test_id = $1")
 	if err != nil {
 		return nil, err
 	}
