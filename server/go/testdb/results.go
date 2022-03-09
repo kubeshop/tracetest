@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	openapi "github.com/GIT_USER_ID/GIT_REPO_ID/go"
+	openapi "github.com/kubeshop/tracetest/server/go"
 )
 
 func (td *TestDB) CreateResult(ctx context.Context, testid string, run *openapi.Result) error {
@@ -47,7 +47,7 @@ func (td *TestDB) GetResult(ctx context.Context, id string) (*openapi.Result, er
 	return &run, nil
 }
 
-func (td *TestDB) GetTestResults(ctx context.Context, testID string) ([]openapi.Result, error) {
+func (td *TestDB) GetResultsByTestID(ctx context.Context, testID string) ([]openapi.Result, error) {
 	stmt, err := td.db.Prepare("SELECT result FROM results WHERE testid = $1")
 	if err != nil {
 		return nil, err

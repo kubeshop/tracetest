@@ -203,14 +203,12 @@ func (c *ApiApiController) GetTests(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// TestsTestidResultsIdGet -
-func (c *ApiApiController) TestsTestidResultsIdGet(w http.ResponseWriter, r *http.Request) {
+// TestsIdResultsGet -
+func (c *ApiApiController) TestsIdResultsGet(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	testidParam := params["testid"]
-
 	idParam := params["id"]
 
-	result, err := c.service.TestsTestidResultsIdGet(r.Context(), testidParam, idParam)
+	result, err := c.service.TestsIdResultsGet(r.Context(), idParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

@@ -95,7 +95,7 @@ func (td *TestDB) GetTest(ctx context.Context, id string) (*openapi.Test, error)
 		return nil, err
 	}
 
-	results, err := td.GetTestResults(ctx, id)
+	results, err := td.GetResultsByTestID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -128,7 +128,7 @@ func (td *TestDB) GetTests(ctx context.Context) ([]openapi.Test, error) {
 			return nil, err
 		}
 
-		results, err := td.GetTestResults(ctx, test.Id)
+		results, err := td.GetResultsByTestID(ctx, test.Id)
 		if err != nil {
 			return nil, err
 		}
