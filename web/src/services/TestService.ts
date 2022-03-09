@@ -1,12 +1,12 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
-import {Assertion, Test} from 'types';
+import {Assertion, ITestResult, ITrace, Test, TestId} from 'types';
 
 export const testAPI = createApi({
   reducerPath: 'testsAPI',
   baseQuery: fetchBaseQuery({
     baseUrl: '/api/',
   }),
-  tagTypes: ['Test'],
+  tagTypes: ['Test', 'TestResult', 'Trace'],
   endpoints: build => ({
     createTest: build.mutation<Test, Partial<Test>>({
       query: newTest => ({
@@ -21,6 +21,7 @@ export const testAPI = createApi({
         url: `/tests/${testId}/run`,
         method: 'POST',
       }),
+      invalidatesTags: ['TestResult'],
     }),
     getTests: build.query<Test[], void>({
       query: () => `/tests`,
@@ -44,11 +45,18 @@ export const testAPI = createApi({
       }),
       invalidatesTags: (result, error, args) => [{type: 'Test', id: args.testId}],
     }),
-    getTestResults: build.query<Assertion[], Pick<Test, 'id'>>({
-      query: ({id}) => `/tests/${id}/results`,
+    getTestResults: build.query<ITestResult[], TestId>({
+      query: id => `/tests/${id}/results`,
+      providesTags: result =>
+        result
+          ? [...result.map(el => ({type: 'TestResult' as const, id: el.id})), {type: 'TestResult' as const, id: 'LIST'}]
+          : [{type: 'TestResult' as const, id: 'LIST'}],
     }),
     getTestResultById: build.query<Assertion[], Pick<Test, 'id'> & {resultId: string}>({
       query: ({id, resultId}) => `/tests/${id}/results/${resultId}`,
+    }),
+    getTestTrace: build.query<ITrace, Pick<Test, 'id'> & {resultId: string}>({
+      query: ({id, resultId}) => `/tests/${id}/results/${resultId}/trace`,
     }),
   }),
 });
@@ -56,9 +64,11 @@ export const testAPI = createApi({
 export const {
   useCreateTestMutation,
   useCreateAssertionMutation,
+  useRunTestMutation,
   useGetTestAssertionsQuery,
   useGetTestByIdQuery,
   useGetTestResultByIdQuery,
   useGetTestResultsQuery,
   useGetTestsQuery,
+  useGetTestTraceQuery,
 } = testAPI;
