@@ -228,6 +228,43 @@ components:
           auth: auth
           id: id
           url: url
+        results:
+        - traceid: traceid
+          spanid: spanid
+          createdAt: 2000-01-23T04:56:07.000+00:00
+          completedAt: 2000-01-23T04:56:07.000+00:00
+          testid: testid
+          id: id
+          failed:
+            selector: selector
+            id: id
+            comparable: comparable
+            operator: operator
+            successful: true
+          successful:
+            selector: selector
+            id: id
+            comparable: comparable
+            operator: operator
+            successful: true
+        - traceid: traceid
+          spanid: spanid
+          createdAt: 2000-01-23T04:56:07.000+00:00
+          completedAt: 2000-01-23T04:56:07.000+00:00
+          testid: testid
+          id: id
+          failed:
+            selector: selector
+            id: id
+            comparable: comparable
+            operator: operator
+            successful: true
+          successful:
+            selector: selector
+            id: id
+            comparable: comparable
+            operator: operator
+            successful: true
       properties:
         id:
           description: ID
@@ -246,6 +283,11 @@ components:
           type: array
         repeats:
           type: integer
+        results:
+          description: Test results
+          items:
+            $ref: '#/components/schemas/Result'
+          type: array
       type: object
     Assertion:
       example:
@@ -279,6 +321,7 @@ components:
         spanid: spanid
         createdAt: 2000-01-23T04:56:07.000+00:00
         completedAt: 2000-01-23T04:56:07.000+00:00
+        testid: testid
         id: id
         failed:
           selector: selector
@@ -295,6 +338,10 @@ components:
       properties:
         id:
           description: ID
+          readOnly: true
+          type: string
+        testid:
+          description: test ID
           readOnly: true
           type: string
         traceid:

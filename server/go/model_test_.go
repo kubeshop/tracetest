@@ -24,6 +24,9 @@ type Test struct {
 	Assertions []Assertion `json:"assertions,omitempty"`
 
 	Repeats int32 `json:"repeats,omitempty"`
+
+	// Test results
+	Results []Result `json:"results,omitempty"`
 }
 
 // AssertTestRequired checks if the required fields are not zero-ed
@@ -33,6 +36,11 @@ func AssertTestRequired(obj Test) error {
 	}
 	for _, el := range obj.Assertions {
 		if err := AssertAssertionRequired(el); err != nil {
+			return err
+		}
+	}
+	for _, el := range obj.Results {
+		if err := AssertResultRequired(el); err != nil {
 			return err
 		}
 	}

@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS tests  (
 	_, err = db.Exec(`
 CREATE TABLE IF NOT EXISTS results  (
 	id UUID NOT NULL PRIMARY KEY,
-	test_id UUID NOT NULL,
+	testid UUID NOT NULL,
 	result json NOT NULL
 );
 `)
@@ -94,6 +94,14 @@ func (td *TestDB) GetTest(ctx context.Context, id string) (*openapi.Test, error)
 	if err != nil {
 		return nil, err
 	}
+
+	results, err := td.GetResultsByTestID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	test.Results = results
+
 	return &test, nil
 }
 
@@ -119,94 +127,17 @@ func (td *TestDB) GetTests(ctx context.Context) ([]openapi.Test, error) {
 		if err != nil {
 			return nil, err
 		}
-		tests = append(tests, test)
-	}
-	return tests, nil
-}
 
-func (td *TestDB) CreateResult(ctx context.Context, testID string, run *openapi.Result) error {
-	stmt, err := td.db.Prepare("INSERT INTO results(id, test_id, result) VALUES( $1, $2, $3 )")
-	if err != nil {
-		return fmt.Errorf("sql prepare: %w", err)
-	}
-	defer stmt.Close()
-	b, err := json.Marshal(run)
-	if err != nil {
-		return fmt.Errorf("json Marshal: %w", err)
-	}
-	_, err = stmt.ExecContext(ctx, run.Id, testID, b)
-	if err != nil {
-		return fmt.Errorf("sql exec: %w", err)
-	}
-
-	return nil
-}
-
-func (td *TestDB) GetResult(ctx context.Context, id string) (*openapi.Result, error) {
-	stmt, err := td.db.Prepare("SELECT result FROM results WHERE id = $1")
-	if err != nil {
-		return nil, err
-	}
-	defer stmt.Close()
-
-	var b []byte
-	err = stmt.QueryRowContext(ctx, id).Scan(&b)
-	if err != nil {
-		return nil, err
-	}
-	var run openapi.Result
-
-	err = json.Unmarshal(b, &run)
-	if err != nil {
-		return nil, err
-	}
-	return &run, nil
-}
-
-func (td *TestDB) GetResultsByTestID(ctx context.Context, testID string) ([]openapi.Result, error) {
-	stmt, err := td.db.Prepare("SELECT result FROM results WHERE test_id = $1")
-	if err != nil {
-		return nil, err
-	}
-	defer stmt.Close()
-
-	rows, err := stmt.QueryContext(ctx, testID)
-	if err != nil {
-		return nil, err
-	}
-	var results []openapi.Result
-	for rows.Next() {
-		var b []byte
-		if err := rows.Scan(&b); err != nil {
-			return nil, err
-		}
-		var res openapi.Result
-		err = json.Unmarshal(b, &res)
+		results, err := td.GetResultsByTestID(ctx, test.Id)
 		if err != nil {
 			return nil, err
 		}
-		results = append(results, res)
-	}
-	return results, nil
-}
 
-func (td *TestDB) UpdateResult(ctx context.Context, run *openapi.Result) error {
-	stmt, err := td.db.Prepare("UPDATE results SET result = $2 WHERE id = $1")
-	if err != nil {
-		return err
-	}
-	defer stmt.Close()
+		test.Results = results
 
-	b, err := json.Marshal(run)
-	if err != nil {
-		return fmt.Errorf("json Marshal: %w", err)
+		tests = append(tests, test)
 	}
-	_, err = stmt.ExecContext(ctx, run.Id, b)
-	if err != nil {
-		return fmt.Errorf("sql exec: %w", err)
-	}
-
-	return nil
+	return tests, nil
 }
 
 func (td *TestDB) CreateAssertion(ctx context.Context, testid string, assertion *openapi.Assertion) (string, error) {

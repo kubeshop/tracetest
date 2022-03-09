@@ -18,6 +18,9 @@ type Result struct {
 	// ID
 	Id string `json:"id,omitempty"`
 
+	// test ID
+	Testid string `json:"testid,omitempty"`
+
 	// trace ID
 	Traceid string `json:"traceid,omitempty"`
 

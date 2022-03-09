@@ -237,6 +237,11 @@ components:
           description: Definition of assertions that are going to be made
         repeats:
           type: integer
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/Result"
+          description: Test results
     Assertion:
       type: object
       properties:
@@ -263,6 +268,10 @@ components:
         id:
           type: string
           description: ID
+          readOnly: true
+        testid:
+          type: string
+          description: test ID
           readOnly: true
         traceid:
           type: string
