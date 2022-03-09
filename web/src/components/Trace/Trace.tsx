@@ -1,41 +1,65 @@
 import styled from 'styled-components';
 import {ReflexContainer, ReflexSplitter, ReflexElement} from 'react-reflex';
 
-import {Tabs} from 'antd';
+import {Button, Skeleton, Tabs} from 'antd';
 import Text from 'antd/lib/typography/Text';
 
 import 'react-reflex/styles.css';
 
-import {useState} from 'react';
+import {useMemo, useState} from 'react';
 import {Test} from 'types';
+import {useGetTestTraceQuery} from 'services/TestService';
 
 import TraceDiagram from './TraceDiagram';
 import TraceTimeline from './TraceTimeline';
 import TraceData from './TraceData';
 
-import data from './data.json';
 import AssertionList from './AssertionsList';
-
-const spanMap = data.resourceSpans
-  .map((i: any) => i.instrumentationLibrarySpans.map((el: any) => el.spans))
-  .flat(2)
-  .reduce((acc: {[key: string]: {id: string; parentIds: string[]; data: any}}, span) => {
-    acc[span.spanId] = acc[span.spanId] || {id: span.spanId, parentIds: [], data: span};
-    acc[span.spanId].parentIds.push(span.parentSpanId);
-
-    return acc;
-  }, {});
 
 const Grid = styled.div`
   display: grid;
 `;
 
-const Trace = ({test}: {test: Test}) => {
+const Trace = ({test, testResultId}: {test: Test; testResultId: string}) => {
   const [selectedSpan, setSelectedSpan] = useState<any>({});
+  const {
+    data: traceData,
+    isLoading: isLoadingTrace,
+    isError,
+    refetch: refetchTrace,
+  } = useGetTestTraceQuery({id: test.id, resultId: testResultId});
+
+  const spanMap = useMemo(() => {
+    return traceData?.resourceSpans
+      ?.map(i => i.instrumentationLibrarySpans.map((el: any) => el.spans))
+      ?.flat(2)
+      ?.reduce((acc, span) => {
+        acc[span.spanId] = acc[span.spanId] || {id: span.spanId, parentIds: [], data: span};
+        acc[span.spanId].parentIds.push(span.parentSpanId);
+
+        return acc;
+      }, {});
+  }, [traceData]);
 
   const handleSelectSpan = (span: any) => {
     setSelectedSpan(span);
   };
+
+  const handleReload = () => {
+    refetchTrace();
+  };
+
+  if (isLoadingTrace) {
+    return <Skeleton />;
+  }
+
+  if (isError) {
+    return (
+      <div>
+        <Button onClick={handleReload}>Reload</Button>
+      </div>
+    );
+  }
 
   return (
     <main>
@@ -71,7 +95,9 @@ const Trace = ({test}: {test: Test}) => {
           <ReflexSplitter />
           <ReflexElement>
             <div className="pane-content">
-              <TraceTimeline onSelectSpan={handleSelectSpan} selectedSpan={selectedSpan} />
+              {traceData && (
+                <TraceTimeline trace={traceData} onSelectSpan={handleSelectSpan} selectedSpan={selectedSpan} />
+              )}
             </div>
           </ReflexElement>
         </ReflexContainer>

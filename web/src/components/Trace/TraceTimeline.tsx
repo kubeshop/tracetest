@@ -2,8 +2,8 @@ import {useEffect, useRef} from 'react';
 import styled from 'styled-components';
 import * as d3 from 'd3';
 import Title from 'antd/lib/typography/Title';
+import {ITrace} from 'types';
 
-import data from './data.json';
 import './TimelineChart.css';
 
 const Header = styled.div`
@@ -16,17 +16,18 @@ const Header = styled.div`
 `;
 
 interface IProps {
+  trace: ITrace;
   selectedSpan: any;
   onSelectSpan: (span: any) => void;
 }
 
-const TraceTimeline = ({selectedSpan, onSelectSpan}: IProps) => {
+const TraceTimeline = ({trace, selectedSpan, onSelectSpan}: IProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
 
   let treeFactory = d3.tree().size([200, 450]).nodeSize([0, 5]);
 
-  const spanDates = data.resourceSpans
+  const spanDates = trace.resourceSpans
     .map((i: any) => i.instrumentationLibrarySpans.map((el: any) => el.spans))
     .flat(2)
     .map(span => ({
@@ -35,7 +36,7 @@ const TraceTimeline = ({selectedSpan, onSelectSpan}: IProps) => {
       span,
     }));
 
-  const spanMap = data.resourceSpans
+  const spanMap = trace.resourceSpans
     .map((i: any) => i.instrumentationLibrarySpans.map((el: any) => el.spans))
     .flat(2)
     .reduce((acc: {[key: string]: {id: string; parentIds: string[]; data: any}}, span) => {
