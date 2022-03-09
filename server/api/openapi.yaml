@@ -1,10 +1,10 @@
 openapi: 3.0.0
 info:
-  description: OpenAPI definition for project X endpoint and resources
-  title: Project X
+  description: OpenAPI definition for TraceTest endpoint and resources
+  title: TraceTest
   version: 0.0.1
 servers:
-- url: /
+- url: /api
 paths:
   /tests:
     get:
@@ -42,6 +42,30 @@ paths:
         "500":
           description: problem with creating test
       summary: Create new test
+      tags:
+      - api
+  /tests/{testid}:
+    get:
+      description: get test
+      operationId: getTest
+      parameters:
+      - explode: false
+        in: path
+        name: testid
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Test'
+          description: successful operation
+        "500":
+          description: problem with creating test
+      summary: get test
       tags:
       - api
   /tests/{testid}/run:
@@ -138,7 +162,7 @@ paths:
           description: successful operation
       tags:
       - api
-  /test/{id}/assertions:
+  /tests/{id}/assertions:
     get:
       description: Gets all assertions associated to the test
       operationId: getAssertions
@@ -204,6 +228,43 @@ components:
           auth: auth
           id: id
           url: url
+        results:
+        - traceid: traceid
+          spanid: spanid
+          createdAt: 2000-01-23T04:56:07.000+00:00
+          completedAt: 2000-01-23T04:56:07.000+00:00
+          testid: testid
+          id: id
+          failed:
+            selector: selector
+            id: id
+            comparable: comparable
+            operator: operator
+            successful: true
+          successful:
+            selector: selector
+            id: id
+            comparable: comparable
+            operator: operator
+            successful: true
+        - traceid: traceid
+          spanid: spanid
+          createdAt: 2000-01-23T04:56:07.000+00:00
+          completedAt: 2000-01-23T04:56:07.000+00:00
+          testid: testid
+          id: id
+          failed:
+            selector: selector
+            id: id
+            comparable: comparable
+            operator: operator
+            successful: true
+          successful:
+            selector: selector
+            id: id
+            comparable: comparable
+            operator: operator
+            successful: true
       properties:
         id:
           description: ID
@@ -222,6 +283,11 @@ components:
           type: array
         repeats:
           type: integer
+        results:
+          description: Test results
+          items:
+            $ref: '#/components/schemas/Result'
+          type: array
       type: object
     Assertion:
       example:
@@ -255,6 +321,7 @@ components:
         spanid: spanid
         createdAt: 2000-01-23T04:56:07.000+00:00
         completedAt: 2000-01-23T04:56:07.000+00:00
+        testid: testid
         id: id
         failed:
           selector: selector
@@ -271,6 +338,10 @@ components:
       properties:
         id:
           description: ID
+          readOnly: true
+          type: string
+        testid:
+          description: test ID
           readOnly: true
           type: string
         traceid:

@@ -69,6 +69,16 @@ func (s *ApiApiService) CreateTest(ctx context.Context, test Test) (ImplResponse
 	return Response(200, test), nil
 }
 
+// GetTest - Get a test
+func (s *ApiApiService) GetTest(ctx context.Context, testid string) (ImplResponse, error) {
+	test, err := s.testDB.GetTest(ctx, testid)
+	if err != nil {
+		return Response(http.StatusInternalServerError, err.Error()), err
+	}
+
+	return Response(200, test), nil
+}
+
 // GetTests - Gets all tests
 func (s *ApiApiService) GetTests(ctx context.Context) (ImplResponse, error) {
 	tests, err := s.testDB.GetTests(ctx)

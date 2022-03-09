@@ -104,7 +104,7 @@ func TestCreateResults(t *testing.T) {
 		Traceid:     "123",
 	}
 	ctx := context.Background()
-	err = db.CreateResult(ctx, &res)
+	err = db.CreateResult(ctx, "", &res)
 	assert.NoError(t, err)
 
 	gotRes, err := db.GetResult(ctx, id)
@@ -124,4 +124,56 @@ func TestCreateResults(t *testing.T) {
 	gotRes, err = db.GetResult(ctx, id)
 	assert.NoError(t, err)
 	assert.Equal(t, &res2, gotRes)
+}
+
+func TestCreateTestWithResults(t *testing.T) {
+	dsn := "host=localhost user=postgres password=postgres port=5432 sslmode=disable"
+	db, err := testdb.New(dsn)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		err = db.Drop()
+		if err != nil {
+			t.Fatal(err)
+		}
+	}()
+	test := openapi.Test{
+		Name:        "first test",
+		Description: "description",
+		ServiceUnderTest: openapi.TestServiceUnderTest{
+			Url: "http://localhost:3030/hello-instrumented",
+		},
+		Assertions: []openapi.Assertion{{}},
+		Repeats:    0,
+	}
+	ctx := context.Background()
+	id, err := db.CreateTest(ctx, &test)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ti := time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC)
+	tid := uuid.New().String()
+	res := openapi.Result{
+		Id:          tid,
+		CreatedAt:   ti,
+		CompletedAt: ti,
+		Traceid:     "123",
+		Testid:      id,
+	}
+
+	err = db.CreateResult(ctx, res.Testid, &res)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	testwithResults, err := db.GetTest(ctx, id)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.Len(t, testwithResults.Results, 1)
+	assert.Equal(t, testwithResults.Results[0].Id, res.Id)
+	assert.Equal(t, testwithResults.Results[0].Testid, test.Id)
 }

@@ -1,8 +1,10 @@
 openapi: 3.0.0
 info:
   version: 0.0.1
-  title: Project X
-  description: OpenAPI definition for project X endpoint and resources
+  title: TraceTest
+  description: OpenAPI definition for TraceTest endpoint and resources
+servers:
+  - url: /api
 paths:
   /tests:
     get:
@@ -54,6 +56,28 @@ paths:
           #       type: array
           #       items:
           #         $ref: "#/components/schemas/Problem"
+  /tests/{testid}:
+    get:
+      tags:
+        - api
+      parameters:
+        - in: path
+          name: testid
+          schema:
+            type: string
+          required: true
+      summary: "get test"
+      description: "get test"
+      operationId: getTest
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Test"
+        500:
+          description: "problem with creating test"
   /tests/{testid}/run:
     post:
       tags:
@@ -139,7 +163,7 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Result"
-  /test/{id}/assertions:
+  /tests/{id}/assertions:
     get:
       tags:
         - api
@@ -213,6 +237,11 @@ components:
           description: Definition of assertions that are going to be made
         repeats:
           type: integer
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/Result"
+          description: Test results
     Assertion:
       type: object
       properties:
@@ -239,6 +268,10 @@ components:
         id:
           type: string
           description: ID
+          readOnly: true
+        testid:
+          type: string
+          description: test ID
           readOnly: true
         traceid:
           type: string

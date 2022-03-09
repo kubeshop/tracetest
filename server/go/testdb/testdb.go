@@ -33,6 +33,7 @@ CREATE TABLE IF NOT EXISTS tests  (
 	_, err = db.Exec(`
 CREATE TABLE IF NOT EXISTS results  (
 	id UUID NOT NULL PRIMARY KEY,
+	testid UUID NOT NULL,
 	result json NOT NULL
 );
 `)
@@ -83,6 +84,14 @@ func (td *TestDB) GetTest(ctx context.Context, id string) (*openapi.Test, error)
 	if err != nil {
 		return nil, err
 	}
+
+	results, err := td.GetTestResults(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	test.Results = results
+
 	return &test, nil
 }
 
@@ -108,67 +117,17 @@ func (td *TestDB) GetTests(ctx context.Context) ([]openapi.Test, error) {
 		if err != nil {
 			return nil, err
 		}
+
+		results, err := td.GetTestResults(ctx, test.Id)
+		if err != nil {
+			return nil, err
+		}
+
+		test.Results = results
+
 		tests = append(tests, test)
 	}
 	return tests, nil
-}
-
-func (td *TestDB) CreateResult(ctx context.Context, run *openapi.Result) error {
-	stmt, err := td.db.Prepare("INSERT INTO results(id, result) VALUES( $1, $2 )")
-	if err != nil {
-		return fmt.Errorf("sql prepare: %w", err)
-	}
-	defer stmt.Close()
-	b, err := json.Marshal(run)
-	if err != nil {
-		return fmt.Errorf("json Marshal: %w", err)
-	}
-	_, err = stmt.ExecContext(ctx, run.Id, b)
-	if err != nil {
-		return fmt.Errorf("sql exec: %w", err)
-	}
-
-	return nil
-}
-
-func (td *TestDB) GetResult(ctx context.Context, id string) (*openapi.Result, error) {
-	stmt, err := td.db.Prepare("SELECT result FROM results WHERE id = $1")
-	if err != nil {
-		return nil, err
-	}
-	defer stmt.Close()
-
-	var b []byte
-	err = stmt.QueryRowContext(ctx, id).Scan(&b)
-	if err != nil {
-		return nil, err
-	}
-	var run openapi.Result
-
-	err = json.Unmarshal(b, &run)
-	if err != nil {
-		return nil, err
-	}
-	return &run, nil
-}
-
-func (td *TestDB) UpdateResult(ctx context.Context, run *openapi.Result) error {
-	stmt, err := td.db.Prepare("UPDATE results SET result = $2 WHERE id = $1")
-	if err != nil {
-		return err
-	}
-	defer stmt.Close()
-
-	b, err := json.Marshal(run)
-	if err != nil {
-		return fmt.Errorf("json Marshal: %w", err)
-	}
-	_, err = stmt.ExecContext(ctx, run.Id, b)
-	if err != nil {
-		return fmt.Errorf("sql exec: %w", err)
-	}
-
-	return nil
 }
 
 func (td *TestDB) Drop() error {
