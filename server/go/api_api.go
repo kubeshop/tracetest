@@ -178,6 +178,7 @@ func (c *ApiApiController) GetAssertions(w http.ResponseWriter, r *http.Request)
 func (c *ApiApiController) GetTest(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	testidParam := params["testid"]
+<<<<<<< HEAD
 	
 	result, err := c.service.GetTest(r.Context(), testidParam)
 	// If an error occurred, encode the error with the status code
@@ -193,6 +194,10 @@ func (c *ApiApiController) GetTest(w http.ResponseWriter, r *http.Request) {
 // GetTests - Create new test
 func (c *ApiApiController) GetTests(w http.ResponseWriter, r *http.Request) {
 	result, err := c.service.GetTests(r.Context())
+=======
+
+	result, err := c.service.GetTest(r.Context(), testidParam)
+>>>>>>> origin
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -203,12 +208,18 @@ func (c *ApiApiController) GetTests(w http.ResponseWriter, r *http.Request) {
 
 }
 
+<<<<<<< HEAD
 // TestsIdResultsGet - 
 func (c *ApiApiController) TestsIdResultsGet(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	idParam := params["id"]
 	
 	result, err := c.service.TestsIdResultsGet(r.Context(), idParam)
+=======
+// GetTests - Create new test
+func (c *ApiApiController) GetTests(w http.ResponseWriter, r *http.Request) {
+	result, err := c.service.GetTests(r.Context())
+>>>>>>> origin
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -219,6 +230,7 @@ func (c *ApiApiController) TestsIdResultsGet(w http.ResponseWriter, r *http.Requ
 
 }
 
+<<<<<<< HEAD
 // TestsTestidResultsIdGet - 
 func (c *ApiApiController) TestsTestidResultsIdGet(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
@@ -227,6 +239,14 @@ func (c *ApiApiController) TestsTestidResultsIdGet(w http.ResponseWriter, r *htt
 	idParam := params["id"]
 	
 	result, err := c.service.TestsTestidResultsIdGet(r.Context(), testidParam, idParam)
+=======
+// TestsIdResultsGet -
+func (c *ApiApiController) TestsIdResultsGet(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	idParam := params["id"]
+
+	result, err := c.service.TestsIdResultsGet(r.Context(), idParam)
+>>>>>>> origin
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -237,14 +257,24 @@ func (c *ApiApiController) TestsTestidResultsIdGet(w http.ResponseWriter, r *htt
 
 }
 
+<<<<<<< HEAD
 // TestsTestidResultsIdTraceGet - 
 func (c *ApiApiController) TestsTestidResultsIdTraceGet(w http.ResponseWriter, r *http.Request) {
+=======
+// TestsTestidResultsIdGet -
+func (c *ApiApiController) TestsTestidResultsIdGet(w http.ResponseWriter, r *http.Request) {
+>>>>>>> origin
 	params := mux.Vars(r)
 	testidParam := params["testid"]
 	
 	idParam := params["id"]
+<<<<<<< HEAD
 	
 	result, err := c.service.TestsTestidResultsIdTraceGet(r.Context(), testidParam, idParam)
+=======
+
+	result, err := c.service.TestsTestidResultsIdGet(r.Context(), testidParam, idParam)
+>>>>>>> origin
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

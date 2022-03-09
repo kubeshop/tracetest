@@ -1,0 +1,2015 @@
+{
+  "resourceSpans": [
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "ip",
+            "value": {
+              "stringValue": "10.42.0.235"
+            }
+          },
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "shipping"
+            }
+          }
+        ]
+      },
+      "instrumentationLibrarySpans": [
+        {
+          "instrumentationLibrary": {
+            "name": "github.com/go-pg/pg"
+          },
+          "spans": [
+            {
+              "traceId": "aKYb16qC20kMMiZL+gU3UA==",
+              "spanId": "A92wFJple0E=",
+              "parentSpanId": "wsO9KpMuKh4=",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1645703712252074094",
+              "endTimeUnixNano": "1645703712252943620",
+              "attributes": [
+                {
+                  "key": "db.system",
+                  "value": {
+                    "stringValue": "postgresql"
+                  }
+                },
+                {
+                  "key": "db.statement",
+                  "value": {
+                    "stringValue": ""
+                  }
+                },
+                {
+                  "key": "code.function",
+                  "value": {
+                    "stringValue": "main.(*server).GetQuote"
+                  }
+                },
+                {
+                  "key": "code.filepath",
+                  "value": {
+                    "stringValue": "/src/main.go"
+                  }
+                },
+                {
+                  "key": "code.lineno",
+                  "value": {
+                    "intValue": "220"
+                  }
+                },
+                {
+                  "key": "db.connection_string",
+                  "value": {
+                    "stringValue": "postgres:5432"
+                  }
+                },
+                {
+                  "key": "db.user",
+                  "value": {
+                    "stringValue": "postgres"
+                  }
+                },
+                {
+                  "key": "db.name",
+                  "value": {
+                    "stringValue": "postgres"
+                  }
+                },
+                {
+                  "key": "db.rows_affected",
+                  "value": {
+                    "intValue": "1"
+                  }
+                },
+                {
+                  "key": "otel.status_code",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "internal.span.format",
+                  "value": {
+                    "stringValue": "proto"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "ip",
+            "value": {
+              "stringValue": "10.42.0.228"
+            }
+          },
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "pov-client"
+            }
+          }
+        ]
+      },
+      "instrumentationLibrarySpans": [
+        {
+          "instrumentationLibrary": {
+            "name": "go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc",
+            "version": "semver:0.27.0"
+          },
+          "spans": [
+            {
+              "traceId": "aKYb16qC20kMMiZL+gU3UA==",
+              "spanId": "GZ0SBrJqM6g=",
+              "parentSpanId": "GAAGr+A8zZ4=",
+              "name": "msdemo.ShippingService/GetQuote",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": "1645703713281842330",
+              "endTimeUnixNano": "1645703714300371661",
+              "attributes": [
+                {
+                  "key": "rpc.system",
+                  "value": {
+                    "stringValue": "grpc"
+                  }
+                },
+                {
+                  "key": "rpc.service",
+                  "value": {
+                    "stringValue": "msdemo.ShippingService"
+                  }
+                },
+                {
+                  "key": "rpc.method",
+                  "value": {
+                    "stringValue": "GetQuote"
+                  }
+                },
+                {
+                  "key": "net.peer.ip",
+                  "value": {
+                    "stringValue": "povserver"
+                  }
+                },
+                {
+                  "key": "net.peer.port",
+                  "value": {
+                    "stringValue": "3550"
+                  }
+                },
+                {
+                  "key": "rpc.grpc.status_code",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "otel.status_code",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "internal.span.format",
+                  "value": {
+                    "stringValue": "proto"
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "timeUnixNano": "1645703713281869680",
+                  "name": "message",
+                  "attributes": [
+                    {
+                      "key": "message.type",
+                      "value": {
+                        "stringValue": "SENT"
+                      }
+                    },
+                    {
+                      "key": "message.id",
+                      "value": {
+                        "intValue": "1"
+                      }
+                    },
+                    {
+                      "key": "message.uncompressed_size",
+                      "value": {
+                        "intValue": "0"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "timeUnixNano": "1645703714300367311",
+                  "name": "message",
+                  "attributes": [
+                    {
+                      "key": "message.type",
+                      "value": {
+                        "stringValue": "RECEIVED"
+                      }
+                    },
+                    {
+                      "key": "message.id",
+                      "value": {
+                        "intValue": "1"
+                      }
+                    },
+                    {
+                      "key": "message.uncompressed_size",
+                      "value": {
+                        "intValue": "14"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "ip",
+            "value": {
+              "stringValue": "10.42.0.228"
+            }
+          },
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "pov-client"
+            }
+          }
+        ]
+      },
+      "instrumentationLibrarySpans": [
+        {
+          "instrumentationLibrary": {
+            "name": "http-app"
+          },
+          "spans": [
+            {
+              "traceId": "aKYb16qC20kMMiZL+gU3UA==",
+              "spanId": "YDJMd9OmV2k=",
+              "parentSpanId": "Ja25lNGcs7o=",
+              "name": "sleep",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1645703711245853052",
+              "endTimeUnixNano": "1645703714300457141",
+              "attributes": [
+                {
+                  "key": "sleep.duration",
+                  "value": {
+                    "intValue": "1000000000"
+                  }
+                },
+                {
+                  "key": "otel.status_code",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "internal.span.format",
+                  "value": {
+                    "stringValue": "proto"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "ip",
+            "value": {
+              "stringValue": "10.42.0.228"
+            }
+          },
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "pov-client"
+            }
+          }
+        ]
+      },
+      "instrumentationLibrarySpans": [
+        {
+          "instrumentationLibrary": {
+            "name": "http-app"
+          },
+          "spans": [
+            {
+              "traceId": "aKYb16qC20kMMiZL+gU3UA==",
+              "spanId": "bW4TrHRn4CQ=",
+              "parentSpanId": "YDJMd9OmV2k=",
+              "name": "pov-span",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1645703712245954389",
+              "endTimeUnixNano": "1645703713281799480",
+              "attributes": [
+                {
+                  "key": "otel.status_code",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "internal.span.format",
+                  "value": {
+                    "stringValue": "proto"
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "timeUnixNano": "1645703712245977168",
+                  "name": "event",
+                  "attributes": [
+                    {
+                      "key": "pid",
+                      "value": {
+                        "intValue": "4328"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "timeUnixNano": "1645703712245978588",
+                  "name": "event2"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "ip",
+            "value": {
+              "stringValue": "10.42.0.182"
+            }
+          },
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "productcatalog"
+            }
+          }
+        ]
+      },
+      "instrumentationLibrarySpans": [
+        {
+          "instrumentationLibrary": {
+            "name": "go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc",
+            "version": "semver:0.27.0"
+          },
+          "spans": [
+            {
+              "traceId": "aKYb16qC20kMMiZL+gU3UA==",
+              "spanId": "ZEvXuICn5Z4=",
+              "parentSpanId": "aHNv5cJBdew=",
+              "name": "msdemo.ProductCatalogService/GetProduct",
+              "kind": "SPAN_KIND_SERVER",
+              "startTimeUnixNano": "1645703712257194793",
+              "endTimeUnixNano": "1645703712280414919",
+              "attributes": [
+                {
+                  "key": "rpc.system",
+                  "value": {
+                    "stringValue": "grpc"
+                  }
+                },
+                {
+                  "key": "rpc.service",
+                  "value": {
+                    "stringValue": "msdemo.ProductCatalogService"
+                  }
+                },
+                {
+                  "key": "rpc.method",
+                  "value": {
+                    "stringValue": "GetProduct"
+                  }
+                },
+                {
+                  "key": "net.peer.ip",
+                  "value": {
+                    "stringValue": "10.42.0.235"
+                  }
+                },
+                {
+                  "key": "net.peer.port",
+                  "value": {
+                    "stringValue": "36194"
+                  }
+                },
+                {
+                  "key": "rpc.grpc.status_code",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "otel.status_code",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "internal.span.format",
+                  "value": {
+                    "stringValue": "proto"
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "timeUnixNano": "1645703712257210313",
+                  "name": "message",
+                  "attributes": [
+                    {
+                      "key": "message.type",
+                      "value": {
+                        "stringValue": "RECEIVED"
+                      }
+                    },
+                    {
+                      "key": "message.id",
+                      "value": {
+                        "intValue": "1"
+                      }
+                    },
+                    {
+                      "key": "message.uncompressed_size",
+                      "value": {
+                        "intValue": "12"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "timeUnixNano": "1645703712280413099",
+                  "name": "message",
+                  "attributes": [
+                    {
+                      "key": "message.type",
+                      "value": {
+                        "stringValue": "SENT"
+                      }
+                    },
+                    {
+                      "key": "message.id",
+                      "value": {
+                        "intValue": "1"
+                      }
+                    },
+                    {
+                      "key": "message.uncompressed_size",
+                      "value": {
+                        "intValue": "142"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "ip",
+            "value": {
+              "stringValue": "10.42.0.182"
+            }
+          },
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "productcatalog"
+            }
+          }
+        ]
+      },
+      "instrumentationLibrarySpans": [
+        {
+          "instrumentationLibrary": {
+            "name": "go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc",
+            "version": "semver:0.27.0"
+          },
+          "spans": [
+            {
+              "traceId": "aKYb16qC20kMMiZL+gU3UA==",
+              "spanId": "UE5WGER2gew=",
+              "parentSpanId": "xKDgg6X6lag=",
+              "name": "msdemo.ProductCatalogService/GetProduct",
+              "kind": "SPAN_KIND_SERVER",
+              "startTimeUnixNano": "1645703713284563689",
+              "endTimeUnixNano": "1645703713298859472",
+              "attributes": [
+                {
+                  "key": "rpc.system",
+                  "value": {
+                    "stringValue": "grpc"
+                  }
+                },
+                {
+                  "key": "rpc.service",
+                  "value": {
+                    "stringValue": "msdemo.ProductCatalogService"
+                  }
+                },
+                {
+                  "key": "rpc.method",
+                  "value": {
+                    "stringValue": "GetProduct"
+                  }
+                },
+                {
+                  "key": "net.peer.ip",
+                  "value": {
+                    "stringValue": "10.42.0.235"
+                  }
+                },
+                {
+                  "key": "net.peer.port",
+                  "value": {
+                    "stringValue": "36194"
+                  }
+                },
+                {
+                  "key": "rpc.grpc.status_code",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "otel.status_code",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "internal.span.format",
+                  "value": {
+                    "stringValue": "proto"
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "timeUnixNano": "1645703713284572649",
+                  "name": "message",
+                  "attributes": [
+                    {
+                      "key": "message.type",
+                      "value": {
+                        "stringValue": "RECEIVED"
+                      }
+                    },
+                    {
+                      "key": "message.id",
+                      "value": {
+                        "intValue": "1"
+                      }
+                    },
+                    {
+                      "key": "message.uncompressed_size",
+                      "value": {
+                        "intValue": "12"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "timeUnixNano": "1645703713298858022",
+                  "name": "message",
+                  "attributes": [
+                    {
+                      "key": "message.type",
+                      "value": {
+                        "stringValue": "SENT"
+                      }
+                    },
+                    {
+                      "key": "message.id",
+                      "value": {
+                        "intValue": "1"
+                      }
+                    },
+                    {
+                      "key": "message.uncompressed_size",
+                      "value": {
+                        "intValue": "142"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "ip",
+            "value": {
+              "stringValue": "10.42.0.235"
+            }
+          },
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "shipping"
+            }
+          }
+        ]
+      },
+      "instrumentationLibrarySpans": [
+        {
+          "instrumentationLibrary": {
+            "name": "github.com/go-pg/pg"
+          },
+          "spans": [
+            {
+              "traceId": "aKYb16qC20kMMiZL+gU3UA==",
+              "spanId": "RrFGCO3GDNE=",
+              "parentSpanId": "BH06DB9phgA=",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1645703713283211035",
+              "endTimeUnixNano": "1645703713283868862",
+              "attributes": [
+                {
+                  "key": "db.system",
+                  "value": {
+                    "stringValue": "postgresql"
+                  }
+                },
+                {
+                  "key": "db.statement",
+                  "value": {
+                    "stringValue": ""
+                  }
+                },
+                {
+                  "key": "code.function",
+                  "value": {
+                    "stringValue": "main.(*server).GetQuote"
+                  }
+                },
+                {
+                  "key": "code.filepath",
+                  "value": {
+                    "stringValue": "/src/main.go"
+                  }
+                },
+                {
+                  "key": "code.lineno",
+                  "value": {
+                    "intValue": "220"
+                  }
+                },
+                {
+                  "key": "db.connection_string",
+                  "value": {
+                    "stringValue": "postgres:5432"
+                  }
+                },
+                {
+                  "key": "db.user",
+                  "value": {
+                    "stringValue": "postgres"
+                  }
+                },
+                {
+                  "key": "db.name",
+                  "value": {
+                    "stringValue": "postgres"
+                  }
+                },
+                {
+                  "key": "db.rows_affected",
+                  "value": {
+                    "intValue": "1"
+                  }
+                },
+                {
+                  "key": "otel.status_code",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "internal.span.format",
+                  "value": {
+                    "stringValue": "proto"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "ip",
+            "value": {
+              "stringValue": "10.42.0.228"
+            }
+          },
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "pov-client"
+            }
+          }
+        ]
+      },
+      "instrumentationLibrarySpans": [
+        {
+          "instrumentationLibrary": {
+            "name": "go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp",
+            "version": "semver:0.27.0"
+          },
+          "spans": [
+            {
+              "traceId": "aKYb16qC20kMMiZL+gU3UA==",
+              "spanId": "Ja25lNGcs7o=",
+              "parentSpanId": "+9/JOnSJx6E=",
+              "name": "hello-instrumented",
+              "kind": "SPAN_KIND_SERVER",
+              "startTimeUnixNano": "1645703711245805862",
+              "endTimeUnixNano": "1645703714300485931",
+              "attributes": [
+                {
+                  "key": "net.transport",
+                  "value": {
+                    "stringValue": "ip_tcp"
+                  }
+                },
+                {
+                  "key": "net.peer.ip",
+                  "value": {
+                    "stringValue": "10.42.0.252"
+                  }
+                },
+                {
+                  "key": "net.peer.port",
+                  "value": {
+                    "intValue": "45072"
+                  }
+                },
+                {
+                  "key": "net.host.name",
+                  "value": {
+                    "stringValue": "http-app"
+                  }
+                },
+                {
+                  "key": "net.host.port",
+                  "value": {
+                    "intValue": "3030"
+                  }
+                },
+                {
+                  "key": "http.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "http.target",
+                  "value": {
+                    "stringValue": "/hello-instrumented"
+                  }
+                },
+                {
+                  "key": "http.server_name",
+                  "value": {
+                    "stringValue": "hello-instrumented"
+                  }
+                },
+                {
+                  "key": "http.user_agent",
+                  "value": {
+                    "stringValue": "Go-http-client/1.1"
+                  }
+                },
+                {
+                  "key": "http.scheme",
+                  "value": {
+                    "stringValue": "http"
+                  }
+                },
+                {
+                  "key": "http.host",
+                  "value": {
+                    "stringValue": "http-app:3030"
+                  }
+                },
+                {
+                  "key": "http.flavor",
+                  "value": {
+                    "stringValue": "1.1"
+                  }
+                },
+                {
+                  "key": "http.wrote_bytes",
+                  "value": {
+                    "intValue": "46"
+                  }
+                },
+                {
+                  "key": "http.status_code",
+                  "value": {
+                    "intValue": "200"
+                  }
+                },
+                {
+                  "key": "otel.status_code",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "internal.span.format",
+                  "value": {
+                    "stringValue": "proto"
+                  }
+                }
+              ],
+              "status": {}
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "ip",
+            "value": {
+              "stringValue": "10.42.0.228"
+            }
+          },
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "pov-client"
+            }
+          }
+        ]
+      },
+      "instrumentationLibrarySpans": [
+        {
+          "instrumentationLibrary": {
+            "name": "go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc",
+            "version": "semver:0.27.0"
+          },
+          "spans": [
+            {
+              "traceId": "aKYb16qC20kMMiZL+gU3UA==",
+              "spanId": "30rZOnVDd9s=",
+              "parentSpanId": "bW4TrHRn4CQ=",
+              "name": "msdemo.ShippingService/GetQuote",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": "1645703712246074778",
+              "endTimeUnixNano": "1645703713281711001",
+              "attributes": [
+                {
+                  "key": "rpc.system",
+                  "value": {
+                    "stringValue": "grpc"
+                  }
+                },
+                {
+                  "key": "rpc.service",
+                  "value": {
+                    "stringValue": "msdemo.ShippingService"
+                  }
+                },
+                {
+                  "key": "rpc.method",
+                  "value": {
+                    "stringValue": "GetQuote"
+                  }
+                },
+                {
+                  "key": "net.peer.ip",
+                  "value": {
+                    "stringValue": "povserver"
+                  }
+                },
+                {
+                  "key": "net.peer.port",
+                  "value": {
+                    "stringValue": "3550"
+                  }
+                },
+                {
+                  "key": "rpc.grpc.status_code",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "otel.status_code",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "internal.span.format",
+                  "value": {
+                    "stringValue": "proto"
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "timeUnixNano": "1645703712246107668",
+                  "name": "message",
+                  "attributes": [
+                    {
+                      "key": "message.type",
+                      "value": {
+                        "stringValue": "SENT"
+                      }
+                    },
+                    {
+                      "key": "message.id",
+                      "value": {
+                        "intValue": "1"
+                      }
+                    },
+                    {
+                      "key": "message.uncompressed_size",
+                      "value": {
+                        "intValue": "0"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "timeUnixNano": "1645703713281705811",
+                  "name": "message",
+                  "attributes": [
+                    {
+                      "key": "message.type",
+                      "value": {
+                        "stringValue": "RECEIVED"
+                      }
+                    },
+                    {
+                      "key": "message.id",
+                      "value": {
+                        "intValue": "1"
+                      }
+                    },
+                    {
+                      "key": "message.uncompressed_size",
+                      "value": {
+                        "intValue": "14"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "ip",
+            "value": {
+              "stringValue": "10.42.0.235"
+            }
+          },
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "shipping"
+            }
+          }
+        ]
+      },
+      "instrumentationLibrarySpans": [
+        {
+          "instrumentationLibrary": {
+            "name": "go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc",
+            "version": "semver:0.27.0"
+          },
+          "spans": [
+            {
+              "traceId": "aKYb16qC20kMMiZL+gU3UA==",
+              "spanId": "aHNv5cJBdew=",
+              "parentSpanId": "wsO9KpMuKh4=",
+              "name": "msdemo.ProductCatalogService/GetProduct",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": "1645703712256686745",
+              "endTimeUnixNano": "1645703712280693768",
+              "attributes": [
+                {
+                  "key": "rpc.system",
+                  "value": {
+                    "stringValue": "grpc"
+                  }
+                },
+                {
+                  "key": "rpc.service",
+                  "value": {
+                    "stringValue": "msdemo.ProductCatalogService"
+                  }
+                },
+                {
+                  "key": "rpc.method",
+                  "value": {
+                    "stringValue": "GetProduct"
+                  }
+                },
+                {
+                  "key": "net.peer.ip",
+                  "value": {
+                    "stringValue": "productcatalogservice"
+                  }
+                },
+                {
+                  "key": "net.peer.port",
+                  "value": {
+                    "stringValue": "3550"
+                  }
+                },
+                {
+                  "key": "rpc.grpc.status_code",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "otel.status_code",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "internal.span.format",
+                  "value": {
+                    "stringValue": "proto"
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "timeUnixNano": "1645703712256723165",
+                  "name": "message",
+                  "attributes": [
+                    {
+                      "key": "message.type",
+                      "value": {
+                        "stringValue": "SENT"
+                      }
+                    },
+                    {
+                      "key": "message.id",
+                      "value": {
+                        "intValue": "1"
+                      }
+                    },
+                    {
+                      "key": "message.uncompressed_size",
+                      "value": {
+                        "intValue": "12"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "timeUnixNano": "1645703712280690888",
+                  "name": "message",
+                  "attributes": [
+                    {
+                      "key": "message.type",
+                      "value": {
+                        "stringValue": "RECEIVED"
+                      }
+                    },
+                    {
+                      "key": "message.id",
+                      "value": {
+                        "intValue": "1"
+                      }
+                    },
+                    {
+                      "key": "message.uncompressed_size",
+                      "value": {
+                        "intValue": "142"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "ip",
+            "value": {
+              "stringValue": "10.42.0.235"
+            }
+          },
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "shipping"
+            }
+          }
+        ]
+      },
+      "instrumentationLibrarySpans": [
+        {
+          "instrumentationLibrary": {
+            "name": "github.com/go-redis/redis"
+          },
+          "spans": [
+            {
+              "traceId": "aKYb16qC20kMMiZL+gU3UA==",
+              "spanId": "PzrZSb7wikc=",
+              "parentSpanId": "BH06DB9phgA=",
+              "name": "set",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1645703713282271188",
+              "endTimeUnixNano": "1645703713282542027",
+              "attributes": [
+                {
+                  "key": "db.system",
+                  "value": {
+                    "stringValue": "redis"
+                  }
+                },
+                {
+                  "key": "db.statement",
+                  "value": {
+                    "stringValue": "set key 68a61bd7aa82db490c32264bfa053750"
+                  }
+                },
+                {
+                  "key": "otel.status_code",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "internal.span.format",
+                  "value": {
+                    "stringValue": "proto"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "ip",
+            "value": {
+              "stringValue": "10.42.0.235"
+            }
+          },
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "shipping"
+            }
+          }
+        ]
+      },
+      "instrumentationLibrarySpans": [
+        {
+          "instrumentationLibrary": {
+            "name": "github.com/go-redis/redis"
+          },
+          "spans": [
+            {
+              "traceId": "aKYb16qC20kMMiZL+gU3UA==",
+              "spanId": "KUscwqwS27s=",
+              "parentSpanId": "BH06DB9phgA=",
+              "name": "get",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1645703713282561637",
+              "endTimeUnixNano": "1645703713282793736",
+              "attributes": [
+                {
+                  "key": "db.system",
+                  "value": {
+                    "stringValue": "redis"
+                  }
+                },
+                {
+                  "key": "db.statement",
+                  "value": {
+                    "stringValue": "get key"
+                  }
+                },
+                {
+                  "key": "otel.status_code",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "internal.span.format",
+                  "value": {
+                    "stringValue": "proto"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "ip",
+            "value": {
+              "stringValue": "10.42.0.235"
+            }
+          },
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "shipping"
+            }
+          }
+        ]
+      },
+      "instrumentationLibrarySpans": [
+        {
+          "instrumentationLibrary": {
+            "name": "go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc",
+            "version": "semver:0.27.0"
+          },
+          "spans": [
+            {
+              "traceId": "aKYb16qC20kMMiZL+gU3UA==",
+              "spanId": "S8a5U2iNtVg=",
+              "parentSpanId": "GZ0SBrJqM6g=",
+              "name": "msdemo.ShippingService/GetQuote",
+              "kind": "SPAN_KIND_SERVER",
+              "startTimeUnixNano": "1645703713282174029",
+              "endTimeUnixNano": "1645703714300101112",
+              "attributes": [
+                {
+                  "key": "rpc.system",
+                  "value": {
+                    "stringValue": "grpc"
+                  }
+                },
+                {
+                  "key": "rpc.service",
+                  "value": {
+                    "stringValue": "msdemo.ShippingService"
+                  }
+                },
+                {
+                  "key": "rpc.method",
+                  "value": {
+                    "stringValue": "GetQuote"
+                  }
+                },
+                {
+                  "key": "net.peer.ip",
+                  "value": {
+                    "stringValue": "10.42.0.228"
+                  }
+                },
+                {
+                  "key": "net.peer.port",
+                  "value": {
+                    "stringValue": "35814"
+                  }
+                },
+                {
+                  "key": "rpc.grpc.status_code",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "otel.status_code",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "internal.span.format",
+                  "value": {
+                    "stringValue": "proto"
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "timeUnixNano": "1645703713282184029",
+                  "name": "message",
+                  "attributes": [
+                    {
+                      "key": "message.type",
+                      "value": {
+                        "stringValue": "RECEIVED"
+                      }
+                    },
+                    {
+                      "key": "message.id",
+                      "value": {
+                        "intValue": "1"
+                      }
+                    },
+                    {
+                      "key": "message.uncompressed_size",
+                      "value": {
+                        "intValue": "0"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "timeUnixNano": "1645703714300099362",
+                  "name": "message",
+                  "attributes": [
+                    {
+                      "key": "message.type",
+                      "value": {
+                        "stringValue": "SENT"
+                      }
+                    },
+                    {
+                      "key": "message.id",
+                      "value": {
+                        "intValue": "1"
+                      }
+                    },
+                    {
+                      "key": "message.uncompressed_size",
+                      "value": {
+                        "intValue": "14"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "ip",
+            "value": {
+              "stringValue": "10.42.0.235"
+            }
+          },
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "shipping"
+            }
+          }
+        ]
+      },
+      "instrumentationLibrarySpans": [
+        {
+          "instrumentationLibrary": {
+            "name": "go.opentelemetry.io/otel/sdk/tracer"
+          },
+          "spans": [
+            {
+              "traceId": "aKYb16qC20kMMiZL+gU3UA==",
+              "spanId": "wsO9KpMuKh4=",
+              "parentSpanId": "++saRWaeVfU=",
+              "name": "pov-get-quote-server",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1645703712246614946",
+              "endTimeUnixNano": "1645703712280780468",
+              "attributes": [
+                {
+                  "key": "pov",
+                  "value": {
+                    "intValue": "1"
+                  }
+                },
+                {
+                  "key": "otel.status_code",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "internal.span.format",
+                  "value": {
+                    "stringValue": "proto"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "ip",
+            "value": {
+              "stringValue": "10.42.0.235"
+            }
+          },
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "shipping"
+            }
+          }
+        ]
+      },
+      "instrumentationLibrarySpans": [
+        {
+          "instrumentationLibrary": {
+            "name": "go.opentelemetry.io/otel/sdk/tracer"
+          },
+          "spans": [
+            {
+              "traceId": "aKYb16qC20kMMiZL+gU3UA==",
+              "spanId": "BH06DB9phgA=",
+              "parentSpanId": "S8a5U2iNtVg=",
+              "name": "pov-get-quote-server",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1645703713282227388",
+              "endTimeUnixNano": "1645703713299154400",
+              "attributes": [
+                {
+                  "key": "pov",
+                  "value": {
+                    "intValue": "1"
+                  }
+                },
+                {
+                  "key": "otel.status_code",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "internal.span.format",
+                  "value": {
+                    "stringValue": "proto"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "ip",
+            "value": {
+              "stringValue": "10.42.0.235"
+            }
+          },
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "shipping"
+            }
+          }
+        ]
+      },
+      "instrumentationLibrarySpans": [
+        {
+          "instrumentationLibrary": {
+            "name": "github.com/go-redis/redis"
+          },
+          "spans": [
+            {
+              "traceId": "aKYb16qC20kMMiZL+gU3UA==",
+              "spanId": "0wnCB8TuXb8=",
+              "parentSpanId": "wsO9KpMuKh4=",
+              "name": "get",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1645703712248081220",
+              "endTimeUnixNano": "1645703712248304609",
+              "attributes": [
+                {
+                  "key": "db.system",
+                  "value": {
+                    "stringValue": "redis"
+                  }
+                },
+                {
+                  "key": "db.statement",
+                  "value": {
+                    "stringValue": "get key"
+                  }
+                },
+                {
+                  "key": "otel.status_code",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "internal.span.format",
+                  "value": {
+                    "stringValue": "proto"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "ip",
+            "value": {
+              "stringValue": "10.42.0.235"
+            }
+          },
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "shipping"
+            }
+          }
+        ]
+      },
+      "instrumentationLibrarySpans": [
+        {
+          "instrumentationLibrary": {
+            "name": "github.com/go-redis/redis"
+          },
+          "spans": [
+            {
+              "traceId": "aKYb16qC20kMMiZL+gU3UA==",
+              "spanId": "T3sZIuuELV4=",
+              "parentSpanId": "wsO9KpMuKh4=",
+              "name": "set",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1645703712246667416",
+              "endTimeUnixNano": "1645703712248068910",
+              "attributes": [
+                {
+                  "key": "db.system",
+                  "value": {
+                    "stringValue": "redis"
+                  }
+                },
+                {
+                  "key": "db.statement",
+                  "value": {
+                    "stringValue": "set key 68a61bd7aa82db490c32264bfa053750"
+                  }
+                },
+                {
+                  "key": "otel.status_code",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "internal.span.format",
+                  "value": {
+                    "stringValue": "proto"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "ip",
+            "value": {
+              "stringValue": "10.42.0.235"
+            }
+          },
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "shipping"
+            }
+          }
+        ]
+      },
+      "instrumentationLibrarySpans": [
+        {
+          "instrumentationLibrary": {
+            "name": "go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc",
+            "version": "semver:0.27.0"
+          },
+          "spans": [
+            {
+              "traceId": "aKYb16qC20kMMiZL+gU3UA==",
+              "spanId": "++saRWaeVfU=",
+              "parentSpanId": "30rZOnVDd9s=",
+              "name": "msdemo.ShippingService/GetQuote",
+              "kind": "SPAN_KIND_SERVER",
+              "startTimeUnixNano": "1645703712246526956",
+              "endTimeUnixNano": "1645703713281419742",
+              "attributes": [
+                {
+                  "key": "rpc.system",
+                  "value": {
+                    "stringValue": "grpc"
+                  }
+                },
+                {
+                  "key": "rpc.service",
+                  "value": {
+                    "stringValue": "msdemo.ShippingService"
+                  }
+                },
+                {
+                  "key": "rpc.method",
+                  "value": {
+                    "stringValue": "GetQuote"
+                  }
+                },
+                {
+                  "key": "net.peer.ip",
+                  "value": {
+                    "stringValue": "10.42.0.228"
+                  }
+                },
+                {
+                  "key": "net.peer.port",
+                  "value": {
+                    "stringValue": "35814"
+                  }
+                },
+                {
+                  "key": "rpc.grpc.status_code",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "otel.status_code",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "internal.span.format",
+                  "value": {
+                    "stringValue": "proto"
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "timeUnixNano": "1645703712246541726",
+                  "name": "message",
+                  "attributes": [
+                    {
+                      "key": "message.type",
+                      "value": {
+                        "stringValue": "RECEIVED"
+                      }
+                    },
+                    {
+                      "key": "message.id",
+                      "value": {
+                        "intValue": "1"
+                      }
+                    },
+                    {
+                      "key": "message.uncompressed_size",
+                      "value": {
+                        "intValue": "0"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "timeUnixNano": "1645703713281418432",
+                  "name": "message",
+                  "attributes": [
+                    {
+                      "key": "message.type",
+                      "value": {
+                        "stringValue": "SENT"
+                      }
+                    },
+                    {
+                      "key": "message.id",
+                      "value": {
+                        "intValue": "1"
+                      }
+                    },
+                    {
+                      "key": "message.uncompressed_size",
+                      "value": {
+                        "intValue": "14"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "ip",
+            "value": {
+              "stringValue": "10.42.0.235"
+            }
+          },
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "shipping"
+            }
+          }
+        ]
+      },
+      "instrumentationLibrarySpans": [
+        {
+          "instrumentationLibrary": {
+            "name": "go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc",
+            "version": "semver:0.27.0"
+          },
+          "spans": [
+            {
+              "traceId": "aKYb16qC20kMMiZL+gU3UA==",
+              "spanId": "xKDgg6X6lag=",
+              "parentSpanId": "BH06DB9phgA=",
+              "name": "msdemo.ProductCatalogService/GetProduct",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": "1645703713284245640",
+              "endTimeUnixNano": "1645703713299085781",
+              "attributes": [
+                {
+                  "key": "rpc.system",
+                  "value": {
+                    "stringValue": "grpc"
+                  }
+                },
+                {
+                  "key": "rpc.service",
+                  "value": {
+                    "stringValue": "msdemo.ProductCatalogService"
+                  }
+                },
+                {
+                  "key": "rpc.method",
+                  "value": {
+                    "stringValue": "GetProduct"
+                  }
+                },
+                {
+                  "key": "net.peer.ip",
+                  "value": {
+                    "stringValue": "productcatalogservice"
+                  }
+                },
+                {
+                  "key": "net.peer.port",
+                  "value": {
+                    "stringValue": "3550"
+                  }
+                },
+                {
+                  "key": "rpc.grpc.status_code",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "otel.status_code",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "internal.span.format",
+                  "value": {
+                    "stringValue": "proto"
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "timeUnixNano": "1645703713284271580",
+                  "name": "message",
+                  "attributes": [
+                    {
+                      "key": "message.type",
+                      "value": {
+                        "stringValue": "SENT"
+                      }
+                    },
+                    {
+                      "key": "message.id",
+                      "value": {
+                        "intValue": "1"
+                      }
+                    },
+                    {
+                      "key": "message.uncompressed_size",
+                      "value": {
+                        "intValue": "12"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "timeUnixNano": "1645703713299083061",
+                  "name": "message",
+                  "attributes": [
+                    {
+                      "key": "message.type",
+                      "value": {
+                        "stringValue": "RECEIVED"
+                      }
+                    },
+                    {
+                      "key": "message.id",
+                      "value": {
+                        "intValue": "1"
+                      }
+                    },
+                    {
+                      "key": "message.uncompressed_size",
+                      "value": {
+                        "intValue": "142"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "ip",
+            "value": {
+              "stringValue": "10.42.0.228"
+            }
+          },
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "pov-client"
+            }
+          }
+        ]
+      },
+      "instrumentationLibrarySpans": [
+        {
+          "instrumentationLibrary": {
+            "name": "http-app"
+          },
+          "spans": [
+            {
+              "traceId": "aKYb16qC20kMMiZL+gU3UA==",
+              "spanId": "GAAGr+A8zZ4=",
+              "parentSpanId": "YDJMd9OmV2k=",
+              "name": "pov-span",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1645703713281809560",
+              "endTimeUnixNano": "1645703714300447971",
+              "attributes": [
+                {
+                  "key": "otel.status_code",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "internal.span.format",
+                  "value": {
+                    "stringValue": "proto"
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "timeUnixNano": "1645703713281815030",
+                  "name": "event",
+                  "attributes": [
+                    {
+                      "key": "pid",
+                      "value": {
+                        "intValue": "4328"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "timeUnixNano": "1645703713281815670",
+                  "name": "event2"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "resource": {
+        "attributes": []
+      },
+      "instrumentationLibrarySpans": [
+        {
+          "instrumentationLibrary": {
+            "name": "tracetest",
+            "version": "v1"
+          },
+          "spans": [
+            {
+              "traceId": "aKYb16qC20kMMiZL+gU3UA==",
+              "spanId": "+9/JOnSJx6E=",
+              "name": "tracetest",
+              "kind": "SPAN_KIND_CLIENT"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

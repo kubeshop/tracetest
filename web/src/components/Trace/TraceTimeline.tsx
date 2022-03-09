@@ -2,8 +2,8 @@ import {useEffect, useRef} from 'react';
 import styled from 'styled-components';
 import * as d3 from 'd3';
 import Title from 'antd/lib/typography/Title';
+import {ITrace} from 'types';
 
-import data from './data.json';
 import './TimelineChart.css';
 
 const Header = styled.div`
@@ -16,58 +16,63 @@ const Header = styled.div`
 `;
 
 interface IProps {
+  trace: ITrace;
   selectedSpan: any;
   onSelectSpan: (span: any) => void;
 }
 
-const TraceTimeline = ({selectedSpan, onSelectSpan}: IProps) => {
+const TraceTimeline = ({trace, selectedSpan, onSelectSpan}: IProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
 
   let treeFactory = d3.tree().size([200, 450]).nodeSize([0, 5]);
 
-  const spanDates = data.data
-    .map(i => i.spans)
-    .flat()
+  const spanDates = trace.resourceSpans
+    .map((i: any) => i.instrumentationLibrarySpans.map((el: any) => el.spans))
+    .flat(2)
     .map(span => ({
-      startTime: new Date(span.startTime),
-      endTime: new Date(span.startTime + span.duration),
+      startTime: new Date(Number(span.startTimeUnixNano) / 1000),
+      endTime: new Date(Number(span.endTimeUnixNano) / 1000),
       span,
     }));
 
-  const spanMap = data.data
-    .map(i => i.spans)
-    .flat()
+  const spanMap = trace.resourceSpans
+    .map((i: any) => i.instrumentationLibrarySpans.map((el: any) => el.spans))
+    .flat(2)
     .reduce((acc: {[key: string]: {id: string; parentIds: string[]; data: any}}, span) => {
-      acc[span.spanID] = acc[span.spanID] || {
-        id: span.spanID,
+      acc[span.spanId] = acc[span.spanId] || {
+        id: span.spanId,
         parentIds: [],
         data: span,
-        startTime: new Date(span.startTime),
-        endTime: new Date(span.startTime + span.duration),
+        startTime: new Date(Number(span.startTimeUnixNano) / 1000),
+        endTime: new Date(Number(span.endTimeUnixNano) / 1000),
       };
-      span.references.forEach(p => {
-        acc[span.spanID].parentIds.push(p.spanID);
-      });
+      acc[span.spanId].parentIds.push(span.parentSpanId);
       return acc;
     }, {});
 
-  const dagData = Object.values(spanMap).map(({id, parentIds, ...rest}) => ({id, parentId: parentIds[0], ...rest}));
+  const dagData = Object.values(spanMap).map(({id, parentIds, ...rest}) => {
+    const parents = parentIds.filter(el => spanMap[el]);
+
+    return {id, parentId: parents[0], ...rest};
+  });
 
   const root = d3.stratify()(dagData);
+  const minNano = d3.min(spanDates, s => Number(s.span.startTimeUnixNano))! as number;
+  const maxNano = d3.max(spanDates, s => Number(s.span.endTimeUnixNano))! as number;
 
   const scaleTime = d3
     .scaleLinear()
-    .domain([0, d3.max(spanDates, s => s.span.duration)! + 1000 * 60 * 5])
+    .domain([0, maxNano - minNano])
     .range([250, 800]);
 
   const barHeight = 20;
   const theBarHeight = barHeight;
-  const minDate = d3.min(spanDates, s => s.startTime) as Date;
 
   useEffect(() => {
     let nodes = treeFactory(root);
     let nodesSort: any[] = [];
+
     nodes.sort((a: any, b: any) =>
       a.depth === b.depth ? a.data.startTime.getTime() - b.data.startTime.getTime() : a.depth - b.depth
     );
@@ -76,15 +81,15 @@ const TraceTimeline = ({selectedSpan, onSelectSpan}: IProps) => {
     nodesSort.forEach((n, i) => {
       n.x = i * barHeight;
     });
-
-    const chart = d3.select(svgRef.current).attr('viewBox', '0 0 800 500');
+    const height = barHeight * nodes.descendants().length + 50;
+    const chart = d3.select(svgRef.current).attr('viewBox', `0 0 810 ${height}`);
 
     const xAxis = d3
       .axisTop(scaleTime)
       .ticks(5)
-      .tickFormat(d => `${d}ms`);
+      .tickFormat(d => `${Number(d) / 1000000}ms`);
 
-    const milliTicks = d3.ticks(0, d3.max(spanDates, d => d.span.duration)!, 5);
+    const milliTicks = d3.ticks(0, maxNano - minNano, 5);
 
     const ticks = chart.append('g').attr('transform', 'translate(0,20)').call(xAxis);
 
@@ -106,7 +111,7 @@ const TraceTimeline = ({selectedSpan, onSelectSpan}: IProps) => {
       })
       .attr('y', 20)
       .attr('width', 1)
-      .attr('height', 500)
+      .attr('height', height)
       .attr('stroke', 'none')
       .attr('fill', 'rgb(213, 215, 224)');
     chart.append('g').attr('class', 'container').attr('transform', `translate(0 , 30 )`);
@@ -180,9 +185,16 @@ const TraceTimeline = ({selectedSpan, onSelectSpan}: IProps) => {
       .append('rect')
       .attr('rx', 3)
       .attr('ry', 3)
-      .attr('x', d => scaleTime(d.data.startTime.getTime() - minDate.getTime()))
+      .attr('x', d => {
+        return scaleTime(Number(d.data.data.startTimeUnixNano || minNano) - minNano);
+      })
       .attr('y', 5)
-      .attr('width', (d: any) => scaleTime(d.data.endTime.getTime()) - scaleTime(d.data.startTime.getTime()))
+      .attr('width', (d: any) => {
+        return (
+          scaleTime(Number(d.data.data.endTimeUnixNano || maxNano) - Number(d.data.data.startTimeUnixNano || minNano)) -
+          250
+        );
+      })
       .attr('height', theBarHeight / 2)
       .attr('stroke', 'none')
       .attr('fill', e => (e.depth < 2 ? 'rgb(70, 74, 102)' : 'rgb(29, 233, 182)'))
@@ -198,7 +210,7 @@ const TraceTimeline = ({selectedSpan, onSelectSpan}: IProps) => {
       .attr('pointer-events', 'none')
       .attr('alignment-baseline', 'middle')
       .attr('dominant-baseline', 'middle')
-      .text((d: any) => d.data.data.operationName);
+      .text((d: any) => d.data.data?.name?.split('/')?.pop());
 
     let nodeUpdate = node.merge(nodeEnter as any);
 
