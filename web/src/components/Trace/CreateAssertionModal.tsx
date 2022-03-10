@@ -47,7 +47,6 @@ const CreateAssertionModal = ({testId, span, trace, open, onClose}: IProps) => {
   const [assertionList, setAssertionList] = useState<Array<string>>(Array(3).fill(''));
   const [createAssertion, result] = useCreateAssertionMutation();
   const attrs = jemsPath.search(trace, filterBySpanId(span.spanId));
-  console.log('@@CreateAssertionModal', attrs);
 
   const selectorCondition = assertionList
     .map(k => {
