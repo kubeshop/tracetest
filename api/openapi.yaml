@@ -219,6 +219,7 @@ components:
           type: string
         serviceUnderTest:
           type: object
+          description: TODO(pov) Postman collections format for Requests
           properties:
             id:
               type: string
@@ -235,13 +236,8 @@ components:
           items:
             $ref: "#/components/schemas/Assertion"
           description: Definition of assertions that are going to be made
-        repeats:
-          type: integer
-        results:
-          type: array
-          items:
-            $ref: "#/components/schemas/Result"
-          description: Test results
+        lastTestResult:
+          $ref: "#/components/schemas/Result"
     Assertion:
       type: object
       properties:
@@ -249,17 +245,14 @@ components:
           type: string
           description: ID
           readOnly: true
-        selector:
-          description: Defines the scope where the sought property/ies is located
-          type: string
-        comparable:
-          description: Defines the expected value of the property/ies
-          type: string
-        operator:
-          description: |
-            Defines how the value of sought property/ies should be compared
-            For example lt (less then), gt (greater then), eq (equals), in (contains)
-          type: string
+        selectors:
+          type: array
+          items:
+            $ref: "#/components/schemas/SelectorItem"
+        spanAssertions:
+          type: array
+          items:
+            $ref: "#/components/schemas/SpanAssertion"
         successful:
           type: boolean
     Result:
@@ -291,6 +284,12 @@ components:
         completedAt:
           type: string
           format: date-time
+        response:
+          type: object
+          description: TODO(pov) This is going to be HTTP Response object for now, at some point it might be GRPC/SOAP/...
+        trace:
+          type: object
+          description: Trace in standard OTEL format, only set when getting single test result
     Attribute:
       type: object
       properties:
@@ -309,3 +308,41 @@ components:
           type: string
           description: ID
           readOnly: true
+    SelectorItem:
+      type: object
+      properties:
+        locationName:
+          type: string
+          enum: [RESOURCE_ATTRIBUTES, INSTRUMENTATION_LIBRARY, SPAN, SPAN_ATTRIBUTES]
+          description: Example "SPAN"
+        propertyName:
+          type: string
+          description: Example "operation"
+        value:
+          type: string
+          description: Example "POST /users/verify"
+        valueType: 
+          type: string
+          description: TODO(pov) think about value types?
+          enum: [stringValue, intValue]
+    SpanAssertion:
+      type: object
+      properties:
+        locationName:
+          type: string
+          enum: [RESOURCE_ATTRIBUTES, INSTRUMENTATION_LIBRARY, SPAN, SPAN_ATTRIBUTES]
+          description: Example "SPAN_ATTRIBUTES"
+        propertyName:
+          type: string
+          description: Example "http.status.code"
+        valueType: 
+          type: string
+          description: Example "intValue"
+          enum: [stringValue, intValue]
+        operator: 
+          type: string
+          description: Example "EQUALS"
+          enum: [EQUALS, LESSTHAN, GREATERTHAN, NOTEQUALS]
+        comparisonValue:
+          type: string
+          description: Example "200"
