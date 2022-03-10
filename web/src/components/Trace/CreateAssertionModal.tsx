@@ -6,7 +6,6 @@ import Text from 'antd/lib/typography/Text';
 
 import {IAttribute, ISpan} from 'types';
 import {useCreateAssertionMutation} from 'services/TestService';
-import data from './data.json';
 
 const {Title} = Typography;
 interface IProps {
@@ -14,6 +13,7 @@ interface IProps {
   onClose: () => void;
   span: ISpan;
   testId: string;
+  trace: any;
 }
 
 const Select = styled(AntSelect)`
@@ -43,11 +43,11 @@ const selectorConditionBuilder = (attribute: IAttribute) => {
   }
 };
 
-const CreateAssertionModal = ({testId, span, open, onClose}: IProps) => {
+const CreateAssertionModal = ({testId, span, trace, open, onClose}: IProps) => {
   const [assertionList, setAssertionList] = useState<Array<string>>(Array(3).fill(''));
   const [createAssertion, result] = useCreateAssertionMutation();
+  const attrs = jemsPath.search(trace, filterBySpanId(span.spanId));
 
-  const attrs = jemsPath.search(data, filterBySpanId(span.spanId));
   const selectorCondition = assertionList
     .map(k => {
       return attrs?.find((el: any) => el.key === k);
@@ -56,7 +56,7 @@ const CreateAssertionModal = ({testId, span, open, onClose}: IProps) => {
     .map(item => selectorConditionBuilder(item))
     .join(' && ');
   console.log('@@query', selectionPipe(filterByAttributes(selectorCondition)));
-  const effectedSpans = jemsPath.search(data, selectionPipe(filterByAttributes(selectorCondition)));
+  const effectedSpans = jemsPath.search(trace, selectionPipe(filterByAttributes(selectorCondition)));
   const spanTagsMap = attrs.reduce((acc: {[x: string]: any}, item: {key: string}) => {
     const keyPrefix = item.key.split('.').shift() || item.key;
     if (!keyPrefix) {

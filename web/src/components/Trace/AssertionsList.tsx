@@ -8,9 +8,10 @@ import CreateAssertionModal from './CreateAssertionModal';
 interface IProps {
   testId: string;
   targetSpan: ISpan;
+  trace: any;
 }
 
-const AssertionList = ({testId, targetSpan}: IProps) => {
+const AssertionList = ({testId, targetSpan, trace}: IProps) => {
   const [openCreateAssertion, setOpenCreateAssertion] = useState(false);
   const {data: testAssertions} = useGetTestAssertionsQuery(testId);
   return (
@@ -19,6 +20,7 @@ const AssertionList = ({testId, targetSpan}: IProps) => {
       <CreateAssertionModal
         key={`KEY_${targetSpan.spanId}`}
         testId={testId}
+        trace={trace}
         span={targetSpan}
         open={openCreateAssertion}
         onClose={() => setOpenCreateAssertion(false)}

@@ -84,7 +84,7 @@ const Trace = ({test, testResultId}: {test: Test; testResultId: string}) => {
                     </Tabs.TabPane>
                     {spanMap[selectedSpan.id]?.data && (
                       <Tabs.TabPane tab="Assertions" key="2">
-                        <AssertionList testId={test.id} targetSpan={spanMap[selectedSpan.id]?.data} />
+                        <AssertionList trace={traceData} testId={test.id} targetSpan={spanMap[selectedSpan.id]?.data} />
                       </Tabs.TabPane>
                     )}
                   </Tabs>
