@@ -61,7 +61,7 @@ const TestPage = () => {
       if (lastIndex >= 0) {
         activeKey = panes[lastIndex].key;
       } else {
-        activeKey = panes[0].key;
+        activeKey = '1';
       }
     }
 
