@@ -4,13 +4,16 @@ info:
   title: TraceTest
   description: OpenAPI definition for TraceTest endpoint and resources
 servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/ken21/Tracetest/0.0.1
   - url: /api
 paths:
   /tests:
     get:
       tags:
         - api
-      summary: "Create new test"
+      summary: "Get tests"
       description: "get tests"
       operationId: getTests
       responses:
@@ -23,7 +26,7 @@ paths:
                 items:
                   $ref: "#/components/schemas/Test"
         500:
-          description: "problem with creating test"
+          description: "problem with getting tests"
           # content:
           #   application/problem+json:
           #     schema:
@@ -56,13 +59,13 @@ paths:
           #       type: array
           #       items:
           #         $ref: "#/components/schemas/Problem"
-  /tests/{testid}:
+  /tests/{testId}:
     get:
       tags:
         - api
       parameters:
         - in: path
-          name: testid
+          name: testId
           schema:
             type: string
           required: true
@@ -77,17 +80,19 @@ paths:
               schema:
                 $ref: "#/components/schemas/Test"
         500:
-          description: "problem with creating test"
-  /tests/{testid}/run:
+          description: "problem with getting a test"
+  /tests/{testId}/run:
     post:
       tags:
         - api
       parameters:
         - in: path
-          name: testid
+          name: testId
           schema:
             type: string
           required: true
+      summary: "run test"
+      description: "run a particular test"          
       responses:
         200:
           description: successful operation
@@ -96,21 +101,23 @@ paths:
               schema:
                 $ref: "#/components/schemas/TestRun"
 
-  /tests/{testid}/results/{id}:
+  /tests/{testId}/results/{resultId}:
     get:
       tags:
         - api
       parameters:
         - in: path
-          name: testid
+          name: testId
           schema:
             type: string
           required: true
         - in: path
-          name: id
+          name: resultId
           schema:
             type: string
           required: true
+      summary: "get test result"
+      description: "get a particular test result"   
       responses:
         200:
           description: successful operation
@@ -120,22 +127,23 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Result"
-
-  /tests/{testid}/results/{id}/trace:
+  /tests/{testId}/results/{resultId}/trace:
     get:
       tags:
         - api
       parameters:
         - in: path
-          name: testid
+          name: testId
           schema:
             type: string
           required: true
         - in: path
-          name: id
+          name: resultId
           schema:
             type: string
           required: true
+      summary: "get the trace for a test result"
+      description: "get the trace created for a particular test result"   
       responses:
         200:
           description: trace
@@ -144,16 +152,18 @@ paths:
               schema:
                 type: object
 
-  /tests/{id}/results:
+  /tests/{testId}/results:
     get:
       tags:
         - api
       parameters:
         - in: path
-          name: id
+          name: testId
           schema:
             type: string
           required: true
+      summary: "get the results for a test"
+      description: "get the results from a particular test"
       responses:
         200:
           description: successful operation
@@ -163,18 +173,19 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Result"
-  /tests/{id}/assertions:
+  /tests/{testId}/assertions:
     get:
       tags:
         - api
       parameters:
         - in: path
-          name: id
+          name: testId
           schema:
             type: string
           required: true
       operationId: getAssertions
-      description: "Gets all assertions associated to the test"
+      summary: "Get assertions for a test"
+      description: "Gets all assertions associated to a particular test"
       responses:
         200:
           description: successful operation
@@ -187,13 +198,14 @@ paths:
     post:
       tags:
         - api
-      description: ""
       parameters:
         - in: path
-          name: id
+          name: testId
           schema:
             type: string
           required: true
+      summary: "Create an assertion for a test"
+      description: "Create an assertion for a particular test"
       operationId: createAssertion
       requestBody:
         content:
@@ -203,13 +215,12 @@ paths:
       responses:
         "200":
           description: OK
-
 components:
   schemas:
     Test:
       type: object
       properties:
-        id:
+        testId:
           type: string
           description: ID
           readOnly: true
@@ -241,7 +252,7 @@ components:
     Assertion:
       type: object
       properties:
-        id:
+        assertionId:
           type: string
           description: ID
           readOnly: true
@@ -253,31 +264,29 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SpanAssertion"
-        successful:
-          type: boolean
     Result:
       type: object
       properties:
-        id:
+        resultId:
           type: string
           description: ID
           readOnly: true
-        testid:
+        testId:
           type: string
           description: test ID
           readOnly: true
-        traceid:
+        traceId:
           type: string
           description: trace ID
           readOnly: true
-        spanid:
+        spanId:
           type: string
           description: parent span ID
           readOnly: true
-        successful:
-          $ref: "#/components/schemas/Assertion"
-        failed:
-          $ref: "#/components/schemas/Assertion"
+        testResult:
+          type: array
+          items:
+            $ref: "#/components/schemas/TestResult"
         createdAt:
           type: string
           format: date-time
@@ -290,21 +299,33 @@ components:
         trace:
           type: object
           description: Trace in standard OTEL format, only set when getting single test result
-    Attribute:
+    TestResult:
       type: object
+      description: "Individual test result"
       properties:
-        id:
+        assertionId: 
           type: string
-          description: ID
+          description: assertion ID
           readOnly: true
-        key:
+        spanAssertionId: 
           type: string
-        value:
+          description: "span assertion ID - the specific span assertion this result references"
+          readOnly: true   
+        spanId:
           type: string
+          description: "span ID - unique spanId pointing to the trace span referenced in this test result"
+          readOnly: true
+        observedValue:
+          type: string
+          description: "value that the trace for this test run contained"
+          readOnly: true
+        successful:
+          type: boolean 
+          description: "whether this assertion passed or failed"
     TestRun:
       type: object
       properties:
-        id:
+        testRunId:
           type: string
           description: ID
           readOnly: true
@@ -328,6 +349,10 @@ components:
     SpanAssertion:
       type: object
       properties:
+        spanAssertionId:
+          type: string
+          description: ID
+          readOnly: true      
         locationName:
           type: string
           enum: [RESOURCE_ATTRIBUTES, INSTRUMENTATION_LIBRARY, SPAN, SPAN_ATTRIBUTES]
