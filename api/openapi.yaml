@@ -92,7 +92,7 @@ paths:
             type: string
           required: true
       summary: "run test"
-      description: "run a particular test"          
+      description: "run a particular test"
       responses:
         200:
           description: successful operation
@@ -117,7 +117,7 @@ paths:
             type: string
           required: true
       summary: "get test result"
-      description: "get a particular test result"   
+      description: "get a particular test result"
       responses:
         200:
           description: successful operation
@@ -126,7 +126,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Result"
+                  $ref: "#/components/schemas/TestRunResult"
   /tests/{testId}/results/{resultId}/trace:
     get:
       tags:
@@ -143,7 +143,7 @@ paths:
             type: string
           required: true
       summary: "get the trace for a test result"
-      description: "get the trace created for a particular test result"   
+      description: "get the trace created for a particular test result"
       responses:
         200:
           description: trace
@@ -172,7 +172,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Result"
+                  $ref: "#/components/schemas/TestRunResult"
   /tests/{testId}/assertions:
     get:
       tags:
@@ -248,7 +248,7 @@ components:
             $ref: "#/components/schemas/Assertion"
           description: Definition of assertions that are going to be made
         lastTestResult:
-          $ref: "#/components/schemas/Result"
+          $ref: "#/components/schemas/TestRunResult"
     Assertion:
       type: object
       properties:
@@ -264,7 +264,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SpanAssertion"
-    Result:
+    TestRunResult:
       type: object
       properties:
         resultId:
@@ -283,7 +283,7 @@ components:
           type: string
           description: parent span ID
           readOnly: true
-        testResult:
+        testResults:
           type: array
           items:
             $ref: "#/components/schemas/TestResult"
@@ -303,14 +303,14 @@ components:
       type: object
       description: "Individual test result"
       properties:
-        assertionId: 
+        assertionId:
           type: string
           description: assertion ID
           readOnly: true
-        spanAssertionId: 
+        spanAssertionId:
           type: string
           description: "span assertion ID - the specific span assertion this result references"
-          readOnly: true   
+          readOnly: true
         spanId:
           type: string
           description: "span ID - unique spanId pointing to the trace span referenced in this test result"
@@ -320,7 +320,7 @@ components:
           description: "value that the trace for this test run contained"
           readOnly: true
         successful:
-          type: boolean 
+          type: boolean
           description: "whether this assertion passed or failed"
     TestRun:
       type: object
@@ -342,7 +342,7 @@ components:
         value:
           type: string
           description: Example "POST /users/verify"
-        valueType: 
+        valueType:
           type: string
           description: TODO(pov) think about value types?
           enum: [stringValue, intValue]
@@ -352,7 +352,7 @@ components:
         spanAssertionId:
           type: string
           description: ID
-          readOnly: true      
+          readOnly: true
         locationName:
           type: string
           enum: [RESOURCE_ATTRIBUTES, INSTRUMENTATION_LIBRARY, SPAN, SPAN_ATTRIBUTES]
@@ -360,11 +360,11 @@ components:
         propertyName:
           type: string
           description: Example "http.status.code"
-        valueType: 
+        valueType:
           type: string
           description: Example "intValue"
           enum: [stringValue, intValue]
-        operator: 
+        operator:
           type: string
           description: Example "EQUALS"
           enum: [EQUALS, LESSTHAN, GREATERTHAN, NOTEQUALS]
