@@ -1,0 +1,48 @@
+site_name: Tracetest
+site_description: "Tracetest - Trace based testing.  Leverage your investment in tracing to easily create integration tests."
+site_author: "Kubeshop Tracetest Team"
+docs_dir: docs/
+repo_name: "kubeshop/tracetest"
+repo_url: "https://github.com/kubeshop/tracetest"
+edit_uri: blob/main/docs/
+
+theme:
+  name: material
+  locale: en
+  #logo: img/logo.png
+  #favicon: img/favicon.ico
+  features:
+    - navigation.expand
+
+extra_css:
+  - css/extra.css
+
+nav:
+  - Welcome: index.md
+  - Installation: installing.md
+  - Getting Started: getting-started.md
+  - Architecture: architecture.md
+  - OpenAPI Definition: openapi.md
+
+# extra:
+#   analytics:
+#     provider: google
+#     property: UA-??????????
+
+#   consent:
+#     title: Cookie consent
+#     description: >
+#       We use cookies to recognize your repeated visits and preferences, as well
+#       as to measure the effectiveness of our documentation and whether users
+#       find what they're searching for. With your consent, you're helping us to
+#       make our documentation better.
+plugins:
+  - render_swagger
+
+# Extensions
+markdown_extensions:
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+
+copyright: Copyright &copy; 2022 <a href="https://kubeshop.io">Kubeshop</a>
