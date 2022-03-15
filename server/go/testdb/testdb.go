@@ -95,12 +95,12 @@ func (td *TestDB) GetTest(ctx context.Context, id string) (*openapi.Test, error)
 		return nil, err
 	}
 
-	results, err := td.GetResultsByTestID(ctx, id)
+	as, err := td.GetAssertionsByTestID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 
-	test.Results = results
+	test.Assertions = as
 
 	return &test, nil
 }
@@ -128,12 +128,12 @@ func (td *TestDB) GetTests(ctx context.Context) ([]openapi.Test, error) {
 			return nil, err
 		}
 
-		results, err := td.GetResultsByTestID(ctx, test.Id)
+		as, err := td.GetAssertionsByTestID(ctx, test.Id)
 		if err != nil {
 			return nil, err
 		}
 
-		test.Results = results
+		test.Assertions = as
 
 		tests = append(tests, test)
 	}
