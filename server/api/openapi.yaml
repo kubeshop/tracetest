@@ -209,61 +209,112 @@ components:
   schemas:
     Test:
       example:
-        repeats: 0
         name: name
         description: description
         id: id
         assertions:
-        - selector: selector
-          id: id
-          comparable: comparable
-          operator: operator
+        - id: id
+          selectors:
+          - locationName: RESOURCE_ATTRIBUTES
+            propertyName: propertyName
+            valueType: stringValue
+            value: value
+          - locationName: RESOURCE_ATTRIBUTES
+            propertyName: propertyName
+            valueType: stringValue
+            value: value
+          spanAssertions:
+          - locationName: RESOURCE_ATTRIBUTES
+            propertyName: propertyName
+            comparisonValue: comparisonValue
+            valueType: stringValue
+            operator: EQUALS
+          - locationName: RESOURCE_ATTRIBUTES
+            propertyName: propertyName
+            comparisonValue: comparisonValue
+            valueType: stringValue
+            operator: EQUALS
           successful: true
-        - selector: selector
-          id: id
-          comparable: comparable
-          operator: operator
+        - id: id
+          selectors:
+          - locationName: RESOURCE_ATTRIBUTES
+            propertyName: propertyName
+            valueType: stringValue
+            value: value
+          - locationName: RESOURCE_ATTRIBUTES
+            propertyName: propertyName
+            valueType: stringValue
+            value: value
+          spanAssertions:
+          - locationName: RESOURCE_ATTRIBUTES
+            propertyName: propertyName
+            comparisonValue: comparisonValue
+            valueType: stringValue
+            operator: EQUALS
+          - locationName: RESOURCE_ATTRIBUTES
+            propertyName: propertyName
+            comparisonValue: comparisonValue
+            valueType: stringValue
+            operator: EQUALS
           successful: true
         serviceUnderTest:
           auth: auth
           id: id
           url: url
-        results:
-        - traceid: traceid
+        lastTestResult:
+          traceid: traceid
           spanid: spanid
           createdAt: 2000-01-23T04:56:07.000+00:00
           completedAt: 2000-01-23T04:56:07.000+00:00
+          trace: '{}'
+          response: '{}'
           testid: testid
           id: id
           failed:
-            selector: selector
             id: id
-            comparable: comparable
-            operator: operator
+            selectors:
+            - locationName: RESOURCE_ATTRIBUTES
+              propertyName: propertyName
+              valueType: stringValue
+              value: value
+            - locationName: RESOURCE_ATTRIBUTES
+              propertyName: propertyName
+              valueType: stringValue
+              value: value
+            spanAssertions:
+            - locationName: RESOURCE_ATTRIBUTES
+              propertyName: propertyName
+              comparisonValue: comparisonValue
+              valueType: stringValue
+              operator: EQUALS
+            - locationName: RESOURCE_ATTRIBUTES
+              propertyName: propertyName
+              comparisonValue: comparisonValue
+              valueType: stringValue
+              operator: EQUALS
             successful: true
           successful:
-            selector: selector
             id: id
-            comparable: comparable
-            operator: operator
-            successful: true
-        - traceid: traceid
-          spanid: spanid
-          createdAt: 2000-01-23T04:56:07.000+00:00
-          completedAt: 2000-01-23T04:56:07.000+00:00
-          testid: testid
-          id: id
-          failed:
-            selector: selector
-            id: id
-            comparable: comparable
-            operator: operator
-            successful: true
-          successful:
-            selector: selector
-            id: id
-            comparable: comparable
-            operator: operator
+            selectors:
+            - locationName: RESOURCE_ATTRIBUTES
+              propertyName: propertyName
+              valueType: stringValue
+              value: value
+            - locationName: RESOURCE_ATTRIBUTES
+              propertyName: propertyName
+              valueType: stringValue
+              value: value
+            spanAssertions:
+            - locationName: RESOURCE_ATTRIBUTES
+              propertyName: propertyName
+              comparisonValue: comparisonValue
+              valueType: stringValue
+              operator: EQUALS
+            - locationName: RESOURCE_ATTRIBUTES
+              propertyName: propertyName
+              comparisonValue: comparisonValue
+              valueType: stringValue
+              operator: EQUALS
             successful: true
       properties:
         id:
@@ -281,37 +332,46 @@ components:
           items:
             $ref: '#/components/schemas/Assertion'
           type: array
-        repeats:
-          type: integer
-        results:
-          description: Test results
-          items:
-            $ref: '#/components/schemas/Result'
-          type: array
+        lastTestResult:
+          $ref: '#/components/schemas/Result'
       type: object
     Assertion:
       example:
-        selector: selector
         id: id
-        comparable: comparable
-        operator: operator
+        selectors:
+        - locationName: RESOURCE_ATTRIBUTES
+          propertyName: propertyName
+          valueType: stringValue
+          value: value
+        - locationName: RESOURCE_ATTRIBUTES
+          propertyName: propertyName
+          valueType: stringValue
+          value: value
+        spanAssertions:
+        - locationName: RESOURCE_ATTRIBUTES
+          propertyName: propertyName
+          comparisonValue: comparisonValue
+          valueType: stringValue
+          operator: EQUALS
+        - locationName: RESOURCE_ATTRIBUTES
+          propertyName: propertyName
+          comparisonValue: comparisonValue
+          valueType: stringValue
+          operator: EQUALS
         successful: true
       properties:
         id:
           description: ID
           readOnly: true
           type: string
-        selector:
-          description: Defines the scope where the sought property/ies is located
-          type: string
-        comparable:
-          description: Defines the expected value of the property/ies
-          type: string
-        operator:
-          description: |
-            Defines how the value of sought property/ies should be compared
-            For example lt (less then), gt (greater then), eq (equals), in (contains)
-          type: string
+        selectors:
+          items:
+            $ref: '#/components/schemas/SelectorItem'
+          type: array
+        spanAssertions:
+          items:
+            $ref: '#/components/schemas/SpanAssertion'
+          type: array
         successful:
           type: boolean
       type: object
@@ -321,19 +381,55 @@ components:
         spanid: spanid
         createdAt: 2000-01-23T04:56:07.000+00:00
         completedAt: 2000-01-23T04:56:07.000+00:00
+        trace: '{}'
+        response: '{}'
         testid: testid
         id: id
         failed:
-          selector: selector
           id: id
-          comparable: comparable
-          operator: operator
+          selectors:
+          - locationName: RESOURCE_ATTRIBUTES
+            propertyName: propertyName
+            valueType: stringValue
+            value: value
+          - locationName: RESOURCE_ATTRIBUTES
+            propertyName: propertyName
+            valueType: stringValue
+            value: value
+          spanAssertions:
+          - locationName: RESOURCE_ATTRIBUTES
+            propertyName: propertyName
+            comparisonValue: comparisonValue
+            valueType: stringValue
+            operator: EQUALS
+          - locationName: RESOURCE_ATTRIBUTES
+            propertyName: propertyName
+            comparisonValue: comparisonValue
+            valueType: stringValue
+            operator: EQUALS
           successful: true
         successful:
-          selector: selector
           id: id
-          comparable: comparable
-          operator: operator
+          selectors:
+          - locationName: RESOURCE_ATTRIBUTES
+            propertyName: propertyName
+            valueType: stringValue
+            value: value
+          - locationName: RESOURCE_ATTRIBUTES
+            propertyName: propertyName
+            valueType: stringValue
+            value: value
+          spanAssertions:
+          - locationName: RESOURCE_ATTRIBUTES
+            propertyName: propertyName
+            comparisonValue: comparisonValue
+            valueType: stringValue
+            operator: EQUALS
+          - locationName: RESOURCE_ATTRIBUTES
+            propertyName: propertyName
+            comparisonValue: comparisonValue
+            valueType: stringValue
+            operator: EQUALS
           successful: true
       properties:
         id:
@@ -362,6 +458,14 @@ components:
         completedAt:
           format: date-time
           type: string
+        response:
+          description: TODO(pov) This is going to be HTTP Response object for now,
+            at some point it might be GRPC/SOAP/...
+          type: object
+        trace:
+          description: Trace in standard OTEL format, only set when getting single
+            test result
+          type: object
       type: object
     Attribute:
       properties:
@@ -383,7 +487,73 @@ components:
           readOnly: true
           type: string
       type: object
+    SelectorItem:
+      example:
+        locationName: RESOURCE_ATTRIBUTES
+        propertyName: propertyName
+        valueType: stringValue
+        value: value
+      properties:
+        locationName:
+          description: Example "SPAN"
+          enum:
+          - RESOURCE_ATTRIBUTES
+          - INSTRUMENTATION_LIBRARY
+          - SPAN
+          - SPAN_ATTRIBUTES
+          type: string
+        propertyName:
+          description: Example "operation"
+          type: string
+        value:
+          description: Example "POST /users/verify"
+          type: string
+        valueType:
+          description: TODO(pov) think about value types?
+          enum:
+          - stringValue
+          - intValue
+          type: string
+      type: object
+    SpanAssertion:
+      example:
+        locationName: RESOURCE_ATTRIBUTES
+        propertyName: propertyName
+        comparisonValue: comparisonValue
+        valueType: stringValue
+        operator: EQUALS
+      properties:
+        locationName:
+          description: Example "SPAN_ATTRIBUTES"
+          enum:
+          - RESOURCE_ATTRIBUTES
+          - INSTRUMENTATION_LIBRARY
+          - SPAN
+          - SPAN_ATTRIBUTES
+          type: string
+        propertyName:
+          description: Example "http.status.code"
+          type: string
+        valueType:
+          description: Example "intValue"
+          enum:
+          - stringValue
+          - intValue
+          type: string
+        operator:
+          description: Example "EQUALS"
+          enum:
+          - EQUALS
+          - LESSTHAN
+          - GREATERTHAN
+          - NOTEQUALS
+          type: string
+        comparisonValue:
+          description: Example "200"
+          type: string
+      type: object
     Test_serviceUnderTest:
+      description: TODO(pov) Postman collections format for Requests
       example:
         auth: auth
         id: id
