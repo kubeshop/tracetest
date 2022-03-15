@@ -68,6 +68,7 @@ paths:
           name: testId
           schema:
             type: string
+            format: uuid
           required: true
       summary: "get test"
       description: "get test"
@@ -90,6 +91,7 @@ paths:
           name: testId
           schema:
             type: string
+            format: uuid
           required: true
       summary: "run test"
       description: "run a particular test"
@@ -110,11 +112,13 @@ paths:
           name: testId
           schema:
             type: string
+            format: uuid
           required: true
         - in: path
           name: resultId
           schema:
             type: string
+            format: uuid
           required: true
       summary: "get test result"
       description: "get a particular test result"
@@ -136,11 +140,13 @@ paths:
           name: testId
           schema:
             type: string
+            format: uuid
           required: true
         - in: path
           name: resultId
           schema:
             type: string
+            format: uuid
           required: true
       summary: "get the trace for a test result"
       description: "get the trace created for a particular test result"
@@ -161,6 +167,7 @@ paths:
           name: testId
           schema:
             type: string
+            format: uuid
           required: true
       summary: "get the results for a test"
       description: "get the results from a particular test"
@@ -182,6 +189,7 @@ paths:
           name: testId
           schema:
             type: string
+            format: uuid
           required: true
       operationId: getAssertions
       summary: "Get assertions for a test"
@@ -203,6 +211,7 @@ paths:
           name: testId
           schema:
             type: string
+            format: uuid
           required: true
       summary: "Create an assertion for a test"
       description: "Create an assertion for a particular test"
@@ -223,6 +232,7 @@ components:
         testId:
           type: string
           description: ID
+          format: uuid
           readOnly: true
         name:
           type: string
@@ -235,6 +245,7 @@ components:
             id:
               type: string
               description: ID
+              format: uuid
               readOnly: true
             url:
               type: string
@@ -255,6 +266,7 @@ components:
         assertionId:
           type: string
           description: ID
+          format: uuid
           readOnly: true
         selectors:
           type: array
@@ -270,10 +282,12 @@ components:
         resultId:
           type: string
           description: ID
+          format: uuid
           readOnly: true
         testId:
           type: string
           description: test ID
+          format: uuid
           readOnly: true
         traceId:
           type: string
@@ -283,10 +297,6 @@ components:
           type: string
           description: parent span ID
           readOnly: true
-        testResults:
-          type: array
-          items:
-            $ref: "#/components/schemas/TestResult"
         createdAt:
           type: string
           format: date-time
@@ -299,35 +309,13 @@ components:
         trace:
           type: object
           description: Trace in standard OTEL format, only set when getting single test result
-    TestResult:
-      type: object
-      description: "Individual test result"
-      properties:
-        assertionId:
-          type: string
-          description: assertion ID
-          readOnly: true
-        spanAssertionId:
-          type: string
-          description: "span assertion ID - the specific span assertion this result references"
-          readOnly: true
-        spanId:
-          type: string
-          description: "span ID - unique spanId pointing to the trace span referenced in this test result"
-          readOnly: true
-        observedValue:
-          type: string
-          description: "value that the trace for this test run contained"
-          readOnly: true
-        successful:
-          type: boolean
-          description: "whether this assertion passed or failed"
     TestRun:
       type: object
       properties:
         testRunId:
           type: string
           description: ID
+          format: uuid
           readOnly: true
     SelectorItem:
       type: object
