@@ -40,12 +40,21 @@ PROTOC_WITH_GRPC := $(PROTOC) \
 PROTOC_INTERNAL := $(PROTOC) \
 		$(PROTO_INCLUDES)
 
+SWAGGER_VER=0.12.0
+SWAGGER_IMAGE=quay.io/goswagger/swagger:$(SWAGGER_VER)
+SWAGGER=docker run --rm -u ${shell id -u} -v "${PWD}:/go/src/${PROJECT_ROOT}" -w /go/src/${PROJECT_ROOT} $(SWAGGER_IMAGE)
+
 proto:
 	rm -rf ./$(PROTO_GEN_GO_DIR)
 	mkdir -p ${PROTO_GEN_GO_DIR}
+	mkdir -p swagger
 
 	# API v3
 	$(PROTOC_WITH_GRPC) \
+		jaeger-idl/proto/api_v3/query_service.proto
+
+	$(PROTOC_INTERNAL) \
+		--swagger_out=disable_default_errors=true,logtostderr=true:./swagger \
 		jaeger-idl/proto/api_v3/query_service.proto
 
 	$(PROTOC_INTERNAL) \
@@ -59,3 +68,7 @@ proto:
 		tempo-idl/tempo.proto
 	cp tempo-idl/prealloc.go server/go/internal/proto-gen-go/tempo-idl/
 
+swagger: proto
+	cp swagger/api_v3/query_service.swagger.json api/trace.json
+	cat api/trace.json | yq e -P - > api/trace.yaml
+	rm api/trace.json

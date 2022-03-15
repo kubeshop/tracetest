@@ -34,6 +34,11 @@ type Result struct {
 	CreatedAt time.Time `json:"createdAt,omitempty"`
 
 	CompletedAt time.Time `json:"completedAt,omitempty"`
+
+	// TODO(pov) This is going to be HTTP Response object for now, at some point it might be GRPC/SOAP/...
+	Response map[string]interface{} `json:"response,omitempty"`
+
+	Trace ApiV3SpansResponseChunk `json:"trace,omitempty"`
 }
 
 // AssertResultRequired checks if the required fields are not zero-ed
@@ -42,6 +47,9 @@ func AssertResultRequired(obj Result) error {
 		return err
 	}
 	if err := AssertAssertionRequired(obj.Failed); err != nil {
+		return err
+	}
+	if err := AssertApiV3SpansResponseChunkRequired(obj.Trace); err != nil {
 		return err
 	}
 	return nil
