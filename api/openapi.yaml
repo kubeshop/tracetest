@@ -4,13 +4,16 @@ info:
   title: TraceTest
   description: OpenAPI definition for TraceTest endpoint and resources
 servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/ken21/Tracetest/0.0.1
   - url: /api
 paths:
   /tests:
     get:
       tags:
         - api
-      summary: "Create new test"
+      summary: "Get tests"
       description: "get tests"
       operationId: getTests
       responses:
@@ -23,7 +26,7 @@ paths:
                 items:
                   $ref: "#/components/schemas/Test"
         500:
-          description: "problem with creating test"
+          description: "problem with getting tests"
           # content:
           #   application/problem+json:
           #     schema:
@@ -56,15 +59,16 @@ paths:
           #       type: array
           #       items:
           #         $ref: "#/components/schemas/Problem"
-  /tests/{testid}:
+  /tests/{testId}:
     get:
       tags:
         - api
       parameters:
         - in: path
-          name: testid
+          name: testId
           schema:
             type: string
+            format: uuid
           required: true
       summary: "get test"
       description: "get test"
@@ -77,17 +81,20 @@ paths:
               schema:
                 $ref: "#/components/schemas/Test"
         500:
-          description: "problem with creating test"
-  /tests/{testid}/run:
+          description: "problem with getting a test"
+  /tests/{testId}/run:
     post:
       tags:
         - api
       parameters:
         - in: path
-          name: testid
+          name: testId
           schema:
             type: string
+            format: uuid
           required: true
+      summary: "run test"
+      description: "run a particular test"
       responses:
         200:
           description: successful operation
@@ -96,21 +103,25 @@ paths:
               schema:
                 $ref: "#/components/schemas/TestRun"
 
-  /tests/{testid}/results/{id}:
+  /tests/{testId}/results/{resultId}:
     get:
       tags:
         - api
       parameters:
         - in: path
-          name: testid
+          name: testId
           schema:
             type: string
+            format: uuid
           required: true
         - in: path
-          name: id
+          name: resultId
           schema:
             type: string
+            format: uuid
           required: true
+      summary: "get test result"
+      description: "get a particular test result"
       responses:
         200:
           description: successful operation
@@ -119,23 +130,26 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Result"
-
-  /tests/{testid}/results/{id}/trace:
+                  $ref: "#/components/schemas/TestRunResult"
+  /tests/{testId}/results/{resultId}/trace:
     get:
       tags:
         - api
       parameters:
         - in: path
-          name: testid
+          name: testId
           schema:
             type: string
+            format: uuid
           required: true
         - in: path
-          name: id
+          name: resultId
           schema:
             type: string
+            format: uuid
           required: true
+      summary: "get the trace for a test result"
+      description: "get the trace created for a particular test result"
       responses:
         200:
           description: trace
@@ -144,16 +158,19 @@ paths:
               schema:
                 type: object
 
-  /tests/{id}/results:
+  /tests/{testId}/results:
     get:
       tags:
         - api
       parameters:
         - in: path
-          name: id
+          name: testId
           schema:
             type: string
+            format: uuid
           required: true
+      summary: "get the results for a test"
+      description: "get the results from a particular test"
       responses:
         200:
           description: successful operation
@@ -162,19 +179,21 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Result"
-  /tests/{id}/assertions:
+                  $ref: "#/components/schemas/TestRunResult"
+  /tests/{testId}/assertions:
     get:
       tags:
         - api
       parameters:
         - in: path
-          name: id
+          name: testId
           schema:
             type: string
+            format: uuid
           required: true
       operationId: getAssertions
-      description: "Gets all assertions associated to the test"
+      summary: "Get assertions for a test"
+      description: "Gets all assertions associated to a particular test"
       responses:
         200:
           description: successful operation
@@ -187,13 +206,15 @@ paths:
     post:
       tags:
         - api
-      description: ""
       parameters:
         - in: path
-          name: id
+          name: testId
           schema:
             type: string
+            format: uuid
           required: true
+      summary: "Create an assertion for a test"
+      description: "Create an assertion for a particular test"
       operationId: createAssertion
       requestBody:
         content:
@@ -203,15 +224,15 @@ paths:
       responses:
         "200":
           description: OK
-
 components:
   schemas:
     Test:
       type: object
       properties:
-        id:
+        testId:
           type: string
           description: ID
+          format: uuid
           readOnly: true
         name:
           type: string
@@ -224,6 +245,7 @@ components:
             id:
               type: string
               description: ID
+              format: uuid
               readOnly: true
             url:
               type: string
@@ -237,13 +259,14 @@ components:
             $ref: "#/components/schemas/Assertion"
           description: Definition of assertions that are going to be made
         lastTestResult:
-          $ref: "#/components/schemas/Result"
+          $ref: "#/components/schemas/TestRunResult"
     Assertion:
       type: object
       properties:
-        id:
+        assertionId:
           type: string
           description: ID
+          format: uuid
           readOnly: true
         selectors:
           type: array
@@ -253,31 +276,27 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SpanAssertion"
-        successful:
-          type: boolean
-    Result:
+    TestRunResult:
       type: object
       properties:
-        id:
+        resultId:
           type: string
           description: ID
+          format: uuid
           readOnly: true
-        testid:
+        testId:
           type: string
           description: test ID
+          format: uuid
           readOnly: true
-        traceid:
+        traceId:
           type: string
           description: trace ID
           readOnly: true
-        spanid:
+        spanId:
           type: string
           description: parent span ID
           readOnly: true
-        successful:
-          $ref: "#/components/schemas/Assertion"
-        failed:
-          $ref: "#/components/schemas/Assertion"
         createdAt:
           type: string
           format: date-time
@@ -303,9 +322,10 @@ components:
     TestRun:
       type: object
       properties:
-        id:
+        testRunId:
           type: string
           description: ID
+          format: uuid
           readOnly: true
     SelectorItem:
       type: object
@@ -320,13 +340,17 @@ components:
         value:
           type: string
           description: Example "POST /users/verify"
-        valueType: 
+        valueType:
           type: string
           description: TODO(pov) think about value types?
           enum: [stringValue, intValue]
     SpanAssertion:
       type: object
       properties:
+        spanAssertionId:
+          type: string
+          description: ID
+          readOnly: true
         locationName:
           type: string
           enum: [RESOURCE_ATTRIBUTES, INSTRUMENTATION_LIBRARY, SPAN, SPAN_ATTRIBUTES]
@@ -334,11 +358,11 @@ components:
         propertyName:
           type: string
           description: Example "http.status.code"
-        valueType: 
+        valueType:
           type: string
           description: Example "intValue"
           enum: [stringValue, intValue]
-        operator: 
+        operator:
           type: string
           description: Example "EQUALS"
           enum: [EQUALS, LESSTHAN, GREATERTHAN, NOTEQUALS]
