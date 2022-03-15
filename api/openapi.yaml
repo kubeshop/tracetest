@@ -288,8 +288,7 @@ components:
           type: object
           description: TODO(pov) This is going to be HTTP Response object for now, at some point it might be GRPC/SOAP/...
         trace:
-          type: object
-          description: Trace in standard OTEL format, only set when getting single test result
+          $ref: "./trace.yaml#/definitions/api_v3SpansResponseChunk"
     Attribute:
       type: object
       properties:
