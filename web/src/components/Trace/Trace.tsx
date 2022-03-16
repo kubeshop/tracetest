@@ -74,7 +74,7 @@ const Trace = ({test, testResultId}: {test: Test; testResultId: string}) => {
               </ReflexElement>
 
               <ReflexElement flex={0.5} className="right-pane">
-                <div className="pane-content" style={{paddingLeft: 8}}>
+                <div className="pane-content" style={{paddingLeft: 8, overflow: 'hidden'}}>
                   <div>
                     <Text>Service</Text>
                   </div>

@@ -32,6 +32,7 @@ const TestDetails = ({testId, onSelectResult}: IProps) => {
     <div style={{overflowY: 'hidden'}}>
       <Title level={5}>Test Results</Title>
       <Table
+        rowKey="id"
         loading={isLoading}
         columns={columns}
         dataSource={testResults?.slice()?.reverse()}

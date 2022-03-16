@@ -6,6 +6,7 @@ import Text from 'antd/lib/typography/Text';
 
 import {IAttribute, ISpan} from 'types';
 import {useCreateAssertionMutation} from 'services/TestService';
+import {filterBySpanId} from 'utils';
 
 const {Title} = Typography;
 interface IProps {
@@ -23,11 +24,6 @@ const Select = styled(AntSelect)`
   }
 `;
 
-const flattenAttributesSelector = () =>
-  `resourceSpans[].[instrumentationLibrarySpans[].spans[].attributes[].{key:key,value:value.*|[0]},resource.attributes[].{key:key,value: value.*|[0]}]|[][]`;
-
-const filterBySpanId = (spanId: string = '') =>
-  `resourceSpans[?instrumentationLibrarySpans[?spans[?starts_with(spanId,'${spanId}')]]] | [].[instrumentationLibrarySpans[].spans[].attributes[].{key:key,value:value.*|[0],type:'span'},resource.attributes[].{key:key,value: value.*|[0],type:'resource'}]|[][]`;
 const NORMALIZED_OBJECT = `resourceSpans[].{instrumentationLibrarySpans:instrumentationLibrarySpans[].{spans:spans[].{spanId:spanId,attributes:attributes[].{key:key,value:value.*|[0],type:'span'}}},resource:resource.{attributes:attributes[].{key:key,value: value.*|[0],type:'resource'}}}`;
 const filterByAttributes = (condition: string) => `[${condition && '?'}${condition}]`;
 
@@ -56,7 +52,8 @@ const CreateAssertionModal = ({testId, span, trace, open, onClose}: IProps) => {
     .map(item => selectorConditionBuilder(item))
     .join(' && ');
   console.log('@@query', selectionPipe(filterByAttributes(selectorCondition)));
-  const effectedSpans = jemsPath.search(trace, selectionPipe(filterByAttributes(selectorCondition)));
+  const effectedSpans =
+    selectorCondition.length > 0 ? jemsPath.search(trace, selectionPipe(filterByAttributes(selectorCondition))) : 0;
   const spanTagsMap = attrs.reduce((acc: {[x: string]: any}, item: {key: string}) => {
     const keyPrefix = item.key.split('.').shift() || item.key;
     if (!keyPrefix) {
