@@ -95,11 +95,6 @@ const Assertions = () => {
       dataIndex: 'value',
       key: 'value',
     },
-    {
-      title: 'Pass/Fail',
-      dataIndex: 'results',
-      key: 'results',
-    },
   ];
 
   return (
