@@ -1,6 +1,7 @@
 package openapi
 
 import (
+	"encoding/hex"
 	"net/http"
 	"strconv"
 
@@ -26,30 +27,41 @@ func EncodeJSONPBResponse(i interface{}, status *int, w http.ResponseWriter) err
 }
 
 func mapAnyValue(val *v11.AnyValue) V1AnyValue {
-	arrV := V1ArrayValue{
-		Values: []V1AnyValue{},
-	}
-	for _, a := range val.GetArrayValue().GetValues() {
-		a := mapAnyValue(a)
-		arrV.Values = append(arrV.Values, a)
-	}
 
-	kvListVal := V1KeyValueList{
-		Values: []V1KeyValue{},
+	var arrV V1ArrayValue
+	if val.GetArrayValue() != nil {
+		arrV = V1ArrayValue{
+			Values: []V1AnyValue{},
+		}
+		for _, a := range val.GetArrayValue().GetValues() {
+			a := mapAnyValue(a)
+			arrV.Values = append(arrV.Values, a)
+		}
 	}
-
-	for _, kv := range val.GetKvlistValue().GetValues() {
-		v := V1KeyValue{
-			Key:   kv.GetKey(),
-			Value: mapAnyValue(kv.GetValue()),
+	var kvListVal V1KeyValueList
+	if val.GetKvlistValue() != nil {
+		kvListVal = V1KeyValueList{
+			Values: []V1KeyValue{},
 		}
 
-		kvListVal.Values = append(kvListVal.Values, v)
+		for _, kv := range val.GetKvlistValue().GetValues() {
+			v := V1KeyValue{
+				Key:   kv.GetKey(),
+				Value: mapAnyValue(kv.GetValue()),
+			}
+
+			kvListVal.Values = append(kvListVal.Values, v)
+		}
+	}
+
+	intVal := ""
+	if i, ok := val.GetValue().(*v11.AnyValue_IntValue); ok {
+		intVal = strconv.FormatInt(i.IntValue, 10)
 	}
 	return V1AnyValue{
 		StringValue: val.GetStringValue(),
 		BoolValue:   val.GetBoolValue(),
-		IntValue:    strconv.FormatInt(val.GetIntValue(), 10),
+		IntValue:    intVal,
 		DoubleValue: val.GetDoubleValue(),
 		ArrayValue:  arrV,
 		KvlistValue: kvListVal,
@@ -120,8 +132,8 @@ func mapTrace(tr *v1.TracesData) ApiV3SpansResponseChunk {
 				var links []SpanLink
 				for _, l := range sp.GetLinks() {
 					v := SpanLink{
-						TraceId:                string(l.GetTraceId()),
-						SpanId:                 string(l.GetSpanId()),
+						TraceId:                hex.EncodeToString(l.GetTraceId()),
+						SpanId:                 hex.EncodeToString(l.GetSpanId()),
 						TraceState:             l.GetTraceState(),
 						Attributes:             mapAttributes(l.GetAttributes()),
 						DroppedAttributesCount: int64(l.GetDroppedAttributesCount()),
@@ -129,11 +141,12 @@ func mapTrace(tr *v1.TracesData) ApiV3SpansResponseChunk {
 
 					links = append(links, v)
 				}
+
 				v := V1Span{
-					TraceId:                string(sp.GetTraceId()),
-					SpanId:                 string(sp.GetSpanId()),
+					TraceId:                hex.EncodeToString(sp.GetTraceId()),
+					SpanId:                 hex.EncodeToString(sp.GetSpanId()),
 					TraceState:             sp.GetTraceState(),
-					ParentSpanId:           string(sp.GetParentSpanId()),
+					ParentSpanId:           hex.EncodeToString(sp.GetParentSpanId()),
 					Name:                   sp.GetName(),
 					Kind:                   kind,
 					StartTimeUnixNano:      strconv.FormatUint(sp.GetStartTimeUnixNano(), 10),
@@ -230,7 +243,7 @@ func (c *ApiApiController) TestsTestidResultsIdTraceGet(w http.ResponseWriter, r
 
 	idParam := params["id"]
 
-	result, err := c.service.TestsTestidResultsIdTraceGet(r.Context(), testidParam, idParam)
+	result, err := c.service.TestsTestIdResultsResultIdTraceGet(r.Context(), testidParam, idParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

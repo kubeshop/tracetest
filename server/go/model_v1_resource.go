@@ -16,7 +16,7 @@ type V1Resource struct {
 	Attributes []V1KeyValue `json:"attributes,omitempty"`
 
 	// dropped_attributes_count is the number of dropped attributes. If the value is 0, then no attributes were dropped.
-	DroppedAttributesCount int64 `json:"dropped_attributes_count,omitempty"`
+	DroppedAttributesCount int64 `json:"droppedAttributesCount,omitempty"`
 }
 
 // AssertV1ResourceRequired checks if the required fields are not zero-ed

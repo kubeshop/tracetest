@@ -63,7 +63,7 @@ func (td *TestDB) CreateTest(ctx context.Context, test *openapi.Test) (string, e
 	}
 	defer stmt.Close()
 	id := uuid.New().String()
-	test.Id = id
+	test.TestId = id
 	b, err := json.Marshal(test)
 	if err != nil {
 		return "", fmt.Errorf("json Marshal: %w", err)
@@ -128,7 +128,7 @@ func (td *TestDB) GetTests(ctx context.Context) ([]openapi.Test, error) {
 			return nil, err
 		}
 
-		as, err := td.GetAssertionsByTestID(ctx, test.Id)
+		as, err := td.GetAssertionsByTestID(ctx, test.TestId)
 		if err != nil {
 			return nil, err
 		}
@@ -147,7 +147,7 @@ func (td *TestDB) CreateAssertion(ctx context.Context, testid string, assertion 
 	}
 	defer stmt.Close()
 	id := uuid.New().String()
-	assertion.Id = id
+	assertion.AssertionId = id
 	b, err := json.Marshal(assertion)
 	if err != nil {
 		return "", fmt.Errorf("json Marshal: %w", err)

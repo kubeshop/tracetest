@@ -4,9 +4,6 @@ info:
   title: TraceTest
   description: OpenAPI definition for TraceTest endpoint and resources
 servers:
-  # Added by API Auto Mocking Plugin
-  - description: SwaggerHub API Auto Mocking
-    url: https://virtserver.swaggerhub.com/ken21/Tracetest/0.0.1
   - url: /api
 paths:
   /tests:

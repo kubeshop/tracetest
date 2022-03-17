@@ -12,7 +12,7 @@ package openapi
 type Test struct {
 
 	// ID
-	Id string `json:"id,omitempty"`
+	TestId string `json:"testId,omitempty"`
 
 	Name string `json:"name,omitempty"`
 
@@ -23,7 +23,7 @@ type Test struct {
 	// Definition of assertions that are going to be made
 	Assertions []Assertion `json:"assertions,omitempty"`
 
-	LastTestResult Result `json:"lastTestResult,omitempty"`
+	LastTestResult TestRunResult `json:"lastTestResult,omitempty"`
 }
 
 // AssertTestRequired checks if the required fields are not zero-ed
@@ -36,7 +36,7 @@ func AssertTestRequired(obj Test) error {
 			return err
 		}
 	}
-	if err := AssertResultRequired(obj.LastTestResult); err != nil {
+	if err := AssertTestRunResultRequired(obj.LastTestResult); err != nil {
 		return err
 	}
 	return nil

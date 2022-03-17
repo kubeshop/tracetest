@@ -13,16 +13,16 @@ package openapi
 type V1Span struct {
 
 	// A unique identifier for a trace. All spans from the same trace share the same `trace_id`. The ID is a 16-byte array. An ID with all zeroes is considered invalid.  This field is semantically required. Receiver should generate new random trace_id if empty or invalid trace_id was received.  This field is required.
-	TraceId string `json:"trace_id,omitempty"`
+	TraceId string `json:"traceId,omitempty"`
 
 	// A unique identifier for a span within a trace, assigned when the span is created. The ID is an 8-byte array. An ID with all zeroes is considered invalid.  This field is semantically required. Receiver should generate new random span_id if empty or invalid span_id was received.  This field is required.
-	SpanId string `json:"span_id,omitempty"`
+	SpanId string `json:"spanId,omitempty"`
 
 	// trace_state conveys information about request position in multiple distributed tracing graphs. It is a trace_state in w3c-trace-context format: https://www.w3.org/TR/trace-context/#tracestate-header See also https://github.com/w3c/distributed-tracing for more details about this field.
-	TraceState string `json:"trace_state,omitempty"`
+	TraceState string `json:"traceState,omitempty"`
 
 	// The `span_id` of this span's parent span. If this is a root span, then this field must be empty. The ID is an 8-byte array.
-	ParentSpanId string `json:"parent_span_id,omitempty"`
+	ParentSpanId string `json:"parentSpanId,omitempty"`
 
 	// A description of the span's operation.  For example, the name can be a qualified method name or a file name and a line number where the operation is called. A best practice is to use the same display name at the same call point in an application. This makes it easier to correlate spans in different traces.  This field is semantically required to be set to non-empty string. Empty value is equivalent to an unknown span name.  This field is required.
 	Name string `json:"name,omitempty"`
@@ -30,28 +30,28 @@ type V1Span struct {
 	Kind SpanSpanKind `json:"kind,omitempty"`
 
 	// start_time_unix_nano is the start time of the span. On the client side, this is the time kept by the local machine where the span execution starts. On the server side, this is the time when the server's application handler starts running. Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.  This field is semantically required and it is expected that end_time >= start_time.
-	StartTimeUnixNano string `json:"start_time_unix_nano,omitempty"`
+	StartTimeUnixNano string `json:"startTimeUnixNano,omitempty"`
 
 	// end_time_unix_nano is the end time of the span. On the client side, this is the time kept by the local machine where the span execution ends. On the server side, this is the time when the server application handler stops running. Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.  This field is semantically required and it is expected that end_time >= start_time.
-	EndTimeUnixNano string `json:"end_time_unix_nano,omitempty"`
+	EndTimeUnixNano string `json:"endTimeUnixNano,omitempty"`
 
 	// \"/http/user_agent\": \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36\"     \"/http/server_latency\": 300     \"abc.com/myattribute\": true     \"abc.com/score\": 10.239  The OpenTelemetry API specification further restricts the allowed value types: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/common/common.md#attributes Attribute keys MUST be unique (it is not allowed to have more than one attribute with the same key).
 	Attributes []V1KeyValue `json:"attributes,omitempty"`
 
 	// dropped_attributes_count is the number of attributes that were discarded. Attributes can be discarded because their keys are too long or because there are too many attributes. If this value is 0, then no attributes were dropped.
-	DroppedAttributesCount int64 `json:"dropped_attributes_count,omitempty"`
+	DroppedAttributesCount int64 `json:"droppedAttributesCount,omitempty"`
 
 	// events is a collection of Event items.
 	Events []SpanEvent `json:"events,omitempty"`
 
 	// dropped_events_count is the number of dropped events. If the value is 0, then no events were dropped.
-	DroppedEventsCount int64 `json:"dropped_events_count,omitempty"`
+	DroppedEventsCount int64 `json:"droppedEventsCount,omitempty"`
 
 	// links is a collection of Links, which are references from this span to a span in the same or different trace.
 	Links []SpanLink `json:"links,omitempty"`
 
 	// dropped_links_count is the number of dropped links after the maximum size was enforced. If this value is 0, then no links were dropped.
-	DroppedLinksCount int64 `json:"dropped_links_count,omitempty"`
+	DroppedLinksCount int64 `json:"droppedLinksCount,omitempty"`
 
 	Status V1Status `json:"status,omitempty"`
 }
