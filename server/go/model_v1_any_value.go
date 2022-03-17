@@ -11,19 +11,19 @@ package openapi
 
 // V1AnyValue - AnyValue is used to represent any type of attribute value. AnyValue may contain a primitive value such as a string or integer or it may contain an arbitrary nested object containing arrays, key-value lists and primitives.
 type V1AnyValue struct {
-	StringValue string `json:"string_value,omitempty"`
+	StringValue string `json:"stringValue,omitempty"`
 
-	BoolValue bool `json:"bool_value,omitempty"`
+	BoolValue bool `json:"boolValue,omitempty"`
 
-	IntValue string `json:"int_value,omitempty"`
+	IntValue string `json:"intValue,omitempty"`
 
-	DoubleValue float64 `json:"double_value,omitempty"`
+	DoubleValue float64 `json:"doubleValue,omitempty"`
 
-	ArrayValue V1ArrayValue `json:"array_value,omitempty"`
+	ArrayValue V1ArrayValue `json:"arrayValue,omitempty"`
 
-	KvlistValue V1KeyValueList `json:"kvlist_value,omitempty"`
+	KvlistValue V1KeyValueList `json:"kvlistValue,omitempty"`
 
-	BytesValue string `json:"bytes_value,omitempty"`
+	BytesValue string `json:"bytesValue,omitempty"`
 }
 
 // AssertV1AnyValueRequired checks if the required fields are not zero-ed

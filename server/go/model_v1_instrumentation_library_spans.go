@@ -11,13 +11,13 @@ package openapi
 
 // V1InstrumentationLibrarySpans - A collection of Spans produced by an InstrumentationLibrary.
 type V1InstrumentationLibrarySpans struct {
-	InstrumentationLibrary V1InstrumentationLibrary `json:"instrumentation_library,omitempty"`
+	InstrumentationLibrary V1InstrumentationLibrary `json:"instrumentationLibrary,omitempty"`
 
 	// A list of Spans that originate from an instrumentation library.
 	Spans []V1Span `json:"spans,omitempty"`
 
 	// This schema_url applies to all spans and span events in the \"spans\" field.
-	SchemaUrl string `json:"schema_url,omitempty"`
+	SchemaUrl string `json:"schemaUrl,omitempty"`
 }
 
 // AssertV1InstrumentationLibrarySpansRequired checks if the required fields are not zero-ed

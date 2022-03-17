@@ -13,19 +13,19 @@ package openapi
 type SpanLink struct {
 
 	// A unique identifier of a trace that this linked span is part of. The ID is a 16-byte array.
-	TraceId string `json:"trace_id,omitempty"`
+	TraceId string `json:"traceId,omitempty"`
 
 	// A unique identifier for the linked span. The ID is an 8-byte array.
-	SpanId string `json:"span_id,omitempty"`
+	SpanId string `json:"spanId,omitempty"`
 
 	// The trace_state associated with the link.
-	TraceState string `json:"trace_state,omitempty"`
+	TraceState string `json:"traceState,omitempty"`
 
 	// attributes is a collection of attribute key/value pairs on the link. Attribute keys MUST be unique (it is not allowed to have more than one attribute with the same key).
 	Attributes []V1KeyValue `json:"attributes,omitempty"`
 
 	// dropped_attributes_count is the number of dropped attributes. If the value is 0, then no attributes were dropped.
-	DroppedAttributesCount int64 `json:"dropped_attributes_count,omitempty"`
+	DroppedAttributesCount int64 `json:"droppedAttributesCount,omitempty"`
 }
 
 // AssertSpanLinkRequired checks if the required fields are not zero-ed

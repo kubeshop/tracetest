@@ -31,7 +31,7 @@ func New() (*TestExecutor, error) {
 	}, nil
 }
 
-func (te *TestExecutor) Execute(test *openapi.Test, tid trace.TraceID, sid trace.SpanID) (*openapi.Result, error) {
+func (te *TestExecutor) Execute(test *openapi.Test, tid trace.TraceID, sid trace.SpanID) (*openapi.TestRunResult, error) {
 	client := http.Client{
 		Transport: otelhttp.NewTransport(http.DefaultTransport,
 			otelhttp.WithTracerProvider(te.traceProvider),
@@ -56,8 +56,8 @@ func (te *TestExecutor) Execute(test *openapi.Test, tid trace.TraceID, sid trace
 		return nil, err
 	}
 
-	return &openapi.Result{
-		Id: uuid.New().String(),
+	return &openapi.TestRunResult{
+		ResultId: uuid.New().String(),
 	}, nil
 }
 
