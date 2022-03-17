@@ -95,7 +95,6 @@ const CreateAssertionModal = ({testId, span, trace, open, onClose}: IProps) => {
   });
 
   const handleCreateAssertion = async () => {
-    await createAssertion({testId, selector: createSelector(filterByAttributes(selectorCondition))});
     onClose();
   };
 
