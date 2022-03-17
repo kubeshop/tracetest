@@ -38,12 +38,36 @@ export interface Test {
   assertions: Array<Assertion>;
   repeats: number;
 }
+
+enum LOCATION_NAME {
+  RESOURCE_ATTRIBUTES,
+  INSTRUMENTATION_LIBRARY,
+  SPAN,
+  SPAN_ATTRIBUTES,
+}
+
+enum COMPARE_OPERATOR {
+  EQUALS,
+  LESSTHAN,
+  GREATERTHAN,
+  NOTEQUALS,
+}
 export interface Assertion {
-  id: string;
-  selector: string;
-  comparable: string;
-  operator: string;
-  successful?: string;
+  assertionId: string;
+  selectors: Array<{
+    locationName: LOCATION_NAME;
+    propertyName: string;
+    value: string;
+    valueType: string;
+  }>;
+  spanAssertions: Array<{
+    spanAssertionId: string;
+    locationName: LOCATION_NAME;
+    propertyName: string;
+    valueType: string;
+    operator: COMPARE_OPERATOR;
+    comparisonValue: string;
+  }>;
 }
 
 export interface TestResult {
