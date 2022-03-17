@@ -12,7 +12,7 @@ package openapi
 type TestRun struct {
 
 	// ID
-	Id string `json:"id,omitempty"`
+	TestRunId string `json:"testRunId,omitempty"`
 }
 
 // AssertTestRunRequired checks if the required fields are not zero-ed

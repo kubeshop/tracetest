@@ -54,7 +54,7 @@ proto:
 		jaeger-idl/proto/api_v3/query_service.proto
 
 	$(PROTOC_INTERNAL) \
-		--swagger_out=disable_default_errors=true,logtostderr=true:./swagger \
+		--swagger_out=disable_default_errors=true,json_names_for_fields=true,logtostderr=true:./swagger \
 		jaeger-idl/proto/api_v3/query_service.proto
 
 	$(PROTOC_INTERNAL) \

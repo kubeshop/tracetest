@@ -12,13 +12,11 @@ package openapi
 type Assertion struct {
 
 	// ID
-	Id string `json:"id,omitempty"`
+	AssertionId string `json:"assertionId,omitempty"`
 
 	Selectors []SelectorItem `json:"selectors,omitempty"`
 
 	SpanAssertions []SpanAssertion `json:"spanAssertions,omitempty"`
-
-	Successful bool `json:"successful,omitempty"`
 }
 
 // AssertAssertionRequired checks if the required fields are not zero-ed
