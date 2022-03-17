@@ -2,6 +2,7 @@ package openapi
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gogo/protobuf/jsonpb"
 	"github.com/gogo/protobuf/proto"
@@ -22,6 +23,156 @@ func EncodeJSONPBResponse(i interface{}, status *int, w http.ResponseWriter) err
 	trace := i.(proto.Message)
 	m := jsonpb.Marshaler{}
 	return m.Marshal(w, trace)
+}
+
+func mapAnyValue(val *v11.AnyValue) V1AnyValue {
+	arrV := V1ArrayValue{
+		Values: []V1AnyValue{},
+	}
+	for _, a := range val.GetArrayValue().GetValues() {
+		a := mapAnyValue(a)
+		arrV.Values = append(arrV.Values, a)
+	}
+
+	kvListVal := V1KeyValueList{
+		Values: []V1KeyValue{},
+	}
+
+	for _, kv := range val.GetKvlistValue().GetValues() {
+		v := V1KeyValue{
+			Key:   kv.GetKey(),
+			Value: mapAnyValue(kv.GetValue()),
+		}
+
+		kvListVal.Values = append(kvListVal.Values, v)
+	}
+	return V1AnyValue{
+		StringValue: val.GetStringValue(),
+		BoolValue:   val.GetBoolValue(),
+		IntValue:    strconv.FormatInt(val.GetIntValue(), 10),
+		DoubleValue: val.GetDoubleValue(),
+		ArrayValue:  arrV,
+		KvlistValue: kvListVal,
+		BytesValue:  string(val.GetBytesValue()),
+	}
+}
+
+func mapAttributes(kvs []*v11.KeyValue) []V1KeyValue {
+	var res []V1KeyValue
+
+	for _, kv := range kvs {
+		v := V1KeyValue{
+			Key:   kv.GetKey(),
+			Value: mapAnyValue(kv.GetValue()),
+		}
+		res = append(res, v)
+	}
+	return res
+}
+
+func mapTrace(tr *v1.TracesData) ApiV3SpansResponseChunk {
+	res := ApiV3SpansResponseChunk{
+		ResourceSpans: []V1ResourceSpans{},
+	}
+
+	for _, t := range tr.GetResourceSpans() {
+		var ilsV []V1InstrumentationLibrarySpans
+
+		for _, ils := range t.GetInstrumentationLibrarySpans() {
+			var sps []V1Span
+			for _, sp := range ils.GetSpans() {
+				var kind SpanSpanKind
+				switch sp.GetKind() {
+				case v1.Span_SPAN_KIND_UNSPECIFIED:
+					kind = UNSPECIFIED
+				case v1.Span_SPAN_KIND_INTERNAL:
+					kind = INTERNAL
+				case v1.Span_SPAN_KIND_SERVER:
+					kind = SERVER
+				case v1.Span_SPAN_KIND_CLIENT:
+					kind = CLIENT
+				case v1.Span_SPAN_KIND_PRODUCER:
+					kind = PRODUCER
+				case v1.Span_SPAN_KIND_CONSUMER:
+					kind = CONSUMER
+				}
+
+				var code StatusStatusCode
+				switch sp.GetStatus().GetCode() {
+				case v1.Status_STATUS_CODE_UNSET:
+					code = UNSET
+				case v1.Status_STATUS_CODE_OK:
+					code = OK
+				case v1.Status_STATUS_CODE_ERROR:
+					code = ERROR
+				}
+				var events []SpanEvent
+				for _, ev := range sp.GetEvents() {
+					v := SpanEvent{
+						TimeUnixNano:           strconv.FormatUint(ev.GetTimeUnixNano(), 10),
+						Name:                   ev.GetName(),
+						Attributes:             mapAttributes(ev.GetAttributes()),
+						DroppedAttributesCount: int64(ev.GetDroppedAttributesCount()),
+					}
+					events = append(events, v)
+				}
+
+				var links []SpanLink
+				for _, l := range sp.GetLinks() {
+					v := SpanLink{
+						TraceId:                string(l.GetTraceId()),
+						SpanId:                 string(l.GetSpanId()),
+						TraceState:             l.GetTraceState(),
+						Attributes:             mapAttributes(l.GetAttributes()),
+						DroppedAttributesCount: int64(l.GetDroppedAttributesCount()),
+					}
+
+					links = append(links, v)
+				}
+				v := V1Span{
+					TraceId:                string(sp.GetTraceId()),
+					SpanId:                 string(sp.GetSpanId()),
+					TraceState:             sp.GetTraceState(),
+					ParentSpanId:           string(sp.GetParentSpanId()),
+					Name:                   sp.GetName(),
+					Kind:                   kind,
+					StartTimeUnixNano:      strconv.FormatUint(sp.GetStartTimeUnixNano(), 10),
+					EndTimeUnixNano:        strconv.FormatUint(sp.GetEndTimeUnixNano(), 10),
+					Attributes:             mapAttributes(sp.GetAttributes()),
+					DroppedAttributesCount: int64(sp.GetDroppedAttributesCount()),
+					Events:                 events,
+					DroppedEventsCount:     int64(sp.GetDroppedEventsCount()),
+					Links:                  links,
+					DroppedLinksCount:      int64(sp.GetDroppedLinksCount()),
+					Status: V1Status{
+						Message: sp.GetStatus().GetMessage(),
+						Code:    code,
+					},
+				}
+				sps = append(sps, v)
+			}
+			v := V1InstrumentationLibrarySpans{
+				InstrumentationLibrary: V1InstrumentationLibrary{
+					Name:    ils.GetInstrumentationLibrary().GetName(),
+					Version: ils.GetInstrumentationLibrary().GetVersion(),
+				},
+				Spans:     sps,
+				SchemaUrl: ils.GetSchemaUrl(),
+			}
+
+			ilsV = append(ilsV, v)
+		}
+		sp := V1ResourceSpans{
+			Resource: V1Resource{
+				Attributes:             mapAttributes(t.GetResource().GetAttributes()),
+				DroppedAttributesCount: int64(t.GetResource().GetDroppedAttributesCount()),
+			},
+			InstrumentationLibrarySpans: ilsV,
+			SchemaUrl:                   t.GetSchemaUrl(),
+		}
+		res.ResourceSpans = append(res.ResourceSpans, sp)
+	}
+	return res
 }
 
 func FixParent(tr *v1.TracesData, traceID, parentSpanID string) *v1.TracesData {
