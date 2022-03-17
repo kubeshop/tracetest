@@ -185,6 +185,20 @@ func (s *ApiApiService) TestsTestidResultsIdGet(ctx context.Context, testid stri
 	if err != nil {
 		return Response(http.StatusInternalServerError, err.Error()), err
 	}
+	tr, err := s.traceDB.GetTraceByID(ctx, res.Traceid)
+	if err != nil {
+		return Response(http.StatusInternalServerError, err.Error()), err
+	}
+	sid, err := trace.SpanIDFromHex(res.Spanid)
+	if err != nil {
+		return Response(http.StatusInternalServerError, err.Error()), err
+	}
+	tid, err := trace.TraceIDFromHex(res.Traceid)
+	if err != nil {
+		return Response(http.StatusInternalServerError, err.Error()), err
+	}
+	ttr := FixParent(tr, string(tid[:]), string(sid[:]))
+	res.Trace = mapTrace(ttr)
 
 	return Response(http.StatusOK, []Result{*res}), nil
 }
