@@ -313,7 +313,7 @@ components:
         assertionResult:
           type: array
           items: 
-            $ref: "#/components/schemas/assertionResult"
+            $ref: "#/components/schemas/AssertionResult"
     Attribute:
       type: object
       properties:
@@ -375,10 +375,10 @@ components:
         comparisonValue:
           type: string
           description: Example "200"
-    assertionResult:
+    AssertionResult:
       type: object
       properties:
-        id:
+        assertionId:
           type: string
         spanAssertions:
           type: array
