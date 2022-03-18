@@ -386,5 +386,7 @@ components:
       properties:
         spanAssertionId:  
           type: string
+        spanId:
+          type: string
         passed:
           type: boolean
