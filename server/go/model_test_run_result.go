@@ -31,14 +31,16 @@ type TestRunResult struct {
 
 	CompletedAt time.Time `json:"completedAt,omitempty"`
 
-	// TODO(pov) This is going to be HTTP Response object for now, at some point it might be GRPC/SOAP/...
-	Response map[string]interface{} `json:"response,omitempty"`
+	Response HttpResponse `json:"response,omitempty"`
 
 	Trace ApiV3SpansResponseChunk `json:"trace,omitempty"`
 }
 
 // AssertTestRunResultRequired checks if the required fields are not zero-ed
 func AssertTestRunResultRequired(obj TestRunResult) error {
+	if err := AssertHttpResponseRequired(obj.Response); err != nil {
+		return err
+	}
 	if err := AssertApiV3SpansResponseChunkRequired(obj.Trace); err != nil {
 		return err
 	}

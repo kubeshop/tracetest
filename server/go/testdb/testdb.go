@@ -7,19 +7,28 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
+	"github.com/j2gg0s/otsql"
+	"github.com/j2gg0s/otsql/hook/trace"
 	openapi "github.com/kubeshop/tracetest/server/go"
-	_ "github.com/lib/pq"
+	pq "github.com/lib/pq"
 )
 
 type TestDB struct {
 	db *sql.DB
 }
 
-func New(connStr string) (*TestDB, error) {
-	db, err := sql.Open("postgres", connStr)
+func New(dsn string) (*TestDB, error) {
+	connector, err := pq.NewConnector(dsn)
 	if err != nil {
 		return nil, fmt.Errorf("sql open: %w", err)
 	}
+	db := sql.OpenDB(
+		otsql.WrapConnector(connector,
+			otsql.WithHooks(trace.New(
+				trace.WithQuery(true),
+				trace.WithQueryParams(true),
+				trace.WithRowsAffected(true),
+			))))
 
 	_, err = db.Exec(`
 CREATE TABLE IF NOT EXISTS tests  (
