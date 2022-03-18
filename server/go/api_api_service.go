@@ -156,30 +156,6 @@ func (s *ApiApiService) TestsTestIdResultsGet(ctx context.Context, id string) (I
 
 }
 
-func (s *ApiApiService) TestsTestIdResultsResultIdTraceGet(ctx context.Context, testID string, resultsID string) (ImplResponse, error) {
-	res, err := s.testDB.GetResult(ctx, resultsID)
-	if err != nil {
-		return Response(http.StatusInternalServerError, err.Error()), err
-	}
-
-	tr, err := s.traceDB.GetTraceByID(ctx, res.TraceId)
-	if err != nil {
-		return Response(http.StatusInternalServerError, err.Error()), err
-	}
-	sid, err := trace.SpanIDFromHex(res.SpanId)
-	if err != nil {
-		return Response(http.StatusInternalServerError, err.Error()), err
-	}
-
-	tid, err := trace.TraceIDFromHex(res.TraceId)
-	if err != nil {
-		return Response(http.StatusInternalServerError, err.Error()), err
-	}
-
-	ttr := FixParent(tr, string(tid[:]), string(sid[:]))
-	return Response(http.StatusOK, ttr), nil
-}
-
 // TestsTestidResultsIdGet -
 func (s *ApiApiService) TestsTestIdResultsResultIdGet(ctx context.Context, testid string, id string) (ImplResponse, error) {
 	res, err := s.testDB.GetResult(ctx, id)
