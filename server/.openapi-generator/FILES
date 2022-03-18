@@ -9,6 +9,8 @@ go/logger.go
 go/model_api_v3_spans_response_chunk.go
 go/model_assertion.go
 go/model_attribute.go
+go/model_http_response.go
+go/model_http_response_headers.go
 go/model_selector_item.go
 go/model_span_assertion.go
 go/model_span_event.go

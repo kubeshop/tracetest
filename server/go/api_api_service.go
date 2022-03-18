@@ -18,6 +18,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/kubeshop/tracetest/server/go/tracedb"
+	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -121,8 +122,11 @@ func (s *ApiApiService) TestsTestIdRunPost(ctx context.Context, testid string) (
 		return Response(http.StatusInternalServerError, err.Error()), err
 	}
 
-	go func(t *Test, tid trace.TraceID, sid trace.SpanID, res *TestRunResult) {
-		ctx := context.Background()
+	go func(t *Test, tid trace.TraceID, sid trace.SpanID, res TestRunResult) {
+		tracer := otel.GetTracerProvider().Tracer("")
+		ctx, span := tracer.Start(ctx, "Execute Test")
+		defer span.End()
+
 		fmt.Println("executing test")
 		resp, err := s.executor.Execute(t, tid, sid)
 		if err != nil {
@@ -131,14 +135,15 @@ func (s *ApiApiService) TestsTestIdRunPost(ctx context.Context, testid string) (
 		}
 		fmt.Println(resp)
 
+		res.Response = resp.Response
 		res.CompletedAt = time.Now()
-		err = s.testDB.UpdateResult(ctx, res)
+		err = s.testDB.UpdateResult(ctx, &res)
 		if err != nil {
-			fmt.Printf("update result err: %s", err)
+			fmt.Printf("update result err: %s\n", err)
 			return
 		}
 		fmt.Println("executed successfully")
-	}(t, tid, sid, res)
+	}(t, tid, sid, *res)
 
 	return Response(200, TestRun{
 		TestRunId: id,

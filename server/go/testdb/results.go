@@ -88,7 +88,7 @@ func (td *TestDB) UpdateResult(ctx context.Context, run *openapi.TestRunResult) 
 	if err != nil {
 		return fmt.Errorf("json Marshal: %w", err)
 	}
-	_, err = stmt.ExecContext(ctx, run.ResultId, b)
+	_, err = stmt.Exec(run.ResultId, b)
 	if err != nil {
 		return fmt.Errorf("sql exec: %w", err)
 	}

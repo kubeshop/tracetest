@@ -21,6 +21,7 @@ func TestExecute(t *testing.T) {
 			t.Fatalf("missing Traceparent header %#v", req.Header)
 		}
 		assert.Len(t, tp, 1)
+		rw.WriteHeader(200)
 		rw.Write([]byte(`OK`))
 	}))
 	defer server.Close()
@@ -41,6 +42,9 @@ func TestExecute(t *testing.T) {
 	sid := trace.SpanID{}
 	rnd.Read(sid[:])
 
-	_, err = ex.Execute(test, tid, sid)
+	resp, err := ex.Execute(test, tid, sid)
 	assert.NoError(t, err)
+
+	assert.Equal(t, int32(200), resp.Response.StatusCode)
+	assert.Equal(t, "OK", resp.Response.Body)
 }

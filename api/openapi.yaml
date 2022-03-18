@@ -274,8 +274,8 @@ components:
           type: string
           format: date-time
         response:
-          type: object
-          description: TODO(pov) This is going to be HTTP Response object for now, at some point it might be GRPC/SOAP/...
+          $ref: "#/components/schemas/HTTPResponse"
+          description: TODO(pov) This is HTTP Response object for now, at some point it might be GRPC/SOAP/...
         trace:
           $ref: "./trace.yaml#/definitions/api_v3SpansResponseChunk"
     Attribute:
@@ -339,3 +339,22 @@ components:
         comparisonValue:
           type: string
           description: Example "200"
+    HTTPResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        statusCode:
+          type: integer
+        headers:
+          type: array
+          items:
+            type: object
+            properties:
+              key:
+                type: string
+              value:
+                type: string
+        body:
+          type: string
+          format: byte
