@@ -93,12 +93,6 @@ func (c *ApiApiController) Routes() Routes {
 			c.TestsTestIdResultsResultIdGet,
 		},
 		{
-			"TestsTestIdResultsResultIdTraceGet",
-			strings.ToUpper("Get"),
-			"/api/tests/{testId}/results/{resultId}/trace",
-			c.TestsTestIdResultsResultIdTraceGet,
-		},
-		{
 			"TestsTestIdRunPost",
 			strings.ToUpper("Post"),
 			"/api/tests/{testId}/run",
@@ -227,24 +221,6 @@ func (c *ApiApiController) TestsTestIdResultsResultIdGet(w http.ResponseWriter, 
 	resultIdParam := params["resultId"]
 
 	result, err := c.service.TestsTestIdResultsResultIdGet(r.Context(), testIdParam, resultIdParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
-// TestsTestIdResultsResultIdTraceGet - get the trace for a test result
-func (c *ApiApiController) TestsTestIdResultsResultIdTraceGet(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	testIdParam := params["testId"]
-
-	resultIdParam := params["resultId"]
-
-	result, err := c.service.TestsTestIdResultsResultIdTraceGet(r.Context(), testIdParam, resultIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

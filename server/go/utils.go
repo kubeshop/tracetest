@@ -5,26 +5,11 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/gogo/protobuf/jsonpb"
-	"github.com/gogo/protobuf/proto"
 	"github.com/gorilla/mux"
 	v11 "go.opentelemetry.io/proto/otlp/common/v1"
 	res "go.opentelemetry.io/proto/otlp/resource/v1"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 )
-
-func EncodeJSONPBResponse(i interface{}, status *int, w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	if status != nil {
-		w.WriteHeader(*status)
-	} else {
-		w.WriteHeader(http.StatusOK)
-	}
-
-	trace := i.(proto.Message)
-	m := jsonpb.Marshaler{}
-	return m.Marshal(w, trace)
-}
 
 func mapAnyValue(val *v11.AnyValue) V1AnyValue {
 

@@ -128,33 +128,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/TestRunResult"
-  /tests/{testId}/results/{resultId}/trace:
-    get:
-      tags:
-        - api
-      parameters:
-        - in: path
-          name: testId
-          schema:
-            type: string
-            format: uuid
-          required: true
-        - in: path
-          name: resultId
-          schema:
-            type: string
-            format: uuid
-          required: true
-      summary: "get the trace for a test result"
-      description: "get the trace created for a particular test result"
-      responses:
-        200:
-          description: trace
-          content:
-            application/json:
-              schema:
-                type: object
-
   /tests/{testId}/results:
     get:
       tags:
