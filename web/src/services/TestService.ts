@@ -55,7 +55,7 @@ export const testAPI = createApi({
             ]
           : [{type: 'TestResult' as const, id: 'LIST'}],
     }),
-    getTestResultById: build.query<TestRunResult[], Pick<Test, 'testId'> & {resultId: string}>({
+    getTestResultById: build.query<TestRunResult, Pick<Test, 'testId'> & {resultId: string}>({
       query: ({testId, resultId}) => `/tests/${testId}/results/${resultId}`,
     }),
   }),
