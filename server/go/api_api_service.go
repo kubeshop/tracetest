@@ -181,7 +181,7 @@ func (s *ApiApiService) TestsTestIdResultsResultIdGet(ctx context.Context, testi
 	}
 	ttr := FixParent(tr, string(tid[:]), string(sid[:]))
 	res.Trace = mapTrace(ttr)
-	return Response(http.StatusOK, []TestRunResult{*res}), nil
+	return Response(http.StatusOK, *res), nil
 }
 
 func (s *ApiApiService) CreateAssertion(ctx context.Context, testID string, assertion Assertion) (ImplResponse, error) {
