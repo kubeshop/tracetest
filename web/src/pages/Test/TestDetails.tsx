@@ -20,7 +20,7 @@ const TestDetails = ({testId, onSelectResult}: IProps) => {
       key: 'createdAt',
       render: (value, record) => {
         return (
-          <p key={record.id}>
+          <p key={record.resultId}>
             {Intl.DateTimeFormat('default', {dateStyle: 'full', timeStyle: 'medium'} as any).format(new Date(value))}
           </p>
         );

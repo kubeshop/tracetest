@@ -27,8 +27,8 @@ const TestPage = () => {
   const [runTest] = useRunTestMutation();
 
   const handleRunTest = () => {
-    if (test?.id) {
-      runTest(test.id);
+    if (test?.testId) {
+      runTest(test.testId);
     }
   };
 
@@ -38,7 +38,7 @@ const TestPage = () => {
     const tracePane = {
       key: `${newTabIndex}`,
       title: `Trace ${newTabIndex}`,
-      content: <Trace test={test!} testResultId={result.id} />,
+      content: <Trace test={test!} testResultId={result.resultId} />,
     };
     setTracePanes([...tracePanes, tracePane]);
     setActiveTabKey(`${newTabIndex}`);

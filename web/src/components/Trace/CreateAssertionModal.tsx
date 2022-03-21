@@ -42,7 +42,7 @@ const selectorConditionBuilder = (attribute: IAttribute) => {
 const CreateAssertionModal = ({testId, span, trace, open, onClose}: IProps) => {
   const [assertionList, setAssertionList] = useState<Array<string>>(Array(3).fill(''));
   const [createAssertion, result] = useCreateAssertionMutation();
-  const attrs = jemsPath.search(trace, filterBySpanId(span.spanId));
+  const attrs = jemsPath.search(trace, filterBySpanId(span.spanId)) || [];
 
   const selectorCondition = assertionList
     .map(k => {
@@ -54,7 +54,7 @@ const CreateAssertionModal = ({testId, span, trace, open, onClose}: IProps) => {
   console.log('@@query', selectionPipe(filterByAttributes(selectorCondition)));
   const effectedSpans =
     selectorCondition.length > 0 ? jemsPath.search(trace, selectionPipe(filterByAttributes(selectorCondition))) : 0;
-  const spanTagsMap = attrs.reduce((acc: {[x: string]: any}, item: {key: string}) => {
+  const spanTagsMap = attrs?.reduce((acc: {[x: string]: any}, item: {key: string}) => {
     const keyPrefix = item.key.split('.').shift() || item.key;
     if (!keyPrefix) {
       return acc;

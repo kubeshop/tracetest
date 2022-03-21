@@ -1,5 +1,5 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
-import {Assertion, ITestResult, ITrace, Test, TestId} from 'types';
+import {Assertion, ITestResult, Test, TestId, TestRunResult} from 'types';
 
 export const testAPI = createApi({
   reducerPath: 'testsAPI',
@@ -27,12 +27,12 @@ export const testAPI = createApi({
       query: () => `/tests`,
       providesTags: result =>
         result
-          ? [...result.map(i => ({type: 'Test' as const, id: i.id})), {type: 'Test', id: 'LIST'}]
+          ? [...result.map(i => ({type: 'Test' as const, id: i.testId})), {type: 'Test', id: 'LIST'}]
           : [{type: 'Test', id: 'LIST'}],
     }),
     getTestById: build.query<Test, string>({
       query: id => `/tests/${id}`,
-      providesTags: result => [{type: 'Test', id: result?.id}],
+      providesTags: result => [{type: 'Test', id: result?.testId}],
     }),
     getTestAssertions: build.query<Assertion[], string>({
       query: testId => `/tests/${testId}/assertions`,
@@ -49,14 +49,14 @@ export const testAPI = createApi({
       query: id => `/tests/${id}/results`,
       providesTags: result =>
         result
-          ? [...result.map(el => ({type: 'TestResult' as const, id: el.id})), {type: 'TestResult' as const, id: 'LIST'}]
+          ? [
+              ...result.map(el => ({type: 'TestResult' as const, id: el.resultId})),
+              {type: 'TestResult' as const, id: 'LIST'},
+            ]
           : [{type: 'TestResult' as const, id: 'LIST'}],
     }),
-    getTestResultById: build.query<Assertion[], Pick<Test, 'id'> & {resultId: string}>({
-      query: ({id, resultId}) => `/tests/${id}/results/${resultId}`,
-    }),
-    getTestTrace: build.query<ITrace, Pick<Test, 'id'> & {resultId: string}>({
-      query: ({id, resultId}) => `/tests/${id}/results/${resultId}/trace`,
+    getTestResultById: build.query<TestRunResult[], Pick<Test, 'testId'> & {resultId: string}>({
+      query: ({testId, resultId}) => `/tests/${testId}/results/${resultId}`,
     }),
   }),
 });
@@ -70,5 +70,4 @@ export const {
   useGetTestResultByIdQuery,
   useGetTestResultsQuery,
   useGetTestsQuery,
-  useGetTestTraceQuery,
 } = testAPI;
