@@ -31,7 +31,7 @@ const TestDetails = ({testId, onSelectResult}: IProps) => {
       dataIndex: 'id',
       key: 'id',
       render: (value, record) => {
-        return <p key={record.id}>0.0.1</p>;
+        return <p key={record.resultId}>0.0.1</p>;
       },
     },
     {
@@ -39,7 +39,7 @@ const TestDetails = ({testId, onSelectResult}: IProps) => {
       dataIndex: 'id',
       key: 'id',
       render: (value, record) => {
-        return <p key={record.id}>Staging</p>;
+        return <p key={record.resultId}>Staging</p>;
       },
     },
     {
@@ -47,7 +47,7 @@ const TestDetails = ({testId, onSelectResult}: IProps) => {
       dataIndex: 'id',
       key: 'id',
       render: (value, record) => {
-        return <p key={record.id}>Passed</p>;
+        return <p key={record.resultId}>Passed</p>;
       },
     },
   ];
@@ -69,7 +69,7 @@ const TestDetails = ({testId, onSelectResult}: IProps) => {
       </Title>
       <Table
         pagination={{pageSize: 5}}
-        rowKey="id"
+        rowKey="resultId"
         loading={isLoading}
         columns={columns}
         dataSource={testResults?.slice()?.reverse()}
