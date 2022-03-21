@@ -280,8 +280,10 @@ components:
           $ref: "./trace.yaml#/definitions/api_v3SpansResponseChunk"
         assertionResultState:
           type: boolean
+          description: True if all trace spans passed the assertion test
         assertionResult:
           type: array
+          description: List of all tested span assertions
           items: 
             $ref: "#/components/schemas/AssertionResult"
     Attribute:
@@ -385,3 +387,4 @@ components:
           description: ID
         passed:
           type: boolean
+          description: True if the span passed the assertion test
