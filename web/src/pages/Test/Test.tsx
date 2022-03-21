@@ -1,8 +1,8 @@
 import {useRef, useState} from 'react';
 import {Button, Tabs} from 'antd';
 import Title from 'antd/lib/typography/Title';
-import {CloseOutlined} from '@ant-design/icons';
-import {useParams} from 'react-router-dom';
+import {CloseOutlined, ArrowLeftOutlined} from '@ant-design/icons';
+import {useNavigate, useParams} from 'react-router-dom';
 
 import {ITestResult} from 'types';
 import {useGetTestByIdQuery, useRunTestMutation} from 'services/TestService';
@@ -19,6 +19,7 @@ interface TracePane {
 }
 
 const TestPage = () => {
+  const navigate = useNavigate();
   const {id} = useParams();
   const newTabIndexRef = useRef<number>(2);
   const [tracePanes, setTracePanes] = useState<TracePane[]>([]);
@@ -71,14 +72,26 @@ const TestPage = () => {
 
   return (
     <>
-      <S.Header>
+      {/* <S.Header>
         <Title style={{margin: 0}} level={3}>
           {test?.name}
         </Title>
         <Button onClick={handleRunTest}>Generate Trace</Button>
-      </S.Header>
+      </S.Header> */}
       <S.Content>
         <Tabs
+          tabBarExtraContent={{
+            left: (
+              <S.Header>
+                <Button type="text" shape="circle" onClick={() => navigate(-1)}>
+                  <ArrowLeftOutlined style={{fontSize: 24, marginRight: 16}} />
+                </Button>
+                <Title style={{margin: 0}} level={3}>
+                  {test?.name}
+                </Title>
+              </S.Header>
+            ),
+          }}
           hideAdd
           defaultActiveKey="1"
           activeKey={activeTabKey}
@@ -89,7 +102,7 @@ const TestPage = () => {
           <Tabs.TabPane tab="Test Details" key="1" closeIcon={<CloseOutlined hidden />}>
             <TestDetails testId={id!} onSelectResult={handleSelectTestResult} />
           </Tabs.TabPane>
-          <Tabs.TabPane tab="Assertions" key="2" closeIcon={<CloseOutlined hidden />}>
+          <Tabs.TabPane tab="Test Assertions" key="2" closeIcon={<CloseOutlined hidden />}>
             <Assertions />
           </Tabs.TabPane>
           {tracePanes.map(item => (

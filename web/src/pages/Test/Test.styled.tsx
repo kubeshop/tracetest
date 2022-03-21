@@ -5,7 +5,7 @@ export const Header = styled.div`
   align-items: center;
   gap: 4px;
   width: 100%;
-  height: 64px;
+  height: 56px;
   padding: 0 32px;
   border-bottom: 1px solid rgb(213, 215, 224);
 `;
