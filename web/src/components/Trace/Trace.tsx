@@ -30,7 +30,7 @@ const Trace = ({test, testResultId}: {test: Test; testResultId: string}) => {
   } = useGetTestResultByIdQuery({testId: test.testId, resultId: testResultId});
 
   const spanMap = useMemo(() => {
-    return traceData?.[0].trace?.resourceSpans
+    return traceData?.trace?.resourceSpans
       ?.map(i => i.instrumentationLibrarySpans.map((el: any) => el.spans))
       ?.flat(2)
       ?.reduce((acc, span) => {
@@ -100,11 +100,7 @@ const Trace = ({test, testResultId}: {test: Test; testResultId: string}) => {
           <ReflexElement>
             <div className="pane-content">
               {traceData && (
-                <TraceTimeline
-                  trace={traceData?.[0]?.trace}
-                  onSelectSpan={handleSelectSpan}
-                  selectedSpan={selectedSpan}
-                />
+                <TraceTimeline trace={traceData?.trace} onSelectSpan={handleSelectSpan} selectedSpan={selectedSpan} />
               )}
             </div>
           </ReflexElement>
