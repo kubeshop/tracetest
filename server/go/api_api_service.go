@@ -18,6 +18,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/kubeshop/tracetest/server/go/tracedb"
+	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -121,8 +122,11 @@ func (s *ApiApiService) TestsTestIdRunPost(ctx context.Context, testid string) (
 		return Response(http.StatusInternalServerError, err.Error()), err
 	}
 
-	go func(t *Test, tid trace.TraceID, sid trace.SpanID, res *TestRunResult) {
-		ctx := context.Background()
+	go func(t *Test, tid trace.TraceID, sid trace.SpanID, res TestRunResult) {
+		tracer := otel.GetTracerProvider().Tracer("")
+		ctx, span := tracer.Start(ctx, "Execute Test")
+		defer span.End()
+
 		fmt.Println("executing test")
 		resp, err := s.executor.Execute(t, tid, sid)
 		if err != nil {
@@ -131,14 +135,15 @@ func (s *ApiApiService) TestsTestIdRunPost(ctx context.Context, testid string) (
 		}
 		fmt.Println(resp)
 
+		res.Response = resp.Response
 		res.CompletedAt = time.Now()
-		err = s.testDB.UpdateResult(ctx, res)
+		err = s.testDB.UpdateResult(ctx, &res)
 		if err != nil {
-			fmt.Printf("update result err: %s", err)
+			fmt.Printf("update result err: %s\n", err)
 			return
 		}
 		fmt.Println("executed successfully")
-	}(t, tid, sid, res)
+	}(t, tid, sid, *res)
 
 	return Response(200, TestRun{
 		TestRunId: id,
@@ -154,30 +159,6 @@ func (s *ApiApiService) TestsTestIdResultsGet(ctx context.Context, id string) (I
 
 	return Response(http.StatusOK, res), nil
 
-}
-
-func (s *ApiApiService) TestsTestIdResultsResultIdTraceGet(ctx context.Context, testID string, resultsID string) (ImplResponse, error) {
-	res, err := s.testDB.GetResult(ctx, resultsID)
-	if err != nil {
-		return Response(http.StatusInternalServerError, err.Error()), err
-	}
-
-	tr, err := s.traceDB.GetTraceByID(ctx, res.TraceId)
-	if err != nil {
-		return Response(http.StatusInternalServerError, err.Error()), err
-	}
-	sid, err := trace.SpanIDFromHex(res.SpanId)
-	if err != nil {
-		return Response(http.StatusInternalServerError, err.Error()), err
-	}
-
-	tid, err := trace.TraceIDFromHex(res.TraceId)
-	if err != nil {
-		return Response(http.StatusInternalServerError, err.Error()), err
-	}
-
-	ttr := FixParent(tr, string(tid[:]), string(sid[:]))
-	return Response(http.StatusOK, ttr), nil
 }
 
 // TestsTestidResultsIdGet -

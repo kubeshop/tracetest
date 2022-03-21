@@ -128,33 +128,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/TestRunResult"
-  /tests/{testId}/results/{resultId}/trace:
-    get:
-      tags:
-        - api
-      parameters:
-        - in: path
-          name: testId
-          schema:
-            type: string
-            format: uuid
-          required: true
-        - in: path
-          name: resultId
-          schema:
-            type: string
-            format: uuid
-          required: true
-      summary: "get the trace for a test result"
-      description: "get the trace created for a particular test result"
-      responses:
-        200:
-          description: trace
-          content:
-            application/json:
-              schema:
-                type: object
-
   /tests/{testId}/results:
     get:
       tags:
@@ -301,8 +274,8 @@ components:
           type: string
           format: date-time
         response:
-          type: object
-          description: TODO(pov) This is going to be HTTP Response object for now, at some point it might be GRPC/SOAP/...
+          $ref: "#/components/schemas/HTTPResponse"
+          description: TODO(pov) This is HTTP Response object for now, at some point it might be GRPC/SOAP/...
         trace:
           $ref: "./trace.yaml#/definitions/api_v3SpansResponseChunk"
         assertionResultState:
@@ -372,11 +345,31 @@ components:
         comparisonValue:
           type: string
           description: Example "200"
+    HTTPResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        statusCode:
+          type: integer
+        headers:
+          type: array
+          items:
+            type: object
+            properties:
+              key:
+                type: string
+              value:
+                type: string
+        body:
+          type: string
+          format: byte
     AssertionResult:
       type: object
       properties:
         assertionId:
           type: string
+          description: ID
         spanAssertions:
           type: array
           items:
@@ -386,7 +379,9 @@ components:
       properties:
         spanAssertionId:  
           type: string
+          description: ID
         spanId:
           type: string
+          description: ID
         passed:
           type: boolean

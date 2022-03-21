@@ -2,29 +2,12 @@ package openapi
 
 import (
 	"encoding/hex"
-	"net/http"
 	"strconv"
 
-	"github.com/gogo/protobuf/jsonpb"
-	"github.com/gogo/protobuf/proto"
-	"github.com/gorilla/mux"
 	v11 "go.opentelemetry.io/proto/otlp/common/v1"
 	res "go.opentelemetry.io/proto/otlp/resource/v1"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 )
-
-func EncodeJSONPBResponse(i interface{}, status *int, w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	if status != nil {
-		w.WriteHeader(*status)
-	} else {
-		w.WriteHeader(http.StatusOK)
-	}
-
-	trace := i.(proto.Message)
-	m := jsonpb.Marshaler{}
-	return m.Marshal(w, trace)
-}
 
 func mapAnyValue(val *v11.AnyValue) V1AnyValue {
 
@@ -234,21 +217,4 @@ func FixParent(tr *v1.TracesData, traceID, parentSpanID string) *v1.TracesData {
 	tr.ResourceSpans = append(tr.ResourceSpans, rs)
 
 	return tr
-}
-
-// TestsTestidResultsIdTraceGet -
-func (c *ApiApiController) TestsTestidResultsIdTraceGet(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	testidParam := params["testid"]
-
-	idParam := params["id"]
-
-	result, err := c.service.TestsTestIdResultsResultIdTraceGet(r.Context(), testidParam, idParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONPBResponse(result.Body, &result.Code, w)
 }

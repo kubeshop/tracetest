@@ -21,12 +21,12 @@ const TestList = () => {
   return (
     <Table
       dataSource={tests?.map(el => ({...el, url: el.serviceUnderTest.url})).reverse()}
-      rowKey={test => test.id}
+      rowKey={test => test.testId}
       loading={isLoading}
       columns={columns}
       onRow={(record, rowIndex) => {
         return {
-          onClick: () => navigate(`/test/${record.id}`),
+          onClick: () => navigate(`/test/${record.testId}`),
         };
       }}
     />
