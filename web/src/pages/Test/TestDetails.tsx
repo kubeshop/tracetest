@@ -27,22 +27,6 @@ const TestDetails = ({testId, onSelectResult}: IProps) => {
       },
     },
     {
-      title: 'Deployment Version',
-      dataIndex: 'id',
-      key: 'id',
-      render: (value, record) => {
-        return <p key={record.resultId}>0.0.1</p>;
-      },
-    },
-    {
-      title: 'Environment',
-      dataIndex: 'id',
-      key: 'id',
-      render: (value, record) => {
-        return <p key={record.resultId}>Staging</p>;
-      },
-    },
-    {
       title: 'Assertion Result',
       dataIndex: 'id',
       key: 'id',
