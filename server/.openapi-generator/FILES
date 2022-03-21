@@ -9,7 +9,8 @@ go/logger.go
 go/model_api_v3_spans_response_chunk.go
 go/model_assertion.go
 go/model_attribute.go
-go/model_result.go
+go/model_http_response.go
+go/model_http_response_headers.go
 go/model_selector_item.go
 go/model_span_assertion.go
 go/model_span_event.go
@@ -18,6 +19,7 @@ go/model_span_span_kind.go
 go/model_status_status_code.go
 go/model_test_.go
 go/model_test_run.go
+go/model_test_run_result.go
 go/model_test_service_under_test_.go
 go/model_v1_any_value.go
 go/model_v1_array_value.go

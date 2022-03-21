@@ -14,10 +14,10 @@ type V1ResourceSpans struct {
 	Resource V1Resource `json:"resource,omitempty"`
 
 	// A list of InstrumentationLibrarySpans that originate from a resource.
-	InstrumentationLibrarySpans []V1InstrumentationLibrarySpans `json:"instrumentation_library_spans,omitempty"`
+	InstrumentationLibrarySpans []V1InstrumentationLibrarySpans `json:"instrumentationLibrarySpans,omitempty"`
 
 	// This schema_url applies to the data in the \"resource\" field. It does not apply to the data in the \"instrumentation_library_spans\" field which have their own schema_url field.
-	SchemaUrl string `json:"schema_url,omitempty"`
+	SchemaUrl string `json:"schemaUrl,omitempty"`
 }
 
 // AssertV1ResourceSpansRequired checks if the required fields are not zero-ed

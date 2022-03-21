@@ -11,7 +11,7 @@ package openapi
 
 // ApiV3SpansResponseChunk - Response object with spans.
 type ApiV3SpansResponseChunk struct {
-	ResourceSpans []V1ResourceSpans `json:"resource_spans,omitempty"`
+	ResourceSpans []V1ResourceSpans `json:"resourceSpans,omitempty"`
 }
 
 // AssertApiV3SpansResponseChunkRequired checks if the required fields are not zero-ed

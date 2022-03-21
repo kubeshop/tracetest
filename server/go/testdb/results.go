@@ -8,7 +8,7 @@ import (
 	openapi "github.com/kubeshop/tracetest/server/go"
 )
 
-func (td *TestDB) CreateResult(ctx context.Context, testid string, run *openapi.Result) error {
+func (td *TestDB) CreateResult(ctx context.Context, testid string, run *openapi.TestRunResult) error {
 	stmt, err := td.db.Prepare("INSERT INTO results(id, test_id, result) VALUES( $1, $2, $3 )")
 	if err != nil {
 		return fmt.Errorf("sql prepare: %w", err)
@@ -18,7 +18,7 @@ func (td *TestDB) CreateResult(ctx context.Context, testid string, run *openapi.
 	if err != nil {
 		return fmt.Errorf("json Marshal: %w", err)
 	}
-	_, err = stmt.ExecContext(ctx, run.Id, testid, b)
+	_, err = stmt.ExecContext(ctx, run.ResultId, testid, b)
 	if err != nil {
 		return fmt.Errorf("sql exec: %w", err)
 	}
@@ -26,7 +26,7 @@ func (td *TestDB) CreateResult(ctx context.Context, testid string, run *openapi.
 	return nil
 }
 
-func (td *TestDB) GetResult(ctx context.Context, id string) (*openapi.Result, error) {
+func (td *TestDB) GetResult(ctx context.Context, id string) (*openapi.TestRunResult, error) {
 	stmt, err := td.db.Prepare("SELECT result FROM results WHERE id = $1")
 	if err != nil {
 		return nil, err
@@ -38,7 +38,7 @@ func (td *TestDB) GetResult(ctx context.Context, id string) (*openapi.Result, er
 	if err != nil {
 		return nil, err
 	}
-	var run openapi.Result
+	var run openapi.TestRunResult
 
 	err = json.Unmarshal(b, &run)
 	if err != nil {
@@ -47,7 +47,7 @@ func (td *TestDB) GetResult(ctx context.Context, id string) (*openapi.Result, er
 	return &run, nil
 }
 
-func (td *TestDB) GetResultsByTestID(ctx context.Context, testID string) ([]openapi.Result, error) {
+func (td *TestDB) GetResultsByTestID(ctx context.Context, testID string) ([]openapi.TestRunResult, error) {
 	stmt, err := td.db.Prepare("SELECT result FROM results WHERE test_id = $1")
 	if err != nil {
 		return nil, err
@@ -58,14 +58,14 @@ func (td *TestDB) GetResultsByTestID(ctx context.Context, testID string) ([]open
 	if err != nil {
 		return nil, err
 	}
-	var run []openapi.Result
+	var run []openapi.TestRunResult
 
 	for rows.Next() {
 		var b []byte
 		if err := rows.Scan(&b); err != nil {
 			return nil, err
 		}
-		var result openapi.Result
+		var result openapi.TestRunResult
 		err = json.Unmarshal(b, &result)
 		if err != nil {
 			return nil, err
@@ -77,7 +77,7 @@ func (td *TestDB) GetResultsByTestID(ctx context.Context, testID string) ([]open
 	return run, nil
 }
 
-func (td *TestDB) UpdateResult(ctx context.Context, run *openapi.Result) error {
+func (td *TestDB) UpdateResult(ctx context.Context, run *openapi.TestRunResult) error {
 	stmt, err := td.db.Prepare("UPDATE results SET result = $2 WHERE id = $1")
 	if err != nil {
 		return err
@@ -88,7 +88,7 @@ func (td *TestDB) UpdateResult(ctx context.Context, run *openapi.Result) error {
 	if err != nil {
 		return fmt.Errorf("json Marshal: %w", err)
 	}
-	_, err = stmt.ExecContext(ctx, run.Id, b)
+	_, err = stmt.Exec(run.ResultId, b)
 	if err != nil {
 		return fmt.Errorf("sql exec: %w", err)
 	}

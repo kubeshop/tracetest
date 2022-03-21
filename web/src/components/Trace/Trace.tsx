@@ -8,7 +8,7 @@ import 'react-reflex/styles.css';
 
 import {useMemo, useState} from 'react';
 import {Test} from 'types';
-import {useGetTestTraceQuery} from 'services/TestService';
+import {useGetTestResultByIdQuery} from 'services/TestService';
 
 import TraceDiagram from './TraceDiagram';
 import TraceTimeline from './TraceTimeline';
@@ -27,10 +27,10 @@ const Trace = ({test, testResultId}: {test: Test; testResultId: string}) => {
     isLoading: isLoadingTrace,
     isError,
     refetch: refetchTrace,
-  } = useGetTestTraceQuery({id: test.id, resultId: testResultId});
+  } = useGetTestResultByIdQuery({testId: test.testId, resultId: testResultId});
 
   const spanMap = useMemo(() => {
-    return traceData?.resourceSpans
+    return traceData?.[0].trace?.resourceSpans
       ?.map(i => i.instrumentationLibrarySpans.map((el: any) => el.spans))
       ?.flat(2)
       ?.reduce((acc, span) => {
@@ -84,7 +84,11 @@ const Trace = ({test, testResultId}: {test: Test; testResultId: string}) => {
                     </Tabs.TabPane>
                     {spanMap[selectedSpan.id]?.data && (
                       <Tabs.TabPane tab="Assertions" key="2">
-                        <AssertionList trace={traceData} testId={test.id} targetSpan={spanMap[selectedSpan.id]?.data} />
+                        <AssertionList
+                          trace={traceData}
+                          testId={test.testId}
+                          targetSpan={spanMap[selectedSpan.id]?.data}
+                        />
                       </Tabs.TabPane>
                     )}
                   </Tabs>
@@ -96,7 +100,11 @@ const Trace = ({test, testResultId}: {test: Test; testResultId: string}) => {
           <ReflexElement>
             <div className="pane-content">
               {traceData && (
-                <TraceTimeline trace={traceData} onSelectSpan={handleSelectSpan} selectedSpan={selectedSpan} />
+                <TraceTimeline
+                  trace={traceData?.[0]?.trace}
+                  onSelectSpan={handleSelectSpan}
+                  selectedSpan={selectedSpan}
+                />
               )}
             </div>
           </ReflexElement>

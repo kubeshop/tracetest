@@ -26,8 +26,19 @@ export interface IAttribute {
   type: 'span' | 'resource';
 }
 
+export interface TestRunResult {
+  resultId: string;
+  testId: string;
+  traceId: string;
+  spanId: string;
+  createdAt: string;
+  completedAt: string;
+  response: any;
+  trace: ITrace;
+}
+
 export interface Test {
-  id: string;
+  testId: string;
   name: string;
   description: string;
   serviceUnderTest: {
@@ -36,7 +47,7 @@ export interface Test {
     auth?: string;
   };
   assertions: Array<Assertion>;
-  repeats: number;
+  lastTestResult: TestRunResult;
 }
 
 enum LOCATION_NAME {
@@ -91,6 +102,7 @@ export interface TestResult {
 
 export interface ITrace {
   resourceSpans: Array<ResourceSpan>;
+  description: string;
 }
 
 export interface ResourceSpan {
@@ -136,7 +148,7 @@ export interface Attribute {
   value: {[key: string]: string};
 }
 export interface ITestResult {
-  id: string;
+  resultId: string;
   traceid: string;
   spanid: string;
   successful: {};

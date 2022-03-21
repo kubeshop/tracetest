@@ -53,7 +53,7 @@ func (c *ApiApiController) Routes() Routes {
 		{
 			"CreateAssertion",
 			strings.ToUpper("Post"),
-			"/api/tests/{id}/assertions",
+			"/api/tests/{testId}/assertions",
 			c.CreateAssertion,
 		},
 		{
@@ -65,13 +65,13 @@ func (c *ApiApiController) Routes() Routes {
 		{
 			"GetAssertions",
 			strings.ToUpper("Get"),
-			"/api/tests/{id}/assertions",
+			"/api/tests/{testId}/assertions",
 			c.GetAssertions,
 		},
 		{
 			"GetTest",
 			strings.ToUpper("Get"),
-			"/api/tests/{testid}",
+			"/api/tests/{testId}",
 			c.GetTest,
 		},
 		{
@@ -81,36 +81,30 @@ func (c *ApiApiController) Routes() Routes {
 			c.GetTests,
 		},
 		{
-			"TestsIdResultsGet",
+			"TestsTestIdResultsGet",
 			strings.ToUpper("Get"),
-			"/api/tests/{id}/results",
-			c.TestsIdResultsGet,
+			"/api/tests/{testId}/results",
+			c.TestsTestIdResultsGet,
 		},
 		{
-			"TestsTestidResultsIdGet",
+			"TestsTestIdResultsResultIdGet",
 			strings.ToUpper("Get"),
-			"/api/tests/{testid}/results/{id}",
-			c.TestsTestidResultsIdGet,
+			"/api/tests/{testId}/results/{resultId}",
+			c.TestsTestIdResultsResultIdGet,
 		},
 		{
-			"TestsTestidResultsIdTraceGet",
-			strings.ToUpper("Get"),
-			"/api/tests/{testid}/results/{id}/trace",
-			c.TestsTestidResultsIdTraceGet,
-		},
-		{
-			"TestsTestidRunPost",
+			"TestsTestIdRunPost",
 			strings.ToUpper("Post"),
-			"/api/tests/{testid}/run",
-			c.TestsTestidRunPost,
+			"/api/tests/{testId}/run",
+			c.TestsTestIdRunPost,
 		},
 	}
 }
 
-// CreateAssertion -
+// CreateAssertion - Create an assertion for a test
 func (c *ApiApiController) CreateAssertion(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	idParam := params["id"]
+	testIdParam := params["testId"]
 
 	assertionParam := Assertion{}
 	d := json.NewDecoder(r.Body)
@@ -123,7 +117,7 @@ func (c *ApiApiController) CreateAssertion(w http.ResponseWriter, r *http.Reques
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	result, err := c.service.CreateAssertion(r.Context(), idParam, assertionParam)
+	result, err := c.service.CreateAssertion(r.Context(), testIdParam, assertionParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -158,12 +152,12 @@ func (c *ApiApiController) CreateTest(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// GetAssertions -
+// GetAssertions - Get assertions for a test
 func (c *ApiApiController) GetAssertions(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	idParam := params["id"]
+	testIdParam := params["testId"]
 
-	result, err := c.service.GetAssertions(r.Context(), idParam)
+	result, err := c.service.GetAssertions(r.Context(), testIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -177,9 +171,9 @@ func (c *ApiApiController) GetAssertions(w http.ResponseWriter, r *http.Request)
 // GetTest - get test
 func (c *ApiApiController) GetTest(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	testidParam := params["testid"]
+	testIdParam := params["testId"]
 
-	result, err := c.service.GetTest(r.Context(), testidParam)
+	result, err := c.service.GetTest(r.Context(), testIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -190,7 +184,7 @@ func (c *ApiApiController) GetTest(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// GetTests - Create new test
+// GetTests - Get tests
 func (c *ApiApiController) GetTests(w http.ResponseWriter, r *http.Request) {
 	result, err := c.service.GetTests(r.Context())
 	// If an error occurred, encode the error with the status code
@@ -203,12 +197,12 @@ func (c *ApiApiController) GetTests(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// TestsIdResultsGet -
-func (c *ApiApiController) TestsIdResultsGet(w http.ResponseWriter, r *http.Request) {
+// TestsTestIdResultsGet - get the results for a test
+func (c *ApiApiController) TestsTestIdResultsGet(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	idParam := params["id"]
+	testIdParam := params["testId"]
 
-	result, err := c.service.TestsIdResultsGet(r.Context(), idParam)
+	result, err := c.service.TestsTestIdResultsGet(r.Context(), testIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -219,14 +213,14 @@ func (c *ApiApiController) TestsIdResultsGet(w http.ResponseWriter, r *http.Requ
 
 }
 
-// TestsTestidResultsIdGet -
-func (c *ApiApiController) TestsTestidResultsIdGet(w http.ResponseWriter, r *http.Request) {
+// TestsTestIdResultsResultIdGet - get test result
+func (c *ApiApiController) TestsTestIdResultsResultIdGet(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	testidParam := params["testid"]
+	testIdParam := params["testId"]
 
-	idParam := params["id"]
+	resultIdParam := params["resultId"]
 
-	result, err := c.service.TestsTestidResultsIdGet(r.Context(), testidParam, idParam)
+	result, err := c.service.TestsTestIdResultsResultIdGet(r.Context(), testIdParam, resultIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -237,12 +231,12 @@ func (c *ApiApiController) TestsTestidResultsIdGet(w http.ResponseWriter, r *htt
 
 }
 
-// TestsTestidRunPost -
-func (c *ApiApiController) TestsTestidRunPost(w http.ResponseWriter, r *http.Request) {
+// TestsTestIdRunPost - run test
+func (c *ApiApiController) TestsTestIdRunPost(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	testidParam := params["testid"]
+	testIdParam := params["testId"]
 
-	result, err := c.service.TestsTestidRunPost(r.Context(), testidParam)
+	result, err := c.service.TestsTestIdRunPost(r.Context(), testIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

@@ -7,19 +7,28 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
+	"github.com/j2gg0s/otsql"
+	"github.com/j2gg0s/otsql/hook/trace"
 	openapi "github.com/kubeshop/tracetest/server/go"
-	_ "github.com/lib/pq"
+	pq "github.com/lib/pq"
 )
 
 type TestDB struct {
 	db *sql.DB
 }
 
-func New(connStr string) (*TestDB, error) {
-	db, err := sql.Open("postgres", connStr)
+func New(dsn string) (*TestDB, error) {
+	connector, err := pq.NewConnector(dsn)
 	if err != nil {
 		return nil, fmt.Errorf("sql open: %w", err)
 	}
+	db := sql.OpenDB(
+		otsql.WrapConnector(connector,
+			otsql.WithHooks(trace.New(
+				trace.WithQuery(true),
+				trace.WithQueryParams(true),
+				trace.WithRowsAffected(true),
+			))))
 
 	_, err = db.Exec(`
 CREATE TABLE IF NOT EXISTS tests  (
@@ -63,7 +72,7 @@ func (td *TestDB) CreateTest(ctx context.Context, test *openapi.Test) (string, e
 	}
 	defer stmt.Close()
 	id := uuid.New().String()
-	test.Id = id
+	test.TestId = id
 	b, err := json.Marshal(test)
 	if err != nil {
 		return "", fmt.Errorf("json Marshal: %w", err)
@@ -128,7 +137,7 @@ func (td *TestDB) GetTests(ctx context.Context) ([]openapi.Test, error) {
 			return nil, err
 		}
 
-		as, err := td.GetAssertionsByTestID(ctx, test.Id)
+		as, err := td.GetAssertionsByTestID(ctx, test.TestId)
 		if err != nil {
 			return nil, err
 		}
@@ -147,7 +156,7 @@ func (td *TestDB) CreateAssertion(ctx context.Context, testid string, assertion 
 	}
 	defer stmt.Close()
 	id := uuid.New().String()
-	assertion.Id = id
+	assertion.AssertionId = id
 	b, err := json.Marshal(assertion)
 	if err != nil {
 		return "", fmt.Errorf("json Marshal: %w", err)

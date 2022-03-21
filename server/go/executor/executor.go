@@ -2,13 +2,13 @@ package executor
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"net/http"
 
 	"github.com/google/uuid"
 	openapi "github.com/kubeshop/tracetest/server/go"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
-	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
@@ -31,10 +31,11 @@ func New() (*TestExecutor, error) {
 	}, nil
 }
 
-func (te *TestExecutor) Execute(test *openapi.Test, tid trace.TraceID, sid trace.SpanID) (*openapi.Result, error) {
+func (te *TestExecutor) Execute(test *openapi.Test, tid trace.TraceID, sid trace.SpanID) (*openapi.TestRunResult, error) {
 	client := http.Client{
 		Transport: otelhttp.NewTransport(http.DefaultTransport,
 			otelhttp.WithTracerProvider(te.traceProvider),
+			otelhttp.WithPropagators(propagation.NewCompositeTextMapPropagator(propagation.Baggage{}, propagation.TraceContext{})),
 		),
 	}
 
@@ -51,20 +52,44 @@ func (te *TestExecutor) Execute(test *openapi.Test, tid trace.TraceID, sid trace
 	if err != nil {
 		return nil, err
 	}
-	_, err = client.Do(req.WithContext(trace.ContextWithSpanContext(context.Background(), sc)))
+	resp, err := client.Do(req.WithContext(trace.ContextWithSpanContext(context.Background(), sc)))
 	if err != nil {
 		return nil, err
 	}
 
-	return &openapi.Result{
-		Id: uuid.New().String(),
+	return &openapi.TestRunResult{
+		ResultId: uuid.New().String(),
+		Response: mapResp(resp),
 	}, nil
 }
 
-func initTracing() (*sdktrace.TracerProvider, error) {
-	// Specify the TextMapPropagator to ensure spans propagate across service boundaries
-	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(propagation.Baggage{}, propagation.TraceContext{}))
+func mapResp(resp *http.Response) openapi.HttpResponse {
+	var mappedHeaders []openapi.HttpResponseHeaders
+	for key, headers := range resp.Header {
+		for _, val := range headers {
+			val := openapi.HttpResponseHeaders{
+				Key:   key,
+				Value: val,
+			}
+			mappedHeaders = append(mappedHeaders, val)
+		}
+	}
+	var body string
+	if b, err := io.ReadAll(resp.Body); err == nil {
+		body = string(b)
+	} else {
+		fmt.Println(err)
+	}
 
+	return openapi.HttpResponse{
+		Status:     resp.Status,
+		StatusCode: int32(resp.StatusCode),
+		Headers:    mappedHeaders,
+		Body:       body,
+	}
+}
+
+func initTracing() (*sdktrace.TracerProvider, error) {
 	// Set standard attributes per semantic conventions
 	res := resource.NewWithAttributes(
 		semconv.SchemaURL,
@@ -81,7 +106,6 @@ func initTracing() (*sdktrace.TracerProvider, error) {
 		sdktrace.WithResource(res),
 		sdktrace.WithSampler(sdktrace.ParentBased(sdktrace.AlwaysSample())),
 	)
-	otel.SetTracerProvider(tp)
 
 	return tp, nil
 }

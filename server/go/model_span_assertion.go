@@ -11,6 +11,9 @@ package openapi
 
 type SpanAssertion struct {
 
+	// ID
+	SpanAssertionId string `json:"spanAssertionId,omitempty"`
+
 	// Example \"SPAN_ATTRIBUTES\"
 	LocationName string `json:"locationName,omitempty"`
 

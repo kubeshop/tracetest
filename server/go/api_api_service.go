@@ -18,6 +18,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/kubeshop/tracetest/server/go/tracedb"
+	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -27,10 +28,10 @@ type TestDB interface {
 	GetTests(ctx context.Context) ([]Test, error)
 	GetTest(ctx context.Context, id string) (*Test, error)
 
-	CreateResult(ctx context.Context, testID string, res *Result) error
-	UpdateResult(ctx context.Context, res *Result) error
-	GetResult(ctx context.Context, id string) (*Result, error)
-	GetResultsByTestID(ctx context.Context, testid string) ([]Result, error)
+	CreateResult(ctx context.Context, testID string, res *TestRunResult) error
+	UpdateResult(ctx context.Context, res *TestRunResult) error
+	GetResult(ctx context.Context, id string) (*TestRunResult, error)
+	GetResultsByTestID(ctx context.Context, testid string) ([]TestRunResult, error)
 
 	CreateAssertion(ctx context.Context, testid string, assertion *Assertion) (string, error)
 	GetAssertion(ctx context.Context, id string) (*Assertion, error)
@@ -39,7 +40,7 @@ type TestDB interface {
 
 //go:generate mockgen -package=mocks -destination=mocks/executor.go . TestExecutor
 type TestExecutor interface {
-	Execute(test *Test, tid trace.TraceID, sid trace.SpanID) (*Result, error)
+	Execute(test *Test, tid trace.TraceID, sid trace.SpanID) (*TestRunResult, error)
 }
 
 // ApiApiService is a service that implements the logic for the ApiApiServicer
@@ -69,7 +70,7 @@ func (s *ApiApiService) CreateTest(ctx context.Context, test Test) (ImplResponse
 		return Response(http.StatusInternalServerError, err.Error()), err
 	}
 
-	test.Id = id
+	test.TestId = id
 	return Response(200, test), nil
 }
 
@@ -93,7 +94,7 @@ func (s *ApiApiService) GetTests(ctx context.Context) (ImplResponse, error) {
 	return Response(200, tests), nil
 }
 
-func (s *ApiApiService) TestsTestidRunPost(ctx context.Context, testid string) (ImplResponse, error) {
+func (s *ApiApiService) TestsTestIdRunPost(ctx context.Context, testid string) (ImplResponse, error) {
 	t, err := s.testDB.GetTest(ctx, testid)
 	//TODO switch on notFound
 	if err != nil {
@@ -108,11 +109,12 @@ func (s *ApiApiService) TestsTestidRunPost(ctx context.Context, testid string) (
 	sid := trace.SpanID{}
 	s.rand.Read(sid[:])
 	fmt.Printf("gen span id: %v\n", sid)
-	res := &Result{
-		Id:        id,
+	res := &TestRunResult{
+		ResultId:  id,
+		TestId:    testid,
 		CreatedAt: time.Now(),
-		Traceid:   tid.String(),
-		Spanid:    sid.String(),
+		TraceId:   tid.String(),
+		SpanId:    sid.String(),
 	}
 
 	err = s.testDB.CreateResult(ctx, testid, res)
@@ -120,8 +122,11 @@ func (s *ApiApiService) TestsTestidRunPost(ctx context.Context, testid string) (
 		return Response(http.StatusInternalServerError, err.Error()), err
 	}
 
-	go func(t *Test, tid trace.TraceID, sid trace.SpanID, res *Result) {
-		ctx := context.Background()
+	go func(t *Test, tid trace.TraceID, sid trace.SpanID, res TestRunResult) {
+		tracer := otel.GetTracerProvider().Tracer("")
+		ctx, span := tracer.Start(ctx, "Execute Test")
+		defer span.End()
+
 		fmt.Println("executing test")
 		resp, err := s.executor.Execute(t, tid, sid)
 		if err != nil {
@@ -130,22 +135,23 @@ func (s *ApiApiService) TestsTestidRunPost(ctx context.Context, testid string) (
 		}
 		fmt.Println(resp)
 
+		res.Response = resp.Response
 		res.CompletedAt = time.Now()
-		err = s.testDB.UpdateResult(ctx, res)
+		err = s.testDB.UpdateResult(ctx, &res)
 		if err != nil {
-			fmt.Printf("update result err: %s", err)
+			fmt.Printf("update result err: %s\n", err)
 			return
 		}
 		fmt.Println("executed successfully")
-	}(t, tid, sid, res)
+	}(t, tid, sid, *res)
 
 	return Response(200, TestRun{
-		Id: id,
+		TestRunId: id,
 	}), nil
 }
 
 // TestsIdResultsGet -
-func (s *ApiApiService) TestsIdResultsGet(ctx context.Context, id string) (ImplResponse, error) {
+func (s *ApiApiService) TestsTestIdResultsGet(ctx context.Context, id string) (ImplResponse, error) {
 	res, err := s.testDB.GetResultsByTestID(ctx, id)
 	if err != nil {
 		return Response(http.StatusInternalServerError, err.Error()), err
@@ -155,38 +161,27 @@ func (s *ApiApiService) TestsIdResultsGet(ctx context.Context, id string) (ImplR
 
 }
 
-func (s *ApiApiService) TestsTestidResultsIdTraceGet(ctx context.Context, testID string, resultsID string) (ImplResponse, error) {
-	res, err := s.testDB.GetResult(ctx, resultsID)
-	if err != nil {
-		return Response(http.StatusInternalServerError, err.Error()), err
-	}
-
-	tr, err := s.traceDB.GetTraceByID(ctx, res.Traceid)
-	if err != nil {
-		return Response(http.StatusInternalServerError, err.Error()), err
-	}
-	sid, err := trace.SpanIDFromHex(res.Spanid)
-	if err != nil {
-		return Response(http.StatusInternalServerError, err.Error()), err
-	}
-
-	tid, err := trace.TraceIDFromHex(res.Traceid)
-	if err != nil {
-		return Response(http.StatusInternalServerError, err.Error()), err
-	}
-
-	ttr := FixParent(tr, string(tid[:]), string(sid[:]))
-	return Response(http.StatusOK, ttr), nil
-}
-
 // TestsTestidResultsIdGet -
-func (s *ApiApiService) TestsTestidResultsIdGet(ctx context.Context, testid string, id string) (ImplResponse, error) {
+func (s *ApiApiService) TestsTestIdResultsResultIdGet(ctx context.Context, testid string, id string) (ImplResponse, error) {
 	res, err := s.testDB.GetResult(ctx, id)
 	if err != nil {
 		return Response(http.StatusInternalServerError, err.Error()), err
 	}
-
-	return Response(http.StatusOK, []Result{*res}), nil
+	tr, err := s.traceDB.GetTraceByID(ctx, res.TraceId)
+	if err != nil {
+		return Response(http.StatusInternalServerError, err.Error()), err
+	}
+	sid, err := trace.SpanIDFromHex(res.SpanId)
+	if err != nil {
+		return Response(http.StatusInternalServerError, err.Error()), err
+	}
+	tid, err := trace.TraceIDFromHex(res.TraceId)
+	if err != nil {
+		return Response(http.StatusInternalServerError, err.Error()), err
+	}
+	ttr := FixParent(tr, string(tid[:]), string(sid[:]))
+	res.Trace = mapTrace(ttr)
+	return Response(http.StatusOK, []TestRunResult{*res}), nil
 }
 
 func (s *ApiApiService) CreateAssertion(ctx context.Context, testID string, assertion Assertion) (ImplResponse, error) {
@@ -195,7 +190,7 @@ func (s *ApiApiService) CreateAssertion(ctx context.Context, testID string, asse
 		return Response(http.StatusInternalServerError, err.Error()), err
 	}
 
-	assertion.Id = id
+	assertion.AssertionId = id
 	return Response(http.StatusOK, assertion), nil
 }
 

@@ -13,7 +13,7 @@ package openapi
 type SpanEvent struct {
 
 	// time_unix_nano is the time the event occurred.
-	TimeUnixNano string `json:"time_unix_nano,omitempty"`
+	TimeUnixNano string `json:"timeUnixNano,omitempty"`
 
 	// name of the event. This field is semantically required to be set to non-empty string.
 	Name string `json:"name,omitempty"`
@@ -22,7 +22,7 @@ type SpanEvent struct {
 	Attributes []V1KeyValue `json:"attributes,omitempty"`
 
 	// dropped_attributes_count is the number of dropped attributes. If the value is 0, then no attributes were dropped.
-	DroppedAttributesCount int64 `json:"dropped_attributes_count,omitempty"`
+	DroppedAttributesCount int64 `json:"droppedAttributesCount,omitempty"`
 }
 
 // AssertSpanEventRequired checks if the required fields are not zero-ed

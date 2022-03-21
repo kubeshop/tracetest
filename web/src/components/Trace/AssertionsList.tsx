@@ -21,7 +21,7 @@ const AssertionList = ({testId, targetSpan, trace}: IProps) => {
   const {data: testAssertions} = useGetTestAssertionsQuery(testId);
   const attrs: IAttribute[] = jemsPath.search(trace, filterBySpanId(targetSpan.spanId));
 
-  const attributesTree = attrs.reduce((acc: any, item: any) => {
+  const attributesTree = attrs?.reduce((acc: any, item: any) => {
     const resource = acc[item.type] || {};
     resource.title = item.type;
     resource.key = item.type;
