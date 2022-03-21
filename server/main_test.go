@@ -60,7 +60,7 @@ func TestRunTest(t *testing.T) {
 	db.EXPECT().UpdateResult(gomock.Any(), gomock.Any()).Return(nil)
 	ex := mocks.NewMockTestExecutor(ctrl)
 
-	ex.EXPECT().Execute(gomock.Any(), gomock.Any(), gomock.Any()).Return(&openapi.Result{Id: "2"}, nil)
+	ex.EXPECT().Execute(gomock.Any(), gomock.Any(), gomock.Any()).Return(&openapi.TestRunResult{ResultId: "2"}, nil)
 	req := httptest.NewRequest(http.MethodPost, "/api/tests/1/run", nil)
 	w := httptest.NewRecorder()
 
@@ -69,7 +69,7 @@ func TestRunTest(t *testing.T) {
 
 	ctr := controller.(*openapi.ApiApiController)
 
-	ctr.TestsTestidRunPost(w, req)
+	ctr.TestsTestIdRunPost(w, req)
 
 	res := w.Result()
 	defer res.Body.Close()
@@ -88,9 +88,23 @@ func TestCreateNewAssertion(t *testing.T) {
 	defer ctrl.Finish()
 
 	assertion := openapi.Assertion{
-		Selector:   "resourceSpans[?resource.attributes[?key=='service.name' && value.stringValue=='productcatalog']]",
-		Comparable: "Comparable",
-		Operator:   "Operator",
+		Selectors: []openapi.SelectorItem{
+			{
+				LocationName: "SPAN",
+				PropertyName: "operation",
+				Value:        "POST /users/verify",
+				ValueType:    "stringValue",
+			},
+		},
+		SpanAssertions: []openapi.SpanAssertion{
+			{
+				LocationName:    "SPAN_ATTRIBUTES",
+				PropertyName:    "http.status.code",
+				ValueType:       "intValue",
+				Operator:        "EQUALS",
+				ComparisonValue: "200",
+			},
+		},
 	}
 	b, err := json.Marshal(assertion)
 	assert.NoError(t, err)

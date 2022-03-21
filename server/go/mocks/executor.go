@@ -36,10 +36,10 @@ func (m *MockTestExecutor) EXPECT() *MockTestExecutorMockRecorder {
 }
 
 // Execute mocks base method.
-func (m *MockTestExecutor) Execute(arg0 *openapi.Test, arg1 trace.TraceID, arg2 trace.SpanID) (*openapi.Result, error) {
+func (m *MockTestExecutor) Execute(arg0 *openapi.Test, arg1 trace.TraceID, arg2 trace.SpanID) (*openapi.TestRunResult, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Execute", arg0, arg1, arg2)
-	ret0, _ := ret[0].(*openapi.Result)
+	ret0, _ := ret[0].(*openapi.TestRunResult)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

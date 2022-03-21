@@ -51,7 +51,7 @@ func (mr *MockTestDBMockRecorder) CreateAssertion(arg0, arg1, arg2 interface{}) 
 }
 
 // CreateResult mocks base method.
-func (m *MockTestDB) CreateResult(arg0 context.Context, arg1 string, arg2 *openapi.Result) error {
+func (m *MockTestDB) CreateResult(arg0 context.Context, arg1 string, arg2 *openapi.TestRunResult) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateResult", arg0, arg1, arg2)
 	ret0, _ := ret[0].(error)
@@ -110,10 +110,10 @@ func (mr *MockTestDBMockRecorder) GetAssertionsByTestID(arg0, arg1 interface{}) 
 }
 
 // GetResult mocks base method.
-func (m *MockTestDB) GetResult(arg0 context.Context, arg1 string) (*openapi.Result, error) {
+func (m *MockTestDB) GetResult(arg0 context.Context, arg1 string) (*openapi.TestRunResult, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetResult", arg0, arg1)
-	ret0, _ := ret[0].(*openapi.Result)
+	ret0, _ := ret[0].(*openapi.TestRunResult)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -125,10 +125,10 @@ func (mr *MockTestDBMockRecorder) GetResult(arg0, arg1 interface{}) *gomock.Call
 }
 
 // GetResultsByTestID mocks base method.
-func (m *MockTestDB) GetResultsByTestID(arg0 context.Context, arg1 string) ([]openapi.Result, error) {
+func (m *MockTestDB) GetResultsByTestID(arg0 context.Context, arg1 string) ([]openapi.TestRunResult, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetResultsByTestID", arg0, arg1)
-	ret0, _ := ret[0].([]openapi.Result)
+	ret0, _ := ret[0].([]openapi.TestRunResult)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -170,7 +170,7 @@ func (mr *MockTestDBMockRecorder) GetTests(arg0 interface{}) *gomock.Call {
 }
 
 // UpdateResult mocks base method.
-func (m *MockTestDB) UpdateResult(arg0 context.Context, arg1 *openapi.Result) error {
+func (m *MockTestDB) UpdateResult(arg0 context.Context, arg1 *openapi.TestRunResult) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateResult", arg0, arg1)
 	ret0, _ := ret[0].(error)
