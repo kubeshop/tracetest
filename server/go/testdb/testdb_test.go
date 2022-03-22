@@ -84,6 +84,23 @@ func TestUpdateTest(t *testing.T) {
 	assert.Equal(t, &test, gotTest)
 }
 
+func TestGetTest(t *testing.T) {
+	dsn := "host=localhost user=postgres password=postgres port=5432 sslmode=disable"
+	db, err := testdb.New(dsn)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		err = db.Drop()
+		if err != nil {
+			t.Fatal(err)
+		}
+	}()
+	ctx := context.Background()
+	_, err = db.GetTest(ctx, uuid.New().String())
+	assert.Equal(t, openapi.ErrNotFound, err)
+}
+
 func TestGetTests(t *testing.T) {
 	dsn := "host=localhost user=postgres password=postgres port=5432 sslmode=disable"
 	db, err := testdb.New(dsn)

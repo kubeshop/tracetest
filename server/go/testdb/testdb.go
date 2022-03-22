@@ -106,14 +106,17 @@ func (td *TestDB) UpdateTest(ctx context.Context, test *openapi.Test) error {
 func (td *TestDB) GetTest(ctx context.Context, id string) (*openapi.Test, error) {
 	stmt, err := td.db.Prepare("SELECT test FROM tests WHERE id = $1")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("prepare: %w", err)
 	}
 	defer stmt.Close()
 
 	var b []byte
 	err = stmt.QueryRowContext(ctx, id).Scan(&b)
 	if err != nil {
-		return nil, err
+		if err.Error() == "sql: no rows in result set" {
+			return nil, openapi.ErrNotFound
+		}
+		return nil, fmt.Errorf("query: %w", err)
 	}
 	var test openapi.Test
 
@@ -196,7 +199,10 @@ func (td *TestDB) GetAssertion(ctx context.Context, id string) (*openapi.Asserti
 	var b []byte
 	err = stmt.QueryRowContext(ctx, id).Scan(&b)
 	if err != nil {
-		return nil, err
+		if err.Error() == "sql: no rows in result set" {
+			return nil, openapi.ErrNotFound
+		}
+		return nil, fmt.Errorf("query: %w", err)
 	}
 	var assertion openapi.Assertion
 
