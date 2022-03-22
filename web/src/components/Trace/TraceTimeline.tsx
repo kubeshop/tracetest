@@ -58,7 +58,10 @@ const TraceTimeline = ({trace, selectedSpan, onSelectSpan}: IProps) => {
   });
 
   const root = d3.stratify()(dagData);
-  const minNano = d3.min(spanDates, s => Number(s.span.startTimeUnixNano))! as number;
+  const minNano = d3.min(
+    spanDates.filter(el => Number(el.span.startTimeUnixNano) > 0 && Number(el.span.endTimeUnixNano) > 0),
+    s => Number(s.span.startTimeUnixNano)
+  )! as number;
   const maxNano = d3.max(spanDates, s => Number(s.span.endTimeUnixNano))! as number;
 
   const scaleTime = d3
