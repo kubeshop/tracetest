@@ -45,6 +45,45 @@ func TestCreateTest(t *testing.T) {
 	assert.Equal(t, &test, gotTest)
 }
 
+func TestUpdateTest(t *testing.T) {
+	dsn := "host=localhost user=postgres password=postgres port=5432 sslmode=disable"
+	db, err := testdb.New(dsn)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		err = db.Drop()
+		if err != nil {
+			t.Fatal(err)
+		}
+	}()
+	test := openapi.Test{
+		TestId:      "",
+		Name:        "first test",
+		Description: "description",
+		ServiceUnderTest: openapi.TestServiceUnderTest{
+			Url: "http://localhost:3030/hello-instrumented",
+		},
+	}
+	ctx := context.Background()
+	id, err := db.CreateTest(ctx, &test)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	test.Name = "updated test"
+	err = db.UpdateTest(ctx, &test)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	gotTest, err := db.GetTest(ctx, id)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Equal(t, &test, gotTest)
+}
+
 func TestGetTests(t *testing.T) {
 	dsn := "host=localhost user=postgres password=postgres port=5432 sslmode=disable"
 	db, err := testdb.New(dsn)

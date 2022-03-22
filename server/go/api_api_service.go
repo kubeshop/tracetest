@@ -25,6 +25,7 @@ import (
 //go:generate mockgen -package=mocks -destination=mocks/testdb.go . TestDB
 type TestDB interface {
 	CreateTest(ctx context.Context, test *Test) (string, error)
+	UpdateTest(ctx context.Context, test *Test) error
 	GetTests(ctx context.Context) ([]Test, error)
 	GetTest(ctx context.Context, id string) (*Test, error)
 
@@ -81,6 +82,23 @@ func (s *ApiApiService) GetTest(ctx context.Context, testid string) (ImplRespons
 		return Response(http.StatusInternalServerError, err.Error()), err
 	}
 
+	if test.LastTestResult.TraceId != "" {
+		res := test.LastTestResult
+		tr, err := s.traceDB.GetTraceByID(ctx, res.TraceId)
+		if err != nil {
+			return Response(http.StatusInternalServerError, err.Error()), err
+		}
+		sid, err := trace.SpanIDFromHex(res.SpanId)
+		if err != nil {
+			return Response(http.StatusInternalServerError, err.Error()), err
+		}
+		tid, err := trace.TraceIDFromHex(res.TraceId)
+		if err != nil {
+			return Response(http.StatusInternalServerError, err.Error()), err
+		}
+		ttr := FixParent(tr, string(tid[:]), string(sid[:]))
+		test.LastTestResult.Trace = mapTrace(ttr)
+	}
 	return Response(200, test), nil
 }
 
@@ -122,13 +140,13 @@ func (s *ApiApiService) TestsTestIdRunPost(ctx context.Context, testid string) (
 		return Response(http.StatusInternalServerError, err.Error()), err
 	}
 
-	go func(t *Test, tid trace.TraceID, sid trace.SpanID, res TestRunResult) {
+	go func(t Test, tid trace.TraceID, sid trace.SpanID, res TestRunResult) {
 		tracer := otel.GetTracerProvider().Tracer("")
 		ctx, span := tracer.Start(ctx, "Execute Test")
 		defer span.End()
 
 		fmt.Println("executing test")
-		resp, err := s.executor.Execute(t, tid, sid)
+		resp, err := s.executor.Execute(&t, tid, sid)
 		if err != nil {
 			fmt.Printf("exec err: %s", err)
 			return
@@ -142,8 +160,16 @@ func (s *ApiApiService) TestsTestIdRunPost(ctx context.Context, testid string) (
 			fmt.Printf("update result err: %s\n", err)
 			return
 		}
+
+		t.LastTestResult = res
+		err = s.testDB.UpdateTest(ctx, &t)
+		if err != nil {
+			fmt.Printf("update test last result err: %s\n", err)
+			return
+		}
+
 		fmt.Println("executed successfully")
-	}(t, tid, sid, *res)
+	}(*t, tid, sid, *res)
 
 	return Response(200, TestRun{
 		TestRunId: id,

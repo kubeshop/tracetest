@@ -85,6 +85,24 @@ func (td *TestDB) CreateTest(ctx context.Context, test *openapi.Test) (string, e
 	return id, nil
 }
 
+func (td *TestDB) UpdateTest(ctx context.Context, test *openapi.Test) error {
+	stmt, err := td.db.Prepare("UPDATE tests SET test = $2 WHERE id = $1")
+	if err != nil {
+		return fmt.Errorf("sql prepare: %w", err)
+	}
+	defer stmt.Close()
+	b, err := json.Marshal(test)
+	if err != nil {
+		return fmt.Errorf("json Marshal: %w", err)
+	}
+	_, err = stmt.Exec(test.TestId, b)
+	if err != nil {
+		return fmt.Errorf("sql exec: %w", err)
+	}
+
+	return nil
+}
+
 func (td *TestDB) GetTest(ctx context.Context, id string) (*openapi.Test, error) {
 	stmt, err := td.db.Prepare("SELECT test FROM tests WHERE id = $1")
 	if err != nil {
@@ -103,7 +121,6 @@ func (td *TestDB) GetTest(ctx context.Context, id string) (*openapi.Test, error)
 	if err != nil {
 		return nil, err
 	}
-
 	as, err := td.GetAssertionsByTestID(ctx, id)
 	if err != nil {
 		return nil, err
