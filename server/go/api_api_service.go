@@ -11,6 +11,7 @@ package openapi
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"math/rand"
 	"net/http"
@@ -21,6 +22,8 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
 )
+
+var ErrNotFound = errors.New("record not found")
 
 //go:generate mockgen -package=mocks -destination=mocks/testdb.go . TestDB
 type TestDB interface {
@@ -79,7 +82,12 @@ func (s *ApiApiService) CreateTest(ctx context.Context, test Test) (ImplResponse
 func (s *ApiApiService) GetTest(ctx context.Context, testid string) (ImplResponse, error) {
 	test, err := s.testDB.GetTest(ctx, testid)
 	if err != nil {
-		return Response(http.StatusInternalServerError, err.Error()), err
+		switch {
+		case errors.Is(ErrNotFound, err):
+			return Response(http.StatusNotFound, err.Error()), err
+		default:
+			return Response(http.StatusInternalServerError, err.Error()), err
+		}
 	}
 
 	if test.LastTestResult.TraceId != "" {
