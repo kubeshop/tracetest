@@ -58,6 +58,7 @@ func TestRunTest(t *testing.T) {
 	db.EXPECT().GetTest(gomock.Any(), gomock.Any()).Return(&openapi.Test{}, nil)
 	db.EXPECT().CreateResult(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil)
 	db.EXPECT().UpdateResult(gomock.Any(), gomock.Any()).Return(nil)
+	db.EXPECT().UpdateTest(gomock.Any(), gomock.Any()).Return(nil)
 	ex := mocks.NewMockTestExecutor(ctrl)
 
 	ex.EXPECT().Execute(gomock.Any(), gomock.Any(), gomock.Any()).Return(&openapi.TestRunResult{ResultId: "2"}, nil)
