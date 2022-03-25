@@ -47,7 +47,7 @@ const itemSelectorKeys = SELECTOR_DEFAULT_ATTRIBUTES.map(el => el.attributes).fl
 const CreateAssertionModal = ({testId, span, trace, open, onClose}: IProps) => {
   const [assertionList, setAssertionList] = useState<
     Array<Partial<{key: string; compareOp: keyof typeof COMPARE_OPERATOR}>>
-  >(Array(3).fill(''));
+  >(Array(3).fill({key: '', compareOp: COMPARE_OPERATOR.EQUALS}));
   const [createAssertion, result] = useCreateAssertionMutation();
   const attrs = jemsPath.search(trace, filterBySpanId(span.spanId));
 
@@ -79,7 +79,7 @@ const CreateAssertionModal = ({testId, span, trace, open, onClose}: IProps) => {
   }, {});
 
   const handleAddItem = () => {
-    setAssertionList([...assertionList, {}]);
+    setAssertionList([...assertionList, {key: '', compareOp: COMPARE_OPERATOR.EQUALS}]);
   };
 
   const renderTitle = (title: any, index: number) => (
@@ -137,7 +137,9 @@ const CreateAssertionModal = ({testId, span, trace, open, onClose}: IProps) => {
         const spanAttribute = span.attributes.find(attr => attr.key.includes(el.attr.key));
 
         return {
-          locationName: LOCATION_NAME.SPAN_ATTRIBUTES,
+          locationName: el.attr.type.includes('span')
+            ? LOCATION_NAME.SPAN_ATTRIBUTES
+            : LOCATION_NAME.RESOURCE_ATTRIBUTES,
           propertyName: el.attr.key as string,
           comparisonValue: el.attr.value as string,
           operator: el.compareOp,
@@ -166,7 +168,7 @@ const CreateAssertionModal = ({testId, span, trace, open, onClose}: IProps) => {
         }
         renderItem={(item: any, index) => {
           const handleSearchChange = (searchText: string) => {
-            assertionList[index] = {key: searchText};
+            assertionList[index] = {...assertionList[index], key: searchText};
             setAssertionList([...assertionList]);
           };
 
