@@ -4,8 +4,9 @@ import {Button, Input, List, Modal, Select as AntSelect, AutoComplete, Typograph
 import jemsPath from 'jmespath';
 import Text from 'antd/lib/typography/Text';
 
-import {IAttribute, ISpan} from 'types';
+import {COMPARE_OPERATOR, IAttribute, ISpan, ItemSelector, LOCATION_NAME, SpanSelector} from 'types';
 import {useCreateAssertionMutation} from 'services/TestService';
+import {SELECTOR_DEFAULT_ATTRIBUTES} from 'lib/SelectorDefaultAttributes';
 import {filterBySpanId} from 'utils';
 
 const {Title} = Typography;
@@ -28,7 +29,9 @@ const NORMALIZED_OBJECT = `resourceSpans[].{instrumentationLibrarySpans:instrume
 const filterByAttributes = (condition: string) => `[${condition && '?'}${condition}]`;
 
 const selectionPipe = (query: string) => `${NORMALIZED_OBJECT} | ${query}  | length([])`;
+
 const createSelector = (query: string) => `${NORMALIZED_OBJECT} | ${query}`;
+
 const selectorConditionBuilder = (attribute: IAttribute) => {
   if (attribute.type === 'span') {
     return `instrumentationLibrarySpans[?spans[?attributes[?key=='${attribute.key}' && value=='${attribute.value}']]]`;
@@ -39,22 +42,32 @@ const selectorConditionBuilder = (attribute: IAttribute) => {
   }
 };
 
+const itemSelectorKeys = SELECTOR_DEFAULT_ATTRIBUTES.map(el => el.attributes).flat();
+
 const CreateAssertionModal = ({testId, span, trace, open, onClose}: IProps) => {
-  const [assertionList, setAssertionList] = useState<Array<string>>(Array(3).fill(''));
+  const [assertionList, setAssertionList] = useState<
+    Array<Partial<{key: string; compareOp: keyof typeof COMPARE_OPERATOR}>>
+  >(Array(3).fill(''));
   const [createAssertion, result] = useCreateAssertionMutation();
   const attrs = jemsPath.search(trace, filterBySpanId(span.spanId));
 
   const selectorCondition = assertionList
     .map(k => {
-      return attrs?.find((el: any) => el.key === k);
+      return attrs?.find((el: any) => el.key === k.key);
     })
     .filter(i => i)
     .map(item => selectorConditionBuilder(item))
     .join(' && ');
+
   console.log('@@query', selectionPipe(filterByAttributes(selectorCondition)));
+
   const effectedSpans =
     selectorCondition.length > 0 ? jemsPath.search(trace, selectionPipe(filterByAttributes(selectorCondition))) : 0;
+
   const spanTagsMap = attrs?.reduce((acc: {[x: string]: any}, item: {key: string}) => {
+    if (itemSelectorKeys.indexOf(item.key) !== -1) {
+      return acc;
+    }
     const keyPrefix = item.key.split('.').shift() || item.key;
     if (!keyPrefix) {
       return acc;
@@ -66,7 +79,7 @@ const CreateAssertionModal = ({testId, span, trace, open, onClose}: IProps) => {
   }, {});
 
   const handleAddItem = () => {
-    setAssertionList([...assertionList, '']);
+    setAssertionList([...assertionList, {}]);
   };
 
   const renderTitle = (title: any, index: number) => (
@@ -94,7 +107,46 @@ const CreateAssertionModal = ({testId, span, trace, open, onClose}: IProps) => {
     };
   });
 
+  const spanAttributeKeys = Object.keys(spanTagsMap);
+  const defaultSpanAttribute =
+    SELECTOR_DEFAULT_ATTRIBUTES.find(el => spanAttributeKeys.includes(el.semanticGroup))?.attributes || [];
+  console.log('@@defaultSpanAttribute', defaultSpanAttribute);
+
+  const itemSelectors = defaultSpanAttribute
+    .map<ItemSelector | undefined>(el => {
+      const spanAttribute = span.attributes.find(attr => attr.key.includes(el));
+      if (spanAttribute) {
+        return {
+          locationName: LOCATION_NAME.SPAN_ATTRIBUTES,
+          propertyName: spanAttribute.key,
+          value: spanAttribute.value['intValue'] || spanAttribute.value['stringValue'],
+          valueType: spanAttribute.value['intValue'] ? 'intValue' : 'stringValue',
+        };
+      }
+      return undefined;
+    })
+    .filter((el: ItemSelector | undefined): el is ItemSelector => Boolean(el));
+
   const handleCreateAssertion = async () => {
+    const spanAssertions = assertionList
+      .map(k => {
+        return {attr: attrs?.find((el: any) => el.key === k?.key), compareOp: k.compareOp};
+      })
+      .filter(i => i.attr)
+      .map(el => {
+        const spanAttribute = span.attributes.find(attr => attr.key.includes(el.attr.key));
+
+        return {
+          locationName: LOCATION_NAME.SPAN_ATTRIBUTES,
+          propertyName: el.attr.key as string,
+          comparisonValue: el.attr.value as string,
+          operator: el.compareOp,
+          valueType: spanAttribute?.value['intValue'] ? 'intValue' : 'stringValue',
+        };
+      })
+      .filter((el): el is SpanSelector => Boolean(el));
+
+    createAssertion({testId, selectors: itemSelectors, spanAssertions});
     onClose();
   };
 
@@ -114,7 +166,12 @@ const CreateAssertionModal = ({testId, span, trace, open, onClose}: IProps) => {
         }
         renderItem={(item: any, index) => {
           const handleSearchChange = (searchText: string) => {
-            assertionList[index] = searchText;
+            assertionList[index] = {key: searchText};
+            setAssertionList([...assertionList]);
+          };
+
+          const handleSelectCompareOperator = (compareOp: any) => {
+            assertionList[index] = {...assertionList[index], compareOp};
             setAssertionList([...assertionList]);
           };
 
@@ -132,19 +189,19 @@ const CreateAssertionModal = ({testId, span, trace, open, onClose}: IProps) => {
               >
                 <Input.Search size="large" placeholder="span key" />
               </AutoComplete>
-              <Select defaultValue="eq">
-                <Select.Option value="eq">eq</Select.Option>
-                <Select.Option value="ne">ne</Select.Option>
-                <Select.Option value="gt">gt</Select.Option>
-                <Select.Option value="lt">lt</Select.Option>
-                <Select.Option value="ge">ge</Select.Option>
-                <Select.Option value="le">le</Select.Option>
+              <Select defaultValue="eq" onSelect={handleSelectCompareOperator}>
+                <Select.Option value={COMPARE_OPERATOR.EQUALS}>eq</Select.Option>
+                <Select.Option value={COMPARE_OPERATOR.NOTEQUALS}>ne</Select.Option>
+                <Select.Option value={COMPARE_OPERATOR.GREATERTHAN}>gt</Select.Option>
+                <Select.Option value={COMPARE_OPERATOR.LESSTHAN}>lt</Select.Option>
+                <Select.Option value={COMPARE_OPERATOR.GREATOREQUALS}>ge</Select.Option>
+                <Select.Option value={COMPARE_OPERATOR.LESSOREQUAL}>le</Select.Option>
               </Select>
               <Input
                 size="small"
                 style={{width: 'unset'}}
                 placeholder="type value"
-                value={attrs?.find((el: any) => el.key === assertionList[index])?.value}
+                value={attrs?.find((el: any) => el.key === assertionList[index].key)?.value}
               />
             </div>
           );
