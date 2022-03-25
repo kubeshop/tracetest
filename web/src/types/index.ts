@@ -50,35 +50,41 @@ export interface Test {
   lastTestResult: TestRunResult;
 }
 
-enum LOCATION_NAME {
-  RESOURCE_ATTRIBUTES,
-  INSTRUMENTATION_LIBRARY,
-  SPAN,
-  SPAN_ATTRIBUTES,
+export const enum LOCATION_NAME {
+  RESOURCE_ATTRIBUTES = 'RESOURCE_ATTRIBUTES',
+  INSTRUMENTATION_LIBRARY = 'INSTRUMENTATION_LIBRARY',
+  SPAN = 'SPAN',
+  SPAN_ATTRIBUTES = 'SPAN_ATTRIBUTES',
 }
 
-enum COMPARE_OPERATOR {
-  EQUALS,
-  LESSTHAN,
-  GREATERTHAN,
-  NOTEQUALS,
+export const enum COMPARE_OPERATOR {
+  EQUALS = 'EQUALS',
+  LESSTHAN = 'LESSTHAN',
+  GREATERTHAN = 'GREATERTHAN',
+  NOTEQUALS = 'NOTEQUALS',
+  GREATOREQUALS = 'GREATOREQUALS',
+  LESSOREQUAL = 'LESSOREQUAL',
+}
+
+export interface ItemSelector {
+  locationName: LOCATION_NAME;
+  propertyName: string;
+  value: string;
+  valueType: string;
+}
+
+export interface SpanSelector {
+  spanAssertionId?: string;
+  locationName: LOCATION_NAME;
+  propertyName: string;
+  valueType: string;
+  operator: COMPARE_OPERATOR;
+  comparisonValue: string;
 }
 export interface Assertion {
   assertionId: string;
-  selectors: Array<{
-    locationName: LOCATION_NAME;
-    propertyName: string;
-    value: string;
-    valueType: string;
-  }>;
-  spanAssertions: Array<{
-    spanAssertionId: string;
-    locationName: LOCATION_NAME;
-    propertyName: string;
-    valueType: string;
-    operator: COMPARE_OPERATOR;
-    comparisonValue: string;
-  }>;
+  selectors: Array<ItemSelector>;
+  spanAssertions: Array<SpanSelector>;
 }
 
 export interface TestResult {
