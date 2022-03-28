@@ -102,9 +102,11 @@ const TestPage = () => {
           <Tabs.TabPane tab="Test Details" key="1" closeIcon={<CloseOutlined hidden />}>
             <TestDetails testId={id!} onSelectResult={handleSelectTestResult} />
           </Tabs.TabPane>
-          <Tabs.TabPane tab="Test Assertions" key="2" closeIcon={<CloseOutlined hidden />}>
-            <Assertions />
-          </Tabs.TabPane>
+          {Boolean(test?.assertions?.length) && (
+            <Tabs.TabPane tab="Test Assertions" key="2" closeIcon={<CloseOutlined hidden />}>
+              <Assertions />
+            </Tabs.TabPane>
+          )}
           {tracePanes.map(item => (
             <Tabs.TabPane tab={item.title} key={item.key}>
               {item.content}
