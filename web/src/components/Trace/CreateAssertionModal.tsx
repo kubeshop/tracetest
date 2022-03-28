@@ -59,8 +59,6 @@ const CreateAssertionModal = ({testId, span, trace, open, onClose}: IProps) => {
     .map(item => selectorConditionBuilder(item))
     .join(' && ');
 
-  console.log('@@query', selectionPipe(filterByAttributes(selectorCondition)));
-
   const effectedSpans =
     selectorCondition.length > 0 ? jemsPath.search(trace, selectionPipe(filterByAttributes(selectorCondition))) : 0;
 

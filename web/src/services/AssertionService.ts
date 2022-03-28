@@ -1,6 +1,6 @@
 import jemspath from 'jmespath';
 
-import {Assertion, COMPARE_OPERATOR, ITrace, LOCATION_NAME} from 'types';
+import {Assertion, AssertionResult, COMPARE_OPERATOR, ItemSelector, ITrace, LOCATION_NAME} from 'types';
 
 export const assertion1: Assertion = {
   assertionId: 'ABC',
@@ -90,16 +90,16 @@ const buildValueSelector = (comparisonValue: string, compareOperator: string, va
   return `value.${valueType} ${compareOperator} \`${comparisonValue}\``;
 };
 
-const buildSelector = (locationName: LOCATION_NAME, query: string) => {
+const buildSelector = (locationName: LOCATION_NAME, conditions: string[]) => {
   switch (locationName) {
     case LOCATION_NAME.RESOURCE_ATTRIBUTES:
-      return `resource[?${query}]`;
+      return `${conditions.map(cond => `resource.attributes[?${cond}]`).join(' && ')}`;
     case LOCATION_NAME.INSTRUMENTATION_LIBRARY:
-      return `resource[?${query}]`;
+      return `${conditions.map(cond => `resource.attributes[?${cond}]`).join(' && ')}`;
     case LOCATION_NAME.SPAN_ATTRIBUTES:
-      return `instrumentationLibrarySpans[?spans[?attributes[?${query}]]]`;
+      return `instrumentationLibrarySpans[?spans[?${conditions.map(cond => `attributes[?${cond}]`).join(' && ')}]]`;
     case LOCATION_NAME.SPAN:
-      return `instrumentationLibrarySpans[?spans[?attributes[?${query}]]]`;
+      return `instrumentationLibrarySpans[?spans[?${conditions.map(cond => `attributes[?${cond}]`).join(' && ')}]]`;
     default:
       return '';
   }
@@ -107,36 +107,35 @@ const buildSelector = (locationName: LOCATION_NAME, query: string) => {
 
 const flattenTraceArray = () => ` [][instrumentationLibrarySpans[].spans]|[][][]`;
 
-export const runTestAssertion = async (trace: ITrace, assertion: Assertion) => {
-  const selectorsMap = assertion.selectors.reduce<{[key in LOCATION_NAME]?: string[]}>((acc, item) => {
-    const selectorArray = acc[item.locationName] || [];
+export const buildItemSelectorQuery = (itemSelectors: ItemSelector[]) => {
+  const selectorsMap = itemSelectors.reduce<string[]>((acc, item) => {
     const keySelector = ` key == \`${item.propertyName}\``;
     const valueSelector = buildValueSelector(item.value, '==', item.valueType);
-    selectorArray.push(keySelector);
-    selectorArray.push(valueSelector);
-    acc[item.locationName] = selectorArray;
+
+    acc.push(` ${[keySelector, valueSelector]!.join(' && ')}`);
     return acc;
-  }, {});
+  }, []);
 
-  const combineSelectors = Object.keys(selectorsMap)
-    .map(key => {
-      return buildSelector(key as LOCATION_NAME, ` ${selectorsMap[key as keyof typeof LOCATION_NAME]!.join(' && ')}`);
-    })
-    .join(' && ');
+  const itemSelector = `[? ${buildSelector(LOCATION_NAME.SPAN_ATTRIBUTES, selectorsMap)}]`;
+  return itemSelector;
+};
 
-  const itemSelector = `[? ${combineSelectors}]`;
+export const runTestAssertion = (trace: ITrace, assertion: Assertion): AssertionResult[] => {
+  if (!assertion?.selectors) {
+    return [];
+  }
 
+  const itemSelector = buildItemSelectorQuery(assertion.selectors);
   const selectedSpans = jemspath.search(trace, `resourceSpans|[]| ${itemSelector}`);
-
   const flattenSelectedSpan = jemspath.search(selectedSpans, flattenTraceArray());
 
   const assertionTestResultArray = assertion.spanAssertions.map(el => {
     const valueSelector = buildValueSelector(el.comparisonValue, getOperator(el.operator), el.valueType);
 
-    const selector = buildSelector(el.locationName, `key == \`${el.propertyName}\` && ${valueSelector}`);
-
+    const selector = buildSelector(el.locationName, [`key == \`${el.propertyName}\` && ${valueSelector}`]);
+    console.log('@@selector', selector);
     const passedSpans = jemspath.search(selectedSpans, `[?${selector}] | ${flattenTraceArray()}`);
-
+    console.log('@@passedSpans', passedSpans);
     const hasPassed = passedSpans.length === selectedSpans.length;
     const passSpansIds = passedSpans.map((span: any) => span.spanId);
 
@@ -146,9 +145,10 @@ export const runTestAssertion = async (trace: ITrace, assertion: Assertion) => {
 
     return {
       ...el,
+      selector: assertion.selectors.map(item => item.propertyName).join(' '),
       hasPassed,
       spanCount: selectedSpans.length,
-      passedSpanCount: passedSpans.length,
+      passedSpanCount: passedSpans.length || 0,
       failedSpans: failedSpanArray,
     };
   });

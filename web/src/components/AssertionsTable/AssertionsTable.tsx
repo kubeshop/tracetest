@@ -1,18 +1,23 @@
 import {Table} from 'antd';
 import {ColumnsType} from 'antd/lib/table';
+import {AssertionResult} from 'types';
 
-const AssertionsResultTable = () => {
-  const dataSource = [
-    {
-      key: '1',
-      name: 'HTTP',
-      selectedSpans: 4,
-      property: 'http.status_code',
-      comparison: 'equals',
-      value: '200',
-      results: '3 / 1',
-    },
-  ];
+interface IProps {
+  assertionResults: AssertionResult[];
+}
+
+const AssertionsResultTable = ({assertionResults}: IProps) => {
+  const data = assertionResults.map(el => {
+    return {
+      key: el.spanAssertionId,
+      name: el.selector,
+      selectedSpans: el.spanCount,
+      property: el.propertyName,
+      comparison: el.operator,
+      value: el.comparisonValue,
+      results: `${el.passedSpanCount}/${el.spanCount - el.passedSpanCount}`,
+    };
+  });
 
   const columns: ColumnsType<any> = [
     {
@@ -24,11 +29,11 @@ const AssertionsResultTable = () => {
           children: value,
           props: {rowSpan: 1},
         };
-        if (dataSource.filter(el => el.name === value).length === 1) {
+        if (data.filter(el => el.name === value).length === 1) {
           return obj;
         }
-        if (dataSource.findIndex(el => el.name === value) === index) {
-          const count = dataSource.filter(item => item.name === value).length;
+        if (data.findIndex(el => el.name === value) === index) {
+          const count = data.filter(item => item.name === value).length;
           obj.props.rowSpan = count;
           return obj;
         }
@@ -64,7 +69,7 @@ const AssertionsResultTable = () => {
     },
   ];
 
-  return <Table size="small" pagination={{hideOnSinglePage: true}} dataSource={dataSource} columns={columns} />;
+  return <Table size="small" pagination={{hideOnSinglePage: true}} dataSource={data} columns={columns} />;
 };
 
 export default AssertionsResultTable;

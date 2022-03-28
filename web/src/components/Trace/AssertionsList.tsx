@@ -1,11 +1,10 @@
 import React, {useState} from 'react';
 import {Button} from 'antd';
 
-import jemsPath from 'jmespath';
+import {AssertionResult, ISpan} from 'types';
+import {runTestAssertion} from 'services/AssertionService';
 
-import {filterBySpanId} from 'utils';
-import {IAttribute, ISpan} from 'types';
-import {useGetTestAssertionsQuery} from 'services/TestService';
+import {useGetTestByIdQuery} from 'services/TestService';
 import AssertionsResultTable from 'components/AssertionsTable/AssertionsTable';
 
 import CreateAssertionModal from './CreateAssertionModal';
@@ -18,25 +17,21 @@ interface IProps {
 
 const AssertionList = ({testId, targetSpan, trace}: IProps) => {
   const [openCreateAssertion, setOpenCreateAssertion] = useState(false);
-  const {data: testAssertions} = useGetTestAssertionsQuery(testId);
-  const attrs: IAttribute[] = jemsPath.search(trace, filterBySpanId(targetSpan.spanId));
+  const {data: test} = useGetTestByIdQuery(testId);
 
-  const attributesTree = attrs?.reduce((acc: any, item: any) => {
-    const resource = acc[item.type] || {};
-    resource.title = item.type;
-    resource.key = item.type;
-    resource.children = resource.children || [];
-    resource.children.push({title: `${item.key} = ${item.value}`, key: item.key});
-    acc[item.type] = resource;
-    return acc;
-  }, {});
+  const assertionsResults = test?.assertions
+    ?.map(el => runTestAssertion(trace, el))
+    .flat()
+    .filter((f?: AssertionResult): f is AssertionResult => Boolean(f));
 
   return (
     <div>
       <Button style={{marginBottom: 8}} onClick={() => setOpenCreateAssertion(true)}>
         New Assertion
       </Button>
-      <AssertionsResultTable />
+      {assertionsResults && assertionsResults.length > 0 && (
+        <AssertionsResultTable assertionResults={assertionsResults} />
+      )}
       <CreateAssertionModal
         key={`KEY_${targetSpan.spanId}`}
         testId={testId}
