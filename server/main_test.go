@@ -22,7 +22,10 @@ func TestCreateNewTest(t *testing.T) {
 	test := openapi.Test{
 		Name: "test",
 		ServiceUnderTest: openapi.TestServiceUnderTest{
-			Url: "http://localhost:3030/test",
+			Request: openapi.HttpRequest{
+				Url:    "http://localhost:3030/test",
+				Method: "GET",
+			},
 		},
 	}
 	b, err := json.Marshal(test)

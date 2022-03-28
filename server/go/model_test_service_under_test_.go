@@ -9,21 +9,19 @@
 
 package openapi
 
-// TestServiceUnderTest - TODO(pov) Postman collections format for Requests
 type TestServiceUnderTest struct {
 
 	// ID
 	Id string `json:"id,omitempty"`
 
-	// URL of the service under test
-	Url string `json:"url,omitempty"`
-
-	// authorization data for the request
-	Auth string `json:"auth,omitempty"`
+	Request HttpRequest `json:"request,omitempty"`
 }
 
 // AssertTestServiceUnderTestRequired checks if the required fields are not zero-ed
 func AssertTestServiceUnderTestRequired(obj TestServiceUnderTest) error {
+	if err := AssertHttpRequestRequired(obj.Request); err != nil {
+		return err
+	}
 	return nil
 }
 

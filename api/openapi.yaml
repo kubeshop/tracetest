@@ -359,7 +359,6 @@ components:
         body:
           type: string
           format: byte
-<<<<<<< HEAD
     AssertionResult:
       type: object
       properties:
