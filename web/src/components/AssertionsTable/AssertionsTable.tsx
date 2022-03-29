@@ -1,6 +1,7 @@
 import {Table} from 'antd';
 import {ColumnsType} from 'antd/lib/table';
 import {AssertionResult} from 'types';
+import {getOperator} from 'utils';
 
 interface IProps {
   assertionResults: AssertionResult[];
@@ -56,6 +57,10 @@ const AssertionsResultTable = ({assertionResults}: IProps) => {
       title: 'Comparison',
       dataIndex: 'comparison',
       key: 'comparison',
+      align: 'center',
+      render: value => {
+        return getOperator(value);
+      },
     },
     {
       title: 'Value',
@@ -66,6 +71,7 @@ const AssertionsResultTable = ({assertionResults}: IProps) => {
       title: 'Pass/Fail',
       dataIndex: 'results',
       key: 'results',
+      align: 'center',
     },
   ];
 
