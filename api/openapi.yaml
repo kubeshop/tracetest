@@ -276,6 +276,14 @@ components:
           description: TODO(pov) This is HTTP Response object for now, at some point it might be GRPC/SOAP/...
         trace:
           $ref: "./trace.yaml#/definitions/api_v3SpansResponseChunk"
+        assertionResultState:
+          type: boolean
+          description: True if all trace spans passed the assertion test
+        assertionResult:
+          type: array
+          description: List of all tested span assertions
+          items: 
+            $ref: "#/components/schemas/AssertionResult"
     Attribute:
       type: object
       properties:
@@ -356,3 +364,29 @@ components:
         body:
           type: string
           format: byte
+    AssertionResult:
+      type: object
+      properties:
+        assertionId:
+          type: string
+          description: ID
+        spanAssertionResults:
+          type: array
+          items:
+            $ref: "#/components/schemas/SpanAssertionResult"
+    SpanAssertionResult:
+      type: object
+      properties:
+        spanAssertionId:  
+          type: string
+          description: ID
+        spanId:
+          type: string
+          description: ID
+        passed:
+          type: boolean
+          description: True if the span passed the assertion test
+        observedValue:
+          type: string
+          description: 'value that the trace for this test run contained'
+          readOnly: true
