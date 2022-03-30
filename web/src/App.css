@@ -1,5 +1,18 @@
 @import '~antd/dist/antd.css';
 
+@font-face {
+  font-family: SFPro;
+  src: url("../public/SF-Pro-Text-Regular.otf") format("opentype");
+}
+
+body {
+  margin: 0;
+  color: '#001529';
+  font-family: SFPro;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 .App {
   text-align: center;
 }

@@ -1,30 +1,40 @@
-import {Button} from 'antd';
+import {Button, Typography} from 'antd';
 import styled from 'styled-components';
+import noResultsIcon from '../../assets/HomeNoResults.svg';
 
-export const Header = styled.div`
-  height: 64px;
-  padding: 16px 32px;
-  border-bottom: 1px solid rgb(213, 215, 224);
+export const CreateTestButton = styled(Button)``;
+
+export const PageHeader = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 32px;
 `;
 
-export const Content = styled.main`
-  display: flex;
-  padding: 16px 0;
+export const TitleText = styled(Typography.Title).attrs({
+  level: 3,
+})``;
+
+export const Wrapper = styled.div`
+  padding: 0 24px;
 `;
 
-export const SideMenu = styled.div`
+export const NoResultsContainer = styled.div`
+  border: 1px solid #f0f0f0;
+  height: 600px;
   display: flex;
+  justify-content: center;
+  align-items: center;
   flex-direction: column;
-  flex: 0.2;
-  padding: 0 16px;
 `;
 
-export const TestsContainer = styled.div`
-  flex: 0.8;
-  padding: 0 8px;
-`;
+export const NoResultsIcon = styled.img.attrs({
+  src: noResultsIcon,
+})``;
 
-export const CreateTestButton = styled(Button)`
-  border-radius: 16px;
-  align-self: flex-start;
+export const NoResultsTitle = styled(Typography.Title).attrs({
+  level: 3,
+})`
+  margin-top: 32px;
 `;

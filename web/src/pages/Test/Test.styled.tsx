@@ -10,6 +10,13 @@ export const Header = styled.div`
   border-bottom: 1px solid rgb(213, 215, 224);
 `;
 
-export const Content = styled.main`
-  padding: 0 8px;
+export const TestDetailsHeader = styled.div`
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  margin: 32px 0px 24px;
+`;
+
+export const Wrapper = styled.div`
+  padding: 0px 24px;
 `;

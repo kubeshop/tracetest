@@ -5,12 +5,13 @@ import {CloseOutlined, ArrowLeftOutlined} from '@ant-design/icons';
 import {useNavigate, useParams} from 'react-router-dom';
 
 import {ITestResult} from 'types';
-import {useGetTestByIdQuery, useRunTestMutation} from 'services/TestService';
+import {useGetTestByIdQuery} from 'services/TestService';
 import Trace from 'components/Trace';
 
 import Assertions from './Assertions';
 import * as S from './Test.styled';
 import TestDetails from './TestDetails';
+import Layout from '../../components/Layout';
 
 interface TracePane {
   key: string;
@@ -25,13 +26,6 @@ const TestPage = () => {
   const [tracePanes, setTracePanes] = useState<TracePane[]>([]);
   const [activeTabKey, setActiveTabKey] = useState<string>('1');
   const {data: test} = useGetTestByIdQuery(id as string);
-  const [runTest] = useRunTestMutation();
-
-  const handleRunTest = () => {
-    if (test?.testId) {
-      runTest(test.testId);
-    }
-  };
 
   const handleSelectTestResult = (result: ITestResult) => {
     newTabIndexRef.current += 1;
@@ -71,50 +65,46 @@ const TestPage = () => {
   };
 
   return (
-    <>
-      {/* <S.Header>
-        <Title style={{margin: 0}} level={3}>
-          {test?.name}
-        </Title>
-        <Button onClick={handleRunTest}>Generate Trace</Button>
-      </S.Header> */}
-      <S.Content>
-        <Tabs
-          tabBarExtraContent={{
-            left: (
-              <S.Header>
-                <Button type="text" shape="circle" onClick={() => navigate(-1)}>
-                  <ArrowLeftOutlined style={{fontSize: 24, marginRight: 16}} />
-                </Button>
-                <Title style={{margin: 0}} level={3}>
-                  {test?.name}
-                </Title>
-              </S.Header>
-            ),
-          }}
-          hideAdd
-          defaultActiveKey="1"
-          activeKey={activeTabKey}
-          onChange={onChangeTab}
-          type="editable-card"
-          onEdit={onEditTab}
-        >
-          <Tabs.TabPane tab="Test Details" key="1" closeIcon={<CloseOutlined hidden />}>
-            <TestDetails testId={id!} onSelectResult={handleSelectTestResult} />
-          </Tabs.TabPane>
-          {Boolean(test?.assertions?.length) && (
-            <Tabs.TabPane tab="Test Assertions" key="2" closeIcon={<CloseOutlined hidden />}>
+    <Layout>
+      <Tabs
+        tabBarExtraContent={{
+          left: (
+            <S.Header>
+              <Button type="text" shape="circle" onClick={() => navigate(-1)}>
+                <ArrowLeftOutlined style={{fontSize: 24, marginRight: 16}} />
+              </Button>
+              <Title style={{margin: 0}} level={3}>
+                {test?.name}
+              </Title>
+            </S.Header>
+          ),
+        }}
+        hideAdd
+        defaultActiveKey="1"
+        activeKey={activeTabKey}
+        onChange={onChangeTab}
+        type="editable-card"
+        onEdit={onEditTab}
+      >
+        <Tabs.TabPane tab="Test Details" key="1" closeIcon={<CloseOutlined hidden />}>
+          <S.Wrapper>
+            <TestDetails testId={id!} url={test?.serviceUnderTest.url} onSelectResult={handleSelectTestResult} />
+          </S.Wrapper>
+        </Tabs.TabPane>
+        {Boolean(test?.assertions?.length) && (
+          <Tabs.TabPane tab="Test Assertions" key="2" closeIcon={<CloseOutlined hidden />}>
+            <S.Wrapper>
               <Assertions />
-            </Tabs.TabPane>
-          )}
-          {tracePanes.map(item => (
-            <Tabs.TabPane tab={item.title} key={item.key}>
-              {item.content}
-            </Tabs.TabPane>
-          ))}
-        </Tabs>
-      </S.Content>
-    </>
+            </S.Wrapper>
+          </Tabs.TabPane>
+        )}
+        {tracePanes.map(item => (
+          <Tabs.TabPane tab={item.title} key={item.key}>
+            <S.Wrapper>{item.content}</S.Wrapper>
+          </Tabs.TabPane>
+        ))}
+      </Tabs>
+    </Layout>
   );
 };
 

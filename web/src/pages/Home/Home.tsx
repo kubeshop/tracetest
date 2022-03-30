@@ -1,8 +1,8 @@
-import Title from 'antd/lib/typography/Title';
 import {useState} from 'react';
 import CreateTestModal from 'components/CreateTestModal';
 import TestList from './TestList';
 import * as S from './Home.styled';
+import Layout from '../../components/Layout';
 
 const Home = (): JSX.Element => {
   const [openCreateTestModal, setOpenCreateTestModal] = useState<boolean>(false);
@@ -11,22 +11,18 @@ const Home = (): JSX.Element => {
   };
 
   return (
-    <>
-      <S.Header>
-        <Title level={2}>Tracetest</Title>
-      </S.Header>
-      <S.Content>
-        <S.SideMenu>
+    <Layout>
+      <S.Wrapper>
+        <S.PageHeader>
+          <S.TitleText>All Tests</S.TitleText>
           <S.CreateTestButton type="primary" size="large" onClick={handleCreateTest}>
             Create Test
           </S.CreateTestButton>
-        </S.SideMenu>
-        <S.TestsContainer>
-          <TestList />
-        </S.TestsContainer>
-      </S.Content>
-      <CreateTestModal visible={openCreateTestModal} onClose={() => setOpenCreateTestModal(false)} />
-    </>
+        </S.PageHeader>
+        <TestList />
+        <CreateTestModal visible={openCreateTestModal} onClose={() => setOpenCreateTestModal(false)} />
+      </S.Wrapper>
+    </Layout>
   );
 };
 
