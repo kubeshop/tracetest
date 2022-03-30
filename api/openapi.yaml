@@ -372,7 +372,7 @@ components:
         assertionId:
           type: string
           description: ID
-        spanAssertions:
+        spanAssertionResults:
           type: array
           items:
             $ref: "#/components/schemas/SpanAssertionResult"
@@ -388,3 +388,7 @@ components:
         passed:
           type: boolean
           description: True if the span passed the assertion test
+        observedValue:
+          type: string
+          description: 'value that the trace for this test run contained'
+          readOnly: true
