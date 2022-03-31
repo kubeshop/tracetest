@@ -1,35 +1,29 @@
 import {Table} from 'antd';
 import {useNavigate} from 'react-router-dom';
 import {useGetTestsQuery} from 'services/TestService';
+import CustomTable from '../../components/CustomTable';
+import {Test} from '../../types';
+import NoResults from './NoResults';
 
 const TestList = () => {
   const navigate = useNavigate();
-  const {data: tests, isLoading} = useGetTestsQuery();
+  const {data: testList = [], isLoading} = useGetTestsQuery();
 
-  const columns = [
-    {
-      title: 'Name',
-      dataIndex: 'name',
-      key: 'name',
-    },
-    {
-      title: 'Url',
-      dataIndex: 'url',
-      key: 'url',
-    },
-  ];
   return (
-    <Table
-      dataSource={tests?.map(el => ({...el, url: el.serviceUnderTest.request.url})).reverse()}
-      rowKey={test => test.testId}
+    <CustomTable
+      dataSource={testList?.map(el => ({...el, url: el.serviceUnderTest.request.url})).reverse()}
+      rowKey="testId"
+      locale={{emptyText: <NoResults />}}
       loading={isLoading}
-      columns={columns}
-      onRow={(record, rowIndex) => {
+      onRow={record => {
         return {
-          onClick: () => navigate(`/test/${record.testId}`),
+          onClick: () => navigate(`/test/${(record as Test).testId}`),
         };
       }}
-    />
+    >
+      <Table.Column title="Name" dataIndex="name" key="name" />
+      <Table.Column title="Endpoint" dataIndex="url" key="url" />
+    </CustomTable>
   );
 };
 

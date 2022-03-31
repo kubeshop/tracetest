@@ -1,71 +1,58 @@
 import {skipToken} from '@reduxjs/toolkit/dist/query';
-import {Button, Table} from 'antd';
-import {ColumnsType} from 'antd/lib/table';
-import Title from 'antd/lib/typography/Title';
+import {Button, Table, Typography} from 'antd';
+import {FC, useCallback} from 'react';
 import {useGetTestResultsQuery, useRunTestMutation} from 'services/TestService';
 import {ITestResult, TestId} from 'types';
+import CustomTable from '../../components/CustomTable';
+import * as S from './Test.styled';
 
-interface IProps {
+type TTestDetailsProps = {
   testId: TestId;
+  url?: string;
   onSelectResult: (result: ITestResult) => void;
-}
+};
 
-const TestDetails = ({testId, onSelectResult}: IProps) => {
+const TestDetails: FC<TTestDetailsProps> = ({testId, onSelectResult, url}) => {
   const {data: testResults, isLoading} = useGetTestResultsQuery(testId ?? skipToken);
   const [runTest, result] = useRunTestMutation();
-  const columns: ColumnsType<ITestResult> = [
-    {
-      title: 'Test Result Date',
-      dataIndex: 'createdAt',
-      key: 'createdAt',
-      render: (value, record) => {
-        return (
-          <p key={record.resultId}>
-            {Intl.DateTimeFormat('default', {dateStyle: 'full', timeStyle: 'medium'} as any).format(new Date(value))}
-          </p>
-        );
-      },
-    },
-    {
-      title: 'Assertion Result',
-      dataIndex: 'id',
-      key: 'id',
-      render: (value, record) => {
-        return <p key={record.resultId}>Passed</p>;
-      },
-    },
-  ];
 
-  const handleRunTest = () => {
-    if (testId) {
-      runTest(testId);
-    }
-  };
+  const handleRunTest = useCallback(() => {
+    if (testId) runTest(testId);
+  }, [runTest, testId]);
 
   return (
-    <div style={{overflowY: 'hidden'}}>
-      <Button style={{marginBottom: 24, marginTop: 8}} shape="round" onClick={handleRunTest} loading={result.isLoading}>
-        Generate Trace
-      </Button>
-
-      <Title style={{marginBottom: 8}} level={5}>
-        Test Results
-      </Title>
-      <Table
-        pagination={{pageSize: 5}}
+    <>
+      <S.TestDetailsHeader>
+        <Typography.Title level={5}>{url}</Typography.Title>
+        <Button onClick={handleRunTest} loading={result.isLoading} type="primary" ghost>
+          Generate Trace
+        </Button>
+      </S.TestDetailsHeader>
+      <CustomTable
+        pagination={{pageSize: 10}}
         rowKey="resultId"
         loading={isLoading}
-        columns={columns}
         dataSource={testResults?.slice()?.reverse()}
         onRow={record => {
           return {
             onClick: () => {
-              onSelectResult(record);
+              onSelectResult(record as ITestResult);
             },
           };
         }}
-      />
-    </div>
+      >
+        <Table.Column
+          title="Test Results"
+          dataIndex="createdAt"
+          key="createdAt"
+          width="30%"
+          render={value =>
+            Intl.DateTimeFormat('default', {dateStyle: 'full', timeStyle: 'medium'} as any).format(new Date(value))
+          }
+        />
+        <Table.Column title="Assertion Result" dataIndex="url" key="url" width="70%" render={() => 'Passed'} />
+      </CustomTable>
+    </>
   );
 };
 

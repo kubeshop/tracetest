@@ -1,5 +1,19 @@
 @import '~antd/dist/antd.css';
 
+@font-face {
+  font-family: SFPro;
+  src: url('../public/SF-Pro-Text-Regular.otf') format('opentype');
+}
+
+body {
+  margin: 0;
+  color: '#001529';
+  font-family: SFPro, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell',
+    'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 .App {
   text-align: center;
 }
