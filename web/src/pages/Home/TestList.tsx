@@ -11,7 +11,7 @@ const TestList = () => {
 
   return (
     <CustomTable
-      dataSource={testList.map(el => ({...el, url: el.serviceUnderTest.url})).reverse()}
+      dataSource={testList?.map(el => ({...el, url: el.serviceUnderTest.request.url})).reverse()}
       rowKey="testId"
       locale={{emptyText: <NoResults />}}
       loading={isLoading}

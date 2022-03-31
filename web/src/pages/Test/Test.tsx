@@ -88,7 +88,7 @@ const TestPage = () => {
       >
         <Tabs.TabPane tab="Test Details" key="1" closeIcon={<CloseOutlined hidden />}>
           <S.Wrapper>
-            <TestDetails testId={id!} url={test?.serviceUnderTest.url} onSelectResult={handleSelectTestResult} />
+            <TestDetails testId={id!} url={test?.serviceUnderTest.request.url} onSelectResult={handleSelectTestResult} />
           </S.Wrapper>
         </Tabs.TabPane>
         {Boolean(test?.assertions?.length) && (

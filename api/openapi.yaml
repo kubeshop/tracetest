@@ -208,19 +208,14 @@ components:
           type: string
         serviceUnderTest:
           type: object
-          description: TODO(pov) Postman collections format for Requests
           properties:
             id:
               type: string
               description: ID
               format: uuid
               readOnly: true
-            url:
-              type: string
-              description: URL of the service under test
-            auth:
-              type: string
-              description: authorization data for the request
+            request:
+              $ref: "#/components/schemas/HTTPRequest"
         assertions:
           type: array
           items:
@@ -276,6 +271,14 @@ components:
           description: TODO(pov) This is HTTP Response object for now, at some point it might be GRPC/SOAP/...
         trace:
           $ref: "./trace.yaml#/definitions/api_v3SpansResponseChunk"
+        assertionResultState:
+          type: boolean
+          description: True if all trace spans passed the assertion test
+        assertionResult:
+          type: array
+          description: List of all tested span assertions
+          items: 
+            $ref: "#/components/schemas/AssertionResult"
     Attribute:
       type: object
       properties:
@@ -356,3 +359,58 @@ components:
         body:
           type: string
           format: byte
+    AssertionResult:
+      type: object
+      properties:
+        assertionId:
+          type: string
+          description: ID
+        spanAssertionResults:
+          type: array
+          items:
+            $ref: "#/components/schemas/SpanAssertionResult"
+    SpanAssertionResult:
+      type: object
+      properties:
+        spanAssertionId:  
+          type: string
+          description: ID
+        spanId:
+          type: string
+          description: ID
+        passed:
+          type: boolean
+          description: True if the span passed the assertion test
+        observedValue:
+          type: string
+          description: 'value that the trace for this test run contained'
+          readOnly: true
+    HTTPRequest:
+      type: object
+      properties:
+        url:
+          type: string
+        method:
+          type: string
+          enum: [GET, PUT, POST, PATCH, DELETE, COPY, HEAD, OPTIONS, LINK, UNLINK, PURGE, LOCK, UNLOCK, PROPFIND, VIEW]
+        headers:
+          type: array
+          items:
+            type: object
+            properties:
+              key:
+                type: string
+              value:
+                type: string
+        body:
+          type: string
+          format: byte
+        auth:
+          type: object
+          description: TODO 
+        proxy:
+          type: object
+          description: TODO 
+        certificate:
+          type: object
+          description: TODO 

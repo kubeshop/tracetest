@@ -1,5 +1,5 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
-import {Assertion, ITestResult, Test, TestId, TestRunResult} from 'types';
+import {Assertion, ITestResult, RecursivePartial, Test, TestId, TestRunResult} from 'types';
 
 export const testAPI = createApi({
   reducerPath: 'testsAPI',
@@ -8,7 +8,7 @@ export const testAPI = createApi({
   }),
   tagTypes: ['Test', 'TestResult', 'Trace'],
   endpoints: build => ({
-    createTest: build.mutation<Test, Partial<Test>>({
+    createTest: build.mutation<Test, RecursivePartial<Test>>({
       query: newTest => ({
         url: `/tests`,
         method: 'POST',

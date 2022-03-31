@@ -1,6 +1,7 @@
 import {Modal as AntModal, Form, Input, Button} from 'antd';
 import styled from 'styled-components';
 import {useCreateTestMutation} from 'services/TestService';
+import { HTTP_METHOD } from 'types';
 
 const Modal = styled(AntModal)`
   .ant-modal {
@@ -24,7 +25,7 @@ const CreateTestModal = ({visible, onClose}: IProps): JSX.Element => {
     createTest({
       name: values.name,
       serviceUnderTest: {
-        url: values.url,
+        request:{ url: values.url, method: HTTP_METHOD.GET},
       },
     });
     onClose();
