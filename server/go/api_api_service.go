@@ -202,19 +202,18 @@ func (s *ApiApiService) TestsTestIdResultsResultIdGet(ctx context.Context, testi
 		return Response(http.StatusInternalServerError, err.Error()), err
 	}
 	tr, err := s.traceDB.GetTraceByID(ctx, res.TraceId)
-	if err != nil {
-		return Response(http.StatusInternalServerError, err.Error()), err
+	if err == nil {
+		sid, err := trace.SpanIDFromHex(res.SpanId)
+		if err != nil {
+			return Response(http.StatusInternalServerError, err.Error()), err
+		}
+		tid, err := trace.TraceIDFromHex(res.TraceId)
+		if err != nil {
+			return Response(http.StatusInternalServerError, err.Error()), err
+		}
+		ttr := FixParent(tr, string(tid[:]), string(sid[:]))
+		res.Trace = mapTrace(ttr)
 	}
-	sid, err := trace.SpanIDFromHex(res.SpanId)
-	if err != nil {
-		return Response(http.StatusInternalServerError, err.Error()), err
-	}
-	tid, err := trace.TraceIDFromHex(res.TraceId)
-	if err != nil {
-		return Response(http.StatusInternalServerError, err.Error()), err
-	}
-	ttr := FixParent(tr, string(tid[:]), string(sid[:]))
-	res.Trace = mapTrace(ttr)
 	return Response(http.StatusOK, *res), nil
 }
 
