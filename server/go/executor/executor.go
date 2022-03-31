@@ -1,14 +1,20 @@
 package executor
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 
 	"github.com/google/uuid"
 	openapi "github.com/kubeshop/tracetest/server/go"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	"go.opentelemetry.io/contrib/propagators/aws/xray"
+	"go.opentelemetry.io/contrib/propagators/b3"
+	"go.opentelemetry.io/contrib/propagators/jaeger"
+	"go.opentelemetry.io/contrib/propagators/ot"
 	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
@@ -35,7 +41,12 @@ func (te *TestExecutor) Execute(test *openapi.Test, tid trace.TraceID, sid trace
 	client := http.Client{
 		Transport: otelhttp.NewTransport(http.DefaultTransport,
 			otelhttp.WithTracerProvider(te.traceProvider),
-			otelhttp.WithPropagators(propagation.NewCompositeTextMapPropagator(propagation.Baggage{}, propagation.TraceContext{})),
+			otelhttp.WithPropagators(propagation.NewCompositeTextMapPropagator(propagation.Baggage{},
+				b3.New(),
+				jaeger.Jaeger{},
+				ot.OT{},
+				xray.Propagator{},
+				propagation.TraceContext{})),
 		),
 	}
 
@@ -48,10 +59,20 @@ func (te *TestExecutor) Execute(test *openapi.Test, tid trace.TraceID, sid trace
 		Remote:     true,
 	})
 
-	req, err := http.NewRequest(http.MethodGet, test.ServiceUnderTest.Url, nil)
+	var req *http.Request
+	tReq := test.ServiceUnderTest.Request
+	var body io.Reader
+	if tReq.Body != "" {
+		body = bytes.NewBufferString(tReq.Body)
+	}
+	req, err := http.NewRequest(strings.ToUpper(tReq.Method), tReq.Url, body)
 	if err != nil {
 		return nil, err
 	}
+	for _, h := range tReq.Headers {
+		req.Header.Set(h.Key, h.Value)
+	}
+
 	resp, err := client.Do(req.WithContext(trace.ContextWithSpanContext(context.Background(), sc)))
 	if err != nil {
 		return nil, err
@@ -93,7 +114,7 @@ func initTracing() (*sdktrace.TracerProvider, error) {
 	// Set standard attributes per semantic conventions
 	res := resource.NewWithAttributes(
 		semconv.SchemaURL,
-		semconv.ServiceNameKey.String("projectx"),
+		semconv.ServiceNameKey.String("tracetest"),
 	)
 
 	spanExporter, err := stdouttrace.New(stdouttrace.WithWriter(io.Discard))

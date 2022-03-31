@@ -248,9 +248,19 @@ components:
             spanAssertionId: spanAssertionId
             operator: EQUALS
         serviceUnderTest:
-          auth: auth
+          request:
+            headers:
+            - value: value
+              key: key
+            - value: value
+              key: key
+            proxy: '{}'
+            method: GET
+            auth: '{}'
+            certificate: '{}'
+            body: body
+            url: url
           id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-          url: url
         lastTestResult:
           traceId: traceId
           spanId: spanId
@@ -3599,6 +3609,57 @@ components:
         body:
           format: byte
           type: string
+      type: object
+    HTTPRequest:
+      example:
+        headers:
+        - value: value
+          key: key
+        - value: value
+          key: key
+        proxy: '{}'
+        method: GET
+        auth: '{}'
+        certificate: '{}'
+        body: body
+        url: url
+      properties:
+        url:
+          type: string
+        method:
+          enum:
+          - GET
+          - PUT
+          - POST
+          - PATCH
+          - DELETE
+          - COPY
+          - HEAD
+          - OPTIONS
+          - LINK
+          - UNLINK
+          - PURGE
+          - LOCK
+          - UNLOCK
+          - PROPFIND
+          - VIEW
+          type: string
+        headers:
+          items:
+            $ref: '#/components/schemas/HTTPResponse_headers'
+          type: array
+        body:
+          format: byte
+          type: string
+        auth:
+          description: TODO
+          type: object
+        proxy:
+          description: TODO
+          type: object
+        certificate:
+          description: TODO
+          type: object
       type: object
     api_v3SpansResponseChunk:
       description: Response object with spans.
@@ -7032,23 +7093,28 @@ components:
         https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/api.md#set-status
       type: string
     Test_serviceUnderTest:
-      description: TODO(pov) Postman collections format for Requests
       example:
-        auth: auth
+        request:
+          headers:
+          - value: value
+            key: key
+          - value: value
+            key: key
+          proxy: '{}'
+          method: GET
+          auth: '{}'
+          certificate: '{}'
+          body: body
+          url: url
         id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-        url: url
       properties:
         id:
           description: ID
           format: uuid
           readOnly: true
           type: string
-        url:
-          description: URL of the service under test
-          type: string
-        auth:
-          description: authorization data for the request
-          type: string
+        request:
+          $ref: '#/components/schemas/HTTPRequest'
       type: object
     HTTPResponse_headers:
       example:
