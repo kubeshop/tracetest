@@ -1,3 +1,37 @@
+export const enum HTTP_METHOD {
+  GET = 'GET',
+  PUT = 'PUT',
+  POST = 'POST',
+  PATCH = 'PATCH',
+  DELETE = 'DELETE',
+  COPY = 'COPY',
+  HEAD = 'HEAD',
+  OPTIONS = 'OPTIONS',
+  LINK = 'LINK',
+  UNLINK = 'UNLINK',
+  PURGE = 'PURGE',
+  LOCK = 'LOCK',
+  UNLOCK = 'UNLOCK',
+  PROPFIND = 'PROPFIND',
+  VIEW = 'VIEW',
+}
+
+export const enum LOCATION_NAME {
+  RESOURCE_ATTRIBUTES = 'RESOURCE_ATTRIBUTES',
+  INSTRUMENTATION_LIBRARY = 'INSTRUMENTATION_LIBRARY',
+  SPAN = 'SPAN',
+  SPAN_ATTRIBUTES = 'SPAN_ATTRIBUTES',
+}
+
+export const enum COMPARE_OPERATOR {
+  EQUALS = 'EQUALS',
+  LESSTHAN = 'LESSTHAN',
+  GREATERTHAN = 'GREATERTHAN',
+  NOTEQUALS = 'NOTEQUALS',
+  GREATOREQUALS = 'GREATOREQUALS',
+  LESSOREQUAL = 'LESSOREQUAL',
+}
+
 export interface ISpan {
   traceId: string;
   spanId: string;
@@ -37,33 +71,26 @@ export interface TestRunResult {
   trace: ITrace;
 }
 
+export interface HTTPRequest {
+  url: string;
+  method: HTTP_METHOD;
+  headers?: Array<{[key: string]: string}>;
+  body?: string;
+  auth?: any;
+  proxy?: any;
+  certificate?: any;
+}
+
 export interface Test {
   testId: string;
   name: string;
   description: string;
   serviceUnderTest: {
-    id?: string;
-    url: string;
-    auth?: string;
+    id: string;
+    request: HTTPRequest;
   };
   assertions: Array<Assertion>;
   lastTestResult: TestRunResult;
-}
-
-export const enum LOCATION_NAME {
-  RESOURCE_ATTRIBUTES = 'RESOURCE_ATTRIBUTES',
-  INSTRUMENTATION_LIBRARY = 'INSTRUMENTATION_LIBRARY',
-  SPAN = 'SPAN',
-  SPAN_ATTRIBUTES = 'SPAN_ATTRIBUTES',
-}
-
-export const enum COMPARE_OPERATOR {
-  EQUALS = 'EQUALS',
-  LESSTHAN = 'LESSTHAN',
-  GREATERTHAN = 'GREATERTHAN',
-  NOTEQUALS = 'NOTEQUALS',
-  GREATOREQUALS = 'GREATOREQUALS',
-  LESSOREQUAL = 'LESSOREQUAL',
 }
 
 export interface ItemSelector {
@@ -178,3 +205,7 @@ export interface AssertionResult {
   operator: COMPARE_OPERATOR;
   comparisonValue: string;
 }
+
+export type RecursivePartial<T> = {
+  [P in keyof T]?: RecursivePartial<T[P]>;
+};
