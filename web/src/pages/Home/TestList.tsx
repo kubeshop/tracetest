@@ -10,21 +10,20 @@ const TestList = () => {
   const {data: testList = [], isLoading} = useGetTestsQuery();
 
   return (
-    (!isLoading && !testList.length && <NoResults />) || (
-      <CustomTable
-        dataSource={testList.map(el => ({...el, url: el.serviceUnderTest.url})).reverse()}
-        rowKey="testId"
-        loading={isLoading}
-        onRow={record => {
-          return {
-            onClick: () => navigate(`/test/${(record as Test).testId}`),
-          };
-        }}
-      >
-        <Table.Column title="Name" dataIndex="name" key="name" />
-        <Table.Column title="Endpoint" dataIndex="url" key="url" />
-      </CustomTable>
-    )
+    <CustomTable
+      dataSource={testList.map(el => ({...el, url: el.serviceUnderTest.url})).reverse()}
+      rowKey="testId"
+      locale={{emptyText: <NoResults />}}
+      loading={isLoading}
+      onRow={record => {
+        return {
+          onClick: () => navigate(`/test/${(record as Test).testId}`),
+        };
+      }}
+    >
+      <Table.Column title="Name" dataIndex="name" key="name" />
+      <Table.Column title="Endpoint" dataIndex="url" key="url" />
+    </CustomTable>
   );
 };
 

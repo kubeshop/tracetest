@@ -21,7 +21,6 @@ export const Wrapper = styled.div`
 `;
 
 export const NoResultsContainer = styled.div`
-  border: 1px solid #f0f0f0;
   height: 600px;
   display: flex;
   justify-content: center;

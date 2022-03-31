@@ -1,8 +1,8 @@
 import {useState} from 'react';
 import CreateTestModal from 'components/CreateTestModal';
+import Layout from 'components/Layout';
 import TestList from './TestList';
 import * as S from './Home.styled';
-import Layout from '../../components/Layout';
 
 const Home = (): JSX.Element => {
   const [openCreateTestModal, setOpenCreateTestModal] = useState<boolean>(false);

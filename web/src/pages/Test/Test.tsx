@@ -7,11 +7,11 @@ import {useNavigate, useParams} from 'react-router-dom';
 import {ITestResult} from 'types';
 import {useGetTestByIdQuery} from 'services/TestService';
 import Trace from 'components/Trace';
+import Layout from 'components/Layout';
 
 import Assertions from './Assertions';
 import * as S from './Test.styled';
 import TestDetails from './TestDetails';
-import Layout from '../../components/Layout';
 
 interface TracePane {
   key: string;
