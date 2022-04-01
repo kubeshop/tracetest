@@ -26,7 +26,9 @@ The commands below will install Tracetest application connecting to Jaeger traci
 helm repo add kubeshop https://kubeshop.github.io/helm-charts
 helm repo update
 
-helm install tracetest kubeshop/tracetest --set tracingBackend=jaeger --set jaegerConnectionConfig.endpoint="jaeger-query:16685"
+helm install tracetest kubeshop/tracetest \
+  --set tracingBackend=jaeger \
+  --set jaegerConnectionConfig.endpoint="jaeger-query:16685"
 ```
 
 ### Grafana Tempo
@@ -41,4 +43,14 @@ helm repo update
 helm install tracetest kubeshop/tracetest \
   --set tracingBackend=tempo \ 
   --set tempoConnectionConfig.endpoint="grafana-tempo:9095"
+```
+
+## Uninstallation
+
+The following command will uninstall Tracetest with Postgres:
+
+```sh
+# Delete releases
+
+helm delete tracetest
 ```
