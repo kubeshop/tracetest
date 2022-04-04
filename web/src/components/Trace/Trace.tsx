@@ -23,14 +23,14 @@ const Grid = styled.div`
 const Trace = ({test, testResultId}: {test: Test; testResultId: string}) => {
   const [selectedSpan, setSelectedSpan] = useState<any>({});
   const {
-    data: traceData,
+    data: testResultDetails,
     isLoading: isLoadingTrace,
     isError,
     refetch: refetchTrace,
   } = useGetTestResultByIdQuery({testId: test.testId, resultId: testResultId});
 
   const spanMap = useMemo(() => {
-    return traceData?.trace?.resourceSpans
+    return testResultDetails?.trace?.resourceSpans
       ?.map(i => i.instrumentationLibrarySpans.map((el: any) => el.spans))
       ?.flat(2)
       ?.reduce((acc, span) => {
@@ -39,7 +39,7 @@ const Trace = ({test, testResultId}: {test: Test; testResultId: string}) => {
 
         return acc;
       }, {});
-  }, [traceData]);
+  }, [testResultDetails]);
 
   const handleSelectSpan = (span: any) => {
     setSelectedSpan(span);
@@ -53,10 +53,10 @@ const Trace = ({test, testResultId}: {test: Test; testResultId: string}) => {
     return <Skeleton />;
   }
 
-  if (isError) {
+  if (isError || Object.keys(testResultDetails?.trace || {}).length === 0) {
     return (
       <div>
-        <Button onClick={handleReload}>Reload</Button>
+        <Button onClick={handleReload} loading={isLoadingTrace}>Reload</Button>
       </div>
     );
   }
@@ -85,7 +85,7 @@ const Trace = ({test, testResultId}: {test: Test; testResultId: string}) => {
                     {spanMap[selectedSpan.id]?.data && (
                       <Tabs.TabPane tab="Assertions" key="2">
                         <AssertionList
-                          trace={traceData?.trace}
+                          trace={testResultDetails?.trace}
                           testId={test.testId}
                           targetSpan={spanMap[selectedSpan.id]?.data}
                         />
@@ -99,8 +99,8 @@ const Trace = ({test, testResultId}: {test: Test; testResultId: string}) => {
           <ReflexSplitter />
           <ReflexElement>
             <div className="pane-content">
-              {traceData && (
-                <TraceTimeline trace={traceData?.trace} onSelectSpan={handleSelectSpan} selectedSpan={selectedSpan} />
+              {testResultDetails && (
+                <TraceTimeline trace={testResultDetails?.trace} onSelectSpan={handleSelectSpan} selectedSpan={selectedSpan} />
               )}
             </div>
           </ReflexElement>
