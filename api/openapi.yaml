@@ -221,7 +221,7 @@ components:
           items:
             $ref: "#/components/schemas/Assertion"
           description: Definition of assertions that are going to be made
-        lastTestResult:
+        referenceTestRunResult:
           $ref: "#/components/schemas/TestRunResult"
     Assertion:
       type: object
