@@ -34,6 +34,12 @@ type TestRunResult struct {
 	Response HttpResponse `json:"response,omitempty"`
 
 	Trace ApiV3SpansResponseChunk `json:"trace,omitempty"`
+
+	// True if all trace spans passed the assertion test
+	AssertionResultState bool `json:"assertionResultState,omitempty"`
+
+	// List of all tested span assertions
+	AssertionResult []AssertionResult `json:"assertionResult,omitempty"`
 }
 
 // AssertTestRunResultRequired checks if the required fields are not zero-ed
@@ -43,6 +49,11 @@ func AssertTestRunResultRequired(obj TestRunResult) error {
 	}
 	if err := AssertApiV3SpansResponseChunkRequired(obj.Trace); err != nil {
 		return err
+	}
+	for _, el := range obj.AssertionResult {
+		if err := AssertAssertionResultRequired(el); err != nil {
+			return err
+		}
 	}
 	return nil
 }

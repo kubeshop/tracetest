@@ -197,71 +197,7 @@ components:
   schemas:
     Test:
       example:
-        name: name
-        description: description
-        testId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-        assertions:
-        - assertionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-          selectors:
-          - locationName: RESOURCE_ATTRIBUTES
-            propertyName: propertyName
-            valueType: stringValue
-            value: value
-          - locationName: RESOURCE_ATTRIBUTES
-            propertyName: propertyName
-            valueType: stringValue
-            value: value
-          spanAssertions:
-          - locationName: RESOURCE_ATTRIBUTES
-            propertyName: propertyName
-            comparisonValue: comparisonValue
-            valueType: stringValue
-            spanAssertionId: spanAssertionId
-            operator: EQUALS
-          - locationName: RESOURCE_ATTRIBUTES
-            propertyName: propertyName
-            comparisonValue: comparisonValue
-            valueType: stringValue
-            spanAssertionId: spanAssertionId
-            operator: EQUALS
-        - assertionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-          selectors:
-          - locationName: RESOURCE_ATTRIBUTES
-            propertyName: propertyName
-            valueType: stringValue
-            value: value
-          - locationName: RESOURCE_ATTRIBUTES
-            propertyName: propertyName
-            valueType: stringValue
-            value: value
-          spanAssertions:
-          - locationName: RESOURCE_ATTRIBUTES
-            propertyName: propertyName
-            comparisonValue: comparisonValue
-            valueType: stringValue
-            spanAssertionId: spanAssertionId
-            operator: EQUALS
-          - locationName: RESOURCE_ATTRIBUTES
-            propertyName: propertyName
-            comparisonValue: comparisonValue
-            valueType: stringValue
-            spanAssertionId: spanAssertionId
-            operator: EQUALS
-        serviceUnderTest:
-          request:
-            headers:
-            - value: value
-              key: key
-            - value: value
-              key: key
-            proxy: '{}'
-            method: GET
-            auth: '{}'
-            certificate: '{}'
-            body: body
-            url: url
-          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-        lastTestResult:
+        referenceTestRunResult:
           traceId: traceId
           spanId: spanId
           createdAt: 2000-01-23T04:56:07.000+00:00
@@ -1823,6 +1759,27 @@ components:
                 droppedAttributesCount: 1
               schemaUrl: schemaUrl
           resultId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          assertionResult:
+          - spanAssertionResults:
+            - spanId: spanId
+              observedValue: observedValue
+              spanAssertionId: spanAssertionId
+              passed: true
+            - spanId: spanId
+              observedValue: observedValue
+              spanAssertionId: spanAssertionId
+              passed: true
+            assertionId: assertionId
+          - spanAssertionResults:
+            - spanId: spanId
+              observedValue: observedValue
+              spanAssertionId: spanAssertionId
+              passed: true
+            - spanId: spanId
+              observedValue: observedValue
+              spanAssertionId: spanAssertionId
+              passed: true
+            assertionId: assertionId
           response:
             headers:
             - value: value
@@ -1832,7 +1789,72 @@ components:
             body: body
             status: status
             statusCode: 0
+          assertionResultState: true
           testId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        name: name
+        description: description
+        testId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        assertions:
+        - assertionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          selectors:
+          - locationName: RESOURCE_ATTRIBUTES
+            propertyName: propertyName
+            valueType: stringValue
+            value: value
+          - locationName: RESOURCE_ATTRIBUTES
+            propertyName: propertyName
+            valueType: stringValue
+            value: value
+          spanAssertions:
+          - locationName: RESOURCE_ATTRIBUTES
+            propertyName: propertyName
+            comparisonValue: comparisonValue
+            valueType: stringValue
+            spanAssertionId: spanAssertionId
+            operator: EQUALS
+          - locationName: RESOURCE_ATTRIBUTES
+            propertyName: propertyName
+            comparisonValue: comparisonValue
+            valueType: stringValue
+            spanAssertionId: spanAssertionId
+            operator: EQUALS
+        - assertionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          selectors:
+          - locationName: RESOURCE_ATTRIBUTES
+            propertyName: propertyName
+            valueType: stringValue
+            value: value
+          - locationName: RESOURCE_ATTRIBUTES
+            propertyName: propertyName
+            valueType: stringValue
+            value: value
+          spanAssertions:
+          - locationName: RESOURCE_ATTRIBUTES
+            propertyName: propertyName
+            comparisonValue: comparisonValue
+            valueType: stringValue
+            spanAssertionId: spanAssertionId
+            operator: EQUALS
+          - locationName: RESOURCE_ATTRIBUTES
+            propertyName: propertyName
+            comparisonValue: comparisonValue
+            valueType: stringValue
+            spanAssertionId: spanAssertionId
+            operator: EQUALS
+        serviceUnderTest:
+          request:
+            headers:
+            - value: value
+              key: key
+            - value: value
+              key: key
+            proxy: '{}'
+            method: GET
+            auth: '{}'
+            certificate: '{}'
+            body: body
+            url: url
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
       properties:
         testId:
           description: ID
@@ -1850,7 +1872,7 @@ components:
           items:
             $ref: '#/components/schemas/Assertion'
           type: array
-        lastTestResult:
+        referenceTestRunResult:
           $ref: '#/components/schemas/TestRunResult'
       type: object
     Assertion:
@@ -3456,6 +3478,27 @@ components:
               droppedAttributesCount: 1
             schemaUrl: schemaUrl
         resultId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        assertionResult:
+        - spanAssertionResults:
+          - spanId: spanId
+            observedValue: observedValue
+            spanAssertionId: spanAssertionId
+            passed: true
+          - spanId: spanId
+            observedValue: observedValue
+            spanAssertionId: spanAssertionId
+            passed: true
+          assertionId: assertionId
+        - spanAssertionResults:
+          - spanId: spanId
+            observedValue: observedValue
+            spanAssertionId: spanAssertionId
+            passed: true
+          - spanId: spanId
+            observedValue: observedValue
+            spanAssertionId: spanAssertionId
+            passed: true
+          assertionId: assertionId
         response:
           headers:
           - value: value
@@ -3465,6 +3508,7 @@ components:
           body: body
           status: status
           statusCode: 0
+        assertionResultState: true
         testId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
       properties:
         resultId:
@@ -3495,6 +3539,14 @@ components:
           $ref: '#/components/schemas/HTTPResponse'
         trace:
           $ref: '#/components/schemas/api_v3SpansResponseChunk'
+        assertionResultState:
+          description: True if all trace spans passed the assertion test
+          type: boolean
+        assertionResult:
+          description: List of all tested span assertions
+          items:
+            $ref: '#/components/schemas/AssertionResult'
+          type: array
       type: object
     Attribute:
       properties:
@@ -3608,6 +3660,48 @@ components:
           type: array
         body:
           format: byte
+          type: string
+      type: object
+    AssertionResult:
+      example:
+        spanAssertionResults:
+        - spanId: spanId
+          observedValue: observedValue
+          spanAssertionId: spanAssertionId
+          passed: true
+        - spanId: spanId
+          observedValue: observedValue
+          spanAssertionId: spanAssertionId
+          passed: true
+        assertionId: assertionId
+      properties:
+        assertionId:
+          description: ID
+          type: string
+        spanAssertionResults:
+          items:
+            $ref: '#/components/schemas/SpanAssertionResult'
+          type: array
+      type: object
+    SpanAssertionResult:
+      example:
+        spanId: spanId
+        observedValue: observedValue
+        spanAssertionId: spanAssertionId
+        passed: true
+      properties:
+        spanAssertionId:
+          description: ID
+          type: string
+        spanId:
+          description: ID
+          type: string
+        passed:
+          description: True if the span passed the assertion test
+          type: boolean
+        observedValue:
+          description: value that the trace for this test run contained
+          readOnly: true
           type: string
       type: object
     HTTPRequest:

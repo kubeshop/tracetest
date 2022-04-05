@@ -115,7 +115,9 @@ func TestCreateNewAssertion(t *testing.T) {
 	t.Logf("request: %s\n", b)
 
 	db := mocks.NewMockTestDB(ctrl)
+	db.EXPECT().GetTest(gomock.Any(), gomock.Any()).Return(&openapi.Test{}, nil)
 	db.EXPECT().CreateAssertion(gomock.Any(), "", &assertion).Return("id", nil)
+	db.EXPECT().UpdateTest(gomock.Any(), gomock.Any()).Return(nil)
 
 	req := httptest.NewRequest(http.MethodPost, "/api/tests/testid/assertions", bytes.NewBuffer(b))
 	w := httptest.NewRecorder()

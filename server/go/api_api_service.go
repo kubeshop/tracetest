@@ -90,8 +90,8 @@ func (s *ApiApiService) GetTest(ctx context.Context, testid string) (ImplRespons
 		}
 	}
 
-	if test.LastTestResult.TraceId != "" {
-		res := test.LastTestResult
+	if test.ReferenceTestRunResult.TraceId != "" {
+		res := test.ReferenceTestRunResult
 		tr, err := s.traceDB.GetTraceByID(ctx, res.TraceId)
 		if err != nil {
 			return Response(http.StatusInternalServerError, err.Error()), err
@@ -105,7 +105,7 @@ func (s *ApiApiService) GetTest(ctx context.Context, testid string) (ImplRespons
 			return Response(http.StatusInternalServerError, err.Error()), err
 		}
 		ttr := FixParent(tr, string(tid[:]), string(sid[:]))
-		test.LastTestResult.Trace = mapTrace(ttr)
+		test.ReferenceTestRunResult.Trace = mapTrace(ttr)
 	}
 	return Response(200, test), nil
 }
@@ -122,19 +122,22 @@ func (s *ApiApiService) GetTests(ctx context.Context) (ImplResponse, error) {
 
 func (s *ApiApiService) TestsTestIdRunPost(ctx context.Context, testid string) (ImplResponse, error) {
 	t, err := s.testDB.GetTest(ctx, testid)
-	//TODO switch on notFound
 	if err != nil {
-		return Response(http.StatusNotFound, err.Error()), err
+		switch {
+		case errors.Is(ErrNotFound, err):
+			return Response(http.StatusNotFound, err.Error()), err
+		default:
+			return Response(http.StatusInternalServerError, err.Error()), err
+		}
 	}
 
 	id := uuid.New().String()
 	tid := trace.TraceID{}
 	s.rand.Read(tid[:])
-	fmt.Printf("gen trace id: %v\n", tid)
 
 	sid := trace.SpanID{}
 	s.rand.Read(sid[:])
-	fmt.Printf("gen span id: %v\n", sid)
+
 	res := &TestRunResult{
 		ResultId:  id,
 		TestId:    testid,
@@ -169,11 +172,13 @@ func (s *ApiApiService) TestsTestIdRunPost(ctx context.Context, testid string) (
 			return
 		}
 
-		t.LastTestResult = res
-		err = s.testDB.UpdateTest(ctx, &t)
-		if err != nil {
-			fmt.Printf("update test last result err: %s\n", err)
-			return
+		if t.ReferenceTestRunResult.ResultId == "" {
+			t.ReferenceTestRunResult = res
+			err = s.testDB.UpdateTest(ctx, &t)
+			if err != nil {
+				fmt.Printf("update test last result err: %s\n", err)
+				return
+			}
 		}
 
 		fmt.Println("executed successfully")
@@ -218,12 +223,29 @@ func (s *ApiApiService) TestsTestIdResultsResultIdGet(ctx context.Context, testi
 }
 
 func (s *ApiApiService) CreateAssertion(ctx context.Context, testID string, assertion Assertion) (ImplResponse, error) {
+	test, err := s.testDB.GetTest(ctx, testID)
+	if err != nil {
+		switch {
+		case errors.Is(ErrNotFound, err):
+			return Response(http.StatusNotFound, err.Error()), err
+		default:
+			return Response(http.StatusInternalServerError, err.Error()), err
+		}
+	}
+
 	id, err := s.testDB.CreateAssertion(ctx, testID, &assertion)
 	if err != nil {
 		return Response(http.StatusInternalServerError, err.Error()), err
 	}
-
 	assertion.AssertionId = id
+
+	// Mark reference result as empty after test is updated,
+	// so that next test run will update the reference result.
+	test.ReferenceTestRunResult.ResultId = ""
+	if err = s.testDB.UpdateTest(ctx, test); err != nil {
+		return Response(http.StatusInternalServerError, err.Error()), err
+	}
+
 	return Response(http.StatusOK, assertion), nil
 }
 
