@@ -29,7 +29,9 @@ func TestCreateTest(t *testing.T) {
 		Name:        "first test",
 		Description: "description",
 		ServiceUnderTest: openapi.TestServiceUnderTest{
-			Url: "http://localhost:3030/hello-instrumented",
+			Request: openapi.HttpRequest{
+				Url: "http://localhost:3030/hello-instrumented",
+			},
 		},
 	}
 	ctx := context.Background()
@@ -62,7 +64,9 @@ func TestUpdateTest(t *testing.T) {
 		Name:        "first test",
 		Description: "description",
 		ServiceUnderTest: openapi.TestServiceUnderTest{
-			Url: "http://localhost:3030/hello-instrumented",
+			Request: openapi.HttpRequest{
+				Url: "http://localhost:3030/hello-instrumented",
+			},
 		},
 	}
 	ctx := context.Background()
@@ -120,7 +124,9 @@ func TestGetTests(t *testing.T) {
 			Name:        strconv.Itoa(i),
 			Description: "description",
 			ServiceUnderTest: openapi.TestServiceUnderTest{
-				Url: "http://localhost:3030/hello-instrumented",
+				Request: openapi.HttpRequest{
+					Url: "http://localhost:3030/hello-instrumented",
+				},
 			},
 			Assertions: []openapi.Assertion{{}},
 		}
