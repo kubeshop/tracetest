@@ -23,7 +23,7 @@ type Test struct {
 	// Definition of assertions that are going to be made
 	Assertions []Assertion `json:"assertions,omitempty"`
 
-	LastTestResult TestRunResult `json:"lastTestResult,omitempty"`
+	ReferenceTestRunResult TestRunResult `json:"referenceTestRunResult,omitempty"`
 }
 
 // AssertTestRequired checks if the required fields are not zero-ed
@@ -36,7 +36,7 @@ func AssertTestRequired(obj Test) error {
 			return err
 		}
 	}
-	if err := AssertTestRunResultRequired(obj.LastTestResult); err != nil {
+	if err := AssertTestRunResultRequired(obj.ReferenceTestRunResult); err != nil {
 		return err
 	}
 	return nil
