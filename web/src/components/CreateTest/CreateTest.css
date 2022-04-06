@@ -1,0 +1,13 @@
+.method-select {
+}
+
+.method-select .ant-select-selector {
+  background-color: #fafafa !important;
+}
+
+.method-select-item {}
+
+
+.method-select-item .ant-select-item-option-selected {
+  background-color: #fafafa !important;
+}
