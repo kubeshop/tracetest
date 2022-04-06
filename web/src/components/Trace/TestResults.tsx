@@ -26,9 +26,9 @@ const TestResults: FC<TTestResultsProps> = ({testId, trace}) => {
       traceResultList.reduce<[number, number]>(
         ([innerTotalPassedCount, innerTotalFailedCount], {spanListAssertionResult}) => {
           const [passed, failed] = spanListAssertionResult.reduce<[number, number]>(
-            ([passedResultCount, failedResultCount], spanResultList) => {
-              const passedCount = spanResultList.filter(({hasPassed}) => hasPassed).length;
-              const failedCount = spanResultList.filter(({hasPassed}) => !hasPassed).length;
+            ([passedResultCount, failedResultCount], {resultList}) => {
+              const passedCount = resultList.filter(({hasPassed}) => hasPassed).length;
+              const failedCount = resultList.filter(({hasPassed}) => !hasPassed).length;
 
               return [passedResultCount + passedCount, failedResultCount + failedCount];
             },

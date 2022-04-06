@@ -6,13 +6,15 @@
 // the selected span that we want to autogenerate the selectors array for.  Create a SelectorItem
 // for each attribute that you find a value for in that selected span.
 
+import {LOCATION_NAME} from '../types';
+
 // Note - need to add the following:
 // lamda - aws lambda section
 // aws-sdk - aws sdk section
 
 export enum SemanticGroupNames {
   Http = 'http',
-  Rcp = 'rcp',
+  Rpc = 'rpc',
   Messaging = 'messaging',
   Faas = 'faas',
   Exception = 'exception',
@@ -22,13 +24,15 @@ export enum SemanticGroupNames {
 
 export const SemanticGroupNamesToText = {
   [SemanticGroupNames.Http]: 'HTTP Service',
-  [SemanticGroupNames.Rcp]: 'RCP Service',
+  [SemanticGroupNames.Rpc]: 'RPC Service',
   [SemanticGroupNames.Messaging]: 'Messaging Queue',
   [SemanticGroupNames.Faas]: 'Function as a Service',
   [SemanticGroupNames.Exception]: 'Exception',
   [SemanticGroupNames.General]: 'General',
   [SemanticGroupNames.Compatibility]: 'Compatibility',
 };
+
+export const ResourceSpanAttributeList = ['service.name'];
 
 export const SELECTOR_DEFAULT_ATTRIBUTES = [
   {
@@ -50,7 +54,7 @@ export const SELECTOR_DEFAULT_ATTRIBUTES = [
     ],
   },
   {
-    semanticGroup: SemanticGroupNames.Rcp,
+    semanticGroup: SemanticGroupNames.Rpc,
     attributes: ['service.name', 'rpc.system', 'rpc.service', 'rpc.method', 'message.type'],
   },
   {
@@ -96,3 +100,22 @@ export const SELECTOR_DEFAULT_ATTRIBUTES = [
     ],
   },
 ];
+
+type TSemanticGroupSignature = {
+  [key in SemanticGroupNames]: {[key2 in LOCATION_NAME]: string[]};
+};
+
+export const SemanticGroupsSignature = SELECTOR_DEFAULT_ATTRIBUTES.reduce<TSemanticGroupSignature>(
+  (acc, {semanticGroup, attributes}) => ({
+    ...acc,
+    [semanticGroup]: {
+      [LOCATION_NAME.SPAN_ATTRIBUTES]: attributes.filter(
+        attribute => !ResourceSpanAttributeList.find(resourceAttribute => resourceAttribute === attribute)
+      ),
+      [LOCATION_NAME.RESOURCE_ATTRIBUTES]: attributes.filter(attribute =>
+        ResourceSpanAttributeList.find(resourceAttribute => resourceAttribute === attribute)
+      ),
+    },
+  }),
+  {} as TSemanticGroupSignature
+);

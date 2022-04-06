@@ -8,9 +8,9 @@ import {
   ITrace,
   LOCATION_NAME,
   ResourceSpan,
-  ISpanAttributes,
   SpanAssertionResult,
 } from 'types';
+import { getSpanValue } from './SpanService';
 
 const getOperator = (op: COMPARE_OPERATOR) => {
   switch (op) {
@@ -51,22 +51,6 @@ const buildSelector = (locationName: LOCATION_NAME, conditions: string[], spanId
   }
 };
 
-export const selectSpanValue = (span: ResourceSpan, locationName: LOCATION_NAME, valueType: string, key: string) => {
-  switch (locationName) {
-    case LOCATION_NAME.INSTRUMENTATION_LIBRARY:
-    case LOCATION_NAME.RESOURCE_ATTRIBUTES:
-      return search(span, `resource.attributes[? key==\`${key}\`].value.${valueType}`);
-    case LOCATION_NAME.SPAN:
-    case LOCATION_NAME.SPAN_ATTRIBUTES: {
-      const attributeList: ISpanAttributes = search(span, `instrumentationLibrarySpans[].spans[].attributes | []`);
-
-      return attributeList.find(attribute => attribute.key === key)?.value[valueType];
-    }
-    default:
-      return '';
-  }
-};
-
 const buildConditionArray = (itemSelectors: ItemSelector[]) => {
   const selectorsMap = itemSelectors.reduce<string[]>((acc, item) => {
     const keySelector = ` key == \`${item.propertyName}\``;
@@ -97,7 +81,7 @@ export const runSpanAssertion = (span: ResourceSpan, assertion: Assertion): Arra
     return {
       ...spanAssertion,
       hasPassed: Boolean(passedSpan),
-      actualValue: selectSpanValue(span, locationName, valueType, propertyName),
+      actualValue: getSpanValue(span, locationName, valueType, propertyName),
     };
   });
 
@@ -126,14 +110,16 @@ export const runSpanAssertionByResourceSpan = (span: ResourceSpan, assertion: As
 };
 
 export const runAssertionByTrace = (trace: ITrace, assertion: Assertion): AssertionResult => {
-  if (!assertion?.selectors) return {assertion, spanListAssertionResult: [], spanCount: 0};
+  if (!assertion?.selectors) return {assertion, spanListAssertionResult: []};
 
   const itemSelector = buildItemSelectorQuery(assertion.selectors);
   const spanList: Array<ResourceSpan> = search(trace, `resourceSpans|[]| ${itemSelector}`);
 
   return {
     assertion,
-    spanListAssertionResult: spanList.map(span => runSpanAssertionByResourceSpan(span, assertion)),
-    spanCount: spanList.length,
+    spanListAssertionResult: spanList.map(span => ({
+      span,
+      resultList: runSpanAssertionByResourceSpan(span, assertion),
+    })),
   };
 };

@@ -1,7 +1,9 @@
 import {Table, Typography} from 'antd';
+import {difference, sortBy} from 'lodash';
 import {FC, useMemo} from 'react';
 import {AssertionResult} from 'types';
 import {getOperator} from 'utils';
+import {getSpanSignature} from '../../services/SpanService';
 import CustomTable from '../CustomTable';
 import * as S from './TraceAssertionsTable.styled';
 
@@ -23,29 +25,30 @@ const TraceAssertionsResultTable: FC<IProps> = ({
   assertionResult: {
     assertion: {selectors = []},
     spanListAssertionResult,
-    spanCount,
   },
 }) => {
-  const selectorsList = useMemo(() => selectors?.map(({value}) => value), [selectors]);
-  const parsedAssertionList = useMemo(
-    () =>
-      spanListAssertionResult.reduce<Array<TParsedAssertion>>((list, currentResultList) => {
-        const subResultList = currentResultList.map<TParsedAssertion>(
-          ({propertyName, comparisonValue, operator, actualValue, hasPassed}) => ({
-            spanLabels: selectorsList,
-            key: propertyName,
-            property: propertyName,
-            comparison: operator,
-            value: comparisonValue,
-            actualValue,
-            hasPassed,
-          })
-        );
+  const selectorValueList = useMemo(() => selectors.map(({value}) => value), [selectors]);
+  const parsedAssertionList = useMemo(() => {
+    const spanAssertionList = spanListAssertionResult.reduce<Array<TParsedAssertion>>((list, {span, resultList}) => {
+      const subResultList = resultList.map<TParsedAssertion>(
+        ({propertyName, comparisonValue, operator, actualValue, hasPassed}) => ({
+          spanLabels: difference(getSpanSignature(span), selectorValueList),
+          key: propertyName,
+          property: propertyName,
+          comparison: operator,
+          value: comparisonValue,
+          actualValue,
+          hasPassed,
+        })
+      );
 
-        return list.concat(subResultList);
-      }, []),
-    [selectorsList, spanListAssertionResult]
-  );
+      return list.concat(subResultList);
+    }, []);
+
+    return sortBy(spanAssertionList, ({spanLabels}) => spanLabels.join(''));
+  }, [selectorValueList, spanListAssertionResult]);
+
+  const spanCount = spanListAssertionResult.length;
 
   return (
     <S.AssertionsTableContainer>
@@ -54,7 +57,7 @@ const TraceAssertionsResultTable: FC<IProps> = ({
           {selectors.map(({value}) => value).join(' ')}
         </Typography.Title>
         <Typography.Title level={4} style={{margin: 0}}>
-          {spanCount} spans
+          {`${spanCount} ${spanCount > 1 ? 'spans' : 'span'}`}
         </Typography.Title>
       </S.AssertionsTableHeader>
       <CustomTable
@@ -70,27 +73,9 @@ const TraceAssertionsResultTable: FC<IProps> = ({
           key="spanLabels"
           ellipsis
           width="40%"
-          render={(value: string[], record, index) => {
-            const spanLabelText = value.join('');
-            const obj = {
-              children: value.map(label => <S.AssertionsTableBadge count={label} key={label} />),
-              props: {rowSpan: 1},
-            };
-
-            if (parsedAssertionList.filter(({spanLabels}) => spanLabels.join('') === spanLabelText).length === 1) {
-              return obj;
-            }
-
-            if (parsedAssertionList.findIndex(({spanLabels}) => spanLabels.join('') === spanLabelText) === index) {
-              const count = parsedAssertionList.filter(({spanLabels}) => spanLabels.join('') === spanLabelText).length;
-              obj.props.rowSpan = count;
-
-              return obj;
-            }
-
-            obj.props.rowSpan = 0;
-            return obj;
-          }}
+          render={(value: string[]) =>
+            value.map(label => <S.AssertionsTableBadge count={label} key={label} />)
+          }
         />
         <Table.Column title="Property" dataIndex="property" key="property" ellipsis width="25%" />
         <Table.Column title="Comparison" dataIndex="comparison" key="comparison" render={value => getOperator(value)} />

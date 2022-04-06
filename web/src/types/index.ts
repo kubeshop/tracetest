@@ -196,9 +196,11 @@ export interface ITestResult {
 export type TestId = string;
 
 export type AssertionResult = {
-  spanListAssertionResult: SpanAssertionResult[][];
+  spanListAssertionResult: {
+    span: ResourceSpan;
+    resultList: SpanAssertionResult[];
+  }[];
   assertion: Assertion;
-  spanCount: number;
 };
 
 export interface SpanAssertionResult extends SpanSelector {
