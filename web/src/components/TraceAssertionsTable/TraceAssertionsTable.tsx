@@ -26,7 +26,7 @@ const TraceAssertionsResultTable: FC<IProps> = ({
     spanCount,
   },
 }) => {
-  const selectorsList = useMemo(() => selectors?.map(({propertyName}) => propertyName), [selectors]);
+  const selectorsList = useMemo(() => selectors?.map(({value}) => value), [selectors]);
   const parsedAssertionList = useMemo(
     () =>
       spanListAssertionResult.reduce<Array<TParsedAssertion>>((list, currentResultList) => {
