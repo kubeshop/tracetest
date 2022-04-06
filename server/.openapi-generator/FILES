@@ -21,6 +21,7 @@ go/model_span_link.go
 go/model_span_span_kind.go
 go/model_status_status_code.go
 go/model_test_.go
+go/model_test_assertion_result.go
 go/model_test_run.go
 go/model_test_run_result.go
 go/model_test_service_under_test_.go

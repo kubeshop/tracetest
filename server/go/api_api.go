@@ -244,18 +244,18 @@ func (c *ApiApiController) TestsTestIdResultsResultIdPatch(w http.ResponseWriter
 
 	resultIdParam := params["resultId"]
 
-	testRunResultParam := TestRunResult{}
+	testAssertionResultParam := TestAssertionResult{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
-	if err := d.Decode(&testRunResultParam); err != nil {
+	if err := d.Decode(&testAssertionResultParam); err != nil {
 		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
 		return
 	}
-	if err := AssertTestRunResultRequired(testRunResultParam); err != nil {
+	if err := AssertTestAssertionResultRequired(testAssertionResultParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	result, err := c.service.TestsTestIdResultsResultIdPatch(r.Context(), testIdParam, resultIdParam, testRunResultParam)
+	result, err := c.service.TestsTestIdResultsResultIdPatch(r.Context(), testIdParam, resultIdParam, testAssertionResultParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

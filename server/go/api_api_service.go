@@ -222,7 +222,7 @@ func (s *ApiApiService) TestsTestIdResultsResultIdGet(ctx context.Context, testi
 	return Response(http.StatusOK, *res), nil
 }
 
-func (s *ApiApiService) TestsTestIdResultsResultIdPatch(ctx context.Context, testid string, id string, testRunResult TestRunResult) (ImplResponse, error) {
+func (s *ApiApiService) TestsTestIdResultsResultIdPatch(ctx context.Context, testid string, id string, testRunResult TestAssertionResult) (ImplResponse, error) {
 	testResult, err := s.testDB.GetResult(ctx, id)
 	if err != nil {
 		return Response(http.StatusInternalServerError, err.Error()), err

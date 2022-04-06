@@ -148,7 +148,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/TestRunResult"
+              $ref: "#/components/schemas/TestAssertionResult"
       responses:
         200:
           description: successful operation
@@ -308,6 +308,17 @@ components:
           type: array
           description: List of all tested span assertions
           items: 
+            $ref: "#/components/schemas/AssertionResult"
+    TestAssertionResult:
+      type: object
+      properties:
+        assertionResultState:
+            type: boolean
+            description: True if all trace spans passed the assertion test
+        assertionResult:
+          type: array
+          description: List of all tested span assertions
+          items:
             $ref: "#/components/schemas/AssertionResult"
     Attribute:
       type: object
