@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import CreateTestModal from 'components/CreateTestModal';
+import CreateTestModal from 'components/CreateTest';
 import Layout from 'components/Layout';
 import TestList from './TestList';
 import * as S from './Home.styled';
