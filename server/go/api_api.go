@@ -93,6 +93,12 @@ func (c *ApiApiController) Routes() Routes {
 			c.TestsTestIdResultsResultIdGet,
 		},
 		{
+			"TestsTestIdResultsResultIdPatch",
+			strings.ToUpper("Patch"),
+			"/api/tests/{testId}/results/{resultId}",
+			c.TestsTestIdResultsResultIdPatch,
+		},
+		{
 			"TestsTestIdRunPost",
 			strings.ToUpper("Post"),
 			"/api/tests/{testId}/run",
@@ -221,6 +227,35 @@ func (c *ApiApiController) TestsTestIdResultsResultIdGet(w http.ResponseWriter, 
 	resultIdParam := params["resultId"]
 
 	result, err := c.service.TestsTestIdResultsResultIdGet(r.Context(), testIdParam, resultIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// TestsTestIdResultsResultIdPatch - update test result state
+func (c *ApiApiController) TestsTestIdResultsResultIdPatch(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	testIdParam := params["testId"]
+
+	resultIdParam := params["resultId"]
+
+	testRunResultParam := TestRunResult{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&testRunResultParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertTestRunResultRequired(testRunResultParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.TestsTestIdResultsResultIdPatch(r.Context(), testIdParam, resultIdParam, testRunResultParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

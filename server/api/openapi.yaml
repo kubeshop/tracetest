@@ -121,6 +121,40 @@ paths:
       summary: get test result
       tags:
       - api
+    patch:
+      description: update test result state for a particular test
+      parameters:
+      - explode: false
+        in: path
+        name: testId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: resultId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TestRunResult'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestRunResult'
+          description: successful operation
+      summary: update test result state
+      tags:
+      - api
   /tests/{testId}/results:
     get:
       description: get the results from a particular test

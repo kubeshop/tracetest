@@ -126,6 +126,36 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TestRunResult"
+    patch:
+      tags:
+        - api
+      parameters:
+        - in: path
+          name: testId
+          schema:
+            type: string
+            format: uuid
+          required: true
+        - in: path
+          name: resultId
+          schema:
+            type: string
+            format: uuid
+          required: true
+      summary: "update test result state"
+      description: "update test result state for a particular test"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TestRunResult"
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TestRunResult"
   /tests/{testId}/results:
     get:
       tags:
