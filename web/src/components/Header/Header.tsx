@@ -12,12 +12,12 @@ const Header: FC = () => {
         <S.TitleText>Tracetest</S.TitleText>
       </Link>
       <S.NavMenu selectedKeys={[pathname]}>
-        <S.NavMenuItem>
+        <S.NavMenuItem key={GITHUB_URL}>
           <a href={GITHUB_URL} target="_blank">
             GitHub
           </a>
         </S.NavMenuItem>
-        <S.NavMenuItem>
+        <S.NavMenuItem key={DOCUMENTATION_URL}>
           <a href={DOCUMENTATION_URL} target="_blank">
             Documentation
           </a>

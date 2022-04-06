@@ -1,81 +1,73 @@
-import {Table} from 'antd';
-import {ColumnsType} from 'antd/lib/table';
-import {AssertionResult} from 'types';
+import {Button, Table, Typography} from 'antd';
+import {useMemo} from 'react';
+import {Assertion, SpanAssertionResult} from 'types';
 import {getOperator} from 'utils';
+import CustomTable from '../CustomTable';
+import * as S from './AssertionsTable.styled';
 
 interface IProps {
-  assertionResults: AssertionResult[];
+  assertionResults: SpanAssertionResult[];
+  assertion: Assertion;
+  sort: number;
 }
 
-const AssertionsResultTable = ({assertionResults}: IProps) => {
-  const data = assertionResults.map(el => {
-    return {
-      key: el.spanAssertionId,
-      name: el.selector,
-      selectedSpans: el.spanCount,
-      property: el.propertyName,
-      comparison: el.operator,
-      value: el.comparisonValue,
-      results: `${el.passedSpanCount}/${el.spanCount - el.passedSpanCount}`,
-    };
-  });
+type TParsedAssertion = {
+  key: string;
+  property: string;
+  comparison: string;
+  value: string;
+  actualValue: string;
+  hasPassed: boolean;
+};
 
-  const columns: ColumnsType<any> = [
-    {
-      title: 'Span selector',
-      dataIndex: 'name',
-      key: 'name',
-      render: (value, record, index) => {
-        const obj = {
-          children: value,
-          props: {rowSpan: 1},
-        };
-        if (data.filter(el => el.name === value).length === 1) {
-          return obj;
-        }
-        if (data.findIndex(el => el.name === value) === index) {
-          const count = data.filter(item => item.name === value).length;
-          obj.props.rowSpan = count;
-          return obj;
-        }
-        obj.props.rowSpan = 0;
-        return obj;
-      },
-    },
-    {
-      title: '# Selected',
-      dataIndex: 'selectedSpans',
-      key: 'selectedSpans',
-    },
+const AssertionsResultTable = ({assertionResults, assertion: {selectors = []}, sort}: IProps) => {
+  const parsedAssertionList = useMemo<Array<TParsedAssertion>>(
+    () =>
+      assertionResults.map(({propertyName, comparisonValue, operator, actualValue, hasPassed}) => ({
+        key: propertyName,
+        property: propertyName,
+        comparison: operator,
+        value: comparisonValue,
+        actualValue,
+        hasPassed,
+      })),
+    [assertionResults]
+  );
 
-    {
-      title: 'Property',
-      dataIndex: 'property',
-      key: 'property',
-    },
-    {
-      title: 'Comparison',
-      dataIndex: 'comparison',
-      key: 'comparison',
-      align: 'center',
-      render: value => {
-        return getOperator(value);
-      },
-    },
-    {
-      title: 'Value',
-      dataIndex: 'value',
-      key: 'value',
-    },
-    {
-      title: 'Pass/Fail',
-      dataIndex: 'results',
-      key: 'results',
-      align: 'center',
-    },
-  ];
-
-  return <Table size="small" pagination={{hideOnSinglePage: true}} dataSource={data} columns={columns} />;
+  return (
+    <S.AssertionsTableContainer>
+      <S.AssertionsTableHeader>
+        <Typography.Title level={3} style={{margin: 0}}>
+          Assertion #{sort}
+          {selectors.map(({value, propertyName}) => (
+            <S.AssertionsTableBadge count={value} key={propertyName} />
+          ))}
+        </Typography.Title>
+        <Button type="link">Edit</Button>
+      </S.AssertionsTableHeader>
+      <CustomTable
+        size="small"
+        pagination={{hideOnSinglePage: true}}
+        dataSource={parsedAssertionList}
+        bordered
+        tableLayout="fixed"
+      >
+        <Table.Column title="Property" dataIndex="property" key="property" ellipsis width="60%" />
+        <Table.Column title="Comparison" dataIndex="comparison" key="comparison" render={value => getOperator(value)} />
+        <Table.Column title="Value" dataIndex="value" key="value" />
+        <Table.Column
+          title="Actual"
+          dataIndex="actualValue"
+          key="actualValue"
+          render={(value, record: TParsedAssertion) => (
+            <Typography.Text strong type={record.hasPassed ? 'success' : 'danger'}>
+              {value}
+            </Typography.Text>
+          )}
+        />
+      </CustomTable>
+    </S.AssertionsTableContainer>
+  );
 };
 
 export default AssertionsResultTable;

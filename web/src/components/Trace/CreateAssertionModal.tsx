@@ -108,7 +108,6 @@ const CreateAssertionModal = ({testId, span, trace, open, onClose}: IProps) => {
   const spanAttributeKeys = Object.keys(spanTagsMap);
   const defaultSpanAttribute =
     SELECTOR_DEFAULT_ATTRIBUTES.find(el => spanAttributeKeys.includes(el.semanticGroup))?.attributes || [];
-  console.log('@@defaultSpanAttribute', defaultSpanAttribute);
 
   const itemSelectors = defaultSpanAttribute
     .map<ItemSelector | undefined>(el => {

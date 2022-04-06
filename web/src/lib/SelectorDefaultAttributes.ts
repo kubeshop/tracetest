@@ -10,9 +10,29 @@
 // lamda - aws lambda section
 // aws-sdk - aws sdk section
 
+export enum SemanticGroupNames {
+  Http = 'http',
+  Rcp = 'rcp',
+  Messaging = 'messaging',
+  Faas = 'faas',
+  Exception = 'exception',
+  General = 'general',
+  Compatibility = 'compatibility',
+}
+
+export const SemanticGroupNamesToText = {
+  [SemanticGroupNames.Http]: 'HTTP Service',
+  [SemanticGroupNames.Rcp]: 'RCP Service',
+  [SemanticGroupNames.Messaging]: 'Messaging Queue',
+  [SemanticGroupNames.Faas]: 'Function as a Service',
+  [SemanticGroupNames.Exception]: 'Exception',
+  [SemanticGroupNames.General]: 'General',
+  [SemanticGroupNames.Compatibility]: 'Compatibility',
+};
+
 export const SELECTOR_DEFAULT_ATTRIBUTES = [
   {
-    semanticGroup: 'http',
+    semanticGroup: SemanticGroupNames.Http,
     attributes: ['service.name', 'http.target', 'http.method'],
   },
   {
@@ -30,11 +50,11 @@ export const SELECTOR_DEFAULT_ATTRIBUTES = [
     ],
   },
   {
-    semanticGroup: 'rpc',
+    semanticGroup: SemanticGroupNames.Rcp,
     attributes: ['service.name', 'rpc.system', 'rpc.service', 'rpc.method', 'message.type'],
   },
   {
-    semanticGroup: 'messaging',
+    semanticGroup: SemanticGroupNames.Messaging,
     attributes: [
       'service.name',
       'messaging.system',
@@ -51,19 +71,19 @@ export const SELECTOR_DEFAULT_ATTRIBUTES = [
     ],
   },
   {
-    semanticGroup: 'faas',
+    semanticGroup: SemanticGroupNames.Faas,
     attributes: ['service.name', 'faas.invoked_name', 'faas.invoked_provider', 'faas.trigger', 'faas.trigger'],
   },
   {
-    semanticGroup: 'exception',
+    semanticGroup: SemanticGroupNames.Exception,
     attributes: ['service.name', 'exception.type', 'exception.message', 'exception.escaped'],
   },
   {
-    semanticGroup: 'compatibility',
+    semanticGroup: SemanticGroupNames.Compatibility,
     attributes: ['service.name', 'opentracing.ref_type'],
   },
   {
-    semanticGroup: 'general',
+    semanticGroup: SemanticGroupNames.General,
     attributes: [
       'service.name',
       'enduser.id',

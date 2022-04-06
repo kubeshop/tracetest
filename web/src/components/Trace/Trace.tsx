@@ -2,7 +2,6 @@ import styled from 'styled-components';
 import {ReflexContainer, ReflexSplitter, ReflexElement} from 'react-reflex';
 
 import {Button, Skeleton, Tabs} from 'antd';
-import Text from 'antd/lib/typography/Text';
 
 import 'react-reflex/styles.css';
 
@@ -12,9 +11,9 @@ import {useGetTestResultByIdQuery} from 'services/TestService';
 
 import TraceDiagram from './TraceDiagram';
 import TraceTimeline from './TraceTimeline';
-import TraceData from './TraceData';
+import * as S from './Trace.styled';
 
-import AssertionList from './AssertionsList';
+import SpanDetail from './SpanDetail';
 
 const Grid = styled.div`
   display: grid;
@@ -56,7 +55,9 @@ const Trace = ({test, testResultId}: {test: Test; testResultId: string}) => {
   if (isError || Object.keys(testResultDetails?.trace || {}).length === 0) {
     return (
       <div>
-        <Button onClick={handleReload} loading={isLoadingTrace}>Reload</Button>
+        <Button onClick={handleReload} loading={isLoadingTrace}>
+          Reload
+        </Button>
       </div>
     );
   }
@@ -72,26 +73,19 @@ const Trace = ({test, testResultId}: {test: Test; testResultId: string}) => {
                   <TraceDiagram spanMap={spanMap} onSelectSpan={handleSelectSpan} selectedSpan={selectedSpan} />
                 </div>
               </ReflexElement>
-
               <ReflexElement flex={0.5} className="right-pane">
-                <div className="pane-content" style={{paddingLeft: 8, overflow: 'hidden'}}>
-                  <div>
-                    <Text>Service</Text>
-                  </div>
-                  <Tabs>
-                    <Tabs.TabPane tab="Raw Data" key="1">
-                      <TraceData json={JSON.parse(JSON.stringify(selectedSpan))} />
-                    </Tabs.TabPane>
+                <div className="pane-content" style={{padding: '14px 24px', overflow: 'hidden'}}>
+                  <S.TraceTabs>
                     {spanMap[selectedSpan.id]?.data && (
-                      <Tabs.TabPane tab="Assertions" key="2">
-                        <AssertionList
-                          trace={testResultDetails?.trace}
+                      <Tabs.TabPane tab="Span detail" key="1">
+                        <SpanDetail
+                          trace={testResultDetails?.trace!}
                           testId={test.testId}
                           targetSpan={spanMap[selectedSpan.id]?.data}
                         />
                       </Tabs.TabPane>
                     )}
-                  </Tabs>
+                  </S.TraceTabs>
                 </div>
               </ReflexElement>
             </ReflexContainer>
@@ -100,7 +94,11 @@ const Trace = ({test, testResultId}: {test: Test; testResultId: string}) => {
           <ReflexElement>
             <div className="pane-content">
               {testResultDetails && (
-                <TraceTimeline trace={testResultDetails?.trace} onSelectSpan={handleSelectSpan} selectedSpan={selectedSpan} />
+                <TraceTimeline
+                  trace={testResultDetails?.trace}
+                  onSelectSpan={handleSelectSpan}
+                  selectedSpan={selectedSpan}
+                />
               )}
             </div>
           </ReflexElement>

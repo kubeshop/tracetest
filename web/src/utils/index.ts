@@ -16,7 +16,7 @@ export const getOperator = (op: COMPARE_OPERATOR) => {
       return 'gt';
     case COMPARE_OPERATOR.LESSTHAN:
       return 'lt';
-      case COMPARE_OPERATOR.GREATOREQUALS:
+    case COMPARE_OPERATOR.GREATOREQUALS:
       return 'gte';
     case COMPARE_OPERATOR.LESSOREQUAL:
       return 'lte';
