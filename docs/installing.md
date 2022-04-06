@@ -47,7 +47,7 @@ helm repo add kubeshop https://kubeshop.github.io/helm-charts
 helm repo update
 
 helm install tracetest kubeshop/tracetest \
-  --set tracingBackend=tempo \ 
+  --set tracingBackend=tempo \
   --set tempoConnectionConfig.endpoint="grafana-tempo:9095"
 ```
 
