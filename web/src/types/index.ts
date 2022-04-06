@@ -195,19 +195,11 @@ export interface ITestResult {
 
 export type TestId = string;
 
-export interface AssertionResult {
-  selector: string;
-  hasPassed: boolean;
-  spanCount: any;
-  passedSpanCount: any;
-  failedSpans: any;
-  spanAssertionId?: string | undefined;
-  locationName: LOCATION_NAME;
-  propertyName: string;
-  valueType: string;
-  operator: COMPARE_OPERATOR;
-  comparisonValue: string;
-}
+export type AssertionResult = {
+  spanListAssertionResult: SpanAssertionResult[][];
+  assertion: Assertion;
+  spanCount: number;
+};
 
 export interface SpanAssertionResult extends SpanSelector {
   hasPassed: boolean;
