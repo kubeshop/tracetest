@@ -21,6 +21,7 @@ export const enum LOCATION_NAME {
   INSTRUMENTATION_LIBRARY = 'INSTRUMENTATION_LIBRARY',
   SPAN = 'SPAN',
   SPAN_ATTRIBUTES = 'SPAN_ATTRIBUTES',
+  SPAN_ID = 'SPAN_ID',
 }
 
 export const enum COMPARE_OPERATOR {
@@ -32,6 +33,11 @@ export const enum COMPARE_OPERATOR {
   LESSOREQUAL = 'LESSOREQUAL',
 }
 
+export type ISpanAttributes = Array<{
+  key: string;
+  value: {[key: string]: any};
+}>;
+
 export interface ISpan {
   traceId: string;
   spanId: string;
@@ -39,10 +45,7 @@ export interface ISpan {
   kind: string;
   startTime: number;
   duration: number;
-  attributes: Array<{
-    key: string;
-    value: {[key: string]: any};
-  }>;
+  attributes: ISpanAttributes;
   events: Array<{
     timeUnixNano: string;
     name: string;
@@ -204,6 +207,11 @@ export interface AssertionResult {
   valueType: string;
   operator: COMPARE_OPERATOR;
   comparisonValue: string;
+}
+
+export interface SpanAssertionResult extends SpanSelector {
+  hasPassed: boolean;
+  actualValue: string;
 }
 
 export type RecursivePartial<T> = {

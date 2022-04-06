@@ -25,7 +25,7 @@ const TestDetails: FC<TTestDetailsProps> = ({testId, onSelectResult, url}) => {
       <S.TestDetailsHeader>
         <Typography.Title level={5}>{url}</Typography.Title>
         <Button onClick={handleRunTest} loading={result.isLoading} type="primary" ghost>
-          Generate Trace
+          Run Test
         </Button>
       </S.TestDetailsHeader>
       <CustomTable
