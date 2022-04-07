@@ -121,7 +121,7 @@ paths:
       summary: get test result
       tags:
       - api
-    patch:
+    put:
       description: update test result state for a particular test
       parameters:
       - explode: false

@@ -93,10 +93,10 @@ func (c *ApiApiController) Routes() Routes {
 			c.TestsTestIdResultsResultIdGet,
 		},
 		{
-			"TestsTestIdResultsResultIdPatch",
-			strings.ToUpper("Patch"),
+			"TestsTestIdResultsResultIdPut",
+			strings.ToUpper("Put"),
 			"/api/tests/{testId}/results/{resultId}",
-			c.TestsTestIdResultsResultIdPatch,
+			c.TestsTestIdResultsResultIdPut,
 		},
 		{
 			"TestsTestIdRunPost",
@@ -237,8 +237,8 @@ func (c *ApiApiController) TestsTestIdResultsResultIdGet(w http.ResponseWriter, 
 
 }
 
-// TestsTestIdResultsResultIdPatch - update test result state
-func (c *ApiApiController) TestsTestIdResultsResultIdPatch(w http.ResponseWriter, r *http.Request) {
+// TestsTestIdResultsResultIdPut - update test result state
+func (c *ApiApiController) TestsTestIdResultsResultIdPut(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	testIdParam := params["testId"]
 
@@ -255,7 +255,7 @@ func (c *ApiApiController) TestsTestIdResultsResultIdPatch(w http.ResponseWriter
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	result, err := c.service.TestsTestIdResultsResultIdPatch(r.Context(), testIdParam, resultIdParam, testAssertionResultParam)
+	result, err := c.service.TestsTestIdResultsResultIdPut(r.Context(), testIdParam, resultIdParam, testAssertionResultParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

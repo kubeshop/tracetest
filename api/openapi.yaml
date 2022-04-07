@@ -126,7 +126,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TestRunResult"
-    patch:
+    put:
       tags:
         - api
       parameters:
