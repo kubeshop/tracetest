@@ -126,6 +126,36 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TestRunResult"
+    put:
+      tags:
+        - api
+      parameters:
+        - in: path
+          name: testId
+          schema:
+            type: string
+            format: uuid
+          required: true
+        - in: path
+          name: resultId
+          schema:
+            type: string
+            format: uuid
+          required: true
+      summary: "update test result state"
+      description: "update test result state for a particular test"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TestAssertionResult"
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TestRunResult"
   /tests/{testId}/results:
     get:
       tags:
@@ -278,6 +308,17 @@ components:
           type: array
           description: List of all tested span assertions
           items: 
+            $ref: "#/components/schemas/AssertionResult"
+    TestAssertionResult:
+      type: object
+      properties:
+        assertionResultState:
+            type: boolean
+            description: True if all trace spans passed the assertion test
+        assertionResult:
+          type: array
+          description: List of all tested span assertions
+          items:
             $ref: "#/components/schemas/AssertionResult"
     Attribute:
       type: object

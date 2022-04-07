@@ -25,6 +25,7 @@ type ApiApiRouter interface {
 	GetTests(http.ResponseWriter, *http.Request)
 	TestsTestIdResultsGet(http.ResponseWriter, *http.Request)
 	TestsTestIdResultsResultIdGet(http.ResponseWriter, *http.Request)
+	TestsTestIdResultsResultIdPut(http.ResponseWriter, *http.Request)
 	TestsTestIdRunPost(http.ResponseWriter, *http.Request)
 }
 
@@ -40,5 +41,6 @@ type ApiApiServicer interface {
 	GetTests(context.Context) (ImplResponse, error)
 	TestsTestIdResultsGet(context.Context, string) (ImplResponse, error)
 	TestsTestIdResultsResultIdGet(context.Context, string, string) (ImplResponse, error)
+	TestsTestIdResultsResultIdPut(context.Context, string, string, TestAssertionResult) (ImplResponse, error)
 	TestsTestIdRunPost(context.Context, string) (ImplResponse, error)
 }

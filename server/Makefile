@@ -1,4 +1,5 @@
 fmt:
 	go fmt ./...
 run-server:
-	go run main.go
+	go build
+	./server --config ./testdata/local-config.yaml

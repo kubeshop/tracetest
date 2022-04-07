@@ -222,6 +222,23 @@ func (s *ApiApiService) TestsTestIdResultsResultIdGet(ctx context.Context, testi
 	return Response(http.StatusOK, *res), nil
 }
 
+func (s *ApiApiService) TestsTestIdResultsResultIdPut(ctx context.Context, testid string, id string, testRunResult TestAssertionResult) (ImplResponse, error) {
+	testResult, err := s.testDB.GetResult(ctx, id)
+	if err != nil {
+		return Response(http.StatusInternalServerError, err.Error()), err
+	}
+
+	testResult.AssertionResultState = testRunResult.AssertionResultState
+	testResult.AssertionResult = testRunResult.AssertionResult
+
+	err = s.testDB.UpdateResult(ctx, testResult)
+	if err != nil {
+		return Response(http.StatusInternalServerError, err.Error()), err
+	}
+
+	return Response(http.StatusOK, *testResult), nil
+}
+
 func (s *ApiApiService) CreateAssertion(ctx context.Context, testID string, assertion Assertion) (ImplResponse, error) {
 	test, err := s.testDB.GetTest(ctx, testID)
 	if err != nil {

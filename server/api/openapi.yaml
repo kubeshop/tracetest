@@ -121,6 +121,40 @@ paths:
       summary: get test result
       tags:
       - api
+    put:
+      description: update test result state for a particular test
+      parameters:
+      - explode: false
+        in: path
+        name: testId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: resultId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TestAssertionResult'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestRunResult'
+          description: successful operation
+      summary: update test result state
+      tags:
+      - api
   /tests/{testId}/results:
     get:
       description: get the results from a particular test
@@ -3539,6 +3573,40 @@ components:
           $ref: '#/components/schemas/HTTPResponse'
         trace:
           $ref: '#/components/schemas/api_v3SpansResponseChunk'
+        assertionResultState:
+          description: True if all trace spans passed the assertion test
+          type: boolean
+        assertionResult:
+          description: List of all tested span assertions
+          items:
+            $ref: '#/components/schemas/AssertionResult'
+          type: array
+      type: object
+    TestAssertionResult:
+      example:
+        assertionResult:
+        - spanAssertionResults:
+          - spanId: spanId
+            observedValue: observedValue
+            spanAssertionId: spanAssertionId
+            passed: true
+          - spanId: spanId
+            observedValue: observedValue
+            spanAssertionId: spanAssertionId
+            passed: true
+          assertionId: assertionId
+        - spanAssertionResults:
+          - spanId: spanId
+            observedValue: observedValue
+            spanAssertionId: spanAssertionId
+            passed: true
+          - spanId: spanId
+            observedValue: observedValue
+            spanAssertionId: spanAssertionId
+            passed: true
+          assertionId: assertionId
+        assertionResultState: true
+      properties:
         assertionResultState:
           description: True if all trace spans passed the assertion test
           type: boolean
