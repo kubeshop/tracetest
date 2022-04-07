@@ -14,6 +14,7 @@ import TraceTimeline from './TraceTimeline';
 import * as S from './Trace.styled';
 
 import SpanDetail from './SpanDetail';
+import TestResults from './TestResults';
 
 const Grid = styled.div`
   display: grid;
@@ -85,6 +86,9 @@ const Trace = ({test, testResultId}: {test: Test; testResultId: string}) => {
                         />
                       </Tabs.TabPane>
                     )}
+                    <Tabs.TabPane tab="Test Results" key="2">
+                      <TestResults trace={testResultDetails?.trace!} testId={test.testId} />
+                    </Tabs.TabPane>
                   </S.TraceTabs>
                 </div>
               </ReflexElement>

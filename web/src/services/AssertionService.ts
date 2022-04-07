@@ -8,9 +8,9 @@ import {
   ITrace,
   LOCATION_NAME,
   ResourceSpan,
-  ISpanAttributes,
   SpanAssertionResult,
 } from 'types';
+import { getSpanValue } from './SpanService';
 
 const getOperator = (op: COMPARE_OPERATOR) => {
   switch (op) {
@@ -51,24 +51,6 @@ const buildSelector = (locationName: LOCATION_NAME, conditions: string[], spanId
   }
 };
 
-export const selectSpanValue = (span: ResourceSpan, locationName: LOCATION_NAME, valueType: string, key: string) => {
-  switch (locationName) {
-    case LOCATION_NAME.INSTRUMENTATION_LIBRARY:
-    case LOCATION_NAME.RESOURCE_ATTRIBUTES:
-      return search(span, `resource.attributes[? key==\`${key}\`].value.${valueType}`);
-    case LOCATION_NAME.SPAN:
-    case LOCATION_NAME.SPAN_ATTRIBUTES: {
-      const attributeList: ISpanAttributes = search(span, `instrumentationLibrarySpans[].spans[].attributes | []`);
-
-      return attributeList.find(attribute => attribute.key === key)?.value[valueType];
-    }
-    default:
-      return '';
-  }
-};
-
-const flattenTraceArray = () => ` [][instrumentationLibrarySpans[].spans]|[][][]`;
-
 const buildConditionArray = (itemSelectors: ItemSelector[]) => {
   const selectorsMap = itemSelectors.reduce<string[]>((acc, item) => {
     const keySelector = ` key == \`${item.propertyName}\``;
@@ -88,35 +70,6 @@ export const buildItemSelectorQuery = (itemSelectors: ItemSelector[]) => {
   return itemSelector;
 };
 
-export const runSpanListAssertion = (spanList: Array<ResourceSpan>, assertion: Assertion) => {
-  const flattenSelectedSpan = search(spanList, flattenTraceArray());
-
-  const assertionTestResultArray = assertion.spanAssertions.map(el => {
-    const valueSelector = buildValueSelector(el.comparisonValue, getOperator(el.operator), el.valueType);
-
-    const selector = buildSelector(el.locationName, [`key == \`${el.propertyName}\` && ${valueSelector}`]);
-    const passedSpans = search(spanList, `[?${selector}] | ${flattenTraceArray()}`);
-    const hasPassed = passedSpans.length === spanList.length;
-    const passSpansIds = passedSpans.map((span: any) => span.spanId);
-
-    const failedSpanArray = flattenSelectedSpan.filter(
-      (selectedSpan: any) => passSpansIds.indexOf(selectedSpan.spanId) === -1
-    );
-
-    return {
-      ...el,
-      selector: assertion.selectors.map(item => item.propertyName).join(' '),
-      hasPassed,
-      spanCount: spanList.length,
-      passedSpanCount: passedSpans.length || 0,
-      failedSpans: failedSpanArray,
-      passSpansIds,
-    };
-  });
-
-  return assertionTestResultArray;
-};
-
 export const runSpanAssertion = (span: ResourceSpan, assertion: Assertion): Array<SpanAssertionResult> => {
   const assertionTestResultArray = assertion.spanAssertions.map(spanAssertion => {
     const {comparisonValue, operator, valueType, locationName, propertyName} = spanAssertion;
@@ -128,14 +81,18 @@ export const runSpanAssertion = (span: ResourceSpan, assertion: Assertion): Arra
     return {
       ...spanAssertion,
       hasPassed: Boolean(passedSpan),
-      actualValue: selectSpanValue(span, locationName, valueType, propertyName),
+      actualValue: getSpanValue(span, locationName, valueType, propertyName),
     };
   });
 
   return assertionTestResultArray;
 };
 
-export const runSpanAssertionList = (spanId: string, trace: ITrace, assertion: Assertion) => {
+export const runAssertionBySpanId = (
+  spanId: string,
+  trace: ITrace,
+  assertion: Assertion
+): SpanAssertionResult[] | undefined => {
   if (!assertion.selectors) return undefined;
   const conditionList = buildConditionArray(assertion.selectors);
   const itemSelector = `[? ${buildSelector(LOCATION_NAME.SPAN_ID, conditionList, spanId)}]`;
@@ -143,18 +100,26 @@ export const runSpanAssertionList = (spanId: string, trace: ITrace, assertion: A
 
   if (!span) return undefined;
 
+  return runSpanAssertionByResourceSpan(span, assertion);
+};
+
+export const runSpanAssertionByResourceSpan = (span: ResourceSpan, assertion: Assertion): SpanAssertionResult[] => {
   const spanResult = runSpanAssertion(span, assertion);
 
   return spanResult;
 };
 
-export const runTraceAssertion = (trace: ITrace, assertion: Assertion): AssertionResult[] => {
-  if (!assertion?.selectors) {
-    return [];
-  }
+export const runAssertionByTrace = (trace: ITrace, assertion: Assertion): AssertionResult => {
+  if (!assertion?.selectors) return {assertion, spanListAssertionResult: []};
 
   const itemSelector = buildItemSelectorQuery(assertion.selectors);
-  const selectedSpans: Array<ResourceSpan> = search(trace, `resourceSpans|[]| ${itemSelector}`);
+  const spanList: Array<ResourceSpan> = search(trace, `resourceSpans|[]| ${itemSelector}`);
 
-  return runSpanListAssertion(selectedSpans, assertion);
+  return {
+    assertion,
+    spanListAssertionResult: spanList.map(span => ({
+      span,
+      resultList: runSpanAssertionByResourceSpan(span, assertion),
+    })),
+  };
 };

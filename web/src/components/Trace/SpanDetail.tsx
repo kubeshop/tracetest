@@ -5,7 +5,7 @@ import {useGetTestByIdQuery} from '../../services/TestService';
 import {Assertion, ISpan, ITrace, SpanAssertionResult} from '../../types';
 import * as S from './SpanDetail.styled';
 import CreateAssertionModal from './CreateAssertionModal';
-import {runSpanAssertionList} from '../../services/AssertionService';
+import {runAssertionBySpanId} from '../../services/AssertionService';
 import AssertionsResultTable from '../AssertionsTable/AssertionsTable';
 import TraceData from './TraceData';
 
@@ -19,18 +19,18 @@ const SpanDetail: FC<TSpanDetailProps> = ({testId, targetSpan, trace}) => {
   const [openCreateAssertion, setOpenCreateAssertion] = useState(false);
   const {data: test} = useGetTestByIdQuery(testId);
 
-  const assertionsResultList = useMemo(() => {
-    return (
+  const assertionsResultList = useMemo(
+    () =>
       test?.assertions.reduce<Array<{assertion: Assertion; assertionResultList: Array<SpanAssertionResult>}>>(
         (resultList, assertion) => {
-          const assertionResultList = runSpanAssertionList(targetSpan.spanId, trace, assertion);
+          const assertionResultList = runAssertionBySpanId(targetSpan.spanId, trace, assertion);
 
           return assertionResultList ? [...resultList, {assertion, assertionResultList}] : resultList;
         },
         []
-      ) || []
-    );
-  }, [targetSpan.spanId, test?.assertions, trace]);
+      ) || [],
+    [targetSpan.spanId, test?.assertions, trace]
+  );
 
   return (
     <>
