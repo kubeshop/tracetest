@@ -9,9 +9,10 @@ import * as S from './TestResults.styled';
 type TTestResultsProps = {
   testId: string;
   trace: ITrace;
+  onSpanSelected(spanId: string): void;
 };
 
-const TestResults: FC<TTestResultsProps> = ({testId, trace}) => {
+const TestResults: FC<TTestResultsProps> = ({testId, trace, onSpanSelected}) => {
   const {data: test} = useGetTestByIdQuery(testId);
 
   const traceResultList = useMemo(
@@ -53,7 +54,12 @@ const TestResults: FC<TTestResultsProps> = ({testId, trace}) => {
       {traceResultList.length ? (
         traceResultList.map(assertionResult =>
           assertionResult.spanListAssertionResult.length ? (
-            <TraceAssertionsResultTable key={assertionResult.assertion.assertionId} assertionResult={assertionResult} />
+            <TraceAssertionsResultTable
+              key={assertionResult.assertion.assertionId}
+              assertionResult={assertionResult}
+              trace={trace}
+              onSpanSelected={onSpanSelected}
+            />
           ) : null
         )
       ) : (

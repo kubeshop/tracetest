@@ -7,7 +7,7 @@ import * as S from './SpanDetail.styled';
 import CreateAssertionModal from './CreateAssertionModal';
 import {runAssertionBySpanId} from '../../services/AssertionService';
 import AssertionsResultTable from '../AssertionsTable/AssertionsTable';
-import TraceData from './TraceData';
+import Attributes from './Attributes';
 
 type TSpanDetailProps = {
   testId: string;
@@ -57,12 +57,7 @@ const SpanDetail: FC<TSpanDetailProps> = ({testId, targetSpan, trace}) => {
           </S.DetailsEmptyStateContainer>
         )}
       </S.DetailsContainer>
-      <S.DetailsContainer>
-        <S.DetailsHeader>
-          <Typography.Text strong>Raw Data</Typography.Text>
-        </S.DetailsHeader>
-        <TraceData json={JSON.parse(JSON.stringify(trace))} />
-      </S.DetailsContainer>
+      <Attributes spanId={targetSpan.spanId} trace={trace} />
       <CreateAssertionModal
         key={`KEY_${targetSpan.spanId}`}
         testId={testId}

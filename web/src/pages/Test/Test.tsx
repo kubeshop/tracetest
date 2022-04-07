@@ -1,4 +1,5 @@
 import {useRef, useState} from 'react';
+import { ReactFlowProvider } from 'react-flow-renderer';
 import {Button, Tabs} from 'antd';
 import Title from 'antd/lib/typography/Title';
 import {CloseOutlined, ArrowLeftOutlined} from '@ant-design/icons';
@@ -66,44 +67,50 @@ const TestPage = () => {
 
   return (
     <Layout>
-      <Tabs
-        tabBarExtraContent={{
-          left: (
-            <S.Header>
-              <Button type="text" shape="circle" onClick={() => navigate(-1)}>
-                <ArrowLeftOutlined style={{fontSize: 24, marginRight: 16}} />
-              </Button>
-              <Title style={{margin: 0}} level={3}>
-                {test?.name}
-              </Title>
-            </S.Header>
-          ),
-        }}
-        hideAdd
-        defaultActiveKey="1"
-        activeKey={activeTabKey}
-        onChange={onChangeTab}
-        type="editable-card"
-        onEdit={onEditTab}
-      >
-        <Tabs.TabPane tab="Test Details" key="1" closeIcon={<CloseOutlined hidden />}>
-          <S.Wrapper>
-            <TestDetails testId={id!} url={test?.serviceUnderTest.request.url} onSelectResult={handleSelectTestResult} />
-          </S.Wrapper>
-        </Tabs.TabPane>
-        {Boolean(test?.assertions?.length) && (
-          <Tabs.TabPane tab="Test Assertions" key="2" closeIcon={<CloseOutlined hidden />}>
+      <ReactFlowProvider>
+        <Tabs
+          tabBarExtraContent={{
+            left: (
+              <S.Header>
+                <Button type="text" shape="circle" onClick={() => navigate(-1)}>
+                  <ArrowLeftOutlined style={{fontSize: 24, marginRight: 16}} />
+                </Button>
+                <Title style={{margin: 0}} level={3}>
+                  {test?.name}
+                </Title>
+              </S.Header>
+            ),
+          }}
+          hideAdd
+          defaultActiveKey="1"
+          activeKey={activeTabKey}
+          onChange={onChangeTab}
+          type="editable-card"
+          onEdit={onEditTab}
+        >
+          <Tabs.TabPane tab="Test Details" key="1" closeIcon={<CloseOutlined hidden />}>
             <S.Wrapper>
-              <Assertions />
+              <TestDetails
+                testId={id!}
+                url={test?.serviceUnderTest.request.url}
+                onSelectResult={handleSelectTestResult}
+              />
             </S.Wrapper>
           </Tabs.TabPane>
-        )}
-        {tracePanes.map(item => (
-          <Tabs.TabPane tab={item.title} key={item.key}>
-            <S.Wrapper>{item.content}</S.Wrapper>
-          </Tabs.TabPane>
-        ))}
-      </Tabs>
+          {Boolean(test?.assertions?.length) && (
+            <Tabs.TabPane tab="Test Assertions" key="2" closeIcon={<CloseOutlined hidden />}>
+              <S.Wrapper>
+                <Assertions />
+              </S.Wrapper>
+            </Tabs.TabPane>
+          )}
+          {tracePanes.map(item => (
+            <Tabs.TabPane tab={item.title} key={item.key}>
+              <S.Wrapper>{item.content}</S.Wrapper>
+            </Tabs.TabPane>
+          ))}
+        </Tabs>
+      </ReactFlowProvider>
     </Layout>
   );
 };

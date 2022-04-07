@@ -33,10 +33,16 @@ export const enum COMPARE_OPERATOR {
   LESSOREQUAL = 'LESSOREQUAL',
 }
 
-export type ISpanAttributes = Array<{
+export type ISpanAttributeValue = {
+  stringValue: string;
+  intValue: number;
+  booleanValue: boolean;
+};
+
+export type ISpanAttribute = {
   key: string;
-  value: {[key: string]: any};
-}>;
+  value: ISpanAttributeValue;
+};
 
 export interface ISpan {
   traceId: string;
@@ -45,7 +51,7 @@ export interface ISpan {
   kind: string;
   startTime: number;
   duration: number;
-  attributes: ISpanAttributes;
+  attributes: ISpanAttribute[];
   events: Array<{
     timeUnixNano: string;
     name: string;
@@ -107,7 +113,7 @@ export interface SpanSelector {
   spanAssertionId?: string;
   locationName: LOCATION_NAME;
   propertyName: string;
-  valueType: string;
+  valueType: keyof ISpanAttributeValue;
   operator: COMPARE_OPERATOR;
   comparisonValue: string;
 }
@@ -163,10 +169,10 @@ export interface Span {
   parentSpanId: string;
   name: string;
   kind: number;
-  startTimeUnixNano: any;
-  endTimeUnixNano: any;
+  startTimeUnixNano: string;
+  endTimeUnixNano: string;
   attributes: Attribute[];
-  status: any;
+  status: {code: string};
   events: Event[];
 }
 
@@ -206,8 +212,11 @@ export type AssertionResult = {
 export interface SpanAssertionResult extends SpanSelector {
   hasPassed: boolean;
   actualValue: string;
+  spanId: string;
 }
 
 export type RecursivePartial<T> = {
   [P in keyof T]?: RecursivePartial<T[P]>;
 };
+
+export type TSpanAttributesList = {key: string; value: string}[];

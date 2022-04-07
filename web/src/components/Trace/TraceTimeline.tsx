@@ -18,7 +18,7 @@ const Header = styled.div`
 interface IProps {
   trace: ITrace;
   selectedSpan: any;
-  onSelectSpan: (span: any) => void;
+  onSelectSpan(spanId: string): void;
 }
 
 const TraceTimeline = ({trace, selectedSpan, onSelectSpan}: IProps) => {
@@ -154,7 +154,7 @@ const TraceTimeline = ({trace, selectedSpan, onSelectSpan}: IProps) => {
       .attr('cursor', 'pointer')
       .attr('pointer-events', 'bounding-box')
       .on('click', (event, d) => {
-        onSelectSpan({data: d.data.data, id: d.id});
+        onSelectSpan(d.id);
       });
 
     nodeEnter

@@ -116,8 +116,8 @@ const CreateAssertionModal = ({testId, span, trace, open, onClose}: IProps) => {
         return {
           locationName: LOCATION_NAME.SPAN_ATTRIBUTES,
           propertyName: spanAttribute.key,
-          value: spanAttribute.value['intValue'] || spanAttribute.value['stringValue'],
-          valueType: spanAttribute.value['intValue'] ? 'intValue' : 'stringValue',
+          value: String(spanAttribute.value.intValue || spanAttribute.value.stringValue),
+          valueType: spanAttribute.value.intValue ? 'intValue' : 'stringValue',
         };
       }
       return undefined;
