@@ -1,5 +1,5 @@
 import Text from 'antd/lib/typography/Text';
-import {useMemo} from 'react';
+import {useEffect, useMemo} from 'react';
 import ReactFlow, {Background, BackgroundVariant, Handle, NodeProps, Position} from 'react-flow-renderer';
 import {useDAGChart} from 'hooks/Charts';
 import {ISpan} from 'types';
@@ -10,7 +10,7 @@ interface IPropsTraceNode extends NodeProps<ISpan> {}
 interface IPropsTraceDiagram {
   spanMap: any;
   selectedSpan: any;
-  onSelectSpan: (span: any) => void;
+  onSelectSpan(spanId: string): void;
 }
 
 const TraceNode = ({id, data, selected, ...rest}: IPropsTraceNode) => {
@@ -55,8 +55,17 @@ const TraceDiagram = ({spanMap, selectedSpan, onSelectSpan}: IPropsTraceDiagram)
   } = useDAGChart(spanMap);
 
   const handleElementClick = (event: any, element: any) => {
-    onSelectSpan(spanMap[element.id]);
+    onSelectSpan(element.id);
   };
+
+  useEffect(() => {
+    const [dragNode] = dag.descendants();
+    const span = spanMap[dragNode?.data.id];
+
+    if (!selectedSpan && span) {
+      onSelectSpan(span.id);
+    }
+  }, [dag, onSelectSpan, selectedSpan, spanMap]);
 
   const dagElements = useMemo(() => {
     const dagNodes = dag.descendants().map((i: any) => {
@@ -65,8 +74,9 @@ const TraceDiagram = ({spanMap, selectedSpan, onSelectSpan}: IPropsTraceDiagram)
         type: 'TraceNode',
         data: spanMap[i.data.id].data,
         position: {x: i.x, y: parseFloat(i.y)},
+        selected: i.data.id === selectedSpan?.id,
         sourcePosition: 'top',
-        className: `${i.data.id === selectedSpan.id ? 'selected' : ''}`,
+        className: `${i.data.id === selectedSpan?.id ? 'selected' : ''}`,
       };
     });
 
