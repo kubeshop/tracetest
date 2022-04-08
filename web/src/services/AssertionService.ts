@@ -43,7 +43,7 @@ const buildSelector = (locationName: LOCATION_NAME, conditions: string[], spanId
     case LOCATION_NAME.SPAN:
       return `instrumentationLibrarySpans[?spans[?${conditions.map(cond => `attributes[?${cond}]`).join(' && ')}]]`;
     case LOCATION_NAME.SPAN_ID:
-      return `instrumentationLibrarySpans[?spans[?spanId == \`${spanId}\` && ${conditions
+      return `instrumentationLibrarySpans[?spans[?spanId == \`${spanId}\` ${conditions.length ? '&&' : ''} ${conditions
         .map(cond => `attributes[?${cond}]`)
         .join(' && ')}]]`;
     default:
@@ -52,22 +52,23 @@ const buildSelector = (locationName: LOCATION_NAME, conditions: string[], spanId
 };
 
 const buildConditionArray = (itemSelectors: ItemSelector[]) => {
-  const selectorsMap = itemSelectors.reduce<string[]>((acc, item) => {
-    const keySelector = ` key == \`${item.propertyName}\``;
-    const valueSelector = buildValueSelector(item.value, '==', item.valueType);
+  const selectorsMap = itemSelectors.reduce<Record<string, string[]>>(
+    (acc, {locationName, propertyName, valueType, value}) => {
+      const keySelector = ` key == \`${propertyName}\``;
+      const valueSelector = buildValueSelector(value, '==', valueType);
+      const condition = ` ${[keySelector, valueSelector]!.join(' && ')}`;
 
-    acc.push(` ${[keySelector, valueSelector]!.join(' && ')}`);
-    return acc;
-  }, []);
+      return {
+        ...acc,
+        [locationName]: acc[locationName] ? acc[locationName].concat([condition]) : [condition],
+      };
+    },
+    {}
+  );
 
-  return selectorsMap;
-};
-
-export const buildItemSelectorQuery = (itemSelectors: ItemSelector[]) => {
-  const selectorsMap = buildConditionArray(itemSelectors);
-
-  const itemSelector = `[? ${buildSelector(LOCATION_NAME.SPAN_ATTRIBUTES, selectorsMap)}]`;
-  return itemSelector;
+  return Object.entries(selectorsMap).map(([locationName, conditionList]) =>
+    buildSelector(locationName as LOCATION_NAME, conditionList)
+  );
 };
 
 export const runSpanAssertionByResourceSpan = (
@@ -105,7 +106,8 @@ export const runAssertionBySpanId = (
 ): SpanAssertionResult[] | undefined => {
   if (!assertion.selectors) return undefined;
   const conditionList = buildConditionArray(assertion.selectors);
-  const itemSelector = `[? ${buildSelector(LOCATION_NAME.SPAN_ID, conditionList, spanId)}]`;
+  const itemSelector = `[? ${buildSelector(LOCATION_NAME.SPAN_ID, [], spanId)} && ${conditionList.join(' && ')}]`;
+
   const [span]: Array<ResourceSpan> = search(trace, `resourceSpans|[]| ${itemSelector}`);
 
   if (!span) return undefined;
@@ -116,7 +118,7 @@ export const runAssertionBySpanId = (
 export const runAssertionByTrace = (trace: ITrace, assertion: Assertion): AssertionResult => {
   if (!assertion?.selectors) return {assertion, spanListAssertionResult: []};
 
-  const itemSelector = buildItemSelectorQuery(assertion.selectors);
+  const itemSelector = `[? ${buildConditionArray(assertion.selectors).join(' && ')}]`;
   const spanList: Array<ResourceSpan> = search(trace, `resourceSpans|[]| ${itemSelector}`);
 
   return {

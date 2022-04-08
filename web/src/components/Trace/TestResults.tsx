@@ -16,11 +16,11 @@ const TestResults: FC<TTestResultsProps> = ({testId, trace, onSpanSelected}) => 
   const {data: test} = useGetTestByIdQuery(testId);
 
   const traceResultList = useMemo(
-    () => test?.assertions.map(assertion => runAssertionByTrace(trace, assertion)) || [],
+    () => test?.assertions?.map(assertion => runAssertionByTrace(trace, assertion)) || [],
     [test?.assertions, trace]
   );
   const totalSpanCount = trace.resourceSpans.length;
-  const totalAssertionCount = test?.assertions.length;
+  const totalAssertionCount = test?.assertions?.length || 0;
 
   const [totalPassedCount, totalFailedCount] = useMemo(
     () =>

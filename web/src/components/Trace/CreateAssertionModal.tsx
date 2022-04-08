@@ -1,13 +1,15 @@
-import {useState} from 'react';
+import {ChangeEvent, useState} from 'react';
+import {isEmpty} from 'lodash';
 import styled from 'styled-components';
 import {Button, Input, List, Modal, Select as AntSelect, AutoComplete, Typography} from 'antd';
 import jemsPath from 'jmespath';
 import Text from 'antd/lib/typography/Text';
 
-import {COMPARE_OPERATOR, IAttribute, ISpan, ItemSelector, LOCATION_NAME, SpanSelector} from 'types';
+import {COMPARE_OPERATOR, IAttribute, ISpan, LOCATION_NAME, SpanSelector} from 'types';
 import {useCreateAssertionMutation} from 'services/TestService';
 import {SELECTOR_DEFAULT_ATTRIBUTES} from 'lib/SelectorDefaultAttributes';
 import {filterBySpanId} from 'utils';
+import {getSpanSignature} from '../../services/SpanService';
 
 const {Title} = Typography;
 interface IProps {
@@ -44,11 +46,12 @@ const selectorConditionBuilder = (attribute: IAttribute) => {
 
 const itemSelectorKeys = SELECTOR_DEFAULT_ATTRIBUTES.map(el => el.attributes).flat();
 
+const initialFormState = Array(3).fill({key: '', compareOp: COMPARE_OPERATOR.EQUALS, value: ''});
+
 const CreateAssertionModal = ({testId, span, trace, open, onClose}: IProps) => {
-  const [assertionList, setAssertionList] = useState<
-    Array<Partial<{key: string; compareOp: keyof typeof COMPARE_OPERATOR}>>
-  >(Array(3).fill({key: '', compareOp: COMPARE_OPERATOR.EQUALS}));
-  const [createAssertion, result] = useCreateAssertionMutation();
+  const [assertionList, setAssertionList] =
+    useState<Array<Partial<{key: string; compareOp: keyof typeof COMPARE_OPERATOR; value: string}>>>(initialFormState);
+  const [createAssertion] = useCreateAssertionMutation();
   const attrs = jemsPath.search(trace, filterBySpanId(span.spanId));
 
   const selectorCondition = assertionList
@@ -105,53 +108,37 @@ const CreateAssertionModal = ({testId, span, trace, open, onClose}: IProps) => {
     };
   });
 
-  const spanAttributeKeys = Object.keys(spanTagsMap);
-  const defaultSpanAttribute =
-    SELECTOR_DEFAULT_ATTRIBUTES.find(el => spanAttributeKeys.includes(el.semanticGroup))?.attributes || [];
+  const itemSelectors = getSpanSignature(span.spanId, trace);
 
-  const itemSelectors = defaultSpanAttribute
-    .map<ItemSelector | undefined>(el => {
-      const spanAttribute = span.attributes.find(attr => attr.key.includes(el));
-      if (spanAttribute) {
-        return {
-          locationName: LOCATION_NAME.SPAN_ATTRIBUTES,
-          propertyName: spanAttribute.key,
-          value: String(spanAttribute.value.intValue || spanAttribute.value.stringValue),
-          valueType: spanAttribute.value.intValue ? 'intValue' : 'stringValue',
-        };
-      }
-      return undefined;
-    })
-    .filter((el: ItemSelector | undefined): el is ItemSelector => Boolean(el));
+  const handleClose = () => {
+    setAssertionList(initialFormState);
+    onClose();
+  };
 
   const handleCreateAssertion = async () => {
     const spanAssertions = assertionList
-      .map(k => {
-        return {attr: attrs?.find((el: any) => el.key === k?.key), compareOp: k.compareOp};
-      })
+      .map(k => ({value: k.value, attr: attrs?.find((el: any) => el.key === k?.key), compareOp: k.compareOp}))
       .filter(i => i.attr)
-      .map(el => {
-        const spanAttribute = span.attributes.find(attr => attr.key.includes(el.attr.key));
+      .map(({attr, value, compareOp}) => {
+        const spanAttribute = span.attributes.find(({key}) => key.includes(attr.key));
 
         return {
-          locationName: el.attr.type.includes('span')
-            ? LOCATION_NAME.SPAN_ATTRIBUTES
-            : LOCATION_NAME.RESOURCE_ATTRIBUTES,
-          propertyName: el.attr.key as string,
-          comparisonValue: el.attr.value as string,
-          operator: el.compareOp,
-          valueType: spanAttribute?.value['intValue'] ? 'intValue' : 'stringValue',
+          locationName: attr.type.includes('span') ? LOCATION_NAME.SPAN_ATTRIBUTES : LOCATION_NAME.RESOURCE_ATTRIBUTES,
+          propertyName: attr.key as string,
+          comparisonValue: value,
+          operator: compareOp,
+          valueType: spanAttribute?.value.intValue ? 'intValue' : 'stringValue',
         };
       })
       .filter((el): el is SpanSelector => Boolean(el));
 
     createAssertion({testId, selectors: itemSelectors, spanAssertions});
-    onClose();
+    handleClose();
   };
 
   return (
-    <Modal style={{minHeight: 500}} footer={null} visible={span && open} onCancel={onClose}>
-      <Title level={2}>Create New Assertion </Title>
+    <Modal style={{minHeight: 500}} footer={null} visible={span && open} onCancel={handleClose} destroyOnClose>
+      <Title level={2}>Create New Assertion</Title>
       <div style={{display: 'flex', justifyContent: 'flex-end', height: 64}}>
         <Text>Effects {effectedSpans} spans</Text>
       </div>
@@ -165,12 +152,19 @@ const CreateAssertionModal = ({testId, span, trace, open, onClose}: IProps) => {
         }
         renderItem={(item: any, index) => {
           const handleSearchChange = (searchText: string) => {
-            assertionList[index] = {...assertionList[index], key: searchText};
+            const value = attrs?.find((el: any) => el.key === assertionList[index].key)?.value;
+
+            assertionList[index] = {...assertionList[index], key: searchText, value: isEmpty(value) ? '' : value};
             setAssertionList([...assertionList]);
           };
 
           const handleSelectCompareOperator = (compareOp: any) => {
             assertionList[index] = {...assertionList[index], compareOp};
+            setAssertionList([...assertionList]);
+          };
+
+          const handleValueChange = (event: ChangeEvent<HTMLInputElement>) => {
+            assertionList[index] = {...assertionList[index], value: event.target.value};
             setAssertionList([...assertionList]);
           };
 
@@ -200,7 +194,8 @@ const CreateAssertionModal = ({testId, span, trace, open, onClose}: IProps) => {
                 size="small"
                 style={{width: 'unset'}}
                 placeholder="type value"
-                value={attrs?.find((el: any) => el.key === assertionList[index].key)?.value}
+                onChange={handleValueChange}
+                value={assertionList[index].value}
               />
             </div>
           );
