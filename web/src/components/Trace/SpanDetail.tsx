@@ -21,7 +21,7 @@ const SpanDetail: FC<TSpanDetailProps> = ({testId, targetSpan, trace}) => {
 
   const assertionsResultList = useMemo(
     () =>
-      test?.assertions.reduce<Array<{assertion: Assertion; assertionResultList: Array<SpanAssertionResult>}>>(
+      test?.assertions?.reduce<Array<{assertion: Assertion; assertionResultList: Array<SpanAssertionResult>}>>(
         (resultList, assertion) => {
           const assertionResultList = runAssertionBySpanId(targetSpan.spanId, trace, assertion);
 

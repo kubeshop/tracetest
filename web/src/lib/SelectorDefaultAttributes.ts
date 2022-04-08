@@ -20,6 +20,7 @@ export enum SemanticGroupNames {
   Exception = 'exception',
   General = 'general',
   Compatibility = 'compatibility',
+  Database = 'db',
 }
 
 export const SemanticGroupNamesToText = {
@@ -40,7 +41,7 @@ export const SELECTOR_DEFAULT_ATTRIBUTES = [
     attributes: ['service.name', 'http.target', 'http.method'],
   },
   {
-    semanticGroup: 'database',
+    semanticGroup: SemanticGroupNames.Database,
     attributes: [
       'service.name',
       'db.system',
@@ -50,7 +51,7 @@ export const SELECTOR_DEFAULT_ATTRIBUTES = [
       'db.redis.database_index',
       'db.mongodb.collection',
       'db.sql.table',
-      'db.cassandra.table',
+      'db.cassandra.table'
     ],
   },
   {

@@ -1,15 +1,16 @@
-import {useState} from 'react';
+import {ChangeEvent, useState} from 'react';
+import {PlusOutlined} from '@ant-design/icons';
+import {isEmpty} from 'lodash';
 import styled from 'styled-components';
 import {Button, Input, List, Modal, Select as AntSelect, AutoComplete, Typography} from 'antd';
 import jemsPath from 'jmespath';
-import Text from 'antd/lib/typography/Text';
 
-import {COMPARE_OPERATOR, IAttribute, ISpan, ItemSelector, LOCATION_NAME, SpanSelector} from 'types';
+import {COMPARE_OPERATOR, ISpan, LOCATION_NAME, SpanSelector} from 'types';
 import {useCreateAssertionMutation} from 'services/TestService';
 import {SELECTOR_DEFAULT_ATTRIBUTES} from 'lib/SelectorDefaultAttributes';
 import {filterBySpanId} from 'utils';
+import {getSpanSignature} from '../../services/SpanService';
 
-const {Title} = Typography;
 interface IProps {
   open: boolean;
   onClose: () => void;
@@ -25,42 +26,15 @@ const Select = styled(AntSelect)`
   }
 `;
 
-const NORMALIZED_OBJECT = `resourceSpans[].{instrumentationLibrarySpans:instrumentationLibrarySpans[].{spans:spans[].{spanId:spanId,attributes:attributes[].{key:key,value:value.*|[0],type:'span'}}},resource:resource.{attributes:attributes[].{key:key,value: value.*|[0],type:'resource'}}}`;
-const filterByAttributes = (condition: string) => `[${condition && '?'}${condition}]`;
-
-const selectionPipe = (query: string) => `${NORMALIZED_OBJECT} | ${query}  | length([])`;
-
-const createSelector = (query: string) => `${NORMALIZED_OBJECT} | ${query}`;
-
-const selectorConditionBuilder = (attribute: IAttribute) => {
-  if (attribute.type === 'span') {
-    return `instrumentationLibrarySpans[?spans[?attributes[?key=='${attribute.key}' && value=='${attribute.value}']]]`;
-  }
-
-  if (attribute.type === 'resource') {
-    return `resource.attributes[?key=='${attribute.key}' && value=='${attribute.value}']`;
-  }
-};
-
 const itemSelectorKeys = SELECTOR_DEFAULT_ATTRIBUTES.map(el => el.attributes).flat();
 
+const initialFormState = Array(3).fill({key: '', compareOp: COMPARE_OPERATOR.EQUALS, value: ''});
+
 const CreateAssertionModal = ({testId, span, trace, open, onClose}: IProps) => {
-  const [assertionList, setAssertionList] = useState<
-    Array<Partial<{key: string; compareOp: keyof typeof COMPARE_OPERATOR}>>
-  >(Array(3).fill({key: '', compareOp: COMPARE_OPERATOR.EQUALS}));
-  const [createAssertion, result] = useCreateAssertionMutation();
+  const [assertionList, setAssertionList] =
+    useState<Array<Partial<{key: string; compareOp: keyof typeof COMPARE_OPERATOR; value: string}>>>(initialFormState);
+  const [createAssertion] = useCreateAssertionMutation();
   const attrs = jemsPath.search(trace, filterBySpanId(span.spanId));
-
-  const selectorCondition = assertionList
-    .map(k => {
-      return attrs?.find((el: any) => el.key === k.key);
-    })
-    .filter(i => i)
-    .map(item => selectorConditionBuilder(item))
-    .join(' && ');
-
-  const effectedSpans =
-    selectorCondition.length > 0 ? jemsPath.search(trace, selectionPipe(filterByAttributes(selectorCondition))) : 0;
 
   const spanTagsMap = attrs?.reduce((acc: {[x: string]: any}, item: {key: string}) => {
     if (itemSelectorKeys.indexOf(item.key) !== -1) {
@@ -105,67 +79,63 @@ const CreateAssertionModal = ({testId, span, trace, open, onClose}: IProps) => {
     };
   });
 
-  const spanAttributeKeys = Object.keys(spanTagsMap);
-  const defaultSpanAttribute =
-    SELECTOR_DEFAULT_ATTRIBUTES.find(el => spanAttributeKeys.includes(el.semanticGroup))?.attributes || [];
+  const itemSelectors = getSpanSignature(span.spanId, trace);
 
-  const itemSelectors = defaultSpanAttribute
-    .map<ItemSelector | undefined>(el => {
-      const spanAttribute = span.attributes.find(attr => attr.key.includes(el));
-      if (spanAttribute) {
-        return {
-          locationName: LOCATION_NAME.SPAN_ATTRIBUTES,
-          propertyName: spanAttribute.key,
-          value: String(spanAttribute.value.intValue || spanAttribute.value.stringValue),
-          valueType: spanAttribute.value.intValue ? 'intValue' : 'stringValue',
-        };
-      }
-      return undefined;
-    })
-    .filter((el: ItemSelector | undefined): el is ItemSelector => Boolean(el));
-
-  const handleCreateAssertion = async () => {
-    const spanAssertions = assertionList
-      .map(k => {
-        return {attr: attrs?.find((el: any) => el.key === k?.key), compareOp: k.compareOp};
-      })
-      .filter(i => i.attr)
-      .map(el => {
-        const spanAttribute = span.attributes.find(attr => attr.key.includes(el.attr.key));
-
-        return {
-          locationName: el.attr.type.includes('span')
-            ? LOCATION_NAME.SPAN_ATTRIBUTES
-            : LOCATION_NAME.RESOURCE_ATTRIBUTES,
-          propertyName: el.attr.key as string,
-          comparisonValue: el.attr.value as string,
-          operator: el.compareOp,
-          valueType: spanAttribute?.value['intValue'] ? 'intValue' : 'stringValue',
-        };
-      })
-      .filter((el): el is SpanSelector => Boolean(el));
-
-    createAssertion({testId, selectors: itemSelectors, spanAssertions});
+  const handleClose = () => {
+    setAssertionList(initialFormState);
     onClose();
   };
 
+  const spanAssertions = assertionList
+    .map(k => ({value: k.value, attr: attrs?.find((el: any) => el.key === k?.key), compareOp: k.compareOp}))
+    .filter(i => i.attr)
+    .map(({attr, value, compareOp}) => {
+      const spanAttribute = span.attributes.find(({key}) => key.includes(attr.key));
+
+      return {
+        locationName: attr.type.includes('span') ? LOCATION_NAME.SPAN_ATTRIBUTES : LOCATION_NAME.RESOURCE_ATTRIBUTES,
+        propertyName: attr.key as string,
+        comparisonValue: value,
+        operator: compareOp,
+        valueType: spanAttribute?.value.intValue ? 'intValue' : 'stringValue',
+      };
+    })
+    .filter((el): el is SpanSelector => Boolean(el));
+
+  const handleCreateAssertion = async () => {
+    createAssertion({testId, selectors: itemSelectors, spanAssertions});
+    handleClose();
+  };
+
+  const isValid = spanAssertions.length && spanAssertions.length;
+
   return (
-    <Modal style={{minHeight: 500}} footer={null} visible={span && open} onCancel={onClose}>
-      <Title level={2}>Create New Assertion </Title>
-      <div style={{display: 'flex', justifyContent: 'flex-end', height: 64}}>
-        <Text>Effects {effectedSpans} spans</Text>
-      </div>
+    <Modal
+      style={{minHeight: 500}}
+      visible={span && open}
+      onCancel={handleClose}
+      destroyOnClose
+      title={<Typography.Title level={5}>Create New Assertion</Typography.Title>}
+      onOk={handleCreateAssertion}
+      okButtonProps={{
+        type: 'default',
+        disabled: !isValid,
+      }}
+      okText="Create"
+    >
       <List
         dataSource={assertionList}
         itemLayout="horizontal"
         loadMore={
-          <Button style={{marginTop: 8}} onClick={handleAddItem}>
+          <Button type="link" icon={<PlusOutlined />} style={{marginTop: 8, padding: 0}} onClick={handleAddItem}>
             Add Item
           </Button>
         }
         renderItem={(item: any, index) => {
           const handleSearchChange = (searchText: string) => {
-            assertionList[index] = {...assertionList[index], key: searchText};
+            const value = attrs?.find((el: any) => el.key === assertionList[index].key)?.value;
+
+            assertionList[index] = {...assertionList[index], key: searchText, value: isEmpty(value) ? '' : value};
             setAssertionList([...assertionList]);
           };
 
@@ -174,8 +144,13 @@ const CreateAssertionModal = ({testId, span, trace, open, onClose}: IProps) => {
             setAssertionList([...assertionList]);
           };
 
+          const handleValueChange = (event: ChangeEvent<HTMLInputElement>) => {
+            assertionList[index] = {...assertionList[index], value: event.target.value};
+            setAssertionList([...assertionList]);
+          };
+
           return (
-            <div key={`key_${index}`} style={{display: 'flex', alignItems: 'stretch', gap: 4, marginBottom: 4}}>
+            <div key={`key_${index}`} style={{display: 'flex', alignItems: 'stretch', gap: 4, marginBottom: 16}}>
               <AutoComplete
                 style={{width: 250}}
                 onChange={handleSearchChange}
@@ -200,15 +175,13 @@ const CreateAssertionModal = ({testId, span, trace, open, onClose}: IProps) => {
                 size="small"
                 style={{width: 'unset'}}
                 placeholder="type value"
-                value={attrs?.find((el: any) => el.key === assertionList[index].key)?.value}
+                onChange={handleValueChange}
+                value={assertionList[index].value}
               />
             </div>
           );
         }}
       />
-      <div style={{padding: 16, display: 'flex', justifyContent: 'flex-end'}}>
-        <Button onClick={handleCreateAssertion}>Create</Button>
-      </div>
     </Modal>
   );
 };

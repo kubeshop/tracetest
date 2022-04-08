@@ -37,16 +37,22 @@ const TraceAssertionsResultTable: FC<IProps> = ({
   const parsedAssertionList = useMemo(() => {
     const spanAssertionList = spanListAssertionResult.reduce<Array<TParsedAssertion>>((list, {resultList}) => {
       const subResultList = resultList.map<TParsedAssertion>(
-        ({propertyName, comparisonValue, operator, actualValue, hasPassed, spanId}) => ({
-          spanLabels: difference(getSpanSignature(spanId, trace), selectorValueList),
-          spanId,
-          key: propertyName,
-          property: propertyName,
-          comparison: operator,
-          value: comparisonValue,
-          actualValue,
-          hasPassed,
-        })
+        ({propertyName, comparisonValue, operator, actualValue, hasPassed, spanId}) => {
+          const spanLabelList = getSpanSignature(spanId, trace)
+            .map(({value}) => value)
+            .concat([`#${spanId.slice(-4)}`]);
+
+          return {
+            spanLabels: difference(spanLabelList, selectorValueList),
+            spanId,
+            key: `${propertyName}-${spanId}`,
+            property: propertyName,
+            comparison: operator,
+            value: comparisonValue,
+            actualValue,
+            hasPassed,
+          };
+        }
       );
 
       return list.concat(subResultList);
@@ -80,7 +86,7 @@ const TraceAssertionsResultTable: FC<IProps> = ({
       </S.Header>
       <CustomTable
         size="small"
-        pagination={{hideOnSinglePage: true}}
+        pagination={false}
         dataSource={parsedAssertionList}
         bordered
         tableLayout="fixed"
@@ -96,7 +102,8 @@ const TraceAssertionsResultTable: FC<IProps> = ({
           width="40%"
           render={(value: string[], record: TParsedAssertion) =>
             value
-              .map(label => <S.LabelBadge count={label} key={label} />)
+              // eslint-disable-next-line react/no-array-index-key
+              .map((label, index) => <S.LabelBadge count={label} key={`${label}-${index}`} />)
               .concat(getIsSelected(record.spanId) ? [<S.SelectedLabelBadge count="selected" key="selected" />] : [])
           }
         />

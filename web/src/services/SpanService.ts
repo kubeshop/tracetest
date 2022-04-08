@@ -3,6 +3,7 @@ import {SemanticGroupNames, SemanticGroupsSignature} from '../lib/SelectorDefaul
 import {
   ISpanAttribute,
   ISpanAttributeValue,
+  ItemSelector,
   ITrace,
   LOCATION_NAME,
   ResourceSpan,
@@ -34,7 +35,7 @@ export const getSpanValue = (
   if (!searchString) return '';
 
   const attributeList: ISpanAttribute[] = search(resourceSpan, searchString);
-  const {value} = attributeList.find(attribute => attribute.key === key) || {};
+  const {value} = attributeList?.find(attribute => attribute.key === key) || {};
 
   return value ? String(value[valueType]) : '';
 };
@@ -44,14 +45,23 @@ export const getSpanType = (resourceSpan: ResourceSpan) => {
 
   const findAttribute = (groupName: SemanticGroupNames) => attributes.find(({key}) => key.trim().startsWith(groupName));
 
-  return SemanticGroupNamesList.find(groupName => Boolean(findAttribute(groupName))) || SemanticGroupNames.Http;
+  return SemanticGroupNamesList.find(groupName => Boolean(findAttribute(groupName))) || SemanticGroupNames.General;
 };
 
-const getAttributeValueList = (resourceSpan: ResourceSpan, attributeList: string[]) =>
-  attributeList.reduce<string[]>((list, attribute) => {
-    const value = getSpanValue(resourceSpan, LOCATION_NAME.RESOURCE_ATTRIBUTES, 'stringValue', attribute);
+const getAttributeValueList = (resourceSpan: ResourceSpan, attributeList: string[], locationName: LOCATION_NAME) =>
+  attributeList.reduce<ItemSelector[]>((list, attribute) => {
+    const value = getSpanValue(resourceSpan, locationName, 'stringValue', attribute);
 
-    return value ? list.concat([value]) : list;
+    return value
+      ? list.concat([
+          {
+            propertyName: attribute,
+            value,
+            valueType: 'stringValue',
+            locationName,
+          },
+        ])
+      : list;
   }, []);
 
 export const getResourceSpanBySpanId = (spanId: string, trace: ITrace): ResourceSpan | undefined => {
@@ -66,17 +76,21 @@ export const getResourceSpanBySpanId = (spanId: string, trace: ITrace): Resource
 export const getSpan = (resourceSpan: ResourceSpan): Span | undefined =>
   resourceSpan.instrumentationLibrarySpans[0]?.spans[0];
 
-export const getSpanSignature = (spanId: string, trace: ITrace): string[] => {
+export const getSpanSignature = (spanId: string, trace: ITrace): ItemSelector[] => {
   const resourceSpan = getResourceSpanBySpanId(spanId, trace);
   if (!resourceSpan) return [];
 
   const type = getSpanType(resourceSpan);
 
   const {SPAN_ATTRIBUTES: spanAttributes, RESOURCE_ATTRIBUTES: resourceAttributes} = SemanticGroupsSignature[type];
-  const spanAttributeList = getAttributeValueList(resourceSpan, spanAttributes);
-  const resourceAttributeList = getAttributeValueList(resourceSpan, resourceAttributes);
+  const spanAttributeList = getAttributeValueList(resourceSpan, spanAttributes, LOCATION_NAME.SPAN_ATTRIBUTES);
+  const resourceAttributeList = getAttributeValueList(
+    resourceSpan,
+    resourceAttributes,
+    LOCATION_NAME.RESOURCE_ATTRIBUTES
+  );
 
-  return [...resourceAttributeList, ...spanAttributeList, `#${spanId.slice(-4)}`];
+  return [...resourceAttributeList, ...spanAttributeList];
 };
 
 export const getSpanAttributeList = (resourceSpan: ResourceSpan): TSpanAttributesList => {
