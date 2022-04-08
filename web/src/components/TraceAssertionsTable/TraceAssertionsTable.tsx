@@ -71,10 +71,10 @@ const TraceAssertionsResultTable: FC<IProps> = ({
   return (
     <S.Container>
       <S.Header>
-        <Typography.Title level={4} style={{margin: 0}}>
+        <Typography.Title level={5} style={{margin: 0}}>
           {selectors.map(({value}) => value).join(' ')}
         </Typography.Title>
-        <Typography.Title level={4} style={{margin: 0}}>
+        <Typography.Title level={5} style={{margin: 0}}>
           {`${spanCount} ${spanCount > 1 ? 'spans' : 'span'}`}
         </Typography.Title>
       </S.Header>

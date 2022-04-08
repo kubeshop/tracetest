@@ -11,7 +11,7 @@ const SpanAttributesTable: FC<TSpanAttributesTableProps> = ({spanAttributesList}
   return (
     <CustomTable
       size="small"
-      pagination={{hideOnSinglePage: true}}
+      pagination={false}
       dataSource={spanAttributesList}
       bordered
       tableLayout="fixed"

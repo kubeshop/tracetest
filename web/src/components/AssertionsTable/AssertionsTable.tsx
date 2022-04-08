@@ -37,7 +37,7 @@ const AssertionsResultTable = ({assertionResults, assertion: {selectors = []}, s
   return (
     <S.AssertionsTableContainer>
       <S.AssertionsTableHeader>
-        <Typography.Title level={3} style={{margin: 0}}>
+        <Typography.Title level={5} style={{margin: 0}}>
           Assertion #{sort}
           {selectors.map(({value, propertyName}) => (
             <S.AssertionsTableBadge count={value} key={propertyName} />
