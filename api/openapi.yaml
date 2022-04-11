@@ -447,11 +447,39 @@ components:
           type: string
           format: byte
         auth:
-          type: object
-          description: TODO 
+          $ref: "#/components/schemas/HTTPAuth"
         proxy:
           type: object
           description: TODO 
         certificate:
           type: object
           description: TODO 
+    HTTPAuth:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [apiKey, basic, bearer]
+        apiKey:
+          type: object
+          properties:
+            key:
+              type: string
+            value:
+              type: string
+            in:
+              type: string
+              enum: [query, header]
+        basic:
+          type: object
+          properties:
+            username:
+              type: string
+            password:
+              type: string
+        bearer:
+          type: object
+          properties:
+            token:
+              type: string
+
