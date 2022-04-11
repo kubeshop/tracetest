@@ -18,8 +18,7 @@ type HttpRequest struct {
 
 	Body string `json:"body,omitempty"`
 
-	// TODO
-	Auth map[string]interface{} `json:"auth,omitempty"`
+	Auth HttpAuth `json:"auth,omitempty"`
 
 	// TODO
 	Proxy map[string]interface{} `json:"proxy,omitempty"`
@@ -34,6 +33,9 @@ func AssertHttpRequestRequired(obj HttpRequest) error {
 		if err := AssertHttpResponseHeadersRequired(el); err != nil {
 			return err
 		}
+	}
+	if err := AssertHttpAuthRequired(obj.Auth); err != nil {
+		return err
 	}
 	return nil
 }

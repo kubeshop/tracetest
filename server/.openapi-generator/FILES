@@ -10,6 +10,10 @@ go/model_api_v3_spans_response_chunk.go
 go/model_assertion.go
 go/model_assertion_result.go
 go/model_attribute.go
+go/model_http_auth.go
+go/model_http_auth_api_key.go
+go/model_http_auth_basic.go
+go/model_http_auth_bearer.go
 go/model_http_request.go
 go/model_http_response.go
 go/model_http_response_headers.go
