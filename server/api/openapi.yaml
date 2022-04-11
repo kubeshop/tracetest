@@ -1884,7 +1884,17 @@ components:
               key: key
             proxy: '{}'
             method: GET
-            auth: '{}'
+            auth:
+              apiKey:
+                in: query
+                value: value
+                key: key
+              bearer:
+                token: token
+              type: apiKey
+              basic:
+                password: password
+                username: username
             certificate: '{}'
             body: body
             url: url
@@ -3781,7 +3791,17 @@ components:
           key: key
         proxy: '{}'
         method: GET
-        auth: '{}'
+        auth:
+          apiKey:
+            in: query
+            value: value
+            key: key
+          bearer:
+            token: token
+          type: apiKey
+          basic:
+            password: password
+            username: username
         certificate: '{}'
         body: body
         url: url
@@ -3814,14 +3834,39 @@ components:
           format: byte
           type: string
         auth:
-          description: TODO
-          type: object
+          $ref: '#/components/schemas/HTTPAuth'
         proxy:
           description: TODO
           type: object
         certificate:
           description: TODO
           type: object
+      type: object
+    HTTPAuth:
+      example:
+        apiKey:
+          in: query
+          value: value
+          key: key
+        bearer:
+          token: token
+        type: apiKey
+        basic:
+          password: password
+          username: username
+      properties:
+        type:
+          enum:
+          - apiKey
+          - basic
+          - bearer
+          type: string
+        apiKey:
+          $ref: '#/components/schemas/HTTPAuth_apiKey'
+        basic:
+          $ref: '#/components/schemas/HTTPAuth_basic'
+        bearer:
+          $ref: '#/components/schemas/HTTPAuth_bearer'
       type: object
     api_v3SpansResponseChunk:
       description: Response object with spans.
@@ -7264,7 +7309,17 @@ components:
             key: key
           proxy: '{}'
           method: GET
-          auth: '{}'
+          auth:
+            apiKey:
+              in: query
+              value: value
+              key: key
+            bearer:
+              token: token
+            type: apiKey
+            basic:
+              password: password
+              username: username
           certificate: '{}'
           body: body
           url: url
@@ -7286,5 +7341,38 @@ components:
         key:
           type: string
         value:
+          type: string
+      type: object
+    HTTPAuth_apiKey:
+      example:
+        in: query
+        value: value
+        key: key
+      properties:
+        key:
+          type: string
+        value:
+          type: string
+        in:
+          enum:
+          - query
+          - header
+          type: string
+      type: object
+    HTTPAuth_basic:
+      example:
+        password: password
+        username: username
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      type: object
+    HTTPAuth_bearer:
+      example:
+        token: token
+      properties:
+        token:
           type: string
       type: object
