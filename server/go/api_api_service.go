@@ -144,6 +144,7 @@ func (s *ApiApiService) TestsTestIdRunPost(ctx context.Context, testid string) (
 		CreatedAt: time.Now(),
 		TraceId:   tid.String(),
 		SpanId:    sid.String(),
+		State:     TestRunStateCreated,
 	}
 
 	err = s.testDB.CreateResult(ctx, testid, res)
