@@ -16,6 +16,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	openapi "github.com/kubeshop/tracetest/server/go"
 	"github.com/kubeshop/tracetest/server/go/executor"
@@ -72,7 +73,13 @@ func main() {
 		log.Fatal(err)
 	}
 
-	apiApiService := openapi.NewApiApiService(traceDB, testDB, ex)
+	maxWaitTimeForTrace, err := time.ParseDuration(c.MaxWaitTimeForTrace)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println("maxWait", maxWaitTimeForTrace)
+
+	apiApiService := openapi.NewApiApiService(traceDB, testDB, ex, maxWaitTimeForTrace)
 	apiApiController := openapi.NewApiApiController(apiApiService)
 
 	router := openapi.NewRouter(apiApiController)

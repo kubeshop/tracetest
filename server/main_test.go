@@ -38,7 +38,7 @@ func TestCreateNewTest(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, "/tests", bytes.NewBuffer(b))
 	w := httptest.NewRecorder()
 
-	ApiApiService := openapi.NewApiApiService(nil, db, nil)
+	ApiApiService := openapi.NewApiApiService(nil, db, nil, time.Second)
 	controller := openapi.NewApiApiController(ApiApiService)
 
 	ctr := controller.(*openapi.ApiApiController)
@@ -60,7 +60,7 @@ func TestRunTest(t *testing.T) {
 	db := mocks.NewMockTestDB(ctrl)
 	db.EXPECT().GetTest(gomock.Any(), gomock.Any()).Return(&openapi.Test{}, nil)
 	db.EXPECT().CreateResult(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil)
-	db.EXPECT().UpdateResult(gomock.Any(), gomock.Any()).Return(nil)
+	db.EXPECT().UpdateResult(gomock.Any(), gomock.Any()).Times(2).Return(nil)
 	db.EXPECT().UpdateTest(gomock.Any(), gomock.Any()).Return(nil)
 	ex := mocks.NewMockTestExecutor(ctrl)
 
@@ -68,7 +68,7 @@ func TestRunTest(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, "/api/tests/1/run", nil)
 	w := httptest.NewRecorder()
 
-	ApiApiService := openapi.NewApiApiService(nil, db, ex)
+	ApiApiService := openapi.NewApiApiService(nil, db, ex, time.Second)
 	controller := openapi.NewApiApiController(ApiApiService)
 
 	ctr := controller.(*openapi.ApiApiController)
@@ -122,7 +122,7 @@ func TestCreateNewAssertion(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, "/api/tests/testid/assertions", bytes.NewBuffer(b))
 	w := httptest.NewRecorder()
 
-	ApiApiService := openapi.NewApiApiService(nil, db, nil)
+	ApiApiService := openapi.NewApiApiService(nil, db, nil, time.Second)
 	controller := openapi.NewApiApiController(ApiApiService)
 
 	ctr := controller.(*openapi.ApiApiController)

@@ -51,19 +51,21 @@ type TestExecutor interface {
 // This service should implement the business logic for every endpoint for the ApiApi API.
 // Include any external packages or services that will be required by this service.
 type ApiApiService struct {
-	traceDB  tracedb.TraceDB
-	testDB   TestDB
-	executor TestExecutor
-	rand     *rand.Rand
+	traceDB             tracedb.TraceDB
+	testDB              TestDB
+	executor            TestExecutor
+	rand                *rand.Rand
+	maxWaitTimeForTrace time.Duration
 }
 
 // NewApiApiService creates a default api service
-func NewApiApiService(traceDB tracedb.TraceDB, testDB TestDB, executor TestExecutor) ApiApiServicer {
+func NewApiApiService(traceDB tracedb.TraceDB, testDB TestDB, executor TestExecutor, maxWaitTimeForTrace time.Duration) ApiApiServicer {
 	return &ApiApiService{
-		traceDB:  traceDB,
-		testDB:   testDB,
-		executor: executor,
-		rand:     rand.New(rand.NewSource(time.Now().UnixNano())),
+		traceDB:             traceDB,
+		testDB:              testDB,
+		executor:            executor,
+		rand:                rand.New(rand.NewSource(time.Now().UnixNano())),
+		maxWaitTimeForTrace: maxWaitTimeForTrace,
 	}
 }
 
@@ -94,7 +96,7 @@ func (s *ApiApiService) GetTest(ctx context.Context, testid string) (ImplRespons
 		res := test.ReferenceTestRunResult
 		tr, err := s.traceDB.GetTraceByID(ctx, res.TraceId)
 		if err != nil {
-			if time.Since(res.CompletedAt) > 60*time.Second {
+			if time.Since(res.CompletedAt) > s.maxWaitTimeForTrace {
 				res.State = TestRunStateFailed
 				dbErr := s.testDB.UpdateResult(ctx, &res)
 				if dbErr != nil {
