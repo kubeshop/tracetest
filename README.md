@@ -4,7 +4,7 @@
 </p>
 
 <p align="center">
-  Build deep integration tests graphically via your OpenTelemetry based traces. For QA, Dev, & Ops.
+  End-to-end tests powered by OpenTelemetry. For QA, Dev, & Ops.
 </p>
 
 <p align="center">
@@ -42,11 +42,18 @@ Tracetest makes this easy. Pick an api to test. Tracetest uses your tracing infr
 
 Examples:
 
+<table><tr><td>
 - assert that all database calls return in less than 250 ms
 - assert that one particular micro service returns a 200 code when called
 - assert that a Kafka queue successful delivers a payload to a dependent micro service.
-
+</td><td>
+![Assertions](/assets/assertions.png)
+</td></tr></table>
 Once the test is built, it can be run automatically as part of a build process or manually. Every test has a trace attached, allowing you to immediately see what worked, and what did not, reducing the need to reproduce the problem to see the underlying issue.
+
+# System Diagram
+
+![Tracetest System Diagram](/assets/tracetest-diagram-01.png)
 
 # Try the demo & give us feedback
 
