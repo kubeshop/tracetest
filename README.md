@@ -11,7 +11,7 @@
   <!--<a href="https://tracetest.io">Website</a>&nbsp;|&nbsp; -->
   <a href="https://kubeshop.github.io/tracetest">Documentation</a>&nbsp;|&nbsp; 
   <a href="https://twitter.com/tracetest_io">Twitter</a>&nbsp;|&nbsp; 
-  <a href="https://discord.gg/XXXX">Discord (TBD!)</a>&nbsp;|&nbsp; 
+  <a href="https://discord.gg/eBvEQRVyKX">Discord</a>&nbsp;|&nbsp; 
   <a href="https://kubeshop.io/category/tracetest">Blog (TBD!)</a>
 </p>
 
