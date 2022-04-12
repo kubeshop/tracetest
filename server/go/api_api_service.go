@@ -94,11 +94,13 @@ func (s *ApiApiService) GetTest(ctx context.Context, testid string) (ImplRespons
 		res := test.ReferenceTestRunResult
 		tr, err := s.traceDB.GetTraceByID(ctx, res.TraceId)
 		if err != nil {
-			res.State = TestRunStateFailed
-			dbErr := s.testDB.UpdateResult(ctx, &res)
-			if dbErr != nil {
-				fmt.Printf("update result err: %s\n", dbErr)
-				return Response(http.StatusInternalServerError, dbErr.Error()), dbErr
+			if time.Since(res.CompletedAt) > 60*time.Second {
+				res.State = TestRunStateFailed
+				dbErr := s.testDB.UpdateResult(ctx, &res)
+				if dbErr != nil {
+					fmt.Printf("update result err: %s\n", dbErr)
+					return Response(http.StatusInternalServerError, dbErr.Error()), dbErr
+				}
 			}
 			return Response(http.StatusInternalServerError, err.Error()), err
 		}
