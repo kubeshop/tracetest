@@ -36,7 +36,7 @@
 
 Testing and debugging software built on Micro-Services architectures is hard. Lots of services, multiple teams, written in various languages, with many different technologies involved. How are you expected to write tests across all this complexity?
 
-Tracetest makes it easy. Pick an api to test. Tracetest uses your tracing infrastructure to trace this api call. This trace is the blueprint of your system, showing all the steps. Use this blueprint to graphically define assertions on different services throughout the trace, checking return statuses, data, or even execution times of systems.
+Tracetest makes it easy. Pick an API to test. Tracetest uses your tracing infrastructure to trace this API call. This trace is the blueprint of your system, showing all the steps. Use this blueprint to graphically define assertions on different services throughout the trace, checking return statuses, data, or even execution times of systems.
 
 ![Assertions](/assets/assertions.png)
 
