@@ -42,13 +42,16 @@ Tracetest makes this easy. Pick an api to test. Tracetest uses your tracing infr
 
 Examples:
 
-<table><tr><td>
+<div style="-webkit-column-count: 2; -moz-column-count: 2; column-count: 2; -webkit-column-rule: 1px dotted #e0e0e0; -moz-column-rule: 1px dotted #e0e0e0; column-rule: 1px dotted #e0e0e0;">
+    <div style="display: inline-block;">
 - assert that all database calls return in less than 250 ms
 - assert that one particular micro service returns a 200 code when called
 - assert that a Kafka queue successful delivers a payload to a dependent micro service.
-</td><td>
+</div>
+    <div style="display: inline-block;">
 ![Assertions](/assets/assertions.png)
-</td></tr></table>
+    </div>
+</div>
 Once the test is built, it can be run automatically as part of a build process or manually. Every test has a trace attached, allowing you to immediately see what worked, and what did not, reducing the need to reproduce the problem to see the underlying issue.
 
 # System Diagram
