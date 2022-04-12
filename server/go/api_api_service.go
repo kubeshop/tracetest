@@ -157,6 +157,13 @@ func (s *ApiApiService) TestsTestIdRunPost(ctx context.Context, testid string) (
 		ctx, span := tracer.Start(ctx, "Execute Test")
 		defer span.End()
 
+		res.State = TestRunStateExecuting
+		err = s.testDB.UpdateResult(ctx, &res)
+		if err != nil {
+			fmt.Printf("update result err: %s\n", err)
+			return
+		}
+
 		fmt.Println("executing test")
 		resp, err := s.executor.Execute(&t, tid, sid)
 		if err != nil {
