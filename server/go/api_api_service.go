@@ -161,6 +161,11 @@ func (s *ApiApiService) TestsTestIdRunPost(ctx context.Context, testid string) (
 		resp, err := s.executor.Execute(&t, tid, sid)
 		if err != nil {
 			fmt.Printf("exec err: %s", err)
+			res.State = TestRunStateFailed
+			err = s.testDB.UpdateResult(ctx, &res)
+			if err != nil {
+				fmt.Printf("update result err: %s\n", err)
+			}
 			return
 		}
 		fmt.Println(resp)
