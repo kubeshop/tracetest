@@ -50,7 +50,7 @@ Once the test is built, it can be run automatically as part of a build process. 
 
 Wanna play with it? [Try the live demo!](https://demo.tracetest.io)
 
-Wanna help us? Give us feedback: [Discord TBD!](https://discord.gg/XXXX) or [Create an Issue](https://github.com/kubeshop/tracetest/issues/new/choose)
+Wanna help us? Give us feedback: [Discord](https://discord.gg/eBvEQRVyKX) or [Create an Issue](https://github.com/kubeshop/tracetest/issues/new/choose)
 
 # Getting Started
 
