@@ -44,7 +44,7 @@ Once the test is built, it can be run automatically as part of a build process. 
 
 # System Diagram
 
-<img src="/assets/tracetest-diagram-01.png" height="500">
+<img src="/assets/tracetest-diagram-01.png" height="600">
 
 # Try the demo & give us feedback
 
