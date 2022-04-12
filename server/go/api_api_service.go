@@ -94,6 +94,12 @@ func (s *ApiApiService) GetTest(ctx context.Context, testid string) (ImplRespons
 		res := test.ReferenceTestRunResult
 		tr, err := s.traceDB.GetTraceByID(ctx, res.TraceId)
 		if err != nil {
+			res.State = TestRunStateFailed
+			dbErr := s.testDB.UpdateResult(ctx, &res)
+			if dbErr != nil {
+				fmt.Printf("update result err: %s\n", dbErr)
+				return Response(http.StatusInternalServerError, dbErr.Error()), dbErr
+			}
 			return Response(http.StatusInternalServerError, err.Error()), err
 		}
 		sid, err := trace.SpanIDFromHex(res.SpanId)
@@ -177,6 +183,7 @@ func (s *ApiApiService) TestsTestIdRunPost(ctx context.Context, testid string) (
 		}
 		fmt.Println(resp)
 
+		res.State = TestRunStateAwaitingTrace
 		res.Response = resp.Response
 		res.CompletedAt = time.Now()
 		err = s.testDB.UpdateResult(ctx, &res)
