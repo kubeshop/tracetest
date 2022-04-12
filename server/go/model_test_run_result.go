@@ -27,6 +27,9 @@ type TestRunResult struct {
 	// parent span ID
 	SpanId string `json:"spanId,omitempty"`
 
+	// Current execution state
+	State string `json:"state,omitempty"`
+
 	CreatedAt time.Time `json:"createdAt,omitempty"`
 
 	CompletedAt time.Time `json:"completedAt,omitempty"`
