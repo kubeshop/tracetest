@@ -21,6 +21,7 @@ nav:
   - Welcome: index.md
   - Installation: installing.md
   - Getting Started: getting-started.md
+  - Creating Tests: create-test.md
   - Architecture: architecture.md
   - OpenAPI Definition: openapi.md
 
