@@ -30,6 +30,9 @@ type TestRunResult struct {
 	// Current execution state
 	State string `json:"state,omitempty"`
 
+	// Details of the cause for the last `FAILED` state
+	LastErrorState string `json:"lastErrorState,omitempty"`
+
 	CreatedAt time.Time `json:"createdAt,omitempty"`
 
 	CompletedAt time.Time `json:"completedAt,omitempty"`
