@@ -77,7 +77,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Println("maxWait", maxWaitTimeForTrace)
 
 	apiApiService := openapi.NewApiApiService(traceDB, testDB, ex, maxWaitTimeForTrace)
 	apiApiController := openapi.NewApiApiController(apiApiService)
