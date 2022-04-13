@@ -75,7 +75,8 @@ func main() {
 
 	maxWaitTimeForTrace, err := time.ParseDuration(c.MaxWaitTimeForTrace)
 	if err != nil {
-		log.Fatal(err)
+		// use a default value
+		maxWaitTimeForTrace = 30 * time.Second
 	}
 
 	apiApiService := openapi.NewApiApiService(traceDB, testDB, ex, maxWaitTimeForTrace)
