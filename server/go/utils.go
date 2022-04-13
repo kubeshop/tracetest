@@ -133,6 +133,20 @@ func mapTrace(tr *v1.TracesData) ApiV3SpansResponseChunk {
 				if sp.GetEndTimeUnixNano() != 0 {
 					endTime = strconv.FormatUint(sp.GetEndTimeUnixNano(), 10)
 				}
+
+				attributes := mapAttributes(sp.GetAttributes())
+
+				if sp.GetStartTimeUnixNano() != 0 && sp.GetEndTimeUnixNano() != 0 {
+					spanDuration := (sp.GetEndTimeUnixNano() - sp.GetStartTimeUnixNano()) / 1000 / 1000 // in milliseconds
+
+					attributes = append(attributes, V1KeyValue{
+						Key: "tracetest.span.duration",
+						Value: V1AnyValue{
+							IntValue: strconv.FormatUint(spanDuration, 10),
+						},
+					})
+				}
+
 				v := V1Span{
 					TraceId:                hex.EncodeToString(sp.GetTraceId()),
 					SpanId:                 hex.EncodeToString(sp.GetSpanId()),
@@ -142,7 +156,7 @@ func mapTrace(tr *v1.TracesData) ApiV3SpansResponseChunk {
 					Kind:                   kind,
 					StartTimeUnixNano:      startTime,
 					EndTimeUnixNano:        endTime,
-					Attributes:             mapAttributes(sp.GetAttributes()),
+					Attributes:             attributes,
 					DroppedAttributesCount: int64(sp.GetDroppedAttributesCount()),
 					Events:                 events,
 					DroppedEventsCount:     int64(sp.GetDroppedEventsCount()),
