@@ -198,7 +198,7 @@ func TestExecutePostWithBasicAuth(t *testing.T) {
 
 		tp, ok = req.Header["Authorization"]
 		if !ok {
-			t.Fatalf("missing key header %#v", req.Header)
+			t.Fatalf("missing Authorization header %#v", req.Header)
 		}
 		assert.Len(t, tp, 1)
 		assert.Equal(t, tp[0], "Basic dXNlcm5hbWU6cGFzc3dvcmQ=")
@@ -264,7 +264,7 @@ func TestExecutePostWithBearerAuth(t *testing.T) {
 
 		tp, ok = req.Header["Authorization"]
 		if !ok {
-			t.Fatalf("missing key header %#v", req.Header)
+			t.Fatalf("missing Authorization header %#v", req.Header)
 		}
 		assert.Len(t, tp, 1)
 		assert.Equal(t, tp[0], "token")
