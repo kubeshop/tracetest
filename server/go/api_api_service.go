@@ -95,17 +95,10 @@ func (s *ApiApiService) GetTest(ctx context.Context, testid string) (ImplRespons
 	if test.ReferenceTestRunResult.TraceId != "" {
 		res := test.ReferenceTestRunResult
 		tr, err := s.traceDB.GetTraceByID(ctx, res.TraceId)
-		if err != nil {
-			if time.Since(res.CompletedAt) > s.maxWaitTimeForTrace {
-				res.State = TestRunStateFailed
-				dbErr := s.testDB.UpdateResult(ctx, &res)
-				if dbErr != nil {
-					fmt.Printf("update result err: %s\n", dbErr)
-					return Response(http.StatusInternalServerError, dbErr.Error()), dbErr
-				}
-			}
-			return Response(http.StatusInternalServerError, err.Error()), err
+		if handledErr := s.handleGetTraceError(ctx, res, err); handledErr != nil {
+			return Response(http.StatusInternalServerError, handledErr.Error()), handledErr
 		}
+
 		sid, err := trace.SpanIDFromHex(res.SpanId)
 		if err != nil {
 			return Response(http.StatusInternalServerError, err.Error()), err
@@ -118,6 +111,35 @@ func (s *ApiApiService) GetTest(ctx context.Context, testid string) (ImplRespons
 		test.ReferenceTestRunResult.Trace = mapTrace(ttr)
 	}
 	return Response(200, test), nil
+}
+
+func (s *ApiApiService) handleGetTraceError(ctx context.Context, res TestRunResult, err error) error {
+	if err == nil {
+		return nil
+	}
+
+	if !errors.Is(err, tracedb.ErrTraceNotFound) {
+		fmt.Printf("cannot fetch trace: %s\n", err.Error())
+		return err
+	}
+
+	// still within maxWaitTime
+	if time.Since(res.CompletedAt) < s.maxWaitTimeForTrace {
+		return nil
+	}
+
+	// now we know this is a wait for trace timeout
+	waitErr := fmt.Errorf("timed out waiting for traces after %s", s.maxWaitTimeForTrace.String())
+	res.State = TestRunStateFailed
+	res.LastErrorState = waitErr.Error()
+	dbErr := s.testDB.UpdateResult(ctx, &res)
+	if dbErr != nil {
+		fmt.Printf("update result err: %s\n", dbErr)
+		return dbErr
+	}
+
+	return waitErr
+
 }
 
 // GetTests - Gets all tests
