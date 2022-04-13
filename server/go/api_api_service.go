@@ -118,27 +118,25 @@ func (s *ApiApiService) handleGetTraceError(ctx context.Context, res TestRunResu
 		return nil
 	}
 
-	if !errors.Is(err, tracedb.ErrTraceNotFound) {
-		fmt.Printf("cannot fetch trace: %s\n", err.Error())
-		return err
+	var finalErr error
+
+	if errors.Is(err, tracedb.ErrTraceNotFound) {
+		if time.Since(res.CompletedAt) < s.maxWaitTimeForTrace {
+			return nil
+		}
+		finalErr = fmt.Errorf("timed out waiting for traces after %s", s.maxWaitTimeForTrace.String())
+	} else {
+		finalErr = fmt.Errorf("cannot fetch trace: %w", err)
 	}
 
-	// still within maxWaitTime
-	if time.Since(res.CompletedAt) < s.maxWaitTimeForTrace {
-		return nil
-	}
-
-	// now we know this is a wait for trace timeout
-	waitErr := fmt.Errorf("timed out waiting for traces after %s", s.maxWaitTimeForTrace.String())
 	res.State = TestRunStateFailed
-	res.LastErrorState = waitErr.Error()
-	dbErr := s.testDB.UpdateResult(ctx, &res)
-	if dbErr != nil {
-		fmt.Printf("update result err: %s\n", dbErr)
-		return dbErr
+	res.LastErrorState = finalErr.Error()
+	if err := s.testDB.UpdateResult(ctx, &res); err != nil {
+		fmt.Printf("update result err: %s\n", err)
+		finalErr = err
 	}
 
-	return waitErr
+	return finalErr
 
 }
 
