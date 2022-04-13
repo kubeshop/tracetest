@@ -24,6 +24,7 @@ nav:
   - Creating Tests: create-test.md
   - Architecture: architecture.md
   - OpenAPI Definition: openapi.md
+  - Development: development.md
 
 extra:
   analytics:

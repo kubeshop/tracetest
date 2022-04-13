@@ -38,6 +38,7 @@ func New() (*TestExecutor, error) {
 }
 
 func (te *TestExecutor) Execute(test *openapi.Test, tid trace.TraceID, sid trace.SpanID) (*openapi.TestRunResult, error) {
+
 	client := http.Client{
 		Transport: otelhttp.NewTransport(http.DefaultTransport,
 			otelhttp.WithTracerProvider(te.traceProvider),
@@ -71,6 +72,23 @@ func (te *TestExecutor) Execute(test *openapi.Test, tid trace.TraceID, sid trace
 	}
 	for _, h := range tReq.Headers {
 		req.Header.Set(h.Key, h.Value)
+	}
+	switch test.ServiceUnderTest.Request.Auth.Type {
+	case "apiKey":
+
+		switch test.ServiceUnderTest.Request.Auth.ApiKey.In {
+		case "query":
+			q := req.URL.Query()
+			q.Add(test.ServiceUnderTest.Request.Auth.ApiKey.Key, test.ServiceUnderTest.Request.Auth.ApiKey.Value)
+			req.URL.RawQuery = q.Encode()
+		case "header", "":
+			req.Header.Set(test.ServiceUnderTest.Request.Auth.ApiKey.Key, test.ServiceUnderTest.Request.Auth.ApiKey.Value)
+		}
+	case "basic":
+		req.SetBasicAuth(test.ServiceUnderTest.Request.Auth.Basic.Username, test.ServiceUnderTest.Request.Auth.Basic.Password)
+	case "bearer":
+		bearer := test.ServiceUnderTest.Request.Auth.Bearer.Token
+		req.Header.Add("Authorization", bearer)
 	}
 
 	resp, err := client.Do(req.WithContext(trace.ContextWithSpanContext(context.Background(), sc)))

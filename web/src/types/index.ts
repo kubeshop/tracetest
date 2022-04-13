@@ -78,6 +78,8 @@ export interface TestRunResult {
   completedAt: string;
   response: any;
   trace: ITrace;
+  assertionResultState: boolean;
+  assertionResult: TestAssertionResult;
 }
 
 export interface HTTPRequest {
@@ -197,6 +199,21 @@ export interface ITestResult {
   failed: {};
   createdAt: string;
   completedAt: string;
+}
+
+export interface spanAssertionResult {
+  spanAssertionId: string;
+  spanId: string;
+  passed: boolean;
+  observedValue: string;
+}
+
+export interface TestAssertionResult {
+  assertionResultState: boolean;
+  assertionResult: Array<{
+    assertionId: string;
+    spanAssertionResults: spanAssertionResult[];
+  }>;
 }
 
 export type TestId = string;
