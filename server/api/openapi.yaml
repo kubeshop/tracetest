@@ -1825,6 +1825,8 @@ components:
             statusCode: 0
           assertionResultState: true
           testId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          state: CREATED
+          lastErrorState: lastErrorState
         name: name
         description: description
         testId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
@@ -3554,6 +3556,8 @@ components:
           statusCode: 0
         assertionResultState: true
         testId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        state: CREATED
+        lastErrorState: lastErrorState
       properties:
         resultId:
           description: ID
@@ -3572,6 +3576,19 @@ components:
         spanId:
           description: parent span ID
           readOnly: true
+          type: string
+        state:
+          description: Current execution state
+          enum:
+          - CREATED
+          - EXECUTING
+          - AWAITING_TRACE
+          - FAILED
+          - FINISHED
+          - AWAITING_TEST_RESULTS
+          type: string
+        lastErrorState:
+          description: Details of the cause for the last `FAILED` state
           type: string
         createdAt:
           format: date-time

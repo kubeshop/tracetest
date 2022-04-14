@@ -13,6 +13,7 @@ type Config struct {
 	PostgresConnString     string                         `mapstructure:"postgresConnString"`
 	JaegerConnectionConfig *configgrpc.GRPCClientSettings `mapstructure:"jaegerConnectionConfig"`
 	TempoConnectionConfig  *configgrpc.GRPCClientSettings `mapstructure:"tempoConnectionConfig"`
+	MaxWaitTimeForTrace    string                         `mapstructure:"maxWaitTimeForTrace"`
 }
 
 func LoadConfig(file string) (*Config, error) {

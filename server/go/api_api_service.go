@@ -51,19 +51,21 @@ type TestExecutor interface {
 // This service should implement the business logic for every endpoint for the ApiApi API.
 // Include any external packages or services that will be required by this service.
 type ApiApiService struct {
-	traceDB  tracedb.TraceDB
-	testDB   TestDB
-	executor TestExecutor
-	rand     *rand.Rand
+	traceDB             tracedb.TraceDB
+	testDB              TestDB
+	executor            TestExecutor
+	rand                *rand.Rand
+	maxWaitTimeForTrace time.Duration
 }
 
 // NewApiApiService creates a default api service
-func NewApiApiService(traceDB tracedb.TraceDB, testDB TestDB, executor TestExecutor) ApiApiServicer {
+func NewApiApiService(traceDB tracedb.TraceDB, testDB TestDB, executor TestExecutor, maxWaitTimeForTrace time.Duration) ApiApiServicer {
 	return &ApiApiService{
-		traceDB:  traceDB,
-		testDB:   testDB,
-		executor: executor,
-		rand:     rand.New(rand.NewSource(time.Now().UnixNano())),
+		traceDB:             traceDB,
+		testDB:              testDB,
+		executor:            executor,
+		rand:                rand.New(rand.NewSource(time.Now().UnixNano())),
+		maxWaitTimeForTrace: maxWaitTimeForTrace,
 	}
 }
 
@@ -93,9 +95,10 @@ func (s *ApiApiService) GetTest(ctx context.Context, testid string) (ImplRespons
 	if test.ReferenceTestRunResult.TraceId != "" {
 		res := test.ReferenceTestRunResult
 		tr, err := s.traceDB.GetTraceByID(ctx, res.TraceId)
-		if err != nil {
-			return Response(http.StatusInternalServerError, err.Error()), err
+		if handledErr := s.handleGetTraceError(ctx, res, err); handledErr != nil {
+			return Response(http.StatusInternalServerError, handledErr.Error()), handledErr
 		}
+
 		sid, err := trace.SpanIDFromHex(res.SpanId)
 		if err != nil {
 			return Response(http.StatusInternalServerError, err.Error()), err
@@ -108,6 +111,33 @@ func (s *ApiApiService) GetTest(ctx context.Context, testid string) (ImplRespons
 		test.ReferenceTestRunResult.Trace = mapTrace(ttr)
 	}
 	return Response(200, test), nil
+}
+
+func (s *ApiApiService) handleGetTraceError(ctx context.Context, res TestRunResult, err error) error {
+	if err == nil {
+		return nil
+	}
+
+	var finalErr error
+
+	if errors.Is(err, tracedb.ErrTraceNotFound) {
+		if time.Since(res.CompletedAt) < s.maxWaitTimeForTrace {
+			return nil
+		}
+		finalErr = fmt.Errorf("timed out waiting for traces after %s", s.maxWaitTimeForTrace.String())
+	} else {
+		finalErr = fmt.Errorf("cannot fetch trace: %w", err)
+	}
+
+	res.State = TestRunStateFailed
+	res.LastErrorState = finalErr.Error()
+	if err := s.testDB.UpdateResult(ctx, &res); err != nil {
+		fmt.Printf("update result err: %s\n", err)
+		finalErr = err
+	}
+
+	return finalErr
+
 }
 
 // GetTests - Gets all tests
@@ -144,6 +174,7 @@ func (s *ApiApiService) TestsTestIdRunPost(ctx context.Context, testid string) (
 		CreatedAt: time.Now(),
 		TraceId:   tid.String(),
 		SpanId:    sid.String(),
+		State:     TestRunStateCreated,
 	}
 
 	err = s.testDB.CreateResult(ctx, testid, res)
@@ -156,14 +187,27 @@ func (s *ApiApiService) TestsTestIdRunPost(ctx context.Context, testid string) (
 		ctx, span := tracer.Start(ctx, "Execute Test")
 		defer span.End()
 
+		res.State = TestRunStateExecuting
+		err = s.testDB.UpdateResult(ctx, &res)
+		if err != nil {
+			fmt.Printf("update result err: %s\n", err)
+			return
+		}
+
 		fmt.Println("executing test")
 		resp, err := s.executor.Execute(&t, tid, sid)
 		if err != nil {
 			fmt.Printf("exec err: %s", err)
+			res.State = TestRunStateFailed
+			err = s.testDB.UpdateResult(ctx, &res)
+			if err != nil {
+				fmt.Printf("update result err: %s\n", err)
+			}
 			return
 		}
 		fmt.Println(resp)
 
+		res.State = TestRunStateAwaitingTrace
 		res.Response = resp.Response
 		res.CompletedAt = time.Now()
 		err = s.testDB.UpdateResult(ctx, &res)

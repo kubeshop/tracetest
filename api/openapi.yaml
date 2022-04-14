@@ -290,6 +290,13 @@ components:
           type: string
           description: parent span ID
           readOnly: true
+        state:
+          type: string
+          enum: [CREATED, EXECUTING, AWAITING_TRACE, FAILED, FINISHED, AWAITING_TEST_RESULTS]
+          description: Current execution state
+        lastErrorState:
+          type: string
+          description: Details of the cause for the last `FAILED` state
         createdAt:
           type: string
           format: date-time
@@ -307,7 +314,7 @@ components:
         assertionResult:
           type: array
           description: List of all tested span assertions
-          items: 
+          items:
             $ref: "#/components/schemas/AssertionResult"
     TestAssertionResult:
       type: object
@@ -413,7 +420,7 @@ components:
     SpanAssertionResult:
       type: object
       properties:
-        spanAssertionId:  
+        spanAssertionId:
           type: string
           description: ID
         spanId:
@@ -450,10 +457,10 @@ components:
           $ref: "#/components/schemas/HTTPAuth"
         proxy:
           type: object
-          description: TODO 
+          description: TODO
         certificate:
           type: object
-          description: TODO 
+          description: TODO
     HTTPAuth:
       type: object
       properties:
@@ -482,4 +489,3 @@ components:
           properties:
             token:
               type: string
-

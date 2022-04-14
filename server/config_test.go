@@ -13,7 +13,8 @@ func TestLoadConfig(t *testing.T) {
 	assert.NoError(t, err)
 
 	expected := &Config{
-		PostgresConnString: "host=postgres user=postgres password=postgres port=5432 sslmode=disable",
+		MaxWaitTimeForTrace: "1m",
+		PostgresConnString:  "host=postgres user=postgres password=postgres port=5432 sslmode=disable",
 		JaegerConnectionConfig: &configgrpc.GRPCClientSettings{
 			Endpoint:   "jaeger-query:16685",
 			TLSSetting: configtls.TLSClientSetting{Insecure: true},
@@ -27,7 +28,8 @@ func TestLoadConfigTempo(t *testing.T) {
 	assert.NoError(t, err)
 
 	expected := &Config{
-		PostgresConnString: "host=postgres user=postgres password=postgres port=5432 sslmode=disable",
+		MaxWaitTimeForTrace: "1m",
+		PostgresConnString:  "host=postgres user=postgres password=postgres port=5432 sslmode=disable",
 		TempoConnectionConfig: &configgrpc.GRPCClientSettings{
 			Endpoint:   "tempo:9095",
 			TLSSetting: configtls.TLSClientSetting{Insecure: true},

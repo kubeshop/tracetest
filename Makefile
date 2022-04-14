@@ -1,6 +1,7 @@
 
 server-generate:
 	openapi-generator-cli generate -i api/openapi.yaml -g go-server -o server/
+	cd server; pwd; go fmt ./...; cd ..
 
 init-submodule:
 	git submodule init
