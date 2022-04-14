@@ -137,3 +137,12 @@ export const runAssertionByTrace = (trace: ITrace, assertion: Assertion): Assert
     })),
   };
 };
+
+export const getEffectedSpansCount = (trace: ITrace, selectors: ItemSelector[] ) => {
+  if (selectors.length === 0 ) return 0;
+
+  const itemSelector = `[? ${buildConditionArray(selectors).join(' && ')}]`;
+  const spanList: Array<ResourceSpan> = search(trace, `resourceSpans|[]| ${itemSelector}`);
+
+  return spanList.length;
+};
