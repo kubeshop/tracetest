@@ -9,6 +9,7 @@
 
 <p align="center">
   <!--<a href="https://tracetest.io">Website</a>&nbsp;|&nbsp; -->
+  <a href="https://demo.tracetest.io">Live Demo</a>&nbsp;|&nbsp; 
   <a href="https://kubeshop.github.io/tracetest">Documentation</a>&nbsp;|&nbsp; 
   <a href="https://twitter.com/tracetest_io">Twitter</a>&nbsp;|&nbsp; 
   <a href="https://discord.gg/eBvEQRVyKX">Discord</a>&nbsp;|&nbsp; 
@@ -44,19 +45,23 @@ Once the test is built, it can be run automatically as part of a build process. 
 
 # System Diagram
 
-<img src="/assets/tracetest-diagram-01.png" height="600">
+<div style="text-align:center;"><img src="/assets/tracetest-diagram-01.png" height="600"></div>
 
 # Try the demo & give us feedback
 
-Wanna play with it? [Try the live demo!](https://demo.tracetest.io)
+Wanna play with it? <button name="button" onClick="https://demo.tracetest.io">Try out the live Tracetest demo!</button>
 
-Wanna help us? Give us feedback: [Discord](https://discord.gg/eBvEQRVyKX) or [Create an Issue](https://github.com/kubeshop/tracetest/issues/new/choose)
+We’re looking for feedback to help make Tracetest even better for developers, QA testers, and DevOPs. Please give us feedback on [Discord](https://discord.gg/eBvEQRVyKX) or [create an issue on Github](https://github.com/kubeshop/tracetest/issues/new/choose)
 
 # Getting Started
 
 Check out the [Installation](https://kubeshop.github.io/tracetest/installing/) and
 [Getting Started](https://kubeshop.github.io/tracetest/getting-started/) guides to set up Tracetest and
 run your first tests! It is still a 'work in progress' so please provide us with any and all [feedback](https://github.com/kubeshop/tracetest/issues/new/choose) - we live for input and will respond!
+
+Follow us on [Twitter at @tracetest_io](href="https://twitter.com/tracetest_io) for updates
+
+Give us a star on Github if you're interested in the project!
 
 # Documentation
 
