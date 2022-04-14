@@ -137,7 +137,7 @@ func mapTrace(tr *v1.TracesData) ApiV3SpansResponseChunk {
 				attributes := mapAttributes(sp.GetAttributes())
 
 				if sp.GetStartTimeUnixNano() != 0 && sp.GetEndTimeUnixNano() != 0 {
-					spanDuration := (sp.GetEndTimeUnixNano() - sp.GetStartTimeUnixNano()) / 1000 / 1000 // in milliseconds
+					spanDuration := (sp.GetEndTimeUnixNano() - sp.GetStartTimeUnixNano()) // in nanoseconds
 
 					attributes = append(attributes, V1KeyValue{
 						Key: "tracetest.span.duration",
