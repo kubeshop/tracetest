@@ -213,7 +213,7 @@ const CreateAssertionModal = ({testId, span, trace, open, onClose}: IProps) => {
     >
       <div style={{marginBottom: 8}}>
         <Typography.Text style={{marginRight: 8}}>Selectors</Typography.Text>
-        <Tooltip title="prompt text">
+        <Tooltip title="Pick the attributes that identify span.">
           <QuestionCircleOutlined style={{color: '#8C8C8C'}} />
         </Tooltip>
       </div>
@@ -226,7 +226,7 @@ const CreateAssertionModal = ({testId, span, trace, open, onClose}: IProps) => {
       />
       <div style={{marginTop: 24, marginBottom: 8}}>
         <Typography.Text style={{marginRight: 8}}>Span Assertions</Typography.Text>
-        <Tooltip title="prompt text">
+        <Tooltip title="Pick attributes to test against.">
           <QuestionCircleOutlined style={{color: '#8C8C8C'}} />
         </Tooltip>
       </div>
