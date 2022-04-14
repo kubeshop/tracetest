@@ -79,6 +79,29 @@ paths:
                 $ref: "#/components/schemas/Test"
         500:
           description: "problem with getting a test"
+    put:
+      tags:
+        - api
+      parameters:
+        - in: path
+          name: testId
+          schema:
+            type: string
+            format: uuid
+          required: true
+      summary: "update test"
+      description: "update test action"
+      operationId: updateTest
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Test"
+      responses:
+        204:
+          description: successful operation
+        500:
+          description: "problem with updating test"
   /tests/{testId}/run:
     post:
       tags:

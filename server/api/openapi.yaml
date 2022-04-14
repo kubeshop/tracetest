@@ -69,6 +69,31 @@ paths:
       summary: get test
       tags:
       - api
+    put:
+      description: update test action
+      operationId: updateTest
+      parameters:
+      - explode: false
+        in: path
+        name: testId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Test'
+      responses:
+        "204":
+          description: successful operation
+        "500":
+          description: problem with updating test
+      summary: update test
+      tags:
+      - api
   /tests/{testId}/run:
     post:
       description: run a particular test
