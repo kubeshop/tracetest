@@ -193,7 +193,22 @@ func mapTrace(tr *v1.TracesData) ApiV3SpansResponseChunk {
 	return res
 }
 
-func FixParent(tr *v1.TracesData, traceID, parentSpanID string) *v1.TracesData {
+func headersToKeyValueList(headers []HttpResponseHeaders) *v11.KeyValueList {
+	mapped := []*v11.KeyValue{}
+
+	for _, h := range headers {
+		mapped = append(mapped, &v11.KeyValue{
+			Key: h.Key,
+			Value: &v11.AnyValue{
+				Value: &v11.AnyValue_StringValue{h.Value},
+			},
+		})
+	}
+
+	return &v11.KeyValueList{Values: mapped}
+}
+
+func FixParent(tr *v1.TracesData, traceID, parentSpanID string, response HttpResponse) *v1.TracesData {
 	spans := make(map[string]*v1.Span)
 	for _, rs := range tr.ResourceSpans {
 		for _, ils := range rs.InstrumentationLibrarySpans {
@@ -213,9 +228,32 @@ func FixParent(tr *v1.TracesData, traceID, parentSpanID string) *v1.TracesData {
 			sp.ParentSpanId = []byte(parentSpanID)
 		}
 	}
+
+	attributes := []*v11.KeyValue{
+		{
+			Key: "tracetest.response.status",
+			Value: &v11.AnyValue{
+				Value: &v11.AnyValue_StringValue{strconv.FormatInt(int64(response.StatusCode), 10)},
+			},
+		},
+		{
+			Key: "tracetest.response.body",
+			Value: &v11.AnyValue{
+				Value: &v11.AnyValue_StringValue{response.Body},
+			},
+		},
+		{
+			Key: "tracetest.response.headers",
+			Value: &v11.AnyValue{
+				Value: &v11.AnyValue_KvlistValue{headersToKeyValueList(response.Headers)},
+			},
+		},
+	}
+
+	// this is the parent span
 	rs := &v1.ResourceSpans{
 		Resource: &res.Resource{
-			Attributes:             []*v11.KeyValue{},
+			Attributes:             attributes,
 			DroppedAttributesCount: 0,
 		},
 		InstrumentationLibrarySpans: []*v1.InstrumentationLibrarySpans{
@@ -225,7 +263,8 @@ func FixParent(tr *v1.TracesData, traceID, parentSpanID string) *v1.TracesData {
 					Version: "v1",
 				},
 				Spans: []*v1.Span{
-					{TraceId: []byte(traceID),
+					{
+						TraceId:      []byte(traceID),
 						SpanId:       []byte(parentSpanID),
 						ParentSpanId: nil,
 						Name:         "tracetest",
