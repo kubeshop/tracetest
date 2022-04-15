@@ -51,7 +51,7 @@ const ItemSelectorDropdown = ({span, trace, itemSelectors, onChangeItemSelector}
           <Checkbox
             style={{marginLeft: 8, marginRight: 8}}
             checked={itemSelectors.findIndex(el => el.propertyName.includes(tag.propertyName)) > -1}
-          />{' '}
+          />
           {`${tag.propertyName} (${tag.value})`}
         </span>
       ),
@@ -117,7 +117,7 @@ const effectedSpanMessage = (spanCount: number) => {
 
 const CreateAssertionModal = ({testId, span, trace, open, onClose}: IProps) => {
   const [assertionList, setAssertionList] = useState<Array<Partial<ISpanSelectorOption>>>(initialFormState);
-  const [itemSelectors, setItemSelectors] = useState<ItemSelector[]>([]);
+  const [itemSelectors, setItemSelectors] = useState<ItemSelector[]>(getSpanSignature(span.spanId, trace));
   const [createAssertion] = useCreateAssertionMutation();
   const attrs = jemsPath.search(trace, filterBySpanId(span.spanId));
   const effectedSpanCount = getEffectedSpansCount(trace, itemSelectors);
