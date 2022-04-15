@@ -22,12 +22,12 @@ type ApiApiRouter interface {
 	CreateTest(http.ResponseWriter, *http.Request)
 	GetAssertions(http.ResponseWriter, *http.Request)
 	GetTest(http.ResponseWriter, *http.Request)
+	GetTestResult(http.ResponseWriter, *http.Request)
+	GetTestResults(http.ResponseWriter, *http.Request)
 	GetTests(http.ResponseWriter, *http.Request)
-	TestsTestIdResultsGet(http.ResponseWriter, *http.Request)
-	TestsTestIdResultsResultIdGet(http.ResponseWriter, *http.Request)
-	TestsTestIdResultsResultIdPut(http.ResponseWriter, *http.Request)
-	TestsTestIdRunPost(http.ResponseWriter, *http.Request)
+	RunTest(http.ResponseWriter, *http.Request)
 	UpdateTest(http.ResponseWriter, *http.Request)
+	UpdateTestResult(http.ResponseWriter, *http.Request)
 }
 
 // ApiApiServicer defines the api actions for the ApiApi service
@@ -39,10 +39,10 @@ type ApiApiServicer interface {
 	CreateTest(context.Context, Test) (ImplResponse, error)
 	GetAssertions(context.Context, string) (ImplResponse, error)
 	GetTest(context.Context, string) (ImplResponse, error)
+	GetTestResult(context.Context, string, string) (ImplResponse, error)
+	GetTestResults(context.Context, string) (ImplResponse, error)
 	GetTests(context.Context) (ImplResponse, error)
-	TestsTestIdResultsGet(context.Context, string) (ImplResponse, error)
-	TestsTestIdResultsResultIdGet(context.Context, string, string) (ImplResponse, error)
-	TestsTestIdResultsResultIdPut(context.Context, string, string, TestAssertionResult) (ImplResponse, error)
-	TestsTestIdRunPost(context.Context, string) (ImplResponse, error)
+	RunTest(context.Context, string) (ImplResponse, error)
 	UpdateTest(context.Context, string, Test) (ImplResponse, error)
+	UpdateTestResult(context.Context, string, string, TestAssertionResult) (ImplResponse, error)
 }

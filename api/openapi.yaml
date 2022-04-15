@@ -115,6 +115,7 @@ paths:
           required: true
       summary: "run test"
       description: "run a particular test"
+      operationId: runTest
       responses:
         200:
           description: successful operation
@@ -142,6 +143,7 @@ paths:
           required: true
       summary: "get test result"
       description: "get a particular test result"
+      operationId: getTestResult
       responses:
         200:
           description: successful operation
@@ -167,6 +169,7 @@ paths:
           required: true
       summary: "update test result state"
       description: "update test result state for a particular test"
+      operationId: updateTestResult
       requestBody:
         content:
           application/json:
@@ -192,6 +195,7 @@ paths:
           required: true
       summary: "get the results for a test"
       description: "get the results from a particular test"
+      operationId: getTestResults
       responses:
         200:
           description: successful operation
