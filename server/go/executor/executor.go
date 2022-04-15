@@ -65,6 +65,8 @@ func (te *TestExecutor) Execute(test *openapi.Test, tid trace.TraceID, sid trace
 	var body io.Reader
 	if tReq.Body != "" {
 		body = bytes.NewBufferString(tReq.Body)
+		// Without this header, some servers will ignore the request body.
+		req.Header.Set("Content-Type", "application/json")
 	}
 	req, err := http.NewRequest(strings.ToUpper(tReq.Method), tReq.Url, body)
 	if err != nil {
