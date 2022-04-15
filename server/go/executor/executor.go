@@ -73,10 +73,6 @@ func (te *TestExecutor) Execute(test *openapi.Test, tid trace.TraceID, sid trace
 	for _, h := range tReq.Headers {
 		req.Header.Set(h.Key, h.Value)
 	}
-	if tReq.Body != "" {
-		// Without this header, some servers will ignore the request body.
-		req.Header.Set("Content-Type", "application/json")
-	}
 	switch test.ServiceUnderTest.Request.Auth.Type {
 	case "apiKey":
 
