@@ -1,4 +1,4 @@
-package testrunner_test
+package openapi_test
 
 import (
 	"context"
@@ -6,7 +6,6 @@ import (
 	"time"
 
 	openapi "github.com/kubeshop/tracetest/server/go"
-	"github.com/kubeshop/tracetest/server/testrunner"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -19,7 +18,7 @@ func Test_PersistentRunner(t *testing.T) {
 			TestId: "test",
 		}
 
-		f := setup(t)
+		f := runnerSetup(t)
 		f.expectSuccessExec(test)
 
 		f.run([]openapi.Test{test}, 10*time.Millisecond)
@@ -35,7 +34,7 @@ func Test_PersistentRunner(t *testing.T) {
 		test1 := openapi.Test{TestId: "test1"}
 		test2 := openapi.Test{TestId: "test2"}
 
-		f := setup(t)
+		f := runnerSetup(t)
 
 		f.expectSuccessExecLong(test1)
 		f.expectSuccessExec(test2)
@@ -65,13 +64,14 @@ var (
 	}
 )
 
-type fixture struct {
-	runner        testrunner.PersistentRunner
-	mockExecutor  *mockExecutor
-	mockResultsDB *mockResultsDB
+type runnerFixture struct {
+	runner          openapi.PersistentRunner
+	mockExecutor    *mockExecutor
+	mockResultsDB   *mockResultsDB
+	mockTracePoller *mockTracePoller
 }
 
-func (f fixture) run(tests []openapi.Test, ttl time.Duration) {
+func (f runnerFixture) run(tests []openapi.Test, ttl time.Duration) {
 	f.runner.Start(2)
 	time.Sleep(10 * time.Millisecond)
 	for _, test := range tests {
@@ -81,28 +81,29 @@ func (f fixture) run(tests []openapi.Test, ttl time.Duration) {
 	f.runner.Stop()
 }
 
-func (f fixture) expectSuccessExecLong(test openapi.Test) {
+func (f runnerFixture) expectSuccessExecLong(test openapi.Test) {
 	f.mockExecutor.expectExecuteTestLong(test)
 	f.expectSuccessResultPersist(test)
 }
 
-func (f fixture) expectSuccessExec(test openapi.Test) {
+func (f runnerFixture) expectSuccessExec(test openapi.Test) {
 	f.mockExecutor.expectExecuteTest(test)
 	f.expectSuccessResultPersist(test)
 }
 
-func (f fixture) expectSuccessResultPersist(test openapi.Test) {
+func (f runnerFixture) expectSuccessResultPersist(test openapi.Test) {
 	f.mockResultsDB.expectCreateResult(test)
-	f.mockResultsDB.expectUpdateResultState(test, testrunner.TestRunStateExecuting)
-	f.mockResultsDB.expectUpdateResultState(test, testrunner.TestRunStateAwaitingTrace)
+	f.mockResultsDB.expectUpdateResultState(test, openapi.TestRunStateExecuting)
+	f.mockResultsDB.expectUpdateResultState(test, openapi.TestRunStateAwaitingTrace)
+	f.mockTracePoller.expectPoll(test)
 }
 
-func (f fixture) assert(t *testing.T) {
+func (f runnerFixture) assert(t *testing.T) {
 	f.mockExecutor.AssertExpectations(t)
 	f.mockResultsDB.AssertExpectations(t)
 }
 
-func setup(t *testing.T) fixture {
+func runnerSetup(t *testing.T) runnerFixture {
 	me := new(mockExecutor)
 	me.t = t
 	me.Test(t)
@@ -110,10 +111,15 @@ func setup(t *testing.T) fixture {
 	mr := new(mockResultsDB)
 	mr.t = t
 	mr.Test(t)
-	return fixture{
-		runner:        testrunner.NewPersistentRunner(me, mr),
-		mockExecutor:  me,
-		mockResultsDB: mr,
+
+	mtp := new(mockTracePoller)
+	mtp.t = t
+	mtp.Test(t)
+	return runnerFixture{
+		runner:          openapi.NewPersistentRunner(me, mr, mtp),
+		mockExecutor:    me,
+		mockResultsDB:   mr,
+		mockTracePoller: mtp,
 	}
 }
 
@@ -147,7 +153,7 @@ type mockResultsDB struct {
 	results map[string]openapi.TestRunResult
 }
 
-func (m *mockResultsDB) CreateResult(ctx context.Context, res *openapi.TestRunResult) error {
+func (m *mockResultsDB) CreateResult(ctx context.Context, testID string, res *openapi.TestRunResult) error {
 	args := m.Called(res.TestId)
 	if m.results == nil {
 		m.results = map[string]openapi.TestRunResult{}
@@ -179,4 +185,18 @@ func (m *mockResultsDB) expectUpdateResultState(test openapi.Test, expectedState
 	return m.
 		On("UpdateResult", test.TestId, expectedState).
 		Return(noError)
+}
+
+type mockTracePoller struct {
+	mock.Mock
+	t *testing.T
+}
+
+func (m *mockTracePoller) Poll(_ context.Context, res openapi.TestRunResult) {
+	m.Called(res.TestId)
+}
+
+func (m *mockTracePoller) expectPoll(test openapi.Test) *mock.Call {
+	return m.
+		On("Poll", test.TestId)
 }

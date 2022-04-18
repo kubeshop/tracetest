@@ -62,8 +62,8 @@ func TestExecuteGet(t *testing.T) {
 	resp, err := ex.Execute(test, tid, sid)
 	assert.NoError(t, err)
 
-	assert.Equal(t, int32(200), resp.Response.StatusCode)
-	assert.Equal(t, "OK", resp.Response.Body)
+	assert.Equal(t, int32(200), resp.StatusCode)
+	assert.Equal(t, "OK", resp.Body)
 }
 
 func TestExecutePost(t *testing.T) {
@@ -115,8 +115,8 @@ func TestExecutePost(t *testing.T) {
 	resp, err := ex.Execute(test, tid, sid)
 	assert.NoError(t, err)
 
-	assert.Equal(t, int32(200), resp.Response.StatusCode)
-	assert.Equal(t, "OK", resp.Response.Body)
+	assert.Equal(t, int32(200), resp.StatusCode)
+	assert.Equal(t, "OK", resp.Body)
 }
 
 func TestExecutePostWithApiKeyAuth(t *testing.T) {
@@ -182,8 +182,8 @@ func TestExecutePostWithApiKeyAuth(t *testing.T) {
 	resp, err := ex.Execute(test, tid, sid)
 	assert.NoError(t, err)
 
-	assert.Equal(t, int32(200), resp.Response.StatusCode)
-	assert.Equal(t, "OK", resp.Response.Body)
+	assert.Equal(t, int32(200), resp.StatusCode)
+	assert.Equal(t, "OK", resp.Body)
 }
 
 func TestExecutePostWithBasicAuth(t *testing.T) {
@@ -248,8 +248,8 @@ func TestExecutePostWithBasicAuth(t *testing.T) {
 	resp, err := ex.Execute(test, tid, sid)
 	assert.NoError(t, err)
 
-	assert.Equal(t, int32(200), resp.Response.StatusCode)
-	assert.Equal(t, "OK", resp.Response.Body)
+	assert.Equal(t, int32(200), resp.StatusCode)
+	assert.Equal(t, "OK", resp.Body)
 }
 
 func TestExecutePostWithBearerAuth(t *testing.T) {
@@ -313,6 +313,6 @@ func TestExecutePostWithBearerAuth(t *testing.T) {
 	resp, err := ex.Execute(test, tid, sid)
 	assert.NoError(t, err)
 
-	assert.Equal(t, int32(200), resp.Response.StatusCode)
-	assert.Equal(t, "OK", resp.Response.Body)
+	assert.Equal(t, int32(200), resp.StatusCode)
+	assert.Equal(t, "OK", resp.Body)
 }

@@ -1,32 +1,35 @@
-package testrunner
+package openapi
 
 import (
 	"context"
 	"fmt"
 	"time"
 
-	openapi "github.com/kubeshop/tracetest/server/go"
 	"go.opentelemetry.io/otel/trace"
 )
 
+type Runner interface {
+	Run(context.Context, Test) (runID string)
+}
+
 type PersistentRunner interface {
-	Run(context.Context, openapi.Test)
-	Start(workers int)
-	Stop()
+	Runner
+	WorkerPool
 }
 
 type Executor interface {
-	Execute(*openapi.Test, trace.TraceID, trace.SpanID) (openapi.HttpResponse, error)
+	Execute(*Test, trace.TraceID, trace.SpanID) (HttpResponse, error)
 }
 
 type ResultDB interface {
-	CreateResult(ctx context.Context, res *openapi.TestRunResult) error
-	UpdateResult(ctx context.Context, res *openapi.TestRunResult) error
+	CreateResult(_ context.Context, testID string, _ *TestRunResult) error
+	ResultUpdater
 }
 
-func NewPersistentRunner(e Executor, resultDB ResultDB) PersistentRunner {
+func NewPersistentRunner(e Executor, resultDB ResultDB, tp TracePoller) PersistentRunner {
 	return persistentRunner{
 		executor:     e,
+		tp:           tp,
 		resultDB:     resultDB,
 		idGen:        NewRandGenerator(),
 		executeQueue: make(chan execReq, 5),
@@ -36,19 +39,18 @@ func NewPersistentRunner(e Executor, resultDB ResultDB) PersistentRunner {
 
 type persistentRunner struct {
 	executor Executor
+	tp       TracePoller
 	idGen    IDGenerator
 	resultDB ResultDB
-	// traceDB tracedb.TraceDB
 
 	executeQueue chan execReq
-
-	exit chan bool
+	exit         chan bool
 }
 
 type execReq struct {
 	ctx    context.Context
-	test   openapi.Test
-	result openapi.TestRunResult
+	test   Test
+	result TestRunResult
 }
 
 func (r persistentRunner) Start(workers int) {
@@ -73,21 +75,24 @@ func (r persistentRunner) Start(workers int) {
 		}()
 	}
 }
+
 func (r persistentRunner) Stop() {
 	fmt.Println("persistentRunner stopping")
 	r.exit <- true
 }
 
-func (r persistentRunner) Run(ctx context.Context, t openapi.Test) {
+func (r persistentRunner) Run(ctx context.Context, t Test) string {
 	result := r.newTestResult(t.TestId)
 	// TODO: handle error
-	_ = r.resultDB.CreateResult(ctx, &result)
+	_ = r.resultDB.CreateResult(ctx, result.TestId, &result)
 
 	r.executeQueue <- execReq{
 		ctx:    ctx,
 		test:   t,
 		result: result,
 	}
+
+	return result.ResultId
 }
 
 func (r persistentRunner) processExecQueue(job execReq) {
@@ -99,16 +104,18 @@ func (r persistentRunner) processExecQueue(job execReq) {
 	tid, _ := trace.TraceIDFromHex(result.TraceId)
 	sid, _ := trace.SpanIDFromHex(result.SpanId)
 
-	fmt.Println("Starting test", job.test.TestId)
 	response, err := r.executor.Execute(&job.test, tid, sid)
-	fmt.Println("Completed test", job.test.TestId)
 	result = r.handleExecutionResult(result, response, err)
 
 	// TODO: handle error
 	_ = r.resultDB.UpdateResult(job.ctx, &result)
+	if result.State == TestRunStateAwaitingTrace {
+		// start a new context
+		r.tp.Poll(context.Background(), result)
+	}
 }
 
-func (r persistentRunner) handleExecutionResult(result openapi.TestRunResult, resp openapi.HttpResponse, err error) openapi.TestRunResult {
+func (r persistentRunner) handleExecutionResult(result TestRunResult, resp HttpResponse, err error) TestRunResult {
 	result.CompletedAt = time.Now()
 	result.Response = resp
 	if err != nil {
@@ -120,9 +127,10 @@ func (r persistentRunner) handleExecutionResult(result openapi.TestRunResult, re
 	return result
 }
 
-func (r persistentRunner) newTestResult(testID string) openapi.TestRunResult {
-	return openapi.TestRunResult{
+func (r persistentRunner) newTestResult(testID string) TestRunResult {
+	return TestRunResult{
 		TestId:    testID,
+		ResultId:  r.idGen.UUID(),
 		TraceId:   r.idGen.TraceID().String(),
 		SpanId:    r.idGen.SpanID().String(),
 		CreatedAt: time.Now(),

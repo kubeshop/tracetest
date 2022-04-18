@@ -1,4 +1,4 @@
-package testrunner
+package openapi
 
 import (
 	"math/rand"
