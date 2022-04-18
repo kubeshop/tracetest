@@ -115,31 +115,38 @@ func (s *ApiApiService) GetTest(ctx context.Context, testid string) (ImplRespons
 	}
 
 	if test.ReferenceTestRunResult.TraceId != "" {
-		res := test.ReferenceTestRunResult
-		tr, err := s.traceDB.GetTraceByID(ctx, res.TraceId)
-		if handledErr := s.handleGetTraceError(ctx, res, err); handledErr != nil {
-			return Response(http.StatusInternalServerError, handledErr.Error()), handledErr
-		}
-		res.State = TestRunStateAwaitingTestResults
-		if err := s.testDB.UpdateResult(ctx, &res); err != nil {
-			fmt.Printf("update result err: %s\n", err)
-			return Response(http.StatusInternalServerError, err.Error()), err
-		}
-
-		sid, err := trace.SpanIDFromHex(res.SpanId)
+		res, err := s.processTrace(ctx, test.ReferenceTestRunResult)
 		if err != nil {
 			return Response(http.StatusInternalServerError, err.Error()), err
 		}
-		tid, err := trace.TraceIDFromHex(res.TraceId)
-		if err != nil {
-			return Response(http.StatusInternalServerError, err.Error()), err
-		}
-		ttr := FixParent(tr, string(tid[:]), string(sid[:]), res.Response)
-		res.Trace = mapTrace(ttr)
-
 		test.ReferenceTestRunResult = res
 	}
 	return Response(200, test), nil
+}
+
+func (s *ApiApiService) processTrace(ctx context.Context, res TestRunResult) (TestRunResult, error) {
+	tr, err := s.traceDB.GetTraceByID(ctx, res.TraceId)
+	if handledErr := s.handleGetTraceError(ctx, res, err); handledErr != nil {
+		return TestRunResult{}, handledErr
+	}
+	res.State = TestRunStateAwaitingTestResults
+	if err := s.testDB.UpdateResult(ctx, &res); err != nil {
+		fmt.Printf("update result err: %s\n", err)
+		return TestRunResult{}, err
+	}
+
+	sid, err := trace.SpanIDFromHex(res.SpanId)
+	if err != nil {
+		return TestRunResult{}, err
+	}
+	tid, err := trace.TraceIDFromHex(res.TraceId)
+	if err != nil {
+		return TestRunResult{}, err
+	}
+	ttr := FixParent(tr, string(tid[:]), string(sid[:]), res.Response)
+	res.Trace = mapTrace(ttr)
+
+	return res, nil
 }
 
 func (s *ApiApiService) handleGetTraceError(ctx context.Context, res TestRunResult, err error) error {
@@ -267,6 +274,14 @@ func (s *ApiApiService) TestsTestIdResultsGet(ctx context.Context, id string) (I
 	res, err := s.testDB.GetResultsByTestID(ctx, id)
 	if err != nil {
 		return Response(http.StatusInternalServerError, err.Error()), err
+	}
+
+	for i, r := range res {
+		updated, err := s.processTrace(ctx, r)
+		if err != nil {
+			return Response(http.StatusInternalServerError, err.Error()), err
+		}
+		res[i] = updated
 	}
 
 	return Response(http.StatusOK, res), nil
