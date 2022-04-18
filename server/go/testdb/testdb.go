@@ -170,6 +170,13 @@ func (td *TestDB) GetTests(ctx context.Context) ([]openapi.Test, error) {
 }
 
 func (td *TestDB) CreateAssertion(ctx context.Context, testid string, assertion *openapi.Assertion) (string, error) {
+	for index := range assertion.SpanAssertions {
+		spanAssertion := &assertion.SpanAssertions[index]
+		if spanAssertion.SpanAssertionId == "" {
+			spanAssertion.SpanAssertionId = uuid.New().String()
+		}
+	}
+
 	stmt, err := td.db.Prepare("INSERT INTO assertions(id, test_id, assertion) VALUES( $1, $2, $3 )")
 	if err != nil {
 		return "", fmt.Errorf("sql prepare: %w", err)
