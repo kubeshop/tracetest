@@ -16,7 +16,6 @@ import * as S from './Trace.styled';
 
 import SpanDetail from './SpanDetail';
 import TestResults from './TestResults';
-import {DEFAULT_SPAN_NAME} from '../../lib/Constants';
 
 const Grid = styled.div`
   display: grid;
@@ -46,7 +45,7 @@ const Trace = ({test, testResultId}: {test: Test; testResultId: string}) => {
         ?.map(i => i.instrumentationLibrarySpans.map((el: any) => el.spans))
         ?.flat(2) || [];
 
-    const defaultSpan = spanList.find(({name, parentSpanId}) => name === DEFAULT_SPAN_NAME && !parentSpanId);
+    const defaultSpan = spanList.find(({parentSpanId}) => !parentSpanId);
 
     return spanList.reduce<TSpanMap>((acc, span) => {
       if (span.spanId === defaultSpan?.spanId) return acc;
