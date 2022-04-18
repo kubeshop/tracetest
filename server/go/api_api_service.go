@@ -80,6 +80,28 @@ func (s *ApiApiService) CreateTest(ctx context.Context, test Test) (ImplResponse
 	return Response(200, test), nil
 }
 
+// UpdateTest - Create new test
+func (s *ApiApiService) UpdateTest(ctx context.Context, testid string, updated Test) (ImplResponse, error) {
+	test, err := s.testDB.GetTest(ctx, testid)
+	if err != nil {
+		switch {
+		case errors.Is(ErrNotFound, err):
+			return Response(http.StatusNotFound, err.Error()), err
+		default:
+			return Response(http.StatusInternalServerError, err.Error()), err
+		}
+	}
+
+	updated.TestId = test.TestId
+
+	err = s.testDB.UpdateTest(ctx, &updated)
+	if err != nil {
+		return Response(http.StatusInternalServerError, err.Error()), err
+	}
+
+	return Response(204, nil), nil
+}
+
 // GetTest - Get a test
 func (s *ApiApiService) GetTest(ctx context.Context, testid string) (ImplResponse, error) {
 	test, err := s.testDB.GetTest(ctx, testid)

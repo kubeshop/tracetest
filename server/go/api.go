@@ -27,6 +27,7 @@ type ApiApiRouter interface {
 	TestsTestIdResultsResultIdGet(http.ResponseWriter, *http.Request)
 	TestsTestIdResultsResultIdPut(http.ResponseWriter, *http.Request)
 	TestsTestIdRunPost(http.ResponseWriter, *http.Request)
+	UpdateTest(http.ResponseWriter, *http.Request)
 }
 
 // ApiApiServicer defines the api actions for the ApiApi service
@@ -43,4 +44,5 @@ type ApiApiServicer interface {
 	TestsTestIdResultsResultIdGet(context.Context, string, string) (ImplResponse, error)
 	TestsTestIdResultsResultIdPut(context.Context, string, string, TestAssertionResult) (ImplResponse, error)
 	TestsTestIdRunPost(context.Context, string) (ImplResponse, error)
+	UpdateTest(context.Context, string, Test) (ImplResponse, error)
 }

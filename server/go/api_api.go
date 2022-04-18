@@ -104,6 +104,12 @@ func (c *ApiApiController) Routes() Routes {
 			"/api/tests/{testId}/run",
 			c.TestsTestIdRunPost,
 		},
+		{
+			"UpdateTest",
+			strings.ToUpper("Put"),
+			"/api/tests/{testId}",
+			c.UpdateTest,
+		},
 	}
 }
 
@@ -272,6 +278,33 @@ func (c *ApiApiController) TestsTestIdRunPost(w http.ResponseWriter, r *http.Req
 	testIdParam := params["testId"]
 
 	result, err := c.service.TestsTestIdRunPost(r.Context(), testIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// UpdateTest - update test
+func (c *ApiApiController) UpdateTest(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	testIdParam := params["testId"]
+
+	testParam := Test{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&testParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertTestRequired(testParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.UpdateTest(r.Context(), testIdParam, testParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
