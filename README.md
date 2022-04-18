@@ -35,9 +35,10 @@
 
 # Overview
 
-Testing and debugging software built on Micro-Services architectures is hard. Lots of services, multiple teams, written in various languages, with many different technologies involved. How are you expected to write tests across all this complexity?
+Testing and debugging software built on Micro-Services architectures is not an easy task. Multiple services, different teams, various programming languages and  technologies involved. We would like to help you write tests across all this complexity.
 
-Tracetest makes it easy. Pick an API to test. Tracetest uses your tracing infrastructure to trace this API call. This trace is the blueprint of your system, showing all the steps. Use this blueprint to graphically define assertions on different services throughout the trace, checking return statuses, data, or even execution times of systems.
+Key Value Prop = Tracetest uses Open Telemetery tracing infrastructure to ....
+Tracetest makes it easy. For example, pick an API to test. Get its trace. This trace is the blueprint of your system (or of that API?}, showing all the steps. Use this blueprint to graphically define assertions through Tracetest UI on different services throughout the trace, checking return statuses, data, or even execution times of a system (system or API).
 
 ![Assertions](/assets/assertions.png)
 
@@ -58,6 +59,8 @@ We’re looking for feedback to help make Tracetest even better for developers, 
 Check out the [Installation](https://kubeshop.github.io/tracetest/installing/) and
 [Getting Started](https://kubeshop.github.io/tracetest/getting-started/) guides to set up Tracetest and
 run your first tests! It is still a 'work in progress' so please provide us with any and all [feedback](https://github.com/kubeshop/tracetest/issues/new/choose) - we live for input and will respond!
+
+We are in the our early days with the project and need your help. Have an idea to improve it? Please Create an issue here or join our community on Discord (link).
 
 Follow us on [Twitter at @tracetest_io](https://twitter.com/tracetest_io) for updates
 
