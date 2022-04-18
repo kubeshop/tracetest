@@ -2,7 +2,6 @@ package testrunner_test
 
 import (
 	"context"
-	"fmt"
 	"testing"
 	"time"
 
@@ -49,7 +48,6 @@ func Test_PersistentRunner(t *testing.T) {
 		result2 := f.mockResultsDB.results[test2.TestId]
 		require.NotNil(t, result2)
 
-		fmt.Println("****", result1.CompletedAt.Format(time.RFC3339), result2.CompletedAt.Format(time.RFC3339))
 		assert.True(t, result1.CompletedAt.UnixNano() > result2.CompletedAt.UnixNano(), "test1 did not complete after test2")
 	})
 
