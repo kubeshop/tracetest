@@ -120,6 +120,11 @@ func (s *ApiApiService) GetTest(ctx context.Context, testid string) (ImplRespons
 		if handledErr := s.handleGetTraceError(ctx, res, err); handledErr != nil {
 			return Response(http.StatusInternalServerError, handledErr.Error()), handledErr
 		}
+		res.State = TestRunStateAwaitingTestResults
+		if err := s.testDB.UpdateResult(ctx, &res); err != nil {
+			fmt.Printf("update result err: %s\n", err)
+			return Response(http.StatusInternalServerError, err.Error()), err
+		}
 
 		sid, err := trace.SpanIDFromHex(res.SpanId)
 		if err != nil {
@@ -130,7 +135,9 @@ func (s *ApiApiService) GetTest(ctx context.Context, testid string) (ImplRespons
 			return Response(http.StatusInternalServerError, err.Error()), err
 		}
 		ttr := FixParent(tr, string(tid[:]), string(sid[:]), res.Response)
-		test.ReferenceTestRunResult.Trace = mapTrace(ttr)
+		res.Trace = mapTrace(ttr)
+
+		test.ReferenceTestRunResult = res
 	}
 	return Response(200, test), nil
 }
