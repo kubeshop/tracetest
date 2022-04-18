@@ -49,6 +49,7 @@ const TraceNode = ({id, data, selected, ...rest}: IPropsTraceNode) => {
 };
 
 const TraceDiagram = ({spanMap, selectedSpan, onSelectSpan}: IPropsTraceDiagram): JSX.Element => {
+
   const {
     dag,
     layout: {height},
