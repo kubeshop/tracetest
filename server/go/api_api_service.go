@@ -129,7 +129,7 @@ func (s *ApiApiService) GetTest(ctx context.Context, testid string) (ImplRespons
 		if err != nil {
 			return Response(http.StatusInternalServerError, err.Error()), err
 		}
-		ttr := FixParent(tr, string(tid[:]), string(sid[:]))
+		ttr := FixParent(tr, string(tid[:]), string(sid[:]), res.Response)
 		test.ReferenceTestRunResult.Trace = mapTrace(ttr)
 	}
 	return Response(200, test), nil
@@ -282,7 +282,7 @@ func (s *ApiApiService) TestsTestIdResultsResultIdGet(ctx context.Context, testi
 		if err != nil {
 			return Response(http.StatusInternalServerError, err.Error()), err
 		}
-		ttr := FixParent(tr, string(tid[:]), string(sid[:]))
+		ttr := FixParent(tr, string(tid[:]), string(sid[:]), res.Response)
 		res.Trace = mapTrace(ttr)
 	}
 	return Response(http.StatusOK, *res), nil
