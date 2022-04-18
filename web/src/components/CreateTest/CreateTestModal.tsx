@@ -1,9 +1,10 @@
 import {useRef} from 'react';
 import {Modal, Form, Input, Button, Select, Checkbox} from 'antd';
 import {DeleteOutlined} from '@ant-design/icons';
-import {useCreateTestMutation} from 'services/TestService';
+import {useCreateTestMutation, useRunTestMutation} from 'services/TestService';
 import {HTTP_METHOD} from 'types';
 import './CreateTest.css';
+import {useNavigate} from 'react-router-dom';
 
 interface IProps {
   visible: boolean;
@@ -11,20 +12,26 @@ interface IProps {
 }
 
 const CreateTestModal = ({visible, onClose}: IProps): JSX.Element => {
-  const [createTest, result] = useCreateTestMutation();
+  const navigate = useNavigate();
+  const [createTest, {isLoading: isLoadingCreateTest}] = useCreateTestMutation();
+  const [runTest, {isLoading: isLoadingRunTest}] = useRunTestMutation();
+
   const [form] = Form.useForm();
   const touchedHttpHeadersRef = useRef<{[key: string]: Boolean}>({});
-  const onFinish = (values: any) => {
+
+  const onFinish = async (values: any) => {
     const headers = values.headersList
       .filter((i: {checked: boolean}) => i.checked)
       .map(({key, value}: {key: string; value: string}) => ({key, value}));
-    createTest({
+    const newTest = await createTest({
       name: values.name,
       serviceUnderTest: {
         request: {url: values.url, method: values.method, body: values.body, headers},
       },
-    });
+    }).unwrap();
+    const newTestRunResult = await runTest(newTest.testId).unwrap();
     onClose();
+    navigate(`/test/${newTest.testId}`, {state: {testRun: {resultId: newTestRunResult.testRunId}}});
   };
 
   const onFinishFailed = () => {};
@@ -36,8 +43,8 @@ const CreateTestModal = ({visible, onClose}: IProps): JSX.Element => {
           Cancel
         </Button>
 
-        <Button type="primary" form="newTest" htmlType="submit">
-          Create Test
+        <Button type="primary" form="newTest" htmlType="submit" loading={isLoadingCreateTest || isLoadingRunTest}>
+          Run Test
         </Button>
       </>
     );
