@@ -179,7 +179,7 @@ func (s *ApiApiService) GetTests(ctx context.Context) (ImplResponse, error) {
 	return Response(200, tests), nil
 }
 
-func (s *ApiApiService) TestsTestIdRunPost(ctx context.Context, testid string) (ImplResponse, error) {
+func (s *ApiApiService) RunTest(ctx context.Context, testid string) (ImplResponse, error) {
 	t, err := s.testDB.GetTest(ctx, testid)
 	if err != nil {
 		switch {
@@ -262,8 +262,8 @@ func (s *ApiApiService) TestsTestIdRunPost(ctx context.Context, testid string) (
 	}), nil
 }
 
-// TestsIdResultsGet -
-func (s *ApiApiService) TestsTestIdResultsGet(ctx context.Context, id string) (ImplResponse, error) {
+// GetTestResults -
+func (s *ApiApiService) GetTestResults(ctx context.Context, id string) (ImplResponse, error) {
 	res, err := s.testDB.GetResultsByTestID(ctx, id)
 	if err != nil {
 		return Response(http.StatusInternalServerError, err.Error()), err
@@ -273,8 +273,8 @@ func (s *ApiApiService) TestsTestIdResultsGet(ctx context.Context, id string) (I
 
 }
 
-// TestsTestidResultsIdGet -
-func (s *ApiApiService) TestsTestIdResultsResultIdGet(ctx context.Context, testid string, id string) (ImplResponse, error) {
+// GetTestResult -
+func (s *ApiApiService) GetTestResult(ctx context.Context, testid string, id string) (ImplResponse, error) {
 	res, err := s.testDB.GetResult(ctx, id)
 	if err != nil {
 		return Response(http.StatusInternalServerError, err.Error()), err
@@ -295,7 +295,7 @@ func (s *ApiApiService) TestsTestIdResultsResultIdGet(ctx context.Context, testi
 	return Response(http.StatusOK, *res), nil
 }
 
-func (s *ApiApiService) TestsTestIdResultsResultIdPut(ctx context.Context, testid string, id string, testRunResult TestAssertionResult) (ImplResponse, error) {
+func (s *ApiApiService) UpdateTestResult(ctx context.Context, testid string, id string, testRunResult TestAssertionResult) (ImplResponse, error) {
 	testResult, err := s.testDB.GetResult(ctx, id)
 	if err != nil {
 		return Response(http.StatusInternalServerError, err.Error()), err

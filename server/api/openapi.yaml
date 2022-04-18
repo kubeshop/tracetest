@@ -97,6 +97,7 @@ paths:
   /tests/{testId}/run:
     post:
       description: run a particular test
+      operationId: runTest
       parameters:
       - explode: false
         in: path
@@ -119,6 +120,7 @@ paths:
   /tests/{testId}/results/{resultId}:
     get:
       description: get a particular test result
+      operationId: getTestResult
       parameters:
       - explode: false
         in: path
@@ -148,6 +150,7 @@ paths:
       - api
     put:
       description: update test result state for a particular test
+      operationId: updateTestResult
       parameters:
       - explode: false
         in: path
@@ -183,6 +186,7 @@ paths:
   /tests/{testId}/results:
     get:
       description: get the results from a particular test
+      operationId: getTestResults
       parameters:
       - explode: false
         in: path

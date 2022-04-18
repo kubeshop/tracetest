@@ -75,40 +75,40 @@ func (c *ApiApiController) Routes() Routes {
 			c.GetTest,
 		},
 		{
+			"GetTestResult",
+			strings.ToUpper("Get"),
+			"/api/tests/{testId}/results/{resultId}",
+			c.GetTestResult,
+		},
+		{
+			"GetTestResults",
+			strings.ToUpper("Get"),
+			"/api/tests/{testId}/results",
+			c.GetTestResults,
+		},
+		{
 			"GetTests",
 			strings.ToUpper("Get"),
 			"/api/tests",
 			c.GetTests,
 		},
 		{
-			"TestsTestIdResultsGet",
-			strings.ToUpper("Get"),
-			"/api/tests/{testId}/results",
-			c.TestsTestIdResultsGet,
-		},
-		{
-			"TestsTestIdResultsResultIdGet",
-			strings.ToUpper("Get"),
-			"/api/tests/{testId}/results/{resultId}",
-			c.TestsTestIdResultsResultIdGet,
-		},
-		{
-			"TestsTestIdResultsResultIdPut",
-			strings.ToUpper("Put"),
-			"/api/tests/{testId}/results/{resultId}",
-			c.TestsTestIdResultsResultIdPut,
-		},
-		{
-			"TestsTestIdRunPost",
+			"RunTest",
 			strings.ToUpper("Post"),
 			"/api/tests/{testId}/run",
-			c.TestsTestIdRunPost,
+			c.RunTest,
 		},
 		{
 			"UpdateTest",
 			strings.ToUpper("Put"),
 			"/api/tests/{testId}",
 			c.UpdateTest,
+		},
+		{
+			"UpdateTestResult",
+			strings.ToUpper("Put"),
+			"/api/tests/{testId}/results/{resultId}",
+			c.UpdateTestResult,
 		},
 	}
 }
@@ -196,6 +196,40 @@ func (c *ApiApiController) GetTest(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// GetTestResult - get test result
+func (c *ApiApiController) GetTestResult(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	testIdParam := params["testId"]
+
+	resultIdParam := params["resultId"]
+
+	result, err := c.service.GetTestResult(r.Context(), testIdParam, resultIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// GetTestResults - get the results for a test
+func (c *ApiApiController) GetTestResults(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	testIdParam := params["testId"]
+
+	result, err := c.service.GetTestResults(r.Context(), testIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
 // GetTests - Get tests
 func (c *ApiApiController) GetTests(w http.ResponseWriter, r *http.Request) {
 	result, err := c.service.GetTests(r.Context())
@@ -209,75 +243,12 @@ func (c *ApiApiController) GetTests(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// TestsTestIdResultsGet - get the results for a test
-func (c *ApiApiController) TestsTestIdResultsGet(w http.ResponseWriter, r *http.Request) {
+// RunTest - run test
+func (c *ApiApiController) RunTest(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	testIdParam := params["testId"]
 
-	result, err := c.service.TestsTestIdResultsGet(r.Context(), testIdParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
-// TestsTestIdResultsResultIdGet - get test result
-func (c *ApiApiController) TestsTestIdResultsResultIdGet(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	testIdParam := params["testId"]
-
-	resultIdParam := params["resultId"]
-
-	result, err := c.service.TestsTestIdResultsResultIdGet(r.Context(), testIdParam, resultIdParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
-// TestsTestIdResultsResultIdPut - update test result state
-func (c *ApiApiController) TestsTestIdResultsResultIdPut(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	testIdParam := params["testId"]
-
-	resultIdParam := params["resultId"]
-
-	testAssertionResultParam := TestAssertionResult{}
-	d := json.NewDecoder(r.Body)
-	d.DisallowUnknownFields()
-	if err := d.Decode(&testAssertionResultParam); err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-	if err := AssertTestAssertionResultRequired(testAssertionResultParam); err != nil {
-		c.errorHandler(w, r, err, nil)
-		return
-	}
-	result, err := c.service.TestsTestIdResultsResultIdPut(r.Context(), testIdParam, resultIdParam, testAssertionResultParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
-// TestsTestIdRunPost - run test
-func (c *ApiApiController) TestsTestIdRunPost(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	testIdParam := params["testId"]
-
-	result, err := c.service.TestsTestIdRunPost(r.Context(), testIdParam)
+	result, err := c.service.RunTest(r.Context(), testIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -305,6 +276,35 @@ func (c *ApiApiController) UpdateTest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	result, err := c.service.UpdateTest(r.Context(), testIdParam, testParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// UpdateTestResult - update test result state
+func (c *ApiApiController) UpdateTestResult(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	testIdParam := params["testId"]
+
+	resultIdParam := params["resultId"]
+
+	testAssertionResultParam := TestAssertionResult{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&testAssertionResultParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertTestAssertionResultRequired(testAssertionResultParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.UpdateTestResult(r.Context(), testIdParam, resultIdParam, testAssertionResultParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
