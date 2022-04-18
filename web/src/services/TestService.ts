@@ -16,7 +16,7 @@ export const testAPI = createApi({
       }),
       invalidatesTags: [{type: 'Test', id: 'LIST'}],
     }),
-    runTest: build.mutation<{id: string}, string>({
+    runTest: build.mutation<{testRunId: string}, string>({
       query: testId => ({
         url: `/tests/${testId}/run`,
         method: 'POST',

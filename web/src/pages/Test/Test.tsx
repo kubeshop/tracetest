@@ -1,9 +1,9 @@
-import {useRef, useState} from 'react';
-import { ReactFlowProvider } from 'react-flow-renderer';
+import {useEffect, useRef, useState} from 'react';
+import {ReactFlowProvider} from 'react-flow-renderer';
 import {Button, Tabs} from 'antd';
 import Title from 'antd/lib/typography/Title';
 import {CloseOutlined, ArrowLeftOutlined} from '@ant-design/icons';
-import {useNavigate, useParams} from 'react-router-dom';
+import {useLocation, useNavigate, useParams} from 'react-router-dom';
 
 import {ITestResult} from 'types';
 import {useGetTestByIdQuery} from 'services/TestService';
@@ -14,6 +14,9 @@ import Assertions from './Assertions';
 import * as S from './Test.styled';
 import TestDetails from './TestDetails';
 
+interface ITestRouteState {
+  testRun: ITestResult;
+}
 interface TracePane {
   key: string;
   title: string;
@@ -22,11 +25,18 @@ interface TracePane {
 
 const TestPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const {id} = useParams();
   const newTabIndexRef = useRef<number>(2);
   const [tracePanes, setTracePanes] = useState<TracePane[]>([]);
   const [activeTabKey, setActiveTabKey] = useState<string>('1');
   const {data: test} = useGetTestByIdQuery(id as string);
+
+  useEffect(() => {
+    if ((location?.state as ITestRouteState)?.testRun && test) {
+      handleSelectTestResult((location.state as ITestRouteState).testRun);
+    }
+  }, [location, test]);
 
   const handleSelectTestResult = (result: ITestResult) => {
     newTabIndexRef.current += 1;
