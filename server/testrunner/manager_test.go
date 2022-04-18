@@ -14,7 +14,7 @@ import (
 )
 
 func Test_PersistentRunner(t *testing.T) {
-	t.Run("a test is executed", func(t *testing.T) {
+	t.Run("TestIsExecuted", func(t *testing.T) {
 		test := openapi.Test{
 			TestId: "test",
 		}
@@ -31,7 +31,7 @@ func Test_PersistentRunner(t *testing.T) {
 		f.assert(t)
 	})
 
-	t.Run("a long test does not block execution", func(t *testing.T) {
+	t.Run("TestsCanBeExecutedConcurrently", func(t *testing.T) {
 		test1 := openapi.Test{TestId: "test1"}
 		test2 := openapi.Test{TestId: "test2"}
 
