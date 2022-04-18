@@ -11,6 +11,8 @@ interface IProps {
   onClose: () => void;
 }
 
+const defaultHeaders = [{key: 'Content-Type', value: 'application/json', checked: true}];
+
 const CreateTestModal = ({visible, onClose}: IProps): JSX.Element => {
   const navigate = useNavigate();
   const [createTest, {isLoading: isLoadingCreateTest}] = useCreateTestMutation();
@@ -99,7 +101,7 @@ const CreateTestModal = ({visible, onClose}: IProps): JSX.Element => {
 
           <Form.Item label="Headers List" wrapperCol={{span: 24, offset: 0}}>
             <div style={{minHeight: 80}}>
-              <Form.List name="headersList" initialValue={[{}, {}, {}]}>
+              <Form.List name="headersList" initialValue={[...defaultHeaders, {}, {}]}>
                 {(fields, {add, remove}) => (
                   <>
                     {fields.map((field, index) => (
