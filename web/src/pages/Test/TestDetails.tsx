@@ -2,17 +2,17 @@ import {skipToken} from '@reduxjs/toolkit/dist/query';
 import {Button, Typography} from 'antd';
 import {FC, useCallback} from 'react';
 import {useGetTestResultsQuery, useRunTestMutation} from 'services/TestService';
-import {ITestResult, Test} from 'types';
+import {Test, TestRunResult} from 'types';
 import * as S from './Test.styled';
 import TestDetailsTable from './TestDetailsTable';
 
 type TTestDetailsProps = {
   test?: Test;
-  onSelectResult: (result: ITestResult) => void;
+  onSelectResult: (result: TestRunResult) => void;
 };
 
 const TestDetails: FC<TTestDetailsProps> = ({onSelectResult, test}) => {
-  const {testId, assertions = [], serviceUnderTest} = test || {};
+  const {testId, serviceUnderTest} = test || {};
 
   const {data: testResults = [], isLoading} = useGetTestResultsQuery(testId ?? skipToken, {
     pollingInterval: 5000,
@@ -31,12 +31,7 @@ const TestDetails: FC<TTestDetailsProps> = ({onSelectResult, test}) => {
           Run Test
         </Button>
       </S.TestDetailsHeader>
-      <TestDetailsTable
-        assertionList={assertions}
-        isLoading={isLoading}
-        onSelectResult={onSelectResult}
-        testResultList={testResults}
-      />
+      <TestDetailsTable isLoading={isLoading} onSelectResult={onSelectResult} testResultList={testResults} />
     </>
   );
 };

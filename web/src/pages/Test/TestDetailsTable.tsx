@@ -3,7 +3,7 @@ import {Badge, Dropdown, Menu, Table, Tooltip} from 'antd';
 import {differenceInSeconds} from 'date-fns';
 import {FC} from 'react';
 import CustomTable from '../../components/CustomTable';
-import {Assertion, ITestResult, TestState} from '../../types';
+import {AssertionResultList, TestRunResult, TestState} from '../../types';
 
 const BadgeStatusMap: Record<
   TestState,
@@ -36,15 +36,33 @@ const BadgeStatusMap: Record<
 };
 
 type TextRowProps = {
-  assertionList: Assertion[];
-  testResultList: ITestResult[];
+  testResultList: TestRunResult[];
   isLoading: boolean;
-  onSelectResult(result: ITestResult): void;
+  onSelectResult(result: TestRunResult): void;
 };
 
 const validStatusList = [TestState.FINISHED, TestState.AWAITING_TEST_RESULTS];
 
-const TextDetailsTable: FC<TextRowProps> = ({assertionList, isLoading, onSelectResult, testResultList}) => {
+const getTestResultCount = (assertionResultList: AssertionResultList, type: 'all' | 'passed' | 'failed' = 'all') => {
+  const spanAssertionList = assertionResultList.flatMap(({spanAssertionResults}) => spanAssertionResults);
+
+  if (type === 'all') return spanAssertionList.length;
+
+  return spanAssertionList.filter(({passed}) => {
+    switch (type) {
+      case 'failed': {
+        return !passed;
+      }
+
+      case 'passed':
+      default: {
+        return passed;
+      }
+    }
+  }).length;
+};
+
+const TextDetailsTable: FC<TextRowProps> = ({isLoading, onSelectResult, testResultList}) => {
   return (
     <CustomTable
       pagination={{pageSize: 10}}
@@ -54,7 +72,7 @@ const TextDetailsTable: FC<TextRowProps> = ({assertionList, isLoading, onSelectR
       onRow={record => {
         return {
           onClick: () => {
-            onSelectResult(record as ITestResult);
+            onSelectResult(record as TestRunResult);
           },
         };
       }}
@@ -72,7 +90,7 @@ const TextDetailsTable: FC<TextRowProps> = ({assertionList, isLoading, onSelectR
         title="Execution time"
         key="executionTime"
         width="10%"
-        render={(value, {createdAt, completedAt}: ITestResult) => {
+        render={(value, {createdAt, completedAt}: TestRunResult) => {
           if (!createdAt || !completedAt) return '';
           const executionTime = differenceInSeconds(new Date(createdAt), new Date(completedAt)) + 1;
 
@@ -81,9 +99,9 @@ const TextDetailsTable: FC<TextRowProps> = ({assertionList, isLoading, onSelectR
       />
       <Table.Column
         title="Status"
-        key="status"
+        key="state"
         width="20%"
-        render={(value, {state}: ITestResult) => {
+        render={(value, {state}: TestRunResult) => {
           const {status, label} = BadgeStatusMap[state] || BadgeStatusMap.CREATED;
 
           return <Badge status={status} text={label} />;
@@ -94,21 +112,42 @@ const TextDetailsTable: FC<TextRowProps> = ({assertionList, isLoading, onSelectR
         title="Total"
         key="total"
         dataIndex="state"
-        render={state => (validStatusList.includes(state) ? assertionList?.length ?? 0 : '')}
+        render={(value, {state, assertionResult = []}: TestRunResult) => {
+          if (validStatusList.includes(state)) {
+            const passedAssertionsCount = getTestResultCount(assertionResult, 'all');
+            return passedAssertionsCount;
+          }
+
+          return '';
+        }}
       />
       <Table.Column
         width="3%"
         title={<Badge count="P" style={{backgroundColor: '#49AA19'}} />}
         key="passed"
         dataIndex="state"
-        render={state => (validStatusList.includes(state) ? 0 : '')}
+        render={(value, {state, assertionResult = []}: TestRunResult) => {
+          if (validStatusList.includes(state)) {
+            const passedAssertionsCount = getTestResultCount(assertionResult, 'passed');
+            return passedAssertionsCount;
+          }
+
+          return '';
+        }}
       />
       <Table.Column
         width="3%"
         title={<Badge count="F" />}
         dataIndex="state"
         key="failed"
-        render={state => (validStatusList.includes(state) ? 0 : '')}
+        render={(value, {state, assertionResult = []}: TestRunResult) => {
+          if (validStatusList.includes(state)) {
+            const passedAssertionsCount = getTestResultCount(assertionResult, 'failed');
+            return passedAssertionsCount;
+          }
+
+          return '';
+        }}
       />
       <Table.Column
         width="3%"
