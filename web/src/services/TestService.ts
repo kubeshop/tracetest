@@ -1,5 +1,5 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
-import {Assertion, ITestResult, RecursivePartial, Test, TestId, TestRunResult} from 'types';
+import {Assertion, ITestResult, RecursivePartial, Test, TestAssertionResult, TestId, TestRunResult} from 'types';
 
 export const testAPI = createApi({
   reducerPath: 'testsAPI',
@@ -55,13 +55,15 @@ export const testAPI = createApi({
             ]
           : [{type: 'TestResult' as const, id: 'LIST'}],
     }),
-    updateTestResult: build.mutation<TestRunResult, Pick<TestRunResult, 'testId' | 'resultId' | 'assertionResult'>>({
+    updateTestResult: build.mutation<
+      TestRunResult,
+      {testId: string; resultId: string; assertionResult: TestAssertionResult}
+    >({
       query: ({testId, resultId, assertionResult}) => ({
         url: `/tests/${testId}/results/${resultId}`,
         method: 'PUT',
         body: assertionResult,
       }),
-      invalidatesTags: result => (result?.resultId ? [{type: 'TestResult' as const, id: result?.resultId}] : []),
     }),
     getTestResultById: build.query<TestRunResult, Pick<Test, 'testId'> & {resultId: string}>({
       query: ({testId, resultId}) => `/tests/${testId}/results/${resultId}`,
