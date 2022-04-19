@@ -31,6 +31,7 @@ type TestDB interface {
 	UpdateResult(ctx context.Context, res *TestRunResult) error
 	GetResult(ctx context.Context, id string) (*TestRunResult, error)
 	GetResultsByTestID(ctx context.Context, testid string) ([]TestRunResult, error)
+	GetResultsByTraceID(ctx context.Context, testid, traceid string) (TestRunResult, error)
 
 	CreateAssertion(ctx context.Context, testid string, assertion *Assertion) (string, error)
 	GetAssertion(ctx context.Context, id string) (*Assertion, error)
@@ -105,10 +106,12 @@ func (s *ApiApiService) GetTest(ctx context.Context, testid string) (ImplRespons
 		}
 	}
 
-	// TODO: implement this code
-	// if test.ReferenceTestRunResult.TraceId != "" {
-	// 	test.ReferenceTestRunResult = getResultByTraceID(test.ReferenceTestRunResult.TraceId)
-	// }
+	if test.ReferenceTestRunResult.TraceId != "" {
+		res, err := s.testDB.GetResultsByTraceID(ctx, test.TestId, test.ReferenceTestRunResult.TraceId)
+		if err == nil {
+			test.ReferenceTestRunResult = res
+		}
+	}
 
 	return Response(200, test), nil
 }
