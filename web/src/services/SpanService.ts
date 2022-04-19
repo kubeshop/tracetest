@@ -10,6 +10,7 @@ import {
   Span,
   TSpanAttributesList,
 } from '../types';
+import {escapeString} from '../utils';
 
 const SemanticGroupNamesList = Object.values(SemanticGroupNames);
 
@@ -34,7 +35,7 @@ export const getSpanValue = (
 
   if (!searchString) return '';
 
-  const attributeList: ISpanAttribute[] = search(resourceSpan, searchString);
+  const attributeList: ISpanAttribute[] = search(resourceSpan, escapeString(searchString));
   const {value} = attributeList?.find(attribute => attribute.key === key) || {};
 
   return value ? String(value[valueType]) : '';
@@ -94,8 +95,8 @@ export const getSpanSignature = (spanId: string, trace: ITrace): ItemSelector[] 
 };
 
 export const getSpanAttributeList = (resourceSpan: ResourceSpan): TSpanAttributesList => {
-  const spanAttributeList: ISpanAttribute[] = search(resourceSpan, spanAttributeSearch) || [];
-  const resourceAttributeList: ISpanAttribute[] = search(resourceSpan, resourceAttributeSearch) || [];
+  const spanAttributeList: ISpanAttribute[] = search(resourceSpan, escapeString(spanAttributeSearch)) || [];
+  const resourceAttributeList: ISpanAttribute[] = search(resourceSpan, escapeString(resourceAttributeSearch)) || [];
   const {spanId, parentSpanId, traceId, kind, status, name} = getSpan(resourceSpan) || {};
 
   const attributeList = [...resourceAttributeList, ...spanAttributeList].map(
