@@ -108,9 +108,10 @@ func (s *ApiApiService) GetTest(ctx context.Context, testid string) (ImplRespons
 
 	if test.ReferenceTestRunResult.TraceId != "" {
 		res, err := s.testDB.GetResultsByTraceID(ctx, test.TestId, test.ReferenceTestRunResult.TraceId)
-		if err == nil {
-			test.ReferenceTestRunResult = res
+		if err != nil {
+			return Response(http.StatusInternalServerError, err.Error()), err
 		}
+		test.ReferenceTestRunResult = res
 	}
 
 	return Response(200, test), nil

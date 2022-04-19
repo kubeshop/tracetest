@@ -48,8 +48,7 @@ func (td *TestDB) GetResult(ctx context.Context, id string) (*openapi.TestRunRes
 }
 
 func (td *TestDB) GetResultsByTraceID(ctx context.Context, testID, traceID string) (openapi.TestRunResult, error) {
-	fmt.Println("***", testID, traceID)
-	stmt, err := td.db.Prepare("SELECT result FROM results WHERE test_id = $1 AND result -> 'traceId' = $2")
+	stmt, err := td.db.Prepare("SELECT result FROM results WHERE test_id = $1 AND result ->> 'traceId' = $2")
 	if err != nil {
 		return openapi.TestRunResult{}, err
 	}

@@ -21,16 +21,17 @@ type Executor interface {
 	Execute(*Test, trace.TraceID, trace.SpanID) (HttpResponse, error)
 }
 
-type ResultDB interface {
+type TestsDB interface {
 	CreateResult(_ context.Context, testID string, _ *TestRunResult) error
+	UpdateTest(context.Context, *Test) error
 	ResultUpdater
 }
 
-func NewPersistentRunner(e Executor, resultDB ResultDB, tp TracePoller) PersistentRunner {
+func NewPersistentRunner(e Executor, resultDB TestsDB, tp TracePoller) PersistentRunner {
 	return persistentRunner{
 		executor:     e,
 		tp:           tp,
-		resultDB:     resultDB,
+		testsDB:      resultDB,
 		idGen:        NewRandGenerator(),
 		executeQueue: make(chan execReq, 5),
 		exit:         make(chan bool, 1),
@@ -41,7 +42,7 @@ type persistentRunner struct {
 	executor Executor
 	tp       TracePoller
 	idGen    IDGenerator
-	resultDB ResultDB
+	testsDB  TestsDB
 
 	executeQueue chan execReq
 	exit         chan bool
@@ -87,7 +88,7 @@ func (r persistentRunner) Run(t Test) string {
 
 	result := r.newTestResult(t.TestId)
 	// TODO: handle error
-	_ = r.resultDB.CreateResult(ctx, result.TestId, &result)
+	_ = r.testsDB.CreateResult(ctx, result.TestId, &result)
 
 	r.executeQueue <- execReq{
 		ctx:    ctx,
@@ -102,7 +103,7 @@ func (r persistentRunner) processExecQueue(job execReq) {
 	result := job.result
 	result.State = TestRunStateExecuting
 	// TODO: handle error
-	_ = r.resultDB.UpdateResult(job.ctx, &result)
+	_ = r.testsDB.UpdateResult(job.ctx, &result)
 
 	tid, _ := trace.TraceIDFromHex(result.TraceId)
 	sid, _ := trace.SpanIDFromHex(result.SpanId)
@@ -110,8 +111,15 @@ func (r persistentRunner) processExecQueue(job execReq) {
 	response, err := r.executor.Execute(&job.test, tid, sid)
 	result = r.handleExecutionResult(result, response, err)
 
+	if job.test.ReferenceTestRunResult.ResultId == "" {
+		job.test.ReferenceTestRunResult = TestRunResult{
+			TraceId: result.TraceId,
+		}
+		_ = r.testsDB.UpdateTest(job.ctx, &job.test)
+	}
+
 	// TODO: handle error
-	_ = r.resultDB.UpdateResult(job.ctx, &result)
+	_ = r.testsDB.UpdateResult(job.ctx, &result)
 	if result.State == TestRunStateAwaitingTrace {
 		// start a new context
 		r.tp.Poll(job.ctx, result)
