@@ -1,22 +1,19 @@
-import {skipToken} from '@reduxjs/toolkit/dist/query';
 import {Button, Typography} from 'antd';
 import {FC, useCallback} from 'react';
-import {useGetTestResultsQuery, useRunTestMutation} from 'services/TestService';
-import {Test, TestRunResult} from 'types';
+import {useRunTestMutation} from 'services/TestService';
+import {TestRunResult, TestId} from 'types';
 import * as S from './Test.styled';
 import TestDetailsTable from './TestDetailsTable';
 
 type TTestDetailsProps = {
-  test?: Test;
+  testId: TestId;
+  url?: string;
   onSelectResult: (result: TestRunResult) => void;
+  testResultList: TestRunResult[];
+  isLoading: boolean;
 };
 
-const TestDetails: FC<TTestDetailsProps> = ({onSelectResult, test}) => {
-  const {testId, serviceUnderTest} = test || {};
-
-  const {data: testResults = [], isLoading} = useGetTestResultsQuery(testId ?? skipToken, {
-    pollingInterval: 5000,
-  });
+const TestDetails: FC<TTestDetailsProps> = ({testId, testResultList, isLoading, onSelectResult, url}) => {
   const [runTest, result] = useRunTestMutation();
 
   const handleRunTest = useCallback(() => {
@@ -26,12 +23,12 @@ const TestDetails: FC<TTestDetailsProps> = ({onSelectResult, test}) => {
   return (
     <>
       <S.TestDetailsHeader>
-        <Typography.Title level={5}>{serviceUnderTest?.request.url}</Typography.Title>
+        <Typography.Title level={5}>{url}</Typography.Title>
         <Button onClick={handleRunTest} loading={result.isLoading} type="primary" ghost>
           Run Test
         </Button>
       </S.TestDetailsHeader>
-      <TestDetailsTable isLoading={isLoading} onSelectResult={onSelectResult} testResultList={testResults} />
+      <TestDetailsTable isLoading={isLoading} onSelectResult={onSelectResult} testResultList={testResultList} />
     </>
   );
 };
