@@ -1,47 +1,22 @@
 import {Typography} from 'antd';
 import {FC, useMemo} from 'react';
-import {runAssertionByTrace} from '../../services/AssertionService';
-import {useGetTestByIdQuery} from '../../services/TestService';
-import {ITrace} from '../../types';
+import {getTestResultCount} from '../../services/TraceService';
+import {AssertionResult, ITrace, Test} from '../../types';
 import TraceAssertionsResultTable from '../TraceAssertionsTable/TraceAssertionsTable';
 import * as S from './TestResults.styled';
 
 type TTestResultsProps = {
-  testId: string;
+  test: Test;
   trace: ITrace;
+  traceResultList: AssertionResult[];
   onSpanSelected(spanId: string): void;
 };
 
-const TestResults: FC<TTestResultsProps> = ({testId, trace, onSpanSelected}) => {
-  const {data: test} = useGetTestByIdQuery(testId);
-
-  const traceResultList = useMemo(
-    () => test?.assertions?.map(assertion => runAssertionByTrace(trace, assertion)) || [],
-    [test?.assertions, trace]
-  );
+const TestResults: FC<TTestResultsProps> = ({test, trace, traceResultList, onSpanSelected}) => {
   const totalSpanCount = trace.resourceSpans.length;
   const totalAssertionCount = test?.assertions?.length || 0;
 
-  const [totalPassedCount, totalFailedCount] = useMemo(
-    () =>
-      traceResultList.reduce<[number, number]>(
-        ([innerTotalPassedCount, innerTotalFailedCount], {spanListAssertionResult}) => {
-          const [passed, failed] = spanListAssertionResult.reduce<[number, number]>(
-            ([passedResultCount, failedResultCount], {resultList}) => {
-              const passedCount = resultList.filter(({hasPassed}) => hasPassed).length;
-              const failedCount = resultList.filter(({hasPassed}) => !hasPassed).length;
-
-              return [passedResultCount + passedCount, failedResultCount + failedCount];
-            },
-            [0, 0]
-          );
-
-          return [innerTotalPassedCount + passed, innerTotalFailedCount + failed];
-        },
-        [0, 0]
-      ),
-    [traceResultList]
-  );
+  const {totalPassedCount, totalFailedCount} = useMemo(() => getTestResultCount(traceResultList), [traceResultList]);
 
   return (
     <S.Container>
