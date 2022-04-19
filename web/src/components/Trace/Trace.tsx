@@ -2,12 +2,13 @@ import styled from 'styled-components';
 import {useStoreActions} from 'react-flow-renderer';
 import {ReflexContainer, ReflexSplitter, ReflexElement} from 'react-reflex';
 
-import {Button, Skeleton, Tabs} from 'antd';
+import {Button, Skeleton, Tabs, Typography} from 'antd';
+import {CloseCircleFilled} from '@ant-design/icons';
 
 import 'react-reflex/styles.css';
 
 import {useCallback, useMemo, useState} from 'react';
-import {ISpan, Test} from 'types';
+import {ISpan, Test, TEST_RUN_EXECUTION_STATE} from 'types';
 import {useGetTestResultByIdQuery} from 'services/TestService';
 
 import TraceDiagram from './TraceDiagram';
@@ -76,13 +77,20 @@ const Trace = ({test, testResultId}: {test: Test; testResultId: string}) => {
     return <Skeleton />;
   }
 
-  if (isError || Object.keys(testResultDetails?.trace || {}).length === 0) {
+  if (
+    isError ||
+    Object.keys(testResultDetails?.trace || {}).length === 0 ||
+    testResultDetails?.state === TEST_RUN_EXECUTION_STATE.FAILED
+  ) {
     return (
-      <div>
-        <Button onClick={handleReload} loading={isLoadingTrace}>
-          Reload
-        </Button>
-      </div>
+      <S.FailedTrace>
+        <CloseCircleFilled style={{color: 'red', fontSize: 32}} />
+        <Typography.Title level={2}>Test Run Failed</Typography.Title>
+        <div style={{display: 'grid', gap: 8, gridTemplateColumns: '1fr 1fr'}}>
+          <Button>Rerun Test</Button>
+          <Button>Cancel</Button>
+        </div>
+      </S.FailedTrace>
     );
   }
 

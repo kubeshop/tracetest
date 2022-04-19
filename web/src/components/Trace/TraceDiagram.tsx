@@ -1,5 +1,6 @@
 import Text from 'antd/lib/typography/Text';
 import {useEffect, useMemo} from 'react';
+import { isEmpty } from 'lodash';
 import ReactFlow, {Background, BackgroundVariant, Handle, NodeProps, Position} from 'react-flow-renderer';
 import {useDAGChart} from 'hooks/Charts';
 import {ISpan} from 'types';
@@ -49,7 +50,6 @@ const TraceNode = ({id, data, selected, ...rest}: IPropsTraceNode) => {
 };
 
 const TraceDiagram = ({spanMap, selectedSpan, onSelectSpan}: IPropsTraceDiagram): JSX.Element => {
-
   const {
     dag,
     layout: {height},
@@ -96,7 +96,7 @@ const TraceDiagram = ({spanMap, selectedSpan, onSelectSpan}: IPropsTraceDiagram)
   }, [spanMap, dag, selectedSpan]);
 
   return (
-    <div style={{height: height + 100}}>
+    <S.Container style={{height: height + 100}}>
       <ReactFlow
         nodeTypes={{TraceNode}}
         defaultZoom={0.5}
@@ -105,7 +105,8 @@ const TraceDiagram = ({spanMap, selectedSpan, onSelectSpan}: IPropsTraceDiagram)
       >
         <Background variant={BackgroundVariant.Lines} gap={4} size={1} />
       </ReactFlow>
-    </div>
+      {isEmpty(spanMap) && <S.LoadingLabel>Loading data...</S.LoadingLabel>}
+    </S.Container>
   );
 };
 

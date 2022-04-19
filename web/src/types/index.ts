@@ -16,6 +16,15 @@ export enum HTTP_METHOD {
   VIEW = 'VIEW',
 }
 
+export const enum TEST_RUN_EXECUTION_STATE {
+  CREATED = 'CREATED',
+  EXECUTING = 'EXECUTING',
+  AWAITING_TRACE = 'AWAITING_TRACE',
+  FAILED = "FAILED",
+  FINISHED = "FINISHED",
+  AWAITING_TEST_RESULTS = "AWAITING_TEST_RESULTS",
+}
+
 export const enum LOCATION_NAME {
   RESOURCE_ATTRIBUTES = 'RESOURCE_ATTRIBUTES',
   INSTRUMENTATION_LIBRARY = 'INSTRUMENTATION_LIBRARY',
@@ -79,6 +88,7 @@ export interface TestRunResult {
   completedAt: string;
   response: any;
   trace: ITrace;
+  state: TEST_RUN_EXECUTION_STATE;
   assertionResultState: boolean;
   assertionResult: TestAssertionResult;
 }
@@ -191,15 +201,6 @@ export interface InstrumentationLibrary {
 export interface Attribute {
   key: string;
   value: {[key: string]: string};
-}
-export interface ITestResult {
-  resultId: string;
-  traceid: string;
-  spanid: string;
-  successful: {};
-  failed: {};
-  createdAt: string;
-  completedAt: string;
 }
 
 export interface spanAssertionResult {

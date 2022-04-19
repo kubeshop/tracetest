@@ -2,14 +2,14 @@ import {skipToken} from '@reduxjs/toolkit/dist/query';
 import {Button, Table, Typography} from 'antd';
 import {FC, useCallback} from 'react';
 import {useGetTestResultsQuery, useRunTestMutation} from 'services/TestService';
-import {ITestResult, TestId} from 'types';
+import {TestId, TestRunResult} from 'types';
 import CustomTable from '../../components/CustomTable';
 import * as S from './Test.styled';
 
 type TTestDetailsProps = {
   testId: TestId;
   url?: string;
-  onSelectResult: (result: ITestResult) => void;
+  onSelectResult: (result: TestRunResult) => void;
 };
 
 const TestDetails: FC<TTestDetailsProps> = ({testId, onSelectResult, url}) => {
@@ -36,7 +36,7 @@ const TestDetails: FC<TTestDetailsProps> = ({testId, onSelectResult, url}) => {
         onRow={record => {
           return {
             onClick: () => {
-              onSelectResult(record as ITestResult);
+              onSelectResult(record as TestRunResult);
             },
           };
         }}

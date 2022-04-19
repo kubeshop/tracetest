@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { Typography } from 'antd';
 
 enum NotchColor {
   HTTP = '#B9E28C',
@@ -49,4 +50,19 @@ export const TraceNotch = styled.div<{system: string}>`
   justify-content: center;
   align-items: center;
   text-align: center;
+`;
+
+export const Container = styled.div`
+  position: relative;
+`;
+
+export const LoadingLabel = styled(Typography.Text)`
+  position: absolute;
+  top: 25%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #C4C4C4;
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 600;
 `;

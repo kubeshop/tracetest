@@ -1,5 +1,5 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
-import {Assertion, ITestResult, RecursivePartial, Test, TestId, TestRunResult} from 'types';
+import {Assertion, RecursivePartial, Test, TestId, TestRunResult} from 'types';
 
 export const testAPI = createApi({
   reducerPath: 'testsAPI',
@@ -45,7 +45,7 @@ export const testAPI = createApi({
       }),
       invalidatesTags: (result, error, args) => [{type: 'Test', id: args.testId}],
     }),
-    getTestResults: build.query<ITestResult[], TestId>({
+    getTestResults: build.query<TestRunResult[], TestId>({
       query: id => `/tests/${id}/results`,
       providesTags: result =>
         result
