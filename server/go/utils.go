@@ -147,6 +147,13 @@ func mapTrace(tr *v1.TracesData) ApiV3SpansResponseChunk {
 					})
 				}
 
+				attributes = append(attributes, V1KeyValue{
+					Key: "tracetest.span.type",
+					Value: V1AnyValue{
+						StringValue: spanType(attributes),
+					},
+				})
+
 				v := V1Span{
 					TraceId:                hex.EncodeToString(sp.GetTraceId()),
 					SpanId:                 hex.EncodeToString(sp.GetSpanId()),
@@ -191,6 +198,30 @@ func mapTrace(tr *v1.TracesData) ApiV3SpansResponseChunk {
 		res.ResourceSpans = append(res.ResourceSpans, sp)
 	}
 	return res
+}
+
+func spanType(attrs []V1KeyValue) string {
+	// based on https://github.com/open-telemetry/opentelemetry-specification/tree/main/specification/trace/semantic_conventions
+	// using the first required attribute for each type
+	for _, attr := range attrs {
+		switch true {
+		case attr.Key == "http.method":
+			return "http"
+		case attr.Key == "db.system":
+			return "database"
+		case attr.Key == "rpc.system":
+			return "rpc"
+		case attr.Key == "messaging.system":
+			return "messaging"
+		case attr.Key == "faas.trigger", attr.Key == "faas.execution":
+			// faas has no required attr, so anyone works
+			return "faas"
+		case attr.Key == "exception.type", attr.Key == "exception.message":
+			// at least one of the two must be present
+			return "exception"
+		}
+	}
+	return "unknown"
 }
 
 func headersToKeyValueList(headers []HttpResponseHeaders) *v11.KeyValueList {
