@@ -94,6 +94,7 @@ func (f runnerFixture) expectSuccessExec(test openapi.Test) {
 func (f runnerFixture) expectSuccessResultPersist(test openapi.Test) {
 	f.mockResultsDB.expectCreateResult(test)
 	f.mockResultsDB.expectUpdateResultState(test, openapi.TestRunStateExecuting)
+	f.mockResultsDB.On("UpdateTest", test.TestId).Return(noError)
 	f.mockResultsDB.expectUpdateResultState(test, openapi.TestRunStateAwaitingTrace)
 	f.mockTracePoller.expectPoll(test)
 }
@@ -161,6 +162,11 @@ func (m *mockResultsDB) CreateResult(ctx context.Context, testID string, res *op
 
 	m.results[res.TestId] = *res
 
+	return args.Error(0)
+}
+
+func (m *mockResultsDB) UpdateTest(_ context.Context, test *openapi.Test) error {
+	args := m.Called(test.TestId)
 	return args.Error(0)
 }
 
