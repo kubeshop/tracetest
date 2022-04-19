@@ -13,8 +13,6 @@ const SpanAttributesTable: FC<TSpanAttributesTableProps> = ({spanAttributesList}
       size="small"
       pagination={false}
       dataSource={spanAttributesList}
-      bordered
-      tableLayout="fixed"
       showHeader={false}
     >
       <Table.Column

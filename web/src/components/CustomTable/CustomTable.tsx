@@ -3,6 +3,7 @@ import styled from 'styled-components';
 
 const CustomTable = styled(Table).attrs({
   bordered: true,
+  tableLayout: 'fixed',
 })`
   .ant-table-thead > tr > th {
     font-weight: 600;

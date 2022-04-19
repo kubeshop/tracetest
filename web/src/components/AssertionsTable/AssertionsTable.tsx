@@ -49,10 +49,8 @@ const AssertionsResultTable = ({assertionResults, assertion: {selectors = []}, s
         size="small"
         pagination={{hideOnSinglePage: true}}
         dataSource={parsedAssertionList}
-        bordered
-        tableLayout="fixed"
       >
-        <Table.Column title="Property" dataIndex="property" key="property" ellipsis width="60%" />
+        <Table.Column title="Property" dataIndex="property" key="property" ellipsis width="50%" />
         <Table.Column title="Comparison" dataIndex="comparison" key="comparison" render={value => getOperator(value)} />
         <Table.Column title="Value" dataIndex="value" key="value" />
         <Table.Column
