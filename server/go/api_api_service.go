@@ -186,6 +186,7 @@ func (s *ApiApiService) UpdateTestResult(ctx context.Context, testid string, id 
 
 	testResult.AssertionResultState = testRunResult.AssertionResultState
 	testResult.AssertionResult = testRunResult.AssertionResult
+	testResult.State = TestRunStateFinished
 
 	err = s.testDB.UpdateResult(ctx, testResult)
 	if err != nil {
