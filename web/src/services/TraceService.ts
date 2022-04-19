@@ -1,4 +1,4 @@
-import {AssertionResult, ITrace, spanAssertionResult, Test, TestAssertionResult} from '../types';
+import {AssertionResult, AssertionResultList, ITrace, spanAssertionResult, Test, TestAssertionResult} from '../types';
 import {runAssertionByTrace} from './AssertionService';
 
 export const runTest = (trace: ITrace, {assertions = []}: Test) => {
@@ -8,7 +8,7 @@ export const runTest = (trace: ITrace, {assertions = []}: Test) => {
 };
 
 export const parseTestResultToAssertionResultList = (
-  {assertionResult = []}: TestAssertionResult,
+  assertionResult: AssertionResultList,
   {assertions}: Test,
   {resourceSpans}: ITrace
 ): AssertionResult[] => {
