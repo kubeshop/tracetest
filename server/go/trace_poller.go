@@ -51,6 +51,7 @@ type tracePoller struct {
 type tracePollReq struct {
 	ctx    context.Context
 	result TestRunResult
+	count  int
 }
 
 func (tp tracePoller) Start(workers int) {
@@ -82,10 +83,14 @@ func (tp tracePoller) Stop() {
 }
 
 func (tp tracePoller) Poll(ctx context.Context, result TestRunResult) {
-	tp.executeQueue <- tracePollReq{
+	tp.enqueueJob(tracePollReq{
 		ctx:    ctx,
 		result: result,
-	}
+	})
+}
+
+func (tp tracePoller) enqueueJob(job tracePollReq) {
+	tp.executeQueue <- job
 }
 
 func (tp tracePoller) processJob(job tracePollReq) {
@@ -106,15 +111,30 @@ func (tp tracePoller) processJob(job tracePollReq) {
 		FixParent(tr, string(tid[:]), string(sid[:]), res.Response),
 	)
 
+	if !donePollingTraces(job, res) {
+		job.result = res
+		job.count = job.count + 1
+		tp.requeue(job)
+		return
+	}
+
+	fmt.Printf("completed polling result %s after %d times\n", job.result.ResultId, job.count)
+
 	// TODO: handle error
 	_ = tp.resultDB.UpdateResult(job.ctx, &res)
+}
+
+const maxTracePollRetry = 5
+
+func donePollingTraces(job tracePollReq, currentResults TestRunResult) bool {
+	// we're done if we have the same amount of spans after polling `maxTracePollRetry` times
+	return len(currentResults.Trace.ResourceSpans) == len(job.result.Trace.ResourceSpans) && job.count == maxTracePollRetry
 }
 
 func (tp tracePoller) handleError(job tracePollReq, err error) {
 	res := job.result
 	if errors.Is(err, tracedb.ErrTraceNotFound) {
 		if time.Since(res.CompletedAt) < tp.maxWaitTimeForTrace {
-			fmt.Println("requeue")
 			tp.requeue(job)
 			return
 		}
@@ -135,7 +155,8 @@ func (tp tracePoller) handleError(job tracePollReq, err error) {
 
 func (tp tracePoller) requeue(job tracePollReq) {
 	go func() {
+		fmt.Printf("requeuing result %s for %d time\n", job.result.ResultId, job.count)
 		time.Sleep(500 * time.Millisecond)
-		tp.Poll(job.ctx, job.result)
+		tp.enqueueJob(job)
 	}()
 }
