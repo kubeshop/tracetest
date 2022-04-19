@@ -112,7 +112,7 @@ const TestPage = () => {
           tabBarExtraContent={{
             left: (
               <S.Header>
-                <Button type="text" shape="circle" onClick={() => navigate(-1)}>
+                <Button type="text" shape="circle" onClick={() => navigate('/')}>
                   <ArrowLeftOutlined style={{fontSize: 24, marginRight: 16}} />
                 </Button>
                 <Title style={{margin: 0}} level={3}>
