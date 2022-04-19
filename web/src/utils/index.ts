@@ -24,3 +24,8 @@ export const getOperator = (op: COMPARE_OPERATOR) => {
       return 'eq';
   }
 };
+
+export const escapeString = (str: string): string => {
+  // eslint-disable-next-line no-control-regex
+  return str.replace(/[\\"']/g, '\\$&').replace(/\u0000/g, '\\0');
+};

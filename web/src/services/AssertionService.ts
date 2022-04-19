@@ -10,6 +10,7 @@ import {
   ResourceSpan,
   SpanAssertionResult,
 } from 'types';
+import {escapeString} from '../utils';
 import {getSpanValue} from './SpanService';
 
 const getOperator = (op: COMPARE_OPERATOR) => {
@@ -86,7 +87,7 @@ export const runSpanAssertionByResourceSpan = (
       selector = `${buildSelector(LOCATION_NAME.SPAN_ID, [`key == \`${propertyName}\` && ${valueSelector}`], spanId)}`;
     }
 
-    const [passedSpan] = search(span, selector);
+    const [passedSpan] = search(span, escapeString(selector));
 
     return {
       ...spanAssertion,
@@ -108,7 +109,7 @@ export const runAssertionBySpanId = (
   const conditionList = buildConditionArray(assertion.selectors);
   const itemSelector = `[? ${buildSelector(LOCATION_NAME.SPAN_ID, [], spanId)} && ${conditionList.join(' && ')}]`;
 
-  const [span]: Array<ResourceSpan> = search(trace, `resourceSpans|[]| ${itemSelector}`);
+  const [span]: Array<ResourceSpan> = search(trace, escapeString(`resourceSpans|[]| ${itemSelector}`));
 
   if (!span) return undefined;
 
@@ -119,7 +120,7 @@ export const runAssertionByTrace = (trace: ITrace, assertion: Assertion): Assert
   if (!assertion?.selectors) return {assertion, spanListAssertionResult: []};
 
   const itemSelector = `[? ${buildConditionArray(assertion.selectors).join(' && ')}]`;
-  const spanList: Array<ResourceSpan> = search(trace, `resourceSpans|[]| ${itemSelector}`) || [];
+  const spanList: Array<ResourceSpan> = search(trace, escapeString(`resourceSpans|[]| ${itemSelector}`)) || [];
 
   return {
     assertion,
@@ -138,11 +139,11 @@ export const runAssertionByTrace = (trace: ITrace, assertion: Assertion): Assert
   };
 };
 
-export const getEffectedSpansCount = (trace: ITrace, selectors: ItemSelector[] ) => {
-  if (selectors.length === 0 ) return 0;
+export const getEffectedSpansCount = (trace: ITrace, selectors: ItemSelector[]) => {
+  if (selectors.length === 0) return 0;
 
   const itemSelector = `[? ${buildConditionArray(selectors).join(' && ')}]`;
-  const spanList: Array<ResourceSpan> = search(trace, `resourceSpans|[]| ${itemSelector}`);
+  const spanList: Array<ResourceSpan> = search(trace, escapeString(`resourceSpans|[]| ${itemSelector}`));
 
   return spanList.length;
 };
