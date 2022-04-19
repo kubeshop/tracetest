@@ -21,7 +21,7 @@ const TestList = () => {
         };
       }}
     >
-      <Table.Column title="Name" dataIndex="name" key="name" />
+      <Table.Column title="Name" dataIndex="name" key="name" width="25%" />
       <Table.Column title="Endpoint" dataIndex="url" key="url" />
     </CustomTable>
   );

@@ -1,6 +1,7 @@
-import {Button, Table} from 'antd';
+import {Button} from 'antd';
 import {ColumnsType} from 'antd/lib/table';
 import Title from 'antd/lib/typography/Title';
+import CustomTable from '../../components/CustomTable';
 
 const Assertions = () => {
   const dataSource = [
@@ -103,7 +104,7 @@ const Assertions = () => {
         <Title level={4}>Assertions</Title>
         <Button>New Assertion</Button>
       </div>
-      <Table dataSource={dataSource} columns={columns} />
+      <CustomTable dataSource={dataSource} columns={columns} />
     </>
   );
 };
