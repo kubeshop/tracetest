@@ -6,7 +6,7 @@ import Title from 'antd/lib/typography/Title';
 import {CloseOutlined, ArrowLeftOutlined} from '@ant-design/icons';
 import {useLocation, useNavigate, useParams} from 'react-router-dom';
 
-import {ITestResult} from 'types';
+import {TestRunResult} from 'types';
 import {useGetTestByIdQuery, useGetTestResultsQuery} from 'services/TestService';
 import Trace from 'components/Trace';
 import Layout from 'components/Layout';
@@ -16,7 +16,7 @@ import * as S from './Test.styled';
 import TestDetails from './TestDetails';
 
 interface ITestRouteState {
-  testRun: ITestResult;
+  testRun: TestRunResult;
 }
 interface TracePane {
   key: string;
@@ -35,7 +35,7 @@ const TestPage = () => {
   const query = useMemo(() => new URLSearchParams(location.search), [location.search]);
 
   const handleSelectTestResult = useCallback(
-    (result: ITestResult) => {
+    (result: TestRunResult) => {
       const itExists = Boolean(tracePanes.find(pane => pane.key === result.resultId));
 
       if (!itExists) {
