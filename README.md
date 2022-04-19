@@ -35,10 +35,16 @@
 
 # Overview
 
-Testing and debugging software built on Micro-Services architectures is not an easy task. Multiple services, different teams, various programming languages and  technologies involved. We would like to help you write tests across all this complexity.
+Testing and debugging software built on microservices architectures is not an easy task. Multiple services, teams, programming languages, and technologies are involved. We want to help you write tests across all this complexity.
 
-Key Value Prop = Tracetest uses Open Telemetery tracing infrastructure to ....
-Tracetest makes it easy. For example, pick an API to test. Get its trace. This trace is the blueprint of your system (or of that API?}, showing all the steps. Use this blueprint to graphically define assertions through Tracetest UI on different services throughout the trace, checking return statuses, data, or even execution times of a system (system or API).
+Tracetest makes it easy:
+
+1. Pick an API to test. 
+2. Run a test, and get the trace. 
+3. The trace is the blueprint of your system under test. It shows all the steps the system has taken to execute the request.
+4. Use this blueprint to define assertions through Tracetest UI.
+5. Add assertions on different services, checking return statuses, data, or even execution times of a system.
+6. Run the tests.
 
 ![Assertions](/assets/assertions.png)
 
