@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math"
 	"time"
 
 	"github.com/kubeshop/tracetest/server/go/tracedb"
@@ -29,10 +30,14 @@ type TraceFetcher interface {
 }
 
 func NewTracePoller(tf TraceFetcher, ru ResultUpdater, maxWaitTimeForTrace time.Duration) PersistentTracePoller {
+	retryDelay := 500 * time.Millisecond
+	maxTracePollRetry := int(math.Ceil(float64(maxWaitTimeForTrace) / float64(retryDelay)))
 	return tracePoller{
 		traceDB:             tf,
 		resultDB:            ru,
 		maxWaitTimeForTrace: maxWaitTimeForTrace,
+		maxTracePollRetry:   maxTracePollRetry,
+		retryDelay:          retryDelay,
 		executeQueue:        make(chan tracePollReq, 5),
 		exit:                make(chan bool, 1),
 	}
@@ -42,10 +47,11 @@ type tracePoller struct {
 	resultDB            ResultUpdater
 	traceDB             TraceFetcher
 	maxWaitTimeForTrace time.Duration
+	retryDelay          time.Duration
+	maxTracePollRetry   int
 
 	executeQueue chan tracePollReq
-
-	exit chan bool
+	exit         chan bool
 }
 
 type tracePollReq struct {
@@ -131,7 +137,7 @@ func (tp tracePoller) processJob(job tracePollReq) {
 		FixParent(tr, string(tid[:]), string(sid[:]), res.Response),
 	)
 
-	if !donePollingTraces(job, res) {
+	if !tp.donePollingTraces(job, res) {
 		job.result = res
 		job.count = job.count + 1
 		tp.requeue(job)
@@ -143,11 +149,9 @@ func (tp tracePoller) processJob(job tracePollReq) {
 	tp.handleDBError(tp.resultDB.UpdateResult(job.ctx, &res))
 }
 
-const maxTracePollRetry = 5
-
-func donePollingTraces(job tracePollReq, currentResults TestRunResult) bool {
+func (tp tracePoller) donePollingTraces(job tracePollReq, currentResults TestRunResult) bool {
 	// we're done if we have the same amount of spans after polling `maxTracePollRetry` times
-	return len(currentResults.Trace.ResourceSpans) == len(job.result.Trace.ResourceSpans) && job.count == maxTracePollRetry
+	return len(currentResults.Trace.ResourceSpans) == len(job.result.Trace.ResourceSpans) && job.count == tp.maxTracePollRetry
 }
 
 func (tp tracePoller) handleTraceDBError(job tracePollReq, err error) {
@@ -174,7 +178,7 @@ func (tp tracePoller) handleTraceDBError(job tracePollReq, err error) {
 func (tp tracePoller) requeue(job tracePollReq) {
 	go func() {
 		fmt.Printf("requeuing result %s for %d time\n", job.result.ResultId, job.count)
-		time.Sleep(500 * time.Millisecond)
+		time.Sleep(tp.retryDelay)
 		tp.enqueueJob(job)
 	}()
 }
