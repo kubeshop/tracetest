@@ -101,8 +101,7 @@ const TestPage = () => {
           <Tabs.TabPane tab="Test Details" key="1" closeIcon={<CloseOutlined hidden />}>
             <S.Wrapper>
               <TestDetails
-                testId={id!}
-                url={test?.serviceUnderTest.request.url}
+                test={test}
                 onSelectResult={handleSelectTestResult}
               />
             </S.Wrapper>

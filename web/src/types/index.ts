@@ -1,3 +1,12 @@
+export enum TestState {
+  CREATED = 'CREATED',
+  EXECUTING = 'EXECUTING',
+  AWAITING_TRACE = 'AWAITING_TRACE',
+  AWAITING_TEST_RESULTS = 'AWAITING_TEST_RESULTS',
+  FAILED = 'FAILED',
+  FINISHED = 'FINISHED',
+}
+
 export enum HTTP_METHOD {
   GET = 'GET',
   PUT = 'PUT',
@@ -198,6 +207,7 @@ export interface ITestResult {
   spanid: string;
   successful: {};
   failed: {};
+  state: TestState;
   createdAt: string;
   completedAt: string;
 }
