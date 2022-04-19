@@ -105,10 +105,10 @@ func (s *ApiApiService) GetTest(ctx context.Context, testid string) (ImplRespons
 		}
 	}
 
-	if test.ReferenceTestRunResult.TraceId != "" {
-		// TOODO: implement this code
-		// test.ReferenceTestRunResult = getResultByTraceID(test.ReferenceTestRunResult.TraceId)
-	}
+	// TODO: implement this code
+	// if test.ReferenceTestRunResult.TraceId != "" {
+	// 	test.ReferenceTestRunResult = getResultByTraceID(test.ReferenceTestRunResult.TraceId)
+	// }
 
 	return Response(200, test), nil
 }
