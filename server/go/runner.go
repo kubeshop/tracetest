@@ -9,7 +9,7 @@ import (
 )
 
 type Runner interface {
-	Run(context.Context, Test) (runID string)
+	Run(Test) (runID string)
 }
 
 type PersistentRunner interface {
@@ -81,7 +81,10 @@ func (r persistentRunner) Stop() {
 	r.exit <- true
 }
 
-func (r persistentRunner) Run(ctx context.Context, t Test) string {
+func (r persistentRunner) Run(t Test) string {
+	// Start a new background context for the async process
+	ctx := context.Background()
+
 	result := r.newTestResult(t.TestId)
 	// TODO: handle error
 	_ = r.resultDB.CreateResult(ctx, result.TestId, &result)
@@ -111,7 +114,7 @@ func (r persistentRunner) processExecQueue(job execReq) {
 	_ = r.resultDB.UpdateResult(job.ctx, &result)
 	if result.State == TestRunStateAwaitingTrace {
 		// start a new context
-		r.tp.Poll(context.Background(), result)
+		r.tp.Poll(job.ctx, result)
 	}
 }
 

@@ -75,7 +75,7 @@ func (f runnerFixture) run(tests []openapi.Test, ttl time.Duration) {
 	f.runner.Start(2)
 	time.Sleep(10 * time.Millisecond)
 	for _, test := range tests {
-		f.runner.Run(context.TODO(), test)
+		f.runner.Run(test)
 	}
 	time.Sleep(ttl)
 	f.runner.Stop()

@@ -134,7 +134,7 @@ func (s *ApiApiService) RunTest(ctx context.Context, testid string) (ImplRespons
 		}
 	}
 
-	id := s.runner.Run(ctx, *test)
+	id := s.runner.Run(*test)
 
 	return Response(200, TestRun{
 		TestRunId: id,
