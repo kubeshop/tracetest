@@ -1,19 +1,19 @@
-import {skipToken} from '@reduxjs/toolkit/dist/query';
-import {Button, Table, Typography} from 'antd';
+import {Button, Typography} from 'antd';
 import {FC, useCallback} from 'react';
-import {useGetTestResultsQuery, useRunTestMutation} from 'services/TestService';
-import {ITestResult, TestId} from 'types';
-import CustomTable from '../../components/CustomTable';
+import {useRunTestMutation} from 'services/TestService';
+import {TestRunResult, TestId} from 'types';
 import * as S from './Test.styled';
+import TestDetailsTable from './TestDetailsTable';
 
 type TTestDetailsProps = {
   testId: TestId;
   url?: string;
-  onSelectResult: (result: ITestResult) => void;
+  onSelectResult: (result: TestRunResult) => void;
+  testResultList: TestRunResult[];
+  isLoading: boolean;
 };
 
-const TestDetails: FC<TTestDetailsProps> = ({testId, onSelectResult, url}) => {
-  const {data: testResults, isLoading} = useGetTestResultsQuery(testId ?? skipToken);
+const TestDetails: FC<TTestDetailsProps> = ({testId, testResultList, isLoading, onSelectResult, url}) => {
   const [runTest, result] = useRunTestMutation();
 
   const handleRunTest = useCallback(() => {
@@ -28,30 +28,7 @@ const TestDetails: FC<TTestDetailsProps> = ({testId, onSelectResult, url}) => {
           Run Test
         </Button>
       </S.TestDetailsHeader>
-      <CustomTable
-        pagination={{pageSize: 10}}
-        rowKey="resultId"
-        loading={isLoading}
-        dataSource={testResults?.slice()?.reverse()}
-        onRow={record => {
-          return {
-            onClick: () => {
-              onSelectResult(record as ITestResult);
-            },
-          };
-        }}
-      >
-        <Table.Column
-          title="Test Results"
-          dataIndex="createdAt"
-          key="createdAt"
-          width="30%"
-          render={value =>
-            Intl.DateTimeFormat('default', {dateStyle: 'full', timeStyle: 'medium'} as any).format(new Date(value))
-          }
-        />
-        <Table.Column title="Assertion Result" dataIndex="url" key="url" width="70%" render={() => 'Passed'} />
-      </CustomTable>
+      <TestDetailsTable isLoading={isLoading} onSelectResult={onSelectResult} testResultList={testResultList} />
     </>
   );
 };

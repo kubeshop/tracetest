@@ -120,7 +120,7 @@ export const runAssertionByTrace = (trace: ITrace, assertion: Assertion): Assert
   if (!assertion?.selectors) return {assertion, spanListAssertionResult: []};
 
   const itemSelector = `[? ${buildConditionArray(assertion.selectors).join(' && ')}]`;
-  const spanList: Array<ResourceSpan> = search(trace, escapeString(`resourceSpans|[]| ${itemSelector}`));
+  const spanList: Array<ResourceSpan> = search(trace, escapeString(`resourceSpans|[]| ${itemSelector}`)) || [];
 
   return {
     assertion,

@@ -6,9 +6,9 @@ import {Button, Skeleton, Tabs} from 'antd';
 
 import 'react-reflex/styles.css';
 
-import {useCallback, useMemo, useState} from 'react';
-import {ISpan, Test} from 'types';
-import {useGetTestResultByIdQuery} from 'services/TestService';
+import {useCallback, useEffect, useMemo, useState} from 'react';
+import {AssertionResult, ISpan, Test} from 'types';
+import {useGetTestResultByIdQuery, useUpdateTestResultMutation} from 'services/TestService';
 
 import TraceDiagram from './TraceDiagram';
 import TraceTimeline from './TraceTimeline';
@@ -16,6 +16,11 @@ import * as S from './Trace.styled';
 
 import SpanDetail from './SpanDetail';
 import TestResults from './TestResults';
+import {
+  parseAssertionResultListToTestResult,
+  parseTestResultToAssertionResultList,
+  runTest,
+} from '../../services/TraceService';
 
 const Grid = styled.div`
   display: grid;
@@ -29,8 +34,15 @@ export type TSpanInfo = {
 
 type TSpanMap = Record<string, TSpanInfo>;
 
-const Trace = ({test, testResultId}: {test: Test; testResultId: string}) => {
+type TraceProps = {
+  test: Test;
+  testResultId: string;
+};
+
+const Trace: React.FC<TraceProps> = ({test, testResultId}) => {
   const [selectedSpan, setSelectedSpan] = useState<TSpanInfo | undefined>();
+  const [traceResultList, setTraceResultList] = useState<AssertionResult[]>([]);
+  const [updateTestResult] = useUpdateTestResultMutation();
 
   const {
     data: testResultDetails,
@@ -72,6 +84,38 @@ const Trace = ({test, testResultId}: {test: Test; testResultId: string}) => {
     refetchTrace();
   }, [refetchTrace]);
 
+  useEffect(() => {
+    if (testResultDetails && !testResultDetails?.assertionResult) {
+      const resultList = runTest(testResultDetails.trace, test);
+
+      setTraceResultList(resultList);
+
+      updateTestResult({
+        testId: test.testId,
+        resultId: testResultId,
+        assertionResult: parseAssertionResultListToTestResult(resultList),
+      });
+    } else if (testResultDetails?.assertionResult) {
+      setTraceResultList(
+        parseTestResultToAssertionResultList(testResultDetails?.assertionResult, test, testResultDetails?.trace)
+      );
+    }
+  }, [testResultDetails, test, testResultId, updateTestResult]);
+
+  useEffect(() => {
+    if (testResultDetails) {
+      const resultList = runTest(testResultDetails.trace, test);
+
+      setTraceResultList(resultList);
+
+      updateTestResult({
+        testId: test.testId,
+        resultId: testResultId,
+        assertionResult: parseAssertionResultListToTestResult(resultList),
+      });
+    }
+  }, [test, testResultDetails, testResultId, updateTestResult]);
+
   if (isLoadingTrace) {
     return <Skeleton />;
   }
@@ -112,7 +156,8 @@ const Trace = ({test, testResultId}: {test: Test; testResultId: string}) => {
                         <TestResults
                           onSpanSelected={handleOnSpanSelected}
                           trace={testResultDetails?.trace!}
-                          testId={test.testId}
+                          test={test}
+                          traceResultList={traceResultList}
                         />
                       </Tabs.TabPane>
                     </S.TraceTabs>
