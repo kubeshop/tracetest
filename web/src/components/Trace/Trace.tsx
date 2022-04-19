@@ -102,6 +102,20 @@ const Trace: React.FC<TraceProps> = ({test, testResultId}) => {
     }
   }, [testResultDetails, test, testResultId, updateTestResult]);
 
+  useEffect(() => {
+    if (testResultDetails) {
+      const resultList = runTest(testResultDetails.trace, test);
+
+      setTraceResultList(resultList);
+
+      updateTestResult({
+        testId: test.testId,
+        resultId: testResultId,
+        assertionResult: parseAssertionResultListToTestResult(resultList),
+      });
+    }
+  }, [test, testResultDetails, testResultId, updateTestResult]);
+
   if (isLoadingTrace) {
     return <Skeleton />;
   }
