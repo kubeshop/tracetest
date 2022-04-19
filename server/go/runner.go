@@ -54,6 +54,12 @@ type execReq struct {
 	result TestRunResult
 }
 
+func (r persistentRunner) handleDBError(err error) {
+	if err != nil {
+		fmt.Printf("DB error when running test: %s\n", err.Error())
+	}
+}
+
 func (r persistentRunner) Start(workers int) {
 	for i := 0; i < workers; i++ {
 		go func() {
@@ -87,8 +93,7 @@ func (r persistentRunner) Run(t Test) string {
 	ctx := context.Background()
 
 	result := r.newTestResult(t.TestId)
-	// TODO: handle error
-	_ = r.testsDB.CreateResult(ctx, result.TestId, &result)
+	r.handleDBError(r.testsDB.CreateResult(ctx, result.TestId, &result))
 
 	r.executeQueue <- execReq{
 		ctx:    ctx,
@@ -102,8 +107,7 @@ func (r persistentRunner) Run(t Test) string {
 func (r persistentRunner) processExecQueue(job execReq) {
 	result := job.result
 	result.State = TestRunStateExecuting
-	// TODO: handle error
-	_ = r.testsDB.UpdateResult(job.ctx, &result)
+	r.handleDBError(r.testsDB.UpdateResult(job.ctx, &result))
 
 	tid, _ := trace.TraceIDFromHex(result.TraceId)
 	sid, _ := trace.SpanIDFromHex(result.SpanId)
@@ -115,11 +119,10 @@ func (r persistentRunner) processExecQueue(job execReq) {
 		job.test.ReferenceTestRunResult = TestRunResult{
 			TraceId: result.TraceId,
 		}
-		_ = r.testsDB.UpdateTest(job.ctx, &job.test)
+		r.handleDBError(r.testsDB.UpdateTest(job.ctx, &job.test))
 	}
 
-	// TODO: handle error
-	_ = r.testsDB.UpdateResult(job.ctx, &result)
+	r.handleDBError(r.testsDB.UpdateResult(job.ctx, &result))
 	if result.State == TestRunStateAwaitingTrace {
 		// start a new context
 		r.tp.Poll(job.ctx, result)

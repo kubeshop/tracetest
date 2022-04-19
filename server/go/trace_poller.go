@@ -54,6 +54,12 @@ type tracePollReq struct {
 	count  int
 }
 
+func (tp tracePoller) handleDBError(err error) {
+	if err != nil {
+		fmt.Printf("DB error when polling traces: %s\n", err.Error())
+	}
+}
+
 func (tp tracePoller) Start(workers int) {
 	for i := 0; i < workers; i++ {
 		go func() {
@@ -98,13 +104,27 @@ func (tp tracePoller) processJob(job tracePollReq) {
 	tr, err := tp.traceDB.GetTraceByID(job.ctx, res.TraceId)
 
 	if err != nil {
-		tp.handleError(job, err)
+		tp.handleTraceDBError(job, err)
 		return
 	}
 
-	// TODO: handle errors
-	sid, _ := trace.SpanIDFromHex(res.SpanId)
-	tid, _ := trace.TraceIDFromHex(res.TraceId)
+	sid, err := trace.SpanIDFromHex(res.SpanId)
+	if err != nil {
+		res.State = TestRunStateFailed
+		res.LastErrorState = err.Error()
+		fmt.Printf("DB error when polling traces: %s\n", err.Error())
+		tp.handleDBError(tp.resultDB.UpdateResult(job.ctx, &res))
+		return
+	}
+
+	tid, err := trace.TraceIDFromHex(res.TraceId)
+	if err != nil {
+		res.State = TestRunStateFailed
+		res.LastErrorState = err.Error()
+		fmt.Printf("DB error when polling traces: %s\n", err.Error())
+		tp.handleDBError(tp.resultDB.UpdateResult(job.ctx, &res))
+		return
+	}
 
 	res.State = TestRunStateAwaitingTestResults
 	res.Trace = mapTrace(
@@ -120,8 +140,7 @@ func (tp tracePoller) processJob(job tracePollReq) {
 
 	fmt.Printf("completed polling result %s after %d times\n", job.result.ResultId, job.count)
 
-	// TODO: handle error
-	_ = tp.resultDB.UpdateResult(job.ctx, &res)
+	tp.handleDBError(tp.resultDB.UpdateResult(job.ctx, &res))
 }
 
 const maxTracePollRetry = 5
@@ -131,7 +150,7 @@ func donePollingTraces(job tracePollReq, currentResults TestRunResult) bool {
 	return len(currentResults.Trace.ResourceSpans) == len(job.result.Trace.ResourceSpans) && job.count == maxTracePollRetry
 }
 
-func (tp tracePoller) handleError(job tracePollReq, err error) {
+func (tp tracePoller) handleTraceDBError(job tracePollReq, err error) {
 	res := job.result
 	if errors.Is(err, tracedb.ErrTraceNotFound) {
 		if time.Since(res.CompletedAt) < tp.maxWaitTimeForTrace {
@@ -148,8 +167,7 @@ func (tp tracePoller) handleError(job tracePollReq, err error) {
 	res.State = TestRunStateFailed
 	res.LastErrorState = err.Error()
 
-	// TODO: handle error
-	_ = tp.resultDB.UpdateResult(job.ctx, &res)
+	tp.handleDBError(tp.resultDB.UpdateResult(job.ctx, &res))
 
 }
 
