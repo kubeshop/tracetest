@@ -1,4 +1,5 @@
-import {useEffect, useRef, useState} from 'react';
+import {skipToken} from '@reduxjs/toolkit/dist/query';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import {ReactFlowProvider} from 'react-flow-renderer';
 import {Button, Tabs} from 'antd';
 import Title from 'antd/lib/typography/Title';
@@ -6,7 +7,7 @@ import {CloseOutlined, ArrowLeftOutlined} from '@ant-design/icons';
 import {useLocation, useNavigate, useParams} from 'react-router-dom';
 
 import {ITestResult} from 'types';
-import {useGetTestByIdQuery} from 'services/TestService';
+import {useGetTestByIdQuery, useGetTestResultsQuery} from 'services/TestService';
 import Trace from 'components/Trace';
 import Layout from 'components/Layout';
 
@@ -24,13 +25,35 @@ interface TracePane {
 }
 
 const TestPage = () => {
-  const navigate = useNavigate();
   const location = useLocation();
+  const navigate = useNavigate();
   const {id} = useParams();
-  const newTabIndexRef = useRef<number>(2);
   const [tracePanes, setTracePanes] = useState<TracePane[]>([]);
   const [activeTabKey, setActiveTabKey] = useState<string>('1');
   const {data: test} = useGetTestByIdQuery(id as string);
+  const {data: testResultList = [], isLoading} = useGetTestResultsQuery(id ?? skipToken);
+  const query = useMemo(() => new URLSearchParams(location.search), [location.search]);
+
+  const handleSelectTestResult = useCallback(
+    (result: ITestResult) => {
+      const itExists = Boolean(tracePanes.find(pane => pane.key === result.resultId));
+
+      if (!itExists) {
+        const newTabIndex = testResultList.findIndex(r => r.resultId === result.resultId) + 1;
+        const tracePane = {
+          key: result.resultId,
+          title: `Trace #${newTabIndex}`,
+          content: <Trace test={test!} testResultId={result.resultId} />,
+        };
+
+        setTracePanes([...tracePanes, tracePane]);
+      }
+
+      navigate(`/test/${id}?resultId=${result.resultId}`);
+      setActiveTabKey(`${result.resultId}`);
+    },
+    [id, navigate, test, testResultList, tracePanes]
+  );
 
   useEffect(() => {
     if ((location?.state as ITestRouteState)?.testRun && test) {
@@ -38,42 +61,49 @@ const TestPage = () => {
     }
   }, [location, test]);
 
-  const handleSelectTestResult = (result: ITestResult) => {
-    newTabIndexRef.current += 1;
-    const newTabIndex = newTabIndexRef.current;
-    const tracePane = {
-      key: `${newTabIndex}`,
-      title: `Trace ${newTabIndex}`,
-      content: <Trace test={test!} testResultId={result.resultId} />,
-    };
-    setTracePanes([...tracePanes, tracePane]);
-    setActiveTabKey(`${newTabIndex}`);
-  };
+  useEffect(() => {
+    const resultId = query.get('resultId');
 
-  const onChangeTab = (tabKey: string) => {
-    setActiveTabKey(tabKey);
-  };
+    if (test && resultId && resultId !== activeTabKey) {
+      const testResult = testResultList.find(({resultId: rId}) => rId === resultId);
 
-  const onEditTab = (targetKey: any) => {
-    let activeKey = activeTabKey;
-    let lastIndex = -1;
-    tracePanes.forEach((pane, i) => {
-      if (pane.key === targetKey) {
-        lastIndex = i - 1;
-      }
-    });
-    const panes = tracePanes.filter(pane => pane.key !== targetKey);
-    if (tracePanes.length && activeTabKey === targetKey) {
-      if (lastIndex >= 0) {
-        activeKey = panes[lastIndex].key;
-      } else {
-        activeKey = '1';
-      }
+      if (testResult) handleSelectTestResult(testResult);
     }
+  }, [location, test, testResultList]);
 
-    setTracePanes(panes);
-    setActiveTabKey(activeKey);
-  };
+  const onChangeTab = useCallback(
+    (tabKey: string) => {
+      if (Number.isNaN(Number(tabKey))) navigate(`/test/${id}?resultId=${tabKey}`);
+      else navigate(`/test/${id}`);
+
+      setActiveTabKey(tabKey);
+    },
+    [id, navigate]
+  );
+
+  const onEditTab = useCallback(
+    (targetKey: any) => {
+      let activeKey = activeTabKey;
+      let lastIndex = -1;
+      tracePanes.forEach((pane, i) => {
+        if (pane.key === targetKey) {
+          lastIndex = i - 1;
+        }
+      });
+      const panes = tracePanes.filter(pane => pane.key !== targetKey);
+      if (tracePanes.length && activeTabKey === targetKey) {
+        if (lastIndex >= 0) {
+          activeKey = panes[lastIndex].key;
+        } else {
+          activeKey = '1';
+        }
+      }
+
+      setTracePanes(panes);
+      setActiveTabKey(activeKey);
+    },
+    [activeTabKey, tracePanes]
+  );
 
   return (
     <Layout>
@@ -101,6 +131,8 @@ const TestPage = () => {
           <Tabs.TabPane tab="Test Details" key="1" closeIcon={<CloseOutlined hidden />}>
             <S.Wrapper>
               <TestDetails
+                testResultList={testResultList}
+                isLoading={isLoading}
                 testId={id!}
                 url={test?.serviceUnderTest.request.url}
                 onSelectResult={handleSelectTestResult}

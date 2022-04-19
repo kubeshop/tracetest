@@ -1,7 +1,6 @@
-import {skipToken} from '@reduxjs/toolkit/dist/query';
 import {Button, Table, Typography} from 'antd';
 import {FC, useCallback} from 'react';
-import {useGetTestResultsQuery, useRunTestMutation} from 'services/TestService';
+import {useRunTestMutation} from 'services/TestService';
 import {ITestResult, TestId} from 'types';
 import CustomTable from '../../components/CustomTable';
 import * as S from './Test.styled';
@@ -10,10 +9,11 @@ type TTestDetailsProps = {
   testId: TestId;
   url?: string;
   onSelectResult: (result: ITestResult) => void;
+  testResultList: ITestResult[];
+  isLoading: boolean;
 };
 
-const TestDetails: FC<TTestDetailsProps> = ({testId, onSelectResult, url}) => {
-  const {data: testResults, isLoading} = useGetTestResultsQuery(testId ?? skipToken);
+const TestDetails: FC<TTestDetailsProps> = ({testId, testResultList, isLoading, onSelectResult, url}) => {
   const [runTest, result] = useRunTestMutation();
 
   const handleRunTest = useCallback(() => {
@@ -32,7 +32,7 @@ const TestDetails: FC<TTestDetailsProps> = ({testId, onSelectResult, url}) => {
         pagination={{pageSize: 10}}
         rowKey="resultId"
         loading={isLoading}
-        dataSource={testResults?.slice()?.reverse()}
+        dataSource={testResultList?.slice()?.reverse()}
         onRow={record => {
           return {
             onClick: () => {
