@@ -80,7 +80,15 @@ func main() {
 		maxWaitTimeForTrace = 30 * time.Second
 	}
 
-	apiApiService := openapi.NewApiApiService(traceDB, testDB, ex, maxWaitTimeForTrace)
+	tracePoller := openapi.NewTracePoller(traceDB, testDB, maxWaitTimeForTrace)
+	tracePoller.Start(5) // worker count. should be configurable
+	defer tracePoller.Stop()
+
+	runner := openapi.NewPersistentRunner(ex, testDB, tracePoller)
+	runner.Start(5) // worker count. should be configurable
+	defer runner.Stop()
+
+	apiApiService := openapi.NewApiApiService(traceDB, testDB, runner)
 	apiApiController := openapi.NewApiApiController(apiApiService)
 
 	router := openapi.NewRouter(apiApiController)
