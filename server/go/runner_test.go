@@ -12,7 +12,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-func Test_PersistentRunner(t *testing.T) {
+func TestPersistentRunner(t *testing.T) {
 	t.Run("TestIsExecuted", func(t *testing.T) {
 		test := openapi.Test{
 			TestId: "test",

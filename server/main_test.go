@@ -74,7 +74,7 @@ func TestRunTest(t *testing.T) {
 
 	ctr := controller.(*openapi.ApiApiController)
 
-	ctr.TestsTestIdRunPost(w, req)
+	ctr.RunTest(w, req)
 
 	res := w.Result()
 	defer res.Body.Close()

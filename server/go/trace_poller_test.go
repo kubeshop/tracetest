@@ -12,7 +12,7 @@ import (
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 )
 
-func Test_PersistentPoller(t *testing.T) {
+func TestPersistentPoller(t *testing.T) {
 	t.Run("CanTracePolls", func(t *testing.T) {
 		// NOT IMPLEMENTED YET
 		t.Skip()
