@@ -1,16 +1,8 @@
 import {search} from 'jmespath';
 import {SemanticGroupNames, SemanticGroupsSignature} from '../lib/SelectorDefaultAttributes';
-import {
-  ISpanAttribute,
-  ISpanAttributeValue,
-  ItemSelector,
-  ITrace,
-  LOCATION_NAME,
-  ResourceSpan,
-  Span,
-  TSpanAttributesList,
-} from '../types';
+import {ISpanAttribute, ItemSelector, ITrace, LOCATION_NAME, ResourceSpan, Span, TSpanAttributesList} from '../types';
 import {escapeString} from '../utils';
+import {getSpanAttributeValue, getSpanAttributeValueType} from './SpanAttributeService';
 
 const SemanticGroupNamesList = Object.values(SemanticGroupNames);
 
@@ -25,20 +17,26 @@ const locationNameMap = {
   [LOCATION_NAME.SPAN_ID]: '',
 };
 
-export const getSpanValue = (
-  resourceSpan: ResourceSpan,
-  locationName: LOCATION_NAME,
-  valueType: keyof ISpanAttributeValue,
-  key: string
-): string => {
+export const getSpanValue = (resourceSpan: ResourceSpan, locationName: LOCATION_NAME, key: string) => {
   const searchString = locationNameMap[locationName] || '';
 
   if (!searchString) return '';
 
   const attributeList: ISpanAttribute[] = search(resourceSpan, escapeString(searchString));
-  const {value} = attributeList?.find(attribute => attribute.key === key) || {};
+  const attributeFound = attributeList?.find(attribute => attribute.key === key);
 
-  return value ? String(value[valueType]) : '';
+  return attributeFound ? getSpanAttributeValue(attributeFound) : '';
+};
+
+export const getSpanAttributeType = (resourceSpan: ResourceSpan, locationName: LOCATION_NAME, key: string) => {
+  const searchString = locationNameMap[locationName] || '';
+
+  if (!searchString) return '';
+
+  const attributeList: ISpanAttribute[] = search(resourceSpan, escapeString(searchString));
+  const attributeFound = attributeList?.find(attribute => attribute.key === key);
+
+  return attributeFound ? getSpanAttributeValueType(attributeFound) : '';
 };
 
 export const getSpanType = (resourceSpan: ResourceSpan) => {
@@ -51,14 +49,15 @@ export const getSpanType = (resourceSpan: ResourceSpan) => {
 
 const getAttributeValueList = (resourceSpan: ResourceSpan, attributeList: string[], locationName: LOCATION_NAME) =>
   attributeList.reduce<ItemSelector[]>((list, attribute) => {
-    const value = getSpanValue(resourceSpan, locationName, 'stringValue', attribute);
+    const value = getSpanValue(resourceSpan, locationName, attribute);
+    const valueType = getSpanAttributeType(resourceSpan, locationName, attribute);
 
     return value
       ? list.concat([
           {
             propertyName: attribute,
             value,
-            valueType: 'stringValue',
+            valueType,
             locationName,
           },
         ])
@@ -99,12 +98,10 @@ export const getSpanAttributeList = (resourceSpan: ResourceSpan): TSpanAttribute
   const resourceAttributeList: ISpanAttribute[] = search(resourceSpan, escapeString(resourceAttributeSearch)) || [];
   const {spanId, parentSpanId, traceId, kind, status, name} = getSpan(resourceSpan) || {};
 
-  const attributeList = [...resourceAttributeList, ...spanAttributeList].map(
-    ({key, value: {intValue, stringValue, booleanValue}}) => ({
-      key,
-      value: String(intValue || stringValue || booleanValue),
-    })
-  );
+  const attributeList = [...resourceAttributeList, ...spanAttributeList].map(attribute => ({
+    key: attribute.key,
+    value: getSpanAttributeValue(attribute),
+  }));
 
   const spanFieldList = Object.entries({traceId, spanId, parentSpanId, name, kind}).map(([key, value]) => ({
     key,
