@@ -9,7 +9,7 @@ import (
 )
 
 type Runner interface {
-	Run(Test) (runID string)
+	Run(Test) TestRunResult
 }
 
 type PersistentRunner interface {
@@ -88,7 +88,7 @@ func (r persistentRunner) Stop() {
 	r.exit <- true
 }
 
-func (r persistentRunner) Run(t Test) string {
+func (r persistentRunner) Run(t Test) TestRunResult {
 	// Start a new background context for the async process
 	ctx := context.Background()
 
@@ -101,7 +101,7 @@ func (r persistentRunner) Run(t Test) string {
 		result: result,
 	}
 
-	return result.ResultId
+	return result
 }
 
 func (r persistentRunner) processExecQueue(job execReq) {
