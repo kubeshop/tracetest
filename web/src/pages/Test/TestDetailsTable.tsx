@@ -1,39 +1,10 @@
 import {MoreOutlined, QuestionCircleOutlined} from '@ant-design/icons';
 import {Badge, Dropdown, Menu, Table, Tooltip} from 'antd';
+import TestStateBadge from 'components/TestStateBadge';
 import {differenceInSeconds} from 'date-fns';
 import {FC} from 'react';
 import CustomTable from '../../components/CustomTable';
 import {AssertionResultList, TestRunResult, TestState} from '../../types';
-
-const BadgeStatusMap: Record<
-  TestState,
-  {status: 'processing' | 'success' | 'error' | 'default' | 'warning' | undefined; label: string}
-> = {
-  [TestState.CREATED]: {
-    status: 'default',
-    label: 'Created',
-  },
-  [TestState.EXECUTING]: {
-    status: 'processing',
-    label: 'Running',
-  },
-  [TestState.AWAITING_TRACE]: {
-    status: 'warning',
-    label: 'Awaiting trace',
-  },
-  [TestState.AWAITING_TEST_RESULTS]: {
-    status: 'success',
-    label: 'Awaiting test results',
-  },
-  [TestState.FINISHED]: {
-    status: 'success',
-    label: 'Finished',
-  },
-  [TestState.FAILED]: {
-    status: 'error',
-    label: 'Failed executing test run',
-  },
-};
 
 type TextRowProps = {
   testResultList: TestRunResult[];
@@ -47,19 +18,20 @@ const getTestResultCount = (assertionResultList: AssertionResultList, type: 'all
   const spanAssertionList = assertionResultList.flatMap(({spanAssertionResults}) => spanAssertionResults);
 
   if (type === 'all') return spanAssertionList.length;
+  return spanAssertionList
+    .filter(el => el)
+    .filter(({passed}) => {
+      switch (type) {
+        case 'failed': {
+          return !passed;
+        }
 
-  return spanAssertionList.filter(({passed}) => {
-    switch (type) {
-      case 'failed': {
-        return !passed;
+        case 'passed':
+        default: {
+          return passed;
+        }
       }
-
-      case 'passed':
-      default: {
-        return passed;
-      }
-    }
-  }).length;
+    }).length;
 };
 
 const TextDetailsTable: FC<TextRowProps> = ({isLoading, onSelectResult, testResultList}) => {
@@ -102,9 +74,7 @@ const TextDetailsTable: FC<TextRowProps> = ({isLoading, onSelectResult, testResu
         key="state"
         width="20%"
         render={(value, {state}: TestRunResult) => {
-          const {status, label} = BadgeStatusMap[state] || BadgeStatusMap.CREATED;
-
-          return <Badge status={status} text={label} />;
+          return <TestStateBadge testState={state} />;
         }}
       />
       <Table.Column

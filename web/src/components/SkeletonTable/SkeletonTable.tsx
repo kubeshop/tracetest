@@ -17,25 +17,27 @@ export const SkeletonTable = ({
   columns,
   children,
   className,
-}: SkeletonTableProps): React.ReactNode => {
+}: SkeletonTableProps): JSX.Element => {
   return loading ? (
-    <Table
-      rowKey="key"
-      pagination={false}
-      dataSource={[...Array(rowCount)].map((_, index) => ({
-        key: `key${index}`,
-      }))}
-      columns={columns.map(column => {
-        return {
-          ...column,
-          render: function renderPlaceholder() {
-            return <Skeleton key={column.key} title active={active} paragraph={false} className={className} />;
-          },
-        };
-      })}
-    />
+    <div>
+      <Table
+        rowKey="key"
+        pagination={false}
+        dataSource={[...Array(rowCount)].map((_, index) => ({
+          key: `key${index}`,
+        }))}
+        columns={columns.map(column => {
+          return {
+            ...column,
+            render: function renderPlaceholder() {
+              return <Skeleton key={column.key} title active={active} paragraph={false} className={className} />;
+            },
+          };
+        })}
+      />
+    </div>
   ) : (
-    {children}
+    <div>{children}</div>
   );
 };
 

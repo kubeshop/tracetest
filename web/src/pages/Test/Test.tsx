@@ -1,7 +1,7 @@
 import {skipToken} from '@reduxjs/toolkit/dist/query';
 import {useCallback, useEffect, useMemo, useState} from 'react';
 import {ReactFlowProvider} from 'react-flow-renderer';
-import {Button, Tabs} from 'antd';
+import {Button, Tabs, Typography} from 'antd';
 import Title from 'antd/lib/typography/Title';
 import {CloseOutlined, ArrowLeftOutlined} from '@ant-design/icons';
 import {useLocation, useNavigate, useParams} from 'react-router-dom';
@@ -11,6 +11,7 @@ import {useGetTestByIdQuery, useGetTestResultsQuery} from 'services/TestService'
 
 import Trace from 'components/Trace';
 import Layout from 'components/Layout';
+import TestStateBadge from 'components/TestStateBadge';
 
 import Assertions from './Assertions';
 import * as S from './Test.styled';
@@ -34,6 +35,7 @@ const TestPage = () => {
   const {data: test} = useGetTestByIdQuery(id as string);
   const {data: testResultList = [], isLoading} = useGetTestResultsQuery(id ?? skipToken);
   const query = useMemo(() => new URLSearchParams(location.search), [location.search]);
+  const activeTestResult = testResultList.find(r => r.resultId === activeTabKey);
 
   const handleSelectTestResult = useCallback(
     (result: TestRunResult) => {
@@ -69,7 +71,6 @@ const TestPage = () => {
       const testResult = testResultList.find(({resultId: rId}) => rId === resultId);
 
       if (testResult) handleSelectTestResult(testResult);
-
     }
   }, [location, test, testResultList]);
 
@@ -121,6 +122,12 @@ const TestPage = () => {
                   {test?.name}
                 </Title>
               </S.Header>
+            ),
+            right: activeTestResult?.state && (
+              <div style={{marginRight: 24}}>
+                <Typography.Text style={{marginRight: 8, color: '#8C8C8C', fontSize: 14}}>Test status:</Typography.Text>
+                <TestStateBadge style={{fontSize: 16}} testState={activeTestResult.state} />
+              </div>
             ),
           }}
           hideAdd

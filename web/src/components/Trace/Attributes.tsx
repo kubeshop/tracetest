@@ -6,12 +6,15 @@ import SpanAttributesTable from '../SpanAttributesTable/SpanAttributesTable';
 import * as S from './Attributes.styled';
 
 type TAttributesProps = {
-  spanId: string;
-  trace: ITrace;
+  spanId?: string;
+  trace?: ITrace;
 };
 
 const Attributes: FC<TAttributesProps> = ({spanId, trace}) => {
   const spanAttributesList = useMemo(() => {
+    if (!spanId || !trace) {
+      return [];
+    }
     const resourceSpan = getResourceSpanBySpanId(spanId, trace);
 
     return resourceSpan ? getSpanAttributeList(resourceSpan) : [];

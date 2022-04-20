@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import {useStoreActions} from 'react-flow-renderer';
 import {ReflexContainer, ReflexSplitter, ReflexElement} from 'react-reflex';
 
-import {Button, Skeleton, Tabs, Typography} from 'antd';
+import {Button, Tabs, Typography} from 'antd';
 import {CloseCircleFilled} from '@ant-design/icons';
 
 import 'react-reflex/styles.css';
@@ -117,10 +117,6 @@ const Trace: React.FC<TraceProps> = ({test, testResultId}) => {
     }
   }, [test, testResultDetails, testResultId, updateTestResult]);
 
-  if (isLoadingTrace) {
-    return <Skeleton />;
-  }
-
   if (
     isError ||
     Object.keys(testResultDetails?.trace || {}).length === 0 ||
@@ -151,25 +147,23 @@ const Trace: React.FC<TraceProps> = ({test, testResultId}) => {
               </ReflexElement>
               <ReflexElement flex={0.5} className="right-pane">
                 <div className="pane-content" style={{padding: '14px 24px', overflow: 'hidden'}}>
-                  {Boolean(selectedSpan) && (
-                    <S.TraceTabs>
-                      <Tabs.TabPane tab="Span detail" key="1">
-                        <SpanDetail
-                          trace={testResultDetails?.trace!}
-                          testId={test.testId}
-                          targetSpan={selectedSpan?.data!}
-                        />
-                      </Tabs.TabPane>
-                      <Tabs.TabPane tab="Test Results" key="2">
-                        <TestResults
-                          onSpanSelected={handleOnSpanSelected}
-                          trace={testResultDetails?.trace!}
-                          test={test}
-                          traceResultList={traceResultList}
-                        />
-                      </Tabs.TabPane>
-                    </S.TraceTabs>
-                  )}
+                  <S.TraceTabs>
+                    <Tabs.TabPane tab="Span detail" key="1">
+                      <SpanDetail
+                        trace={testResultDetails?.trace}
+                        testId={test.testId}
+                        targetSpan={selectedSpan?.data}
+                      />
+                    </Tabs.TabPane>
+                    <Tabs.TabPane tab="Test Results" key="2">
+                      <TestResults
+                        onSpanSelected={handleOnSpanSelected}
+                        trace={testResultDetails?.trace!}
+                        test={test}
+                        traceResultList={traceResultList}
+                      />
+                    </Tabs.TabPane>
+                  </S.TraceTabs>
                 </div>
               </ReflexElement>
             </ReflexContainer>
