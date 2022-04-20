@@ -56,12 +56,6 @@ const TestPage = () => {
   );
 
   useEffect(() => {
-    if ((location?.state as ITestRouteState)?.testRun && test) {
-      handleSelectTestResult((location.state as ITestRouteState).testRun);
-    }
-  }, [location, test]);
-
-  useEffect(() => {
     const resultId = query.get('resultId');
 
     if (test && resultId && resultId !== activeTabKey) {
