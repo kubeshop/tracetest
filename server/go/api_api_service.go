@@ -12,6 +12,7 @@ package openapi
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/kubeshop/tracetest/server/go/tracedb"
@@ -174,6 +175,17 @@ func (s *ApiApiService) UpdateTestResult(ctx context.Context, testid string, id 
 	testResult, err := s.testDB.GetResult(ctx, id)
 	if err != nil {
 		return Response(http.StatusInternalServerError, err.Error()), err
+	}
+
+	if len(testRunResult.AssertionResult) == 0 {
+		return Response(http.StatusUnprocessableEntity, "cannot accept empty assertionResult array"), err
+	}
+
+	for i, r := range testRunResult.AssertionResult {
+		if len(r.SpanAssertionResults) == 0 {
+			msg := fmt.Sprintf("cannot accept empty spanAssertionResults for assertionResult index #%d", i)
+			return Response(http.StatusUnprocessableEntity, msg), err
+		}
 	}
 
 	testResult.AssertionResultState = testRunResult.AssertionResultState
