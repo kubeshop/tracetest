@@ -12,7 +12,7 @@ export const parseTestResultToAssertionResultList = (
   {assertions}: Test,
   {resourceSpans}: ITrace
 ): AssertionResult[] => {
-  return assertionResult.map(({assertionId, spanAssertionResults}) => {
+  return assertionResult.map(({assertionId, spanAssertionResults = []}) => {
     const assertion = assertions.find(({assertionId: id}) => id === assertionId);
 
     return {
@@ -35,7 +35,9 @@ export const parseTestResultToAssertionResultList = (
   });
 };
 
-export const parseAssertionResultListToTestResult = (assertionResultList: AssertionResult[]): TestAssertionResult => {
+export const parseAssertionResultListToTestResult = (
+  assertionResultList: AssertionResult[] = []
+): TestAssertionResult => {
   const {totalFailedCount} = getTestResultCount(assertionResultList);
 
   return {

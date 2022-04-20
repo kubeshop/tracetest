@@ -11,6 +11,7 @@ import {SELECTOR_DEFAULT_ATTRIBUTES} from 'lib/SelectorDefaultAttributes';
 import {filterBySpanId} from 'utils';
 import {CreateAssertionSelectorInput} from './CreateAssertionSelectorInput';
 import {getSpanSignature} from '../../services/SpanService';
+import { getSpanAttributeValueType } from '../../services/SpanAttributeService';
 
 interface AssertionSpan {
   key: string;
@@ -116,7 +117,7 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
             propertyName: attr.key as string,
             comparisonValue: value,
             operator: compareOp,
-            valueType: spanAttribute?.value.intValue ? 'intValue' : 'stringValue',
+            valueType: getSpanAttributeValueType(spanAttribute!),
           };
         })
         .filter((el): el is SpanSelector => Boolean(el));

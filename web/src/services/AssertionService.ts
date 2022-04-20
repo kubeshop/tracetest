@@ -93,7 +93,7 @@ export const runSpanAssertionByResourceSpan = (
       ...spanAssertion,
       spanId,
       hasPassed: Boolean(passedSpan),
-      actualValue: getSpanValue(span, locationName, valueType, propertyName),
+      actualValue: getSpanValue(span, locationName, propertyName),
     };
   });
 
