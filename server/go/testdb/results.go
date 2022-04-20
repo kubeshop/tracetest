@@ -69,7 +69,7 @@ func (td *TestDB) GetResultsByTraceID(ctx context.Context, testID, traceID strin
 }
 
 func (td *TestDB) GetResultsByTestID(ctx context.Context, testID string) ([]openapi.TestRunResult, error) {
-	stmt, err := td.db.Prepare("SELECT result FROM results WHERE test_id = $1")
+	stmt, err := td.db.Prepare("SELECT result FROM results WHERE test_id = $1 ORDER BY result ->> 'createdAt' DESC")
 	if err != nil {
 		return nil, err
 	}
