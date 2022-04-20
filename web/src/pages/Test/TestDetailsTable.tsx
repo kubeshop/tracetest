@@ -48,18 +48,20 @@ const getTestResultCount = (assertionResultList: AssertionResultList, type: 'all
 
   if (type === 'all') return spanAssertionList.length;
 
-  return spanAssertionList.filter(({passed}) => {
-    switch (type) {
-      case 'failed': {
-        return !passed;
-      }
+  return spanAssertionList
+    .filter(el => el)
+    .filter(({passed}) => {
+      switch (type) {
+        case 'failed': {
+          return !passed;
+        }
 
-      case 'passed':
-      default: {
-        return passed;
+        case 'passed':
+        default: {
+          return passed;
+        }
       }
-    }
-  }).length;
+    }).length;
 };
 
 const TextDetailsTable: FC<TextRowProps> = ({isLoading, onSelectResult, testResultList}) => {
