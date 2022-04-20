@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Typography } from 'antd';
+import {Typography} from 'antd';
 
 enum NotchColor {
   HTTP = '#B9E28C',
@@ -58,10 +58,10 @@ export const Container = styled.div`
 
 export const LoadingLabel = styled(Typography.Text)`
   position: absolute;
-  top: 25%;
+  top: 30%;
   left: 50%;
   transform: translate(-50%, -50%);
-  color: #C4C4C4;
+  color: #c4c4c4;
   font-size: 24px;
   line-height: 32px;
   font-weight: 600;

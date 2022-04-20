@@ -1,4 +1,5 @@
 import {Typography} from 'antd';
+import SkeletonTable from 'components/SkeletonTable';
 import {FC, useMemo} from 'react';
 import {getResourceSpanBySpanId, getSpanAttributeList} from '../../services/SpanService';
 import {ITrace} from '../../types';
@@ -25,7 +26,9 @@ const Attributes: FC<TAttributesProps> = ({spanId, trace}) => {
       <S.Header>
         <Typography.Text strong>Attributes</Typography.Text>
       </S.Header>
-      <SpanAttributesTable spanAttributesList={spanAttributesList} />
+      <SkeletonTable loading={!spanId || !trace}>
+        <SpanAttributesTable spanAttributesList={spanAttributesList} />
+      </SkeletonTable>
     </S.Container>
   );
 };

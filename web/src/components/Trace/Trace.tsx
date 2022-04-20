@@ -48,7 +48,6 @@ const Trace: React.FC<TraceProps> = ({test, testResultId}) => {
 
   const {
     data: testResultDetails,
-    isLoading: isLoadingTrace,
     isError,
     refetch: refetchTrace,
   } = useGetTestResultByIdQuery({testId: test.testId, resultId: testResultId});
@@ -75,12 +74,18 @@ const Trace: React.FC<TraceProps> = ({test, testResultId}) => {
     [addSelected, spanMap]
   );
 
-  const handleReload = useCallback(() => {
-    refetchTrace();
-  }, [refetchTrace]);
+  useEffect(() => {
+    let TIMEOUTID: any = null;
+    if (testResultDetails?.state === TestState.AWAITING_TRACE) {
+      TIMEOUTID = setTimeout(() => {
+        refetchTrace();
+      }, 500);
+    }
+    return () => TIMEOUTID && clearTimeout(TIMEOUTID);
+  }, [refetchTrace, testResultDetails]);
 
   useEffect(() => {
-    if (testResultDetails  && !isEmpty(testResultDetails.trace) && !testResultDetails?.assertionResult) {
+    if (testResultDetails && !isEmpty(testResultDetails.trace) && !testResultDetails?.assertionResult) {
       const resultList = runTest(testResultDetails.trace, test);
 
       setTraceResultList(resultList);
@@ -111,11 +116,7 @@ const Trace: React.FC<TraceProps> = ({test, testResultId}) => {
     }
   }, [test, testResultDetails, testResultId, updateTestResult]);
 
-  if (
-    isError ||
-    Object.keys(testResultDetails?.trace || {}).length === 0 ||
-    testResultDetails?.state === TestState.FAILED
-  ) {
+  if (isError || testResultDetails?.state === TestState.FAILED) {
     return (
       <S.FailedTrace>
         <CloseCircleFilled style={{color: 'red', fontSize: 32}} />
@@ -152,7 +153,7 @@ const Trace: React.FC<TraceProps> = ({test, testResultId}) => {
                     <Tabs.TabPane tab="Test Results" key="2">
                       <TestResults
                         onSpanSelected={handleOnSpanSelected}
-                        trace={testResultDetails?.trace!}
+                        trace={testResultDetails?.trace}
                         test={test}
                         traceResultList={traceResultList}
                       />

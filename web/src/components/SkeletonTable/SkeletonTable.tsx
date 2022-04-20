@@ -6,7 +6,7 @@ export type SkeletonTableColumnsType = {
 };
 
 type SkeletonTableProps = SkeletonProps & {
-  columns: ColumnsType<SkeletonTableColumnsType>;
+  columns?: ColumnsType<SkeletonTableColumnsType>;
   rowCount?: number;
 };
 
@@ -14,13 +14,14 @@ export const SkeletonTable = ({
   loading = false,
   active = false,
   rowCount = 5,
-  columns,
+  columns = [{key: 'loading'}] as SkeletonTableColumnsType[],
   children,
   className,
 }: SkeletonTableProps): JSX.Element => {
   return loading ? (
     <div>
       <Table
+        showHeader={false}
         rowKey="key"
         pagination={false}
         dataSource={[...Array(rowCount)].map((_, index) => ({

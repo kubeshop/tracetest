@@ -7,7 +7,7 @@ import {CloseOutlined, ArrowLeftOutlined} from '@ant-design/icons';
 import {useLocation, useNavigate, useParams} from 'react-router-dom';
 
 import {TestRunResult} from 'types';
-import {useGetTestByIdQuery, useGetTestResultsQuery} from 'services/TestService';
+import {useGetTestByIdQuery, useGetTestResultByIdQuery, useGetTestResultsQuery} from 'services/TestService';
 
 import Trace from 'components/Trace';
 import Layout from 'components/Layout';
@@ -36,6 +36,9 @@ const TestPage = () => {
   const {data: testResultList = [], isLoading} = useGetTestResultsQuery(id ?? skipToken);
   const query = useMemo(() => new URLSearchParams(location.search), [location.search]);
   const activeTestResult = testResultList.find(r => r.resultId === activeTabKey);
+  const {data: activeTestResultDetails} = useGetTestResultByIdQuery(
+    activeTestResult?.resultId && id ? {testId: id, resultId: activeTestResult.resultId} : skipToken
+  );
 
   const handleSelectTestResult = useCallback(
     (result: TestRunResult) => {
@@ -117,10 +120,10 @@ const TestPage = () => {
                 </Title>
               </S.Header>
             ),
-            right: activeTestResult?.state && (
+            right: activeTestResult?.resultId && activeTestResultDetails?.state && (
               <div style={{marginRight: 24}}>
                 <Typography.Text style={{marginRight: 8, color: '#8C8C8C', fontSize: 14}}>Test status:</Typography.Text>
-                <TestStateBadge style={{fontSize: 16}} testState={activeTestResult.state} />
+                <TestStateBadge style={{fontSize: 16}} testState={activeTestResultDetails?.state} />
               </div>
             ),
           }}

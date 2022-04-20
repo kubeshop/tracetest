@@ -1,11 +1,12 @@
 import {Button, Typography} from 'antd';
+import {skipToken} from '@reduxjs/toolkit/dist/query';
 import {PlusOutlined} from '@ant-design/icons';
 import {FC, useMemo, useState} from 'react';
 import {useGetTestByIdQuery} from 'services/TestService';
 import {Assertion, ISpan, ITrace, SpanAssertionResult} from 'types';
 import {runAssertionBySpanId} from 'services/AssertionService';
 import AssertionsResultTable from 'components/AssertionsTable/AssertionsTable';
-import SkeletonTable, {SkeletonTableColumnsType} from 'components/SkeletonTable';
+import SkeletonTable from 'components/SkeletonTable';
 import * as S from './SpanDetail.styled';
 import CreateAssertionModal from './CreateAssertionModal';
 import Attributes from './Attributes';
@@ -18,7 +19,7 @@ type TSpanDetailProps = {
 
 const SpanDetail: FC<TSpanDetailProps> = ({testId, targetSpan, trace}) => {
   const [openCreateAssertion, setOpenCreateAssertion] = useState(false);
-  const {data: test} = useGetTestByIdQuery(testId);
+  const {data: test} = useGetTestByIdQuery(testId ?? skipToken);
 
   const assertionsResultList = useMemo(() => {
     if (!targetSpan?.spanId || !trace) {
@@ -45,7 +46,7 @@ const SpanDetail: FC<TSpanDetailProps> = ({testId, targetSpan, trace}) => {
             Add Assertion
           </Button>
         </S.DetailsHeader>
-        <SkeletonTable columns={[{key: 'loading'}] as SkeletonTableColumnsType[]} loading>
+        <SkeletonTable loading={!targetSpan || !trace}>
           {assertionsResultList.length ? (
             assertionsResultList.map(({assertion, assertionResultList}, index) => (
               <AssertionsResultTable
@@ -64,14 +65,17 @@ const SpanDetail: FC<TSpanDetailProps> = ({testId, targetSpan, trace}) => {
         </SkeletonTable>
       </S.DetailsContainer>
       <Attributes spanId={targetSpan?.spanId} trace={trace} />
-      <CreateAssertionModal
-        key={`KEY_${targetSpan?.spanId}`}
-        testId={testId}
-        trace={trace}
-        span={targetSpan!}
-        open={openCreateAssertion}
-        onClose={() => setOpenCreateAssertion(false)}
-      />
+
+      {targetSpan?.spanId && (
+        <CreateAssertionModal
+          key={`KEY_${targetSpan?.spanId}`}
+          testId={testId}
+          trace={trace}
+          span={targetSpan!}
+          open={openCreateAssertion}
+          onClose={() => setOpenCreateAssertion(false)}
+        />
+      )}
     </>
   );
 };

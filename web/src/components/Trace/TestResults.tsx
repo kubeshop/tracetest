@@ -1,4 +1,5 @@
 import {Typography} from 'antd';
+import SkeletonTable from 'components/SkeletonTable';
 import {FC, useMemo} from 'react';
 import {getTestResultCount} from '../../services/TraceService';
 import {AssertionResult, ITrace, Test} from '../../types';
@@ -7,13 +8,13 @@ import * as S from './TestResults.styled';
 
 type TTestResultsProps = {
   test: Test;
-  trace: ITrace;
+  trace?: ITrace;
   traceResultList: AssertionResult[];
   onSpanSelected(spanId: string): void;
 };
 
 const TestResults: FC<TTestResultsProps> = ({test, trace, traceResultList, onSpanSelected}) => {
-  const totalSpanCount = trace.resourceSpans.length;
+  const totalSpanCount = trace?.resourceSpans?.length;
   const totalAssertionCount = test?.assertions?.length || 0;
 
   const {totalPassedCount, totalFailedCount} = useMemo(() => getTestResultCount(traceResultList), [traceResultList]);
@@ -26,23 +27,25 @@ const TestResults: FC<TTestResultsProps> = ({test, trace, traceResultList, onSpa
           • {totalPassedCount} passed/{totalFailedCount} failed
         </Typography.Text>
       </S.Header>
-      {traceResultList.length ? (
-        traceResultList.map(assertionResult =>
-          assertionResult.spanListAssertionResult.length ? (
-            <TraceAssertionsResultTable
-              key={assertionResult.assertion.assertionId}
-              assertionResult={assertionResult}
-              trace={trace}
-              onSpanSelected={onSpanSelected}
-            />
-          ) : null
-        )
-      ) : (
-        <S.EmptyStateContainer>
-          <S.EmptyStateIcon />
-          <Typography.Text disabled>No Data</Typography.Text>
-        </S.EmptyStateContainer>
-      )}
+      <SkeletonTable loading={!trace}>
+        {traceResultList.length ? (
+          traceResultList.map(assertionResult =>
+            assertionResult.spanListAssertionResult.length ? (
+              <TraceAssertionsResultTable
+                key={assertionResult.assertion.assertionId}
+                assertionResult={assertionResult}
+                trace={trace!}
+                onSpanSelected={onSpanSelected}
+              />
+            ) : null
+          )
+        ) : (
+          <S.EmptyStateContainer>
+            <S.EmptyStateIcon />
+            <Typography.Text disabled>No Data</Typography.Text>
+          </S.EmptyStateContainer>
+        )}
+      </SkeletonTable>
     </S.Container>
   );
 };

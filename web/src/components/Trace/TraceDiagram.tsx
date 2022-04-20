@@ -1,6 +1,6 @@
 import Text from 'antd/lib/typography/Text';
 import {useEffect, useMemo} from 'react';
-import { isEmpty } from 'lodash';
+import {isEmpty} from 'lodash';
 import ReactFlow, {Background, BackgroundVariant, Handle, NodeProps, Position} from 'react-flow-renderer';
 import {useDAGChart} from 'hooks/Charts';
 import {ISpan} from 'types';
@@ -50,26 +50,29 @@ const TraceNode = ({id, data, selected, ...rest}: IPropsTraceNode) => {
 };
 
 const TraceDiagram = ({spanMap, selectedSpan, onSelectSpan}: IPropsTraceDiagram): JSX.Element => {
-  const {
-    dag,
-    layout: {height},
-  } = useDAGChart(spanMap);
+  const dagLayout = useDAGChart(spanMap);
 
   const handleElementClick = (event: any, element: any) => {
     onSelectSpan(element.id);
   };
 
   useEffect(() => {
-    const [dragNode] = dag.descendants();
+    if (!dagLayout || !dagLayout.dag) {
+      return;
+    }
+    const [dragNode] = dagLayout.dag.descendants();
     const span = spanMap[dragNode?.data.id];
 
     if (!selectedSpan && span) {
       onSelectSpan(span.id);
     }
-  }, [dag, onSelectSpan, selectedSpan, spanMap]);
+  }, [dagLayout, onSelectSpan, selectedSpan, spanMap]);
 
   const dagElements = useMemo(() => {
-    const dagNodes = dag.descendants().map((i: any) => {
+    if (!dagLayout || !dagLayout.dag) {
+      return [];
+    }
+    const dagNodes = dagLayout.dag.descendants().map((i: any) => {
       return {
         id: i.data.id,
         type: 'TraceNode',
@@ -81,7 +84,7 @@ const TraceDiagram = ({spanMap, selectedSpan, onSelectSpan}: IPropsTraceDiagram)
       };
     });
 
-    dag.links().forEach(({source, target}: any) => {
+    dagLayout?.dag?.links().forEach(({source, target}: any) => {
       dagNodes.push({
         id: `${source.data.id}_${target.data.id}`,
         source: source.data.id,
@@ -93,10 +96,10 @@ const TraceDiagram = ({spanMap, selectedSpan, onSelectSpan}: IPropsTraceDiagram)
       } as any);
     });
     return dagNodes;
-  }, [spanMap, dag, selectedSpan]);
+  }, [spanMap, dagLayout, selectedSpan]);
 
   return (
-    <S.Container style={{height: height + 100}}>
+    <S.Container style={{height: Math.max(dagLayout?.layout?.height || 0, 700) + 100}}>
       <ReactFlow
         nodeTypes={{TraceNode}}
         defaultZoom={0.5}
