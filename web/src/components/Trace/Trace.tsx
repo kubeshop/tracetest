@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import {useStoreActions} from 'react-flow-renderer';
 import {ReflexContainer, ReflexSplitter, ReflexElement} from 'react-reflex';
+import {isEmpty} from 'lodash';
 
 import {Button, Skeleton, Tabs} from 'antd';
 
@@ -78,7 +79,7 @@ const Trace: React.FC<TraceProps> = ({test, testResultId}) => {
   }, [refetchTrace]);
 
   useEffect(() => {
-    if (testResultDetails && !testResultDetails?.assertionResult) {
+    if (testResultDetails  && !isEmpty(testResultDetails.trace) && !testResultDetails?.assertionResult) {
       const resultList = runTest(testResultDetails.trace, test);
 
       setTraceResultList(resultList);
@@ -88,7 +89,7 @@ const Trace: React.FC<TraceProps> = ({test, testResultId}) => {
         resultId: testResultId,
         assertionResult: parseAssertionResultListToTestResult(resultList),
       });
-    } else if (testResultDetails?.assertionResult) {
+    } else if (testResultDetails?.assertionResult && !isEmpty(testResultDetails?.trace)) {
       setTraceResultList(
         parseTestResultToAssertionResultList(testResultDetails?.assertionResult, test, testResultDetails?.trace)
       );
@@ -96,7 +97,7 @@ const Trace: React.FC<TraceProps> = ({test, testResultId}) => {
   }, [testResultDetails, test, testResultId, updateTestResult]);
 
   useEffect(() => {
-    if (testResultDetails) {
+    if (testResultDetails && !isEmpty(testResultDetails.trace)) {
       const resultList = runTest(testResultDetails.trace, test);
 
       setTraceResultList(resultList);
