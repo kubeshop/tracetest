@@ -162,11 +162,6 @@ func (s *ApiApiService) GetTestResult(ctx context.Context, testid string, id str
 	if err != nil {
 		return Response(http.StatusInternalServerError, err.Error()), err
 	}
-	tr, err := s.traceDB.GetTraceByID(ctx, res.TraceId)
-	if err == nil {
-		ttr := FixParent(tr, res.Response)
-		res.Trace = mapTrace(ttr)
-	}
 	return Response(http.StatusOK, *res), nil
 }
 
