@@ -1,3 +1,12 @@
+export enum TestState {
+  CREATED = 'CREATED',
+  EXECUTING = 'EXECUTING',
+  AWAITING_TRACE = 'AWAITING_TRACE',
+  AWAITING_TEST_RESULTS = 'AWAITING_TEST_RESULTS',
+  FAILED = 'FAILED',
+  FINISHED = 'FINISHED',
+}
+
 export enum HTTP_METHOD {
   GET = 'GET',
   PUT = 'PUT',
@@ -88,10 +97,15 @@ export interface TestRunResult {
   completedAt: string;
   response: any;
   trace: ITrace;
-  state: TEST_RUN_EXECUTION_STATE;
+  state: TestState;
   assertionResultState: boolean;
-  assertionResult: TestAssertionResult;
+  assertionResult: AssertionResultList;
 }
+
+export type AssertionResultList = Array<{
+  assertionId: string;
+  spanAssertionResults: spanAssertionResult[];
+}>;
 
 export interface HTTPRequest {
   url: string;
@@ -212,10 +226,7 @@ export interface spanAssertionResult {
 
 export interface TestAssertionResult {
   assertionResultState: boolean;
-  assertionResult: Array<{
-    assertionId: string;
-    spanAssertionResults: spanAssertionResult[];
-  }>;
+  assertionResult: AssertionResultList;
 }
 
 export type TestId = string;

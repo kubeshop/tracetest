@@ -47,6 +47,27 @@ func (td *TestDB) GetResult(ctx context.Context, id string) (*openapi.TestRunRes
 	return &run, nil
 }
 
+func (td *TestDB) GetResultsByTraceID(ctx context.Context, testID, traceID string) (openapi.TestRunResult, error) {
+	stmt, err := td.db.Prepare("SELECT result FROM results WHERE test_id = $1 AND result ->> 'traceId' = $2")
+	if err != nil {
+		return openapi.TestRunResult{}, err
+	}
+	defer stmt.Close()
+
+	var b []byte
+	err = stmt.QueryRowContext(ctx, testID, traceID).Scan(&b)
+	if err != nil {
+		return openapi.TestRunResult{}, err
+	}
+	var run openapi.TestRunResult
+
+	err = json.Unmarshal(b, &run)
+	if err != nil {
+		return openapi.TestRunResult{}, err
+	}
+	return run, nil
+}
+
 func (td *TestDB) GetResultsByTestID(ctx context.Context, testID string) ([]openapi.TestRunResult, error) {
 	stmt, err := td.db.Prepare("SELECT result FROM results WHERE test_id = $1")
 	if err != nil {

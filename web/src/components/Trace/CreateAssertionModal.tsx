@@ -1,4 +1,4 @@
-import {ChangeEvent, useState} from 'react';
+import {ChangeEvent, useCallback, useState} from 'react';
 import {QuestionCircleOutlined, PlusOutlined, TagOutlined} from '@ant-design/icons';
 import {isEmpty} from 'lodash';
 import styled from 'styled-components';
@@ -164,10 +164,10 @@ const CreateAssertionModal = ({testId, span, trace, open, onClose}: IProps) => {
     };
   });
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setAssertionList(initialFormState);
     onClose();
-  };
+  }, [onClose]);
 
   const spanAssertions = assertionList
     .map(k => ({value: k.value, attr: attrs?.find((el: any) => el.key === k?.key), compareOp: k.compareOp}))
@@ -185,10 +185,10 @@ const CreateAssertionModal = ({testId, span, trace, open, onClose}: IProps) => {
     })
     .filter((el): el is SpanSelector => Boolean(el));
 
-  const handleCreateAssertion = async () => {
-    createAssertion({testId, selectors: itemSelectors, spanAssertions});
+  const handleCreateAssertion = useCallback(async () => {
+    createAssertion({testId, selectors: itemSelectors, spanAssertions}).unwrap();
     handleClose();
-  };
+  }, [createAssertion, handleClose, itemSelectors, spanAssertions, testId]);
 
   const isValid = spanAssertions.length && spanAssertions.length;
 

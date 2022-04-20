@@ -12,14 +12,9 @@ package openapi
 import (
 	"context"
 	"errors"
-	"fmt"
-	"math/rand"
 	"net/http"
-	"time"
 
-	"github.com/google/uuid"
 	"github.com/kubeshop/tracetest/server/go/tracedb"
-	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -36,6 +31,7 @@ type TestDB interface {
 	UpdateResult(ctx context.Context, res *TestRunResult) error
 	GetResult(ctx context.Context, id string) (*TestRunResult, error)
 	GetResultsByTestID(ctx context.Context, testid string) ([]TestRunResult, error)
+	GetResultsByTraceID(ctx context.Context, testid, traceid string) (TestRunResult, error)
 
 	CreateAssertion(ctx context.Context, testid string, assertion *Assertion) (string, error)
 	GetAssertion(ctx context.Context, id string) (*Assertion, error)
@@ -51,21 +47,17 @@ type TestExecutor interface {
 // This service should implement the business logic for every endpoint for the ApiApi API.
 // Include any external packages or services that will be required by this service.
 type ApiApiService struct {
-	traceDB             tracedb.TraceDB
-	testDB              TestDB
-	executor            TestExecutor
-	rand                *rand.Rand
-	maxWaitTimeForTrace time.Duration
+	traceDB tracedb.TraceDB
+	testDB  TestDB
+	runner  Runner
 }
 
 // NewApiApiService creates a default api service
-func NewApiApiService(traceDB tracedb.TraceDB, testDB TestDB, executor TestExecutor, maxWaitTimeForTrace time.Duration) ApiApiServicer {
+func NewApiApiService(traceDB tracedb.TraceDB, testDB TestDB, runner Runner) ApiApiServicer {
 	return &ApiApiService{
-		traceDB:             traceDB,
-		testDB:              testDB,
-		executor:            executor,
-		rand:                rand.New(rand.NewSource(time.Now().UnixNano())),
-		maxWaitTimeForTrace: maxWaitTimeForTrace,
+		traceDB: traceDB,
+		testDB:  testDB,
+		runner:  runner,
 	}
 }
 
@@ -115,58 +107,14 @@ func (s *ApiApiService) GetTest(ctx context.Context, testid string) (ImplRespons
 	}
 
 	if test.ReferenceTestRunResult.TraceId != "" {
-		res := test.ReferenceTestRunResult
-		tr, err := s.traceDB.GetTraceByID(ctx, res.TraceId)
-		if handledErr := s.handleGetTraceError(ctx, res, err); handledErr != nil {
-			return Response(http.StatusInternalServerError, handledErr.Error()), handledErr
-		}
-		res.State = TestRunStateAwaitingTestResults
-		if err := s.testDB.UpdateResult(ctx, &res); err != nil {
-			fmt.Printf("update result err: %s\n", err)
-			return Response(http.StatusInternalServerError, err.Error()), err
-		}
-
-		sid, err := trace.SpanIDFromHex(res.SpanId)
+		res, err := s.testDB.GetResultsByTraceID(ctx, test.TestId, test.ReferenceTestRunResult.TraceId)
 		if err != nil {
 			return Response(http.StatusInternalServerError, err.Error()), err
 		}
-		tid, err := trace.TraceIDFromHex(res.TraceId)
-		if err != nil {
-			return Response(http.StatusInternalServerError, err.Error()), err
-		}
-		ttr := FixParent(tr, string(tid[:]), string(sid[:]), res.Response)
-		res.Trace = mapTrace(ttr)
-
 		test.ReferenceTestRunResult = res
 	}
+
 	return Response(200, test), nil
-}
-
-func (s *ApiApiService) handleGetTraceError(ctx context.Context, res TestRunResult, err error) error {
-	if err == nil {
-		return nil
-	}
-
-	var finalErr error
-
-	if errors.Is(err, tracedb.ErrTraceNotFound) {
-		if time.Since(res.CompletedAt) < s.maxWaitTimeForTrace {
-			return nil
-		}
-		finalErr = fmt.Errorf("timed out waiting for traces after %s", s.maxWaitTimeForTrace.String())
-	} else {
-		finalErr = fmt.Errorf("cannot fetch trace: %w", err)
-	}
-
-	res.State = TestRunStateFailed
-	res.LastErrorState = finalErr.Error()
-	if err := s.testDB.UpdateResult(ctx, &res); err != nil {
-		fmt.Printf("update result err: %s\n", err)
-		finalErr = err
-	}
-
-	return finalErr
-
 }
 
 // GetTests - Gets all tests
@@ -180,7 +128,7 @@ func (s *ApiApiService) GetTests(ctx context.Context) (ImplResponse, error) {
 }
 
 func (s *ApiApiService) RunTest(ctx context.Context, testid string) (ImplResponse, error) {
-	t, err := s.testDB.GetTest(ctx, testid)
+	test, err := s.testDB.GetTest(ctx, testid)
 	if err != nil {
 		switch {
 		case errors.Is(ErrNotFound, err):
@@ -190,72 +138,7 @@ func (s *ApiApiService) RunTest(ctx context.Context, testid string) (ImplRespons
 		}
 	}
 
-	id := uuid.New().String()
-	tid := trace.TraceID{}
-	s.rand.Read(tid[:])
-
-	sid := trace.SpanID{}
-	s.rand.Read(sid[:])
-
-	res := &TestRunResult{
-		ResultId:  id,
-		TestId:    testid,
-		CreatedAt: time.Now(),
-		TraceId:   tid.String(),
-		SpanId:    sid.String(),
-		State:     TestRunStateCreated,
-	}
-
-	err = s.testDB.CreateResult(ctx, testid, res)
-	if err != nil {
-		return Response(http.StatusInternalServerError, err.Error()), err
-	}
-
-	go func(t Test, tid trace.TraceID, sid trace.SpanID, res TestRunResult) {
-		tracer := otel.GetTracerProvider().Tracer("")
-		ctx, span := tracer.Start(ctx, "Execute Test")
-		defer span.End()
-
-		res.State = TestRunStateExecuting
-		err = s.testDB.UpdateResult(ctx, &res)
-		if err != nil {
-			fmt.Printf("update result err: %s\n", err)
-			return
-		}
-
-		fmt.Println("executing test")
-		resp, err := s.executor.Execute(&t, tid, sid)
-		if err != nil {
-			fmt.Printf("exec err: %s", err)
-			res.State = TestRunStateFailed
-			err = s.testDB.UpdateResult(ctx, &res)
-			if err != nil {
-				fmt.Printf("update result err: %s\n", err)
-			}
-			return
-		}
-		fmt.Println(resp)
-
-		res.State = TestRunStateAwaitingTrace
-		res.Response = resp.Response
-		res.CompletedAt = time.Now()
-		err = s.testDB.UpdateResult(ctx, &res)
-		if err != nil {
-			fmt.Printf("update result err: %s\n", err)
-			return
-		}
-
-		if t.ReferenceTestRunResult.ResultId == "" {
-			t.ReferenceTestRunResult = res
-			err = s.testDB.UpdateTest(ctx, &t)
-			if err != nil {
-				fmt.Printf("update test last result err: %s\n", err)
-				return
-			}
-		}
-
-		fmt.Println("executed successfully")
-	}(*t, tid, sid, *res)
+	id := s.runner.Run(*test)
 
 	return Response(200, TestRun{
 		TestRunId: id,
@@ -303,6 +186,7 @@ func (s *ApiApiService) UpdateTestResult(ctx context.Context, testid string, id 
 
 	testResult.AssertionResultState = testRunResult.AssertionResultState
 	testResult.AssertionResult = testRunResult.AssertionResult
+	testResult.State = TestRunStateFinished
 
 	err = s.testDB.UpdateResult(ctx, testResult)
 	if err != nil {

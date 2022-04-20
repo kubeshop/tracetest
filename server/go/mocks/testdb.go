@@ -139,6 +139,21 @@ func (mr *MockTestDBMockRecorder) GetResultsByTestID(arg0, arg1 interface{}) *go
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetResultsByTestID", reflect.TypeOf((*MockTestDB)(nil).GetResultsByTestID), arg0, arg1)
 }
 
+// GetResultsByTraceID mocks base method.
+func (m *MockTestDB) GetResultsByTraceID(arg0 context.Context, arg1, arg2 string) (openapi.TestRunResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetResultsByTraceID", arg0, arg1, arg2)
+	ret0, _ := ret[0].(openapi.TestRunResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetResultsByTraceID indicates an expected call of GetResultsByTraceID.
+func (mr *MockTestDBMockRecorder) GetResultsByTraceID(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetResultsByTraceID", reflect.TypeOf((*MockTestDB)(nil).GetResultsByTraceID), arg0, arg1, arg2)
+}
+
 // GetTest mocks base method.
 func (m *MockTestDB) GetTest(arg0 context.Context, arg1 string) (*openapi.Test, error) {
 	m.ctrl.T.Helper()

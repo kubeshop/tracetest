@@ -16,6 +16,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"regexp"
 	"time"
 
 	openapi "github.com/kubeshop/tracetest/server/go"
@@ -79,13 +80,30 @@ func main() {
 		maxWaitTimeForTrace = 30 * time.Second
 	}
 
-	apiApiService := openapi.NewApiApiService(traceDB, testDB, ex, maxWaitTimeForTrace)
+	tracePoller := openapi.NewTracePoller(traceDB, testDB, maxWaitTimeForTrace)
+	tracePoller.Start(5) // worker count. should be configurable
+	defer tracePoller.Stop()
+
+	runner := openapi.NewPersistentRunner(ex, testDB, tracePoller)
+	runner.Start(5) // worker count. should be configurable
+	defer runner.Stop()
+
+	apiApiService := openapi.NewApiApiService(traceDB, testDB, runner)
 	apiApiController := openapi.NewApiApiController(apiApiService)
 
 	router := openapi.NewRouter(apiApiController)
 	router.Use(otelmux.Middleware("tracetest"))
+
 	dir := "./html"
-	router.PathPrefix("/").Handler(http.FileServer(http.Dir(dir)))
+	fileServer := http.FileServer(http.Dir(dir))
+	fileMatcher := regexp.MustCompile(`\.[a-zA-Z]*$`)
+	router.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if !fileMatcher.MatchString(r.URL.Path) {
+			http.ServeFile(w, r, dir+"/index.html")
+		} else {
+			fileServer.ServeHTTP(w, r)
+		}
+	})
 
 	log.Printf("Server started")
 	log.Fatal(http.ListenAndServe(":8080", router))

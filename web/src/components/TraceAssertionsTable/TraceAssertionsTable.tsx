@@ -88,8 +88,6 @@ const TraceAssertionsResultTable: FC<IProps> = ({
         size="small"
         pagination={false}
         dataSource={parsedAssertionList}
-        bordered
-        tableLayout="fixed"
         onRow={record => ({
           onClick: () => onSpanSelected((record as TParsedAssertion).spanId),
         })}

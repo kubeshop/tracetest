@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/google/uuid"
 	openapi "github.com/kubeshop/tracetest/server/go"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/contrib/propagators/aws/xray"
@@ -37,7 +36,7 @@ func New() (*TestExecutor, error) {
 	}, nil
 }
 
-func (te *TestExecutor) Execute(test *openapi.Test, tid trace.TraceID, sid trace.SpanID) (*openapi.TestRunResult, error) {
+func (te *TestExecutor) Execute(test *openapi.Test, tid trace.TraceID, sid trace.SpanID) (openapi.HttpResponse, error) {
 
 	client := http.Client{
 		Transport: otelhttp.NewTransport(http.DefaultTransport,
@@ -68,7 +67,7 @@ func (te *TestExecutor) Execute(test *openapi.Test, tid trace.TraceID, sid trace
 	}
 	req, err := http.NewRequest(strings.ToUpper(tReq.Method), tReq.Url, body)
 	if err != nil {
-		return nil, err
+		return openapi.HttpResponse{}, err
 	}
 	for _, h := range tReq.Headers {
 		req.Header.Set(h.Key, h.Value)
@@ -93,13 +92,10 @@ func (te *TestExecutor) Execute(test *openapi.Test, tid trace.TraceID, sid trace
 
 	resp, err := client.Do(req.WithContext(trace.ContextWithSpanContext(context.Background(), sc)))
 	if err != nil {
-		return nil, err
+		return openapi.HttpResponse{}, err
 	}
 
-	return &openapi.TestRunResult{
-		ResultId: uuid.New().String(),
-		Response: mapResp(resp),
-	}, nil
+	return mapResp(resp), nil
 }
 
 func mapResp(resp *http.Response) openapi.HttpResponse {
