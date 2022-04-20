@@ -70,7 +70,6 @@ export interface ISpan {
   startTime: number;
   duration: number;
   attributes: ISpanAttribute[];
-  parentSpanId?: string;
   events: Array<{
     timeUnixNano: string;
     name: string;

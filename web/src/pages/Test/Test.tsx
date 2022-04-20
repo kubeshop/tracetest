@@ -46,7 +46,7 @@ const TestPage = () => {
         const tracePane = {
           key: result.resultId,
           title: `Trace #${newTabIndex}`,
-          content: <Trace test={test!} testResultId={result.resultId} />,
+          content: <Trace test={{...test!}} testResultId={result.resultId} />,
         };
 
         setTracePanes([...tracePanes, tracePane]);
@@ -57,12 +57,6 @@ const TestPage = () => {
     },
     [id, navigate, test, testResultList, tracePanes]
   );
-
-  useEffect(() => {
-    if ((location?.state as ITestRouteState)?.testRun && test) {
-      handleSelectTestResult((location.state as ITestRouteState).testRun);
-    }
-  }, [location, test]);
 
   useEffect(() => {
     const resultId = query.get('resultId');

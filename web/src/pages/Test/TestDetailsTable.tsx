@@ -18,6 +18,7 @@ const getTestResultCount = (assertionResultList: AssertionResultList, type: 'all
   const spanAssertionList = assertionResultList.flatMap(({spanAssertionResults}) => spanAssertionResults);
 
   if (type === 'all') return spanAssertionList.length;
+
   return spanAssertionList
     .filter(el => el)
     .filter(({passed}) => {

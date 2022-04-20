@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/server/go/tracedb"
-	"go.opentelemetry.io/otel/trace"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 )
 
@@ -114,27 +113,9 @@ func (tp tracePoller) processJob(job tracePollReq) {
 		return
 	}
 
-	sid, err := trace.SpanIDFromHex(res.SpanId)
-	if err != nil {
-		res.State = TestRunStateFailed
-		res.LastErrorState = err.Error()
-		fmt.Printf("DB error when polling traces: %s\n", err.Error())
-		tp.handleDBError(tp.resultDB.UpdateResult(job.ctx, &res))
-		return
-	}
-
-	tid, err := trace.TraceIDFromHex(res.TraceId)
-	if err != nil {
-		res.State = TestRunStateFailed
-		res.LastErrorState = err.Error()
-		fmt.Printf("DB error when polling traces: %s\n", err.Error())
-		tp.handleDBError(tp.resultDB.UpdateResult(job.ctx, &res))
-		return
-	}
-
 	res.State = TestRunStateAwaitingTestResults
 	res.Trace = mapTrace(
-		FixParent(tr, string(tid[:]), string(sid[:]), res.Response),
+		FixParent(tr, res.Response),
 	)
 
 	if !tp.donePollingTraces(job, res) {

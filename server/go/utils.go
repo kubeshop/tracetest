@@ -5,7 +5,6 @@ import (
 	"strconv"
 
 	v11 "go.opentelemetry.io/proto/otlp/common/v1"
-	res "go.opentelemetry.io/proto/otlp/resource/v1"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 )
 
@@ -239,7 +238,7 @@ func headersToKeyValueList(headers []HttpResponseHeaders) *v11.KeyValueList {
 	return &v11.KeyValueList{Values: mapped}
 }
 
-func FixParent(tr *v1.TracesData, traceID, parentSpanID string, response HttpResponse) *v1.TracesData {
+func FixParent(tr *v1.TracesData, response HttpResponse) *v1.TracesData {
 	spans := make(map[string]*v1.Span)
 	for _, rs := range tr.ResourceSpans {
 		for _, ils := range rs.InstrumentationLibrarySpans {
@@ -249,18 +248,22 @@ func FixParent(tr *v1.TracesData, traceID, parentSpanID string, response HttpRes
 		}
 	}
 
-	// Fix parent id
+	// Find parent span
+	var parentSpan *v1.Span
 	for _, sp := range spans {
 		if sp.ParentSpanId == nil {
 			continue
 		}
 		_, ok := spans[string(sp.ParentSpanId)]
 		if !ok {
-			sp.ParentSpanId = []byte(parentSpanID)
+			parentSpan = sp
 		}
 	}
+	if parentSpan == nil {
+		return tr
+	}
 
-	attributes := []*v11.KeyValue{
+	tracetestAttrs := []*v11.KeyValue{
 		{
 			Key: "tracetest.response.status",
 			Value: &v11.AnyValue{
@@ -281,32 +284,8 @@ func FixParent(tr *v1.TracesData, traceID, parentSpanID string, response HttpRes
 		},
 	}
 
-	// this is the parent span
-	rs := &v1.ResourceSpans{
-		Resource: &res.Resource{
-			Attributes:             attributes,
-			DroppedAttributesCount: 0,
-		},
-		InstrumentationLibrarySpans: []*v1.InstrumentationLibrarySpans{
-			{
-				InstrumentationLibrary: &v11.InstrumentationLibrary{
-					Name:    "tracetest",
-					Version: "v1",
-				},
-				Spans: []*v1.Span{
-					{
-						TraceId:      []byte(traceID),
-						SpanId:       []byte(parentSpanID),
-						ParentSpanId: nil,
-						Name:         "tracetest",
-						Kind:         v1.Span_SPAN_KIND_CLIENT,
-					},
-				},
-			},
-		},
-		SchemaUrl: "",
-	}
-	tr.ResourceSpans = append(tr.ResourceSpans, rs)
+	parentSpan.ParentSpanId = nil
+	parentSpan.Attributes = append(parentSpan.Attributes, tracetestAttrs...)
 
 	return tr
 }

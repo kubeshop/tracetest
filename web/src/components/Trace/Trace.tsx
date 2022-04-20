@@ -2,6 +2,7 @@ import {useCallback, useEffect, useMemo, useState} from 'react';
 import styled from 'styled-components';
 import {useStoreActions} from 'react-flow-renderer';
 import {ReflexContainer, ReflexSplitter, ReflexElement} from 'react-reflex';
+import {isEmpty} from 'lodash';
 
 import {Button, Tabs, Typography} from 'antd';
 import {CloseCircleFilled} from '@ant-design/icons';
@@ -52,23 +53,16 @@ const Trace: React.FC<TraceProps> = ({test, testResultId}) => {
     refetch: refetchTrace,
   } = useGetTestResultByIdQuery({testId: test.testId, resultId: testResultId});
 
-  const spanMap = useMemo(() => {
-    const spanList: ISpan[] =
-      testResultDetails?.trace?.resourceSpans
-        ?.map(i => i.instrumentationLibrarySpans.map((el: any) => el.spans))
-        ?.flat(2) || [];
-
-    const defaultSpan = spanList.find(({parentSpanId}) => !parentSpanId);
-
-    return spanList.reduce<TSpanMap>((acc, span) => {
-      if (span.spanId === defaultSpan?.spanId) return acc;
-
-      acc[span.spanId] = acc[span.spanId] || {id: span.spanId, parentIds: [], data: span};
-      if (span.parentSpanId !== defaultSpan?.spanId && span.parentSpanId)
+  const spanMap = useMemo<TSpanMap>(() => {
+    return testResultDetails?.trace?.resourceSpans
+      ?.map(i => i.instrumentationLibrarySpans.map((el: any) => el.spans))
+      ?.flat(2)
+      ?.reduce((acc, span) => {
+        acc[span.spanId] = acc[span.spanId] || {id: span.spanId, parentIds: [], data: span};
         acc[span.spanId].parentIds.push(span.parentSpanId);
 
-      return acc;
-    }, {});
+        return acc;
+      }, {});
   }, [testResultDetails]);
 
   const addSelected = useStoreActions(actions => actions.addSelectedElements);
@@ -86,7 +80,7 @@ const Trace: React.FC<TraceProps> = ({test, testResultId}) => {
   }, [refetchTrace]);
 
   useEffect(() => {
-    if (testResultDetails && !testResultDetails?.assertionResult) {
+    if (testResultDetails  && !isEmpty(testResultDetails.trace) && !testResultDetails?.assertionResult) {
       const resultList = runTest(testResultDetails.trace, test);
 
       setTraceResultList(resultList);
@@ -96,7 +90,7 @@ const Trace: React.FC<TraceProps> = ({test, testResultId}) => {
         resultId: testResultId,
         assertionResult: parseAssertionResultListToTestResult(resultList),
       });
-    } else if (testResultDetails?.assertionResult) {
+    } else if (testResultDetails?.assertionResult && !isEmpty(testResultDetails?.trace)) {
       setTraceResultList(
         parseTestResultToAssertionResultList(testResultDetails?.assertionResult, test, testResultDetails?.trace)
       );
@@ -104,7 +98,7 @@ const Trace: React.FC<TraceProps> = ({test, testResultId}) => {
   }, [testResultDetails, test, testResultId, updateTestResult]);
 
   useEffect(() => {
-    if (testResultDetails) {
+    if (testResultDetails && !isEmpty(testResultDetails.trace)) {
       const resultList = runTest(testResultDetails.trace, test);
 
       setTraceResultList(resultList);
