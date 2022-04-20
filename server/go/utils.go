@@ -3,6 +3,7 @@ package openapi
 import (
 	"encoding/hex"
 	"strconv"
+	"strings"
 
 	v11 "go.opentelemetry.io/proto/otlp/common/v1"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
@@ -204,19 +205,17 @@ func spanType(attrs []V1KeyValue) string {
 	// using the first required attribute for each type
 	for _, attr := range attrs {
 		switch true {
-		case attr.Key == "http.method":
+		case strings.HasPrefix(attr.Key, "http."):
 			return "http"
-		case attr.Key == "db.system":
+		case strings.HasPrefix(attr.Key, "db."):
 			return "database"
-		case attr.Key == "rpc.system":
+		case strings.HasPrefix(attr.Key, "rpc."):
 			return "rpc"
-		case attr.Key == "messaging.system":
+		case strings.HasPrefix(attr.Key, "messaging."):
 			return "messaging"
-		case attr.Key == "faas.trigger", attr.Key == "faas.execution":
-			// faas has no required attr, so anyone works
+		case strings.HasPrefix(attr.Key, "faas."):
 			return "faas"
-		case attr.Key == "exception.type", attr.Key == "exception.message":
-			// at least one of the two must be present
+		case strings.HasPrefix(attr.Key, "exception."):
 			return "exception"
 		}
 	}
