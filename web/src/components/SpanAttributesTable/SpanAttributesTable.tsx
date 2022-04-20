@@ -19,10 +19,13 @@ const SpanAttributesTable: FC<TSpanAttributesTableProps> = ({spanAttributesList}
         dataIndex="key"
         key="key"
         width="20%"
-        onCell={() => ({
-          style: {
-            background: '#FAFAFA',
+        render={value => ({
+          props: {
+            style: {
+              background: '#FAFAFA',
+            },
           },
+          children: value,
         })}
       />
       <Table.Column dataIndex="value" key="value" />

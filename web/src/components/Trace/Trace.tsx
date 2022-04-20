@@ -51,23 +51,16 @@ const Trace: React.FC<TraceProps> = ({test, testResultId}) => {
     refetch: refetchTrace,
   } = useGetTestResultByIdQuery({testId: test.testId, resultId: testResultId});
 
-  const spanMap = useMemo(() => {
-    const spanList: ISpan[] =
-      testResultDetails?.trace?.resourceSpans
-        ?.map(i => i.instrumentationLibrarySpans.map((el: any) => el.spans))
-        ?.flat(2) || [];
-
-    const defaultSpan = spanList.find(({parentSpanId}) => !parentSpanId);
-
-    return spanList.reduce<TSpanMap>((acc, span) => {
-      if (span.spanId === defaultSpan?.spanId) return acc;
-
-      acc[span.spanId] = acc[span.spanId] || {id: span.spanId, parentIds: [], data: span};
-      if (span.parentSpanId !== defaultSpan?.spanId && span.parentSpanId)
+  const spanMap = useMemo<TSpanMap>(() => {
+    return testResultDetails?.trace?.resourceSpans
+      ?.map(i => i.instrumentationLibrarySpans.map((el: any) => el.spans))
+      ?.flat(2)
+      ?.reduce((acc, span) => {
+        acc[span.spanId] = acc[span.spanId] || {id: span.spanId, parentIds: [], data: span};
         acc[span.spanId].parentIds.push(span.parentSpanId);
 
-      return acc;
-    }, {});
+        return acc;
+      }, {});
   }, [testResultDetails]);
 
   const addSelected = useStoreActions(actions => actions.addSelectedElements);
