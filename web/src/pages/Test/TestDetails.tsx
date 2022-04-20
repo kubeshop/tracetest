@@ -16,8 +16,11 @@ type TTestDetailsProps = {
 const TestDetails: FC<TTestDetailsProps> = ({testId, testResultList, isLoading, onSelectResult, url}) => {
   const [runTest, result] = useRunTestMutation();
 
-  const handleRunTest = useCallback(() => {
-    if (testId) runTest(testId);
+  const handleRunTest = useCallback(async () => {
+    if (testId) {
+      const testResult = await runTest(testId).unwrap();
+      onSelectResult({resultId: testResult.testRunId} as TestRunResult);
+    }
   }, [runTest, testId]);
 
   return (
