@@ -30,8 +30,11 @@ const TestPage = () => {
   const {id} = useParams();
   const [tracePanes, setTracePanes] = useState<TracePane[]>([]);
   const [activeTabKey, setActiveTabKey] = useState<string>('1');
+  const [readRoute, setReadRoute] = useState(false);
   const {data: test} = useGetTestByIdQuery(id as string);
-  const {data: testResultList = [], isLoading} = useGetTestResultsQuery(id ?? skipToken);
+  const {data: testResultList = [], isLoading} = useGetTestResultsQuery(id ?? skipToken, {
+    pollingInterval: 5000,
+  });
   const query = useMemo(() => new URLSearchParams(location.search), [location.search]);
 
   const handleSelectTestResult = useCallback(
@@ -43,7 +46,7 @@ const TestPage = () => {
         const tracePane = {
           key: result.resultId,
           title: `Trace #${newTabIndex}`,
-          content: <Trace test={{...test!}} testResultId={result.resultId} />,
+          content: <Trace testId={id!} testResultId={result.resultId} />,
         };
 
         setTracePanes([...tracePanes, tracePane]);
@@ -52,18 +55,19 @@ const TestPage = () => {
       navigate(`/test/${id}?resultId=${result.resultId}`);
       setActiveTabKey(`${result.resultId}`);
     },
-    [id, navigate, test, testResultList, tracePanes]
+    [id, navigate, testResultList, tracePanes]
   );
 
   useEffect(() => {
     const resultId = query.get('resultId');
 
-    if (test && resultId && resultId !== activeTabKey) {
+    if (test && resultId && resultId !== activeTabKey && !readRoute && testResultList.length) {
       const testResult = testResultList.find(({resultId: rId}) => rId === resultId);
 
       if (testResult) handleSelectTestResult(testResult);
+      setReadRoute(true);
     }
-  }, [location, test, testResultList]);
+  }, [location, test, testResultList, readRoute]);
 
   const onChangeTab = useCallback(
     (tabKey: string) => {

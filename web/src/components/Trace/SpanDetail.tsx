@@ -1,23 +1,21 @@
 import {Button, Typography} from 'antd';
 import {PlusOutlined} from '@ant-design/icons';
 import {FC, useMemo, useState} from 'react';
-import {useGetTestByIdQuery} from '../../services/TestService';
-import {Assertion, ISpan, ITrace, SpanAssertionResult} from '../../types';
+import {Assertion, ISpan, ITrace, SpanAssertionResult, Test} from '../../types';
 import * as S from './SpanDetail.styled';
-import CreateAssertionModal from './CreateAssertionModal';
+import CreateAssertionModal from '../CreateAssertionModal';
 import {runAssertionBySpanId} from '../../services/AssertionService';
 import AssertionsResultTable from '../AssertionsTable/AssertionsTable';
 import Attributes from './Attributes';
 
 type TSpanDetailProps = {
-  testId: string;
+  test?: Test;
   targetSpan: ISpan;
   trace: ITrace;
 };
 
-const SpanDetail: FC<TSpanDetailProps> = ({testId, targetSpan, trace}) => {
+const SpanDetail: FC<TSpanDetailProps> = ({test, targetSpan, trace}) => {
   const [openCreateAssertion, setOpenCreateAssertion] = useState(false);
-  const {data: test} = useGetTestByIdQuery(testId);
 
   const assertionsResultList = useMemo(
     () =>
@@ -60,7 +58,7 @@ const SpanDetail: FC<TSpanDetailProps> = ({testId, targetSpan, trace}) => {
       <Attributes spanId={targetSpan.spanId} trace={trace} />
       <CreateAssertionModal
         key={`KEY_${targetSpan.spanId}`}
-        testId={testId}
+        testId={test?.testId!}
         trace={trace}
         span={targetSpan}
         open={openCreateAssertion}

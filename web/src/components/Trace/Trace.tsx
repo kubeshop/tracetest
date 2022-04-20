@@ -8,8 +8,8 @@ import {Button, Skeleton, Tabs} from 'antd';
 import 'react-reflex/styles.css';
 
 import {useCallback, useEffect, useMemo, useState} from 'react';
-import {AssertionResult, ISpan, Test} from 'types';
-import {useGetTestResultByIdQuery, useUpdateTestResultMutation} from 'services/TestService';
+import {AssertionResult, ISpan} from 'types';
+import {useGetTestByIdQuery, useGetTestResultByIdQuery, useUpdateTestResultMutation} from 'services/TestService';
 
 import TraceDiagram from './TraceDiagram';
 import TraceTimeline from './TraceTimeline';
@@ -36,21 +36,23 @@ export type TSpanInfo = {
 type TSpanMap = Record<string, TSpanInfo>;
 
 type TraceProps = {
-  test: Test;
+  testId: string;
   testResultId: string;
 };
 
-const Trace: React.FC<TraceProps> = ({test, testResultId}) => {
+const Trace: React.FC<TraceProps> = ({testId, testResultId}) => {
   const [selectedSpan, setSelectedSpan] = useState<TSpanInfo | undefined>();
   const [traceResultList, setTraceResultList] = useState<AssertionResult[]>([]);
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [updateTestResult] = useUpdateTestResultMutation();
+  const {data: test} = useGetTestByIdQuery(testId);
 
   const {
     data: testResultDetails,
     isLoading: isLoadingTrace,
     isError,
     refetch: refetchTrace,
-  } = useGetTestResultByIdQuery({testId: test.testId, resultId: testResultId});
+  } = useGetTestResultByIdQuery({testId, resultId: testResultId});
 
   const spanMap = useMemo<TSpanMap>(() => {
     return testResultDetails?.trace?.resourceSpans
@@ -79,36 +81,38 @@ const Trace: React.FC<TraceProps> = ({test, testResultId}) => {
   }, [refetchTrace]);
 
   useEffect(() => {
-    if (testResultDetails  && !isEmpty(testResultDetails.trace) && !testResultDetails?.assertionResult) {
+    if (testResultDetails && test && !isFirstLoad) {
       const resultList = runTest(testResultDetails.trace, test);
 
       setTraceResultList(resultList);
 
       updateTestResult({
-        testId: test.testId,
+        testId,
         resultId: testResultId,
         assertionResult: parseAssertionResultListToTestResult(resultList),
       });
-    } else if (testResultDetails?.assertionResult && !isEmpty(testResultDetails?.trace)) {
+    }
+  }, [test]);
+
+  useEffect(() => {
+    if (testResultDetails && !isEmpty(testResultDetails.trace) && !testResultDetails?.assertionResult && test) {
+      const resultList = runTest(testResultDetails.trace, test);
+
+      setTraceResultList(resultList);
+      setIsFirstLoad(false);
+
+      updateTestResult({
+        testId,
+        resultId: testResultId,
+        assertionResult: parseAssertionResultListToTestResult(resultList),
+      });
+    } else if (testResultDetails?.assertionResult && test) {
+      setIsFirstLoad(false);
       setTraceResultList(
         parseTestResultToAssertionResultList(testResultDetails?.assertionResult, test, testResultDetails?.trace)
       );
     }
-  }, [testResultDetails, test, testResultId, updateTestResult]);
-
-  useEffect(() => {
-    if (testResultDetails && !isEmpty(testResultDetails.trace)) {
-      const resultList = runTest(testResultDetails.trace, test);
-
-      setTraceResultList(resultList);
-
-      updateTestResult({
-        testId: test.testId,
-        resultId: testResultId,
-        assertionResult: parseAssertionResultListToTestResult(resultList),
-      });
-    }
-  }, [test, testResultDetails, testResultId, updateTestResult]);
+  }, [testResultDetails, test, testResultId, updateTestResult, testId]);
 
   if (isLoadingTrace) {
     return <Skeleton />;
@@ -140,17 +144,12 @@ const Trace: React.FC<TraceProps> = ({test, testResultId}) => {
                   {Boolean(selectedSpan) && (
                     <S.TraceTabs>
                       <Tabs.TabPane tab="Span detail" key="1">
-                        <SpanDetail
-                          trace={testResultDetails?.trace!}
-                          testId={test.testId}
-                          targetSpan={selectedSpan?.data!}
-                        />
+                        <SpanDetail trace={testResultDetails?.trace!} test={test} targetSpan={selectedSpan?.data!} />
                       </Tabs.TabPane>
                       <Tabs.TabPane tab="Test Results" key="2">
                         <TestResults
                           onSpanSelected={handleOnSpanSelected}
                           trace={testResultDetails?.trace!}
-                          test={test}
                           traceResultList={traceResultList}
                         />
                       </Tabs.TabPane>

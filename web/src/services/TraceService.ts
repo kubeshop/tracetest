@@ -19,9 +19,7 @@ export const parseTestResultToAssertionResultList = (
       assertion: assertion!,
       spanListAssertionResult: spanAssertionResults.map(({spanId, passed, observedValue, spanAssertionId}) => {
         const resourceSpan = resourceSpans.find(({instrumentationLibrarySpans}) => {
-          const span = instrumentationLibrarySpans.find(({spans}) => {
-            return spans.find(({spanId: id}) => id === spanId);
-          });
+          const span = instrumentationLibrarySpans.find(({spans}) => spans.find(({spanId: id}) => id === spanId));
 
           return span;
         });
