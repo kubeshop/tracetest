@@ -48,7 +48,7 @@ const CreateAssertionModal = ({testId, span, trace, open, onClose, assertion}: I
       destroyOnClose
       title={
         <div style={{display: 'flex', justifyContent: 'space-between', marginRight: 36}}>
-          <Typography.Title level={5}>Create New Assertion</Typography.Title>
+          <Typography.Title level={5}>{assertion ? 'Edit Assertion' : 'Create New Assertion'}</Typography.Title>
           <Typography.Text>{effectedSpanMessage(effectedSpanCount)}</Typography.Text>
         </div>
       }
