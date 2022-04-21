@@ -1,15 +1,17 @@
 import {skipToken} from '@reduxjs/toolkit/dist/query';
 import {useCallback, useEffect, useMemo, useState} from 'react';
 import {ReactFlowProvider} from 'react-flow-renderer';
-import {Button, Tabs} from 'antd';
+import {Button, Tabs, Typography} from 'antd';
 import Title from 'antd/lib/typography/Title';
 import {CloseOutlined, ArrowLeftOutlined} from '@ant-design/icons';
 import {useLocation, useNavigate, useParams} from 'react-router-dom';
 
 import {TestRunResult} from 'types';
-import {useGetTestByIdQuery, useGetTestResultsQuery} from 'services/TestService';
+import {useGetTestByIdQuery, useGetTestResultByIdQuery, useGetTestResultsQuery} from 'services/TestService';
+
 import Trace from 'components/Trace';
 import Layout from 'components/Layout';
+import TestStateBadge from 'components/TestStateBadge';
 
 import Assertions from './Assertions';
 import * as S from './Test.styled';
@@ -36,6 +38,10 @@ const TestPage = () => {
     pollingInterval: 5000,
   });
   const query = useMemo(() => new URLSearchParams(location.search), [location.search]);
+  const activeTestResult = testResultList.find(r => r.resultId === activeTabKey);
+  const {data: activeTestResultDetails} = useGetTestResultByIdQuery(
+    activeTestResult?.resultId && id ? {testId: id, resultId: activeTestResult.resultId} : skipToken
+  );
 
   const handleSelectTestResult = useCallback(
     (result: TestRunResult) => {
@@ -46,7 +52,7 @@ const TestPage = () => {
         const tracePane = {
           key: result.resultId,
           title: `Trace #${newTabIndex}`,
-          content: <Trace testId={id!} testResultId={result.resultId} />,
+          content: <Trace testId={id!} testResultId={result.resultId} onDismissTrace={handleCloseTab} />,
         };
 
         setTracePanes([...tracePanes, tracePane]);
@@ -78,6 +84,11 @@ const TestPage = () => {
     },
     [id, navigate]
   );
+
+  const handleCloseTab = useCallback(() => {
+    navigate(`/test/${id}`);
+    setActiveTabKey('1');
+  }, [id, navigate]);
 
   const onEditTab = useCallback(
     (targetKey: any) => {
@@ -117,6 +128,12 @@ const TestPage = () => {
                   {test?.name}
                 </Title>
               </S.Header>
+            ),
+            right: activeTestResult?.resultId && activeTestResultDetails?.state && (
+              <div style={{marginRight: 24}}>
+                <Typography.Text style={{marginRight: 8, color: '#8C8C8C', fontSize: 14}}>Test status:</Typography.Text>
+                <TestStateBadge style={{fontSize: 16}} testState={activeTestResultDetails?.state} />
+              </div>
             ),
           }}
           hideAdd

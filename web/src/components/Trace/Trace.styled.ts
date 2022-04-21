@@ -10,3 +10,11 @@ export const TraceTabs = styled(Tabs)`
     border: none;
   }
 `;
+
+export const FailedTrace = styled.div`
+  height: calc(100vh - 200px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`;

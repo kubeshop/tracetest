@@ -1,7 +1,7 @@
 import {Button, Typography} from 'antd';
 import {FC, useCallback} from 'react';
 import {useRunTestMutation} from 'services/TestService';
-import {TestRunResult, TestId} from 'types';
+import {TestId, TestRunResult} from 'types';
 import * as S from './Test.styled';
 import TestDetailsTable from './TestDetailsTable';
 
@@ -19,7 +19,7 @@ const TestDetails: FC<TTestDetailsProps> = ({testId, testResultList, isLoading, 
   const handleRunTest = useCallback(async () => {
     if (testId) {
       const testResult = await runTest(testId).unwrap();
-      onSelectResult({resultId: testResult.testRunId} as TestRunResult);
+      onSelectResult({resultId: testResult.resultId} as TestRunResult);
     }
   }, [runTest, testId]);
 

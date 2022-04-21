@@ -1,10 +1,14 @@
 import * as d3DAG from 'd3-dag';
+import _ from 'lodash';
 
 interface ISpanMap {
   [key: string]: {id: string; parentIds: string[]};
 }
 
-export const useDAGChart = (spanMap: ISpanMap) => {
+export const useDAGChart = (spanMap: ISpanMap = {}) => {
+  if (_.isEmpty(spanMap)) {
+    return;
+  }
   const dagData = Object.values(spanMap).map(({id, parentIds}) => ({id, parentIds: parentIds.filter(el => el)}));
   const stratify = d3DAG.dagStratify();
   const dag = stratify(dagData);
