@@ -65,7 +65,7 @@ We have a live demo environment with a couple systems you can test against. Use 
 | Pokemon Microservice | Add a Pokemon    | http://demo-pokemon-api.demo.svc.cluster.local/pokemon                | POST   | { "name": "meowth", "type": "normal","imageUrl": "https://assets.pokemon.com/assets/cms2/img/pokedex/full/052.png","isFeatured": true} |
 | Pokemon Microservice | Import a Pokemon | http://demo-pokemon-api.demo.svc.cluster.local/pokemon/import         | POST   | { "id": 52 }                                                                                                                           |
 
-(More documentation about the installed Pokemon Microservice App, PMA, is at [Pokemon Microservice App github](https://github.com/kubeshop/pokeshop/blob/master/docs/overview.md)
+More documentation about the installed Pokemon Microservice App, PMA, is at [Pokemon Microservice App github](https://github.com/kubeshop/pokeshop/blob/master/docs/overview.md)
 
 Wanna play with it? [Try the Live Demo](https://demo.tracetest.io/)
 
