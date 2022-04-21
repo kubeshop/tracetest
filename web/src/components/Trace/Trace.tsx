@@ -24,7 +24,7 @@ import {
   parseTestResultToAssertionResultList,
   runTest,
 } from 'services/TraceService';
-import TraceDiagram from './TraceDiagram';
+import TraceDiagram from '../TraceDiagram/TraceDiagram';
 import TraceTimeline from './TraceTimeline';
 import * as S from './Trace.styled';
 
@@ -41,7 +41,7 @@ export type TSpanInfo = {
   data: ISpan;
 };
 
-type TSpanMap = Record<string, TSpanInfo>;
+export type TSpanMap = Record<string, TSpanInfo>;
 
 type TraceProps = {
   testId: string;
@@ -164,7 +164,7 @@ const Trace: React.FC<TraceProps> = ({testId, testResultId, onDismissTrace}) => 
             <ReflexContainer orientation="vertical">
               <ReflexElement flex={0.5} className="left-pane">
                 <div className="pane-content">
-                  <TraceDiagram spanMap={spanMap} onSelectSpan={handleOnSpanSelected} selectedSpan={selectedSpan} />
+                  <TraceDiagram spanMap={spanMap} onSelectSpan={handleOnSpanSelected} selectedSpan={selectedSpan} trace={testResultDetails?.trace!} />
                 </div>
               </ReflexElement>
               <ReflexElement flex={0.5} className="right-pane">

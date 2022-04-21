@@ -24,16 +24,52 @@ export enum SemanticGroupNames {
 }
 
 export const SemanticGroupNamesToText = {
-  [SemanticGroupNames.Http]: 'HTTP Service',
-  [SemanticGroupNames.Rpc]: 'RPC Service',
-  [SemanticGroupNames.Messaging]: 'Messaging Queue',
-  [SemanticGroupNames.Faas]: 'Function as a Service',
+  [SemanticGroupNames.Database]: 'Database',
+  [SemanticGroupNames.Http]: 'HTTP',
+  [SemanticGroupNames.Rpc]: 'RPC',
+  [SemanticGroupNames.Messaging]: 'Messaging',
+  [SemanticGroupNames.Faas]: 'FASS',
   [SemanticGroupNames.Exception]: 'Exception',
   [SemanticGroupNames.General]: 'General',
   [SemanticGroupNames.Compatibility]: 'Compatibility',
 };
 
 export const ResourceSpanAttributeList = ['service.name'];
+
+export const SemanticGroupNameNodeMap: Record<SemanticGroupNames, {primary: string[]; type: string}> = {
+  [SemanticGroupNames.Http]: {
+    primary: ['http.target', 'service.name'],
+    type: '',
+  },
+  [SemanticGroupNames.Database]: {
+    primary: ['db.mongodb.collection', 'db.sql.table', 'db.redis.database_index', 'db.cassandra.table', 'service.name'],
+    type: 'db.system',
+  },
+  [SemanticGroupNames.Rpc]: {
+    primary: ['rpc.service', 'service.name'],
+    type: '',
+  },
+  [SemanticGroupNames.Messaging]: {
+    primary: ['messaging.destination', 'service.name'],
+    type: 'messaging.system',
+  },
+  [SemanticGroupNames.Faas]: {
+    primary: ['faas.invoked_name', 'service.name'],
+    type: '',
+  },
+  [SemanticGroupNames.Exception]: {
+    primary: ['exception.type', 'service.name'],
+    type: '',
+  },
+  [SemanticGroupNames.General]: {
+    primary: ['service.name', 'service.name'],
+    type: '',
+  },
+  [SemanticGroupNames.Compatibility]: {
+    primary: ['opentracing.ref_type', 'service.name'],
+    type: '',
+  },
+};
 
 export const SELECTOR_DEFAULT_ATTRIBUTES = [
   {
@@ -51,7 +87,7 @@ export const SELECTOR_DEFAULT_ATTRIBUTES = [
       'db.redis.database_index',
       'db.mongodb.collection',
       'db.sql.table',
-      'db.cassandra.table'
+      'db.cassandra.table',
     ],
   },
   {
@@ -77,7 +113,7 @@ export const SELECTOR_DEFAULT_ATTRIBUTES = [
   },
   {
     semanticGroup: SemanticGroupNames.Faas,
-    attributes: ['service.name', 'faas.invoked_name', 'faas.invoked_provider', 'faas.trigger', 'faas.trigger'],
+    attributes: ['service.name', 'faas.invoked_name', 'faas.invoked_provider', 'faas.trigger'],
   },
   {
     semanticGroup: SemanticGroupNames.Exception,

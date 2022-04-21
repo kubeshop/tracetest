@@ -13,7 +13,6 @@ import Trace from 'components/Trace';
 import Layout from 'components/Layout';
 import TestStateBadge from 'components/TestStateBadge';
 
-import Assertions from './Assertions';
 import * as S from './Test.styled';
 import TestDetails from './TestDetails';
 
@@ -158,13 +157,6 @@ const TestPage = () => {
               />
             </S.Wrapper>
           </Tabs.TabPane>
-          {Boolean(test?.assertions?.length) && (
-            <Tabs.TabPane tab="Test Assertions" key="2" closeIcon={<CloseOutlined hidden />}>
-              <S.Wrapper>
-                <Assertions />
-              </S.Wrapper>
-            </Tabs.TabPane>
-          )}
           {tracePanes.map(item => (
             <Tabs.TabPane tab={item.title} key={item.key}>
               <S.Wrapper>{item.content}</S.Wrapper>
