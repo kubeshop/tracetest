@@ -5,7 +5,7 @@ enum NotchColor {
   HTTP = '#B9E28C',
   DB = '#DBCBD8',
   RPC = '#9AD4D6',
-  MESSAGING = '#101935',
+  MESSAGING = '#B1B2B4',
 }
 
 const getNotchColor = (system: string) => {
