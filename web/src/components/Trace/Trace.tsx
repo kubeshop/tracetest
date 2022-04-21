@@ -87,18 +87,22 @@ const Trace: React.FC<TraceProps> = ({testId, testResultId, onDismissTrace}) => 
   );
 
   useEffect(() => {
-    let TIMEOUTID: any = null;
-    if (
-      isError ||
-      testResultDetails?.state === TestState.AWAITING_TRACE ||
-      testResultDetails?.state === TestState.EXECUTING
-    ) {
-      TIMEOUTID = setTimeout(() => {
+    let INTERVALID: any = null;
+
+    INTERVALID = setInterval(() => {
+      if (
+        isError ||
+        testResultDetails?.state === TestState.AWAITING_TRACE ||
+        testResultDetails?.state === TestState.EXECUTING
+      ) {
         refetchTrace();
-      }, 500);
-    }
-    return () => TIMEOUTID && clearTimeout(TIMEOUTID);
-  }, [refetchTrace, testResultDetails, isError]);
+      } else {
+        INTERVALID && clearInterval(INTERVALID);
+      }
+    }, 1000);
+
+    return () => INTERVALID && clearInterval(INTERVALID);
+  }, [refetchTrace, testResultDetails?.state, isError]);
 
   useEffect(() => {
     if (testResultDetails && test && !isFirstLoad) {
