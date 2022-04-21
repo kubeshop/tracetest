@@ -122,7 +122,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/TestRun"
+                $ref: "#/components/schemas/TestRunResult"
 
   /tests/{testId}/results/{resultId}:
     get:
@@ -365,14 +365,6 @@ components:
           type: string
         value:
           type: string
-    TestRun:
-      type: object
-      properties:
-        testRunId:
-          type: string
-          description: ID
-          format: uuid
-          readOnly: true
     SelectorItem:
       type: object
       properties:

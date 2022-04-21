@@ -1,10 +1,12 @@
-import {useEffect, useRef} from 'react';
+import {useEffect, useMemo, useRef} from 'react';
 import styled from 'styled-components';
 import * as d3 from 'd3';
+
 import Title from 'antd/lib/typography/Title';
 import {ITrace} from 'types';
 
 import './TimelineChart.css';
+import SkeletonTable from 'components/SkeletonTable';
 
 const Header = styled.div`
   display: flex;
@@ -15,16 +17,20 @@ const Header = styled.div`
   color: rgb(213, 215, 224);
 `;
 
-interface IProps {
+interface ITimelineChartProps {
   trace: ITrace;
   selectedSpan: any;
   onSelectSpan(spanId: string): void;
 }
 
-const TraceTimeline = ({trace, selectedSpan, onSelectSpan}: IProps) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const svgRef = useRef<SVGSVGElement>(null);
+interface IProps {
+  trace?: ITrace;
+  selectedSpan?: any;
+  onSelectSpan(spanId: string): void;
+}
 
+const TimelineChart = ({trace, selectedSpan, onSelectSpan}: ITimelineChartProps) => {
+  const svgRef = useRef<SVGSVGElement>(null);
   let treeFactory = d3.tree().size([200, 450]).nodeSize([0, 5]);
 
   const spanDates = trace.resourceSpans
@@ -51,13 +57,16 @@ const TraceTimeline = ({trace, selectedSpan, onSelectSpan}: IProps) => {
       return acc;
     }, {});
 
-  const dagData = Object.values(spanMap).map(({id, parentIds, ...rest}) => {
-    const parents = parentIds.filter(el => spanMap[el]);
+  const root = useMemo(() => {
+    const dagData = Object.values(spanMap).map(({id, parentIds, ...rest}) => {
+      const parents = parentIds.filter(el => spanMap[el]);
 
-    return {id, parentId: parents[0], ...rest};
-  });
+      return {id, parentId: parents[0], ...rest};
+    });
 
-  const root = d3.stratify()(dagData);
+    return d3.stratify()(dagData);
+  }, [trace]);
+
   const minNano = d3.min(
     spanDates.filter(el => Number(el.span.startTimeUnixNano) > 0 && Number(el.span.endTimeUnixNano) > 0),
     s => Number(s.span.startTimeUnixNano)
@@ -118,7 +127,7 @@ const TraceTimeline = ({trace, selectedSpan, onSelectSpan}: IProps) => {
       .attr('stroke', 'none')
       .attr('fill', 'rgb(213, 215, 224)');
     chart.append('g').attr('class', 'container').attr('transform', `translate(0 , 30 )`);
-  }, []);
+  }, [trace]);
 
   useEffect(() => {
     drawChart();
@@ -241,12 +250,18 @@ const TraceTimeline = ({trace, selectedSpan, onSelectSpan}: IProps) => {
     });
   };
 
+  return <svg ref={svgRef} />;
+};
+
+const TraceTimeline = ({trace, selectedSpan, onSelectSpan}: IProps) => {
   return (
-    <div ref={containerRef}>
+    <div>
       <Header>
         <Title level={4}>Component Timeline</Title>
       </Header>
-      <svg ref={svgRef} />
+      <SkeletonTable loading={!trace || !selectedSpan}>
+        <TimelineChart trace={trace!} selectedSpan={selectedSpan} onSelectSpan={onSelectSpan} />
+      </SkeletonTable>
     </div>
   );
 };

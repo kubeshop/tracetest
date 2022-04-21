@@ -112,7 +112,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TestRun'
+                $ref: '#/components/schemas/TestRunResult'
           description: successful operation
       summary: run test
       tags:
@@ -3681,16 +3681,6 @@ components:
         key:
           type: string
         value:
-          type: string
-      type: object
-    TestRun:
-      example:
-        testRunId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-      properties:
-        testRunId:
-          description: ID
-          format: uuid
-          readOnly: true
           type: string
       type: object
     SelectorItem:

@@ -12,16 +12,14 @@ export const parseTestResultToAssertionResultList = (
   {assertions}: Test,
   {resourceSpans}: ITrace
 ): AssertionResult[] => {
-  return assertionResult.map(({assertionId, spanAssertionResults}) => {
+  return assertionResult.map(({assertionId, spanAssertionResults = []}) => {
     const assertion = assertions.find(({assertionId: id}) => id === assertionId);
 
     return {
       assertion: assertion!,
       spanListAssertionResult: spanAssertionResults.map(({spanId, passed, observedValue, spanAssertionId}) => {
         const resourceSpan = resourceSpans.find(({instrumentationLibrarySpans}) => {
-          const span = instrumentationLibrarySpans.find(({spans}) => {
-            return spans.find(({spanId: id}) => id === spanId);
-          });
+          const span = instrumentationLibrarySpans.find(({spans}) => spans.find(({spanId: id}) => id === spanId));
 
           return span;
         });
@@ -37,7 +35,9 @@ export const parseTestResultToAssertionResultList = (
   });
 };
 
-export const parseAssertionResultListToTestResult = (assertionResultList: AssertionResult[]): TestAssertionResult => {
+export const parseAssertionResultListToTestResult = (
+  assertionResultList: AssertionResult[] = []
+): TestAssertionResult => {
   const {totalFailedCount} = getTestResultCount(assertionResultList);
 
   return {

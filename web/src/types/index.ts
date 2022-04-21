@@ -1,3 +1,5 @@
+import { SpanAttributeType } from "../services/SpanAttributeService";
+
 export enum TestState {
   CREATED = 'CREATED',
   EXECUTING = 'EXECUTING',
@@ -55,6 +57,8 @@ export type ISpanAttributeValue = {
   stringValue: string;
   intValue: number;
   booleanValue: boolean;
+  doubleValue: number;
+  kvlistValue: {values: ISpanAttribute[]};
 };
 
 export type ISpanAttribute = {
@@ -139,7 +143,7 @@ export interface SpanSelector {
   spanAssertionId?: string;
   locationName: LOCATION_NAME;
   propertyName: string;
-  valueType: keyof ISpanAttributeValue;
+  valueType: SpanAttributeType;
   operator: COMPARE_OPERATOR;
   comparisonValue: string;
 }

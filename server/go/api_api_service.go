@@ -12,6 +12,7 @@ package openapi
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/kubeshop/tracetest/server/go/tracedb"
@@ -31,7 +32,7 @@ type TestDB interface {
 	UpdateResult(ctx context.Context, res *TestRunResult) error
 	GetResult(ctx context.Context, id string) (*TestRunResult, error)
 	GetResultsByTestID(ctx context.Context, testid string) ([]TestRunResult, error)
-	GetResultsByTraceID(ctx context.Context, testid, traceid string) (TestRunResult, error)
+	GetResultByTraceID(ctx context.Context, testid, traceid string) (TestRunResult, error)
 
 	CreateAssertion(ctx context.Context, testid string, assertion *Assertion) (string, error)
 	GetAssertion(ctx context.Context, id string) (*Assertion, error)
@@ -107,7 +108,7 @@ func (s *ApiApiService) GetTest(ctx context.Context, testid string) (ImplRespons
 	}
 
 	if test.ReferenceTestRunResult.TraceId != "" {
-		res, err := s.testDB.GetResultsByTraceID(ctx, test.TestId, test.ReferenceTestRunResult.TraceId)
+		res, err := s.testDB.GetResultByTraceID(ctx, test.TestId, test.ReferenceTestRunResult.TraceId)
 		if err != nil {
 			return Response(http.StatusInternalServerError, err.Error()), err
 		}
@@ -138,11 +139,9 @@ func (s *ApiApiService) RunTest(ctx context.Context, testid string) (ImplRespons
 		}
 	}
 
-	id := s.runner.Run(*test)
+	result := s.runner.Run(*test)
 
-	return Response(200, TestRun{
-		TestRunId: id,
-	}), nil
+	return Response(200, result), nil
 }
 
 // GetTestResults -
@@ -162,11 +161,6 @@ func (s *ApiApiService) GetTestResult(ctx context.Context, testid string, id str
 	if err != nil {
 		return Response(http.StatusInternalServerError, err.Error()), err
 	}
-	tr, err := s.traceDB.GetTraceByID(ctx, res.TraceId)
-	if err == nil {
-		ttr := FixParent(tr, res.Response)
-		res.Trace = mapTrace(ttr)
-	}
 	return Response(http.StatusOK, *res), nil
 }
 
@@ -174,6 +168,17 @@ func (s *ApiApiService) UpdateTestResult(ctx context.Context, testid string, id 
 	testResult, err := s.testDB.GetResult(ctx, id)
 	if err != nil {
 		return Response(http.StatusInternalServerError, err.Error()), err
+	}
+
+	if len(testRunResult.AssertionResult) == 0 {
+		return Response(http.StatusUnprocessableEntity, "cannot accept empty assertionResult array"), err
+	}
+
+	for i, r := range testRunResult.AssertionResult {
+		if len(r.SpanAssertionResults) == 0 {
+			msg := fmt.Sprintf("cannot accept empty spanAssertionResults for assertionResult index #%d", i)
+			return Response(http.StatusUnprocessableEntity, msg), err
+		}
 	}
 
 	testResult.AssertionResultState = testRunResult.AssertionResultState

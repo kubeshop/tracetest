@@ -33,7 +33,7 @@ const CreateTestModal = ({visible, onClose}: IProps): JSX.Element => {
     }).unwrap();
     const newTestRunResult = await runTest(newTest.testId).unwrap();
     onClose();
-    navigate(`/test/${newTest.testId}?resultId=${newTestRunResult.testRunId}`);
+    navigate(`/test/${newTest.testId}?resultId=${newTestRunResult.resultId}`);
   };
 
   const onFinishFailed = () => {};

@@ -1,25 +1,22 @@
 import {Button, Typography} from 'antd';
-import {skipToken} from '@reduxjs/toolkit/dist/query';
 import {PlusOutlined} from '@ant-design/icons';
 import {FC, useMemo, useState} from 'react';
-import {useGetTestByIdQuery} from 'services/TestService';
-import {Assertion, ISpan, ITrace, SpanAssertionResult} from 'types';
+import {Assertion, ISpan, ITrace, SpanAssertionResult, Test} from 'types';
 import {runAssertionBySpanId} from 'services/AssertionService';
 import AssertionsResultTable from 'components/AssertionsTable/AssertionsTable';
+import CreateAssertionModal from 'components/CreateAssertionModal';
 import SkeletonTable from 'components/SkeletonTable';
 import * as S from './SpanDetail.styled';
-import CreateAssertionModal from './CreateAssertionModal';
 import Attributes from './Attributes';
 
 type TSpanDetailProps = {
-  testId: string;
+  test?: Test;
   targetSpan?: ISpan;
   trace?: ITrace;
 };
 
-const SpanDetail: FC<TSpanDetailProps> = ({testId, targetSpan, trace}) => {
+const SpanDetail: FC<TSpanDetailProps> = ({test, targetSpan, trace}) => {
   const [openCreateAssertion, setOpenCreateAssertion] = useState(false);
-  const {data: test} = useGetTestByIdQuery(testId ?? skipToken);
 
   const assertionsResultList = useMemo(() => {
     if (!targetSpan?.spanId || !trace) {
@@ -66,10 +63,10 @@ const SpanDetail: FC<TSpanDetailProps> = ({testId, targetSpan, trace}) => {
       </S.DetailsContainer>
       <Attributes spanId={targetSpan?.spanId} trace={trace} />
 
-      {targetSpan?.spanId && (
+      {targetSpan?.spanId && test?.testId && (
         <CreateAssertionModal
           key={`KEY_${targetSpan?.spanId}`}
-          testId={testId}
+          testId={test.testId}
           trace={trace}
           span={targetSpan!}
           open={openCreateAssertion}

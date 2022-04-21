@@ -16,7 +16,7 @@ export const testAPI = createApi({
       }),
       invalidatesTags: [{type: 'Test', id: 'LIST'}],
     }),
-    runTest: build.mutation<{testRunId: string}, string>({
+    runTest: build.mutation<TestRunResult, string>({
       query: testId => ({
         url: `/tests/${testId}/run`,
         method: 'POST',
@@ -48,12 +48,7 @@ export const testAPI = createApi({
     getTestResults: build.query<TestRunResult[], TestId>({
       query: id => `/tests/${id}/results`,
       providesTags: result =>
-        result
-          ? [
-              ...result.map(el => ({type: 'TestResult' as const, id: el.resultId})),
-              {type: 'TestResult' as const, id: 'LIST'},
-            ]
-          : [{type: 'TestResult' as const, id: 'LIST'}],
+        result ? [{type: 'TestResult' as const, id: 'LIST'}] : [{type: 'TestResult' as const, id: 'LIST'}],
     }),
     updateTestResult: build.mutation<
       TestRunResult,
@@ -64,6 +59,7 @@ export const testAPI = createApi({
         method: 'PUT',
         body: assertionResult,
       }),
+      invalidatesTags: (result, error, args) => [{type: 'TestResult', id: args.resultId}],
     }),
     getTestResultById: build.query<TestRunResult, Pick<Test, 'testId'> & {resultId: string}>({
       query: ({testId, resultId}) => `/tests/${testId}/results/${resultId}`,

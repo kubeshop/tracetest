@@ -1,5 +1,7 @@
 import {useCallback, useEffect, useMemo, useState} from 'react';
 import styled from 'styled-components';
+import {useNavigate} from 'react-router-dom';
+
 import {useStoreActions} from 'react-flow-renderer';
 import {ReflexContainer, ReflexSplitter, ReflexElement} from 'react-reflex';
 import {isEmpty} from 'lodash';
@@ -9,20 +11,25 @@ import {CloseCircleFilled} from '@ant-design/icons';
 
 import 'react-reflex/styles.css';
 
-import {AssertionResult, ISpan, Test, TestState} from 'types';
-import {useGetTestResultByIdQuery, useUpdateTestResultMutation} from 'services/TestService';
+import {AssertionResult, ISpan, TestState} from 'types';
 
+import {
+  useGetTestByIdQuery,
+  useGetTestResultByIdQuery,
+  useRunTestMutation,
+  useUpdateTestResultMutation,
+} from 'services/TestService';
+import {
+  parseAssertionResultListToTestResult,
+  parseTestResultToAssertionResultList,
+  runTest,
+} from 'services/TraceService';
 import TraceDiagram from './TraceDiagram';
 import TraceTimeline from './TraceTimeline';
 import * as S from './Trace.styled';
 
 import SpanDetail from './SpanDetail';
 import TestResults from './TestResults';
-import {
-  parseAssertionResultListToTestResult,
-  parseTestResultToAssertionResultList,
-  runTest,
-} from '../../services/TraceService';
 
 const Grid = styled.div`
   display: grid;
@@ -37,20 +44,25 @@ export type TSpanInfo = {
 type TSpanMap = Record<string, TSpanInfo>;
 
 type TraceProps = {
-  test: Test;
+  testId: string;
   testResultId: string;
+  onDismissTrace: () => void;
 };
 
-const Trace: React.FC<TraceProps> = ({test, testResultId}) => {
+const Trace: React.FC<TraceProps> = ({testId, testResultId, onDismissTrace}) => {
+  const navigate = useNavigate();
   const [selectedSpan, setSelectedSpan] = useState<TSpanInfo | undefined>();
   const [traceResultList, setTraceResultList] = useState<AssertionResult[]>([]);
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [updateTestResult] = useUpdateTestResultMutation();
+  const {data: test} = useGetTestByIdQuery(testId);
+  const [runNewTest] = useRunTestMutation();
 
   const {
     data: testResultDetails,
     isError,
     refetch: refetchTrace,
-  } = useGetTestResultByIdQuery({testId: test.testId, resultId: testResultId});
+  } = useGetTestResultByIdQuery({testId, resultId: testResultId});
 
   const spanMap = useMemo<TSpanMap>(() => {
     return testResultDetails?.trace?.resourceSpans
@@ -76,45 +88,56 @@ const Trace: React.FC<TraceProps> = ({test, testResultId}) => {
 
   useEffect(() => {
     let TIMEOUTID: any = null;
-    if (testResultDetails?.state === TestState.AWAITING_TRACE) {
+    if (
+      isError ||
+      testResultDetails?.state === TestState.AWAITING_TRACE ||
+      testResultDetails?.state === TestState.EXECUTING
+    ) {
       TIMEOUTID = setTimeout(() => {
         refetchTrace();
       }, 500);
     }
     return () => TIMEOUTID && clearTimeout(TIMEOUTID);
-  }, [refetchTrace, testResultDetails]);
+  }, [refetchTrace, testResultDetails, isError]);
 
   useEffect(() => {
-    if (testResultDetails && !isEmpty(testResultDetails.trace) && !testResultDetails?.assertionResult) {
+    if (testResultDetails && test && !isFirstLoad) {
       const resultList = runTest(testResultDetails.trace, test);
 
       setTraceResultList(resultList);
 
       updateTestResult({
-        testId: test.testId,
+        testId,
         resultId: testResultId,
         assertionResult: parseAssertionResultListToTestResult(resultList),
       });
-    } else if (testResultDetails?.assertionResult && !isEmpty(testResultDetails?.trace)) {
+    }
+  }, [test]);
+
+  useEffect(() => {
+    if (testResultDetails && !isEmpty(testResultDetails.trace) && !testResultDetails?.assertionResult && test) {
+      const resultList = runTest(testResultDetails.trace, test);
+
+      setTraceResultList(resultList);
+      setIsFirstLoad(false);
+
+      updateTestResult({
+        testId,
+        resultId: testResultId,
+        assertionResult: parseAssertionResultListToTestResult(resultList),
+      });
+    } else if (testResultDetails?.assertionResult && test) {
+      setIsFirstLoad(false);
       setTraceResultList(
         parseTestResultToAssertionResultList(testResultDetails?.assertionResult, test, testResultDetails?.trace)
       );
     }
-  }, [testResultDetails, test, testResultId, updateTestResult]);
+  }, [testResultDetails, test, testResultId, updateTestResult, testId]);
 
-  useEffect(() => {
-    if (testResultDetails && !isEmpty(testResultDetails.trace)) {
-      const resultList = runTest(testResultDetails.trace, test);
-
-      setTraceResultList(resultList);
-
-      updateTestResult({
-        testId: test.testId,
-        resultId: testResultId,
-        assertionResult: parseAssertionResultListToTestResult(resultList),
-      });
-    }
-  }, [test, testResultDetails, testResultId, updateTestResult]);
+  const handleReRunTest = async () => {
+    const result = await runNewTest(testId).unwrap();
+    navigate(`/test/${result.testId}?resultId=${result.resultId}`);
+  };
 
   if (isError || testResultDetails?.state === TestState.FAILED) {
     return (
@@ -122,8 +145,8 @@ const Trace: React.FC<TraceProps> = ({test, testResultId}) => {
         <CloseCircleFilled style={{color: 'red', fontSize: 32}} />
         <Typography.Title level={2}>Test Run Failed</Typography.Title>
         <div style={{display: 'grid', gap: 8, gridTemplateColumns: '1fr 1fr'}}>
-          <Button>Rerun Test</Button>
-          <Button>Cancel</Button>
+          <Button onClick={handleReRunTest}>Rerun Test</Button>
+          <Button onClick={onDismissTrace}>Cancel</Button>
         </div>
       </S.FailedTrace>
     );
@@ -144,17 +167,12 @@ const Trace: React.FC<TraceProps> = ({test, testResultId}) => {
                 <div className="pane-content" style={{padding: '14px 24px', overflow: 'hidden'}}>
                   <S.TraceTabs>
                     <Tabs.TabPane tab="Span detail" key="1">
-                      <SpanDetail
-                        trace={testResultDetails?.trace}
-                        testId={test.testId}
-                        targetSpan={selectedSpan?.data}
-                      />
+                      <SpanDetail trace={testResultDetails?.trace} test={test} targetSpan={selectedSpan?.data} />
                     </Tabs.TabPane>
                     <Tabs.TabPane tab="Test Results" key="2">
                       <TestResults
                         onSpanSelected={handleOnSpanSelected}
                         trace={testResultDetails?.trace}
-                        test={test}
                         traceResultList={traceResultList}
                       />
                     </Tabs.TabPane>
@@ -166,13 +184,11 @@ const Trace: React.FC<TraceProps> = ({test, testResultId}) => {
           <ReflexSplitter />
           <ReflexElement>
             <div className="pane-content">
-              {testResultDetails && selectedSpan && (
-                <TraceTimeline
-                  trace={testResultDetails?.trace}
-                  onSelectSpan={handleOnSpanSelected}
-                  selectedSpan={selectedSpan}
-                />
-              )}
+              <TraceTimeline
+                trace={testResultDetails?.trace}
+                onSelectSpan={handleOnSpanSelected}
+                selectedSpan={selectedSpan}
+              />
             </div>
           </ReflexElement>
         </ReflexContainer>

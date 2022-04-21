@@ -93,7 +93,7 @@ const TextDetailsTable: FC<TextRowProps> = ({isLoading, onSelectResult, testResu
         }}
       />
       <Table.Column
-        width="3%"
+        width="5%"
         title={<Badge count="P" style={{backgroundColor: '#49AA19'}} />}
         key="passed"
         dataIndex="state"
@@ -107,7 +107,7 @@ const TextDetailsTable: FC<TextRowProps> = ({isLoading, onSelectResult, testResu
         }}
       />
       <Table.Column
-        width="3%"
+        width="5%"
         title={<Badge count="F" />}
         dataIndex="state"
         key="failed"

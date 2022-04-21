@@ -19,7 +19,7 @@ const TestDetails: FC<TTestDetailsProps> = ({testId, testResultList, isLoading, 
   const handleRunTest = useCallback(async () => {
     if (testId) {
       const testResult = await runTest(testId).unwrap();
-      onSelectResult({resultId: testResult.testRunId} as TestRunResult);
+      onSelectResult({resultId: testResult.resultId} as TestRunResult);
     }
   }, [runTest, testId]);
 
