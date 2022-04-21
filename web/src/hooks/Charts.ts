@@ -9,6 +9,7 @@ export const useDAGChart = (spanMap: ISpanMap = {}) => {
   if (_.isEmpty(spanMap)) {
     return;
   }
+
   const dagData = Object.values(spanMap).map(({id, parentIds}) => ({id, parentIds: parentIds.filter(el => el)}));
   const stratify = d3DAG.dagStratify();
   const dag = stratify(dagData);
