@@ -30,10 +30,10 @@ export const NavMenu = styled(Menu).attrs({
   && {
     align-items: center;
   }
-`;
 
-export const NavMenuItem = styled(Menu.Item)`
-  && {
+  .ant-menu-item > span > a {
     color: white;
   }
 `;
+
+export const NavMenuItem = styled(Menu.Item)``;

@@ -74,11 +74,12 @@ export const SemanticGroupNameNodeMap: Record<SemanticGroupNames, {primary: stri
 export const SELECTOR_DEFAULT_ATTRIBUTES = [
   {
     semanticGroup: SemanticGroupNames.Http,
-    attributes: ['service.name', 'http.target', 'http.method'],
+    attributes: ['tracetest.span.type', 'service.name', 'http.target', 'http.method'],
   },
   {
     semanticGroup: SemanticGroupNames.Database,
     attributes: [
+      'tracetest.span.type',
       'service.name',
       'db.system',
       'db.name',
@@ -92,11 +93,12 @@ export const SELECTOR_DEFAULT_ATTRIBUTES = [
   },
   {
     semanticGroup: SemanticGroupNames.Rpc,
-    attributes: ['service.name', 'rpc.system', 'rpc.service', 'rpc.method', 'message.type'],
+    attributes: ['tracetest.span.type', 'service.name', 'rpc.system', 'rpc.service', 'rpc.method', 'message.type'],
   },
   {
     semanticGroup: SemanticGroupNames.Messaging,
     attributes: [
+      'tracetest.span.type',
       'service.name',
       'messaging.system',
       'messaging.destination',
@@ -108,20 +110,20 @@ export const SELECTOR_DEFAULT_ATTRIBUTES = [
       'messaging.rocketmq.client_group',
       'messaging.rocketmq.message_type',
       'messaging.rocketmq.message_keys',
-      'messaging.rocketmq.consumption_model',
+      'messaging.rocketmq.consumption_model'
     ],
   },
   {
     semanticGroup: SemanticGroupNames.Faas,
-    attributes: ['service.name', 'faas.invoked_name', 'faas.invoked_provider', 'faas.trigger'],
+    attributes: ['tracetest.span.type', 'service.name', 'faas.invoked_name', 'faas.invoked_provider', 'faas.trigger'],
   },
   {
     semanticGroup: SemanticGroupNames.Exception,
-    attributes: ['service.name', 'exception.type', 'exception.message', 'exception.escaped'],
+    attributes: ['tracetest.span.type', 'service.name', 'exception.type', 'exception.message', 'exception.escaped'],
   },
   {
     semanticGroup: SemanticGroupNames.Compatibility,
-    attributes: ['service.name', 'opentracing.ref_type'],
+    attributes: ['tracetest.span.type', 'service.name', 'opentracing.ref_type'],
   },
   {
     semanticGroup: SemanticGroupNames.General,
