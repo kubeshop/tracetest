@@ -60,8 +60,8 @@ We have a live demo environment with a couple systems you can test against. Use 
 
 | System               | Description      | URL                                                                   | Method | Request Body                                                                                                                           |
 | -------------------- | ---------------- | --------------------------------------------------------------------- | ------ | -------------------------------------------------------------------------------------------------------------------------------------- |
-| Shopping app         | Generic get      | http://shop/buy                                                       |        |
-| Pokemon Microservice | Get a Pokemon    | http://demo-pokemon-api.demo.svc.cluster.local/pokemon?take=20&skip=0 |        |
+| Shopping app         | Generic get      | http://shop/buy                                                       | GET    |
+| Pokemon Microservice | Get a Pokemon    | http://demo-pokemon-api.demo.svc.cluster.local/pokemon?take=20&skip=0 | GET    |
 | Pokemon Microservice | Add a Pokemon    | http://demo-pokemon-api.demo.svc.cluster.local/pokemon                | POST   | { "name": "meowth", "type": "normal","imageUrl": "https://assets.pokemon.com/assets/cms2/img/pokedex/full/052.png","isFeatured": true} |
 | Pokemon Microservice | Import a Pokemon | http://demo-pokemon-api.demo.svc.cluster.local/pokemon/import         | POST   | { "id": 52 }                                                                                                                           |
 
