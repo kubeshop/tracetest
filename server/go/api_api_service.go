@@ -35,7 +35,7 @@ type TestDB interface {
 	GetResultByTraceID(ctx context.Context, testid, traceid string) (TestRunResult, error)
 
 	CreateAssertion(ctx context.Context, testid string, assertion *Assertion) (string, error)
-	UpdateAssertion(ctx context.Context, assertionID string, assertion Assertion) error
+	UpdateAssertion(ctx context.Context, testID, assertionID string, assertion Assertion) error
 	GetAssertion(ctx context.Context, id string) (*Assertion, error)
 	GetAssertionsByTestID(ctx context.Context, testID string) ([]Assertion, error)
 }
@@ -221,7 +221,7 @@ func (s *ApiApiService) CreateAssertion(ctx context.Context, testID string, asse
 	return Response(http.StatusOK, assertion), nil
 }
 
-func (s *ApiApiService) UpdateAssertion(ctx context.Context, _ string, assertionID string, updated Assertion) (ImplResponse, error) {
+func (s *ApiApiService) UpdateAssertion(ctx context.Context, testID string, assertionID string, updated Assertion) (ImplResponse, error) {
 	_, err := s.testDB.GetAssertion(ctx, assertionID)
 	if err != nil {
 		return Response(http.StatusInternalServerError, err.Error()), err
@@ -229,7 +229,7 @@ func (s *ApiApiService) UpdateAssertion(ctx context.Context, _ string, assertion
 
 	updated.AssertionId = assertionID
 
-	err = s.testDB.UpdateAssertion(ctx, assertionID, updated)
+	err = s.testDB.UpdateAssertion(ctx, testID, assertionID, updated)
 	if err != nil {
 		return Response(http.StatusInternalServerError, err.Error()), err
 	}

@@ -201,12 +201,12 @@ func ensureUUID(in string) string {
 	return in
 }
 
-func (td *TestDB) UpdateAssertion(ctx context.Context, assertionID string, assertion openapi.Assertion) error {
+func (td *TestDB) UpdateAssertion(ctx context.Context, testID, assertionID string, assertion openapi.Assertion) error {
 	for i := range assertion.SpanAssertions {
 		assertion.SpanAssertions[i].SpanAssertionId = ensureUUID(assertion.SpanAssertions[i].SpanAssertionId)
 	}
 
-	stmt, err := td.db.Prepare("UPDATE assertions SET assertion = $2 WHERE id = $1")
+	stmt, err := td.db.Prepare("UPDATE assertions SET assertion = $3 WHERE id = $1 AND test_id = $2")
 	if err != nil {
 		return fmt.Errorf("sql prepare: %w", err)
 	}
@@ -215,7 +215,7 @@ func (td *TestDB) UpdateAssertion(ctx context.Context, assertionID string, asser
 	if err != nil {
 		return fmt.Errorf("json Marshal: %w", err)
 	}
-	_, err = stmt.Exec(assertionID, b)
+	_, err = stmt.ExecContext(ctx, assertionID, testID, b)
 	if err != nil {
 		return fmt.Errorf("sql exec: %w", err)
 	}
