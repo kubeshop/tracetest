@@ -1,12 +1,11 @@
 import React, {useCallback, useEffect, useMemo} from 'react';
 import {isEmpty} from 'lodash';
 import {QuestionCircleOutlined, PlusOutlined, MinusCircleOutlined} from '@ant-design/icons';
-import styled from 'styled-components';
-import {Button, Input, Select as AntSelect, AutoComplete, Typography, Tooltip, Form, Space, FormInstance} from 'antd';
+import {Button, Input, AutoComplete, Typography, Tooltip, Form, Space, FormInstance} from 'antd';
 import jemsPath from 'jmespath';
 
-import {COMPARE_OPERATOR, ISpan, ItemSelector, ITrace, LOCATION_NAME, SpanSelector} from 'types';
-import {useCreateAssertionMutation} from 'services/TestService';
+import {Assertion, COMPARE_OPERATOR, ISpan, ItemSelector, ITrace, LOCATION_NAME, SpanSelector} from 'types';
+import {useCreateAssertionMutation, useUpdateAssertionMutation} from 'services/TestService';
 import {SELECTOR_DEFAULT_ATTRIBUTES} from 'lib/SelectorDefaultAttributes';
 import {filterBySpanId} from 'utils';
 import {CreateAssertionSelectorInput} from './CreateAssertionSelectorInput';
@@ -19,13 +18,6 @@ interface AssertionSpan {
   compareOp: keyof typeof COMPARE_OPERATOR;
   value: string;
 }
-
-const Select = styled(AntSelect)`
-  min-width: 88px;
-  > .ant-select-selector {
-    min-height: 100%;
-  }
-`;
 
 export type TValues = {
   assertionList: AssertionSpan[];
@@ -41,28 +33,49 @@ interface TCreateAssertionFormProps {
   span: ISpan;
   testId: string;
   trace: ITrace;
+  assertion?: Assertion;
 }
 
 const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
   testId,
   span,
   trace,
+  assertion,
   onForm,
   onCreate,
   onSelectorList,
 }) => {
   const [createAssertion] = useCreateAssertionMutation();
+  const [updateAssertion] = useUpdateAssertionMutation();
   const attrs = jemsPath.search(trace, filterBySpanId(span.spanId));
   const [form] = Form.useForm<TValues>();
-  const spanSignature = useMemo(() => getSpanSignature(span.spanId, trace), [span.spanId, trace]);
+  const defaultSelectorList = useMemo(() => getSpanSignature(span.spanId, trace), [span.spanId, trace]);
+
+  const defaultAssertionList = useMemo<AssertionSpan[]>(() => {
+    if (assertion) {
+      return assertion.spanAssertions.map(({propertyName, operator, comparisonValue}) => ({
+        key: propertyName,
+        compareOp: operator,
+        value: comparisonValue,
+      }));
+    }
+
+    return [
+      {
+        key: '',
+        compareOp: COMPARE_OPERATOR.EQUALS,
+        value: '',
+      },
+    ];
+  }, [assertion]);
 
   useEffect(() => {
     onForm(form);
   }, [onForm, form]);
 
   useEffect(() => {
-    onSelectorList(spanSignature);
-  }, [onSelectorList, spanSignature]);
+    onSelectorList(defaultSelectorList);
+  }, [onSelectorList, defaultSelectorList]);
 
   const spanTagsMap = attrs?.reduce((acc: {[x: string]: any}, item: {key: string}) => {
     if (itemSelectorKeys.indexOf(item.key) !== -1) {
@@ -123,10 +136,16 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
         })
         .filter((el): el is SpanSelector => Boolean(el));
 
-      await createAssertion({testId, selectors: selectorList, spanAssertions}).unwrap();
+      const newData = {selectors: selectorList, spanAssertions};
+
+      if (assertion) {
+        await updateAssertion({testId, assertionId: assertion.assertionId, assertion: newData});
+      } else {
+        await createAssertion({testId, assertion: newData});
+      }
       onCreate();
     },
-    [attrs, createAssertion, onCreate, span.attributes, testId]
+    [assertion, attrs, createAssertion, onCreate, span.attributes, testId, updateAssertion]
   );
 
   return (
@@ -135,14 +154,8 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
       form={form}
       initialValues={{
         remember: true,
-        assertionList: [
-          {
-            key: '',
-            compare: COMPARE_OPERATOR.EQUALS,
-            value: '',
-          },
-        ],
-        selectorList: spanSignature,
+        assertionList: defaultAssertionList,
+        selectorList: assertion ? assertion.selectors : defaultSelectorList,
       }}
       onFinish={handleCreateAssertion}
       autoComplete="off"
@@ -157,15 +170,15 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
           const assertionList: AssertionSpan[] = form.getFieldValue('assertionList') || [];
 
           form.setFieldsValue({
-            assertionList: assertionList.map((assertion, index) => {
+            assertionList: assertionList.map((assertionEntry, index) => {
               if (index === entry) {
                 const value = attrs?.find((el: any) => el.key === assertionList[index].key)?.value;
                 const isValid = typeof value === 'number' || !isEmpty(value);
 
-                return {...assertion, value: isValid ? String(value) : ''};
+                return {...assertionEntry, value: isValid ? String(value) : ''};
               }
 
-              return assertion;
+              return assertionEntry;
             }),
           });
         }
@@ -178,7 +191,7 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
         </Tooltip>
       </div>
       <Form.Item name="selectorList" rules={[{required: true, message: 'At least one selector is required'}]}>
-        <CreateAssertionSelectorInput spanSignature={spanSignature} />
+        <CreateAssertionSelectorInput spanSignature={defaultSelectorList} />
       </Form.Item>
       <div style={{marginTop: 24, marginBottom: 8}}>
         <Typography.Text style={{marginRight: 8}}>Span Assertions</Typography.Text>
@@ -215,14 +228,14 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
                     name={[name, 'compareOp']}
                     rules={[{required: true, message: 'Operator is required'}]}
                   >
-                    <Select style={{margin: 0}}>
-                      <Select.Option value={COMPARE_OPERATOR.EQUALS}>eq</Select.Option>
-                      <Select.Option value={COMPARE_OPERATOR.NOTEQUALS}>ne</Select.Option>
-                      <Select.Option value={COMPARE_OPERATOR.GREATERTHAN}>gt</Select.Option>
-                      <Select.Option value={COMPARE_OPERATOR.LESSTHAN}>lt</Select.Option>
-                      <Select.Option value={COMPARE_OPERATOR.GREATOREQUALS}>ge</Select.Option>
-                      <Select.Option value={COMPARE_OPERATOR.LESSOREQUAL}>le</Select.Option>
-                    </Select>
+                    <S.Select style={{margin: 0}}>
+                      <S.Select.Option value={COMPARE_OPERATOR.EQUALS}>eq</S.Select.Option>
+                      <S.Select.Option value={COMPARE_OPERATOR.NOTEQUALS}>ne</S.Select.Option>
+                      <S.Select.Option value={COMPARE_OPERATOR.GREATERTHAN}>gt</S.Select.Option>
+                      <S.Select.Option value={COMPARE_OPERATOR.LESSTHAN}>lt</S.Select.Option>
+                      <S.Select.Option value={COMPARE_OPERATOR.GREATOREQUALS}>ge</S.Select.Option>
+                      <S.Select.Option value={COMPARE_OPERATOR.LESSOREQUAL}>le</S.Select.Option>
+                    </S.Select>
                   </S.FullHeightFormItem>
                   <S.FullHeightFormItem
                     {...field}

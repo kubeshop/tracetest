@@ -45,14 +45,19 @@ const SpanDetail: FC<TSpanDetailProps> = ({test, targetSpan, trace}) => {
         </S.DetailsHeader>
         <SkeletonTable loading={!targetSpan || !trace}>
           {assertionsResultList.length ? (
-            assertionsResultList.map(({assertion, assertionResultList}, index) => (
-              <AssertionsResultTable
-                key={assertion.assertionId}
-                assertionResults={assertionResultList}
-                sort={index + 1}
-                assertion={assertion}
-              />
-            ))
+            assertionsResultList
+              .sort((a, b) => (a.assertion.assertionId > b.assertion.assertionId ? -1 : 1))
+              .map(({assertion, assertionResultList}, index) => (
+                <AssertionsResultTable
+                  key={assertion.assertionId}
+                  assertionResults={assertionResultList}
+                  sort={index + 1}
+                  assertion={assertion}
+                  span={targetSpan!}
+                  trace={trace!}
+                  testId={test?.testId!}
+                />
+              ))
           ) : (
             <S.DetailsEmptyStateContainer>
               <S.DetailsTableEmptyStateIcon />
@@ -61,13 +66,13 @@ const SpanDetail: FC<TSpanDetailProps> = ({test, targetSpan, trace}) => {
           )}
         </SkeletonTable>
       </S.DetailsContainer>
-      <Attributes spanId={targetSpan?.spanId} trace={trace} />
+      <Attributes spanId={targetSpan?.spanId!} trace={trace!} />
 
       {targetSpan?.spanId && test?.testId && (
         <CreateAssertionModal
           key={`KEY_${targetSpan?.spanId}`}
           testId={test.testId}
-          trace={trace}
+          trace={trace!}
           span={targetSpan!}
           open={openCreateAssertion}
           onClose={() => setOpenCreateAssertion(false)}
