@@ -1,15 +1,19 @@
 import {Button, Table, Typography} from 'antd';
-import {useMemo} from 'react';
-import {Assertion, SpanAssertionResult} from 'types';
+import {useMemo, useState} from 'react';
+import {Assertion, SpanAssertionResult, ITrace, ISpan} from 'types';
 import {getOperator} from 'utils';
+import CreateAssertionModal from '../CreateAssertionModal';
 import CustomTable from '../CustomTable';
 import * as S from './AssertionsTable.styled';
 
-interface IProps {
+type AssertionsResultTableProps = {
   assertionResults: SpanAssertionResult[];
   assertion: Assertion;
   sort: number;
-}
+  span: ISpan;
+  testId: string;
+  trace: ITrace;
+};
 
 type TParsedAssertion = {
   key: string;
@@ -20,7 +24,17 @@ type TParsedAssertion = {
   hasPassed: boolean;
 };
 
-const AssertionsResultTable = ({assertionResults, assertion: {selectors = []}, sort}: IProps) => {
+const AssertionsResultTable: React.FC<AssertionsResultTableProps> = ({
+  assertionResults,
+  assertion: {selectors = []},
+  assertion,
+  sort,
+  span,
+  testId,
+  trace,
+}) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const parsedAssertionList = useMemo<Array<TParsedAssertion>>(
     () =>
       assertionResults.map(({propertyName, comparisonValue, operator, actualValue, hasPassed}) => ({
@@ -43,13 +57,11 @@ const AssertionsResultTable = ({assertionResults, assertion: {selectors = []}, s
             <S.AssertionsTableBadge count={value} key={propertyName} />
           ))}
         </Typography.Title>
-        <Button type="link">Edit</Button>
+        <Button type="link" onClick={() => setIsModalOpen(true)}>
+          Edit
+        </Button>
       </S.AssertionsTableHeader>
-      <CustomTable
-        size="small"
-        pagination={{hideOnSinglePage: true}}
-        dataSource={parsedAssertionList}
-      >
+      <CustomTable size="small" pagination={{hideOnSinglePage: true}} dataSource={parsedAssertionList}>
         <Table.Column title="Property" dataIndex="property" key="property" ellipsis width="50%" />
         <Table.Column title="Comparison" dataIndex="comparison" key="comparison" render={value => getOperator(value)} />
         <Table.Column title="Value" dataIndex="value" key="value" />
@@ -64,6 +76,14 @@ const AssertionsResultTable = ({assertionResults, assertion: {selectors = []}, s
           )}
         />
       </CustomTable>
+      <CreateAssertionModal
+        open={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        assertion={assertion}
+        span={span}
+        testId={testId}
+        trace={trace}
+      />
     </S.AssertionsTableContainer>
   );
 };

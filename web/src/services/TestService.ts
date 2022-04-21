@@ -37,10 +37,18 @@ export const testAPI = createApi({
     getTestAssertions: build.query<Assertion[], string>({
       query: testId => `/tests/${testId}/assertions`,
     }),
-    createAssertion: build.mutation<Assertion, {testId: string} & Partial<Assertion>>({
-      query: ({testId, ...assertion}) => ({
+    createAssertion: build.mutation<Assertion, {testId: string; assertion: Partial<Assertion>}>({
+      query: ({testId, assertion}) => ({
         url: `/tests/${testId}/assertions`,
         method: 'POST',
+        body: assertion,
+      }),
+      invalidatesTags: (result, error, args) => [{type: 'Test', id: args.testId}],
+    }),
+    updateAssertion: build.mutation<Assertion, {testId: string; assertionId: string, assertion: Partial<Assertion>}>({
+      query: ({testId, assertion, assertionId}) => ({
+        url: `/tests/${testId}/assertions/${assertionId}`,
+        method: 'PUT',
         body: assertion,
       }),
       invalidatesTags: (result, error, args) => [{type: 'Test', id: args.testId}],
@@ -78,4 +86,5 @@ export const {
   useGetTestResultByIdQuery,
   useGetTestResultsQuery,
   useGetTestsQuery,
+  useUpdateAssertionMutation,
 } = testAPI;
