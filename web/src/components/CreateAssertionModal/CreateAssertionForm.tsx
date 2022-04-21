@@ -161,7 +161,7 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
                 const value = attrs?.find((el: any) => el.key === assertionList[index].key)?.value;
                 const isValid = typeof value === 'number' || !isEmpty(value);
 
-                return {...assertion, value: isValid ? value : ''};
+                return {...assertion, value: isValid ? String(value) : ''};
               }
 
               return assertion;
