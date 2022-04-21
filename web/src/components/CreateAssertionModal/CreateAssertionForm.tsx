@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useMemo} from 'react';
 import {isEmpty} from 'lodash';
-import {QuestionCircleOutlined, PlusOutlined} from '@ant-design/icons';
+import {QuestionCircleOutlined, PlusOutlined, MinusCircleOutlined} from '@ant-design/icons';
 import styled from 'styled-components';
 import {Button, Input, Select as AntSelect, AutoComplete, Typography, Tooltip, Form, Space, FormInstance} from 'antd';
 import jemsPath from 'jmespath';
@@ -12,6 +12,7 @@ import {filterBySpanId} from 'utils';
 import {CreateAssertionSelectorInput} from './CreateAssertionSelectorInput';
 import {getSpanSignature} from '../../services/SpanService';
 import {getSpanAttributeValueType} from '../../services/SpanAttributeService';
+import * as S from './CreateAssertionModal.styled';
 
 interface AssertionSpan {
   key: string;
@@ -186,19 +187,19 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
         </Tooltip>
       </div>
       <Form.List name="assertionList">
-        {(fields, {add}) => {
+        {(fields, {add, remove}) => {
           return (
             <>
-              {fields.map(field => (
-                <Space key={field.key} style={{display: 'flex', alignItems: 'stretch', gap: '4px', marginBottom: 16}}>
+              {fields.map(({key, name, ...field}, index) => (
+                <Space key={key} style={{display: 'flex', alignItems: 'center', gap: '4px', marginBottom: 16}}>
                   <Form.Item
                     {...field}
-                    name={[field.name, 'key']}
+                    name={[name, 'key']}
                     style={{margin: 0}}
                     rules={[{required: true, message: 'Attribute is required'}]}
                   >
                     <AutoComplete
-                      style={{width: 250, margin: 0}}
+                      style={{margin: 0}}
                       options={spanAssertionOptions}
                       filterOption={(inputValue, option) => {
                         return option?.label.props.children.includes(inputValue);
@@ -207,11 +208,11 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
                       <Input.Search size="large" placeholder="span key" />
                     </AutoComplete>
                   </Form.Item>
-                  <Form.Item
+                  <S.FullHeightFormItem
                     {...field}
                     initialValue={COMPARE_OPERATOR.EQUALS}
                     style={{margin: 0}}
-                    name={[field.name, 'compareOp']}
+                    name={[name, 'compareOp']}
                     rules={[{required: true, message: 'Operator is required'}]}
                   >
                     <Select style={{margin: 0}}>
@@ -222,15 +223,20 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
                       <Select.Option value={COMPARE_OPERATOR.GREATOREQUALS}>ge</Select.Option>
                       <Select.Option value={COMPARE_OPERATOR.LESSOREQUAL}>le</Select.Option>
                     </Select>
-                  </Form.Item>
-                  <Form.Item
+                  </S.FullHeightFormItem>
+                  <S.FullHeightFormItem
                     {...field}
-                    name={[field.name, 'value']}
+                    name={[name, 'value']}
                     style={{margin: 0}}
                     rules={[{required: true, message: 'Value is required'}]}
                   >
                     <Input placeholder="value" />
-                  </Form.Item>
+                  </S.FullHeightFormItem>
+                  <MinusCircleOutlined
+                    color="error"
+                    style={{cursor: 'pointer', color: 'rgb(140, 140, 140)'}}
+                    onClick={() => index > 0 && remove(name)}
+                  />
                 </Space>
               ))}
 
