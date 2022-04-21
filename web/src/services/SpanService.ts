@@ -94,7 +94,7 @@ export const getSpanSignature = (spanId: string, trace: ITrace): ItemSelector[] 
     LOCATION_NAME.RESOURCE_ATTRIBUTES
   );
 
-  return [...resourceAttributeList, ...spanAttributeList];
+  return [...spanAttributeList, ...resourceAttributeList];
 };
 
 export const getSpanNodeInfo = (spanId: string, trace: ITrace) => {

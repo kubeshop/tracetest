@@ -11,7 +11,7 @@ import {SELECTOR_DEFAULT_ATTRIBUTES} from 'lib/SelectorDefaultAttributes';
 import {filterBySpanId} from 'utils';
 import {CreateAssertionSelectorInput} from './CreateAssertionSelectorInput';
 import {getSpanSignature} from '../../services/SpanService';
-import { getSpanAttributeValueType } from '../../services/SpanAttributeService';
+import {getSpanAttributeValueType} from '../../services/SpanAttributeService';
 
 interface AssertionSpan {
   key: string;
@@ -159,8 +159,9 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
             assertionList: assertionList.map((assertion, index) => {
               if (index === entry) {
                 const value = attrs?.find((el: any) => el.key === assertionList[index].key)?.value;
+                const isValid = typeof value === 'number' || !isEmpty(value);
 
-                return {...assertion, value: isEmpty(value) ? '' : value};
+                return {...assertion, value: isValid ? value : ''};
               }
 
               return assertion;
@@ -210,7 +211,7 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
                     {...field}
                     initialValue={COMPARE_OPERATOR.EQUALS}
                     style={{margin: 0}}
-                    name={[field.name, 'compare']}
+                    name={[field.name, 'compareOp']}
                     rules={[{required: true, message: 'Operator is required'}]}
                   >
                     <Select style={{margin: 0}}>
