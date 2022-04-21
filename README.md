@@ -69,7 +69,7 @@ We have a live demo environment with a couple systems you can test against. Use 
 
 Wanna play with it? [Try the Live Demo](https://demo.tracetest.io/)
 
-[![button](/assets/tracetest-diagram-01.png)](https://demo.tracetest.io/)
+[![button](/assets/button_try_tracetest.png)](https://demo.tracetest.io/)
 
 We’re looking for feedback to help make Tracetest even better for developers, QA testers, and DevOPs. Please give us feedback on [Discord](https://discord.gg/eBvEQRVyKX) or [create an issue on Github](https://github.com/kubeshop/tracetest/issues/new/choose)
 
