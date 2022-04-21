@@ -26,6 +26,7 @@ type ApiApiRouter interface {
 	GetTestResults(http.ResponseWriter, *http.Request)
 	GetTests(http.ResponseWriter, *http.Request)
 	RunTest(http.ResponseWriter, *http.Request)
+	UpdateAssertion(http.ResponseWriter, *http.Request)
 	UpdateTest(http.ResponseWriter, *http.Request)
 	UpdateTestResult(http.ResponseWriter, *http.Request)
 }
@@ -43,6 +44,7 @@ type ApiApiServicer interface {
 	GetTestResults(context.Context, string) (ImplResponse, error)
 	GetTests(context.Context) (ImplResponse, error)
 	RunTest(context.Context, string) (ImplResponse, error)
+	UpdateAssertion(context.Context, string, string, Assertion) (ImplResponse, error)
 	UpdateTest(context.Context, string, Test) (ImplResponse, error)
 	UpdateTestResult(context.Context, string, string, TestAssertionResult) (ImplResponse, error)
 }

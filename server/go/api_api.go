@@ -99,6 +99,12 @@ func (c *ApiApiController) Routes() Routes {
 			c.RunTest,
 		},
 		{
+			"UpdateAssertion",
+			strings.ToUpper("Put"),
+			"/api/tests/{testId}/assertions/{assertionId}",
+			c.UpdateAssertion,
+		},
+		{
 			"UpdateTest",
 			strings.ToUpper("Put"),
 			"/api/tests/{testId}",
@@ -249,6 +255,35 @@ func (c *ApiApiController) RunTest(w http.ResponseWriter, r *http.Request) {
 	testIdParam := params["testId"]
 
 	result, err := c.service.RunTest(r.Context(), testIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// UpdateAssertion - update an assertion
+func (c *ApiApiController) UpdateAssertion(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	testIdParam := params["testId"]
+
+	assertionIdParam := params["assertionId"]
+
+	assertionParam := Assertion{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&assertionParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertAssertionRequired(assertionParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.UpdateAssertion(r.Context(), testIdParam, assertionIdParam, assertionParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

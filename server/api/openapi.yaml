@@ -256,6 +256,38 @@ paths:
       summary: Create an assertion for a test
       tags:
       - api
+  /tests/{testId}/assertions/{assertionId}:
+    put:
+      description: update an assertion
+      operationId: updateAssertion
+      parameters:
+      - explode: false
+        in: path
+        name: testId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: assertionId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Assertion'
+      responses:
+        "204":
+          description: OK
+      summary: update an assertion
+      tags:
+      - api
 components:
   schemas:
     Test:
