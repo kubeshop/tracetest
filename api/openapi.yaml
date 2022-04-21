@@ -277,6 +277,28 @@ paths:
       responses:
         "204":
           description: OK
+    delete:
+      tags:
+        - api
+      parameters:
+        - in: path
+          name: testId
+          schema:
+            type: string
+            format: uuid
+          required: true
+        - in: path
+          name: assertionId
+          schema:
+            type: string
+            format: uuid
+          required: true
+      summary: "delete an assertion"
+      description: "delete an assertion"
+      operationId: deleteAssertion
+      responses:
+        "204":
+          description: OK
 components:
   schemas:
     Test:

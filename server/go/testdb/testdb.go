@@ -223,6 +223,21 @@ func (td *TestDB) UpdateAssertion(ctx context.Context, testID, assertionID strin
 	return nil
 }
 
+func (td *TestDB) DeleteAssertion(ctx context.Context, testID, assertionID string) error {
+	stmt, err := td.db.Prepare("DELETE FROM assertions WHERE id = $1 AND test_id = $2")
+	if err != nil {
+		return fmt.Errorf("sql prepare: %w", err)
+	}
+	defer stmt.Close()
+
+	_, err = stmt.ExecContext(ctx, assertionID, testID)
+	if err != nil {
+		return fmt.Errorf("sql exec: %w", err)
+	}
+
+	return nil
+}
+
 func (td *TestDB) GetAssertion(ctx context.Context, id string) (*openapi.Assertion, error) {
 	stmt, err := td.db.Prepare("SELECT assertion FROM assertions WHERE id = $1")
 	if err != nil {
