@@ -67,7 +67,7 @@ We have a live demo environment with a couple systems you can test against. Use 
 
 (More documentation about the installed Pokemon Microservice App, PMA, is at [Pokemon Microservice App github](https://github.com/kubeshop/pokeshop/blob/master/docs/overview.md)
 
-Wanna play with it? <button name="button" onClick="https://demo.tracetest.io"><img src="/assets/button_try_tracetest"</button>
+Wanna play with it? <button name="button" onClick="https://demo.tracetest.io"><img src="/assets/button_try_tracetest"></button>
 
 We’re looking for feedback to help make Tracetest even better for developers, QA testers, and DevOPs. Please give us feedback on [Discord](https://discord.gg/eBvEQRVyKX) or [create an issue on Github](https://github.com/kubeshop/tracetest/issues/new/choose)
 
