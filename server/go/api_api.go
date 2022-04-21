@@ -63,6 +63,12 @@ func (c *ApiApiController) Routes() Routes {
 			c.CreateTest,
 		},
 		{
+			"DeleteAssertion",
+			strings.ToUpper("Delete"),
+			"/api/tests/{testId}/assertions/{assertionId}",
+			c.DeleteAssertion,
+		},
+		{
 			"GetAssertions",
 			strings.ToUpper("Get"),
 			"/api/tests/{testId}/assertions",
@@ -160,6 +166,24 @@ func (c *ApiApiController) CreateTest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	result, err := c.service.CreateTest(r.Context(), testParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// DeleteAssertion - delete an assertion
+func (c *ApiApiController) DeleteAssertion(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	testIdParam := params["testId"]
+
+	assertionIdParam := params["assertionId"]
+
+	result, err := c.service.DeleteAssertion(r.Context(), testIdParam, assertionIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

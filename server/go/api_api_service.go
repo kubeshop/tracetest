@@ -36,6 +36,7 @@ type TestDB interface {
 
 	CreateAssertion(ctx context.Context, testid string, assertion *Assertion) (string, error)
 	UpdateAssertion(ctx context.Context, testID, assertionID string, assertion Assertion) error
+	DeleteAssertion(ctx context.Context, testID, assertionID string) error
 	GetAssertion(ctx context.Context, id string) (*Assertion, error)
 	GetAssertionsByTestID(ctx context.Context, testID string) ([]Assertion, error)
 }
@@ -230,6 +231,20 @@ func (s *ApiApiService) UpdateAssertion(ctx context.Context, testID string, asse
 	updated.AssertionId = assertionID
 
 	err = s.testDB.UpdateAssertion(ctx, testID, assertionID, updated)
+	if err != nil {
+		return Response(http.StatusInternalServerError, err.Error()), err
+	}
+
+	return Response(http.StatusNoContent, nil), nil
+}
+
+func (s *ApiApiService) DeleteAssertion(ctx context.Context, testID string, assertionID string) (ImplResponse, error) {
+	_, err := s.testDB.GetAssertion(ctx, assertionID)
+	if err != nil {
+		return Response(http.StatusInternalServerError, err.Error()), err
+	}
+
+	err = s.testDB.DeleteAssertion(ctx, testID, assertionID)
 	if err != nil {
 		return Response(http.StatusInternalServerError, err.Error()), err
 	}

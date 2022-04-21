@@ -257,6 +257,32 @@ paths:
       tags:
       - api
   /tests/{testId}/assertions/{assertionId}:
+    delete:
+      description: delete an assertion
+      operationId: deleteAssertion
+      parameters:
+      - explode: false
+        in: path
+        name: testId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: assertionId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "204":
+          description: OK
+      summary: delete an assertion
+      tags:
+      - api
     put:
       description: update an assertion
       operationId: updateAssertion
