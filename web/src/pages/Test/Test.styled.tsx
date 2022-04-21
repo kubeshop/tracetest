@@ -1,4 +1,5 @@
-import styled, {keyframes} from 'styled-components';
+import styled, {keyframes, css} from 'styled-components';
+import {Tabs as AntTabs} from 'antd';
 
 export const Header = styled.div`
   display: flex;
@@ -22,7 +23,7 @@ export const Wrapper = styled.div`
 `;
 
 const IndeterminateAnimation = keyframes`
- 0% {
+  0% {
     transform:  translateX(0) scaleX(0);
   }
   40% {
@@ -33,17 +34,32 @@ const IndeterminateAnimation = keyframes`
   }
 `;
 
-export const ProgressBarContainer = styled.div`
-  height: 4px;
-  background-color: rgba(5, 114, 206, 0.2);
-  width: 100%;
-  overflow: hidden;
-`;
+export const TestTabs = styled(AntTabs)<{loading: string}>`
+  ${props => {
+    if (props.loading === 'true') {
+      return css`
+        &:first-child > .ant-tabs-nav {
+        }
+        &:first-child > .ant-tabs-nav::before,
+        &:first-child > .ant-tabs-nav::after {
+          z-index: 1000;
+          content: '';
+          height: 2px;
+          bottom: 0;
+          left: 0;
+          position: absolute;
+          width: 100%;
+        }
 
-export const Progress = styled.div`
-  width: 100%;
-  height: 100%;
-  background-color: rgb(5, 114, 206);
-  animation: ${IndeterminateAnimation} 1s infinite linear;
-  transform-origin: 0% 50%;
+        &:first-child > .ant-tabs-nav::before {
+          background-color: #c4c4c4;
+        }
+        &:first-child > .ant-tabs-nav::after {
+          background-color: #1890ff;
+          animation: ${IndeterminateAnimation} 1s infinite linear;
+          transform-origin: 0% 50%;
+        }
+      `;
+    }
+  }}
 `;

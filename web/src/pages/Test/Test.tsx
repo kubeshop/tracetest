@@ -6,7 +6,7 @@ import Title from 'antd/lib/typography/Title';
 import {CloseOutlined, ArrowLeftOutlined} from '@ant-design/icons';
 import {useLocation, useNavigate, useParams} from 'react-router-dom';
 
-import {TestRunResult} from 'types';
+import {TestRunResult, TestState} from 'types';
 import {useGetTestByIdQuery, useGetTestResultByIdQuery, useGetTestResultsQuery} from 'services/TestService';
 
 import Trace from 'components/Trace';
@@ -17,9 +17,6 @@ import Assertions from './Assertions';
 import * as S from './Test.styled';
 import TestDetails from './TestDetails';
 
-interface ITestRouteState {
-  testRun: TestRunResult;
-}
 interface TracePane {
   key: string;
   title: string;
@@ -42,6 +39,12 @@ const TestPage = () => {
   const {data: activeTestResultDetails} = useGetTestResultByIdQuery(
     activeTestResult?.resultId && id ? {testId: id, resultId: activeTestResult.resultId} : skipToken
   );
+
+  const isTraceLoading =
+    (activeTestResult?.resultId &&
+      (activeTestResultDetails?.state === TestState.AWAITING_TRACE ||
+        activeTestResultDetails?.state === TestState.EXECUTING)) ||
+    false;
 
   const handleSelectTestResult = useCallback(
     (result: TestRunResult) => {
@@ -117,7 +120,8 @@ const TestPage = () => {
   return (
     <Layout>
       <ReactFlowProvider>
-        <Tabs
+        <S.TestTabs
+          loading={isTraceLoading.toString()}
           tabBarExtraContent={{
             left: (
               <S.Header>
@@ -166,7 +170,7 @@ const TestPage = () => {
               <S.Wrapper>{item.content}</S.Wrapper>
             </Tabs.TabPane>
           ))}
-        </Tabs>
+        </S.TestTabs>
       </ReactFlowProvider>
     </Layout>
   );
