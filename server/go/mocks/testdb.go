@@ -79,6 +79,20 @@ func (mr *MockTestDBMockRecorder) CreateTest(arg0, arg1 interface{}) *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateTest", reflect.TypeOf((*MockTestDB)(nil).CreateTest), arg0, arg1)
 }
 
+// DeleteAssertion mocks base method.
+func (m *MockTestDB) DeleteAssertion(arg0 context.Context, arg1, arg2 string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteAssertion", arg0, arg1, arg2)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteAssertion indicates an expected call of DeleteAssertion.
+func (mr *MockTestDBMockRecorder) DeleteAssertion(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteAssertion", reflect.TypeOf((*MockTestDB)(nil).DeleteAssertion), arg0, arg1, arg2)
+}
+
 // GetAssertion mocks base method.
 func (m *MockTestDB) GetAssertion(arg0 context.Context, arg1 string) (*openapi.Assertion, error) {
 	m.ctrl.T.Helper()
@@ -124,21 +138,6 @@ func (mr *MockTestDBMockRecorder) GetResult(arg0, arg1 interface{}) *gomock.Call
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetResult", reflect.TypeOf((*MockTestDB)(nil).GetResult), arg0, arg1)
 }
 
-// GetResultsByTestID mocks base method.
-func (m *MockTestDB) GetResultsByTestID(arg0 context.Context, arg1 string) ([]openapi.TestRunResult, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetResultsByTestID", arg0, arg1)
-	ret0, _ := ret[0].([]openapi.TestRunResult)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetResultsByTestID indicates an expected call of GetResultsByTestID.
-func (mr *MockTestDBMockRecorder) GetResultsByTestID(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetResultsByTestID", reflect.TypeOf((*MockTestDB)(nil).GetResultsByTestID), arg0, arg1)
-}
-
 // GetResultByTraceID mocks base method.
 func (m *MockTestDB) GetResultByTraceID(arg0 context.Context, arg1, arg2 string) (openapi.TestRunResult, error) {
 	m.ctrl.T.Helper()
@@ -152,6 +151,21 @@ func (m *MockTestDB) GetResultByTraceID(arg0 context.Context, arg1, arg2 string)
 func (mr *MockTestDBMockRecorder) GetResultByTraceID(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetResultByTraceID", reflect.TypeOf((*MockTestDB)(nil).GetResultByTraceID), arg0, arg1, arg2)
+}
+
+// GetResultsByTestID mocks base method.
+func (m *MockTestDB) GetResultsByTestID(arg0 context.Context, arg1 string) ([]openapi.TestRunResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetResultsByTestID", arg0, arg1)
+	ret0, _ := ret[0].([]openapi.TestRunResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetResultsByTestID indicates an expected call of GetResultsByTestID.
+func (mr *MockTestDBMockRecorder) GetResultsByTestID(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetResultsByTestID", reflect.TypeOf((*MockTestDB)(nil).GetResultsByTestID), arg0, arg1)
 }
 
 // GetTest mocks base method.
@@ -182,6 +196,20 @@ func (m *MockTestDB) GetTests(arg0 context.Context) ([]openapi.Test, error) {
 func (mr *MockTestDBMockRecorder) GetTests(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTests", reflect.TypeOf((*MockTestDB)(nil).GetTests), arg0)
+}
+
+// UpdateAssertion mocks base method.
+func (m *MockTestDB) UpdateAssertion(arg0 context.Context, arg1, arg2 string, arg3 openapi.Assertion) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateAssertion", arg0, arg1, arg2, arg3)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateAssertion indicates an expected call of UpdateAssertion.
+func (mr *MockTestDBMockRecorder) UpdateAssertion(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateAssertion", reflect.TypeOf((*MockTestDB)(nil).UpdateAssertion), arg0, arg1, arg2, arg3)
 }
 
 // UpdateResult mocks base method.
