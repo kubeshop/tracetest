@@ -1,4 +1,5 @@
 import {Table} from 'antd';
+import {useRef} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useGetTestsQuery} from 'services/TestService';
 import CustomTable from '../../components/CustomTable';
@@ -7,7 +8,20 @@ import NoResults from './NoResults';
 
 const TestList = () => {
   const navigate = useNavigate();
+  const eventRef = useRef<{previousPageX: number; currentPageX: number}>({previousPageX: 0, currentPageX: 0});
   const {data: testList = [], isLoading} = useGetTestsQuery();
+  
+  const handleMouseUp = (event: any) => {
+    if (event.type === 'mousedown') {
+      eventRef.current.previousPageX = event.pageX;
+    } else if (event.type === 'mouseup') {
+      eventRef.current.currentPageX = event.pageX;
+    } else if (event.type === 'click') {
+      if (Math.abs(eventRef.current.currentPageX - eventRef.current.previousPageX) > 0) {
+        event?.stopPropagation();
+      }
+    }
+  };
 
   return (
     <CustomTable
@@ -22,7 +36,23 @@ const TestList = () => {
       }}
     >
       <Table.Column title="Name" dataIndex="name" key="name" width="25%" />
-      <Table.Column title="Endpoint" dataIndex="url" key="url" />
+      <Table.Column
+        title="Endpoint"
+        dataIndex="url"
+        key="url"
+        render={value => {
+          return (
+            <span
+              style={{paddingLeft: 16, paddingRight: 16}}
+              onMouseDown={handleMouseUp}
+              onMouseUp={handleMouseUp}
+              onClick={handleMouseUp}
+            >
+              {value}
+            </span>
+          );
+        }}
+      />
     </CustomTable>
   );
 };
