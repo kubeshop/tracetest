@@ -54,7 +54,7 @@ const TestPage = () => {
         const tracePane = {
           key: result.resultId,
           title: `Trace #${newTabIndex}`,
-          content: <Trace testId={id!} testResultId={result.resultId} onDismissTrace={handleCloseTab} />,
+          content: <Trace testId={id!} testResultId={result.resultId} onDismissTrace={handleCloseTab} onRunTest={handleSelectTestResult}/>,
         };
 
         setTracePanes([...tracePanes, tracePane]);
@@ -88,7 +88,11 @@ const TestPage = () => {
   );
 
   const handleCloseTab = useCallback(() => {
+    const panes = tracePanes.filter(pane => pane.key !== activeTabKey);
+
     navigate(`/test/${id}`);
+
+    setTracePanes(panes);
     setActiveTabKey('1');
   }, [id, navigate]);
 
