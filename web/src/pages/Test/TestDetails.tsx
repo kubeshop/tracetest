@@ -24,7 +24,7 @@ const TestDetails: FC<TTestDetailsProps> = ({testId, testResultList, isLoading, 
   }, [runTest, testId]);
 
   return (
-    <>
+    <div style={{height: 'calc(100vh - 250px)'}}>
       <S.TestDetailsHeader>
         <Typography.Title level={5}>{url}</Typography.Title>
         <Button onClick={handleRunTest} loading={result.isLoading} type="primary" ghost>
@@ -32,7 +32,7 @@ const TestDetails: FC<TTestDetailsProps> = ({testId, testResultList, isLoading, 
         </Button>
       </S.TestDetailsHeader>
       <TestDetailsTable isLoading={isLoading} onSelectResult={onSelectResult} testResultList={testResultList} />
-    </>
+    </div>
   );
 };
 
