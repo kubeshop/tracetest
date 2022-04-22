@@ -9,12 +9,12 @@ const CustomTable = styled(Table).attrs({
     font-weight: 600;
   }
 
-  .ant-table.ant-table-bordered > .ant-table-container > .ant-table-content > table > tbody > tr > td,
-  .ant-table.ant-table-bordered > .ant-table-container > .ant-table-content > table > thead > tr > th {
+  .ant-table.ant-table-bordered > .ant-table-container > .ant-table-body > table > tbody > tr > td,
+  .ant-table.ant-table-bordered > .ant-table-container > .ant-table-header > table > thead > tr > th {
     border-right: none;
   }
 
-  .ant-table.ant-table-bordered > .ant-table-container {
+  .ant-table.ant-table-bordered > .ant-table-body {
     border-right: 1px solid #f0f0f0;
   }
 
