@@ -65,7 +65,7 @@ const TextDetailsTable: FC<TextRowProps> = ({isLoading, onSelectResult, testResu
         width="10%"
         render={(value, {createdAt, completedAt}: TestRunResult) => {
           if (!createdAt || !completedAt) return '';
-          const executionTime = differenceInSeconds(new Date(createdAt), new Date(completedAt)) + 1;
+          const executionTime = differenceInSeconds(new Date(completedAt), new Date(createdAt)) + 1;
 
           return `${executionTime}s`;
         }}

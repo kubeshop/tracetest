@@ -99,10 +99,11 @@ const TraceAssertionsResultTable: FC<IProps> = ({
           ellipsis
           width="40%"
           render={(value: string[], record: TParsedAssertion) =>
-            value
-              // eslint-disable-next-line react/no-array-index-key
-              .map((label, index) => <S.LabelBadge count={label} key={`${label}-${index}`} />)
-              .concat(getIsSelected(record.spanId) ? [<S.SelectedLabelBadge count="selected" key="selected" />] : [])
+            (getIsSelected(record.spanId) ? [<S.SelectedLabelBadge count="selected" key="selected" />] : []).concat(
+              value
+                // eslint-disable-next-line react/no-array-index-key
+                .map((label, index) => <S.LabelBadge count={label} key={`${label}-${index}`} />)
+            )
           }
         />
         <Table.Column title="Property" dataIndex="property" key="property" ellipsis width="25%" />

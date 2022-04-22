@@ -2,6 +2,7 @@ import {FC} from 'react';
 import {Link, useLocation} from 'react-router-dom';
 import {DOCUMENTATION_URL, GITHUB_URL} from '../../lib/Constants';
 import * as S from './Header.styled';
+import Logo from '../../assets/Logo.svg';
 
 const Header: FC = () => {
   const {pathname} = useLocation();
@@ -9,7 +10,9 @@ const Header: FC = () => {
   return (
     <S.Header>
       <Link to="/">
-        <S.TitleText>Tracetest</S.TitleText>
+        <S.TitleText>
+          <img src={Logo} />
+        </S.TitleText>
       </Link>
       <S.NavMenu selectedKeys={[pathname]}>
         <S.NavMenuItem key={GITHUB_URL}>

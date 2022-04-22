@@ -12,7 +12,6 @@ package openapi
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/kubeshop/tracetest/server/go/tracedb"
@@ -35,6 +34,8 @@ type TestDB interface {
 	GetResultByTraceID(ctx context.Context, testid, traceid string) (TestRunResult, error)
 
 	CreateAssertion(ctx context.Context, testid string, assertion *Assertion) (string, error)
+	UpdateAssertion(ctx context.Context, testID, assertionID string, assertion Assertion) error
+	DeleteAssertion(ctx context.Context, testID, assertionID string) error
 	GetAssertion(ctx context.Context, id string) (*Assertion, error)
 	GetAssertionsByTestID(ctx context.Context, testID string) ([]Assertion, error)
 }
@@ -170,14 +171,13 @@ func (s *ApiApiService) UpdateTestResult(ctx context.Context, testid string, id 
 		return Response(http.StatusInternalServerError, err.Error()), err
 	}
 
-	if len(testRunResult.AssertionResult) == 0 {
-		return Response(http.StatusUnprocessableEntity, "cannot accept empty assertionResult array"), err
+	if testRunResult.AssertionResult == nil {
+		testRunResult.AssertionResult = []AssertionResult{}
 	}
 
-	for i, r := range testRunResult.AssertionResult {
-		if len(r.SpanAssertionResults) == 0 {
-			msg := fmt.Sprintf("cannot accept empty spanAssertionResults for assertionResult index #%d", i)
-			return Response(http.StatusUnprocessableEntity, msg), err
+	for i := range testRunResult.AssertionResult {
+		if testRunResult.AssertionResult[i].SpanAssertionResults == nil {
+			testRunResult.AssertionResult[i].SpanAssertionResults = []SpanAssertionResult{}
 		}
 	}
 
@@ -218,6 +218,36 @@ func (s *ApiApiService) CreateAssertion(ctx context.Context, testID string, asse
 	}
 
 	return Response(http.StatusOK, assertion), nil
+}
+
+func (s *ApiApiService) UpdateAssertion(ctx context.Context, testID string, assertionID string, updated Assertion) (ImplResponse, error) {
+	_, err := s.testDB.GetAssertion(ctx, assertionID)
+	if err != nil {
+		return Response(http.StatusInternalServerError, err.Error()), err
+	}
+
+	updated.AssertionId = assertionID
+
+	err = s.testDB.UpdateAssertion(ctx, testID, assertionID, updated)
+	if err != nil {
+		return Response(http.StatusInternalServerError, err.Error()), err
+	}
+
+	return Response(http.StatusNoContent, nil), nil
+}
+
+func (s *ApiApiService) DeleteAssertion(ctx context.Context, testID string, assertionID string) (ImplResponse, error) {
+	_, err := s.testDB.GetAssertion(ctx, assertionID)
+	if err != nil {
+		return Response(http.StatusInternalServerError, err.Error()), err
+	}
+
+	err = s.testDB.DeleteAssertion(ctx, testID, assertionID)
+	if err != nil {
+		return Response(http.StatusInternalServerError, err.Error()), err
+	}
+
+	return Response(http.StatusNoContent, nil), nil
 }
 
 func (s *ApiApiService) GetAssertions(ctx context.Context, testID string) (ImplResponse, error) {

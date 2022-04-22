@@ -170,11 +170,8 @@ func (td *TestDB) GetTests(ctx context.Context) ([]openapi.Test, error) {
 }
 
 func (td *TestDB) CreateAssertion(ctx context.Context, testid string, assertion *openapi.Assertion) (string, error) {
-	for index := range assertion.SpanAssertions {
-		spanAssertion := &assertion.SpanAssertions[index]
-		if spanAssertion.SpanAssertionId == "" {
-			spanAssertion.SpanAssertionId = uuid.New().String()
-		}
+	for i := range assertion.SpanAssertions {
+		assertion.SpanAssertions[i].SpanAssertionId = ensureUUID(assertion.SpanAssertions[i].SpanAssertionId)
 	}
 
 	stmt, err := td.db.Prepare("INSERT INTO assertions(id, test_id, assertion) VALUES( $1, $2, $3 )")
@@ -194,6 +191,51 @@ func (td *TestDB) CreateAssertion(ctx context.Context, testid string, assertion 
 	}
 
 	return id, nil
+}
+
+func ensureUUID(in string) string {
+	if in == "" {
+		return uuid.New().String()
+	}
+
+	return in
+}
+
+func (td *TestDB) UpdateAssertion(ctx context.Context, testID, assertionID string, assertion openapi.Assertion) error {
+	for i := range assertion.SpanAssertions {
+		assertion.SpanAssertions[i].SpanAssertionId = ensureUUID(assertion.SpanAssertions[i].SpanAssertionId)
+	}
+
+	stmt, err := td.db.Prepare("UPDATE assertions SET assertion = $3 WHERE id = $1 AND test_id = $2")
+	if err != nil {
+		return fmt.Errorf("sql prepare: %w", err)
+	}
+	defer stmt.Close()
+	b, err := json.Marshal(assertion)
+	if err != nil {
+		return fmt.Errorf("json Marshal: %w", err)
+	}
+	_, err = stmt.ExecContext(ctx, assertionID, testID, b)
+	if err != nil {
+		return fmt.Errorf("sql exec: %w", err)
+	}
+
+	return nil
+}
+
+func (td *TestDB) DeleteAssertion(ctx context.Context, testID, assertionID string) error {
+	stmt, err := td.db.Prepare("DELETE FROM assertions WHERE id = $1 AND test_id = $2")
+	if err != nil {
+		return fmt.Errorf("sql prepare: %w", err)
+	}
+	defer stmt.Close()
+
+	_, err = stmt.ExecContext(ctx, assertionID, testID)
+	if err != nil {
+		return fmt.Errorf("sql exec: %w", err)
+	}
+
+	return nil
 }
 
 func (td *TestDB) GetAssertion(ctx context.Context, id string) (*openapi.Assertion, error) {

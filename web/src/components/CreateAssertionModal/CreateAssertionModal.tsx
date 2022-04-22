@@ -1,7 +1,7 @@
 import {useCallback, useState} from 'react';
 import {Modal, Typography, FormInstance} from 'antd';
 
-import {ISpan, ItemSelector} from 'types';
+import {Assertion, ISpan, ItemSelector, ITrace} from 'types';
 import CreateAssertionForm, {TValues} from './CreateAssertionForm';
 import {getEffectedSpansCount} from '../../services/AssertionService';
 
@@ -10,7 +10,8 @@ interface IProps {
   onClose: () => void;
   span: ISpan;
   testId: string;
-  trace: any;
+  trace: ITrace;
+  assertion?: Assertion;
 }
 
 const effectedSpanMessage = (spanCount: number) => {
@@ -21,7 +22,7 @@ const effectedSpanMessage = (spanCount: number) => {
   return `Effects ${spanCount} spans`;
 };
 
-const CreateAssertionModal = ({testId, span, trace, open, onClose}: IProps) => {
+const CreateAssertionModal = ({testId, span, trace, open, onClose, assertion}: IProps) => {
   const [form, setForm] = useState<FormInstance<TValues>>();
   const [selectorList, setSelectorList] = useState<ItemSelector[]>([]);
 
@@ -47,7 +48,7 @@ const CreateAssertionModal = ({testId, span, trace, open, onClose}: IProps) => {
       destroyOnClose
       title={
         <div style={{display: 'flex', justifyContent: 'space-between', marginRight: 36}}>
-          <Typography.Title level={5}>Create New Assertion</Typography.Title>
+          <Typography.Title level={5}>{assertion ? 'Edit Assertion' : 'Create New Assertion'}</Typography.Title>
           <Typography.Text>{effectedSpanMessage(effectedSpanCount)}</Typography.Text>
         </div>
       }
@@ -58,6 +59,7 @@ const CreateAssertionModal = ({testId, span, trace, open, onClose}: IProps) => {
       okText="Save"
     >
       <CreateAssertionForm
+        assertion={assertion}
         onCreate={handleClose}
         onForm={onForm}
         onSelectorList={onSelectorList}

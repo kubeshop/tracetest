@@ -1,5 +1,5 @@
 import {search} from 'jmespath';
-import {SemanticGroupNames, SemanticGroupsSignature} from '../lib/SelectorDefaultAttributes';
+import {SemanticGroupNameNodeMap, SemanticGroupNames, SemanticGroupsSignature} from '../lib/SelectorDefaultAttributes';
 import {ISpanAttribute, ItemSelector, ITrace, LOCATION_NAME, ResourceSpan, Span, TSpanAttributesList} from '../types';
 import {escapeString} from '../utils';
 import {getSpanAttributeValue, getSpanAttributeValueType} from './SpanAttributeService';
@@ -39,8 +39,21 @@ export const getSpanAttributeType = (resourceSpan: ResourceSpan, locationName: L
   return attributeFound ? getSpanAttributeValueType(attributeFound) : '';
 };
 
-export const getSpanType = (resourceSpan: ResourceSpan) => {
-  const [{spans: [{attributes = []}] = []} = {}] = resourceSpan.instrumentationLibrarySpans || [];
+export const getResourceSpanBySpanId = (spanId: string, trace: ITrace): ResourceSpan | undefined => {
+  const [resourceSpan]: Array<ResourceSpan> = search(
+    trace,
+    `resourceSpans|[]| [? instrumentationLibrarySpans[?spans[?spanId == \`${spanId}\`]]]`
+  );
+
+  return resourceSpan;
+};
+
+export const getSpanType = (spanId: string, trace: ITrace) => {
+  const resourceSpan = getResourceSpanBySpanId(spanId, trace);
+  if (!resourceSpan) return undefined;
+
+  const {attributes = []} =
+    resourceSpan.instrumentationLibrarySpans.flatMap(({spans}) => spans).find(({spanId: id}) => id === spanId) || {};
 
   const findAttribute = (groupName: SemanticGroupNames) => attributes.find(({key}) => key.trim().startsWith(groupName));
 
@@ -64,23 +77,14 @@ const getAttributeValueList = (resourceSpan: ResourceSpan, attributeList: string
       : list;
   }, []);
 
-export const getResourceSpanBySpanId = (spanId: string, trace: ITrace): ResourceSpan | undefined => {
-  const [resourceSpan]: Array<ResourceSpan> = search(
-    trace,
-    `resourceSpans|[]| [? instrumentationLibrarySpans[?spans[?spanId == \`${spanId}\`]]]`
-  );
-
-  return resourceSpan;
-};
-
 export const getSpan = (resourceSpan: ResourceSpan): Span | undefined =>
   resourceSpan.instrumentationLibrarySpans[0]?.spans[0];
 
 export const getSpanSignature = (spanId: string, trace: ITrace): ItemSelector[] => {
+  const type = getSpanType(spanId, trace);
   const resourceSpan = getResourceSpanBySpanId(spanId, trace);
-  if (!resourceSpan) return [];
 
-  const type = getSpanType(resourceSpan);
+  if (!type || !resourceSpan) return [];
 
   const {SPAN_ATTRIBUTES: spanAttributes, RESOURCE_ATTRIBUTES: resourceAttributes} = SemanticGroupsSignature[type];
   const spanAttributeList = getAttributeValueList(resourceSpan, spanAttributes, LOCATION_NAME.SPAN_ATTRIBUTES);
@@ -90,7 +94,30 @@ export const getSpanSignature = (spanId: string, trace: ITrace): ItemSelector[] 
     LOCATION_NAME.RESOURCE_ATTRIBUTES
   );
 
-  return [...resourceAttributeList, ...spanAttributeList];
+  return [...spanAttributeList, ...resourceAttributeList];
+};
+
+export const getSpanNodeInfo = (spanId: string, trace: ITrace) => {
+  const spanType = getSpanType(spanId, trace);
+  const signatureArray = getSpanSignature(spanId, trace);
+
+  const signatureObject = signatureArray.reduce<Record<string, string>>(
+    (signature, {propertyName, value}) => ({
+      ...signature,
+      [propertyName]: value,
+    }),
+    {}
+  );
+
+  const {primary, type} = SemanticGroupNameNodeMap[spanType!];
+
+  const attributeKey = primary.find(key => signatureObject[key]) || '';
+
+  return {
+    primary: signatureObject[attributeKey] || '',
+    heading: signatureObject[type],
+    spanType,
+  };
 };
 
 export const getSpanAttributeList = (resourceSpan: ResourceSpan): TSpanAttributesList => {

@@ -20,12 +20,14 @@ import (
 type ApiApiRouter interface {
 	CreateAssertion(http.ResponseWriter, *http.Request)
 	CreateTest(http.ResponseWriter, *http.Request)
+	DeleteAssertion(http.ResponseWriter, *http.Request)
 	GetAssertions(http.ResponseWriter, *http.Request)
 	GetTest(http.ResponseWriter, *http.Request)
 	GetTestResult(http.ResponseWriter, *http.Request)
 	GetTestResults(http.ResponseWriter, *http.Request)
 	GetTests(http.ResponseWriter, *http.Request)
 	RunTest(http.ResponseWriter, *http.Request)
+	UpdateAssertion(http.ResponseWriter, *http.Request)
 	UpdateTest(http.ResponseWriter, *http.Request)
 	UpdateTestResult(http.ResponseWriter, *http.Request)
 }
@@ -37,12 +39,14 @@ type ApiApiRouter interface {
 type ApiApiServicer interface {
 	CreateAssertion(context.Context, string, Assertion) (ImplResponse, error)
 	CreateTest(context.Context, Test) (ImplResponse, error)
+	DeleteAssertion(context.Context, string, string) (ImplResponse, error)
 	GetAssertions(context.Context, string) (ImplResponse, error)
 	GetTest(context.Context, string) (ImplResponse, error)
 	GetTestResult(context.Context, string, string) (ImplResponse, error)
 	GetTestResults(context.Context, string) (ImplResponse, error)
 	GetTests(context.Context) (ImplResponse, error)
 	RunTest(context.Context, string) (ImplResponse, error)
+	UpdateAssertion(context.Context, string, string, Assertion) (ImplResponse, error)
 	UpdateTest(context.Context, string, Test) (ImplResponse, error)
 	UpdateTestResult(context.Context, string, string, TestAssertionResult) (ImplResponse, error)
 }
