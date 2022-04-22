@@ -74,7 +74,7 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
   }, [onForm, form]);
 
   useEffect(() => {
-    onSelectorList(defaultSelectorList);
+    onSelectorList(assertion ? assertion.selectors : defaultSelectorList);
   }, [onSelectorList, defaultSelectorList]);
 
   const spanTagsMap = attrs?.reduce((acc: {[x: string]: any}, item: {key: string}) => {
