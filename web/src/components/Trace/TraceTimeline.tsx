@@ -7,6 +7,8 @@ import {ITrace} from 'types';
 
 import './TimelineChart.css';
 import SkeletonTable from 'components/SkeletonTable';
+import GuidedTourService, { GuidedTours } from '../../services/GuidedTourService';
+import { Steps } from '../GuidedTour/traceStepList';
 
 const Header = styled.div`
   display: flex;
@@ -256,7 +258,7 @@ const TimelineChart = ({trace, selectedSpan, onSelectSpan}: ITimelineChartProps)
 const TraceTimeline = ({trace, selectedSpan, onSelectSpan}: IProps) => {
   return (
     <div>
-      <Header>
+      <Header data-tour={GuidedTourService.getStep(GuidedTours.Trace, Steps.Timeline)}>
         <Title level={4}>Component Timeline</Title>
       </Header>
       <SkeletonTable loading={!trace || !selectedSpan}>

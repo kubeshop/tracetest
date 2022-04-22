@@ -4,6 +4,9 @@ import {useRunTestMutation} from 'services/TestService';
 import {TestId, TestRunResult} from 'types';
 import * as S from './Test.styled';
 import TestDetailsTable from './TestDetailsTable';
+import GuidedTourService, {GuidedTours} from '../../services/GuidedTourService';
+import {Steps} from '../../components/GuidedTour/testDetailsStepList';
+import useGuidedTour from '../../components/GuidedTour/useGuidedTour';
 
 type TTestDetailsProps = {
   testId: TestId;
@@ -21,13 +24,21 @@ const TestDetails: FC<TTestDetailsProps> = ({testId, testResultList, isLoading, 
       const testResult = await runTest(testId).unwrap();
       onSelectResult({resultId: testResult.resultId} as TestRunResult);
     }
-  }, [runTest, testId]);
+  }, [onSelectResult, runTest, testId]);
+
+  useGuidedTour(GuidedTours.TestDetails);
 
   return (
     <div style={{height: 'calc(100vh - 250px)'}}>
       <S.TestDetailsHeader>
         <Typography.Title level={5}>{url}</Typography.Title>
-        <Button onClick={handleRunTest} loading={result.isLoading} type="primary" ghost>
+        <Button
+          onClick={handleRunTest}
+          loading={result.isLoading}
+          type="primary"
+          ghost
+          data-tour={GuidedTourService.getStep(GuidedTours.TestDetails, Steps.RunTest)}
+        >
           Run Test
         </Button>
       </S.TestDetailsHeader>

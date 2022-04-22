@@ -14,7 +14,7 @@ const CustomTable = styled(Table).attrs({
     border-right: none;
   }
 
-  .ant-table.ant-table-bordered > .ant-table-body {
+  .ant-table.ant-table-bordered > .ant-table-container {
     border-right: 1px solid #f0f0f0;
   }
 

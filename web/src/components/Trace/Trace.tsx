@@ -29,10 +29,14 @@ import * as S from './Trace.styled';
 
 import SpanDetail from './SpanDetail';
 import TestResults from './TestResults';
+import GuidedTourService, {GuidedTours} from '../../services/GuidedTourService';
+import {Steps} from '../GuidedTour/traceStepList';
+import useGuidedTour from '../GuidedTour/useGuidedTour';
 
 const Grid = styled.div`
   display: grid;
   height: calc(100vh - 200px);
+  overflow: scroll;
 `;
 
 export type TSpanInfo = {
@@ -85,6 +89,8 @@ const Trace: React.FC<TraceProps> = ({testId, testResultId, onDismissTrace, onRu
     },
     [addSelected, spanMap]
   );
+
+  useGuidedTour(GuidedTours.Trace);
 
   useEffect(() => {
     let INTERVALID: any = null;
@@ -162,7 +168,11 @@ const Trace: React.FC<TraceProps> = ({testId, testResultId, onDismissTrace, onRu
         <ReflexContainer style={{height: '100vh'}} orientation="horizontal">
           <ReflexElement flex={0.6}>
             <ReflexContainer orientation="vertical">
-              <ReflexElement flex={0.5} className="left-pane">
+              <ReflexElement
+                flex={0.5}
+                className="left-pane"
+                data-tour={GuidedTourService.getStep(GuidedTours.Trace, Steps.Diagram)}
+              >
                 <div className="pane-content">
                   <TraceDiagram
                     spanMap={spanMap}
@@ -175,10 +185,24 @@ const Trace: React.FC<TraceProps> = ({testId, testResultId, onDismissTrace, onRu
               <ReflexElement flex={0.5} className="right-pane">
                 <div className="pane-content" style={{padding: '14px 24px', overflow: 'hidden'}}>
                   <S.TraceTabs>
-                    <Tabs.TabPane tab="Span detail" key="1">
+                    <Tabs.TabPane
+                      tab={
+                        <span data-tour={GuidedTourService.getStep(GuidedTours.Trace, Steps.SpanDetail)}>
+                          Span Detail
+                        </span>
+                      }
+                      key="1"
+                    >
                       <SpanDetail trace={testResultDetails?.trace} test={test} targetSpan={selectedSpan?.data} />
                     </Tabs.TabPane>
-                    <Tabs.TabPane tab="Test Results" key="2">
+                    <Tabs.TabPane
+                      tab={
+                        <span data-tour={GuidedTourService.getStep(GuidedTours.Trace, Steps.TestResults)}>
+                          Test Results
+                        </span>
+                      }
+                      key="2"
+                    >
                       <TestResults
                         onSpanSelected={handleOnSpanSelected}
                         trace={testResultDetails?.trace}
@@ -194,7 +218,7 @@ const Trace: React.FC<TraceProps> = ({testId, testResultId, onDismissTrace, onRu
           <ReflexElement>
             <div className="pane-content">
               <TraceTimeline
-                trace={testResultDetails?.trace}
+                trace={testResultDetails?.trace!}
                 onSelectSpan={handleOnSpanSelected}
                 selectedSpan={selectedSpan}
               />

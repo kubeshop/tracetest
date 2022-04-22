@@ -4,6 +4,8 @@
   "private": true,
   "dependencies": {
     "@ant-design/icons": "^4.7.0",
+    "@emotion/react": "^11.9.0",
+    "@reactour/tour": "^2.10.3",
     "@reduxjs/toolkit": "^1.7.2",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",

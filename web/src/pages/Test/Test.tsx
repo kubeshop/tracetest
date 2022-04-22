@@ -1,4 +1,5 @@
 import {skipToken} from '@reduxjs/toolkit/dist/query';
+import {TourProvider} from '@reactour/tour';
 import {useCallback, useEffect, useMemo, useState} from 'react';
 import {ReactFlowProvider} from 'react-flow-renderer';
 import {Button, Tabs, Typography} from 'antd';
@@ -54,7 +55,14 @@ const TestPage = () => {
         const tracePane = {
           key: result.resultId,
           title: `Trace #${newTabIndex}`,
-          content: <Trace testId={id!} testResultId={result.resultId} onDismissTrace={handleCloseTab} onRunTest={handleSelectTestResult}/>,
+          content: (
+            <Trace
+              testId={id!}
+              testResultId={result.resultId}
+              onDismissTrace={handleCloseTab}
+              onRunTest={handleSelectTestResult}
+            />
+          ),
         };
 
         setTracePanes([...tracePanes, tracePane]);
@@ -122,52 +130,56 @@ const TestPage = () => {
 
   return (
     <Layout>
-      <ReactFlowProvider>
-        <S.TestTabs
-          loading={isTraceLoading.toString()}
-          tabBarExtraContent={{
-            left: (
-              <S.Header>
-                <Button type="text" shape="circle" onClick={() => navigate('/')}>
-                  <ArrowLeftOutlined style={{fontSize: 24, marginRight: 16}} />
-                </Button>
-                <Title style={{margin: 0}} level={3}>
-                  {test?.name}
-                </Title>
-              </S.Header>
-            ),
-            right: activeTestResult?.resultId && activeTestResultDetails?.state && (
-              <div style={{marginRight: 24}}>
-                <Typography.Text style={{marginRight: 8, color: '#8C8C8C', fontSize: 14}}>Test status:</Typography.Text>
-                <TestStateBadge style={{fontSize: 16}} testState={activeTestResultDetails?.state} />
-              </div>
-            ),
-          }}
-          hideAdd
-          defaultActiveKey="1"
-          activeKey={activeTabKey}
-          onChange={onChangeTab}
-          type="editable-card"
-          onEdit={onEditTab}
-        >
-          <Tabs.TabPane tab="Test Details" key="1" closeIcon={<CloseOutlined hidden />}>
-            <S.Wrapper>
-              <TestDetails
-                testResultList={testResultList}
-                isLoading={isLoading}
-                testId={id!}
-                url={test?.serviceUnderTest.request.url}
-                onSelectResult={handleSelectTestResult}
-              />
-            </S.Wrapper>
-          </Tabs.TabPane>
-          {tracePanes.map(item => (
-            <Tabs.TabPane tab={item.title} key={item.key}>
-              <S.Wrapper>{item.content}</S.Wrapper>
+      <TourProvider steps={[]}>
+        <ReactFlowProvider>
+          <S.TestTabs
+            loading={isTraceLoading.toString()}
+            tabBarExtraContent={{
+              left: (
+                <S.Header>
+                  <Button type="text" shape="circle" onClick={() => navigate('/')}>
+                    <ArrowLeftOutlined style={{fontSize: 24, marginRight: 16}} />
+                  </Button>
+                  <Title style={{margin: 0}} level={3}>
+                    {test?.name}
+                  </Title>
+                </S.Header>
+              ),
+              right: activeTestResult?.resultId && activeTestResultDetails?.state && (
+                <div style={{marginRight: 24}}>
+                  <Typography.Text style={{marginRight: 8, color: '#8C8C8C', fontSize: 14}}>
+                    Test status:
+                  </Typography.Text>
+                  <TestStateBadge style={{fontSize: 16}} testState={activeTestResultDetails?.state} />
+                </div>
+              ),
+            }}
+            hideAdd
+            defaultActiveKey="1"
+            activeKey={activeTabKey}
+            onChange={onChangeTab}
+            type="editable-card"
+            onEdit={onEditTab}
+          >
+            <Tabs.TabPane tab="Test Details" key="1" closeIcon={<CloseOutlined hidden />}>
+              <S.Wrapper>
+                <TestDetails
+                  testResultList={testResultList}
+                  isLoading={isLoading}
+                  testId={id!}
+                  url={test?.serviceUnderTest.request.url}
+                  onSelectResult={handleSelectTestResult}
+                />
+              </S.Wrapper>
             </Tabs.TabPane>
-          ))}
-        </S.TestTabs>
-      </ReactFlowProvider>
+            {tracePanes.map(item => (
+              <Tabs.TabPane tab={item.title} key={item.key}>
+                <S.Wrapper>{item.content}</S.Wrapper>
+              </Tabs.TabPane>
+            ))}
+          </S.TestTabs>
+        </ReactFlowProvider>
+      </TourProvider>
     </Layout>
   );
 };

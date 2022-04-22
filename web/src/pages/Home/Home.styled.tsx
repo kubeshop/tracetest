@@ -21,6 +21,13 @@ export const Wrapper = styled.div`
   padding: 0 24px;
 `;
 
+export const ActionContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+`;
+
 export const NoResultsContainer = styled.div`
   height: 600px;
   display: flex;

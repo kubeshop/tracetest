@@ -12,6 +12,9 @@ import {CreateAssertionSelectorInput} from './CreateAssertionSelectorInput';
 import {getSpanSignature} from '../../services/SpanService';
 import {getSpanAttributeValueType} from '../../services/SpanAttributeService';
 import * as S from './CreateAssertionModal.styled';
+import GuidedTourService, {GuidedTours} from '../../services/GuidedTourService';
+import {Steps} from '../GuidedTour/assertionStepList';
+import useGuidedTour from '../GuidedTour/useGuidedTour';
 
 interface AssertionSpan {
   key: string;
@@ -50,6 +53,8 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
   const attrs = jemsPath.search(trace, filterBySpanId(span.spanId));
   const [form] = Form.useForm<TValues>();
   const defaultSelectorList = useMemo(() => getSpanSignature(span.spanId, trace), [span.spanId, trace]);
+
+  useGuidedTour(GuidedTours.Assertion);
 
   const defaultAssertionList = useMemo<AssertionSpan[]>(() => {
     if (assertion) {
@@ -190,7 +195,11 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
           <QuestionCircleOutlined style={{color: '#8C8C8C'}} />
         </Tooltip>
       </div>
-      <Form.Item name="selectorList" rules={[{required: true, message: 'At least one selector is required'}]}>
+      <Form.Item
+        name="selectorList"
+        rules={[{required: true, message: 'At least one selector is required'}]}
+        data-tour={GuidedTourService.getStep(GuidedTours.Assertion, Steps.Selectors)}
+      >
         <CreateAssertionSelectorInput spanSignature={defaultSelectorList} />
       </Form.Item>
       <div style={{marginTop: 24, marginBottom: 8}}>
@@ -199,67 +208,69 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
           <QuestionCircleOutlined style={{color: '#8C8C8C'}} />
         </Tooltip>
       </div>
-      <Form.List name="assertionList">
-        {(fields, {add, remove}) => {
-          return (
-            <>
-              {fields.map(({key, name, ...field}, index) => (
-                <Space key={key} style={{display: 'flex', alignItems: 'center', gap: '4px', marginBottom: 16}}>
-                  <Form.Item
-                    {...field}
-                    name={[name, 'key']}
-                    style={{margin: 0}}
-                    rules={[{required: true, message: 'Attribute is required'}]}
-                  >
-                    <AutoComplete
+      <div data-tour={GuidedTourService.getStep(GuidedTours.Assertion, Steps.Checks)}>
+        <Form.List name="assertionList">
+          {(fields, {add, remove}) => {
+            return (
+              <>
+                {fields.map(({key, name, ...field}, index) => (
+                  <Space key={key} style={{display: 'flex', alignItems: 'center', gap: '4px', marginBottom: 16}}>
+                    <Form.Item
+                      {...field}
+                      name={[name, 'key']}
                       style={{margin: 0}}
-                      options={spanAssertionOptions}
-                      filterOption={(inputValue, option) => {
-                        return option?.label.props.children.includes(inputValue);
-                      }}
+                      rules={[{required: true, message: 'Attribute is required'}]}
                     >
-                      <Input.Search size="large" placeholder="span key" />
-                    </AutoComplete>
-                  </Form.Item>
-                  <S.FullHeightFormItem
-                    {...field}
-                    initialValue={COMPARE_OPERATOR.EQUALS}
-                    style={{margin: 0}}
-                    name={[name, 'compareOp']}
-                    rules={[{required: true, message: 'Operator is required'}]}
-                  >
-                    <S.Select style={{margin: 0}}>
-                      <S.Select.Option value={COMPARE_OPERATOR.EQUALS}>eq</S.Select.Option>
-                      <S.Select.Option value={COMPARE_OPERATOR.NOTEQUALS}>ne</S.Select.Option>
-                      <S.Select.Option value={COMPARE_OPERATOR.GREATERTHAN}>gt</S.Select.Option>
-                      <S.Select.Option value={COMPARE_OPERATOR.LESSTHAN}>lt</S.Select.Option>
-                      <S.Select.Option value={COMPARE_OPERATOR.GREATOREQUALS}>ge</S.Select.Option>
-                      <S.Select.Option value={COMPARE_OPERATOR.LESSOREQUAL}>le</S.Select.Option>
-                    </S.Select>
-                  </S.FullHeightFormItem>
-                  <S.FullHeightFormItem
-                    {...field}
-                    name={[name, 'value']}
-                    style={{margin: 0}}
-                    rules={[{required: true, message: 'Value is required'}]}
-                  >
-                    <Input placeholder="value" />
-                  </S.FullHeightFormItem>
-                  <MinusCircleOutlined
-                    color="error"
-                    style={{cursor: 'pointer', color: 'rgb(140, 140, 140)'}}
-                    onClick={() => index > 0 && remove(name)}
-                  />
-                </Space>
-              ))}
+                      <AutoComplete
+                        style={{margin: 0}}
+                        options={spanAssertionOptions}
+                        filterOption={(inputValue, option) => {
+                          return option?.label.props.children.includes(inputValue);
+                        }}
+                      >
+                        <Input.Search size="large" placeholder="span key" />
+                      </AutoComplete>
+                    </Form.Item>
+                    <S.FullHeightFormItem
+                      {...field}
+                      initialValue={COMPARE_OPERATOR.EQUALS}
+                      style={{margin: 0}}
+                      name={[name, 'compareOp']}
+                      rules={[{required: true, message: 'Operator is required'}]}
+                    >
+                      <S.Select style={{margin: 0}}>
+                        <S.Select.Option value={COMPARE_OPERATOR.EQUALS}>eq</S.Select.Option>
+                        <S.Select.Option value={COMPARE_OPERATOR.NOTEQUALS}>ne</S.Select.Option>
+                        <S.Select.Option value={COMPARE_OPERATOR.GREATERTHAN}>gt</S.Select.Option>
+                        <S.Select.Option value={COMPARE_OPERATOR.LESSTHAN}>lt</S.Select.Option>
+                        <S.Select.Option value={COMPARE_OPERATOR.GREATOREQUALS}>ge</S.Select.Option>
+                        <S.Select.Option value={COMPARE_OPERATOR.LESSOREQUAL}>le</S.Select.Option>
+                      </S.Select>
+                    </S.FullHeightFormItem>
+                    <S.FullHeightFormItem
+                      {...field}
+                      name={[name, 'value']}
+                      style={{margin: 0}}
+                      rules={[{required: true, message: 'Value is required'}]}
+                    >
+                      <Input placeholder="value" />
+                    </S.FullHeightFormItem>
+                    <MinusCircleOutlined
+                      color="error"
+                      style={{cursor: 'pointer', color: 'rgb(140, 140, 140)'}}
+                      onClick={() => index > 0 && remove(name)}
+                    />
+                  </Space>
+                ))}
 
-              <Button type="link" icon={<PlusOutlined />} style={{padding: 0}} onClick={add}>
-                Add Item
-              </Button>
-            </>
-          );
-        }}
-      </Form.List>
+                <Button type="link" icon={<PlusOutlined />} style={{padding: 0}} onClick={add}>
+                  Add Item
+                </Button>
+              </>
+            );
+          }}
+        </Form.List>
+      </div>
     </Form>
   );
 };

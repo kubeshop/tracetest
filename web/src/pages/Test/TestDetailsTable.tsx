@@ -4,6 +4,8 @@ import TestStateBadge from 'components/TestStateBadge';
 import {differenceInSeconds} from 'date-fns';
 import {FC} from 'react';
 import CustomTable from '../../components/CustomTable';
+import {Steps} from '../../components/GuidedTour/testDetailsStepList';
+import GuidedTourService, {GuidedTours} from '../../services/GuidedTourService';
 import {AssertionResultList, TestRunResult, TestState} from '../../types';
 
 type TextRowProps = {
@@ -61,7 +63,11 @@ const TextDetailsTable: FC<TextRowProps> = ({isLoading, onSelectResult, testResu
         }
       />
       <Table.Column
-        title="Execution time"
+        title={
+          <span data-tour={GuidedTourService.getStep(GuidedTours.TestDetails, Steps.ExecutionTime)}>
+            Execution time
+          </span>
+        }
         key="executionTime"
         width="10%"
         render={(value, {createdAt, completedAt}: TestRunResult) => {
@@ -72,7 +78,7 @@ const TextDetailsTable: FC<TextRowProps> = ({isLoading, onSelectResult, testResu
         }}
       />
       <Table.Column
-        title="Status"
+        title={<span data-tour={GuidedTourService.getStep(GuidedTours.TestDetails, Steps.Status)}>Status</span>}
         key="state"
         width="20%"
         render={(value, {state}: TestRunResult) => {
@@ -81,7 +87,7 @@ const TextDetailsTable: FC<TextRowProps> = ({isLoading, onSelectResult, testResu
       />
       <Table.Column
         width="5%"
-        title="Total"
+        title={<span data-tour={GuidedTourService.getStep(GuidedTours.TestDetails, Steps.Assertions)}>Total</span>}
         key="total"
         dataIndex="state"
         render={(value, {state, assertionResult = []}: TestRunResult) => {
@@ -95,7 +101,7 @@ const TextDetailsTable: FC<TextRowProps> = ({isLoading, onSelectResult, testResu
       />
       <Table.Column
         width="5%"
-        title={<Badge count="P" style={{backgroundColor: '#49AA19'}} />}
+        title={<Badge data-tour={GuidedTourService.getStep(GuidedTours.TestDetails, Steps.Passed)} count="P" style={{backgroundColor: '#49AA19'}} />}
         key="passed"
         dataIndex="state"
         render={(value, {state, assertionResult = []}: TestRunResult) => {
@@ -109,7 +115,7 @@ const TextDetailsTable: FC<TextRowProps> = ({isLoading, onSelectResult, testResu
       />
       <Table.Column
         width="5%"
-        title={<Badge count="F" />}
+        title={<Badge data-tour={GuidedTourService.getStep(GuidedTours.TestDetails, Steps.Failed)} count="F" />}
         dataIndex="state"
         key="failed"
         render={(value, {state, assertionResult = []}: TestRunResult) => {

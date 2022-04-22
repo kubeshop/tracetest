@@ -1,10 +1,13 @@
 import {useRef} from 'react';
+import {useTour} from '@reactour/tour';
 import {Modal, Form, Input, Button, Select, Checkbox} from 'antd';
 import {DeleteOutlined} from '@ant-design/icons';
 import {useCreateTestMutation, useRunTestMutation} from 'services/TestService';
 import {HTTP_METHOD} from 'types';
 import './CreateTest.css';
 import {useNavigate} from 'react-router-dom';
+import GuidedTourService, {GuidedTours} from '../../services/GuidedTourService';
+import {Steps} from '../GuidedTour/homeStepList';
 
 interface IProps {
   visible: boolean;
@@ -15,6 +18,7 @@ const defaultHeaders = [{key: 'Content-Type', value: 'application/json', checked
 
 const CreateTestModal = ({visible, onClose}: IProps): JSX.Element => {
   const navigate = useNavigate();
+  const {setIsOpen} = useTour();
   const [createTest, {isLoading: isLoadingCreateTest}] = useCreateTestMutation();
   const [runTest, {isLoading: isLoadingRunTest}] = useRunTestMutation();
 
@@ -33,6 +37,7 @@ const CreateTestModal = ({visible, onClose}: IProps): JSX.Element => {
     }).unwrap();
     const newTestRunResult = await runTest(newTest.testId).unwrap();
     onClose();
+    setIsOpen(false);
     navigate(`/test/${newTest.testId}?resultId=${newTestRunResult.resultId}`);
   };
 
@@ -45,7 +50,13 @@ const CreateTestModal = ({visible, onClose}: IProps): JSX.Element => {
           Cancel
         </Button>
 
-        <Button type="primary" form="newTest" htmlType="submit" loading={isLoadingCreateTest || isLoadingRunTest}>
+        <Button
+          type="primary"
+          form="newTest"
+          htmlType="submit"
+          loading={isLoadingCreateTest || isLoadingRunTest}
+          data-tour={GuidedTourService.getStep(GuidedTours.Home, Steps.Run)}
+        >
           Run Test
         </Button>
       </>
@@ -73,7 +84,12 @@ const CreateTestModal = ({visible, onClose}: IProps): JSX.Element => {
         >
           <div style={{display: 'flex', marginBottom: 24}}>
             <Form.Item name="method" initialValue="GET" valuePropName="value" noStyle>
-              <Select style={{minWidth: 120}} className="method-select" dropdownClassName="method-select-item">
+              <Select
+                style={{minWidth: 120}}
+                className="method-select"
+                dropdownClassName="method-select-item"
+                data-tour={GuidedTourService.getStep(GuidedTours.Home, Steps.Method)}
+              >
                 {Object.keys(HTTP_METHOD).map(el => {
                   return (
                     <Select.Option key={el} value={el}>
@@ -85,7 +101,10 @@ const CreateTestModal = ({visible, onClose}: IProps): JSX.Element => {
             </Form.Item>
 
             <Form.Item name="url" rules={[{required: true, message: 'Please input Endpoint!'}]} noStyle>
-              <Input placeholder="Enter request url" />
+              <Input
+                placeholder="Enter request url"
+                data-tour={GuidedTourService.getStep(GuidedTours.Home, Steps.Url)}
+              />
             </Form.Item>
           </div>
 
@@ -93,13 +112,18 @@ const CreateTestModal = ({visible, onClose}: IProps): JSX.Element => {
             name="name"
             label="Name"
             colon={false}
+            data-tour={GuidedTourService.getStep(GuidedTours.Home, Steps.Name)}
             wrapperCol={{span: 24, offset: 0}}
             rules={[{required: true, message: 'Please input test name!'}]}
           >
             <Input />
           </Form.Item>
 
-          <Form.Item label="Headers List" wrapperCol={{span: 24, offset: 0}}>
+          <Form.Item
+            label="Headers List"
+            wrapperCol={{span: 24, offset: 0}}
+            data-tour={GuidedTourService.getStep(GuidedTours.Home, Steps.Headers)}
+          >
             <div style={{minHeight: 80}}>
               <Form.List name="headersList" initialValue={[...defaultHeaders, {}, {}]}>
                 {(fields, {add, remove}) => (
@@ -166,7 +190,13 @@ const CreateTestModal = ({visible, onClose}: IProps): JSX.Element => {
               </Form.List>
             </div>
           </Form.Item>
-          <Form.Item label="Request body" name="body" colon={false} wrapperCol={{span: 24, offset: 0}}>
+          <Form.Item
+            label="Request body"
+            name="body"
+            colon={false}
+            wrapperCol={{span: 24, offset: 0}}
+            data-tour={GuidedTourService.getStep(GuidedTours.Home, Steps.Body)}
+          >
             <Input.TextArea style={{maxHeight: 150, height: 120}} />
           </Form.Item>
         </Form>
