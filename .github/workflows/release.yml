@@ -16,7 +16,6 @@ on:
       - "v[0-9]+.[0-9]+.[0-9]+-*"
 
 jobs:
-
   release:
     name: Create and upload release-artifacts, triggers Helm charts release
     if: github.event.base_ref == 'refs/heads/main'
