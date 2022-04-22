@@ -24,7 +24,7 @@ const useGuidedTour = (tour: GuidedTours, delay = 500) => {
 
   useEffect(() => {
     const isComplete = GuidedTourService.getIsComplete(tour);
-    if (isComplete) {
+    if (!isComplete) {
       delayFn(() => {
         setCurrentStep(0);
         setIsOpen(true);
