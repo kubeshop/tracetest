@@ -1,6 +1,5 @@
 import {useCallback, useEffect, useMemo, useState} from 'react';
 import styled from 'styled-components';
-import {useNavigate} from 'react-router-dom';
 
 import {useStoreActions} from 'react-flow-renderer';
 import {ReflexContainer, ReflexSplitter, ReflexElement} from 'react-reflex';
@@ -33,6 +32,7 @@ import TestResults from './TestResults';
 
 const Grid = styled.div`
   display: grid;
+  height: calc(100vh - 200px);
 `;
 
 export type TSpanInfo = {
@@ -51,7 +51,6 @@ type TraceProps = {
 };
 
 const Trace: React.FC<TraceProps> = ({testId, testResultId, onDismissTrace, onRunTest}) => {
-  const navigate = useNavigate();
   const [selectedSpan, setSelectedSpan] = useState<TSpanInfo | undefined>();
   const [traceResultList, setTraceResultList] = useState<AssertionResult[]>([]);
   const [isFirstLoad, setIsFirstLoad] = useState(true);
@@ -165,7 +164,12 @@ const Trace: React.FC<TraceProps> = ({testId, testResultId, onDismissTrace, onRu
             <ReflexContainer orientation="vertical">
               <ReflexElement flex={0.5} className="left-pane">
                 <div className="pane-content">
-                  <TraceDiagram spanMap={spanMap} onSelectSpan={handleOnSpanSelected} selectedSpan={selectedSpan} trace={testResultDetails?.trace!} />
+                  <TraceDiagram
+                    spanMap={spanMap}
+                    onSelectSpan={handleOnSpanSelected}
+                    selectedSpan={selectedSpan}
+                    trace={testResultDetails?.trace!}
+                  />
                 </div>
               </ReflexElement>
               <ReflexElement flex={0.5} className="right-pane">

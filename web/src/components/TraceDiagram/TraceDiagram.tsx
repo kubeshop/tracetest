@@ -69,7 +69,7 @@ const TraceDiagram = ({spanMap, trace, selectedSpan, onSelectSpan}: IPropsTraceD
   }, [dagLayout, spanMap, trace, selectedSpan?.id]);
 
   return (
-    <S.Container style={{height: Math.max(dagLayout?.layout?.height || 0, 700) + 100}}>
+    <S.Container style={{height: Math.max(dagLayout?.layout?.height || 0, 900) + 100}}>
       <ReactFlow
         nodeTypes={{TraceNode}}
         defaultZoom={0.5}
