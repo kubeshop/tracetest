@@ -1,0 +1,22 @@
+builds:
+  - id: tracetest
+    skip: true
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+
+release:
+  # Create a thread in the General category in the repo's discussion tab.
+  discussion_category_name: General
+
+  # If set to true, will not auto-publish the release.
+  # Default is false.
+  draft: false
+
+  # Tags that have the format v1.0.0-rc1 will mark the release as a pre-release (i.e. not ready for production)
+  # Other tags will be marked as ready for production
+  prerelease: auto

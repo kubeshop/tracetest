@@ -1,0 +1,149 @@
+name: Release Tracetest
+
+# Cancel any pending or running workflow if the new one is triggered
+concurrency:
+  group: "release"
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+      - "v[0-9]+.[0-9]+.[0-9]+-*"
+
+jobs:
+
+  release:
+    name: Create and upload release-artifacts, triggers Helm charts release
+    if: github.event.base_ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    outputs:
+      changed_resources: ${{ steps.check_modified_resources.outputs.changed_resources }}
+      release_version: ${{ steps.check_modified_resources.outputs.release_version }}
+
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      -
+        name: Login to DockerHub
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v1 
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      -
+        name: Docker metadata for Tracetest
+        id: meta
+        uses: docker/metadata-action@v3
+        with:
+          images: kubeshop/tracetest
+          tags: |
+            type=match,pattern=v(.*)
+            type=sha
+          flavor: |
+            latest=true
+      -
+        name: Build and push Tracetest
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: build/manager/Dockerfile
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+     -
+        name: Run GoReleaser to publish release notes
+        uses: goreleaser/goreleaser-action@v2
+        with:
+          distribution: goreleaser
+          version: latest
+          args: release --rm-dist --skip-sign
+        env:
+          GITHUB_TOKEN: ${{ secrets.CI_BOT_TOKEN }}
+  # This job runs when we there is no changed resources in the upstream job
+  helm_chart_version_bump:
+      name: "Trigger Helm chart appVersion update"
+      needs: "release"
+      runs-on: ubuntu-latest
+      if: ${{ needs.release.outputs.changed_resources == 'false'}}
+      steps:
+      - 
+        name: Checkout
+        uses: actions/checkout@v2
+        with:
+          repository: "kubeshop/helm-charts"
+          ref: "main"
+          fetch-depth: 0
+          token: ${{ secrets.CI_BOT_TOKEN }}
+
+      - 
+        name: Install Helm
+        uses: azure/setup-helm@v1
+        with:
+          version: v3.4.0
+
+      - 
+        name: Bump up tracetest chart
+        run: |
+          # sets appVersion in the Chart.yaml
+          echo New appVersion: ${{ needs.release.outputs.release_version }}
+          sed  -i -e "s/^appVersion: .*$/appVersion: \"${{ needs.release.outputs.release_version }}\"/" charts/tracetest/Chart.yaml
+          # Bumps charts patch version
+          CURRENT_VERSION=$(sed  -n  -e  "s/^version: \(.*\)$/\1/p"  charts/tracetest/Chart.yaml)
+          echo Current chart version ${CURRENT_VERSION}
+          NEW_VERSION=$(echo $CURRENT_VERSION |awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')
+          echo New version ${NEW_VERSION}
+          sed -i -e "s/^version: .*/version: ${NEW_VERSION}/g" charts/tracetest/Chart.yaml
+
+      - 
+        name: Lint the chart
+        run: |
+          helm lint charts/tracetest
+
+      - 
+        name: Push updated chart
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+          git remote -v
+          git add .
+          git commit -m "automatically updated tracetest related charts"
+          git push
+
+      - 
+        name: Slack Notification if the helm version bump succeeded
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_CHANNEL: tracetest
+          SLACK_COLOR: good
+          SLACK_ICON: https://github.githubassets.com/images/modules/site/features/actions-icon-actions.svg
+          SLACK_TITLE: Helm chart version bump succeeded :party_blob:!
+          SLACK_MESSAGE: "Tracetest chart version was bumped"
+          SLACK_USERNAME: GitHub
+          SLACK_LINK_NAMES: true
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_FOOTER: "Kubeshop --> Tracetest"
+
+  notify_slack_if_helm_chart_bump_fails:
+    runs-on: ubuntu-latest
+    needs: helm_chart_version_bump
+    if: always() && (needs.helm_chart_version_bump.result == 'failure')
+    steps:
+    - name: Slack Notification if Helm Release action failed
+      uses: rtCamp/action-slack-notify@v2
+      env:
+        SLACK_CHANNEL: tracetest
+        SLACK_COLOR: ${{ needs.helm_chart_version_bump.result }} # or a specific color like 'good' or '#ff00ff'
+        SLACK_ICON: https://github.githubassets.com/images/modules/site/features/actions-icon-actions.svg
+        SLACK_TITLE: Helm Chart version bump action failed :boom:!
+        SLACK_USERNAME: GitHub
+        SLACK_LINK_NAMES: true
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        SLACK_FOOTER: "Kubeshop --> Tracetest"
