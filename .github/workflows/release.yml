@@ -19,9 +19,6 @@ jobs:
     name: Create and upload release-artifacts, triggers Helm charts release
     if: github.event.base_ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    outputs:
-      changed_resources: ${{ steps.check_modified_resources.outputs.changed_resources }}
-      release_version: ${{ steps.check_modified_resources.outputs.release_version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -64,7 +61,6 @@ jobs:
       name: "Trigger Helm chart appVersion update"
       needs: "release"
       runs-on: ubuntu-latest
-      if: ${{ needs.release.outputs.changed_resources == 'false'}}
       steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -80,8 +76,8 @@ jobs:
       - name: Bump up tracetest chart
         run: |
           # sets appVersion in the Chart.yaml
-          echo New appVersion: ${{ needs.release.outputs.release_version }}
-          sed  -i -e "s/^appVersion: .*$/appVersion: \"${{ needs.release.outputs.release_version }}\"/" charts/tracetest/Chart.yaml
+          echo New appVersion: ${{ github.ref_name }}
+          sed  -i -e "s/^appVersion: .*$/appVersion: \"${{ github.ref_name}}\"/" charts/tracetest/Chart.yaml
           # Bumps charts patch version
           CURRENT_VERSION=$(sed  -n  -e  "s/^version: \(.*\)$/\1/p"  charts/tracetest/Chart.yaml)
           echo Current chart version ${CURRENT_VERSION}
