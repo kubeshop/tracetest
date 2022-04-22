@@ -73,3 +73,12 @@ swagger: proto
 	cp swagger/api_v3/query_service.swagger.json api/trace.json
 	cat api/trace.json | yq e -P - > api/trace.yaml
 	rm api/trace.json
+
+.PHONY: build
+build:
+	cd server; go build .; cd ../
+
+.PHONY: test
+test:
+	cd server; go test ./... -coverprofile ../cover.out; cd ../
+
