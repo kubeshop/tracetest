@@ -11,7 +11,7 @@ import {CloseCircleFilled} from '@ant-design/icons';
 
 import 'react-reflex/styles.css';
 
-import {AssertionResult, ISpan, TestState} from 'types';
+import {AssertionResult, ISpan, TestRunResult, TestState} from 'types';
 
 import {
   useGetTestByIdQuery,
@@ -47,9 +47,10 @@ type TraceProps = {
   testId: string;
   testResultId: string;
   onDismissTrace: () => void;
+  onRunTest: (result: TestRunResult) => void;
 };
 
-const Trace: React.FC<TraceProps> = ({testId, testResultId, onDismissTrace}) => {
+const Trace: React.FC<TraceProps> = ({testId, testResultId, onDismissTrace, onRunTest}) => {
   const navigate = useNavigate();
   const [selectedSpan, setSelectedSpan] = useState<TSpanInfo | undefined>();
   const [traceResultList, setTraceResultList] = useState<AssertionResult[]>([]);
@@ -140,7 +141,7 @@ const Trace: React.FC<TraceProps> = ({testId, testResultId, onDismissTrace}) => 
 
   const handleReRunTest = async () => {
     const result = await runNewTest(testId).unwrap();
-    navigate(`/test/${result.testId}?resultId=${result.resultId}`);
+    onRunTest(result);
   };
 
   if (isError || testResultDetails?.state === TestState.FAILED) {
