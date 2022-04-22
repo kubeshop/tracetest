@@ -87,7 +87,7 @@ jobs:
 
       - name: Lint the chart
         run: |
-          helm dependency update
+          helm dependency update charts/tracetest
           helm lint charts/tracetest
       - name: Push updated chart
         run: |
