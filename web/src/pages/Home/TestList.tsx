@@ -10,7 +10,7 @@ const TestList = () => {
   const navigate = useNavigate();
   const eventRef = useRef<{previousPageX: number; currentPageX: number}>({previousPageX: 0, currentPageX: 0});
   const {data: testList = [], isLoading} = useGetTestsQuery();
-  
+
   const handleMouseUp = (event: any) => {
     if (event.type === 'mousedown') {
       eventRef.current.previousPageX = event.pageX;
@@ -25,6 +25,7 @@ const TestList = () => {
 
   return (
     <CustomTable
+      scroll={{y: 'calc(100vh - 300px)'}}
       dataSource={testList?.map(el => ({...el, url: el.serviceUnderTest.request.url})).reverse()}
       rowKey="testId"
       locale={{emptyText: <NoResults />}}

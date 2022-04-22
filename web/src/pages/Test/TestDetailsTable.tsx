@@ -38,6 +38,7 @@ const getTestResultCount = (assertionResultList: AssertionResultList, type: 'all
 const TextDetailsTable: FC<TextRowProps> = ({isLoading, onSelectResult, testResultList}) => {
   return (
     <CustomTable
+      scroll={{y: 'calc(100vh - 450px)'}}
       pagination={{pageSize: 10}}
       rowKey="resultId"
       loading={isLoading}
