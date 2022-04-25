@@ -47,8 +47,9 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 
   publish:
-    if: github.event.base_ref == 'refs/heads/main'
-    name: Setup, Build, Publish, and Deploy
+    if: github.event == 'push'
+    needs: build
+    name: Deploy
     runs-on: ubuntu-latest
 
     steps:
