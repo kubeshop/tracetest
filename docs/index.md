@@ -6,7 +6,7 @@ Tracetest allows you to quickly build integration and e2e tests, powered by your
 
 - Point the system to your Jaeger or Tempo trace datastore.
 - Define a triggering transaction, such as a GET against an API endpoint.
-- System runs this transaction, returning both the response data and a full trace.
+- The system runs this transaction, returning both the response data and a full trace.
 - Define tests & assertions against this data, ensuring both your response and the underlying processes worked correctly, quickly, and without errors.
 - Save your test.
 - Run the tests either manually or via your CI build jobs.

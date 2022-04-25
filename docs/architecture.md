@@ -1,7 +1,5 @@
 # Architecture
 
-## **Info**
-
 The diagram below shows the underlying Tracetest architecture.
 
-COMING SOON!!!
+![Architecture Diagram](img/architecture-diagram-1.png)

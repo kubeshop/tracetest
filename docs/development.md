@@ -1,8 +1,8 @@
 # Development
 
-## Web Folder Structure
+## **Web Folder Structure**
 
-### Web Folder Tree
+### **Web Folder Tree**
 
 - [public/](./web/public)
 - [src/](./web/src)

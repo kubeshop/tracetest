@@ -21,8 +21,9 @@ nav:
   - Welcome: index.md
   - Installation: installing.md
   - Getting Started: getting-started.md
-  - Creating Tests: create-test.md
   - Architecture: architecture.md
+  - Creating Tests: create-test.md
+  - Adding Assertions: adding-assertions.md
   - OpenAPI Definition: openapi.md
   - Development: development.md
 
@@ -39,7 +40,7 @@ extra:
       find what they're searching for. With your consent, you're helping us to
       make our documentation better.
 
-plugins:
+ plugins:
   - render_swagger
 
 # Extensions
