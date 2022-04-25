@@ -58,7 +58,7 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
 
   const defaultAssertionList = useMemo<AssertionSpan[]>(() => {
     if (assertion) {
-      return assertion.spanAssertions.map(({propertyName, operator, comparisonValue}) => ({
+      return assertion.spanAssertions?.map(({propertyName, operator, comparisonValue}) => ({
         key: propertyName,
         compareOp: operator,
         value: comparisonValue,
@@ -259,7 +259,7 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
                     <MinusCircleOutlined
                       color="error"
                       style={{cursor: 'pointer', color: 'rgb(140, 140, 140)'}}
-                      onClick={() => index > 0 && remove(name)}
+                      onClick={() => remove(name)}
                     />
                   </Space>
                 ))}

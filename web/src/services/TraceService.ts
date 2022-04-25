@@ -24,7 +24,7 @@ export const parseTestResultToAssertionResultList = (
           return span;
         });
 
-        const spanAssertion = assertion?.spanAssertions.find(({spanAssertionId: id}) => id === spanAssertionId);
+        const spanAssertion = assertion?.spanAssertions?.find(({spanAssertionId: id}) => id === spanAssertionId);
 
         return {
           span: resourceSpan!,
