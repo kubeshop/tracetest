@@ -245,6 +245,7 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
                         <S.Select.Option value={COMPARE_OPERATOR.LESSTHAN}>lt</S.Select.Option>
                         <S.Select.Option value={COMPARE_OPERATOR.GREATOREQUALS}>ge</S.Select.Option>
                         <S.Select.Option value={COMPARE_OPERATOR.LESSOREQUAL}>le</S.Select.Option>
+                        <S.Select.Option value={COMPARE_OPERATOR.CONTAINS}>contains</S.Select.Option>
                       </S.Select>
                     </S.FullHeightFormItem>
                     <S.FullHeightFormItem
