@@ -82,9 +82,9 @@ const buildConditionArray = (itemSelectors: ItemSelector[]) => {
 export const runSpanAssertionByResourceSpan = (
   span: ResourceSpan,
   spanId: string,
-  assertion: Assertion
+  { spanAssertions = [] }: Assertion
 ): Array<SpanAssertionResult> => {
-  const assertionTestResultArray = assertion.spanAssertions.map(spanAssertion => {
+  const assertionTestResultArray = spanAssertions.map(spanAssertion => {
     const {comparisonValue, operator, valueType, locationName, propertyName} = spanAssertion;
     const valueSelector = buildValueSelector(comparisonValue, getOperator(operator), valueType);
 
