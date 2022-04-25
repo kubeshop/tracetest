@@ -47,7 +47,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 
   publish:
-    if: github.event == 'push'
+    if: github.event_name == 'push'
     needs: build
     name: Deploy
     runs-on: ubuntu-latest
