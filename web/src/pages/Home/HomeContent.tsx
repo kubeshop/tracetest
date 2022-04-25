@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {delay} from 'lodash';
 import {Button} from 'antd';
 import {InfoCircleOutlined} from '@ant-design/icons';
@@ -12,7 +12,15 @@ import useGuidedTour from '../../components/GuidedTour/useGuidedTour';
 const HomeContent: React.FC = () => {
   const [openCreateTestModal, setOpenCreateTestModal] = useState(false);
 
-  const {setCurrentStep, setIsOpen, currentStep} = useGuidedTour(GuidedTours.Home);
+  const {setCurrentStep, setIsOpen, currentStep, isOpen} = useGuidedTour(GuidedTours.Home);
+
+  useEffect(() => {
+    if (currentStep > 0 && !openCreateTestModal) {
+      setOpenCreateTestModal(true);
+      setCurrentStep(2);
+      delay(() => setCurrentStep(1), 0);
+    }
+  }, [currentStep, openCreateTestModal, setCurrentStep]);
 
   return (
     <S.Wrapper>
@@ -36,7 +44,7 @@ const HomeContent: React.FC = () => {
             size="large"
             onClick={() => {
               setOpenCreateTestModal(true);
-              delay(() => setCurrentStep(currentStep + 1), 1);
+              if (isOpen) delay(() => setCurrentStep(currentStep + 1), 1);
             }}
           >
             Create Test

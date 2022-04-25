@@ -15,37 +15,30 @@ const StepList: StepType[] = [
   {
     selector: GuidedTourService.getSelectorStep(GuidedTours.Home, Steps.CreateTest),
     content: 'Create test',
-    disableActions: true,
   },
   {
     selector: GuidedTourService.getSelectorStep(GuidedTours.Home, Steps.Method),
     content: 'method',
-    disableActions: false,
   },
   {
     selector: GuidedTourService.getSelectorStep(GuidedTours.Home, Steps.Url),
     content: 'url',
-    disableActions: false,
   },
   {
     selector: GuidedTourService.getSelectorStep(GuidedTours.Home, Steps.Name),
     content: 'name',
-    disableActions: false,
   },
   {
     selector: GuidedTourService.getSelectorStep(GuidedTours.Home, Steps.Headers),
     content: 'headers',
-    disableActions: false,
   },
   {
     selector: GuidedTourService.getSelectorStep(GuidedTours.Home, Steps.Body),
     content: 'body',
-    disableActions: false,
   },
   {
     selector: GuidedTourService.getSelectorStep(GuidedTours.Home, Steps.Run),
     content: 'run',
-    disableActions: false,
   },
 ];
 

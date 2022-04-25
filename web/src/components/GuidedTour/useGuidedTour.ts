@@ -36,8 +36,11 @@ const useGuidedTour = (tour: GuidedTours, delay = 500) => {
   }, [delay, setCurrentStep, setIsOpen, tour]);
 
   useEffect(() => {
-    if (!isOpen && isLoaded) GuidedTourService.save(tour);
-  }, [isLoaded, isOpen, tour]);
+    if (!isOpen && isLoaded) {
+      GuidedTourService.save(tour);
+      setCurrentStep(0);
+    }
+  }, [isLoaded, isOpen, setCurrentStep, tour]);
 
   return tourFn;
 };
