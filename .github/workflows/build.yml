@@ -74,5 +74,5 @@ jobs:
     # Deploy the Docker image to the GKE cluster
     - name: Deploy
       run: |-
-        kubectl delete po -l app=beta-tracetest  
+        kubectl delete po -l app=beta-tracetest -n tracetest
 
