@@ -51,6 +51,7 @@ export const enum COMPARE_OPERATOR {
   NOTEQUALS = 'NOTEQUALS',
   GREATOREQUALS = 'GREATOREQUALS',
   LESSOREQUAL = 'LESSOREQUAL',
+  CONTAINS = 'CONTAINS',
 }
 
 export type ISpanAttributeValue = {

@@ -23,6 +23,8 @@ const getOperator = (op: COMPARE_OPERATOR) => {
       return '>';
     case COMPARE_OPERATOR.LESSTHAN:
       return '<';
+    case COMPARE_OPERATOR.CONTAINS:
+      return 'contains';
     default:
       return '==';
   }
@@ -32,6 +34,11 @@ const buildValueSelector = (comparisonValue: string, compareOperator: string, va
   if (valueType === 'intValue') {
     return `to_number(value.${valueType}) ${compareOperator} \`${comparisonValue}\``;
   }
+
+  if (compareOperator === 'contains') {
+    return `contains(value.${valueType}, \`${comparisonValue}\`)`;
+  }
+
   return `value.${valueType} ${compareOperator} \`${comparisonValue}\``;
 };
 

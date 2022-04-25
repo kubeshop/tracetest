@@ -20,6 +20,8 @@ export const getOperator = (op: COMPARE_OPERATOR) => {
       return 'gte';
     case COMPARE_OPERATOR.LESSOREQUAL:
       return 'lte';
+    case COMPARE_OPERATOR.CONTAINS:
+      return 'contains';
     default:
       return 'eq';
   }
