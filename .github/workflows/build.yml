@@ -46,12 +46,10 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-
   publish:
     if: github.event.base_ref == 'refs/heads/main'
     name: Setup, Build, Publish, and Deploy
     runs-on: ubuntu-latest
-    environment: production
 
     steps:
     - name: Checkout
