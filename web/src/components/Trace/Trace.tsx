@@ -33,6 +33,7 @@ import * as S from './Trace.styled';
 
 import SpanDetail from './SpanDetail';
 import TestResults from './TestResults';
+import useTraceAnalytics from './useTrace.analytics';
 
 const Grid = styled.div`
   display: grid;
@@ -62,6 +63,7 @@ const Trace: React.FC<TraceProps> = ({testId, testResultId, onDismissTrace, onRu
   const [updateTestResult] = useUpdateTestResultMutation();
   const {data: test} = useGetTestByIdQuery(testId);
   const [runNewTest] = useRunTestMutation();
+  const {onChangeTab} = useTraceAnalytics();
 
   const {
     data: testResultDetails,
@@ -185,14 +187,14 @@ const Trace: React.FC<TraceProps> = ({testId, testResultId, onDismissTrace, onRu
               </ReflexElement>
               <ReflexElement flex={0.5} className="right-pane">
                 <div className="pane-content" style={{padding: '14px 24px', overflow: 'hidden'}}>
-                  <S.TraceTabs>
+                  <S.TraceTabs onChange={activeTab => onChangeTab(activeTab)}>
                     <Tabs.TabPane
                       tab={
                         <span data-tour={GuidedTourService.getStep(GuidedTours.Trace, Steps.SpanDetail)}>
                           Span Detail
                         </span>
                       }
-                      key="1"
+                      key="span-detail"
                     >
                       <SpanDetail trace={testResultDetails?.trace} test={test} targetSpan={selectedSpan?.data} />
                     </Tabs.TabPane>
@@ -202,7 +204,7 @@ const Trace: React.FC<TraceProps> = ({testId, testResultId, onDismissTrace, onRu
                           Test Results
                         </span>
                       }
-                      key="2"
+                      key="test-results"
                     >
                       <TestResults
                         onSpanSelected={handleOnSpanSelected}

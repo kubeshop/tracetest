@@ -8,6 +8,7 @@ import './CreateTest.css';
 import {useNavigate} from 'react-router-dom';
 import GuidedTourService, {GuidedTours} from '../../services/GuidedTourService';
 import {Steps} from '../GuidedTour/homeStepList';
+import useCreateTestAnalytics from './useCreateTest.analytics';
 
 interface IProps {
   visible: boolean;
@@ -17,6 +18,7 @@ interface IProps {
 const defaultHeaders = [{key: 'Content-Type', value: 'application/json', checked: true}];
 
 const CreateTestModal = ({visible, onClose}: IProps): JSX.Element => {
+  const {onCreateTestFormSubmit} = useCreateTestAnalytics();
   const navigate = useNavigate();
   const {setIsOpen} = useTour();
   const [createTest, {isLoading: isLoadingCreateTest}] = useCreateTestMutation();
@@ -53,7 +55,10 @@ const CreateTestModal = ({visible, onClose}: IProps): JSX.Element => {
         <Button
           type="primary"
           form="newTest"
-          htmlType="submit"
+          onClick={() => {
+            onCreateTestFormSubmit();
+            form.submit();
+          }}
           loading={isLoadingCreateTest || isLoadingRunTest}
           data-tour={GuidedTourService.getStep(GuidedTours.Home, Steps.Run)}
         >

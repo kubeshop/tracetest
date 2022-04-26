@@ -5,11 +5,13 @@ import {useGetTestsQuery} from 'redux/services/TestService';
 import CustomTable from '../../components/CustomTable';
 import {Test} from '../../types';
 import NoResults from './NoResults';
+import useHomeAnalytics from './useHome.analytics';
 
 const TestList = () => {
   const navigate = useNavigate();
   const eventRef = useRef<{previousPageX: number; currentPageX: number}>({previousPageX: 0, currentPageX: 0});
   const {data: testList = [], isLoading} = useGetTestsQuery();
+  const {onTestClick} = useHomeAnalytics();
 
   const handleMouseUp = (event: any) => {
     if (event.type === 'mousedown') {
@@ -32,7 +34,12 @@ const TestList = () => {
       loading={isLoading}
       onRow={record => {
         return {
-          onClick: () => navigate(`/test/${(record as Test).testId}`),
+          onClick: () => {
+            const testId = (record as Test).testId;
+
+            onTestClick(testId);
+            navigate(`/test/${testId}`);
+          },
         };
       }}
     >

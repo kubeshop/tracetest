@@ -8,6 +8,7 @@ import CreateAssertionModal from 'components/CreateAssertionModal';
 import SkeletonTable from 'components/SkeletonTable';
 import * as S from './SpanDetail.styled';
 import Attributes from './Attributes';
+import useTraceAnalytics from './useTrace.analytics';
 
 type TSpanDetailProps = {
   test?: Test;
@@ -17,6 +18,7 @@ type TSpanDetailProps = {
 
 const SpanDetail: FC<TSpanDetailProps> = ({test, targetSpan, trace}) => {
   const [openCreateAssertion, setOpenCreateAssertion] = useState(false);
+  const {onAddAssertionButtonClick} = useTraceAnalytics();
 
   const assertionsResultList = useMemo(() => {
     if (!targetSpan?.spanId || !trace) {
@@ -39,7 +41,14 @@ const SpanDetail: FC<TSpanDetailProps> = ({test, targetSpan, trace}) => {
       <S.DetailsContainer>
         <S.DetailsHeader>
           <Typography.Text strong> Details for selected span</Typography.Text>
-          <Button type="link" icon={<PlusOutlined />} onClick={() => setOpenCreateAssertion(true)}>
+          <Button
+            type="link"
+            icon={<PlusOutlined />}
+            onClick={() => {
+              onAddAssertionButtonClick();
+              setOpenCreateAssertion(true);
+            }}
+          >
             Add Assertion
           </Button>
         </S.DetailsHeader>

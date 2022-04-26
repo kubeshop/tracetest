@@ -1,4 +1,4 @@
-import { SpanAttributeType } from "../services/SpanAttributeService";
+import {SpanAttributeType} from '../services/SpanAttributeService';
 
 export enum TestState {
   CREATED = 'CREATED',
@@ -31,9 +31,9 @@ export const enum TEST_RUN_EXECUTION_STATE {
   CREATED = 'CREATED',
   EXECUTING = 'EXECUTING',
   AWAITING_TRACE = 'AWAITING_TRACE',
-  FAILED = "FAILED",
-  FINISHED = "FINISHED",
-  AWAITING_TEST_RESULTS = "AWAITING_TEST_RESULTS",
+  FAILED = 'FAILED',
+  FINISHED = 'FINISHED',
+  AWAITING_TEST_RESULTS = 'AWAITING_TEST_RESULTS',
 }
 
 export const enum LOCATION_NAME {
@@ -254,3 +254,8 @@ export type RecursivePartial<T> = {
 };
 
 export type TSpanAttributesList = {key: string; value: string}[];
+
+export type TEnv = {
+  measurementId: string;
+  analyticsEnabled: string;
+};

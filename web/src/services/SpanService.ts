@@ -1,4 +1,5 @@
 import {search} from 'jmespath';
+import {uniqBy} from 'lodash';
 import {SemanticGroupNameNodeMap, SemanticGroupNames, SemanticGroupsSignature} from '../lib/SelectorDefaultAttributes';
 import {ISpanAttribute, ItemSelector, ITrace, LOCATION_NAME, ResourceSpan, Span, TSpanAttributesList} from '../types';
 import {escapeString} from '../utils';
@@ -135,12 +136,15 @@ export const getSpanAttributeList = (resourceSpan: ResourceSpan): TSpanAttribute
     value: typeof value !== 'undefined' ? String(value) : '',
   }));
 
-  return [
-    ...spanFieldList,
-    {
-      key: 'status',
-      value: status?.code!,
-    },
-    ...attributeList,
-  ];
+  return uniqBy(
+    [
+      ...spanFieldList,
+      {
+        key: 'status',
+        value: status?.code!,
+      },
+      ...attributeList,
+    ],
+    'key'
+  );
 };

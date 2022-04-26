@@ -5,6 +5,7 @@ import {getOperator} from 'utils';
 import CreateAssertionModal from '../CreateAssertionModal';
 import CustomTable from '../CustomTable';
 import * as S from './AssertionsTable.styled';
+import useAssertionTableAnalytics from './useAssertionTable.analytics';
 
 type AssertionsResultTableProps = {
   assertionResults: SpanAssertionResult[];
@@ -34,6 +35,7 @@ const AssertionsResultTable: React.FC<AssertionsResultTableProps> = ({
   trace,
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const {onEditAssertionButtonClick} = useAssertionTableAnalytics();
 
   const parsedAssertionList = useMemo<Array<TParsedAssertion>>(
     () =>
@@ -57,7 +59,13 @@ const AssertionsResultTable: React.FC<AssertionsResultTableProps> = ({
             <S.AssertionsTableBadge count={value} key={propertyName} />
           ))}
         </Typography.Title>
-        <Button type="link" onClick={() => setIsModalOpen(true)}>
+        <Button
+          type="link"
+          onClick={() => {
+            onEditAssertionButtonClick(assertion.assertionId);
+            setIsModalOpen(true);
+          }}
+        >
           Edit
         </Button>
       </S.AssertionsTableHeader>

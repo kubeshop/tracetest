@@ -5,6 +5,7 @@ import TraceNode from './TraceNode';
 import {TSpanInfo, TSpanMap} from '../Trace/Trace';
 import {ITrace} from '../../types';
 import * as S from './TraceDiagram.styled';
+import useTraceDiagramAnalytics from './useTraceDiagram.analytics';
 
 interface IPropsTraceDiagram {
   spanMap: TSpanMap;
@@ -15,12 +16,14 @@ interface IPropsTraceDiagram {
 
 const TraceDiagram = ({spanMap, trace, selectedSpan, onSelectSpan}: IPropsTraceDiagram): JSX.Element => {
   const dagLayout = useDAGChart(spanMap);
+  const {onClickSpan} = useTraceDiagramAnalytics();
 
   const handleElementClick = useCallback(
     (event, {id}: FlowElement) => {
+      onClickSpan(id);
       onSelectSpan(id);
     },
-    [onSelectSpan]
+    [onClickSpan, onSelectSpan]
   );
 
   useEffect(() => {
@@ -69,9 +72,7 @@ const TraceDiagram = ({spanMap, trace, selectedSpan, onSelectSpan}: IPropsTraceD
   }, [dagLayout, spanMap, trace, selectedSpan?.id]);
 
   return (
-    <S.Container
-      style={{height: Math.max(dagLayout?.layout?.height || 0, 900) + 100}}
-    >
+    <S.Container style={{height: Math.max(dagLayout?.layout?.height || 0, 900) + 100}}>
       <ReactFlow
         nodeTypes={{TraceNode}}
         defaultZoom={0.5}

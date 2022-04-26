@@ -15,6 +15,7 @@ import {Steps} from 'components/GuidedTour/assertionStepList';
 import useGuidedTour from 'hooks/useGuidedTour';
 import {CreateAssertionSelectorInput} from './CreateAssertionSelectorInput';
 import * as S from './CreateAssertionModal.styled';
+import useCreateAssertionModalAnalytics from './useCreateAssertionModal.analytics';
 
 interface AssertionSpan {
   key: string;
@@ -53,6 +54,14 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
   const attrs = jemsPath.search(trace, filterBySpanId(span.spanId));
   const [form] = Form.useForm<TValues>();
   const defaultSelectorList = useMemo(() => getSpanSignature(span.spanId, trace), [span.spanId, trace]);
+  const {
+    onAddCheck,
+    onRemoveCheck,
+    onChecksChange,
+    onCreateAssertionFormSubmit,
+    onEditAssertionFormSubmit,
+    onSelectorChange,
+  } = useCreateAssertionModalAnalytics();
 
   useGuidedTour(GuidedTours.Assertion);
 
@@ -144,13 +153,25 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
       const newData = {selectors: selectorList, spanAssertions};
 
       if (assertion) {
+        onEditAssertionFormSubmit(assertion.assertionId);
         await updateAssertion({testId, assertionId: assertion.assertionId, assertion: newData});
       } else {
+        onCreateAssertionFormSubmit(testId);
         await createAssertion({testId, assertion: newData});
       }
       onCreate();
     },
-    [assertion, attrs, createAssertion, onCreate, span.attributes, testId, updateAssertion]
+    [
+      assertion,
+      attrs,
+      createAssertion,
+      onCreate,
+      onCreateAssertionFormSubmit,
+      onEditAssertionFormSubmit,
+      span.attributes,
+      testId,
+      updateAssertion,
+    ]
   );
 
   return (
@@ -166,10 +187,14 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
       autoComplete="off"
       layout="vertical"
       onFieldsChange={changedFields => {
-        onSelectorList(form.getFieldValue('selectorList') || []);
+        const selectorList = form.getFieldValue('selectorList') || [];
+        onSelectorList(selectorList);
         const [field] = changedFields;
 
         const [fieldName = '', entry = 0, keyName = ''] = field.name as Array<string | number>;
+
+        if (fieldName === 'selectorList') onSelectorChange(JSON.stringify(selectorList));
+        if (fieldName === 'assertionList') onChecksChange(JSON.stringify(form.getFieldValue('assertionList') || []));
 
         if (fieldName === 'assertionList' && keyName === 'key' && field.value) {
           const assertionList: AssertionSpan[] = form.getFieldValue('assertionList') || [];
@@ -213,7 +238,7 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
           {(fields, {add, remove}) => {
             return (
               <>
-                {fields.map(({key, name, ...field}, index) => (
+                {fields.map(({key, name, ...field}) => (
                   <Space key={key} style={{display: 'flex', alignItems: 'center', gap: '4px', marginBottom: 16}}>
                     <Form.Item
                       {...field}
@@ -259,12 +284,23 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
                     <MinusCircleOutlined
                       color="error"
                       style={{cursor: 'pointer', color: 'rgb(140, 140, 140)'}}
-                      onClick={() => remove(name)}
+                      onClick={() => {
+                        onRemoveCheck();
+                        remove(name);
+                      }}
                     />
                   </Space>
                 ))}
 
-                <Button type="link" icon={<PlusOutlined />} style={{padding: 0}} onClick={add}>
+                <Button
+                  type="link"
+                  icon={<PlusOutlined />}
+                  style={{padding: 0}}
+                  onClick={() => {
+                    onAddCheck();
+                    add();
+                  }}
+                >
                   Add Item
                 </Button>
               </>
