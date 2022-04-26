@@ -4,10 +4,10 @@ import {Button} from 'antd';
 import {InfoCircleOutlined} from '@ant-design/icons';
 import CreateTestModal from 'components/CreateTest';
 import {Steps} from 'components/GuidedTour/homeStepList';
+import GuidedTourService, {GuidedTours} from 'services/GuidedTourService';
+import useGuidedTour from 'hooks/useGuidedTour';
 import TestList from './TestList';
 import * as S from './Home.styled';
-import GuidedTourService, {GuidedTours} from '../../services/GuidedTourService';
-import useGuidedTour from '../../components/GuidedTour/useGuidedTour';
 
 const HomeContent: React.FC = () => {
   const [openCreateTestModal, setOpenCreateTestModal] = useState(false);
