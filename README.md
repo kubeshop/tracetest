@@ -25,8 +25,8 @@
 </p>
 
 <p align="center">
-  <a target="_new" href="https://www.youtube.com/watch?v=mrJBf8DA7RU">
-    <img src="https://img.youtube.com/vi/mrJBf8DA7RU/0.jpg" style="width:66%;height:auto">
+  <a target="_new" href="https://www.youtube.com/watch?v=WMRicNlaehc">
+    <img src="https://img.youtube.com/vi/WMRicNlaehc/0.jpg" style="width:66%;height:auto">
     <p align="center">
       Click on the image or this link to watch the "Tracetest Intro Video" video (7 mins)
     </p>
