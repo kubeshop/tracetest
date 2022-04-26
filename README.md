@@ -33,8 +33,6 @@
   </a>
 </p>
 
-[![]](http://www.youtube.com/watch?v=mrJBf8DA7RU "Tracetest End-to-End Testing, Powered by Your OpenTelemetry Traces")
-
 <p align="center">
   <a target="_new" href="https://www.youtube.com/watch?v=mrJBf8DA7RU">
     <img src="http://img.youtube.com/vi/mrJBf8DA7RU/0.jpg" style="width:66%;height:auto">
