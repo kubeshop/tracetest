@@ -18,8 +18,6 @@
 
 <p align="center">
   <a href="https://github.com/kubeshop/tracetest/releases"><img title="Release" src="https://img.shields.io/github/v/release/kubeshop/tracetest"/></a>
-  <a href=""><img title="Downloads" src="https://img.shields.io/github/downloads/kubeshop/tracetest/total.svg"/></a>
-  <a href=""><img title="Go version" src="https://img.shields.io/github/go-mod/go-version/kubeshop/tracetest"/></a>
   <a href=""><img title="Docker builds" src="https://img.shields.io/docker/automated/kubeshop/tracetest"/></a>
   <a href="https://github.com/kubeshop/tracetest/releases"><img title="Release date" src="https://img.shields.io/github/release-date/kubeshop/tracetest"/></a>
 </p>
