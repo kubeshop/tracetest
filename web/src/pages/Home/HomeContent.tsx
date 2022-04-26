@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react';
 import {delay} from 'lodash';
-import {Button} from 'antd';
-import {InfoCircleOutlined} from '@ant-design/icons';
+// import {Button} from 'antd';
+// import {InfoCircleOutlined} from '@ant-design/icons';
 import CreateTestModal from 'components/CreateTest';
 import {Steps} from 'components/GuidedTour/homeStepList';
 import GuidedTourService, {GuidedTours} from 'services/GuidedTourService';
@@ -27,7 +27,7 @@ const HomeContent: React.FC = () => {
       <S.PageHeader>
         <S.TitleText>All Tests</S.TitleText>
         <S.ActionContainer>
-          <Button
+          {/* <Button
             size="large"
             type="link"
             icon={<InfoCircleOutlined />}
@@ -37,7 +37,7 @@ const HomeContent: React.FC = () => {
             }}
           >
             Guided tour
-          </Button>
+          </Button> */}
           <S.CreateTestButton
             data-tour={GuidedTourService.getStep(GuidedTours.Home, Steps.CreateTest)}
             type="primary"
