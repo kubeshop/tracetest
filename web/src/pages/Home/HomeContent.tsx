@@ -12,15 +12,15 @@ import * as S from './Home.styled';
 const HomeContent: React.FC = () => {
   const [openCreateTestModal, setOpenCreateTestModal] = useState(false);
 
-  const {setCurrentStep, setIsOpen, currentStep, isOpen} = useGuidedTour(GuidedTours.Home);
+  const {setCurrentStep, setIsOpen, currentStep, isOpen: isGuidOpen} = useGuidedTour(GuidedTours.Home);
 
   useEffect(() => {
-    if (currentStep > 0 && !openCreateTestModal) {
+    if (currentStep > 0 && !openCreateTestModal && isGuidOpen) {
       setOpenCreateTestModal(true);
       setCurrentStep(2);
       delay(() => setCurrentStep(1), 0);
     }
-  }, [currentStep, openCreateTestModal, setCurrentStep]);
+  }, [currentStep, openCreateTestModal, setCurrentStep, isGuidOpen]);
 
   return (
     <S.Wrapper>
@@ -44,7 +44,7 @@ const HomeContent: React.FC = () => {
             size="large"
             onClick={() => {
               setOpenCreateTestModal(true);
-              if (isOpen) delay(() => setCurrentStep(currentStep + 1), 1);
+              if (isGuidOpen) delay(() => setCurrentStep(currentStep + 1), 1);
             }}
           >
             Create Test
