@@ -1,4 +1,4 @@
-import useAnalytics, {Categories} from '../../components/Analytics/useAnalytics';
+import AnalyticsService, {Categories} from './AnalyticsService';
 
 enum Actions {
   RunTest = 'run-test-button-click',
@@ -10,15 +10,15 @@ type TTestAnalytics = {
   onTestRunClick(testRunId: string): void;
 };
 
-const useTestAnalytics = (): TTestAnalytics => {
-  const {event} = useAnalytics(Categories.Test);
+const {event} = AnalyticsService(Categories.Test);
 
+const TestAnalyticsService = (): TTestAnalytics => {
   const onRunTest = (testId: string) => {
     event(Actions.RunTest, testId);
   };
 
   const onTestRunClick = (testRunId: string) => {
-    event(Actions.RunTest, testRunId);
+    event(Actions.TestRunClick, testRunId);
   };
 
   return {
@@ -27,4 +27,4 @@ const useTestAnalytics = (): TTestAnalytics => {
   };
 };
 
-export default useTestAnalytics;
+export default TestAnalyticsService();

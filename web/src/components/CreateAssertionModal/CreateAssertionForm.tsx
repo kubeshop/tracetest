@@ -15,7 +15,16 @@ import {Steps} from 'components/GuidedTour/assertionStepList';
 import useGuidedTour from 'hooks/useGuidedTour';
 import {CreateAssertionSelectorInput} from './CreateAssertionSelectorInput';
 import * as S from './CreateAssertionModal.styled';
-import useCreateAssertionModalAnalytics from './useCreateAssertionModal.analytics';
+import CreateAssertionModalAnalyticsService from '../../services/analytics/CreateAssertionModalAnalyticsService';
+
+const {
+  onAddCheck,
+  onRemoveCheck,
+  onChecksChange,
+  onCreateAssertionFormSubmit,
+  onEditAssertionFormSubmit,
+  onSelectorChange,
+} = CreateAssertionModalAnalyticsService;
 
 interface AssertionSpan {
   key: string;
@@ -54,14 +63,6 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
   const attrs = jemsPath.search(trace, filterBySpanId(span.spanId));
   const [form] = Form.useForm<TValues>();
   const defaultSelectorList = useMemo(() => getSpanSignature(span.spanId, trace), [span.spanId, trace]);
-  const {
-    onAddCheck,
-    onRemoveCheck,
-    onChecksChange,
-    onCreateAssertionFormSubmit,
-    onEditAssertionFormSubmit,
-    onSelectorChange,
-  } = useCreateAssertionModalAnalytics();
 
   useGuidedTour(GuidedTours.Assertion);
 
@@ -161,17 +162,7 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
       }
       onCreate();
     },
-    [
-      assertion,
-      attrs,
-      createAssertion,
-      onCreate,
-      onCreateAssertionFormSubmit,
-      onEditAssertionFormSubmit,
-      span.attributes,
-      testId,
-      updateAssertion,
-    ]
+    [assertion, attrs, createAssertion, onCreate, span.attributes, testId, updateAssertion]
   );
 
   return (

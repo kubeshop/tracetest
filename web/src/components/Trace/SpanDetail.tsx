@@ -8,7 +8,9 @@ import CreateAssertionModal from 'components/CreateAssertionModal';
 import SkeletonTable from 'components/SkeletonTable';
 import * as S from './SpanDetail.styled';
 import Attributes from './Attributes';
-import useTraceAnalytics from './useTrace.analytics';
+import TraceAnalyticsService from '../../services/analytics/TraceAnalyticsService';
+
+const {onAddAssertionButtonClick} = TraceAnalyticsService;
 
 type TSpanDetailProps = {
   test?: Test;
@@ -18,7 +20,6 @@ type TSpanDetailProps = {
 
 const SpanDetail: FC<TSpanDetailProps> = ({test, targetSpan, trace}) => {
   const [openCreateAssertion, setOpenCreateAssertion] = useState(false);
-  const {onAddAssertionButtonClick} = useTraceAnalytics();
 
   const assertionsResultList = useMemo(() => {
     if (!targetSpan?.spanId || !trace) {

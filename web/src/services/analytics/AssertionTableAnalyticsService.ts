@@ -1,4 +1,4 @@
-import useAnalytics, {Categories} from '../Analytics/useAnalytics';
+import AnalyticsService, { Categories } from './AnalyticsService';
 
 enum Actions {
   EditAssertionButtonClick = 'edit-assertion-button-click',
@@ -8,9 +8,9 @@ type TAssertionTableAnalytics = {
   onEditAssertionButtonClick(assertionId: string): void;
 };
 
-const useAssertionTableAnalytics = (): TAssertionTableAnalytics => {
-  const {event} = useAnalytics(Categories.SpanDetail);
+const {event} = AnalyticsService(Categories.SpanDetail);
 
+const AssertionTableAnalyticsService = (): TAssertionTableAnalytics => {
   const onEditAssertionButtonClick = (assertionId: string) => {
     event(Actions.EditAssertionButtonClick, assertionId);
   };
@@ -20,4 +20,4 @@ const useAssertionTableAnalytics = (): TAssertionTableAnalytics => {
   };
 };
 
-export default useAssertionTableAnalytics;
+export default AssertionTableAnalyticsService();

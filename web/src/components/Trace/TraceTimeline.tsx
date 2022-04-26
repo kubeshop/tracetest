@@ -9,7 +9,9 @@ import './TimelineChart.css';
 import SkeletonTable from 'components/SkeletonTable';
 import GuidedTourService, {GuidedTours} from '../../services/GuidedTourService';
 import {Steps} from '../GuidedTour/traceStepList';
-import useTraceAnalytics from './useTrace.analytics';
+import TraceAnalyticsService from '../../services/analytics/TraceAnalyticsService';
+
+const {onTimelineSpanClick} = TraceAnalyticsService;
 
 const Header = styled.div`
   display: flex;
@@ -35,7 +37,6 @@ interface IProps {
 const TimelineChart = ({trace, selectedSpan, onSelectSpan}: ITimelineChartProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
   let treeFactory = d3.tree().size([200, 450]).nodeSize([0, 5]);
-  const {onTimelineSpanClick} = useTraceAnalytics();
 
   const spanDates = trace.resourceSpans
     .map((i: any) => i.instrumentationLibrarySpans.map((el: any) => el.spans))

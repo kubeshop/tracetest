@@ -7,7 +7,9 @@ import CustomTable from '../../components/CustomTable';
 import {Steps} from '../../components/GuidedTour/testDetailsStepList';
 import GuidedTourService, {GuidedTours} from '../../services/GuidedTourService';
 import {AssertionResultList, TestRunResult, TestState} from '../../types';
-import useTestAnalytics from './useTest.analytics';
+import TestAnalyticsService from '../../services/analytics/TestAnalyticsService';
+
+const {onTestRunClick} = TestAnalyticsService;
 
 type TextRowProps = {
   testResultList: TestRunResult[];
@@ -39,8 +41,6 @@ const getTestResultCount = (assertionResultList: AssertionResultList, type: 'all
 };
 
 const TextDetailsTable: FC<TextRowProps> = ({isLoading, onSelectResult, testResultList}) => {
-  const {onTestRunClick} = useTestAnalytics();
-
   return (
     <CustomTable
       scroll={{y: 'calc(100vh - 450px)'}}

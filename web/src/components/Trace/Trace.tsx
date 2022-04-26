@@ -33,7 +33,9 @@ import * as S from './Trace.styled';
 
 import SpanDetail from './SpanDetail';
 import TestResults from './TestResults';
-import useTraceAnalytics from './useTrace.analytics';
+import TraceAnalyticsService from '../../services/analytics/TraceAnalyticsService';
+
+const {onChangeTab} = TraceAnalyticsService;
 
 const Grid = styled.div`
   display: grid;
@@ -63,7 +65,6 @@ const Trace: React.FC<TraceProps> = ({testId, testResultId, onDismissTrace, onRu
   const [updateTestResult] = useUpdateTestResultMutation();
   const {data: test} = useGetTestByIdQuery(testId);
   const [runNewTest] = useRunTestMutation();
-  const {onChangeTab} = useTraceAnalytics();
 
   const {
     data: testResultDetails,

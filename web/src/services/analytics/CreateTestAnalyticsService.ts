@@ -1,4 +1,4 @@
-import useAnalytics, {Categories, Labels} from '../Analytics/useAnalytics';
+import AnalyticsService, { Categories, Labels } from "./AnalyticsService";
 
 enum Actions {
   CreateTestFormSubmit = 'create-test-form-submit',
@@ -8,9 +8,9 @@ type TCreateTestAnalytics = {
   onCreateTestFormSubmit(): void;
 };
 
-const useCreateTestAnalytics = (): TCreateTestAnalytics => {
-  const {event} = useAnalytics(Categories.Home);
+const {event} = AnalyticsService(Categories.Home);
 
+const CreateTestAnalyticsService = (): TCreateTestAnalytics => {  
   const onCreateTestFormSubmit = () => {
     event(Actions.CreateTestFormSubmit, Labels.Form);
   };
@@ -20,4 +20,4 @@ const useCreateTestAnalytics = (): TCreateTestAnalytics => {
   };
 };
 
-export default useCreateTestAnalytics;
+export default CreateTestAnalyticsService();

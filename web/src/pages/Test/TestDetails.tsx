@@ -7,7 +7,9 @@ import {Steps} from 'components/GuidedTour/testDetailsStepList';
 import useGuidedTour from 'hooks/useGuidedTour';
 import * as S from './Test.styled';
 import TestDetailsTable from './TestDetailsTable';
-import useTestAnalytics from './useTest.analytics';
+import TestAnalyticsService from '../../services/analytics/TestAnalyticsService';
+
+const {onRunTest} = TestAnalyticsService;
 
 type TTestDetailsProps = {
   testId: TestId;
@@ -20,7 +22,6 @@ type TTestDetailsProps = {
 const TestDetails: FC<TTestDetailsProps> = ({testId, testResultList, isLoading, onSelectResult, url}) => {
   const [runTest, result] = useRunTestMutation();
   useGuidedTour(GuidedTours.TestDetails);
-  const {onRunTest} = useTestAnalytics();
 
   const handleRunTest = useCallback(async () => {
     if (testId) {
@@ -28,7 +29,7 @@ const TestDetails: FC<TTestDetailsProps> = ({testId, testResultList, isLoading, 
       const testResult = await runTest(testId).unwrap();
       onSelectResult({resultId: testResult.resultId} as TestRunResult);
     }
-  }, [onRunTest, onSelectResult, runTest, testId]);
+  }, [onSelectResult, runTest, testId]);
 
   return (
     <div style={{height: 'calc(100vh - 250px)'}}>

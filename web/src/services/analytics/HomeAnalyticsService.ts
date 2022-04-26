@@ -1,4 +1,4 @@
-import useAnalytics, {Categories, Labels} from '../../components/Analytics/useAnalytics';
+import AnalyticsService, { Categories, Labels } from "./AnalyticsService";
 
 enum Actions {
   CreateTestClick = 'create-test-button-click',
@@ -12,9 +12,9 @@ type THomeAnalytics = {
   onTestClick(testId: string): void;
 };
 
-const useHomeAnalytics = (): THomeAnalytics => {
-  const {event} = useAnalytics(Categories.Home);
+const {event} = AnalyticsService(Categories.Home);
 
+const HomeAnalyticsService = (): THomeAnalytics => {  
   const onCreateTestClick = () => {
     event(Actions.CreateTestClick, Labels.Button);
   };
@@ -34,4 +34,4 @@ const useHomeAnalytics = (): THomeAnalytics => {
   };
 };
 
-export default useHomeAnalytics;
+export default HomeAnalyticsService();

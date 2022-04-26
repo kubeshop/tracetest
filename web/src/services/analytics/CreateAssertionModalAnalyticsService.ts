@@ -1,4 +1,4 @@
-import useAnalytics, {Categories, Labels} from '../Analytics/useAnalytics';
+import AnalyticsService, {Categories, Labels} from './AnalyticsService';
 
 enum Actions {
   EditAssertionFormSubmit = 'edit-assertion-form-submit',
@@ -18,9 +18,9 @@ type TCreateAssertionModalAnalytics = {
   onRemoveCheck(): void;
 };
 
-const useCreateAssertionModalAnalytics = (): TCreateAssertionModalAnalytics => {
-  const {event} = useAnalytics(Categories.Assertion);
+const {event} = AnalyticsService(Categories.Assertion);
 
+const CreateAssertionModalAnalyticsService = (): TCreateAssertionModalAnalytics => {
   const onCreateAssertionFormSubmit = (testId: string) => {
     event(Actions.CreateAssertionFormSubmit, testId);
   };
@@ -55,4 +55,4 @@ const useCreateAssertionModalAnalytics = (): TCreateAssertionModalAnalytics => {
   };
 };
 
-export default useCreateAssertionModalAnalytics;
+export default CreateAssertionModalAnalyticsService();

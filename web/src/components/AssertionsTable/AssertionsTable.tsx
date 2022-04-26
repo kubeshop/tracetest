@@ -5,7 +5,7 @@ import {getOperator} from 'utils';
 import CreateAssertionModal from '../CreateAssertionModal';
 import CustomTable from '../CustomTable';
 import * as S from './AssertionsTable.styled';
-import useAssertionTableAnalytics from './useAssertionTable.analytics';
+import AssertionTableAnalyticsService from '../../services/analytics/AssertionTableAnalyticsService';
 
 type AssertionsResultTableProps = {
   assertionResults: SpanAssertionResult[];
@@ -35,7 +35,6 @@ const AssertionsResultTable: React.FC<AssertionsResultTableProps> = ({
   trace,
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const {onEditAssertionButtonClick} = useAssertionTableAnalytics();
 
   const parsedAssertionList = useMemo<Array<TParsedAssertion>>(
     () =>
@@ -62,7 +61,7 @@ const AssertionsResultTable: React.FC<AssertionsResultTableProps> = ({
         <Button
           type="link"
           onClick={() => {
-            onEditAssertionButtonClick(assertion.assertionId);
+            AssertionTableAnalyticsService.onEditAssertionButtonClick(assertion.assertionId);
             setIsModalOpen(true);
           }}
         >

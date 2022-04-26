@@ -7,7 +7,9 @@ import {getOperator} from 'utils';
 import {getSpanSignature} from '../../services/SpanService';
 import CustomTable from '../CustomTable';
 import * as S from './TraceAssertionsTable.styled';
-import useTraceAssertionTableAnalytics from './useTraceAssertionTable.analytics';
+import TraceAssertionTableAnalyticsService from '../../services/analytics/TraceAssertionTableAnalyticsService';
+
+const {onSpanAssertionClick} = TraceAssertionTableAnalyticsService;
 
 interface IProps {
   assertionResult: AssertionResult;
@@ -34,8 +36,6 @@ const TraceAssertionsResultTable: FC<IProps> = ({
   trace,
   onSpanSelected,
 }) => {
-  const {onSpanAssertionClick} = useTraceAssertionTableAnalytics();
-
   const selectorValueList = useMemo(() => selectors.map(({value}) => value), [selectors]);
   const parsedAssertionList = useMemo(() => {
     const spanAssertionList = spanListAssertionResult.reduce<Array<TParsedAssertion>>((list, {resultList}) => {

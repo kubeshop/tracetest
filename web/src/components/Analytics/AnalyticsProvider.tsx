@@ -1,11 +1,5 @@
 import {ReactElement, useEffect, useState, createContext, useCallback, useMemo} from 'react';
-import GA4React from 'ga-4-react';
-
-const {analyticsEnabled = 'true', measurementId = 'G-ZP277L2M37'} = window.ENV || {};
-
-export const instance = new GA4React(measurementId);
-
-const isEnabled = analyticsEnabled === 'true';
+import {isEnabled, instance} from '../../services/analytics/AnalyticsService';
 
 export const Context = createContext({
   isEnabled,

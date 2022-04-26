@@ -8,11 +8,12 @@ import GuidedTourService, {GuidedTours} from 'services/GuidedTourService';
 import useGuidedTour from 'hooks/useGuidedTour';
 import TestList from './TestList';
 import * as S from './Home.styled';
-import useHomeAnalytics from './useHome.analytics';
+import HomeAnalyticsService from '../../services/analytics/HomeAnalyticsService';
+
+const {onCreateTestClick} = HomeAnalyticsService;
 
 const HomeContent: React.FC = () => {
   const [openCreateTestModal, setOpenCreateTestModal] = useState(false);
-  const {onGuidedTourClick, onCreateTestClick} = useHomeAnalytics();
 
   const {setCurrentStep, setIsOpen, currentStep, isOpen: isGuidOpen} = useGuidedTour(GuidedTours.Home);
 

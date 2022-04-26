@@ -1,4 +1,4 @@
-import useAnalytics, {Categories, Labels} from '../Analytics/useAnalytics';
+import AnalyticsService, { Categories, Labels } from "./AnalyticsService";
 
 enum Actions {
   ChangeTab = 'change-tab',
@@ -12,9 +12,9 @@ type TTraceAnalytics = {
   onTimelineSpanClick(spanId: string): void;
 };
 
-const useTraceAnalytics = (): TTraceAnalytics => {
-  const {event} = useAnalytics(Categories.Trace);
+const {event} = AnalyticsService(Categories.Trace);
 
+const TraceAnalyticsService = (): TTraceAnalytics => {
   const onChangeTab = (tabName: string) => {
     event(Actions.ChangeTab, tabName);
   };
@@ -34,4 +34,4 @@ const useTraceAnalytics = (): TTraceAnalytics => {
   };
 };
 
-export default useTraceAnalytics;
+export default TraceAnalyticsService();
