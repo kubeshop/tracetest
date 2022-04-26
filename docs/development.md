@@ -17,7 +17,7 @@
   - [utils/](./web/src/utils)
 
 | Folder      | Description                                                            |
-| ----------- | ---------------------------------------------------------------------- | --- |
+| ----------- | ---------------------------------------------------------------------- |
 | public/     | contains html and can put any scripts, or static files                 |
 | components/ | any reusable components                                                |
 | hooks/      | any reusable hooks                                                     |
@@ -26,5 +26,5 @@
 | pages/      | each page has its folder that contains styled file, and sub components |
 | redux/      | state management setup                                                 |
 | services/   | any class or functions that talk with data and processing it           |
-| types/      | defined models used in the web app                                     |     |
-| utils/      | any pure functions that shared in the app                              |     |
+| types/      | defined models used in the web app                                     |
+| utils/      | any pure functions that shared in the app                              |

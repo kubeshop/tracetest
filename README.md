@@ -25,17 +25,17 @@
 </p>
 
 <p align="center">
-  <a target="_new" href="https://www.youtube.com/watch?v=GVvgLuxdrXE&t=47s">
-    <img src="assets/intro-to-tracetest.jpg" style="width:66%;height:auto">
+  <a target="_new" href="https://www.youtube.com/watch?v=mrJBf8DA7RU">
+    <img src="https://img.youtube.com/vi/mrJBf8DA7RU/0.jpg" style="width:66%;height:auto">
     <p align="center">
-      Click on the image or this link to watch the "Intro to Tracetest" short video (3 mins)
+      Click on the image or this link to watch the "Tracetest Intro Video" video (7 mins)
     </p>
   </a>
 </p>
 
 # Overview
 
-Testing and debugging software built on microservices architectures is not an easy task. Multiple services, teams, programming languages, and technologies are involved. We want to help you write tests across all this complexity.
+Testing and debugging software built on microservices architectures is not an easy task. Multiple services, teams, programming languages, and technologies are involved. We want to help you write tests across all this complexity by leveraging your existing investment in OpenTelemetry tracing.
 
 Tracetest makes it easy:
 
