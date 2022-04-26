@@ -23,15 +23,16 @@ import {
   parseTestResultToAssertionResultList,
   runTest,
 } from 'services/TraceService';
-import TraceDiagram from '../TraceDiagram/TraceDiagram';
+import TraceDiagram from 'components/TraceDiagram/TraceDiagram';
+
+import GuidedTourService, {GuidedTours} from 'services/GuidedTourService';
+import {Steps} from 'components/GuidedTour/traceStepList';
+import useGuidedTour from 'hooks/useGuidedTour';
 import TraceTimeline from './TraceTimeline';
 import * as S from './Trace.styled';
 
 import SpanDetail from './SpanDetail';
 import TestResults from './TestResults';
-import GuidedTourService, {GuidedTours} from '../../services/GuidedTourService';
-import {Steps} from '../GuidedTour/traceStepList';
-import useGuidedTour from '../GuidedTour/useGuidedTour';
 
 const Grid = styled.div`
   display: grid;

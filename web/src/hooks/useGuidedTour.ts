@@ -1,11 +1,11 @@
 import {useTour} from '@reactour/tour';
 import {delay as delayFn} from 'lodash';
 import {useEffect, useState} from 'react';
-import GuidedTourService, {GuidedTours} from '../../services/GuidedTourService';
-import HomeStepList from './homeStepList';
-import AssertionStepList from './assertionStepList';
-import TraceStepList from './traceStepList';
-import TestDetailsStepList from './testDetailsStepList';
+import GuidedTourService, {GuidedTours} from 'services/GuidedTourService';
+import HomeStepList from 'components/GuidedTour/homeStepList';
+import AssertionStepList from 'components/GuidedTour/assertionStepList';
+import TraceStepList from 'components/GuidedTour/traceStepList';
+import TestDetailsStepList from 'components/GuidedTour/testDetailsStepList';
 
 const StepListMap = {
   [GuidedTours.Home]: HomeStepList,

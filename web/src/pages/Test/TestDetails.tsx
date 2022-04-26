@@ -2,11 +2,11 @@ import {Button, Typography} from 'antd';
 import {FC, useCallback} from 'react';
 import {useRunTestMutation} from 'redux/services/TestService';
 import {TestId, TestRunResult} from 'types';
+import GuidedTourService, {GuidedTours} from 'services/GuidedTourService';
+import {Steps} from 'components/GuidedTour/testDetailsStepList';
+import useGuidedTour from 'hooks/useGuidedTour';
 import * as S from './Test.styled';
 import TestDetailsTable from './TestDetailsTable';
-import GuidedTourService, {GuidedTours} from '../../services/GuidedTourService';
-import {Steps} from '../../components/GuidedTour/testDetailsStepList';
-import useGuidedTour from '../../components/GuidedTour/useGuidedTour';
 
 type TTestDetailsProps = {
   testId: TestId;

@@ -8,13 +8,13 @@ import {Assertion, COMPARE_OPERATOR, ISpan, ItemSelector, ITrace, LOCATION_NAME,
 import {useCreateAssertionMutation, useUpdateAssertionMutation} from 'redux/services/TestService';
 import {SELECTOR_DEFAULT_ATTRIBUTES} from 'lib/SelectorDefaultAttributes';
 import {filterBySpanId} from 'utils';
+import {getSpanSignature} from 'services/SpanService';
+import {getSpanAttributeValueType} from 'services/SpanAttributeService';
+import GuidedTourService, {GuidedTours} from 'services/GuidedTourService';
+import {Steps} from 'components/GuidedTour/assertionStepList';
+import useGuidedTour from 'hooks/useGuidedTour';
 import {CreateAssertionSelectorInput} from './CreateAssertionSelectorInput';
-import {getSpanSignature} from '../../services/SpanService';
-import {getSpanAttributeValueType} from '../../services/SpanAttributeService';
 import * as S from './CreateAssertionModal.styled';
-import GuidedTourService, {GuidedTours} from '../../services/GuidedTourService';
-import {Steps} from '../GuidedTour/assertionStepList';
-import useGuidedTour from '../GuidedTour/useGuidedTour';
 
 interface AssertionSpan {
   key: string;
