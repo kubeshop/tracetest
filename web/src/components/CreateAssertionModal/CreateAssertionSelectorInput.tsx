@@ -60,9 +60,14 @@ export const CreateAssertionSelectorInput: React.FC<TItemSelectorDropdownProps> 
 
   return (
     <>
-      <div style={{marginBottom: 8, display: 'flex', flexWrap: 'wrap'}}>
+      <div style={{display: 'flex', flexWrap: 'wrap'}}>
         {selectorList.map((item: ItemSelector) => (
-          <Tag key={item.propertyName} closable onClose={() => handleDeleteItemSelector(item)}>
+          <Tag
+            key={item.propertyName}
+            style={{marginBottom: 8}}
+            closable
+            onClose={() => handleDeleteItemSelector(item)}
+          >
             {item.value}
           </Tag>
         ))}
