@@ -1,6 +1,6 @@
 <p align="center">  
-  <img style="width:66%" src="assets/tracetest-color-white.png#gh-dark-mode-only" alt="Tracetest Logo Light"/>
-  <img style="width:66%" src="assets/tracetest-color-dark.png#gh-light-mode-only" alt="Tracetest Logo Dark" />
+  <img style="width:66%" src="assets/tracetest-logo-color-w-white-text.svg#gh-dark-mode-only" alt="Tracetest Logo Light"/>
+  <img style="width:66%" src="assets/tracetest-logo-color-w-black-text.svg#gh-light-mode-only" alt="Tracetest Logo Dark" />
 </p>
 
 <p align="center">
