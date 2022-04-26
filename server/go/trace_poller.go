@@ -114,9 +114,15 @@ func (tp tracePoller) processJob(job tracePollReq) {
 	}
 
 	res.State = TestRunStateAwaitingTestResults
-	res.Trace = mapTrace(
-		FixParent(tr, res.Response),
-	)
+	tr, err = FixParent(tr, res.Response)
+	if err != nil {
+		job.result = res
+		job.count = job.count + 1
+		tp.requeue(job)
+		return
+	}
+
+	res.Trace = mapTrace(tr)
 
 	if !tp.donePollingTraces(job, res) {
 		job.result = res

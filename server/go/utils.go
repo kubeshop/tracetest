@@ -2,6 +2,7 @@ package openapi
 
 import (
 	"encoding/hex"
+	"errors"
 	"strconv"
 	"strings"
 
@@ -237,7 +238,7 @@ func headersToKeyValueList(headers []HttpResponseHeaders) *v11.KeyValueList {
 	return &v11.KeyValueList{Values: mapped}
 }
 
-func FixParent(tr *v1.TracesData, response HttpResponse) *v1.TracesData {
+func FixParent(tr *v1.TracesData, response HttpResponse) (*v1.TracesData, error) {
 	spans := make(map[string]*v1.Span)
 	for _, rs := range tr.ResourceSpans {
 		for _, ils := range rs.InstrumentationLibrarySpans {
@@ -259,7 +260,7 @@ func FixParent(tr *v1.TracesData, response HttpResponse) *v1.TracesData {
 		}
 	}
 	if parentSpan == nil {
-		return tr
+		return nil, errors.New("no parentspan")
 	}
 
 	tracetestAttrs := []*v11.KeyValue{
@@ -286,5 +287,5 @@ func FixParent(tr *v1.TracesData, response HttpResponse) *v1.TracesData {
 	parentSpan.ParentSpanId = nil
 	parentSpan.Attributes = append(parentSpan.Attributes, tracetestAttrs...)
 
-	return tr
+	return tr, nil
 }
