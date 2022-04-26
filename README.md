@@ -24,7 +24,16 @@
   <a href="https://github.com/kubeshop/tracetest/releases"><img title="Release date" src="https://img.shields.io/github/release-date/kubeshop/tracetest"/></a>
 </p>
 
-[![Tracetest Intro Video](http://img.youtube.com/vi/mrJBf8DA7RU/0.jpg)](http://www.youtube.com/watch?v=mrJBf8DA7RU "Tracetest End-to-End Testing, Powered by Your OpenTelemetry Traces")
+<p align="center">
+  <a target="_new" href="https://www.youtube.com/watch?v=mrJBf8DA7RU">
+    <img src="https://img.youtube.com/vi/mrJBf8DA7RU/0.jpg" style="width:66%;height:auto">
+    <p align="center">
+      Click on the image or this link to watch the "Tracetest Intro Video" video (7 mins)
+    </p>
+  </a>
+</p>
+
+[![]](http://www.youtube.com/watch?v=mrJBf8DA7RU "Tracetest End-to-End Testing, Powered by Your OpenTelemetry Traces")
 
 <p align="center">
   <a target="_new" href="https://www.youtube.com/watch?v=mrJBf8DA7RU">
