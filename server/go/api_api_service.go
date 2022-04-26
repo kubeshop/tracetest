@@ -14,6 +14,7 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/kubeshop/tracetest/server/go/analytics"
 	"github.com/kubeshop/tracetest/server/go/tracedb"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -70,6 +71,8 @@ func (s *ApiApiService) CreateTest(ctx context.Context, test Test) (ImplResponse
 		return Response(http.StatusInternalServerError, err.Error()), err
 	}
 
+	analytics.CreateAndSendEvent("test_created", "test")
+
 	test.TestId = id
 	return Response(200, test), nil
 }
@@ -92,6 +95,8 @@ func (s *ApiApiService) UpdateTest(ctx context.Context, testid string, updated T
 	if err != nil {
 		return Response(http.StatusInternalServerError, err.Error()), err
 	}
+
+	analytics.CreateAndSendEvent("test_updated", "test")
 
 	return Response(204, nil), nil
 }
@@ -141,6 +146,8 @@ func (s *ApiApiService) RunTest(ctx context.Context, testid string) (ImplRespons
 	}
 
 	result := s.runner.Run(*test)
+
+	analytics.CreateAndSendEvent("test_run", "test")
 
 	return Response(200, result), nil
 }
@@ -217,6 +224,8 @@ func (s *ApiApiService) CreateAssertion(ctx context.Context, testID string, asse
 		return Response(http.StatusInternalServerError, err.Error()), err
 	}
 
+	analytics.CreateAndSendEvent("assertion_created", "test")
+
 	return Response(http.StatusOK, assertion), nil
 }
 
@@ -233,6 +242,8 @@ func (s *ApiApiService) UpdateAssertion(ctx context.Context, testID string, asse
 		return Response(http.StatusInternalServerError, err.Error()), err
 	}
 
+	analytics.CreateAndSendEvent("assertion_updated", "test")
+
 	return Response(http.StatusNoContent, nil), nil
 }
 
@@ -246,6 +257,8 @@ func (s *ApiApiService) DeleteAssertion(ctx context.Context, testID string, asse
 	if err != nil {
 		return Response(http.StatusInternalServerError, err.Error()), err
 	}
+
+	analytics.CreateAndSendEvent("assertion_deleted", "test")
 
 	return Response(http.StatusNoContent, nil), nil
 }

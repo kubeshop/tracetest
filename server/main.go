@@ -124,7 +124,7 @@ type gaParams struct {
 func serveIndex(w http.ResponseWriter, path string) {
 	templateData := gaParams{
 		MeasurementId:    os.Getenv("GOOGLE_ANALYTICS_MEASUREMENT_ID"),
-		AnalyticsEnabled: true,
+		AnalyticsEnabled: os.Getenv("ANALYTICS_ENABLED") == "true",
 	}
 
 	tpl, err := template.ParseFiles(path)
