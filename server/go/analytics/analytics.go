@@ -96,11 +96,11 @@ func NewEvent(name string, category string) (Event, error) {
 
 // SendEvent sends an event to Google Analytics.
 func SendEvent(event Event) error {
-	if analyticsEnabled {
-		return sendEvent(event)
+	if !analyticsEnabled {
+		return nil
 	}
 
-	return nil
+	return sendEvent(event)
 }
 
 // CreateAndSendEvent is a syntax-sugar to create and send the event in a single command
