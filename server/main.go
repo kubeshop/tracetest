@@ -20,6 +20,7 @@ import (
 	"time"
 
 	openapi "github.com/kubeshop/tracetest/server/go"
+	"github.com/kubeshop/tracetest/server/go/analytics"
 	"github.com/kubeshop/tracetest/server/go/executor"
 	"github.com/kubeshop/tracetest/server/go/testdb"
 	"github.com/kubeshop/tracetest/server/go/tracedb"
@@ -104,6 +105,11 @@ func main() {
 			fileServer.ServeHTTP(w, r)
 		}
 	})
+
+	err = analytics.CreateAndSendEvent("server_started", "beacon")
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	log.Printf("Server started")
 	log.Fatal(http.ListenAndServe(":8080", router))
