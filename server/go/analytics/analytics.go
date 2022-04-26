@@ -8,21 +8,29 @@ import (
 	"net/http"
 	"os"
 	"runtime"
+	"strconv"
 
 	"github.com/denisbrodbeck/machineid"
 )
 
 var (
-	appName         = "tracetest"
-	gaURL           = "https://www.google-analytics.com/mp/collect?measurement_id=%s&api_secret=%s"
-	gaValidationURL = "https://www.google-analytics.com/debug/mp/collect?measurement_id=%s&api_secret=%s"
-	gaMeasurementId = ""
-	gaSecretKey     = ""
+	appName          = "tracetest"
+	analyticsEnabled = false
+	gaURL            = "https://www.google-analytics.com/mp/collect?measurement_id=%s&api_secret=%s"
+	gaValidationURL  = "https://www.google-analytics.com/debug/mp/collect?measurement_id=%s&api_secret=%s"
+	gaMeasurementId  = ""
+	gaSecretKey      = ""
 )
 
 func init() {
 	gaMeasurementId = os.Getenv("GOOGLE_ANALYTICS_MEASUREMENT_ID")
 	gaSecretKey = os.Getenv("GOOGLE_ANALYTICS_SECRET_KEY")
+	analyticsIsEnabled, err := strconv.ParseBool(os.Getenv("ANALYTICS_ENABLED"))
+	if err != nil {
+		analyticsEnabled = false
+	} else {
+		analyticsEnabled = analyticsIsEnabled
+	}
 }
 
 type Params struct {
@@ -88,7 +96,11 @@ func NewEvent(name string, category string) (Event, error) {
 
 // SendEvent sends an event to Google Analytics.
 func SendEvent(event Event) error {
-	return sendEvent(event)
+	if analyticsEnabled {
+		return sendEvent(event)
+	}
+
+	return nil
 }
 
 // CreateAndSendEvent is a syntax-sugar to create and send the event in a single command
