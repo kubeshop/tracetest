@@ -45,7 +45,7 @@ export const testAPI = createApi({
       }),
       invalidatesTags: (result, error, args) => [{type: 'Test', id: args.testId}],
     }),
-    updateAssertion: build.mutation<Assertion, {testId: string; assertionId: string, assertion: Partial<Assertion>}>({
+    updateAssertion: build.mutation<Assertion, {testId: string; assertionId: string; assertion: Partial<Assertion>}>({
       query: ({testId, assertion, assertionId}) => ({
         url: `/tests/${testId}/assertions/${assertionId}`,
         method: 'PUT',

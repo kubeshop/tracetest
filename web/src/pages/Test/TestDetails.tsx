@@ -1,6 +1,6 @@
 import {Button, Typography} from 'antd';
 import {FC, useCallback} from 'react';
-import {useRunTestMutation} from 'services/TestService';
+import {useRunTestMutation} from 'redux/services/TestService';
 import {TestId, TestRunResult} from 'types';
 import * as S from './Test.styled';
 import TestDetailsTable from './TestDetailsTable';

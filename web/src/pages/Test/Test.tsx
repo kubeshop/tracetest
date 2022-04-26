@@ -8,7 +8,7 @@ import {CloseOutlined, ArrowLeftOutlined} from '@ant-design/icons';
 import {useLocation, useNavigate, useParams} from 'react-router-dom';
 
 import {TestRunResult, TestState} from 'types';
-import {useGetTestByIdQuery, useGetTestResultByIdQuery, useGetTestResultsQuery} from 'services/TestService';
+import {useGetTestByIdQuery, useGetTestResultByIdQuery, useGetTestResultsQuery} from 'redux/services/TestService';
 
 import Trace from 'components/Trace';
 import Layout from 'components/Layout';

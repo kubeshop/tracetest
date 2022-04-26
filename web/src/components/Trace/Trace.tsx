@@ -17,7 +17,7 @@ import {
   useGetTestResultByIdQuery,
   useRunTestMutation,
   useUpdateTestResultMutation,
-} from 'services/TestService';
+} from 'redux/services/TestService';
 import {
   parseAssertionResultListToTestResult,
   parseTestResultToAssertionResultList,

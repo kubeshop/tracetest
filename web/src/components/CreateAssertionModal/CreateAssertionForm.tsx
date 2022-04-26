@@ -5,7 +5,7 @@ import {Button, Input, AutoComplete, Typography, Tooltip, Form, Space, FormInsta
 import jemsPath from 'jmespath';
 
 import {Assertion, COMPARE_OPERATOR, ISpan, ItemSelector, ITrace, LOCATION_NAME, SpanSelector} from 'types';
-import {useCreateAssertionMutation, useUpdateAssertionMutation} from 'services/TestService';
+import {useCreateAssertionMutation, useUpdateAssertionMutation} from 'redux/services/TestService';
 import {SELECTOR_DEFAULT_ATTRIBUTES} from 'lib/SelectorDefaultAttributes';
 import {filterBySpanId} from 'utils';
 import {CreateAssertionSelectorInput} from './CreateAssertionSelectorInput';
