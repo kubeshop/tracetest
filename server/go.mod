@@ -5,6 +5,7 @@ go 1.13
 replace k8s.io/client-go => k8s.io/client-go v0.18.0
 
 require (
+	github.com/denisbrodbeck/machineid v1.0.1 // indirect
 	github.com/gogo/protobuf v1.3.2
 	github.com/golang/mock v1.6.0
 	github.com/google/uuid v1.3.0
