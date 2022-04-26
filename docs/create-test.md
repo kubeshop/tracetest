@@ -2,14 +2,13 @@
 
 Open the [Tracetest application](https://demo.tracetest.io).
 
-
 ![Main Screen](img/main-screen.png)
 
 Click the **Create Test** button and the **Create New Test** dialog appears:
 
 ![Create a Test](img/create-test.png)
 
-Input the test details. The screenshot below shows one of the examples from the [Readme](/README.md) document. Then click **Run Test**.
+Input the test details. The screenshot below shows one of the examples from the Tracetest GitHub [Readme](https://github.com/kubeshop/tracetest#readmed) document. Then click **Run Test**.
 
 ![Create New Test](img/run-test.png)
 
