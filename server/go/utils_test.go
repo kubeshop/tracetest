@@ -50,8 +50,9 @@ func TestFixParent(t *testing.T) {
 		},
 	}
 	resp := openapi.HttpResponse{StatusCode: 200, Body: "body"}
-	out := openapi.FixParent(td, resp)
+	out, err := openapi.FixParent(td, resp)
 
+	assert.NoError(t, err)
 	assert.Equal(t, []uint8([]byte(nil)), out.ResourceSpans[0].InstrumentationLibrarySpans[0].Spans[0].ParentSpanId)
 	//TODO check if returned attributes contain response body and status
 }
