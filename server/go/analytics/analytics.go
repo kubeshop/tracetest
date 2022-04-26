@@ -2,6 +2,7 @@ package analytics
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -9,6 +10,7 @@ import (
 	"os"
 	"runtime"
 	"strconv"
+	"time"
 
 	"github.com/denisbrodbeck/machineid"
 )
@@ -190,7 +192,9 @@ func sendPayloadToURL(payload Payload, url string) (*http.Response, []byte, erro
 
 	request.Header.Set("Content-Type", "application/json")
 
-	resp, err := http.DefaultClient.Do(request)
+	client := getClient()
+
+	resp, err := client.Do(request)
 	if err != nil {
 		return nil, []byte{}, fmt.Errorf("could not execute request: %w", err)
 	}
@@ -201,4 +205,16 @@ func sendPayloadToURL(payload Payload, url string) (*http.Response, []byte, erro
 	}
 
 	return resp, body, err
+}
+
+func getClient() *http.Client {
+	return &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				// TODO: point to valid certificate
+				InsecureSkipVerify: true,
+			},
+		},
+		Timeout: 10 * time.Second,
+	}
 }
