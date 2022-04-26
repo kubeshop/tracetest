@@ -25,6 +25,13 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>Tracetest</title>
+    <script>
+      window.ENV = {
+        measurementId: "{{ .MeasurementId }}",
+        analyticsEnabled: "{{ .AnalyticsEnabled }}",
+        secretKey: {{ .SecretKey }}
+      };
+    </script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>

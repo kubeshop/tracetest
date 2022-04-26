@@ -12,6 +12,7 @@ package main
 import (
 	"context"
 	"flag"
+	"html/template"
 	"io"
 	"log"
 	"net/http"
@@ -99,7 +100,7 @@ func main() {
 	fileMatcher := regexp.MustCompile(`\.[a-zA-Z]*$`)
 	router.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if !fileMatcher.MatchString(r.URL.Path) {
-			http.ServeFile(w, r, dir+"/index.html")
+			serveIndex(w, dir+"/index.html")
 		} else {
 			fileServer.ServeHTTP(w, r)
 		}
@@ -107,6 +108,29 @@ func main() {
 
 	log.Printf("Server started")
 	log.Fatal(http.ListenAndServe(":8080", router))
+}
+
+type gaParams struct {
+	MeasurementId    string
+	AnalyticsEnabled bool
+}
+
+func serveIndex(w http.ResponseWriter, path string) {
+	templateData := gaParams{
+		MeasurementId:    os.Getenv("GOOGLE_ANALYTICS_MEASUREMENT_ID"),
+		AnalyticsEnabled: true,
+	}
+
+	tpl, err := template.ParseFiles(path)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	if err = tpl.Execute(w, templateData); err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
 }
 
 func initOtelTracing(ctx context.Context) *sdktrace.TracerProvider {
