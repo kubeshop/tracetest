@@ -10,6 +10,7 @@ import (
 	"os"
 	"runtime"
 	"strconv"
+	"time"
 
 	"github.com/denisbrodbeck/machineid"
 )
@@ -214,6 +215,6 @@ func getClient() *http.Client {
 				InsecureSkipVerify: true,
 			},
 		},
-		Timeout: 10,
+		Timeout: 10 * time.Second,
 	}
 }
