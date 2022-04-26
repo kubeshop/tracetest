@@ -7,6 +7,9 @@ import CustomTable from '../../components/CustomTable';
 import {Steps} from '../../components/GuidedTour/testDetailsStepList';
 import GuidedTourService, {GuidedTours} from '../../services/GuidedTourService';
 import {AssertionResultList, TestRunResult, TestState} from '../../types';
+import TestAnalyticsService from '../../services/analytics/TestAnalyticsService';
+
+const {onTestRunClick} = TestAnalyticsService;
 
 type TextRowProps = {
   testResultList: TestRunResult[];
@@ -48,7 +51,9 @@ const TextDetailsTable: FC<TextRowProps> = ({isLoading, onSelectResult, testResu
       onRow={record => {
         return {
           onClick: () => {
-            onSelectResult(record as TestRunResult);
+            const testResult = record as TestRunResult;
+            onTestRunClick(testResult.traceId);
+            onSelectResult(testResult);
           },
         };
       }}
@@ -101,7 +106,13 @@ const TextDetailsTable: FC<TextRowProps> = ({isLoading, onSelectResult, testResu
       />
       <Table.Column
         width="5%"
-        title={<Badge data-tour={GuidedTourService.getStep(GuidedTours.TestDetails, Steps.Passed)} count="P" style={{backgroundColor: '#49AA19'}} />}
+        title={
+          <Badge
+            data-tour={GuidedTourService.getStep(GuidedTours.TestDetails, Steps.Passed)}
+            count="P"
+            style={{backgroundColor: '#49AA19'}}
+          />
+        }
         key="passed"
         dataIndex="state"
         render={(value, {state, assertionResult = []}: TestRunResult) => {

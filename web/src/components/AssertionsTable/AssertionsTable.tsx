@@ -5,6 +5,7 @@ import {getOperator} from 'utils';
 import CreateAssertionModal from '../CreateAssertionModal';
 import CustomTable from '../CustomTable';
 import * as S from './AssertionsTable.styled';
+import AssertionTableAnalyticsService from '../../services/analytics/AssertionTableAnalyticsService';
 
 type AssertionsResultTableProps = {
   assertionResults: SpanAssertionResult[];
@@ -57,7 +58,13 @@ const AssertionsResultTable: React.FC<AssertionsResultTableProps> = ({
             <S.AssertionsTableBadge count={value} key={propertyName} />
           ))}
         </Typography.Title>
-        <Button type="link" onClick={() => setIsModalOpen(true)}>
+        <Button
+          type="link"
+          onClick={() => {
+            AssertionTableAnalyticsService.onEditAssertionButtonClick(assertion.assertionId);
+            setIsModalOpen(true);
+          }}
+        >
           Edit
         </Button>
       </S.AssertionsTableHeader>

@@ -8,6 +8,9 @@ import GuidedTourService, {GuidedTours} from 'services/GuidedTourService';
 import useGuidedTour from 'hooks/useGuidedTour';
 import TestList from './TestList';
 import * as S from './Home.styled';
+import HomeAnalyticsService from '../../services/analytics/HomeAnalyticsService';
+
+const {onCreateTestClick} = HomeAnalyticsService;
 
 const HomeContent: React.FC = () => {
   const [openCreateTestModal, setOpenCreateTestModal] = useState(false);
@@ -34,6 +37,7 @@ const HomeContent: React.FC = () => {
             onClick={() => {
               setCurrentStep(0);
               setIsOpen(true);
+              onGuidedTourClick();
             }}
           >
             Guided tour
@@ -43,6 +47,7 @@ const HomeContent: React.FC = () => {
             type="primary"
             size="large"
             onClick={() => {
+              onCreateTestClick();
               setOpenCreateTestModal(true);
               if (isGuidOpen) delay(() => setCurrentStep(currentStep + 1), 1);
             }}

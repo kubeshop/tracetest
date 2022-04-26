@@ -5,6 +5,9 @@ import {useGetTestsQuery} from 'redux/services/TestService';
 import CustomTable from '../../components/CustomTable';
 import {Test} from '../../types';
 import NoResults from './NoResults';
+import HomeAnalyticsService from '../../services/analytics/HomeAnalyticsService';
+
+const {onTestClick} = HomeAnalyticsService;
 
 const TestList = () => {
   const navigate = useNavigate();
@@ -32,7 +35,12 @@ const TestList = () => {
       loading={isLoading}
       onRow={record => {
         return {
-          onClick: () => navigate(`/test/${(record as Test).testId}`),
+          onClick: () => {
+            const testId = (record as Test).testId;
+
+            onTestClick(testId);
+            navigate(`/test/${testId}`);
+          },
         };
       }}
     >

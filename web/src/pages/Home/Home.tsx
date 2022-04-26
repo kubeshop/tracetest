@@ -1,15 +1,13 @@
 import Layout from 'components/Layout';
-import {TourProvider} from '@reactour/tour';
+import {withTracker} from 'ga-4-react';
 import HomeContent from './HomeContent';
 
 const Home = (): JSX.Element => {
   return (
     <Layout>
-      <TourProvider steps={[]}>
-        <HomeContent />
-      </TourProvider>
+      <HomeContent />
     </Layout>
   );
 };
 
-export default Home;
+export default withTracker(Home);

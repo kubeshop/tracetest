@@ -1,17 +1,20 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {Provider} from 'react-redux';
 import './index.css';
 import App from './App';
-import {store} from './redux/store';
 
 import * as serviceWorker from './serviceWorker';
+import {TEnv} from './types';
+
+declare global {
+  interface Window {
+    ENV: TEnv;
+  }
+}
 
 ReactDOM.render(
   <React.StrictMode>
-    <Provider store={store}>
-      <App />
-    </Provider>
+    <App />
   </React.StrictMode>,
   document.getElementById('root')
 );

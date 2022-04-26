@@ -7,8 +7,11 @@ import {ITrace} from 'types';
 
 import './TimelineChart.css';
 import SkeletonTable from 'components/SkeletonTable';
-import GuidedTourService, { GuidedTours } from '../../services/GuidedTourService';
-import { Steps } from '../GuidedTour/traceStepList';
+import GuidedTourService, {GuidedTours} from '../../services/GuidedTourService';
+import {Steps} from '../GuidedTour/traceStepList';
+import TraceAnalyticsService from '../../services/analytics/TraceAnalyticsService';
+
+const {onTimelineSpanClick} = TraceAnalyticsService;
 
 const Header = styled.div`
   display: flex;
@@ -165,6 +168,7 @@ const TimelineChart = ({trace, selectedSpan, onSelectSpan}: ITimelineChartProps)
       .attr('cursor', 'pointer')
       .attr('pointer-events', 'bounding-box')
       .on('click', (event, d) => {
+        onTimelineSpanClick(d.id);
         onSelectSpan(d.id);
       });
 

@@ -7,6 +7,9 @@ import {getOperator} from 'utils';
 import {getSpanSignature} from '../../services/SpanService';
 import CustomTable from '../CustomTable';
 import * as S from './TraceAssertionsTable.styled';
+import TraceAssertionTableAnalyticsService from '../../services/analytics/TraceAssertionTableAnalyticsService';
+
+const {onSpanAssertionClick} = TraceAssertionTableAnalyticsService;
 
 interface IProps {
   assertionResult: AssertionResult;
@@ -89,7 +92,12 @@ const TraceAssertionsResultTable: FC<IProps> = ({
         pagination={false}
         dataSource={parsedAssertionList}
         onRow={record => ({
-          onClick: () => onSpanSelected((record as TParsedAssertion).spanId),
+          onClick: () => {
+            const spanId = (record as TParsedAssertion).spanId;
+
+            onSpanAssertionClick(spanId);
+            onSpanSelected(spanId);
+          },
         })}
       >
         <Table.Column
