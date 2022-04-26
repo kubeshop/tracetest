@@ -142,6 +142,10 @@ func sendEvent(event Event) error {
 func sendValidationRequest(payload Payload) error {
 	response, body, err := sendPayloadToURL(payload, gaValidationURL)
 
+	if response.StatusCode >= 300 {
+		return fmt.Errorf("validation response got unexpected status. Got: %d", response.StatusCode)
+	}
+
 	validationResponse := validationResponse{}
 	err = json.Unmarshal(body, &validationResponse)
 	if err != nil {
@@ -151,10 +155,6 @@ func sendValidationRequest(payload Payload) error {
 	if len(validationResponse.ValidationMessages) > 0 {
 		fmt.Println(validationResponse)
 		return fmt.Errorf("google analytics request validation failed")
-	}
-
-	if response.StatusCode >= 300 {
-		return fmt.Errorf("validation response got unexpected status. Got: %d", response.StatusCode)
 	}
 
 	return err
