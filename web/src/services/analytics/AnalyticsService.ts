@@ -1,6 +1,6 @@
 import GA4React from 'ga-4-react';
 
-const {analyticsEnabled = 'true', measurementId = 'G-ZP277L2M37'} = window.ENV || {};
+const {analyticsEnabled = 'true', measurementId = ''} = window.ENV || {};
 
 export enum Categories {
   Home = 'home',
