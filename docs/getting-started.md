@@ -5,10 +5,9 @@ Please follow the [install steps](installing.md) for the first installation of T
 Once installed, you can get started by launching the Tracetest Dashboard by following these instructions:
 
 Run:
-
-kubectl config set-context --current --namespace=tracetest
-
+```sh
 kubectl port-forward svc/tracetest 8080
+```
 
 Then launch a browser to [http://localhost:8080/](http://localhost:8080/).
 
