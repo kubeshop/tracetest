@@ -138,8 +138,8 @@ func (tp tracePoller) processJob(job tracePollReq) {
 
 func (tp tracePoller) donePollingTraces(job tracePollReq, currentResults TestRunResult) bool {
 	// we're done if we have the same amount of spans after polling `maxTracePollRetry` times
-	return (len(currentResults.Trace.ResourceSpans) > 0 &&
-		len(currentResults.Trace.ResourceSpans) == len(job.result.Trace.ResourceSpans)) ||
+	return len(currentResults.Trace.ResourceSpans) > 0 &&
+		len(currentResults.Trace.ResourceSpans) == len(job.result.Trace.ResourceSpans) &&
 		job.count == tp.maxTracePollRetry
 }
 
