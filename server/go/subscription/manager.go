@@ -38,14 +38,14 @@ func (m *Manager) Subscribe(resourceID string, subscriber Subscriber) {
 	m.subscriptions[resourceID] = array
 }
 
-func (m *Manager) Unsubscribe(resourceID string, subscriber Subscriber) {
+func (m *Manager) Unsubscribe(resourceID string, subscriptionID string) {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
 
 	if array, ok := m.subscriptions[resourceID]; ok {
 		newArray := make([]Subscriber, 0, len(array)-1)
 		for _, item := range array {
-			if item.ID() != subscriber.ID() {
+			if item.ID() != subscriptionID {
 				newArray = append(newArray, item)
 			}
 		}

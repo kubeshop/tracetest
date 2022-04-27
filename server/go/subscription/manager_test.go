@@ -100,7 +100,7 @@ func TestManagerUnsubscribe(t *testing.T) {
 
 	assert.Equal(t, &message1, receivedMessage)
 
-	manager.Unsubscribe("test:1", subscriber)
+	manager.Unsubscribe("test:1", subscriber.ID())
 	manager.PublishUpdate("test:1", message2)
 
 	assert.Equal(t, &message1, receivedMessage, "subscriber should not be notified after unsubscribed")
