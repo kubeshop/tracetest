@@ -25,6 +25,7 @@ import (
 	httpServer "github.com/kubeshop/tracetest/http"
 	"github.com/kubeshop/tracetest/http/websocket"
 	"github.com/kubeshop/tracetest/openapi"
+	"github.com/kubeshop/tracetest/subscription"
 	"github.com/kubeshop/tracetest/testdb"
 	"github.com/kubeshop/tracetest/tracedb"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux"
@@ -66,7 +67,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	tracePoller := executor.NewTracePoller(traceDB, testDB, cfg.MaxWaitTimeForTraceDuration())
+	subscriptionManager := subscription.NewManager()
+
+	tracePoller := executor.NewTracePoller(traceDB, testDB, cfg.MaxWaitTimeForTraceDuration(), subscriptionManager)
 	tracePoller.Start(5) // worker count. should be configurable
 	defer tracePoller.Stop()
 
@@ -96,12 +99,16 @@ func main() {
 		log.Fatal(err)
 	}
 
-	go func() {
-		log.Printf("WS Server started")
+	go startWebsocketServer(subscriptionManager)
+	log.Printf("HTTP Server started")
+	log.Fatal(http.ListenAndServe(":8080", router))
+}
 
-		wsRouter := websocket.NewRouter()
-		wsRouter.ListenAndServe(":8081")
-	}()
+func startWebsocketServer(subscriptionManager *subscription.Manager) {
+	wsRouter := websocket.NewRouter()
+	wsRouter.Add("subscribe", websocket.NewSubscribeCommandExecutor(subscriptionManager))
+	wsRouter.Add("unsubscribe", websocket.NewUnsubscribeCommandExecutor(subscriptionManager))
+	log.Printf("WS Server started")
 
 	log.Printf("HTTP Server started")
 	log.Fatal(http.ListenAndServe(":8080", router))

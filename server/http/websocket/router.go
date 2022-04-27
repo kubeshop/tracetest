@@ -7,12 +7,20 @@ import (
 	"net/http"
 
 	"github.com/gorilla/websocket"
+	"github.com/kubeshop/tracetest/subscription"
 )
 
-type MessageExecutor func(*websocket.Conn, Message)
+type MessageExecutor interface {
+	Execute(*websocket.Conn, []byte)
+}
+
+type routingMessage struct {
+	Type string `json:"type"`
+}
 
 type Router struct {
-	routes map[string]MessageExecutor
+	routes              map[string]MessageExecutor
+	subscriptionManager *subscription.Manager
 }
 
 func NewRouter() *Router {
@@ -27,18 +35,18 @@ func (r *Router) Add(messageType string, executor MessageExecutor) {
 
 func (r *Router) ListenAndServe(addr string) {
 	routingFunction := func(conn *websocket.Conn, message []byte) {
-		messageObject := Message{}
+		messageObject := routingMessage{}
 		err := json.Unmarshal(message, &messageObject)
 		if err != nil {
-			errMessage := Error(fmt.Errorf("could not unmarshal message: %w", err))
+			errMessage := ErrorMessage(fmt.Errorf("could not unmarshal message: %w", err))
 			conn.WriteJSON(errMessage)
 			return
 		}
 
-		if handler, exists := r.routes[messageObject.Type]; exists {
-			handler(conn, messageObject)
+		if messageExecutor, exists := r.routes[messageObject.Type]; exists {
+			messageExecutor.Execute(conn, message)
 		} else {
-			conn.WriteJSON(Error(fmt.Errorf("No routes for message type %s", messageObject.Type)))
+			conn.WriteJSON(ErrorMessage(fmt.Errorf("No routes for message type %s", messageObject.Type)))
 		}
 	}
 

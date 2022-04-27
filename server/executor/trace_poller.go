@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/openapi"
+	"github.com/kubeshop/tracetest/subscription"
 	"github.com/kubeshop/tracetest/tracedb"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 )
@@ -29,7 +30,12 @@ type TraceFetcher interface {
 	GetTraceByID(ctx context.Context, traceID string) (*v1.TracesData, error)
 }
 
-func NewTracePoller(tf TraceFetcher, ru ResultUpdater, maxWaitTimeForTrace time.Duration) PersistentTracePoller {
+func NewTracePoller(
+	tf TraceFetcher,
+	ru ResultUpdater,
+	maxWaitTimeForTrace time.Duration,
+	subscriptionManager *subscription.Manager,
+) PersistentTracePoller {
 	retryDelay := 500 * time.Millisecond
 	maxTracePollRetry := int(math.Ceil(float64(maxWaitTimeForTrace) / float64(retryDelay)))
 	return tracePoller{
@@ -40,6 +46,7 @@ func NewTracePoller(tf TraceFetcher, ru ResultUpdater, maxWaitTimeForTrace time.
 		retryDelay:          retryDelay,
 		executeQueue:        make(chan tracePollReq, 5),
 		exit:                make(chan bool, 1),
+		subscriptionManager: subscriptionManager,
 	}
 }
 
@@ -52,6 +59,8 @@ type tracePoller struct {
 
 	executeQueue chan tracePollReq
 	exit         chan bool
+
+	subscriptionManager *subscription.Manager
 }
 
 type tracePollReq struct {
@@ -135,6 +144,12 @@ func (tp tracePoller) processJob(job tracePollReq) {
 	fmt.Printf("completed polling result %s after %d times\n", job.result.ResultId, job.count)
 
 	tp.handleDBError(tp.resultDB.UpdateResult(job.ctx, &res))
+
+	resource := fmt.Sprintf("test/%s/result/%s", res.TestId, res.ResultId)
+	tp.subscriptionManager.PublishUpdate(resource, subscription.Message{
+		Type:    "result_update",
+		Content: res,
+	})
 }
 
 func (tp tracePoller) donePollingTraces(job tracePollReq, currentResults openapi.TestRunResult) bool {
