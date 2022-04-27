@@ -13,7 +13,19 @@ type unsubscribeMessage struct {
 	SubscriptionId string `json:"subscriptionId"`
 }
 
-func HandleUnsubscribeCommand(conn *websocket.Conn, message []byte) {
+type UnsubscribeCommandExecutor struct {
+	subscriptionManager *subscription.Manager
+}
+
+func NewUnsubscribeCommandExecutor(manager *subscription.Manager) UnsubscribeCommandExecutor {
+	return UnsubscribeCommandExecutor{
+		subscriptionManager: manager,
+	}
+}
+
+var _ MessageExecutor = &UnsubscribeCommandExecutor{}
+
+func (e UnsubscribeCommandExecutor) Execute(conn *websocket.Conn, message []byte) {
 	msg := unsubscribeMessage{}
 	err := json.Unmarshal(message, &msg)
 	if err != nil {
@@ -26,8 +38,7 @@ func HandleUnsubscribeCommand(conn *websocket.Conn, message []byte) {
 		return
 	}
 
-	manager := subscription.GetManager()
-	manager.Unsubscribe(msg.Resource, msg.SubscriptionId)
+	e.subscriptionManager.Unsubscribe(msg.Resource, msg.SubscriptionId)
 
 	conn.WriteJSON(UnsubscribeSuccess())
 }

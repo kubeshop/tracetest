@@ -12,7 +12,19 @@ type subscriptionMessage struct {
 	Resource string `json:"resource"`
 }
 
-func HandleSubscribeCommand(conn *websocket.Conn, message []byte) {
+type SubscribeCommandExecutor struct {
+	subscriptionManager *subscription.Manager
+}
+
+func NewSubscribeCommandExecutor(manager *subscription.Manager) SubscribeCommandExecutor {
+	return SubscribeCommandExecutor{
+		subscriptionManager: manager,
+	}
+}
+
+var _ MessageExecutor = &SubscribeCommandExecutor{}
+
+func (e SubscribeCommandExecutor) Execute(conn *websocket.Conn, message []byte) {
 	msg := subscriptionMessage{}
 	err := json.Unmarshal(message, &msg)
 	if err != nil {
@@ -25,7 +37,7 @@ func HandleSubscribeCommand(conn *websocket.Conn, message []byte) {
 		return
 	}
 
-	messageConverter := subscription.NewSubscriberFunction(func(m *subscription.Message) error {
+	messageConverter := subscription.NewSubscriberFunction(func(m subscription.Message) error {
 		err := conn.WriteJSON(ResourceUpdatedEvent(m.Content))
 		if err != nil {
 			return fmt.Errorf("could not send update message: %w", err)
@@ -34,8 +46,7 @@ func HandleSubscribeCommand(conn *websocket.Conn, message []byte) {
 		return nil
 	})
 
-	manager := subscription.GetManager()
-	manager.Subscribe(msg.Resource, messageConverter)
+	e.subscriptionManager.Subscribe(msg.Resource, messageConverter)
 
 	conn.WriteJSON(SubscriptionSuccess(messageConverter.ID()))
 }

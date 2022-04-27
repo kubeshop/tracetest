@@ -23,6 +23,7 @@ import (
 	openapi "github.com/kubeshop/tracetest/server/go"
 	"github.com/kubeshop/tracetest/server/go/analytics"
 	"github.com/kubeshop/tracetest/server/go/executor"
+	"github.com/kubeshop/tracetest/server/go/subscription"
 	"github.com/kubeshop/tracetest/server/go/testdb"
 	"github.com/kubeshop/tracetest/server/go/tracedb"
 	"github.com/kubeshop/tracetest/server/go/tracedb/jaegerdb"
@@ -50,6 +51,8 @@ func main() {
 	ctx := context.Background()
 	tp := initOtelTracing(ctx)
 	defer func() { _ = tp.Shutdown(ctx) }()
+
+	subscriptionManager := subscription.NewManager()
 
 	testDB, err := testdb.New(c.PostgresConnString)
 	if err != nil {
@@ -83,7 +86,7 @@ func main() {
 		maxWaitTimeForTrace = 30 * time.Second
 	}
 
-	tracePoller := openapi.NewTracePoller(traceDB, testDB, maxWaitTimeForTrace)
+	tracePoller := openapi.NewTracePoller(traceDB, testDB, maxWaitTimeForTrace, subscriptionManager)
 	tracePoller.Start(5) // worker count. should be configurable
 	defer tracePoller.Stop()
 
@@ -113,15 +116,15 @@ func main() {
 		log.Fatal(err)
 	}
 
-	go startWebsocketServer()
+	go startWebsocketServer(subscriptionManager)
 	log.Printf("HTTP Server started")
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
 
-func startWebsocketServer() {
+func startWebsocketServer(subscriptionManager *subscription.Manager) {
 	wsRouter := websocket.NewRouter()
-	wsRouter.Add("subscribe", websocket.HandleSubscribeCommand)
-	wsRouter.Add("unsubscribe", websocket.HandleUnsubscribeCommand)
+	wsRouter.Add("subscribe", websocket.NewSubscribeCommandExecutor(subscriptionManager))
+	wsRouter.Add("unsubscribe", websocket.NewUnsubscribeCommandExecutor(subscriptionManager))
 	log.Printf("WS Server started")
 
 	wsRouter.ListenAndServe(":8081")

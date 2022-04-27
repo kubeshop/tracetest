@@ -29,7 +29,12 @@ type TraceFetcher interface {
 	GetTraceByID(ctx context.Context, traceID string) (*v1.TracesData, error)
 }
 
-func NewTracePoller(tf TraceFetcher, ru ResultUpdater, maxWaitTimeForTrace time.Duration) PersistentTracePoller {
+func NewTracePoller(
+	tf TraceFetcher,
+	ru ResultUpdater,
+	maxWaitTimeForTrace time.Duration,
+	subscriptionManager *subscription.Manager,
+) PersistentTracePoller {
 	retryDelay := 500 * time.Millisecond
 	maxTracePollRetry := int(math.Ceil(float64(maxWaitTimeForTrace) / float64(retryDelay)))
 	return tracePoller{
@@ -40,7 +45,7 @@ func NewTracePoller(tf TraceFetcher, ru ResultUpdater, maxWaitTimeForTrace time.
 		retryDelay:          retryDelay,
 		executeQueue:        make(chan tracePollReq, 5),
 		exit:                make(chan bool, 1),
-		subscriptionManager: subscription.GetManager(),
+		subscriptionManager: subscriptionManager,
 	}
 }
 
