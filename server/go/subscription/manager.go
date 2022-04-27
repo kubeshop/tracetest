@@ -9,15 +9,7 @@ type Manager struct {
 
 var managerInstance *Manager = nil
 
-func GetManager() *Manager {
-	if managerInstance == nil {
-		managerInstance = newManager()
-	}
-
-	return managerInstance
-}
-
-func newManager() *Manager {
+func NewManager() *Manager {
 	return &Manager{
 		subscriptions: make(map[string][]Subscriber),
 		mutex:         sync.Mutex{},

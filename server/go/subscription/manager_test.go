@@ -7,15 +7,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestManagerIsSingleton(t *testing.T) {
-	manager1 := subscription.GetManager()
-	manager2 := subscription.GetManager()
-
-	assert.Equal(t, manager1, manager2, "managers should be the same instance")
-}
-
 func TestManagerSubscriptionDifferentResources(t *testing.T) {
-	manager := subscription.GetManager()
+	manager := subscription.NewManager()
 	var messageReceivedBySubscriber1, messageReceivedBySubscriber2 *subscription.Message
 
 	subscriber1 := subscription.NewSubscriberFunction(func(message *subscription.Message) error {
@@ -49,7 +42,7 @@ func TestManagerSubscriptionDifferentResources(t *testing.T) {
 }
 
 func TestManagerSubscriptionSameResourceDifferentSubscribers(t *testing.T) {
-	manager := subscription.GetManager()
+	manager := subscription.NewManager()
 	var messageReceivedBySubscriber1, messageReceivedBySubscriber2 *subscription.Message
 
 	subscriber1 := subscription.NewSubscriberFunction(func(message *subscription.Message) error {
@@ -77,7 +70,7 @@ func TestManagerSubscriptionSameResourceDifferentSubscribers(t *testing.T) {
 }
 
 func TestManagerUnsubscribe(t *testing.T) {
-	manager := subscription.GetManager()
+	manager := subscription.NewManager()
 	var receivedMessage *subscription.Message
 
 	subscriber := subscription.NewSubscriberFunction(func(message *subscription.Message) error {
