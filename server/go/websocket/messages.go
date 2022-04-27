@@ -1,7 +1,5 @@
 package websocket
 
-import "encoding/json"
-
 type Message struct {
 	Type    string      `json:"type"`
 	Message interface{} `json:"message"`
@@ -27,9 +25,8 @@ func ErrorMessage(err error) Message {
 }
 
 func ResourceUpdatedEvent(resource interface{}) Event {
-	jsonContent, _ := json.Marshal(resource)
 	return Event{
 		Type:  "update",
-		Event: jsonContent,
+		Event: resource,
 	}
 }

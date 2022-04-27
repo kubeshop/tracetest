@@ -7,6 +7,7 @@ import (
 	"math"
 	"time"
 
+	"github.com/kubeshop/tracetest/server/go/subscription"
 	"github.com/kubeshop/tracetest/server/go/tracedb"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 )
@@ -39,6 +40,7 @@ func NewTracePoller(tf TraceFetcher, ru ResultUpdater, maxWaitTimeForTrace time.
 		retryDelay:          retryDelay,
 		executeQueue:        make(chan tracePollReq, 5),
 		exit:                make(chan bool, 1),
+		subscriptionManager: subscription.GetManager(),
 	}
 }
 
@@ -51,6 +53,8 @@ type tracePoller struct {
 
 	executeQueue chan tracePollReq
 	exit         chan bool
+
+	subscriptionManager *subscription.Manager
 }
 
 type tracePollReq struct {
@@ -133,7 +137,17 @@ func (tp tracePoller) processJob(job tracePollReq) {
 
 	fmt.Printf("completed polling result %s after %d times\n", job.result.ResultId, job.count)
 
-	tp.handleDBError(tp.resultDB.UpdateResult(job.ctx, &res))
+	err = tp.resultDB.UpdateResult(job.ctx, &res)
+	if err != nil {
+		tp.handleDBError(err)
+		return
+	}
+
+	resource := fmt.Sprintf("test/%s/result/%s", res.TestId, res.ResultId)
+	tp.subscriptionManager.PublishUpdate(resource, subscription.Message{
+		Type:    "result_update",
+		Content: res,
+	})
 }
 
 func (tp tracePoller) donePollingTraces(job tracePollReq, currentResults TestRunResult) bool {

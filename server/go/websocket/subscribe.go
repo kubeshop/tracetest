@@ -9,8 +9,7 @@ import (
 )
 
 type subscriptionMessage struct {
-	ResourceType string `json:"resourceType"`
-	ResourceID   string `json:"resourceId"`
+	Resource string `json:"resource"`
 }
 
 func HandleSubscribeCommand(conn *websocket.Conn, message []byte) {
@@ -21,8 +20,8 @@ func HandleSubscribeCommand(conn *websocket.Conn, message []byte) {
 		return
 	}
 
-	if msg.ResourceID == "" || msg.ResourceType == "" {
-		conn.WriteJSON(ErrorMessage(fmt.Errorf("either ResourceType or ResourceID is empty")))
+	if msg.Resource == "" {
+		conn.WriteJSON(ErrorMessage(fmt.Errorf("Resource cannot be empty")))
 		return
 	}
 
@@ -36,8 +35,7 @@ func HandleSubscribeCommand(conn *websocket.Conn, message []byte) {
 	})
 
 	manager := subscription.GetManager()
-	resourceName := fmt.Sprintf("%s:%s", msg.ResourceType, msg.ResourceID)
-	manager.Subscribe(resourceName, messageConverter)
+	manager.Subscribe(msg.Resource, messageConverter)
 
 	conn.WriteJSON(SuccessMessage("susbcribe"))
 }
