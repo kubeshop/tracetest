@@ -2,7 +2,8 @@ version: "3"
 services:
   tracetest:
     container_name: tracetest
-    image: kubeshop/tracetest:refactor
+    image: kubeshop/tracetest
+    build: .
     volumes:
       - ${PWD}/server/config.yaml:/app/config.yaml
     ports:
