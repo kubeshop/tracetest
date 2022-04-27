@@ -34,7 +34,7 @@ func (r *Router) ListenAndServe(addr string) {
 		messageObject := routingMessage{}
 		err := json.Unmarshal(message, &messageObject)
 		if err != nil {
-			errMessage := Error(fmt.Errorf("could not unmarshal message: %w", err))
+			errMessage := ErrorMessage(fmt.Errorf("could not unmarshal message: %w", err))
 			conn.WriteJSON(errMessage)
 			return
 		}
@@ -42,7 +42,7 @@ func (r *Router) ListenAndServe(addr string) {
 		if handler, exists := r.routes[messageObject.Type]; exists {
 			handler(conn, message)
 		} else {
-			conn.WriteJSON(Error(fmt.Errorf("No routes for message type %s", messageObject.Type)))
+			conn.WriteJSON(ErrorMessage(fmt.Errorf("No routes for message type %s", messageObject.Type)))
 		}
 	}
 

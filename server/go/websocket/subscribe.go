@@ -17,17 +17,17 @@ func HandleSubscribeCommand(conn *websocket.Conn, message []byte) {
 	msg := subscriptionMessage{}
 	err := json.Unmarshal(message, &msg)
 	if err != nil {
-		conn.WriteJSON(Error(fmt.Errorf("invalid subscription message: %w", err)))
+		conn.WriteJSON(ErrorMessage(fmt.Errorf("invalid subscription message: %w", err)))
 		return
 	}
 
 	if msg.ResourceID == "" || msg.ResourceType == "" {
-		conn.WriteJSON(Error(fmt.Errorf("either ResourceType or ResourceID is empty")))
+		conn.WriteJSON(ErrorMessage(fmt.Errorf("either ResourceType or ResourceID is empty")))
 		return
 	}
 
 	messageConverter := subscription.NewSubscriberFunction(func(m *subscription.Message) error {
-		err := conn.WriteJSON(UpdateMessage(m.Content))
+		err := conn.WriteJSON(ResourceUpdatedEvent(m.Content))
 		if err != nil {
 			return fmt.Errorf("could not send update message: %w", err)
 		}

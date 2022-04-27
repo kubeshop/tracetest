@@ -7,6 +7,11 @@ type Message struct {
 	Message interface{} `json:"message"`
 }
 
+type Event struct {
+	Type  string      `json:"type"`
+	Event interface{} `json:"event"`
+}
+
 func SuccessMessage(messageType string) Message {
 	return Message{
 		Type:    messageType,
@@ -14,17 +19,17 @@ func SuccessMessage(messageType string) Message {
 	}
 }
 
-func Error(err error) Message {
+func ErrorMessage(err error) Message {
 	return Message{
 		Type:    "error",
 		Message: err.Error(),
 	}
 }
 
-func UpdateMessage(object interface{}) Message {
-	jsonContent, _ := json.Marshal(object)
-	return Message{
-		Type:    "update",
-		Message: jsonContent,
+func ResourceUpdatedEvent(resource interface{}) Event {
+	jsonContent, _ := json.Marshal(resource)
+	return Event{
+		Type:  "update",
+		Event: jsonContent,
 	}
 }
