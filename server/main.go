@@ -99,16 +99,13 @@ func main() {
 		log.Fatal(err)
 	}
 
-	go startWebsocketServer(subscriptionManager)
-	log.Printf("HTTP Server started")
-	log.Fatal(http.ListenAndServe(":8080", router))
-}
-
-func startWebsocketServer(subscriptionManager *subscription.Manager) {
-	wsRouter := websocket.NewRouter()
-	wsRouter.Add("subscribe", websocket.NewSubscribeCommandExecutor(subscriptionManager))
-	wsRouter.Add("unsubscribe", websocket.NewUnsubscribeCommandExecutor(subscriptionManager))
-	log.Printf("WS Server started")
+	go func() {
+		wsRouter := websocket.NewRouter()
+		wsRouter.Add("subscribe", websocket.NewSubscribeCommandExecutor(subscriptionManager))
+		wsRouter.Add("unsubscribe", websocket.NewUnsubscribeCommandExecutor(subscriptionManager))
+		log.Printf("WS Server started")
+		wsRouter.ListenAndServe(":8081")
+	}()
 
 	log.Printf("HTTP Server started")
 	log.Fatal(http.ListenAndServe(":8080", router))

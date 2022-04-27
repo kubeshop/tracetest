@@ -18,7 +18,6 @@ server-vet:
 server-run:
 	cd server; go run main.go
 
-
 init-submodule:
 	git submodule init
 	git submodule update
