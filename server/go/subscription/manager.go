@@ -34,17 +34,19 @@ func (m *Manager) Unsubscribe(resourceID string, subscriptionID string) {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
 
-	if array, ok := m.subscriptions[resourceID]; ok {
-		newArray := make([]Subscriber, 0, len(array)-1)
-		for _, item := range array {
-			if item.ID() != subscriptionID {
-				newArray = append(newArray, item)
-			}
-		}
-
-		m.subscriptions[resourceID] = newArray
+	array, exists := m.subscriptions[resourceID]
+	if !exists {
+		return
 	}
 
+	newArray := make([]Subscriber, 0, len(array)-1)
+	for _, item := range array {
+		if item.ID() != subscriptionID {
+			newArray = append(newArray, item)
+		}
+	}
+
+	m.subscriptions[resourceID] = newArray
 }
 
 func (m *Manager) PublishUpdate(resourceID string, message Message) {
