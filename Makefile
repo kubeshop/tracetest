@@ -5,6 +5,7 @@ server-generate:
 
 	openapi-generator-cli generate -i api/openapi.yaml -g go-server -o $(TMPDIR)
 	mv $(TMPDIR)/go server/openapi
+	rm -f server/openapi/api_api_service.go
 	rm -rf $(TMPDIR)
 
 	cd server; pwd; go fmt ./...; cd ..
