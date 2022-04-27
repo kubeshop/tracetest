@@ -9,14 +9,14 @@ import (
 
 func TestManagerSubscriptionDifferentResources(t *testing.T) {
 	manager := subscription.NewManager()
-	var messageReceivedBySubscriber1, messageReceivedBySubscriber2 *subscription.Message
+	var messageReceivedBySubscriber1, messageReceivedBySubscriber2 subscription.Message
 
-	subscriber1 := subscription.NewSubscriberFunction(func(message *subscription.Message) error {
+	subscriber1 := subscription.NewSubscriberFunction(func(message subscription.Message) error {
 		messageReceivedBySubscriber1 = message
 		return nil
 	})
 
-	subscriber2 := subscription.NewSubscriberFunction(func(message *subscription.Message) error {
+	subscriber2 := subscription.NewSubscriberFunction(func(message subscription.Message) error {
 		messageReceivedBySubscriber2 = message
 		return nil
 	})
@@ -37,20 +37,20 @@ func TestManagerSubscriptionDifferentResources(t *testing.T) {
 	manager.PublishUpdate("test:1", test1Message)
 	manager.PublishUpdate("test:2", test2Message)
 
-	assert.Equal(t, &test1Message, messageReceivedBySubscriber1, "received message should be equal to the one sent")
-	assert.Equal(t, &test2Message, messageReceivedBySubscriber2, "received message should be equal to the one sent")
+	assert.Equal(t, test1Message, messageReceivedBySubscriber1, "received message should be equal to the one sent")
+	assert.Equal(t, test2Message, messageReceivedBySubscriber2, "received message should be equal to the one sent")
 }
 
 func TestManagerSubscriptionSameResourceDifferentSubscribers(t *testing.T) {
 	manager := subscription.NewManager()
-	var messageReceivedBySubscriber1, messageReceivedBySubscriber2 *subscription.Message
+	var messageReceivedBySubscriber1, messageReceivedBySubscriber2 subscription.Message
 
-	subscriber1 := subscription.NewSubscriberFunction(func(message *subscription.Message) error {
+	subscriber1 := subscription.NewSubscriberFunction(func(message subscription.Message) error {
 		messageReceivedBySubscriber1 = message
 		return nil
 	})
 
-	subscriber2 := subscription.NewSubscriberFunction(func(message *subscription.Message) error {
+	subscriber2 := subscription.NewSubscriberFunction(func(message subscription.Message) error {
 		messageReceivedBySubscriber2 = message
 		return nil
 	})
@@ -66,14 +66,15 @@ func TestManagerSubscriptionSameResourceDifferentSubscribers(t *testing.T) {
 	manager.PublishUpdate("test:1", test1Message)
 
 	assert.NotNil(t, messageReceivedBySubscriber1, "message received by subscriber should not be nil")
-	assert.Equal(t, messageReceivedBySubscriber1, messageReceivedBySubscriber2, "subscribers of the same resource should receive the same message")
+	assert.Equal(t, messageReceivedBySubscriber1.Type, messageReceivedBySubscriber2.Type, "subscribers of the same resource should receive the same message")
+	assert.Equal(t, messageReceivedBySubscriber1.Content, messageReceivedBySubscriber2.Content, "subscribers of the same resource should receive the same message")
 }
 
 func TestManagerUnsubscribe(t *testing.T) {
 	manager := subscription.NewManager()
-	var receivedMessage *subscription.Message
+	var receivedMessage subscription.Message
 
-	subscriber := subscription.NewSubscriberFunction(func(message *subscription.Message) error {
+	subscriber := subscription.NewSubscriberFunction(func(message subscription.Message) error {
 		receivedMessage = message
 		return nil
 	})
@@ -91,11 +92,13 @@ func TestManagerUnsubscribe(t *testing.T) {
 	manager.Subscribe("test:1", subscriber)
 	manager.PublishUpdate("test:1", message1)
 
-	assert.Equal(t, &message1, receivedMessage)
+	assert.Equal(t, message1.Type, receivedMessage.Type)
+	assert.Equal(t, message1.Content, receivedMessage.Content)
 
 	manager.Unsubscribe("test:1", subscriber.ID())
 	manager.PublishUpdate("test:1", message2)
 
-	assert.Equal(t, &message1, receivedMessage, "subscriber should not be notified after unsubscribed")
+	assert.Equal(t, message1.Type, receivedMessage.Type, "subscriber should not be notified after unsubscribed")
+	assert.Equal(t, message1.Content, receivedMessage.Content, "subscriber should not be notified after unsubscribed")
 
 }

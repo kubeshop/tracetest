@@ -53,7 +53,7 @@ func (m *Manager) PublishUpdate(resourceID string, message Message) {
 
 	if subscribers, ok := m.subscriptions[resourceID]; ok {
 		for _, subscriber := range subscribers {
-			(subscriber).Notify(&message)
+			subscriber.Notify(message)
 		}
 	}
 }
