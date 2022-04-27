@@ -1,5 +1,16 @@
 version: "3"
 services:
+  tracetest:
+    container_name: tracetest
+    image: kubeshop/tracetest:refactor
+    volumes:
+      - ${PWD}/server/config.yaml:/app/config.yaml
+    ports:
+      - 8080:8080
+      - 8081:8081
+    depends_on:
+      - postgres
+
   postgres:
     container_name: postgres
     image: postgres
@@ -7,3 +18,9 @@ services:
       POSTGRES_PASSWORD: postgres
     ports:
       - 5432:5432
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "6831:6831/udp"
+      - "16686:16686"

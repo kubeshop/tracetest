@@ -9,6 +9,16 @@ server-generate:
 
 	cd server; pwd; go fmt ./...; cd ..
 
+server-test:
+	cd server; go test ./...
+
+server-vet:
+	cd server; go vet ./...
+
+server-run:
+	cd server; go run main.go
+
+
 init-submodule:
 	git submodule init
 	git submodule update
