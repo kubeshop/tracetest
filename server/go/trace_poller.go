@@ -142,11 +142,7 @@ func (tp tracePoller) processJob(job tracePollReq) {
 
 	fmt.Printf("completed polling result %s after %d times\n", job.result.ResultId, job.count)
 
-	err = tp.resultDB.UpdateResult(job.ctx, &res)
-	if err != nil {
-		tp.handleDBError(err)
-		return
-	}
+	tp.handleDBError(tp.resultDB.UpdateResult(job.ctx, &res))
 
 	resource := fmt.Sprintf("test/%s/result/%s", res.TestId, res.ResultId)
 	tp.subscriptionManager.PublishUpdate(resource, subscription.Message{
