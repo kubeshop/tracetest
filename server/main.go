@@ -120,6 +120,7 @@ func main() {
 
 func startWebsocketServer() {
 	wsRouter := websocket.NewRouter()
+	wsRouter.Add("subscribe", websocket.HandleSubscribeCommand)
 	log.Printf("WS Server started")
 
 	wsRouter.ListenAndServe(":8081")
