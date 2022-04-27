@@ -19,6 +19,7 @@ import (
 	"os"
 
 	"github.com/kubeshop/tracetest/config"
+	"github.com/kubeshop/tracetest/testdb"
 	"github.com/kubeshop/tracetest/tracedb"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
@@ -43,10 +44,10 @@ func main() {
 	tp := initOtelTracing(ctx)
 	defer func() { _ = tp.Shutdown(ctx) }()
 
-	// testDB, err := testdb.New(c.PostgresConnString)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+	_, err = testdb.Postgres(cfg.PostgresConnString)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	_, err = tracedb.New(cfg)
 	if err != nil {
