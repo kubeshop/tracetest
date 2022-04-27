@@ -1,6 +1,12 @@
-
+OPENAPI_SERVER_TARGET_DIR=./server/openapi
 server-generate:
-	openapi-generator-cli generate -i api/openapi.yaml -g go-server -o server/
+	$(eval TMPDIR := $(shell mktemp -d))
+	rm -rf $(OPENAPI_SERVER_TARGET_DIR)
+
+	openapi-generator-cli generate -i api/openapi.yaml -g go-server -o $(TMPDIR)
+	mv $(TMPDIR)/go server/openapi
+	rm -rf $(TMPDIR)
+
 	cd server; pwd; go fmt ./...; cd ..
 
 init-submodule:
@@ -81,4 +87,3 @@ build:
 .PHONY: test
 test:
 	cd server; go test ./... -coverprofile ../cover.out; cd ../
-
