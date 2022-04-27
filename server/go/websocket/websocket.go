@@ -50,16 +50,20 @@ func keepAlive(conn *websocket.Conn, timeout time.Duration) {
 		return nil
 	})
 
+	ticker := time.NewTicker(timeout / 2)
+
 	go func() {
 		for {
-			err := conn.WriteMessage(websocket.PingMessage, []byte("keepalive"))
-			if err != nil {
-				return
-			}
-			time.Sleep(timeout / 2)
-			if time.Since(lastResponse) > timeout {
-				conn.Close()
-				return
+			select {
+			case <-ticker.C:
+				err := conn.WriteMessage(websocket.PingMessage, []byte("keepalive"))
+				if err != nil {
+					return
+				}
+				if time.Since(lastResponse) > timeout {
+					conn.Close()
+					return
+				}
 			}
 		}
 	}()
