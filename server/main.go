@@ -17,11 +17,17 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"regexp"
 
+	"github.com/kubeshop/tracetest/analytics"
 	"github.com/kubeshop/tracetest/config"
 	"github.com/kubeshop/tracetest/executor"
+	httpServer "github.com/kubeshop/tracetest/http"
+	"github.com/kubeshop/tracetest/http/websocket"
+	"github.com/kubeshop/tracetest/openapi"
 	"github.com/kubeshop/tracetest/testdb"
 	"github.com/kubeshop/tracetest/tracedb"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
@@ -68,39 +74,38 @@ func main() {
 	runner.Start(5) // worker count. should be configurable
 	defer runner.Stop()
 
-	// apiApiService := openapi.NewApiApiService(traceDB, testDB, runner)
-	// apiApiController := openapi.NewApiApiController(apiApiService)
+	controller := httpServer.NewController(traceDB, testDB, runner)
+	apiApiController := openapi.NewApiApiController(controller)
 
-	// router := openapi.NewRouter(apiApiController)
-	// router.Use(otelmux.Middleware("tracetest"))
+	router := openapi.NewRouter(apiApiController)
+	router.Use(otelmux.Middleware("tracetest"))
 
-	// dir := "./html"
-	// fileServer := http.FileServer(http.Dir(dir))
-	// fileMatcher := regexp.MustCompile(`\.[a-zA-Z]*$`)
-	// router.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-	// 	if !fileMatcher.MatchString(r.URL.Path) {
-	// 		serveIndex(w, dir+"/index.html")
-	// 	} else {
-	// 		fileServer.ServeHTTP(w, r)
-	// 	}
-	// })
+	dir := "./html"
+	fileServer := http.FileServer(http.Dir(dir))
+	fileMatcher := regexp.MustCompile(`\.[a-zA-Z]*$`)
+	router.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if !fileMatcher.MatchString(r.URL.Path) {
+			serveIndex(w, dir+"/index.html")
+		} else {
+			fileServer.ServeHTTP(w, r)
+		}
+	})
 
-	// err = analytics.CreateAndSendEvent("server_started", "beacon")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+	err = analytics.CreateAndSendEvent("server_started", "beacon")
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	// go startWebsocketServer()
-	// log.Printf("HTTP Server started")
-	// log.Fatal(http.ListenAndServe(":8080", router))
+	go func() {
+		log.Printf("WS Server started")
+
+		wsRouter := websocket.NewRouter()
+		wsRouter.ListenAndServe(":8081")
+	}()
+
+	log.Printf("HTTP Server started")
+	log.Fatal(http.ListenAndServe(":8080", router))
 }
-
-// func startWebsocketServer() {
-// 	wsRouter := websocket.NewRouter()
-// 	log.Printf("WS Server started")
-
-// 	wsRouter.ListenAndServe(":8081")
-// }
 
 type gaParams struct {
 	MeasurementId    string
