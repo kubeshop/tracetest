@@ -27,6 +27,7 @@ import (
 	"github.com/kubeshop/tracetest/server/go/tracedb"
 	"github.com/kubeshop/tracetest/server/go/tracedb/jaegerdb"
 	"github.com/kubeshop/tracetest/server/go/tracedb/tempodb"
+	"github.com/kubeshop/tracetest/server/go/websocket"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
@@ -112,8 +113,16 @@ func main() {
 		log.Fatal(err)
 	}
 
-	log.Printf("Server started")
+	go startWebsocketServer()
+	log.Printf("HTTP Server started")
 	log.Fatal(http.ListenAndServe(":8080", router))
+}
+
+func startWebsocketServer() {
+	wsRouter := websocket.NewRouter()
+	log.Printf("WS Server started")
+
+	wsRouter.ListenAndServe(":8081")
 }
 
 type gaParams struct {
