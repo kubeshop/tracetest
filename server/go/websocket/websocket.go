@@ -25,7 +25,7 @@ func createHandler(messageExecutor func(*websocket.Conn, []byte)) http.HandlerFu
 			messageType, message, err := conn.ReadMessage()
 			if err != nil {
 				log.Printf("could not read message: %s\n", err.Error())
-				continue
+				break
 			}
 
 			if messageType != websocket.TextMessage {
