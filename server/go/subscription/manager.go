@@ -7,8 +7,6 @@ type Manager struct {
 	mutex         sync.Mutex
 }
 
-var managerInstance *Manager = nil
-
 func NewManager() *Manager {
 	return &Manager{
 		subscriptions: make(map[string][]Subscriber),
