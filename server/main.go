@@ -17,18 +17,9 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"regexp"
-	"time"
 
-	openapi "github.com/kubeshop/tracetest/server/go"
-	"github.com/kubeshop/tracetest/server/go/analytics"
-	"github.com/kubeshop/tracetest/server/go/executor"
-	"github.com/kubeshop/tracetest/server/go/testdb"
-	"github.com/kubeshop/tracetest/server/go/tracedb"
-	"github.com/kubeshop/tracetest/server/go/tracedb/jaegerdb"
-	"github.com/kubeshop/tracetest/server/go/tracedb/tempodb"
-	"github.com/kubeshop/tracetest/server/go/websocket"
-	"go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux"
+	"github.com/kubeshop/tracetest/config"
+	"github.com/kubeshop/tracetest/tracedb"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
@@ -43,87 +34,77 @@ var cfg = flag.String("config", "config.yaml", "path to the config file")
 
 func main() {
 	flag.Parse()
-	c, err := LoadConfig(*cfg)
+	cfg, err := config.FromFile(*cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	ctx := context.Background()
 	tp := initOtelTracing(ctx)
 	defer func() { _ = tp.Shutdown(ctx) }()
 
-	testDB, err := testdb.New(c.PostgresConnString)
+	// testDB, err := testdb.New(c.PostgresConnString)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	_, err = tracedb.New(cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	var traceDB tracedb.TraceDB
-	switch {
-	case c.JaegerConnectionConfig != nil:
-		log.Printf("connecting to Jaeger: %s\n", c.JaegerConnectionConfig.Endpoint)
-		traceDB, err = jaegerdb.New(c.JaegerConnectionConfig)
-		if err != nil {
-			log.Fatal(err)
-		}
-	case c.TempoConnectionConfig != nil:
-		log.Printf("connecting to tempo: %s\n", c.TempoConnectionConfig.Endpoint)
-		traceDB, err = tempodb.New(c.TempoConnectionConfig)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
+	// ex, err := executor.New()
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
-	ex, err := executor.New()
-	if err != nil {
-		log.Fatal(err)
-	}
+	// maxWaitTimeForTrace, err := time.ParseDuration(c.MaxWaitTimeForTrace)
+	// if err != nil {
+	// 	// use a default value
+	// 	maxWaitTimeForTrace = 30 * time.Second
+	// }
 
-	maxWaitTimeForTrace, err := time.ParseDuration(c.MaxWaitTimeForTrace)
-	if err != nil {
-		// use a default value
-		maxWaitTimeForTrace = 30 * time.Second
-	}
+	// tracePoller := openapi.NewTracePoller(traceDB, testDB, maxWaitTimeForTrace)
+	// tracePoller.Start(5) // worker count. should be configurable
+	// defer tracePoller.Stop()
 
-	tracePoller := openapi.NewTracePoller(traceDB, testDB, maxWaitTimeForTrace)
-	tracePoller.Start(5) // worker count. should be configurable
-	defer tracePoller.Stop()
+	// runner := openapi.NewPersistentRunner(ex, testDB, tracePoller)
+	// runner.Start(5) // worker count. should be configurable
+	// defer runner.Stop()
 
-	runner := openapi.NewPersistentRunner(ex, testDB, tracePoller)
-	runner.Start(5) // worker count. should be configurable
-	defer runner.Stop()
+	// apiApiService := openapi.NewApiApiService(traceDB, testDB, runner)
+	// apiApiController := openapi.NewApiApiController(apiApiService)
 
-	apiApiService := openapi.NewApiApiService(traceDB, testDB, runner)
-	apiApiController := openapi.NewApiApiController(apiApiService)
+	// router := openapi.NewRouter(apiApiController)
+	// router.Use(otelmux.Middleware("tracetest"))
 
-	router := openapi.NewRouter(apiApiController)
-	router.Use(otelmux.Middleware("tracetest"))
+	// dir := "./html"
+	// fileServer := http.FileServer(http.Dir(dir))
+	// fileMatcher := regexp.MustCompile(`\.[a-zA-Z]*$`)
+	// router.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	// 	if !fileMatcher.MatchString(r.URL.Path) {
+	// 		serveIndex(w, dir+"/index.html")
+	// 	} else {
+	// 		fileServer.ServeHTTP(w, r)
+	// 	}
+	// })
 
-	dir := "./html"
-	fileServer := http.FileServer(http.Dir(dir))
-	fileMatcher := regexp.MustCompile(`\.[a-zA-Z]*$`)
-	router.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if !fileMatcher.MatchString(r.URL.Path) {
-			serveIndex(w, dir+"/index.html")
-		} else {
-			fileServer.ServeHTTP(w, r)
-		}
-	})
+	// err = analytics.CreateAndSendEvent("server_started", "beacon")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
-	err = analytics.CreateAndSendEvent("server_started", "beacon")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	go startWebsocketServer()
-	log.Printf("HTTP Server started")
-	log.Fatal(http.ListenAndServe(":8080", router))
+	// go startWebsocketServer()
+	// log.Printf("HTTP Server started")
+	// log.Fatal(http.ListenAndServe(":8080", router))
 }
 
-func startWebsocketServer() {
-	wsRouter := websocket.NewRouter()
-	log.Printf("WS Server started")
+// func startWebsocketServer() {
+// 	wsRouter := websocket.NewRouter()
+// 	log.Printf("WS Server started")
 
-	wsRouter.ListenAndServe(":8081")
-}
+// 	wsRouter.ListenAndServe(":8081")
+// }
 
 type gaParams struct {
 	MeasurementId    string
