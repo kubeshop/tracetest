@@ -10,10 +10,19 @@ type Event struct {
 	Event interface{} `json:"event"`
 }
 
-func SuccessMessage(messageType string) Message {
+func SubscriptionSuccess(subscriptionId string) Message {
 	return Message{
-		Type:    messageType,
-		Message: "success",
+		Type: "success",
+		Message: struct {
+			SubscriptionId string `json:"subscriptionId"`
+		}{SubscriptionId: subscriptionId},
+	}
+}
+
+func UnsubscribeSuccess() Message {
+	return Message{
+		Type:    "success",
+		Message: "ok",
 	}
 }
 

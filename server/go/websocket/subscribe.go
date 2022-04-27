@@ -37,5 +37,5 @@ func HandleSubscribeCommand(conn *websocket.Conn, message []byte) {
 	manager := subscription.GetManager()
 	manager.Subscribe(msg.Resource, messageConverter)
 
-	conn.WriteJSON(SuccessMessage("susbcribe"))
+	conn.WriteJSON(SubscriptionSuccess(messageConverter.ID()))
 }
