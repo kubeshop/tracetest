@@ -19,6 +19,7 @@ import (
 	"os"
 
 	"github.com/kubeshop/tracetest/config"
+	"github.com/kubeshop/tracetest/executor"
 	"github.com/kubeshop/tracetest/testdb"
 	"github.com/kubeshop/tracetest/tracedb"
 	"go.opentelemetry.io/otel"
@@ -54,10 +55,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// ex, err := executor.New()
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+	_, err = executor.New()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// maxWaitTimeForTrace, err := time.ParseDuration(c.MaxWaitTimeForTrace)
 	// if err != nil {
