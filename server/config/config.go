@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"io/ioutil"
+	"time"
 
 	"github.com/mitchellh/mapstructure"
 	"go.opentelemetry.io/collector/config/configgrpc"
@@ -14,6 +15,15 @@ type Config struct {
 	JaegerConnectionConfig *configgrpc.GRPCClientSettings `mapstructure:"jaegerConnectionConfig"`
 	TempoConnectionConfig  *configgrpc.GRPCClientSettings `mapstructure:"tempoConnectionConfig"`
 	MaxWaitTimeForTrace    string                         `mapstructure:"maxWaitTimeForTrace"`
+}
+
+func (c Config) MaxWaitTimeForTraceDuration() time.Duration {
+	maxWaitTimeForTrace, err := time.ParseDuration(c.MaxWaitTimeForTrace)
+	if err != nil {
+		// use a default value
+		maxWaitTimeForTrace = 30 * time.Second
+	}
+	return maxWaitTimeForTrace
 }
 
 func FromFile(file string) (Config, error) {

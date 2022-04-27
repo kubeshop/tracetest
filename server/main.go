@@ -45,34 +45,28 @@ func main() {
 	tp := initOtelTracing(ctx)
 	defer func() { _ = tp.Shutdown(ctx) }()
 
-	_, err = testdb.Postgres(cfg.PostgresConnString)
+	testDB, err := testdb.Postgres(cfg.PostgresConnString)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	_, err = tracedb.New(cfg)
+	traceDB, err := tracedb.New(cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	_, err = executor.New()
+	ex, err := executor.New()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// maxWaitTimeForTrace, err := time.ParseDuration(c.MaxWaitTimeForTrace)
-	// if err != nil {
-	// 	// use a default value
-	// 	maxWaitTimeForTrace = 30 * time.Second
-	// }
+	tracePoller := executor.NewTracePoller(traceDB, testDB, cfg.MaxWaitTimeForTraceDuration())
+	tracePoller.Start(5) // worker count. should be configurable
+	defer tracePoller.Stop()
 
-	// tracePoller := openapi.NewTracePoller(traceDB, testDB, maxWaitTimeForTrace)
-	// tracePoller.Start(5) // worker count. should be configurable
-	// defer tracePoller.Stop()
-
-	// runner := openapi.NewPersistentRunner(ex, testDB, tracePoller)
-	// runner.Start(5) // worker count. should be configurable
-	// defer runner.Stop()
+	runner := executor.NewPersistentRunner(ex, testDB, tracePoller)
+	runner.Start(5) // worker count. should be configurable
+	defer runner.Stop()
 
 	// apiApiService := openapi.NewApiApiService(traceDB, testDB, runner)
 	// apiApiController := openapi.NewApiApiController(apiApiService)
