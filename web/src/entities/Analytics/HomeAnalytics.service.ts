@@ -24,7 +24,7 @@ const HomeAnalyticsService = (): THomeAnalytics => {
   };
 
   const onTestClick = (testId: string) => {
-    event(Actions.GuidedTourClick, testId);
+    event(Actions.TestClick, testId);
   };
 
   return {
