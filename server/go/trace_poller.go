@@ -140,7 +140,7 @@ func (tp tracePoller) processJob(job tracePollReq) {
 	}
 	res.Trace = currentTr
 
-	fmt.Printf("completed polling result %s after %d times\n", job.result.ResultId, job.count)
+	fmt.Printf("completed polling result %s after %d times, number of spans: %d \n", job.result.ResultId, job.count, numSpans(currentTr))
 
 	tp.handleDBError(tp.resultDB.UpdateResult(job.ctx, &res))
 
@@ -151,10 +151,24 @@ func (tp tracePoller) processJob(job tracePollReq) {
 	})
 }
 
+// to compare trace we count the number of resourceSpans + InstrumentationLibrarySpans + spans.
+func numSpans(trace ApiV3SpansResponseChunk) int {
+	num := 0
+	for _, rsp := range trace.ResourceSpans {
+		num++
+		for _, ils := range rsp.InstrumentationLibrarySpans {
+			num++
+
+			num += len(ils.Spans)
+		}
+	}
+	return num
+}
+
 func (tp tracePoller) donePollingTraces(job tracePollReq, currentTrace ApiV3SpansResponseChunk) bool {
 	// we're done if we have the same amount of spans after polling or `maxTracePollRetry` times
 	return (len(currentTrace.ResourceSpans) > 0 &&
-		len(currentTrace.ResourceSpans) == len(job.result.Trace.ResourceSpans)) ||
+		numSpans(currentTrace) == numSpans(job.result.Trace)) ||
 		job.count == tp.maxTracePollRetry
 }
 
