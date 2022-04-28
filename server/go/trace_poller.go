@@ -35,7 +35,7 @@ func NewTracePoller(
 	maxWaitTimeForTrace time.Duration,
 	subscriptionManager *subscription.Manager,
 ) PersistentTracePoller {
-	retryDelay := 500 * time.Millisecond
+	retryDelay := 1 * time.Second
 	maxTracePollRetry := int(math.Ceil(float64(maxWaitTimeForTrace) / float64(retryDelay)))
 	return tracePoller{
 		traceDB:             tf,
