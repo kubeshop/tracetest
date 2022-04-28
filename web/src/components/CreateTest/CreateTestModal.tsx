@@ -2,13 +2,13 @@ import {useRef} from 'react';
 import {useTour} from '@reactour/tour';
 import {Modal, Form, Input, Button, Select, Checkbox} from 'antd';
 import {DeleteOutlined} from '@ant-design/icons';
-import {useCreateTestMutation, useRunTestMutation} from 'redux/services/TestService';
-import {HTTP_METHOD} from 'types';
+import {useCreateTestMutation, useRunTestMutation} from 'gateways/Test.gateway';
 import './CreateTest.css';
 import {useNavigate} from 'react-router-dom';
-import GuidedTourService, {GuidedTours} from '../../services/GuidedTourService';
+import GuidedTourService, {GuidedTours} from '../../entities/GuidedTour/GuidedTour.service';
 import {Steps} from '../GuidedTour/homeStepList';
-import CreateTestAnalyticsService from '../../services/analytics/CreateTestAnalyticsService';
+import CreateTestAnalyticsService from '../../entities/Analytics/CreateTestAnalytics.service';
+import { HTTP_METHOD } from '../../constants/Common.contants';
 
 interface IProps {
   visible: boolean;

@@ -2,12 +2,13 @@ import Text from 'antd/lib/typography/Text';
 import {upperCase} from 'lodash';
 import React from 'react';
 import {Handle, NodeProps, Position} from 'react-flow-renderer';
-import {ISpan, ITrace} from 'types';
-import {SemanticGroupNames, SemanticGroupNamesToText} from '../../lib/SelectorDefaultAttributes';
-import {getSpanNodeInfo} from '../../services/SpanService';
+import {SemanticGroupNames, SemanticGroupNamesToText} from '../../constants/SemanticGroupNames.constants';
+import {getSpanNodeInfo} from '../../entities/Span/Span.service';
+import {TSpan} from '../../entities/Span/Span.types';
+import {TTrace} from '../../entities/Trace/Trace.types';
 import * as S from './TraceDiagram.styled';
 
-type TTraceNodeProps = NodeProps<{span: ISpan; trace: ITrace}>;
+type TTraceNodeProps = NodeProps<{span: TSpan; trace: TTrace}>;
 
 const TraceNode: React.FC<TTraceNodeProps> = ({
   id,

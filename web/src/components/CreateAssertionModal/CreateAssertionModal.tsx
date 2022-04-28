@@ -1,17 +1,19 @@
 import {useCallback, useState} from 'react';
 import {Modal, Typography, FormInstance} from 'antd';
 
-import {Assertion, ISpan, ItemSelector, ITrace} from 'types';
 import CreateAssertionForm, {TValues} from './CreateAssertionForm';
-import {getEffectedSpansCount} from '../../services/AssertionService';
+import {getEffectedSpansCount} from '../../entities/Assertion/Assertion.service';
+import { TSpan } from '../../entities/Span/Span.types';
+import { TTrace } from '../../entities/Trace/Trace.types';
+import { TAssertion, TItemSelector } from '../../entities/Assertion/Assertion.types';
 
 interface IProps {
   open: boolean;
   onClose: () => void;
-  span: ISpan;
+  span: TSpan;
   testId: string;
-  trace: ITrace;
-  assertion?: Assertion;
+  trace: TTrace;
+  assertion?: TAssertion;
 }
 
 const effectedSpanMessage = (spanCount: number) => {
@@ -24,13 +26,13 @@ const effectedSpanMessage = (spanCount: number) => {
 
 const CreateAssertionModal = ({testId, span, trace, open, onClose, assertion}: IProps) => {
   const [form, setForm] = useState<FormInstance<TValues>>();
-  const [selectorList, setSelectorList] = useState<ItemSelector[]>([]);
+  const [selectorList, setSelectorList] = useState<TItemSelector[]>([]);
 
   const onForm = useCallback((formInstance: FormInstance) => {
     setForm(formInstance);
   }, []);
 
-  const onSelectorList = useCallback((selectorListData: ItemSelector[]) => {
+  const onSelectorList = useCallback((selectorListData: TItemSelector[]) => {
     setSelectorList(selectorListData);
   }, []);
 

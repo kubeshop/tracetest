@@ -2,18 +2,19 @@ import {Table, Typography} from 'antd';
 import {useStore} from 'react-flow-renderer';
 import {difference, sortBy} from 'lodash';
 import {FC, useCallback, useMemo} from 'react';
-import {AssertionResult, ITrace} from 'types';
-import {getOperator} from 'utils';
-import {getSpanSignature} from '../../services/SpanService';
+import {getSpanSignature} from '../../entities/Span/Span.service';
 import CustomTable from '../CustomTable';
 import * as S from './TraceAssertionsTable.styled';
-import TraceAssertionTableAnalyticsService from '../../services/analytics/TraceAssertionTableAnalyticsService';
+import TraceAssertionTableAnalyticsService from '../../entities/Analytics/TraceAssertionTableAnalytics.service';
+import {TAssertionResult} from '../../entities/Assertion/Assertion.types';
+import {TTrace} from '../../entities/Trace/Trace.types';
+import OperatorService from '../../entities/Operator/Operator.service';
 
 const {onSpanAssertionClick} = TraceAssertionTableAnalyticsService;
 
 interface IProps {
-  assertionResult: AssertionResult;
-  trace: ITrace;
+  assertionResult: TAssertionResult;
+  trace: TTrace;
   onSpanSelected(spanId: string): void;
 }
 
@@ -115,7 +116,12 @@ const TraceAssertionsResultTable: FC<IProps> = ({
           }
         />
         <Table.Column title="Property" dataIndex="property" key="property" ellipsis width="25%" />
-        <Table.Column title="Comparison" dataIndex="comparison" key="comparison" render={value => getOperator(value)} />
+        <Table.Column
+          title="Comparison"
+          dataIndex="comparison"
+          key="comparison"
+          render={value => OperatorService.getOperatorName(value)}
+        />
         <Table.Column title="Value" dataIndex="value" key="value" />
         <Table.Column
           title="Actual"

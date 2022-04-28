@@ -2,12 +2,12 @@ import {TagOutlined} from '@ant-design/icons';
 import {AutoComplete, Checkbox, Input, Tag} from 'antd';
 import {noop} from 'lodash';
 import React, {useCallback, useMemo, useState} from 'react';
-import {ItemSelector} from '../../types';
+import { TItemSelector } from '../../entities/Assertion/Assertion.types';
 
 type TItemSelectorDropdownProps = {
-  spanSignature: ItemSelector[];
-  value?: ItemSelector[];
-  onChange?(selectorList: ItemSelector[]): void;
+  spanSignature: TItemSelector[];
+  value?: TItemSelector[];
+  onChange?(selectorList: TItemSelector[]): void;
 };
 
 export const CreateAssertionSelectorInput: React.FC<TItemSelectorDropdownProps> = ({
@@ -52,7 +52,7 @@ export const CreateAssertionSelectorInput: React.FC<TItemSelectorDropdownProps> 
   );
 
   const handleDeleteItemSelector = useCallback(
-    (item: ItemSelector) => {
+    (item: TItemSelector) => {
       onChange(selectorList.filter(({propertyName}) => propertyName !== item.propertyName));
     },
     [onChange, selectorList]
@@ -61,7 +61,7 @@ export const CreateAssertionSelectorInput: React.FC<TItemSelectorDropdownProps> 
   return (
     <>
       <div style={{display: 'flex', flexWrap: 'wrap'}}>
-        {selectorList.map((item: ItemSelector) => (
+        {selectorList.map((item: TItemSelector) => (
           <Tag
             key={item.propertyName}
             style={{marginBottom: 8}}

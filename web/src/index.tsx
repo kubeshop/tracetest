@@ -4,7 +4,7 @@ import './index.css';
 import App from './App';
 
 import * as serviceWorker from './serviceWorker';
-import {TEnv} from './types';
+import {TEnv} from './types/Common.types';
 
 declare global {
   interface Window {

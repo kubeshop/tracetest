@@ -4,11 +4,11 @@ import {delay} from 'lodash';
 // import {InfoCircleOutlined} from '@ant-design/icons';
 import CreateTestModal from 'components/CreateTest';
 import {Steps} from 'components/GuidedTour/homeStepList';
-import GuidedTourService, {GuidedTours} from 'services/GuidedTourService';
+import GuidedTourService, {GuidedTours} from 'entities/GuidedTour/GuidedTour.service';
 import useGuidedTour from 'hooks/useGuidedTour';
 import TestList from './TestList';
 import * as S from './Home.styled';
-import HomeAnalyticsService from '../../services/analytics/HomeAnalyticsService';
+import HomeAnalyticsService from '../../entities/Analytics/HomeAnalytics.service';
 
 const {onCreateTestClick} = HomeAnalyticsService;
 

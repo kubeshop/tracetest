@@ -1,14 +1,14 @@
 import {Typography} from 'antd';
 import SkeletonTable from 'components/SkeletonTable';
 import {FC, useMemo} from 'react';
-import {getResourceSpanBySpanId, getSpanAttributeList} from '../../services/SpanService';
-import {ITrace} from '../../types';
+import {getResourceSpanBySpanId, getSpanAttributeList} from '../../entities/Span/Span.service';
+import { TTrace } from '../../entities/Trace/Trace.types';
 import SpanAttributesTable from '../SpanAttributesTable/SpanAttributesTable';
 import * as S from './Attributes.styled';
 
 type TAttributesProps = {
   spanId?: string;
-  trace?: ITrace;
+  trace?: TTrace;
 };
 
 const Attributes: FC<TAttributesProps> = ({spanId, trace}) => {

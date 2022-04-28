@@ -1,5 +1,6 @@
 import {Badge, BadgeProps} from 'antd';
-import {TestRunResult, TestState} from 'types';
+import { TestState } from '../../entities/TestRunResult/TestRunResult.constants';
+import { TTestRunResult } from '../../entities/TestRunResult/TestRunResult.types';
 
 const BadgeStatusMap: Record<
   TestState,
@@ -32,7 +33,7 @@ const BadgeStatusMap: Record<
 };
 
 interface IProps extends BadgeProps {
-  testState: TestRunResult['state'];
+  testState: TTestRunResult['state'];
 }
 
 const TestStateBadge = ({testState, ...rest}: IProps) => {

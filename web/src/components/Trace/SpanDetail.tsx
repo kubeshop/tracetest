@@ -1,21 +1,24 @@
 import {Button, Typography} from 'antd';
 import {PlusOutlined} from '@ant-design/icons';
 import {FC, useMemo, useState} from 'react';
-import {Assertion, ISpan, ITrace, SpanAssertionResult, Test} from 'types';
-import {runAssertionBySpanId} from 'services/AssertionService';
+import {runAssertionBySpanId} from 'entities/Assertion/Assertion.service';
 import AssertionsResultTable from 'components/AssertionsTable/AssertionsTable';
 import CreateAssertionModal from 'components/CreateAssertionModal';
 import SkeletonTable from 'components/SkeletonTable';
 import * as S from './SpanDetail.styled';
 import Attributes from './Attributes';
-import TraceAnalyticsService from '../../services/analytics/TraceAnalyticsService';
+import TraceAnalyticsService from '../../entities/Analytics/TraceAnalytics.service';
+import {TTest} from '../../entities/Test/Test.types';
+import {TSpan} from '../../entities/Span/Span.types';
+import {TTrace} from '../../entities/Trace/Trace.types';
+import { TAssertion, TSpanAssertionResult } from '../../entities/Assertion/Assertion.types';
 
 const {onAddAssertionButtonClick} = TraceAnalyticsService;
 
 type TSpanDetailProps = {
-  test?: Test;
-  targetSpan?: ISpan;
-  trace?: ITrace;
+  test?: TTest;
+  targetSpan?: TSpan;
+  trace?: TTrace;
 };
 
 const SpanDetail: FC<TSpanDetailProps> = ({test, targetSpan, trace}) => {
@@ -26,7 +29,7 @@ const SpanDetail: FC<TSpanDetailProps> = ({test, targetSpan, trace}) => {
       return [];
     }
     return (
-      test?.assertions?.reduce<Array<{assertion: Assertion; assertionResultList: Array<SpanAssertionResult>}>>(
+      test?.assertions?.reduce<Array<{assertion: TAssertion; assertionResultList: Array<TSpanAssertionResult>}>>(
         (resultList, assertion) => {
           const assertionResultList = runAssertionBySpanId(targetSpan.spanId, trace, assertion);
 

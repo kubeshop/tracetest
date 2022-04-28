@@ -1,6 +1,6 @@
 import {FC} from 'react';
 import {Link, useLocation} from 'react-router-dom';
-import {DOCUMENTATION_URL, GITHUB_URL} from '../../lib/Constants';
+import {DOCUMENTATION_URL, GITHUB_URL} from '../../constants/Common.contants';
 import * as S from './Header.styled';
 import Logo from '../../assets/Logo.svg';
 

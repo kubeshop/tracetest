@@ -1,5 +1,5 @@
 import {StepType} from '@reactour/tour';
-import GuidedTourService, {GuidedTours} from '../../services/GuidedTourService';
+import GuidedTourService, {GuidedTours} from '../../entities/GuidedTour/GuidedTour.service';
 
 export enum Steps {
   ExecutionTime = 'executionTime',

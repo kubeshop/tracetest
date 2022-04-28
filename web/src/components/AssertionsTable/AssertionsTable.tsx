@@ -1,19 +1,21 @@
 import {Button, Table, Typography} from 'antd';
 import {useMemo, useState} from 'react';
-import {Assertion, SpanAssertionResult, ITrace, ISpan} from 'types';
-import {getOperator} from 'utils';
+import AssertionTableAnalyticsService from '../../entities/Analytics/AssertionTableAnalytics.service';
+import {TAssertion, TSpanAssertionResult} from '../../entities/Assertion/Assertion.types';
+import OperatorService from '../../entities/Operator/Operator.service';
+import {TSpan} from '../../entities/Span/Span.types';
+import {TTrace} from '../../entities/Trace/Trace.types';
 import CreateAssertionModal from '../CreateAssertionModal';
 import CustomTable from '../CustomTable';
 import * as S from './AssertionsTable.styled';
-import AssertionTableAnalyticsService from '../../services/analytics/AssertionTableAnalyticsService';
 
 type AssertionsResultTableProps = {
-  assertionResults: SpanAssertionResult[];
-  assertion: Assertion;
+  assertionResults: TSpanAssertionResult[];
+  assertion: TAssertion;
   sort: number;
-  span: ISpan;
+  span: TSpan;
   testId: string;
-  trace: ITrace;
+  trace: TTrace;
 };
 
 type TParsedAssertion = {
@@ -70,7 +72,12 @@ const AssertionsResultTable: React.FC<AssertionsResultTableProps> = ({
       </S.AssertionsTableHeader>
       <CustomTable size="small" pagination={{hideOnSinglePage: true}} dataSource={parsedAssertionList}>
         <Table.Column title="Property" dataIndex="property" key="property" ellipsis width="50%" />
-        <Table.Column title="Comparison" dataIndex="comparison" key="comparison" render={value => getOperator(value)} />
+        <Table.Column
+          title="Comparison"
+          dataIndex="comparison"
+          key="comparison"
+          render={value => OperatorService.getOperatorName(value)}
+        />
         <Table.Column title="Value" dataIndex="value" key="value" />
         <Table.Column
           title="Actual"

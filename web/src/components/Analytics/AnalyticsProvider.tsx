@@ -1,5 +1,5 @@
 import {ReactElement, useEffect, useState, createContext, useCallback, useMemo} from 'react';
-import {isEnabled, instance} from '../../services/analytics/AnalyticsService';
+import {isEnabled, instance} from '../../entities/Analytics/Analytics.service';
 
 export const Context = createContext({
   isEnabled,

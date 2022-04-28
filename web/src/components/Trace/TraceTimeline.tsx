@@ -3,13 +3,13 @@ import styled from 'styled-components';
 import * as d3 from 'd3';
 
 import Title from 'antd/lib/typography/Title';
-import {ITrace} from 'types';
 
 import './TimelineChart.css';
 import SkeletonTable from 'components/SkeletonTable';
-import GuidedTourService, {GuidedTours} from '../../services/GuidedTourService';
+import GuidedTourService, {GuidedTours} from '../../entities/GuidedTour/GuidedTour.service';
 import {Steps} from '../GuidedTour/traceStepList';
-import TraceAnalyticsService from '../../services/analytics/TraceAnalyticsService';
+import TraceAnalyticsService from '../../entities/Analytics/TraceAnalytics.service';
+import { TTrace } from '../../entities/Trace/Trace.types';
 
 const {onTimelineSpanClick} = TraceAnalyticsService;
 
@@ -23,13 +23,13 @@ const Header = styled.div`
 `;
 
 interface ITimelineChartProps {
-  trace: ITrace;
+  trace: TTrace;
   selectedSpan: any;
   onSelectSpan(spanId: string): void;
 }
 
 interface IProps {
-  trace?: ITrace;
+  trace?: TTrace;
   selectedSpan?: any;
   onSelectSpan(spanId: string): void;
 }

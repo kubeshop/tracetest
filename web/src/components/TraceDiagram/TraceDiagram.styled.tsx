@@ -1,6 +1,6 @@
 import {Typography} from 'antd';
 import styled from 'styled-components';
-import {SemanticGroupNames} from '../../lib/SelectorDefaultAttributes';
+import {SemanticGroupNames} from '../../constants/SemanticGroupNames.constants';
 
 enum NotchColor {
   HTTP = '#B9E28C',

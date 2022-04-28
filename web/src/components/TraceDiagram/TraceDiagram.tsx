@@ -3,16 +3,16 @@ import ReactFlow, {Background, BackgroundVariant, FlowElement} from 'react-flow-
 import {useDAGChart} from 'hooks/Charts';
 import TraceNode from './TraceNode';
 import {TSpanInfo, TSpanMap} from '../Trace/Trace';
-import {ITrace} from '../../types';
 import * as S from './TraceDiagram.styled';
-import TraceDiagramAnalyticsService from '../../services/analytics/TraceDiagramAnalyticsService';
+import TraceDiagramAnalyticsService from '../../entities/Analytics/TraceDiagramAnalytics.service';
+import {TTrace} from '../../entities/Trace/Trace.types';
 
 const {onClickSpan} = TraceDiagramAnalyticsService;
 
 interface IPropsTraceDiagram {
   spanMap: TSpanMap;
   selectedSpan?: TSpanInfo;
-  trace: ITrace;
+  trace: TTrace;
   onSelectSpan(spanId: string): void;
 }
 
