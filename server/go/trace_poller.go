@@ -115,7 +115,7 @@ func (tp tracePoller) enqueueJob(job tracePollReq) {
 
 func (tp tracePoller) processJob(job tracePollReq) {
 	res := job.result
-	tr, err := tp.traceDB.GetTraceByID(job.ctx, res.TraceId)
+	currentTrace, err := tp.traceDB.GetTraceByID(job.ctx, res.TraceId)
 
 	if err != nil {
 		tp.handleTraceDBError(job, err)
@@ -123,22 +123,22 @@ func (tp tracePoller) processJob(job tracePollReq) {
 	}
 
 	res.State = TestRunStateAwaitingTestResults
-	tr, err = FixParent(tr, res.Response)
+	currentTrace, err = FixParent(currentTrace, res.Response)
 	if err != nil {
 		job.result = res
 		job.count = job.count + 1
 		tp.requeue(job)
 		return
 	}
-
-	res.Trace = mapTrace(tr)
-
-	if !tp.donePollingTraces(job, res) {
+	currentTr := mapTrace(currentTrace)
+	if !tp.donePollingTraces(job, currentTr) {
+		res.Trace = currentTr
 		job.result = res
 		job.count = job.count + 1
 		tp.requeue(job)
 		return
 	}
+	res.Trace = currentTr
 
 	fmt.Printf("completed polling result %s after %d times\n", job.result.ResultId, job.count)
 
@@ -151,10 +151,10 @@ func (tp tracePoller) processJob(job tracePollReq) {
 	})
 }
 
-func (tp tracePoller) donePollingTraces(job tracePollReq, currentResults TestRunResult) bool {
-	// we're done if we have the same amount of spans after polling `maxTracePollRetry` times
-	return len(currentResults.Trace.ResourceSpans) > 0 &&
-		len(currentResults.Trace.ResourceSpans) == len(job.result.Trace.ResourceSpans) &&
+func (tp tracePoller) donePollingTraces(job tracePollReq, currentTrace ApiV3SpansResponseChunk) bool {
+	// we're done if we have the same amount of spans after polling or `maxTracePollRetry` times
+	return (len(currentTrace.ResourceSpans) > 0 &&
+		len(currentTrace.ResourceSpans) == len(job.result.Trace.ResourceSpans)) ||
 		job.count == tp.maxTracePollRetry
 }
 
