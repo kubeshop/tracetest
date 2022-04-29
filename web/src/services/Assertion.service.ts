@@ -7,11 +7,11 @@ import {IAssertion, IAssertionResult, IItemSelector, ISpanAssertionResult} from 
 import {SpanAttributeType} from '../constants/SpanAttribute.constants';
 
 const buildValueSelector = (comparisonValue: string, compareOperator: string, type: string) => {
+  if (compareOperator === 'contains') return `contains(value, \`${comparisonValue}\`)`;
+
   if ([SpanAttributeType.intValue, SpanAttributeType.doubleValue].includes(type as SpanAttributeType)) {
     return `to_number(value) ${compareOperator} \`${comparisonValue}\``;
   }
-
-  if (compareOperator === 'contains') return `contains(value, \`${comparisonValue}\`)`;
 
   return `value ${compareOperator} \`${comparisonValue}\``;
 };
