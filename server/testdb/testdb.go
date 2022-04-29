@@ -9,14 +9,14 @@ import (
 
 var ErrNotFound = errors.New("record not found")
 
-type Tests interface {
+type TestRepository interface {
 	CreateTest(ctx context.Context, test *openapi.Test) (string, error)
 	UpdateTest(ctx context.Context, test *openapi.Test) error
 	GetTests(ctx context.Context) ([]openapi.Test, error)
 	GetTest(ctx context.Context, id string) (*openapi.Test, error)
 }
 
-type Results interface {
+type ResultRepository interface {
 	CreateResult(ctx context.Context, testID string, res *openapi.TestRunResult) error
 	UpdateResult(ctx context.Context, res *openapi.TestRunResult) error
 	GetResult(ctx context.Context, id string) (*openapi.TestRunResult, error)
@@ -24,7 +24,7 @@ type Results interface {
 	GetResultByTraceID(ctx context.Context, testid, traceid string) (openapi.TestRunResult, error)
 }
 
-type Assertions interface {
+type AssertionRepository interface {
 	CreateAssertion(ctx context.Context, testid string, assertion *openapi.Assertion) (string, error)
 	UpdateAssertion(ctx context.Context, testID, assertionID string, assertion openapi.Assertion) error
 	DeleteAssertion(ctx context.Context, testID, assertionID string) error
@@ -32,10 +32,10 @@ type Assertions interface {
 	GetAssertionsByTestID(ctx context.Context, testID string) ([]openapi.Assertion, error)
 }
 
-type Database interface {
-	Tests
-	Results
-	Assertions
+type Repository interface {
+	TestRepository
+	ResultRepository
+	AssertionRepository
 
 	Drop() error
 }

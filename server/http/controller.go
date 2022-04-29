@@ -14,11 +14,11 @@ import (
 
 type controller struct {
 	traceDB tracedb.TraceDB
-	testDB  testdb.Database
+	testDB  testdb.Repository
 	runner  executor.Runner
 }
 
-func NewController(traceDB tracedb.TraceDB, testDB testdb.Database, runner executor.Runner) openapi.ApiApiServicer {
+func NewController(traceDB tracedb.TraceDB, testDB testdb.Repository, runner executor.Runner) openapi.ApiApiServicer {
 	return &controller{
 		traceDB: traceDB,
 		testDB:  testDB,

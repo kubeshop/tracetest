@@ -17,7 +17,7 @@ type postgresDB struct {
 	db *sql.DB
 }
 
-func Postgres(dsn string) (Database, error) {
+func Postgres(dsn string) (Repository, error) {
 	connector, err := pq.NewConnector(dsn)
 	if err != nil {
 		return nil, fmt.Errorf("sql open: %w", err)
