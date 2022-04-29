@@ -12,13 +12,12 @@ WORKDIR /go/src
 
 COPY ./server/go.mod ./server/go.sum ./
 RUN go mod download
-COPY ./server/go ./go
-COPY ./server/*.go ./
-RUN go build -o openapi .
+COPY ./server ./
+RUN go build -o tracetest-server .
 
 FROM ubuntu AS release
 WORKDIR /app
-COPY --from=build-go /go/src/openapi ./
+COPY --from=build-go /go/src/tracetest-server ./
 COPY --from=build-js /app/build /app/html
 EXPOSE 8080/tcp
-ENTRYPOINT ["/app/openapi"]
+ENTRYPOINT ["/app/tracetest-server"]
