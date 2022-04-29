@@ -2,24 +2,19 @@ import React, {useCallback, useEffect, useMemo} from 'react';
 import {isEmpty} from 'lodash';
 import {QuestionCircleOutlined, PlusOutlined, MinusCircleOutlined} from '@ant-design/icons';
 import {Button, Input, AutoComplete, Typography, Tooltip, Form, Space, FormInstance} from 'antd';
-import jemsPath from 'jmespath';
 
 import {useCreateAssertionMutation, useUpdateAssertionMutation} from 'gateways/Test.gateway';
 import {SELECTOR_DEFAULT_ATTRIBUTES} from 'constants/SemanticGroupNames.constants';
-import {filterBySpanId} from 'utils/Common';
-import {getSpanSignature} from 'services/Span.service';
-import {getSpanAttributeValueType} from 'services/SpansAttribute.service';
 import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
 import useGuidedTour from 'hooks/useGuidedTour';
 import {CreateAssertionSelectorInput} from './CreateAssertionSelectorInput';
 import * as S from './CreateAssertionModal.styled';
 import CreateAssertionModalAnalyticsService from '../../services/Analytics/CreateAssertionModalAnalytics.service';
 import {IAssertion, IItemSelector, ISpanSelector} from '../../types/Assertion.types';
-import { CompareOperator } from '../../constants/Operator.constants';
-import { ISpan } from '../../types/Span.types';
-import { ITrace } from '../../types/Trace.types';
-import { LOCATION_NAME } from '../../constants/Span.constants';
-import { Steps } from '../GuidedTour/assertionStepList';
+import {CompareOperator} from '../../constants/Operator.constants';
+import {ISpan} from '../../types/Span.types';
+import {LOCATION_NAME} from '../../constants/Span.constants';
+import {Steps} from '../GuidedTour/assertionStepList';
 
 const {
   onAddCheck,
@@ -34,7 +29,7 @@ interface IAssertionSpan {
   key: string;
   compareOp: CompareOperator;
   value: string;
-};
+}
 
 export type TValues = {
   assertionList: IAssertionSpan[];
@@ -49,14 +44,12 @@ interface TCreateAssertionFormProps {
   onSelectorList(selectorList: IItemSelector[]): void;
   span: ISpan;
   testId: string;
-  trace: ITrace;
   assertion?: IAssertion;
 }
 
 const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
   testId,
   span,
-  trace,
   assertion,
   onForm,
   onCreate,
@@ -64,9 +57,8 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
 }) => {
   const [createAssertion] = useCreateAssertionMutation();
   const [updateAssertion] = useUpdateAssertionMutation();
-  const attrs = jemsPath.search(trace, filterBySpanId(span.spanId));
   const [form] = Form.useForm<TValues>();
-  const defaultSelectorList = useMemo(() => getSpanSignature(span.spanId, trace), [span.spanId, trace]);
+  const {attributeList, signature: defaultSelectorList} = span;
 
   useGuidedTour(GuidedTours.Assertion);
 
@@ -96,7 +88,7 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
     onSelectorList(assertion ? assertion.selectors : defaultSelectorList);
   }, [onSelectorList, defaultSelectorList]);
 
-  const spanTagsMap = attrs?.reduce((acc: {[x: string]: any}, item: {key: string}) => {
+  const spanTagsMap = attributeList?.reduce((acc: {[x: string]: any}, item: {key: string}) => {
     if (itemSelectorKeys.indexOf(item.key) !== -1) {
       return acc;
     }
@@ -138,19 +130,15 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
   const handleCreateAssertion = useCallback(
     async ({assertionList, selectorList}: TValues) => {
       const spanAssertions = assertionList
-        .map(k => ({value: k.value, attr: attrs?.find((el: any) => el.key === k?.key), compareOp: k.compareOp}))
-        .filter(i => i.attr)
-        .map(({attr, value, compareOp}) => {
-          const spanAttribute = span.attributes.find(({key}) => key.includes(attr.key));
+        .map(({value, compareOp, key}) => {
+          const {name, type} = span.attributes[key];
 
           return {
-            locationName: attr.type.includes('span')
-              ? LOCATION_NAME.SPAN_ATTRIBUTES
-              : LOCATION_NAME.RESOURCE_ATTRIBUTES,
-            propertyName: attr.key as string,
+            locationName: LOCATION_NAME.SPAN_ATTRIBUTES,
+            propertyName: name,
             comparisonValue: value,
             operator: compareOp,
-            valueType: getSpanAttributeValueType(spanAttribute!),
+            valueType: type,
           };
         })
         .filter((el): el is ISpanSelector => Boolean(el));
@@ -166,7 +154,7 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
       }
       onCreate();
     },
-    [assertion, attrs, createAssertion, onCreate, span.attributes, testId, updateAssertion]
+    [assertion, createAssertion, onCreate, span.attributes, testId, updateAssertion]
   );
 
   return (
@@ -197,7 +185,7 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
           form.setFieldsValue({
             assertionList: assertionList.map((assertionEntry, index) => {
               if (index === entry) {
-                const value = attrs?.find((el: any) => el.key === assertionList[index].key)?.value;
+                const value = attributeList?.find((el: any) => el.key === assertionList[index].key)?.value;
                 const isValid = typeof value === 'number' || !isEmpty(value);
 
                 return {...assertionEntry, value: isValid ? String(value) : ''};

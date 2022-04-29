@@ -16,11 +16,6 @@ import {
   useRunTestMutation,
   useUpdateTestResultMutation,
 } from 'gateways/Test.gateway';
-import {
-  parseAssertionResultListToTestResult,
-  parseTestResultToAssertionResultList,
-  runTest,
-} from 'services/Trace.service';
 import TraceDiagram from 'components/TraceDiagram/TraceDiagram';
 
 import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
@@ -36,6 +31,7 @@ import {ITestRunResult} from '../../types/TestRunResult.types';
 import {TestState} from '../../constants/TestRunResult.constants';
 import TraceTimeline from './TraceTimeline';
 import TraceAnalyticsService from '../../services/Analytics/TraceAnalytics.service';
+import TraceService from '../../services/Trace.service';
 
 const {onChangeTab} = TraceAnalyticsService;
 
@@ -75,15 +71,14 @@ const Trace: React.FC<TraceProps> = ({testId, testResultId, onDismissTrace, onRu
   } = useGetTestResultByIdQuery({testId, resultId: testResultId});
 
   const spanMap = useMemo<TSpanMap>(() => {
-    return testResultDetails?.trace?.resourceSpans
-      ?.map(i => i.instrumentationLibrarySpans.map((el: any) => el.spans))
-      ?.flat(2)
-      ?.reduce((acc, span) => {
+    return (
+      testResultDetails?.trace?.spans?.reduce<TSpanMap>((acc, span) => {
         acc[span.spanId] = acc[span.spanId] || {id: span.spanId, parentIds: [], data: span};
-        acc[span.spanId].parentIds.push(span.parentSpanId);
+        if (span.parentSpanId) acc[span.spanId].parentIds.push(span.parentSpanId);
 
         return acc;
-      }, {});
+      }, {}) || {}
+    );
   }, [testResultDetails]);
 
   const addSelected = useStoreActions(actions => actions.addSelectedElements);
@@ -118,21 +113,21 @@ const Trace: React.FC<TraceProps> = ({testId, testResultId, onDismissTrace, onRu
 
   useEffect(() => {
     if (testResultDetails && test && !isFirstLoad) {
-      const resultList = runTest(testResultDetails.trace, test);
+      const resultList = TraceService.runTest(testResultDetails.trace!, test);
 
       setTraceResultList(resultList);
 
       updateTestResult({
         testId,
         resultId: testResultId,
-        assertionResult: parseAssertionResultListToTestResult(resultList),
+        assertionResult: TraceService.parseAssertionResultListToTestResult(resultList),
       });
     }
   }, [test]);
 
   useEffect(() => {
-    if (testResultDetails && !isEmpty(testResultDetails.trace) && !testResultDetails?.assertionResult && test) {
-      const resultList = runTest(testResultDetails.trace, test);
+    if (testResultDetails && !isEmpty(testResultDetails.trace) && testResultDetails?.assertionResult && test) {
+      const resultList = TraceService.runTest(testResultDetails.trace!, test);
 
       setTraceResultList(resultList);
       setIsFirstLoad(false);
@@ -140,12 +135,16 @@ const Trace: React.FC<TraceProps> = ({testId, testResultId, onDismissTrace, onRu
       updateTestResult({
         testId,
         resultId: testResultId,
-        assertionResult: parseAssertionResultListToTestResult(resultList),
+        assertionResult: TraceService.parseAssertionResultListToTestResult(resultList),
       });
     } else if (testResultDetails?.assertionResult && test) {
       setIsFirstLoad(false);
       setTraceResultList(
-        parseTestResultToAssertionResultList(testResultDetails?.assertionResult, test, testResultDetails?.trace)
+        TraceService.parseTestResultToAssertionResultList(
+          testResultDetails?.assertionResult,
+          test,
+          testResultDetails?.trace!
+        )
       );
     }
   }, [testResultDetails, test, testResultId, updateTestResult, testId]);

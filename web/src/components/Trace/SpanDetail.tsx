@@ -1,17 +1,17 @@
 import {Button, Typography} from 'antd';
 import {PlusOutlined} from '@ant-design/icons';
 import {FC, useMemo, useState} from 'react';
-import {runAssertionBySpanId} from 'services/Assertion.service';
 import AssertionsResultTable from 'components/AssertionsTable/AssertionsTable';
 import CreateAssertionModal from 'components/CreateAssertionModal';
 import SkeletonTable from 'components/SkeletonTable';
 import * as S from './SpanDetail.styled';
-import TraceAnalyticsService from '../../services/Analytics/TraceAnalytics.service';
 import {ITest} from '../../types/Test.types';
 import {ISpan} from '../../types/Span.types';
 import {ITrace} from '../../types/Trace.types';
 import {IAssertion, ISpanAssertionResult} from '../../types/Assertion.types';
 import Attributes from './Attributes';
+import TraceAnalyticsService from '../../services/Analytics/TraceAnalytics.service';
+import AssertionService from '../../services/Assertion.service';
 
 const {onAddAssertionButtonClick} = TraceAnalyticsService;
 
@@ -31,14 +31,14 @@ const SpanDetail: FC<TSpanDetailProps> = ({test, targetSpan, trace}) => {
     return (
       test?.assertions?.reduce<Array<{assertion: IAssertion; assertionResultList: Array<ISpanAssertionResult>}>>(
         (resultList, assertion) => {
-          const assertionResultList = runAssertionBySpanId(targetSpan.spanId, trace, assertion);
+          const assertionResultList = AssertionService.runBySpan(targetSpan, assertion);
 
-          return assertionResultList ? [...resultList, {assertion, assertionResultList}] : resultList;
+          return assertionResultList.length ? [...resultList, {assertion, assertionResultList}] : resultList;
         },
         []
       ) || []
     );
-  }, [targetSpan?.spanId, test?.assertions, trace]);
+  }, [targetSpan, test?.assertions, trace]);
 
   return (
     <>
@@ -79,7 +79,7 @@ const SpanDetail: FC<TSpanDetailProps> = ({test, targetSpan, trace}) => {
           )}
         </SkeletonTable>
       </S.DetailsContainer>
-      <Attributes spanId={targetSpan?.spanId!} trace={trace!} />
+      <Attributes spanAttributeList={targetSpan?.attributeList} />
 
       {targetSpan?.spanId && test?.testId && (
         <CreateAssertionModal

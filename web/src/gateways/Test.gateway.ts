@@ -1,8 +1,9 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
-import {IAssertion, ITestAssertionResult} from '../types/Assertion.types';
-import {ITest} from '../types/Test.types';
-import {ITestRunResult} from '../types/TestRunResult.types';
-import {TRecursivePartial} from '../types/Common.types';
+import {IAssertion, ITestAssertionResult} from 'types/Assertion.types';
+import {ITest} from 'types/Test.types';
+import {ITestRunResult, IRawTestRunResult} from 'types/TestRunResult.types';
+import {TRecursivePartial} from 'types/Common.types';
+import TestRunResult from 'models/TestRunResult.model';
 
 export const testAPI = createApi({
   reducerPath: 'testsAPI',
@@ -60,6 +61,8 @@ export const testAPI = createApi({
       query: id => `/tests/${id}/results`,
       providesTags: result =>
         result ? [{type: 'TestResult' as const, id: 'LIST'}] : [{type: 'TestResult' as const, id: 'LIST'}],
+      transformResponse: (rawTestResultList: IRawTestRunResult[]) =>
+        rawTestResultList.map(rawTestResult => TestRunResult(rawTestResult)),
     }),
     updateTestResult: build.mutation<
       ITestRunResult,
@@ -71,10 +74,12 @@ export const testAPI = createApi({
         body: assertionResult,
       }),
       invalidatesTags: (result, error, args) => [{type: 'TestResult', id: args.resultId}],
+      transformResponse: (rawTestResult: IRawTestRunResult) => TestRunResult(rawTestResult),
     }),
     getTestResultById: build.query<ITestRunResult, Pick<ITest, 'testId'> & {resultId: string}>({
       query: ({testId, resultId}) => `/tests/${testId}/results/${resultId}`,
       providesTags: result => (result ? [{type: 'TestResult' as const, id: result?.resultId}] : []),
+      transformResponse: (rawTestResult: IRawTestRunResult) => TestRunResult(rawTestResult),
     }),
   }),
 });

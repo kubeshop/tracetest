@@ -1,11 +1,8 @@
 import * as d3DAG from 'd3-dag';
 import _ from 'lodash';
+import {TSpanMap} from '../components/Trace/Trace';
 
-interface ISpanMap {
-  [key: string]: {id: string; parentIds: string[]};
-}
-
-export const useDAGChart = (spanMap: ISpanMap = {}) => {
+export const useDAGChart = (spanMap: TSpanMap = {}) => {
   if (_.isEmpty(spanMap)) {
     return;
   }

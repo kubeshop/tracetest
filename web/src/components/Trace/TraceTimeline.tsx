@@ -38,19 +38,14 @@ const TimelineChart = ({trace, selectedSpan, onSelectSpan}: ITimelineChartProps)
   const svgRef = useRef<SVGSVGElement>(null);
   let treeFactory = d3.tree().size([200, 450]).nodeSize([0, 5]);
 
-  const spanDates = trace.resourceSpans
-    .map((i: any) => i.instrumentationLibrarySpans.map((el: any) => el.spans))
-    .flat(2)
-    .map(span => ({
-      startTime: new Date(Number(span.startTimeUnixNano) / 1000),
-      endTime: new Date(Number(span.endTimeUnixNano) / 1000),
-      span,
-    }));
+  const spanDates = trace.spans.map(span => ({
+    startTime: new Date(Number(span.startTimeUnixNano) / 1000),
+    endTime: new Date(Number(span.endTimeUnixNano) / 1000),
+    span,
+  }));
 
-  const spanMap = trace.resourceSpans
-    .map((i: any) => i.instrumentationLibrarySpans.map((el: any) => el.spans))
-    .flat(2)
-    .reduce((acc: {[key: string]: {id: string; parentIds: string[]; data: any}}, span) => {
+  const spanMap = trace.spans.reduce(
+    (acc: {[key: string]: {id: string; parentIds: Array<string | undefined>; data: any}}, span) => {
       acc[span.spanId] = acc[span.spanId] || {
         id: span.spanId,
         parentIds: [],
@@ -60,13 +55,15 @@ const TimelineChart = ({trace, selectedSpan, onSelectSpan}: ITimelineChartProps)
       };
       acc[span.spanId].parentIds.push(span.parentSpanId);
       return acc;
-    }, {});
+    },
+    {}
+  );
 
   const root = useMemo(() => {
     const dagData = Object.values(spanMap).map(({id, parentIds, ...rest}) => {
-      const parents = parentIds.filter(el => spanMap[el]);
+      const parent = parentIds.find(el => spanMap[el!]);
 
-      return {id, parentId: parents[0], ...rest};
+      return {id, parentId: parent, ...rest};
     });
 
     return d3.stratify()(dagData);

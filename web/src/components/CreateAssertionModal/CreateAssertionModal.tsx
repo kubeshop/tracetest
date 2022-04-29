@@ -2,7 +2,7 @@ import {useCallback, useState} from 'react';
 import {Modal, Typography, FormInstance} from 'antd';
 
 import CreateAssertionForm, {TValues} from './CreateAssertionForm';
-import {getEffectedSpansCount} from '../../services/Assertion.service';
+import AssertionService from '../../services/Assertion.service';
 import { ISpan } from '../../types/Span.types';
 import { ITrace } from '../../types/Trace.types';
 import { IAssertion, IItemSelector } from '../../types/Assertion.types';
@@ -40,7 +40,7 @@ const CreateAssertionModal = ({testId, span, trace, open, onClose, assertion}: I
     onClose();
   }, [onClose]);
 
-  const effectedSpanCount = getEffectedSpansCount(trace, selectorList);
+  const effectedSpanCount = AssertionService.getEffectedSpansCount(trace, selectorList);
 
   return (
     <Modal
@@ -67,7 +67,6 @@ const CreateAssertionModal = ({testId, span, trace, open, onClose, assertion}: I
         onSelectorList={onSelectorList}
         span={span}
         testId={testId}
-        trace={trace}
       />
     </Modal>
   );

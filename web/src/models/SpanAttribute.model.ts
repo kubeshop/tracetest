@@ -1,6 +1,6 @@
 import {isEmpty} from 'lodash';
-import { SpanAttributeType } from '../constants/SpanAttribute.constants';
-import { IRawSpanAttribute, ISpanAttribute } from '../types/SpanAttribute.types';
+import {SpanAttributeType} from '../constants/SpanAttribute.constants';
+import {IRawSpanAttribute, ISpanAttribute} from '../types/SpanAttribute.types';
 
 const spanAttributeTypeList = Object.values(SpanAttributeType);
 

@@ -1,10 +1,10 @@
 import {Typography} from 'antd';
 import SkeletonTable from 'components/SkeletonTable';
 import {FC, useMemo} from 'react';
-import {getTestResultCount} from '../../services/Trace.service';
 import {IAssertionResult} from '../../types/Assertion.types';
 import {ITrace} from '../../types/Trace.types';
 import TraceAssertionsResultTable from '../TraceAssertionsTable/TraceAssertionsTable';
+import TraceService from '../../services/Trace.service';
 import * as S from './TestResults.styled';
 
 type TTestResultsProps = {
@@ -14,10 +14,13 @@ type TTestResultsProps = {
 };
 
 const TestResults: FC<TTestResultsProps> = ({trace, traceResultList, onSpanSelected}) => {
-  const totalSpanCount = trace?.resourceSpans?.length;
+  const totalSpanCount = trace?.spans.length;
   const totalAssertionCount = traceResultList.length || 0;
 
-  const {totalPassedCount, totalFailedCount} = useMemo(() => getTestResultCount(traceResultList), [traceResultList]);
+  const {totalPassedCount, totalFailedCount} = useMemo(
+    () => TraceService.getTestResultCount(traceResultList),
+    [traceResultList]
+  );
 
   return (
     <S.Container>
@@ -34,7 +37,6 @@ const TestResults: FC<TTestResultsProps> = ({trace, traceResultList, onSpanSelec
               <TraceAssertionsResultTable
                 key={assertionResult.assertion.assertionId}
                 assertionResult={assertionResult}
-                trace={trace!}
                 onSpanSelected={onSpanSelected}
               />
             ) : null

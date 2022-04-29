@@ -2,19 +2,16 @@ import {Table, Typography} from 'antd';
 import {useStore} from 'react-flow-renderer';
 import {difference, sortBy} from 'lodash';
 import {FC, useCallback, useMemo} from 'react';
-import {getSpanSignature} from '../../services/Span.service';
 import CustomTable from '../CustomTable';
 import * as S from './TraceAssertionsTable.styled';
 import TraceAssertionTableAnalyticsService from '../../services/Analytics/TraceAssertionTableAnalytics.service';
 import {IAssertionResult} from '../../types/Assertion.types';
-import {ITrace} from '../../types/Trace.types';
 import OperatorService from '../../services/Operator.service';
 
 const {onSpanAssertionClick} = TraceAssertionTableAnalyticsService;
 
 interface IProps {
   assertionResult: IAssertionResult;
-  trace: ITrace;
   onSpanSelected(spanId: string): void;
 }
 
@@ -34,17 +31,14 @@ const TraceAssertionsResultTable: FC<IProps> = ({
     assertion: {selectors = []},
     spanListAssertionResult,
   },
-  trace,
   onSpanSelected,
 }) => {
   const selectorValueList = useMemo(() => selectors.map(({value}) => value), [selectors]);
   const parsedAssertionList = useMemo(() => {
-    const spanAssertionList = spanListAssertionResult.reduce<Array<TParsedAssertion>>((list, {resultList}) => {
+    const spanAssertionList = spanListAssertionResult.reduce<Array<TParsedAssertion>>((list, {resultList, span}) => {
       const subResultList = resultList.map<TParsedAssertion>(
         ({propertyName, comparisonValue, operator, actualValue, hasPassed, spanId}) => {
-          const spanLabelList = getSpanSignature(spanId, trace)
-            .map(({value}) => value)
-            .concat([`#${spanId.slice(-4)}`]);
+          const spanLabelList = span.signature.map(({value}) => value).concat([`#${spanId.slice(-4)}`]) || [];
 
           return {
             spanLabels: difference(spanLabelList, selectorValueList),
@@ -63,7 +57,7 @@ const TraceAssertionsResultTable: FC<IProps> = ({
     }, []);
 
     return sortBy(spanAssertionList, ({spanLabels}) => spanLabels.join(''));
-  }, [selectorValueList, spanListAssertionResult, trace]);
+  }, [selectorValueList, spanListAssertionResult]);
 
   const spanCount = spanListAssertionResult.length;
   const store = useStore();

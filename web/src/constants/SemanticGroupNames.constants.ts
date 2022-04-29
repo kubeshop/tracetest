@@ -6,8 +6,6 @@
 // the selected span that we want to autogenerate the selectors array for.  Create a SelectorItem
 // for each attribute that you find a value for in that selected span.
 
-import {LOCATION_NAME} from '../constants/Span.constants';
-
 // Note - need to add the following:
 // lamda - aws lambda section
 // aws-sdk - aws sdk section
@@ -33,8 +31,6 @@ export const SemanticGroupNamesToText = {
   [SemanticGroupNames.General]: 'General',
   [SemanticGroupNames.Compatibility]: 'Compatibility',
 };
-
-export const ResourceSpanAttributeList = ['service.name'];
 
 export const SemanticGroupNameNodeMap: Record<SemanticGroupNames, {primary: string[]; type: string}> = {
   [SemanticGroupNames.Http]: {
@@ -141,20 +137,13 @@ export const SELECTOR_DEFAULT_ATTRIBUTES = [
 ];
 
 type TSemanticGroupSignature = {
-  [key in SemanticGroupNames]: {[key2 in LOCATION_NAME]: string[]};
+  [key in SemanticGroupNames]: string[];
 };
 
 export const SemanticGroupsSignature = SELECTOR_DEFAULT_ATTRIBUTES.reduce<TSemanticGroupSignature>(
   (acc, {semanticGroup, attributes}) => ({
     ...acc,
-    [semanticGroup]: {
-      [LOCATION_NAME.SPAN_ATTRIBUTES]: attributes.filter(
-        attribute => !ResourceSpanAttributeList.find(resourceAttribute => resourceAttribute === attribute)
-      ),
-      [LOCATION_NAME.RESOURCE_ATTRIBUTES]: attributes.filter(attribute =>
-        ResourceSpanAttributeList.find(resourceAttribute => resourceAttribute === attribute)
-      ),
-    },
+    [semanticGroup]: attributes,
   }),
   {} as TSemanticGroupSignature
 );
