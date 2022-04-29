@@ -19,6 +19,9 @@ server-vet:
 server-run:
 	cd server; go run main.go
 
+server-build:
+	cd server; go build -o tracetest-server main.go
+
 init-submodule:
 	git submodule init
 	git submodule update
