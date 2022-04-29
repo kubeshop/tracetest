@@ -46,7 +46,7 @@ func NewTracePoller(
 		retryDelay:          retryDelay,
 		executeQueue:        make(chan tracePollReq, 5),
 		exit:                make(chan bool, 1),
-		subscriptionManager: subscriptionManager,
+		subscriptions:       subscriptionManager,
 	}
 }
 
@@ -60,7 +60,7 @@ type tracePoller struct {
 	executeQueue chan tracePollReq
 	exit         chan bool
 
-	subscriptionManager *subscription.Manager
+	subscriptions *subscription.Manager
 }
 
 type tracePollReq struct {
@@ -146,7 +146,7 @@ func (tp tracePoller) processJob(job tracePollReq) {
 	tp.handleDBError(tp.resultDB.UpdateResult(job.ctx, &res))
 
 	resource := fmt.Sprintf("test/%s/result/%s", res.TestId, res.ResultId)
-	tp.subscriptionManager.PublishUpdate(resource, subscription.Message{
+	tp.subscriptions.PublishUpdate(resource, subscription.Message{
 		Type:    "result_update",
 		Content: res,
 	})

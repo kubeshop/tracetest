@@ -7,6 +7,7 @@ import (
 
 	"github.com/kubeshop/tracetest/executor"
 	"github.com/kubeshop/tracetest/openapi"
+	"github.com/kubeshop/tracetest/subscription"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -72,7 +73,7 @@ func tracePollerSetup(t *testing.T) tracePollerFixture {
 	mr.t = t
 	mr.Test(t)
 	return tracePollerFixture{
-		tracePoller:      executor.NewTracePoller(mtf, mr, 100*time.Millisecond),
+		tracePoller:      executor.NewTracePoller(mtf, mr, 100*time.Millisecond, subscription.NewManager()),
 		mockTraceFetcher: mtf,
 		mockResultsDB:    mr,
 	}
