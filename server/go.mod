@@ -1,4 +1,4 @@
-module github.com/kubeshop/tracetest/server
+module github.com/kubeshop/tracetest
 
 go 1.13
 

@@ -18,17 +18,16 @@ import (
 	"net/http"
 	"os"
 	"regexp"
-	"time"
 
-	openapi "github.com/kubeshop/tracetest/server/go"
-	"github.com/kubeshop/tracetest/server/go/analytics"
-	"github.com/kubeshop/tracetest/server/go/executor"
-	"github.com/kubeshop/tracetest/server/go/subscription"
-	"github.com/kubeshop/tracetest/server/go/testdb"
-	"github.com/kubeshop/tracetest/server/go/tracedb"
-	"github.com/kubeshop/tracetest/server/go/tracedb/jaegerdb"
-	"github.com/kubeshop/tracetest/server/go/tracedb/tempodb"
-	"github.com/kubeshop/tracetest/server/go/websocket"
+	"github.com/kubeshop/tracetest/analytics"
+	"github.com/kubeshop/tracetest/config"
+	"github.com/kubeshop/tracetest/executor"
+	httpServer "github.com/kubeshop/tracetest/http"
+	"github.com/kubeshop/tracetest/http/websocket"
+	"github.com/kubeshop/tracetest/openapi"
+	"github.com/kubeshop/tracetest/subscription"
+	"github.com/kubeshop/tracetest/testdb"
+	"github.com/kubeshop/tracetest/tracedb"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
@@ -44,35 +43,23 @@ var cfg = flag.String("config", "config.yaml", "path to the config file")
 
 func main() {
 	flag.Parse()
-	c, err := LoadConfig(*cfg)
+	cfg, err := config.FromFile(*cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	ctx := context.Background()
 	tp := initOtelTracing(ctx)
 	defer func() { _ = tp.Shutdown(ctx) }()
 
-	subscriptionManager := subscription.NewManager()
-
-	testDB, err := testdb.New(c.PostgresConnString)
+	testDB, err := testdb.Postgres(cfg.PostgresConnString)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	var traceDB tracedb.TraceDB
-	switch {
-	case c.JaegerConnectionConfig != nil:
-		log.Printf("connecting to Jaeger: %s\n", c.JaegerConnectionConfig.Endpoint)
-		traceDB, err = jaegerdb.New(c.JaegerConnectionConfig)
-		if err != nil {
-			log.Fatal(err)
-		}
-	case c.TempoConnectionConfig != nil:
-		log.Printf("connecting to tempo: %s\n", c.TempoConnectionConfig.Endpoint)
-		traceDB, err = tempodb.New(c.TempoConnectionConfig)
-		if err != nil {
-			log.Fatal(err)
-		}
+	traceDB, err := tracedb.New(cfg)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	ex, err := executor.New()
@@ -80,22 +67,18 @@ func main() {
 		log.Fatal(err)
 	}
 
-	maxWaitTimeForTrace, err := time.ParseDuration(c.MaxWaitTimeForTrace)
-	if err != nil {
-		// use a default value
-		maxWaitTimeForTrace = 30 * time.Second
-	}
+	subscriptionManager := subscription.NewManager()
 
-	tracePoller := openapi.NewTracePoller(traceDB, testDB, maxWaitTimeForTrace, subscriptionManager)
+	tracePoller := executor.NewTracePoller(traceDB, testDB, cfg.MaxWaitTimeForTraceDuration(), subscriptionManager)
 	tracePoller.Start(5) // worker count. should be configurable
 	defer tracePoller.Stop()
 
-	runner := openapi.NewPersistentRunner(ex, testDB, tracePoller)
+	runner := executor.NewPersistentRunner(ex, testDB, tracePoller)
 	runner.Start(5) // worker count. should be configurable
 	defer runner.Stop()
 
-	apiApiService := openapi.NewApiApiService(traceDB, testDB, runner)
-	apiApiController := openapi.NewApiApiController(apiApiService)
+	controller := httpServer.NewController(traceDB, testDB, runner)
+	apiApiController := openapi.NewApiApiController(controller)
 
 	router := openapi.NewRouter(apiApiController)
 	router.Use(otelmux.Middleware("tracetest"))
@@ -116,18 +99,16 @@ func main() {
 		log.Fatal(err)
 	}
 
-	go startWebsocketServer(subscriptionManager)
+	go func() {
+		wsRouter := websocket.NewRouter()
+		wsRouter.Add("subscribe", websocket.NewSubscribeCommandExecutor(subscriptionManager))
+		wsRouter.Add("unsubscribe", websocket.NewUnsubscribeCommandExecutor(subscriptionManager))
+		log.Printf("WS Server started")
+		wsRouter.ListenAndServe(":8081")
+	}()
+
 	log.Printf("HTTP Server started")
 	log.Fatal(http.ListenAndServe(":8080", router))
-}
-
-func startWebsocketServer(subscriptionManager *subscription.Manager) {
-	wsRouter := websocket.NewRouter()
-	wsRouter.Add("subscribe", websocket.NewSubscribeCommandExecutor(subscriptionManager))
-	wsRouter.Add("unsubscribe", websocket.NewUnsubscribeCommandExecutor(subscriptionManager))
-	log.Printf("WS Server started")
-
-	wsRouter.ListenAndServe(":8081")
 }
 
 type gaParams struct {

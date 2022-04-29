@@ -1,4 +1,3 @@
 # Binary files
-server
-
-testdata/custom-config.yaml
+tracetest-server
+config.yaml
