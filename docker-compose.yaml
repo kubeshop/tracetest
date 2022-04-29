@@ -1,24 +1,33 @@
-version: "3"
+version: "3.2"
 services:
   tracetest:
     container_name: tracetest
     image: kubeshop/tracetest
     build: .
     volumes:
-      - ${PWD}/server/config.yaml:/app/config.yaml
+      - type: bind
+        source: ./server/config.yaml
+        target: /app/config.yaml
     ports:
       - 8080:8080
       - 8081:8081
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
 
   postgres:
     container_name: postgres
     image: postgres
     environment:
       POSTGRES_PASSWORD: postgres
+      POSTGRES_USER:  postgres
     ports:
       - 5432:5432
+    healthcheck:
+      test: pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
+      interval: 1s
+      timeout: 5s
+      retries: 60
 
   jaeger:
     image: jaegertracing/all-in-one:latest
