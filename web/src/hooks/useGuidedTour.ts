@@ -1,7 +1,7 @@
 import {useTour} from '@reactour/tour';
 import {delay as delayFn} from 'lodash';
 import {useEffect, useState} from 'react';
-import GuidedTourService, {GuidedTours} from 'entities/GuidedTour/GuidedTour.service';
+import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
 import HomeStepList from 'components/GuidedTour/homeStepList';
 import AssertionStepList from 'components/GuidedTour/assertionStepList';
 import TraceStepList from 'components/GuidedTour/traceStepList';

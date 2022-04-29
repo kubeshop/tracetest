@@ -1,15 +1,15 @@
 import {Typography} from 'antd';
 import SkeletonTable from 'components/SkeletonTable';
 import {FC, useMemo} from 'react';
-import { TAssertionResult } from '../../entities/Assertion/Assertion.types';
-import {getTestResultCount} from '../../entities/Trace/Trace.service';
-import { TTrace } from '../../entities/Trace/Trace.types';
+import {getTestResultCount} from '../../services/Trace.service';
+import {IAssertionResult} from '../../types/Assertion.types';
+import {ITrace} from '../../types/Trace.types';
 import TraceAssertionsResultTable from '../TraceAssertionsTable/TraceAssertionsTable';
 import * as S from './TestResults.styled';
 
 type TTestResultsProps = {
-  trace?: TTrace;
-  traceResultList: TAssertionResult[];
+  trace?: ITrace;
+  traceResultList: IAssertionResult[];
   onSpanSelected(spanId: string): void;
 };
 

@@ -6,10 +6,10 @@ import Title from 'antd/lib/typography/Title';
 
 import './TimelineChart.css';
 import SkeletonTable from 'components/SkeletonTable';
-import GuidedTourService, {GuidedTours} from '../../entities/GuidedTour/GuidedTour.service';
+import GuidedTourService, {GuidedTours} from '../../services/GuidedTour.service';
 import {Steps} from '../GuidedTour/traceStepList';
-import TraceAnalyticsService from '../../entities/Analytics/TraceAnalytics.service';
-import { TTrace } from '../../entities/Trace/Trace.types';
+import TraceAnalyticsService from '../../services/Analytics/TraceAnalytics.service';
+import {ITrace} from '../../types/Trace.types';
 
 const {onTimelineSpanClick} = TraceAnalyticsService;
 
@@ -23,13 +23,13 @@ const Header = styled.div`
 `;
 
 interface ITimelineChartProps {
-  trace: TTrace;
+  trace: ITrace;
   selectedSpan: any;
   onSelectSpan(spanId: string): void;
 }
 
 interface IProps {
-  trace?: TTrace;
+  trace?: ITrace;
   selectedSpan?: any;
   onSelectSpan(spanId: string): void;
 }

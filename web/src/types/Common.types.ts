@@ -2,7 +2,7 @@ export type TRecursivePartial<T> = {
   [P in keyof T]?: TRecursivePartial<T[P]>;
 };
 
-export type TEnv = {
+export interface IEnv {
   measurementId: string;
   analyticsEnabled: string;
-};
+}

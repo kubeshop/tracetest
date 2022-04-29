@@ -3,9 +3,9 @@ import {useRef} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useGetTestsQuery} from 'gateways/Test.gateway';
 import CustomTable from '../../components/CustomTable';
-import HomeAnalyticsService from '../../entities/Analytics/HomeAnalytics.service';
+import HomeAnalyticsService from '../../services/Analytics/HomeAnalytics.service';
 import NoResults from './NoResults';
-import {TTest} from '../../entities/Test/Test.types';
+import {ITest} from '../../types/Test.types';
 
 const {onTestClick} = HomeAnalyticsService;
 
@@ -36,7 +36,7 @@ const TestList = () => {
       onRow={record => {
         return {
           onClick: () => {
-            const testId = (record as TTest).testId;
+            const testId = (record as ITest).testId;
 
             onTestClick(testId);
             navigate(`/test/${testId}`);

@@ -1,33 +1,33 @@
 import {Button, Table, Typography} from 'antd';
 import {useMemo, useState} from 'react';
-import AssertionTableAnalyticsService from '../../entities/Analytics/AssertionTableAnalytics.service';
-import {TAssertion, TSpanAssertionResult} from '../../entities/Assertion/Assertion.types';
-import OperatorService from '../../entities/Operator/Operator.service';
-import {TSpan} from '../../entities/Span/Span.types';
-import {TTrace} from '../../entities/Trace/Trace.types';
+import AssertionTableAnalyticsService from '../../services/Analytics/AssertionTableAnalytics.service';
+import {IAssertion, ISpanAssertionResult} from '../../types/Assertion.types';
+import OperatorService from '../../services/Operator.service';
+import {ISpan} from '../../types/Span.types';
+import {ITrace} from '../../types/Trace.types';
 import CreateAssertionModal from '../CreateAssertionModal';
 import CustomTable from '../CustomTable';
 import * as S from './AssertionsTable.styled';
 
-type AssertionsResultTableProps = {
-  assertionResults: TSpanAssertionResult[];
-  assertion: TAssertion;
+interface IAssertionsResultTableProps {
+  assertionResults: ISpanAssertionResult[];
+  assertion: IAssertion;
   sort: number;
-  span: TSpan;
+  span: ISpan;
   testId: string;
-  trace: TTrace;
-};
+  trace: ITrace;
+}
 
-type TParsedAssertion = {
+interface IParsedAssertion {
   key: string;
   property: string;
   comparison: string;
   value: string;
   actualValue: string;
   hasPassed: boolean;
-};
+}
 
-const AssertionsResultTable: React.FC<AssertionsResultTableProps> = ({
+const AssertionsResultTable: React.FC<IAssertionsResultTableProps> = ({
   assertionResults,
   assertion: {selectors = []},
   assertion,
@@ -38,7 +38,7 @@ const AssertionsResultTable: React.FC<AssertionsResultTableProps> = ({
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const parsedAssertionList = useMemo<Array<TParsedAssertion>>(
+  const parsedAssertionList = useMemo<Array<IParsedAssertion>>(
     () =>
       assertionResults.map(({propertyName, comparisonValue, operator, actualValue, hasPassed}) => ({
         key: propertyName,
@@ -83,7 +83,7 @@ const AssertionsResultTable: React.FC<AssertionsResultTableProps> = ({
           title="Actual"
           dataIndex="actualValue"
           key="actualValue"
-          render={(value, record: TParsedAssertion) => (
+          render={(value, record: IParsedAssertion) => (
             <Typography.Text strong type={record.hasPassed ? 'success' : 'danger'}>
               {value}
             </Typography.Text>

@@ -2,19 +2,19 @@ import {Table, Typography} from 'antd';
 import {useStore} from 'react-flow-renderer';
 import {difference, sortBy} from 'lodash';
 import {FC, useCallback, useMemo} from 'react';
-import {getSpanSignature} from '../../entities/Span/Span.service';
+import {getSpanSignature} from '../../services/Span.service';
 import CustomTable from '../CustomTable';
 import * as S from './TraceAssertionsTable.styled';
-import TraceAssertionTableAnalyticsService from '../../entities/Analytics/TraceAssertionTableAnalytics.service';
-import {TAssertionResult} from '../../entities/Assertion/Assertion.types';
-import {TTrace} from '../../entities/Trace/Trace.types';
-import OperatorService from '../../entities/Operator/Operator.service';
+import TraceAssertionTableAnalyticsService from '../../services/Analytics/TraceAssertionTableAnalytics.service';
+import {IAssertionResult} from '../../types/Assertion.types';
+import {ITrace} from '../../types/Trace.types';
+import OperatorService from '../../services/Operator.service';
 
 const {onSpanAssertionClick} = TraceAssertionTableAnalyticsService;
 
 interface IProps {
-  assertionResult: TAssertionResult;
-  trace: TTrace;
+  assertionResult: IAssertionResult;
+  trace: ITrace;
   onSpanSelected(spanId: string): void;
 }
 

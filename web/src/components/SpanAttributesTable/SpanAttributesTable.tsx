@@ -1,10 +1,10 @@
 import {Table} from 'antd';
 import {FC} from 'react';
-import { TSpanFlatAttribute } from '../../entities/Span/Span.types';
+import { ISpanFlatAttribute } from '../../types/Span.types';
 import CustomTable from '../CustomTable';
 
 type TSpanAttributesTableProps = {
-  spanAttributesList: TSpanFlatAttribute[];
+  spanAttributesList: ISpanFlatAttribute[];
 };
 
 const SpanAttributesTable: FC<TSpanAttributesTableProps> = ({spanAttributesList}) => {

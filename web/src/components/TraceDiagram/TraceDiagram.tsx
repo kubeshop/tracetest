@@ -4,15 +4,15 @@ import {useDAGChart} from 'hooks/Charts';
 import TraceNode from './TraceNode';
 import {TSpanInfo, TSpanMap} from '../Trace/Trace';
 import * as S from './TraceDiagram.styled';
-import TraceDiagramAnalyticsService from '../../entities/Analytics/TraceDiagramAnalytics.service';
-import {TTrace} from '../../entities/Trace/Trace.types';
+import TraceDiagramAnalyticsService from '../../services/Analytics/TraceDiagramAnalytics.service';
+import {ITrace} from '../../types/Trace.types';
 
 const {onClickSpan} = TraceDiagramAnalyticsService;
 
 interface IPropsTraceDiagram {
   spanMap: TSpanMap;
   selectedSpan?: TSpanInfo;
-  trace: TTrace;
+  trace: ITrace;
   onSelectSpan(spanId: string): void;
 }
 

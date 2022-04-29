@@ -20,22 +20,22 @@ import {
   parseAssertionResultListToTestResult,
   parseTestResultToAssertionResultList,
   runTest,
-} from 'entities/Trace/Trace.service';
+} from 'services/Trace.service';
 import TraceDiagram from 'components/TraceDiagram/TraceDiagram';
 
-import GuidedTourService, {GuidedTours} from 'entities/GuidedTour/GuidedTour.service';
+import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
 import {Steps} from 'components/GuidedTour/traceStepList';
 import useGuidedTour from 'hooks/useGuidedTour';
-import TraceTimeline from './TraceTimeline';
 import * as S from './Trace.styled';
 
 import SpanDetail from './SpanDetail';
 import TestResults from './TestResults';
-import TraceAnalyticsService from '../../entities/Analytics/TraceAnalytics.service';
-import {TSpan} from '../../entities/Span/Span.types';
-import {TAssertionResult} from '../../entities/Assertion/Assertion.types';
-import {TTestRunResult} from '../../entities/TestRunResult/TestRunResult.types';
-import {TestState} from '../../entities/TestRunResult/TestRunResult.constants';
+import {ISpan} from '../../types/Span.types';
+import {IAssertionResult} from '../../types/Assertion.types';
+import {ITestRunResult} from '../../types/TestRunResult.types';
+import {TestState} from '../../constants/TestRunResult.constants';
+import TraceTimeline from './TraceTimeline';
+import TraceAnalyticsService from '../../services/Analytics/TraceAnalytics.service';
 
 const {onChangeTab} = TraceAnalyticsService;
 
@@ -48,7 +48,7 @@ const Grid = styled.div`
 export type TSpanInfo = {
   id: string;
   parentIds: string[];
-  data: TSpan;
+  data: ISpan;
 };
 
 export type TSpanMap = Record<string, TSpanInfo>;
@@ -57,12 +57,12 @@ type TraceProps = {
   testId: string;
   testResultId: string;
   onDismissTrace(): void;
-  onRunTest(result: TTestRunResult): void;
+  onRunTest(result: ITestRunResult): void;
 };
 
 const Trace: React.FC<TraceProps> = ({testId, testResultId, onDismissTrace, onRunTest}) => {
   const [selectedSpan, setSelectedSpan] = useState<TSpanInfo | undefined>();
-  const [traceResultList, setTraceResultList] = useState<TAssertionResult[]>([]);
+  const [traceResultList, setTraceResultList] = useState<IAssertionResult[]>([]);
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [updateTestResult] = useUpdateTestResultMutation();
   const {data: test} = useGetTestByIdQuery(testId);

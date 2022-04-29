@@ -1,7 +1,7 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
-import {TAssertion, TTestAssertionResult} from '../entities/Assertion/Assertion.types';
-import {TTest} from '../entities/Test/Test.types';
-import {TTestRunResult} from '../entities/TestRunResult/TestRunResult.types';
+import {IAssertion, ITestAssertionResult} from '../types/Assertion.types';
+import {ITest} from '../types/Test.types';
+import {ITestRunResult} from '../types/TestRunResult.types';
 import {TRecursivePartial} from '../types/Common.types';
 
 export const testAPI = createApi({
@@ -11,7 +11,7 @@ export const testAPI = createApi({
   }),
   tagTypes: ['Test', 'TestResult', 'Trace'],
   endpoints: build => ({
-    createTest: build.mutation<TTest, TRecursivePartial<TTest>>({
+    createTest: build.mutation<ITest, TRecursivePartial<ITest>>({
       query: newTest => ({
         url: `/tests`,
         method: 'POST',
@@ -19,28 +19,28 @@ export const testAPI = createApi({
       }),
       invalidatesTags: [{type: 'Test', id: 'LIST'}],
     }),
-    runTest: build.mutation<TTestRunResult, string>({
+    runTest: build.mutation<ITestRunResult, string>({
       query: testId => ({
         url: `/tests/${testId}/run`,
         method: 'POST',
       }),
       invalidatesTags: ['TestResult'],
     }),
-    getTests: build.query<TTest[], void>({
+    getTests: build.query<ITest[], void>({
       query: () => `/tests`,
       providesTags: result =>
         result
           ? [...result.map(i => ({type: 'Test' as const, id: i.testId})), {type: 'Test', id: 'LIST'}]
           : [{type: 'Test', id: 'LIST'}],
     }),
-    getTestById: build.query<TTest, string>({
+    getTestById: build.query<ITest, string>({
       query: id => `/tests/${id}`,
       providesTags: result => [{type: 'Test', id: result?.testId}],
     }),
-    getTestAssertions: build.query<TAssertion[], string>({
+    getTestAssertions: build.query<IAssertion[], string>({
       query: testId => `/tests/${testId}/assertions`,
     }),
-    createAssertion: build.mutation<TAssertion, {testId: string; assertion: Partial<TAssertion>}>({
+    createAssertion: build.mutation<IAssertion, {testId: string; assertion: Partial<IAssertion>}>({
       query: ({testId, assertion}) => ({
         url: `/tests/${testId}/assertions`,
         method: 'POST',
@@ -48,7 +48,7 @@ export const testAPI = createApi({
       }),
       invalidatesTags: (result, error, args) => [{type: 'Test', id: args.testId}],
     }),
-    updateAssertion: build.mutation<TAssertion, {testId: string; assertionId: string; assertion: Partial<TAssertion>}>({
+    updateAssertion: build.mutation<IAssertion, {testId: string; assertionId: string; assertion: Partial<IAssertion>}>({
       query: ({testId, assertion, assertionId}) => ({
         url: `/tests/${testId}/assertions/${assertionId}`,
         method: 'PUT',
@@ -56,14 +56,14 @@ export const testAPI = createApi({
       }),
       invalidatesTags: (result, error, args) => [{type: 'Test', id: args.testId}],
     }),
-    getTestResults: build.query<TTestRunResult[], string>({
+    getTestResults: build.query<ITestRunResult[], string>({
       query: id => `/tests/${id}/results`,
       providesTags: result =>
         result ? [{type: 'TestResult' as const, id: 'LIST'}] : [{type: 'TestResult' as const, id: 'LIST'}],
     }),
     updateTestResult: build.mutation<
-      TTestRunResult,
-      {testId: string; resultId: string; assertionResult: TTestAssertionResult}
+      ITestRunResult,
+      {testId: string; resultId: string; assertionResult: ITestAssertionResult}
     >({
       query: ({testId, resultId, assertionResult}) => ({
         url: `/tests/${testId}/results/${resultId}`,
@@ -72,7 +72,7 @@ export const testAPI = createApi({
       }),
       invalidatesTags: (result, error, args) => [{type: 'TestResult', id: args.resultId}],
     }),
-    getTestResultById: build.query<TTestRunResult, Pick<TTest, 'testId'> & {resultId: string}>({
+    getTestResultById: build.query<ITestRunResult, Pick<ITest, 'testId'> & {resultId: string}>({
       query: ({testId, resultId}) => `/tests/${testId}/results/${resultId}`,
       providesTags: result => (result ? [{type: 'TestResult' as const, id: result?.resultId}] : []),
     }),

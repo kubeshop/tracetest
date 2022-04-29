@@ -6,7 +6,7 @@
 // the selected span that we want to autogenerate the selectors array for.  Create a SelectorItem
 // for each attribute that you find a value for in that selected span.
 
-import {LOCATION_NAME} from '../entities/Span/Span.constants';
+import {LOCATION_NAME} from '../constants/Span.constants';
 
 // Note - need to add the following:
 // lamda - aws lambda section

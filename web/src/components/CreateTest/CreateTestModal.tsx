@@ -5,9 +5,9 @@ import {DeleteOutlined} from '@ant-design/icons';
 import {useCreateTestMutation, useRunTestMutation} from 'gateways/Test.gateway';
 import './CreateTest.css';
 import {useNavigate} from 'react-router-dom';
-import GuidedTourService, {GuidedTours} from '../../entities/GuidedTour/GuidedTour.service';
+import GuidedTourService, {GuidedTours} from '../../services/GuidedTour.service';
 import {Steps} from '../GuidedTour/homeStepList';
-import CreateTestAnalyticsService from '../../entities/Analytics/CreateTestAnalytics.service';
+import CreateTestAnalyticsService from '../../services/Analytics/CreateTestAnalytics.service';
 import { HTTP_METHOD } from '../../constants/Common.contants';
 
 interface IProps {

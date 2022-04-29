@@ -14,8 +14,8 @@ import TestStateBadge from 'components/TestStateBadge';
 
 import * as S from './Test.styled';
 import TestDetails from './TestDetails';
-import { TestState } from '../../entities/TestRunResult/TestRunResult.constants';
-import { TTestRunResult } from '../../entities/TestRunResult/TestRunResult.types';
+import { TestState } from '../../constants/TestRunResult.constants';
+import { ITestRunResult } from '../../types/TestRunResult.types';
 
 interface TracePane {
   key: string;
@@ -47,7 +47,7 @@ const TestPage = () => {
     false;
 
   const handleSelectTestResult = useCallback(
-    (result: TTestRunResult) => {
+    (result: ITestRunResult) => {
       const itExists = Boolean(tracePanes.find(pane => pane.key === result.resultId));
 
       if (!itExists) {

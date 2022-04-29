@@ -5,18 +5,18 @@ import {differenceInSeconds} from 'date-fns';
 import {FC} from 'react';
 import CustomTable from '../../components/CustomTable';
 import {Steps} from '../../components/GuidedTour/testDetailsStepList';
-import TestAnalyticsService from '../../entities/Analytics/TestAnalytics.service';
-import {TAssertionResultList} from '../../entities/Assertion/Assertion.types';
-import GuidedTourService, {GuidedTours} from '../../entities/GuidedTour/GuidedTour.service';
-import {TestState} from '../../entities/TestRunResult/TestRunResult.constants';
-import {TTestRunResult} from '../../entities/TestRunResult/TestRunResult.types';
+import TestAnalyticsService from '../../services/Analytics/TestAnalytics.service';
+import {TAssertionResultList} from '../../types/Assertion.types';
+import GuidedTourService, {GuidedTours} from '../../services/GuidedTour.service';
+import {TestState} from '../../constants/TestRunResult.constants';
+import {ITestRunResult} from '../../types/TestRunResult.types';
 
 const {onTestRunClick} = TestAnalyticsService;
 
 type TextRowProps = {
-  testResultList: TTestRunResult[];
+  testResultList: ITestRunResult[];
   isLoading: boolean;
-  onSelectResult(result: TTestRunResult): void;
+  onSelectResult(result: ITestRunResult): void;
 };
 
 const validStatusList = [TestState.FINISHED, TestState.AWAITING_TEST_RESULTS];
@@ -53,7 +53,7 @@ const TextDetailsTable: FC<TextRowProps> = ({isLoading, onSelectResult, testResu
       onRow={record => {
         return {
           onClick: () => {
-            const testResult = record as TTestRunResult;
+            const testResult = record as ITestRunResult;
             onTestRunClick(testResult.traceId);
             onSelectResult(testResult);
           },
@@ -77,7 +77,7 @@ const TextDetailsTable: FC<TextRowProps> = ({isLoading, onSelectResult, testResu
         }
         key="executionTime"
         width="10%"
-        render={(value, {createdAt, completedAt}: TTestRunResult) => {
+        render={(value, {createdAt, completedAt}: ITestRunResult) => {
           if (!createdAt || !completedAt) return '';
           const executionTime = differenceInSeconds(new Date(completedAt), new Date(createdAt)) + 1;
 
@@ -88,7 +88,7 @@ const TextDetailsTable: FC<TextRowProps> = ({isLoading, onSelectResult, testResu
         title={<span data-tour={GuidedTourService.getStep(GuidedTours.TestDetails, Steps.Status)}>Status</span>}
         key="state"
         width="20%"
-        render={(value, {state}: TTestRunResult) => {
+        render={(value, {state}: ITestRunResult) => {
           return <TestStateBadge testState={state} />;
         }}
       />
@@ -97,7 +97,7 @@ const TextDetailsTable: FC<TextRowProps> = ({isLoading, onSelectResult, testResu
         title={<span data-tour={GuidedTourService.getStep(GuidedTours.TestDetails, Steps.Assertions)}>Total</span>}
         key="total"
         dataIndex="state"
-        render={(value, {state, assertionResult = []}: TTestRunResult) => {
+        render={(value, {state, assertionResult = []}: ITestRunResult) => {
           if (validStatusList.includes(state)) {
             const passedAssertionsCount = getTestResultCount(assertionResult, 'all');
             return passedAssertionsCount;
@@ -117,7 +117,7 @@ const TextDetailsTable: FC<TextRowProps> = ({isLoading, onSelectResult, testResu
         }
         key="passed"
         dataIndex="state"
-        render={(value, {state, assertionResult = []}: TTestRunResult) => {
+        render={(value, {state, assertionResult = []}: ITestRunResult) => {
           if (validStatusList.includes(state)) {
             const passedAssertionsCount = getTestResultCount(assertionResult, 'passed');
             return passedAssertionsCount;
@@ -131,7 +131,7 @@ const TextDetailsTable: FC<TextRowProps> = ({isLoading, onSelectResult, testResu
         title={<Badge data-tour={GuidedTourService.getStep(GuidedTours.TestDetails, Steps.Failed)} count="F" />}
         dataIndex="state"
         key="failed"
-        render={(value, {state, assertionResult = []}: TTestRunResult) => {
+        render={(value, {state, assertionResult = []}: ITestRunResult) => {
           if (validStatusList.includes(state)) {
             const passedAssertionsCount = getTestResultCount(assertionResult, 'failed');
             return passedAssertionsCount;

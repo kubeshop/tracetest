@@ -7,19 +7,19 @@ import jemsPath from 'jmespath';
 import {useCreateAssertionMutation, useUpdateAssertionMutation} from 'gateways/Test.gateway';
 import {SELECTOR_DEFAULT_ATTRIBUTES} from 'constants/SemanticGroupNames.constants';
 import {filterBySpanId} from 'utils/Common';
-import {getSpanSignature} from 'entities/Span/Span.service';
-import {getSpanAttributeValueType} from 'entities/SpanAttribute/SpansAttribute.service';
-import GuidedTourService, {GuidedTours} from 'entities/GuidedTour/GuidedTour.service';
-import {Steps} from 'components/GuidedTour/assertionStepList';
+import {getSpanSignature} from 'services/Span.service';
+import {getSpanAttributeValueType} from 'services/SpansAttribute.service';
+import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
 import useGuidedTour from 'hooks/useGuidedTour';
 import {CreateAssertionSelectorInput} from './CreateAssertionSelectorInput';
 import * as S from './CreateAssertionModal.styled';
-import CreateAssertionModalAnalyticsService from '../../entities/Analytics/CreateAssertionModalAnalytics.service';
-import {TAssertion, TItemSelector, TSpanSelector} from '../../entities/Assertion/Assertion.types';
-import { CompareOperator } from '../../entities/Operator/Operator.constants';
-import { TSpan } from '../../entities/Span/Span.types';
-import { TTrace } from '../../entities/Trace/Trace.types';
-import { LOCATION_NAME } from '../../entities/Span/Span.constants';
+import CreateAssertionModalAnalyticsService from '../../services/Analytics/CreateAssertionModalAnalytics.service';
+import {IAssertion, IItemSelector, ISpanSelector} from '../../types/Assertion.types';
+import { CompareOperator } from '../../constants/Operator.constants';
+import { ISpan } from '../../types/Span.types';
+import { ITrace } from '../../types/Trace.types';
+import { LOCATION_NAME } from '../../constants/Span.constants';
+import { Steps } from '../GuidedTour/assertionStepList';
 
 const {
   onAddCheck,
@@ -30,15 +30,15 @@ const {
   onSelectorChange,
 } = CreateAssertionModalAnalyticsService;
 
-type TAssertionSpan = {
+interface IAssertionSpan {
   key: string;
   compareOp: CompareOperator;
   value: string;
 };
 
 export type TValues = {
-  assertionList: TAssertionSpan[];
-  selectorList: TItemSelector[];
+  assertionList: IAssertionSpan[];
+  selectorList: IItemSelector[];
 };
 
 const itemSelectorKeys = SELECTOR_DEFAULT_ATTRIBUTES.map(el => el.attributes).flat();
@@ -46,11 +46,11 @@ const itemSelectorKeys = SELECTOR_DEFAULT_ATTRIBUTES.map(el => el.attributes).fl
 interface TCreateAssertionFormProps {
   onCreate(): void;
   onForm(form: FormInstance): void;
-  onSelectorList(selectorList: TItemSelector[]): void;
-  span: TSpan;
+  onSelectorList(selectorList: IItemSelector[]): void;
+  span: ISpan;
   testId: string;
-  trace: TTrace;
-  assertion?: TAssertion;
+  trace: ITrace;
+  assertion?: IAssertion;
 }
 
 const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
@@ -70,7 +70,7 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
 
   useGuidedTour(GuidedTours.Assertion);
 
-  const defaultAssertionList = useMemo<TAssertionSpan[]>(() => {
+  const defaultAssertionList = useMemo<IAssertionSpan[]>(() => {
     if (assertion) {
       return assertion.spanAssertions?.map(({propertyName, operator, comparisonValue}) => ({
         key: propertyName,
@@ -153,7 +153,7 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
             valueType: getSpanAttributeValueType(spanAttribute!),
           };
         })
-        .filter((el): el is TSpanSelector => Boolean(el));
+        .filter((el): el is ISpanSelector => Boolean(el));
 
       const newData = {selectors: selectorList, spanAssertions};
 
@@ -192,7 +192,7 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
         if (fieldName === 'assertionList') onChecksChange(JSON.stringify(form.getFieldValue('assertionList') || []));
 
         if (fieldName === 'assertionList' && keyName === 'key' && field.value) {
-          const assertionList: TAssertionSpan[] = form.getFieldValue('assertionList') || [];
+          const assertionList: IAssertionSpan[] = form.getFieldValue('assertionList') || [];
 
           form.setFieldsValue({
             assertionList: assertionList.map((assertionEntry, index) => {
