@@ -36,7 +36,7 @@ func NewTracePoller(
 	maxWaitTimeForTrace time.Duration,
 	subscriptionManager *subscription.Manager,
 ) PersistentTracePoller {
-	retryDelay := 500 * time.Millisecond
+	retryDelay := 1 * time.Second
 	maxTracePollRetry := int(math.Ceil(float64(maxWaitTimeForTrace) / float64(retryDelay)))
 	return tracePoller{
 		traceDB:             tf,
@@ -116,7 +116,7 @@ func (tp tracePoller) enqueueJob(job tracePollReq) {
 
 func (tp tracePoller) processJob(job tracePollReq) {
 	res := job.result
-	tr, err := tp.traceDB.GetTraceByID(job.ctx, res.TraceId)
+	currentTrace, err := tp.traceDB.GetTraceByID(job.ctx, res.TraceId)
 
 	if err != nil {
 		tp.handleTraceDBError(job, err)
@@ -124,24 +124,24 @@ func (tp tracePoller) processJob(job tracePollReq) {
 	}
 
 	res.State = TestRunStateAwaitingTestResults
-	tr, err = FixParent(tr, res.Response)
+	currentTrace, err = FixParent(currentTrace, res.Response)
 	if err != nil {
 		job.result = res
 		job.count = job.count + 1
 		tp.requeue(job)
 		return
 	}
-
-	res.Trace = mapTrace(tr)
-
-	if !tp.donePollingTraces(job, res) {
+	currentTr := mapTrace(currentTrace)
+	if !tp.donePollingTraces(job, currentTr) {
+		res.Trace = currentTr
 		job.result = res
 		job.count = job.count + 1
 		tp.requeue(job)
 		return
 	}
+	res.Trace = currentTr
 
-	fmt.Printf("completed polling result %s after %d times\n", job.result.ResultId, job.count)
+	fmt.Printf("completed polling result %s after %d times, number of spans: %d \n", job.result.ResultId, job.count, numSpans(currentTr))
 
 	tp.handleDBError(tp.resultDB.UpdateResult(job.ctx, &res))
 
@@ -152,10 +152,24 @@ func (tp tracePoller) processJob(job tracePollReq) {
 	})
 }
 
-func (tp tracePoller) donePollingTraces(job tracePollReq, currentResults openapi.TestRunResult) bool {
-	// we're done if we have the same amount of spans after polling `maxTracePollRetry` times
-	return len(currentResults.Trace.ResourceSpans) > 0 &&
-		len(currentResults.Trace.ResourceSpans) == len(job.result.Trace.ResourceSpans) &&
+// to compare trace we count the number of resourceSpans + InstrumentationLibrarySpans + spans.
+func numSpans(trace openapi.ApiV3SpansResponseChunk) int {
+	num := 0
+	for _, rsp := range trace.ResourceSpans {
+		num++
+		for _, ils := range rsp.InstrumentationLibrarySpans {
+			num++
+
+			num += len(ils.Spans)
+		}
+	}
+	return num
+}
+
+func (tp tracePoller) donePollingTraces(job tracePollReq, currentTrace openapi.ApiV3SpansResponseChunk) bool {
+	// we're done if we have the same amount of spans after polling or `maxTracePollRetry` times
+	return (len(currentTrace.ResourceSpans) > 0 &&
+		numSpans(currentTrace) == numSpans(job.result.Trace)) ||
 		job.count == tp.maxTracePollRetry
 }
 
