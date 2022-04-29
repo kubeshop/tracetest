@@ -18,7 +18,7 @@ type jaegerTraceDB struct {
 	query pb.QueryServiceClient
 }
 
-func newJaegerDB(config *configgrpc.GRPCClientSettings) (*jaegerTraceDB, error) {
+func newJaegerDB(config *configgrpc.GRPCClientSettings) (TraceDB, error) {
 	opts, err := config.ToDialOptions(nil, componenttest.NewNopTelemetrySettings())
 	if err != nil {
 		return nil, fmt.Errorf("jaegerdb grpc config: %w", err)
