@@ -1,5 +1,8 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
-import {Assertion, RecursivePartial, Test, TestAssertionResult, TestId, TestRunResult} from 'types';
+import {IAssertion, ITestAssertionResult} from '../types/Assertion.types';
+import {ITest} from '../types/Test.types';
+import {ITestRunResult} from '../types/TestRunResult.types';
+import {TRecursivePartial} from '../types/Common.types';
 
 export const testAPI = createApi({
   reducerPath: 'testsAPI',
@@ -8,7 +11,7 @@ export const testAPI = createApi({
   }),
   tagTypes: ['Test', 'TestResult', 'Trace'],
   endpoints: build => ({
-    createTest: build.mutation<Test, RecursivePartial<Test>>({
+    createTest: build.mutation<ITest, TRecursivePartial<ITest>>({
       query: newTest => ({
         url: `/tests`,
         method: 'POST',
@@ -16,28 +19,28 @@ export const testAPI = createApi({
       }),
       invalidatesTags: [{type: 'Test', id: 'LIST'}],
     }),
-    runTest: build.mutation<TestRunResult, string>({
+    runTest: build.mutation<ITestRunResult, string>({
       query: testId => ({
         url: `/tests/${testId}/run`,
         method: 'POST',
       }),
       invalidatesTags: ['TestResult'],
     }),
-    getTests: build.query<Test[], void>({
+    getTests: build.query<ITest[], void>({
       query: () => `/tests`,
       providesTags: result =>
         result
           ? [...result.map(i => ({type: 'Test' as const, id: i.testId})), {type: 'Test', id: 'LIST'}]
           : [{type: 'Test', id: 'LIST'}],
     }),
-    getTestById: build.query<Test, string>({
+    getTestById: build.query<ITest, string>({
       query: id => `/tests/${id}`,
       providesTags: result => [{type: 'Test', id: result?.testId}],
     }),
-    getTestAssertions: build.query<Assertion[], string>({
+    getTestAssertions: build.query<IAssertion[], string>({
       query: testId => `/tests/${testId}/assertions`,
     }),
-    createAssertion: build.mutation<Assertion, {testId: string; assertion: Partial<Assertion>}>({
+    createAssertion: build.mutation<IAssertion, {testId: string; assertion: Partial<IAssertion>}>({
       query: ({testId, assertion}) => ({
         url: `/tests/${testId}/assertions`,
         method: 'POST',
@@ -45,7 +48,7 @@ export const testAPI = createApi({
       }),
       invalidatesTags: (result, error, args) => [{type: 'Test', id: args.testId}],
     }),
-    updateAssertion: build.mutation<Assertion, {testId: string; assertionId: string; assertion: Partial<Assertion>}>({
+    updateAssertion: build.mutation<IAssertion, {testId: string; assertionId: string; assertion: Partial<IAssertion>}>({
       query: ({testId, assertion, assertionId}) => ({
         url: `/tests/${testId}/assertions/${assertionId}`,
         method: 'PUT',
@@ -53,14 +56,14 @@ export const testAPI = createApi({
       }),
       invalidatesTags: (result, error, args) => [{type: 'Test', id: args.testId}],
     }),
-    getTestResults: build.query<TestRunResult[], TestId>({
+    getTestResults: build.query<ITestRunResult[], string>({
       query: id => `/tests/${id}/results`,
       providesTags: result =>
         result ? [{type: 'TestResult' as const, id: 'LIST'}] : [{type: 'TestResult' as const, id: 'LIST'}],
     }),
     updateTestResult: build.mutation<
-      TestRunResult,
-      {testId: string; resultId: string; assertionResult: TestAssertionResult}
+      ITestRunResult,
+      {testId: string; resultId: string; assertionResult: ITestAssertionResult}
     >({
       query: ({testId, resultId, assertionResult}) => ({
         url: `/tests/${testId}/results/${resultId}`,
@@ -69,7 +72,7 @@ export const testAPI = createApi({
       }),
       invalidatesTags: (result, error, args) => [{type: 'TestResult', id: args.resultId}],
     }),
-    getTestResultById: build.query<TestRunResult, Pick<Test, 'testId'> & {resultId: string}>({
+    getTestResultById: build.query<ITestRunResult, Pick<ITest, 'testId'> & {resultId: string}>({
       query: ({testId, resultId}) => `/tests/${testId}/results/${resultId}`,
       providesTags: result => (result ? [{type: 'TestResult' as const, id: result?.resultId}] : []),
     }),

@@ -1,21 +1,21 @@
 import {Button, Typography} from 'antd';
 import {FC, useCallback} from 'react';
-import {useRunTestMutation} from 'redux/services/TestService';
-import {TestId, TestRunResult} from 'types';
-import GuidedTourService, {GuidedTours} from 'services/GuidedTourService';
+import {useRunTestMutation} from 'gateways/Test.gateway';
+import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
 import {Steps} from 'components/GuidedTour/testDetailsStepList';
 import useGuidedTour from 'hooks/useGuidedTour';
 import * as S from './Test.styled';
 import TestDetailsTable from './TestDetailsTable';
-import TestAnalyticsService from '../../services/analytics/TestAnalyticsService';
+import TestAnalyticsService from '../../services/Analytics/TestAnalytics.service';
+import { ITestRunResult } from '../../types/TestRunResult.types';
 
 const {onRunTest} = TestAnalyticsService;
 
 type TTestDetailsProps = {
-  testId: TestId;
+  testId: string;
   url?: string;
-  onSelectResult: (result: TestRunResult) => void;
-  testResultList: TestRunResult[];
+  onSelectResult: (result: ITestRunResult) => void;
+  testResultList: ITestRunResult[];
   isLoading: boolean;
 };
 
@@ -27,7 +27,7 @@ const TestDetails: FC<TTestDetailsProps> = ({testId, testResultList, isLoading, 
     if (testId) {
       onRunTest(testId);
       const testResult = await runTest(testId).unwrap();
-      onSelectResult({resultId: testResult.resultId} as TestRunResult);
+      onSelectResult({resultId: testResult.resultId} as ITestRunResult);
     }
   }, [onSelectResult, runTest, testId]);
 

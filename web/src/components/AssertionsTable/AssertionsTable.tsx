@@ -1,31 +1,33 @@
 import {Button, Table, Typography} from 'antd';
 import {useMemo, useState} from 'react';
-import {Assertion, SpanAssertionResult, ITrace, ISpan} from 'types';
-import {getOperator} from 'utils';
+import AssertionTableAnalyticsService from '../../services/Analytics/AssertionTableAnalytics.service';
+import {IAssertion, ISpanAssertionResult} from '../../types/Assertion.types';
+import OperatorService from '../../services/Operator.service';
+import {ISpan} from '../../types/Span.types';
+import {ITrace} from '../../types/Trace.types';
 import CreateAssertionModal from '../CreateAssertionModal';
 import CustomTable from '../CustomTable';
 import * as S from './AssertionsTable.styled';
-import AssertionTableAnalyticsService from '../../services/analytics/AssertionTableAnalyticsService';
 
-type AssertionsResultTableProps = {
-  assertionResults: SpanAssertionResult[];
-  assertion: Assertion;
+interface IAssertionsResultTableProps {
+  assertionResults: ISpanAssertionResult[];
+  assertion: IAssertion;
   sort: number;
   span: ISpan;
   testId: string;
   trace: ITrace;
-};
+}
 
-type TParsedAssertion = {
+interface IParsedAssertion {
   key: string;
   property: string;
   comparison: string;
   value: string;
   actualValue: string;
   hasPassed: boolean;
-};
+}
 
-const AssertionsResultTable: React.FC<AssertionsResultTableProps> = ({
+const AssertionsResultTable: React.FC<IAssertionsResultTableProps> = ({
   assertionResults,
   assertion: {selectors = []},
   assertion,
@@ -36,7 +38,7 @@ const AssertionsResultTable: React.FC<AssertionsResultTableProps> = ({
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const parsedAssertionList = useMemo<Array<TParsedAssertion>>(
+  const parsedAssertionList = useMemo<Array<IParsedAssertion>>(
     () =>
       assertionResults.map(({propertyName, comparisonValue, operator, actualValue, hasPassed}) => ({
         key: propertyName,
@@ -70,13 +72,18 @@ const AssertionsResultTable: React.FC<AssertionsResultTableProps> = ({
       </S.AssertionsTableHeader>
       <CustomTable size="small" pagination={{hideOnSinglePage: true}} dataSource={parsedAssertionList}>
         <Table.Column title="Property" dataIndex="property" key="property" ellipsis width="50%" />
-        <Table.Column title="Comparison" dataIndex="comparison" key="comparison" render={value => getOperator(value)} />
+        <Table.Column
+          title="Comparison"
+          dataIndex="comparison"
+          key="comparison"
+          render={value => OperatorService.getOperatorName(value)}
+        />
         <Table.Column title="Value" dataIndex="value" key="value" />
         <Table.Column
           title="Actual"
           dataIndex="actualValue"
           key="actualValue"
-          render={(value, record: TParsedAssertion) => (
+          render={(value, record: IParsedAssertion) => (
             <Typography.Text strong type={record.hasPassed ? 'success' : 'danger'}>
               {value}
             </Typography.Text>

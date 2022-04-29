@@ -1,19 +1,22 @@
 import {Button, Typography} from 'antd';
 import {PlusOutlined} from '@ant-design/icons';
 import {FC, useMemo, useState} from 'react';
-import {Assertion, ISpan, ITrace, SpanAssertionResult, Test} from 'types';
-import {runAssertionBySpanId} from 'services/AssertionService';
+import {runAssertionBySpanId} from 'services/Assertion.service';
 import AssertionsResultTable from 'components/AssertionsTable/AssertionsTable';
 import CreateAssertionModal from 'components/CreateAssertionModal';
 import SkeletonTable from 'components/SkeletonTable';
 import * as S from './SpanDetail.styled';
+import TraceAnalyticsService from '../../services/Analytics/TraceAnalytics.service';
+import {ITest} from '../../types/Test.types';
+import {ISpan} from '../../types/Span.types';
+import {ITrace} from '../../types/Trace.types';
+import {IAssertion, ISpanAssertionResult} from '../../types/Assertion.types';
 import Attributes from './Attributes';
-import TraceAnalyticsService from '../../services/analytics/TraceAnalyticsService';
 
 const {onAddAssertionButtonClick} = TraceAnalyticsService;
 
 type TSpanDetailProps = {
-  test?: Test;
+  test?: ITest;
   targetSpan?: ISpan;
   trace?: ITrace;
 };
@@ -26,7 +29,7 @@ const SpanDetail: FC<TSpanDetailProps> = ({test, targetSpan, trace}) => {
       return [];
     }
     return (
-      test?.assertions?.reduce<Array<{assertion: Assertion; assertionResultList: Array<SpanAssertionResult>}>>(
+      test?.assertions?.reduce<Array<{assertion: IAssertion; assertionResultList: Array<ISpanAssertionResult>}>>(
         (resultList, assertion) => {
           const assertionResultList = runAssertionBySpanId(targetSpan.spanId, trace, assertion);
 

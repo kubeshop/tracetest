@@ -1,4 +1,4 @@
-import AnalyticsService, { Categories } from "./AnalyticsService";
+import AnalyticsService, { Categories } from "./Analytics.service";
 
 enum Actions {
   SpanAssertionCLick = 'test-assertion-table-span-assertion-click',

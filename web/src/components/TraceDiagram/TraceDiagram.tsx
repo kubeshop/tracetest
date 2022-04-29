@@ -3,9 +3,9 @@ import ReactFlow, {Background, BackgroundVariant, FlowElement} from 'react-flow-
 import {useDAGChart} from 'hooks/Charts';
 import TraceNode from './TraceNode';
 import {TSpanInfo, TSpanMap} from '../Trace/Trace';
-import {ITrace} from '../../types';
 import * as S from './TraceDiagram.styled';
-import TraceDiagramAnalyticsService from '../../services/analytics/TraceDiagramAnalyticsService';
+import TraceDiagramAnalyticsService from '../../services/Analytics/TraceDiagramAnalytics.service';
+import {ITrace} from '../../types/Trace.types';
 
 const {onClickSpan} = TraceDiagramAnalyticsService;
 

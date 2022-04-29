@@ -6,9 +6,7 @@ import {Button, Tabs, Typography} from 'antd';
 import Title from 'antd/lib/typography/Title';
 import {CloseOutlined, ArrowLeftOutlined} from '@ant-design/icons';
 import {useLocation, useNavigate, useParams} from 'react-router-dom';
-
-import {TestRunResult, TestState} from 'types';
-import {useGetTestByIdQuery, useGetTestResultByIdQuery, useGetTestResultsQuery} from 'redux/services/TestService';
+import {useGetTestByIdQuery, useGetTestResultByIdQuery, useGetTestResultsQuery} from 'gateways/Test.gateway';
 
 import Trace from 'components/Trace';
 import Layout from 'components/Layout';
@@ -16,6 +14,8 @@ import TestStateBadge from 'components/TestStateBadge';
 
 import * as S from './Test.styled';
 import TestDetails from './TestDetails';
+import { TestState } from '../../constants/TestRunResult.constants';
+import { ITestRunResult } from '../../types/TestRunResult.types';
 
 interface TracePane {
   key: string;
@@ -47,7 +47,7 @@ const TestPage = () => {
     false;
 
   const handleSelectTestResult = useCallback(
-    (result: TestRunResult) => {
+    (result: ITestRunResult) => {
       const itExists = Boolean(tracePanes.find(pane => pane.key === result.resultId));
 
       if (!itExists) {

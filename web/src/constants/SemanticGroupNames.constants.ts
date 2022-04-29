@@ -6,7 +6,7 @@
 // the selected span that we want to autogenerate the selectors array for.  Create a SelectorItem
 // for each attribute that you find a value for in that selected span.
 
-import {LOCATION_NAME} from '../types';
+import {LOCATION_NAME} from '../constants/Span.constants';
 
 // Note - need to add the following:
 // lamda - aws lambda section
@@ -110,7 +110,7 @@ export const SELECTOR_DEFAULT_ATTRIBUTES = [
       'messaging.rocketmq.client_group',
       'messaging.rocketmq.message_type',
       'messaging.rocketmq.message_keys',
-      'messaging.rocketmq.consumption_model'
+      'messaging.rocketmq.consumption_model',
     ],
   },
   {

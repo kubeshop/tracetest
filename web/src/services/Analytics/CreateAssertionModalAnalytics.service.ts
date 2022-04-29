@@ -1,4 +1,4 @@
-import AnalyticsService, {Categories, Labels} from './AnalyticsService';
+import AnalyticsService, {Categories, Labels} from './Analytics.service';
 
 enum Actions {
   EditAssertionFormSubmit = 'edit-assertion-form-submit',

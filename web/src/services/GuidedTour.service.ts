@@ -1,4 +1,4 @@
-import LocalStorageService from './LocalStorageService';
+import LocalStorageGateway from '../gateways/LocalStorage.gateway';
 
 export enum GuidedTours {
   Home = 'home',
@@ -11,7 +11,7 @@ type TTour = Record<GuidedTours, boolean>;
 
 const GUIDED_TOUR_KEY = 'guided_tour';
 
-const {get, set} = LocalStorageService<TTour>(GUIDED_TOUR_KEY);
+const {get, set} = LocalStorageGateway<TTour>(GUIDED_TOUR_KEY);
 
 const defaultValue = Object.values(GuidedTours).reduce<TTour>(
   (acc, value) => ({

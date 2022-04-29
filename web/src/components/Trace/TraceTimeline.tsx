@@ -3,13 +3,13 @@ import styled from 'styled-components';
 import * as d3 from 'd3';
 
 import Title from 'antd/lib/typography/Title';
-import {ITrace} from 'types';
 
 import './TimelineChart.css';
 import SkeletonTable from 'components/SkeletonTable';
-import GuidedTourService, {GuidedTours} from '../../services/GuidedTourService';
+import GuidedTourService, {GuidedTours} from '../../services/GuidedTour.service';
 import {Steps} from '../GuidedTour/traceStepList';
-import TraceAnalyticsService from '../../services/analytics/TraceAnalyticsService';
+import TraceAnalyticsService from '../../services/Analytics/TraceAnalytics.service';
+import {ITrace} from '../../types/Trace.types';
 
 const {onTimelineSpanClick} = TraceAnalyticsService;
 

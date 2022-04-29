@@ -2,9 +2,10 @@ import Text from 'antd/lib/typography/Text';
 import {upperCase} from 'lodash';
 import React from 'react';
 import {Handle, NodeProps, Position} from 'react-flow-renderer';
-import {ISpan, ITrace} from 'types';
-import {SemanticGroupNames, SemanticGroupNamesToText} from '../../lib/SelectorDefaultAttributes';
-import {getSpanNodeInfo} from '../../services/SpanService';
+import {SemanticGroupNames, SemanticGroupNamesToText} from '../../constants/SemanticGroupNames.constants';
+import {getSpanNodeInfo} from '../../services/Span.service';
+import {ISpan} from '../../types/Span.types';
+import {ITrace} from '../../types/Trace.types';
 import * as S from './TraceDiagram.styled';
 
 type TTraceNodeProps = NodeProps<{span: ISpan; trace: ITrace}>;

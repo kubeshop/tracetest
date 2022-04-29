@@ -1,11 +1,11 @@
 import {Table} from 'antd';
 import {useRef} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {useGetTestsQuery} from 'redux/services/TestService';
+import {useGetTestsQuery} from 'gateways/Test.gateway';
 import CustomTable from '../../components/CustomTable';
-import {Test} from '../../types';
+import HomeAnalyticsService from '../../services/Analytics/HomeAnalytics.service';
 import NoResults from './NoResults';
-import HomeAnalyticsService from '../../services/analytics/HomeAnalyticsService';
+import {ITest} from '../../types/Test.types';
 
 const {onTestClick} = HomeAnalyticsService;
 
@@ -36,7 +36,7 @@ const TestList = () => {
       onRow={record => {
         return {
           onClick: () => {
-            const testId = (record as Test).testId;
+            const testId = (record as ITest).testId;
 
             onTestClick(testId);
             navigate(`/test/${testId}`);

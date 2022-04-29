@@ -1,4 +1,4 @@
-import AnalyticsService, { Categories, Labels } from "./AnalyticsService";
+import AnalyticsService, { Categories, Labels } from "./Analytics.service";
 
 enum Actions {
   CreateTestFormSubmit = 'create-test-form-submit',

@@ -1,4 +1,4 @@
-import AnalyticsService, { Categories, Labels } from "./AnalyticsService";
+import AnalyticsService, { Categories, Labels } from "./Analytics.service";
 
 enum Actions {
   CreateTestClick = 'create-test-button-click',
@@ -24,7 +24,7 @@ const HomeAnalyticsService = (): THomeAnalytics => {
   };
 
   const onTestClick = (testId: string) => {
-    event(Actions.GuidedTourClick, testId);
+    event(Actions.TestClick, testId);
   };
 
   return {

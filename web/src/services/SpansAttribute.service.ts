@@ -1,13 +1,6 @@
 import {isEmpty} from 'lodash';
-import {ISpanAttribute} from '../types';
-
-export enum SpanAttributeType {
-  stringValue = 'stringValue',
-  intValue = 'intValue',
-  booleanValue = 'booleanValue',
-  doubleValue = 'doubleValue',
-  kvlistValue = 'kvlistValue',
-}
+import {SpanAttributeType} from '../constants/SpanAttribute.constants';
+import {ISpanAttribute} from '../types/SpanAttribute.types';
 
 const spanAttributeTypeList = Object.values(SpanAttributeType);
 

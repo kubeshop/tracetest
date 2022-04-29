@@ -1,34 +1,11 @@
 import {search} from 'jmespath';
-
-import {
-  Assertion,
-  AssertionResult,
-  COMPARE_OPERATOR,
-  ItemSelector,
-  ITrace,
-  LOCATION_NAME,
-  ResourceSpan,
-  SpanAssertionResult,
-} from 'types';
-import {escapeString} from '../utils';
-import {getSpanValue} from './SpanService';
-
-const getOperator = (op: COMPARE_OPERATOR) => {
-  switch (op) {
-    case COMPARE_OPERATOR.EQUALS:
-      return '==';
-    case COMPARE_OPERATOR.NOTEQUALS:
-      return '!=';
-    case COMPARE_OPERATOR.GREATERTHAN:
-      return '>';
-    case COMPARE_OPERATOR.LESSTHAN:
-      return '<';
-    case COMPARE_OPERATOR.CONTAINS:
-      return 'contains';
-    default:
-      return '==';
-  }
-};
+import {escapeString} from '../utils/Common';
+import OperatorService from './Operator.service';
+import {LOCATION_NAME} from '../constants/Span.constants';
+import {getSpanValue} from './Span.service';
+import {IResourceSpan} from '../types/Span.types';
+import {ITrace} from '../types/Trace.types';
+import {IAssertion, IAssertionResult, IItemSelector, ISpanAssertionResult} from '../types/Assertion.types';
 
 const buildValueSelector = (comparisonValue: string, compareOperator: string, valueType: string) => {
   if (valueType === 'intValue') {
@@ -59,7 +36,7 @@ const buildSelector = (locationName: LOCATION_NAME, conditions: string[], spanId
   }
 };
 
-const buildConditionArray = (itemSelectors: ItemSelector[]) => {
+const buildConditionArray = (itemSelectors: IItemSelector[]) => {
   const selectorsMap = itemSelectors.reduce<Record<string, string[]>>(
     (acc, {locationName, propertyName, valueType, value}) => {
       const keySelector = ` key == \`${propertyName}\``;
@@ -80,13 +57,13 @@ const buildConditionArray = (itemSelectors: ItemSelector[]) => {
 };
 
 export const runSpanAssertionByResourceSpan = (
-  span: ResourceSpan,
+  span: IResourceSpan,
   spanId: string,
-  { spanAssertions = [] }: Assertion
-): Array<SpanAssertionResult> => {
+  {spanAssertions = []}: IAssertion
+): Array<ISpanAssertionResult> => {
   const assertionTestResultArray = spanAssertions.map(spanAssertion => {
     const {comparisonValue, operator, valueType, locationName, propertyName} = spanAssertion;
-    const valueSelector = buildValueSelector(comparisonValue, getOperator(operator), valueType);
+    const valueSelector = buildValueSelector(comparisonValue, OperatorService.getOperatorSymbol(operator), valueType);
 
     let selector = `${buildSelector(locationName, [`key == \`${propertyName}\` && ${valueSelector}`])}`;
 
@@ -110,30 +87,30 @@ export const runSpanAssertionByResourceSpan = (
 export const runAssertionBySpanId = (
   spanId: string,
   trace: ITrace,
-  assertion: Assertion
-): SpanAssertionResult[] | undefined => {
+  assertion: IAssertion
+): ISpanAssertionResult[] | undefined => {
   if (!assertion.selectors) return undefined;
   const conditionList = buildConditionArray(assertion.selectors);
   const itemSelector = `[? ${buildSelector(LOCATION_NAME.SPAN_ID, [], spanId)} && ${conditionList.join(' && ')}]`;
 
-  const [span]: Array<ResourceSpan> = search(trace, escapeString(`resourceSpans|[]| ${itemSelector}`));
+  const [span]: Array<IResourceSpan> = search(trace, escapeString(`resourceSpans|[]| ${itemSelector}`));
 
   if (!span) return undefined;
 
   return runSpanAssertionByResourceSpan(span, spanId, assertion);
 };
 
-export const runAssertionByTrace = (trace: ITrace, assertion: Assertion): AssertionResult => {
+export const runAssertionByTrace = (trace: ITrace, assertion: IAssertion): IAssertionResult => {
   if (!assertion?.selectors) return {assertion, spanListAssertionResult: []};
 
   const itemSelector = `[? ${buildConditionArray(assertion.selectors).join(' && ')}]`;
-  const spanList: Array<ResourceSpan> = search(trace, escapeString(`resourceSpans|[]| ${itemSelector}`)) || [];
+  const spanList: Array<IResourceSpan> = search(trace, escapeString(`resourceSpans|[]| ${itemSelector}`)) || [];
 
   return {
     assertion,
     spanListAssertionResult: spanList.map(span => ({
       span,
-      resultList: span.instrumentationLibrarySpans.reduce<SpanAssertionResult[]>(
+      resultList: span.instrumentationLibrarySpans.reduce<ISpanAssertionResult[]>(
         (resultList, instrumentationLibrary) =>
           resultList.concat(
             instrumentationLibrary.spans
@@ -146,11 +123,11 @@ export const runAssertionByTrace = (trace: ITrace, assertion: Assertion): Assert
   };
 };
 
-export const getEffectedSpansCount = (trace: ITrace, selectors: ItemSelector[]) => {
+export const getEffectedSpansCount = (trace: ITrace, selectors: IItemSelector[]) => {
   if (selectors.length === 0) return 0;
 
   const itemSelector = `[? ${buildConditionArray(selectors).join(' && ')}]`;
-  const spanList: Array<ResourceSpan> = search(trace, escapeString(`resourceSpans|[]| ${itemSelector}`));
+  const spanList: Array<IResourceSpan> = search(trace, escapeString(`resourceSpans|[]| ${itemSelector}`));
 
   return spanList.length;
 };

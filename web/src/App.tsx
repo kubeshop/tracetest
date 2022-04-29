@@ -1,6 +1,6 @@
 import {Provider} from 'react-redux';
 import {TourProvider} from '@reactour/tour';
-import Router from './navigation';
+import Router from './components/Navigation';
 import {store} from './redux/store';
 import './App.css';
 import AnalyticsProvider from './components/Analytics/AnalyticsProvider';

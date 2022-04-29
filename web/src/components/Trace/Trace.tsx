@@ -10,30 +10,32 @@ import {CloseCircleFilled} from '@ant-design/icons';
 
 import 'react-reflex/styles.css';
 
-import {AssertionResult, ISpan, TestRunResult, TestState} from 'types';
-
 import {
   useGetTestByIdQuery,
   useGetTestResultByIdQuery,
   useRunTestMutation,
   useUpdateTestResultMutation,
-} from 'redux/services/TestService';
+} from 'gateways/Test.gateway';
 import {
   parseAssertionResultListToTestResult,
   parseTestResultToAssertionResultList,
   runTest,
-} from 'services/TraceService';
+} from 'services/Trace.service';
 import TraceDiagram from 'components/TraceDiagram/TraceDiagram';
 
-import GuidedTourService, {GuidedTours} from 'services/GuidedTourService';
+import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
 import {Steps} from 'components/GuidedTour/traceStepList';
 import useGuidedTour from 'hooks/useGuidedTour';
-import TraceTimeline from './TraceTimeline';
 import * as S from './Trace.styled';
 
 import SpanDetail from './SpanDetail';
 import TestResults from './TestResults';
-import TraceAnalyticsService from '../../services/analytics/TraceAnalyticsService';
+import {ISpan} from '../../types/Span.types';
+import {IAssertionResult} from '../../types/Assertion.types';
+import {ITestRunResult} from '../../types/TestRunResult.types';
+import {TestState} from '../../constants/TestRunResult.constants';
+import TraceTimeline from './TraceTimeline';
+import TraceAnalyticsService from '../../services/Analytics/TraceAnalytics.service';
 
 const {onChangeTab} = TraceAnalyticsService;
 
@@ -54,13 +56,13 @@ export type TSpanMap = Record<string, TSpanInfo>;
 type TraceProps = {
   testId: string;
   testResultId: string;
-  onDismissTrace: () => void;
-  onRunTest: (result: TestRunResult) => void;
+  onDismissTrace(): void;
+  onRunTest(result: ITestRunResult): void;
 };
 
 const Trace: React.FC<TraceProps> = ({testId, testResultId, onDismissTrace, onRunTest}) => {
   const [selectedSpan, setSelectedSpan] = useState<TSpanInfo | undefined>();
-  const [traceResultList, setTraceResultList] = useState<AssertionResult[]>([]);
+  const [traceResultList, setTraceResultList] = useState<IAssertionResult[]>([]);
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [updateTestResult] = useUpdateTestResultMutation();
   const {data: test} = useGetTestByIdQuery(testId);

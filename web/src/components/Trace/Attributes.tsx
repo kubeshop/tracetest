@@ -1,8 +1,8 @@
 import {Typography} from 'antd';
 import SkeletonTable from 'components/SkeletonTable';
 import {FC, useMemo} from 'react';
-import {getResourceSpanBySpanId, getSpanAttributeList} from '../../services/SpanService';
-import {ITrace} from '../../types';
+import { getResourceSpanBySpanId, getSpanAttributeList } from '../../services/Span.service';
+import { ITrace } from '../../types/Trace.types';
 import SpanAttributesTable from '../SpanAttributesTable/SpanAttributesTable';
 import * as S from './Attributes.styled';
 

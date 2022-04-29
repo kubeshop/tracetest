@@ -1,9 +1,17 @@
 import {search} from 'jmespath';
 import {uniqBy} from 'lodash';
-import {SemanticGroupNameNodeMap, SemanticGroupNames, SemanticGroupsSignature} from '../lib/SelectorDefaultAttributes';
-import {ISpanAttribute, ItemSelector, ITrace, LOCATION_NAME, ResourceSpan, Span, TSpanAttributesList} from '../types';
-import {escapeString} from '../utils';
-import {getSpanAttributeValue, getSpanAttributeValueType} from './SpanAttributeService';
+import {
+  SemanticGroupNameNodeMap,
+  SemanticGroupNames,
+  SemanticGroupsSignature,
+} from '../constants/SemanticGroupNames.constants';
+import {escapeString} from '../utils/Common';
+import {IItemSelector} from '../types/Assertion.types';
+import {ISpanAttribute} from '../types/SpanAttribute.types';
+import {getSpanAttributeValue, getSpanAttributeValueType} from './SpansAttribute.service';
+import {ITrace} from '../types/Trace.types';
+import {LOCATION_NAME} from '../constants/Span.constants';
+import {IResourceSpan, ISpan, ISpanFlatAttribute} from '../types/Span.types';
 
 const SemanticGroupNamesList = Object.values(SemanticGroupNames);
 
@@ -18,7 +26,7 @@ const locationNameMap = {
   [LOCATION_NAME.SPAN_ID]: '',
 };
 
-export const getSpanValue = (resourceSpan: ResourceSpan, locationName: LOCATION_NAME, key: string) => {
+export const getSpanValue = (resourceSpan: IResourceSpan, locationName: LOCATION_NAME, key: string) => {
   const searchString = locationNameMap[locationName] || '';
 
   if (!searchString) return '';
@@ -29,7 +37,7 @@ export const getSpanValue = (resourceSpan: ResourceSpan, locationName: LOCATION_
   return attributeFound ? getSpanAttributeValue(attributeFound) : '';
 };
 
-export const getSpanAttributeType = (resourceSpan: ResourceSpan, locationName: LOCATION_NAME, key: string) => {
+export const getSpanAttributeType = (resourceSpan: IResourceSpan, locationName: LOCATION_NAME, key: string) => {
   const searchString = locationNameMap[locationName] || '';
 
   if (!searchString) return '';
@@ -40,8 +48,8 @@ export const getSpanAttributeType = (resourceSpan: ResourceSpan, locationName: L
   return attributeFound ? getSpanAttributeValueType(attributeFound) : '';
 };
 
-export const getResourceSpanBySpanId = (spanId: string, trace: ITrace): ResourceSpan | undefined => {
-  const [resourceSpan]: Array<ResourceSpan> = search(
+export const getResourceSpanBySpanId = (spanId: string, trace: ITrace): IResourceSpan | undefined => {
+  const [resourceSpan]: Array<IResourceSpan> = search(
     trace,
     `resourceSpans|[]| [? instrumentationLibrarySpans[?spans[?spanId == \`${spanId}\`]]]`
   );
@@ -61,8 +69,8 @@ export const getSpanType = (spanId: string, trace: ITrace) => {
   return SemanticGroupNamesList.find(groupName => Boolean(findAttribute(groupName))) || SemanticGroupNames.General;
 };
 
-const getAttributeValueList = (resourceSpan: ResourceSpan, attributeList: string[], locationName: LOCATION_NAME) =>
-  attributeList.reduce<ItemSelector[]>((list, attribute) => {
+const getAttributeValueList = (resourceSpan: IResourceSpan, attributeList: string[], locationName: LOCATION_NAME) =>
+  attributeList.reduce<IItemSelector[]>((list, attribute) => {
     const value = getSpanValue(resourceSpan, locationName, attribute);
     const valueType = getSpanAttributeType(resourceSpan, locationName, attribute);
 
@@ -78,10 +86,10 @@ const getAttributeValueList = (resourceSpan: ResourceSpan, attributeList: string
       : list;
   }, []);
 
-export const getSpan = (resourceSpan: ResourceSpan): Span | undefined =>
+export const getSpan = (resourceSpan: IResourceSpan): ISpan | undefined =>
   resourceSpan.instrumentationLibrarySpans[0]?.spans[0];
 
-export const getSpanSignature = (spanId: string, trace: ITrace): ItemSelector[] => {
+export const getSpanSignature = (spanId: string, trace: ITrace): IItemSelector[] => {
   const type = getSpanType(spanId, trace);
   const resourceSpan = getResourceSpanBySpanId(spanId, trace);
 
@@ -121,7 +129,7 @@ export const getSpanNodeInfo = (spanId: string, trace: ITrace) => {
   };
 };
 
-export const getSpanAttributeList = (resourceSpan: ResourceSpan): TSpanAttributesList => {
+export const getSpanAttributeList = (resourceSpan: IResourceSpan): ISpanFlatAttribute[] => {
   const spanAttributeList: ISpanAttribute[] = search(resourceSpan, escapeString(spanAttributeSearch)) || [];
   const resourceAttributeList: ISpanAttribute[] = search(resourceSpan, escapeString(resourceAttributeSearch)) || [];
   const {spanId, parentSpanId, traceId, kind, status, name} = getSpan(resourceSpan) || {};

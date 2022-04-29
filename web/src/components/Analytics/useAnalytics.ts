@@ -1,7 +1,7 @@
 import {useContext, useMemo} from 'react';
 import {GA4ReactInterface} from 'ga-4-react/src/models/gtagModels';
 import {Context} from './AnalyticsProvider';
-import AnalyticsService, {Categories} from '../../services/analytics/AnalyticsService';
+import AnalyticsService, {Categories} from '../../services/Analytics/Analytics.service';
 
 export type TAnalyticsService<A> = {
   isEnabled: boolean;

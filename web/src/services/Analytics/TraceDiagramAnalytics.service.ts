@@ -1,4 +1,4 @@
-import AnalyticsService, {Categories} from './AnalyticsService';
+import AnalyticsService, {Categories} from './Analytics.service';
 
 enum Actions {
   ClickSpan = 'click-span-node',
