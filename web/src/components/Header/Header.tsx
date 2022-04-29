@@ -3,8 +3,7 @@ import {Menu} from 'antd';
 import {Link, useLocation} from 'react-router-dom';
 import {QuestionCircleOutlined} from '@ant-design/icons';
 import {DOCUMENTATION_URL, GITHUB_URL} from 'lib/Constants';
-import useGuidedTour from 'hooks/useGuidedTour';
-import {GuidedTours} from 'services/GuidedTourService';
+import { useTour } from '@reactour/tour';
 import HomeAnalyticsService from 'services/analytics/HomeAnalyticsService';
 import Logo from 'assets/Logo.svg';
 import * as S from './Header.styled';
@@ -13,10 +12,9 @@ const {onGuidedTourClick} = HomeAnalyticsService;
 
 const Header: FC = () => {
   const {pathname} = useLocation();
-  const {setCurrentStep, setIsOpen} = useGuidedTour(GuidedTours.Home);
+  const {setIsOpen} = useTour();
 
   const handleGuidedTourCLick = () => {
-    setCurrentStep(0);
     setIsOpen(true);
     onGuidedTourClick();
   };
@@ -39,8 +37,8 @@ const Header: FC = () => {
             Documentation
           </a>
         </S.NavMenuItem>
-        <Menu.SubMenu icon={<QuestionCircleOutlined style={{color: '#E5E5E5', fontSize: 16}} />}>
-          <S.NavMenuItem onClick={handleGuidedTourCLick}>Show Onboarding </S.NavMenuItem>
+        <Menu.SubMenu key="help" icon={<QuestionCircleOutlined style={{color: '#E5E5E5', fontSize: 16}} />}>
+          <S.NavMenuItem key="guidedTour" onClick={handleGuidedTourCLick}>Show Onboarding </S.NavMenuItem>
         </Menu.SubMenu>
       </S.NavMenu>
     </S.Header>
