@@ -7,7 +7,7 @@ import (
 )
 
 type Selector struct {
-	SpanSelector []SpanSelector `( @@* ( "," @@ )*)` //nolint
+	SpanSelector []SpanSelector `( @@* ( "," @@ )*)`
 }
 
 type SpanSelector struct {
