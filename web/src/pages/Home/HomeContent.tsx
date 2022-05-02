@@ -2,7 +2,7 @@ import {useEffect, useState} from 'react';
 import {delay} from 'lodash';
 // import {Button} from 'antd';
 // import {InfoCircleOutlined} from '@ant-design/icons';
-import CreateTestModal from 'components/CreateTest';
+import CreateTestModal from 'components/CreateTestModal';
 import {Steps} from 'components/GuidedTour/homeStepList';
 import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
 import useGuidedTour from 'hooks/useGuidedTour';
