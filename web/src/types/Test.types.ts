@@ -1,4 +1,4 @@
-import {HTTP_METHOD} from '../constants/Common.contants';
+import {HTTP_METHOD} from '../constants/Common.constants';
 import {IAssertion} from './Assertion.types';
 import {ITestRunResult} from './TestRunResult.types';
 

@@ -2,7 +2,7 @@ import {FC} from 'react';
 import {Menu} from 'antd';
 import {Link, useLocation} from 'react-router-dom';
 import {QuestionCircleOutlined} from '@ant-design/icons';
-import {DOCUMENTATION_URL, GITHUB_URL} from 'constants/Common.contants';
+import {DOCUMENTATION_URL, GITHUB_URL} from 'constants/Common.constants';
 import {useTour} from '@reactour/tour';
 import HomeAnalyticsService from 'services/Analytics/HomeAnalytics.service';
 import Logo from 'assets/Logo.svg';
