@@ -2,7 +2,7 @@ import {useCallback, useRef, useState} from 'react';
 import {useTour} from '@reactour/tour';
 import {Modal, Form, Input, Button, Select, Checkbox, Dropdown, Menu, Typography} from 'antd';
 import {DeleteOutlined, DownOutlined} from '@ant-design/icons';
-import {useCreateTestMutation, useRunTestMutation} from 'gateways/Test.gateway';
+import {useCreateTestMutation, useRunTestMutation} from 'redux/apis/Test.api';
 import './CreateTestModal.styled.ts';
 import {useNavigate} from 'react-router-dom';
 import GuidedTourService, {GuidedTours} from '../../services/GuidedTour.service';

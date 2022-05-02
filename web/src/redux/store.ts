@@ -1,11 +1,13 @@
 import {configureStore, ThunkAction, Action} from '@reduxjs/toolkit';
-import {testAPI} from 'gateways/Test.gateway';
+import TestAPI from 'redux/apis/Test.api';
+import ResultListSlice from 'redux/slices/ResultList.slice';
 
 export const store = configureStore({
   reducer: {
-    [testAPI.reducerPath]: testAPI.reducer,
+    [TestAPI.reducerPath]: TestAPI.reducer,
+    resultList: ResultListSlice,
   },
-  middleware: getDefaultMiddleware => getDefaultMiddleware().concat(testAPI.middleware),
+  middleware: getDefaultMiddleware => getDefaultMiddleware().concat(TestAPI.middleware),
 });
 
 export type AppDispatch = typeof store.dispatch;

@@ -2,29 +2,29 @@ import {useCallback, useState} from 'react';
 import {Modal, Typography, FormInstance} from 'antd';
 
 import CreateAssertionForm, {TValues} from './CreateAssertionForm';
-import AssertionService from '../../services/Assertion.service';
-import { ISpan } from '../../types/Span.types';
-import { ITrace } from '../../types/Trace.types';
-import { IAssertion, IItemSelector } from '../../types/Assertion.types';
+import {ISpan} from '../../types/Span.types';
+import {IAssertion, IItemSelector} from '../../types/Assertion.types';
+import {useAppSelector} from '../../redux/hooks';
+import AssertionSelectors from '../../selectors/Assertion.selectors';
 
 interface IProps {
   open: boolean;
   onClose: () => void;
   span: ISpan;
   testId: string;
-  trace: ITrace;
+  resultId: string;
   assertion?: IAssertion;
 }
 
 const effectedSpanMessage = (spanCount: number) => {
   if (spanCount <= 1) {
-    return `Effects ${spanCount} span`;
+    return `Affects ${spanCount} span`;
   }
 
-  return `Effects ${spanCount} spans`;
+  return `Affects ${spanCount} spans`;
 };
 
-const CreateAssertionModal = ({testId, span, trace, open, onClose, assertion}: IProps) => {
+const CreateAssertionModal = ({testId, span, resultId, open, onClose, assertion}: IProps) => {
   const [form, setForm] = useState<FormInstance<TValues>>();
   const [selectorList, setSelectorList] = useState<IItemSelector[]>([]);
 
@@ -40,7 +40,7 @@ const CreateAssertionModal = ({testId, span, trace, open, onClose, assertion}: I
     onClose();
   }, [onClose]);
 
-  const effectedSpanCount = AssertionService.getEffectedSpansCount(trace, selectorList);
+  const affectedSpanCount = useAppSelector(AssertionSelectors.selectAffectedSpanCount(testId, resultId, selectorList));
 
   return (
     <Modal
@@ -51,7 +51,7 @@ const CreateAssertionModal = ({testId, span, trace, open, onClose, assertion}: I
       title={
         <div style={{display: 'flex', justifyContent: 'space-between', marginRight: 36}}>
           <Typography.Title level={5}>{assertion ? 'Edit Assertion' : 'Create New Assertion'}</Typography.Title>
-          <Typography.Text>{effectedSpanMessage(effectedSpanCount)}</Typography.Text>
+          <Typography.Text>{effectedSpanMessage(affectedSpanCount)}</Typography.Text>
         </div>
       }
       onOk={form?.submit}

@@ -6,7 +6,7 @@ import {Button, Tabs, Typography} from 'antd';
 import Title from 'antd/lib/typography/Title';
 import {CloseOutlined, ArrowLeftOutlined} from '@ant-design/icons';
 import {useLocation, useNavigate, useParams} from 'react-router-dom';
-import {useGetTestByIdQuery, useGetTestResultByIdQuery, useGetTestResultsQuery} from 'gateways/Test.gateway';
+import {useGetTestByIdQuery, useGetResultByIdQuery, useGetResultListQuery} from 'redux/apis/Test.api';
 
 import Trace from 'components/Trace';
 import Layout from 'components/Layout';
@@ -14,8 +14,8 @@ import TestStateBadge from 'components/TestStateBadge';
 
 import * as S from './Test.styled';
 import TestDetails from './TestDetails';
-import { TestState } from '../../constants/TestRunResult.constants';
-import { ITestRunResult } from '../../types/TestRunResult.types';
+import {TestState} from '../../constants/TestRunResult.constants';
+import {ITestRunResult} from '../../types/TestRunResult.types';
 
 interface TracePane {
   key: string;
@@ -31,12 +31,12 @@ const TestPage = () => {
   const [activeTabKey, setActiveTabKey] = useState<string>('1');
   const [readRoute, setReadRoute] = useState(false);
   const {data: test} = useGetTestByIdQuery(id as string);
-  const {data: testResultList = [], isLoading} = useGetTestResultsQuery(id ?? skipToken, {
+  const {data: testResultList = [], isLoading} = useGetResultListQuery(id ?? skipToken, {
     pollingInterval: 5000,
   });
   const query = useMemo(() => new URLSearchParams(location.search), [location.search]);
   const activeTestResult = testResultList.find(r => r.resultId === activeTabKey);
-  const {data: activeTestResultDetails} = useGetTestResultByIdQuery(
+  const {data: activeTestResultDetails} = useGetResultByIdQuery(
     activeTestResult?.resultId && id ? {testId: id, resultId: activeTestResult.resultId} : skipToken
   );
 
@@ -45,6 +45,15 @@ const TestPage = () => {
       (activeTestResultDetails?.state === TestState.AWAITING_TRACE ||
         activeTestResultDetails?.state === TestState.EXECUTING)) ||
     false;
+
+  const handleCloseTab = useCallback(() => {
+    const panes = tracePanes.filter(pane => pane.key !== activeTabKey);
+
+    navigate(`/test/${id}`);
+
+    setTracePanes(panes);
+    setActiveTabKey('1');
+  }, [activeTabKey, id, navigate, tracePanes]);
 
   const handleSelectTestResult = useCallback(
     (result: ITestRunResult) => {
@@ -71,7 +80,7 @@ const TestPage = () => {
       navigate(`/test/${id}?resultId=${result.resultId}`);
       setActiveTabKey(`${result.resultId}`);
     },
-    [id, navigate, testResultList, tracePanes]
+    [handleCloseTab, id, navigate, testResultList, tracePanes]
   );
 
   useEffect(() => {
@@ -94,15 +103,6 @@ const TestPage = () => {
     },
     [id, navigate]
   );
-
-  const handleCloseTab = useCallback(() => {
-    const panes = tracePanes.filter(pane => pane.key !== activeTabKey);
-
-    navigate(`/test/${id}`);
-
-    setTracePanes(panes);
-    setActiveTabKey('1');
-  }, [id, navigate]);
 
   const onEditTab = useCallback(
     (targetKey: any) => {

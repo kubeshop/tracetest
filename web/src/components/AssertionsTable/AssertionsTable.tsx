@@ -4,7 +4,6 @@ import AssertionTableAnalyticsService from '../../services/Analytics/AssertionTa
 import {IAssertion, ISpanAssertionResult} from '../../types/Assertion.types';
 import OperatorService from '../../services/Operator.service';
 import {ISpan} from '../../types/Span.types';
-import {ITrace} from '../../types/Trace.types';
 import CreateAssertionModal from '../CreateAssertionModal';
 import CustomTable from '../CustomTable';
 import * as S from './AssertionsTable.styled';
@@ -15,7 +14,7 @@ interface IAssertionsResultTableProps {
   sort: number;
   span: ISpan;
   testId: string;
-  trace: ITrace;
+  resultId: string;
 }
 
 interface IParsedAssertion {
@@ -34,7 +33,7 @@ const AssertionsResultTable: React.FC<IAssertionsResultTableProps> = ({
   sort,
   span,
   testId,
-  trace,
+  resultId,
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -96,7 +95,7 @@ const AssertionsResultTable: React.FC<IAssertionsResultTableProps> = ({
         assertion={assertion}
         span={span}
         testId={testId}
-        trace={trace}
+        resultId={resultId}
       />
     </S.AssertionsTableContainer>
   );
