@@ -1,6 +1,6 @@
 import * as d3DAG from 'd3-dag';
 import _ from 'lodash';
-import {TSpanMap} from '../components/Trace/Trace';
+import { TSpanMap } from '../components/Diagram/components/DAG';
 
 export const useDAGChart = (spanMap: TSpanMap = {}) => {
   if (_.isEmpty(spanMap)) {

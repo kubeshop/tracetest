@@ -92,7 +92,3 @@ export const TextContainer = styled.div`
   justify-content: center;
   align-items: center;
 `;
-
-export const Container = styled.div`
-  position: relative;
-`;
