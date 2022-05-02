@@ -9,16 +9,14 @@ import ErrorBoundary from './components/ErrorBoundary';
 
 const App = () => {
   return (
-    <TourProvider steps={[]}>
-      <AnalyticsProvider>
-        <Provider store={store}>
-          <Router />
-        </Provider>
-      </AnalyticsProvider>
-    </TourProvider>
+    <Sentry.ErrorBoundary fallback={({error}) => <ErrorBoundary error={error} />}>
+      <TourProvider steps={[]}>
+        <AnalyticsProvider>
+          <Provider store={store}>
+            <Router />
+          </Provider>
+        </AnalyticsProvider>
+      </TourProvider>
+    </Sentry.ErrorBoundary>
   );
 };
-
-export default Sentry.withErrorBoundary(App, {
-  fallback: <ErrorBoundary />,
-});

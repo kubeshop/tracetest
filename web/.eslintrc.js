@@ -56,6 +56,7 @@ module.exports = {
     'react/require-default-props': 'off', // TODO re-enable
     'no-nested-ternary': 'off', // warn
     'consistent-return': 'off', // warn. Look at api calls closely before enabling this. api.ts.
+    'react/no-unstable-nested-components': 'off',
     // Accessibility off for now to make speed a priority and avoid restructuring for now
     'jsx-a11y/click-events-have-key-events': 'off',
     'jsx-a11y/no-static-element-interactions': 'off',
@@ -82,8 +83,8 @@ module.exports = {
     'react/function-component-definition': [
       2,
       {
-        namedComponents: "arrow-function",
-        unnamedComponents: "arrow-function",
+        namedComponents: 'arrow-function',
+        unnamedComponents: 'arrow-function',
       },
     ],
   },

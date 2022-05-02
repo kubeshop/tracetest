@@ -7,6 +7,8 @@
     "@emotion/react": "^11.9.0",
     "@reactour/tour": "^2.10.3",
     "@reduxjs/toolkit": "^1.7.2",
+    "@sentry/react": "^6.19.7",
+    "@sentry/tracing": "^6.19.7",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",
