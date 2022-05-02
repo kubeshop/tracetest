@@ -1,13 +1,13 @@
 import {Button, Typography} from 'antd';
 import {FC, useCallback} from 'react';
-import {useRunTestMutation} from 'gateways/Test.gateway';
+import {useRunTestMutation} from 'redux/apis/Test.api';
 import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
 import {Steps} from 'components/GuidedTour/testDetailsStepList';
 import useGuidedTour from 'hooks/useGuidedTour';
 import * as S from './Test.styled';
 import TestDetailsTable from './TestDetailsTable';
 import TestAnalyticsService from '../../services/Analytics/TestAnalytics.service';
-import { ITestRunResult } from '../../types/TestRunResult.types';
+import {ITestRunResult} from '../../types/TestRunResult.types';
 
 const {onRunTest} = TestAnalyticsService;
 

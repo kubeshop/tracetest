@@ -1,7 +1,7 @@
 import {Table} from 'antd';
 import {useRef} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {useGetTestsQuery} from 'gateways/Test.gateway';
+import {useGetTestListQuery} from 'redux/apis/Test.api';
 import CustomTable from '../../components/CustomTable';
 import HomeAnalyticsService from '../../services/Analytics/HomeAnalytics.service';
 import NoResults from './NoResults';
@@ -12,7 +12,7 @@ const {onTestClick} = HomeAnalyticsService;
 const TestList = () => {
   const navigate = useNavigate();
   const eventRef = useRef<{previousPageX: number; currentPageX: number}>({previousPageX: 0, currentPageX: 0});
-  const {data: testList = [], isLoading} = useGetTestsQuery();
+  const {data: testList = [], isLoading} = useGetTestListQuery();
 
   const handleMouseUp = (event: any) => {
     if (event.type === 'mousedown') {

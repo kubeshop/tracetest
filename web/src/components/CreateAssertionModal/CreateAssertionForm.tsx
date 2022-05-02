@@ -3,7 +3,7 @@ import {isEmpty} from 'lodash';
 import {QuestionCircleOutlined, PlusOutlined, MinusCircleOutlined} from '@ant-design/icons';
 import {Button, Input, AutoComplete, Typography, Tooltip, Form, Space, FormInstance} from 'antd';
 
-import {useCreateAssertionMutation, useUpdateAssertionMutation} from 'gateways/Test.gateway';
+import {useCreateAssertionMutation, useUpdateAssertionMutation} from 'redux/apis/Test.api';
 import {SELECTOR_DEFAULT_ATTRIBUTES} from 'constants/SemanticGroupNames.constants';
 import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
 import useGuidedTour from 'hooks/useGuidedTour';

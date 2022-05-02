@@ -1,6 +1,6 @@
 import {useCallback, useEffect, useMemo} from 'react';
 import ReactFlow, {Background, BackgroundVariant, FlowElement} from 'react-flow-renderer';
-import {useDAGChart} from 'hooks/Charts';
+import {useDAGChart} from 'hooks/useDAGChart';
 import TraceNode from './TraceNode';
 import {TSpanInfo, TSpanMap} from '../Trace/Trace';
 import * as S from './TraceDiagram.styled';

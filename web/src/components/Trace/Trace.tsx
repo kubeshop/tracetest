@@ -10,12 +10,7 @@ import {CloseCircleFilled} from '@ant-design/icons';
 
 import 'react-reflex/styles.css';
 
-import {
-  useGetTestByIdQuery,
-  useGetTestResultByIdQuery,
-  useRunTestMutation,
-  useUpdateTestResultMutation,
-} from 'gateways/Test.gateway';
+import {useGetTestByIdQuery, useGetResultByIdQuery, useRunTestMutation} from 'redux/apis/Test.api';
 import TraceDiagram from 'components/TraceDiagram/TraceDiagram';
 
 import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
@@ -26,12 +21,13 @@ import * as S from './Trace.styled';
 import SpanDetail from './SpanDetail';
 import TestResults from './TestResults';
 import {ISpan} from '../../types/Span.types';
-import {IAssertionResult} from '../../types/Assertion.types';
 import {ITestRunResult} from '../../types/TestRunResult.types';
 import {TestState} from '../../constants/TestRunResult.constants';
 import TraceTimeline from './TraceTimeline';
 import TraceAnalyticsService from '../../services/Analytics/TraceAnalytics.service';
-import TraceService from '../../services/Trace.service';
+import usePolling from '../../hooks/usePolling';
+import {useAppDispatch} from '../../redux/hooks';
+import {replace, updateTestResult} from '../../redux/slices/ResultList.slice';
 
 const {onChangeTab} = TraceAnalyticsService;
 
@@ -58,17 +54,16 @@ type TraceProps = {
 
 const Trace: React.FC<TraceProps> = ({testId, testResultId, onDismissTrace, onRunTest}) => {
   const [selectedSpan, setSelectedSpan] = useState<TSpanInfo | undefined>();
-  const [traceResultList, setTraceResultList] = useState<IAssertionResult[]>([]);
   const [isFirstLoad, setIsFirstLoad] = useState(true);
-  const [updateTestResult] = useUpdateTestResultMutation();
   const {data: test} = useGetTestByIdQuery(testId);
   const [runNewTest] = useRunTestMutation();
+  const dispatch = useAppDispatch();
 
   const {
     data: testResultDetails,
     isError,
     refetch: refetchTrace,
-  } = useGetTestResultByIdQuery({testId, resultId: testResultId});
+  } = useGetResultByIdQuery({testId, resultId: testResultId});
 
   const spanMap = useMemo<TSpanMap>(() => {
     return (
@@ -92,62 +87,50 @@ const Trace: React.FC<TraceProps> = ({testId, testResultId, onDismissTrace, onRu
   );
 
   useGuidedTour(GuidedTours.Trace);
-
-  useEffect(() => {
-    let INTERVALID: any = null;
-
-    INTERVALID = setInterval(() => {
-      if (
-        isError ||
-        testResultDetails?.state === TestState.AWAITING_TRACE ||
-        testResultDetails?.state === TestState.EXECUTING
-      ) {
-        refetchTrace();
-      } else {
-        INTERVALID && clearInterval(INTERVALID);
-      }
-    }, 1000);
-
-    return () => INTERVALID && clearInterval(INTERVALID);
-  }, [refetchTrace, testResultDetails?.state, isError]);
+  usePolling({
+    callback: refetchTrace,
+    delay: 1000,
+    isPolling:
+      isError ||
+      testResultDetails?.state === TestState.AWAITING_TRACE ||
+      testResultDetails?.state === TestState.EXECUTING,
+  });
 
   useEffect(() => {
     if (testResultDetails && test && !isFirstLoad) {
-      const resultList = TraceService.runTest(testResultDetails.trace!, test);
-
-      setTraceResultList(resultList);
-
-      updateTestResult({
-        testId,
-        resultId: testResultId,
-        assertionResult: TraceService.parseAssertionResultListToTestResult(resultList),
-      });
-    }
-  }, [test]);
-
-  useEffect(() => {
-    if (testResultDetails && !isEmpty(testResultDetails.trace) && testResultDetails?.assertionResult && test) {
-      const resultList = TraceService.runTest(testResultDetails.trace!, test);
-
-      setTraceResultList(resultList);
-      setIsFirstLoad(false);
-
-      updateTestResult({
-        testId,
-        resultId: testResultId,
-        assertionResult: TraceService.parseAssertionResultListToTestResult(resultList),
-      });
-    } else if (testResultDetails?.assertionResult && test) {
-      setIsFirstLoad(false);
-      setTraceResultList(
-        TraceService.parseTestResultToAssertionResultList(
-          testResultDetails?.assertionResult,
+      dispatch(
+        updateTestResult({
+          trace: testResultDetails.trace!,
+          resultId: testResultId,
           test,
-          testResultDetails?.trace!
-        )
+        })
       );
     }
-  }, [testResultDetails, test, testResultId, updateTestResult, testId]);
+  }, [test, dispatch]);
+
+  useEffect(() => {
+    if (testResultDetails && !isEmpty(testResultDetails.trace) && !testResultDetails?.assertionResult && test) {
+      setIsFirstLoad(false);
+      dispatch(
+        updateTestResult({
+          trace: testResultDetails.trace!,
+          resultId: testResultId,
+          test,
+        })
+      );
+    } else if (testResultDetails?.assertionResult && test) {
+      setIsFirstLoad(false);
+
+      dispatch(
+        replace({
+          resultId: testResultId,
+          assertionResult: testResultDetails?.assertionResult!,
+          test,
+          trace: testResultDetails?.trace!,
+        })
+      );
+    }
+  }, [testResultDetails, test, testResultId, testId, dispatch]);
 
   const handleReRunTest = async () => {
     const result = await runNewTest(testId).unwrap();
@@ -198,7 +181,11 @@ const Trace: React.FC<TraceProps> = ({testId, testResultId, onDismissTrace, onRu
                       }
                       key="span-detail"
                     >
-                      <SpanDetail trace={testResultDetails?.trace} test={test} targetSpan={selectedSpan?.data} />
+                      <SpanDetail
+                        resultId={testResultDetails?.resultId}
+                        testId={test?.testId}
+                        targetSpan={selectedSpan?.data}
+                      />
                     </Tabs.TabPane>
                     <Tabs.TabPane
                       tab={
@@ -211,7 +198,7 @@ const Trace: React.FC<TraceProps> = ({testId, testResultId, onDismissTrace, onRu
                       <TestResults
                         onSpanSelected={handleOnSpanSelected}
                         trace={testResultDetails?.trace}
-                        traceResultList={traceResultList}
+                        resultId={testResultId}
                       />
                     </Tabs.TabPane>
                   </S.TraceTabs>

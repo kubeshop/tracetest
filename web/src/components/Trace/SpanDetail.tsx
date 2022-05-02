@@ -1,44 +1,30 @@
 import {Button, Typography} from 'antd';
 import {PlusOutlined} from '@ant-design/icons';
-import {FC, useMemo, useState} from 'react';
+import {FC, useState} from 'react';
 import AssertionsResultTable from 'components/AssertionsTable/AssertionsTable';
 import CreateAssertionModal from 'components/CreateAssertionModal';
 import SkeletonTable from 'components/SkeletonTable';
 import * as S from './SpanDetail.styled';
-import {ITest} from '../../types/Test.types';
-import {ISpan} from '../../types/Span.types';
-import {ITrace} from '../../types/Trace.types';
-import {IAssertion, ISpanAssertionResult} from '../../types/Assertion.types';
 import Attributes from './Attributes';
 import TraceAnalyticsService from '../../services/Analytics/TraceAnalytics.service';
-import AssertionService from '../../services/Assertion.service';
+import {useAppSelector} from '../../redux/hooks';
+import AssertionSelectors from '../../selectors/Assertion.selectors';
+import {ISpan} from '../../types/Span.types';
 
 const {onAddAssertionButtonClick} = TraceAnalyticsService;
 
 type TSpanDetailProps = {
-  test?: ITest;
+  testId?: string;
   targetSpan?: ISpan;
-  trace?: ITrace;
+  resultId?: string;
 };
 
-const SpanDetail: FC<TSpanDetailProps> = ({test, targetSpan, trace}) => {
+const SpanDetail: FC<TSpanDetailProps> = ({testId, targetSpan, resultId}) => {
   const [openCreateAssertion, setOpenCreateAssertion] = useState(false);
 
-  const assertionsResultList = useMemo(() => {
-    if (!targetSpan?.spanId || !trace) {
-      return [];
-    }
-    return (
-      test?.assertions?.reduce<Array<{assertion: IAssertion; assertionResultList: Array<ISpanAssertionResult>}>>(
-        (resultList, assertion) => {
-          const assertionResultList = AssertionService.runBySpan(targetSpan, assertion);
-
-          return assertionResultList.length ? [...resultList, {assertion, assertionResultList}] : resultList;
-        },
-        []
-      ) || []
-    );
-  }, [targetSpan, test?.assertions, trace]);
+  const assertionsResultList = useAppSelector(
+    AssertionSelectors.selectAssertionResultListBySpan(testId, resultId, targetSpan?.spanId)
+  );
 
   return (
     <>
@@ -56,7 +42,7 @@ const SpanDetail: FC<TSpanDetailProps> = ({test, targetSpan, trace}) => {
             Add Assertion
           </Button>
         </S.DetailsHeader>
-        <SkeletonTable loading={!targetSpan || !trace}>
+        <SkeletonTable loading={!targetSpan}>
           {assertionsResultList.length ? (
             assertionsResultList
               .sort((a, b) => (a.assertion.assertionId > b.assertion.assertionId ? -1 : 1))
@@ -67,8 +53,8 @@ const SpanDetail: FC<TSpanDetailProps> = ({test, targetSpan, trace}) => {
                   sort={index + 1}
                   assertion={assertion}
                   span={targetSpan!}
-                  trace={trace!}
-                  testId={test?.testId!}
+                  resultId={resultId!}
+                  testId={testId!}
                 />
               ))
           ) : (
@@ -81,12 +67,12 @@ const SpanDetail: FC<TSpanDetailProps> = ({test, targetSpan, trace}) => {
       </S.DetailsContainer>
       <Attributes spanAttributeList={targetSpan?.attributeList} />
 
-      {targetSpan?.spanId && test?.testId && (
+      {targetSpan?.spanId && testId && (
         <CreateAssertionModal
           key={`KEY_${targetSpan?.spanId}`}
-          testId={test.testId}
-          trace={trace!}
+          testId={testId}
           span={targetSpan!}
+          resultId={resultId!}
           open={openCreateAssertion}
           onClose={() => setOpenCreateAssertion(false)}
         />

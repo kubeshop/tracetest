@@ -1,19 +1,21 @@
 import {Typography} from 'antd';
+import {useSelector} from 'react-redux';
 import SkeletonTable from 'components/SkeletonTable';
 import {FC, useMemo} from 'react';
-import {IAssertionResult} from '../../types/Assertion.types';
 import {ITrace} from '../../types/Trace.types';
 import TraceAssertionsResultTable from '../TraceAssertionsTable/TraceAssertionsTable';
 import TraceService from '../../services/Trace.service';
 import * as S from './TestResults.styled';
+import TestResultSelectors from '../../selectors/TestResult.selectors';
 
 type TTestResultsProps = {
   trace?: ITrace;
-  traceResultList: IAssertionResult[];
+  resultId: string;
   onSpanSelected(spanId: string): void;
 };
 
-const TestResults: FC<TTestResultsProps> = ({trace, traceResultList, onSpanSelected}) => {
+const TestResults: FC<TTestResultsProps> = ({trace, resultId, onSpanSelected}) => {
+  const traceResultList = useSelector(TestResultSelectors.selectTestResultList(resultId));
   const totalSpanCount = trace?.spans.length;
   const totalAssertionCount = traceResultList.length || 0;
 
