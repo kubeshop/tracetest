@@ -6,6 +6,9 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/golang-migrate/migrate/v4"
+	"github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/google/uuid"
 	"github.com/j2gg0s/otsql"
 	"github.com/j2gg0s/otsql/hook/trace"
@@ -24,45 +27,42 @@ func Postgres(dsn string) (Repository, error) {
 	}
 	db := sql.OpenDB(
 		otsql.WrapConnector(connector,
-			otsql.WithHooks(trace.New(
-				trace.WithQuery(true),
-				trace.WithQueryParams(true),
-				trace.WithRowsAffected(true),
-			))))
+			otsql.WithHooks(
+				trace.New(
+					trace.WithQuery(true),
+					trace.WithQueryParams(true),
+					trace.WithRowsAffected(true),
+				),
+			),
+		),
+	)
 
-	_, err = db.Exec(`
-CREATE TABLE IF NOT EXISTS tests  (
-	id UUID NOT NULL PRIMARY KEY,
-	test json NOT NULL
-);
-`)
+	err = ensureLatestMigration(db)
 	if err != nil {
-		return nil, fmt.Errorf("create table tests: %w", err)
-	}
-	_, err = db.Exec(`
-CREATE TABLE IF NOT EXISTS results  (
-	id UUID NOT NULL PRIMARY KEY,
-	test_id UUID NOT NULL,
-	result json NOT NULL
-);
-`)
-	if err != nil {
-		return nil, fmt.Errorf("create table results: %w", err)
-	}
-	_, err = db.Exec(`
-CREATE TABLE IF NOT EXISTS assertions  (
-	id UUID NOT NULL PRIMARY KEY,
-	test_id UUID NOT NULL,
-	assertion json NOT NULL
-);
-`)
-	if err != nil {
-		return nil, fmt.Errorf("create table assertions: %w", err)
+		return nil, fmt.Errorf("could not execute migrations: %w", err)
 	}
 
 	return &postgresDB{
 		db: db,
 	}, nil
+}
+
+func ensureLatestMigration(db *sql.DB) error {
+	driver, err := postgres.WithInstance(db, &postgres.Config{})
+	if err != nil {
+		return fmt.Errorf("could not get driver from postgres connection: %w", err)
+	}
+	migrateClient, err := migrate.NewWithDatabaseInstance("file://./migrations", "tracetest", driver)
+	if err != nil {
+		return fmt.Errorf("could not get migration client: %w", err)
+	}
+
+	err = migrateClient.Up()
+	if err != nil && err != migrate.ErrNoChange {
+		return fmt.Errorf("could not run migrations: %w", err)
+	}
+
+	return nil
 }
 
 func (td *postgresDB) CreateTest(ctx context.Context, test *openapi.Test) (string, error) {

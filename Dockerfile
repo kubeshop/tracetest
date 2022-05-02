@@ -7,7 +7,7 @@ RUN npm ci --silent
 COPY ./web ./
 RUN npm run build
 
-FROM golang:1.17 AS build-go
+FROM golang:1.17-alpine AS build-go
 WORKDIR /go/src
 
 COPY ./server/go.mod ./server/go.sum ./
@@ -15,9 +15,12 @@ RUN go mod download
 COPY ./server ./
 RUN go build -o tracetest-server .
 
-FROM ubuntu AS release
+FROM alpine AS release
+# Enable machine-id on alpine-linux (https://gitlab.alpinelinux.org/alpine/aports/-/issues/8761)
+RUN apk add dbus
 WORKDIR /app
 COPY --from=build-go /go/src/tracetest-server ./
+COPY --from=build-go /go/src/migrations/ ./migrations/
 COPY --from=build-js /app/build /app/html
 EXPOSE 8080/tcp
 ENTRYPOINT ["/app/tracetest-server"]
