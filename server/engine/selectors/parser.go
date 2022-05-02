@@ -1,4 +1,3 @@
-//nolint directives: structtag
 package selectors
 
 import (
@@ -8,32 +7,32 @@ import (
 )
 
 type Selector struct {
-	SpanSelector []SpanSelector `parser:"( @@* ( \",\" @@ )*)"`
+	SpanSelector []SpanSelector `( @@* ( "," @@ )*)` //nolint
 }
 
 type SpanSelector struct {
-	Filters       []Filter      `parser:"\"span\"\"[\"( @@* ( \",\" @@)*)\"]\""`
-	PseudoClass   PseudoClass   `parser:"@@*"`
-	ChildSelector *SpanSelector `parser:" @@*"`
+	Filters       []Filter      `"span""["( @@* ( "," @@)*)"]"`
+	PseudoClass   PseudoClass   `@@*`
+	ChildSelector *SpanSelector ` @@*`
 }
 
 type Filter struct {
-	Property string `parser:"( @Ident ( @\".\" @Ident )*)"`
-	Operator string `parser:"@(\"=\" | \"contains\" )"`
-	Value    *Value `parser:"@@*"`
+	Property string `( @Ident ( @"." @Ident )*)`
+	Operator string `@("=" | "contains" )`
+	Value    *Value `@@*`
 }
 
 type Value struct {
-	String  *string  `parser:" @String"`
-	Int     *int64   `parser:" | @Int"`
-	Float   *float64 `parser:" | @Float"`
-	Boolean *bool    `parser:" | @(\"true\" | \"false\")"`
-	Null    bool     `parser:" | @\"NULL\""`
+	String  *string  ` @String`
+	Int     *int64   ` | @Int`
+	Float   *float64 ` | @Float`
+	Boolean *bool    ` | @("true" | "false")`
+	Null    bool     ` | @"NULL"`
 }
 
 type PseudoClass struct {
-	Type  string `parser:"\":\" @(\"nth_child\")"`
-	Value *Value `parser:"\"(\" @@* \")\""`
+	Type  string `":" @("nth_child")`
+	Value *Value `"(" @@* ")"`
 }
 
 func CreateParser() (*participle.Parser, error) {
