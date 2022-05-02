@@ -2,28 +2,28 @@ import Text from 'antd/lib/typography/Text';
 import {upperCase} from 'lodash';
 import React from 'react';
 import {Handle, NodeProps, Position} from 'react-flow-renderer';
-import {SemanticGroupNames, SemanticGroupNamesToText} from '../../constants/SemanticGroupNames.constants';
-import {getSpanNodeInfo} from '../../services/Span.service';
+import {SemanticGroupNamesToText} from '../../constants/SemanticGroupNames.constants';
 import {ISpan} from '../../types/Span.types';
-import {ITrace} from '../../types/Trace.types';
 import * as S from './TraceDiagram.styled';
+import SpanService from '../../services/Span.service';
+import { ITrace } from '../../types/Trace.types';
 
 type TTraceNodeProps = NodeProps<{span: ISpan; trace: ITrace}>;
 
 const TraceNode: React.FC<TTraceNodeProps> = ({
   id,
   data: {
-    span: {name, spanId},
-    trace,
+    span: {name, type},
+    span,
   },
   selected,
 }) => {
-  const {heading, spanType = SemanticGroupNames.General, primary} = getSpanNodeInfo(spanId, trace);
-  const spanTypeText = SemanticGroupNamesToText[spanType];
+  const {heading, primary} = SpanService.getSpanNodeInfo(span);
+  const spanTypeText = SemanticGroupNamesToText[type];
 
   return (
     <S.TraceNode selected={selected}>
-      <S.TraceNotch spanType={spanType}>
+      <S.TraceNotch spanType={type}>
         <Text>{upperCase(heading || spanTypeText)}</Text>
       </S.TraceNotch>
       <Handle type="target" id={id} position={Position.Top} style={{top: 0, borderRadius: 0, visibility: 'hidden'}} />

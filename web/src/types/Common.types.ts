@@ -5,4 +5,6 @@ export type TRecursivePartial<T> = {
 export interface IEnv {
   measurementId: string;
   analyticsEnabled: string;
-}
+};
+
+export type Modify<T, R> = Omit<T, keyof R> & R;

@@ -1,12 +1,20 @@
-export interface ISpanAttributeValue {
+import {SpanAttributeType} from 'constants/SpanAttribute.constants';
+
+export type IRawSpanAttributeValue = {
   stringValue: string;
   intValue: number;
   booleanValue: boolean;
   doubleValue: number;
-  kvlistValue: {values: ISpanAttribute[]};
-}
+  kvlistValue: {values: IRawSpanAttribute[]};
+};
 
-export interface ISpanAttribute {
+export type IRawSpanAttribute = {
   key: string;
-  value: ISpanAttributeValue;
-}
+  value: IRawSpanAttributeValue;
+};
+
+export type ISpanAttribute = {
+  type: SpanAttributeType;
+  name: string;
+  value: string;
+};

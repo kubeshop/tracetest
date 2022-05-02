@@ -1,17 +1,17 @@
 import {isEmpty} from 'lodash';
 import {SpanAttributeType} from '../constants/SpanAttribute.constants';
-import {ISpanAttribute} from '../types/SpanAttribute.types';
+import {IRawSpanAttribute, ISpanAttribute} from '../types/SpanAttribute.types';
 
 const spanAttributeTypeList = Object.values(SpanAttributeType);
 
-export const getSpanAttributeValueType = (attribute: ISpanAttribute): SpanAttributeType =>
+const getSpanAttributeValueType = (attribute: IRawSpanAttribute): SpanAttributeType =>
   spanAttributeTypeList.find(type => {
     const value = attribute.value[type];
     if (typeof value === 'number') return true;
     return !isEmpty(value);
   }) || SpanAttributeType.stringValue;
 
-export const getSpanAttributeValue = (attribute: ISpanAttribute): string => {
+const getSpanAttributeValue = (attribute: IRawSpanAttribute): string => {
   const attributeType = getSpanAttributeValueType(attribute);
   const value = attribute.value[attributeType];
 
@@ -26,3 +26,16 @@ export const getSpanAttributeValue = (attribute: ISpanAttribute): string => {
     }
   }
 };
+
+const SpanAttribute = (rawAttribute: IRawSpanAttribute): ISpanAttribute => {
+  const type = getSpanAttributeValueType(rawAttribute);
+  const value = getSpanAttributeValue(rawAttribute);
+
+  return {
+    type,
+    name: rawAttribute.key,
+    value,
+  };
+};
+
+export default SpanAttribute;

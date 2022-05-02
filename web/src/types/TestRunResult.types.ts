@@ -1,6 +1,7 @@
-import {TAssertionResultList} from './Assertion.types';
-import {ITrace} from './Trace.types';
 import {TestState} from '../constants/TestRunResult.constants';
+import {TAssertionResultList} from './Assertion.types';
+import {Modify} from './Common.types';
+import {IRawTrace, ITrace} from './Trace.types';
 
 export interface IAttribute {
   id?: string;
@@ -9,26 +10,7 @@ export interface IAttribute {
   type: 'span' | 'resource';
 }
 
-export interface ITestResult {
-  id: string;
-  successful: {
-    id: string;
-    operationName: string;
-    duration: string;
-    numOfSPans: number;
-    attributes: Array<IAttribute>;
-  };
-  failed: {
-    id: string;
-    operationName: string;
-    duration: string;
-    numOfSPans: number;
-    attributes: Array<IAttribute>;
-  };
-  timeStamp: Date;
-}
-
-export interface ITestRunResult {
+export interface IRawTestRunResult {
   resultId: string;
   testId: string;
   traceId: string;
@@ -36,8 +18,10 @@ export interface ITestRunResult {
   createdAt: string;
   completedAt: string;
   response: any;
-  trace: ITrace;
+  trace?: IRawTrace;
   state: TestState;
   assertionResultState: boolean;
   assertionResult: TAssertionResultList;
 }
+
+export type ITestRunResult = Modify<IRawTestRunResult, {trace?: ITrace}>;

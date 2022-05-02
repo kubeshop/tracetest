@@ -1,4 +1,7 @@
-import {ISpanAttribute} from './SpanAttribute.types';
+import {SemanticGroupNames} from '../constants/SemanticGroupNames.constants';
+import {Modify} from './Common.types';
+import {IItemSelector} from './Assertion.types';
+import {IRawSpanAttribute, ISpanAttribute} from './SpanAttribute.types';
 
 export interface IInstrumentationLibrary {
   name: string;
@@ -6,7 +9,7 @@ export interface IInstrumentationLibrary {
 }
 
 export interface IResource {
-  attributes: ISpanAttribute[];
+  attributes: IRawSpanAttribute[];
 }
 
 export interface ISpanFlatAttribute {
@@ -16,7 +19,7 @@ export interface ISpanFlatAttribute {
 
 export interface IInstrumentationLibrarySpan {
   instrumentationLibrary: IInstrumentationLibrary;
-  spans: ISpan[];
+  spans: IRawSpan[];
 }
 
 export interface IResourceSpan {
@@ -24,15 +27,26 @@ export interface IResourceSpan {
   instrumentationLibrarySpans: IInstrumentationLibrarySpan[];
 }
 
-export interface ISpan {
+export interface IRawSpan {
   traceId: string;
   spanId: string;
-  parentSpanId: string;
+  parentSpanId?: string;
   name: string;
-  kind: number;
+  kind: string;
   startTimeUnixNano: string;
   endTimeUnixNano: string;
-  attributes: ISpanAttribute[];
+  attributes: IRawSpanAttribute[];
   status: {code: string};
-  events: Event[];
 }
+
+export type ISpan = Modify<
+  IRawSpan,
+  {
+    attributes: Record<string, ISpanAttribute>;
+    instrumentationLibrary: IInstrumentationLibrary;
+    type: SemanticGroupNames;
+    duration: number;
+    signature: IItemSelector[];
+    attributeList: ISpanFlatAttribute[];
+  }
+>;

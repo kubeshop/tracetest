@@ -1,7 +1,7 @@
-import {CompareOperator} from '../constants/Operator.constants';
-import {LOCATION_NAME} from '../constants/Span.constants';
-import {IResourceSpan} from './Span.types';
-import {SpanAttributeType} from '../constants/SpanAttribute.constants';
+import {CompareOperator} from 'constants/Operator.constants';
+import {LOCATION_NAME} from 'constants/Span.constants';
+import {SpanAttributeType} from 'constants/SpanAttribute.constants';
+import {IResourceSpan, ISpan} from './Span.types';
 
 export interface IAssertion {
   assertionId: string;
@@ -37,7 +37,7 @@ export interface ITestAssertionResult {
 
 export interface IAssertionResult {
   spanListAssertionResult: {
-    span: IResourceSpan;
+    span: ISpan;
     resultList: ISpanAssertionResult[];
   }[];
   assertion: IAssertion;
