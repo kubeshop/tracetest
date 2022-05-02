@@ -40,7 +40,7 @@ func TestParserSingleSpanIntProperty(t *testing.T) {
 }
 
 func TestParserSingleSpanMultipleAttributes(t *testing.T) {
-	expression := "span[service.name=\"Pokeshop\", tracetest.span.type=\"http\"]"
+	expression := "span[service.name=\"Pokeshop\" tracetest.span.type=\"http\"]"
 
 	selector := parseExpressionOrFail(t, expression)
 
