@@ -8,11 +8,11 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func parseExpressionOrFail(t *testing.T, expression string) *selectors.Selector {
+func parseExpressionOrFail(t *testing.T, expression string) *selectors.ParserSelector {
 	parser, err := selectors.CreateParser()
 	require.NoError(t, err, "parser should be created successfully")
 
-	selector := &selectors.Selector{}
+	selector := &selectors.ParserSelector{}
 	err = parser.ParseString("", expression, selector)
 	require.NoError(t, err, "parser should be able to parse expression")
 

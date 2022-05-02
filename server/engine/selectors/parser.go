@@ -6,23 +6,23 @@ import (
 	"github.com/alecthomas/participle/v2"
 )
 
-type Selector struct {
-	SpanSelector []SpanSelector `( @@* ( "," @@ )*)`
+type ParserSelector struct {
+	SpanSelector []parserSpanSelector `( @@* ( "," @@ )*)`
 }
 
-type SpanSelector struct {
-	Filters       []Filter      `"span""["( @@* ( "," @@)*)"]"`
-	PseudoClass   PseudoClass   `@@*`
-	ChildSelector *SpanSelector ` @@*`
+type parserSpanSelector struct {
+	Filters       []parserFilter      `"span""["( @@* ( "," @@)*)"]"`
+	PseudoClass   parserPseudoClass   `@@*`
+	ChildSelector *parserSpanSelector ` @@*`
 }
 
-type Filter struct {
-	Property string `( @Ident ( @"." @Ident )*)`
-	Operator string `@("=" | "contains" )`
-	Value    *Value `@@*`
+type parserFilter struct {
+	Property string       `( @Ident ( @"." @Ident )*)`
+	Operator string       `@("=" | "contains" )`
+	Value    *parserValue `@@*`
 }
 
-type Value struct {
+type parserValue struct {
 	String  *string  ` @String`
 	Int     *int64   ` | @Int`
 	Float   *float64 ` | @Float`
@@ -30,13 +30,13 @@ type Value struct {
 	Null    bool     ` | @"NULL"`
 }
 
-type PseudoClass struct {
-	Type  string `":" @("nth_child")`
-	Value *Value `"(" @@* ")"`
+type parserPseudoClass struct {
+	Type  string       `":" @("nth_child")`
+	Value *parserValue `"(" @@* ")"`
 }
 
 func CreateParser() (*participle.Parser, error) {
-	parser, err := participle.Build(&Selector{})
+	parser, err := participle.Build(&ParserSelector{})
 	if err != nil {
 		return nil, fmt.Errorf("could not create parser: %w", err)
 	}
