@@ -7,65 +7,153 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestEq(t *testing.T) {
-	assert.Equal(t, "=", comparator.Eq.String())
+func TestComparators(t *testing.T) {
+	type compInput struct{ expected, actual string }
+	type compErr struct{ expected, actual, err string }
+	comps := []struct {
+		name          string
+		symbol        string
+		comparator    comparator.Comparator
+		expectSuccess []compInput
+		expectNoMatch []compInput
+		expectError   []compErr
+	}{
+		// ***********
+		{
+			name:       "Equal",
+			symbol:     "=",
+			comparator: comparator.Eq,
+			expectSuccess: []compInput{
+				{"a", "a"},
+				{"1", "1"},
+			},
+			expectNoMatch: []compInput{
+				{"", "2"},
+				{"a", "b"},
+			},
+		},
 
-	t.Run("String", func(t *testing.T) {
-		t.Parallel()
+		// ***********
+		{
+			name:       "Gt",
+			symbol:     ">",
+			comparator: comparator.Gt,
+			expectSuccess: []compInput{
+				{"2", "1"},
+				{"10", "2"},
+			},
+			expectNoMatch: []compInput{
+				{"1", "1"},
+				{"1", "2"},
+			},
+			expectError: []compErr{
+				{"a", "1", `cannot parse "a" as integer`},
+			},
+		},
 
-		assert.NoError(t, comparator.Eq.Compare("a", "a"))
-		assert.ErrorIs(t, comparator.Eq.Compare("a", "b"), comparator.ErrNoMatch)
-	})
+		// ***********
+		{
+			name:       "Lt",
+			symbol:     "<",
+			comparator: comparator.Lt,
+			expectSuccess: []compInput{
+				{"1", "2"},
+				{"2", "10"},
+			},
+			expectNoMatch: []compInput{
+				{"1", "1"},
+				{"2", "1"},
+			},
+			expectError: []compErr{
+				{"a", "1", `cannot parse "a" as integer`},
+			},
+		},
 
-	t.Run("Int", func(t *testing.T) {
-		t.Parallel()
+		// ***********
+		{
+			name:       "Contains",
+			symbol:     "contains",
+			comparator: comparator.Contains,
+			expectSuccess: []compInput{
+				{"he", "hello"},
+				{"ll", "hello"},
+				{"lo", "hello"},
+			},
+			expectNoMatch: []compInput{
+				{"nop", "hello"},
+			},
+		},
 
-		assert.NoError(t, comparator.Eq.Compare("1", "1"))
-		assert.ErrorIs(t, comparator.Eq.Compare("", "2"), comparator.ErrNoMatch)
-	})
-}
+		// ***********
+		{
+			name:       "StartsWith",
+			symbol:     "startsWith",
+			comparator: comparator.StartsWith,
+			expectSuccess: []compInput{
+				{"he", "hello"},
+			},
+			expectNoMatch: []compInput{
+				{"nop", "hello"},
+				{"ll", "hello"},
+				{"lo", "hello"},
+			},
+		},
 
-func TestGt(t *testing.T) {
-	assert.Equal(t, ">", comparator.Gt.String())
+		// ***********
+		{
+			name:       "EndsWith",
+			symbol:     "endsWith",
+			comparator: comparator.EndsWith,
+			expectSuccess: []compInput{
+				{"lo", "hello"},
+			},
+			expectNoMatch: []compInput{
+				{"nop", "hello"},
+				{"he", "hello"},
+				{"ll", "hello"},
+			},
+		},
+	}
 
-	t.Run("String", func(t *testing.T) {
-		t.Parallel()
-		assert.EqualError(t, comparator.Gt.Compare("a", "1"), `cannot parse "a" as integer`)
-	})
+	registry := comparator.DefaultRegistry()
 
-	t.Run("Int", func(t *testing.T) {
-		t.Parallel()
+	for _, c := range comps {
+		t.Run(c.name, func(t *testing.T) {
+			comp := c
+			t.Parallel()
 
-		assert.NoError(t, comparator.Gt.Compare("2", "1"))
-		assert.NoError(t, comparator.Gt.Compare("10", "2"))
-		assert.ErrorIs(t, comparator.Gt.Compare("1", "1"), comparator.ErrNoMatch)
-		assert.ErrorIs(t, comparator.Gt.Compare("1", "2"), comparator.ErrNoMatch)
-	})
-}
+			assert.Equal(t, comp.symbol, comp.comparator.String())
+			found, err := registry.Get(comp.comparator.String())
+			assert.NoError(
+				t, err,
+				`comparator "%s" not included in default registry`, comp.comparator.String(),
+			)
+			assert.Equal(
+				t, comp.comparator, found,
+				`comparator "%s" is incorrectly registered`, comp.comparator.String(),
+			)
 
-func TestLt(t *testing.T) {
-	assert.Equal(t, "<", comparator.Lt.String())
+			for _, input := range comp.expectSuccess {
+				assert.NoError(
+					t, comp.comparator.Compare(input.expected, input.actual),
+					`expected success comparing "%s" with "%s"`, input.expected, input.actual,
+				)
+			}
 
-	t.Run("String", func(t *testing.T) {
-		t.Parallel()
-		assert.EqualError(t, comparator.Lt.Compare("a", "1"), `cannot parse "a" as integer`)
-	})
+			for _, input := range comp.expectNoMatch {
+				assert.ErrorIs(
+					t, comp.comparator.Compare(input.expected, input.actual), comparator.ErrNoMatch,
+					`expected NoMatch comparing "%s" with "%s"`, input.expected, input.actual,
+				)
+			}
 
-	t.Run("Int", func(t *testing.T) {
-		t.Parallel()
+			for _, input := range comp.expectError {
+				assert.EqualError(
+					t, comparator.Gt.Compare(input.expected, input.actual), input.err,
+					`expected "%s" err comparing "%s" with "%s"`, input.err, input.expected, input.actual,
+				)
+			}
 
-		assert.NoError(t, comparator.Lt.Compare("1", "2"))
-		assert.NoError(t, comparator.Lt.Compare("2", "10"))
-		assert.ErrorIs(t, comparator.Lt.Compare("1", "1"), comparator.ErrNoMatch)
-		assert.ErrorIs(t, comparator.Lt.Compare("2", "1"), comparator.ErrNoMatch)
-	})
-}
-
-func TestContains(t *testing.T) {
-	t.Parallel()
-
-	assert.Equal(t, "contains", comparator.Contains.String())
-
-	assert.NoError(t, comparator.Contains.Compare("lo", "hello"))
-	assert.ErrorIs(t, comparator.Contains.Compare("hello", "lo"), comparator.ErrNoMatch)
+		})
+	}
 }

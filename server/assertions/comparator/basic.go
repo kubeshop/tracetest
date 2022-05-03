@@ -6,6 +6,17 @@ import (
 	"strings"
 )
 
+var (
+	Basic = []Comparator{
+		Eq,
+		Gt,
+		Lt,
+		Contains,
+		StartsWith,
+		EndsWith,
+	}
+)
+
 // Eq
 var Eq Comparator = eq{}
 
@@ -102,4 +113,38 @@ func (c contains) Compare(expected, actual string) error {
 
 func (c contains) String() string {
 	return "contains"
+}
+
+// StartsWith
+var StartsWith Comparator = startsWith{}
+
+type startsWith struct{}
+
+func (c startsWith) Compare(expected, actual string) error {
+	if strings.HasPrefix(actual, expected) {
+		return nil
+	}
+
+	return ErrNoMatch
+}
+
+func (c startsWith) String() string {
+	return "startsWith"
+}
+
+// EndsWith
+var EndsWith Comparator = endsWith{}
+
+type endsWith struct{}
+
+func (c endsWith) Compare(expected, actual string) error {
+	if strings.HasSuffix(actual, expected) {
+		return nil
+	}
+
+	return ErrNoMatch
+}
+
+func (c endsWith) String() string {
+	return "endsWith"
 }

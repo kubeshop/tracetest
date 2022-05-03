@@ -10,17 +10,15 @@ type Comparator interface {
 var (
 	ErrNoMatch  = fmt.Errorf("no match")
 	ErrNotFound = fmt.Errorf("not found")
-
-	Basic = []Comparator{
-		Eq,
-		Gt,
-		Lt,
-		Contains,
-	}
 )
 
 type Registry interface {
 	Get(string) (Comparator, error)
+}
+
+func DefaultRegistry() Registry {
+	r, _ := NewRegistry(Basic...)
+	return r
 }
 
 func NewRegistry(comps ...Comparator) (Registry, error) {
