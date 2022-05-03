@@ -5,6 +5,7 @@ go 1.13
 replace k8s.io/client-go => k8s.io/client-go v0.18.0
 
 require (
+	github.com/alecthomas/participle/v2 v2.0.0-alpha8 // indirect
 	github.com/denisbrodbeck/machineid v1.0.1 // indirect
 	github.com/gogo/protobuf v1.3.2
 	github.com/golang-migrate/migrate/v4 v4.15.2 // indirect
