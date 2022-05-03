@@ -5,7 +5,6 @@ import (
 
 	"github.com/kubeshop/tracetest/assertions/selectors"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestSimpleSelectorBuilder(t *testing.T) {
@@ -42,12 +41,9 @@ func TestSimpleSelectorBuilder(t *testing.T) {
 		},
 	}
 
-	builder, err := selectors.NewSelectorBuilder()
-	require.NoError(t, err, "builder must be created successfully")
-
 	for _, testCase := range testCases {
 		t.Run(testCase.Name, func(t *testing.T) {
-			_, err := builder.NewSelector(testCase.Expression)
+			_, err := selectors.New(testCase.Expression)
 			if testCase.ShouldSucceed {
 				assert.NoError(t, err)
 			} else {

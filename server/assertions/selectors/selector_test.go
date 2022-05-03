@@ -98,12 +98,9 @@ func TestSelector(t *testing.T) {
 		},
 	}
 
-	builder, err := selectors.NewSelectorBuilder()
-	require.NoError(t, err)
-
 	for _, testCase := range testCases {
 		t.Run(testCase.Name, func(t *testing.T) {
-			selector, err := builder.NewSelector(testCase.Expression)
+			selector, err := selectors.New(testCase.Expression)
 			require.NoError(t, err)
 
 			spans := selector.Filter(pokeshopTrace)

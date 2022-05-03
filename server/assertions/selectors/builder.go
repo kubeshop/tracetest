@@ -8,22 +8,36 @@ import (
 	"github.com/kubeshop/tracetest/traces"
 )
 
-func NewSelectorBuilder() (*SelectorBuilder, error) {
+var defaultParser *SelectorParser
+
+func newParser() (*SelectorParser, error) {
 	parser, err := CreateParser()
 	if err != nil {
 		return nil, err
 	}
 
-	return &SelectorBuilder{
+	return &SelectorParser{
 		parser: parser,
 	}, nil
 }
 
-type SelectorBuilder struct {
+func New(query string) (Selector, error) {
+	var err error
+	if defaultParser == nil {
+		defaultParser, err = newParser()
+		if err != nil {
+			return Selector{}, err
+		}
+	}
+
+	return defaultParser.Selector(query)
+}
+
+type SelectorParser struct {
 	parser *participle.Parser
 }
 
-func (sb *SelectorBuilder) NewSelector(query string) (Selector, error) {
+func (sb *SelectorParser) Selector(query string) (Selector, error) {
 	parserSelector := ParserSelector{}
 	err := sb.parser.ParseString("", query, &parserSelector)
 	if err != nil {
