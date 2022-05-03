@@ -1,21 +1,17 @@
 package assertions
 
 import (
-	"fmt"
-
+	"github.com/kubeshop/tracetest/assertions/comparator"
 	"github.com/kubeshop/tracetest/traces"
 )
 
 type Selector string // TODO: use actual selectors
 
-type Comparator interface {
-	Compare(string, string) error
-	fmt.Stringer
-}
+type TestDefinition map[Selector][]Assertion
 
 type Assertion struct {
 	Attribute  string
-	Comparator Comparator
+	Comparator comparator.Comparator
 	Value      string
 }
 
@@ -50,8 +46,6 @@ type AssertionSpanResults struct {
 	CompareErr  error
 }
 
-type TestDefinition map[Selector][]Assertion
-
 type TestResult map[Selector]AssertionResult
 
 func Assert(trace traces.Trace, defs TestDefinition) TestResult {
@@ -68,20 +62,4 @@ func Assert(trace traces.Trace, defs TestDefinition) TestResult {
 func findSpans(t traces.Trace, s Selector) []traces.Span {
 	// todo: actually implement search
 	return []traces.Span{t.RootSpan}
-}
-
-var ErrNoMatch = fmt.Errorf("no match")
-
-type ComparatorEq struct{}
-
-func (c ComparatorEq) Compare(expected, actual string) error {
-	if expected == actual {
-		return nil
-	}
-
-	return ErrNoMatch
-}
-
-func (c ComparatorEq) String() string {
-	return "="
 }

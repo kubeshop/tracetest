@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/kubeshop/tracetest/assertions"
+	"github.com/kubeshop/tracetest/assertions/comparator"
 	"github.com/kubeshop/tracetest/traces"
 	"github.com/stretchr/testify/assert"
 )
@@ -22,7 +23,7 @@ func TestAssertion(t *testing.T) {
 				"selector": []assertions.Assertion{
 					{
 						Attribute:  "tracetest.span.duration",
-						Comparator: assertions.ComparatorEq{},
+						Comparator: comparator.Eq,
 						Value:      "2000",
 					},
 				},
@@ -38,7 +39,7 @@ func TestAssertion(t *testing.T) {
 				"selector": assertions.AssertionResult{
 					Assertion: assertions.Assertion{
 						Attribute:  "tracetest.span.duration",
-						Comparator: assertions.ComparatorEq{},
+						Comparator: comparator.Eq,
 						Value:      "2000",
 					},
 					AssertionSpanResults: []assertions.AssertionSpanResults{
