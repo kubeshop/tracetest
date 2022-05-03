@@ -2,12 +2,12 @@ import {TagOutlined} from '@ant-design/icons';
 import {AutoComplete, Checkbox, Input, Tag} from 'antd';
 import {noop} from 'lodash';
 import React, {useCallback, useMemo, useState} from 'react';
-import { IItemSelector } from '../../types/Assertion.types';
+import { TItemSelector } from '../../types/Assertion.types';
 
 type TItemSelectorDropdownProps = {
-  spanSignature: IItemSelector[];
-  value?: IItemSelector[];
-  onChange?(selectorList: IItemSelector[]): void;
+  spanSignature: TItemSelector[];
+  value?: TItemSelector[];
+  onChange?(selectorList: TItemSelector[]): void;
 };
 
 export const CreateAssertionSelectorInput: React.FC<TItemSelectorDropdownProps> = ({
@@ -25,7 +25,7 @@ export const CreateAssertionSelectorInput: React.FC<TItemSelectorDropdownProps> 
             <span>
               <Checkbox
                 style={{marginLeft: 8, marginRight: 8}}
-                checked={selectorList.findIndex(el => el.propertyName.includes(tag.propertyName)) > -1}
+                checked={selectorList.findIndex(el => el.propertyName?.includes(tag.propertyName)) > -1}
               />
               {`${tag.propertyName} (${tag.value})`}
             </span>
@@ -38,10 +38,10 @@ export const CreateAssertionSelectorInput: React.FC<TItemSelectorDropdownProps> 
 
   const handleSelectItemSelector = useCallback(
     (text: any) => {
-      if (selectorList.findIndex(({propertyName}) => propertyName.includes(text)) > -1) {
-        onChange(selectorList.filter(({propertyName}) => !propertyName.includes(text)));
+      if (selectorList.findIndex(({propertyName}) => propertyName?.includes(text)) > -1) {
+        onChange(selectorList.filter(({propertyName}) => !propertyName?.includes(text)));
       } else {
-        const selectedItem = spanSignature.find(el => el.propertyName.includes(text));
+        const selectedItem = spanSignature.find(el => el.propertyName?.includes(text));
         if (selectedItem) {
           onChange([...selectorList, selectedItem]);
         }
@@ -52,7 +52,7 @@ export const CreateAssertionSelectorInput: React.FC<TItemSelectorDropdownProps> 
   );
 
   const handleDeleteItemSelector = useCallback(
-    (item: IItemSelector) => {
+    (item: TItemSelector) => {
       onChange(selectorList.filter(({propertyName}) => propertyName !== item.propertyName));
     },
     [onChange, selectorList]
@@ -61,7 +61,7 @@ export const CreateAssertionSelectorInput: React.FC<TItemSelectorDropdownProps> 
   return (
     <>
       <div style={{display: 'flex', flexWrap: 'wrap'}}>
-        {selectorList.map((item: IItemSelector) => (
+        {selectorList.map((item: TItemSelector) => (
           <Tag
             key={item.propertyName}
             style={{marginBottom: 8}}

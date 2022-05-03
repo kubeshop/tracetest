@@ -20,9 +20,8 @@ import * as S from './Trace.styled';
 
 import SpanDetail from './SpanDetail';
 import TestResults from './TestResults';
-import {ISpan} from '../../types/Span.types';
-import {ITestRunResult} from '../../types/TestRunResult.types';
-import {TestState} from '../../constants/TestRunResult.constants';
+import {TSpan} from '../../types/Span.types';
+import {TTestRunResult} from '../../types/TestRunResult.types';
 import TraceTimeline from './TraceTimeline';
 import TraceAnalyticsService from '../../services/Analytics/TraceAnalytics.service';
 import usePolling from '../../hooks/usePolling';
@@ -40,7 +39,7 @@ const Grid = styled.div`
 export type TSpanInfo = {
   id: string;
   parentIds: string[];
-  data: ISpan;
+  data: TSpan;
 };
 
 export type TSpanMap = Record<string, TSpanInfo>;
@@ -49,7 +48,7 @@ type TraceProps = {
   testId: string;
   testResultId: string;
   onDismissTrace(): void;
-  onRunTest(result: ITestRunResult): void;
+  onRunTest(result: TTestRunResult): void;
 };
 
 const Trace: React.FC<TraceProps> = ({testId, testResultId, onDismissTrace, onRunTest}) => {
@@ -90,10 +89,7 @@ const Trace: React.FC<TraceProps> = ({testId, testResultId, onDismissTrace, onRu
   usePolling({
     callback: refetchTrace,
     delay: 1000,
-    isPolling:
-      isError ||
-      testResultDetails?.state === TestState.AWAITING_TRACE ||
-      testResultDetails?.state === TestState.EXECUTING,
+    isPolling: isError || testResultDetails?.state === 'AWAITING_TRACE' || testResultDetails?.state === 'EXECUTING',
   });
 
   useEffect(() => {
@@ -137,7 +133,7 @@ const Trace: React.FC<TraceProps> = ({testId, testResultId, onDismissTrace, onRu
     onRunTest(result);
   };
 
-  if (isError || testResultDetails?.state === TestState.FAILED) {
+  if (isError || testResultDetails?.state === 'FAILED') {
     return (
       <S.FailedTrace>
         <CloseCircleFilled style={{color: 'red', fontSize: 32}} />

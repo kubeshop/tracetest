@@ -14,13 +14,12 @@ import TestStateBadge from 'components/TestStateBadge';
 
 import * as S from './Test.styled';
 import TestDetails from './TestDetails';
-import {TestState} from '../../constants/TestRunResult.constants';
-import {ITestRunResult} from '../../types/TestRunResult.types';
+import {TTestRunResult} from '../../types/TestRunResult.types';
 
 interface TracePane {
   key: string;
   title: string;
-  content: any;
+  content: React.ReactElement;
 }
 
 const TestPage = () => {
@@ -42,8 +41,7 @@ const TestPage = () => {
 
   const isTraceLoading =
     (activeTestResult?.resultId &&
-      (activeTestResultDetails?.state === TestState.AWAITING_TRACE ||
-        activeTestResultDetails?.state === TestState.EXECUTING)) ||
+      (activeTestResultDetails?.state === 'AWAITING_TRACE' || activeTestResultDetails?.state === 'EXECUTING')) ||
     false;
 
   const handleCloseTab = useCallback(() => {
@@ -56,18 +54,18 @@ const TestPage = () => {
   }, [activeTabKey, id, navigate, tracePanes]);
 
   const handleSelectTestResult = useCallback(
-    (result: ITestRunResult) => {
+    (result: TTestRunResult) => {
       const itExists = Boolean(tracePanes.find(pane => pane.key === result.resultId));
 
       if (!itExists) {
         const newTabIndex = testResultList.findIndex(r => r.resultId === result.resultId) + 1;
         const tracePane = {
-          key: result.resultId,
+          key: result.resultId!,
           title: `Trace #${newTabIndex}`,
           content: (
             <Trace
               testId={id!}
-              testResultId={result.resultId}
+              testResultId={result.resultId!}
               onDismissTrace={handleCloseTab}
               onRunTest={handleSelectTestResult}
             />
@@ -164,7 +162,7 @@ const TestPage = () => {
                 testResultList={testResultList}
                 isLoading={isLoading}
                 testId={id!}
-                url={test?.serviceUnderTest.request.url}
+                url={test?.serviceUnderTest?.request?.url}
                 onSelectResult={handleSelectTestResult}
               />
             </S.Wrapper>

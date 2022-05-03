@@ -3,7 +3,7 @@ import {createSelector} from '@reduxjs/toolkit';
 import {endpoints} from 'redux/apis/Test.api';
 import {RootState} from '../redux/store';
 import AssertionService from '../services/Assertion.service';
-import {IAssertion, IItemSelector, ISpanAssertionResult} from '../types/Assertion.types';
+import {TAssertion, TItemSelector, TSpanAssertionResult} from '../types/Assertion.types';
 
 const stateSelector = (state: RootState) => state;
 
@@ -19,7 +19,7 @@ const AssertionSelectors = () => ({
       const span = trace?.spans.find(({spanId: id}) => id === spanId);
 
       return (
-        test?.assertions?.reduce<Array<{assertion: IAssertion; assertionResultList: Array<ISpanAssertionResult>}>>(
+        test?.assertions?.reduce<Array<{assertion: TAssertion; assertionResultList: Array<TSpanAssertionResult>}>>(
           (resultList, assertion) => {
             const assertionResultList = AssertionService.runBySpan(span!, assertion);
 
@@ -30,7 +30,7 @@ const AssertionSelectors = () => ({
       );
     });
   },
-  selectAffectedSpanCount(testId: string, resultId: string, selectorList: IItemSelector[]) {
+  selectAffectedSpanCount(testId: string, resultId: string, selectorList: TItemSelector[]) {
     return createSelector(stateSelector, state => {
       const {data: result} = endpoints.getResultById.select({testId, resultId})(state);
 

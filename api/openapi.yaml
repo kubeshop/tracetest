@@ -319,6 +319,10 @@ components:
   schemas:
     Test:
       type: object
+      required:
+        - testId
+        - name
+        - serviceUnderTest
       properties:
         testId:
           type: string
@@ -348,6 +352,9 @@ components:
           $ref: "#/components/schemas/TestRunResult"
     Assertion:
       type: object
+      required:
+        - assertionId
+        - selectors
       properties:
         assertionId:
           type: string
@@ -364,6 +371,11 @@ components:
             $ref: "#/components/schemas/SpanAssertion"
     TestRunResult:
       type: object
+      required:
+        - resultId
+        - testId
+        - createdAt
+        - state
       properties:
         resultId:
           type: string
@@ -385,7 +397,15 @@ components:
           readOnly: true
         state:
           type: string
-          enum: [CREATED, EXECUTING, AWAITING_TRACE, FAILED, FINISHED, AWAITING_TEST_RESULTS]
+          enum:
+            [
+              CREATED,
+              EXECUTING,
+              AWAITING_TRACE,
+              FAILED,
+              FINISHED,
+              AWAITING_TEST_RESULTS,
+            ]
           description: Current execution state
         lastErrorState:
           type: string
@@ -400,7 +420,7 @@ components:
           $ref: "#/components/schemas/HTTPResponse"
           description: TODO(pov) This is HTTP Response object for now, at some point it might be GRPC/SOAP/...
         trace:
-          $ref: "./trace.yaml#/definitions/api_v3SpansResponseChunk"
+          $ref: "./trace.yaml#/components/schemas/Trace"
         assertionResultState:
           type: boolean
           description: True if all trace spans passed the assertion test
@@ -413,8 +433,8 @@ components:
       type: object
       properties:
         assertionResultState:
-            type: boolean
-            description: True if all trace spans passed the assertion test
+          type: boolean
+          description: True if all trace spans passed the assertion test
         assertionResult:
           type: array
           description: List of all tested span assertions
@@ -422,6 +442,10 @@ components:
             $ref: "#/components/schemas/AssertionResult"
     Attribute:
       type: object
+      required:
+        - key
+        - id
+        - value
       properties:
         id:
           type: string
@@ -433,10 +457,21 @@ components:
           type: string
     SelectorItem:
       type: object
+      required:
+        - locationName
+        - valueType
+        - propertyName
+        - value
       properties:
         locationName:
           type: string
-          enum: [RESOURCE_ATTRIBUTES, INSTRUMENTATION_LIBRARY, SPAN, SPAN_ATTRIBUTES]
+          enum:
+            [
+              RESOURCE_ATTRIBUTES,
+              INSTRUMENTATION_LIBRARY,
+              SPAN,
+              SPAN_ATTRIBUTES,
+            ]
           description: Example "SPAN"
         propertyName:
           type: string
@@ -446,10 +481,23 @@ components:
           description: Example "POST /users/verify"
         valueType:
           type: string
-          description: TODO(pov) think about value types?
-          enum: [stringValue, intValue]
+          enum:
+            [
+              stringValue,
+              intValue,
+              boolValue,
+              doubleValue,
+              kvlistValue,
+            ]
     SpanAssertion:
       type: object
+      required:
+        - spanAssertionId
+        - locationName
+        - propertyName
+        - valueType
+        - operator
+        - comparisonValue
       properties:
         spanAssertionId:
           type: string
@@ -457,7 +505,13 @@ components:
           readOnly: true
         locationName:
           type: string
-          enum: [RESOURCE_ATTRIBUTES, INSTRUMENTATION_LIBRARY, SPAN, SPAN_ATTRIBUTES]
+          enum:
+            [
+              RESOURCE_ATTRIBUTES,
+              INSTRUMENTATION_LIBRARY,
+              SPAN,
+              SPAN_ATTRIBUTES,
+            ]
           description: Example "SPAN_ATTRIBUTES"
         propertyName:
           type: string
@@ -465,11 +519,18 @@ components:
         valueType:
           type: string
           description: Example "intValue"
-          enum: [stringValue, intValue]
+          enum:
+            [
+              stringValue,
+              intValue,
+              boolValue,
+              doubleValue,
+              kvlistValue,
+            ]
         operator:
           type: string
           description: Example "EQUALS"
-          enum: [EQUALS, LESSTHAN, GREATERTHAN, NOTEQUALS]
+          enum: [EQUALS, NOTEQUALS, LESSTHAN, GREATERTHAN, GREATOREQUALS, LESSOREQUAL, CONTAINS]
         comparisonValue:
           type: string
           description: Example "200"
@@ -494,6 +555,9 @@ components:
           format: byte
     AssertionResult:
       type: object
+      required:
+        - assertionId
+        - spanAssertionResults
       properties:
         assertionId:
           type: string
@@ -504,6 +568,11 @@ components:
             $ref: "#/components/schemas/SpanAssertionResult"
     SpanAssertionResult:
       type: object
+      required:
+        - spanAssertionId
+        - spanId
+        - passed
+        - observedValue
       properties:
         spanAssertionId:
           type: string
@@ -516,7 +585,7 @@ components:
           description: True if the span passed the assertion test
         observedValue:
           type: string
-          description: 'value that the trace for this test run contained'
+          description: "value that the trace for this test run contained"
           readOnly: true
     HTTPRequest:
       type: object
@@ -525,7 +594,24 @@ components:
           type: string
         method:
           type: string
-          enum: [GET, PUT, POST, PATCH, DELETE, COPY, HEAD, OPTIONS, LINK, UNLINK, PURGE, LOCK, UNLOCK, PROPFIND, VIEW]
+          enum:
+            [
+              GET,
+              PUT,
+              POST,
+              PATCH,
+              DELETE,
+              COPY,
+              HEAD,
+              OPTIONS,
+              LINK,
+              UNLINK,
+              PURGE,
+              LOCK,
+              UNLOCK,
+              PROPFIND,
+              VIEW,
+            ]
         headers:
           type: array
           items:

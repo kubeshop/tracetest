@@ -1,20 +1,11 @@
-import {SpanAttributeType} from 'constants/SpanAttribute.constants';
+import {Schemas, TraceSchemas} from './Common.types';
 
-export type IRawSpanAttributeValue = {
-  stringValue: string;
-  intValue: number;
-  booleanValue: boolean;
-  doubleValue: number;
-  kvlistValue: {values: IRawSpanAttribute[]};
-};
+export type TRawSpanAttribute = TraceSchemas['Attribute'];
 
-export type IRawSpanAttribute = {
-  key: string;
-  value: IRawSpanAttributeValue;
-};
+export type TSpanAttributeValueType = Schemas['SpanAssertion']['valueType']
 
-export type ISpanAttribute = {
-  type: SpanAttributeType;
+export type TSpanAttribute = {
+  type: Schemas['SpanAssertion']['valueType'];
   name: string;
   value: string;
 };

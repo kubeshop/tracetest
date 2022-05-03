@@ -1,9 +1,9 @@
-import {IRawTrace, ITrace} from '../types/Trace.types';
+import {TRawTrace, TTrace} from '../types/Trace.types';
 import Span from './Span.model';
 
-const Trace = ({description = '', resourceSpans = []}: IRawTrace): ITrace => {
+const Trace = ({resourceSpans = []}: TRawTrace): TTrace => {
   return {
-    description,
+    description: '',
     spans: Span.createFromResourceSpanList(resourceSpans),
   };
 };

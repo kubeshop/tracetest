@@ -1,23 +1,22 @@
 import {isEmpty} from 'lodash';
-import {SpanAttributeType} from '../constants/SpanAttribute.constants';
-import {IRawSpanAttribute, ISpanAttribute} from '../types/SpanAttribute.types';
+import {TRawSpanAttribute, TSpanAttribute, TSpanAttributeValueType} from '../types/SpanAttribute.types';
 
-const spanAttributeTypeList = Object.values(SpanAttributeType);
+const spanAttributeTypeList: TSpanAttributeValueType[] = ['boolValue', 'doubleValue', 'intValue', 'kvlistValue', 'stringValue'];
 
-const getSpanAttributeValueType = (attribute: IRawSpanAttribute): SpanAttributeType =>
+const getSpanAttributeValueType = (attribute: TRawSpanAttribute): TSpanAttributeValueType =>
   spanAttributeTypeList.find(type => {
     const value = attribute.value[type];
     if (typeof value === 'number') return true;
     return !isEmpty(value);
-  }) || SpanAttributeType.stringValue;
+  }) || 'stringValue';
 
-const getSpanAttributeValue = (attribute: IRawSpanAttribute): string => {
+const getSpanAttributeValue = (attribute: TRawSpanAttribute): string => {
   const attributeType = getSpanAttributeValueType(attribute);
   const value = attribute.value[attributeType];
 
   if (!value) return 'Empty value';
   switch (attributeType) {
-    case SpanAttributeType.kvlistValue: {
+    case 'kvlistValue': {
       return JSON.stringify(value);
     }
 
@@ -27,13 +26,13 @@ const getSpanAttributeValue = (attribute: IRawSpanAttribute): string => {
   }
 };
 
-const SpanAttribute = (rawAttribute: IRawSpanAttribute): ISpanAttribute => {
+const SpanAttribute = (rawAttribute: TRawSpanAttribute): TSpanAttribute => {
   const type = getSpanAttributeValueType(rawAttribute);
   const value = getSpanAttributeValue(rawAttribute);
 
   return {
     type,
-    name: rawAttribute.key,
+    name: rawAttribute.key || '',
     value,
   };
 };

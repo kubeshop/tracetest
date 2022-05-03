@@ -1,18 +1,18 @@
 import {Button, Table, Typography} from 'antd';
 import {useMemo, useState} from 'react';
 import AssertionTableAnalyticsService from '../../services/Analytics/AssertionTableAnalytics.service';
-import {IAssertion, ISpanAssertionResult} from '../../types/Assertion.types';
+import {TAssertion, TSpanAssertionResult} from '../../types/Assertion.types';
 import OperatorService from '../../services/Operator.service';
-import {ISpan} from '../../types/Span.types';
+import {TSpan} from '../../types/Span.types';
 import CreateAssertionModal from '../CreateAssertionModal';
 import CustomTable from '../CustomTable';
 import * as S from './AssertionsTable.styled';
 
-interface IAssertionsResultTableProps {
-  assertionResults: ISpanAssertionResult[];
-  assertion: IAssertion;
+interface TAssertionsResultTableProps {
+  assertionResults: TSpanAssertionResult[];
+  assertion: TAssertion;
   sort: number;
-  span: ISpan;
+  span: TSpan;
   testId: string;
   resultId: string;
 }
@@ -26,7 +26,7 @@ interface IParsedAssertion {
   hasPassed: boolean;
 }
 
-const AssertionsResultTable: React.FC<IAssertionsResultTableProps> = ({
+const AssertionsResultTable: React.FC<TAssertionsResultTableProps> = ({
   assertionResults,
   assertion: {selectors = []},
   assertion,
@@ -39,14 +39,16 @@ const AssertionsResultTable: React.FC<IAssertionsResultTableProps> = ({
 
   const parsedAssertionList = useMemo<Array<IParsedAssertion>>(
     () =>
-      assertionResults.map(({propertyName, comparisonValue, operator, actualValue, hasPassed}) => ({
-        key: propertyName,
-        property: propertyName,
-        comparison: operator,
-        value: comparisonValue,
-        actualValue,
-        hasPassed,
-      })),
+      assertionResults.map(
+        ({propertyName = '', comparisonValue = '', operator = 'EQUALS', actualValue = '', hasPassed = true}) => ({
+          key: propertyName,
+          property: propertyName,
+          comparison: operator,
+          value: comparisonValue,
+          actualValue,
+          hasPassed,
+        })
+      ),
     [assertionResults]
   );
 
@@ -62,7 +64,7 @@ const AssertionsResultTable: React.FC<IAssertionsResultTableProps> = ({
         <Button
           type="link"
           onClick={() => {
-            AssertionTableAnalyticsService.onEditAssertionButtonClick(assertion.assertionId);
+            AssertionTableAnalyticsService.onEditAssertionButtonClick(assertion.assertionId!);
             setIsModalOpen(true);
           }}
         >

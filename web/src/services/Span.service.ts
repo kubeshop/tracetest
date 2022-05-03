@@ -1,12 +1,12 @@
 import {SemanticGroupNameNodeMap} from '../constants/SemanticGroupNames.constants';
-import {ISpan} from '../types/Span.types';
+import {TSpan} from '../types/Span.types';
 
 const SpanService = () => ({
-  getSpanNodeInfo(span: ISpan) {
+  getSpanNodeInfo(span: TSpan) {
     const signatureObject = span.signature.reduce<Record<string, string>>(
       (signature, {propertyName, value}) => ({
         ...signature,
-        [propertyName]: value,
+        [propertyName || '']: value!,
       }),
       {}
     );

@@ -1,52 +1,37 @@
 import {SemanticGroupNames} from '../constants/SemanticGroupNames.constants';
-import {Modify} from './Common.types';
-import {IItemSelector} from './Assertion.types';
-import {IRawSpanAttribute, ISpanAttribute} from './SpanAttribute.types';
+import {TItemSelector} from './Assertion.types';
+import {Modify, TraceSchemas} from './Common.types';
+import {TRawSpanAttribute, TSpanAttribute} from './SpanAttribute.types';
 
-export interface IInstrumentationLibrary {
-  name: string;
-  version: string;
-}
+export type TInstrumentationLibrary = TraceSchemas['InstrumentationLibrary'];
 
-export interface IResource {
-  attributes: IRawSpanAttribute[];
-}
+export type TResource = Modify<
+  TraceSchemas['Resource'],
+  {
+    attributes: TRawSpanAttribute[];
+  }
+>;
 
-export interface ISpanFlatAttribute {
+export interface TSpanFlatAttribute {
   key: string;
   value: string;
 }
 
-export interface IInstrumentationLibrarySpan {
-  instrumentationLibrary: IInstrumentationLibrary;
-  spans: IRawSpan[];
-}
+export type TInstrumentationLibrarySpan = TraceSchemas['InstrumentationLibrarySpans'];
 
-export interface IResourceSpan {
-  resource: IResource;
-  instrumentationLibrarySpans: IInstrumentationLibrarySpan[];
-}
+export type TResourceSpan = TraceSchemas['ResourceSpans'];
 
-export interface IRawSpan {
-  traceId: string;
-  spanId: string;
-  parentSpanId?: string;
-  name: string;
-  kind: string;
-  startTimeUnixNano: string;
-  endTimeUnixNano: string;
-  attributes: IRawSpanAttribute[];
-  status: {code: string};
-}
+export type TRawSpan = TraceSchemas['Span'];
 
-export type ISpan = Modify<
-  IRawSpan,
+export type TSpan = Modify<
+  TRawSpan,
   {
-    attributes: Record<string, ISpanAttribute>;
-    instrumentationLibrary: IInstrumentationLibrary;
+    spanId: string;
+    attributes: Record<string, TSpanAttribute>;
+    instrumentationLibrary: TInstrumentationLibrary;
     type: SemanticGroupNames;
     duration: number;
-    signature: IItemSelector[];
-    attributeList: ISpanFlatAttribute[];
+    signature: TItemSelector[];
+    attributeList: TSpanFlatAttribute[];
   }
 >;

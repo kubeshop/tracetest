@@ -9,7 +9,7 @@ import SkeletonTable from 'components/SkeletonTable';
 import GuidedTourService, {GuidedTours} from '../../services/GuidedTour.service';
 import {Steps} from '../GuidedTour/traceStepList';
 import TraceAnalyticsService from '../../services/Analytics/TraceAnalytics.service';
-import {ITrace} from '../../types/Trace.types';
+import {TTrace} from '../../types/Trace.types';
 
 const {onTimelineSpanClick} = TraceAnalyticsService;
 
@@ -23,13 +23,13 @@ const Header = styled.div`
 `;
 
 interface ITimelineChartProps {
-  trace: ITrace;
+  trace: TTrace;
   selectedSpan: any;
   onSelectSpan(spanId: string): void;
 }
 
 interface IProps {
-  trace?: ITrace;
+  trace?: TTrace;
   selectedSpan?: any;
   onSelectSpan(spanId: string): void;
 }

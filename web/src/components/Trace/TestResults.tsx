@@ -2,14 +2,14 @@ import {Typography} from 'antd';
 import {useSelector} from 'react-redux';
 import SkeletonTable from 'components/SkeletonTable';
 import {FC, useMemo} from 'react';
-import {ITrace} from '../../types/Trace.types';
+import {TTrace} from '../../types/Trace.types';
 import TraceAssertionsResultTable from '../TraceAssertionsTable/TraceAssertionsTable';
 import TraceService from '../../services/Trace.service';
 import * as S from './TestResults.styled';
 import TestResultSelectors from '../../selectors/TestResult.selectors';
 
 type TTestResultsProps = {
-  trace?: ITrace;
+  trace?: TTrace;
   resultId: string;
   onSpanSelected(spanId: string): void;
 };

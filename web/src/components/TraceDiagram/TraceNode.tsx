@@ -3,12 +3,12 @@ import {upperCase} from 'lodash';
 import React from 'react';
 import {Handle, NodeProps, Position} from 'react-flow-renderer';
 import {SemanticGroupNamesToText} from '../../constants/SemanticGroupNames.constants';
-import {ISpan} from '../../types/Span.types';
+import {TSpan} from '../../types/Span.types';
 import * as S from './TraceDiagram.styled';
 import SpanService from '../../services/Span.service';
-import { ITrace } from '../../types/Trace.types';
+import { TTrace } from '../../types/Trace.types';
 
-type TTraceNodeProps = NodeProps<{span: ISpan; trace: ITrace}>;
+type TTraceNodeProps = NodeProps<{span: TSpan; trace: TTrace}>;
 
 const TraceNode: React.FC<TTraceNodeProps> = ({
   id,

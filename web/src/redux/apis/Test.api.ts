@@ -1,8 +1,8 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
-import {ITest} from 'types/Test.types';
-import {IRawTestRunResult, ITestRunResult} from 'types/TestRunResult.types';
+import {TTest} from 'types/Test.types';
+import {TRawTestRunResult, TTestRunResult} from 'types/TestRunResult.types';
 import {TRecursivePartial} from 'types/Common.types';
-import {IAssertion, ITestAssertionResult} from '../../types/Assertion.types';
+import {TAssertion, TTestAssertionResult} from '../../types/Assertion.types';
 import TestRunResult from '../../models/TestRunResult.model';
 
 const TestAPI = createApi({
@@ -13,7 +13,7 @@ const TestAPI = createApi({
   tagTypes: ['Test', 'Assertion', 'TestRunResult'],
   endpoints: build => ({
     // Tests
-    createTest: build.mutation<ITest, TRecursivePartial<ITest>>({
+    createTest: build.mutation<TTest, TRecursivePartial<TTest>>({
       query: newTest => ({
         url: `/tests`,
         method: 'POST',
@@ -21,29 +21,29 @@ const TestAPI = createApi({
       }),
       invalidatesTags: [{type: 'Test', id: 'LIST'}],
     }),
-    runTest: build.mutation<ITestRunResult, string>({
+    runTest: build.mutation<TTestRunResult, string>({
       query: testId => ({
         url: `/tests/${testId}/run`,
         method: 'POST',
       }),
     }),
-    getTestList: build.query<ITest[], void>({
+    getTestList: build.query<TTest[], void>({
       query: () => `/tests`,
       providesTags: result =>
         result
           ? [...result.map(i => ({type: 'Test' as const, id: i.testId})), {type: 'Test', id: 'LIST'}]
           : [{type: 'Test', id: 'LIST'}],
     }),
-    getTestById: build.query<ITest, string>({
+    getTestById: build.query<TTest, string>({
       query: id => `/tests/${id}`,
       providesTags: result => [{type: 'Test', id: result?.testId}],
     }),
 
     // Assertions
-    getAssertions: build.query<IAssertion[], string>({
+    getAssertions: build.query<TAssertion[], string>({
       query: testId => `/tests/${testId}/assertions`,
     }),
-    createAssertion: build.mutation<IAssertion, {testId: string; assertion: Partial<IAssertion>}>({
+    createAssertion: build.mutation<TAssertion, {testId: string; assertion: TRecursivePartial<TAssertion>}>({
       query: ({testId, assertion}) => ({
         url: `/tests/${testId}/assertions`,
         method: 'POST',
@@ -51,7 +51,7 @@ const TestAPI = createApi({
       }),
       invalidatesTags: (result, error, args) => [{type: 'Test', id: args.testId}],
     }),
-    updateAssertion: build.mutation<IAssertion, {testId: string; assertionId: string; assertion: Partial<IAssertion>}>({
+    updateAssertion: build.mutation<TAssertion, {testId: string; assertionId: string; assertion: TRecursivePartial<TAssertion>}>({
       query: ({testId, assertion, assertionId}) => ({
         url: `/tests/${testId}/assertions/${assertionId}`,
         method: 'PUT',
@@ -61,16 +61,16 @@ const TestAPI = createApi({
     }),
 
     // Test Results
-    getResultList: build.query<ITestRunResult[], string>({
+    getResultList: build.query<TTestRunResult[], string>({
       query: id => `/tests/${id}/results`,
       providesTags: result =>
         result ? [{type: 'TestRunResult' as const, id: 'LIST'}] : [{type: 'TestRunResult' as const, id: 'LIST'}],
-      transformResponse: (rawTestResultList: IRawTestRunResult[]) =>
+      transformResponse: (rawTestResultList: TRawTestRunResult[]) =>
         rawTestResultList.map(rawTestResult => TestRunResult(rawTestResult)),
     }),
     updateResult: build.mutation<
-      ITestRunResult,
-      {testId: string; resultId: string; assertionResult: ITestAssertionResult}
+      TTestRunResult,
+      {testId: string; resultId: string; assertionResult: TTestAssertionResult}
     >({
       query: ({testId, resultId, assertionResult}) => ({
         url: `/tests/${testId}/results/${resultId}`,
@@ -78,12 +78,12 @@ const TestAPI = createApi({
         body: assertionResult,
       }),
       invalidatesTags: (result, error, args) => [{type: 'TestRunResult', id: args.resultId}],
-      transformResponse: (rawTestResult: IRawTestRunResult) => TestRunResult(rawTestResult),
+      transformResponse: (rawTestResult: TRawTestRunResult) => TestRunResult(rawTestResult),
     }),
-    getResultById: build.query<ITestRunResult, Pick<ITest, 'testId'> & {resultId: string}>({
+    getResultById: build.query<TTestRunResult, Pick<TTest, 'testId'> & {resultId: string}>({
       query: ({testId, resultId}) => `/tests/${testId}/results/${resultId}`,
       providesTags: result => (result ? [{type: 'TestRunResult' as const, id: result?.resultId}] : []),
-      transformResponse: (rawTestResult: IRawTestRunResult) => TestRunResult(rawTestResult),
+      transformResponse: (rawTestResult: TRawTestRunResult) => TestRunResult(rawTestResult),
     }),
   }),
 });

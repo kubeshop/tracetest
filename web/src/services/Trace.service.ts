@@ -1,30 +1,30 @@
 import AssertionService from './Assertion.service';
 import {
-  IAssertionResult,
+  TAssertionResult,
   TAssertionResultList,
-  ISpanAssertionResult2,
-  ITestAssertionResult,
+  TSpanAssertionResult2,
+  TTestAssertionResult,
 } from '../types/Assertion.types';
-import {ITest} from '../types/Test.types';
-import {ITrace} from '../types/Trace.types';
+import {TTest} from '../types/Test.types';
+import {TTrace} from '../types/Trace.types';
 
 const TraceService = () => ({
-  runTest(trace: ITrace, {assertions = []}: ITest) {
+  runTest(trace: TTrace, {assertions = []}: TTest) {
     const resultList = assertions?.map(assertion => AssertionService.runByTrace(trace, assertion));
 
     return resultList;
   },
   parseTestResultToAssertionResultList(
     assertionResult: TAssertionResultList,
-    {assertions}: ITest,
-    trace: ITrace
-  ): IAssertionResult[] {
+    {assertions}: TTest,
+    trace: TTrace
+  ): TAssertionResult[] {
     const assertionResultList = assertionResult.map(({assertionId, spanAssertionResults = []}) => {
       const assertion = assertions.find(({assertionId: id}) => id === assertionId);
 
       return {
         assertion: assertion!,
-        spanListAssertionResult: spanAssertionResults.map(({spanId, passed, observedValue, spanAssertionId}) => {
+        spanListAssertionResult: spanAssertionResults.map(({spanId = '', passed = false, observedValue = '', spanAssertionId = ''}) => {
           const span = trace.spans.find(({spanId: id}) => id === spanId);
           const spanAssertion = assertion?.spanAssertions?.find(({spanAssertionId: id}) => id === spanAssertionId);
 
@@ -40,14 +40,14 @@ const TraceService = () => ({
 
     return assertionResultList;
   },
-  parseAssertionResultListToTestResult(assertionResultList: IAssertionResult[] = []): ITestAssertionResult {
+  parseAssertionResultListToTestResult(assertionResultList: TAssertionResult[] = []): TTestAssertionResult {
     const {totalFailedCount} = this.getTestResultCount(assertionResultList);
 
     return {
       assertionResultState: !totalFailedCount,
       assertionResult: assertionResultList.map(({assertion, spanListAssertionResult}) => ({
         assertionId: assertion.assertionId,
-        spanAssertionResults: spanListAssertionResult.reduce<ISpanAssertionResult2[]>(
+        spanAssertionResults: spanListAssertionResult.reduce<TSpanAssertionResult2[]>(
           (accList, {resultList}) =>
             accList.concat(
               resultList.map(({spanId, hasPassed, actualValue, spanAssertionId = ''}) => ({
@@ -62,7 +62,7 @@ const TraceService = () => ({
       })),
     };
   },
-  getTestResultCount(assertionResultList: IAssertionResult[]) {
+  getTestResultCount(assertionResultList: TAssertionResult[]) {
     const [totalPassedCount, totalFailedCount] = assertionResultList.reduce<[number, number]>(
       ([innerTotalPassedCount, innerTotalFailedCount], {spanListAssertionResult}) => {
         const [passed, failed] = spanListAssertionResult.reduce<[number, number]>(

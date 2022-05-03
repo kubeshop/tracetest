@@ -9,13 +9,13 @@ import Attributes from './Attributes';
 import TraceAnalyticsService from '../../services/Analytics/TraceAnalytics.service';
 import {useAppSelector} from '../../redux/hooks';
 import AssertionSelectors from '../../selectors/Assertion.selectors';
-import {ISpan} from '../../types/Span.types';
+import {TSpan} from '../../types/Span.types';
 
 const {onAddAssertionButtonClick} = TraceAnalyticsService;
 
 type TSpanDetailProps = {
   testId?: string;
-  targetSpan?: ISpan;
+  targetSpan?: TSpan;
   resultId?: string;
 };
 

@@ -5,13 +5,13 @@ import {FC, useCallback, useMemo} from 'react';
 import CustomTable from '../CustomTable';
 import * as S from './TraceAssertionsTable.styled';
 import TraceAssertionTableAnalyticsService from '../../services/Analytics/TraceAssertionTableAnalytics.service';
-import {IAssertionResult} from '../../types/Assertion.types';
+import {TAssertionResult} from '../../types/Assertion.types';
 import OperatorService from '../../services/Operator.service';
 
 const {onSpanAssertionClick} = TraceAssertionTableAnalyticsService;
 
 interface IProps {
-  assertionResult: IAssertionResult;
+  assertionResult: TAssertionResult;
   onSpanSelected(spanId: string): void;
 }
 
@@ -33,12 +33,19 @@ const TraceAssertionsResultTable: FC<IProps> = ({
   },
   onSpanSelected,
 }) => {
-  const selectorValueList = useMemo(() => selectors.map(({value}) => value), [selectors]);
+  const selectorValueList = useMemo(() => selectors.map(({value = ''}) => value), [selectors]);
   const parsedAssertionList = useMemo(() => {
     const spanAssertionList = spanListAssertionResult.reduce<Array<TParsedAssertion>>((list, {resultList, span}) => {
       const subResultList = resultList.map<TParsedAssertion>(
-        ({propertyName, comparisonValue, operator, actualValue, hasPassed, spanId}) => {
-          const spanLabelList = span.signature.map(({value}) => value).concat([`#${spanId.slice(-4)}`]) || [];
+        ({
+          propertyName = '',
+          comparisonValue = '',
+          operator = 'EQUALS',
+          actualValue = '',
+          hasPassed = false,
+          spanId = '',
+        }) => {
+          const spanLabelList = span.signature.map(({value = ''}) => value).concat([`#${spanId.slice(-4)}`]) || [];
 
           return {
             spanLabels: difference(spanLabelList, selectorValueList),

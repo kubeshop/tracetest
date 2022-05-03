@@ -1,15 +1,14 @@
 import {search} from 'jmespath';
 import {escapeString} from '../utils/Common';
 import OperatorService from './Operator.service';
-import {ISpan} from '../types/Span.types';
-import {ITrace} from '../types/Trace.types';
-import {IAssertion, IAssertionResult, IItemSelector, ISpanAssertionResult} from '../types/Assertion.types';
-import {SpanAttributeType} from '../constants/SpanAttribute.constants';
+import {TSpan} from '../types/Span.types';
+import {TTrace} from '../types/Trace.types';
+import {TAssertion, TAssertionResult, TItemSelector, TSpanAssertionResult} from '../types/Assertion.types';
 
 const buildValueSelector = (comparisonValue: string, compareOperator: string, type: string) => {
   if (compareOperator === 'contains') return `contains(value, \`${comparisonValue}\`)`;
 
-  if ([SpanAttributeType.intValue, SpanAttributeType.doubleValue].includes(type as SpanAttributeType)) {
+  if (['intValue', 'doubleValue'].includes(type)) {
     return `to_number(value) ${compareOperator} \`${comparisonValue}\``;
   }
 
@@ -18,10 +17,10 @@ const buildValueSelector = (comparisonValue: string, compareOperator: string, ty
 
 const buildSelector = (conditions: string[]) => `${conditions.map(cond => `${cond}`).join(' && ')}`;
 
-const getSelectorList = (itemSelectors: IItemSelector[]) => {
+const getSelectorList = (itemSelectors: TItemSelector[]) => {
   const selectorList = itemSelectors.map<string>(({propertyName, value, valueType}) => {
     const keySelector = ` key == \`${propertyName}\``;
-    const valueSelector = buildValueSelector(value, '==', valueType);
+    const valueSelector = buildValueSelector(value!, '==', valueType);
     const condition = `${[keySelector, valueSelector]!.join(' && ')}`;
 
     return condition;
@@ -31,7 +30,7 @@ const getSelectorList = (itemSelectors: IItemSelector[]) => {
 };
 
 const AssertionService = () => ({
-  runBySpan(span: ISpan, {spanAssertions = [], selectors}: IAssertion): Array<ISpanAssertionResult> {
+  runBySpan(span: TSpan, {spanAssertions = [], selectors}: TAssertion): Array<TSpanAssertionResult> {
     const {spanId, attributes} = span;
     const itemSelector = getSelectorList(selectors);
     const [itMatches] = search(span.attributeList, escapeString(`[? ${itemSelector.join('] && [? ')}]`));
@@ -40,7 +39,7 @@ const AssertionService = () => ({
 
     const assertionTestResultArray = spanAssertions.map(spanAssertion => {
       const {comparisonValue, operator, propertyName, valueType} = spanAssertion;
-      const valueSelector = buildValueSelector(comparisonValue, OperatorService.getOperatorSymbol(operator), valueType);
+      const valueSelector = buildValueSelector(comparisonValue!, OperatorService.getOperatorSymbol(operator), valueType);
 
       const selector = `${buildSelector([`[? key == \`${propertyName}\` && ${valueSelector}]`])}`;
 
@@ -50,20 +49,20 @@ const AssertionService = () => ({
         ...spanAssertion,
         spanId,
         hasPassed: Boolean(hasPassed),
-        actualValue: attributes[propertyName]?.value || '',
+        actualValue: attributes[propertyName!]?.value || '',
       };
     });
 
     return assertionTestResultArray;
   },
 
-  runByTrace(trace: ITrace, assertion: IAssertion): IAssertionResult {
+  runByTrace(trace: TTrace, assertion: TAssertion): TAssertionResult {
     if (!assertion?.selectors) return {assertion, spanListAssertionResult: []};
 
     const itemSelector = `${getSelectorList(assertion.selectors)
       .map(condition => `attributeList[? ${condition}]`)
       .join(' && ')}`;
-    const spanList: ISpan[] = search(trace.spans, escapeString(`[? ${itemSelector}]`)) || [];
+    const spanList: TSpan[] = search(trace.spans, escapeString(`[? ${itemSelector}]`)) || [];
 
     return {
       assertion,
@@ -74,13 +73,13 @@ const AssertionService = () => ({
     };
   },
 
-  getEffectedSpansCount(trace: ITrace, selectors: IItemSelector[]) {
+  getEffectedSpansCount(trace: TTrace, selectors: TItemSelector[]) {
     if (selectors.length === 0) return 0;
 
     const itemSelector = `${getSelectorList(selectors)
       .map(condition => `attributeList[? ${condition}]`)
       .join(' && ')}`;
-    const spanList: ISpan[] = search(trace.spans, escapeString(`[? ${itemSelector}]`)) || [];
+    const spanList: TSpan[] = search(trace.spans, escapeString(`[? ${itemSelector}]`)) || [];
 
     return spanList.length;
   },

@@ -1,5 +1,6 @@
 import {endpoints} from '../redux/apis/Test.api';
-import {ITest} from '../types/Test.types';
+import { TRecursivePartial } from '../types/Common.types';
+import {TTest} from '../types/Test.types';
 
 const {createTest, getTestById, getTestList, runTest} = endpoints;
 
@@ -10,7 +11,7 @@ const TestGateway = () => ({
   getById(testId: string) {
     return getTestById.initiate(testId);
   },
-  create(test: Partial<ITest>) {
+  create(test: TRecursivePartial<TTest>) {
     return createTest.initiate(test);
   },
   run(testId: string) {

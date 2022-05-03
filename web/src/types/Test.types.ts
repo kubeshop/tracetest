@@ -1,25 +1,10 @@
-import {HTTP_METHOD} from '../constants/Common.constants';
-import {IAssertion} from './Assertion.types';
-import {ITestRunResult} from './TestRunResult.types';
+import {TAssertion} from './Assertion.types';
+import {Modify, Schemas} from './Common.types';
 
-export interface IHTTPRequest {
-  url: string;
-  method: HTTP_METHOD;
-  headers?: Array<{[key: string]: string}>;
-  body?: string;
-  auth?: any;
-  proxy?: any;
-  certificate?: any;
-}
-
-export interface ITest {
-  testId: string;
-  name: string;
-  description: string;
-  serviceUnderTest: {
-    id: string;
-    request: IHTTPRequest;
-  };
-  assertions: Array<IAssertion>;
-  lastTestResult: ITestRunResult;
-}
+export type THTTPRequest = Schemas['HTTPRequest'];
+export type TTest = Modify<
+  Schemas['Test'],
+  {
+    assertions: TAssertion[];
+  }
+>;

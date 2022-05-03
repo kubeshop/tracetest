@@ -5,7 +5,7 @@ import {useGetTestListQuery} from 'redux/apis/Test.api';
 import CustomTable from '../../components/CustomTable';
 import HomeAnalyticsService from '../../services/Analytics/HomeAnalytics.service';
 import NoResults from './NoResults';
-import {ITest} from '../../types/Test.types';
+import {TTest} from '../../types/Test.types';
 
 const {onTestClick} = HomeAnalyticsService;
 
@@ -29,16 +29,16 @@ const TestList = () => {
   return (
     <CustomTable
       scroll={{y: 'calc(100vh - 300px)'}}
-      dataSource={testList?.map(el => ({...el, url: el.serviceUnderTest.request.url})).reverse()}
+      dataSource={testList?.map(el => ({...el, url: el?.serviceUnderTest?.request?.url})).reverse()}
       rowKey="testId"
       locale={{emptyText: <NoResults />}}
       loading={isLoading}
       onRow={record => {
         return {
           onClick: () => {
-            const testId = (record as ITest).testId;
+            const testId = (record as TTest).testId;
 
-            onTestClick(testId);
+            onTestClick(testId!);
             navigate(`/test/${testId}`);
           },
         };

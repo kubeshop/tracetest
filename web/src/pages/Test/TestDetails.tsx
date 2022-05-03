@@ -7,15 +7,15 @@ import useGuidedTour from 'hooks/useGuidedTour';
 import * as S from './Test.styled';
 import TestDetailsTable from './TestDetailsTable';
 import TestAnalyticsService from '../../services/Analytics/TestAnalytics.service';
-import {ITestRunResult} from '../../types/TestRunResult.types';
+import {TTestRunResult} from '../../types/TestRunResult.types';
 
 const {onRunTest} = TestAnalyticsService;
 
 type TTestDetailsProps = {
   testId: string;
   url?: string;
-  onSelectResult: (result: ITestRunResult) => void;
-  testResultList: ITestRunResult[];
+  onSelectResult: (result: TTestRunResult) => void;
+  testResultList: TTestRunResult[];
   isLoading: boolean;
 };
 
@@ -27,7 +27,7 @@ const TestDetails: FC<TTestDetailsProps> = ({testId, testResultList, isLoading, 
     if (testId) {
       onRunTest(testId);
       const testResult = await runTest(testId).unwrap();
-      onSelectResult({resultId: testResult.resultId} as ITestRunResult);
+      onSelectResult({resultId: testResult.resultId} as TTestRunResult);
     }
   }, [onSelectResult, runTest, testId]);
 

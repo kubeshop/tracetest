@@ -41,7 +41,7 @@ const CreateTestModal = ({visible, onClose}: IProps): JSX.Element => {
           request: {url: values.url, method: values.method, body: values.body, headers},
         },
       }).unwrap();
-      const newTestRunResult = await runTest(newTest.testId).unwrap();
+      const newTestRunResult = await runTest(newTest.testId || '').unwrap();
       onClose();
       setIsOpen(false);
       navigate(`/test/${newTest.testId}?resultId=${newTestRunResult.resultId}`);

@@ -1,39 +1,38 @@
 import {Badge, BadgeProps} from 'antd';
-import { TestState } from '../../constants/TestRunResult.constants';
-import { ITestRunResult } from '../../types/TestRunResult.types';
+import {TTestRunResult, TTestState} from '../../types/TestRunResult.types';
 
 const BadgeStatusMap: Record<
-  TestState,
+  TTestState,
   {status: 'processing' | 'success' | 'error' | 'default' | 'warning' | undefined; label: string}
 > = {
-  [TestState.CREATED]: {
+  CREATED: {
     status: 'default',
     label: 'Created',
   },
-  [TestState.EXECUTING]: {
+  EXECUTING: {
     status: 'processing',
     label: 'Running',
   },
-  [TestState.AWAITING_TRACE]: {
+  AWAITING_TRACE: {
     status: 'warning',
     label: 'Awaiting trace',
   },
-  [TestState.AWAITING_TEST_RESULTS]: {
+  AWAITING_TEST_RESULTS: {
     status: 'success',
     label: 'Awaiting test results',
   },
-  [TestState.FINISHED]: {
+  FINISHED: {
     status: 'success',
     label: 'Finished',
   },
-  [TestState.FAILED]: {
+  FAILED: {
     status: 'error',
     label: 'Failed executing test run',
   },
 };
 
 interface IProps extends BadgeProps {
-  testState: ITestRunResult['state'];
+  testState: TTestRunResult['state'];
 }
 
 const TestStateBadge = ({testState, ...rest}: IProps) => {

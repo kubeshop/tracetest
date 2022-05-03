@@ -1,31 +1,22 @@
+import { Schemas } from '../types/Common.types';
 import {TCompareOperatorName, TCompareOperatorSymbol} from '../types/Operator.types';
 
-export const enum CompareOperator {
-  EQUALS = 'EQUALS',
-  NOTEQUALS = 'NOTEQUALS',
-  LESSTHAN = 'LESSTHAN',
-  GREATERTHAN = 'GREATERTHAN',
-  GREATOREQUALS = 'GREATOREQUALS',
-  LESSOREQUAL = 'LESSOREQUAL',
-  CONTAINS = 'CONTAINS',
-}
-
-export const CompareOperatorNameMap: Record<CompareOperator, TCompareOperatorName> = {
-  [CompareOperator.EQUALS]: 'eq',
-  [CompareOperator.NOTEQUALS]: 'ne',
-  [CompareOperator.LESSTHAN]: 'lt',
-  [CompareOperator.GREATERTHAN]: 'gt',
-  [CompareOperator.GREATOREQUALS]: 'gte',
-  [CompareOperator.LESSOREQUAL]: 'lte',
-  [CompareOperator.CONTAINS]: 'contains',
+export const CompareOperatorNameMap: Record<Schemas['SpanAssertion']['operator'], TCompareOperatorName> = {
+  EQUALS: 'eq',
+  NOTEQUALS: 'ne',
+  LESSTHAN: 'lt',
+  GREATERTHAN: 'gt',
+  GREATOREQUALS: 'gte',
+  LESSOREQUAL: 'lte',
+  CONTAINS: 'contains',
 };
 
-export const CompareOperatorSymbolMap: Record<CompareOperator, TCompareOperatorSymbol> = {
-  [CompareOperator.EQUALS]: '==',
-  [CompareOperator.LESSTHAN]: '<',
-  [CompareOperator.GREATERTHAN]: '>',
-  [CompareOperator.NOTEQUALS]: '!=',
-  [CompareOperator.GREATOREQUALS]: '>=',
-  [CompareOperator.LESSOREQUAL]: '<=',
-  [CompareOperator.CONTAINS]: 'contains',
+export const CompareOperatorSymbolMap: Record<Schemas['SpanAssertion']['operator'], TCompareOperatorSymbol> = {
+  EQUALS: '==',
+  LESSTHAN: '<',
+  GREATERTHAN: '>',
+  NOTEQUALS: '!=',
+  GREATOREQUALS: '>=',
+  LESSOREQUAL: '<=',
+  CONTAINS: 'contains',
 };

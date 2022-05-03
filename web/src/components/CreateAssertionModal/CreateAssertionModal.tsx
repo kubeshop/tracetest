@@ -2,18 +2,18 @@ import {useCallback, useState} from 'react';
 import {Modal, Typography, FormInstance} from 'antd';
 
 import CreateAssertionForm, {TValues} from './CreateAssertionForm';
-import {ISpan} from '../../types/Span.types';
-import {IAssertion, IItemSelector} from '../../types/Assertion.types';
+import {TSpan} from '../../types/Span.types';
+import {TAssertion, TItemSelector} from '../../types/Assertion.types';
 import {useAppSelector} from '../../redux/hooks';
 import AssertionSelectors from '../../selectors/Assertion.selectors';
 
 interface IProps {
   open: boolean;
   onClose: () => void;
-  span: ISpan;
+  span: TSpan;
   testId: string;
   resultId: string;
-  assertion?: IAssertion;
+  assertion?: TAssertion;
 }
 
 const effectedSpanMessage = (spanCount: number) => {
@@ -26,13 +26,13 @@ const effectedSpanMessage = (spanCount: number) => {
 
 const CreateAssertionModal = ({testId, span, resultId, open, onClose, assertion}: IProps) => {
   const [form, setForm] = useState<FormInstance<TValues>>();
-  const [selectorList, setSelectorList] = useState<IItemSelector[]>([]);
+  const [selectorList, setSelectorList] = useState<TItemSelector[]>([]);
 
   const onForm = useCallback((formInstance: FormInstance) => {
     setForm(formInstance);
   }, []);
 
-  const onSelectorList = useCallback((selectorListData: IItemSelector[]) => {
+  const onSelectorList = useCallback((selectorListData: TItemSelector[]) => {
     setSelectorList(selectorListData);
   }, []);
 
