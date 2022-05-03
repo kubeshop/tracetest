@@ -51,7 +51,7 @@ PROTO_GOGO_MAPPINGS := $(shell echo \
 		Mmodel.proto=github.com/jaegertracing/jaeger/model \
 	| sed 's/ //g')
 
-PROTO_GEN_GO_DIR ?= server/go/internal/proto-gen-go
+PROTO_GEN_GO_DIR ?= server/internal/proto-gen-go
 
 PROTOC_WITH_GRPC := $(PROTOC) \
 		$(PROTO_INCLUDES) \
@@ -86,7 +86,7 @@ proto:
 
 	$(PROTOC_WITH_GRPC) \
 		tempo-idl/tempo.proto
-	cp tempo-idl/prealloc.go server/go/internal/proto-gen-go/tempo-idl/
+	cp tempo-idl/prealloc.go server/internal/proto-gen-go/tempo-idl/
 
 swagger: proto
 	cp swagger/api_v3/query_service.swagger.json api/trace.json
