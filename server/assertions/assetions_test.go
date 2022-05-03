@@ -7,6 +7,7 @@ import (
 	"github.com/kubeshop/tracetest/assertions/comparator"
 	"github.com/kubeshop/tracetest/traces"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestAssertion(t *testing.T) {
@@ -18,9 +19,9 @@ func TestAssertion(t *testing.T) {
 		expectedResult assertions.TestResult
 	}{
 		{
-			name: "simple assertion works",
+			name: "CanAssert",
 			testDef: assertions.TestDefinition{
-				"selector": []assertions.Assertion{
+				`span[service.name="Pokeshop"]`: []assertions.Assertion{
 					{
 						Attribute:  "tracetest.span.duration",
 						Comparator: comparator.Eq,
@@ -31,12 +32,13 @@ func TestAssertion(t *testing.T) {
 			trace: traces.Trace{
 				RootSpan: traces.Span{
 					Attributes: traces.Attributes{
+						"service.name":            "Pokeshop",
 						"tracetest.span.duration": "2000",
 					},
 				},
 			},
 			expectedResult: assertions.TestResult{
-				"selector": assertions.AssertionResult{
+				`span[service.name="Pokeshop"]`: assertions.AssertionResult{
 					Assertion: assertions.Assertion{
 						Attribute:  "tracetest.span.duration",
 						Comparator: comparator.Eq,
@@ -59,9 +61,9 @@ func TestAssertion(t *testing.T) {
 
 			for expectedSel, expectedAR := range cl.expectedResult {
 				actualAR, ok := actual[expectedSel]
-				assert.True(t, ok, "expected selector %s not found", expectedSel)
+				assert.True(t, ok, `expected selector "%s" not found`, expectedSel)
 				assert.Equal(t, expectedAR.Assertion, actualAR.Assertion)
-				assert.Len(t, actualAR.AssertionSpanResults, len(expectedAR.AssertionSpanResults))
+				require.Len(t, actualAR.AssertionSpanResults, len(expectedAR.AssertionSpanResults))
 
 				for i, expectedSpanRes := range expectedAR.AssertionSpanResults {
 					actualSpanRes := actualAR.AssertionSpanResults[i]
