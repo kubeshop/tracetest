@@ -2,12 +2,18 @@ package assertions
 
 import (
 	"github.com/kubeshop/tracetest/assertions/comparator"
+	"github.com/kubeshop/tracetest/assertions/selectors"
 	"github.com/kubeshop/tracetest/traces"
 )
 
-type Selector string // TODO: use actual selectors
+type SpanQuery string
 
-type TestDefinition map[Selector][]Assertion
+func (sq SpanQuery) Selector() selectors.Selector {
+	sel, _ := selectors.New(string(sq))
+	return sel
+}
+
+type TestDefinition map[SpanQuery][]Assertion
 
 type Assertion struct {
 	Attribute  string
@@ -46,20 +52,16 @@ type AssertionSpanResults struct {
 	CompareErr  error
 }
 
-type TestResult map[Selector]AssertionResult
+type TestResult map[SpanQuery]AssertionResult
 
 func Assert(trace traces.Trace, defs TestDefinition) TestResult {
 	testResult := TestResult{}
-	for selector, asserts := range defs {
-		spans := findSpans(trace, selector)
+	for spanQuery, asserts := range defs {
+		spans := spanQuery.Selector().Filter(trace)
 		for _, assertion := range asserts {
-			testResult[selector] = assertion.Assert(spans)
+			testResult[spanQuery] = assertion.Assert(spans)
 		}
 	}
-	return testResult
-}
 
-func findSpans(t traces.Trace, s Selector) []traces.Span {
-	// todo: actually implement search
-	return []traces.Span{t.RootSpan}
+	return testResult
 }
