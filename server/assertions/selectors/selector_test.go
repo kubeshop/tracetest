@@ -83,7 +83,7 @@ func TestSelector(t *testing.T) {
 		},
 		{
 			Name:            "Selector with pseudo class",
-			Expression:      "span[service.name=\"tracetest.span.type=\"db\"]:nth_child(2)",
+			Expression:      "span[tracetest.span.type=\"db\"]:nth_child(2)",
 			ExpectedSpanIds: []trace.SpanID{updatePokemonDatabaseSpanID},
 		},
 	}
@@ -94,7 +94,7 @@ func TestSelector(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.Name, func(t *testing.T) {
 			selector, err := builder.NewSelector(testCase.Expression)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 
 			spans := selector.Filter(pokeshopTrace)
 			ensureExpectedSpansWereReturned(t, testCase.ExpectedSpanIds, spans)

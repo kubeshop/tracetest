@@ -18,7 +18,13 @@ func filterSpans(rootSpan traces.Span, spanSelector spanSelector) []traces.Span 
 		}
 	})
 
-	return filterDuplicated(filteredSpans)
+	uniqueSpans := filterDuplicated(filteredSpans)
+
+	if spanSelector.PsedoClass != nil {
+		return spanSelector.PsedoClass.Filter(uniqueSpans)
+	}
+
+	return uniqueSpans
 }
 
 func traverseTree(rootNode traces.Span, fn func(traces.Span)) {

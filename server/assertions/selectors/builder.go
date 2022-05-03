@@ -108,12 +108,11 @@ func getComparatorFromOperator(operator string) (comparator.Comparator, error) {
 	return comparator, nil
 }
 
-func createPseudoClass(parserPseudoClass parserPseudoClass) (*pseudoClass, error) {
+func createPseudoClass(parserPseudoClass parserPseudoClass) (PseudoClass, error) {
 	switch parserPseudoClass.Type {
 	case "nth_child":
-		return &pseudoClass{
-			Name:     parserPseudoClass.Type,
-			Argument: Value{Type: ValueInt, Int: *parserPseudoClass.Value.Int},
+		return &NthChildPseudoClass{
+			N: *parserPseudoClass.Value.Int,
 		}, nil
 	case "":
 		// No pseudoClass

@@ -23,7 +23,7 @@ func (s Selector) Filter(trace traces.Trace) []traces.Span {
 
 type spanSelector struct {
 	Filters       []filter
-	PsedoClass    *pseudoClass
+	PsedoClass    PseudoClass
 	ChildSelector *spanSelector
 }
 
@@ -47,11 +47,6 @@ type filter struct {
 
 func (f filter) Filter(span traces.Span) error {
 	return f.Operation(span, f.Property, f.Value)
-}
-
-type pseudoClass struct {
-	Name     string
-	Argument Value
 }
 
 var (
