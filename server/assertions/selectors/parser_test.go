@@ -3,7 +3,7 @@ package selectors_test
 import (
 	"testing"
 
-	"github.com/kubeshop/tracetest/engine/selectors"
+	"github.com/kubeshop/tracetest/assertions/selectors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
