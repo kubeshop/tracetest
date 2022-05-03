@@ -1,6 +1,10 @@
 package selectors
 
-import "github.com/kubeshop/tracetest/engine/operations"
+import (
+	"fmt"
+
+	"github.com/kubeshop/tracetest/traces"
+)
 
 type Selector struct {
 	spanSelectors []spanSelector
@@ -8,13 +12,15 @@ type Selector struct {
 
 type spanSelector struct {
 	Filters       []filter
-	PsedoClass    pseudoClass
+	PsedoClass    *pseudoClass
 	ChildSelector *spanSelector
 }
 
+type filterFunction func(traces.Span, string, Value) error
+
 type filter struct {
 	Property  string
-	Operation operations.OperationFunction
+	Operation filterFunction
 	Value     Value
 }
 
@@ -37,4 +43,17 @@ type Value struct {
 	Int     int64
 	Float   float64
 	Boolean bool
+}
+
+func (v Value) AsString() string {
+	switch v.Type {
+	case ValueInt:
+		return fmt.Sprintf("%d", v.Int)
+	case ValueBoolean:
+		return fmt.Sprintf("%t", v.Boolean)
+	case ValueFloat:
+		return fmt.Sprintf("%.2f", v.Float)
+	default:
+		return "null"
+	}
 }

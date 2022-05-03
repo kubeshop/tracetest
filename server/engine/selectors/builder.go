@@ -2,9 +2,10 @@ package selectors
 
 import (
 	"fmt"
-	"strconv"
 
 	"github.com/alecthomas/participle/v2"
+	"github.com/kubeshop/tracetest/assertions/comparator"
+	"github.com/kubeshop/tracetest/traces"
 )
 
 func NewSelectorBuilder() (*SelectorBuilder, error) {
@@ -48,9 +49,13 @@ func createSelectorFromParserSelector(parserSelector ParserSelector) (Selector, 
 }
 
 func createSpanSelectorFromParserSpanSelector(parserSpanSelector parserSpanSelector) (spanSelector, error) {
-	childSelector, err := createSpanSelectorFromParserSpanSelector(*parserSpanSelector.ChildSelector)
-	if err != nil {
-		return spanSelector{}, fmt.Errorf("could not create the child selector: %w", err)
+	var childSelector *spanSelector = nil
+	if parserSpanSelector.ChildSelector != nil {
+		newChildSelector, err := createSpanSelectorFromParserSpanSelector(*parserSpanSelector.ChildSelector)
+		if err != nil {
+			return spanSelector{}, fmt.Errorf("could not create the child selector: %w", err)
+		}
+		childSelector = &newChildSelector
 	}
 
 	pseudoClass, err := createPseudoClass(parserSpanSelector.PseudoClass)
@@ -60,10 +65,15 @@ func createSpanSelectorFromParserSpanSelector(parserSpanSelector parserSpanSelec
 
 	filters := make([]filter, 0, len(parserSpanSelector.Filters))
 	for _, parserFilter := range parserSpanSelector.Filters {
+		operatorFunction, err := getOperatorFunction(parserFilter.Operator)
+		if err != nil {
+			return spanSelector{}, fmt.Errorf("could not create filter function: %w", err)
+		}
+
 		filter := filter{
-			Property: parserFilter.Property,
-			// Operation: parserFilter.Operator,
-			Value: Value{},
+			Property:  parserFilter.Property,
+			Operation: operatorFunction,
+			Value:     createValueFromParserValue(*parserFilter.Value),
 		}
 
 		filters = append(filters, filter)
@@ -72,25 +82,45 @@ func createSpanSelectorFromParserSpanSelector(parserSpanSelector parserSpanSelec
 	return spanSelector{
 		Filters:       filters,
 		PsedoClass:    pseudoClass,
-		ChildSelector: &childSelector,
+		ChildSelector: childSelector,
 	}, nil
 }
 
-func createPseudoClass(parserPseudoClass parserPseudoClass) (pseudoClass, error) {
-	switch parserPseudoClass.Type {
-	case "nth_child":
-		argument, err := strconv.Atoi(*parserPseudoClass.Value.String)
-		if err != nil {
-			return pseudoClass{}, fmt.Errorf("nth_child argument must be an integer")
-		}
-
-		return pseudoClass{
-			Name:     parserPseudoClass.Type,
-			Argument: Value{Type: ValueInt, Int: int64(argument)},
-		}, nil
+func getOperatorFunction(operator string) (filterFunction, error) {
+	comparator, err := getComparatorFromOperator(operator)
+	if err != nil {
+		return nil, err
 	}
 
-	return pseudoClass{}, fmt.Errorf("unsupported pseudo class: %s", parserPseudoClass.Type)
+	return func(span traces.Span, attribute string, value Value) error {
+		attrValue := span.Attributes.Get(attribute)
+		return comparator.Compare(value.AsString(), attrValue)
+	}, nil
+}
+
+func getComparatorFromOperator(operator string) (comparator.Comparator, error) {
+	registry := comparator.DefaultRegistry()
+	comparator, err := registry.Get(operator)
+	if err != nil {
+		return nil, fmt.Errorf("Unsupported comparator %s: %w", operator, err)
+	}
+
+	return comparator, nil
+}
+
+func createPseudoClass(parserPseudoClass parserPseudoClass) (*pseudoClass, error) {
+	switch parserPseudoClass.Type {
+	case "nth_child":
+		return &pseudoClass{
+			Name:     parserPseudoClass.Type,
+			Argument: Value{Type: ValueInt, Int: *parserPseudoClass.Value.Int},
+		}, nil
+	case "":
+		// No pseudoClass
+		return nil, nil
+	}
+
+	return nil, fmt.Errorf("unsupported pseudo class: %s", parserPseudoClass.Type)
 }
 
 func createValueFromParserValue(parserValue parserValue) Value {
