@@ -1,28 +1,40 @@
 import {useCallback, useEffect, useMemo} from 'react';
 import ReactFlow, {Background, BackgroundVariant, FlowElement} from 'react-flow-renderer';
 import {useDAGChart} from 'hooks/useDAGChart';
-import TraceNode from './TraceNode';
-import {TSpanInfo, TSpanMap} from '../Trace/Trace';
-import * as S from './TraceDiagram.styled';
-import TraceDiagramAnalyticsService from '../../services/Analytics/TraceDiagramAnalytics.service';
-import {TTrace} from '../../types/Trace.types';
+import TraceNode from '../../TraceNode';
+import * as S from './DAG.styled';
+import TraceDiagramAnalyticsService from '../../../services/Analytics/TraceDiagramAnalytics.service';
+import {IDiagramProps} from '../Diagram';
+import {TSpan} from '../../../types/Span.types';
+
+export type TSpanInfo = {
+  id: string;
+  parentIds: string[];
+  data: TSpan;
+};
+
+export type TSpanMap = Record<string, TSpanInfo>;
 
 const {onClickSpan} = TraceDiagramAnalyticsService;
 
-interface IPropsTraceDiagram {
-  spanMap: TSpanMap;
-  selectedSpan?: TSpanInfo;
-  trace: TTrace;
-  onSelectSpan(spanId: string): void;
-}
+const Diagram: React.FC<IDiagramProps> = ({trace, selectedSpan, onSelectSpan}): JSX.Element => {
+  const spanMap = useMemo<TSpanMap>(() => {
+    return (
+      trace?.spans?.reduce<TSpanMap>((acc, span) => {
+        acc[span.spanId] = acc[span.spanId] || {id: span.spanId, parentIds: [], data: span};
+        if (span.parentSpanId) acc[span.spanId].parentIds.push(span.parentSpanId);
 
-const TraceDiagram = ({spanMap, trace, selectedSpan, onSelectSpan}: IPropsTraceDiagram): JSX.Element => {
+        return acc;
+      }, {}) || {}
+    );
+  }, [trace?.spans]);
+
   const dagLayout = useDAGChart(spanMap);
 
   const handleElementClick = useCallback(
     (event, {id}: FlowElement) => {
       onClickSpan(id);
-      onSelectSpan(id);
+      if (onSelectSpan) onSelectSpan(id);
     },
     [onSelectSpan]
   );
@@ -32,9 +44,7 @@ const TraceDiagram = ({spanMap, trace, selectedSpan, onSelectSpan}: IPropsTraceD
       const [dragNode] = dagLayout.dag.descendants();
       const span = spanMap[dragNode?.data.id];
 
-      if (!selectedSpan && span) {
-        onSelectSpan(span.id);
-      }
+      if (!selectedSpan && span && onSelectSpan) onSelectSpan(span.id);
     }
   }, [dagLayout, onSelectSpan, selectedSpan, spanMap]);
 
@@ -46,11 +56,11 @@ const TraceDiagram = ({spanMap, trace, selectedSpan, onSelectSpan}: IPropsTraceD
         return {
           id: data.id,
           type: 'TraceNode',
-          data: {span, trace},
+          data: span,
           position: {x, y: parseFloat(String(y))},
-          selected: data.id === selectedSpan?.id,
+          selected: data.id === selectedSpan?.spanId,
           sourcePosition: 'top',
-          className: `${data.id === selectedSpan?.id ? 'selected' : ''}`,
+          className: `${data.id === selectedSpan?.spanId ? 'selected' : ''}`,
         };
       });
 
@@ -70,7 +80,7 @@ const TraceDiagram = ({spanMap, trace, selectedSpan, onSelectSpan}: IPropsTraceD
     }
 
     return [];
-  }, [dagLayout, spanMap, trace, selectedSpan?.id]);
+  }, [dagLayout, spanMap, selectedSpan?.spanId]);
 
   return (
     <S.Container style={{height: Math.max(dagLayout?.layout?.height || 0, 900) + 100}}>
@@ -86,4 +96,4 @@ const TraceDiagram = ({spanMap, trace, selectedSpan, onSelectSpan}: IPropsTraceD
   );
 };
 
-export default TraceDiagram;
+export default Diagram;

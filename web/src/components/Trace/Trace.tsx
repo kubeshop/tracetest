@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useMemo, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import styled from 'styled-components';
 
 import {useStoreActions} from 'react-flow-renderer';
@@ -11,14 +11,14 @@ import {CloseCircleFilled} from '@ant-design/icons';
 import 'react-reflex/styles.css';
 
 import {useGetTestByIdQuery, useGetResultByIdQuery, useRunTestMutation} from 'redux/apis/Test.api';
-import TraceDiagram from 'components/TraceDiagram/TraceDiagram';
+import Diagram from 'components/Diagram';
 
 import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
 import {Steps} from 'components/GuidedTour/traceStepList';
 import useGuidedTour from 'hooks/useGuidedTour';
 import * as S from './Trace.styled';
 
-import SpanDetail from './SpanDetail';
+import SpanDetail from '../SpanDetail';
 import TestResults from './TestResults';
 import {TSpan} from '../../types/Span.types';
 import {TTestRunResult} from '../../types/TestRunResult.types';
@@ -27,6 +27,7 @@ import TraceAnalyticsService from '../../services/Analytics/TraceAnalytics.servi
 import usePolling from '../../hooks/usePolling';
 import {useAppDispatch} from '../../redux/hooks';
 import {replace, updateTestResult} from '../../redux/slices/ResultList.slice';
+import { SupportedDiagrams } from '../Diagram/Diagram';
 
 const {onChangeTab} = TraceAnalyticsService;
 
@@ -36,14 +37,6 @@ const Grid = styled.div`
   overflow: scroll;
 `;
 
-export type TSpanInfo = {
-  id: string;
-  parentIds: string[];
-  data: TSpan;
-};
-
-export type TSpanMap = Record<string, TSpanInfo>;
-
 type TraceProps = {
   testId: string;
   testResultId: string;
@@ -52,7 +45,7 @@ type TraceProps = {
 };
 
 const Trace: React.FC<TraceProps> = ({testId, testResultId, onDismissTrace, onRunTest}) => {
-  const [selectedSpan, setSelectedSpan] = useState<TSpanInfo | undefined>();
+  const [selectedSpan, setSelectedSpan] = useState<TSpan | undefined>();
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const {data: test} = useGetTestByIdQuery(testId);
   const [runNewTest] = useRunTestMutation();
@@ -64,25 +57,15 @@ const Trace: React.FC<TraceProps> = ({testId, testResultId, onDismissTrace, onRu
     refetch: refetchTrace,
   } = useGetResultByIdQuery({testId, resultId: testResultId});
 
-  const spanMap = useMemo<TSpanMap>(() => {
-    return (
-      testResultDetails?.trace?.spans?.reduce<TSpanMap>((acc, span) => {
-        acc[span.spanId] = acc[span.spanId] || {id: span.spanId, parentIds: [], data: span};
-        if (span.parentSpanId) acc[span.spanId].parentIds.push(span.parentSpanId);
-
-        return acc;
-      }, {}) || {}
-    );
-  }, [testResultDetails]);
-
   const addSelected = useStoreActions(actions => actions.addSelectedElements);
 
   const handleOnSpanSelected = useCallback(
     (spanId: string) => {
       addSelected([{id: spanId}]);
-      setSelectedSpan(spanMap[spanId]);
+      const span = testResultDetails?.trace?.spans.find(({spanId: id}) => id === spanId);
+      setSelectedSpan(span);
     },
-    [addSelected, spanMap]
+    [addSelected, testResultDetails?.trace?.spans]
   );
 
   useGuidedTour(GuidedTours.Trace);
@@ -158,11 +141,11 @@ const Trace: React.FC<TraceProps> = ({testId, testResultId, onDismissTrace, onRu
                 data-tour={GuidedTourService.getStep(GuidedTours.Trace, Steps.Diagram)}
               >
                 <div className="pane-content">
-                  <TraceDiagram
-                    spanMap={spanMap}
+                  <Diagram
+                    type={SupportedDiagrams.DAG}
+                    trace={testResultDetails?.trace!}
                     onSelectSpan={handleOnSpanSelected}
                     selectedSpan={selectedSpan}
-                    trace={testResultDetails?.trace!}
                   />
                 </div>
               </ReflexElement>
@@ -180,7 +163,7 @@ const Trace: React.FC<TraceProps> = ({testId, testResultId, onDismissTrace, onRu
                       <SpanDetail
                         resultId={testResultDetails?.resultId}
                         testId={test?.testId}
-                        targetSpan={selectedSpan?.data}
+                        span={selectedSpan}
                       />
                     </Tabs.TabPane>
                     <Tabs.TabPane
