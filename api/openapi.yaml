@@ -102,6 +102,22 @@ paths:
           description: successful operation
         500:
           description: "problem with updating test"
+    delete:
+      tags:
+        - api
+      parameters:
+        - in: path
+          name: testId
+          schema:
+            type: string
+            format: uuid
+          required: true
+      summary: "delete a test"
+      description: "delete a test"
+      operationId: deleteTest
+      responses:
+        "204":
+          description: OK
   /tests/{testId}/run:
     post:
       tags:

@@ -26,7 +26,6 @@ func NewController(traceDB tracedb.TraceDB, testDB testdb.Repository, runner exe
 	}
 }
 
-// CreateTest - Create new test
 func (s *controller) CreateTest(ctx context.Context, test openapi.Test) (openapi.ImplResponse, error) {
 	id, err := s.testDB.CreateTest(ctx, &test)
 	if err != nil {
@@ -39,7 +38,6 @@ func (s *controller) CreateTest(ctx context.Context, test openapi.Test) (openapi
 	return openapi.Response(200, test), nil
 }
 
-// UpdateTest - Create new test
 func (s *controller) UpdateTest(ctx context.Context, testid string, updated openapi.Test) (openapi.ImplResponse, error) {
 	test, err := s.testDB.GetTest(ctx, testid)
 	if err != nil {
@@ -63,7 +61,27 @@ func (s *controller) UpdateTest(ctx context.Context, testid string, updated open
 	return openapi.Response(204, nil), nil
 }
 
-// GetTest - Get a test
+func (s *controller) DeleteTest(ctx context.Context, testid string) (openapi.ImplResponse, error) {
+	test, err := s.testDB.GetTest(ctx, testid)
+	if err != nil {
+		switch {
+		case errors.Is(testdb.ErrNotFound, err):
+			return openapi.Response(http.StatusNotFound, err.Error()), err
+		default:
+			return openapi.Response(http.StatusInternalServerError, err.Error()), err
+		}
+	}
+
+	err = s.testDB.DeleteTest(ctx, test)
+	if err != nil {
+		return openapi.Response(http.StatusInternalServerError, err.Error()), err
+	}
+
+	analytics.CreateAndSendEvent("test_deleted", "test")
+
+	return openapi.Response(204, nil), nil
+}
+
 func (s *controller) GetTest(ctx context.Context, testid string) (openapi.ImplResponse, error) {
 	test, err := s.testDB.GetTest(ctx, testid)
 	if err != nil {
@@ -86,7 +104,6 @@ func (s *controller) GetTest(ctx context.Context, testid string) (openapi.ImplRe
 	return openapi.Response(200, test), nil
 }
 
-// GetTests - Gets all tests
 func (s *controller) GetTests(ctx context.Context) (openapi.ImplResponse, error) {
 	tests, err := s.testDB.GetTests(ctx)
 	if err != nil {
@@ -114,7 +131,6 @@ func (s *controller) RunTest(ctx context.Context, testid string) (openapi.ImplRe
 	return openapi.Response(200, result), nil
 }
 
-// GetTestResults -
 func (s *controller) GetTestResults(ctx context.Context, id string) (openapi.ImplResponse, error) {
 	res, err := s.testDB.GetResultsByTestID(ctx, id)
 	if err != nil {
@@ -125,7 +141,6 @@ func (s *controller) GetTestResults(ctx context.Context, id string) (openapi.Imp
 
 }
 
-// GetTestResult -
 func (s *controller) GetTestResult(ctx context.Context, testid string, id string) (openapi.ImplResponse, error) {
 	res, err := s.testDB.GetResult(ctx, id)
 	if err != nil {

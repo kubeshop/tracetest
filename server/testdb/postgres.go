@@ -103,6 +103,24 @@ func (td *postgresDB) UpdateTest(ctx context.Context, test *openapi.Test) error 
 	return nil
 }
 
+func (td *postgresDB) DeleteTest(ctx context.Context, test *openapi.Test) error {
+	queries := []string{
+		"DELETE FROM tests WHERE id = $1",
+		"DELETE FROM assertions WHERE test_id = $1",
+		"DELETE FROM results WHERE test_id = $1",
+	}
+
+	for _, sql := range queries {
+		fmt.Println("aca", sql)
+		_, err := td.db.Exec(sql, test.TestId)
+		if err != nil {
+			return fmt.Errorf("sql prepare: %w", err)
+		}
+	}
+
+	return nil
+}
+
 func (td *postgresDB) GetTest(ctx context.Context, id string) (*openapi.Test, error) {
 	stmt, err := td.db.Prepare("SELECT test FROM tests WHERE id = $1")
 	if err != nil {
