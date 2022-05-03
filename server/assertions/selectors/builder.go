@@ -45,7 +45,7 @@ func createSelectorFromParserSelector(parserSelector ParserSelector) (Selector, 
 
 		selector.spanSelectors = append(selector.spanSelectors, spanSelector)
 	}
-	return Selector{}, nil
+	return selector, nil
 }
 
 func createSpanSelectorFromParserSpanSelector(parserSpanSelector parserSpanSelector) (spanSelector, error) {
