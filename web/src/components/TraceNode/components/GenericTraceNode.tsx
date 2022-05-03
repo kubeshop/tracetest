@@ -1,23 +1,13 @@
 import Text from 'antd/lib/typography/Text';
 import {upperCase} from 'lodash';
 import React from 'react';
-import {Handle, NodeProps, Position} from 'react-flow-renderer';
-import {SemanticGroupNamesToText} from '../../constants/SemanticGroupNames.constants';
-import {ISpan} from '../../types/Span.types';
-import * as S from './TraceDiagram.styled';
-import SpanService from '../../services/Span.service';
-import { ITrace } from '../../types/Trace.types';
+import {Handle, Position} from 'react-flow-renderer';
+import {SemanticGroupNamesToText} from '../../../constants/SemanticGroupNames.constants';
+import * as S from '../TraceNode.styled';
+import SpanService from '../../../services/Span.service';
+import {TTraceNodeProps} from '../TraceNode';
 
-type TTraceNodeProps = NodeProps<{span: ISpan; trace: ITrace}>;
-
-const TraceNode: React.FC<TTraceNodeProps> = ({
-  id,
-  data: {
-    span: {name, type},
-    span,
-  },
-  selected,
-}) => {
+const GenericTraceNode: React.FC<TTraceNodeProps> = ({id, data: {name, type}, data: span, selected}) => {
   const {heading, primary} = SpanService.getSpanNodeInfo(span);
   const spanTypeText = SemanticGroupNamesToText[type];
 
@@ -41,4 +31,4 @@ const TraceNode: React.FC<TTraceNodeProps> = ({
   );
 };
 
-export default TraceNode;
+export default GenericTraceNode;
