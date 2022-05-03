@@ -40,6 +40,7 @@ const TestAPI = createApi({
     }),
     deleteTestById: build.mutation<ITest, string>({
       query: id => ({url: `/tests/${id}`, method: 'DELETE'}),
+      invalidatesTags: [{type: 'Test', id: 'LIST'}],
     }),
     // Assertions
     getAssertions: build.query<IAssertion[], string>({
