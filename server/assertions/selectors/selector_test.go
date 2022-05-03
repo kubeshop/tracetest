@@ -72,6 +72,11 @@ func TestSelector(t *testing.T) {
 			ExpectedSpanIds: []trace.SpanID{postImportSpanID, insertPokemonDatabaseSpanID},
 		},
 		{
+			Name:            "Multiple span selectors",
+			Expression:      "span[service.name=\"Pokeshop\"], span[service.name=\"Pokeshop-worker\"]",
+			ExpectedSpanIds: []trace.SpanID{postImportSpanID, insertPokemonDatabaseSpanID, getPokemonFromExternalAPISpanID, updatePokemonDatabaseSpanID},
+		},
+		{
 			Name:            "Selector with multiple attributes",
 			Expression:      "span[service.name=\"Pokeshop\" tracetest.span.type=\"db\"]",
 			ExpectedSpanIds: []trace.SpanID{insertPokemonDatabaseSpanID},
