@@ -7,7 +7,7 @@ import (
 )
 
 type ParserSelector struct {
-	SpanSelector []parserSpanSelector `( @@* ( "," @@ )*)`
+	SpanSelectors []parserSpanSelector `( @@* ( "," @@ )*)`
 }
 
 type parserSpanSelector struct {
@@ -27,7 +27,6 @@ type parserValue struct {
 	Int     *int64   ` | @Int`
 	Float   *float64 ` | @Float`
 	Boolean *bool    ` | @("true" | "false")`
-	Null    bool     ` | @"NULL"`
 }
 
 type parserPseudoClass struct {
