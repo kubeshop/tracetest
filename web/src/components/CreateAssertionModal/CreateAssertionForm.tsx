@@ -168,7 +168,6 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
       </div>
       <Form.Item
         name="selectorList"
-        rules={[{required: true, message: 'At least one selector is required'}]}
         data-tour={GuidedTourService.getStep(GuidedTours.Assertion, Steps.Selectors)}
       >
         <CreateAssertionSelectorInput spanSignature={defaultSelectorList} />

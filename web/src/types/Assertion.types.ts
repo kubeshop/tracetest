@@ -1,7 +1,7 @@
 import {CompareOperator} from 'constants/Operator.constants';
 import {LOCATION_NAME} from 'constants/Span.constants';
 import {SpanAttributeType} from 'constants/SpanAttribute.constants';
-import {IResourceSpan, ISpan} from './Span.types';
+import {ISpan} from './Span.types';
 
 export interface IAssertion {
   assertionId: string;
