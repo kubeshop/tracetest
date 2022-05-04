@@ -75,14 +75,14 @@ const AssertionService = () => ({
   },
 
   getEffectedSpansCount(trace: ITrace, selectors: IItemSelector[]) {
-    if (selectors.length === 0) return 0;
+    if (selectors.length === 0) return [];
 
     const itemSelector = `${getSelectorList(selectors)
       .map(condition => `attributeList[? ${condition}]`)
       .join(' && ')}`;
     const spanList: ISpan[] = search(trace.spans, escapeString(`[? ${itemSelector}]`)) || [];
 
-    return spanList.length;
+    return spanList;
   },
 });
 
