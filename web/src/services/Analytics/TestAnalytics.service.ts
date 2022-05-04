@@ -2,7 +2,7 @@ import AnalyticsService, {Categories} from './Analytics.service';
 
 enum Actions {
   RunTest = 'run-test-button-click',
-  TestRunClick = 'test-run-click',
+  TestRunClick = 'test-run-result-click',
 }
 
 type TTestAnalytics = {

@@ -18,6 +18,7 @@ export enum Labels {
   Modal = 'modal',
   Table = 'table',
   Form = 'form',
+  Tab = 'tab',
 }
 
 export const instance = new GA4React(measurementId);
