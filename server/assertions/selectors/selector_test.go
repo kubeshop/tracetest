@@ -67,43 +67,48 @@ func TestSelector(t *testing.T) {
 		ExpectedSpanIds []trace.SpanID
 	}{
 		{
+			Name:            "Selector with span name",
+			Expression:      `span[name="Get pokemon from external API"]`,
+			ExpectedSpanIds: []trace.SpanID{getPokemonFromExternalAPISpanID},
+		},
+		{
 			Name:            "Selector with simple single attribute querying",
-			Expression:      "span[service.name=\"Pokeshop\"]",
+			Expression:      `span[service.name="Pokeshop"]`,
 			ExpectedSpanIds: []trace.SpanID{postImportSpanID, insertPokemonDatabaseSpanID},
 		},
 		{
 			Name:            "Multiple span selectors",
-			Expression:      "span[service.name=\"Pokeshop\"], span[service.name=\"Pokeshop-worker\"]",
+			Expression:      `span[service.name="Pokeshop"], span[service.name="Pokeshop-worker"]`,
 			ExpectedSpanIds: []trace.SpanID{postImportSpanID, insertPokemonDatabaseSpanID, getPokemonFromExternalAPISpanID, updatePokemonDatabaseSpanID},
 		},
 		{
 			Name:            "Multiple spans using contains",
-			Expression:      "span[service.name contains \"Pokeshop\"]",
+			Expression:      `span[service.name contains "Pokeshop"]`,
 			ExpectedSpanIds: []trace.SpanID{postImportSpanID, insertPokemonDatabaseSpanID, getPokemonFromExternalAPISpanID, updatePokemonDatabaseSpanID},
 		},
 		{
 			Name:            "Selector with multiple attributes",
-			Expression:      "span[service.name=\"Pokeshop\" tracetest.span.type=\"db\"]",
+			Expression:      `span[service.name="Pokeshop" tracetest.span.type="db"]`,
 			ExpectedSpanIds: []trace.SpanID{insertPokemonDatabaseSpanID},
 		},
 		{
 			Name:            "Selector with child selector",
-			Expression:      "span[service.name=\"Pokeshop-worker\"] span[tracetest.span.type=\"db\"]",
+			Expression:      `span[service.name="Pokeshop-worker"] span[tracetest.span.type="db"]`,
 			ExpectedSpanIds: []trace.SpanID{updatePokemonDatabaseSpanID},
 		},
 		{
 			Name:            "Selector with first pseudo class",
-			Expression:      "span[tracetest.span.type=\"db\"]:first",
+			Expression:      `span[tracetest.span.type="db"]:first`,
 			ExpectedSpanIds: []trace.SpanID{insertPokemonDatabaseSpanID},
 		},
 		{
 			Name:            "Selector with first pseudo class",
-			Expression:      "span[tracetest.span.type=\"db\"]:last",
+			Expression:      `span[tracetest.span.type="db"]:last`,
 			ExpectedSpanIds: []trace.SpanID{updatePokemonDatabaseSpanID},
 		},
 		{
 			Name:            "Selector with nth_child pseudo class",
-			Expression:      "span[tracetest.span.type=\"db\"]:nth_child(2)",
+			Expression:      `span[tracetest.span.type="db"]:nth_child(2)`,
 			ExpectedSpanIds: []trace.SpanID{updatePokemonDatabaseSpanID},
 		},
 	}
