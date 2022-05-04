@@ -1246,7 +1246,7 @@ We could use the `purchase products` parent to ensure just `http` class to the `
 span[service.name="cart-api", name="purchase products"] span[service.name="auth-api" tracetest.span.type="http"]
 ```
 
-This would find the parent span and only select the spans that are descedents of that parent and match the provider filter:
+This would find the parent span and only select the spans that are descedents of that parent and match the provided filter:
 
 ```mermaid
 flowchart TD
