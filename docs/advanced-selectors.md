@@ -6,7 +6,7 @@ The query language is based on `CSS`. We don't support all features of CSS, just
 
 In order to present each selector feature as easily as possible, we will use a theoretical scenario of an e-commerce application.
 
-The flow we will inspect has this flow:
+The system we will inspect has this flow:
 
 ```mermaid
 flowchart LR
