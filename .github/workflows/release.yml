@@ -113,7 +113,7 @@ jobs:
 
   publish:
     if: github.event_name == 'push'
-    needs: build
+    needs: helm_chart_version_bump
     name: Deploy
     runs-on: ubuntu-latest
 
