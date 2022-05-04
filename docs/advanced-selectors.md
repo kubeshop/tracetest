@@ -1120,7 +1120,7 @@ flowchart TD
 ## Parent-child relation filtering
 Even with all those capabilities, we might have problems with ambiguous selectors returning several spans when just a few were intended.
 
-In our example, you can notice that `auth-api` is called twice from different parts of the trace. At first by `product-api` and later by `purchase-api`.
+In our example, you can notice that `auth-api` is called twice from different parts of the trace. At first by `product-api` and later by `cart-api`.
 
 What if I want to test if a product only available in US can be bought in UK? The product can be seen by the user, but it cannot be bought if the user is outside US. Certainly I cannot apply the same assertions on all `auth-api` spans, otherwise the test will not pass.
 
@@ -1240,7 +1240,7 @@ flowchart TD
 
 This is a problem, because if we apply the same assertion to both spans, one of them will fail. We could try to use `nth_child` but that could break if a http request failed and the retry policy kicked in. Thus, the only way of filtering that is based on the context when it was generated. For example: using its parent span to do so.
 
-We could use the `purchase-api` parent to ensure just `http` class to the `auth-api` triggered by the `purchase-api` would be selected:
+We could use the `purchase products` parent to ensure just `http` class to the `auth-api` triggered by the `purchase-api` would be selected:
 
 ```css
 span[service.name="cart-api", name="purchase products"] span[service.name="auth-api" tracetest.span.type="http"]
