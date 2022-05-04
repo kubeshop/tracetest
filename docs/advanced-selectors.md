@@ -2,8 +2,6 @@
 
 If you need a more complex way of selecting which spans of a trace will be asserted, you can write your selector as a query. This will enable you to express more complex conditions to select spans.
 
-The query language is based on `CSS`. We don't support all features of CSS, just a few features. If you think there is one that can help users to be more effective, open an issue and request it.
-
 In order to present each selector feature as easily as possible, we will use a theoretical scenario of an e-commerce application.
 
 The system we will inspect has this flow:
