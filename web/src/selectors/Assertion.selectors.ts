@@ -30,11 +30,11 @@ const AssertionSelectors = () => ({
       );
     });
   },
-  selectAffectedSpanCount(testId: string, resultId: string, selectorList: IItemSelector[]) {
+  selectAffectedSpanList(testId: string, resultId: string, selectorList: IItemSelector[]) {
     return createSelector(stateSelector, state => {
       const {data: result} = endpoints.getResultById.select({testId, resultId})(state);
 
-      if (!result) return 0;
+      if (!result) return [];
       const {trace} = result;
 
       return AssertionService.getEffectedSpansCount(trace!, selectorList);

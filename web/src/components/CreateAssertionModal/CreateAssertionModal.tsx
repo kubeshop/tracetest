@@ -16,7 +16,7 @@ interface IProps {
   assertion?: IAssertion;
 }
 
-const effectedSpanMessage = (spanCount: number) => {
+const affectedSpanMessage = (spanCount: number) => {
   if (spanCount <= 1) {
     return `Affects ${spanCount} span`;
   }
@@ -40,7 +40,7 @@ const CreateAssertionModal = ({testId, span, resultId, open, onClose, assertion}
     onClose();
   }, [onClose]);
 
-  const affectedSpanCount = useAppSelector(AssertionSelectors.selectAffectedSpanCount(testId, resultId, selectorList));
+  const affectedSpanList = useAppSelector(AssertionSelectors.selectAffectedSpanList(testId, resultId, selectorList));
 
   return (
     <Modal
@@ -51,7 +51,7 @@ const CreateAssertionModal = ({testId, span, resultId, open, onClose, assertion}
       title={
         <div style={{display: 'flex', justifyContent: 'space-between', marginRight: 36}}>
           <Typography.Title level={5}>{assertion ? 'Edit Assertion' : 'Create New Assertion'}</Typography.Title>
-          <Typography.Text>{effectedSpanMessage(affectedSpanCount)}</Typography.Text>
+          <Typography.Text>{affectedSpanMessage(affectedSpanList.length)}</Typography.Text>
         </div>
       }
       onOk={form?.submit}
@@ -61,6 +61,7 @@ const CreateAssertionModal = ({testId, span, resultId, open, onClose, assertion}
       okText="Save"
     >
       <CreateAssertionForm
+        affectedSpanList={affectedSpanList}
         assertion={assertion}
         onCreate={handleClose}
         onForm={onForm}
