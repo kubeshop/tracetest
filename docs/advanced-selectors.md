@@ -387,7 +387,7 @@ flowchart TD
 Sometimes we want to have a broader result by selecting spans that match different selectors. Let's say we have to get all spans from our services, but not from any other external service.
 
 ```css
-span[service.name="api-product"] span[service.name="api-auth"] span[service.name="api-notification"] span[service.name="api-cart"]
+span[service.name="api-product"], span[service.name="api-auth"], span[service.name="api-notification"], span[service.name="api-cart"]
 ```
 
 This would select the following spans:
