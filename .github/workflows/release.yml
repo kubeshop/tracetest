@@ -26,7 +26,7 @@ jobs:
           fetch-depth: 0
       - name: Login to DockerHub
         if: github.event_name != 'pull_request'
-        uses: docker/login-action@v1 
+        uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -110,6 +110,46 @@ jobs:
           SLACK_LINK_NAMES: true
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_FOOTER: "Kubeshop --> Tracetest"
+
+  publish:
+    if: github.event_name == 'push'
+    needs: build
+    name: Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    # Setup gcloud CLI
+    - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
+      with:
+        service_account_key: ${{ secrets.GKE_SA_KEY }}
+        project_id: ${{ secrets.GKE_PROJECT }}
+
+    - run: |-
+        gcloud --quiet auth configure-docker
+
+    - uses: google-github-actions/get-gke-credentials@fb08709ba27618c31c09e014e1d8364b02e5042e
+      with:
+        cluster_name: ${{ secrets.GKE_CLUSTER }}
+        location: ${{ secrets.GKE_ZONE }}
+        credentials: ${{ secrets.GKE_SA_KEY }}
+
+    # Deploy the Docker image to the GKE cluster
+    - name: Deploy
+      run: |
+        helm repo add kubeshop https://kubeshop.github.io/helm-charts && \
+        helm repo update && \
+        helm upgrade tracetest-beta kubeshop/tracetest \
+          --namespace tracetest-beta \
+          --set image.tag=sha-{{ github.ref_name }} \
+          --set tracingBackend=jaeger \
+          --set jaegerConnectionConfig.endpoint="jaeger-query.tracetest.svc.cluster.local:16685" \
+          --set ingress.enabled=true \
+          --set 'ingress.hosts[0].host=beta.tracetest.io,ingress.hosts[0].paths[0].path=/,ingress.hosts[0].paths[0].pathType=Prefix' \
+          --set ingress.annotations."networking\.gke\.io/managed-certificates"=tracetest-beta \
+          --set ingress.annotations."networking\.gke\.io/v1beta1\.FrontendConfig"="ssl-redirect"
 
   notify_slack_if_helm_chart_bump_fails:
     runs-on: ubuntu-latest
