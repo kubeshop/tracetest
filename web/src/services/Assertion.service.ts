@@ -18,7 +18,7 @@ const buildValueSelector = (comparisonValue: string, compareOperator: string, ty
 
 const buildSelector = (conditions: string[]) => `${conditions.map(cond => `${cond}`).join(' && ')}`;
 
-const getSelectorList = (itemSelectors: IItemSelector[]) => {
+const getSelectorList = (itemSelectors: IItemSelector[] = []) => {
   const selectorList = itemSelectors.map<string>(({propertyName, value, valueType}) => {
     const keySelector = ` key == \`${propertyName}\``;
     const valueSelector = buildValueSelector(value, '==', valueType);
@@ -33,8 +33,8 @@ const getSelectorList = (itemSelectors: IItemSelector[]) => {
 const AssertionService = () => ({
   runBySpan(span: ISpan, {spanAssertions = [], selectors}: IAssertion): Array<ISpanAssertionResult> {
     const {spanId, attributes} = span;
-    const itemSelector = getSelectorList(selectors);
-    const [itMatches] = search(span.attributeList, escapeString(`[? ${itemSelector.join('] && [? ')}]`));
+    const itemSelector = getSelectorList(selectors || []);
+    const itMatches = !selectors || search(span.attributeList, escapeString(`[? ${itemSelector.join('] && [? ')}]`))[0];
 
     if (!itMatches) return [];
 
@@ -58,12 +58,13 @@ const AssertionService = () => ({
   },
 
   runByTrace(trace: ITrace, assertion: IAssertion): IAssertionResult {
-    if (!assertion?.selectors) return {assertion, spanListAssertionResult: []};
-
-    const itemSelector = `${getSelectorList(assertion.selectors)
+    const itemSelector = `${getSelectorList(assertion.selectors || [])
       .map(condition => `attributeList[? ${condition}]`)
       .join(' && ')}`;
-    const spanList: ISpan[] = search(trace.spans, escapeString(`[? ${itemSelector}]`)) || [];
+
+    const spanList: ISpan[] = assertion.selectors
+      ? search(trace.spans, escapeString(`[? ${itemSelector}]`)) || []
+      : trace.spans;
 
     return {
       assertion,
@@ -75,7 +76,7 @@ const AssertionService = () => ({
   },
 
   getEffectedSpansCount(trace: ITrace, selectors: IItemSelector[]) {
-    if (selectors.length === 0) return 0;
+    if (selectors.length === 0) return trace.spans;
 
     const itemSelector = `${getSelectorList(selectors)
       .map(condition => `attributeList[? ${condition}]`)
