@@ -879,7 +879,7 @@ flowchart TD
 ```
 
 ### :last
-This would return the first appearing span from the list
+This would return the last appearing span from the list
 
 ```css
 span[tracetest.span.type="http"]:last
