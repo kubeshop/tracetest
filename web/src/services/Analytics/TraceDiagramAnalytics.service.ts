@@ -1,7 +1,7 @@
 import AnalyticsService, {Categories} from './Analytics.service';
 
 enum Actions {
-  ClickSpan = 'click-span-node',
+  ClickSpan = 'span-node-click',
 }
 
 type TTraceDiagramAnalytics = {

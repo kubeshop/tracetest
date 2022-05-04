@@ -1,4 +1,4 @@
-import AnalyticsService, { Categories, Labels } from "./Analytics.service";
+import AnalyticsService, {Categories, Labels} from './Analytics.service';
 
 enum Actions {
   ChangeTab = 'change-tab',
@@ -16,7 +16,7 @@ const {event} = AnalyticsService(Categories.Trace);
 
 const TraceAnalyticsService = (): TTraceAnalytics => {
   const onChangeTab = (tabName: string) => {
-    event(Actions.ChangeTab, tabName);
+    event(`${Actions.ChangeTab}-${tabName}`, Labels.Table);
   };
 
   const onAddAssertionButtonClick = () => {
