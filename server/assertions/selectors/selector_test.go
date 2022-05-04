@@ -92,7 +92,17 @@ func TestSelector(t *testing.T) {
 			ExpectedSpanIds: []trace.SpanID{updatePokemonDatabaseSpanID},
 		},
 		{
-			Name:            "Selector with pseudo class",
+			Name:            "Selector with first pseudo class",
+			Expression:      "span[tracetest.span.type=\"db\"]:first",
+			ExpectedSpanIds: []trace.SpanID{insertPokemonDatabaseSpanID},
+		},
+		{
+			Name:            "Selector with first pseudo class",
+			Expression:      "span[tracetest.span.type=\"db\"]:last",
+			ExpectedSpanIds: []trace.SpanID{updatePokemonDatabaseSpanID},
+		},
+		{
+			Name:            "Selector with nth_child pseudo class",
 			Expression:      "span[tracetest.span.type=\"db\"]:nth_child(2)",
 			ExpectedSpanIds: []trace.SpanID{updatePokemonDatabaseSpanID},
 		},

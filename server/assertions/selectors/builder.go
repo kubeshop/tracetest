@@ -128,6 +128,10 @@ func createPseudoClass(parserPseudoClass parserPseudoClass) (PseudoClass, error)
 		return &NthChildPseudoClass{
 			N: *parserPseudoClass.Value.Int,
 		}, nil
+	case "first":
+		return &FirstPseudoClass{}, nil
+	case "last":
+		return &LastPseudoClass{}, nil
 	case "":
 		// No pseudoClass
 		return nil, nil
