@@ -4,7 +4,6 @@ import {QuestionCircleOutlined, PlusOutlined, MinusCircleOutlined} from '@ant-de
 import {Button, Input, AutoComplete, Typography, Tooltip, Form, Space, FormInstance} from 'antd';
 
 import {useCreateAssertionMutation, useUpdateAssertionMutation} from 'redux/apis/Test.api';
-import {SELECTOR_DEFAULT_ATTRIBUTES} from 'constants/SemanticGroupNames.constants';
 import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
 import useGuidedTour from 'hooks/useGuidedTour';
 import {CreateAssertionSelectorInput} from './CreateAssertionSelectorInput';
@@ -15,6 +14,7 @@ import {CompareOperator} from '../../constants/Operator.constants';
 import {ISpan} from '../../types/Span.types';
 import {LOCATION_NAME} from '../../constants/Span.constants';
 import {Steps} from '../GuidedTour/assertionStepList';
+import useAttributeList from './useAttributeList';
 
 const {
   onAddCheck,
@@ -36,13 +36,12 @@ export type TValues = {
   selectorList: IItemSelector[];
 };
 
-const itemSelectorKeys = SELECTOR_DEFAULT_ATTRIBUTES.map(el => el.attributes).flat();
-
 interface TCreateAssertionFormProps {
   onCreate(): void;
   onForm(form: FormInstance): void;
   onSelectorList(selectorList: IItemSelector[]): void;
   span: ISpan;
+  affectedSpanList: ISpan[];
   testId: string;
   assertion?: IAssertion;
 }
@@ -54,6 +53,7 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
   onForm,
   onCreate,
   onSelectorList,
+  affectedSpanList,
 }) => {
   const [createAssertion] = useCreateAssertionMutation();
   const [updateAssertion] = useUpdateAssertionMutation();
@@ -88,44 +88,7 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
     onSelectorList(assertion ? assertion.selectors : defaultSelectorList);
   }, [onSelectorList, defaultSelectorList]);
 
-  const spanTagsMap = attributeList?.reduce((acc: {[x: string]: any}, item: {key: string}) => {
-    if (itemSelectorKeys.indexOf(item.key) !== -1) {
-      return acc;
-    }
-    const keyPrefix = item.key.split('.').shift() || item.key;
-    if (!keyPrefix) {
-      return acc;
-    }
-    const keys = acc[keyPrefix] || [];
-    keys.push(item);
-    acc[keyPrefix] = keys;
-    return acc;
-  }, {});
-
-  const renderTitle = (title: any, index: number) => (
-    <span key={`KEY_${title}_${index}`}>{`${title} (${spanTagsMap[title][0].type})`}</span>
-  );
-
-  const renderItem = (attr: any) => ({
-    value: attr.key,
-    label: (
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-        }}
-      >
-        {attr.key}
-      </div>
-    ),
-  });
-
-  const spanAssertionOptions = Object.keys(spanTagsMap).map((tagKey: any, index) => {
-    return {
-      label: renderTitle(tagKey, index),
-      options: spanTagsMap[tagKey].map((el: any) => renderItem(el)),
-    };
-  });
+  const spanAssertionOptions = useAttributeList(span, affectedSpanList);
 
   const handleCreateAssertion = useCallback(
     async ({assertionList, selectorList}: TValues) => {

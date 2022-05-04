@@ -83,7 +83,7 @@ const AssertionService = () => ({
       .join(' && ')}`;
     const spanList: ISpan[] = search(trace.spans, escapeString(`[? ${itemSelector}]`)) || [];
 
-    return spanList.length;
+    return spanList;
   },
 });
 
