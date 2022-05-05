@@ -67,6 +67,11 @@ func TestSelector(t *testing.T) {
 		ExpectedSpanIds []trace.SpanID
 	}{
 		{
+			Name:            "Empty selector should select all spans",
+			Expression:      ``,
+			ExpectedSpanIds: []trace.SpanID{postImportSpanID, insertPokemonDatabaseSpanID, getPokemonFromExternalAPISpanID, updatePokemonDatabaseSpanID},
+		},
+		{
 			Name:            "Selector with span name",
 			Expression:      `span[name="Get pokemon from external API"]`,
 			ExpectedSpanIds: []trace.SpanID{getPokemonFromExternalAPISpanID},
