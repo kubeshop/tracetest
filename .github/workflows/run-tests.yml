@@ -33,5 +33,7 @@ jobs:
           go-version: ${{ matrix.go-version }}
       - name: Checkout code
         uses: actions/checkout@v2
+      - name: Setup config file
+        run: cp server/config.yaml.sample server/config.yaml
       - name: Run tests
         run: cd server && go test ./...
