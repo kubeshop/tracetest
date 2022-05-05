@@ -8,6 +8,7 @@ The system we will inspect has this flow:
 
 ```mermaid
 flowchart LR
+    start((start))
     subgraph purchase
         cart-api
         purchase-api
@@ -26,16 +27,17 @@ flowchart LR
         external-notification-service{{external service}}
     end
 
-    cart-api-->|send buy action| purchase-api
-    purchase-api --> notification-api
-    purchase-api -->|can product be bought by user?| auth-api
+    start -->|1. Close order| cart-api
+    cart-api-->|5. send buy action| purchase-api
+    purchase-api --> |7. Send notification to user|notification-api
+    purchase-api -->|6. can product be bought by user?| auth-api 
     auth-api --> auth-storage
-    cart-api -->|is product available?| product-api
-    product-api -->|can user view product?| auth-api
-    product-api -->product-storage
+    cart-api -->|2. is product available?| product-api
+    product-api -->|4. can user view product?| auth-api
+    product-api -->|3. retrieve product| product-storage
 
-    notification-api --> kafka
-    kafka --> external-notification-service
+    notification-api -->|8| kafka
+    kafka -->|9| external-notification-service
 ```
 
 And it generates the following trace:
