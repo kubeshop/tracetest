@@ -23,20 +23,7 @@
         "assertions": [
             {
                 "assertionId": "20f4611d-c5da-4331-ab97-3bf0006703a5",
-                "selectors": [
-                    {
-                        "locationName": "RESOURCE_ATTRIBUTES",
-                        "propertyName": "service.name",
-                        "value": "pokeshop",
-                        "valueType": "stringValue"
-                    },
-                    {
-                        "locationName": "SPAN_ATTRIBUTES",
-                        "propertyName": "tracetest.span.type",
-                        "value": "http",
-                        "valueType": "stringValue"
-                    }
-                ],
+                "selector": "span[service.name=\"pokeshop\" tracetest.span.type=\"http\"]",
                 "spanAssertions": [
                     {
                         "spanAssertionId": "82376099-c9c5-4ba8-9fcb-b7357030c28f",
@@ -50,20 +37,7 @@
             },
             {
                 "assertionId": "2f4e175d-9ac9-4e77-af55-1491d8ace349",
-                "selectors": [
-                    {
-                        "locationName": "SPAN_ATTRIBUTES",
-                        "propertyName": "tracetest.span.type",
-                        "value": "database",
-                        "valueType": "stringValue"
-                    },
-                    {
-                        "locationName": "RESOURCE_ATTRIBUTES",
-                        "propertyName": "service.name",
-                        "value": "pokeshop-worker",
-                        "valueType": "stringValue"
-                    }
-                ],
+                "selector": "span[service.name=\"pokeshop-worker\" tracetest.span.type=\"database\"]",
                 "spanAssertions": [
                     {
                         "spanAssertionId": "093dfb59-dc00-4c67-b78d-85177483d469",
@@ -77,26 +51,7 @@
             },
             {
                 "assertionId": "bb7eb657-01a3-468c-a62b-5178a5a079c6",
-                "selectors": [
-                    {
-                        "locationName": "SPAN_ATTRIBUTES",
-                        "propertyName": "tracetest.span.type",
-                        "value": "messaging",
-                        "valueType": "stringValue"
-                    },
-                    {
-                        "locationName": "SPAN_ATTRIBUTES",
-                        "propertyName": "service.name",
-                        "value": "pokeshop-worker",
-                        "valueType": "stringValue"
-                    },
-                    {
-                        "locationName": "SPAN_ATTRIBUTES",
-                        "propertyName": "messaging.destination",
-                        "value": "/queue/syncronizePokemon",
-                        "valueType": "stringValue"
-                    }
-                ],
+                "selector": "span[service.name=\"pokeshop-worker\" tracetest.span.type=\"messaging\" messaging.destination=\"/queue/syncronizePokemon\"]",
                 "spanAssertions": [
                     {
                         "spanAssertionId": "58a96699-5197-429b-a867-f68de7a473e2",

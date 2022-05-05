@@ -2,6 +2,7 @@ package assertions
 
 import (
 	"fmt"
+	"math"
 
 	"github.com/kubeshop/tracetest/openapi"
 	"github.com/kubeshop/tracetest/traces"
@@ -33,7 +34,7 @@ func convertOTelTraceIntoTraceTree(trace openapi.ApiV3SpansResponseChunk) (trace
 func convertOtelSpanIntoSpan(span openapi.V1Span) (*traces.Span, error) {
 	attributes := make(traces.Attributes, 0)
 	for _, attribute := range span.Attributes {
-		attributes[attribute.Key] = attribute.Value.StringValue
+		attributes[attribute.Key] = getAttributeValue(attribute.Value)
 	}
 
 	spanID, err := createSpanID(span.SpanId)
@@ -48,6 +49,27 @@ func convertOtelSpanIntoSpan(span openapi.V1Span) (*traces.Span, error) {
 		Children:   make([]*traces.Span, 0),
 		Attributes: attributes,
 	}, nil
+}
+
+func getAttributeValue(value openapi.V1AnyValue) string {
+	if value.StringValue != "" {
+		return value.StringValue
+	}
+
+	if value.IntValue != "" {
+		return value.IntValue
+	}
+
+	if value.DoubleValue != 0.0 {
+		isFloatingPoint := math.Abs(value.DoubleValue-math.Abs(value.DoubleValue)) > 0.0
+		if isFloatingPoint {
+			return fmt.Sprintf("%f", value.DoubleValue)
+		}
+
+		return fmt.Sprintf("%.0f", value.DoubleValue)
+	}
+
+	return fmt.Sprintf("%t", value.BoolValue)
 }
 
 func createSpanID(id string) (trace.SpanID, error) {

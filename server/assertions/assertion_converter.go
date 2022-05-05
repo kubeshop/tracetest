@@ -7,10 +7,10 @@ import (
 
 func convertAssertionsIntoTestDefinition(assertions []openapi.Assertion) TestDefinition {
 	testDefinition := make(TestDefinition, 0)
-	newAssertions := make([]Assertion, 0, len(assertions))
 	selector := ""
 	for _, assertion := range assertions {
 		selector = assertion.Selector
+		newAssertions := make([]Assertion, 0, len(assertions))
 		for _, spanAssertion := range assertion.SpanAssertions {
 			newAssertion := Assertion{
 				Attribute:  spanAssertion.PropertyName,
@@ -20,8 +20,8 @@ func convertAssertionsIntoTestDefinition(assertions []openapi.Assertion) TestDef
 
 			newAssertions = append(newAssertions, newAssertion)
 		}
+		testDefinition[SpanQuery(selector)] = newAssertions
 	}
-	testDefinition[SpanQuery(selector)] = newAssertions
 	return testDefinition
 }
 
