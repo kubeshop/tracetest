@@ -17,10 +17,12 @@ import (
 )
 
 type postgresDB struct {
-	db *sql.DB
+	db               *sql.DB
+	migrationsFolder string
 }
 
-func Postgres(dsn string) (Repository, error) {
+func Postgres(dsn string, options ...PostgresOption) (Repository, error) {
+	postgres := &postgresDB{}
 	connector, err := pq.NewConnector(dsn)
 	if err != nil {
 		return nil, fmt.Errorf("sql open: %w", err)
@@ -36,23 +38,30 @@ func Postgres(dsn string) (Repository, error) {
 			),
 		),
 	)
+	postgres.db = db
+	postgres.migrationsFolder = "file://./migrations"
 
-	err = ensureLatestMigration(db)
+	for _, option := range options {
+		err = option(postgres)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	err = postgres.ensureLatestMigration()
 	if err != nil {
 		return nil, fmt.Errorf("could not execute migrations: %w", err)
 	}
 
-	return &postgresDB{
-		db: db,
-	}, nil
+	return postgres, nil
 }
 
-func ensureLatestMigration(db *sql.DB) error {
-	driver, err := postgres.WithInstance(db, &postgres.Config{})
+func (p *postgresDB) ensureLatestMigration() error {
+	driver, err := postgres.WithInstance(p.db, &postgres.Config{})
 	if err != nil {
 		return fmt.Errorf("could not get driver from postgres connection: %w", err)
 	}
-	migrateClient, err := migrate.NewWithDatabaseInstance("file://./migrations", "tracetest", driver)
+	migrateClient, err := migrate.NewWithDatabaseInstance(p.migrationsFolder, "tracetest", driver)
 	if err != nil {
 		return fmt.Errorf("could not get migration client: %w", err)
 	}
@@ -308,17 +317,15 @@ func (td *postgresDB) GetAssertionsByTestID(ctx context.Context, testID string) 
 }
 
 func (td *postgresDB) Drop() error {
-	_, err := td.db.Exec(`
-DROP TABLE IF EXISTS tests;
-`)
-	if err != nil {
-		return err
-	}
-	_, err = td.db.Exec(`
-DROP TABLE IF EXISTS results;
-`)
-	if err != nil {
-		return err
+	return dropTables(td, "results", "assertions", "tests", "schema_migrations")
+}
+
+func dropTables(td *postgresDB, tables ...string) error {
+	for _, table := range tables {
+		_, err := td.db.Exec(fmt.Sprintf("DROP TABLE IF EXISTS %s;", table))
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
