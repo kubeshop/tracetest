@@ -262,7 +262,8 @@ flowchart TD
     G:::selectedSpan
     I:::selectedSpan
 
-    classDef selectedSpan fill:#4CAF50
+    classDef selectedSpan fill:#439846, color:#ffffff
+    classDef candidateSpan fill:#FF6905, color:#ffffff
 ```
 
 ### AND condition
@@ -378,7 +379,8 @@ flowchart TD
     A:::selectedSpan
     F:::selectedSpan
 
-    classDef selectedSpan fill:#4CAF50
+    classDef selectedSpan fill:#439846, color:#ffffff
+    classDef candidateSpan fill:#FF6905, color:#ffffff
 ```
 
 ### OR condition
@@ -502,7 +504,8 @@ flowchart TD
     I:::selectedSpan
     J:::selectedSpan
 
-    classDef selectedSpan fill:#4CAF50
+    classDef selectedSpan fill:#439846, color:#ffffff
+    classDef candidateSpan fill:#FF6905, color:#ffffff
 ```
 
 Each span selector will be executed individually and the results will be merged together, creating a list of all spans that match any of the provided span selectors.
@@ -628,7 +631,8 @@ flowchart TD
     I:::selectedSpan
     J:::selectedSpan
 
-    classDef selectedSpan fill:#4CAF50
+    classDef selectedSpan fill:#439846, color:#ffffff
+    classDef candidateSpan fill:#FF6905, color:#ffffff
 ```
 ## pseudo-classes support
 
@@ -754,7 +758,8 @@ flowchart TD
     G:::selectedSpan
     I:::selectedSpan
 
-    classDef selectedSpan fill:#4CAF50
+    classDef selectedSpan fill:#439846, color:#ffffff
+    classDef candidateSpan fill:#FF6905, color:#ffffff
 ```
 
 ### :first
@@ -872,8 +877,8 @@ flowchart TD
     G:::candidateSpan
     I:::candidateSpan
 
-    classDef selectedSpan fill:#4CAF50
-    classDef candidateSpan fill:#FF8B3D
+    classDef selectedSpan fill:#439846, color:#ffffff
+    classDef candidateSpan fill:#FF6905, color:#ffffff
 ```
 
 ### :last
@@ -984,15 +989,15 @@ flowchart TD
     I -->|9| J
     J -->|10| K
 
-    A:::cand
+    A:::candidateSpan
     B:::candidateSpan
     D:::candidateSpan
     F:::candidateSpan
     G:::candidateSpan
     I:::selectedSpan
 
-    classDef selectedSpan fill:#4CAF50
-    classDef candidateSpan fill:#FF8B3D
+    classDef selectedSpan fill:#439846, color:#ffffff
+    classDef candidateSpan fill:#FF6905, color:#ffffff
 ```
 
 ### :nth_child
@@ -1110,8 +1115,8 @@ flowchart TD
     G:::candidateSpan
     I:::candidateSpan
 
-    classDef selectedSpan fill:#4CAF50
-    classDef candidateSpan fill:#FF8B3D
+    classDef selectedSpan fill:#439846, color:#ffffff
+    classDef candidateSpan fill:#FF6905, color:#ffffff
 ```
 
 
@@ -1233,7 +1238,8 @@ flowchart TD
     D:::selectedSpan
     G:::selectedSpan
 
-    classDef selectedSpan fill:#4CAF50
+    classDef selectedSpan fill:#439846, color:#ffffff
+    classDef candidateSpan fill:#FF6905, color:#ffffff
 ```
 
 This is a problem, because if we apply the same assertion to both spans, one of them will fail. We could try to use `nth_child` but that could break if a http request failed and the retry policy kicked in. Thus, the only way of filtering that is based on the context when it was generated. For example: using its parent span to do so.
@@ -1350,6 +1356,6 @@ flowchart TD
     F:::parentSpan
     G:::selectedSpan
 
-    classDef selectedSpan fill:#4CAF50
-    classDef parentSpan fill:#3792cb
+    classDef selectedSpan fill:#439846, color:#ffffff
+    classDef candidateSpan fill:#FF6905, color:#ffffff
 ```
