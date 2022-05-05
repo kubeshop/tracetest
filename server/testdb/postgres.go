@@ -10,49 +10,38 @@ import (
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/google/uuid"
-	"github.com/j2gg0s/otsql"
-	"github.com/j2gg0s/otsql/hook/trace"
 	"github.com/kubeshop/tracetest/openapi"
-	pq "github.com/lib/pq"
 )
 
 type postgresDB struct {
-	db *sql.DB
+	db               *sql.DB
+	migrationsFolder string
 }
 
-func Postgres(dsn string) (Repository, error) {
-	connector, err := pq.NewConnector(dsn)
-	if err != nil {
-		return nil, fmt.Errorf("sql open: %w", err)
+func Postgres(options ...PostgresOption) (Repository, error) {
+	postgres := &postgresDB{}
+	postgres.migrationsFolder = "file://./migrations"
+	for _, option := range options {
+		err := option(postgres)
+		if err != nil {
+			return nil, err
+		}
 	}
-	db := sql.OpenDB(
-		otsql.WrapConnector(connector,
-			otsql.WithHooks(
-				trace.New(
-					trace.WithQuery(true),
-					trace.WithQueryParams(true),
-					trace.WithRowsAffected(true),
-				),
-			),
-		),
-	)
 
-	err = ensureLatestMigration(db)
+	err := postgres.ensureLatestMigration()
 	if err != nil {
 		return nil, fmt.Errorf("could not execute migrations: %w", err)
 	}
 
-	return &postgresDB{
-		db: db,
-	}, nil
+	return postgres, nil
 }
 
-func ensureLatestMigration(db *sql.DB) error {
-	driver, err := postgres.WithInstance(db, &postgres.Config{})
+func (p *postgresDB) ensureLatestMigration() error {
+	driver, err := postgres.WithInstance(p.db, &postgres.Config{})
 	if err != nil {
 		return fmt.Errorf("could not get driver from postgres connection: %w", err)
 	}
-	migrateClient, err := migrate.NewWithDatabaseInstance("file://./migrations", "tracetest", driver)
+	migrateClient, err := migrate.NewWithDatabaseInstance(p.migrationsFolder, "tracetest", driver)
 	if err != nil {
 		return fmt.Errorf("could not get migration client: %w", err)
 	}
@@ -308,17 +297,15 @@ func (td *postgresDB) GetAssertionsByTestID(ctx context.Context, testID string) 
 }
 
 func (td *postgresDB) Drop() error {
-	_, err := td.db.Exec(`
-DROP TABLE IF EXISTS tests;
-`)
-	if err != nil {
-		return err
-	}
-	_, err = td.db.Exec(`
-DROP TABLE IF EXISTS results;
-`)
-	if err != nil {
-		return err
+	return dropTables(td, "results", "assertions", "tests", "schema_migrations")
+}
+
+func dropTables(td *postgresDB, tables ...string) error {
+	for _, table := range tables {
+		_, err := td.db.Exec(fmt.Sprintf("DROP TABLE IF EXISTS %s;", table))
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

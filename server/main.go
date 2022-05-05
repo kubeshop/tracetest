@@ -52,7 +52,9 @@ func main() {
 	tp := initOtelTracing(ctx)
 	defer func() { _ = tp.Shutdown(ctx) }()
 
-	testDB, err := testdb.Postgres(cfg.PostgresConnString)
+	testDB, err := testdb.Postgres(
+		testdb.WithDSN(cfg.PostgresConnString),
+	)
 	if err != nil {
 		log.Fatal(err)
 	}
