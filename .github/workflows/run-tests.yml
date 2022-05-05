@@ -23,4 +23,4 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Run tests
-        run: cd server && go test ./...
+        run: make server-test
