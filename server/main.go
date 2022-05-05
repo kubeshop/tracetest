@@ -94,7 +94,7 @@ func main() {
 		}
 	})
 
-	err = analytics.CreateAndSendEvent("server-started-backend", "beacon")
+	err = analytics.CreateAndSendEvent("server_started_backend", "beacon")
 	if err != nil {
 		log.Fatal(err)
 	}
