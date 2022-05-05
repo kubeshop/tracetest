@@ -1,41 +1,39 @@
-import {useCallback, useEffect, useState} from 'react';
+/* eslint-disable */
+import React, {useCallback, useEffect, useState} from 'react';
 import styled from 'styled-components';
 
 import {useStoreActions} from 'react-flow-renderer';
-import {ReflexContainer, ReflexSplitter, ReflexElement} from 'react-reflex';
 import {isEmpty} from 'lodash';
 
-import {Button, Tabs, Typography} from 'antd';
+import {Button, Typography} from 'antd';
 import {CloseCircleFilled} from '@ant-design/icons';
 
 import 'react-reflex/styles.css';
 
-import {useGetTestByIdQuery, useGetResultByIdQuery, useRunTestMutation} from 'redux/apis/Test.api';
+import {useGetResultByIdQuery, useGetTestByIdQuery, useRunTestMutation} from 'redux/apis/Test.api';
 import Diagram from 'components/Diagram';
 
-import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
-import {Steps} from 'components/GuidedTour/traceStepList';
+import {GuidedTours} from 'services/GuidedTour.service';
 import useGuidedTour from 'hooks/useGuidedTour';
 import * as S from './Trace.styled';
-
-import SpanDetail from '../SpanDetail';
-import TestResults from './TestResults';
 import {ISpan} from '../../types/Span.types';
 import {ITestRunResult} from '../../types/TestRunResult.types';
 import {TestState} from '../../constants/TestRunResult.constants';
-import TraceTimeline from './TraceTimeline';
 import TraceAnalyticsService from '../../services/Analytics/TraceAnalytics.service';
 import usePolling from '../../hooks/usePolling';
 import {useAppDispatch} from '../../redux/hooks';
 import {replace, updateTestResult} from '../../redux/slices/ResultList.slice';
-import { SupportedDiagrams } from '../Diagram/Diagram';
+import {SupportedDiagrams} from '../Diagram/Diagram';
+import SpanDetail from '../SpanDetail';
+import TraceTimeline from './TraceTimeline';
+import {ResizableDrawer} from './ResizableDrawer';
 
 const {onChangeTab} = TraceAnalyticsService;
 
 const Grid = styled.div`
-  display: grid;
-  height: calc(100vh - 200px);
-  overflow: scroll;
+  display: flex;
+  //height: calc(100vh - 200px);
+  //overflow-y: scroll;
 `;
 
 type TraceProps = {
@@ -133,75 +131,36 @@ const Trace: React.FC<TraceProps> = ({testId, testResultId, onDismissTrace, onRu
     );
   }
 
+  const visiblePortion = 60;
+  const height = `calc(100% - ${visiblePortion}px)`;
+  const [max, setMax] = useState(600);
   return (
-    <main>
-      <Grid>
-        <ReflexContainer style={{height: '100vh'}} orientation="horizontal">
-          <ReflexElement flex={0.6}>
-            <ReflexContainer orientation="vertical">
-              <ReflexElement
-                flex={0.5}
-                className="left-pane"
-                data-tour={GuidedTourService.getStep(GuidedTours.Trace, Steps.Diagram)}
-              >
-                <div className="pane-content">
-                  <Diagram
-                    type={SupportedDiagrams.DAG}
-                    trace={testResultDetails?.trace!}
-                    onSelectSpan={handleOnSpanSelected}
-                    selectedSpan={selectedSpan}
-                  />
-                </div>
-              </ReflexElement>
-              <ReflexElement flex={0.5} className="right-pane">
-                <div className="pane-content" style={{padding: '14px 24px', overflow: 'hidden'}}>
-                  <S.TraceTabs onChange={activeTab => onChangeTab(activeTab)}>
-                    <Tabs.TabPane
-                      tab={
-                        <span data-tour={GuidedTourService.getStep(GuidedTours.Trace, Steps.SpanDetail)}>
-                          Span Detail
-                        </span>
-                      }
-                      key="span-detail"
-                    >
-                      <SpanDetail
-                        resultId={testResultDetails?.resultId}
-                        testId={test?.testId}
-                        span={selectedSpan}
-                      />
-                    </Tabs.TabPane>
-                    <Tabs.TabPane
-                      tab={
-                        <span data-tour={GuidedTourService.getStep(GuidedTours.Trace, Steps.TestResults)}>
-                          Test Results
-                        </span>
-                      }
-                      key="test-results"
-                    >
-                      <TestResults
-                        onSpanSelected={handleOnSpanSelected}
-                        trace={testResultDetails?.trace}
-                        resultId={testResultId}
-                      />
-                    </Tabs.TabPane>
-                  </S.TraceTabs>
-                </div>
-              </ReflexElement>
-            </ReflexContainer>
-          </ReflexElement>
-          <ReflexSplitter />
-          <ReflexElement>
-            <div className="pane-content">
-              <TraceTimeline
-                trace={testResultDetails?.trace!}
-                onSelectSpan={handleOnSpanSelected}
-                selectedSpan={selectedSpan}
-              />
-            </div>
-          </ReflexElement>
-        </ReflexContainer>
+    <>
+      <Grid style={{width: '100%', minHeight: height, maxHeight: height, height: height}}>
+        <div style={{flexBasis: '50%', paddingTop: 10, paddingLeft: 10}}>
+          <Diagram
+            type={SupportedDiagrams.DAG}
+            trace={testResultDetails?.trace!}
+            onSelectSpan={handleOnSpanSelected}
+            selectedSpan={selectedSpan}
+          />
+        </div>
+        <div style={{flexBasis: '50%', overflowY: 'scroll', paddingTop: 10, paddingRight: 10}}>
+          <SpanDetail resultId={testResultDetails?.resultId} testId={test?.testId} span={selectedSpan} />
+        </div>
       </Grid>
-    </main>
+      <ResizableDrawer min={visiblePortion} max={max}>
+        <TraceTimeline
+          min={visiblePortion}
+          max={max}
+          setMax={setMax}
+          visiblePortion={visiblePortion}
+          trace={testResultDetails?.trace!}
+          onSelectSpan={handleOnSpanSelected}
+          selectedSpan={selectedSpan}
+        />
+      </ResizableDrawer>
+    </>
   );
 };
 

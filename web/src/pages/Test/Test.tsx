@@ -157,6 +157,7 @@ const TestPage = () => {
           onChange={onChangeTab}
           type="editable-card"
           onEdit={onEditTab}
+          style={{flexGrow: 1, display: 'flex', margin: 0}}
         >
           <Tabs.TabPane tab="Test Details" key="1" closeIcon={<CloseOutlined hidden />}>
             <S.Wrapper>
