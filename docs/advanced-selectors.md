@@ -1129,7 +1129,7 @@ In our example, you can notice that `auth-api` is called twice from different pa
 
 What if I want to test if a product only available in US can be bought in UK? The product can be seen by the user, but it cannot be bought if the user is outside US. Certainly I cannot apply the same assertions on all `auth-api` spans, otherwise the test will not pass.
 
-> :information_source: When you filter by parent-child relation, it matches spans recursively ai all levels bellow the parent. This doesn't match only direct children of the parent, but all other spans in the sub-tree.
+> :information_source: When you filter by parent-child relation, it matches spans recursively in all levels bellow the parent. This doesn't match only direct children of the parent, but all other spans in the sub-tree.
 
 For example:
 
