@@ -5,3 +5,12 @@ export const escapeString = (str: string): string => {
   // eslint-disable-next-line no-control-regex
   return str.replace(/[\\"']/g, '\\$&').replace(/\u0000/g, '\\0');
 };
+
+export const isJson = (str: string) => {
+  try {
+    JSON.parse(str);
+  } catch (e) {
+    return false;
+  }
+  return true;
+};

@@ -1,5 +1,5 @@
 import {search} from 'jmespath';
-import {escapeString} from '../utils/Common';
+import {escapeString, isJson} from '../utils/Common';
 import OperatorService from './Operator.service';
 import {ISpan} from '../types/Span.types';
 import {ITrace} from '../types/Trace.types';
@@ -10,10 +10,14 @@ const buildValueSelector = (comparisonValue: string, compareOperator: string, ty
   if (compareOperator === 'contains') return `contains(value, \`${comparisonValue}\`)`;
 
   if ([SpanAttributeType.intValue, SpanAttributeType.doubleValue].includes(type as SpanAttributeType)) {
-    return `to_number(value) ${compareOperator} \`${comparisonValue}\``;
+    return `to_number(value) ${compareOperator} \`${escapeString(comparisonValue)}\``;
   }
 
-  return `value ${compareOperator} \`${comparisonValue}\``;
+  if (isJson(comparisonValue)) {
+    return `value ${compareOperator} \`${JSON.stringify(comparisonValue)}\``;
+  }
+
+  return `value ${compareOperator} \`${escapeString(comparisonValue)}\``;
 };
 
 const buildSelector = (conditions: string[]) => `${conditions.map(cond => `${cond}`).join(' && ')}`;
@@ -44,7 +48,7 @@ const AssertionService = () => ({
 
       const selector = `${buildSelector([`[? key == \`${propertyName}\` && ${valueSelector}]`])}`;
 
-      const [hasPassed] = search(span.attributeList, escapeString(selector));
+      const [hasPassed] = search(span.attributeList, selector);
 
       return {
         ...spanAssertion,
