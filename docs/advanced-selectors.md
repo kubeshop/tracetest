@@ -1,6 +1,6 @@
 # Advanced Selectors
 
-If you need a more complex way of selecting which spans of a trace will be asserted, you can write your selector as a query. This will enable you to express more complex conditions to select spans.
+If you find yourself in a position where you cannot select complex spans, you can use our advanced selectors to help in that task. It enables you selecting spans that are impossible to select using just basic selectors.
 
 In order to present each selector feature as easily as possible, we will use a theoretical scenario of an e-commerce application.
 
