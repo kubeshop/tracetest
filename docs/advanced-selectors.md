@@ -1361,5 +1361,5 @@ flowchart TD
     G:::selectedSpan
 
     classDef selectedSpan fill:#439846, color:#ffffff
-    classDef candidateSpan fill:#FF6905, color:#ffffff
+    classDef parentSpan fill:#3792cb, color:#ffffff
 ```
