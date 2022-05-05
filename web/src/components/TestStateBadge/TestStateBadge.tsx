@@ -28,7 +28,7 @@ const BadgeStatusMap: Record<
   },
   [TestState.FAILED]: {
     status: 'error',
-    label: 'Failed executing test run',
+    label: 'Failed',
   },
 };
 

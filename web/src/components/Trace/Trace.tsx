@@ -5,8 +5,7 @@ import {useStoreActions} from 'react-flow-renderer';
 import {ReflexContainer, ReflexSplitter, ReflexElement} from 'react-reflex';
 import {isEmpty} from 'lodash';
 
-import {Button, Tabs, Typography} from 'antd';
-import {CloseCircleFilled} from '@ant-design/icons';
+import {Tabs} from 'antd';
 
 import 'react-reflex/styles.css';
 
@@ -28,7 +27,8 @@ import TraceAnalyticsService from '../../services/Analytics/TraceAnalytics.servi
 import usePolling from '../../hooks/usePolling';
 import {useAppDispatch} from '../../redux/hooks';
 import {replace, updateTestResult} from '../../redux/slices/ResultList.slice';
-import { SupportedDiagrams } from '../Diagram/Diagram';
+import {SupportedDiagrams} from '../Diagram/Diagram';
+import FailedTrace from './FailedTrace';
 
 const {onChangeTab} = TraceAnalyticsService;
 
@@ -121,16 +121,7 @@ const Trace: React.FC<TraceProps> = ({testId, testResultId, onDismissTrace, onRu
   };
 
   if (isError || testResultDetails?.state === TestState.FAILED) {
-    return (
-      <S.FailedTrace>
-        <CloseCircleFilled style={{color: 'red', fontSize: 32}} />
-        <Typography.Title level={2}>Test Run Failed</Typography.Title>
-        <div style={{display: 'grid', gap: 8, gridTemplateColumns: '1fr 1fr'}}>
-          <Button onClick={handleReRunTest}>Rerun Test</Button>
-          <Button onClick={onDismissTrace}>Cancel</Button>
-        </div>
-      </S.FailedTrace>
-    );
+    return <FailedTrace onReRun={handleReRunTest} onEdit={() => console.log('onEdit')} />;
   }
 
   return (
@@ -164,11 +155,7 @@ const Trace: React.FC<TraceProps> = ({testId, testResultId, onDismissTrace, onRu
                       }
                       key="span-detail"
                     >
-                      <SpanDetail
-                        resultId={testResultDetails?.resultId}
-                        testId={test?.testId}
-                        span={selectedSpan}
-                      />
+                      <SpanDetail resultId={testResultDetails?.resultId} testId={test?.testId} span={selectedSpan} />
                     </Tabs.TabPane>
                     <Tabs.TabPane
                       tab={
