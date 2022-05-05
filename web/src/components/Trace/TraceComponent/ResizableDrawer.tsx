@@ -5,24 +5,22 @@ import {Drawer} from 'antd';
 interface IProps {
   min: number;
   max: number;
+  open: boolean;
   children: React.ReactElement;
 }
 
-export const ResizableDrawer = ({children, min, max}: IProps): JSX.Element => {
+export const ResizableDrawer = ({open, children, min, max}: IProps): JSX.Element => {
   const [isResizing, setIsResizing] = useState(false);
   const [height, setHeight] = useState(min);
 
-  const listener = (e: any) => {
-    e.preventDefault();
-  };
   const onPointerDown: MouseEventHandler = useCallback(() => {
     setIsResizing(true);
-    window.addEventListener('selectstart', listener);
+    window.addEventListener('selectstart', e => e.preventDefault());
   }, [setIsResizing]);
 
   const onMouseUp: EventListener = useCallback(() => {
     setIsResizing(false);
-    window.removeEventListener('selectstart', listener);
+    window.removeEventListener('selectstart', e => e.preventDefault());
   }, [setIsResizing]);
 
   const onMouseMove: EventListener = useCallback(
@@ -52,7 +50,7 @@ export const ResizableDrawer = ({children, min, max}: IProps): JSX.Element => {
     <Drawer
       placement="bottom"
       closable={false}
-      visible
+      visible={open}
       height={height}
       mask={false}
       style={{overflow: 'hidden'}}

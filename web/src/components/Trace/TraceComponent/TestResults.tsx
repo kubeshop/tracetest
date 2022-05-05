@@ -2,11 +2,11 @@ import {Typography} from 'antd';
 import {useSelector} from 'react-redux';
 import SkeletonTable from 'components/SkeletonTable';
 import {FC, useMemo} from 'react';
-import {ITrace} from '../../types/Trace.types';
-import TraceAssertionsResultTable from '../TraceAssertionsTable/TraceAssertionsTable';
-import TraceService from '../../services/Trace.service';
+import {ITrace} from 'types/Trace.types';
 import * as S from './TestResults.styled';
-import TestResultSelectors from '../../selectors/TestResult.selectors';
+import TestResultSelectors from '../../../selectors/TestResult.selectors';
+import TraceService from '../../../services/Trace.service';
+import TraceAssertionsResultTable from '../../TraceAssertionsTable/TraceAssertionsTable';
 
 type TTestResultsProps = {
   trace?: ITrace;

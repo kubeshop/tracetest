@@ -1,75 +1,9 @@
-import React, {
-  Dispatch,
-  RefObject,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
-import styled, {css} from 'styled-components';
+import {useEffect, useMemo, useRef} from 'react';
 import * as d3 from 'd3';
-
-import Title from 'antd/lib/typography/Title';
-
-import './TimelineChart.css';
-import SkeletonTable from 'components/SkeletonTable';
-import GuidedTourService, {GuidedTours} from '../../services/GuidedTour.service';
-import {Steps} from '../GuidedTour/traceStepList';
-import TraceAnalyticsService from '../../services/Analytics/TraceAnalytics.service';
-import {ITrace} from '../../types/Trace.types';
-// See: https://usehooks-ts.com/react-hook/use-isomorphic-layout-effect
-
-const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
-
-function useEventListener<K extends keyof HTMLElementEventMap, T extends HTMLElement = HTMLDivElement>(
-  eventName: K,
-  handler: (event: HTMLElementEventMap[K]) => void,
-  element?: RefObject<T>
-) {
-  // Create a ref that stores handler
-  const savedHandler = useRef(handler);
-
-  useIsomorphicLayoutEffect(() => {
-    savedHandler.current = handler;
-  }, [handler]);
-
-  useEffect(() => {
-    // Define the listening target
-    const targetElement: T | Window = element?.current || window;
-    if (!(targetElement && targetElement.addEventListener)) {
-      return;
-    }
-
-    // Create event listener that calls handler function stored in ref
-    const eventListener: typeof handler = event => savedHandler.current(event);
-
-    targetElement.addEventListener(eventName, eventListener as any);
-
-    // Remove event listener on cleanup
-    return () => {
-      targetElement.removeEventListener(eventName, eventListener as any);
-    };
-  }, [eventName, element]);
-}
+import {ITrace} from 'types/Trace.types';
+import TraceAnalyticsService from '../../../services/Analytics/TraceAnalytics.service';
 
 const {onTimelineSpanClick} = TraceAnalyticsService;
-
-const Header = styled.div<{visiblePortion: number}>`
-  display: flex;
-  //padding: 24px;
-  align-items: center;
-  cursor: grab;
-  width: 100%;
-  ${props =>
-    css`
-      height: ${props.visiblePortion}px;
-    `}
-  margin: 0 16px;
-  color: rgb(213, 215, 224);
-`;
 
 interface ITimelineChartProps {
   trace: ITrace;
@@ -78,21 +12,7 @@ interface ITimelineChartProps {
   onSelectSpan(spanId: string): void;
 }
 
-interface IProps {
-  onPointerDown?: any;
-  trace?: ITrace;
-  visiblePortion: number;
-  setMax: Dispatch<SetStateAction<number>>;
-  max: number;
-  height?: number;
-  min: number;
-  setHeight?: Dispatch<SetStateAction<number>>;
-  selectedSpan?: any;
-
-  onSelectSpan(spanId: string): void;
-}
-
-const TimelineChart = ({trace, selectedSpan, onSelectSpan}: ITimelineChartProps) => {
+export const TimelineChart = ({trace, selectedSpan, onSelectSpan}: ITimelineChartProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
   let treeFactory = d3.tree().size([200, 450]).nodeSize([0, 5]);
 
@@ -313,105 +233,3 @@ const TimelineChart = ({trace, selectedSpan, onSelectSpan}: ITimelineChartProps)
 
   return <svg ref={svgRef} />;
 };
-
-interface Size {
-  width: number;
-  height: number;
-}
-
-function useElementSize<T extends HTMLElement = HTMLDivElement>(): [(node: T | null) => void, Size] {
-  // Mutable values like 'ref.current' aren't valid dependencies
-  // because mutating them doesn't re-render the component.
-  // Instead, we use a state as a ref to be reactive.
-  const [ref, setRef] = useState<T | null>(null);
-  const [size, setSize] = useState<Size>({
-    width: 0,
-    height: 0,
-  });
-
-  // Prevent too many rendering using useCallback
-  const handleSize = useCallback(() => {
-    setSize({
-      width: ref?.offsetWidth || 0,
-      height: ref?.offsetHeight || 0,
-    });
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ref?.offsetHeight, ref?.offsetWidth]);
-
-  useEventListener('resize', handleSize);
-
-  useIsomorphicLayoutEffect(() => {
-    handleSize();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ref?.offsetHeight, ref?.offsetWidth]);
-
-  return [setRef, size];
-}
-
-export const useDoubleClick = (doubleClick: any, click?: any, timeout = 200) => {
-  // we're using useRef here for the useCallback to rememeber the timeout
-  const clickTimeout = useRef<any>();
-
-  const clearClickTimeout = () => {
-    if (clickTimeout) {
-      clearTimeout(clickTimeout.current);
-      clickTimeout.current = undefined;
-    }
-  };
-
-  // return a memoized version of the callback that only changes if one of the dependencies has changed
-  return useCallback(
-    event => {
-      clearClickTimeout();
-      if (click && event.detail === 1) {
-        clickTimeout.current = setTimeout(() => {
-          click(event);
-        }, timeout);
-      }
-      if (event.detail % 2 === 0) {
-        doubleClick(event);
-      }
-    },
-    [click, doubleClick]
-  );
-};
-
-const TraceTimeline = ({
-  max,
-  min,
-  setHeight,
-  setMax,
-  onPointerDown,
-  visiblePortion,
-  trace,
-  selectedSpan,
-  onSelectSpan,
-  ...props
-}: IProps) => {
-  const [squareRef, {height}] = useElementSize();
-  useEffect(() => {
-    setMax(height);
-  }, [height]);
-  const hybridClick = useDoubleClick(() => {
-    setHeight?.(height === props.height ? min : height);
-  });
-  return (
-    <div ref={squareRef} onClick={hybridClick}>
-      <Header
-        onPointerDown={onPointerDown}
-        visiblePortion={visiblePortion}
-        data-tour={GuidedTourService.getStep(GuidedTours.Trace, Steps.Timeline)}
-      >
-        <Title level={4}>
-          Component Timeline HEIGHT{props.height} MAX{max}
-        </Title>
-      </Header>
-      <SkeletonTable loading={!trace || !selectedSpan}>
-        <TimelineChart trace={trace!} selectedSpan={selectedSpan} onSelectSpan={onSelectSpan} />
-      </SkeletonTable>
-    </div>
-  );
-};
-
-export default TraceTimeline;
