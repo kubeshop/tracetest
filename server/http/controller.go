@@ -32,7 +32,7 @@ func (s *controller) CreateTest(ctx context.Context, test openapi.Test) (openapi
 		return openapi.Response(http.StatusInternalServerError, err.Error()), err
 	}
 
-	analytics.CreateAndSendEvent("test-created-backend", "test")
+	analytics.CreateAndSendEvent("test_created_backend", "test")
 
 	test.TestId = id
 	return openapi.Response(200, test), nil
@@ -56,7 +56,7 @@ func (s *controller) UpdateTest(ctx context.Context, testid string, updated open
 		return openapi.Response(http.StatusInternalServerError, err.Error()), err
 	}
 
-	analytics.CreateAndSendEvent("test-updated-backend", "test")
+	analytics.CreateAndSendEvent("test_updated_backend", "test")
 
 	return openapi.Response(204, nil), nil
 }
@@ -77,7 +77,7 @@ func (s *controller) DeleteTest(ctx context.Context, testid string) (openapi.Imp
 		return openapi.Response(http.StatusInternalServerError, err.Error()), err
 	}
 
-	analytics.CreateAndSendEvent("test-deleted-backend", "test")
+	analytics.CreateAndSendEvent("test_deleted_backend", "test")
 
 	return openapi.Response(204, nil), nil
 }
@@ -126,7 +126,7 @@ func (s *controller) RunTest(ctx context.Context, testid string) (openapi.ImplRe
 
 	result := s.runner.Run(*test)
 
-	analytics.CreateAndSendEvent("test-run-backend", "test")
+	analytics.CreateAndSendEvent("test_run_backend", "test")
 
 	return openapi.Response(200, result), nil
 }
@@ -219,7 +219,7 @@ func (s *controller) UpdateAssertion(ctx context.Context, testID string, asserti
 		return openapi.Response(http.StatusInternalServerError, err.Error()), err
 	}
 
-	analytics.CreateAndSendEvent("assertion-updated-backend", "test")
+	analytics.CreateAndSendEvent("assertion_updated_backend", "test")
 
 	return openapi.Response(http.StatusNoContent, nil), nil
 }
@@ -235,7 +235,7 @@ func (s *controller) DeleteAssertion(ctx context.Context, testID string, asserti
 		return openapi.Response(http.StatusInternalServerError, err.Error()), err
 	}
 
-	analytics.CreateAndSendEvent("assertion-deleted-backend", "test")
+	analytics.CreateAndSendEvent("assertion_deleted_backend", "test")
 
 	return openapi.Response(http.StatusNoContent, nil), nil
 }

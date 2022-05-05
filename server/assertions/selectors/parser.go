@@ -30,8 +30,8 @@ type parserValue struct {
 }
 
 type parserPseudoClass struct {
-	Type  string       `":" @("nth_child")`
-	Value *parserValue `"(" @@* ")"`
+	Type  string       `":" @("nth_child" | "first" | "last")`
+	Value *parserValue `("(" @@* ")")*`
 }
 
 func CreateParser() (*participle.Parser, error) {
