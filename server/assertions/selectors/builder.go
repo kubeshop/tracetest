@@ -107,7 +107,12 @@ func getOperatorFunction(operator string) (filterFunction, error) {
 	}
 
 	return func(span traces.Span, attribute string, value Value) error {
-		attrValue := span.Attributes.Get(attribute)
+		var attrValue string
+		if attribute == "name" {
+			attrValue = span.Name
+		} else {
+			attrValue = span.Attributes.Get(attribute)
+		}
 		return comparator.Compare(value.AsString(), attrValue)
 	}, nil
 }
