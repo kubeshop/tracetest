@@ -638,7 +638,7 @@ flowchart TD
 ```
 ## pseudo-classes support
 
-Sometimes filtering by attributes is not enough because we might have two or three identical spans in the three, but we only want to assert one of them. For example, imagine a system that has a `retry` policy for all the HTTP requests it sends. How would we allow a user to validate if the `third` execution was successful without asserting the other two spans?
+Sometimes filtering by attributes is not enough because we might have two or three identical spans in the tree, but we only want to assert one of them. For example, imagine a system that has a `retry` policy for all the HTTP requests it sends. How would we allow a user to validate if the `third` execution was successful without asserting the other two spans?
 
 This is where pseudo-classes enter the scene. Those are ways of filtering spans by data that is not present in the span itself. For example, the order which the span appears.
 
@@ -1128,6 +1128,8 @@ Even with all those capabilities, we might have problems with ambiguous selector
 In our example, you can notice that `auth-api` is called twice from different parts of the trace. At first by `product-api` and later by `cart-api`.
 
 What if I want to test if a product only available in US can be bought in UK? The product can be seen by the user, but it cannot be bought if the user is outside US. Certainly I cannot apply the same assertions on all `auth-api` spans, otherwise the test will not pass.
+
+> :information_source: When you filter by parent-child relation, it matches spans recursively ai all levels bellow the parent. This doesn't match only direct children of the parent, but all other spans in the sub-tree.
 
 For example:
 
