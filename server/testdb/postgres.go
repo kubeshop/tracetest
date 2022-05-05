@@ -10,10 +10,7 @@ import (
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/google/uuid"
-	"github.com/j2gg0s/otsql"
-	"github.com/j2gg0s/otsql/hook/trace"
 	"github.com/kubeshop/tracetest/openapi"
-	pq "github.com/lib/pq"
 )
 
 type postgresDB struct {
@@ -21,34 +18,17 @@ type postgresDB struct {
 	migrationsFolder string
 }
 
-func Postgres(dsn string, options ...PostgresOption) (Repository, error) {
+func Postgres(options ...PostgresOption) (Repository, error) {
 	postgres := &postgresDB{}
-	connector, err := pq.NewConnector(dsn)
-	if err != nil {
-		return nil, fmt.Errorf("sql open: %w", err)
-	}
-	db := sql.OpenDB(
-		otsql.WrapConnector(connector,
-			otsql.WithHooks(
-				trace.New(
-					trace.WithQuery(true),
-					trace.WithQueryParams(true),
-					trace.WithRowsAffected(true),
-				),
-			),
-		),
-	)
-	postgres.db = db
 	postgres.migrationsFolder = "file://./migrations"
-
 	for _, option := range options {
-		err = option(postgres)
+		err := option(postgres)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	err = postgres.ensureLatestMigration()
+	err := postgres.ensureLatestMigration()
 	if err != nil {
 		return nil, fmt.Errorf("could not execute migrations: %w", err)
 	}

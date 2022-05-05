@@ -8,13 +8,21 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/kubeshop/tracetest/openapi"
+	"github.com/kubeshop/tracetest/test"
 	"github.com/kubeshop/tracetest/testdb"
 	"github.com/stretchr/testify/assert"
 )
 
 func getDB() (testdb.Repository, error) {
-	dsn := "host=localhost user=postgres password=postgres port=5432 sslmode=disable"
-	return testdb.Postgres(dsn, testdb.WithMigrations("file://../migrations"))
+	db, err := test.GetTestingDatabase()
+	if err != nil {
+		return nil, err
+	}
+
+	return testdb.Postgres(
+		testdb.WithDB(db),
+		testdb.WithMigrations("file://../migrations"),
+	)
 }
 
 func TestCreateTest(t *testing.T) {
