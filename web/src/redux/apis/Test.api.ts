@@ -38,7 +38,10 @@ const TestAPI = createApi({
       query: id => `/tests/${id}`,
       providesTags: result => [{type: 'Test', id: result?.testId}],
     }),
-
+    deleteTestById: build.mutation<ITest, string>({
+      query: id => ({url: `/tests/${id}`, method: 'DELETE'}),
+      invalidatesTags: [{type: 'Test', id: 'LIST'}],
+    }),
     // Assertions
     getAssertions: build.query<IAssertion[], string>({
       query: testId => `/tests/${testId}/assertions`,
@@ -98,6 +101,7 @@ export const {
   useGetTestListQuery,
   useRunTestMutation,
   useUpdateAssertionMutation,
+  useDeleteTestByIdMutation,
   useUpdateResultMutation,
 } = TestAPI;
 export const {endpoints} = TestAPI;

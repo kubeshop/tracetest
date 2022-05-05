@@ -1,11 +1,13 @@
-import {Table} from 'antd';
+import {Dropdown, Menu, Table} from 'antd';
 import {useRef} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {useGetTestListQuery} from 'redux/apis/Test.api';
+import {MoreOutlined} from '@ant-design/icons';
+import {useDeleteTestByIdMutation, useGetTestListQuery} from 'redux/apis/Test.api';
 import CustomTable from '../../components/CustomTable';
 import HomeAnalyticsService from '../../services/Analytics/HomeAnalytics.service';
 import NoResults from './NoResults';
 import {ITest} from '../../types/Test.types';
+import {useMenuDeleteCallback} from './useMenuDeleteCallback';
 
 const {onTestClick} = HomeAnalyticsService;
 
@@ -13,6 +15,8 @@ const TestList = () => {
   const navigate = useNavigate();
   const eventRef = useRef<{previousPageX: number; currentPageX: number}>({previousPageX: 0, currentPageX: 0});
   const {data: testList = [], isLoading} = useGetTestListQuery();
+
+  const [deleteTestMutation] = useDeleteTestByIdMutation();
 
   const handleMouseUp = (event: any) => {
     if (event.type === 'mousedown') {
@@ -25,7 +29,7 @@ const TestList = () => {
       }
     }
   };
-
+  const onDelete = useMenuDeleteCallback(deleteTestMutation);
   return (
     <CustomTable
       scroll={{y: 'calc(100vh - 300px)'}}
@@ -61,6 +65,28 @@ const TestList = () => {
             </span>
           );
         }}
+      />
+      <Table.Column<ITest>
+        title="Actions"
+        key="actions"
+        align="right"
+        render={i => (
+          <Dropdown
+            overlay={
+              <Menu>
+                <Menu.Item onClick={onDelete(i)} key="delete">
+                  Delete
+                </Menu.Item>
+              </Menu>
+            }
+            placement="bottomLeft"
+            trigger={['click']}
+          >
+            <span className="ant-dropdown-link" onClick={e => e.stopPropagation()}>
+              <MoreOutlined style={{fontSize: 24}} />
+            </span>
+          </Dropdown>
+        )}
       />
     </CustomTable>
   );
