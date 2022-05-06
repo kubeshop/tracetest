@@ -139,7 +139,7 @@ const TestPage = () => {
                 <Button type="text" shape="circle" onClick={() => navigate('/')}>
                   <ArrowLeftOutlined style={{fontSize: 24, marginRight: 16}} />
                 </Button>
-                <Title style={{margin: 0}} level={3}>
+                <Title style={{margin: 0}} level={3} data-cy="test-details-name">
                   {test?.name}
                 </Title>
               </S.Header>

@@ -23,23 +23,26 @@ const Header: FC = () => {
     <S.Header>
       <Link to="/">
         <S.TitleText>
-          <img src={Logo} />
+          <img data-cy="logo" src={Logo} />
         </S.TitleText>
       </Link>
       <S.NavMenu selectedKeys={[pathname]}>
         <S.NavMenuItem key={GITHUB_URL}>
-          <a href={GITHUB_URL} target="_blank">
+          <a href={GITHUB_URL} target="_blank" data-cy="github-link">
             GitHub
           </a>
         </S.NavMenuItem>
         <S.NavMenuItem key={DOCUMENTATION_URL}>
-          <a href={DOCUMENTATION_URL} target="_blank">
+          <a href={DOCUMENTATION_URL} target="_blank" data-cy="documentation-link">
             Documentation
           </a>
         </S.NavMenuItem>
-        <Menu.SubMenu key="help" icon={<QuestionCircleOutlined style={{color: '#E5E5E5', fontSize: 16}} />}>
+        <Menu.SubMenu
+          key="help"
+          icon={<QuestionCircleOutlined data-cy="onboarding-link" style={{color: '#E5E5E5', fontSize: 16}} />}
+        >
           <S.NavMenuItem key="guidedTour" onClick={handleGuidedTourCLick}>
-            Show Onboarding{' '}
+            Show Onboarding
           </S.NavMenuItem>
         </Menu.SubMenu>
       </S.NavMenu>
