@@ -18,8 +18,16 @@ export const TestDetailsHeader = styled.div`
   margin: 32px 0px 24px;
 `;
 
-export const Wrapper = styled.div`
-  padding: 0px 24px;
+export const Wrapper = styled.div<{detail?: boolean}>`
+  ${props =>
+    props.detail
+      ? css`
+          padding: 0px 24px;
+        `
+      : ''}
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
 `;
 
 const IndeterminateAnimation = keyframes`
@@ -62,4 +70,19 @@ export const TestTabs = styled(AntTabs)<{loading: string}>`
       `;
     }
   }}
+  .ant-tabs-content-holder {
+    display: flex;
+  }
+
+  .ant-tabs-tabpane {
+    display: flex;
+  }
+
+  .ant-tabs-nav {
+    margin: 0;
+  }
+
+  .ant-tabs-content {
+    flex-grow: 1;
+  }
 `;

@@ -32,7 +32,7 @@ const TestDetails: FC<TTestDetailsProps> = ({testId, testResultList, isLoading, 
   }, [onSelectResult, runTest, testId]);
 
   return (
-    <div style={{height: 'calc(100vh - 250px)'}}>
+    <div>
       <S.TestDetailsHeader>
         <Typography.Title level={5}>{url}</Typography.Title>
         <Button

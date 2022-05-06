@@ -8,7 +8,7 @@ import {CloseOutlined, ArrowLeftOutlined} from '@ant-design/icons';
 import {useLocation, useNavigate, useParams} from 'react-router-dom';
 import {useGetTestByIdQuery, useGetResultByIdQuery, useGetResultListQuery} from 'redux/apis/Test.api';
 
-import Trace from 'components/Trace';
+import {Trace} from 'components/Trace/Trace';
 import Layout from 'components/Layout';
 import TestStateBadge from 'components/TestStateBadge';
 
@@ -157,9 +157,10 @@ const TestPage = () => {
           onChange={onChangeTab}
           type="editable-card"
           onEdit={onEditTab}
+          style={{flexGrow: 1, display: 'flex', margin: 0}}
         >
           <Tabs.TabPane tab="Test Details" key="1" closeIcon={<CloseOutlined hidden />}>
-            <S.Wrapper>
+            <S.Wrapper detail>
               <TestDetails
                 testResultList={testResultList}
                 isLoading={isLoading}

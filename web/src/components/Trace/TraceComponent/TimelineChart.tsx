@@ -1,40 +1,18 @@
 import {useEffect, useMemo, useRef} from 'react';
-import styled from 'styled-components';
 import * as d3 from 'd3';
-
-import Title from 'antd/lib/typography/Title';
-
-import './TimelineChart.css';
-import SkeletonTable from 'components/SkeletonTable';
-import GuidedTourService, {GuidedTours} from '../../services/GuidedTour.service';
-import {Steps} from '../GuidedTour/traceStepList';
-import TraceAnalyticsService from '../../services/Analytics/TraceAnalytics.service';
-import {ITrace} from '../../types/Trace.types';
+import {ITrace} from 'types/Trace.types';
+import TraceAnalyticsService from '../../../services/Analytics/TraceAnalytics.service';
 
 const {onTimelineSpanClick} = TraceAnalyticsService;
-
-const Header = styled.div`
-  display: flex;
-  align-items: center;
-  width: 100%;
-  height: 56px;
-  padding: 0 16px;
-  color: rgb(213, 215, 224);
-`;
 
 interface ITimelineChartProps {
   trace: ITrace;
   selectedSpan: any;
+
   onSelectSpan(spanId: string): void;
 }
 
-interface IProps {
-  trace?: ITrace;
-  selectedSpan?: any;
-  onSelectSpan(spanId: string): void;
-}
-
-const TimelineChart = ({trace, selectedSpan, onSelectSpan}: ITimelineChartProps) => {
+export const TimelineChart = ({trace, selectedSpan, onSelectSpan}: ITimelineChartProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
   let treeFactory = d3.tree().size([200, 450]).nodeSize([0, 5]);
 
@@ -255,18 +233,3 @@ const TimelineChart = ({trace, selectedSpan, onSelectSpan}: ITimelineChartProps)
 
   return <svg ref={svgRef} />;
 };
-
-const TraceTimeline = ({trace, selectedSpan, onSelectSpan}: IProps) => {
-  return (
-    <div>
-      <Header data-tour={GuidedTourService.getStep(GuidedTours.Trace, Steps.Timeline)}>
-        <Title level={4}>Component Timeline</Title>
-      </Header>
-      <SkeletonTable loading={!trace || !selectedSpan}>
-        <TimelineChart trace={trace!} selectedSpan={selectedSpan} onSelectSpan={onSelectSpan} />
-      </SkeletonTable>
-    </div>
-  );
-};
-
-export default TraceTimeline;

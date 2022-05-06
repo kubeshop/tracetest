@@ -17,8 +17,8 @@ export const TitleText = styled(Typography.Title).attrs({
 })``;
 
 export const Wrapper = styled.div`
-  height: calc(100vh - 200px);
   padding: 0 24px;
+  flex-grow: 1;
 `;
 
 export const ActionContainer = styled.div`

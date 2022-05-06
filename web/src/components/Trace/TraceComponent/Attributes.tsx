@@ -1,15 +1,15 @@
 import {Typography} from 'antd';
 import SkeletonTable from 'components/SkeletonTable';
 import {FC} from 'react';
-import {ISpanFlatAttribute} from '../../types/Span.types';
-import SpanAttributesTable from '../SpanAttributesTable/SpanAttributesTable';
+import {ISpanFlatAttribute} from 'types/Span.types';
 import * as S from './Attributes.styled';
+import SpanAttributesTable from '../../SpanAttributesTable/SpanAttributesTable';
 
-type TAttributesProps = {
+interface TAttributesProps {
   spanAttributeList?: ISpanFlatAttribute[];
-};
+}
 
-const Attributes: FC<TAttributesProps> = ({spanAttributeList = []}) => {
+export const Attributes: FC<TAttributesProps> = ({spanAttributeList = []}) => {
   return (
     <S.Container>
       <S.Header>
@@ -21,5 +21,3 @@ const Attributes: FC<TAttributesProps> = ({spanAttributeList = []}) => {
     </S.Container>
   );
 };
-
-export default Attributes;
