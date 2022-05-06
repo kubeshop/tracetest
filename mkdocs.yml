@@ -24,6 +24,7 @@ nav:
   - Architecture: architecture.md
   - Creating Tests: create-test.md
   - Adding Assertions: adding-assertions.md
+  - Selectors: advanced-selectors.md
   - OpenAPI Definition: openapi.md
   - Development: development.md
 
