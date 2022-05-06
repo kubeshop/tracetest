@@ -1,11 +1,11 @@
 OPENAPI_SERVER_TARGET_DIR=./server/openapi
-server-generate:
+server-generate: proto
 	$(eval TMPDIR := $(shell mktemp -d))
 	rm -rf $(OPENAPI_SERVER_TARGET_DIR)
 
 	openapi-generator-cli generate -i api/openapi.yaml -g go-server -o $(TMPDIR)
-	mv $(TMPDIR)/go server/openapi
-	rm -f server/openapi/api_api_service.go
+	rm -f $(TMPDIR)/api_api_service.go
+	mv $(TMPDIR)/go $(OPENAPI_SERVER_TARGET_DIR)
 	rm -rf $(TMPDIR)
 
 	cd server; pwd; go fmt ./...; cd ..
@@ -51,7 +51,7 @@ PROTO_GOGO_MAPPINGS := $(shell echo \
 		Mmodel.proto=github.com/jaegertracing/jaeger/model \
 	| sed 's/ //g')
 
-PROTO_GEN_GO_DIR ?= server/go/internal/proto-gen-go
+PROTO_GEN_GO_DIR ?= server/internal/proto-gen-go
 
 PROTOC_WITH_GRPC := $(PROTOC) \
 		$(PROTO_INCLUDES) \
@@ -65,16 +65,14 @@ SWAGGER_IMAGE=quay.io/goswagger/swagger:$(SWAGGER_VER)
 SWAGGER=docker run --rm -u ${shell id -u} -v "${PWD}:/go/src/${PROJECT_ROOT}" -w /go/src/${PROJECT_ROOT} $(SWAGGER_IMAGE)
 
 proto:
-	rm -rf ./$(PROTO_GEN_GO_DIR)
-	mkdir -p ${PROTO_GEN_GO_DIR}
-	mkdir -p swagger
+	$(eval TMPDIR := $(shell mktemp -d))
+	rm -rf $(PROTO_GEN_GO_DIR)
 
-	# API v3
+	openapi-generator-cli generate -i api/openapi.yaml -g go-server -o $(TMPDIR)
+	mv $(TMPDIR)/go $(PROTO_GEN_GO_DIR)
+	rm -rf $(TMPDIR)
+
 	$(PROTOC_WITH_GRPC) \
-		jaeger-idl/proto/api_v3/query_service.proto
-
-	$(PROTOC_INTERNAL) \
-		--swagger_out=disable_default_errors=true,json_names_for_fields=true,logtostderr=true:./swagger \
 		jaeger-idl/proto/api_v3/query_service.proto
 
 	$(PROTOC_INTERNAL) \
@@ -86,9 +84,4 @@ proto:
 
 	$(PROTOC_WITH_GRPC) \
 		tempo-idl/tempo.proto
-	cp tempo-idl/prealloc.go server/go/internal/proto-gen-go/tempo-idl/
-
-swagger: proto
-	cp swagger/api_v3/query_service.swagger.json api/trace.json
-	cat api/trace.json | yq e -P - > api/trace.yaml
-	rm api/trace.json
+	cp tempo-idl/prealloc.go $(PROTO_GEN_GO_DIR)/tempo-idl/

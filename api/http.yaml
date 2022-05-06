@@ -1,0 +1,79 @@
+openapi: 3.0.0
+definitions:
+  HTTPRequest:
+    type: object
+    properties:
+      url:
+        type: string
+      method:
+        type: string
+        enum: [GET, PUT, POST, PATCH, DELETE, COPY, HEAD, OPTIONS, LINK, UNLINK, PURGE, LOCK, UNLOCK, PROPFIND, VIEW]
+      headers:
+        type: array
+        items:
+          type: object
+          properties:
+            key:
+              type: string
+            value:
+              type: string
+      body:
+        type: string
+        format: byte
+      auth:
+        $ref: "#/definitions/HTTPAuth"
+      proxy:
+        type: object
+        description: TODO
+      certificate:
+        type: object
+        description: TODO
+
+  HTTPResponse:
+    type: object
+    properties:
+      status:
+        type: string
+      statusCode:
+        type: integer
+      headers:
+        type: array
+        items:
+          type: object
+          properties:
+            key:
+              type: string
+            value:
+              type: string
+      body:
+        type: string
+        format: byte
+
+  HTTPAuth:
+    type: object
+    properties:
+      type:
+        type: string
+        enum: [apiKey, basic, bearer]
+      apiKey:
+        type: object
+        properties:
+          key:
+            type: string
+          value:
+            type: string
+          in:
+            type: string
+            enum: [query, header]
+      basic:
+        type: object
+        properties:
+          username:
+            type: string
+          password:
+            type: string
+      bearer:
+        type: object
+        properties:
+          token:
+            type: string

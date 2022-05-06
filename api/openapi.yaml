@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: 0.0.1
+  version: 0.2.1
   title: TraceTest
   description: OpenAPI definition for TraceTest endpoint and resources
 servers:
@@ -203,7 +203,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/TestAssertionResult"
+              $ref: "#/components/schemas/TestRunResult"
       responses:
         200:
           description: successful operation
@@ -340,14 +340,14 @@ paths:
       responses:
         "204":
           description: OK
+
 components:
   schemas:
     Test:
       type: object
       properties:
-        testId:
+        id:
           type: string
-          description: ID
           format: uuid
           readOnly: true
         name:
@@ -359,56 +359,63 @@ components:
           properties:
             id:
               type: string
-              description: ID
               format: uuid
               readOnly: true
             request:
-              $ref: "#/components/schemas/HTTPRequest"
-        assertions:
-          type: array
-          items:
-            $ref: "#/components/schemas/Assertion"
+              $ref: "./http.yaml#/definitions/HTTPRequest"
+        definition:
+          type: object
+          $ref: "#/components/schemas/TestDefinition"
           description: Definition of assertions that are going to be made
         referenceTestRunResult:
           $ref: "#/components/schemas/TestRunResult"
+
+    TestDefinition:
+      type: object
+      description: Map using selector query as key, and an array of assertions as value
+      additionalProperties:
+        type: array
+        items:
+          $ref: '#/components/schemas/Assertion'
+      example:
+        'span[tracetest.span.type="http"]':
+          - attr: tracetest.span.duration
+            comparator: "<"
+            expected: "2000"
+          - attr: http.status_code
+            comparator: "="
+            expected: "200"
+
     Assertion:
       type: object
       properties:
-        assertionId:
+        id:
           type: string
-          description: ID
           format: uuid
           readOnly: true
-        selectors:
-          type: array
-          items:
-            $ref: "#/components/schemas/SelectorItem"
-        selector:
+        attr:
           type: string
-        spanAssertions:
-          type: array
-          items:
-            $ref: "#/components/schemas/SpanAssertion"
-    TestRunResult:
+        comparator:
+          type: string
+        expected:
+          type: string
+
+    TestRun:
       type: object
       properties:
         resultId:
           type: string
-          description: ID
           format: uuid
           readOnly: true
         testId:
           type: string
-          description: test ID
           format: uuid
           readOnly: true
         traceId:
           type: string
-          description: trace ID
           readOnly: true
         spanId:
           type: string
-          description: parent span ID
           readOnly: true
         state:
           type: string
@@ -423,181 +430,26 @@ components:
         completedAt:
           type: string
           format: date-time
+        request:
+          $ref: "./http.yaml#/definitions/HTTPRequest"
         response:
-          $ref: "#/components/schemas/HTTPResponse"
+          $ref: "./http.yaml#/definitions/HTTPResponse"
           description: TODO(pov) This is HTTP Response object for now, at some point it might be GRPC/SOAP/...
-        trace:
-          $ref: "./trace.yaml#/definitions/api_v3SpansResponseChunk"
-        assertionResultState:
-          type: boolean
-          description: True if all trace spans passed the assertion test
-        assertionResult:
-          type: array
-          description: List of all tested span assertions
-          items:
-            $ref: "#/components/schemas/AssertionResult"
-    TestAssertionResult:
+        result:
+          $ref: "#/components/schemas/HTTPResponse"
+
+    TestRunResult:
       type: object
-      properties:
-        assertionResultState:
-            type: boolean
-            description: True if all trace spans passed the assertion test
-        assertionResult:
-          type: array
-          description: List of all tested span assertions
-          items:
-            $ref: "#/components/schemas/AssertionResult"
-    Attribute:
-      type: object
-      properties:
-        id:
-          type: string
-          description: ID
-          readOnly: true
-        key:
-          type: string
-        value:
-          type: string
-    SelectorItem:
-      type: object
-      properties:
-        locationName:
-          type: string
-          enum: [RESOURCE_ATTRIBUTES, INSTRUMENTATION_LIBRARY, SPAN, SPAN_ATTRIBUTES]
-          description: Example "SPAN"
-        propertyName:
-          type: string
-          description: Example "operation"
-        value:
-          type: string
-          description: Example "POST /users/verify"
-        valueType:
-          type: string
-          description: TODO(pov) think about value types?
-          enum: [stringValue, intValue]
-    SpanAssertion:
-      type: object
-      properties:
-        spanAssertionId:
-          type: string
-          description: ID
-          readOnly: true
-        locationName:
-          type: string
-          enum: [RESOURCE_ATTRIBUTES, INSTRUMENTATION_LIBRARY, SPAN, SPAN_ATTRIBUTES]
-          description: Example "SPAN_ATTRIBUTES"
-        propertyName:
-          type: string
-          description: Example "http.status.code"
-        valueType:
-          type: string
-          description: Example "intValue"
-          enum: [stringValue, intValue]
-        operator:
-          type: string
-          description: Example "EQUALS"
-          enum: [EQUALS, LESSTHAN, GREATERTHAN, NOTEQUALS]
-        comparisonValue:
-          type: string
-          description: Example "200"
-    HTTPResponse:
-      type: object
-      properties:
-        status:
-          type: string
-        statusCode:
-          type: integer
-        headers:
-          type: array
-          items:
-            type: object
-            properties:
-              key:
-                type: string
-              value:
-                type: string
-        body:
-          type: string
-          format: byte
-    AssertionResult:
-      type: object
-      properties:
-        assertionId:
-          type: string
-          description: ID
-        spanAssertionResults:
-          type: array
-          items:
-            $ref: "#/components/schemas/SpanAssertionResult"
-    SpanAssertionResult:
-      type: object
-      properties:
-        spanAssertionId:
-          type: string
-          description: ID
-        spanId:
-          type: string
-          description: ID
-        passed:
-          type: boolean
-          description: True if the span passed the assertion test
-        observedValue:
-          type: string
-          description: 'value that the trace for this test run contained'
-          readOnly: true
-    HTTPRequest:
-      type: object
-      properties:
-        url:
-          type: string
-        method:
-          type: string
-          enum: [GET, PUT, POST, PATCH, DELETE, COPY, HEAD, OPTIONS, LINK, UNLINK, PURGE, LOCK, UNLOCK, PROPFIND, VIEW]
-        headers:
-          type: array
-          items:
-            type: object
-            properties:
-              key:
-                type: string
-              value:
-                type: string
-        body:
-          type: string
-          format: byte
-        auth:
-          $ref: "#/components/schemas/HTTPAuth"
-        proxy:
-          type: object
-          description: TODO
-        certificate:
-          type: object
-          description: TODO
-    HTTPAuth:
-      type: object
-      properties:
-        type:
-          type: string
-          enum: [apiKey, basic, bearer]
-        apiKey:
-          type: object
-          properties:
-            key:
-              type: string
-            value:
-              type: string
-            in:
-              type: string
-              enum: [query, header]
-        basic:
-          type: object
-          properties:
-            username:
-              type: string
-            password:
-              type: string
-        bearer:
-          type: object
-          properties:
-            token:
-              type: string
+      description: Map using selector query as key, and an array of assertions as value
+      additionalProperties:
+        type: array
+        items:
+          $ref: '#/components/schemas/Assertion'
+      example:
+        'span[tracetest.span.type="http"]':
+          - attr: tracetest.span.duration
+            comparator: "<"
+            expected: "2000"
+          - attr: http.status_code
+            comparator: "="
+            expected: "200"
