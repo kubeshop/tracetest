@@ -77,7 +77,7 @@ Check out the [Installation](https://kubeshop.github.io/tracetest/installing/) a
 [Getting Started](https://kubeshop.github.io/tracetest/getting-started/) guides to set up Tracetest and
 run your first tests! It is still a 'work in progress' so please provide us with any and all [feedback](https://github.com/kubeshop/tracetest/issues/new/choose) - we live for input and will respond!
 
-We are in the our early days with the project and need your help. Have an idea to improve it? Please Create an issue here or join our community on Discord (link).
+We are in the our early days with the project and need your help. Have an idea to improve it? Please Create an issue here or join our community on [Discord](https://discord.gg/eBvEQRVyKX).
 
 Follow us on [Twitter at @tracetest_io](https://twitter.com/tracetest_io) for updates
 
