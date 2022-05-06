@@ -167,7 +167,9 @@ func (s *controller) UpdateTestResult(ctx context.Context, testid string, id str
 
 	testResult.AssertionResultState = testRunResult.AssertionResultState
 	testResult.AssertionResult = testRunResult.AssertionResult
-	testResult.State = executor.TestRunStateFinished
+	if isExpectingResultStateUpdate(testResult) {
+		testResult.State = executor.TestRunStateFinished
+	}
 
 	err = s.testDB.UpdateResult(ctx, testResult)
 	if err != nil {
@@ -175,6 +177,11 @@ func (s *controller) UpdateTestResult(ctx context.Context, testid string, id str
 	}
 
 	return openapi.Response(http.StatusOK, *testResult), nil
+}
+
+func isExpectingResultStateUpdate(r *openapi.TestRunResult) bool {
+	return r.State == executor.TestRunStateAwaitingTestResults
+
 }
 
 func (s *controller) CreateAssertion(ctx context.Context, testID string, assertion openapi.Assertion) (openapi.ImplResponse, error) {
