@@ -1,5 +1,5 @@
-import styled from 'styled-components';
-import noResultsIcon from '../../assets/SpanAssertionsEmptyState.svg';
+import styled, {css} from 'styled-components';
+import noResultsIcon from '../../../assets/SpanAssertionsEmptyState.svg';
 
 export const Header = styled.div`
   display: flex;
@@ -8,6 +8,21 @@ export const Header = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
+`;
+
+export const TraceHeader = styled.div<{visiblePortion: number}>`
+  display: flex;
+  align-items: center;
+  align-content: center;
+  align-items: center;
+  cursor: grab;
+  width: 100%;
+  ${props =>
+    css`
+      height: ${props.visiblePortion}px;
+    `}
+  margin: 0 16px;
+  color: rgb(213, 215, 224);
 `;
 
 export const Container = styled.div`

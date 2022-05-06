@@ -1,5 +1,5 @@
-import { ISpan } from '../../types/Span.types';
-import { ITrace } from '../../types/Trace.types';
+import {ISpan} from '../../types/Span.types';
+import {ITrace} from '../../types/Trace.types';
 import DAGComponent from './components/DAG';
 
 export enum SupportedDiagrams {
@@ -17,10 +17,8 @@ const ComponentMap: Record<string, typeof DAGComponent> = {
   [SupportedDiagrams.DAG]: DAGComponent,
 };
 
-const Diagram: React.FC<IDiagramProps> = ({type, ...props}) => {
+export const Diagram: React.FC<IDiagramProps> = ({type, ...props}) => {
   const Component = ComponentMap[type || ''] || DAGComponent;
 
   return <Component type={type} {...props} />;
 };
-
-export default Diagram;

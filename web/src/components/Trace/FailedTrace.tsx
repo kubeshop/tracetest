@@ -1,14 +1,26 @@
 import {Button, Typography} from 'antd';
+import {useCallback} from 'react';
 import {DISCORD_URL, GITHUB_ISSUES_URL} from '../../constants/Common.constants';
+import {useRunTestMutation} from '../../redux/apis/Test.api';
+import {ITestRunResult} from '../../types/TestRunResult.types';
 import * as S from './FailedTrace.styled';
 
-interface FailedTraceProps {
-  onReRun(): void;
+interface IFailedTraceProps {
+  isDisplayingError: boolean;
+  testId: string;
   onEdit(): void;
+  onRunTest(result: ITestRunResult): void;
 }
 
-const FailedTrace: React.FC<FailedTraceProps> = ({onReRun, onEdit}) => {
-  return (
+const FailedTrace: React.FC<IFailedTraceProps> = ({onRunTest, onEdit, testId, isDisplayingError}) => {
+  const [runNewTest] = useRunTestMutation();
+
+  const onReRun = useCallback(async () => {
+    const result = await runNewTest(testId).unwrap();
+    onRunTest(result);
+  }, [onRunTest, runNewTest, testId]);
+
+  return isDisplayingError ? (
     <S.FailedTrace>
       <S.Container>
         <S.FailedIcon />
@@ -31,7 +43,7 @@ const FailedTrace: React.FC<FailedTraceProps> = ({onReRun, onEdit}) => {
         </S.ButtonContainer>
       </S.Container>
     </S.FailedTrace>
-  );
+  ) : null;
 };
 
 export default FailedTrace;

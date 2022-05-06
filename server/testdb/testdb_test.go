@@ -8,13 +8,25 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/kubeshop/tracetest/openapi"
+	"github.com/kubeshop/tracetest/test"
 	"github.com/kubeshop/tracetest/testdb"
 	"github.com/stretchr/testify/assert"
 )
 
+func getDB() (testdb.Repository, error) {
+	db, err := test.GetTestingDatabase()
+	if err != nil {
+		return nil, err
+	}
+
+	return testdb.Postgres(
+		testdb.WithDB(db),
+		testdb.WithMigrations("file://../migrations"),
+	)
+}
+
 func TestCreateTest(t *testing.T) {
-	dsn := "host=localhost user=postgres password=postgres port=5432 sslmode=disable"
-	db, err := testdb.Postgres(dsn)
+	db, err := getDB()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -48,8 +60,7 @@ func TestCreateTest(t *testing.T) {
 }
 
 func TestUpdateTest(t *testing.T) {
-	dsn := "host=localhost user=postgres password=postgres port=5432 sslmode=disable"
-	db, err := testdb.Postgres(dsn)
+	db, err := getDB()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -89,8 +100,7 @@ func TestUpdateTest(t *testing.T) {
 }
 
 func TestGetTest(t *testing.T) {
-	dsn := "host=localhost user=postgres password=postgres port=5432 sslmode=disable"
-	db, err := testdb.Postgres(dsn)
+	db, err := getDB()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -106,8 +116,7 @@ func TestGetTest(t *testing.T) {
 }
 
 func TestGetTests(t *testing.T) {
-	dsn := "host=localhost user=postgres password=postgres port=5432 sslmode=disable"
-	db, err := testdb.Postgres(dsn)
+	db, err := getDB()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -144,8 +153,7 @@ func TestGetTests(t *testing.T) {
 }
 
 func TestCreateResults(t *testing.T) {
-	dsn := "host=localhost user=postgres password=postgres port=5432 sslmode=disable"
-	db, err := testdb.Postgres(dsn)
+	db, err := getDB()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -192,8 +200,7 @@ func TestCreateResults(t *testing.T) {
 }
 
 func TestCreateAssertions(t *testing.T) {
-	dsn := "host=localhost user=postgres password=postgres port=5432 sslmode=disable"
-	db, err := testdb.Postgres(dsn)
+	db, err := getDB()
 	if err != nil {
 		t.Fatal(err)
 	}

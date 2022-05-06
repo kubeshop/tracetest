@@ -35,6 +35,7 @@ const TestList = () => {
       scroll={{y: 'calc(100vh - 300px)'}}
       dataSource={testList?.map(el => ({...el, url: el.serviceUnderTest.request.url})).reverse()}
       rowKey="testId"
+      data-cy="testList"
       locale={{emptyText: <NoResults />}}
       loading={isLoading}
       onRow={record => {
@@ -70,11 +71,11 @@ const TestList = () => {
         title="Actions"
         key="actions"
         align="right"
-        render={i => (
+        render={(test: ITest) => (
           <Dropdown
             overlay={
               <Menu>
-                <Menu.Item onClick={onDelete(i)} key="delete">
+                <Menu.Item data-cy="test-delete-button" onClick={onDelete(test)} key="delete">
                   Delete
                 </Menu.Item>
               </Menu>
@@ -82,7 +83,7 @@ const TestList = () => {
             placement="bottomLeft"
             trigger={['click']}
           >
-            <span className="ant-dropdown-link" onClick={e => e.stopPropagation()}>
+            <span data-cy={`test-actions-button-${test.testId}`} className="ant-dropdown-link" onClick={e => e.stopPropagation()}>
               <MoreOutlined style={{fontSize: 24}} />
             </span>
           </Dropdown>

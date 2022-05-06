@@ -45,7 +45,6 @@ const getTestResultCount = (assertionResultList: TAssertionResultList, type: 'al
 const TextDetailsTable: FC<TextRowProps> = ({isLoading, onSelectResult, testResultList}) => {
   return (
     <CustomTable
-      scroll={{y: 'calc(100vh - 450px)'}}
       pagination={{pageSize: 10}}
       rowKey="resultId"
       loading={isLoading}
@@ -99,8 +98,7 @@ const TextDetailsTable: FC<TextRowProps> = ({isLoading, onSelectResult, testResu
         dataIndex="state"
         render={(value, {state, assertionResult = []}: ITestRunResult) => {
           if (validStatusList.includes(state)) {
-            const passedAssertionsCount = getTestResultCount(assertionResult, 'all');
-            return passedAssertionsCount;
+            return getTestResultCount(assertionResult, 'all');
           }
 
           return '';
@@ -119,8 +117,7 @@ const TextDetailsTable: FC<TextRowProps> = ({isLoading, onSelectResult, testResu
         dataIndex="state"
         render={(value, {state, assertionResult = []}: ITestRunResult) => {
           if (validStatusList.includes(state)) {
-            const passedAssertionsCount = getTestResultCount(assertionResult, 'passed');
-            return passedAssertionsCount;
+            return getTestResultCount(assertionResult, 'passed');
           }
 
           return '';
@@ -133,8 +130,7 @@ const TextDetailsTable: FC<TextRowProps> = ({isLoading, onSelectResult, testResu
         key="failed"
         render={(value, {state, assertionResult = []}: ITestRunResult) => {
           if (validStatusList.includes(state)) {
-            const passedAssertionsCount = getTestResultCount(assertionResult, 'failed');
-            return passedAssertionsCount;
+            return getTestResultCount(assertionResult, 'failed');
           }
 
           return '';

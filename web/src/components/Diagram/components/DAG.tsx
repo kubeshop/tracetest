@@ -83,7 +83,7 @@ const Diagram: React.FC<IDiagramProps> = ({trace, selectedSpan, onSelectSpan}): 
   }, [dagLayout, spanMap, selectedSpan?.spanId]);
 
   return (
-    <S.Container style={{height: Math.max(dagLayout?.layout?.height || 0, 900) + 100}}>
+    <S.Container style={{height: "100%" }}>
       <ReactFlow
         nodeTypes={{TraceNode}}
         defaultZoom={0.5}

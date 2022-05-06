@@ -24,4 +24,4 @@ export interface IRawTestRunResult {
   assertionResult: TAssertionResultList;
 }
 
-export type ITestRunResult = Modify<IRawTestRunResult, {trace?: ITrace}>;
+export type ITestRunResult = Modify<IRawTestRunResult, {trace?: ITrace} | undefined>;

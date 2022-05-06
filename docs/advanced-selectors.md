@@ -147,6 +147,9 @@ flowchart TD
 
 # Features
 
+## Empty selector
+By providing an empty selector, all spans from the trace are selected. Note that an empty selector is an empty string. Providing `span` or `span[]` as a selector will result as a syntax error.
+
 ## Filter by attributes
 The most basic way of filtering the spans you want to apply an assertion on is by using its attributes. A good starting example would be filtering all spans of type `http`:
 

@@ -9,7 +9,7 @@ interface ITestResultListState {
   resultListMap: Record<string, IAssertionResult[]>;
 }
 
-interface ITestResultListReplaceParams {
+export interface ITestResultListReplaceParams {
   resultList: IAssertionResult[];
   resultId: string;
 }

@@ -29,9 +29,13 @@ type TAnalyticsService<A> = {
   event(action: A, label: string): void;
 };
 
+const initializePromise = instance.initialize();
+
 const AnalyticsService = <A>(category: Categories): TAnalyticsService<A> => {
   const event = (action: A, label: string) => {
-    instance.event(String(action), label, category);
+    initializePromise.then(() => {
+      instance.event(String(action), label, category);
+    });
   };
 
   return {event};

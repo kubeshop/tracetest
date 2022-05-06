@@ -7,7 +7,7 @@ import (
 )
 
 type ParserSelector struct {
-	SpanSelectors []parserSpanSelector `( @@* ( "," @@ )*)`
+	SpanSelectors []parserSpanSelector `( @@* ( "," @@ )*)*`
 }
 
 type parserSpanSelector struct {
