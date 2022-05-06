@@ -54,10 +54,11 @@ const TestList = () => {
         title="Endpoint"
         dataIndex="url"
         key="url"
-        render={value => {
+        render={(value, {testId}: ITest) => {
           return (
             <span
               style={{paddingLeft: 16, paddingRight: 16}}
+              data-cy={`test-url-${testId}`}
               onMouseDown={handleMouseUp}
               onMouseUp={handleMouseUp}
               onClick={handleMouseUp}
@@ -83,7 +84,11 @@ const TestList = () => {
             placement="bottomLeft"
             trigger={['click']}
           >
-            <span data-cy={`test-actions-button-${test.testId}`} className="ant-dropdown-link" onClick={e => e.stopPropagation()}>
+            <span
+              data-cy={`test-actions-button-${test.testId}`}
+              className="ant-dropdown-link"
+              onClick={e => e.stopPropagation()}
+            >
               <MoreOutlined style={{fontSize: 24}} />
             </span>
           </Dropdown>

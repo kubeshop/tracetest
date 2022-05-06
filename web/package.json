@@ -39,9 +39,9 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test:unit": "react-scripts test",
+    "test:unit": "react-scripts test --watchAll=false",
     "test:integration": "npm run cy:run",
-    "test:lint": "eslint",
+    "test:lint": "eslint ./src/**/*.{ts,tsx}",
     "test:types": "tsc",
     "test": "npm run test:lint && npm run test:types && npm run test:unit && npm run test:integration",
     "eject": "react-scripts eject",

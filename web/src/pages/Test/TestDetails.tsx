@@ -39,6 +39,7 @@ const TestDetails: FC<TTestDetailsProps> = ({testId, testResultList, isLoading, 
           onClick={handleRunTest}
           loading={result.isLoading}
           type="primary"
+          data-cy="test-details-run-test-button"
           ghost
           data-tour={GuidedTourService.getStep(GuidedTours.TestDetails, Steps.RunTest)}
         >
