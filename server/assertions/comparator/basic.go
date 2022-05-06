@@ -83,11 +83,11 @@ var Lt Comparator = lt{}
 type lt struct{}
 
 func (c lt) Compare(expected, actual string) error {
-	a, b, err := parseNumbers(expected, actual)
+	expectedNumber, actualNumber, err := parseNumbers(expected, actual)
 	if err != nil {
 		return err
 	}
-	if a < b {
+	if actualNumber < expectedNumber {
 		return nil
 	}
 

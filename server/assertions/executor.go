@@ -1,8 +1,11 @@
 package assertions
 
 import (
+	"encoding/hex"
 	"fmt"
+	"time"
 
+	"github.com/kubeshop/tracetest/executor"
 	"github.com/kubeshop/tracetest/openapi"
 	"github.com/kubeshop/tracetest/traces"
 )
@@ -27,27 +30,64 @@ func (e Executor) Start() {
 	for {
 		select {
 		case request := <-e.inputChannel:
-			err := e.executeAssertions(request)
+			response, err := e.executeAssertions(request)
 			if err != nil {
 				fmt.Println(err)
 			}
 
-			e.outputChannel <- request
+			e.outputChannel <- *response
 		}
 	}
 }
 
-func (e Executor) executeAssertions(request RunAssertionsMessage) error {
+func (e Executor) executeAssertions(request RunAssertionsMessage) (*RunAssertionsMessage, error) {
 	trace, err := traces.FromOtel(request.Result.Trace)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	testDefinition := convertAssertionsIntoTestDefinition(request.Test.Assertions)
 
 	result := Assert(trace, testDefinition)
 
-	fmt.Println(result)
+	response := e.setResults(request, result)
 
-	return nil
+	return response, nil
+}
+
+func (e Executor) setResults(request RunAssertionsMessage, testResult TestResult) *RunAssertionsMessage {
+	response := request
+	response.Result.State = executor.TestRunStateFinished
+	response.Result.CompletedAt = time.Now()
+	assertionResultArray := make([]openapi.AssertionResult, 0)
+	allTestsPassed := true
+
+	for _, assertionResult := range testResult {
+		spanAssertions := make([]openapi.SpanAssertionResult, 0)
+		for _, spanAssertionResult := range assertionResult.AssertionSpanResults {
+			spanID := hex.EncodeToString(spanAssertionResult.Span.ID[:])
+			testPassed := spanAssertionResult.CompareErr == nil
+			if !testPassed {
+				allTestsPassed = false
+			}
+
+			spanAssertions = append(spanAssertions, openapi.SpanAssertionResult{
+				Passed:        testPassed,
+				SpanId:        spanID,
+				ObservedValue: spanAssertionResult.ActualValue,
+			})
+		}
+
+		result := openapi.AssertionResult{
+			AssertionId:          "", // TODO: populate assertionID
+			SpanAssertionResults: spanAssertions,
+		}
+
+		assertionResultArray = append(assertionResultArray, result)
+	}
+
+	response.Result.AssertionResult = assertionResultArray
+	response.Result.AssertionResultState = allTestsPassed
+
+	return &response
 }

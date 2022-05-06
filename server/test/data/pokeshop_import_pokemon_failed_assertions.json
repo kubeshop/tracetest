@@ -31,7 +31,7 @@
                         "propertyName": "http.status_code",
                         "valueType": "doubleValue",
                         "operator": "EQUALS",
-                        "comparisonValue": "200"
+                        "comparisonValue": "400"
                     }
                 ]
             },
