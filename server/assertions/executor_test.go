@@ -15,51 +15,58 @@ import (
 )
 
 func TestExecutorSuccessfulExecution(t *testing.T) {
-	test, result, err := loadTestFile("../test/data/pokeshop_import_pokemon.json")
-	require.NoError(t, err)
-
-	runAssertionsMessage := assertions.RunAssertionsMessage{
-		Test:   test,
-		Result: result,
+	testCases := []struct {
+		Name       string
+		Tracefile  string
+		ShouldPass bool
+	}{
+		{
+			Name:       "pokeshop - import pokemon: should pass",
+			Tracefile:  "../test/data/pokeshop_import_pokemon.json",
+			ShouldPass: true,
+		},
+		{
+			Name:       "pokeshop - import pokemon: should fail",
+			Tracefile:  "../test/data/pokeshop_import_pokemon_failed_assertions.json",
+			ShouldPass: false,
+		},
 	}
 
-	inputChannel := make(chan assertions.RunAssertionsMessage, 1)
-	outputChannel := make(chan assertions.RunAssertionsMessage, 1)
+	for _, testCase := range testCases {
+		t.Run(testCase.Name, func(t *testing.T) {
 
-	assertionExecutor := assertions.NewExecutor(inputChannel, outputChannel)
+			test, result, err := loadTestFile(testCase.Tracefile)
+			require.NoError(t, err)
 
-	go assertionExecutor.Start()
+			runAssertionsMessage := assertions.RunAssertionsMessage{
+				Test:   test,
+				Result: result,
+			}
 
-	inputChannel <- runAssertionsMessage
-	outputMessage := <-outputChannel
+			inputChannel := make(chan assertions.RunAssertionsMessage, 1)
+			outputChannel := make(chan assertions.RunAssertionsMessage, 1)
 
-	assert.NotNil(t, outputMessage)
-	assert.Equal(t, executor.TestRunStateFinished, outputMessage.Result.State)
-	assert.Equal(t, true, outputMessage.Result.AssertionResultState)
-}
+			assertionExecutor := assertions.NewExecutor(inputChannel, outputChannel)
 
-func TestExecutorFailedExecution(t *testing.T) {
-	test, result, err := loadTestFile("../test/data/pokeshop_import_pokemon_failed_assertions.json")
-	require.NoError(t, err)
+			go assertionExecutor.Start()
 
-	runAssertionsMessage := assertions.RunAssertionsMessage{
-		Test:   test,
-		Result: result,
+			inputChannel <- runAssertionsMessage
+			outputMessage := <-outputChannel
+
+			assert.NotNil(t, outputMessage)
+			if testCase.ShouldPass {
+				assert.Equal(t, executor.TestRunStateFinished, outputMessage.Result.State)
+				for _, assertionResult := range outputMessage.Result.AssertionResult {
+					for _, spanAssertionResult := range assertionResult.SpanAssertionResults {
+						assert.True(t, spanAssertionResult.Passed)
+					}
+				}
+				assert.True(t, outputMessage.Result.AssertionResultState)
+			} else {
+				assert.False(t, outputMessage.Result.AssertionResultState)
+			}
+		})
 	}
-
-	inputChannel := make(chan assertions.RunAssertionsMessage, 1)
-	outputChannel := make(chan assertions.RunAssertionsMessage, 1)
-
-	assertionExecutor := assertions.NewExecutor(inputChannel, outputChannel)
-
-	go assertionExecutor.Start()
-
-	inputChannel <- runAssertionsMessage
-	outputMessage := <-outputChannel
-
-	assert.NotNil(t, outputMessage)
-	assert.Equal(t, executor.TestRunStateFinished, outputMessage.Result.State)
-	assert.Equal(t, false, outputMessage.Result.AssertionResultState)
 }
 
 type testFile struct {
