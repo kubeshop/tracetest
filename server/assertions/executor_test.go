@@ -1,15 +1,19 @@
 package assertions_test
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/kubeshop/tracetest/assertions"
 	"github.com/kubeshop/tracetest/executor"
 	"github.com/kubeshop/tracetest/openapi"
+	"github.com/kubeshop/tracetest/test"
+	"github.com/kubeshop/tracetest/testdb"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -32,39 +36,50 @@ func TestExecutorSuccessfulExecution(t *testing.T) {
 		},
 	}
 
+	sqlDb, err := test.GetTestingDatabase()
+	require.NoError(t, err)
+
+	postgresRepository, err := testdb.Postgres(
+		testdb.WithDB(sqlDb),
+		testdb.WithMigrations("file://../migrations"),
+	)
+	require.NoError(t, err)
+
 	for _, testCase := range testCases {
 		t.Run(testCase.Name, func(t *testing.T) {
+			ctx := context.Background()
+			t.Parallel()
 
 			test, result, err := loadTestFile(testCase.Tracefile)
 			require.NoError(t, err)
 
-			runAssertionsMessage := assertions.RunAssertionsMessage{
-				Test:   test,
-				Result: result,
-			}
+			assertionExecutor := assertions.NewExecutor(postgresRepository)
 
-			inputChannel := make(chan assertions.RunAssertionsMessage, 1)
-			outputChannel := make(chan assertions.RunAssertionsMessage, 1)
+			_, err = postgresRepository.CreateTest(ctx, &test)
+			require.NoError(t, err)
 
-			assertionExecutor := assertions.NewExecutor(inputChannel, outputChannel)
+			err = postgresRepository.CreateResult(ctx, test.TestId, &result)
+			require.NoError(t, err)
 
-			go assertionExecutor.Start()
+			assertionExecutor.Start(1)
+			assertionExecutor.RunAssertions(test, result)
+			assertionExecutor.Stop()
 
-			inputChannel <- runAssertionsMessage
-			outputMessage := <-outputChannel
+			dbResult, err := postgresRepository.GetResult(ctx, result.ResultId)
+			require.NoError(t, err)
 
-			assert.NotNil(t, outputMessage)
 			if testCase.ShouldPass {
-				assert.Equal(t, executor.TestRunStateFinished, outputMessage.Result.State)
-				for _, assertionResult := range outputMessage.Result.AssertionResult {
+				assert.Equal(t, executor.TestRunStateFinished, dbResult.State)
+				for _, assertionResult := range dbResult.AssertionResult {
 					for _, spanAssertionResult := range assertionResult.SpanAssertionResults {
 						assert.True(t, spanAssertionResult.Passed)
 					}
 				}
-				assert.True(t, outputMessage.Result.AssertionResultState)
+				assert.True(t, dbResult.AssertionResultState)
 			} else {
-				assert.False(t, outputMessage.Result.AssertionResultState)
+				assert.False(t, dbResult.AssertionResultState)
 			}
+
 		})
 	}
 }
@@ -90,6 +105,9 @@ func loadTestFile(filePath string) (openapi.Test, openapi.TestRunResult, error) 
 	if err != nil {
 		return openapi.Test{}, openapi.TestRunResult{}, fmt.Errorf("could not parse test file: %w", err)
 	}
+
+	testFile.Test.TestId = uuid.NewString()
+	testFile.Result.ResultId = uuid.NewString()
 
 	return testFile.Test, testFile.Result, nil
 }
