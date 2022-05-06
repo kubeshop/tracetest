@@ -1,15 +1,14 @@
-package assertions
+package traces
 
 import (
 	"fmt"
 	"math"
 
 	"github.com/kubeshop/tracetest/openapi"
-	"github.com/kubeshop/tracetest/traces"
 	"go.opentelemetry.io/otel/trace"
 )
 
-func convertOTelTraceIntoTraceTree(trace openapi.ApiV3SpansResponseChunk) (traces.Trace, error) {
+func FromOtel(trace openapi.ApiV3SpansResponseChunk) (Trace, error) {
 	flattenSpans := make([]openapi.V1Span, 0)
 	for _, resource := range trace.ResourceSpans {
 		for _, librarySpans := range resource.InstrumentationLibrarySpans {
@@ -19,11 +18,11 @@ func convertOTelTraceIntoTraceTree(trace openapi.ApiV3SpansResponseChunk) (trace
 		}
 	}
 
-	spansMap := make(map[string]*traces.Span, 0)
+	spansMap := make(map[string]*Span, 0)
 	for _, span := range flattenSpans {
 		newSpan, err := convertOtelSpanIntoSpan(span)
 		if err != nil {
-			return traces.Trace{}, err
+			return Trace{}, err
 		}
 		spansMap[span.SpanId] = newSpan
 	}
@@ -31,8 +30,8 @@ func convertOTelTraceIntoTraceTree(trace openapi.ApiV3SpansResponseChunk) (trace
 	return createTrace(flattenSpans, spansMap), nil
 }
 
-func convertOtelSpanIntoSpan(span openapi.V1Span) (*traces.Span, error) {
-	attributes := make(traces.Attributes, 0)
+func convertOtelSpanIntoSpan(span openapi.V1Span) (*Span, error) {
+	attributes := make(Attributes, 0)
 	for _, attribute := range span.Attributes {
 		attributes[attribute.Key] = getAttributeValue(attribute.Value)
 	}
@@ -42,11 +41,11 @@ func convertOtelSpanIntoSpan(span openapi.V1Span) (*traces.Span, error) {
 		return nil, err
 	}
 
-	return &traces.Span{
+	return &Span{
 		ID:         spanID,
 		Name:       span.Name,
 		Parent:     nil,
-		Children:   make([]*traces.Span, 0),
+		Children:   make([]*Span, 0),
 		Attributes: attributes,
 	}, nil
 }
@@ -81,7 +80,7 @@ func createSpanID(id string) (trace.SpanID, error) {
 	return spanId, nil
 }
 
-func createTrace(spans []openapi.V1Span, spansMap map[string]*traces.Span) traces.Trace {
+func createTrace(spans []openapi.V1Span, spansMap map[string]*Span) Trace {
 	var rootSpanID string = ""
 	for _, span := range spans {
 		if span.ParentSpanId == "" {
@@ -97,7 +96,7 @@ func createTrace(spans []openapi.V1Span, spansMap map[string]*traces.Span) trace
 
 	rootSpan := spansMap[rootSpanID]
 
-	return traces.Trace{
+	return Trace{
 		RootSpan: *rootSpan,
 	}
 }

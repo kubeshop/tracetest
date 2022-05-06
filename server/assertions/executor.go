@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/kubeshop/tracetest/openapi"
+	"github.com/kubeshop/tracetest/traces"
 )
 
 type RunAssertionsMessage struct {
@@ -37,7 +38,7 @@ func (e Executor) Start() {
 }
 
 func (e Executor) executeAssertions(request RunAssertionsMessage) error {
-	trace, err := convertOTelTraceIntoTraceTree(request.Result.Trace)
+	trace, err := traces.FromOtel(request.Result.Trace)
 	if err != nil {
 		return err
 	}
