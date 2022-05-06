@@ -44,6 +44,7 @@ const HomeContent: React.FC = () => {
           </Button> */}
           <S.CreateTestButton
             data-tour={GuidedTourService.getStep(GuidedTours.Home, Steps.CreateTest)}
+            data-cy="create-test-button"
             type="primary"
             size="large"
             onClick={() => {
