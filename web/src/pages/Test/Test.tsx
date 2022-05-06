@@ -46,15 +46,6 @@ const TestPage = () => {
         activeTestResultDetails?.state === TestState.EXECUTING)) ||
     false;
 
-  const handleCloseTab = useCallback(() => {
-    const panes = tracePanes.filter(pane => pane.key !== activeTabKey);
-
-    navigate(`/test/${id}`);
-
-    setTracePanes(panes);
-    setActiveTabKey('1');
-  }, [activeTabKey, id, navigate, tracePanes]);
-
   const handleSelectTestResult = useCallback(
     (result: ITestRunResult) => {
       const itExists = Boolean(tracePanes.find(pane => pane.key === result.resultId));
@@ -64,14 +55,7 @@ const TestPage = () => {
         const tracePane = {
           key: result.resultId,
           title: `Trace #${newTabIndex}`,
-          content: (
-            <Trace
-              testId={id!}
-              testResultId={result.resultId}
-              onDismissTrace={handleCloseTab}
-              onRunTest={handleSelectTestResult}
-            />
-          ),
+          content: <Trace testId={id!} testResultId={result.resultId} onRunTest={handleSelectTestResult} />,
         };
 
         setTracePanes([...tracePanes, tracePane]);
@@ -80,7 +64,7 @@ const TestPage = () => {
       navigate(`/test/${id}?resultId=${result.resultId}`);
       setActiveTabKey(`${result.resultId}`);
     },
-    [handleCloseTab, id, navigate, testResultList, tracePanes]
+    [id, navigate, testResultList, tracePanes]
   );
 
   useEffect(() => {

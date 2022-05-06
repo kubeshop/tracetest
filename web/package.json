@@ -39,7 +39,11 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "npm run cy:run && react-scripts test",
+    "test:unit": "react-scripts test",
+    "test:integration": "npm run cy:run",
+    "test:lint": "eslint",
+    "test:types": "tsc",
+    "test": "npm run test:lint && npm run test:types && npm run test:unit && npm run test:integration",
     "eject": "react-scripts eject",
     "cy:open": "cypress open",
     "cy:run": "cypress run"
