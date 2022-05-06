@@ -79,7 +79,7 @@ func (e Executor) setResults(request RunAssertionsMessage, testResult TestResult
 		}
 
 		result := openapi.AssertionResult{
-			AssertionId:          "", // TODO: populate assertionID
+			AssertionId:          assertionResult.Assertion.ID,
 			SpanAssertionResults: spanAssertions,
 		}
 

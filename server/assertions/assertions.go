@@ -16,6 +16,7 @@ func (sq SpanQuery) Selector() selectors.Selector {
 type TestDefinition map[SpanQuery][]Assertion
 
 type Assertion struct {
+	ID         string
 	Attribute  string
 	Comparator comparator.Comparator
 	Value      string

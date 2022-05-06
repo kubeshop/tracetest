@@ -13,6 +13,7 @@ func convertAssertionsIntoTestDefinition(assertions []openapi.Assertion) TestDef
 		newAssertions := make([]Assertion, 0, len(assertions))
 		for _, spanAssertion := range assertion.SpanAssertions {
 			newAssertion := Assertion{
+				ID:         assertion.AssertionId,
 				Attribute:  spanAssertion.PropertyName,
 				Comparator: getComparator(spanAssertion.Operator),
 				Value:      spanAssertion.ComparisonValue,
