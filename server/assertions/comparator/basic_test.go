@@ -149,7 +149,7 @@ func TestComparators(t *testing.T) {
 
 			for _, input := range comp.expectError {
 				assert.EqualError(
-					t, comparator.Gt.Compare(input.expected, input.actual), input.err,
+					t, comp.comparator.Compare(input.expected, input.actual), input.err,
 					`expected "%s" err comparing "%s" with "%s"`, input.err, input.expected, input.actual,
 				)
 			}

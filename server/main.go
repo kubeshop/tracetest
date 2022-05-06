@@ -43,7 +43,42 @@ func main() {
 		log.Fatal(err)
 	}
 
+<<<<<<< HEAD
 	err = app.Start()
+=======
+	subscriptionManager := subscription.NewManager()
+
+	tracePoller := executor.NewTracePoller(traceDB, testDB, cfg.MaxWaitTimeForTraceDuration(), subscriptionManager)
+	tracePoller.Start(5) // worker count. should be configurable
+	defer tracePoller.Stop()
+
+	assertionRunner := executor.NewAssertionRunner(testDB)
+	assertionRunner.Start(5)
+	defer assertionRunner.Stop()
+
+	runner := executor.NewPersistentRunner(ex, testDB, tracePoller, assertionRunner)
+	runner.Start(5) // worker count. should be configurable
+	defer runner.Stop()
+
+	controller := httpServer.NewController(traceDB, testDB, runner)
+	apiApiController := openapi.NewApiApiController(controller)
+
+	router := openapi.NewRouter(apiApiController)
+	router.Use(otelmux.Middleware("tracetest"))
+
+	dir := "./html"
+	fileServer := http.FileServer(http.Dir(dir))
+	fileMatcher := regexp.MustCompile(`\.[a-zA-Z]*$`)
+	router.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if !fileMatcher.MatchString(r.URL.Path) {
+			serveIndex(w, dir+"/index.html")
+		} else {
+			fileServer.ServeHTTP(w, r)
+		}
+	})
+
+	err = analytics.CreateAndSendEvent("server_started_backend", "beacon")
+>>>>>>> f4e7234 (refactor assertion runner)
 	if err != nil {
 		log.Fatal(err)
 	}

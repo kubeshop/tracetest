@@ -1,4 +1,4 @@
-package assertions
+package executor
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/kubeshop/tracetest/executor"
+	"github.com/kubeshop/tracetest/assertions"
 	"github.com/kubeshop/tracetest/openapi"
 	"github.com/kubeshop/tracetest/testdb"
 	"github.com/kubeshop/tracetest/traces"
@@ -19,22 +19,28 @@ type RunAssertionsMessage struct {
 
 type AssertionFinishCallback func(openapi.Test, openapi.TestRunResult)
 
-type Executor struct {
+type AssertionRunner interface {
+	RunAssertions(test openapi.Test, result openapi.TestRunResult)
+	WorkerPool
+}
+
+type defaultAssertionRunner struct {
 	resultDB     testdb.ResultRepository
 	inputChannel chan RunAssertionsMessage
 	exitChannel  chan bool
 }
 
-var _ executor.WorkerPool = &Executor{}
+var _ WorkerPool = &defaultAssertionRunner{}
+var _ AssertionRunner = &defaultAssertionRunner{}
 
-func NewExecutor(resultRepository testdb.ResultRepository) *Executor {
-	return &Executor{
+func NewAssertionRunner(resultRepository testdb.ResultRepository) AssertionRunner {
+	return &defaultAssertionRunner{
 		resultDB:     resultRepository,
 		inputChannel: make(chan RunAssertionsMessage, 1),
 	}
 }
 
-func (e *Executor) Start(workers int) {
+func (e *defaultAssertionRunner) Start(workers int) {
 	e.exitChannel = make(chan bool, workers)
 
 	for i := 0; i < workers; i++ {
@@ -43,7 +49,7 @@ func (e *Executor) Start(workers int) {
 	}
 }
 
-func (e *Executor) Stop() {
+func (e *defaultAssertionRunner) Stop() {
 	ticker := time.NewTicker(1 * time.Second)
 	for {
 		select {
@@ -54,7 +60,7 @@ func (e *Executor) Stop() {
 	}
 }
 
-func (e *Executor) startWorker(ctx context.Context) {
+func (e *defaultAssertionRunner) startWorker(ctx context.Context) {
 	for {
 		select {
 		case <-e.exitChannel:
@@ -74,7 +80,7 @@ func (e *Executor) startWorker(ctx context.Context) {
 	}
 }
 
-func (e *Executor) executeAssertions(request RunAssertionsMessage) (*RunAssertionsMessage, error) {
+func (e *defaultAssertionRunner) executeAssertions(request RunAssertionsMessage) (*RunAssertionsMessage, error) {
 	trace, err := traces.FromOtel(request.Result.Trace)
 	if err != nil {
 		return nil, err
@@ -82,16 +88,16 @@ func (e *Executor) executeAssertions(request RunAssertionsMessage) (*RunAssertio
 
 	testDefinition := convertAssertionsIntoTestDefinition(request.Test.Assertions)
 
-	result := Assert(trace, testDefinition)
+	result := assertions.Assert(trace, testDefinition)
 
 	response := e.setResults(request, result)
 
 	return response, nil
 }
 
-func (e *Executor) setResults(request RunAssertionsMessage, testResult TestResult) *RunAssertionsMessage {
+func (e *defaultAssertionRunner) setResults(request RunAssertionsMessage, testResult assertions.TestResult) *RunAssertionsMessage {
 	response := request
-	response.Result.State = executor.TestRunStateFinished
+	response.Result.State = TestRunStateFinished
 	response.Result.CompletedAt = time.Now()
 	assertionResultArray := make([]openapi.AssertionResult, 0)
 	allTestsPassed := true
@@ -126,7 +132,7 @@ func (e *Executor) setResults(request RunAssertionsMessage, testResult TestResul
 	return &response
 }
 
-func (e *Executor) RunAssertions(test openapi.Test, result openapi.TestRunResult) {
+func (e *defaultAssertionRunner) RunAssertions(test openapi.Test, result openapi.TestRunResult) {
 	message := RunAssertionsMessage{
 		test,
 		result,

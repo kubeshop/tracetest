@@ -1,18 +1,19 @@
-package assertions
+package executor
 
 import (
+	"github.com/kubeshop/tracetest/assertions"
 	"github.com/kubeshop/tracetest/assertions/comparator"
 	"github.com/kubeshop/tracetest/openapi"
 )
 
-func convertAssertionsIntoTestDefinition(assertions []openapi.Assertion) TestDefinition {
-	testDefinition := make(TestDefinition, 0)
+func convertAssertionsIntoTestDefinition(openapiAssertions []openapi.Assertion) assertions.TestDefinition {
+	testDefinition := make(assertions.TestDefinition, 0)
 	selector := ""
-	for _, assertion := range assertions {
+	for _, assertion := range openapiAssertions {
 		selector = assertion.Selector
-		newAssertions := make([]Assertion, 0, len(assertions))
+		newAssertions := make([]assertions.Assertion, 0, len(openapiAssertions))
 		for _, spanAssertion := range assertion.SpanAssertions {
-			newAssertion := Assertion{
+			newAssertion := assertions.Assertion{
 				ID:         assertion.AssertionId,
 				Attribute:  spanAssertion.PropertyName,
 				Comparator: getComparator(spanAssertion.Operator),
@@ -21,7 +22,7 @@ func convertAssertionsIntoTestDefinition(assertions []openapi.Assertion) TestDef
 
 			newAssertions = append(newAssertions, newAssertion)
 		}
-		testDefinition[SpanQuery(selector)] = newAssertions
+		testDefinition[assertions.SpanQuery(selector)] = newAssertions
 	}
 	return testDefinition
 }

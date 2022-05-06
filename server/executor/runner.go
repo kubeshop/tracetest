@@ -29,12 +29,14 @@ func NewPersistentRunner(
 	testDB testdb.TestRepository,
 	resultDB testdb.ResultRepository,
 	tp TracePoller,
+	ar AssertionRunner,
 ) PersistentRunner {
 	return persistentRunner{
 		executor:     e,
 		tp:           tp,
 		testsDB:      testDB,
 		resultDB:     resultDB,
+		ar:           ar,
 		idGen:        id.NewRandGenerator(),
 		executeQueue: make(chan execReq, 5),
 		exit:         make(chan bool, 1),
@@ -45,6 +47,7 @@ type persistentRunner struct {
 	executor Executor
 	tp       TracePoller
 	idGen    id.Generator
+	ar       AssertionRunner
 	testsDB  testdb.TestRepository
 	resultDB testdb.ResultRepository
 

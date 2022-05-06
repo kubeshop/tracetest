@@ -1,4 +1,4 @@
-package assertions_test
+package executor_test
 
 import (
 	"context"
@@ -9,7 +9,6 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-	"github.com/kubeshop/tracetest/assertions"
 	"github.com/kubeshop/tracetest/executor"
 	"github.com/kubeshop/tracetest/openapi"
 	"github.com/kubeshop/tracetest/test"
@@ -53,7 +52,7 @@ func TestExecutorSuccessfulExecution(t *testing.T) {
 			test, result, err := loadTestFile(testCase.Tracefile)
 			require.NoError(t, err)
 
-			assertionExecutor := assertions.NewExecutor(postgresRepository)
+			assertionExecutor := executor.NewAssertionRunner(postgresRepository)
 
 			_, err = postgresRepository.CreateTest(ctx, &test)
 			require.NoError(t, err)
