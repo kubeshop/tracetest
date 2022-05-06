@@ -1,6 +1,7 @@
 import {SemanticGroupNames} from '../../constants/SemanticGroupNames.constants';
 import {ISpan} from '../../types/Span.types';
 import GenericSpanDetail from './components/GenericSpanDetail';
+import GenericHttpSpanDetail from './components/GenericHttpSpanDetail';
 
 export interface ISpanDetailProps {
   testId?: string;
@@ -9,7 +10,7 @@ export interface ISpanDetailProps {
 }
 
 const ComponentMap: Record<string, typeof GenericSpanDetail> = {
-  [SemanticGroupNames.Http]: GenericSpanDetail,
+  [SemanticGroupNames.Http]: GenericHttpSpanDetail,
 };
 
 const SpanDetail: React.FC<ISpanDetailProps> = ({span, ...props}) => {
