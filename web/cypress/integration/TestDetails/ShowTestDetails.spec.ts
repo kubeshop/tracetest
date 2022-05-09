@@ -1,24 +1,4 @@
-import {camelCase} from 'lodash';
-import {openCreateTestModal, deleteTest} from '../Home/CreateTest.spec';
-import {DemoTestExampleList} from '../../../src/constants/Test.constants';
-
-const [, {name, description}] = DemoTestExampleList;
-let testId = '';
-
-export const createTest = () => {
-  cy.visit('http://localhost:3000/');
-  const $form = openCreateTestModal();
-
-  $form.get('[data-cy=example-button]').click();
-  $form.get(`[data-cy=demo-example-${camelCase(name)}]`).click();
-  $form.get('[data-cy=create-test-submit]').click();
-
-  cy.location('pathname').should('match', /\/test\/.*/i);
-  cy.location().then(({pathname}) => {
-    testId = pathname.split('/').pop();
-  });
-  cy.visit('http://localhost:3000/');
-};
+import { createTest, deleteTest, description, name, testId } from "../utils/common";
 
 describe('Show test details', () => {
   before(() => {

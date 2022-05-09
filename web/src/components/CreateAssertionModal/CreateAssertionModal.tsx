@@ -17,8 +17,8 @@ interface IProps {
 }
 
 const affectedSpanMessage = (spanCount: number) => {
-  if (spanCount <= 1) {
-    return `Affects ${spanCount} span`;
+  if (spanCount === 1) {
+    return `Affect ${spanCount} span`;
   }
 
   return `Affects ${spanCount} spans`;
@@ -51,12 +51,15 @@ const CreateAssertionModal = ({testId, span, resultId, open, onClose, assertion}
       title={
         <div style={{display: 'flex', justifyContent: 'space-between', marginRight: 36}}>
           <Typography.Title level={5}>{assertion ? 'Edit Assertion' : 'Create New Assertion'}</Typography.Title>
-          <Typography.Text>{affectedSpanMessage(affectedSpanList.length)}</Typography.Text>
+          <Typography.Text data-cy="affected-spans-count">
+            {affectedSpanMessage(affectedSpanList.length)}
+          </Typography.Text>
         </div>
       }
       onOk={form?.submit}
       okButtonProps={{
         type: 'default',
+        id: 'add-assertion-modal-ok-button',
       }}
       okText="Save"
     >

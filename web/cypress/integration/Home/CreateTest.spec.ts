@@ -1,28 +1,6 @@
-import {camelCase} from 'lodash';
-import {DemoTestExampleList} from '../../../src/constants/Test.constants';
-
-Cypress.on('uncaught:exception', err => !err.message.includes('ResizeObserver loop limit exceeded'));
-
-export const deleteTest = () => {
-  cy.location().then(({pathname}) => {
-    const testId = pathname.split('/').pop();
-    cy.visit('http://localhost:3000/');
-
-    cy.get(`[data-cy=test-actions-button-${testId}]`).click();
-    cy.get('[data-cy=test-delete-button]').click();
-
-    cy.get(`[data-cy=test-actions-button-${testId}]`).should('not.exist');
-  });
-};
-
-export const openCreateTestModal = () => {
-  cy.get('[data-cy=create-test-button]').click();
-
-  const $form = cy.get('[data-cy=create-test-modal] form');
-  $form.should('be.visible');
-
-  return $form;
-};
+import { camelCase } from "lodash";
+import { DemoTestExampleList } from "../../../src/constants/Test.constants";
+import { deleteTest, openCreateTestModal } from "../utils/common";
 
 describe('Create test', () => {
   beforeEach(() => {

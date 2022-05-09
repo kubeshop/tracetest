@@ -12,7 +12,7 @@ const GenericTraceNode: React.FC<TTraceNodeProps> = ({id, data: {name, type}, da
   const spanTypeText = SemanticGroupNamesToText[type];
 
   return (
-    <S.TraceNode selected={selected}>
+    <S.TraceNode selected={selected} data-cy={`trace-node-${type}`}>
       <S.TraceNotch spanType={type}>
         <Text>{upperCase(heading || spanTypeText)}</Text>
       </S.TraceNotch>

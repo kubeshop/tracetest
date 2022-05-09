@@ -51,7 +51,7 @@ const AssertionsResultTable: React.FC<IAssertionsResultTableProps> = ({
   );
 
   return (
-    <S.AssertionsTableContainer>
+    <S.AssertionsTableContainer data-cy="assertion-table">
       <S.AssertionsTableHeader>
         <Typography.Title level={5} style={{margin: 0}}>
           Assertion #{sort}
@@ -61,6 +61,7 @@ const AssertionsResultTable: React.FC<IAssertionsResultTableProps> = ({
         </Typography.Title>
         <Button
           type="link"
+          data-cy="edit-assertion-button"
           onClick={() => {
             AssertionTableAnalyticsService.onEditAssertionButtonClick(assertion.assertionId);
             setIsModalOpen(true);
@@ -70,7 +71,14 @@ const AssertionsResultTable: React.FC<IAssertionsResultTableProps> = ({
         </Button>
       </S.AssertionsTableHeader>
       <CustomTable size="small" pagination={{hideOnSinglePage: true}} dataSource={parsedAssertionList}>
-        <Table.Column title="Property" dataIndex="property" key="property" ellipsis width="50%" />
+        <Table.Column
+          title="Property"
+          dataIndex="property"
+          key="property"
+          ellipsis
+          width="50%"
+          render={value => <span data-cy="assertion-check-property">{value}</span>}
+        />
         <Table.Column
           title="Comparison"
           dataIndex="comparison"

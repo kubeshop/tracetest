@@ -9,6 +9,10 @@ export const TraceTabs = styled(Tabs)`
   .ant-tabs-nav::before {
     border: none;
   }
+
+  .ant-tabs-tabpane {
+    flex-direction: column;
+  }
 `;
 
 export const FailedTrace = styled.div`

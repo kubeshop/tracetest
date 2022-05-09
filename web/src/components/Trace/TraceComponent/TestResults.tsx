@@ -25,7 +25,7 @@ const TestResults: FC<TTestResultsProps> = ({trace, resultId, onSpanSelected}) =
   );
 
   return (
-    <S.Container>
+    <S.Container data-cy="test-results">
       <S.Header>
         <Typography.Text strong>
           {totalSpanCount} total spans • {totalAssertionCount} selectors • {totalPassedCount + totalFailedCount} checks
