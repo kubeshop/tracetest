@@ -20,7 +20,9 @@ describe('Create Assertion', () => {
     cy.get('[data-cy=create-assertion-form]', {timeout: 10000}).should('be.visible');
 
     cy.get('[data-cy=item-selector-tag] + [role=img]').first().click();
-    cy.get('[data-cy=affected-spans-count]').should('have.text', 'Affects 7 spans');
+    cy.get('[data-cy=affected-spans-count]')
+      .invoke('text')
+      .should('match', /Affects \d+ spans/);
 
     cy.get('[data-cy=assertion-check-key]').type('http');
     cy.get('.ant-select-item-option-content').first().click();
