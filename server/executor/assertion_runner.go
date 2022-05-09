@@ -12,31 +12,32 @@ import (
 	"github.com/kubeshop/tracetest/traces"
 )
 
-type RunAssertionsMessage struct {
-	Test   openapi.Test
-	Result openapi.TestRunResult
-}
-
 type AssertionFinishCallback func(openapi.Test, openapi.TestRunResult)
 
 type AssertionRunner interface {
-	RunAssertions(test openapi.Test, result openapi.TestRunResult)
+	RunAssertions(result openapi.TestRunResult)
 	WorkerPool
 }
 
 type defaultAssertionRunner struct {
+	testDB       testdb.TestRepository
 	resultDB     testdb.ResultRepository
-	inputChannel chan RunAssertionsMessage
+	inputChannel chan openapi.TestRunResult
 	exitChannel  chan bool
 }
 
 var _ WorkerPool = &defaultAssertionRunner{}
 var _ AssertionRunner = &defaultAssertionRunner{}
 
-func NewAssertionRunner(resultRepository testdb.ResultRepository) AssertionRunner {
+func NewAssertionRunner(
+	testRepository testdb.TestRepository,
+	resultRepository testdb.ResultRepository,
+	inputChannel chan openapi.TestRunResult,
+) AssertionRunner {
 	return &defaultAssertionRunner{
+		testDB:       testRepository,
 		resultDB:     resultRepository,
-		inputChannel: make(chan RunAssertionsMessage, 1),
+		inputChannel: inputChannel,
 	}
 }
 
@@ -66,13 +67,13 @@ func (e *defaultAssertionRunner) startWorker(ctx context.Context) {
 		case <-e.exitChannel:
 			fmt.Println("Exiting assertion executor worker")
 			return
-		case request := <-e.inputChannel:
-			response, err := e.executeAssertions(request)
+		case testResult := <-e.inputChannel:
+			response, err := e.executeAssertions(ctx, testResult)
 			if err != nil {
 				fmt.Println(err.Error())
 			}
 
-			err = e.resultDB.UpdateResult(ctx, &response.Result)
+			err = e.resultDB.UpdateResult(ctx, response)
 			if err != nil {
 				fmt.Println(fmt.Errorf("could not save result on database: %w", err).Error())
 			}
@@ -80,25 +81,29 @@ func (e *defaultAssertionRunner) startWorker(ctx context.Context) {
 	}
 }
 
-func (e *defaultAssertionRunner) executeAssertions(request RunAssertionsMessage) (*RunAssertionsMessage, error) {
-	trace, err := traces.FromOtel(request.Result.Trace)
+func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, testResult openapi.TestRunResult) (*openapi.TestRunResult, error) {
+	trace, err := traces.FromOtel(testResult.Trace)
 	if err != nil {
 		return nil, err
 	}
 
-	testDefinition := convertAssertionsIntoTestDefinition(request.Test.Assertions)
+	test, err := e.testDB.GetTest(ctx, testResult.TestId)
+	if err != nil {
+		return nil, err
+	}
+
+	testDefinition := convertAssertionsIntoTestDefinition(test.Assertions)
 
 	result := assertions.Assert(trace, testDefinition)
 
-	response := e.setResults(request, result)
+	e.setResults(&testResult, result)
 
-	return response, nil
+	return &testResult, nil
 }
 
-func (e *defaultAssertionRunner) setResults(request RunAssertionsMessage, testResult assertions.TestResult) *RunAssertionsMessage {
-	response := request
-	response.Result.State = TestRunStateFinished
-	response.Result.CompletedAt = time.Now()
+func (e *defaultAssertionRunner) setResults(result *openapi.TestRunResult, testResult assertions.TestResult) {
+	result.State = TestRunStateFinished
+	result.CompletedAt = time.Now()
 	assertionResultArray := make([]openapi.AssertionResult, 0)
 	allTestsPassed := true
 
@@ -126,17 +131,10 @@ func (e *defaultAssertionRunner) setResults(request RunAssertionsMessage, testRe
 		assertionResultArray = append(assertionResultArray, result)
 	}
 
-	response.Result.AssertionResult = assertionResultArray
-	response.Result.AssertionResultState = allTestsPassed
-
-	return &response
+	result.AssertionResult = assertionResultArray
+	result.AssertionResultState = allTestsPassed
 }
 
-func (e *defaultAssertionRunner) RunAssertions(test openapi.Test, result openapi.TestRunResult) {
-	message := RunAssertionsMessage{
-		test,
-		result,
-	}
-
-	e.inputChannel <- message
+func (e *defaultAssertionRunner) RunAssertions(result openapi.TestRunResult) {
+	e.inputChannel <- result
 }

@@ -52,7 +52,8 @@ func TestExecutorSuccessfulExecution(t *testing.T) {
 			test, result, err := loadTestFile(testCase.Tracefile)
 			require.NoError(t, err)
 
-			assertionExecutor := executor.NewAssertionRunner(postgresRepository)
+			inputChannel := make(chan openapi.TestRunResult)
+			assertionExecutor := executor.NewAssertionRunner(postgresRepository, postgresRepository, inputChannel)
 
 			_, err = postgresRepository.CreateTest(ctx, &test)
 			require.NoError(t, err)
@@ -61,7 +62,7 @@ func TestExecutorSuccessfulExecution(t *testing.T) {
 			require.NoError(t, err)
 
 			assertionExecutor.Start(1)
-			assertionExecutor.RunAssertions(test, result)
+			assertionExecutor.RunAssertions(result)
 			assertionExecutor.Stop()
 
 			dbResult, err := postgresRepository.GetResult(ctx, result.ResultId)

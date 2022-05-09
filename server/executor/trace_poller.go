@@ -35,6 +35,7 @@ func NewTracePoller(
 	ru ResultUpdater,
 	maxWaitTimeForTrace time.Duration,
 	subscriptionManager *subscription.Manager,
+	completePoolChannel chan openapi.TestRunResult,
 ) PersistentTracePoller {
 	retryDelay := 1 * time.Second
 	maxTracePollRetry := int(math.Ceil(float64(maxWaitTimeForTrace) / float64(retryDelay)))
@@ -47,6 +48,7 @@ func NewTracePoller(
 		executeQueue:        make(chan tracePollReq, 5),
 		exit:                make(chan bool, 1),
 		subscriptions:       subscriptionManager,
+		completePoolChannel: completePoolChannel,
 	}
 }
 
@@ -57,8 +59,9 @@ type tracePoller struct {
 	retryDelay          time.Duration
 	maxTracePollRetry   int
 
-	executeQueue chan tracePollReq
-	exit         chan bool
+	executeQueue        chan tracePollReq
+	exit                chan bool
+	completePoolChannel chan openapi.TestRunResult
 
 	subscriptions *subscription.Manager
 }
@@ -150,6 +153,8 @@ func (tp tracePoller) processJob(job tracePollReq) {
 		Type:    "result_update",
 		Content: res,
 	})
+
+	tp.completePoolChannel <- res
 }
 
 // to compare trace we count the number of resourceSpans + InstrumentationLibrarySpans + spans.
