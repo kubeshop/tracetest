@@ -47,6 +47,7 @@ const TextDetailsTable: FC<TextRowProps> = ({isLoading, onSelectResult, testResu
     <CustomTable
       pagination={{pageSize: 10}}
       rowKey="resultId"
+      data-cy="test-result-table"
       loading={isLoading}
       dataSource={testResultList?.slice()?.reverse()}
       onRow={record => {
@@ -64,9 +65,11 @@ const TextDetailsTable: FC<TextRowProps> = ({isLoading, onSelectResult, testResu
         dataIndex="createdAt"
         key="createdAt"
         width="30%"
-        render={value =>
-          Intl.DateTimeFormat('default', {dateStyle: 'full', timeStyle: 'medium'} as any).format(new Date(value))
-        }
+        render={(value, {resultId}: ITestRunResult) => (
+          <span data-cy={`test-run-result-${resultId}`}>
+            {Intl.DateTimeFormat('default', {dateStyle: 'full', timeStyle: 'medium'} as any).format(new Date(value))}
+          </span>
+        )}
       />
       <Table.Column
         title={
@@ -87,8 +90,8 @@ const TextDetailsTable: FC<TextRowProps> = ({isLoading, onSelectResult, testResu
         title={<span data-tour={GuidedTourService.getStep(GuidedTours.TestDetails, Steps.Status)}>Status</span>}
         key="state"
         width="20%"
-        render={(value, {state}: ITestRunResult) => {
-          return <TestStateBadge testState={state} />;
+        render={(value, {state, resultId}: ITestRunResult) => {
+          return <TestStateBadge data-cy={`test-run-result-status-${resultId}`} testState={state} />;
         }}
       />
       <Table.Column

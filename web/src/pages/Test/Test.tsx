@@ -129,7 +129,7 @@ const TestPage = () => {
               </S.Header>
             ),
             right: activeTestResult?.resultId && activeTestResultDetails?.state && (
-              <div style={{marginRight: 24}}>
+              <div style={{marginRight: 24}} data-cy="test-run-result-status">
                 <Typography.Text style={{marginRight: 8, color: '#8C8C8C', fontSize: 14}}>Test status:</Typography.Text>
                 <TestStateBadge style={{fontSize: 16}} testState={activeTestResultDetails?.state} />
               </div>
@@ -143,7 +143,7 @@ const TestPage = () => {
           onEdit={onEditTab}
           style={{flexGrow: 1, display: 'flex', margin: 0}}
         >
-          <Tabs.TabPane tab="Test Details" key="1" closeIcon={<CloseOutlined hidden />}>
+          <Tabs.TabPane data-cy="test-details" tab="Test Details" key="1" closeIcon={<CloseOutlined hidden />}>
             <S.Wrapper detail>
               <TestDetails
                 testResultList={testResultList}

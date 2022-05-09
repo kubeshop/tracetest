@@ -24,6 +24,6 @@ export const useDoubleClick = (doubleClick: any, click?: any, timeout = 200) => 
         doubleClick(event);
       }
     },
-    [click, doubleClick]
+    [click, doubleClick, timeout]
   );
 };
