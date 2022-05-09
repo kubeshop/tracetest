@@ -1,6 +1,6 @@
-import { camelCase } from "lodash";
-import { DemoTestExampleList } from "../../../src/constants/Test.constants";
-import { deleteTest, openCreateTestModal } from "../utils/common";
+import {camelCase} from 'lodash';
+import {DemoTestExampleList} from '../../../src/constants/Test.constants';
+import {deleteTest, openCreateTestModal} from '../utils/common';
 
 describe('Create test', () => {
   beforeEach(() => {

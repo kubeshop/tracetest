@@ -1,4 +1,4 @@
-import { createTest, deleteTest, testId } from "../utils/common";
+import {createTest, deleteTest, testId} from '../utils/common';
 
 describe('Show Trace', () => {
   beforeEach(() => {
@@ -16,9 +16,8 @@ describe('Show Trace', () => {
     cy.get(`[data-cy^=test-run-result-]`).first().click();
     cy.location('href').should('match', /resultId=.*/i);
 
-    cy.wait(6000);
-    cy.get('[data-cy=diagram-dag]').should('be.visible');
-    cy.get('[data-cy^=trace-node-]').should('be.visible');
+    cy.get('[data-cy=diagram-dag]', {timeout: 6000}).should('be.visible');
+    cy.get('[data-cy^=trace-node-]', {timeout: 6000}).should('be.visible');
     cy.get('[data-cy=span-details-attributes]').should('be.visible');
     cy.get('[data-cy=empty-assertion-table]').should('be.visible');
 

@@ -1,4 +1,4 @@
-import { createTest, deleteTest, testId } from "../utils/common";
+import {createTest, deleteTest, testId} from '../utils/common';
 
 describe('Create Assertion', () => {
   before(() => {
@@ -16,10 +16,8 @@ describe('Create Assertion', () => {
     cy.get(`[data-cy^=test-run-result-]`).first().click();
     cy.location('href').should('match', /resultId=.*/i);
 
-    cy.wait(5000);
-
     cy.get('[data-cy=add-assertion-button]').click();
-    cy.get('[data-cy=create-assertion-form]').should('be.visible');
+    cy.get('[data-cy=create-assertion-form]', {timeout: 10000}).should('be.visible');
 
     cy.get('[data-cy=item-selector-tag] + [role=img]').first().click();
     cy.get('[data-cy=affected-spans-count]').should('have.text', 'Affects 7 spans');

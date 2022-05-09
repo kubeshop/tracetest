@@ -1,4 +1,4 @@
-import { createTest, deleteTest, description, name, testId } from "../utils/common";
+import {createTest, deleteTest, description, name, testId} from '../utils/common';
 
 describe('Show test details', () => {
   before(() => {
