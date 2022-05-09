@@ -4,8 +4,8 @@ server-generate: proto
 	rm -rf $(OPENAPI_SERVER_TARGET_DIR)
 
 	openapi-generator-cli generate -i api/openapi.yaml -g go-server -o $(TMPDIR)
-	rm -f $(TMPDIR)/api_api_service.go
-	mv $(TMPDIR)/go $(OPENAPI_SERVER_TARGET_DIR)
+	mv $(TMPDIR)/go server/openapi
+	rm -f $(OPENAPI_SERVER_TARGET_DIR)/api_api_service.go
 	rm -rf $(TMPDIR)
 
 	cd server; pwd; go fmt ./...; cd ..
