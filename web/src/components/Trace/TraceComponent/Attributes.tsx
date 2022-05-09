@@ -11,7 +11,7 @@ interface TAttributesProps {
 
 export const Attributes: FC<TAttributesProps> = ({spanAttributeList = []}) => {
   return (
-    <S.Container>
+    <S.Container data-cy="span-details-attributes">
       <S.Header>
         <Typography.Text strong>Attributes</Typography.Text>
       </S.Header>

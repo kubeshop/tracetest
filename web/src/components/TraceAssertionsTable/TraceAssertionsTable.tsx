@@ -73,7 +73,7 @@ const TraceAssertionsResultTable: FC<IProps> = ({
   );
 
   return (
-    <S.Container>
+    <S.Container data-cy="test-results-assertion-table">
       <S.Header>
         <Typography.Title level={5} style={{margin: 0}}>
           {selectors.map(({value}) => value).join(' ')}

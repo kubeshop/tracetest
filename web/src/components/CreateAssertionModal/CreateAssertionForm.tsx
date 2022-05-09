@@ -122,7 +122,7 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
 
   return (
     <Form
-      name="newTest"
+      name="assertion-form"
       form={form}
       initialValues={{
         remember: true,
@@ -132,6 +132,7 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
       onFinish={handleCreateAssertion}
       autoComplete="off"
       layout="vertical"
+      data-cy="create-assertion-form"
       onFieldsChange={changedFields => {
         const selectorList = form.getFieldValue('selectorList') || [];
         onSelectorList(selectorList);
@@ -166,10 +167,7 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
           <QuestionCircleOutlined style={{color: '#8C8C8C'}} />
         </Tooltip>
       </div>
-      <Form.Item
-        name="selectorList"
-        data-tour={GuidedTourService.getStep(GuidedTours.Assertion, Steps.Selectors)}
-      >
+      <Form.Item name="selectorList" data-tour={GuidedTourService.getStep(GuidedTours.Assertion, Steps.Selectors)}>
         <CreateAssertionSelectorInput spanSignature={defaultSelectorList} />
       </Form.Item>
       <div style={{marginTop: 24, marginBottom: 8}}>
@@ -190,6 +188,7 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
                       name={[name, 'key']}
                       style={{margin: 0}}
                       rules={[{required: true, message: 'Attribute is required'}]}
+                      data-cy="assertion-check-key"
                     >
                       <AutoComplete
                         style={{margin: 0}}
@@ -207,6 +206,7 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
                       style={{margin: 0}}
                       name={[name, 'compareOp']}
                       rules={[{required: true, message: 'Operator is required'}]}
+                      data-cy="assertion-check-operator"
                     >
                       <S.Select style={{margin: 0}}>
                         <S.Select.Option value={CompareOperator.EQUALS}>eq</S.Select.Option>
@@ -223,6 +223,7 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
                       name={[name, 'value']}
                       style={{margin: 0}}
                       rules={[{required: true, message: 'Value is required'}]}
+                      data-cy="assertion-check-value"
                     >
                       <Input placeholder="value" />
                     </S.FullHeightFormItem>
@@ -245,6 +246,7 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
                     onAddCheck();
                     add();
                   }}
+                  data-cy="add-assertion-form-add-check"
                 >
                   Add Item
                 </Button>

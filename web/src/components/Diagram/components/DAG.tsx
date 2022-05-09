@@ -5,7 +5,7 @@ import TraceNode from '../../TraceNode';
 import * as S from './DAG.styled';
 import TraceDiagramAnalyticsService from '../../../services/Analytics/TraceDiagramAnalytics.service';
 import {IDiagramProps} from '../Diagram';
-import { ISpan } from '../../../types/Span.types';
+import {ISpan} from '../../../types/Span.types';
 
 export type TSpanInfo = {
   id: string;
@@ -83,7 +83,7 @@ const Diagram: React.FC<IDiagramProps> = ({trace, selectedSpan, onSelectSpan}): 
   }, [dagLayout, spanMap, selectedSpan?.spanId]);
 
   return (
-    <S.Container style={{height: "100%" }}>
+    <S.Container data-cy="diagram-dag">
       <ReactFlow
         nodeTypes={{TraceNode}}
         defaultZoom={0.5}

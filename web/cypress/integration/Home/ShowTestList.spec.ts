@@ -1,7 +1,5 @@
 import {DOCUMENTATION_URL, GITHUB_URL} from '../../../src/constants/Common.constants';
 
-Cypress.on('uncaught:exception', err => !err.message.includes('ResizeObserver loop limit exceeded'));
-
 describe('Home', () => {
   beforeEach(() => {
     cy.visit('http://localhost:3000/');
@@ -18,8 +16,5 @@ describe('Home', () => {
     cy.get('[data-cy=create-test-button]').should('be.visible');
 
     cy.get('[data-cy=testList]').should('be.visible');
-    cy.get('[data-cy=testList] .ant-table-row').should($tr => {
-      expect($tr).to.have.length.greaterThan(0);
-    });
   });
 });

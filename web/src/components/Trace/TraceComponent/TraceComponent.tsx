@@ -1,5 +1,5 @@
-import * as React from 'react';
 import {useState} from 'react';
+import {Tabs} from 'antd';
 import {useStoreActions} from 'react-flow-renderer';
 import {ISpan} from 'types/Span.types';
 import {ITestRunResult} from 'types/TestRunResult.types';
@@ -8,6 +8,11 @@ import {Diagram, SupportedDiagrams} from 'components/Diagram/Diagram';
 import SpanDetail from 'components/SpanDetail';
 import {TimelineDrawer} from 'components/Trace/TraceComponent/TimelineDrawer';
 import {useHandleOnSpanSelectedCallback} from 'components/Trace/TraceComponent/useHandleOnSpanSelectedCallback';
+import * as S from '../Trace.styled';
+import TestResults from './TestResults';
+import GuidedTourService, {GuidedTours} from '../../../services/GuidedTour.service';
+import {Steps} from '../../GuidedTour/traceStepList';
+import TraceAnalyticsService from '../../../services/Analytics/TraceAnalytics.service';
 
 interface IProps {
   displayError: boolean;
@@ -39,7 +44,30 @@ export const TraceComponent = ({
           />
         </div>
         <div style={{flexBasis: '50%', overflowY: 'scroll', paddingTop: 10, paddingRight: 10}}>
-          <SpanDetail resultId={testResultDetails?.resultId} testId={test?.testId} span={selectedSpan} />
+          <div className="pane-content" style={{padding: '14px 24px', overflow: 'hidden'}}>
+            <S.TraceTabs onChange={activeTab => TraceAnalyticsService.onChangeTab(activeTab)}>
+              <Tabs.TabPane
+                tab={
+                  <span data-tour={GuidedTourService.getStep(GuidedTours.Trace, Steps.SpanDetail)}>Span Detail</span>
+                }
+                key="span-detail"
+              >
+                <SpanDetail resultId={testResultDetails?.resultId} testId={test?.testId} span={selectedSpan} />
+              </Tabs.TabPane>
+              <Tabs.TabPane
+                tab={
+                  <span data-tour={GuidedTourService.getStep(GuidedTours.Trace, Steps.TestResults)}>Test Results</span>
+                }
+                key="test-results"
+              >
+                <TestResults
+                  onSpanSelected={onSelectSpan}
+                  trace={testResultDetails?.trace}
+                  resultId={testResultDetails?.resultId!}
+                />
+              </Tabs.TabPane>
+            </S.TraceTabs>
+          </div>
         </div>
       </div>
       <TimelineDrawer

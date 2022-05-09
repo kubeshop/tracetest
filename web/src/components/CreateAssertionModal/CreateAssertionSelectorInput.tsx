@@ -2,7 +2,7 @@ import {TagOutlined} from '@ant-design/icons';
 import {AutoComplete, Checkbox, Input, Tag} from 'antd';
 import {noop} from 'lodash';
 import React, {useCallback, useMemo, useState} from 'react';
-import { IItemSelector } from '../../types/Assertion.types';
+import {IItemSelector} from '../../types/Assertion.types';
 
 type TItemSelectorDropdownProps = {
   spanSignature: IItemSelector[];
@@ -68,7 +68,7 @@ export const CreateAssertionSelectorInput: React.FC<TItemSelectorDropdownProps> 
             closable
             onClose={() => handleDeleteItemSelector(item)}
           >
-            {item.value}
+            <span data-cy="item-selector-tag">{item.value}</span>
           </Tag>
         ))}
       </div>

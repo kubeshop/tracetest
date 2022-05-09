@@ -22,11 +22,12 @@ const GenericSpanDetail: FC<ISpanDetailProps> = ({testId, span, resultId}) => {
 
   return (
     <>
-      <S.DetailsContainer>
+      <S.DetailsContainer data-cy="span-details">
         <S.DetailsHeader>
-          <Typography.Text strong> Details for selected span</Typography.Text>
+          <Typography.Text strong>Details for selected span</Typography.Text>
           <Button
             type="link"
+            data-cy="add-assertion-button"
             icon={<PlusOutlined />}
             onClick={() => {
               onAddAssertionButtonClick();
@@ -52,7 +53,7 @@ const GenericSpanDetail: FC<ISpanDetailProps> = ({testId, span, resultId}) => {
                 />
               ))
           ) : (
-            <S.DetailsEmptyStateContainer>
+            <S.DetailsEmptyStateContainer data-cy="empty-assertion-table">
               <S.DetailsTableEmptyStateIcon />
               <Typography.Text disabled>No Data</Typography.Text>
             </S.DetailsEmptyStateContainer>
