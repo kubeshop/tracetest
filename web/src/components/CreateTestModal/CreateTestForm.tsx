@@ -1,7 +1,7 @@
 import {useCallback, useRef, useState} from 'react';
 import {camelCase} from 'lodash';
 import {Form, Input, Button, Select, Checkbox, Dropdown, Menu, Typography, FormInstance} from 'antd';
-import {DeleteOutlined, DownOutlined} from '@ant-design/icons';
+import {DeleteOutlined, DownOutlined, PlusOutlined} from '@ant-design/icons';
 import './CreateTestModal.styled.ts';
 import GuidedTourService, {GuidedTours} from '../../services/GuidedTour.service';
 import {Steps} from '../GuidedTour/homeStepList';
@@ -120,11 +120,11 @@ const CreateTestForm: React.FC<ICreateTestFormProps> = ({onSubmit, form}) => {
         data-tour={GuidedTourService.getStep(GuidedTours.Home, Steps.Headers)}
       >
         <div style={{minHeight: 80}}>
-          <Form.List name="headersList" initialValue={[...defaultHeaders, {}, {}]}>
+          <Form.List name="headersList" initialValue={defaultHeaders}>
             {(fields, {add, remove}) => (
               <>
                 {fields.map((field, index) => (
-                  <div key={field.name} style={{display: 'flex', alignItems: 'center'}}>
+                  <div key={field.name} style={{display: 'flex', alignItems: 'center', marginBottom: '8px'}}>
                     <Form.Item name={[field.name, 'checked']} valuePropName="checked" noStyle>
                       <Checkbox style={{marginRight: 8}} />
                     </Form.Item>
@@ -169,17 +169,20 @@ const CreateTestForm: React.FC<ICreateTestFormProps> = ({onSubmit, form}) => {
                         style={{marginLeft: 8}}
                         type="text"
                         icon={<DeleteOutlined style={{fontSize: 24, color: '#D9D9D9'}} />}
-                        onClick={() => {
-                          touchedHttpHeadersRef.current[field.name] = false;
-                          remove(index);
-                          if (fields.length === 1 || fields.length - 1 === index) {
-                            add();
-                          }
-                        }}
+                        onClick={() => remove(field.name)}
                       />
                     </Form.Item>
                   </div>
                 ))}
+                <Button
+                  type="link"
+                  icon={<PlusOutlined />}
+                  style={{padding: 0}}
+                  onClick={() => add({ checked: true })}
+                  data-cy="add-header"
+                >
+                  Add Header
+                </Button>
               </>
             )}
           </Form.List>

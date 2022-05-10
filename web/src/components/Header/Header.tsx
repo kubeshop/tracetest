@@ -39,7 +39,7 @@ const Header: FC = () => {
         </S.NavMenuItem>
         <Menu.SubMenu
           key="help"
-          icon={<QuestionCircleOutlined data-cy="onboarding-link" style={{color: '#E5E5E5', fontSize: 16}} />}
+          icon={<QuestionCircleOutlined data-cy="onboarding-link" style={{color: '#61175e', fontSize: 16}} />}
         >
           <S.NavMenuItem key="guidedTour" onClick={handleGuidedTourCLick}>
             Show Onboarding

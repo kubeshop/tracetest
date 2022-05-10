@@ -37,19 +37,31 @@
     "typescript": "~4.1.5"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test:unit": "react-scripts test --watchAll=false",
+    "start": "craco start",
+    "build": "craco build",
+    "test:unit": "craco test --watchAll=false",
     "test:integration": "npm run cy:run",
     "test:lint": "eslint ./src/**/*.{ts,tsx}",
     "test:types": "tsc",
     "test": "npm run test:lint && npm run test:types && npm run test:unit && npm run test:integration",
     "eject": "react-scripts eject",
     "cy:open": "cypress open",
-    "cy:run": "cypress run"
+    "cy:run": "cypress run",
+    "storybook": "start-storybook -p 6006 -s public",
+    "build-storybook": "build-storybook -s public"
   },
   "eslintConfig": {
-    "extends": "react-app"
+    "extends": "react-app",
+    "overrides": [
+      {
+        "files": [
+          "**/*.stories.*"
+        ],
+        "rules": {
+          "import/no-anonymous-default-export": "off"
+        }
+      }
+    ]
   },
   "browserslist": {
     "production": [
@@ -72,11 +84,25 @@
     "styled-components": "^5"
   },
   "devDependencies": {
+    "@craco/craco": "^6.4.3",
     "@cypress/react": "^5.12.4",
     "@cypress/webpack-dev-server": "^1.8.4",
+    "@faker-js/faker": "^6.3.1",
+    "@storybook/addon-actions": "^6.4.22",
+    "@storybook/addon-essentials": "^6.4.22",
+    "@storybook/addon-interactions": "^6.4.22",
+    "@storybook/addon-links": "^6.4.22",
+    "@storybook/builder-webpack5": "^6.4.22",
+    "@storybook/manager-webpack5": "^6.4.22",
+    "@storybook/node-logger": "^6.4.22",
+    "@storybook/preset-ant-design": "^0.0.2",
+    "@storybook/preset-create-react-app": "^4.1.0",
+    "@storybook/react": "^6.4.22",
+    "@storybook/testing-library": "^0.0.11",
     "@types/jmespath": "^0.15.0",
     "@types/lodash": "^4.14.181",
     "@types/styled-components": "^5.1.21",
+    "craco-less": "^2.0.0",
     "cypress": "^9.6.0",
     "eslint": "^8.8.0",
     "eslint-config-airbnb": "^19.0.4",
@@ -87,7 +113,8 @@
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.3.0",
     "eslint-plugin-unused-imports": "^2.0.0",
-    "prettier": "^2.5.1"
+    "prettier": "^2.5.1",
+    "webpack": "^5.72.0"
   },
   "proxy": "http://localhost:8080"
 }

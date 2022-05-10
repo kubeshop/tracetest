@@ -26,6 +26,7 @@ const TestAPI = createApi({
         url: `/tests/${testId}/run`,
         method: 'POST',
       }),
+      invalidatesTags: () => [{type: 'TestRunResult', id: 'LIST'}],
     }),
     getTestList: build.query<ITest[], void>({
       query: () => `/tests`,

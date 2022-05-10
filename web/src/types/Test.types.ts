@@ -21,5 +21,5 @@ export interface ITest {
     request: IHTTPRequest;
   };
   assertions: Array<IAssertion>;
-  lastTestResult: ITestRunResult;
+  lastTestResult?: ITestRunResult;
 }
