@@ -30,7 +30,7 @@ func Init(cfg config.GoogleAnalytics, appName, appVersion string) error {
 	// setup an actual client
 	hostname, err := os.Hostname()
 	if err != nil {
-		return fmt.Errorf("could not get hostnmae: %w", err)
+		return fmt.Errorf("could not get hostname: %w", err)
 	}
 
 	machineID, err := machineid.ProtectedID(appName)
