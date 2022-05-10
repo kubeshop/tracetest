@@ -32,7 +32,7 @@
     "react-redux": "^7.2.6",
     "react-reflex": "^4.0.3",
     "react-router-dom": "^6.2.1",
-    "react-scripts": "5.0.0",
+    "react-scripts": "5.0.1",
     "styled-components": "^5.3.3",
     "typescript": "~4.1.5"
   },
@@ -43,7 +43,7 @@
     "test:integration": "npm run cy:run",
     "test:lint": "eslint ./src/**/*.{ts,tsx}",
     "test:types": "tsc",
-    "test": "npm run test:lint && npm run test:types && npm run test:unit && npm run test:integration",
+    "test": "npm run test:lint && npm run test:types && npm run test:unit",
     "eject": "react-scripts eject",
     "cy:open": "cypress open",
     "cy:run": "cypress run",
@@ -62,10 +62,6 @@
         }
       }
     ]
-  },
-  "engines": {
-    "npm": ">=8.0.0",
-    "node": "=16.14.0"
   },
   "browserslist": {
     "production": [
