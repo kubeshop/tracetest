@@ -48,6 +48,11 @@ func main() {
 		log.Fatal(err)
 	}
 
+	err = analytics.Init(cfg.GA, "tracetest", os.Getenv("VERSION"))
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	ctx := context.Background()
 	tp := initOtelTracing(ctx)
 	defer func() { _ = tp.Shutdown(ctx) }()
@@ -90,7 +95,7 @@ func main() {
 	fileMatcher := regexp.MustCompile(`\.[a-zA-Z]*$`)
 	router.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if !fileMatcher.MatchString(r.URL.Path) {
-			serveIndex(w, dir+"/index.html")
+			serveIndex(cfg, w, dir+"/index.html")
 		} else {
 			fileServer.ServeHTTP(w, r)
 		}
@@ -118,10 +123,10 @@ type gaParams struct {
 	AnalyticsEnabled bool
 }
 
-func serveIndex(w http.ResponseWriter, path string) {
+func serveIndex(cfg config.Config, w http.ResponseWriter, path string) {
 	templateData := gaParams{
-		MeasurementId:    os.Getenv("GOOGLE_ANALYTICS_MEASUREMENT_ID"),
-		AnalyticsEnabled: os.Getenv("ANALYTICS_ENABLED") == "true",
+		MeasurementId:    cfg.GA.MeasurementID,
+		AnalyticsEnabled: cfg.GA.Enabled,
 	}
 
 	tpl, err := template.ParseFiles(path)

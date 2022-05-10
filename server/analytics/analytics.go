@@ -8,139 +8,132 @@ import (
 	"net/http"
 	"os"
 	"runtime"
-	"strconv"
 
 	"github.com/denisbrodbeck/machineid"
+	"github.com/kubeshop/tracetest/config"
 )
 
-var (
-	appName          = "tracetest"
-	analyticsEnabled = false
-	gaURL            = "https://www.google-analytics.com/mp/collect?measurement_id=%s&api_secret=%s"
-	gaValidationURL  = "https://www.google-analytics.com/debug/mp/collect?measurement_id=%s&api_secret=%s"
-	gaMeasurementId  = ""
-	gaSecretKey      = ""
+const (
+	gaURL           = "https://www.google-analytics.com/mp/collect?measurement_id=%s&api_secret=%s"
+	gaValidationURL = "https://www.google-analytics.com/debug/mp/collect?measurement_id=%s&api_secret=%s"
 )
 
-func init() {
-	gaMeasurementId = os.Getenv("GOOGLE_ANALYTICS_MEASUREMENT_ID")
-	gaSecretKey = os.Getenv("GOOGLE_ANALYTICS_SECRET_KEY")
-	analyticsIsEnabled, err := strconv.ParseBool(os.Getenv("ANALYTICS_ENABLED"))
-	if err != nil {
-		analyticsEnabled = false
-	} else {
-		analyticsEnabled = analyticsIsEnabled
+var defaultClient ga
+
+func Init(cfg config.GoogleAnalytics, appName, appVersion string) error {
+	// ga not enabled, use dumb settings
+	if !cfg.Enabled {
+		defaultClient = ga{enabled: false}
+		return nil
 	}
-}
 
-type Params struct {
-	EventCount       int64  `json:"event_count,omitempty"`
-	EventCategory    string `json:"event_category,omitempty"`
-	AppVersion       string `json:"app_version,omitempty"`
-	AppName          string `json:"app_name,omitempty"`
-	CustomDimensions string `json:"custom_dimensions,omitempty"`
-	DataSource       string `json:"data_source,omitempty"`
-	Host             string `json:"host,omitempty"`
-	MachineID        string `json:"machine_id,omitempty"`
-	OperatingSystem  string `json:"operating_system,omitempty"`
-	Architecture     string `json:"architecture,omitempty"`
-}
-
-type Event struct {
-	Name   string `json:"name"`
-	Params Params `json:"params,omitempty"`
-}
-
-type Payload struct {
-	UserID   string  `json:"user_id,omitempty"`
-	ClientID string  `json:"client_id,omitempty"`
-	Events   []Event `json:"events,omitempty"`
-}
-
-type validationResponse struct {
-	ValidationMessages []validationMessage `json:"validationMessages"`
-}
-
-type validationMessage struct {
-	FieldPath      string `json:"fieldPath"`
-	Description    string `json:"description"`
-	ValidationCode string `json:"validationCode"`
-}
-
-func NewEvent(name string, category string) (Event, error) {
-	appVersion := os.Getenv("VERSION")
-	host, err := os.Hostname()
+	// setup an actual client
+	hostname, err := os.Hostname()
 	if err != nil {
-		return Event{}, fmt.Errorf("could not get hostname: %w", err)
+		return fmt.Errorf("could not get hostnmae: %w", err)
 	}
 
 	machineID, err := machineid.ProtectedID(appName)
 	if err != nil {
-		return Event{}, fmt.Errorf("could not get machineID: %w", err)
+		return fmt.Errorf("could not get machineID: %w", err)
 	}
 
-	return Event{
+	defaultClient = ga{
+		enabled:       cfg.Enabled,
+		measurementID: cfg.MeasurementID,
+		secretKey:     cfg.SecretKey,
+		appVersion:    appVersion,
+		appName:       appName,
+		hostname:      hostname,
+		machineID:     machineID,
+	}
+
+	return nil
+}
+
+func CreateAndSendEvent(name, category string) error {
+	if defaultClient.ready() {
+		return fmt.Errorf("uninitalized client. Call analytics.Init")
+	}
+	return defaultClient.CreateAndSendEvent(name, category)
+}
+
+type ga struct {
+	enabled       bool
+	appVersion    string
+	appName       string
+	measurementID string
+	secretKey     string
+	hostname      string
+	machineID     string
+}
+
+func (ga ga) ready() bool {
+	return !ga.enabled || (ga.appVersion != "" &&
+		ga.appName != "" &&
+		ga.measurementID != "" &&
+		ga.secretKey != "" &&
+		ga.hostname != "" &&
+		ga.machineID != "")
+
+}
+
+func (ga ga) CreateAndSendEvent(name, category string) error {
+	if !ga.enabled {
+		return nil
+	}
+	event, err := ga.newEvent(name, category)
+	if err != nil {
+		return fmt.Errorf("could not create event: %w", err)
+	}
+
+	return ga.sendEvent(event)
+}
+
+func (ga ga) newEvent(name, category string) (event, error) {
+	return event{
 		Name: name,
-		Params: Params{
+		Params: params{
 			EventCount:      1,
-			AppName:         "tracetest",
 			EventCategory:   category,
-			Host:            host,
-			MachineID:       machineID,
-			AppVersion:      appVersion,
+			AppName:         ga.appName,
+			Host:            ga.hostname,
+			MachineID:       ga.machineID,
+			AppVersion:      ga.appVersion,
 			Architecture:    runtime.GOARCH,
 			OperatingSystem: runtime.GOOS,
 		},
 	}, nil
 }
 
-// SendEvent sends an event to Google Analytics.
-func SendEvent(event Event) error {
-	if !analyticsEnabled {
-		return nil
-	}
-
-	return sendEvent(event)
-}
-
-// CreateAndSendEvent is a syntax-sugar to create and send the event in a single command
-func CreateAndSendEvent(name string, category string) error {
-	event, err := NewEvent(name, category)
-	if err != nil {
-		return fmt.Errorf("could not create event: %w", err)
-	}
-
-	return SendEvent(event)
-}
-
-func sendEvent(event Event) error {
-	machineID, err := machineid.ProtectedID(appName)
-	if err != nil {
-		return fmt.Errorf("could not get machine id: %w", err)
-	}
-	payload := Payload{
-		UserID:   machineID,
-		ClientID: machineID,
-		Events: []Event{
-			event,
+func (ga ga) sendEvent(e event) error {
+	payload := payload{
+		UserID:   ga.machineID,
+		ClientID: ga.machineID,
+		Events: []event{
+			e,
 		},
 	}
 
-	err = sendValidationRequest(payload)
+	fmt.Printf("ga %+v\n", payload)
+	err := ga.sendValidationRequest(payload)
 	if err != nil {
+		fmt.Println("err validation", err)
 		return err
 	}
 
-	err = sendDataToGA(payload)
+	err = ga.sendDataToGA(payload)
 	if err != nil {
+		fmt.Println("err sendData", err)
 		return fmt.Errorf("could not send request to google analytics: %w", err)
 	}
 
+	fmt.Println("success data")
 	return nil
 }
 
-func sendValidationRequest(payload Payload) error {
-	response, body, err := sendPayloadToURL(payload, gaValidationURL)
+func (ga ga) sendValidationRequest(p payload) error {
+	response, body, err := ga.sendPayloadToURL(p, gaValidationURL)
 
 	if err != nil {
 		return err
@@ -164,8 +157,8 @@ func sendValidationRequest(payload Payload) error {
 	return nil
 }
 
-func sendDataToGA(payload Payload) error {
-	response, _, err := sendPayloadToURL(payload, gaURL)
+func (ga ga) sendDataToGA(p payload) error {
+	response, _, err := ga.sendPayloadToURL(p, gaURL)
 	if err != nil {
 		return fmt.Errorf("could not send event to google analytics: %w", err)
 	}
@@ -177,13 +170,13 @@ func sendDataToGA(payload Payload) error {
 	return nil
 }
 
-func sendPayloadToURL(payload Payload, url string) (*http.Response, []byte, error) {
-	jsonData, err := json.Marshal(payload)
+func (ga ga) sendPayloadToURL(p payload, url string) (*http.Response, []byte, error) {
+	jsonData, err := json.Marshal(p)
 	if err != nil {
 		return nil, []byte{}, fmt.Errorf("could not marshal json payload: %w", err)
 	}
 
-	request, err := http.NewRequest("POST", fmt.Sprintf(url, gaMeasurementId, gaSecretKey), bytes.NewBuffer(jsonData))
+	request, err := http.NewRequest("POST", fmt.Sprintf(url, ga.measurementID, ga.secretKey), bytes.NewBuffer(jsonData))
 	if err != nil {
 		return nil, []byte{}, fmt.Errorf("could not create request: %w", err)
 	}
@@ -203,4 +196,38 @@ func sendPayloadToURL(payload Payload, url string) (*http.Response, []byte, erro
 	}
 
 	return resp, body, err
+}
+
+type params struct {
+	EventCount       int64  `json:"event_count,omitempty"`
+	EventCategory    string `json:"event_category,omitempty"`
+	AppVersion       string `json:"app_version,omitempty"`
+	AppName          string `json:"app_name,omitempty"`
+	CustomDimensions string `json:"custom_dimensions,omitempty"`
+	DataSource       string `json:"data_source,omitempty"`
+	Host             string `json:"host,omitempty"`
+	MachineID        string `json:"machine_id,omitempty"`
+	OperatingSystem  string `json:"operating_system,omitempty"`
+	Architecture     string `json:"architecture,omitempty"`
+}
+
+type event struct {
+	Name   string `json:"name"`
+	Params params `json:"params,omitempty"`
+}
+
+type payload struct {
+	UserID   string  `json:"user_id,omitempty"`
+	ClientID string  `json:"client_id,omitempty"`
+	Events   []event `json:"events,omitempty"`
+}
+
+type validationResponse struct {
+	ValidationMessages []validationMessage `json:"validationMessages"`
+}
+
+type validationMessage struct {
+	FieldPath      string `json:"fieldPath"`
+	Description    string `json:"description"`
+	ValidationCode string `json:"validationCode"`
 }
