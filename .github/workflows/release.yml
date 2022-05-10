@@ -143,6 +143,7 @@ jobs:
         helm repo update && \
         helm upgrade tracetest-demo kubeshop/tracetest \
           --namespace tracetest-demo \
+          --set analytics.enabled=true \
           --set image.tag=${{ github.ref_name }} \
           --set tracingBackend=jaeger \
           --set jaegerConnectionConfig.endpoint="jaeger-query.tracetest.svc.cluster.local:16685" \
