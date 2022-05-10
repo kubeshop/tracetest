@@ -121,17 +121,14 @@ func (ga ga) sendEvent(e event) error {
 
 	err := ga.sendValidationRequest(payload)
 	if err != nil {
-		fmt.Println("err validation", err)
 		return err
 	}
 
 	err = ga.sendDataToGA(payload)
 	if err != nil {
-		fmt.Println("err sendData", err)
 		return fmt.Errorf("could not send request to google analytics: %w", err)
 	}
 
-	fmt.Println("success data")
 	return nil
 }
 
@@ -153,7 +150,6 @@ func (ga ga) sendValidationRequest(p payload) error {
 	}
 
 	if len(validationResponse.ValidationMessages) > 0 {
-		fmt.Println(validationResponse)
 		return fmt.Errorf("google analytics request validation failed")
 	}
 

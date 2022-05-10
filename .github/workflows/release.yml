@@ -17,6 +17,7 @@ on:
 jobs:
   release:
     name: Create and upload release-artifacts, triggers Helm charts release
+    if: github.event.base_ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -143,6 +144,8 @@ jobs:
         helm upgrade tracetest-demo kubeshop/tracetest \
           --namespace tracetest-demo \
           --set analytics.enabled=true \
+          --set analytics.measurementId="{{ secrets.GA_MEASUREMENT_ID_DEMO }}" \
+          --set analytics.secretKey="{{ secrets.GA_SECRET_KEY_DEMO }}" \
           --set image.tag=${{ github.ref_name }} \
           --set tracingBackend=jaeger \
           --set jaegerConnectionConfig.endpoint="jaeger-query.tracetest.svc.cluster.local:16685" \
