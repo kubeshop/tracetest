@@ -75,7 +75,7 @@ func TestFromFileError(t *testing.T) {
 			cl := c
 			t.Parallel()
 
-			_, err := config.FromFile("./testdata/config.yaml")
+			_, err := config.FromFile(cl.file)
 
 			assert.True(t, strings.HasPrefix(err.Error(), cl.expected))
 
