@@ -17,7 +17,6 @@ on:
 jobs:
   release:
     name: Create and upload release-artifacts, triggers Helm charts release
-    if: github.event.base_ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
