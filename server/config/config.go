@@ -10,12 +10,21 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type Config struct {
-	PostgresConnString     string                         `mapstructure:"postgresConnString"`
-	JaegerConnectionConfig *configgrpc.GRPCClientSettings `mapstructure:"jaegerConnectionConfig"`
-	TempoConnectionConfig  *configgrpc.GRPCClientSettings `mapstructure:"tempoConnectionConfig"`
-	MaxWaitTimeForTrace    string                         `mapstructure:"maxWaitTimeForTrace"`
-}
+type (
+	Config struct {
+		PostgresConnString     string                         `mapstructure:"postgresConnString"`
+		JaegerConnectionConfig *configgrpc.GRPCClientSettings `mapstructure:"jaegerConnectionConfig"`
+		TempoConnectionConfig  *configgrpc.GRPCClientSettings `mapstructure:"tempoConnectionConfig"`
+		MaxWaitTimeForTrace    string                         `mapstructure:"maxWaitTimeForTrace"`
+		GA                     GoogleAnalytics                `mapstructure:"googleAnalytics"`
+	}
+
+	GoogleAnalytics struct {
+		MeasurementID string `mapstructure:"measurementId"`
+		SecretKey     string `mapstructure:"secretKey"`
+		Enabled       bool   `mapstructure:"enabled"`
+	}
+)
 
 func (c Config) MaxWaitTimeForTraceDuration() time.Duration {
 	maxWaitTimeForTrace, err := time.ParseDuration(c.MaxWaitTimeForTrace)

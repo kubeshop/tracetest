@@ -1,6 +1,12 @@
-maxWaitTimeForTrace: 30s
 postgresConnString: "host=postgres user=postgres password=postgres port=5432 sslmode=disable"
 jaegerConnectionConfig:
   endpoint: jaeger-query:16685
   tls:
     insecure: true
+
+maxWaitTimeForTrace: 30s
+
+googleAnalytics:
+  enabled: false
+  measurementId: ""
+  secretKey: ""

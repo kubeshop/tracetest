@@ -61,46 +61,11 @@ Now Tracetest is available at [http://localhost:8080]
 ## **Run a Development Build**
 
 Now that Tracetest is running, we can expose the dependencies in our cluster to the host machine so they are accessible to the development build.
-
-### Expose jaeger-query
-
-Any method for exposing a service will work. Here is an example using `LoadBalancer`
+Tracetests needs postgres to store the tests, results, etc, and access to the trace backend (jaeger, tempo, etc) to fetch traces.
+We can use kubectl's port forwarding capabilites for this
 
 ```
-cat <<EOF | kubectl create -f -
-apiVersion: v1
-kind: Service
-metadata:
-  name: jaeger-query-exposed
-spec:
-  type: LoadBalancer
-  ports:
-    - port: 16685
-      targetPort: 16685
-  selector:
-    app: jaeger
-EOF
-```
-
-### Expose postgres
-
-Any method for exposing a service will work. Here is an example using `LoadBalancer`
-
-```
-cat <<EOF | kubectl create -f -
-apiVersion: v1
-kind: Service
-metadata:
-  name: psql
-spec:
-  type: LoadBalancer
-  ports:
-    - port: 5432
-      targetPort: 5432
-  selector:
-    app.kubernetes.io/instance: tracetest
-    app.kubernetes.io/name: postgresql
-EOF
+(trap "kill 0" SIGINT; kubectl port-forward svc/tracetest-postgresql 5432:5432 & kubectl port-forward svc/jaeger-query 16685:16685)
 ```
 
 ### Start Development Server
@@ -110,8 +75,7 @@ When running the development version, the frontend and backend are built and run
 To start the backend server:
 
 ```
-cd server
-make run-server # builds the server and starts it
+make server-run
 ```
 
 To start the frontend server:
