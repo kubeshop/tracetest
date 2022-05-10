@@ -51,6 +51,7 @@ export const TraceComponent = ({
               key="span-detail"
             >
               <SpanDetail resultId={testResultDetails?.resultId} testId={test?.testId} span={selectedSpan} />
+              <br />
             </Tabs.TabPane>
             <Tabs.TabPane
               tab={

@@ -28,7 +28,7 @@ export const Container = styled.div`
   padding: 24px;
   border: 1px solid rgba(0, 0, 0, 0.06);
   margin-bottom: 16px;
-  overflow-y: scroll;
+  overflow-y: auto;
 `;
 
 export const EmptyStateContainer = styled.div`
@@ -61,6 +61,8 @@ export const LeftContainer = styled.div`
 export const RightContainer = styled.div`
   display: flex;
   flex-basis: 50%;
+  width: 100%;
+  flex-grow: 1;
   padding-top: 10px;
   padding-left: 10px;
 `;

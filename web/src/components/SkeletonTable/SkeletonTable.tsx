@@ -1,9 +1,9 @@
 import {Skeleton, SkeletonProps, Table} from 'antd';
 import {ColumnsType} from 'antd/lib/table';
 
-export type SkeletonTableColumnsType = {
+export interface SkeletonTableColumnsType {
   key: string;
-};
+}
 
 type SkeletonTableProps = SkeletonProps & {
   columns?: ColumnsType<SkeletonTableColumnsType>;

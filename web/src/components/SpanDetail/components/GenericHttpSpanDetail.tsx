@@ -38,7 +38,6 @@ export const GenericHttpSpanDetail: FC<ISpanDetailProps> = ({testId, span, resul
         <br />
         <br />
       </S.DetailsContainer>
-
       {span && testId && (
         <CreateAssertionModal
           key={`KEY_${span?.spanId}`}

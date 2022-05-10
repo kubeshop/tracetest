@@ -5,7 +5,6 @@ import CustomTable from '../../CustomTable';
 
 const STabs = styled(Tabs)`
   .ant-tabs-content-holder {
-    overflow: hidden;
     padding-bottom: 100px;
   }
 `;
@@ -21,7 +20,7 @@ export const HTTPAttributesTabs = ({attributeList}: IProps): JSX.Element => {
       <Typography.Title level={5} style={{margin: 0}}>
         Attributes
       </Typography.Title>
-      <STabs style={{marginBottom: 150, overflow: 'hidden'}}>
+      <STabs id="the_tabs" style={{marginBottom: 150, overflow: 'hidden'}}>
         <Tabs.TabPane style={{overflow: 'hidden'}} tab={<span>Request</span>} key="span-request-detail">
           <CustomTable
             size="small"

@@ -14,7 +14,6 @@ export const DetailsContainer = styled.div`
   padding: 24px;
   border: 1px solid rgba(0, 0, 0, 0.06);
   margin-bottom: 16px;
-  min-height: 280px;
 `;
 
 export const DetailsEmptyStateContainer = styled.div`
@@ -24,6 +23,7 @@ export const DetailsEmptyStateContainer = styled.div`
   margin-top: 40px;
   flex-direction: column;
   gap: 14px;
+  overflow-y: auto;
 `;
 
 export const DetailsTableEmptyStateIcon = styled.img.attrs({

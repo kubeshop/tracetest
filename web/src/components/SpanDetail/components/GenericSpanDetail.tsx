@@ -72,6 +72,9 @@ const GenericSpanDetail: FC<ISpanDetailProps> = ({testId, span, resultId}) => {
           onClose={() => setOpenCreateAssertion(false)}
         />
       )}
+      <br />
+      <br />
+      <br />
     </>
   );
 };
