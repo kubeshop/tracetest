@@ -49,6 +49,7 @@ type DemoAppConfig struct {
 type DemoApp struct {
 	endpoint          string
 	apiContainer      *gnomock.Container
+	workerContainer   *gnomock.Container
 	redisContainer    *gnomock.Container
 	postgresContainer *gnomock.Container
 	jaegerContainer   *gnomock.Container
@@ -60,11 +61,12 @@ func (da *DemoApp) Endpoint() string {
 }
 
 func (da *DemoApp) Stop() {
+	gnomock.Stop(da.apiContainer)
+	gnomock.Stop(da.workerContainer)
 	gnomock.Stop(da.jaegerContainer)
 	gnomock.Stop(da.postgresContainer)
 	gnomock.Stop(da.redisContainer)
 	gnomock.Stop(da.rabbitmqContainer)
-	gnomock.Stop(da.apiContainer)
 }
 
 func GetDemoApplicationInstance() (*DemoApp, error) {
@@ -118,7 +120,7 @@ func GetDemoApplicationInstance() (*DemoApp, error) {
 		return nil, err
 	}
 
-	apiContainer, err := getPokeshopInstance(demoConfig)
+	apiContainer, workerContainer, err := getPokeshopInstance(demoConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -126,6 +128,7 @@ func GetDemoApplicationInstance() (*DemoApp, error) {
 	return &DemoApp{
 		endpoint:          fmt.Sprintf("%s:%d", apiContainer.Host, apiContainer.DefaultPort()),
 		apiContainer:      apiContainer,
+		workerContainer:   workerContainer,
 		redisContainer:    redisContainer,
 		postgresContainer: postgresContainer,
 		jaegerContainer:   jaegerContainer,
@@ -227,7 +230,7 @@ func getJaegerInstance(wg *sync.WaitGroup, pokeshopConfig *pokeshopConfig) (*gno
 	return pgContainer, nil
 }
 
-func getPokeshopInstance(config pokeshopConfig) (*gnomock.Container, error) {
+func getPokeshopInstance(config pokeshopConfig) (*gnomock.Container, *gnomock.Container, error) {
 	databaseUrl := fmt.Sprintf(
 		"postgresql://%s:%s@%s:%d/%s?schema=public",
 		config.postgres.user,
@@ -255,7 +258,7 @@ func getPokeshopInstance(config pokeshopConfig) (*gnomock.Container, error) {
 		return nil
 	}
 
-	container, err := gnomock.StartCustom(
+	apiContainer, err := gnomock.StartCustom(
 		"kubeshop/demo-pokemon-api:0.0.11",
 		gnomock.DefaultTCP(80),
 		gnomock.WithEnv(fmt.Sprintf("DATABASE_URL=%s", databaseUrl)),
@@ -272,8 +275,27 @@ func getPokeshopInstance(config pokeshopConfig) (*gnomock.Container, error) {
 	)
 
 	if err != nil {
-		return nil, fmt.Errorf("could not create demo app container: %w", err)
+		return nil, nil, fmt.Errorf("could not create demo app api container: %w", err)
 	}
 
-	return container, nil
+	workerContainer, err := gnomock.StartCustom(
+		"kubeshop/demo-pokemon-api:0.0.11",
+		gnomock.DefaultTCP(80),
+		gnomock.WithEnv(fmt.Sprintf("DATABASE_URL=%s", databaseUrl)),
+		gnomock.WithEnv(fmt.Sprintf("REDIS_URL=%s", config.redis.endpoint)),
+		gnomock.WithEnv(fmt.Sprintf("RABBITMQ_HOST=%s", config.rabbitmq.endpoint)),
+		gnomock.WithEnv(fmt.Sprintf("JAEGER_HOST=%s", config.jaeger.host)),
+		gnomock.WithEnv(fmt.Sprintf("JAEGER_PORT=%d", config.jaeger.port)),
+		gnomock.WithEnv("POKE_API_BASE_URL=https://pokeapi.co/api/v2"),
+		gnomock.WithEnv("NPM_RUN_COMMAND=worker"),
+		gnomock.WithContainerName("pokeshop-worker"),
+		gnomock.WithDebugMode(),
+		gnomock.WithNetwork("pokeshop"),
+	)
+
+	if err != nil {
+		return nil, nil, fmt.Errorf("could not create demo app worker container: %w", err)
+	}
+
+	return apiContainer, workerContainer, nil
 }
