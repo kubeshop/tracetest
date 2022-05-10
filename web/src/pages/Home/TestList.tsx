@@ -1,100 +1,46 @@
-import {Dropdown, Menu, Table} from 'antd';
-import {useRef} from 'react';
+import {useCallback} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {MoreOutlined} from '@ant-design/icons';
-import {useDeleteTestByIdMutation, useGetTestListQuery} from 'redux/apis/Test.api';
-import CustomTable from '../../components/CustomTable';
 import HomeAnalyticsService from '../../services/Analytics/HomeAnalytics.service';
-import NoResults from './NoResults';
-import {ITest} from '../../types/Test.types';
 import {useMenuDeleteCallback} from './useMenuDeleteCallback';
+import TestCard from '../../components/TestCard';
+import {useGetTestListQuery, useRunTestMutation} from '../../redux/apis/Test.api';
+import TestAnalyticsService from '../../services/Analytics/TestAnalytics.service';
+import * as S from './Home.styled';
 
 const {onTestClick} = HomeAnalyticsService;
 
 const TestList = () => {
   const navigate = useNavigate();
-  const eventRef = useRef<{previousPageX: number; currentPageX: number}>({previousPageX: 0, currentPageX: 0});
-  const {data: testList = [], isLoading} = useGetTestListQuery();
+  const {data: testList = []} = useGetTestListQuery();
+  const [runTest] = useRunTestMutation();
 
-  const [deleteTestMutation] = useDeleteTestByIdMutation();
+  const onClick = useCallback(
+    (testId: string) => {
+      onTestClick(testId);
+      navigate(`/test/${testId}`);
+    },
+    [navigate]
+  );
 
-  const handleMouseUp = (event: any) => {
-    if (event.type === 'mousedown') {
-      eventRef.current.previousPageX = event.pageX;
-    } else if (event.type === 'mouseup') {
-      eventRef.current.currentPageX = event.pageX;
-    } else if (event.type === 'click') {
-      if (Math.abs(eventRef.current.currentPageX - eventRef.current.previousPageX) > 0) {
-        event?.stopPropagation();
+  const onRunTest = useCallback(
+    async (testId: string) => {
+      if (testId) {
+        TestAnalyticsService.onRunTest(testId);
+        const testResult = await runTest(testId).unwrap();
+        navigate(`/test/${testId}?resultId=${testResult.resultId}`);
       }
-    }
-  };
-  const onDelete = useMenuDeleteCallback(deleteTestMutation);
-  return (
-    <CustomTable
-      scroll={{y: 'calc(100vh - 300px)'}}
-      dataSource={testList?.map(el => ({...el, url: el.serviceUnderTest.request.url})).reverse()}
-      rowKey="testId"
-      data-cy="testList"
-      locale={{emptyText: <NoResults />}}
-      loading={isLoading}
-      onRow={record => {
-        return {
-          onClick: () => {
-            const testId = (record as ITest).testId;
+    },
+    [navigate, runTest]
+  );
 
-            onTestClick(testId);
-            navigate(`/test/${testId}`);
-          },
-        };
-      }}
-    >
-      <Table.Column title="Name" dataIndex="name" key="name" width="25%" />
-      <Table.Column
-        title="Endpoint"
-        dataIndex="url"
-        key="url"
-        render={(value, {testId}: ITest) => {
-          return (
-            <span
-              style={{paddingLeft: 16, paddingRight: 16}}
-              data-cy={`test-url-${testId}`}
-              onMouseDown={handleMouseUp}
-              onMouseUp={handleMouseUp}
-              onClick={handleMouseUp}
-            >
-              {value}
-            </span>
-          );
-        }}
-      />
-      <Table.Column<ITest>
-        title="Actions"
-        key="actions"
-        align="right"
-        render={(test: ITest) => (
-          <Dropdown
-            overlay={
-              <Menu>
-                <Menu.Item data-cy="test-delete-button" onClick={onDelete(test)} key="delete">
-                  Delete
-                </Menu.Item>
-              </Menu>
-            }
-            placement="bottomLeft"
-            trigger={['click']}
-          >
-            <span
-              data-cy={`test-actions-button-${test.testId}`}
-              className="ant-dropdown-link"
-              onClick={e => e.stopPropagation()}
-            >
-              <MoreOutlined style={{fontSize: 24}} />
-            </span>
-          </Dropdown>
-        )}
-      />
-    </CustomTable>
+  const onDelete = useMenuDeleteCallback();
+
+  return (
+    <S.TestListContainer>
+      {testList?.map(test => (
+        <TestCard test={test} onClick={onClick} onDelete={onDelete} onRunTest={onRunTest} key={test.testId} />
+      ))}
+    </S.TestListContainer>
   );
 };
 

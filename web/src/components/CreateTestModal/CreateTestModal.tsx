@@ -47,7 +47,7 @@ const CreateTestModal = ({visible, onClose}: IProps): JSX.Element => {
   const renderActionButtons = () => {
     return (
       <>
-        <Button type="ghost" htmlType="button" onClick={onClose}>
+        <Button type="primary" ghost htmlType="button" onClick={onClose}>
           Cancel
         </Button>
 
@@ -62,7 +62,7 @@ const CreateTestModal = ({visible, onClose}: IProps): JSX.Element => {
           data-tour={GuidedTourService.getStep(GuidedTours.Home, Steps.Run)}
           data-cy="create-test-submit"
         >
-          Run Test
+          Save
         </Button>
       </>
     );
@@ -72,13 +72,13 @@ const CreateTestModal = ({visible, onClose}: IProps): JSX.Element => {
     <S.Wrapper>
       <Modal
         closable
-        title="Create New Test"
+        title="Create Test"
         visible={visible}
         footer={renderActionButtons()}
         onCancel={onClose}
         wrapClassName="test-modal"
       >
-        <div style={{display: 'flex'}} data-cy="create-test-modal">
+        <div data-cy="create-test-modal">
           <CreateTestForm onSubmit={onCreate} form={form} />
         </div>
       </Modal>

@@ -1,21 +1,15 @@
 import {useEffect, useState} from 'react';
 import {delay} from 'lodash';
-// import {Button} from 'antd';
-// import {InfoCircleOutlined} from '@ant-design/icons';
-import CreateTestModal from 'components/CreateTestModal';
-import {Steps} from 'components/GuidedTour/homeStepList';
-import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
+import {GuidedTours} from 'services/GuidedTour.service';
 import useGuidedTour from 'hooks/useGuidedTour';
 import TestList from './TestList';
 import * as S from './Home.styled';
-import HomeAnalyticsService from '../../services/Analytics/HomeAnalytics.service';
-
-const {onCreateTestClick} = HomeAnalyticsService;
+import HomeActions from './HomeActions';
+import CreateTestModal from '../../components/CreateTestModal';
 
 const HomeContent: React.FC = () => {
   const [openCreateTestModal, setOpenCreateTestModal] = useState(false);
-
-  const {setCurrentStep, setIsOpen, currentStep, isOpen: isGuidOpen} = useGuidedTour(GuidedTours.Home);
+  const {setCurrentStep, currentStep, isOpen: isGuidOpen} = useGuidedTour(GuidedTours.Home);
 
   useEffect(() => {
     if (currentStep > 0 && !openCreateTestModal && isGuidOpen) {
@@ -26,40 +20,16 @@ const HomeContent: React.FC = () => {
   }, [currentStep, openCreateTestModal, setCurrentStep, isGuidOpen]);
 
   return (
-    <S.Wrapper>
-      <S.PageHeader>
-        <S.TitleText>All Tests</S.TitleText>
-        <S.ActionContainer>
-          {/* <Button
-            size="large"
-            type="link"
-            icon={<InfoCircleOutlined />}
-            onClick={() => {
-              setCurrentStep(0);
-              setIsOpen(true);
-              onGuidedTourClick();
-            }}
-          >
-            Guided tour
-          </Button> */}
-          <S.CreateTestButton
-            data-tour={GuidedTourService.getStep(GuidedTours.Home, Steps.CreateTest)}
-            data-cy="create-test-button"
-            type="primary"
-            size="large"
-            onClick={() => {
-              onCreateTestClick();
-              setOpenCreateTestModal(true);
-              if (isGuidOpen) delay(() => setCurrentStep(currentStep + 1), 1);
-            }}
-          >
-            Create Test
-          </S.CreateTestButton>
-        </S.ActionContainer>
-      </S.PageHeader>
-      <TestList />
+    <>
+      <S.Wrapper>
+        <S.PageHeader>
+          <S.TitleText>All Tests</S.TitleText>
+          <HomeActions onCreateTest={() => setOpenCreateTestModal(true)} />
+        </S.PageHeader>
+        <TestList />
+      </S.Wrapper>
       <CreateTestModal visible={openCreateTestModal} onClose={() => setOpenCreateTestModal(false)} />
-    </S.Wrapper>
+    </>
   );
 };
 

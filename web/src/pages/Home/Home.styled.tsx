@@ -45,3 +45,9 @@ export const NoResultsTitle = styled(Typography.Title).attrs({
 })`
   margin-top: 32px;
 `;
+
+export const TestListContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+`;

@@ -3,13 +3,13 @@ import Layout from 'antd/lib/layout';
 import Title from 'antd/lib/typography/Title';
 import Menu from 'antd/lib/menu';
 
-export const Header = styled(Layout.Header).attrs({
-  theme: 'dark',
-})`
+export const Header = styled(Layout.Header)`
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0 24px;
+  background: #fff;
+  border-bottom: 1px solid #e2e4e6;
 `;
 
 export const TitleText = styled(Title).attrs({
@@ -23,7 +23,6 @@ export const TitleText = styled(Title).attrs({
 `;
 
 export const NavMenu = styled(Menu).attrs({
-  theme: 'dark',
   mode: 'horizontal',
   disabledOverflow: true,
 })`
@@ -32,7 +31,7 @@ export const NavMenu = styled(Menu).attrs({
   }
 
   .ant-menu-item > span > a {
-    color: white;
+    color: #61175e;
   }
 `;
 

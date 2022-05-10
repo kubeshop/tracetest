@@ -41,7 +41,9 @@ export const Wrapper = styled.div`
 
 export const DropdownText = styled(Typography.Text).attrs({
   as: 'a',
-})``;
+})`
+  font-weight: 600;
+`;
 
 export const DemoTextContainer = styled.div`
   margin-bottom: 24px;
