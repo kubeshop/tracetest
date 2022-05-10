@@ -1,16 +1,14 @@
 package test
 
 import (
-	"context"
-
 	"github.com/kubeshop/tracetest/app"
 	"github.com/kubeshop/tracetest/config"
+	"github.com/kubeshop/tracetest/tracedb"
 	"go.opentelemetry.io/collector/config/configgrpc"
 	"go.opentelemetry.io/collector/config/configtls"
 )
 
 func GetTestingApp(demoApp *DemoApp) (*app.App, error) {
-	ctx := context.Background()
 	db, err := GetTestingDatabase("file://../migrations")
 
 	if err != nil {
@@ -26,5 +24,10 @@ func GetTestingApp(demoApp *DemoApp) (*app.App, error) {
 		},
 	}
 
-	return app.NewApp(ctx, config, app.WithDB(db))
+	tracedb, err := tracedb.New(config)
+	if err != nil {
+		return nil, err
+	}
+
+	return app.New(config, db, tracedb)
 }

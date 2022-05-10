@@ -10,12 +10,13 @@
 package main
 
 import (
-	"context"
 	"flag"
 	"log"
 
 	"github.com/kubeshop/tracetest/app"
 	"github.com/kubeshop/tracetest/config"
+	"github.com/kubeshop/tracetest/testdb"
+	"github.com/kubeshop/tracetest/tracedb"
 )
 
 var cfg = flag.String("config", "config.yaml", "path to the config file")
@@ -27,15 +28,23 @@ func main() {
 		log.Fatal(err)
 	}
 
-	ctx := context.Background()
-	app, err := app.NewApp(ctx, cfg)
+	testDB, err := testdb.Postgres(testdb.WithDSN(cfg.PostgresConnString))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	err = app.Start(ctx)
+	traceDB, err := tracedb.New(cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer app.Stop(ctx)
+
+	app, err := app.New(cfg, testDB, traceDB)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = app.Start()
+	if err != nil {
+		log.Fatal(err)
+	}
 }

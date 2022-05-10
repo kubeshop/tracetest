@@ -2,7 +2,6 @@ package executor_test
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -18,17 +17,17 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+const appEndpoint = "http://localhost:8080"
+
 func TestExecutorIntegration(t *testing.T) {
 	demoApp, err := test.GetDemoApplicationInstance()
 	require.NoError(t, err)
 	defer demoApp.Stop()
 
-	ctx := context.Background()
-
 	app, err := test.GetTestingApp(demoApp)
 	require.NoError(t, err)
 
-	go app.Start(ctx)
+	go app.Start()
 
 	time.Sleep(1 * time.Second)
 
@@ -69,7 +68,7 @@ func createImportPokemonTest(app *app.App, demoApp *test.DemoApp) (string, error
 		return "", fmt.Errorf("could not convert body into json: %w", err)
 	}
 	bytesBuffer := bytes.NewBuffer(jsonBytes)
-	url := fmt.Sprintf("%s/api/tests", app.Endpoint())
+	url := fmt.Sprintf("%s/api/tests", appEndpoint)
 
 	response, err := http.Post(url, "application/json", bytesBuffer)
 	if err != nil {
@@ -95,7 +94,7 @@ func createImportPokemonTest(app *app.App, demoApp *test.DemoApp) (string, error
 }
 
 func runTest(app *app.App, testID string) (string, error) {
-	url := fmt.Sprintf("%s/api/tests/%s/run", app.Endpoint(), testID)
+	url := fmt.Sprintf("%s/api/tests/%s/run", appEndpoint, testID)
 	response, err := http.Post(url, "application/json", nil)
 	if err != nil {
 		return "", fmt.Errorf("could not send request to run test: %w", err)
@@ -157,7 +156,7 @@ func getTestRunResultInState(app *app.App, testID, resultID, state string) *open
 }
 
 func getTestResult(app *app.App, testID, resultID string) (*openapi.TestRunResult, error) {
-	url := fmt.Sprintf("%s/api/tests/%s/results/%s", app.Endpoint(), testID, resultID)
+	url := fmt.Sprintf("%s/api/tests/%s/results/%s", appEndpoint, testID, resultID)
 	response, err := http.Get(url)
 	if err != nil {
 		return nil, fmt.Errorf("could not send request to run test: %w", err)
