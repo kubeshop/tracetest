@@ -19,6 +19,7 @@ extra_css:
 
 extra_javascript:
   - https://unpkg.com/mermaid/dist/mermaid.min.js
+  - js/loader.js
 
 nav:
   - Welcome: index.md
