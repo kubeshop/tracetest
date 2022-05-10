@@ -143,8 +143,8 @@ jobs:
         helm upgrade tracetest-demo kubeshop/tracetest \
           --namespace tracetest-demo \
           --set analytics.enabled=true \
-          --set analytics.measurementId="{{ secrets.GA_MEASUREMENT_ID_DEMO }}" \
-          --set analytics.secretKey="{{ secrets.GA_SECRET_KEY_DEMO }}" \
+          --set analytics.measurementId="${{ secrets.GA_MEASUREMENT_ID_DEMO }}" \
+          --set analytics.secretKey="${{ secrets.GA_SECRET_KEY_DEMO }}" \
           --set image.tag=${{ github.ref_name }} \
           --set tracingBackend=jaeger \
           --set jaegerConnectionConfig.endpoint="jaeger-query.tracetest.svc.cluster.local:16685" \
