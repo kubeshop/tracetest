@@ -5,9 +5,11 @@ import (
 
 	"github.com/kubeshop/tracetest/app"
 	"github.com/kubeshop/tracetest/config"
+	"go.opentelemetry.io/collector/config/configgrpc"
+	"go.opentelemetry.io/collector/config/configtls"
 )
 
-func GetTestingApp() (*app.App, error) {
+func GetTestingApp(demoApp *DemoApp) (*app.App, error) {
 	ctx := context.Background()
 	db, err := GetTestingDatabase("file://../migrations")
 
@@ -15,6 +17,14 @@ func GetTestingApp() (*app.App, error) {
 		return nil, err
 	}
 
-	config := config.Config{}
+	config := config.Config{
+		JaegerConnectionConfig: &configgrpc.GRPCClientSettings{
+			Endpoint: demoApp.JaegerEndpoint(),
+			TLSSetting: configtls.TLSClientSetting{
+				Insecure: true,
+			},
+		},
+	}
+
 	return app.NewApp(ctx, config, app.WithDB(db))
 }

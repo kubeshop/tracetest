@@ -60,6 +60,10 @@ func NewApp(ctx context.Context, config config.Config, options ...Option) (*App,
 	return app, nil
 }
 
+func (a *App) Endpoint() string {
+	return "http://localhost:8080"
+}
+
 func (a *App) Start(ctx context.Context) error {
 	err := analytics.Init(a.config.GA, "tracetest", os.Getenv("VERSION"))
 	if err != nil {
