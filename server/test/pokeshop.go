@@ -172,7 +172,7 @@ func getRabbitMQInstance(wg *sync.WaitGroup, pokeshopConfig *pokeshopConfig) err
 func getJaegerInstance(wg *sync.WaitGroup, pokeshopConfig *pokeshopConfig) error {
 	defer wg.Done()
 
-	container, err := gnomock.StartCustom(
+	_, err := gnomock.StartCustom(
 		"jaegertracing/all-in-one:latest",
 		gnomock.NamedPorts{
 			"6832":  gnomock.Port{Protocol: "udp", Port: 6832},
@@ -190,7 +190,7 @@ func getJaegerInstance(wg *sync.WaitGroup, pokeshopConfig *pokeshopConfig) error
 
 	pokeshopConfig.jaeger = jaegerConfig{
 		host: "pokeshop_jaeger",
-		port: container.Port("6832"),
+		port: 6832,
 	}
 
 	return nil
