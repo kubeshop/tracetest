@@ -5,13 +5,26 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/kubeshop/tracetest/testdb"
 	"github.com/orlangure/gnomock"
 	"github.com/orlangure/gnomock/preset/postgres"
 )
 
 var pgContainer *gnomock.Container
 
-func GetTestingDatabase() (*sql.DB, error) {
+func GetTestingDatabase(migrationFolder string) (testdb.Repository, error) {
+	db, err := GetRawTestingDatabase()
+	if err != nil {
+		return nil, err
+	}
+
+	return testdb.Postgres(
+		testdb.WithDB(db),
+		testdb.WithMigrations(migrationFolder),
+	)
+}
+
+func GetRawTestingDatabase() (*sql.DB, error) {
 	pgContainer, err := getPostgresContainer()
 	if err != nil {
 		return nil, err
