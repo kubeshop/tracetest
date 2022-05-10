@@ -19,7 +19,7 @@ const TestCard: React.FC<ITestCardProps> = ({
   onRunTest,
 }) => {
   return (
-    <S.TestCard onClick={() => onClick(testId)}>
+    <S.TestCard onClick={() => onClick(testId)} data-cy="test-card">
       <RightOutlined />
       <S.TextContainer>
         <S.NameText>{name}</S.NameText>
@@ -35,6 +35,7 @@ const TestCard: React.FC<ITestCardProps> = ({
         <Button
           type="primary"
           ghost
+          data-cy="test-run-button"
           onClick={event => {
             event.stopPropagation();
             onRunTest(testId);

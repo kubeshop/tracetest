@@ -36,7 +36,7 @@ const TestList = () => {
   const onDelete = useMenuDeleteCallback();
 
   return (
-    <S.TestListContainer>
+    <S.TestListContainer data-cy="test-list">
       {testList?.map(test => (
         <TestCard test={test} onClick={onClick} onDelete={onDelete} onRunTest={onRunTest} key={test.testId} />
       ))}
