@@ -4,6 +4,8 @@ services:
     container_name: tracetest
     image: kubeshop/tracetest
     build: .
+    environment:
+      - VERSION=1.0
     volumes:
       - type: bind
         source: ./server/config.yaml

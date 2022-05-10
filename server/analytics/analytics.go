@@ -39,7 +39,7 @@ func Init(cfg config.GoogleAnalytics, appName, appVersion string) error {
 	}
 
 	defaultClient = ga{
-		enabled:       cfg.Enabled,
+		enabled:       true,
 		measurementID: cfg.MeasurementID,
 		secretKey:     cfg.SecretKey,
 		appVersion:    appVersion,
@@ -52,10 +52,14 @@ func Init(cfg config.GoogleAnalytics, appName, appVersion string) error {
 }
 
 func CreateAndSendEvent(name, category string) error {
-	if defaultClient.ready() {
+	if !defaultClient.ready() {
 		return fmt.Errorf("uninitalized client. Call analytics.Init")
 	}
 	return defaultClient.CreateAndSendEvent(name, category)
+}
+
+func Ready() bool {
+	return defaultClient.ready()
 }
 
 type ga struct {
@@ -115,7 +119,6 @@ func (ga ga) sendEvent(e event) error {
 		},
 	}
 
-	fmt.Printf("ga %+v\n", payload)
 	err := ga.sendValidationRequest(payload)
 	if err != nil {
 		fmt.Println("err validation", err)
