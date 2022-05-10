@@ -35,3 +35,12 @@ require (
 	google.golang.org/grpc v1.45.0
 	gopkg.in/yaml.v2 v2.4.0
 )
+
+// Temporary fix until we manage to merge the patch to the gnomock repo (https://github.com/orlangure/gnomock/pull/534)
+replace github.com/orlangure/gnomock v0.20.0 => github.com/mathnogueira/gnomock v0.21.0
+
+replace github.com/orlangure/gnomock/preset/postgres v0.20.0 => github.com/mathnogueira/gnomock/preset/postgres v0.21.0
+
+replace github.com/orlangure/gnomock/preset/redis v0.20.0 => github.com/mathnogueira/gnomock/preset/redis v0.21.0
+
+replace github.com/orlangure/gnomock/preset/rabbitmq v0.20.0 => github.com/mathnogueira/gnomock/preset/rabbitmq v0.21.0
