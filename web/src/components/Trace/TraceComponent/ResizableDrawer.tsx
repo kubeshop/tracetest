@@ -33,7 +33,7 @@ export const ResizableDrawer = ({open, children, min, max}: IProps): JSX.Element
         }
       }
     },
-    [setHeight, isResizing, document.body]
+    [setHeight, isResizing, min, max]
   );
 
   useEffect(() => {

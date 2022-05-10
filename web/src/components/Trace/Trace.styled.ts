@@ -2,6 +2,12 @@ import {Tabs} from 'antd';
 import styled from 'styled-components';
 
 export const TraceTabs = styled(Tabs)`
+  flex-grow: 1;
+
+  .ant-tabs {
+    flex-grow: 1;
+  }
+
   .ant-tabs-nav {
     margin-bottom: 0;
   }
@@ -13,12 +19,11 @@ export const TraceTabs = styled(Tabs)`
   .ant-tabs-tabpane {
     flex-direction: column;
   }
-`;
 
-export const FailedTrace = styled.div`
-  height: calc(100vh - 200px);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  .ant-tabs-content-holder {
+    width: 100%;
+    min-width: unset;
+    min-height: unset;
+    overflow-y: auto;
+  }
 `;

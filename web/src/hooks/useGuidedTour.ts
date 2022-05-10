@@ -1,5 +1,4 @@
 import {useTour} from '@reactour/tour';
-// import {delay as delayFn} from 'lodash';
 import {useEffect, useState} from 'react';
 import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
 import HomeStepList from 'components/GuidedTour/homeStepList';
@@ -14,10 +13,10 @@ const StepListMap = {
   [GuidedTours.TestDetails]: TestDetailsStepList,
 };
 
-const useGuidedTour = (tour: GuidedTours, delay = 500) => {
+const useGuidedTour = (tour: GuidedTours) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const tourFn = useTour();
-  const {setCurrentStep, setIsOpen, setSteps, isOpen} = tourFn;
+  const {setCurrentStep, setSteps, isOpen} = tourFn;
 
   useEffect(() => {
     setIsLoaded(false);

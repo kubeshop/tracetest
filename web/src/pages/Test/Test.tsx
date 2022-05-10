@@ -76,7 +76,7 @@ const TestPage = () => {
       if (testResult) handleSelectTestResult(testResult);
       setReadRoute(true);
     }
-  }, [location, test, testResultList, readRoute]);
+  }, [query, activeTabKey, handleSelectTestResult, location, test, testResultList, readRoute]);
 
   const onChangeTab = useCallback(
     (tabKey: string) => {
