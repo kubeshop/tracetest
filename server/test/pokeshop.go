@@ -46,9 +46,31 @@ type DemoAppConfig struct {
 	Endpoint string
 }
 
-func GetDemoApplicationInstance() (DemoAppConfig, error) {
+type DemoApp struct {
+	endpoint          string
+	apiContainer      *gnomock.Container
+	redisContainer    *gnomock.Container
+	postgresContainer *gnomock.Container
+	jaegerContainer   *gnomock.Container
+	rabbitmqContainer *gnomock.Container
+}
+
+func (da *DemoApp) Endpoint() string {
+	return da.endpoint
+}
+
+func (da *DemoApp) Stop() {
+	gnomock.Stop(da.jaegerContainer)
+	gnomock.Stop(da.postgresContainer)
+	gnomock.Stop(da.redisContainer)
+	gnomock.Stop(da.rabbitmqContainer)
+	gnomock.Stop(da.apiContainer)
+}
+
+func GetDemoApplicationInstance() (*DemoApp, error) {
 	demoConfig := pokeshopConfig{}
 	var wg sync.WaitGroup
+	var jaegerContainer, postgresContainer, redisContainer, rabbitContainer *gnomock.Container
 	wg.Add(4)
 	var err error
 
@@ -59,63 +81,72 @@ func GetDemoApplicationInstance() (DemoAppConfig, error) {
 			password: "squirtle123",
 		}
 
-		pgErr := getDemoPostgresInstance(postgresConfig, wg, pokeshopConfig)
-		if err != nil {
+		container, pgErr := getDemoPostgresInstance(postgresConfig, wg, pokeshopConfig)
+		if pgErr != nil {
 			err = pgErr
 		}
+		postgresContainer = container
 	}(&wg, &demoConfig)
 
 	go func(wg *sync.WaitGroup, pokeshopConfig *pokeshopConfig) {
-		redisErr := getRedisInstance(wg, pokeshopConfig)
-		if err != nil {
+		container, redisErr := getRedisInstance(wg, pokeshopConfig)
+		if redisErr != nil {
 			err = redisErr
 		}
+		redisContainer = container
 	}(&wg, &demoConfig)
 
 	go func(wg *sync.WaitGroup, pokeshopConfig *pokeshopConfig) {
-		rabbitErr := getRabbitMQInstance(wg, pokeshopConfig)
-		if err != nil {
+		container, rabbitErr := getRabbitMQInstance(wg, pokeshopConfig)
+		if rabbitErr != nil {
 			err = rabbitErr
 		}
+		rabbitContainer = container
 	}(&wg, &demoConfig)
 
 	go func(wg *sync.WaitGroup, pokeshopConfig *pokeshopConfig) {
-		jaegerErr := getJaegerInstance(wg, pokeshopConfig)
-		if err != nil {
+		container, jaegerErr := getJaegerInstance(wg, pokeshopConfig)
+		if jaegerErr != nil {
 			err = jaegerErr
 		}
+		jaegerContainer = container
 	}(&wg, &demoConfig)
 
 	wg.Wait()
 
 	if err != nil {
-		return DemoAppConfig{}, err
+		return nil, err
 	}
 
-	container, err = getPokeshopInstance(demoConfig)
+	apiContainer, err := getPokeshopInstance(demoConfig)
 	if err != nil {
-		return DemoAppConfig{}, err
+		return nil, err
 	}
 
-	return DemoAppConfig{
-		Endpoint: fmt.Sprintf("%s:%d", container.Host, container.DefaultPort()),
+	return &DemoApp{
+		endpoint:          fmt.Sprintf("%s:%d", apiContainer.Host, apiContainer.DefaultPort()),
+		apiContainer:      apiContainer,
+		redisContainer:    redisContainer,
+		postgresContainer: postgresContainer,
+		jaegerContainer:   jaegerContainer,
+		rabbitmqContainer: rabbitContainer,
 	}, nil
 }
 
-func getDemoPostgresInstance(config postgresConfig, wg *sync.WaitGroup, pokeshopConfig *pokeshopConfig) error {
+func getDemoPostgresInstance(config postgresConfig, wg *sync.WaitGroup, pokeshopConfig *pokeshopConfig) (*gnomock.Container, error) {
 	defer wg.Done()
 	preset := postgres.Preset(
 		postgres.WithDatabase(config.db),
 		postgres.WithUser(config.user, config.password),
 	)
 
-	_, err := gnomock.Start(
+	container, err := gnomock.Start(
 		preset,
 		gnomock.WithContainerName("pokeshop_postgres"),
 		gnomock.WithNetwork("pokeshop"),
 	)
 	if err != nil {
-		return fmt.Errorf("could not start demo app's postgres: %w", err)
+		return nil, fmt.Errorf("could not start demo app's postgres: %w", err)
 	}
 
 	pokeshopConfig.postgres = postgresConfig{
@@ -126,50 +157,50 @@ func getDemoPostgresInstance(config postgresConfig, wg *sync.WaitGroup, pokeshop
 		password: config.password,
 	}
 
-	return nil
+	return container, nil
 }
 
-func getRedisInstance(wg *sync.WaitGroup, pokeshopConfig *pokeshopConfig) error {
+func getRedisInstance(wg *sync.WaitGroup, pokeshopConfig *pokeshopConfig) (*gnomock.Container, error) {
 	defer wg.Done()
 	preset := redis.Preset()
 
-	_, err := gnomock.Start(
+	container, err := gnomock.Start(
 		preset,
 		gnomock.WithContainerName("pokeshop_redis"),
 		gnomock.WithNetwork("pokeshop"),
 	)
 	if err != nil {
-		return fmt.Errorf("could not start redis container: %w", err)
+		return nil, fmt.Errorf("could not start redis container: %w", err)
 	}
 
 	pokeshopConfig.redis = redisConfig{
-		endpoint: fmt.Sprintf("%s", "pokeshop_redis"),
+		endpoint: "pokeshop_redis",
 	}
 
-	return nil
+	return container, nil
 }
 
-func getRabbitMQInstance(wg *sync.WaitGroup, pokeshopConfig *pokeshopConfig) error {
+func getRabbitMQInstance(wg *sync.WaitGroup, pokeshopConfig *pokeshopConfig) (*gnomock.Container, error) {
 	defer wg.Done()
 	preset := rabbitmq.Preset()
 
-	_, err := gnomock.Start(
+	container, err := gnomock.Start(
 		preset,
 		gnomock.WithContainerName("pokeshop_rabbitmq"),
 		gnomock.WithNetwork("pokeshop"),
 	)
 	if err != nil {
-		return fmt.Errorf("could not start rabbitMQ container: %w", err)
+		return nil, fmt.Errorf("could not start rabbitMQ container: %w", err)
 	}
 
 	pokeshopConfig.rabbitmq = rabbitmqConfig{
 		endpoint: fmt.Sprintf("%s:%d", "pokeshop_rabbitmq", 5672),
 	}
 
-	return nil
+	return container, nil
 }
 
-func getJaegerInstance(wg *sync.WaitGroup, pokeshopConfig *pokeshopConfig) error {
+func getJaegerInstance(wg *sync.WaitGroup, pokeshopConfig *pokeshopConfig) (*gnomock.Container, error) {
 	defer wg.Done()
 
 	_, err := gnomock.StartCustom(
@@ -185,7 +216,7 @@ func getJaegerInstance(wg *sync.WaitGroup, pokeshopConfig *pokeshopConfig) error
 	)
 
 	if err != nil {
-		return fmt.Errorf("could not start jaeger container: %w", err)
+		return nil, fmt.Errorf("could not start jaeger container: %w", err)
 	}
 
 	pokeshopConfig.jaeger = jaegerConfig{
@@ -193,7 +224,7 @@ func getJaegerInstance(wg *sync.WaitGroup, pokeshopConfig *pokeshopConfig) error
 		port: 6832,
 	}
 
-	return nil
+	return pgContainer, nil
 }
 
 func getPokeshopInstance(config pokeshopConfig) (*gnomock.Container, error) {

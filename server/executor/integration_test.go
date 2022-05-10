@@ -11,10 +11,11 @@ import (
 )
 
 func TestExecutorIntegration(t *testing.T) {
-	demoAppConfig, err := test.GetDemoApplicationInstance()
+	demoApp, err := test.GetDemoApplicationInstance()
 	require.NoError(t, err)
+	defer demoApp.Stop()
 
-	resp, err := http.Get(fmt.Sprintf("http://%s/pokemon/healthcheck", demoAppConfig.Endpoint))
+	resp, err := http.Get(fmt.Sprintf("http://%s/pokemon/healthcheck", demoApp.Endpoint()))
 	assert.NoError(t, err)
 
 	assert.Equal(t, 200, resp.StatusCode)
