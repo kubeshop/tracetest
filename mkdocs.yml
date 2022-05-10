@@ -43,8 +43,7 @@ extra:
 
 plugins:
   - render_swagger
-  - mermaid2:
-      version: 8.6.4
+  - mermaid2
 
 # Extensions
 markdown_extensions:

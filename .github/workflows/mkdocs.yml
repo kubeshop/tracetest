@@ -22,5 +22,5 @@ jobs:
           python-version: 3.x
       - run: pip install mkdocs-material
       - run: pip install mkdocs-render-swagger-plugin
-      - run: pip install mkdocs-mermaid2-plugin
+      - run: pip install mkdocs-mermaid2-plugin==0.5.2
       - run: mkdocs gh-deploy --force
