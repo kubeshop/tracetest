@@ -13,6 +13,13 @@ export const TraceTabs = styled(Tabs)`
   .ant-tabs-tabpane {
     flex-direction: column;
   }
+
+  .ant-tabs-content-holder {
+    width: 100%;
+    min-width: unset;
+    min-height: unset;
+    overflow-y: scroll;
+  }
 `;
 
 export const FailedTrace = styled.div`

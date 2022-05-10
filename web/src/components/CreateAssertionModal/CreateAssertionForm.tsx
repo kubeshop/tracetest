@@ -86,7 +86,7 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
 
   useEffect(() => {
     onSelectorList(assertion ? assertion.selectors : defaultSelectorList);
-  }, [onSelectorList, defaultSelectorList]);
+  }, [onSelectorList, defaultSelectorList, assertion]);
 
   const spanAssertionOptions = useAttributeList(span, affectedSpanList);
 

@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useRef} from 'react';
+import {useCallback, useEffect, useMemo, useRef} from 'react';
 import * as d3 from 'd3';
 import {ITrace} from 'types/Trace.types';
 import TraceAnalyticsService from '../../../services/Analytics/TraceAnalytics.service';
@@ -45,7 +45,7 @@ export const TimelineChart = ({trace, selectedSpan, onSelectSpan}: ITimelineChar
     });
 
     return d3.stratify()(dagData);
-  }, [trace]);
+  }, [spanMap]);
 
   const minNano = d3.min(
     spanDates.filter(el => Number(el.span.startTimeUnixNano) > 0 && Number(el.span.endTimeUnixNano) > 0),
@@ -107,13 +107,9 @@ export const TimelineChart = ({trace, selectedSpan, onSelectSpan}: ITimelineChar
       .attr('stroke', 'none')
       .attr('fill', 'rgb(213, 215, 224)');
     chart.append('g').attr('class', 'container').attr('transform', `translate(0 , 30 )`);
-  }, [trace]);
+  }, [trace, maxNano, minNano, root, scaleTime, treeFactory]);
 
-  useEffect(() => {
-    drawChart();
-  }, [selectedSpan]);
-
-  const drawChart = () => {
+  const drawChart = useCallback(() => {
     let nodes = treeFactory(root);
     let nodesSort: any[] = [];
     nodes.sort((a: any, b: any) =>
@@ -229,7 +225,11 @@ export const TimelineChart = ({trace, selectedSpan, onSelectSpan}: ITimelineChar
       d.x0 = d.x;
       d.y0 = d.y;
     });
-  };
+  }, [treeFactory, maxNano, minNano, onSelectSpan, root, scaleTime, selectedSpan.id, theBarHeight]);
+
+  useEffect(() => {
+    drawChart();
+  }, [selectedSpan, drawChart]);
 
   return <svg ref={svgRef} />;
 };

@@ -1,7 +1,7 @@
 import {SemanticGroupNames} from '../../constants/SemanticGroupNames.constants';
 import {ISpan} from '../../types/Span.types';
 import GenericSpanDetail from './components/GenericSpanDetail';
-import GenericHttpSpanDetail from './components/GenericHttpSpanDetail';
+import {GenericHttpSpanDetail} from './components/GenericHttpSpanDetail';
 
 export interface ISpanDetailProps {
   testId?: string;

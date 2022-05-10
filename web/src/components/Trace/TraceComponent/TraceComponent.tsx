@@ -8,6 +8,7 @@ import {Diagram, SupportedDiagrams} from 'components/Diagram/Diagram';
 import SpanDetail from 'components/SpanDetail';
 import {TimelineDrawer} from 'components/Trace/TraceComponent/TimelineDrawer';
 import {useHandleOnSpanSelectedCallback} from 'components/Trace/TraceComponent/useHandleOnSpanSelectedCallback';
+import {LeftContainer, RightContainer, TraceContainer} from './TestResults.styled';
 import * as S from '../Trace.styled';
 import TestResults from './TestResults';
 import GuidedTourService, {GuidedTours} from '../../../services/GuidedTour.service';
@@ -34,42 +35,38 @@ export const TraceComponent = ({
   const onSelectSpan = useHandleOnSpanSelectedCallback(addSelected, testResultDetails, setSelectedSpan);
   return !displayError ? (
     <>
-      <div style={{display: 'flex', width: '100%', minHeight, maxHeight: minHeight, height: minHeight}}>
-        <div style={{flexBasis: '50%', paddingTop: 10, paddingLeft: 10}}>
+      <TraceContainer height={minHeight}>
+        <LeftContainer>
           <Diagram
             type={SupportedDiagrams.DAG}
             trace={testResultDetails?.trace!}
             onSelectSpan={onSelectSpan}
             selectedSpan={selectedSpan}
           />
-        </div>
-        <div style={{flexBasis: '50%', overflowY: 'scroll', paddingTop: 10, paddingRight: 10}}>
-          <div className="pane-content" style={{padding: '14px 24px', overflow: 'hidden'}}>
-            <S.TraceTabs onChange={activeTab => TraceAnalyticsService.onChangeTab(activeTab)}>
-              <Tabs.TabPane
-                tab={
-                  <span data-tour={GuidedTourService.getStep(GuidedTours.Trace, Steps.SpanDetail)}>Span Detail</span>
-                }
-                key="span-detail"
-              >
-                <SpanDetail resultId={testResultDetails?.resultId} testId={test?.testId} span={selectedSpan} />
-              </Tabs.TabPane>
-              <Tabs.TabPane
-                tab={
-                  <span data-tour={GuidedTourService.getStep(GuidedTours.Trace, Steps.TestResults)}>Test Results</span>
-                }
-                key="test-results"
-              >
-                <TestResults
-                  onSpanSelected={onSelectSpan}
-                  trace={testResultDetails?.trace}
-                  resultId={testResultDetails?.resultId!}
-                />
-              </Tabs.TabPane>
-            </S.TraceTabs>
-          </div>
-        </div>
-      </div>
+        </LeftContainer>
+        <RightContainer>
+          <S.TraceTabs onChange={activeTab => TraceAnalyticsService.onChangeTab(activeTab)}>
+            <Tabs.TabPane
+              tab={<span data-tour={GuidedTourService.getStep(GuidedTours.Trace, Steps.SpanDetail)}>Span Detail</span>}
+              key="span-detail"
+            >
+              <SpanDetail resultId={testResultDetails?.resultId} testId={test?.testId} span={selectedSpan} />
+            </Tabs.TabPane>
+            <Tabs.TabPane
+              tab={
+                <span data-tour={GuidedTourService.getStep(GuidedTours.Trace, Steps.TestResults)}>Test Results</span>
+              }
+              key="test-results"
+            >
+              <TestResults
+                onSpanSelected={onSelectSpan}
+                trace={testResultDetails?.trace}
+                resultId={testResultDetails?.resultId!}
+              />
+            </Tabs.TabPane>
+          </S.TraceTabs>
+        </RightContainer>
+      </TraceContainer>
       <TimelineDrawer
         visiblePortion={visiblePortion}
         testResultDetails={testResultDetails}

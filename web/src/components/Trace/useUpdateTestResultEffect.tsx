@@ -21,5 +21,5 @@ export function useUpdateTestResultEffect(
         })
       );
     }
-  }, [test, dispatch]);
+  }, [test, dispatch, isFirstLoad, testResultDetails, testResultId]);
 }

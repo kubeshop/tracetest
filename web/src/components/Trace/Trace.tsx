@@ -37,7 +37,15 @@ export const Trace: React.FC<TraceProps> = ({testId, testResultId, onRunTest}): 
 
   return (
     <>
-      <FailedTrace onRunTest={onRunTest} testId={testId} isDisplayingError={isDisplayingError} onEdit={() => console.log('onEdit')} />
+      <FailedTrace
+        onRunTest={onRunTest}
+        testId={testId}
+        isDisplayingError={isDisplayingError}
+        onEdit={() => {
+          // eslint-disable-next-line no-console
+          console.log('onEdit');
+        }}
+      />
       <TraceComponent
         displayError={isDisplayingError}
         minHeight={height}

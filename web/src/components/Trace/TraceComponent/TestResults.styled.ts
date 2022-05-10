@@ -14,7 +14,6 @@ export const TraceHeader = styled.div<{visiblePortion: number}>`
   display: flex;
   align-items: center;
   align-content: center;
-  align-items: center;
   cursor: grab;
   width: 100%;
   ${props =>
@@ -29,7 +28,7 @@ export const Container = styled.div`
   padding: 24px;
   border: 1px solid rgba(0, 0, 0, 0.06);
   margin-bottom: 16px;
-  min-height: 280px;
+  overflow-y: scroll;
 `;
 
 export const EmptyStateContainer = styled.div`
@@ -44,3 +43,24 @@ export const EmptyStateContainer = styled.div`
 export const EmptyStateIcon = styled.img.attrs({
   src: noResultsIcon,
 })``;
+
+export const TraceContainer = styled.div<{height: string}>`
+  display: flex;
+  width: 100%;
+  min-height: ${props => props.height};
+  max-height: ${props => props.height};
+  height: ${props => props.height};
+`;
+
+export const LeftContainer = styled.div`
+  flex-basis: 50%;
+  padding-top: 10px;
+  padding-left: 10px;
+`;
+
+export const RightContainer = styled.div`
+  display: flex;
+  flex-basis: 50%;
+  padding-top: 10px;
+  padding-left: 10px;
+`;
