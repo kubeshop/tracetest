@@ -43,11 +43,18 @@ extra:
 
 plugins:
   - render_swagger
+  - search
+  - mermaid2
 
 # Extensions
 markdown_extensions:
   - pymdownx.highlight
-  - pymdownx.superfences
   - pymdownx.inlinehilite
+  - pymdownx.superfences:
+      # make exceptions to highlighting of code:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:mermaid2.fence_mermaid
 
 copyright: Copyright &copy; 2022 <a href="https://kubeshop.io">Kubeshop</a>
