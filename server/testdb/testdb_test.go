@@ -14,15 +14,7 @@ import (
 )
 
 func getDB() (testdb.Repository, error) {
-	db, err := test.GetTestingDatabase()
-	if err != nil {
-		return nil, err
-	}
-
-	return testdb.Postgres(
-		testdb.WithDB(db),
-		testdb.WithMigrations("file://../migrations"),
-	)
+	return test.GetTestingDatabase("file://../migrations")
 }
 
 func TestCreateTest(t *testing.T) {

@@ -11,7 +11,7 @@ server-generate:
 	cd server; pwd; go fmt ./...; cd ..
 
 server-test:
-	cd server; go test ./... -timeout 1m
+	cd server; go test -timeout 1m -coverprofile=coverage.out ./...
 
 server-vet:
 	cd server; go vet -structtag=false ./...
