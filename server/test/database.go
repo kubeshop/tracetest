@@ -9,11 +9,17 @@ import (
 	"github.com/orlangure/gnomock/preset/postgres"
 )
 
-var container *gnomock.Container
+var pgContainer *gnomock.Container
 
 func GetTestingDatabase() (*sql.DB, error) {
-	container, err := getPostgresContainer()
-	db, err := getMainDatabaseConnection(container)
+	pgContainer, err := getPostgresContainer()
+	if err != nil {
+		return nil, err
+	}
+	db, err := getMainDatabaseConnection(pgContainer)
+	if err != nil {
+		return nil, err
+	}
 	newDbConnection, err := createRandomDatabaseForTest(db, "tracetest")
 
 	if err != nil {
@@ -42,15 +48,15 @@ func createRandomDatabaseForTest(db *sql.DB, baseDatabase string) (*sql.DB, erro
 
 	connStr := fmt.Sprintf(
 		"host=%s port=%d user=%s password=%s  dbname=%s sslmode=disable",
-		container.Host, container.DefaultPort(), "tracetest", "tracetest", newDatabaseName,
+		pgContainer.Host, pgContainer.DefaultPort(), "tracetest", "tracetest", newDatabaseName,
 	)
 
 	return sql.Open("postgres", connStr)
 }
 
 func getPostgresContainer() (*gnomock.Container, error) {
-	if container != nil {
-		return container, nil
+	if pgContainer != nil {
+		return pgContainer, nil
 	}
 
 	preset := postgres.Preset(
@@ -63,7 +69,7 @@ func getPostgresContainer() (*gnomock.Container, error) {
 		return nil, fmt.Errorf("could not start postgres container")
 	}
 
-	container = dbContainer
+	pgContainer = dbContainer
 
 	return dbContainer, nil
 }

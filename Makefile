@@ -11,7 +11,7 @@ server-generate:
 	cd server; pwd; go fmt ./...; cd ..
 
 server-test:
-	cd server; go test ./...
+	cd server; go test ./... -timeout 1m
 
 server-vet:
 	cd server; go vet -structtag=false ./...
