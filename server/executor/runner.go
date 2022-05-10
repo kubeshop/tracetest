@@ -7,6 +7,7 @@ import (
 
 	"github.com/kubeshop/tracetest/id"
 	"github.com/kubeshop/tracetest/openapi"
+	"github.com/kubeshop/tracetest/testdb"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -23,17 +24,17 @@ type Executor interface {
 	Execute(*openapi.Test, trace.TraceID, trace.SpanID) (openapi.HttpResponse, error)
 }
 
-type TestsDB interface {
-	CreateResult(_ context.Context, testID string, _ *openapi.TestRunResult) error
-	UpdateTest(context.Context, *openapi.Test) error
-	ResultUpdater
-}
-
-func NewPersistentRunner(e Executor, resultDB TestsDB, tp TracePoller) PersistentRunner {
+func NewPersistentRunner(
+	e Executor,
+	testDB testdb.TestRepository,
+	resultDB testdb.ResultRepository,
+	tp TracePoller,
+) PersistentRunner {
 	return persistentRunner{
 		executor:     e,
 		tp:           tp,
-		testsDB:      resultDB,
+		testsDB:      testDB,
+		resultDB:     resultDB,
 		idGen:        id.NewRandGenerator(),
 		executeQueue: make(chan execReq, 5),
 		exit:         make(chan bool, 1),
@@ -44,7 +45,8 @@ type persistentRunner struct {
 	executor Executor
 	tp       TracePoller
 	idGen    id.Generator
-	testsDB  TestsDB
+	testsDB  testdb.TestRepository
+	resultDB testdb.ResultRepository
 
 	executeQueue chan execReq
 	exit         chan bool
@@ -95,7 +97,7 @@ func (r persistentRunner) Run(t openapi.Test) openapi.TestRunResult {
 	ctx := context.Background()
 
 	result := r.newTestResult(t.TestId)
-	r.handleDBError(r.testsDB.CreateResult(ctx, result.TestId, &result))
+	r.handleDBError(r.resultDB.CreateResult(ctx, result.TestId, &result))
 
 	r.executeQueue <- execReq{
 		ctx:    ctx,
@@ -109,7 +111,7 @@ func (r persistentRunner) Run(t openapi.Test) openapi.TestRunResult {
 func (r persistentRunner) processExecQueue(job execReq) {
 	result := job.result
 	result.State = TestRunStateExecuting
-	r.handleDBError(r.testsDB.UpdateResult(job.ctx, &result))
+	r.handleDBError(r.resultDB.UpdateResult(job.ctx, &result))
 
 	tid, _ := trace.TraceIDFromHex(result.TraceId)
 	sid, _ := trace.SpanIDFromHex(result.SpanId)
@@ -124,7 +126,7 @@ func (r persistentRunner) processExecQueue(job execReq) {
 		r.handleDBError(r.testsDB.UpdateTest(job.ctx, &job.test))
 	}
 
-	r.handleDBError(r.testsDB.UpdateResult(job.ctx, &result))
+	r.handleDBError(r.resultDB.UpdateResult(job.ctx, &result))
 	if result.State == TestRunStateAwaitingTrace {
 		// start a new context
 		r.tp.Poll(job.ctx, result)

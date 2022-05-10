@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/kubeshop/tracetest/openapi"
 	"github.com/kubeshop/tracetest/test"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -19,4 +20,9 @@ func TestExecutorIntegration(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.Equal(t, 200, resp.StatusCode)
+}
+
+func createTest(demoApp test.DemoApp) (openapi.Test, error) {
+	importPokemonEndpointURL := fmt.Sprintf("http://%s/pokemon/import")
+	resp, err := 
 }
