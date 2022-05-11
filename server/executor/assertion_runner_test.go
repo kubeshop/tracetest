@@ -12,7 +12,6 @@ import (
 	"github.com/kubeshop/tracetest/executor"
 	"github.com/kubeshop/tracetest/openapi"
 	"github.com/kubeshop/tracetest/test"
-	"github.com/kubeshop/tracetest/testdb"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -35,29 +34,26 @@ func TestExecutorSuccessfulExecution(t *testing.T) {
 		},
 	}
 
-	sqlDb, err := test.GetTestingDatabase()
-	require.NoError(t, err)
-
-	postgresRepository, err := testdb.Postgres(
-		testdb.WithDB(sqlDb),
-		testdb.WithMigrations("file://../migrations"),
-	)
+	postgresRepository, err := test.GetTestingDatabase("file://../migrations")
 	require.NoError(t, err)
 
 	for _, testCase := range testCases {
 		t.Run(testCase.Name, func(t *testing.T) {
 			ctx := context.Background()
-			t.Parallel()
 
 			test, result, err := loadTestFile(testCase.Tracefile)
 			require.NoError(t, err)
 
-			inputChannel := make(chan openapi.TestRunResult)
-			assertionExecutor := executor.NewAssertionRunner(postgresRepository, postgresRepository, inputChannel)
+			assertionExecutor := executor.NewAssertionRunner(postgresRepository)
 
-			_, err = postgresRepository.CreateTest(ctx, &test)
+			createdTestID, err := postgresRepository.CreateTest(ctx, &test)
 			require.NoError(t, err)
 
+			for _, assertion := range test.Assertions {
+				postgresRepository.CreateAssertion(ctx, test.TestId, &assertion)
+			}
+
+			result.TestId = createdTestID
 			err = postgresRepository.CreateResult(ctx, test.TestId, &result)
 			require.NoError(t, err)
 
@@ -107,6 +103,7 @@ func loadTestFile(filePath string) (openapi.Test, openapi.TestRunResult, error) 
 	}
 
 	testFile.Test.TestId = uuid.NewString()
+	testFile.Result.TestId = testFile.Test.TestId
 	testFile.Result.ResultId = uuid.NewString()
 
 	return testFile.Test, testFile.Result, nil

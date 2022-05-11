@@ -39,10 +39,10 @@ func TestExecutorIntegration(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotEmpty(t, resultID)
 
-	testRunResult := waitForResultState(app, testID, resultID, executor.TestRunStateAwaitingTestResults, 30*time.Second)
+	testRunResult := waitForResultState(app, testID, resultID, executor.TestRunStateFinished, 30*time.Second)
 	assert.NotNil(t, testRunResult)
 	assert.Greater(t, len(testRunResult.Trace.ResourceSpans), 0)
-	assert.Equal(t, executor.TestRunStateAwaitingTestResults, testRunResult.State)
+	assert.Equal(t, executor.TestRunStateFinished, testRunResult.State)
 }
 
 func createImportPokemonTest(app *app.App, demoApp *test.DemoApp) (string, error) {

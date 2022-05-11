@@ -15,6 +15,7 @@ import (
 
 type TracePoller interface {
 	Poll(context.Context, openapi.TestRunResult)
+	OnPollComplete(callback func(openapi.TestRunResult))
 }
 
 type PersistentTracePoller interface {
@@ -35,7 +36,6 @@ func NewTracePoller(
 	ru ResultUpdater,
 	maxWaitTimeForTrace time.Duration,
 	subscriptionManager *subscription.Manager,
-	completePoolChannel chan openapi.TestRunResult,
 ) PersistentTracePoller {
 	retryDelay := 1 * time.Second
 	maxTracePollRetry := int(math.Ceil(float64(maxWaitTimeForTrace) / float64(retryDelay)))
@@ -48,7 +48,7 @@ func NewTracePoller(
 		executeQueue:        make(chan tracePollReq, 5),
 		exit:                make(chan bool, 1),
 		subscriptions:       subscriptionManager,
-		completePoolChannel: completePoolChannel,
+		completePoolChannel: make(chan openapi.TestRunResult, 1),
 	}
 }
 
@@ -204,5 +204,12 @@ func (tp tracePoller) requeue(job tracePollReq) {
 		fmt.Printf("requeuing result %s for %d time\n", job.result.ResultId, job.count)
 		time.Sleep(tp.retryDelay)
 		tp.enqueueJob(job)
+	}()
+}
+
+func (tp tracePoller) OnPollComplete(callback func(openapi.TestRunResult)) {
+	go func() {
+		result := <-tp.completePoolChannel
+		callback(result)
 	}()
 }

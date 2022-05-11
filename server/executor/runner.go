@@ -68,6 +68,10 @@ func (r persistentRunner) handleDBError(err error) {
 }
 
 func (r persistentRunner) Start(workers int) {
+	r.tp.OnPollComplete(func(result openapi.TestRunResult) {
+		r.ar.RunAssertions(result)
+	})
+
 	for i := 0; i < workers; i++ {
 		go func() {
 			fmt.Println("persistentRunner start goroutine")

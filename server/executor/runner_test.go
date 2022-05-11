@@ -95,6 +95,7 @@ func (f runnerFixture) expectSuccessExecLong(test openapi.Test) {
 
 func (f runnerFixture) expectSuccessExec(test openapi.Test) {
 	f.mockExecutor.expectExecuteTest(test)
+	f.mockTracePoller.expectOnPollComplete()
 	f.expectSuccessResultPersist(test)
 }
 
@@ -263,13 +264,23 @@ type mockTracePoller struct {
 	t *testing.T
 }
 
+var _ executor.TracePoller = &mockTracePoller{}
+
 func (m *mockTracePoller) Poll(_ context.Context, res openapi.TestRunResult) {
 	m.Called(res.TestId)
+}
+
+func (m *mockTracePoller) OnPollComplete(callback func(result openapi.TestRunResult)) {
+	m.Called(callback)
 }
 
 func (m *mockTracePoller) expectPoll(test openapi.Test) *mock.Call {
 	return m.
 		On("Poll", test.TestId)
+}
+
+func (m *mockTracePoller) expectOnPollComplete() *mock.Call {
+	return m.On("OnPollComplete", mock.Anything)
 }
 
 type mockAssertionRunner struct {
@@ -279,8 +290,8 @@ type mockAssertionRunner struct {
 
 var _ executor.AssertionRunner = &mockAssertionRunner{}
 
-func (m *mockAssertionRunner) RunAssertions(test openapi.Test, result openapi.TestRunResult) {
-	m.Called(test, result)
+func (m *mockAssertionRunner) RunAssertions(result openapi.TestRunResult) {
+	m.Called(result)
 }
 
 func (m *mockAssertionRunner) Start(workers int) {

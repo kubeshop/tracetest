@@ -38,7 +38,7 @@ func (a Assertion) apply(span traces.Span) AssertionSpanResults {
 	return AssertionSpanResults{
 		Span:        &span,
 		ActualValue: attr,
-		CompareErr:  a.Comparator.Compare(a.Value, attr),
+		CompareErr:  a.Comparator.Compare(attr, a.Value),
 	}
 }
 

@@ -20,8 +20,7 @@ type AssertionRunner interface {
 }
 
 type defaultAssertionRunner struct {
-	testDB       testdb.TestRepository
-	resultDB     testdb.ResultRepository
+	db           testdb.Repository
 	inputChannel chan openapi.TestRunResult
 	exitChannel  chan bool
 }
@@ -29,15 +28,10 @@ type defaultAssertionRunner struct {
 var _ WorkerPool = &defaultAssertionRunner{}
 var _ AssertionRunner = &defaultAssertionRunner{}
 
-func NewAssertionRunner(
-	testRepository testdb.TestRepository,
-	resultRepository testdb.ResultRepository,
-	inputChannel chan openapi.TestRunResult,
-) AssertionRunner {
+func NewAssertionRunner(db testdb.Repository) AssertionRunner {
 	return &defaultAssertionRunner{
-		testDB:       testRepository,
-		resultDB:     resultRepository,
-		inputChannel: inputChannel,
+		db:           db,
+		inputChannel: make(chan openapi.TestRunResult, 1),
 	}
 }
 
@@ -73,7 +67,7 @@ func (e *defaultAssertionRunner) startWorker(ctx context.Context) {
 				fmt.Println(err.Error())
 			}
 
-			err = e.resultDB.UpdateResult(ctx, response)
+			err = e.db.UpdateResult(ctx, response)
 			if err != nil {
 				fmt.Println(fmt.Errorf("could not save result on database: %w", err).Error())
 			}
@@ -87,7 +81,7 @@ func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, testResu
 		return nil, err
 	}
 
-	test, err := e.testDB.GetTest(ctx, testResult.TestId)
+	test, err := e.db.GetTest(ctx, testResult.TestId)
 	if err != nil {
 		return nil, err
 	}
