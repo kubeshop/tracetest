@@ -21,7 +21,6 @@ describe('Show Trace', () => {
     cy.get('[data-cy=span-details-attributes]').should('be.visible');
     cy.get('[data-cy=empty-assertion-table]').should('be.visible');
 
-    cy.get('[id*=tab-test-results').click();
-    cy.get('[data-cy=test-results]').should('be.visible');
+    cy.get('[data-cy=test-results]').should('exist');
   });
 });

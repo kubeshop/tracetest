@@ -24,7 +24,7 @@ export const LabelBadge = styled(Badge)`
 
 export const SelectedLabelBadge = styled(LabelBadge)`
   > sup {
-    background-color: rgb(0,161,253);
+    background-color: #61175E;
     color: white;
   }
 `;

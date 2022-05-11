@@ -27,6 +27,7 @@ export const TestUrl = styled(Typography.Text).attrs({
 })`
   && {
     margin: 0;
+    align-self: flex-end;
   }
 `;
 
