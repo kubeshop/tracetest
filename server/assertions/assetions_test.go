@@ -38,14 +38,16 @@ func TestAssertion(t *testing.T) {
 				},
 			},
 			expectedResult: assertions.TestResult{
-				`span[service.name="Pokeshop"]`: assertions.AssertionResult{
-					Assertion: assertions.Assertion{
-						Attribute:  "tracetest.span.duration",
-						Comparator: comparator.Eq,
-						Value:      "2000",
-					},
-					AssertionSpanResults: []assertions.AssertionSpanResults{
-						{ActualValue: "2000", CompareErr: nil},
+				`span[service.name="Pokeshop"]`: []assertions.AssertionResult{
+					{
+						Assertion: assertions.Assertion{
+							Attribute:  "tracetest.span.duration",
+							Comparator: comparator.Eq,
+							Value:      "2000",
+						},
+						AssertionSpanResults: []assertions.AssertionSpanResults{
+							{ActualValue: "2000", CompareErr: nil},
+						},
 					},
 				},
 			},
@@ -59,16 +61,21 @@ func TestAssertion(t *testing.T) {
 
 			actual := assertions.Assert(cl.trace, cl.testDef)
 
-			for expectedSel, expectedAR := range cl.expectedResult {
-				actualAR, ok := actual[expectedSel]
+			for expectedSel, expectedAssertionResults := range cl.expectedResult {
+				actualAssertionResults, ok := actual[expectedSel]
 				assert.True(t, ok, `expected selector "%s" not found`, expectedSel)
-				assert.Equal(t, expectedAR.Assertion, actualAR.Assertion)
-				require.Len(t, actualAR.AssertionSpanResults, len(expectedAR.AssertionSpanResults))
+				for i := 0; i < len(expectedAssertionResults); i++ {
+					expectedAR := expectedAssertionResults[i]
+					actualAR := actualAssertionResults[i]
 
-				for i, expectedSpanRes := range expectedAR.AssertionSpanResults {
-					actualSpanRes := actualAR.AssertionSpanResults[i]
-					assert.Equal(t, expectedSpanRes.ActualValue, actualSpanRes.ActualValue)
-					assert.Equal(t, expectedSpanRes.CompareErr, actualSpanRes.CompareErr)
+					assert.Equal(t, expectedAR.Assertion, actualAR.Assertion)
+					require.Len(t, actualAR.AssertionSpanResults, len(expectedAR.AssertionSpanResults))
+
+					for i, expectedSpanRes := range expectedAR.AssertionSpanResults {
+						actualSpanRes := actualAR.AssertionSpanResults[i]
+						assert.Equal(t, expectedSpanRes.ActualValue, actualSpanRes.ActualValue)
+						assert.Equal(t, expectedSpanRes.CompareErr, actualSpanRes.CompareErr)
+					}
 				}
 			}
 

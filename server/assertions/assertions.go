@@ -53,15 +53,17 @@ type AssertionSpanResults struct {
 	CompareErr  error
 }
 
-type TestResult map[SpanQuery]AssertionResult
+type TestResult map[SpanQuery][]AssertionResult
 
 func Assert(trace traces.Trace, defs TestDefinition) TestResult {
 	testResult := TestResult{}
 	for spanQuery, asserts := range defs {
 		spans := spanQuery.Selector().Filter(trace)
+		assertionResults := make([]AssertionResult, 0)
 		for _, assertion := range asserts {
-			testResult[spanQuery] = assertion.Assert(spans)
+			assertionResults = append(assertionResults, assertion.Assert(spans))
 		}
+		testResult[spanQuery] = assertionResults
 	}
 
 	return testResult

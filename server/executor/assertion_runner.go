@@ -118,28 +118,30 @@ func (e *defaultAssertionRunner) setResults(result *openapi.TestRunResult, testR
 	assertionResultArray := make([]openapi.AssertionResult, 0)
 	allTestsPassed := true
 
-	for _, assertionResult := range testResult {
+	for _, assertionExecutionResult := range testResult {
 		spanAssertions := make([]openapi.SpanAssertionResult, 0)
-		for _, spanAssertionResult := range assertionResult.AssertionSpanResults {
-			spanID := hex.EncodeToString(spanAssertionResult.Span.ID[:])
-			testPassed := spanAssertionResult.CompareErr == nil
-			if !testPassed {
-				allTestsPassed = false
+		for _, assertionResult := range assertionExecutionResult {
+			for _, spanAssertionResult := range assertionResult.AssertionSpanResults {
+				spanID := hex.EncodeToString(spanAssertionResult.Span.ID[:])
+				testPassed := spanAssertionResult.CompareErr == nil
+				if !testPassed {
+					allTestsPassed = false
+				}
+
+				spanAssertions = append(spanAssertions, openapi.SpanAssertionResult{
+					Passed:        testPassed,
+					SpanId:        spanID,
+					ObservedValue: spanAssertionResult.ActualValue,
+				})
 			}
 
-			spanAssertions = append(spanAssertions, openapi.SpanAssertionResult{
-				Passed:        testPassed,
-				SpanId:        spanID,
-				ObservedValue: spanAssertionResult.ActualValue,
-			})
-		}
+			result := openapi.AssertionResult{
+				AssertionId:          assertionResult.Assertion.ID,
+				SpanAssertionResults: spanAssertions,
+			}
 
-		result := openapi.AssertionResult{
-			AssertionId:          assertionResult.Assertion.ID,
-			SpanAssertionResults: spanAssertions,
+			assertionResultArray = append(assertionResultArray, result)
 		}
-
-		assertionResultArray = append(assertionResultArray, result)
 	}
 
 	result.AssertionResult = assertionResultArray

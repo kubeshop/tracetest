@@ -35,14 +35,27 @@ func TestExecutorIntegration(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotEmpty(t, testID)
 
+	err = createTestAssertions(testID)
+	assert.NoError(t, err)
+
 	resultID, err := runTest(app, testID)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, resultID)
 
 	testRunResult := waitForResultState(app, testID, resultID, executor.TestRunStateFinished, 30*time.Second)
-	assert.NotNil(t, testRunResult)
-	assert.Greater(t, len(testRunResult.Trace.ResourceSpans), 0)
-	assert.Equal(t, executor.TestRunStateFinished, testRunResult.State)
+	assert.NotNil(t, testRunResult, "Test result should not be nil")
+	assert.Greater(t, len(testRunResult.Trace.ResourceSpans), 0, "Number of affected spans should be greater than 0")
+	assert.Equal(t, executor.TestRunStateFinished, testRunResult.State, "Result should be in FINISHED state")
+
+	spanAssertions := make([]openapi.SpanAssertionResult, 0)
+	for _, assertionResult := range testRunResult.AssertionResult {
+		spanAssertions = append(spanAssertions, assertionResult.SpanAssertionResults...)
+	}
+
+	assert.Equal(t, len(spanAssertions), 2, "Test should contain 2 assertions")
+	for _, spanAssertion := range spanAssertions {
+		assert.True(t, spanAssertion.Passed, "All assertions should pass")
+	}
 }
 
 func createImportPokemonTest(app *app.App, demoApp *test.DemoApp) (string, error) {
@@ -91,6 +104,41 @@ func createImportPokemonTest(app *app.App, demoApp *test.DemoApp) (string, error
 	}
 
 	return test.TestId, nil
+}
+
+func createTestAssertions(testID string) error {
+	body := openapi.Assertion{
+		Selector: `span[service.name="pokeshop" tracetest.span.type="http" name="POST /pokemon/import"]`,
+		SpanAssertions: []openapi.SpanAssertion{
+			{
+				PropertyName:    "http.status_code",
+				Operator:        "EQUALS",
+				ComparisonValue: "200",
+			},
+			{
+				PropertyName:    "tracetest.span.duration",
+				Operator:        "LESSTHAN",
+				ComparisonValue: "100",
+			},
+		},
+	}
+	jsonBytes, err := json.Marshal(body)
+	if err != nil {
+		return fmt.Errorf("could not convert body into json: %w", err)
+	}
+	bytesBuffer := bytes.NewBuffer(jsonBytes)
+	url := fmt.Sprintf("%s/api/tests/%s/assertions", appEndpoint, testID)
+
+	response, err := http.Post(url, "application/json", bytesBuffer)
+	if err != nil {
+		return fmt.Errorf("could not send request to create assertion: %w", err)
+	}
+
+	if response.StatusCode != 200 {
+		return fmt.Errorf("could not create assertion. Expected status 200, got %d", response.StatusCode)
+	}
+
+	return nil
 }
 
 func runTest(app *app.App, testID string) (string, error) {
