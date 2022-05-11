@@ -1,33 +1,28 @@
 import {useState} from 'react';
 import {ITestRunResult} from 'types/TestRunResult.types';
 import ResizableDrawer from '../ResizableDrawer/ResizableDrawer';
-import {TraceTimeline} from './TraceTimeline';
-import {ISpan} from '../../types/Span.types';
+import TestResults from '../TestResults';
 
 interface IProps {
   visiblePortion: number;
-  testResultDetails: ITestRunResult | undefined;
+  testResultDetails?: ITestRunResult;
   onSelectSpan: (spanId: string) => void;
-  selectedSpan?: ISpan;
 }
 
-export const TimelineDrawer = ({
-  visiblePortion,
-  onSelectSpan,
-  selectedSpan,
-  testResultDetails,
-}: IProps): JSX.Element => {
+const TraceDrawer: React.FC<IProps> = ({visiblePortion, onSelectSpan, testResultDetails}) => {
   const [max, setMax] = useState(600);
+
   return (
     <ResizableDrawer open min={visiblePortion} max={max}>
-      <TraceTimeline
+      <TestResults
         max={max}
+        result={testResultDetails!}
         setMax={setMax}
         visiblePortion={visiblePortion}
-        trace={testResultDetails?.trace!}
-        onSelectSpan={onSelectSpan}
-        selectedSpan={selectedSpan}
+        onSpanSelected={onSelectSpan}
       />
     </ResizableDrawer>
   );
 };
+
+export default TraceDrawer;

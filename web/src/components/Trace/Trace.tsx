@@ -5,10 +5,10 @@ import {ITestRunResult} from 'types/TestRunResult.types';
 import {ITest} from 'types/Test.types';
 import Diagram, {SupportedDiagrams} from 'components/Diagram/Diagram';
 import SpanDetail from 'components/SpanDetail';
-import {TimelineDrawer} from './TimelineDrawer';
 import {useHandleOnSpanSelectedCallback} from './hooks/useHandleOnSpanSelectedCallback';
 import * as S from './Trace.styled';
 import DiagramSwitcher from '../DiagramSwitcher';
+import TraceDrawer from './TraceDrawer';
 
 interface IProps {
   displayError: boolean;
@@ -45,12 +45,7 @@ const Trace = ({displayError, visiblePortion, minHeight, test, testResultDetails
           <SpanDetail resultId={testResultDetails?.resultId} testId={test?.testId} span={selectedSpan} />
         </S.DetailsSection>
       </S.Main>
-      <TimelineDrawer
-        visiblePortion={visiblePortion}
-        testResultDetails={testResultDetails}
-        onSelectSpan={onSelectSpan}
-        selectedSpan={selectedSpan}
-      />
+      <TraceDrawer visiblePortion={visiblePortion} testResultDetails={testResultDetails} onSelectSpan={onSelectSpan} />
     </>
   ) : null;
 };
