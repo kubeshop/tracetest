@@ -86,6 +86,11 @@ func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, testResu
 		return nil, err
 	}
 
+	// Temporary patch to disable the assertion engine if frontend request is not prepared yet (old selector format)
+	if e.shouldIgnoreTest(test) {
+		return &testResult, nil
+	}
+
 	testDefinition := convertAssertionsIntoTestDefinition(test.Assertions)
 
 	result := assertions.Assert(trace, testDefinition)
@@ -93,6 +98,18 @@ func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, testResu
 	e.setResults(&testResult, result)
 
 	return &testResult, nil
+}
+
+func (e *defaultAssertionRunner) shouldIgnoreTest(test *openapi.Test) bool {
+	// If any assertion uses the old selector format, ignore the whole test and don't execute the
+	// assertions.
+	for _, assertion := range test.Assertions {
+		if assertion.Selector == "" && len(assertion.Selectors) > 0 {
+			return true
+		}
+	}
+
+	return false
 }
 
 func (e *defaultAssertionRunner) setResults(result *openapi.TestRunResult, testResult assertions.TestResult) {
