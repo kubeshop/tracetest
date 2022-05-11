@@ -1,5 +1,5 @@
 import {differenceBy, intersectionBy} from 'lodash';
-import {SELECTOR_DEFAULT_ATTRIBUTES, SemanticGroupNameNodeMap} from '../constants/SemanticGroupNames.constants';
+import {SELECTOR_DEFAULT_ATTRIBUTES, SemanticGroupNameNodeMap,} from '../constants/SemanticGroupNames.constants';
 import {ISpan, ISpanFlatAttribute} from '../types/Span.types';
 
 const itemSelectorKeys = SELECTOR_DEFAULT_ATTRIBUTES.flatMap(el => el.attributes);

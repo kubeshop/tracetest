@@ -55,3 +55,8 @@ export interface ISpanAssertionResult2 {
   passed: boolean;
   observedValue: string;
 }
+
+export interface IAssertionResultList {
+  assertion: IAssertion;
+  assertionResultList: ISpanAssertionResult[];
+};

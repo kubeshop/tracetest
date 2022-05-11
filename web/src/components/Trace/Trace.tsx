@@ -1,5 +1,4 @@
 import {useState} from 'react';
-import {Tabs} from 'antd';
 import {useStoreActions} from 'react-flow-renderer';
 import {ISpan} from 'types/Span.types';
 import {ITestRunResult} from 'types/TestRunResult.types';
@@ -9,10 +8,6 @@ import SpanDetail from 'components/SpanDetail';
 import {TimelineDrawer} from './TimelineDrawer';
 import {useHandleOnSpanSelectedCallback} from './hooks/useHandleOnSpanSelectedCallback';
 import * as S from './Trace.styled';
-import TestResults from './TestResults';
-import GuidedTourService, {GuidedTours} from '../../services/GuidedTour.service';
-import {Steps} from '../GuidedTour/traceStepList';
-import TraceAnalyticsService from '../../services/Analytics/TraceAnalytics.service';
 import DiagramSwitcher from '../DiagramSwitcher';
 
 interface IProps {
@@ -47,30 +42,7 @@ const Trace = ({displayError, visiblePortion, minHeight, test, testResultDetails
           />
         </S.DiagramSection>
         <S.DetailsSection>
-          <S.TabsContainer>
-            <S.TraceTabs onChange={activeTab => TraceAnalyticsService.onChangeTab(activeTab)}>
-              <Tabs.TabPane
-                tab={
-                  <span data-tour={GuidedTourService.getStep(GuidedTours.Trace, Steps.SpanDetail)}>Span Detail</span>
-                }
-                key="span-detail"
-              >
-                <SpanDetail resultId={testResultDetails?.resultId} testId={test?.testId} span={selectedSpan} />
-              </Tabs.TabPane>
-              <Tabs.TabPane
-                tab={
-                  <span data-tour={GuidedTourService.getStep(GuidedTours.Trace, Steps.TestResults)}>Test Results</span>
-                }
-                key="test-results"
-              >
-                <TestResults
-                  onSpanSelected={onSelectSpan}
-                  trace={testResultDetails?.trace}
-                  resultId={testResultDetails?.resultId!}
-                />
-              </Tabs.TabPane>
-            </S.TraceTabs>
-          </S.TabsContainer>
+          <SpanDetail resultId={testResultDetails?.resultId} testId={test?.testId} span={selectedSpan} />
         </S.DetailsSection>
       </S.Main>
       <TimelineDrawer

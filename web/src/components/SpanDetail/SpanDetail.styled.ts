@@ -1,13 +1,27 @@
+import {Tabs, Typography, Button} from 'antd';
 import styled from 'styled-components';
 import noResultsIcon from '../../assets/SpanAssertionsEmptyState.svg';
 
-export const DetailsHeader = styled.div`
-  display: flex;
-  flex-direction: row;
+export const SpanHeader = styled.div`
   width: 100%;
-  justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
+`;
+
+export const SpanHeaderTitle = styled(Typography.Title).attrs({
+  level: 5,
+})`
+  && {
+    margin-bottom: 5px;
+  }
+`;
+
+export const SpanTabs = styled(Tabs).attrs({
+  style: {marginBottom: 150, overflow: 'hidden'},
+})`
+  .ant-tabs-content-holder {
+    padding-bottom: 100px;
+  }
 `;
 
 export const DetailsContainer = styled.div`
@@ -29,3 +43,26 @@ export const DetailsEmptyStateContainer = styled.div`
 export const DetailsTableEmptyStateIcon = styled.img.attrs({
   src: noResultsIcon,
 })``;
+
+export const SpanDetail = styled.div`
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+`;
+
+export const AssertionActionsContainer = styled.div`
+  margin-bottom: 24px;
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-end;
+`;
+
+export const AddAssertionButton = styled(Button).attrs({
+  type: 'primary',
+  ghost: true,
+})`
+  && {
+    background: rgba(97, 23, 94, 0.05);
+    font-weight: 600;
+  }
+`;

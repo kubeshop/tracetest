@@ -62,7 +62,7 @@ describe('Create Assertion', () => {
     cy.get('#add-assertion-modal-ok-button').click();
 
     cy.get('[data-cy=assertion-table]').should('have.lengthOf', 2);
-    cy.get('[data-cy=assertion-check-property]').should('have.lengthOf', 5);
+    cy.get('[data-cy=assertion-check-property]').should('have.lengthOf', 3);
   });
 
   it('should update an assertion', () => {
@@ -84,9 +84,6 @@ describe('Create Assertion', () => {
     cy.get('#add-assertion-modal-ok-button').click();
 
     cy.get('[data-cy=assertion-table]').should('have.lengthOf', 2);
-    cy.get('[data-cy=assertion-check-property]').should('have.lengthOf', 6);
-
-    cy.get('[id*=tab-test-results').click();
-    cy.get('[data-cy=test-results-assertion-table]').should('have.lengthOf', 2);
+    cy.get('[data-cy=assertion-check-property]').should('have.lengthOf', 4);
   });
 });
