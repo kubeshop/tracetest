@@ -49,7 +49,7 @@ export const TraceNode = styled.div<{selected: boolean}>`
   display: flex;
   width: 150px;
   max-width: 150px;
-  height: 90px;
+  height: 75px;
   justify-content: center;
   align-items: center;
 `;
@@ -76,6 +76,7 @@ export const NameText = styled(Typography.Text).attrs({
   ellipsis: true,
 })`
   margin: 0;
+  font-size: 12px;
 `;
 
 export const TextContainer = styled.div`

@@ -18,6 +18,7 @@ export const TestName = styled(Typography.Title).attrs({
 })`
   && {
     margin: 0;
+    font-weight: 400;
   }
 `;
 
