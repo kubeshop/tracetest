@@ -119,8 +119,8 @@ func (e *defaultAssertionRunner) setResults(result *openapi.TestRunResult, testR
 	allTestsPassed := true
 
 	for _, assertionExecutionResult := range testResult {
-		spanAssertions := make([]openapi.SpanAssertionResult, 0)
 		for _, assertionResult := range assertionExecutionResult {
+			spanAssertions := make([]openapi.SpanAssertionResult, 0)
 			for _, spanAssertionResult := range assertionResult.AssertionSpanResults {
 				spanID := hex.EncodeToString(spanAssertionResult.Span.ID[:])
 				testPassed := spanAssertionResult.CompareErr == nil
