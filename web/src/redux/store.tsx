@@ -1,4 +1,4 @@
-import {configureStore, ThunkAction, Action} from '@reduxjs/toolkit';
+import {Action, configureStore, ThunkAction} from '@reduxjs/toolkit';
 import TestAPI from 'redux/apis/Test.api';
 import ResultListSlice from 'redux/slices/ResultList.slice';
 

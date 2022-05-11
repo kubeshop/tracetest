@@ -1,25 +1,23 @@
-import AssertionService from './Assertion.service';
 import {
   IAssertionResult,
-  TAssertionResultList,
   ISpanAssertionResult2,
   ITestAssertionResult,
+  TAssertionResultList,
 } from '../types/Assertion.types';
 import {ITest} from '../types/Test.types';
 import {ITrace} from '../types/Trace.types';
+import AssertionService from './Assertion.service';
 
 const TraceService = () => ({
   runTest(trace: ITrace, {assertions = []}: ITest) {
-    const resultList = assertions?.map(assertion => AssertionService.runByTrace(trace, assertion));
-
-    return resultList;
+    return assertions?.map(assertion => AssertionService.runByTrace(trace, assertion));
   },
   parseTestResultToAssertionResultList(
     assertionResult: TAssertionResultList,
     {assertions}: ITest,
     trace: ITrace
   ): IAssertionResult[] {
-    const assertionResultList = assertionResult.map(({assertionId, spanAssertionResults = []}) => {
+    return assertionResult.map(({assertionId, spanAssertionResults = []}) => {
       const assertion = assertions.find(({assertionId: id}) => id === assertionId);
 
       return {
@@ -37,8 +35,6 @@ const TraceService = () => ({
         }),
       };
     });
-
-    return assertionResultList;
   },
   parseAssertionResultListToTestResult(assertionResultList: IAssertionResult[] = []): ITestAssertionResult {
     const {totalFailedCount} = this.getTestResultCount(assertionResultList);

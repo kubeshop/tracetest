@@ -27,6 +27,7 @@ export function useUpdateFirstLoadEffect(
       setIsFirstLoad(false);
 
       dispatch(
+        // @ts-ignore
         replace({
           resultId: testResultId,
           assertionResult: testResultDetails?.assertionResult!,

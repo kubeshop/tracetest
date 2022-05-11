@@ -31,19 +31,17 @@ export const updateTestResult = createAsyncThunk<
   return {resultId, resultList};
 });
 
-const ResultListSlice = createSlice({
+const ResultListSlice = createSlice<ITestResultListState, any, 'resultList'>({
   name: 'resultList',
   initialState,
   reducers: {
     replace(
-      state,
+      state: ITestResultListState,
       {
         payload: {assertionResult, test, trace, resultId},
       }: PayloadAction<{assertionResult: TAssertionResultList; test: ITest; trace: ITrace; resultId: string}>
     ) {
-      const resultList = TraceService.parseTestResultToAssertionResultList(assertionResult, test, trace);
-
-      state.resultListMap[resultId] = resultList;
+      state.resultListMap[resultId] = TraceService.parseTestResultToAssertionResultList(assertionResult, test, trace);
     },
   },
   extraReducers: builder => {
