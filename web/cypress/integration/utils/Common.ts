@@ -18,7 +18,9 @@ export const createTest = () => {
 
   cy.location('pathname').should('match', /\/test\/.*/i);
   cy.location().then(({pathname}) => {
-    testId = pathname.split('/').pop();
+    const id = getTestId(pathname);
+
+    testId = id;
   });
   cy.visit('http://localhost:3000/');
 };
@@ -34,12 +36,24 @@ export const openCreateTestModal = () => {
 
 export const deleteTest = () => {
   cy.location().then(({pathname}) => {
-    const testId = pathname.split('/').pop();
+    const localTestId = getTestId(pathname);
     cy.visit('http://localhost:3000/');
 
-    cy.get(`[data-cy=test-actions-button-${testId}]`).click();
+    cy.get(`[data-cy=test-actions-button-${localTestId}]`).click();
     cy.get('[data-cy=test-delete-button]').click();
 
-    cy.get(`[data-cy=test-actions-button-${testId}]`).should('not.exist');
+    cy.get(`[data-cy=test-actions-button-${localTestId}]`).should('not.exist');
   });
+};
+
+export const getTestId = (pathname: string) => {
+  const [, , localTestId] = pathname.split('/').reverse();
+
+  return localTestId;
+};
+
+export const getResultId = (pathname: string) => {
+  const [resultId, ,] = pathname.split('/').reverse();
+
+  return resultId;
 };

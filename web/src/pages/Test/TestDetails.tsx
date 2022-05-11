@@ -1,4 +1,4 @@
-import {Button, Typography} from 'antd';
+import {Button} from 'antd';
 import {FC, useCallback} from 'react';
 import {useRunTestMutation} from 'redux/apis/Test.api';
 import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
@@ -13,13 +13,12 @@ const {onRunTest} = TestAnalyticsService;
 
 type TTestDetailsProps = {
   testId: string;
-  url?: string;
   onSelectResult: (result: ITestRunResult) => void;
   testResultList: ITestRunResult[];
   isLoading: boolean;
 };
 
-const TestDetails: FC<TTestDetailsProps> = ({testId, testResultList, isLoading, onSelectResult, url}) => {
+const TestDetails: FC<TTestDetailsProps> = ({testId, testResultList, isLoading, onSelectResult}) => {
   const [runTest, result] = useRunTestMutation();
   useGuidedTour(GuidedTours.TestDetails);
 
@@ -27,14 +26,13 @@ const TestDetails: FC<TTestDetailsProps> = ({testId, testResultList, isLoading, 
     if (testId) {
       onRunTest(testId);
       const testResult = await runTest(testId).unwrap();
-      onSelectResult({resultId: testResult.resultId} as ITestRunResult);
+      onSelectResult(testResult);
     }
   }, [onSelectResult, runTest, testId]);
 
   return (
-    <div>
+    <>
       <S.TestDetailsHeader>
-        <Typography.Title level={5}>{url}</Typography.Title>
         <Button
           onClick={handleRunTest}
           loading={result.isLoading}
@@ -47,7 +45,7 @@ const TestDetails: FC<TTestDetailsProps> = ({testId, testResultList, isLoading, 
         </Button>
       </S.TestDetailsHeader>
       <TestDetailsTable isLoading={isLoading} onSelectResult={onSelectResult} testResultList={testResultList} />
-    </div>
+    </>
   );
 };
 

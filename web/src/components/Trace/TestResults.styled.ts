@@ -1,5 +1,5 @@
 import styled, {css} from 'styled-components';
-import noResultsIcon from '../../../assets/SpanAssertionsEmptyState.svg';
+import noResultsIcon from '../../assets/SpanAssertionsEmptyState.svg';
 
 export const Header = styled.div`
   display: flex;

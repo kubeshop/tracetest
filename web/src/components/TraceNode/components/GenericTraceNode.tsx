@@ -1,5 +1,5 @@
 import Text from 'antd/lib/typography/Text';
-import {upperCase} from 'lodash';
+import {capitalize} from 'lodash';
 import React from 'react';
 import {Handle, Position} from 'react-flow-renderer';
 import {SemanticGroupNamesToText} from '../../../constants/SemanticGroupNames.constants';
@@ -14,7 +14,7 @@ const GenericTraceNode: React.FC<TTraceNodeProps> = ({id, data: {name, type}, da
   return (
     <S.TraceNode selected={selected} data-cy={`trace-node-${type}`}>
       <S.TraceNotch spanType={type}>
-        <Text>{upperCase(heading || spanTypeText)}</Text>
+        <Text>{capitalize(heading) || spanTypeText}</Text>
       </S.TraceNotch>
       <Handle type="target" id={id} position={Position.Top} style={{top: 0, borderRadius: 0, visibility: 'hidden'}} />
       <S.TextContainer>

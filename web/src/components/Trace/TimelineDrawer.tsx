@@ -1,10 +1,8 @@
-import * as React from 'react';
 import {useState} from 'react';
-import {useSearchParams} from 'react-router-dom';
 import {ITestRunResult} from 'types/TestRunResult.types';
-import {ResizableDrawer} from './ResizableDrawer';
+import ResizableDrawer from '../ResizableDrawer/ResizableDrawer';
 import {TraceTimeline} from './TraceTimeline';
-import {ISpan} from '../../../types/Span.types';
+import {ISpan} from '../../types/Span.types';
 
 interface IProps {
   visiblePortion: number;
@@ -20,9 +18,8 @@ export const TimelineDrawer = ({
   testResultDetails,
 }: IProps): JSX.Element => {
   const [max, setMax] = useState(600);
-  const [searchParams] = useSearchParams();
   return (
-    <ResizableDrawer open={searchParams.get('resultId') !== null} min={visiblePortion} max={max}>
+    <ResizableDrawer open min={visiblePortion} max={max}>
       <TraceTimeline
         max={max}
         setMax={setMax}

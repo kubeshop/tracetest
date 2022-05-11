@@ -9,7 +9,7 @@ interface IProps {
   children: React.ReactElement;
 }
 
-export const ResizableDrawer = ({open, children, min, max}: IProps): JSX.Element => {
+const ResizableDrawer = ({open, children, min, max}: IProps): JSX.Element => {
   const [isResizing, setIsResizing] = useState(false);
   const [height, setHeight] = useState(min);
 
@@ -76,3 +76,5 @@ export const ResizableDrawer = ({open, children, min, max}: IProps): JSX.Element
     </Drawer>
   );
 };
+
+export default ResizableDrawer;

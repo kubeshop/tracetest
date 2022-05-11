@@ -45,7 +45,9 @@ const Span = (
       return {...map, [spanAttribute.name]: SpanAttribute(rawSpanAttribute)};
     }, {});
 
-  const duration = (Number(rawSpan.endTimeUnixNano) - Number(rawSpan.startTimeUnixNano)) * 1000 * 1000;
+  const duration = Number(
+    ((Number(rawSpan.endTimeUnixNano) - Number(rawSpan.startTimeUnixNano)) / 1000 / 1000).toFixed(1)
+  );
   const type = getSpanType(rawSpan);
 
   return {

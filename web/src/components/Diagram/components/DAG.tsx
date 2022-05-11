@@ -1,6 +1,6 @@
 import {useCallback, useEffect, useMemo} from 'react';
-import ReactFlow, {Background, BackgroundVariant, FlowElement} from 'react-flow-renderer';
-import {useDAGChart} from 'hooks/useDAGChart';
+import ReactFlow, {Background, FlowElement} from 'react-flow-renderer';
+import {useDAGChart} from '../../../hooks/useDAGChart';
 import TraceNode from '../../TraceNode';
 import * as S from './DAG.styled';
 import TraceDiagramAnalyticsService from '../../../services/Analytics/TraceDiagramAnalytics.service';
@@ -89,8 +89,9 @@ const Diagram: React.FC<IDiagramProps> = ({trace, selectedSpan, onSelectSpan}): 
         defaultZoom={0.5}
         elements={dagElements as any}
         onElementClick={handleElementClick}
+        onLoad={({fitView}) => fitView()}
       >
-        <Background variant={BackgroundVariant.Lines} gap={4} size={1} />
+        <Background gap={4} size={1} color="#FBFBFF" />
       </ReactFlow>
     </S.Container>
   );

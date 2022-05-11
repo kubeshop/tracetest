@@ -10,7 +10,7 @@ interface IProps {
 export const GenericHttpSpanHeader = ({title, onClick}: IProps): JSX.Element => (
   <S.DetailsHeader>
     <Typography.Text strong>{title}</Typography.Text>
-    <Button type="link" icon={<PlusOutlined />} onClick={onClick}>
+    <Button data-cy="add-assertion-button" type="link" icon={<PlusOutlined />} onClick={onClick}>
       Add Assertion
     </Button>
   </S.DetailsHeader>

@@ -67,8 +67,7 @@ const TestAPI = createApi({
     // Test Results
     getResultList: build.query<ITestRunResult[], string>({
       query: id => `/tests/${id}/results`,
-      providesTags: result =>
-        result ? [{type: 'TestRunResult' as const, id: 'LIST'}] : [{type: 'TestRunResult' as const, id: 'LIST'}],
+      providesTags: () => [{type: 'TestRunResult' as const, id: 'LIST'}],
       transformResponse: (rawTestResultList: IRawTestRunResult[]) =>
         rawTestResultList.map(rawTestResult => TestRunResult(rawTestResult)),
     }),
@@ -81,7 +80,10 @@ const TestAPI = createApi({
         method: 'PUT',
         body: assertionResult,
       }),
-      invalidatesTags: (result, error, args) => [{type: 'TestRunResult', id: args.resultId}],
+      invalidatesTags: (result, error, args) => [
+        {type: 'TestRunResult', id: args.resultId},
+        {type: 'TestRunResult', id: 'LIST'},
+      ],
       transformResponse: (rawTestResult: IRawTestRunResult) => TestRunResult(rawTestResult),
     }),
     getResultById: build.query<ITestRunResult, Pick<ITest, 'testId'> & {resultId: string}>({

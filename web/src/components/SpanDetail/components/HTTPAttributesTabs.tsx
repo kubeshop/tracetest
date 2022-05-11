@@ -15,7 +15,11 @@ export const HTTPAttributesTabs: React.FC<IProps> = ({attributeList}) => {
       <Typography.Title level={5} style={{margin: 0}}>
         Attributes
       </Typography.Title>
-      <HTTPAttributesTabsComponent id="the_tabs" style={{marginBottom: 150, overflow: 'hidden'}}>
+      <HTTPAttributesTabsComponent
+        data-cy="span-details-attributes"
+        id="the_tabs"
+        style={{marginBottom: 150, overflow: 'hidden'}}
+      >
         <Tabs.TabPane style={{overflow: 'hidden'}} tab={<span>Request</span>} key="span-request-detail">
           <CustomTable
             size="small"

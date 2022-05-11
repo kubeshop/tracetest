@@ -3,14 +3,14 @@ import styled from 'styled-components';
 import {SemanticGroupNames} from '../../constants/SemanticGroupNames.constants';
 
 enum NotchColor {
-  HTTP = '#B9E28C',
-  DB = '#DBCBD8',
+  HTTP = '#C1E095',
+  DB = '#EFDBFF',
   RPC = '#9AD4D6',
-  MESSAGING = '#101935',
-  DEFAULT = '#F49D6E',
+  MESSAGING = '#BFBFBF',
+  DEFAULT = '#FFBB96',
 }
 
-const getNotchColor = (spanType: SemanticGroupNames) => {
+export const getNotchColor = (spanType: SemanticGroupNames) => {
   switch (spanType) {
     case SemanticGroupNames.Http: {
       return NotchColor.HTTP;
@@ -35,9 +35,6 @@ const getNotchColor = (spanType: SemanticGroupNames) => {
 
 const getTextColor = (spanType: SemanticGroupNames) => {
   switch (spanType) {
-    case SemanticGroupNames.Messaging: {
-      return 'white';
-    }
     default: {
       return 'inherit';
     }
@@ -46,11 +43,12 @@ const getTextColor = (spanType: SemanticGroupNames) => {
 
 export const TraceNode = styled.div<{selected: boolean}>`
   background-color: white;
-  border: 2px solid ${({selected}) => (selected ? 'rgb(0, 161, 253)' : 'rgb(213, 215, 224)')};
-  border-radius: 4px;
+  border: 1px solid ${({selected}) => (selected ? '#48586C' : '#E2E4E6')};
+  border-radius: 2px;
   min-width: fit-content;
   display: flex;
-  width: 200px;
+  width: 150px;
+  max-width: 150px;
   height: 90px;
   justify-content: center;
   align-items: center;
@@ -58,18 +56,16 @@ export const TraceNode = styled.div<{selected: boolean}>`
 
 export const TraceNotch = styled.div<{spanType: SemanticGroupNames}>`
   background-color: ${({spanType}) => getNotchColor(spanType)};
-  margin-top: -8px;
   position: absolute;
   top: 0px;
-  padding-top: 4px;
-  padding-bottom: 4px;
-  padding-left: 16px;
-  padding-right: 16px;
-  border-radius: 4px;
-  width: 70%;
-  justify-content: center;
+  margin-top: 1px;
+  padding: 3px 6px;
+  border-radius: 2px;
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+  width: 99%;
+  font-weight: 700;
   align-items: center;
-  text-align: center;
 
   span {
     color: ${({spanType}) => getTextColor(spanType)};
@@ -80,15 +76,14 @@ export const NameText = styled(Typography.Text).attrs({
   ellipsis: true,
 })`
   margin: 0;
-  margin-bottom: 5px;
 `;
 
 export const TextContainer = styled.div`
-  padding: 14px;
-  padding-top: 35px;
-  max-width: 180px;
+  padding: 6px;
+  padding-top: 30px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
+  width: 150px;
+  max-width: 150px;
 `;
