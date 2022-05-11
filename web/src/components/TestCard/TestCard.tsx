@@ -27,7 +27,7 @@ const TestCard: React.FC<ITestCardProps> = ({
       <S.TextContainer>
         <S.Text>{serviceUnderTest.request.method}</S.Text>
       </S.TextContainer>
-      <S.TextContainer>
+      <S.TextContainer data-cy={`test-url-${testId}`}>
         <S.Text>{serviceUnderTest.request.url}</S.Text>
       </S.TextContainer>
       <S.TextContainer />

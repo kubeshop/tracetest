@@ -5,12 +5,12 @@ import SkeletonTable from 'components/SkeletonTable';
 import {Steps} from 'components/GuidedTour/traceStepList';
 import {ITrace} from 'types/Trace.types';
 import {ISpan} from 'types/Span.types';
-import {TimelineChart} from './TimelineChart';
+import Diagram from 'components/Diagram';
 import {TraceHeader} from './TestResults.styled';
-import {useElementSize} from '../../../hooks/useElementSize';
-import {useDoubleClick} from '../../../hooks/useDoubleClick';
-import GuidedTourService, {GuidedTours} from '../../../services/GuidedTour.service';
-import './TimelineChart.css';
+import {useElementSize} from '../../hooks/useElementSize';
+import {useDoubleClick} from '../../hooks/useDoubleClick';
+import GuidedTourService, {GuidedTours} from '../../services/GuidedTour.service';
+import { SupportedDiagrams } from '../Diagram/Diagram';
 
 interface IProps {
   onPointerDown?: PointerEventHandler;
@@ -50,7 +50,7 @@ export const TraceTimeline = ({
         </Title>
       </TraceHeader>
       <SkeletonTable loading={!trace || !selectedSpan}>
-        <TimelineChart trace={trace!} selectedSpan={selectedSpan} onSelectSpan={onSelectSpan} />
+        <Diagram type={SupportedDiagrams.Timeline} trace={trace!} selectedSpan={selectedSpan} onSelectSpan={onSelectSpan} />
       </SkeletonTable>
     </div>
   );

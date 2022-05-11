@@ -1,20 +1,18 @@
 import {useCallback, useEffect, useMemo, useRef} from 'react';
 import * as d3 from 'd3';
-import {ITrace} from 'types/Trace.types';
 import TraceAnalyticsService from '../../../services/Analytics/TraceAnalytics.service';
+import {IDiagramProps} from '../Diagram';
+import {ISpan} from '../../../types/Span.types';
+import {getNotchColor} from '../../TraceNode/TraceNode.styled';
+import * as S from './TimelineChart.styled';
 
 const {onTimelineSpanClick} = TraceAnalyticsService;
 
-interface ITimelineChartProps {
-  trace: ITrace;
-  selectedSpan: any;
+const barHeight = 54;
 
-  onSelectSpan(spanId: string): void;
-}
-
-export const TimelineChart = ({trace, selectedSpan, onSelectSpan}: ITimelineChartProps) => {
+export const TimelineChart = ({trace, selectedSpan, onSelectSpan}: IDiagramProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
-  let treeFactory = d3.tree().size([200, 450]).nodeSize([0, 5]);
+  const treeFactory = d3.tree().size([200, 450]).nodeSize([0, 5]);
 
   const spanDates = trace.spans.map(span => ({
     startTime: new Date(Number(span.startTimeUnixNano) / 1000),
@@ -58,12 +56,9 @@ export const TimelineChart = ({trace, selectedSpan, onSelectSpan}: ITimelineChar
     .domain([0, maxNano - minNano])
     .range([250, 800]);
 
-  const barHeight = 20;
-  const theBarHeight = barHeight;
-
   useEffect(() => {
-    let nodes = treeFactory(root);
-    let nodesSort: any[] = [];
+    const nodes = treeFactory(root);
+    const nodesSort: any[] = [];
 
     nodes.sort((a: any, b: any) =>
       a.depth === b.depth ? a.data.startTime.getTime() - b.data.startTime.getTime() : a.depth - b.depth
@@ -78,40 +73,41 @@ export const TimelineChart = ({trace, selectedSpan, onSelectSpan}: ITimelineChar
 
     const xAxis = d3
       .axisTop(scaleTime)
-      .ticks(5)
-      .tickFormat(d => `${Number(d) / 1000000}ms`);
+      .ticks(10)
+      .tickFormat(d => {
+        return `${Number(d) / 1000000}`;
+      });
 
-    const milliTicks = d3.ticks(0, maxNano - minNano, 5);
+    const milliTicks = d3.ticks(0, maxNano - minNano, 10);
 
     const ticks = chart.append('g').attr('transform', 'translate(0,20)').call(xAxis);
 
-    ticks
-      .selectAll('text')
-      .style('text-anchor', 'middle')
-      .attr('fill', '#000')
-      .attr('stroke', 'none')
-      .attr('font-size', 10);
-
+    ticks.selectAll('text').attr('class', 'tick').style('text-anchor', 'middle');
     ticks.select('.domain').attr('stroke', 'none').attr('opacity', '0');
     ticks.selectAll('.tick line').attr('stroke', 'none');
+
     const grid = chart.append('g').selectAll('rect').data(milliTicks).enter();
+
+    chart.append('text').attr('class', 'duration-ms-text').attr('x', 230).attr('y', 20).text('Duration (ms)');
+    chart.append('rect').attr('class', 'cross-line').attr('y', 30);
 
     grid
       .append('rect')
+      .attr('class', 'checkpoint-mark')
       .attr('x', d => {
         return scaleTime(d) - 0.5;
       })
-      .attr('y', 20)
-      .attr('width', 1)
-      .attr('height', height)
-      .attr('stroke', 'none')
-      .attr('fill', 'rgb(213, 215, 224)');
-    chart.append('g').attr('class', 'container').attr('transform', `translate(0 , 30 )`);
-  }, [trace, maxNano, minNano, root, scaleTime, treeFactory]);
+      .attr('y', 20);
+    chart.append('g').attr('class', 'container').attr('transform', `translate(0, 50)`);
+  }, [trace]);
+
+  useEffect(() => {
+    drawChart();
+  }, [selectedSpan]);
 
   const drawChart = useCallback(() => {
-    let nodes = treeFactory(root);
-    let nodesSort: any[] = [];
+    const nodes = treeFactory(root);
+    const nodesSort: any[] = [];
     nodes.sort((a: any, b: any) =>
       a.depth === b.depth ? a.data.startTime.getTime() - b.data.startTime.getTime() : a.depth - b.depth
     );
@@ -135,27 +131,22 @@ export const TimelineChart = ({trace, selectedSpan, onSelectSpan}: ITimelineChar
       .attr('id', el => el.id)
       .attr('x', el => el.x)
       .attr('y', el => el.y)
-      .attr('height', barHeight)
-      .attr('cursor', 'pointer')
-      .attr('pointer-events', 'bounding-box')
       .on('click', (event, d) => {
         onTimelineSpanClick(d.id);
-        onSelectSpan(d.id);
+        if (onSelectSpan) onSelectSpan(d.id);
       });
 
     nodeEnter
       .append('rect')
-      .attr('class', d => `rect-svg ${d.id === selectedSpan.id ? 'rect-svg-selected' : ''}`)
+      .attr('class', d => `rect-svg ${d.id === selectedSpan?.spanId ? 'rect-svg-selected' : ''}`)
       .attr('rx', 3)
       .attr('ry', 3)
       .attr('x', 0)
-      .attr('width', '100%')
-      .attr('height', theBarHeight)
-      .attr('stroke', 'none')
-      .attr('fill', 'none');
+      .attr('y', -(barHeight / 4));
 
     nodeEnter
       .append('g')
+      .attr('class', 'chevron')
       .attr('transform', d => `translate(${d.y + 5},0)`)
       .append('path')
       .attr('transform', 'scale(0.5)')
@@ -170,43 +161,50 @@ export const TimelineChart = ({trace, selectedSpan, onSelectSpan}: ITimelineChar
         }
         drawChart();
       });
+
+    nodeEnter.append('rect').attr('class', 'grey-line').attr('y', 30);
+
     nodeEnter
       .append('rect')
+      .attr('class', 'duration-line')
       .attr('rx', 3)
       .attr('ry', 3)
+      .attr('y', 25)
       .attr('x', d => {
         return scaleTime(Number(d.data.data.startTimeUnixNano || minNano) - minNano);
       })
-      .attr('y', 5)
       .attr('width', (d: any) => {
         return (
           scaleTime(Number(d.data.data.endTimeUnixNano || maxNano) - Number(d.data.data.startTimeUnixNano || minNano)) -
           250
         );
       })
-      .attr('height', theBarHeight / 2)
-      .attr('stroke', 'none')
-      .attr('fill', e => (e.depth < 2 ? 'rgb(70, 74, 102)' : 'rgb(29, 233, 182)'))
-      .attr('pointer-events', 'none');
+      .attr('fill', e => {
+        const span: ISpan = e.data.data;
+
+        const color = getNotchColor(span.type);
+
+        return color;
+      });
 
     nodeEnter
       .append('text')
-      .attr('width', 180)
+      .attr('class', 'span-name')
       .attr('y', 10)
-      .attr('height', barHeight)
-      .attr('fill', '#000')
-      .attr('font-size', 8)
-      .attr('pointer-events', 'none')
-      .attr('alignment-baseline', 'middle')
-      .attr('dominant-baseline', 'middle')
-      .text((d: any) => d.data.data?.name?.split('/')?.pop());
+      .text((d: any) => d.data.data?.name);
 
-    let nodeUpdate = node.merge(nodeEnter as any);
+    nodeEnter
+      .append('text')
+      .attr('class', 'span-duration')
+      .attr('y', 30)
+      .text((d: any) => `${d.data.data?.duration} ms`);
+
+    const nodeUpdate = node.merge(nodeEnter as any);
 
     nodeUpdate
       .attr('transform', (d: any) => `translate(${0} ,${d.x})`)
       .select('rect')
-      .attr('class', d => `rect-svg ${d.id === selectedSpan.id ? 'rect-svg-selected' : ''}`);
+      .attr('class', d => `rect-svg ${d.id === selectedSpan?.spanId ? 'rect-svg-selected' : ''}`);
 
     nodeUpdate
       .select('path')
@@ -217,6 +215,7 @@ export const TimelineChart = ({trace, selectedSpan, onSelectSpan}: ITimelineChar
           : 'M16.003 18.626l7.081-7.081L25 13.46l-8.997 8.998-9.003-9 1.917-1.916z'
       );
 
+    nodeUpdate.selectAll('.grey-line').attr('transform', (d: any) => `translate(${d.y + 90} ,0)`);
     nodeUpdate.selectAll('text').attr('transform', (d: any) => `translate(${d.y + 20} ,0)`);
 
     node.exit().remove();
@@ -225,11 +224,15 @@ export const TimelineChart = ({trace, selectedSpan, onSelectSpan}: ITimelineChar
       d.x0 = d.x;
       d.y0 = d.y;
     });
-  }, [treeFactory, maxNano, minNano, onSelectSpan, root, scaleTime, selectedSpan.id, theBarHeight]);
+  }, [treeFactory, root, onSelectSpan, selectedSpan?.spanId, scaleTime, minNano, maxNano]);
 
   useEffect(() => {
     drawChart();
   }, [selectedSpan, drawChart]);
 
-  return <svg ref={svgRef} />;
+  return (
+    <S.Container barHeight={barHeight}>
+      <svg ref={svgRef} />
+    </S.Container>
+  );
 };

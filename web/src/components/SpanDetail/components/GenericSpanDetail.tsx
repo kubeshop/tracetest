@@ -5,7 +5,7 @@ import AssertionsResultTable from 'components/AssertionsTable/AssertionsTable';
 import CreateAssertionModal from 'components/CreateAssertionModal';
 import SkeletonTable from 'components/SkeletonTable';
 import * as S from '../SpanDetail.styled';
-import {Attributes} from '../../Trace/TraceComponent/Attributes';
+import {Attributes} from '../../Trace/Attributes';
 import TraceAnalyticsService from '../../../services/Analytics/TraceAnalytics.service';
 import {useAppSelector} from '../../../redux/hooks';
 import AssertionSelectors from '../../../selectors/Assertion.selectors';

@@ -4,9 +4,9 @@ import SkeletonTable from 'components/SkeletonTable';
 import {FC, useMemo} from 'react';
 import {ITrace} from 'types/Trace.types';
 import * as S from './TestResults.styled';
-import TestResultSelectors from '../../../selectors/TestResult.selectors';
-import TraceService from '../../../services/Trace.service';
-import TraceAssertionsResultTable from '../../TraceAssertionsTable/TraceAssertionsTable';
+import TestResultSelectors from '../../selectors/TestResult.selectors';
+import TraceService from '../../services/Trace.service';
+import TraceAssertionsResultTable from '../TraceAssertionsTable/TraceAssertionsTable';
 
 type TTestResultsProps = {
   trace?: ITrace;

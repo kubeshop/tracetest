@@ -27,7 +27,7 @@ const TestList = () => {
       if (testId) {
         TestAnalyticsService.onRunTest(testId);
         const testResult = await runTest(testId).unwrap();
-        navigate(`/test/${testId}?resultId=${testResult.resultId}`);
+        navigate(`/test/${testId}/result/${testResult.resultId}`);
       }
     },
     [navigate, runTest]

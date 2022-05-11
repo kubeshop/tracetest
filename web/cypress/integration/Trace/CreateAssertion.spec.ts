@@ -14,8 +14,9 @@ describe('Create Assertion', () => {
     cy.location('href').should('match', /\/test\/.*/i);
 
     cy.get(`[data-cy^=test-run-result-]`).first().click();
-    cy.location('href').should('match', /resultId=.*/i);
+    cy.location('href').should('match', /\/result\/.*/i);
 
+    cy.wait(7000);
     cy.get('[data-cy=add-assertion-button]').click();
     cy.get('[data-cy=create-assertion-form]', {timeout: 10000}).should('be.visible');
 
@@ -61,7 +62,7 @@ describe('Create Assertion', () => {
     cy.get('#add-assertion-modal-ok-button').click();
 
     cy.get('[data-cy=assertion-table]').should('have.lengthOf', 2);
-    cy.get('[data-cy=assertion-check-property]').should('have.lengthOf', 3);
+    cy.get('[data-cy=assertion-check-property]').should('have.lengthOf', 5);
   });
 
   it('should update an assertion', () => {
@@ -83,9 +84,9 @@ describe('Create Assertion', () => {
     cy.get('#add-assertion-modal-ok-button').click();
 
     cy.get('[data-cy=assertion-table]').should('have.lengthOf', 2);
-    cy.get('[data-cy=assertion-check-property]').should('have.lengthOf', 4);
+    cy.get('[data-cy=assertion-check-property]').should('have.lengthOf', 6);
 
-    cy.get('#rc-tabs-1-tab-test-results').click();
+    cy.get('[id*=tab-test-results').click();
     cy.get('[data-cy=test-results-assertion-table]').should('have.lengthOf', 2);
   });
 });

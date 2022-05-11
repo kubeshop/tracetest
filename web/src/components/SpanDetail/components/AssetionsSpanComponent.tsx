@@ -28,7 +28,7 @@ export const AssetionsSpanComponent = ({assertionsResultList, testId, span, resu
           />
         ))
     ) : (
-      <S.DetailsEmptyStateContainer>
+      <S.DetailsEmptyStateContainer data-cy="empty-assertion-table">
         <S.DetailsTableEmptyStateIcon />
         <Typography.Text disabled>No Data</Typography.Text>
       </S.DetailsEmptyStateContainer>
