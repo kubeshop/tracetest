@@ -1,6 +1,6 @@
 import {renderHook} from '@testing-library/react-hooks';
-import {SemanticGroupNames} from '../constants/SemanticGroupNames.constants';
-import {useDAGChart} from './useDAGChart';
+import {SemanticGroupNames} from '../../constants/SemanticGroupNames.constants';
+import {useDAGChart} from '../useDAGChart';
 
 test('useDAGChart with empty span', () => {
   const {result} = renderHook(() => useDAGChart({}));

@@ -1,5 +1,5 @@
 import {act, renderHook} from '@testing-library/react-hooks';
-import {useDoubleClick} from './useDoubleClick';
+import {useDoubleClick} from '../useDoubleClick';
 
 test('useDoubleClick', () => {
   const doubleClick = jest.fn();

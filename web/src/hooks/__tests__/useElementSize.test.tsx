@@ -1,5 +1,5 @@
 import {renderHook} from '@testing-library/react-hooks';
-import {useElementSize} from './useElementSize';
+import {useElementSize} from '../useElementSize';
 
 test('useElementSize', () => {
   const {result} = renderHook(() => useElementSize());

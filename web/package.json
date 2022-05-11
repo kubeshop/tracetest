@@ -39,7 +39,6 @@
   "scripts": {
     "start": "craco start",
     "build": "craco build",
-    "test:work": "craco test --watchAll=false --coverage ./src/hooks --collectCoverageFrom='src/hooks/**/*.(tsx|ts)'",
     "test:unit": "craco test --watchAll=false --coverage",
     "test:integration": "npm run cy:run",
     "test:lint": "eslint ./src/**/*.{ts,tsx}",
@@ -79,8 +78,7 @@
   "jest": {
     "transformIgnorePatterns": [
       "/node_modules/(?!antd|@ant-design|rc-.+?|@babel/runtime).+(js|jsx)$"
-    ],
-    "testMatch": [ "<rootDir>/src/hooks/**/*.test.tsx" ]
+    ]
   },
   "resolutions": {
     "styled-components": "^5"
