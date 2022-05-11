@@ -39,7 +39,8 @@
   "scripts": {
     "start": "craco start",
     "build": "craco build",
-    "test:unit": "craco test --watchAll=false",
+    "test:work": "craco test --watchAll=false --coverage ./src/hooks --collectCoverageFrom='src/hooks/**/*.(tsx|ts)'",
+    "test:unit": "craco test --watchAll=false --coverage",
     "test:integration": "npm run cy:run",
     "test:lint": "eslint ./src/**/*.{ts,tsx}",
     "test:types": "tsc",
@@ -78,7 +79,8 @@
   "jest": {
     "transformIgnorePatterns": [
       "/node_modules/(?!antd|@ant-design|rc-.+?|@babel/runtime).+(js|jsx)$"
-    ]
+    ],
+    "testMatch": [ "<rootDir>/src/hooks/**/*.test.tsx" ]
   },
   "resolutions": {
     "styled-components": "^5"
@@ -99,6 +101,7 @@
     "@storybook/preset-create-react-app": "^4.1.0",
     "@storybook/react": "^6.4.22",
     "@storybook/testing-library": "^0.0.11",
+    "@testing-library/react-hooks": "^8.0.0",
     "@types/jmespath": "^0.15.0",
     "@types/lodash": "^4.14.181",
     "@types/styled-components": "^5.1.21",

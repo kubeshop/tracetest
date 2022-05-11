@@ -6,18 +6,26 @@ interface usePollingProps {
   isPolling: boolean;
 }
 
-const usePolling = ({callback, delay = 1000, isPolling}: usePollingProps) => {
+const usePolling = ({callback, delay = 1000, isPolling}: usePollingProps): void => {
   useEffect(() => {
     let interval: any = null;
 
+    console.log(1);
     interval = setInterval(() => {
-      if (isPolling) callback();
-      else {
+      console.log(2);
+      if (isPolling) {
+        console.log(3);
+        callback();
+      } else {
+        console.log(4);
         interval && clearInterval(interval);
       }
     }, delay);
 
-    return () => interval && clearInterval(interval);
+    return () => {
+      console.log(5);
+      return interval && clearInterval(interval);
+    };
   }, [delay, isPolling, callback]);
 };
 

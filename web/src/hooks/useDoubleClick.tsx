@@ -1,6 +1,14 @@
 import {useCallback, useRef} from 'react';
 
-export const useDoubleClick = (doubleClick: any, click?: any, timeout = 200) => {
+interface E {
+  detail: any;
+}
+
+export const useDoubleClick = (
+  doubleClick: (e?: E) => void,
+  click?: (e?: E) => void,
+  timeout = 200
+): ((e: E) => void) => {
   // we're using useRef here for the useCallback to rememeber the timeout
   const clickTimeout = useRef<any>();
 
