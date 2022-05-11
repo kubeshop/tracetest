@@ -1,8 +1,14 @@
 import * as d3DAG from 'd3-dag';
+import {Dag} from 'd3-dag';
 import _ from 'lodash';
-import { TSpanMap } from '../components/Diagram/components/DAG';
+import {TSpanMap} from '../components/Diagram/components/DAG';
 
-export const useDAGChart = (spanMap: TSpanMap = {}) => {
+interface DAGResponse {
+  dag: Dag<{id: string; parentIds: string[]}, undefined>;
+  layout: {width: number; height: number};
+}
+
+export const useDAGChart = (spanMap: TSpanMap = {}): void | DAGResponse => {
   if (_.isEmpty(spanMap)) {
     return;
   }
