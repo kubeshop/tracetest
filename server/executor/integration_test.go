@@ -24,18 +24,42 @@ func TestExecutorIntegration(t *testing.T) {
 	require.NoError(t, err)
 	defer demoApp.Stop()
 
-	app, err := test.GetTestingApp(demoApp)
+	tracetestApp, err := test.GetTestingApp(demoApp)
 	require.NoError(t, err)
 
-	go app.Start()
+	go tracetestApp.Start()
 
 	time.Sleep(1 * time.Second)
 
+	testCases := []struct {
+		Name string
+		Fn   func(*testing.T, *app.App, *test.DemoApp)
+	}{
+		{
+			Name: "Test with new selector should be asserted by assertion engine",
+			Fn:   happyPathWithNewSelector,
+		},
+		// This test should be removed after we migrate the frontend application to run the new
+		// selector format
+		{
+			Name: "Test with old selectors should not be asserted by assertion engine",
+			Fn:   happyPathWithOldSelector,
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.Name, func(t *testing.T) {
+			testCase.Fn(t, tracetestApp, demoApp)
+		})
+	}
+}
+
+func happyPathWithNewSelector(t *testing.T, app *app.App, demoApp *test.DemoApp) {
 	testID, err := createImportPokemonTest(app, demoApp)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, testID)
 
-	err = createTestAssertions(testID)
+	err = createNewTestAssertions(testID)
 	assert.NoError(t, err)
 
 	resultID, err := runTest(app, testID)
@@ -56,6 +80,31 @@ func TestExecutorIntegration(t *testing.T) {
 	for _, spanAssertion := range spanAssertions {
 		assert.True(t, spanAssertion.Passed, "All assertions should pass")
 	}
+}
+
+func happyPathWithOldSelector(t *testing.T, app *app.App, demoApp *test.DemoApp) {
+	testID, err := createImportPokemonTest(app, demoApp)
+	assert.NoError(t, err)
+	assert.NotEmpty(t, testID)
+
+	err = createOldTestAssertions(testID)
+	assert.NoError(t, err)
+
+	resultID, err := runTest(app, testID)
+	assert.NoError(t, err)
+	assert.NotEmpty(t, resultID)
+
+	testRunResult := waitForResultState(app, testID, resultID, executor.TestRunStateAwaitingTestResults, 30*time.Second)
+	assert.NotNil(t, testRunResult, "Test result should not be nil")
+	assert.Greater(t, len(testRunResult.Trace.ResourceSpans), 0, "Number of affected spans should be greater than 0")
+	assert.Equal(t, executor.TestRunStateAwaitingTestResults, testRunResult.State, "Result should be in FINISHED state")
+
+	spanAssertions := make([]openapi.SpanAssertionResult, 0)
+	for _, assertionResult := range testRunResult.AssertionResult {
+		spanAssertions = append(spanAssertions, assertionResult.SpanAssertionResults...)
+	}
+
+	assert.Equal(t, len(spanAssertions), 0, "Test should contain no assertions")
 }
 
 func createImportPokemonTest(app *app.App, demoApp *test.DemoApp) (string, error) {
@@ -106,9 +155,51 @@ func createImportPokemonTest(app *app.App, demoApp *test.DemoApp) (string, error
 	return test.TestId, nil
 }
 
-func createTestAssertions(testID string) error {
+func createNewTestAssertions(testID string) error {
 	body := openapi.Assertion{
 		Selector: `span[service.name="pokeshop" tracetest.span.type="http" name="POST /pokemon/import"]`,
+		SpanAssertions: []openapi.SpanAssertion{
+			{
+				PropertyName:    "http.status_code",
+				Operator:        "EQUALS",
+				ComparisonValue: "200",
+			},
+			{
+				PropertyName:    "tracetest.span.duration",
+				Operator:        "LESSTHAN",
+				ComparisonValue: "100",
+			},
+		},
+	}
+	jsonBytes, err := json.Marshal(body)
+	if err != nil {
+		return fmt.Errorf("could not convert body into json: %w", err)
+	}
+	bytesBuffer := bytes.NewBuffer(jsonBytes)
+	url := fmt.Sprintf("%s/api/tests/%s/assertions", appEndpoint, testID)
+
+	response, err := http.Post(url, "application/json", bytesBuffer)
+	if err != nil {
+		return fmt.Errorf("could not send request to create assertion: %w", err)
+	}
+
+	if response.StatusCode != 200 {
+		return fmt.Errorf("could not create assertion. Expected status 200, got %d", response.StatusCode)
+	}
+
+	return nil
+}
+
+func createOldTestAssertions(testID string) error {
+	body := openapi.Assertion{
+		Selectors: []openapi.SelectorItem{
+			{
+				PropertyName: "service.name",
+				Value:        "pokeshop",
+				ValueType:    "string",
+				LocationName: "SPAN",
+			},
+		},
 		SpanAssertions: []openapi.SpanAssertion{
 			{
 				PropertyName:    "http.status_code",
