@@ -104,8 +104,12 @@ func (s *controller) GetTest(ctx context.Context, testid string) (openapi.ImplRe
 	return openapi.Response(200, test), nil
 }
 
-func (s *controller) GetTests(ctx context.Context) (openapi.ImplResponse, error) {
-	tests, err := s.testDB.GetTests(ctx)
+func (s *controller) GetTests(ctx context.Context, take, skip int32) (openapi.ImplResponse, error) {
+	if take == 0 {
+		take = 20
+	}
+
+	tests, err := s.testDB.GetTests(ctx, take, skip)
 	if err != nil {
 		return openapi.Response(http.StatusInternalServerError, err.Error()), err
 	}

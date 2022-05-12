@@ -13,7 +13,7 @@ type TestRepository interface {
 	CreateTest(ctx context.Context, test *openapi.Test) (string, error)
 	UpdateTest(ctx context.Context, test *openapi.Test) error
 	DeleteTest(ctx context.Context, test *openapi.Test) error
-	GetTests(ctx context.Context) ([]openapi.Test, error)
+	GetTests(ctx context.Context, take, skip int32) ([]openapi.Test, error)
 	GetTest(ctx context.Context, id string) (*openapi.Test, error)
 }
 

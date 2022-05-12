@@ -13,6 +13,19 @@ paths:
       summary: "Get tests"
       description: "get tests"
       operationId: getTests
+      parameters:
+        - in: query
+          name: take
+          description: "indicates how many tests can be returned by each page"
+          schema:
+            type: integer
+            default: 20
+        - in: query
+          name: skip
+          description: "indicates how many tests will be skipped when paginating"
+          schema:
+            type: integer
+            default: 0
       responses:
         200:
           description: successful operation

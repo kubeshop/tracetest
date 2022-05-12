@@ -141,14 +141,14 @@ func (td *postgresDB) GetTest(ctx context.Context, id string) (*openapi.Test, er
 	return &test, nil
 }
 
-func (td *postgresDB) GetTests(ctx context.Context) ([]openapi.Test, error) {
-	stmt, err := td.db.Prepare("SELECT test FROM tests")
+func (td *postgresDB) GetTests(ctx context.Context, take, skip int32) ([]openapi.Test, error) {
+	stmt, err := td.db.Prepare("SELECT test FROM tests LIMIT $1 OFFSET $2")
 	if err != nil {
 		return nil, err
 	}
 	defer stmt.Close()
 
-	rows, err := stmt.QueryContext(ctx)
+	rows, err := stmt.QueryContext(ctx, take, skip)
 	if err != nil {
 		return nil, err
 	}
