@@ -1,6 +1,5 @@
-import {debounce} from 'lodash';
-import {useMemo} from 'react';
 import {SupportedDiagrams} from '../Diagram/Diagram';
+import SearchInput from '../SearchInput';
 import * as S from './DiagramStories.styled';
 
 interface IDiagramSwitcherProps {
@@ -10,14 +9,6 @@ interface IDiagramSwitcherProps {
 }
 
 const DiagramSwitcher: React.FC<IDiagramSwitcherProps> = ({onSearch, onTypeChange, selectedType}) => {
-  const handleSearch = useMemo(
-    () =>
-      debounce(event => {
-        onSearch(event.target.value);
-      }, 500),
-    [onSearch]
-  );
-
   return (
     <S.DiagramSwitcher>
       <S.Switch>
@@ -30,7 +21,7 @@ const DiagramSwitcher: React.FC<IDiagramSwitcherProps> = ({onSearch, onTypeChang
           onClick={() => onTypeChange(SupportedDiagrams.Timeline)}
         />
       </S.Switch>
-      <S.SearchInput onChange={handleSearch} />
+      <SearchInput onSearch={onSearch} width="100%" placeholder="Search in trace (Not implemented yet)" />
     </S.DiagramSwitcher>
   );
 };

@@ -19,11 +19,12 @@ describe('Home', () => {
     cy.get('[data-cy=test-list]').should('be.visible');
   });
 
-  it('should go to the test details after click', () => {
+  it('should go to the test details after clicking the see all details button', () => {
     createTest();
 
     cy.visit('http://localhost:3000/');
-    cy.get('[data-cy=test-card]').first().click();
+    cy.get('[data-cy=collapse-test]').first().click();
+    cy.get('[data-cy=test-details-link]').first().click();
     cy.location('href').should('match', /\/test\/.*/i);
   });
 

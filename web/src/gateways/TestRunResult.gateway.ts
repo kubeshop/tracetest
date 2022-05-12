@@ -4,8 +4,8 @@ import {ITestAssertionResult} from '../types/Assertion.types';
 const {getResultById, getResultList, updateResult} = endpoints;
 
 const TestRunResultGateway = () => ({
-  get(testId: string) {
-    return getResultList.initiate(testId);
+  get(testId: string, take = 25, skip = 0) {
+    return getResultList.initiate({testId, take, skip});
   },
   getById(testId: string, resultId: string) {
     return getResultById.initiate({testId, resultId});

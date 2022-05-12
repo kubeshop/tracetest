@@ -1,25 +1,35 @@
 import {Button} from 'antd';
 import {FC, useCallback} from 'react';
-import {useRunTestMutation} from 'redux/apis/Test.api';
+import {useGetResultListQuery, useRunTestMutation} from 'redux/apis/Test.api';
 import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
 import {Steps} from 'components/GuidedTour/testDetailsStepList';
 import useGuidedTour from 'hooks/useGuidedTour';
 import * as S from './Test.styled';
-import TestDetailsTable from './TestDetailsTable';
 import TestAnalyticsService from '../../services/Analytics/TestAnalytics.service';
 import {ITestRunResult} from '../../types/TestRunResult.types';
+import ResultCardList from '../../components/ResultCardList';
+import useInfiniteScroll from './hooks/useInfiniteScroll';
+import InfiniteScroll from '../../components/InfiniteScroll';
+import SearchInput from '../../components/SearchInput';
 
 const {onRunTest} = TestAnalyticsService;
 
 type TTestDetailsProps = {
   testId: string;
   onSelectResult: (result: ITestRunResult) => void;
-  testResultList: ITestRunResult[];
-  isLoading: boolean;
 };
 
-const TestDetails: FC<TTestDetailsProps> = ({testId, testResultList, isLoading, onSelectResult}) => {
+const TestDetails: FC<TTestDetailsProps> = ({testId, onSelectResult}) => {
   const [runTest, result] = useRunTestMutation();
+  const {
+    list: resultList,
+    hasMore,
+    loadMore,
+    isLoading,
+  } = useInfiniteScroll<ITestRunResult, {testId: string}>(useGetResultListQuery, {
+    testId,
+  });
+
   useGuidedTour(GuidedTours.TestDetails);
 
   const handleRunTest = useCallback(async () => {
@@ -33,6 +43,7 @@ const TestDetails: FC<TTestDetailsProps> = ({testId, testResultList, isLoading, 
   return (
     <>
       <S.TestDetailsHeader>
+        <SearchInput onSearch={() => console.log('onSearch')} placeholder="Search test result (Not implemented yet)" />
         <Button
           onClick={handleRunTest}
           loading={result.isLoading}
@@ -44,7 +55,14 @@ const TestDetails: FC<TTestDetailsProps> = ({testId, testResultList, isLoading, 
           Run Test
         </Button>
       </S.TestDetailsHeader>
-      <TestDetailsTable isLoading={isLoading} onSelectResult={onSelectResult} testResultList={testResultList} />
+      <InfiniteScroll
+        loadMore={loadMore}
+        isLoading={isLoading}
+        hasMore={hasMore}
+        shouldTrigger={Boolean(resultList.length)}
+      >
+        <ResultCardList resultList={resultList} />
+      </InfiniteScroll>
     </>
   );
 };

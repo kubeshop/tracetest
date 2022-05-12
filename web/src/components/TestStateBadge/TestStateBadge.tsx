@@ -1,10 +1,10 @@
 import {Badge, BadgeProps} from 'antd';
-import { TestState } from '../../constants/TestRunResult.constants';
-import { ITestRunResult } from '../../types/TestRunResult.types';
+import {TestState} from '../../constants/TestRunResult.constants';
+import {ITestRunResult} from '../../types/TestRunResult.types';
 
 const BadgeStatusMap: Record<
   TestState,
-  {status: 'processing' | 'success' | 'error' | 'default' | 'warning' | undefined; label: string}
+  {status: 'processing' | 'success' | 'error' | 'default' | 'warning' | undefined; label: string; percentage?: number}
 > = {
   [TestState.CREATED]: {
     status: 'default',
@@ -38,6 +38,7 @@ interface IProps extends BadgeProps {
 
 const TestStateBadge = ({testState, ...rest}: IProps) => {
   const {status, label} = BadgeStatusMap[testState] || BadgeStatusMap.CREATED;
+
   return <Badge {...rest} status={status} text={label} />;
 };
 

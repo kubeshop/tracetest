@@ -26,7 +26,7 @@ const TestAPI = createApi({
         url: `/tests/${testId}/run`,
         method: 'POST',
       }),
-      invalidatesTags: () => [{type: 'TestRunResult', id: 'LIST'}],
+      invalidatesTags: (response, error, testId) => [{type: 'TestRunResult', id: `${testId}-LIST`}],
     }),
     getTestList: build.query<ITest[], void>({
       query: () => `/tests`,
@@ -65,9 +65,9 @@ const TestAPI = createApi({
     }),
 
     // Test Results
-    getResultList: build.query<ITestRunResult[], string>({
-      query: id => `/tests/${id}/results`,
-      providesTags: () => [{type: 'TestRunResult' as const, id: 'LIST'}],
+    getResultList: build.query<ITestRunResult[], {testId: string; take?: number; skip?: number}>({
+      query: ({testId, take = 25, skip = 0}) => `/tests/${testId}/results?take=${take}&skip=${skip}`,
+      providesTags: (result, error, {testId}) => [{type: 'TestRunResult' as const, id: `${testId}-LIST`}],
       transformResponse: (rawTestResultList: IRawTestRunResult[]) =>
         rawTestResultList.map(rawTestResult => TestRunResult(rawTestResult)),
     }),
@@ -80,9 +80,9 @@ const TestAPI = createApi({
         method: 'PUT',
         body: assertionResult,
       }),
-      invalidatesTags: (result, error, args) => [
-        {type: 'TestRunResult', id: args.resultId},
-        {type: 'TestRunResult', id: 'LIST'},
+      invalidatesTags: (result, error, {testId, resultId}) => [
+        {type: 'TestRunResult', id: resultId},
+        {type: 'TestRunResult', id: `${testId}-LIST`},
       ],
       transformResponse: (rawTestResult: IRawTestRunResult) => TestRunResult(rawTestResult),
     }),
@@ -106,6 +106,7 @@ export const {
   useDeleteTestByIdMutation,
   useGetAssertionsQuery,
   useUpdateResultMutation,
+  useLazyGetResultListQuery
 } = TestAPI;
 export const {endpoints} = TestAPI;
 

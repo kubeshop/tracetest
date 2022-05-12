@@ -73,6 +73,7 @@ const Diagram: React.FC<IDiagramProps> = ({trace, selectedSpan, onSelectSpan}): 
           labelShowBg: false,
           animated: false,
           arrowHeadType: 'arrowclosed',
+          style: { stroke: '#C9CEDB' },
         } as any);
       });
 

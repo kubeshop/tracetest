@@ -43,7 +43,7 @@ const getTextColor = (spanType: SemanticGroupNames) => {
 
 export const TraceNode = styled.div<{selected: boolean}>`
   background-color: white;
-  border: 1px solid ${({selected}) => (selected ? '#48586C' : '#E2E4E6')};
+  border: 1px solid ${({selected}) => (selected ? '#48586C' : '#C9CEDB')};
   border-radius: 2px;
   min-width: fit-content;
   display: flex;
