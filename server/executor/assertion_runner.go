@@ -91,7 +91,10 @@ func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, testResu
 		return &testResult, nil
 	}
 
-	testDefinition := convertAssertionsIntoTestDefinition(test.Assertions)
+	testDefinition, err := convertAssertionsIntoTestDefinition(test.Assertions)
+	if err != nil {
+		return nil, err
+	}
 
 	result := assertions.Assert(trace, testDefinition)
 
