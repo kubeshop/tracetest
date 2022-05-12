@@ -1,12 +1,12 @@
+import {GA4React} from 'ga-4-react';
 import {useCallback, useContext} from 'react';
-import {GA4ReactInterface} from 'ga-4-react/src/models/gtagModels';
-import {Context} from './AnalyticsProvider';
-import AnalyticsService from '../../services/Analytics/Analytics.service';
 import {Categories} from '../../constants/Analytics.constants';
+import AnalyticsService from '../../services/Analytics/Analytics.service';
+import {Context} from './AnalyticsProvider';
 
 export type TAnalyticsService<A> = {
   isEnabled: boolean;
-  instance: GA4ReactInterface;
+  instance: GA4React;
   event(action: A, label: string): void;
 };
 

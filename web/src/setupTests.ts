@@ -5,3 +5,16 @@
 import '@testing-library/jest-dom/extend-expect';
 
 require('jest-fetch-mock').enableMocks();
+
+/**
+ * fix: `matchMedia` not present, legacy browsers require a polyfill
+ */
+global.matchMedia =
+  global.matchMedia ||
+  function match() {
+    return {
+      matches: false,
+      addListener() {},
+      removeListener() {},
+    };
+  };
