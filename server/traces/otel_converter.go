@@ -36,6 +36,8 @@ func convertOtelSpanIntoSpan(span openapi.V1Span) (*Span, error) {
 		attributes[attribute.Key] = getAttributeValue(attribute.Value)
 	}
 
+	attributes["name"] = span.Name
+
 	spanID, err := createSpanID(span.SpanId)
 	if err != nil {
 		return nil, err
