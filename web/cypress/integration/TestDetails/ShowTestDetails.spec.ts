@@ -40,8 +40,7 @@ describe('Show test details', () => {
     cy.location().then(({pathname}) => {
       const testRunResultId = getResultId(pathname);
 
-      cy.wait(2000);
-      cy.get('[data-cy=test-run-result-status]').should('have.text', 'Test status:Awaiting trace');
+      cy.get('[data-cy=test-run-result-status]', { timeout: 2000 }).should('have.text', 'Test status:Awaiting trace');
       cy.wait(2000);
       cy.get('[data-cy=test-run-result-status]').should('have.text', 'Test status:Finished');
       cy.get('[data-cy=test-header-back-button]').click();

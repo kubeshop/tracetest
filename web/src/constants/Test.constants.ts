@@ -10,13 +10,6 @@ interface DemoTestExample {
 
 export const DemoTestExampleList: DemoTestExample[] = [
   {
-    name: 'Shopping app',
-    url: 'http://shop/buy',
-    method: HTTP_METHOD.GET,
-    body: '',
-    description: 'Generic get',
-  },
-  {
     name: 'Pokemon - List',
     url: 'http://demo-pokemon-api.demo.svc.cluster.local/pokemon?take=20&skip=0',
     method: HTTP_METHOD.GET,

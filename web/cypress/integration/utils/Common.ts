@@ -3,7 +3,7 @@ import {DemoTestExampleList} from '../../../src/constants/Test.constants';
 
 Cypress.on('uncaught:exception', err => !err.message.includes('ResizeObserver loop limit exceeded'));
 
-export const [, {name, description}] = DemoTestExampleList;
+export const [{name, description}] = DemoTestExampleList;
 
 // eslint-disable-next-line import/no-mutable-exports
 export let testId = '';

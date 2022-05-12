@@ -63,7 +63,7 @@ describe('Create test', () => {
   });
 
   it('should create a POST test from an example', () => {
-    const [, , {name, description}] = DemoTestExampleList;
+    const [, {name, description}] = DemoTestExampleList;
 
     const $form = openCreateTestModal();
     $form.get('[data-cy=example-button]').click();
