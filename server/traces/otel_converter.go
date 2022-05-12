@@ -12,9 +12,7 @@ func FromOtel(trace openapi.ApiV3SpansResponseChunk) (Trace, error) {
 	flattenSpans := make([]openapi.V1Span, 0)
 	for _, resource := range trace.ResourceSpans {
 		for _, librarySpans := range resource.InstrumentationLibrarySpans {
-			for _, span := range librarySpans.Spans {
-				flattenSpans = append(flattenSpans, span)
-			}
+			flattenSpans = append(flattenSpans, librarySpans.Spans...)
 		}
 	}
 
