@@ -13,7 +13,7 @@ type TestRepository interface {
 	CreateTest(ctx context.Context, test *openapi.Test) (string, error)
 	UpdateTest(ctx context.Context, test *openapi.Test) error
 	DeleteTest(ctx context.Context, test *openapi.Test) error
-	GetTests(ctx context.Context) ([]openapi.Test, error)
+	GetTests(ctx context.Context, take, skip int32) ([]openapi.Test, error)
 	GetTest(ctx context.Context, id string) (*openapi.Test, error)
 }
 
@@ -21,7 +21,7 @@ type ResultRepository interface {
 	CreateResult(ctx context.Context, testID string, res *openapi.TestRunResult) error
 	UpdateResult(ctx context.Context, res *openapi.TestRunResult) error
 	GetResult(ctx context.Context, id string) (*openapi.TestRunResult, error)
-	GetResultsByTestID(ctx context.Context, testid string) ([]openapi.TestRunResult, error)
+	GetResultsByTestID(ctx context.Context, testid string, take, skip int32) ([]openapi.TestRunResult, error)
 	GetResultByTraceID(ctx context.Context, testid, traceid string) (openapi.TestRunResult, error)
 }
 

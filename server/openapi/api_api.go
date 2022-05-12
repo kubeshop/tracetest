@@ -269,9 +269,20 @@ func (c *ApiApiController) GetTestResult(w http.ResponseWriter, r *http.Request)
 // GetTestResults - get the results for a test
 func (c *ApiApiController) GetTestResults(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
+	query := r.URL.Query()
 	testIdParam := params["testId"]
 
-	result, err := c.service.GetTestResults(r.Context(), testIdParam)
+	takeParam, err := parseInt32Parameter(query.Get("take"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	skipParam, err := parseInt32Parameter(query.Get("skip"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	result, err := c.service.GetTestResults(r.Context(), testIdParam, takeParam, skipParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -284,7 +295,18 @@ func (c *ApiApiController) GetTestResults(w http.ResponseWriter, r *http.Request
 
 // GetTests - Get tests
 func (c *ApiApiController) GetTests(w http.ResponseWriter, r *http.Request) {
-	result, err := c.service.GetTests(r.Context())
+	query := r.URL.Query()
+	takeParam, err := parseInt32Parameter(query.Get("take"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	skipParam, err := parseInt32Parameter(query.Get("skip"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	result, err := c.service.GetTests(r.Context(), takeParam, skipParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
