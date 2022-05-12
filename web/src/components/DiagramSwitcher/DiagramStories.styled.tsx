@@ -1,5 +1,4 @@
-import {BarsOutlined, ClusterOutlined, SearchOutlined} from '@ant-design/icons';
-import {Input} from 'antd';
+import {BarsOutlined, ClusterOutlined} from '@ant-design/icons';
 import styled from 'styled-components';
 
 export const DiagramSwitcher = styled.div`
@@ -34,11 +33,4 @@ export const TimelineIcon = styled(BarsOutlined).attrs<{isSelected?: boolean}>({
 })<{isSelected?: boolean}>`
   cursor: pointer;
   color: ${({isSelected = false}) => (isSelected ? '#61175E' : '#9AA3AB')};
-`;
-
-export const SearchInput = styled(Input).attrs({
-  prefix: <SearchOutlined />,
-  placeholder: 'Search in trace',
-})`
-  height: 32px;
 `;

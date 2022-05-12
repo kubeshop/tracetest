@@ -38,7 +38,7 @@ const TracePage = () => {
     console.log('onRunTest');
   }, []);
 
-  return test && result ? (
+  return test && result && !isError ? (
     <ReactFlowProvider>
       <Layout>
         <S.Wrapper>

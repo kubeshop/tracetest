@@ -13,8 +13,13 @@ export const PageHeader = styled.div`
 `;
 
 export const TitleText = styled(Typography.Title).attrs({
-  level: 3,
-})``;
+  level: 4,
+})`
+  && {
+    font-size: 18px;
+    margin: 32px 0;
+  }
+`;
 
 export const Wrapper = styled.div`
   padding: 0 24px;
@@ -50,4 +55,5 @@ export const TestListContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
+  margin-bottom: 24px;
 `;

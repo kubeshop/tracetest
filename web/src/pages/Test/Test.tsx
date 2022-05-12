@@ -1,8 +1,7 @@
 import {useCallback} from 'react';
-import {skipToken} from '@reduxjs/toolkit/dist/query';
 import {withTracker} from 'ga-4-react';
 import {useNavigate, useParams} from 'react-router-dom';
-import {useGetTestByIdQuery, useGetResultListQuery} from 'redux/apis/Test.api';
+import {useGetTestByIdQuery} from 'redux/apis/Test.api';
 import Layout from 'components/Layout';
 
 import * as S from './Test.styled';
@@ -14,9 +13,6 @@ const TestPage: React.FC = () => {
   const navigate = useNavigate();
   const {id} = useParams();
   const {data: test} = useGetTestByIdQuery(id as string);
-  const {data: testResultList = [], isLoading} = useGetResultListQuery(id ?? skipToken, {
-    pollingInterval: 5000,
-  });
 
   const handleSelectTestResult = useCallback(
     (result: ITestRunResult) => {
@@ -30,12 +26,7 @@ const TestPage: React.FC = () => {
     <Layout>
       <TestHeader test={test} onBack={() => navigate('/')} />
       <S.Wrapper>
-        <TestDetails
-          testResultList={testResultList}
-          isLoading={isLoading}
-          testId={id!}
-          onSelectResult={handleSelectTestResult}
-        />
+        <TestDetails testId={test.testId} onSelectResult={handleSelectTestResult} />
       </S.Wrapper>
     </Layout>
   ) : null;

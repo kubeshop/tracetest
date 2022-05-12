@@ -6,6 +6,7 @@ import TestList from './TestList';
 import * as S from './Home.styled';
 import HomeActions from './HomeActions';
 import CreateTestModal from '../../components/CreateTestModal';
+import SearchInput from '../../components/SearchInput';
 
 const HomeContent: React.FC = () => {
   const [openCreateTestModal, setOpenCreateTestModal] = useState(false);
@@ -22,8 +23,9 @@ const HomeContent: React.FC = () => {
   return (
     <>
       <S.Wrapper>
+        <S.TitleText level={4}>All Tests</S.TitleText>
         <S.PageHeader>
-          <S.TitleText>All Tests</S.TitleText>
+          <SearchInput onSearch={() => console.log('onSearch')} placeholder="Search test (Not implemented yet)" />
           <HomeActions onCreateTest={() => setOpenCreateTestModal(true)} />
         </S.PageHeader>
         <TestList />
