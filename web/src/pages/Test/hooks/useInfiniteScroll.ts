@@ -13,7 +13,6 @@ const useInfiniteScroll = <T, P>(
   const [localPage, setLocalPage] = useState(0);
   const [list, setList] = useState<T[]>([]);
   const [lastCount, setLastCount] = useState(0);
-  console.log('@@', {localPage, take});
 
   const {data, isLoading, isFetching} = useGetDataListQuery({
     skip: localPage * take,
@@ -42,20 +41,8 @@ const useInfiniteScroll = <T, P>(
   }, []);
 
   const loadMore = useCallback(() => {
-    console.log('@@loadMore');
     setLocalPage(page => page + 1);
   }, []);
-
-  console.log('@@', {
-    list,
-    localPage,
-    isLoading,
-    isFetching,
-    hasMore,
-    loadMore,
-    refresh,
-    lastCount,
-  });
 
   return {
     list,
