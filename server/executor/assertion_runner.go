@@ -62,17 +62,26 @@ func (e *defaultAssertionRunner) startWorker(ctx context.Context) {
 			fmt.Println("Exiting assertion executor worker")
 			return
 		case testResult := <-e.inputChannel:
-			response, err := e.executeAssertions(ctx, testResult)
+			err := e.runAssertionsAndUpdateResult(ctx, testResult)
 			if err != nil {
 				fmt.Println(err.Error())
 			}
-
-			err = e.db.UpdateResult(ctx, response)
-			if err != nil {
-				fmt.Println(fmt.Errorf("could not save result on database: %w", err).Error())
-			}
 		}
 	}
+}
+
+func (e *defaultAssertionRunner) runAssertionsAndUpdateResult(ctx context.Context, testResult openapi.TestRunResult) error {
+	response, err := e.executeAssertions(ctx, testResult)
+	if err != nil {
+		return err
+	}
+
+	err = e.db.UpdateResult(ctx, response)
+	if err != nil {
+		return fmt.Errorf("could not save result on database: %w", err)
+	}
+
+	return nil
 }
 
 func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, testResult openapi.TestRunResult) (*openapi.TestRunResult, error) {
