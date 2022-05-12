@@ -181,8 +181,8 @@ func (m *mockTestDB) DeleteTest(ctx context.Context, test *openapi.Test) error {
 	return args.Error(0)
 }
 
-func (m *mockTestDB) GetTests(ctx context.Context) ([]openapi.Test, error) {
-	args := m.Called(ctx)
+func (m *mockTestDB) GetTests(ctx context.Context, take, skip int32) ([]openapi.Test, error) {
+	args := m.Called(ctx, take, skip)
 	return args.Get(0).([]openapi.Test), args.Error(1)
 }
 
@@ -216,8 +216,8 @@ func (m *mockResultsDB) GetResult(ctx context.Context, id string) (*openapi.Test
 	return args.Get(0).(*openapi.TestRunResult), args.Error(1)
 }
 
-func (m *mockResultsDB) GetResultsByTestID(ctx context.Context, testid string) ([]openapi.TestRunResult, error) {
-	args := m.Called(ctx, testid)
+func (m *mockResultsDB) GetResultsByTestID(ctx context.Context, testid string, take, skip int32) ([]openapi.TestRunResult, error) {
+	args := m.Called(ctx, testid, take, skip)
 	return args.Get(0).([]openapi.TestRunResult), args.Error(1)
 }
 

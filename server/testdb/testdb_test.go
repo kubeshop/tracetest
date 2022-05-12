@@ -136,7 +136,7 @@ func TestGetTests(t *testing.T) {
 			t.Fatal(err)
 		}
 	}
-	gotTests, err := db.GetTests(ctx)
+	gotTests, err := db.GetTests(ctx, 20, 0)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -186,7 +186,7 @@ func TestCreateResults(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, &res2, gotRes)
 
-	gotResults, err := db.GetResultsByTestID(ctx, testID)
+	gotResults, err := db.GetResultsByTestID(ctx, testID, 20, 0)
 	assert.NoError(t, err)
 	assert.Equal(t, res2, gotResults[0])
 }
