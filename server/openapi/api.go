@@ -45,7 +45,7 @@ type ApiApiServicer interface {
 	GetAssertions(context.Context, string) (ImplResponse, error)
 	GetTest(context.Context, string) (ImplResponse, error)
 	GetTestResult(context.Context, string, string) (ImplResponse, error)
-	GetTestResults(context.Context, string) (ImplResponse, error)
+	GetTestResults(context.Context, string, int32, int32) (ImplResponse, error)
 	GetTests(context.Context) (ImplResponse, error)
 	RunTest(context.Context, string) (ImplResponse, error)
 	UpdateAssertion(context.Context, string, string, Assertion) (ImplResponse, error)

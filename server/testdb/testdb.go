@@ -21,7 +21,7 @@ type ResultRepository interface {
 	CreateResult(ctx context.Context, testID string, res *openapi.TestRunResult) error
 	UpdateResult(ctx context.Context, res *openapi.TestRunResult) error
 	GetResult(ctx context.Context, id string) (*openapi.TestRunResult, error)
-	GetResultsByTestID(ctx context.Context, testid string) ([]openapi.TestRunResult, error)
+	GetResultsByTestID(ctx context.Context, testid string, take, skip int32) ([]openapi.TestRunResult, error)
 	GetResultByTraceID(ctx context.Context, testid, traceid string) (openapi.TestRunResult, error)
 }
 

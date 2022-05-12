@@ -371,14 +371,14 @@ func (td *postgresDB) GetResultByTraceID(ctx context.Context, testID, traceID st
 	return run, nil
 }
 
-func (td *postgresDB) GetResultsByTestID(ctx context.Context, testID string) ([]openapi.TestRunResult, error) {
-	stmt, err := td.db.Prepare("SELECT result FROM results WHERE test_id = $1 ORDER BY result ->> 'createdAt' DESC")
+func (td *postgresDB) GetResultsByTestID(ctx context.Context, testID string, take, skip int32) ([]openapi.TestRunResult, error) {
+	stmt, err := td.db.Prepare("SELECT result FROM results WHERE test_id = $1 ORDER BY result ->> 'createdAt' DESC LIMIT $2 OFFSET $3")
 	if err != nil {
 		return nil, err
 	}
 	defer stmt.Close()
 
-	rows, err := stmt.QueryContext(ctx, testID) //.Scan(&b)
+	rows, err := stmt.QueryContext(ctx, testID, take, skip) //.Scan(&b)
 	if err != nil {
 		return nil, err
 	}
