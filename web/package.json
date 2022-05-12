@@ -78,7 +78,8 @@
   "jest": {
     "transformIgnorePatterns": [
       "/node_modules/(?!antd|@ant-design|rc-.+?|@babel/runtime).+(js|jsx)$"
-    ]
+    ],
+    "resetMocks": false
   },
   "resolutions": {
     "styled-components": "^5"
@@ -114,6 +115,7 @@
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.3.0",
     "eslint-plugin-unused-imports": "^2.0.0",
+    "jest-fetch-mock": "^3.0.3",
     "prettier": "^2.5.1",
     "webpack": "^5.72.0"
   },

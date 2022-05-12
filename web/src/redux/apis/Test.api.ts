@@ -8,7 +8,7 @@ import TestRunResult from '../../models/TestRunResult.model';
 const TestAPI = createApi({
   reducerPath: 'tests',
   baseQuery: fetchBaseQuery({
-    baseUrl: '/api/',
+    baseUrl: `${document.location.protocol}//${document.location.host}/api/`,
   }),
   tagTypes: ['Test', 'Assertion', 'TestRunResult'],
   endpoints: build => ({
@@ -97,7 +97,6 @@ const TestAPI = createApi({
 export const {
   useCreateAssertionMutation,
   useCreateTestMutation,
-  useGetAssertionsQuery,
   useGetResultByIdQuery,
   useGetResultListQuery,
   useGetTestByIdQuery,
@@ -105,6 +104,7 @@ export const {
   useRunTestMutation,
   useUpdateAssertionMutation,
   useDeleteTestByIdMutation,
+  useGetAssertionsQuery,
   useUpdateResultMutation,
 } = TestAPI;
 export const {endpoints} = TestAPI;
