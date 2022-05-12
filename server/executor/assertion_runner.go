@@ -14,14 +14,19 @@ import (
 
 type AssertionFinishCallback func(openapi.Test, openapi.TestRunResult)
 
+type AssertionRequest struct {
+	TestDefinition assertions.TestDefinition
+	Result         openapi.TestRunResult
+}
+
 type AssertionRunner interface {
-	RunAssertions(result openapi.TestRunResult)
+	RunAssertions(request AssertionRequest)
 	WorkerPool
 }
 
 type defaultAssertionRunner struct {
 	db           testdb.Repository
-	inputChannel chan openapi.TestRunResult
+	inputChannel chan AssertionRequest
 	exitChannel  chan bool
 }
 
@@ -31,7 +36,7 @@ var _ AssertionRunner = &defaultAssertionRunner{}
 func NewAssertionRunner(db testdb.Repository) AssertionRunner {
 	return &defaultAssertionRunner{
 		db:           db,
-		inputChannel: make(chan openapi.TestRunResult, 1),
+		inputChannel: make(chan AssertionRequest, 1),
 	}
 }
 
@@ -61,8 +66,8 @@ func (e *defaultAssertionRunner) startWorker(ctx context.Context) {
 		case <-e.exitChannel:
 			fmt.Println("Exiting assertion executor worker")
 			return
-		case testResult := <-e.inputChannel:
-			err := e.runAssertionsAndUpdateResult(ctx, testResult)
+		case assertionRequest := <-e.inputChannel:
+			err := e.runAssertionsAndUpdateResult(ctx, assertionRequest)
 			if err != nil {
 				fmt.Println(err.Error())
 			}
@@ -70,8 +75,8 @@ func (e *defaultAssertionRunner) startWorker(ctx context.Context) {
 	}
 }
 
-func (e *defaultAssertionRunner) runAssertionsAndUpdateResult(ctx context.Context, testResult openapi.TestRunResult) error {
-	response, err := e.executeAssertions(ctx, testResult)
+func (e *defaultAssertionRunner) runAssertionsAndUpdateResult(ctx context.Context, request AssertionRequest) error {
+	response, err := e.executeAssertions(ctx, request)
 	if err != nil {
 		return err
 	}
@@ -84,32 +89,27 @@ func (e *defaultAssertionRunner) runAssertionsAndUpdateResult(ctx context.Contex
 	return nil
 }
 
-func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, testResult openapi.TestRunResult) (*openapi.TestRunResult, error) {
-	trace, err := traces.FromOtel(testResult.Trace)
+func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, request AssertionRequest) (*openapi.TestRunResult, error) {
+	trace, err := traces.FromOtel(request.Result.Trace)
 	if err != nil {
 		return nil, err
 	}
 
-	test, err := e.db.GetTest(ctx, testResult.TestId)
+	test, err := e.db.GetTest(ctx, request.Result.TestId)
 	if err != nil {
 		return nil, err
 	}
 
 	// Temporary patch to disable the assertion engine if frontend request is not prepared yet (old selector format)
 	if e.shouldIgnoreTest(test) {
-		return &testResult, nil
+		return &request.Result, nil
 	}
 
-	testDefinition, err := convertAssertionsIntoTestDefinition(test.Assertions)
-	if err != nil {
-		return nil, err
-	}
+	result := assertions.Assert(trace, request.TestDefinition)
 
-	result := assertions.Assert(trace, testDefinition)
+	e.setResults(&request.Result, result)
 
-	e.setResults(&testResult, result)
-
-	return &testResult, nil
+	return &request.Result, nil
 }
 
 func (e *defaultAssertionRunner) shouldIgnoreTest(test *openapi.Test) bool {
@@ -160,6 +160,6 @@ func (e *defaultAssertionRunner) setResults(result *openapi.TestRunResult, testR
 	result.AssertionResultState = allTestsPassed
 }
 
-func (e *defaultAssertionRunner) RunAssertions(result openapi.TestRunResult) {
-	e.inputChannel <- result
+func (e *defaultAssertionRunner) RunAssertions(request AssertionRequest) {
+	e.inputChannel <- request
 }

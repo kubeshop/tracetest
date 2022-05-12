@@ -74,11 +74,11 @@ func (a *App) Start() error {
 	assertionRunner.Start(5)
 	defer assertionRunner.Stop()
 
-	tracePoller := executor.NewTracePoller(a.traceDB, a.db, a.config.MaxWaitTimeForTraceDuration(), subscriptionManager)
+	tracePoller := executor.NewTracePoller(a.traceDB, a.db, a.db, a.config.MaxWaitTimeForTraceDuration(), subscriptionManager, assertionRunner)
 	tracePoller.Start(5) // worker count. should be configurable
 	defer tracePoller.Stop()
 
-	runner := executor.NewPersistentRunner(ex, a.db, a.db, tracePoller, assertionRunner)
+	runner := executor.NewPersistentRunner(ex, a.db, a.db, tracePoller)
 	runner.Start(5) // worker count. should be configurable
 	defer runner.Stop()
 

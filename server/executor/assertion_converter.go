@@ -8,7 +8,7 @@ import (
 	"github.com/kubeshop/tracetest/openapi"
 )
 
-func convertAssertionsIntoTestDefinition(openapiAssertions []openapi.Assertion) (assertions.TestDefinition, error) {
+func ConvertAssertionsIntoTestDefinition(openapiAssertions []openapi.Assertion) (assertions.TestDefinition, error) {
 	testDefinition := make(assertions.TestDefinition, 0)
 	selector := ""
 	for _, assertion := range openapiAssertions {

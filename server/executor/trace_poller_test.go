@@ -72,8 +72,17 @@ func tracePollerSetup(t *testing.T) tracePollerFixture {
 	mr := new(mockResultsDB)
 	mr.t = t
 	mr.Test(t)
+
+	mt := new(mockTestDB)
+	mt.t = t
+	mt.Test(t)
+
+	mar := new(mockAssertionRunner)
+	mar.t = t
+	mar.Test(t)
+
 	return tracePollerFixture{
-		tracePoller:      executor.NewTracePoller(mtf, mr, 100*time.Millisecond, subscription.NewManager()),
+		tracePoller:      executor.NewTracePoller(mtf, mr, mt, 100*time.Millisecond, subscription.NewManager(), mar),
 		mockTraceFetcher: mtf,
 		mockResultsDB:    mr,
 	}

@@ -133,7 +133,7 @@ func runnerSetup(t *testing.T) runnerFixture {
 
 	mtp.Test(t)
 	return runnerFixture{
-		runner:          executor.NewPersistentRunner(me, mt, mr, mtp, mar),
+		runner:          executor.NewPersistentRunner(me, mt, mr, mtp),
 		mockExecutor:    me,
 		mockTestDB:      mt,
 		mockResultsDB:   mr,
@@ -290,8 +290,8 @@ type mockAssertionRunner struct {
 
 var _ executor.AssertionRunner = &mockAssertionRunner{}
 
-func (m *mockAssertionRunner) RunAssertions(result openapi.TestRunResult) {
-	m.Called(result)
+func (m *mockAssertionRunner) RunAssertions(request executor.AssertionRequest) {
+	m.Called(request)
 }
 
 func (m *mockAssertionRunner) Start(workers int) {
