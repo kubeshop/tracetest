@@ -211,6 +211,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TestRunResult"
+
   /tests/{testId}/results/{resultId}/select:
     get:
       tags:
@@ -244,6 +245,34 @@ paths:
                 type: array
                 items:
                   type: string
+
+  /tests/{testId}/results/{resultId}/rerun:
+    post:
+      tags:
+        - api
+      parameters:
+        - in: path
+          name: testId
+          schema:
+            type: string
+            format: uuid
+          required: true
+        - in: path
+          name: resultId
+          schema:
+            type: string
+            format: uuid
+          required: true
+      summary: "rerun a test result"
+      description: "rerun a test result"
+      operationId: rerunTestResult
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TestRunResult"
 
   /tests/{testId}/results:
     get:

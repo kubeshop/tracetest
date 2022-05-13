@@ -158,31 +158,10 @@ func (tp tracePoller) processJob(job tracePollReq) {
 		Content: res,
 	})
 
-	err = tp.runAssertions(job.ctx, res)
+	err = tp.assertionRunner.RunAssertions(job.ctx, res)
 	if err != nil {
 		fmt.Printf("could not run assertions: %s\n", err.Error())
 	}
-}
-
-func (tp tracePoller) runAssertions(ctx context.Context, result openapi.TestRunResult) error {
-	test, err := tp.testDB.GetTest(ctx, result.TestId)
-	if err != nil {
-		return err
-	}
-
-	testDefinition, err := ConvertAssertionsIntoTestDefinition(test.Assertions)
-	if err != nil {
-		return err
-	}
-
-	assertionRequest := AssertionRequest{
-		TestDefinition: testDefinition,
-		Result:         result,
-	}
-
-	tp.assertionRunner.RunAssertions(assertionRequest)
-
-	return nil
 }
 
 // to compare trace we count the number of resourceSpans + InstrumentationLibrarySpans + spans.
