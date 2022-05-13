@@ -47,6 +47,23 @@ export const ValueText = styled(Text)<{isCollapsed: boolean}>`
           -webkit-box-orient: vertical;
           overflow: hidden;
         `}
+
+  pre {
+    margin: 0;
+    background: #fbfbff;
+    border: 1px solid #c9cedb;
+    ${({isCollapsed}) =>
+      isCollapsed
+        ? css`
+            word-break: break-all;
+          `
+        : css`
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+          `}
+  }
 `;
 
 export const IconContainer = styled.div`

@@ -12,7 +12,8 @@ export const isJson = (str: string) => {
   } catch (e) {
     return false;
   }
-  return true;
+
+  return Number.isNaN(Number(str)) && true;
 };
 
 const visiblePortion = 70;

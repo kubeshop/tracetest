@@ -1,6 +1,8 @@
-import {useCallback, useState} from 'react';
+import {useCallback, useMemo, useState} from 'react';
+import JSONPretty from 'react-json-pretty';
 import useHover from '../../hooks/useHover';
 import {ISpanFlatAttribute} from '../../types/Span.types';
+import {isJson} from '../../utils/Common';
 import * as S from './AttributeRow.styled';
 
 interface IAttributeRowProps {
@@ -16,13 +18,15 @@ const AttributeRow: React.FC<IAttributeRowProps> = ({attribute: {key, value}, at
     navigator.clipboard.writeText(value);
   }, [value]);
 
+  const parsedValue = useMemo(() => (isJson(value) ? <JSONPretty data={value} /> : value), [value]);
+
   return (
     <S.AttributeRow onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
       <S.TextContainer>
         <S.Text type="secondary">{key}</S.Text>
       </S.TextContainer>
       <S.ValueText onClick={() => setIsCollapsed(!isCollapsed)} isCollapsed={isCollapsed}>
-        {value}
+        {parsedValue}
       </S.ValueText>
       <S.IconContainer>
         {isHovering && (
