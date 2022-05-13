@@ -20,7 +20,7 @@ module.exports = {
             '@primary-color': '#61175E',
             '@border-radius-base': '2px',
             '@text-color': '#031849',
-            '@text-color-secondary': 'rgba(3, 24, 73, 0.6)',
+            '@text-color-secondary': '#687492',
           },
         },
       },
