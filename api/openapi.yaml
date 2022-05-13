@@ -211,6 +211,40 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TestRunResult"
+  /tests/{testId}/results/{resultId}/select:
+    get:
+      tags:
+        - api
+      parameters:
+        - in: path
+          name: testId
+          schema:
+            type: string
+            format: uuid
+          required: true
+        - in: path
+          name: resultId
+          schema:
+            type: string
+            format: uuid
+          required: true
+        - in: query
+          name: query
+          schema:
+            type: string
+      summary: "retrieve spans that will be selected by selector"
+      description: "get the spans ids that would be selected by a specific selector query"
+      operationId: getTestResultSelectedSpans
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema: 
+                type: array
+                items:
+                  type: string
+
   /tests/{testId}/results:
     get:
       tags:

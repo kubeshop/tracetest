@@ -2,14 +2,17 @@ package http
 
 import (
 	"context"
+	"encoding/hex"
 	"errors"
 	"net/http"
 
 	"github.com/kubeshop/tracetest/analytics"
+	"github.com/kubeshop/tracetest/assertions/selectors"
 	"github.com/kubeshop/tracetest/executor"
 	"github.com/kubeshop/tracetest/openapi"
 	"github.com/kubeshop/tracetest/testdb"
 	"github.com/kubeshop/tracetest/tracedb"
+	"github.com/kubeshop/tracetest/traces"
 )
 
 type controller struct {
@@ -262,4 +265,30 @@ func (s *controller) GetAssertions(ctx context.Context, testID string) (openapi.
 	}
 
 	return openapi.Response(http.StatusOK, assertions), nil
+}
+
+func (s *controller) GetTestResultSelectedSpans(ctx context.Context, testID string, resultID string, selectorQuery string) (openapi.ImplResponse, error) {
+	selector, err := selectors.New(selectorQuery)
+	if err != nil {
+		return openapi.Response(http.StatusBadRequest, "invalid selector query"), nil
+	}
+
+	result, err := s.testDB.GetResult(ctx, resultID)
+	if err != nil {
+		return openapi.Response(http.StatusInternalServerError, ""), nil
+	}
+
+	trace, err := traces.FromOtel(result.Trace)
+	if err != nil {
+		return openapi.Response(http.StatusInternalServerError, ""), nil
+	}
+
+	selectedSpans := selector.Filter(trace)
+	selectedSpanIds := make([]string, len(selectedSpans))
+
+	for i, span := range selectedSpans {
+		selectedSpanIds[i] = hex.EncodeToString(span.ID[:])
+	}
+
+	return openapi.Response(http.StatusOK, selectedSpanIds), nil
 }
