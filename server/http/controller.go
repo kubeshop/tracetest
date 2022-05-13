@@ -11,6 +11,7 @@ import (
 	"github.com/kubeshop/tracetest/openapi"
 	"github.com/kubeshop/tracetest/testdb"
 	"github.com/kubeshop/tracetest/tracedb"
+	"github.com/kubeshop/tracetest/traces"
 )
 
 type controller struct {
@@ -276,5 +277,17 @@ func (s *controller) GetTestResultSelectedSpans(ctx context.Context, testID stri
 		return openapi.Response(http.StatusInternalServerError, ""), nil
 	}
 
-	return openapi.Response(http.StatusOK, selectedSpans), nil
+	trace, err := traces.FromOtel(result.Trace)
+	if err != nil {
+		return openapi.Response(http.StatusInternalServerError, ""), nil
+	}
+
+	selectedSpans := selector.Filter(trace)
+	selectedSpanIds := make([]string, len(selectedSpans))
+
+	for i, span := range selectedSpans {
+		selectedSpanIds[i] = span.ID.String()
+	}
+
+	return openapi.Response(http.StatusOK, selectedSpanIds), nil
 }
