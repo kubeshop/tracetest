@@ -7,7 +7,8 @@ definitions:
         type: string
         format: byte
       rootSpan:
-        type: Span
+        $ref: "#/definitions/Span"
+
   Span:
     type: object
     properties:

@@ -34,15 +34,9 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Test"
+                  $ref: "./tests.yaml#/definitions/Test"
         500:
           description: "problem with getting tests"
-          # content:
-          #   application/problem+json:
-          #     schema:
-          #       type: array
-          #       items:
-          #         $ref: "#/components/schemas/Problem"
     post:
       tags:
         - api
@@ -53,22 +47,17 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Test"
+              $ref: "./tests.yaml#/definitions/Test"
       responses:
         200:
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Test"
+                $ref: "./tests.yaml#/definitions/Test"
         500:
           description: "problem with creating test"
-          # content:
-          #   application/problem+json:
-          #     schema:
-          #       type: array
-          #       items:
-          #         $ref: "#/components/schemas/Problem"
+
   /tests/{testId}:
     get:
       tags:
@@ -89,7 +78,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Test"
+                $ref: "./tests.yaml#/definitions/Test"
         500:
           description: "problem with getting a test"
     put:
@@ -109,7 +98,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Test"
+              $ref: "./tests.yaml#/definitions/Test"
       responses:
         204:
           description: successful operation
@@ -151,7 +140,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/TestRunResult"
+                $ref: "./tests.yaml#/definitions/TestRun"
 
   /tests/{testId}/results/{resultId}:
     get:
@@ -170,16 +159,16 @@ paths:
             type: string
             format: uuid
           required: true
-      summary: "get test result"
-      description: "get a particular test result"
-      operationId: getTestResult
+      summary: "get test Run"
+      description: "get a particular test Run"
+      operationId: getTestRun
       responses:
         200:
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/TestRunResult"
+                $ref: "./tests.yaml#/definitions/TestRun"
     put:
       tags:
         - api
@@ -203,14 +192,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/TestRunResult"
+              $ref: "./tests.yaml#/definitions/TestRunResult"
       responses:
         200:
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/TestRunResult"
+                $ref: "./tests.yaml#/definitions/TestRunResult"
   /tests/{testId}/results:
     get:
       tags:
@@ -245,7 +234,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/TestRunResult"
+                  $ref: "./tests.yaml#/definitions/TestRunResult"
   /tests/{testId}/assertions:
     get:
       tags:
@@ -268,7 +257,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Assertion"
+                  $ref: "./tests.yaml#/definitions/Assertion"
     post:
       tags:
         - api
@@ -286,7 +275,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Assertion"
+              $ref: "./tests.yaml#/definitions/Assertion"
       responses:
         "200":
           description: OK
@@ -314,7 +303,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Assertion"
+              $ref: "./tests.yaml#/definitions/Assertion"
       responses:
         "204":
           description: OK
@@ -340,116 +329,3 @@ paths:
       responses:
         "204":
           description: OK
-
-components:
-  schemas:
-    Test:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          readOnly: true
-        name:
-          type: string
-        description:
-          type: string
-        serviceUnderTest:
-          type: object
-          properties:
-            id:
-              type: string
-              format: uuid
-              readOnly: true
-            request:
-              $ref: "./http.yaml#/definitions/HTTPRequest"
-        definition:
-          type: object
-          $ref: "#/components/schemas/TestDefinition"
-          description: Definition of assertions that are going to be made
-        referenceTestRunResult:
-          $ref: "#/components/schemas/TestRunResult"
-
-    TestDefinition:
-      type: object
-      description: Map using selector query as key, and an array of assertions as value
-      additionalProperties:
-        type: array
-        items:
-          $ref: '#/components/schemas/Assertion'
-      example:
-        'span[tracetest.span.type="http"]':
-          - attr: tracetest.span.duration
-            comparator: "<"
-            expected: "2000"
-          - attr: http.status_code
-            comparator: "="
-            expected: "200"
-
-    Assertion:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          readOnly: true
-        attr:
-          type: string
-        comparator:
-          type: string
-        expected:
-          type: string
-
-    TestRun:
-      type: object
-      properties:
-        resultId:
-          type: string
-          format: uuid
-          readOnly: true
-        testId:
-          type: string
-          format: uuid
-          readOnly: true
-        traceId:
-          type: string
-          readOnly: true
-        spanId:
-          type: string
-          readOnly: true
-        state:
-          type: string
-          enum: [CREATED, EXECUTING, AWAITING_TRACE, FAILED, FINISHED, AWAITING_TEST_RESULTS]
-          description: Current execution state
-        lastErrorState:
-          type: string
-          description: Details of the cause for the last `FAILED` state
-        createdAt:
-          type: string
-          format: date-time
-        completedAt:
-          type: string
-          format: date-time
-        request:
-          $ref: "./http.yaml#/definitions/HTTPRequest"
-        response:
-          $ref: "./http.yaml#/definitions/HTTPResponse"
-          description: TODO(pov) This is HTTP Response object for now, at some point it might be GRPC/SOAP/...
-        result:
-          $ref: "#/components/schemas/TestRunResult"
-
-    TestRunResult:
-      type: object
-      description: Map using selector query as key, and an array of assertions as value
-      additionalProperties:
-        type: array
-        items:
-          $ref: '#/components/schemas/Assertion'
-      example:
-        'span[tracetest.span.type="http"]':
-          - attr: tracetest.span.duration
-            comparator: "<"
-            expected: "2000"
-          - attr: http.status_code
-            comparator: "="
-            expected: "200"

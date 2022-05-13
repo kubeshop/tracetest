@@ -1,0 +1,114 @@
+openapi: 3.0.0
+definitions:
+  Test:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uuid
+        readOnly: true
+      name:
+        type: string
+      description:
+        type: string
+      serviceUnderTest:
+        type: object
+        properties:
+          id:
+            type: string
+            format: uuid
+            readOnly: true
+          request:
+            $ref: "./http.yaml#/definitions/HTTPRequest"
+      definition:
+        type: object
+        $ref: "#/definitions/TestDefinition"
+        description: Definition of assertions that are going to be made
+      referenceTestRunResult:
+        $ref: "#/definitions/TestRunResult"
+
+  TestDefinition:
+    type: object
+    description: Map using selector query as key, and an array of assertions as value
+    additionalProperties:
+      type: array
+      items:
+        $ref: '#/definitions/Assertion'
+    example:
+      'span[tracetest.span.type="http"]':
+        - attr: tracetest.span.duration
+          comparator: "<"
+          expected: "2000"
+        - attr: http.status_code
+          comparator: "="
+          expected: "200"
+
+  Assertion:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uuid
+        readOnly: true
+      attr:
+        type: string
+      comparator:
+        type: string
+      expected:
+        type: string
+
+  TestRun:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uuid
+        readOnly: true
+      testId:
+        type: string
+        format: uuid
+        readOnly: true
+      traceId:
+        type: string
+        readOnly: true
+      spanId:
+        type: string
+        readOnly: true
+      state:
+        type: string
+        enum: [CREATED, EXECUTING, AWAITING_TRACE, AWAITING_TEST_RESULTS, FINISHED, FAILED]
+        description: Current execution state
+      lastErrorState:
+        type: string
+        description: Details of the cause for the last `FAILED` state
+      createdAt:
+        type: string
+        format: date-time
+      completedAt:
+        type: string
+        format: date-time
+      request:
+        $ref: "./http.yaml#/definitions/HTTPRequest"
+      response:
+        $ref: "./http.yaml#/definitions/HTTPResponse"
+        description: TODO(pov) This is HTTP Response object for now, at some point it might be GRPC/SOAP/...
+      trace:
+        $ref: "./trace.yaml#/definitions/Trace"
+      result:
+        $ref: "#/definitions/TestRunResult"
+
+  TestRunResult:
+    type: object
+    description: Map using selector query as key, and an array of assertions as value
+    additionalProperties:
+      type: array
+      items:
+        $ref: '#/definitions/Assertion'
+    example:
+      'span[tracetest.span.type="http"]':
+        - attr: tracetest.span.duration
+          comparator: "<"
+          expected: "2000"
+        - attr: http.status_code
+          comparator: "="
+          expected: "200"
