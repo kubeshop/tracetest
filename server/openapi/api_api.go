@@ -93,6 +93,12 @@ func (c *ApiApiController) Routes() Routes {
 			c.GetTestResult,
 		},
 		{
+			"GetTestResultSelectedSpans",
+			strings.ToUpper("Get"),
+			"/api/tests/{testId}/results/{resultId}/select",
+			c.GetTestResultSelectedSpans,
+		},
+		{
 			"GetTestResults",
 			strings.ToUpper("Get"),
 			"/api/tests/{testId}/results",
@@ -256,6 +262,26 @@ func (c *ApiApiController) GetTestResult(w http.ResponseWriter, r *http.Request)
 	resultIdParam := params["resultId"]
 
 	result, err := c.service.GetTestResult(r.Context(), testIdParam, resultIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// GetTestResultSelectedSpans - retrieve spans that will be selected by selector
+func (c *ApiApiController) GetTestResultSelectedSpans(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	query := r.URL.Query()
+	testIdParam := params["testId"]
+
+	resultIdParam := params["resultId"]
+
+	queryParam := query.Get("query")
+	result, err := c.service.GetTestResultSelectedSpans(r.Context(), testIdParam, resultIdParam, queryParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

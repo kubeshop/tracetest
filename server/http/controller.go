@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/kubeshop/tracetest/analytics"
+	"github.com/kubeshop/tracetest/assertions/selectors"
 	"github.com/kubeshop/tracetest/executor"
 	"github.com/kubeshop/tracetest/openapi"
 	"github.com/kubeshop/tracetest/testdb"
@@ -262,4 +263,18 @@ func (s *controller) GetAssertions(ctx context.Context, testID string) (openapi.
 	}
 
 	return openapi.Response(http.StatusOK, assertions), nil
+}
+
+func (s *controller) GetTestResultSelectedSpans(ctx context.Context, testID string, resultID string, selectorQuery string) (openapi.ImplResponse, error) {
+	selector, err := selectors.New(selectorQuery)
+	if err != nil {
+		return openapi.Response(http.StatusBadRequest, "invalid selector query"), nil
+	}
+
+	result, err := s.testDB.GetResult(ctx, resultID)
+	if err != nil {
+		return openapi.Response(http.StatusInternalServerError, ""), nil
+	}
+
+	return openapi.Response(http.StatusOK, selectedSpans), nil
 }
