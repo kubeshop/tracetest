@@ -111,6 +111,12 @@ func (c *ApiApiController) Routes() Routes {
 			c.GetTests,
 		},
 		{
+			"RerunTestResult",
+			strings.ToUpper("Post"),
+			"/api/tests/{testId}/results/{resultId}/rerun",
+			c.RerunTestResult,
+		},
+		{
 			"RunTest",
 			strings.ToUpper("Post"),
 			"/api/tests/{testId}/run",
@@ -333,6 +339,24 @@ func (c *ApiApiController) GetTests(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	result, err := c.service.GetTests(r.Context(), takeParam, skipParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// RerunTestResult - rerun a test result
+func (c *ApiApiController) RerunTestResult(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	testIdParam := params["testId"]
+
+	resultIdParam := params["resultId"]
+
+	result, err := c.service.RerunTestResult(r.Context(), testIdParam, resultIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

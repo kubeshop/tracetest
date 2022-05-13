@@ -16,16 +16,23 @@ import (
 )
 
 type controller struct {
-	traceDB tracedb.TraceDB
-	testDB  testdb.Repository
-	runner  executor.Runner
+	traceDB         tracedb.TraceDB
+	testDB          testdb.Repository
+	runner          executor.Runner
+	assertionRunner executor.AssertionRunner
 }
 
-func NewController(traceDB tracedb.TraceDB, testDB testdb.Repository, runner executor.Runner) openapi.ApiApiServicer {
+func NewController(
+	traceDB tracedb.TraceDB,
+	testDB testdb.Repository,
+	runner executor.Runner,
+	assertionRunner executor.AssertionRunner,
+) openapi.ApiApiServicer {
 	return &controller{
-		traceDB: traceDB,
-		testDB:  testDB,
-		runner:  runner,
+		traceDB:         traceDB,
+		testDB:          testDB,
+		runner:          runner,
+		assertionRunner: assertionRunner,
 	}
 }
 
@@ -291,4 +298,36 @@ func (s *controller) GetTestResultSelectedSpans(ctx context.Context, testID stri
 	}
 
 	return openapi.Response(http.StatusOK, selectedSpanIds), nil
+}
+
+func (s *controller) RerunTestResult(ctx context.Context, testID string, resultID string) (openapi.ImplResponse, error) {
+	test, err := s.testDB.GetTest(ctx, testID)
+	if err != nil {
+		return openapi.Response(http.StatusInternalServerError, err.Error()), err
+	}
+
+	result, err := s.testDB.GetResult(ctx, resultID)
+	if err != nil {
+		return openapi.Response(http.StatusInternalServerError, err.Error()), err
+	}
+
+	result.State = executor.TestRunStateAwaitingTestResults
+	err = s.testDB.UpdateResult(ctx, result)
+	if err != nil {
+		return openapi.Response(http.StatusInternalServerError, err.Error()), err
+	}
+
+	testDefinition, err := executor.ConvertAssertionsIntoTestDefinition(test.Assertions)
+	if err != nil {
+		return openapi.Response(http.StatusInternalServerError, err.Error()), err
+	}
+
+	assertionRequest := executor.AssertionRequest{
+		TestDefinition: testDefinition,
+		Result:         *result,
+	}
+
+	s.assertionRunner.RunAssertions(assertionRequest)
+
+	return openapi.Response(http.StatusOK, result), nil
 }
