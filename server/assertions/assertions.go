@@ -16,6 +16,7 @@ func (sq SpanQuery) Selector() selectors.Selector {
 type TestDefinition map[SpanQuery][]Assertion
 
 type Assertion struct {
+	ID         string
 	Attribute  string
 	Comparator comparator.Comparator
 	Value      string
@@ -37,7 +38,7 @@ func (a Assertion) apply(span traces.Span) AssertionSpanResults {
 	return AssertionSpanResults{
 		Span:        &span,
 		ActualValue: attr,
-		CompareErr:  a.Comparator.Compare(a.Value, attr),
+		CompareErr:  a.Comparator.Compare(attr, a.Value),
 	}
 }
 
@@ -52,15 +53,17 @@ type AssertionSpanResults struct {
 	CompareErr  error
 }
 
-type TestResult map[SpanQuery]AssertionResult
+type TestResult map[SpanQuery][]AssertionResult
 
 func Assert(trace traces.Trace, defs TestDefinition) TestResult {
 	testResult := TestResult{}
 	for spanQuery, asserts := range defs {
 		spans := spanQuery.Selector().Filter(trace)
+		assertionResults := make([]AssertionResult, 0)
 		for _, assertion := range asserts {
-			testResult[spanQuery] = assertion.Assert(spans)
+			assertionResults = append(assertionResults, assertion.Assert(spans))
 		}
+		testResult[spanQuery] = assertionResults
 	}
 
 	return testResult

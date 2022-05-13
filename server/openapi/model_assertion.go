@@ -16,6 +16,8 @@ type Assertion struct {
 
 	Selectors []SelectorItem `json:"selectors,omitempty"`
 
+	Selector string `json:"selector,omitempty"`
+
 	SpanAssertions []SpanAssertion `json:"spanAssertions,omitempty"`
 }
 

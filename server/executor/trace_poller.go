@@ -9,6 +9,7 @@ import (
 
 	"github.com/kubeshop/tracetest/openapi"
 	"github.com/kubeshop/tracetest/subscription"
+	"github.com/kubeshop/tracetest/testdb"
 	"github.com/kubeshop/tracetest/tracedb"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 )
@@ -33,26 +34,31 @@ type TraceFetcher interface {
 func NewTracePoller(
 	tf TraceFetcher,
 	ru ResultUpdater,
+	testDB testdb.TestRepository,
 	maxWaitTimeForTrace time.Duration,
 	subscriptionManager *subscription.Manager,
+	assertionRunner AssertionRunner,
 ) PersistentTracePoller {
 	retryDelay := 1 * time.Second
 	maxTracePollRetry := int(math.Ceil(float64(maxWaitTimeForTrace) / float64(retryDelay)))
 	return tracePoller{
 		traceDB:             tf,
 		resultDB:            ru,
+		testDB:              testDB,
 		maxWaitTimeForTrace: maxWaitTimeForTrace,
 		maxTracePollRetry:   maxTracePollRetry,
 		retryDelay:          retryDelay,
 		executeQueue:        make(chan tracePollReq, 5),
 		exit:                make(chan bool, 1),
 		subscriptions:       subscriptionManager,
+		assertionRunner:     assertionRunner,
 	}
 }
 
 type tracePoller struct {
 	resultDB            ResultUpdater
 	traceDB             TraceFetcher
+	testDB              testdb.TestRepository
 	maxWaitTimeForTrace time.Duration
 	retryDelay          time.Duration
 	maxTracePollRetry   int
@@ -60,7 +66,8 @@ type tracePoller struct {
 	executeQueue chan tracePollReq
 	exit         chan bool
 
-	subscriptions *subscription.Manager
+	subscriptions   *subscription.Manager
+	assertionRunner AssertionRunner
 }
 
 type tracePollReq struct {
@@ -150,6 +157,32 @@ func (tp tracePoller) processJob(job tracePollReq) {
 		Type:    "result_update",
 		Content: res,
 	})
+
+	err = tp.runAssertions(job.ctx, res)
+	if err != nil {
+		fmt.Printf("could not run assertions: %s\n", err.Error())
+	}
+}
+
+func (tp tracePoller) runAssertions(ctx context.Context, result openapi.TestRunResult) error {
+	test, err := tp.testDB.GetTest(ctx, result.TestId)
+	if err != nil {
+		return err
+	}
+
+	testDefinition, err := ConvertAssertionsIntoTestDefinition(test.Assertions)
+	if err != nil {
+		return err
+	}
+
+	assertionRequest := AssertionRequest{
+		TestDefinition: testDefinition,
+		Result:         result,
+	}
+
+	tp.assertionRunner.RunAssertions(assertionRequest)
+
+	return nil
 }
 
 // to compare trace we count the number of resourceSpans + InstrumentationLibrarySpans + spans.

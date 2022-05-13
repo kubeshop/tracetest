@@ -126,6 +126,7 @@ func runnerSetup(t *testing.T) runnerFixture {
 
 	mtp := new(mockTracePoller)
 	mtp.t = t
+
 	mtp.Test(t)
 	return runnerFixture{
 		runner:          executor.NewPersistentRunner(me, mt, mr, mtp),
@@ -258,6 +259,8 @@ type mockTracePoller struct {
 	mock.Mock
 	t *testing.T
 }
+
+var _ executor.TracePoller = &mockTracePoller{}
 
 func (m *mockTracePoller) Poll(_ context.Context, res openapi.TestRunResult) {
 	m.Called(res.TestId)

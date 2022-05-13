@@ -383,6 +383,8 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SelectorItem"
+        selector:
+          type: string
         spanAssertions:
           type: array
           items:

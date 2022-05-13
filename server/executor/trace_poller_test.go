@@ -72,8 +72,17 @@ func tracePollerSetup(t *testing.T) tracePollerFixture {
 	mr := new(mockResultsDB)
 	mr.t = t
 	mr.Test(t)
+
+	mt := new(mockTestDB)
+	mt.t = t
+	mt.Test(t)
+
+	mar := new(mockAssertionRunner)
+	mar.t = t
+	mar.Test(t)
+
 	return tracePollerFixture{
-		tracePoller:      executor.NewTracePoller(mtf, mr, 100*time.Millisecond, subscription.NewManager()),
+		tracePoller:      executor.NewTracePoller(mtf, mr, mt, 100*time.Millisecond, subscription.NewManager(), mar),
 		mockTraceFetcher: mtf,
 		mockResultsDB:    mr,
 	}
@@ -93,4 +102,23 @@ func (m *mockTraceFetcher) expectTracePoll(traceID string) *mock.Call {
 	return m.
 		On("GetTraceByID", traceID).
 		Return(sampleRawTraces, noError)
+}
+
+type mockAssertionRunner struct {
+	mock.Mock
+	t *testing.T
+}
+
+var _ executor.AssertionRunner = &mockAssertionRunner{}
+
+func (m *mockAssertionRunner) RunAssertions(request executor.AssertionRequest) {
+	m.Called(request)
+}
+
+func (m *mockAssertionRunner) Start(workers int) {
+	m.Called(workers)
+}
+
+func (m *mockAssertionRunner) Stop() {
+	m.Called()
 }

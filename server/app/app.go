@@ -70,7 +70,11 @@ func (a *App) Start() error {
 
 	subscriptionManager := subscription.NewManager()
 
-	tracePoller := executor.NewTracePoller(a.traceDB, a.db, a.config.MaxWaitTimeForTraceDuration(), subscriptionManager)
+	assertionRunner := executor.NewAssertionRunner(a.db)
+	assertionRunner.Start(5)
+	defer assertionRunner.Stop()
+
+	tracePoller := executor.NewTracePoller(a.traceDB, a.db, a.db, a.config.MaxWaitTimeForTraceDuration(), subscriptionManager, assertionRunner)
 	tracePoller.Start(5) // worker count. should be configurable
 	defer tracePoller.Stop()
 
