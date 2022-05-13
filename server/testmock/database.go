@@ -1,4 +1,4 @@
-package test
+package testmock
 
 import (
 	"database/sql"

@@ -11,7 +11,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/kubeshop/tracetest/executor"
 	"github.com/kubeshop/tracetest/openapi"
-	"github.com/kubeshop/tracetest/test"
+	"github.com/kubeshop/tracetest/testmock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -24,17 +24,17 @@ func TestExecutorSuccessfulExecution(t *testing.T) {
 	}{
 		{
 			Name:       "pokeshop - import pokemon: should pass",
-			Tracefile:  "../test/data/pokeshop_import_pokemon.json",
+			Tracefile:  "../testmock/data/pokeshop_import_pokemon.json",
 			ShouldPass: true,
 		},
 		{
 			Name:       "pokeshop - import pokemon: should fail",
-			Tracefile:  "../test/data/pokeshop_import_pokemon_failed_assertions.json",
+			Tracefile:  "../testmock/data/pokeshop_import_pokemon_failed_assertions.json",
 			ShouldPass: false,
 		},
 	}
 
-	postgresRepository, err := test.GetTestingDatabase("file://../migrations")
+	postgresRepository, err := testmock.GetTestingDatabase("file://../migrations")
 	require.NoError(t, err)
 
 	for _, testCase := range testCases {

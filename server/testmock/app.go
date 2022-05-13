@@ -1,4 +1,4 @@
-package test
+package testmock
 
 import (
 	"github.com/kubeshop/tracetest/app"
