@@ -1,12 +1,19 @@
+OPENAPI_GENERATOR_VER=v5.4.0
+OPENAPI_GENERATOR_IMAGE=openapitools/openapi-generator-cli:$(OPENAPI_GENERATOR_VER)
+OPENAPI_GENERATOR_CLI=docker run --rm -u ${shell id -u}  -v "${PWD}:/local" -w "/local" ${OPENAPI_GENERATOR_IMAGE}
 OPENAPI_SERVER_TARGET_DIR=./server/openapi
-server-generate: proto
-	$(eval TMPDIR := $(shell mktemp -d))
+server-generate:
 	rm -rf $(OPENAPI_SERVER_TARGET_DIR)
+	mkdir -p ./tmp
 
-	openapi-generator-cli generate -i api/openapi.yaml -g go-server -o $(TMPDIR)
-	mv $(TMPDIR)/go server/openapi
+	$(OPENAPI_GENERATOR_CLI)  generate \
+		-i api/openapi.yaml \
+		-g go-server \
+		-o ./tmp \
+		--generate-alias-as-model
+	mv ./tmp/go server/openapi
 	rm -f $(OPENAPI_SERVER_TARGET_DIR)/api_api_service.go
-	rm -rf $(TMPDIR)
+	rm -rf ./tmp
 
 	cd server; pwd; go fmt ./...; cd ..
 
@@ -27,11 +34,9 @@ init-submodule:
 	git submodule update
 
 PROTOC_VER=0.3.1
-PROTOC_IMAGE=jaegertracing/protobuf:$(PROTOC_VER)
+# temporarily using custom image to make it work on m1 macs
+PROTOC_IMAGE=schoren/protobuf:$(PROTOC_VER)
 PROTOC=docker run --rm -u ${shell id -u} -v "${PWD}:${PWD}" -w ${PWD} ${PROTOC_IMAGE} --proto_path=${PWD}
-
-#OTEL_DOCKER_PROTOBUF ?= otel/build-protobuf:0.9.0
-#PROTOC := docker run --rm -u ${shell id -u} -v${PWD}:${PWD} -w${PWD} ${OTEL_DOCKER_PROTOBUF} --proto_path=${PWD}
 
 PROTO_INCLUDES := \
 	-Ijaeger-idl/proto \
@@ -51,36 +56,18 @@ PROTO_GOGO_MAPPINGS := $(shell echo \
 		Mmodel.proto=github.com/jaegertracing/jaeger/model \
 	| sed 's/ //g')
 
-PROTO_GEN_GO_DIR ?= server/internal/proto-gen-go
-
 PROTOC_WITH_GRPC := $(PROTOC) \
 		$(PROTO_INCLUDES) \
 		--gogo_out=plugins=grpc,$(PROTO_GOGO_MAPPINGS):$(PWD)/${PROTO_GEN_GO_DIR}
 
-PROTOC_INTERNAL := $(PROTOC) \
-		$(PROTO_INCLUDES)
-
-SWAGGER_VER=0.12.0
-SWAGGER_IMAGE=quay.io/goswagger/swagger:$(SWAGGER_VER)
-SWAGGER=docker run --rm -u ${shell id -u} -v "${PWD}:/go/src/${PROJECT_ROOT}" -w /go/src/${PROJECT_ROOT} $(SWAGGER_IMAGE)
-
+PROTO_GEN_GO_DIR ?= server/internal/proto-gen-go
 proto:
 	$(eval TMPDIR := $(shell mktemp -d))
 	rm -rf $(PROTO_GEN_GO_DIR)
-
-	openapi-generator-cli generate -i api/openapi.yaml -g go-server -o $(TMPDIR)
-	mv $(TMPDIR)/go $(PROTO_GEN_GO_DIR)
-	rm -rf $(TMPDIR)
+	mkdir -p $(PROTO_GEN_GO_DIR)
 
 	$(PROTOC_WITH_GRPC) \
 		jaeger-idl/proto/api_v3/query_service.proto
-
-	$(PROTOC_INTERNAL) \
-		google/api/annotations.proto \
-		google/api/http.proto \
-		protoc-gen-swagger/options/annotations.proto \
-		protoc-gen-swagger/options/openapiv2.proto \
-		gogoproto/gogo.proto
 
 	$(PROTOC_WITH_GRPC) \
 		tempo-idl/tempo.proto

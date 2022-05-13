@@ -1,6 +1,5 @@
 openapi: 3.0.0
 definitions:
-
   Trace:
     type: object
     properties:
@@ -9,7 +8,6 @@ definitions:
         format: byte
       rootSpan:
         type: Span
-
   Span:
     type: object
     properties:

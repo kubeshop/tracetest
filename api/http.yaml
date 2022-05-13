@@ -1,5 +1,13 @@
 openapi: 3.0.0
 definitions:
+  HTTPHeader:
+    type: object
+    properties:
+      key:
+        type: string
+      value:
+        type: string
+
   HTTPRequest:
     type: object
     properties:
@@ -11,12 +19,7 @@ definitions:
       headers:
         type: array
         items:
-          type: object
-          properties:
-            key:
-              type: string
-            value:
-              type: string
+          $ref: "#/definitions/HTTPHeader"
       body:
         type: string
         format: byte
@@ -39,12 +42,7 @@ definitions:
       headers:
         type: array
         items:
-          type: object
-          properties:
-            key:
-              type: string
-            value:
-              type: string
+          $ref: "#/definitions/HTTPHeader"
       body:
         type: string
         format: byte

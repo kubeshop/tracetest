@@ -436,7 +436,7 @@ components:
           $ref: "./http.yaml#/definitions/HTTPResponse"
           description: TODO(pov) This is HTTP Response object for now, at some point it might be GRPC/SOAP/...
         result:
-          $ref: "#/components/schemas/HTTPResponse"
+          $ref: "#/components/schemas/TestRunResult"
 
     TestRunResult:
       type: object
