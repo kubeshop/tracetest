@@ -8,13 +8,13 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/kubeshop/tracetest/openapi"
-	"github.com/kubeshop/tracetest/test"
 	"github.com/kubeshop/tracetest/testdb"
+	"github.com/kubeshop/tracetest/testmock"
 	"github.com/stretchr/testify/assert"
 )
 
 func getDB() (testdb.Repository, error) {
-	return test.GetTestingDatabase("file://../migrations")
+	return testmock.GetTestingDatabase("file://../migrations")
 }
 
 func TestCreateTest(t *testing.T) {

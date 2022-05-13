@@ -12,7 +12,7 @@ import (
 	"github.com/kubeshop/tracetest/app"
 	"github.com/kubeshop/tracetest/executor"
 	"github.com/kubeshop/tracetest/openapi"
-	"github.com/kubeshop/tracetest/test"
+	"github.com/kubeshop/tracetest/testmock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -20,11 +20,11 @@ import (
 const appEndpoint = "http://localhost:8080"
 
 func TestExecutorIntegration(t *testing.T) {
-	demoApp, err := test.GetDemoApplicationInstance()
+	demoApp, err := testmock.GetDemoApplicationInstance()
 	require.NoError(t, err)
 	defer demoApp.Stop()
 
-	tracetestApp, err := test.GetTestingApp(demoApp)
+	tracetestApp, err := testmock.GetTestingApp(demoApp)
 	require.NoError(t, err)
 
 	go tracetestApp.Start()
@@ -40,7 +40,7 @@ func TestExecutorIntegration(t *testing.T) {
 	})
 }
 
-func happyPathWithNewSelector(t *testing.T, app *app.App, demoApp *test.DemoApp) {
+func happyPathWithNewSelector(t *testing.T, app *app.App, demoApp *testmock.DemoApp) {
 	testID, err := createImportPokemonTest(app, demoApp)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, testID)
@@ -68,7 +68,7 @@ func happyPathWithNewSelector(t *testing.T, app *app.App, demoApp *test.DemoApp)
 	}
 }
 
-func happyPathWithOldSelector(t *testing.T, app *app.App, demoApp *test.DemoApp) {
+func happyPathWithOldSelector(t *testing.T, app *app.App, demoApp *testmock.DemoApp) {
 	testID, err := createImportPokemonTest(app, demoApp)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, testID)
@@ -93,7 +93,7 @@ func happyPathWithOldSelector(t *testing.T, app *app.App, demoApp *test.DemoApp)
 	assert.Equal(t, len(spanAssertions), 0, "Test should contain no assertions")
 }
 
-func createImportPokemonTest(app *app.App, demoApp *test.DemoApp) (string, error) {
+func createImportPokemonTest(app *app.App, demoApp *testmock.DemoApp) (string, error) {
 	body := openapi.Test{
 		Name:        "Import Pokemon",
 		Description: "Import a pokemon into the api",
