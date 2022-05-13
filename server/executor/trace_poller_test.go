@@ -111,8 +111,10 @@ type mockAssertionRunner struct {
 
 var _ executor.AssertionRunner = &mockAssertionRunner{}
 
-func (m *mockAssertionRunner) RunAssertions(request executor.AssertionRequest) {
-	m.Called(request)
+func (m *mockAssertionRunner) RunAssertions(ctx context.Context, result openapi.TestRunResult) error {
+	args := m.Called(ctx, result)
+
+	return args.Error(0)
 }
 
 func (m *mockAssertionRunner) Start(workers int) {
