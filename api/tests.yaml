@@ -24,8 +24,8 @@ definitions:
         type: object
         $ref: "#/definitions/TestDefinition"
         description: Definition of assertions that are going to be made
-      referenceTestRunResult:
-        $ref: "#/definitions/TestRunResult"
+      referenceTestRun:
+        $ref: "#/definitions/TestRun"
 
   TestDefinition:
     type: object
@@ -95,9 +95,9 @@ definitions:
       trace:
         $ref: "./trace.yaml#/definitions/Trace"
       result:
-        $ref: "#/definitions/TestRunResult"
+        $ref: "#/definitions/AssertionResult"
 
-  TestRunResult:
+  AssertionResult:
     type: object
     description: Map using selector query as key, and an array of assertions as value
     additionalProperties:
