@@ -301,6 +301,11 @@ func (s *controller) GetTestResultSelectedSpans(ctx context.Context, testID stri
 }
 
 func (s *controller) RerunTestResult(ctx context.Context, testID string, resultID string) (openapi.ImplResponse, error) {
+	test, err := s.testDB.GetTest(ctx, testID)
+	if err != nil {
+		return openapi.Response(http.StatusInternalServerError, err.Error()), err
+	}
+
 	result, err := s.testDB.GetResult(ctx, resultID)
 	if err != nil {
 		return openapi.Response(http.StatusInternalServerError, err.Error()), err
@@ -312,10 +317,17 @@ func (s *controller) RerunTestResult(ctx context.Context, testID string, resultI
 		return openapi.Response(http.StatusInternalServerError, err.Error()), err
 	}
 
-	err = s.assertionRunner.RunAssertions(ctx, *result)
+	testDefinition, err := executor.ConvertAssertionsIntoTestDefinition(test.Assertions)
 	if err != nil {
 		return openapi.Response(http.StatusInternalServerError, err.Error()), err
 	}
+
+	assertionRequest := executor.AssertionRequest{
+		TestDefinition: testDefinition,
+		Result:         *result,
+	}
+
+	s.assertionRunner.RunAssertions(assertionRequest)
 
 	return openapi.Response(http.StatusOK, result), nil
 }

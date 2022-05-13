@@ -20,7 +20,7 @@ type AssertionRequest struct {
 }
 
 type AssertionRunner interface {
-	RunAssertions(ctx context.Context, result openapi.TestRunResult) error
+	RunAssertions(request AssertionRequest)
 	WorkerPool
 }
 
@@ -160,23 +160,6 @@ func (e *defaultAssertionRunner) setResults(result *openapi.TestRunResult, testR
 	result.AssertionResultState = allTestsPassed
 }
 
-func (e *defaultAssertionRunner) RunAssertions(ctx context.Context, result openapi.TestRunResult) error {
-	test, err := e.db.GetTest(ctx, result.TestId)
-	if err != nil {
-		return err
-	}
-
-	testDefinition, err := ConvertAssertionsIntoTestDefinition(test.Assertions)
-	if err != nil {
-		return err
-	}
-
-	assertionRequest := AssertionRequest{
-		TestDefinition: testDefinition,
-		Result:         result,
-	}
-
-	e.inputChannel <- assertionRequest
-
-	return nil
+func (e *defaultAssertionRunner) RunAssertions(request AssertionRequest) {
+	e.inputChannel <- request
 }

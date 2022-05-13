@@ -57,8 +57,16 @@ func TestExecutorSuccessfulExecution(t *testing.T) {
 			err = postgresRepository.CreateResult(ctx, test.TestId, &result)
 			require.NoError(t, err)
 
+			testDefinition, err := executor.ConvertAssertionsIntoTestDefinition(test.Assertions)
+			assert.NoError(t, err)
+
+			assertionRequest := executor.AssertionRequest{
+				TestDefinition: testDefinition,
+				Result:         result,
+			}
+
 			assertionExecutor.Start(1)
-			assertionExecutor.RunAssertions(ctx, result)
+			assertionExecutor.RunAssertions(assertionRequest)
 			assertionExecutor.Stop()
 
 			dbResult, err := postgresRepository.GetResult(ctx, result.ResultId)
