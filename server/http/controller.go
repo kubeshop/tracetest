@@ -2,6 +2,7 @@ package http
 
 import (
 	"context"
+	"encoding/hex"
 	"errors"
 	"net/http"
 
@@ -286,7 +287,7 @@ func (s *controller) GetTestResultSelectedSpans(ctx context.Context, testID stri
 	selectedSpanIds := make([]string, len(selectedSpans))
 
 	for i, span := range selectedSpans {
-		selectedSpanIds[i] = span.ID.String()
+		selectedSpanIds[i] = hex.EncodeToString(span.ID[:])
 	}
 
 	return openapi.Response(http.StatusOK, selectedSpanIds), nil
