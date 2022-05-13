@@ -128,9 +128,6 @@ func runnerSetup(t *testing.T) runnerFixture {
 	mtp := new(mockTracePoller)
 	mtp.t = t
 
-	mar := new(mockAssertionRunner)
-	mar.t = t
-
 	mtp.Test(t)
 	return runnerFixture{
 		runner:          executor.NewPersistentRunner(me, mt, mr, mtp),
@@ -270,34 +267,7 @@ func (m *mockTracePoller) Poll(_ context.Context, res openapi.TestRunResult) {
 	m.Called(res.TestId)
 }
 
-func (m *mockTracePoller) OnPollComplete(callback func(result openapi.TestRunResult)) {
-	m.Called(callback)
-}
-
 func (m *mockTracePoller) expectPoll(test openapi.Test) *mock.Call {
 	return m.
 		On("Poll", test.TestId)
-}
-
-func (m *mockTracePoller) expectOnPollComplete() *mock.Call {
-	return m.On("OnPollComplete", mock.Anything)
-}
-
-type mockAssertionRunner struct {
-	mock.Mock
-	t *testing.T
-}
-
-var _ executor.AssertionRunner = &mockAssertionRunner{}
-
-func (m *mockAssertionRunner) RunAssertions(request executor.AssertionRequest) {
-	m.Called(request)
-}
-
-func (m *mockAssertionRunner) Start(workers int) {
-	m.Called(workers)
-}
-
-func (m *mockAssertionRunner) Stop() {
-	m.Called()
 }

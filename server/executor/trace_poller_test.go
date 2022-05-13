@@ -103,3 +103,22 @@ func (m *mockTraceFetcher) expectTracePoll(traceID string) *mock.Call {
 		On("GetTraceByID", traceID).
 		Return(sampleRawTraces, noError)
 }
+
+type mockAssertionRunner struct {
+	mock.Mock
+	t *testing.T
+}
+
+var _ executor.AssertionRunner = &mockAssertionRunner{}
+
+func (m *mockAssertionRunner) RunAssertions(request executor.AssertionRequest) {
+	m.Called(request)
+}
+
+func (m *mockAssertionRunner) Start(workers int) {
+	m.Called(workers)
+}
+
+func (m *mockAssertionRunner) Stop() {
+	m.Called()
+}
