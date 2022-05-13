@@ -2,7 +2,7 @@ import {useCallback, useState} from 'react';
 import {Modal, Typography, FormInstance} from 'antd';
 
 import CreateAssertionForm, {TValues} from './CreateAssertionForm';
-import {ISpan} from '../../types/Span.types';
+import {ISpan, ISpanFlatAttribute} from '../../types/Span.types';
 import {IAssertion, IItemSelector} from '../../types/Assertion.types';
 import {useAppSelector} from '../../redux/hooks';
 import AssertionSelectors from '../../selectors/Assertion.selectors';
@@ -14,6 +14,7 @@ interface IProps {
   testId: string;
   resultId: string;
   assertion?: IAssertion;
+  defaultAttributeList?: ISpanFlatAttribute[];
 }
 
 const affectedSpanMessage = (spanCount: number) => {
@@ -24,7 +25,7 @@ const affectedSpanMessage = (spanCount: number) => {
   return `Affects ${spanCount} spans`;
 };
 
-const CreateAssertionModal = ({testId, span, resultId, open, onClose, assertion}: IProps) => {
+const CreateAssertionModal = ({testId, span, resultId, open, onClose, assertion, defaultAttributeList = []}: IProps) => {
   const [form, setForm] = useState<FormInstance<TValues>>();
   const [selectorList, setSelectorList] = useState<IItemSelector[]>([]);
 
@@ -65,6 +66,7 @@ const CreateAssertionModal = ({testId, span, resultId, open, onClose, assertion}
     >
       <CreateAssertionForm
         affectedSpanList={affectedSpanList}
+        defaultAttributeList={defaultAttributeList}
         assertion={assertion}
         onCreate={handleClose}
         onForm={onForm}

@@ -8,7 +8,7 @@ interface IProps {
 const SpanHeader: React.FC<IProps> = ({title}) => (
   <S.SpanHeader>
     <S.SpanHeaderTitle>Span Details</S.SpanHeaderTitle>
-    <Typography.Text>{title}</Typography.Text>
+    <Typography.Text type="secondary">{title}</Typography.Text>
   </S.SpanHeader>
 );
 

@@ -59,10 +59,8 @@ export const AssertionActionsContainer = styled.div`
 
 export const AddAssertionButton = styled(Button).attrs({
   type: 'primary',
-  ghost: true,
 })`
   && {
-    background: rgba(97, 23, 94, 0.05);
     font-weight: 600;
   }
 `;

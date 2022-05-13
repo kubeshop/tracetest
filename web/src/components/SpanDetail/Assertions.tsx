@@ -1,12 +1,11 @@
-import {useState} from 'react';
 import {Typography} from 'antd';
 import {PlusOutlined} from '@ant-design/icons';
 import {ISpan} from 'types/Span.types';
 import SkeletonTable from 'components/SkeletonTable';
 import AssertionsResultTable from '../AssertionsTable';
 import * as S from './SpanDetail.styled';
-import CreateAssertionModal from '../CreateAssertionModal';
 import {IAssertionResultList} from '../../types/Assertion.types';
+import {useCreateAssertionModal} from '../CreateAssertionModal/CreateAssertionModalProvider';
 
 interface IProps {
   span?: ISpan;
@@ -16,7 +15,7 @@ interface IProps {
 }
 
 const Assertion: React.FC<IProps> = ({assertionsResultList, testId, span, resultId}) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const {open} = useCreateAssertionModal();
 
   return (
     <SkeletonTable loading={!span}>
@@ -24,7 +23,13 @@ const Assertion: React.FC<IProps> = ({assertionsResultList, testId, span, result
         <S.AddAssertionButton
           data-cy="add-assertion-button"
           icon={<PlusOutlined />}
-          onClick={() => setIsModalOpen(true)}
+          onClick={() =>
+            open({
+              span,
+              testId: testId!,
+              resultId: resultId!,
+            })
+          }
         >
           Add Assertion
         </S.AddAssertionButton>
@@ -46,17 +51,9 @@ const Assertion: React.FC<IProps> = ({assertionsResultList, testId, span, result
       ) : (
         <S.DetailsEmptyStateContainer data-cy="empty-assertion-table">
           <S.DetailsTableEmptyStateIcon />
-          <Typography.Text disabled>No Data</Typography.Text>
+          <Typography.Text disabled>Add assertion to see result here.</Typography.Text>
         </S.DetailsEmptyStateContainer>
       )}
-
-      <CreateAssertionModal
-        open={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        span={span!}
-        testId={testId!}
-        resultId={resultId!}
-      />
     </SkeletonTable>
   );
 };

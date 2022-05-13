@@ -1,4 +1,4 @@
-import {createTest, deleteTest} from '../utils/common';
+import {createTest, deleteTest, testId} from '../utils/common';
 
 describe('Create Assertion', () => {
   before(() => {
@@ -10,8 +10,9 @@ describe('Create Assertion', () => {
   });
 
   it('should create a basic assertion', () => {
-    cy.get('[data-cy=collapse-test]').first().click();
-    cy.get('[data-cy=test-details-link]').first().click();
+    cy.visit(`http://localhost:3000/test/${testId}`);
+    cy.get('[data-cy^=result-card]').first().click();
+
     cy.location('href').should('match', /\/test\/.*/i);
 
     cy.get(`[data-cy^=test-run-result-]`).first().click();
