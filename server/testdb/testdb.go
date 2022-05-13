@@ -18,11 +18,11 @@ type TestRepository interface {
 }
 
 type RunRepository interface {
-	CreateResult(ctx context.Context, testID string, res *openapi.TestRun) error
-	UpdateResult(ctx context.Context, res *openapi.TestRun) error
-	GetResult(ctx context.Context, id string) (*openapi.TestRun, error)
-	GetResultsByTestID(ctx context.Context, testid string, take, skip int32) ([]openapi.TestRun, error)
-	GetResultByTraceID(ctx context.Context, testid, traceid string) (openapi.TestRun, error)
+	CreateRun(ctx context.Context, testID string, res *openapi.TestRun) error
+	UpdateRun(ctx context.Context, res *openapi.TestRun) error
+	GetRun(ctx context.Context, id string) (*openapi.TestRun, error)
+	GetRunsByTestID(ctx context.Context, testid string, take, skip int32) ([]openapi.TestRun, error)
+	GetRunByTraceID(ctx context.Context, testid, traceid string) (openapi.TestRun, error)
 }
 
 type AssertionRepository interface {

@@ -23,7 +23,7 @@ type Assertion struct {
 }
 
 func (a Assertion) Assert(spans []traces.Span) AssertionResult {
-	results := make([]AssertionSpanResults, len(spans))
+	results := make([]AssertionSpanResult, len(spans))
 	for i, span := range spans {
 		results[i] = a.apply(span)
 	}
@@ -33,9 +33,9 @@ func (a Assertion) Assert(spans []traces.Span) AssertionResult {
 	}
 }
 
-func (a Assertion) apply(span traces.Span) AssertionSpanResults {
+func (a Assertion) apply(span traces.Span) AssertionSpanResult {
 	attr := span.Attributes.Get(a.Attribute)
-	return AssertionSpanResults{
+	return AssertionSpanResult{
 		Span:        &span,
 		ActualValue: attr,
 		CompareErr:  a.Comparator.Compare(attr, a.Value),
@@ -44,10 +44,10 @@ func (a Assertion) apply(span traces.Span) AssertionSpanResults {
 
 type AssertionResult struct {
 	Assertion
-	AssertionSpanResults []AssertionSpanResults
+	AssertionSpanResults []AssertionSpanResult
 }
 
-type AssertionSpanResults struct {
+type AssertionSpanResult struct {
 	Span        *traces.Span
 	ActualValue string
 	CompareErr  error

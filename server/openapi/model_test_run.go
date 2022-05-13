@@ -38,7 +38,7 @@ type TestRun struct {
 
 	Trace Trace `json:"trace,omitempty"`
 
-	Result AssertionResult `json:"result,omitempty"`
+	Result AssertionResults `json:"result,omitempty"`
 }
 
 // AssertTestRunRequired checks if the required fields are not zero-ed
@@ -50,6 +50,9 @@ func AssertTestRunRequired(obj TestRun) error {
 		return err
 	}
 	if err := AssertTraceRequired(obj.Trace); err != nil {
+		return err
+	}
+	if err := AssertAssertionResultsRequired(obj.Result); err != nil {
 		return err
 	}
 	return nil

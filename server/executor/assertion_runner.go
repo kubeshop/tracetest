@@ -12,11 +12,9 @@ import (
 	"github.com/kubeshop/tracetest/traces"
 )
 
-type AssertionFinishCallback func(openapi.Test, openapi.TestRunResult)
-
 type AssertionRequest struct {
 	TestDefinition assertions.TestDefinition
-	Result         openapi.TestRunResult
+	TestRun        openapi.TestRun
 }
 
 type AssertionRunner interface {
@@ -81,7 +79,7 @@ func (e *defaultAssertionRunner) runAssertionsAndUpdateResult(ctx context.Contex
 		return err
 	}
 
-	err = e.db.UpdateResult(ctx, response)
+	err = e.db.UpdateRun(ctx, response)
 	if err != nil {
 		return fmt.Errorf("could not save result on database: %w", err)
 	}
@@ -89,75 +87,78 @@ func (e *defaultAssertionRunner) runAssertionsAndUpdateResult(ctx context.Contex
 	return nil
 }
 
-func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, request AssertionRequest) (*openapi.TestRunResult, error) {
-	trace, err := traces.FromOtel(request.Result.Trace)
+func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, request AssertionRequest) (*openapi.TestRun, error) {
+	trace, err := traces.FromOtel(request.TestRun.Trace)
 	if err != nil {
 		return nil, err
 	}
 
-	test, err := e.db.GetTest(ctx, request.Result.TestId)
+	test, err := e.db.GetTest(ctx, request.TestRun.TestId)
 	if err != nil {
 		return nil, err
 	}
 
 	// Temporary patch to disable the assertion engine if frontend request is not prepared yet (old selector format)
 	if e.shouldIgnoreTest(test) {
-		return &request.Result, nil
+		return &request.TestRun, nil
 	}
 
 	result := assertions.Assert(trace, request.TestDefinition)
 
-	e.setResults(&request.Result, result)
+	e.setResults(&request.TestRun, result)
 
-	return &request.Result, nil
+	return &request.TestRun, nil
 }
 
 func (e *defaultAssertionRunner) shouldIgnoreTest(test *openapi.Test) bool {
 	// If any assertion uses the old selector format, ignore the whole test and don't execute the
 	// assertions.
-	for _, assertion := range test.Assertions {
-		if assertion.Selector == "" && len(assertion.Selectors) > 0 {
-			return true
+	for selector, asserts := range test.Definition.Definitions {
+		for _, assert := range asserts {
+			if selector == "" && len(assert.Selectors) > 0 {
+				return true
+			}
 		}
 	}
 
 	return false
 }
 
-func (e *defaultAssertionRunner) setResults(result *openapi.TestRunResult, testResult assertions.TestResult) {
-	result.State = TestRunStateFinished
-	result.CompletedAt = time.Now()
-	assertionResultArray := make([]openapi.AssertionResult, 0)
-	allTestsPassed := true
+func (e *defaultAssertionRunner) setResults(run *openapi.TestRun, testResult assertions.TestResult) {
+	run.State = TestRunStateFinished
+	run.CompletedAt = time.Now()
 
-	for _, assertionExecutionResult := range testResult {
-		for _, assertionResult := range assertionExecutionResult {
-			spanAssertions := make([]openapi.SpanAssertionResult, 0)
-			for _, spanAssertionResult := range assertionResult.AssertionSpanResults {
+	res := openapi.AssertionResults{
+		Results:   map[string][]openapi.AssertionResult{},
+		AllPassed: true,
+	}
+	for selector, assertionResults := range testResult {
+		res.Results[string(selector)] = make([]openapi.AssertionResult, len(assertionResults))
+		for i, assertionResult := range assertionResults {
+			res.Results[string(selector)][i] = openapi.AssertionResult{
+				Id:          assertionResult.ID,
+				Attribute:   assertionResult.Attribute,
+				Comparator:  assertionResult.Comparator.String(),
+				Expected:    assertionResult.Value,
+				SpanResults: make([]openapi.AssertionSpanResult, len(assertionResult.AssertionSpanResults)),
+			}
+			for j, spanAssertionResult := range assertionResult.AssertionSpanResults {
 				spanID := hex.EncodeToString(spanAssertionResult.Span.ID[:])
 				testPassed := spanAssertionResult.CompareErr == nil
 				if !testPassed {
-					allTestsPassed = false
+					res.AllPassed = false
 				}
 
-				spanAssertions = append(spanAssertions, openapi.SpanAssertionResult{
-					Passed:        testPassed,
+				res.Results[string(selector)][i].SpanResults[j] = openapi.AssertionSpanResult{
 					SpanId:        spanID,
 					ObservedValue: spanAssertionResult.ActualValue,
-				})
+					Passed:        testPassed,
+				}
 			}
-
-			result := openapi.AssertionResult{
-				AssertionId:          assertionResult.Assertion.ID,
-				SpanAssertionResults: spanAssertions,
-			}
-
-			assertionResultArray = append(assertionResultArray, result)
 		}
 	}
 
-	result.AssertionResult = assertionResultArray
-	result.AssertionResultState = allTestsPassed
+	run.Result = res
 }
 
 func (e *defaultAssertionRunner) RunAssertions(request AssertionRequest) {

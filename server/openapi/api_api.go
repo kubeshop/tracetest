@@ -263,20 +263,9 @@ func (c *ApiApiController) GetTestRun(w http.ResponseWriter, r *http.Request) {
 // GetTestRuns - get the runs for a test
 func (c *ApiApiController) GetTestRuns(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	query := r.URL.Query()
 	testIdParam := params["testId"]
 
-	takeParam, err := parseInt32Parameter(query.Get("take"), false)
-	if err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-	skipParam, err := parseInt32Parameter(query.Get("skip"), false)
-	if err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-	result, err := c.service.GetTestRuns(r.Context(), testIdParam, takeParam, skipParam)
+	result, err := c.service.GetTestRuns(r.Context(), testIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

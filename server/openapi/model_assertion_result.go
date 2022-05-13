@@ -9,12 +9,25 @@
 
 package openapi
 
-// AssertionResult - Map using selector query as key, and an array of assertions as value
 type AssertionResult struct {
+	Id string `json:"id,omitempty"`
+
+	Attribute string `json:"attribute,omitempty"`
+
+	Comparator string `json:"comparator,omitempty"`
+
+	Expected string `json:"expected,omitempty"`
+
+	SpanResults []AssertionSpanResult `json:"spanResults,omitempty"`
 }
 
 // AssertAssertionResultRequired checks if the required fields are not zero-ed
 func AssertAssertionResultRequired(obj AssertionResult) error {
+	for _, el := range obj.SpanResults {
+		if err := AssertAssertionSpanResultRequired(el); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 

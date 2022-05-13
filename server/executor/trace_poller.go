@@ -158,26 +158,25 @@ func (tp tracePoller) processJob(job tracePollReq) {
 		Content: run,
 	})
 
-	err = tp.runAssertions(job.ctx, res)
+	err = tp.runAssertions(job.ctx, run)
 	if err != nil {
 		fmt.Printf("could not run assertions: %s\n", err.Error())
 	}
 }
 
-func (tp tracePoller) runAssertions(ctx context.Context, result openapi.TestRunResult) error {
+func (tp tracePoller) runAssertions(ctx context.Context, result openapi.TestRun) error {
 	test, err := tp.testDB.GetTest(ctx, result.TestId)
 	if err != nil {
 		return err
 	}
 
-	testDefinition, err := ConvertAssertionsIntoTestDefinition(test.Assertions)
+	testDefinition, err := ConvertInputTestIntoTestDefinition(*test)
 	if err != nil {
 		return err
 	}
 
 	assertionRequest := AssertionRequest{
 		TestDefinition: testDefinition,
-		Result:         result,
 	}
 
 	tp.assertionRunner.RunAssertions(assertionRequest)
@@ -229,7 +228,7 @@ func (tp tracePoller) handleTraceDBError(job tracePollReq, err error) {
 
 func (tp tracePoller) requeue(job tracePollReq) {
 	go func() {
-		fmt.Printf("requeuing result %s for %d time\n", job.run.ResultId, job.count)
+		fmt.Printf("requeuing result %s for %d time\n", job.run.Id, job.count)
 		time.Sleep(tp.retryDelay)
 		tp.enqueueJob(job)
 	}()

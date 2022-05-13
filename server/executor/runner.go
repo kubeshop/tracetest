@@ -33,14 +33,14 @@ type testsDB interface {
 func NewPersistentRunner(
 	e Executor,
 	testDB testdb.TestRepository,
-	resultDB testdb.ResultRepository,
+	resultDB testdb.RunRepository,
 	tp TracePoller,
 ) PersistentRunner {
 	return persistentRunner{
 		executor:     e,
 		tp:           tp,
 		testsDB:      testDB,
-		resultDB:     resultDB,
+		runDB:        resultDB,
 		idGen:        id.NewRandGenerator(),
 		executeQueue: make(chan execReq, 5),
 		exit:         make(chan bool, 1),
@@ -52,7 +52,7 @@ type persistentRunner struct {
 	tp       TracePoller
 	idGen    id.Generator
 	testsDB  testdb.TestRepository
-	resultDB testdb.ResultRepository
+	runDB    testdb.RunRepository
 
 	executeQueue chan execReq
 	exit         chan bool
@@ -102,8 +102,8 @@ func (r persistentRunner) Run(t openapi.Test) openapi.TestRun {
 	// Start a new background context for the async process
 	ctx := context.Background()
 
-	result := r.newTestResult(t.TestId)
-	r.handleDBError(r.resultDB.CreateResult(ctx, result.TestId, &result))
+	result := r.newTestRun(t.Id)
+	r.handleDBError(r.runDB.CreateRun(ctx, result.TestId, &result))
 
 	r.executeQueue <- execReq{
 		ctx:  ctx,
@@ -115,9 +115,9 @@ func (r persistentRunner) Run(t openapi.Test) openapi.TestRun {
 }
 
 func (r persistentRunner) processExecQueue(job execReq) {
-	result := job.result
-	result.State = TestRunStateExecuting
-	r.handleDBError(r.resultDB.UpdateResult(job.ctx, &result))
+	run := job.run
+	run.State = TestRunStateExecuting
+	r.handleDBError(r.runDB.UpdateRun(job.ctx, &run))
 
 	tid, _ := trace.TraceIDFromHex(run.TraceId)
 	sid, _ := trace.SpanIDFromHex(run.SpanId)
@@ -132,8 +132,8 @@ func (r persistentRunner) processExecQueue(job execReq) {
 		r.handleDBError(r.testsDB.UpdateTest(job.ctx, &job.test))
 	}
 
-	r.handleDBError(r.resultDB.UpdateResult(job.ctx, &result))
-	if result.State == TestRunStateAwaitingTrace {
+	r.handleDBError(r.runDB.UpdateRun(job.ctx, &run))
+	if run.State == TestRunStateAwaitingTrace {
 		// start a new context
 		r.tp.Poll(job.ctx, run)
 	}

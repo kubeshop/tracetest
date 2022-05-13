@@ -30,18 +30,22 @@ definitions:
   TestDefinition:
     type: object
     description: Map using selector query as key, and an array of assertions as value
-    additionalProperties:
-      type: array
-      items:
-        $ref: '#/definitions/Assertion'
+    properties:
+      definitions:
+        type: object
+        additionalProperties:
+          type: array
+          items:
+            $ref: "#/definitions/Assertion"
     example:
-      'span[tracetest.span.type="http"]':
-        - attr: tracetest.span.duration
-          comparator: "<"
-          expected: "2000"
-        - attr: http.status_code
-          comparator: "="
-          expected: "200"
+      definitions:
+        'span[tracetest.span.type="http"]':
+          - attr: tracetest.span.duration
+            comparator: "<"
+            expected: "2000"
+          - attr: http.status_code
+            comparator: "="
+            expected: "200"
 
   Assertion:
     type: object
@@ -50,12 +54,17 @@ definitions:
         type: string
         format: uuid
         readOnly: true
-      attr:
+      attribute:
         type: string
       comparator:
         type: string
       expected:
         type: string
+      # TODO: remove this. tmp patch for FE
+      selectors:
+        type: array
+        items:
+          $ref: "#/definitions/SelectorItem"
 
   TestRun:
     type: object
@@ -95,20 +104,72 @@ definitions:
       trace:
         $ref: "./trace.yaml#/definitions/Trace"
       result:
-        $ref: "#/definitions/AssertionResult"
+        $ref: "#/definitions/AssertionResults"
+
+  AssertionResults:
+    type: object
+    description: Map using selector query as key, and an array of assertions as value
+    properties:
+      allPassed:
+        type: bool
+      results:
+        type: object
+        additionalProperties:
+          type: array
+          items:
+            $ref: "#/definitions/AssertionResult"
+    example:
+      results:
+        'span[tracetest.span.type="http"]':
+          - spanId: "123"
+            observedValue: "test"
+            passed: true
+          - spanId: "456"
+            observedValue: "test"
+            passed: false
 
   AssertionResult:
     type: object
-    description: Map using selector query as key, and an array of assertions as value
-    additionalProperties:
-      type: array
-      items:
-        $ref: '#/definitions/Assertion'
-    example:
-      'span[tracetest.span.type="http"]':
-        - attr: tracetest.span.duration
-          comparator: "<"
-          expected: "2000"
-        - attr: http.status_code
-          comparator: "="
-          expected: "200"
+    properties:
+      id:
+        type: string
+        format: uuid
+        readOnly: true
+      attribute:
+        type: string
+      comparator:
+        type: string
+      expected:
+        type: string
+      spanResults:
+        type: array
+        items:
+          $ref: "#/definitions/AssertionSpanResult"
+
+  AssertionSpanResult:
+    type: object
+    properties:
+      spanId:
+        type: string
+      observedValue:
+        type: string
+      passed:
+        type: bool
+
+  SelectorItem:
+    type: object
+    properties:
+      locationName:
+        type: string
+        enum: [RESOURCE_ATTRIBUTES, INSTRUMENTATION_LIBRARY, SPAN, SPAN_ATTRIBUTES]
+        description: Example "SPAN"
+      propertyName:
+        type: string
+        description: Example "operation"
+      value:
+        type: string
+        description: Example "POST /users/verify"
+      valueType:
+        type: string
+        description: TODO(pov) think about value types?
+        enum: [stringValue, intValue]

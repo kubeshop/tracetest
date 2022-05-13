@@ -45,7 +45,7 @@ func TestAssertion(t *testing.T) {
 							Comparator: comparator.Eq,
 							Value:      "2000",
 						},
-						AssertionSpanResults: []assertions.AssertionSpanResults{
+						AssertionSpanResults: []assertions.AssertionSpanResult{
 							{ActualValue: "2000", CompareErr: nil},
 						},
 					},

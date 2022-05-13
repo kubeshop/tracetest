@@ -49,15 +49,15 @@ func TestExecutorSuccessfulExecution(t *testing.T) {
 			createdTestID, err := postgresRepository.CreateTest(ctx, &test)
 			require.NoError(t, err)
 
-			for _, assertion := range test.Assertions {
-				postgresRepository.CreateAssertion(ctx, test.TestId, &assertion)
+			for _, assertion := range test.Definition.Definitions {
+				postgresRepository.CreateAssertion(ctx, test.Id, &assertion)
 			}
 
 			result.TestId = createdTestID
-			err = postgresRepository.CreateResult(ctx, test.TestId, &result)
+			err = postgresRepository.CreateRun(ctx, test.Id, &result)
 			require.NoError(t, err)
 
-			testDefinition, err := executor.ConvertAssertionsIntoTestDefinition(test.Assertions)
+			testDefinition, err := executor.ConvertInputTestIntoTestDefinition(test)
 			assert.NoError(t, err)
 
 			assertionRequest := executor.AssertionRequest{
@@ -69,7 +69,7 @@ func TestExecutorSuccessfulExecution(t *testing.T) {
 			assertionExecutor.RunAssertions(assertionRequest)
 			assertionExecutor.Stop()
 
-			dbResult, err := postgresRepository.GetResult(ctx, result.ResultId)
+			dbResult, err := postgresRepository.GetResult(ctx, result.Id)
 			require.NoError(t, err)
 
 			if testCase.ShouldPass {
@@ -89,30 +89,30 @@ func TestExecutorSuccessfulExecution(t *testing.T) {
 }
 
 type testFile struct {
-	Test   openapi.Test          `json:"test"`
-	Result openapi.TestRunResult `json:"result"`
+	Test   openapi.Test    `json:"test"`
+	Result openapi.TestRun `json:"result"`
 }
 
-func loadTestFile(filePath string) (openapi.Test, openapi.TestRunResult, error) {
+func loadTestFile(filePath string) (openapi.Test, openapi.TestRun, error) {
 	fileContent, err := os.Open(filePath)
 	if err != nil {
-		return openapi.Test{}, openapi.TestRunResult{}, fmt.Errorf("could not open test file: %w", err)
+		return openapi.Test{}, openapi.TestRun{}, fmt.Errorf("could not open test file: %w", err)
 	}
 
 	fileBytes, err := ioutil.ReadAll(fileContent)
 	if err != nil {
-		return openapi.Test{}, openapi.TestRunResult{}, fmt.Errorf("could not read test file: %w", err)
+		return openapi.Test{}, openapi.TestRun{}, fmt.Errorf("could not read test file: %w", err)
 	}
 
 	testFile := testFile{}
 	err = json.Unmarshal(fileBytes, &testFile)
 	if err != nil {
-		return openapi.Test{}, openapi.TestRunResult{}, fmt.Errorf("could not parse test file: %w", err)
+		return openapi.Test{}, openapi.TestRun{}, fmt.Errorf("could not parse test file: %w", err)
 	}
 
-	testFile.Test.TestId = uuid.NewString()
-	testFile.Result.TestId = testFile.Test.TestId
-	testFile.Result.ResultId = uuid.NewString()
+	testFile.Test.Id = uuid.NewString()
+	testFile.Result.TestId = testFile.Test.Id
+	testFile.Result.Id = uuid.NewString()
 
 	return testFile.Test, testFile.Result, nil
 }

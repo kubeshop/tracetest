@@ -12,19 +12,22 @@ package openapi
 type Assertion struct {
 	Id string `json:"id,omitempty"`
 
-	Attr string `json:"attr,omitempty"`
+	Attribute string `json:"attribute,omitempty"`
 
 	Comparator string `json:"comparator,omitempty"`
 
-	Selector string `json:"selector,omitempty"`
-
-	SpanAssertions []SpanAssertion `json:"spanAssertions,omitempty"`
-
 	Expected string `json:"expected,omitempty"`
+
+	Selectors []SelectorItem `json:"selectors,omitempty"`
 }
 
 // AssertAssertionRequired checks if the required fields are not zero-ed
 func AssertAssertionRequired(obj Assertion) error {
+	for _, el := range obj.Selectors {
+		if err := AssertSelectorItemRequired(el); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
