@@ -95,7 +95,6 @@ func (f runnerFixture) expectSuccessExecLong(test openapi.Test) {
 
 func (f runnerFixture) expectSuccessExec(test openapi.Test) {
 	f.mockExecutor.expectExecuteTest(test)
-	f.mockTracePoller.expectOnPollComplete()
 	f.expectSuccessResultPersist(test)
 }
 
