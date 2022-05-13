@@ -12,7 +12,7 @@ import (
 )
 
 type Runner interface {
-	Run(openapi.Test) openapi.TestRunResult
+	Run(openapi.Test) openapi.TestRun
 }
 
 type PersistentRunner interface {
@@ -22,6 +22,12 @@ type PersistentRunner interface {
 
 type Executor interface {
 	Execute(*openapi.Test, trace.TraceID, trace.SpanID) (openapi.HttpResponse, error)
+}
+
+type testsDB interface {
+	UpdateTest(context.Context, *openapi.Test) error
+	CreateRun(_ context.Context, Id string, _ *openapi.TestRun) error
+	runUpdater
 }
 
 func NewPersistentRunner(
@@ -53,9 +59,9 @@ type persistentRunner struct {
 }
 
 type execReq struct {
-	ctx    context.Context
-	test   openapi.Test
-	result openapi.TestRunResult
+	ctx  context.Context
+	test openapi.Test
+	run  openapi.TestRun
 }
 
 func (r persistentRunner) handleDBError(err error) {
@@ -75,10 +81,10 @@ func (r persistentRunner) Start(workers int) {
 					return
 				case job := <-r.executeQueue:
 					fmt.Printf(
-						"persistentRunner job. TestID %s, TraceID %s, SpanID %s\n",
-						job.result.TestId,
-						job.result.TraceId,
-						job.result.SpanId,
+						"persistentRunner job. Id %s, TraceID %s, SpanID %s\n",
+						job.run.Id,
+						job.run.TraceId,
+						job.run.SpanId,
 					)
 					r.processExecQueue(job)
 				}
@@ -92,7 +98,7 @@ func (r persistentRunner) Stop() {
 	r.exit <- true
 }
 
-func (r persistentRunner) Run(t openapi.Test) openapi.TestRunResult {
+func (r persistentRunner) Run(t openapi.Test) openapi.TestRun {
 	// Start a new background context for the async process
 	ctx := context.Background()
 
@@ -100,9 +106,9 @@ func (r persistentRunner) Run(t openapi.Test) openapi.TestRunResult {
 	r.handleDBError(r.resultDB.CreateResult(ctx, result.TestId, &result))
 
 	r.executeQueue <- execReq{
-		ctx:    ctx,
-		test:   t,
-		result: result,
+		ctx:  ctx,
+		test: t,
+		run:  result,
 	}
 
 	return result
@@ -113,15 +119,15 @@ func (r persistentRunner) processExecQueue(job execReq) {
 	result.State = TestRunStateExecuting
 	r.handleDBError(r.resultDB.UpdateResult(job.ctx, &result))
 
-	tid, _ := trace.TraceIDFromHex(result.TraceId)
-	sid, _ := trace.SpanIDFromHex(result.SpanId)
+	tid, _ := trace.TraceIDFromHex(run.TraceId)
+	sid, _ := trace.SpanIDFromHex(run.SpanId)
 
 	response, err := r.executor.Execute(&job.test, tid, sid)
-	result = r.handleExecutionResult(result, response, err)
+	run = r.handleExecutionResult(run, response, err)
 
-	if job.test.ReferenceTestRunResult.ResultId == "" {
-		job.test.ReferenceTestRunResult = openapi.TestRunResult{
-			TraceId: result.TraceId,
+	if job.test.ReferenceTestRun.Id == "" {
+		job.test.ReferenceTestRun = openapi.TestRun{
+			TraceId: run.TraceId,
 		}
 		r.handleDBError(r.testsDB.UpdateTest(job.ctx, &job.test))
 	}
@@ -129,11 +135,11 @@ func (r persistentRunner) processExecQueue(job execReq) {
 	r.handleDBError(r.resultDB.UpdateResult(job.ctx, &result))
 	if result.State == TestRunStateAwaitingTrace {
 		// start a new context
-		r.tp.Poll(job.ctx, result)
+		r.tp.Poll(job.ctx, run)
 	}
 }
 
-func (r persistentRunner) handleExecutionResult(result openapi.TestRunResult, resp openapi.HttpResponse, err error) openapi.TestRunResult {
+func (r persistentRunner) handleExecutionResult(result openapi.TestRun, resp openapi.HttpResponse, err error) openapi.TestRun {
 	result.CompletedAt = time.Now()
 	result.Response = resp
 	if err != nil {
@@ -145,10 +151,9 @@ func (r persistentRunner) handleExecutionResult(result openapi.TestRunResult, re
 	return result
 }
 
-func (r persistentRunner) newTestResult(testID string) openapi.TestRunResult {
-	return openapi.TestRunResult{
-		TestId:    testID,
-		ResultId:  r.idGen.UUID(),
+func (r persistentRunner) newTestRun(Id string) openapi.TestRun {
+	return openapi.TestRun{
+		Id:        Id,
 		TraceId:   r.idGen.TraceID().String(),
 		SpanId:    r.idGen.SpanID().String(),
 		CreatedAt: time.Now(),

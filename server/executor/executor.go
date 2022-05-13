@@ -99,10 +99,10 @@ func (te *TestExecutor) Execute(test *openapi.Test, tid trace.TraceID, sid trace
 }
 
 func mapResp(resp *http.Response) openapi.HttpResponse {
-	var mappedHeaders []openapi.HttpResponseHeaders
+	var mappedHeaders []openapi.HttpHeader
 	for key, headers := range resp.Header {
 		for _, val := range headers {
-			val := openapi.HttpResponseHeaders{
+			val := openapi.HttpHeader{
 				Key:   key,
 				Value: val,
 			}

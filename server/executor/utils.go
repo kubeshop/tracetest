@@ -224,7 +224,7 @@ func spanType(attrs []openapi.V1KeyValue) string {
 	return "unknown"
 }
 
-func headersToKeyValueList(headers []openapi.HttpResponseHeaders) *v11.KeyValueList {
+func headersToKeyValueList(headers []openapi.HttpHeader) *v11.KeyValueList {
 	mapped := []*v11.KeyValue{}
 
 	for _, h := range headers {

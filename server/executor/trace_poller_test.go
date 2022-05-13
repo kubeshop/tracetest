@@ -29,7 +29,7 @@ func TestPersistentPoller(t *testing.T) {
 
 		f.run([]openapi.TestRunResult{res}, 10*time.Millisecond)
 
-		result := f.mockResultsDB.results[res.TestId]
+		result := f.mockResultsDB.runs[res.TestId]
 		require.NotNil(t, result)
 		assert.Equal(t, sampleParsedTraces, result.Trace)
 

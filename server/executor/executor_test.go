@@ -45,7 +45,7 @@ func TestExecuteGet(t *testing.T) {
 			Request: openapi.HttpRequest{
 				Url:    server.URL,
 				Method: "GET",
-				Headers: []openapi.HttpResponseHeaders{
+				Headers: []openapi.HttpHeader{
 					{Key: "Key1", Value: "Value1"},
 				},
 				Body: "body",
@@ -98,7 +98,7 @@ func TestExecutePost(t *testing.T) {
 			Request: openapi.HttpRequest{
 				Url:    server.URL,
 				Method: "POST",
-				Headers: []openapi.HttpResponseHeaders{
+				Headers: []openapi.HttpHeader{
 					{Key: "Key1", Value: "Value1"},
 				},
 				Body: "body",
@@ -157,7 +157,7 @@ func TestExecutePostWithApiKeyAuth(t *testing.T) {
 			Request: openapi.HttpRequest{
 				Url:    server.URL,
 				Method: "POST",
-				Headers: []openapi.HttpResponseHeaders{
+				Headers: []openapi.HttpHeader{
 					{Key: "Key1", Value: "Value1"},
 				},
 				Auth: openapi.HttpAuth{
@@ -224,7 +224,7 @@ func TestExecutePostWithBasicAuth(t *testing.T) {
 			Request: openapi.HttpRequest{
 				Url:    server.URL,
 				Method: "POST",
-				Headers: []openapi.HttpResponseHeaders{
+				Headers: []openapi.HttpHeader{
 					{Key: "Key1", Value: "Value1"},
 				},
 				Auth: openapi.HttpAuth{
@@ -290,7 +290,7 @@ func TestExecutePostWithBearerAuth(t *testing.T) {
 			Request: openapi.HttpRequest{
 				Url:    server.URL,
 				Method: "POST",
-				Headers: []openapi.HttpResponseHeaders{
+				Headers: []openapi.HttpHeader{
 					{Key: "Key1", Value: "Value1"},
 				},
 				Auth: openapi.HttpAuth{

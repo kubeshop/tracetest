@@ -311,7 +311,7 @@ func dropTables(td *postgresDB, tables ...string) error {
 	return nil
 }
 
-func (td *postgresDB) CreateResult(ctx context.Context, testid string, run *openapi.TestRunResult) error {
+func (td *postgresDB) CreateResult(ctx context.Context, testid string, run *openapi.TestRun) error {
 	stmt, err := td.db.Prepare("INSERT INTO results(id, test_id, result) VALUES( $1, $2, $3 )")
 	if err != nil {
 		return fmt.Errorf("sql prepare: %w", err)
@@ -329,7 +329,7 @@ func (td *postgresDB) CreateResult(ctx context.Context, testid string, run *open
 	return nil
 }
 
-func (td *postgresDB) GetResult(ctx context.Context, id string) (*openapi.TestRunResult, error) {
+func (td *postgresDB) GetResult(ctx context.Context, id string) (*openapi.TestRun, error) {
 	stmt, err := td.db.Prepare("SELECT result FROM results WHERE id = $1")
 	if err != nil {
 		return nil, err
@@ -341,7 +341,7 @@ func (td *postgresDB) GetResult(ctx context.Context, id string) (*openapi.TestRu
 	if err != nil {
 		return nil, err
 	}
-	var run openapi.TestRunResult
+	var run openapi.TestRun
 
 	err = json.Unmarshal(b, &run)
 	if err != nil {
@@ -350,28 +350,28 @@ func (td *postgresDB) GetResult(ctx context.Context, id string) (*openapi.TestRu
 	return &run, nil
 }
 
-func (td *postgresDB) GetResultByTraceID(ctx context.Context, testID, traceID string) (openapi.TestRunResult, error) {
+func (td *postgresDB) GetResultByTraceID(ctx context.Context, testID, traceID string) (openapi.TestRun, error) {
 	stmt, err := td.db.Prepare("SELECT result FROM results WHERE test_id = $1 AND result ->> 'traceId' = $2")
 	if err != nil {
-		return openapi.TestRunResult{}, err
+		return openapi.TestRun{}, err
 	}
 	defer stmt.Close()
 
 	var b []byte
 	err = stmt.QueryRowContext(ctx, testID, traceID).Scan(&b)
 	if err != nil {
-		return openapi.TestRunResult{}, err
+		return openapi.TestRun{}, err
 	}
-	var run openapi.TestRunResult
+	var run openapi.TestRun
 
 	err = json.Unmarshal(b, &run)
 	if err != nil {
-		return openapi.TestRunResult{}, err
+		return openapi.TestRun{}, err
 	}
 	return run, nil
 }
 
-func (td *postgresDB) GetResultsByTestID(ctx context.Context, testID string, take, skip int32) ([]openapi.TestRunResult, error) {
+func (td *postgresDB) GetResultsByTestID(ctx context.Context, testID string, take, skip int32) ([]openapi.TestRun, error) {
 	stmt, err := td.db.Prepare("SELECT result FROM results WHERE test_id = $1 ORDER BY result ->> 'createdAt' DESC LIMIT $2 OFFSET $3")
 	if err != nil {
 		return nil, err
@@ -382,14 +382,14 @@ func (td *postgresDB) GetResultsByTestID(ctx context.Context, testID string, tak
 	if err != nil {
 		return nil, err
 	}
-	var run []openapi.TestRunResult
+	var run []openapi.TestRun
 
 	for rows.Next() {
 		var b []byte
 		if err := rows.Scan(&b); err != nil {
 			return nil, err
 		}
-		var result openapi.TestRunResult
+		var result openapi.TestRun
 		err = json.Unmarshal(b, &result)
 		if err != nil {
 			return nil, err
@@ -401,7 +401,7 @@ func (td *postgresDB) GetResultsByTestID(ctx context.Context, testID string, tak
 	return run, nil
 }
 
-func (td *postgresDB) UpdateResult(ctx context.Context, run *openapi.TestRunResult) error {
+func (td *postgresDB) UpdateResult(ctx context.Context, run *openapi.TestRun) error {
 	stmt, err := td.db.Prepare("UPDATE results SET result = $2 WHERE id = $1")
 	if err != nil {
 		return err
