@@ -31,27 +31,13 @@ func TestExecutorIntegration(t *testing.T) {
 
 	time.Sleep(1 * time.Second)
 
-	testCases := []struct {
-		Name string
-		Fn   func(*testing.T, *app.App, *test.DemoApp)
-	}{
-		{
-			Name: "Test with new selector should be asserted by assertion engine",
-			Fn:   happyPathWithNewSelector,
-		},
-		// This test should be removed after we migrate the frontend application to run the new
-		// selector format
-		{
-			Name: "Test with old selectors should not be asserted by assertion engine",
-			Fn:   happyPathWithOldSelector,
-		},
-	}
+	t.Run("Test with new selector should be asserted by assertion engine", func(t *testing.T) {
+		happyPathWithNewSelector(t, tracetestApp, demoApp)
+	})
 
-	for _, testCase := range testCases {
-		t.Run(testCase.Name, func(t *testing.T) {
-			testCase.Fn(t, tracetestApp, demoApp)
-		})
-	}
+	t.Run("Test with old selectors should not be asserted by assertion engine", func(t *testing.T) {
+		happyPathWithOldSelector(t, tracetestApp, demoApp)
+	})
 }
 
 func happyPathWithNewSelector(t *testing.T, app *app.App, demoApp *test.DemoApp) {
