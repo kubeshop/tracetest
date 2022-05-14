@@ -1,13 +1,11 @@
 import {render} from '@testing-library/react';
 import {MemoryRouter} from 'react-router-dom';
-import Layout from '../index';
+import Header from '../index';
 
-test('Layout', () => {
+test('Header', () => {
   const result = render(
     <MemoryRouter>
-      <Layout>
-        <h2>This</h2>
-      </Layout>
+      <Header />
     </MemoryRouter>
   );
   expect(result.container).toMatchSnapshot();

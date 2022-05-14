@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SkeletonTable 1`] = `
+<div>
+  <div>
+    <h2>
+      Whatever
+    </h2>
+  </div>
+</div>
+`;

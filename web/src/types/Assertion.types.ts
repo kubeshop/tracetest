@@ -59,4 +59,4 @@ export interface ISpanAssertionResult2 {
 export interface IAssertionResultList {
   assertion: IAssertion;
   assertionResultList: ISpanAssertionResult[];
-};
+}
