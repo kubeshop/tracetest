@@ -1,70 +1,48 @@
 package assertions
 
 import (
-	"github.com/kubeshop/tracetest/assertions/comparator"
 	"github.com/kubeshop/tracetest/assertions/selectors"
+	"github.com/kubeshop/tracetest/model"
 	"github.com/kubeshop/tracetest/traces"
+	"go.opentelemetry.io/otel/trace"
 )
 
-type SpanQuery string
-
-func (sq SpanQuery) Selector() selectors.Selector {
-	sel, _ := selectors.New(string(sq))
-	return sel
-}
-
-type TestDefinition map[SpanQuery][]Assertion
-
-type Assertion struct {
-	ID         string
-	Attribute  string
-	Comparator comparator.Comparator
-	Value      string
-}
-
-func (a Assertion) Assert(spans []traces.Span) AssertionResult {
-	results := make([]AssertionSpanResult, len(spans))
-	for i, span := range spans {
-		results[i] = a.apply(span)
-	}
-	return AssertionResult{
-		Assertion:            a,
-		AssertionSpanResults: results,
-	}
-}
-
-func (a Assertion) apply(span traces.Span) AssertionSpanResult {
-	attr := span.Attributes.Get(a.Attribute)
-	return AssertionSpanResult{
-		Span:        &span,
-		ActualValue: attr,
-		CompareErr:  a.Comparator.Compare(attr, a.Value),
-	}
-}
-
-type AssertionResult struct {
-	Assertion
-	AssertionSpanResults []AssertionSpanResult
-}
-
-type AssertionSpanResult struct {
-	Span        *traces.Span
-	ActualValue string
-	CompareErr  error
-}
-
-type TestResult map[SpanQuery][]AssertionResult
-
-func Assert(trace traces.Trace, defs TestDefinition) TestResult {
-	testResult := TestResult{}
+func Assert(defs model.Definition, trace traces.Trace) model.Results {
+	testResult := model.Results{}
 	for spanQuery, asserts := range defs {
-		spans := spanQuery.Selector().Filter(trace)
-		assertionResults := make([]AssertionResult, 0)
+		spans := selector(spanQuery).Filter(trace)
+		assertionResults := make([]model.AssertionResult, 0)
 		for _, assertion := range asserts {
-			assertionResults = append(assertionResults, assertion.Assert(spans))
+			assertionResults = append(assertionResults, assert(assertion, spans))
 		}
 		testResult[spanQuery] = assertionResults
 	}
 
 	return testResult
+}
+
+func assert(a model.Assertion, spans []traces.Span) model.AssertionResult {
+	res := make([]model.SpanAssertionResult, len(spans))
+	for i, span := range spans {
+		res[i] = apply(a, span)
+	}
+
+	return model.AssertionResult{
+		Assertion: a,
+		Results:   res,
+	}
+}
+
+func apply(a model.Assertion, span traces.Span) model.SpanAssertionResult {
+	attr := span.Attributes.Get(a.Attribute)
+	return model.SpanAssertionResult{
+		SpanID:        trace.SpanID(span.ID),
+		ObservedValue: attr,
+		CompareErr:    a.Comparator.Compare(attr, a.Value),
+	}
+}
+
+func selector(sq model.SpanQuery) selectors.Selector {
+	sel, _ := selectors.New(string(sq))
+	return sel
 }

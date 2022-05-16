@@ -8,7 +8,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/kubeshop/tracetest/model"
-	"go.opencensus.io/trace"
+	"go.opentelemetry.io/otel/trace"
 )
 
 var _ model.RunRepository = &postgresDB{}

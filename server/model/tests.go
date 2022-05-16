@@ -6,7 +6,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/kubeshop/tracetest/assertions/comparator"
 	"github.com/kubeshop/tracetest/traces"
-	"go.opencensus.io/trace"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type (

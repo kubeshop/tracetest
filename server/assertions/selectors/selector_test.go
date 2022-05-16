@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/kubeshop/tracetest/assertions/selectors"
+	"github.com/kubeshop/tracetest/id"
 	"github.com/kubeshop/tracetest/traces"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -11,13 +12,14 @@ import (
 )
 
 var (
-	postImportSpanID                = createSpanID("00000001")
-	insertPokemonDatabaseSpanID     = createSpanID("00000002")
-	getPokemonFromExternalAPISpanID = createSpanID("00000003")
-	updatePokemonDatabaseSpanID     = createSpanID("00000004")
+	gen                             = id.NewRandGenerator()
+	postImportSpanID                = gen.SpanID()
+	insertPokemonDatabaseSpanID     = gen.SpanID()
+	getPokemonFromExternalAPISpanID = gen.SpanID()
+	updatePokemonDatabaseSpanID     = gen.SpanID()
 )
 var pokeshopTrace = traces.Trace{
-	ID: trace.TraceID{},
+	ID: gen.TraceID(),
 	RootSpan: traces.Span{
 		ID: postImportSpanID,
 		Attributes: traces.Attributes{
@@ -134,13 +136,4 @@ func ensureExpectedSpansWereReturned(t *testing.T, spanIDs []trace.SpanID, spans
 	for _, span := range spans {
 		assert.Contains(t, spanIDs, span.ID, "span ID was returned but wasn't expected")
 	}
-}
-
-func createSpanID(id string) trace.SpanID {
-	stringBytes := []byte(id)
-	bytes := [8]byte{}
-	for i, b := range stringBytes {
-		bytes[i] = b
-	}
-	return trace.SpanID(bytes)
 }

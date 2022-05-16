@@ -9,7 +9,7 @@ import (
 )
 
 type Generator interface {
-	UUID() string
+	UUID() uuid.UUID
 	TraceID() trace.TraceID
 	SpanID() trace.SpanID
 }
@@ -24,8 +24,8 @@ type randGenerator struct {
 	rand *rand.Rand
 }
 
-func (g randGenerator) UUID() string {
-	return uuid.New().String()
+func (g randGenerator) UUID() uuuuid.UUID {
+	return uuid.New()
 }
 
 func (g randGenerator) TraceID() trace.TraceID {

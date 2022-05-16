@@ -4,8 +4,14 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/kubeshop/tracetest/model"
 	"github.com/kubeshop/tracetest/traces"
 )
+
+func FromSpanQuery(sq model.SpanQuery) Selector {
+	sel, _ := New(string(sq))
+	return sel
+}
 
 type Selector struct {
 	spanSelectors []spanSelector
