@@ -6,7 +6,7 @@ SKIP_PMA="no"
 while [[ $# -gt 0 ]]; do
   case $1 in
     -n|--namespace)
-      EXTENSION="$2"
+      NAMESPACE="$2"
       shift
       shift
       ;;
