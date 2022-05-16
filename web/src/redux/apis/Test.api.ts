@@ -115,6 +115,7 @@ export const {
   useGetAssertionsQuery,
   useUpdateResultMutation,
   useLazyGetResultListQuery,
+  useDeleteAssertionMutation,
 } = TestAPI;
 export const {endpoints} = TestAPI;
 

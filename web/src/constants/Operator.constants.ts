@@ -11,12 +11,12 @@ export const enum CompareOperator {
 }
 
 export const CompareOperatorNameMap: Record<CompareOperator, TCompareOperatorName> = {
-  [CompareOperator.EQUALS]: 'eq',
-  [CompareOperator.NOTEQUALS]: 'ne',
-  [CompareOperator.LESSTHAN]: 'lt',
-  [CompareOperator.GREATERTHAN]: 'gt',
-  [CompareOperator.GREATOREQUALS]: 'gte',
-  [CompareOperator.LESSOREQUAL]: 'lte',
+  [CompareOperator.EQUALS]: 'equals',
+  [CompareOperator.NOTEQUALS]: 'not equals',
+  [CompareOperator.LESSTHAN]: 'less than',
+  [CompareOperator.GREATERTHAN]: 'greater than',
+  [CompareOperator.GREATOREQUALS]: 'greater or equals',
+  [CompareOperator.LESSOREQUAL]: 'less or equals',
   [CompareOperator.CONTAINS]: 'contains',
 };
 

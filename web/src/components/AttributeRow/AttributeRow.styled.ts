@@ -1,6 +1,6 @@
 import {CopyOutlined, PlusOutlined} from '@ant-design/icons';
 import {Tooltip, Typography} from 'antd';
-import styled, {css} from 'styled-components';
+import styled from 'styled-components';
 
 export const AttributeRow = styled.div`
   display: grid;
@@ -31,39 +31,6 @@ export const TextContainer = styled.div`
 
 export const Text = styled(Typography.Text)`
   font-size: 12px;
-`;
-
-export const ValueText = styled(Text)<{isCollapsed: boolean}>`
-  cursor: pointer;
-
-  ${({isCollapsed}) =>
-    isCollapsed
-      ? css`
-          word-break: break-all;
-        `
-      : css`
-          display: -webkit-box;
-          -webkit-line-clamp: 3;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-        `}
-
-  pre {
-    margin: 0;
-    background: #fbfbff;
-    border: 1px solid #c9cedb;
-    ${({isCollapsed}) =>
-      isCollapsed
-        ? css`
-            word-break: break-all;
-          `
-        : css`
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-          `}
-  }
 `;
 
 export const IconContainer = styled.div`
