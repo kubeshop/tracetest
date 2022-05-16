@@ -12,11 +12,12 @@ export const isJson = (str: string) => {
   } catch (e) {
     return false;
   }
-  return true;
+
+  return Number.isNaN(Number(str)) && true;
 };
 
-const visiblePortion = 70;
+const visiblePortion = 64;
 
 export function visiblePortionFuction() {
-  return {visiblePortion, height: `calc(100% - ${visiblePortion}px - 77px)`};
+  return {visiblePortion, height: `calc(100% - ${visiblePortion}px - 60px)`};
 }

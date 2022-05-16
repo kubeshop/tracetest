@@ -40,7 +40,7 @@ const ResultCardList: React.FC<IResultCardListProps> = ({resultList}) => {
         </S.TextContainer>
         <S.FailedContainer>
           <Badge count="F" />
-          <Tooltip title="The number of Total/Pass/Fail assertions">
+          <Tooltip color="#FBFBFF" title="The number of Total/Pass/Fail assertions">
             <QuestionCircleOutlined style={{color: '#8C8C8C', cursor: 'pointer'}} />
           </Tooltip>
         </S.FailedContainer>

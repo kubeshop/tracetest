@@ -1,4 +1,4 @@
-import {createTest, deleteTest} from '../utils/common';
+import {createTest, deleteTest, testId} from '../utils/common';
 
 describe('Create Assertion', () => {
   before(() => {
@@ -10,8 +10,9 @@ describe('Create Assertion', () => {
   });
 
   it('should create a basic assertion', () => {
-    cy.get('[data-cy=collapse-test]').first().click();
-    cy.get('[data-cy=test-details-link]').first().click();
+    cy.visit(`http://localhost:3000/test/${testId}`);
+    cy.get('[data-cy^=result-card]').first().click();
+
     cy.location('href').should('match', /\/test\/.*/i);
 
     cy.get(`[data-cy^=test-run-result-]`).first().click();
@@ -84,7 +85,8 @@ describe('Create Assertion', () => {
     cy.get('#add-assertion-modal-ok-button').click();
 
     cy.get('[data-cy=assertion-table]').should('have.lengthOf', 2);
+    cy.get('[data-cy=trace-drawer').click();
 
-    cy.get('[data-cy=test-results-assertion-table]').should('have.lengthOf', 2);
+    cy.get('[data-cy=assertion-card"]').should('be.visible');
   });
 });

@@ -56,7 +56,7 @@ const TestCard: React.FC<ITestCardProps> = ({
           <Button
             type="primary"
             ghost
-            data-cy="test-run-button"
+            data-cy={`test-run-button-${testId}`}
             onClick={event => {
               event.stopPropagation();
               onRunTest(testId);
@@ -71,11 +71,13 @@ const TestCard: React.FC<ITestCardProps> = ({
       {isCollapsed && Boolean(resultList.length) && (
         <S.ResultListContainer>
           <ResultCardList resultList={resultList} />
-          <S.TestDetails>
-            <S.TestDetailsLink data-cy="test-details-link" onClick={() => onClick(testId)}>
-              Explore all test details
-            </S.TestDetailsLink>
-          </S.TestDetails>
+          {resultList.length === 5 && (
+            <S.TestDetails>
+              <S.TestDetailsLink data-cy="test-details-link" onClick={() => onClick(testId)}>
+                Explore all test details
+              </S.TestDetailsLink>
+            </S.TestDetails>
+          )}
         </S.ResultListContainer>
       )}
     </S.TestCard>

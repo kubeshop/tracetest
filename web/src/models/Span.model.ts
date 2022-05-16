@@ -1,7 +1,7 @@
 import {SemanticGroupNames, SemanticGroupsSignature} from '../constants/SemanticGroupNames.constants';
 import {LOCATION_NAME} from '../constants/Span.constants';
 import {IItemSelector} from '../types/Assertion.types';
-import {IInstrumentationLibrary, IRawSpan, IResource, IResourceSpan, ISpan} from '../types/Span.types';
+import {IRawSpan, IResourceSpan, ISpan} from '../types/Span.types';
 import {ISpanAttribute} from '../types/SpanAttribute.types';
 import SpanAttribute from './SpanAttribute.model';
 
@@ -32,18 +32,12 @@ const getSpanSignature = (attributes: Record<string, ISpanAttribute>, type: Sema
   }, []);
 };
 
-const Span = (
-  rawSpan: IRawSpan,
-  {attributes: resourceAttributes = []}: IResource,
-  instrumentationLibrary: IInstrumentationLibrary
-): ISpan => {
-  const attributesMap = rawSpan.attributes
-    .concat(resourceAttributes)
-    .reduce<Record<string, ISpanAttribute>>((map, rawSpanAttribute) => {
-      const spanAttribute = SpanAttribute(rawSpanAttribute);
+const Span = (rawSpan: IRawSpan): ISpan => {
+  const attributesMap = rawSpan.attributes.reduce<Record<string, ISpanAttribute>>((map, rawSpanAttribute) => {
+    const spanAttribute = SpanAttribute(rawSpanAttribute);
 
-      return {...map, [spanAttribute.name]: SpanAttribute(rawSpanAttribute)};
-    }, {});
+    return {...map, [spanAttribute.name]: SpanAttribute(rawSpanAttribute)};
+  }, {});
 
   const duration = Number(
     ((Number(rawSpan.endTimeUnixNano) - Number(rawSpan.startTimeUnixNano)) / 1000 / 1000).toFixed(1)
@@ -54,7 +48,6 @@ const Span = (
     ...rawSpan,
     attributes: attributesMap,
     attributeList: Object.entries(attributesMap).map(([key, {value}]) => ({key, value})),
-    instrumentationLibrary,
     type,
     duration,
     signature: getSpanSignature(attributesMap, type),
@@ -62,11 +55,9 @@ const Span = (
 };
 
 Span.createFromResourceSpanList = (resourceSpans: IResourceSpan[]): ISpan[] =>
-  resourceSpans.reduce<ISpan[]>((spanList, {resource, instrumentationLibrarySpans}) => {
+  resourceSpans.reduce<ISpan[]>((spanList, {instrumentationLibrarySpans}) => {
     const spans = instrumentationLibrarySpans
-      .flatMap<ISpan[]>(({instrumentationLibrary, spans: innerSpans}) =>
-        innerSpans.map(span => Span(span, resource, instrumentationLibrary))
-      )
+      .flatMap<ISpan[]>(({spans: innerSpans}) => innerSpans.map(span => Span(span)))
       .flat();
 
     return spanList.concat(spans);

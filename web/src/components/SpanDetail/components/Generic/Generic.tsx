@@ -1,16 +1,17 @@
 import {Tabs} from 'antd';
 import React from 'react';
-import SpanAttributesTable from '../../../SpanAttributesTable/SpanAttributesTable';
+import AttributeList from '../../../AttributeList';
 import Assertions from '../../Assertions';
-import {ISpanDetailProps} from '../../SpanDetail';
+import {ISpanDetailsComponentProps} from '../../SpanDetail';
 import * as S from '../../SpanDetail.styled';
 
-const Generic: React.FC<ISpanDetailProps> = ({
+const Generic: React.FC<ISpanDetailsComponentProps> = ({
   span: {attributeList = []} = {},
   span,
-  assertionsResultList = [],
+  assertionsResultList,
   testId,
   resultId,
+  onCreateAssertion,
 }) => {
   return (
     <S.SpanTabs data-cy="span-details-attributes">
@@ -18,7 +19,7 @@ const Generic: React.FC<ISpanDetailProps> = ({
         <Assertions span={span} assertionsResultList={assertionsResultList} testId={testId} resultId={resultId} />
       </Tabs.TabPane>
       <Tabs.TabPane tab="Attribute list" key="span-attribute-list">
-        <SpanAttributesTable spanAttributesList={attributeList} />
+        <AttributeList attributeList={attributeList} onCreateAssertion={onCreateAssertion} />
       </Tabs.TabPane>
     </S.SpanTabs>
   );

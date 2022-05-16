@@ -8,7 +8,7 @@ export const TestHeader = styled.div`
   gap: 14px;
   align-items: center;
   justify-content: space-between;
-  padding: 24px 32px;
+  padding: 19px 24px;
   border-bottom: 1px solid rgba(3, 24, 73, 0.1);
   width: 100%;
 `;
@@ -19,6 +19,7 @@ export const TestName = styled(Typography.Title).attrs({
   && {
     margin: 0;
     font-weight: 400;
+    font-size: 18px;
   }
 `;
 

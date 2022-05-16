@@ -1,5 +1,5 @@
 import {DOCUMENTATION_URL, GITHUB_URL} from '../../../src/constants/Common.constants';
-import {createTest, deleteTest} from '../utils/common';
+import {deleteTest} from '../utils/common';
 
 describe('Home', () => {
   beforeEach(() => {
@@ -16,21 +16,12 @@ describe('Home', () => {
   it('should render the list of tests', () => {
     cy.get('[data-cy=create-test-button]').should('be.visible');
 
-    cy.get('[data-cy=test-list]').should('be.visible');
-  });
-
-  it('should go to the test details after clicking the see all details button', () => {
-    createTest();
-
-    cy.visit('http://localhost:3000/');
-    cy.get('[data-cy=collapse-test]').first().click();
-    cy.get('[data-cy=test-details-link]').first().click();
-    cy.location('href').should('match', /\/test\/.*/i);
+    cy.get('[data-cy=test-list]').should('exist');
   });
 
   it('should run a test from the home page', () => {
     cy.visit('http://localhost:3000/');
-    cy.get('[data-cy=test-run-button]').first().click();
+    cy.get('[data-cy^=test-run-button]', {timeout: 10000}).first().click();
     cy.location('href').should('match', /\/test\/.*/i);
 
     deleteTest();

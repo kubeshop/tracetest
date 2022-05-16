@@ -11,7 +11,7 @@ import * as S from './CreateAssertionModal.styled';
 import CreateAssertionModalAnalyticsService from '../../services/Analytics/CreateAssertionModalAnalytics.service';
 import {IAssertion, IItemSelector, ISpanSelector} from '../../types/Assertion.types';
 import {CompareOperator} from '../../constants/Operator.constants';
-import {ISpan} from '../../types/Span.types';
+import {ISpan, ISpanFlatAttribute} from '../../types/Span.types';
 import {LOCATION_NAME} from '../../constants/Span.constants';
 import {Steps} from '../GuidedTour/assertionStepList';
 import useAttributeList from './useAttributeList';
@@ -44,6 +44,7 @@ interface TCreateAssertionFormProps {
   affectedSpanList: ISpan[];
   testId: string;
   assertion?: IAssertion;
+  defaultAttributeList: ISpanFlatAttribute[];
 }
 
 const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
@@ -54,6 +55,7 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
   onCreate,
   onSelectorList,
   affectedSpanList,
+  defaultAttributeList,
 }) => {
   const [createAssertion] = useCreateAssertionMutation();
   const [updateAssertion] = useUpdateAssertionMutation();
@@ -71,6 +73,14 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
       }));
     }
 
+    if (defaultAttributeList.length) {
+      return defaultAttributeList.map(({key, value}) => ({
+        key,
+        compareOp: CompareOperator.EQUALS,
+        value,
+      }));
+    }
+
     return [
       {
         key: '',
@@ -78,7 +88,7 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
         value: '',
       },
     ];
-  }, [assertion]);
+  }, [assertion, defaultAttributeList]);
 
   useEffect(() => {
     onForm(form);
@@ -163,7 +173,11 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
     >
       <div style={{marginBottom: 8}}>
         <Typography.Text style={{marginRight: 8}}>Selectors</Typography.Text>
-        <Tooltip title="Pick the attributes that filter the list of spans selected by this selector" placement="right">
+        <Tooltip
+          color="#FBFBFF"
+          title="Pick the attributes that filter the list of spans selected by this selector"
+          placement="right"
+        >
           <QuestionCircleOutlined style={{color: '#8C8C8C'}} />
         </Tooltip>
       </div>
@@ -172,7 +186,11 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
       </Form.Item>
       <div style={{marginTop: 24, marginBottom: 8}}>
         <Typography.Text style={{marginRight: 8}}>Span Assertions</Typography.Text>
-        <Tooltip title="Define the checks to run against each span selected by the list of selectors" placement="right">
+        <Tooltip
+          color="#FBFBFF"
+          title="Define the checks to run against each span selected by the list of selectors"
+          placement="right"
+        >
           <QuestionCircleOutlined style={{color: '#8C8C8C'}} />
         </Tooltip>
       </div>

@@ -1,7 +1,9 @@
 import {capitalize} from 'lodash';
+import {useCallback} from 'react';
 import {SemanticGroupNames, SemanticGroupNamesToText} from '../../constants/SemanticGroupNames.constants';
+import {useCreateAssertionModal} from '../CreateAssertionModal/CreateAssertionModalProvider';
 import SpanService from '../../services/Span.service';
-import {ISpan} from '../../types/Span.types';
+import {ISpan, ISpanFlatAttribute} from '../../types/Span.types';
 import Generic from './components/Generic';
 import Http from './components/Http';
 import SpanHeader from './SpanHeader';
@@ -14,7 +16,11 @@ export interface ISpanDetailProps {
   testId?: string;
   span?: ISpan;
   resultId?: string;
-  assertionsResultList?: IAssertionResultList[];
+}
+
+export interface ISpanDetailsComponentProps extends ISpanDetailProps {
+  assertionsResultList: IAssertionResultList[];
+  onCreateAssertion(attribute: ISpanFlatAttribute): void;
 }
 
 const ComponentMap: Record<string, typeof Generic> = {
@@ -29,6 +35,7 @@ const getSpanTitle = (span: ISpan) => {
 };
 
 const SpanDetail: React.FC<ISpanDetailProps> = ({span, testId, resultId}) => {
+  const {open} = useCreateAssertionModal();
   const Component = ComponentMap[span?.type || ''] || Generic;
 
   const title = (span && getSpanTitle(span)) || '';
@@ -36,10 +43,28 @@ const SpanDetail: React.FC<ISpanDetailProps> = ({span, testId, resultId}) => {
     AssertionSelectors.selectAssertionResultListBySpan(testId, resultId, span?.spanId)
   );
 
+  const onCreateAssertion = useCallback(
+    (attribute: ISpanFlatAttribute) => {
+      open({
+        span,
+        resultId: resultId!,
+        testId: testId!,
+        defaultAttributeList: [attribute],
+      });
+    },
+    [open, resultId, span, testId]
+  );
+
   return (
     <S.SpanDetail>
       <SpanHeader title={title} />
-      <Component span={span} assertionsResultList={assertionsResultList} testId={testId} resultId={resultId} />
+      <Component
+        span={span}
+        assertionsResultList={assertionsResultList}
+        testId={testId}
+        resultId={resultId}
+        onCreateAssertion={onCreateAssertion}
+      />
     </S.SpanDetail>
   );
 };

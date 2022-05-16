@@ -4,6 +4,7 @@ import {useNavigate, useParams} from 'react-router-dom';
 import {ReactFlowProvider} from 'react-flow-renderer';
 import Layout from 'components/Layout';
 import TestHeader from 'components/TestHeader';
+import CreateAssertionModalProvider from 'components/CreateAssertionModal/CreateAssertionModalProvider';
 import {useGetResultByIdQueryPolling} from './hooks/useGetResultByIdQueryPolling';
 import {useUpdateTestResultEffect} from './hooks/useUpdateTestResultEffect';
 import {useUpdateFirstLoadEffect} from './hooks/useUpdateFirstLoadEffect';
@@ -17,6 +18,7 @@ import {GuidedTours} from '../../services/GuidedTour.service';
 import FailedTrace from '../../components/FailedTrace';
 import Trace from '../../components/Trace';
 import * as S from './Trace.styled';
+
 
 const TracePage = () => {
   const dispatch = useAppDispatch();
@@ -40,24 +42,26 @@ const TracePage = () => {
 
   return test && result ? (
     <ReactFlowProvider>
-      <Layout>
-        <S.Wrapper>
-          <TestHeader test={test} onBack={() => navigate(`/test/${testId}`)} testState={result.state} />
-          <FailedTrace
-            onRunTest={onRunTest}
-            testId={testId}
-            isDisplayingError={isDisplayingError}
-            onEdit={() => console.log('onEdit')}
-          />
-          <Trace
-            displayError={isDisplayingError}
-            minHeight={height}
-            testResultDetails={result}
-            test={test}
-            visiblePortion={visiblePortion}
-          />
-        </S.Wrapper>
-      </Layout>
+      <CreateAssertionModalProvider>
+        <Layout>
+          <S.Wrapper>
+            <TestHeader test={test} onBack={() => navigate(`/test/${testId}`)} testState={result.state} />
+            <FailedTrace
+              onRunTest={onRunTest}
+              testId={testId}
+              isDisplayingError={isDisplayingError}
+              onEdit={() => console.log('onEdit')}
+            />
+            <Trace
+              displayError={isDisplayingError}
+              minHeight={height}
+              testResultDetails={result}
+              test={test}
+              visiblePortion={visiblePortion}
+            />
+          </S.Wrapper>
+        </Layout>
+      </CreateAssertionModalProvider>
     </ReactFlowProvider>
   ) : null;
 };

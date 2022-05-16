@@ -20,6 +20,6 @@ export interface ITest {
     id: string;
     request: IHTTPRequest;
   };
-  assertions: Array<IAssertion>;
+  assertions?: Array<IAssertion>;
   lastTestResult?: ITestRunResult;
 }

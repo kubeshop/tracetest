@@ -43,7 +43,6 @@ export type ISpan = Modify<
   IRawSpan,
   {
     attributes: Record<string, ISpanAttribute>;
-    instrumentationLibrary: IInstrumentationLibrary;
     type: SemanticGroupNames;
     duration: number;
     signature: IItemSelector[];

@@ -1,6 +1,6 @@
+import {Drawer} from 'antd';
 import {useState} from 'react';
 import {ITestRunResult} from 'types/TestRunResult.types';
-import ResizableDrawer from '../ResizableDrawer/ResizableDrawer';
 import TestResults from '../TestResults';
 
 interface IProps {
@@ -10,18 +10,26 @@ interface IProps {
 }
 
 const TraceDrawer: React.FC<IProps> = ({visiblePortion, onSelectSpan, testResultDetails}) => {
-  const [max, setMax] = useState(600);
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
-    <ResizableDrawer open min={visiblePortion} max={max}>
+    <Drawer
+      placement="bottom"
+      closable={false}
+      mask={false}
+      visible
+      data-cy="trace-drawer"
+      height={isCollapsed ? '420px' : visiblePortion}
+      style={{overflow: 'hidden'}}
+      bodyStyle={{overflow: 'hidden', padding: 0}}
+    >
       <TestResults
-        max={max}
+        onHeaderClick={() => setIsCollapsed(!isCollapsed)}
         result={testResultDetails!}
-        setMax={setMax}
         visiblePortion={visiblePortion}
         onSpanSelected={onSelectSpan}
       />
-    </ResizableDrawer>
+    </Drawer>
   );
 };
 
