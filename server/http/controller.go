@@ -2,27 +2,37 @@ package http
 
 import (
 	"context"
+	"encoding/hex"
 	"errors"
 	"net/http"
 
 	"github.com/kubeshop/tracetest/analytics"
+	"github.com/kubeshop/tracetest/assertions/selectors"
 	"github.com/kubeshop/tracetest/executor"
 	"github.com/kubeshop/tracetest/openapi"
 	"github.com/kubeshop/tracetest/testdb"
 	"github.com/kubeshop/tracetest/tracedb"
+	"github.com/kubeshop/tracetest/traces"
 )
 
 type controller struct {
-	traceDB tracedb.TraceDB
-	testDB  testdb.Repository
-	runner  executor.Runner
+	traceDB         tracedb.TraceDB
+	testDB          testdb.Repository
+	runner          executor.Runner
+	assertionRunner executor.AssertionRunner
 }
 
-func NewController(traceDB tracedb.TraceDB, testDB testdb.Repository, runner executor.Runner) openapi.ApiApiServicer {
+func NewController(
+	traceDB tracedb.TraceDB,
+	testDB testdb.Repository,
+	runner executor.Runner,
+	assertionRunner executor.AssertionRunner,
+) openapi.ApiApiServicer {
 	return &controller{
-		traceDB: traceDB,
-		testDB:  testDB,
-		runner:  runner,
+		traceDB:         traceDB,
+		testDB:          testDB,
+		runner:          runner,
+		assertionRunner: assertionRunner,
 	}
 }
 
@@ -262,4 +272,62 @@ func (s *controller) GetAssertions(ctx context.Context, testID string) (openapi.
 	}
 
 	return openapi.Response(http.StatusOK, assertions), nil
+}
+
+func (s *controller) GetTestResultSelectedSpans(ctx context.Context, testID string, resultID string, selectorQuery string) (openapi.ImplResponse, error) {
+	selector, err := selectors.New(selectorQuery)
+	if err != nil {
+		return openapi.Response(http.StatusBadRequest, "invalid selector query"), nil
+	}
+
+	result, err := s.testDB.GetResult(ctx, resultID)
+	if err != nil {
+		return openapi.Response(http.StatusInternalServerError, ""), nil
+	}
+
+	trace, err := traces.FromOtel(result.Trace)
+	if err != nil {
+		return openapi.Response(http.StatusInternalServerError, ""), nil
+	}
+
+	selectedSpans := selector.Filter(trace)
+	selectedSpanIds := make([]string, len(selectedSpans))
+
+	for i, span := range selectedSpans {
+		selectedSpanIds[i] = hex.EncodeToString(span.ID[:])
+	}
+
+	return openapi.Response(http.StatusOK, selectedSpanIds), nil
+}
+
+func (s *controller) RerunTestResult(ctx context.Context, testID string, resultID string) (openapi.ImplResponse, error) {
+	test, err := s.testDB.GetTest(ctx, testID)
+	if err != nil {
+		return openapi.Response(http.StatusInternalServerError, err.Error()), err
+	}
+
+	result, err := s.testDB.GetResult(ctx, resultID)
+	if err != nil {
+		return openapi.Response(http.StatusInternalServerError, err.Error()), err
+	}
+
+	result.State = executor.TestRunStateAwaitingTestResults
+	err = s.testDB.UpdateResult(ctx, result)
+	if err != nil {
+		return openapi.Response(http.StatusInternalServerError, err.Error()), err
+	}
+
+	testDefinition, err := executor.ConvertAssertionsIntoTestDefinition(test.Assertions)
+	if err != nil {
+		return openapi.Response(http.StatusInternalServerError, err.Error()), err
+	}
+
+	assertionRequest := executor.AssertionRequest{
+		TestDefinition: testDefinition,
+		Result:         *result,
+	}
+
+	s.assertionRunner.RunAssertions(assertionRequest)
+
+	return openapi.Response(http.StatusOK, result), nil
 }

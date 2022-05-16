@@ -87,6 +87,12 @@ func (c *ApiApiController) Routes() Routes {
 			c.GetTest,
 		},
 		{
+			"GetTestResultSelectedSpans",
+			strings.ToUpper("Get"),
+			"/api/tests/{testId}/s/{resultId}/select",
+			c.GetTestResultSelectedSpans,
+		},
+		{
 			"GetTestRun",
 			strings.ToUpper("Get"),
 			"/api/tests/{testId}/run/{runId}",
@@ -103,6 +109,12 @@ func (c *ApiApiController) Routes() Routes {
 			strings.ToUpper("Get"),
 			"/api/tests",
 			c.GetTests,
+		},
+		{
+			"RerunTestRun",
+			strings.ToUpper("Post"),
+			"/api/tests/{testId}/run/{runId}/rerun",
+			c.RerunTestRun,
 		},
 		{
 			"RunTest",
@@ -242,6 +254,26 @@ func (c *ApiApiController) GetTest(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// GetTestResultSelectedSpans - retrieve spans that will be selected by selector
+func (c *ApiApiController) GetTestResultSelectedSpans(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	query := r.URL.Query()
+	testIdParam := params["testId"]
+
+	resultIdParam := params["resultId"]
+
+	queryParam := query.Get("query")
+	result, err := c.service.GetTestResultSelectedSpans(r.Context(), testIdParam, resultIdParam, queryParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
 // GetTestRun - get test Run
 func (c *ApiApiController) GetTestRun(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
@@ -290,6 +322,24 @@ func (c *ApiApiController) GetTests(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	result, err := c.service.GetTests(r.Context(), takeParam, skipParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// RerunTestRun - rerun a test run
+func (c *ApiApiController) RerunTestRun(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	testIdParam := params["testId"]
+
+	runIdParam := params["runId"]
+
+	result, err := c.service.RerunTestRun(r.Context(), testIdParam, runIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
