@@ -15,7 +15,7 @@ const getSpanAttributeValue = (attribute: IRawSpanAttribute): string => {
   const attributeType = getSpanAttributeValueType(attribute);
   const value = attribute.value[attributeType];
 
-  if (!value) return 'Empty value';
+  if (!value) return '<Empty value>';
   switch (attributeType) {
     case SpanAttributeType.kvlistValue: {
       return JSON.stringify(value);

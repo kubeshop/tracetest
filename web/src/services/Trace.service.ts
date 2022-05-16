@@ -14,9 +14,10 @@ const TraceService = () => ({
   },
   parseTestResultToAssertionResultList(
     assertionResult: TAssertionResultList,
-    {assertions}: ITest,
+    {assertions = []}: ITest,
     trace: ITrace
   ): IAssertionResult[] {
+    console.log('@@', {assertionResult});
     return assertionResult.map(({assertionId, spanAssertionResults = []}) => {
       const assertion = assertions.find(({assertionId: id}) => id === assertionId);
 

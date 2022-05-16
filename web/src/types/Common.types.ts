@@ -5,6 +5,13 @@ export type TRecursivePartial<T> = {
 export interface IEnv {
   measurementId: string;
   analyticsEnabled: string;
-};
+}
 
 export type Modify<T, R> = Omit<T, keyof R> & R;
+
+export interface IMockFactory<T, R> {
+  (): {
+    raw(data?: Partial<R>): R;
+    model(data?: Partial<R>): T;
+  };
+}

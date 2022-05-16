@@ -1,13 +1,13 @@
 import {Typography} from 'antd';
 import styled, {css} from 'styled-components';
-import noResultsIcon from '../../assets/SpanAssertionsEmptyState.svg';
 
 export const Header = styled.div<{visiblePortion: number}>`
   display: flex;
   align-items: center;
   align-content: center;
-  cursor: grab;
+  cursor: pointer;
   width: 100%;
+  background: #F5F5FA;
   ${props =>
     css`
       height: ${props.visiblePortion}px;
@@ -33,22 +33,11 @@ export const CountNumber = styled.span`
 export const Container = styled.div`
   border: 1px solid rgba(0, 0, 0, 0.06);
   margin-bottom: 16px;
-  overflow-y: auto;
+  overflow-y: hidden;
 `;
-
-export const EmptyStateContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 40px;
-  flex-direction: column;
-  gap: 14px;
-`;
-
-export const EmptyStateIcon = styled.img.attrs({
-  src: noResultsIcon,
-})``;
 
 export const Content = styled.div`
   padding: 24px;
+  overflow-y: scroll;
+  height: 330px;
 `;
