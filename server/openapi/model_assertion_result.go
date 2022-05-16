@@ -10,19 +10,16 @@
 package openapi
 
 type AssertionResult struct {
-	Id string `json:"id,omitempty"`
-
-	Attribute string `json:"attribute,omitempty"`
-
-	Comparator string `json:"comparator,omitempty"`
-
-	Expected string `json:"expected,omitempty"`
+	Assertion Assertion `json:"assertion,omitempty"`
 
 	SpanResults []AssertionSpanResult `json:"spanResults,omitempty"`
 }
 
 // AssertAssertionResultRequired checks if the required fields are not zero-ed
 func AssertAssertionResultRequired(obj AssertionResult) error {
+	if err := AssertAssertionRequired(obj.Assertion); err != nil {
+		return err
+	}
 	for _, el := range obj.SpanResults {
 		if err := AssertAssertionSpanResultRequired(el); err != nil {
 			return err

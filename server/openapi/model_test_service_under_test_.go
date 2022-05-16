@@ -10,8 +10,6 @@
 package openapi
 
 type TestServiceUnderTest struct {
-	Id string `json:"id,omitempty"`
-
 	Request HttpRequest `json:"request,omitempty"`
 }
 

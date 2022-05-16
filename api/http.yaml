@@ -25,12 +25,12 @@ definitions:
         format: byte
       auth:
         $ref: "#/definitions/HTTPAuth"
-      proxy:
-        type: object
-        description: TODO
-      certificate:
-        type: object
-        description: TODO
+      # proxy:
+      #   type: object
+      #   description: TODO
+      # certificate:
+      #   type: object
+      #   description: TODO
 
   HTTPResponse:
     type: object

@@ -3,11 +3,16 @@ definitions:
   Trace:
     type: object
     properties:
-      id:
+      traceId:
         type: string
         format: byte
-      rootSpan:
+      tree:
         $ref: "#/definitions/Span"
+      flat:
+        description: falttened version, mapped as spanId -> span{}
+        type: object
+        additionalProperties:
+          $ref: "#/definitions/Span"
 
   Span:
     type: object

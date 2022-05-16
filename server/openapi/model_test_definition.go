@@ -9,13 +9,17 @@
 
 package openapi
 
-// TestDefinition - Map using selector query as key, and an array of assertions as value
 type TestDefinition struct {
-	Definitions map[string][]Assertion `json:"definitions,omitempty"`
+	Definitions []TestDefinitionDefinitions `json:"definitions,omitempty"`
 }
 
 // AssertTestDefinitionRequired checks if the required fields are not zero-ed
 func AssertTestDefinitionRequired(obj TestDefinition) error {
+	for _, el := range obj.Definitions {
+		if err := AssertTestDefinitionDefinitionsRequired(el); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 

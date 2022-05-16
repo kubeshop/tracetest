@@ -14,10 +14,6 @@ definitions:
       serviceUnderTest:
         type: object
         properties:
-          id:
-            type: string
-            format: uuid
-            readOnly: true
           request:
             $ref: "./http.yaml#/definitions/HTTPRequest"
       definition:
@@ -29,17 +25,22 @@ definitions:
 
   TestDefinition:
     type: object
-    description: Map using selector query as key, and an array of assertions as value
     properties:
       definitions:
-        type: object
-        additionalProperties:
-          type: array
-          items:
-            $ref: "#/definitions/Assertion"
+        type: array
+        items:
+          type: object
+          properties:
+            selector:
+              type: string
+            assertions:
+              type: array
+              items:
+                $ref: "#/definitions/Assertion"
     example:
       definitions:
-        'span[tracetest.span.type="http"]':
+        - selector: 'span[tracetest.span.type="http"]'
+          assertions:
           - attr: tracetest.span.duration
             comparator: "<"
             expected: "2000"
@@ -60,11 +61,6 @@ definitions:
         type: string
       expected:
         type: string
-      # TODO: remove this. tmp patch for FE
-      selectors:
-        type: array
-        items:
-          $ref: "#/definitions/SelectorItem"
 
   TestRun:
     type: object
@@ -108,39 +104,47 @@ definitions:
 
   AssertionResults:
     type: object
-    description: Map using selector query as key, and an array of assertions as value
     properties:
       allPassed:
         type: bool
       results:
-        type: object
-        additionalProperties:
-          type: array
-          items:
-            $ref: "#/definitions/AssertionResult"
+        type: array
+        items:
+          type: object
+          properties:
+            selector:
+              type: string
+            results:
+              type: array
+              items:
+                $ref: "#/definitions/AssertionResult"
     example:
+      allPassed: true
       results:
-        'span[tracetest.span.type="http"]':
-          - spanId: "123"
-            observedValue: "test"
-            passed: true
-          - spanId: "456"
-            observedValue: "test"
-            passed: false
+        - selector: 'span[tracetest.span.type="http"]'
+          results:
+          - assertion:
+              attr: http.status_code
+              comparator: "="
+              expected: "200"
+            spanResults:
+              spanId: "123"
+              observedValue: "test"
+              passed: true
+          - assertion:
+              attr: http.status_code
+              comparator: "="
+              expected: "200"
+            spanResults:
+              spanId: "123"
+              observedValue: "test"
+              passed: true
 
   AssertionResult:
     type: object
     properties:
-      id:
-        type: string
-        format: uuid
-        readOnly: true
-      attribute:
-        type: string
-      comparator:
-        type: string
-      expected:
-        type: string
+      assertion:
+        $ref: "#/definitions/Assertion"
       spanResults:
         type: array
         items:
@@ -155,21 +159,3 @@ definitions:
         type: string
       passed:
         type: bool
-
-  SelectorItem:
-    type: object
-    properties:
-      locationName:
-        type: string
-        enum: [RESOURCE_ATTRIBUTES, INSTRUMENTATION_LIBRARY, SPAN, SPAN_ATTRIBUTES]
-        description: Example "SPAN"
-      propertyName:
-        type: string
-        description: Example "operation"
-      value:
-        type: string
-        description: Example "POST /users/verify"
-      valueType:
-        type: string
-        description: TODO(pov) think about value types?
-        enum: [stringValue, intValue]

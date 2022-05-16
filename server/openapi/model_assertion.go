@@ -17,17 +17,10 @@ type Assertion struct {
 	Comparator string `json:"comparator,omitempty"`
 
 	Expected string `json:"expected,omitempty"`
-
-	Selectors []SelectorItem `json:"selectors,omitempty"`
 }
 
 // AssertAssertionRequired checks if the required fields are not zero-ed
 func AssertAssertionRequired(obj Assertion) error {
-	for _, el := range obj.Selectors {
-		if err := AssertSelectorItemRequired(el); err != nil {
-			return err
-		}
-	}
 	return nil
 }
 

@@ -10,14 +10,17 @@
 package openapi
 
 type Trace struct {
-	Id string `json:"id,omitempty"`
+	TraceId string `json:"traceId,omitempty"`
 
-	RootSpan Span `json:"rootSpan,omitempty"`
+	Tree Span `json:"tree,omitempty"`
+
+	// falttened version, mapped as spanId -> span{}
+	Flat map[string]Span `json:"flat,omitempty"`
 }
 
 // AssertTraceRequired checks if the required fields are not zero-ed
 func AssertTraceRequired(obj Trace) error {
-	if err := AssertSpanRequired(obj.RootSpan); err != nil {
+	if err := AssertSpanRequired(obj.Tree); err != nil {
 		return err
 	}
 	return nil
