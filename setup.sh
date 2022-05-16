@@ -31,10 +31,10 @@ echo
 helm repo add kubeshop https://kubeshop.github.io/helm-charts
 helm repo update
 
-# helm install tracetest kubeshop/tracetest \
-#   --namespace $NAMESPACE \
-#   --set tracingBackend=jaeger \
-#   --set jaegerConnectionConfig.endpoint="jaeger-query:16685"
+helm install tracetest kubeshop/tracetest \
+  --namespace $NAMESPACE \
+  --set tracingBackend=jaeger \
+  --set jaegerConnectionConfig.endpoint="jaeger-query:16685"
 
 
 if [ "$SKIP_PMA" = "no" ]; then
