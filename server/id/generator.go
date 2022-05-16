@@ -24,7 +24,7 @@ type randGenerator struct {
 	rand *rand.Rand
 }
 
-func (g randGenerator) UUID() uuuuid.UUID {
+func (g randGenerator) UUID() uuid.UUID {
 	return uuid.New()
 }
 
