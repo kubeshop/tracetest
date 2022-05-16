@@ -1,12 +1,12 @@
 import {Button, Table, Typography} from 'antd';
-import {useMemo, useState} from 'react';
+import {useMemo} from 'react';
 import AssertionTableAnalyticsService from '../../services/Analytics/AssertionTableAnalytics.service';
 import {IAssertion, ISpanAssertionResult} from '../../types/Assertion.types';
 import OperatorService from '../../services/Operator.service';
 import {ISpan} from '../../types/Span.types';
-import CreateAssertionModal from '../CreateAssertionModal';
 import CustomTable from '../CustomTable';
 import * as S from './AssertionsTable.styled';
+import {useCreateAssertionModal} from '../CreateAssertionModal/CreateAssertionModalProvider';
 
 interface IAssertionsResultTableProps {
   assertionResults: ISpanAssertionResult[];
@@ -35,7 +35,7 @@ const AssertionsResultTable: React.FC<IAssertionsResultTableProps> = ({
   testId,
   resultId,
 }) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const {open} = useCreateAssertionModal();
 
   const parsedAssertionList = useMemo<Array<IParsedAssertion>>(
     () =>
@@ -64,7 +64,12 @@ const AssertionsResultTable: React.FC<IAssertionsResultTableProps> = ({
           data-cy="edit-assertion-button"
           onClick={() => {
             AssertionTableAnalyticsService.onEditAssertionButtonClick(assertion.assertionId);
-            setIsModalOpen(true);
+            open({
+              span,
+              assertion,
+              resultId,
+              testId,
+            });
           }}
         >
           Edit
@@ -97,14 +102,6 @@ const AssertionsResultTable: React.FC<IAssertionsResultTableProps> = ({
           )}
         />
       </CustomTable>
-      <CreateAssertionModal
-        open={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        assertion={assertion}
-        span={span}
-        testId={testId}
-        resultId={resultId}
-      />
     </S.AssertionsTableContainer>
   );
 };

@@ -4,6 +4,7 @@ import {IRawTestRunResult, ITestRunResult} from 'types/TestRunResult.types';
 import {TRecursivePartial} from 'types/Common.types';
 import {IAssertion, ITestAssertionResult} from '../../types/Assertion.types';
 import TestRunResult from '../../models/TestRunResult.model';
+import {HTTP_METHOD} from '../../constants/Common.constants';
 
 const TestAPI = createApi({
   reducerPath: 'tests',
@@ -16,7 +17,7 @@ const TestAPI = createApi({
     createTest: build.mutation<ITest, TRecursivePartial<ITest>>({
       query: newTest => ({
         url: `/tests`,
-        method: 'POST',
+        method: HTTP_METHOD.POST,
         body: newTest,
       }),
       invalidatesTags: [{type: 'Test', id: 'LIST'}],
@@ -24,16 +25,16 @@ const TestAPI = createApi({
     runTest: build.mutation<ITestRunResult, string>({
       query: testId => ({
         url: `/tests/${testId}/run`,
-        method: 'POST',
+        method: HTTP_METHOD.POST,
       }),
-      invalidatesTags: (response, error, testId) => [{type: 'TestRunResult', id: `${testId}-LIST`}],
+      invalidatesTags: (response, error, testId) => [
+        {type: 'TestRunResult', id: `${testId}-LIST`},
+        {type: 'Test', id: 'LIST'},
+      ],
     }),
     getTestList: build.query<ITest[], void>({
       query: () => `/tests`,
-      providesTags: result =>
-        result
-          ? [...result.map(i => ({type: 'Test' as const, id: i.testId})), {type: 'Test', id: 'LIST'}]
-          : [{type: 'Test', id: 'LIST'}],
+      providesTags: () => [{type: 'Test', id: 'LIST'}],
     }),
     getTestById: build.query<ITest, string>({
       query: id => `/tests/${id}`,
@@ -50,7 +51,7 @@ const TestAPI = createApi({
     createAssertion: build.mutation<IAssertion, {testId: string; assertion: Partial<IAssertion>}>({
       query: ({testId, assertion}) => ({
         url: `/tests/${testId}/assertions`,
-        method: 'POST',
+        method: HTTP_METHOD.POST,
         body: assertion,
       }),
       invalidatesTags: (result, error, args) => [{type: 'Test', id: args.testId}],
@@ -58,8 +59,15 @@ const TestAPI = createApi({
     updateAssertion: build.mutation<IAssertion, {testId: string; assertionId: string; assertion: Partial<IAssertion>}>({
       query: ({testId, assertion, assertionId}) => ({
         url: `/tests/${testId}/assertions/${assertionId}`,
-        method: 'PUT',
+        method: HTTP_METHOD.PUT,
         body: assertion,
+      }),
+      invalidatesTags: (result, error, args) => [{type: 'Test', id: args.testId}],
+    }),
+    deleteAssertion: build.mutation<IAssertion, {testId: string; assertionId: string}>({
+      query: ({testId, assertionId}) => ({
+        url: `/tests/${testId}/assertions/${assertionId}`,
+        method: HTTP_METHOD.DELETE,
       }),
       invalidatesTags: (result, error, args) => [{type: 'Test', id: args.testId}],
     }),
@@ -77,7 +85,7 @@ const TestAPI = createApi({
     >({
       query: ({testId, resultId, assertionResult}) => ({
         url: `/tests/${testId}/results/${resultId}`,
-        method: 'PUT',
+        method: HTTP_METHOD.PUT,
         body: assertionResult,
       }),
       invalidatesTags: (result, error, {testId, resultId}) => [
@@ -106,7 +114,7 @@ export const {
   useDeleteTestByIdMutation,
   useGetAssertionsQuery,
   useUpdateResultMutation,
-  useLazyGetResultListQuery
+  useLazyGetResultListQuery,
 } = TestAPI;
 export const {endpoints} = TestAPI;
 

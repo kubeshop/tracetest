@@ -57,3 +57,15 @@ export const getResultId = (pathname: string) => {
 
   return resultId;
 };
+
+export const createMultipleTestRuns = (id: string, count: number) => {
+  cy.visit('http://localhost:3000/');
+
+  for (let i = 0; i < count; i += 1) {
+    cy.get(`[data-cy=test-run-button-${id}]`).click();
+    cy.location('pathname').should('match', /\/test\/.*/i);
+    cy.wait(500);
+
+    cy.visit('http://localhost:3000/');
+  }
+};
