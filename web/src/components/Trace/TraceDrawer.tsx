@@ -18,6 +18,7 @@ const TraceDrawer: React.FC<IProps> = ({visiblePortion, onSelectSpan, testResult
       closable={false}
       mask={false}
       visible
+      data-cy="trace-drawer"
       height={isCollapsed ? '420px' : visiblePortion}
       style={{overflow: 'hidden'}}
       bodyStyle={{overflow: 'hidden', padding: 0}}

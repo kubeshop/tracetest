@@ -37,7 +37,7 @@ const AssertionCard: React.FC<IAssertionCardProps> = ({
   );
 
   return (
-    <S.AssertionCard>
+    <S.AssertionCard data-cy="assertion-card">
       <S.Header>
         <div>
           <S.SelectorListText>{selectors.map(({value}) => value).join(' ')}</S.SelectorListText>
