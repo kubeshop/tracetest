@@ -1,6 +1,6 @@
 #!/bin/bash
 
-NAMESPACE="tractest"
+NAMESPACE="tracetest"
 SKIP_PMA="no"
 
 while [[ $# -gt 0 ]]; do
