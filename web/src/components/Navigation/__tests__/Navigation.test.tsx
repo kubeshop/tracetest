@@ -1,16 +1,14 @@
-import {render} from '@testing-library/react';
+import {render, waitFor} from '@testing-library/react';
 import {ReduxWrapperProvider} from '../../../redux/ReduxWrapperProvider';
-import AnalyticsProvider from '../../Analytics';
 import Router from '../Router';
 
 test('Router', async () => {
-  const {container} = render(
-    <AnalyticsProvider>
-      <ReduxWrapperProvider>
-        <Router />
-      </ReduxWrapperProvider>
-    </AnalyticsProvider>
+  const {container, getByTestId} = render(
+    <ReduxWrapperProvider>
+      <Router />
+    </ReduxWrapperProvider>
   );
 
+  await waitFor(() => getByTestId('github-link'));
   expect(container).toMatchSnapshot();
 });

@@ -12,6 +12,7 @@ exports[`Layout 1`] = `
         class="ant-typography sc-dkPtRN jStClu"
       >
         <img
+          alt="tracetest_log"
           data-cy="logo"
           src="Logo.svg"
         />

@@ -12,8 +12,8 @@ test('AssetionsTable', () => {
         sort={1}
         assertion={TestingModels.assertion}
         span={TestingModels.span}
-        resultId="546"
-        testId="234"
+        resultId={TestingModels.resultId}
+        testId={TestingModels.testId}
       />
     </Provider>
   );

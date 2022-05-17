@@ -1,7 +1,9 @@
-import {render} from '@testing-library/react';
+import {render, waitFor} from '@testing-library/react';
 import SpanAttributesTable from '../SpanAttributesTable';
 
-test('SpanAttributesTable', () => {
-  const result = render(<SpanAttributesTable spanAttributesList={[]} />);
-  expect(result.container).toMatchSnapshot();
+test('SpanAttributesTable', async () => {
+  const {container, getByText} = render(<SpanAttributesTable spanAttributesList={[]} />);
+
+  await waitFor(() => getByText('No Data'));
+  expect(container).toMatchSnapshot();
 });

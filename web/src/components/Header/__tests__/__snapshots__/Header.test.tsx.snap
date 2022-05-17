@@ -12,6 +12,7 @@ exports[`Header 1`] = `
         class="ant-typography sc-gsDKAQ esBGBW"
       >
         <img
+          alt="tracetest_log"
           data-cy="logo"
           src="Logo.svg"
         />

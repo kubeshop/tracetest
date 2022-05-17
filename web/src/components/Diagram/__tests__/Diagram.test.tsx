@@ -1,12 +1,11 @@
-import {render} from '@testing-library/react';
+import {render, waitFor} from '@testing-library/react';
 import {ReactFlowProvider} from 'react-flow-renderer';
 import {TestingModels} from '../../../utils/TestingModels';
-import AnalyticsProvider from '../../Analytics';
 import Diagram, {SupportedDiagrams} from '../Diagram';
 
-test('Diagram DAG', () => {
-  const result = render(
-    <AnalyticsProvider>
+test('Diagram DAG', async () => {
+  const {getByText} = render(
+    <div style={{width: 200, height: 200}}>
       <ReactFlowProvider>
         <Diagram
           type={SupportedDiagrams.DAG}
@@ -15,13 +14,14 @@ test('Diagram DAG', () => {
           selectedSpan={TestingModels.span}
         />
       </ReactFlowProvider>
-    </AnalyticsProvider>
+    </div>
   );
-  expect(result.container).toMatchSnapshot();
+  await waitFor(() => getByText('HTTP'));
 });
-test('Diagram Timeline', () => {
-  const result = render(
-    <AnalyticsProvider>
+
+test('Diagram Timeline', async () => {
+  const {getByText} = render(
+    <div style={{width: 200, height: 200}}>
       <ReactFlowProvider>
         <Diagram
           type={SupportedDiagrams.Timeline}
@@ -30,7 +30,8 @@ test('Diagram Timeline', () => {
           selectedSpan={TestingModels.span}
         />
       </ReactFlowProvider>
-    </AnalyticsProvider>
+    </div>
   );
-  expect(result.container).toMatchSnapshot();
+
+  await waitFor(() => getByText('Duration (ms)'));
 });

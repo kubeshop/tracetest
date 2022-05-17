@@ -1,11 +1,11 @@
-import {render} from '@testing-library/react';
+import {render, waitFor} from '@testing-library/react';
 import {ReactFlowProvider} from 'react-flow-renderer';
 import {ReduxWrapperProvider} from '../../../redux/ReduxWrapperProvider';
 import {TestingModels} from '../../../utils/TestingModels';
 import Trace from '../Trace';
 
-test('Trace', () => {
-  const result = render(
+test('Trace', async () => {
+  const {getByText} = render(
     <ReactFlowProvider>
       <ReduxWrapperProvider>
         <div style={{width: 600, height: 600}}>
@@ -20,5 +20,6 @@ test('Trace', () => {
       </ReduxWrapperProvider>
     </ReactFlowProvider>
   );
-  expect(result.container).toMatchSnapshot();
+
+  await waitFor(() => getByText('HTTP'));
 });

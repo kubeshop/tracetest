@@ -1,14 +1,14 @@
-import {render} from '@testing-library/react';
+import {render, waitFor} from '@testing-library/react';
 import TestResults from '../TestResults';
 import {TestingModels} from '../../../utils/TestingModels';
 import {ReduxWrapperProvider} from '../../../redux/ReduxWrapperProvider';
 
-test('SpanAttributesTable', () => {
+test('SpanAttributesTable', async () => {
   const setMax = jest.fn();
   const onSpanSelected = jest.fn();
   const onPointerDown = jest.fn();
   const setHeight = jest.fn();
-  const result = render(
+  const {getByText} = render(
     <ReduxWrapperProvider>
       <TestResults
         result={TestingModels.testRunResult}
@@ -22,5 +22,5 @@ test('SpanAttributesTable', () => {
       />
     </ReduxWrapperProvider>
   );
-  expect(result.container).toMatchSnapshot();
+  await waitFor(() => getByText('Trace Information'));
 });

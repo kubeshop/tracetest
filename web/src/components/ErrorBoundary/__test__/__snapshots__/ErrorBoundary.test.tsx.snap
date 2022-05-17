@@ -33,7 +33,7 @@ exports[`ErrorBoundary 1`] = `
     <div
       style="display: flex; max-width: 800px; padding: 24px;"
     >
-      [object Object]
+      Error: cannot find value of undefined
     </div>
   </div>
 </div>
