@@ -1,28 +1,18 @@
 import {Dropdown, Menu} from 'antd';
 import * as S from './TestCard.styled';
+import {useOnDeleteCallback} from './useOnDeleteCallback';
 
-interface ITestCardActions {
+interface IProps {
   testId: string;
+
   onDelete(): void;
 }
 
-const TestCardActions: React.FC<ITestCardActions> = ({testId, onDelete}) => {
+const TestCardActions: React.FC<IProps> = ({testId, onDelete}) => {
+  const onClick = useOnDeleteCallback(onDelete);
   return (
     <Dropdown
-      overlay={
-        <Menu>
-          <Menu.Item
-            data-cy="test-delete-button"
-            onClick={({domEvent}) => {
-              domEvent.stopPropagation();
-              onDelete();
-            }}
-            key="delete"
-          >
-            Delete
-          </Menu.Item>
-        </Menu>
-      }
+      overlay={<Menu items={[{key: 'delete', label: <p data-cy="delete">Delete</p>, onClick}]} />}
       placement="bottomLeft"
       trigger={['click']}
     >

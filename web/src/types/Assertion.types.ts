@@ -35,11 +35,13 @@ export interface ITestAssertionResult {
   assertionResult: TAssertionResultList;
 }
 
+export interface SpanAssertionResult {
+  span: ISpan;
+  resultList: ISpanAssertionResult[];
+}
+
 export interface IAssertionResult {
-  spanListAssertionResult: {
-    span: ISpan;
-    resultList: ISpanAssertionResult[];
-  }[];
+  spanListAssertionResult: SpanAssertionResult[];
   assertion: IAssertion;
 }
 
@@ -59,4 +61,4 @@ export interface ISpanAssertionResult2 {
 export interface IAssertionResultList {
   assertion: IAssertion;
   assertionResultList: ISpanAssertionResult[];
-};
+}

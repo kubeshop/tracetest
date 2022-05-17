@@ -1,0 +1,132 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AssetionsTable 1`] = `
+<div>
+  <div
+    class="sc-gsDKAQ hZxeIA"
+    data-cy="assertion-table"
+  >
+    <div
+      class="sc-dkPtRN diGMvB"
+    >
+      <h5
+        class="ant-typography"
+        style="margin: 0px;"
+      >
+        Assertion #
+        1
+        <span
+          class="ant-badge ant-badge-not-a-wrapper sc-hKwDye wxfDf"
+        />
+      </h5>
+      <button
+        class="ant-btn ant-btn-link"
+        data-cy="edit-assertion-button"
+        type="button"
+      >
+        <span>
+          Edit
+        </span>
+      </button>
+    </div>
+    <div
+      class="ant-table-wrapper sc-bdvvtL kLJHSf"
+    >
+      <div
+        class="ant-spin-nested-loading"
+      >
+        <div
+          class="ant-spin-container"
+        >
+          <div
+            class="ant-table ant-table-small ant-table-bordered ant-table-layout-fixed"
+          >
+            <div
+              class="ant-table-container"
+            >
+              <div
+                class="ant-table-content"
+              >
+                <table
+                  style="table-layout: fixed;"
+                >
+                  <colgroup>
+                    <col
+                      style="width: 50%;"
+                    />
+                  </colgroup>
+                  <thead
+                    class="ant-table-thead"
+                  >
+                    <tr>
+                      <th
+                        class="ant-table-cell ant-table-cell-ellipsis"
+                        title="Property"
+                      >
+                        Property
+                      </th>
+                      <th
+                        class="ant-table-cell"
+                      >
+                        Comparison
+                      </th>
+                      <th
+                        class="ant-table-cell"
+                      >
+                        Value
+                      </th>
+                      <th
+                        class="ant-table-cell"
+                      >
+                        Actual
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody
+                    class="ant-table-tbody"
+                  >
+                    <tr
+                      class="ant-table-row ant-table-row-level-0"
+                      data-row-key=""
+                    >
+                      <td
+                        class="ant-table-cell ant-table-cell-ellipsis"
+                        title=""
+                      >
+                        <span
+                          data-cy="assertion-check-property"
+                        />
+                      </td>
+                      <td
+                        class="ant-table-cell"
+                      >
+                        equals
+                      </td>
+                      <td
+                        class="ant-table-cell"
+                      >
+                        
+                      </td>
+                      <td
+                        class="ant-table-cell"
+                      >
+                        <span
+                          class="ant-typography ant-typography-danger"
+                        >
+                          <strong>
+                            New request
+                          </strong>
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
