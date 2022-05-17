@@ -16,10 +16,11 @@ func TestAssertion(t *testing.T) {
 
 	spanID := id.NewRandGenerator().SpanID()
 	cases := []struct {
-		name           string
-		testDef        model.Definition
-		trace          traces.Trace
-		expectedResult model.Results
+		name              string
+		testDef           model.Definition
+		trace             traces.Trace
+		expectedResult    model.Results
+		expectedAllPassed bool
 	}{
 		{
 			name: "CanAssert",
@@ -41,6 +42,7 @@ func TestAssertion(t *testing.T) {
 					},
 				},
 			},
+			expectedAllPassed: true,
 			expectedResult: model.Results{
 				`span[service.name="Pokeshop"]`: []model.AssertionResult{
 					{
@@ -67,7 +69,9 @@ func TestAssertion(t *testing.T) {
 			cl := c
 			t.Parallel()
 
-			actual := assertions.Assert(cl.testDef, cl.trace)
+			actual, allPassed := assertions.Assert(cl.testDef, cl.trace)
+
+			assert.Equal(t, cl.expectedAllPassed, allPassed)
 
 			for expectedSel, expectedAssertionResults := range cl.expectedResult {
 				actualAssertionResults, ok := actual[expectedSel]

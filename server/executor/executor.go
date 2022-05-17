@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/kubeshop/tracetest/openapi"
+	"github.com/kubeshop/tracetest/model"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/contrib/propagators/aws/xray"
 	"go.opentelemetry.io/contrib/propagators/b3"
@@ -36,7 +36,7 @@ func New() (*TestExecutor, error) {
 	}, nil
 }
 
-func (te *TestExecutor) Execute(test *openapi.Test, tid trace.TraceID, sid trace.SpanID) (openapi.HttpResponse, error) {
+func (te *TestExecutor) Execute(test model.Test, tid trace.TraceID, sid trace.SpanID) (model.HTTPResponse, error) {
 
 	client := http.Client{
 		Transport: otelhttp.NewTransport(http.DefaultTransport,
@@ -65,16 +65,15 @@ func (te *TestExecutor) Execute(test *openapi.Test, tid trace.TraceID, sid trace
 	if tReq.Body != "" {
 		body = bytes.NewBufferString(tReq.Body)
 	}
-	req, err := http.NewRequest(strings.ToUpper(tReq.Method), tReq.Url, body)
+	req, err := http.NewRequest(strings.ToUpper(string(tReq.Method)), tReq.URL, body)
 	if err != nil {
-		return openapi.HttpResponse{}, err
+		return model.HTTPResponse{}, err
 	}
 	for _, h := range tReq.Headers {
 		req.Header.Set(h.Key, h.Value)
 	}
 	switch test.ServiceUnderTest.Request.Auth.Type {
 	case "apiKey":
-
 		switch test.ServiceUnderTest.Request.Auth.ApiKey.In {
 		case "query":
 			q := req.URL.Query()
@@ -92,17 +91,17 @@ func (te *TestExecutor) Execute(test *openapi.Test, tid trace.TraceID, sid trace
 
 	resp, err := client.Do(req.WithContext(trace.ContextWithSpanContext(context.Background(), sc)))
 	if err != nil {
-		return openapi.HttpResponse{}, err
+		return model.HTTPResponse{}, err
 	}
 
 	return mapResp(resp), nil
 }
 
-func mapResp(resp *http.Response) openapi.HttpResponse {
-	var mappedHeaders []openapi.HttpHeader
+func mapResp(resp *http.Response) model.HTTPResponse {
+	var mappedHeaders []model.HTTPHeader
 	for key, headers := range resp.Header {
 		for _, val := range headers {
-			val := openapi.HttpHeader{
+			val := model.HTTPHeader{
 				Key:   key,
 				Value: val,
 			}
@@ -116,9 +115,9 @@ func mapResp(resp *http.Response) openapi.HttpResponse {
 		fmt.Println(err)
 	}
 
-	return openapi.HttpResponse{
+	return model.HTTPResponse{
 		Status:     resp.Status,
-		StatusCode: int32(resp.StatusCode),
+		StatusCode: resp.StatusCode,
 		Headers:    mappedHeaders,
 		Body:       body,
 	}

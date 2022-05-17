@@ -323,8 +323,8 @@ func (s *controller) RerunTestResult(ctx context.Context, testID string, resultI
 	}
 
 	assertionRequest := executor.AssertionRequest{
-		TestDefinition: testDefinition,
-		Result:         *result,
+		Definition: testDefinition,
+		Result:     *result,
 	}
 
 	s.assertionRunner.RunAssertions(assertionRequest)

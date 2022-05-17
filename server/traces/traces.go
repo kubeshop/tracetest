@@ -7,6 +7,11 @@ import (
 type Trace struct {
 	ID       trace.TraceID
 	RootSpan Span
+	Flat     map[trace.SpanID]*Span
+}
+
+func (t Trace) Equals(in Trace) bool {
+	return false
 }
 
 type Attributes map[string]string

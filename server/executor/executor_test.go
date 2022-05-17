@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/kubeshop/tracetest/executor"
+	"github.com/kubeshop/tracetest/model"
 	"github.com/kubeshop/tracetest/openapi"
 	"github.com/stretchr/testify/assert"
 	"go.opentelemetry.io/otel/trace"
@@ -39,13 +40,13 @@ func TestExecuteGet(t *testing.T) {
 	ex, err := executor.New()
 	assert.NoError(t, err)
 
-	test := &openapi.Test{
+	test := model.Test{
 		Name: "test",
-		ServiceUnderTest: openapi.TestServiceUnderTest{
-			Request: openapi.HttpRequest{
-				Url:    server.URL,
-				Method: "GET",
-				Headers: []openapi.HttpHeader{
+		ServiceUnderTest: model.ServiceUnderTest{
+			Request: model.HTTPRequest{
+				URL:    server.URL,
+				Method: model.HTTPMethodGET,
+				Headers: []model.HTTPHeader{
 					{Key: "Key1", Value: "Value1"},
 				},
 				Body: "body",
@@ -92,13 +93,13 @@ func TestExecutePost(t *testing.T) {
 	ex, err := executor.New()
 	assert.NoError(t, err)
 
-	test := &openapi.Test{
+	test := model.Test{
 		Name: "test",
-		ServiceUnderTest: openapi.TestServiceUnderTest{
-			Request: openapi.HttpRequest{
-				Url:    server.URL,
-				Method: "POST",
-				Headers: []openapi.HttpHeader{
+		ServiceUnderTest: model.ServiceUnderTest{
+			Request: model.HTTPRequest{
+				URL:    server.URL,
+				Method: model.HTTPMethodPOST,
+				Headers: []model.HTTPHeader{
 					{Key: "Key1", Value: "Value1"},
 				},
 				Body: "body",

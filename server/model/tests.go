@@ -56,6 +56,7 @@ type (
 
 	AssertionResult struct {
 		Assertion Assertion
+		AllPassed bool
 		Results   []SpanAssertionResult
 	}
 

@@ -25,7 +25,7 @@ type HTTPHeader struct {
 }
 
 type HTTPAuth struct {
-	// TODO: model this
+	// Type HTTPAuthType
 }
 
 type HTTPRequest struct {

@@ -8,9 +8,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/google/uuid"
 	"github.com/kubeshop/tracetest/executor"
-	"github.com/kubeshop/tracetest/openapi"
+	"github.com/kubeshop/tracetest/id"
+	"github.com/kubeshop/tracetest/model"
 	"github.com/kubeshop/tracetest/testmock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -34,54 +34,52 @@ func TestExecutorSuccessfulExecution(t *testing.T) {
 		},
 	}
 
-	postgresRepository, err := testmock.GetTestingDatabase("file://../migrations")
+	repo, err := testmock.GetTestingDatabase("file://../migrations")
 	require.NoError(t, err)
 
 	for _, testCase := range testCases {
 		t.Run(testCase.Name, func(t *testing.T) {
 			ctx := context.Background()
 
-			test, result, err := loadTestFile(testCase.Tracefile)
+			test, run, err := loadTestFile(testCase.Tracefile)
 			require.NoError(t, err)
 
-			assertionExecutor := executor.NewAssertionRunner(postgresRepository)
+			assertionExecutor := executor.NewAssertionRunner(repo)
 
-			createdTestID, err := postgresRepository.CreateTest(ctx, &test)
+			test, err = repo.CreateTest(ctx, test)
 			require.NoError(t, err)
 
-			for _, assertion := range test.Definition.Definitions {
-				postgresRepository.CreateAssertion(ctx, test.Id, &assertion)
-			}
-
-			result.TestId = createdTestID
-			err = postgresRepository.CreateRun(ctx, test.Id, &result)
+			err = repo.SetDefiniton(ctx, test, test.Definition)
 			require.NoError(t, err)
 
-			testDefinition, err := executor.ConvertInputTestIntoTestDefinition(test)
-			assert.NoError(t, err)
+			run, err = repo.CreateRun(ctx, test, run)
+			require.NoError(t, err)
 
 			assertionRequest := executor.AssertionRequest{
-				TestDefinition: testDefinition,
-				Result:         result,
+				Test: test,
+				Run:  run,
 			}
 
 			assertionExecutor.Start(1)
 			assertionExecutor.RunAssertions(assertionRequest)
 			assertionExecutor.Stop()
 
-			dbResult, err := postgresRepository.GetResult(ctx, result.Id)
+			dbResult, err := repo.GetRun(ctx, run.ID)
 			require.NoError(t, err)
 
 			if testCase.ShouldPass {
-				assert.Equal(t, executor.TestRunStateFinished, dbResult.State)
-				for _, assertionResult := range dbResult.AssertionResult {
-					for _, spanAssertionResult := range assertionResult.SpanAssertionResults {
-						assert.True(t, spanAssertionResult.Passed)
+				assert.Equal(t, model.RunStateFinished, dbResult.State)
+				for _, results := range dbResult.Results.Results {
+					for _, assertRes := range results {
+						for _, spanAssertionRes := range assertRes.Results {
+							assert.NoError(t, spanAssertionRes.CompareErr)
+						}
 					}
+
 				}
-				assert.True(t, dbResult.AssertionResultState)
+				assert.True(t, dbResult.Results.AllPassed)
 			} else {
-				assert.False(t, dbResult.AssertionResultState)
+				assert.False(t, dbResult.Results.AllPassed)
 			}
 
 		})
@@ -89,30 +87,29 @@ func TestExecutorSuccessfulExecution(t *testing.T) {
 }
 
 type testFile struct {
-	Test   openapi.Test    `json:"test"`
-	Result openapi.TestRun `json:"result"`
+	Test   model.Test `json:"test"`
+	Result model.Run  `json:"result"`
 }
 
-func loadTestFile(filePath string) (openapi.Test, openapi.TestRun, error) {
+func loadTestFile(filePath string) (model.Test, model.Run, error) {
 	fileContent, err := os.Open(filePath)
 	if err != nil {
-		return openapi.Test{}, openapi.TestRun{}, fmt.Errorf("could not open test file: %w", err)
+		return model.Test{}, model.Run{}, fmt.Errorf("could not open test file: %w", err)
 	}
 
 	fileBytes, err := ioutil.ReadAll(fileContent)
 	if err != nil {
-		return openapi.Test{}, openapi.TestRun{}, fmt.Errorf("could not read test file: %w", err)
+		return model.Test{}, model.Run{}, fmt.Errorf("could not read test file: %w", err)
 	}
 
 	testFile := testFile{}
 	err = json.Unmarshal(fileBytes, &testFile)
 	if err != nil {
-		return openapi.Test{}, openapi.TestRun{}, fmt.Errorf("could not parse test file: %w", err)
+		return model.Test{}, model.Run{}, fmt.Errorf("could not parse test file: %w", err)
 	}
 
-	testFile.Test.Id = uuid.NewString()
-	testFile.Result.TestId = testFile.Test.Id
-	testFile.Result.Id = uuid.NewString()
+	testFile.Test.ID = id.NewRandGenerator().UUID()
+	testFile.Result.ID = id.NewRandGenerator().UUID()
 
 	return testFile.Test, testFile.Result, nil
 }
