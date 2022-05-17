@@ -20,13 +20,13 @@ test('useUpdateResultMutation', async () => {
     }).unwrap();
   });
   expect(testResult).toStrictEqual({
+    executionTime: 0,
+    failedAssertionCount: 0,
+    passedAssertionCount: 0,
+    totalAssertionCount: 0,
     trace: {
       description: '',
       spans: [],
-      executionTime: 0,
-      failedAssertionCount: 0,
-      passedAssertionCount: 0,
-      totalAssertionCount: 0,
     },
   });
 });
