@@ -72,22 +72,8 @@ func (te *TestExecutor) Execute(test model.Test, tid trace.TraceID, sid trace.Sp
 	for _, h := range tReq.Headers {
 		req.Header.Set(h.Key, h.Value)
 	}
-	switch test.ServiceUnderTest.Request.Auth.Type {
-	case "apiKey":
-		switch test.ServiceUnderTest.Request.Auth.ApiKey.In {
-		case "query":
-			q := req.URL.Query()
-			q.Add(test.ServiceUnderTest.Request.Auth.ApiKey.Key, test.ServiceUnderTest.Request.Auth.ApiKey.Value)
-			req.URL.RawQuery = q.Encode()
-		case "header", "":
-			req.Header.Set(test.ServiceUnderTest.Request.Auth.ApiKey.Key, test.ServiceUnderTest.Request.Auth.ApiKey.Value)
-		}
-	case "basic":
-		req.SetBasicAuth(test.ServiceUnderTest.Request.Auth.Basic.Username, test.ServiceUnderTest.Request.Auth.Basic.Password)
-	case "bearer":
-		bearer := test.ServiceUnderTest.Request.Auth.Bearer.Token
-		req.Header.Add("Authorization", bearer)
-	}
+
+	test.ServiceUnderTest.Request.Auth.Authenticate(req)
 
 	resp, err := client.Do(req.WithContext(trace.ContextWithSpanContext(context.Background(), sc)))
 	if err != nil {

@@ -51,12 +51,6 @@ func NewApiApiController(s ApiApiServicer, opts ...ApiApiOption) Router {
 func (c *ApiApiController) Routes() Routes {
 	return Routes{
 		{
-			"CreateAssertion",
-			strings.ToUpper("Post"),
-			"/api/tests/{testId}/assertions",
-			c.CreateAssertion,
-		},
-		{
 			"CreateTest",
 			strings.ToUpper("Post"),
 			"/api/tests",
@@ -75,21 +69,21 @@ func (c *ApiApiController) Routes() Routes {
 			c.DeleteTest,
 		},
 		{
-			"GetAssertions",
-			strings.ToUpper("Get"),
-			"/api/tests/{testId}/assertions",
-			c.GetAssertions,
-		},
-		{
 			"GetTest",
 			strings.ToUpper("Get"),
 			"/api/tests/{testId}",
 			c.GetTest,
 		},
 		{
+			"GetTestDefinition",
+			strings.ToUpper("Get"),
+			"/api/tests/{testId}/definition",
+			c.GetTestDefinition,
+		},
+		{
 			"GetTestResultSelectedSpans",
 			strings.ToUpper("Get"),
-			"/api/tests/{testId}/s/{resultId}/select",
+			"/api/tests/{testId}/run/{runId}/select",
 			c.GetTestResultSelectedSpans,
 		},
 		{
@@ -123,6 +117,12 @@ func (c *ApiApiController) Routes() Routes {
 			c.RunTest,
 		},
 		{
+			"SetTestDefinition",
+			strings.ToUpper("Put"),
+			"/api/tests/{testId}/definition",
+			c.SetTestDefinition,
+		},
+		{
 			"UpdateAssertion",
 			strings.ToUpper("Put"),
 			"/api/tests/{testId}/assertions/{assertionId}",
@@ -135,33 +135,6 @@ func (c *ApiApiController) Routes() Routes {
 			c.UpdateTest,
 		},
 	}
-}
-
-// CreateAssertion - Create an assertion for a test
-func (c *ApiApiController) CreateAssertion(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	testIdParam := params["testId"]
-
-	assertionParam := Assertion{}
-	d := json.NewDecoder(r.Body)
-	d.DisallowUnknownFields()
-	if err := d.Decode(&assertionParam); err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-	if err := AssertAssertionRequired(assertionParam); err != nil {
-		c.errorHandler(w, r, err, nil)
-		return
-	}
-	result, err := c.service.CreateAssertion(r.Context(), testIdParam, assertionParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
 }
 
 // CreateTest - Create new test
@@ -222,22 +195,6 @@ func (c *ApiApiController) DeleteTest(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// GetAssertions - Get assertions for a test
-func (c *ApiApiController) GetAssertions(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	testIdParam := params["testId"]
-
-	result, err := c.service.GetAssertions(r.Context(), testIdParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
 // GetTest - get test
 func (c *ApiApiController) GetTest(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
@@ -254,16 +211,32 @@ func (c *ApiApiController) GetTest(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// GetTestDefinition - Get definition for a test
+func (c *ApiApiController) GetTestDefinition(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	testIdParam := params["testId"]
+
+	result, err := c.service.GetTestDefinition(r.Context(), testIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
 // GetTestResultSelectedSpans - retrieve spans that will be selected by selector
 func (c *ApiApiController) GetTestResultSelectedSpans(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	query := r.URL.Query()
 	testIdParam := params["testId"]
 
-	resultIdParam := params["resultId"]
+	runIdParam := params["runId"]
 
 	queryParam := query.Get("query")
-	result, err := c.service.GetTestResultSelectedSpans(r.Context(), testIdParam, resultIdParam, queryParam)
+	result, err := c.service.GetTestResultSelectedSpans(r.Context(), testIdParam, runIdParam, queryParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -356,6 +329,33 @@ func (c *ApiApiController) RunTest(w http.ResponseWriter, r *http.Request) {
 	testIdParam := params["testId"]
 
 	result, err := c.service.RunTest(r.Context(), testIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// SetTestDefinition - Set testDefinition for a test
+func (c *ApiApiController) SetTestDefinition(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	testIdParam := params["testId"]
+
+	testDefinitionParam := TestDefinition{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&testDefinitionParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertTestDefinitionRequired(testDefinitionParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.SetTestDefinition(r.Context(), testIdParam, testDefinitionParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

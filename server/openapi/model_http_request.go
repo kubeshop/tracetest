@@ -19,12 +19,6 @@ type HttpRequest struct {
 	Body string `json:"body,omitempty"`
 
 	Auth HttpAuth `json:"auth,omitempty"`
-
-	// TODO
-	Proxy map[string]interface{} `json:"proxy,omitempty"`
-
-	// TODO
-	Certificate map[string]interface{} `json:"certificate,omitempty"`
 }
 
 // AssertHttpRequestRequired checks if the required fields are not zero-ed
