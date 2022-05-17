@@ -1,4 +1,6 @@
 import fetchMock from 'jest-fetch-mock';
+import {HTTP_METHOD} from '../../../constants/Common.constants';
+import {SemanticGroupNames} from '../../../constants/SemanticGroupNames.constants';
 import {store} from '../../store';
 import {updateTestResult} from '../ResultList.slice';
 
@@ -6,7 +8,7 @@ describe('test ResultList slice', () => {
   it('updateTestResult', async () => {
     const resultId = '23049';
     fetchMock.mockResponse(JSON.stringify({}));
-    const assertion = {assertionId: '', selectors: undefined, spanAssertions: undefined};
+    const assertion = {assertionId: '', selectors: [], spanAssertions: []};
     await store.dispatch(
       updateTestResult({
         trace: {
@@ -14,10 +16,9 @@ describe('test ResultList slice', () => {
           spans: [
             {
               attributeList: [],
-              attributes: undefined,
+              attributes: {},
               duration: 0,
               endTimeUnixNano: '',
-              instrumentationLibrary: undefined,
               kind: '',
               name: '',
               parentSpanId: '',
@@ -26,7 +27,7 @@ describe('test ResultList slice', () => {
               startTimeUnixNano: '',
               status: {code: ''},
               traceId: '',
-              type: undefined,
+              type: SemanticGroupNames.Http,
             },
           ],
         },
@@ -36,13 +37,15 @@ describe('test ResultList slice', () => {
           description: '',
           lastTestResult: undefined,
           name: '',
-          serviceUnderTest: {id: '', request: undefined},
+          serviceUnderTest: {id: '', request: {url: 'http://localhost:3000', method: HTTP_METHOD.GET}},
           testId: '',
         },
-      }) as any
+      })
     );
 
-    expect((store.getState().resultList as any).resultListMap[resultId][0].assertion).toStrictEqual(assertion);
+    console.log('@@', store.getState().resultList.resultListMap);
+
+    expect(store.getState().resultList.resultListMap[resultId][0].assertion).toStrictEqual(assertion);
   });
 
   it('dispatch resultList/replace', async () => {
@@ -57,7 +60,7 @@ describe('test ResultList slice', () => {
         resultId,
       },
     });
-    expect((store.getState().resultList as any).resultListMap[resultId]).toStrictEqual([
+    expect(store.getState().resultList.resultListMap[resultId]).toStrictEqual([
       {assertion: {assertionId}, spanListAssertionResult: []},
     ]);
   });

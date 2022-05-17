@@ -1,5 +1,7 @@
 import {act, renderHook} from '@testing-library/react-hooks';
 import fetchMock from 'jest-fetch-mock';
+import {HTTP_METHOD} from '../../../constants/Common.constants';
+import { ITest } from '../../../types/Test.types';
 import {ReduxWrapperProvider} from '../../ReduxWrapperProvider';
 import {useCreateTestMutation} from '../Test.api';
 
@@ -10,15 +12,15 @@ test('useCreateTestMutation', async () => {
     wrapper: ReduxWrapperProvider,
   });
 
-  let newTest;
+  let newTest: ITest;
   await act(async () => {
     const [createTest] = result.current;
     newTest = await createTest({
       name: 'New test',
       serviceUnderTest: {
-        request: {url: 'https://google.com', method: 'GET'},
+        request: {url: 'https://google.com', method: HTTP_METHOD.GET},
       },
     }).unwrap();
   });
-  expect(newTest.testId).toBe(testId);
+  expect(newTest!.testId).toBe(testId);
 });

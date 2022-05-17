@@ -14,7 +14,6 @@ test('useDAGChart with filled span', () => {
         id: '1',
         data: {
           attributes: {},
-          instrumentationLibrary: {name: 'fist', version: '1'},
           type: SemanticGroupNames.Http,
           duration: 10,
           signature: [],

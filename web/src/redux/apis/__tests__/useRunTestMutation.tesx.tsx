@@ -1,5 +1,6 @@
 import {act, renderHook} from '@testing-library/react-hooks';
 import fetchMock from 'jest-fetch-mock';
+import { ITestRunResult } from '../../../types/TestRunResult.types';
 import {ReduxWrapperProvider} from '../../ReduxWrapperProvider';
 import {useRunTestMutation} from '../Test.api';
 
@@ -24,10 +25,10 @@ test('useRunTestMutation', async () => {
     wrapper: ReduxWrapperProvider,
   });
 
-  let testResult;
+  let testResult: ITestRunResult;
   await act(async () => {
     const [runNewTest] = result.current;
     testResult = await runNewTest(`${testId}`).unwrap();
   });
-  expect(testResult.testId).toBe(`${testId}`);
+  expect(testResult!.testId).toBe(`${testId}`);
 });

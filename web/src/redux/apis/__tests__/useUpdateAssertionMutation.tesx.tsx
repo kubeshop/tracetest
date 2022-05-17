@@ -16,7 +16,7 @@ test('useUpdateAssertionMutation', async () => {
     testResult = await updateResult({
       testId: `${traceId}`,
       assertionId: 'dfkjns',
-      assertion: undefined,
+      assertion: {selectors: []},
     }).unwrap();
   });
   expect(testResult).toStrictEqual({
