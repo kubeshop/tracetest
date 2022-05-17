@@ -1,0 +1,236 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Layout 1`] = `
+<div>
+  <div
+    class="sc-iqseJM dOxiDQ"
+  >
+    <div
+      class="sc-gKclnd cuTtNC"
+    >
+      <h5
+        class="ant-typography sc-iCfMLu kkJaa-d"
+      >
+        Span Details
+      </h5>
+      <span
+        class="ant-typography"
+      >
+        HTTP •  • 
+      </span>
+    </div>
+    <div
+      class="ant-tabs ant-tabs-top sc-furwcr igSass"
+      data-cy="span-details-attributes"
+      style="margin-bottom: 150px; overflow: hidden;"
+    >
+      <div
+        class="ant-tabs-nav"
+        role="tablist"
+      >
+        <div
+          class="ant-tabs-nav-wrap"
+        >
+          <div
+            class="ant-tabs-nav-list"
+            style="transform: translate(0px, 0px);"
+          >
+            <div
+              class="ant-tabs-tab ant-tabs-tab-active"
+            >
+              <div
+                aria-controls="rc-tabs-test-panel-span-assertion"
+                aria-selected="true"
+                class="ant-tabs-tab-btn"
+                id="rc-tabs-test-tab-span-assertion"
+                role="tab"
+                tabindex="0"
+              >
+                Assertion
+              </div>
+            </div>
+            <div
+              class="ant-tabs-tab"
+            >
+              <div
+                aria-controls="rc-tabs-test-panel-span-request"
+                aria-selected="false"
+                class="ant-tabs-tab-btn"
+                id="rc-tabs-test-tab-span-request"
+                role="tab"
+                tabindex="0"
+              >
+                Request
+              </div>
+            </div>
+            <div
+              class="ant-tabs-tab"
+            >
+              <div
+                aria-controls="rc-tabs-test-panel-span-response"
+                aria-selected="false"
+                class="ant-tabs-tab-btn"
+                id="rc-tabs-test-tab-span-response"
+                role="tab"
+                tabindex="0"
+              >
+                Response
+              </div>
+            </div>
+            <div
+              class="ant-tabs-tab"
+            >
+              <div
+                aria-controls="rc-tabs-test-panel-span-attribute-list"
+                aria-selected="false"
+                class="ant-tabs-tab-btn"
+                id="rc-tabs-test-tab-span-attribute-list"
+                role="tab"
+                tabindex="0"
+              >
+                Attribute list
+              </div>
+            </div>
+            <div
+              class="ant-tabs-ink-bar ant-tabs-ink-bar-animated"
+            />
+          </div>
+        </div>
+        <div
+          class="ant-tabs-nav-operations ant-tabs-nav-operations-hidden"
+        >
+          <button
+            aria-controls="rc-tabs-test-more-popup"
+            aria-expanded="false"
+            aria-haspopup="listbox"
+            aria-hidden="true"
+            class="ant-tabs-nav-more"
+            id="rc-tabs-test-more"
+            style="visibility: hidden; order: 1;"
+            tabindex="-1"
+            type="button"
+          >
+            <span
+              aria-label="ellipsis"
+              class="anticon anticon-ellipsis"
+              role="img"
+            >
+              <svg
+                aria-hidden="true"
+                data-icon="ellipsis"
+                fill="currentColor"
+                focusable="false"
+                height="1em"
+                viewBox="64 64 896 896"
+                width="1em"
+              >
+                <path
+                  d="M176 511a56 56 0 10112 0 56 56 0 10-112 0zm280 0a56 56 0 10112 0 56 56 0 10-112 0zm280 0a56 56 0 10112 0 56 56 0 10-112 0z"
+                />
+              </svg>
+            </span>
+          </button>
+        </div>
+      </div>
+      <div
+        class="ant-tabs-content-holder"
+      >
+        <div
+          class="ant-tabs-content ant-tabs-content-top"
+        >
+          <div
+            aria-hidden="false"
+            aria-labelledby="rc-tabs-test-tab-span-assertion"
+            class="ant-tabs-tabpane ant-tabs-tabpane-active"
+            id="rc-tabs-test-panel-span-assertion"
+            role="tabpanel"
+            tabindex="0"
+          >
+            <div>
+              <div
+                class="sc-crHmcD lhiPth"
+              >
+                <button
+                  class="ant-btn ant-btn-primary ant-btn-background-ghost sc-egiyK jRGBrO"
+                  data-cy="add-assertion-button"
+                  type="button"
+                >
+                  <span
+                    aria-label="plus"
+                    class="anticon anticon-plus"
+                    role="img"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      data-icon="plus"
+                      fill="currentColor"
+                      focusable="false"
+                      height="1em"
+                      viewBox="64 64 896 896"
+                      width="1em"
+                    >
+                      <defs>
+                        <style />
+                      </defs>
+                      <path
+                        d="M482 152h60q8 0 8 8v704q0 8-8 8h-60q-8 0-8-8V160q0-8 8-8z"
+                      />
+                      <path
+                        d="M176 474h672q8 0 8 8v60q0 8-8 8H176q-8 0-8-8v-60q0-8 8-8z"
+                      />
+                    </svg>
+                  </span>
+                  <span>
+                    Add Assertion
+                  </span>
+                </button>
+              </div>
+              <div
+                class="sc-jrQzAO itSTOr"
+                data-cy="empty-assertion-table"
+              >
+                <img
+                  class="sc-kDTinF"
+                  src="SpanAssertionsEmptyState.svg"
+                />
+                <span
+                  class="ant-typography ant-typography-disabled"
+                >
+                  No Data
+                </span>
+              </div>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+            aria-labelledby="rc-tabs-test-tab-span-request"
+            class="ant-tabs-tabpane"
+            id="rc-tabs-test-panel-span-request"
+            role="tabpanel"
+            style="display: none;"
+            tabindex="-1"
+          />
+          <div
+            aria-hidden="true"
+            aria-labelledby="rc-tabs-test-tab-span-response"
+            class="ant-tabs-tabpane"
+            id="rc-tabs-test-panel-span-response"
+            role="tabpanel"
+            style="display: none;"
+            tabindex="-1"
+          />
+          <div
+            aria-hidden="true"
+            aria-labelledby="rc-tabs-test-tab-span-attribute-list"
+            class="ant-tabs-tabpane"
+            id="rc-tabs-test-panel-span-attribute-list"
+            role="tabpanel"
+            style="display: none;"
+            tabindex="-1"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

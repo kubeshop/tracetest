@@ -23,7 +23,11 @@ const AnalyticsProvider: React.FC<TAnalyticsProviderProps> = ({children}) => {
 
   const value = useMemo(() => ({isEnabled, instance}), []);
 
-  return isInitialized ? <Context.Provider value={value}>{children}</Context.Provider> : <div />;
+  return isInitialized ? (
+    <Context.Provider value={value}>{children}</Context.Provider>
+  ) : (
+    <div data-cy="not_initialized" />
+  );
 };
 
 export default AnalyticsProvider;

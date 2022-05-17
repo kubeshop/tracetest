@@ -1,12 +1,15 @@
-import {render} from '@testing-library/react';
+import {render, waitFor} from '@testing-library/react';
 import {MemoryRouter} from 'react-router-dom';
 import Header from '../index';
 
-test('Header', () => {
-  const result = render(
+test('Header', async () => {
+  const {container, getByTestId} = render(
     <MemoryRouter>
       <Header />
     </MemoryRouter>
   );
-  expect(result.container).toMatchSnapshot();
+
+  await waitFor(() => getByTestId('github-link'));
+
+  expect(container).toMatchSnapshot();
 });

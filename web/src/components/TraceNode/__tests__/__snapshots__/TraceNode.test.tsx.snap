@@ -1,0 +1,42 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TraceNode 1`] = `
+<div>
+  <div
+    class="sc-bdvvtL eMSMDz"
+    data-cy="trace-node-http"
+  >
+    <div
+      class="sc-gsDKAQ cmaxSH"
+    >
+      <span
+        class="ant-typography"
+      >
+        HTTP
+      </span>
+    </div>
+    <div
+      class="react-flow__handle react-flow__handle-top nodrag target connectable"
+      data-handleid="sdfkjn"
+      data-handlepos="top"
+      style="top: 0px; border-radius: 0; visibility: hidden;"
+    />
+    <div
+      class="sc-hKwDye etMbsh"
+    >
+      
+      <span
+        class="ant-typography ant-typography-ellipsis ant-typography-single-line ant-typography-ellipsis-single-line sc-dkPtRN dvhzfk"
+      >
+        
+      </span>
+    </div>
+    <div
+      class="react-flow__handle react-flow__handle-bottom nodrag source connectable"
+      data-handleid="sdfkjn"
+      data-handlepos="bottom"
+      style="bottom: 0px; border-radius: 0; visibility: hidden;"
+    />
+  </div>
+</div>
+`;

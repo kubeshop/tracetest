@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Diagram DAG 1`] = `
+<div>
+  <div
+    data-cy="not_initialized"
+  />
+</div>
+`;
+
+exports[`Diagram Timeline 1`] = `
+<div>
+  <div
+    data-cy="not_initialized"
+  />
+</div>
+`;

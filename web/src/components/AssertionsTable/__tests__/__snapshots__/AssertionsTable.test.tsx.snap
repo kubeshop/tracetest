@@ -114,7 +114,7 @@ exports[`AssetionsTable 1`] = `
                           class="ant-typography ant-typography-danger"
                         >
                           <strong>
-                            
+                            New request
                           </strong>
                         </span>
                       </td>

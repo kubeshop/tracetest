@@ -1,13 +1,30 @@
-import {render} from '@testing-library/react';
+import {fireEvent, render} from '@testing-library/react';
+import {ReactFlowProvider} from 'react-flow-renderer';
 import {ReduxWrapperProvider} from '../../../redux/ReduxWrapperProvider';
-import {TestingModels} from '../../../utils/TestingModels';
+import {TestingModels, TestingObj} from '../../../utils/TestingModels';
 import TraceAssertionsTable from '../TraceAssertionsTable';
 
-test('Layout', () => {
-  // const result = render(
-  //   <ReduxWrapperProvider>
-  //     <TraceAssertionsTable assertionResult={TestingModels.assertionResult} onSpanSelected={jest.fn()} />
-  //   </ReduxWrapperProvider>
-  // );
-  // expect(result.container).toMatchSnapshot();
+test('TraceAssertionsTable', () => {
+  const result = render(
+    <ReactFlowProvider>
+      <ReduxWrapperProvider>
+        <TraceAssertionsTable assertionResult={TestingObj.assertionResult} onSpanSelected={jest.fn()} />
+      </ReduxWrapperProvider>
+    </ReactFlowProvider>
+  );
+  expect(result.container).toMatchSnapshot();
+});
+
+test('TraceAssertionsTable click row', () => {
+  const result = render(
+    <ReactFlowProvider>
+      <ReduxWrapperProvider>
+        <TraceAssertionsTable assertionResult={TestingObj.assertionResult} onSpanSelected={jest.fn()} />
+      </ReduxWrapperProvider>
+    </ReactFlowProvider>
+  );
+
+  const elementsByClassName = result.container.getElementsByClassName('ant-table-row');
+  expect(result.container).toMatchSnapshot();
+  fireEvent(elementsByClassName.item(0)!, TestingModels.mouseEvent);
 });

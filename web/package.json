@@ -10,12 +10,12 @@
     "@sentry/react": "6.19.7",
     "@sentry/tracing": "6.19.7",
     "@testing-library/jest-dom": "4.2.4",
-    "@testing-library/react": "9.5.0",
+    "@testing-library/react": "^12.1.4",
     "@testing-library/user-event": "7.2.1",
     "@types/d3": "7.1.0",
     "@types/jest": "24.9.1",
     "@types/node": "12.20.43",
-    "@types/react": "16.14.22",
+    "@types/react": "^17.0.39",
     "@types/react-dom": "16.9.14",
     "@types/react-redux": "7.1.22",
     "antd": "4.20.4",
@@ -25,6 +25,7 @@
     "ga-4-react": "0.1.281",
     "jmespath": "0.16.0",
     "lodash": "4.17.21",
+    "rc-menu": "^9.6.0",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-flow-renderer": "9.7.3",
@@ -79,7 +80,12 @@
   },
   "jest": {
     "transformIgnorePatterns": [
-      "/node_modules/(?!antd|@ant-design|rc-.+?|@babel/runtime).+(js|jsx)$"
+      "/node_modules/(?!antd|@ant-design|d3-array|d3|internmap|delaunator|robust-predicates|rc-.+?|@babel/runtime).+(js|jsx)$"
+    ],
+    "collectCoverageFrom": [
+      "src/(components|redux|hooks)/**/*.(ts|tsx)",
+      "!src/(components|redux|hooks)/**/*.stories.(ts|tsx)",
+      "!src/(components|redux|hooks)/**/*.test.(ts|tsx)"
     ],
     "resetMocks": false
   },

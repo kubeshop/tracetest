@@ -1,13 +1,23 @@
-import {render} from '@testing-library/react';
-import TestCard from '../TestCard';
+import {fireEvent, render, waitFor} from '@testing-library/react';
 import {TestingModels} from '../../../utils/TestingModels';
+import TestCard from '../TestCard';
 
-test('SpanAttributesTable', () => {
+const mouseEvent = new MouseEvent('click', {
+  bubbles: true,
+  cancelable: true,
+});
+
+test('TestCard', async () => {
   const onDelete = jest.fn();
   const onRunTest = jest.fn();
   const onClick = jest.fn();
-  const result = render(
+
+  const {container, getByTestId} = render(
     <TestCard onDelete={onDelete} onRunTest={onRunTest} test={TestingModels.test} onClick={onClick} />
   );
-  expect(result.container).toMatchSnapshot();
+  fireEvent(getByTestId('test-card'), mouseEvent);
+  fireEvent(getByTestId('test-run-button'), mouseEvent);
+  fireEvent(getByTestId(`test-actions-button-${TestingModels.test.testId}`), mouseEvent);
+  await waitFor(() => getByTestId('delete'));
+  expect(container).toMatchSnapshot();
 });

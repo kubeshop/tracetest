@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`AnalyticsProvider 1`] = `
+exports[`Router 1`] = `
 <div>
   <div
     data-cy="not_initialized"

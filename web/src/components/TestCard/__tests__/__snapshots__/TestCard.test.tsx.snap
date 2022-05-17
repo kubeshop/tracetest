@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`SpanAttributesTable 1`] = `
+exports[`TestCard 1`] = `
 <div>
   <div
     class="sc-bdvvtL CSceT"
@@ -45,7 +45,7 @@ exports[`SpanAttributesTable 1`] = `
     </div>
     <div
       class="sc-gsDKAQ iwigcB"
-      data-cy="test-url-"
+      data-cy="test-url-2309ei30"
     >
       <span
         class="ant-typography sc-eCImPb"
@@ -60,6 +60,7 @@ exports[`SpanAttributesTable 1`] = `
       class="sc-dkPtRN eWbiec"
     >
       <button
+        ant-click-animating-without-extra-node="false"
         class="ant-btn ant-btn-primary ant-btn-background-ghost"
         data-cy="test-run-button"
         type="button"
@@ -70,8 +71,8 @@ exports[`SpanAttributesTable 1`] = `
       </button>
     </div>
     <span
-      class="ant-dropdown-trigger ant-dropdown-link"
-      data-cy="test-actions-button-"
+      class="ant-dropdown-trigger ant-dropdown-link ant-dropdown-open"
+      data-cy="test-actions-button-2309ei30"
     >
       <span
         aria-label="more"

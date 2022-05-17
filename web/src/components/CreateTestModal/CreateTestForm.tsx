@@ -1,13 +1,13 @@
-import {useCallback, useRef, useState} from 'react';
-import {camelCase} from 'lodash';
-import {Form, Input, Button, Select, Checkbox, Dropdown, Menu, Typography, FormInstance} from 'antd';
 import {DeleteOutlined, DownOutlined, PlusOutlined} from '@ant-design/icons';
-import './CreateTestModal.styled.ts';
-import GuidedTourService, {GuidedTours} from '../../services/GuidedTour.service';
-import {Steps} from '../GuidedTour/homeStepList';
+import {Button, Checkbox, Dropdown, Form, FormInstance, Input, Menu, Select, Typography} from 'antd';
+import {camelCase} from 'lodash';
+import {useCallback, useRef, useState} from 'react';
 import {HTTP_METHOD} from '../../constants/Common.constants';
 import {DemoTestExampleList} from '../../constants/Test.constants';
+import GuidedTourService, {GuidedTours} from '../../services/GuidedTour.service';
+import {Steps} from '../GuidedTour/homeStepList';
 import * as S from './CreateTestModal.styled';
+import './CreateTestModal.styled.ts';
 
 const defaultHeaders = [{key: 'Content-Type', value: 'application/json', checked: true}];
 
@@ -48,13 +48,17 @@ const CreateTestForm: React.FC<ICreateTestFormProps> = ({onSubmit, form}) => {
   );
 
   const menuLayout = (
-    <Menu onClick={onDemoClick}>
-      {DemoTestExampleList.map(({name}) => (
-        <Menu.Item key={name}>
-          <span data-cy={`demo-example-${camelCase(name)}`}>{name}</span>
-        </Menu.Item>
-      ))}
-    </Menu>
+    <Menu
+      onClick={onDemoClick}
+      items={DemoTestExampleList.map(({name}) => ({
+        key: name,
+        label: (
+          <Menu.Item key={name}>
+            <span data-cy={`demo-example-${camelCase(name)}`}>{name}</span>
+          </Menu.Item>
+        ),
+      }))}
+    />
   );
 
   return (
@@ -68,7 +72,7 @@ const CreateTestForm: React.FC<ICreateTestFormProps> = ({onSubmit, form}) => {
     >
       <S.DemoTextContainer>
         <Typography.Text>Try these examples in our demo env: </Typography.Text>
-        <Dropdown overlay={menuLayout} placement="bottomCenter" trigger={['click']}>
+        <Dropdown overlay={menuLayout} placement="bottom" trigger={['click']}>
           <S.DropdownText data-cy="example-button" className="ant-dropdown-link" id="create-test-example-selector">
             {selectedDemo || 'Choose Example'} <DownOutlined />
           </S.DropdownText>
@@ -178,7 +182,7 @@ const CreateTestForm: React.FC<ICreateTestFormProps> = ({onSubmit, form}) => {
                   type="link"
                   icon={<PlusOutlined />}
                   style={{padding: 0}}
-                  onClick={() => add({ checked: true })}
+                  onClick={() => add({checked: true})}
                   data-cy="add-header"
                 >
                   Add Header

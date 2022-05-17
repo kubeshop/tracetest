@@ -4,12 +4,13 @@ import {store} from '../../../redux/store';
 import AnalyticsProvider from '../index';
 
 test('AnalyticsProvider', () => {
-  const result = render(
+  const {container, getAllByTestId} = render(
     <Provider store={store}>
       <AnalyticsProvider>
-        <h2>Cesco</h2>
+        <h2 data-cy="sample">Cesco</h2>
       </AnalyticsProvider>
     </Provider>
   );
-  expect(result.container).toMatchSnapshot();
+  expect(container).toMatchSnapshot();
+  expect(getAllByTestId('not_initialized').length).toBe(1);
 });
