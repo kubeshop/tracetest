@@ -1,16 +1,21 @@
 import {render} from '@testing-library/react';
-import Request from '../components/Http/Request';
+import Http from '../components/Http/Http';
+import {TestingModels} from '../../../utils/TestingModels';
 
-test('Request', () => {
+test('Http', () => {
   const {getAllByTestId} = render(
-    <Request
-      attributeList={[
-        {key: 'http.user_agent', value: 'iPhone'},
-        {key: 'http.request_content_length', value: '3024'},
-        {key: 'http.not', value: 'nothing'},
-        {key: 'http.host', value: 'google.com'},
+    <Http
+      testId={TestingModels.testId}
+      resultId={TestingModels.resultId}
+      onCreateAssertion={jest.fn()}
+      assertionsResultList={[
+        {
+          assertion: TestingModels.assertion,
+          assertionResultList: [TestingModels.spanAssertionResult],
+        },
       ]}
+      span={TestingModels.span}
     />
   );
-  expect(getAllByTestId('assertion-check-property').length).toBe(3);
+  expect(getAllByTestId('assertion-check-property').length).toBe(1);
 });

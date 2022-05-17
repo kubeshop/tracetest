@@ -3,11 +3,6 @@ import {ReduxWrapperProvider} from '../../../redux/ReduxWrapperProvider';
 import {TestingModels} from '../../../utils/TestingModels';
 import TestCard from '../TestCard';
 
-const mouseEvent = new MouseEvent('click', {
-  bubbles: true,
-  cancelable: true,
-});
-
 test('TestCard', async () => {
   const onDelete = jest.fn();
   const onRunTest = jest.fn();
@@ -18,9 +13,7 @@ test('TestCard', async () => {
       <TestCard onDelete={onDelete} onRunTest={onRunTest} test={TestingModels.test} onClick={onClick} />
     </ReduxWrapperProvider>
   );
-  fireEvent(getByTestId('test-card'), mouseEvent);
-  fireEvent(getByTestId('test-run-button'), mouseEvent);
-  fireEvent(getByTestId(`test-actions-button-${TestingModels.test.testId}`), mouseEvent);
+  fireEvent(getByTestId(`test-actions-button-${TestingModels.test.testId}`), TestingModels.mouseEvent);
   await waitFor(() => getByTestId('delete'));
   expect(container).toMatchSnapshot();
 });
