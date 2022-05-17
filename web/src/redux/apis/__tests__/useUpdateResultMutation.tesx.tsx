@@ -16,10 +16,14 @@ test('useUpdateResultMutation', async () => {
     testResult = await updateResult({
       testId: `${testId}`,
       resultId: 'dfkjns',
-      assertionResult: undefined,
+      assertionResult: {assertionResult: [], assertionResultState: true},
     }).unwrap();
   });
   expect(testResult).toStrictEqual({
+    executionTime: 0,
+    failedAssertionCount: 0,
+    passedAssertionCount: 0,
+    totalAssertionCount: 0,
     trace: {
       description: '',
       spans: [],

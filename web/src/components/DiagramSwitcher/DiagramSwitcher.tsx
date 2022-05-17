@@ -1,6 +1,6 @@
 import {SupportedDiagrams} from '../Diagram/Diagram';
 import SearchInput from '../SearchInput';
-import * as S from './DiagramStories.styled';
+import * as S from './DiagramSwitcher.styled';
 
 interface IDiagramSwitcherProps {
   onSearch(search: string): void;

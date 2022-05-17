@@ -1,10 +1,10 @@
 import {SpanAttributeType} from 'constants/SpanAttribute.constants';
 
 export type IRawSpanAttributeValue = {
-  stringValue: string;
-  intValue: number;
-  booleanValue: boolean;
-  doubleValue: number;
+  stringValue?: string;
+  intValue?: number;
+  booleanValue?: boolean;
+  doubleValue?: number;
   kvlistValue: {values: IRawSpanAttribute[]};
 };
 

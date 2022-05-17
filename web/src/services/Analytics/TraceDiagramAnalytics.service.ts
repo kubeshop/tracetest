@@ -1,6 +1,7 @@
-import AnalyticsService, {Categories} from './Analytics.service';
+import {Categories} from '../../constants/Analytics.constants';
+import AnalyticsService from './Analytics.service';
 
-enum Actions {
+export enum Actions {
   ClickSpan = 'span-node-click',
 }
 
@@ -8,11 +9,9 @@ type TTraceDiagramAnalytics = {
   onClickSpan(spanId: string): void;
 };
 
-const {event} = AnalyticsService(Categories.Trace);
-
 const TraceDiagramAnalyticsService = (): TTraceDiagramAnalytics => {
   const onClickSpan = (spanId: string) => {
-    event(Actions.ClickSpan, spanId);
+    AnalyticsService.event(Categories.Trace, Actions.ClickSpan, spanId);
   };
 
   return {
