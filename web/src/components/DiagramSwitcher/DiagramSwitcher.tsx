@@ -1,5 +1,5 @@
-import {SupportedDiagrams} from '../Diagram/Diagram';
 import React from 'react';
+import {SupportedDiagrams} from '../Diagram/Diagram';
 import SearchInput from '../SearchInput';
 import * as S from './DiagramSwitcher.styled';
 

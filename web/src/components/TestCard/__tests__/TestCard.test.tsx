@@ -1,4 +1,5 @@
 import {fireEvent, render, waitFor} from '@testing-library/react';
+import {ReduxWrapperProvider} from '../../../redux/ReduxWrapperProvider';
 import {TestingModels} from '../../../utils/TestingModels';
 import TestCard from '../TestCard';
 
@@ -13,7 +14,9 @@ test('TestCard', async () => {
   const onClick = jest.fn();
 
   const {container, getByTestId} = render(
-    <TestCard onDelete={onDelete} onRunTest={onRunTest} test={TestingModels.test} onClick={onClick} />
+    <ReduxWrapperProvider>
+      <TestCard onDelete={onDelete} onRunTest={onRunTest} test={TestingModels.test} onClick={onClick} />
+    </ReduxWrapperProvider>
   );
   fireEvent(getByTestId('test-card'), mouseEvent);
   fireEvent(getByTestId('test-run-button'), mouseEvent);

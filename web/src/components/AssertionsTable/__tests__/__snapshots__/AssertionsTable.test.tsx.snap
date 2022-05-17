@@ -3,11 +3,11 @@
 exports[`AssetionsTable 1`] = `
 <div>
   <div
-    class="sc-hKwDye iytRYn"
+    class="sc-gsDKAQ hZxeIA"
     data-cy="assertion-table"
   >
     <div
-      class="sc-eCImPb gTzCre"
+      class="sc-dkPtRN diGMvB"
     >
       <h5
         class="ant-typography"
@@ -16,7 +16,7 @@ exports[`AssetionsTable 1`] = `
         Assertion #
         1
         <span
-          class="ant-badge ant-badge-not-a-wrapper sc-jRQBWg kvNTIw"
+          class="ant-badge ant-badge-not-a-wrapper sc-hKwDye wxfDf"
         />
       </h5>
       <button
@@ -30,7 +30,7 @@ exports[`AssetionsTable 1`] = `
       </button>
     </div>
     <div
-      class="ant-table-wrapper sc-dkPtRN exmISC"
+      class="ant-table-wrapper sc-bdvvtL kLJHSf"
     >
       <div
         class="ant-spin-nested-loading"
@@ -100,7 +100,7 @@ exports[`AssetionsTable 1`] = `
                       <td
                         class="ant-table-cell"
                       >
-                        eq
+                        equals
                       </td>
                       <td
                         class="ant-table-cell"

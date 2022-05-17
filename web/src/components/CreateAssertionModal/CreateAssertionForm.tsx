@@ -118,14 +118,15 @@ const CreateAssertionForm: React.FC<TCreateAssertionFormProps> = ({
 
       const newData = {selectors: selectorList, spanAssertions};
 
-      if (assertion) {
-        onEditAssertionFormSubmit(assertion.assertionId);
-        await updateAssertion({testId, assertionId: assertion.assertionId, assertion: newData});
-      } else {
-        onCreateAssertionFormSubmit(testId);
-        await createAssertion({testId, assertion: newData});
-      }
-      onCreate();
+      console.log(newData);
+      // if (assertion) {
+      //   onEditAssertionFormSubmit(assertion.assertionId);
+      //   await updateAssertion({testId, assertionId: assertion.assertionId, assertion: newData});
+      // } else {
+      //   onCreateAssertionFormSubmit(testId);
+      //   await createAssertion({testId, assertion: newData});
+      // }
+      // onCreate();
     },
     [assertion, createAssertion, onCreate, span.attributes, testId, updateAssertion]
   );

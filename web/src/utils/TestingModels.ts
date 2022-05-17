@@ -54,7 +54,6 @@ const span: ISpan = {
   attributes: {},
   duration: 0,
   endTimeUnixNano: '',
-  instrumentationLibrary: {name: 'sdkfn', version: ''},
   kind: '',
   name: '',
   parentSpanId: '',
@@ -107,6 +106,11 @@ const assertionResult: IAssertionResult = {
 };
 
 const testRunResult: ITestRunResult = {
+  executionTime: 0,
+  failedAssertionCount: 0,
+  passedAssertionCount: 0,
+  totalAssertionCount: 0,
+
   assertionResult: [{assertionId: '', spanAssertionResults: []}],
   assertionResultState: false,
   completedAt: '',

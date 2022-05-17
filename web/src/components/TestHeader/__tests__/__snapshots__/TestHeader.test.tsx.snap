@@ -3,7 +3,7 @@
 exports[`SpanAttributesTable 1`] = `
 <div>
   <div
-    class="sc-bdvvtL ofmEZ"
+    class="sc-bdvvtL bQEEzU"
   >
     <div
       class="sc-jRQBWg bHOJVG"
@@ -30,13 +30,13 @@ exports[`SpanAttributesTable 1`] = `
         </svg>
       </span>
       <h4
-        class="ant-typography sc-gsDKAQ cvDvpI"
+        class="ant-typography sc-gsDKAQ flnTLB"
         data-cy="test-details-name"
       >
         
       </h4>
       <span
-        class="ant-typography ant-typography-secondary sc-dkPtRN jjuiUP"
+        class="ant-typography ant-typography-secondary sc-dkPtRN keTppE"
       >
         GET
          - 

@@ -3,24 +3,24 @@
 exports[`Layout 1`] = `
 <div>
   <div
-    class="sc-iqseJM dOxiDQ"
+    class="sc-ieecCq FiStd"
   >
     <div
-      class="sc-gKclnd cuTtNC"
+      class="sc-bqiRlB iwrCuh"
     >
       <h5
-        class="ant-typography sc-iCfMLu kkJaa-d"
+        class="ant-typography sc-ksdxgE ipQGyD"
       >
         Span Details
       </h5>
       <span
-        class="ant-typography"
+        class="ant-typography ant-typography-secondary"
       >
         HTTP •  • 
       </span>
     </div>
     <div
-      class="ant-tabs ant-tabs-top sc-furwcr igSass"
+      class="ant-tabs ant-tabs-top sc-hBUSln kUdfoR"
       data-cy="span-details-attributes"
       style="margin-bottom: 150px; overflow: hidden;"
     >
@@ -148,10 +148,10 @@ exports[`Layout 1`] = `
           >
             <div>
               <div
-                class="sc-crHmcD lhiPth"
+                class="sc-dJjYzT jydkUB"
               >
                 <button
-                  class="ant-btn ant-btn-primary ant-btn-background-ghost sc-egiyK jRGBrO"
+                  class="ant-btn ant-btn-primary sc-hGPBjI ijyrZa"
                   data-cy="add-assertion-button"
                   type="button"
                 >
@@ -186,17 +186,17 @@ exports[`Layout 1`] = `
                 </button>
               </div>
               <div
-                class="sc-jrQzAO itSTOr"
+                class="sc-fFeiMQ dGJwRW"
                 data-cy="empty-assertion-table"
               >
                 <img
-                  class="sc-kDTinF"
+                  class="sc-bkkeKt"
                   src="SpanAssertionsEmptyState.svg"
                 />
                 <span
                   class="ant-typography ant-typography-disabled"
                 >
-                  No Data
+                  Add assertion to see result here.
                 </span>
               </div>
             </div>
