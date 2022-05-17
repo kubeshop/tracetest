@@ -13,7 +13,22 @@ const SpanMock: IMockFactory<ISpan, IRawSpan> = () => ({
       kind: faker.random.word(),
       startTimeUnixNano: faker.date.recent().toISOString(),
       endTimeUnixNano: faker.date.recent().toISOString(),
-      attributes: [],
+      attributes: faker.datatype
+        .array(faker.datatype.number({min: 2, max: 10}))
+        .map(() => ({
+          key: faker.random.word(),
+          value: {
+            stringValue: faker.random.word(),
+            kvlistValue: {values: []},
+          },
+        }))
+        .concat({
+          key: 'service.name',
+          value: {
+            stringValue: 'mock',
+            kvlistValue: {values: []},
+          },
+        }),
       status: {
         code: faker.random.word(),
       },

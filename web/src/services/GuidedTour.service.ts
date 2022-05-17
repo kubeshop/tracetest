@@ -13,7 +13,7 @@ const GUIDED_TOUR_KEY = 'guided_tour';
 
 const {get, set} = LocalStorageGateway<TTour>(GUIDED_TOUR_KEY);
 
-const defaultValue = Object.values(GuidedTours).reduce<TTour>(
+export const defaultValue = Object.values(GuidedTours).reduce<TTour>(
   (acc, value) => ({
     ...acc,
     [value]: false,

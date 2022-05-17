@@ -1,6 +1,7 @@
-import AnalyticsService, { Categories, Labels } from "./Analytics.service";
+import {Categories, Labels} from '../../constants/Analytics.constants';
+import AnalyticsService from './Analytics.service';
 
-enum Actions {
+export enum Actions {
   CreateTestFormSubmit = 'create-test-form-submit',
 }
 
@@ -8,11 +9,9 @@ type TCreateTestAnalytics = {
   onCreateTestFormSubmit(): void;
 };
 
-const {event} = AnalyticsService(Categories.Home);
-
-const CreateTestAnalyticsService = (): TCreateTestAnalytics => {  
+const CreateTestAnalyticsService = (): TCreateTestAnalytics => {
   const onCreateTestFormSubmit = () => {
-    event(Actions.CreateTestFormSubmit, Labels.Form);
+    AnalyticsService.event(Categories.Home, Actions.CreateTestFormSubmit, Labels.Form);
   };
 
   return {

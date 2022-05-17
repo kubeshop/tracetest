@@ -40,6 +40,7 @@
   "scripts": {
     "start": "craco start",
     "build": "craco build",
+    "test:unit:watch": "craco test",
     "test:unit": "craco test --watchAll=false --coverage",
     "test:integration": "npm run cy:run",
     "test:lint": "eslint ./src/**/*.{ts,tsx}",

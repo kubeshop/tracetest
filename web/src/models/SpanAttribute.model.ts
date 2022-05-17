@@ -4,27 +4,24 @@ import {IRawSpanAttribute, ISpanAttribute} from '../types/SpanAttribute.types';
 
 const spanAttributeTypeList = Object.values(SpanAttributeType);
 
+const typeOfList = ['number', 'boolean', 'string'];
+
 const getSpanAttributeValueType = (attribute: IRawSpanAttribute): SpanAttributeType =>
   spanAttributeTypeList.find(type => {
     const value = attribute.value[type];
-    if (typeof value === 'number') return true;
-    return !isEmpty(value);
+
+    return typeOfList.includes(typeof value) || !isEmpty(value);
   }) || SpanAttributeType.stringValue;
 
 const getSpanAttributeValue = (attribute: IRawSpanAttribute): string => {
-  const attributeType = getSpanAttributeValueType(attribute);
-  const value = attribute.value[attributeType];
+  const type = getSpanAttributeValueType(attribute);
+  const value = attribute.value[type];
 
-  if (!value) return '<Empty value>';
-  switch (attributeType) {
-    case SpanAttributeType.kvlistValue: {
-      return JSON.stringify(value);
-    }
+  if (['number', 'boolean'].includes(typeof value)) return String(value);
 
-    default: {
-      return String(value);
-    }
-  }
+  return (
+    (type === SpanAttributeType.kvlistValue && JSON.stringify(value)) || (value && String(value)) || '<Empty value>'
+  );
 };
 
 const SpanAttribute = (rawAttribute: IRawSpanAttribute): ISpanAttribute => {

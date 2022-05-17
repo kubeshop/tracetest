@@ -1,6 +1,7 @@
-import AnalyticsService, {Categories} from './Analytics.service';
+import {Categories} from '../../constants/Analytics.constants';
+import AnalyticsService from './Analytics.service';
 
-enum Actions {
+export enum Actions {
   RunTest = 'run-test-button-click',
   TestRunClick = 'test-run-result-click',
 }
@@ -10,15 +11,13 @@ type TTestAnalytics = {
   onTestRunClick(testRunId: string): void;
 };
 
-const {event} = AnalyticsService(Categories.Test);
-
 const TestAnalyticsService = (): TTestAnalytics => {
   const onRunTest = (testId: string) => {
-    event(Actions.RunTest, testId);
+    AnalyticsService.event(Categories.Test, Actions.RunTest, testId);
   };
 
   const onTestRunClick = (testRunId: string) => {
-    event(Actions.TestRunClick, testRunId);
+    AnalyticsService.event(Categories.Test, Actions.TestRunClick, testRunId);
   };
 
   return {
