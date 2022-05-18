@@ -21,16 +21,16 @@ export const DAGIcon = styled(ClusterOutlined).attrs({
   style: {
     fontSize: '18px',
   },
-})<{isSelected?: boolean}>`
+})<{$isSelected?: boolean}>`
   cursor: pointer;
-  color: ${({isSelected = false}) => (isSelected ? '#61175E' : '#9AA3AB')};
+  color: ${({$isSelected = false}) => ($isSelected ? '#61175E' : '#9AA3AB')};
 `;
 
 export const TimelineIcon = styled(BarsOutlined).attrs<{isSelected?: boolean}>({
   style: {
     fontSize: '18px',
   },
-})<{isSelected?: boolean}>`
+})<{$isSelected?: boolean}>`
   cursor: pointer;
-  color: ${({isSelected = false}) => (isSelected ? '#61175E' : '#9AA3AB')};
+  color: ${({$isSelected = false}) => ($isSelected ? '#61175E' : '#9AA3AB')};
 `;

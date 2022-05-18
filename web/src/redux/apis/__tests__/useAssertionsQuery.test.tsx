@@ -11,5 +11,5 @@ test('useGetAssertionsQuery', async () => {
   expect(result.current.isLoading).toBeTruthy();
   await waitForNextUpdate({timeout: 5000});
   expect(result.current.isLoading).toBeFalsy();
-  expect(result.current.data.length).toBe(1);
+  expect(result.current.data!.length).toBe(1);
 });

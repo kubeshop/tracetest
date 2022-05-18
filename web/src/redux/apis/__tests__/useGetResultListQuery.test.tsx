@@ -5,7 +5,7 @@ import {useGetResultListQuery} from '../Test.api';
 
 test('useGetResultListQuery', async () => {
   fetchMock.mockResponse(JSON.stringify([]));
-  const {result, waitForNextUpdate} = renderHook(() => useGetResultListQuery('3321'), {
+  const {result, waitForNextUpdate} = renderHook(() => useGetResultListQuery({testId: '3321'}), {
     wrapper: ReduxWrapperProvider,
   });
   expect(result.current.isLoading).toBeTruthy();

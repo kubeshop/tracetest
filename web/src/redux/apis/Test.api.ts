@@ -1,15 +1,17 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
+import {TRecursivePartial} from 'types/Common.types';
 import {ITest} from 'types/Test.types';
 import {IRawTestRunResult, ITestRunResult} from 'types/TestRunResult.types';
-import {TRecursivePartial} from 'types/Common.types';
-import {IAssertion, ITestAssertionResult} from '../../types/Assertion.types';
-import TestRunResult from '../../models/TestRunResult.model';
 import {HTTP_METHOD} from '../../constants/Common.constants';
+import TestRunResult from '../../models/TestRunResult.model';
+import {IAssertion, ITestAssertionResult} from '../../types/Assertion.types';
+
+const PATH = `${document.location.protocol}//${document.location.host}/api/`;
 
 const TestAPI = createApi({
   reducerPath: 'tests',
   baseQuery: fetchBaseQuery({
-    baseUrl: `${document.location.protocol}//${document.location.host}/api/`,
+    baseUrl: PATH,
   }),
   tagTypes: ['Test', 'Assertion', 'TestRunResult'],
   endpoints: build => ({

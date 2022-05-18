@@ -1,6 +1,7 @@
-import AnalyticsService, {Categories, Labels} from './Analytics.service';
+import {Categories, Labels} from '../../constants/Analytics.constants';
+import AnalyticsService from './Analytics.service';
 
-enum Actions {
+export enum Actions {
   ChangeTab = 'change-tab',
   AddAssertionButtonClick = 'add-assertion-button-click',
   TimelineSpanClick = 'timeline-span-click',
@@ -12,19 +13,17 @@ type TTraceAnalytics = {
   onTimelineSpanClick(spanId: string): void;
 };
 
-const {event} = AnalyticsService(Categories.Trace);
-
 const TraceAnalyticsService = (): TTraceAnalytics => {
   const onChangeTab = (tabName: string) => {
-    event(`${Actions.ChangeTab}-${tabName}`, Labels.Table);
+    AnalyticsService.event(Categories.Trace, `${Actions.ChangeTab}-${tabName}`, Labels.Tab);
   };
 
   const onAddAssertionButtonClick = () => {
-    event(Actions.AddAssertionButtonClick, Labels.Button);
+    AnalyticsService.event(Categories.Trace, Actions.AddAssertionButtonClick, Labels.Button);
   };
 
   const onTimelineSpanClick = (spanId: string) => {
-    event(Actions.TimelineSpanClick, spanId);
+    AnalyticsService.event(Categories.Trace, Actions.TimelineSpanClick, spanId);
   };
 
   return {
