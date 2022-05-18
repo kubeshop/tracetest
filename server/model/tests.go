@@ -27,7 +27,6 @@ type (
 
 	SpanQuery string
 	Assertion struct {
-		ID         string
 		Attribute  string
 		Comparator comparator.Comparator
 		Value      string

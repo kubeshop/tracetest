@@ -12,6 +12,8 @@ package openapi
 type Span struct {
 	Id string `json:"id,omitempty"`
 
+	Name string `json:"name,omitempty"`
+
 	// Key-Value of span attributes
 	Attributes map[string]string `json:"attributes,omitempty"`
 

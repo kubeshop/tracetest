@@ -51,10 +51,6 @@ definitions:
   Assertion:
     type: object
     properties:
-      id:
-        type: string
-        format: uuid
-        readOnly: true
       attribute:
         type: string
       comparator:
@@ -66,10 +62,6 @@ definitions:
     type: object
     properties:
       id:
-        type: string
-        format: uuid
-        readOnly: true
-      testId:
         type: string
         format: uuid
         readOnly: true
@@ -145,6 +137,8 @@ definitions:
     properties:
       assertion:
         $ref: "#/definitions/Assertion"
+      allPassed:
+        type: bool
       spanResults:
         type: array
         items:
@@ -159,3 +153,5 @@ definitions:
         type: string
       passed:
         type: bool
+      error:
+        type: string

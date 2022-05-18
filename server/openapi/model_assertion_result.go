@@ -12,6 +12,8 @@ package openapi
 type AssertionResult struct {
 	Assertion Assertion `json:"assertion,omitempty"`
 
+	AllPassed bool `json:"allPassed,omitempty"`
+
 	SpanResults []AssertionSpanResult `json:"spanResults,omitempty"`
 }
 

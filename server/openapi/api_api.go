@@ -57,12 +57,6 @@ func (c *ApiApiController) Routes() Routes {
 			c.CreateTest,
 		},
 		{
-			"DeleteAssertion",
-			strings.ToUpper("Delete"),
-			"/api/tests/{testId}/assertions/{assertionId}",
-			c.DeleteAssertion,
-		},
-		{
 			"DeleteTest",
 			strings.ToUpper("Delete"),
 			"/api/tests/{testId}",
@@ -123,12 +117,6 @@ func (c *ApiApiController) Routes() Routes {
 			c.SetTestDefinition,
 		},
 		{
-			"UpdateAssertion",
-			strings.ToUpper("Put"),
-			"/api/tests/{testId}/assertions/{assertionId}",
-			c.UpdateAssertion,
-		},
-		{
 			"UpdateTest",
 			strings.ToUpper("Put"),
 			"/api/tests/{testId}",
@@ -151,24 +139,6 @@ func (c *ApiApiController) CreateTest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	result, err := c.service.CreateTest(r.Context(), testParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
-// DeleteAssertion - delete an assertion
-func (c *ApiApiController) DeleteAssertion(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	testIdParam := params["testId"]
-
-	assertionIdParam := params["assertionId"]
-
-	result, err := c.service.DeleteAssertion(r.Context(), testIdParam, assertionIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -268,9 +238,20 @@ func (c *ApiApiController) GetTestRun(w http.ResponseWriter, r *http.Request) {
 // GetTestRuns - get the runs for a test
 func (c *ApiApiController) GetTestRuns(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
+	query := r.URL.Query()
 	testIdParam := params["testId"]
 
-	result, err := c.service.GetTestRuns(r.Context(), testIdParam)
+	takeParam, err := parseInt32Parameter(query.Get("take"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	skipParam, err := parseInt32Parameter(query.Get("skip"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	result, err := c.service.GetTestRuns(r.Context(), testIdParam, takeParam, skipParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -356,35 +337,6 @@ func (c *ApiApiController) SetTestDefinition(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	result, err := c.service.SetTestDefinition(r.Context(), testIdParam, testDefinitionParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
-// UpdateAssertion - update an assertion
-func (c *ApiApiController) UpdateAssertion(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	testIdParam := params["testId"]
-
-	assertionIdParam := params["assertionId"]
-
-	assertionParam := Assertion{}
-	d := json.NewDecoder(r.Body)
-	d.DisallowUnknownFields()
-	if err := d.Decode(&assertionParam); err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-	if err := AssertAssertionRequired(assertionParam); err != nil {
-		c.errorHandler(w, r, err, nil)
-		return
-	}
-	result, err := c.service.UpdateAssertion(r.Context(), testIdParam, assertionIdParam, assertionParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

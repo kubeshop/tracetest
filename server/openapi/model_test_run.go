@@ -16,8 +16,6 @@ import (
 type TestRun struct {
 	Id string `json:"id,omitempty"`
 
-	TestId string `json:"testId,omitempty"`
-
 	TraceId string `json:"traceId,omitempty"`
 
 	SpanId string `json:"spanId,omitempty"`

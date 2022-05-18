@@ -20,6 +20,8 @@ definitions:
       id:
         type: string
         format: byte
+      name:
+        type: string
       attributes:
         type: object
         description: Key-Value of span attributes

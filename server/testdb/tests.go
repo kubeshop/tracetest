@@ -77,16 +77,10 @@ func (td *postgresDB) GetTest(ctx context.Context, id uuid.UUID) (model.Test, er
 	}
 	defer stmt.Close()
 
-	test, err := readTestRow(stmt.QueryRowContext(ctx, id))
+	test, err := td.readTestRow(ctx, stmt.QueryRowContext(ctx, id))
 	if err != nil {
 		return model.Test{}, err
 	}
-
-	defs, err := td.GetDefiniton(ctx, test)
-	if err != nil {
-		return model.Test{}, err
-	}
-	test.Definition = defs
 
 	return test, nil
 }
@@ -106,7 +100,7 @@ func (td *postgresDB) GetTests(ctx context.Context, take, skip int32) ([]model.T
 	tests := []model.Test{}
 
 	for rows.Next() {
-		test, err := readTestRow(rows)
+		test, err := td.readTestRow(ctx, rows)
 		if err != nil {
 			return nil, err
 		}
@@ -140,14 +134,33 @@ func decodeTest(b []byte) (model.Test, error) {
 	return test, nil
 }
 
-func readTestRow(row scanner) (model.Test, error) {
+func (td *postgresDB) readTestRow(ctx context.Context, row scanner) (model.Test, error) {
 	var b []byte
 	err := row.Scan(&b)
 	switch err {
 	case sql.ErrNoRows:
 		return model.Test{}, ErrNotFound
 	case nil:
-		return decodeTest(b)
+		test, err := decodeTest(b)
+		if err != nil {
+			return model.Test{}, err
+		}
+
+		defs, err := td.GetDefiniton(ctx, test)
+		if err != nil {
+			return model.Test{}, err
+		}
+		test.Definition = defs
+
+		if test.ReferenceRun.TraceID.String() != "" {
+			res, err := td.GetRunByTraceID(ctx, test, test.ReferenceRun.TraceID)
+			if err != nil {
+				return model.Test{}, err
+			}
+			test.ReferenceRun = res
+		}
+
+		return test, nil
 	default:
 		return model.Test{}, err
 	}

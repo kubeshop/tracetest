@@ -15,6 +15,8 @@ type AssertionSpanResult struct {
 	ObservedValue string `json:"observedValue,omitempty"`
 
 	Passed bool `json:"passed,omitempty"`
+
+	Error string `json:"error,omitempty"`
 }
 
 // AssertAssertionSpanResultRequired checks if the required fields are not zero-ed

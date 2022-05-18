@@ -26,10 +26,6 @@ type HTTPHeader struct {
 	Key, Value string
 }
 
-type HTTPAuth struct {
-	// Type HTTPAuthType
-}
-
 type HTTPRequest struct {
 	Method  HTTPMethod
 	URL     string

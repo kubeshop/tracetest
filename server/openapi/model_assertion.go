@@ -10,8 +10,6 @@
 package openapi
 
 type Assertion struct {
-	Id string `json:"id,omitempty"`
-
 	Attribute string `json:"attribute,omitempty"`
 
 	Comparator string `json:"comparator,omitempty"`
