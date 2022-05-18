@@ -33,9 +33,7 @@ func setupLogger(cmd *cobra.Command, args []string) {
 		atom.SetLevel(zap.DebugLevel)
 	}
 
-	// To keep the example deterministic, disable timestamps in the output.
 	encoderCfg := zap.NewProductionEncoderConfig()
-	encoderCfg.TimeKey = ""
 
 	logger := zap.New(zapcore.NewCore(
 		zapcore.NewJSONEncoder(encoderCfg),
