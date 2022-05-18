@@ -14,7 +14,7 @@ func TestDefinitions(t *testing.T) {
 	db, clean := getDB()
 	defer clean()
 
-	test := createTest(db)
+	test := createTest(t, db)
 
 	def := model.Definition{
 		`span[service.name="Pokeshop"]`: []model.Assertion{

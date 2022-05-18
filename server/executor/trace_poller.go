@@ -136,14 +136,14 @@ func (tp tracePoller) processJob(job tracePollReq) {
 	}
 
 	if !tp.donePollingTraces(job, trace) {
-		run.Trace = trace
+		run.Trace = &trace
 		job.run = run
 		job.count = job.count + 1
 		tp.requeue(job)
 		return
 	}
 
-	run.Trace = augmentData(trace, run.Response)
+	run.Trace = augmentData(&trace, run.Response)
 
 	fmt.Printf("completed polling result %s after %d times, number of spans: %d \n", job.run.ID, job.count, len(run.Trace.Flat))
 
@@ -172,7 +172,11 @@ func (tp tracePoller) runAssertions(ctx context.Context, test model.Test, run mo
 	return nil
 }
 
-func augmentData(trace traces.Trace, resp model.HTTPResponse) traces.Trace {
+func augmentData(trace *traces.Trace, resp model.HTTPResponse) *traces.Trace {
+	if trace == nil {
+		return trace
+	}
+
 	trace.RootSpan.Attributes["tracetest.response.status"] = fmt.Sprintf("%d", resp.StatusCode)
 	trace.RootSpan.Attributes["tracetest.response.body"] = resp.Body
 	trace.RootSpan.Attributes["tracetest.response.headers"] = fmt.Sprintf("%d", resp.StatusCode)

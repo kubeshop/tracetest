@@ -86,8 +86,11 @@ func (e *defaultAssertionRunner) runAssertionsAndUpdateResult(ctx context.Contex
 }
 
 func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, req AssertionRequest) (model.Run, error) {
-	results, allPassed := assertions.Assert(req.Test.Definition, req.Run.Trace)
-	req.Run.Results = model.RunResults{
+	if req.Run.Trace == nil {
+		return model.Run{}, fmt.Errorf("trace not available")
+	}
+	results, allPassed := assertions.Assert(req.Test.Definition, *req.Run.Trace)
+	req.Run.Results = &model.RunResults{
 		AllPassed: allPassed,
 		Results:   results,
 	}

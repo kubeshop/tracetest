@@ -2,6 +2,7 @@ package testdb_test
 
 import (
 	"context"
+	"testing"
 	"time"
 
 	"github.com/kubeshop/tracetest/model"
@@ -25,7 +26,8 @@ func getDB() (model.Repository, func()) {
 	return db, clean
 }
 
-func createTestWithName(db model.Repository, name string) model.Test {
+func createTestWithName(t *testing.T, db model.Repository, name string) model.Test {
+	t.Helper()
 	test := model.Test{
 		Name:        name,
 		Description: "description",
@@ -43,11 +45,12 @@ func createTestWithName(db model.Repository, name string) model.Test {
 	return updated
 }
 
-func createTest(db model.Repository) model.Test {
-	return createTestWithName(db, "first test")
+func createTest(t *testing.T, db model.Repository) model.Test {
+	return createTestWithName(t, db, "first test")
 }
 
-func createRun(db model.Repository, test model.Test) model.Run {
+func createRun(t *testing.T, db model.Repository, test model.Test) model.Run {
+	t.Helper()
 	run := model.Run{
 		TraceID:   testdb.IDGen.TraceID(),
 		SpanID:    testdb.IDGen.SpanID(),

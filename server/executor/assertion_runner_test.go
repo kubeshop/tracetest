@@ -67,6 +67,7 @@ func TestExecutorSuccessfulExecution(t *testing.T) {
 			dbResult, err := repo.GetRun(ctx, run.ID)
 			require.NoError(t, err)
 
+			require.NotNil(t, dbResult.Results)
 			if testCase.ShouldPass {
 				assert.Equal(t, model.RunStateFinished, dbResult.State)
 				for _, results := range dbResult.Results.Results {

@@ -73,7 +73,7 @@ func (te *TestExecutor) Execute(test model.Test, tid trace.TraceID, sid trace.Sp
 		req.Header.Set(h.Key, h.Value)
 	}
 
-	test.ServiceUnderTest.Request.Auth.Authenticate(req)
+	test.ServiceUnderTest.Request.Authenticate(req)
 
 	resp, err := client.Do(req.WithContext(trace.ContextWithSpanContext(context.Background(), sc)))
 	if err != nil {

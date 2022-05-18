@@ -64,13 +64,13 @@ func (td *postgresDB) GetRun(ctx context.Context, id uuid.UUID) (model.Run, erro
 
 	run, err := readRunRow(stmt.QueryRowContext(ctx, id))
 	if err != nil {
-		return model.Run{}, err
+		return model.Run{}, fmt.Errorf("cannot read row: %w", err)
 	}
 	return run, nil
 }
 
 func (td *postgresDB) GetTestRuns(ctx context.Context, test model.Test, take, skip int32) ([]model.Run, error) {
-	stmt, err := td.db.Prepare("SELECT run FROM runs WHERE test_id = $1 ORDER BY result ->> 'createdAt' DESC LIMIT $2 OFFSET $3")
+	stmt, err := td.db.Prepare("SELECT run FROM runs WHERE test_id = $1 ORDER BY run ->> 'createdAt' DESC LIMIT $2 OFFSET $3")
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +85,7 @@ func (td *postgresDB) GetTestRuns(ctx context.Context, test model.Test, take, sk
 	for rows.Next() {
 		run, err := readRunRow(rows)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("cannot read row: %w", err)
 		}
 		runs = append(runs, run)
 	}
@@ -94,7 +94,7 @@ func (td *postgresDB) GetTestRuns(ctx context.Context, test model.Test, take, sk
 }
 
 func (td *postgresDB) GetRunByTraceID(ctx context.Context, test model.Test, traceID trace.TraceID) (model.Run, error) {
-	stmt, err := td.db.Prepare("SELECT run FROM runs WHERE test_id = $1 AND result ->> 'traceId' = $2")
+	stmt, err := td.db.Prepare("SELECT run FROM runs WHERE test_id = $1 AND run ->> 'traceId' = $2")
 	if err != nil {
 		return model.Run{}, err
 	}
@@ -102,7 +102,7 @@ func (td *postgresDB) GetRunByTraceID(ctx context.Context, test model.Test, trac
 
 	run, err := readRunRow(stmt.QueryRowContext(ctx, test.ID, traceID))
 	if err != nil {
-		return model.Run{}, err
+		return model.Run{}, fmt.Errorf("cannot read row: %w", err)
 	}
 	return run, nil
 }

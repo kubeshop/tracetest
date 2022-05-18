@@ -33,7 +33,15 @@ type HTTPRequest struct {
 	URL     string
 	Headers []HTTPHeader
 	Body    string
-	Auth    HTTPAuthenticator
+	Auth    *HTTPAuthenticator
+}
+
+func (a HTTPRequest) Authenticate(req *http.Request) {
+	if a.Auth == nil {
+		return
+	}
+
+	a.Auth.Authenticate(req)
 }
 
 type HTTPResponse struct {

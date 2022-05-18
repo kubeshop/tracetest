@@ -55,7 +55,7 @@ func TestExecuteGet(t *testing.T) {
 	resp, err := ex.Execute(test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
 	assert.NoError(t, err)
 
-	assert.Equal(t, int32(200), resp.StatusCode)
+	assert.Equal(t, 200, resp.StatusCode)
 	assert.Equal(t, "OK", resp.Body)
 }
 
@@ -102,7 +102,7 @@ func TestExecutePost(t *testing.T) {
 	resp, err := ex.Execute(test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
 	assert.NoError(t, err)
 
-	assert.Equal(t, int32(200), resp.StatusCode)
+	assert.Equal(t, 200, resp.StatusCode)
 	assert.Equal(t, "OK", resp.Body)
 }
 
@@ -147,7 +147,7 @@ func TestExecutePostWithApiKeyAuth(t *testing.T) {
 				Headers: []model.HTTPHeader{
 					{Key: "Key1", Value: "Value1"},
 				},
-				Auth: model.HTTPAuthenticator{
+				Auth: &model.HTTPAuthenticator{
 					Type: "apiKey",
 					Props: map[string]string{
 						"key":   "key",
@@ -163,7 +163,7 @@ func TestExecutePostWithApiKeyAuth(t *testing.T) {
 	resp, err := ex.Execute(test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
 	assert.NoError(t, err)
 
-	assert.Equal(t, int32(200), resp.StatusCode)
+	assert.Equal(t, 200, resp.StatusCode)
 	assert.Equal(t, "OK", resp.Body)
 }
 
@@ -208,7 +208,7 @@ func TestExecutePostWithBasicAuth(t *testing.T) {
 				Headers: []model.HTTPHeader{
 					{Key: "Key1", Value: "Value1"},
 				},
-				Auth: model.HTTPAuthenticator{
+				Auth: &model.HTTPAuthenticator{
 					Type: "basic",
 					Props: map[string]string{
 						"username": "username",
@@ -223,7 +223,7 @@ func TestExecutePostWithBasicAuth(t *testing.T) {
 	resp, err := ex.Execute(test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
 	assert.NoError(t, err)
 
-	assert.Equal(t, int32(200), resp.StatusCode)
+	assert.Equal(t, 200, resp.StatusCode)
 	assert.Equal(t, "OK", resp.Body)
 }
 
@@ -268,7 +268,7 @@ func TestExecutePostWithBearerAuth(t *testing.T) {
 				Headers: []model.HTTPHeader{
 					{Key: "Key1", Value: "Value1"},
 				},
-				Auth: model.HTTPAuthenticator{
+				Auth: &model.HTTPAuthenticator{
 					Type: "bearer",
 					Props: map[string]string{
 						"token": "token",
@@ -282,6 +282,6 @@ func TestExecutePostWithBearerAuth(t *testing.T) {
 	resp, err := ex.Execute(test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
 	assert.NoError(t, err)
 
-	assert.Equal(t, int32(200), resp.StatusCode)
+	assert.Equal(t, 200, resp.StatusCode)
 	assert.Equal(t, "OK", resp.Body)
 }

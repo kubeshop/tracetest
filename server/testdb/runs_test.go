@@ -17,7 +17,7 @@ func TestCreateRun(t *testing.T) {
 	db, clean := getDB()
 	defer clean()
 
-	test := createTest(db)
+	test := createTest(t, db)
 
 	run := model.Run{
 		TraceID:   testdb.IDGen.TraceID(),
@@ -34,7 +34,7 @@ func TestCreateRun(t *testing.T) {
 	assert.Equal(t, model.RunStateCreated, actual.State)
 	assert.Equal(t, run.TraceID, actual.TraceID)
 	assert.Equal(t, run.SpanID, actual.SpanID)
-	assert.Equal(t, run.CreatedAt, actual.CreatedAt)
+	assert.Equal(t, run.CreatedAt.Unix(), actual.CreatedAt.Unix())
 	assert.Equal(t, run.Request, actual.Request)
 }
 
@@ -42,11 +42,12 @@ func TestUpdateRun(t *testing.T) {
 	db, clean := getDB()
 	defer clean()
 
-	test := createTest(db)
-	run := createRun(db, test)
+	test := createTest(t, db)
+	run := createRun(t, db, test)
 
 	run.State = model.RunStateFinished
-	run.Trace = traces.Trace{
+	run.Trace = &traces.Trace{
+		ID: testdb.IDGen.TraceID(),
 		RootSpan: traces.Span{
 			ID: testdb.IDGen.SpanID(),
 			Attributes: traces.Attributes{
@@ -55,7 +56,7 @@ func TestUpdateRun(t *testing.T) {
 			},
 		},
 	}
-	run.Results = model.RunResults{
+	run.Results = &model.RunResults{
 		AllPassed: true,
 		Results: model.Results{
 			`span[service.name="Pokeshop"]`: []model.AssertionResult{
@@ -83,9 +84,8 @@ func TestUpdateRun(t *testing.T) {
 	actual, err := db.GetRun(context.TODO(), run.ID)
 	require.NoError(t, err)
 
-	assert.Equal(t, run, actual)
-	assert.Equal(t, run.SpanID, actual.SpanID)
-	assert.Equal(t, run.CreatedAt, actual.CreatedAt)
+	assert.Equal(t, run.SpanID.String(), actual.SpanID.String())
+	assert.Equal(t, run.CreatedAt.Unix(), actual.CreatedAt.Unix())
 	assert.Equal(t, run.Request, actual.Request)
 	assert.Equal(t, run.State, actual.State)
 	assert.Equal(t, run.Trace, actual.Trace)

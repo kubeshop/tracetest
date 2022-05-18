@@ -36,7 +36,7 @@ func TestUpdateTest(t *testing.T) {
 	db, clean := getDB()
 	defer clean()
 
-	test := createTest(db)
+	test := createTest(t, db)
 	test.Name = "updated test"
 
 	err := db.UpdateTest(context.TODO(), test)
@@ -51,7 +51,7 @@ func TestDeleteTest(t *testing.T) {
 	db, clean := getDB()
 	defer clean()
 
-	test := createTest(db)
+	test := createTest(t, db)
 
 	err := db.DeleteTest(context.TODO(), test)
 	require.NoError(t, err)
@@ -66,8 +66,8 @@ func TestGetTests(t *testing.T) {
 	db, clean := getDB()
 	defer clean()
 
-	createTestWithName(db, "1")
-	createTestWithName(db, "2")
+	createTestWithName(t, db, "1")
+	createTestWithName(t, db, "2")
 
 	actual, err := db.GetTests(context.TODO(), 20, 0)
 	require.NoError(t, err)

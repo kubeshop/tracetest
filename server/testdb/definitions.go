@@ -26,7 +26,7 @@ func (td *postgresDB) GetDefiniton(ctx context.Context, test model.Test) (model.
 }
 
 func (td *postgresDB) SetDefiniton(ctx context.Context, t model.Test, d model.Definition) error {
-	sql := `UPDATE definitions SET definition = $3 WHERE test_id = $1 AND  = $2`
+	sql := `UPDATE definitions SET definition = $2 WHERE test_id = $1`
 	if _, err := td.GetDefiniton(ctx, t); err == ErrNotFound {
 		sql = `INSERT INTO definitions (test_id, "definition") VALUES ($1, $2)`
 	}

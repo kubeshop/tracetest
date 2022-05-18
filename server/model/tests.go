@@ -17,7 +17,7 @@ type (
 		Name             string
 		Description      string
 		ServiceUnderTest ServiceUnderTest
-		ReferenceRun     Run
+		ReferenceRun     *Run
 		Definition       Definition
 	}
 
@@ -44,8 +44,8 @@ type (
 		CompletedAt time.Time
 		Request     HTTPRequest
 		Response    HTTPResponse
-		Trace       traces.Trace
-		Results     RunResults
+		Trace       *traces.Trace
+		Results     *RunResults
 	}
 
 	RunResults struct {
@@ -79,7 +79,7 @@ const (
 	RunStateAwaitingTestResults RunState = "AWAITING_TEST_RESULTS"
 )
 
-func (sar *SpanAssertionResult) MarshalJSON() ([]byte, error) {
+func (sar SpanAssertionResult) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&struct {
 		SpanID        string
 		ObservedValue string
@@ -113,7 +113,7 @@ func (sar *SpanAssertionResult) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (a *Assertion) MarshalJSON() ([]byte, error) {
+func (a Assertion) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&struct {
 		Attribute  string
 		Comparator string
@@ -147,7 +147,7 @@ func (a *Assertion) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (r *Run) MarshalJSON() ([]byte, error) {
+func (r Run) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&struct {
 		ID              string
 		TraceID         string
@@ -158,8 +158,8 @@ func (r *Run) MarshalJSON() ([]byte, error) {
 		CompletedAt     time.Time
 		Request         HTTPRequest
 		Response        HTTPResponse
-		Trace           traces.Trace
-		Results         RunResults
+		Trace           *traces.Trace
+		Results         *RunResults
 	}{
 		ID:              r.ID.String(),
 		TraceID:         r.TraceID.String(),
@@ -186,9 +186,10 @@ func (r *Run) UnmarshalJSON(data []byte) error {
 		CompletedAt     time.Time
 		Request         HTTPRequest
 		Response        HTTPResponse
-		Trace           traces.Trace
-		Results         RunResults
+		Trace           *traces.Trace
+		Results         *RunResults
 	}{}
+
 	if err := json.Unmarshal(data, &aux); err != nil {
 		return err
 	}

@@ -30,6 +30,11 @@ func (td *postgresDB) CreateTest(ctx context.Context, test model.Test) (model.Te
 		return model.Test{}, fmt.Errorf("sql exec: %w", err)
 	}
 
+	err = td.SetDefiniton(ctx, test, test.Definition)
+	if err != nil {
+		return model.Test{}, fmt.Errorf("setDefinition error: %w", err)
+	}
+
 	return test, nil
 }
 
@@ -105,12 +110,6 @@ func (td *postgresDB) GetTests(ctx context.Context, take, skip int32) ([]model.T
 			return nil, err
 		}
 
-		defs, err := td.GetDefiniton(ctx, test)
-		if err != nil {
-			return nil, err
-		}
-		test.Definition = defs
-
 		tests = append(tests, test)
 	}
 	return tests, nil
@@ -151,14 +150,6 @@ func (td *postgresDB) readTestRow(ctx context.Context, row scanner) (model.Test,
 			return model.Test{}, err
 		}
 		test.Definition = defs
-
-		if test.ReferenceRun.TraceID.String() != "" {
-			res, err := td.GetRunByTraceID(ctx, test, test.ReferenceRun.TraceID)
-			if err != nil {
-				return model.Test{}, err
-			}
-			test.ReferenceRun = res
-		}
 
 		return test, nil
 	default:

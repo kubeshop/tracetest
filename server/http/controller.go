@@ -126,7 +126,11 @@ func (c *controller) GetTestResultSelectedSpans(ctx context.Context, _ string, r
 		return openapi.Response(http.StatusInternalServerError, ""), nil
 	}
 
-	selectedSpans := selector.Filter(run.Trace)
+	if run.Trace == nil {
+		return openapi.Response(http.StatusInternalServerError, "trace not available"), nil
+	}
+
+	selectedSpans := selector.Filter(*run.Trace)
 	selectedSpanIds := make([]string, len(selectedSpans))
 
 	for i, span := range selectedSpans {
@@ -147,7 +151,7 @@ func (c *controller) GetTestRun(ctx context.Context, _ string, runID string) (op
 		return handleDBError(err), err
 	}
 
-	return openapi.Response(200, c.openapi.Run(run)), nil
+	return openapi.Response(200, c.openapi.Run(&run)), nil
 }
 
 func (c *controller) GetTestRuns(ctx context.Context, testID string, take, skip int32) (openapi.ImplResponse, error) {
@@ -220,7 +224,7 @@ func (c *controller) RerunTestRun(ctx context.Context, testID string, runID stri
 
 	c.assertionRunner.RunAssertions(assertionRequest)
 
-	return openapi.Response(http.StatusOK, c.openapi.Run(run)), nil
+	return openapi.Response(http.StatusOK, c.openapi.Run(&run)), nil
 }
 
 func (c *controller) RunTest(ctx context.Context, testID string) (openapi.ImplResponse, error) {
@@ -238,7 +242,7 @@ func (c *controller) RunTest(ctx context.Context, testID string) (openapi.ImplRe
 
 	analytics.CreateAndSendEvent("test_run_backend", "test")
 
-	return openapi.Response(200, c.openapi.Run(run)), nil
+	return openapi.Response(200, c.openapi.Run(&run)), nil
 }
 
 func (c *controller) SetTestDefinition(ctx context.Context, testID string, def openapi.TestDefinition) (openapi.ImplResponse, error) {
@@ -273,7 +277,7 @@ func (c *controller) UpdateTest(ctx context.Context, testID string, in openapi.T
 
 	updated := c.model.Test(in)
 	updated.ID = test.ID
-	updated.ReferenceRun = model.Run{}
+	updated.ReferenceRun = nil
 
 	err = c.testDB.UpdateTest(ctx, updated)
 	if err != nil {

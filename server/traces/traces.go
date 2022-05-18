@@ -70,7 +70,7 @@ type encodedSpan struct {
 	Children   []encodedSpan
 }
 
-func (s *Span) MarshalJSON() ([]byte, error) {
+func (s Span) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&encodedSpan{
 		ID:         s.ID.String(),
 		Name:       s.Name,

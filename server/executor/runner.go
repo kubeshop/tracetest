@@ -113,8 +113,8 @@ func (r persistentRunner) processExecQueue(job execReq) {
 	response, err := r.executor.Execute(job.test, job.run.TraceID, job.run.SpanID)
 	run = r.handleExecutionResult(run, response, err)
 
-	if job.test.ReferenceRun.ID.String() == "" {
-		job.test.ReferenceRun = run
+	if job.test.ReferenceRun == nil {
+		job.test.ReferenceRun = &run
 		r.handleDBError(r.tests.UpdateTest(job.ctx, job.test))
 	}
 
