@@ -11,6 +11,7 @@ import (
 	"github.com/kubeshop/tracetest/traces"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/otel/trace"
 )
 
 func TestCreateRun(t *testing.T) {
@@ -55,6 +56,9 @@ func TestUpdateRun(t *testing.T) {
 				"tracetest.span.duration": "2000",
 			},
 		},
+	}
+	run.Trace.Flat = map[trace.SpanID]*traces.Span{
+		run.Trace.RootSpan.ID: &run.Trace.RootSpan,
 	}
 	run.Results = &model.RunResults{
 		AllPassed: true,

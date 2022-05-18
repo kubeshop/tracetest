@@ -42,7 +42,7 @@ func happyPath(t *testing.T, app *app.App, demoApp *testmock.DemoApp) {
 	assert.NoError(t, err)
 	assert.NotEmpty(t, testID)
 
-	createTestAssertions(testID)
+	createTestDefinition(testID)
 
 	runID, err := runTest(app, testID)
 	assert.NoError(t, err)
@@ -116,7 +116,7 @@ func createImportPokemonTest(app *app.App, demoApp *testmock.DemoApp) (string, e
 	return test.Id, nil
 }
 
-func createTestAssertions(testID string) {
+func createTestDefinition(testID string) {
 	body := openapi.TestDefinition{
 		Definitions: []openapi.TestDefinitionDefinitions{
 			{
@@ -143,13 +143,19 @@ func createTestAssertions(testID string) {
 	bytesBuffer := bytes.NewBuffer(jsonBytes)
 	url := fmt.Sprintf("%s/api/tests/%s/definition", appEndpoint, testID)
 
+	req, _ := http.NewRequest("PUT", url, bytesBuffer)
+	req.Header.Set("Content-Type", "application/json")
+	http.DefaultClient.Do(req)
+
 	response, err := http.Post(url, "application/json", bytesBuffer)
 	if err != nil {
 		panic(fmt.Errorf("could not send request to create assertion: %w", err))
 	}
 
-	if response.StatusCode != 201 {
-		panic(fmt.Errorf("could not create assertion. Expected status 200, got %d", response.StatusCode))
+	if response.StatusCode != 204 {
+		r, _ := ioutil.ReadAll(response.Body)
+		fmt.Println("Response", string(r))
+		panic(fmt.Errorf("could not create definition. Expected status 201, got %d", response.StatusCode))
 	}
 }
 

@@ -29,7 +29,11 @@ func TestCreateTest(t *testing.T) {
 
 	actual, err := db.GetTest(context.TODO(), updated.ID)
 	require.NoError(t, err)
-	assert.Equal(t, test, actual)
+	assert.Equal(t, test.Name, actual.Name)
+	assert.Equal(t, test.Description, actual.Description)
+	assert.Equal(t, test.ServiceUnderTest, actual.ServiceUnderTest)
+	assert.Equal(t, test.ReferenceRun, actual.ReferenceRun)
+	assert.Equal(t, test.Definition, actual.Definition)
 }
 
 func TestUpdateTest(t *testing.T) {
