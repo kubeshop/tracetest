@@ -11,11 +11,11 @@ var verbose bool
 var configFile string
 
 var rootCmd = &cobra.Command{
-	Use:    "tracetest",
-	Short:  "tracetest CLI is a tool to interact with a tracetest server",
-	Long:   `tracetest CLI is a tool to interact with a tracetest server`,
-	Run:    func(cmd *cobra.Command, args []string) {},
-	PreRun: func(cmd *cobra.Command, args []string) {},
+	Use:     "tracetest",
+	Short:   "tracetest CLI is a tool to interact with a tracetest server",
+	Long:    `tracetest CLI is a tool to interact with a tracetest server`,
+	PreRun:  setupCommand,
+	PostRun: teardownCommand,
 }
 
 func Execute() {

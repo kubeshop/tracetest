@@ -7,12 +7,14 @@ import (
 )
 
 var testCmd = &cobra.Command{
-	Use:   "test",
-	Short: "Manage your tracetest tests",
-	Long:  "Manage your tracetest tests",
+	Use:    "test",
+	Short:  "Manage your tracetest tests",
+	Long:   "Manage your tracetest tests",
+	PreRun: setupCommand,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("Manage your tests")
 	},
+	PostRun: teardownCommand,
 }
 
 func init() {
