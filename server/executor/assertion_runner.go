@@ -76,6 +76,7 @@ func (e *defaultAssertionRunner) runAssertionsAndUpdateResult(ctx context.Contex
 		return err
 	}
 
+	run.State = model.RunStateFinished
 	err = e.db.UpdateRun(ctx, run)
 	if err != nil {
 		return fmt.Errorf("could not save result on database: %w", err)

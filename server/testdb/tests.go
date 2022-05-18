@@ -57,7 +57,7 @@ func (td *postgresDB) DeleteTest(ctx context.Context, test model.Test) error {
 	queries := []string{
 		"DELETE FROM tests WHERE id = $1",
 		"DELETE FROM definitions WHERE test_id = $1",
-		"DELETE FROM results WHERE test_id = $1",
+		"DELETE FROM runs WHERE test_id = $1",
 	}
 
 	for _, sql := range queries {

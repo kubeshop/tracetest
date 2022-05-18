@@ -23,12 +23,12 @@ func TestExecutorSuccessfulExecution(t *testing.T) {
 		ShouldPass bool
 	}{
 		{
-			Name:       "pokeshop - import pokemon: should pass",
+			Name:       "ImportPokemonSucess",
 			Tracefile:  "../testmock/data/pokeshop_import_pokemon.json",
 			ShouldPass: true,
 		},
 		{
-			Name:       "pokeshop - import pokemon: should fail",
+			Name:       "ImportPokemonFail",
 			Tracefile:  "../testmock/data/pokeshop_import_pokemon_failed_assertions.json",
 			ShouldPass: false,
 		},
@@ -87,8 +87,8 @@ func TestExecutorSuccessfulExecution(t *testing.T) {
 }
 
 type testFile struct {
-	Test   model.Test `json:"test"`
-	Result model.Run  `json:"result"`
+	Test model.Test `json:"test"`
+	Run  model.Run  `json:"run"`
 }
 
 func loadTestFile(filePath string) (model.Test, model.Run, error) {
@@ -109,7 +109,7 @@ func loadTestFile(filePath string) (model.Test, model.Run, error) {
 	}
 
 	testFile.Test.ID = id.NewRandGenerator().UUID()
-	testFile.Result.ID = id.NewRandGenerator().UUID()
+	testFile.Run.ID = id.NewRandGenerator().UUID()
 
-	return testFile.Test, testFile.Result, nil
+	return testFile.Test, testFile.Run, nil
 }

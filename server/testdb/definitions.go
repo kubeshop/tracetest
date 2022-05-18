@@ -26,11 +26,12 @@ func (td *postgresDB) GetDefiniton(ctx context.Context, test model.Test) (model.
 }
 
 func (td *postgresDB) SetDefiniton(ctx context.Context, t model.Test, d model.Definition) error {
-	stmt, err := td.db.Prepare(`
-		INSERT INTO definition (id, test_id, definition) VALUES ($1, $2, $3)
-		ON CONFLICT DO
-			UPDATE definition SET definition = $3 WHERE id = $1 AND test_id = $2
-	`)
+	sql := `UPDATE definitions SET definition = $3 WHERE test_id = $1 AND  = $2`
+	if _, err := td.GetDefiniton(ctx, t); err == ErrNotFound {
+		sql = `INSERT INTO definitions (test_id, "definition") VALUES ($1, $2)`
+	}
+
+	stmt, err := td.db.Prepare(sql)
 	if err != nil {
 		return fmt.Errorf("prepare: %w", err)
 	}

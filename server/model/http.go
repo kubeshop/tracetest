@@ -1,6 +1,8 @@
 package model
 
-import "net/http"
+import (
+	"net/http"
+)
 
 type HTTPMethod string
 
@@ -41,8 +43,32 @@ type HTTPResponse struct {
 	Body       string
 }
 
-type HTTPAuthenticator interface {
-	Authenticate(*http.Request)
+type HTTPAuthenticator struct {
+	Type  string
+	Props map[string]string
+}
+
+func (a HTTPAuthenticator) Authenticate(req *http.Request) {
+	var auth authenticator
+	switch a.Type {
+	case "apiKey":
+		auth = APIKeyAuthenticator{
+			Key:   a.Props["key"],
+			Value: a.Props["value"],
+			In:    APIKeyPosition(a.Props["in"]),
+		}
+	case "basic":
+		auth = BasicAuthenticator{
+			Username: a.Props["username"],
+			Password: a.Props["password"],
+		}
+	case "bearer":
+		auth = BearerAuthenticator{
+			Bearer: a.Props["token"],
+		}
+	}
+
+	auth.Authenticate(req)
 }
 
 type APIKeyPosition string
@@ -51,6 +77,10 @@ const (
 	APIKeyPositionHeader APIKeyPosition = "header"
 	APIKeyPositionQuery  APIKeyPosition = "query"
 )
+
+type authenticator interface {
+	Authenticate(req *http.Request)
+}
 
 type APIKeyAuthenticator struct {
 	Key   string

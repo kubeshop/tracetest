@@ -1,6 +1,7 @@
 package http
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/google/uuid"
@@ -56,25 +57,24 @@ func (m openapiMapper) HTTPResponse(in model.HTTPResponse) openapi.HttpResponse 
 }
 
 func (m openapiMapper) Auth(in model.HTTPAuthenticator) openapi.HttpAuth {
-	auth := openapi.HttpAuth{}
-	switch v := in.(type) {
-	case model.APIKeyAuthenticator:
-		auth.Type = "apiKey"
+	auth := openapi.HttpAuth{
+		Type: in.Type,
+	}
+	switch in.Type {
+	case "apiKey":
 		auth.ApiKey = openapi.HttpAuthApiKey{
-			Key:   v.Key,
-			Value: v.Value,
-			In:    string(v.In),
+			Key:   in.Props["key"],
+			Value: in.Props["value"],
+			In:    in.Props["in"],
 		}
-	case model.BasicAuthenticator:
-		auth.Type = "basic"
+	case "basic":
 		auth.Basic = openapi.HttpAuthBasic{
-			Username: v.Username,
-			Password: v.Password,
+			Username: in.Props["username"],
+			Password: in.Props["password"],
 		}
-	case model.BearerAuthenticator:
-		auth.Type = "bearer"
+	case "bearer":
 		auth.Bearer = openapi.HttpAuthBearer{
-			Token: v.Bearer,
+			Token: in.Props["bearer"],
 		}
 	}
 
@@ -261,26 +261,29 @@ func (m modelMapper) HTTPResponse(in openapi.HttpResponse) model.HTTPResponse {
 }
 
 func (m modelMapper) Auth(in openapi.HttpAuth) model.HTTPAuthenticator {
-	var auth model.HTTPAuthenticator
+	var props map[string]string
 	switch in.Type {
 	case "apiKey":
-		auth = model.APIKeyAuthenticator{
-			Key:   in.ApiKey.Key,
-			Value: in.ApiKey.Value,
-			In:    model.APIKeyPosition(in.ApiKey.In),
+		props = map[string]string{
+			"key":   in.ApiKey.Key,
+			"value": in.ApiKey.Value,
+			"in":    in.ApiKey.In,
 		}
 	case "basic":
-		auth = model.BasicAuthenticator{
-			Username: in.Basic.Username,
-			Password: in.Basic.Password,
+		props = map[string]string{
+			"username": in.Basic.Username,
+			"password": in.Basic.Password,
 		}
 	case "bearer":
-		auth = model.BearerAuthenticator{
-			Bearer: in.Bearer.Token,
+		props = map[string]string{
+			"token": in.Bearer.Token,
 		}
 	}
 
-	return auth
+	return model.HTTPAuthenticator{
+		Type:  in.Type,
+		Props: props,
+	}
 }
 
 func (m modelMapper) Tests(in []openapi.Test) []model.Test {
@@ -314,7 +317,7 @@ func (m modelMapper) Run(in openapi.TestRun) model.Run {
 		TraceID:     tid,
 		SpanID:      sid,
 		State:       model.RunState(in.State),
-		LastError:   fmt.Errorf(in.LastErrorState),
+		LastError:   errors.New(in.LastErrorState),
 		CreatedAt:   in.CreatedAt,
 		CompletedAt: in.CompletedAt,
 		Request:     m.HTTPRequest(in.Request),

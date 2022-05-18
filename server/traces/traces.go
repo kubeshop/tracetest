@@ -30,16 +30,16 @@ func (t *Trace) UnmarshalJSON(data []byte) error {
 
 	t.ID = tid
 	t.Flat = map[trace.SpanID]*Span{}
-	FlattenSpans(t.Flat, &t.RootSpan)
+	flattenSpans(t.Flat, &t.RootSpan)
 	return nil
 }
 
-func FlattenSpans(res map[trace.SpanID]*Span, root *Span) {
+func flattenSpans(res map[trace.SpanID]*Span, root *Span) {
 	res[root.ID] = root
 	for _, child := range root.Children {
 		res[child.ID] = child
 		if len(child.Children) > 0 {
-			FlattenSpans(res, child)
+			flattenSpans(res, child)
 		}
 	}
 }

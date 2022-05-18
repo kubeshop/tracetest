@@ -147,7 +147,14 @@ func TestExecutePostWithApiKeyAuth(t *testing.T) {
 				Headers: []model.HTTPHeader{
 					{Key: "Key1", Value: "Value1"},
 				},
-				Auth: model.APIKeyAuthenticator{"key", "value", model.APIKeyPositionHeader},
+				Auth: model.HTTPAuthenticator{
+					Type: "apiKey",
+					Props: map[string]string{
+						"key":   "key",
+						"value": "value",
+						"in":    string(model.APIKeyPositionHeader),
+					},
+				},
 				Body: "body",
 			},
 		},
@@ -201,7 +208,13 @@ func TestExecutePostWithBasicAuth(t *testing.T) {
 				Headers: []model.HTTPHeader{
 					{Key: "Key1", Value: "Value1"},
 				},
-				Auth: model.APIKeyAuthenticator{"key", "value", model.APIKeyPositionQuery},
+				Auth: model.HTTPAuthenticator{
+					Type: "basic",
+					Props: map[string]string{
+						"username": "username",
+						"password": "password",
+					},
+				},
 				Body: "body",
 			},
 		},
@@ -255,7 +268,12 @@ func TestExecutePostWithBearerAuth(t *testing.T) {
 				Headers: []model.HTTPHeader{
 					{Key: "Key1", Value: "Value1"},
 				},
-				Auth: model.BearerAuthenticator{"token"},
+				Auth: model.HTTPAuthenticator{
+					Type: "bearer",
+					Props: map[string]string{
+						"token": "token",
+					},
+				},
 				Body: "body",
 			},
 		},
