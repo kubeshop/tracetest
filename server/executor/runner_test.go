@@ -99,10 +99,10 @@ func (f runnerFixture) expectSuccessExec(test model.Test) {
 }
 
 func (f runnerFixture) expectSuccessResultPersist(test model.Test) {
-	expectCreateRun(*f.mockDB, test)
-	expectUpdateRunState(f.mockDB, test, model.RunStateExecuting)
-	f.mockDB.On("UpdateTest", test.ID).Return(noError)
-	expectUpdateRunState(f.mockDB, test, model.RunStateAwaitingTrace)
+	expectCreateRun(f.mockDB, test)
+	f.mockDB.On("UpdateRun", mock.Anything).Return(noError)
+	f.mockDB.On("UpdateTest", mock.Anything).Return(noError)
+	f.mockDB.On("UpdateRun", mock.Anything).Return(noError)
 	f.mockTracePoller.expectPoll(test)
 }
 
@@ -139,14 +139,25 @@ type mockDB struct {
 }
 
 func (m *mockDB) CreateRun(_ context.Context, test model.Test, run model.Run) (model.Run, error) {
-	args := m.Called(test.ID, run)
+	args := m.Called(test.ID.String())
 	if m.runs == nil {
 		m.runs = map[string]model.Run{}
 	}
 
 	m.runs[test.ID.String()] = run
 
-	return args.Get(0).(model.Run), args.Error(1)
+	return run, args.Error(0)
+}
+
+func (m *mockDB) UpdateRun(_ context.Context, run model.Run) error {
+	args := m.Called(run.ID.String())
+	for k, v := range m.runs {
+		if v.ID.String() == run.ID.String() {
+			m.runs[k] = run
+		}
+	}
+
+	return args.Error(0)
 }
 
 type mockExecutor struct {
@@ -172,15 +183,9 @@ func (m *mockExecutor) expectExecuteTestLong(test model.Test) *mock.Call {
 		Return(sampleResponse, noError)
 }
 
-func expectCreateRun(m mockDB, test model.Test) *mock.Call {
+func expectCreateRun(m *mockDB, test model.Test) *mock.Call {
 	return m.
-		On("CreateRun", test.ID).
-		Return(noError)
-}
-
-func expectUpdateRunState(m *mockDB, test model.Test, expectedState model.RunState) *mock.Call {
-	return m.
-		On("UpdateRun", test.ID, expectedState).
+		On("CreateRun", test.ID.String()).
 		Return(noError)
 }
 
@@ -190,7 +195,7 @@ type mockTracePoller struct {
 }
 
 func (m *mockTracePoller) Poll(_ context.Context, test model.Test, run model.Run) {
-	m.Called(test.ID, run.ID)
+	m.Called(test.ID)
 }
 
 func (m *mockTracePoller) expectPoll(test model.Test) *mock.Call {

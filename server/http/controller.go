@@ -8,6 +8,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/kubeshop/tracetest/analytics"
+	"github.com/kubeshop/tracetest/assertions/comparator"
 	"github.com/kubeshop/tracetest/assertions/selectors"
 	"github.com/kubeshop/tracetest/executor"
 	"github.com/kubeshop/tracetest/model"
@@ -36,7 +37,7 @@ func NewController(
 		runner:          runner,
 		assertionRunner: assertionRunner,
 		openapi:         openapiMapper{},
-		model:           modelMapper{},
+		model:           modelMapper{Comparators: comparator.DefaultRegistry()},
 	}
 }
 

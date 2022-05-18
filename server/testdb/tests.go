@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	"github.com/google/uuid"
@@ -20,6 +21,7 @@ func (td *postgresDB) CreateTest(ctx context.Context, test model.Test) (model.Te
 	defer stmt.Close()
 
 	test.ID = IDGen.UUID()
+	test.ReferenceRun = nil
 
 	b, err := encodeTest(test)
 	if err != nil {
@@ -146,7 +148,8 @@ func (td *postgresDB) readTestRow(ctx context.Context, row scanner) (model.Test,
 		}
 
 		defs, err := td.GetDefiniton(ctx, test)
-		if err != nil {
+		if err != nil && !errors.Is(err, ErrNotFound) {
+			err = fmt.Errorf("aca 1. %w", err)
 			return model.Test{}, err
 		}
 		test.Definition = defs

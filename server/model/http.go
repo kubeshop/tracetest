@@ -74,6 +74,8 @@ func (a HTTPAuthenticator) Authenticate(req *http.Request) {
 		auth = BearerAuthenticator{
 			Bearer: a.Props["token"],
 		}
+	default:
+		return
 	}
 
 	auth.Authenticate(req)

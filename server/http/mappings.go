@@ -166,15 +166,11 @@ func (m openapiMapper) Result(in *model.RunResults) openapi.AssertionResults {
 		for j, r := range inRes {
 			sres := make([]openapi.AssertionSpanResult, len(r.Results))
 			for k, asr := range r.Results {
-				err := ""
-				if asr.CompareErr != nil {
-					err = asr.CompareErr.Error()
-				}
 				sres[k] = openapi.AssertionSpanResult{
 					SpanId:        asr.SpanID.String(),
 					ObservedValue: asr.ObservedValue,
 					Passed:        asr.CompareErr == nil,
-					Error:         err,
+					Error:         errToString(asr.CompareErr),
 				}
 			}
 			res[j] = openapi.AssertionResult{
@@ -210,7 +206,7 @@ func (m openapiMapper) Run(in *model.Run) openapi.TestRun {
 		TraceId:        in.TraceID.String(),
 		SpanId:         in.SpanID.String(),
 		State:          string(in.State),
-		LastErrorState: in.LastError.Error(),
+		LastErrorState: errToString(in.LastError),
 		CreatedAt:      in.CreatedAt,
 		CompletedAt:    in.CompletedAt,
 		Request:        m.HTTPRequest(in.Request),
@@ -332,7 +328,7 @@ func (m modelMapper) Run(in openapi.TestRun) *model.Run {
 		TraceID:     tid,
 		SpanID:      sid,
 		State:       model.RunState(in.State),
-		LastError:   errors.New(in.LastErrorState),
+		LastError:   stringToErr(in.LastErrorState),
 		CreatedAt:   in.CreatedAt,
 		CompletedAt: in.CompletedAt,
 		Request:     m.HTTPRequest(in.Request),
@@ -419,4 +415,20 @@ func (m modelMapper) Runs(in []openapi.TestRun) []model.Run {
 	}
 
 	return runs
+}
+
+func errToString(err error) string {
+	if err != nil {
+		return err.Error()
+	}
+
+	return ""
+}
+
+func stringToErr(s string) error {
+	if s != "" {
+		return errors.New(s)
+	}
+
+	return nil
 }

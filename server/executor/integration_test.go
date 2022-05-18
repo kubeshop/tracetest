@@ -145,9 +145,7 @@ func createTestDefinition(testID string) {
 
 	req, _ := http.NewRequest("PUT", url, bytesBuffer)
 	req.Header.Set("Content-Type", "application/json")
-	http.DefaultClient.Do(req)
-
-	response, err := http.Post(url, "application/json", bytesBuffer)
+	response, err := http.DefaultClient.Do(req)
 	if err != nil {
 		panic(fmt.Errorf("could not send request to create assertion: %w", err))
 	}
