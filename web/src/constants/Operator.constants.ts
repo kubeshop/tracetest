@@ -1,6 +1,6 @@
 import {TCompareOperatorName, TCompareOperatorSymbol} from '../types/Operator.types';
 
-export const enum CompareOperator {
+export enum CompareOperator {
   EQUALS = 'EQUALS',
   NOTEQUALS = 'NOTEQUALS',
   LESSTHAN = 'LESSTHAN',
@@ -29,3 +29,10 @@ export const CompareOperatorSymbolMap: Record<CompareOperator, TCompareOperatorS
   [CompareOperator.LESSOREQUAL]: '<=',
   [CompareOperator.CONTAINS]: 'contains',
 };
+
+export enum PseudoSelector {
+  FIRST = ':first',
+  LAST = ':last',
+  NTH = ':nth',
+  ALL = ':all',
+}

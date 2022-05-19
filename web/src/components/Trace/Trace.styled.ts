@@ -1,32 +1,4 @@
-import {Tabs} from 'antd';
-import styled from 'styled-components';
-
-export const TraceTabs = styled(Tabs)`
-  flex-grow: 1;
-
-  .ant-tabs {
-    flex-grow: 1;
-  }
-
-  .ant-tabs-nav {
-    margin-bottom: 0;
-  }
-
-  .ant-tabs-nav::before {
-    border: none;
-  }
-
-  .ant-tabs-tabpane {
-    flex-direction: column;
-  }
-
-  .ant-tabs-content-holder {
-    width: 100%;
-    min-width: unset;
-    min-height: unset;
-    overflow-y: auto;
-  }
-`;
+import styled, { css } from 'styled-components';
 
 export const Main = styled.main<{height: string}>`
   display: flex;
@@ -50,7 +22,17 @@ export const DetailsSection = styled.div`
   box-shadow: 0px 20px 24px rgba(153, 155, 168, 0.18);
 `;
 
-export const TabsContainer = styled.div`
-  padding: 14px 24px;
-  overflow: hidden;
+export const Header = styled.div<{visiblePortion: number}>`
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  justify-content: space-between;
+  width: 100%;
+  background: #f5f5fa;
+  ${props =>
+    css`
+      height: ${props.visiblePortion}px;
+    `}
+  padding: 0 24px;
+  color: rgb(213, 215, 224);
 `;

@@ -3,13 +3,13 @@
 exports[`Layout 1`] = `
 <div>
   <div
-    class="sc-ieecCq FiStd"
+    class="sc-bqiRlB eGzDFf"
   >
     <div
-      class="sc-bqiRlB iwrCuh"
+      class="sc-pVTFL cMobMb"
     >
       <h5
-        class="ant-typography sc-ksdxgE ipQGyD"
+        class="ant-typography sc-jrQzAO bLVaNA"
       >
         Span Details
       </h5>
@@ -20,7 +20,7 @@ exports[`Layout 1`] = `
       </span>
     </div>
     <div
-      class="ant-tabs ant-tabs-top sc-hBUSln kUdfoR"
+      class="ant-tabs ant-tabs-top sc-kDTinF bZZsKx"
       data-cy="span-details-attributes"
       style="margin-bottom: 150px; overflow: hidden;"
     >
@@ -39,22 +39,8 @@ exports[`Layout 1`] = `
               class="ant-tabs-tab ant-tabs-tab-active"
             >
               <div
-                aria-controls="rc-tabs-test-panel-span-assertion"
-                aria-selected="true"
-                class="ant-tabs-tab-btn"
-                id="rc-tabs-test-tab-span-assertion"
-                role="tab"
-                tabindex="0"
-              >
-                Assertion
-              </div>
-            </div>
-            <div
-              class="ant-tabs-tab"
-            >
-              <div
                 aria-controls="rc-tabs-test-panel-span-request"
-                aria-selected="false"
+                aria-selected="true"
                 class="ant-tabs-tab-btn"
                 id="rc-tabs-test-tab-span-request"
                 role="tab"
@@ -140,76 +126,16 @@ exports[`Layout 1`] = `
         >
           <div
             aria-hidden="false"
-            aria-labelledby="rc-tabs-test-tab-span-assertion"
+            aria-labelledby="rc-tabs-test-tab-span-request"
             class="ant-tabs-tabpane ant-tabs-tabpane-active"
-            id="rc-tabs-test-panel-span-assertion"
+            id="rc-tabs-test-panel-span-request"
             role="tabpanel"
             tabindex="0"
           >
-            <div>
-              <div
-                class="sc-dJjYzT jydkUB"
-              >
-                <button
-                  class="ant-btn ant-btn-primary sc-hGPBjI ijyrZa"
-                  data-cy="add-assertion-button"
-                  type="button"
-                >
-                  <span
-                    aria-label="plus"
-                    class="anticon anticon-plus"
-                    role="img"
-                  >
-                    <svg
-                      aria-hidden="true"
-                      data-icon="plus"
-                      fill="currentColor"
-                      focusable="false"
-                      height="1em"
-                      viewBox="64 64 896 896"
-                      width="1em"
-                    >
-                      <defs>
-                        <style />
-                      </defs>
-                      <path
-                        d="M482 152h60q8 0 8 8v704q0 8-8 8h-60q-8 0-8-8V160q0-8 8-8z"
-                      />
-                      <path
-                        d="M176 474h672q8 0 8 8v60q0 8-8 8H176q-8 0-8-8v-60q0-8 8-8z"
-                      />
-                    </svg>
-                  </span>
-                  <span>
-                    Add Assertion
-                  </span>
-                </button>
-              </div>
-              <div
-                class="sc-fFeiMQ dGJwRW"
-                data-cy="empty-assertion-table"
-              >
-                <img
-                  class="sc-bkkeKt"
-                  src="SpanAssertionsEmptyState.svg"
-                />
-                <span
-                  class="ant-typography ant-typography-disabled"
-                >
-                  Add assertion to see result here.
-                </span>
-              </div>
-            </div>
+            <div
+              class="sc-furwcr bsfqEZ"
+            />
           </div>
-          <div
-            aria-hidden="true"
-            aria-labelledby="rc-tabs-test-tab-span-request"
-            class="ant-tabs-tabpane"
-            id="rc-tabs-test-panel-span-request"
-            role="tabpanel"
-            style="display: none;"
-            tabindex="-1"
-          />
           <div
             aria-hidden="true"
             aria-labelledby="rc-tabs-test-tab-span-response"

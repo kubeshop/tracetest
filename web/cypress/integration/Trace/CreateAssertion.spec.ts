@@ -18,75 +18,88 @@ describe('Create Assertion', () => {
     cy.get(`[data-cy^=test-run-result-]`).first().click();
     cy.location('href').should('match', /\/result\/.*/i);
 
-    cy.wait(7000);
+    cy.get('[data-cy^=trace-node-]', {timeout: 10000}).should('be.visible');
     cy.get('[data-cy=add-assertion-button]').click();
-    cy.get('[data-cy=create-assertion-form]', {timeout: 10000}).should('be.visible');
+    cy.get('[data-cy=assertion-form]', {timeout: 10000}).should('be.visible');
 
-    cy.get('[data-cy=item-selector-tag] + [role=img]').first().click();
-    cy.get('[data-cy=affected-spans-count]')
-      .invoke('text')
-      .should('match', /Affects \d+ spans/);
-
-    cy.get('[data-cy=assertion-check-key]').type('http');
+    // add selector
+    cy.get('[data-cy=assertion-form-selector-input]').type('db');
     cy.get('.ant-select-item-option-content').first().click();
-    cy.get('[data-cy=assertion-check-key]').should('have.text', 'http.status_code');
-    cy.get('[data-cy=assertion-check-value] input').should('have.attr', 'value', '200');
+    cy.get('.ant-select-item-option-content').first().click();
+    cy.get('.ant-select-item-option-content').first().click();
+
+    cy.get('[data-cy=assertion-check-attribute]').type('db');
+    cy.wait(500);
+    cy.get('#assertion-form_assertionList_0_key_list + div .ant-select-item').first().click();
 
     cy.get('[data-cy=assertion-check-operator]').click();
-    cy.get('.ant-select-item-option-content').last().click();
+    cy.get('#assertion-form_assertionList_0_compareOp_list + div .ant-select-item').last().click();
+    cy.get('[data-cy=assertion-check-operator] .ant-select-selection-item').should('have.text', 'Contains');
 
-    cy.get('[data-cy=assertion-check-operator] .ant-select-selection-item').should('have.text', 'contains');
-    cy.get('#add-assertion-modal-ok-button').click();
+    cy.get('[data-cy=assertion-form-submit-button]').click();
 
-    cy.get('[data-cy=assertion-table]').should('be.visible');
+    cy.get('[data-cy=assertion-card-list]').should('be.visible');
+    cy.get('[data-cy=assertion-card]').should('have.lengthOf', 1);
   });
 
   it('should create an assertion with multiple checks', () => {
     cy.get('[data-cy=add-assertion-button]').click();
-    cy.get('[data-cy=create-assertion-form]').should('be.visible');
+    cy.get('[data-cy=assertion-form]').should('be.visible');
 
-    cy.get('[data-cy=assertion-check-key]').first().type('http');
+    // add selector
+    cy.get('[data-cy=assertion-form-selector-input]').type('db');
     cy.get('.ant-select-item-option-content').first().click();
-    cy.get('[data-cy=assertion-check-key]').first().should('have.text', 'http.status_code');
-    cy.get('[data-cy=assertion-check-value] input').first().should('have.attr', 'value', '200');
-    cy.get('[data-cy=assertion-check-operator]').first().click();
+    cy.get('.ant-select-item-option-content').first().click();
+    cy.get('.ant-select-item-option-content').first().click();
+
+    cy.get('[data-cy=assertion-form-selector-input]').type('service');
     cy.get('.ant-select-item-option-content').last().click();
-    cy.get('[data-cy=assertion-check-operator] .ant-select-selection-item').first().should('have.text', 'contains');
+    cy.get('.ant-select-item-option-content').last().click();
+    cy.get('.ant-select-item-option-content').last().click();
+
+    cy.get('[data-cy=assertion-check-attribute]').type('db');
+    cy.wait(500);
+    cy.get('#assertion-form_assertionList_0_key_list + div .ant-select-item').first().click();
+
+    cy.get('[data-cy=assertion-check-operator]').click();
+    cy.get('#assertion-form_assertionList_0_compareOp_list + div .ant-select-item').first().click();
+    cy.get('[data-cy=assertion-check-operator] .ant-select-selection-item').first().should('have.text', 'Equals');
 
     cy.get('[data-cy=add-assertion-form-add-check]').click();
 
-    cy.get('[data-cy=assertion-check-key]').last().type('service');
-    cy.get('.ant-select-item-option-content').last().click();
-    cy.get('[data-cy=assertion-check-key]').last().should('have.text', 'service.name');
-    cy.get('[data-cy=assertion-check-value] input').last().should('have.attr', 'value', 'pokeshop');
+    cy.get('[data-cy=assertion-check-attribute]').last().type('service');
+    cy.wait(500);
+    cy.get('#assertion-form_assertionList_1_key_list + div .ant-select-item').first().click();
 
-    cy.get('[data-cy=assertion-check-operator] .ant-select-selection-item').last().should('have.text', 'eq');
-    cy.get('#add-assertion-modal-ok-button').click();
+    cy.get('[data-cy=assertion-check-operator]').last().click();
+    cy.get('#assertion-form_assertionList_1_compareOp_list + div .ant-select-item').last().click();
+    cy.get('[data-cy=assertion-check-operator] .ant-select-selection-item').last().should('have.text', 'Contains');
+    cy.get('[data-cy=assertion-form-submit-button]').click();
 
-    cy.get('[data-cy=assertion-table]').should('have.lengthOf', 2);
+    cy.get('[data-cy=assertion-card-list]').should('be.visible');
+    cy.get('[data-cy=assertion-card]').should('have.lengthOf', 2);
   });
 
   it('should update an assertion', () => {
     cy.get('[data-cy=edit-assertion-button]').last().click();
-    cy.get('[data-cy=create-assertion-form]').should('be.visible');
+    cy.get('[data-cy=assertion-form]').should('be.visible');
 
     cy.get('[data-cy=assertion-check-operator]').first().click();
-    cy.get('.ant-select-item-option-content').first().click();
-    cy.get('[data-cy=assertion-check-operator] .ant-select-selection-item').first().should('have.text', 'eq');
+    cy.get('#assertion-form_assertionList_0_compareOp_list + div .ant-select-item:nth-child(2)').first().click();
+    cy.get('[data-cy=assertion-check-operator] .ant-select-selection-item').first().should('have.text', 'Not equals');
 
     cy.get('[data-cy=add-assertion-form-add-check]').click();
 
-    cy.get('[data-cy=assertion-check-key]').last().type('service');
-    cy.get('.ant-select-item-option-content').last().click();
-    cy.get('[data-cy=assertion-check-key]').last().should('have.text', 'service.name');
-    cy.get('[data-cy=assertion-check-value] input').last().should('have.attr', 'value', 'pokeshop');
+    cy.get('[data-cy=assertion-check-attribute]').last().type('service');
+    cy.wait(500);
+    cy.get('#assertion-form_assertionList_2_key_list + div .ant-select-item').first().click();
 
-    cy.get('[data-cy=assertion-check-operator] .ant-select-selection-item').last().should('have.text', 'eq');
-    cy.get('#add-assertion-modal-ok-button').click();
+    cy.get('[data-cy=assertion-check-operator]').last().click();
+    cy.get('#assertion-form_assertionList_2_compareOp_list + div .ant-select-item').last().click();
+    cy.get('[data-cy=assertion-check-operator] .ant-select-selection-item').last().should('have.text', 'Contains');
+    cy.get('[data-cy=assertion-form-submit-button]').click();
 
-    cy.get('[data-cy=assertion-table]').should('have.lengthOf', 2);
-    cy.get('[data-cy=trace-drawer').click();
-
-    cy.get('[data-cy=assertion-card"]').should('be.visible');
+    cy.get('[data-cy=assertion-card-list]').should('be.visible');
+    cy.get('[data-cy=assertion-card]').should('have.lengthOf', 2);
   });
 });

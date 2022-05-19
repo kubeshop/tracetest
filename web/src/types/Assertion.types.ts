@@ -12,9 +12,9 @@ export interface IAssertion {
 export interface IItemSelector {
   locationName: LOCATION_NAME;
   propertyName: string;
+  operator?: CompareOperator;
   value: string;
   valueType: string;
-  operator?: CompareOperator;
 }
 
 export interface ISpanSelector {
@@ -62,4 +62,11 @@ export interface ISpanAssertionResult2 {
 export interface IAssertionResultList {
   assertion: IAssertion;
   assertionResultList: ISpanAssertionResult[];
+}
+
+export interface IAssertionSpan {
+  key: string;
+  compareOp: CompareOperator;
+  value: string;
+  type?: string;
 }

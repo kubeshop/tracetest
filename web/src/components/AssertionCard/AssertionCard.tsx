@@ -44,7 +44,7 @@ const AssertionCard: React.FC<IAssertionCardProps> = ({
           <S.SpanCountText>{spanCountText}</S.SpanCountText>
         </div>
         <div>
-          <S.EditIcon onClick={() => onEdit(assertionResult)} />
+          <S.EditIcon data-cy="edit-assertion-button" onClick={() => onEdit(assertionResult)} />
           <S.DeleteIcon onClick={() => onDelete(assertionId)} />
         </div>
       </S.Header>

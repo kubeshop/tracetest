@@ -21,8 +21,8 @@ describe('Show Trace', () => {
     cy.get('[data-cy=diagram-dag]', {timeout: 10000}).should('be.visible');
     cy.get('[data-cy^=trace-node-]', {timeout: 10000}).should('be.visible');
     cy.get('[data-cy=span-details-attributes]').should('be.visible');
-    cy.get('[data-cy=empty-assertion-table]').should('be.visible');
+    cy.get('[data-cy=empty-assertion-card-list]').should('exist');
 
-    cy.get('[data-cy=test-results]').should('exist');
+    cy.get('[data-cy=assertion-card-list]').should('exist');
   });
 });
