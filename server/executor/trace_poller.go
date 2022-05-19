@@ -7,24 +7,20 @@ import (
 	"math"
 	"time"
 
-	"github.com/kubeshop/tracetest/openapi"
+	"github.com/kubeshop/tracetest/model"
 	"github.com/kubeshop/tracetest/subscription"
-	"github.com/kubeshop/tracetest/testdb"
 	"github.com/kubeshop/tracetest/tracedb"
+	"github.com/kubeshop/tracetest/traces"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 )
 
 type TracePoller interface {
-	Poll(context.Context, openapi.TestRunResult)
+	Poll(context.Context, model.Test, model.Run)
 }
 
 type PersistentTracePoller interface {
 	TracePoller
 	WorkerPool
-}
-
-type ResultUpdater interface {
-	UpdateResult(ctx context.Context, res *openapi.TestRunResult) error
 }
 
 type TraceFetcher interface {
@@ -33,8 +29,7 @@ type TraceFetcher interface {
 
 func NewTracePoller(
 	tf TraceFetcher,
-	ru ResultUpdater,
-	testDB testdb.TestRepository,
+	tests model.Repository,
 	maxWaitTimeForTrace time.Duration,
 	subscriptionManager *subscription.Manager,
 	assertionRunner AssertionRunner,
@@ -42,9 +37,8 @@ func NewTracePoller(
 	retryDelay := 1 * time.Second
 	maxTracePollRetry := int(math.Ceil(float64(maxWaitTimeForTrace) / float64(retryDelay)))
 	return tracePoller{
+		tests:               tests,
 		traceDB:             tf,
-		resultDB:            ru,
-		testDB:              testDB,
 		maxWaitTimeForTrace: maxWaitTimeForTrace,
 		maxTracePollRetry:   maxTracePollRetry,
 		retryDelay:          retryDelay,
@@ -56,9 +50,8 @@ func NewTracePoller(
 }
 
 type tracePoller struct {
-	resultDB            ResultUpdater
+	tests               model.Repository
 	traceDB             TraceFetcher
-	testDB              testdb.TestRepository
 	maxWaitTimeForTrace time.Duration
 	retryDelay          time.Duration
 	maxTracePollRetry   int
@@ -71,9 +64,10 @@ type tracePoller struct {
 }
 
 type tracePollReq struct {
-	ctx    context.Context
-	result openapi.TestRunResult
-	count  int
+	ctx   context.Context
+	test  model.Test
+	run   model.Run
+	count int
 }
 
 func (tp tracePoller) handleDBError(err error) {
@@ -94,9 +88,9 @@ func (tp tracePoller) Start(workers int) {
 				case job := <-tp.executeQueue:
 					fmt.Printf(
 						"tracePoller job. TestID %s, TraceID %s, SpanID %s\n",
-						job.result.TestId,
-						job.result.TraceId,
-						job.result.SpanId,
+						job.test.ID,
+						job.run.TraceID,
+						job.run.SpanID,
 					)
 					tp.processJob(job)
 				}
@@ -110,10 +104,11 @@ func (tp tracePoller) Stop() {
 	tp.exit <- true
 }
 
-func (tp tracePoller) Poll(ctx context.Context, result openapi.TestRunResult) {
+func (tp tracePoller) Poll(ctx context.Context, test model.Test, run model.Run) {
 	tp.enqueueJob(tracePollReq{
-		ctx:    ctx,
-		result: result,
+		ctx:  ctx,
+		test: test,
+		run:  run,
 	})
 }
 
@@ -122,62 +117,50 @@ func (tp tracePoller) enqueueJob(job tracePollReq) {
 }
 
 func (tp tracePoller) processJob(job tracePollReq) {
-	res := job.result
-	currentTrace, err := tp.traceDB.GetTraceByID(job.ctx, res.TraceId)
+	run := job.run
 
+	otelTrace, err := tp.traceDB.GetTraceByID(job.ctx, run.TraceID.String())
 	if err != nil {
 		tp.handleTraceDBError(job, err)
 		return
 	}
 
-	res.State = TestRunStateAwaitingTestResults
-	currentTrace, err = FixParent(currentTrace, res.Response)
-	if err != nil {
-		job.result = res
+	run.State = model.RunStateAwaitingTestResults
+
+	trace := traces.FromOtel(otelTrace)
+	trace.ID = run.TraceID
+	if !tp.donePollingTraces(job, trace) {
+		fmt.Println("Not done polling traces. Requeue")
+		run.Trace = &trace
+		job.run = run
 		job.count = job.count + 1
 		tp.requeue(job)
 		return
 	}
-	currentTr := mapTrace(currentTrace)
-	if !tp.donePollingTraces(job, currentTr) {
-		res.Trace = currentTr
-		job.result = res
-		job.count = job.count + 1
-		tp.requeue(job)
-		return
-	}
-	res.Trace = currentTr
 
-	fmt.Printf("completed polling result %s after %d times, number of spans: %d \n", job.result.ResultId, job.count, numSpans(currentTr))
+	run.Trace = augmentData(&trace, run.Response)
+	run.State = model.RunStateAwaitingTestResults
 
-	tp.handleDBError(tp.resultDB.UpdateResult(job.ctx, &res))
+	fmt.Printf("completed polling result %s after %d times, number of spans: %d \n", job.run.ID, job.count, len(run.Trace.Flat))
 
-	resource := fmt.Sprintf("test/%s/result/%s", res.TestId, res.ResultId)
+	tp.handleDBError(tp.tests.UpdateRun(job.ctx, run))
+
+	resource := fmt.Sprintf("test/%s/run/%s", job.test.ID, run.ID)
 	tp.subscriptions.PublishUpdate(resource, subscription.Message{
 		Type:    "result_update",
-		Content: res,
+		Content: run,
 	})
 
-	err = tp.runAssertions(job.ctx, res)
+	err = tp.runAssertions(job.ctx, job.test, run)
 	if err != nil {
 		fmt.Printf("could not run assertions: %s\n", err.Error())
 	}
 }
 
-func (tp tracePoller) runAssertions(ctx context.Context, result openapi.TestRunResult) error {
-	test, err := tp.testDB.GetTest(ctx, result.TestId)
-	if err != nil {
-		return err
-	}
-
-	testDefinition, err := ConvertAssertionsIntoTestDefinition(test.Assertions)
-	if err != nil {
-		return err
-	}
-
+func (tp tracePoller) runAssertions(ctx context.Context, test model.Test, run model.Run) error {
 	assertionRequest := AssertionRequest{
-		TestDefinition: testDefinition,
-		Result:         result,
+		Test: test,
+		Run:  run,
 	}
 
 	tp.assertionRunner.RunAssertions(assertionRequest)
@@ -185,31 +168,40 @@ func (tp tracePoller) runAssertions(ctx context.Context, result openapi.TestRunR
 	return nil
 }
 
-// to compare trace we count the number of resourceSpans + InstrumentationLibrarySpans + spans.
-func numSpans(trace openapi.ApiV3SpansResponseChunk) int {
-	num := 0
-	for _, rsp := range trace.ResourceSpans {
-		num++
-		for _, ils := range rsp.InstrumentationLibrarySpans {
-			num++
-
-			num += len(ils.Spans)
-		}
+func augmentData(trace *traces.Trace, resp model.HTTPResponse) *traces.Trace {
+	if trace == nil {
+		return trace
 	}
-	return num
+
+	trace.RootSpan.Attributes["tracetest.response.status"] = fmt.Sprintf("%d", resp.StatusCode)
+	trace.RootSpan.Attributes["tracetest.response.body"] = resp.Body
+	trace.RootSpan.Attributes["tracetest.response.headers"] = fmt.Sprintf("%d", resp.StatusCode)
+
+	return trace
 }
 
-func (tp tracePoller) donePollingTraces(job tracePollReq, currentTrace openapi.ApiV3SpansResponseChunk) bool {
+func (tp tracePoller) donePollingTraces(job tracePollReq, trace traces.Trace) bool {
 	// we're done if we have the same amount of spans after polling or `maxTracePollRetry` times
-	return (len(currentTrace.ResourceSpans) > 0 &&
-		numSpans(currentTrace) == numSpans(job.result.Trace)) ||
-		job.count == tp.maxTracePollRetry
+	if job.count == tp.maxTracePollRetry {
+		return true
+	}
+
+	if job.run.Trace == nil {
+		return false
+	}
+
+	if len(trace.Flat) > 0 && len(trace.Flat) == len(job.run.Trace.Flat) {
+		return true
+	}
+
+	return false
+
 }
 
 func (tp tracePoller) handleTraceDBError(job tracePollReq, err error) {
-	res := job.result
+	run := job.run
 	if errors.Is(err, tracedb.ErrTraceNotFound) {
-		if time.Since(res.CompletedAt) < tp.maxWaitTimeForTrace {
+		if time.Since(run.CompletedAt) < tp.maxWaitTimeForTrace {
 			tp.requeue(job)
 			return
 		}
@@ -220,16 +212,16 @@ func (tp tracePoller) handleTraceDBError(job tracePollReq, err error) {
 		fmt.Println("other", err)
 	}
 
-	res.State = TestRunStateFailed
-	res.LastErrorState = err.Error()
+	run.State = model.RunStateFailed
+	run.LastError = err
 
-	tp.handleDBError(tp.resultDB.UpdateResult(job.ctx, &res))
+	tp.handleDBError(tp.tests.UpdateRun(job.ctx, run))
 
 }
 
 func (tp tracePoller) requeue(job tracePollReq) {
 	go func() {
-		fmt.Printf("requeuing result %s for %d time\n", job.result.ResultId, job.count)
+		fmt.Printf("requeuing result %s for %d time\n", job.run.ID, job.count)
 		time.Sleep(tp.retryDelay)
 		tp.enqueueJob(job)
 	}()

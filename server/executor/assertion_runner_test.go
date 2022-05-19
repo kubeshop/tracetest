@@ -8,9 +8,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/google/uuid"
 	"github.com/kubeshop/tracetest/executor"
-	"github.com/kubeshop/tracetest/openapi"
+	"github.com/kubeshop/tracetest/id"
+	"github.com/kubeshop/tracetest/model"
 	"github.com/kubeshop/tracetest/testmock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -23,65 +23,64 @@ func TestExecutorSuccessfulExecution(t *testing.T) {
 		ShouldPass bool
 	}{
 		{
-			Name:       "pokeshop - import pokemon: should pass",
+			Name:       "ImportPokemonSucess",
 			Tracefile:  "../testmock/data/pokeshop_import_pokemon.json",
 			ShouldPass: true,
 		},
 		{
-			Name:       "pokeshop - import pokemon: should fail",
+			Name:       "ImportPokemonFail",
 			Tracefile:  "../testmock/data/pokeshop_import_pokemon_failed_assertions.json",
 			ShouldPass: false,
 		},
 	}
 
-	postgresRepository, err := testmock.GetTestingDatabase("file://../migrations")
+	repo, err := testmock.GetTestingDatabase("file://../migrations")
 	require.NoError(t, err)
 
 	for _, testCase := range testCases {
 		t.Run(testCase.Name, func(t *testing.T) {
 			ctx := context.Background()
 
-			test, result, err := loadTestFile(testCase.Tracefile)
+			test, run, err := loadTestFile(testCase.Tracefile)
 			require.NoError(t, err)
 
-			assertionExecutor := executor.NewAssertionRunner(postgresRepository)
+			assertionExecutor := executor.NewAssertionRunner(repo)
 
-			createdTestID, err := postgresRepository.CreateTest(ctx, &test)
+			test, err = repo.CreateTest(ctx, test)
 			require.NoError(t, err)
 
-			for _, assertion := range test.Assertions {
-				postgresRepository.CreateAssertion(ctx, test.TestId, &assertion)
-			}
-
-			result.TestId = createdTestID
-			err = postgresRepository.CreateResult(ctx, test.TestId, &result)
+			err = repo.SetDefiniton(ctx, test, test.Definition)
 			require.NoError(t, err)
 
-			testDefinition, err := executor.ConvertAssertionsIntoTestDefinition(test.Assertions)
-			assert.NoError(t, err)
+			run, err = repo.CreateRun(ctx, test, run)
+			require.NoError(t, err)
 
 			assertionRequest := executor.AssertionRequest{
-				TestDefinition: testDefinition,
-				Result:         result,
+				Test: test,
+				Run:  run,
 			}
 
 			assertionExecutor.Start(1)
 			assertionExecutor.RunAssertions(assertionRequest)
 			assertionExecutor.Stop()
 
-			dbResult, err := postgresRepository.GetResult(ctx, result.ResultId)
+			dbResult, err := repo.GetRun(ctx, run.ID)
 			require.NoError(t, err)
 
+			require.NotNil(t, dbResult.Results)
 			if testCase.ShouldPass {
-				assert.Equal(t, executor.TestRunStateFinished, dbResult.State)
-				for _, assertionResult := range dbResult.AssertionResult {
-					for _, spanAssertionResult := range assertionResult.SpanAssertionResults {
-						assert.True(t, spanAssertionResult.Passed)
+				assert.Equal(t, model.RunStateFinished, dbResult.State)
+				for _, results := range dbResult.Results.Results {
+					for _, assertRes := range results {
+						for _, spanAssertionRes := range assertRes.Results {
+							assert.NoError(t, spanAssertionRes.CompareErr)
+						}
 					}
+
 				}
-				assert.True(t, dbResult.AssertionResultState)
+				assert.True(t, dbResult.Results.AllPassed)
 			} else {
-				assert.False(t, dbResult.AssertionResultState)
+				assert.False(t, dbResult.Results.AllPassed)
 			}
 
 		})
@@ -89,30 +88,29 @@ func TestExecutorSuccessfulExecution(t *testing.T) {
 }
 
 type testFile struct {
-	Test   openapi.Test          `json:"test"`
-	Result openapi.TestRunResult `json:"result"`
+	Test model.Test `json:"test"`
+	Run  model.Run  `json:"run"`
 }
 
-func loadTestFile(filePath string) (openapi.Test, openapi.TestRunResult, error) {
+func loadTestFile(filePath string) (model.Test, model.Run, error) {
 	fileContent, err := os.Open(filePath)
 	if err != nil {
-		return openapi.Test{}, openapi.TestRunResult{}, fmt.Errorf("could not open test file: %w", err)
+		return model.Test{}, model.Run{}, fmt.Errorf("could not open test file: %w", err)
 	}
 
 	fileBytes, err := ioutil.ReadAll(fileContent)
 	if err != nil {
-		return openapi.Test{}, openapi.TestRunResult{}, fmt.Errorf("could not read test file: %w", err)
+		return model.Test{}, model.Run{}, fmt.Errorf("could not read test file: %w", err)
 	}
 
 	testFile := testFile{}
 	err = json.Unmarshal(fileBytes, &testFile)
 	if err != nil {
-		return openapi.Test{}, openapi.TestRunResult{}, fmt.Errorf("could not parse test file: %w", err)
+		return model.Test{}, model.Run{}, fmt.Errorf("could not parse test file: %w", err)
 	}
 
-	testFile.Test.TestId = uuid.NewString()
-	testFile.Result.TestId = testFile.Test.TestId
-	testFile.Result.ResultId = uuid.NewString()
+	testFile.Test.ID = id.NewRandGenerator().UUID()
+	testFile.Run.ID = id.NewRandGenerator().UUID()
 
-	return testFile.Test, testFile.Result, nil
+	return testFile.Test, testFile.Run, nil
 }

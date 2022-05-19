@@ -2,15 +2,14 @@ package executor_test
 
 import (
 	"io"
-	"math/rand"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/kubeshop/tracetest/executor"
-	"github.com/kubeshop/tracetest/openapi"
+	"github.com/kubeshop/tracetest/id"
+	"github.com/kubeshop/tracetest/model"
 	"github.com/stretchr/testify/assert"
-	"go.opentelemetry.io/otel/trace"
 )
 
 func TestExecuteGet(t *testing.T) {
@@ -39,13 +38,13 @@ func TestExecuteGet(t *testing.T) {
 	ex, err := executor.New()
 	assert.NoError(t, err)
 
-	test := &openapi.Test{
+	test := model.Test{
 		Name: "test",
-		ServiceUnderTest: openapi.TestServiceUnderTest{
-			Request: openapi.HttpRequest{
-				Url:    server.URL,
-				Method: "GET",
-				Headers: []openapi.HttpResponseHeaders{
+		ServiceUnderTest: model.ServiceUnderTest{
+			Request: model.HTTPRequest{
+				URL:    server.URL,
+				Method: model.HTTPMethodGET,
+				Headers: []model.HTTPHeader{
 					{Key: "Key1", Value: "Value1"},
 				},
 				Body: "body",
@@ -53,16 +52,10 @@ func TestExecuteGet(t *testing.T) {
 		},
 	}
 
-	rnd := rand.New(rand.NewSource(0))
-	tid := trace.TraceID{}
-	rnd.Read(tid[:])
-	sid := trace.SpanID{}
-	rnd.Read(sid[:])
-
-	resp, err := ex.Execute(test, tid, sid)
+	resp, err := ex.Execute(test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
 	assert.NoError(t, err)
 
-	assert.Equal(t, int32(200), resp.StatusCode)
+	assert.Equal(t, 200, resp.StatusCode)
 	assert.Equal(t, "OK", resp.Body)
 }
 
@@ -92,13 +85,13 @@ func TestExecutePost(t *testing.T) {
 	ex, err := executor.New()
 	assert.NoError(t, err)
 
-	test := &openapi.Test{
+	test := model.Test{
 		Name: "test",
-		ServiceUnderTest: openapi.TestServiceUnderTest{
-			Request: openapi.HttpRequest{
-				Url:    server.URL,
-				Method: "POST",
-				Headers: []openapi.HttpResponseHeaders{
+		ServiceUnderTest: model.ServiceUnderTest{
+			Request: model.HTTPRequest{
+				URL:    server.URL,
+				Method: model.HTTPMethodPOST,
+				Headers: []model.HTTPHeader{
 					{Key: "Key1", Value: "Value1"},
 				},
 				Body: "body",
@@ -106,16 +99,10 @@ func TestExecutePost(t *testing.T) {
 		},
 	}
 
-	rnd := rand.New(rand.NewSource(0))
-	tid := trace.TraceID{}
-	rnd.Read(tid[:])
-	sid := trace.SpanID{}
-	rnd.Read(sid[:])
-
-	resp, err := ex.Execute(test, tid, sid)
+	resp, err := ex.Execute(test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
 	assert.NoError(t, err)
 
-	assert.Equal(t, int32(200), resp.StatusCode)
+	assert.Equal(t, 200, resp.StatusCode)
 	assert.Equal(t, "OK", resp.Body)
 }
 
@@ -151,21 +138,21 @@ func TestExecutePostWithApiKeyAuth(t *testing.T) {
 	ex, err := executor.New()
 	assert.NoError(t, err)
 
-	test := &openapi.Test{
+	test := model.Test{
 		Name: "test",
-		ServiceUnderTest: openapi.TestServiceUnderTest{
-			Request: openapi.HttpRequest{
-				Url:    server.URL,
-				Method: "POST",
-				Headers: []openapi.HttpResponseHeaders{
+		ServiceUnderTest: model.ServiceUnderTest{
+			Request: model.HTTPRequest{
+				URL:    server.URL,
+				Method: model.HTTPMethodPOST,
+				Headers: []model.HTTPHeader{
 					{Key: "Key1", Value: "Value1"},
 				},
-				Auth: openapi.HttpAuth{
+				Auth: &model.HTTPAuthenticator{
 					Type: "apiKey",
-					ApiKey: openapi.HttpAuthApiKey{
-						Key:   "key",
-						Value: "value",
-						In:    "header",
+					Props: map[string]string{
+						"key":   "key",
+						"value": "value",
+						"in":    string(model.APIKeyPositionHeader),
 					},
 				},
 				Body: "body",
@@ -173,16 +160,10 @@ func TestExecutePostWithApiKeyAuth(t *testing.T) {
 		},
 	}
 
-	rnd := rand.New(rand.NewSource(0))
-	tid := trace.TraceID{}
-	rnd.Read(tid[:])
-	sid := trace.SpanID{}
-	rnd.Read(sid[:])
-
-	resp, err := ex.Execute(test, tid, sid)
+	resp, err := ex.Execute(test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
 	assert.NoError(t, err)
 
-	assert.Equal(t, int32(200), resp.StatusCode)
+	assert.Equal(t, 200, resp.StatusCode)
 	assert.Equal(t, "OK", resp.Body)
 }
 
@@ -218,20 +199,20 @@ func TestExecutePostWithBasicAuth(t *testing.T) {
 	ex, err := executor.New()
 	assert.NoError(t, err)
 
-	test := &openapi.Test{
+	test := model.Test{
 		Name: "test",
-		ServiceUnderTest: openapi.TestServiceUnderTest{
-			Request: openapi.HttpRequest{
-				Url:    server.URL,
-				Method: "POST",
-				Headers: []openapi.HttpResponseHeaders{
+		ServiceUnderTest: model.ServiceUnderTest{
+			Request: model.HTTPRequest{
+				URL:    server.URL,
+				Method: model.HTTPMethodPOST,
+				Headers: []model.HTTPHeader{
 					{Key: "Key1", Value: "Value1"},
 				},
-				Auth: openapi.HttpAuth{
+				Auth: &model.HTTPAuthenticator{
 					Type: "basic",
-					Basic: openapi.HttpAuthBasic{
-						Username: "username",
-						Password: "password",
+					Props: map[string]string{
+						"username": "username",
+						"password": "password",
 					},
 				},
 				Body: "body",
@@ -239,16 +220,10 @@ func TestExecutePostWithBasicAuth(t *testing.T) {
 		},
 	}
 
-	rnd := rand.New(rand.NewSource(0))
-	tid := trace.TraceID{}
-	rnd.Read(tid[:])
-	sid := trace.SpanID{}
-	rnd.Read(sid[:])
-
-	resp, err := ex.Execute(test, tid, sid)
+	resp, err := ex.Execute(test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
 	assert.NoError(t, err)
 
-	assert.Equal(t, int32(200), resp.StatusCode)
+	assert.Equal(t, 200, resp.StatusCode)
 	assert.Equal(t, "OK", resp.Body)
 }
 
@@ -284,19 +259,19 @@ func TestExecutePostWithBearerAuth(t *testing.T) {
 	ex, err := executor.New()
 	assert.NoError(t, err)
 
-	test := &openapi.Test{
+	test := model.Test{
 		Name: "test",
-		ServiceUnderTest: openapi.TestServiceUnderTest{
-			Request: openapi.HttpRequest{
-				Url:    server.URL,
-				Method: "POST",
-				Headers: []openapi.HttpResponseHeaders{
+		ServiceUnderTest: model.ServiceUnderTest{
+			Request: model.HTTPRequest{
+				URL:    server.URL,
+				Method: model.HTTPMethodPOST,
+				Headers: []model.HTTPHeader{
 					{Key: "Key1", Value: "Value1"},
 				},
-				Auth: openapi.HttpAuth{
+				Auth: &model.HTTPAuthenticator{
 					Type: "bearer",
-					Bearer: openapi.HttpAuthBearer{
-						Token: "token",
+					Props: map[string]string{
+						"token": "token",
 					},
 				},
 				Body: "body",
@@ -304,15 +279,9 @@ func TestExecutePostWithBearerAuth(t *testing.T) {
 		},
 	}
 
-	rnd := rand.New(rand.NewSource(0))
-	tid := trace.TraceID{}
-	rnd.Read(tid[:])
-	sid := trace.SpanID{}
-	rnd.Read(sid[:])
-
-	resp, err := ex.Execute(test, tid, sid)
+	resp, err := ex.Execute(test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
 	assert.NoError(t, err)
 
-	assert.Equal(t, int32(200), resp.StatusCode)
+	assert.Equal(t, 200, resp.StatusCode)
 	assert.Equal(t, "OK", resp.Body)
 }

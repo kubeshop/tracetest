@@ -14,19 +14,19 @@ import (
 	"github.com/kubeshop/tracetest/executor"
 	httpServer "github.com/kubeshop/tracetest/http"
 	"github.com/kubeshop/tracetest/http/websocket"
+	"github.com/kubeshop/tracetest/model"
 	"github.com/kubeshop/tracetest/openapi"
 	"github.com/kubeshop/tracetest/subscription"
-	"github.com/kubeshop/tracetest/testdb"
 	"github.com/kubeshop/tracetest/tracedb"
 )
 
 type App struct {
 	config  config.Config
-	db      testdb.Repository
+	db      model.Repository
 	traceDB tracedb.TraceDB
 }
 
-func New(config config.Config, db testdb.Repository, tracedb tracedb.TraceDB) (*App, error) {
+func New(config config.Config, db model.Repository, tracedb tracedb.TraceDB) (*App, error) {
 	app := &App{
 		config:  config,
 		db:      db,
@@ -74,11 +74,11 @@ func (a *App) Start() error {
 	assertionRunner.Start(5)
 	defer assertionRunner.Stop()
 
-	tracePoller := executor.NewTracePoller(a.traceDB, a.db, a.db, a.config.MaxWaitTimeForTraceDuration(), subscriptionManager, assertionRunner)
+	tracePoller := executor.NewTracePoller(a.traceDB, a.db, a.config.MaxWaitTimeForTraceDuration(), subscriptionManager, assertionRunner)
 	tracePoller.Start(5) // worker count. should be configurable
 	defer tracePoller.Stop()
 
-	runner := executor.NewPersistentRunner(ex, a.db, a.db, tracePoller)
+	runner := executor.NewPersistentRunner(ex, a.db, tracePoller)
 	runner.Start(5) // worker count. should be configurable
 	defer runner.Stop()
 

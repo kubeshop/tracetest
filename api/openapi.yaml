@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: 0.0.1
+  version: 0.2.1
   title: TraceTest
   description: OpenAPI definition for TraceTest endpoint and resources
 servers:
@@ -34,15 +34,9 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Test"
+                  $ref: "./tests.yaml#/components/schemas/Test"
         500:
           description: "problem with getting tests"
-          # content:
-          #   application/problem+json:
-          #     schema:
-          #       type: array
-          #       items:
-          #         $ref: "#/components/schemas/Problem"
     post:
       tags:
         - api
@@ -53,22 +47,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Test"
+              $ref: "./tests.yaml#/components/schemas/Test"
       responses:
         200:
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Test"
+                $ref: "./tests.yaml#/components/schemas/Test"
         500:
           description: "problem with creating test"
-          # content:
-          #   application/problem+json:
-          #     schema:
-          #       type: array
-          #       items:
-          #         $ref: "#/components/schemas/Problem"
   /tests/{testId}:
     get:
       tags:
@@ -89,7 +77,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Test"
+                $ref: "./tests.yaml#/components/schemas/Test"
         500:
           description: "problem with getting a test"
     put:
@@ -109,7 +97,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Test"
+              $ref: "./tests.yaml#/components/schemas/Test"
       responses:
         204:
           description: successful operation
@@ -151,130 +139,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/TestRunResult"
-
-  /tests/{testId}/results/{resultId}:
-    get:
-      tags:
-        - api
-      parameters:
-        - in: path
-          name: testId
-          schema:
-            type: string
-            format: uuid
-          required: true
-        - in: path
-          name: resultId
-          schema:
-            type: string
-            format: uuid
-          required: true
-      summary: "get test result"
-      description: "get a particular test result"
-      operationId: getTestResult
-      responses:
-        200:
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/TestRunResult"
-    put:
-      tags:
-        - api
-      parameters:
-        - in: path
-          name: testId
-          schema:
-            type: string
-            format: uuid
-          required: true
-        - in: path
-          name: resultId
-          schema:
-            type: string
-            format: uuid
-          required: true
-      summary: "update test result state"
-      description: "update test result state for a particular test"
-      operationId: updateTestResult
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/TestAssertionResult"
-      responses:
-        200:
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/TestRunResult"
-
-  /tests/{testId}/results/{resultId}/select:
-    get:
-      tags:
-        - api
-      parameters:
-        - in: path
-          name: testId
-          schema:
-            type: string
-            format: uuid
-          required: true
-        - in: path
-          name: resultId
-          schema:
-            type: string
-            format: uuid
-          required: true
-        - in: query
-          name: query
-          schema:
-            type: string
-      summary: "retrieve spans that will be selected by selector"
-      description: "get the spans ids that would be selected by a specific selector query"
-      operationId: getTestResultSelectedSpans
-      responses:
-        200:
-          description: successful operation
-          content:
-            application/json:
-              schema: 
-                type: array
-                items:
-                  type: string
-
-  /tests/{testId}/results/{resultId}/rerun:
-    post:
-      tags:
-        - api
-      parameters:
-        - in: path
-          name: testId
-          schema:
-            type: string
-            format: uuid
-          required: true
-        - in: path
-          name: resultId
-          schema:
-            type: string
-            format: uuid
-          required: true
-      summary: "rerun a test result"
-      description: "rerun a test result"
-      operationId: rerunTestResult
-      responses:
-        200:
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/TestRunResult"
-
-  /tests/{testId}/results:
+                $ref: "./tests.yaml#/components/schemas/TestRun"
     get:
       tags:
         - api
@@ -297,9 +162,9 @@ paths:
           schema:
             type: integer
             default: 0
-      summary: "get the results for a test"
-      description: "get the results from a particular test"
-      operationId: getTestResults
+      summary: "get the runs for a test"
+      description: "get the runs from a particular test"
+      operationId: getTestRuns
       responses:
         200:
           description: successful operation
@@ -308,8 +173,8 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/TestRunResult"
-  /tests/{testId}/assertions:
+                  $ref: "./tests.yaml#/components/schemas/TestRun"
+  /tests/{testId}/run/{runId}/select:
     get:
       tags:
         - api
@@ -320,9 +185,19 @@ paths:
             type: string
             format: uuid
           required: true
-      operationId: getAssertions
-      summary: "Get assertions for a test"
-      description: "Gets all assertions associated to a particular test"
+        - in: path
+          name: runId
+          schema:
+            type: string
+            format: uuid
+          required: true
+        - in: query
+          name: query
+          schema:
+            type: string
+      summary: "retrieve spans that will be selected by selector"
+      description: "get the spans ids that would be selected by a specific selector query"
+      operationId: getTestResultSelectedSpans
       responses:
         200:
           description: successful operation
@@ -331,7 +206,8 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Assertion"
+                  type: string
+  /tests/{testId}/run/{runId}/rerun:
     post:
       tags:
         - api
@@ -342,18 +218,72 @@ paths:
             type: string
             format: uuid
           required: true
-      summary: "Create an assertion for a test"
-      description: "Create an assertion for a particular test"
-      operationId: createAssertion
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Assertion"
+        - in: path
+          name: runId
+          schema:
+            type: string
+            format: uuid
+          required: true
+      summary: "rerun a test run"
+      description: "rerun a test run"
+      operationId: rerunTestRun
       responses:
-        "200":
-          description: OK
-  /tests/{testId}/assertions/{assertionId}:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "./tests.yaml#/components/schemas/TestRun"
+  /tests/{testId}/run/{runId}:
+    get:
+      tags:
+        - api
+      parameters:
+        - in: path
+          name: testId
+          schema:
+            type: string
+            format: uuid
+          required: true
+        - in: path
+          name: runId
+          schema:
+            type: string
+            format: uuid
+          required: true
+      summary: "get test Run"
+      description: "get a particular test Run"
+      operationId: getTestRun
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "./tests.yaml#/components/schemas/TestRun"
+  /tests/{testId}/definition:
+    get:
+      tags:
+        - api
+      parameters:
+        - in: path
+          name: testId
+          schema:
+            type: string
+            format: uuid
+          required: true
+      operationId: getTestDefinition
+      summary: "Get definition for a test"
+      description: "Gets definition for a test"
+      responses:
+        201:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "./tests.yaml#/components/schemas/TestDefinition"
     put:
       tags:
         - api
@@ -364,303 +294,14 @@ paths:
             type: string
             format: uuid
           required: true
-        - in: path
-          name: assertionId
-          schema:
-            type: string
-            format: uuid
-          required: true
-      summary: "update an assertion"
-      description: "update an assertion"
-      operationId: updateAssertion
+      summary: "Set testDefinition for a test"
+      description: "Set testDefinition for a particular test"
+      operationId: setTestDefinition
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Assertion"
+              $ref: "./tests.yaml#/components/schemas/TestDefinition"
       responses:
-        "204":
+        204:
           description: OK
-    delete:
-      tags:
-        - api
-      parameters:
-        - in: path
-          name: testId
-          schema:
-            type: string
-            format: uuid
-          required: true
-        - in: path
-          name: assertionId
-          schema:
-            type: string
-            format: uuid
-          required: true
-      summary: "delete an assertion"
-      description: "delete an assertion"
-      operationId: deleteAssertion
-      responses:
-        "204":
-          description: OK
-components:
-  schemas:
-    Test:
-      type: object
-      properties:
-        testId:
-          type: string
-          description: ID
-          format: uuid
-          readOnly: true
-        name:
-          type: string
-        description:
-          type: string
-        serviceUnderTest:
-          type: object
-          properties:
-            id:
-              type: string
-              description: ID
-              format: uuid
-              readOnly: true
-            request:
-              $ref: "#/components/schemas/HTTPRequest"
-        assertions:
-          type: array
-          items:
-            $ref: "#/components/schemas/Assertion"
-          description: Definition of assertions that are going to be made
-        referenceTestRunResult:
-          $ref: "#/components/schemas/TestRunResult"
-    Assertion:
-      type: object
-      properties:
-        assertionId:
-          type: string
-          description: ID
-          format: uuid
-          readOnly: true
-        selectors:
-          type: array
-          items:
-            $ref: "#/components/schemas/SelectorItem"
-        selector:
-          type: string
-        spanAssertions:
-          type: array
-          items:
-            $ref: "#/components/schemas/SpanAssertion"
-    TestRunResult:
-      type: object
-      properties:
-        resultId:
-          type: string
-          description: ID
-          format: uuid
-          readOnly: true
-        testId:
-          type: string
-          description: test ID
-          format: uuid
-          readOnly: true
-        traceId:
-          type: string
-          description: trace ID
-          readOnly: true
-        spanId:
-          type: string
-          description: parent span ID
-          readOnly: true
-        state:
-          type: string
-          enum: [CREATED, EXECUTING, AWAITING_TRACE, FAILED, FINISHED, AWAITING_TEST_RESULTS]
-          description: Current execution state
-        lastErrorState:
-          type: string
-          description: Details of the cause for the last `FAILED` state
-        createdAt:
-          type: string
-          format: date-time
-        completedAt:
-          type: string
-          format: date-time
-        response:
-          $ref: "#/components/schemas/HTTPResponse"
-          description: TODO(pov) This is HTTP Response object for now, at some point it might be GRPC/SOAP/...
-        trace:
-          $ref: "./trace.yaml#/definitions/api_v3SpansResponseChunk"
-        assertionResultState:
-          type: boolean
-          description: True if all trace spans passed the assertion test
-        assertionResult:
-          type: array
-          description: List of all tested span assertions
-          items:
-            $ref: "#/components/schemas/AssertionResult"
-    TestAssertionResult:
-      type: object
-      properties:
-        assertionResultState:
-            type: boolean
-            description: True if all trace spans passed the assertion test
-        assertionResult:
-          type: array
-          description: List of all tested span assertions
-          items:
-            $ref: "#/components/schemas/AssertionResult"
-    Attribute:
-      type: object
-      properties:
-        id:
-          type: string
-          description: ID
-          readOnly: true
-        key:
-          type: string
-        value:
-          type: string
-    SelectorItem:
-      type: object
-      properties:
-        locationName:
-          type: string
-          enum: [RESOURCE_ATTRIBUTES, INSTRUMENTATION_LIBRARY, SPAN, SPAN_ATTRIBUTES]
-          description: Example "SPAN"
-        propertyName:
-          type: string
-          description: Example "operation"
-        value:
-          type: string
-          description: Example "POST /users/verify"
-        valueType:
-          type: string
-          description: TODO(pov) think about value types?
-          enum: [stringValue, intValue]
-    SpanAssertion:
-      type: object
-      properties:
-        spanAssertionId:
-          type: string
-          description: ID
-          readOnly: true
-        locationName:
-          type: string
-          enum: [RESOURCE_ATTRIBUTES, INSTRUMENTATION_LIBRARY, SPAN, SPAN_ATTRIBUTES]
-          description: Example "SPAN_ATTRIBUTES"
-        propertyName:
-          type: string
-          description: Example "http.status.code"
-        valueType:
-          type: string
-          description: Example "intValue"
-          enum: [stringValue, intValue]
-        operator:
-          type: string
-          description: Example "EQUALS"
-          enum: [EQUALS, LESSTHAN, GREATERTHAN, NOTEQUALS]
-        comparisonValue:
-          type: string
-          description: Example "200"
-    HTTPResponse:
-      type: object
-      properties:
-        status:
-          type: string
-        statusCode:
-          type: integer
-        headers:
-          type: array
-          items:
-            type: object
-            properties:
-              key:
-                type: string
-              value:
-                type: string
-        body:
-          type: string
-          format: byte
-    AssertionResult:
-      type: object
-      properties:
-        assertionId:
-          type: string
-          description: ID
-        spanAssertionResults:
-          type: array
-          items:
-            $ref: "#/components/schemas/SpanAssertionResult"
-    SpanAssertionResult:
-      type: object
-      properties:
-        spanAssertionId:
-          type: string
-          description: ID
-        spanId:
-          type: string
-          description: ID
-        passed:
-          type: boolean
-          description: True if the span passed the assertion test
-        observedValue:
-          type: string
-          description: 'value that the trace for this test run contained'
-          readOnly: true
-    HTTPRequest:
-      type: object
-      properties:
-        url:
-          type: string
-        method:
-          type: string
-          enum: [GET, PUT, POST, PATCH, DELETE, COPY, HEAD, OPTIONS, LINK, UNLINK, PURGE, LOCK, UNLOCK, PROPFIND, VIEW]
-        headers:
-          type: array
-          items:
-            type: object
-            properties:
-              key:
-                type: string
-              value:
-                type: string
-        body:
-          type: string
-          format: byte
-        auth:
-          $ref: "#/components/schemas/HTTPAuth"
-        proxy:
-          type: object
-          description: TODO
-        certificate:
-          type: object
-          description: TODO
-    HTTPAuth:
-      type: object
-      properties:
-        type:
-          type: string
-          enum: [apiKey, basic, bearer]
-        apiKey:
-          type: object
-          properties:
-            key:
-              type: string
-            value:
-              type: string
-            in:
-              type: string
-              enum: [query, header]
-        basic:
-          type: object
-          properties:
-            username:
-              type: string
-            password:
-              type: string
-        bearer:
-          type: object
-          properties:
-            token:
-              type: string

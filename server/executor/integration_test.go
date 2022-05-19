@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/app"
-	"github.com/kubeshop/tracetest/executor"
+	"github.com/kubeshop/tracetest/model"
 	"github.com/kubeshop/tracetest/openapi"
 	"github.com/kubeshop/tracetest/testmock"
 	"github.com/stretchr/testify/assert"
@@ -31,66 +31,40 @@ func TestExecutorIntegration(t *testing.T) {
 
 	time.Sleep(1 * time.Second)
 
-	t.Run("Test with new selector should be asserted by assertion engine", func(t *testing.T) {
-		happyPathWithNewSelector(t, tracetestApp, demoApp)
-	})
-
-	t.Run("Test with old selectors should not be asserted by assertion engine", func(t *testing.T) {
-		happyPathWithOldSelector(t, tracetestApp, demoApp)
+	t.Run("HappyPath", func(t *testing.T) {
+		happyPath(t, tracetestApp, demoApp)
 	})
 }
 
-func happyPathWithNewSelector(t *testing.T, app *app.App, demoApp *testmock.DemoApp) {
+func happyPath(t *testing.T, app *app.App, demoApp *testmock.DemoApp) {
 	testID, err := createImportPokemonTest(app, demoApp)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, testID)
 
-	err = createNewTestAssertions(testID)
+	createTestDefinition(testID)
+
+	runID, err := runTest(app, testID)
 	assert.NoError(t, err)
+	assert.NotEmpty(t, runID)
 
-	resultID, err := runTest(app, testID)
-	assert.NoError(t, err)
-	assert.NotEmpty(t, resultID)
+	run := waitForRunState(app, testID, runID, string(model.RunStateFinished), 30*time.Second)
+	require.NotNil(t, run)
 
-	testRunResult := waitForResultState(app, testID, resultID, executor.TestRunStateFinished, 30*time.Second)
-	assert.NotNil(t, testRunResult, "Test result should not be nil")
-	assert.Greater(t, len(testRunResult.Trace.ResourceSpans), 0, "Number of affected spans should be greater than 0")
-	assert.Equal(t, executor.TestRunStateFinished, testRunResult.State, "Result should be in FINISHED state")
+	assert.Equal(t, string(model.RunStateFinished), run.State)
+	assert.Greater(t, len(run.Result.Results), 0)
+	assert.True(t, run.Result.AllPassed)
 
-	spanAssertions := make([]openapi.SpanAssertionResult, 0)
-	for _, assertionResult := range testRunResult.AssertionResult {
-		spanAssertions = append(spanAssertions, assertionResult.SpanAssertionResults...)
+	count := 0
+	for _, res := range run.Result.Results {
+		for _, assertionResult := range res.Results {
+			for _, spanRes := range assertionResult.SpanResults {
+				assert.True(t, spanRes.Passed)
+				count = count + 1
+			}
+		}
 	}
 
-	assert.Equal(t, len(spanAssertions), 2, "Test should contain 2 assertions")
-	for _, spanAssertion := range spanAssertions {
-		assert.True(t, spanAssertion.Passed, "All assertions should pass")
-	}
-}
-
-func happyPathWithOldSelector(t *testing.T, app *app.App, demoApp *testmock.DemoApp) {
-	testID, err := createImportPokemonTest(app, demoApp)
-	assert.NoError(t, err)
-	assert.NotEmpty(t, testID)
-
-	err = createOldTestAssertions(testID)
-	assert.NoError(t, err)
-
-	resultID, err := runTest(app, testID)
-	assert.NoError(t, err)
-	assert.NotEmpty(t, resultID)
-
-	testRunResult := waitForResultState(app, testID, resultID, executor.TestRunStateAwaitingTestResults, 30*time.Second)
-	assert.NotNil(t, testRunResult, "Test result should not be nil")
-	assert.Greater(t, len(testRunResult.Trace.ResourceSpans), 0, "Number of affected spans should be greater than 0")
-	assert.Equal(t, executor.TestRunStateAwaitingTestResults, testRunResult.State, "Result should be in FINISHED state")
-
-	spanAssertions := make([]openapi.SpanAssertionResult, 0)
-	for _, assertionResult := range testRunResult.AssertionResult {
-		spanAssertions = append(spanAssertions, assertionResult.SpanAssertionResults...)
-	}
-
-	assert.Equal(t, len(spanAssertions), 0, "Test should contain no assertions")
+	assert.Equal(t, 2, count)
 }
 
 func createImportPokemonTest(app *app.App, demoApp *testmock.DemoApp) (string, error) {
@@ -101,7 +75,7 @@ func createImportPokemonTest(app *app.App, demoApp *testmock.DemoApp) (string, e
 			Request: openapi.HttpRequest{
 				Url:    fmt.Sprintf("http://%s/pokemon/import", demoApp.Endpoint()),
 				Method: "POST",
-				Headers: []openapi.HttpResponseHeaders{
+				Headers: []openapi.HttpHeader{
 					{
 						Key:   "Content-Type",
 						Value: "application/json",
@@ -138,84 +112,46 @@ func createImportPokemonTest(app *app.App, demoApp *testmock.DemoApp) (string, e
 		return "", fmt.Errorf("could not unmarshal response body: %w", err)
 	}
 
-	return test.TestId, nil
+	return test.Id, nil
 }
 
-func createNewTestAssertions(testID string) error {
-	body := openapi.Assertion{
-		Selector: `span[service.name="pokeshop" tracetest.span.type="http" name="POST /pokemon/import"]`,
-		SpanAssertions: []openapi.SpanAssertion{
+func createTestDefinition(testID string) {
+	body := openapi.TestDefinition{
+		Definitions: []openapi.TestDefinitionDefinitions{
 			{
-				PropertyName:    "http.status_code",
-				Operator:        "EQUALS",
-				ComparisonValue: "200",
-			},
-			{
-				PropertyName:    "tracetest.span.duration",
-				Operator:        "LESSTHAN",
-				ComparisonValue: "100",
+				Selector: `span[service.name="pokeshop" tracetest.span.type="http" name="POST /pokemon/import"]`,
+				Assertions: []openapi.Assertion{
+					{
+						Attribute:  "http.status_code",
+						Comparator: "=",
+						Expected:   "200",
+					},
+					{
+						Attribute:  "tracetest.span.duration",
+						Comparator: "<",
+						Expected:   "200",
+					},
+				},
 			},
 		},
 	}
 	jsonBytes, err := json.Marshal(body)
 	if err != nil {
-		return fmt.Errorf("could not convert body into json: %w", err)
+		panic(fmt.Errorf("could not convert body into json: %w", err))
 	}
 	bytesBuffer := bytes.NewBuffer(jsonBytes)
-	url := fmt.Sprintf("%s/api/tests/%s/assertions", appEndpoint, testID)
+	url := fmt.Sprintf("%s/api/tests/%s/definition", appEndpoint, testID)
 
-	response, err := http.Post(url, "application/json", bytesBuffer)
+	req, _ := http.NewRequest("PUT", url, bytesBuffer)
+	req.Header.Set("Content-Type", "application/json")
+	response, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return fmt.Errorf("could not send request to create assertion: %w", err)
+		panic(fmt.Errorf("could not send request to create assertion: %w", err))
 	}
 
-	if response.StatusCode != 200 {
-		return fmt.Errorf("could not create assertion. Expected status 200, got %d", response.StatusCode)
+	if response.StatusCode != 204 {
+		panic(fmt.Errorf("could not create definition. Expected status 201, got %d", response.StatusCode))
 	}
-
-	return nil
-}
-
-func createOldTestAssertions(testID string) error {
-	body := openapi.Assertion{
-		Selectors: []openapi.SelectorItem{
-			{
-				PropertyName: "service.name",
-				Value:        "pokeshop",
-				ValueType:    "string",
-				LocationName: "SPAN",
-			},
-		},
-		SpanAssertions: []openapi.SpanAssertion{
-			{
-				PropertyName:    "http.status_code",
-				Operator:        "EQUALS",
-				ComparisonValue: "200",
-			},
-			{
-				PropertyName:    "tracetest.span.duration",
-				Operator:        "LESSTHAN",
-				ComparisonValue: "100",
-			},
-		},
-	}
-	jsonBytes, err := json.Marshal(body)
-	if err != nil {
-		return fmt.Errorf("could not convert body into json: %w", err)
-	}
-	bytesBuffer := bytes.NewBuffer(jsonBytes)
-	url := fmt.Sprintf("%s/api/tests/%s/assertions", appEndpoint, testID)
-
-	response, err := http.Post(url, "application/json", bytesBuffer)
-	if err != nil {
-		return fmt.Errorf("could not send request to create assertion: %w", err)
-	}
-
-	if response.StatusCode != 200 {
-		return fmt.Errorf("could not create assertion. Expected status 200, got %d", response.StatusCode)
-	}
-
-	return nil
 }
 
 func runTest(app *app.App, testID string) (string, error) {
@@ -234,19 +170,19 @@ func runTest(app *app.App, testID string) (string, error) {
 		return "", fmt.Errorf("could not read response body: %w", err)
 	}
 
-	testRunResult := openapi.TestRunResult{}
-	err = json.Unmarshal(bodyBytes, &testRunResult)
+	testRun := openapi.TestRun{}
+	err = json.Unmarshal(bodyBytes, &testRun)
 	if err != nil {
 		return "", fmt.Errorf("could not unmarshal response body: %w", err)
 	}
 
-	return testRunResult.ResultId, nil
+	return testRun.Id, nil
 }
 
-func waitForResultState(app *app.App, testID, resultID, state string, timeout time.Duration) *openapi.TestRunResult {
+func waitForRunState(app *app.App, testID, runID, state string, timeout time.Duration) *openapi.TestRun {
 	timeoutTicker := time.NewTicker(timeout)
 	executionTicker := time.NewTicker(1 * time.Second)
-	outputChannel := make(chan *openapi.TestRunResult, 1)
+	outputChannel := make(chan *openapi.TestRun, 1)
 	go func() {
 		for {
 			select {
@@ -254,53 +190,54 @@ func waitForResultState(app *app.App, testID, resultID, state string, timeout ti
 				outputChannel <- nil
 				return
 			case <-executionTicker.C:
-				testRunResult := getTestRunResultInState(app, testID, resultID, state)
-				if testRunResult != nil {
-					outputChannel <- testRunResult
+				testRun := getRunInState(app, testID, runID, state)
+				if testRun != nil {
+					outputChannel <- testRun
 					return
 				}
 			}
 		}
 	}()
 
-	testRunResult := <-outputChannel
-	return testRunResult
+	testRun := <-outputChannel
+	return testRun
 }
 
-func getTestRunResultInState(app *app.App, testID, resultID, state string) *openapi.TestRunResult {
-	result, err := getTestResult(app, testID, resultID)
+func getRunInState(app *app.App, testID, resultID, state string) *openapi.TestRun {
+	run, err := getRun(app, testID, resultID)
 	if err != nil {
 		return nil
 	}
 
-	if result.State == state {
-		return result
+	if run.State != state {
+		return nil
+
 	}
 
-	return nil
+	return &run
 }
 
-func getTestResult(app *app.App, testID, resultID string) (*openapi.TestRunResult, error) {
-	url := fmt.Sprintf("%s/api/tests/%s/results/%s", appEndpoint, testID, resultID)
+func getRun(app *app.App, testID, runID string) (openapi.TestRun, error) {
+	url := fmt.Sprintf("%s/api/tests/%s/run/%s", appEndpoint, testID, runID)
 	response, err := http.Get(url)
 	if err != nil {
-		return nil, fmt.Errorf("could not send request to run test: %w", err)
+		return openapi.TestRun{}, fmt.Errorf("could not send request to run test: %w", err)
 	}
 
 	if response.StatusCode != 200 {
-		return nil, fmt.Errorf("could not run test. Expected status 200, got %d", response.StatusCode)
+		return openapi.TestRun{}, fmt.Errorf("could not run test. Expected status 200, got %d", response.StatusCode)
 	}
 
 	bodyBytes, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		return nil, fmt.Errorf("could not read response body: %w", err)
+		return openapi.TestRun{}, fmt.Errorf("could not read response body: %w", err)
 	}
 
-	testRunResult := openapi.TestRunResult{}
-	err = json.Unmarshal(bodyBytes, &testRunResult)
+	run := openapi.TestRun{}
+	err = json.Unmarshal(bodyBytes, &run)
 	if err != nil {
-		return nil, fmt.Errorf("could not unmarshal response body: %w", err)
+		return openapi.TestRun{}, fmt.Errorf("could not unmarshal response body: %w", err)
 	}
 
-	return &testRunResult, nil
+	return run, nil
 }

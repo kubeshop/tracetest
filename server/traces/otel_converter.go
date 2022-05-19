@@ -3,94 +3,126 @@ package traces
 import (
 	"fmt"
 	"math"
+	"strconv"
+	"strings"
 
-	"github.com/kubeshop/tracetest/openapi"
 	"go.opentelemetry.io/otel/trace"
+	v11 "go.opentelemetry.io/proto/otlp/common/v1"
+	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 )
 
-func FromOtel(trace openapi.ApiV3SpansResponseChunk) (Trace, error) {
-	flattenSpans := make([]openapi.V1Span, 0)
-	for _, resource := range trace.ResourceSpans {
+func FromOtel(input *v1.TracesData) Trace {
+	flattenSpans := make([]*v1.Span, 0)
+	for _, resource := range input.ResourceSpans {
 		for _, librarySpans := range resource.InstrumentationLibrarySpans {
 			flattenSpans = append(flattenSpans, librarySpans.Spans...)
 		}
 	}
 
-	spansMap := make(map[string]*Span, 0)
+	spansMap := map[trace.SpanID]*Span{}
 	for _, span := range flattenSpans {
-		newSpan, err := convertOtelSpanIntoSpan(span)
-		if err != nil {
-			return Trace{}, err
-		}
-		spansMap[span.SpanId] = newSpan
+		newSpan := convertOtelSpanIntoSpan(span)
+		spansMap[newSpan.ID] = newSpan
 	}
 
-	return createTrace(flattenSpans, spansMap), nil
+	return createTrace(flattenSpans, spansMap)
 }
 
-func convertOtelSpanIntoSpan(span openapi.V1Span) (*Span, error) {
+func convertOtelSpanIntoSpan(span *v1.Span) *Span {
 	attributes := make(Attributes, 0)
 	for _, attribute := range span.Attributes {
 		attributes[attribute.Key] = getAttributeValue(attribute.Value)
 	}
 
 	attributes["name"] = span.Name
+	attributes["tracetest.span.type"] = spanType(attributes)
+	attributes["tracetest.span.duration"] = spanDuration(span)
 
-	spanID, err := createSpanID(span.SpanId)
-	if err != nil {
-		return nil, err
-	}
-
+	spanID := createSpanID(span.SpanId)
 	return &Span{
 		ID:         spanID,
 		Name:       span.Name,
 		Parent:     nil,
 		Children:   make([]*Span, 0),
 		Attributes: attributes,
-	}, nil
+	}
 }
 
-func getAttributeValue(value openapi.V1AnyValue) string {
-	if value.StringValue != "" {
-		return value.StringValue
+func spanDuration(span *v1.Span) string {
+	if span.GetStartTimeUnixNano() != 0 && span.GetEndTimeUnixNano() != 0 {
+		spanDuration := (span.GetEndTimeUnixNano() - span.GetStartTimeUnixNano()) / 1000 / 1000 // in milliseconds
+		return strconv.FormatUint(spanDuration, 10)
 	}
 
-	if value.IntValue != "" {
-		return value.IntValue
-	}
+	return "0"
+}
 
-	if value.DoubleValue != 0.0 {
-		isFloatingPoint := math.Abs(value.DoubleValue-math.Abs(value.DoubleValue)) > 0.0
-		if isFloatingPoint {
-			return fmt.Sprintf("%f", value.DoubleValue)
+func spanType(attrs Attributes) string {
+	// based on https://github.com/open-telemetry/opentelemetry-specification/tree/main/specification/trace/semantic_conventions
+	// using the first required attribute for each type
+	for key := range attrs {
+		switch true {
+		case strings.HasPrefix(key, "http."):
+			return "http"
+		case strings.HasPrefix(key, "db."):
+			return "database"
+		case strings.HasPrefix(key, "rpc."):
+			return "rpc"
+		case strings.HasPrefix(key, "messaging."):
+			return "messaging"
+		case strings.HasPrefix(key, "faas."):
+			return "faas"
+		case strings.HasPrefix(key, "exception."):
+			return "exception"
+		}
+	}
+	return "unknown"
+}
+
+func getAttributeValue(value *v11.AnyValue) string {
+	switch v := value.GetValue().(type) {
+	case *v11.AnyValue_StringValue:
+		return v.StringValue
+
+	case *v11.AnyValue_IntValue:
+		return fmt.Sprintf("%d", v.IntValue)
+
+	case *v11.AnyValue_DoubleValue:
+		if v.DoubleValue != 0.0 {
+			isFloatingPoint := math.Abs(v.DoubleValue-math.Abs(v.DoubleValue)) > 0.0
+			if isFloatingPoint {
+				return fmt.Sprintf("%f", v.DoubleValue)
+			}
+
+			return fmt.Sprintf("%.0f", v.DoubleValue)
 		}
 
-		return fmt.Sprintf("%.0f", value.DoubleValue)
+	case *v11.AnyValue_BoolValue:
+		return fmt.Sprintf("%t", v.BoolValue)
 	}
 
-	return fmt.Sprintf("%t", value.BoolValue)
+	return "unsupported value type"
 }
 
-func createSpanID(id string) (trace.SpanID, error) {
-	spanId, err := trace.SpanIDFromHex(id)
-	if err != nil {
-		return trace.SpanID{}, fmt.Errorf("could not convert spanID")
-	}
+func createSpanID(id []byte) trace.SpanID {
+	var sid [8]byte
+	copy(sid[:], id[:8])
 
-	return spanId, nil
+	return trace.SpanID(sid)
 }
 
-func createTrace(spans []openapi.V1Span, spansMap map[string]*Span) Trace {
-	var rootSpanID string = ""
+func createTrace(spans []*v1.Span, spansMap map[trace.SpanID]*Span) Trace {
+	rootSpanID := trace.SpanID{}
 	for _, span := range spans {
-		if span.ParentSpanId == "" {
-			rootSpanID = span.SpanId
+		spanID := createSpanID(span.SpanId)
+		parentSpanID := createSpanID(span.ParentSpanId)
+		parentSpan, hasParent := spansMap[parentSpanID]
+		if !hasParent {
+			rootSpanID = spanID
 		} else {
-			parent := spansMap[span.ParentSpanId]
-			thisSpan := spansMap[span.SpanId]
-
-			thisSpan.Parent = parent
-			parent.Children = append(parent.Children, thisSpan)
+			thisSpan := spansMap[spanID]
+			thisSpan.Parent = parentSpan
+			parentSpan.Children = append(parentSpan.Children, thisSpan)
 		}
 	}
 
@@ -98,5 +130,6 @@ func createTrace(spans []openapi.V1Span, spansMap map[string]*Span) Trace {
 
 	return Trace{
 		RootSpan: *rootSpan,
+		Flat:     spansMap,
 	}
 }

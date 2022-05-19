@@ -5,6 +5,8 @@ import (
 
 	"github.com/kubeshop/tracetest/assertions"
 	"github.com/kubeshop/tracetest/assertions/comparator"
+	"github.com/kubeshop/tracetest/id"
+	"github.com/kubeshop/tracetest/model"
 	"github.com/kubeshop/tracetest/traces"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -12,16 +14,18 @@ import (
 
 func TestAssertion(t *testing.T) {
 
+	spanID := id.NewRandGenerator().SpanID()
 	cases := []struct {
-		name           string
-		testDef        assertions.TestDefinition
-		trace          traces.Trace
-		expectedResult assertions.TestResult
+		name              string
+		testDef           model.Definition
+		trace             traces.Trace
+		expectedResult    model.Results
+		expectedAllPassed bool
 	}{
 		{
 			name: "CanAssert",
-			testDef: assertions.TestDefinition{
-				`span[service.name="Pokeshop"]`: []assertions.Assertion{
+			testDef: model.Definition{
+				`span[service.name="Pokeshop"]`: []model.Assertion{
 					{
 						Attribute:  "tracetest.span.duration",
 						Comparator: comparator.Eq,
@@ -31,22 +35,28 @@ func TestAssertion(t *testing.T) {
 			},
 			trace: traces.Trace{
 				RootSpan: traces.Span{
+					ID: spanID,
 					Attributes: traces.Attributes{
 						"service.name":            "Pokeshop",
 						"tracetest.span.duration": "2000",
 					},
 				},
 			},
-			expectedResult: assertions.TestResult{
-				`span[service.name="Pokeshop"]`: []assertions.AssertionResult{
+			expectedAllPassed: true,
+			expectedResult: model.Results{
+				`span[service.name="Pokeshop"]`: []model.AssertionResult{
 					{
-						Assertion: assertions.Assertion{
+						Assertion: model.Assertion{
 							Attribute:  "tracetest.span.duration",
 							Comparator: comparator.Eq,
 							Value:      "2000",
 						},
-						AssertionSpanResults: []assertions.AssertionSpanResults{
-							{ActualValue: "2000", CompareErr: nil},
+						Results: []model.SpanAssertionResult{
+							{
+								SpanID:        spanID,
+								ObservedValue: "2000",
+								CompareErr:    nil,
+							},
 						},
 					},
 				},
@@ -59,7 +69,9 @@ func TestAssertion(t *testing.T) {
 			cl := c
 			t.Parallel()
 
-			actual := assertions.Assert(cl.trace, cl.testDef)
+			actual, allPassed := assertions.Assert(cl.testDef, cl.trace)
+
+			assert.Equal(t, cl.expectedAllPassed, allPassed)
 
 			for expectedSel, expectedAssertionResults := range cl.expectedResult {
 				actualAssertionResults, ok := actual[expectedSel]
@@ -69,11 +81,11 @@ func TestAssertion(t *testing.T) {
 					actualAR := actualAssertionResults[i]
 
 					assert.Equal(t, expectedAR.Assertion, actualAR.Assertion)
-					require.Len(t, actualAR.AssertionSpanResults, len(expectedAR.AssertionSpanResults))
+					require.Len(t, actualAR.Results, len(expectedAR.Results))
 
-					for i, expectedSpanRes := range expectedAR.AssertionSpanResults {
-						actualSpanRes := actualAR.AssertionSpanResults[i]
-						assert.Equal(t, expectedSpanRes.ActualValue, actualSpanRes.ActualValue)
+					for i, expectedSpanRes := range expectedAR.Results {
+						actualSpanRes := actualAR.Results[i]
+						assert.Equal(t, expectedSpanRes.ObservedValue, actualSpanRes.ObservedValue)
 						assert.Equal(t, expectedSpanRes.CompareErr, actualSpanRes.CompareErr)
 					}
 				}

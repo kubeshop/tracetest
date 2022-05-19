@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/kubeshop/tracetest/model"
 	"github.com/kubeshop/tracetest/testdb"
 	"github.com/orlangure/gnomock"
 	"github.com/orlangure/gnomock/preset/postgres"
@@ -12,7 +13,7 @@ import (
 
 var pgContainer *gnomock.Container
 
-func GetTestingDatabase(migrationFolder string) (testdb.Repository, error) {
+func GetTestingDatabase(migrationFolder string) (model.Repository, error) {
 	db, err := GetRawTestingDatabase()
 	if err != nil {
 		return nil, err

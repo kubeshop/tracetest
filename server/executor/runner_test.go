@@ -6,7 +6,8 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/executor"
-	"github.com/kubeshop/tracetest/openapi"
+	"github.com/kubeshop/tracetest/id"
+	"github.com/kubeshop/tracetest/model"
 	"github.com/kubeshop/tracetest/testdb"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -18,16 +19,16 @@ func TestPersistentRunner(t *testing.T) {
 	t.Run("TestIsExecuted", func(t *testing.T) {
 		t.Parallel()
 
-		test := openapi.Test{
-			TestId: "test",
+		test := model.Test{
+			ID: id.NewRandGenerator().UUID(),
 		}
 
 		f := runnerSetup(t)
 		f.expectSuccessExec(test)
 
-		f.run([]openapi.Test{test}, 10*time.Millisecond)
+		f.run([]model.Test{test}, 10*time.Millisecond)
 
-		result := f.mockResultsDB.results[test.TestId]
+		result := f.mockDB.runs[test.ID.String()]
 		require.NotNil(t, result)
 		assert.Greater(t, result.CompletedAt.UnixNano(), result.CreatedAt.UnixNano())
 
@@ -37,23 +38,23 @@ func TestPersistentRunner(t *testing.T) {
 	t.Run("TestsCanBeExecutedConcurrently", func(t *testing.T) {
 		t.Parallel()
 
-		test1 := openapi.Test{TestId: "test1"}
-		test2 := openapi.Test{TestId: "test2"}
+		test1 := model.Test{ID: id.NewRandGenerator().UUID()}
+		test2 := model.Test{ID: id.NewRandGenerator().UUID()}
 
 		f := runnerSetup(t)
 
 		f.expectSuccessExecLong(test1)
 		f.expectSuccessExec(test2)
 
-		f.run([]openapi.Test{test1, test2}, 100*time.Millisecond)
+		f.run([]model.Test{test1, test2}, 100*time.Millisecond)
 
-		result1 := f.mockResultsDB.results[test1.TestId]
-		require.NotNil(t, result1)
+		run1 := f.mockDB.runs[test1.ID.String()]
+		require.NotNil(t, run1)
 
-		result2 := f.mockResultsDB.results[test2.TestId]
-		require.NotNil(t, result2)
+		run2 := f.mockDB.runs[test2.ID.String()]
+		require.NotNil(t, run2)
 
-		assert.True(t, result1.CompletedAt.UnixNano() > result2.CompletedAt.UnixNano(), "test1 did not complete after test2")
+		assert.True(t, run1.CompletedAt.UnixNano() > run2.CompletedAt.UnixNano(), "test1 did not complete after test2")
 	})
 
 }
@@ -61,10 +62,10 @@ func TestPersistentRunner(t *testing.T) {
 var (
 	noError error = nil
 
-	sampleResponse = openapi.HttpResponse{
+	sampleResponse = model.HTTPResponse{
 		StatusCode: 200,
 		Body:       "this is the body",
-		Headers: []openapi.HttpResponseHeaders{
+		Headers: []model.HTTPHeader{
 			{Key: "Content-Type", Value: "text/plain"},
 		},
 	}
@@ -73,12 +74,11 @@ var (
 type runnerFixture struct {
 	runner          executor.PersistentRunner
 	mockExecutor    *mockExecutor
-	mockTestDB      *mockTestDB
-	mockResultsDB   *mockResultsDB
+	mockDB          *mockDB
 	mockTracePoller *mockTracePoller
 }
 
-func (f runnerFixture) run(tests []openapi.Test, ttl time.Duration) {
+func (f runnerFixture) run(tests []model.Test, ttl time.Duration) {
 	f.runner.Start(2)
 	time.Sleep(10 * time.Millisecond)
 	for _, test := range tests {
@@ -88,27 +88,27 @@ func (f runnerFixture) run(tests []openapi.Test, ttl time.Duration) {
 	f.runner.Stop()
 }
 
-func (f runnerFixture) expectSuccessExecLong(test openapi.Test) {
+func (f runnerFixture) expectSuccessExecLong(test model.Test) {
 	f.mockExecutor.expectExecuteTestLong(test)
 	f.expectSuccessResultPersist(test)
 }
 
-func (f runnerFixture) expectSuccessExec(test openapi.Test) {
+func (f runnerFixture) expectSuccessExec(test model.Test) {
 	f.mockExecutor.expectExecuteTest(test)
 	f.expectSuccessResultPersist(test)
 }
 
-func (f runnerFixture) expectSuccessResultPersist(test openapi.Test) {
-	f.mockResultsDB.expectCreateResult(test)
-	f.mockResultsDB.expectUpdateResultState(test, executor.TestRunStateExecuting)
-	f.mockTestDB.On("UpdateTest", mock.Anything, mock.Anything).Return(noError)
-	f.mockResultsDB.expectUpdateResultState(test, executor.TestRunStateAwaitingTrace)
+func (f runnerFixture) expectSuccessResultPersist(test model.Test) {
+	expectCreateRun(f.mockDB, test)
+	f.mockDB.On("UpdateRun", mock.Anything).Return(noError)
+	f.mockDB.On("UpdateTest", mock.Anything).Return(noError)
+	f.mockDB.On("UpdateRun", mock.Anything).Return(noError)
 	f.mockTracePoller.expectPoll(test)
 }
 
 func (f runnerFixture) assert(t *testing.T) {
 	f.mockExecutor.AssertExpectations(t)
-	f.mockResultsDB.AssertExpectations(t)
+	f.mockDB.AssertExpectations(t)
 }
 
 func runnerSetup(t *testing.T) runnerFixture {
@@ -116,25 +116,48 @@ func runnerSetup(t *testing.T) runnerFixture {
 	me.t = t
 	me.Test(t)
 
-	mt := new(mockTestDB)
-	mt.t = t
-	mt.Test(t)
-
-	mr := new(mockResultsDB)
-	mr.t = t
-	mr.Test(t)
+	db := new(mockDB)
+	db.T = t
+	db.Test(t)
 
 	mtp := new(mockTracePoller)
 	mtp.t = t
 
 	mtp.Test(t)
 	return runnerFixture{
-		runner:          executor.NewPersistentRunner(me, mt, mr, mtp),
+		runner:          executor.NewPersistentRunner(me, db, mtp),
 		mockExecutor:    me,
-		mockTestDB:      mt,
-		mockResultsDB:   mr,
+		mockDB:          db,
 		mockTracePoller: mtp,
 	}
+}
+
+type mockDB struct {
+	testdb.MockRepository
+
+	runs map[string]model.Run
+}
+
+func (m *mockDB) CreateRun(_ context.Context, test model.Test, run model.Run) (model.Run, error) {
+	args := m.Called(test.ID.String())
+	if m.runs == nil {
+		m.runs = map[string]model.Run{}
+	}
+
+	m.runs[test.ID.String()] = run
+
+	return run, args.Error(0)
+}
+
+func (m *mockDB) UpdateRun(_ context.Context, run model.Run) error {
+	args := m.Called(run.ID.String())
+	for k, v := range m.runs {
+		if v.ID.String() == run.ID.String() {
+			m.runs[k] = run
+		}
+	}
+
+	return args.Error(0)
 }
 
 type mockExecutor struct {
@@ -142,116 +165,27 @@ type mockExecutor struct {
 	t *testing.T
 }
 
-func (m *mockExecutor) Execute(test *openapi.Test, tid trace.TraceID, sid trace.SpanID) (openapi.HttpResponse, error) {
-	args := m.Called(test.TestId)
-	return args.Get(0).(openapi.HttpResponse), args.Error(1)
+func (m *mockExecutor) Execute(test model.Test, tid trace.TraceID, sid trace.SpanID) (model.HTTPResponse, error) {
+	args := m.Called(test.ID)
+	return args.Get(0).(model.HTTPResponse), args.Error(1)
 }
 
-func (m *mockExecutor) expectExecuteTest(test openapi.Test) *mock.Call {
+func (m *mockExecutor) expectExecuteTest(test model.Test) *mock.Call {
 	return m.
-		On("Execute", test.TestId).
+		On("Execute", test.ID).
 		Return(sampleResponse, noError)
 }
 
-func (m *mockExecutor) expectExecuteTestLong(test openapi.Test) *mock.Call {
+func (m *mockExecutor) expectExecuteTestLong(test model.Test) *mock.Call {
 	return m.
-		On("Execute", test.TestId).
+		On("Execute", test.ID).
 		After(50*time.Millisecond).
 		Return(sampleResponse, noError)
 }
 
-type mockTestDB struct {
-	mock.Mock
-	t *testing.T
-}
-
-var _ testdb.TestRepository = &mockTestDB{}
-
-func (m *mockTestDB) CreateTest(ctx context.Context, test *openapi.Test) (string, error) {
-	args := m.Called(ctx, test)
-	return args.String(0), args.Error(1)
-}
-
-func (m *mockTestDB) UpdateTest(ctx context.Context, test *openapi.Test) error {
-	args := m.Called(ctx, test)
-	return args.Error(0)
-}
-
-func (m *mockTestDB) DeleteTest(ctx context.Context, test *openapi.Test) error {
-	args := m.Called(ctx, test)
-	return args.Error(0)
-}
-
-func (m *mockTestDB) GetTests(ctx context.Context, take, skip int32) ([]openapi.Test, error) {
-	args := m.Called(ctx, take, skip)
-	return args.Get(0).([]openapi.Test), args.Error(1)
-}
-
-func (m *mockTestDB) GetTest(ctx context.Context, id string) (*openapi.Test, error) {
-	args := m.Called(ctx, id)
-	return args.Get(0).(*openapi.Test), args.Error(1)
-}
-
-type mockResultsDB struct {
-	mock.Mock
-	t *testing.T
-
-	results map[string]openapi.TestRunResult
-}
-
-var _ testdb.ResultRepository = &mockResultsDB{}
-
-func (m *mockResultsDB) CreateResult(ctx context.Context, testID string, res *openapi.TestRunResult) error {
-	args := m.Called(res.TestId)
-	if m.results == nil {
-		m.results = map[string]openapi.TestRunResult{}
-	}
-
-	m.results[res.TestId] = *res
-
-	return args.Error(0)
-}
-
-func (m *mockResultsDB) GetResult(ctx context.Context, id string) (*openapi.TestRunResult, error) {
-	args := m.Called(ctx, id)
-	return args.Get(0).(*openapi.TestRunResult), args.Error(1)
-}
-
-func (m *mockResultsDB) GetResultsByTestID(ctx context.Context, testid string, take, skip int32) ([]openapi.TestRunResult, error) {
-	args := m.Called(ctx, testid, take, skip)
-	return args.Get(0).([]openapi.TestRunResult), args.Error(1)
-}
-
-func (m *mockResultsDB) GetResultByTraceID(ctx context.Context, testid, traceid string) (openapi.TestRunResult, error) {
-	args := m.Called(ctx, testid, traceid)
-	return args.Get(0).(openapi.TestRunResult), args.Error(1)
-}
-
-func (m *mockResultsDB) UpdateTest(_ context.Context, test *openapi.Test) error {
-	args := m.Called(test.TestId)
-	return args.Error(0)
-}
-
-func (m *mockResultsDB) UpdateResult(ctx context.Context, res *openapi.TestRunResult) error {
-	args := m.Called(res.TestId, res.State)
-	if m.results == nil {
-		m.results = map[string]openapi.TestRunResult{}
-	}
-
-	m.results[res.TestId] = *res
-
-	return args.Error(0)
-}
-
-func (m *mockResultsDB) expectCreateResult(test openapi.Test) *mock.Call {
+func expectCreateRun(m *mockDB, test model.Test) *mock.Call {
 	return m.
-		On("CreateResult", test.TestId).
-		Return(noError)
-}
-
-func (m *mockResultsDB) expectUpdateResultState(test openapi.Test, expectedState string) *mock.Call {
-	return m.
-		On("UpdateResult", test.TestId, expectedState).
+		On("CreateRun", test.ID.String()).
 		Return(noError)
 }
 
@@ -260,13 +194,11 @@ type mockTracePoller struct {
 	t *testing.T
 }
 
-var _ executor.TracePoller = &mockTracePoller{}
-
-func (m *mockTracePoller) Poll(_ context.Context, res openapi.TestRunResult) {
-	m.Called(res.TestId)
+func (m *mockTracePoller) Poll(_ context.Context, test model.Test, run model.Run) {
+	m.Called(test.ID)
 }
 
-func (m *mockTracePoller) expectPoll(test openapi.Test) *mock.Call {
+func (m *mockTracePoller) expectPoll(test model.Test) *mock.Call {
 	return m.
-		On("Poll", test.TestId)
+		On("Poll", test.ID)
 }

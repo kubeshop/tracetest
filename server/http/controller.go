@@ -6,83 +6,73 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/google/uuid"
 	"github.com/kubeshop/tracetest/analytics"
+	"github.com/kubeshop/tracetest/assertions/comparator"
 	"github.com/kubeshop/tracetest/assertions/selectors"
 	"github.com/kubeshop/tracetest/executor"
+	"github.com/kubeshop/tracetest/model"
 	"github.com/kubeshop/tracetest/openapi"
 	"github.com/kubeshop/tracetest/testdb"
 	"github.com/kubeshop/tracetest/tracedb"
-	"github.com/kubeshop/tracetest/traces"
 )
 
 type controller struct {
-	traceDB         tracedb.TraceDB
-	testDB          testdb.Repository
+	testDB          model.Repository
 	runner          executor.Runner
 	assertionRunner executor.AssertionRunner
+
+	openapi openapiMapper
+	model   modelMapper
 }
 
 func NewController(
 	traceDB tracedb.TraceDB,
-	testDB testdb.Repository,
+	testDB model.Repository,
 	runner executor.Runner,
 	assertionRunner executor.AssertionRunner,
 ) openapi.ApiApiServicer {
 	return &controller{
-		traceDB:         traceDB,
 		testDB:          testDB,
 		runner:          runner,
 		assertionRunner: assertionRunner,
+		openapi:         openapiMapper{},
+		model:           modelMapper{Comparators: comparator.DefaultRegistry()},
 	}
 }
 
-func (s *controller) CreateTest(ctx context.Context, test openapi.Test) (openapi.ImplResponse, error) {
-	id, err := s.testDB.CreateTest(ctx, &test)
+func handleDBError(err error) openapi.ImplResponse {
+	switch {
+	case errors.Is(testdb.ErrNotFound, err):
+		return openapi.Response(http.StatusNotFound, err.Error())
+	default:
+		return openapi.Response(http.StatusInternalServerError, err.Error())
+	}
+}
+
+func (c *controller) CreateTest(ctx context.Context, in openapi.Test) (openapi.ImplResponse, error) {
+	test, err := c.testDB.CreateTest(ctx, c.model.Test(in))
 	if err != nil {
 		return openapi.Response(http.StatusInternalServerError, err.Error()), err
 	}
 
 	analytics.CreateAndSendEvent("test_created_backend", "test")
 
-	test.TestId = id
-	return openapi.Response(200, test), nil
+	return openapi.Response(200, c.openapi.Test(test)), nil
 }
 
-func (s *controller) UpdateTest(ctx context.Context, testid string, updated openapi.Test) (openapi.ImplResponse, error) {
-	test, err := s.testDB.GetTest(ctx, testid)
+func (c *controller) DeleteTest(ctx context.Context, testID string) (openapi.ImplResponse, error) {
+	id, err := uuid.Parse(testID)
 	if err != nil {
-		switch {
-		case errors.Is(testdb.ErrNotFound, err):
-			return openapi.Response(http.StatusNotFound, err.Error()), err
-		default:
-			return openapi.Response(http.StatusInternalServerError, err.Error()), err
-		}
+		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
 	}
 
-	updated.TestId = test.TestId
-
-	err = s.testDB.UpdateTest(ctx, &updated)
+	test, err := c.testDB.GetTest(ctx, id)
 	if err != nil {
-		return openapi.Response(http.StatusInternalServerError, err.Error()), err
+		return handleDBError(err), err
 	}
 
-	analytics.CreateAndSendEvent("test_updated_backend", "test")
-
-	return openapi.Response(204, nil), nil
-}
-
-func (s *controller) DeleteTest(ctx context.Context, testid string) (openapi.ImplResponse, error) {
-	test, err := s.testDB.GetTest(ctx, testid)
-	if err != nil {
-		switch {
-		case errors.Is(testdb.ErrNotFound, err):
-			return openapi.Response(http.StatusNotFound, err.Error()), err
-		default:
-			return openapi.Response(http.StatusInternalServerError, err.Error()), err
-		}
-	}
-
-	err = s.testDB.DeleteTest(ctx, test)
+	err = c.testDB.DeleteTest(ctx, test)
 	if err != nil {
 		return openapi.Response(http.StatusInternalServerError, err.Error()), err
 	}
@@ -90,207 +80,58 @@ func (s *controller) DeleteTest(ctx context.Context, testid string) (openapi.Imp
 	analytics.CreateAndSendEvent("test_deleted_backend", "test")
 
 	return openapi.Response(204, nil), nil
-}
-
-func (s *controller) GetTest(ctx context.Context, testid string) (openapi.ImplResponse, error) {
-	test, err := s.testDB.GetTest(ctx, testid)
-	if err != nil {
-		switch {
-		case errors.Is(testdb.ErrNotFound, err):
-			return openapi.Response(http.StatusNotFound, err.Error()), err
-		default:
-			return openapi.Response(http.StatusInternalServerError, err.Error()), err
-		}
-	}
-
-	if test.ReferenceTestRunResult.TraceId != "" {
-		res, err := s.testDB.GetResultByTraceID(ctx, test.TestId, test.ReferenceTestRunResult.TraceId)
-		if err != nil {
-			return openapi.Response(http.StatusInternalServerError, err.Error()), err
-		}
-		test.ReferenceTestRunResult = res
-	}
-
-	return openapi.Response(200, test), nil
-}
-
-func (s *controller) GetTests(ctx context.Context, take, skip int32) (openapi.ImplResponse, error) {
-	if take == 0 {
-		take = 20
-	}
-
-	tests, err := s.testDB.GetTests(ctx, take, skip)
-	if err != nil {
-		return openapi.Response(http.StatusInternalServerError, err.Error()), err
-	}
-
-	return openapi.Response(200, tests), nil
-}
-
-func (s *controller) RunTest(ctx context.Context, testid string) (openapi.ImplResponse, error) {
-	test, err := s.testDB.GetTest(ctx, testid)
-	if err != nil {
-		switch {
-		case errors.Is(testdb.ErrNotFound, err):
-			return openapi.Response(http.StatusNotFound, err.Error()), err
-		default:
-			return openapi.Response(http.StatusInternalServerError, err.Error()), err
-		}
-	}
-
-	result := s.runner.Run(*test)
-
-	analytics.CreateAndSendEvent("test_run_backend", "test")
-
-	return openapi.Response(200, result), nil
-}
-
-func (s *controller) GetTestResults(ctx context.Context, id string, take, skip int32) (openapi.ImplResponse, error) {
-	if take == 0 {
-		take = 20
-	}
-
-	res, err := s.testDB.GetResultsByTestID(ctx, id, take, skip)
-	if err != nil {
-		return openapi.Response(http.StatusInternalServerError, err.Error()), err
-	}
-
-	return openapi.Response(http.StatusOK, res), nil
 
 }
 
-func (s *controller) GetTestResult(ctx context.Context, testid string, id string) (openapi.ImplResponse, error) {
-	res, err := s.testDB.GetResult(ctx, id)
+func (c *controller) GetTest(ctx context.Context, testID string) (openapi.ImplResponse, error) {
+	id, err := uuid.Parse(testID)
 	if err != nil {
-		return openapi.Response(http.StatusInternalServerError, err.Error()), err
+		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
 	}
-	return openapi.Response(http.StatusOK, *res), nil
+
+	test, err := c.testDB.GetTest(ctx, id)
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	return openapi.Response(200, c.openapi.Test(test)), nil
 }
 
-func (s *controller) UpdateTestResult(ctx context.Context, testid string, id string, testRunResult openapi.TestAssertionResult) (openapi.ImplResponse, error) {
-	testResult, err := s.testDB.GetResult(ctx, id)
+func (c *controller) GetTestDefinition(ctx context.Context, testID string) (openapi.ImplResponse, error) {
+	id, err := uuid.Parse(testID)
 	if err != nil {
-		return openapi.Response(http.StatusInternalServerError, err.Error()), err
+		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
 	}
 
-	if testRunResult.AssertionResult == nil {
-		testRunResult.AssertionResult = []openapi.AssertionResult{}
-	}
-
-	for i := range testRunResult.AssertionResult {
-		if testRunResult.AssertionResult[i].SpanAssertionResults == nil {
-			testRunResult.AssertionResult[i].SpanAssertionResults = []openapi.SpanAssertionResult{}
-		}
-	}
-
-	testResult.AssertionResultState = testRunResult.AssertionResultState
-	testResult.AssertionResult = testRunResult.AssertionResult
-	if isExpectingResultStateUpdate(testResult) {
-		testResult.State = executor.TestRunStateFinished
-	}
-
-	err = s.testDB.UpdateResult(ctx, testResult)
+	test, err := c.testDB.GetTest(ctx, id)
 	if err != nil {
-		return openapi.Response(http.StatusInternalServerError, err.Error()), err
+		return handleDBError(err), err
 	}
 
-	return openapi.Response(http.StatusOK, *testResult), nil
+	return openapi.Response(200, c.openapi.Definition(test.Definition)), nil
 }
 
-func isExpectingResultStateUpdate(r *openapi.TestRunResult) bool {
-	return r.State == executor.TestRunStateAwaitingTestResults
-
-}
-
-func (s *controller) CreateAssertion(ctx context.Context, testID string, assertion openapi.Assertion) (openapi.ImplResponse, error) {
-	test, err := s.testDB.GetTest(ctx, testID)
+func (c *controller) GetTestResultSelectedSpans(ctx context.Context, _ string, runID string, selectorQuery string) (openapi.ImplResponse, error) {
+	rid, err := uuid.Parse(runID)
 	if err != nil {
-		switch {
-		case errors.Is(testdb.ErrNotFound, err):
-			return openapi.Response(http.StatusNotFound, err.Error()), err
-		default:
-			return openapi.Response(http.StatusInternalServerError, err.Error()), err
-		}
+		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
 	}
 
-	id, err := s.testDB.CreateAssertion(ctx, testID, &assertion)
-	if err != nil {
-		return openapi.Response(http.StatusInternalServerError, err.Error()), err
-	}
-	assertion.AssertionId = id
-
-	// Mark reference result as empty after test is updated,
-	// so that next test run will update the reference result.
-	test.ReferenceTestRunResult.ResultId = ""
-	if err = s.testDB.UpdateTest(ctx, test); err != nil {
-		return openapi.Response(http.StatusInternalServerError, err.Error()), err
-	}
-
-	analytics.CreateAndSendEvent("assertion-created-backend", "test")
-
-	return openapi.Response(http.StatusOK, assertion), nil
-}
-
-func (s *controller) UpdateAssertion(ctx context.Context, testID string, assertionID string, updated openapi.Assertion) (openapi.ImplResponse, error) {
-	_, err := s.testDB.GetAssertion(ctx, assertionID)
-	if err != nil {
-		return openapi.Response(http.StatusInternalServerError, err.Error()), err
-	}
-
-	updated.AssertionId = assertionID
-
-	err = s.testDB.UpdateAssertion(ctx, testID, assertionID, updated)
-	if err != nil {
-		return openapi.Response(http.StatusInternalServerError, err.Error()), err
-	}
-
-	analytics.CreateAndSendEvent("assertion_updated_backend", "test")
-
-	return openapi.Response(http.StatusNoContent, nil), nil
-}
-
-func (s *controller) DeleteAssertion(ctx context.Context, testID string, assertionID string) (openapi.ImplResponse, error) {
-	_, err := s.testDB.GetAssertion(ctx, assertionID)
-	if err != nil {
-		return openapi.Response(http.StatusInternalServerError, err.Error()), err
-	}
-
-	err = s.testDB.DeleteAssertion(ctx, testID, assertionID)
-	if err != nil {
-		return openapi.Response(http.StatusInternalServerError, err.Error()), err
-	}
-
-	analytics.CreateAndSendEvent("assertion_deleted_backend", "test")
-
-	return openapi.Response(http.StatusNoContent, nil), nil
-}
-
-func (s *controller) GetAssertions(ctx context.Context, testID string) (openapi.ImplResponse, error) {
-	assertions, err := s.testDB.GetAssertionsByTestID(ctx, testID)
-	if err != nil {
-		return openapi.Response(http.StatusInternalServerError, err.Error()), err
-	}
-
-	return openapi.Response(http.StatusOK, assertions), nil
-}
-
-func (s *controller) GetTestResultSelectedSpans(ctx context.Context, testID string, resultID string, selectorQuery string) (openapi.ImplResponse, error) {
 	selector, err := selectors.New(selectorQuery)
 	if err != nil {
-		return openapi.Response(http.StatusBadRequest, "invalid selector query"), nil
+		return handleDBError(err), err
 	}
 
-	result, err := s.testDB.GetResult(ctx, resultID)
+	run, err := c.testDB.GetRun(ctx, rid)
 	if err != nil {
 		return openapi.Response(http.StatusInternalServerError, ""), nil
 	}
 
-	trace, err := traces.FromOtel(result.Trace)
-	if err != nil {
-		return openapi.Response(http.StatusInternalServerError, ""), nil
+	if run.Trace == nil {
+		return openapi.Response(http.StatusInternalServerError, "trace not available"), nil
 	}
 
-	selectedSpans := selector.Filter(trace)
+	selectedSpans := selector.Filter(*run.Trace)
 	selectedSpanIds := make([]string, len(selectedSpans))
 
 	for i, span := range selectedSpans {
@@ -300,34 +141,149 @@ func (s *controller) GetTestResultSelectedSpans(ctx context.Context, testID stri
 	return openapi.Response(http.StatusOK, selectedSpanIds), nil
 }
 
-func (s *controller) RerunTestResult(ctx context.Context, testID string, resultID string) (openapi.ImplResponse, error) {
-	test, err := s.testDB.GetTest(ctx, testID)
+func (c *controller) GetTestRun(ctx context.Context, _ string, runID string) (openapi.ImplResponse, error) {
+	rid, err := uuid.Parse(runID)
 	if err != nil {
-		return openapi.Response(http.StatusInternalServerError, err.Error()), err
+		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
 	}
 
-	result, err := s.testDB.GetResult(ctx, resultID)
+	run, err := c.testDB.GetRun(ctx, rid)
 	if err != nil {
-		return openapi.Response(http.StatusInternalServerError, err.Error()), err
+		return handleDBError(err), err
 	}
 
-	result.State = executor.TestRunStateAwaitingTestResults
-	err = s.testDB.UpdateResult(ctx, result)
-	if err != nil {
-		return openapi.Response(http.StatusInternalServerError, err.Error()), err
+	return openapi.Response(200, c.openapi.Run(&run)), nil
+}
+
+func (c *controller) GetTestRuns(ctx context.Context, testID string, take, skip int32) (openapi.ImplResponse, error) {
+	if take == 0 {
+		take = 20
 	}
 
-	testDefinition, err := executor.ConvertAssertionsIntoTestDefinition(test.Assertions)
+	id, err := uuid.Parse(testID)
+	if err != nil {
+		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
+	}
+
+	test, err := c.testDB.GetTest(ctx, id)
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	runs, err := c.testDB.GetTestRuns(ctx, test, take, skip)
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	return openapi.Response(200, c.openapi.Runs(runs)), nil
+}
+
+func (c *controller) GetTests(ctx context.Context, take, skip int32) (openapi.ImplResponse, error) {
+	if take == 0 {
+		take = 20
+	}
+
+	tests, err := c.testDB.GetTests(ctx, take, skip)
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	return openapi.Response(200, c.openapi.Tests(tests)), nil
+}
+
+func (c *controller) RerunTestRun(ctx context.Context, testID string, runID string) (openapi.ImplResponse, error) {
+	id, err := uuid.Parse(testID)
+	if err != nil {
+		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
+	}
+
+	test, err := c.testDB.GetTest(ctx, id)
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	rid, err := uuid.Parse(runID)
+	if err != nil {
+		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
+	}
+
+	run, err := c.testDB.GetRun(ctx, rid)
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	run.State = model.RunStateAwaitingTestResults
+	err = c.testDB.UpdateRun(ctx, run)
 	if err != nil {
 		return openapi.Response(http.StatusInternalServerError, err.Error()), err
 	}
 
 	assertionRequest := executor.AssertionRequest{
-		TestDefinition: testDefinition,
-		Result:         *result,
+		Test: test,
+		Run:  run,
 	}
 
-	s.assertionRunner.RunAssertions(assertionRequest)
+	c.assertionRunner.RunAssertions(assertionRequest)
 
-	return openapi.Response(http.StatusOK, result), nil
+	return openapi.Response(http.StatusOK, c.openapi.Run(&run)), nil
+}
+
+func (c *controller) RunTest(ctx context.Context, testID string) (openapi.ImplResponse, error) {
+	id, err := uuid.Parse(testID)
+	if err != nil {
+		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
+	}
+
+	test, err := c.testDB.GetTest(ctx, id)
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	run := c.runner.Run(test)
+
+	analytics.CreateAndSendEvent("test_run_backend", "test")
+
+	return openapi.Response(200, c.openapi.Run(&run)), nil
+}
+
+func (c *controller) SetTestDefinition(ctx context.Context, testID string, def openapi.TestDefinition) (openapi.ImplResponse, error) {
+	id, err := uuid.Parse(testID)
+	if err != nil {
+		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
+	}
+
+	test, err := c.testDB.GetTest(ctx, id)
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	err = c.testDB.SetDefiniton(ctx, test, c.model.Definition(def))
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	return openapi.Response(204, nil), nil
+}
+
+func (c *controller) UpdateTest(ctx context.Context, testID string, in openapi.Test) (openapi.ImplResponse, error) {
+	id, err := uuid.Parse(testID)
+	if err != nil {
+		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
+	}
+
+	test, err := c.testDB.GetTest(ctx, id)
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	updated := c.model.Test(in)
+	updated.ID = test.ID
+	updated.ReferenceRun = nil
+
+	err = c.testDB.UpdateTest(ctx, updated)
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	return openapi.Response(204, nil), nil
 }
