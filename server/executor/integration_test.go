@@ -22,6 +22,7 @@ const appEndpoint = "http://localhost:8080"
 func TestExecutorIntegration(t *testing.T) {
 	demoApp, err := testmock.GetDemoApplicationInstance()
 	require.NoError(t, err)
+	defer demoApp.Stop()
 
 	tracetestApp, err := testmock.GetTestingApp(demoApp)
 	require.NoError(t, err)
