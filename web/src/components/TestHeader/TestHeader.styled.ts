@@ -36,7 +36,7 @@ export const TestUrl = styled(Typography.Text).attrs({
 export const StateText = styled(Typography.Text)`
   && {
     margin-right: 8px;
-    color: 8c8c8c;
+    color: #8c8c8c;
   }
 `;
 
@@ -52,5 +52,7 @@ export const Content = styled.div`
 `;
 
 export const StateContainer = styled.div`
+  align-items: center;
+  display: flex;
   justify-self: flex-end;
 `;

@@ -116,18 +116,18 @@ exports[`Router 1`] = `
     class="ant-layout-content sc-bdvvtL cVXBSg"
   >
     <div
-      class="sc-iwjdpV NooTe"
+      class="sc-llYSUQ jPRqiW"
     >
       <h4
-        class="ant-typography sc-bBHxTw hNGPLR"
+        class="ant-typography sc-cxpSdN bbcJQg"
       >
         All Tests
       </h4>
       <div
-        class="sc-fKVqWL hXBhTv"
+        class="sc-iwjdpV NicDQ"
       >
         <span
-          class="ant-input-affix-wrapper sc-jJoQJp lKcrg"
+          class="ant-input-affix-wrapper sc-gWXbKe kPVVws"
         >
           <span
             class="ant-input-prefix"
@@ -163,10 +163,10 @@ exports[`Router 1`] = `
           />
         </span>
         <div
-          class="sc-cxpSdN daEcoQ"
+          class="sc-iJKOTD bLqiN"
         >
           <button
-            class="ant-btn ant-btn-primary sc-kfPuZi"
+            class="ant-btn ant-btn-primary sc-bBHxTw"
             data-cy="create-test-button"
             data-tour="home_create_test"
             type="button"
@@ -178,12 +178,12 @@ exports[`Router 1`] = `
         </div>
       </div>
       <div
-        class="sc-ezbkAF gkHwYo"
+        class="sc-kLwhqv kFBBsa"
         data-cy="test-list"
       />
     </div>
     <div
-      class="sc-bYoBSM kZlmwb"
+      class="sc-ikJyIC exAstU"
     />
   </main>
 </div>

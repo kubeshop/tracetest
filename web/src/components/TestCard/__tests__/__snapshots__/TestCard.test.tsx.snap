@@ -3,10 +3,10 @@
 exports[`TestCard 1`] = `
 <div>
   <div
-    class="sc-jrQzAO guQEPO"
+    class="sc-iqseJM fscQmy"
   >
     <div
-      class="sc-kDTinF iNqRfS"
+      class="sc-crHmcD dvudNn"
     >
       <span
         aria-label="right"
@@ -30,38 +30,38 @@ exports[`TestCard 1`] = `
         </svg>
       </span>
       <div
-        class="sc-crHmcD dqqtkd"
+        class="sc-bqiRlB ghwjXk"
       >
         <span
-          class="ant-typography sc-bqiRlB jCwMNy"
+          class="ant-typography sc-hBUSln fEhLhq"
         >
           
         </span>
       </div>
       <div
-        class="sc-crHmcD dqqtkd"
+        class="sc-bqiRlB ghwjXk"
       >
         <span
-          class="ant-typography sc-ksdxgE"
+          class="ant-typography sc-fotOHu"
         >
           GET
         </span>
       </div>
       <div
-        class="sc-crHmcD dqqtkd"
+        class="sc-bqiRlB ghwjXk"
         data-cy="test-url-2309ei30"
       >
         <span
-          class="ant-typography sc-ksdxgE"
+          class="ant-typography sc-fotOHu"
         >
           
         </span>
       </div>
       <div
-        class="sc-crHmcD dqqtkd"
+        class="sc-bqiRlB ghwjXk"
       />
       <div
-        class="sc-egiyK hbItou"
+        class="sc-ksdxgE kMvHnp"
       >
         <button
           class="ant-btn ant-btn-primary ant-btn-background-ghost"
@@ -79,7 +79,7 @@ exports[`TestCard 1`] = `
       >
         <span
           aria-label="more"
-          class="anticon anticon-more sc-hBUSln"
+          class="anticon anticon-more sc-fFeiMQ"
           role="img"
           style="font-size: 24px; color: rgb(154, 163, 171); cursor: pointer;"
         >
