@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
 
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/openapi"
@@ -33,7 +34,7 @@ func (a listTestsAction) Run(ctx context.Context, args []string) error {
 		return err
 	}
 
-	fmt.Println(string(bytes))
+	fmt.Fprintln(os.Stdout, string(bytes))
 	return nil
 }
 

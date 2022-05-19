@@ -15,7 +15,7 @@ build: generate-client
 	go build -o tracetest main.go
 
 test: mockserver
-	@go test ./...
+	@go test -coverprofile=coverage.out ./...
 	@make --no-print-directory kill-mock
 
 mockserver:
