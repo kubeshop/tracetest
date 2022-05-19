@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/kubeshop/tracetest/cli/config"
+	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -46,4 +47,18 @@ func setupLogger(cmd *cobra.Command, args []string) {
 
 func teardownCommand(cmd *cobra.Command, args []string) {
 	cliLogger.Sync()
+}
+
+func getAPIClient() *openapi.APIClient {
+	config := openapi.NewConfiguration()
+	config.Scheme = cliConfig.Scheme
+	config.Host = cliConfig.Endpoint
+	if cliConfig.ServerPath != nil {
+		config.Servers = []openapi.ServerConfiguration{
+			{
+				URL: *cliConfig.ServerPath,
+			},
+		}
+	}
+	return openapi.NewAPIClient(config)
 }
