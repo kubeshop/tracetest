@@ -1,18 +1,6 @@
 import {DeleteOutlined} from '@ant-design/icons';
-import {Button, Form, Select as AntSelect, Space, Typography} from 'antd';
+import {Button, Select as AntSelect, Space, Typography} from 'antd';
 import styled from 'styled-components';
-
-export const FullHeightFormItem = styled(Form.Item)`
-  .ant-select-single:not(.ant-select-customize-input) .ant-select-selector {
-    height: 40px;
-    display: flex;
-    align-items: center;
-  }
-
-  input {
-    height: 40px;
-  }
-`;
 
 export const Select = styled(AntSelect)`
   min-width: 88px;
@@ -44,7 +32,7 @@ export const Check = styled(Space)`
   display: grid;
   grid-template-columns: repeat(3, 210px) 1fr;
   gap: 4px;
-  align-items: center;
+  align-items: start;
   margin-bottom: 16px;
 `;
 

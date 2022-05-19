@@ -58,6 +58,7 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
   useGuidedTour(GuidedTours.Assertion);
 
   const currentSelectorList = Form.useWatch('selectorList', form) || [];
+  const currentAssertionList = Form.useWatch('assertionList', form) || [];
   const attributeList = useSelector(AssertionSelectors.selectAttributeList(testId, resultId, currentSelectorList));
 
   const onFieldsChange = useCallback(
@@ -70,13 +71,13 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
       if (fieldName === 'assertionList') onChecksChange(JSON.stringify(form.getFieldValue('assertionList') || []));
 
       if (fieldName === 'assertionList' && keyName === 'key' && field.value) {
-        const currentAssertionList: IAssertionSpan[] = form.getFieldValue('assertionList') || [];
+        const list: IAssertionSpan[] = form.getFieldValue('assertionList') || [];
 
         form.setFieldsValue({
-          assertionList: currentAssertionList.map((assertionEntry, index) => {
+          assertionList: list.map((assertionEntry, index) => {
             if (index === entry) {
               const {value = '', type = ''} =
-                attributeList?.find((el: any) => el.key === currentAssertionList[index].key) || {};
+                attributeList?.find((el: any) => el.key === list[index].key) || {};
               const isValid = typeof value === 'number' || !isEmpty(value);
 
               return {...assertionEntry, value: isValid ? String(value) : '', type};
@@ -128,7 +129,7 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
         <div data-tour={GuidedTourService.getStep(GuidedTours.Assertion, Steps.Checks)}>
           <Form.List name="assertionList">
             {(fields, {add, remove}) => (
-              <AssertionFormCheckList fields={fields} add={add} remove={remove} attributeList={attributeList} />
+              <AssertionFormCheckList assertionList={currentAssertionList} fields={fields} add={add} remove={remove} attributeList={attributeList} />
             )}
           </Form.List>
         </div>

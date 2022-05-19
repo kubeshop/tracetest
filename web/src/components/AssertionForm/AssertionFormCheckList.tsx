@@ -1,16 +1,18 @@
 import {PlusOutlined} from '@ant-design/icons';
-import {Input, Select} from 'antd';
+import {Input, Select, Form} from 'antd';
 import {FormListFieldData} from 'antd/lib/form/FormList';
 import {capitalize, uniqBy} from 'lodash';
 import {useMemo} from 'react';
 import {CompareOperator} from '../../constants/Operator.constants';
 import CreateAssertionModalAnalyticsService from '../../services/Analytics/CreateAssertionModalAnalytics.service';
 import OperatorService from '../../services/Operator.service';
+import {IAssertionSpan} from '../../types/Assertion.types';
 import {ISpanFlatAttribute} from '../../types/Span.types';
 import * as S from './AssertionForm.styled';
 
 interface IProps {
   fields: FormListFieldData[];
+  assertionList: IAssertionSpan[];
   add(): void;
   remove(name: number): void;
   attributeList: ISpanFlatAttribute[];
@@ -21,7 +23,9 @@ const operatorList = Object.values(CompareOperator).map(value => ({
   label: capitalize(OperatorService.getOperatorName(value)),
 }));
 
-const AssertionFormCheckList: React.FC<IProps> = ({fields, add, remove, attributeList}) => {
+const getIsValid = ({key, compareOp, value}: IAssertionSpan): boolean => Boolean(key && compareOp && value);
+
+const AssertionFormCheckList: React.FC<IProps> = ({fields, add, remove, attributeList, assertionList}) => {
   const attributeOptionList = useMemo(
     () =>
       uniqBy(attributeList, 'key').map(({key}) => (
@@ -36,7 +40,7 @@ const AssertionFormCheckList: React.FC<IProps> = ({fields, add, remove, attribut
     <>
       {fields.map(({key, name, ...field}, index) => (
         <S.Check key={key}>
-          <S.FullHeightFormItem
+          <Form.Item
             {...field}
             name={[name, 'key']}
             style={{margin: 0}}
@@ -47,8 +51,8 @@ const AssertionFormCheckList: React.FC<IProps> = ({fields, add, remove, attribut
             <S.Select style={{margin: 0}} placeholder="Attribute" showSearch>
               {attributeOptionList}
             </S.Select>
-          </S.FullHeightFormItem>
-          <S.FullHeightFormItem
+          </Form.Item>
+          <Form.Item
             {...field}
             style={{margin: 0}}
             name={[name, 'compareOp']}
@@ -62,8 +66,8 @@ const AssertionFormCheckList: React.FC<IProps> = ({fields, add, remove, attribut
                 </Select.Option>
               ))}
             </S.Select>
-          </S.FullHeightFormItem>
-          <S.FullHeightFormItem
+          </Form.Item>
+          <Form.Item
             {...field}
             name={[name, 'value']}
             style={{margin: 0}}
@@ -71,7 +75,7 @@ const AssertionFormCheckList: React.FC<IProps> = ({fields, add, remove, attribut
             data-cy="assertion-check-value"
           >
             <Input placeholder="Expected Value" />
-          </S.FullHeightFormItem>
+          </Form.Item>
           {index === fields.length - 1 ? (
             <S.AddCheckButton
               icon={<PlusOutlined />}
@@ -79,9 +83,10 @@ const AssertionFormCheckList: React.FC<IProps> = ({fields, add, remove, attribut
                 CreateAssertionModalAnalyticsService.onAddCheck();
                 add();
               }}
+              disabled={!assertionList[name] || !getIsValid(assertionList[name])}
               data-cy="add-assertion-form-add-check"
             >
-              Add Item
+              Add Check
             </S.AddCheckButton>
           ) : (
             <S.DeleteCheckIcon
