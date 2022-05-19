@@ -34,7 +34,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "./tests.yaml#/definitions/Test"
+                  $ref: "./tests.yaml#/components/schemas/Test"
         500:
           description: "problem with getting tests"
     post:
@@ -47,14 +47,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "./tests.yaml#/definitions/Test"
+              $ref: "./tests.yaml#/components/schemas/Test"
       responses:
         200:
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: "./tests.yaml#/definitions/Test"
+                $ref: "./tests.yaml#/components/schemas/Test"
         500:
           description: "problem with creating test"
   /tests/{testId}:
@@ -77,7 +77,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "./tests.yaml#/definitions/Test"
+                $ref: "./tests.yaml#/components/schemas/Test"
         500:
           description: "problem with getting a test"
     put:
@@ -97,7 +97,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "./tests.yaml#/definitions/Test"
+              $ref: "./tests.yaml#/components/schemas/Test"
       responses:
         204:
           description: successful operation
@@ -139,7 +139,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "./tests.yaml#/definitions/TestRun"
+                $ref: "./tests.yaml#/components/schemas/TestRun"
     get:
       tags:
         - api
@@ -173,7 +173,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "./tests.yaml#/definitions/TestRun"
+                  $ref: "./tests.yaml#/components/schemas/TestRun"
   /tests/{testId}/run/{runId}/select:
     get:
       tags:
@@ -233,7 +233,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "./tests.yaml#/definitions/TestRun"
+                $ref: "./tests.yaml#/components/schemas/TestRun"
   /tests/{testId}/run/{runId}:
     get:
       tags:
@@ -260,7 +260,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "./tests.yaml#/definitions/TestRun"
+                $ref: "./tests.yaml#/components/schemas/TestRun"
   /tests/{testId}/definition:
     get:
       tags:
@@ -283,7 +283,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "./tests.yaml#/definitions/TestDefinition"
+                  $ref: "./tests.yaml#/components/schemas/TestDefinition"
     put:
       tags:
         - api
@@ -301,7 +301,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "./tests.yaml#/definitions/TestDefinition"
+              $ref: "./tests.yaml#/components/schemas/TestDefinition"
       responses:
         204:
           description: OK

@@ -1,157 +1,158 @@
 openapi: 3.0.0
-definitions:
-  Test:
-    type: object
-    properties:
-      id:
-        type: string
-        format: uuid
-        readOnly: true
-      name:
-        type: string
-      description:
-        type: string
-      serviceUnderTest:
-        type: object
-        properties:
-          request:
-            $ref: "./http.yaml#/definitions/HTTPRequest"
-      definition:
-        type: object
-        $ref: "#/definitions/TestDefinition"
-        description: Definition of assertions that are going to be made
-      referenceTestRun:
-        $ref: "#/definitions/TestRun"
-
-  TestDefinition:
-    type: object
-    properties:
-      definitions:
-        type: array
-        items:
+components:
+  schemas:
+    Test:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+        description:
+          type: string
+        serviceUnderTest:
           type: object
           properties:
-            selector:
-              type: string
+            request:
+              $ref: "./http.yaml#/components/schemas/HTTPRequest"
+        definition:
+          type: object
+          $ref: "#/components/schemas/TestDefinition"
+          description: Definition of assertions that are going to be made
+        referenceTestRun:
+          $ref: "#/components/schemas/TestRun"
+
+    TestDefinition:
+      type: object
+      properties:
+        definitions:
+          type: array
+          items:
+            type: object
+            properties:
+              selector:
+                type: string
+              assertions:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Assertion"
+      example:
+        definitions:
+          - selector: 'span[tracetest.span.type="http"]'
             assertions:
-              type: array
-              items:
-                $ref: "#/definitions/Assertion"
-    example:
-      definitions:
-        - selector: 'span[tracetest.span.type="http"]'
-          assertions:
-          - attr: tracetest.span.duration
-            comparator: "<"
-            expected: "2000"
-          - attr: http.status_code
-            comparator: "="
-            expected: "200"
+            - attr: tracetest.span.duration
+              comparator: "<"
+              expected: "2000"
+            - attr: http.status_code
+              comparator: "="
+              expected: "200"
 
-  Assertion:
-    type: object
-    properties:
-      attribute:
-        type: string
-      comparator:
-        type: string
-      expected:
-        type: string
+    Assertion:
+      type: object
+      properties:
+        attribute:
+          type: string
+        comparator:
+          type: string
+        expected:
+          type: string
 
-  TestRun:
-    type: object
-    properties:
-      id:
-        type: string
-        format: uuid
-        readOnly: true
-      traceId:
-        type: string
-        readOnly: true
-      spanId:
-        type: string
-        readOnly: true
-      state:
-        type: string
-        enum: [CREATED, EXECUTING, AWAITING_TRACE, AWAITING_TEST_RESULTS, FINISHED, FAILED]
-        description: Current execution state
-      lastErrorState:
-        type: string
-        description: Details of the cause for the last `FAILED` state
-      createdAt:
-        type: string
-        format: date-time
-      completedAt:
-        type: string
-        format: date-time
-      request:
-        $ref: "./http.yaml#/definitions/HTTPRequest"
-      response:
-        $ref: "./http.yaml#/definitions/HTTPResponse"
-        description: TODO(pov) This is HTTP Response object for now, at some point it might be GRPC/SOAP/...
-      trace:
-        $ref: "./trace.yaml#/definitions/Trace"
-      result:
-        $ref: "#/definitions/AssertionResults"
+    TestRun:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        traceId:
+          type: string
+          readOnly: true
+        spanId:
+          type: string
+          readOnly: true
+        state:
+          type: string
+          enum: [CREATED, EXECUTING, AWAITING_TRACE, AWAITING_TEST_RESULTS, FINISHED, FAILED]
+          description: Current execution state
+        lastErrorState:
+          type: string
+          description: Details of the cause for the last `FAILED` state
+        createdAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+        request:
+          $ref: "./http.yaml#/components/schemas/HTTPRequest"
+        response:
+          $ref: "./http.yaml#/components/schemas/HTTPResponse"
+          description: TODO(pov) This is HTTP Response object for now, at some point it might be GRPC/SOAP/...
+        trace:
+          $ref: "./trace.yaml#/components/schemas/Trace"
+        result:
+          $ref: "#/components/schemas/AssertionResults"
 
-  AssertionResults:
-    type: object
-    properties:
-      allPassed:
-        type: bool
-      results:
-        type: array
-        items:
-          type: object
-          properties:
-            selector:
-              type: string
+    AssertionResults:
+      type: object
+      properties:
+        allPassed:
+          type: bool
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              selector:
+                type: string
+              results:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AssertionResult"
+      example:
+        allPassed: true
+        results:
+          - selector: 'span[tracetest.span.type="http"]'
             results:
-              type: array
-              items:
-                $ref: "#/definitions/AssertionResult"
-    example:
-      allPassed: true
-      results:
-        - selector: 'span[tracetest.span.type="http"]'
-          results:
-          - assertion:
-              attr: http.status_code
-              comparator: "="
-              expected: "200"
-            spanResults:
-              spanId: "123"
-              observedValue: "test"
-              passed: true
-          - assertion:
-              attr: http.status_code
-              comparator: "="
-              expected: "200"
-            spanResults:
-              spanId: "123"
-              observedValue: "test"
-              passed: true
+            - assertion:
+                attr: http.status_code
+                comparator: "="
+                expected: "200"
+              spanResults:
+                spanId: "123"
+                observedValue: "test"
+                passed: true
+            - assertion:
+                attr: http.status_code
+                comparator: "="
+                expected: "200"
+              spanResults:
+                spanId: "123"
+                observedValue: "test"
+                passed: true
 
-  AssertionResult:
-    type: object
-    properties:
-      assertion:
-        $ref: "#/definitions/Assertion"
-      allPassed:
-        type: bool
-      spanResults:
-        type: array
-        items:
-          $ref: "#/definitions/AssertionSpanResult"
+    AssertionResult:
+      type: object
+      properties:
+        assertion:
+          $ref: "#/components/schemas/Assertion"
+        allPassed:
+          type: bool
+        spanResults:
+          type: array
+          items:
+            $ref: "#/components/schemas/AssertionSpanResult"
 
-  AssertionSpanResult:
-    type: object
-    properties:
-      spanId:
-        type: string
-      observedValue:
-        type: string
-      passed:
-        type: bool
-      error:
-        type: string
+    AssertionSpanResult:
+      type: object
+      properties:
+        spanId:
+          type: string
+        observedValue:
+          type: string
+        passed:
+          type: bool
+        error:
+          type: string

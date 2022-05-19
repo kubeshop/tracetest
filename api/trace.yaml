@@ -1,38 +1,39 @@
 openapi: 3.0.0
-definitions:
-  Trace:
-    type: object
-    properties:
-      traceId:
-        type: string
-        format: byte
-      tree:
-        $ref: "#/definitions/Span"
-      flat:
-        description: falttened version, mapped as spanId -> span{}
-        type: object
-        additionalProperties:
-          $ref: "#/definitions/Span"
-
-  Span:
-    type: object
-    properties:
-      id:
-        type: string
-        format: byte
-      name:
-        type: string
-      attributes:
-        type: object
-        description: Key-Value of span attributes
-        additionalProperties:
+components:
+  schemas:
+    Trace:
+      type: object
+      properties:
+        traceId:
           type: string
-          description: attribute value
-        example:
-          span.name: "POST /create"
-          tracetest.span.type: "http"
-          tracetest.span.duration: "2000"
-      children:
-        type: array
-        items:
-          $ref: "#/definitions/Span"
+          format: byte
+        tree:
+          $ref: "#/components/schemas/Span"
+        flat:
+          description: falttened version, mapped as spanId -> span{}
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/Span"
+
+    Span:
+      type: object
+      properties:
+        id:
+          type: string
+          format: byte
+        name:
+          type: string
+        attributes:
+          type: object
+          description: Key-Value of span attributes
+          additionalProperties:
+            type: string
+            description: attribute value
+          example:
+            span.name: "POST /create"
+            tracetest.span.type: "http"
+            tracetest.span.duration: "2000"
+        children:
+          type: array
+          items:
+            $ref: "#/components/schemas/Span"
