@@ -2,7 +2,6 @@ package e2e
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"os"
 
@@ -25,11 +24,12 @@ func (c CLI) RunCommand(command string, args ...string) (string, error) {
 	executableArgs = append(executableArgs, args...)
 
 	os.Args = executableArgs
-	fmt.Println(executableArgs)
 
 	old := os.Stdout
 	r, w, _ := os.Pipe()
 	os.Stdout = w
+
+	cmd.Execute()
 
 	outC := make(chan string)
 	go func() {
@@ -38,11 +38,9 @@ func (c CLI) RunCommand(command string, args ...string) (string, error) {
 		outC <- buf.String()
 	}()
 
-	cmd.Execute()
-
+	w.Close()
 	os.Stdout = old
 	out := <-outC
-	w.Close()
 
 	return out, nil
 }
