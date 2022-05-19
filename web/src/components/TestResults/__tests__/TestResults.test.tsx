@@ -1,22 +1,15 @@
-import {render, waitFor} from '@testing-library/react';
+import {render} from '@testing-library/react';
 import TestResults from '../TestResults';
 import {TestingModels} from '../../../utils/TestingModels';
 import {ReduxWrapperProvider} from '../../../redux/ReduxWrapperProvider';
 
-test('SpanAttributesTable', async () => {
+test('TestResults', async () => {
   const onSpanSelected = jest.fn();
-  const onPointerDown = jest.fn();
-  const onHeaderClick = jest.fn();
-  const {getByText} = render(
+  const {getAllByTestId} = render(
     <ReduxWrapperProvider>
-      <TestResults
-        result={TestingModels.testRunResult}
-        visiblePortion={0}
-        onSpanSelected={onSpanSelected}
-        onPointerDown={onPointerDown}
-        onHeaderClick={onHeaderClick}
-      />
+      <TestResults assertionResultList={[]} result={TestingModels.testRunResult} onSelectSpan={onSpanSelected} />
     </ReduxWrapperProvider>
   );
-  await waitFor(() => getByText('Trace Information'));
+
+  expect(getAllByTestId('assertion-card-list').length).toBe(1);
 });

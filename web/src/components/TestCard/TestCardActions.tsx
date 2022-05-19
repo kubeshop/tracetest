@@ -12,7 +12,7 @@ const TestCardActions: React.FC<IProps> = ({testId, onDelete}) => {
   const onClick = useOnDeleteCallback(onDelete);
   return (
     <Dropdown
-      overlay={<Menu items={[{key: 'delete', label: <p data-cy="delete">Delete</p>, onClick}]} />}
+      overlay={<Menu items={[{key: 'delete', label: <span data-cy="test-card-delete">Delete</span>, onClick}]} />}
       placement="bottomLeft"
       trigger={['click']}
     >

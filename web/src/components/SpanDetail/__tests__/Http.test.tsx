@@ -5,17 +5,9 @@ import {TestingModels} from '../../../utils/TestingModels';
 test('Http', () => {
   const {getAllByTestId} = render(
     <Http
-      testId={TestingModels.testId}
-      resultId={TestingModels.resultId}
       onCreateAssertion={jest.fn()}
-      assertionsResultList={[
-        {
-          assertion: TestingModels.assertion,
-          assertionResultList: [TestingModels.spanAssertionResult],
-        },
-      ]}
       span={TestingModels.span}
     />
   );
-  expect(getAllByTestId('assertion-check-property').length).toBe(1);
+  expect(getAllByTestId('span-details-attributes').length).toBe(1);
 });

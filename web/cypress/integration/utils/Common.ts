@@ -40,7 +40,7 @@ export const deleteTest = () => {
     cy.visit('http://localhost:3000/');
 
     cy.get(`[data-cy=test-actions-button-${localTestId}]`).click();
-    cy.get('[data-cy=test-delete-button]').click();
+    cy.get('[data-cy=test-card-delete]').click();
 
     cy.get(`[data-cy=test-actions-button-${localTestId}]`).should('not.exist');
   });

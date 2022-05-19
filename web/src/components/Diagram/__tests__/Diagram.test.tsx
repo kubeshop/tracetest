@@ -3,6 +3,12 @@ import {ReactFlowProvider} from 'react-flow-renderer';
 import {TestingModels} from '../../../utils/TestingModels';
 import Diagram, {SupportedDiagrams} from '../Diagram';
 
+jest.mock('../../../services/Analytics/Analytics.service', () => {
+  return {
+    event: jest.fn(),
+  };
+});
+
 test('Diagram DAG', async () => {
   const {getByText} = render(
     <div style={{width: 200, height: 200}}>
