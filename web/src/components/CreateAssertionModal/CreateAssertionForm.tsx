@@ -1,27 +1,27 @@
-import React, {useCallback, useEffect, useMemo} from 'react';
+import {MinusCircleOutlined, PlusOutlined, QuestionCircleOutlined} from '@ant-design/icons';
+import {AutoComplete, Button, Form, FormInstance, Input, Space, Tooltip, Typography} from 'antd';
+import useGuidedTour from 'hooks/useGuidedTour';
 import {isEmpty} from 'lodash';
-import {QuestionCircleOutlined, PlusOutlined, MinusCircleOutlined} from '@ant-design/icons';
-import {Button, Input, AutoComplete, Typography, Tooltip, Form, Space, FormInstance} from 'antd';
+import React, {useCallback, useEffect, useMemo} from 'react';
 
 import {useCreateAssertionMutation, useUpdateAssertionMutation} from 'redux/apis/Test.api';
 import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
-import useGuidedTour from 'hooks/useGuidedTour';
-import {CreateAssertionSelectorInput} from './CreateAssertionSelectorInput';
-import * as S from './CreateAssertionModal.styled';
+import {CompareOperator} from '../../constants/Operator.constants';
+import {LOCATION_NAME} from '../../constants/Span.constants';
 import CreateAssertionModalAnalyticsService from '../../services/Analytics/CreateAssertionModalAnalytics.service';
 import {IAssertion, IItemSelector, ISpanSelector} from '../../types/Assertion.types';
-import {CompareOperator} from '../../constants/Operator.constants';
 import {ISpan, ISpanFlatAttribute} from '../../types/Span.types';
-import {LOCATION_NAME} from '../../constants/Span.constants';
 import {Steps} from '../GuidedTour/assertionStepList';
+import * as S from './CreateAssertionModal.styled';
+import {CreateAssertionSelectorInput} from './CreateAssertionSelectorInput';
 import useAttributeList from './useAttributeList';
 
 const {
+  onCreateAssertionFormSubmit,
+  onEditAssertionFormSubmit,
   onAddCheck,
   onRemoveCheck,
   onChecksChange,
-  onCreateAssertionFormSubmit,
-  onEditAssertionFormSubmit,
   onSelectorChange,
 } = CreateAssertionModalAnalyticsService;
 
@@ -38,8 +38,11 @@ export type TValues = {
 
 interface TCreateAssertionFormProps {
   onCreate(): void;
+
   onForm(form: FormInstance): void;
+
   onSelectorList(selectorList: IItemSelector[]): void;
+
   span: ISpan;
   affectedSpanList: ISpan[];
   testId: string;
