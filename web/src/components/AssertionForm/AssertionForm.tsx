@@ -18,18 +18,18 @@ import AssertionFormCheckList from './AssertionFormCheckList';
 
 const {onChecksChange, onSelectorChange} = CreateAssertionModalAnalyticsService;
 
-export type TValues = {
+export interface IValues {
   assertionList: IAssertionSpan[];
   selectorList: IItemSelector[];
   pseudoSelector?: {
     selector: PseudoSelector;
     number?: number;
   };
-};
+}
 
 interface TAssertionFormProps {
-  defaultValues?: TValues;
-  onSubmit(values: TValues): void;
+  defaultValues?: IValues;
+  onSubmit(values: IValues): void;
   testId: string;
   resultId: string;
   isEditing?: boolean;
@@ -53,7 +53,7 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
   testId,
   resultId,
 }) => {
-  const [form] = Form.useForm<TValues>();
+  const [form] = Form.useForm<IValues>();
 
   useGuidedTour(GuidedTours.Assertion);
 
@@ -76,8 +76,7 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
         form.setFieldsValue({
           assertionList: list.map((assertionEntry, index) => {
             if (index === entry) {
-              const {value = '', type = ''} =
-                attributeList?.find((el: any) => el.key === list[index].key) || {};
+              const {value = '', type = ''} = attributeList?.find((el: any) => el.key === list[index].key) || {};
               const isValid = typeof value === 'number' || !isEmpty(value);
 
               return {...assertionEntry, value: isValid ? String(value) : '', type};
@@ -129,7 +128,13 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
         <div data-tour={GuidedTourService.getStep(GuidedTours.Assertion, Steps.Checks)}>
           <Form.List name="assertionList">
             {(fields, {add, remove}) => (
-              <AssertionFormCheckList assertionList={currentAssertionList} fields={fields} add={add} remove={remove} attributeList={attributeList} />
+              <AssertionFormCheckList
+                assertionList={currentAssertionList}
+                fields={fields}
+                add={add}
+                remove={remove}
+                attributeList={attributeList}
+              />
             )}
           </Form.List>
         </div>

@@ -2,10 +2,10 @@ import {noop} from 'lodash';
 import {useState, createContext, useCallback, useMemo, useContext} from 'react';
 import {useCreateAssertionMutation, useUpdateAssertionMutation} from '../../redux/apis/Test.api';
 import AssertionService from '../../services/Assertion.service';
-import {TValues} from './AssertionForm';
+import {IValues} from './AssertionForm';
 
 interface IFormProps {
-  defaultValues?: TValues;
+  defaultValues?: IValues;
   assertionId?: string;
   isEditing?: boolean;
 }
@@ -14,7 +14,7 @@ interface ICreateAssertionModalProviderContext {
   isOpen: boolean;
   open(props?: IFormProps): void;
   close(): void;
-  onSubmit(values: TValues): void;
+  onSubmit(values: IValues): void;
   formProps: IFormProps;
 }
 
@@ -49,7 +49,7 @@ const AssertionFormProvider: React.FC<{testId: string}> = ({children, testId}) =
   }, []);
 
   const onSubmit = useCallback(
-    ({selectorList, assertionList}: TValues) => {
+    ({selectorList, assertionList}: IValues) => {
       const {assertionId} = formProps;
       const selectors = selectorList.map(({operator, ...selector}) => selector);
 
