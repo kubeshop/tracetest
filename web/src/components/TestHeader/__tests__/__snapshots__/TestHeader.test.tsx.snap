@@ -3,14 +3,14 @@
 exports[`SpanAttributesTable 1`] = `
 <div>
   <div
-    class="sc-bdvvtL bQEEzU"
+    class="sc-dkPtRN giofdF"
   >
     <div
-      class="sc-jRQBWg bHOJVG"
+      class="sc-iCfMLu fxGWsx"
     >
       <span
         aria-label="left"
-        class="anticon anticon-left sc-eCImPb jQaqRW"
+        class="anticon anticon-left sc-gKclnd dGddRj"
         data-cy="test-header-back-button"
         role="img"
         tabindex="-1"
@@ -30,13 +30,13 @@ exports[`SpanAttributesTable 1`] = `
         </svg>
       </span>
       <h4
-        class="ant-typography sc-gsDKAQ flnTLB"
+        class="ant-typography sc-hKwDye gXTdui"
         data-cy="test-details-name"
       >
         
       </h4>
       <span
-        class="ant-typography ant-typography-secondary sc-dkPtRN keTppE"
+        class="ant-typography ant-typography-secondary sc-eCImPb bTklbz"
       >
         GET
          - 
@@ -44,27 +44,30 @@ exports[`SpanAttributesTable 1`] = `
       </span>
     </div>
     <div
-      class="sc-gKclnd iAZrTR"
+      class="sc-furwcr kLOQYj"
       data-cy="test-run-result-status"
     >
       <span
-        class="ant-typography sc-hKwDye eSRBwq"
+        class="ant-typography sc-jRQBWg LTTZG"
       >
         Test status:
       </span>
-      <span
-        class="ant-badge ant-badge-status ant-badge-not-a-wrapper"
-        style="font-size: 16px;"
+      <div
+        class="sc-bdvvtL hICooe"
       >
         <span
-          class="ant-badge-status-dot ant-badge-status-default"
-        />
-        <span
-          class="ant-badge-status-text"
+          class="ant-badge ant-badge-status ant-badge-not-a-wrapper"
         >
-          Created
+          <span
+            class="ant-badge-status-dot ant-badge-status-default"
+          />
+          <span
+            class="ant-badge-status-text"
+          >
+            Created
+          </span>
         </span>
-      </span>
+      </div>
     </div>
   </div>
 </div>

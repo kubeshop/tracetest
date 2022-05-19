@@ -1,7 +1,7 @@
 import {format, parseISO} from 'date-fns';
 import {RESULT_DATE_FORMAT} from '../../constants/Date.constants';
 import {ITestRunResult} from '../../types/TestRunResult.types';
-import TestStateBadge from '../TestStateBadge';
+import TestState from '../TestState';
 import * as S from './ResultCard.styled';
 import ResultCardActions from './ResultCardActions';
 
@@ -35,8 +35,8 @@ const ResultCard: React.FC<IResultCardProps> = ({
       <S.TextContainer>
         <S.Text>{executionTime}s</S.Text>
       </S.TextContainer>
-      <S.TextContainer>
-        <TestStateBadge data-cy={`test-run-result-status-${resultId}`} testState={state} />
+      <S.TextContainer data-cy={`test-run-result-status-${resultId}`}>
+        <TestState testState={state} />
       </S.TextContainer>
       <S.TextContainer>
         <S.Text>{totalAssertionCount}</S.Text>
