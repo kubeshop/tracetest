@@ -6,8 +6,8 @@ on:
     branches:
       - main
     paths:
-      - server/api/
-      - cli/
+      - server/api/**
+      - cli/**
 
 name: run CLI tests
 jobs:
