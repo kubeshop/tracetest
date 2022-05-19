@@ -14,6 +14,7 @@ export interface IItemSelector {
   propertyName: string;
   value: string;
   valueType: string;
+  operator?: CompareOperator;
 }
 
 export interface ISpanSelector {
