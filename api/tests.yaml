@@ -18,7 +18,6 @@ components:
             request:
               $ref: "./http.yaml#/components/schemas/HTTPRequest"
         definition:
-          type: object
           $ref: "#/components/schemas/TestDefinition"
           description: Definition of assertions that are going to be made
         referenceTestRun:
@@ -99,7 +98,7 @@ components:
       type: object
       properties:
         allPassed:
-          type: bool
+          type: boolean
         results:
           type: array
           items:
@@ -139,7 +138,7 @@ components:
         assertion:
           $ref: "#/components/schemas/Assertion"
         allPassed:
-          type: bool
+          type: boolean
         spanResults:
           type: array
           items:
@@ -153,6 +152,6 @@ components:
         observedValue:
           type: string
         passed:
-          type: bool
+          type: boolean
         error:
           type: string
