@@ -13,7 +13,8 @@ test('TestCard', async () => {
       <TestCard onDelete={onDelete} onRunTest={onRunTest} test={TestingModels.test} onClick={onClick} />
     </ReduxWrapperProvider>
   );
+
   fireEvent(getByTestId(`test-actions-button-${TestingModels.test.testId}`), TestingModels.mouseEvent);
-  await waitFor(() => getByTestId('delete'));
+  await waitFor(() => getByTestId('test-card-delete'));
   expect(container).toMatchSnapshot();
 });

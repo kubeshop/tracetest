@@ -1,9 +1,10 @@
 import {Typography} from 'antd';
 import {useCallback} from 'react';
 import {useDeleteAssertionMutation} from '../../redux/apis/Test.api';
+import AssertionService from '../../services/Assertion.service';
 import {IAssertionResult} from '../../types/Assertion.types';
 import AssertionCard from '../AssertionCard/AssertionCard';
-import {useCreateAssertionModal} from '../CreateAssertionModal/CreateAssertionModalProvider';
+import {useAssertionForm} from '../AssertionForm/AssertionFormProvider';
 import * as S from './AssertionCardList.styled';
 
 interface IAssertionCardListProps {
@@ -13,31 +14,26 @@ interface IAssertionCardListProps {
   testId: string;
 }
 
-const AssertionCardList: React.FC<IAssertionCardListProps> = ({
-  assertionResultList,
-  onSelectSpan,
-  testId,
-  resultId,
-}) => {
-  const {open} = useCreateAssertionModal();
+const AssertionCardList: React.FC<IAssertionCardListProps> = ({assertionResultList, onSelectSpan, testId}) => {
+  const {open} = useAssertionForm();
   const [deleteAssertion] = useDeleteAssertionMutation();
 
   const handleEdit = useCallback(
-    ({assertion, spanListAssertionResult}: IAssertionResult) => {
-      const [{span}] = spanListAssertionResult;
-
+    ({assertion: {assertionId, selectors: selectorList, spanAssertions}}: IAssertionResult) => {
       open({
-        span,
-        testId,
-        assertion,
-        resultId,
+        isEditing: true,
+        assertionId,
+        defaultValues: {
+          selectorList,
+          assertionList: AssertionService.parseSelectorSpanToAssertionSpan(spanAssertions),
+        },
       });
     },
-    [open, resultId, testId]
+    [open]
   );
 
   return (
-    <S.AssertionCardList>
+    <S.AssertionCardList data-cy="assertion-card-list">
       {assertionResultList.length ? (
         assertionResultList.map(assertionResult =>
           assertionResult.spanListAssertionResult.length ? (
@@ -51,7 +47,7 @@ const AssertionCardList: React.FC<IAssertionCardListProps> = ({
           ) : null
         )
       ) : (
-        <S.EmptyStateContainer>
+        <S.EmptyStateContainer data-cy="empty-assertion-card-list">
           <S.EmptyStateIcon />
           <Typography.Text disabled>No Data</Typography.Text>
         </S.EmptyStateContainer>

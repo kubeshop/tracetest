@@ -1,13 +1,13 @@
-import {Typography} from 'antd';
+import {Button, Typography} from 'antd';
 import styled, {css} from 'styled-components';
 
 export const Header = styled.div<{visiblePortion: number}>`
   display: flex;
   align-items: center;
-  align-content: center;
   cursor: pointer;
+  justify-content: space-between;
   width: 100%;
-  background: #F5F5FA;
+  background: #f5f5fa;
   ${props =>
     css`
       height: ${props.visiblePortion}px;
@@ -40,4 +40,12 @@ export const Content = styled.div`
   padding: 24px;
   overflow-y: scroll;
   height: 330px;
+`;
+
+export const AddAssertionButton = styled(Button).attrs({
+  type: 'primary',
+})`
+  && {
+    font-weight: 600;
+  }
 `;

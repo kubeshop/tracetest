@@ -1,10 +1,18 @@
 import {search} from 'jmespath';
-import {SpanAttributeType} from '../constants/SpanAttribute.constants';
-import {IAssertion, IAssertionResult, IItemSelector, ISpanAssertionResult} from '../types/Assertion.types';
 import {ISpan} from '../types/Span.types';
 import {ITrace} from '../types/Trace.types';
 import {escapeString, isJson} from '../utils/Common';
 import OperatorService from './Operator.service';
+import {
+  IAssertion,
+  IAssertionResult,
+  IAssertionSpan,
+  IItemSelector,
+  ISpanAssertionResult,
+  ISpanSelector,
+} from '../types/Assertion.types';
+import {SpanAttributeType} from '../constants/SpanAttribute.constants';
+import {LOCATION_NAME} from '../constants/Span.constants';
 
 const buildValueSelector = (comparisonValue: string, compareOperator: string, type: string) => {
   if (compareOperator === 'contains') return `contains(value, \`${comparisonValue}\`)`;
@@ -84,24 +92,43 @@ const AssertionService = () => ({
     return spanList;
   },
 
-  newSelectorLogic(selectorList: IItemSelector[]): string {
-    function getValue({value, valueType}: {value: string; valueType: string}): string {
+  getSelectorString(selectorList: IItemSelector[]): string {
+    function getValue(value: string, valueType: string): string {
       let result = ``;
       // add quotes if value is a string
-      if (valueType === 'stringValue') result += `'`;
+      if (valueType === 'stringValue') result += `"`;
       result += value;
       // add quotes if value is a string
-      if (valueType === 'stringValue') result += `'`;
+      if (valueType === 'stringValue') result += `"`;
       return result;
     }
 
-    const getFilters = (selectors: IItemSelector[]) => {
-      return selectors.map(selector => {
-        const {propertyName, operator, value, valueType} = selector;
-        return `${propertyName}${operator ? ` ${operator.toLowerCase()} ` : '='}${getValue({value, valueType})}`;
-      });
-    };
-    return selectorList.length === 0 ? '' : `span[${getFilters(selectorList).join(' ')}]`;
+    const getFilters = (selectors: IItemSelector[]) =>
+      selectors.map(
+        ({propertyName, operator, value, valueType}) =>
+          `${propertyName}${operator ? ` ${operator.toLowerCase()} ` : '='}${getValue(value, valueType)}`
+      );
+
+    return selectorList.length ? `span[${getFilters(selectorList).join(' ')}]` : '';
+  },
+
+  parseAssertionSpanToSelectorSpan(assertionList: IAssertionSpan[]) {
+    return assertionList.map(({key, compareOp, value, type}) => ({
+      locationName: LOCATION_NAME.SPAN_ATTRIBUTES,
+      propertyName: key,
+      valueType: type as SpanAttributeType,
+      operator: compareOp,
+      comparisonValue: value,
+    }));
+  },
+
+  parseSelectorSpanToAssertionSpan(spanAssertions: ISpanSelector[]) {
+    return spanAssertions.map(({propertyName, operator, comparisonValue, valueType}) => ({
+      key: propertyName,
+      compareOp: operator,
+      value: comparisonValue,
+      type: valueType,
+    }));
   },
 });
 

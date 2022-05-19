@@ -1,7 +1,15 @@
 import {DOCUMENTATION_URL, GITHUB_URL} from '../../../src/constants/Common.constants';
-import {deleteTest} from '../utils/common';
+import {createTest, deleteTest} from '../utils/common';
 
 describe('Home', () => {
+  before(() => {
+    createTest();
+  });
+
+  after(() => {
+    deleteTest();
+  });
+
   beforeEach(() => {
     cy.visit('http://localhost:3000/');
   });
@@ -23,7 +31,5 @@ describe('Home', () => {
     cy.visit('http://localhost:3000/');
     cy.get('[data-cy^=test-run-button]', {timeout: 10000}).first().click();
     cy.location('href').should('match', /\/test\/.*/i);
-
-    deleteTest();
   });
 });

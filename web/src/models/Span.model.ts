@@ -47,7 +47,11 @@ const Span = (rawSpan: IRawSpan): ISpan => {
   return {
     ...rawSpan,
     attributes: attributesMap,
-    attributeList: Object.entries(attributesMap).map(([key, {value}]) => ({key, value})),
+    attributeList: Object.entries(attributesMap).map(([key, {value, type: attributeType}]) => ({
+      key,
+      value,
+      type: attributeType,
+    })),
     type,
     duration,
     signature: getSpanSignature(attributesMap, type),
