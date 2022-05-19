@@ -1,12 +1,12 @@
-import {TestState} from '../../constants/TestRunResult.constants';
+import {TestState as TestStateEnum} from '../../constants/TestRunResult.constants';
 import {ITest} from '../../types/Test.types';
-import TestStateBadge from '../TestStateBadge';
+import TestState from '../TestState';
 import * as S from './TestHeader.styled';
 
 interface ITestHeaderProps {
   test: ITest;
   onBack(): void;
-  testState?: TestState;
+  testState?: TestStateEnum;
 }
 
 const TestHeader: React.FC<ITestHeaderProps> = ({test: {name, serviceUnderTest}, onBack, testState}) => {
@@ -22,7 +22,7 @@ const TestHeader: React.FC<ITestHeaderProps> = ({test: {name, serviceUnderTest},
       {testState && (
         <S.StateContainer data-cy="test-run-result-status">
           <S.StateText>Test status:</S.StateText>
-          <TestStateBadge style={{fontSize: 16}} testState={testState} />
+          <TestState testState={testState} />
         </S.StateContainer>
       )}
     </S.TestHeader>
