@@ -35,8 +35,8 @@ const ResultCard: React.FC<IResultCardProps> = ({
       <S.TextContainer>
         <S.Text>{executionTime}s</S.Text>
       </S.TextContainer>
-      <S.TextContainer>
-        <TestState data-cy={`test-run-result-status-${resultId}`} testState={state} />
+      <S.TextContainer data-cy={`test-run-result-status-${resultId}`}>
+        <TestState testState={state} />
       </S.TextContainer>
       <S.TextContainer>
         <S.Text>{totalAssertionCount}</S.Text>
