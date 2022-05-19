@@ -10,7 +10,7 @@ enum NotchColor {
   DEFAULT = '#FFBB96',
 }
 
-export const getNotchColor = (spanType: SemanticGroupNames) => {
+export const getNotchColor = (spanType: SemanticGroupNames): string => {
   switch (spanType) {
     case SemanticGroupNames.Http: {
       return NotchColor.HTTP;
@@ -57,12 +57,10 @@ export const TraceNode = styled.div<{selected: boolean}>`
 export const TraceNotch = styled.div<{spanType: SemanticGroupNames}>`
   background-color: ${({spanType}) => getNotchColor(spanType)};
   position: absolute;
-  top: 0px;
+  top: 0;
   margin-top: 1px;
   padding: 3px 6px;
-  border-radius: 2px;
-  border-bottom-left-radius: 0px;
-  border-bottom-right-radius: 0px;
+  border-radius: 2px 2px 0 0;
   width: 99%;
   font-weight: 700;
   align-items: center;
