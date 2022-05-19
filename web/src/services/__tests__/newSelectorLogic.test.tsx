@@ -1,14 +1,14 @@
-import {CompareOperator} from '../../../constants/Operator.constants';
-import {LOCATION_NAME} from '../../../constants/Span.constants';
-import {newSelectorLogic} from '../newSelectorLogic';
+import {CompareOperator} from '../../constants/Operator.constants';
+import {LOCATION_NAME} from '../../constants/Span.constants';
+import AssertionService from '../Assertion.service';
 
-describe('newSelectorLogic', () => {
+describe('AssertionService.newSelectorLogic', () => {
   test('empty selectorList', () => {
-    const result = newSelectorLogic([]);
+    const result = AssertionService.newSelectorLogic([]);
     expect(result).toBe('');
   });
   test('single selectorList', () => {
-    const result = newSelectorLogic([
+    const result = AssertionService.newSelectorLogic([
       {
         locationName: LOCATION_NAME.SPAN,
         operator: undefined,
@@ -20,7 +20,7 @@ describe('newSelectorLogic', () => {
     expect(result).toStrictEqual(`span[service.name='pokeshop']`);
   });
   test('double selectorList', () => {
-    const result = newSelectorLogic([
+    const result = AssertionService.newSelectorLogic([
       {
         locationName: LOCATION_NAME.SPAN,
         operator: undefined,
