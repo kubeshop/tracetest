@@ -1,3 +1,5 @@
+all: init-submodule proto server-generate
+
 OPENAPI_GENERATOR_VER=v5.4.0
 OPENAPI_GENERATOR_IMAGE=openapitools/openapi-generator-cli:$(OPENAPI_GENERATOR_VER)
 OPENAPI_GENERATOR_CLI=docker run --rm -u ${shell id -u}  -v "${PWD}:/local" -w "/local" ${OPENAPI_GENERATOR_IMAGE}
@@ -38,6 +40,8 @@ PROTOC_VER=0.3.1
 PROTOC_IMAGE=schoren/protobuf:$(PROTOC_VER)
 PROTOC=docker run --rm -u ${shell id -u} -v "${PWD}:${PWD}" -w ${PWD} ${PROTOC_IMAGE} --proto_path=${PWD}
 
+
+
 PROTO_INCLUDES := \
 	-Ijaeger-idl/proto \
 	-I/usr/include/github.com/gogo/protobuf \
@@ -56,18 +60,34 @@ PROTO_GOGO_MAPPINGS := $(shell echo \
 		Mmodel.proto=github.com/jaegertracing/jaeger/model \
 	| sed 's/ //g')
 
+PROTO_GEN_GO_DIR ?= server/internal/proto-gen-go
+
 PROTOC_WITH_GRPC := $(PROTOC) \
 		$(PROTO_INCLUDES) \
 		--gogo_out=plugins=grpc,$(PROTO_GOGO_MAPPINGS):$(PWD)/${PROTO_GEN_GO_DIR}
 
-PROTO_GEN_GO_DIR ?= server/internal/proto-gen-go
-proto:
-	$(eval TMPDIR := $(shell mktemp -d))
-	rm -rf $(PROTO_GEN_GO_DIR)
-	mkdir -p $(PROTO_GEN_GO_DIR)
+PROTOC_INTERNAL := $(PROTOC) \
+		$(PROTO_INCLUDES)
 
+proto:
+	rm -rf ./$(PROTO_GEN_GO_DIR)
+	mkdir -p ${PROTO_GEN_GO_DIR}
+	mkdir -p swagger
+
+	# API v3
 	$(PROTOC_WITH_GRPC) \
 		jaeger-idl/proto/api_v3/query_service.proto
+
+	$(PROTOC_INTERNAL) \
+		--swagger_out=disable_default_errors=true,json_names_for_fields=true,logtostderr=true:./swagger \
+		jaeger-idl/proto/api_v3/query_service.proto
+
+	$(PROTOC_INTERNAL) \
+		google/api/annotations.proto \
+		google/api/http.proto \
+		protoc-gen-swagger/options/annotations.proto \
+		protoc-gen-swagger/options/openapiv2.proto \
+		gogoproto/gogo.proto
 
 	$(PROTOC_WITH_GRPC) \
 		tempo-idl/tempo.proto
