@@ -3,6 +3,7 @@ package model
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -147,7 +148,7 @@ func (a *Assertion) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (r Run) MarshalJSON() ([]byte, error) {
+func (r *Run) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&struct {
 		ID              string
 		TraceID         string
@@ -191,22 +192,22 @@ func (r *Run) UnmarshalJSON(data []byte) error {
 	}{}
 
 	if err := json.Unmarshal(data, &aux); err != nil {
-		return err
+		return fmt.Errorf("unmarshal run: %w", err)
 	}
 
 	id, err := uuid.Parse(aux.ID)
 	if err != nil {
-		return err
+		return fmt.Errorf("unmarshal run: %w", err)
 	}
 
 	tid, err := trace.TraceIDFromHex(aux.TraceID)
 	if err != nil {
-		return err
+		return fmt.Errorf("unmarshal run: %w", err)
 	}
 
 	sid, err := trace.SpanIDFromHex(aux.SpanID)
 	if err != nil {
-		return err
+		return fmt.Errorf("unmarshal run: %w", err)
 	}
 
 	r.ID = id

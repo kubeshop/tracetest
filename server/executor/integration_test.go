@@ -22,7 +22,6 @@ const appEndpoint = "http://localhost:8080"
 func TestExecutorIntegration(t *testing.T) {
 	demoApp, err := testmock.GetDemoApplicationInstance()
 	require.NoError(t, err)
-	defer demoApp.Stop()
 
 	tracetestApp, err := testmock.GetTestingApp(demoApp)
 	require.NoError(t, err)
@@ -34,7 +33,6 @@ func TestExecutorIntegration(t *testing.T) {
 	t.Run("HappyPath", func(t *testing.T) {
 		happyPath(t, tracetestApp, demoApp)
 	})
-
 }
 
 func happyPath(t *testing.T, app *app.App, demoApp *testmock.DemoApp) {
@@ -51,7 +49,7 @@ func happyPath(t *testing.T, app *app.App, demoApp *testmock.DemoApp) {
 	run := waitForRunState(app, testID, runID, string(model.RunStateFinished), 30*time.Second)
 	require.NotNil(t, run)
 
-	assert.Equal(t, model.RunStateFinished, run.State)
+	assert.Equal(t, string(model.RunStateFinished), run.State)
 	assert.Greater(t, len(run.Result.Results), 0)
 	assert.True(t, run.Result.AllPassed)
 
@@ -130,7 +128,7 @@ func createTestDefinition(testID string) {
 					{
 						Attribute:  "tracetest.span.duration",
 						Comparator: "<",
-						Expected:   "100",
+						Expected:   "200",
 					},
 				},
 			},
@@ -151,8 +149,6 @@ func createTestDefinition(testID string) {
 	}
 
 	if response.StatusCode != 204 {
-		r, _ := ioutil.ReadAll(response.Body)
-		fmt.Println("Response", string(r))
 		panic(fmt.Errorf("could not create definition. Expected status 201, got %d", response.StatusCode))
 	}
 }
@@ -182,7 +178,7 @@ func runTest(app *app.App, testID string) (string, error) {
 	return testRun.Id, nil
 }
 
-func waitForRunState(app *app.App, testID, resultID, state string, timeout time.Duration) *openapi.TestRun {
+func waitForRunState(app *app.App, testID, runID, state string, timeout time.Duration) *openapi.TestRun {
 	timeoutTicker := time.NewTicker(timeout)
 	executionTicker := time.NewTicker(1 * time.Second)
 	outputChannel := make(chan *openapi.TestRun, 1)
@@ -193,7 +189,7 @@ func waitForRunState(app *app.App, testID, resultID, state string, timeout time.
 				outputChannel <- nil
 				return
 			case <-executionTicker.C:
-				testRun := getRunInState(app, testID, resultID, state)
+				testRun := getRunInState(app, testID, runID, state)
 				if testRun != nil {
 					outputChannel <- testRun
 					return

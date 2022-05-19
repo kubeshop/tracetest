@@ -127,15 +127,10 @@ func (tp tracePoller) processJob(job tracePollReq) {
 
 	run.State = model.RunStateAwaitingTestResults
 
-	trace, err := traces.FromOtel(otelTrace)
-	if err != nil {
-		job.run = run
-		job.count = job.count + 1
-		tp.requeue(job)
-		return
-	}
-
+	trace := traces.FromOtel(otelTrace)
+	trace.ID = run.TraceID
 	if !tp.donePollingTraces(job, trace) {
+		fmt.Println("Not done polling traces. Requeue")
 		run.Trace = &trace
 		job.run = run
 		job.count = job.count + 1
@@ -144,6 +139,7 @@ func (tp tracePoller) processJob(job tracePollReq) {
 	}
 
 	run.Trace = augmentData(&trace, run.Response)
+	run.State = model.RunStateAwaitingTestResults
 
 	fmt.Printf("completed polling result %s after %d times, number of spans: %d \n", job.run.ID, job.count, len(run.Trace.Flat))
 
@@ -186,8 +182,20 @@ func augmentData(trace *traces.Trace, resp model.HTTPResponse) *traces.Trace {
 
 func (tp tracePoller) donePollingTraces(job tracePollReq, trace traces.Trace) bool {
 	// we're done if we have the same amount of spans after polling or `maxTracePollRetry` times
-	return (len(trace.Flat) > 0 && len(trace.Flat) == len(job.run.Trace.Flat)) ||
-		job.count == tp.maxTracePollRetry
+	if job.count == tp.maxTracePollRetry {
+		return true
+	}
+
+	if job.run.Trace == nil {
+		return false
+	}
+
+	if len(trace.Flat) > 0 && len(trace.Flat) == len(job.run.Trace.Flat) {
+		return true
+	}
+
+	return false
+
 }
 
 func (tp tracePoller) handleTraceDBError(job tracePollReq, err error) {

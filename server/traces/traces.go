@@ -2,6 +2,7 @@ package traces
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"go.opentelemetry.io/otel/trace"
 )
@@ -21,17 +22,27 @@ func (t *Trace) UnmarshalJSON(data []byte) error {
 		Alias: (*Alias)(t),
 	}
 	if err := json.Unmarshal(data, &aux); err != nil {
-		return err
+		return fmt.Errorf("unmarshal trace: %w", err)
 	}
 	tid, err := trace.TraceIDFromHex(aux.ID)
 	if err != nil {
-		return err
+		return fmt.Errorf("unmarshal trace: %w", err)
 	}
 
 	t.ID = tid
 	t.Flat = map[trace.SpanID]*Span{}
 	flattenSpans(t.Flat, &t.RootSpan)
 	return nil
+}
+
+func (t *Trace) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&struct {
+		ID       string
+		RootSpan Span
+	}{
+		ID:       t.ID.String(),
+		RootSpan: t.RootSpan,
+	})
 }
 
 func flattenSpans(res map[trace.SpanID]*Span, root *Span) {
@@ -95,17 +106,17 @@ func encodeChildren(children []*Span) []encodedSpan {
 func (s *Span) UnmarshalJSON(data []byte) error {
 	aux := encodedSpan{}
 	if err := json.Unmarshal(data, &aux); err != nil {
-		return err
+		return fmt.Errorf("unmarshal span: %w", err)
 	}
 
 	sid, err := trace.SpanIDFromHex(aux.ID)
 	if err != nil {
-		return err
+		return fmt.Errorf("unmarshal span: %w", err)
 	}
 
 	children, err := decodeChildren(s, aux.Children)
 	if err != nil {
-		return err
+		return fmt.Errorf("unmarshal span: %w", err)
 	}
 
 	s.ID = sid
@@ -123,7 +134,7 @@ func decodeChildren(parent *Span, children []encodedSpan) ([]*Span, error) {
 	for i, c := range children {
 		sid, err := trace.SpanIDFromHex(c.ID)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("span decode children: %w", err)
 		}
 
 		span := &Span{

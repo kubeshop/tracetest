@@ -120,7 +120,7 @@ func decodeRun(b []byte) (model.Run, error) {
 	var run model.Run
 	err := json.Unmarshal(b, &run)
 	if err != nil {
-		return model.Run{}, err
+		return model.Run{}, fmt.Errorf("unmarshal run: %w", err)
 	}
 	return run, nil
 }
@@ -134,6 +134,6 @@ func readRunRow(row scanner) (model.Run, error) {
 	case nil:
 		return decodeRun(b)
 	default:
-		return model.Run{}, err
+		return model.Run{}, fmt.Errorf("read run row: %w", err)
 	}
 }

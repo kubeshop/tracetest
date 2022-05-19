@@ -73,7 +73,9 @@ func (e *defaultAssertionRunner) startWorker(ctx context.Context) {
 func (e *defaultAssertionRunner) runAssertionsAndUpdateResult(ctx context.Context, request AssertionRequest) error {
 	run, err := e.executeAssertions(ctx, request)
 	if err != nil {
-		return err
+		run.State = model.RunStateFailed
+		run.LastError = err
+		return e.db.UpdateRun(ctx, run)
 	}
 
 	run.State = model.RunStateFinished
@@ -89,6 +91,7 @@ func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, req Asse
 	if req.Run.Trace == nil {
 		return model.Run{}, fmt.Errorf("trace not available")
 	}
+
 	results, allPassed := assertions.Assert(req.Test.Definition, *req.Run.Trace)
 	req.Run.Results = &model.RunResults{
 		AllPassed: allPassed,

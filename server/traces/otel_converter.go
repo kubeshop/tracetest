@@ -11,7 +11,7 @@ import (
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 )
 
-func FromOtel(input *v1.TracesData) (Trace, error) {
+func FromOtel(input *v1.TracesData) Trace {
 	flattenSpans := make([]*v1.Span, 0)
 	for _, resource := range input.ResourceSpans {
 		for _, librarySpans := range resource.InstrumentationLibrarySpans {
@@ -19,19 +19,16 @@ func FromOtel(input *v1.TracesData) (Trace, error) {
 		}
 	}
 
-	spansMap := make(map[trace.SpanID]*Span, 0)
+	spansMap := map[trace.SpanID]*Span{}
 	for _, span := range flattenSpans {
-		newSpan, err := convertOtelSpanIntoSpan(span)
-		if err != nil {
-			return Trace{}, err
-		}
+		newSpan := convertOtelSpanIntoSpan(span)
 		spansMap[newSpan.ID] = newSpan
 	}
 
-	return createTrace(flattenSpans, spansMap), nil
+	return createTrace(flattenSpans, spansMap)
 }
 
-func convertOtelSpanIntoSpan(span *v1.Span) (*Span, error) {
+func convertOtelSpanIntoSpan(span *v1.Span) *Span {
 	attributes := make(Attributes, 0)
 	for _, attribute := range span.Attributes {
 		attributes[attribute.Key] = getAttributeValue(attribute.Value)
@@ -41,18 +38,14 @@ func convertOtelSpanIntoSpan(span *v1.Span) (*Span, error) {
 	attributes["tracetest.span.type"] = spanType(attributes)
 	attributes["tracetest.span.duration"] = spanDuration(span)
 
-	spanID, err := createSpanID(string(span.SpanId))
-	if err != nil {
-		return nil, err
-	}
-
+	spanID := createSpanID(span.SpanId)
 	return &Span{
 		ID:         spanID,
 		Name:       span.Name,
 		Parent:     nil,
 		Children:   make([]*Span, 0),
 		Attributes: attributes,
-	}, nil
+	}
 }
 
 func spanDuration(span *v1.Span) string {
@@ -111,28 +104,25 @@ func getAttributeValue(value *v11.AnyValue) string {
 	return "unsupported value type"
 }
 
-func createSpanID(id string) (trace.SpanID, error) {
-	spanId, err := trace.SpanIDFromHex(id)
-	if err != nil {
-		return trace.SpanID{}, fmt.Errorf("could not convert spanID")
-	}
+func createSpanID(id []byte) trace.SpanID {
+	var sid [8]byte
+	copy(sid[:], id[:8])
 
-	return spanId, nil
+	return trace.SpanID(sid)
 }
 
 func createTrace(spans []*v1.Span, spansMap map[trace.SpanID]*Span) Trace {
 	rootSpanID := trace.SpanID{}
 	for _, span := range spans {
-		spanID, _ := createSpanID(string(span.SpanId))
-		if string(span.ParentSpanId) == "" {
+		spanID := createSpanID(span.SpanId)
+		parentSpanID := createSpanID(span.ParentSpanId)
+		parentSpan, hasParent := spansMap[parentSpanID]
+		if !hasParent {
 			rootSpanID = spanID
 		} else {
-			parentID, _ := createSpanID(string(span.ParentSpanId))
-			parent := spansMap[parentID]
 			thisSpan := spansMap[spanID]
-
-			thisSpan.Parent = parent
-			parent.Children = append(parent.Children, thisSpan)
+			thisSpan.Parent = parentSpan
+			parentSpan.Children = append(parentSpan.Children, thisSpan)
 		}
 	}
 

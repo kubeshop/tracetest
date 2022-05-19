@@ -36,6 +36,7 @@ func New() (*TestExecutor, error) {
 	}, nil
 }
 
+// TODO change test input to model.HTTPRequest
 func (te *TestExecutor) Execute(test model.Test, tid trace.TraceID, sid trace.SpanID) (model.HTTPResponse, error) {
 
 	client := http.Client{
