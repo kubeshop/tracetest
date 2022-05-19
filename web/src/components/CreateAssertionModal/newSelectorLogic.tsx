@@ -8,19 +8,13 @@ export function newSelectorLogic(selectorList: IItemSelector[]): string {
     result += selector.propertyName;
     result += selector.operator ? ` ${selector.operator.toLowerCase()} ` : '=';
     // add quotes if value is a string
-    if (selector.valueType === 'stringValue') {
-      result += `'`;
-    }
+    if (selector.valueType === 'stringValue') result += `'`;
     result += selector.value;
     // add quotes if value is a string
-    if (selector.valueType === 'stringValue') {
-      result += `'`;
-    }
+    if (selector.valueType === 'stringValue') result += `'`;
     result += `]`;
     // adds space between selector if not the last selector
-    if (i !== selectorList.length - 1) {
-      result += ` `;
-    }
+    if (i !== selectorList.length - 1) result += ` `;
   }
   return result;
 }
