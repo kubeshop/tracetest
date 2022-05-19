@@ -1,10 +1,10 @@
 import {search} from 'jmespath';
-import {escapeString, isJson} from '../utils/Common';
-import OperatorService from './Operator.service';
+import {SpanAttributeType} from '../constants/SpanAttribute.constants';
+import {IAssertion, IAssertionResult, IItemSelector, ISpanAssertionResult} from '../types/Assertion.types';
 import {ISpan} from '../types/Span.types';
 import {ITrace} from '../types/Trace.types';
-import {IAssertion, IAssertionResult, IItemSelector, ISpanAssertionResult} from '../types/Assertion.types';
-import {SpanAttributeType} from '../constants/SpanAttribute.constants';
+import {escapeString, isJson} from '../utils/Common';
+import OperatorService from './Operator.service';
 
 const buildValueSelector = (comparisonValue: string, compareOperator: string, type: string) => {
   if (compareOperator === 'contains') return `contains(value, \`${comparisonValue}\`)`;
@@ -23,15 +23,11 @@ const buildValueSelector = (comparisonValue: string, compareOperator: string, ty
 const buildSelector = (conditions: string[]) => `${conditions.map(cond => `${cond}`).join(' && ')}`;
 
 const getSelectorList = (itemSelectors: IItemSelector[] = []) => {
-  const selectorList = itemSelectors.map<string>(({propertyName, value, valueType}) => {
+  return itemSelectors.map<string>(({propertyName, value, valueType}) => {
     const keySelector = ` key == \`${propertyName}\``;
     const valueSelector = buildValueSelector(value, '==', valueType);
-    const condition = `${[keySelector, valueSelector]!.join(' && ')}`;
-
-    return condition;
+    return `${[keySelector, valueSelector]!.join(' && ')}`;
   }, {});
-
-  return selectorList;
 };
 
 const AssertionService = () => ({
@@ -42,7 +38,7 @@ const AssertionService = () => ({
 
     if (!itMatches) return [];
 
-    const assertionTestResultArray = spanAssertions.map(spanAssertion => {
+    return spanAssertions.map(spanAssertion => {
       const {comparisonValue, operator, propertyName, valueType} = spanAssertion;
       const valueSelector = buildValueSelector(comparisonValue, OperatorService.getOperatorSymbol(operator), valueType);
 
@@ -57,8 +53,6 @@ const AssertionService = () => ({
         actualValue: attributes[propertyName]?.value || '',
       };
     });
-
-    return assertionTestResultArray;
   },
 
   runByTrace(trace: ITrace, assertion: IAssertion): IAssertionResult {
@@ -88,6 +82,26 @@ const AssertionService = () => ({
     const spanList: ISpan[] = search(trace.spans, escapeString(`[? ${itemSelector}]`)) || [];
 
     return spanList;
+  },
+
+  newSelectorLogic(selectorList: IItemSelector[]): string {
+    function getValue({value, valueType}: {value: string; valueType: string}): string {
+      let result = ``;
+      // add quotes if value is a string
+      if (valueType === 'stringValue') result += `'`;
+      result += value;
+      // add quotes if value is a string
+      if (valueType === 'stringValue') result += `'`;
+      return result;
+    }
+
+    const getFilters = (selectors: IItemSelector[]) => {
+      return selectors.map(selector => {
+        const {propertyName, operator, value, valueType} = selector;
+        return `${propertyName}${operator ? ` ${operator.toLowerCase()} ` : '='}${getValue({value, valueType})}`;
+      });
+    };
+    return selectorList.length === 0 ? '' : `span[${getFilters(selectorList).join(' ')}]`;
   },
 });
 
