@@ -8,7 +8,7 @@ import SpanDetail from 'components/SpanDetail';
 import {useHandleOnSpanSelectedCallback} from './hooks/useHandleOnSpanSelectedCallback';
 import * as S from './Trace.styled';
 import DiagramSwitcher from '../DiagramSwitcher';
-import TraceDrawer from './TraceDrawer';
+import TraceDrawer from '../TraceDrawer';
 
 interface IProps {
   displayError: boolean;
@@ -45,7 +45,7 @@ const Trace = ({displayError, visiblePortion, minHeight, test, testResultDetails
           <SpanDetail resultId={testResultDetails?.resultId} testId={test?.testId} span={selectedSpan} />
         </S.DetailsSection>
       </S.Main>
-      <TraceDrawer visiblePortion={visiblePortion} testResultDetails={testResultDetails} onSelectSpan={onSelectSpan} />
+      <TraceDrawer visiblePortion={visiblePortion} result={testResultDetails!} onSelectSpan={onSelectSpan} />
     </>
   ) : null;
 };

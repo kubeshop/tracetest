@@ -1,16 +1,14 @@
 import {capitalize} from 'lodash';
 import {useCallback} from 'react';
 import {SemanticGroupNames, SemanticGroupNamesToText} from '../../constants/SemanticGroupNames.constants';
-import {useCreateAssertionModal} from '../CreateAssertionModal/CreateAssertionModalProvider';
 import SpanService from '../../services/Span.service';
 import {ISpan, ISpanFlatAttribute} from '../../types/Span.types';
 import Generic from './components/Generic';
 import Http from './components/Http';
 import SpanHeader from './SpanHeader';
 import * as S from './SpanDetail.styled';
-import {useAppSelector} from '../../redux/hooks';
-import {IAssertionResultList} from '../../types/Assertion.types';
-import AssertionSelectors from '../../selectors/Assertion.selectors';
+import {useAssertionForm} from '../AssertionForm/AssertionFormProvider';
+import {CompareOperator} from '../../constants/Operator.constants';
 
 export interface ISpanDetailProps {
   testId?: string;
@@ -18,8 +16,8 @@ export interface ISpanDetailProps {
   resultId?: string;
 }
 
-export interface ISpanDetailsComponentProps extends ISpanDetailProps {
-  assertionsResultList: IAssertionResultList[];
+export interface ISpanDetailsComponentProps {
+  span?: ISpan;
   onCreateAssertion(attribute: ISpanFlatAttribute): void;
 }
 
@@ -34,37 +32,36 @@ const getSpanTitle = (span: ISpan) => {
   return `${capitalize(heading) || spanTypeText} • ${primary} • ${span.name}`;
 };
 
-const SpanDetail: React.FC<ISpanDetailProps> = ({span, testId, resultId}) => {
-  const {open} = useCreateAssertionModal();
+const SpanDetail: React.FC<ISpanDetailProps> = ({span}) => {
+  const {open} = useAssertionForm();
   const Component = ComponentMap[span?.type || ''] || Generic;
 
   const title = (span && getSpanTitle(span)) || '';
-  const assertionsResultList = useAppSelector(
-    AssertionSelectors.selectAssertionResultListBySpan(testId, resultId, span?.spanId)
-  );
 
   const onCreateAssertion = useCallback(
-    (attribute: ISpanFlatAttribute) => {
+    ({type, value, key}: ISpanFlatAttribute) => {
       open({
-        span,
-        resultId: resultId!,
-        testId: testId!,
-        defaultAttributeList: [attribute],
+        isEditing: false,
+        defaultValues: {
+          assertionList: [
+            {
+              compareOp: CompareOperator.EQUALS,
+              value,
+              key,
+              type,
+            },
+          ],
+          selectorList: span?.signature || [],
+        },
       });
     },
-    [open, resultId, span, testId]
+    [open, span?.signature]
   );
 
   return (
     <S.SpanDetail>
       <SpanHeader title={title} />
-      <Component
-        span={span}
-        assertionsResultList={assertionsResultList}
-        testId={testId}
-        resultId={resultId}
-        onCreateAssertion={onCreateAssertion}
-      />
+      <Component span={span} onCreateAssertion={onCreateAssertion} />
     </S.SpanDetail>
   );
 };

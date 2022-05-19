@@ -3,7 +3,6 @@ import React, {useMemo} from 'react';
 import {HttpRequestAttributeList, HttpResponseAttributeList} from '../../../../constants/Span.constants';
 import {ISpanFlatAttribute} from '../../../../types/Span.types';
 import AttributeList from '../../../AttributeList';
-import Assertions from '../../Assertions';
 import {ISpanDetailsComponentProps} from '../../SpanDetail';
 import * as S from '../../SpanDetail.styled';
 
@@ -13,22 +12,12 @@ const filterRequestList = (attributeList: ISpanFlatAttribute[]) =>
 const filterResponseList = (attributeList: ISpanFlatAttribute[]) =>
   attributeList?.filter(a => HttpResponseAttributeList.includes(a.key) || a.key.includes('http.request'));
 
-const Http: React.FC<ISpanDetailsComponentProps> = ({
-  span: {attributeList = []} = {},
-  span,
-  assertionsResultList = [],
-  testId,
-  resultId,
-  onCreateAssertion,
-}) => {
+const Http: React.FC<ISpanDetailsComponentProps> = ({span: {attributeList = []} = {}, onCreateAssertion}) => {
   const responseList = useMemo(() => filterResponseList(attributeList), [attributeList]);
   const requestList = useMemo(() => filterRequestList(attributeList), [attributeList]);
 
   return (
     <S.SpanTabs data-cy="span-details-attributes">
-      <Tabs.TabPane tab="Assertion" key="span-assertion">
-        <Assertions span={span} assertionsResultList={assertionsResultList} testId={testId} resultId={resultId} />
-      </Tabs.TabPane>
       <Tabs.TabPane tab="Request" key="span-request">
         <AttributeList attributeList={requestList} onCreateAssertion={onCreateAssertion} />
       </Tabs.TabPane>

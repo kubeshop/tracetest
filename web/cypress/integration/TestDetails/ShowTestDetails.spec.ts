@@ -10,7 +10,7 @@ describe('Show test details', () => {
   });
 
   it('should show the test details for any trace', () => {
-    createMultipleTestRuns(testId, 5);
+    createMultipleTestRuns(testId, 7);
     cy.get('[data-cy=collapse-test]').first().click();
     cy.get('[data-cy=test-details-link]', {timeout: 10000}).first().click();
 

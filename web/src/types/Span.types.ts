@@ -2,6 +2,7 @@ import {SemanticGroupNames} from '../constants/SemanticGroupNames.constants';
 import {Modify} from './Common.types';
 import {IItemSelector} from './Assertion.types';
 import {IRawSpanAttribute, ISpanAttribute} from './SpanAttribute.types';
+import { SpanAttributeType } from '../constants/SpanAttribute.constants';
 
 export interface IInstrumentationLibrary {
   name: string;
@@ -15,6 +16,7 @@ export interface IResource {
 export interface ISpanFlatAttribute {
   key: string;
   value: string;
+  type: SpanAttributeType;
 }
 
 export interface IInstrumentationLibrarySpan {
