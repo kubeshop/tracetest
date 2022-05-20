@@ -9,10 +9,20 @@
 
 package openapi
 
+import (
+	"time"
+)
+
 type Span struct {
 	Id string `json:"id,omitempty"`
 
+	ParentId string `json:"parentId,omitempty"`
+
 	Name string `json:"name,omitempty"`
+
+	StartTime time.Time `json:"startTime,omitempty"`
+
+	EndTime time.Time `json:"endTime,omitempty"`
 
 	// Key-Value of span attributes
 	Attributes map[string]string `json:"attributes,omitempty"`

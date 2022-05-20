@@ -3,6 +3,7 @@ package traces
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"go.opentelemetry.io/otel/trace"
 )
@@ -68,6 +69,8 @@ func (a Attributes) Get(key string) string {
 type Span struct {
 	ID         trace.SpanID
 	Name       string
+	StartTime  time.Time
+	EndTime    time.Time
 	Attributes Attributes
 
 	Parent   *Span   `json:"-"`
@@ -77,28 +80,32 @@ type Span struct {
 type encodedSpan struct {
 	ID         string
 	Name       string
+	StartTime  string
+	EndTime    string
 	Attributes Attributes
 	Children   []encodedSpan
 }
 
 func (s Span) MarshalJSON() ([]byte, error) {
-	return json.Marshal(&encodedSpan{
+	enc := encodeSpan(s)
+	return json.Marshal(&enc)
+}
+
+func encodeSpan(s Span) encodedSpan {
+	return encodedSpan{
 		ID:         s.ID.String(),
 		Name:       s.Name,
+		StartTime:  s.StartTime.Format(time.RFC3339),
+		EndTime:    s.EndTime.Format(time.RFC3339),
 		Attributes: s.Attributes,
 		Children:   encodeChildren(s.Children),
-	})
+	}
 }
 
 func encodeChildren(children []*Span) []encodedSpan {
 	res := make([]encodedSpan, len(children))
 	for i, c := range children {
-		res[i] = encodedSpan{
-			ID:         c.ID.String(),
-			Name:       c.Name,
-			Attributes: c.Attributes,
-			Children:   encodeChildren(c.Children),
-		}
+		res[i] = encodeSpan(*c)
 	}
 	return res
 }
@@ -109,6 +116,10 @@ func (s *Span) UnmarshalJSON(data []byte) error {
 		return fmt.Errorf("unmarshal span: %w", err)
 	}
 
+	return s.decodeSpan(aux)
+}
+
+func (s *Span) decodeSpan(aux encodedSpan) error {
 	sid, err := trace.SpanIDFromHex(aux.ID)
 	if err != nil {
 		return fmt.Errorf("unmarshal span: %w", err)
@@ -119,10 +130,23 @@ func (s *Span) UnmarshalJSON(data []byte) error {
 		return fmt.Errorf("unmarshal span: %w", err)
 	}
 
+	startTime, err := time.Parse(time.RFC3339, aux.StartTime)
+	if err != nil {
+		return fmt.Errorf("unmarshal span: %w", err)
+	}
+
+	endTime, err := time.Parse(time.RFC3339, aux.EndTime)
+	if err != nil {
+		return fmt.Errorf("unmarshal span: %w", err)
+	}
+
 	s.ID = sid
 	s.Name = aux.Name
+	s.StartTime = startTime
+	s.EndTime = endTime
 	s.Attributes = aux.Attributes
 	s.Children = children
+
 	return nil
 }
 
@@ -132,21 +156,16 @@ func decodeChildren(parent *Span, children []encodedSpan) ([]*Span, error) {
 	}
 	res := make([]*Span, len(children))
 	for i, c := range children {
-		sid, err := trace.SpanIDFromHex(c.ID)
-		if err != nil {
-			return nil, fmt.Errorf("span decode children: %w", err)
-		}
-
 		span := &Span{
-			ID:         sid,
-			Name:       c.Name,
-			Attributes: c.Attributes,
-			Parent:     parent,
+			Parent: parent,
+		}
+		if err := span.decodeSpan(c); err != nil {
+			return nil, fmt.Errorf("unmarshal children: %w", err)
 		}
 
 		children, err := decodeChildren(span, c.Children)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("unmarshal children: %w", err)
 		}
 
 		span.Children = children
