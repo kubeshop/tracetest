@@ -1,4 +1,4 @@
-import {endpoints} from '../../redux/apis/Test.api';
+import {endpoints} from '../../redux/apis/TraceTest.api';
 import TestGateway from '../Test.gateway';
 
 const {createTest, getTestById, getTestList, runTest} = endpoints;

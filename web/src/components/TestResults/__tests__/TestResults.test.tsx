@@ -1,13 +1,13 @@
 import {render} from '@testing-library/react';
 import TestResults from '../TestResults';
-import {TestingModels} from '../../../utils/TestingModels';
 import {ReduxWrapperProvider} from '../../../redux/ReduxWrapperProvider';
+import TestRunMock from '../../../models/__mocks__/TestRun.mock';
 
 test('TestResults', async () => {
   const onSpanSelected = jest.fn();
   const {getAllByTestId} = render(
     <ReduxWrapperProvider>
-      <TestResults assertionResultList={[]} result={TestingModels.testRunResult} onSelectSpan={onSpanSelected} />
+      <TestResults run={TestRunMock.model()} onSelectSpan={onSpanSelected} testId="12345" />
     </ReduxWrapperProvider>
   );
 

@@ -1,10 +1,10 @@
 import TestStateBadge from './TestStateBadge';
 import TestStateProgress from './TestStateProgress';
-import {TestStateMap} from '../../constants/TestRunResult.constants';
-import {ITestRunResult} from '../../types/TestRunResult.types';
+import {TestStateMap} from '../../constants/TestRun.constants';
+import {TTestRun} from '../../types/TestRun.types';
 
 interface IProps {
-  testState: ITestRunResult['state'];
+  testState: TTestRun['state'];
 }
 
 const TestState = ({testState}: IProps) => {

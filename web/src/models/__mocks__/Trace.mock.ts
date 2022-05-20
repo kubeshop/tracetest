@@ -1,29 +1,18 @@
 import faker from '@faker-js/faker';
 import {IMockFactory} from '../../types/Common.types';
-import {IRawTrace, ITrace} from '../../types/Trace.types';
+import {TRawTrace, TTrace} from '../../types/Trace.types';
 import Trace from '../Trace.model';
 import SpanMock from './Span.mock';
 
-const TraceMock: IMockFactory<ITrace, IRawTrace> = () => ({
+const TraceMock: IMockFactory<TTrace, TRawTrace> = () => ({
   raw(data = {}) {
     return {
-      description: faker.random.words(),
-      resourceSpans: [
-        {
-          resource: {
-            attributes: [],
-          },
-          instrumentationLibrarySpans: [
-            {
-              instrumentationLibrary: {
-                version: String(faker.datatype.number()),
-                name: faker.random.word(),
-              },
-              spans: faker.datatype.array(faker.datatype.number({min: 2, max: 10})).map(() => SpanMock.raw()),
-            },
-          ],
-        },
-      ],
+      traceId: faker.datatype.uuid(),
+      tree: SpanMock.raw(),
+      flat: {
+        '1': SpanMock.raw(),
+        '2': SpanMock.raw(),
+      },
       ...data,
     };
   },

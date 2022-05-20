@@ -1,5 +1,4 @@
 import {CompareOperator} from '../../constants/Operator.constants';
-import {LOCATION_NAME} from '../../constants/Span.constants';
 import AssertionService from '../Assertion.service';
 
 describe('AssertionService', () => {
@@ -12,11 +11,9 @@ describe('AssertionService', () => {
     test('single selectorList', () => {
       const result = AssertionService.getSelectorString([
         {
-          locationName: LOCATION_NAME.SPAN,
-          operator: undefined,
-          propertyName: 'service.name',
+          operator: CompareOperator.EQUALS,
+          key: 'service.name',
           value: 'pokeshop',
-          valueType: 'stringValue',
         },
       ]);
       expect(result).toStrictEqual(`span[service.name="pokeshop"]`);
@@ -25,18 +22,14 @@ describe('AssertionService', () => {
     test('double selectorList', () => {
       const result = AssertionService.getSelectorString([
         {
-          locationName: LOCATION_NAME.SPAN,
-          operator: undefined,
-          propertyName: 'service.name',
+          operator: CompareOperator.EQUALS,
+          key: 'service.name',
           value: 'pokeshop',
-          valueType: 'stringValue',
         },
         {
-          locationName: LOCATION_NAME.SPAN,
           operator: CompareOperator.CONTAINS,
-          propertyName: 'tracetest.span.type',
+          key: 'tracetest.span.type',
           value: 'http',
-          valueType: 'stringValue',
         },
       ]);
       expect(result).toStrictEqual(`span[service.name="pokeshop" tracetest.span.type contains "http"]`);

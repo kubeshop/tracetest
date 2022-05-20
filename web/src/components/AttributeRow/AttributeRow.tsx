@@ -1,12 +1,12 @@
 import {useCallback} from 'react';
 import useHover from '../../hooks/useHover';
-import {ISpanFlatAttribute} from '../../types/Span.types';
+import {TSpanFlatAttribute} from '../../types/Span.types';
 import * as S from './AttributeRow.styled';
 import AttributeValue from '../AttributeValue';
 
 interface IAttributeRowProps {
-  attribute: ISpanFlatAttribute;
-  onCreateAssertion(attribute: ISpanFlatAttribute): void;
+  attribute: TSpanFlatAttribute;
+  onCreateAssertion(attribute: TSpanFlatAttribute): void;
 }
 
 const AttributeRow: React.FC<IAttributeRowProps> = ({attribute: {key, value}, attribute, onCreateAssertion}) => {

@@ -1,18 +1,20 @@
 import {useCallback, useMemo} from 'react';
 import {useStore} from 'react-flow-renderer';
-import {IAssertionResult} from '../../types/Assertion.types';
+import {TAssertionResultEntry, TSpanSelector} from '../../types/Assertion.types';
 import AssertionCheckRow from '../AssertionCheckRow';
 import * as S from './AssertionCard.styled';
 
-interface IAssertionCardProps {
-  assertionResult: IAssertionResult;
+interface TAssertionCardProps {
+  assertionResult: TAssertionResultEntry;
+  selectorList: TSpanSelector[];
   onSelectSpan(spanId: string): void;
   onDelete(assertionId: string): void;
-  onEdit(assertionResult: IAssertionResult): void;
+  onEdit(assertionResult: TAssertionResultEntry): void;
 }
 
-const AssertionCard: React.FC<IAssertionCardProps> = ({
-  assertionResult: {assertion: {selectors = [], assertionId = ''} = {}, spanListAssertionResult},
+const AssertionCard: React.FC<TAssertionCardProps> = ({
+  assertionResult: {resultList, id: assertionId},
+  selectorList,
   assertionResult,
   onSelectSpan,
   onDelete,
@@ -21,10 +23,10 @@ const AssertionCard: React.FC<IAssertionCardProps> = ({
   const store = useStore();
 
   const spanCountText = useMemo(() => {
-    const spanCount = spanListAssertionResult.length;
+    const spanCount = resultList.length;
 
     return `${spanCount} ${spanCount > 1 ? 'spans' : 'span'}`;
-  }, [spanListAssertionResult.length]);
+  }, [resultList.length]);
 
   const getIsSelectedSpan = useCallback(
     (id: string): boolean => {
@@ -40,7 +42,7 @@ const AssertionCard: React.FC<IAssertionCardProps> = ({
     <S.AssertionCard data-cy="assertion-card">
       <S.Header>
         <div>
-          <S.SelectorListText>{selectors.map(({value}) => value).join(' ')}</S.SelectorListText>
+          <S.SelectorListText>{selectorList.map(({value}) => value).join(' ')}</S.SelectorListText>
           <S.SpanCountText>{spanCountText}</S.SpanCountText>
         </div>
         <div>
@@ -49,15 +51,15 @@ const AssertionCard: React.FC<IAssertionCardProps> = ({
         </div>
       </S.Header>
       <S.Body>
-        {spanListAssertionResult.flatMap(({span, resultList}) =>
-          resultList.map(result => (
+        {resultList.flatMap(({spanResults, assertion: {attribute}, assertion}) =>
+          spanResults.map(result => (
             <AssertionCheckRow
-              key={`${result.propertyName}-${span.spanId}`}
+              key={`${attribute}-${result.spanId}`}
+              assertion={assertion}
               result={result}
-              span={span}
               onSelectSpan={onSelectSpan}
               getIsSelectedSpan={getIsSelectedSpan}
-              assertionSelectorList={selectors.map(({value}) => value)}
+              assertionSelectorList={selectorList.map(({value}) => value)}
             />
           ))
         )}

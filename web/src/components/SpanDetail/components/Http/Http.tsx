@@ -1,18 +1,18 @@
 import {Tabs} from 'antd';
 import React, {useMemo} from 'react';
 import {HttpRequestAttributeList, HttpResponseAttributeList} from '../../../../constants/Span.constants';
-import {ISpanFlatAttribute} from '../../../../types/Span.types';
+import {TSpanFlatAttribute} from '../../../../types/Span.types';
 import AttributeList from '../../../AttributeList';
-import {ISpanDetailsComponentProps} from '../../SpanDetail';
+import {TSpanDetailsComponentProps} from '../../SpanDetail';
 import * as S from '../../SpanDetail.styled';
 
-const filterRequestList = (attributeList: ISpanFlatAttribute[]) =>
+const filterRequestList = (attributeList: TSpanFlatAttribute[]) =>
   attributeList?.filter(a => HttpRequestAttributeList.includes(a.key) || a.key.includes('http.request'));
 
-const filterResponseList = (attributeList: ISpanFlatAttribute[]) =>
+const filterResponseList = (attributeList: TSpanFlatAttribute[]) =>
   attributeList?.filter(a => HttpResponseAttributeList.includes(a.key) || a.key.includes('http.request'));
 
-const Http: React.FC<ISpanDetailsComponentProps> = ({span: {attributeList = []} = {}, onCreateAssertion}) => {
+const Http: React.FC<TSpanDetailsComponentProps> = ({span: {attributeList = []} = {}, onCreateAssertion}) => {
   const responseList = useMemo(() => filterResponseList(attributeList), [attributeList]);
   const requestList = useMemo(() => filterRequestList(attributeList), [attributeList]);
 

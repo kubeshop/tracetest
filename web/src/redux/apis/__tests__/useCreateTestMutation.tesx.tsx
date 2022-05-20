@@ -1,9 +1,9 @@
 import {act, renderHook} from '@testing-library/react-hooks';
 import fetchMock from 'jest-fetch-mock';
 import {HTTP_METHOD} from '../../../constants/Common.constants';
-import { ITest } from '../../../types/Test.types';
+import { TTest } from '../../../types/Test.types';
 import {ReduxWrapperProvider} from '../../ReduxWrapperProvider';
-import {useCreateTestMutation} from '../Test.api';
+import {useCreateTestMutation} from '../TraceTest.api';
 
 test('useCreateTestMutation', async () => {
   const testId = 22;
@@ -12,7 +12,7 @@ test('useCreateTestMutation', async () => {
     wrapper: ReduxWrapperProvider,
   });
 
-  let newTest: ITest;
+  let newTest: TTest;
   await act(async () => {
     const [createTest] = result.current;
     newTest = await createTest({
@@ -22,5 +22,5 @@ test('useCreateTestMutation', async () => {
       },
     }).unwrap();
   });
-  expect(newTest!.testId).toBe(testId);
+  expect(newTest!.id).toBe(testId);
 });

@@ -1,11 +1,3 @@
-export const enum LOCATION_NAME {
-  RESOURCE_ATTRIBUTES = 'RESOURCE_ATTRIBUTES',
-  INSTRUMENTATION_LIBRARY = 'INSTRUMENTATION_LIBRARY',
-  SPAN = 'SPAN',
-  SPAN_ATTRIBUTES = 'SPAN_ATTRIBUTES',
-  SPAN_ID = 'SPAN_ID',
-}
-
 export const HttpRequestAttributeList = [
   'http.method',
   'http.url',

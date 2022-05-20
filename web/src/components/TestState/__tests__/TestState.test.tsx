@@ -1,6 +1,6 @@
 import {render} from '@testing-library/react';
 import TestState from '../TestState';
-import {TestState as TestStateEnum, TestStateMap} from '../../../constants/TestRunResult.constants';
+import {TestState as TestStateEnum, TestStateMap} from '../../../constants/TestRun.constants';
 
 describe('TestState', () => {
   it('should render badge component', () => {

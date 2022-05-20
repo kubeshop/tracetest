@@ -1,11 +1,11 @@
 import {renderHook} from '@testing-library/react-hooks';
 import fetchMock from 'jest-fetch-mock';
 import {ReduxWrapperProvider} from '../../ReduxWrapperProvider';
-import {useGetResultListQuery} from '../Test.api';
+import {useGetRunListQuery} from '../TraceTest.api';
 
-test('useGetResultListQuery', async () => {
+test('useGetRunListQuery', async () => {
   fetchMock.mockResponse(JSON.stringify([]));
-  const {result, waitForNextUpdate} = renderHook(() => useGetResultListQuery({testId: '3321'}), {
+  const {result, waitForNextUpdate} = renderHook(() => useGetRunListQuery({testId: '3321'}), {
     wrapper: ReduxWrapperProvider,
   });
   expect(result.current.isLoading).toBeTruthy();

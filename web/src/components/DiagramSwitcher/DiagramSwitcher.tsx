@@ -5,9 +5,7 @@ import * as S from './DiagramSwitcher.styled';
 
 interface IProps {
   onSearch(search: string): void;
-
   onTypeChange(type: SupportedDiagrams): void;
-
   selectedType: SupportedDiagrams;
 }
 

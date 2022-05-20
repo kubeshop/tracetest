@@ -1,7 +1,5 @@
 import {noop} from 'lodash';
 import {useState, createContext, useCallback, useMemo, useContext} from 'react';
-import {useCreateAssertionMutation, useUpdateAssertionMutation} from '../../redux/apis/Test.api';
-import AssertionService from '../../services/Assertion.service';
 import {IValues} from './AssertionForm';
 
 interface IFormProps {
@@ -32,11 +30,9 @@ export const Context = createContext<ICreateAssertionModalProviderContext>({
 
 export const useAssertionForm = () => useContext(Context);
 
-const AssertionFormProvider: React.FC<{testId: string}> = ({children, testId}) => {
+const AssertionFormProvider: React.FC<{testId: string}> = ({children}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [formProps, setFormProps] = useState<IFormProps>(initialFormProps);
-  const [createAssertion] = useCreateAssertionMutation();
-  const [updateAssertion] = useUpdateAssertionMutation();
 
   const open = useCallback((props: IFormProps = {}) => {
     setFormProps(props);
@@ -48,34 +44,10 @@ const AssertionFormProvider: React.FC<{testId: string}> = ({children, testId}) =
     setFormProps(initialFormProps);
   }, []);
 
-  const onSubmit = useCallback(
-    ({selectorList, assertionList}: IValues) => {
-      const {assertionId} = formProps;
-      const selectors = selectorList.map(({operator, ...selector}) => selector);
-
-      if (assertionId) {
-        updateAssertion({
-          testId,
-          assertionId,
-          assertion: {
-            selectors,
-            spanAssertions: AssertionService.parseAssertionSpanToSelectorSpan(assertionList),
-          },
-        });
-      } else {
-        createAssertion({
-          testId,
-          assertion: {
-            selectors,
-            spanAssertions: AssertionService.parseAssertionSpanToSelectorSpan(assertionList),
-          },
-        });
-      }
-
-      setIsOpen(false);
-    },
-    [createAssertion, formProps, testId, updateAssertion]
-  );
+  const onSubmit = useCallback(({selectorList, assertionList}: IValues) => {
+    console.log('@@onSubmit', selectorList, assertionList);
+    setIsOpen(false);
+  }, []);
 
   const contextValue = useMemo(
     () => ({isOpen, open, close, formProps, onSubmit}),

@@ -3,7 +3,7 @@ import {useNavigate} from 'react-router-dom';
 import HomeAnalyticsService from '../../services/Analytics/HomeAnalytics.service';
 import {useMenuDeleteCallback} from './useMenuDeleteCallback';
 import TestCard from '../../components/TestCard';
-import {useGetTestListQuery, useRunTestMutation} from '../../redux/apis/Test.api';
+import {useGetTestListQuery, useRunTestMutation} from '../../redux/apis/TraceTest.api';
 import TestAnalyticsService from '../../services/Analytics/TestAnalytics.service';
 import * as S from './Home.styled';
 
@@ -26,8 +26,8 @@ const TestList = () => {
     async (testId: string) => {
       if (testId) {
         TestAnalyticsService.onRunTest(testId);
-        const testResult = await runTest(testId).unwrap();
-        navigate(`/test/${testId}/result/${testResult.resultId}`);
+        const testRun = await runTest({testId}).unwrap();
+        navigate(`/test/${testId}/result/${testRun.id}`);
       }
     },
     [navigate, runTest]
@@ -38,7 +38,7 @@ const TestList = () => {
   return (
     <S.TestListContainer data-cy="test-list">
       {testList?.map(test => (
-        <TestCard test={test} onClick={onClick} onDelete={onDelete} onRunTest={onRunTest} key={test.testId} />
+        <TestCard test={test} onClick={onClick} onDelete={onDelete} onRunTest={onRunTest} key={test.id} />
       ))}
     </S.TestListContainer>
   );

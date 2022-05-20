@@ -1,28 +1,28 @@
 import {DownOutlined, RightOutlined} from '@ant-design/icons';
 import {Button} from 'antd';
 import {useCallback, useState} from 'react';
-import {useLazyGetResultListQuery} from '../../redux/apis/Test.api';
-import {ITest} from '../../types/Test.types';
-import ResultCardList from '../ResultCardList';
+import {useLazyGetRunListQuery} from '../../redux/apis/TraceTest.api';
+import {TTest} from '../../types/Test.types';
+import ResultCardList from '../RunCardList';
 import * as S from './TestCard.styled';
 import TestCardActions from './TestCardActions';
 
-interface ITestCardProps {
-  test: ITest;
+interface TTestCardProps {
+  test: TTest;
   onClick(testId: string): void;
-  onDelete(test: ITest): void;
+  onDelete(test: TTest): void;
   onRunTest(testId: string): void;
 }
 
-const TestCard: React.FC<ITestCardProps> = ({
-  test: {name, serviceUnderTest, testId},
+const TestCard: React.FC<TTestCardProps> = ({
+  test: {name, serviceUnderTest, id: testId},
   test,
   onClick,
   onDelete,
   onRunTest,
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [loadResultList, {data: resultList = []}] = useLazyGetResultListQuery();
+  const [loadResultList, {data: resultList = []}] = useLazyGetRunListQuery();
 
   const onCollapse = useCallback(async () => {
     if (!resultList.length) {
@@ -32,7 +32,7 @@ const TestCard: React.FC<ITestCardProps> = ({
     } else {
       setIsCollapsed(true);
     }
-  }, [loadResultList, resultList, testId]);
+  }, [loadResultList, resultList.length, testId]);
 
   return (
     <S.TestCard isCollapsed={isCollapsed}>
@@ -46,10 +46,10 @@ const TestCard: React.FC<ITestCardProps> = ({
           <S.NameText>{name}</S.NameText>
         </S.TextContainer>
         <S.TextContainer>
-          <S.Text>{serviceUnderTest.request.method}</S.Text>
+          <S.Text>{serviceUnderTest?.request?.method}</S.Text>
         </S.TextContainer>
         <S.TextContainer data-cy={`test-url-${testId}`}>
-          <S.Text>{serviceUnderTest.request.url}</S.Text>
+          <S.Text>{serviceUnderTest?.request?.url}</S.Text>
         </S.TextContainer>
         <S.TextContainer />
         <S.ButtonContainer>
@@ -70,7 +70,7 @@ const TestCard: React.FC<ITestCardProps> = ({
 
       {isCollapsed && Boolean(resultList.length) && (
         <S.ResultListContainer>
-          <ResultCardList resultList={resultList} />
+          <ResultCardList testId={testId} resultList={resultList} />
           {resultList.length === 5 && (
             <S.TestDetails>
               <S.TestDetailsLink data-cy="test-details-link" onClick={() => onClick(testId)}>

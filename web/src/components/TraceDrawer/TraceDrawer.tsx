@@ -1,8 +1,6 @@
 import {Drawer} from 'antd';
 import {useState, useEffect} from 'react';
-import {useSelector} from 'react-redux';
-import {ITestRunResult} from 'types/TestRunResult.types';
-import TestResultSelectors from '../../selectors/TestResult.selectors';
+import {TTestRun} from 'types/TestRun.types';
 import TestResults from '../TestResults';
 import * as S from './TraceDrawer.styled';
 import TraceDrawerHeader from './TraceDrawerHeader';
@@ -11,15 +9,14 @@ import AssertionForm from '../AssertionForm';
 
 interface IProps {
   visiblePortion: number;
-  result: ITestRunResult;
+  run: TTestRun;
+  testId: string;
   onSelectSpan: (spanId: string) => void;
 }
 
-const TraceDrawer: React.FC<IProps> = ({result: {resultId, testId}, result, visiblePortion, onSelectSpan}) => {
+const TraceDrawer: React.FC<IProps> = ({run: {id: runId}, run, testId, visiblePortion, onSelectSpan}) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const {isOpen: isAssertionFormOpen, formProps, onSubmit, close} = useAssertionForm();
-
-  const traceResultList = useSelector(TestResultSelectors.selectTestResultList(resultId));
 
   useEffect(() => {
     if (isAssertionFormOpen) setIsCollapsed(true);
@@ -38,14 +35,14 @@ const TraceDrawer: React.FC<IProps> = ({result: {resultId, testId}, result, visi
     >
       <TraceDrawerHeader
         onClick={() => !isAssertionFormOpen && setIsCollapsed(!isCollapsed)}
-        result={result}
+        run={run}
         isDisabled={isAssertionFormOpen}
         visiblePortion={visiblePortion}
       />
       <S.Content>
         {isAssertionFormOpen ? (
           <AssertionForm
-            resultId={resultId}
+            runId={runId}
             onSubmit={onSubmit}
             testId={testId}
             {...formProps}
@@ -55,7 +52,7 @@ const TraceDrawer: React.FC<IProps> = ({result: {resultId, testId}, result, visi
             }}
           />
         ) : (
-          <TestResults assertionResultList={traceResultList} result={result} onSelectSpan={onSelectSpan} />
+          <TestResults testId={testId} run={run} onSelectSpan={onSelectSpan} />
         )}
       </S.Content>
     </Drawer>

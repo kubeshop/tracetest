@@ -1,8 +1,9 @@
 import {useCallback, useEffect, useMemo, useRef} from 'react';
+import {parseISO} from 'date-fns';
 import * as d3 from 'd3';
 import TraceAnalyticsService from '../../../services/Analytics/TraceAnalytics.service';
 import {IDiagramProps} from '../Diagram';
-import {ISpan} from '../../../types/Span.types';
+import {TSpan} from '../../../types/Span.types';
 import {getNotchColor} from '../../TraceNode/TraceNode.styled';
 import * as S from './TimelineChart.styled';
 
@@ -15,21 +16,21 @@ export const TimelineChart = ({trace, selectedSpan, onSelectSpan}: IDiagramProps
   const treeFactory = d3.tree().size([200, 450]).nodeSize([0, 5]);
 
   const spanDates = trace.spans.map(span => ({
-    startTime: new Date(Number(span.startTimeUnixNano) / 1000),
-    endTime: new Date(Number(span.endTimeUnixNano) / 1000),
+    startTime: parseISO(span.startTime).getTime(),
+    endTime: parseISO(span.endTime).getTime(),
     span,
   }));
 
   const spanMap = trace.spans.reduce(
     (acc: {[key: string]: {id: string; parentIds: Array<string | undefined>; data: any}}, span) => {
-      acc[span.spanId] = acc[span.spanId] || {
-        id: span.spanId,
+      acc[span.id] = acc[span.id] || {
+        id: span.id,
         parentIds: [],
         data: span,
-        startTime: new Date(Number(span.startTimeUnixNano) / 1000),
-        endTime: new Date(Number(span.endTimeUnixNano) / 1000),
+        startTime: parseISO(span.startTime).getTime(),
+        endTime: parseISO(span.endTime).getTime(),
       };
-      acc[span.spanId].parentIds.push(span.parentSpanId);
+      acc[span.id].parentIds.push(span.parentId);
       return acc;
     },
     {}
@@ -46,10 +47,10 @@ export const TimelineChart = ({trace, selectedSpan, onSelectSpan}: IDiagramProps
   }, [spanMap]);
 
   const minNano = d3.min(
-    spanDates.filter(el => Number(el.span.startTimeUnixNano) > 0 && Number(el.span.endTimeUnixNano) > 0),
-    s => Number(s.span.startTimeUnixNano)
+    spanDates.filter(el => el.startTime > 0 && el.endTime > 0),
+    s => Number(parseISO(s.span.startTime).getTime())
   )! as number;
-  const maxNano = d3.max(spanDates, s => Number(s.span.endTimeUnixNano))! as number;
+  const maxNano = d3.max(spanDates, s => s.endTime) as number;
 
   const scaleTime = d3
     .scaleLinear()
@@ -138,7 +139,7 @@ export const TimelineChart = ({trace, selectedSpan, onSelectSpan}: IDiagramProps
 
     nodeEnter
       .append('rect')
-      .attr('class', d => `rect-svg ${d.id === selectedSpan?.spanId ? 'rect-svg-selected' : ''}`)
+      .attr('class', d => `rect-svg ${d.id === selectedSpan?.id ? 'rect-svg-selected' : ''}`)
       .attr('rx', 3)
       .attr('ry', 3)
       .attr('x', 0)
@@ -180,7 +181,7 @@ export const TimelineChart = ({trace, selectedSpan, onSelectSpan}: IDiagramProps
         );
       })
       .attr('fill', e => {
-        const span: ISpan = e.data.data;
+        const span: TSpan = e.data.data;
 
         const color = getNotchColor(span.type);
 
@@ -204,7 +205,7 @@ export const TimelineChart = ({trace, selectedSpan, onSelectSpan}: IDiagramProps
     nodeUpdate
       .attr('transform', (d: any) => `translate(${0} ,${d.x})`)
       .select('rect')
-      .attr('class', d => `rect-svg ${d.id === selectedSpan?.spanId ? 'rect-svg-selected' : ''}`);
+      .attr('class', d => `rect-svg ${d.id === selectedSpan?.id ? 'rect-svg-selected' : ''}`);
 
     nodeUpdate
       .select('path')
@@ -224,7 +225,7 @@ export const TimelineChart = ({trace, selectedSpan, onSelectSpan}: IDiagramProps
       d.x0 = d.x;
       d.y0 = d.y;
     });
-  }, [treeFactory, root, onSelectSpan, selectedSpan?.spanId, scaleTime, minNano, maxNano]);
+  }, [treeFactory, root, onSelectSpan, selectedSpan?.id, scaleTime, minNano, maxNano]);
 
   useEffect(() => {
     drawChart();

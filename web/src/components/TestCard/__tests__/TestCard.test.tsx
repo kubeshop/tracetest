@@ -1,6 +1,6 @@
 import {fireEvent, render, waitFor} from '@testing-library/react';
+import TestMock from '../../../models/__mocks__/Test.mock';
 import {ReduxWrapperProvider} from '../../../redux/ReduxWrapperProvider';
-import {TestingModels} from '../../../utils/TestingModels';
 import TestCard from '../TestCard';
 
 test('TestCard', async () => {
@@ -8,13 +8,21 @@ test('TestCard', async () => {
   const onRunTest = jest.fn();
   const onClick = jest.fn();
 
+  const test = TestMock.model();
+
   const {container, getByTestId} = render(
     <ReduxWrapperProvider>
-      <TestCard onDelete={onDelete} onRunTest={onRunTest} test={TestingModels.test} onClick={onClick} />
+      <TestCard onDelete={onDelete} onRunTest={onRunTest} test={test} onClick={onClick} />
     </ReduxWrapperProvider>
   );
 
-  fireEvent(getByTestId(`test-actions-button-${TestingModels.test.testId}`), TestingModels.mouseEvent);
+  fireEvent(
+    getByTestId(`test-actions-button-${test.id}`),
+    new MouseEvent('click', {
+      bubbles: true,
+      cancelable: true,
+    })
+  );
   await waitFor(() => getByTestId('test-card-delete'));
   expect(container).toMatchSnapshot();
 });

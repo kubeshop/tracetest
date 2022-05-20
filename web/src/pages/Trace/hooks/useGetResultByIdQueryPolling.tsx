@@ -1,5 +1,5 @@
 import usePolling from '../../../hooks/usePolling';
-import {TestState} from '../../../constants/TestRunResult.constants';
+import {TestState} from '../../../constants/TestRun.constants';
 
 export function useGetResultByIdQueryPolling(refetchTrace: any, isError: boolean, testResultDetails: any): void {
   usePolling({

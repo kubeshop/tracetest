@@ -1,14 +1,14 @@
 import {Button} from 'antd';
 import {FC, useCallback} from 'react';
-import {useGetResultListQuery, useRunTestMutation} from 'redux/apis/Test.api';
+import {useGetRunListQuery, useRunTestMutation} from 'redux/apis/TraceTest.api';
 import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
 import {Steps} from 'components/GuidedTour/testDetailsStepList';
 import useGuidedTour from 'hooks/useGuidedTour';
 import * as S from './Test.styled';
 import TestAnalyticsService from '../../services/Analytics/TestAnalytics.service';
-import {ITestRunResult} from '../../types/TestRunResult.types';
-import ResultCardList from '../../components/ResultCardList';
-import useInfiniteScroll from './hooks/useInfiniteScroll';
+import {TTestRun} from '../../types/TestRun.types';
+import ResultCardList from '../../components/RunCardList';
+import useInfiniteScroll from '../../hooks/useInfiniteScroll';
 import InfiniteScroll from '../../components/InfiniteScroll';
 import SearchInput from '../../components/SearchInput';
 
@@ -16,7 +16,7 @@ const {onRunTest} = TestAnalyticsService;
 
 type TTestDetailsProps = {
   testId: string;
-  onSelectResult: (result: ITestRunResult) => void;
+  onSelectResult: (result: TTestRun) => void;
 };
 
 const TestDetails: FC<TTestDetailsProps> = ({testId, onSelectResult}) => {
@@ -26,7 +26,7 @@ const TestDetails: FC<TTestDetailsProps> = ({testId, onSelectResult}) => {
     hasMore,
     loadMore,
     isLoading,
-  } = useInfiniteScroll<ITestRunResult, {testId: string}>(useGetResultListQuery, {
+  } = useInfiniteScroll<TTestRun, {testId: string}>(useGetRunListQuery, {
     testId,
   });
 
@@ -35,7 +35,7 @@ const TestDetails: FC<TTestDetailsProps> = ({testId, onSelectResult}) => {
   const handleRunTest = useCallback(async () => {
     if (testId) {
       onRunTest(testId);
-      const testResult = await runTest(testId).unwrap();
+      const testResult = await runTest({testId}).unwrap();
       onSelectResult(testResult);
     }
   }, [onSelectResult, runTest, testId]);
@@ -61,7 +61,7 @@ const TestDetails: FC<TTestDetailsProps> = ({testId, onSelectResult}) => {
         hasMore={hasMore}
         shouldTrigger={Boolean(resultList.length)}
       >
-        <ResultCardList resultList={resultList} />
+        <ResultCardList testId={testId} resultList={resultList} />
       </InfiniteScroll>
     </>
   );

@@ -1,22 +1,22 @@
 import {Button, Typography} from 'antd';
 import {useCallback} from 'react';
 import {DISCORD_URL, GITHUB_ISSUES_URL} from '../../constants/Common.constants';
-import {useRunTestMutation} from '../../redux/apis/Test.api';
-import {ITestRunResult} from '../../types/TestRunResult.types';
+import {useRunTestMutation} from '../../redux/apis/TraceTest.api';
+import {TTestRun} from '../../types/TestRun.types';
 import * as S from './FailedTrace.styled';
 
 interface IFailedTraceProps {
   isDisplayingError: boolean;
   testId: string;
   onEdit(): void;
-  onRunTest(result: ITestRunResult): void;
+  onRunTest(result: TTestRun): void;
 }
 
 const FailedTrace: React.FC<IFailedTraceProps> = ({onRunTest, onEdit, testId, isDisplayingError}) => {
   const [runNewTest] = useRunTestMutation();
 
   const onReRun = useCallback(async () => {
-    const result = await runNewTest(testId).unwrap();
+    const result = await runNewTest({testId}).unwrap();
     onRunTest(result);
   }, [onRunTest, runNewTest, testId]);
 

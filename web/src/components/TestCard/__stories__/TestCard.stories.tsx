@@ -15,16 +15,14 @@ const Template: ComponentStory<typeof TestCard> = args => <TestCard {...args} />
 export const Default = Template.bind({});
 Default.args = {
   test: {
-    testId: faker.datatype.uuid(),
+    id: faker.datatype.uuid(),
     name: `${faker.name.firstName()} ${faker.name.lastName()}`,
     description: faker.lorem.sentences(),
     serviceUnderTest: {
-      id: faker.datatype.uuid(),
       request: {
         url: faker.internet.url(),
         method: faker.internet.httpMethod().toUpperCase() as HTTP_METHOD,
       },
     },
-    assertions: [],
   },
 };

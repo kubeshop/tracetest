@@ -1,10 +1,10 @@
-import {ISpanFlatAttribute} from '../../types/Span.types';
+import {TSpanFlatAttribute} from '../../types/Span.types';
 import AttributeRow from '../AttributeRow';
 import * as S from './AttributeList.styled';
 
 interface IAttributeListProps {
-  attributeList: ISpanFlatAttribute[];
-  onCreateAssertion(attribute: ISpanFlatAttribute): void;
+  attributeList: TSpanFlatAttribute[];
+  onCreateAssertion(attribute: TSpanFlatAttribute): void;
 }
 
 const AttributeList: React.FC<IAttributeListProps> = ({attributeList, onCreateAssertion}) => {

@@ -2,9 +2,7 @@ import {PlusOutlined} from '@ant-design/icons';
 import {Badge} from 'antd';
 import {format, parseISO} from 'date-fns';
 import {useMemo} from 'react';
-import {useSelector} from 'react-redux';
-import {ITestRunResult} from 'types/TestRunResult.types';
-import TestResultSelectors from '../../selectors/TestResult.selectors';
+import {TTestRun} from 'types/TestRun.types';
 import GuidedTourService, {GuidedTours} from '../../services/GuidedTour.service';
 import TraceService from '../../services/Trace.service';
 import {useAssertionForm} from '../AssertionForm/AssertionFormProvider';
@@ -13,26 +11,22 @@ import * as S from './TraceDrawer.styled';
 
 interface IProps {
   visiblePortion: number;
-  result: ITestRunResult;
+  run: TTestRun;
   onClick(): void;
   isDisabled: boolean;
 }
 
 const TraceDrawerHeader: React.FC<IProps> = ({
-  result: {resultId, trace, createdAt},
+  run: {trace, createdAt, result},
   visiblePortion,
   onClick,
   isDisabled,
 }) => {
   const {open} = useAssertionForm();
-  const traceResultList = useSelector(TestResultSelectors.selectTestResultList(resultId));
   const totalSpanCount = trace?.spans.length;
-  const totalAssertionCount = traceResultList.length || 0;
+  const totalAssertionCount = result.resultList.length || 0;
 
-  const {totalPassedCount, totalFailedCount} = useMemo(
-    () => TraceService.getTestResultCount(traceResultList),
-    [traceResultList]
-  );
+  const {totalPassedCount, totalFailedCount} = useMemo(() => TraceService.getTestResultCount(result), [result]);
 
   const startDate = useMemo(() => format(parseISO(createdAt), "EEEE, do MMMM yyyy 'at' HH:mm:ss"), [createdAt]);
 

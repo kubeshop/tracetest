@@ -5,22 +5,10 @@ describe('SpanService', () => {
   describe('getSpanNodeInfo', () => {
     it('should return the span node info', () => {
       const span = SpanMock.model({
-        attributes: [
-          {
-            key: 'db.system',
-            value: {
-              stringValue: 'mysql',
-              kvlistValue: {values: []},
-            },
-          },
-          {
-            key: 'service.name',
-            value: {
-              stringValue: 'test',
-              kvlistValue: {values: []},
-            },
-          },
-        ],
+        attributes: {
+          'db.system': 'mysql',
+          'service.name': 'test',
+        },
       });
       const info = SpanService.getSpanNodeInfo(span);
 
@@ -30,7 +18,7 @@ describe('SpanService', () => {
 
     it('should handle empty attributes array', () => {
       const span = SpanMock.model({
-        attributes: [],
+        attributes: {},
       });
       const info = SpanService.getSpanNodeInfo(span);
 

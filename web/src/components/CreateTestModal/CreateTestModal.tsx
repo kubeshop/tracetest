@@ -1,7 +1,7 @@
 import {useCallback} from 'react';
 import {useTour} from '@reactour/tour';
 import {Modal, Form, Button} from 'antd';
-import {useCreateTestMutation, useRunTestMutation} from 'redux/apis/Test.api';
+import {useCreateTestMutation, useRunTestMutation} from 'redux/apis/TraceTest.api';
 import './CreateTestModal.styled.ts';
 import {useNavigate} from 'react-router-dom';
 import GuidedTourService, {GuidedTours} from '../../services/GuidedTour.service';
@@ -36,10 +36,10 @@ const CreateTestModal = ({visible, onClose}: IProps): JSX.Element => {
           request: {url: values.url, method: values.method, body: values.body, headers},
         },
       }).unwrap();
-      const newTestRunResult = await runTest(newTest.testId).unwrap();
+      const newRun = await runTest({testId: newTest.id}).unwrap();
       onClose();
       setIsOpen(false);
-      navigate(`/test/${newTest.testId}/result/${newTestRunResult.resultId}`);
+      navigate(`/test/${newTest.id}/result/${newRun.id}`);
     },
     [createTest, navigate, onClose, runTest, setIsOpen]
   );

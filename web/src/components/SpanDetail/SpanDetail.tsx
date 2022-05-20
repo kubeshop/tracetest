@@ -2,7 +2,7 @@ import {capitalize} from 'lodash';
 import {useCallback} from 'react';
 import {SemanticGroupNames, SemanticGroupNamesToText} from '../../constants/SemanticGroupNames.constants';
 import SpanService from '../../services/Span.service';
-import {ISpan, ISpanFlatAttribute} from '../../types/Span.types';
+import {TSpan, TSpanFlatAttribute} from '../../types/Span.types';
 import Generic from './components/Generic';
 import Http from './components/Http';
 import SpanHeader from './SpanHeader';
@@ -10,52 +10,51 @@ import * as S from './SpanDetail.styled';
 import {useAssertionForm} from '../AssertionForm/AssertionFormProvider';
 import {CompareOperator} from '../../constants/Operator.constants';
 
-export interface ISpanDetailProps {
+export interface TSpanDetailProps {
   testId?: string;
-  span?: ISpan;
+  span?: TSpan;
   resultId?: string;
 }
 
-export interface ISpanDetailsComponentProps {
-  span?: ISpan;
-  onCreateAssertion(attribute: ISpanFlatAttribute): void;
+export interface TSpanDetailsComponentProps {
+  span?: TSpan;
+  onCreateAssertion(attribute: TSpanFlatAttribute): void;
 }
 
 const ComponentMap: Record<string, typeof Generic> = {
   [SemanticGroupNames.Http]: Http,
 };
 
-const getSpanTitle = (span: ISpan) => {
+const getSpanTitle = (span: TSpan) => {
   const {primary, heading} = SpanService.getSpanNodeInfo(span);
   const spanTypeText = SemanticGroupNamesToText[span.type];
 
   return `${capitalize(heading) || spanTypeText} • ${primary} • ${span.name}`;
 };
 
-const SpanDetail: React.FC<ISpanDetailProps> = ({span}) => {
+const SpanDetail: React.FC<TSpanDetailProps> = ({span}) => {
   const {open} = useAssertionForm();
   const Component = ComponentMap[span?.type || ''] || Generic;
 
   const title = (span && getSpanTitle(span)) || '';
 
   const onCreateAssertion = useCallback(
-    ({type, value, key}: ISpanFlatAttribute) => {
+    ({value, key}: TSpanFlatAttribute) => {
       open({
         isEditing: false,
         defaultValues: {
           assertionList: [
             {
-              compareOp: CompareOperator.EQUALS,
-              value,
-              key,
-              type,
+              comparator: CompareOperator.EQUALS,
+              expected: value,
+              attribute: key,
             },
           ],
-          selectorList: span?.signature || [],
+          selectorList: [],
         },
       });
     },
-    [open, span?.signature]
+    [open]
   );
 
   return (
