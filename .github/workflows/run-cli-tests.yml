@@ -25,6 +25,8 @@ jobs:
           go-version: ${{ matrix.go-version }}
       - name: Install prism
         run: npm install -g @stoplight/prism-cli
+      - name: Install openapi-generator-cli
+        run: npm install -g @openapitools/openapi-generator-cli
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Run tests
