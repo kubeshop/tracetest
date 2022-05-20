@@ -6,6 +6,7 @@ on:
     branches:
       - main
     paths:
+      - api/**
       - server/**
 
 name: run server tests
