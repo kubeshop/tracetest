@@ -1,15 +1,24 @@
-OPENAPI_SERVER_TARGET_DIR=./openapi/
+PROJECT_ROOT=${shell dirname $${PWD}}
+
+OPENAPI_GENERATOR_VER=v5.4.0
+OPENAPI_GENERATOR_IMAGE=openapitools/openapi-generator-cli:$(OPENAPI_GENERATOR_VER)
+OPENAPI_GENERATOR_CLI=docker run --rm -u ${shell id -u}  -v "$(PROJECT_ROOT):/local" -w "/local" ${OPENAPI_GENERATOR_IMAGE}
+OPENAPI_TARGET_DIR=./openapi/
 
 generate-client:
-	$(eval TMPDIR := $(shell mktemp -d))
-	rm -rf $(OPENAPI_SERVER_TARGET_DIR)
+	rm -rf $(OPENAPI_TARGET_DIR)
+	mkdir -p ./tmp
+	mkdir -p $(OPENAPI_TARGET_DIR)
 
-	openapi-generator-cli generate -i ../api/openapi.yaml -g go -o $(TMPDIR)
-	mkdir -p $(OPENAPI_SERVER_TARGET_DIR)
-	mv $(TMPDIR)/*.go $(OPENAPI_SERVER_TARGET_DIR)
-	rm -rf $(TMPDIR)
+	$(OPENAPI_GENERATOR_CLI)  generate \
+		-i api/openapi.yaml \
+		-g go \
+		-o ./cli/tmp \
+		--generate-alias-as-model
+	cp ./tmp/*.go $(OPENAPI_TARGET_DIR)
+	rm -rf ./tmp
 
-	cd $(OPENAPI_SERVER_TARGET_DIR); go fmt ./...; cd ..;
+	cd openapi; pwd; go fmt ./...; cd ..
 
 build: generate-client
 	go build -o tracetest main.go
