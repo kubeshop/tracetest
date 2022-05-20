@@ -89,6 +89,8 @@
         "RootSpan": {
           "ID": "08a235a937d76e75",
           "Name": "POST /pokemon/import",
+          "StartTime": "2022-05-04T15:57:39Z",
+          "EndTime": "2022-05-04T15:57:45Z",
           "Attributes": {
             "service.name": "pokeshop",
             "http.status_code": "200",
@@ -102,6 +104,8 @@
             {
               "ID": "6ddd34839e7aad4b",
               "Name": "consume message from queue",
+              "StartTime": "2022-05-04T15:57:39Z",
+              "EndTime": "2022-05-04T15:57:45Z",
               "Attributes": {
                 "service.name": "pokeshop-worker",
                 "messaging.destination": "/queue/syncronizePokemon",
@@ -113,6 +117,8 @@
             {
               "ID": "fe4104307cabdb19",
               "Name": "pg.query:INSERT",
+              "StartTime": "2022-05-04T15:57:39Z",
+                "EndTime": "2022-05-04T15:57:45Z",
               "Attributes": {
                 "service.name": "pokeshop-worker",
                 "db.name": "pokeshop",

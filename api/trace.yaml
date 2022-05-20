@@ -21,8 +21,17 @@ components:
         id:
           type: string
           format: byte
+        parentId:
+          type: string
+          format: byte
         name:
           type: string
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
         attributes:
           type: object
           description: Key-Value of span attributes

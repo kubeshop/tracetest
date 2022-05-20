@@ -140,6 +140,8 @@ func (m openapiMapper) Trace(in *traces.Trace) openapi.Trace {
 func (m openapiMapper) Span(in traces.Span) openapi.Span {
 	return openapi.Span{
 		Id:         in.ID.String(),
+		StartTime:  in.StartTime,
+		EndTime:    in.EndTime,
 		Attributes: map[string]string(in.Attributes),
 		Children:   m.Spans(in.Children),
 	}
@@ -391,6 +393,8 @@ func (m modelMapper) Span(in openapi.Span, parent *traces.Span) traces.Span {
 		ID:         sid,
 		Attributes: in.Attributes,
 		Name:       in.Name,
+		StartTime:  in.StartTime,
+		EndTime:    in.EndTime,
 		Parent:     parent,
 	}
 	span.Children = m.Spans(in.Children, &span)

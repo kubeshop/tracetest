@@ -5,6 +5,7 @@ import (
 	"math"
 	"strconv"
 	"strings"
+	"time"
 
 	"go.opentelemetry.io/otel/trace"
 	v11 "go.opentelemetry.io/proto/otlp/common/v1"
@@ -34,6 +35,16 @@ func convertOtelSpanIntoSpan(span *v1.Span) *Span {
 		attributes[attribute.Key] = getAttributeValue(attribute.Value)
 	}
 
+	var startTime, endTime time.Time
+
+	if span.GetStartTimeUnixNano() != 0 {
+		startTime = time.Unix(0, int64(span.GetStartTimeUnixNano()))
+	}
+
+	if span.GetEndTimeUnixNano() != 0 {
+		endTime = time.Unix(0, int64(span.GetEndTimeUnixNano()))
+	}
+
 	attributes["name"] = span.Name
 	attributes["tracetest.span.type"] = spanType(attributes)
 	attributes["tracetest.span.duration"] = spanDuration(span)
@@ -42,6 +53,8 @@ func convertOtelSpanIntoSpan(span *v1.Span) *Span {
 	return &Span{
 		ID:         spanID,
 		Name:       span.Name,
+		StartTime:  startTime,
+		EndTime:    endTime,
 		Parent:     nil,
 		Children:   make([]*Span, 0),
 		Attributes: attributes,

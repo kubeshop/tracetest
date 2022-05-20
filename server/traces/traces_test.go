@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/kubeshop/tracetest/id"
 	"github.com/kubeshop/tracetest/traces"
@@ -43,6 +44,8 @@ func TestJSONEncoding(t *testing.T) {
 		"RootSpan": {
 			"ID": "%s",
 			"Name":"root",
+			"StartTime":"%s",
+			"EndTime":"%s",
 			"Attributes": {
 				"service.name": "root"
 			},
@@ -50,12 +53,16 @@ func TestJSONEncoding(t *testing.T) {
 				{
 					"ID": "%s",
 					"Name":"subSpan1",
+					"StartTime":"%s",
+					"EndTime":"%s",
 					"Attributes": {
 						"service.name": "subSpan1"
 					},
 					"Children": [
 						{
 							"ID": "%s",
+							"StartTime":"%s",
+							"EndTime":"%s",
 							"Name":"subSubSpan1",
 							"Attributes": {
 								"service.name": "subSubSpan1"
@@ -67,6 +74,8 @@ func TestJSONEncoding(t *testing.T) {
 				{
 					"ID": "%s",
 					"Name":"subSpan2",
+					"StartTime":"%s",
+					"EndTime":"%s",
 					"Attributes": {
 						"service.name": "subSpan2"
 					},
@@ -76,10 +85,22 @@ func TestJSONEncoding(t *testing.T) {
 		}
 	}`,
 		tid.String(),
+
 		rootSpan.ID.String(),
+		rootSpan.StartTime.Format(time.RFC3339),
+		rootSpan.EndTime.Format(time.RFC3339),
+
 		subSpan1.ID.String(),
+		subSpan1.StartTime.Format(time.RFC3339),
+		subSpan1.EndTime.Format(time.RFC3339),
+
 		subSubSpan1.ID.String(),
+		subSubSpan1.StartTime.Format(time.RFC3339),
+		subSubSpan1.EndTime.Format(time.RFC3339),
+
 		subSpan2.ID.String(),
+		subSpan2.StartTime.Format(time.RFC3339),
+		subSpan2.EndTime.Format(time.RFC3339),
 	)
 
 	t.Run("encode", func(t *testing.T) {
@@ -102,8 +123,10 @@ func TestJSONEncoding(t *testing.T) {
 
 func createSpan(name string) *traces.Span {
 	return &traces.Span{
-		ID:   id.NewRandGenerator().SpanID(),
-		Name: name,
+		ID:        id.NewRandGenerator().SpanID(),
+		Name:      name,
+		StartTime: time.Date(2021, 11, 24, 14, 05, 12, 0, time.UTC),
+		EndTime:   time.Date(2021, 11, 24, 14, 05, 17, 0, time.UTC),
 		Attributes: traces.Attributes{
 			"service.name": name,
 		},
