@@ -18,7 +18,6 @@ components:
             request:
               $ref: "./http.yaml#/components/schemas/HTTPRequest"
         definition:
-          type: object
           $ref: "#/components/schemas/TestDefinition"
           description: Definition of assertions that are going to be made
         referenceTestRun:
@@ -42,10 +41,10 @@ components:
         definitions:
           - selector: 'span[tracetest.span.type="http"]'
             assertions:
-            - attr: tracetest.span.duration
+            - attribute: tracetest.span.duration
               comparator: "<"
               expected: "2000"
-            - attr: http.status_code
+            - attribute: http.status_code
               comparator: "="
               expected: "200"
 
@@ -99,7 +98,7 @@ components:
       type: object
       properties:
         allPassed:
-          type: bool
+          type: boolean
         results:
           type: array
           items:
@@ -117,21 +116,23 @@ components:
           - selector: 'span[tracetest.span.type="http"]'
             results:
             - assertion:
-                attr: http.status_code
+                attribute: http.status_code
                 comparator: "="
                 expected: "200"
+              allPassed: true
               spanResults:
-                spanId: "123"
-                observedValue: "test"
-                passed: true
+                - spanId: "123"
+                  observedValue: "test"
+                  passed: true
             - assertion:
-                attr: http.status_code
+                attribute: http.status_code
                 comparator: "="
                 expected: "200"
+              allPassed: true
               spanResults:
-                spanId: "123"
-                observedValue: "test"
-                passed: true
+                - spanId: "123"
+                  observedValue: "test"
+                  passed: true
 
     AssertionResult:
       type: object
@@ -139,7 +140,7 @@ components:
         assertion:
           $ref: "#/components/schemas/Assertion"
         allPassed:
-          type: bool
+          type: boolean
         spanResults:
           type: array
           items:
@@ -153,6 +154,6 @@ components:
         observedValue:
           type: string
         passed:
-          type: bool
+          type: boolean
         error:
           type: string

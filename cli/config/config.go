@@ -8,7 +8,9 @@ import (
 )
 
 type Config struct {
-	Endpoint string `yaml:"endpoint"`
+	Scheme     string  `yaml:"scheme"`
+	Endpoint   string  `yaml:"endpoint"`
+	ServerPath *string `yaml:"serverPath"`
 }
 
 func LoadConfig(configFile string) (Config, error) {
