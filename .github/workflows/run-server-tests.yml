@@ -5,8 +5,10 @@ on:
   pull_request:
     branches:
       - main
+    paths:
+      - server/**
 
-name: run tests
+name: run server tests
 jobs:
   gotest:
     strategy:
