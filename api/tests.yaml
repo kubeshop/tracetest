@@ -41,10 +41,10 @@ components:
         definitions:
           - selector: 'span[tracetest.span.type="http"]'
             assertions:
-            - attr: tracetest.span.duration
+            - attribute: tracetest.span.duration
               comparator: "<"
               expected: "2000"
-            - attr: http.status_code
+            - attribute: http.status_code
               comparator: "="
               expected: "200"
 
@@ -116,21 +116,23 @@ components:
           - selector: 'span[tracetest.span.type="http"]'
             results:
             - assertion:
-                attr: http.status_code
+                attribute: http.status_code
                 comparator: "="
                 expected: "200"
+              allPassed: true
               spanResults:
-                spanId: "123"
-                observedValue: "test"
-                passed: true
+                - spanId: "123"
+                  observedValue: "test"
+                  passed: true
             - assertion:
-                attr: http.status_code
+                attribute: http.status_code
                 comparator: "="
                 expected: "200"
+              allPassed: true
               spanResults:
-                spanId: "123"
-                observedValue: "test"
-                passed: true
+                - spanId: "123"
+                  observedValue: "test"
+                  passed: true
 
     AssertionResult:
       type: object
