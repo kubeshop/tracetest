@@ -12,12 +12,16 @@ package openapi
 
 import (
 	"encoding/json"
+	"time"
 )
 
 // Span struct for Span
 type Span struct {
-	Id   *string `json:"id,omitempty"`
-	Name *string `json:"name,omitempty"`
+	Id        *string    `json:"id,omitempty"`
+	ParentId  *string    `json:"parentId,omitempty"`
+	Name      *string    `json:"name,omitempty"`
+	StartTime *time.Time `json:"startTime,omitempty"`
+	EndTime   *time.Time `json:"endTime,omitempty"`
 	// Key-Value of span attributes
 	Attributes *map[string]string `json:"attributes,omitempty"`
 	Children   []Span             `json:"children,omitempty"`
@@ -72,6 +76,38 @@ func (o *Span) SetId(v string) {
 	o.Id = &v
 }
 
+// GetParentId returns the ParentId field value if set, zero value otherwise.
+func (o *Span) GetParentId() string {
+	if o == nil || o.ParentId == nil {
+		var ret string
+		return ret
+	}
+	return *o.ParentId
+}
+
+// GetParentIdOk returns a tuple with the ParentId field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Span) GetParentIdOk() (*string, bool) {
+	if o == nil || o.ParentId == nil {
+		return nil, false
+	}
+	return o.ParentId, true
+}
+
+// HasParentId returns a boolean if a field has been set.
+func (o *Span) HasParentId() bool {
+	if o != nil && o.ParentId != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetParentId gets a reference to the given string and assigns it to the ParentId field.
+func (o *Span) SetParentId(v string) {
+	o.ParentId = &v
+}
+
 // GetName returns the Name field value if set, zero value otherwise.
 func (o *Span) GetName() string {
 	if o == nil || o.Name == nil {
@@ -102,6 +138,70 @@ func (o *Span) HasName() bool {
 // SetName gets a reference to the given string and assigns it to the Name field.
 func (o *Span) SetName(v string) {
 	o.Name = &v
+}
+
+// GetStartTime returns the StartTime field value if set, zero value otherwise.
+func (o *Span) GetStartTime() time.Time {
+	if o == nil || o.StartTime == nil {
+		var ret time.Time
+		return ret
+	}
+	return *o.StartTime
+}
+
+// GetStartTimeOk returns a tuple with the StartTime field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Span) GetStartTimeOk() (*time.Time, bool) {
+	if o == nil || o.StartTime == nil {
+		return nil, false
+	}
+	return o.StartTime, true
+}
+
+// HasStartTime returns a boolean if a field has been set.
+func (o *Span) HasStartTime() bool {
+	if o != nil && o.StartTime != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetStartTime gets a reference to the given time.Time and assigns it to the StartTime field.
+func (o *Span) SetStartTime(v time.Time) {
+	o.StartTime = &v
+}
+
+// GetEndTime returns the EndTime field value if set, zero value otherwise.
+func (o *Span) GetEndTime() time.Time {
+	if o == nil || o.EndTime == nil {
+		var ret time.Time
+		return ret
+	}
+	return *o.EndTime
+}
+
+// GetEndTimeOk returns a tuple with the EndTime field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Span) GetEndTimeOk() (*time.Time, bool) {
+	if o == nil || o.EndTime == nil {
+		return nil, false
+	}
+	return o.EndTime, true
+}
+
+// HasEndTime returns a boolean if a field has been set.
+func (o *Span) HasEndTime() bool {
+	if o != nil && o.EndTime != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetEndTime gets a reference to the given time.Time and assigns it to the EndTime field.
+func (o *Span) SetEndTime(v time.Time) {
+	o.EndTime = &v
 }
 
 // GetAttributes returns the Attributes field value if set, zero value otherwise.
@@ -173,8 +273,17 @@ func (o Span) MarshalJSON() ([]byte, error) {
 	if o.Id != nil {
 		toSerialize["id"] = o.Id
 	}
+	if o.ParentId != nil {
+		toSerialize["parentId"] = o.ParentId
+	}
 	if o.Name != nil {
 		toSerialize["name"] = o.Name
+	}
+	if o.StartTime != nil {
+		toSerialize["startTime"] = o.StartTime
+	}
+	if o.EndTime != nil {
+		toSerialize["endTime"] = o.EndTime
 	}
 	if o.Attributes != nil {
 		toSerialize["attributes"] = o.Attributes

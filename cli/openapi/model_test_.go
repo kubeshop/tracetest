@@ -16,9 +16,11 @@ import (
 
 // Test struct for Test
 type Test struct {
-	Id               *string               `json:"id,omitempty"`
-	Name             *string               `json:"name,omitempty"`
-	Description      *string               `json:"description,omitempty"`
+	Id          *string `json:"id,omitempty"`
+	Name        *string `json:"name,omitempty"`
+	Description *string `json:"description,omitempty"`
+	// version number of the test
+	Version          *string               `json:"version,omitempty"`
 	ServiceUnderTest *TestServiceUnderTest `json:"serviceUnderTest,omitempty"`
 	Definition       *TestDefinition       `json:"definition,omitempty"`
 	ReferenceTestRun *TestRun              `json:"referenceTestRun,omitempty"`
@@ -137,6 +139,38 @@ func (o *Test) SetDescription(v string) {
 	o.Description = &v
 }
 
+// GetVersion returns the Version field value if set, zero value otherwise.
+func (o *Test) GetVersion() string {
+	if o == nil || o.Version == nil {
+		var ret string
+		return ret
+	}
+	return *o.Version
+}
+
+// GetVersionOk returns a tuple with the Version field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Test) GetVersionOk() (*string, bool) {
+	if o == nil || o.Version == nil {
+		return nil, false
+	}
+	return o.Version, true
+}
+
+// HasVersion returns a boolean if a field has been set.
+func (o *Test) HasVersion() bool {
+	if o != nil && o.Version != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetVersion gets a reference to the given string and assigns it to the Version field.
+func (o *Test) SetVersion(v string) {
+	o.Version = &v
+}
+
 // GetServiceUnderTest returns the ServiceUnderTest field value if set, zero value otherwise.
 func (o *Test) GetServiceUnderTest() TestServiceUnderTest {
 	if o == nil || o.ServiceUnderTest == nil {
@@ -243,6 +277,9 @@ func (o Test) MarshalJSON() ([]byte, error) {
 	}
 	if o.Description != nil {
 		toSerialize["description"] = o.Description
+	}
+	if o.Version != nil {
+		toSerialize["version"] = o.Version
 	}
 	if o.ServiceUnderTest != nil {
 		toSerialize["serviceUnderTest"] = o.ServiceUnderTest

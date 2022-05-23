@@ -12,6 +12,9 @@ components:
           type: string
         description:
           type: string
+        version:
+          type: string
+          description: version number of the test
         serviceUnderTest:
           type: object
           properties:
@@ -71,6 +74,9 @@ components:
         spanId:
           type: string
           readOnly: true
+        testVersion:
+          type: string
+          description: Test version used when running this test run
         state:
           type: string
           enum: [CREATED, EXECUTING, AWAITING_TRACE, AWAITING_TEST_RESULTS, FINISHED, FAILED]

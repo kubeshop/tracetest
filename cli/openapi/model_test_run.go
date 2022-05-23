@@ -20,6 +20,8 @@ type TestRun struct {
 	Id      *string `json:"id,omitempty"`
 	TraceId *string `json:"traceId,omitempty"`
 	SpanId  *string `json:"spanId,omitempty"`
+	// Test version used when running this test run
+	TestVersion *string `json:"testVersion,omitempty"`
 	// Current execution state
 	State *string `json:"state,omitempty"`
 	// Details of the cause for the last `FAILED` state
@@ -143,6 +145,38 @@ func (o *TestRun) HasSpanId() bool {
 // SetSpanId gets a reference to the given string and assigns it to the SpanId field.
 func (o *TestRun) SetSpanId(v string) {
 	o.SpanId = &v
+}
+
+// GetTestVersion returns the TestVersion field value if set, zero value otherwise.
+func (o *TestRun) GetTestVersion() string {
+	if o == nil || o.TestVersion == nil {
+		var ret string
+		return ret
+	}
+	return *o.TestVersion
+}
+
+// GetTestVersionOk returns a tuple with the TestVersion field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *TestRun) GetTestVersionOk() (*string, bool) {
+	if o == nil || o.TestVersion == nil {
+		return nil, false
+	}
+	return o.TestVersion, true
+}
+
+// HasTestVersion returns a boolean if a field has been set.
+func (o *TestRun) HasTestVersion() bool {
+	if o != nil && o.TestVersion != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetTestVersion gets a reference to the given string and assigns it to the TestVersion field.
+func (o *TestRun) SetTestVersion(v string) {
+	o.TestVersion = &v
 }
 
 // GetState returns the State field value if set, zero value otherwise.
@@ -411,6 +445,9 @@ func (o TestRun) MarshalJSON() ([]byte, error) {
 	}
 	if o.SpanId != nil {
 		toSerialize["spanId"] = o.SpanId
+	}
+	if o.TestVersion != nil {
+		toSerialize["testVersion"] = o.TestVersion
 	}
 	if o.State != nil {
 		toSerialize["state"] = o.State
