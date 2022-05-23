@@ -46,12 +46,14 @@
     "test:unit": "craco test --watchAll=false --coverage",
     "test:integration": "npm run cy:run",
     "lint": "npm run eslint && npm run types",
+    "types:generate": "openapi-typescript ../api/openapi.yaml --output ./src/types/Generated.types.ts",
     "types": "tsc",
     "eslint": "eslint ./src/**/*.{ts,tsx}",
     "test": "npm run test:unit",
     "eject": "react-scripts eject",
     "cy:open": "cypress open",
     "cy:run": "cypress run",
+    "prettier": "prettier --write ./src",
     "storybook": "start-storybook -p 6006 -s public",
     "build-storybook": "build-storybook -s public"
   },
@@ -126,6 +128,7 @@
     "eslint-plugin-react-hooks": "4.3.0",
     "eslint-plugin-unused-imports": "2.0.0",
     "jest-fetch-mock": "3.0.3",
+    "openapi-typescript": "5.3.0",
     "prettier": "2.5.1",
     "webpack": "5.72.0"
   },

@@ -1,3 +1,5 @@
+import {external} from './Generated.types';
+
 export type TRecursivePartial<T> = {
   [P in keyof T]?: TRecursivePartial<T[P]>;
 };
@@ -15,3 +17,9 @@ export interface IMockFactory<T, R> {
     model(data?: Partial<R>): T;
   };
 }
+
+export type THttpSchemas = external['http.yaml']['components']['schemas'];
+export type TTraceSchemas = external['trace.yaml']['components']['schemas'];
+export type TTestSchemas = external['tests.yaml']['components']['schemas'];
+
+export type Model<T, R> = Modify<Required<T>, R>;

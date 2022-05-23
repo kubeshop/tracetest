@@ -3,7 +3,7 @@ import {Button, Typography} from 'antd';
 import styled from 'styled-components';
 
 export const TestCard = styled.div<{isCollapsed: boolean}>`
-  box-shadow: 0px 4px 8px rgba(153, 155, 168, 0.1);
+  box-shadow: 0 4px 8px rgba(153, 155, 168, 0.1);
   background: #fff;
   border-left: ${({isCollapsed}) => isCollapsed && `2px solid #61175E`};
   border-radius: 2px;
@@ -18,7 +18,7 @@ export const InfoContainer = styled.div`
 `;
 
 export const ResultListContainer = styled.div`
-  margin: 0px 68px 54px 54px;
+  margin: 0 68px 54px 54px;
 `;
 
 export const TextContainer = styled.div`
@@ -52,7 +52,7 @@ export const TestDetails = styled.div`
 export const TestDetailsLink = styled(Button).attrs({
   type: 'link',
 })`
-  color: #61175E;
+  color: #61175e;
   font-weight: 600;
-  padding: 0px;
+  padding: 0;
 `;

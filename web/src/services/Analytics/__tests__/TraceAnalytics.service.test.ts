@@ -18,7 +18,11 @@ describe('TraceAnalyticsService', () => {
   it('should trigger the onAddAssertionButtonClick event', () => {
     TraceAnalyticsService.onAddAssertionButtonClick();
 
-    expect(AnalyticsService.event).toHaveBeenCalledWith(Categories.Trace, Actions.AddAssertionButtonClick, Labels.Button);
+    expect(AnalyticsService.event).toHaveBeenCalledWith(
+      Categories.Trace,
+      Actions.AddAssertionButtonClick,
+      Labels.Button
+    );
   });
 
   it('should trigger the onTimelineSpanClick event', () => {

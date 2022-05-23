@@ -1,4 +1,4 @@
-import { Categories } from '../../constants/Analytics.constants';
+import {Categories} from '../../constants/Analytics.constants';
 import AnalyticsService from './Analytics.service';
 
 export enum Actions {

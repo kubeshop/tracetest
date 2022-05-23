@@ -1,4 +1,4 @@
-import styled, { css } from 'styled-components';
+import styled, {css} from 'styled-components';
 
 export const Main = styled.main<{height: string}>`
   display: flex;
@@ -19,7 +19,7 @@ export const DetailsSection = styled.div`
   flex-basis: 50%;
   overflow-y: scroll;
   background: #fff;
-  box-shadow: 0px 20px 24px rgba(153, 155, 168, 0.18);
+  box-shadow: 0 20px 24px rgba(153, 155, 168, 0.18);
 `;
 
 export const Header = styled.div<{visiblePortion: number}>`

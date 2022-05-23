@@ -1,6 +1,7 @@
 import {render, waitFor} from '@testing-library/react';
 import {ReactFlowProvider} from 'react-flow-renderer';
-import {TestingModels} from '../../../utils/TestingModels';
+import SpanMock from '../../../models/__mocks__/Span.mock';
+import TraceMock from '../../../models/__mocks__/Trace.mock';
 import Diagram, {SupportedDiagrams} from '../Diagram';
 
 jest.mock('../../../services/Analytics/Analytics.service', () => {
@@ -15,9 +16,9 @@ test('Diagram DAG', async () => {
       <ReactFlowProvider>
         <Diagram
           type={SupportedDiagrams.DAG}
-          trace={TestingModels.trace}
+          trace={TraceMock.model()}
           onSelectSpan={jest.fn()}
-          selectedSpan={TestingModels.span}
+          selectedSpan={SpanMock.model()}
         />
       </ReactFlowProvider>
     </div>
@@ -31,9 +32,9 @@ test('Diagram Timeline', async () => {
       <ReactFlowProvider>
         <Diagram
           type={SupportedDiagrams.Timeline}
-          trace={TestingModels.trace}
+          trace={TraceMock.model()}
           onSelectSpan={jest.fn()}
-          selectedSpan={TestingModels.span}
+          selectedSpan={SpanMock.model()}
         />
       </ReactFlowProvider>
     </div>

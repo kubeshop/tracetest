@@ -6,16 +6,16 @@ import {useMemo} from 'react';
 import {CompareOperator} from '../../constants/Operator.constants';
 import CreateAssertionModalAnalyticsService from '../../services/Analytics/CreateAssertionModalAnalytics.service';
 import OperatorService from '../../services/Operator.service';
-import {IAssertionSpan} from '../../types/Assertion.types';
-import {ISpanFlatAttribute} from '../../types/Span.types';
+import {TAssertion} from '../../types/Assertion.types';
+import {TSpanFlatAttribute} from '../../types/Span.types';
 import * as S from './AssertionForm.styled';
 
 interface IProps {
   fields: FormListFieldData[];
-  assertionList: IAssertionSpan[];
+  assertionList: TAssertion[];
   add(): void;
   remove(name: number): void;
-  attributeList: ISpanFlatAttribute[];
+  attributeList: TSpanFlatAttribute[];
 }
 
 const operatorList = Object.values(CompareOperator).map(value => ({
@@ -23,7 +23,8 @@ const operatorList = Object.values(CompareOperator).map(value => ({
   label: capitalize(OperatorService.getOperatorName(value)),
 }));
 
-const getIsValid = ({key, compareOp, value}: IAssertionSpan): boolean => Boolean(key && compareOp && value);
+const getIsValid = ({attribute, comparator, expected}: TAssertion): boolean =>
+  Boolean(attribute && comparator && expected);
 
 const AssertionFormCheckList: React.FC<IProps> = ({fields, add, remove, attributeList, assertionList}) => {
   const attributeOptionList = useMemo(
@@ -42,7 +43,7 @@ const AssertionFormCheckList: React.FC<IProps> = ({fields, add, remove, attribut
         <S.Check key={key}>
           <Form.Item
             {...field}
-            name={[name, 'key']}
+            name={[name, 'attribute']}
             style={{margin: 0}}
             rules={[{required: true, message: 'Attribute is required'}]}
             data-cy="assertion-check-attribute"
@@ -55,7 +56,7 @@ const AssertionFormCheckList: React.FC<IProps> = ({fields, add, remove, attribut
           <Form.Item
             {...field}
             style={{margin: 0}}
-            name={[name, 'compareOp']}
+            name={[name, 'comparator']}
             rules={[{required: true, message: 'Operator is required'}]}
             data-cy="assertion-check-operator"
           >
@@ -69,7 +70,7 @@ const AssertionFormCheckList: React.FC<IProps> = ({fields, add, remove, attribut
           </Form.Item>
           <Form.Item
             {...field}
-            name={[name, 'value']}
+            name={[name, 'expected']}
             style={{margin: 0}}
             rules={[{required: true, message: 'Value is required'}]}
             data-cy="assertion-check-value"

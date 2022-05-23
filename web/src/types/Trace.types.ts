@@ -1,11 +1,9 @@
-import {IResourceSpan, ISpan} from './Span.types';
+import {TTraceSchemas} from './Common.types';
+import {TSpan} from './Span.types';
 
-export type IRawTrace = {
-  resourceSpans?: Array<IResourceSpan>;
-  description?: string;
-};
+export type TRawTrace = TTraceSchemas['Trace'];
 
-export type ITrace = {
-  spans: ISpan[];
-  description: string;
+export type TTrace = {
+  spans: TSpan[];
+  traceId: string;
 };

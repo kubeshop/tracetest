@@ -6,20 +6,20 @@ describe('Trace', () => {
     const rawTrace = TraceMock.raw();
     const trace = Trace(rawTrace);
 
-    expect(trace.description).toEqual(rawTrace.description);
-    const length = rawTrace.resourceSpans![0].instrumentationLibrarySpans[0].spans.length;
+    expect(trace.traceId).toEqual(rawTrace.traceId);
+    const length = Object.keys(rawTrace.flat!).length;
 
     expect(trace.spans).toHaveLength(length);
   });
 
   it('should handle empty values', () => {
     const rawTrace = TraceMock.raw({
-      description: undefined,
-      resourceSpans: undefined,
+      traceId: undefined,
+      flat: undefined,
     });
     const trace = Trace(rawTrace);
 
-    expect(trace.description).toEqual('');
+    expect(trace.traceId).toEqual('');
     expect(trace.spans).toHaveLength(0);
   });
 });

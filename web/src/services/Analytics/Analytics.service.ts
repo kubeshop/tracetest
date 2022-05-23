@@ -1,5 +1,5 @@
 import GA4React from 'ga-4-react';
-import { Categories } from '../../constants/Analytics.constants';
+import {Categories} from '../../constants/Analytics.constants';
 
 const {analyticsEnabled = 'true', measurementId = ''} = window.ENV || {};
 

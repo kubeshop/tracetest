@@ -1,15 +1,15 @@
 import {differenceBy, intersectionBy} from 'lodash';
 import {SELECTOR_DEFAULT_ATTRIBUTES, SemanticGroupNameNodeMap} from '../constants/SemanticGroupNames.constants';
-import {ISpan, ISpanFlatAttribute} from '../types/Span.types';
+import {TSpan, TSpanFlatAttribute} from '../types/Span.types';
 
 const itemSelectorKeys = SELECTOR_DEFAULT_ATTRIBUTES.flatMap(el => el.attributes);
 
 const SpanService = () => ({
-  getSpanNodeInfo(span: ISpan) {
+  getSpanNodeInfo(span: TSpan) {
     const signatureObject = span.signature.reduce<Record<string, string>>(
-      (signature, {propertyName, value}) => ({
+      (signature, {key, value}) => ({
         ...signature,
-        [propertyName]: value,
+        [key]: value,
       }),
       {}
     );
@@ -23,10 +23,10 @@ const SpanService = () => ({
       heading: signatureObject[type] || '',
     };
   },
-  getSelectedSpanListAttributes({attributeList}: ISpan, selectedSpanList: ISpan[]) {
+  getSelectedSpanListAttributes({attributeList}: TSpan, selectedSpanList: TSpan[]) {
     const intersectedAttributeList = intersectionBy(...selectedSpanList.map(el => el.attributeList), 'key');
 
-    const selectedSpanAttributeList = attributeList?.reduce<ISpanFlatAttribute[]>((acc, item) => {
+    const selectedSpanAttributeList = attributeList?.reduce<TSpanFlatAttribute[]>((acc, item) => {
       if (itemSelectorKeys.includes(item.key)) return acc;
 
       return acc.concat([item]);

@@ -12,15 +12,15 @@ import {Steps} from '../GuidedTour/assertionStepList';
 import * as S from './AssertionForm.styled';
 import AssertionSelectors from '../../selectors/Assertion.selectors';
 import AssertionFormSelectorInput from './AssertionFormSelectorInput';
-import {IAssertionSpan, IItemSelector} from '../../types/Assertion.types';
+import {TAssertion, TSpanSelector} from '../../types/Assertion.types';
 import AssertionFormPseudoSelectorInput from './AssertionFormPseudoSelectorInput';
 import AssertionFormCheckList from './AssertionFormCheckList';
 
 const {onChecksChange, onSelectorChange} = CreateAssertionModalAnalyticsService;
 
 export interface IValues {
-  assertionList: IAssertionSpan[];
-  selectorList: IItemSelector[];
+  assertionList: TAssertion[];
+  selectorList: TSpanSelector[];
   pseudoSelector?: {
     selector: PseudoSelector;
     number?: number;
@@ -31,7 +31,7 @@ interface TAssertionFormProps {
   defaultValues?: IValues;
   onSubmit(values: IValues): void;
   testId: string;
-  resultId: string;
+  runId: string;
   isEditing?: boolean;
   onCancel(): void;
 }
@@ -51,7 +51,7 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
   onCancel,
   isEditing = false,
   testId,
-  resultId,
+  runId,
 }) => {
   const [form] = Form.useForm<IValues>();
 
@@ -59,7 +59,7 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
 
   const currentSelectorList = Form.useWatch('selectorList', form) || [];
   const currentAssertionList = Form.useWatch('assertionList', form) || [];
-  const attributeList = useSelector(AssertionSelectors.selectAttributeList(testId, resultId, currentSelectorList));
+  const attributeList = useSelector(AssertionSelectors.selectAttributeList(testId, runId, currentSelectorList));
 
   const onFieldsChange = useCallback(
     (changedFields: FieldData[]) => {
@@ -71,15 +71,15 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
       if (fieldName === 'assertionList') onChecksChange(JSON.stringify(form.getFieldValue('assertionList') || []));
 
       if (fieldName === 'assertionList' && keyName === 'key' && field.value) {
-        const list: IAssertionSpan[] = form.getFieldValue('assertionList') || [];
+        const list: TAssertion[] = form.getFieldValue('assertionList') || [];
 
         form.setFieldsValue({
           assertionList: list.map((assertionEntry, index) => {
             if (index === entry) {
-              const {value = '', type = ''} = attributeList?.find((el: any) => el.key === list[index].key) || {};
+              const {value = ''} = attributeList?.find((el: any) => el.key === list[index].attribute) || {};
               const isValid = typeof value === 'number' || !isEmpty(value);
 
-              return {...assertionEntry, value: isValid ? String(value) : '', type};
+              return {...assertionEntry, expected: isValid ? String(value) : ''};
             }
 
             return assertionEntry;

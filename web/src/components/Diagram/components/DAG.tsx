@@ -5,12 +5,12 @@ import TraceNode from '../../TraceNode';
 import * as S from './DAG.styled';
 import TraceDiagramAnalyticsService from '../../../services/Analytics/TraceDiagramAnalytics.service';
 import {IDiagramProps} from '../Diagram';
-import {ISpan} from '../../../types/Span.types';
+import {TSpan} from '../../../types/Span.types';
 
 export type TSpanInfo = {
   id: string;
   parentIds: string[];
-  data: ISpan;
+  data: TSpan;
 };
 
 export type TSpanMap = Record<string, TSpanInfo>;
@@ -21,8 +21,8 @@ const Diagram: React.FC<IDiagramProps> = ({trace, selectedSpan, onSelectSpan}): 
   const spanMap = useMemo<TSpanMap>(() => {
     return (
       trace?.spans?.reduce<TSpanMap>((acc, span) => {
-        acc[span.spanId] = acc[span.spanId] || {id: span.spanId, parentIds: [], data: span};
-        if (span.parentSpanId) acc[span.spanId].parentIds.push(span.parentSpanId);
+        acc[span.id] = acc[span.id] || {id: span.id, parentIds: [], data: span};
+        if (span.parentId) acc[span.id].parentIds.push(span.parentId);
 
         return acc;
       }, {}) || {}
@@ -58,9 +58,9 @@ const Diagram: React.FC<IDiagramProps> = ({trace, selectedSpan, onSelectSpan}): 
           type: 'TraceNode',
           data: span,
           position: {x, y: parseFloat(String(y))},
-          selected: data.id === selectedSpan?.spanId,
+          selected: data.id === selectedSpan?.id,
           sourcePosition: 'top',
-          className: `${data.id === selectedSpan?.spanId ? 'selected' : ''}`,
+          className: `${data.id === selectedSpan?.id ? 'selected' : ''}`,
         };
       });
 
@@ -73,7 +73,7 @@ const Diagram: React.FC<IDiagramProps> = ({trace, selectedSpan, onSelectSpan}): 
           labelShowBg: false,
           animated: false,
           arrowHeadType: 'arrowclosed',
-          style: { stroke: '#C9CEDB' },
+          style: {stroke: '#C9CEDB'},
         } as any);
       });
 
@@ -81,7 +81,7 @@ const Diagram: React.FC<IDiagramProps> = ({trace, selectedSpan, onSelectSpan}): 
     }
 
     return [];
-  }, [dagLayout, spanMap, selectedSpan?.spanId]);
+  }, [dagLayout, spanMap, selectedSpan?.id]);
 
   return (
     <S.Container data-cy="diagram-dag">

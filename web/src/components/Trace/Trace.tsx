@@ -1,8 +1,8 @@
 import {useState} from 'react';
 import {useStoreActions} from 'react-flow-renderer';
-import {ISpan} from 'types/Span.types';
-import {ITestRunResult} from 'types/TestRunResult.types';
-import {ITest} from 'types/Test.types';
+import {TSpan} from 'types/Span.types';
+import {TTestRun} from 'types/TestRun.types';
+import {TTest} from 'types/Test.types';
 import Diagram, {SupportedDiagrams} from 'components/Diagram/Diagram';
 import SpanDetail from 'components/SpanDetail';
 import {useHandleOnSpanSelectedCallback} from './hooks/useHandleOnSpanSelectedCallback';
@@ -13,17 +13,17 @@ import TraceDrawer from '../TraceDrawer';
 interface IProps {
   displayError: boolean;
   minHeight: string;
-  testResultDetails: ITestRunResult | undefined;
-  test?: ITest;
+  run: TTestRun;
+  test?: TTest;
   visiblePortion: number;
 }
 
-const Trace = ({displayError, visiblePortion, minHeight, test, testResultDetails}: IProps): JSX.Element | null => {
-  const [selectedSpan, setSelectedSpan] = useState<ISpan | undefined>();
+const Trace = ({displayError, visiblePortion, minHeight, test, run}: IProps): JSX.Element | null => {
+  const [selectedSpan, setSelectedSpan] = useState<TSpan | undefined>();
   const [diagramType, setDiagramType] = useState<SupportedDiagrams>(SupportedDiagrams.DAG);
 
   const addSelected = useStoreActions(actions => actions.addSelectedElements);
-  const onSelectSpan = useHandleOnSpanSelectedCallback(addSelected, testResultDetails, setSelectedSpan);
+  const onSelectSpan = useHandleOnSpanSelectedCallback(addSelected, run, setSelectedSpan);
 
   return !displayError ? (
     <>
@@ -34,18 +34,13 @@ const Trace = ({displayError, visiblePortion, minHeight, test, testResultDetails
             onSearch={() => console.log('onSearch')}
             selectedType={diagramType}
           />
-          <Diagram
-            type={diagramType}
-            trace={testResultDetails?.trace!}
-            onSelectSpan={onSelectSpan}
-            selectedSpan={selectedSpan}
-          />
+          <Diagram type={diagramType} trace={run.trace!} onSelectSpan={onSelectSpan} selectedSpan={selectedSpan} />
         </S.DiagramSection>
         <S.DetailsSection>
-          <SpanDetail resultId={testResultDetails?.resultId} testId={test?.testId} span={selectedSpan} />
+          <SpanDetail resultId={run.id} testId={test?.id} span={selectedSpan} />
         </S.DetailsSection>
       </S.Main>
-      <TraceDrawer visiblePortion={visiblePortion} result={testResultDetails!} onSelectSpan={onSelectSpan} />
+      <TraceDrawer visiblePortion={visiblePortion} testId={test?.id!} run={run} onSelectSpan={onSelectSpan} />
     </>
   ) : null;
 };

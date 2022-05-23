@@ -12,10 +12,6 @@ describe('TraceDiagramAnalyticsService', () => {
   it('should trigger the onClickSpan event', () => {
     TraceDiagramAnalyticsService.onClickSpan('spanId');
 
-    expect(AnalyticsService.event).toHaveBeenCalledWith(
-      Categories.Trace,
-      Actions.ClickSpan,
-      'spanId'
-    );
+    expect(AnalyticsService.event).toHaveBeenCalledWith(Categories.Trace, Actions.ClickSpan, 'spanId');
   });
 });

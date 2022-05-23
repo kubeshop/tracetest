@@ -1,16 +1,15 @@
 import {noop, uniqBy} from 'lodash';
 import React, {useCallback, useMemo, useState} from 'react';
 import {CompareOperator} from '../../constants/Operator.constants';
-import {LOCATION_NAME} from '../../constants/Span.constants';
-import {IItemSelector} from '../../types/Assertion.types';
-import {ISpanFlatAttribute} from '../../types/Span.types';
+import {TSpanSelector} from '../../types/Assertion.types';
+import {TSpanFlatAttribute} from '../../types/Span.types';
 import MultiSelectInput, {SEPARATOR} from '../MultiSelectInput/MultiSelectInput';
 import * as S from './AssertionForm.styled';
 
 type TItemSelectorDropdownProps = {
-  attributeList: ISpanFlatAttribute[];
-  value?: IItemSelector[];
-  onChange?(selectorList: IItemSelector[]): void;
+  attributeList: TSpanFlatAttribute[];
+  value?: TSpanSelector[];
+  onChange?(selectorList: TSpanSelector[]): void;
 };
 
 const operatorOptionList = [
@@ -64,12 +63,10 @@ const AssertionFormSelectorInput: React.FC<TItemSelectorDropdownProps> = ({
     (entry: string[]) => {
       const [attribute, operator, value] = entry;
 
-      const selector: IItemSelector = {
-        propertyName: attribute,
+      const selector: TSpanSelector = {
+        key: attribute,
         value,
         operator: operator as CompareOperator,
-        valueType: 'stringValue',
-        locationName: LOCATION_NAME.SPAN_ATTRIBUTES,
       };
 
       onChange([...selectorList, selector]);
@@ -90,12 +87,12 @@ const AssertionFormSelectorInput: React.FC<TItemSelectorDropdownProps> = ({
 
   const defaultValueList = useMemo(
     () =>
-      selectorList.flatMap(({propertyName, operator = CompareOperator.EQUALS, value}, index) => {
+      selectorList.flatMap(({key, operator = CompareOperator.EQUALS, value}, index) => {
         return [
           {
-            key: `${index}-${propertyName}`,
-            label: propertyName,
-            value: `${propertyName}${SEPARATOR}0${SEPARATOR}${index}`,
+            key: `${index}-${key}`,
+            label: key,
+            value: `${key}${SEPARATOR}0${SEPARATOR}${index}`,
           },
           {
             key: `${index}-${operator}`,

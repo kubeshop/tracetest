@@ -21,7 +21,7 @@ export const CompareOperatorNameMap: Record<CompareOperator, TCompareOperatorNam
 };
 
 export const CompareOperatorSymbolMap: Record<CompareOperator, TCompareOperatorSymbol> = {
-  [CompareOperator.EQUALS]: '==',
+  [CompareOperator.EQUALS]: '=',
   [CompareOperator.LESSTHAN]: '<',
   [CompareOperator.GREATERTHAN]: '>',
   [CompareOperator.NOTEQUALS]: '!=',

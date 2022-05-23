@@ -1,6 +1,6 @@
 import {render} from '@testing-library/react';
 import {ReactFlowProvider} from 'react-flow-renderer';
-import {TestingModels} from '../../../utils/TestingModels';
+import SpanMock from '../../../models/__mocks__/Span.mock';
 import TraceNode from '../TraceNode';
 
 test('TraceNode', () => {
@@ -9,7 +9,7 @@ test('TraceNode', () => {
       <TraceNode
         id="sdfkjn"
         type="ksdjfn"
-        data={TestingModels.span}
+        data={SpanMock.model()}
         dragHandle="sdkjf"
         isDragging={false}
         selected={false}

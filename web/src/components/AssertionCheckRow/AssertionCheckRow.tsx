@@ -1,14 +1,13 @@
-import {difference} from 'lodash';
 import {useMemo} from 'react';
-import OperatorService from '../../services/Operator.service';
-import {ISpanAssertionResult} from '../../types/Assertion.types';
-import {ISpan} from '../../types/Span.types';
-import AttributeValue from '../AttributeValue';
+import {difference} from 'lodash';
+import {TAssertion, TAssertionSpanResult} from '../../types/Assertion.types';
 import * as S from './AssertionCheckRow.styled';
+import AttributeValue from '../AttributeValue';
+import {useTestRun} from '../../providers/TestRun/TestRun.provider';
 
-interface IAssertionCheckRowProps {
-  result: ISpanAssertionResult;
-  span: ISpan;
+interface TAssertionCheckRowProps {
+  result: TAssertionSpanResult;
+  assertion: TAssertion;
   assertionSelectorList: string[];
 
   getIsSelectedSpan(spanId: string): boolean;
@@ -16,25 +15,30 @@ interface IAssertionCheckRowProps {
   onSelectSpan(spanId: string): void;
 }
 
-const AssertionCheckRow: React.FC<IAssertionCheckRowProps> = ({
-  result: {propertyName, comparisonValue, operator, actualValue, hasPassed, spanId},
-  span: {signature, type},
+const AssertionCheckRow: React.FC<TAssertionCheckRowProps> = ({
+  result: {observedValue, passed, spanId},
+  assertion: {attribute, comparator, expected},
   assertionSelectorList,
   getIsSelectedSpan,
   onSelectSpan,
 }) => {
-  const signatureSelectorList = signature.map(({value}) => value).concat([`#${spanId.slice(-4)}`]) || [];
+  const {
+    run: {trace},
+  } = useTestRun();
+  const span = useMemo(() => trace?.spans.find(({id}) => id === spanId), [spanId, trace?.spans]);
+
+  const signatureSelectorList = span?.signature.map(({value}) => value).concat([`#${spanId.slice(-4)}`]) || [];
   const spanLabelList = difference(signatureSelectorList, assertionSelectorList);
   const badgeList = useMemo(() => {
     const isSelected = getIsSelectedSpan(spanId);
 
-    return (isSelected ? [<S.SelectedLabelBadge spanType={type} count="selected" key="selected" />] : []).concat(
+    return (isSelected ? [<S.SelectedLabelBadge count="selected" key="selected" />] : []).concat(
       spanLabelList.map((label, index) => (
         // eslint-disable-next-line react/no-array-index-key
-        <S.LabelBadge spanType={!index ? type : undefined} count={label} key={`${label}-${index}`} />
+        <S.LabelBadge count={label} key={`${label}-${index}`} />
       ))
     );
-  }, [getIsSelectedSpan, spanId, spanLabelList, type]);
+  }, [getIsSelectedSpan, spanId, spanLabelList]);
 
   return (
     <S.AssertionCheckRow onClick={() => onSelectSpan(spanId)}>
@@ -44,19 +48,19 @@ const AssertionCheckRow: React.FC<IAssertionCheckRowProps> = ({
       </S.Entry>
       <S.Entry>
         <S.Label>Attribute</S.Label>
-        <S.Value>{propertyName}</S.Value>
+        <S.Value>{attribute}</S.Value>
       </S.Entry>
       <S.Entry>
         <S.Label>Assertion Type</S.Label>
-        <S.Value>{OperatorService.getOperatorName(operator)}</S.Value>
+        <S.Value>{comparator}</S.Value>
       </S.Entry>
       <S.Entry>
         <S.Label>Expected Value</S.Label>
-        <AttributeValue value={comparisonValue} />
+        <AttributeValue value={expected} />
       </S.Entry>
       <S.Entry>
         <S.Label>Actual Value</S.Label>
-        <AttributeValue strong type={hasPassed ? 'success' : 'danger'} value={actualValue || '<Empty Value>'} />
+        <AttributeValue strong type={passed ? 'success' : 'danger'} value={observedValue || '<Empty Value>'} />
       </S.Entry>
     </S.AssertionCheckRow>
   );

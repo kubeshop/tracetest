@@ -1,19 +1,14 @@
 import faker from '@faker-js/faker';
 import {IMockFactory} from '../../types/Common.types';
-import {IRawSpanAttribute, ISpanAttribute} from '../../types/SpanAttribute.types';
+import {TSpanFlatAttribute} from '../../types/Span.types';
+import {TSpanAttribute} from '../../types/SpanAttribute.types';
 import SpanAttribute from '../SpanAttribute.model';
 
-const SpanAttributeMock: IMockFactory<ISpanAttribute, IRawSpanAttribute> = () => ({
+const SpanAttributeMock: IMockFactory<TSpanAttribute, TSpanFlatAttribute> = () => ({
   raw(data = {}) {
     return {
-      key: `${faker.random.word()}.${faker.random.word()}`,
-      value: {
-        stringValue: faker.random.word(),
-        intValue: faker.datatype.number(),
-        booleanValue: faker.datatype.boolean(),
-        doubleValue: faker.datatype.number(),
-        kvlistValue: {values: []},
-      },
+      value: faker.random.word(),
+      key: faker.random.word(),
       ...data,
     };
   },

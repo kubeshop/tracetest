@@ -1,9 +1,9 @@
 import {useCallback} from 'react';
-import {ITest} from '../../types/Test.types';
-import {useDeleteTestByIdMutation} from '../../redux/apis/Test.api';
+import {TTest} from '../../types/Test.types';
+import {useDeleteTestByIdMutation} from '../../redux/apis/TraceTest.api';
 
-export function useMenuDeleteCallback(): (test: ITest) => void {
+export function useMenuDeleteCallback(): (test: TTest) => void {
   const [deleteTestMutation] = useDeleteTestByIdMutation();
 
-  return useCallback(({testId}: ITest) => deleteTestMutation(testId), [deleteTestMutation]);
+  return useCallback(({id: testId}: TTest) => deleteTestMutation({testId}), [deleteTestMutation]);
 }

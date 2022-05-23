@@ -1,72 +1,43 @@
 import {CompareOperator} from 'constants/Operator.constants';
-import {LOCATION_NAME} from 'constants/Span.constants';
-import {SpanAttributeType} from 'constants/SpanAttribute.constants';
-import {ISpan} from './Span.types';
+import {Model, TTestSchemas} from './Common.types';
+import {TSpanFlatAttribute} from './Span.types';
 
-export interface IAssertion {
-  assertionId: string;
-  selectors: Array<IItemSelector>;
-  spanAssertions: Array<ISpanSelector>;
-}
+export type TRawAssertion = TTestSchemas['Assertion'];
 
-export interface IItemSelector {
-  locationName: LOCATION_NAME;
-  propertyName: string;
-  operator?: CompareOperator;
-  value: string;
-  valueType: string;
-}
+export type TAssertion = Model<TRawAssertion, {}>;
 
-export interface ISpanSelector {
-  spanAssertionId?: string;
-  locationName: LOCATION_NAME;
-  propertyName: string;
-  valueType: SpanAttributeType;
-  operator: CompareOperator;
-  comparisonValue: string;
-}
+export type TSpanSelector = Model<
+  TSpanFlatAttribute,
+  {
+    operator: CompareOperator;
+  }
+>;
 
-export type TAssertionResultList = Array<{
-  assertionId: string;
-  spanAssertionResults: ISpanAssertionResult2[];
-}>;
+export type TRawAssertionResults = TTestSchemas['AssertionResults'];
 
-export interface ITestAssertionResult {
-  assertionResultState: boolean;
-  assertionResult: TAssertionResultList;
-}
+export type TAssertionResultEntry = {
+  id: string;
+  selector: string;
+  resultList: TAssertionResult[];
+};
 
-export interface SpanAssertionResult {
-  span: ISpan;
-  resultList: ISpanAssertionResult[];
-}
+export type TAssertionResults = Model<
+  TRawAssertionResults,
+  {
+    allPassed: boolean;
+    results?: never;
+    resultList: TAssertionResultEntry[];
+  }
+>;
 
-export interface IAssertionResult {
-  spanListAssertionResult: SpanAssertionResult[];
-  assertion: IAssertion;
-}
+export type TRawAssertionResult = TTestSchemas['AssertionResult'];
+export type TAssertionResult = Model<
+  TRawAssertionResult,
+  {
+    assertion: TAssertion;
+    spanResults: TAssertionSpanResult[];
+  }
+>;
 
-export interface ISpanAssertionResult extends ISpanSelector {
-  hasPassed: boolean;
-  actualValue: string;
-  spanId: string;
-}
-
-export interface ISpanAssertionResult2 {
-  spanAssertionId: string;
-  spanId: string;
-  passed: boolean;
-  observedValue: string;
-}
-
-export interface IAssertionResultList {
-  assertion: IAssertion;
-  assertionResultList: ISpanAssertionResult[];
-}
-
-export interface IAssertionSpan {
-  key: string;
-  compareOp: CompareOperator;
-  value: string;
-  type?: string;
-}
+export type TRawAssertionSpanResult = TTestSchemas['AssertionSpanResult'];
+export type TAssertionSpanResult = Model<TRawAssertionSpanResult, {}>;

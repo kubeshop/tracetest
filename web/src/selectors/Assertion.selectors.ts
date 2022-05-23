@@ -1,47 +1,26 @@
 import {createSelector} from '@reduxjs/toolkit';
 
-import {endpoints} from 'redux/apis/Test.api';
+import {endpoints} from 'redux/apis/TraceTest.api';
 import {RootState} from '../redux/store';
 import AssertionService from '../services/Assertion.service';
-import {IAssertion, IAssertionResultList, IItemSelector, ISpanAssertionResult} from '../types/Assertion.types';
+import {TSpanSelector} from '../types/Assertion.types';
 
 const stateSelector = (state: RootState) => state;
 
 const AssertionSelectors = () => ({
-  selectAssertionResultListBySpan(testId = '', resultId = '', spanId = '') {
-    return createSelector(stateSelector, (state): IAssertionResultList[] => {
-      const {data: test} = endpoints.getTestById.select(testId)(state);
-      const {data: result} = endpoints.getResultById.select({testId, resultId})(state);
-
-      if (!spanId || !result) return [];
-      const {trace} = result;
-
-      const span = trace?.spans.find(({spanId: id}) => id === spanId);
-
-      return (
-        test?.assertions?.reduce<Array<{assertion: IAssertion; assertionResultList: Array<ISpanAssertionResult>}>>(
-          (resultList, assertion) => {
-            const assertionResultList = AssertionService.runBySpan(span!, assertion);
-
-            return assertionResultList.length ? [...resultList, {assertion, assertionResultList}] : resultList;
-          },
-          []
-        ) || []
-      );
-    });
-  },
-  selectAffectedSpanList(testId: string, resultId: string, selectorList: IItemSelector[]) {
+  selectAffectedSpanList(testId: string, runId: string, selectorList: TSpanSelector[]) {
     return createSelector(stateSelector, state => {
-      const {data: result} = endpoints.getResultById.select({testId, resultId})(state);
+      const query = AssertionService.getSelectorString(selectorList);
+      const {data: selectedSpanIdList} = endpoints.getSelectedSpans.select({testId, runId, query})(state);
+      const {data: {trace} = {}} = endpoints.getRunById.select({testId, runId})(state);
 
-      if (!result) return [];
-      const {trace} = result;
+      if (!selectedSpanIdList) return [];
 
-      return AssertionService.getEffectedSpansCount(trace!, selectorList);
+      return trace?.spans.filter(({id}) => selectedSpanIdList.includes(id)) || [];
     });
   },
-  selectAttributeList(testId: string, resultId: string, selectorList: IItemSelector[]) {
-    return createSelector(this.selectAffectedSpanList(testId, resultId, selectorList), spanList =>
+  selectAttributeList(testId: string, runId: string, selectorList: TSpanSelector[]) {
+    return createSelector(this.selectAffectedSpanList(testId, runId, selectorList), spanList =>
       spanList.flatMap(span => span.attributeList)
     );
   },

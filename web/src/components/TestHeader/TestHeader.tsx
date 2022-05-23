@@ -1,22 +1,22 @@
-import {TestState as TestStateEnum} from '../../constants/TestRunResult.constants';
-import {ITest} from '../../types/Test.types';
+import {TTest} from '../../types/Test.types';
+import {TTestRunState} from '../../types/TestRun.types';
 import TestState from '../TestState';
 import * as S from './TestHeader.styled';
 
-interface ITestHeaderProps {
-  test: ITest;
+interface TTestHeaderProps {
+  test: TTest;
   onBack(): void;
-  testState?: TestStateEnum;
+  testState?: TTestRunState;
 }
 
-const TestHeader: React.FC<ITestHeaderProps> = ({test: {name, serviceUnderTest}, onBack, testState}) => {
+const TestHeader: React.FC<TTestHeaderProps> = ({test: {name, serviceUnderTest}, onBack, testState}) => {
   return (
     <S.TestHeader>
       <S.Content>
         <S.BackIcon data-cy="test-header-back-button" onClick={onBack} />
         <S.TestName data-cy="test-details-name">{name}</S.TestName>
         <S.TestUrl>
-          {serviceUnderTest.request.method.toUpperCase()} - {serviceUnderTest.request.url}
+          {serviceUnderTest?.request?.method?.toUpperCase()} - {serviceUnderTest?.request?.url}
         </S.TestUrl>
       </S.Content>
       {testState && (
