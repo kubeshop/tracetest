@@ -36,8 +36,13 @@ init-submodule:
 	git submodule update
 
 PROTOC_VER=0.3.1
-# temporarily using custom image to make it work on m1 macs
-PROTOC_IMAGE=schoren/protobuf:$(PROTOC_VER)
+UNAME_P := $(shell uname -p)
+ifeq ($(UNAME_P),x86_64)
+	PROTOC_IMAGE=jaegertracing/protobuf:$(PROTOC_VER)
+endif
+ifneq ($(filter arm%,$(UNAME_P)),)
+	PROTOC_IMAGE=schoren/protobuf:$(PROTOC_VER)
+endif
 PROTOC=docker run --rm -u ${shell id -u} -v "${PWD}:${PWD}" -w ${PWD} ${PROTOC_IMAGE} --proto_path=${PWD}
 
 
