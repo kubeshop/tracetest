@@ -4,43 +4,43 @@
  */
 
 export interface paths {
-  "/tests": {
+  '/tests': {
     /** get tests */
-    get: operations["getTests"];
+    get: operations['getTests'];
     /** Create new test action */
-    post: operations["createTest"];
+    post: operations['createTest'];
   };
-  "/tests/{testId}": {
+  '/tests/{testId}': {
     /** get test */
-    get: operations["getTest"];
+    get: operations['getTest'];
     /** update test action */
-    put: operations["updateTest"];
+    put: operations['updateTest'];
     /** delete a test */
-    delete: operations["deleteTest"];
+    delete: operations['deleteTest'];
   };
-  "/tests/{testId}/run": {
+  '/tests/{testId}/run': {
     /** get the runs from a particular test */
-    get: operations["getTestRuns"];
+    get: operations['getTestRuns'];
     /** run a particular test */
-    post: operations["runTest"];
+    post: operations['runTest'];
   };
-  "/tests/{testId}/run/{runId}/select": {
+  '/tests/{testId}/run/{runId}/select': {
     /** get the spans ids that would be selected by a specific selector query */
-    get: operations["getTestResultSelectedSpans"];
+    get: operations['getTestResultSelectedSpans'];
   };
-  "/tests/{testId}/run/{runId}/rerun": {
+  '/tests/{testId}/run/{runId}/rerun': {
     /** rerun a test run */
-    post: operations["rerunTestRun"];
+    post: operations['rerunTestRun'];
   };
-  "/tests/{testId}/run/{runId}": {
+  '/tests/{testId}/run/{runId}': {
     /** get a particular test Run */
-    get: operations["getTestRun"];
+    get: operations['getTestRun'];
   };
-  "/tests/{testId}/definition": {
+  '/tests/{testId}/definition': {
     /** Gets definition for a test */
-    get: operations["getTestDefinition"];
+    get: operations['getTestDefinition'];
     /** Set testDefinition for a particular test */
-    put: operations["setTestDefinition"];
+    put: operations['setTestDefinition'];
   };
 }
 
@@ -61,7 +61,7 @@ export interface operations {
       /** successful operation */
       200: {
         content: {
-          "application/json": external["tests.yaml"]["components"]["schemas"]["Test"][];
+          'application/json': external['tests.yaml']['components']['schemas']['Test'][];
         };
       };
       /** problem with getting tests */
@@ -74,7 +74,7 @@ export interface operations {
       /** successful operation */
       200: {
         content: {
-          "application/json": external["tests.yaml"]["components"]["schemas"]["Test"];
+          'application/json': external['tests.yaml']['components']['schemas']['Test'];
         };
       };
       /** problem with creating test */
@@ -82,7 +82,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": external["tests.yaml"]["components"]["schemas"]["Test"];
+        'application/json': external['tests.yaml']['components']['schemas']['Test'];
       };
     };
   };
@@ -97,7 +97,7 @@ export interface operations {
       /** successful operation */
       200: {
         content: {
-          "application/json": external["tests.yaml"]["components"]["schemas"]["Test"];
+          'application/json': external['tests.yaml']['components']['schemas']['Test'];
         };
       };
       /** problem with getting a test */
@@ -119,7 +119,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": external["tests.yaml"]["components"]["schemas"]["Test"];
+        'application/json': external['tests.yaml']['components']['schemas']['Test'];
       };
     };
   };
@@ -152,7 +152,7 @@ export interface operations {
       /** successful operation */
       200: {
         content: {
-          "application/json": external["tests.yaml"]["components"]["schemas"]["TestRun"][];
+          'application/json': external['tests.yaml']['components']['schemas']['TestRun'][];
         };
       };
     };
@@ -168,7 +168,7 @@ export interface operations {
       /** successful operation */
       200: {
         content: {
-          "application/json": external["tests.yaml"]["components"]["schemas"]["TestRun"];
+          'application/json': external['tests.yaml']['components']['schemas']['TestRun'];
         };
       };
     };
@@ -188,7 +188,7 @@ export interface operations {
       /** successful operation */
       200: {
         content: {
-          "application/json": string[];
+          'application/json': string[];
         };
       };
     };
@@ -205,7 +205,7 @@ export interface operations {
       /** successful operation */
       200: {
         content: {
-          "application/json": external["tests.yaml"]["components"]["schemas"]["TestRun"];
+          'application/json': external['tests.yaml']['components']['schemas']['TestRun'];
         };
       };
     };
@@ -222,7 +222,7 @@ export interface operations {
       /** successful operation */
       200: {
         content: {
-          "application/json": external["tests.yaml"]["components"]["schemas"]["TestRun"];
+          'application/json': external['tests.yaml']['components']['schemas']['TestRun'];
         };
       };
     };
@@ -238,7 +238,7 @@ export interface operations {
       /** successful operation */
       201: {
         content: {
-          "application/json": external["tests.yaml"]["components"]["schemas"]["TestDefinition"][];
+          'application/json': external['tests.yaml']['components']['schemas']['TestDefinition'][];
         };
       };
     };
@@ -256,14 +256,14 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": external["tests.yaml"]["components"]["schemas"]["TestDefinition"];
+        'application/json': external['tests.yaml']['components']['schemas']['TestDefinition'];
       };
     };
   };
 }
 
 export interface external {
-  "http.yaml": {
+  'http.yaml': {
     paths: {};
     components: {
       schemas: {
@@ -275,41 +275,41 @@ export interface external {
           url?: string;
           /** @enum {string} */
           method?:
-            | "GET"
-            | "PUT"
-            | "POST"
-            | "PATCH"
-            | "DELETE"
-            | "COPY"
-            | "HEAD"
-            | "OPTIONS"
-            | "LINK"
-            | "UNLINK"
-            | "PURGE"
-            | "LOCK"
-            | "UNLOCK"
-            | "PROPFIND"
-            | "VIEW";
-          headers?: external["http.yaml"]["components"]["schemas"]["HTTPHeader"][];
+            | 'GET'
+            | 'PUT'
+            | 'POST'
+            | 'PATCH'
+            | 'DELETE'
+            | 'COPY'
+            | 'HEAD'
+            | 'OPTIONS'
+            | 'LINK'
+            | 'UNLINK'
+            | 'PURGE'
+            | 'LOCK'
+            | 'UNLOCK'
+            | 'PROPFIND'
+            | 'VIEW';
+          headers?: external['http.yaml']['components']['schemas']['HTTPHeader'][];
           /** Format: byte */
           body?: string;
-          auth?: external["http.yaml"]["components"]["schemas"]["HTTPAuth"];
+          auth?: external['http.yaml']['components']['schemas']['HTTPAuth'];
         };
         HTTPResponse: {
           status?: string;
           statusCode?: number;
-          headers?: external["http.yaml"]["components"]["schemas"]["HTTPHeader"][];
+          headers?: external['http.yaml']['components']['schemas']['HTTPHeader'][];
           /** Format: byte */
           body?: string;
         };
         HTTPAuth: {
           /** @enum {string} */
-          type?: "apiKey" | "basic" | "bearer";
+          type?: 'apiKey' | 'basic' | 'bearer';
           apiKey?: {
             key?: string;
             value?: string;
             /** @enum {string} */
-            in?: "query" | "header";
+            in?: 'query' | 'header';
           };
           basic?: {
             username?: string;
@@ -323,7 +323,7 @@ export interface external {
     };
     operations: {};
   };
-  "tests.yaml": {
+  'tests.yaml': {
     paths: {};
     components: {
       schemas: {
@@ -333,17 +333,17 @@ export interface external {
           name?: string;
           description?: string;
           serviceUnderTest?: {
-            request?: external["http.yaml"]["components"]["schemas"]["HTTPRequest"];
+            request?: external['http.yaml']['components']['schemas']['HTTPRequest'];
           };
           /** @description Definition of assertions that are going to be made */
-          definition?: external["tests.yaml"]["components"]["schemas"]["TestDefinition"];
-          referenceTestRun?: external["tests.yaml"]["components"]["schemas"]["TestRun"];
+          definition?: external['tests.yaml']['components']['schemas']['TestDefinition'];
+          referenceTestRun?: external['tests.yaml']['components']['schemas']['TestRun'];
         };
         /** @example [object Object] */
         TestDefinition: {
           definitions?: {
             selector?: string;
-            assertions?: external["tests.yaml"]["components"]["schemas"]["Assertion"][];
+            assertions?: external['tests.yaml']['components']['schemas']['Assertion'][];
           }[];
         };
         Assertion: {
@@ -360,37 +360,31 @@ export interface external {
            * @description Current execution state
            * @enum {string}
            */
-          state?:
-            | "CREATED"
-            | "EXECUTING"
-            | "AWAITING_TRACE"
-            | "AWAITING_TEST_RESULTS"
-            | "FINISHED"
-            | "FAILED";
+          state?: 'CREATED' | 'EXECUTING' | 'AWAITING_TRACE' | 'AWAITING_TEST_RESULTS' | 'FINISHED' | 'FAILED';
           /** @description Details of the cause for the last `FAILED` state */
           lastErrorState?: string;
           /** Format: date-time */
           createdAt?: string;
           /** Format: date-time */
           completedAt?: string;
-          request?: external["http.yaml"]["components"]["schemas"]["HTTPRequest"];
+          request?: external['http.yaml']['components']['schemas']['HTTPRequest'];
           /** @description TODO(pov) This is HTTP Response object for now, at some point it might be GRPC/SOAP/... */
-          response?: external["http.yaml"]["components"]["schemas"]["HTTPResponse"];
-          trace?: external["trace.yaml"]["components"]["schemas"]["Trace"];
-          result?: external["tests.yaml"]["components"]["schemas"]["AssertionResults"];
+          response?: external['http.yaml']['components']['schemas']['HTTPResponse'];
+          trace?: external['trace.yaml']['components']['schemas']['Trace'];
+          result?: external['tests.yaml']['components']['schemas']['AssertionResults'];
         };
         /** @example [object Object] */
         AssertionResults: {
           allPassed?: boolean;
           results?: {
             selector?: string;
-            results?: external["tests.yaml"]["components"]["schemas"]["AssertionResult"][];
+            results?: external['tests.yaml']['components']['schemas']['AssertionResult'][];
           }[];
         };
         AssertionResult: {
-          assertion?: external["tests.yaml"]["components"]["schemas"]["Assertion"];
+          assertion?: external['tests.yaml']['components']['schemas']['Assertion'];
           allPassed?: boolean;
-          spanResults?: external["tests.yaml"]["components"]["schemas"]["AssertionSpanResult"][];
+          spanResults?: external['tests.yaml']['components']['schemas']['AssertionSpanResult'][];
         };
         AssertionSpanResult: {
           spanId?: string;
@@ -402,19 +396,17 @@ export interface external {
     };
     operations: {};
   };
-  "trace.yaml": {
+  'trace.yaml': {
     paths: {};
     components: {
       schemas: {
         Trace: {
           /** Format: byte */
           traceId?: string;
-          tree?: external["trace.yaml"]["components"]["schemas"]["Span"];
+          tree?: external['trace.yaml']['components']['schemas']['Span'];
           /** @description falttened version, mapped as spanId -> span{} */
           flat?: {
-            [
-              key: string
-            ]: external["trace.yaml"]["components"]["schemas"]["Span"];
+            [key: string]: external['trace.yaml']['components']['schemas']['Span'];
           };
         };
         Span: {
@@ -431,8 +423,8 @@ export interface external {
            * @description Key-Value of span attributes
            * @example [object Object]
            */
-          attributes?: { [key: string]: string };
-          children?: external["trace.yaml"]["components"]["schemas"]["Span"][];
+          attributes?: {[key: string]: string};
+          children?: external['trace.yaml']['components']['schemas']['Span'][];
         };
       };
     };

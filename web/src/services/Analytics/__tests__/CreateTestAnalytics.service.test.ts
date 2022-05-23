@@ -12,10 +12,6 @@ describe('CreateTestAnalyticsService', () => {
   it('should trigger the onCreateAssertionFormSubmit event', () => {
     CreateTestAnalyticsService.onCreateTestFormSubmit();
 
-    expect(AnalyticsService.event).toHaveBeenCalledWith(
-      Categories.Home,
-      Actions.CreateTestFormSubmit,
-      Labels.Form
-    );
+    expect(AnalyticsService.event).toHaveBeenCalledWith(Categories.Home, Actions.CreateTestFormSubmit, Labels.Form);
   });
 });

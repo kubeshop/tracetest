@@ -1,4 +1,4 @@
-import { uniqueId } from 'lodash';
+import {uniqueId} from 'lodash';
 import {TAssertionResults, TRawAssertionResults} from '../types/Assertion.types';
 import AssertionResult from './AssertionResult.model';
 

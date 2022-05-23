@@ -1,4 +1,4 @@
-import {TTestSchemas, THttpSchemas, Model} from './Common.types';
+import {Model, THttpSchemas, TTestSchemas} from './Common.types';
 import {TTestDefinition} from './TestDefinition.types';
 import {TRawTestRun} from './TestRun.types';
 

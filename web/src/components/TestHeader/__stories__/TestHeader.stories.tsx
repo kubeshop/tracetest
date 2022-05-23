@@ -1,7 +1,7 @@
 import faker from '@faker-js/faker';
 import {ComponentStory, ComponentMeta} from '@storybook/react';
 import {HTTP_METHOD} from '../../../constants/Common.constants';
-import { TestState } from '../../../constants/TestRun.constants';
+import {TestState} from '../../../constants/TestRun.constants';
 
 import TestHeader from '../TestHeader';
 

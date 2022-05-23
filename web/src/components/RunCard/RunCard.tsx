@@ -12,15 +12,7 @@ interface IResultCardProps {
 }
 
 const ResultCard: React.FC<IResultCardProps> = ({
-  run: {
-    id: runId,
-    executionTime,
-    totalAssertionCount,
-    passedAssertionCount,
-    failedAssertionCount,
-    state,
-    createdAt,
-  },
+  run: {id: runId, executionTime, totalAssertionCount, passedAssertionCount, failedAssertionCount, state, createdAt},
   onClick,
   onDelete,
 }) => {

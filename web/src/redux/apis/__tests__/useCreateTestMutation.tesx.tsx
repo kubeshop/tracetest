@@ -1,7 +1,7 @@
 import {act, renderHook} from '@testing-library/react-hooks';
 import fetchMock from 'jest-fetch-mock';
 import {HTTP_METHOD} from '../../../constants/Common.constants';
-import { TTest } from '../../../types/Test.types';
+import {TTest} from '../../../types/Test.types';
 import {ReduxWrapperProvider} from '../../ReduxWrapperProvider';
 import {useCreateTestMutation} from '../TraceTest.api';
 

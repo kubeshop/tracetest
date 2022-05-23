@@ -5,5 +5,5 @@ export const Content = styled(Layout.Content)`
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  background: #FBFBFF;
+  background: #fbfbff;
 `;
