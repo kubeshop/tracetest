@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useMemo} from 'react';
+import React, {useCallback, useEffect, useMemo} from 'react';
 import ReactFlow, {Background, FlowElement} from 'react-flow-renderer';
 import {useDAGChart} from '../../../hooks/useDAGChart';
 import TraceNode from '../../TraceNode';
@@ -29,6 +29,7 @@ const Diagram: React.FC<IDiagramProps> = ({trace, selectedSpan, onSelectSpan}): 
     );
   }, [trace?.spans]);
 
+  console.log(spanMap);
   const dagLayout = useDAGChart(spanMap);
 
   const handleElementClick = useCallback(

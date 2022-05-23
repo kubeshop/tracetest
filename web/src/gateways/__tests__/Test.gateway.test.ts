@@ -1,7 +1,7 @@
 import {endpoints} from '../../redux/apis/TraceTest.api';
 import TestGateway from '../Test.gateway';
 
-const {createTest, getTestById, getTestList, runTest} = endpoints;
+const {createTest, getTestById, getTestList} = endpoints;
 
 jest.mock('../../redux/apis/TraceTest.api', () => {
   const initiate = jest.fn(() => Promise.resolve());
@@ -29,7 +29,7 @@ describe('TestGateway', () => {
     expect.assertions(1);
     await TestGateway.getById('testId');
 
-    expect(getTestById.initiate).toBeCalledWith('testId');
+    expect(getTestById.initiate).toBeCalledWith({testId: 'testId'});
   });
 
   it('should execute the getList function', async () => {
@@ -43,6 +43,6 @@ describe('TestGateway', () => {
     expect.assertions(1);
     await TestGateway.run('testId');
 
-    expect(runTest.initiate).toBeCalledWith('testId');
+    expect(getTestById.initiate).toBeCalledWith({testId: 'testId'});
   });
 });

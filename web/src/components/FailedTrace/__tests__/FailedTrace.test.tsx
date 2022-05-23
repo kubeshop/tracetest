@@ -2,14 +2,16 @@ import {render} from '@testing-library/react';
 import {MemoryRouter} from 'react-router-dom';
 import FailedTrace from '../index';
 import {ReduxWrapperProvider} from '../../../redux/ReduxWrapperProvider';
+import TestMock from '../../../models/__mocks__/Test.mock';
 
 test('FailedTrace', () => {
-  const result = render(
+  const test = TestMock.model();
+  const {getByText} = render(
     <MemoryRouter>
       <ReduxWrapperProvider>
-        <FailedTrace onRunTest={jest.fn()} testId="234" isDisplayingError onEdit={jest.fn()} />
+        <FailedTrace onRunTest={jest.fn()} testId={test.id} isDisplayingError onEdit={jest.fn()} />
       </ReduxWrapperProvider>
     </MemoryRouter>
   );
-  expect(result.container).toMatchSnapshot();
+  expect(getByText('Rerun Test')).toBeTruthy();
 });

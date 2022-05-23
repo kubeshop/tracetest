@@ -2,10 +2,10 @@ import {MoreOutlined} from '@ant-design/icons';
 import {Button, Typography} from 'antd';
 import styled from 'styled-components';
 
-export const TestCard = styled.div<{isCollapsed: boolean}>`
+export const TestCard = styled.div<{$isCollapsed: boolean}>`
   box-shadow: 0 4px 8px rgba(153, 155, 168, 0.1);
   background: #fff;
-  border-left: ${({isCollapsed}) => isCollapsed && `2px solid #61175E`};
+  border-left: ${({$isCollapsed}) => $isCollapsed && `2px solid #61175E`};
   border-radius: 2px;
 `;
 

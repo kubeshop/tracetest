@@ -13,6 +13,7 @@ const TraceMock: IMockFactory<TTrace, TRawTrace> = () => ({
         '1': SpanMock.raw(),
         '2': SpanMock.raw(),
       },
+      spans: [SpanMock.raw(), SpanMock.raw()],
       ...data,
     };
   },
