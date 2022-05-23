@@ -8,13 +8,18 @@ test('TestCard', async () => {
   const onRunTest = jest.fn();
   const onClick = jest.fn();
 
+<<<<<<< Updated upstream
   const test = TestMock.model();
 
   const {container, getByTestId} = render(
+=======
+  const {getByTestId, getByText} = render(
+>>>>>>> Stashed changes
     <ReduxWrapperProvider>
       <TestCard onDelete={onDelete} onRunTest={onRunTest} test={test} onClick={onClick} />
     </ReduxWrapperProvider>
   );
+<<<<<<< Updated upstream
 
   fireEvent(
     getByTestId(`test-actions-button-${test.id}`),
@@ -25,4 +30,10 @@ test('TestCard', async () => {
   );
   await waitFor(() => getByTestId('test-card-delete'));
   expect(container).toMatchSnapshot();
+=======
+  fireEvent(getByTestId(`test-actions-button-${TestingModels.test.testId}`), TestingModels.mouseEvent);
+  await waitFor(() => getByTestId('delete'));
+  expect(getByText('GET')).toBeTruthy();
+  expect(getByText('Run Test')).toBeTruthy();
+>>>>>>> Stashed changes
 });
