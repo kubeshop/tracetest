@@ -1,22 +1,24 @@
-import {useMemo} from 'react';
 import {difference} from 'lodash';
+import {useMemo} from 'react';
 import OperatorService from '../../services/Operator.service';
 import {ISpanAssertionResult} from '../../types/Assertion.types';
 import {ISpan} from '../../types/Span.types';
-import * as S from './AssertionCheckRow.styled';
 import AttributeValue from '../AttributeValue';
+import * as S from './AssertionCheckRow.styled';
 
 interface IAssertionCheckRowProps {
   result: ISpanAssertionResult;
   span: ISpan;
   assertionSelectorList: string[];
+
   getIsSelectedSpan(spanId: string): boolean;
+
   onSelectSpan(spanId: string): void;
 }
 
 const AssertionCheckRow: React.FC<IAssertionCheckRowProps> = ({
   result: {propertyName, comparisonValue, operator, actualValue, hasPassed, spanId},
-  span: {signature},
+  span: {signature, type},
   assertionSelectorList,
   getIsSelectedSpan,
   onSelectSpan,
@@ -26,12 +28,13 @@ const AssertionCheckRow: React.FC<IAssertionCheckRowProps> = ({
   const badgeList = useMemo(() => {
     const isSelected = getIsSelectedSpan(spanId);
 
-    return (isSelected ? [<S.SelectedLabelBadge count="selected" key="selected" />] : []).concat(
-      spanLabelList
+    return (isSelected ? [<S.SelectedLabelBadge spanType={type} count="selected" key="selected" />] : []).concat(
+      spanLabelList.map((label, index) => (
         // eslint-disable-next-line react/no-array-index-key
-        .map((label, index) => <S.LabelBadge count={label} key={`${label}-${index}`} />)
+        <S.LabelBadge spanType={!index ? type : undefined} count={label} key={`${label}-${index}`} />
+      ))
     );
-  }, [getIsSelectedSpan, spanId, spanLabelList]);
+  }, [getIsSelectedSpan, spanId, spanLabelList, type]);
 
   return (
     <S.AssertionCheckRow onClick={() => onSelectSpan(spanId)}>
