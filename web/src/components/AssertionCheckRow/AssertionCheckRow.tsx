@@ -32,13 +32,13 @@ const AssertionCheckRow: React.FC<TAssertionCheckRowProps> = ({
   const badgeList = useMemo(() => {
     const isSelected = getIsSelectedSpan(spanId);
 
-    return (isSelected ? [<S.SelectedLabelBadge spanType={type} count="selected" key="selected" />] : []).concat(
+    return (isSelected ? [<S.SelectedLabelBadge count="selected" key="selected" />] : []).concat(
       spanLabelList.map((label, index) => (
         // eslint-disable-next-line react/no-array-index-key
-        <S.LabelBadge spanType={!index ? type : undefined} count={label} key={`${label}-${index}`} />
+        <S.LabelBadge count={label} key={`${label}-${index}`} />
       ))
     );
-  }, [getIsSelectedSpan, spanId, spanLabelList, type]);
+  }, [getIsSelectedSpan, spanId, spanLabelList]);
 
   return (
     <S.AssertionCheckRow onClick={() => onSelectSpan(spanId)}>
