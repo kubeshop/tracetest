@@ -17,6 +17,7 @@ type (
 		ID               uuid.UUID
 		Name             string
 		Description      string
+		Version          int
 		ServiceUnderTest ServiceUnderTest
 		ReferenceRun     *Run
 		Definition       Definition

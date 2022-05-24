@@ -14,7 +14,7 @@ import (
 var _ model.TestRepository = &postgresDB{}
 
 func (td *postgresDB) CreateTest(ctx context.Context, test model.Test) (model.Test, error) {
-	stmt, err := td.db.Prepare("INSERT INTO tests(id, test) VALUES( $1, $2 )")
+	stmt, err := td.db.Prepare("INSERT INTO tests(id, test, version) VALUES( $1, $2, $3 )")
 	if err != nil {
 		return model.Test{}, fmt.Errorf("sql prepare: %w", err)
 	}
@@ -22,12 +22,13 @@ func (td *postgresDB) CreateTest(ctx context.Context, test model.Test) (model.Te
 
 	test.ID = IDGen.UUID()
 	test.ReferenceRun = nil
+	test.Version = 1
 
 	b, err := encodeTest(test)
 	if err != nil {
 		return model.Test{}, fmt.Errorf("encoding error: %w", err)
 	}
-	_, err = stmt.ExecContext(ctx, test.ID, b)
+	_, err = stmt.ExecContext(ctx, test.ID, b, test.Version)
 	if err != nil {
 		return model.Test{}, fmt.Errorf("sql exec: %w", err)
 	}
