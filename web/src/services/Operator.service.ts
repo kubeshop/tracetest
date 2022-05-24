@@ -1,4 +1,9 @@
-import {CompareOperator, CompareOperatorNameMap, CompareOperatorSymbolMap} from '../constants/Operator.constants';
+import {
+  CompareOperator,
+  CompareOperatorNameMap,
+  CompareOperatorSymbolMap,
+  CompareOperatorSymbolNameMap,
+} from '../constants/Operator.constants';
 import {TCompareOperatorName, TCompareOperatorSymbol} from '../types/Operator.types';
 
 const OperatorService = () => ({
@@ -7,6 +12,9 @@ const OperatorService = () => ({
   },
   getOperatorSymbol(op: CompareOperator): TCompareOperatorSymbol {
     return CompareOperatorSymbolMap[op];
+  },
+  getNameFromSymbol(symbol: TCompareOperatorSymbol): TCompareOperatorName {
+    return CompareOperatorSymbolNameMap[symbol];
   },
 });
 

@@ -1,35 +1,18 @@
-import {isNumber} from 'lodash';
-import {CompareOperator} from '../constants/Operator.constants';
-import {TSpanSelector} from '../types/Assertion.types';
-import {escapeString, isJson} from '../utils/Common';
-import OperatorService from './Operator.service';
-
-const getValue = (value: string): string => {
-  if (isNumber(value)) {
-    return value;
-  }
-
-  if (isJson(value)) {
-    return escapeString(value);
-  }
-
-  return value;
-};
-
-const getFilters = (selectors: TSpanSelector[]) =>
-  selectors.map(
-    ({key, operator = CompareOperator.EQUALS, value}) =>
-      `${key}${OperatorService.getOperatorSymbol(operator)}${getValue(value)}`
-  );
+import {TRawAssertionResult} from '../types/Assertion.types';
 
 const AssertionService = () => ({
-  getSelectorString(selectorList: TSpanSelector[]): string {
-    return selectorList.length ? `span[${getFilters(selectorList).join(' ')}]` : '';
-  },
+  getSpanCount(resultList: TRawAssertionResult[]): number {
+    const spanIdList = resultList.reduce<string[]>((list, {spanResults}) => {
+      const tmpList: string[] = [];
 
-  getSpanSelectorList(selectorString: string): TSpanSelector[] {
-    console.log('@@selectorString', selectorString);
-    return [];
+      spanResults?.forEach(({spanId = ''}) => {
+        if (!tmpList.includes(spanId)) tmpList.push(spanId);
+      });
+
+      return list.concat(tmpList);
+    }, []);
+
+    return spanIdList.length;
   },
 });
 

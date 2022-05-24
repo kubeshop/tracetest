@@ -7,24 +7,26 @@ import {Typography, Form, Button} from 'antd';
 import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
 import useGuidedTour from 'hooks/useGuidedTour';
 import CreateAssertionModalAnalyticsService from '../../services/Analytics/CreateAssertionModalAnalytics.service';
-import {CompareOperator, PseudoSelector} from '../../constants/Operator.constants';
+import {CompareOperator} from '../../constants/Operator.constants';
 import {Steps} from '../GuidedTour/assertionStepList';
 import * as S from './AssertionForm.styled';
 import AssertionSelectors from '../../selectors/Assertion.selectors';
 import AssertionFormSelectorInput from './AssertionFormSelectorInput';
-import {TAssertion, TSpanSelector} from '../../types/Assertion.types';
+import {TAssertion, TPseudoSelector, TSpanSelector} from '../../types/Assertion.types';
 import AssertionFormPseudoSelectorInput from './AssertionFormPseudoSelectorInput';
 import AssertionFormCheckList from './AssertionFormCheckList';
+import {useGetSelectedSpansQuery} from '../../redux/apis/TraceTest.api';
+import {RootState} from '../../redux/store';
+import {TSpanFlatAttribute} from '../../types/Span.types';
+import OperatorService from '../../services/Operator.service';
+import SelectorService from '../../services/Selector.service';
 
 const {onChecksChange, onSelectorChange} = CreateAssertionModalAnalyticsService;
 
 export interface IValues {
   assertionList: TAssertion[];
   selectorList: TSpanSelector[];
-  pseudoSelector?: {
-    selector: PseudoSelector;
-    number?: number;
-  };
+  pseudoSelector?: TPseudoSelector;
 }
 
 interface TAssertionFormProps {
@@ -40,12 +42,11 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
   defaultValues: {
     assertionList = [
       {
-        key: '',
-        compareOp: CompareOperator.EQUALS,
-        value: '',
+        comparator: OperatorService.getOperatorSymbol(CompareOperator.EQUALS),
       },
     ],
     selectorList = [],
+    pseudoSelector,
   } = {},
   onSubmit,
   onCancel,
@@ -54,12 +55,19 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
   runId,
 }) => {
   const [form] = Form.useForm<IValues>();
-
   useGuidedTour(GuidedTours.Assertion);
 
   const currentSelectorList = Form.useWatch('selectorList', form) || [];
   const currentAssertionList = Form.useWatch('assertionList', form) || [];
-  const attributeList = useSelector(AssertionSelectors.selectAttributeList(testId, runId, currentSelectorList));
+  const {data: spanIdList = []} = useGetSelectedSpansQuery({
+    query: SelectorService.getSelectorString(currentSelectorList),
+    testId,
+    runId,
+  });
+
+  const attributeList = useSelector<RootState, TSpanFlatAttribute[]>(state =>
+    AssertionSelectors.selectAttributeList(state, testId, runId, spanIdList)
+  );
 
   const onFieldsChange = useCallback(
     (changedFields: FieldData[]) => {
@@ -70,7 +78,7 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
       if (fieldName === 'selectorList') onSelectorChange(JSON.stringify(selectorList));
       if (fieldName === 'assertionList') onChecksChange(JSON.stringify(form.getFieldValue('assertionList') || []));
 
-      if (fieldName === 'assertionList' && keyName === 'key' && field.value) {
+      if (fieldName === 'assertionList' && keyName === 'attribute' && field.value) {
         const list: TAssertion[] = form.getFieldValue('assertionList') || [];
 
         form.setFieldsValue({
@@ -92,7 +100,10 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
 
   return (
     <S.AssertionForm>
-      <S.AssertionFormTitle strong>{isEditing ? 'Edit Assertion' : 'Add New Assertion'}</S.AssertionFormTitle>
+      <S.AssertionFormHeader>
+        <S.AssertionFormTitle strong>{isEditing ? 'Edit Assertion' : 'Add New Assertion'}</S.AssertionFormTitle>
+        <Typography.Text type="secondary">Affects {spanIdList.length} span(s)</Typography.Text>
+      </S.AssertionFormHeader>
       <Form
         name="assertion-form"
         form={form}
@@ -100,6 +111,7 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
           remember: true,
           assertionList,
           selectorList,
+          pseudoSelector,
         }}
         onFinish={onSubmit}
         autoComplete="off"

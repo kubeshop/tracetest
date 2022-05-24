@@ -6,6 +6,8 @@ import * as S from './TraceDrawer.styled';
 import TraceDrawerHeader from './TraceDrawerHeader';
 import {useAssertionForm} from '../AssertionForm/AssertionFormProvider';
 import AssertionForm from '../AssertionForm';
+import {useTestDefinition} from '../../providers/TestDefinition/TestDefinition.provider';
+import LoadingSpinner from '../LoadingSpinner';
 
 interface IProps {
   visiblePortion: number;
@@ -17,6 +19,7 @@ interface IProps {
 const TraceDrawer: React.FC<IProps> = ({run: {id: runId}, run, testId, visiblePortion, onSelectSpan}) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const {isOpen: isAssertionFormOpen, formProps, onSubmit, close} = useAssertionForm();
+  const {isLoading} = useTestDefinition();
 
   useEffect(() => {
     if (isAssertionFormOpen) setIsCollapsed(true);
@@ -40,14 +43,17 @@ const TraceDrawer: React.FC<IProps> = ({run: {id: runId}, run, testId, visiblePo
         visiblePortion={visiblePortion}
       />
       <S.Content>
-        {isAssertionFormOpen ? (
+        {isLoading ? (
+          <S.LoadingSpinnerContainer>
+            <LoadingSpinner />
+          </S.LoadingSpinnerContainer>
+        ) : isAssertionFormOpen ? (
           <AssertionForm
             runId={runId}
             onSubmit={onSubmit}
             testId={testId}
             {...formProps}
             onCancel={() => {
-              setIsCollapsed(false);
               close();
             }}
           />

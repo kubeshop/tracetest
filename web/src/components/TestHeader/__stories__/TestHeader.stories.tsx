@@ -1,7 +1,8 @@
 import faker from '@faker-js/faker';
 import {ComponentStory, ComponentMeta} from '@storybook/react';
 import {HTTP_METHOD} from '../../../constants/Common.constants';
-import {TestState} from '../../../constants/TestRun.constants';
+import { TestState } from '../../../constants/TestRun.constants';
+import TestDefinition from '../../../models/TestDefinition.model';
 
 import TestHeader from '../TestHeader';
 
@@ -19,6 +20,7 @@ Default.args = {
     id: faker.datatype.uuid(),
     name: `${faker.name.firstName()} ${faker.name.lastName()}`,
     description: faker.lorem.sentences(),
+    definition: TestDefinition({}),
     serviceUnderTest: {
       request: {
         url: faker.internet.url(),
@@ -34,6 +36,7 @@ WithState.args = {
     id: faker.datatype.uuid(),
     name: `${faker.name.firstName()} ${faker.name.lastName()}`,
     description: faker.lorem.sentences(),
+    definition: TestDefinition({}),
     serviceUnderTest: {
       request: {
         url: faker.internet.url(),

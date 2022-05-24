@@ -1,38 +1,28 @@
-import {CompareOperator} from '../../constants/Operator.constants';
+import faker from '@faker-js/faker';
 import AssertionService from '../Assertion.service';
+import AssertionResultMock from '../../models/__mocks__/AssertionResult.mock';
+import AssertionSpanResultMock from '../../models/__mocks__/AssertionSpanResult.mock';
 
 describe('AssertionService', () => {
-  describe('getSelectorString', () => {
-    test('empty selectorList', () => {
-      const result = AssertionService.getSelectorString([]);
-      expect(result).toBe('');
-    });
+  describe('getSpanCount', () => {
+    test('should returning the number of spans', () => {
+      const id = faker.datatype.uuid();
+      const assertionResult = AssertionResultMock.model({
+        spanResults: [
+          AssertionSpanResultMock.raw({
+            spanId: id,
+          }),
+          AssertionSpanResultMock.raw({
+            spanId: id,
+          }),
+          AssertionSpanResultMock.raw(),
+          AssertionSpanResultMock.raw(),
+        ],
+      });
 
-    test('single selectorList', () => {
-      const result = AssertionService.getSelectorString([
-        {
-          operator: CompareOperator.EQUALS,
-          key: 'service.name',
-          value: 'pokeshop',
-        },
-      ]);
-      expect(result).toStrictEqual(`span[service.name="pokeshop"]`);
-    });
+      const result = AssertionService.getSpanCount([assertionResult]);
 
-    test('double selectorList', () => {
-      const result = AssertionService.getSelectorString([
-        {
-          operator: CompareOperator.EQUALS,
-          key: 'service.name',
-          value: 'pokeshop',
-        },
-        {
-          operator: CompareOperator.CONTAINS,
-          key: 'tracetest.span.type',
-          value: 'http',
-        },
-      ]);
-      expect(result).toStrictEqual(`span[service.name="pokeshop" tracetest.span.type contains "http"]`);
+      expect(result).toBe(3);
     });
   });
 });

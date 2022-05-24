@@ -22,7 +22,7 @@ interface IProps {
 
 const AssertionFormPseudoSelectorInput: React.FC<IProps> = ({
   value: pseudoSelector = {
-    selector: PseudoSelector.FIRST,
+    selector: PseudoSelector.ALL,
     number: 0,
   },
   onChange = noop,
@@ -53,7 +53,13 @@ const AssertionFormPseudoSelectorInput: React.FC<IProps> = ({
         {optionList}
       </Select>
       {pseudoSelector?.selector === PseudoSelector.NTH && (
-        <Input placeholder="number" style={{width: '100px'}} type="number" onChange={handleNumberChange} />
+        <Input
+          placeholder="number"
+          style={{width: '100px'}}
+          type="number"
+          value={pseudoSelector.number}
+          onChange={handleNumberChange}
+        />
       )}
     </S.PseudoSelector>
   );

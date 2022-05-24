@@ -81,14 +81,12 @@ const TraceTestAPI = createApi({
       ],
       transformResponse: (rawTestRun: TRawTestRun) => TestRun(rawTestRun),
     }),
-
     getRunList: build.query<TTestRun[], {testId: string; take?: number; skip?: number}>({
       query: ({testId, take = 25, skip = 0}) => `/tests/${testId}/run?take=${take}&skip=${skip}`,
       providesTags: (result, error, {testId}) => [{type: Tags.TEST_RUN, id: `${testId}-LIST`}],
       transformResponse: (rawTestResultList: TRawTestRun[]) =>
         rawTestResultList.map(rawTestResult => TestRun(rawTestResult)),
     }),
-
     getRunById: build.query<TTestRun, {runId: string; testId: string}>({
       query: ({testId, runId}) => `/tests/${testId}/run/${runId}`,
       providesTags: result => (result ? [{type: Tags.TEST_RUN, id: result?.id}] : []),

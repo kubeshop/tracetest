@@ -1,10 +1,13 @@
 import {noop} from 'lodash';
 import {useState, createContext, useCallback, useMemo, useContext} from 'react';
+import {useTestDefinition} from '../../providers/TestDefinition/TestDefinition.provider';
+import SelectorService from '../../services/Selector.service';
+import {TTestDefinitionEntry} from '../../types/TestDefinition.types';
 import {IValues} from './AssertionForm';
 
 interface IFormProps {
   defaultValues?: IValues;
-  assertionId?: string;
+  selector?: string;
   isEditing?: boolean;
 }
 
@@ -33,6 +36,7 @@ export const useAssertionForm = () => useContext(Context);
 const AssertionFormProvider: React.FC<{testId: string}> = ({children}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [formProps, setFormProps] = useState<IFormProps>(initialFormProps);
+  const {update, add} = useTestDefinition();
 
   const open = useCallback((props: IFormProps = {}) => {
     setFormProps(props);
@@ -44,10 +48,22 @@ const AssertionFormProvider: React.FC<{testId: string}> = ({children}) => {
     setFormProps(initialFormProps);
   }, []);
 
-  const onSubmit = useCallback(({selectorList, assertionList}: IValues) => {
-    console.log('@@onSubmit', selectorList, assertionList);
-    setIsOpen(false);
-  }, []);
+  const onSubmit = useCallback(
+    async ({selectorList, assertionList, pseudoSelector}: IValues) => {
+      const {isEditing, selector = ''} = formProps;
+
+      const definition: TTestDefinitionEntry = {
+        selector: SelectorService.getSelectorString(selectorList, pseudoSelector),
+        assertionList,
+      };
+
+      if (isEditing) await update(selector, definition);
+      else await add(definition);
+
+      setIsOpen(false);
+    },
+    [add, formProps, update]
+  );
 
   const contextValue = useMemo(
     () => ({isOpen, open, close, formProps, onSubmit}),

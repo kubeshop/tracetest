@@ -1,20 +1,18 @@
 import {useCallback, useMemo} from 'react';
 import {useStore} from 'react-flow-renderer';
-import {TAssertionResultEntry, TSpanSelector} from '../../types/Assertion.types';
+import {TAssertionResultEntry} from '../../types/Assertion.types';
 import AssertionCheckRow from '../AssertionCheckRow';
 import * as S from './AssertionCard.styled';
 
 interface TAssertionCardProps {
   assertionResult: TAssertionResultEntry;
-  selectorList: TSpanSelector[];
   onSelectSpan(spanId: string): void;
-  onDelete(assertionId: string): void;
+  onDelete(selector: string): void;
   onEdit(assertionResult: TAssertionResultEntry): void;
 }
 
 const AssertionCard: React.FC<TAssertionCardProps> = ({
-  assertionResult: {resultList, id: assertionId},
-  selectorList,
+  assertionResult: {selector, resultList, selectorList, pseudoSelector, spanCount},
   assertionResult,
   onSelectSpan,
   onDelete,
@@ -22,11 +20,7 @@ const AssertionCard: React.FC<TAssertionCardProps> = ({
 }) => {
   const store = useStore();
 
-  const spanCountText = useMemo(() => {
-    const spanCount = resultList.length;
-
-    return `${spanCount} ${spanCount > 1 ? 'spans' : 'span'}`;
-  }, [resultList.length]);
+  const spanCountText = useMemo(() => `${spanCount} ${spanCount > 1 ? 'spans' : 'span'}`, [spanCount]);
 
   const getIsSelectedSpan = useCallback(
     (id: string): boolean => {
@@ -42,12 +36,15 @@ const AssertionCard: React.FC<TAssertionCardProps> = ({
     <S.AssertionCard data-cy="assertion-card">
       <S.Header>
         <div>
-          <S.SelectorListText>{selectorList.map(({value}) => value).join(' ')}</S.SelectorListText>
+          <S.SelectorListText>
+            {selectorList.map(({value}) => value).join(' ')} {pseudoSelector?.selector}
+            {pseudoSelector?.number && `(${pseudoSelector?.number})`}
+          </S.SelectorListText>
           <S.SpanCountText>{spanCountText}</S.SpanCountText>
         </div>
         <div>
           <S.EditIcon data-cy="edit-assertion-button" onClick={() => onEdit(assertionResult)} />
-          <S.DeleteIcon onClick={() => onDelete(assertionId)} />
+          <S.DeleteIcon onClick={() => onDelete(selector)} />
         </div>
       </S.Header>
       <S.Body>

@@ -1,7 +1,9 @@
 import {noop, uniqBy} from 'lodash';
 import React, {useCallback, useMemo, useState} from 'react';
 import {CompareOperator} from '../../constants/Operator.constants';
+import OperatorService from '../../services/Operator.service';
 import {TSpanSelector} from '../../types/Assertion.types';
+import {TCompareOperatorSymbol} from '../../types/Operator.types';
 import {TSpanFlatAttribute} from '../../types/Span.types';
 import MultiSelectInput, {SEPARATOR} from '../MultiSelectInput/MultiSelectInput';
 import * as S from './AssertionForm.styled';
@@ -15,12 +17,11 @@ type TItemSelectorDropdownProps = {
 const operatorOptionList = [
   {
     key: '=',
-    value: CompareOperator.EQUALS,
+    value: OperatorService.getOperatorSymbol(CompareOperator.EQUALS),
   },
-  // this will be added when we add the query language parser
   // {
   //   key: 'contains',
-  //   value: CompareOperator.CONTAINS,
+  //   value: OperatorService.getOperatorSymbol(CompareOperator.CONTAINS),
   // },
 ];
 
@@ -66,7 +67,7 @@ const AssertionFormSelectorInput: React.FC<TItemSelectorDropdownProps> = ({
       const selector: TSpanSelector = {
         key: attribute,
         value,
-        operator: operator as CompareOperator,
+        operator: operator as TCompareOperatorSymbol,
       };
 
       onChange([...selectorList, selector]);
