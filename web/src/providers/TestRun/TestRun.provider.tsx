@@ -27,7 +27,7 @@ const TestRunProvider: React.FC<IProps> = ({children, testId, runId}) => {
 
   const value = useMemo(() => ({run, refetch, isError}), [refetch, run, isError]) as IContext;
 
-  return run ? <Context.Provider value={value}>{children}</Context.Provider> : <div data-cy="not_initialized" />;
+  return run ? <Context.Provider value={value}>{children}</Context.Provider> : <div data-cy="loading_test_run" />;
 };
 
 export default TestRunProvider;

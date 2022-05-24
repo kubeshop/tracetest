@@ -8,7 +8,8 @@ import Http from './components/Http';
 import SpanHeader from './SpanHeader';
 import * as S from './SpanDetail.styled';
 import {useAssertionForm} from '../AssertionForm/AssertionFormProvider';
-import {CompareOperator} from '../../constants/Operator.constants';
+import {CompareOperator, PseudoSelector} from '../../constants/Operator.constants';
+import OperatorService from '../../services/Operator.service';
 
 export interface TSpanDetailProps {
   testId?: string;
@@ -43,18 +44,26 @@ const SpanDetail: React.FC<TSpanDetailProps> = ({span}) => {
       open({
         isEditing: false,
         defaultValues: {
+          pseudoSelector: {
+            selector: PseudoSelector.FIRST,
+          },
           assertionList: [
             {
-              comparator: CompareOperator.EQUALS,
+              comparator: OperatorService.getOperatorSymbol(CompareOperator.EQUALS),
               expected: value,
               attribute: key,
             },
           ],
-          selectorList: [],
+          selectorList:
+            span?.signature.map(attribute => ({
+              value: attribute.value,
+              key: attribute.key,
+              operator: OperatorService.getOperatorSymbol(CompareOperator.EQUALS),
+            })) || [],
         },
       });
     },
-    [open]
+    [open, span?.signature]
   );
 
   return (

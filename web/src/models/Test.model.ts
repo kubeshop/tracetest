@@ -13,7 +13,7 @@ const Test = ({
     id,
     name,
     description,
-    definition: definition ? TestDefinition(definition) : undefined,
+    definition: TestDefinition(definition || {}),
     serviceUnderTest,
     referenceTestRun,
   };

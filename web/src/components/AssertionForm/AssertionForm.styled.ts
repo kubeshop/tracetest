@@ -63,6 +63,12 @@ export const AssertionFormTitle = styled(Typography.Text).attrs({
   font-weight: 600;
 `;
 
+export const AssertionFormHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
 export const AssertionFromActions = styled.div`
   display: flex;
   justify-content: flex-end;

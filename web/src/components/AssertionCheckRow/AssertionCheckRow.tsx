@@ -1,9 +1,11 @@
 import {useMemo} from 'react';
-import {difference} from 'lodash';
+import {capitalize, difference} from 'lodash';
 import {TAssertion, TAssertionSpanResult} from '../../types/Assertion.types';
 import * as S from './AssertionCheckRow.styled';
 import AttributeValue from '../AttributeValue';
 import {useTestRun} from '../../providers/TestRun/TestRun.provider';
+import OperatorService from '../../services/Operator.service';
+import {TCompareOperatorSymbol} from '../../types/Operator.types';
 
 interface TAssertionCheckRowProps {
   result: TAssertionSpanResult;
@@ -52,7 +54,7 @@ const AssertionCheckRow: React.FC<TAssertionCheckRowProps> = ({
       </S.Entry>
       <S.Entry>
         <S.Label>Assertion Type</S.Label>
-        <S.Value>{comparator}</S.Value>
+        <S.Value>{capitalize(OperatorService.getNameFromSymbol(comparator as TCompareOperatorSymbol))}</S.Value>
       </S.Entry>
       <S.Entry>
         <S.Label>Expected Value</S.Label>

@@ -19,7 +19,7 @@ interface IProps {
 }
 
 const operatorList = Object.values(CompareOperator).map(value => ({
-  value,
+  value: OperatorService.getOperatorSymbol(value),
   label: capitalize(OperatorService.getOperatorName(value)),
 }));
 

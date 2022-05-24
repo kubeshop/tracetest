@@ -49,3 +49,11 @@ export const AddAssertionButton = styled(Button).attrs({
     font-weight: 600;
   }
 `;
+
+export const LoadingSpinnerContainer = styled.div`
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;

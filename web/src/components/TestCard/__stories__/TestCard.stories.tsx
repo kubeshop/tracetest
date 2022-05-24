@@ -1,6 +1,7 @@
 import faker from '@faker-js/faker';
 import {ComponentStory, ComponentMeta} from '@storybook/react';
 import {HTTP_METHOD} from '../../../constants/Common.constants';
+import TestDefinition from '../../../models/TestDefinition.model';
 
 import TestCard from '../TestCard';
 
@@ -16,6 +17,7 @@ export const Default = Template.bind({});
 Default.args = {
   test: {
     id: faker.datatype.uuid(),
+    definition: TestDefinition({}),
     name: `${faker.name.firstName()} ${faker.name.lastName()}`,
     description: faker.lorem.sentences(),
     serviceUnderTest: {

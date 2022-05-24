@@ -30,9 +30,19 @@ export const CompareOperatorSymbolMap: Record<CompareOperator, TCompareOperatorS
   [CompareOperator.CONTAINS]: 'contains',
 };
 
+export const CompareOperatorSymbolNameMap: Record<TCompareOperatorSymbol, TCompareOperatorName> = {
+  '=': 'equals',
+  '<': 'not equals',
+  '>': 'less than',
+  '!=': 'greater than',
+  '>=': 'greater or equals',
+  '<=': 'less or equals',
+  contains: 'contains',
+};
+
 export enum PseudoSelector {
   FIRST = ':first',
   LAST = ':last',
-  NTH = ':nth',
-  ALL = ':all',
+  NTH = ':nth_child',
+  ALL = '',
 }

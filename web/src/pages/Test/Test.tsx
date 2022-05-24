@@ -11,14 +11,14 @@ import TestHeader from '../../components/TestHeader';
 
 const TestPage: React.FC = () => {
   const navigate = useNavigate();
-  const {id} = useParams();
-  const {data: test} = useGetTestByIdQuery({testId: id as string});
+  const {testId = ''} = useParams();
+  const {data: test} = useGetTestByIdQuery({testId});
 
   const handleSelectTestResult = useCallback(
     (result: TTestRun) => {
-      navigate(`/test/${id}/result/${result.id}`);
+      navigate(`/test/${testId}/run/${result.id}`);
     },
-    [id, navigate]
+    [navigate, testId]
   );
 
   // TODO: Add proper loading states

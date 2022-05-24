@@ -1,5 +1,8 @@
 import {createTest, deleteTest, testId} from '../utils/common';
 
+const getAttributeListId = (number: number) => `#assertion-form_assertionList_${number}_attribute_list`;
+const getComparatorListId = (number: number) => `#assertion-form_assertionList_${number}_comparator_list`;
+
 describe('Create Assertion', () => {
   before(() => {
     createTest();
@@ -16,7 +19,7 @@ describe('Create Assertion', () => {
     cy.location('href').should('match', /\/test\/.*/i);
 
     cy.get(`[data-cy^=test-run-result-]`).first().click();
-    cy.location('href').should('match', /\/result\/.*/i);
+    cy.location('href').should('match', /\/run\/.*/i);
 
     cy.get('[data-cy^=trace-node-]', {timeout: 10000}).should('be.visible');
     cy.get('[data-cy=add-assertion-button]').click();
@@ -30,10 +33,14 @@ describe('Create Assertion', () => {
 
     cy.get('[data-cy=assertion-check-attribute]').type('db');
     cy.wait(500);
-    cy.get('#assertion-form_assertionList_0_key_list + div .ant-select-item').first().click();
+    cy.get(`${getAttributeListId(0)} + div .ant-select-item`)
+      .first()
+      .click();
 
     cy.get('[data-cy=assertion-check-operator]').click();
-    cy.get('#assertion-form_assertionList_0_compareOp_list + div .ant-select-item').last().click();
+    cy.get(`${getComparatorListId(0)} + div .ant-select-item`)
+      .last()
+      .click();
     cy.get('[data-cy=assertion-check-operator] .ant-select-selection-item').should('have.text', 'Contains');
 
     cy.get('[data-cy=assertion-form-submit-button]').click();
@@ -59,20 +66,28 @@ describe('Create Assertion', () => {
 
     cy.get('[data-cy=assertion-check-attribute]').type('db');
     cy.wait(500);
-    cy.get('#assertion-form_assertionList_0_key_list + div .ant-select-item').first().click();
+    cy.get(`${getAttributeListId(0)} + div .ant-select-item`)
+      .first()
+      .click();
 
     cy.get('[data-cy=assertion-check-operator]').click();
-    cy.get('#assertion-form_assertionList_0_compareOp_list + div .ant-select-item').first().click();
+    cy.get(`${getComparatorListId(0)} + div .ant-select-item`)
+      .first()
+      .click();
     cy.get('[data-cy=assertion-check-operator] .ant-select-selection-item').first().should('have.text', 'Equals');
 
     cy.get('[data-cy=add-assertion-form-add-check]').click();
 
     cy.get('[data-cy=assertion-check-attribute]').last().type('service');
     cy.wait(500);
-    cy.get('#assertion-form_assertionList_1_key_list + div .ant-select-item').first().click();
+    cy.get(`${getAttributeListId(1)} + div .ant-select-item`)
+      .first()
+      .click();
 
     cy.get('[data-cy=assertion-check-operator]').last().click();
-    cy.get('#assertion-form_assertionList_1_compareOp_list + div .ant-select-item').last().click();
+    cy.get(`${getComparatorListId(1)} + div .ant-select-item`)
+      .last()
+      .click();
     cy.get('[data-cy=assertion-check-operator] .ant-select-selection-item').last().should('have.text', 'Contains');
     cy.get('[data-cy=assertion-form-submit-button]').click();
 
@@ -81,21 +96,27 @@ describe('Create Assertion', () => {
   });
 
   it('should update an assertion', () => {
-    cy.get('[data-cy=edit-assertion-button]').last().click();
+    cy.get('[data-cy=edit-assertion-button]').first().click();
     cy.get('[data-cy=assertion-form]').should('be.visible');
 
     cy.get('[data-cy=assertion-check-operator]').first().click();
-    cy.get('#assertion-form_assertionList_0_compareOp_list + div .ant-select-item:nth-child(2)').first().click();
-    cy.get('[data-cy=assertion-check-operator] .ant-select-selection-item').first().should('have.text', 'Not equals');
+    cy.get(`${getComparatorListId(0)} + div .ant-select-item`)
+      .first()
+      .click();
+    cy.get('[data-cy=assertion-check-operator] .ant-select-selection-item').first().should('have.text', 'Equals');
 
     cy.get('[data-cy=add-assertion-form-add-check]').click();
 
     cy.get('[data-cy=assertion-check-attribute]').last().type('service');
     cy.wait(500);
-    cy.get('#assertion-form_assertionList_2_key_list + div .ant-select-item').first().click();
+    cy.get(`${getAttributeListId(2)} + div .ant-select-item`)
+      .first()
+      .click();
 
     cy.get('[data-cy=assertion-check-operator]').last().click();
-    cy.get('#assertion-form_assertionList_2_compareOp_list + div .ant-select-item').last().click();
+    cy.get(`${getComparatorListId(2)} + div .ant-select-item`)
+      .last()
+      .click();
     cy.get('[data-cy=assertion-check-operator] .ant-select-selection-item').last().should('have.text', 'Contains');
     cy.get('[data-cy=assertion-form-submit-button]').click();
 

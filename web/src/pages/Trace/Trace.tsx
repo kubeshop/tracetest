@@ -4,6 +4,7 @@ import {ReactFlowProvider} from 'react-flow-renderer';
 import Layout from 'components/Layout';
 import AssertionFormProvider from '../../components/AssertionForm/AssertionFormProvider';
 import TestRunProvider from '../../providers/TestRun';
+import TestDefinitionProvider from '../../providers/TestDefinition';
 import TraceContent from './TraceContent';
 
 const TracePage = () => {
@@ -11,13 +12,15 @@ const TracePage = () => {
 
   return (
     <ReactFlowProvider>
-      <AssertionFormProvider testId={testId}>
-        <TestRunProvider testId={testId} runId={runId}>
-          <Layout>
-            <TraceContent />
-          </Layout>
-        </TestRunProvider>
-      </AssertionFormProvider>
+      <TestDefinitionProvider testId={testId} runId={runId}>
+        <AssertionFormProvider testId={testId}>
+          <TestRunProvider testId={testId} runId={runId}>
+            <Layout>
+              <TraceContent />
+            </Layout>
+          </TestRunProvider>
+        </AssertionFormProvider>
+      </TestDefinitionProvider>
     </ReactFlowProvider>
   );
 };

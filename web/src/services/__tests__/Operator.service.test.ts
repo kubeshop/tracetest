@@ -13,4 +13,10 @@ describe('OperatorService', () => {
 
     expect(symbol).toEqual('==');
   });
+
+  it('should return the name of an operator from the symbol', () =>{
+    const name = OperatorService.getNameFromSymbol('=');
+
+    expect(name).toEqual('equals');
+  });
 });

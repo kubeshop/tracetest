@@ -1,6 +1,7 @@
 import {Typography} from 'antd';
 import {useCallback} from 'react';
-import {TAssertionResults} from '../../types/Assertion.types';
+import {useTestDefinition} from '../../providers/TestDefinition/TestDefinition.provider';
+import {TAssertionResultEntry, TAssertionResults} from '../../types/Assertion.types';
 import AssertionCard from '../AssertionCard/AssertionCard';
 import {useAssertionForm} from '../AssertionForm/AssertionFormProvider';
 import * as S from './AssertionCardList.styled';
@@ -11,16 +12,31 @@ interface TAssertionCardListProps {
   testId: string;
 }
 
-const AssertionCardList: React.FC<TAssertionCardListProps> = ({
-  assertionResults: {resultList},
-  onSelectSpan,
-  testId,
-}) => {
+const AssertionCardList: React.FC<TAssertionCardListProps> = ({assertionResults: {resultList}, onSelectSpan}) => {
   const {open} = useAssertionForm();
+  const {remove} = useTestDefinition();
 
-  const handleEdit = useCallback(data => {
-    console.log('@@onEditAssertion', data);
-  }, []);
+  const handleEdit = useCallback(
+    ({selector, resultList: list, selectorList, pseudoSelector}: TAssertionResultEntry) => {
+      open({
+        isEditing: true,
+        selector,
+        defaultValues: {
+          assertionList: list.map(({assertion}) => assertion),
+          selectorList,
+          pseudoSelector,
+        },
+      });
+    },
+    [open]
+  );
+
+  const handleDelete = useCallback(
+    (selector: string) => {
+      remove(selector);
+    },
+    [remove]
+  );
 
   return (
     <S.AssertionCardList data-cy="assertion-card-list">
@@ -31,9 +47,8 @@ const AssertionCardList: React.FC<TAssertionCardListProps> = ({
               key={assertionResult.id}
               assertionResult={assertionResult}
               onSelectSpan={onSelectSpan}
-              selectorList={[]}
               onEdit={handleEdit}
-              onDelete={assertionId => console.log('@@onDeleteAssertion', assertionId)}
+              onDelete={handleDelete}
             />
           ) : null
         )

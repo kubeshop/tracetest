@@ -6,7 +6,7 @@ export type TRawTest = TTestSchemas['Test'];
 export type TTest = Model<
   TRawTest,
   {
-    definition?: TTestDefinition;
+    definition: TTestDefinition;
     serviceUnderTest?: {
       request?: THttpSchemas['HTTPRequest'];
     };

@@ -1,5 +1,6 @@
-import {CompareOperator} from 'constants/Operator.constants';
+import {PseudoSelector} from '../constants/Operator.constants';
 import {Model, TTestSchemas} from './Common.types';
+import {TCompareOperatorSymbol} from './Operator.types';
 import {TSpanFlatAttribute} from './Span.types';
 
 export type TRawAssertion = TTestSchemas['Assertion'];
@@ -9,15 +10,23 @@ export type TAssertion = Model<TRawAssertion, {}>;
 export type TSpanSelector = Model<
   TSpanFlatAttribute,
   {
-    operator: CompareOperator;
+    operator: TCompareOperatorSymbol;
   }
 >;
+
+export type TPseudoSelector = {
+  selector: PseudoSelector;
+  number?: number;
+};
 
 export type TRawAssertionResults = TTestSchemas['AssertionResults'];
 
 export type TAssertionResultEntry = {
   id: string;
   selector: string;
+  spanCount: number;
+  pseudoSelector?: TPseudoSelector;
+  selectorList: TSpanSelector[];
   resultList: TAssertionResult[];
 };
 
