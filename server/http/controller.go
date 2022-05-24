@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/google/uuid"
@@ -301,7 +302,7 @@ func (c *controller) AssertionDryRun(ctx context.Context, _, runID string, def o
 	}
 
 	if run.Trace == nil {
-		return openapi.Response(http.StatusInternalServerError, "given run has no trace associated"), nil
+		return openapi.Response(http.StatusUnprocessableEntity, fmt.Sprintf(`run "%s" has no trace associated`, runID)), nil
 	}
 
 	results, allPassed := assertions.Assert(c.model.Definition(def), *run.Trace)
