@@ -16,7 +16,7 @@ const ResultCardList: React.FC<IResultCardListProps> = ({resultList, testId}) =>
 
   const onResultClick = useCallback(
     (resultId: string) => {
-      navigate(`/test/${testId}/result/${resultId}`);
+      navigate(`/test/${testId}/run/${resultId}`);
     },
     [navigate, testId]
   );

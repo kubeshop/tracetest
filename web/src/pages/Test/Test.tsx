@@ -16,7 +16,7 @@ const TestPage: React.FC = () => {
 
   const handleSelectTestResult = useCallback(
     (result: TTestRun) => {
-      navigate(`/test/${testId}/result/${result.id}`);
+      navigate(`/test/${testId}/run/${result.id}`);
     },
     [navigate, testId]
   );

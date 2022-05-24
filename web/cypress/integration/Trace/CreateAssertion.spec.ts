@@ -19,7 +19,7 @@ describe('Create Assertion', () => {
     cy.location('href').should('match', /\/test\/.*/i);
 
     cy.get(`[data-cy^=test-run-result-]`).first().click();
-    cy.location('href').should('match', /\/result\/.*/i);
+    cy.location('href').should('match', /\/run\/.*/i);
 
     cy.get('[data-cy^=trace-node-]', {timeout: 10000}).should('be.visible');
     cy.get('[data-cy=add-assertion-button]').click();

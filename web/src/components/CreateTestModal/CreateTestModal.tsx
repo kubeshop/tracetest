@@ -39,7 +39,7 @@ const CreateTestModal = ({visible, onClose}: IProps): JSX.Element => {
       const newRun = await runTest({testId: newTest.id}).unwrap();
       onClose();
       setIsOpen(false);
-      navigate(`/test/${newTest.id}/result/${newRun.id}`);
+      navigate(`/test/${newTest.id}/run/${newRun.id}`);
     },
     [createTest, navigate, onClose, runTest, setIsOpen]
   );

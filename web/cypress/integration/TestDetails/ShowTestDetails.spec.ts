@@ -23,7 +23,7 @@ describe('Show test details', () => {
   it('should run a new test', () => {
     cy.visit(`http://localhost:3000/test/${testId}`);
     cy.get(`[data-cy=test-details-run-test-button]`).click();
-    cy.location('pathname').should('match', /\/result\/.*/i);
+    cy.location('pathname').should('match', /\/run\/.*/i);
 
     cy.location().then(({pathname}) => {
       const testRunResultId = getResultId(pathname);
@@ -31,7 +31,7 @@ describe('Show test details', () => {
       cy.wait(2000);
       cy.get('[data-cy=test-header-back-button]').click();
       cy.get(`[data-cy=result-card-${testRunResultId}]`, {timeout: 10000}).should('be.visible');
-      cy.visit(`http://localhost:3000/test/${testId}/result/${testRunResultId}`);
+      cy.visit(`http://localhost:3000/test/${testId}/run/${testRunResultId}`);
     });
   });
 
