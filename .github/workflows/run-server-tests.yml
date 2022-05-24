@@ -25,4 +25,4 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Run tests
-        run: cd cli; make test
+        run: cd server; make test
