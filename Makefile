@@ -40,6 +40,9 @@ UNAME_P := $(shell uname -p)
 ifeq ($(UNAME_P),x86_64)
 	PROTOC_IMAGE=jaegertracing/protobuf:$(PROTOC_VER)
 endif
+ifeq ($(UNAME_P),i386)
+	PROTOC_IMAGE=jaegertracing/protobuf:$(PROTOC_VER)
+endif
 ifneq ($(filter arm%,$(UNAME_P)),)
 	PROTOC_IMAGE=schoren/protobuf:$(PROTOC_VER)
 endif
