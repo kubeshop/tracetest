@@ -11,7 +11,7 @@ vet:
 	go vet -structtag=false ./...
 
 run:
-	go run main.go
+	go run -mod=readonly main.go
 
 OPENAPI_GENERATOR_VER=v5.4.0
 OPENAPI_GENERATOR_IMAGE=openapitools/openapi-generator-cli:$(OPENAPI_GENERATOR_VER)
