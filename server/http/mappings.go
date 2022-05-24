@@ -127,6 +127,7 @@ func (m openapiMapper) Trace(in *traces.Trace) openapi.Trace {
 		flat[id.String()] = openapi.Span{
 			Id:         span.ID.String(),
 			Attributes: map[string]string(span.Attributes),
+			ParentId:   span.Parent.ID.String(),
 		}
 	}
 
