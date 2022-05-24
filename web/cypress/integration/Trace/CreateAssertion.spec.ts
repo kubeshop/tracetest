@@ -3,7 +3,7 @@ import {createTest, deleteTest, testId} from '../utils/common';
 const getAttributeListId = (number: number) => `#assertion-form_assertionList_${number}_attribute_list`;
 const getComparatorListId = (number: number) => `#assertion-form_assertionList_${number}_comparator_list`;
 
-describe.only('Create Assertion', () => {
+describe('Create Assertion', () => {
   before(() => {
     createTest();
   });
