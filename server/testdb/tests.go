@@ -18,12 +18,47 @@ func (td *postgresDB) CreateTest(ctx context.Context, test model.Test) (model.Te
 	test.ReferenceRun = nil
 	test.Version = 1
 
-	return td.CreateTestVersion(ctx, test)
+	stmt, err := td.db.Prepare("INSERT INTO tests(id, test, version) VALUES( $1, $2, $3 )")
+	if err != nil {
+		return model.Test{}, fmt.Errorf("sql prepare: %w", err)
+	}
+	defer stmt.Close()
+
+	b, err := encodeTest(test)
+	if err != nil {
+		return model.Test{}, fmt.Errorf("encoding error: %w", err)
+	}
+	_, err = stmt.ExecContext(ctx, test.ID, b, test.Version)
+	if err != nil {
+		return model.Test{}, fmt.Errorf("sql exec: %w", err)
+	}
+
+	err = td.SetDefiniton(ctx, test, test.Definition)
+	if err != nil {
+		return model.Test{}, fmt.Errorf("setDefinition error: %w", err)
+	}
+
+	return test, nil
 }
 
-func (td *postgresDB) CreateTestVersion(ctx context.Context, test model.Test) (model.Test, error) {
+func (td *postgresDB) UpdateTest(ctx context.Context, test model.Test) (model.Test, error) {
 	if test.Version == 0 {
 		test.Version = 1
+	}
+
+	oldTest, err := td.GetLatestTestVersion(ctx, test.ID)
+	if err != nil {
+		return model.Test{}, fmt.Errorf("could not get latest test version while updating test: %w", err)
+	}
+
+	testToUpdate, err := model.BumpTestVersionIfNeeded(oldTest, test)
+	if err != nil {
+		return model.Test{}, fmt.Errorf("could not bump test version: %w", err)
+	}
+
+	if oldTest.Version == testToUpdate.Version {
+		// No change in the version, so nothing changes and it doesn't need to persist it
+		return testToUpdate, nil
 	}
 
 	stmt, err := td.db.Prepare("INSERT INTO tests(id, test, version) VALUES( $1, $2, $3 )")
@@ -49,8 +84,8 @@ func (td *postgresDB) CreateTestVersion(ctx context.Context, test model.Test) (m
 	return test, nil
 }
 
-func (td *postgresDB) UpdateTest(ctx context.Context, test model.Test) error {
-	stmt, err := td.db.Prepare("UPDATE tests SET test = $2 WHERE id = $1")
+func (td *postgresDB) UpdateTestVersion(ctx context.Context, test model.Test) error {
+	stmt, err := td.db.Prepare("UPDATE tests SET test = $2 WHERE id = $1 AND version = $3")
 	if err != nil {
 		return fmt.Errorf("sql prepare: %w", err)
 	}
@@ -61,7 +96,7 @@ func (td *postgresDB) UpdateTest(ctx context.Context, test model.Test) error {
 		return fmt.Errorf("encoding error: %w", err)
 	}
 
-	_, err = stmt.Exec(test.ID, b)
+	_, err = stmt.Exec(test.ID, b, test.Version)
 	if err != nil {
 		return fmt.Errorf("sql exec: %w", err)
 	}

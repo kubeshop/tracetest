@@ -43,7 +43,7 @@ func TestUpdateTest(t *testing.T) {
 	test := createTest(t, db)
 	test.Name = "updated test"
 
-	err := db.UpdateTest(context.TODO(), test)
+	err := db.UpdateTestVersion(context.TODO(), test)
 	require.NoError(t, err)
 
 	actual, err := db.GetLatestTestVersion(context.TODO(), test.ID)
@@ -74,7 +74,7 @@ func TestGetLatestTestVersion(t *testing.T) {
 	test.Name = "1 v2"
 	test.Version = 2
 
-	_, err := db.CreateTestVersion(context.TODO(), test)
+	_, err := db.UpdateTest(context.TODO(), test)
 	require.NoError(t, err)
 
 	latestTest, err := db.GetLatestTestVersion(context.TODO(), test.ID)
@@ -106,14 +106,14 @@ func TestGetTestsWithMultipleVersions(t *testing.T) {
 	test1.Name = "1 v2"
 	test1.Version = 2
 
-	_, err := db.CreateTestVersion(context.TODO(), test1)
+	_, err := db.UpdateTest(context.TODO(), test1)
 	require.NoError(t, err)
 
 	test2 := createTestWithName(t, db, "2")
 	test2.Name = "2 v2"
 	test2.Version = 2
 
-	_, err = db.CreateTestVersion(context.TODO(), test2)
+	_, err = db.UpdateTest(context.TODO(), test2)
 	require.NoError(t, err)
 
 	tests, err := db.GetTests(context.TODO(), 20, 0)

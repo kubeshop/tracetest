@@ -283,16 +283,9 @@ func (c *controller) UpdateTest(ctx context.Context, testID string, in openapi.T
 	updated.ID = test.ID
 	updated.ReferenceRun = nil
 
-	updated, err = model.BumpTestVersionIfNeeded(test, updated)
+	_, err = c.testDB.UpdateTest(ctx, updated)
 	if err != nil {
-		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
-	}
-
-	if updated.Version != test.Version {
-		_, err = c.testDB.CreateTestVersion(ctx, updated)
-		if err != nil {
-			return handleDBError(err), err
-		}
+		return handleDBError(err), err
 	}
 
 	return openapi.Response(204, nil), nil

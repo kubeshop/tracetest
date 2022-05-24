@@ -101,7 +101,7 @@ func (f runnerFixture) expectSuccessExec(test model.Test) {
 func (f runnerFixture) expectSuccessResultPersist(test model.Test) {
 	expectCreateRun(f.mockDB, test)
 	f.mockDB.On("UpdateRun", mock.Anything).Return(noError)
-	f.mockDB.On("UpdateTest", mock.Anything).Return(noError)
+	f.mockDB.On("UpdateTestVersion", mock.Anything).Return(noError)
 	f.mockDB.On("UpdateRun", mock.Anything).Return(noError)
 	f.mockTracePoller.expectPoll(test)
 }

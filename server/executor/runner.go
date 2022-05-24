@@ -115,7 +115,7 @@ func (r persistentRunner) processExecQueue(job execReq) {
 
 	if job.test.ReferenceRun == nil {
 		job.test.ReferenceRun = &run
-		r.handleDBError(r.tests.UpdateTest(job.ctx, job.test))
+		r.handleDBError(r.tests.UpdateTestVersion(job.ctx, job.test))
 	}
 
 	r.handleDBError(r.tests.UpdateRun(job.ctx, run))
