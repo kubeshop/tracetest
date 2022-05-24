@@ -32,7 +32,7 @@ generate:
 	rm -f $(OPENAPI_SERVER_TARGET_DIR)/api_api_service.go
 	rm -rf ./tmp
 
-	go fmt ./...
+	go fmt $(GO_FLAGS) ./...
 
 PROTOC_VER=0.3.1
 UNAME_P := $(shell uname -p)
