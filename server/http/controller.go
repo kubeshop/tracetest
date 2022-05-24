@@ -290,11 +290,11 @@ func (c *controller) UpdateTest(ctx context.Context, testID string, in openapi.T
 
 	if testHasChanged {
 		updated.Version = test.Version + 1
-	}
 
-	err = c.testDB.UpdateTest(ctx, updated)
-	if err != nil {
-		return handleDBError(err), err
+		_, err = c.testDB.CreateTestVersion(ctx, updated)
+		if err != nil {
+			return handleDBError(err), err
+		}
 	}
 
 	return openapi.Response(204, nil), nil

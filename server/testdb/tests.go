@@ -18,10 +18,14 @@ func (td *postgresDB) CreateTest(ctx context.Context, test model.Test) (model.Te
 	test.ReferenceRun = nil
 	test.Version = 1
 
-	return td.createTest(ctx, test)
+	return td.CreateTestVersion(ctx, test)
 }
 
-func (td *postgresDB) createTest(ctx context.Context, test model.Test) (model.Test, error) {
+func (td *postgresDB) CreateTestVersion(ctx context.Context, test model.Test) (model.Test, error) {
+	if test.Version == 0 {
+		test.Version = 1
+	}
+
 	stmt, err := td.db.Prepare("INSERT INTO tests(id, test, version) VALUES( $1, $2, $3 )")
 	if err != nil {
 		return model.Test{}, fmt.Errorf("sql prepare: %w", err)

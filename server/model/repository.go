@@ -9,6 +9,7 @@ import (
 
 type TestRepository interface {
 	CreateTest(context.Context, Test) (Test, error)
+	CreateTestVersion(context.Context, Test) (Test, error)
 	UpdateTest(context.Context, Test) error
 	DeleteTest(context.Context, Test) error
 	GetLatestTestVersion(context.Context, uuid.UUID) (Test, error)
