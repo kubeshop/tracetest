@@ -9,7 +9,7 @@ const Router = (): JSX.Element => {
       <Routes>
         <Route path="/" element={<Home path="home" />} />
         <Route path="/test/:testId" element={<Test path="test-details" />} />
-        <Route path="/test/:testId/result/:runId" element={<Trace path="trace" />} />
+        <Route path="/test/:testId/run/:runId" element={<Trace path="trace" />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </BrowserRouter>

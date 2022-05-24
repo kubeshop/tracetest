@@ -20,7 +20,7 @@ const AssertionCard: React.FC<TAssertionCardProps> = ({
 }) => {
   const store = useStore();
 
-  const spanCountText = useMemo(() => `${spanCount} ${spanCount > 1 ? 'spans' : 'span'}`, [spanCount]);
+  const spanCountText = `${spanCount} ${spanCount > 1 ? 'spans' : 'span'}`;
 
   const getIsSelectedSpan = useCallback(
     (id: string): boolean => {

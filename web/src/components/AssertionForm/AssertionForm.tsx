@@ -1,5 +1,4 @@
 import React, {useCallback} from 'react';
-import {useSelector} from 'react-redux';
 import {FieldData} from 'antd/node_modules/rc-field-form/es/interface';
 import {isEmpty} from 'lodash';
 import {Typography, Form, Button} from 'antd';
@@ -16,10 +15,9 @@ import {TAssertion, TPseudoSelector, TSpanSelector} from '../../types/Assertion.
 import AssertionFormPseudoSelectorInput from './AssertionFormPseudoSelectorInput';
 import AssertionFormCheckList from './AssertionFormCheckList';
 import {useGetSelectedSpansQuery} from '../../redux/apis/TraceTest.api';
-import {RootState} from '../../redux/store';
-import {TSpanFlatAttribute} from '../../types/Span.types';
 import OperatorService from '../../services/Operator.service';
 import SelectorService from '../../services/Selector.service';
+import {useAppSelector} from '../../redux/hooks';
 
 const {onChecksChange, onSelectorChange} = CreateAssertionModalAnalyticsService;
 
@@ -67,7 +65,7 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
     runId,
   });
 
-  const attributeList = useSelector<RootState, TSpanFlatAttribute[]>(state =>
+  const attributeList = useAppSelector(state =>
     AssertionSelectors.selectAttributeList(state, testId, runId, spanIdList)
   );
 

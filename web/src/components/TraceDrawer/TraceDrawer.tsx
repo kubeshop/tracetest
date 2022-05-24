@@ -43,11 +43,12 @@ const TraceDrawer: React.FC<IProps> = ({run: {id: runId}, run, testId, visiblePo
         visiblePortion={visiblePortion}
       />
       <S.Content>
-        {isLoading ? (
+        {isLoading && (
           <S.LoadingSpinnerContainer>
             <LoadingSpinner />
           </S.LoadingSpinnerContainer>
-        ) : isAssertionFormOpen ? (
+        )}
+        {!isLoading && isAssertionFormOpen && (
           <AssertionForm
             runId={runId}
             onSubmit={onSubmit}
@@ -57,9 +58,8 @@ const TraceDrawer: React.FC<IProps> = ({run: {id: runId}, run, testId, visiblePo
               close();
             }}
           />
-        ) : (
-          <TestResults testId={testId} run={run} onSelectSpan={onSelectSpan} />
         )}
+        {!isLoading && !isAssertionFormOpen && <TestResults testId={testId} run={run} onSelectSpan={onSelectSpan} />}
       </S.Content>
     </Drawer>
   );
