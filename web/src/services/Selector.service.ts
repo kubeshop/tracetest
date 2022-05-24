@@ -21,7 +21,7 @@ const nthChildNumberRegex = /\((.*)\)/i;
 const operationRegex = /([=]+|contains)/;
 
 const getFilters = (selectors: TSpanSelector[]) =>
-  selectors.map(({key, operator, value}) => `${key}${operator}${getValue(value)}`);
+  selectors.map(({key, operator, value}) => `${key} ${operator} ${getValue(value)}`);
 
 const getCleanValue = (value: string): string => {
   if (value.includes('"')) {
@@ -46,7 +46,7 @@ const getPseudoSelectorString = (pseudoSelector?: TPseudoSelector): string => {
 const SelectorService = () => ({
   getSelectorString(selectorList: TSpanSelector[], pseudoSelector?: TPseudoSelector): string {
     return selectorList.length
-      ? `span[${getFilters(selectorList).join(' ')}]${getPseudoSelectorString(pseudoSelector)}`
+      ? `span[${getFilters(selectorList).join('  ')}]${getPseudoSelectorString(pseudoSelector)}`
       : '';
   },
 
@@ -55,11 +55,18 @@ const SelectorService = () => ({
 
     if (!matchString) return [];
 
-    const selectorList = matchString.split(' ').map(operation => {
+    const selectorList = matchString.split('  ').reduce<TSpanSelector[]>((list, operation) => {
+      if (!operation) return list;
       const [key, operator, value] = operation.split(operationRegex);
 
-      return {key, operator: operator as TCompareOperatorSymbol, value: getCleanValue(value)};
-    });
+      const spanSelector = {
+        key: key.trim(),
+        operator: operator.trim() as TCompareOperatorSymbol,
+        value: getCleanValue(value.trim()),
+      };
+
+      return list.concat([spanSelector]);
+    }, []);
 
     return selectorList;
   },

@@ -19,10 +19,10 @@ const operatorOptionList = [
     key: '=',
     value: OperatorService.getOperatorSymbol(CompareOperator.EQUALS),
   },
-  // {
-  //   key: 'contains',
-  //   value: OperatorService.getOperatorSymbol(CompareOperator.CONTAINS),
-  // },
+  {
+    key: 'contains',
+    value: OperatorService.getOperatorSymbol(CompareOperator.CONTAINS),
+  },
 ];
 
 const AssertionFormSelectorInput: React.FC<TItemSelectorDropdownProps> = ({
@@ -88,7 +88,7 @@ const AssertionFormSelectorInput: React.FC<TItemSelectorDropdownProps> = ({
 
   const defaultValueList = useMemo(
     () =>
-      selectorList.flatMap(({key, operator = CompareOperator.EQUALS, value}, index) => {
+      selectorList.flatMap(({key, operator, value}, index) => {
         return [
           {
             key: `${index}-${key}`,
@@ -97,7 +97,7 @@ const AssertionFormSelectorInput: React.FC<TItemSelectorDropdownProps> = ({
           },
           {
             key: `${index}-${operator}`,
-            label: '=',
+            label: operator,
             value: `${operator}${SEPARATOR}1${SEPARATOR}${index}`,
           },
           {
