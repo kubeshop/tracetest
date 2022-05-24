@@ -226,6 +226,121 @@ func (a *ApiApiService) DeleteTestExecute(r ApiDeleteTestRequest) (*http.Respons
 	return localVarHTTPResponse, nil
 }
 
+type ApiDryRunAssertionRequest struct {
+	ctx            context.Context
+	ApiService     *ApiApiService
+	testId         string
+	runId          string
+	testDefinition *TestDefinition
+}
+
+func (r ApiDryRunAssertionRequest) TestDefinition(testDefinition TestDefinition) ApiDryRunAssertionRequest {
+	r.testDefinition = &testDefinition
+	return r
+}
+
+func (r ApiDryRunAssertionRequest) Execute() (*AssertionResults, *http.Response, error) {
+	return r.ApiService.DryRunAssertionExecute(r)
+}
+
+/*
+DryRunAssertion run given assertions against the traces from the given run without persisting anything
+
+use this method to test a definition against an actual trace without creating a new version or persisting anything
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param testId
+ @param runId
+ @return ApiDryRunAssertionRequest
+*/
+func (a *ApiApiService) DryRunAssertion(ctx context.Context, testId string, runId string) ApiDryRunAssertionRequest {
+	return ApiDryRunAssertionRequest{
+		ApiService: a,
+		ctx:        ctx,
+		testId:     testId,
+		runId:      runId,
+	}
+}
+
+// Execute executes the request
+//  @return AssertionResults
+func (a *ApiApiService) DryRunAssertionExecute(r ApiDryRunAssertionRequest) (*AssertionResults, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodPut
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *AssertionResults
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.DryRunAssertion")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/tests/{testId}/run/{runId}/dry-run"
+	localVarPath = strings.Replace(localVarPath, "{"+"testId"+"}", url.PathEscape(parameterToString(r.testId, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"runId"+"}", url.PathEscape(parameterToString(r.runId, "")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.testDefinition
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
 type ApiGetTestRequest struct {
 	ctx        context.Context
 	ApiService *ApiApiService

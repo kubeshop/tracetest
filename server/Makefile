@@ -1,17 +1,19 @@
 all: init-submodule proto generate
 
+GO_FLAGS=-mod=readonly
+
 init-submodule:
 	git submodule init
 	git submodule update
 
 test:
-	go test -timeout 90s -coverprofile=coverage.out ./...
+	go test $(GO_FLAGS) -timeout 90s -coverprofile=coverage.out ./...
 
 vet:
-	go vet -structtag=false ./...
+	go vet $(GO_FLAGS) -structtag=false ./...
 
 run:
-	go run main.go
+	go run $(GO_FLAGS) main.go
 
 OPENAPI_GENERATOR_VER=v5.4.0
 OPENAPI_GENERATOR_IMAGE=openapitools/openapi-generator-cli:$(OPENAPI_GENERATOR_VER)
@@ -30,7 +32,7 @@ generate:
 	rm -f $(OPENAPI_SERVER_TARGET_DIR)/api_api_service.go
 	rm -rf ./tmp
 
-	go fmt ./...
+	go fmt $(GO_FLAGS) ./...
 
 PROTOC_VER=0.3.1
 UNAME_P := $(shell uname -p)

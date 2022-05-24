@@ -18,7 +18,7 @@ generate-client:
 	cp ./tmp/*.go $(OPENAPI_TARGET_DIR)
 	rm -rf ./tmp
 
-	cd openapi; pwd; go fmt ./...; cd ..
+	go fmt ./...; cd ..
 
 build: generate-client
 	go build -o tracetest main.go

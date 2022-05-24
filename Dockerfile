@@ -7,13 +7,13 @@ RUN npm ci --silent
 COPY ./web ./
 RUN npm run build
 
-FROM golang:1.17-alpine AS build-go
+FROM golang:1.18-alpine AS build-go
 WORKDIR /go/src
 
 COPY ./server/go.mod ./server/go.sum ./
 RUN go mod download
 COPY ./server ./
-RUN go build -o tracetest-server .
+RUN go build -mod=readonly -o tracetest-server .
 
 FROM alpine AS release
 # Enable machine-id on alpine-linux (https://gitlab.alpinelinux.org/alpine/aports/-/issues/8761)
