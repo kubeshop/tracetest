@@ -4,10 +4,12 @@ import (
 	"context"
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/google/uuid"
 	"github.com/kubeshop/tracetest/analytics"
+	"github.com/kubeshop/tracetest/assertions"
 	"github.com/kubeshop/tracetest/assertions/comparator"
 	"github.com/kubeshop/tracetest/assertions/selectors"
 	"github.com/kubeshop/tracetest/executor"
@@ -286,4 +288,28 @@ func (c *controller) UpdateTest(ctx context.Context, testID string, in openapi.T
 	}
 
 	return openapi.Response(204, nil), nil
+}
+
+func (c *controller) DryRunAssertion(ctx context.Context, _, runID string, def openapi.TestDefinition) (openapi.ImplResponse, error) {
+	rid, err := uuid.Parse(runID)
+	if err != nil {
+		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
+	}
+
+	run, err := c.testDB.GetRun(ctx, rid)
+	if err != nil {
+		return openapi.Response(http.StatusInternalServerError, ""), nil
+	}
+
+	if run.Trace == nil {
+		return openapi.Response(http.StatusUnprocessableEntity, fmt.Sprintf(`run "%s" has no trace associated`, runID)), nil
+	}
+
+	results, allPassed := assertions.Assert(c.model.Definition(def), *run.Trace)
+	res := c.openapi.Result(&model.RunResults{
+		AllPassed: allPassed,
+		Results:   results,
+	})
+
+	return openapi.Response(200, res), nil
 }
