@@ -53,6 +53,23 @@ func TestComparators(t *testing.T) {
 
 		// ***********
 		{
+			name:       "Gte",
+			symbol:     ">=",
+			comparator: comparator.Gte,
+			expectSuccess: []compInput{
+				{"2", "1"},
+				{"2", "2"},
+			},
+			expectNoMatch: []compInput{
+				{"1", "2"},
+			},
+			expectError: []compErr{
+				{"a", "1", `cannot parse "a" as integer`},
+			},
+		},
+
+		// ***********
+		{
 			name:       "Lt",
 			symbol:     "<",
 			comparator: comparator.Lt,
@@ -62,6 +79,23 @@ func TestComparators(t *testing.T) {
 			},
 			expectNoMatch: []compInput{
 				{"1", "1"},
+				{"2", "1"},
+			},
+			expectError: []compErr{
+				{"a", "1", `cannot parse "a" as integer`},
+			},
+		},
+
+		// ***********
+		{
+			name:       "Lte",
+			symbol:     "<=",
+			comparator: comparator.Lte,
+			expectSuccess: []compInput{
+				{"1", "2"},
+				{"1", "1"},
+			},
+			expectNoMatch: []compInput{
 				{"2", "1"},
 			},
 			expectError: []compErr{
