@@ -31,3 +31,5 @@ export const DemoTestExampleList: DemoTestExample[] = [
     description: 'Import a Pokemon',
   },
 ];
+
+export const DEFAULT_HEADERS = [{key: 'Content-Type', value: 'application/json'}];
