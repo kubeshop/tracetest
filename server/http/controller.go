@@ -3,7 +3,6 @@ package http
 import (
 	"context"
 	"encoding/hex"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -280,17 +279,16 @@ func (c *controller) UpdateTest(ctx context.Context, testID string, in openapi.T
 	}
 
 	updated := c.model.Test(in)
+	updated.Version = test.Version
 	updated.ID = test.ID
 	updated.ReferenceRun = nil
 
-	testHasChanged, err := c.testHasChanged(test, updated)
+	updated, err = model.BumpTestVersionIfNeeded(test, updated)
 	if err != nil {
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
 	}
 
-	if testHasChanged {
-		updated.Version = test.Version + 1
-
+	if updated.Version != test.Version {
 		_, err = c.testDB.CreateTestVersion(ctx, updated)
 		if err != nil {
 			return handleDBError(err), err
@@ -322,35 +320,4 @@ func (c *controller) DryRunAssertion(ctx context.Context, _, runID string, def o
 	})
 
 	return openapi.Response(200, res), nil
-}
-
-func (c *controller) testHasChanged(oldTest model.Test, newTest model.Test) (bool, error) {
-	definitionHasChanged, err := c.testFieldHasChanged(oldTest.Definition, newTest.Definition)
-	if err != nil {
-		return false, err
-	}
-
-	serviceUnderTestHasChanged, err := c.testFieldHasChanged(oldTest.ServiceUnderTest, newTest.ServiceUnderTest)
-	if err != nil {
-		return false, err
-	}
-
-	nameHasChanged := oldTest.Name != newTest.Name
-	descriptionHasChanged := oldTest.Description != newTest.Description
-
-	return definitionHasChanged || serviceUnderTestHasChanged || nameHasChanged || descriptionHasChanged, nil
-}
-
-func (c controller) testFieldHasChanged(oldField interface{}, newField interface{}) (bool, error) {
-	oldFieldJSON, err := json.Marshal(oldField)
-	if err != nil {
-		return false, err
-	}
-
-	newFieldJSON, err := json.Marshal(newField)
-	if err != nil {
-		return false, err
-	}
-
-	return string(oldFieldJSON) != string(newFieldJSON), nil
 }

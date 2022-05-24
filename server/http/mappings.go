@@ -257,6 +257,7 @@ func (m modelMapper) Test(in openapi.Test) model.Test {
 		},
 		ReferenceRun: m.Run(in.ReferenceTestRun),
 		Definition:   m.Definition(in.Definition),
+		Version:      int(in.Version),
 	}
 }
 
