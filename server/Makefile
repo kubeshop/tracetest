@@ -4,16 +4,19 @@ init-submodule:
 	git submodule init
 	git submodule update
 
+deps:
+	go mod download
+
 test:
 	go test -timeout 90s -coverprofile=coverage.out ./...
 
 vet:
 	go vet -structtag=false ./...
 
-run:
+run: deps
 	go run main.go
 
-build:
+build: deps
 	go build -o tracetest-server main.go
 
 OPENAPI_GENERATOR_VER=v5.4.0
