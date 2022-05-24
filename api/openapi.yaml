@@ -224,7 +224,7 @@ paths:
             type: string
             format: uuid
           required: true
-      summary: "run given assertions agains the traces from the given run without persisting anything"
+      summary: "run given assertions against the traces from the given run without persisting anything"
       description: "use this method to test a definition agains an actual trace without creating a new version or persisting anything"
       operationId: assertionDryRun
       requestBody:
