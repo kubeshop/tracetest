@@ -80,6 +80,7 @@ func TestGetLatestTestVersion(t *testing.T) {
 	latestTest, err := db.GetLatestTestVersion(context.TODO(), test.ID)
 	assert.NoError(t, err)
 	assert.Equal(t, "1 v2", latestTest.Name)
+	assert.Equal(t, 2, latestTest.Version)
 }
 
 func TestGetTests(t *testing.T) {
