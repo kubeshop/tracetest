@@ -48,6 +48,7 @@ type (
 		Response    HTTPResponse
 		Trace       *traces.Trace
 		Results     *RunResults
+		TestVersion int
 	}
 
 	RunResults struct {

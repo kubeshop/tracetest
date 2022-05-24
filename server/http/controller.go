@@ -69,7 +69,7 @@ func (c *controller) DeleteTest(ctx context.Context, testID string) (openapi.Imp
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
 	}
 
-	test, err := c.testDB.GetTest(ctx, id)
+	test, err := c.testDB.GetLatestTestVersion(ctx, id)
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -91,7 +91,7 @@ func (c *controller) GetTest(ctx context.Context, testID string) (openapi.ImplRe
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
 	}
 
-	test, err := c.testDB.GetTest(ctx, id)
+	test, err := c.testDB.GetLatestTestVersion(ctx, id)
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -105,7 +105,7 @@ func (c *controller) GetTestDefinition(ctx context.Context, testID string) (open
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
 	}
 
-	test, err := c.testDB.GetTest(ctx, id)
+	test, err := c.testDB.GetLatestTestVersion(ctx, id)
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -167,7 +167,7 @@ func (c *controller) GetTestRuns(ctx context.Context, testID string, take, skip 
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
 	}
 
-	test, err := c.testDB.GetTest(ctx, id)
+	test, err := c.testDB.GetLatestTestVersion(ctx, id)
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -199,7 +199,7 @@ func (c *controller) RerunTestRun(ctx context.Context, testID string, runID stri
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
 	}
 
-	test, err := c.testDB.GetTest(ctx, id)
+	test, err := c.testDB.GetLatestTestVersion(ctx, id)
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -236,7 +236,7 @@ func (c *controller) RunTest(ctx context.Context, testID string) (openapi.ImplRe
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
 	}
 
-	test, err := c.testDB.GetTest(ctx, id)
+	test, err := c.testDB.GetLatestTestVersion(ctx, id)
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -254,7 +254,7 @@ func (c *controller) SetTestDefinition(ctx context.Context, testID string, def o
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
 	}
 
-	test, err := c.testDB.GetTest(ctx, id)
+	test, err := c.testDB.GetLatestTestVersion(ctx, id)
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -273,7 +273,7 @@ func (c *controller) UpdateTest(ctx context.Context, testID string, in openapi.T
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
 	}
 
-	test, err := c.testDB.GetTest(ctx, id)
+	test, err := c.testDB.GetLatestTestVersion(ctx, id)
 	if err != nil {
 		return handleDBError(err), err
 	}

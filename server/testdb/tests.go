@@ -14,15 +14,19 @@ import (
 var _ model.TestRepository = &postgresDB{}
 
 func (td *postgresDB) CreateTest(ctx context.Context, test model.Test) (model.Test, error) {
+	test.ID = IDGen.UUID()
+	test.ReferenceRun = nil
+	test.Version = 1
+
+	return td.createTest(ctx, test)
+}
+
+func (td *postgresDB) createTest(ctx context.Context, test model.Test) (model.Test, error) {
 	stmt, err := td.db.Prepare("INSERT INTO tests(id, test, version) VALUES( $1, $2, $3 )")
 	if err != nil {
 		return model.Test{}, fmt.Errorf("sql prepare: %w", err)
 	}
 	defer stmt.Close()
-
-	test.ID = IDGen.UUID()
-	test.ReferenceRun = nil
-	test.Version = 1
 
 	b, err := encodeTest(test)
 	if err != nil {
@@ -42,20 +46,15 @@ func (td *postgresDB) CreateTest(ctx context.Context, test model.Test) (model.Te
 }
 
 func (td *postgresDB) UpdateTest(ctx context.Context, test model.Test) error {
-	stmt, err := td.db.Prepare("UPDATE tests SET test = $2 WHERE id = $1")
+	oldTest, err := td.GetLatestTestVersion(ctx, test.ID)
 	if err != nil {
-		return fmt.Errorf("sql prepare: %w", err)
-	}
-	defer stmt.Close()
-
-	b, err := encodeTest(test)
-	if err != nil {
-		return fmt.Errorf("encoding error: %w", err)
+		return fmt.Errorf("could not get test latest version: %w", err)
 	}
 
-	_, err = stmt.Exec(test.ID, b)
+	test.Version = oldTest.Version + 1
+	_, err = td.createTest(ctx, test)
 	if err != nil {
-		return fmt.Errorf("sql exec: %w", err)
+		return fmt.Errorf("could not create new test version: %w", err)
 	}
 
 	return nil
@@ -78,8 +77,8 @@ func (td *postgresDB) DeleteTest(ctx context.Context, test model.Test) error {
 	return nil
 }
 
-func (td *postgresDB) GetTest(ctx context.Context, id uuid.UUID) (model.Test, error) {
-	stmt, err := td.db.Prepare("SELECT test FROM tests WHERE id = $1")
+func (td *postgresDB) GetLatestTestVersion(ctx context.Context, id uuid.UUID) (model.Test, error) {
+	stmt, err := td.db.Prepare("SELECT test FROM tests WHERE id = $1 ORDER BY version DESC LIMIT 1")
 	if err != nil {
 		return model.Test{}, fmt.Errorf("prepare: %w", err)
 	}
@@ -94,7 +93,9 @@ func (td *postgresDB) GetTest(ctx context.Context, id uuid.UUID) (model.Test, er
 }
 
 func (td *postgresDB) GetTests(ctx context.Context, take, skip int32) ([]model.Test, error) {
-	stmt, err := td.db.Prepare("SELECT test FROM tests LIMIT $1 OFFSET $2")
+	stmt, err := td.db.Prepare(`SELECT test FROM tests INNER JOIN (
+		SELECT id as idx, max(version) as latest_version FROM tests GROUP BY idx
+	) as latestTests ON latestTests.idx = id WHERE version = latestTests.latest_version LIMIT $1 OFFSET $2`)
 	if err != nil {
 		return nil, err
 	}

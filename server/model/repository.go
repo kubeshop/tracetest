@@ -11,7 +11,7 @@ type TestRepository interface {
 	CreateTest(context.Context, Test) (Test, error)
 	UpdateTest(context.Context, Test) error
 	DeleteTest(context.Context, Test) error
-	GetTest(context.Context, uuid.UUID) (Test, error)
+	GetLatestTestVersion(context.Context, uuid.UUID) (Test, error)
 	GetTests(_ context.Context, take, skip int32) ([]Test, error)
 }
 

@@ -17,7 +17,7 @@ type Test struct {
 	Description string `json:"description,omitempty"`
 
 	// version number of the test
-	Version string `json:"version,omitempty"`
+	Version int32 `json:"version,omitempty"`
 
 	ServiceUnderTest TestServiceUnderTest `json:"serviceUnderTest,omitempty"`
 

@@ -22,13 +22,14 @@ func (td *postgresDB) CreateRun(ctx context.Context, test model.Test, run model.
 
 	run.ID = IDGen.UUID()
 	run.State = model.RunStateCreated
+	run.TestVersion = test.Version
 
 	encoded, err := encodeRun(run)
 	if err != nil {
 		return model.Run{}, fmt.Errorf("encoding error: %w", err)
 	}
 
-	_, err = stmt.ExecContext(ctx, run.ID, test.ID, test.Version, encoded)
+	_, err = stmt.ExecContext(ctx, run.ID, test.ID, run.TestVersion, encoded)
 	if err != nil {
 		return model.Run{}, fmt.Errorf("sql exec: %w", err)
 	}

@@ -1,7 +1,11 @@
 ALTER TABLE tests
 ADD COLUMN "version" int NOT NULL DEFAULT 1;
 
-CREATE UNIQUE INDEX idx_unique_test_id_version ON tests (id, "version");
+ALTER TABLE tests
+DROP CONSTRAINT tests_pkey;
+
+ALTER TABLE tests
+ADD CONSTRAINT tests_pkey PRIMARY KEY (id, "version");
 
 ALTER TABLE runs
 ADD COLUMN test_version int NOT NULL;
