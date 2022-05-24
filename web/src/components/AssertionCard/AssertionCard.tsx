@@ -1,4 +1,4 @@
-import {useCallback, useMemo} from 'react';
+import {useCallback} from 'react';
 import {useStore} from 'react-flow-renderer';
 import {TAssertionResultEntry} from '../../types/Assertion.types';
 import AssertionCheckRow from '../AssertionCheckRow';
