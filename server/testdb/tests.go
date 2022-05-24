@@ -67,21 +67,21 @@ func (td *postgresDB) UpdateTest(ctx context.Context, test model.Test) (model.Te
 	}
 	defer stmt.Close()
 
-	b, err := encodeTest(test)
+	b, err := encodeTest(testToUpdate)
 	if err != nil {
 		return model.Test{}, fmt.Errorf("encoding error: %w", err)
 	}
-	_, err = stmt.ExecContext(ctx, test.ID, b, test.Version)
+	_, err = stmt.ExecContext(ctx, testToUpdate.ID, b, testToUpdate.Version)
 	if err != nil {
 		return model.Test{}, fmt.Errorf("sql exec: %w", err)
 	}
 
-	err = td.SetDefiniton(ctx, test, test.Definition)
+	err = td.SetDefiniton(ctx, testToUpdate, testToUpdate.Definition)
 	if err != nil {
 		return model.Test{}, fmt.Errorf("setDefinition error: %w", err)
 	}
 
-	return test, nil
+	return testToUpdate, nil
 }
 
 func (td *postgresDB) UpdateTestVersion(ctx context.Context, test model.Test) error {

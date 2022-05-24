@@ -104,14 +104,12 @@ func TestGetTestsWithMultipleVersions(t *testing.T) {
 
 	test1 := createTestWithName(t, db, "1")
 	test1.Name = "1 v2"
-	test1.Version = 2
 
 	_, err := db.UpdateTest(context.TODO(), test1)
 	require.NoError(t, err)
 
 	test2 := createTestWithName(t, db, "2")
 	test2.Name = "2 v2"
-	test2.Version = 2
 
 	_, err = db.UpdateTest(context.TODO(), test2)
 	require.NoError(t, err)
