@@ -46,15 +46,20 @@ func (td *postgresDB) createTest(ctx context.Context, test model.Test) (model.Te
 }
 
 func (td *postgresDB) UpdateTest(ctx context.Context, test model.Test) error {
-	oldTest, err := td.GetLatestTestVersion(ctx, test.ID)
+	stmt, err := td.db.Prepare("UPDATE tests SET test = $2 WHERE id = $1")
 	if err != nil {
-		return fmt.Errorf("could not get test latest version: %w", err)
+		return fmt.Errorf("sql prepare: %w", err)
+	}
+	defer stmt.Close()
+
+	b, err := encodeTest(test)
+	if err != nil {
+		return fmt.Errorf("encoding error: %w", err)
 	}
 
-	test.Version = oldTest.Version + 1
-	_, err = td.createTest(ctx, test)
+	_, err = stmt.Exec(test.ID, b)
 	if err != nil {
-		return fmt.Errorf("could not create new test version: %w", err)
+		return fmt.Errorf("sql exec: %w", err)
 	}
 
 	return nil

@@ -48,7 +48,7 @@ func TestUpdateTest(t *testing.T) {
 
 	actual, err := db.GetLatestTestVersion(context.TODO(), test.ID)
 	require.NoError(t, err)
-	assert.NotEqual(t, test, actual)
+	assert.Equal(t, test, actual)
 }
 
 func TestDeleteTest(t *testing.T) {
@@ -88,11 +88,14 @@ func TestGetTestsWithMultipleVersions(t *testing.T) {
 
 	test1 := createTestWithName(t, db, "1")
 	test1.Name = "1 v2"
-	test2 := createTestWithName(t, db, "2")
-	test2.Name = "2 v2"
+	test1.Version = 2
 
 	err := db.UpdateTest(context.TODO(), test1)
 	require.NoError(t, err)
+
+	test2 := createTestWithName(t, db, "2")
+	test2.Name = "2 v2"
+	test2.Version = 2
 
 	err = db.UpdateTest(context.TODO(), test2)
 	require.NoError(t, err)
