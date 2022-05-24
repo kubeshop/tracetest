@@ -1,5 +1,5 @@
 import {DeleteOutlined} from '@ant-design/icons';
-import {Button, Select as AntSelect, Space, Typography} from 'antd';
+import {Button, Select as AntSelect, Typography} from 'antd';
 import styled from 'styled-components';
 
 export const Select = styled(AntSelect)`
@@ -28,7 +28,7 @@ export const PseudoSelector = styled.div`
   gap: 4px;
 `;
 
-export const Check = styled(Space)`
+export const Check = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 210px) 1fr;
   gap: 4px;
@@ -73,4 +73,12 @@ export const AssertionFromActions = styled.div`
   display: flex;
   justify-content: flex-end;
   gap: 8px;
+`;
+
+export const CheckActions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-left: 14px;
+  height: 100%;
 `;

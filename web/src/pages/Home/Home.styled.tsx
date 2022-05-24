@@ -9,7 +9,7 @@ export const PageHeader = styled.div`
   flex-direction: row;
   justify-content: space-between;
   width: 100%;
-  margin: 32px 0;
+  margin: 14px 0;
 `;
 
 export const TitleText = styled(Typography.Title).attrs({
@@ -17,7 +17,7 @@ export const TitleText = styled(Typography.Title).attrs({
 })`
   && {
     font-size: 18px;
-    margin: 32px 0;
+    margin: 14px 0;
   }
 `;
 

@@ -77,26 +77,29 @@ const AssertionFormCheckList: React.FC<IProps> = ({fields, add, remove, attribut
           >
             <Input placeholder="Expected Value" />
           </Form.Item>
-          {index === fields.length - 1 ? (
-            <S.AddCheckButton
-              icon={<PlusOutlined />}
-              onClick={() => {
-                CreateAssertionModalAnalyticsService.onAddCheck();
-                add();
-              }}
-              disabled={!assertionList[name] || !getIsValid(assertionList[name])}
-              data-cy="add-assertion-form-add-check"
-            >
-              Add Check
-            </S.AddCheckButton>
-          ) : (
+          <S.CheckActions>
             <S.DeleteCheckIcon
               onClick={() => {
-                CreateAssertionModalAnalyticsService.onRemoveCheck();
-                remove(name);
+                if (index !== 0) {
+                  CreateAssertionModalAnalyticsService.onRemoveCheck();
+                  remove(name);
+                }
               }}
             />
-          )}
+            {index === fields.length - 1 && (
+              <S.AddCheckButton
+                icon={<PlusOutlined />}
+                onClick={() => {
+                  CreateAssertionModalAnalyticsService.onAddCheck();
+                  add();
+                }}
+                disabled={!assertionList[name] || !getIsValid(assertionList[name])}
+                data-cy="add-assertion-form-add-check"
+              >
+                Add Check
+              </S.AddCheckButton>
+            )}
+          </S.CheckActions>
         </S.Check>
       ))}
     </>

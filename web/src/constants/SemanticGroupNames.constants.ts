@@ -70,11 +70,12 @@ export const SemanticGroupNameNodeMap: Record<SemanticGroupNames, {primary: stri
 export const SELECTOR_DEFAULT_ATTRIBUTES = [
   {
     semanticGroup: SemanticGroupNames.Http,
-    attributes: ['tracetest.span.type', 'service.name', 'http.target', 'http.method'],
+    attributes: ['name', 'tracetest.span.type', 'service.name', 'http.target', 'http.method'],
   },
   {
     semanticGroup: SemanticGroupNames.Database,
     attributes: [
+      'name',
       'tracetest.span.type',
       'service.name',
       'db.system',
@@ -89,11 +90,20 @@ export const SELECTOR_DEFAULT_ATTRIBUTES = [
   },
   {
     semanticGroup: SemanticGroupNames.Rpc,
-    attributes: ['tracetest.span.type', 'service.name', 'rpc.system', 'rpc.service', 'rpc.method', 'message.type'],
+    attributes: [
+      'name',
+      'tracetest.span.type',
+      'service.name',
+      'rpc.system',
+      'rpc.service',
+      'rpc.method',
+      'message.type',
+    ],
   },
   {
     semanticGroup: SemanticGroupNames.Messaging,
     attributes: [
+      'name',
       'tracetest.span.type',
       'service.name',
       'messaging.system',
@@ -111,19 +121,34 @@ export const SELECTOR_DEFAULT_ATTRIBUTES = [
   },
   {
     semanticGroup: SemanticGroupNames.Faas,
-    attributes: ['tracetest.span.type', 'service.name', 'faas.invoked_name', 'faas.invoked_provider', 'faas.trigger'],
+    attributes: [
+      'name',
+      'tracetest.span.type',
+      'service.name',
+      'faas.invoked_name',
+      'faas.invoked_provider',
+      'faas.trigger',
+    ],
   },
   {
     semanticGroup: SemanticGroupNames.Exception,
-    attributes: ['tracetest.span.type', 'service.name', 'exception.type', 'exception.message', 'exception.escaped'],
+    attributes: [
+      'name',
+      'tracetest.span.type',
+      'service.name',
+      'exception.type',
+      'exception.message',
+      'exception.escaped',
+    ],
   },
   {
     semanticGroup: SemanticGroupNames.Compatibility,
-    attributes: ['tracetest.span.type', 'service.name', 'opentracing.ref_type'],
+    attributes: ['name', 'tracetest.span.type', 'service.name', 'opentracing.ref_type'],
   },
   {
     semanticGroup: SemanticGroupNames.General,
     attributes: [
+      'name',
       'service.name',
       'enduser.id',
       'enduser.role',

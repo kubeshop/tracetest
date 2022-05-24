@@ -1,4 +1,3 @@
-import {differenceInSeconds, parseISO} from 'date-fns';
 import {SemanticGroupNames, SemanticGroupsSignature} from '../constants/SemanticGroupNames.constants';
 
 import {TRawSpan, TSpan, TSpanFlatAttribute} from '../types/Span.types';
@@ -34,7 +33,7 @@ const getSpanSignature = (
   }, []);
 };
 
-const Span = ({id = '', name = '', attributes = {}, startTime = '', endTime = '', parentId = ''}: TRawSpan): TSpan => {
+const Span = ({id = '', attributes = {}, startTime = '', endTime = '', parentId = ''}: TRawSpan): TSpan => {
   const attributeList = Object.entries(attributes).map<TSpanFlatAttribute>(([key, value]) => ({
     value: String(value),
     key,
@@ -46,8 +45,8 @@ const Span = ({id = '', name = '', attributes = {}, startTime = '', endTime = ''
     return {...map, [spanAttribute.name]: SpanAttribute(rawSpanAttribute)};
   }, {});
 
-  const duration = startTime && endTime ? differenceInSeconds(parseISO(startTime), parseISO(endTime)) + 1 : 0;
-
+  const duration = Number(attributes['tracetest.span.duration']) || 0;
+  const name = attributes.name || '';
   const type = getSpanType(attributeList);
 
   return {
