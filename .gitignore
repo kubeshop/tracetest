@@ -18,4 +18,3 @@ swagger/
 # Common text editors
 .vscode/
 .idea/
-vendor/
