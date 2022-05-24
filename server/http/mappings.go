@@ -124,9 +124,16 @@ func (m openapiMapper) Trace(in *traces.Trace) openapi.Trace {
 
 	flat := map[string]openapi.Span{}
 	for id, span := range in.Flat {
+		parentID := ""
+		if span.Parent != nil {
+			parentID = span.Parent.ID.String()
+		}
 		flat[id.String()] = openapi.Span{
 			Id:         span.ID.String(),
 			Attributes: map[string]string(span.Attributes),
+			StartTime:  span.StartTime,
+			EndTime:    span.EndTime,
+			ParentId:   parentID,
 		}
 	}
 
