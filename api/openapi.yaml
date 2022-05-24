@@ -226,7 +226,7 @@ paths:
           required: true
       summary: "run given assertions against the traces from the given run without persisting anything"
       description: "use this method to test a definition against an actual trace without creating a new version or persisting anything"
-      operationId: assertionDryRun
+      operationId: dryRunAssertion
       requestBody:
         content:
           application/json:

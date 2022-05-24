@@ -51,12 +51,6 @@ func NewApiApiController(s ApiApiServicer, opts ...ApiApiOption) Router {
 func (c *ApiApiController) Routes() Routes {
 	return Routes{
 		{
-			"AssertionDryRun",
-			strings.ToUpper("Put"),
-			"/api/tests/{testId}/run/{runId}/dry-run",
-			c.AssertionDryRun,
-		},
-		{
 			"CreateTest",
 			strings.ToUpper("Post"),
 			"/api/tests",
@@ -67,6 +61,12 @@ func (c *ApiApiController) Routes() Routes {
 			strings.ToUpper("Delete"),
 			"/api/tests/{testId}",
 			c.DeleteTest,
+		},
+		{
+			"DryRunAssertion",
+			strings.ToUpper("Put"),
+			"/api/tests/{testId}/run/{runId}/dry-run",
+			c.DryRunAssertion,
 		},
 		{
 			"GetTest",
@@ -131,35 +131,6 @@ func (c *ApiApiController) Routes() Routes {
 	}
 }
 
-// AssertionDryRun - run given assertions agains the traces from the given run without persisting anything
-func (c *ApiApiController) AssertionDryRun(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	testIdParam := params["testId"]
-
-	runIdParam := params["runId"]
-
-	testDefinitionParam := TestDefinition{}
-	d := json.NewDecoder(r.Body)
-	d.DisallowUnknownFields()
-	if err := d.Decode(&testDefinitionParam); err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-	if err := AssertTestDefinitionRequired(testDefinitionParam); err != nil {
-		c.errorHandler(w, r, err, nil)
-		return
-	}
-	result, err := c.service.AssertionDryRun(r.Context(), testIdParam, runIdParam, testDefinitionParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
 // CreateTest - Create new test
 func (c *ApiApiController) CreateTest(w http.ResponseWriter, r *http.Request) {
 	testParam := Test{}
@@ -190,6 +161,35 @@ func (c *ApiApiController) DeleteTest(w http.ResponseWriter, r *http.Request) {
 	testIdParam := params["testId"]
 
 	result, err := c.service.DeleteTest(r.Context(), testIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// DryRunAssertion - run given assertions against the traces from the given run without persisting anything
+func (c *ApiApiController) DryRunAssertion(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	testIdParam := params["testId"]
+
+	runIdParam := params["runId"]
+
+	testDefinitionParam := TestDefinition{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&testDefinitionParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertTestDefinitionRequired(testDefinitionParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.DryRunAssertion(r.Context(), testIdParam, runIdParam, testDefinitionParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
