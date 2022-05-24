@@ -21,7 +21,7 @@ type TestRun struct {
 	TraceId *string `json:"traceId,omitempty"`
 	SpanId  *string `json:"spanId,omitempty"`
 	// Test version used when running this test run
-	TestVersion *string `json:"testVersion,omitempty"`
+	TestVersion *int32 `json:"testVersion,omitempty"`
 	// Current execution state
 	State *string `json:"state,omitempty"`
 	// Details of the cause for the last `FAILED` state
@@ -148,9 +148,9 @@ func (o *TestRun) SetSpanId(v string) {
 }
 
 // GetTestVersion returns the TestVersion field value if set, zero value otherwise.
-func (o *TestRun) GetTestVersion() string {
+func (o *TestRun) GetTestVersion() int32 {
 	if o == nil || o.TestVersion == nil {
-		var ret string
+		var ret int32
 		return ret
 	}
 	return *o.TestVersion
@@ -158,7 +158,7 @@ func (o *TestRun) GetTestVersion() string {
 
 // GetTestVersionOk returns a tuple with the TestVersion field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *TestRun) GetTestVersionOk() (*string, bool) {
+func (o *TestRun) GetTestVersionOk() (*int32, bool) {
 	if o == nil || o.TestVersion == nil {
 		return nil, false
 	}
@@ -174,8 +174,8 @@ func (o *TestRun) HasTestVersion() bool {
 	return false
 }
 
-// SetTestVersion gets a reference to the given string and assigns it to the TestVersion field.
-func (o *TestRun) SetTestVersion(v string) {
+// SetTestVersion gets a reference to the given int32 and assigns it to the TestVersion field.
+func (o *TestRun) SetTestVersion(v int32) {
 	o.TestVersion = &v
 }
 

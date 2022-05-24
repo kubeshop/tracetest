@@ -20,7 +20,7 @@ type Test struct {
 	Name        *string `json:"name,omitempty"`
 	Description *string `json:"description,omitempty"`
 	// version number of the test
-	Version          *string               `json:"version,omitempty"`
+	Version          *int32                `json:"version,omitempty"`
 	ServiceUnderTest *TestServiceUnderTest `json:"serviceUnderTest,omitempty"`
 	Definition       *TestDefinition       `json:"definition,omitempty"`
 	ReferenceTestRun *TestRun              `json:"referenceTestRun,omitempty"`
@@ -140,9 +140,9 @@ func (o *Test) SetDescription(v string) {
 }
 
 // GetVersion returns the Version field value if set, zero value otherwise.
-func (o *Test) GetVersion() string {
+func (o *Test) GetVersion() int32 {
 	if o == nil || o.Version == nil {
-		var ret string
+		var ret int32
 		return ret
 	}
 	return *o.Version
@@ -150,7 +150,7 @@ func (o *Test) GetVersion() string {
 
 // GetVersionOk returns a tuple with the Version field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Test) GetVersionOk() (*string, bool) {
+func (o *Test) GetVersionOk() (*int32, bool) {
 	if o == nil || o.Version == nil {
 		return nil, false
 	}
@@ -166,8 +166,8 @@ func (o *Test) HasVersion() bool {
 	return false
 }
 
-// SetVersion gets a reference to the given string and assigns it to the Version field.
-func (o *Test) SetVersion(v string) {
+// SetVersion gets a reference to the given int32 and assigns it to the Version field.
+func (o *Test) SetVersion(v int32) {
 	o.Version = &v
 }
 
