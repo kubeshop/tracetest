@@ -28,6 +28,9 @@ func AssertTestRequired(obj Test) error {
 	if err := AssertTestServiceUnderTestRequired(obj.ServiceUnderTest); err != nil {
 		return err
 	}
+	if err := AssertTestDefinitionRequired(obj.Definition); err != nil {
+		return err
+	}
 	if err := AssertTestRunRequired(obj.ReferenceTestRun); err != nil {
 		return err
 	}
