@@ -59,8 +59,10 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
 
   const currentSelectorList = Form.useWatch('selectorList', form) || [];
   const currentAssertionList = Form.useWatch('assertionList', form) || [];
+  const currentPseudoSelector = Form.useWatch('pseudoSelector', form) || undefined;
+
   const {data: spanIdList = []} = useGetSelectedSpansQuery({
-    query: SelectorService.getSelectorString(currentSelectorList),
+    query: SelectorService.getSelectorString(currentSelectorList, currentPseudoSelector),
     testId,
     runId,
   });
