@@ -7,15 +7,19 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/kubeshop/tracetest/app"
-	"github.com/kubeshop/tracetest/openapi"
-	"github.com/kubeshop/tracetest/testmock"
+	"github.com/kubeshop/tracetest/server/app"
+	"github.com/kubeshop/tracetest/server/openapi"
+	"github.com/kubeshop/tracetest/server/testmock"
 )
 
 const appEndpoint = "http://localhost:8080"
 
 func init() {
 	RegisterFixture(IMPORT_POKEMON_TEST, getImportPokemonTest)
+}
+
+func GetPokemonTest() (*openapi.Test, error) {
+	return GetFixtureValue[*openapi.Test](IMPORT_POKEMON_TEST)
 }
 
 func getImportPokemonTest(args ...interface{}) (*openapi.Test, error) {

@@ -7,13 +7,17 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/kubeshop/tracetest/app"
-	"github.com/kubeshop/tracetest/model"
-	"github.com/kubeshop/tracetest/openapi"
+	"github.com/kubeshop/tracetest/server/app"
+	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/openapi"
 )
 
 func init() {
 	RegisterFixture(IMPORT_POKEMON_TEST_RUN, getImportPokemonTestRun)
+}
+
+func GetPokemonTestRun() (*openapi.TestRun, error) {
+	return GetFixtureValue[*openapi.TestRun](IMPORT_POKEMON_TEST_RUN)
 }
 
 func getImportPokemonTestRun(args ...interface{}) (*openapi.TestRun, error) {

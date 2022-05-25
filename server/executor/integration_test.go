@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/kubeshop/tracetest/server/model"
-	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/testfixtures"
 	"github.com/stretchr/testify/assert"
 )
@@ -12,7 +11,7 @@ import (
 const appEndpoint = "http://localhost:8080"
 
 func TestExecutorIntegration(t *testing.T) {
-	testRun, err := testfixtures.GetFixtureValue[*openapi.TestRun](testfixtures.IMPORT_POKEMON_TEST_RUN)
+	testRun, err := testfixtures.GetPokemonTestRun()
 	assert.NoError(t, err)
 
 	assert.Equal(t, string(model.RunStateFinished), testRun.State)
