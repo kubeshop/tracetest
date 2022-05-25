@@ -13,8 +13,11 @@ import * as S from './AssertionForm.styled';
 interface IProps {
   fields: FormListFieldData[];
   assertionList: TAssertion[];
+
   add(): void;
+
   remove(name: number): void;
+
   attributeList: TSpanFlatAttribute[];
 }
 
@@ -77,13 +80,12 @@ const AssertionFormCheckList: React.FC<IProps> = ({fields, add, remove, attribut
           >
             <Input placeholder="Expected Value" />
           </Form.Item>
+
           <S.CheckActions>
             <S.DeleteCheckIcon
               onClick={() => {
-                if (index !== 0) {
-                  CreateAssertionModalAnalyticsService.onRemoveCheck();
-                  remove(name);
-                }
+                CreateAssertionModalAnalyticsService.onRemoveCheck();
+                remove(name);
               }}
             />
             {index === fields.length - 1 && (
