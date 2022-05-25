@@ -153,7 +153,7 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
         <S.AssertionFromActions>
           <Button onClick={onCancel}>Cancel</Button>
           <Button type="primary" onClick={form.submit} data-cy="assertion-form-submit-button">
-            Add
+            {isEditing ? 'Save' : 'Add'}
           </Button>
         </S.AssertionFromActions>
       </Form>
