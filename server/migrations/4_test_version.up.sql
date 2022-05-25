@@ -8,7 +8,7 @@ ALTER TABLE tests
 ADD CONSTRAINT tests_pkey PRIMARY KEY (id, "version");
 
 ALTER TABLE runs
-ADD COLUMN test_version int NOT NULL;
+ADD COLUMN test_version int NOT NULL DEFAULT 1;
 
 ALTER TABLE runs
 ADD CONSTRAINT test_id_version_fk
