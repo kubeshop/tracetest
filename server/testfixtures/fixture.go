@@ -15,7 +15,7 @@ type Generator[T comparable] func(args ...interface{}) (T, error)
 
 var fixtures = make(map[string]interface{}, 0)
 
-func emptyValue[T any]() T {
+func emptyValue[T comparable]() T {
 	var empty T
 	return empty
 }
@@ -50,5 +50,6 @@ func GetFixtureValue[T comparable](name string, args ...interface{}) (T, error) 
 	}
 
 	fixture.value = value
+	fixtures[name] = fixture
 	return value, nil
 }
