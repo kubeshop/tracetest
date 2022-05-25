@@ -1,206 +1,188 @@
 import {DeleteOutlined, DownOutlined, PlusOutlined} from '@ant-design/icons';
-import {Button, Checkbox, Dropdown, Form, FormInstance, Input, Menu, Select, Typography} from 'antd';
+import {Button, Dropdown, Form, FormInstance, Input, Menu, Select, Typography} from 'antd';
 import {camelCase} from 'lodash';
-import {useCallback, useRef, useState} from 'react';
-import {HTTP_METHOD} from '../../constants/Common.constants';
-import {DemoTestExampleList} from '../../constants/Test.constants';
-import GuidedTourService, {GuidedTours} from '../../services/GuidedTour.service';
-import {Steps} from '../GuidedTour/homeStepList';
-import * as S from './CreateTestModal.styled';
-import './CreateTestModal.styled.ts';
 
-const defaultHeaders = [{key: 'Content-Type', value: 'application/json', checked: true}];
+import {Steps} from 'components/GuidedTour/homeStepList';
+import {HTTP_METHOD} from 'constants/Common.constants';
+import {DEFAULT_HEADERS, DemoTestExampleList} from 'constants/Test.constants';
+import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
+import Validator from 'utils/Validator';
+import * as S from './CreateTestModal.styled';
+
+export const FORM_ID = 'create-test';
 
 export interface ICreateTestValues {
-  name: string;
-  url: string;
-  method: HTTP_METHOD;
   body: string;
-  headersList: {
+  headers: {
     key: string;
     value: string;
-    checked: boolean;
   }[];
+  method: HTTP_METHOD;
+  name: string;
+  url: string;
 }
 
-interface ICreateTestFormProps {
-  onSubmit(values: ICreateTestValues): Promise<void>;
+interface IProps {
   form: FormInstance<ICreateTestValues>;
+  onSelectDemo(value: string): void;
+  onSubmit(values: ICreateTestValues): Promise<void>;
+  onValidation(isValid: boolean): void;
+  selectedDemo: string;
 }
 
-const CreateTestForm: React.FC<ICreateTestFormProps> = ({onSubmit, form}) => {
-  const touchedHttpHeadersRef = useRef<{[key: string]: Boolean}>({});
-  const [selectedDemo, setSelectedDemo] = useState();
+const CreateTestForm = ({form, onSelectDemo, onSubmit, onValidation, selectedDemo}: IProps) => {
+  const handleOnDemoClick = ({key}: {key: string}) => {
+    onSelectDemo(key);
+    const {body, description, method, name, url} = DemoTestExampleList.find(demo => demo.name === key) || {};
 
-  const onDemoClick = useCallback(
-    ({key}) => {
-      setSelectedDemo(key);
-      const {method, url, name, description, body} = DemoTestExampleList.find(example => example.name === key) || {};
+    form.setFieldsValue({
+      body,
+      method,
+      name: `${name} - ${description}`,
+      url,
+    });
 
-      form.setFieldsValue({
-        method,
-        url,
-        body,
-        name: `${name} - ${description}`,
-      });
-    },
-    [form]
-  );
+    onValidation(true);
+  };
+
+  const handleOnValuesChange = (changedValues: any, allValues: ICreateTestValues) => {
+    const isValid =
+      Validator.required(allValues.name) && Validator.required(allValues.url) && Validator.url(allValues.url);
+    onValidation(isValid);
+  };
 
   const menuLayout = (
     <Menu
-      onClick={onDemoClick}
       items={DemoTestExampleList.map(({name}) => ({
         key: name,
-        label: (
-          <Menu.Item key={name}>
-            <span data-cy={`demo-example-${camelCase(name)}`}>{name}</span>
-          </Menu.Item>
-        ),
+        label: <span data-cy={`demo-example-${camelCase(name)}`}>{name}</span>,
       }))}
+      onClick={handleOnDemoClick}
+      style={{width: '190px'}}
     />
   );
 
   return (
     <Form
-      name="newTest"
-      form={form}
-      initialValues={{remember: true}}
-      onFinish={onSubmit}
       autoComplete="off"
+      data-cy="create-test-modal"
+      form={form}
       layout="vertical"
+      name={FORM_ID}
+      onFinish={onSubmit}
+      onValuesChange={handleOnValuesChange}
     >
-      <S.DemoTextContainer>
-        <Typography.Text>Try these examples in our demo env: </Typography.Text>
-        <Dropdown overlay={menuLayout} placement="bottom" trigger={['click']}>
-          <S.DropdownText data-cy="example-button" className="ant-dropdown-link" id="create-test-example-selector">
-            {selectedDemo || 'Choose Example'} <DownOutlined />
-          </S.DropdownText>
-        </Dropdown>
-      </S.DemoTextContainer>
-      <div style={{display: 'flex', marginBottom: 24}}>
-        <Form.Item name="method" initialValue="GET" valuePropName="value" noStyle>
-          <Select
-            style={{minWidth: 120}}
-            data-cy="method-select"
-            className="method-select"
-            dropdownClassName="method-select-item"
-            data-tour={GuidedTourService.getStep(GuidedTours.Home, Steps.Method)}
-          >
-            {Object.keys(HTTP_METHOD).map(el => {
-              return (
-                <Select.Option data-cy={`method-select-option-${el}`} key={el} value={el}>
-                  {el}
-                </Select.Option>
-              );
-            })}
-          </Select>
-        </Form.Item>
+      <S.GlobalStyle />
 
-        <Form.Item name="url" rules={[{required: true, message: 'Please input Endpoint!'}]} noStyle>
+      <S.DemoContainer>
+        <Typography.Text>Try these examples in our demo env: </Typography.Text>
+        <Dropdown overlay={menuLayout} placement="bottomLeft" trigger={['click']}>
+          <Typography.Link data-cy="example-button" onClick={e => e.preventDefault()} strong>
+            {selectedDemo || 'Choose Example'} <DownOutlined />
+          </Typography.Link>
+        </Dropdown>
+      </S.DemoContainer>
+
+      <S.Row>
+        <div>
+          <Form.Item name="method" initialValue={HTTP_METHOD.GET} valuePropName="value" noStyle>
+            <Select
+              className="select-method"
+              data-cy="method-select"
+              data-tour={GuidedTourService.getStep(GuidedTours.Home, Steps.Method)}
+              dropdownClassName="select-dropdown-method"
+              style={{minWidth: 120}}
+            >
+              {Object.keys(HTTP_METHOD).map(method => {
+                return (
+                  <Select.Option data-cy={`method-select-option-${method}`} key={method} value={method}>
+                    {method}
+                  </Select.Option>
+                );
+              })}
+            </Select>
+          </Form.Item>
+        </div>
+
+        <Form.Item
+          name="url"
+          rules={[
+            {required: true, message: 'Please enter a request url'},
+            {type: 'url', message: 'Request url is not valid'},
+          ]}
+          style={{flex: 1}}
+        >
           <Input
-            placeholder="Enter request url"
             data-cy="url"
             data-tour={GuidedTourService.getStep(GuidedTours.Home, Steps.Url)}
+            placeholder="Enter request url"
           />
         </Form.Item>
-      </div>
+      </S.Row>
 
       <Form.Item
-        name="name"
-        label="Name"
-        colon={false}
-        data-tour={GuidedTourService.getStep(GuidedTours.Home, Steps.Name)}
+        className="input-name"
         data-cy="name"
-        wrapperCol={{span: 24, offset: 0}}
-        rules={[{required: true, message: 'Please input test name!'}]}
+        data-tour={GuidedTourService.getStep(GuidedTours.Home, Steps.Name)}
+        label="Name"
+        name="name"
+        rules={[{required: true, message: 'Please enter a test name'}]}
       >
-        <Input />
+        <Input placeholder="Enter test name" />
       </Form.Item>
 
       <Form.Item
-        label="Headers List"
-        wrapperCol={{span: 24, offset: 0}}
+        className="input-headers"
         data-tour={GuidedTourService.getStep(GuidedTours.Home, Steps.Headers)}
+        label="Headers list"
       >
-        <div style={{minHeight: 80}}>
-          <Form.List name="headersList" initialValue={defaultHeaders}>
-            {(fields, {add, remove}) => (
-              <>
-                {fields.map((field, index) => (
-                  <div key={field.name} style={{display: 'flex', alignItems: 'center', marginBottom: '8px'}}>
-                    <Form.Item name={[field.name, 'checked']} valuePropName="checked" noStyle>
-                      <Checkbox style={{marginRight: 8}} />
-                    </Form.Item>
+        <Form.List name="headers" initialValue={DEFAULT_HEADERS}>
+          {(fields, {add, remove}) => (
+            <>
+              {fields.map((field, index) => (
+                <S.HeaderContainer key={field.name}>
+                  <Form.Item name={[field.name, 'key']} noStyle>
+                    <Input placeholder={`Header ${index + 1}`} />
+                  </Form.Item>
 
-                    <Form.Item name={[field.name, 'key']} noStyle>
-                      <Input
-                        placeholder={`Header${index + 1}`}
-                        onChangeCapture={() => {
-                          if (!touchedHttpHeadersRef.current[field.name]) {
-                            touchedHttpHeadersRef.current[field.name] = true;
-                            const headers = form.getFieldsValue().headersList;
-                            headers[field.name].checked = true;
-                            form.setFieldsValue({headersList: headers});
-                          }
+                  <Form.Item name={[field.name, 'value']} noStyle>
+                    <Input placeholder={`Value ${index + 1}`} />
+                  </Form.Item>
 
-                          if (fields.length - 1 === index) {
-                            add({checked: false});
-                          }
-                        }}
-                      />
-                    </Form.Item>
-                    <Form.Item noStyle name={[field.name, 'value']}>
-                      <Input
-                        placeholder={`Value${index + 1}`}
-                        onChangeCapture={() => {
-                          if (!touchedHttpHeadersRef.current[field.name]) {
-                            touchedHttpHeadersRef.current[field.name] = true;
-                            const headers = form.getFieldsValue().headersList;
-                            headers[field.name].checked = true;
-                            form.setFieldsValue({headersList: headers});
-                          }
+                  <Form.Item noStyle>
+                    <Button
+                      icon={<DeleteOutlined style={{fontSize: 12, color: 'rgba(3, 24, 73, 0.5)'}} />}
+                      onClick={() => remove(field.name)}
+                      style={{marginLeft: 12}}
+                      type="link"
+                    />
+                  </Form.Item>
+                </S.HeaderContainer>
+              ))}
 
-                          if (fields.length - 1 === index) {
-                            add({checked: false});
-                          }
-                        }}
-                      />
-                    </Form.Item>
-
-                    <Form.Item noStyle>
-                      <Button
-                        style={{marginLeft: 8}}
-                        type="text"
-                        icon={<DeleteOutlined style={{fontSize: 24, color: '#D9D9D9'}} />}
-                        onClick={() => remove(field.name)}
-                      />
-                    </Form.Item>
-                  </div>
-                ))}
-                <Button
-                  type="link"
-                  icon={<PlusOutlined />}
-                  style={{padding: 0}}
-                  onClick={() => add({checked: true})}
-                  data-cy="add-header"
-                >
-                  Add Header
-                </Button>
-              </>
-            )}
-          </Form.List>
-        </div>
+              <Button
+                data-cy="add-header"
+                icon={<PlusOutlined />}
+                onClick={() => add()}
+                style={{fontWeight: 600, height: 'auto', padding: 0}}
+                type="link"
+              >
+                Add Header
+              </Button>
+            </>
+          )}
+        </Form.List>
       </Form.Item>
+
       <Form.Item
+        className="input-body"
+        data-cy="body"
+        data-tour={GuidedTourService.getStep(GuidedTours.Home, Steps.Body)}
         label="Request body"
         name="body"
-        colon={false}
-        wrapperCol={{span: 24, offset: 0}}
-        data-tour={GuidedTourService.getStep(GuidedTours.Home, Steps.Body)}
-        data-cy="body"
+        style={{marginBottom: 0}}
       >
-        <Input.TextArea style={{maxHeight: 150, height: 120}} />
+        <Input.TextArea placeholder="Enter request body text" />
       </Form.Item>
     </Form>
   );

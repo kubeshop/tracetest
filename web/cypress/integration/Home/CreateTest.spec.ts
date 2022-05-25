@@ -14,7 +14,7 @@ describe('Create test', () => {
     $form.get('[data-cy=method-select-option-GET]').click();
     const name = `Test - Shop - #${String(Date.now()).slice(-4)}`;
 
-    $form.get('[data-cy=url]').type('http://shop/buy');
+    $form.get('[data-cy=url]').type('https://shop.buy');
     $form.get('[data-cy=name').type(name);
 
     $form.get('[data-cy=create-test-submit]').click();

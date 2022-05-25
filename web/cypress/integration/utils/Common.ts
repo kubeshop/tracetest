@@ -28,7 +28,7 @@ export const createTest = () => {
 export const openCreateTestModal = () => {
   cy.get('[data-cy=create-test-button]').click();
 
-  const $form = cy.get('[data-cy=create-test-modal] form');
+  const $form = cy.get('[data-cy=create-test-modal]');
   $form.should('be.visible');
 
   return $form;
