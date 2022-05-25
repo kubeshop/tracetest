@@ -1,5 +1,5 @@
 import {noop} from 'lodash';
-import {useState, createContext, useCallback, useMemo, useContext} from 'react';
+import {useState, createContext, useCallback, useMemo, useContext, Dispatch, SetStateAction} from 'react';
 import {useTestDefinition} from '../../providers/TestDefinition/TestDefinition.provider';
 import SelectorService from '../../services/Selector.service';
 import {TTestDefinitionEntry} from '../../types/TestDefinition.types';
@@ -12,10 +12,18 @@ interface IFormProps {
 }
 
 interface ICreateAssertionModalProviderContext {
+  isCollapsed: boolean;
+
+  setIsCollapsed: Dispatch<SetStateAction<boolean>>;
+
   isOpen: boolean;
+
   open(props?: IFormProps): void;
+
   close(): void;
+
   onSubmit(values: IValues): void;
+
   formProps: IFormProps;
 }
 
@@ -24,6 +32,8 @@ const initialFormProps = {
 };
 
 export const Context = createContext<ICreateAssertionModalProviderContext>({
+  isCollapsed: false,
+  setIsCollapsed: noop,
   isOpen: false,
   open: noop,
   close: noop,
@@ -34,6 +44,7 @@ export const Context = createContext<ICreateAssertionModalProviderContext>({
 export const useAssertionForm = () => useContext(Context);
 
 const AssertionFormProvider: React.FC<{testId: string}> = ({children}) => {
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [formProps, setFormProps] = useState<IFormProps>(initialFormProps);
   const {update, add} = useTestDefinition();
@@ -66,8 +77,8 @@ const AssertionFormProvider: React.FC<{testId: string}> = ({children}) => {
   );
 
   const contextValue = useMemo(
-    () => ({isOpen, open, close, formProps, onSubmit}),
-    [isOpen, open, close, formProps, onSubmit]
+    () => ({isOpen, open, close, formProps, onSubmit, isCollapsed, setIsCollapsed}),
+    [isOpen, open, close, formProps, onSubmit, isCollapsed, setIsCollapsed]
   );
 
   return <Context.Provider value={contextValue}>{children}</Context.Provider>;
