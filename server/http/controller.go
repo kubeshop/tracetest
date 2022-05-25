@@ -13,11 +13,14 @@ import (
 	"github.com/kubeshop/tracetest/assertions/comparator"
 	"github.com/kubeshop/tracetest/assertions/selectors"
 	"github.com/kubeshop/tracetest/executor"
+	"github.com/kubeshop/tracetest/id"
 	"github.com/kubeshop/tracetest/model"
 	"github.com/kubeshop/tracetest/openapi"
 	"github.com/kubeshop/tracetest/testdb"
 	"github.com/kubeshop/tracetest/tracedb"
 )
+
+var IDGen = id.NewRandGenerator()
 
 type controller struct {
 	testDB          model.Repository
@@ -214,15 +217,24 @@ func (c *controller) RerunTestRun(ctx context.Context, testID string, runID stri
 		return handleDBError(err), err
 	}
 
-	run.State = model.RunStateAwaitingTestResults
-	err = c.testDB.UpdateRun(ctx, run)
+	newTestRun := run
+	newTestRun.Results = nil
+	newTestRun.TestVersion = test.Version
+
+	newTestRun, err = c.testDB.CreateRun(ctx, test, newTestRun)
+	if err != nil {
+		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
+	}
+
+	newTestRun.State = model.RunStateAwaitingTestResults
+	err = c.testDB.UpdateRun(ctx, newTestRun)
 	if err != nil {
 		return openapi.Response(http.StatusInternalServerError, err.Error()), err
 	}
 
 	assertionRequest := executor.AssertionRequest{
 		Test: test,
-		Run:  run,
+		Run:  newTestRun,
 	}
 
 	c.assertionRunner.RunAssertions(assertionRequest)
