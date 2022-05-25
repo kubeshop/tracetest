@@ -46,10 +46,7 @@ export const TimelineChart = ({trace, selectedSpan, onSelectSpan}: IDiagramProps
     return d3.stratify()(dagData);
   }, [spanMap]);
 
-  const minNano = d3.min(
-    spanDates.filter(el => el.startTime > 0 && el.endTime > 0),
-    s => Number(parseISO(s.span.startTime).getTime())
-  )! as number;
+  const minNano = d3.min(spanDates, s => s.startTime) as number;
   const maxNano = d3.max(spanDates, s => s.endTime) as number;
 
   const scaleTime = d3
@@ -61,9 +58,7 @@ export const TimelineChart = ({trace, selectedSpan, onSelectSpan}: IDiagramProps
     const nodes = treeFactory(root);
     const nodesSort: any[] = [];
 
-    nodes.sort((a: any, b: any) =>
-      a.depth === b.depth ? a.data.startTime.getTime() - b.data.startTime.getTime() : a.depth - b.depth
-    );
+    nodes.sort((a: any, b: any) => (a.depth === b.depth ? a.data.startTime - b.data.startTime : a.depth - b.depth));
     nodes.eachBefore(n => nodesSort.push(n));
 
     nodesSort.forEach((n, i) => {
@@ -76,7 +71,7 @@ export const TimelineChart = ({trace, selectedSpan, onSelectSpan}: IDiagramProps
       .axisTop(scaleTime)
       .ticks(10)
       .tickFormat(d => {
-        return `${Number(d) / 1000000}`;
+        return `${Number(d)}`;
       });
 
     const milliTicks = d3.ticks(0, maxNano - minNano, 10);
@@ -109,9 +104,7 @@ export const TimelineChart = ({trace, selectedSpan, onSelectSpan}: IDiagramProps
   const drawChart = useCallback(() => {
     const nodes = treeFactory(root);
     const nodesSort: any[] = [];
-    nodes.sort((a: any, b: any) =>
-      a.depth === b.depth ? a.data.startTime.getTime() - b.data.startTime.getTime() : a.depth - b.depth
-    );
+    nodes.sort((a: any, b: any) => (a.depth === b.depth ? a.data.startTime - b.data.startTime : a.depth - b.depth));
     nodes.eachBefore(n => nodesSort.push(n));
 
     nodesSort.forEach((n, i) => {
@@ -172,13 +165,10 @@ export const TimelineChart = ({trace, selectedSpan, onSelectSpan}: IDiagramProps
       .attr('ry', 3)
       .attr('y', 25)
       .attr('x', d => {
-        return scaleTime(Number(d.data.data.startTimeUnixNano || minNano) - minNano);
+        return scaleTime(Number(d.data.startTime || minNano) - minNano);
       })
-      .attr('width', (d: any) => {
-        return (
-          scaleTime(Number(d.data.data.endTimeUnixNano || maxNano) - Number(d.data.data.startTimeUnixNano || minNano)) -
-          250
-        );
+      .attr('width', d => {
+        return scaleTime(d.data.data.duration) - 250;
       })
       .attr('fill', e => {
         const span: TSpan = e.data.data;
