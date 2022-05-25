@@ -29,7 +29,6 @@ const Diagram: React.FC<IDiagramProps> = ({trace, selectedSpan, onSelectSpan}): 
     );
   }, [trace?.spans]);
 
-  console.log(spanMap);
   const dagLayout = useDAGChart(spanMap);
 
   const handleElementClick = useCallback(
