@@ -219,6 +219,7 @@ func (c *controller) RerunTestRun(ctx context.Context, testID string, runID stri
 
 	newTestRun := run
 	newTestRun.Results = nil
+	newTestRun.TestVersion = test.Version
 
 	newTestRun, err = c.testDB.CreateRun(ctx, test, newTestRun)
 	if err != nil {
