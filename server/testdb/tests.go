@@ -14,20 +14,21 @@ import (
 var _ model.TestRepository = &postgresDB{}
 
 func (td *postgresDB) CreateTest(ctx context.Context, test model.Test) (model.Test, error) {
-	stmt, err := td.db.Prepare("INSERT INTO tests(id, test) VALUES( $1, $2 )")
+	test.ID = IDGen.UUID()
+	test.ReferenceRun = nil
+	test.Version = 1
+
+	stmt, err := td.db.Prepare("INSERT INTO tests(id, test, version) VALUES( $1, $2, $3 )")
 	if err != nil {
 		return model.Test{}, fmt.Errorf("sql prepare: %w", err)
 	}
 	defer stmt.Close()
 
-	test.ID = IDGen.UUID()
-	test.ReferenceRun = nil
-
 	b, err := encodeTest(test)
 	if err != nil {
 		return model.Test{}, fmt.Errorf("encoding error: %w", err)
 	}
-	_, err = stmt.ExecContext(ctx, test.ID, b)
+	_, err = stmt.ExecContext(ctx, test.ID, b, test.Version)
 	if err != nil {
 		return model.Test{}, fmt.Errorf("sql exec: %w", err)
 	}
@@ -40,8 +41,51 @@ func (td *postgresDB) CreateTest(ctx context.Context, test model.Test) (model.Te
 	return test, nil
 }
 
-func (td *postgresDB) UpdateTest(ctx context.Context, test model.Test) error {
-	stmt, err := td.db.Prepare("UPDATE tests SET test = $2 WHERE id = $1")
+func (td *postgresDB) UpdateTest(ctx context.Context, test model.Test) (model.Test, error) {
+	if test.Version == 0 {
+		test.Version = 1
+	}
+
+	oldTest, err := td.GetLatestTestVersion(ctx, test.ID)
+	if err != nil {
+		return model.Test{}, fmt.Errorf("could not get latest test version while updating test: %w", err)
+	}
+
+	testToUpdate, err := model.BumpTestVersionIfNeeded(oldTest, test)
+	if err != nil {
+		return model.Test{}, fmt.Errorf("could not bump test version: %w", err)
+	}
+
+	if oldTest.Version == testToUpdate.Version {
+		// No change in the version, so nothing changes and it doesn't need to persist it
+		return testToUpdate, nil
+	}
+
+	stmt, err := td.db.Prepare("INSERT INTO tests(id, test, version) VALUES( $1, $2, $3 )")
+	if err != nil {
+		return model.Test{}, fmt.Errorf("sql prepare: %w", err)
+	}
+	defer stmt.Close()
+
+	b, err := encodeTest(testToUpdate)
+	if err != nil {
+		return model.Test{}, fmt.Errorf("encoding error: %w", err)
+	}
+	_, err = stmt.ExecContext(ctx, testToUpdate.ID, b, testToUpdate.Version)
+	if err != nil {
+		return model.Test{}, fmt.Errorf("sql exec: %w", err)
+	}
+
+	err = td.SetDefiniton(ctx, testToUpdate, testToUpdate.Definition)
+	if err != nil {
+		return model.Test{}, fmt.Errorf("setDefinition error: %w", err)
+	}
+
+	return testToUpdate, nil
+}
+
+func (td *postgresDB) UpdateTestVersion(ctx context.Context, test model.Test) error {
+	stmt, err := td.db.Prepare("UPDATE tests SET test = $2 WHERE id = $1 AND version = $3")
 	if err != nil {
 		return fmt.Errorf("sql prepare: %w", err)
 	}
@@ -52,7 +96,7 @@ func (td *postgresDB) UpdateTest(ctx context.Context, test model.Test) error {
 		return fmt.Errorf("encoding error: %w", err)
 	}
 
-	_, err = stmt.Exec(test.ID, b)
+	_, err = stmt.Exec(test.ID, b, test.Version)
 	if err != nil {
 		return fmt.Errorf("sql exec: %w", err)
 	}
@@ -77,8 +121,8 @@ func (td *postgresDB) DeleteTest(ctx context.Context, test model.Test) error {
 	return nil
 }
 
-func (td *postgresDB) GetTest(ctx context.Context, id uuid.UUID) (model.Test, error) {
-	stmt, err := td.db.Prepare("SELECT test FROM tests WHERE id = $1")
+func (td *postgresDB) GetLatestTestVersion(ctx context.Context, id uuid.UUID) (model.Test, error) {
+	stmt, err := td.db.Prepare("SELECT test FROM tests WHERE id = $1 ORDER BY version DESC LIMIT 1")
 	if err != nil {
 		return model.Test{}, fmt.Errorf("prepare: %w", err)
 	}
@@ -93,7 +137,9 @@ func (td *postgresDB) GetTest(ctx context.Context, id uuid.UUID) (model.Test, er
 }
 
 func (td *postgresDB) GetTests(ctx context.Context, take, skip int32) ([]model.Test, error) {
-	stmt, err := td.db.Prepare("SELECT test FROM tests LIMIT $1 OFFSET $2")
+	stmt, err := td.db.Prepare(`SELECT test FROM tests INNER JOIN (
+		SELECT id as idx, max(version) as latest_version FROM tests GROUP BY idx
+	) as latestTests ON latestTests.idx = id WHERE version = latestTests.latest_version LIMIT $1 OFFSET $2`)
 	if err != nil {
 		return nil, err
 	}

@@ -21,7 +21,12 @@ func (m *MockRepository) CreateTest(_ context.Context, test model.Test) (model.T
 	return args.Get(0).(model.Test), args.Error(1)
 }
 
-func (m *MockRepository) UpdateTest(_ context.Context, test model.Test) error {
+func (m *MockRepository) UpdateTest(_ context.Context, test model.Test) (model.Test, error) {
+	args := m.Called(test)
+	return args.Get(0).(model.Test), args.Error(1)
+}
+
+func (m *MockRepository) UpdateTestVersion(_ context.Context, test model.Test) error {
 	args := m.Called(test)
 	return args.Error(0)
 }
@@ -31,7 +36,7 @@ func (m *MockRepository) DeleteTest(_ context.Context, test model.Test) error {
 	return args.Error(0)
 }
 
-func (m *MockRepository) GetTest(_ context.Context, id uuid.UUID) (model.Test, error) {
+func (m *MockRepository) GetLatestTestVersion(_ context.Context, id uuid.UUID) (model.Test, error) {
 	args := m.Called(id)
 	return args.Get(0).(model.Test), args.Error(1)
 }

@@ -14,7 +14,7 @@ import (
 var _ model.RunRepository = &postgresDB{}
 
 func (td *postgresDB) CreateRun(ctx context.Context, test model.Test, run model.Run) (model.Run, error) {
-	stmt, err := td.db.Prepare("INSERT INTO runs(id, test_id, run) VALUES( $1, $2, $3 )")
+	stmt, err := td.db.Prepare("INSERT INTO runs(id, test_id, test_version, run) VALUES( $1, $2, $3, $4 )")
 	if err != nil {
 		return model.Run{}, fmt.Errorf("sql prepare: %w", err)
 	}
@@ -22,13 +22,14 @@ func (td *postgresDB) CreateRun(ctx context.Context, test model.Test, run model.
 
 	run.ID = IDGen.UUID()
 	run.State = model.RunStateCreated
+	run.TestVersion = test.Version
 
 	encoded, err := encodeRun(run)
 	if err != nil {
 		return model.Run{}, fmt.Errorf("encoding error: %w", err)
 	}
 
-	_, err = stmt.ExecContext(ctx, run.ID, test.ID, encoded)
+	_, err = stmt.ExecContext(ctx, run.ID, test.ID, run.TestVersion, encoded)
 	if err != nil {
 		return model.Run{}, fmt.Errorf("sql exec: %w", err)
 	}

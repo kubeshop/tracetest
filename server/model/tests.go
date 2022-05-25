@@ -17,6 +17,7 @@ type (
 		ID               uuid.UUID
 		Name             string
 		Description      string
+		Version          int
 		ServiceUnderTest ServiceUnderTest
 		ReferenceRun     *Run
 		Definition       Definition
@@ -47,6 +48,7 @@ type (
 		Response    HTTPResponse
 		Trace       *traces.Trace
 		Results     *RunResults
+		TestVersion int
 	}
 
 	RunResults struct {

@@ -24,6 +24,7 @@ func (m openapiMapper) Test(in model.Test) openapi.Test {
 		},
 		Definition:       m.Definition(in.Definition),
 		ReferenceTestRun: m.Run(in.ReferenceRun),
+		Version:          int32(in.Version),
 	}
 }
 
@@ -226,6 +227,7 @@ func (m openapiMapper) Run(in *model.Run) openapi.TestRun {
 		CompletedAt:    in.CompletedAt,
 		Request:        m.HTTPRequest(in.Request),
 		Response:       m.HTTPResponse(in.Response),
+		TestVersion:    int32(in.TestVersion),
 		Trace:          m.Trace(in.Trace),
 		Result:         m.Result(in.Results),
 	}
@@ -255,6 +257,7 @@ func (m modelMapper) Test(in openapi.Test) model.Test {
 		},
 		ReferenceRun: m.Run(in.ReferenceTestRun),
 		Definition:   m.Definition(in.Definition),
+		Version:      int(in.Version),
 	}
 }
 
