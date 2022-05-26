@@ -1,5 +1,6 @@
 import {TTest} from '../../types/Test.types';
 import {TTestRunState} from '../../types/TestRun.types';
+import {useAssertionForm} from '../AssertionForm/AssertionFormProvider';
 import TestState from '../TestState';
 import * as S from './TestHeader.styled';
 
@@ -10,6 +11,7 @@ interface TTestHeaderProps {
 }
 
 const TestHeader: React.FC<TTestHeaderProps> = ({test: {name, serviceUnderTest}, onBack, testState}) => {
+  const {setIsCollapsed} = useAssertionForm();
   return (
     <S.TestHeader>
       <S.Content>
@@ -20,7 +22,7 @@ const TestHeader: React.FC<TTestHeaderProps> = ({test: {name, serviceUnderTest},
         </S.TestUrl>
       </S.Content>
       {testState && (
-        <S.StateContainer data-cy="test-run-result-status">
+        <S.StateContainer onClick={() => setIsCollapsed(o => !o)} data-cy="test-run-result-status">
           <S.StateText>Test status:</S.StateText>
           <TestState testState={testState} />
         </S.StateContainer>

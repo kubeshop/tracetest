@@ -41,6 +41,7 @@
   },
   "scripts": {
     "start": "craco start",
+    "port-forward": "kubectl -n tracetest-beta port-forward svc/tracetest-beta 8080:8080",
     "build": "craco build",
     "test": "npm run test:unit",
     "test:integration": "npm run cy:run",
