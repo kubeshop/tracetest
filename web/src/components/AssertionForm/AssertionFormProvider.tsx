@@ -50,16 +50,16 @@ const AssertionFormProvider: React.FC<{testId: string}> = ({children}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
   const [formProps, setFormProps] = useState<IFormProps>(initialFormProps);
-  const {update, add, test} = useTestDefinition();
+  const {update, add, test, isDraftMode} = useTestDefinition();
   const {run} = useTestRun();
 
   const open = useCallback(
     (props: IFormProps = {}) => {
       setFormProps(props);
-      if (run.testVersion !== test?.version) setIsConfirmationModalOpen(true);
+      if (run.testVersion !== test?.version && !isDraftMode) setIsConfirmationModalOpen(true);
       else setIsOpen(true);
     },
-    [run.testVersion, test?.version]
+    [isDraftMode, run.testVersion, test?.version]
   );
 
   const close = useCallback(() => {

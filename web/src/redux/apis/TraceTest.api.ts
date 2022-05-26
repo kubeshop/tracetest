@@ -118,7 +118,7 @@ const TraceTestAPI = createApi({
 
     // Spans
     getSelectedSpans: build.query<string[], {testId: string; runId: string; query: string}>({
-      query: ({testId, runId, query}) => `/tests/${testId}/run/${runId}/select?query=${query}`,
+      query: ({testId, runId, query}) => `/tests/${testId}/run/${runId}/select?query=${encodeURIComponent(query)}`,
       providesTags: (result, error, {query}) => (result ? [{type: Tags.SPAN, id: `${query}-LIST`}] : []),
     }),
   }),
