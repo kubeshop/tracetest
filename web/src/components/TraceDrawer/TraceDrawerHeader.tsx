@@ -30,7 +30,7 @@ const TraceDrawerHeader: React.FC<IProps> = ({
   isDisabled,
   selectedSpan,
 }) => {
-  const {open} = useAssertionForm();
+  const {open, isCollapsed} = useAssertionForm();
   const totalSpanCount = trace?.spans.length;
   const totalAssertionCount = assertionResults?.resultList.length || 0;
 
@@ -80,6 +80,9 @@ const TraceDrawerHeader: React.FC<IProps> = ({
         >
           Add Assertion
         </S.AddAssertionButton>
+        <span style={{marginLeft: 16}}>
+          <S.Chevron $isCollapsed={isCollapsed} />
+        </span>
       </div>
     </S.Header>
   );
