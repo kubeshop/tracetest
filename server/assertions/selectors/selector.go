@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/kubeshop/tracetest/model"
-	"github.com/kubeshop/tracetest/traces"
+	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/traces"
 )
 
 func FromSpanQuery(sq model.SpanQuery) Selector {

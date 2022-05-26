@@ -3,8 +3,8 @@ package analytics_test
 import (
 	"testing"
 
-	"github.com/kubeshop/tracetest/analytics"
-	"github.com/kubeshop/tracetest/config"
+	"github.com/kubeshop/tracetest/server/analytics"
+	"github.com/kubeshop/tracetest/server/config"
 	"github.com/stretchr/testify/assert"
 )
 

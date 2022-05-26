@@ -1,7 +1,7 @@
 package selectors
 
 import (
-	"github.com/kubeshop/tracetest/traces"
+	"github.com/kubeshop/tracetest/server/traces"
 	"go.opentelemetry.io/otel/trace"
 )
 

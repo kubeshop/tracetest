@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	tempopb "github.com/kubeshop/tracetest/internal/proto-gen-go/tempo-idl"
+	tempopb "github.com/kubeshop/tracetest/server/internal/proto-gen-go/tempo-idl"
 	"go.opentelemetry.io/collector/component/componenttest"
 	"go.opentelemetry.io/collector/config/configgrpc"
 	"go.opentelemetry.io/otel/trace"

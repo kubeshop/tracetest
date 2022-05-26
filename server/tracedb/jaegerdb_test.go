@@ -7,8 +7,8 @@ import (
 	"testing"
 
 	"github.com/gogo/protobuf/jsonpb"
-	"github.com/kubeshop/tracetest/config"
-	"github.com/kubeshop/tracetest/tracedb"
+	"github.com/kubeshop/tracetest/server/config"
+	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/stretchr/testify/assert"
 	"go.opentelemetry.io/collector/config/configgrpc"
 	"go.opentelemetry.io/collector/config/configtls"

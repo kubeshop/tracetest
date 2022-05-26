@@ -3,7 +3,7 @@ package comparator_test
 import (
 	"testing"
 
-	"github.com/kubeshop/tracetest/assertions/comparator"
+	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/stretchr/testify/assert"
 )
 

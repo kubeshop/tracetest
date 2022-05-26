@@ -8,7 +8,7 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
-	"github.com/kubeshop/tracetest/model"
+	"github.com/kubeshop/tracetest/server/model"
 )
 
 var _ model.TestRepository = &postgresDB{}

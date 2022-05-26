@@ -13,10 +13,10 @@ import (
 	"flag"
 	"log"
 
-	"github.com/kubeshop/tracetest/app"
-	"github.com/kubeshop/tracetest/config"
-	"github.com/kubeshop/tracetest/testdb"
-	"github.com/kubeshop/tracetest/tracedb"
+	"github.com/kubeshop/tracetest/server/app"
+	"github.com/kubeshop/tracetest/server/config"
+	"github.com/kubeshop/tracetest/server/testdb"
+	"github.com/kubeshop/tracetest/server/tracedb"
 )
 
 var cfg = flag.String("config", "config.yaml", "path to the config file")

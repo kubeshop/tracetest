@@ -6,9 +6,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/kubeshop/tracetest/executor"
-	"github.com/kubeshop/tracetest/id"
-	"github.com/kubeshop/tracetest/model"
+	"github.com/kubeshop/tracetest/server/executor"
+	"github.com/kubeshop/tracetest/server/id"
+	"github.com/kubeshop/tracetest/server/model"
 	"github.com/stretchr/testify/assert"
 )
 

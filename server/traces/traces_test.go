@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kubeshop/tracetest/id"
-	"github.com/kubeshop/tracetest/traces"
+	"github.com/kubeshop/tracetest/server/id"
+	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/otel/trace"

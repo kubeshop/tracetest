@@ -10,7 +10,7 @@ import (
 	"runtime"
 
 	"github.com/denisbrodbeck/machineid"
-	"github.com/kubeshop/tracetest/config"
+	"github.com/kubeshop/tracetest/server/config"
 )
 
 const (

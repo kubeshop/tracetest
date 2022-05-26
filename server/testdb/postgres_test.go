@@ -5,9 +5,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kubeshop/tracetest/model"
-	"github.com/kubeshop/tracetest/testdb"
-	"github.com/kubeshop/tracetest/testmock"
+	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/testdb"
+	"github.com/kubeshop/tracetest/server/testmock"
 )
 
 func getDB() (model.Repository, func()) {

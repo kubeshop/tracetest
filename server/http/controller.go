@@ -8,16 +8,16 @@ import (
 	"net/http"
 
 	"github.com/google/uuid"
-	"github.com/kubeshop/tracetest/analytics"
-	"github.com/kubeshop/tracetest/assertions"
-	"github.com/kubeshop/tracetest/assertions/comparator"
-	"github.com/kubeshop/tracetest/assertions/selectors"
-	"github.com/kubeshop/tracetest/executor"
-	"github.com/kubeshop/tracetest/id"
-	"github.com/kubeshop/tracetest/model"
-	"github.com/kubeshop/tracetest/openapi"
-	"github.com/kubeshop/tracetest/testdb"
-	"github.com/kubeshop/tracetest/tracedb"
+	"github.com/kubeshop/tracetest/server/analytics"
+	"github.com/kubeshop/tracetest/server/assertions"
+	"github.com/kubeshop/tracetest/server/assertions/comparator"
+	"github.com/kubeshop/tracetest/server/assertions/selectors"
+	"github.com/kubeshop/tracetest/server/executor"
+	"github.com/kubeshop/tracetest/server/id"
+	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/openapi"
+	"github.com/kubeshop/tracetest/server/testdb"
+	"github.com/kubeshop/tracetest/server/tracedb"
 )
 
 var IDGen = id.NewRandGenerator()
