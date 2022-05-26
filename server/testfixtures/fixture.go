@@ -6,14 +6,14 @@ import (
 )
 
 type Fixture[T comparable] struct {
-	mutex     *sync.Mutex
+	mutex     sync.Mutex
 	value     T
 	generator Generator[T]
 }
 
 type Generator[T comparable] func(args ...interface{}) (T, error)
 
-var fixtures = make(map[string]interface{}, 0)
+var fixtures = make(map[string]interface{})
 
 func emptyValue[T comparable]() T {
 	var empty T
@@ -21,28 +21,32 @@ func emptyValue[T comparable]() T {
 }
 
 func RegisterFixture[T comparable](name string, generator Generator[T]) {
+	if _, exists := fixtures[name]; exists {
+		panic(fmt.Errorf("fixture %s already exists", name))
+	}
+
 	fixture := Fixture[T]{
-		mutex:     &sync.Mutex{},
+		mutex:     sync.Mutex{},
 		value:     emptyValue[T](),
 		generator: generator,
 	}
 
-	fixtures[name] = fixture
+	fixtures[name] = &fixture
 }
 
 func GetFixtureValue[T comparable](name string, args ...interface{}) (T, error) {
 	obj := fixtures[name]
-	fixture, ok := obj.(Fixture[T])
+	fixture, ok := obj.(*Fixture[T])
 	if !ok {
 		return emptyValue[T](), fmt.Errorf("fixture \"%s\": conflict between configured and requested types", name)
 	}
 
+	fixture.mutex.Lock()
+	defer fixture.mutex.Unlock()
+
 	if fixture.value != emptyValue[T]() {
 		return fixture.value, nil
 	}
-
-	fixture.mutex.Lock()
-	defer fixture.mutex.Unlock()
 
 	value, err := fixture.generator(args)
 	if err != nil {

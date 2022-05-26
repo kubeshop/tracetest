@@ -1,4 +1,4 @@
-package http_test
+package integration_test
 
 import (
 	"encoding/json"
@@ -12,8 +12,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
-
-var endpointUrl = "http://localhost:8080"
 
 func TestRerun(t *testing.T) {
 	importPokemonTest, err := testfixtures.GetPokemonTest()

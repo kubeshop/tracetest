@@ -1,4 +1,4 @@
-package executor_test
+package integration_test
 
 import (
 	"testing"
@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const appEndpoint = "http://localhost:8080"
+const endpointUrl = "http://localhost:8080"
 
 func TestExecutorIntegration(t *testing.T) {
 	testRun, err := testfixtures.GetPokemonTestRun()
