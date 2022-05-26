@@ -18,7 +18,7 @@ const getValue = (value: string): string => {
 
 const selectorRegex = /span\[(.*)\]/i;
 const nthChildNumberRegex = /\((.*)\)/i;
-const operationRegex = /([=]+|contains)/;
+const operationRegex = / ([=]+|contains) /;
 
 const getFilters = (selectors: TSpanSelector[]) =>
   selectors.map(({key, operator, value}) => `${key} ${operator} ${getValue(value)}`);
