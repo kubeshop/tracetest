@@ -46,7 +46,7 @@ export const Context = createContext<ICreateAssertionModalProviderContext>({
 export const useAssertionForm = () => useContext(Context);
 
 const AssertionFormProvider: React.FC<{testId: string}> = ({children}) => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
   const [formProps, setFormProps] = useState<IFormProps>(initialFormProps);
