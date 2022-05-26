@@ -3,7 +3,7 @@
 exports[`TestCard 1`] = `
 <div>
   <div
-    class="sc-iqseJM fscQmy"
+    class="sc-iqseJM eeBDwy"
   >
     <div
       class="sc-crHmcD dvudNn"
@@ -11,7 +11,7 @@ exports[`TestCard 1`] = `
       <span
         aria-label="right"
         class="anticon anticon-right"
-        data-cy="collapse-test"
+        data-cy="collapse-test-1dc446cf-83c8-4daf-b972-47ad00475d9a"
         role="img"
         tabindex="-1"
       >
@@ -35,7 +35,7 @@ exports[`TestCard 1`] = `
         <span
           class="ant-typography sc-hBUSln fEhLhq"
         >
-          
+          Brent
         </span>
       </div>
       <div
@@ -43,19 +43,15 @@ exports[`TestCard 1`] = `
       >
         <span
           class="ant-typography sc-fotOHu"
-        >
-          GET
-        </span>
+        />
       </div>
       <div
         class="sc-bqiRlB ghwjXk"
-        data-cy="test-url-2309ei30"
+        data-cy="test-url-1dc446cf-83c8-4daf-b972-47ad00475d9a"
       >
         <span
           class="ant-typography sc-fotOHu"
-        >
-          
-        </span>
+        />
       </div>
       <div
         class="sc-bqiRlB ghwjXk"
@@ -65,7 +61,7 @@ exports[`TestCard 1`] = `
       >
         <button
           class="ant-btn ant-btn-primary ant-btn-background-ghost"
-          data-cy="test-run-button-2309ei30"
+          data-cy="test-run-button-1dc446cf-83c8-4daf-b972-47ad00475d9a"
           type="button"
         >
           <span>
@@ -75,7 +71,7 @@ exports[`TestCard 1`] = `
       </div>
       <span
         class="ant-dropdown-trigger ant-dropdown-link ant-dropdown-open"
-        data-cy="test-actions-button-2309ei30"
+        data-cy="test-actions-button-1dc446cf-83c8-4daf-b972-47ad00475d9a"
       >
         <span
           aria-label="more"

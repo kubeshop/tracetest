@@ -113,18 +113,18 @@ exports[`Router 1`] = `
     />
   </header>
   <main
-    class="ant-layout-content sc-bdvvtL cVXBSg"
+    class="ant-layout-content sc-bdvvtL ioserY"
   >
     <div
       class="sc-llYSUQ jPRqiW"
     >
       <h4
-        class="ant-typography sc-cxpSdN bbcJQg"
+        class="ant-typography sc-cxpSdN fwzkuk"
       >
         All Tests
       </h4>
       <div
-        class="sc-iwjdpV NicDQ"
+        class="sc-iwjdpV CCAvg"
       >
         <span
           class="ant-input-affix-wrapper sc-gWXbKe kPVVws"
@@ -182,9 +182,6 @@ exports[`Router 1`] = `
         data-cy="test-list"
       />
     </div>
-    <div
-      class="sc-ikJyIC exAstU"
-    />
   </main>
 </div>
 `;

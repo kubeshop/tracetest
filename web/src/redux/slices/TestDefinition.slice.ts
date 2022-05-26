@@ -12,7 +12,7 @@ interface ITestDefinitionState {
   isInitialized: boolean;
 }
 
-const initialState: ITestDefinitionState = {
+export const initialState: ITestDefinitionState = {
   initialDefinitionList: [],
   definitionList: [],
   changeList: [],
@@ -20,7 +20,7 @@ const initialState: ITestDefinitionState = {
   isInitialized: false,
 };
 
-const assertionResultsToDefinitionList = (assertionResults: TAssertionResults): TTestDefinitionEntry[] => {
+export const assertionResultsToDefinitionList = (assertionResults: TAssertionResults): TTestDefinitionEntry[] => {
   return assertionResults.resultList.map(({selector, resultList}) => ({
     isDraft: false,
     isDeleted: false,

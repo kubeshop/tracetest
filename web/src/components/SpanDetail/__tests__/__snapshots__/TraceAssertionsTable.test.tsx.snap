@@ -16,7 +16,7 @@ exports[`Layout 1`] = `
       <span
         class="ant-typography ant-typography-secondary"
       >
-        HTTP •  • 
+        General • mock • span-mock
       </span>
     </div>
     <div
@@ -39,36 +39,8 @@ exports[`Layout 1`] = `
               class="ant-tabs-tab ant-tabs-tab-active"
             >
               <div
-                aria-controls="rc-tabs-test-panel-span-request"
-                aria-selected="true"
-                class="ant-tabs-tab-btn"
-                id="rc-tabs-test-tab-span-request"
-                role="tab"
-                tabindex="0"
-              >
-                Request
-              </div>
-            </div>
-            <div
-              class="ant-tabs-tab"
-            >
-              <div
-                aria-controls="rc-tabs-test-panel-span-response"
-                aria-selected="false"
-                class="ant-tabs-tab-btn"
-                id="rc-tabs-test-tab-span-response"
-                role="tab"
-                tabindex="0"
-              >
-                Response
-              </div>
-            </div>
-            <div
-              class="ant-tabs-tab"
-            >
-              <div
                 aria-controls="rc-tabs-test-panel-span-attribute-list"
-                aria-selected="false"
+                aria-selected="true"
                 class="ant-tabs-tab-btn"
                 id="rc-tabs-test-tab-span-attribute-list"
                 role="tab"
@@ -126,34 +98,80 @@ exports[`Layout 1`] = `
         >
           <div
             aria-hidden="false"
-            aria-labelledby="rc-tabs-test-tab-span-request"
+            aria-labelledby="rc-tabs-test-tab-span-attribute-list"
             class="ant-tabs-tabpane ant-tabs-tabpane-active"
-            id="rc-tabs-test-panel-span-request"
+            id="rc-tabs-test-panel-span-attribute-list"
             role="tabpanel"
             tabindex="0"
           >
             <div
               class="sc-furwcr bsfqEZ"
-            />
+            >
+              <div
+                class="sc-bdvvtL laqDNn"
+              >
+                <div
+                  class="sc-hKwDye fzIjgC"
+                >
+                  <span
+                    class="ant-typography ant-typography-secondary sc-eCImPb kRXiwK"
+                  >
+                    service.name
+                  </span>
+                </div>
+                <span
+                  class="ant-typography sc-iCfMLu leaIeI"
+                >
+                  mock
+                </span>
+                <div
+                  class="sc-jRQBWg bHOJVG"
+                />
+              </div>
+              <div
+                class="sc-bdvvtL laqDNn"
+              >
+                <div
+                  class="sc-hKwDye fzIjgC"
+                >
+                  <span
+                    class="ant-typography ant-typography-secondary sc-eCImPb kRXiwK"
+                  >
+                    name
+                  </span>
+                </div>
+                <span
+                  class="ant-typography sc-iCfMLu leaIeI"
+                >
+                  span-mock
+                </span>
+                <div
+                  class="sc-jRQBWg bHOJVG"
+                />
+              </div>
+              <div
+                class="sc-bdvvtL laqDNn"
+              >
+                <div
+                  class="sc-hKwDye fzIjgC"
+                >
+                  <span
+                    class="ant-typography ant-typography-secondary sc-eCImPb kRXiwK"
+                  >
+                    tracetest.span.duration
+                  </span>
+                </div>
+                <span
+                  class="ant-typography sc-iCfMLu leaIeI"
+                >
+                  10
+                </span>
+                <div
+                  class="sc-jRQBWg bHOJVG"
+                />
+              </div>
+            </div>
           </div>
-          <div
-            aria-hidden="true"
-            aria-labelledby="rc-tabs-test-tab-span-response"
-            class="ant-tabs-tabpane"
-            id="rc-tabs-test-panel-span-response"
-            role="tabpanel"
-            style="display: none;"
-            tabindex="-1"
-          />
-          <div
-            aria-hidden="true"
-            aria-labelledby="rc-tabs-test-tab-span-attribute-list"
-            class="ant-tabs-tabpane"
-            id="rc-tabs-test-panel-span-attribute-list"
-            role="tabpanel"
-            style="display: none;"
-            tabindex="-1"
-          />
         </div>
       </div>
     </div>

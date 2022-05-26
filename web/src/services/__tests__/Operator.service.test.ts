@@ -11,7 +11,7 @@ describe('OperatorService', () => {
   it('should return the operator symbol', () => {
     const symbol = OperatorService.getOperatorSymbol(CompareOperator.EQUALS);
 
-    expect(symbol).toEqual('==');
+    expect(symbol).toEqual('=');
   });
 
   it('should return the name of an operator from the symbol', () =>{
