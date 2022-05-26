@@ -9,10 +9,6 @@
 
 package openapi
 
-import (
-	"time"
-)
-
 type Span struct {
 	Id string `json:"id,omitempty"`
 
@@ -20,9 +16,11 @@ type Span struct {
 
 	Name string `json:"name,omitempty"`
 
-	StartTime time.Time `json:"startTime,omitempty"`
+	// span start time in unix nano format
+	StartTime int32 `json:"startTime,omitempty"`
 
-	EndTime time.Time `json:"endTime,omitempty"`
+	// span end time in unix nano format
+	EndTime int32 `json:"endTime,omitempty"`
 
 	// Key-Value of span attributes
 	Attributes map[string]string `json:"attributes,omitempty"`
