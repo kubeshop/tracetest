@@ -15,10 +15,33 @@ Tools needed for the installation:
 
 ## **Installation**
 
+### Install script
+
+We provide a simple install script that can install all required components:
+
+```
+curl -L https://raw.githubusercontent.com/kubeshop/tracetest/sample-setup-script/setup.sh | bash -s
+```
+
+This command will install tracetest using the default settings. You can configure the following options:
+
+
+| Option                   | description                                  | Default value      |
+|--------------------------|----------------------------------------------|--------------------|
+| --help                   | show help message                            | n/a                |
+| --namespace              | target installation k8s namespace            | tracetest          |
+| --trace-backend          | trace backend (jaeger or tempo)              | jaeger             |
+| --trace-backend-endpoint | trace backend endpoint                       | jaeger-query:16685 |
+| --skip-pma               | if set, don't install the sample application | n/a                |
+
+
+### Using Helm
+
 Container images are hosted on the Docker Hub [Tracetest repository](https://hub.docker.com/r/kubeshop/tracetest).
 
-There are two options to install Tracetest, if you use Jaeger to store your trace.
-### **Jaeger**
+There are two options to install Tracetest
+
+#### **Jaeger**
 
 Tracetest uses [Jaeger Query Service `16685` port](https://www.jaegertracing.io/docs/1.32/deployment/#query-service--ui), which allows Tracetest to find Traces using GRPC protocol.
 
@@ -34,7 +57,7 @@ helm install tracetest kubeshop/tracetest \
   --set jaegerConnectionConfig.endpoint="jaeger-query:16685"
 ```
 
-### **Grafana Tempo**
+#### **Grafana Tempo**
 
 Tracetest uses [Grafana Tempo's Server's `9095` port](https://grafana.com/docs/tempo/latest/configuration/#server), which allows Tracetest to find Traces using GRPC protocol.
 
