@@ -453,10 +453,10 @@ export interface external {
           /** Format: byte */
           parentId?: string;
           name?: string;
-          /** Format: date-time */
-          startTime?: string;
-          /** Format: date-time */
-          endTime?: string;
+          /** @description span start time in unix milli format */
+          startTime?: number;
+          /** @description span end time in unix milli format */
+          endTime?: number;
           /**
            * @description Key-Value of span attributes
            * @example [object Object]
