@@ -35,6 +35,21 @@ func TestComparators(t *testing.T) {
 
 		// ***********
 		{
+			name:       "NotEqual",
+			symbol:     "!=",
+			comparator: comparator.Neq,
+			expectSuccess: []compInput{
+				{"", "2"},
+				{"a", "b"},
+			},
+			expectNoMatch: []compInput{
+				{"a", "a"},
+				{"1", "1"},
+			},
+		},
+
+		// ***********
+		{
 			name:       "Gt",
 			symbol:     ">",
 			comparator: comparator.Gt,

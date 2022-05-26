@@ -9,6 +9,7 @@ import (
 var (
 	Basic = []Comparator{
 		Eq,
+		Neq,
 		Gt,
 		Gte,
 		Lt,
@@ -34,6 +35,23 @@ func (c eq) Compare(expected, actual string) error {
 
 func (c eq) String() string {
 	return "="
+}
+
+// Neq
+var Neq Comparator = neq{}
+
+type neq struct{}
+
+func (c neq) Compare(expected, actual string) error {
+	if expected != actual {
+		return nil
+	}
+
+	return ErrNoMatch
+}
+
+func (c neq) String() string {
+	return "!="
 }
 
 func parseNumber(s string) (int64, error) {
