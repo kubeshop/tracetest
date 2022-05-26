@@ -20,7 +20,7 @@ Tools needed for the installation:
 We provide a simple install script that can install all required components:
 
 ```
-curl -L https://raw.githubusercontent.com/kubeshop/tracetest/sample-setup-script/setup.sh | bash -s
+curl -L https://raw.githubusercontent.com/kubeshop/main/setup.sh | bash -s
 ```
 
 This command will install tracetest using the default settings. You can configure the following options:
