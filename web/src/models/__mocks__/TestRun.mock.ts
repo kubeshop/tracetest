@@ -13,6 +13,7 @@ const TestRunMock: IMockFactory<TTestRun, TRawTestRun> = () => ({
       traceId: faker.datatype.uuid(),
       spanId: faker.datatype.uuid(),
       createdAt: faker.date.past().toISOString(),
+      testVersion: faker.datatype.number(),
       completedAt: faker.date.past().toISOString(),
       response: {},
       result: {} as TRawAssertionResults,

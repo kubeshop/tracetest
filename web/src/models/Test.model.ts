@@ -6,12 +6,14 @@ const Test = ({
   name = '',
   description = '',
   definition,
+  version = 1,
   serviceUnderTest,
   referenceTestRun,
 }: TRawTest): TTest => {
   return {
     id,
     name,
+    version,
     description,
     definition: TestDefinition(definition || {}),
     serviceUnderTest,

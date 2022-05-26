@@ -1,5 +1,4 @@
 import {useCallback, useEffect, useMemo, useRef} from 'react';
-import {parseISO} from 'date-fns';
 import * as d3 from 'd3';
 import TraceAnalyticsService from '../../../services/Analytics/TraceAnalytics.service';
 import {IDiagramProps} from '../Diagram';
@@ -16,8 +15,8 @@ export const TimelineChart = ({trace, selectedSpan, onSelectSpan}: IDiagramProps
   const treeFactory = d3.tree().size([200, 450]).nodeSize([0, 5]);
 
   const spanDates = trace.spans.map(span => ({
-    startTime: parseISO(span.startTime).getTime(),
-    endTime: parseISO(span.endTime).getTime(),
+    startTime: span.startTime,
+    endTime: span.endTime,
     span,
   }));
 
@@ -27,8 +26,8 @@ export const TimelineChart = ({trace, selectedSpan, onSelectSpan}: IDiagramProps
         id: span.id,
         parentIds: [],
         data: span,
-        startTime: parseISO(span.startTime).getTime(),
-        endTime: parseISO(span.endTime).getTime(),
+        startTime: span.startTime,
+        endTime: span.endTime,
       };
       acc[span.id].parentIds.push(span.parentId);
       return acc;

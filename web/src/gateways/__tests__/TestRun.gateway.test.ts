@@ -3,7 +3,7 @@ import TestRunResultGateway from '../TestRun.gateway';
 
 const {getRunList, getRunById, reRun} = endpoints;
 
-jest.mock('../../redux/apis/Test.api', () => {
+jest.mock('../../redux/apis/TraceTest.api', () => {
   const initiate = jest.fn(() => Promise.resolve());
 
   return {

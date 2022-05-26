@@ -33,18 +33,18 @@ exports[`SpanAttributesTable 1`] = `
         class="ant-typography sc-hKwDye gXTdui"
         data-cy="test-details-name"
       >
-        
+        Josephine
+         (v
+        )
       </h4>
       <span
         class="ant-typography ant-typography-secondary sc-eCImPb bTklbz"
       >
-        GET
          - 
-        
       </span>
     </div>
     <div
-      class="sc-furwcr kLOQYj"
+      class="sc-furwcr ePseWR"
       data-cy="test-run-result-status"
     >
       <span

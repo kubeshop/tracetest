@@ -1,9 +1,11 @@
 import {noop} from 'lodash';
 import {useState, createContext, useCallback, useMemo, useContext, Dispatch, SetStateAction} from 'react';
 import {useTestDefinition} from '../../providers/TestDefinition/TestDefinition.provider';
+import {useTestRun} from '../../providers/TestRun/TestRun.provider';
 import SelectorService from '../../services/Selector.service';
 import {TTestDefinitionEntry} from '../../types/TestDefinition.types';
 import {IValues} from './AssertionForm';
+import AssertionFormConfirmModal from './AssertionFormConfirmModal';
 
 interface IFormProps {
   defaultValues?: IValues;
@@ -46,26 +48,38 @@ export const useAssertionForm = () => useContext(Context);
 const AssertionFormProvider: React.FC<{testId: string}> = ({children}) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
   const [formProps, setFormProps] = useState<IFormProps>(initialFormProps);
-  const {update, add} = useTestDefinition();
+  const {update, add, test, isDraftMode} = useTestDefinition();
+  const {run} = useTestRun();
 
-  const open = useCallback((props: IFormProps = {}) => {
-    setFormProps(props);
+  const open = useCallback(
+    (props: IFormProps = {}) => {
+      setFormProps(props);
+      if (run.testVersion !== test?.version && !isDraftMode) setIsConfirmationModalOpen(true);
+      else setIsOpen(true);
+    },
+    [isDraftMode, run.testVersion, test?.version]
+  );
+
+  const close = useCallback(() => {
+    setFormProps(initialFormProps);
+
+    setIsOpen(false);
+  }, []);
+
+  const onConfirm = useCallback(() => {
     setIsOpen(true);
   }, []);
 
-  const close = useCallback(() => {
-    setIsOpen(false);
-    setFormProps(initialFormProps);
-  }, []);
-
   const onSubmit = useCallback(
-    async ({selectorList, assertionList, pseudoSelector}: IValues) => {
+    async ({selectorList, assertionList = [], pseudoSelector}: IValues) => {
       const {isEditing, selector = ''} = formProps;
 
       const definition: TTestDefinitionEntry = {
         selector: SelectorService.getSelectorString(selectorList, pseudoSelector),
         assertionList,
+        isDraft: true,
       };
 
       if (isEditing) await update(selector, definition);
@@ -81,7 +95,18 @@ const AssertionFormProvider: React.FC<{testId: string}> = ({children}) => {
     [isOpen, open, close, formProps, onSubmit, isCollapsed, setIsCollapsed]
   );
 
-  return <Context.Provider value={contextValue}>{children}</Context.Provider>;
+  return (
+    <Context.Provider value={contextValue}>
+      {children}
+      <AssertionFormConfirmModal
+        isOpen={isConfirmationModalOpen}
+        latestVersion={test?.version || 1}
+        currentVersion={run.testVersion}
+        onCancel={() => setIsConfirmationModalOpen(false)}
+        onConfirm={onConfirm}
+      />
+    </Context.Provider>
+  );
 };
 
 export default AssertionFormProvider;

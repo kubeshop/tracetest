@@ -9,8 +9,8 @@ const SpanMock: IMockFactory<TSpan, TRawSpan> = () => ({
       id: faker.datatype.uuid(),
       parentId: faker.datatype.uuid(),
       name: faker.random.word(),
-      startTime: faker.date.recent().toISOString(),
-      endTime: faker.date.recent().toISOString(),
+      startTime: faker.date.recent().getMilliseconds(),
+      endTime: faker.date.recent().getMilliseconds(),
       attributes: {
         'service.name': 'mock',
         name: 'span-mock',

@@ -46,6 +46,7 @@ const TestRun = ({
   lastErrorState,
   request,
   response,
+  testVersion = 1,
 }: TRawTestRun): TTestRun => {
   return {
     lastErrorState,
@@ -58,6 +59,7 @@ const TestRun = ({
     traceId,
     spanId,
     state,
+    testVersion,
     trace: trace ? Trace(trace) : undefined,
     totalAssertionCount: getTestResultCount(result),
     failedAssertionCount: getTestResultCount(result, 'failed'),

@@ -6,6 +6,13 @@ export type TRawTestDefinition = TTestSchemas['TestDefinition'];
 export type TTestDefinitionEntry = {
   selector: string;
   assertionList: TAssertion[];
+  isDraft: boolean;
+  isDeleted?: boolean;
+};
+
+export type TRawTestDefinitionEntry = {
+  selector: string;
+  assertions: TAssertion[];
 };
 
 export type TTestDefinition = Model<

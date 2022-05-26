@@ -7,7 +7,7 @@ test('TestResults', async () => {
   const onSpanSelected = jest.fn();
   const {getAllByTestId} = render(
     <ReduxWrapperProvider>
-      <TestResults run={TestRunMock.model()} onSelectSpan={onSpanSelected} testId="12345" />
+      <TestResults assertionResults={TestRunMock.model().result} onSelectSpan={onSpanSelected} testId="12345" />
     </ReduxWrapperProvider>
   );
 

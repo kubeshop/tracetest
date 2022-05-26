@@ -8,20 +8,32 @@ interface TTestHeaderProps {
   test: TTest;
   onBack(): void;
   testState?: TTestRunState;
+  testVersion: number;
+  extraContent?: React.ReactElement;
 }
 
-const TestHeader: React.FC<TTestHeaderProps> = ({test: {name, serviceUnderTest}, onBack, testState}) => {
+const TestHeader: React.FC<TTestHeaderProps> = ({
+  test: {name, serviceUnderTest},
+  onBack,
+  testState,
+  extraContent,
+  testVersion,
+}) => {
   const {setIsCollapsed} = useAssertionForm();
+
   return (
     <S.TestHeader>
       <S.Content>
         <S.BackIcon data-cy="test-header-back-button" onClick={onBack} />
-        <S.TestName data-cy="test-details-name">{name}</S.TestName>
+        <S.TestName data-cy="test-details-name">
+          {name} (v{testVersion})
+        </S.TestName>
         <S.TestUrl>
           {serviceUnderTest?.request?.method?.toUpperCase()} - {serviceUnderTest?.request?.url}
         </S.TestUrl>
       </S.Content>
-      {testState && (
+      {extraContent}
+      {testState && !extraContent && (
         <S.StateContainer onClick={() => setIsCollapsed(o => !o)} data-cy="test-run-result-status">
           <S.StateText>Test status:</S.StateText>
           <TestState testState={testState} />

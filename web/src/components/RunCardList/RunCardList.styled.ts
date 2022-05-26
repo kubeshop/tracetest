@@ -6,7 +6,7 @@ export const ResultCardList = styled.div``;
 export const Header = styled.div`
   display: grid;
   align-items: center;
-  grid-template-columns: 300px 1fr 220px 40px 40px 40px 1fr;
+  grid-template-columns: 300px 300px 100px 220px 40px 40px 40px 1fr;
   gap: 16px;
   padding: 16px 12px;
 `;

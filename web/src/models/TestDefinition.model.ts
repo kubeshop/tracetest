@@ -4,6 +4,8 @@ import Assertion from './Assertion.model';
 const TestDefinition = ({definitions = []}: TRawTestDefinition): TTestDefinition => {
   return {
     definitionList: definitions.map(({selector = '', assertions = []}) => ({
+      isDraft: false,
+      isDeleted: false,
       selector,
       assertionList: assertions.map(rawAssertion => Assertion(rawAssertion)),
     })),

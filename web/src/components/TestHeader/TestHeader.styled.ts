@@ -55,4 +55,5 @@ export const StateContainer = styled.div`
   align-items: center;
   display: flex;
   justify-self: flex-end;
+  cursor: pointer;
 `;

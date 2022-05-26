@@ -12,15 +12,15 @@ describe('Create test', () => {
 
     $form.get('[data-cy=method-select]').click();
     $form.get('[data-cy=method-select-option-GET]').click();
-    const name = `Test - Shop - #${String(Date.now()).slice(-4)}`;
+    const name = `Test - Pokemon - #${String(Date.now()).slice(-4)}`;
 
-    $form.get('[data-cy=url]').type('https://shop.buy');
+    $form.get('[data-cy=url]').type('http://demo-pokemon-api.demo.svc.cluster.local/pokemon');
     $form.get('[data-cy=name').type(name);
 
     $form.get('[data-cy=create-test-submit]').click();
 
     cy.location('pathname').should('match', /\/test\/.*/i);
-    cy.get('[data-cy=test-details-name]').should('have.text', name);
+    cy.get('[data-cy=test-details-name]').should('have.text', `${name} (v1)`);
     deleteTest();
   });
 
@@ -45,7 +45,7 @@ describe('Create test', () => {
     $form.get('[data-cy=create-test-submit]').click();
 
     cy.location('pathname').should('match', /\/test\/.*/i);
-    cy.get('[data-cy=test-details-name]').should('have.text', name);
+    cy.get('[data-cy=test-details-name]').should('have.text', `${name} (v1)`);
     deleteTest();
   });
 
@@ -58,7 +58,7 @@ describe('Create test', () => {
     $form.get('[data-cy=create-test-submit]').click();
 
     cy.location('pathname').should('match', /\/test\/.*/i);
-    cy.get('[data-cy=test-details-name]').should('have.text', `${name} - ${description}`);
+    cy.get('[data-cy=test-details-name]').should('have.text', `${name} - ${description} (v1)`);
     deleteTest();
   });
 
@@ -71,7 +71,7 @@ describe('Create test', () => {
     $form.get('[data-cy=create-test-submit]').click();
 
     cy.location('pathname').should('match', /\/test\/.*/i);
-    cy.get('[data-cy=test-details-name]').should('have.text', `${name} - ${description}`);
+    cy.get('[data-cy=test-details-name]').should('have.text', `${name} - ${description} (v1)`);
     deleteTest();
   });
 });

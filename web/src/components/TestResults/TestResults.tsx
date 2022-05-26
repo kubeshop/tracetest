@@ -1,18 +1,18 @@
 import SkeletonTable from 'components/SkeletonTable';
 import {FC} from 'react';
-import {TTestRun} from '../../types/TestRun.types';
+import { TAssertionResults } from '../../types/Assertion.types';
 import AssertionCardList from '../AssertionCardList';
 
 type TTestResultsProps = {
   onSelectSpan(spanId: string): void;
   testId: string;
-  run: TTestRun;
+  assertionResults: TAssertionResults;
 };
 
-const TestResults: FC<TTestResultsProps> = ({run: {trace, result}, testId, onSelectSpan}) => {
+const TestResults: FC<TTestResultsProps> = ({assertionResults, testId, onSelectSpan}) => {
   return (
-    <SkeletonTable loading={!trace}>
-      <AssertionCardList assertionResults={result} onSelectSpan={onSelectSpan} testId={testId} />
+    <SkeletonTable loading={!assertionResults}>
+      <AssertionCardList assertionResults={assertionResults} onSelectSpan={onSelectSpan} testId={testId} />
     </SkeletonTable>
   );
 };

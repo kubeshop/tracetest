@@ -4,7 +4,7 @@ import TestDefinitionGateway from '../TestDefinition.gateway';
 
 const {setTestDefinition, getTestDefinition} = endpoints;
 
-jest.mock('../../redux/apis/Test.api', () => {
+jest.mock('../../redux/apis/TraceTest.api', () => {
   const initiate = jest.fn(() => Promise.resolve());
 
   return {

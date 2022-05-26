@@ -40,7 +40,7 @@ const Trace = ({displayError, visiblePortion, minHeight, test, run}: IProps): JS
           <SpanDetail resultId={run.id} testId={test?.id} span={selectedSpan} />
         </S.DetailsSection>
       </S.Main>
-      <TraceDrawer visiblePortion={visiblePortion} testId={test?.id!} run={run} onSelectSpan={onSelectSpan} />
+      <TraceDrawer selectedSpan={selectedSpan!} visiblePortion={visiblePortion} testId={test?.id!} run={run} onSelectSpan={onSelectSpan} />
     </>
   ) : null;
 };

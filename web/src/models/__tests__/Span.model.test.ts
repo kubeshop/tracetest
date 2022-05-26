@@ -1,4 +1,3 @@
-import {differenceInSeconds, parseISO} from 'date-fns';
 import Span from '../Span.model';
 import SpanMock from '../__mocks__/Span.mock';
 
@@ -15,7 +14,7 @@ describe('Span', () => {
     expect(span.name).toEqual(rawSpan.attributes?.name);
     expect(span.duration).toEqual(Number(rawSpan.attributes!['tracetest.span.duration']));
 
-    const duration = differenceInSeconds(parseISO(rawSpan.startTime!), parseISO(rawSpan.endTime!));
+    const duration = Number(rawSpan.attributes!['tracetest.span.duration']) || 0;
 
     expect(span.duration).toEqual(duration);
   });

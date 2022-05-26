@@ -9,6 +9,7 @@ const TestMock: IMockFactory<TTest, TRawTest> = () => ({
     return {
       id: faker.datatype.uuid(),
       name: faker.name.firstName(),
+      version: faker.datatype.number(),
       definition: {
         definitions: [
           {

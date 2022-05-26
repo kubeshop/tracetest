@@ -1,7 +1,5 @@
-import faker from '@faker-js/faker';
 import {ComponentStory, ComponentMeta} from '@storybook/react';
-import {HTTP_METHOD} from '../../../constants/Common.constants';
-import TestDefinition from '../../../models/TestDefinition.model';
+import TestMock from '../../../models/__mocks__/Test.mock';
 
 import TestCard from '../TestCard';
 
@@ -15,16 +13,5 @@ const Template: ComponentStory<typeof TestCard> = args => <TestCard {...args} />
 
 export const Default = Template.bind({});
 Default.args = {
-  test: {
-    id: faker.datatype.uuid(),
-    definition: TestDefinition({}),
-    name: `${faker.name.firstName()} ${faker.name.lastName()}`,
-    description: faker.lorem.sentences(),
-    serviceUnderTest: {
-      request: {
-        url: faker.internet.url(),
-        method: faker.internet.httpMethod().toUpperCase() as HTTP_METHOD,
-      },
-    },
-  },
+  test: TestMock.model(),
 };

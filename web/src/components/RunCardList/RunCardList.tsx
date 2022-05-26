@@ -31,6 +31,9 @@ const ResultCardList: React.FC<IResultCardListProps> = ({resultList, testId}) =>
           <S.Text>Execution time</S.Text>
         </S.TextContainer>
         <S.TextContainer>
+          <S.Text>Version</S.Text>
+        </S.TextContainer>
+        <S.TextContainer>
           <S.Text>Status</S.Text>
         </S.TextContainer>
         <S.TextContainer>

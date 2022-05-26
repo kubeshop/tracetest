@@ -4,15 +4,15 @@ exports[`TraceNode 1`] = `
 <div>
   <div
     class="sc-bdvvtL kNAymc"
-    data-cy="trace-node-http"
+    data-cy="trace-node-general"
   >
     <div
-      class="sc-gsDKAQ cmaxSH"
+      class="sc-gsDKAQ hcmEDi"
     >
       <span
         class="ant-typography"
       >
-        HTTP
+        General
       </span>
     </div>
     <div
@@ -24,11 +24,17 @@ exports[`TraceNode 1`] = `
     <div
       class="sc-hKwDye etMbsh"
     >
-      
       <span
         class="ant-typography ant-typography-ellipsis ant-typography-single-line ant-typography-ellipsis-single-line sc-dkPtRN dvhzfk"
       >
-        
+        <strong>
+          mock
+        </strong>
+      </span>
+      <span
+        class="ant-typography ant-typography-ellipsis ant-typography-single-line ant-typography-ellipsis-single-line sc-dkPtRN dvhzfk"
+      >
+        span-mock
       </span>
     </div>
     <div
