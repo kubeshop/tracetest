@@ -12,16 +12,17 @@ package openapi
 
 import (
 	"encoding/json"
-	"time"
 )
 
 // Span struct for Span
 type Span struct {
-	Id        *string    `json:"id,omitempty"`
-	ParentId  *string    `json:"parentId,omitempty"`
-	Name      *string    `json:"name,omitempty"`
-	StartTime *time.Time `json:"startTime,omitempty"`
-	EndTime   *time.Time `json:"endTime,omitempty"`
+	Id       *string `json:"id,omitempty"`
+	ParentId *string `json:"parentId,omitempty"`
+	Name     *string `json:"name,omitempty"`
+	// span start time in unix milli format
+	StartTime *int32 `json:"startTime,omitempty"`
+	// span end time in unix milli format
+	EndTime *int32 `json:"endTime,omitempty"`
 	// Key-Value of span attributes
 	Attributes *map[string]string `json:"attributes,omitempty"`
 	Children   []Span             `json:"children,omitempty"`
@@ -141,9 +142,9 @@ func (o *Span) SetName(v string) {
 }
 
 // GetStartTime returns the StartTime field value if set, zero value otherwise.
-func (o *Span) GetStartTime() time.Time {
+func (o *Span) GetStartTime() int32 {
 	if o == nil || o.StartTime == nil {
-		var ret time.Time
+		var ret int32
 		return ret
 	}
 	return *o.StartTime
@@ -151,7 +152,7 @@ func (o *Span) GetStartTime() time.Time {
 
 // GetStartTimeOk returns a tuple with the StartTime field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Span) GetStartTimeOk() (*time.Time, bool) {
+func (o *Span) GetStartTimeOk() (*int32, bool) {
 	if o == nil || o.StartTime == nil {
 		return nil, false
 	}
@@ -167,15 +168,15 @@ func (o *Span) HasStartTime() bool {
 	return false
 }
 
-// SetStartTime gets a reference to the given time.Time and assigns it to the StartTime field.
-func (o *Span) SetStartTime(v time.Time) {
+// SetStartTime gets a reference to the given int32 and assigns it to the StartTime field.
+func (o *Span) SetStartTime(v int32) {
 	o.StartTime = &v
 }
 
 // GetEndTime returns the EndTime field value if set, zero value otherwise.
-func (o *Span) GetEndTime() time.Time {
+func (o *Span) GetEndTime() int32 {
 	if o == nil || o.EndTime == nil {
-		var ret time.Time
+		var ret int32
 		return ret
 	}
 	return *o.EndTime
@@ -183,7 +184,7 @@ func (o *Span) GetEndTime() time.Time {
 
 // GetEndTimeOk returns a tuple with the EndTime field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Span) GetEndTimeOk() (*time.Time, bool) {
+func (o *Span) GetEndTimeOk() (*int32, bool) {
 	if o == nil || o.EndTime == nil {
 		return nil, false
 	}
@@ -199,8 +200,8 @@ func (o *Span) HasEndTime() bool {
 	return false
 }
 
-// SetEndTime gets a reference to the given time.Time and assigns it to the EndTime field.
-func (o *Span) SetEndTime(v time.Time) {
+// SetEndTime gets a reference to the given int32 and assigns it to the EndTime field.
+func (o *Span) SetEndTime(v int32) {
 	o.EndTime = &v
 }
 

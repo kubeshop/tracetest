@@ -7,10 +7,10 @@ import (
 	"math"
 	"time"
 
-	"github.com/kubeshop/tracetest/model"
-	"github.com/kubeshop/tracetest/subscription"
-	"github.com/kubeshop/tracetest/tracedb"
-	"github.com/kubeshop/tracetest/traces"
+	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/subscription"
+	"github.com/kubeshop/tracetest/server/tracedb"
+	"github.com/kubeshop/tracetest/server/traces"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 )
 

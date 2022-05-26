@@ -7,7 +7,7 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
-	"github.com/kubeshop/tracetest/model"
+	"github.com/kubeshop/tracetest/server/model"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -57,7 +57,7 @@ func (td *postgresDB) UpdateRun(ctx context.Context, r model.Run) error {
 }
 
 func (td *postgresDB) GetRun(ctx context.Context, id uuid.UUID) (model.Run, error) {
-	stmt, err := td.db.Prepare("SELECT run FROM runs WHERE id = $1")
+	stmt, err := td.db.Prepare("SELECT run, test_version FROM runs WHERE id = $1")
 	if err != nil {
 		return model.Run{}, err
 	}
@@ -71,7 +71,7 @@ func (td *postgresDB) GetRun(ctx context.Context, id uuid.UUID) (model.Run, erro
 }
 
 func (td *postgresDB) GetTestRuns(ctx context.Context, test model.Test, take, skip int32) ([]model.Run, error) {
-	stmt, err := td.db.Prepare("SELECT run FROM runs WHERE test_id = $1 ORDER BY run ->> 'createdAt' DESC LIMIT $2 OFFSET $3")
+	stmt, err := td.db.Prepare("SELECT run, test_version FROM runs WHERE test_id = $1 ORDER BY run ->> 'createdAt' DESC LIMIT $2 OFFSET $3")
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +95,7 @@ func (td *postgresDB) GetTestRuns(ctx context.Context, test model.Test, take, sk
 }
 
 func (td *postgresDB) GetRunByTraceID(ctx context.Context, test model.Test, traceID trace.TraceID) (model.Run, error) {
-	stmt, err := td.db.Prepare("SELECT run FROM runs WHERE test_id = $1 AND run ->> 'traceId' = $2")
+	stmt, err := td.db.Prepare("SELECT run, test_version FROM runs WHERE test_id = $1 AND run ->> 'traceId' = $2")
 	if err != nil {
 		return model.Run{}, err
 	}
@@ -117,23 +117,25 @@ func encodeRun(r model.Run) (string, error) {
 	return string(b), nil
 }
 
-func decodeRun(b []byte) (model.Run, error) {
+func decodeRun(b []byte, testVersion int) (model.Run, error) {
 	var run model.Run
 	err := json.Unmarshal(b, &run)
 	if err != nil {
 		return model.Run{}, fmt.Errorf("unmarshal run: %w", err)
 	}
+	run.TestVersion = testVersion
 	return run, nil
 }
 
 func readRunRow(row scanner) (model.Run, error) {
 	var b []byte
-	err := row.Scan(&b)
+	var testVersion int
+	err := row.Scan(&b, &testVersion)
 	switch err {
 	case sql.ErrNoRows:
 		return model.Run{}, ErrNotFound
 	case nil:
-		return decodeRun(b)
+		return decodeRun(b, testVersion)
 	default:
 		return model.Run{}, fmt.Errorf("read run row: %w", err)
 	}

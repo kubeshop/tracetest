@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/kubeshop/tracetest/id"
-	"github.com/kubeshop/tracetest/model"
+	"github.com/kubeshop/tracetest/server/id"
+	"github.com/kubeshop/tracetest/server/model"
 	"go.opentelemetry.io/otel/trace"
 )
 

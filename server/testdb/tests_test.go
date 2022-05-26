@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/kubeshop/tracetest/model"
-	"github.com/kubeshop/tracetest/testdb"
+	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

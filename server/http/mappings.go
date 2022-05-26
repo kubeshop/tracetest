@@ -3,12 +3,13 @@ package http
 import (
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/google/uuid"
-	"github.com/kubeshop/tracetest/assertions/comparator"
-	"github.com/kubeshop/tracetest/model"
-	"github.com/kubeshop/tracetest/openapi"
-	"github.com/kubeshop/tracetest/traces"
+	"github.com/kubeshop/tracetest/server/assertions/comparator"
+	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/openapi"
+	"github.com/kubeshop/tracetest/server/traces"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -125,17 +126,7 @@ func (m openapiMapper) Trace(in *traces.Trace) openapi.Trace {
 
 	flat := map[string]openapi.Span{}
 	for id, span := range in.Flat {
-		parentID := ""
-		if span.Parent != nil {
-			parentID = span.Parent.ID.String()
-		}
-		flat[id.String()] = openapi.Span{
-			Id:         span.ID.String(),
-			Attributes: map[string]string(span.Attributes),
-			StartTime:  span.StartTime,
-			EndTime:    span.EndTime,
-			ParentId:   parentID,
-		}
+		flat[id.String()] = m.Span(*span)
 	}
 
 	return openapi.Trace{
@@ -154,8 +145,8 @@ func (m openapiMapper) Span(in traces.Span) openapi.Span {
 	return openapi.Span{
 		Id:         in.ID.String(),
 		ParentId:   parentID,
-		StartTime:  in.StartTime,
-		EndTime:    in.EndTime,
+		StartTime:  int32(in.StartTime.UnixMilli()),
+		EndTime:    int32(in.EndTime.UnixMilli()),
 		Attributes: map[string]string(in.Attributes),
 		Children:   m.Spans(in.Children),
 	}
@@ -324,6 +315,19 @@ func (m modelMapper) Tests(in []openapi.Test) []model.Test {
 	return tests
 }
 
+func (m modelMapper) ValidateDefinition(in openapi.TestDefinition) error {
+	selectors := map[string]bool{}
+	for _, d := range in.Definitions {
+		if _, exists := selectors[d.Selector]; exists {
+			return fmt.Errorf("duplicated selector %s", d.Selector)
+		}
+
+		selectors[d.Selector] = true
+	}
+
+	return nil
+}
+
 func (m modelMapper) Definition(in openapi.TestDefinition) model.Definition {
 	defs := model.Definition{}
 	for _, d := range in.Definitions {
@@ -409,8 +413,8 @@ func (m modelMapper) Span(in openapi.Span, parent *traces.Span) traces.Span {
 		ID:         sid,
 		Attributes: in.Attributes,
 		Name:       in.Name,
-		StartTime:  in.StartTime,
-		EndTime:    in.EndTime,
+		StartTime:  time.UnixMilli(int64(in.StartTime)),
+		EndTime:    time.UnixMilli(int64(in.EndTime)),
 		Parent:     parent,
 	}
 	span.Children = m.Spans(in.Children, &span)

@@ -8,8 +8,8 @@ import (
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
-	"github.com/kubeshop/tracetest/id"
-	"github.com/kubeshop/tracetest/model"
+	"github.com/kubeshop/tracetest/server/id"
+	"github.com/kubeshop/tracetest/server/model"
 )
 
 type postgresDB struct {

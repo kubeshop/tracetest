@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/google/uuid"
-	"github.com/kubeshop/tracetest/model"
+	"github.com/kubeshop/tracetest/server/model"
 	"github.com/stretchr/testify/mock"
 	"go.opentelemetry.io/otel/trace"
 )
