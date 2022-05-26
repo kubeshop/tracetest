@@ -82,7 +82,7 @@ func (a *App) Start() error {
 	runner.Start(5) // worker count. should be configurable
 	defer runner.Stop()
 
-	controller := httpServer.NewController(a.traceDB, a.db, runner, assertionRunner)
+	controller := httpServer.NewController(a.db, runner, assertionRunner)
 	apiApiController := openapi.NewApiApiController(controller)
 
 	router := openapi.NewRouter(apiApiController)

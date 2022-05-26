@@ -17,7 +17,6 @@ import (
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/testdb"
-	"github.com/kubeshop/tracetest/server/tracedb"
 )
 
 var IDGen = id.NewRandGenerator()
@@ -32,7 +31,6 @@ type controller struct {
 }
 
 func NewController(
-	traceDB tracedb.TraceDB,
 	testDB model.Repository,
 	runner executor.Runner,
 	assertionRunner executor.AssertionRunner,
@@ -263,6 +261,10 @@ func (c *controller) RunTest(ctx context.Context, testID string) (openapi.ImplRe
 func (c *controller) SetTestDefinition(ctx context.Context, testID string, def openapi.TestDefinition) (openapi.ImplResponse, error) {
 	id, err := uuid.Parse(testID)
 	if err != nil {
+		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
+	}
+
+	if err := c.model.ValidateDefinition(def); err != nil {
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
 	}
 

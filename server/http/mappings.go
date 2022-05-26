@@ -324,6 +324,19 @@ func (m modelMapper) Tests(in []openapi.Test) []model.Test {
 	return tests
 }
 
+func (m modelMapper) ValidateDefinition(in openapi.TestDefinition) error {
+	selectors := map[string]bool{}
+	for _, d := range in.Definitions {
+		if _, exists := selectors[d.Selector]; exists {
+			return fmt.Errorf("duplicated selector %s", d.Selector)
+		}
+
+		selectors[d.Selector] = true
+	}
+
+	return nil
+}
+
 func (m modelMapper) Definition(in openapi.TestDefinition) model.Definition {
 	defs := model.Definition{}
 	for _, d := range in.Definitions {
