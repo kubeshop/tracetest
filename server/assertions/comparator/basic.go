@@ -10,7 +10,9 @@ var (
 	Basic = []Comparator{
 		Eq,
 		Gt,
+		Gte,
 		Lt,
+		Lte,
 		Contains,
 		StartsWith,
 		EndsWith,
@@ -77,6 +79,27 @@ func (c gt) String() string {
 	return ">"
 }
 
+// Gte
+var Gte Comparator = gte{}
+
+type gte struct{}
+
+func (c gte) Compare(expected, actual string) error {
+	a, b, err := parseNumbers(expected, actual)
+	if err != nil {
+		return err
+	}
+	if a >= b {
+		return nil
+	}
+
+	return ErrNoMatch
+}
+
+func (c gte) String() string {
+	return ">="
+}
+
 // Lt
 var Lt Comparator = lt{}
 
@@ -96,6 +119,27 @@ func (c lt) Compare(expected, actual string) error {
 
 func (c lt) String() string {
 	return "<"
+}
+
+// Lte
+var Lte Comparator = lte{}
+
+type lte struct{}
+
+func (c lte) Compare(expected, actual string) error {
+	a, b, err := parseNumbers(expected, actual)
+	if err != nil {
+		return err
+	}
+	if a <= b {
+		return nil
+	}
+
+	return ErrNoMatch
+}
+
+func (c lte) String() string {
+	return "<="
 }
 
 // Contains
