@@ -1,4 +1,5 @@
 import {PseudoSelector} from '../../constants/Operator.constants';
+import {TSpanSelector} from '../../types/Assertion.types';
 import SelectorService from '../Selector.service';
 
 describe('AssertionService', () => {
@@ -90,6 +91,67 @@ describe('AssertionService', () => {
         selector: PseudoSelector.NTH,
         number: 2,
       });
+    });
+  });
+
+  describe('validateSelector', () => {
+    it('should return true for a valid selector', async () => {
+      const selector: TSpanSelector = {
+        key: 'service.name',
+        operator: '=',
+        value: 'pokeshop',
+      };
+
+      const result = await SelectorService.validateSelector([], false, [], [selector]);
+      expect(result).toEqual(true);
+    });
+
+    it('should return true when editing and the selector match with the initial', async () => {
+      const selector: TSpanSelector = {
+        key: 'service.name',
+        operator: '=',
+        value: 'pokeshop',
+      };
+
+      const selectorString = 'span[service.name = "pokeshop"]';
+
+      const result = await SelectorService.validateSelector([selectorString], true, [selector], [selector]);
+      expect(result).toEqual(true);
+    });
+
+    it('should return an error when editing and the selector does not match with the initial', done => {
+      expect.assertions(2);
+      const selector: TSpanSelector = {
+        key: 'service.name',
+        operator: '=',
+        value: 'pokeshop',
+      };
+
+      const selectorString = 'span[service.name = "pokeshop"]';
+
+      SelectorService.validateSelector([selectorString], true, [], [selector]).catch((error: Error) => {
+        expect(error).toBeInstanceOf(Error);
+        expect(error.message).toBe('Selector already exists');
+        done();
+      });
+    });
+  });
+
+  it('should return an error when not editing and the selector is already part of the list', done => {
+    expect.assertions(2);
+    const selector: TSpanSelector = {
+      key: 'service.name',
+      operator: '=',
+      value: 'pokeshop',
+    };
+
+    const selectorString = 'span[service.name = "pokeshop"]';
+
+    SelectorService.validateSelector([selectorString], false, [selector], [selector]).catch((error: Error) => {
+      expect(error).toBeInstanceOf(Error);
+      expect(error.message).toBe('Selector already exists');
+
+      done();
     });
   });
 });

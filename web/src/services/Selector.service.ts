@@ -89,6 +89,22 @@ const SelectorService = () => ({
         }
       : undefined;
   },
+
+  validateSelector(
+    definitionSelectorList: string[],
+    isEditing: boolean,
+    initialSelectorList: TSpanSelector[],
+    selectorList: TSpanSelector[],
+    initialPseudoSelector?: TPseudoSelector,
+    pseudoSelector?: TPseudoSelector
+  ): Promise<boolean> {
+    const initialSelectorString = this.getSelectorString(initialSelectorList, initialPseudoSelector);
+    const selectorString = this.getSelectorString(selectorList, pseudoSelector);
+
+    if (!definitionSelectorList.includes(selectorString) || (isEditing && initialSelectorString === selectorString))
+      return Promise.resolve(true);
+    return Promise.reject(new Error('Selector already exists'));
+  },
 });
 
 export default SelectorService();

@@ -1,6 +1,8 @@
 import {differenceBy, intersectionBy} from 'lodash';
+import {CompareOperator, PseudoSelector} from '../constants/Operator.constants';
 import {SELECTOR_DEFAULT_ATTRIBUTES, SemanticGroupNameNodeMap} from '../constants/SemanticGroupNames.constants';
 import {TSpan, TSpanFlatAttribute} from '../types/Span.types';
+import OperatorService from './Operator.service';
 
 const itemSelectorKeys = SELECTOR_DEFAULT_ATTRIBUTES.flatMap(el => el.attributes);
 
@@ -36,6 +38,21 @@ const SpanService = () => ({
       intersectedList: intersectedAttributeList,
       differenceList: differenceBy(selectedSpanAttributeList, intersectedAttributeList, 'key'),
     };
+  },
+
+  getSelectorInformation(span: TSpan) {
+    const selectorList =
+      span?.signature.map(attribute => ({
+        value: attribute.value,
+        key: attribute.key,
+        operator: OperatorService.getOperatorSymbol(CompareOperator.EQUALS),
+      })) || [];
+
+    const pseudoSelector = {
+      selector: PseudoSelector.FIRST,
+    };
+
+    return {selectorList, pseudoSelector};
   },
 });
 

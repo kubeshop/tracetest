@@ -1,11 +1,10 @@
 import {PlusOutlined} from '@ant-design/icons';
 import {Badge} from 'antd';
 import {format, parseISO} from 'date-fns';
-import {useMemo} from 'react';
+import {MouseEventHandler, useCallback, useMemo} from 'react';
 import {TTestRun} from 'types/TestRun.types';
-import {CompareOperator} from '../../constants/Operator.constants';
 import GuidedTourService, {GuidedTours} from '../../services/GuidedTour.service';
-import OperatorService from '../../services/Operator.service';
+import SpanService from '../../services/Span.service';
 import TraceService from '../../services/Trace.service';
 import {TAssertionResults} from '../../types/Assertion.types';
 import {TSpan} from '../../types/Span.types';
@@ -41,6 +40,22 @@ const TraceDrawerHeader: React.FC<IProps> = ({
 
   const startDate = useMemo(() => format(parseISO(createdAt), "EEEE, do MMMM yyyy 'at' HH:mm:ss"), [createdAt]);
 
+  const handleAssertionClick: MouseEventHandler<HTMLElement> = useCallback(
+    event => {
+      event.stopPropagation();
+      const {selectorList, pseudoSelector} = SpanService.getSelectorInformation(selectedSpan!);
+
+      open({
+        isEditing: false,
+        defaultValues: {
+          pseudoSelector,
+          selectorList,
+        },
+      });
+    },
+    [open, selectedSpan]
+  );
+
   return (
     <S.Header
       visiblePortion={visiblePortion}
@@ -63,20 +78,7 @@ const TraceDrawerHeader: React.FC<IProps> = ({
           data-cy="add-assertion-button"
           icon={<PlusOutlined />}
           disabled={isDisabled}
-          onClick={event => {
-            event.stopPropagation();
-            open({
-              isEditing: false,
-              defaultValues: {
-                selectorList:
-                  selectedSpan?.signature.map(attribute => ({
-                    value: attribute.value,
-                    key: attribute.key,
-                    operator: OperatorService.getOperatorSymbol(CompareOperator.EQUALS),
-                  })) || [],
-              },
-            });
-          }}
+          onClick={handleAssertionClick}
         >
           Add Assertion
         </S.AddAssertionButton>
