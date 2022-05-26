@@ -22,7 +22,7 @@ import {useAppSelector} from '../../redux/hooks';
 const {onChecksChange, onSelectorChange} = CreateAssertionModalAnalyticsService;
 
 export interface IValues {
-  assertionList: TAssertion[];
+  assertionList?: TAssertion[];
   selectorList: TSpanSelector[];
   pseudoSelector?: TPseudoSelector;
 }
@@ -45,7 +45,8 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
     ],
     selectorList = [],
     pseudoSelector,
-  } = {},
+  } = {
+  },
   onSubmit,
   onCancel,
   isEditing = false,

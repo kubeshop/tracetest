@@ -1,7 +1,7 @@
 import {TAssertionResults} from '../types/Assertion.types';
 
 const TraceService = () => ({
-  getTestResultCount({resultList}: TAssertionResults) {
+  getTestResultCount({resultList}: TAssertionResults = {resultList: [], allPassed: false}) {
     const [totalPassedCount, totalFailedCount] = resultList.reduce<[number, number]>(
       ([innerTotalPassedCount, innerTotalFailedCount], {resultList: testResultList}) => {
         const [passed, failed] = testResultList.reduce<[number, number]>(

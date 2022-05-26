@@ -1,53 +1,48 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
+import {PatchCollection} from '@reduxjs/toolkit/dist/query/core/buildThunks';
 import TestDefinitionGateway from '../../gateways/TestDefinition.gateway';
-import TestSelectors from '../../selectors/Test.selectors';
+import TestRunGateway from '../../gateways/TestRun.gateway';
+import TestDefinitionSelectors from '../../selectors/TestDefinition.selectors';
 import TestDefinitionService from '../../services/TestDefinition.service';
-import {TTestDefinitionEntry} from '../../types/TestDefinition.types';
+import {TAssertionResults} from '../../types/Assertion.types';
+import {TRawTestDefinitionEntry, TTestDefinitionEntry} from '../../types/TestDefinition.types';
+import { TTestRun } from '../../types/TestRun.types';
 import {RootState} from '../store';
 
+export type TChange = {
+  selector: string;
+  action: 'add' | 'remove' | 'update';
+  patch: PatchCollection;
+};
+
+export type TCrudResponse = {
+  definitionList: TTestDefinitionEntry[];
+  change: TChange;
+};
+
 const TestDefinitionActions = () => ({
-  add: createAsyncThunk<void, {testId: string; definition: TTestDefinitionEntry}>(
-    'testDefinition/add',
-    async ({testId, definition}, {dispatch, getState}) => {
-      const test = TestSelectors.selectTest(getState() as RootState, testId);
-
-      const rawDefinitionList = test.definition.definitionList.map(def => TestDefinitionService.toRaw(def));
+  publish: createAsyncThunk<TTestRun, {testId: string; runId: string}>(
+    'testDefinition/publish',
+    async ({testId, runId}, {dispatch, getState}) => {
+      const rawDefinitionList = TestDefinitionSelectors.selectDefinitionList(getState() as RootState).reduce<
+        TRawTestDefinitionEntry[]
+      >((list, def) => (!def.isDeleted ? list.concat([TestDefinitionService.toRaw(def)]) : list), []);
 
       await dispatch(
         TestDefinitionGateway.set(testId, {
-          definitions: [...rawDefinitionList, TestDefinitionService.toRaw(definition)],
+          definitions: rawDefinitionList,
         })
       );
+
+      return dispatch(TestRunGateway.reRun(testId, runId)).unwrap();
     }
   ),
-  update: createAsyncThunk<void, {testId: string; selector: string; definition: TTestDefinitionEntry}>(
-    'testDefinition/update',
-    async ({testId, definition, selector}, {dispatch, getState}) => {
-      const test = TestSelectors.selectTest(getState() as RootState, testId);
-      const rawDefinitionList = test.definition.definitionList.map(def => TestDefinitionService.toRaw(def));
+  dryRun: createAsyncThunk<TAssertionResults, {definitionList: TTestDefinitionEntry[]; testId: string; runId: string}>(
+    'testDefinition/dryRun',
+    ({definitionList, testId, runId}, {dispatch}) => {
+      const rawDefinitionList = definitionList.map(def => TestDefinitionService.toRaw(def));
 
-      await dispatch(
-        TestDefinitionGateway.set(testId, {
-          definitions: rawDefinitionList.map(def => {
-            if (def.selector === selector) return TestDefinitionService.toRaw(definition);
-
-            return def;
-          }),
-        })
-      );
-    }
-  ),
-  remove: createAsyncThunk<void, {testId: string; selector: string}>(
-    'testDefinition/remove',
-    async ({testId, selector}, {dispatch, getState}) => {
-      const test = TestSelectors.selectTest(getState() as RootState, testId);
-      const rawDefinitionList = test.definition.definitionList.map(def => TestDefinitionService.toRaw(def));
-
-      await dispatch(
-        TestDefinitionGateway.set(testId, {
-          definitions: rawDefinitionList.filter(definition => definition.selector !== selector),
-        })
-      );
+      return dispatch(TestRunGateway.dryRun(testId, runId, {definitions: rawDefinitionList})).unwrap();
     }
   ),
 });

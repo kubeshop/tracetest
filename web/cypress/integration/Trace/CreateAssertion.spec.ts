@@ -22,6 +22,8 @@ describe('Create Assertion', () => {
     cy.location('href').should('match', /\/run\/.*/i);
 
     cy.get('[data-cy^=trace-node-]', {timeout: 10000}).should('be.visible');
+    cy.get(`[data-cy=trace-node-db]`).first().click();
+
     cy.get('[data-cy=add-assertion-button]').click();
     cy.get('[data-cy=assertion-form]', {timeout: 10000}).should('be.visible');
 
@@ -109,18 +111,55 @@ describe('Create Assertion', () => {
 
     cy.get('[data-cy=assertion-check-attribute]').last().type('service');
     cy.wait(500);
-    cy.get(`${getAttributeListId(2)} + div .ant-select-item`)
+    cy.get(`${getAttributeListId(1)} + div .ant-select-item`)
       .first()
       .click();
 
     cy.get('[data-cy=assertion-check-operator]').last().click();
-    cy.get(`${getComparatorListId(2)} + div .ant-select-item`)
+    cy.get(`${getComparatorListId(1)} + div .ant-select-item`)
       .last()
       .click();
     cy.get('[data-cy=assertion-check-operator] .ant-select-selection-item').last().should('have.text', 'Contains');
     cy.get('[data-cy=assertion-form-submit-button]').click();
 
     cy.get('[data-cy=assertion-card-list]').should('be.visible');
+    cy.get('[data-cy=assertion-card]').should('have.lengthOf', 2);
+  });
+
+  it('should publish the changes', () => {
+    cy.get('[data-cy=trace-actions-publish').click();
+    cy.get('[data-cy=assertion-card]').should('have.lengthOf', 2);
+  });
+
+  it('should create an assertion and revert all changes', () => {
+    cy.get(`[data-cy=trace-node-db]`).last().click();
+    cy.get('[data-cy=add-assertion-button]').click();
+    cy.get('[data-cy=assertion-form]', {timeout: 10000}).should('be.visible');
+
+    // add selector
+    cy.get('[data-cy=assertion-form-selector-input]').type('db');
+    cy.get('.ant-select-item-option-content').first().click();
+    cy.get('.ant-select-item-option-content').first().click();
+    cy.get('.ant-select-item-option-content').first().click();
+
+    cy.get('[data-cy=assertion-check-attribute]').type('db');
+    cy.wait(500);
+    cy.get(`${getAttributeListId(0)} + div .ant-select-item`)
+      .first()
+      .click();
+
+    cy.get('[data-cy=assertion-check-operator]').click();
+    cy.get(`${getComparatorListId(0)} + div .ant-select-item`)
+      .last()
+      .click();
+    cy.get('[data-cy=assertion-check-operator] .ant-select-selection-item').should('have.text', 'Contains');
+
+    cy.get('[data-cy=assertion-form-submit-button]').click();
+
+    cy.get('[data-cy=assertion-card-list]').should('be.visible');
+    cy.get('[data-cy=assertion-card]').should('have.lengthOf', 3);
+
+    cy.get('[data-cy=trace-actions-revert-all').click();
     cy.get('[data-cy=assertion-card]').should('have.lengthOf', 2);
   });
 });

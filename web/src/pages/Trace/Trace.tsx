@@ -12,15 +12,15 @@ const TracePage = () => {
 
   return (
     <ReactFlowProvider>
-      <TestDefinitionProvider testId={testId} runId={runId}>
-        <AssertionFormProvider testId={testId}>
-          <TestRunProvider testId={testId} runId={runId}>
+      <TestRunProvider testId={testId} runId={runId}>
+        <TestDefinitionProvider testId={testId} runId={runId}>
+          <AssertionFormProvider testId={testId}>
             <Layout>
               <TraceContent />
             </Layout>
-          </TestRunProvider>
-        </AssertionFormProvider>
-      </TestDefinitionProvider>
+          </AssertionFormProvider>
+        </TestDefinitionProvider>
+      </TestRunProvider>
     </ReactFlowProvider>
   );
 };

@@ -12,7 +12,11 @@ interface TAssertionCardListProps {
   testId: string;
 }
 
-const AssertionCardList: React.FC<TAssertionCardListProps> = ({assertionResults: {resultList}, onSelectSpan}) => {
+const AssertionCardList: React.FC<TAssertionCardListProps> = ({
+  assertionResults: {resultList},
+  onSelectSpan,
+  testId,
+}) => {
   const {open} = useAssertionForm();
   const {remove} = useTestDefinition();
 

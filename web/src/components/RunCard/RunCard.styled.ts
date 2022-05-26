@@ -5,7 +5,7 @@ import styled from 'styled-components';
 export const ResultCard = styled.div`
   display: grid;
   align-items: center;
-  grid-template-columns: 300px 1fr 220px 40px 40px 40px 1fr;
+  grid-template-columns: 300px 300px 100px 220px 40px 40px 40px 1fr;
   gap: 16px;
   padding: 16px 12px;
   border: 1px solid rgba(3, 24, 73, 0.1);

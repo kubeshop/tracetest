@@ -1,5 +1,7 @@
 import {useCallback} from 'react';
 import {useStore} from 'react-flow-renderer';
+import {useAppSelector} from '../../redux/hooks';
+import TestDefinitionSelectors from '../../selectors/TestDefinition.selectors';
 import {TAssertionResultEntry} from '../../types/Assertion.types';
 import AssertionCheckRow from '../AssertionCheckRow';
 import * as S from './AssertionCard.styled';
@@ -21,6 +23,8 @@ const AssertionCard: React.FC<TAssertionCardProps> = ({
   const store = useStore();
 
   const spanCountText = `${spanCount} ${spanCount > 1 ? 'spans' : 'span'}`;
+  const definition = useAppSelector(state => TestDefinitionSelectors.selectDefinitionBySelector(state, selector));
+  const {isDraft = false, isDeleted = false} = definition || {};
 
   const getIsSelectedSpan = useCallback(
     (id: string): boolean => {
@@ -42,10 +46,12 @@ const AssertionCard: React.FC<TAssertionCardProps> = ({
           </S.SelectorListText>
           <S.SpanCountText>{spanCountText}</S.SpanCountText>
         </div>
-        <div>
+        <S.ActionsContainer>
+          {isDraft && <S.StatusTag>draft</S.StatusTag>}
+          {isDeleted && <S.StatusTag color="#61175E">deleted</S.StatusTag>}
           <S.EditIcon data-cy="edit-assertion-button" onClick={() => onEdit(assertionResult)} />
           <S.DeleteIcon onClick={() => onDelete(selector)} />
-        </div>
+        </S.ActionsContainer>
       </S.Header>
       <S.Body>
         {resultList.flatMap(({spanResults, assertion: {attribute}, assertion}) =>

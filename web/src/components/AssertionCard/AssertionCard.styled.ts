@@ -1,5 +1,5 @@
 import {CloseCircleOutlined, EditOutlined} from '@ant-design/icons';
-import {Typography} from 'antd';
+import {Tag, Typography} from 'antd';
 import styled, {css} from 'styled-components';
 
 export const AssertionCard = styled.div`
@@ -46,3 +46,12 @@ export const DeleteIcon = styled(CloseCircleOutlined)`
   ${baseIcon}
   margin-left: 12px;
 `;
+
+export const ActionsContainer = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+export const StatusTag = styled(Tag).attrs({
+  color: '#61175E',
+})``;

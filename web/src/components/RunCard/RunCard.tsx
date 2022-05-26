@@ -12,7 +12,16 @@ interface IResultCardProps {
 }
 
 const ResultCard: React.FC<IResultCardProps> = ({
-  run: {id: runId, executionTime, totalAssertionCount, passedAssertionCount, failedAssertionCount, state, createdAt},
+  run: {
+    id: runId,
+    executionTime,
+    totalAssertionCount,
+    passedAssertionCount,
+    failedAssertionCount,
+    state,
+    createdAt,
+    testVersion,
+  },
   onClick,
   onDelete,
 }) => {
@@ -25,6 +34,9 @@ const ResultCard: React.FC<IResultCardProps> = ({
       </S.TextContainer>
       <S.TextContainer>
         <S.Text>{executionTime}s</S.Text>
+      </S.TextContainer>
+      <S.TextContainer>
+        <S.Text>v{testVersion}</S.Text>
       </S.TextContainer>
       <S.TextContainer data-cy={`test-run-result-status-${runId}`}>
         <TestState testState={state} />

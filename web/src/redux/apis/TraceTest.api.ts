@@ -2,10 +2,11 @@ import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
 import {TRecursivePartial} from 'types/Common.types';
 import {TRawTest, TTest} from 'types/Test.types';
 import {HTTP_METHOD} from '../../constants/Common.constants';
+import AssertionResults from '../../models/AssertionResults.model';
 import Test from '../../models/Test.model';
 import TestDefinition from '../../models/TestDefinition.model';
 import TestRun from '../../models/TestRun.model';
-import {TAssertion} from '../../types/Assertion.types';
+import {TAssertion, TAssertionResults, TRawAssertionResults} from '../../types/Assertion.types';
 import {TRawTestDefinition, TTestDefinition} from '../../types/TestDefinition.types';
 import {TRawTestRun, TTestRun} from '../../types/TestRun.types';
 
@@ -103,6 +104,17 @@ const TraceTestAPI = createApi({
       ],
       transformResponse: (rawTestRun: TRawTestRun) => TestRun(rawTestRun),
     }),
+    dryRun: build.mutation<
+      TAssertionResults,
+      {testId: string; runId: string; testDefinition: Partial<TRawTestDefinition>}
+    >({
+      query: ({testId, runId, testDefinition}) => ({
+        url: `/tests/${testId}/run/${runId}/dry-run`,
+        method: HTTP_METHOD.PUT,
+        body: testDefinition,
+      }),
+      transformResponse: (rawTestResults: TRawAssertionResults) => AssertionResults(rawTestResults),
+    }),
 
     // Spans
     getSelectedSpans: build.query<string[], {testId: string; runId: string; query: string}>({
@@ -125,6 +137,7 @@ export const {
   useGetSelectedSpansQuery,
   useReRunMutation,
   useLazyGetRunListQuery,
+  useDryRunMutation,
 } = TraceTestAPI;
 export const {endpoints} = TraceTestAPI;
 
