@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/kubeshop/tracetest/openapi"
-	"github.com/kubeshop/tracetest/testfixtures"
+	"github.com/kubeshop/tracetest/server/openapi"
+	"github.com/kubeshop/tracetest/server/testfixtures"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
