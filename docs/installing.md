@@ -35,6 +35,12 @@ This command will install tracetest using the default settings. You can configur
 | --skip-pma               | if set, don't install the sample application | n/a                |
 
 
+Example with custom options:
+
+```
+curl -L https://raw.githubusercontent.com/kubeshop/main/setup.sh | bash -s --skip-pma --namespace my-custom-namespace
+```
+
 ### Using Helm
 
 Container images are hosted on the Docker Hub [Tracetest repository](https://hub.docker.com/r/kubeshop/tracetest).
