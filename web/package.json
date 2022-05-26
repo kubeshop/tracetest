@@ -41,6 +41,7 @@
   },
   "scripts": {
     "start": "craco start",
+    "dev": "concurrently 'npm run start' 'npm run port-forward'",
     "port-forward": "kubectl -n tracetest-beta port-forward svc/tracetest-beta 8080:8080",
     "build": "craco build",
     "test": "npm run test:unit",
@@ -117,6 +118,7 @@
     "@types/jmespath": "0.15.0",
     "@types/lodash": "4.14.181",
     "@types/styled-components": "5.1.21",
+    "concurrently": "7.2.1",
     "craco-less": "2.0.0",
     "cypress": "9.6.0",
     "eslint": "8.8.0",
