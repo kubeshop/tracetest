@@ -1,11 +1,11 @@
-import {useMemo} from 'react';
 import {capitalize, difference} from 'lodash';
-import {TAssertion, TAssertionSpanResult} from '../../types/Assertion.types';
-import * as S from './AssertionCheckRow.styled';
-import AttributeValue from '../AttributeValue';
+import {useMemo} from 'react';
 import {useTestRun} from '../../providers/TestRun/TestRun.provider';
 import OperatorService from '../../services/Operator.service';
+import {TAssertion, TAssertionSpanResult} from '../../types/Assertion.types';
 import {TCompareOperatorSymbol} from '../../types/Operator.types';
+import AttributeValue from '../AttributeValue';
+import * as S from './AssertionCheckRow.styled';
 
 interface TAssertionCheckRowProps {
   result: TAssertionSpanResult;
@@ -29,7 +29,7 @@ const AssertionCheckRow: React.FC<TAssertionCheckRowProps> = ({
   } = useTestRun();
   const span = useMemo(() => trace?.spans.find(({id}) => id === spanId), [spanId, trace?.spans]);
 
-  const signatureSelectorList = span?.signature.map(({value}) => value).concat([`#${spanId.slice(-4)}`]) || [];
+  const signatureSelectorList = span?.signature.map(({value}) => value);
   const spanLabelList = difference(signatureSelectorList, assertionSelectorList);
   const badgeList = useMemo(() => {
     const isSelected = getIsSelectedSpan(spanId);
@@ -37,10 +37,10 @@ const AssertionCheckRow: React.FC<TAssertionCheckRowProps> = ({
     return (isSelected ? [<S.SelectedLabelBadge count="selected" key="selected" />] : []).concat(
       spanLabelList.map((label, index) => (
         // eslint-disable-next-line react/no-array-index-key
-        <S.LabelBadge count={label} key={`${label}-${index}`} />
+        <S.LabelBadge spanType={!index ? span?.type : undefined} count={label} key={`${label}-${index}`} />
       ))
     );
-  }, [getIsSelectedSpan, spanId, spanLabelList]);
+  }, [getIsSelectedSpan, spanId, spanLabelList, span?.type]);
 
   return (
     <S.AssertionCheckRow onClick={() => onSelectSpan(spanId)}>
