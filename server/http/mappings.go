@@ -3,6 +3,7 @@ package http
 import (
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
@@ -125,17 +126,7 @@ func (m openapiMapper) Trace(in *traces.Trace) openapi.Trace {
 
 	flat := map[string]openapi.Span{}
 	for id, span := range in.Flat {
-		parentID := ""
-		if span.Parent != nil {
-			parentID = span.Parent.ID.String()
-		}
-		flat[id.String()] = openapi.Span{
-			Id:         span.ID.String(),
-			Attributes: map[string]string(span.Attributes),
-			StartTime:  span.StartTime,
-			EndTime:    span.EndTime,
-			ParentId:   parentID,
-		}
+		flat[id.String()] = m.Span(*span)
 	}
 
 	return openapi.Trace{
@@ -154,8 +145,8 @@ func (m openapiMapper) Span(in traces.Span) openapi.Span {
 	return openapi.Span{
 		Id:         in.ID.String(),
 		ParentId:   parentID,
-		StartTime:  in.StartTime,
-		EndTime:    in.EndTime,
+		StartTime:  int32(in.StartTime.UnixMilli()),
+		EndTime:    int32(in.EndTime.UnixMilli()),
 		Attributes: map[string]string(in.Attributes),
 		Children:   m.Spans(in.Children),
 	}
@@ -409,8 +400,8 @@ func (m modelMapper) Span(in openapi.Span, parent *traces.Span) traces.Span {
 		ID:         sid,
 		Attributes: in.Attributes,
 		Name:       in.Name,
-		StartTime:  in.StartTime,
-		EndTime:    in.EndTime,
+		StartTime:  time.UnixMilli(int64(in.StartTime)),
+		EndTime:    time.UnixMilli(int64(in.EndTime)),
 		Parent:     parent,
 	}
 	span.Children = m.Spans(in.Children, &span)

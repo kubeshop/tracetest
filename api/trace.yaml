@@ -27,11 +27,11 @@ components:
         name:
           type: string
         startTime:
-          type: string
-          format: date-time
+          type: integer
+          description: span start time in unix milli format
         endTime:
-          type: string
-          format: date-time
+          type: integer
+          description: span end time in unix milli format
         attributes:
           type: object
           description: Key-Value of span attributes
