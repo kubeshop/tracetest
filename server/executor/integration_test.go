@@ -9,10 +9,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kubeshop/tracetest/app"
-	"github.com/kubeshop/tracetest/model"
-	"github.com/kubeshop/tracetest/openapi"
-	"github.com/kubeshop/tracetest/testmock"
+	"github.com/kubeshop/tracetest/server/app"
+	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/openapi"
+	"github.com/kubeshop/tracetest/server/testmock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

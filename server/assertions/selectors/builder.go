@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/alecthomas/participle/v2"
-	"github.com/kubeshop/tracetest/assertions/comparator"
-	"github.com/kubeshop/tracetest/traces"
+	"github.com/kubeshop/tracetest/server/assertions/comparator"
+	"github.com/kubeshop/tracetest/server/traces"
 )
 
 var defaultParser *SelectorParser

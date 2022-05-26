@@ -3,11 +3,11 @@ package assertions_test
 import (
 	"testing"
 
-	"github.com/kubeshop/tracetest/assertions"
-	"github.com/kubeshop/tracetest/assertions/comparator"
-	"github.com/kubeshop/tracetest/id"
-	"github.com/kubeshop/tracetest/model"
-	"github.com/kubeshop/tracetest/traces"
+	"github.com/kubeshop/tracetest/server/assertions"
+	"github.com/kubeshop/tracetest/server/assertions/comparator"
+	"github.com/kubeshop/tracetest/server/id"
+	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

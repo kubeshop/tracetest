@@ -8,10 +8,10 @@ import (
 	"os"
 	"testing"
 
-	"github.com/kubeshop/tracetest/executor"
-	"github.com/kubeshop/tracetest/id"
-	"github.com/kubeshop/tracetest/model"
-	"github.com/kubeshop/tracetest/testmock"
+	"github.com/kubeshop/tracetest/server/executor"
+	"github.com/kubeshop/tracetest/server/id"
+	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/testmock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

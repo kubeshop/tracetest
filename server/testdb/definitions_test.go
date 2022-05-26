@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/kubeshop/tracetest/assertions/comparator"
-	"github.com/kubeshop/tracetest/model"
+	"github.com/kubeshop/tracetest/server/assertions/comparator"
+	"github.com/kubeshop/tracetest/server/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

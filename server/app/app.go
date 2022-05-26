@@ -9,15 +9,15 @@ import (
 	"regexp"
 	"text/template"
 
-	"github.com/kubeshop/tracetest/analytics"
-	"github.com/kubeshop/tracetest/config"
-	"github.com/kubeshop/tracetest/executor"
-	httpServer "github.com/kubeshop/tracetest/http"
-	"github.com/kubeshop/tracetest/http/websocket"
-	"github.com/kubeshop/tracetest/model"
-	"github.com/kubeshop/tracetest/openapi"
-	"github.com/kubeshop/tracetest/subscription"
-	"github.com/kubeshop/tracetest/tracedb"
+	"github.com/kubeshop/tracetest/server/analytics"
+	"github.com/kubeshop/tracetest/server/config"
+	"github.com/kubeshop/tracetest/server/executor"
+	httpServer "github.com/kubeshop/tracetest/server/http"
+	"github.com/kubeshop/tracetest/server/http/websocket"
+	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/openapi"
+	"github.com/kubeshop/tracetest/server/subscription"
+	"github.com/kubeshop/tracetest/server/tracedb"
 )
 
 type App struct {

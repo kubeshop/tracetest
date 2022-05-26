@@ -3,7 +3,7 @@ package subscription_test
 import (
 	"testing"
 
-	"github.com/kubeshop/tracetest/subscription"
+	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/stretchr/testify/assert"
 )
 

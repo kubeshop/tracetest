@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/kubeshop/tracetest/assertions"
-	"github.com/kubeshop/tracetest/model"
+	"github.com/kubeshop/tracetest/server/assertions"
+	"github.com/kubeshop/tracetest/server/model"
 )
 
 type AssertionRequest struct {

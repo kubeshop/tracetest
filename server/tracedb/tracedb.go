@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/kubeshop/tracetest/config"
+	"github.com/kubeshop/tracetest/server/config"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 )
 

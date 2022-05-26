@@ -1,9 +1,9 @@
 package assertions
 
 import (
-	"github.com/kubeshop/tracetest/assertions/selectors"
-	"github.com/kubeshop/tracetest/model"
-	"github.com/kubeshop/tracetest/traces"
+	"github.com/kubeshop/tracetest/server/assertions/selectors"
+	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/traces"
 	"go.opentelemetry.io/otel/trace"
 )
 
