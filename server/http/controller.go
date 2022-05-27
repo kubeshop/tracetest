@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/kubeshop/tracetest/server/analytics"
@@ -218,6 +219,8 @@ func (c *controller) RerunTestRun(ctx context.Context, testID string, runID stri
 	newTestRun := run
 	newTestRun.Results = nil
 	newTestRun.TestVersion = test.Version
+	newTestRun.CreatedAt = time.Now()
+	newTestRun.CompletedAt = time.Now()
 
 	newTestRun, err = c.testDB.CreateRun(ctx, test, newTestRun)
 	if err != nil {
@@ -268,12 +271,29 @@ func (c *controller) SetTestDefinition(ctx context.Context, testID string, def o
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
 	}
 
-	test, err := c.testDB.GetLatestTestVersion(ctx, id)
+	oldTest, err := c.testDB.GetLatestTestVersion(ctx, id)
 	if err != nil {
 		return handleDBError(err), err
 	}
 
-	err = c.testDB.SetDefiniton(ctx, test, c.model.Definition(def))
+	newTest, err := oldTest.Copy()
+	if err != nil {
+		return openapi.Response(http.StatusInternalServerError, err.Error()), err
+	}
+
+	newTest.Definition = c.model.Definition(def)
+
+	newTest, err = model.BumpTestVersionIfNeeded(oldTest, newTest)
+	if err != nil {
+		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
+	}
+
+	newTest, err = c.testDB.UpdateTest(ctx, newTest)
+	if err != nil {
+		return openapi.Response(http.StatusInternalServerError, err.Error()), err
+	}
+
+	err = c.testDB.SetDefiniton(ctx, newTest, c.model.Definition(def))
 	if err != nil {
 		return handleDBError(err), err
 	}

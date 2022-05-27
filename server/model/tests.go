@@ -82,6 +82,21 @@ const (
 	RunStateAwaitingTestResults RunState = "AWAITING_TEST_RESULTS"
 )
 
+func (t Test) Copy() (Test, error) {
+	testJSON, err := json.Marshal(t)
+	if err != nil {
+		return Test{}, fmt.Errorf("could not copy test: %w", err)
+	}
+
+	var newTest Test
+	err = json.Unmarshal(testJSON, &newTest)
+	if err != nil {
+		return Test{}, fmt.Errorf("could not copy test: %w", err)
+	}
+
+	return newTest, nil
+}
+
 func (sar SpanAssertionResult) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&struct {
 		SpanID        string
