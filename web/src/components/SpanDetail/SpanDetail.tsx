@@ -5,7 +5,7 @@ import {useAssertionForm} from 'components/AssertionForm/AssertionFormProvider';
 import {CompareOperator} from 'constants/Operator.constants';
 import {SemanticGroupNames, SemanticGroupNamesToText} from 'constants/SemanticGroupNames.constants';
 import {useAppSelector} from 'redux/hooks';
-import AssertionSelectors from 'selectors/Assertion.selectors';
+import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
 import SpanService from 'services/Span.service';
 import OperatorService from 'services/Operator.service';
 import {TResultAssertions} from 'types/Assertion.types';
@@ -22,9 +22,7 @@ export interface ISpanDetailsComponentProps {
 }
 
 interface IProps {
-  resultId?: string;
   span?: TSpan;
-  testId?: string;
 }
 
 const ComponentMap: Record<string, typeof Generic> = {
@@ -38,10 +36,10 @@ const getSpanTitle = (span: TSpan) => {
   return `${capitalize(heading) || spanTypeText} • ${primary} • ${span.name}`;
 };
 
-const SpanDetail: React.FC<IProps> = ({span, testId, resultId}) => {
+const SpanDetail: React.FC<IProps> = ({span}) => {
   const {open} = useAssertionForm();
   const assertions = useAppSelector(state =>
-    AssertionSelectors.selectResultAssertionsBySpan(state, testId || '', resultId, span?.id || '')
+    TestDefinitionSelectors.selectAssertionResultsBySpan(state, span?.id || '')
   );
 
   const Component = ComponentMap[span?.type || ''] || Generic;
