@@ -40,6 +40,7 @@ export const Content = styled.div`
   padding: 24px;
   overflow-y: scroll;
   height: 330px;
+  position: relative;
 `;
 
 export const AddAssertionButton = styled(Button).attrs({

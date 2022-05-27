@@ -1,25 +1,40 @@
 import {capitalize} from 'lodash';
 import {useCallback} from 'react';
-import {SemanticGroupNames, SemanticGroupNamesToText} from '../../constants/SemanticGroupNames.constants';
-import SpanService from '../../services/Span.service';
-import {TSpan, TSpanFlatAttribute} from '../../types/Span.types';
+
+import {useAssertionForm} from 'components/AssertionForm/AssertionFormProvider';
+import {CompareOperator} from 'constants/Operator.constants';
+import {SemanticGroupNames, SemanticGroupNamesToText} from 'constants/SemanticGroupNames.constants';
+import {useAppSelector} from 'redux/hooks';
+import AssertionSelectors from 'selectors/Assertion.selectors';
+import SpanService from 'services/Span.service';
+import OperatorService from 'services/Operator.service';
+import {TSpan, TSpanFlatAttribute} from 'types/Span.types';
 import Generic from './components/Generic';
 import Http from './components/Http';
 import SpanHeader from './SpanHeader';
 import * as S from './SpanDetail.styled';
-import {useAssertionForm} from '../AssertionForm/AssertionFormProvider';
-import {CompareOperator} from '../../constants/Operator.constants';
-import OperatorService from '../../services/Operator.service';
 
-export interface TSpanDetailProps {
-  testId?: string;
+export interface ISpanDetailsComponentProps {
+  assertions?: IResultAssertions;
+  onCreateAssertion(attribute: TSpanFlatAttribute): void;
   span?: TSpan;
-  resultId?: string;
 }
 
-export interface TSpanDetailsComponentProps {
+export interface IResultAssertions {
+  [key: string]: {
+    failed: IResult[];
+    passed: IResult[];
+  };
+}
+
+export interface IResult {
+  id: string;
+}
+
+interface IProps {
+  resultId?: string;
   span?: TSpan;
-  onCreateAssertion(attribute: TSpanFlatAttribute): void;
+  testId?: string;
 }
 
 const ComponentMap: Record<string, typeof Generic> = {
@@ -33,10 +48,13 @@ const getSpanTitle = (span: TSpan) => {
   return `${capitalize(heading) || spanTypeText} • ${primary} • ${span.name}`;
 };
 
-const SpanDetail: React.FC<TSpanDetailProps> = ({span}) => {
+const SpanDetail: React.FC<IProps> = ({span, testId, resultId}) => {
   const {open} = useAssertionForm();
-  const Component = ComponentMap[span?.type || ''] || Generic;
+  const assertions = useAppSelector(state =>
+    AssertionSelectors.selectResultAssertionsBySpan(state, testId || '', resultId, span?.id || '')
+  );
 
+  const Component = ComponentMap[span?.type || ''] || Generic;
   const title = (span && getSpanTitle(span)) || '';
 
   const onCreateAssertion = useCallback(
@@ -61,10 +79,12 @@ const SpanDetail: React.FC<TSpanDetailProps> = ({span}) => {
     [open, span]
   );
 
+  console.log('### assertions', assertions);
+
   return (
     <S.SpanDetail>
       <SpanHeader title={title} />
-      <Component span={span} onCreateAssertion={onCreateAssertion} />
+      <Component span={span} onCreateAssertion={onCreateAssertion} assertions={assertions} />
     </S.SpanDetail>
   );
 };

@@ -37,7 +37,7 @@ const AssertionCard: React.FC<TAssertionCardProps> = ({
   );
 
   return (
-    <S.AssertionCard data-cy="assertion-card">
+    <S.AssertionCard data-cy="assertion-card" id={`assertion-${assertionResult.id}`}>
       <S.Header>
         <div>
           <S.SelectorListText>
