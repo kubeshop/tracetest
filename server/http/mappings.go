@@ -209,18 +209,21 @@ func (m openapiMapper) Run(in *model.Run) openapi.TestRun {
 		return openapi.TestRun{}
 	}
 	return openapi.TestRun{
-		Id:             in.ID.String(),
-		TraceId:        in.TraceID.String(),
-		SpanId:         in.SpanID.String(),
-		State:          string(in.State),
-		LastErrorState: errToString(in.LastError),
-		CreatedAt:      in.CreatedAt,
-		CompletedAt:    in.CompletedAt,
-		Request:        m.HTTPRequest(in.Request),
-		Response:       m.HTTPResponse(in.Response),
-		TestVersion:    int32(in.TestVersion),
-		Trace:          m.Trace(in.Trace),
-		Result:         m.Result(in.Results),
+		Id:                 in.ID.String(),
+		TraceId:            in.TraceID.String(),
+		SpanId:             in.SpanID.String(),
+		State:              string(in.State),
+		LastErrorState:     errToString(in.LastError),
+		CreatedAt:          in.CreatedAt,
+		StartedAt:          in.StartedAt,
+		ServiceTriggeredAt: in.ServiceTriggeredAt,
+		ObtainedTraceAt:    in.ObtainedTraceAt,
+		CompletedAt:        in.CompletedAt,
+		Request:            m.HTTPRequest(in.Request),
+		Response:           m.HTTPResponse(in.Response),
+		TestVersion:        int32(in.TestVersion),
+		Trace:              m.Trace(in.Trace),
+		Result:             m.Result(in.Results),
 	}
 }
 
@@ -352,7 +355,7 @@ func (m modelMapper) Run(in openapi.TestRun) *model.Run {
 		State:              model.RunState(in.State),
 		LastError:          stringToErr(in.LastErrorState),
 		CreatedAt:          in.CreatedAt,
-		StartAt:            in.StartedAt,
+		StartedAt:          in.StartedAt,
 		ServiceTriggeredAt: in.ServiceTriggeredAt,
 		ObtainedTraceAt:    in.ObtainedTraceAt,
 		CompletedAt:        in.CompletedAt,

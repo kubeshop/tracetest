@@ -43,7 +43,7 @@ type (
 		State              RunState
 		LastError          error
 		CreatedAt          time.Time
-		StartAt            time.Time
+		StartedAt          time.Time
 		ServiceTriggeredAt time.Time
 		ObtainedTraceAt    time.Time
 		CompletedAt        time.Time
@@ -183,17 +183,21 @@ func (r *Run) MarshalJSON() ([]byte, error) {
 
 func (r *Run) UnmarshalJSON(data []byte) error {
 	aux := struct {
-		ID              string
-		TraceID         string
-		SpanID          string
-		State           string
-		LastErrorString string
-		CreatedAt       time.Time
-		CompletedAt     time.Time
-		Request         HTTPRequest
-		Response        HTTPResponse
-		Trace           *traces.Trace
-		Results         *RunResults
+		ID                 string
+		TraceID            string
+		SpanID             string
+		State              string
+		LastErrorString    string
+		CreatedAt          time.Time
+		StartAt            time.Time
+		ServiceTriggeredAt time.Time
+		ObtainedTraceAt    time.Time
+		CompletedAt        time.Time
+		TestVersion        int
+		Request            HTTPRequest
+		Response           HTTPResponse
+		Trace              *traces.Trace
+		Results            *RunResults
 	}{}
 
 	if err := json.Unmarshal(data, &aux); err != nil {
@@ -221,7 +225,11 @@ func (r *Run) UnmarshalJSON(data []byte) error {
 	r.State = RunState(aux.State)
 	r.LastError = stringToErr(aux.LastErrorString)
 	r.CreatedAt = aux.CreatedAt
+	r.StartedAt = aux.StartAt
+	r.ServiceTriggeredAt = aux.ServiceTriggeredAt
+	r.ObtainedTraceAt = aux.ObtainedTraceAt
 	r.CompletedAt = aux.CompletedAt
+	r.TestVersion = aux.TestVersion
 	r.Request = aux.Request
 	r.Response = aux.Response
 	r.Trace = aux.Trace

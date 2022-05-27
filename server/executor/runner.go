@@ -70,7 +70,7 @@ func (r persistentRunner) Start(workers int) {
 					fmt.Println("persistentRunner exit goroutine")
 					return
 				case job := <-r.executeQueue:
-					job.run.StartAt = time.Now()
+					job.run.StartedAt = time.Now()
 					fmt.Printf(
 						"persistentRunner job. ID %s, testID %s, TraceID %s, SpanID %s\n",
 						job.run.ID,
@@ -145,7 +145,7 @@ func (r persistentRunner) newTestRun() model.Run {
 		SpanID:             r.idGen.SpanID(),
 		State:              model.RunStateCreated,
 		CreatedAt:          time.Now(),
-		StartAt:            time.Time{},
+		StartedAt:          time.Time{},
 		ServiceTriggeredAt: time.Time{},
 		ObtainedTraceAt:    time.Time{},
 		CompletedAt:        time.Time{}, // zero value
