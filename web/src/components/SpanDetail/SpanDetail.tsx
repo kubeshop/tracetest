@@ -29,6 +29,7 @@ export interface IResultAssertions {
 
 export interface IResult {
   id: string;
+  label: string;
 }
 
 interface IProps {
@@ -78,8 +79,6 @@ const SpanDetail: React.FC<IProps> = ({span, testId, resultId}) => {
     },
     [open, span]
   );
-
-  console.log('### assertions', assertions);
 
   return (
     <S.SpanDetail>

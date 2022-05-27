@@ -23,16 +23,17 @@ const selectResultAssertionsBySpan = createSelector(
   (state, {testId, runId, spanId}) => {
     const {data} = endpoints.getRunById.select({testId, runId})(state);
 
-    console.log('### data', data);
     if (!data) return {};
 
-    // result.resultList = array of selectors - 1 item for each selector
-    // result.resultList[].resultList = array of checks/assertions - 1 item for each check/assertion
+    // Map and flat items in one single array
     const results = data.result.resultList
       .flatMap(selector =>
         selector.resultList.map(assertion => ({
-          id: selector.id,
+          id: selector.selector,
           attribute: assertion.assertion.attribute,
+          label: `${selector.selectorList.map(({value}) => value).join(' ')} ${
+            selector.pseudoSelector?.selector ?? ''
+          }`,
           result: assertion.spanResults.find(spanResult => spanResult.spanId === spanId),
         }))
       )
@@ -42,8 +43,8 @@ const selectResultAssertionsBySpan = createSelector(
       .reduce((prev: {[key: string]: any}, curr) => {
         const value = prev[curr.attribute] || {failed: [], passed: []};
 
-        if (curr.result?.passed) value.passed.push({id: curr.id});
-        else value.failed.push({id: curr.id});
+        if (curr.result?.passed) value.passed.push({id: curr.id, label: curr.label});
+        else value.failed.push({id: curr.id, label: curr.label});
 
         return {...prev, [curr.attribute]: value};
       }, {});

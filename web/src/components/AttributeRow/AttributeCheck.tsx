@@ -2,6 +2,7 @@ import {Dropdown, Menu} from 'antd';
 
 import {IResult} from 'components/SpanDetail/SpanDetail';
 import * as S from './AttributeRow.styled';
+import {useAssertionForm} from '../AssertionForm/AssertionFormProvider';
 
 interface IProps {
   items: IResult[];
@@ -9,11 +10,12 @@ interface IProps {
 }
 
 const AttributeCheck = ({items, type}: IProps) => {
+  const {setIsCollapsed} = useAssertionForm();
+
   const handleOnClick = (id: string) => {
-    console.log('### click', id);
+    setIsCollapsed(true);
     const resultListElement = document.getElementById(`assertion-${id}`);
     const offsetTop = resultListElement?.offsetTop ?? 0;
-    console.log('### offsetTop', offsetTop);
     const assertionsContainer = document.getElementById('assertions-container');
     if (assertionsContainer) {
       assertionsContainer.scrollTop = offsetTop;
@@ -24,7 +26,7 @@ const AttributeCheck = ({items, type}: IProps) => {
     <Menu
       items={items.map(item => ({
         key: item.id,
-        label: item.id,
+        label: item.label,
       }))}
       onClick={({key: id}) => handleOnClick(id)}
     />
