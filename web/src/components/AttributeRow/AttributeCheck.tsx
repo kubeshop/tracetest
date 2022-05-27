@@ -1,8 +1,8 @@
 import {Dropdown, Menu} from 'antd';
 
+import {useAssertionForm} from 'components/AssertionForm/AssertionFormProvider';
 import {IResult} from 'components/SpanDetail/SpanDetail';
 import * as S from './AttributeRow.styled';
-import {useAssertionForm} from '../AssertionForm/AssertionFormProvider';
 
 interface IProps {
   items: IResult[];
@@ -28,7 +28,7 @@ const AttributeCheck = ({items, type}: IProps) => {
         key: item.id,
         label: item.label,
       }))}
-      onClick={({key: id}) => handleOnClick(id)}
+      onClick={({key}) => handleOnClick(key)}
     />
   );
 
