@@ -10,6 +10,7 @@ import {CompareOperator} from '../../constants/Operator.constants';
 import {Steps} from '../GuidedTour/assertionStepList';
 import * as S from './AssertionForm.styled';
 import AssertionSelectors from '../../selectors/Assertion.selectors';
+import TestDefinitionSelectors from '../../selectors/TestDefinition.selectors';
 import AssertionFormSelectorInput from './AssertionFormSelectorInput';
 import {TAssertion, TPseudoSelector, TSpanSelector} from '../../types/Assertion.types';
 import AssertionFormPseudoSelectorInput from './AssertionFormPseudoSelectorInput';
@@ -45,8 +46,7 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
     ],
     selectorList = [],
     pseudoSelector,
-  } = {
-  },
+  } = {},
   onSubmit,
   onCancel,
   isEditing = false,
@@ -69,6 +69,7 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
   const attributeList = useAppSelector(state =>
     AssertionSelectors.selectAttributeList(state, testId, runId, spanIdList)
   );
+  const definitionSelectorList = useAppSelector(state => TestDefinitionSelectors.selectDefinitionSelectorList(state));
 
   const onFieldsChange = useCallback(
     (changedFields: FieldData[]) => {
@@ -126,7 +127,20 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
         <S.SelectorInputContainer>
           <Form.Item
             name="selectorList"
-            rules={[{required: true, message: 'At least one selector is required'}]}
+            rules={[
+              {required: true, message: 'At least one selector is required'},
+              {
+                validator: (_, value: TSpanSelector[]) =>
+                  SelectorService.validateSelector(
+                    definitionSelectorList,
+                    isEditing,
+                    selectorList,
+                    value,
+                    currentPseudoSelector,
+                    pseudoSelector
+                  ),
+              },
+            ]}
             data-tour={GuidedTourService.getStep(GuidedTours.Assertion, Steps.Selectors)}
           >
             <AssertionFormSelectorInput attributeList={attributeList} />

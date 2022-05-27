@@ -29,7 +29,7 @@ export const assertionResultsToDefinitionList = (assertionResults: TAssertionRes
   }));
 };
 
-const counterSlice = createSlice({
+const testDefinitionSlice = createSlice({
   name: 'testDefinition',
   initialState,
   reducers: {
@@ -109,5 +109,5 @@ export const {
   initDefinitionList,
   resetDefinitionList,
   reset,
-} = counterSlice.actions;
-export default counterSlice.reducer;
+} = testDefinitionSlice.actions;
+export default testDefinitionSlice.reducer;

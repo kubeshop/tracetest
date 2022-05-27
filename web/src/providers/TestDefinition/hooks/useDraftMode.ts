@@ -8,6 +8,12 @@ const useDraftMode = (isDefaultDraftMode = false) => {
     else window.onbeforeunload = null;
   }, [isDraftMode]);
 
+  useEffect(() => {
+    return () => {
+      window.onbeforeunload = null;
+    };
+  }, []);
+
   return {isDraftMode, setIsDraftMode};
 };
 

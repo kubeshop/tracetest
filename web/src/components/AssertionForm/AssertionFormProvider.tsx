@@ -2,6 +2,8 @@ import {noop} from 'lodash';
 import {useState, createContext, useCallback, useMemo, useContext, Dispatch, SetStateAction} from 'react';
 import {useTestDefinition} from '../../providers/TestDefinition/TestDefinition.provider';
 import {useTestRun} from '../../providers/TestRun/TestRun.provider';
+import {useAppSelector} from '../../redux/hooks';
+import TestDefinitionSelectors from '../../selectors/TestDefinition.selectors';
 import SelectorService from '../../services/Selector.service';
 import {TTestDefinitionEntry} from '../../types/TestDefinition.types';
 import {IValues} from './AssertionForm';
@@ -52,14 +54,31 @@ const AssertionFormProvider: React.FC<{testId: string}> = ({children}) => {
   const [formProps, setFormProps] = useState<IFormProps>(initialFormProps);
   const {update, add, test, isDraftMode} = useTestDefinition();
   const {run} = useTestRun();
+  const definitionList = useAppSelector(state => TestDefinitionSelectors.selectDefinitionList(state));
 
   const open = useCallback(
     (props: IFormProps = {}) => {
-      setFormProps(props);
+      const {isEditing, defaultValues: {selectorList = [], pseudoSelector, assertionList = []} = {}} = props;
+      const selectorString = SelectorService.getSelectorString(selectorList, pseudoSelector);
+      const definition = definitionList.find(({selector}) => selectorString === selector);
+
+      if (definition)
+        setFormProps({
+          ...props,
+          isEditing: true,
+          selector: selectorString,
+          defaultValues: {
+            pseudoSelector,
+            assertionList: isEditing ? assertionList : [...definition.assertionList, ...assertionList],
+            selectorList,
+          },
+        });
+      else setFormProps(props);
+
       if (run.testVersion !== test?.version && !isDraftMode) setIsConfirmationModalOpen(true);
       else setIsOpen(true);
     },
-    [isDraftMode, run.testVersion, test?.version]
+    [definitionList, isDraftMode, run.testVersion, test?.version]
   );
 
   const close = useCallback(() => {

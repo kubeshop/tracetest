@@ -18,7 +18,7 @@ const getValue = (value: string): string => {
 
 const selectorRegex = /span\[(.*)\]/i;
 const nthChildNumberRegex = /\((.*)\)/i;
-const operationRegex = /([=]+|contains)/;
+const operationRegex = / ([=]+|contains) /;
 
 const getFilters = (selectors: TSpanSelector[]) =>
   selectors.map(({key, operator, value}) => `${key} ${operator} ${getValue(value)}`);
@@ -88,6 +88,22 @@ const SelectorService = () => ({
           selector: pseudoSelector as PseudoSelector,
         }
       : undefined;
+  },
+
+  validateSelector(
+    definitionSelectorList: string[],
+    isEditing: boolean,
+    initialSelectorList: TSpanSelector[],
+    selectorList: TSpanSelector[],
+    initialPseudoSelector?: TPseudoSelector,
+    pseudoSelector?: TPseudoSelector
+  ): Promise<boolean> {
+    const initialSelectorString = this.getSelectorString(initialSelectorList, initialPseudoSelector);
+    const selectorString = this.getSelectorString(selectorList, pseudoSelector);
+
+    if (!definitionSelectorList.includes(selectorString) || (isEditing && initialSelectorString === selectorString))
+      return Promise.resolve(true);
+    return Promise.reject(new Error('Selector already exists'));
   },
 });
 
