@@ -12,13 +12,13 @@ import (
 var _ model.DefinitionRepository = &postgresDB{}
 
 func (td *postgresDB) GetDefiniton(ctx context.Context, test model.Test) (model.Definition, error) {
-	stmt, err := td.db.Prepare("SELECT definition FROM definitions WHERE test_id = $1")
+	stmt, err := td.db.Prepare("SELECT definition FROM definitions WHERE test_id = $1 and test_version = $2")
 	if err != nil {
 		return model.Definition{}, fmt.Errorf("prepare: %w", err)
 	}
 	defer stmt.Close()
 
-	def, err := readDefinitionRow(stmt.QueryRowContext(ctx, test.ID))
+	def, err := readDefinitionRow(stmt.QueryRowContext(ctx, test.ID, test.Version))
 	if err != nil {
 		return model.Definition{}, err
 	}
@@ -26,9 +26,9 @@ func (td *postgresDB) GetDefiniton(ctx context.Context, test model.Test) (model.
 }
 
 func (td *postgresDB) SetDefiniton(ctx context.Context, t model.Test, d model.Definition) error {
-	sql := `UPDATE definitions SET definition = $2 WHERE test_id = $1`
+	sql := `UPDATE definitions SET definition = $3 WHERE test_id = $1 AND test_version = $2`
 	if _, err := td.GetDefiniton(ctx, t); err == ErrNotFound {
-		sql = `INSERT INTO definitions (test_id, "definition") VALUES ($1, $2)`
+		sql = `INSERT INTO definitions (test_id, test_version, "definition") VALUES ($1, $2, $3)`
 	}
 
 	stmt, err := td.db.Prepare(sql)
@@ -41,7 +41,7 @@ func (td *postgresDB) SetDefiniton(ctx context.Context, t model.Test, d model.De
 	if err != nil {
 		return err
 	}
-	_, err = stmt.ExecContext(ctx, t.ID, def)
+	_, err = stmt.ExecContext(ctx, t.ID, t.Version, def)
 	if err != nil {
 		return fmt.Errorf("sql exec: %w", err)
 	}

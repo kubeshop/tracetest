@@ -12,6 +12,6 @@ func GetPokeshopApp() (*testmock.DemoApp, error) {
 	return GetFixtureValue[*testmock.DemoApp](POKESHOP_APP)
 }
 
-func getPokeshopApp(args ...interface{}) (*testmock.DemoApp, error) {
+func getPokeshopApp(options FixtureOptions) (*testmock.DemoApp, error) {
 	return testmock.GetDemoApplicationInstance()
 }

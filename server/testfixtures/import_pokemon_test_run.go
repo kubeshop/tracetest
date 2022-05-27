@@ -16,17 +16,17 @@ func init() {
 	RegisterFixture(IMPORT_POKEMON_TEST_RUN, getImportPokemonTestRun)
 }
 
-func GetPokemonTestRun() (*openapi.TestRun, error) {
-	return GetFixtureValue[*openapi.TestRun](IMPORT_POKEMON_TEST_RUN)
+func GetPokemonTestRun(options ...Option) (*openapi.TestRun, error) {
+	return GetFixtureValue[*openapi.TestRun](IMPORT_POKEMON_TEST_RUN, options...)
 }
 
-func getImportPokemonTestRun(args ...interface{}) (*openapi.TestRun, error) {
-	tracetestApp, err := GetFixtureValue[*app.App](TRACETEST_APP)
+func getImportPokemonTestRun(options FixtureOptions) (*openapi.TestRun, error) {
+	tracetestApp, err := GetTracetestApp()
 	if err != nil {
 		return nil, fmt.Errorf("could not get tracetest app: %w", err)
 	}
 
-	importPokemonTest, err := GetFixtureValue[*openapi.Test](IMPORT_POKEMON_TEST)
+	importPokemonTest, err := GetPokemonTest()
 	if err != nil {
 		return nil, fmt.Errorf("could not get import pokemon test: %w", err)
 	}
