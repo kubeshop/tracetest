@@ -1,7 +1,8 @@
 import {Dropdown, Menu} from 'antd';
 
 import {useAssertionForm} from 'components/AssertionForm/AssertionFormProvider';
-import {IResult} from 'components/SpanDetail/SpanDetail';
+import useScrollTo from 'hooks/useScrollTo';
+import {IResult} from 'types/Assertion.types';
 import * as S from './AttributeRow.styled';
 
 interface IProps {
@@ -11,15 +12,11 @@ interface IProps {
 
 const AttributeCheck = ({items, type}: IProps) => {
   const {setIsCollapsed} = useAssertionForm();
+  const scrollTo = useScrollTo();
 
   const handleOnClick = (id: string) => {
     setIsCollapsed(true);
-    const resultListElement = document.getElementById(`assertion-${id}`);
-    const offsetTop = resultListElement?.offsetTop ?? 0;
-    const assertionsContainer = document.getElementById('assertions-container');
-    if (assertionsContainer) {
-      assertionsContainer.scrollTop = offsetTop;
-    }
+    scrollTo({elementId: `assertion-${id}`, containerId: 'assertions-container'});
   };
 
   const menuLayout = (

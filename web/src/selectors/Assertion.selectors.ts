@@ -1,7 +1,8 @@
 import {createSelector} from '@reduxjs/toolkit';
 
 import {endpoints} from 'redux/apis/TraceTest.api';
-import {RootState} from '../redux/store';
+import {RootState} from 'redux/store';
+import {TResultAssertions} from 'types/Assertion.types';
 
 const stateSelector = (state: RootState) => state;
 const paramsSelector = (state: RootState, testId: string, runId: string, spanIdList: string[]) => ({
@@ -40,7 +41,7 @@ const selectResultAssertionsBySpan = createSelector(
       // Filter if it has result for the spanId
       .filter(assertion => Boolean(assertion?.result))
       // Hash items by attribute
-      .reduce((prev: {[key: string]: any}, curr) => {
+      .reduce((prev: TResultAssertions, curr) => {
         const value = prev[curr.attribute] || {failed: [], passed: []};
 
         if (curr.result?.passed) value.passed.push({id: curr.id, label: curr.label});

@@ -8,6 +8,7 @@ import {useAppSelector} from 'redux/hooks';
 import AssertionSelectors from 'selectors/Assertion.selectors';
 import SpanService from 'services/Span.service';
 import OperatorService from 'services/Operator.service';
+import {TResultAssertions} from 'types/Assertion.types';
 import {TSpan, TSpanFlatAttribute} from 'types/Span.types';
 import Generic from './components/Generic';
 import Http from './components/Http';
@@ -15,21 +16,9 @@ import SpanHeader from './SpanHeader';
 import * as S from './SpanDetail.styled';
 
 export interface ISpanDetailsComponentProps {
-  assertions?: IResultAssertions;
+  assertions?: TResultAssertions;
   onCreateAssertion(attribute: TSpanFlatAttribute): void;
   span?: TSpan;
-}
-
-export interface IResultAssertions {
-  [key: string]: {
-    failed: IResult[];
-    passed: IResult[];
-  };
-}
-
-export interface IResult {
-  id: string;
-  label: string;
 }
 
 interface IProps {

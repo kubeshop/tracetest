@@ -1,10 +1,10 @@
 import AttributeRow from 'components/AttributeRow';
-import {IResultAssertions} from 'components/SpanDetail/SpanDetail';
+import {TResultAssertions} from 'types/Assertion.types';
 import {TSpanFlatAttribute} from 'types/Span.types';
 import * as S from './AttributeList.styled';
 
 interface IProps {
-  assertions?: IResultAssertions;
+  assertions?: TResultAssertions;
   attributeList: TSpanFlatAttribute[];
   onCreateAssertion(attribute: TSpanFlatAttribute): void;
 }

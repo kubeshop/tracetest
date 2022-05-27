@@ -1,7 +1,7 @@
 import AttributeValue from 'components/AttributeValue';
 import useHover from 'hooks/useHover';
+import {IResult} from 'types/Assertion.types';
 import {TSpanFlatAttribute} from 'types/Span.types';
-import {IResult} from 'components/SpanDetail/SpanDetail';
 import AttributeCheck from './AttributeCheck';
 import * as S from './AttributeRow.styled';
 
