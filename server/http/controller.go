@@ -268,22 +268,19 @@ func (c *controller) SetTestDefinition(ctx context.Context, testID string, def o
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
 	}
 
-	oldTest, err := c.testDB.GetLatestTestVersion(ctx, id)
+	test, err := c.testDB.GetLatestTestVersion(ctx, id)
 	if err != nil {
 		return handleDBError(err), err
 	}
 
-	newTest, err := oldTest.Copy()
-	if err != nil {
-		return openapi.Response(http.StatusInternalServerError, err.Error()), err
-	}
+	newDefinition := c.model.Definition(def)
 
-	newTest.Definition = c.model.Definition(def)
-
-	newTest, err = model.BumpTestVersionIfNeeded(oldTest, newTest)
+	newTest, err := model.BumpVersionIfDefinitionChanged(test, newDefinition)
 	if err != nil {
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
 	}
+
+	newTest.Definition = newDefinition
 
 	newTest, err = c.testDB.UpdateTest(ctx, newTest)
 	if err != nil {
