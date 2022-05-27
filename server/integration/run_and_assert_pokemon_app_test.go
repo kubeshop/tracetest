@@ -11,7 +11,7 @@ import (
 const endpointUrl = "http://localhost:8080"
 
 func TestExecutorIntegration(t *testing.T) {
-	testRun, err := testfixtures.GetPokemonTestRun()
+	testRun, err := testfixtures.GetPokemonTestRun(testfixtures.WithCacheDisabled())
 	assert.NoError(t, err)
 
 	assert.Equal(t, string(model.RunStateFinished), testRun.State)

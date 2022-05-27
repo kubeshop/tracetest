@@ -17,6 +17,19 @@ func BumpTestVersionIfNeeded(in, updated Test) (Test, error) {
 	return updated, nil
 }
 
+func BumpVersionIfDefinitionChanged(test Test, newDef Definition) (Test, error) {
+	definitionHasChanged, err := testFieldHasChanged(test.Definition, newDef)
+	if err != nil {
+		return test, err
+	}
+
+	if definitionHasChanged {
+		test.Version = test.Version + 1
+	}
+
+	return test, nil
+}
+
 func testHasChanged(oldTest Test, newTest Test) (bool, error) {
 	definitionHasChanged, err := testFieldHasChanged(oldTest.Definition, newTest.Definition)
 	if err != nil {
