@@ -287,11 +287,6 @@ func (c *controller) SetTestDefinition(ctx context.Context, testID string, def o
 		return openapi.Response(http.StatusInternalServerError, err.Error()), err
 	}
 
-	err = c.testDB.SetDefiniton(ctx, newTest, c.model.Definition(def))
-	if err != nil {
-		return handleDBError(err), err
-	}
-
 	return openapi.Response(204, nil), nil
 }
 

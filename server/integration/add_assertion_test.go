@@ -50,9 +50,7 @@ func setDefinition(t *testing.T, test *openapi.Test) {
 	resp, err := http.DefaultClient.Do(req)
 	require.NoError(t, err)
 
-	if resp.StatusCode != 204 {
-		require.Fail(t, fmt.Sprintf("expected status 204, got %d", resp.StatusCode))
-	}
+	require.Equal(t, 204, resp.StatusCode)
 }
 
 func getTest(t *testing.T, id string) openapi.Test {
