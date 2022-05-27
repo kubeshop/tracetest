@@ -56,6 +56,11 @@ const testDefinitionSlice = createSlice({
         return def;
       });
     },
+    revertDefinition(state, {payload: {index}}: PayloadAction<{index: number}>) {
+      state.definitionList = state.definitionList
+        .map((d, idx) => (idx === index ? state.initialDefinitionList[index] || undefined : d))
+        .filter(Boolean);
+    },
     removeDefinition(state, {payload: {selector}}: PayloadAction<{selector: string}>) {
       state.definitionList = state.definitionList.map(def => {
         if (def.selector === selector)
@@ -104,6 +109,7 @@ const testDefinitionSlice = createSlice({
 export const {
   addDefinition,
   removeDefinition,
+  revertDefinition,
   updateDefinition,
   setAssertionResults,
   initDefinitionList,

@@ -1,4 +1,4 @@
-import {Tooltip} from 'antd';
+import {Button, Tooltip} from 'antd';
 import {useCallback} from 'react';
 import {useStore} from 'react-flow-renderer';
 import {useAppSelector} from '../../redux/hooks';
@@ -6,8 +6,10 @@ import TestDefinitionSelectors from '../../selectors/TestDefinition.selectors';
 import {TAssertionResultEntry} from '../../types/Assertion.types';
 import AssertionCheckRow from '../AssertionCheckRow';
 import * as S from './AssertionCard.styled';
+import {useRevertDefinitionCallback} from './useRevertDefinitionCallback';
 
 interface TAssertionCardProps {
+  index: number;
   assertionResult: TAssertionResultEntry;
 
   onSelectSpan(spanId: string): void;
@@ -18,6 +20,7 @@ interface TAssertionCardProps {
 }
 
 const AssertionCard: React.FC<TAssertionCardProps> = ({
+  index,
   assertionResult: {selector, resultList, selectorList, pseudoSelector, spanCount},
   assertionResult,
   onSelectSpan,
@@ -39,7 +42,7 @@ const AssertionCard: React.FC<TAssertionCardProps> = ({
     },
     [store]
   );
-
+  const resetDefinition = useRevertDefinitionCallback(index);
   return (
     <S.AssertionCard data-cy="assertion-card" id={`assertion-${assertionResult.selector}`}>
       <S.Header>
@@ -51,7 +54,16 @@ const AssertionCard: React.FC<TAssertionCardProps> = ({
           <S.SpanCountText>{spanCountText}</S.SpanCountText>
         </div>
         <S.ActionsContainer>
-          {isDraft && <S.StatusTag>draft</S.StatusTag>}
+          {isDraft && (
+            <>
+              <S.StatusTag>draft</S.StatusTag>
+              <Tooltip color="white" title="Revert Assertion">
+                <Button type="link" data-cy="assertion-action-revert" onClick={resetDefinition}>
+                  Revert Assertion
+                </Button>
+              </Tooltip>
+            </>
+          )}
           {isDeleted && <S.StatusTag color="#61175E">deleted</S.StatusTag>}
           <Tooltip color="white" title="Edit Assertion">
             <S.EditIcon data-cy="edit-assertion-button" onClick={() => onEdit(assertionResult)} />

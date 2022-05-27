@@ -14,6 +14,7 @@ import Reducer, {
   initialState,
   assertionResultsToDefinitionList,
   updateDefinition,
+  revertDefinition,
 } from '../TestDefinition.slice';
 
 const {definitionList} = TestDefinitionMock.model();
@@ -98,6 +99,27 @@ describe('TestDefinitionReducer', () => {
         ...initialState,
         definitionList: [definition, ...definitionList.slice(1, definitionList.length)],
       });
+    });
+
+    it('should handle the revert definition action', () => {
+      const initialSelector = 'span[http.status_code] = "204"]';
+      const result = Reducer(
+        {
+          ...state,
+          initialDefinitionList: [
+            {
+              ...state.definitionList[0],
+              isDraft: true,
+              selector: initialSelector,
+            },
+          ],
+        },
+        revertDefinition({
+          index: 0,
+        })
+      );
+
+      expect(result.definitionList[0].selector).toEqual(initialSelector);
     });
 
     it('should handle the remove definition action', () => {
