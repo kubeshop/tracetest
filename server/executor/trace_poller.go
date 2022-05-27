@@ -215,6 +215,7 @@ func (tp tracePoller) handleTraceDBError(job tracePollReq, err error) {
 
 	run.State = model.RunStateFailed
 	run.LastError = err
+	run.CompletedAt = time.Now()
 
 	tp.handleDBError(tp.tests.UpdateRun(job.ctx, run))
 

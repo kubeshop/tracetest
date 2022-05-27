@@ -132,6 +132,7 @@ func (r persistentRunner) handleExecutionResult(run model.Run, resp model.HTTPRe
 	if err != nil {
 		run.State = model.RunStateFailed
 		run.LastError = err
+		run.CompletedAt = time.Now()
 	} else {
 		run.State = model.RunStateAwaitingTrace
 	}
