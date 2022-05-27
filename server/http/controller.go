@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/google/uuid"
 	"github.com/kubeshop/tracetest/server/analytics"
@@ -219,8 +218,6 @@ func (c *controller) RerunTestRun(ctx context.Context, testID string, runID stri
 	newTestRun := run
 	newTestRun.Results = nil
 	newTestRun.TestVersion = test.Version
-	newTestRun.CreatedAt = time.Now()
-	newTestRun.CompletedAt = time.Now()
 
 	newTestRun, err = c.testDB.CreateRun(ctx, test, newTestRun)
 	if err != nil {
