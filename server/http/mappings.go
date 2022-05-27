@@ -346,17 +346,21 @@ func (m modelMapper) Run(in openapi.TestRun) *model.Run {
 	tid, _ := trace.TraceIDFromHex(in.TraceId)
 	sid, _ := trace.SpanIDFromHex(in.SpanId)
 	return &model.Run{
-		ID:          id,
-		TraceID:     tid,
-		SpanID:      sid,
-		State:       model.RunState(in.State),
-		LastError:   stringToErr(in.LastErrorState),
-		CreatedAt:   in.CreatedAt,
-		CompletedAt: in.CompletedAt,
-		Request:     m.HTTPRequest(in.Request),
-		Response:    m.HTTPResponse(in.Response),
-		Trace:       m.Trace(in.Trace),
-		Results:     m.Result(in.Result),
+		ID:                 id,
+		TraceID:            tid,
+		SpanID:             sid,
+		State:              model.RunState(in.State),
+		LastError:          stringToErr(in.LastErrorState),
+		CreatedAt:          in.CreatedAt,
+		StartAt:            in.StartedAt,
+		ServiceTriggeredAt: in.ServiceTriggeredAt,
+		ObtainedTraceAt:    in.ObtainedTraceAt,
+		CompletedAt:        in.CompletedAt,
+		TestVersion:        int(in.TestVersion),
+		Request:            m.HTTPRequest(in.Request),
+		Response:           m.HTTPResponse(in.Response),
+		Trace:              m.Trace(in.Trace),
+		Results:            m.Result(in.Result),
 	}
 }
 

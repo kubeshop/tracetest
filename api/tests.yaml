@@ -87,6 +87,15 @@ components:
         createdAt:
           type: string
           format: date-time
+        startedAt:
+          type: string
+          format: date-time
+        serviceTriggeredAt:
+          type: string
+          format: date-time
+        obtainedTraceAt:
+          type: string
+          format: date-time
         completedAt:
           type: string
           format: date-time

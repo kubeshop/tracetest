@@ -70,6 +70,7 @@ func (r persistentRunner) Start(workers int) {
 					fmt.Println("persistentRunner exit goroutine")
 					return
 				case job := <-r.executeQueue:
+					job.run.StartAt = time.Now()
 					fmt.Printf(
 						"persistentRunner job. ID %s, testID %s, TraceID %s, SpanID %s\n",
 						job.run.ID,
@@ -108,6 +109,7 @@ func (r persistentRunner) Run(test model.Test) model.Run {
 func (r persistentRunner) processExecQueue(job execReq) {
 	run := job.run
 	run.State = model.RunStateExecuting
+	run.ServiceTriggeredAt = time.Now()
 	r.handleDBError(r.tests.UpdateRun(job.ctx, run))
 
 	response, err := r.executor.Execute(job.test, job.run.TraceID, job.run.SpanID)
@@ -138,11 +140,14 @@ func (r persistentRunner) handleExecutionResult(run model.Run, resp model.HTTPRe
 
 func (r persistentRunner) newTestRun() model.Run {
 	return model.Run{
-		ID:          r.idGen.UUID(),
-		TraceID:     r.idGen.TraceID(),
-		SpanID:      r.idGen.SpanID(),
-		CreatedAt:   time.Now(),
-		State:       model.RunStateCreated,
-		CompletedAt: time.Time{}, // zero value
+		ID:                 r.idGen.UUID(),
+		TraceID:            r.idGen.TraceID(),
+		SpanID:             r.idGen.SpanID(),
+		State:              model.RunStateCreated,
+		CreatedAt:          time.Now(),
+		StartAt:            time.Time{},
+		ServiceTriggeredAt: time.Time{},
+		ObtainedTraceAt:    time.Time{},
+		CompletedAt:        time.Time{}, // zero value
 	}
 }

@@ -140,6 +140,7 @@ func (tp tracePoller) processJob(job tracePollReq) {
 
 	run.Trace = augmentData(&trace, run.Response)
 	run.State = model.RunStateAwaitingTestResults
+	run.ObtainedTraceAt = time.Now()
 
 	fmt.Printf("completed polling result %s after %d times, number of spans: %d \n", job.run.ID, job.count, len(run.Trace.Flat))
 

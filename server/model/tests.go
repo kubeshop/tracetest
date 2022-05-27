@@ -37,18 +37,21 @@ type (
 	}
 
 	Run struct {
-		ID          uuid.UUID
-		TraceID     trace.TraceID
-		SpanID      trace.SpanID
-		State       RunState
-		LastError   error
-		CreatedAt   time.Time
-		CompletedAt time.Time
-		Request     HTTPRequest
-		Response    HTTPResponse
-		Trace       *traces.Trace
-		Results     *RunResults
-		TestVersion int
+		ID                 uuid.UUID
+		TraceID            trace.TraceID
+		SpanID             trace.SpanID
+		State              RunState
+		LastError          error
+		CreatedAt          time.Time
+		StartAt            time.Time
+		ServiceTriggeredAt time.Time
+		ObtainedTraceAt    time.Time
+		CompletedAt        time.Time
+		Request            HTTPRequest
+		Response           HTTPResponse
+		Trace              *traces.Trace
+		Results            *RunResults
+		TestVersion        int
 	}
 
 	RunResults struct {
