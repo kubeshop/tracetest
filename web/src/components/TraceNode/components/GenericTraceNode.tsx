@@ -13,7 +13,7 @@ const GenericTraceNode: React.FC<TTraceNodeProps> = ({id, data: {name, type}, da
 
   return (
     <S.TraceNode selected={selected} data-cy={`trace-node-${type}`}>
-      <S.TraceNotch spanType={type}>
+      <S.TraceNotch $spanType={type}>
         <Text>{capitalize(heading) || spanTypeText}</Text>
       </S.TraceNotch>
       <Handle type="target" id={id} position={Position.Top} style={{top: 0, borderRadius: 0, visibility: 'hidden'}} />

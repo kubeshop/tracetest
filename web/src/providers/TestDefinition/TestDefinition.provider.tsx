@@ -65,7 +65,7 @@ const TestDefinitionProvider: React.FC<IProps> = ({children, testId, runId}) => 
     return () => {
       reset();
     };
-  }, []);
+  }, [reset]);
 
   useEffect(() => {
     if (isInitialized && run.state === 'FINISHED') dryRun(definitionList);

@@ -21,7 +21,7 @@ const MultiSelectInputTag: React.FC<IProps> = ({value, entryListCount, onDeselec
 
         onDeselect(Number(entryNumber));
       }}
-      isLast={isLast}
+      $isLast={isLast}
     >
       {props.label}
     </S.SelectedTag>

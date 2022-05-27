@@ -54,8 +54,8 @@ export const TraceNode = styled.div<{selected: boolean}>`
   align-items: center;
 `;
 
-export const TraceNotch = styled.div<{spanType: SemanticGroupNames}>`
-  background-color: ${({spanType}) => getNotchColor(spanType)};
+export const TraceNotch = styled.div<{$spanType: SemanticGroupNames}>`
+  background-color: ${({$spanType}) => getNotchColor($spanType)};
   position: absolute;
   top: 0;
   margin-top: 1px;
@@ -66,7 +66,7 @@ export const TraceNotch = styled.div<{spanType: SemanticGroupNames}>`
   align-items: center;
 
   span {
-    color: ${({spanType}) => getTextColor(spanType)};
+    color: ${({$spanType}) => getTextColor($spanType)};
   }
 `;
 

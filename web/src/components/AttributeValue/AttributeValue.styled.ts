@@ -4,8 +4,8 @@ import styled, {css} from 'styled-components';
 export const ValueJson = styled(Typography.Text)<{isCollapsed: boolean}>`
   cursor: pointer;
 
-  ${({isCollapsed}) =>
-    isCollapsed
+  ${({$isCollapsed}) =>
+    $isCollapsed
       ? css`
           word-break: break-all;
         `
@@ -21,9 +21,8 @@ export const ValueJson = styled(Typography.Text)<{isCollapsed: boolean}>`
     background: #fbfbff;
     border: 1px solid #c9cedb;
     font-size: 12px;
-
-    ${({isCollapsed}) =>
-      isCollapsed
+    ${({$isCollapsed}) =>
+      $isCollapsed
         ? css`
             word-break: break-all;
           `

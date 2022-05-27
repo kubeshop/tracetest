@@ -37,7 +37,7 @@ const AssertionCheckRow: React.FC<TAssertionCheckRowProps> = ({
     return (isSelected ? [<S.SelectedLabelBadge count="selected" key="selected" />] : []).concat(
       spanLabelList.map((label, index) => (
         // eslint-disable-next-line react/no-array-index-key
-        <S.LabelBadge spanType={!index ? span?.type : undefined} count={label} key={`${label}-${index}`} />
+        <S.LabelBadge $spanType={!index ? span?.type : undefined} count={label} key={`${label}-${index}`} />
       ))
     );
   }, [getIsSelectedSpan, spanId, spanLabelList, span?.type]);
