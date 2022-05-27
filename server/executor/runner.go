@@ -126,7 +126,6 @@ func (r persistentRunner) processExecQueue(job execReq) {
 }
 
 func (r persistentRunner) handleExecutionResult(run model.Run, resp model.HTTPResponse, err error) model.Run {
-	run.CompletedAt = time.Now()
 	run.Response = resp
 	if err != nil {
 		run.State = model.RunStateFailed

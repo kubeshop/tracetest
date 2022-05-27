@@ -72,6 +72,7 @@ func (e *defaultAssertionRunner) startWorker(ctx context.Context) {
 
 func (e *defaultAssertionRunner) runAssertionsAndUpdateResult(ctx context.Context, request AssertionRequest) error {
 	run, err := e.executeAssertions(ctx, request)
+	run.CompletedAt = time.Now()
 	if err != nil {
 		run.State = model.RunStateFailed
 		run.LastError = err
