@@ -89,6 +89,7 @@ const AssertionFormProvider: React.FC<{testId: string}> = ({children}) => {
 
   const onConfirm = useCallback(() => {
     setIsOpen(true);
+    setIsConfirmationModalOpen(false);
   }, []);
 
   const onSubmit = useCallback(
