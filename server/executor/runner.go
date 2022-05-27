@@ -138,10 +138,11 @@ func (r persistentRunner) handleExecutionResult(run model.Run, resp model.HTTPRe
 
 func (r persistentRunner) newTestRun() model.Run {
 	return model.Run{
-		ID:        r.idGen.UUID(),
-		TraceID:   r.idGen.TraceID(),
-		SpanID:    r.idGen.SpanID(),
-		CreatedAt: time.Now(),
-		State:     model.RunStateCreated,
+		ID:          r.idGen.UUID(),
+		TraceID:     r.idGen.TraceID(),
+		SpanID:      r.idGen.SpanID(),
+		CreatedAt:   time.Now(),
+		State:       model.RunStateCreated,
+		CompletedAt: time.Time{}, // zero value
 	}
 }
