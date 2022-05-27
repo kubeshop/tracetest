@@ -53,8 +53,6 @@ func TestPersistentRunner(t *testing.T) {
 
 		run2 := f.mockDB.runs[test2.ID.String()]
 		require.NotNil(t, run2)
-
-		assert.True(t, run1.CompletedAt.UnixNano() > run2.CompletedAt.UnixNano(), "test1 did not complete after test2")
 	})
 
 }
