@@ -1,4 +1,4 @@
-import {useCallback} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import useHover from '../../hooks/useHover';
 import {TSpanFlatAttribute} from '../../types/Span.types';
 import * as S from './AttributeRow.styled';
@@ -11,10 +11,16 @@ interface IAttributeRowProps {
 
 const AttributeRow: React.FC<IAttributeRowProps> = ({attribute: {key, value}, attribute, onCreateAssertion}) => {
   const {isHovering, onMouseEnter, onMouseLeave} = useHover();
+  const [isCopy, setIsCopy] = useState(false);
 
   const onCopy = useCallback(() => {
     navigator.clipboard.writeText(value);
+    setIsCopy(true);
   }, [value]);
+
+  useEffect(() => {
+    if (!isHovering) setIsCopy(false);
+  }, [isHovering]);
 
   return (
     <S.AttributeRow onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
@@ -25,8 +31,10 @@ const AttributeRow: React.FC<IAttributeRowProps> = ({attribute: {key, value}, at
       <S.IconContainer>
         {isHovering && (
           <>
-            <S.CopyIcon onClick={onCopy} />
-            <S.CustomTooltip placement="top" title="Add Assertion">
+            <S.CustomTooltip title={isCopy ? 'Copied' : 'Copy'}>
+              <S.CopyIcon onClick={onCopy} />
+            </S.CustomTooltip>
+            <S.CustomTooltip title="Add Assertion">
               <S.AddAssertionIcon onClick={() => onCreateAssertion(attribute)} />
             </S.CustomTooltip>
           </>
