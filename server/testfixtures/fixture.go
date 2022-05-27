@@ -11,7 +11,7 @@ type Fixture[T comparable] struct {
 	generator Generator[T]
 }
 
-type Generator[T comparable] func(args ...interface{}) (T, error)
+type Generator[T comparable] func(options FixtureOptions) (T, error)
 
 var fixtures = make(map[string]interface{})
 
@@ -19,6 +19,12 @@ func emptyValue[T comparable]() T {
 	var empty T
 	return empty
 }
+
+type FixtureOptions struct {
+	DisableCache bool
+}
+
+type Option func(opt *FixtureOptions)
 
 func RegisterFixture[T comparable](name string, generator Generator[T]) {
 	if _, exists := fixtures[name]; exists {
@@ -34,7 +40,12 @@ func RegisterFixture[T comparable](name string, generator Generator[T]) {
 	fixtures[name] = &fixture
 }
 
-func GetFixtureValue[T comparable](name string, args ...interface{}) (T, error) {
+func GetFixtureValue[T comparable](name string, options ...Option) (T, error) {
+	fixtureOptions := &FixtureOptions{}
+	for _, option := range options {
+		option(fixtureOptions)
+	}
+
 	obj := fixtures[name]
 	fixture, ok := obj.(*Fixture[T])
 	if !ok {
@@ -44,16 +55,19 @@ func GetFixtureValue[T comparable](name string, args ...interface{}) (T, error) 
 	fixture.mutex.Lock()
 	defer fixture.mutex.Unlock()
 
-	if fixture.value != emptyValue[T]() {
+	if !fixtureOptions.DisableCache && fixture.value != emptyValue[T]() {
 		return fixture.value, nil
 	}
 
-	value, err := fixture.generator(args)
+	value, err := fixture.generator(*fixtureOptions)
 	if err != nil {
 		return emptyValue[T](), fmt.Errorf("fixture \"%s\": could not get value from generator: %w", name, err)
 	}
 
-	fixture.value = value
+	if !fixtureOptions.DisableCache {
+		fixture.value = value
+	}
+
 	fixtures[name] = fixture
 	return value, nil
 }

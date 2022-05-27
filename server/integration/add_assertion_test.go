@@ -15,7 +15,7 @@ import (
 )
 
 func TestAddAssertionToTest(t *testing.T) {
-	test, err := testfixtures.GetPokemonTest()
+	test, err := testfixtures.GetPokemonTest(testfixtures.WithCacheDisabled())
 	require.NoError(t, err)
 
 	setDefinition(t, test)

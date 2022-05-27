@@ -12,7 +12,11 @@ func GetTracetestApp() (*app.App, error) {
 	return GetFixtureValue[*app.App](TRACETEST_APP)
 }
 
-func getTracetestApp(args ...interface{}) (*app.App, error) {
+func init() {
+	RegisterFixture(TRACETEST_APP, getTracetestApp)
+}
+
+func getTracetestApp(options FixtureOptions) (*app.App, error) {
 	demoApp, err := GetFixtureValue[*testmock.DemoApp](POKESHOP_APP)
 	if err != nil {
 		return nil, fmt.Errorf("could not get pokeshop app: %w", err)
@@ -28,10 +32,4 @@ func getTracetestApp(args ...interface{}) (*app.App, error) {
 	time.Sleep(1 * time.Second)
 
 	return tracetestApp, nil
-}
-
-var _ Generator[*app.App] = getTracetestApp
-
-func init() {
-	RegisterFixture(TRACETEST_APP, getTracetestApp)
 }

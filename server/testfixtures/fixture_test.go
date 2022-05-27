@@ -11,7 +11,7 @@ import (
 )
 
 func TestFixture(t *testing.T) {
-	testfixtures.RegisterFixture("uuid", func(args ...interface{}) (string, error) {
+	testfixtures.RegisterFixture("uuid", func(options testfixtures.FixtureOptions) (string, error) {
 		return uuid.NewString(), nil
 	})
 
