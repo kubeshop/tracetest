@@ -4,12 +4,17 @@ import styled from 'styled-components';
 
 export const AttributeRow = styled.div`
   display: grid;
-  grid-template-columns: 200px 1fr 50px;
+  grid-template-columns: 190px 1fr 60px;
   gap: 14px;
   align-items: start;
+  padding: 8px;
 
   .ant-tooltip-inner {
     color: yellow;
+  }
+
+  &:hover {
+    background-color: #fbfbff;
   }
 `;
 
@@ -41,10 +46,13 @@ export const IconContainer = styled.div`
   display: flex;
   gap: 14px;
   align-items: center;
+  align-self: center;
 `;
 
 export const CustomTooltip = styled(Tooltip).attrs({
   color: '#FBFBFF',
+  placement: 'top',
+  arrowPointAtCenter: true,
 })``;
 
 export const CustomBadge = styled(Badge)`

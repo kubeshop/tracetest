@@ -1,4 +1,4 @@
-import {CloseCircleOutlined, EditOutlined} from '@ant-design/icons';
+import {DeleteOutlined, EditOutlined} from '@ant-design/icons';
 import {Tag, Typography} from 'antd';
 import styled, {css} from 'styled-components';
 
@@ -13,7 +13,7 @@ export const Header = styled.div`
   border-bottom: 1px solid rgba(3, 24, 73, 0.1);
   padding: 8px 14px;
   justify-content: space-between;
-  border-radius: 2px 2px 0px 0px;
+  border-radius: 2px 2px 0 0;
 `;
 
 export const Body = styled.div`
@@ -30,7 +30,7 @@ export const SelectorListText = styled(Typography.Text).attrs({
 `;
 
 export const SpanCountText = styled(Typography.Text)`
-  font-size: 12;
+  font-size: 12px;
 `;
 const baseIcon = css`
   font-size: 18px;
@@ -42,8 +42,8 @@ export const EditIcon = styled(EditOutlined)`
   ${baseIcon}
 `;
 
-export const DeleteIcon = styled(CloseCircleOutlined)`
-  ${baseIcon}
+export const DeleteIcon = styled(DeleteOutlined)`
+  ${baseIcon};
   margin-left: 12px;
 `;
 

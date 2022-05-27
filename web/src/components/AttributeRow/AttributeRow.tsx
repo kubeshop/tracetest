@@ -1,16 +1,20 @@
-import AttributeValue from 'components/AttributeValue';
+import {useEffect} from 'react';
+
 import useHover from 'hooks/useHover';
 import {IResult} from 'types/Assertion.types';
 import {TSpanFlatAttribute} from 'types/Span.types';
 import AttributeCheck from './AttributeCheck';
 import * as S from './AttributeRow.styled';
+import AttributeValue from '../AttributeValue';
 
 interface IProps {
   assertionsFailed?: IResult[];
   assertionsPassed?: IResult[];
   attribute: TSpanFlatAttribute;
+  isCopied: boolean;
   onCopy(value: string): void;
   onCreateAssertion(attribute: TSpanFlatAttribute): void;
+  setIsCopied(value: boolean): void;
 }
 
 const AttributeRow = ({
@@ -18,12 +22,18 @@ const AttributeRow = ({
   assertionsPassed,
   attribute: {key, value},
   attribute,
+  isCopied,
   onCopy,
   onCreateAssertion,
+  setIsCopied,
 }: IProps) => {
   const {isHovering, onMouseEnter, onMouseLeave} = useHover();
   const passedCount = assertionsPassed?.length ?? 0;
   const failedCount = assertionsFailed?.length ?? 0;
+
+  useEffect(() => {
+    if (!isHovering) setIsCopied(false);
+  }, [isHovering]);
 
   return (
     <S.AttributeRow onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
@@ -40,8 +50,10 @@ const AttributeRow = ({
       <S.IconContainer>
         {isHovering && (
           <>
-            <S.CopyIcon onClick={() => onCopy(value)} />
-            <S.CustomTooltip placement="top" title="Add Assertion">
+            <S.CustomTooltip title={isCopied ? 'Copied' : 'Copy'}>
+              <S.CopyIcon onClick={() => onCopy(value)} />
+            </S.CustomTooltip>
+            <S.CustomTooltip title="Add Assertion">
               <S.AddAssertionIcon onClick={() => onCreateAssertion(attribute)} />
             </S.CustomTooltip>
           </>

@@ -1,5 +1,6 @@
 import {Button, Typography} from 'antd';
 import styled, {css} from 'styled-components';
+import chevron from '../../assets/chevron.svg';
 
 export const Header = styled.div<{visiblePortion: number}>`
   display: flex;
@@ -57,4 +58,10 @@ export const LoadingSpinnerContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+`;
+
+export const Chevron = styled.img.attrs({
+  src: chevron,
+})<{$isCollapsed: boolean}>`
+  transform: ${({$isCollapsed}) => ($isCollapsed ? 'rotate(0deg)' : 'rotate(180deg)')};
 `;

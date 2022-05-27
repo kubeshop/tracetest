@@ -1,3 +1,4 @@
+import {Tooltip} from 'antd';
 import {useCallback} from 'react';
 import {useStore} from 'react-flow-renderer';
 import {useAppSelector} from '../../redux/hooks';
@@ -8,8 +9,11 @@ import * as S from './AssertionCard.styled';
 
 interface TAssertionCardProps {
   assertionResult: TAssertionResultEntry;
+
   onSelectSpan(spanId: string): void;
+
   onDelete(selector: string): void;
+
   onEdit(assertionResult: TAssertionResultEntry): void;
 }
 
@@ -49,8 +53,12 @@ const AssertionCard: React.FC<TAssertionCardProps> = ({
         <S.ActionsContainer>
           {isDraft && <S.StatusTag>draft</S.StatusTag>}
           {isDeleted && <S.StatusTag color="#61175E">deleted</S.StatusTag>}
-          <S.EditIcon data-cy="edit-assertion-button" onClick={() => onEdit(assertionResult)} />
-          <S.DeleteIcon onClick={() => onDelete(selector)} />
+          <Tooltip color="white" title="Edit Assertion">
+            <S.EditIcon data-cy="edit-assertion-button" onClick={() => onEdit(assertionResult)} />
+          </Tooltip>
+          <Tooltip color="white" title="Delete Assertion">
+            <S.DeleteIcon onClick={() => onDelete(selector)} />
+          </Tooltip>
         </S.ActionsContainer>
       </S.Header>
       <S.Body>
