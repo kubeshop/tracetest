@@ -81,19 +81,28 @@ if [ "$SKIP_JAEGER" != "YES" ]; then
     echo
     echo
 
-    helm repo add jaeger-all-in-one https://raw.githubusercontent.com/hansehe/jaeger-all-in-one/master/helm/charts
-    helm upgrade --install jaeger jaeger-all-in-one/jaeger-all-in-one \
-      --namespace $NAMESPACE --create-namespace
+    kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.8.0/cert-manager.yaml
 
-    # service alias
-    cat <<EOF | kubectl apply --namespace $NAMESPACE -f -
-apiVersion: v1
-kind: Service
+    cat <<EOF | kubectl apply -f -
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
 metadata:
-  name: "jaeger-query"
+  name: selfsigned
 spec:
-  type: ExternalName
-  externalName: "jaeger-jaeger-all-in-one.$NAMESPACE.svc.cluster.local"
+  selfSigned: {}
+EOF
+
+    kubectl create namespace observability
+    kubectl create -f https://github.com/jaegertracing/jaeger-operator/releases/download/v1.32.0/jaeger-operator.yaml -n observability
+    echo "--> waiting for jaeger-operator"
+    kubectl wait --for=condition=ready pod -l name=jaeger-operator --namespace observability --timeout 5m
+    echo "--> jaeger-operator ready"
+
+    cat <<EOF | kubectl apply --namespace $NAMESPACE -f -
+apiVersion: jaegertracing.io/v1
+kind: Jaeger
+metadata:
+  name: jaeger
 EOF
 fi
 
