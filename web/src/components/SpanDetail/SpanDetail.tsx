@@ -1,15 +1,14 @@
 import {capitalize} from 'lodash';
 import {useCallback} from 'react';
-import {SemanticGroupNames, SemanticGroupNamesToText} from '../../constants/SemanticGroupNames.constants';
+import {SemanticGroupNamesToText} from '../../constants/SemanticGroupNames.constants';
 import SpanService from '../../services/Span.service';
 import {TSpan, TSpanFlatAttribute} from '../../types/Span.types';
-import Generic from './components/Generic';
-import Http from './components/Http';
 import SpanHeader from './SpanHeader';
 import * as S from './SpanDetail.styled';
 import {useAssertionForm} from '../AssertionForm/AssertionFormProvider';
 import {CompareOperator} from '../../constants/Operator.constants';
 import OperatorService from '../../services/Operator.service';
+import SpanDetailTabs from './SpanDetailTabs';
 
 export interface TSpanDetailProps {
   testId?: string;
@@ -22,10 +21,6 @@ export interface TSpanDetailsComponentProps {
   onCreateAssertion(attribute: TSpanFlatAttribute): void;
 }
 
-const ComponentMap: Record<string, typeof Generic> = {
-  [SemanticGroupNames.Http]: Http,
-};
-
 const getSpanTitle = (span: TSpan) => {
   const {primary, heading} = SpanService.getSpanNodeInfo(span);
   const spanTypeText = SemanticGroupNamesToText[span.type];
@@ -35,7 +30,6 @@ const getSpanTitle = (span: TSpan) => {
 
 const SpanDetail: React.FC<TSpanDetailProps> = ({span}) => {
   const {open} = useAssertionForm();
-  const Component = ComponentMap[span?.type || ''] || Generic;
 
   const title = (span && getSpanTitle(span)) || '';
 
@@ -64,7 +58,7 @@ const SpanDetail: React.FC<TSpanDetailProps> = ({span}) => {
   return (
     <S.SpanDetail>
       <SpanHeader title={title} />
-      <Component span={span} onCreateAssertion={onCreateAssertion} />
+      <SpanDetailTabs onCreateAssertion={onCreateAssertion} span={span} />
     </S.SpanDetail>
   );
 };

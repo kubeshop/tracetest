@@ -1,0 +1,187 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Layout 1`] = `
+<div>
+  <div
+    class="sc-gKclnd bwOPWE"
+  >
+    <div
+      class="sc-bdvvtL NRNkx"
+    >
+      <h5
+        class="ant-typography sc-gsDKAQ cksOeG"
+      >
+        Span Details
+      </h5>
+      <span
+        class="ant-typography ant-typography-secondary"
+      >
+        General • span-mock • span-mock
+      </span>
+    </div>
+    <div
+      class="ant-tabs ant-tabs-top sc-dkPtRN gPnAnM"
+      data-cy="span-details-attributes"
+      style="margin-bottom: 150px; overflow: hidden;"
+    >
+      <div
+        class="ant-tabs-nav"
+        role="tablist"
+      >
+        <div
+          class="ant-tabs-nav-wrap"
+        >
+          <div
+            class="ant-tabs-nav-list"
+            style="transform: translate(0px, 0px);"
+          >
+            <div
+              class="ant-tabs-tab ant-tabs-tab-active"
+            >
+              <div
+                aria-controls="rc-tabs-test-panel-custom"
+                aria-selected="true"
+                class="ant-tabs-tab-btn"
+                id="rc-tabs-test-tab-custom"
+                role="tab"
+                tabindex="0"
+              >
+                Custom
+              </div>
+            </div>
+            <div
+              class="ant-tabs-tab"
+            >
+              <div
+                aria-controls="rc-tabs-test-panel-all"
+                aria-selected="false"
+                class="ant-tabs-tab-btn"
+                id="rc-tabs-test-tab-all"
+                role="tab"
+                tabindex="0"
+              >
+                All
+              </div>
+            </div>
+            <div
+              class="ant-tabs-ink-bar ant-tabs-ink-bar-animated"
+            />
+          </div>
+        </div>
+        <div
+          class="ant-tabs-nav-operations ant-tabs-nav-operations-hidden"
+        >
+          <button
+            aria-controls="rc-tabs-test-more-popup"
+            aria-expanded="false"
+            aria-haspopup="listbox"
+            aria-hidden="true"
+            class="ant-tabs-nav-more"
+            id="rc-tabs-test-more"
+            style="visibility: hidden; order: 1;"
+            tabindex="-1"
+            type="button"
+          >
+            <span
+              aria-label="ellipsis"
+              class="anticon anticon-ellipsis"
+              role="img"
+            >
+              <svg
+                aria-hidden="true"
+                data-icon="ellipsis"
+                fill="currentColor"
+                focusable="false"
+                height="1em"
+                viewBox="64 64 896 896"
+                width="1em"
+              >
+                <path
+                  d="M176 511a56 56 0 10112 0 56 56 0 10-112 0zm280 0a56 56 0 10112 0 56 56 0 10-112 0zm280 0a56 56 0 10112 0 56 56 0 10-112 0z"
+                />
+              </svg>
+            </span>
+          </button>
+        </div>
+      </div>
+      <div
+        class="ant-tabs-content-holder"
+      >
+        <div
+          class="ant-tabs-content ant-tabs-content-top"
+        >
+          <div
+            aria-hidden="false"
+            aria-labelledby="rc-tabs-test-tab-custom"
+            class="ant-tabs-tabpane ant-tabs-tabpane-active"
+            id="rc-tabs-test-panel-custom"
+            role="tabpanel"
+            tabindex="0"
+          >
+            <div
+              class="sc-fotOHu hXnbHw"
+              data-cy="empty-attribute-list"
+            >
+              <span
+                aria-label="question-circle"
+                class="anticon anticon-question-circle sc-fFeiMQ rFEFY"
+                role="img"
+              >
+                <svg
+                  aria-hidden="true"
+                  data-icon="question-circle"
+                  fill="currentColor"
+                  focusable="false"
+                  height="1em"
+                  viewBox="64 64 896 896"
+                  width="1em"
+                >
+                  <path
+                    d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64zm0 820c-205.4 0-372-166.6-372-372s166.6-372 372-372 372 166.6 372 372-166.6 372-372 372z"
+                  />
+                  <path
+                    d="M623.6 316.7C593.6 290.4 554 276 512 276s-81.6 14.5-111.6 40.7C369.2 344 352 380.7 352 420v7.6c0 4.4 3.6 8 8 8h48c4.4 0 8-3.6 8-8V420c0-44.1 43.1-80 96-80s96 35.9 96 80c0 31.1-22 59.6-56.1 72.7-21.2 8.1-39.2 22.3-52.1 40.9-13.1 19-19.9 41.8-19.9 64.9V620c0 4.4 3.6 8 8 8h48c4.4 0 8-3.6 8-8v-22.7a48.3 48.3 0 0130.9-44.8c59-22.7 97.1-74.7 97.1-132.5.1-39.3-17.1-76-48.3-103.3zM472 732a40 40 0 1080 0 40 40 0 10-80 0z"
+                  />
+                </svg>
+              </span>
+              <h5
+                class="ant-typography ant-typography-secondary sc-bkkeKt"
+              >
+                Looking for attributes?
+              </h5>
+              <span
+                class="ant-typography ant-typography-secondary sc-ieecCq lgsuex"
+              >
+                Take a look a the open telemetry specification for
+                 
+                <a
+                  href="https://github.com/open-telemetry/opentelemetry-specification/tree/main/specification/trace/semantic_conventions"
+                >
+                  trace semantic conventions
+                </a>
+                 and here for
+                 
+                <a
+                  href="https://github.com/open-telemetry/opentelemetry-specification/tree/main/specification/resource/semantic_conventions"
+                >
+                  resource semantic conventions
+                </a>
+                .
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+            aria-labelledby="rc-tabs-test-tab-all"
+            class="ant-tabs-tabpane"
+            id="rc-tabs-test-panel-all"
+            role="tabpanel"
+            style="display: none;"
+            tabindex="-1"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

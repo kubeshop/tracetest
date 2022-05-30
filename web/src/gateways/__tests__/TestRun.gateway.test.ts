@@ -27,7 +27,7 @@ describe('TestRunGateway', () => {
     expect.assertions(1);
     await TestRunResultGateway.getById('testId', 'resultId');
 
-    expect(getRunById.initiate).toBeCalledWith({testId: 'testId', resultId: 'resultId'});
+    expect(getRunById.initiate).toBeCalledWith({testId: 'testId', runId: 'resultId'});
   });
 
   it('should execute the update function', async () => {
@@ -36,7 +36,7 @@ describe('TestRunGateway', () => {
 
     expect(reRun.initiate).toBeCalledWith({
       testId: 'testId',
-      resultId: 'resultId',
+      runId: 'resultId',
     });
   });
 });

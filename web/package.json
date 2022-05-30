@@ -5,6 +5,7 @@
   "dependencies": {
     "@ant-design/icons": "4.7.0",
     "@emotion/react": "11.9.0",
+    "@opentelemetry/semantic-conventions": "1.3.0",
     "@reactour/tour": "2.10.3",
     "@reduxjs/toolkit": "1.7.2",
     "@sentry/react": "6.19.7",

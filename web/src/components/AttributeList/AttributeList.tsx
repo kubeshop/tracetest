@@ -1,6 +1,7 @@
 import {TSpanFlatAttribute} from '../../types/Span.types';
 import AttributeRow from '../AttributeRow';
 import * as S from './AttributeList.styled';
+import EmptyAttributeList from './EmptyAttributeList';
 
 interface IAttributeListProps {
   attributeList: TSpanFlatAttribute[];
@@ -8,12 +9,14 @@ interface IAttributeListProps {
 }
 
 const AttributeList: React.FC<IAttributeListProps> = ({attributeList, onCreateAssertion}) => {
-  return (
-    <S.AttributeList>
+  return attributeList.length ? (
+    <S.AttributeList data-cy="attribute-list">
       {attributeList.map(attribute => (
         <AttributeRow attribute={attribute} key={attribute.key} onCreateAssertion={onCreateAssertion} />
       ))}
     </S.AttributeList>
+  ) : (
+    <EmptyAttributeList />
   );
 };
 

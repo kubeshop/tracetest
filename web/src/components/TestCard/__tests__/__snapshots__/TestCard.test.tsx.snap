@@ -11,7 +11,7 @@ exports[`TestCard 1`] = `
       <span
         aria-label="right"
         class="anticon anticon-right"
-        data-cy="collapse-test-c79502a8-4828-4993-9bea-4265f78cbc96"
+        data-cy="collapse-test-12232d3f-022a-4244-a23f-b871d606c69d"
         role="img"
         tabindex="-1"
       >
@@ -35,7 +35,7 @@ exports[`TestCard 1`] = `
         <span
           class="ant-typography sc-hBUSln fEhLhq"
         >
-          Jamarcus
+          Mariane
         </span>
       </div>
       <div
@@ -47,7 +47,7 @@ exports[`TestCard 1`] = `
       </div>
       <div
         class="sc-bqiRlB ghwjXk"
-        data-cy="test-url-c79502a8-4828-4993-9bea-4265f78cbc96"
+        data-cy="test-url-12232d3f-022a-4244-a23f-b871d606c69d"
       >
         <span
           class="ant-typography sc-fotOHu"
@@ -61,7 +61,7 @@ exports[`TestCard 1`] = `
       >
         <button
           class="ant-btn ant-btn-primary ant-btn-background-ghost"
-          data-cy="test-run-button-c79502a8-4828-4993-9bea-4265f78cbc96"
+          data-cy="test-run-button-12232d3f-022a-4244-a23f-b871d606c69d"
           type="button"
         >
           <span>
@@ -71,7 +71,7 @@ exports[`TestCard 1`] = `
       </div>
       <span
         class="ant-dropdown-trigger ant-dropdown-link ant-dropdown-open"
-        data-cy="test-actions-button-c79502a8-4828-4993-9bea-4265f78cbc96"
+        data-cy="test-actions-button-12232d3f-022a-4244-a23f-b871d606c69d"
       >
         <span
           aria-label="more"

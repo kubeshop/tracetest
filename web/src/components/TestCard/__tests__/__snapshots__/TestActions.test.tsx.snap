@@ -4,7 +4,7 @@ exports[`TestCardActions 1`] = `
 <div>
   <span
     class="ant-dropdown-trigger ant-dropdown-link"
-    data-cy="test-actions-button-dbe439ad-ead4-4379-bf14-fca81e316889"
+    data-cy="test-actions-button-50c96a93-b27b-4c45-b810-e353c96d1994"
   >
     <span
       aria-label="more"

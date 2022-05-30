@@ -28,7 +28,7 @@ exports[`TraceNode 1`] = `
         class="ant-typography ant-typography-ellipsis ant-typography-single-line ant-typography-ellipsis-single-line sc-dkPtRN dvhzfk"
       >
         <strong>
-          mock
+          span-mock
         </strong>
       </span>
       <span
