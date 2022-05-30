@@ -10,7 +10,7 @@ const {onTimelineSpanClick} = TraceAnalyticsService;
 
 const barHeight = 54;
 
-export const TimelineChart = ({trace, selectedSpan, onSelectSpan}: IDiagramProps) => {
+export const TimelineChart = ({affectedSpans, trace, selectedSpan, onSelectSpan}: IDiagramProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const treeFactory = d3.tree().size([200, 450]).nodeSize([0, 5]);
 
@@ -95,10 +95,6 @@ export const TimelineChart = ({trace, selectedSpan, onSelectSpan}: IDiagramProps
       .attr('y', 20);
     chart.append('g').attr('class', 'container').attr('transform', `translate(0, 50)`);
   }, [trace]);
-
-  useEffect(() => {
-    drawChart();
-  }, [selectedSpan]);
 
   const drawChart = useCallback(() => {
     const nodes = treeFactory(root);
@@ -194,7 +190,13 @@ export const TimelineChart = ({trace, selectedSpan, onSelectSpan}: IDiagramProps
     nodeUpdate
       .attr('transform', (d: any) => `translate(${0} ,${d.x})`)
       .select('rect')
-      .attr('class', d => `rect-svg ${d.id === selectedSpan?.id ? 'rect-svg-selected' : ''}`);
+      .attr(
+        'class',
+        d =>
+          `rect-svg ${d.id === selectedSpan?.id ? 'rect-svg-selected' : ''} ${
+            affectedSpans.includes(d.id) ? 'rect-svg-affected' : ''
+          }`
+      );
 
     nodeUpdate
       .select('path')
@@ -218,10 +220,10 @@ export const TimelineChart = ({trace, selectedSpan, onSelectSpan}: IDiagramProps
 
   useEffect(() => {
     drawChart();
-  }, [selectedSpan, drawChart]);
+  }, [selectedSpan?.id, drawChart]);
 
   return (
-    <S.Container barHeight={barHeight}>
+    <S.Container barHeight={barHeight} showAffected={affectedSpans.length > 0}>
       <svg ref={svgRef} />
     </S.Container>
   );

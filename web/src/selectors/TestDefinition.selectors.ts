@@ -1,4 +1,5 @@
 import {createSelector} from '@reduxjs/toolkit';
+
 import {RootState} from '../redux/store';
 
 const stateSelector = (state: RootState) => state.testDefinition;
@@ -21,6 +22,7 @@ const TestDefinitionSelectors = () => ({
   selectDefinitionBySelector: createSelector(selectDefinitionList, selectorSelector, (definitionList, selector) =>
     definitionList.find(def => def.selector === selector)
   ),
+  selectAffectedSpans: createSelector(stateSelector, ({affectedSpans}) => affectedSpans),
 });
 
 export default TestDefinitionSelectors();

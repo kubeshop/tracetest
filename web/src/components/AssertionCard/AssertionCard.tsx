@@ -1,32 +1,36 @@
 import {Tooltip} from 'antd';
 import {useCallback} from 'react';
 import {useStore} from 'react-flow-renderer';
-import {useAppSelector} from '../../redux/hooks';
-import TestDefinitionSelectors from '../../selectors/TestDefinition.selectors';
-import {TAssertionResultEntry} from '../../types/Assertion.types';
-import AssertionCheckRow from '../AssertionCheckRow';
+
+import AssertionCheckRow from 'components/AssertionCheckRow';
+import {useAppDispatch, useAppSelector} from 'redux/hooks';
+import {clearAffectedSpans, setAffectedSpans} from 'redux/slices/TestDefinition.slice';
+import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
+import {TAssertionResultEntry} from 'types/Assertion.types';
 import * as S from './AssertionCard.styled';
 
 interface TAssertionCardProps {
   assertionResult: TAssertionResultEntry;
-
   onSelectSpan(spanId: string): void;
-
   onDelete(selector: string): void;
-
   onEdit(assertionResult: TAssertionResultEntry): void;
+  selectedAssertion: string;
+  setSelectedAssertion(assertion: string): void;
 }
 
 const AssertionCard: React.FC<TAssertionCardProps> = ({
-  assertionResult: {selector, resultList, selectorList, pseudoSelector, spanCount},
+  assertionResult: {selector, resultList, selectorList, pseudoSelector, spanIds},
   assertionResult,
   onSelectSpan,
   onDelete,
   onEdit,
+  selectedAssertion,
+  setSelectedAssertion,
 }) => {
+  const dispatch = useAppDispatch();
   const store = useStore();
 
-  const spanCountText = `${spanCount} ${spanCount > 1 ? 'spans' : 'span'}`;
+  const spanCountText = `${spanIds.length} ${spanIds.length > 1 ? 'spans' : 'span'}`;
   const definition = useAppSelector(state => TestDefinitionSelectors.selectDefinitionBySelector(state, selector));
   const {isDraft = false, isDeleted = false} = definition || {};
 
@@ -40,9 +44,19 @@ const AssertionCard: React.FC<TAssertionCardProps> = ({
     [store]
   );
 
+  const handleOnClick = () => {
+    if (selectedAssertion === selector) {
+      dispatch(clearAffectedSpans());
+      setSelectedAssertion('');
+      return;
+    }
+    setSelectedAssertion(selector);
+    dispatch(setAffectedSpans(spanIds));
+  };
+
   return (
-    <S.AssertionCard data-cy="assertion-card">
-      <S.Header>
+    <S.AssertionCard data-cy="assertion-card" isSelected={selectedAssertion === selector}>
+      <S.Header onClick={handleOnClick}>
         <div>
           <S.SelectorListText>
             {selectorList.map(({value}) => value).join(' ')} {pseudoSelector?.selector}

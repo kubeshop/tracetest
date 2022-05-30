@@ -1,24 +1,25 @@
-import React, {useCallback} from 'react';
+import {Typography, Form, Button} from 'antd';
 import {FieldData} from 'antd/node_modules/rc-field-form/es/interface';
 import {isEmpty} from 'lodash';
-import {Typography, Form, Button} from 'antd';
+import React, {useCallback, useEffect} from 'react';
 
-import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
+import {Steps} from 'components/GuidedTour/assertionStepList';
+import {CompareOperator} from 'constants/Operator.constants';
 import useGuidedTour from 'hooks/useGuidedTour';
-import CreateAssertionModalAnalyticsService from '../../services/Analytics/CreateAssertionModalAnalytics.service';
-import {CompareOperator} from '../../constants/Operator.constants';
-import {Steps} from '../GuidedTour/assertionStepList';
+import {useGetSelectedSpansQuery} from 'redux/apis/TraceTest.api';
+import {useAppDispatch, useAppSelector} from 'redux/hooks';
+import {setAffectedSpans} from 'redux/slices/TestDefinition.slice';
+import AssertionSelectors from 'selectors/Assertion.selectors';
+import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
+import CreateAssertionModalAnalyticsService from 'services/Analytics/CreateAssertionModalAnalytics.service';
+import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
+import OperatorService from 'services/Operator.service';
+import SelectorService from 'services/Selector.service';
+import {TAssertion, TPseudoSelector, TSpanSelector} from 'types/Assertion.types';
 import * as S from './AssertionForm.styled';
-import AssertionSelectors from '../../selectors/Assertion.selectors';
-import TestDefinitionSelectors from '../../selectors/TestDefinition.selectors';
-import AssertionFormSelectorInput from './AssertionFormSelectorInput';
-import {TAssertion, TPseudoSelector, TSpanSelector} from '../../types/Assertion.types';
-import AssertionFormPseudoSelectorInput from './AssertionFormPseudoSelectorInput';
 import AssertionFormCheckList from './AssertionFormCheckList';
-import {useGetSelectedSpansQuery} from '../../redux/apis/TraceTest.api';
-import OperatorService from '../../services/Operator.service';
-import SelectorService from '../../services/Selector.service';
-import {useAppSelector} from '../../redux/hooks';
+import AssertionFormPseudoSelectorInput from './AssertionFormPseudoSelectorInput';
+import AssertionFormSelectorInput from './AssertionFormSelectorInput';
 
 const {onChecksChange, onSelectorChange} = CreateAssertionModalAnalyticsService;
 
@@ -53,6 +54,7 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
   testId,
   runId,
 }) => {
+  const dispatch = useAppDispatch();
   const [form] = Form.useForm<IValues>();
   useGuidedTour(GuidedTours.Assertion);
 
@@ -65,6 +67,10 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
     testId,
     runId,
   });
+
+  useEffect(() => {
+    dispatch(setAffectedSpans(spanIdList));
+  }, [spanIdList]);
 
   const attributeList = useAppSelector(state =>
     AssertionSelectors.selectAttributeList(state, testId, runId, spanIdList)

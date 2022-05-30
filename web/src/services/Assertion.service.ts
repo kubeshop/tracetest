@@ -1,18 +1,11 @@
-import {TRawAssertionResult} from '../types/Assertion.types';
+import uniq from 'lodash/uniq';
+
+import {TRawAssertionResult} from 'types/Assertion.types';
 
 const AssertionService = () => ({
-  getSpanCount(resultList: TRawAssertionResult[]): number {
-    const spanIdList = resultList.reduce<string[]>((list, {spanResults}) => {
-      const tmpList: string[] = [];
-
-      spanResults?.forEach(({spanId = ''}) => {
-        if (!tmpList.includes(spanId)) tmpList.push(spanId);
-      });
-
-      return list.concat(tmpList);
-    }, []);
-
-    return spanIdList.length;
+  getSpanIds(resultList: TRawAssertionResult[]) {
+    const spanIds = resultList.flatMap(assertion => assertion?.spanResults?.map(span => span.spanId ?? '') ?? []);
+    return uniq(spanIds);
   },
 });
 

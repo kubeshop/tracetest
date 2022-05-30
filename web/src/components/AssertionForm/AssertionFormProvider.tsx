@@ -1,11 +1,13 @@
 import {noop} from 'lodash';
 import {useState, createContext, useCallback, useMemo, useContext, Dispatch, SetStateAction} from 'react';
-import {useTestDefinition} from '../../providers/TestDefinition/TestDefinition.provider';
-import {useTestRun} from '../../providers/TestRun/TestRun.provider';
-import {useAppSelector} from '../../redux/hooks';
-import TestDefinitionSelectors from '../../selectors/TestDefinition.selectors';
-import SelectorService from '../../services/Selector.service';
-import {TTestDefinitionEntry} from '../../types/TestDefinition.types';
+
+import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
+import {useTestRun} from 'providers/TestRun/TestRun.provider';
+import {useAppDispatch, useAppSelector} from 'redux/hooks';
+import {clearAffectedSpans} from 'redux/slices/TestDefinition.slice';
+import SelectorService from 'services/Selector.service';
+import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
+import {TTestDefinitionEntry} from 'types/TestDefinition.types';
 import {IValues} from './AssertionForm';
 import AssertionFormConfirmModal from './AssertionFormConfirmModal';
 
@@ -17,17 +19,11 @@ interface IFormProps {
 
 interface ICreateAssertionModalProviderContext {
   isCollapsed: boolean;
-
   setIsCollapsed: Dispatch<SetStateAction<boolean>>;
-
   isOpen: boolean;
-
   open(props?: IFormProps): void;
-
   close(): void;
-
   onSubmit(values: IValues): void;
-
   formProps: IFormProps;
 }
 
@@ -48,6 +44,7 @@ export const Context = createContext<ICreateAssertionModalProviderContext>({
 export const useAssertionForm = () => useContext(Context);
 
 const AssertionFormProvider: React.FC<{testId: string}> = ({children}) => {
+  const dispatch = useAppDispatch();
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
@@ -83,6 +80,7 @@ const AssertionFormProvider: React.FC<{testId: string}> = ({children}) => {
 
   const close = useCallback(() => {
     setFormProps(initialFormProps);
+    dispatch(clearAffectedSpans());
 
     setIsOpen(false);
   }, []);
@@ -106,6 +104,7 @@ const AssertionFormProvider: React.FC<{testId: string}> = ({children}) => {
       else await add(definition);
 
       setIsOpen(false);
+      dispatch(clearAffectedSpans());
     },
     [add, formProps, update]
   );

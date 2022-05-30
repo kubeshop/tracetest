@@ -24,7 +24,7 @@ export type TRawAssertionResults = TTestSchemas['AssertionResults'];
 export type TAssertionResultEntry = {
   id: string;
   selector: string;
-  spanCount: number;
+  spanIds: string[];
   pseudoSelector?: TPseudoSelector;
   selectorList: TSpanSelector[];
   resultList: TAssertionResult[];

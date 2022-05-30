@@ -17,7 +17,7 @@ export type TSpanMap = Record<string, TSpanInfo>;
 
 const {onClickSpan} = TraceDiagramAnalyticsService;
 
-const Diagram: React.FC<IDiagramProps> = ({trace, selectedSpan, onSelectSpan}): JSX.Element => {
+const Diagram: React.FC<IDiagramProps> = ({affectedSpans, trace, selectedSpan, onSelectSpan}): JSX.Element => {
   const spanMap = useMemo<TSpanMap>(() => {
     return (
       trace?.spans?.reduce<TSpanMap>((acc, span) => {
@@ -60,7 +60,7 @@ const Diagram: React.FC<IDiagramProps> = ({trace, selectedSpan, onSelectSpan}): 
           position: {x, y: parseFloat(String(y))},
           selected: data.id === selectedSpan?.id,
           sourcePosition: 'top',
-          className: `${data.id === selectedSpan?.id ? 'selected' : ''}`,
+          className: affectedSpans.includes(data.id) ? 'affected' : '',
         };
       });
 
@@ -84,7 +84,7 @@ const Diagram: React.FC<IDiagramProps> = ({trace, selectedSpan, onSelectSpan}): 
   }, [dagLayout, spanMap, selectedSpan?.id]);
 
   return (
-    <S.Container data-cy="diagram-dag">
+    <S.Container showAffected={affectedSpans.length > 0} data-cy="diagram-dag">
       <ReactFlow
         nodeTypes={{TraceNode}}
         defaultZoom={0.5}

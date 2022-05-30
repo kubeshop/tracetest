@@ -10,6 +10,7 @@ interface ITestDefinitionState {
   changeList: TChange[];
   isLoading: boolean;
   isInitialized: boolean;
+  affectedSpans: string[];
 }
 
 export const initialState: ITestDefinitionState = {
@@ -18,6 +19,7 @@ export const initialState: ITestDefinitionState = {
   changeList: [],
   isLoading: false,
   isInitialized: false,
+  affectedSpans: [],
 };
 
 export const assertionResultsToDefinitionList = (assertionResults: TAssertionResults): TTestDefinitionEntry[] => {
@@ -74,6 +76,12 @@ const testDefinitionSlice = createSlice({
     setAssertionResults(state, {payload}: PayloadAction<TAssertionResults>) {
       state.assertionResults = payload;
     },
+    clearAffectedSpans(state) {
+      state.affectedSpans = [];
+    },
+    setAffectedSpans(state, {payload: spans}: PayloadAction<string[]>) {
+      state.affectedSpans = spans;
+    },
   },
   extraReducers: builder => {
     builder
@@ -109,5 +117,7 @@ export const {
   initDefinitionList,
   resetDefinitionList,
   reset,
+  clearAffectedSpans,
+  setAffectedSpans,
 } = testDefinitionSlice.actions;
 export default testDefinitionSlice.reducer;

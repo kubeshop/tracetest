@@ -1,5 +1,5 @@
 import {Typography} from 'antd';
-import {useCallback} from 'react';
+import {useCallback, useState} from 'react';
 import {useTestDefinition} from '../../providers/TestDefinition/TestDefinition.provider';
 import {TAssertionResultEntry, TAssertionResults} from '../../types/Assertion.types';
 import AssertionCard from '../AssertionCard/AssertionCard';
@@ -15,6 +15,7 @@ interface TAssertionCardListProps {
 const AssertionCardList: React.FC<TAssertionCardListProps> = ({assertionResults: {resultList}, onSelectSpan}) => {
   const {open} = useAssertionForm();
   const {remove} = useTestDefinition();
+  const [selectedAssertion, setSelectedAssertion] = useState('');
 
   const handleEdit = useCallback(
     ({selector, resultList: list, selectorList, pseudoSelector}: TAssertionResultEntry) => {
@@ -49,6 +50,8 @@ const AssertionCardList: React.FC<TAssertionCardListProps> = ({assertionResults:
               onSelectSpan={onSelectSpan}
               onEdit={handleEdit}
               onDelete={handleDelete}
+              selectedAssertion={selectedAssertion}
+              setSelectedAssertion={setSelectedAssertion}
             />
           ) : null
         )
