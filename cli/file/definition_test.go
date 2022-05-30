@@ -21,7 +21,8 @@ func TestLoadDefinition(t *testing.T) {
 			File:          "../testdata/definitions/valid_http_test_definition.yml",
 			ShouldSucceed: true,
 			ExpectedDefinition: definition.Test{
-				Name: "POST import pokemon",
+				Name:        "POST import pokemon",
+				Description: "Import a pokemon using its ID",
 				Trigger: definition.TestTrigger{
 					Type: "http",
 					HTTPRequest: definition.HttpRequest{
@@ -31,8 +32,11 @@ func TestLoadDefinition(t *testing.T) {
 							{Key: "ContentType", Value: "application/json"},
 						},
 						Authentication: definition.HTTPAuthentication{
-							Type:  "Bearer",
-							Token: "my-token-123",
+							Type: "basic",
+							BasicAuth: definition.HTTPBasicAuth{
+								User:     "ash",
+								Password: "pikachu@Rules",
+							},
 						},
 						Body: definition.HTTPBody{
 							Type: "raw",
@@ -47,8 +51,9 @@ func TestLoadDefinition(t *testing.T) {
 			File:          "../testdata/definitions/valid_http_test_definition_with_id.yml",
 			ShouldSucceed: true,
 			ExpectedDefinition: definition.Test{
-				Id:   "3fd66887-4ee7-44d5-bad8-9934ab9c1a9a",
-				Name: "POST import pokemon",
+				Id:          "3fd66887-4ee7-44d5-bad8-9934ab9c1a9a",
+				Name:        "POST import pokemon",
+				Description: "Import a pokemon using its ID",
 				Trigger: definition.TestTrigger{
 					Type: "http",
 					HTTPRequest: definition.HttpRequest{
@@ -58,8 +63,10 @@ func TestLoadDefinition(t *testing.T) {
 							{Key: "ContentType", Value: "application/json"},
 						},
 						Authentication: definition.HTTPAuthentication{
-							Type:  "Bearer",
-							Token: "my-token-123",
+							Type: "bearer",
+							Bearer: definition.HTTPBearerAuth{
+								Token: "my-token-123",
+							},
 						},
 						Body: definition.HTTPBody{
 							Type: "raw",
@@ -76,6 +83,8 @@ func TestLoadDefinition(t *testing.T) {
 			definition, err := file.LoadDefinition(testCase.File)
 			if testCase.ShouldSucceed {
 				require.NoError(t, err, "LoadDefinition should not fail")
+				err = definition.Validate()
+				assert.NoError(t, err)
 				assert.Equal(t, testCase.ExpectedDefinition, definition)
 			} else {
 				require.Error(t, err, "LoadDefinition should fail")

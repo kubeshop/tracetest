@@ -11,19 +11,21 @@ import (
 	"go.uber.org/zap"
 )
 
+type ListTestConfig struct{}
+
 type listTestsAction struct {
 	config config.Config
 	logger *zap.Logger
 	client *openapi.APIClient
 }
 
-var _ Action = &listTestsAction{}
+var _ Action[ListTestConfig] = &listTestsAction{}
 
 func NewListTestsAction(config config.Config, logger *zap.Logger, client *openapi.APIClient) listTestsAction {
 	return listTestsAction{config, logger, client}
 }
 
-func (a listTestsAction) Run(ctx context.Context, args []string) error {
+func (a listTestsAction) Run(ctx context.Context, args ListTestConfig) error {
 	tests, err := a.executeRequest(ctx)
 	if err != nil {
 		return err

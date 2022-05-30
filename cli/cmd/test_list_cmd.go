@@ -20,7 +20,8 @@ var testListCmd = &cobra.Command{
 		client := getAPIClient()
 		listTestsAction := actions.NewListTestsAction(cliConfig, cliLogger, client)
 
-		err := listTestsAction.Run(ctx, args)
+		actionArgs := actions.ListTestConfig{}
+		err := listTestsAction.Run(ctx, actionArgs)
 		if err != nil {
 			log.Fatal(err)
 		}

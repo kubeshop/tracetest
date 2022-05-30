@@ -4,6 +4,6 @@ import (
 	"context"
 )
 
-type Action interface {
-	Run(ctx context.Context, args []string) error
+type Action[T any] interface {
+	Run(ctx context.Context, args T) error
 }
