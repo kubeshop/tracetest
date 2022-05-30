@@ -1,0 +1,39 @@
+id: "3fd66887-4ee7-44d5-bad8-9934ab9c1a9a"
+name: "POST import pokemon"
+trigger:
+    # I think it is important to have this type attribute, so we can extend our triggering transaction later to support
+    # other triggering methods, such as grpc, messages queues, async events, etc
+    type: http
+    http_request:
+        url: http://pokemon-demo.tracetest.io/pokemon/import
+        method: "POST"
+        headers:
+            - key: ContentType
+              value: application/json
+        authentication:
+            type: Bearer
+            # Fields here change based on `type` value.
+            # If Basic: user and password fields are available
+            # If Bearer: token field is available
+            token: my-token-123
+        body:
+            type: raw
+            raw: "{ \"id\": 52 }"
+testDefinition:
+    - selector: "span[span.name = \"POST /pokemon/import\"]"
+      assertions:
+        - "tracetest.span.duration <= 100"
+        - "http.status = 200"
+    - selector: "span[span.name = \"send message to queue\"]"
+      assertions:
+        - "messaging.message.payload contains '\"id\": 52'"
+    - selector: "span[span.name = \"consume message from queue\"]:last"
+      assertions:
+        - "messaging.message.payload contains '\"id\": 52'"
+    - selector: "span[span.name = \"consume message from queue\"]:last span[span.name = \"import pokemon from pokeapi\"]"
+      assertions:
+        - "http.status = 200"
+    - selector: "span[span.name = \"consume message from queue\"]:last span[span.name = \"\"]"
+      assertions:
+        - "db.repository.operation = create"
+        - "tracetest.span.duration <= 100"
