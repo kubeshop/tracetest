@@ -79,8 +79,8 @@ if [ "$SKIP_PMA" != "YES" ]; then
     curl -L https://github.com/kubeshop/pokeshop/tarball/master | tar -xz --strip-components 1 -C  $tmpdir
     cd $tmpdir/helm-chart
     helm dependency update
-    helm upgrade --install pokeshop . \
-      -n demo \
+    helm upgrade --install demo . \
+      --namespace demo --create-namespace \
       -f values.yaml
 
 fi
