@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/kubeshop/tracetest/cli/config"
+	"github.com/kubeshop/tracetest/cli/convertion"
 	"github.com/kubeshop/tracetest/cli/definition"
 	"github.com/kubeshop/tracetest/cli/file"
 	"github.com/kubeshop/tracetest/cli/openapi"
@@ -42,38 +43,25 @@ func (a runTestAction) runDefinition(ctx context.Context, definitionFile string)
 		return err
 	}
 
+	err = definition.Validate()
+	if err != nil {
+		return fmt.Errorf("invalid definition file: %w", err)
+	}
+
 	if definition.Id == "" {
 		a.logger.Debug("test doesn't exist. Creating it")
 		testID, err := a.createTestFromDefinition(ctx, definition)
+
+		fmt.Println(testID, err)
 	}
 
 	return nil
 }
 
 func (a runTestAction) createTestFromDefinition(ctx context.Context, definition definition.Test) (string, error) {
-	headers := make([]openapi.HTTPHeader, 0, len(definition.Trigger.HTTPRequest.Headers))
-	for _, header := range definition.Trigger.HTTPRequest.Headers {
-		headers = append(headers, openapi.HTTPHeader{
-			Key:   &header.Key,
-			Value: &header.Value,
-		})
-	}
-	testModel := openapi.Test{
-		Name:        &definition.Name,
-		Description: &definition.Description,
-		ServiceUnderTest: &openapi.TestServiceUnderTest{
-			Request: &openapi.HTTPRequest{
-				Url:     &definition.Trigger.HTTPRequest.URL,
-				Method:  &definition.Trigger.HTTPRequest.Method,
-				Headers: headers,
-				Body:    &definition.Trigger.HTTPRequest.Body.Raw,
-				Auth: &openapi.HTTPAuth{
-					Type:   &definition.Trigger.HTTPRequest.Authentication.Type,
-					ApiKey: &openapi.HTTPAuthApiKey{},
-				},
-			},
-		},
-	}
+	openapiTest := convertion.ConvertTestDefinitionIntoOpenAPIObject(definition)
+	fmt.Println(openapiTest)
+	return "", nil
 }
 
 func (a runTestAction) executeRequest(ctx context.Context) ([]openapi.Test, error) {

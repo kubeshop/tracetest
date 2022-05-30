@@ -3,10 +3,11 @@ package definition
 import "fmt"
 
 type Test struct {
-	Id          string      `yaml:"id"`
-	Name        string      `yaml:"name"`
-	Description string      `yaml:"description"`
-	Trigger     TestTrigger `yaml:"trigger"`
+	Id             string           `yaml:"id"`
+	Name           string           `yaml:"name"`
+	Description    string           `yaml:"description"`
+	Trigger        TestTrigger      `yaml:"trigger"`
+	TestDefinition []TestDefinition `yaml:"testDefinition"`
 }
 
 func (t Test) Validate() error {
