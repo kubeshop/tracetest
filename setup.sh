@@ -46,7 +46,7 @@ while [[ $# -gt 0 ]]; do
       shift # past argument
       ;;
     --skip-cert-manager)
-      SKIP_CERT_MANAGEr="YES"
+      SKIP_CERT_MANAGER="YES"
       shift # past argument
       ;;
     --skip-jaeger)
