@@ -74,12 +74,12 @@ const ResizableDrawer: React.FC<IProps> = ({open, children, min, max}: IProps) =
           left: 0,
           bottom: 0,
           zIndex: 100,
-          cursor: 'grab',
+          cursor: 'row-resize',
           backgroundColor: '#f4f7f9',
         }}
         onPointerDown={onPointerDown}
       />
-      {children.map(child => React.cloneElement(child))}
+      {children.map(child => React.cloneElement(child, {height}))}
     </Drawer>
   );
 };
