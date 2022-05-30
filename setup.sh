@@ -4,6 +4,8 @@ NAMESPACE="tracetest"
 TRACE_BACKEND="jaeger"
 TRACE_BACKEND_ENDPOINT="jaeger-query:16685"
 SKIP_PMA=""
+SKIP_JAEGER=""
+SKIP_CERT_MANAGER=""
 
 help_message() {
   echo "Tracetest setup script"
@@ -14,6 +16,8 @@ help_message() {
   echo "  --trace-backend [jaeger]                       trace backend (jaeger or tempo)"
   echo "  --trace-backend-endpoint [jaeger-query:16685]  trace backend endpoint"
   echo "  --skip-pma                                     if set, don't install the sample application"
+  echo "  --skip-cert-manager                            if set, don't install cert-manager"
+  echo "  --skip-jaeger                                  if set, don't install cert-manager"
   echo
 }
 
@@ -39,6 +43,14 @@ while [[ $# -gt 0 ]]; do
       ;;
     --skip-pma)
       SKIP_PMA="YES"
+      shift # past argument
+      ;;
+    --skip-cert-manager)
+      SKIP_CERT_MANAGEr="YES"
+      shift # past argument
+      ;;
+    --skip-jaeger)
+      SKIP_JAEGER="YES"
       shift # past argument
       ;;
     -h|--help)
@@ -67,6 +79,32 @@ helm upgrade --install tracetest kubeshop/tracetest \
   --set ${TRACE_BACKEND}ConnectionConfig.endpoint="$TRACE_BACKEND_ENDPOINT"
 
 
+if [ "$SKIP_CERT_MANAGER" != "YES" ]; then
+    echo
+    echo
+    echo "----------------------------"
+    echo "Installing cert-manager"
+    echo "----------------------------"
+    echo
+    echo
+    kubectl apply \
+      --namespace $NAMESPACE \
+      -f https://github.com/cert-manager/cert-manager/releases/download/v1.8.0/cert-manager.yaml
+fi
+
+if [ "$SKIP_JAEGER" != "YES" ]; then
+    echo
+    echo
+    echo "----------------------------"
+    echo "Installing Jaeger"
+    echo "----------------------------"
+    echo
+    echo
+    kubectl apply -f https://raw.githubusercontent.com/jaegertracing/jaeger-kubernetes/master/all-in-one/jaeger-all-in-one-template.yml
+fi
+
+
+https://raw.githubusercontent.com/jaegertracing/jaeger-kubernetes/master/all-in-one/jaeger-all-in-one-template.yml
 if [ "$SKIP_PMA" != "YES" ]; then
     echo
     echo
