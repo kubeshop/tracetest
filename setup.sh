@@ -80,9 +80,8 @@ if [ "$SKIP_PMA" != "YES" ]; then
     cd $tmpdir/helm-chart
     helm dependency update
     helm upgrade --install pokeshop . \
-      -n $NAMESPACE \
-      -f values.yaml \
-      --set 'env[2].valueFrom.secretKeyRef.name=pokeshop-rabbitmq'
+      -n demo \
+      -f values.yaml
 
 fi
 
