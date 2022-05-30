@@ -16,10 +16,10 @@ type Span struct {
 
 	Name string `json:"name,omitempty"`
 
-	// span start time in unix nano format
+	// span start time in unix milli format
 	StartTime int32 `json:"startTime,omitempty"`
 
-	// span end time in unix nano format
+	// span end time in unix milli format
 	EndTime int32 `json:"endTime,omitempty"`
 
 	// Key-Value of span attributes

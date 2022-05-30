@@ -21,8 +21,11 @@ func TestFromFileSuccess(t *testing.T) {
 			name: "Jaeger",
 			file: "./testdata/jaeger.yaml",
 			expected: config.Config{
-				MaxWaitTimeForTrace: "1m",
-				PostgresConnString:  "host=postgres user=postgres password=postgres port=5432 sslmode=disable",
+				PoolingConfig: config.PoolingConfig{
+					MaxWaitTimeForTrace: "1m",
+					RetryDelay:          "3s",
+				},
+				PostgresConnString: "host=postgres user=postgres password=postgres port=5432 sslmode=disable",
 				JaegerConnectionConfig: &configgrpc.GRPCClientSettings{
 					Endpoint:   "jaeger-query:16685",
 					TLSSetting: configtls.TLSClientSetting{Insecure: true},
@@ -33,8 +36,11 @@ func TestFromFileSuccess(t *testing.T) {
 			name: "Tempo",
 			file: "./testdata/tempo.yaml",
 			expected: config.Config{
-				MaxWaitTimeForTrace: "1m",
-				PostgresConnString:  "host=postgres user=postgres password=postgres port=5432 sslmode=disable",
+				PoolingConfig: config.PoolingConfig{
+					MaxWaitTimeForTrace: "1m",
+					RetryDelay:          "1s",
+				},
+				PostgresConnString: "host=postgres user=postgres password=postgres port=5432 sslmode=disable",
 				TempoConnectionConfig: &configgrpc.GRPCClientSettings{
 					Endpoint:   "tempo:9095",
 					TLSSetting: configtls.TLSClientSetting{Insecure: true},

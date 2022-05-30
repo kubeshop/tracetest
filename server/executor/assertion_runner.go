@@ -75,6 +75,7 @@ func (e *defaultAssertionRunner) runAssertionsAndUpdateResult(ctx context.Contex
 	if err != nil {
 		run.State = model.RunStateFailed
 		run.LastError = err
+		run.CompletedAt = time.Now()
 		return e.db.UpdateRun(ctx, run)
 	}
 

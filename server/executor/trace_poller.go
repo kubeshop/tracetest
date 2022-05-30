@@ -30,11 +30,11 @@ type TraceFetcher interface {
 func NewTracePoller(
 	tf TraceFetcher,
 	tests model.Repository,
+	retryDelay time.Duration,
 	maxWaitTimeForTrace time.Duration,
 	subscriptionManager *subscription.Manager,
 	assertionRunner AssertionRunner,
 ) PersistentTracePoller {
-	retryDelay := 1 * time.Second
 	maxTracePollRetry := int(math.Ceil(float64(maxWaitTimeForTrace) / float64(retryDelay)))
 	return tracePoller{
 		tests:               tests,
@@ -140,6 +140,7 @@ func (tp tracePoller) processJob(job tracePollReq) {
 
 	run.Trace = augmentData(&trace, run.Response)
 	run.State = model.RunStateAwaitingTestResults
+	run.ObtainedTraceAt = time.Now()
 
 	fmt.Printf("completed polling result %s after %d times, number of spans: %d \n", job.run.ID, job.count, len(run.Trace.Flat))
 
@@ -201,7 +202,7 @@ func (tp tracePoller) donePollingTraces(job tracePollReq, trace traces.Trace) bo
 func (tp tracePoller) handleTraceDBError(job tracePollReq, err error) {
 	run := job.run
 	if errors.Is(err, tracedb.ErrTraceNotFound) {
-		if time.Since(run.CompletedAt) < tp.maxWaitTimeForTrace {
+		if time.Since(run.ServiceTriggeredAt) < tp.maxWaitTimeForTrace {
 			tp.requeue(job)
 			return
 		}
@@ -214,6 +215,7 @@ func (tp tracePoller) handleTraceDBError(job tracePollReq, err error) {
 
 	run.State = model.RunStateFailed
 	run.LastError = err
+	run.CompletedAt = time.Now()
 
 	tp.handleDBError(tp.tests.UpdateRun(job.ctx, run))
 

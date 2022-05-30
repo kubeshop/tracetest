@@ -30,7 +30,7 @@ func TestPersistentRunner(t *testing.T) {
 
 		result := f.mockDB.runs[test.ID.String()]
 		require.NotNil(t, result)
-		assert.Greater(t, result.CompletedAt.UnixNano(), result.CreatedAt.UnixNano())
+		assert.Greater(t, result.ServiceTriggerCompletedAt.UnixNano(), result.CreatedAt.UnixNano())
 
 		f.assert(t)
 	})
@@ -54,7 +54,7 @@ func TestPersistentRunner(t *testing.T) {
 		run2 := f.mockDB.runs[test2.ID.String()]
 		require.NotNil(t, run2)
 
-		assert.True(t, run1.CompletedAt.UnixNano() > run2.CompletedAt.UnixNano(), "test1 did not complete after test2")
+		assert.Greater(t, run1.ServiceTriggerCompletedAt.UnixNano(), run2.ServiceTriggerCompletedAt.UnixNano(), "test1 did not complete after test2")
 	})
 
 }

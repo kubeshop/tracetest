@@ -12,11 +12,12 @@ import (
 
 type (
 	Config struct {
-		PostgresConnString     string                         `mapstructure:"postgresConnString"`
-		JaegerConnectionConfig *configgrpc.GRPCClientSettings `mapstructure:"jaegerConnectionConfig"`
-		TempoConnectionConfig  *configgrpc.GRPCClientSettings `mapstructure:"tempoConnectionConfig"`
-		MaxWaitTimeForTrace    string                         `mapstructure:"maxWaitTimeForTrace"`
-		GA                     GoogleAnalytics                `mapstructure:"googleAnalytics"`
+		PostgresConnString      string                         `mapstructure:"postgresConnString"`
+		JaegerConnectionConfig  *configgrpc.GRPCClientSettings `mapstructure:"jaegerConnectionConfig"`
+		TempoConnectionConfig   *configgrpc.GRPCClientSettings `mapstructure:"tempoConnectionConfig"`
+		PoolingConfig           PoolingConfig                  `mapstructure:"poolingConfig"`
+		GA                      GoogleAnalytics                `mapstructure:"googleAnalytics"`
+		PoolingRetryDelayString string                         `mapśtructure:"poolingRetryDelay"`
 	}
 
 	GoogleAnalytics struct {
@@ -24,10 +25,24 @@ type (
 		SecretKey     string `mapstructure:"secretKey"`
 		Enabled       bool   `mapstructure:"enabled"`
 	}
+
+	PoolingConfig struct {
+		MaxWaitTimeForTrace string `mapstructure:"maxWaitTimeForTrace"`
+		RetryDelay          string `mapstructure:"retryDelay"`
+	}
 )
 
+func (c Config) PoolingRetryDelay() time.Duration {
+	delay, err := time.ParseDuration(c.PoolingConfig.RetryDelay)
+	if err != nil {
+		return 1 * time.Second
+	}
+
+	return delay
+}
+
 func (c Config) MaxWaitTimeForTraceDuration() time.Duration {
-	maxWaitTimeForTrace, err := time.ParseDuration(c.MaxWaitTimeForTrace)
+	maxWaitTimeForTrace, err := time.ParseDuration(c.PoolingConfig.MaxWaitTimeForTrace)
 	if err != nil {
 		// use a default value
 		maxWaitTimeForTrace = 30 * time.Second

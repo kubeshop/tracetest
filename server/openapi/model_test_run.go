@@ -31,6 +31,12 @@ type TestRun struct {
 
 	CreatedAt time.Time `json:"createdAt,omitempty"`
 
+	ServiceTriggeredAt time.Time `json:"serviceTriggeredAt,omitempty"`
+
+	ServiceTriggerCompletedAt time.Time `json:"serviceTriggerCompletedAt,omitempty"`
+
+	ObtainedTraceAt time.Time `json:"obtainedTraceAt,omitempty"`
+
 	CompletedAt time.Time `json:"completedAt,omitempty"`
 
 	Request HttpRequest `json:"request,omitempty"`
