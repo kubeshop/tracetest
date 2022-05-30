@@ -37,11 +37,10 @@ export const Container = styled.div`
   overflow-y: hidden;
 `;
 
-export const Content = styled.div`
+export const Content = styled.div<{$height: number}>`
   padding: 24px;
   overflow-y: scroll;
-  height: 330px;
-  position: relative;
+  height: ${({$height}) => $height}px;
 `;
 
 export const AddAssertionButton = styled(Button).attrs({
