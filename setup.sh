@@ -82,6 +82,9 @@ if [ "$SKIP_JAEGER" != "YES" ]; then
     echo
 
     kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.8.0/cert-manager.yaml
+    echo "--> waiting for cert-manager"
+    kubectl wait --for=condition=ready pod -l app=webhook --namespace cert-manager
+    echo "--> cert-manager ready"
 
     cat <<EOF | kubectl apply -f -
 apiVersion: cert-manager.io/v1
