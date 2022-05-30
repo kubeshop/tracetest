@@ -31,9 +31,9 @@ type TestRun struct {
 
 	CreatedAt time.Time `json:"createdAt,omitempty"`
 
-	StartedAt time.Time `json:"startedAt,omitempty"`
-
 	ServiceTriggeredAt time.Time `json:"serviceTriggeredAt,omitempty"`
+
+	ServiceTriggerCompletedAt time.Time `json:"serviceTriggerCompletedAt,omitempty"`
 
 	ObtainedTraceAt time.Time `json:"obtainedTraceAt,omitempty"`
 

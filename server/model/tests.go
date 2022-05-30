@@ -37,20 +37,21 @@ type (
 	}
 
 	Run struct {
-		ID                 uuid.UUID
-		TraceID            trace.TraceID
-		SpanID             trace.SpanID
-		State              RunState
-		LastError          error
-		CreatedAt          time.Time
-		ServiceTriggeredAt time.Time
-		ObtainedTraceAt    time.Time
-		CompletedAt        time.Time
-		Request            HTTPRequest
-		Response           HTTPResponse
-		Trace              *traces.Trace
-		Results            *RunResults
-		TestVersion        int
+		ID                        uuid.UUID
+		TraceID                   trace.TraceID
+		SpanID                    trace.SpanID
+		State                     RunState
+		LastError                 error
+		CreatedAt                 time.Time
+		ServiceTriggeredAt        time.Time
+		ServiceTriggerCompletedAt time.Time
+		ObtainedTraceAt           time.Time
+		CompletedAt               time.Time
+		Request                   HTTPRequest
+		Response                  HTTPResponse
+		Trace                     *traces.Trace
+		Results                   *RunResults
+		TestVersion               int
 	}
 
 	RunResults struct {
@@ -154,49 +155,55 @@ func (a *Assertion) UnmarshalJSON(data []byte) error {
 
 func (r *Run) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&struct {
-		ID              string
-		TraceID         string
-		SpanID          string
-		State           string
-		LastErrorString string
-		CreatedAt       time.Time
-		CompletedAt     time.Time
-		Request         HTTPRequest
-		Response        HTTPResponse
-		Trace           *traces.Trace
-		Results         *RunResults
+		ID                        string
+		TraceID                   string
+		SpanID                    string
+		State                     string
+		LastErrorString           string
+		CreatedAt                 time.Time
+		ServiceTriggeredAt        time.Time
+		ServiceTriggerCompletedAt time.Time
+		ObtainedTraceAt           time.Time
+		CompletedAt               time.Time
+		Request                   HTTPRequest
+		Response                  HTTPResponse
+		Trace                     *traces.Trace
+		Results                   *RunResults
 	}{
-		ID:              r.ID.String(),
-		TraceID:         r.TraceID.String(),
-		SpanID:          r.SpanID.String(),
-		State:           string(r.State),
-		LastErrorString: errToString(r.LastError),
-		CreatedAt:       r.CreatedAt,
-		CompletedAt:     r.CompletedAt,
-		Request:         r.Request,
-		Response:        r.Response,
-		Trace:           r.Trace,
-		Results:         r.Results,
+		ID:                        r.ID.String(),
+		TraceID:                   r.TraceID.String(),
+		SpanID:                    r.SpanID.String(),
+		State:                     string(r.State),
+		LastErrorString:           errToString(r.LastError),
+		CreatedAt:                 r.CreatedAt,
+		ServiceTriggeredAt:        r.ServiceTriggeredAt,
+		ServiceTriggerCompletedAt: r.ServiceTriggerCompletedAt,
+		ObtainedTraceAt:           r.ObtainedTraceAt,
+		CompletedAt:               r.CompletedAt,
+		Request:                   r.Request,
+		Response:                  r.Response,
+		Trace:                     r.Trace,
+		Results:                   r.Results,
 	})
 }
 
 func (r *Run) UnmarshalJSON(data []byte) error {
 	aux := struct {
-		ID                 string
-		TraceID            string
-		SpanID             string
-		State              string
-		LastErrorString    string
-		CreatedAt          time.Time
-		StartAt            time.Time
-		ServiceTriggeredAt time.Time
-		ObtainedTraceAt    time.Time
-		CompletedAt        time.Time
-		TestVersion        int
-		Request            HTTPRequest
-		Response           HTTPResponse
-		Trace              *traces.Trace
-		Results            *RunResults
+		ID                        string
+		TraceID                   string
+		SpanID                    string
+		State                     string
+		LastErrorString           string
+		CreatedAt                 time.Time
+		ServiceTriggeredAt        time.Time
+		ServiceTriggerCompletedAt time.Time
+		ObtainedTraceAt           time.Time
+		CompletedAt               time.Time
+		TestVersion               int
+		Request                   HTTPRequest
+		Response                  HTTPResponse
+		Trace                     *traces.Trace
+		Results                   *RunResults
 	}{}
 
 	if err := json.Unmarshal(data, &aux); err != nil {

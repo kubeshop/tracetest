@@ -87,10 +87,10 @@ components:
         createdAt:
           type: string
           format: date-time
-        startedAt:
+        serviceTriggeredAt:
           type: string
           format: date-time
-        serviceTriggeredAt:
+        serviceTriggerCompletedAt:
           type: string
           format: date-time
         obtainedTraceAt:

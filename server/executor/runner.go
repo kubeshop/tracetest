@@ -119,6 +119,8 @@ func (r persistentRunner) processExecQueue(job execReq) {
 		r.handleDBError(r.tests.UpdateTestVersion(job.ctx, job.test))
 	}
 
+	run.ServiceTriggerCompletedAt = time.Now()
+
 	r.handleDBError(r.tests.UpdateRun(job.ctx, run))
 	if run.State == model.RunStateAwaitingTrace {
 		// start a new context
@@ -140,14 +142,14 @@ func (r persistentRunner) handleExecutionResult(run model.Run, resp model.HTTPRe
 
 func (r persistentRunner) newTestRun() model.Run {
 	return model.Run{
-		ID:                 r.idGen.UUID(),
-		TraceID:            r.idGen.TraceID(),
-		SpanID:             r.idGen.SpanID(),
-		State:              model.RunStateCreated,
-		CreatedAt:          time.Now(),
-		StartedAt:          time.Time{},
-		ServiceTriggeredAt: time.Time{},
-		ObtainedTraceAt:    time.Time{},
-		CompletedAt:        time.Time{}, // zero value
+		ID:                        r.idGen.UUID(),
+		TraceID:                   r.idGen.TraceID(),
+		SpanID:                    r.idGen.SpanID(),
+		State:                     model.RunStateCreated,
+		CreatedAt:                 time.Now(),
+		ServiceTriggeredAt:        time.Time{},
+		ServiceTriggerCompletedAt: time.Time{},
+		ObtainedTraceAt:           time.Time{},
+		CompletedAt:               time.Time{}, // zero value
 	}
 }
