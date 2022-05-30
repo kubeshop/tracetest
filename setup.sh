@@ -61,8 +61,8 @@ echo
 helm repo add kubeshop https://kubeshop.github.io/helm-charts
 helm repo update
 
-helm install tracetest kubeshop/tracetest \
-  --namespace $NAMESPACE \
+helm upgrade --install tracetest kubeshop/tracetest \
+  --namespace $NAMESPACE --create-namespace \
   --set tracingBackend=$TRACE_BACKEND \
   --set ${TRACE_BACKEND}ConnectionConfig.endpoint="$TRACE_BACKEND_ENDPOINT"
 
@@ -79,5 +79,21 @@ if [ "$SKIP_PMA" != "YES" ]; then
     curl -L https://github.com/kubeshop/pokeshop/tarball/master | tar -xz --strip-components 1 -C  $tmpdir
     cd $tmpdir/helm-chart
     helm dependency update
-    helm install -n $NAMESPACE -f values.yaml .
+    helm upgrade --install pokeshop . \
+      -n $NAMESPACE \
+      -f values.yaml \
+      --set 'env[2].valueFrom.secretKeyRef.name=pokeshop-rabbitmq'
+
 fi
+
+
+echo "----------------------------"
+echo "Install complete"
+echo "----------------------------"
+echo
+echo "to connect to tracetest, run:"
+echo "  kubectl port-forward --namespace ${NAMESPACE} svc/tracetest 8080:8080"
+echo "and navigate to http://localhost:8080"
+echo
+echo "to see tracetest logs: kubectl logs --namespace ${NAMESPACE} -f tracetest svc/tracetest"
+
