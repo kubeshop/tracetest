@@ -25,13 +25,16 @@ type TestRun struct {
 	// Current execution state
 	State *string `json:"state,omitempty"`
 	// Details of the cause for the last `FAILED` state
-	LastErrorState *string           `json:"lastErrorState,omitempty"`
-	CreatedAt      *time.Time        `json:"createdAt,omitempty"`
-	CompletedAt    *time.Time        `json:"completedAt,omitempty"`
-	Request        *HTTPRequest      `json:"request,omitempty"`
-	Response       *HTTPResponse     `json:"response,omitempty"`
-	Trace          *Trace            `json:"trace,omitempty"`
-	Result         *AssertionResults `json:"result,omitempty"`
+	LastErrorState            *string           `json:"lastErrorState,omitempty"`
+	CreatedAt                 *time.Time        `json:"createdAt,omitempty"`
+	ServiceTriggeredAt        *time.Time        `json:"serviceTriggeredAt,omitempty"`
+	ServiceTriggerCompletedAt *time.Time        `json:"serviceTriggerCompletedAt,omitempty"`
+	ObtainedTraceAt           *time.Time        `json:"obtainedTraceAt,omitempty"`
+	CompletedAt               *time.Time        `json:"completedAt,omitempty"`
+	Request                   *HTTPRequest      `json:"request,omitempty"`
+	Response                  *HTTPResponse     `json:"response,omitempty"`
+	Trace                     *Trace            `json:"trace,omitempty"`
+	Result                    *AssertionResults `json:"result,omitempty"`
 }
 
 // NewTestRun instantiates a new TestRun object
@@ -275,6 +278,102 @@ func (o *TestRun) SetCreatedAt(v time.Time) {
 	o.CreatedAt = &v
 }
 
+// GetServiceTriggeredAt returns the ServiceTriggeredAt field value if set, zero value otherwise.
+func (o *TestRun) GetServiceTriggeredAt() time.Time {
+	if o == nil || o.ServiceTriggeredAt == nil {
+		var ret time.Time
+		return ret
+	}
+	return *o.ServiceTriggeredAt
+}
+
+// GetServiceTriggeredAtOk returns a tuple with the ServiceTriggeredAt field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *TestRun) GetServiceTriggeredAtOk() (*time.Time, bool) {
+	if o == nil || o.ServiceTriggeredAt == nil {
+		return nil, false
+	}
+	return o.ServiceTriggeredAt, true
+}
+
+// HasServiceTriggeredAt returns a boolean if a field has been set.
+func (o *TestRun) HasServiceTriggeredAt() bool {
+	if o != nil && o.ServiceTriggeredAt != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetServiceTriggeredAt gets a reference to the given time.Time and assigns it to the ServiceTriggeredAt field.
+func (o *TestRun) SetServiceTriggeredAt(v time.Time) {
+	o.ServiceTriggeredAt = &v
+}
+
+// GetServiceTriggerCompletedAt returns the ServiceTriggerCompletedAt field value if set, zero value otherwise.
+func (o *TestRun) GetServiceTriggerCompletedAt() time.Time {
+	if o == nil || o.ServiceTriggerCompletedAt == nil {
+		var ret time.Time
+		return ret
+	}
+	return *o.ServiceTriggerCompletedAt
+}
+
+// GetServiceTriggerCompletedAtOk returns a tuple with the ServiceTriggerCompletedAt field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *TestRun) GetServiceTriggerCompletedAtOk() (*time.Time, bool) {
+	if o == nil || o.ServiceTriggerCompletedAt == nil {
+		return nil, false
+	}
+	return o.ServiceTriggerCompletedAt, true
+}
+
+// HasServiceTriggerCompletedAt returns a boolean if a field has been set.
+func (o *TestRun) HasServiceTriggerCompletedAt() bool {
+	if o != nil && o.ServiceTriggerCompletedAt != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetServiceTriggerCompletedAt gets a reference to the given time.Time and assigns it to the ServiceTriggerCompletedAt field.
+func (o *TestRun) SetServiceTriggerCompletedAt(v time.Time) {
+	o.ServiceTriggerCompletedAt = &v
+}
+
+// GetObtainedTraceAt returns the ObtainedTraceAt field value if set, zero value otherwise.
+func (o *TestRun) GetObtainedTraceAt() time.Time {
+	if o == nil || o.ObtainedTraceAt == nil {
+		var ret time.Time
+		return ret
+	}
+	return *o.ObtainedTraceAt
+}
+
+// GetObtainedTraceAtOk returns a tuple with the ObtainedTraceAt field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *TestRun) GetObtainedTraceAtOk() (*time.Time, bool) {
+	if o == nil || o.ObtainedTraceAt == nil {
+		return nil, false
+	}
+	return o.ObtainedTraceAt, true
+}
+
+// HasObtainedTraceAt returns a boolean if a field has been set.
+func (o *TestRun) HasObtainedTraceAt() bool {
+	if o != nil && o.ObtainedTraceAt != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetObtainedTraceAt gets a reference to the given time.Time and assigns it to the ObtainedTraceAt field.
+func (o *TestRun) SetObtainedTraceAt(v time.Time) {
+	o.ObtainedTraceAt = &v
+}
+
 // GetCompletedAt returns the CompletedAt field value if set, zero value otherwise.
 func (o *TestRun) GetCompletedAt() time.Time {
 	if o == nil || o.CompletedAt == nil {
@@ -457,6 +556,15 @@ func (o TestRun) MarshalJSON() ([]byte, error) {
 	}
 	if o.CreatedAt != nil {
 		toSerialize["createdAt"] = o.CreatedAt
+	}
+	if o.ServiceTriggeredAt != nil {
+		toSerialize["serviceTriggeredAt"] = o.ServiceTriggeredAt
+	}
+	if o.ServiceTriggerCompletedAt != nil {
+		toSerialize["serviceTriggerCompletedAt"] = o.ServiceTriggerCompletedAt
+	}
+	if o.ObtainedTraceAt != nil {
+		toSerialize["obtainedTraceAt"] = o.ObtainedTraceAt
 	}
 	if o.CompletedAt != nil {
 		toSerialize["completedAt"] = o.CompletedAt
