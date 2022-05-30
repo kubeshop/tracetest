@@ -84,7 +84,7 @@ const Diagram: React.FC<IDiagramProps> = ({affectedSpans, trace, selectedSpan, o
   }, [dagLayout, spanMap, selectedSpan?.id]);
 
   return (
-    <S.Container showAffected={affectedSpans.length > 0} data-cy="diagram-dag">
+    <S.Container $showAffected={affectedSpans.length > 0} data-cy="diagram-dag">
       <ReactFlow
         nodeTypes={{TraceNode}}
         defaultZoom={0.5}

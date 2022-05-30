@@ -223,7 +223,7 @@ export const TimelineChart = ({affectedSpans, trace, selectedSpan, onSelectSpan}
   }, [selectedSpan?.id, drawChart]);
 
   return (
-    <S.Container barHeight={barHeight} showAffected={affectedSpans.length > 0}>
+    <S.Container $barHeight={barHeight} $showAffected={affectedSpans.length > 0}>
       <svg ref={svgRef} />
     </S.Container>
   );

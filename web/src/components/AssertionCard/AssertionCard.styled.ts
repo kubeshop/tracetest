@@ -2,9 +2,9 @@ import {DeleteOutlined, EditOutlined} from '@ant-design/icons';
 import {Tag, Typography} from 'antd';
 import styled, {css} from 'styled-components';
 
-export const AssertionCard = styled.div<{isSelected: boolean}>`
+export const AssertionCard = styled.div<{$isSelected: boolean}>`
   border-radius: 2px;
-  border: ${({isSelected}) => (isSelected ? '1px solid #031849' : '1px solid rgba(3, 24, 73, 0.1)')};
+  border: ${({$isSelected}) => ($isSelected ? '1px solid #031849' : '1px solid rgba(3, 24, 73, 0.1)')};
 `;
 
 export const Header = styled.div`

@@ -55,7 +55,7 @@ const AssertionCard: React.FC<TAssertionCardProps> = ({
   };
 
   return (
-    <S.AssertionCard data-cy="assertion-card" isSelected={selectedAssertion === selector}>
+    <S.AssertionCard data-cy="assertion-card" $isSelected={selectedAssertion === selector}>
       <S.Header onClick={handleOnClick}>
         <div>
           <S.SelectorListText>

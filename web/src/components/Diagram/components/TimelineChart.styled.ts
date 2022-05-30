@@ -1,9 +1,9 @@
 import styled, {css} from 'styled-components';
 
-export const Container = styled.div<{barHeight: number; showAffected: boolean}>`
+export const Container = styled.div<{$barHeight: number; $showAffected: boolean}>`
   .rect-svg {
     width: 100%;
-    height: ${({barHeight}) => `${barHeight}px`};
+    height: ${({$barHeight}) => `${$barHeight}px`};
     stroke: none;
     fill: none;
 
@@ -20,7 +20,7 @@ export const Container = styled.div<{barHeight: number; showAffected: boolean}>`
 
   .span-name {
     width: 180px;
-    height ${({barHeight}) => `${barHeight}px`};
+    height ${({$barHeight}) => `${$barHeight}px`};
     fill: #000;
     font-size: 14px;
     pointer-events: none;
@@ -30,7 +30,7 @@ export const Container = styled.div<{barHeight: number; showAffected: boolean}>`
 
   .span-duration {
     width: 100px;
-    height: ${({barHeight}) => `${barHeight}px`};
+    height: ${({$barHeight}) => `${$barHeight}px`};
     fill: #9AA3AB;
     font-size: 14px;
     pointer-events: none;
@@ -53,7 +53,7 @@ export const Container = styled.div<{barHeight: number; showAffected: boolean}>`
   }
 
   .node {
-    height: ${({barHeight}) => `${barHeight}px`};
+    height: ${({$barHeight}) => `${$barHeight}px`};
     cursor: pointer;
     pointer-events: bounding-box;
   }
@@ -83,8 +83,8 @@ export const Container = styled.div<{barHeight: number; showAffected: boolean}>`
     font-size: 14px;
   }
 
-  ${({showAffected}) =>
-    showAffected &&
+  ${({$showAffected}) =>
+    $showAffected &&
     css`
       .rect-svg:not(.rect-svg-affected) ~ .span-name,
       .rect-svg:not(.rect-svg-affected) ~ .span-duration,
