@@ -99,6 +99,7 @@ EOF
     kubectl create -f https://github.com/jaegertracing/jaeger-operator/releases/download/v1.32.0/jaeger-operator.yaml -n observability
     echo "--> waiting for jaeger-operator"
     kubectl wait --for=condition=ready pod -l name=jaeger-operator --namespace observability --timeout 5m
+    sleep 5
     echo "--> jaeger-operator ready"
 
     cat <<EOF | kubectl apply --namespace $NAMESPACE -f -
