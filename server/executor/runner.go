@@ -70,7 +70,6 @@ func (r persistentRunner) Start(workers int) {
 					fmt.Println("persistentRunner exit goroutine")
 					return
 				case job := <-r.executeQueue:
-					job.run.StartedAt = time.Now()
 					fmt.Printf(
 						"persistentRunner job. ID %s, testID %s, TraceID %s, SpanID %s\n",
 						job.run.ID,

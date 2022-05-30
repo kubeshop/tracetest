@@ -202,7 +202,7 @@ func (tp tracePoller) donePollingTraces(job tracePollReq, trace traces.Trace) bo
 func (tp tracePoller) handleTraceDBError(job tracePollReq, err error) {
 	run := job.run
 	if errors.Is(err, tracedb.ErrTraceNotFound) {
-		if time.Since(run.CreatedAt) < tp.maxWaitTimeForTrace {
+		if time.Since(run.ServiceTriggeredAt) < tp.maxWaitTimeForTrace {
 			tp.requeue(job)
 			return
 		}

@@ -43,7 +43,6 @@ type (
 		State              RunState
 		LastError          error
 		CreatedAt          time.Time
-		StartedAt          time.Time
 		ServiceTriggeredAt time.Time
 		ObtainedTraceAt    time.Time
 		CompletedAt        time.Time
@@ -225,7 +224,6 @@ func (r *Run) UnmarshalJSON(data []byte) error {
 	r.State = RunState(aux.State)
 	r.LastError = stringToErr(aux.LastErrorString)
 	r.CreatedAt = aux.CreatedAt
-	r.StartedAt = aux.StartAt
 	r.ServiceTriggeredAt = aux.ServiceTriggeredAt
 	r.ObtainedTraceAt = aux.ObtainedTraceAt
 	r.CompletedAt = aux.CompletedAt
