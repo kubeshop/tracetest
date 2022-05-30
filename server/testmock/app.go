@@ -22,6 +22,9 @@ func GetTestingApp(demoApp *DemoApp) (*app.App, error) {
 				Insecure: true,
 			},
 		},
+		PoolingConfig: config.PoolingConfig{
+			RetryDelay: "5s",
+		},
 	}
 
 	tracedb, err := tracedb.New(config)

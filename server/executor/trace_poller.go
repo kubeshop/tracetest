@@ -30,11 +30,11 @@ type TraceFetcher interface {
 func NewTracePoller(
 	tf TraceFetcher,
 	tests model.Repository,
+	retryDelay time.Duration,
 	maxWaitTimeForTrace time.Duration,
 	subscriptionManager *subscription.Manager,
 	assertionRunner AssertionRunner,
 ) PersistentTracePoller {
-	retryDelay := 1 * time.Second
 	maxTracePollRetry := int(math.Ceil(float64(maxWaitTimeForTrace) / float64(retryDelay)))
 	return tracePoller{
 		tests:               tests,
