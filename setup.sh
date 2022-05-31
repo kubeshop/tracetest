@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 NAMESPACE="tracetest"
 TRACE_BACKEND="jaeger"
 TRACE_BACKEND_ENDPOINT="jaeger-query:16685"
@@ -67,6 +69,8 @@ echo
 helm repo add kubeshop https://kubeshop.github.io/helm-charts
 helm repo update
 
+
+echo "--> install tracetest to namespace $NAMESPACE"
 helm upgrade --install tracetest kubeshop/tracetest \
   --namespace $NAMESPACE --create-namespace \
   --set tracingBackend=$TRACE_BACKEND \
@@ -81,10 +85,14 @@ if [ "$SKIP_JAEGER" != "YES" ]; then
     echo
     echo
 
+    echo
+    echo "--> install cert-manager"
     kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.8.0/cert-manager.yaml
+    echo
     echo "--> waiting for cert-manager"
     kubectl wait --for=condition=ready pod -l app=webhook --namespace cert-manager
     echo "--> cert-manager ready"
+    echo
 
     cat <<EOF | kubectl apply -f -
 apiVersion: cert-manager.io/v1
@@ -95,12 +103,16 @@ spec:
   selfSigned: {}
 EOF
 
+    echo
+    echo "--> install jaeger"
     kubectl create namespace observability
     kubectl create -f https://github.com/jaegertracing/jaeger-operator/releases/download/v1.32.0/jaeger-operator.yaml -n observability
+    echo
     echo "--> waiting for jaeger-operator"
     kubectl wait --for=condition=ready pod -l name=jaeger-operator --namespace observability --timeout 5m
     sleep 5
     echo "--> jaeger-operator ready"
+    echo
 
     cat <<EOF | kubectl apply --namespace $NAMESPACE -f -
 apiVersion: jaegertracing.io/v1
@@ -129,7 +141,8 @@ if [ "$SKIP_PMA" != "YES" ]; then
 
 fi
 
-
+echo
+echo
 echo "----------------------------"
 echo "Install complete"
 echo "----------------------------"
