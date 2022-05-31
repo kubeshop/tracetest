@@ -11,6 +11,7 @@ const AssertionResults = ({allPassed = false, results = []}: TRawAssertionResult
       id: uniqueId(),
       selector,
       spanIds: AssertionService.getSpanIds(resultList),
+      originalSelector: selector,
       pseudoSelector: SelectorService.getPseudoSelector(selector),
       selectorList: SelectorService.getSpanSelectorList(selector),
       resultList: resultList.map(assertionResult => AssertionResult(assertionResult)),

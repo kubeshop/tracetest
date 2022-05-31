@@ -1,7 +1,7 @@
 import {noop} from 'lodash';
-import {createContext, useContext, useMemo, useEffect, useCallback} from 'react';
 
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
+import {createContext, useCallback, useContext, useEffect, useMemo} from 'react';
 import {useGetTestByIdQuery} from 'redux/apis/TraceTest.api';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import {
@@ -15,6 +15,7 @@ import {TTestDefinitionEntry} from 'types/TestDefinition.types';
 import useTestDefinitionCrud from './hooks/useTestDefinitionCrud';
 
 interface IContext {
+  revert: (originalSelector: string) => void;
   add(testDefinition: TTestDefinitionEntry): void;
   update(selector: string, testDefinition: TTestDefinitionEntry): void;
   remove(selector: string): void;
@@ -33,6 +34,7 @@ interface IContext {
 
 export const Context = createContext<IContext>({
   add: noop,
+  revert: () => noop,
   update: noop,
   remove: noop,
   publish: noop,
@@ -62,7 +64,7 @@ const TestDefinitionProvider: React.FC<IProps> = ({children, testId, runId}) => 
   const isInitialized = useAppSelector(state => TestDefinitionSelectors.selectIsInitialized(state));
   const {data: test} = useGetTestByIdQuery({testId});
 
-  const {add, cancel, publish, remove, dryRun, update, isDraftMode, init, reset} = useTestDefinitionCrud({
+  const {add, cancel, publish, remove, dryRun, update, isDraftMode, init, reset, revert} = useTestDefinitionCrud({
     testId,
     runId,
   });
@@ -75,7 +77,7 @@ const TestDefinitionProvider: React.FC<IProps> = ({children, testId, runId}) => 
     return () => {
       reset();
     };
-  }, []);
+  }, [reset]);
 
   useEffect(() => {
     if (isInitialized && run.state === 'FINISHED') dryRun(definitionList);
@@ -111,8 +113,10 @@ const TestDefinitionProvider: React.FC<IProps> = ({children, testId, runId}) => 
       test,
       setAffectedSpans,
       setSelectedAssertion,
+      revert,
     }),
     [
+      revert,
       add,
       assertionResults,
       cancel,

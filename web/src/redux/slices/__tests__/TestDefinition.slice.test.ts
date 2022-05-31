@@ -6,21 +6,26 @@ import TestRunMock from '../../../models/__mocks__/TestRun.mock';
 import {TTestDefinitionEntry} from '../../../types/TestDefinition.types';
 import Reducer, {
   addDefinition,
+  assertionResultsToDefinitionList,
   initDefinitionList,
-  resetDefinitionList,
+  initialState,
   removeDefinition,
   reset,
+  resetDefinitionList,
+  revertDefinition,
   setAssertionResults,
-  initialState,
-  assertionResultsToDefinitionList,
   updateDefinition,
 } from '../TestDefinition.slice';
 
 const {definitionList} = TestDefinitionMock.model();
+
+const definitionSelector = `span[http.status_code] = "304"]`;
+
 const definition: TTestDefinitionEntry = {
-  selector: `span[http.status_code] = "304"]`,
+  selector: definitionSelector,
   isDraft: true,
   assertionList: new Array(faker.datatype.number({min: 2, max: 10})).fill(null).map(() => AssertionMock.model()),
+  originalSelector: definitionSelector,
 };
 
 const state = {
@@ -98,6 +103,25 @@ describe('TestDefinitionReducer', () => {
         ...initialState,
         definitionList: [definition, ...definitionList.slice(1, definitionList.length)],
       });
+    });
+    it('should handle the revert definition action', () => {
+      const initialSelector = 'span[http.status_code] = "204"]';
+      const result = Reducer(
+        {
+          ...state,
+          definitionList: [
+            {
+              ...definition,
+              originalSelector: initialSelector,
+            },
+          ],
+        },
+        revertDefinition({
+          originalSelector: definitionSelector,
+        })
+      );
+
+      expect(result.definitionList[0].originalSelector).toEqual(initialSelector);
     });
 
     it('should handle the remove definition action', () => {
