@@ -71,7 +71,7 @@ func (td *postgresDB) GetRun(ctx context.Context, id uuid.UUID) (model.Run, erro
 }
 
 func (td *postgresDB) GetTestRuns(ctx context.Context, test model.Test, take, skip int32) ([]model.Run, error) {
-	stmt, err := td.db.Prepare("SELECT run, test_version FROM runs WHERE test_id = $1 ORDER BY run ->> 'createdAt' DESC LIMIT $2 OFFSET $3")
+	stmt, err := td.db.Prepare("SELECT run, test_version FROM runs WHERE test_id = $1 ORDER BY (run ->> 'CreatedAt')::timestamp DESC LIMIT $2 OFFSET $3")
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +95,7 @@ func (td *postgresDB) GetTestRuns(ctx context.Context, test model.Test, take, sk
 }
 
 func (td *postgresDB) GetRunByTraceID(ctx context.Context, test model.Test, traceID trace.TraceID) (model.Run, error) {
-	stmt, err := td.db.Prepare("SELECT run, test_version FROM runs WHERE test_id = $1 AND run ->> 'traceId' = $2")
+	stmt, err := td.db.Prepare("SELECT run, test_version FROM runs WHERE test_id = $1 AND run ->> 'TraceId' = $2")
 	if err != nil {
 		return model.Run{}, err
 	}
