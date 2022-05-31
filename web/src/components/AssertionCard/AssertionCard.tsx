@@ -64,10 +64,21 @@ const AssertionCard: React.FC<TAssertionCardProps> = ({
           {isDeleted && <S.StatusTag color="#61175E">deleted</S.StatusTag>}
           <S.SpanCountText>{spanCountText}</S.SpanCountText>
           <Tooltip color="white" title="Edit Assertion">
-            <S.EditIcon data-cy="edit-assertion-button" onClick={() => onEdit(assertionResult)} />
+            <S.EditIcon
+              data-cy="edit-assertion-button"
+              onClick={e => {
+                e.stopPropagation();
+                onEdit(assertionResult);
+              }}
+            />
           </Tooltip>
           <Tooltip color="white" title="Delete Assertion">
-            <S.DeleteIcon onClick={() => onDelete(selector)} />
+            <S.DeleteIcon
+              onClick={e => {
+                e.stopPropagation();
+                onDelete(selector);
+              }}
+            />
           </Tooltip>
         </S.ActionsContainer>
       </S.Header>
