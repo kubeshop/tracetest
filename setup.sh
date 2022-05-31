@@ -141,7 +141,12 @@ if [ "$SKIP_PMA" != "YES" ]; then
     helm dependency update
     helm upgrade --install demo . \
       --namespace demo --create-namespace \
-      -f values.yaml
+      -f values.yaml \
+      --set 'env.[0].value=postgresql://ashketchum:squirtle123@demo-postgresql:5432/pokeshop?schema=public' \
+      --set 'env.[1].value=demo-redis-master' \
+      --set 'env.[3]value=pokemon:$(RABBITMQ_PASSWORD)@demo-rabbitmq-headless' \
+      --set 'env.[4]value=https://pokeapi.co/api/v2' \
+      --set 'env.[5]value=jaeger-agent.'$NAMESPACE'.svc.cluster.local'
 fi
 
 echo
@@ -151,8 +156,9 @@ echo "Install complete"
 echo "----------------------------"
 echo
 echo "to connect to tracetest, run:"
-echo "  kubectl port-forward --namespace ${NAMESPACE} svc/tracetest 8080:8080"
+echo "  kubectl port-forward --namespace $NAMESPACE svc/tracetest 8080:8080"
 echo "and navigate to http://localhost:8080"
 echo
-echo "to see tracetest logs: kubectl logs --namespace ${NAMESPACE} -f tracetest svc/tracetest"
+echo "to see tracetest logs:"
+echo "  kubectl logs --namespace $NAMESPACE -f svc/tracetest"
 
