@@ -75,6 +75,9 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
   const attributeList = useAppSelector(state =>
     AssertionSelectors.selectAttributeList(state, testId, runId, spanIdList)
   );
+  const selectorAttributeList = useAppSelector(state =>
+    AssertionSelectors.selectSelectorAttributeList(state, testId, runId, spanIdList, currentSelectorList)
+  );
   const definitionSelectorList = useAppSelector(state => TestDefinitionSelectors.selectDefinitionSelectorList(state));
 
   const onFieldsChange = useCallback(
@@ -149,7 +152,7 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
             ]}
             data-tour={GuidedTourService.getStep(GuidedTours.Assertion, Steps.Selectors)}
           >
-            <AssertionFormSelectorInput attributeList={attributeList} />
+            <AssertionFormSelectorInput attributeList={selectorAttributeList} />
           </Form.Item>
           <Form.Item name="pseudoSelector">
             <AssertionFormPseudoSelectorInput />

@@ -1,4 +1,4 @@
-import {Badge, Typography} from 'antd';
+import {Badge, Tooltip, Typography} from 'antd';
 import styled from 'styled-components';
 import {SemanticGroupNames} from '../../constants/SemanticGroupNames.constants';
 import {getNotchColor} from '../TraceNode/TraceNode.styled';
@@ -18,6 +18,12 @@ export const Entry = styled.div`
   overflow: hidden;
 `;
 
+export const SelectorEntry = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+`;
+
 export const Label = styled(Typography.Text).attrs({
   type: 'secondary',
 })`
@@ -34,8 +40,15 @@ export const LabelBadge = styled(Badge)<{spanType?: SemanticGroupNames}>`
     color: black;
     margin-right: 6px;
     border-radius: 2px;
+    margin-bottom: 8px;
   }
 `;
+
+export const LabelTooltip = styled(Tooltip).attrs({
+  color: '#FBFBFF',
+  placement: 'top',
+  arrowPointAtCenter: true,
+})``;
 
 export const SelectedLabelBadge = styled(LabelBadge)`
   > sup {

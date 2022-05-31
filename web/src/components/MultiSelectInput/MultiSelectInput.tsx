@@ -10,7 +10,7 @@ interface IProps {
   }[];
   onEntry(entry: string[]): void;
   onStepEntry?(name: string, entry: string): void;
-  onDeselect(entryNumber: number): void;
+  onDeselect(entry: string[]): void;
   onClear(): void;
   placeholder?: string;
   defaultValueList?: LabeledValue[];
@@ -88,7 +88,12 @@ const MultiSelectInput: React.FC<IProps> = ({
         })
       );
 
-      onDeselect(entryNumber);
+      const deselectedEntry = selectedItemList.reduce<string[]>((list, {value, label}) => {
+        const [, , number] = String(value).split(SEPARATOR);
+
+        return Number(number) === entryNumber ? list.concat(label as string) : list;
+      }, []);
+      onDeselect(deselectedEntry);
     },
     [onDeselect, selectedItemList]
   );

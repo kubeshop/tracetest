@@ -1,4 +1,4 @@
-import {capitalize, difference} from 'lodash';
+import {capitalize} from 'lodash';
 import {useMemo} from 'react';
 import {useTestRun} from '../../providers/TestRun/TestRun.provider';
 import OperatorService from '../../services/Operator.service';
@@ -10,17 +10,13 @@ import * as S from './AssertionCheckRow.styled';
 interface TAssertionCheckRowProps {
   result: TAssertionSpanResult;
   assertion: TAssertion;
-  assertionSelectorList: string[];
-
   getIsSelectedSpan(spanId: string): boolean;
-
   onSelectSpan(spanId: string): void;
 }
 
 const AssertionCheckRow: React.FC<TAssertionCheckRowProps> = ({
   result: {observedValue, passed, spanId},
   assertion: {attribute, comparator, expected},
-  assertionSelectorList,
   getIsSelectedSpan,
   onSelectSpan,
 }) => {
@@ -29,25 +25,25 @@ const AssertionCheckRow: React.FC<TAssertionCheckRowProps> = ({
   } = useTestRun();
   const span = useMemo(() => trace?.spans.find(({id}) => id === spanId), [spanId, trace?.spans]);
 
-  const signatureSelectorList = span?.signature.map(({value}) => value);
-  const spanLabelList = difference(signatureSelectorList, assertionSelectorList);
   const badgeList = useMemo(() => {
     const isSelected = getIsSelectedSpan(spanId);
+    const signatureSelectorList = span?.signature || [];
 
     return (isSelected ? [<S.SelectedLabelBadge count="selected" key="selected" />] : []).concat(
-      spanLabelList.map((label, index) => (
-        // eslint-disable-next-line react/no-array-index-key
-        <S.LabelBadge spanType={!index ? span?.type : undefined} count={label} key={`${label}-${index}`} />
+      signatureSelectorList.map(({key, value}, index) => (
+        <S.LabelTooltip title={key} key={key}>
+          <S.LabelBadge spanType={!index ? span?.type : undefined} count={value} />
+        </S.LabelTooltip>
       ))
     );
-  }, [getIsSelectedSpan, spanId, spanLabelList, span?.type]);
+  }, [getIsSelectedSpan, spanId, span?.signature, span?.type]);
 
   return (
     <S.AssertionCheckRow onClick={() => onSelectSpan(spanId)}>
-      <S.Entry>
+      <S.SelectorEntry>
         <S.Label>Span Labels</S.Label>
         <S.Value>{badgeList}</S.Value>
-      </S.Entry>
+      </S.SelectorEntry>
       <S.Entry>
         <S.Label>Attribute</S.Label>
         <S.Value>{attribute}</S.Value>

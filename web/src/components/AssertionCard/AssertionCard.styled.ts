@@ -24,15 +24,11 @@ export const Body = styled.div`
   gap: 9px;
 `;
 
-export const SelectorListText = styled(Typography.Text).attrs({
-  strong: true,
-})`
+export const SpanCountText = styled(Typography.Text)`
+  font-size: 12px;
   margin-right: 14px;
 `;
 
-export const SpanCountText = styled(Typography.Text)`
-  font-size: 12px;
-`;
 const baseIcon = css`
   font-size: 18px;
   color: #61175e;
@@ -56,3 +52,22 @@ export const ActionsContainer = styled.div`
 export const StatusTag = styled(Tag).attrs({
   color: '#61175E',
 })``;
+
+export const Selector = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+export const SelectorList = styled.div`
+  display: flex;
+  gap: 14px;
+`;
+
+export const SelectorValueText = styled(Typography.Text)``;
+
+export const SelectorAttributeText = styled(Typography.Text).attrs({
+  type: 'secondary',
+})`
+  font-size: 10px;
+  margin-bottom: -3px;
+`;
