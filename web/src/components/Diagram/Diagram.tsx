@@ -9,10 +9,11 @@ export enum SupportedDiagrams {
 }
 
 export interface IDiagramProps {
-  type: SupportedDiagrams;
-  trace: TTrace;
-  selectedSpan?: TSpan;
+  affectedSpans: string[];
   onSelectSpan?(spanId: string): void;
+  selectedSpan?: TSpan;
+  trace: TTrace;
+  type: SupportedDiagrams;
 }
 
 const ComponentMap: Record<string, typeof DAGComponent | typeof TimelineChart> = {

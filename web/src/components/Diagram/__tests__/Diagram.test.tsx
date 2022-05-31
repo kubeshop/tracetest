@@ -15,6 +15,7 @@ test('Diagram DAG', async () => {
     <div style={{width: 200, height: 200}}>
       <ReactFlowProvider>
         <Diagram
+          affectedSpans={[]}
           type={SupportedDiagrams.DAG}
           trace={TraceMock.model()}
           onSelectSpan={jest.fn()}
@@ -31,6 +32,7 @@ test('Diagram Timeline', async () => {
     <div style={{width: 200, height: 200}}>
       <ReactFlowProvider>
         <Diagram
+          affectedSpans={[]}
           type={SupportedDiagrams.Timeline}
           trace={TraceMock.model()}
           onSelectSpan={jest.fn()}

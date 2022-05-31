@@ -1,10 +1,12 @@
 import {Tooltip} from 'antd';
 import {useCallback} from 'react';
 import {useStore} from 'react-flow-renderer';
-import {useAppSelector} from '../../redux/hooks';
-import TestDefinitionSelectors from '../../selectors/TestDefinition.selectors';
-import {TAssertionResultEntry} from '../../types/Assertion.types';
-import AssertionCheckRow from '../AssertionCheckRow';
+
+import AssertionCheckRow from 'components/AssertionCheckRow';
+import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
+import {useAppSelector} from 'redux/hooks';
+import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
+import {TAssertionResultEntry} from 'types/Assertion.types';
 import * as S from './AssertionCard.styled';
 import AssertionCardSelectorList from './AssertionCardSelectorList';
 
@@ -16,18 +18,20 @@ interface TAssertionCardProps {
 }
 
 const AssertionCard: React.FC<TAssertionCardProps> = ({
-  assertionResult: {selector, resultList, selectorList, pseudoSelector, spanCount},
+  assertionResult: {selector, resultList, selectorList, pseudoSelector, spanIds},
   assertionResult,
   onSelectSpan,
   onDelete,
   onEdit,
 }) => {
+  const {setSelectedAssertion} = useTestDefinition();
   const store = useStore();
   const {selectedElements} = store.getState();
 
-  const spanCountText = `${spanCount} ${spanCount > 1 ? 'spans' : 'span'}`;
+  const selectedAssertion = useAppSelector(TestDefinitionSelectors.selectSelectedAssertion);
   const {isDraft = false, isDeleted = false} =
     useAppSelector(state => TestDefinitionSelectors.selectDefinitionBySelector(state, selector)) || {};
+  const spanCountText = `${spanIds.length} ${spanIds.length > 1 ? 'spans' : 'span'}`;
 
   const getIsSelectedSpan = useCallback(
     (id: string): boolean => {
@@ -38,10 +42,23 @@ const AssertionCard: React.FC<TAssertionCardProps> = ({
     [selectedElements]
   );
 
+  const handleOnClick = () => {
+    if (selectedAssertion === selector) {
+      return setSelectedAssertion('');
+    }
+    setSelectedAssertion(selector);
+  };
+
   return (
-    <S.AssertionCard data-cy="assertion-card" id={`assertion-${assertionResult.selector}`}>
-      <S.Header>
-        <AssertionCardSelectorList selectorList={selectorList} pseudoSelector={pseudoSelector} />
+    <S.AssertionCard
+      $isSelected={selectedAssertion === selector}
+      data-cy="assertion-card"
+      id={`assertion-${assertionResult.selector}`}
+    >
+      <S.Header onClick={handleOnClick}>
+        <div>
+          <AssertionCardSelectorList selectorList={selectorList} pseudoSelector={pseudoSelector} />
+        </div>
         <S.ActionsContainer>
           {isDraft && <S.StatusTag>draft</S.StatusTag>}
           {isDeleted && <S.StatusTag color="#61175E">deleted</S.StatusTag>}

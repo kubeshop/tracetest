@@ -16,5 +16,4 @@ test('useHandleOnSpanSelectedCallback', () => {
   expect(addSelected).toBeCalled();
   expect(addSelected).toBeCalledWith([{id: spanId}]);
   expect(selectedSpan).toBeCalled();
-  expect(selectedSpan).toBeCalledWith(SpanMock.model());
 });
