@@ -1,9 +1,10 @@
-import {createSlice, PayloadAction} from '@reduxjs/toolkit';
+import {CaseReducer, createSlice, PayloadAction} from '@reduxjs/toolkit';
+import getUuidByString from 'uuid-by-string';
 import {TAssertionResults} from '../../types/Assertion.types';
 import {TTestDefinitionEntry} from '../../types/TestDefinition.types';
 import TestDefinitionActions, {TChange} from '../actions/TestDefinition.actions';
 
-interface ITestDefinitionState {
+export interface ITestDefinitionState {
   initialDefinitionList: TTestDefinitionEntry[];
   definitionList: TTestDefinitionEntry[];
   assertionResults?: TAssertionResults;
@@ -25,43 +26,61 @@ export const assertionResultsToDefinitionList = (assertionResults: TAssertionRes
     isDraft: false,
     isDeleted: false,
     selector,
+    id: getUuidByString(selector),
     assertionList: resultList.flatMap(({assertion}) => [assertion]),
   }));
 };
 
-const testDefinitionSlice = createSlice({
+const testDefinitionSlice = createSlice<
+  ITestDefinitionState,
+  {
+    reset: CaseReducer<ITestDefinitionState>;
+    initDefinitionList: CaseReducer<ITestDefinitionState, PayloadAction<{assertionResults: TAssertionResults}>>;
+    addDefinition: CaseReducer<ITestDefinitionState, PayloadAction<{definition: TTestDefinitionEntry}>>;
+    updateDefinition: CaseReducer<
+      ITestDefinitionState,
+      PayloadAction<{definition: TTestDefinitionEntry; selector: string}>
+    >;
+    removeDefinition: CaseReducer<ITestDefinitionState, PayloadAction<{selector: string}>>;
+    revertDefinition: CaseReducer<ITestDefinitionState, PayloadAction<{id?: string}>>;
+    resetDefinitionList: CaseReducer<ITestDefinitionState>;
+    setAssertionResults: CaseReducer<ITestDefinitionState, PayloadAction<TAssertionResults>>;
+  },
+  'testDefinition'
+>({
   name: 'testDefinition',
   initialState,
   reducers: {
     reset() {
       return initialState;
     },
-    initDefinitionList(state, {payload: {assertionResults}}: PayloadAction<{assertionResults: TAssertionResults}>) {
+    initDefinitionList(state, {payload: {assertionResults}}) {
       const definitionList = assertionResultsToDefinitionList(assertionResults);
 
       state.initialDefinitionList = definitionList;
       state.definitionList = definitionList;
       state.isInitialized = true;
     },
-    addDefinition(state, {payload: {definition}}: PayloadAction<{definition: TTestDefinitionEntry}>) {
+    addDefinition(state, {payload: {definition}}) {
       state.definitionList = [...state.definitionList, definition];
     },
-    updateDefinition(
-      state,
-      {payload: {definition, selector}}: PayloadAction<{definition: TTestDefinitionEntry; selector: string}>
-    ) {
+    updateDefinition(state, {payload: {definition, selector}}) {
       state.definitionList = state.definitionList.map(def => {
-        if (def.selector === selector) return definition;
+        if (def.selector === selector)
+          return {
+            ...def,
+            ...definition,
+          };
 
         return def;
       });
     },
-    revertDefinition(state, {payload: {index}}: PayloadAction<{index: number}>) {
-      state.definitionList = state.definitionList
-        .map((d, idx) => (idx === index ? state.initialDefinitionList[index] || undefined : d))
-        .filter(Boolean);
+    revertDefinition(state, {payload: {id}}) {
+      state.definitionList = state.definitionList.map(d => {
+        return d?.id === id ? state.initialDefinitionList.find(f => f.id === id) || d : d;
+      });
     },
-    removeDefinition(state, {payload: {selector}}: PayloadAction<{selector: string}>) {
+    removeDefinition(state: ITestDefinitionState, {payload: {selector}}: PayloadAction<{selector: string}>) {
       state.definitionList = state.definitionList.map(def => {
         if (def.selector === selector)
           return {
@@ -76,16 +95,17 @@ const testDefinitionSlice = createSlice({
     resetDefinitionList(state) {
       state.definitionList = state.initialDefinitionList;
     },
-    setAssertionResults(state, {payload}: PayloadAction<TAssertionResults>) {
+    setAssertionResults(state, {payload}) {
+      console.log('here');
       state.assertionResults = payload;
     },
   },
   extraReducers: builder => {
     builder
-      .addCase(TestDefinitionActions.dryRun.fulfilled, (state, {payload}) => {
+      .addCase(TestDefinitionActions.dryRun.fulfilled, (state: ITestDefinitionState, {payload}) => {
         state.assertionResults = payload;
       })
-      .addCase(TestDefinitionActions.publish.fulfilled, (state, {payload: {result}}) => {
+      .addCase(TestDefinitionActions.publish.fulfilled, (state: ITestDefinitionState, {payload: {result}}) => {
         const definitionList = assertionResultsToDefinitionList(result);
 
         state.assertionResults = result;

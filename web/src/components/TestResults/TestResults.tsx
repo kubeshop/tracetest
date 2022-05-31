@@ -1,6 +1,6 @@
 import SkeletonTable from 'components/SkeletonTable';
 import {FC} from 'react';
-import { TAssertionResults } from '../../types/Assertion.types';
+import {TAssertionResults} from '../../types/Assertion.types';
 import AssertionCardList from '../AssertionCardList';
 
 type TTestResultsProps = {

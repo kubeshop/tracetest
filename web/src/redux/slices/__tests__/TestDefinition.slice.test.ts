@@ -115,7 +115,7 @@ describe('TestDefinitionReducer', () => {
           ],
         },
         revertDefinition({
-          index: 0,
+          id: '0',
         })
       );
 

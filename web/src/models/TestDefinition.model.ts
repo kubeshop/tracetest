@@ -3,7 +3,8 @@ import Assertion from './Assertion.model';
 
 const TestDefinition = ({definitions = []}: TRawTestDefinition): TTestDefinition => {
   return {
-    definitionList: definitions.map(({selector = '', assertions = []}) => ({
+    definitionList: definitions.map(({selector = '', assertions = []}, index) => ({
+      id: String(index),
       isDraft: false,
       isDeleted: false,
       selector,

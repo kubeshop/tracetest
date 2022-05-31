@@ -9,7 +9,6 @@ import * as S from './AssertionCard.styled';
 import {useRevertDefinitionCallback} from './useRevertDefinitionCallback';
 
 interface TAssertionCardProps {
-  index: number;
   assertionResult: TAssertionResultEntry;
 
   onSelectSpan(spanId: string): void;
@@ -20,8 +19,7 @@ interface TAssertionCardProps {
 }
 
 const AssertionCard: React.FC<TAssertionCardProps> = ({
-  index,
-  assertionResult: {selector, resultList, selectorList, pseudoSelector, spanCount},
+  assertionResult: {id, selector, resultList, selectorList, pseudoSelector, spanCount},
   assertionResult,
   onSelectSpan,
   onDelete,
@@ -34,15 +32,15 @@ const AssertionCard: React.FC<TAssertionCardProps> = ({
   const {isDraft = false, isDeleted = false} = definition || {};
 
   const getIsSelectedSpan = useCallback(
-    (id: string): boolean => {
+    (identificator: string): boolean => {
       const {selectedElements} = store.getState();
-      const found = selectedElements ? selectedElements.find(element => element.id === id) : undefined;
+      const found = selectedElements ? selectedElements.find(element => element.id === identificator) : undefined;
 
       return Boolean(found);
     },
     [store]
   );
-  const resetDefinition = useRevertDefinitionCallback(index);
+  const resetDefinition = useRevertDefinitionCallback(id);
   return (
     <S.AssertionCard data-cy="assertion-card" id={`assertion-${assertionResult.selector}`}>
       <S.Header>

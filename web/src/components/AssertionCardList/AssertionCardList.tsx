@@ -44,7 +44,6 @@ const AssertionCardList: React.FC<TAssertionCardListProps> = ({assertionResults:
         resultList.map((assertionResult, index) =>
           assertionResult.resultList.length ? (
             <AssertionCard
-              index={index}
               key={assertionResult.id}
               assertionResult={assertionResult}
               onSelectSpan={onSelectSpan}

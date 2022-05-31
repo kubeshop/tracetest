@@ -1,4 +1,4 @@
-import {uniqueId} from 'lodash';
+import getUuidByString from 'uuid-by-string';
 import AssertionService from '../services/Assertion.service';
 import SelectorService from '../services/Selector.service';
 import {TAssertionResults, TRawAssertionResults} from '../types/Assertion.types';
@@ -8,7 +8,7 @@ const AssertionResults = ({allPassed = false, results = []}: TRawAssertionResult
   return {
     allPassed,
     resultList: results.map(({selector = '', results: resultList = []}) => ({
-      id: uniqueId(),
+      id: getUuidByString(selector),
       selector,
       spanCount: AssertionService.getSpanCount(resultList),
       pseudoSelector: SelectorService.getPseudoSelector(selector),
