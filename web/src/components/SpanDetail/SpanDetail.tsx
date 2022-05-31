@@ -9,16 +9,18 @@ import {useAssertionForm} from '../AssertionForm/AssertionFormProvider';
 import {CompareOperator} from '../../constants/Operator.constants';
 import OperatorService from '../../services/Operator.service';
 import SpanDetailTabs from './SpanDetailTabs';
+import {useAppSelector} from '../../redux/hooks';
+import TestDefinitionSelectors from '../../selectors/TestDefinition.selectors';
+import {TResultAssertions} from '../../types/Assertion.types';
 
-export interface TSpanDetailProps {
-  testId?: string;
+export interface ISpanDetailsComponentProps {
+  assertions?: TResultAssertions;
+  onCreateAssertion(attribute: TSpanFlatAttribute): void;
   span?: TSpan;
-  resultId?: string;
 }
 
-export interface TSpanDetailsComponentProps {
+interface IProps {
   span?: TSpan;
-  onCreateAssertion(attribute: TSpanFlatAttribute): void;
 }
 
 const getSpanTitle = (span: TSpan) => {
@@ -28,9 +30,11 @@ const getSpanTitle = (span: TSpan) => {
   return `${capitalize(heading) || spanTypeText} • ${primary} • ${span.name}`;
 };
 
-const SpanDetail: React.FC<TSpanDetailProps> = ({span}) => {
+const SpanDetail: React.FC<IProps> = ({span}) => {
   const {open} = useAssertionForm();
-
+  const assertions = useAppSelector(state =>
+    TestDefinitionSelectors.selectAssertionResultsBySpan(state, span?.id || '')
+  );
   const title = (span && getSpanTitle(span)) || '';
 
   const onCreateAssertion = useCallback(
@@ -58,7 +62,7 @@ const SpanDetail: React.FC<TSpanDetailProps> = ({span}) => {
   return (
     <S.SpanDetail>
       <SpanHeader title={title} />
-      <SpanDetailTabs onCreateAssertion={onCreateAssertion} span={span} />
+      <SpanDetailTabs onCreateAssertion={onCreateAssertion} span={span} assertions={assertions} />
     </S.SpanDetail>
   );
 };

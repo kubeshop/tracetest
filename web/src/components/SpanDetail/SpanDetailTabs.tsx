@@ -3,10 +3,10 @@ import {capitalize} from 'lodash';
 import React, {useMemo} from 'react';
 import SpanAttributeService from 'services/SpanAttribute.service';
 import AttributeList from '../AttributeList';
-import {TSpanDetailsComponentProps} from './SpanDetail';
+import {ISpanDetailsComponentProps} from './SpanDetail';
 import * as S from './SpanDetail.styled';
 
-const SpanDetailTabs: React.FC<TSpanDetailsComponentProps> = ({span: {attributeList = [], type} = {}, onCreateAssertion}) => {
+const SpanDetailTabs: React.FC<ISpanDetailsComponentProps> = ({span: {attributeList = [], type} = {}, onCreateAssertion, assertions}) => {
   const sectionList = useMemo(
     () => SpanAttributeService.getSpanAttributeSectionsList(attributeList, type!),
     [attributeList, type]
@@ -16,7 +16,7 @@ const SpanDetailTabs: React.FC<TSpanDetailsComponentProps> = ({span: {attributeL
     <S.SpanTabs data-cy="span-details-attributes">
       {sectionList.map(({section, attributeList: attrList}) => (
         <Tabs.TabPane tab={capitalize(section)} key={section}>
-          <AttributeList attributeList={attrList} onCreateAssertion={onCreateAssertion} />
+          <AttributeList assertions={assertions} attributeList={attrList} onCreateAssertion={onCreateAssertion} />
         </Tabs.TabPane>
       ))}
     </S.SpanTabs>

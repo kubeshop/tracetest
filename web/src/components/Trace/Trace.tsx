@@ -37,10 +37,16 @@ const Trace = ({displayError, visiblePortion, minHeight, test, run}: IProps): JS
           <Diagram type={diagramType} trace={run.trace!} onSelectSpan={onSelectSpan} selectedSpan={selectedSpan} />
         </S.DiagramSection>
         <S.DetailsSection>
-          <SpanDetail resultId={run.id} testId={test?.id} span={selectedSpan} />
+          <SpanDetail span={selectedSpan} />
         </S.DetailsSection>
       </S.Main>
-      <TraceDrawer selectedSpan={selectedSpan!} visiblePortion={visiblePortion} testId={test?.id!} run={run} onSelectSpan={onSelectSpan} />
+      <TraceDrawer
+        selectedSpan={selectedSpan!}
+        visiblePortion={visiblePortion}
+        testId={test?.id!}
+        run={run}
+        onSelectSpan={onSelectSpan}
+      />
     </>
   ) : null;
 };
