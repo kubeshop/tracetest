@@ -9,6 +9,7 @@ import {
   resetDefinitionList,
   updateDefinition,
   reset as resetAction,
+  clearAffectedSpans,
 } from '../../../redux/slices/TestDefinition.slice';
 import {TAssertionResults} from '../../../types/Assertion.types';
 import {TTestDefinitionEntry} from '../../../types/TestDefinition.types';
@@ -34,6 +35,7 @@ const useTestDefinitionCrud = ({runId, testId}: IProps) => {
   const publish = useCallback(async () => {
     const {id} = await dispatch(TestDefinitionActions.publish({testId, runId})).unwrap();
     setIsDraftMode(false);
+    dispatch(clearAffectedSpans());
 
     navigate(`/test/${testId}/run/${id}`);
   }, [dispatch, navigate, runId, setIsDraftMode, testId]);

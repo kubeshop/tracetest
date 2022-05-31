@@ -1,5 +1,4 @@
-import {render} from '@testing-library/react';
-import {ReduxWrapperProvider} from '../../../redux/ReduxWrapperProvider';
+import {render} from 'test-utils';
 import TestDefinitionProvider from '../TestDefinition.provider';
 
 describe('TestDefinitionProvider', () => {
@@ -9,8 +8,7 @@ describe('TestDefinitionProvider', () => {
         <div>
           <p>Hello</p>
         </div>
-      </TestDefinitionProvider>,
-      {wrapper: ReduxWrapperProvider}
+      </TestDefinitionProvider>
     );
 
     expect(getByText('Hello')).toBeInTheDocument();

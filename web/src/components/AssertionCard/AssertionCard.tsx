@@ -1,34 +1,35 @@
 import {Tooltip} from 'antd';
 import {useCallback} from 'react';
 import {useStore} from 'react-flow-renderer';
-import {useAppSelector} from '../../redux/hooks';
-import TestDefinitionSelectors from '../../selectors/TestDefinition.selectors';
-import {TAssertionResultEntry} from '../../types/Assertion.types';
-import AssertionCheckRow from '../AssertionCheckRow';
+
+import AssertionCheckRow from 'components/AssertionCheckRow';
+import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
+import {useAppSelector} from 'redux/hooks';
+import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
+import {TAssertionResultEntry} from 'types/Assertion.types';
 import * as S from './AssertionCard.styled';
 
 interface TAssertionCardProps {
   assertionResult: TAssertionResultEntry;
-
   onSelectSpan(spanId: string): void;
-
   onDelete(selector: string): void;
-
   onEdit(assertionResult: TAssertionResultEntry): void;
 }
 
 const AssertionCard: React.FC<TAssertionCardProps> = ({
-  assertionResult: {selector, resultList, selectorList, pseudoSelector, spanCount},
+  assertionResult: {selector, resultList, selectorList, pseudoSelector, spanIds},
   assertionResult,
   onSelectSpan,
   onDelete,
   onEdit,
 }) => {
+  const {setSelectedAssertion} = useTestDefinition();
   const store = useStore();
 
-  const spanCountText = `${spanCount} ${spanCount > 1 ? 'spans' : 'span'}`;
+  const selectedAssertion = useAppSelector(TestDefinitionSelectors.selectSelectedAssertion);
   const definition = useAppSelector(state => TestDefinitionSelectors.selectDefinitionBySelector(state, selector));
   const {isDraft = false, isDeleted = false} = definition || {};
+  const spanCountText = `${spanIds.length} ${spanIds.length > 1 ? 'spans' : 'span'}`;
 
   const getIsSelectedSpan = useCallback(
     (id: string): boolean => {
@@ -40,9 +41,20 @@ const AssertionCard: React.FC<TAssertionCardProps> = ({
     [store]
   );
 
+  const handleOnClick = () => {
+    if (selectedAssertion === selector) {
+      return setSelectedAssertion('');
+    }
+    setSelectedAssertion(selector);
+  };
+
   return (
-    <S.AssertionCard data-cy="assertion-card" id={`assertion-${assertionResult.selector}`}>
-      <S.Header>
+    <S.AssertionCard
+      $isSelected={selectedAssertion === selector}
+      data-cy="assertion-card"
+      id={`assertion-${assertionResult.selector}`}
+    >
+      <S.Header onClick={handleOnClick}>
         <div>
           <S.SelectorListText>
             {selectorList.map(({value}) => value).join(' ')} {pseudoSelector?.selector}
