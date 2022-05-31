@@ -13,9 +13,9 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-type openapiMapper struct{}
+type OpenAPIMapper struct{}
 
-func (m openapiMapper) Test(in model.Test) openapi.Test {
+func (m OpenAPIMapper) Test(in model.Test) openapi.Test {
 	return openapi.Test{
 		Id:          in.ID.String(),
 		Name:        in.Name,
@@ -29,7 +29,7 @@ func (m openapiMapper) Test(in model.Test) openapi.Test {
 	}
 }
 
-func (m openapiMapper) HTTPHeaders(in []model.HTTPHeader) []openapi.HttpHeader {
+func (m OpenAPIMapper) HTTPHeaders(in []model.HTTPHeader) []openapi.HttpHeader {
 	headers := make([]openapi.HttpHeader, len(in))
 	for i, h := range in {
 		headers[i] = openapi.HttpHeader{Key: h.Key, Value: h.Value}
@@ -38,7 +38,7 @@ func (m openapiMapper) HTTPHeaders(in []model.HTTPHeader) []openapi.HttpHeader {
 	return headers
 }
 
-func (m openapiMapper) HTTPRequest(in model.HTTPRequest) openapi.HttpRequest {
+func (m OpenAPIMapper) HTTPRequest(in model.HTTPRequest) openapi.HttpRequest {
 	return openapi.HttpRequest{
 		Url:     in.URL,
 		Method:  string(in.Method),
@@ -48,7 +48,7 @@ func (m openapiMapper) HTTPRequest(in model.HTTPRequest) openapi.HttpRequest {
 	}
 }
 
-func (m openapiMapper) HTTPResponse(in model.HTTPResponse) openapi.HttpResponse {
+func (m OpenAPIMapper) HTTPResponse(in model.HTTPResponse) openapi.HttpResponse {
 
 	return openapi.HttpResponse{
 		Status:     in.Status,
@@ -58,7 +58,7 @@ func (m openapiMapper) HTTPResponse(in model.HTTPResponse) openapi.HttpResponse 
 	}
 }
 
-func (m openapiMapper) Auth(in *model.HTTPAuthenticator) openapi.HttpAuth {
+func (m OpenAPIMapper) Auth(in *model.HTTPAuthenticator) openapi.HttpAuth {
 	if in == nil {
 		return openapi.HttpAuth{}
 	}
@@ -87,7 +87,7 @@ func (m openapiMapper) Auth(in *model.HTTPAuthenticator) openapi.HttpAuth {
 	return auth
 }
 
-func (m openapiMapper) Tests(in []model.Test) []openapi.Test {
+func (m OpenAPIMapper) Tests(in []model.Test) []openapi.Test {
 	tests := make([]openapi.Test, len(in))
 	for i, t := range in {
 		tests[i] = m.Test(t)
@@ -96,7 +96,7 @@ func (m openapiMapper) Tests(in []model.Test) []openapi.Test {
 	return tests
 }
 
-func (m openapiMapper) Definition(in model.Definition) openapi.TestDefinition {
+func (m OpenAPIMapper) Definition(in model.Definition) openapi.TestDefinition {
 
 	defs := make([]openapi.TestDefinitionDefinitions, len(in))
 
@@ -119,7 +119,7 @@ func (m openapiMapper) Definition(in model.Definition) openapi.TestDefinition {
 	}
 }
 
-func (m openapiMapper) Trace(in *traces.Trace) openapi.Trace {
+func (m OpenAPIMapper) Trace(in *traces.Trace) openapi.Trace {
 	if in == nil {
 		return openapi.Trace{}
 	}
@@ -136,7 +136,7 @@ func (m openapiMapper) Trace(in *traces.Trace) openapi.Trace {
 	}
 }
 
-func (m openapiMapper) Span(in traces.Span) openapi.Span {
+func (m OpenAPIMapper) Span(in traces.Span) openapi.Span {
 	parentID := ""
 	if in.Parent != nil {
 		parentID = in.Parent.ID.String()
@@ -152,7 +152,7 @@ func (m openapiMapper) Span(in traces.Span) openapi.Span {
 	}
 }
 
-func (m openapiMapper) Spans(in []*traces.Span) []openapi.Span {
+func (m OpenAPIMapper) Spans(in []*traces.Span) []openapi.Span {
 	spans := make([]openapi.Span, len(in))
 	for i, s := range in {
 		spans[i] = m.Span(*s)
@@ -161,7 +161,7 @@ func (m openapiMapper) Spans(in []*traces.Span) []openapi.Span {
 	return spans
 }
 
-func (m openapiMapper) Result(in *model.RunResults) openapi.AssertionResults {
+func (m OpenAPIMapper) Result(in *model.RunResults) openapi.AssertionResults {
 	if in == nil {
 		return openapi.AssertionResults{}
 	}
@@ -196,7 +196,7 @@ func (m openapiMapper) Result(in *model.RunResults) openapi.AssertionResults {
 		Results:   results,
 	}
 }
-func (m openapiMapper) Assertion(in model.Assertion) openapi.Assertion {
+func (m OpenAPIMapper) Assertion(in model.Assertion) openapi.Assertion {
 	return openapi.Assertion{
 		Attribute:  in.Attribute,
 		Comparator: in.Comparator.String(),
@@ -204,7 +204,7 @@ func (m openapiMapper) Assertion(in model.Assertion) openapi.Assertion {
 	}
 }
 
-func (m openapiMapper) Run(in *model.Run) openapi.TestRun {
+func (m OpenAPIMapper) Run(in *model.Run) openapi.TestRun {
 	if in == nil {
 		return openapi.TestRun{}
 	}
@@ -228,7 +228,7 @@ func (m openapiMapper) Run(in *model.Run) openapi.TestRun {
 	}
 }
 
-func (m openapiMapper) Runs(in []model.Run) []openapi.TestRun {
+func (m OpenAPIMapper) Runs(in []model.Run) []openapi.TestRun {
 	runs := make([]openapi.TestRun, len(in))
 	for i, t := range in {
 		runs[i] = m.Run(&t)
@@ -237,11 +237,11 @@ func (m openapiMapper) Runs(in []model.Run) []openapi.TestRun {
 	return runs
 }
 
-type modelMapper struct {
+type ModelMapper struct {
 	Comparators comparator.Registry
 }
 
-func (m modelMapper) Test(in openapi.Test) model.Test {
+func (m ModelMapper) Test(in openapi.Test) model.Test {
 	id, _ := uuid.Parse(in.Id)
 	return model.Test{
 		ID:          id,
@@ -256,7 +256,7 @@ func (m modelMapper) Test(in openapi.Test) model.Test {
 	}
 }
 
-func (m modelMapper) HTTPHeaders(in []openapi.HttpHeader) []model.HTTPHeader {
+func (m ModelMapper) HTTPHeaders(in []openapi.HttpHeader) []model.HTTPHeader {
 	headers := make([]model.HTTPHeader, len(in))
 	for i, h := range in {
 		headers[i] = model.HTTPHeader{Key: h.Key, Value: h.Value}
@@ -265,7 +265,7 @@ func (m modelMapper) HTTPHeaders(in []openapi.HttpHeader) []model.HTTPHeader {
 	return headers
 }
 
-func (m modelMapper) HTTPRequest(in openapi.HttpRequest) model.HTTPRequest {
+func (m ModelMapper) HTTPRequest(in openapi.HttpRequest) model.HTTPRequest {
 	return model.HTTPRequest{
 		URL:     in.Url,
 		Method:  model.HTTPMethod(in.Method),
@@ -275,7 +275,7 @@ func (m modelMapper) HTTPRequest(in openapi.HttpRequest) model.HTTPRequest {
 	}
 }
 
-func (m modelMapper) HTTPResponse(in openapi.HttpResponse) model.HTTPResponse {
+func (m ModelMapper) HTTPResponse(in openapi.HttpResponse) model.HTTPResponse {
 	return model.HTTPResponse{
 		Status:     in.Status,
 		StatusCode: int(in.StatusCode),
@@ -284,7 +284,7 @@ func (m modelMapper) HTTPResponse(in openapi.HttpResponse) model.HTTPResponse {
 	}
 }
 
-func (m modelMapper) Auth(in openapi.HttpAuth) *model.HTTPAuthenticator {
+func (m ModelMapper) Auth(in openapi.HttpAuth) *model.HTTPAuthenticator {
 	var props map[string]string
 	switch in.Type {
 	case "apiKey":
@@ -310,7 +310,7 @@ func (m modelMapper) Auth(in openapi.HttpAuth) *model.HTTPAuthenticator {
 	}
 }
 
-func (m modelMapper) Tests(in []openapi.Test) []model.Test {
+func (m ModelMapper) Tests(in []openapi.Test) []model.Test {
 	tests := make([]model.Test, len(in))
 	for i, t := range in {
 		tests[i] = m.Test(t)
@@ -319,7 +319,7 @@ func (m modelMapper) Tests(in []openapi.Test) []model.Test {
 	return tests
 }
 
-func (m modelMapper) ValidateDefinition(in openapi.TestDefinition) error {
+func (m ModelMapper) ValidateDefinition(in openapi.TestDefinition) error {
 	selectors := map[string]bool{}
 	for _, d := range in.Definitions {
 		if _, exists := selectors[d.Selector]; exists {
@@ -332,7 +332,7 @@ func (m modelMapper) ValidateDefinition(in openapi.TestDefinition) error {
 	return nil
 }
 
-func (m modelMapper) Definition(in openapi.TestDefinition) model.Definition {
+func (m ModelMapper) Definition(in openapi.TestDefinition) model.Definition {
 	defs := model.Definition{}
 	for _, d := range in.Definitions {
 		asserts := make([]model.Assertion, len(d.Assertions))
@@ -345,7 +345,7 @@ func (m modelMapper) Definition(in openapi.TestDefinition) model.Definition {
 	return defs
 }
 
-func (m modelMapper) Run(in openapi.TestRun) *model.Run {
+func (m ModelMapper) Run(in openapi.TestRun) *model.Run {
 	id, _ := uuid.Parse(in.Id)
 	tid, _ := trace.TraceIDFromHex(in.TraceId)
 	sid, _ := trace.SpanIDFromHex(in.SpanId)
@@ -368,7 +368,7 @@ func (m modelMapper) Run(in openapi.TestRun) *model.Run {
 	}
 }
 
-func (m modelMapper) Result(in openapi.AssertionResults) *model.RunResults {
+func (m ModelMapper) Result(in openapi.AssertionResults) *model.RunResults {
 	results := model.Results{}
 
 	for _, res := range in.Results {
@@ -398,7 +398,7 @@ func (m modelMapper) Result(in openapi.AssertionResults) *model.RunResults {
 	}
 }
 
-func (m modelMapper) Assertion(in openapi.Assertion) model.Assertion {
+func (m ModelMapper) Assertion(in openapi.Assertion) model.Assertion {
 	comp, _ := m.Comparators.Get(in.Comparator)
 	return model.Assertion{
 		Attribute:  in.Attribute,
@@ -407,7 +407,7 @@ func (m modelMapper) Assertion(in openapi.Assertion) model.Assertion {
 	}
 }
 
-func (m modelMapper) Trace(in openapi.Trace) *traces.Trace {
+func (m ModelMapper) Trace(in openapi.Trace) *traces.Trace {
 	tid, _ := trace.TraceIDFromHex(in.TraceId)
 	return &traces.Trace{
 		ID:       tid,
@@ -415,7 +415,7 @@ func (m modelMapper) Trace(in openapi.Trace) *traces.Trace {
 	}
 }
 
-func (m modelMapper) Span(in openapi.Span, parent *traces.Span) traces.Span {
+func (m ModelMapper) Span(in openapi.Span, parent *traces.Span) traces.Span {
 	sid, _ := trace.SpanIDFromHex(in.Id)
 	span := traces.Span{
 		ID:         sid,
@@ -430,7 +430,7 @@ func (m modelMapper) Span(in openapi.Span, parent *traces.Span) traces.Span {
 	return span
 }
 
-func (m modelMapper) Spans(in []openapi.Span, parent *traces.Span) []*traces.Span {
+func (m ModelMapper) Spans(in []openapi.Span, parent *traces.Span) []*traces.Span {
 	spans := make([]*traces.Span, len(in))
 	for i, s := range in {
 		span := m.Span(s, parent)
@@ -440,7 +440,7 @@ func (m modelMapper) Spans(in []openapi.Span, parent *traces.Span) []*traces.Spa
 	return spans
 }
 
-func (m modelMapper) Runs(in []openapi.TestRun) []model.Run {
+func (m ModelMapper) Runs(in []openapi.TestRun) []model.Run {
 	runs := make([]model.Run, len(in))
 	for i, r := range in {
 		runs[i] = *m.Run(r)
