@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useMemo} from 'react';
+import React, {useCallback, useEffect, useMemo} from 'react';
 import ReactFlow, {Background, FlowElement} from 'react-flow-renderer';
 import {useDAGChart} from '../../../hooks/useDAGChart';
 import TraceNode from '../../TraceNode';
