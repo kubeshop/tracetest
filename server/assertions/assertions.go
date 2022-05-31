@@ -10,7 +10,7 @@ import (
 func Assert(defs model.Definition, trace traces.Trace) (model.Results, bool) {
 	testResult := model.Results{}
 	allPassed := true
-	for spanQuery, asserts := range defs {
+	defs.Map(func(spanQuery model.SpanQuery, asserts []model.Assertion) {
 		spans := selector(spanQuery).Filter(trace)
 		assertionResults := make([]model.AssertionResult, 0)
 		for _, assertion := range asserts {
@@ -21,7 +21,7 @@ func Assert(defs model.Definition, trace traces.Trace) (model.Results, bool) {
 			assertionResults = append(assertionResults, res)
 		}
 		testResult[spanQuery] = assertionResults
-	}
+	})
 
 	return testResult, allPassed
 }

@@ -98,21 +98,21 @@ func (m OpenAPIMapper) Tests(in []model.Test) []openapi.Test {
 
 func (m OpenAPIMapper) Definition(in model.Definition) openapi.TestDefinition {
 
-	defs := make([]openapi.TestDefinitionDefinitions, len(in))
+	defs := make([]openapi.TestDefinitionDefinitions, in.Len())
 
 	i := 0
-	for sel, def := range in {
-		assertions := make([]openapi.Assertion, len(def))
-		for j, a := range def {
+	in.Map(func(spanQuery model.SpanQuery, asserts []model.Assertion) {
+		assertions := make([]openapi.Assertion, len(asserts))
+		for j, a := range asserts {
 			assertions[j] = m.Assertion(a)
 		}
 
 		defs[i] = openapi.TestDefinitionDefinitions{
-			Selector:   string(sel),
+			Selector:   string(spanQuery),
 			Assertions: assertions,
 		}
 		i++
-	}
+	})
 
 	return openapi.TestDefinition{
 		Definitions: defs,
@@ -339,7 +339,7 @@ func (m ModelMapper) Definition(in openapi.TestDefinition) model.Definition {
 		for i, a := range d.Assertions {
 			asserts[i] = m.Assertion(a)
 		}
-		defs[model.SpanQuery(d.Selector)] = asserts
+		defs, _ = defs.Add(model.SpanQuery(d.Selector), asserts)
 	}
 
 	return defs
