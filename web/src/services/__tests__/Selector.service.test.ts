@@ -52,7 +52,7 @@ describe('AssertionService', () => {
     });
 
     it('should get a list of selector objects from the selector string with multiple filters', () => {
-      const selectorString = 'span[service.name = "pokeshop" tracetest.span.type = "http"]';
+      const selectorString = 'span[service.name = "pokeshop"  tracetest.span.type = "http"]';
 
       const result = SelectorService.getSpanSelectorList(selectorString);
       expect(result).toStrictEqual([

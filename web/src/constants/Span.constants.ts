@@ -1,13 +1,88 @@
-export const HttpRequestAttributeList = [
-  'http.method',
-  'http.url',
-  'http.target',
-  'http.host',
-  'http.scheme',
-  'http.request_content_length',
-  'http.request_content_length_uncompressed',
-  'http.retry_count exists',
-  'http.user_agent',
-];
+import {SemanticGroupNames} from './SemanticGroupNames.constants';
+import {Attributes} from './SpanAttribute.constants';
 
-export const HttpResponseAttributeList = ['http.status_code'];
+type TValueOfAttributes = typeof Attributes[keyof typeof Attributes];
+
+export enum SectionNames {
+  request = 'request',
+  response = 'response',
+  metadata = 'metadata',
+  operation = 'operation',
+  consumer = 'consumer',
+  producer = 'producer',
+  custom = 'custom',
+  all = 'all',
+}
+
+export const SpanAttributeSections: Record<SemanticGroupNames, Record<string, TValueOfAttributes[]>> = {
+  [SemanticGroupNames.Http]: {
+    [SectionNames.request]: [
+      Attributes.HTTP_URL,
+      Attributes.HTTP_METHOD,
+      Attributes.HTTP_ROUTE,
+      Attributes.HTTP_TARGET,
+      Attributes.HTTP_FLAVOR,
+      Attributes.HTTP_HOST,
+      Attributes.HTTP_CLIENT_IP,
+      Attributes.HTTP_SCHEME,
+      Attributes.HTTP_REQUEST_CONTENT_LENGTH,
+      Attributes.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
+      Attributes.HTTP_USER_AGENT,
+    ],
+    [SectionNames.response]: [
+      Attributes.HTTP_STATUS_CODE,
+      Attributes.TRACETEST_RESPONSE_BODY,
+      Attributes.TRACETEST_RESPONSE_HEADERS,
+      Attributes.HTTP_RESPONSE_CONTENT_LENGTH,
+      Attributes.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
+    ],
+  },
+  [SemanticGroupNames.Database]: {
+    [SectionNames.metadata]: [
+      Attributes.DB_NAME,
+      Attributes.DB_SYSTEM,
+      Attributes.DB_USER,
+      Attributes.DB_CONNECTION_STRING,
+      Attributes.DB_MONGODB_COLLECTION,
+      Attributes.DB_REDIS_DATABASE_INDEX,
+      Attributes.DB_SQL_TABLE,
+      Attributes.DB_CASSANDRA_TABLE,
+      Attributes.DB_CASSANDRA_PAGE_SIZE,
+      Attributes.DB_CASSANDRA_CONSISTENCY_LEVEL,
+      Attributes.DB_CASSANDRA_IDEMPOTENCE,
+      Attributes.DB_CASSANDRA_SPECULATIVE_EXECUTION_COUNT,
+      Attributes.DB_CASSANDRA_COORDINATOR_ID,
+      Attributes.DB_CASSANDRA_COORDINATOR_DC,
+    ],
+    [SectionNames.operation]: [Attributes.DB_OPERATION, Attributes.DB_STATEMENT],
+  },
+  [SemanticGroupNames.Messaging]: {
+    [SectionNames.metadata]: [
+      Attributes.MESSAGING_SYSTEM,
+      Attributes.MESSAGING_URL,
+      Attributes.MESSAGING_PROTOCOL,
+      Attributes.MESSAGING_RABBITMQ_ROUTING_KEY,
+      Attributes.MESSAGING_KAFKA_CLIENT_ID,
+      Attributes.MESSAGING_KAFKA_PARTITION,
+      Attributes.MESSAGING_KAFKA_TOMBSTONE,
+    ],
+    [SectionNames.producer]: [
+      Attributes.MESSAGING_DESTINATION,
+      Attributes.MESSAGING_DESTINATION_KIND,
+      Attributes.MESSAGING_TEMP_DESTINATION,
+      Attributes.MESSAGING_CONVERSATION_ID,
+      Attributes.MESSAGING_RABBITMQ_ROUTING_KEY,
+      Attributes.MESSAGING_KAFKA_MESSAGE_KEY,
+    ],
+    [SectionNames.consumer]: [
+      Attributes.MESSAGING_OPERATION,
+      Attributes.MESSAGING_CONSUMER_ID,
+      Attributes.MESSAGING_KAFKA_CONSUMER_GROUP,
+    ],
+  },
+  [SemanticGroupNames.Rpc]: {},
+  [SemanticGroupNames.Exception]: {},
+  [SemanticGroupNames.General]: {},
+  [SemanticGroupNames.Compatibility]: {},
+  [SemanticGroupNames.Faas]: {},
+};

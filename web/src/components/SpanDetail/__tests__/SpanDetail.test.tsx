@@ -1,4 +1,3 @@
-import faker from '@faker-js/faker';
 import {render} from '@testing-library/react';
 import SpanMock from '../../../models/__mocks__/Span.mock';
 import {ReduxWrapperProvider} from '../../../redux/ReduxWrapperProvider';
@@ -10,5 +9,5 @@ test('Layout', () => {
       <SpanDetail span={SpanMock.model()} />
     </ReduxWrapperProvider>
   );
-  expect(getByText('Attribute list')).toBeTruthy();
+  expect(getByText('All')).toBeTruthy();
 });

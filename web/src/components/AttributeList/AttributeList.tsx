@@ -4,6 +4,7 @@ import AttributeRow from 'components/AttributeRow';
 import {TResultAssertions} from 'types/Assertion.types';
 import {TSpanFlatAttribute} from 'types/Span.types';
 import * as S from './AttributeList.styled';
+import EmptyAttributeList from './EmptyAttributeList';
 
 interface IProps {
   assertions?: TResultAssertions;
@@ -19,8 +20,8 @@ const AttributeList: React.FC<IProps> = ({assertions, attributeList, onCreateAss
     setIsCopied(true);
   };
 
-  return (
-    <S.AttributeList>
+  return attributeList.length ? (
+    <S.AttributeList data-cy="attribute-list">
       {attributeList.map(attribute => (
         <AttributeRow
           assertionsFailed={assertions?.[attribute.key]?.failed}
@@ -34,6 +35,8 @@ const AttributeList: React.FC<IProps> = ({assertions, attributeList, onCreateAss
         />
       ))}
     </S.AttributeList>
+  ) : (
+    <EmptyAttributeList />
   );
 };
 

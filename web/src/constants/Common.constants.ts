@@ -8,6 +8,11 @@ export const GITHUB_URL = 'https://github.com/kubeshop/tracetest';
 export const GITHUB_ISSUES_URL = 'https://github.com/kubeshop/tracetest/issues/new/choose';
 export const DISCORD_URL = 'https://discord.gg/6zupCZFQbe';
 
+export const TRACE_SEMANTIC_CONVENTIONS_URL =
+  'https://github.com/open-telemetry/opentelemetry-specification/tree/main/specification/trace/semantic_conventions';
+export const RESOURCE_SEMANTIC_CONVENTIONS_URL =
+  'https://github.com/open-telemetry/opentelemetry-specification/tree/main/specification/resource/semantic_conventions';
+
 export enum HTTP_METHOD {
   GET = 'GET',
   PUT = 'PUT',
