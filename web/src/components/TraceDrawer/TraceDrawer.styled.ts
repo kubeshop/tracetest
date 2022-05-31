@@ -37,11 +37,10 @@ export const Container = styled.div`
   overflow-y: hidden;
 `;
 
-export const Content = styled.div`
+export const Content = styled.div<{$height: number}>`
   padding: 24px;
   overflow-y: scroll;
-  height: 330px;
-  position: relative;
+  height: ${({$height}) => $height}px;
 `;
 
 export const AddAssertionButton = styled(Button).attrs({
@@ -63,5 +62,5 @@ export const LoadingSpinnerContainer = styled.div`
 export const Chevron = styled.img.attrs({
   src: chevron,
 })<{$isCollapsed: boolean}>`
-  transform: ${({$isCollapsed}) => ($isCollapsed ? 'rotate(0deg)' : 'rotate(180deg)')};
+  transform: ${({$isCollapsed}) => (!$isCollapsed ? 'rotate(0deg)' : 'rotate(180deg)')};
 `;

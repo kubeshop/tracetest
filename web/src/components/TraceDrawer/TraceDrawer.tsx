@@ -1,4 +1,3 @@
-import {Drawer} from 'antd';
 import {useEffect} from 'react';
 import {TTestRun} from 'types/TestRun.types';
 import {useTestDefinition} from '../../providers/TestDefinition/TestDefinition.provider';
@@ -6,6 +5,7 @@ import {TSpan} from '../../types/Span.types';
 import AssertionForm from '../AssertionForm';
 import {useAssertionForm} from '../AssertionForm/AssertionFormProvider';
 import LoadingSpinner from '../LoadingSpinner';
+import ResizableDrawer from '../ResizableDrawer';
 import TestResults from '../TestResults';
 import * as S from './TraceDrawer.styled';
 import TraceDrawerHeader from './TraceDrawerHeader';
@@ -19,6 +19,7 @@ interface IProps {
 }
 
 const TraceDrawer: React.FC<IProps> = ({run: {id: runId}, run, testId, visiblePortion, onSelectSpan, selectedSpan}) => {
+  const contentHeight = 330;
   const {isOpen: isAssertionFormOpen, formProps, onSubmit, close, setIsCollapsed, isCollapsed} = useAssertionForm();
   const {isLoading, assertionResults} = useTestDefinition();
 
@@ -27,16 +28,7 @@ const TraceDrawer: React.FC<IProps> = ({run: {id: runId}, run, testId, visiblePo
   }, [isAssertionFormOpen, setIsCollapsed]);
 
   return (
-    <Drawer
-      placement="bottom"
-      closable={false}
-      mask={false}
-      visible
-      data-cy="trace-drawer"
-      height={isCollapsed ? '420px' : visiblePortion}
-      style={{overflow: 'hidden'}}
-      bodyStyle={{overflow: 'hidden', padding: 0}}
-    >
+    <ResizableDrawer min={visiblePortion} max={contentHeight + visiblePortion} open={isCollapsed}>
       <TraceDrawerHeader
         onClick={() => setIsCollapsed(!isCollapsed)}
         run={run}
@@ -46,7 +38,8 @@ const TraceDrawer: React.FC<IProps> = ({run: {id: runId}, run, testId, visiblePo
         selectedSpan={selectedSpan}
       />
 
-      <S.Content id="assertions-container">
+      <S.Content id="assertions-container"
+      $height={contentHeight}>
         {(isLoading || !assertionResults) && (
           <S.LoadingSpinnerContainer>
             <LoadingSpinner />
@@ -67,7 +60,7 @@ const TraceDrawer: React.FC<IProps> = ({run: {id: runId}, run, testId, visiblePo
           <TestResults testId={testId} assertionResults={assertionResults!} onSelectSpan={onSelectSpan} />
         )}
       </S.Content>
-    </Drawer>
+    </ResizableDrawer>
   );
 };
 

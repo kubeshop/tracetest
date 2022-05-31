@@ -19,6 +19,7 @@ interface IProps {
   onClick(): void;
   isDisabled: boolean;
   selectedSpan: TSpan;
+  height?: number;
 }
 
 const TraceDrawerHeader: React.FC<IProps> = ({
@@ -28,8 +29,9 @@ const TraceDrawerHeader: React.FC<IProps> = ({
   onClick,
   isDisabled,
   selectedSpan,
+  height,
 }) => {
-  const {open, isCollapsed} = useAssertionForm();
+  const {open} = useAssertionForm();
   const totalSpanCount = trace?.spans.length;
   const totalAssertionCount = assertionResults?.resultList.length || 0;
 
@@ -83,7 +85,7 @@ const TraceDrawerHeader: React.FC<IProps> = ({
           Add Assertion
         </S.AddAssertionButton>
         <span style={{marginLeft: 16}}>
-          <S.Chevron $isCollapsed={isCollapsed} />
+          <S.Chevron $isCollapsed={height === visiblePortion} />
         </span>
       </div>
     </S.Header>

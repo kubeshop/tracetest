@@ -6,10 +6,10 @@ interface IProps {
   min: number;
   max: number;
   open: boolean;
-  children: React.ReactElement;
+  children: JSX.Element[];
 }
 
-const ResizableDrawer = ({open, children, min, max}: IProps): JSX.Element => {
+const ResizableDrawer: React.FC<IProps> = ({open, children, min, max}: IProps) => {
   const [isResizing, setIsResizing] = useState(false);
   const [height, setHeight] = useState(min);
 
@@ -37,6 +37,13 @@ const ResizableDrawer = ({open, children, min, max}: IProps): JSX.Element => {
   );
 
   useEffect(() => {
+    if (open) {
+      setHeight(max);
+      return;
+    }
+    setHeight(min);
+  }, [open]);
+  useEffect(() => {
     document.addEventListener('pointermove', onMouseMove);
     document.addEventListener('pointerup', onMouseUp);
 
@@ -50,7 +57,7 @@ const ResizableDrawer = ({open, children, min, max}: IProps): JSX.Element => {
     <Drawer
       placement="bottom"
       closable={false}
-      visible={open}
+      visible
       height={height}
       mask={false}
       style={{overflow: 'hidden'}}
@@ -67,12 +74,12 @@ const ResizableDrawer = ({open, children, min, max}: IProps): JSX.Element => {
           left: 0,
           bottom: 0,
           zIndex: 100,
-          cursor: 'grab',
+          cursor: 'row-resize',
           backgroundColor: '#f4f7f9',
         }}
         onPointerDown={onPointerDown}
       />
-      {React.cloneElement(children, {height, onPointerDown, setHeight})}
+      {children.map(child => React.cloneElement(child, {height}))}
     </Drawer>
   );
 };
