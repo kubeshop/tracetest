@@ -9,12 +9,12 @@ jest.mock('../../../services/Analytics/Analytics.service', () => {
 });
 
 test('Router', async () => {
-  const {container, getByTestId} = render(
+  const {getByText, getByTestId} = render(
     <ReduxWrapperProvider>
       <Router />
     </ReduxWrapperProvider>
   );
 
   await waitFor(() => getByTestId('github-link'));
-  expect(container).toMatchSnapshot();
+  expect(getByText('Documentation')).toBeTruthy();
 });

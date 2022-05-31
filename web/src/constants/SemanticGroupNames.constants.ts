@@ -1,14 +1,4 @@
-// JSON sructure to be used when auto generating selectors for a span.
-// Semantic groups are named based on the filenames of each group
-// as shown at https://github.com/open-telemetry/opentelemetry-specification/tree/main/semantic_conventions/trace
-//
-// All attributes listed below for a particular group should be checked for existence in
-// the selected span that we want to autogenerate the selectors array for.  Create a SelectorItem
-// for each attribute that you find a value for in that selected span.
-
-// Note - need to add the following:
-// lamda - aws lambda section
-// aws-sdk - aws sdk section
+import {Attributes} from './SpanAttribute.constants';
 
 export enum SemanticGroupNames {
   Http = 'http',
@@ -34,129 +24,121 @@ export const SemanticGroupNamesToText = {
 
 export const SemanticGroupNameNodeMap: Record<SemanticGroupNames, {primary: string[]; type: string}> = {
   [SemanticGroupNames.Http]: {
-    primary: ['http.target', 'service.name'],
+    primary: [Attributes.HTTP_TARGET, Attributes.SERVICE_NAME],
     type: '',
   },
   [SemanticGroupNames.Database]: {
-    primary: ['db.mongodb.collection', 'db.sql.table', 'db.redis.database_index', 'db.cassandra.table', 'service.name'],
-    type: 'db.system',
+    primary: [
+      Attributes.DB_MONGODB_COLLECTION,
+      Attributes.DB_SQL_TABLE,
+      Attributes.DB_REDIS_DATABASE_INDEX,
+      Attributes.DB_CASSANDRA_TABLE,
+      Attributes.SERVICE_NAME,
+    ],
+    type: Attributes.DB_SYSTEM,
   },
   [SemanticGroupNames.Rpc]: {
-    primary: ['rpc.service', 'service.name'],
-    type: '',
+    primary: [Attributes.RPC_SYSTEM, Attributes.SERVICE_NAME],
+    type: Attributes.RPC_SYSTEM,
   },
   [SemanticGroupNames.Messaging]: {
-    primary: ['messaging.destination', 'service.name'],
-    type: 'messaging.system',
+    primary: [Attributes.MESSAGING_DESTINATION, Attributes.SERVICE_NAME],
+    type: Attributes.MESSAGING_SYSTEM,
   },
   [SemanticGroupNames.Faas]: {
-    primary: ['faas.invoked_name', 'service.name'],
+    primary: [Attributes.NAME, Attributes.SERVICE_NAME],
     type: '',
   },
   [SemanticGroupNames.Exception]: {
-    primary: ['exception.type', 'service.name'],
+    primary: [Attributes.EXCEPTION_TYPE, Attributes.SERVICE_NAME],
     type: '',
   },
   [SemanticGroupNames.General]: {
-    primary: ['service.name', 'service.name'],
+    primary: [Attributes.NAME, Attributes.SERVICE_NAME],
     type: '',
   },
   [SemanticGroupNames.Compatibility]: {
-    primary: ['opentracing.ref_type', 'service.name'],
+    primary: [Attributes.NAME, Attributes.SERVICE_NAME],
     type: '',
   },
 };
 
+const BASE_ATTRIBUTES = [Attributes.NAME, Attributes.TRACETEST_SPAN_TYPE, Attributes.SERVICE_NAME];
+
 export const SELECTOR_DEFAULT_ATTRIBUTES = [
   {
     semanticGroup: SemanticGroupNames.Http,
-    attributes: ['name', 'tracetest.span.type', 'service.name', 'http.target', 'http.method'],
+    attributes: [...BASE_ATTRIBUTES, Attributes.HTTP_TARGET, Attributes.HTTP_METHOD],
   },
   {
     semanticGroup: SemanticGroupNames.Database,
     attributes: [
-      'name',
-      'tracetest.span.type',
-      'service.name',
-      'db.system',
-      'db.name',
-      'db.user',
-      'db.operation',
-      'db.redis.database_index',
-      'db.mongodb.collection',
-      'db.sql.table',
-      'db.cassandra.table',
+      ...BASE_ATTRIBUTES,
+      Attributes.DB_SYSTEM,
+      Attributes.DB_NAME,
+      Attributes.DB_USER,
+      Attributes.DB_OPERATION,
+      Attributes.DB_MONGODB_COLLECTION,
+      Attributes.DB_REDIS_DATABASE_INDEX,
+      Attributes.DB_SQL_TABLE,
+      Attributes.DB_CASSANDRA_TABLE,
     ],
   },
   {
     semanticGroup: SemanticGroupNames.Rpc,
     attributes: [
-      'name',
-      'tracetest.span.type',
-      'service.name',
-      'rpc.system',
-      'rpc.service',
-      'rpc.method',
-      'message.type',
+      ...BASE_ATTRIBUTES,
+      Attributes.RPC_SYSTEM,
+      Attributes.RPC_METHOD,
+      Attributes.RPC_SERVICE,
+      Attributes.MESSAGE_TYPE,
     ],
   },
   {
     semanticGroup: SemanticGroupNames.Messaging,
     attributes: [
-      'name',
-      'tracetest.span.type',
-      'service.name',
-      'messaging.system',
-      'messaging.destination',
-      'messaging.destination_kind',
-      'messaging.operation',
-      'messaging.rabbitmq.routing_key',
-      'messaging.kafka.consumer_group',
-      'messaging.rocketmq.namespace',
-      'messaging.rocketmq.client_group',
-      'messaging.rocketmq.message_type',
-      'messaging.rocketmq.message_keys',
-      'messaging.rocketmq.consumption_model',
+      ...BASE_ATTRIBUTES,
+      Attributes.MESSAGING_SYSTEM,
+      Attributes.MESSAGING_DESTINATION,
+      Attributes.MESSAGING_DESTINATION_KIND,
+      Attributes.MESSAGING_OPERATION,
+      Attributes.MESSAGING_RABBITMQ_ROUTING_KEY,
+      Attributes.MESSAGING_KAFKA_CONSUMER_GROUP,
     ],
   },
   {
     semanticGroup: SemanticGroupNames.Faas,
     attributes: [
-      'name',
-      'tracetest.span.type',
-      'service.name',
-      'faas.invoked_name',
-      'faas.invoked_provider',
-      'faas.trigger',
+      ...BASE_ATTRIBUTES,
+      Attributes.FAAS_INVOKED_NAME,
+      Attributes.FAAS_INVOKED_PROVIDER,
+      Attributes.FAAS_TRIGGER,
     ],
   },
   {
     semanticGroup: SemanticGroupNames.Exception,
     attributes: [
-      'name',
-      'tracetest.span.type',
-      'service.name',
-      'exception.type',
-      'exception.message',
-      'exception.escaped',
+      ...BASE_ATTRIBUTES,
+      Attributes.EXCEPTION_TYPE,
+      Attributes.EXCEPTION_MESSAGE,
+      Attributes.EXCEPTION_ESCAPED,
     ],
   },
   {
     semanticGroup: SemanticGroupNames.Compatibility,
-    attributes: ['name', 'tracetest.span.type', 'service.name', 'opentracing.ref_type'],
+    attributes: BASE_ATTRIBUTES,
   },
   {
     semanticGroup: SemanticGroupNames.General,
     attributes: [
-      'name',
-      'service.name',
-      'enduser.id',
-      'enduser.role',
-      'enduser.scope',
-      'thread.name',
-      'code.function',
-      'code.namespace',
-      'code.filepath',
+      ...BASE_ATTRIBUTES,
+      Attributes.ENDUSER_ID,
+      Attributes.ENDUSER_ROLE,
+      Attributes.ENDUSER_SCOPE,
+      Attributes.THREAD_NAME,
+      Attributes.CODE_FUNCTION,
+      Attributes.CODE_NAMESPACE,
+      Attributes.CODE_FILEPATH,
     ],
   },
 ];

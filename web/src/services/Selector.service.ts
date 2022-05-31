@@ -16,12 +16,13 @@ const getValue = (value: string): string => {
   return `"${value}"`;
 };
 
-const selectorRegex = /span\[(.*)\]/i;
+const selectorRegex = /span\[(.*)]/i;
 const nthChildNumberRegex = /\((.*)\)/i;
 const operationRegex = / ([=]+|contains) /;
 
-const getFilters = (selectors: TSpanSelector[]) =>
-  selectors.map(({key, operator, value}) => `${key} ${operator} ${getValue(value)}`);
+const getFilters = (selectors: TSpanSelector[]) => {
+  return selectors.map(({key, operator, value}) => `${key} ${operator} ${getValue(value)}`);
+};
 
 const getCleanValue = (value: string): string => {
   if (value.includes('"')) {
@@ -46,7 +47,7 @@ const getPseudoSelectorString = (pseudoSelector?: TPseudoSelector): string => {
 const SelectorService = () => ({
   getSelectorString(selectorList: TSpanSelector[], pseudoSelector?: TPseudoSelector): string {
     return selectorList.length
-      ? `span[${getFilters(selectorList).join('  ')}]${getPseudoSelectorString(pseudoSelector)}`
+      ? `span[${getFilters(selectorList).join(' ')}]${getPseudoSelectorString(pseudoSelector)}`
       : '';
   },
 
@@ -55,7 +56,7 @@ const SelectorService = () => ({
 
     if (!matchString) return [];
 
-    const selectorList = matchString.split('  ').reduce<TSpanSelector[]>((list, operation) => {
+    return matchString.split('  ').reduce<TSpanSelector[]>((list, operation) => {
       if (!operation) return list;
       const [key, operator, value] = operation.split(operationRegex);
 
@@ -67,8 +68,6 @@ const SelectorService = () => ({
 
       return list.concat([spanSelector]);
     }, []);
-
-    return selectorList;
   },
 
   getPseudoSelector(selectorString: string): TPseudoSelector | undefined {

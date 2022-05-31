@@ -29,7 +29,7 @@ describe('TestGateway', () => {
     expect.assertions(1);
     await TestGateway.getById('testId');
 
-    expect(getTestById.initiate).toBeCalledWith('testId');
+    expect(getTestById.initiate).toBeCalledWith({testId: 'testId'});
   });
 
   it('should execute the getList function', async () => {
@@ -43,6 +43,6 @@ describe('TestGateway', () => {
     expect.assertions(1);
     await TestGateway.run('testId');
 
-    expect(runTest.initiate).toBeCalledWith('testId');
+    expect(runTest.initiate).toBeCalledWith({testId: 'testId'});
   });
 });
