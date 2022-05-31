@@ -6,8 +6,6 @@ test('TestCardActions', async () => {
   const onDelete = jest.fn();
   const testId = faker.datatype.uuid();
 
-  const {getByTestId, container} = render(<TestCardActions onDelete={onDelete} testId={testId} />);
+  const {getByTestId} = render(<TestCardActions onDelete={onDelete} testId={testId} />);
   await waitFor(() => getByTestId(`test-actions-button-${testId}`));
-
-  expect(container).toMatchSnapshot();
 });

@@ -21,7 +21,7 @@ const AttributeList: React.FC<IProps> = ({assertions, attributeList, onCreateAss
   };
 
   return attributeList.length ? (
-    <S.AttributeList>
+    <S.AttributeList data-cy="attribute-list">
       {attributeList.map(attribute => (
         <AttributeRow
           assertionsFailed={assertions?.[attribute.key]?.failed}

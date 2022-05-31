@@ -1,17 +1,18 @@
 import {capitalize} from 'lodash';
 import {useCallback} from 'react';
-import {SemanticGroupNamesToText} from '../../constants/SemanticGroupNames.constants';
-import SpanService from '../../services/Span.service';
-import {TSpan, TSpanFlatAttribute} from '../../types/Span.types';
+import {SemanticGroupNamesToText} from 'constants/SemanticGroupNames.constants';
+import SpanService from 'services/Span.service';
+import {TSpan, TSpanFlatAttribute} from 'types/Span.types';
+import {CompareOperator} from 'constants/Operator.constants';
+import OperatorService from 'services/Operator.service';
+import {useAppSelector} from 'redux/hooks';
+import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
+import {TResultAssertions} from 'types/Assertion.types';
+import {useAssertionForm} from 'components/AssertionForm/AssertionFormProvider';
+
+import SpanDetailTabs from './SpanDetailTabs';
 import SpanHeader from './SpanHeader';
 import * as S from './SpanDetail.styled';
-import {useAssertionForm} from '../AssertionForm/AssertionFormProvider';
-import {CompareOperator} from '../../constants/Operator.constants';
-import OperatorService from '../../services/Operator.service';
-import SpanDetailTabs from './SpanDetailTabs';
-import {useAppSelector} from '../../redux/hooks';
-import TestDefinitionSelectors from '../../selectors/TestDefinition.selectors';
-import {TResultAssertions} from '../../types/Assertion.types';
 
 export interface ISpanDetailsComponentProps {
   assertions?: TResultAssertions;

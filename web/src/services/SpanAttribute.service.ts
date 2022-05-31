@@ -1,14 +1,14 @@
 import {isEmpty, remove} from 'lodash';
-import {SemanticGroupNames} from '../constants/SemanticGroupNames.constants';
+import {SemanticGroupNames} from 'constants/SemanticGroupNames.constants';
 import {
   SectionNames,
   SelectorAttributesBlackList,
   SelectorAttributesWhiteList,
   SpanAttributeSections,
-} from '../constants/Span.constants';
-import {Attributes} from '../constants/SpanAttribute.constants';
-import {TSpanFlatAttribute} from '../types/Span.types';
-import {isJson} from '../utils/Common';
+} from 'constants/Span.constants';
+import {Attributes} from 'constants/SpanAttribute.constants';
+import {TSpanFlatAttribute} from 'types/Span.types';
+import {isJson} from 'utils/Common';
 
 const flatAttributes = Object.values(Attributes);
 

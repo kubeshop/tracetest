@@ -1,6 +1,6 @@
 import {DownOutlined, RightOutlined} from '@ant-design/icons';
 import {Button} from 'antd';
-import {useCallback, useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {useLazyGetRunListQuery} from '../../redux/apis/TraceTest.api';
 import {TTest} from '../../types/Test.types';
 import ResultCardList from '../RunCardList';
@@ -9,8 +9,11 @@ import TestCardActions from './TestCardActions';
 
 interface TTestCardProps {
   test: TTest;
+
   onClick(testId: string): void;
+
   onDelete(test: TTest): void;
+
   onRunTest(testId: string): void;
 }
 
@@ -35,7 +38,7 @@ const TestCard: React.FC<TTestCardProps> = ({
   }, [loadResultList, resultList.length, testId]);
 
   return (
-    <S.TestCard isCollapsed={isCollapsed}>
+    <S.TestCard $isCollapsed={isCollapsed}>
       <S.InfoContainer>
         {isCollapsed ? (
           <DownOutlined onClick={() => setIsCollapsed(false)} />
