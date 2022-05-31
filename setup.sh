@@ -144,9 +144,9 @@ if [ "$SKIP_PMA" != "YES" ]; then
       -f values.yaml \
       --set 'env[0].value=postgresql://ashketchum:squirtle123@demo-postgresql:5432/pokeshop?schema=public' \
       --set 'env[1].value=demo-redis-master' \
-      --set 'env[3]value=pokemon:$(RABBITMQ_PASSWORD)@demo-rabbitmq-headless' \
-      --set 'env[4]value=https://pokeapi.co/api/v2' \
-      --set 'env[5]value=jaeger-agent.'$NAMESPACE'.svc.cluster.local'
+      --set 'env[3].value=pokemon:$(RABBITMQ_PASSWORD)@demo-rabbitmq-headless' \
+      --set 'env[4].value=https://pokeapi.co/api/v2' \
+      --set 'env[5].value=jaeger-agent.'$NAMESPACE'.svc.cluster.local'
 fi
 
 echo
