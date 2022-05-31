@@ -105,7 +105,11 @@ EOF
 
     echo
     echo "--> install jaeger"
+
+    set +e #ignore errors here
     kubectl create namespace observability
+    set -e
+
     kubectl create -f https://github.com/jaegertracing/jaeger-operator/releases/download/v1.32.0/jaeger-operator.yaml -n observability
     echo
     echo "--> waiting for jaeger-operator"
@@ -138,7 +142,6 @@ if [ "$SKIP_PMA" != "YES" ]; then
     helm upgrade --install demo . \
       --namespace demo --create-namespace \
       -f values.yaml
-
 fi
 
 echo
