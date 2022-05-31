@@ -38,7 +38,7 @@ This command will install tracetest using the default settings. You can configur
 Example with custom options:
 
 ```
-curl -L https://raw.githubusercontent.com/kubeshop/main/setup.sh | bash -s --skip-pma --namespace my-custom-namespace
+curl -L https://raw.githubusercontent.com/kubeshop/main/setup.sh | bash -s -- --skip-pma --namespace my-custom-namespace
 ```
 
 ### Using Helm
