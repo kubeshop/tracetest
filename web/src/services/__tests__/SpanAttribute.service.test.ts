@@ -112,7 +112,7 @@ describe('SpanAttributeService', () => {
         },
       ];
 
-      expect(SpanAttributeService.getFilteredSelectorAttributeList(attributeList)).toEqual([
+      expect(SpanAttributeService.getFilteredSelectorAttributeList(attributeList, [])).toEqual([
         {
           key: Attributes.DB_NAME,
           value: 'pokeshop',

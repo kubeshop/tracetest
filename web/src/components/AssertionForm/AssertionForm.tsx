@@ -70,7 +70,7 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
     AssertionSelectors.selectAttributeList(state, testId, runId, spanIdList)
   );
   const selectorAttributeList = useAppSelector(state =>
-    AssertionSelectors.selectSelectorAttributeList(state, testId, runId, spanIdList)
+    AssertionSelectors.selectSelectorAttributeList(state, testId, runId, spanIdList, currentSelectorList)
   );
   const definitionSelectorList = useAppSelector(state => TestDefinitionSelectors.selectDefinitionSelectorList(state));
 

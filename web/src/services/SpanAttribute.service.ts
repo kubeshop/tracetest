@@ -49,8 +49,12 @@ const SpanAttributeService = () => ({
     return sectionList.concat(defaultSectionList);
   },
 
-  getFilteredSelectorAttributeList(attributeList: TSpanFlatAttribute[]): TSpanFlatAttribute[] {
-    const whiteListFiltered = filterAttributeList(attributeList, SelectorAttributesWhiteList);
+  getFilteredSelectorAttributeList(
+    attributeList: TSpanFlatAttribute[],
+    currentSelectorList: string[]
+  ): TSpanFlatAttribute[] {
+    const duplicatedFiltered = removeFromAttributeList(attributeList, currentSelectorList);
+    const whiteListFiltered = filterAttributeList(duplicatedFiltered, SelectorAttributesWhiteList);
     const blackListFiltered = removeFromAttributeList(whiteListFiltered, SelectorAttributesBlackList);
     const customList = attributeList.filter(attr => !flatAttributes.includes(attr.key));
 
