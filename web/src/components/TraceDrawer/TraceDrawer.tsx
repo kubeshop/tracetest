@@ -45,7 +45,8 @@ const TraceDrawer: React.FC<IProps> = ({run: {id: runId}, run, testId, visiblePo
         visiblePortion={visiblePortion}
         selectedSpan={selectedSpan}
       />
-      <S.Content>
+
+      <S.Content id="assertions-container">
         {(isLoading || !assertionResults) && (
           <S.LoadingSpinnerContainer>
             <LoadingSpinner />

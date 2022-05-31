@@ -47,7 +47,7 @@ const Trace = ({displayError, visiblePortion, minHeight, test, run}: IProps): JS
           />
         </S.DiagramSection>
         <S.DetailsSection>
-          <SpanDetail resultId={run.id} testId={test?.id} span={selectedSpan} />
+          <SpanDetail span={selectedSpan} />
         </S.DetailsSection>
       </S.Main>
       <TraceDrawer

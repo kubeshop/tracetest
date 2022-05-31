@@ -1,5 +1,5 @@
 import {CopyOutlined, PlusOutlined} from '@ant-design/icons';
-import {Tooltip, Typography} from 'antd';
+import {Badge, Tooltip, Typography} from 'antd';
 import styled from 'styled-components';
 
 export const AttributeRow = styled.div`
@@ -16,6 +16,10 @@ export const AttributeRow = styled.div`
   &:hover {
     background-color: #fbfbff;
   }
+`;
+
+export const AttributeValueRow = styled.div`
+  display: flex;
 `;
 
 export const CopyIcon = styled(CopyOutlined)`
@@ -50,3 +54,19 @@ export const CustomTooltip = styled(Tooltip).attrs({
   placement: 'top',
   arrowPointAtCenter: true,
 })``;
+
+export const CustomBadge = styled(Badge)`
+  border: 1px solid rgba(3, 24, 73, 0.5);
+  border-radius: 9999px;
+  cursor: pointer;
+  line-height: 19px;
+  margin-left: 8px;
+  padding: 0 8px;
+  white-space: nowrap;
+
+  .ant-badge-status-text {
+    color: rgba(3, 24, 73, 0.5);
+    font-size: 12px;
+    margin-left: 3px;
+  }
+`;

@@ -1,22 +1,27 @@
 import {TextProps} from 'antd/lib/typography/Text';
 import {useMemo, useState} from 'react';
 import JSONPretty from 'react-json-pretty';
-import {isJson} from '../../utils/Common';
+
+import {isJson} from 'utils/Common';
 import * as S from './AttributeValue.styled';
 
-interface IAttributeValueProps extends TextProps {
+interface IProps extends TextProps {
   value: string;
 }
 
-const AttributeValue: React.FC<IAttributeValueProps> = ({value, ...props}) => {
+const AttributeValue: React.FC<IProps> = ({value, ...props}) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const parsedValue = useMemo(() => (isJson(value) ? <JSONPretty data={value} /> : value), [value]);
+  const isJsonValue = useMemo(() => isJson(value), [value]);
 
-  return (
-    <S.ValueText onClick={() => setIsCollapsed(!isCollapsed)} isCollapsed={isCollapsed} {...props}>
-      {parsedValue}
-    </S.ValueText>
-  );
+  if (isJsonValue) {
+    return (
+      <S.ValueJson isCollapsed={isCollapsed} onClick={() => setIsCollapsed(!isCollapsed)} {...props}>
+        <JSONPretty data={value} />
+      </S.ValueJson>
+    );
+  }
+
+  return <S.ValueText {...props}>{value}</S.ValueText>;
 };
 
 export default AttributeValue;

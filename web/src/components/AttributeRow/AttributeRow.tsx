@@ -1,25 +1,38 @@
-import {useCallback, useEffect, useState} from 'react';
-import useHover from '../../hooks/useHover';
-import {TSpanFlatAttribute} from '../../types/Span.types';
+import {useEffect} from 'react';
+
+import useHover from 'hooks/useHover';
+import {IResult} from 'types/Assertion.types';
+import {TSpanFlatAttribute} from 'types/Span.types';
+import AttributeCheck from './AttributeCheck';
 import * as S from './AttributeRow.styled';
 import AttributeValue from '../AttributeValue';
 
-interface IAttributeRowProps {
+interface IProps {
+  assertionsFailed?: IResult[];
+  assertionsPassed?: IResult[];
   attribute: TSpanFlatAttribute;
+  isCopied: boolean;
+  onCopy(value: string): void;
   onCreateAssertion(attribute: TSpanFlatAttribute): void;
+  setIsCopied(value: boolean): void;
 }
 
-const AttributeRow: React.FC<IAttributeRowProps> = ({attribute: {key, value}, attribute, onCreateAssertion}) => {
+const AttributeRow = ({
+  assertionsFailed,
+  assertionsPassed,
+  attribute: {key, value},
+  attribute,
+  isCopied,
+  onCopy,
+  onCreateAssertion,
+  setIsCopied,
+}: IProps) => {
   const {isHovering, onMouseEnter, onMouseLeave} = useHover();
-  const [isCopy, setIsCopy] = useState(false);
-
-  const onCopy = useCallback(() => {
-    navigator.clipboard.writeText(value);
-    setIsCopy(true);
-  }, [value]);
+  const passedCount = assertionsPassed?.length ?? 0;
+  const failedCount = assertionsFailed?.length ?? 0;
 
   useEffect(() => {
-    if (!isHovering) setIsCopy(false);
+    if (!isHovering) setIsCopied(false);
   }, [isHovering]);
 
   return (
@@ -27,12 +40,18 @@ const AttributeRow: React.FC<IAttributeRowProps> = ({attribute: {key, value}, at
       <S.TextContainer>
         <S.Text type="secondary">{key}</S.Text>
       </S.TextContainer>
-      <AttributeValue value={value} />
+
+      <S.AttributeValueRow>
+        <AttributeValue value={value} />
+        {passedCount > 0 && <AttributeCheck items={assertionsPassed!} type="success" />}
+        {failedCount > 0 && <AttributeCheck items={assertionsFailed!} type="error" />}
+      </S.AttributeValueRow>
+
       <S.IconContainer>
         {isHovering && (
           <>
-            <S.CustomTooltip title={isCopy ? 'Copied' : 'Copy'}>
-              <S.CopyIcon onClick={onCopy} />
+            <S.CustomTooltip title={isCopied ? 'Copied' : 'Copy'}>
+              <S.CopyIcon onClick={() => onCopy(value)} />
             </S.CustomTooltip>
             <S.CustomTooltip title="Add Assertion">
               <S.AddAssertionIcon onClick={() => onCreateAssertion(attribute)} />

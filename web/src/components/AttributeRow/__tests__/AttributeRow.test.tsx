@@ -8,10 +8,20 @@ const attribute: TSpanFlatAttribute = {
 };
 
 const onCreateAssertion = jest.fn();
+const onCopy = jest.fn();
+const setIsCopied = jest.fn();
 
 describe('AttributeRow', () => {
   it('should render correctly', () => {
-    const {getByText} = render(<AttributeRow attribute={attribute} onCreateAssertion={onCreateAssertion} />);
+    const {getByText} = render(
+      <AttributeRow
+        attribute={attribute}
+        isCopied={false}
+        onCreateAssertion={onCreateAssertion}
+        onCopy={onCopy}
+        setIsCopied={setIsCopied}
+      />
+    );
 
     expect(getByText(attribute.key)).toBeInTheDocument();
     expect(getByText(attribute.value)).toBeInTheDocument();

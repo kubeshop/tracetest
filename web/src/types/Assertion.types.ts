@@ -50,3 +50,16 @@ export type TAssertionResult = Model<
 
 export type TRawAssertionSpanResult = TTestSchemas['AssertionSpanResult'];
 export type TAssertionSpanResult = Model<TRawAssertionSpanResult, {}>;
+
+export interface IResult {
+  id: string;
+  label: string;
+}
+
+export type TResultAssertions = Record<
+  string,
+  {
+    failed: IResult[];
+    passed: IResult[];
+  }
+>;

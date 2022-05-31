@@ -7,7 +7,7 @@ import SpanDetail from '../SpanDetail';
 test('Layout', () => {
   const result = render(
     <ReduxWrapperProvider>
-      <SpanDetail resultId={faker.datatype.uuid()} testId={faker.datatype.uuid()} span={SpanMock.model()} />
+      <SpanDetail span={SpanMock.model()} />
     </ReduxWrapperProvider>
   );
   expect(result.container).toMatchSnapshot();
