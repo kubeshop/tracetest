@@ -118,6 +118,14 @@ func (d *Definition) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (d Definition) MustAdd(key SpanQuery, asserts []Assertion) Definition {
+	def, err := d.Add(key, asserts)
+	if err != nil {
+		panic(err)
+	}
+	return def
+}
+
 func (d Definition) Add(key SpanQuery, asserts []Assertion) (Definition, error) {
 	if d.keyPosition == nil {
 		d.keyPosition = make(map[SpanQuery]int)

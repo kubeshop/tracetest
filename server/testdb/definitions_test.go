@@ -16,15 +16,13 @@ func TestDefinitions(t *testing.T) {
 
 	test := createTest(t, db)
 
-	def := model.Definition{
-		`span[service.name="Pokeshop"]`: []model.Assertion{
-			{
-				Attribute:  "tracetest.span.duration",
-				Comparator: comparator.Eq,
-				Value:      "2000",
-			},
+	def := (model.Definition{}).MustAdd(`span[service.name="Pokeshop"]`, []model.Assertion{
+		{
+			Attribute:  "tracetest.span.duration",
+			Comparator: comparator.Eq,
+			Value:      "2000",
 		},
-	}
+	})
 
 	err := db.SetDefiniton(context.TODO(), test, def)
 	require.NoError(t, err)

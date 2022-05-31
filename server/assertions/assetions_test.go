@@ -24,15 +24,13 @@ func TestAssertion(t *testing.T) {
 	}{
 		{
 			name: "CanAssert",
-			testDef: model.Definition{
-				`span[service.name="Pokeshop"]`: []model.Assertion{
-					{
-						Attribute:  "tracetest.span.duration",
-						Comparator: comparator.Eq,
-						Value:      "2000",
-					},
+			testDef: (model.Definition{}).MustAdd(`span[service.name="Pokeshop"]`, []model.Assertion{
+				{
+					Attribute:  "tracetest.span.duration",
+					Comparator: comparator.Eq,
+					Value:      "2000",
 				},
-			},
+			}),
 			trace: traces.Trace{
 				RootSpan: traces.Span{
 					ID: spanID,
