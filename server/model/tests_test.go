@@ -1,6 +1,7 @@
 package model_test
 
 import (
+	"encoding/json"
 	"testing"
 
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
@@ -64,6 +65,20 @@ func TestDefinition(t *testing.T) {
 
 		assert.Empty(t, def.Get(model.SpanQuery("3")))
 
+	})
+
+	t.Run("JSON", func(t *testing.T) {
+
+		def := generateDef()
+
+		encoded, err := json.Marshal(def)
+		require.NoError(t, err)
+
+		decoded := model.Definition{}
+		err = json.Unmarshal(encoded, &decoded)
+		require.NoError(t, err)
+
+		assert.Equal(t, def, decoded)
 	})
 
 }

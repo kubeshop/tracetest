@@ -76,6 +76,48 @@ type Definition struct {
 	positionKey map[int]SpanQuery
 }
 
+func (d *Definition) replace(d2 *Definition) {
+	*d = *d2
+
+}
+
+func (d Definition) MarshalJSON() ([]byte, error) {
+	type s struct {
+		Selector   string
+		Assertions []Assertion
+	}
+
+	j := []s{}
+	d.Map(func(spanQuery SpanQuery, asserts []Assertion) {
+		j = append(j, s{string(spanQuery), asserts})
+	})
+
+	return json.Marshal(j)
+}
+
+func (d *Definition) UnmarshalJSON(data []byte) error {
+	aux := []struct {
+		Selector   string
+		Assertions []Assertion
+	}{}
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+
+	newD := Definition{}
+	var err error
+	for _, s := range aux {
+		newD, err = newD.Add(SpanQuery(s.Selector), s.Assertions)
+		if err != nil {
+			return err
+		}
+	}
+
+	d.replace(&newD)
+
+	return nil
+}
+
 func (d Definition) Add(key SpanQuery, asserts []Assertion) (Definition, error) {
 	if d.keyPosition == nil {
 		d.keyPosition = make(map[SpanQuery]int)
