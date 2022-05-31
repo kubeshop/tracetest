@@ -76,8 +76,10 @@ const AssertionFormSelectorInput: React.FC<TItemSelectorDropdownProps> = ({
   );
 
   const handleDeleteItemSelector = useCallback(
-    (entryNumber: number) => {
-      onChange(selectorList.filter((item, index) => index !== entryNumber));
+    ([attribute, operator, value]: string[]) => {
+      onChange(
+        selectorList.filter(item => attribute !== item.key || operator !== item.operator || value !== item.value)
+      );
     },
     [onChange, selectorList]
   );

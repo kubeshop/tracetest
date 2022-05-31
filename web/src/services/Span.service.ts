@@ -49,7 +49,7 @@ const SpanService = () => ({
       })) || [];
 
     const pseudoSelector = {
-      selector: PseudoSelector.FIRST,
+      selector: PseudoSelector.ALL,
     };
 
     return {selectorList, pseudoSelector};

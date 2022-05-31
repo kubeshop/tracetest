@@ -63,7 +63,7 @@ export const SemanticGroupNameNodeMap: Record<SemanticGroupNames, {primary: stri
   },
 };
 
-const BASE_ATTRIBUTES = [Attributes.NAME, Attributes.TRACETEST_SPAN_TYPE, Attributes.SERVICE_NAME];
+export const BASE_ATTRIBUTES = [Attributes.TRACETEST_SPAN_TYPE, Attributes.SERVICE_NAME, Attributes.NAME];
 
 export const SELECTOR_DEFAULT_ATTRIBUTES = [
   {

@@ -64,7 +64,7 @@ describe('SpanService', () => {
       const selectorInfo = SpanService.getSelectorInformation(span);
 
       expect(selectorInfo.selectorList).toHaveLength(2);
-      expect(selectorInfo.pseudoSelector).toEqual({selector: PseudoSelector.FIRST});
+      expect(selectorInfo.pseudoSelector).toEqual({selector: PseudoSelector.ALL});
     });
   });
 });

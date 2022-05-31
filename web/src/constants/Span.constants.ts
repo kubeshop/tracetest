@@ -1,5 +1,6 @@
-import {SemanticGroupNames} from './SemanticGroupNames.constants';
-import {Attributes} from './SpanAttribute.constants';
+import {uniq} from 'lodash';
+import {SemanticGroupNames, BASE_ATTRIBUTES, SemanticGroupsSignature} from './SemanticGroupNames.constants';
+import {Attributes, SemanticAttributes} from './SpanAttribute.constants';
 
 type TValueOfAttributes = typeof Attributes[keyof typeof Attributes];
 
@@ -13,6 +14,8 @@ export enum SectionNames {
   custom = 'custom',
   all = 'all',
 }
+
+export const SelectorAttributesBlackList = [SemanticAttributes.DB_STATEMENT, SemanticAttributes.DB_CONNECTION_STRING];
 
 export const SpanAttributeSections: Record<SemanticGroupNames, Record<string, TValueOfAttributes[]>> = {
   [SemanticGroupNames.Http]: {
@@ -80,9 +83,28 @@ export const SpanAttributeSections: Record<SemanticGroupNames, Record<string, TV
       Attributes.MESSAGING_KAFKA_CONSUMER_GROUP,
     ],
   },
-  [SemanticGroupNames.Rpc]: {},
-  [SemanticGroupNames.Exception]: {},
-  [SemanticGroupNames.General]: {},
-  [SemanticGroupNames.Compatibility]: {},
-  [SemanticGroupNames.Faas]: {},
+  [SemanticGroupNames.Rpc]: {
+    [SectionNames.metadata]: SemanticGroupsSignature.rpc,
+  },
+  [SemanticGroupNames.Exception]: {
+    [SectionNames.metadata]: SemanticGroupsSignature.exception,
+  },
+  [SemanticGroupNames.General]: {
+    [SectionNames.metadata]: SemanticGroupsSignature.general,
+  },
+  [SemanticGroupNames.Compatibility]: {
+    [SectionNames.metadata]: SemanticGroupsSignature.compatibility,
+  },
+  [SemanticGroupNames.Faas]: {
+    [SectionNames.metadata]: SemanticGroupsSignature.faas,
+  },
 };
+
+export const SelectorAttributesWhiteList = uniq([
+  ...BASE_ATTRIBUTES,
+  ...Object.values(SpanAttributeSections).flatMap(section => {
+    const sectionAttributes = Object.values(section).flatMap(attributes => attributes);
+
+    return sectionAttributes;
+  }),
+]);
