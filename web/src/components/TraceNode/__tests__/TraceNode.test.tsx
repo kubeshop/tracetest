@@ -4,7 +4,7 @@ import SpanMock from '../../../models/__mocks__/Span.mock';
 import TraceNode from '../TraceNode';
 
 test('TraceNode', () => {
-  const result = render(
+  const {getByText} = render(
     <ReactFlowProvider>
       <TraceNode
         id="sdfkjn"
@@ -17,5 +17,5 @@ test('TraceNode', () => {
       />
     </ReactFlowProvider>
   );
-  expect(result.container).toMatchSnapshot();
+  expect(getByText('General')).toBeTruthy();
 });

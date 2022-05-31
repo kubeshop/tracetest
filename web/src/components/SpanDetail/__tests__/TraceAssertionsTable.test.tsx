@@ -5,10 +5,10 @@ import {ReduxWrapperProvider} from '../../../redux/ReduxWrapperProvider';
 import SpanDetail from '../SpanDetail';
 
 test('Layout', () => {
-  const result = render(
+  const {getByText} = render(
     <ReduxWrapperProvider>
       <SpanDetail span={SpanMock.model()} />
     </ReduxWrapperProvider>
   );
-  expect(result.container).toMatchSnapshot();
+  expect(getByText('Attribute list')).toBeTruthy();
 });

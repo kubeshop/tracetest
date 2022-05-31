@@ -10,19 +10,14 @@ test('TestCard', async () => {
 
   const test = TestMock.model();
 
-  const {container, getByTestId} = render(
+  const {getByTestId, getByText} = render(
     <ReduxWrapperProvider>
       <TestCard onDelete={onDelete} onRunTest={onRunTest} test={test} onClick={onClick} />
     </ReduxWrapperProvider>
   );
 
-  fireEvent(
-    getByTestId(`test-actions-button-${test.id}`),
-    new MouseEvent('click', {
-      bubbles: true,
-      cancelable: true,
-    })
-  );
+  const mouseEvent = new MouseEvent('click', {bubbles: true});
+  fireEvent(getByTestId(`test-actions-button-${test.id}`), mouseEvent);
   await waitFor(() => getByTestId('test-card-delete'));
-  expect(container).toMatchSnapshot();
+  expect(getByText('Run Test')).toBeTruthy();
 });
