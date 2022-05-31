@@ -3,8 +3,8 @@ import {useCallback} from 'react';
 import {useStore} from 'react-flow-renderer';
 
 import AssertionCheckRow from 'components/AssertionCheckRow';
-import {useAppDispatch, useAppSelector} from 'redux/hooks';
-import {clearAffectedSpans, setAffectedSpans} from 'redux/slices/TestDefinition.slice';
+import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
+import {useAppSelector} from 'redux/hooks';
 import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
 import {TAssertionResultEntry} from 'types/Assertion.types';
 import * as S from './AssertionCard.styled';
@@ -14,8 +14,6 @@ interface TAssertionCardProps {
   onSelectSpan(spanId: string): void;
   onDelete(selector: string): void;
   onEdit(assertionResult: TAssertionResultEntry): void;
-  selectedAssertion: string;
-  setSelectedAssertion(assertion: string): void;
 }
 
 const AssertionCard: React.FC<TAssertionCardProps> = ({
@@ -24,15 +22,14 @@ const AssertionCard: React.FC<TAssertionCardProps> = ({
   onSelectSpan,
   onDelete,
   onEdit,
-  selectedAssertion,
-  setSelectedAssertion,
 }) => {
-  const dispatch = useAppDispatch();
+  const {setSelectedAssertion} = useTestDefinition();
   const store = useStore();
 
-  const spanCountText = `${spanIds.length} ${spanIds.length > 1 ? 'spans' : 'span'}`;
+  const selectedAssertion = useAppSelector(TestDefinitionSelectors.selectSelectedAssertion);
   const definition = useAppSelector(state => TestDefinitionSelectors.selectDefinitionBySelector(state, selector));
   const {isDraft = false, isDeleted = false} = definition || {};
+  const spanCountText = `${spanIds.length} ${spanIds.length > 1 ? 'spans' : 'span'}`;
 
   const getIsSelectedSpan = useCallback(
     (id: string): boolean => {
@@ -46,12 +43,9 @@ const AssertionCard: React.FC<TAssertionCardProps> = ({
 
   const handleOnClick = () => {
     if (selectedAssertion === selector) {
-      dispatch(clearAffectedSpans());
-      setSelectedAssertion('');
-      return;
+      return setSelectedAssertion('');
     }
     setSelectedAssertion(selector);
-    dispatch(setAffectedSpans(spanIds));
   };
 
   return (

@@ -6,9 +6,9 @@ import React, {useCallback, useEffect} from 'react';
 import {Steps} from 'components/GuidedTour/assertionStepList';
 import {CompareOperator} from 'constants/Operator.constants';
 import useGuidedTour from 'hooks/useGuidedTour';
+import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
 import {useGetSelectedSpansQuery} from 'redux/apis/TraceTest.api';
-import {useAppDispatch, useAppSelector} from 'redux/hooks';
-import {setAffectedSpans} from 'redux/slices/TestDefinition.slice';
+import {useAppSelector} from 'redux/hooks';
 import AssertionSelectors from 'selectors/Assertion.selectors';
 import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
 import CreateAssertionModalAnalyticsService from 'services/Analytics/CreateAssertionModalAnalytics.service';
@@ -54,7 +54,7 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
   testId,
   runId,
 }) => {
-  const dispatch = useAppDispatch();
+  const {setAffectedSpans} = useTestDefinition();
   const [form] = Form.useForm<IValues>();
   useGuidedTour(GuidedTours.Assertion);
 
@@ -69,8 +69,8 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
   });
 
   useEffect(() => {
-    dispatch(setAffectedSpans(spanIdList));
-  }, [spanIdList]);
+    setAffectedSpans(spanIdList);
+  }, [setAffectedSpans, spanIdList]);
 
   const attributeList = useAppSelector(state =>
     AssertionSelectors.selectAttributeList(state, testId, runId, spanIdList)

@@ -4,7 +4,7 @@ import {useState, createContext, useCallback, useMemo, useContext, Dispatch, Set
 import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
-import {clearAffectedSpans} from 'redux/slices/TestDefinition.slice';
+import {clearAffectedSpans, setSelectedAssertion} from 'redux/slices/TestDefinition.slice';
 import SelectorService from 'services/Selector.service';
 import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
 import {TTestDefinitionEntry} from 'types/TestDefinition.types';
@@ -74,6 +74,8 @@ const AssertionFormProvider: React.FC<{testId: string}> = ({children}) => {
 
       if (run.testVersion !== test?.version && !isDraftMode) setIsConfirmationModalOpen(true);
       else setIsOpen(true);
+
+      dispatch(setSelectedAssertion(''));
     },
     [definitionList, isDraftMode, run.testVersion, test?.version]
   );
