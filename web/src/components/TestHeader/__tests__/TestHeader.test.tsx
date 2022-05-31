@@ -4,6 +4,8 @@ import TestMock from '../../../models/__mocks__/Test.mock';
 import TestHeader from '../TestHeader';
 
 test('SpanAttributesTable', () => {
-  const result = render(<TestHeader onBack={jest.fn()} test={TestMock.model()} testState={TestState.CREATED} />);
+  const result = render(
+    <TestHeader onBack={jest.fn()} test={TestMock.model()} testState={TestState.CREATED} testVersion={1} />
+  );
   expect(result.container).toMatchSnapshot();
 });
