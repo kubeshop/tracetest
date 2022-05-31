@@ -24,9 +24,8 @@ type (
 		Request HTTPRequest
 	}
 
-	Definition map[SpanQuery][]Assertion
-
 	SpanQuery string
+
 	Assertion struct {
 		Attribute  string
 		Comparator comparator.Comparator
@@ -70,6 +69,54 @@ type (
 		CompareErr    error
 	}
 )
+
+type Definition struct {
+	list        [][]Assertion
+	keyPosition map[SpanQuery]int
+	positionKey map[int]SpanQuery
+}
+
+func (d Definition) Add(key SpanQuery, asserts []Assertion) (Definition, error) {
+	if d.keyPosition == nil {
+		d.keyPosition = make(map[SpanQuery]int)
+	}
+	if d.positionKey == nil {
+		d.positionKey = make(map[int]SpanQuery)
+	}
+
+	if _, exists := d.keyPosition[key]; exists {
+		return Definition{}, errors.New("selector already exists")
+	}
+
+	d.list = append(d.list, asserts)
+	ix := len(d.list) - 1
+	d.keyPosition[key] = ix
+	d.positionKey[ix] = key
+
+	return d, nil
+}
+
+func (d Definition) Len() int {
+	return len(d.list)
+}
+
+func (d Definition) Get(spanQuery SpanQuery) []Assertion {
+	ix, exists := d.keyPosition[spanQuery]
+	if !exists {
+		return nil
+	}
+
+	return d.list[ix]
+}
+
+type mapFn func(spanQuery SpanQuery, asserts []Assertion)
+
+func (d *Definition) Map(fn mapFn) {
+	for ix, asserts := range d.list {
+		spanQuery := d.positionKey[ix]
+		fn(spanQuery, asserts)
+	}
+}
 
 type RunState string
 
