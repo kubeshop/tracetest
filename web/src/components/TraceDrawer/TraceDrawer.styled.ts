@@ -62,5 +62,5 @@ export const LoadingSpinnerContainer = styled.div`
 export const Chevron = styled.img.attrs({
   src: chevron,
 })<{$isCollapsed: boolean}>`
-  transform: ${({$isCollapsed}) => ($isCollapsed ? 'rotate(0deg)' : 'rotate(180deg)')};
+  transform: ${({$isCollapsed}) => (!$isCollapsed ? 'rotate(0deg)' : 'rotate(180deg)')};
 `;
