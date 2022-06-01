@@ -39,12 +39,16 @@ const TestCard: React.FC<TTestCardProps> = ({
 
   return (
     <S.TestCard $isCollapsed={isCollapsed}>
-      <S.InfoContainer>
-        {isCollapsed ? (
-          <DownOutlined onClick={() => setIsCollapsed(false)} />
-        ) : (
-          <RightOutlined data-cy={`collapse-test-${testId}`} onClick={onCollapse} />
-        )}
+      <S.InfoContainer
+        onClick={async () => {
+          if (isCollapsed) {
+            setIsCollapsed(false);
+            return;
+          }
+          await onCollapse();
+        }}
+      >
+        {isCollapsed ? <DownOutlined /> : <RightOutlined data-cy={`collapse-test-${testId}`} onClick={onCollapse} />}
         <S.TextContainer>
           <S.NameText>{name}</S.NameText>
         </S.TextContainer>
