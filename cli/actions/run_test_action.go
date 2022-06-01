@@ -51,7 +51,7 @@ func (a runTestAction) Run(ctx context.Context, args RunTestConfig) error {
 		return fmt.Errorf("could not marshal output json: %w", err)
 	}
 
-	fmt.Printf(string(bytes))
+	fmt.Print(string(bytes))
 	return nil
 }
 
