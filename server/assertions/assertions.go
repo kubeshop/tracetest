@@ -7,10 +7,10 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-func Assert(defs model.Definition, trace traces.Trace) (model.Results, bool) {
-	testResult := model.Results{}
+func Assert(defs model.OrderedMap[model.SpanQuery, []model.Assertion], trace traces.Trace) (model.OrderedMap[model.SpanQuery, []model.AssertionResult], bool) {
+	testResult := model.OrderedMap[model.SpanQuery, []model.AssertionResult]{}
 	allPassed := true
-	for spanQuery, asserts := range defs {
+	defs.Map(func(spanQuery model.SpanQuery, asserts []model.Assertion) {
 		spans := selector(spanQuery).Filter(trace)
 		assertionResults := make([]model.AssertionResult, 0)
 		for _, assertion := range asserts {
@@ -20,8 +20,8 @@ func Assert(defs model.Definition, trace traces.Trace) (model.Results, bool) {
 			}
 			assertionResults = append(assertionResults, res)
 		}
-		testResult[spanQuery] = assertionResults
-	}
+		testResult, _ = testResult.Add(spanQuery, assertionResults)
+	})
 
 	return testResult, allPassed
 }

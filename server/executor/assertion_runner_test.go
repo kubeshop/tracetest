@@ -70,14 +70,13 @@ func TestExecutorSuccessfulExecution(t *testing.T) {
 			require.NotNil(t, dbResult.Results)
 			if testCase.ShouldPass {
 				assert.Equal(t, model.RunStateFinished, dbResult.State)
-				for _, results := range dbResult.Results.Results {
+				dbResult.Results.Results.Map(func(_ model.SpanQuery, results []model.AssertionResult) {
 					for _, assertRes := range results {
 						for _, spanAssertionRes := range assertRes.Results {
 							assert.NoError(t, spanAssertionRes.CompareErr)
 						}
 					}
-
-				}
+				})
 				assert.True(t, dbResult.Results.AllPassed)
 			} else {
 				assert.False(t, dbResult.Results.AllPassed)

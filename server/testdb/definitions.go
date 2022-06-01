@@ -9,23 +9,23 @@ import (
 	"github.com/kubeshop/tracetest/server/model"
 )
 
-var _ model.DefinitionRepository = &postgresDB{}
+var _ model.RunRepository = &postgresDB{}
 
-func (td *postgresDB) GetDefiniton(ctx context.Context, test model.Test) (model.Definition, error) {
+func (td *postgresDB) GetDefiniton(ctx context.Context, test model.Test) (model.OrderedMap[model.SpanQuery, []model.Assertion], error) {
 	stmt, err := td.db.Prepare("SELECT definition FROM definitions WHERE test_id = $1 and test_version = $2")
 	if err != nil {
-		return model.Definition{}, fmt.Errorf("prepare: %w", err)
+		return model.OrderedMap[model.SpanQuery, []model.Assertion]{}, fmt.Errorf("prepare: %w", err)
 	}
 	defer stmt.Close()
 
 	def, err := readDefinitionRow(stmt.QueryRowContext(ctx, test.ID, test.Version))
 	if err != nil {
-		return model.Definition{}, err
+		return model.OrderedMap[model.SpanQuery, []model.Assertion]{}, err
 	}
 	return def, nil
 }
 
-func (td *postgresDB) SetDefiniton(ctx context.Context, t model.Test, d model.Definition) error {
+func (td *postgresDB) SetDefiniton(ctx context.Context, t model.Test, d model.OrderedMap[model.SpanQuery, []model.Assertion]) error {
 	sql := `UPDATE definitions SET definition = $3 WHERE test_id = $1 AND test_version = $2`
 	if _, err := td.GetDefiniton(ctx, t); err == ErrNotFound {
 		sql = `INSERT INTO definitions (test_id, test_version, "definition") VALUES ($1, $2, $3)`
@@ -49,7 +49,7 @@ func (td *postgresDB) SetDefiniton(ctx context.Context, t model.Test, d model.De
 	return nil
 }
 
-func encodeDefinition(d model.Definition) (string, error) {
+func encodeDefinition(d model.OrderedMap[model.SpanQuery, []model.Assertion]) (string, error) {
 	b, err := json.Marshal(d)
 	if err != nil {
 		return "", fmt.Errorf("json Marshal: %w", err)
@@ -58,24 +58,24 @@ func encodeDefinition(d model.Definition) (string, error) {
 	return string(b), nil
 }
 
-func decodeDefinition(b []byte) (model.Definition, error) {
-	var def model.Definition
+func decodeDefinition(b []byte) (model.OrderedMap[model.SpanQuery, []model.Assertion], error) {
+	var def model.OrderedMap[model.SpanQuery, []model.Assertion]
 	err := json.Unmarshal(b, &def)
 	if err != nil {
-		return model.Definition{}, err
+		return model.OrderedMap[model.SpanQuery, []model.Assertion]{}, err
 	}
 	return def, nil
 }
 
-func readDefinitionRow(row scanner) (model.Definition, error) {
+func readDefinitionRow(row scanner) (model.OrderedMap[model.SpanQuery, []model.Assertion], error) {
 	var b []byte
 	err := row.Scan(&b)
 	switch err {
 	case sql.ErrNoRows:
-		return model.Definition{}, ErrNotFound
+		return model.OrderedMap[model.SpanQuery, []model.Assertion]{}, ErrNotFound
 	case nil:
 		return decodeDefinition(b)
 	default:
-		return model.Definition{}, err
+		return model.OrderedMap[model.SpanQuery, []model.Assertion]{}, err
 	}
 }

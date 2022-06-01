@@ -15,29 +15,38 @@
                 "Body": "{ \"id\": 52 }"
             }
         },
-        "Definition": {
-          "span[service.name=\"pokeshop\" tracetest.span.type=\"http\" name=\"POST /pokemon/import\"]": [
-            {
-              "attribute": "http.status_code",
-              "comparator": "=",
-              "value": "200"
-            }
-          ],
-          "span[service.name=\"pokeshop-worker\" tracetest.span.type=\"database\" db.statement contains \"INSERT INTO\"]": [
-            {
-              "attribute": "tracetest.span.duration",
-              "comparator": "<",
-              "value": "100"
-            }
-          ],
-          "span[service.name=\"pokeshop-worker\" tracetest.span.type=\"messaging\" messaging.destination=\"/queue/syncronizePokemon\"]": [
-            {
-              "attribute": "tracetest.span.duration",
-              "comparator": "<",
-              "value": "1000"
-            }
-          ]
-        }
+        "Definition": [
+          {
+            "Key": "span[service.name=\"pokeshop\" tracetest.span.type=\"http\" name=\"POST /pokemon/import\"]",
+            "Value": [
+              {
+                "attribute": "http.status_code",
+                "comparator": "=",
+                "value": "200"
+              }
+            ]
+          },
+          {
+            "Key": "span[service.name=\"pokeshop-worker\" tracetest.span.type=\"database\" db.statement contains \"INSERT INTO\"]",
+            "Value": [
+              {
+                "attribute": "tracetest.span.duration",
+                "comparator": "<",
+                "value": "100"
+              }
+            ]
+          },
+          {
+            "Key": "span[service.name=\"pokeshop-worker\" tracetest.span.type=\"messaging\" messaging.destination=\"/queue/syncronizePokemon\"]",
+            "Value": [
+              {
+                "attribute": "tracetest.span.duration",
+                "comparator": "<",
+                "value": "1000"
+              }
+            ]
+          }
+        ]
     },
     "run": {
         "ID": "0841f905-4d9e-4049-815c-7e348c10e182",

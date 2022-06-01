@@ -26,8 +26,8 @@ type controller struct {
 	runner          executor.Runner
 	assertionRunner executor.AssertionRunner
 
-	openapi openapiMapper
-	model   modelMapper
+	openapi OpenAPIMapper
+	model   ModelMapper
 }
 
 func NewController(
@@ -39,8 +39,8 @@ func NewController(
 		testDB:          testDB,
 		runner:          runner,
 		assertionRunner: assertionRunner,
-		openapi:         openapiMapper{},
-		model:           modelMapper{Comparators: comparator.DefaultRegistry()},
+		openapi:         OpenAPIMapper{},
+		model:           ModelMapper{Comparators: comparator.DefaultRegistry()},
 	}
 }
 

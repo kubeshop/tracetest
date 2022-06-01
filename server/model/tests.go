@@ -17,16 +17,15 @@ type (
 		Version          int
 		ServiceUnderTest ServiceUnderTest
 		ReferenceRun     *Run
-		Definition       Definition
+		Definition       OrderedMap[SpanQuery, []Assertion]
 	}
 
 	ServiceUnderTest struct {
 		Request HTTPRequest
 	}
 
-	Definition map[SpanQuery][]Assertion
-
 	SpanQuery string
+
 	Assertion struct {
 		Attribute  string
 		Comparator comparator.Comparator
@@ -53,10 +52,8 @@ type (
 
 	RunResults struct {
 		AllPassed bool
-		Results   Results
+		Results   OrderedMap[SpanQuery, []AssertionResult]
 	}
-
-	Results map[SpanQuery][]AssertionResult
 
 	AssertionResult struct {
 		Assertion Assertion

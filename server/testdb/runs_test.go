@@ -62,24 +62,22 @@ func TestUpdateRun(t *testing.T) {
 	}
 	run.Results = &model.RunResults{
 		AllPassed: true,
-		Results: model.Results{
-			`span[service.name="Pokeshop"]`: []model.AssertionResult{
-				{
-					Assertion: model.Assertion{
-						Attribute:  "tracetest.span.duration",
-						Comparator: comparator.Eq,
-						Value:      "2000",
-					},
-					Results: []model.SpanAssertionResult{
-						{
-							SpanID:        run.Trace.RootSpan.ID,
-							ObservedValue: "2000",
-							CompareErr:    nil,
-						},
+		Results: (model.OrderedMap[model.SpanQuery, []model.AssertionResult]{}).MustAdd(`span[service.name="Pokeshop"]`, []model.AssertionResult{
+			{
+				Assertion: model.Assertion{
+					Attribute:  "tracetest.span.duration",
+					Comparator: comparator.Eq,
+					Value:      "2000",
+				},
+				Results: []model.SpanAssertionResult{
+					{
+						SpanID:        run.Trace.RootSpan.ID,
+						ObservedValue: "2000",
+						CompareErr:    nil,
 					},
 				},
 			},
-		},
+		}),
 	}
 
 	err := db.UpdateRun(context.TODO(), run)

@@ -46,12 +46,12 @@ func (m *MockRepository) GetTests(_ context.Context, take int32, skip int32) ([]
 	return args.Get(0).([]model.Test), args.Error(1)
 }
 
-func (m *MockRepository) GetDefiniton(_ context.Context, test model.Test) (model.Definition, error) {
+func (m *MockRepository) GetDefiniton(_ context.Context, test model.Test) (model.OrderedMap[model.SpanQuery, []model.Assertion], error) {
 	args := m.Called(test)
-	return args.Get(0).(model.Definition), args.Error(1)
+	return args.Get(0).(model.OrderedMap[model.SpanQuery, []model.Assertion]), args.Error(1)
 }
 
-func (m *MockRepository) SetDefiniton(_ context.Context, test model.Test, def model.Definition) error {
+func (m *MockRepository) SetDefiniton(_ context.Context, test model.Test, def model.OrderedMap[model.SpanQuery, []model.Assertion]) error {
 	args := m.Called(test, def)
 	return args.Error(0)
 }
