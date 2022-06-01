@@ -1,7 +1,6 @@
 package model
 
 import (
-	"math"
 	"time"
 
 	"github.com/google/uuid"
@@ -82,22 +81,3 @@ const (
 	RunStateFinished            RunState = "FINISHED"
 	RunStateAwaitingTestResults RunState = "AWAITING_TEST_RESULTS"
 )
-
-var (
-	Now = func() time.Time {
-		return time.Now()
-	}
-)
-
-func (r Run) ExecutionTime() int {
-	var endDate time.Time
-	if !r.CompletedAt.IsZero() {
-		endDate = r.CompletedAt
-	} else {
-		endDate = Now()
-	}
-
-	et := math.Ceil(endDate.Sub(r.CreatedAt).Seconds())
-
-	return int(et)
-}

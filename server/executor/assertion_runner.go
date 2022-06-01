@@ -73,14 +73,10 @@ func (e *defaultAssertionRunner) startWorker(ctx context.Context) {
 func (e *defaultAssertionRunner) runAssertionsAndUpdateResult(ctx context.Context, request AssertionRequest) error {
 	run, err := e.executeAssertions(ctx, request)
 	if err != nil {
-		run.State = model.RunStateFailed
-		run.LastError = err
-		run.CompletedAt = time.Now()
-		return e.db.UpdateRun(ctx, run)
+		return e.db.UpdateRun(ctx, run.Failed(err))
 	}
 
-	run.State = model.RunStateFinished
-	err = e.db.UpdateRun(ctx, run)
+	err = e.db.UpdateRun(ctx, run.SuccessfullyAsserted())
 	if err != nil {
 		return fmt.Errorf("could not save result on database: %w", err)
 	}
