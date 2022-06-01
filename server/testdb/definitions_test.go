@@ -16,7 +16,7 @@ func TestDefinitions(t *testing.T) {
 
 	test := createTest(t, db)
 
-	def := (model.Definition{}).MustAdd(`span[service.name="Pokeshop"]`, []model.Assertion{
+	def := (model.OrderedMap[model.SpanQuery, []model.Assertion]{}).MustAdd(`span[service.name="Pokeshop"]`, []model.Assertion{
 		{
 			Attribute:  "tracetest.span.duration",
 			Comparator: comparator.Eq,

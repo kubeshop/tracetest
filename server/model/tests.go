@@ -17,7 +17,7 @@ type (
 		Version          int
 		ServiceUnderTest ServiceUnderTest
 		ReferenceRun     *Run
-		Definition       Definition
+		Definition       OrderedMap[SpanQuery, []Assertion]
 	}
 
 	ServiceUnderTest struct {
@@ -52,10 +52,8 @@ type (
 
 	RunResults struct {
 		AllPassed bool
-		Results   Results
+		Results   OrderedMap[SpanQuery, []AssertionResult]
 	}
-
-	Results map[SpanQuery][]AssertionResult
 
 	AssertionResult struct {
 		Assertion Assertion
@@ -69,104 +67,6 @@ type (
 		CompareErr    error
 	}
 )
-
-type Definition struct {
-	list        [][]Assertion
-	keyPosition map[SpanQuery]int
-	positionKey map[int]SpanQuery
-}
-
-func (d *Definition) replace(d2 *Definition) {
-	*d = *d2
-
-}
-
-func (d Definition) MarshalJSON() ([]byte, error) {
-	type s struct {
-		Selector   string
-		Assertions []Assertion
-	}
-
-	j := []s{}
-	d.Map(func(spanQuery SpanQuery, asserts []Assertion) {
-		j = append(j, s{string(spanQuery), asserts})
-	})
-
-	return json.Marshal(j)
-}
-
-func (d *Definition) UnmarshalJSON(data []byte) error {
-	aux := []struct {
-		Selector   string
-		Assertions []Assertion
-	}{}
-	if err := json.Unmarshal(data, &aux); err != nil {
-		return err
-	}
-
-	newD := Definition{}
-	var err error
-	for _, s := range aux {
-		newD, err = newD.Add(SpanQuery(s.Selector), s.Assertions)
-		if err != nil {
-			return err
-		}
-	}
-
-	d.replace(&newD)
-
-	return nil
-}
-
-func (d Definition) MustAdd(key SpanQuery, asserts []Assertion) Definition {
-	def, err := d.Add(key, asserts)
-	if err != nil {
-		panic(err)
-	}
-	return def
-}
-
-func (d Definition) Add(key SpanQuery, asserts []Assertion) (Definition, error) {
-	if d.keyPosition == nil {
-		d.keyPosition = make(map[SpanQuery]int)
-	}
-	if d.positionKey == nil {
-		d.positionKey = make(map[int]SpanQuery)
-	}
-
-	if _, exists := d.keyPosition[key]; exists {
-		return Definition{}, errors.New("selector already exists")
-	}
-
-	d.list = append(d.list, asserts)
-	ix := len(d.list) - 1
-	d.keyPosition[key] = ix
-	d.positionKey[ix] = key
-
-	return d, nil
-}
-
-func (d Definition) Len() int {
-	return len(d.list)
-}
-
-func (d Definition) Get(spanQuery SpanQuery) []Assertion {
-	ix, exists := d.keyPosition[spanQuery]
-	if !exists {
-		return nil
-	}
-
-	return d.list[ix]
-}
-
-type mapFn func(spanQuery SpanQuery, asserts []Assertion)
-
-func (d *Definition) Map(fn mapFn) {
-	for ix, asserts := range d.list {
-		spanQuery := d.positionKey[ix]
-		fn(spanQuery, asserts)
-	}
-}
 
 type RunState string
 

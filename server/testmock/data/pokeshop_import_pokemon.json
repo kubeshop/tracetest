@@ -17,8 +17,8 @@
         },
         "Definition": [
           {
-            "Selector": "span[service.name=\"pokeshop\" tracetest.span.type=\"http\" name=\"POST /pokemon/import\"]",
-            "Assertions": [
+            "Key": "span[service.name=\"pokeshop\" tracetest.span.type=\"http\" name=\"POST /pokemon/import\"]",
+            "Value": [
               {
                 "attribute": "http.status_code",
                 "comparator": "=",
@@ -27,8 +27,8 @@
             ]
           },
           {
-            "Selector": "span[service.name=\"pokeshop-worker\" tracetest.span.type=\"database\" db.statement contains \"INSERT INTO\"]",
-            "Assertions": [
+            "Key": "span[service.name=\"pokeshop-worker\" tracetest.span.type=\"database\" db.statement contains \"INSERT INTO\"]",
+            "Value": [
               {
                 "attribute": "tracetest.span.duration",
                 "comparator": "<",
@@ -37,8 +37,8 @@
             ]
           },
           {
-            "Selector": "span[service.name=\"pokeshop-worker\" tracetest.span.type=\"messaging\" messaging.destination=\"/queue/syncronizePokemon\"]",
-            "Assertions": [
+            "Key": "span[service.name=\"pokeshop-worker\" tracetest.span.type=\"messaging\" messaging.destination=\"/queue/syncronizePokemon\"]",
+            "Value": [
               {
                 "attribute": "tracetest.span.duration",
                 "comparator": "<",

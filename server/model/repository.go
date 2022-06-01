@@ -17,8 +17,8 @@ type TestRepository interface {
 }
 
 type DefinitionRepository interface {
-	GetDefiniton(context.Context, Test) (Definition, error)
-	SetDefiniton(context.Context, Test, Definition) error
+	GetDefiniton(context.Context, Test) (OrderedMap[SpanQuery, []Assertion], error)
+	SetDefiniton(context.Context, Test, OrderedMap[SpanQuery, []Assertion]) error
 }
 
 type RunRepository interface {

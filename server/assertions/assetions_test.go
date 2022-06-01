@@ -17,14 +17,14 @@ func TestAssertion(t *testing.T) {
 	spanID := id.NewRandGenerator().SpanID()
 	cases := []struct {
 		name              string
-		testDef           model.Definition
+		testDef           model.OrderedMap[model.SpanQuery, []model.Assertion]
 		trace             traces.Trace
-		expectedResult    model.Results
+		expectedResult    model.OrderedMap[model.SpanQuery, []model.AssertionResult]
 		expectedAllPassed bool
 	}{
 		{
 			name: "CanAssert",
-			testDef: (model.Definition{}).MustAdd(`span[service.name="Pokeshop"]`, []model.Assertion{
+			testDef: (model.OrderedMap[model.SpanQuery, []model.Assertion]{}).MustAdd(`span[service.name="Pokeshop"]`, []model.Assertion{
 				{
 					Attribute:  "tracetest.span.duration",
 					Comparator: comparator.Eq,
@@ -41,24 +41,22 @@ func TestAssertion(t *testing.T) {
 				},
 			},
 			expectedAllPassed: true,
-			expectedResult: model.Results{
-				`span[service.name="Pokeshop"]`: []model.AssertionResult{
-					{
-						Assertion: model.Assertion{
-							Attribute:  "tracetest.span.duration",
-							Comparator: comparator.Eq,
-							Value:      "2000",
-						},
-						Results: []model.SpanAssertionResult{
-							{
-								SpanID:        spanID,
-								ObservedValue: "2000",
-								CompareErr:    nil,
-							},
+			expectedResult: (model.OrderedMap[model.SpanQuery, []model.AssertionResult]{}).MustAdd(`span[service.name="Pokeshop"]`, []model.AssertionResult{
+				{
+					Assertion: model.Assertion{
+						Attribute:  "tracetest.span.duration",
+						Comparator: comparator.Eq,
+						Value:      "2000",
+					},
+					Results: []model.SpanAssertionResult{
+						{
+							SpanID:        spanID,
+							ObservedValue: "2000",
+							CompareErr:    nil,
 						},
 					},
 				},
-			},
+			}),
 		},
 	}
 
@@ -71,9 +69,9 @@ func TestAssertion(t *testing.T) {
 
 			assert.Equal(t, cl.expectedAllPassed, allPassed)
 
-			for expectedSel, expectedAssertionResults := range cl.expectedResult {
-				actualAssertionResults, ok := actual[expectedSel]
-				assert.True(t, ok, `expected selector "%s" not found`, expectedSel)
+			cl.expectedResult.Map(func(expectedSel model.SpanQuery, expectedAssertionResults []model.AssertionResult) {
+				actualAssertionResults := actual.Get(expectedSel)
+				assert.NotEmpty(t, actualAssertionResults, `expected selector "%s" not found`, expectedSel)
 				for i := 0; i < len(expectedAssertionResults); i++ {
 					expectedAR := expectedAssertionResults[i]
 					actualAR := actualAssertionResults[i]
@@ -87,7 +85,7 @@ func TestAssertion(t *testing.T) {
 						assert.Equal(t, expectedSpanRes.CompareErr, actualSpanRes.CompareErr)
 					}
 				}
-			}
+			})
 
 		})
 	}

@@ -96,7 +96,7 @@ func (m OpenAPIMapper) Tests(in []model.Test) []openapi.Test {
 	return tests
 }
 
-func (m OpenAPIMapper) Definition(in model.Definition) openapi.TestDefinition {
+func (m OpenAPIMapper) Definition(in model.OrderedMap[model.SpanQuery, []model.Assertion]) openapi.TestDefinition {
 
 	defs := make([]openapi.TestDefinitionDefinitions, in.Len())
 
@@ -166,9 +166,10 @@ func (m OpenAPIMapper) Result(in *model.RunResults) openapi.AssertionResults {
 		return openapi.AssertionResults{}
 	}
 
-	results := make([]openapi.AssertionResultsResults, len(in.Results))
+	results := make([]openapi.AssertionResultsResults, in.Results.Len())
+
 	i := 0
-	for query, inRes := range in.Results {
+	in.Results.Map(func(query model.SpanQuery, inRes []model.AssertionResult) {
 		res := make([]openapi.AssertionResult, len(inRes))
 		for j, r := range inRes {
 			sres := make([]openapi.AssertionSpanResult, len(r.Results))
@@ -190,7 +191,8 @@ func (m OpenAPIMapper) Result(in *model.RunResults) openapi.AssertionResults {
 			Results:  res,
 		}
 		i++
-	}
+	})
+
 	return openapi.AssertionResults{
 		AllPassed: in.AllPassed,
 		Results:   results,
@@ -332,8 +334,8 @@ func (m ModelMapper) ValidateDefinition(in openapi.TestDefinition) error {
 	return nil
 }
 
-func (m ModelMapper) Definition(in openapi.TestDefinition) model.Definition {
-	defs := model.Definition{}
+func (m ModelMapper) Definition(in openapi.TestDefinition) model.OrderedMap[model.SpanQuery, []model.Assertion] {
+	defs := model.OrderedMap[model.SpanQuery, []model.Assertion]{}
 	for _, d := range in.Definitions {
 		asserts := make([]model.Assertion, len(d.Assertions))
 		for i, a := range d.Assertions {
@@ -369,10 +371,10 @@ func (m ModelMapper) Run(in openapi.TestRun) *model.Run {
 }
 
 func (m ModelMapper) Result(in openapi.AssertionResults) *model.RunResults {
-	results := model.Results{}
+	results := model.OrderedMap[model.SpanQuery, []model.AssertionResult]{}
 
 	for _, res := range in.Results {
-		results[model.SpanQuery(res.Selector)] = make([]model.AssertionResult, len(res.Results))
+		ars := make([]model.AssertionResult, len(res.Results))
 		for i, r := range res.Results {
 			sars := make([]model.SpanAssertionResult, len(r.SpanResults))
 			for j, sar := range r.SpanResults {
@@ -384,12 +386,13 @@ func (m ModelMapper) Result(in openapi.AssertionResults) *model.RunResults {
 				}
 			}
 
-			results[model.SpanQuery(res.Selector)][i] = model.AssertionResult{
+			ars[i] = model.AssertionResult{
 				Assertion: m.Assertion(r.Assertion),
 				AllPassed: r.AllPassed,
 				Results:   sars,
 			}
 		}
+		results, _ = results.Add(model.SpanQuery(res.Selector), ars)
 	}
 
 	return &model.RunResults{
