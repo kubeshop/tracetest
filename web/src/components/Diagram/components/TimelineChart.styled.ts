@@ -1,6 +1,8 @@
 import styled, {css} from 'styled-components';
 
 export const Container = styled.div<{$barHeight: number; $showAffected: boolean}>`
+  overflow-y: scroll;
+  
   .rect-svg {
     width: 100%;
     height: ${({$barHeight}) => `${$barHeight}px`};
