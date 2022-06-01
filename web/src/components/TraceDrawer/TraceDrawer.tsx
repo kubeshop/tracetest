@@ -7,7 +7,6 @@ import {useAssertionForm} from '../AssertionForm/AssertionFormProvider';
 import LoadingSpinner from '../LoadingSpinner';
 import ResizableDrawer from '../ResizableDrawer';
 import {DrawerState} from '../ResizableDrawer/ResizableDrawer';
-import {useSetIsCollapsedCallback} from '../ResizableDrawer/useSetIsCollapsedCallback';
 import TestResults from '../TestResults';
 import * as S from './TraceDrawer.styled';
 import TraceDrawerHeader from './TraceDrawerHeader';
@@ -30,7 +29,6 @@ const TraceDrawer: React.FC<IProps> = ({run: {id: runId}, run, testId, visiblePo
   return (
     <ResizableDrawer visiblePortion={visiblePortion}>
       <TraceDrawerHeader
-        onClick={useSetIsCollapsedCallback()}
         run={run}
         assertionResults={assertionResults}
         isDisabled={isAssertionFormOpen}

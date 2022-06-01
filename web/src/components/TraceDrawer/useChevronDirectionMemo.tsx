@@ -8,6 +8,6 @@ export function useChevronDirectionMemo(height = 0, max = 0, min = 0) {
     if (isMin) {
       return false;
     }
-    return false;
+    return true;
   }, [height, max, min]);
 }

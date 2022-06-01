@@ -15,6 +15,7 @@ export enum DrawerState {
   CLOSE = 'CLOSE',
   INITIAL = 'INITIAL',
   FORM = 'FORM',
+  MAX = 'MAX',
 }
 
 const CustomDrawer = styled(Drawer)`
@@ -45,7 +46,7 @@ const ResizableDrawer: React.FC<IProps> = ({children, visiblePortion}: IProps) =
       if (isResizing) {
         const offsetRight =
           document.body.offsetHeight - ((e.clientY || document.body.offsetLeft) - document.body.offsetLeft);
-        if (offsetRight > visiblePortion && offsetRight < ref['OPEN']) {
+        if (offsetRight > visiblePortion && offsetRight < ref[DrawerState.MAX]) {
           setHeight(offsetRight);
         }
       }
@@ -104,7 +105,7 @@ const ResizableDrawer: React.FC<IProps> = ({children, visiblePortion}: IProps) =
         }}
         onPointerDown={onPointerDown}
       />
-      {children.map(child => React.cloneElement(child, {height, max: ref['OPEN'], min: visiblePortion}))}
+      {children.map(child => React.cloneElement(child, {height, max: ref[DrawerState.MAX], min: visiblePortion}))}
     </CustomDrawer>
   );
 };
