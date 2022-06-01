@@ -45,7 +45,7 @@ const TestCard: React.FC<TTestCardProps> = ({
             setIsCollapsed(false);
             return;
           }
-          await onCollapse();
+          onCollapse();
         }}
       >
         {isCollapsed ? <DownOutlined /> : <RightOutlined data-cy={`collapse-test-${testId}`} onClick={onCollapse} />}
