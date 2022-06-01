@@ -12,6 +12,7 @@ import (
 type (
 	Test struct {
 		ID               uuid.UUID
+		CreatedAt        time.Time
 		Name             string
 		Description      string
 		Version          int
