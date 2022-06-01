@@ -13,6 +13,14 @@ var (
 	}
 )
 
+func (r Run) Copy(testVersion int) Run {
+	r.Results = nil
+	r.Trace = nil
+	r.TestVersion = testVersion
+
+	return r
+}
+
 func (r Run) ExecutionTime() int {
 	var endDate time.Time
 	if !r.CompletedAt.IsZero() {
@@ -45,7 +53,11 @@ func (r Run) SuccessfullyPolledTraces(t *traces.Trace) Run {
 	return r
 }
 
-func (r Run) SuccessfullyAsserted() Run {
+func (r Run) SuccessfullyAsserted(res Results, allPassed bool) Run {
+	r.Results = &RunResults{
+		AllPassed: allPassed,
+		Results:   res,
+	}
 	r.State = RunStateFinished
 	return r.Finish()
 }
