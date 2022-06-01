@@ -1,6 +1,6 @@
 import {TTest} from '../../types/Test.types';
 import {TTestRunState} from '../../types/TestRun.types';
-import {useAssertionForm} from '../AssertionForm/AssertionFormProvider';
+import {useSetIsCollapsedCallback} from '../ResizableDrawer/useSetIsCollapsedCallback';
 import TestState from '../TestState';
 import * as S from './TestHeader.styled';
 
@@ -19,8 +19,7 @@ const TestHeader: React.FC<TTestHeaderProps> = ({
   extraContent,
   testVersion,
 }) => {
-  const {setIsCollapsed} = useAssertionForm();
-
+  const onClick = useSetIsCollapsedCallback();
   return (
     <S.TestHeader>
       <S.Content>
@@ -34,7 +33,7 @@ const TestHeader: React.FC<TTestHeaderProps> = ({
       </S.Content>
       {extraContent}
       {testState && !extraContent && (
-        <S.StateContainer onClick={() => setIsCollapsed(o => !o)} data-cy="test-run-result-status">
+        <S.StateContainer onClick={onClick} data-cy="test-run-result-status">
           <S.StateText>Test status:</S.StateText>
           <TestState testState={testState} />
         </S.StateContainer>

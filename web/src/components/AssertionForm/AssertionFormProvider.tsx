@@ -1,13 +1,14 @@
 import {noop} from 'lodash';
-import {useState, createContext, useCallback, useMemo, useContext, Dispatch, SetStateAction} from 'react';
 
 import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
+import {createContext, Dispatch, SetStateAction, useCallback, useContext, useMemo, useState} from 'react';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import {clearAffectedSpans, setSelectedAssertion} from 'redux/slices/TestDefinition.slice';
-import SelectorService from 'services/Selector.service';
 import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
+import SelectorService from 'services/Selector.service';
 import {TTestDefinitionEntry} from 'types/TestDefinition.types';
+import {DrawerState} from '../ResizableDrawer/ResizableDrawer';
 import {IValues} from './AssertionForm';
 import AssertionFormConfirmModal from './AssertionFormConfirmModal';
 
@@ -18,8 +19,8 @@ interface IFormProps {
 }
 
 interface ICreateAssertionModalProviderContext {
-  isCollapsed: boolean;
-  setIsCollapsed: Dispatch<SetStateAction<boolean>>;
+  drawerState: DrawerState;
+  setDrawerState: Dispatch<SetStateAction<DrawerState>>;
   isOpen: boolean;
   open(props?: IFormProps): void;
   close(): void;
@@ -32,8 +33,8 @@ const initialFormProps = {
 };
 
 export const Context = createContext<ICreateAssertionModalProviderContext>({
-  isCollapsed: false,
-  setIsCollapsed: noop,
+  drawerState: DrawerState.INITIAL,
+  setDrawerState: noop,
   isOpen: false,
   open: noop,
   close: noop,
@@ -41,17 +42,19 @@ export const Context = createContext<ICreateAssertionModalProviderContext>({
   onSubmit: noop,
 });
 
-export const useAssertionForm = () => useContext(Context);
+export const useAssertionForm = () => useContext<ICreateAssertionModalProviderContext>(Context);
 
 const AssertionFormProvider: React.FC<{testId: string}> = ({children}) => {
   const dispatch = useAppDispatch();
-  const [isCollapsed, setIsCollapsed] = useState(true);
+  const [drawerState, setDrawerState] = useState<DrawerState>(DrawerState.INITIAL);
   const [isOpen, setIsOpen] = useState(false);
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
   const [formProps, setFormProps] = useState<IFormProps>(initialFormProps);
   const {update, add, test, isDraftMode} = useTestDefinition();
   const {run} = useTestRun();
-  const definitionList = useAppSelector(state => TestDefinitionSelectors.selectDefinitionList(state));
+  const definitionList: TTestDefinitionEntry[] = useAppSelector(state =>
+    TestDefinitionSelectors.selectDefinitionList(state)
+  );
 
   const open = useCallback(
     (props: IFormProps = {}) => {
@@ -77,7 +80,7 @@ const AssertionFormProvider: React.FC<{testId: string}> = ({children}) => {
 
       dispatch(setSelectedAssertion(''));
     },
-    [definitionList, isDraftMode, run.testVersion, test?.version]
+    [dispatch, definitionList, isDraftMode, run.testVersion, test?.version]
   );
 
   const close = useCallback(() => {
@@ -85,7 +88,7 @@ const AssertionFormProvider: React.FC<{testId: string}> = ({children}) => {
     dispatch(clearAffectedSpans());
 
     setIsOpen(false);
-  }, []);
+  }, [dispatch]);
 
   const onConfirm = useCallback(() => {
     setIsOpen(true);
@@ -108,12 +111,12 @@ const AssertionFormProvider: React.FC<{testId: string}> = ({children}) => {
       setIsOpen(false);
       dispatch(clearAffectedSpans());
     },
-    [add, formProps, update]
+    [add, formProps, update, dispatch]
   );
 
   const contextValue = useMemo(
-    () => ({isOpen, open, close, formProps, onSubmit, isCollapsed, setIsCollapsed}),
-    [isOpen, open, close, formProps, onSubmit, isCollapsed, setIsCollapsed]
+    () => ({isOpen, open, close, formProps, onSubmit, drawerState, setDrawerState}),
+    [isOpen, open, close, formProps, onSubmit, drawerState, setDrawerState]
   );
 
   return (
