@@ -8,16 +8,6 @@ import (
 	"github.com/kubeshop/tracetest/cli/openapi"
 )
 
-var availableOperators = map[string]bool{
-	"=":        true,
-	"<":        true,
-	">":        true,
-	"!=":       true,
-	">=":       true,
-	"<=":       true,
-	"contains": true,
-}
-
 func ConvertStringIntoOpenAPIString(in string) *string {
 	if in == "" {
 		return nil
@@ -129,12 +119,6 @@ func convertStringIntoAssertion(assertion string) (openapi.Assertion, error) {
 	parsedAssertion, err := parser.ParseAssertion(assertion)
 	if err != nil {
 		return openapi.Assertion{}, err
-	}
-
-	// We have a bug in the parser that doesn't allow us to match operators that have more than one character. To overcome this
-	// problem while the bug is not solved, we gonna validate the token here
-	if _, ok := availableOperators[parsedAssertion.Operator]; !ok {
-		return openapi.Assertion{}, fmt.Errorf("operator \"%s\" is not supported", parsedAssertion.Operator)
 	}
 
 	return openapi.Assertion{

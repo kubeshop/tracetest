@@ -51,9 +51,25 @@ func (a runTestAction) runDefinition(ctx context.Context, definitionFile string)
 	if definition.Id == "" {
 		a.logger.Debug("test doesn't exist. Creating it")
 		testID, err := a.createTestFromDefinition(ctx, definition)
+		if err != nil {
+			return fmt.Errorf("could not create test from definition: %w", err)
+		}
 
-		fmt.Println(testID, err)
+		definition.Id = testID
+		err = file.SaveDefinition(definitionFile, definition)
+		if err != nil {
+			return fmt.Errorf("could not save definition: %w", err)
+		}
 	}
+
+	// TODO: update definition
+
+	testRunId, err := a.runTest(ctx, definition.Id)
+	if err != nil {
+		return fmt.Errorf("could not run test: %w", err)
+	}
+
+	fmt.Println("testRunId", testRunId)
 
 	return nil
 }
@@ -63,6 +79,24 @@ func (a runTestAction) createTestFromDefinition(ctx context.Context, definition 
 	if err != nil {
 		return "", err
 	}
-	fmt.Println(openapiTest)
-	return "", nil
+
+	req := a.client.ApiApi.CreateTest(ctx)
+	req.Test(openapiTest)
+
+	createdTest, _, err := a.client.ApiApi.CreateTestExecute(req)
+	if err != nil {
+		return "", fmt.Errorf("could not execute request: %w", err)
+	}
+
+	return *createdTest.Id, nil
+}
+
+func (a runTestAction) runTest(ctx context.Context, testID string) (string, error) {
+	req := a.client.ApiApi.RunTest(ctx, testID)
+	run, _, err := a.client.ApiApi.RunTestExecute(req)
+	if err != nil {
+		return "", fmt.Errorf("could not execute request: %w", err)
+	}
+
+	return *run.Id, nil
 }

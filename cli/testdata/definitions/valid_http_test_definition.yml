@@ -19,18 +19,18 @@ trigger:
 testDefinition:
     - selector: "span[span.name = \"POST /pokemon/import\"]"
       assertions:
-        - "tracetest.span.duration <= 100"
-        - "http.status = 200"
+        - tracetest.span.duration <= 100
+        - http.status = 200
     - selector: "span[span.name = \"send message to queue\"]"
       assertions:
-        - "messaging.message.payload contains '\"id\": 52'"
+        - messaging.message.payload contains 52
     - selector: "span[span.name = \"consume message from queue\"]:last"
       assertions:
-        - "messaging.message.payload contains '\"id\": 52'"
+        - messaging.message.payload contains 52
     - selector: "span[span.name = \"consume message from queue\"]:last span[span.name = \"import pokemon from pokeapi\"]"
       assertions:
-        - "http.status = 200"
+        - http.status = 200
     - selector: "span[span.name = \"consume message from queue\"]:last span[span.name = \"\"]"
       assertions:
-        - "db.repository.operation = create"
-        - "tracetest.span.duration <= 100"
+        - db.repository.operation = create
+        - tracetest.span.duration <= 100

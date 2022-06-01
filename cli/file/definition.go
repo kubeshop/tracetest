@@ -22,3 +22,17 @@ func LoadDefinition(file string) (definition.Test, error) {
 
 	return test, nil
 }
+
+func SaveDefinition(file string, definition definition.Test) error {
+	yamlContent, err := yaml.Marshal(definition)
+	if err != nil {
+		return fmt.Errorf("could not marshal definition into YAML: %w", err)
+	}
+
+	err = os.WriteFile(file, yamlContent, 0)
+	if err != nil {
+		return fmt.Errorf("could not write file: %w", err)
+	}
+
+	return nil
+}

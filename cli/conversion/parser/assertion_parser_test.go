@@ -77,6 +77,24 @@ func TestParseAssertion(t *testing.T) {
 				Value:     "INSERT INTO",
 			},
 		},
+		{
+			Name:  "should parse string values",
+			Query: `db.statement = "create"`,
+			ExpectedOutput: parser.Assertion{
+				Attribute: "db.statement",
+				Operator:  "=",
+				Value:     "create",
+			},
+		},
+		{
+			Name:  "should parse double values",
+			Query: `custom.item.value = 199.99`,
+			ExpectedOutput: parser.Assertion{
+				Attribute: "custom.item.value",
+				Operator:  "=",
+				Value:     "199.99",
+			},
+		},
 	}
 
 	for _, testCase := range testCases {
