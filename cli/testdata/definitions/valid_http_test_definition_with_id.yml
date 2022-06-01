@@ -9,10 +9,6 @@ trigger:
     headers:
     - key: Content-Type
       value: application/json
-    authentication:
-      type: bearer
-      bearer:
-        token: my-token-123
     body:
       type: raw
       raw: '{ "id": 52 }'

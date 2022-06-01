@@ -22,10 +22,12 @@ testDefinition:
 - selector: span[span.name = "consume message from queue"]:last
   assertions:
   - messaging.message.payload contains 52
-- selector: span[span.name = "consume message from queue"]:last span[span.name = "import pokemon from pokeapi"]
+- selector: span[span.name = "consume message from queue"]:last span[span.name = "import
+    pokemon from pokeapi"]
   assertions:
-  - http.status = 200
-- selector: span[span.name = "consume message from queue"]:last span[span.name = "save pokemon on database"]
+  - http.status_code = 200
+- selector: span[span.name = "consume message from queue"]:last span[span.name = "save
+    pokemon on database"]
   assertions:
   - db.repository.operation = "create"
   - tracetest.span.duration <= 100

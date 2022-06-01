@@ -29,13 +29,7 @@ func TestLoadDefinition(t *testing.T) {
 						URL:    "http://pokemon-demo.tracetest.io/pokemon/import",
 						Method: "POST",
 						Headers: []definition.HTTPHeader{
-							{Key: "ContentType", Value: "application/json"},
-						},
-						Authentication: definition.HTTPAuthentication{
-							Type: "bearer",
-							Bearer: definition.HTTPBearerAuth{
-								Token: "my-token-123",
-							},
+							{Key: "Content-Type", Value: "application/json"},
 						},
 						Body: definition.HTTPBody{
 							Type: "raw",
@@ -48,7 +42,7 @@ func TestLoadDefinition(t *testing.T) {
 						Selector: "span[span.name = \"POST /pokemon/import\"]",
 						Assertions: []string{
 							"tracetest.span.duration <= 100",
-							"http.status = 200",
+							"http.status_code = 200",
 						},
 					},
 					{
@@ -66,7 +60,7 @@ func TestLoadDefinition(t *testing.T) {
 					{
 						Selector: "span[span.name = \"consume message from queue\"]:last span[span.name = \"import pokemon from pokeapi\"]",
 						Assertions: []string{
-							"http.status = 200",
+							"http.status_code = 200",
 						},
 					},
 					{
@@ -93,13 +87,7 @@ func TestLoadDefinition(t *testing.T) {
 						URL:    "http://pokemon-demo.tracetest.io/pokemon/import",
 						Method: "POST",
 						Headers: []definition.HTTPHeader{
-							{Key: "ContentType", Value: "application/json"},
-						},
-						Authentication: definition.HTTPAuthentication{
-							Type: "bearer",
-							Bearer: definition.HTTPBearerAuth{
-								Token: "my-token-123",
-							},
+							{Key: "Content-Type", Value: "application/json"},
 						},
 						Body: definition.HTTPBody{
 							Type: "raw",
@@ -112,7 +100,7 @@ func TestLoadDefinition(t *testing.T) {
 						Selector: "span[span.name = \"POST /pokemon/import\"]",
 						Assertions: []string{
 							"tracetest.span.duration <= 100",
-							"http.status = 200",
+							"http.status_code = 200",
 						},
 					},
 					{
@@ -130,7 +118,7 @@ func TestLoadDefinition(t *testing.T) {
 					{
 						Selector: "span[span.name = \"consume message from queue\"]:last span[span.name = \"import pokemon from pokeapi\"]",
 						Assertions: []string{
-							"http.status = 200",
+							"http.status_code = 200",
 						},
 					},
 					{
