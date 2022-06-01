@@ -1,35 +1,35 @@
 name: POST import pokemon
 description: Import a pokemon using its ID
 trigger:
-    type: http
-    http_request:
-        url: http://pokemon-demo.tracetest.io/pokemon/import
-        method: POST
-        headers:
-            - key: ContentType
-              value: application/json
-        authentication:
-            type: bearer
-            bearer:
-              token: my-token-123
-        body:
-            type: raw
-            raw: '{ \"id\": 52 }'
+  type: http
+  http_request:
+    url: http://pokemon-demo.tracetest.io/pokemon/import
+    method: POST
+    headers:
+      - key: ContentType
+        value: application/json
+    authentication:
+      type: bearer
+      bearer:
+        token: my-token-123
+    body:
+      type: raw
+      raw: '{ \"id\": 52 }'
 testDefinition:
-    - selector: span[span.name = "POST /pokemon/import"]
-      assertions:
-        - tracetest.span.duration <= 100
-        - http.status = 200
-    - selector: span[span.name = "send message to queue"]
-      assertions:
-        - messaging.message.payload contains 52
-    - selector: span[span.name = "consume message from queue"]:last
-      assertions:
-        - messaging.message.payload contains 52
-    - selector: span[span.name = "consume message from queue"]:last span[span.name = "import pokemon from pokeapi"]
-      assertions:
-        - http.status = 200
-    - selector: span[span.name = "consume message from queue"]:last span[span.name = "save pokemon on database"]
-      assertions:
-        - db.repository.operation = "create"
-        - tracetest.span.duration <= 100
+  - selector: span[span.name = "POST /pokemon/import"]
+    assertions:
+      - tracetest.span.duration <= 100
+      - http.status = 200
+  - selector: span[span.name = "send message to queue"]
+    assertions:
+      - messaging.message.payload contains 52
+  - selector: span[span.name = "consume message from queue"]:last
+    assertions:
+      - messaging.message.payload contains 52
+  - selector: span[span.name = "consume message from queue"]:last span[span.name = "import pokemon from pokeapi"]
+    assertions:
+      - http.status = 200
+  - selector: span[span.name = "consume message from queue"]:last span[span.name = "save pokemon on database"]
+    assertions:
+      - db.repository.operation = "create"
+      - tracetest.span.duration <= 100
