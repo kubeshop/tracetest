@@ -35,7 +35,7 @@ type parserPseudoClass struct {
 }
 
 func CreateParser() (*participle.Parser, error) {
-	parser, err := participle.Build(&ParserSelector{}, participle.UseLookahead(1))
+	parser, err := participle.Build(&ParserSelector{})
 	if err != nil {
 		return nil, fmt.Errorf("could not create parser: %w", err)
 	}
