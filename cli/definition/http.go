@@ -7,9 +7,9 @@ import (
 type HttpRequest struct {
 	URL            string             `yaml:"url"`
 	Method         string             `yaml:"method"`
-	Headers        []HTTPHeader       `yaml:"headers"`
-	Authentication HTTPAuthentication `yaml:"authentication"`
-	Body           HTTPBody           `yaml:"body"`
+	Headers        []HTTPHeader       `yaml:"headers,omitempty"`
+	Authentication HTTPAuthentication `yaml:"authentication,omitempty"`
+	Body           HTTPBody           `yaml:"body,omitempty"`
 }
 
 func (r HttpRequest) Validate() error {
@@ -52,10 +52,10 @@ func (h HTTPHeader) Validate() error {
 }
 
 type HTTPAuthentication struct {
-	Type      string         `yaml:"type"`
-	BasicAuth HTTPBasicAuth  `yaml:"basicAuth"`
-	ApiKey    HTTPAPIKeyAuth `yaml:"apiKey"`
-	Bearer    HTTPBearerAuth `yaml:"bearer"`
+	Type      string         `yaml:"type,omitempty"`
+	BasicAuth HTTPBasicAuth  `yaml:"basicAuth,omitempty"`
+	ApiKey    HTTPAPIKeyAuth `yaml:"apiKey,omitempty"`
+	Bearer    HTTPBearerAuth `yaml:"bearer,omitempty"`
 }
 
 func (a HTTPAuthentication) Validate() error {

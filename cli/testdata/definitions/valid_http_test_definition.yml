@@ -1,3 +1,4 @@
+id: 356d5fc0-2580-4d7d-b5b4-34aafdd02b0d
 name: POST import pokemon
 description: Import a pokemon using its ID
 trigger:
