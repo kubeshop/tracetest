@@ -15,7 +15,6 @@ var (
 
 func (r Run) Copy(testVersion int) Run {
 	r.Results = nil
-	r.Trace = nil
 	r.TestVersion = testVersion
 
 	return r
