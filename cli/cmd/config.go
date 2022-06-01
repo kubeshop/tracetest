@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"log"
 	"os"
 
 	"github.com/kubeshop/tracetest/cli/config"
@@ -15,14 +14,14 @@ var cliConfig config.Config
 var cliLogger *zap.Logger
 
 func setupCommand(cmd *cobra.Command, args []string) {
-	loadConfig(cmd, args)
 	setupLogger(cmd, args)
+	loadConfig(cmd, args)
 }
 
 func loadConfig(cmd *cobra.Command, args []string) {
 	config, err := config.LoadConfig(configFile)
 	if err != nil {
-		log.Fatal(err)
+		cliLogger.Fatal("could not load config", zap.Error(err))
 	}
 
 	cliConfig = config

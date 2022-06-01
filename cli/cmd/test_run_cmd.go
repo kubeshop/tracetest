@@ -26,7 +26,8 @@ var testRunCmd = &cobra.Command{
 
 		err := runTestAction.Run(ctx, actionArgs)
 		if err != nil {
-			cliLogger.Fatal("failed to run test", zap.Error(err))
+			cliLogger.Error("failed to run test", zap.Error(err))
+			return
 		}
 	},
 	PostRun: teardownCommand,

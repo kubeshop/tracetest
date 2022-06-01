@@ -66,8 +66,6 @@ func createParser() (*participle.Parser, error) {
 	if defaultParser != nil {
 		return defaultParser, nil
 	}
-	x := languageLexer.Symbols()
-	fmt.Print(x)
 
 	parser, err := participle.Build(&assertionParserObject{}, participle.Lexer(languageLexer))
 	if err != nil {

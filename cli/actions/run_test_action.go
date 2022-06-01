@@ -102,6 +102,12 @@ func (a runTestAction) createTestFromDefinition(ctx context.Context, definition 
 	req := a.client.ApiApi.CreateTest(ctx)
 	req = req.Test(openapiTest)
 
+	testBytes, err := json.Marshal(openapiTest)
+	if err != nil {
+		return "", fmt.Errorf("could not marshal test: %w", err)
+	}
+
+	a.logger.Debug("Sending request to create test", zap.ByteString("test", testBytes))
 	createdTest, _, err := a.client.ApiApi.CreateTestExecute(req)
 	if err != nil {
 		return "", fmt.Errorf("could not execute request: %w", err)

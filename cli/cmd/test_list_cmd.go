@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"context"
-	"log"
 
 	"github.com/kubeshop/tracetest/cli/actions"
 	"github.com/spf13/cobra"
@@ -23,7 +22,8 @@ var testListCmd = &cobra.Command{
 		actionArgs := actions.ListTestConfig{}
 		err := listTestsAction.Run(ctx, actionArgs)
 		if err != nil {
-			log.Fatal(err)
+			cliLogger.Error("could not get tests", zap.Error(err))
+			return
 		}
 	},
 	PostRun: teardownCommand,

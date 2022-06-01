@@ -23,7 +23,6 @@ components:
             $ref: "#/components/schemas/HTTPHeader"
         body:
           type: string
-          format: byte
         auth:
           $ref: "#/components/schemas/HTTPAuth"
         # proxy:
