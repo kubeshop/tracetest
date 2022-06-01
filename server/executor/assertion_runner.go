@@ -73,13 +73,9 @@ func (e *defaultAssertionRunner) startWorker(ctx context.Context) {
 func (e *defaultAssertionRunner) runAssertionsAndUpdateResult(ctx context.Context, request AssertionRequest) error {
 	run, err := e.executeAssertions(ctx, request)
 	if err != nil {
-		run.State = model.RunStateFailed
-		run.LastError = err
-		run.CompletedAt = time.Now()
-		return e.db.UpdateRun(ctx, run)
+		return e.db.UpdateRun(ctx, run.Failed(err))
 	}
 
-	run.State = model.RunStateFinished
 	err = e.db.UpdateRun(ctx, run)
 	if err != nil {
 		return fmt.Errorf("could not save result on database: %w", err)
@@ -89,17 +85,16 @@ func (e *defaultAssertionRunner) runAssertionsAndUpdateResult(ctx context.Contex
 }
 
 func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, req AssertionRequest) (model.Run, error) {
-	if req.Run.Trace == nil {
+	run := req.Run
+	if run.Trace == nil {
 		return model.Run{}, fmt.Errorf("trace not available")
 	}
 
-	results, allPassed := assertions.Assert(req.Test.Definition, *req.Run.Trace)
-	req.Run.Results = &model.RunResults{
-		AllPassed: allPassed,
-		Results:   results,
-	}
+	run = run.SuccessfullyAsserted(
+		assertions.Assert(req.Test.Definition, *run.Trace),
+	)
 
-	return req.Run, nil
+	return run, nil
 }
 
 func (e *defaultAssertionRunner) RunAssertions(request AssertionRequest) {

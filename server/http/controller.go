@@ -215,16 +215,12 @@ func (c *controller) RerunTestRun(ctx context.Context, testID string, runID stri
 		return handleDBError(err), err
 	}
 
-	newTestRun := run
-	newTestRun.Results = nil
-	newTestRun.TestVersion = test.Version
-
-	newTestRun, err = c.testDB.CreateRun(ctx, test, newTestRun)
+	newTestRun, err := c.testDB.CreateRun(ctx, test, run.Copy(test.Version))
 	if err != nil {
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
 	}
 
-	newTestRun.State = model.RunStateAwaitingTestResults
+	newTestRun = newTestRun.SuccessfullyPolledTraces(run.Trace)
 	err = c.testDB.UpdateRun(ctx, newTestRun)
 	if err != nil {
 		return openapi.Response(http.StatusInternalServerError, err.Error()), err

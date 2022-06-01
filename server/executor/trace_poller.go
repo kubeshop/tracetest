@@ -125,8 +125,6 @@ func (tp tracePoller) processJob(job tracePollReq) {
 		return
 	}
 
-	run.State = model.RunStateAwaitingTestResults
-
 	trace := traces.FromOtel(otelTrace)
 	trace.ID = run.TraceID
 	if !tp.donePollingTraces(job, trace) {
@@ -138,9 +136,7 @@ func (tp tracePoller) processJob(job tracePollReq) {
 		return
 	}
 
-	run.Trace = augmentData(&trace, run.Response)
-	run.State = model.RunStateAwaitingTestResults
-	run.ObtainedTraceAt = time.Now()
+	run = run.SuccessfullyPolledTraces(augmentData(&trace, run.Response))
 
 	fmt.Printf("completed polling result %s after %d times, number of spans: %d \n", job.run.ID, job.count, len(run.Trace.Flat))
 
@@ -213,11 +209,7 @@ func (tp tracePoller) handleTraceDBError(job tracePollReq, err error) {
 		fmt.Println("other", err)
 	}
 
-	run.State = model.RunStateFailed
-	run.LastError = err
-	run.CompletedAt = time.Now()
-
-	tp.handleDBError(tp.tests.UpdateRun(job.ctx, run))
+	tp.handleDBError(tp.tests.UpdateRun(job.ctx, run.Failed(err)))
 
 }
 
