@@ -59,7 +59,10 @@ func (a runTestAction) runDefinition(ctx context.Context, definitionFile string)
 }
 
 func (a runTestAction) createTestFromDefinition(ctx context.Context, definition definition.Test) (string, error) {
-	openapiTest := conversion.ConvertTestDefinitionIntoOpenAPIObject(definition)
+	openapiTest, err := conversion.ConvertTestDefinitionIntoOpenAPIObject(definition)
+	if err != nil {
+		return "", err
+	}
 	fmt.Println(openapiTest)
 	return "", nil
 }

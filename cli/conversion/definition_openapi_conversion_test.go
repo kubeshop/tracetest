@@ -252,7 +252,7 @@ func TestDefinitionToOpenAPIConversion(t *testing.T) {
 								{
 									Attribute:  openAPIStr("tracetest.span.duration"),
 									Comparator: openAPIStr("<="),
-									Expected:   openAPIStr("100"),
+									Expected:   openAPIStr("200"),
 								},
 								{
 									Attribute:  openAPIStr("http.status_code"),
