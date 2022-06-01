@@ -1,9 +1,22 @@
 package conversion
 
 import (
+	"fmt"
+
+	"github.com/kubeshop/tracetest/cli/conversion/parser"
 	"github.com/kubeshop/tracetest/cli/definition"
 	"github.com/kubeshop/tracetest/cli/openapi"
 )
+
+var availableOperators = map[string]bool{
+	"=":        true,
+	"<":        true,
+	">":        true,
+	"!=":       true,
+	">=":       true,
+	"<=":       true,
+	"contains": true,
+}
 
 func ConvertStringIntoOpenAPIString(in string) *string {
 	if in == "" {
@@ -13,15 +26,19 @@ func ConvertStringIntoOpenAPIString(in string) *string {
 	return &in
 }
 
-func ConvertTestDefinitionIntoOpenAPIObject(definition definition.Test) openapi.Test {
+func ConvertTestDefinitionIntoOpenAPIObject(definition definition.Test) (openapi.Test, error) {
+	testDefinition, err := convertTestDefinitionsIntoOpenAPIObject(definition.TestDefinition)
+	if err != nil {
+		return openapi.Test{}, fmt.Errorf("could not convert test definition: %w", err)
+	}
 	return openapi.Test{
 		Name:        ConvertStringIntoOpenAPIString(definition.Name),
 		Description: ConvertStringIntoOpenAPIString(definition.Description),
 		ServiceUnderTest: &openapi.TestServiceUnderTest{
 			Request: convertHTTPRequestDefinitionIntoOpenAPIObject(definition.Trigger.HTTPRequest),
 		},
-		Definition: convertTestDefinitionsIntoOpenAPIObject(definition.TestDefinition),
-	}
+		Definition: testDefinition,
+	}, nil
 }
 
 func convertHTTPRequestDefinitionIntoOpenAPIObject(request definition.HttpRequest) *openapi.HTTPRequest {
@@ -80,16 +97,20 @@ func getBearerAuthFromDefinition(in definition.HTTPBearerAuth) *openapi.HTTPAuth
 	}
 }
 
-func convertTestDefinitionsIntoOpenAPIObject(testDefinitions []definition.TestDefinition) *openapi.TestDefinition {
+func convertTestDefinitionsIntoOpenAPIObject(testDefinitions []definition.TestDefinition) (*openapi.TestDefinition, error) {
 	if len(testDefinitions) == 0 {
-		return nil
+		return nil, nil
 	}
 
 	definitions := make([]openapi.TestDefinitionDefinitions, 0, len(testDefinitions))
 	for _, testDefinition := range testDefinitions {
 		assertions := make([]openapi.Assertion, 0, len(testDefinition.Assertions))
 		for _, assertion := range testDefinition.Assertions {
-			assertions = append(assertions, convertStringIntoAssertion(assertion))
+			assertionObject, err := convertStringIntoAssertion(assertion)
+			if err != nil {
+				return nil, err
+			}
+			assertions = append(assertions, assertionObject)
 		}
 
 		definitions = append(definitions, openapi.TestDefinitionDefinitions{
@@ -100,10 +121,25 @@ func convertTestDefinitionsIntoOpenAPIObject(testDefinitions []definition.TestDe
 
 	return &openapi.TestDefinition{
 		Definitions: definitions,
-	}
+	}, nil
 }
 
-func convertStringIntoAssertion(assertion string) openapi.Assertion {
+func convertStringIntoAssertion(assertion string) (openapi.Assertion, error) {
 	// TODO: convert string into assertion (using a parser?)
-	return openapi.Assertion{}
+	parsedAssertion, err := parser.ParseAssertion(assertion)
+	if err != nil {
+		return openapi.Assertion{}, err
+	}
+
+	// We have a bug in the parser that doesn't allow us to match operators that have more than one character. To overcome this
+	// problem while the bug is not solved, we gonna validate the token here
+	if _, ok := availableOperators[parsedAssertion.Operator]; !ok {
+		return openapi.Assertion{}, fmt.Errorf("operator \"%s\" is not supported", parsedAssertion.Operator)
+	}
+
+	return openapi.Assertion{
+		Attribute:  ConvertStringIntoOpenAPIString(parsedAssertion.Attribute),
+		Comparator: ConvertStringIntoOpenAPIString(parsedAssertion.Operator),
+		Expected:   ConvertStringIntoOpenAPIString(parsedAssertion.Value),
+	}, nil
 }
