@@ -32,10 +32,9 @@ func TestLoadDefinition(t *testing.T) {
 							{Key: "ContentType", Value: "application/json"},
 						},
 						Authentication: definition.HTTPAuthentication{
-							Type: "basic",
-							BasicAuth: definition.HTTPBasicAuth{
-								User:     "ash",
-								Password: "pikachu@Rules",
+							Type: "bearer",
+							Bearer: definition.HTTPBearerAuth{
+								Token: "my-token-123",
 							},
 						},
 						Body: definition.HTTPBody{
@@ -55,13 +54,13 @@ func TestLoadDefinition(t *testing.T) {
 					{
 						Selector: "span[span.name = \"send message to queue\"]",
 						Assertions: []string{
-							"messaging.message.payload contains '\"id\": 52'",
+							"messaging.message.payload contains 52",
 						},
 					},
 					{
 						Selector: "span[span.name = \"consume message from queue\"]:last",
 						Assertions: []string{
-							"messaging.message.payload contains '\"id\": 52'",
+							"messaging.message.payload contains 52",
 						},
 					},
 					{
@@ -71,9 +70,9 @@ func TestLoadDefinition(t *testing.T) {
 						},
 					},
 					{
-						Selector: "span[span.name = \"consume message from queue\"]:last span[span.name = \"\"]",
+						Selector: "span[span.name = \"consume message from queue\"]:last span[span.name = \"save pokemon on database\"]",
 						Assertions: []string{
-							"db.repository.operation = create",
+							"db.repository.operation = \"create\"",
 							"tracetest.span.duration <= 100",
 						},
 					},
@@ -119,13 +118,13 @@ func TestLoadDefinition(t *testing.T) {
 					{
 						Selector: "span[span.name = \"send message to queue\"]",
 						Assertions: []string{
-							"messaging.message.payload contains '\"id\": 52'",
+							"messaging.message.payload contains 52",
 						},
 					},
 					{
 						Selector: "span[span.name = \"consume message from queue\"]:last",
 						Assertions: []string{
-							"messaging.message.payload contains '\"id\": 52'",
+							"messaging.message.payload contains 52",
 						},
 					},
 					{
@@ -135,9 +134,9 @@ func TestLoadDefinition(t *testing.T) {
 						},
 					},
 					{
-						Selector: "span[span.name = \"consume message from queue\"]:last span[span.name = \"\"]",
+						Selector: "span[span.name = \"consume message from queue\"]:last span[span.name = \"save pokemon on database\"]",
 						Assertions: []string{
-							"db.repository.operation = create",
+							"db.repository.operation = \"create\"",
 							"tracetest.span.duration <= 100",
 						},
 					},
