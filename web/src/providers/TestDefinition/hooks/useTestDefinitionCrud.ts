@@ -10,6 +10,7 @@ import {
   updateDefinition,
   reset as resetAction,
   clearAffectedSpans,
+  revertDefinition,
 } from '../../../redux/slices/TestDefinition.slice';
 import {TAssertionResults} from '../../../types/Assertion.types';
 import {TTestDefinitionEntry} from '../../../types/TestDefinition.types';
@@ -24,6 +25,13 @@ const useTestDefinitionCrud = ({runId, testId}: IProps) => {
   const {isDraftMode, setIsDraftMode} = useDraftMode();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+
+  const revert = useCallback(
+    (originalSelector: string) => {
+      return dispatch(revertDefinition({originalSelector}));
+    },
+    [dispatch]
+  );
 
   const dryRun = useCallback(
     (definitionList: TTestDefinitionEntry[]) => {
@@ -80,7 +88,7 @@ const useTestDefinitionCrud = ({runId, testId}: IProps) => {
     dispatch(resetAction());
   }, [dispatch]);
 
-  return {init, reset, add, remove, update, publish, cancel, dryRun, isDraftMode};
+  return {revert, init, reset, add, remove, update, publish, cancel, dryRun, isDraftMode};
 };
 
 export default useTestDefinitionCrud;

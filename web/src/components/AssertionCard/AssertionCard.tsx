@@ -1,12 +1,12 @@
-import {Tooltip} from 'antd';
-import {useCallback} from 'react';
-import {useStore} from 'react-flow-renderer';
+import {Button, Tooltip} from 'antd';
 
 import AssertionCheckRow from 'components/AssertionCheckRow';
 import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
-import {useAppSelector} from 'redux/hooks';
+import {useCallback} from 'react';
+import {useStore} from 'react-flow-renderer';
 import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
-import {TAssertionResultEntry} from 'types/Assertion.types';
+import {useAppSelector} from '../../redux/hooks';
+import {TAssertionResultEntry} from '../../types/Assertion.types';
 import * as S from './AssertionCard.styled';
 import AssertionCardSelectorList from './AssertionCardSelectorList';
 
@@ -24,13 +24,16 @@ const AssertionCard: React.FC<TAssertionCardProps> = ({
   onDelete,
   onEdit,
 }) => {
-  const {setSelectedAssertion} = useTestDefinition();
+  const {setSelectedAssertion, revert} = useTestDefinition();
   const store = useStore();
   const {selectedElements} = store.getState();
 
   const selectedAssertion = useAppSelector(TestDefinitionSelectors.selectSelectedAssertion);
-  const {isDraft = false, isDeleted = false} =
-    useAppSelector(state => TestDefinitionSelectors.selectDefinitionBySelector(state, selector)) || {};
+  const {
+    isDraft = false,
+    isDeleted = false,
+    originalSelector = '',
+  } = useAppSelector(state => TestDefinitionSelectors.selectDefinitionBySelector(state, selector)) || {};
   const spanCountText = `${spanIds.length} ${spanIds.length > 1 ? 'spans' : 'span'}`;
 
   const getIsSelectedSpan = useCallback(
@@ -49,6 +52,13 @@ const AssertionCard: React.FC<TAssertionCardProps> = ({
     setSelectedAssertion(selector);
   };
 
+  const resetDefinition: React.MouseEventHandler = useCallback(
+    e => {
+      e.stopPropagation();
+      revert(originalSelector);
+    },
+    [revert, originalSelector]
+  );
   return (
     <S.AssertionCard
       $isSelected={selectedAssertion === selector}
@@ -60,7 +70,14 @@ const AssertionCard: React.FC<TAssertionCardProps> = ({
           <AssertionCardSelectorList selectorList={selectorList} pseudoSelector={pseudoSelector} />
         </div>
         <S.ActionsContainer>
-          {isDraft && <S.StatusTag>draft</S.StatusTag>}
+          {isDraft && (
+            <>
+              <S.StatusTag>draft</S.StatusTag>
+              <Button type="link" data-cy="assertion-action-revert" onClick={resetDefinition}>
+                Revert Assertion
+              </Button>
+            </>
+          )}
           {isDeleted && <S.StatusTag color="#61175E">deleted</S.StatusTag>}
           <S.SpanCountText>{spanCountText}</S.SpanCountText>
           <Tooltip color="white" title="Edit Assertion">

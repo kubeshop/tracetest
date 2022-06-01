@@ -4,6 +4,7 @@ import {Model, TTestSchemas} from './Common.types';
 export type TRawTestDefinition = TTestSchemas['TestDefinition'];
 
 export type TTestDefinitionEntry = {
+  originalSelector?: string;
   selector: string;
   assertionList: TAssertion[];
   isDraft: boolean;
