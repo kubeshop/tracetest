@@ -5,7 +5,7 @@ init-submodule:
 	git submodule update
 
 test:
-	go test $(go list ./... | grep -v external) -timeout 90s -coverprofile=coverage.out ./...
+	go test ./... -timeout 90s -coverprofile=coverage.out ./...
 
 vet:
 	go vet -structtag=false ./...
@@ -90,4 +90,4 @@ proto:
 	$(PROTOC_WITH_GRPC) \
 		external/tempo-idl/tempo.proto
 	mv $(PROTO_GEN_GO_DIR)/external/tempo-idl $(PROTO_GEN_GO_DIR)/tempo-idl
-	cp external/tempo-idl/prealloc.go $(PROTO_GEN_GO_DIR)/tempo-idl/prealloc.go
+	cp external/tempo-idl/prealloc.go.tmp $(PROTO_GEN_GO_DIR)/tempo-idl/prealloc.go
