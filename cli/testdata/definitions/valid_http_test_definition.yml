@@ -9,28 +9,27 @@ trigger:
             - key: ContentType
               value: application/json
         authentication:
-            type: basic
-            basicAuth:
-              user: "ash"
-              password: "pikachu@Rules"
+            type: bearer
+            bearer:
+              token: my-token-123
         body:
             type: raw
             raw: "{ \"id\": 52 }"
 testDefinition:
-    - selector: "span[span.name = \"POST /pokemon/import\"]"
+    - selector: span[span.name = "POST /pokemon/import"]
       assertions:
         - tracetest.span.duration <= 100
         - http.status = 200
-    - selector: "span[span.name = \"send message to queue\"]"
+    - selector: span[span.name = "send message to queue"]
       assertions:
         - messaging.message.payload contains 52
-    - selector: "span[span.name = \"consume message from queue\"]:last"
+    - selector: span[span.name = "consume message from queue"]:last
       assertions:
         - messaging.message.payload contains 52
-    - selector: "span[span.name = \"consume message from queue\"]:last span[span.name = \"import pokemon from pokeapi\"]"
+    - selector: span[span.name = "consume message from queue"]:last span[span.name = "import pokemon from pokeapi"]
       assertions:
         - http.status = 200
-    - selector: "span[span.name = \"consume message from queue\"]:last span[span.name = \"\"]"
+    - selector: span[span.name = "consume message from queue"]:last span[span.name = "save pokemon on database"]
       assertions:
-        - db.repository.operation = create
+        - db.repository.operation = "create"
         - tracetest.span.duration <= 100
