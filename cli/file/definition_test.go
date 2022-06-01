@@ -44,6 +44,40 @@ func TestLoadDefinition(t *testing.T) {
 						},
 					},
 				},
+				TestDefinition: []definition.TestDefinition{
+					{
+						Selector: "span[span.name = \"POST /pokemon/import\"]",
+						Assertions: []string{
+							"tracetest.span.duration <= 100",
+							"http.status = 200",
+						},
+					},
+					{
+						Selector: "span[span.name = \"send message to queue\"]",
+						Assertions: []string{
+							"messaging.message.payload contains '\"id\": 52'",
+						},
+					},
+					{
+						Selector: "span[span.name = \"consume message from queue\"]:last",
+						Assertions: []string{
+							"messaging.message.payload contains '\"id\": 52'",
+						},
+					},
+					{
+						Selector: "span[span.name = \"consume message from queue\"]:last span[span.name = \"import pokemon from pokeapi\"]",
+						Assertions: []string{
+							"http.status = 200",
+						},
+					},
+					{
+						Selector: "span[span.name = \"consume message from queue\"]:last span[span.name = \"\"]",
+						Assertions: []string{
+							"db.repository.operation = create",
+							"tracetest.span.duration <= 100",
+						},
+					},
+				},
 			},
 		},
 		{
@@ -71,6 +105,40 @@ func TestLoadDefinition(t *testing.T) {
 						Body: definition.HTTPBody{
 							Type: "raw",
 							Raw:  `{ "id": 52 }`,
+						},
+					},
+				},
+				TestDefinition: []definition.TestDefinition{
+					{
+						Selector: "span[span.name = \"POST /pokemon/import\"]",
+						Assertions: []string{
+							"tracetest.span.duration <= 100",
+							"http.status = 200",
+						},
+					},
+					{
+						Selector: "span[span.name = \"send message to queue\"]",
+						Assertions: []string{
+							"messaging.message.payload contains '\"id\": 52'",
+						},
+					},
+					{
+						Selector: "span[span.name = \"consume message from queue\"]:last",
+						Assertions: []string{
+							"messaging.message.payload contains '\"id\": 52'",
+						},
+					},
+					{
+						Selector: "span[span.name = \"consume message from queue\"]:last span[span.name = \"import pokemon from pokeapi\"]",
+						Assertions: []string{
+							"http.status = 200",
+						},
+					},
+					{
+						Selector: "span[span.name = \"consume message from queue\"]:last span[span.name = \"\"]",
+						Assertions: []string{
+							"db.repository.operation = create",
+							"tracetest.span.duration <= 100",
 						},
 					},
 				},
