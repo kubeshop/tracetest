@@ -7,7 +7,7 @@ trigger:
     url: http://pokemon-demo.tracetest.io/pokemon/import
     method: POST
     headers:
-    - key: ContentType
+    - key: Content-Type
       value: application/json
     authentication:
       type: bearer
@@ -20,7 +20,7 @@ testDefinition:
 - selector: span[span.name = "POST /pokemon/import"]
   assertions:
   - tracetest.span.duration <= 100
-  - http.status = 200
+  - http.status_code = 200
 - selector: span[span.name = "send message to queue"]
   assertions:
   - messaging.message.payload contains 52
@@ -29,7 +29,7 @@ testDefinition:
   - messaging.message.payload contains 52
 - selector: span[span.name = "consume message from queue"]:last span[span.name = "import pokemon from pokeapi"]
   assertions:
-  - http.status = 200
+  - http.status_code = 200
 - selector: span[span.name = "consume message from queue"]:last span[span.name = "save pokemon on database"]
   assertions:
   - db.repository.operation = "create"
