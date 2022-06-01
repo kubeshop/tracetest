@@ -1,11 +1,11 @@
-id: "3fd66887-4ee7-44d5-bad8-9934ab9c1a9a"
-name: "POST import pokemon"
-description: "Import a pokemon using its ID"
+id: 3fd66887-4ee7-44d5-bad8-9934ab9c1a9a
+name: POST import pokemon
+description: Import a pokemon using its ID
 trigger:
     type: http
     http_request:
         url: http://pokemon-demo.tracetest.io/pokemon/import
-        method: "POST"
+        method: POST
         headers:
             - key: ContentType
               value: application/json
@@ -15,7 +15,7 @@ trigger:
               token: my-token-123
         body:
             type: raw
-            raw: "{ \"id\": 52 }"
+            raw: '{ \"id\": 52 }'
 testDefinition:
     - selector: span[span.name = "POST /pokemon/import"]
       assertions:
