@@ -26,8 +26,9 @@ type runTestAction struct {
 var _ Action[RunTestConfig] = &runTestAction{}
 
 type runTestOutput struct {
-	TestID string `json:"testId"`
-	RunID  string `json:"testRunId"`
+	TestID    string `json:"testId"`
+	RunID     string `json:"testRunId"`
+	RunWebURL string `json:"testRunWebUrl"`
 }
 
 func NewRunTestAction(config config.Config, logger *zap.Logger, client *openapi.APIClient) runTestAction {
@@ -88,8 +89,9 @@ func (a runTestAction) runDefinition(ctx context.Context, definitionFile string)
 	}
 
 	return runTestOutput{
-		TestID: definition.Id,
-		RunID:  *testRun.Id,
+		TestID:    definition.Id,
+		RunID:     *testRun.Id,
+		RunWebURL: fmt.Sprintf("%s://%s/test/%s/run%s", a.config.Scheme, a.config.Endpoint, definition.Id, *testRun.Id),
 	}, nil
 }
 
