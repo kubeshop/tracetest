@@ -1,17 +1,34 @@
+import {Drawer} from 'antd';
 import * as React from 'react';
 import {MouseEventHandler, useCallback, useEffect, useState} from 'react';
-import {Drawer} from 'antd';
+import styled from 'styled-components';
+import {useAssertionForm} from '../AssertionForm/AssertionFormProvider';
+import {useReferenceMemo} from './useReferenceMemo';
 
 interface IProps {
-  min: number;
-  max: number;
-  open: boolean;
+  visiblePortion: number;
   children: JSX.Element[];
 }
 
-const ResizableDrawer: React.FC<IProps> = ({open, children, min, max}: IProps) => {
+export enum DrawerState {
+  OPEN = 'OPEN',
+  CLOSE = 'CLOSE',
+  INITIAL = 'INITIAL',
+  FORM = 'FORM',
+}
+
+const CustomDrawer = styled(Drawer)`
+  .ant-drawer-body {
+    display: flex;
+    flex-direction: column;
+  }
+`;
+
+const ResizableDrawer: React.FC<IProps> = ({children, visiblePortion}: IProps) => {
+  const {drawerState} = useAssertionForm();
   const [isResizing, setIsResizing] = useState(false);
-  const [height, setHeight] = useState(min);
+  const ref = useReferenceMemo(visiblePortion);
+  const [height, setHeight] = useState(ref[DrawerState.INITIAL]);
 
   const onPointerDown: MouseEventHandler = useCallback(() => {
     setIsResizing(true);
@@ -28,21 +45,29 @@ const ResizableDrawer: React.FC<IProps> = ({open, children, min, max}: IProps) =
       if (isResizing) {
         const offsetRight =
           document.body.offsetHeight - ((e.clientY || document.body.offsetLeft) - document.body.offsetLeft);
-        if (offsetRight > min && offsetRight < max) {
+        if (offsetRight > visiblePortion && offsetRight < ref['OPEN']) {
           setHeight(offsetRight);
         }
       }
     },
-    [setHeight, isResizing, min, max]
+    [setHeight, isResizing, visiblePortion, ref]
   );
 
   useEffect(() => {
-    if (open) {
-      setHeight(max);
+    if (drawerState === DrawerState.CLOSE) {
+      setHeight(visiblePortion);
       return;
     }
-    setHeight(min);
-  }, [open]);
+    if (drawerState === DrawerState.OPEN) {
+      setHeight(ref[DrawerState.OPEN]);
+    }
+    if (drawerState === DrawerState.FORM) {
+      setHeight(ref[DrawerState.FORM]);
+    }
+    if (drawerState === DrawerState.INITIAL) {
+      setHeight(ref[DrawerState.INITIAL]);
+    }
+  }, [drawerState, ref, visiblePortion]);
   useEffect(() => {
     document.addEventListener('pointermove', onMouseMove);
     document.addEventListener('pointerup', onMouseUp);
@@ -54,7 +79,7 @@ const ResizableDrawer: React.FC<IProps> = ({open, children, min, max}: IProps) =
   });
 
   return (
-    <Drawer
+    <CustomDrawer
       placement="bottom"
       closable={false}
       visible
@@ -79,8 +104,8 @@ const ResizableDrawer: React.FC<IProps> = ({open, children, min, max}: IProps) =
         }}
         onPointerDown={onPointerDown}
       />
-      {children.map(child => React.cloneElement(child, {height}))}
-    </Drawer>
+      {children.map(child => React.cloneElement(child, {height, max: ref['OPEN'], min: visiblePortion}))}
+    </CustomDrawer>
   );
 };
 

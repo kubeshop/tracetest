@@ -4,6 +4,7 @@ import {useAssertionForm} from 'components/AssertionForm/AssertionFormProvider';
 import useScrollTo from 'hooks/useScrollTo';
 import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
 import {IResult} from 'types/Assertion.types';
+import {DrawerState} from '../ResizableDrawer/ResizableDrawer';
 import * as S from './AttributeRow.styled';
 
 interface IProps {
@@ -13,11 +14,11 @@ interface IProps {
 
 const AttributeCheck = ({items, type}: IProps) => {
   const {setSelectedAssertion} = useTestDefinition();
-  const {setIsCollapsed} = useAssertionForm();
+  const {setDrawerState} = useAssertionForm();
   const scrollTo = useScrollTo();
 
   const handleOnClick = (id: string) => {
-    setIsCollapsed(true);
+    setDrawerState(DrawerState.OPEN);
     setSelectedAssertion(id);
     scrollTo({elementId: `assertion-${id}`, containerId: 'assertions-container'});
   };

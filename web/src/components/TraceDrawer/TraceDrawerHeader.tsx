@@ -1,6 +1,7 @@
 import {PlusOutlined} from '@ant-design/icons';
 import {Badge} from 'antd';
 import {format, parseISO} from 'date-fns';
+import * as React from 'react';
 import {MouseEventHandler, useCallback, useMemo} from 'react';
 import {TTestRun} from 'types/TestRun.types';
 import GuidedTourService, {GuidedTours} from '../../services/GuidedTour.service';
@@ -11,15 +12,18 @@ import {TSpan} from '../../types/Span.types';
 import {useAssertionForm} from '../AssertionForm/AssertionFormProvider';
 import {Steps} from '../GuidedTour/traceStepList';
 import * as S from './TraceDrawer.styled';
+import {useChevronDirectionMemo} from './useChevronDirectionMemo';
 
 interface IProps {
   visiblePortion: number;
   run: TTestRun;
   assertionResults?: TAssertionResults;
-  onClick(): void;
+  onClick: React.MouseEventHandler<HTMLDivElement>;
   isDisabled: boolean;
   selectedSpan: TSpan;
   height?: number;
+  min?: number;
+  max?: number;
 }
 
 const TraceDrawerHeader: React.FC<IProps> = ({
@@ -30,6 +34,8 @@ const TraceDrawerHeader: React.FC<IProps> = ({
   isDisabled,
   selectedSpan,
   height,
+  max,
+  min,
 }) => {
   const {open} = useAssertionForm();
   const totalSpanCount = trace?.spans.length;
@@ -57,12 +63,12 @@ const TraceDrawerHeader: React.FC<IProps> = ({
     },
     [open, selectedSpan]
   );
-
+  const $isCollapsed = useChevronDirectionMemo(height, max, min);
   return (
     <S.Header
       visiblePortion={visiblePortion}
       data-tour={GuidedTourService.getStep(GuidedTours.Trace, Steps.Timeline)}
-      style={{height: visiblePortion}}
+      style={{height: visiblePortion, minHeight: visiblePortion}}
       onClick={onClick}
     >
       <div>
@@ -85,7 +91,7 @@ const TraceDrawerHeader: React.FC<IProps> = ({
           Add Assertion
         </S.AddAssertionButton>
         <span style={{marginLeft: 16}}>
-          <S.Chevron $isCollapsed={height === visiblePortion} />
+          <S.Chevron $isCollapsed={$isCollapsed} />
         </span>
       </div>
     </S.Header>

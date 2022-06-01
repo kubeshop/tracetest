@@ -6,6 +6,8 @@ import AssertionForm from '../AssertionForm';
 import {useAssertionForm} from '../AssertionForm/AssertionFormProvider';
 import LoadingSpinner from '../LoadingSpinner';
 import ResizableDrawer from '../ResizableDrawer';
+import {DrawerState} from '../ResizableDrawer/ResizableDrawer';
+import {useSetIsCollapsedCallback} from '../ResizableDrawer/useSetIsCollapsedCallback';
 import TestResults from '../TestResults';
 import * as S from './TraceDrawer.styled';
 import TraceDrawerHeader from './TraceDrawerHeader';
@@ -19,27 +21,23 @@ interface IProps {
 }
 
 const TraceDrawer: React.FC<IProps> = ({run: {id: runId}, run, testId, visiblePortion, onSelectSpan, selectedSpan}) => {
-  const contentHeight = 330;
-  const {isOpen: isAssertionFormOpen, formProps, onSubmit, close, setIsCollapsed, isCollapsed} = useAssertionForm();
+  const {isOpen: isAssertionFormOpen, formProps, onSubmit, close, setDrawerState} = useAssertionForm();
   const {isLoading, assertionResults} = useTestDefinition();
 
   useEffect(() => {
-    if (isAssertionFormOpen) setIsCollapsed(true);
-  }, [isAssertionFormOpen, setIsCollapsed]);
-
+    if (isAssertionFormOpen) setDrawerState(DrawerState.FORM);
+  }, [isAssertionFormOpen, setDrawerState]);
   return (
-    <ResizableDrawer min={visiblePortion} max={contentHeight + visiblePortion} open={isCollapsed}>
+    <ResizableDrawer visiblePortion={visiblePortion}>
       <TraceDrawerHeader
-        onClick={() => setIsCollapsed(!isCollapsed)}
+        onClick={useSetIsCollapsedCallback()}
         run={run}
         assertionResults={assertionResults}
         isDisabled={isAssertionFormOpen}
         visiblePortion={visiblePortion}
         selectedSpan={selectedSpan}
       />
-
-      <S.Content id="assertions-container"
-      $height={contentHeight}>
+      <S.Content id="assertions-container">
         {(isLoading || !assertionResults) && (
           <S.LoadingSpinnerContainer>
             <LoadingSpinner />
