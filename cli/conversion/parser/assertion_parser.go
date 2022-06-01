@@ -14,44 +14,11 @@ type Assertion struct {
 	Value     string
 }
 
-// type assertionParserObject struct {
-// 	Attribute string       `( @Ident ( @"." @Ident )*)`
-// 	Operator  string       `@( "contains" | "<" | ">" | "=" | "!" )+`
-// 	Value     *parserValue `@@*`
-// }
-
 type assertionParserObject struct {
 	Attribute string `@Attribute`
 	Operator  string `@Operator`
 	Value     string `@Value`
 }
-
-// type parserValue struct {
-// 	String  *string  ` @String`
-// 	Int     *int64   ` | @Int`
-// 	Float   *float64 ` | @Float`
-// 	Boolean *bool    ` | @("true" | "false")`
-// }
-
-// func (v *parserValue) GetString() string {
-// 	if v.String != nil {
-// 		return *v.String
-// 	}
-
-// 	if v.Int != nil {
-// 		return fmt.Sprintf("%d", *v.Int)
-// 	}
-
-// 	if v.Float != nil {
-// 		return fmt.Sprintf("%f", *v.Float)
-// 	}
-
-// 	if v.Boolean != nil {
-// 		return fmt.Sprintf("%t", *v.Boolean)
-// 	}
-
-// 	return ""
-// }
 
 var languageLexer = lexer.MustSimple([]lexer.SimpleRule{
 	{Name: "Operator", Pattern: `!=|<=|>=|=|<|>|contains`},
