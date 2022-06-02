@@ -34,6 +34,7 @@ func TestCreateTest(t *testing.T) {
 	assert.Equal(t, test.ServiceUnderTest, actual.ServiceUnderTest)
 	assert.Equal(t, test.ReferenceRun, actual.ReferenceRun)
 	assert.Equal(t, test.Definition, actual.Definition)
+	assert.False(t, actual.CreatedAt.IsZero())
 }
 
 func TestUpdateTest(t *testing.T) {
@@ -48,6 +49,9 @@ func TestUpdateTest(t *testing.T) {
 
 	actual, err := db.GetLatestTestVersion(context.TODO(), test.ID)
 	require.NoError(t, err)
+
+	assert.False(t, actual.CreatedAt.IsZero())
+	actual.CreatedAt = test.CreatedAt // hack to ignore created at in equal comparation
 	assert.Equal(t, test, actual)
 }
 
@@ -89,10 +93,16 @@ func TestGetTests(t *testing.T) {
 
 	createTestWithName(t, db, "1")
 	createTestWithName(t, db, "2")
+	createTestWithName(t, db, "3")
 
 	actual, err := db.GetTests(context.TODO(), 20, 0)
 	require.NoError(t, err)
-	assert.Len(t, actual, 2)
+	assert.Len(t, actual, 3)
+
+	// test order
+	assert.Equal(t, "3", actual[0].Name)
+	assert.Equal(t, "2", actual[1].Name)
+	assert.Equal(t, "1", actual[2].Name)
 
 	actual, err = db.GetTests(context.TODO(), 20, 10)
 	require.NoError(t, err)

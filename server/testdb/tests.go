@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/kubeshop/tracetest/server/model"
@@ -15,6 +16,7 @@ var _ model.TestRepository = &postgresDB{}
 
 func (td *postgresDB) CreateTest(ctx context.Context, test model.Test) (model.Test, error) {
 	test.ID = IDGen.UUID()
+	test.CreatedAt = time.Now()
 	test.ReferenceRun = nil
 	test.Version = 1
 
@@ -139,7 +141,9 @@ func (td *postgresDB) GetLatestTestVersion(ctx context.Context, id uuid.UUID) (m
 func (td *postgresDB) GetTests(ctx context.Context, take, skip int32) ([]model.Test, error) {
 	stmt, err := td.db.Prepare(`SELECT test FROM tests INNER JOIN (
 		SELECT id as idx, max(version) as latest_version FROM tests GROUP BY idx
-	) as latestTests ON latestTests.idx = id WHERE version = latestTests.latest_version LIMIT $1 OFFSET $2`)
+	) as latestTests ON latestTests.idx = id WHERE version = latestTests.latest_version
+	ORDER BY (test ->> 'CreatedAt')::timestamp DESC
+	LIMIT $1 OFFSET $2`)
 	if err != nil {
 		return nil, err
 	}
