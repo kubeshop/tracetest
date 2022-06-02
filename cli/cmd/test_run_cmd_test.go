@@ -13,6 +13,11 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+type cliOutput struct {
+	TestId    string `json:"testId"`
+	TestRunId string `json:"testRunId"`
+}
+
 func TestRunTestCmd(t *testing.T) {
 	cli := e2e.NewCLI()
 
@@ -32,11 +37,6 @@ func TestRunTestCmd(t *testing.T) {
 	require.NoError(t, err)
 	assert.NotEmpty(t, definition.Id)
 
-	type cliOutput struct {
-		TestId    string `json:"testId"`
-		TestRunId string `json:"testRunId"`
-	}
-
 	var outputObject cliOutput
 	err = json.Unmarshal([]byte(output), &outputObject)
 	require.NoError(t, err)
@@ -44,6 +44,37 @@ func TestRunTestCmd(t *testing.T) {
 	assert.NotEmpty(t, outputObject.TestId)
 	assert.NotEmpty(t, outputObject.TestRunId)
 	assert.Equal(t, outputObject.TestId, definition.Id)
+}
+
+func TestRunTestCmdWhenEditingTest(t *testing.T) {
+	cli := e2e.NewCLI()
+
+	definitionFile := "test_run_cmd_test_definition.yml"
+	err := copyFile("../testdata/definitions/valid_http_test_definition.yml", definitionFile)
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		err := deleteFile(definitionFile)
+		require.NoError(t, err)
+	})
+
+	output, err := cli.RunCommand("test", "run", "--config", "e2e/config.yml", "--definition", definitionFile)
+	assert.NoError(t, err)
+	assert.NotEmpty(t, output)
+
+	var outputObject cliOutput
+	err = json.Unmarshal([]byte(output), &outputObject)
+	require.NoError(t, err)
+
+	updateCmdOutput, err := cli.RunCommand("test", "run", "--config", "e2e/config.yml", "--definition", definitionFile)
+	assert.NoError(t, err)
+	assert.NotEmpty(t, output)
+
+	var updateOutputObject cliOutput
+	err = json.Unmarshal([]byte(updateCmdOutput), &updateOutputObject)
+	require.NoError(t, err)
+
+	// Assert a new test wasn't created
+	assert.Equal(t, outputObject.TestId, updateOutputObject.TestId)
 }
 
 func copyFile(source string, destination string) error {
