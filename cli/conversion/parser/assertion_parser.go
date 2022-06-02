@@ -57,7 +57,7 @@ func ParseAssertion(assertionQuery string) (Assertion, error) {
 	}
 
 	value := assertionParserObject.Value
-	if value[0:1] == "\"" {
+	if value[0:1] == `"` {
 		value, err = strconv.Unquote(value)
 		if err != nil {
 			return Assertion{}, fmt.Errorf("could not unquote value: %w", err)
