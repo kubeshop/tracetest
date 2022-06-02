@@ -11,6 +11,7 @@ import {TAssertionResults} from '../../types/Assertion.types';
 import {TSpan} from '../../types/Span.types';
 import {useAssertionForm} from '../AssertionForm/AssertionFormProvider';
 import {Steps} from '../GuidedTour/traceStepList';
+import {useSetIsCollapsedCallbackDirection} from '../ResizableDrawer/useSetIsCollapsedCallback';
 import * as S from './TraceDrawer.styled';
 import {useChevronDirectionMemo} from './useChevronDirectionMemo';
 
@@ -18,7 +19,6 @@ interface IProps {
   visiblePortion: number;
   run: TTestRun;
   assertionResults?: TAssertionResults;
-  onClick: React.MouseEventHandler<HTMLDivElement>;
   isDisabled: boolean;
   selectedSpan: TSpan;
   height?: number;
@@ -30,13 +30,14 @@ const TraceDrawerHeader: React.FC<IProps> = ({
   run: {trace, createdAt},
   visiblePortion,
   assertionResults,
-  onClick,
   isDisabled,
   selectedSpan,
   height,
   max,
   min,
 }) => {
+  const $isCollapsed = useChevronDirectionMemo(height, max, min);
+  const onClick = useSetIsCollapsedCallbackDirection($isCollapsed);
   const {open} = useAssertionForm();
   const totalSpanCount = trace?.spans.length;
   const totalAssertionCount = assertionResults?.resultList.length || 0;
@@ -63,7 +64,6 @@ const TraceDrawerHeader: React.FC<IProps> = ({
     },
     [open, selectedSpan]
   );
-  const $isCollapsed = useChevronDirectionMemo(height, max, min);
   return (
     <S.Header
       visiblePortion={visiblePortion}
