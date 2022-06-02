@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"sync"
+	"time"
 
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/conversion"
@@ -15,6 +17,7 @@ import (
 
 type RunTestConfig struct {
 	DefinitionFile string
+	WaitForResult  bool
 }
 
 type runTestAction struct {
@@ -26,9 +29,9 @@ type runTestAction struct {
 var _ Action[RunTestConfig] = &runTestAction{}
 
 type runTestOutput struct {
-	TestID    string `json:"testId"`
-	RunID     string `json:"testRunId"`
-	RunWebURL string `json:"testRunWebUrl"`
+	Test      openapi.Test    `json:"test"`
+	Run       openapi.TestRun `json:"testRun"`
+	RunWebURL string          `json:"testRunWebUrl"`
 }
 
 func NewRunTestAction(config config.Config, logger *zap.Logger, client *openapi.APIClient) runTestAction {
@@ -41,7 +44,7 @@ func (a runTestAction) Run(ctx context.Context, args RunTestConfig) error {
 	}
 
 	a.logger.Debug("Running test from definition", zap.String("definitionFile", args.DefinitionFile))
-	output, err := a.runDefinition(ctx, args.DefinitionFile)
+	output, err := a.runDefinition(ctx, args.DefinitionFile, args.WaitForResult)
 
 	if err != nil {
 		return fmt.Errorf("could not run definition: %w", err)
@@ -56,7 +59,7 @@ func (a runTestAction) Run(ctx context.Context, args RunTestConfig) error {
 	return nil
 }
 
-func (a runTestAction) runDefinition(ctx context.Context, definitionFile string) (runTestOutput, error) {
+func (a runTestAction) runDefinition(ctx context.Context, definitionFile string, waitForResult bool) (runTestOutput, error) {
 	definition, err := file.LoadDefinition(definitionFile)
 	if err != nil {
 		return runTestOutput{}, err
@@ -67,21 +70,23 @@ func (a runTestAction) runDefinition(ctx context.Context, definitionFile string)
 		return runTestOutput{}, fmt.Errorf("invalid definition file: %w", err)
 	}
 
+	var test openapi.Test
+
 	if definition.Id == "" {
 		a.logger.Debug("test doesn't exist. Creating it")
-		testID, err := a.createTestFromDefinition(ctx, definition)
+		test, err = a.createTestFromDefinition(ctx, definition)
 		if err != nil {
 			return runTestOutput{}, fmt.Errorf("could not create test from definition: %w", err)
 		}
 
-		definition.Id = testID
+		definition.Id = *test.Id
 		err = file.SaveDefinition(definitionFile, definition)
 		if err != nil {
 			return runTestOutput{}, fmt.Errorf("could not save definition: %w", err)
 		}
 	} else {
 		a.logger.Debug("test exists. Updating it")
-		err = a.updateTestFromDefinition(ctx, definition)
+		test, err = a.updateTestFromDefinition(ctx, definition)
 		if err != nil {
 			return runTestOutput{}, fmt.Errorf("could not update test using definition: %w", err)
 		}
@@ -92,17 +97,26 @@ func (a runTestAction) runDefinition(ctx context.Context, definitionFile string)
 		return runTestOutput{}, fmt.Errorf("could not run test: %w", err)
 	}
 
+	if waitForResult {
+		updatedTestRun, err := a.waitForResult(ctx, definition.Id, *testRun.Id)
+		if err != nil {
+			return runTestOutput{}, fmt.Errorf("could not wait for result: %w", err)
+		}
+
+		testRun = updatedTestRun
+	}
+
 	return runTestOutput{
-		TestID:    definition.Id,
-		RunID:     *testRun.Id,
+		Test:      test,
+		Run:       testRun,
 		RunWebURL: fmt.Sprintf("%s://%s/test/%s/run/%s", a.config.Scheme, a.config.Endpoint, definition.Id, *testRun.Id),
 	}, nil
 }
 
-func (a runTestAction) createTestFromDefinition(ctx context.Context, definition definition.Test) (string, error) {
+func (a runTestAction) createTestFromDefinition(ctx context.Context, definition definition.Test) (openapi.Test, error) {
 	openapiTest, err := conversion.ConvertTestDefinitionIntoOpenAPIObject(definition)
 	if err != nil {
-		return "", err
+		return openapi.Test{}, err
 	}
 
 	req := a.client.ApiApi.CreateTest(ctx)
@@ -110,22 +124,22 @@ func (a runTestAction) createTestFromDefinition(ctx context.Context, definition 
 
 	testBytes, err := json.Marshal(openapiTest)
 	if err != nil {
-		return "", fmt.Errorf("could not marshal test: %w", err)
+		return openapi.Test{}, fmt.Errorf("could not marshal test: %w", err)
 	}
 
 	a.logger.Debug("Sending request to create test", zap.ByteString("test", testBytes))
 	createdTest, _, err := a.client.ApiApi.CreateTestExecute(req)
 	if err != nil {
-		return "", fmt.Errorf("could not execute request: %w", err)
+		return openapi.Test{}, fmt.Errorf("could not execute request: %w", err)
 	}
 
-	return *createdTest.Id, nil
+	return *createdTest, nil
 }
 
-func (a runTestAction) updateTestFromDefinition(ctx context.Context, definition definition.Test) error {
+func (a runTestAction) updateTestFromDefinition(ctx context.Context, definition definition.Test) (openapi.Test, error) {
 	openapiTest, err := conversion.ConvertTestDefinitionIntoOpenAPIObject(definition)
 	if err != nil {
-		return err
+		return openapi.Test{}, err
 	}
 
 	req := a.client.ApiApi.UpdateTest(ctx, definition.Id)
@@ -133,16 +147,16 @@ func (a runTestAction) updateTestFromDefinition(ctx context.Context, definition 
 
 	testBytes, err := json.Marshal(openapiTest)
 	if err != nil {
-		return fmt.Errorf("could not marshal test: %w", err)
+		return openapi.Test{}, fmt.Errorf("could not marshal test: %w", err)
 	}
 
 	a.logger.Debug("Sending request to update test", zap.ByteString("test", testBytes))
 	_, err = a.client.ApiApi.UpdateTestExecute(req)
 	if err != nil {
-		return fmt.Errorf("could not execute request: %w", err)
+		return openapi.Test{}, fmt.Errorf("could not execute request: %w", err)
 	}
 
-	return nil
+	return openapiTest, nil
 }
 
 func (a runTestAction) runTest(ctx context.Context, testID string) (openapi.TestRun, error) {
@@ -153,4 +167,52 @@ func (a runTestAction) runTest(ctx context.Context, testID string) (openapi.Test
 	}
 
 	return *run, nil
+}
+
+func (a runTestAction) waitForResult(ctx context.Context, testId string, testRunId string) (openapi.TestRun, error) {
+	var testRun openapi.TestRun
+	var lastError error
+	var wg sync.WaitGroup
+	wg.Add(1)
+	ticker := time.NewTicker(1 * time.Second) // TODO: make this configurable
+	go func() {
+		for {
+			select {
+			case <-ticker.C:
+				isReady, readyTestRun, err := a.isTestReady(ctx, testId, testRunId)
+				if err != nil {
+					lastError = err
+					wg.Done()
+					return
+				}
+
+				if isReady {
+					testRun = readyTestRun
+					wg.Done()
+					return
+				}
+			}
+		}
+	}()
+	wg.Wait()
+
+	if lastError != nil {
+		return openapi.TestRun{}, lastError
+	}
+
+	return testRun, nil
+}
+
+func (a runTestAction) isTestReady(ctx context.Context, testId string, testRunId string) (bool, openapi.TestRun, error) {
+	req := a.client.ApiApi.GetTestRun(ctx, testId, testRunId)
+	run, _, err := a.client.ApiApi.GetTestRunExecute(req)
+	if err != nil {
+		return false, openapi.TestRun{}, fmt.Errorf("could not execute GetTestRun request: %w", err)
+	}
+
+	if *run.State == "FAILED" || *run.State == "FINISHED" {
+		return true, *run, nil
+	}
+
+	return false, *run, nil
 }

@@ -9,6 +9,7 @@ import (
 )
 
 var runTestFileDefinition string
+var runTestWaitForResult bool
 
 var testRunCmd = &cobra.Command{
 	Use:    "run",
@@ -22,6 +23,7 @@ var testRunCmd = &cobra.Command{
 		runTestAction := actions.NewRunTestAction(cliConfig, cliLogger, client)
 		actionArgs := actions.RunTestConfig{
 			DefinitionFile: runTestFileDefinition,
+			WaitForResult:  runTestWaitForResult,
 		}
 
 		err := runTestAction.Run(ctx, actionArgs)
@@ -35,5 +37,6 @@ var testRunCmd = &cobra.Command{
 
 func init() {
 	testRunCmd.PersistentFlags().StringVarP(&runTestFileDefinition, "definition", "d", "", "--definition <definition-file.yml>")
+	testRunCmd.PersistentFlags().BoolVarP(&runTestWaitForResult, "wait-for-result", "w", false, "")
 	testCmd.AddCommand(testRunCmd)
 }
