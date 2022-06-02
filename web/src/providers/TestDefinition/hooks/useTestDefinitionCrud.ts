@@ -11,10 +11,12 @@ import {
   reset as resetAction,
   clearAffectedSpans,
   revertDefinition,
+  setSelectedAssertion,
 } from '../../../redux/slices/TestDefinition.slice';
 import {TAssertionResults} from '../../../types/Assertion.types';
 import {TTestDefinitionEntry} from '../../../types/TestDefinition.types';
 import useDraftMode from './useDraftMode';
+import TestRunGateway from '../../../gateways/TestRun.gateway';
 
 interface IProps {
   runId: string;
@@ -44,9 +46,19 @@ const useTestDefinitionCrud = ({runId, testId}: IProps) => {
     const {id} = await dispatch(TestDefinitionActions.publish({testId, runId})).unwrap();
     setIsDraftMode(false);
     dispatch(clearAffectedSpans());
+    dispatch(setSelectedAssertion(''));
 
     navigate(`/test/${testId}/run/${id}`);
   }, [dispatch, navigate, runId, setIsDraftMode, testId]);
+
+  const runTest = useCallback(async () => {
+    const {id} = await dispatch(TestRunGateway.runTest(testId)).unwrap();
+    dispatch(clearAffectedSpans());
+    dispatch(setSelectedAssertion(''));
+    dispatch(resetAction());
+
+    navigate(`/test/${testId}/run/${id}`);
+  }, [dispatch, navigate, runId, testId]);
 
   const cancel = useCallback(() => {
     setIsDraftMode(false);
@@ -88,7 +100,7 @@ const useTestDefinitionCrud = ({runId, testId}: IProps) => {
     dispatch(resetAction());
   }, [dispatch]);
 
-  return {revert, init, reset, add, remove, update, publish, cancel, dryRun, isDraftMode};
+  return {revert, init, reset, add, remove, update, publish, runTest, cancel, dryRun, isDraftMode};
 };
 
 export default useTestDefinitionCrud;

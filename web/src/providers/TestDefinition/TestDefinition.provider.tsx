@@ -20,6 +20,7 @@ interface IContext {
   update(selector: string, testDefinition: TTestDefinitionEntry): void;
   remove(selector: string): void;
   publish(): void;
+  runTest(): void;
   cancel(): void;
   dryRun(definitionList: TTestDefinitionEntry[]): void;
   assertionResults?: TAssertionResults;
@@ -38,6 +39,7 @@ export const Context = createContext<IContext>({
   update: noop,
   remove: noop,
   publish: noop,
+  runTest: noop,
   dryRun: noop,
   cancel: noop,
   isLoading: false,
@@ -64,14 +66,15 @@ const TestDefinitionProvider: React.FC<IProps> = ({children, testId, runId}) => 
   const isInitialized = useAppSelector(state => TestDefinitionSelectors.selectIsInitialized(state));
   const {data: test} = useGetTestByIdQuery({testId});
 
-  const {add, cancel, publish, remove, dryRun, update, isDraftMode, init, reset, revert} = useTestDefinitionCrud({
-    testId,
-    runId,
-  });
+  const {add, cancel, publish, runTest, remove, dryRun, update, isDraftMode, init, reset, revert} =
+    useTestDefinitionCrud({
+      testId,
+      runId,
+    });
 
   useEffect(() => {
-    init(run.result);
-  }, [init, isInitialized, reset, run.result]);
+    if (run.state === 'FINISHED') init(run.result);
+  }, [init, run.result, run.state]);
 
   useEffect(() => {
     return () => {
@@ -106,6 +109,7 @@ const TestDefinitionProvider: React.FC<IProps> = ({children, testId, runId}) => 
       isError: false,
       isDraftMode,
       publish,
+      runTest,
       dryRun,
       assertionResults,
       definitionList,
@@ -125,6 +129,7 @@ const TestDefinitionProvider: React.FC<IProps> = ({children, testId, runId}) => 
       isDraftMode,
       isLoading,
       publish,
+      runTest,
       remove,
       update,
       test,

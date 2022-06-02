@@ -1,7 +1,7 @@
-import {endpoints} from '../redux/apis/TraceTest.api';
-import { TRawTestDefinition } from '../types/TestDefinition.types';
+import {endpoints} from 'redux/apis/TraceTest.api';
+import {TRawTestDefinition} from 'types/TestDefinition.types';
 
-const {getRunList, getRunById, reRun, dryRun} = endpoints;
+const {getRunList, getRunById, reRun, dryRun, runTest} = endpoints;
 
 const TestRunGateway = () => ({
   get(testId: string, take = 25, skip = 0) {
@@ -15,6 +15,9 @@ const TestRunGateway = () => ({
   },
   dryRun(testId: string, runId: string, testDefinition: Partial<TRawTestDefinition>) {
     return dryRun.initiate({testId, runId, testDefinition});
+  },
+  runTest(testId: string) {
+    return runTest.initiate({testId});
   },
 });
 

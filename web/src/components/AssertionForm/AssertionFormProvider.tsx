@@ -1,5 +1,6 @@
 import {noop} from 'lodash';
 
+import VersionMismatchModal from 'components/VersionMismatchModal/VersionMismatchModal';
 import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import {createContext, Dispatch, SetStateAction, useCallback, useContext, useMemo, useState} from 'react';
@@ -10,7 +11,6 @@ import SelectorService from 'services/Selector.service';
 import {TTestDefinitionEntry} from 'types/TestDefinition.types';
 import {DrawerState} from '../ResizableDrawer/ResizableDrawer';
 import {IValues} from './AssertionForm';
-import AssertionFormConfirmModal from './AssertionFormConfirmModal';
 
 interface IFormProps {
   defaultValues?: IValues;
@@ -122,7 +122,8 @@ const AssertionFormProvider: React.FC<{testId: string}> = ({children}) => {
   return (
     <Context.Provider value={contextValue}>
       {children}
-      <AssertionFormConfirmModal
+      <VersionMismatchModal
+        description="Changing and saving changes will result in a new version that will become the latest."
         isOpen={isConfirmationModalOpen}
         latestVersion={test?.version || 1}
         currentVersion={run.testVersion}
