@@ -32,11 +32,14 @@ const TraceContent = () => {
   return test ? (
     <S.Wrapper>
       <TestHeader
-        test={test}
+        executionTime={run?.executionTime}
         extraContent={isDraftMode ? <TraceActions /> : undefined}
         onBack={() => navigate(`/test/${testId}`)}
+        showInfo
+        test={test}
         testState={run.state}
         testVersion={run.testVersion}
+        totalSpans={run?.trace?.spans?.length}
       />
       <FailedTrace
         onRunTest={onRunTest}

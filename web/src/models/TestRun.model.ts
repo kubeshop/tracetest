@@ -1,14 +1,7 @@
-import {differenceInSeconds} from 'date-fns';
 import {TRawAssertionResults} from '../types/Assertion.types';
 import {TRawTestRun, TTestRun} from '../types/TestRun.types';
 import AssertionResults from './AssertionResults.model';
 import Trace from './Trace.model';
-
-const getExecutionTime = (createdAt?: string, completedAt?: string) => {
-  if (!createdAt || !completedAt) return 0;
-
-  return differenceInSeconds(new Date(completedAt), new Date(createdAt)) + 1;
-};
 
 const getTestResultCount = (
   {results: resultList = []}: TRawAssertionResults = {},
@@ -47,8 +40,17 @@ const TestRun = ({
   request,
   response,
   testVersion = 1,
+  exectutionTime = 0,
+  obtainedTraceAt = '',
+  serviceTriggerCompletedAt = '',
+  serviceTriggeredAt = '',
 }: TRawTestRun): TTestRun => {
   return {
+    obtainedTraceAt,
+    serviceTriggerCompletedAt,
+    serviceTriggeredAt,
+    executionTime: exectutionTime,
+    exectutionTime,
     lastErrorState,
     request,
     response,
@@ -64,7 +66,6 @@ const TestRun = ({
     totalAssertionCount: getTestResultCount(result),
     failedAssertionCount: getTestResultCount(result, 'failed'),
     passedAssertionCount: getTestResultCount(result, 'passed'),
-    executionTime: getExecutionTime(createdAt, completedAt),
   };
 };
 
