@@ -22,6 +22,7 @@ func ConvertTestDefinitionIntoOpenAPIObject(definition definition.Test) (openapi
 		return openapi.Test{}, fmt.Errorf("could not convert test definition: %w", err)
 	}
 	return openapi.Test{
+		Id:          ConvertStringIntoOpenAPIString(definition.Id),
 		Name:        ConvertStringIntoOpenAPIString(definition.Name),
 		Description: ConvertStringIntoOpenAPIString(definition.Description),
 		ServiceUnderTest: &openapi.TestServiceUnderTest{
