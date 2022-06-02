@@ -32,9 +32,9 @@ export const CompareOperatorSymbolMap: Record<CompareOperator, TCompareOperatorS
 
 export const CompareOperatorSymbolNameMap: Record<TCompareOperatorSymbol, TCompareOperatorName> = {
   '=': 'equals',
-  '<': 'not equals',
-  '>': 'less than',
-  '!=': 'greater than',
+  '!=': 'not equals',
+  '<': 'less than',
+  '>': 'greater than',
   '>=': 'greater or equals',
   '<=': 'less or equals',
   contains: 'contains',

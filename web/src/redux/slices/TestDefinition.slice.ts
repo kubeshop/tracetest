@@ -84,7 +84,7 @@ const testDefinitionSlice = createSlice<
     },
     updateDefinition(state, {payload: {definition, selector}}) {
       state.definitionList = state.definitionList.map(def => {
-        if (def.originalSelector === selector)
+        if (def.selector === selector)
           return {
             ...definition,
             originalSelector: def.originalSelector,
