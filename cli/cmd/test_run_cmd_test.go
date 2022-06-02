@@ -9,13 +9,14 @@ import (
 
 	"github.com/kubeshop/tracetest/cli/cmd/e2e"
 	"github.com/kubeshop/tracetest/cli/file"
+	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 type cliOutput struct {
-	TestId    string `json:"testId"`
-	TestRunId string `json:"testRunId"`
+	Test    openapi.Test    `json:"test"`
+	TestRun openapi.TestRun `json:"testRun"`
 }
 
 func TestRunTestCmd(t *testing.T) {
@@ -41,9 +42,9 @@ func TestRunTestCmd(t *testing.T) {
 	err = json.Unmarshal([]byte(output), &outputObject)
 	require.NoError(t, err)
 
-	assert.NotEmpty(t, outputObject.TestId)
-	assert.NotEmpty(t, outputObject.TestRunId)
-	assert.Equal(t, outputObject.TestId, definition.Id)
+	assert.NotEmpty(t, outputObject.Test.Id)
+	assert.NotEmpty(t, outputObject.TestRun.Id)
+	assert.Equal(t, *outputObject.Test.Id, definition.Id)
 }
 
 func TestRunTestCmdWhenEditingTest(t *testing.T) {
@@ -74,7 +75,7 @@ func TestRunTestCmdWhenEditingTest(t *testing.T) {
 	require.NoError(t, err)
 
 	// Assert a new test wasn't created
-	assert.Equal(t, outputObject.TestId, updateOutputObject.TestId)
+	assert.Equal(t, *outputObject.Test.Id, *updateOutputObject.Test.Id)
 }
 
 func copyFile(source string, destination string) error {
