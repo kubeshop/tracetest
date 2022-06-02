@@ -127,6 +127,9 @@ func TestComparators(t *testing.T) {
 				{"he", "hello"},
 				{"ll", "hello"},
 				{"lo", "hello"},
+
+				// https://github.com/kubeshop/tracetest/issues/617
+				{"52", `{"id":52}`},
 			},
 			expectNoMatch: []compInput{
 				{"nop", "hello"},
