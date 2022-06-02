@@ -4,6 +4,7 @@ import (
 	"math"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/kubeshop/tracetest/server/traces"
 )
 
@@ -13,9 +14,14 @@ var (
 	}
 )
 
-func (r Run) Copy(testVersion int) Run {
+func (r Run) Copy() Run {
+	r.ID = uuid.UUID{}
 	r.Results = nil
-	r.TestVersion = testVersion
+	r.CreatedAt = Now()
+	r.ServiceTriggeredAt = time.Time{}
+	r.ServiceTriggerCompletedAt = time.Time{}
+	r.ObtainedTraceAt = time.Time{}
+	r.CompletedAt = time.Time{}
 
 	return r
 }
