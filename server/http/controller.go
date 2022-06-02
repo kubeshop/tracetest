@@ -215,7 +215,7 @@ func (c *controller) RerunTestRun(ctx context.Context, testID string, runID stri
 		return handleDBError(err), err
 	}
 
-	newTestRun, err := c.testDB.CreateRun(ctx, test, run.Copy(test.Version))
+	newTestRun, err := c.testDB.CreateRun(ctx, test, run.Copy())
 	if err != nil {
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
 	}
