@@ -1,19 +1,17 @@
 all: init-submodule proto generate
 
-GO_FLAGS=-mod=readonly
-
 init-submodule:
 	git submodule init
 	git submodule update
 
 test:
-	go test $(GO_FLAGS) -timeout 90s -coverprofile=coverage.out ./...
+	go test -timeout 90s -coverprofile=coverage.out ./...
 
 vet:
-	go vet $(GO_FLAGS) -structtag=false ./...
+	go vet -structtag=false ./...
 
 run:
-	go run $(GO_FLAGS) main.go
+	go run main.go
 
 OPENAPI_GENERATOR_VER=v5.4.0
 OPENAPI_GENERATOR_IMAGE=openapitools/openapi-generator-cli:$(OPENAPI_GENERATOR_VER)
@@ -32,7 +30,7 @@ generate:
 	rm -f $(OPENAPI_SERVER_TARGET_DIR)/api_api_service.go
 	rm -rf ./tmp
 
-	go fmt $(GO_FLAGS) ./...
+	go fmt ./...
 
 PROTOC_VER=0.3.1
 UNAME_P := $(shell uname -p)
@@ -51,9 +49,9 @@ PROTOC=docker run --rm -u ${shell id -u} -v "${PWD}:${PWD}" -w ${PWD} ${PROTOC_I
 
 PROTO_INCLUDES := \
 	-I/usr/include/github.com/gogo/protobuf \
-	-Ivendor/jaeger-idl/proto \
-	-Ivendor/opentelemetry-proto \
-	-Ivendor/opentelemetry-proto/opentelemetry/proto
+	-Iexternal/jaeger-idl/proto \
+	-Iexternal/opentelemetry-proto \
+	-Iexternal/opentelemetry-proto/opentelemetry/proto
 
 PROTO_GOGO_MAPPINGS := $(shell echo \
 		Mgoogle/protobuf/descriptor.proto=github.com/gogo/protobuf/types, \
@@ -82,7 +80,7 @@ proto:
 
 	# API v3
 	$(PROTOC_WITH_GRPC) \
-		vendor/jaeger-idl/proto/api_v3/query_service.proto
+		external/jaeger-idl/proto/api_v3/query_service.proto
 
 	$(PROTOC_INTERNAL) \
 		google/api/annotations.proto \
@@ -90,6 +88,6 @@ proto:
 		gogoproto/gogo.proto
 
 	$(PROTOC_WITH_GRPC) \
-		vendor/tempo-idl/tempo.proto
-	mv $(PROTO_GEN_GO_DIR)/vendor/tempo-idl $(PROTO_GEN_GO_DIR)/tempo-idl
-	cp vendor/tempo-idl/prealloc.go $(PROTO_GEN_GO_DIR)/tempo-idl/prealloc.go
+		external/tempo-idl/tempo.proto
+	mv $(PROTO_GEN_GO_DIR)/external/tempo-idl $(PROTO_GEN_GO_DIR)/tempo-idl
+	cp external/tempo-idl/prealloc.go.tmp $(PROTO_GEN_GO_DIR)/tempo-idl/prealloc.go
