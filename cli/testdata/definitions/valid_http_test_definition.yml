@@ -12,21 +12,21 @@ trigger:
       type: raw
       raw: '{ "id": 52 }'
 testDefinition:
-- selector: span[span.name = "POST /pokemon/import"]
+- selector: span[name = "POST /pokemon/import"]
   assertions:
   - tracetest.span.duration <= 100
   - http.status_code = 200
-- selector: span[span.name = "send message to queue"]
+- selector: span[name = "send message to queue"]
   assertions:
   - messaging.message.payload contains 52
-- selector: span[span.name = "consume message from queue"]:last
+- selector: span[name = "consume message from queue"]:last
   assertions:
   - messaging.message.payload contains 52
-- selector: span[span.name = "consume message from queue"]:last span[span.name = "import
+- selector: span[name = "consume message from queue"]:last span[name = "import
     pokemon from pokeapi"]
   assertions:
   - http.status_code = 200
-- selector: span[span.name = "consume message from queue"]:last span[span.name = "save
+- selector: span[name = "consume message from queue"]:last span[name = "save
     pokemon on database"]
   assertions:
   - db.repository.operation = "create"

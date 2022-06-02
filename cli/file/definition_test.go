@@ -39,32 +39,32 @@ func TestLoadDefinition(t *testing.T) {
 				},
 				TestDefinition: []definition.TestDefinition{
 					{
-						Selector: "span[span.name = \"POST /pokemon/import\"]",
+						Selector: "span[name = \"POST /pokemon/import\"]",
 						Assertions: []string{
 							"tracetest.span.duration <= 100",
 							"http.status_code = 200",
 						},
 					},
 					{
-						Selector: "span[span.name = \"send message to queue\"]",
+						Selector: "span[name = \"send message to queue\"]",
 						Assertions: []string{
 							"messaging.message.payload contains 52",
 						},
 					},
 					{
-						Selector: "span[span.name = \"consume message from queue\"]:last",
+						Selector: "span[name = \"consume message from queue\"]:last",
 						Assertions: []string{
 							"messaging.message.payload contains 52",
 						},
 					},
 					{
-						Selector: "span[span.name = \"consume message from queue\"]:last span[span.name = \"import pokemon from pokeapi\"]",
+						Selector: "span[name = \"consume message from queue\"]:last span[name = \"import pokemon from pokeapi\"]",
 						Assertions: []string{
 							"http.status_code = 200",
 						},
 					},
 					{
-						Selector: "span[span.name = \"consume message from queue\"]:last span[span.name = \"save pokemon on database\"]",
+						Selector: "span[name = \"consume message from queue\"]:last span[name = \"save pokemon on database\"]",
 						Assertions: []string{
 							"db.repository.operation = \"create\"",
 							"tracetest.span.duration <= 100",
@@ -97,32 +97,32 @@ func TestLoadDefinition(t *testing.T) {
 				},
 				TestDefinition: []definition.TestDefinition{
 					{
-						Selector: "span[span.name = \"POST /pokemon/import\"]",
+						Selector: "span[name = \"POST /pokemon/import\"]",
 						Assertions: []string{
 							"tracetest.span.duration <= 100",
 							"http.status_code = 200",
 						},
 					},
 					{
-						Selector: "span[span.name = \"send message to queue\"]",
+						Selector: "span[name = \"send message to queue\"]",
 						Assertions: []string{
 							"messaging.message.payload contains 52",
 						},
 					},
 					{
-						Selector: "span[span.name = \"consume message from queue\"]:last",
+						Selector: "span[name = \"consume message from queue\"]:last",
 						Assertions: []string{
 							"messaging.message.payload contains 52",
 						},
 					},
 					{
-						Selector: "span[span.name = \"consume message from queue\"]:last span[span.name = \"import pokemon from pokeapi\"]",
+						Selector: "span[name = \"consume message from queue\"]:last span[name = \"import pokemon from pokeapi\"]",
 						Assertions: []string{
 							"http.status_code = 200",
 						},
 					},
 					{
-						Selector: "span[span.name = \"consume message from queue\"]:last span[span.name = \"save pokemon on database\"]",
+						Selector: "span[name = \"consume message from queue\"]:last span[name = \"save pokemon on database\"]",
 						Assertions: []string{
 							"db.repository.operation = \"create\"",
 							"tracetest.span.duration <= 100",

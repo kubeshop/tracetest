@@ -45,7 +45,6 @@ components:
             $ref: "#/components/schemas/HTTPHeader"
         body:
           type: string
-          format: byte
 
     HTTPAuth:
       type: object
