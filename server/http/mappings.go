@@ -182,6 +182,7 @@ func (m OpenAPIMapper) Result(in *model.RunResults) openapi.AssertionResults {
 				}
 			}
 			res[j] = openapi.AssertionResult{
+				AllPassed:   r.AllPassed,
 				Assertion:   m.Assertion(r.Assertion),
 				SpanResults: sres,
 			}
