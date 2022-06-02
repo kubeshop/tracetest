@@ -294,6 +294,11 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 									Comparator: openAPIStr("<="),
 									Expected:   openAPIStr("200"),
 								},
+								{
+									Attribute:  openAPIStr("db.operation"),
+									Comparator: openAPIStr("="),
+									Expected:   openAPIStr("create"),
+								},
 							},
 						},
 					},
@@ -310,6 +315,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 						Selector: `span[name = "my span name"]`,
 						Assertions: []string{
 							"tracetest.span.duration <= 200",
+							`db.operation = "create"`,
 						},
 					},
 				},
