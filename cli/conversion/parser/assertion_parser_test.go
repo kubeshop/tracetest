@@ -15,7 +15,7 @@ func TestParseAssertion(t *testing.T) {
 		ExpectedOutput parser.Assertion
 	}{
 		{
-			Name:  "should parse equals operator",
+			Name:  "should_parse_equals_operator",
 			Query: "http.status_code = 200",
 			ExpectedOutput: parser.Assertion{
 				Attribute: "http.status_code",
@@ -24,7 +24,7 @@ func TestParseAssertion(t *testing.T) {
 			},
 		},
 		{
-			Name:  "should parse less than operator",
+			Name:  "should_parse_less_than_operator",
 			Query: "tracetest.span.duration < 100",
 			ExpectedOutput: parser.Assertion{
 				Attribute: "tracetest.span.duration",
@@ -33,7 +33,7 @@ func TestParseAssertion(t *testing.T) {
 			},
 		},
 		{
-			Name:  "should parse less or equal to operator",
+			Name:  "should_parse_less_or_equal_to_operator",
 			Query: "tracetest.span.duration <= 100",
 			ExpectedOutput: parser.Assertion{
 				Attribute: "tracetest.span.duration",
@@ -42,7 +42,7 @@ func TestParseAssertion(t *testing.T) {
 			},
 		},
 		{
-			Name:  "should parse not equal operator",
+			Name:  "should_parse_not_equal_operator",
 			Query: `tracetest.span.type != "http"`,
 			ExpectedOutput: parser.Assertion{
 				Attribute: "tracetest.span.type",
@@ -51,7 +51,7 @@ func TestParseAssertion(t *testing.T) {
 			},
 		},
 		{
-			Name:  "should parse greater than operator",
+			Name:  "should_parse_greater_than_operator",
 			Query: `tracetest.span.duration > 0`,
 			ExpectedOutput: parser.Assertion{
 				Attribute: "tracetest.span.duration",
@@ -60,7 +60,7 @@ func TestParseAssertion(t *testing.T) {
 			},
 		},
 		{
-			Name:  "should parse greater or equal to operator",
+			Name:  "should_parse_greater_or_equal_to_operator",
 			Query: `tracetest.span.duration >= 0`,
 			ExpectedOutput: parser.Assertion{
 				Attribute: "tracetest.span.duration",
@@ -69,7 +69,7 @@ func TestParseAssertion(t *testing.T) {
 			},
 		},
 		{
-			Name:  "should parse contains operator",
+			Name:  "should_parse_contains_operator",
 			Query: `db.statement contains "INSERT INTO"`,
 			ExpectedOutput: parser.Assertion{
 				Attribute: "db.statement",
@@ -78,7 +78,7 @@ func TestParseAssertion(t *testing.T) {
 			},
 		},
 		{
-			Name:  "should parse string values",
+			Name:  "should_parse_string_values",
 			Query: `db.statement = "create"`,
 			ExpectedOutput: parser.Assertion{
 				Attribute: "db.statement",
@@ -87,7 +87,7 @@ func TestParseAssertion(t *testing.T) {
 			},
 		},
 		{
-			Name:  "should parse double values",
+			Name:  "should_parse_double_values",
 			Query: `custom.item.value = 199.99`,
 			ExpectedOutput: parser.Assertion{
 				Attribute: "custom.item.value",

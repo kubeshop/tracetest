@@ -17,7 +17,7 @@ func TestLoadDefinition(t *testing.T) {
 		ShouldSucceed      bool
 	}{
 		{
-			Name:          "Should parse valid definition file",
+			Name:          "Should_parse_valid_definition_file",
 			File:          "../testdata/definitions/valid_http_test_definition.yml",
 			ShouldSucceed: true,
 			ExpectedDefinition: definition.Test{
@@ -74,7 +74,7 @@ func TestLoadDefinition(t *testing.T) {
 			},
 		},
 		{
-			Name:          "Should parse valid definition file with id",
+			Name:          "Should_parse_valid_definition_file_with_id",
 			File:          "../testdata/definitions/valid_http_test_definition_with_id.yml",
 			ShouldSucceed: true,
 			ExpectedDefinition: definition.Test{

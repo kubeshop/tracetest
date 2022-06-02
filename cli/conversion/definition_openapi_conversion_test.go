@@ -21,7 +21,7 @@ func TestDefinitionToOpenAPIConversion(t *testing.T) {
 		ExpectedOutput openapi.Test
 	}{
 		{
-			Name: "Should be able to convert request with no authentication and no body",
+			Name: "Should_be_able_to_convert_request_with_no_authentication_and_no_body",
 			Input: definition.Test{
 				Name:        "A test",
 				Description: "A test description",
@@ -55,7 +55,7 @@ func TestDefinitionToOpenAPIConversion(t *testing.T) {
 			},
 		},
 		{
-			Name: "Should be able to convert request with basic auth",
+			Name: "Should_be_able_to_convert_request_with_basic_auth",
 			Input: definition.Test{
 				Name:        "A test",
 				Description: "A test description",
@@ -95,7 +95,7 @@ func TestDefinitionToOpenAPIConversion(t *testing.T) {
 			},
 		},
 		{
-			Name: "Should be able to convert request with api key auth",
+			Name: "Should_be_able_to_convert_request_with_api_key_auth",
 			Input: definition.Test{
 				Name:        "A test",
 				Description: "A test description",
@@ -137,7 +137,7 @@ func TestDefinitionToOpenAPIConversion(t *testing.T) {
 			},
 		},
 		{
-			Name: "Should be able to convert request with bearer auth",
+			Name: "Should_be_able_to_convert_request_with_bearer_auth",
 			Input: definition.Test{
 				Name:        "A test",
 				Description: "A test description",
@@ -175,7 +175,7 @@ func TestDefinitionToOpenAPIConversion(t *testing.T) {
 			},
 		},
 		{
-			Name: "Should be able to convert request body",
+			Name: "Should_be_able_to_convert_request_body",
 			Input: definition.Test{
 				Name:        "A test",
 				Description: "A test description",
@@ -208,7 +208,7 @@ func TestDefinitionToOpenAPIConversion(t *testing.T) {
 			},
 		},
 		{
-			Name: "Should be able to convert test definitions",
+			Name: "Should_be_able_to_convert_test_definitions",
 			Input: definition.Test{
 				Name:        "A test",
 				Description: "A test description",
