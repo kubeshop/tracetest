@@ -24,7 +24,7 @@ const TestPage: React.FC = () => {
   // TODO: Add proper loading states
   return test ? (
     <Layout>
-      <TestHeader test={test} onBack={() => navigate('/')} testVersion={test.version} />
+      <TestHeader onBack={() => navigate('/')} showInfo={false} test={test} testVersion={test.version} />
       <S.Wrapper>
         <TestDetails testId={test.id} onSelectResult={handleSelectTestResult} />
       </S.Wrapper>

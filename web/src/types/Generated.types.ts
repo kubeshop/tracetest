@@ -399,8 +399,16 @@ export interface external {
             | "FAILED";
           /** @description Details of the cause for the last `FAILED` state */
           lastErrorState?: string;
+          /** @description time it took for the test to complete, either success or fail. If the test is still running, it will show the time up to the time of the request */
+          exectutionTime?: number;
           /** Format: date-time */
           createdAt?: string;
+          /** Format: date-time */
+          serviceTriggeredAt?: string;
+          /** Format: date-time */
+          serviceTriggerCompletedAt?: string;
+          /** Format: date-time */
+          obtainedTraceAt?: string;
           /** Format: date-time */
           completedAt?: string;
           request?: external["http.yaml"]["components"]["schemas"]["HTTPRequest"];

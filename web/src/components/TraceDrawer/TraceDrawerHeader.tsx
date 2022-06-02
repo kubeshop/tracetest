@@ -1,9 +1,9 @@
 import {PlusOutlined} from '@ant-design/icons';
 import {Badge} from 'antd';
-import {format, parseISO} from 'date-fns';
 import * as React from 'react';
 import {MouseEventHandler, useCallback, useMemo} from 'react';
 import {TTestRun} from 'types/TestRun.types';
+import Date from 'utils/Date';
 import GuidedTourService, {GuidedTours} from '../../services/GuidedTour.service';
 import SpanService from '../../services/Span.service';
 import TraceService from '../../services/Trace.service';
@@ -39,15 +39,12 @@ const TraceDrawerHeader: React.FC<IProps> = ({
   const $isCollapsed = useChevronDirectionMemo(height, max, min);
   const onClick = useSetIsCollapsedCallbackDirection($isCollapsed);
   const {open} = useAssertionForm();
-  const totalSpanCount = trace?.spans.length;
   const totalAssertionCount = assertionResults?.resultList.length || 0;
 
   const {totalPassedCount, totalFailedCount} = useMemo(
     () => TraceService.getTestResultCount(assertionResults!),
     [assertionResults]
   );
-
-  const startDate = useMemo(() => format(parseISO(createdAt), "EEEE, do MMMM yyyy 'at' HH:mm:ss"), [createdAt]);
 
   const handleAssertionClick: MouseEventHandler<HTMLElement> = useCallback(
     event => {
@@ -72,12 +69,11 @@ const TraceDrawerHeader: React.FC<IProps> = ({
       onClick={onClick}
     >
       <div>
-        <S.HeaderText strong>Test Results</S.HeaderText>
-        <S.StartDateText>Trace Start {startDate}</S.StartDateText>
+        <S.HeaderText strong>Test Result</S.HeaderText>
+        <S.StartDateText>{Date.format(createdAt)}</S.StartDateText>
         <S.HeaderText strong>
-          {totalSpanCount} total span(s) • {totalAssertionCount} assertion(s) • {totalPassedCount + totalFailedCount}{' '}
-          check(s) • <Badge count="P" style={{backgroundColor: '#49AA19'}} />{' '}
-          <S.CountNumber>{totalPassedCount}</S.CountNumber>
+          {totalAssertionCount} assertion(s) • {totalPassedCount + totalFailedCount} check(s) •{' '}
+          <Badge count="P" style={{backgroundColor: '#49AA19'}} /> <S.CountNumber>{totalPassedCount}</S.CountNumber>
           <Badge count="F" /> <S.CountNumber>{totalFailedCount}</S.CountNumber>
         </S.HeaderText>
       </div>

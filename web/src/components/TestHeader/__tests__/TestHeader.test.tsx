@@ -5,7 +5,13 @@ import TestHeader from '../TestHeader';
 
 test('SpanAttributesTable', () => {
   const {getByTestId} = render(
-    <TestHeader onBack={jest.fn()} test={TestMock.model()} testState={TestState.CREATED} testVersion={1} />
+    <TestHeader
+      onBack={jest.fn()}
+      showInfo={false}
+      test={TestMock.model()}
+      testState={TestState.CREATED}
+      testVersion={1}
+    />
   );
   expect(getByTestId('test-details-name')).toBeInTheDocument();
 });

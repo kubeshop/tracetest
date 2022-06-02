@@ -18,8 +18,7 @@ export const TestName = styled(Typography.Title).attrs({
 })`
   && {
     margin: 0;
-    font-weight: 400;
-    font-size: 18px;
+    font-size: 16px;
   }
 `;
 
@@ -28,7 +27,6 @@ export const TestUrl = styled(Typography.Text).attrs({
 })`
   && {
     margin: 0;
-    align-self: flex-end;
     font-size: 12px;
   }
 `;
@@ -56,4 +54,8 @@ export const StateContainer = styled.div`
   display: flex;
   justify-self: flex-end;
   cursor: pointer;
+`;
+
+export const Row = styled.div`
+  display: flex;
 `;
