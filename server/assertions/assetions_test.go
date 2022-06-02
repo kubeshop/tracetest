@@ -58,6 +58,63 @@ func TestAssertion(t *testing.T) {
 				},
 			}),
 		},
+		// https://github.com/kubeshop/tracetest/issues/617
+		{
+			name: "ContainsWithJSON",
+			testDef: (model.OrderedMap[model.SpanQuery, []model.Assertion]{}).MustAdd(`span[service.name="Pokeshop"]`, []model.Assertion{
+				{
+					Attribute:  "http.response.body",
+					Comparator: comparator.Contains,
+					Value:      "52",
+				},
+				{
+					Attribute:  "tracetest.span.duration",
+					Comparator: comparator.Lt,
+					Value:      "2001",
+				},
+			}),
+			trace: traces.Trace{
+				RootSpan: traces.Span{
+					ID: spanID,
+					Attributes: traces.Attributes{
+						"service.name":            "Pokeshop",
+						"http.response.body":      `{"id":52}`,
+						"tracetest.span.duration": "2000",
+					},
+				},
+			},
+			expectedAllPassed: true,
+			expectedResult: (model.OrderedMap[model.SpanQuery, []model.AssertionResult]{}).MustAdd(`span[service.name="Pokeshop"]`, []model.AssertionResult{
+				{
+					Assertion: model.Assertion{
+						Attribute:  "http.response.body",
+						Comparator: comparator.Contains,
+						Value:      "52",
+					},
+					Results: []model.SpanAssertionResult{
+						{
+							SpanID:        spanID,
+							ObservedValue: `{"id":52}`,
+							CompareErr:    nil,
+						},
+					},
+				},
+				{
+					Assertion: model.Assertion{
+						Attribute:  "tracetest.span.duration",
+						Comparator: comparator.Lt,
+						Value:      "2001",
+					},
+					Results: []model.SpanAssertionResult{
+						{
+							SpanID:        spanID,
+							ObservedValue: "2000",
+							CompareErr:    nil,
+						},
+					},
+				},
+			}),
+		},
 	}
 
 	for _, c := range cases {

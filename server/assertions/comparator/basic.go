@@ -26,7 +26,7 @@ var Eq Comparator = eq{}
 type eq struct{}
 
 func (c eq) Compare(expected, actual string) error {
-	if expected == actual {
+	if actual == expected {
 		return nil
 	}
 
@@ -43,7 +43,7 @@ var Neq Comparator = neq{}
 type neq struct{}
 
 func (c neq) Compare(expected, actual string) error {
-	if expected != actual {
+	if actual != expected {
 		return nil
 	}
 
@@ -62,13 +62,13 @@ func parseNumber(s string) (int64, error) {
 	return n, nil
 }
 
-func parseNumbers(expected, actual string) (a, b int64, err error) {
-	a, err = parseNumber(expected)
+func parseNumbers(expected, actual string) (e, a int64, err error) {
+	e, err = parseNumber(expected)
 	if err != nil {
 		return
 	}
 
-	b, err = parseNumber(actual)
+	a, err = parseNumber(actual)
 	if err != nil {
 		return
 	}
@@ -82,11 +82,11 @@ var Gt Comparator = gt{}
 type gt struct{}
 
 func (c gt) Compare(expected, actual string) error {
-	a, b, err := parseNumbers(expected, actual)
+	e, a, err := parseNumbers(expected, actual)
 	if err != nil {
 		return err
 	}
-	if a > b {
+	if a > e {
 		return nil
 	}
 
@@ -103,11 +103,11 @@ var Gte Comparator = gte{}
 type gte struct{}
 
 func (c gte) Compare(expected, actual string) error {
-	a, b, err := parseNumbers(expected, actual)
+	e, a, err := parseNumbers(expected, actual)
 	if err != nil {
 		return err
 	}
-	if a >= b {
+	if a >= e {
 		return nil
 	}
 
@@ -124,11 +124,11 @@ var Lt Comparator = lt{}
 type lt struct{}
 
 func (c lt) Compare(expected, actual string) error {
-	a, b, err := parseNumbers(expected, actual)
+	e, a, err := parseNumbers(expected, actual)
 	if err != nil {
 		return err
 	}
-	if a < b {
+	if a < e {
 		return nil
 	}
 
@@ -145,11 +145,11 @@ var Lte Comparator = lte{}
 type lte struct{}
 
 func (c lte) Compare(expected, actual string) error {
-	a, b, err := parseNumbers(expected, actual)
+	e, a, err := parseNumbers(expected, actual)
 	if err != nil {
 		return err
 	}
-	if a <= b {
+	if a <= e {
 		return nil
 	}
 

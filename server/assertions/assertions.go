@@ -44,11 +44,12 @@ func assert(a model.Assertion, spans []traces.Span) model.AssertionResult {
 }
 
 func apply(a model.Assertion, span traces.Span) model.SpanAssertionResult {
-	attr := span.Attributes.Get(a.Attribute)
+	expected := a.Value
+	actual := span.Attributes.Get(a.Attribute)
 	return model.SpanAssertionResult{
 		SpanID:        trace.SpanID(span.ID),
-		ObservedValue: attr,
-		CompareErr:    a.Comparator.Compare(attr, a.Value),
+		ObservedValue: actual,
+		CompareErr:    a.Comparator.Compare(expected, actual),
 	}
 }
 
