@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 export const AttributeRow = styled.div`
   display: grid;
-  grid-template-columns: 190px 1fr 60px;
+  grid-template-columns: 160px 1fr 60px;
   gap: 14px;
   align-items: start;
   padding: 8px;
@@ -20,6 +20,7 @@ export const AttributeRow = styled.div`
 
 export const AttributeValueRow = styled.div`
   display: flex;
+  word-break: break-word;
 `;
 
 export const CopyIcon = styled(CopyOutlined)`

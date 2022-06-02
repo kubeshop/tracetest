@@ -31,7 +31,6 @@ export const SemanticGroupNameNodeMap: Record<SemanticGroupNames, {primary: stri
     primary: [
       Attributes.DB_MONGODB_COLLECTION,
       Attributes.DB_SQL_TABLE,
-      Attributes.DB_REDIS_DATABASE_INDEX,
       Attributes.DB_CASSANDRA_TABLE,
       Attributes.SERVICE_NAME,
     ],
