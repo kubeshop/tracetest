@@ -79,9 +79,13 @@ func (a runTestAction) runDefinition(ctx context.Context, definitionFile string)
 		if err != nil {
 			return runTestOutput{}, fmt.Errorf("could not save definition: %w", err)
 		}
+	} else {
+		a.logger.Debug("test exists. Updating it")
+		err = a.updateTestFromDefinition(ctx, definition)
+		if err != nil {
+			return runTestOutput{}, fmt.Errorf("could not update test using definition: %w", err)
+		}
 	}
-
-	// TODO: update definition if definition.Id is present
 
 	testRun, err := a.runTest(ctx, definition.Id)
 	if err != nil {
@@ -116,6 +120,29 @@ func (a runTestAction) createTestFromDefinition(ctx context.Context, definition 
 	}
 
 	return *createdTest.Id, nil
+}
+
+func (a runTestAction) updateTestFromDefinition(ctx context.Context, definition definition.Test) error {
+	openapiTest, err := conversion.ConvertTestDefinitionIntoOpenAPIObject(definition)
+	if err != nil {
+		return err
+	}
+
+	req := a.client.ApiApi.UpdateTest(ctx, definition.Id)
+	req = req.Test(openapiTest)
+
+	testBytes, err := json.Marshal(openapiTest)
+	if err != nil {
+		return fmt.Errorf("could not marshal test: %w", err)
+	}
+
+	a.logger.Debug("Sending request to update test", zap.ByteString("test", testBytes))
+	_, err = a.client.ApiApi.UpdateTestExecute(req)
+	if err != nil {
+		return fmt.Errorf("could not execute request: %w", err)
+	}
+
+	return nil
 }
 
 func (a runTestAction) runTest(ctx context.Context, testID string) (openapi.TestRun, error) {
