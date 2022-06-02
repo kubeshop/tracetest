@@ -179,15 +179,15 @@ func (a runTestAction) waitForResult(ctx context.Context, testId string, testRun
 		for {
 			select {
 			case <-ticker.C:
-				isReady, readyTestRun, err := a.isTestReady(ctx, testId, testRunId)
+				readyTestRun, err := a.isTestReady(ctx, testId, testRunId)
 				if err != nil {
 					lastError = err
 					wg.Done()
 					return
 				}
 
-				if isReady {
-					testRun = readyTestRun
+				if readyTestRun != nil {
+					testRun = *readyTestRun
 					wg.Done()
 					return
 				}
@@ -203,16 +203,16 @@ func (a runTestAction) waitForResult(ctx context.Context, testId string, testRun
 	return testRun, nil
 }
 
-func (a runTestAction) isTestReady(ctx context.Context, testId string, testRunId string) (bool, openapi.TestRun, error) {
+func (a runTestAction) isTestReady(ctx context.Context, testId string, testRunId string) (*openapi.TestRun, error) {
 	req := a.client.ApiApi.GetTestRun(ctx, testId, testRunId)
 	run, _, err := a.client.ApiApi.GetTestRunExecute(req)
 	if err != nil {
-		return false, openapi.TestRun{}, fmt.Errorf("could not execute GetTestRun request: %w", err)
+		return &openapi.TestRun{}, fmt.Errorf("could not execute GetTestRun request: %w", err)
 	}
 
 	if *run.State == "FAILED" || *run.State == "FINISHED" {
-		return true, *run, nil
+		return run, nil
 	}
 
-	return false, *run, nil
+	return nil, nil
 }
