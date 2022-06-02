@@ -95,7 +95,7 @@ func (a runTestAction) runDefinition(ctx context.Context, definitionFile string)
 	return runTestOutput{
 		TestID:    definition.Id,
 		RunID:     *testRun.Id,
-		RunWebURL: fmt.Sprintf("%s://%s/test/%s/run%s", a.config.Scheme, a.config.Endpoint, definition.Id, *testRun.Id),
+		RunWebURL: fmt.Sprintf("%s://%s/test/%s/run/%s", a.config.Scheme, a.config.Endpoint, definition.Id, *testRun.Id),
 	}, nil
 }
 
