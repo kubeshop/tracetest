@@ -25,7 +25,9 @@ type TestRun struct {
 	// Current execution state
 	State *string `json:"state,omitempty"`
 	// Details of the cause for the last `FAILED` state
-	LastErrorState            *string           `json:"lastErrorState,omitempty"`
+	LastErrorState *string `json:"lastErrorState,omitempty"`
+	// time it took for the test to complete, either success or fail. If the test is still running, it will show the time up to the time of the request
+	ExectutionTime            *int32            `json:"exectutionTime,omitempty"`
 	CreatedAt                 *time.Time        `json:"createdAt,omitempty"`
 	ServiceTriggeredAt        *time.Time        `json:"serviceTriggeredAt,omitempty"`
 	ServiceTriggerCompletedAt *time.Time        `json:"serviceTriggerCompletedAt,omitempty"`
@@ -244,6 +246,38 @@ func (o *TestRun) HasLastErrorState() bool {
 // SetLastErrorState gets a reference to the given string and assigns it to the LastErrorState field.
 func (o *TestRun) SetLastErrorState(v string) {
 	o.LastErrorState = &v
+}
+
+// GetExectutionTime returns the ExectutionTime field value if set, zero value otherwise.
+func (o *TestRun) GetExectutionTime() int32 {
+	if o == nil || o.ExectutionTime == nil {
+		var ret int32
+		return ret
+	}
+	return *o.ExectutionTime
+}
+
+// GetExectutionTimeOk returns a tuple with the ExectutionTime field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *TestRun) GetExectutionTimeOk() (*int32, bool) {
+	if o == nil || o.ExectutionTime == nil {
+		return nil, false
+	}
+	return o.ExectutionTime, true
+}
+
+// HasExectutionTime returns a boolean if a field has been set.
+func (o *TestRun) HasExectutionTime() bool {
+	if o != nil && o.ExectutionTime != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetExectutionTime gets a reference to the given int32 and assigns it to the ExectutionTime field.
+func (o *TestRun) SetExectutionTime(v int32) {
+	o.ExectutionTime = &v
 }
 
 // GetCreatedAt returns the CreatedAt field value if set, zero value otherwise.
@@ -553,6 +587,9 @@ func (o TestRun) MarshalJSON() ([]byte, error) {
 	}
 	if o.LastErrorState != nil {
 		toSerialize["lastErrorState"] = o.LastErrorState
+	}
+	if o.ExectutionTime != nil {
+		toSerialize["exectutionTime"] = o.ExectutionTime
 	}
 	if o.CreatedAt != nil {
 		toSerialize["createdAt"] = o.CreatedAt
