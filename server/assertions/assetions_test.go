@@ -67,13 +67,19 @@ func TestAssertion(t *testing.T) {
 					Comparator: comparator.Contains,
 					Value:      "52",
 				},
+				{
+					Attribute:  "tracetest.span.duration",
+					Comparator: comparator.Lt,
+					Value:      "2001",
+				},
 			}),
 			trace: traces.Trace{
 				RootSpan: traces.Span{
 					ID: spanID,
 					Attributes: traces.Attributes{
-						"service.name":       "Pokeshop",
-						"http.response.body": `{"id":52}`,
+						"service.name":            "Pokeshop",
+						"http.response.body":      `{"id":52}`,
+						"tracetest.span.duration": "2000",
 					},
 				},
 			},
@@ -89,6 +95,20 @@ func TestAssertion(t *testing.T) {
 						{
 							SpanID:        spanID,
 							ObservedValue: `{"id":52}`,
+							CompareErr:    nil,
+						},
+					},
+				},
+				{
+					Assertion: model.Assertion{
+						Attribute:  "tracetest.span.duration",
+						Comparator: comparator.Lt,
+						Value:      "2001",
+					},
+					Results: []model.SpanAssertionResult{
+						{
+							SpanID:        spanID,
+							ObservedValue: "2000",
 							CompareErr:    nil,
 						},
 					},

@@ -8,8 +8,8 @@ import (
 )
 
 func TestComparators(t *testing.T) {
-	type compInput struct{ expected, actual string }
-	type compErr struct{ expected, actual, err string }
+	type compInput struct{ actual, expected string }
+	type compErr struct{ actual, expected, err string }
 	comps := []struct {
 		name          string
 		symbol        string
@@ -23,6 +23,7 @@ func TestComparators(t *testing.T) {
 			name:       "Equal",
 			symbol:     "=",
 			comparator: comparator.Eq,
+			// actual = expected
 			expectSuccess: []compInput{
 				{"a", "a"},
 				{"1", "1"},
@@ -38,6 +39,7 @@ func TestComparators(t *testing.T) {
 			name:       "NotEqual",
 			symbol:     "!=",
 			comparator: comparator.Neq,
+			// actual != expected
 			expectSuccess: []compInput{
 				{"", "2"},
 				{"a", "b"},
@@ -53,6 +55,7 @@ func TestComparators(t *testing.T) {
 			name:       "Gt",
 			symbol:     ">",
 			comparator: comparator.Gt,
+			// actual > expected
 			expectSuccess: []compInput{
 				{"2", "1"},
 				{"10", "2"},
@@ -71,6 +74,7 @@ func TestComparators(t *testing.T) {
 			name:       "Gte",
 			symbol:     ">=",
 			comparator: comparator.Gte,
+			// actual >= expected
 			expectSuccess: []compInput{
 				{"2", "1"},
 				{"2", "2"},
@@ -88,6 +92,7 @@ func TestComparators(t *testing.T) {
 			name:       "Lt",
 			symbol:     "<",
 			comparator: comparator.Lt,
+			// actual < expected
 			expectSuccess: []compInput{
 				{"1", "2"},
 				{"2", "10"},
@@ -106,6 +111,7 @@ func TestComparators(t *testing.T) {
 			name:       "Lte",
 			symbol:     "<=",
 			comparator: comparator.Lte,
+			// actual <= expected
 			expectSuccess: []compInput{
 				{"1", "2"},
 				{"1", "1"},
@@ -123,16 +129,17 @@ func TestComparators(t *testing.T) {
 			name:       "Contains",
 			symbol:     "contains",
 			comparator: comparator.Contains,
+			// actual CONTAINS expected
 			expectSuccess: []compInput{
-				{"he", "hello"},
-				{"ll", "hello"},
-				{"lo", "hello"},
+				{"hello", "he"},
+				{"hello", "ll"},
+				{"hello", "lo"},
 
 				// https://github.com/kubeshop/tracetest/issues/617
-				{"52", `{"id":52}`},
+				{`{"id":52}`, "52"},
 			},
 			expectNoMatch: []compInput{
-				{"nop", "hello"},
+				{"hello", "nop"},
 			},
 		},
 
@@ -142,12 +149,12 @@ func TestComparators(t *testing.T) {
 			symbol:     "startsWith",
 			comparator: comparator.StartsWith,
 			expectSuccess: []compInput{
-				{"he", "hello"},
+				{"hello", "he"},
 			},
 			expectNoMatch: []compInput{
-				{"nop", "hello"},
-				{"ll", "hello"},
-				{"lo", "hello"},
+				{"hello", "nop"},
+				{"hello", "ll"},
+				{"hello", "lo"},
 			},
 		},
 
@@ -157,12 +164,12 @@ func TestComparators(t *testing.T) {
 			symbol:     "endsWith",
 			comparator: comparator.EndsWith,
 			expectSuccess: []compInput{
-				{"lo", "hello"},
+				{"hello", "lo"},
 			},
 			expectNoMatch: []compInput{
-				{"nop", "hello"},
-				{"he", "hello"},
-				{"ll", "hello"},
+				{"hello", "nop"},
+				{"hello", "he"},
+				{"hello", "ll"},
 			},
 		},
 	}
