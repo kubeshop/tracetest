@@ -1,35 +1,34 @@
 import React, {useCallback, useEffect, useMemo} from 'react';
-import ReactFlow, {Background, FlowElement} from 'react-flow-renderer';
-import {useDAGChart} from '../../../hooks/useDAGChart';
+import ReactFlow, {ArrowHeadType, Background, Elements, FlowElement, Position} from 'react-flow-renderer';
+import {IDAGNode, useDAGChart} from '../../../hooks/useDAGChart';
 import TraceNode from '../../TraceNode';
 import * as S from './DAG.styled';
 import TraceDiagramAnalyticsService from '../../../services/Analytics/TraceDiagramAnalytics.service';
 import {IDiagramProps} from '../Diagram';
 import {TSpan} from '../../../types/Span.types';
+import {strokeColor, TraceNodes} from '../../../constants/Diagram.constants';
 
-export type TSpanInfo = {
-  id: string;
-  parentIds: string[];
-  data: TSpan;
-};
-
-export type TSpanMap = Record<string, TSpanInfo>;
+type TElementList = Elements<TSpan>;
 
 const {onClickSpan} = TraceDiagramAnalyticsService;
 
-const Diagram: React.FC<IDiagramProps> = ({affectedSpans, trace, selectedSpan, onSelectSpan}): JSX.Element => {
-  const spanMap = useMemo<TSpanMap>(() => {
-    return (
-      trace?.spans?.reduce<TSpanMap>((acc, span) => {
-        acc[span.id] = acc[span.id] || {id: span.id, parentIds: [], data: span};
-        if (span.parentId) acc[span.id].parentIds.push(span.parentId);
+const Diagram: React.FC<IDiagramProps> = ({
+  affectedSpans,
+  trace: {spans = []},
+  selectedSpan,
+  onSelectSpan,
+}): JSX.Element => {
+  const nodeList = useMemo<IDAGNode<TSpan>[]>(
+    () =>
+      spans.map(span => ({
+        id: span.id,
+        parentIds: span.parentId ? [span.parentId] : [],
+        data: span,
+      })),
+    [spans]
+  );
 
-        return acc;
-      }, {}) || {}
-    );
-  }, [trace?.spans]);
-
-  const dagLayout = useDAGChart(spanMap);
+  const {dag} = useDAGChart(nodeList);
 
   const handleElementClick = useCallback(
     (event, {id}: FlowElement) => {
@@ -40,57 +39,55 @@ const Diagram: React.FC<IDiagramProps> = ({affectedSpans, trace, selectedSpan, o
   );
 
   useEffect(() => {
-    if (dagLayout && dagLayout.dag) {
-      const [dragNode] = dagLayout.dag.descendants();
-      const span = spanMap[dragNode?.data.id];
+    if (dag) {
+      const [dagNode] = dag.descendants();
+      const node = nodeList.find(({id}) => id === dagNode?.data.id);
 
-      if (!selectedSpan && span && onSelectSpan) onSelectSpan(span.id);
+      if (!selectedSpan && node && onSelectSpan) onSelectSpan(node.id);
     }
-  }, [dagLayout, onSelectSpan, selectedSpan, spanMap]);
+  }, [dag, nodeList, onSelectSpan, selectedSpan]);
 
-  const dagElements = useMemo(() => {
-    if (dagLayout && dagLayout.dag) {
-      const dagNodes = dagLayout.dag.descendants().map(({data, x, y}) => {
-        const span = spanMap[data.id].data;
-
+  const dagElements = useMemo<TElementList>(() => {
+    if (dag) {
+      const dagNodeList: TElementList = dag.descendants().map(({data: {data}, x, y}) => {
         return {
           id: data.id,
-          type: 'TraceNode',
-          data: span,
-          position: {x, y: parseFloat(String(y))},
+          type: TraceNodes.TraceNode,
+          data,
+          position: {x: x!, y: parseFloat(String(y))},
           selected: data.id === selectedSpan?.id,
-          sourcePosition: 'top',
+          sourcePosition: Position.Top,
           className: affectedSpans.includes(data.id) ? 'affected' : '',
         };
       });
 
-      dagLayout.dag.links().forEach(({source, target}: any) => {
-        dagNodes.push({
+      dag.links().forEach(({source, target}) => {
+        dagNodeList.push({
           id: `${source.data.id}_${target.data.id}`,
           source: source.data.id,
           target: target.data.id,
-          data: spanMap[source.data.id].data,
+          data: source.data.data,
           labelShowBg: false,
           animated: false,
-          arrowHeadType: 'arrowclosed',
-          style: {stroke: '#C9CEDB'},
-        } as any);
+          arrowHeadType: ArrowHeadType.ArrowClosed,
+          style: {stroke: strokeColor},
+        });
       });
 
-      return dagNodes;
+      return dagNodeList;
     }
 
     return [];
-  }, [dagLayout, spanMap, selectedSpan?.id]);
+  }, [dag, selectedSpan?.id, affectedSpans]);
 
   return (
     <S.Container $showAffected={affectedSpans.length > 0} data-cy="diagram-dag">
       <ReactFlow
         nodeTypes={{TraceNode}}
         defaultZoom={0.5}
-        elements={dagElements as any}
+        elements={dagElements}
         onElementClick={handleElementClick}
-        onLoad={({fitView}) => fitView()}
+        onLoad={instance => setTimeout(() => instance.fitView(), 0)}
       >
         <Background gap={4} size={1} color="#FBFBFF" />
       </ReactFlow>

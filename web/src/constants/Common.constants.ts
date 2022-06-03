@@ -12,6 +12,8 @@ export const TRACE_SEMANTIC_CONVENTIONS_URL =
   'https://github.com/open-telemetry/opentelemetry-specification/tree/main/specification/trace/semantic_conventions';
 export const RESOURCE_SEMANTIC_CONVENTIONS_URL =
   'https://github.com/open-telemetry/opentelemetry-specification/tree/main/specification/resource/semantic_conventions';
+export const TRACE_DOCUMENTATION_URL =
+  'https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/api.md';
 
 export enum HTTP_METHOD {
   GET = 'GET',

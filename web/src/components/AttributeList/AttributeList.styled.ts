@@ -13,7 +13,7 @@ export const EmptyAttributeList = styled.div`
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  min-height: 450px;
+  min-height: 300px;
 `;
 
 export const EmptyIcon = styled(QuestionCircleOutlined)`
@@ -30,5 +30,6 @@ export const EmptyTitle = styled(Typography.Title).attrs({
 export const EmptyText = styled(Typography.Text).attrs({
   type: 'secondary',
 })`
-  max-width: 400px;
+  max-width: 320px;
+  text-align: center;
 `;
