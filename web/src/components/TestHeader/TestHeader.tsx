@@ -75,7 +75,7 @@ const TestHeader = ({
         </S.StateContainer>
       )}
       {!extraContent && testState && testState === TestStateEnum.FINISHED && (
-        <Button ghost onClick={handleRunTestOnClick} type="primary">
+        <Button data-cy="run-test-button" ghost onClick={handleRunTestOnClick} type="primary">
           Run Test
         </Button>
       )}
