@@ -170,14 +170,13 @@ func TestLoadDefinition(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		envVariables := testCase.EnvVariables
 		t.Run(testCase.Name, func(t *testing.T) {
-			for key, value := range envVariables {
+			for key, value := range testCase.EnvVariables {
 				os.Setenv(key, value)
 			}
 
 			t.Cleanup(func() {
-				for key, _ := range envVariables {
+				for key := range testCase.EnvVariables {
 					os.Unsetenv(key)
 				}
 			})
