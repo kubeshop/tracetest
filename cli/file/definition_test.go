@@ -1,6 +1,7 @@
 package file_test
 
 import (
+	"os"
 	"testing"
 
 	"github.com/kubeshop/tracetest/cli/definition"
@@ -15,6 +16,7 @@ func TestLoadDefinition(t *testing.T) {
 		File               string
 		ExpectedDefinition definition.Test
 		ShouldSucceed      bool
+		EnvVariables       map[string]string
 	}{
 		{
 			Name:          "Should_parse_valid_definition_file",
@@ -131,10 +133,55 @@ func TestLoadDefinition(t *testing.T) {
 				},
 			},
 		},
+		{
+			Name:          "Should_parse_env_variables",
+			File:          "../testdata/definitions/valid_http_test_definition_with_env_variables.yml",
+			ShouldSucceed: true,
+			EnvVariables: map[string]string{
+				"POKEMON_APP_API_KEY": "my secret key",
+			},
+			ExpectedDefinition: definition.Test{
+				Name:        "POST import pokemon",
+				Description: "Import a pokemon using its ID",
+				Trigger: definition.TestTrigger{
+					Type: "http",
+					HTTPRequest: definition.HttpRequest{
+						URL:    "http://pokemon-demo.tracetest.io/pokemon/import",
+						Method: "POST",
+						Headers: []definition.HTTPHeader{
+							{Key: "Content-Type", Value: "application/json"},
+						},
+						Body: definition.HTTPBody{
+							Type: "raw",
+							Raw:  `{ "id": 52 }`,
+						},
+						Authentication: definition.HTTPAuthentication{
+							Type: "apiKey",
+							ApiKey: definition.HTTPAPIKeyAuth{
+								Key:   "X-Key",
+								Value: "my secret key",
+								In:    "header",
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, testCase := range testCases {
+		envVariables := testCase.EnvVariables
 		t.Run(testCase.Name, func(t *testing.T) {
+			for key, value := range envVariables {
+				os.Setenv(key, value)
+			}
+
+			t.Cleanup(func() {
+				for key, _ := range envVariables {
+					os.Unsetenv(key)
+				}
+			})
+
 			definition, err := file.LoadDefinition(testCase.File)
 			if testCase.ShouldSucceed {
 				require.NoError(t, err, "LoadDefinition should not fail")
