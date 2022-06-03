@@ -15,10 +15,6 @@ func (t Test) Validate() error {
 		return fmt.Errorf("test name cannot be empty")
 	}
 
-	if t.Description == "" {
-		return fmt.Errorf("test description cannot be empty")
-	}
-
 	if err := t.Trigger.Validate(); err != nil {
 		return fmt.Errorf("test trigger must be valid: %w", err)
 	}
