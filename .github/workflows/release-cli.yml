@@ -1,10 +1,6 @@
 on:
-  create:
-    tags:
-      - v*
-  push:
-    branches:
-      - ci/cli-binaries
+  release:
+    types: [created]
 
 name: release CLI
 jobs:
