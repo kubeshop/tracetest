@@ -24,6 +24,7 @@ type DefinitionRepository interface {
 type RunRepository interface {
 	CreateRun(context.Context, Test, Run) (Run, error)
 	UpdateRun(context.Context, Run) error
+	DeleteRun(context.Context, Run) error
 	GetRun(context.Context, uuid.UUID) (Run, error)
 	GetTestRuns(_ context.Context, _ Test, take, skip int32) ([]Run, error)
 	GetRunByTraceID(context.Context, Test, trace.TraceID) (Run, error)
