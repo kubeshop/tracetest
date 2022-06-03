@@ -10,8 +10,8 @@ jobs:
     strategy:
       matrix:
         # build and publish in parallel: linux/amd64
-        goos: [linux]
-        goarch: [amd64]
+        goos: [linux, darwin, windows]
+        goarch: [amd64, arm64]
     steps:
       - uses: actions/checkout@v2
       - uses: wangyoucao577/go-release-action@v1.28
