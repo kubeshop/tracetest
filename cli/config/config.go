@@ -10,13 +10,14 @@ import (
 type Config struct {
 	Scheme     string  `yaml:"scheme"`
 	Endpoint   string  `yaml:"endpoint"`
-	ServerPath *string `yaml:"serverPath"`
+	ServerPath *string `yaml:"serverPath,omitempty"`
 }
 
 func LoadConfig(configFile string) (Config, error) {
 	viper.SetConfigFile(configFile)
 	viper.SetConfigType("yaml")
 	viper.SetEnvPrefix("tracetest")
+	viper.AddConfigPath("$HOME/.tracetest/")
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	viper.AutomaticEnv()
 

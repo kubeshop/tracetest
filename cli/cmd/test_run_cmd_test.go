@@ -30,7 +30,8 @@ func TestRunTestCmd(t *testing.T) {
 		require.NoError(t, err)
 	})
 
-	output, err := cli.RunCommand("test", "run", "--config", "e2e/config.yml", "--definition", definitionFile)
+	testRunCommand := cli.NewCommand("test", "run", "--config", "e2e/config.yml", "--definition", definitionFile)
+	output, err := testRunCommand.Run()
 	assert.NoError(t, err)
 	assert.NotEmpty(t, output)
 
@@ -58,7 +59,8 @@ func TestRunTestCmdWhenEditingTest(t *testing.T) {
 		require.NoError(t, err)
 	})
 
-	output, err := cli.RunCommand("test", "run", "--config", "e2e/config.yml", "--definition", definitionFile)
+	testRunCommand := cli.NewCommand("test", "run", "--config", "e2e/config.yml", "--definition", definitionFile)
+	output, err := testRunCommand.Run()
 	assert.NoError(t, err)
 	assert.NotEmpty(t, output)
 
@@ -66,7 +68,7 @@ func TestRunTestCmdWhenEditingTest(t *testing.T) {
 	err = json.Unmarshal([]byte(output), &outputObject)
 	require.NoError(t, err)
 
-	updateCmdOutput, err := cli.RunCommand("test", "run", "--config", "e2e/config.yml", "--definition", definitionFile)
+	updateCmdOutput, err := testRunCommand.Run()
 	assert.NoError(t, err)
 	assert.NotEmpty(t, output)
 
