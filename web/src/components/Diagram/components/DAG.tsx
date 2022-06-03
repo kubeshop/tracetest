@@ -1,5 +1,6 @@
 import {ZoomInOutlined, ZoomOutOutlined} from '@ant-design/icons';
 
+import {Steps} from 'components/GuidedTour/traceStepList';
 import React, {useCallback, useEffect, useMemo} from 'react';
 import ReactFlow, {
   ArrowHeadType,
@@ -9,13 +10,14 @@ import ReactFlow, {
   Position,
   useZoomPanHelper,
 } from 'react-flow-renderer';
-import {IDAGNode, useDAGChart} from '../../../hooks/useDAGChart';
-import TraceNode from '../../TraceNode';
-import * as S from './DAG.styled';
-import TraceDiagramAnalyticsService from '../../../services/Analytics/TraceDiagramAnalytics.service';
-import {IDiagramProps} from '../Diagram';
-import {TSpan} from '../../../types/Span.types';
 import {strokeColor, TraceNodes} from '../../../constants/Diagram.constants';
+import {IDAGNode, useDAGChart} from '../../../hooks/useDAGChart';
+import TraceDiagramAnalyticsService from '../../../services/Analytics/TraceDiagramAnalytics.service';
+import GuidedTourService, {GuidedTours} from '../../../services/GuidedTour.service';
+import {TSpan} from '../../../types/Span.types';
+import TraceNode from '../../TraceNode';
+import {IDiagramProps} from '../Diagram';
+import * as S from './DAG.styled';
 
 type TElementList = Elements<TSpan>;
 
@@ -92,7 +94,11 @@ const Diagram: React.FC<IDiagramProps> = ({
   }, [dag, selectedSpan?.id, affectedSpans]);
 
   return (
-    <S.Container $showAffected={affectedSpans.length > 0} data-cy="diagram-dag">
+    <S.Container
+      data-tour={GuidedTourService.getStep(GuidedTours.Trace, Steps.Graph)}
+      $showAffected={affectedSpans.length > 0}
+      data-cy="diagram-dag"
+    >
       <S.Controls>
         <S.ZoomButton icon={<ZoomInOutlined />} onClick={() => zoomIn()} type="text" />
         <S.ZoomButton icon={<ZoomOutOutlined />} onClick={() => zoomOut()} type="text" />

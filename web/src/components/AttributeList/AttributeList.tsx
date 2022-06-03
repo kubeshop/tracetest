@@ -1,8 +1,9 @@
-import {useState} from 'react';
-
 import AttributeRow from 'components/AttributeRow';
+import {useState} from 'react';
 import {TResultAssertions} from 'types/Assertion.types';
 import {TSpanFlatAttribute} from 'types/Span.types';
+import useGuidedTour from '../../hooks/useGuidedTour';
+import {GuidedTours} from '../../services/GuidedTour.service';
 import * as S from './AttributeList.styled';
 import EmptyAttributeList from './EmptyAttributeList';
 import TraceAnalyticsService from '../../services/Analytics/TraceAnalytics.service';
@@ -21,11 +22,15 @@ const AttributeList: React.FC<IProps> = ({assertions, attributeList, onCreateAss
     navigator.clipboard.writeText(value);
     setIsCopied(true);
   };
+  const {isOpen, currentStep} = useGuidedTour(GuidedTours.Trace);
 
   return attributeList.length ? (
     <S.AttributeList data-cy="attribute-list">
-      {attributeList.map(attribute => (
+      {attributeList.map((attribute, index) => (
         <AttributeRow
+          isGuidedTourOpen={isOpen}
+          guidedTourCurrentStep={currentStep}
+          index={index}
           assertionsFailed={assertions?.[attribute.key]?.failed}
           assertionsPassed={assertions?.[attribute.key]?.passed}
           attribute={attribute}

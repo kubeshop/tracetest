@@ -1,4 +1,4 @@
-import {Tabs, Typography, Button} from 'antd';
+import {Button, Tabs, Typography} from 'antd';
 import styled from 'styled-components';
 import noResultsIcon from '../../assets/SpanAssertionsEmptyState.svg';
 

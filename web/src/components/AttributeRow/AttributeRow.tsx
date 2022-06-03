@@ -1,20 +1,24 @@
-import {useEffect} from 'react';
-
 import useHover from 'hooks/useHover';
+import {useEffect} from 'react';
 import {IResult} from 'types/Assertion.types';
 import {TSpanFlatAttribute} from 'types/Span.types';
+import GuidedTourService, {GuidedTours} from '../../services/GuidedTour.service';
+import AttributeValue from '../AttributeValue';
+import {Steps} from '../GuidedTour/traceStepList';
 import AttributeCheck from './AttributeCheck';
 import * as S from './AttributeRow.styled';
-import AttributeValue from '../AttributeValue';
 
 interface IProps {
   assertionsFailed?: IResult[];
   assertionsPassed?: IResult[];
   attribute: TSpanFlatAttribute;
   isCopied: boolean;
+  isGuidedTourOpen: Boolean;
+  guidedTourCurrentStep: number;
   onCopy(value: string): void;
   onCreateAssertion(attribute: TSpanFlatAttribute): void;
   setIsCopied(value: boolean): void;
+  index: number;
 }
 
 const AttributeRow = ({
@@ -26,14 +30,18 @@ const AttributeRow = ({
   onCopy,
   onCreateAssertion,
   setIsCopied,
+  index,
+  guidedTourCurrentStep,
+  isGuidedTourOpen,
 }: IProps) => {
+  const shouldDisplayActions = index === 0 && isGuidedTourOpen && guidedTourCurrentStep === 3;
   const {isHovering, onMouseEnter, onMouseLeave} = useHover();
   const passedCount = assertionsPassed?.length ?? 0;
   const failedCount = assertionsFailed?.length ?? 0;
 
   useEffect(() => {
     if (!isHovering) setIsCopied(false);
-  }, [isHovering]);
+  }, [isHovering, setIsCopied]);
 
   return (
     <S.AttributeRow onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
@@ -48,13 +56,16 @@ const AttributeRow = ({
       </S.AttributeValueRow>
 
       <S.IconContainer>
-        {isHovering && (
+        {(isHovering || shouldDisplayActions) && (
           <>
             <S.CustomTooltip title={isCopied ? 'Copied' : 'Copy'}>
               <S.CopyIcon onClick={() => onCopy(value)} />
             </S.CustomTooltip>
             <S.CustomTooltip title="Add Assertion">
-              <S.AddAssertionIcon onClick={() => onCreateAssertion(attribute)} />
+              <S.AddAssertionIcon
+                data-tour={GuidedTourService.getStep(GuidedTours.Trace, Steps.Assertions)}
+                onClick={() => onCreateAssertion(attribute)}
+              />
             </S.CustomTooltip>
           </>
         )}
