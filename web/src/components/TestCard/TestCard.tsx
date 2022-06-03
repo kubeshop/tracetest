@@ -1,40 +1,31 @@
 import {DownOutlined, RightOutlined} from '@ant-design/icons';
-import {Button} from 'antd';
+import {Button, Typography} from 'antd';
 import React, {useCallback, useState} from 'react';
-import {useLazyGetRunListQuery} from '../../redux/apis/TraceTest.api';
-import {TTest} from '../../types/Test.types';
-import ResultCardList from '../RunCardList';
+
+import ResultCardList from 'components/RunCardList';
+import {useLazyGetRunListQuery} from 'redux/apis/TraceTest.api';
+import {TTest} from 'types/Test.types';
 import * as S from './TestCard.styled';
 import TestCardActions from './TestCardActions';
 
-interface TTestCardProps {
-  test: TTest;
-
+interface IProps {
   onClick(testId: string): void;
-
   onDelete(test: TTest): void;
-
   onRunTest(testId: string): void;
+  test: TTest;
 }
 
-const TestCard: React.FC<TTestCardProps> = ({
-  test: {name, serviceUnderTest, id: testId},
-  test,
-  onClick,
-  onDelete,
-  onRunTest,
-}) => {
+const TestCard = ({onClick, onDelete, onRunTest, test: {name, serviceUnderTest, id: testId}, test}: IProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [loadResultList, {data: resultList = []}] = useLazyGetRunListQuery();
 
   const onCollapse = useCallback(async () => {
-    if (!resultList.length) {
-      const list = await loadResultList({testId, take: 5}).unwrap();
-
-      if (list.length) setIsCollapsed(true);
-    } else {
+    if (resultList.length > 0) {
       setIsCollapsed(true);
+      return;
     }
+    await loadResultList({testId, take: 5});
+    setIsCollapsed(true);
   }, [loadResultList, resultList.length, testId]);
 
   return (
@@ -48,7 +39,7 @@ const TestCard: React.FC<TTestCardProps> = ({
           onCollapse();
         }}
       >
-        {isCollapsed ? <DownOutlined /> : <RightOutlined data-cy={`collapse-test-${testId}`} onClick={onCollapse} />}
+        {isCollapsed ? <DownOutlined /> : <RightOutlined data-cy={`collapse-test-${testId}`} />}
         <S.TextContainer>
           <S.NameText>{name}</S.NameText>
         </S.TextContainer>
@@ -86,6 +77,13 @@ const TestCard: React.FC<TTestCardProps> = ({
             </S.TestDetails>
           )}
         </S.ResultListContainer>
+      )}
+
+      {isCollapsed && !resultList.length && (
+        <S.EmptyStateContainer>
+          <S.EmptyStateIcon />
+          <Typography.Text disabled>No Runs</Typography.Text>
+        </S.EmptyStateContainer>
       )}
     </S.TestCard>
   );

@@ -1,25 +1,28 @@
-import {useCallback} from 'react';
-import {useNavigate} from 'react-router-dom';
-import {Badge, Tooltip} from 'antd';
 import {QuestionCircleOutlined} from '@ant-design/icons';
-import * as S from './RunCardList.styled';
-import ResultCard from '../RunCard';
-import {TTestRun} from '../../types/TestRun.types';
+import {Badge, Tooltip} from 'antd';
+import {useNavigate} from 'react-router-dom';
 
-interface IResultCardListProps {
+import ResultCard from 'components/RunCard';
+import {useDeleteRunByIdMutation} from 'redux/apis/TraceTest.api';
+import {TTestRun} from 'types/TestRun.types';
+import * as S from './RunCardList.styled';
+
+interface IProps {
   resultList: TTestRun[];
   testId: string;
 }
 
-const ResultCardList: React.FC<IResultCardListProps> = ({resultList, testId}) => {
+const ResultCardList = ({resultList, testId}: IProps) => {
   const navigate = useNavigate();
+  const [deleteRunById] = useDeleteRunByIdMutation();
 
-  const onResultClick = useCallback(
-    (resultId: string) => {
-      navigate(`/test/${testId}/run/${resultId}`);
-    },
-    [navigate, testId]
-  );
+  const handleOnResultClick = (runId: string) => {
+    navigate(`/test/${testId}/run/${runId}`);
+  };
+
+  const handleOnDelete = (runId: string) => {
+    deleteRunById({testId, runId});
+  };
 
   return (
     <S.ResultCardList data-cy="result-card-list">
@@ -54,7 +57,7 @@ const ResultCardList: React.FC<IResultCardListProps> = ({resultList, testId}) =>
       </S.Header>
       <S.List>
         {resultList.map(run => (
-          <ResultCard key={run.id} run={run} onClick={onResultClick} onDelete={() => console.log('onDelete')} />
+          <ResultCard key={run.id} run={run} onClick={handleOnResultClick} onDelete={handleOnDelete} />
         ))}
       </S.List>
     </S.ResultCardList>

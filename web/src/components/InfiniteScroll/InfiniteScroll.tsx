@@ -1,4 +1,4 @@
-import {useEffect} from 'react';
+import {useEffect, ReactNode} from 'react';
 import {useInView} from 'react-intersection-observer';
 
 interface IInfiniteScrollProps {
@@ -6,9 +6,17 @@ interface IInfiniteScrollProps {
   loadMore(): void;
   hasMore: boolean;
   isLoading: boolean;
+  emptyComponent?: ReactNode;
 }
 
-const InfiniteScroll: React.FC<IInfiniteScrollProps> = ({children, isLoading, hasMore, shouldTrigger, loadMore}) => {
+const InfiniteScroll: React.FC<IInfiniteScrollProps> = ({
+  children,
+  isLoading,
+  hasMore,
+  shouldTrigger,
+  loadMore,
+  emptyComponent,
+}) => {
   const {ref, inView} = useInView();
 
   useEffect(() => {
@@ -21,6 +29,7 @@ const InfiniteScroll: React.FC<IInfiniteScrollProps> = ({children, isLoading, ha
     <>
       {children}
       {shouldTrigger && <div style={{height: '10px'}} ref={ref} />}
+      {!isLoading && !shouldTrigger && emptyComponent}
     </>
   );
 };

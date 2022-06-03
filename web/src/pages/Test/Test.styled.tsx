@@ -1,5 +1,7 @@
 import styled from 'styled-components';
 
+import emptyStateIcon from 'assets/SpanAssertionsEmptyState.svg';
+
 export const TestDetailsHeader = styled.div`
   display: flex;
   width: 100%;
@@ -13,4 +15,17 @@ export const Wrapper = styled.div<{detail?: boolean}>`
   flex-grow: 1;
   flex-direction: column;
   background: #fff;
+`;
+
+export const EmptyStateIcon = styled.img.attrs({
+  src: emptyStateIcon,
+})``;
+
+export const EmptyStateContainer = styled.div`
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  justify-content: center;
+  margin: 100px 0;
 `;
