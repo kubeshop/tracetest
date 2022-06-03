@@ -62,6 +62,7 @@ const TestDefinitionSelectors = () => ({
   selectAffectedSpans: createSelector(stateSelector, ({affectedSpans}) => affectedSpans),
   selectSelectedAssertion: createSelector(stateSelector, ({selectedAssertion}) => selectedAssertion),
   selectAssertionResultsBySpan,
+  selectSelectedSpan: createSelector(stateSelector, ({selectedSpan}) => selectedSpan),
 });
 
 export default TestDefinitionSelectors();

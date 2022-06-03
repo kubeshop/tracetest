@@ -1,7 +1,8 @@
 import {CaseReducer, createSlice, PayloadAction} from '@reduxjs/toolkit';
 
-import {TAssertionResults} from '../../types/Assertion.types';
-import {TTestDefinitionEntry} from '../../types/TestDefinition.types';
+import {TAssertionResults} from 'types/Assertion.types';
+import {TSpan} from 'types/Span.types';
+import {TTestDefinitionEntry} from 'types/TestDefinition.types';
 import TestDefinitionActions, {TChange} from '../actions/TestDefinition.actions';
 
 interface ITestDefinitionState {
@@ -13,6 +14,7 @@ interface ITestDefinitionState {
   isInitialized: boolean;
   affectedSpans: string[];
   selectedAssertion: string;
+  selectedSpan?: TSpan;
 }
 
 export const initialState: ITestDefinitionState = {
@@ -23,6 +25,7 @@ export const initialState: ITestDefinitionState = {
   isInitialized: false,
   affectedSpans: [],
   selectedAssertion: '',
+  selectedSpan: undefined,
 };
 
 export const assertionResultsToDefinitionList = (assertionResults: TAssertionResults): TTestDefinitionEntry[] => {
@@ -52,6 +55,7 @@ const testDefinitionSlice = createSlice<
     clearAffectedSpans: CaseReducer<ITestDefinitionState>;
     setAffectedSpans: CaseReducer<ITestDefinitionState, PayloadAction<string[]>>;
     setSelectedAssertion: CaseReducer<ITestDefinitionState, PayloadAction<string>>;
+    setSelectedSpan: CaseReducer<ITestDefinitionState, PayloadAction<TSpan | undefined>>;
   },
   'testDefinition'
 >({
@@ -123,6 +127,9 @@ const testDefinitionSlice = createSlice<
       state.selectedAssertion = selectorId;
       state.affectedSpans = spanIds;
     },
+    setSelectedSpan(state, {payload: span}) {
+      state.selectedSpan = span;
+    },
   },
   extraReducers: builder => {
     builder
@@ -162,5 +169,6 @@ export const {
   clearAffectedSpans,
   setAffectedSpans,
   setSelectedAssertion,
+  setSelectedSpan,
 } = testDefinitionSlice.actions;
 export default testDefinitionSlice.reducer;

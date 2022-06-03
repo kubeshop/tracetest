@@ -1,16 +1,24 @@
-import React, {useMemo} from 'react';
+import React, {useEffect, useMemo} from 'react';
 import {Typography} from 'antd';
 import ReactFlow, {ArrowHeadType, Background, Elements, Position} from 'react-flow-renderer';
 import SkeletonNode from './SkeletonNode';
 import * as S from './SkeletonDiagram.styled';
 import {useDAGChart} from '../../hooks/useDAGChart';
 import {TRACE_DOCUMENTATION_URL} from '../../constants/Common.constants';
-import { skeletonNodeList, strokeColor, TraceNodes } from '../../constants/Diagram.constants';
+import {skeletonNodeList, strokeColor, TraceNodes} from '../../constants/Diagram.constants';
 
 export type SkeletonElementList = Elements<{}>;
 
-const SkeletonDiagram: React.FC = () => {
+export interface IProps {
+  onSelectSpan?(spanId: string): void;
+}
+
+const SkeletonDiagram = ({onSelectSpan}: IProps) => {
   const {dag} = useDAGChart(skeletonNodeList);
+
+  useEffect(() => {
+    if (onSelectSpan) onSelectSpan('');
+  }, []);
 
   const dagElementList = useMemo<SkeletonElementList>(() => {
     const dagNodeList: SkeletonElementList =
@@ -53,7 +61,7 @@ const SkeletonDiagram: React.FC = () => {
         nodeTypes={{SkeletonNode}}
         defaultZoom={0.5}
         elements={dagElementList}
-        onLoad={(instance) => setTimeout(() => instance.fitView(), 0)}
+        onLoad={instance => setTimeout(() => instance.fitView(), 0)}
       >
         <Background gap={4} size={1} color="#FBFBFF" />
       </ReactFlow>
