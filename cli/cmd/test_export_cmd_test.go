@@ -17,7 +17,8 @@ func TestTestExportCmd(t *testing.T) {
 		deleteFile(definitionFile)
 	})
 
-	output, err := cli.RunCommand("test", "export", "--config", "e2e/config.yml", "--id", "a6074714-e986-4747-a399-b87748143884", "--output", definitionFile)
+	testExportCommand := cli.NewCommand("test", "export", "--config", "e2e/config.yml", "--id", "a6074714-e986-4747-a399-b87748143884", "--output", definitionFile)
+	output, err := testExportCommand.Run()
 	assert.NoError(t, err)
 	assert.Empty(t, output)
 
