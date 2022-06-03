@@ -20,6 +20,7 @@ import (
 type ApiApiRouter interface {
 	CreateTest(http.ResponseWriter, *http.Request)
 	DeleteTest(http.ResponseWriter, *http.Request)
+	DeleteTestRun(http.ResponseWriter, *http.Request)
 	DryRunAssertion(http.ResponseWriter, *http.Request)
 	GetTest(http.ResponseWriter, *http.Request)
 	GetTestDefinition(http.ResponseWriter, *http.Request)
@@ -40,6 +41,7 @@ type ApiApiRouter interface {
 type ApiApiServicer interface {
 	CreateTest(context.Context, Test) (ImplResponse, error)
 	DeleteTest(context.Context, string) (ImplResponse, error)
+	DeleteTestRun(context.Context, string, string) (ImplResponse, error)
 	DryRunAssertion(context.Context, string, string, TestDefinition) (ImplResponse, error)
 	GetTest(context.Context, string) (ImplResponse, error)
 	GetTestDefinition(context.Context, string) (ImplResponse, error)
