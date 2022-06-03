@@ -293,6 +293,28 @@ paths:
             application/json:
               schema:
                 $ref: "./tests.yaml#/components/schemas/TestRun"
+    delete:
+      tags:
+        - api
+      parameters:
+        - in: path
+          name: testId
+          schema:
+            type: string
+            format: uuid
+          required: true
+        - in: path
+          name: runId
+          schema:
+            type: string
+            format: uuid
+          required: true
+      summary: "delete a test run"
+      description: "delete a test run"
+      operationId: deleteTestRun
+      responses:
+        "204":
+          description: OK
   /tests/{testId}/definition:
     get:
       tags:

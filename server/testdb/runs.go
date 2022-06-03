@@ -56,6 +56,21 @@ func (td *postgresDB) UpdateRun(ctx context.Context, r model.Run) error {
 	return nil
 }
 
+func (td *postgresDB) DeleteRun(ctx context.Context, r model.Run) error {
+	stmt, err := td.db.Prepare("DELETE FROM runs WHERE id = $1")
+	if err != nil {
+		return fmt.Errorf("prepare: %w", err)
+	}
+	defer stmt.Close()
+
+	_, err = stmt.ExecContext(ctx, r.ID)
+	if err != nil {
+		return fmt.Errorf("sql exec: %w", err)
+	}
+
+	return nil
+}
+
 func (td *postgresDB) GetRun(ctx context.Context, id uuid.UUID) (model.Run, error) {
 	stmt, err := td.db.Prepare("SELECT run, test_version FROM runs WHERE id = $1")
 	if err != nil {

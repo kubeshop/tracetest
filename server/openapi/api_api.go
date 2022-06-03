@@ -63,6 +63,12 @@ func (c *ApiApiController) Routes() Routes {
 			c.DeleteTest,
 		},
 		{
+			"DeleteTestRun",
+			strings.ToUpper("Delete"),
+			"/api/tests/{testId}/run/{runId}",
+			c.DeleteTestRun,
+		},
+		{
 			"DryRunAssertion",
 			strings.ToUpper("Put"),
 			"/api/tests/{testId}/run/{runId}/dry-run",
@@ -161,6 +167,24 @@ func (c *ApiApiController) DeleteTest(w http.ResponseWriter, r *http.Request) {
 	testIdParam := params["testId"]
 
 	result, err := c.service.DeleteTest(r.Context(), testIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// DeleteTestRun - delete a test run
+func (c *ApiApiController) DeleteTestRun(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	testIdParam := params["testId"]
+
+	runIdParam := params["runId"]
+
+	result, err := c.service.DeleteTestRun(r.Context(), testIdParam, runIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

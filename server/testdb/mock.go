@@ -66,6 +66,11 @@ func (m *MockRepository) UpdateRun(_ context.Context, run model.Run) error {
 	return args.Error(0)
 }
 
+func (m *MockRepository) DeleteRun(_ context.Context, run model.Run) error {
+	args := m.Called(run)
+	return args.Error(0)
+}
+
 func (m *MockRepository) GetRun(_ context.Context, id uuid.UUID) (model.Run, error) {
 	args := m.Called(id)
 	return args.Get(0).(model.Run), args.Error(1)

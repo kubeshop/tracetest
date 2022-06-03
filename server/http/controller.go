@@ -158,6 +158,27 @@ func (c *controller) GetTestRun(ctx context.Context, _ string, runID string) (op
 	return openapi.Response(200, c.openapi.Run(&run)), nil
 }
 
+func (c *controller) DeleteTestRun(ctx context.Context, _ string, runID string) (openapi.ImplResponse, error) {
+	rid, err := uuid.Parse(runID)
+	if err != nil {
+		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
+	}
+
+	run, err := c.testDB.GetRun(ctx, rid)
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	err = c.testDB.DeleteRun(ctx, run)
+	if err != nil {
+		return openapi.Response(http.StatusInternalServerError, err.Error()), err
+	}
+
+	analytics.CreateAndSendEvent("test_deleted_backend", "test")
+
+	return openapi.Response(204, nil), nil
+}
+
 func (c *controller) GetTestRuns(ctx context.Context, testID string, take, skip int32) (openapi.ImplResponse, error) {
 	if take == 0 {
 		take = 20
