@@ -2,9 +2,9 @@ on:
   create:
     tags:
       - v*
-  pull_request:
+  push:
     branches:
-      - main
+      - ci/cli-binaries
 
 name: release CLI
 jobs:
