@@ -1,7 +1,10 @@
 package config
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/spf13/viper"
@@ -13,16 +16,42 @@ type Config struct {
 	ServerPath *string `yaml:"serverPath,omitempty"`
 }
 
+func (c Config) IsEmpty() bool {
+	thisConfigJson, _ := json.Marshal(c)
+	emptyConfigJson, _ := json.Marshal(Config{})
+
+	return string(thisConfigJson) == string(emptyConfigJson)
+}
+
 func LoadConfig(configFile string) (Config, error) {
+	config, err := loadConfig(configFile)
+	if err != nil {
+		return Config{}, err
+	}
+
+	if !config.IsEmpty() {
+		return config, nil
+	}
+
+	homePath, err := os.UserHomeDir()
+	if err != nil {
+		return Config{}, fmt.Errorf("could not get user home path")
+	}
+
+	globalConfigPath := filepath.Join(homePath, ".tracetest/config.yml")
+	return loadConfig(globalConfigPath)
+}
+
+func loadConfig(configFile string) (Config, error) {
 	viper.SetConfigFile(configFile)
 	viper.SetConfigType("yaml")
 	viper.SetEnvPrefix("tracetest")
-	viper.AddConfigPath("$HOME/.tracetest/")
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	viper.AutomaticEnv()
 
 	if err := viper.ReadInConfig(); err != nil {
-		return Config{}, fmt.Errorf("could not load config file: %w", err)
+		// No configuration file found, return empty config
+		return Config{}, nil
 	}
 
 	config := Config{}
