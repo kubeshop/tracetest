@@ -1,30 +1,28 @@
 import * as d3DAG from 'd3-dag';
-import {Dag} from 'd3-dag';
-import _ from 'lodash';
-import {TSpanMap} from '../components/Diagram/components/DAG';
+import {useMemo} from 'react';
 
-interface DAGResponse {
-  dag: Dag<{id: string; parentIds: string[]}, undefined>;
-  layout: {width: number; height: number};
+export interface IDAGNode<T> {
+  data: T;
+  id: string;
+  parentIds: string[];
 }
 
-export const useDAGChart = (spanMap: TSpanMap = {}): void | DAGResponse => {
-  if (_.isEmpty(spanMap)) {
-    return;
-  }
+export const useDAGChart = <T>(nodeList: IDAGNode<T>[] = []) => {
+  return useMemo(() => {
+    if (!nodeList || !nodeList.length) return {};
 
-  const dagData = Object.values(spanMap).map(({id, parentIds}) => ({id, parentIds: parentIds.filter(el => el)}));
-  const stratify = d3DAG.dagStratify();
-  const dag = stratify(dagData);
+    const stratify = d3DAG.dagStratify();
+    const dag = stratify(nodeList);
 
-  const layout = d3DAG
-    .sugiyama()
-    .layering(d3DAG.layeringSimplex())
-    .decross(d3DAG.decrossOpt())
-    .coord(d3DAG.coordCenter())
-    .nodeSize(() => [200, 150]);
+    const dagLayout = d3DAG
+      .sugiyama()
+      .layering(d3DAG.layeringSimplex())
+      .decross(d3DAG.decrossOpt())
+      .coord(d3DAG.coordCenter())
+      .nodeSize(() => [200, 150]);
 
-  const {width, height} = layout(dag as any);
+    const {width, height} = dagLayout(dag as never);
 
-  return {dag, layout: {width, height}};
+    return {dag, layout: {width, height}};
+  }, [nodeList]);
 };

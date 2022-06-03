@@ -43,6 +43,7 @@ const Trace = ({displayError, visiblePortion, minHeight, test, run}: IProps): JS
             onSelectSpan={onSelectSpan}
             selectedSpan={selectedSpan}
             trace={run.trace!}
+            runState={run.state}
             type={diagramType}
           />
         </S.DiagramSection>
