@@ -1,12 +1,11 @@
-import {QuestionCircleOutlined} from '@ant-design/icons';
-import {Badge, Tooltip} from 'antd';
-import {useNavigate} from 'react-router-dom';
-
+import {Badge} from 'antd';
 import ResultCard from 'components/RunCard';
+import {useNavigate} from 'react-router-dom';
 import {useDeleteRunByIdMutation} from 'redux/apis/TraceTest.api';
-import {TTestRun} from 'types/TestRun.types';
-import * as S from './RunCardList.styled';
 import TestAnalyticsService from '../../services/Analytics/TestAnalytics.service';
+import {TTestRun} from '../../types/TestRun.types';
+import {TooltipQuestion} from '../TooltipQuestion/TooltipQuestion';
+import * as S from './RunCardList.styled';
 
 interface IProps {
   resultList: TTestRun[];
@@ -50,9 +49,7 @@ const ResultCardList = ({resultList, testId}: IProps) => {
         </S.TextContainer>
         <S.FailedContainer>
           <Badge count="F" />
-          <Tooltip color="#FBFBFF" title="The number of Total/Pass/Fail assertions">
-            <QuestionCircleOutlined style={{color: '#8C8C8C', cursor: 'pointer'}} />
-          </Tooltip>
+          <TooltipQuestion margin={0} title="The number of Total/Pass/Fail assertions" />
         </S.FailedContainer>
         <S.TextContainer style={{textAlign: 'right'}}>
           <S.Text>Actions</S.Text>

@@ -1,6 +1,5 @@
-import {useState} from 'react';
-
 import AttributeRow from 'components/AttributeRow';
+import {useState} from 'react';
 import {TResultAssertions} from 'types/Assertion.types';
 import {TSpanFlatAttribute} from 'types/Span.types';
 import * as S from './AttributeList.styled';
@@ -21,11 +20,15 @@ const AttributeList: React.FC<IProps> = ({assertions, attributeList, onCreateAss
     navigator.clipboard.writeText(value);
     setIsCopied(true);
   };
+  const [isAnyHovered, setIsAnyHovered] = useState<number[]>([]);
 
   return attributeList.length ? (
     <S.AttributeList data-cy="attribute-list">
-      {attributeList.map(attribute => (
+      {attributeList.map((attribute, index) => (
         <AttributeRow
+          index={index}
+          setIsAnyHovered={setIsAnyHovered}
+          isAnyHovered={isAnyHovered}
           assertionsFailed={assertions?.[attribute.key]?.failed}
           assertionsPassed={assertions?.[attribute.key]?.passed}
           attribute={attribute}

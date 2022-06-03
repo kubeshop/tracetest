@@ -16,6 +16,7 @@ import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
 import OperatorService from 'services/Operator.service';
 import SelectorService from 'services/Selector.service';
 import {TAssertion, TPseudoSelector, TSpanSelector} from 'types/Assertion.types';
+import {TooltipQuestion} from '../TooltipQuestion/TooltipQuestion';
 import * as S from './AssertionForm.styled';
 import AssertionFormCheckList from './AssertionFormCheckList';
 import AssertionFormPseudoSelectorInput from './AssertionFormPseudoSelectorInput';
@@ -132,6 +133,12 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
       >
         <div style={{marginBottom: 8}}>
           <Typography.Text>Filter to limit the span(s) included in this assertion</Typography.Text>
+          <TooltipQuestion
+            title={`
+            You can decided which spans will be tested by this assertion by altering the filter. 
+            Use the dropdown to the right to select the first matching span, last, n-th, or all.  
+            `}
+          />
         </div>
         <S.SelectorInputContainer>
           <Form.Item
@@ -160,6 +167,13 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
         </S.SelectorInputContainer>
         <div style={{marginBottom: 8}}>
           <Typography.Text>Define the checks to run against each span selected</Typography.Text>
+          <TooltipQuestion
+            title={`
+            Add one of more checks to be run against the span(s) that match your filter.  
+            For example, create one assertion to check all http spans to make sure they return status code 200... 
+            all in one assertion.
+            `}
+          />
         </div>
         <div data-tour={GuidedTourService.getStep(GuidedTours.Assertion, Steps.Checks)}>
           <Form.List name="assertionList">

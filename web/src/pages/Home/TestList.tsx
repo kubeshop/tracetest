@@ -1,11 +1,11 @@
 import {useCallback} from 'react';
 import {useNavigate} from 'react-router-dom';
-import HomeAnalyticsService from '../../services/Analytics/HomeAnalytics.service';
-import {useMenuDeleteCallback} from './useMenuDeleteCallback';
+import HomeAnalyticsService from 'services/Analytics/HomeAnalytics.service';
+import TestAnalyticsService from 'services/Analytics/TestAnalytics.service';
 import TestCard from '../../components/TestCard';
 import {useGetTestListQuery, useRunTestMutation} from '../../redux/apis/TraceTest.api';
-import TestAnalyticsService from '../../services/Analytics/TestAnalytics.service';
 import * as S from './Home.styled';
+import {useMenuDeleteCallback} from './useMenuDeleteCallback';
 
 const {onTestClick} = HomeAnalyticsService;
 

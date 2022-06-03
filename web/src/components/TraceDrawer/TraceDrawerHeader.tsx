@@ -27,7 +27,7 @@ interface IProps {
 }
 
 const TraceDrawerHeader: React.FC<IProps> = ({
-  run: {trace, createdAt},
+  run: {createdAt},
   visiblePortion,
   assertionResults,
   isDisabled,

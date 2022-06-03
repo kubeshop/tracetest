@@ -1,5 +1,7 @@
 import {StepType} from '@reactour/tour';
+import {Typography} from 'antd';
 import GuidedTourService, {GuidedTours} from '../../services/GuidedTour.service';
+import {StepContent} from './StepContent';
 
 export enum Steps {
   CreateTest = 'create_test',
@@ -14,31 +16,59 @@ export enum Steps {
 const StepList: StepType[] = [
   {
     selector: GuidedTourService.getSelectorStep(GuidedTours.Home, Steps.CreateTest),
-    content: 'Create test',
+    content: ({setIsOpen}) => (
+      <StepContent title="Create test" setIsOpen={setIsOpen}>
+        <Typography.Text>Create test</Typography.Text>
+      </StepContent>
+    ),
   },
   {
     selector: GuidedTourService.getSelectorStep(GuidedTours.Home, Steps.Method),
-    content: 'method',
+    content: ({setIsOpen}) => (
+      <StepContent title="method" setIsOpen={setIsOpen}>
+        <Typography.Text>method</Typography.Text>
+      </StepContent>
+    ),
   },
   {
     selector: GuidedTourService.getSelectorStep(GuidedTours.Home, Steps.Url),
-    content: 'url',
+    content: ({setIsOpen}) => (
+      <StepContent title="url" setIsOpen={setIsOpen}>
+        <Typography.Text>url</Typography.Text>
+      </StepContent>
+    ),
   },
   {
     selector: GuidedTourService.getSelectorStep(GuidedTours.Home, Steps.Name),
-    content: 'name',
+    content: ({setIsOpen}) => (
+      <StepContent title="name" setIsOpen={setIsOpen}>
+        <Typography.Text>name</Typography.Text>
+      </StepContent>
+    ),
   },
   {
     selector: GuidedTourService.getSelectorStep(GuidedTours.Home, Steps.Headers),
-    content: 'headers',
+    content: ({setIsOpen}) => (
+      <StepContent title="headers" setIsOpen={setIsOpen}>
+        <Typography.Text>headers</Typography.Text>
+      </StepContent>
+    ),
   },
   {
     selector: GuidedTourService.getSelectorStep(GuidedTours.Home, Steps.Body),
-    content: 'body',
+    content: ({setIsOpen}) => (
+      <StepContent title="body" setIsOpen={setIsOpen}>
+        <Typography.Text>body</Typography.Text>
+      </StepContent>
+    ),
   },
   {
     selector: GuidedTourService.getSelectorStep(GuidedTours.Home, Steps.Run),
-    content: 'run',
+    content: ({setIsOpen}) => (
+      <StepContent title="Test View" setIsOpen={setIsOpen}>
+        <Typography.Text>run</Typography.Text>
+      </StepContent>
+    ),
   },
 ];
 

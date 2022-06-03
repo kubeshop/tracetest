@@ -1,5 +1,7 @@
 import {StepType} from '@reactour/tour';
+import {Typography} from 'antd';
 import GuidedTourService, {GuidedTours} from '../../services/GuidedTour.service';
+import {StepContent} from './StepContent';
 
 export enum Steps {
   ExecutionTime = 'executionTime',
@@ -13,15 +15,27 @@ export enum Steps {
 const StepList: StepType[] = [
   {
     selector: GuidedTourService.getSelectorStep(GuidedTours.TestDetails, Steps.ExecutionTime),
-    content: 'execution time',
+    content: ({setIsOpen}) => (
+      <StepContent title="Test View" setIsOpen={setIsOpen}>
+        <Typography.Text>execution time</Typography.Text>
+      </StepContent>
+    ),
   },
   {
     selector: GuidedTourService.getSelectorStep(GuidedTours.TestDetails, Steps.Status),
-    content: 'status',
+    content: ({setIsOpen}) => (
+      <StepContent title="Test View" setIsOpen={setIsOpen}>
+        <Typography.Text>status</Typography.Text>
+      </StepContent>
+    ),
   },
   {
     selector: GuidedTourService.getSelectorStep(GuidedTours.TestDetails, Steps.Assertions),
-    content: 'assertions',
+    content: ({setIsOpen}) => (
+      <StepContent title="Test View" setIsOpen={setIsOpen}>
+        <Typography.Text>assertions</Typography.Text>
+      </StepContent>
+    ),
     highlightedSelectors: [
       GuidedTourService.getSelectorStep(GuidedTours.TestDetails, Steps.Assertions),
       GuidedTourService.getSelectorStep(GuidedTours.TestDetails, Steps.Passed),
@@ -30,7 +44,11 @@ const StepList: StepType[] = [
   },
   {
     selector: GuidedTourService.getSelectorStep(GuidedTours.TestDetails, Steps.RunTest),
-    content: 'run test',
+    content: ({setIsOpen}) => (
+      <StepContent title="Test View" setIsOpen={setIsOpen}>
+        <Typography.Text>assertions</Typography.Text>
+      </StepContent>
+    ),
   },
 ];
 
