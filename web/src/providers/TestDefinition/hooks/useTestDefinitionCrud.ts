@@ -53,8 +53,6 @@ const useTestDefinitionCrud = ({runId, testId}: IProps) => {
 
   const runTest = useCallback(async () => {
     const {id} = await dispatch(TestRunGateway.runTest(testId)).unwrap();
-    dispatch(clearAffectedSpans());
-    dispatch(setSelectedAssertion(''));
     dispatch(resetAction());
 
     navigate(`/test/${testId}/run/${id}`);
