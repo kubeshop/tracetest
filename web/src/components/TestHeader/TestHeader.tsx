@@ -84,6 +84,7 @@ const TestHeader = ({
         currentVersion={testVersion}
         isOpen={isConfirmationModalOpen}
         latestVersion={version}
+        okText="Run Test"
         onCancel={() => setIsConfirmationModalOpen(false)}
         onConfirm={() => {
           setIsConfirmationModalOpen(false);
