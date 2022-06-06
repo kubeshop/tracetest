@@ -17,7 +17,8 @@ type (
 		TempoConnectionConfig   *configgrpc.GRPCClientSettings `mapstructure:"tempoConnectionConfig"`
 		PoolingConfig           PoolingConfig                  `mapstructure:"poolingConfig"`
 		GA                      GoogleAnalytics                `mapstructure:"googleAnalytics"`
-		PoolingRetryDelayString string                         `mapśtructure:"poolingRetryDelay"`
+		PoolingRetryDelayString string                         `mapstructure:"poolingRetryDelay"`
+		Telemetry               TelemetryConfig                `mapstructure:"telemetry"`
 	}
 
 	GoogleAnalytics struct {
@@ -29,6 +30,18 @@ type (
 	PoolingConfig struct {
 		MaxWaitTimeForTrace string `mapstructure:"maxWaitTimeForTrace"`
 		RetryDelay          string `mapstructure:"retryDelay"`
+	}
+
+	TelemetryConfig struct {
+		ServiceName string                `mapstructure:"serviceName"`
+		Sampling    float64               `mapstructure:"sampling"`
+		Exporters   []string              `mapstructure:"exporters"`
+		Jaeger      JaegerTelemetryConfig `mapstructure:"jaeger"`
+	}
+
+	JaegerTelemetryConfig struct {
+		Host string `mapstructure:"host"`
+		Port int    `mapstructure:"port"`
 	}
 )
 
