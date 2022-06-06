@@ -123,6 +123,21 @@ func (td *postgresDB) DeleteTest(ctx context.Context, test model.Test) error {
 	return nil
 }
 
+func (td *postgresDB) GetTestVersion(ctx context.Context, id uuid.UUID, version int) (model.Test, error) {
+	stmt, err := td.db.Prepare("SELECT test FROM tests WHERE id = $1 AND version = $2")
+	if err != nil {
+		return model.Test{}, fmt.Errorf("prepare: %w", err)
+	}
+	defer stmt.Close()
+
+	test, err := td.readTestRow(ctx, stmt.QueryRowContext(ctx, id, version))
+	if err != nil {
+		return model.Test{}, err
+	}
+
+	return test, nil
+}
+
 func (td *postgresDB) GetLatestTestVersion(ctx context.Context, id uuid.UUID) (model.Test, error) {
 	stmt, err := td.db.Prepare("SELECT test FROM tests WHERE id = $1 ORDER BY version DESC LIMIT 1")
 	if err != nil {
