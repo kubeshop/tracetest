@@ -46,6 +46,7 @@ func (c *customController) instrumentRoute(name string, route string, f http.Han
 		span.SetAttributes(
 			attribute.String(string(semconv.HTTPMethodKey), r.Method),
 			attribute.String(string(semconv.HTTPRouteKey), route),
+			attribute.String(string(semconv.HTTPTargetKey), r.URL.String()),
 		)
 
 		newRequest := r.WithContext(ctx)
