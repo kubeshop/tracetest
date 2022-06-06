@@ -18,19 +18,22 @@ import (
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/tracedb"
+	"go.opentelemetry.io/otel/sdk/trace"
 )
 
 type App struct {
 	config  config.Config
 	db      model.Repository
 	traceDB tracedb.TraceDB
+	tracer  *trace.TracerProvider
 }
 
-func New(config config.Config, db model.Repository, tracedb tracedb.TraceDB) (*App, error) {
+func New(config config.Config, db model.Repository, tracedb tracedb.TraceDB, tracer *trace.TracerProvider) (*App, error) {
 	app := &App{
 		config:  config,
 		db:      db,
 		traceDB: tracedb,
+		tracer:  tracer,
 	}
 
 	return app, nil
