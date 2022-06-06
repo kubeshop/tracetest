@@ -117,3 +117,9 @@ func (is instrumentedServicer) UpdateTest(ctx context.Context, testID string, te
 		return is.servicer.UpdateTest(ctx, testID, test)
 	})
 }
+
+func (is instrumentedServicer) GetRunResultJUnit(ctx context.Context, testID string, runID string) (openapi.ImplResponse, error) {
+	return is.instrumentFunction(ctx, "GetRunResultJUnit", func(ctx context.Context) (openapi.ImplResponse, error) {
+		return is.servicer.GetRunResultJUnit(ctx, testID, runID)
+	})
+}
