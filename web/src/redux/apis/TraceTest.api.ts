@@ -115,6 +115,10 @@ const TraceTestAPI = createApi({
       }),
       transformResponse: (rawTestResults: TRawAssertionResults) => AssertionResults(rawTestResults),
     }),
+    deleteRunById: build.mutation<TTest, {testId: string; runId: string}>({
+      query: ({testId, runId}) => ({url: `/tests/${testId}/run/${runId}`, method: 'DELETE'}),
+      invalidatesTags: (result, error, {testId}) => [{type: Tags.TEST_RUN, id: `${testId}-LIST`}],
+    }),
 
     // Spans
     getSelectedSpans: build.query<string[], {testId: string; runId: string; query: string}>({
@@ -138,6 +142,7 @@ export const {
   useReRunMutation,
   useLazyGetRunListQuery,
   useDryRunMutation,
+  useDeleteRunByIdMutation,
 } = TraceTestAPI;
 export const {endpoints} = TraceTestAPI;
 

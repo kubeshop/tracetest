@@ -1,25 +1,26 @@
-import {Button} from 'antd';
-import {FC, useCallback} from 'react';
-import {useGetRunListQuery, useRunTestMutation} from 'redux/apis/TraceTest.api';
-import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
+import {Button, Typography} from 'antd';
+import {useCallback} from 'react';
+
 import {Steps} from 'components/GuidedTour/testDetailsStepList';
+import InfiniteScroll from 'components/InfiniteScroll';
+import ResultCardList from 'components/RunCardList';
+import SearchInput from 'components/SearchInput';
 import useGuidedTour from 'hooks/useGuidedTour';
+import useInfiniteScroll from 'hooks/useInfiniteScroll';
+import {useGetRunListQuery, useRunTestMutation} from 'redux/apis/TraceTest.api';
+import TestAnalyticsService from 'services/Analytics/TestAnalytics.service';
+import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
+import {TTestRun} from 'types/TestRun.types';
 import * as S from './Test.styled';
-import TestAnalyticsService from '../../services/Analytics/TestAnalytics.service';
-import {TTestRun} from '../../types/TestRun.types';
-import ResultCardList from '../../components/RunCardList';
-import useInfiniteScroll from '../../hooks/useInfiniteScroll';
-import InfiniteScroll from '../../components/InfiniteScroll';
-import SearchInput from '../../components/SearchInput';
 
 const {onRunTest} = TestAnalyticsService;
 
-type TTestDetailsProps = {
-  testId: string;
+interface IProps {
   onSelectResult: (result: TTestRun) => void;
-};
+  testId: string;
+}
 
-const TestDetails: FC<TTestDetailsProps> = ({testId, onSelectResult}) => {
+const TestDetails = ({onSelectResult, testId}: IProps) => {
   const [runTest, result] = useRunTestMutation();
   const {
     list: resultList,
@@ -55,11 +56,18 @@ const TestDetails: FC<TTestDetailsProps> = ({testId, onSelectResult}) => {
           Run Test
         </Button>
       </S.TestDetailsHeader>
+
       <InfiniteScroll
         loadMore={loadMore}
         isLoading={isLoading}
         hasMore={hasMore}
         shouldTrigger={Boolean(resultList.length)}
+        emptyComponent={
+          <S.EmptyStateContainer>
+            <S.EmptyStateIcon />
+            <Typography.Text disabled>No Runs</Typography.Text>
+          </S.EmptyStateContainer>
+        }
       >
         <ResultCardList testId={testId} resultList={resultList} />
       </InfiniteScroll>

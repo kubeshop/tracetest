@@ -31,7 +31,7 @@ const Diagram: React.FC<IDiagramProps> = ({type, runState, ...props}) => {
   return runState === TestState.FINISHED ? (
     <Component type={type} runState={runState} {...props} />
   ) : (
-    <SkeletonDiagram />
+    <SkeletonDiagram onSelectSpan={props.onSelectSpan} />
   );
 };
 
