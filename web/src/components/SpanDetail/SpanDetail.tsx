@@ -13,6 +13,7 @@ import {useAssertionForm} from 'components/AssertionForm/AssertionFormProvider';
 import SpanDetailTabs from './SpanDetailTabs';
 import SpanHeader from './SpanHeader';
 import * as S from './SpanDetail.styled';
+import TraceAnalyticsService from '../../services/Analytics/TraceAnalytics.service';
 
 export interface ISpanDetailsComponentProps {
   assertions?: TResultAssertions;
@@ -40,6 +41,7 @@ const SpanDetail: React.FC<IProps> = ({span}) => {
 
   const onCreateAssertion = useCallback(
     ({value, key}: TSpanFlatAttribute) => {
+      TraceAnalyticsService.onAddAssertionButtonClick();
       const {selectorList, pseudoSelector} = SpanService.getSelectorInformation(span!);
 
       open({

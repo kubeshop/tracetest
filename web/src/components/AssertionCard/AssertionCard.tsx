@@ -1,11 +1,11 @@
-import {Button, Tooltip} from 'antd';
-
+import {Tooltip} from 'antd';
 import AssertionCheckRow from 'components/AssertionCheckRow';
 import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
 import {useCallback} from 'react';
 import {useStore} from 'react-flow-renderer';
 import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
 import {useAppSelector} from '../../redux/hooks';
+import AssertionAnalyticsService from '../../services/Analytics/AssertionAnalytics.service';
 import {TAssertionResultEntry} from '../../types/Assertion.types';
 import * as S from './AssertionCard.styled';
 import AssertionCardSelectorList from './AssertionCardSelectorList';
@@ -49,16 +49,20 @@ const AssertionCard: React.FC<TAssertionCardProps> = ({
     if (selectedAssertion === selector) {
       return setSelectedAssertion('');
     }
+
+    AssertionAnalyticsService.onAssertionClick();
     setSelectedAssertion(selector);
   };
 
   const resetDefinition: React.MouseEventHandler = useCallback(
     e => {
       e.stopPropagation();
+      AssertionAnalyticsService.onRevertAssertion();
       revert(originalSelector);
     },
     [revert, originalSelector]
   );
+
   return (
     <S.AssertionCard
       $isSelected={selectedAssertion === selector}
@@ -70,16 +74,14 @@ const AssertionCard: React.FC<TAssertionCardProps> = ({
           <AssertionCardSelectorList selectorList={selectorList} pseudoSelector={pseudoSelector} />
         </div>
         <S.ActionsContainer>
-          {isDraft && (
-            <>
-              <S.StatusTag>draft</S.StatusTag>
-              <Button type="link" data-cy="assertion-action-revert" onClick={resetDefinition}>
-                Revert Assertion
-              </Button>
-            </>
-          )}
+          {isDraft && <S.StatusTag>draft</S.StatusTag>}
           {isDeleted && <S.StatusTag color="#61175E">deleted</S.StatusTag>}
           <S.SpanCountText>{spanCountText}</S.SpanCountText>
+          {isDraft && (
+            <Tooltip color="white" title="Revert Assertion">
+              <S.UndoIcon data-cy="assertion-action-revert" onClick={resetDefinition} />
+            </Tooltip>
+          )}
           <Tooltip color="white" title="Edit Assertion">
             <S.EditIcon
               data-cy="edit-assertion-button"

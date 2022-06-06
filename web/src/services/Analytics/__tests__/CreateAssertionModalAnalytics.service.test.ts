@@ -1,6 +1,6 @@
+import {Categories, Labels} from 'constants/Analytics.constants';
 import CreateAssertionModalAnalyticsService, {Actions} from '../CreateAssertionModalAnalytics.service';
 import AnalyticsService from '../Analytics.service';
-import {Categories, Labels} from '../../../constants/Analytics.constants';
 
 jest.mock('../Analytics.service', () => {
   return {
@@ -10,35 +10,35 @@ jest.mock('../Analytics.service', () => {
 
 describe('CreateAssertionModalAnalyticsService', () => {
   it('should trigger the onCreateAssertionFormSubmit event', () => {
-    CreateAssertionModalAnalyticsService.onCreateAssertionFormSubmit('testId');
+    CreateAssertionModalAnalyticsService.onCreateAssertionFormSubmit();
 
     expect(AnalyticsService.event).toHaveBeenCalledWith(
       Categories.Assertion,
       Actions.CreateAssertionFormSubmit,
-      'testId'
+      Labels.Form
     );
   });
 
   it('should trigger the onEditAssertionFormSubmit event', () => {
-    CreateAssertionModalAnalyticsService.onEditAssertionFormSubmit('assertionId');
+    CreateAssertionModalAnalyticsService.onEditAssertionFormSubmit();
 
     expect(AnalyticsService.event).toHaveBeenCalledWith(
       Categories.Assertion,
       Actions.EditAssertionFormSubmit,
-      'assertionId'
+      Labels.Form
     );
   });
 
   it('should trigger the onSelectorChange event', () => {
-    CreateAssertionModalAnalyticsService.onSelectorChange('selector');
+    CreateAssertionModalAnalyticsService.onSelectorChange();
 
-    expect(AnalyticsService.event).toHaveBeenCalledWith(Categories.Assertion, Actions.SelectorChange, 'selector');
+    expect(AnalyticsService.event).toHaveBeenCalledWith(Categories.Assertion, Actions.SelectorChange, Labels.Input);
   });
 
   it('should trigger the onChecksChange event', () => {
-    CreateAssertionModalAnalyticsService.onChecksChange('checks');
+    CreateAssertionModalAnalyticsService.onChecksChange();
 
-    expect(AnalyticsService.event).toHaveBeenCalledWith(Categories.Assertion, Actions.ChecksChange, 'checks');
+    expect(AnalyticsService.event).toHaveBeenCalledWith(Categories.Assertion, Actions.ChecksChange, Labels.Input);
   });
 
   it('should trigger the onAddCheck event', () => {
@@ -51,5 +51,21 @@ describe('CreateAssertionModalAnalyticsService', () => {
     CreateAssertionModalAnalyticsService.onRemoveCheck();
 
     expect(AnalyticsService.event).toHaveBeenCalledWith(Categories.Assertion, Actions.RemoveCheck, Labels.Button);
+  });
+
+  it('should trigger the onAssertionFormOpen event', () => {
+    CreateAssertionModalAnalyticsService.onAssertionFormOpen();
+
+    expect(AnalyticsService.event).toHaveBeenCalledWith(Categories.Assertion, Actions.OpenForm, Labels.Button);
+  });
+
+  it('should trigger the onConfirmationModalOpen event', () => {
+    CreateAssertionModalAnalyticsService.onConfirmationModalOpen();
+
+    expect(AnalyticsService.event).toHaveBeenCalledWith(
+      Categories.Assertion,
+      Actions.ConfirmationModalOpen,
+      Labels.Button
+    );
   });
 });

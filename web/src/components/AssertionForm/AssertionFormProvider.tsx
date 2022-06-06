@@ -11,6 +11,7 @@ import SelectorService from 'services/Selector.service';
 import {TTestDefinitionEntry} from 'types/TestDefinition.types';
 import {DrawerState} from '../ResizableDrawer/ResizableDrawer';
 import {IValues} from './AssertionForm';
+import CreateAssertionModalAnalyticsService from '../../services/Analytics/CreateAssertionModalAnalytics.service';
 
 interface IFormProps {
   defaultValues?: IValues;
@@ -52,9 +53,7 @@ const AssertionFormProvider: React.FC<{testId: string}> = ({children}) => {
   const [formProps, setFormProps] = useState<IFormProps>(initialFormProps);
   const {update, add, test, isDraftMode} = useTestDefinition();
   const {run} = useTestRun();
-  const definitionList: TTestDefinitionEntry[] = useAppSelector(state =>
-    TestDefinitionSelectors.selectDefinitionList(state)
-  );
+  const definitionList = useAppSelector(state => TestDefinitionSelectors.selectDefinitionList(state));
 
   const open = useCallback(
     (props: IFormProps = {}) => {
@@ -75,8 +74,13 @@ const AssertionFormProvider: React.FC<{testId: string}> = ({children}) => {
         });
       else setFormProps(props);
 
-      if (run.testVersion !== test?.version && !isDraftMode) setIsConfirmationModalOpen(true);
-      else setIsOpen(true);
+      if (run.testVersion !== test?.version && !isDraftMode) {
+        CreateAssertionModalAnalyticsService.onConfirmationModalOpen();
+        setIsConfirmationModalOpen(true);
+      } else {
+        CreateAssertionModalAnalyticsService.onAssertionFormOpen();
+        setIsOpen(true);
+      }
 
       dispatch(setSelectedAssertion(''));
     },
@@ -91,6 +95,7 @@ const AssertionFormProvider: React.FC<{testId: string}> = ({children}) => {
   }, [dispatch]);
 
   const onConfirm = useCallback(() => {
+    CreateAssertionModalAnalyticsService.onAssertionFormOpen();
     setIsOpen(true);
     setIsConfirmationModalOpen(false);
   }, []);
@@ -105,8 +110,13 @@ const AssertionFormProvider: React.FC<{testId: string}> = ({children}) => {
         isDraft: true,
       };
 
-      if (isEditing) await update(selector, definition);
-      else await add(definition);
+      if (isEditing) {
+        CreateAssertionModalAnalyticsService.onCreateAssertionFormSubmit();
+        await update(selector, definition);
+      } else {
+        CreateAssertionModalAnalyticsService.onEditAssertionFormSubmit();
+        await add(definition);
+      }
 
       setIsOpen(false);
       dispatch(clearAffectedSpans());

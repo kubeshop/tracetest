@@ -8,6 +8,7 @@ import {DEFAULT_HEADERS, DemoTestExampleList} from 'constants/Test.constants';
 import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
 import Validator from 'utils/Validator';
 import * as S from './CreateTestModal.styled';
+import CreateTestAnalyticsService from '../../services/Analytics/CreateTestAnalytics.service';
 
 export const FORM_ID = 'create-test';
 
@@ -32,6 +33,7 @@ interface IProps {
 
 const CreateTestForm = ({form, onSelectDemo, onSubmit, onValidation, selectedDemo}: IProps) => {
   const handleOnDemoClick = ({key}: {key: string}) => {
+    CreateTestAnalyticsService.onDemoTestClick();
     onSelectDemo(key);
     const {body, description, method, name, url} = DemoTestExampleList.find(demo => demo.name === key) || {};
 

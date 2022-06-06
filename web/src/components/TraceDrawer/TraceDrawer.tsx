@@ -26,6 +26,7 @@ const TraceDrawer: React.FC<IProps> = ({run: {id: runId}, run, testId, visiblePo
   useEffect(() => {
     if (isAssertionFormOpen) setDrawerState(DrawerState.FORM);
   }, [isAssertionFormOpen, setDrawerState]);
+
   return (
     <ResizableDrawer visiblePortion={visiblePortion}>
       <TraceDrawerHeader

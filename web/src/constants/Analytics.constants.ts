@@ -15,4 +15,5 @@ export enum Labels {
   Table = 'table',
   Form = 'form',
   Tab = 'tab',
+  Input = 'input',
 }

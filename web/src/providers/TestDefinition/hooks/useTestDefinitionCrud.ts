@@ -56,7 +56,7 @@ const useTestDefinitionCrud = ({runId, testId}: IProps) => {
     dispatch(resetAction());
 
     navigate(`/test/${testId}/run/${id}`);
-  }, [dispatch, navigate, runId, testId]);
+  }, [dispatch, navigate, testId]);
 
   const cancel = useCallback(() => {
     setIsDraftMode(false);

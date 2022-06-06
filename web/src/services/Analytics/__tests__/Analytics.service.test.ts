@@ -1,4 +1,4 @@
-import {Categories} from '../../../constants/Analytics.constants';
+import {Categories} from 'constants/Analytics.constants';
 import AnalyticsService, {instance} from '../Analytics.service';
 
 jest.mock('ga-4-react', () => {

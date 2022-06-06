@@ -6,6 +6,7 @@ import ResultCard from 'components/RunCard';
 import {useDeleteRunByIdMutation} from 'redux/apis/TraceTest.api';
 import {TTestRun} from 'types/TestRun.types';
 import * as S from './RunCardList.styled';
+import TestAnalyticsService from '../../services/Analytics/TestAnalytics.service';
 
 interface IProps {
   resultList: TTestRun[];
@@ -17,10 +18,12 @@ const ResultCardList = ({resultList, testId}: IProps) => {
   const [deleteRunById] = useDeleteRunByIdMutation();
 
   const handleOnResultClick = (runId: string) => {
+    TestAnalyticsService.onTestRunClick();
     navigate(`/test/${testId}/run/${runId}`);
   };
 
   const handleOnDelete = (runId: string) => {
+    TestAnalyticsService.onDeleteTestRun();
     deleteRunById({testId, runId});
   };
 

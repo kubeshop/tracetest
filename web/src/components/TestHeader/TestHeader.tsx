@@ -10,6 +10,7 @@ import {TTest} from 'types/Test.types';
 import {TTestRunState} from 'types/TestRun.types';
 import Info from './Info';
 import * as S from './TestHeader.styled';
+import TestAnalyticsService from '../../services/Analytics/TestAnalytics.service';
 
 interface IProps {
   executionTime?: number;
@@ -37,6 +38,7 @@ const TestHeader = ({
   const onClick = useSetIsCollapsedCallback();
 
   const handleRunTestOnClick = () => {
+    TestAnalyticsService.onRunTest();
     if (testVersion !== version) {
       setIsConfirmationModalOpen(true);
       return;

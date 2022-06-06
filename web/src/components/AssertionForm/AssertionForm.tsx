@@ -86,8 +86,8 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
 
       const [fieldName = '', entry = 0, keyName = ''] = field.name as Array<string | number>;
 
-      if (fieldName === 'selectorList') onSelectorChange(JSON.stringify(selectorList));
-      if (fieldName === 'assertionList') onChecksChange(JSON.stringify(form.getFieldValue('assertionList') || []));
+      if (fieldName === 'selectorList') onSelectorChange();
+      if (fieldName === 'assertionList') onChecksChange();
 
       if (fieldName === 'assertionList' && keyName === 'attribute' && field.value) {
         const list: TAssertion[] = form.getFieldValue('assertionList') || [];
@@ -106,7 +106,7 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
         });
       }
     },
-    [attributeList, form, selectorList]
+    [attributeList, form]
   );
 
   return (
