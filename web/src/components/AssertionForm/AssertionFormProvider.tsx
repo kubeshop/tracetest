@@ -103,10 +103,12 @@ const AssertionFormProvider: React.FC<{testId: string}> = ({children}) => {
   const onSubmit = useCallback(
     async ({selectorList, assertionList = [], pseudoSelector}: IValues) => {
       const {isEditing, selector = ''} = formProps;
+      const newSelector = SelectorService.getSelectorString(selectorList, pseudoSelector);
 
       const definition: TTestDefinitionEntry = {
-        selector: SelectorService.getSelectorString(selectorList, pseudoSelector),
+        selector: newSelector,
         assertionList,
+        originalSelector: newSelector,
         isDraft: true,
       };
 

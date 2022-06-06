@@ -1,21 +1,7 @@
-import {CaseReducer, createSlice, PayloadAction} from '@reduxjs/toolkit';
-
+import {createSlice} from '@reduxjs/toolkit';
 import {TAssertionResults} from 'types/Assertion.types';
-import {TSpan} from 'types/Span.types';
-import {TTestDefinitionEntry} from 'types/TestDefinition.types';
-import TestDefinitionActions, {TChange} from '../actions/TestDefinition.actions';
-
-interface ITestDefinitionState {
-  initialDefinitionList: TTestDefinitionEntry[];
-  definitionList: TTestDefinitionEntry[];
-  assertionResults?: TAssertionResults;
-  changeList: TChange[];
-  isLoading: boolean;
-  isInitialized: boolean;
-  affectedSpans: string[];
-  selectedAssertion: string;
-  selectedSpan?: TSpan;
-}
+import {ITestDefinitionState, TTestDefinitionEntry, TTestDefinitionSliceActions} from 'types/TestDefinition.types';
+import TestDefinitionActions from '../actions/TestDefinition.actions';
 
 export const initialState: ITestDefinitionState = {
   initialDefinitionList: [],
@@ -26,6 +12,7 @@ export const initialState: ITestDefinitionState = {
   affectedSpans: [],
   selectedAssertion: '',
   selectedSpan: undefined,
+  isDraftMode: false,
 };
 
 export const assertionResultsToDefinitionList = (assertionResults: TAssertionResults): TTestDefinitionEntry[] => {
@@ -38,27 +25,7 @@ export const assertionResultsToDefinitionList = (assertionResults: TAssertionRes
   }));
 };
 
-const testDefinitionSlice = createSlice<
-  ITestDefinitionState,
-  {
-    reset: CaseReducer<ITestDefinitionState>;
-    initDefinitionList: CaseReducer<ITestDefinitionState, PayloadAction<{assertionResults: TAssertionResults}>>;
-    addDefinition: CaseReducer<ITestDefinitionState, PayloadAction<{definition: TTestDefinitionEntry}>>;
-    updateDefinition: CaseReducer<
-      ITestDefinitionState,
-      PayloadAction<{definition: TTestDefinitionEntry; selector: string}>
-    >;
-    removeDefinition: CaseReducer<ITestDefinitionState, PayloadAction<{selector: string}>>;
-    revertDefinition: CaseReducer<ITestDefinitionState, PayloadAction<{originalSelector: string}>>;
-    resetDefinitionList: CaseReducer<ITestDefinitionState>;
-    setAssertionResults: CaseReducer<ITestDefinitionState, PayloadAction<TAssertionResults>>;
-    clearAffectedSpans: CaseReducer<ITestDefinitionState>;
-    setAffectedSpans: CaseReducer<ITestDefinitionState, PayloadAction<string[]>>;
-    setSelectedAssertion: CaseReducer<ITestDefinitionState, PayloadAction<string>>;
-    setSelectedSpan: CaseReducer<ITestDefinitionState, PayloadAction<TSpan | undefined>>;
-  },
-  'testDefinition'
->({
+const testDefinitionSlice = createSlice<ITestDefinitionState, TTestDefinitionSliceActions, 'testDefinition'>({
   name: 'testDefinition',
   initialState,
   reducers: {
@@ -71,22 +38,14 @@ const testDefinitionSlice = createSlice<
       state.initialDefinitionList = definitionList;
       state.definitionList = definitionList;
       state.isInitialized = true;
+      state.isDraftMode = false;
     },
     addDefinition(state, {payload: {definition}}) {
+      state.isDraftMode = true;
       state.definitionList = [...state.definitionList, definition];
     },
-    revertDefinition(state, {payload: {originalSelector}}) {
-      const initialDefinition = state.initialDefinitionList.find(
-        definition => definition.originalSelector === originalSelector
-      );
-
-      state.definitionList = initialDefinition
-        ? state.definitionList.map(definition =>
-            definition.originalSelector === originalSelector ? initialDefinition : definition
-          )
-        : state.definitionList.filter(definition => definition.originalSelector === originalSelector);
-    },
     updateDefinition(state, {payload: {definition, selector}}) {
+      state.isDraftMode = true;
       state.definitionList = state.definitionList.map(def => {
         if (def.selector === selector)
           return {
@@ -98,6 +57,7 @@ const testDefinitionSlice = createSlice<
       });
     },
     removeDefinition(state, {payload: {selector}}) {
+      state.isDraftMode = true;
       state.definitionList = state.definitionList.map(def => {
         if (def.selector === selector)
           return {
@@ -109,7 +69,23 @@ const testDefinitionSlice = createSlice<
         return def;
       });
     },
+    revertDefinition(state, {payload: {originalSelector}}) {
+      const initialDefinition = state.initialDefinitionList.find(
+        definition => definition.originalSelector === originalSelector
+      );
+
+      state.definitionList = initialDefinition
+        ? state.definitionList.map(definition =>
+            definition.originalSelector === originalSelector ? initialDefinition : definition
+          )
+        : state.definitionList.filter(definition => definition.selector !== originalSelector);
+
+      const pendingChanges = state.definitionList.filter(({isDraft}) => isDraft).length;
+
+      if (!pendingChanges) state.isDraftMode = false;
+    },
     resetDefinitionList(state) {
+      state.isDraftMode = false;
       state.definitionList = state.initialDefinitionList;
     },
     setAssertionResults(state, {payload}) {
@@ -135,6 +111,9 @@ const testDefinitionSlice = createSlice<
     builder
       .addCase(TestDefinitionActions.dryRun.fulfilled, (state, {payload}) => {
         state.assertionResults = payload;
+      })
+      .addCase(TestDefinitionActions.publish.pending, state => {
+        state.isDraftMode = false;
       })
       .addCase(TestDefinitionActions.publish.fulfilled, (state, {payload: {result}}) => {
         const definitionList = assertionResultsToDefinitionList(result);
