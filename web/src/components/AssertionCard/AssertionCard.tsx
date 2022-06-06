@@ -58,9 +58,9 @@ const AssertionCard: React.FC<TAssertionCardProps> = ({
     e => {
       e.stopPropagation();
       AssertionAnalyticsService.onRevertAssertion();
-      revert(originalSelector);
+      revert(originalSelector, selector);
     },
-    [revert, originalSelector]
+    [revert, originalSelector, selector]
   );
 
   return (

@@ -15,7 +15,7 @@ import {TTestDefinitionEntry} from 'types/TestDefinition.types';
 import useTestDefinitionCrud from './hooks/useTestDefinitionCrud';
 
 interface IContext {
-  revert: (originalSelector: string) => void;
+  revert: (originalSelector: string, selector: string) => void;
   add(testDefinition: TTestDefinitionEntry): void;
   update(selector: string, testDefinition: TTestDefinitionEntry): void;
   remove(selector: string): void;
@@ -62,15 +62,16 @@ const TestDefinitionProvider: React.FC<IProps> = ({children, testId, runId}) => 
   const {run} = useTestRun();
   const assertionResults = useAppSelector(state => TestDefinitionSelectors.selectAssertionResults(state));
   const definitionList = useAppSelector(state => TestDefinitionSelectors.selectDefinitionList(state));
+  const isDraftMode = useAppSelector(state => TestDefinitionSelectors.selectIsDraftMode(state));
   const isLoading = useAppSelector(state => TestDefinitionSelectors.selectIsLoading(state));
   const isInitialized = useAppSelector(state => TestDefinitionSelectors.selectIsInitialized(state));
   const {data: test} = useGetTestByIdQuery({testId});
 
-  const {add, cancel, publish, runTest, remove, dryRun, update, isDraftMode, init, reset, revert} =
-    useTestDefinitionCrud({
-      testId,
-      runId,
-    });
+  const {add, cancel, publish, runTest, remove, dryRun, update, init, reset, revert} = useTestDefinitionCrud({
+    testId,
+    runId,
+    isDraftMode,
+  });
 
   useEffect(() => {
     if (run.state === 'FINISHED') init(run.result);

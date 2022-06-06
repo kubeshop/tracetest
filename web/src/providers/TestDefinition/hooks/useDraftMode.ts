@@ -1,8 +1,6 @@
-import {useEffect, useState} from 'react';
+import {useEffect} from 'react';
 
-const useDraftMode = (isDefaultDraftMode = false) => {
-  const [isDraftMode, setIsDraftMode] = useState(isDefaultDraftMode);
-
+const useDraftMode = (isDraftMode: boolean) => {
   useEffect(() => {
     if (isDraftMode) window.onbeforeunload = () => true;
     else window.onbeforeunload = null;
@@ -13,8 +11,6 @@ const useDraftMode = (isDefaultDraftMode = false) => {
       window.onbeforeunload = null;
     };
   }, []);
-
-  return {isDraftMode, setIsDraftMode};
 };
 
 export default useDraftMode;

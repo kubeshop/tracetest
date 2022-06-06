@@ -86,6 +86,7 @@ describe('TestDefinitionReducer', () => {
       expect(Reducer(state, addDefinition({definition}))).toEqual({
         ...initialState,
         definitionList: [...definitionList, definition],
+        isDraftMode: true,
       });
     });
 
@@ -98,12 +99,17 @@ describe('TestDefinitionReducer', () => {
         })
       );
 
-      expect(result.definitionList[0]).toEqual(definition);
+      expect(result.definitionList[0]).toEqual({...definition, originalSelector: undefined});
       expect(result).toEqual({
         ...initialState,
-        definitionList: [definition, ...definitionList.slice(1, definitionList.length)],
+        definitionList: [
+          {...definition, originalSelector: undefined},
+          ...definitionList.slice(1, definitionList.length),
+        ],
+        isDraftMode: true,
       });
     });
+
     it('should handle the revert definition action', () => {
       const initialSelector = 'span[http.status_code] = "204"]';
       const result = Reducer(
@@ -118,6 +124,7 @@ describe('TestDefinitionReducer', () => {
         },
         revertDefinition({
           originalSelector: definitionSelector,
+          selector: '',
         })
       );
 
@@ -138,6 +145,7 @@ describe('TestDefinitionReducer', () => {
           {...definitionList[0], isDraft: true, isDeleted: true},
           ...definitionList.slice(1, definitionList.length),
         ],
+        isDraftMode: true,
       });
     });
   });
@@ -179,5 +187,13 @@ describe('TestDefinitionReducer', () => {
       expect(result.assertionResults).toEqual(run.result);
       expect(result.initialDefinitionList).toEqual(assertionResultsToDefinitionList(run.result));
     });
+  });
+
+  it('should handle on pending publish', () => {
+    const result = Reducer(initialState, {
+      type: 'testDefinition/publish/pending',
+    });
+
+    expect(result.isDraftMode).toBeFalsy();
   });
 });
