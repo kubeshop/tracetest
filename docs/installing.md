@@ -52,7 +52,7 @@ Tracetest currently supports two traces backend: Jaeger and Grafana Tempo.
 
 Tracetest uses [Jaeger Query Service `16685` port](https://www.jaegertracing.io/docs/1.32/deployment/#query-service--ui) to find Traces using gRPC protocol.
 
-The commands below will install Tracetest connecting to Jaeger tracing backend on `jaeger-query:16685`.
+The commands below will install Tracetest connecting to the Jaeger tracing backend on `jaeger-query:16685`.
 
 ```sh
 # Install Kubeshop Helm repo and update it
