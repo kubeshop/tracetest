@@ -23,7 +23,7 @@ We provide a simple install script that can install all required components:
 curl -L https://raw.githubusercontent.com/kubeshop/main/setup.sh | bash -s
 ```
 
-This command will install tracetest using the default settings. You can configure the following options:
+This command will install Tracetest using the default settings. You can configure the following options:
 
 
 | Option                   | description                                  | Default value      |
