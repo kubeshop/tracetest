@@ -25,6 +25,7 @@ export const Controls = styled.div`
 
 export const ZoomButton = styled(Button)`
   color: rgba(3, 24, 73, 0.3);
+  width: 24px;
 
   &:hover,
   &:focus {
