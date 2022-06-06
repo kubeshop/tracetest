@@ -15,7 +15,7 @@ import {TTestDefinitionEntry} from 'types/TestDefinition.types';
 import useTestDefinitionCrud from './hooks/useTestDefinitionCrud';
 
 interface IContext {
-  revert: (originalSelector: string, selector: string) => void;
+  revert: (originalSelector: string) => void;
   add(testDefinition: TTestDefinitionEntry): void;
   update(selector: string, testDefinition: TTestDefinitionEntry): void;
   remove(selector: string): void;

@@ -49,7 +49,7 @@ export type TTestDefinitionSliceActions = {
     PayloadAction<{definition: TTestDefinitionEntry; selector: string}>
   >;
   removeDefinition: CaseReducer<ITestDefinitionState, PayloadAction<{selector: string}>>;
-  revertDefinition: CaseReducer<ITestDefinitionState, PayloadAction<{originalSelector: string; selector: string}>>;
+  revertDefinition: CaseReducer<ITestDefinitionState, PayloadAction<{originalSelector: string}>>;
   resetDefinitionList: CaseReducer<ITestDefinitionState>;
   setAssertionResults: CaseReducer<ITestDefinitionState, PayloadAction<TAssertionResults>>;
   clearAffectedSpans: CaseReducer<ITestDefinitionState>;

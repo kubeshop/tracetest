@@ -15,8 +15,8 @@ import {
 } from '../../../redux/slices/TestDefinition.slice';
 import {TAssertionResults} from '../../../types/Assertion.types';
 import {TTestDefinitionEntry} from '../../../types/TestDefinition.types';
-import useDraftMode from './useDraftMode';
 import TestRunGateway from '../../../gateways/TestRun.gateway';
+import useBlockNavigation from '../../../hooks/useBlockNavigation';
 
 interface IProps {
   runId: string;
@@ -25,13 +25,13 @@ interface IProps {
 }
 
 const useTestDefinitionCrud = ({runId, testId, isDraftMode}: IProps) => {
-  useDraftMode(isDraftMode);
+  useBlockNavigation(isDraftMode);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   const revert = useCallback(
-    (originalSelector: string, selector: string) => {
-      return dispatch(revertDefinition({originalSelector, selector}));
+    (originalSelector: string) => {
+      return dispatch(revertDefinition({originalSelector}));
     },
     [dispatch]
   );

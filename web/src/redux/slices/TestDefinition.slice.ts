@@ -69,7 +69,7 @@ const testDefinitionSlice = createSlice<ITestDefinitionState, TTestDefinitionSli
         return def;
       });
     },
-    revertDefinition(state, {payload: {originalSelector, selector}}) {
+    revertDefinition(state, {payload: {originalSelector}}) {
       const initialDefinition = state.initialDefinitionList.find(
         definition => definition.originalSelector === originalSelector
       );
@@ -78,7 +78,7 @@ const testDefinitionSlice = createSlice<ITestDefinitionState, TTestDefinitionSli
         ? state.definitionList.map(definition =>
             definition.originalSelector === originalSelector ? initialDefinition : definition
           )
-        : state.definitionList.filter(definition => definition.selector !== selector);
+        : state.definitionList.filter(definition => definition.selector !== originalSelector);
 
       const pendingChanges = state.definitionList.filter(({isDraft}) => isDraft).length;
 
