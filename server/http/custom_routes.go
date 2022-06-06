@@ -6,6 +6,8 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/kubeshop/tracetest/server/openapi"
+	"go.opentelemetry.io/otel/attribute"
+	semconv "go.opentelemetry.io/otel/semconv/v1.10.0"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -28,7 +30,7 @@ func (c *customController) Routes() openapi.Routes {
 
 	for index, route := range routes {
 		routeName := fmt.Sprintf("%s %s", route.Method, route.Pattern)
-		newRouteHandlerFunc := c.instrumentRoute(routeName, route.HandlerFunc)
+		newRouteHandlerFunc := c.instrumentRoute(routeName, route.Pattern, route.HandlerFunc)
 		route.HandlerFunc = newRouteHandlerFunc
 
 		routes[index] = route
@@ -37,10 +39,15 @@ func (c *customController) Routes() openapi.Routes {
 	return routes
 }
 
-func (c *customController) instrumentRoute(name string, f http.HandlerFunc) http.HandlerFunc {
+func (c *customController) instrumentRoute(name string, route string, f http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx, span := c.tracer.Start(r.Context(), name)
 		defer span.End()
+		span.SetAttributes(
+			attribute.String(string(semconv.HTTPMethodKey), r.Method),
+			attribute.String(string(semconv.HTTPRouteKey), route),
+		)
+
 		newRequest := r.WithContext(ctx)
 
 		f(w, newRequest)
