@@ -27,7 +27,7 @@ const TraceActions: React.FC = () => {
         data-cy="trace-actions-publish"
         onClick={() => {
           TraceAnalyticsService.onPublishClick();
-          publish;
+          publish();
         }}
       >
         Publish

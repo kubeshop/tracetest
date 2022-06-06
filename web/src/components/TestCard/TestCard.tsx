@@ -21,8 +21,9 @@ const TestCard = ({onClick, onDelete, onRunTest, test: {name, serviceUnderTest, 
   const [loadResultList, {data: resultList = []}] = useLazyGetRunListQuery();
 
   const onCollapse = useCallback(async () => {
+    TestAnalyticsService.onTestCardCollapse();
+
     if (resultList.length > 0) {
-      TestAnalyticsService.onTestCardCollapse();
       setIsCollapsed(true);
       return;
     }
