@@ -3,6 +3,7 @@ package junit
 import (
 	"encoding/xml"
 	"errors"
+	"fmt"
 
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/model"
@@ -14,6 +15,9 @@ func FromRunResult(test model.Test, run model.Run) ([]byte, error) {
 
 	var testTotals, testFails, testErrs int
 
+	if run.Results == nil {
+		return nil, fmt.Errorf("run has no results")
+	}
 	run.Results.Results.Map(func(selector model.SpanQuery, results []model.AssertionResult) {
 		checks := []check{}
 		var total, fails, errs int

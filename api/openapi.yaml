@@ -293,7 +293,6 @@ paths:
             application/xml:
               schema:
                 type: string
-                format: binary
 
 
   /tests/{testId}/run/{runId}:
