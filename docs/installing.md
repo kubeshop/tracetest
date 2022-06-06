@@ -46,13 +46,13 @@ curl -L https://raw.githubusercontent.com/kubeshop/main/setup.sh | bash -s -- --
 
 Container images are hosted on the Docker Hub [Tracetest repository](https://hub.docker.com/r/kubeshop/tracetest).
 
-There are two options to install Tracetest
+Tracetest currently supports two traces backend: Jaeger and Grafana Tempo.
 
 #### **Jaeger**
 
-Tracetest uses [Jaeger Query Service `16685` port](https://www.jaegertracing.io/docs/1.32/deployment/#query-service--ui), which allows Tracetest to find Traces using GRPC protocol.
+Tracetest uses [Jaeger Query Service `16685` port](https://www.jaegertracing.io/docs/1.32/deployment/#query-service--ui) to find Traces using gRPC protocol.
 
-The commands below will install the Tracetest application connecting to Jaeger tracing backend on `jaeger-query:16685`.
+The commands below will install Tracetest connecting to Jaeger tracing backend on `jaeger-query:16685`.
 
 ```sh
 # Install Kubeshop Helm repo and update it
@@ -61,12 +61,12 @@ helm repo update
 
 helm install tracetest kubeshop/tracetest \
   --set tracingBackend=jaeger \
-  --set jaegerConnectionConfig.endpoint="jaeger-query:16685"
+  --set jaegerConnectionConfig.endpoint="jaeger-query:16685" # update this value to point to your jaeger install
 ```
 
 #### **Grafana Tempo**
 
-Tracetest uses [Grafana Tempo's Server's `9095` port](https://grafana.com/docs/tempo/latest/configuration/#server), which allows Tracetest to find Traces using GRPC protocol.
+Tracetest uses [Grafana Tempo's Server's `9095` port](https://grafana.com/docs/tempo/latest/configuration/#server) to find Traces using gRPC protocol.
 
 
 The commands below will install the Tracetest application connecting to Grafana Tempo tracing backend on `grafana-tempo:9095`:
@@ -78,7 +78,7 @@ helm repo update
 
 helm install tracetest kubeshop/tracetest \
   --set tracingBackend=tempo \
-  --set tempoConnectionConfig.endpoint="grafana-tempo:9095"
+  --set tempoConnectionConfig.endpoint="grafana-tempo:9095"  # update this value to point to your tempo install
 ```
 
 ## **Uninstallation**
@@ -86,7 +86,5 @@ helm install tracetest kubeshop/tracetest \
 The following command will uninstall Tracetest with Postgres:
 
 ```sh
-# Delete releases
-
 helm delete tracetest
 ```
