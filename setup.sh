@@ -160,7 +160,7 @@ if [ "$SKIP_PMA" != "YES" ]; then
       --set 'env[5].value=jaeger-agent.'$NAMESPACE'.svc.cluster.local'
 
     echo "--> waiting for demo app to be ready"
-    kubectl wait --for=condition=ready pod --namespace demo demo-rabbitmq-0
+    kubectl wait --for=condition=ready pod --namespace demo demo-rabbitmq-0 --timeout 2m
     kubectl wait --for=condition=ready pod --namespace demo -l app.kubernetes.io/name=pokemon-api
     echo "--> demo app ready"
     rm -rf $tmpdir
