@@ -1,6 +1,7 @@
 import {Typography} from 'antd';
 import {useCallback} from 'react';
 import {useTestDefinition} from '../../providers/TestDefinition/TestDefinition.provider';
+import AssertionAnalyticsService from '../../services/Analytics/AssertionAnalytics.service';
 import {TAssertionResultEntry, TAssertionResults} from '../../types/Assertion.types';
 import AssertionCard from '../AssertionCard/AssertionCard';
 import {useAssertionForm} from '../AssertionForm/AssertionFormProvider';
@@ -18,6 +19,7 @@ const AssertionCardList: React.FC<TAssertionCardListProps> = ({assertionResults:
 
   const handleEdit = useCallback(
     ({selector, resultList: list, selectorList, pseudoSelector}: TAssertionResultEntry) => {
+      AssertionAnalyticsService.onAssertionEdit();
       open({
         isEditing: true,
         selector,
@@ -33,6 +35,7 @@ const AssertionCardList: React.FC<TAssertionCardListProps> = ({assertionResults:
 
   const handleDelete = useCallback(
     (selector: string) => {
+      AssertionAnalyticsService.onAssertionDelete();
       remove(selector);
     },
     [remove]

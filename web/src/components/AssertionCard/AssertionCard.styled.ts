@@ -1,4 +1,4 @@
-import {DeleteOutlined, EditOutlined} from '@ant-design/icons';
+import {DeleteOutlined, EditOutlined, UndoOutlined} from '@ant-design/icons';
 import {Tag, Typography} from 'antd';
 import styled, {css} from 'styled-components';
 
@@ -36,12 +36,17 @@ const baseIcon = css`
 `;
 
 export const EditIcon = styled(EditOutlined)`
-  ${baseIcon}
+  ${baseIcon};
+  margin-left: 12px;
 `;
 
 export const DeleteIcon = styled(DeleteOutlined)`
   ${baseIcon};
   margin-left: 12px;
+`;
+
+export const UndoIcon = styled(UndoOutlined)`
+  ${baseIcon};
 `;
 
 export const ActionsContainer = styled.div`

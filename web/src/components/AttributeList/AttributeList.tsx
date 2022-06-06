@@ -5,6 +5,7 @@ import {TResultAssertions} from 'types/Assertion.types';
 import {TSpanFlatAttribute} from 'types/Span.types';
 import * as S from './AttributeList.styled';
 import EmptyAttributeList from './EmptyAttributeList';
+import TraceAnalyticsService from '../../services/Analytics/TraceAnalytics.service';
 
 interface IProps {
   assertions?: TResultAssertions;
@@ -16,6 +17,7 @@ const AttributeList: React.FC<IProps> = ({assertions, attributeList, onCreateAss
   const [isCopied, setIsCopied] = useState(false);
 
   const onCopy = (value: string) => {
+    TraceAnalyticsService.onAttributeCopy();
     navigator.clipboard.writeText(value);
     setIsCopied(true);
   };

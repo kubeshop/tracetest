@@ -25,7 +25,7 @@ const TestList = () => {
   const onRunTest = useCallback(
     async (testId: string) => {
       if (testId) {
-        TestAnalyticsService.onRunTest(testId);
+        TestAnalyticsService.onRunTest();
         const testRun = await runTest({testId}).unwrap();
         navigate(`/test/${testId}/run/${testRun.id}`);
       }

@@ -1,6 +1,6 @@
+import {Categories, Labels} from 'constants/Analytics.constants';
 import CreateTestAnalyticsService, {Actions} from '../CreateTestAnalytics.service';
 import AnalyticsService from '../Analytics.service';
-import {Categories, Labels} from '../../../constants/Analytics.constants';
 
 jest.mock('../Analytics.service', () => {
   return {
@@ -9,9 +9,15 @@ jest.mock('../Analytics.service', () => {
 });
 
 describe('CreateTestAnalyticsService', () => {
-  it('should trigger the onCreateAssertionFormSubmit event', () => {
+  it('should trigger the onDemoTestClick event', () => {
     CreateTestAnalyticsService.onCreateTestFormSubmit();
 
     expect(AnalyticsService.event).toHaveBeenCalledWith(Categories.Home, Actions.CreateTestFormSubmit, Labels.Form);
+  });
+
+  it('should trigger the onDemoTestClick event', () => {
+    CreateTestAnalyticsService.onDemoTestClick();
+
+    expect(AnalyticsService.event).toHaveBeenCalledWith(Categories.Home, Actions.DemoTestClick, Labels.Button);
   });
 });

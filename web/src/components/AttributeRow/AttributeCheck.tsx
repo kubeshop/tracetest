@@ -4,6 +4,7 @@ import {useAssertionForm} from 'components/AssertionForm/AssertionFormProvider';
 import useScrollTo from 'hooks/useScrollTo';
 import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
 import {IResult} from 'types/Assertion.types';
+import TraceAnalyticsService from '../../services/Analytics/TraceAnalytics.service';
 import {DrawerState} from '../ResizableDrawer/ResizableDrawer';
 import * as S from './AttributeRow.styled';
 
@@ -18,6 +19,7 @@ const AttributeCheck = ({items, type}: IProps) => {
   const scrollTo = useScrollTo();
 
   const handleOnClick = (id: string) => {
+    TraceAnalyticsService.onAttributeCheckClick();
     setDrawerState(DrawerState.OPEN);
     setSelectedAssertion(id);
     scrollTo({elementId: `assertion-${id}`, containerId: 'assertions-container'});

@@ -35,7 +35,7 @@ const TestDetails = ({onSelectResult, testId}: IProps) => {
 
   const handleRunTest = useCallback(async () => {
     if (testId) {
-      onRunTest(testId);
+      onRunTest();
       const testResult = await runTest({testId}).unwrap();
       onSelectResult(testResult);
     }

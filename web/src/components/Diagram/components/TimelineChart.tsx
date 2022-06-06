@@ -121,7 +121,7 @@ export const TimelineChart = ({affectedSpans, trace, selectedSpan, onSelectSpan}
       .attr('x', el => el.x)
       .attr('y', el => el.y)
       .on('click', (event, d) => {
-        onTimelineSpanClick(d.id);
+        onTimelineSpanClick();
         if (onSelectSpan) onSelectSpan(d.id);
       });
 

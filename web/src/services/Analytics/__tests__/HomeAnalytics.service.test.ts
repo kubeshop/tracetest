@@ -1,6 +1,6 @@
+import {Categories, Labels} from 'constants/Analytics.constants';
 import HomeAnalyticsService, {Actions} from '../HomeAnalytics.service';
 import AnalyticsService from '../Analytics.service';
-import {Categories, Labels} from '../../../constants/Analytics.constants';
 
 jest.mock('../Analytics.service', () => {
   return {

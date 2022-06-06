@@ -1,4 +1,4 @@
-import {Categories, Labels} from '../../constants/Analytics.constants';
+import {Categories, Labels} from 'constants/Analytics.constants';
 import AnalyticsService from './Analytics.service';
 
 export enum Actions {

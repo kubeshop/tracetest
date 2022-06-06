@@ -11,6 +11,7 @@ import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
 import {TTest} from 'types/Test.types';
 import {TTestRun} from 'types/TestRun.types';
 import * as S from './Trace.styled';
+import TraceAnalyticsService from '../../services/Analytics/TraceAnalytics.service';
 
 interface IProps {
   displayError: boolean;
@@ -33,7 +34,7 @@ const Trace = ({displayError, visiblePortion, minHeight, test, run}: IProps): JS
       if (span) addSelected([{id: span?.id}]);
       dispatch(setSelectedSpan(span));
     },
-    [dispatch, run?.trace?.spans]
+    [addSelected, dispatch, run?.trace?.spans]
   );
 
   return !displayError ? (
@@ -41,7 +42,10 @@ const Trace = ({displayError, visiblePortion, minHeight, test, run}: IProps): JS
       <S.Main height={minHeight}>
         <S.DiagramSection>
           <DiagramSwitcher
-            onTypeChange={setDiagramType}
+            onTypeChange={type => {
+              TraceAnalyticsService.onSwitchDiagramView(type);
+              setDiagramType(type);
+            }}
             onSearch={() => console.log('onSearch')}
             selectedType={diagramType}
           />

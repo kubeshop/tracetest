@@ -7,6 +7,7 @@ import {useLazyGetRunListQuery} from 'redux/apis/TraceTest.api';
 import {TTest} from 'types/Test.types';
 import * as S from './TestCard.styled';
 import TestCardActions from './TestCardActions';
+import TestAnalyticsService from '../../services/Analytics/TestAnalytics.service';
 
 interface IProps {
   onClick(testId: string): void;
@@ -21,6 +22,7 @@ const TestCard = ({onClick, onDelete, onRunTest, test: {name, serviceUnderTest, 
 
   const onCollapse = useCallback(async () => {
     if (resultList.length > 0) {
+      TestAnalyticsService.onTestCardCollapse();
       setIsCollapsed(true);
       return;
     }
@@ -57,6 +59,7 @@ const TestCard = ({onClick, onDelete, onRunTest, test: {name, serviceUnderTest, 
             data-cy={`test-run-button-${testId}`}
             onClick={event => {
               event.stopPropagation();
+              TestAnalyticsService.onRunTest();
               onRunTest(testId);
             }}
           >

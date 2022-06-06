@@ -2,6 +2,7 @@ import {Button, Popover, Typography} from 'antd';
 import {InfoCircleOutlined} from '@ant-design/icons';
 
 import Date from 'utils/Date';
+import TestAnalyticsService from '../../services/Analytics/TestAnalytics.service';
 
 interface IProps {
   date: string;
@@ -33,7 +34,13 @@ const Info = ({date, executionTime, totalSpans, traceId}: IProps) => {
   );
 
   return (
-    <Popover placement="right" content={content}>
+    <Popover
+      placement="right"
+      content={content}
+      onVisibleChange={isVisible => {
+        isVisible && TestAnalyticsService.onDisplayTestInfo();
+      }}
+    >
       <Button
         icon={<InfoCircleOutlined style={{color: 'rgba(3, 24, 73, 0.6)'}} />}
         shape="circle"

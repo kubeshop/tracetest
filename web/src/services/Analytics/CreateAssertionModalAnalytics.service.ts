@@ -1,4 +1,4 @@
-import {Categories, Labels} from '../../constants/Analytics.constants';
+import {Categories, Labels} from 'constants/Analytics.constants';
 import AnalyticsService from './Analytics.service';
 
 export enum Actions {
@@ -8,32 +8,25 @@ export enum Actions {
   ChecksChange = 'create-assertion-modal-assertion-checks-change',
   AddCheck = 'create-assertion-modal-add-check',
   RemoveCheck = 'create-assertion-modal-remove-check',
+  OpenForm = 'open-create-assertion-modal-form',
+  ConfirmationModalOpen = 'open-create-assertion-modal-confirmation-modal',
 }
 
-type TCreateAssertionModalAnalytics = {
-  onEditAssertionFormSubmit(assertionId: string): void;
-  onCreateAssertionFormSubmit(testId: string): void;
-  onSelectorChange(selector: string): void;
-  onChecksChange(checks: string): void;
-  onAddCheck(): void;
-  onRemoveCheck(): void;
-};
-
-const CreateAssertionModalAnalyticsService = (): TCreateAssertionModalAnalytics => {
-  const onCreateAssertionFormSubmit = (testId: string) => {
-    AnalyticsService.event(Categories.Assertion, Actions.CreateAssertionFormSubmit, testId);
+const CreateAssertionModalAnalyticsService = () => {
+  const onCreateAssertionFormSubmit = () => {
+    AnalyticsService.event(Categories.Assertion, Actions.CreateAssertionFormSubmit, Labels.Form);
   };
 
-  const onEditAssertionFormSubmit = (assertionId: string) => {
-    AnalyticsService.event(Categories.Assertion, Actions.EditAssertionFormSubmit, assertionId);
+  const onEditAssertionFormSubmit = () => {
+    AnalyticsService.event(Categories.Assertion, Actions.EditAssertionFormSubmit, Labels.Form);
   };
 
-  const onSelectorChange = (selector: string) => {
-    AnalyticsService.event(Categories.Assertion, Actions.SelectorChange, selector);
+  const onSelectorChange = () => {
+    AnalyticsService.event(Categories.Assertion, Actions.SelectorChange, Labels.Input);
   };
 
-  const onChecksChange = (checks: string) => {
-    AnalyticsService.event(Categories.Assertion, Actions.ChecksChange, checks);
+  const onChecksChange = () => {
+    AnalyticsService.event(Categories.Assertion, Actions.ChecksChange, Labels.Input);
   };
 
   const onAddCheck = () => {
@@ -44,6 +37,14 @@ const CreateAssertionModalAnalyticsService = (): TCreateAssertionModalAnalytics 
     AnalyticsService.event(Categories.Assertion, Actions.RemoveCheck, Labels.Button);
   };
 
+  const onAssertionFormOpen = () => {
+    AnalyticsService.event(Categories.Assertion, Actions.OpenForm, Labels.Button);
+  };
+
+  const onConfirmationModalOpen = () => {
+    AnalyticsService.event(Categories.Assertion, Actions.ConfirmationModalOpen, Labels.Button);
+  };
+
   return {
     onCreateAssertionFormSubmit,
     onEditAssertionFormSubmit,
@@ -51,6 +52,8 @@ const CreateAssertionModalAnalyticsService = (): TCreateAssertionModalAnalytics 
     onChecksChange,
     onAddCheck,
     onRemoveCheck,
+    onAssertionFormOpen,
+    onConfirmationModalOpen,
   };
 };
 

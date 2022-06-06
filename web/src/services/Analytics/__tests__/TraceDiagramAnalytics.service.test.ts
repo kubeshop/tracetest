@@ -1,6 +1,6 @@
+import {Categories} from 'constants/Analytics.constants';
 import TraceDiagramAnalyticsService, {Actions} from '../TraceDiagramAnalytics.service';
 import AnalyticsService from '../Analytics.service';
-import {Categories} from '../../../constants/Analytics.constants';
 
 jest.mock('../Analytics.service', () => {
   return {
