@@ -69,7 +69,7 @@ helm install tracetest kubeshop/tracetest \
 Tracetest uses [Grafana Tempo's Server's `9095` port](https://grafana.com/docs/tempo/latest/configuration/#server) to find Traces using gRPC protocol.
 
 
-The commands below will install the Tracetest application connecting to Grafana Tempo tracing backend on `grafana-tempo:9095`:
+The commands below will install the Tracetest application connecting to the Grafana Tempo tracing backend on `grafana-tempo:9095`:
 
 ```sh
 # Install Kubeshop Helm repo and update it
