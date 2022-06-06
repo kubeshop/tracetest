@@ -51,9 +51,9 @@ func (is instrumentedServicer) CreateTest(ctx context.Context, test openapi.Test
 			return is.servicer.CreateTest(ctx, test)
 		},
 		func() []attribute.KeyValue {
-			testJson, _ := json.Marshal(test)
+			body, _ := json.Marshal(test)
 			return []attribute.KeyValue{
-				attribute.String("http.request.body", string(testJson)),
+				attribute.String("http.request.body", string(body)),
 			}
 		},
 	)
@@ -105,8 +105,10 @@ func (is instrumentedServicer) DryRunAssertion(ctx context.Context, testID strin
 				"runID":  runID,
 			}
 			paramsJson, _ := json.Marshal(params)
+			body, _ := json.Marshal(definition)
 			return []attribute.KeyValue{
 				attribute.String("http.request.params", string(paramsJson)),
+				attribute.String("http.request.body", string(body)),
 			}
 		},
 	)
@@ -153,8 +155,9 @@ func (is instrumentedServicer) GetTestResultSelectedSpans(ctx context.Context, t
 		},
 		func() []attribute.KeyValue {
 			params := map[string]interface{}{
-				"testID": testID,
-				"runID":  runID,
+				"testID":   testID,
+				"runID":    runID,
+				"selector": selector,
 			}
 			paramsJson, _ := json.Marshal(params)
 			return []attribute.KeyValue{
@@ -264,8 +267,10 @@ func (is instrumentedServicer) SetTestDefinition(ctx context.Context, testID str
 				"testID": testID,
 			}
 			paramsJson, _ := json.Marshal(params)
+			body, _ := json.Marshal(definition)
 			return []attribute.KeyValue{
 				attribute.String("http.request.params", string(paramsJson)),
+				attribute.String("http.request.body", string(body)),
 			}
 		},
 	)
@@ -281,8 +286,10 @@ func (is instrumentedServicer) UpdateTest(ctx context.Context, testID string, te
 				"testID": testID,
 			}
 			paramsJson, _ := json.Marshal(params)
+			body, _ := json.Marshal(test)
 			return []attribute.KeyValue{
 				attribute.String("http.request.params", string(paramsJson)),
+				attribute.String("http.request.body", string(body)),
 			}
 		},
 	)
