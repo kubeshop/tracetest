@@ -84,8 +84,9 @@ func (a *App) Start() error {
 
 	controller := httpServer.NewController(a.db, runner, assertionRunner)
 	apiApiController := openapi.NewApiApiController(controller)
+	customController := httpServer.NewCustomController(controller, apiApiController, openapi.DefaultErrorHandler)
 
-	router := openapi.NewRouter(apiApiController)
+	router := openapi.NewRouter(customController)
 
 	router.PathPrefix("/").Handler(
 		spaHandler(
