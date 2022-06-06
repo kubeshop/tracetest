@@ -13,6 +13,7 @@ type TestRepository interface {
 	UpdateTestVersion(context.Context, Test) error
 	DeleteTest(context.Context, Test) error
 	GetLatestTestVersion(context.Context, uuid.UUID) (Test, error)
+	GetTestVersion(_ context.Context, _ uuid.UUID, verson int) (Test, error)
 	GetTests(_ context.Context, take, skip int32) ([]Test, error)
 }
 

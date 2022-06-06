@@ -14,6 +14,7 @@ import (
 	"github.com/kubeshop/tracetest/server/assertions/selectors"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/id"
+	"github.com/kubeshop/tracetest/server/junit"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/testdb"
@@ -351,6 +352,35 @@ func (c *controller) DryRunAssertion(ctx context.Context, _, runID string, def o
 		AllPassed: allPassed,
 		Results:   results,
 	})
+
+	return openapi.Response(200, res), nil
+}
+
+func (c *controller) GetRunResultJUnit(ctx context.Context, testID string, runID string) (openapi.ImplResponse, error) {
+	rid, err := uuid.Parse(runID)
+	if err != nil {
+		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
+	}
+
+	run, err := c.testDB.GetRun(ctx, rid)
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	tid, err := uuid.Parse(testID)
+	if err != nil {
+		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
+	}
+
+	test, err := c.testDB.GetTestVersion(ctx, tid, run.TestVersion)
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	res, err := junit.FromRunResult(test, run)
+	if err != nil {
+		return openapi.Response(http.StatusInternalServerError, err.Error()), err
+	}
 
 	return openapi.Response(200, res), nil
 }

@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -68,6 +69,10 @@ type (
 		CompareErr    error
 	}
 )
+
+func (a Assertion) String() string {
+	return fmt.Sprintf(`"%s" %s "%s"`, a.Attribute, a.Comparator, a.Value)
+}
 
 type RunState string
 
