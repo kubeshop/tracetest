@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Example test" tests="3" failures="1" errors="1" skipped="0" time="11">
+  <testsuite name="span[tracetest.span.type = &quot;database&quot;]"
+    tests="3"
+    failures="1"
+    errors="1"
+    skipped="0">
+    <testcase name="&quot;db.statement&quot; contains &quot;INSERT&quot;"></testcase>
+    <testcase name="&quot;tracetest.span.duration&quot; &lt; &quot;500&quot;">
+      <error type="error" message="cannot parse &quot;notANumber&quot; as integer" />
+    </testcase>
+    <testcase name="&quot;tracetest.span.type&quot; = &quot;http&quot;">
+      <failure type="tracetest.span.type" message="database" />
+    </testcase>
+  </testsuite>
+</testsuites>
