@@ -86,8 +86,7 @@ func (a *App) Start() error {
 	defer runner.Stop()
 
 	controller := httpServer.NewController(a.db, runner, assertionRunner)
-	instrumentedController := httpServer.NewInstrumentedServicer(a.tracer, controller)
-	apiApiController := openapi.NewApiApiController(instrumentedController)
+	apiApiController := openapi.NewApiApiController(controller)
 	customController := httpServer.NewCustomController(controller, apiApiController, openapi.DefaultErrorHandler, a.tracer)
 
 	router := openapi.NewRouter(customController)

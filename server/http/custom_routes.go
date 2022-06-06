@@ -1,6 +1,7 @@
 package http
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -43,10 +44,33 @@ func (c *customController) instrumentRoute(name string, route string, f http.Han
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx, span := c.tracer.Start(r.Context(), name)
 		defer span.End()
+
+		params := make(map[string]interface{}, 0)
+		for key, value := range mux.Vars(r) {
+			params[key] = value
+		}
+
+		paramsJson, _ := json.Marshal(params)
+
+		queryString := make(map[string]interface{}, 0)
+		for key, value := range r.URL.Query() {
+			queryString[key] = value
+		}
+		queryStringJson, _ := json.Marshal(queryString)
+
+		headers := make(map[string]interface{}, 0)
+		for key, value := range r.Header {
+			headers[key] = value
+		}
+		headersJson, _ := json.Marshal(headers)
+
 		span.SetAttributes(
 			attribute.String(string(semconv.HTTPMethodKey), r.Method),
 			attribute.String(string(semconv.HTTPRouteKey), route),
 			attribute.String(string(semconv.HTTPTargetKey), r.URL.String()),
+			attribute.String("http.request.params", string(paramsJson)),
+			attribute.String("http.request.query", string(queryStringJson)),
+			attribute.String("http.request.headers", string(headersJson)),
 		)
 
 		newRequest := r.WithContext(ctx)
