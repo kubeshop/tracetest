@@ -15,10 +15,10 @@ const MultiSelectInputTag: React.FC<IProps> = ({value, entryListCount, onDeselec
     <S.SelectedTag
       {...props}
       closable={isLast}
-      onClose={event => {
-        event.stopPropagation();
-        event.preventDefault();
-
+      onMouseDown={e => {
+        if (isLast) e.stopPropagation();
+      }}
+      onClose={() => {
         onDeselect(Number(entryNumber));
       }}
       isLast={isLast}
