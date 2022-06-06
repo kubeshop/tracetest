@@ -47,6 +47,8 @@ func main() {
 		log.Fatal(err)
 	}
 
+	defer tracing.ShutdownTracer(ctx)
+
 	app, err := app.New(cfg, testDB, traceDB, tracer)
 	if err != nil {
 		log.Fatal(err)

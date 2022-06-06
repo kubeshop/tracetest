@@ -6,14 +6,26 @@ import (
 	"os"
 
 	"github.com/kubeshop/tracetest/server/config"
+	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/jaeger"
 	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.10.0"
+	"go.opentelemetry.io/otel/trace"
 )
 
-func NewTracer(ctx context.Context, config config.Config) (*sdktrace.TracerProvider, error) {
+var tracerProviderInstance *sdktrace.TracerProvider
+
+func ShutdownTracer(ctx context.Context) error {
+	if tracerProviderInstance != nil {
+		return tracerProviderInstance.Shutdown(ctx)
+	}
+
+	return nil
+}
+
+func NewTracer(ctx context.Context, config config.Config) (trace.Tracer, error) {
 	r, err := resource.Merge(
 		resource.Default(),
 		resource.NewWithAttributes(
@@ -32,14 +44,24 @@ func NewTracer(ctx context.Context, config config.Config) (*sdktrace.TracerProvi
 			return nil, fmt.Errorf(`could not create "%s" exporter: %w`, exporterName, err)
 		}
 
-		tracerOptions = append(tracerOptions, sdktrace.WithBatcher(exporter))
+		processor := sdktrace.NewSimpleSpanProcessor(exporter)
+		tracerOptions = append(tracerOptions, sdktrace.WithSpanProcessor(processor))
 	}
 
+	sampleRate := config.Telemetry.Sampling / 100.0
 	tracerOptions = append(tracerOptions, sdktrace.WithResource(r))
+	tracerOptions = append(tracerOptions, sdktrace.WithSampler(sdktrace.TraceIDRatioBased(sampleRate)))
 
-	return sdktrace.NewTracerProvider(
+	tracerProvider := sdktrace.NewTracerProvider(
 		tracerOptions...,
-	), nil
+	)
+
+	tracerProviderInstance = tracerProvider
+
+	otel.SetTracerProvider(tracerProvider)
+
+	tracer := tracerProvider.Tracer("tracetest")
+	return tracer, nil
 }
 
 func getExporter(ctx context.Context, config config.Config, name string) (sdktrace.SpanExporter, error) {
@@ -54,7 +76,12 @@ func getExporter(ctx context.Context, config config.Config, name string) (sdktra
 }
 
 func newJaegerExporter(ctx context.Context, config config.Config) (sdktrace.SpanExporter, error) {
-	exporter, err := jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint(config.Telemetry.Jaeger.Endpoint)))
+	exporter, err := jaeger.New(
+		jaeger.WithAgentEndpoint(
+			jaeger.WithAgentHost(config.Telemetry.Jaeger.Host),
+			jaeger.WithAgentPort(fmt.Sprintf("%d", config.Telemetry.Jaeger.Port)),
+		),
+	)
 	if err != nil {
 		return nil, fmt.Errorf("could not get jaeger exporter: %w", err)
 	}

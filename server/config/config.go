@@ -34,12 +34,14 @@ type (
 
 	TelemetryConfig struct {
 		ServiceName string                `mapstructure:"serviceName"`
-		Exporters   []string              `mapstructure:"exporter"`
+		Sampling    float64               `mapstructure:"sampling"`
+		Exporters   []string              `mapstructure:"exporters"`
 		Jaeger      JaegerTelemetryConfig `mapstructure:"jaeger"`
 	}
 
 	JaegerTelemetryConfig struct {
-		Endpoint string `mapstructure:"endpoint"`
+		Host string `mapstructure:"host"`
+		Port int    `mapstructure:"port"`
 	}
 )
 

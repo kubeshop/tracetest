@@ -10,3 +10,11 @@ googleAnalytics:
   enabled: false
   measurementId: ""
   secretKey: ""
+
+telemetry:
+  serviceName: tracetest
+  jaeger:
+    endpoint: localhost:6832
+  exporters:
+    - console
+    - jaeger

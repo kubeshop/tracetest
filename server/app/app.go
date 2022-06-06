@@ -18,17 +18,17 @@ import (
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/tracedb"
-	"go.opentelemetry.io/otel/sdk/trace"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type App struct {
 	config  config.Config
 	db      model.Repository
 	traceDB tracedb.TraceDB
-	tracer  *trace.TracerProvider
+	tracer  trace.Tracer
 }
 
-func New(config config.Config, db model.Repository, tracedb tracedb.TraceDB, tracer *trace.TracerProvider) (*App, error) {
+func New(config config.Config, db model.Repository, tracedb tracedb.TraceDB, tracer trace.Tracer) (*App, error) {
 	app := &App{
 		config:  config,
 		db:      db,
@@ -86,7 +86,8 @@ func (a *App) Start() error {
 	defer runner.Stop()
 
 	controller := httpServer.NewController(a.db, runner, assertionRunner)
-	apiApiController := openapi.NewApiApiController(controller)
+	instrumentedController := httpServer.NewInstrumentedServicer(a.tracer, controller)
+	apiApiController := openapi.NewApiApiController(instrumentedController)
 	customController := httpServer.NewCustomController(controller, apiApiController, openapi.DefaultErrorHandler)
 
 	router := openapi.NewRouter(customController)
