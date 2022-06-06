@@ -2,7 +2,7 @@
 
 During the setup, we'll deploy Tracetest and Postgres with Helm.
 
-For the architectural overview of the components please check the [Architecture](architecture.md) page.
+For the architectural overview of the components, please check the [Architecture](architecture.md) page.
 
 ## **Prerequsities**
 
