@@ -1,5 +1,14 @@
+import {ZoomInOutlined, ZoomOutOutlined} from '@ant-design/icons';
+
 import React, {useCallback, useEffect, useMemo} from 'react';
-import ReactFlow, {ArrowHeadType, Background, Elements, FlowElement, Position} from 'react-flow-renderer';
+import ReactFlow, {
+  ArrowHeadType,
+  Background,
+  Elements,
+  FlowElement,
+  Position,
+  useZoomPanHelper,
+} from 'react-flow-renderer';
 import {IDAGNode, useDAGChart} from '../../../hooks/useDAGChart';
 import TraceNode from '../../TraceNode';
 import * as S from './DAG.styled';
@@ -18,6 +27,8 @@ const Diagram: React.FC<IDiagramProps> = ({
   selectedSpan,
   onSelectSpan,
 }): JSX.Element => {
+  const {zoomIn, zoomOut} = useZoomPanHelper();
+
   const nodeList = useMemo<IDAGNode<TSpan>[]>(
     () =>
       spans.map(span => ({
@@ -82,6 +93,10 @@ const Diagram: React.FC<IDiagramProps> = ({
 
   return (
     <S.Container $showAffected={affectedSpans.length > 0} data-cy="diagram-dag">
+      <S.Controls>
+        <S.ZoomButton icon={<ZoomInOutlined />} onClick={() => zoomIn()} type="text" />
+        <S.ZoomButton icon={<ZoomOutOutlined />} onClick={() => zoomOut()} type="text" />
+      </S.Controls>
       <ReactFlow
         nodeTypes={{TraceNode}}
         defaultZoom={0.5}
