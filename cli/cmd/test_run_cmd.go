@@ -10,6 +10,7 @@ import (
 
 var runTestFileDefinition string
 var runTestWaitForResult bool
+var runTestJUnit string
 
 var testRunCmd = &cobra.Command{
 	Use:    "run",
@@ -24,6 +25,7 @@ var testRunCmd = &cobra.Command{
 		actionArgs := actions.RunTestConfig{
 			DefinitionFile: runTestFileDefinition,
 			WaitForResult:  runTestWaitForResult,
+			JUnit:          runTestJUnit,
 		}
 
 		err := runTestAction.Run(ctx, actionArgs)
@@ -38,5 +40,6 @@ var testRunCmd = &cobra.Command{
 func init() {
 	testRunCmd.PersistentFlags().StringVarP(&runTestFileDefinition, "definition", "d", "", "--definition <definition-file.yml>")
 	testRunCmd.PersistentFlags().BoolVarP(&runTestWaitForResult, "wait-for-result", "w", false, "")
+	testRunCmd.PersistentFlags().StringVarP(&runTestJUnit, "junit", "j", "", "--junit <junit-output.xml>")
 	testCmd.AddCommand(testRunCmd)
 }

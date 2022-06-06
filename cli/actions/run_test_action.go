@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
 	"sync"
 	"time"
 
@@ -18,6 +19,7 @@ import (
 type RunTestConfig struct {
 	DefinitionFile string
 	WaitForResult  bool
+	JUnit          string
 }
 
 type runTestAction struct {
@@ -43,8 +45,12 @@ func (a runTestAction) Run(ctx context.Context, args RunTestConfig) error {
 		return fmt.Errorf("you must specify a definition file to run a test")
 	}
 
+	if args.JUnit != "" && !args.WaitForResult {
+		return fmt.Errorf("--junit option requires --wait-for-result")
+	}
+
 	a.logger.Debug("Running test from definition", zap.String("definitionFile", args.DefinitionFile))
-	output, err := a.runDefinition(ctx, args.DefinitionFile, args.WaitForResult)
+	output, err := a.runDefinition(ctx, args.DefinitionFile, args.WaitForResult, args.JUnit)
 
 	if err != nil {
 		return fmt.Errorf("could not run definition: %w", err)
@@ -59,7 +65,7 @@ func (a runTestAction) Run(ctx context.Context, args RunTestConfig) error {
 	return nil
 }
 
-func (a runTestAction) runDefinition(ctx context.Context, definitionFile string, waitForResult bool) (runTestOutput, error) {
+func (a runTestAction) runDefinition(ctx context.Context, definitionFile string, waitForResult bool, junit string) (runTestOutput, error) {
 	definition, err := file.LoadDefinition(definitionFile)
 	if err != nil {
 		return runTestOutput{}, err
@@ -104,6 +110,10 @@ func (a runTestAction) runDefinition(ctx context.Context, definitionFile string,
 		}
 
 		testRun = updatedTestRun
+
+		if err := a.saveJUnitFile(ctx, definition.Id, *testRun.Id, junit); err != nil {
+			return runTestOutput{}, fmt.Errorf("could not save junit file: %w", err)
+		}
 	}
 
 	return runTestOutput{
@@ -111,6 +121,28 @@ func (a runTestAction) runDefinition(ctx context.Context, definitionFile string,
 		Run:       testRun,
 		RunWebURL: fmt.Sprintf("%s://%s/test/%s/run/%s", a.config.Scheme, a.config.Endpoint, definition.Id, *testRun.Id),
 	}, nil
+}
+
+func (a runTestAction) saveJUnitFile(ctx context.Context, testId, testRunId, outputFile string) error {
+	if outputFile == "" {
+		return nil
+	}
+
+	req := a.client.ApiApi.GetRunResultJUnit(ctx, testId, testRunId)
+	junit, _, err := a.client.ApiApi.GetRunResultJUnitExecute(req)
+	if err != nil {
+		return fmt.Errorf("could not execute request: %w", err)
+	}
+
+	f, err := os.Create(outputFile)
+	if err != nil {
+		return fmt.Errorf("could not create junit output file: %w", err)
+	}
+
+	_, err = f.WriteString(junit)
+
+	return err
+
 }
 
 func (a runTestAction) createTestFromDefinition(ctx context.Context, definition definition.Test) (openapi.Test, error) {
