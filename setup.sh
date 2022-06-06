@@ -6,7 +6,7 @@ NAMESPACE="tracetest"
 TRACE_BACKEND="jaeger"
 TRACE_BACKEND_ENDPOINT="jaeger-query:16685"
 SKIP_PMA=""
-SKIP_JAEGER=""
+SKIP_BACKEND=""
 
 help_message() {
   echo "Tracetest setup script"
@@ -17,7 +17,7 @@ help_message() {
   echo "  --trace-backend [jaeger]                       trace backend (jaeger or tempo)"
   echo "  --trace-backend-endpoint [jaeger-query:16685]  trace backend endpoint"
   echo "  --skip-pma                                     if set, don't install the sample application"
-  echo "  --skip-jaeger                                  if set, don't install jaeger"
+  echo "  --skip-backend                                  if set, don't install jaeger"
   echo
 }
 
@@ -93,8 +93,8 @@ while [[ $# -gt 0 ]]; do
       SKIP_PMA="YES"
       shift # past argument
       ;;
-    --skip-jaeger)
-      SKIP_JAEGER="YES"
+    --skip-backend)
+      SKIP_BACKEND="YES"
       shift # past argument
       ;;
     -h|--help)
@@ -116,7 +116,7 @@ helm upgrade --install tracetest kubeshop/tracetest \
   --set tracingBackend=$TRACE_BACKEND \
   --set ${TRACE_BACKEND}ConnectionConfig.endpoint="$TRACE_BACKEND_ENDPOINT"
 
-if [ "$SKIP_JAEGER" != "YES" ]; then
+if [ "$SKIP_BACKEND" != "YES" ]; then
     echo
     echo
     echo "----------------------------"

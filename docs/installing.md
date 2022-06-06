@@ -33,6 +33,7 @@ This command will install tracetest using the default settings. You can configur
 | --trace-backend          | trace backend (jaeger or tempo)              | jaeger             |
 | --trace-backend-endpoint | trace backend endpoint                       | jaeger-query:16685 |
 | --skip-pma               | if set, don't install the sample application | n/a                |
+| --skip-backend           | if set, don't install the jaeger backend     | n/a                |
 
 
 Example with custom options:
