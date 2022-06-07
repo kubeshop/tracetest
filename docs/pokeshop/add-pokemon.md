@@ -1,3 +1,5 @@
+## Pokeshop - Add Pokemon Endpoint
+
 This endpoint showcases the different checkpoints that can be added to an application to include custom instrumentation such as validation of the incoming data before inserting it into the database.
 
 ![](../img/516849692/518193163.png)
@@ -11,24 +13,39 @@ Method: `POST`
 Request Body:
 
 ```java
+
 {
-    "name": "meowth",
-    "type": "normal",
-    "imageUrl": "https://assets.pokemon.com/assets/cms2/img/pokedex/full/052.png",
-    "isFeatured": true
+
+"name":  "meowth",
+
+"type":  "normal",
+
+"imageUrl":  "https://assets.pokemon.com/assets/cms2/img/pokedex/full/052.png",
+
+"isFeatured":  true
+
 }
+
 ```
 
 Response:
 
 ```java
+
 {
-    "id": 1000,
-    "name": "meowth",
-    "type": "normal",
-    "imageUrl": "https://assets.pokemon.com/assets/cms2/img/pokedex/full/052.png",
-    "isFeatured": true
+
+"id":  1000,
+
+"name":  "meowth",
+
+"type":  "normal",
+
+"imageUrl":  "https://assets.pokemon.com/assets/cms2/img/pokedex/full/052.png",
+
+"isFeatured":  true
+
 }
+
 ```
 
 ### **Trace Details**

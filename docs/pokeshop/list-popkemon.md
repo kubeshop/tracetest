@@ -1,3 +1,5 @@
+## Pokeshop - List Pokemons Endpoint
+
 This endpoint returns the list of Pokemon directly from the database (Postgres) based on the provided query. The idea of this query is to showcase a straightforward scenario, where the API layer receives a request from the outside and needs to trigger a database query to get some data and return it to the client.
 
 ![](../img/516521996/517275672.png)
@@ -11,22 +13,39 @@ Method: `GET`
 Response:
 
 ```java
+
 [
-    {
-        "id": 25,
-        "name": "pikachu",
-        "type": "electric",
-        "imageUrl": "https://assets.pokemon.com/assets/cms2/img/pokedex/full/025.png",
-        "isFeatured": true
-    },
-    {
-        "id": 26,
-        "name": "raichu",
-        "type": "electric",
-        "imageUrl": "https://assets.pokemon.com/assets/cms2/img/pokedex/full/026.png",
-        "isFeatured": true
-    }
+
+{
+
+"id":  25,
+
+"name":  "pikachu",
+
+"type":  "electric",
+
+"imageUrl":  "https://assets.pokemon.com/assets/cms2/img/pokedex/full/025.png",
+
+"isFeatured":  true
+
+},
+
+{
+
+"id":  26,
+
+"name":  "raichu",
+
+"type":  "electric",
+
+"imageUrl":  "https://assets.pokemon.com/assets/cms2/img/pokedex/full/026.png",
+
+"isFeatured":  true
+
+}
+
 ]
+
 ```
 
 ### **Trace**

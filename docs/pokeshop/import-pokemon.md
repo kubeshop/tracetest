@@ -1,3 +1,5 @@
+## Pokeshop - Import Pokemon Endpoint
+
 This endpoint showcases a more complex scenario involving an async process. Usually, when working with microservices, there are use cases where some of the processing needs to happen asynchronously, for example, when triggering a user notification, generating reports, or processing a payment order. With this endpoint, we provide an example of how users can implement trace-based testing for such scenarios.
 
 ![](../img/516816935/518193157.png)![](../img/516816935/517898257.png)
@@ -11,21 +13,33 @@ Method: `POST`
 Request Body:
 
 ```java
+
 {
-    "id": 1
+
+"id":  1
+
 }
+
 ```
 
 Response:
 
 ```java
+
 {
-    "id": 1000,
-    "name": "meowth",
-    "type": "normal",
-    "imageUrl": "https://assets.pokemon.com/assets/cms2/img/pokedex/full/052.png",
-    "isFeatured": true
+
+"id":  1000,
+
+"name":  "meowth",
+
+"type":  "normal",
+
+"imageUrl":  "https://assets.pokemon.com/assets/cms2/img/pokedex/full/052.png",
+
+"isFeatured":  true
+
 }
+
 ```
 
 ### **Trace**
@@ -50,8 +64,10 @@ Clicking **add** should show the newly created assertion.
 
 **Validate the Message Is Processed by the Worker**
 
-The next thing would be to add an assertion related to the worker receiving the message and starting to process the job.  
-We can achieve this by validating that the custom checkpoint for the worker exists. In this case, we can click the `import pokemon` general span, then click on the **add assertion** button.  
+The next thing would be to add an assertion related to the worker receiving the message and starting to process the job.
+
+We can achieve this by validating that the custom checkpoint for the worker exists. In this case, we can click the `import pokemon` general span, then click on the **add assertion** button.
+
 After this is done, we can proceed to add checks for the `service.name` and `process.command` attributes that should match the specific worker metadata.
 
 ![](../img/516816935/519798785.png)
@@ -64,7 +80,8 @@ Clicking **save** should display the newly created assertion
 
 After validating that the message has arrived at the worker, we can start adding assertions to the different steps.
 
-The first one is requesting the pokemon information from the poke API, here we can add multiple checks in regards to url, routes, response, status, etc.  
+The first one is requesting the pokemon information from the poke API, here we can add multiple checks in regards to url, routes, response, status, etc.
+
 After having selected the worker HTTP span and clicking the **add assertion** button, we can start modifying the different checks.
 
 ![](../img/516816935/519897089.png)
