@@ -1,4 +1,4 @@
-name: build and test
+name: beta deploy
 
 # Cancel any pending or running workflow if the new one is triggered
 concurrency:
