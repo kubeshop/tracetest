@@ -10,10 +10,16 @@ RUN npm run build
 FROM golang:1.18-alpine AS build-go
 WORKDIR /go/src
 
+ARG GA_MEASUREMENT_ID
+ARG GA_SECRET_KEY
+ARG VERSION
+
+RUN apk add --update make
+
 COPY ./server/go.mod ./server/go.sum ./
 RUN go mod download
 COPY ./server ./
-RUN go build -mod=readonly -o tracetest-server .
+RUN make build
 
 FROM alpine AS release
 # Enable machine-id on alpine-linux (https://gitlab.alpinelinux.org/alpine/aports/-/issues/8761)
