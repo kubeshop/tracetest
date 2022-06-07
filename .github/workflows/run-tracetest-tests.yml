@@ -30,7 +30,8 @@ jobs:
     - name: Install CLI
       run: |
         mkdir -p $GITHUB_WORKSPACE/bin
-        curl https://github.com/mathnogueira/tracetest/releases/download/v0.4.6/tracetest-v0.4.6-linux-amd64.tar.gz | tar -xz && cp
+        curl -L https://github.com/mathnogueira/tracetest/releases/download/v0.4.6/tracetest-v0.4.6-linux-amd64.tar.gz -O file.tar.gz
+        tar -xvf file.tar.gz
         mv tracetest $GITHUB_WORKSPACE/bin
         chmod +x $GITHUB_WORKSPACE/bin/tracetest
     - name: Configure CLI
