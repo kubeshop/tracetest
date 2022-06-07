@@ -6,15 +6,16 @@ import {
   SelectorAttributesWhiteList,
   SpanAttributeSections,
 } from 'constants/Span.constants';
-import {Attributes} from 'constants/SpanAttribute.constants';
+import {Attributes, TraceTestAttributes} from 'constants/SpanAttribute.constants';
 import {TSpanFlatAttribute} from 'types/Span.types';
 import {isJson} from 'utils/Common';
 
 const flatAttributes = Object.values(Attributes);
+const flatTraceTestAttributes = Object.values(TraceTestAttributes);
 
 const filterAttributeList = (attributeList: TSpanFlatAttribute[], attrKeyList: string[]): TSpanFlatAttribute[] => {
   return attrKeyList.reduce<TSpanFlatAttribute[]>((list, key) => {
-    const foundAttrList = attributeList.filter(attr => attr.key === key);
+    const foundAttrList = attributeList.filter(attr => attr.key.indexOf(key) === 0);
 
     return foundAttrList.length ? list.concat(foundAttrList) : list;
   }, []);
@@ -22,6 +23,18 @@ const filterAttributeList = (attributeList: TSpanFlatAttribute[], attrKeyList: s
 
 const removeFromAttributeList = (attributeList: TSpanFlatAttribute[], attrKeyList: string[]): TSpanFlatAttribute[] =>
   remove(attributeList, attr => !attrKeyList.includes(attr.key));
+
+const getCustomAttributeList = (attributeList: TSpanFlatAttribute[]) => {
+  const traceTestList = filterAttributeList(attributeList, flatTraceTestAttributes);
+
+  const filetedList = attributeList.filter(attr => {
+    const foundAttr = flatAttributes.find(key => attr.key.indexOf(key) === 0);
+
+    return !foundAttr;
+  });
+
+  return traceTestList.concat(filetedList);
+};
 
 const SpanAttributeService = () => ({
   getSpanAttributeSectionsList(
@@ -32,7 +45,7 @@ const SpanAttributeService = () => ({
     const defaultSectionList = [
       {
         section: SectionNames.custom,
-        attributeList: attributeList.filter(attr => !flatAttributes.includes(attr.key)),
+        attributeList: getCustomAttributeList(attributeList),
       },
       {
         section: SectionNames.all,
@@ -56,7 +69,7 @@ const SpanAttributeService = () => ({
     const duplicatedFiltered = removeFromAttributeList(attributeList, currentSelectorList);
     const whiteListFiltered = filterAttributeList(duplicatedFiltered, SelectorAttributesWhiteList);
     const blackListFiltered = removeFromAttributeList(whiteListFiltered, SelectorAttributesBlackList);
-    const customList = attributeList.filter(attr => !flatAttributes.includes(attr.key));
+    const customList = getCustomAttributeList(attributeList);
 
     const parsedList = blackListFiltered.concat(customList).filter(attr => !isJson(attr.value) && !isEmpty(attr));
 

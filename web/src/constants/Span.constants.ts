@@ -31,6 +31,7 @@ export const SpanAttributeSections: Record<SemanticGroupNames, Record<string, TV
       Attributes.HTTP_REQUEST_CONTENT_LENGTH,
       Attributes.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
       Attributes.HTTP_USER_AGENT,
+      Attributes.HTTP_REQUEST_HEADER,
     ],
     [SectionNames.response]: [
       Attributes.HTTP_STATUS_CODE,
@@ -38,6 +39,7 @@ export const SpanAttributeSections: Record<SemanticGroupNames, Record<string, TV
       Attributes.TRACETEST_RESPONSE_HEADERS,
       Attributes.HTTP_RESPONSE_CONTENT_LENGTH,
       Attributes.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
+      Attributes.HTTP_RESPONSE_HEADER,
     ],
   },
   [SemanticGroupNames.Database]: {
