@@ -18,4 +18,7 @@ export const EmptyStateContainer = styled.div`
 
 export const EmptyStateIcon = styled.img.attrs({
   src: noResultsIcon,
-})``;
+})`
+  width: 90px;
+  height: auto;
+`;

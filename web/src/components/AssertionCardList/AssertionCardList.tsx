@@ -58,7 +58,7 @@ const AssertionCardList: React.FC<TAssertionCardListProps> = ({assertionResults:
       ) : (
         <S.EmptyStateContainer data-cy="empty-assertion-card-list">
           <S.EmptyStateIcon />
-          <Typography.Text disabled>No Data</Typography.Text>
+          <Typography.Text disabled>Add an Assertion to See the Result</Typography.Text>
         </S.EmptyStateContainer>
       )}
     </S.AssertionCardList>

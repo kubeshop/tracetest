@@ -7,12 +7,19 @@ import * as S from './FailedTrace.styled';
 
 interface IFailedTraceProps {
   isDisplayingError: boolean;
+  run: TTestRun;
   testId: string;
   onEdit(): void;
   onRunTest(result: TTestRun): void;
 }
 
-const FailedTrace: React.FC<IFailedTraceProps> = ({onRunTest, onEdit, testId, isDisplayingError}) => {
+const FailedTrace: React.FC<IFailedTraceProps> = ({
+  onRunTest,
+  onEdit,
+  testId,
+  isDisplayingError,
+  run: {lastErrorState},
+}) => {
   const [runNewTest] = useRunTestMutation();
 
   const onReRun = useCallback(async () => {
@@ -26,7 +33,7 @@ const FailedTrace: React.FC<IFailedTraceProps> = ({onRunTest, onEdit, testId, is
         <S.FailedIcon />
         <S.TextContainer>
           <Typography.Title level={3}>Test Run Failed</Typography.Title>
-          <Typography.Text type="secondary">Information explaining the state the test failed at.</Typography.Text>
+          <Typography.Text type="secondary">{lastErrorState}</Typography.Text>
           <Typography.Text type="secondary">
             Please let us know about this issue - <a href={GITHUB_ISSUES_URL}>create an issue</a> or contact us via{' '}
             <a href={DISCORD_URL}>Discord</a>.
