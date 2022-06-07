@@ -1,17 +1,17 @@
+import TestHeader from 'components/TestHeader';
 import {useCallback} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
-import TestHeader from 'components/TestHeader';
-import {useGetResultByIdQueryPolling} from './hooks/useGetResultByIdQueryPolling';
-import {TestState} from '../../constants/TestRun.constants';
-import useGuidedTour from '../../hooks/useGuidedTour';
-import {visiblePortionFuction} from '../../utils/Common';
-import {GuidedTours} from '../../services/GuidedTour.service';
 import FailedTrace from '../../components/FailedTrace';
 import Trace from '../../components/Trace';
-import * as S from './Trace.styled';
-import {useTestRun} from '../../providers/TestRun/TestRun.provider';
-import {useTestDefinition} from '../../providers/TestDefinition/TestDefinition.provider';
 import TraceActions from '../../components/TraceActions';
+import {TestState} from '../../constants/TestRun.constants';
+import useGuidedTour from '../../hooks/useGuidedTour';
+import {useTestDefinition} from '../../providers/TestDefinition/TestDefinition.provider';
+import {useTestRun} from '../../providers/TestRun/TestRun.provider';
+import {GuidedTours} from '../../services/GuidedTour.service';
+import {visiblePortionFuction} from '../../utils/Common';
+import {useGetResultByIdQueryPolling} from './hooks/useGetResultByIdQueryPolling';
+import * as S from './Trace.styled';
 
 const TraceContent = () => {
   const {testId = ''} = useParams();

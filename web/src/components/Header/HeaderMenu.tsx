@@ -4,6 +4,7 @@ import {Popover, Typography} from 'antd';
 import {useMemo, useState} from 'react';
 import {useParams} from 'react-router-dom';
 import {DOCUMENTATION_URL, GITHUB_URL} from '../../constants/Common.constants';
+import {useOpenGuidedTourForNewUsersEffect} from '../../pages/Trace/useOpenGuidedTourForNewUsersEffect';
 import * as S from './Header.styled';
 import {ShowOnboardingContent} from './ShowOnboardingContent';
 
@@ -16,6 +17,7 @@ export const HeaderMenu = ({pathname, onGuidedTourClick}: IProps) => {
   const {setIsOpen} = useTour();
   const [visible, setVisible] = useState(false);
   const handleGuidedTourCLick = () => setVisible(o => !o);
+  useOpenGuidedTourForNewUsersEffect(setVisible);
   const content = useMemo(
     () => ShowOnboardingContent(onGuidedTourClick, setIsOpen, setVisible),
     [setIsOpen, setVisible, onGuidedTourClick]
