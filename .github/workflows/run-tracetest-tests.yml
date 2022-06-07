@@ -16,5 +16,5 @@ jobs:
     - name: Clone pokeapi
       uses: actions/checkout@v2
       with:
-        name: kubeshop/pokeshop
+        repository: kubeshop/pokeshop
         ref: fe07891b08914f704605696e27cfd2ed7efae78d # future commits are broken and will be fixed later
