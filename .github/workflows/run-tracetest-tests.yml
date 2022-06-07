@@ -10,7 +10,7 @@ on:
 
 name: Dogfood tracetest
 jobs:
-  startPokemonApi:
+  run:
     runs-on: ubuntu-latest
     steps:
     - name: Clone pokeapi
@@ -18,5 +18,9 @@ jobs:
       with:
         repository: kubeshop/pokeshop
         path: 'pokeshop'
-    - name: Run docker-compose
-      run: docker-compose -f pokeshop/api/docker-compose.yml up api-ci
+    - name: Start pokeapi
+      run: docker-compose -f pokeshop/api/docker-compose.yml up -d api-ci
+    - name: Clone tracetest
+      uses: actions/checkout@v2
+    - name: Start tracetest
+      run: docker-compose up -d
