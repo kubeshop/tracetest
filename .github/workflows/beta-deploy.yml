@@ -44,6 +44,10 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args:
+            GA_MEASUREMENT_ID=${{ secrets.GA_MEASUREMENT_ID }}
+            GA_SECRET_KEY=${{ secrets.GA_SECRET_KEY }}
+            VERSION=sha-$(git rev-parse --short $GITHUB_SHA)
 
   publish:
     if: github.event_name == 'push'
