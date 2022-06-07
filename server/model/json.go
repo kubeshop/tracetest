@@ -80,23 +80,31 @@ func (a *Assertion) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (r *Run) MarshalJSON() ([]byte, error) {
-	return json.Marshal(&struct {
-		ID                        string
-		TraceID                   string
-		SpanID                    string
-		State                     string
-		LastErrorString           string
-		CreatedAt                 time.Time
-		ServiceTriggeredAt        time.Time
-		ServiceTriggerCompletedAt time.Time
-		ObtainedTraceAt           time.Time
-		CompletedAt               time.Time
-		Request                   HTTPRequest
-		Response                  HTTPResponse
-		Trace                     *traces.Trace
-		Results                   *RunResults
-	}{
+type encodedRun struct {
+	ID                        string
+	TraceID                   string
+	SpanID                    string
+	State                     string
+	LastErrorString           string
+	CreatedAt                 time.Time
+	ServiceTriggeredAt        time.Time
+	ServiceTriggerCompletedAt time.Time
+	ObtainedTraceAt           time.Time
+	CompletedAt               time.Time
+	Request                   HTTPRequest
+	Response                  *HTTPResponse
+	Trace                     *traces.Trace
+	Results                   *RunResults
+	TestVersion               int
+}
+
+func (r Run) MarshalJSON() ([]byte, error) {
+	var resp *HTTPResponse
+	if r.Response.StatusCode != 0 {
+		resp = &r.Response
+	}
+
+	return json.Marshal(&encodedRun{
 		ID:                        r.ID.String(),
 		TraceID:                   r.TraceID.String(),
 		SpanID:                    r.SpanID.String(),
@@ -107,31 +115,16 @@ func (r *Run) MarshalJSON() ([]byte, error) {
 		ServiceTriggerCompletedAt: r.ServiceTriggerCompletedAt,
 		ObtainedTraceAt:           r.ObtainedTraceAt,
 		CompletedAt:               r.CompletedAt,
+		TestVersion:               r.TestVersion,
 		Request:                   r.Request,
-		Response:                  r.Response,
+		Response:                  resp,
 		Trace:                     r.Trace,
 		Results:                   r.Results,
 	})
 }
 
 func (r *Run) UnmarshalJSON(data []byte) error {
-	aux := struct {
-		ID                        string
-		TraceID                   string
-		SpanID                    string
-		State                     string
-		LastErrorString           string
-		CreatedAt                 time.Time
-		ServiceTriggeredAt        time.Time
-		ServiceTriggerCompletedAt time.Time
-		ObtainedTraceAt           time.Time
-		CompletedAt               time.Time
-		TestVersion               int
-		Request                   HTTPRequest
-		Response                  HTTPResponse
-		Trace                     *traces.Trace
-		Results                   *RunResults
-	}{}
+	aux := encodedRun{}
 
 	if err := json.Unmarshal(data, &aux); err != nil {
 		return fmt.Errorf("unmarshal run: %w", err)
@@ -159,11 +152,16 @@ func (r *Run) UnmarshalJSON(data []byte) error {
 	r.LastError = stringToErr(aux.LastErrorString)
 	r.CreatedAt = aux.CreatedAt
 	r.ServiceTriggeredAt = aux.ServiceTriggeredAt
+	r.ServiceTriggerCompletedAt = aux.ServiceTriggerCompletedAt
 	r.ObtainedTraceAt = aux.ObtainedTraceAt
 	r.CompletedAt = aux.CompletedAt
 	r.TestVersion = aux.TestVersion
 	r.Request = aux.Request
-	r.Response = aux.Response
+
+	if aux.Response != nil {
+		r.Response = *aux.Response
+	}
+
 	r.Trace = aux.Trace
 	r.Results = aux.Results
 

@@ -36,7 +36,7 @@ func (t *Trace) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (t *Trace) MarshalJSON() ([]byte, error) {
+func (t Trace) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&struct {
 		ID       string
 		RootSpan Span
