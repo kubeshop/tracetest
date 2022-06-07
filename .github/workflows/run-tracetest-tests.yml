@@ -18,5 +18,6 @@ jobs:
       with:
         repository: kubeshop/pokeshop
         ref: fe07891b08914f704605696e27cfd2ed7efae78d # future commits are broken and will be fixed later
+        path: 'pokeshop'
     - name: Run docker-compose
       run: docker-compose -f pokeshop/api/docker-compose.yml up
