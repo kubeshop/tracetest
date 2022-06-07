@@ -41,7 +41,13 @@ func (sar *SpanAssertionResult) UnmarshalJSON(data []byte) error {
 
 	sar.SpanID = sid
 	sar.ObservedValue = aux.ObservedValue
-	sar.CompareErr = stringToErr(aux.CompareErr)
+	if err := stringToErr(aux.CompareErr); err != nil {
+		if err.Error() == comparator.ErrNoMatch.Error() {
+			err = comparator.ErrNoMatch
+		}
+
+		sar.CompareErr = err
+	}
 
 	return nil
 }
