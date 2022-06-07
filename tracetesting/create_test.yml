@@ -1,0 +1,54 @@
+id: 83568d7d-6784-4d50-a5ce-245ebaf0641e
+name: POST create test
+description: Test if the create test endpoint creates a test correctly
+trigger:
+  type: http
+  http_request:
+    url: http://localhost:8080/api/tests
+    method: POST
+    headers:
+    - key: Content-Type
+      value: application/json
+    body:
+      type: raw
+      raw: |-
+        {
+          "name": "My test",
+          "serviceUnderTest": {
+            "request": {
+              "url": "http://localhost:3001/pokemon/import",
+              "method": "GET",
+              "headers": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\"id\": 2}"
+            }
+          },
+          "definition": {
+            "definitions": [
+              {
+                "selector": "span[tracetest.span.type=\"http\"]",
+                "assertions": [
+                  {
+                    "attribute": "tracetest.span.duration",
+                    "comparator": "<=",
+                    "expected": "60"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+testDefinition:
+  - selector: span[name="POST /api/tests"]
+    assertions:
+      - http.method = "POST"
+      - http.route = "/api/tests"
+      - tracetest.span.duration <= 100
+  - selector: span[sql.query contains "INSERT INTO tests"]
+    assertions:
+      - tracetest.span.duration <= 50
+      - otel.status_code = "OK"
