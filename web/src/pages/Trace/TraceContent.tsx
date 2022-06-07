@@ -5,10 +5,8 @@ import FailedTrace from '../../components/FailedTrace';
 import Trace from '../../components/Trace';
 import TraceActions from '../../components/TraceActions';
 import {TestState} from '../../constants/TestRun.constants';
-import useGuidedTour from '../../hooks/useGuidedTour';
 import {useTestDefinition} from '../../providers/TestDefinition/TestDefinition.provider';
 import {useTestRun} from '../../providers/TestRun/TestRun.provider';
-import {GuidedTours} from '../../services/GuidedTour.service';
 import {visiblePortionFuction} from '../../utils/Common';
 import {useGetResultByIdQueryPolling} from './hooks/useGetResultByIdQueryPolling';
 import * as S from './Trace.styled';
@@ -18,7 +16,6 @@ const TraceContent = () => {
   const {visiblePortion, height} = visiblePortionFuction();
   const navigate = useNavigate();
   const {isDraftMode, test} = useTestDefinition();
-  useGuidedTour(GuidedTours.Trace);
 
   const {isError, run, refetch} = useTestRun();
   const isDisplayingError = isError || run.state === TestState.FAILED;

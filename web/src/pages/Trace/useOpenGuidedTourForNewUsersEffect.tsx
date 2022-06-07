@@ -1,14 +1,14 @@
 import {Dispatch, SetStateAction, useEffect} from 'react';
 
 const key = 'tracetest-new-user';
-const value = String(true);
+const oldUserValue = String(true);
 
 export function useOpenGuidedTourForNewUsersEffect(setVisible: Dispatch<SetStateAction<boolean>>): void {
   useEffect(() => {
-    const isNewUser = localStorage.getItem(key);
-    if (isNewUser !== value) {
+    const isOldUser = localStorage.getItem(key);
+    if (isOldUser !== oldUserValue) {
       setVisible(true);
-      localStorage.setItem(key, value);
+      localStorage.setItem(key, oldUserValue);
     }
   }, [setVisible]);
 }

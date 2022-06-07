@@ -1,5 +1,5 @@
 import useHover from 'hooks/useHover';
-import {Dispatch, SetStateAction, useEffect} from 'react';
+import {useEffect} from 'react';
 import {IResult} from 'types/Assertion.types';
 import {TSpanFlatAttribute} from 'types/Span.types';
 import GuidedTourService, {GuidedTours} from '../../services/GuidedTour.service';
@@ -7,24 +7,21 @@ import AttributeValue from '../AttributeValue';
 import {Steps} from '../GuidedTour/traceStepList';
 import AttributeCheck from './AttributeCheck';
 import * as S from './AttributeRow.styled';
-import {useHoverComponent} from './useHoverComponent';
 
 interface IProps {
-  isAnyHovered: number[];
-  setIsAnyHovered: Dispatch<SetStateAction<number[]>>;
   assertionsFailed?: IResult[];
-  index: number;
   assertionsPassed?: IResult[];
   attribute: TSpanFlatAttribute;
   isCopied: boolean;
+  isOpen: Boolean;
+  currentStep: number;
   onCopy(value: string): void;
   onCreateAssertion(attribute: TSpanFlatAttribute): void;
   setIsCopied(value: boolean): void;
+  index: number;
 }
 
 const AttributeRow = ({
-  isAnyHovered,
-  setIsAnyHovered,
   assertionsFailed,
   assertionsPassed,
   attribute: {key, value},
@@ -34,11 +31,11 @@ const AttributeRow = ({
   onCreateAssertion,
   setIsCopied,
   index,
+  currentStep,
+  isOpen,
 }: IProps) => {
-  const isFirst = index === 0;
-
+  const shouldDisplayActions = index === 0 && isOpen && currentStep === 3;
   const {isHovering, onMouseEnter, onMouseLeave} = useHover();
-  const isAnyHoverCallback = useHoverComponent(index, isAnyHovered, setIsAnyHovered);
   const passedCount = assertionsPassed?.length ?? 0;
   const failedCount = assertionsFailed?.length ?? 0;
 
@@ -47,16 +44,7 @@ const AttributeRow = ({
   }, [isHovering, setIsCopied]);
 
   return (
-    <S.AttributeRow
-      onMouseEnter={() => {
-        onMouseEnter();
-        isAnyHoverCallback.onMouseEnter();
-      }}
-      onMouseLeave={() => {
-        onMouseLeave();
-        isAnyHoverCallback.onMouseLeave();
-      }}
-    >
+    <S.AttributeRow onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
       <S.TextContainer>
         <S.Text type="secondary">{key}</S.Text>
       </S.TextContainer>
@@ -68,7 +56,7 @@ const AttributeRow = ({
       </S.AttributeValueRow>
 
       <S.IconContainer>
-        {(isHovering || (isFirst && isAnyHovered.length === 0)) && (
+        {(isHovering || shouldDisplayActions) && (
           <>
             <S.CustomTooltip title={isCopied ? 'Copied' : 'Copy'}>
               <S.CopyIcon onClick={() => onCopy(value)} />
