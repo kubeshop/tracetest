@@ -7,7 +7,7 @@ jaegerConnectionConfig:
 maxWaitTimeForTrace: 30s
 
 googleAnalytics:
-  enabled: false
+  enabled: true
 
 telemetry:
   serviceName: tracetest
