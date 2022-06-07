@@ -1,14 +1,12 @@
 import {Dispatch, SetStateAction, useEffect} from 'react';
-
-const key = 'tracetest-new-user';
-const oldUserValue = String(true);
+import GuidedTourService, {GuidedTours} from '../../services/GuidedTour.service';
 
 export function useOpenGuidedTourForNewUsersEffect(setVisible: Dispatch<SetStateAction<boolean>>): void {
   useEffect(() => {
-    const isOldUser = localStorage.getItem(key);
-    if (isOldUser !== oldUserValue) {
+    const isComplete = GuidedTourService.getIsComplete(GuidedTours.Trace);
+    if (!isComplete) {
       setVisible(true);
-      localStorage.setItem(key, oldUserValue);
+      GuidedTourService.save(GuidedTours.Trace, true);
     }
   }, [setVisible]);
 }

@@ -28,8 +28,8 @@ const AttributeList: React.FC<IProps> = ({assertions, attributeList, onCreateAss
     <S.AttributeList data-cy="attribute-list">
       {attributeList.map((attribute, index) => (
         <AttributeRow
-          isOpen={isOpen}
-          currentStep={currentStep}
+          isGuidedTourOpen={isOpen}
+          guidedTourCurrentStep={currentStep}
           index={index}
           assertionsFailed={assertions?.[attribute.key]?.failed}
           assertionsPassed={assertions?.[attribute.key]?.passed}
