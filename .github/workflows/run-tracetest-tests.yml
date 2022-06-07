@@ -23,7 +23,9 @@ jobs:
     - name: Clone tracetest
       uses: actions/checkout@v2
     - name: Start tracetest
-      run: docker-compose up -d
+      run: |
+        docker-compose pull
+        docker-compose up -d
     - name: Install CLI
       run: |
         mkdir -p $GITHUB_WORKSPACE/bin
