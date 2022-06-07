@@ -24,3 +24,14 @@ jobs:
       uses: actions/checkout@v2
     - name: Start tracetest
       run: docker-compose up -d
+    - name: Install CLI
+      run: |
+        mkdir -p $GITHUB_WORKSPACE/bin
+        curl https://github.com/mathnogueira/tracetest/releases/download/v0.4.6/tracetest-v0.4.6-linux-amd64.tar.gz | tar -xz && cp
+        mv tracetest $GITHUB_WORKSPACE/bin
+        chmod +x $GITHUB_WORKSPACE/bin/tracetest
+    - name: Configure CLI
+      run: |
+        echo "scheme: http\nendpoint: localhost:8080" > config.yml
+    - name: Run test
+      run: tracetest test run --definition tracetesting/create_test.yml --wait-for-result
