@@ -1,4 +1,4 @@
-## Pokeshop - List Pokemons Endpoint
+# Pokeshop - List Pokemons Endpoint
 
 This endpoint returns the list of Pokemon directly from the database (Postgres) based on the provided query. The idea of this query is to showcase a straightforward scenario, where the API layer receives a request from the outside and needs to trigger a database query to get some data and return it to the client.
 
