@@ -1,0 +1,20 @@
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+    paths:
+      - server/**
+
+name: Dogfood tracetest
+jobs:
+  startPokemonApi:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Clone pokeapi
+      uses: actions/checkout
+      with:
+        name: kubeshop/pokeshop
+        ref: fe07891b08914f704605696e27cfd2ed7efae78d # future commits are broken and will be fixed later
