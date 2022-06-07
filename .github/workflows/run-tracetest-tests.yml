@@ -34,6 +34,7 @@ jobs:
         tar -xvf file.tar.gz
         mv tracetest $GITHUB_WORKSPACE/bin
         chmod +x $GITHUB_WORKSPACE/bin/tracetest
+        echo "::add-path::$GITHUB_WORKSPACE/bin"
     - name: Configure CLI
       run: |
         echo "scheme: http\nendpoint: localhost:8080" > config.yml
