@@ -10,7 +10,6 @@ import (
 	"runtime"
 
 	"github.com/denisbrodbeck/machineid"
-	"github.com/kubeshop/tracetest/server/config"
 )
 
 const (
@@ -20,9 +19,14 @@ const (
 
 var defaultClient ga
 
-func Init(cfg config.GoogleAnalytics, appName, appVersion string) error {
+var (
+	MeasurementID = ""
+	SecretKey     = ""
+)
+
+func Init(enabled bool, appName, appVersion string) error {
 	// ga not enabled, use dumb settings
-	if !cfg.Enabled {
+	if !enabled {
 		defaultClient = ga{enabled: false}
 		return nil
 	}
@@ -40,8 +44,8 @@ func Init(cfg config.GoogleAnalytics, appName, appVersion string) error {
 
 	defaultClient = ga{
 		enabled:       true,
-		measurementID: cfg.MeasurementID,
-		secretKey:     cfg.SecretKey,
+		measurementID: MeasurementID,
+		secretKey:     SecretKey,
 		appVersion:    appVersion,
 		appName:       appName,
 		hostname:      hostname,
@@ -75,8 +79,6 @@ type ga struct {
 func (ga ga) ready() bool {
 	return !ga.enabled || (ga.appVersion != "" &&
 		ga.appName != "" &&
-		ga.measurementID != "" &&
-		ga.secretKey != "" &&
 		ga.hostname != "" &&
 		ga.machineID != "")
 
