@@ -47,6 +47,11 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args:
+            GA_MEASUREMENT_ID=${{ secrets.GA_MEASUREMENT_ID }}
+            GA_SECRET_KEY=${{ secrets.GA_SECRET_KEY }}
+            VERSION=${{ github.ref_name}}
+
       - name: Run GoReleaser to publish release notes
         uses: goreleaser/goreleaser-action@v2
         with:
