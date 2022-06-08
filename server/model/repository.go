@@ -36,5 +36,6 @@ type Repository interface {
 	DefinitionRepository
 	RunRepository
 
+	ServerID() (id string, isNew bool, _ error)
 	Drop() error
 }
