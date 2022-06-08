@@ -1,0 +1,119 @@
+version: "3"
+
+services:
+  pokeshop_db:
+    image: postgres:14
+    ports:
+      - 5434:5432
+    environment:
+      POSTGRES_USER: ashketchum
+      POSTGRES_PASSWORD: squirtle123
+      POSTGRES_DB: pokeshop
+    networks:
+      - local
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 1s
+      timeout: 5s
+      retries: 60
+  pokeshop_cache:
+    image: redis:6
+    ports:
+      - 6379:6379
+    networks:
+      - local
+    healthcheck:
+      test: ["CMD", "redis-cli","ping"]
+      interval: 1s
+      timeout: 3s
+      retries: 60
+  pokeshop_queue:
+    image: rabbitmq:3.9
+    ports:
+      - 5672:5672
+      - 15672:15672
+    networks:
+      - local
+    healthcheck:
+      test: rabbitmq-diagnostics -q check_running
+      interval: 1s
+      timeout: 5s
+      retries: 60
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - 5775:5775/udp
+      - 6831:6831/udp
+      - 6832:6832/udp
+      - 5778:5778
+      - 16685:16685
+      - 16686:16686
+      - 14268:14268
+      - 9411:9411
+    environment:
+      - COLLECTOR_ZIPKIN_HOST_PORT=:9411
+    networks:
+      - local
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "localhost:16686"]
+      interval: 1s
+      timeout: 3s
+      retries: 60
+
+  pokeshop:
+    image: kubeshop/demo-pokemon-api:0.0.10
+    environment:
+      REDIS_URL: pokeshop_cache
+      DATABASE_URL: postgresql://ashketchum:squirtle123@pokeshop_db:5432/pokeshop?schema=public
+      RABBITMQ_HOST: pokeshop_queue
+      POKE_API_BASE_URL: https://pokeapi.co/api/v2
+      JAEGER_HOST: jaeger
+      JAEGER_PORT: 6832
+    ports:
+      - 3001:80
+    networks:
+      - local
+    depends_on:
+      pokeshop_db:
+        condition: service_healthy
+      pokeshop_cache:
+        condition: service_healthy
+      pokeshop_queue:
+        condition: service_healthy
+      jaeger:
+        condition: service_healthy
+
+  tracetest:
+    container_name: tracetest
+    image: kubeshop/tracetest
+    build: .
+    environment:
+      - VERSION=1.0
+    volumes:
+      - type: bind
+        source: ./server/config.yaml
+        target: /app/config.yaml
+    ports:
+      - 8080:8080
+      - 8081:8081
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    container_name: postgres
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER:  postgres
+    ports:
+      - 5432:5432
+    healthcheck:
+      test: pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
+      interval: 1s
+      timeout: 5s
+      retries: 60
+
+
+networks:
+  local:

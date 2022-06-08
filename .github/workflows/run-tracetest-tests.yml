@@ -13,17 +13,11 @@ jobs:
   run:
     runs-on: ubuntu-latest
     steps:
-    # - name: Clone pokeapi
-    #   uses: actions/checkout@v2
-    #   with:
-    #     repository: kubeshop/pokeshop
-    #     path: 'pokeshop'
-    # - name: Start pokeapi
-    #   run: docker-compose -f pokeshop/api/docker-compose.yml up -d api-ci
     - name: Checkout
       uses: actions/checkout@v2
     - name: Start tracetest
       run: |
+        ls
         cp ./tracetesting/ci/config.yml .
         cp ./tracetesting/ci/tracetest-testing-docker-compose.yml docker-compose.yml
         docker-compose pull
