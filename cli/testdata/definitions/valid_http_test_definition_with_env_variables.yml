@@ -3,7 +3,7 @@ description: Import a pokemon using its ID
 trigger:
   type: http
   http_request:
-    url: http://pokemon-demo.tracetest.io/pokemon/import
+    url: ${POKEMON_API_URL}/pokemon/import
     method: POST
     headers:
     - key: Content-Type

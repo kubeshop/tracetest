@@ -139,6 +139,7 @@ func TestLoadDefinition(t *testing.T) {
 			ShouldSucceed: true,
 			EnvVariables: map[string]string{
 				"POKEMON_APP_API_KEY": "my secret key",
+				"POKEMON_API_URL":     "http://pokemon-demo.tracetest.io",
 			},
 			ExpectedDefinition: definition.Test{
 				Name:        "POST import pokemon",
