@@ -99,6 +99,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    networks:
+      - local
 
   postgres:
     container_name: postgres
@@ -113,6 +115,8 @@ services:
       interval: 1s
       timeout: 5s
       retries: 60
+    networks:
+      - local
 
 
 networks:
