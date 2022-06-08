@@ -13,6 +13,10 @@ jobs:
   run:
     runs-on: ubuntu-latest
     steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
     - name: Start tracetest
       run: |
         cp ./tracetesting/ci/config.yml server/config.yaml
