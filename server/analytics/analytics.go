@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"os"
 	"runtime"
+
+	"github.com/google/uuid"
 )
 
 const (
@@ -104,6 +106,7 @@ func (ga ga) newEvent(name, category string) (event, error) {
 	return event{
 		Name: name,
 		Params: params{
+			ID:              uuid.NewString(), // prevent event caching
 			EventCount:      1,
 			EventCategory:   category,
 			AppName:         ga.appName,
@@ -203,6 +206,7 @@ func (ga ga) sendPayloadToURL(p payload, url string) (*http.Response, []byte, er
 }
 
 type params struct {
+	ID               string `json:"tt_event_id,omitempty"`
 	EventCount       int64  `json:"event_count,omitempty"`
 	EventCategory    string `json:"event_category,omitempty"`
 	AppVersion       string `json:"app_version,omitempty"`
