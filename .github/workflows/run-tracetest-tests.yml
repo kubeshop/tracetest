@@ -13,24 +13,25 @@ jobs:
   run:
     runs-on: ubuntu-latest
     steps:
-    - name: Clone pokeapi
-      uses: actions/checkout@v2
-      with:
-        repository: kubeshop/pokeshop
-        path: 'pokeshop'
-    - name: Start pokeapi
-      run: docker-compose -f pokeshop/api/docker-compose.yml up -d api-ci
-    - name: Clone tracetest
+    # - name: Clone pokeapi
+    #   uses: actions/checkout@v2
+    #   with:
+    #     repository: kubeshop/pokeshop
+    #     path: 'pokeshop'
+    # - name: Start pokeapi
+    #   run: docker-compose -f pokeshop/api/docker-compose.yml up -d api-ci
+    - name: Checkout
       uses: actions/checkout@v2
     - name: Start tracetest
       run: |
-        cp server/config.yaml.sample server/config.yaml
+        cp tracetesting/ci/config.yml .
+        cp tracetesting/ci/tracetest-testing-docker-compose.yml docker-compose.yml
         docker-compose pull
         docker-compose up -d tracetest
     - name: Install CLI
       run: |
         mkdir -p $GITHUB_WORKSPACE/bin
-        curl -L https://github.com/mathnogueira/tracetest/releases/download/v0.4.6/tracetest-v0.4.6-linux-amd64.tar.gz --output file.tar.gz
+        curl -L https://github.com/kubeshop/tracetest/releases/download/v0.5.0/tracetest-v0.5.0-linux-amd64.tar.gz --output file.tar.gz
         tar -xvf file.tar.gz
     - name: Configure CLI
       run: |
