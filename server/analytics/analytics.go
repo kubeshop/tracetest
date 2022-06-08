@@ -50,8 +50,9 @@ func Init(enabled bool, serverID, appName, appVersion string) error {
 
 func CreateAndSendEvent(name, category string) error {
 	if !defaultClient.ready() {
-		fmt.Println(name, defaultClient)
-		return fmt.Errorf("uninitalized client. Call analytics.Init")
+		err := fmt.Errorf("uninitalized client. Call analytics.Init")
+		fmt.Printf(`could not send event "%s" (%s): %s \n`, name, category, err.Error())
+		return err
 	}
 	return defaultClient.CreateAndSendEvent(name, category)
 }
@@ -80,6 +81,7 @@ func (ga ga) ready() bool {
 
 func (ga ga) CreateAndSendEvent(name, category string) error {
 	if !ga.enabled {
+		fmt.Printf(`Ignore event "%s" (%s): ga not enabled`, name, category)
 		return nil
 	}
 	event, err := ga.newEvent(name, category)
