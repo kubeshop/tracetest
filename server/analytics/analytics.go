@@ -118,7 +118,6 @@ func (ga ga) newEvent(name, category string) (event, error) {
 
 func (ga ga) sendEvent(e event) error {
 	payload := payload{
-		UserID:   ga.serverID,
 		ClientID: ga.serverID,
 		Events: []event{
 			e,
@@ -222,7 +221,6 @@ type event struct {
 }
 
 type payload struct {
-	UserID   string  `json:"user_id,omitempty"`
 	ClientID string  `json:"client_id,omitempty"`
 	Events   []event `json:"events,omitempty"`
 }
