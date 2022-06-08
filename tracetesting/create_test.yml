@@ -1,4 +1,3 @@
-id: 83568d7d-6784-4d50-a5ce-245ebaf0641e
 name: POST create test
 description: Test if the create test endpoint creates a test correctly
 trigger:
