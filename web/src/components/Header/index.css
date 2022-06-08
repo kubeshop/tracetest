@@ -1,0 +1,9 @@
+.ant-popover-title {
+    padding: 16px;
+}
+.ant-popover-arrow {
+    display: none;
+}
+.ant-popover-inner-content {
+    padding: 0;
+}
