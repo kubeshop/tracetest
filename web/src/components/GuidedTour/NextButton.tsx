@@ -1,5 +1,5 @@
 import {BtnFnProps} from '@reactour/tour/dist/types';
-import {AddAssertionButton} from '../TraceDrawer/TraceDrawer.styled';
+import {AddAssertionButton} from 'components/RunBottomPanel/RunBottomPanel.styled';
 
 export const NextButton: React.FC<BtnFnProps> = ({currentStep, setCurrentStep, stepsLength, setIsOpen}) => {
   const isLast = currentStep === stepsLength - 1;

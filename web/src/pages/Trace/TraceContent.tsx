@@ -1,19 +1,18 @@
-import TestHeader from 'components/TestHeader';
 import {useCallback} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
+
 import FailedTrace from 'components/FailedTrace';
-import Trace from 'components/Trace';
+import Run from 'components/Run';
+import TestHeader from 'components/TestHeader';
 import TraceActions from 'components/TraceActions';
 import {TestState} from 'constants/TestRun.constants';
 import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
-import {visiblePortionFuction} from 'utils/Common';
 import {useGetResultByIdQueryPolling} from './hooks/useGetResultByIdQueryPolling';
 import * as S from './Trace.styled';
 
 const TraceContent = () => {
   const {testId = ''} = useParams();
-  const {visiblePortion, height} = visiblePortionFuction();
   const navigate = useNavigate();
   const {isDraftMode, test} = useTestDefinition();
 
@@ -45,13 +44,7 @@ const TraceContent = () => {
         isDisplayingError={isDisplayingError}
         onEdit={() => console.log('onEdit')}
       />
-      <Trace
-        displayError={isDisplayingError}
-        minHeight={height}
-        run={run}
-        test={test}
-        visiblePortion={visiblePortion}
-      />
+      <Run displayError={isDisplayingError} run={run} test={test} />
     </S.Wrapper>
   ) : null;
 };

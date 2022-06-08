@@ -124,7 +124,6 @@ describe('TestDefinitionReducer', () => {
         },
         revertDefinition({
           originalSelector: definitionSelector,
-          selector: '',
         })
       );
 

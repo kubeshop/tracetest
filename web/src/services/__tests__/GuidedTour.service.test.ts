@@ -15,10 +15,10 @@ describe('GuidedTourService', () => {
   });
 
   it('getIsComplete should return after the tour is completed', () => {
-    expect(GuidedTourService.getIsComplete(GuidedTours.Assertion)).toBeFalsy();
-    GuidedTourService.save(GuidedTours.Assertion);
+    expect(GuidedTourService.getIsComplete(GuidedTours.Trace)).toBeFalsy();
+    GuidedTourService.save(GuidedTours.Trace);
 
-    expect(GuidedTourService.getIsComplete(GuidedTours.Assertion)).toBeTruthy();
+    expect(GuidedTourService.getIsComplete(GuidedTours.Trace)).toBeTruthy();
   });
 
   it('getSelectorStep should return the identifier for a specific guided tour step', () => {

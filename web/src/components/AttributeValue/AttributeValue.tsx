@@ -15,7 +15,7 @@ const AttributeValue: React.FC<IProps> = ({value, ...props}) => {
 
   if (isJsonValue) {
     return (
-      <S.ValueJson isCollapsed={isCollapsed} onClick={() => setIsCollapsed(!isCollapsed)} {...props}>
+      <S.ValueJson $isCollapsed={isCollapsed} onClick={() => setIsCollapsed(!isCollapsed)} {...props}>
         <JSONPretty data={value} />
       </S.ValueJson>
     );
