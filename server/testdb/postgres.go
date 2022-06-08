@@ -86,7 +86,7 @@ func (td *postgresDB) ServerID() (id string, isNew bool, err error) {
 		err = fmt.Errorf("could not get machineID: %w", err)
 		return
 	}
-	id = id[:32] // limit lenght to avoid issues with GA
+	id = id[:10] // limit lenght to avoid issues with GA
 
 	stmt, err := td.db.Prepare(`INSERT INTO "server" (id) VALUES ($1)`)
 	if err != nil {
