@@ -8,8 +8,6 @@ import (
 	"net/http"
 	"os"
 	"runtime"
-
-	"github.com/denisbrodbeck/machineid"
 )
 
 const (
@@ -24,7 +22,7 @@ var (
 	SecretKey     = ""
 )
 
-func Init(enabled bool, appName, appVersion string) error {
+func Init(enabled bool, serverID, appName, appVersion string) error {
 	// ga not enabled, use dumb settings
 	if !enabled {
 		defaultClient = ga{enabled: false}
@@ -37,11 +35,6 @@ func Init(enabled bool, appName, appVersion string) error {
 		return fmt.Errorf("could not get hostname: %w", err)
 	}
 
-	machineID, err := machineid.ProtectedID(appName)
-	if err != nil {
-		return fmt.Errorf("could not get machineID: %w", err)
-	}
-
 	defaultClient = ga{
 		enabled:       true,
 		measurementID: MeasurementID,
@@ -49,7 +42,7 @@ func Init(enabled bool, appName, appVersion string) error {
 		appVersion:    appVersion,
 		appName:       appName,
 		hostname:      hostname,
-		machineID:     machineID,
+		serverID:      serverID,
 	}
 
 	return nil
@@ -57,6 +50,7 @@ func Init(enabled bool, appName, appVersion string) error {
 
 func CreateAndSendEvent(name, category string) error {
 	if !defaultClient.ready() {
+		fmt.Println(name, defaultClient)
 		return fmt.Errorf("uninitalized client. Call analytics.Init")
 	}
 	return defaultClient.CreateAndSendEvent(name, category)
@@ -73,14 +67,14 @@ type ga struct {
 	measurementID string
 	secretKey     string
 	hostname      string
-	machineID     string
+	serverID      string
 }
 
 func (ga ga) ready() bool {
 	return !ga.enabled || (ga.appVersion != "" &&
 		ga.appName != "" &&
 		ga.hostname != "" &&
-		ga.machineID != "")
+		ga.serverID != "")
 
 }
 
@@ -104,7 +98,7 @@ func (ga ga) newEvent(name, category string) (event, error) {
 			EventCategory:   category,
 			AppName:         ga.appName,
 			Host:            ga.hostname,
-			MachineID:       ga.machineID,
+			MachineID:       ga.serverID,
 			AppVersion:      ga.appVersion,
 			Architecture:    runtime.GOARCH,
 			OperatingSystem: runtime.GOOS,
@@ -114,8 +108,8 @@ func (ga ga) newEvent(name, category string) (event, error) {
 
 func (ga ga) sendEvent(e event) error {
 	payload := payload{
-		UserID:   ga.machineID,
-		ClientID: ga.machineID,
+		UserID:   ga.serverID,
+		ClientID: ga.serverID,
 		Events: []event{
 			e,
 		},
