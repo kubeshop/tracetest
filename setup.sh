@@ -109,9 +109,23 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-set +e #ignore errors here
-kubectl create namespace $NAMESPACE
-set -e
+echo "----------------------------"
+echo "Installing Tracetest"
+echo "----------------------------"
+echo
+
+helm repo add kubeshop https://kubeshop.github.io/helm-charts
+helm repo update
+
+version=$(helm show chart kubeshop/tracetest | head -2 | tail -1 | awk -F ': ' '{print $2}')
+
+echo
+echo "--> install tracetest version $version to namespace $NAMESPACE"
+helm upgrade --install tracetest kubeshop/tracetest \
+  --namespace $NAMESPACE --create-namespace \
+  --set tracingBackend=$TRACE_BACKEND \
+  --set ${TRACE_BACKEND}ConnectionConfig.endpoint="$TRACE_BACKEND_ENDPOINT"
+
 
 if [ "$SKIP_BACKEND" != "YES" ]; then
     echo
@@ -162,24 +176,6 @@ if [ "$SKIP_PMA" != "YES" ]; then
     echo "--> demo app ready"
     rm -rf $tmpdir
 fi
-
-
-echo "----------------------------"
-echo "Installing Tracetest"
-echo "----------------------------"
-echo
-
-helm repo add kubeshop https://kubeshop.github.io/helm-charts
-helm repo update
-
-version=$(helm show chart kubeshop/tracetest | head -2 | tail -1 | awk -F ': ' '{print $2}')
-
-echo
-echo "--> install tracetest version $version to namespace $NAMESPACE"
-helm upgrade --install tracetest kubeshop/tracetest \
-  --namespace $NAMESPACE --create-namespace \
-  --set tracingBackend=$TRACE_BACKEND \
-  --set ${TRACE_BACKEND}ConnectionConfig.endpoint="$TRACE_BACKEND_ENDPOINT"
 
 GA_MEASUREMENT_ID="G-WP4XXN1FYN"
 GA_SECRET_KEY="QHaq8ZCHTzGzdcRxJ-NIbw"
