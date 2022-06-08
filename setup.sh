@@ -109,13 +109,6 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-
-echo "--> install tracetest to namespace $NAMESPACE"
-helm upgrade --install tracetest kubeshop/tracetest \
-  --namespace $NAMESPACE --create-namespace \
-  --set tracingBackend=$TRACE_BACKEND \
-  --set ${TRACE_BACKEND}ConnectionConfig.endpoint="$TRACE_BACKEND_ENDPOINT"
-
 if [ "$SKIP_BACKEND" != "YES" ]; then
     echo
     echo
@@ -175,6 +168,24 @@ echo
 helm repo add kubeshop https://kubeshop.github.io/helm-charts
 helm repo update
 
+version=$(helm show chart kubeshop/tracetest | head -2 | tail -1 | awk -F ': ' '{print $2}')
+
+echo
+echo "--> install tracetest version $version to namespace $NAMESPACE"
+helm upgrade --install tracetest kubeshop/tracetest \
+  --namespace $NAMESPACE --create-namespace \
+  --set tracingBackend=$TRACE_BACKEND \
+  --set ${TRACE_BACKEND}ConnectionConfig.endpoint="$TRACE_BACKEND_ENDPOINT"
+
+GA_MEASUREMENT_ID="G-WP4XXN1FYN"
+GA_SECRET_KEY="QHaq8ZCHTzGzdcRxJ-NIbw"
+uid=$(uuidgen)
+host=$(hostname)
+os=$(uname -s)
+arch=$(uname -m)
+curl -i -X POST "https://www.google-analytics.com/mp/collect?measurement_id=${GA_MEASUREMENT_ID}&api_secret=${GA_SECRET_KEY}" -d '{"user_id":"'$uid'","client_id":"'$uid'","events":[{"name":"setup_script","params":{"event_count":1,"event_category":"beacon","app_version":"'$version'","app_name":"tracetest","host":"'$host'","machine_id":"'$uid'","operating_system":"'$os'","architecture":"'$arch'"}}]}'
+
+
 echo
 echo
 echo "----------------------------"
@@ -187,4 +198,3 @@ echo "and navigate to http://localhost:8080"
 echo
 echo "to see tracetest logs:"
 echo "  kubectl logs --namespace $NAMESPACE -f svc/tracetest"
-
