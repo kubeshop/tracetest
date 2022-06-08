@@ -101,6 +101,8 @@ services:
         condition: service_healthy
       jaeger:
         condition: service_healthy
+      pokeshop:
+        condition: service_healthy
     networks:
       - local
 

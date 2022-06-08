@@ -20,7 +20,7 @@ jobs:
         cp ./tracetesting/ci/config.yml server/config.yaml
         cp ./tracetesting/ci/tracetest-testing-docker-compose.yml docker-compose.yaml
         docker-compose pull
-        docker-compose up -d pokeshop tracetest
+        docker-compose up -d tracetest
     - name: Install CLI
       run: |
         mkdir -p $GITHUB_WORKSPACE/bin
