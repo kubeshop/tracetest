@@ -3,7 +3,7 @@ description: Test if the create test endpoint creates a test correctly
 trigger:
   type: http
   http_request:
-    url: ${TRACETEST_ENDPOINT}/api/tests
+    url: ${TRACETEST_URL}/api/tests
     method: POST
     headers:
     - key: Content-Type
@@ -15,7 +15,7 @@ trigger:
           "name": "My test",
           "serviceUnderTest": {
             "request": {
-              "url": "${POKESHOP_ENDPOINT}/pokemon/import",
+              "url": "${POKESHOP_URL}/pokemon/import",
               "method": "GET",
               "headers": [
                 {
