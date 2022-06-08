@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"net/http/httputil"
 	"os"
 	"runtime"
 )
@@ -188,8 +187,6 @@ func (ga ga) sendPayloadToURL(p payload, url string) (*http.Response, []byte, er
 	}
 
 	request.Header.Set("Content-Type", "application/json")
-	d, _ := httputil.DumpRequestOut(request, true)
-	fmt.Println("DEBUG REQUEST", string(d))
 
 	client := http.DefaultClient
 
@@ -202,9 +199,6 @@ func (ga ga) sendPayloadToURL(p payload, url string) (*http.Response, []byte, er
 	if err != nil {
 		return nil, []byte{}, fmt.Errorf("could not read response body: %w", err)
 	}
-
-	d, _ = httputil.DumpResponse(resp, true)
-	fmt.Println("DEBUG RESPONSE", string(d))
 
 	return resp, body, err
 }
