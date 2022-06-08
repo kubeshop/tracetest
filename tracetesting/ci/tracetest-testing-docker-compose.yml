@@ -102,7 +102,7 @@ services:
       jaeger:
         condition: service_healthy
       pokeshop:
-        condition: service_healthy
+        condition: service_started
     networks:
       - local
 
