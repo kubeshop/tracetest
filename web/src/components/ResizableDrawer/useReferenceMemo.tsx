@@ -5,6 +5,8 @@ export function useReferenceMemo(visiblePortion: number) {
   return useMemo<Record<DrawerState, number>>(() => {
     return {
       CLOSE: visiblePortion,
+      // value not used
+      RESIZING: 0,
       // used when the page initially loads
       INITIAL: window.outerHeight * 0.2,
       // used when user open the assertion block form

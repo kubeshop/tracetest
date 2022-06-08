@@ -14,6 +14,7 @@ export enum DrawerState {
   OPEN = 'OPEN',
   CLOSE = 'CLOSE',
   INITIAL = 'INITIAL',
+  RESIZING = 'RESIZING',
   FORM = 'FORM',
   MAX = 'MAX',
 }
@@ -26,9 +27,10 @@ const CustomDrawer = styled(Drawer)`
 `;
 
 const ResizableDrawer: React.FC<IProps> = ({children, visiblePortion}: IProps) => {
-  const {drawerState} = useAssertionForm();
+  const {drawerState, setDrawerState} = useAssertionForm();
   const [isResizing, setIsResizing] = useState(false);
   const ref = useReferenceMemo(visiblePortion);
+  const [lastClosedHeight, setLastClosedHeight] = useState<undefined | number>(undefined);
   const [height, setHeight] = useState(ref[DrawerState.INITIAL]);
 
   const onPointerDown: MouseEventHandler = useCallback(() => {
@@ -48,19 +50,28 @@ const ResizableDrawer: React.FC<IProps> = ({children, visiblePortion}: IProps) =
           document.body.offsetHeight - ((e.clientY || document.body.offsetLeft) - document.body.offsetLeft);
         if (offsetRight > visiblePortion && offsetRight < ref[DrawerState.MAX]) {
           setHeight(offsetRight);
+          setLastClosedHeight(undefined);
+          if (drawerState !== DrawerState.RESIZING) {
+            setDrawerState(DrawerState.RESIZING);
+          }
         }
       }
     },
-    [setHeight, isResizing, visiblePortion, ref]
+    [isResizing, visiblePortion, ref, drawerState, setDrawerState]
   );
 
   useEffect(() => {
     if (drawerState === DrawerState.CLOSE) {
       setHeight(visiblePortion);
+      const isPresetHeights = [ref.OPEN, ref.FORM, ref.MAX, ref.INITIAL].includes(height);
+      if (!isPresetHeights) {
+        setLastClosedHeight(height);
+      }
       return;
     }
     if (drawerState === DrawerState.OPEN) {
-      setHeight(ref[DrawerState.OPEN]);
+      setHeight(lastClosedHeight || ref[DrawerState.OPEN]);
+      setLastClosedHeight(undefined);
     }
     if (drawerState === DrawerState.FORM) {
       setHeight(ref[DrawerState.FORM]);
@@ -68,7 +79,10 @@ const ResizableDrawer: React.FC<IProps> = ({children, visiblePortion}: IProps) =
     if (drawerState === DrawerState.INITIAL) {
       setHeight(ref[DrawerState.INITIAL]);
     }
+    // height cannot be inside the dep array, bc it will trigger
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [drawerState, ref, visiblePortion]);
+
   useEffect(() => {
     document.addEventListener('pointermove', onMouseMove);
     document.addEventListener('pointerup', onMouseUp);
@@ -105,7 +119,13 @@ const ResizableDrawer: React.FC<IProps> = ({children, visiblePortion}: IProps) =
         }}
         onPointerDown={onPointerDown}
       />
-      {children.map(child => React.cloneElement(child, {height, max: ref[DrawerState.MAX], min: visiblePortion}))}
+      {children.map(child =>
+        React.cloneElement(child, {
+          height,
+          max: ref[DrawerState.MAX],
+          min: visiblePortion,
+        })
+      )}
     </CustomDrawer>
   );
 };
