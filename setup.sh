@@ -109,6 +109,10 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+set +e #ignore errors here
+kubectl create namespace $NAMESPACE
+set -e
+
 if [ "$SKIP_BACKEND" != "YES" ]; then
     echo
     echo
@@ -183,7 +187,7 @@ uid=$(uuidgen)
 host=$(hostname)
 os=$(uname -s)
 arch=$(uname -m)
-payload='{"user_id":"'$uid'","client_id":"'$uid'","events":[{"name":"setup_script","params":{"event_count":1,"event_category":"beacon","app_version":"'$version'","app_name":"tracetest","host":"'$host'","machine_id":"'$uid'","operating_system":"'$os'","architecture":"'$arch'"}}]}'
+payload='{"client_id":"'$uid'","events":[{"name":"setup_script","params":{"event_count":1,"event_category":"beacon","app_version":"'$version'","app_name":"tracetest","host":"'$host'","machine_id":"'$uid'","operating_system":"'$os'","architecture":"'$arch'"}}]}'
 curl -X POST "https://www.google-analytics.com/debug/mp/collect?measurement_id=${GA_MEASUREMENT_ID}&api_secret=${GA_SECRET_KEY}" -d $payload > /dev/null
 curl -X POST "https://www.google-analytics.com/mp/collect?measurement_id=${GA_MEASUREMENT_ID}&api_secret=${GA_SECRET_KEY}" -d $payload
 
