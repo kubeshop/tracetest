@@ -59,13 +59,7 @@ const TestDefinitionSelectors = () => ({
   selectDefinitionBySelector: createSelector(selectDefinitionList, selectorSelector, (definitionList, selector) =>
     definitionList.find(def => def.selector === selector)
   ),
-  selectAffectedSpans: createSelector(stateSelector, ({affectedSpans, assertionResults, selectedAssertion}) => {
-    const foundAssertion = assertionResults?.resultList.find(({selector}) => selector === selectedAssertion);
-
-    if (!foundAssertion) return [];
-
-    return affectedSpans;
-  }),
+  selectAffectedSpans: createSelector(stateSelector, ({affectedSpans}) => affectedSpans),
   selectSelectedAssertion: createSelector(stateSelector, ({selectedAssertion}) => selectedAssertion),
   selectAssertionResultsBySpan,
   selectSelectedSpan: createSelector(stateSelector, ({selectedSpan}) => selectedSpan),
