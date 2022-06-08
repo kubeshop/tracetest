@@ -41,6 +41,7 @@ const TraceContent = () => {
       <FailedTrace
         onRunTest={onRunTest}
         testId={testId}
+        run={run}
         isDisplayingError={isDisplayingError}
         onEdit={() => console.log('onEdit')}
       />

@@ -80,6 +80,24 @@ func TestRunTestCmdWhenEditingTest(t *testing.T) {
 	assert.Equal(t, *outputObject.Test.Id, *updateOutputObject.Test.Id)
 }
 
+func TestRunTestJUnitCmdValidation(t *testing.T) {
+	cli := e2e.NewCLI()
+
+	definitionFile := "test_run_cmd_test_definition.yml"
+	err := copyFile("../testdata/definitions/valid_http_test_definition.yml", definitionFile)
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		err := deleteFile(definitionFile)
+		require.NoError(t, err)
+	})
+
+	testRunCommand := cli.NewCommand("test", "run", "--config", "e2e/config.yml", "--definition", definitionFile, "--junit", "junit_output.xml")
+	output, err := testRunCommand.Run()
+	assert.NoError(t, err)
+	assert.NotEmpty(t, output)
+	assert.Contains(t, output, "--junit option requires --wait-for-result")
+}
+
 func copyFile(source string, destination string) error {
 	input, err := os.ReadFile(source)
 	if err != nil {

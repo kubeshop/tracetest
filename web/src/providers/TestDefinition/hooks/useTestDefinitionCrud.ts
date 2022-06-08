@@ -15,16 +15,17 @@ import {
 } from '../../../redux/slices/TestDefinition.slice';
 import {TAssertionResults} from '../../../types/Assertion.types';
 import {TTestDefinitionEntry} from '../../../types/TestDefinition.types';
-import useDraftMode from './useDraftMode';
 import TestRunGateway from '../../../gateways/TestRun.gateway';
+import useBlockNavigation from '../../../hooks/useBlockNavigation';
 
 interface IProps {
   runId: string;
   testId: string;
+  isDraftMode: boolean;
 }
 
-const useTestDefinitionCrud = ({runId, testId}: IProps) => {
-  const {isDraftMode, setIsDraftMode} = useDraftMode();
+const useTestDefinitionCrud = ({runId, testId, isDraftMode}: IProps) => {
+  useBlockNavigation(isDraftMode);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
@@ -44,12 +45,11 @@ const useTestDefinitionCrud = ({runId, testId}: IProps) => {
 
   const publish = useCallback(async () => {
     const {id} = await dispatch(TestDefinitionActions.publish({testId, runId})).unwrap();
-    setIsDraftMode(false);
     dispatch(clearAffectedSpans());
     dispatch(setSelectedAssertion(''));
 
     navigate(`/test/${testId}/run/${id}`);
-  }, [dispatch, navigate, runId, setIsDraftMode, testId]);
+  }, [dispatch, navigate, runId, testId]);
 
   const runTest = useCallback(async () => {
     const {id} = await dispatch(TestRunGateway.runTest(testId)).unwrap();
@@ -59,32 +59,28 @@ const useTestDefinitionCrud = ({runId, testId}: IProps) => {
   }, [dispatch, navigate, testId]);
 
   const cancel = useCallback(() => {
-    setIsDraftMode(false);
     dispatch(resetDefinitionList());
-  }, [dispatch, setIsDraftMode]);
+  }, [dispatch]);
 
   const add = useCallback(
     async (definition: TTestDefinitionEntry) => {
       dispatch(addDefinition({definition}));
-      setIsDraftMode(true);
     },
-    [dispatch, setIsDraftMode]
+    [dispatch]
   );
 
   const update = useCallback(
     async (selector: string, definition: TTestDefinitionEntry) => {
       dispatch(updateDefinition({definition, selector}));
-      setIsDraftMode(true);
     },
-    [dispatch, setIsDraftMode]
+    [dispatch]
   );
 
   const remove = useCallback(
     async (selector: string) => {
       dispatch(removeDefinition({selector}));
-      setIsDraftMode(true);
     },
-    [dispatch, setIsDraftMode]
+    [dispatch]
   );
 
   const init = useCallback(
@@ -98,7 +94,7 @@ const useTestDefinitionCrud = ({runId, testId}: IProps) => {
     dispatch(resetAction());
   }, [dispatch]);
 
-  return {revert, init, reset, add, remove, update, publish, runTest, cancel, dryRun, isDraftMode};
+  return {revert, init, reset, add, remove, update, publish, runTest, cancel, dryRun};
 };
 
 export default useTestDefinitionCrud;

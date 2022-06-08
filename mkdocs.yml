@@ -24,6 +24,11 @@ nav:
   - Architecture: architecture.md
   - Creating Tests: create-test.md
   - Adding Assertions: adding-assertions.md
+  - Example - Pokeshop Service:
+      - Overview: pokeshop.md
+      - Add Pokemon Endpoint: pokeshop/add-pokemon.md
+      - Import Pokemon Endpoint: pokeshop/import-pokemon.md
+      - List Pokemon Endpoints: pokeshop/list-pokemon.md
   - Selectors: advanced-selectors.md
   - OpenAPI Definition: openapi.md
   - Development: development.md
