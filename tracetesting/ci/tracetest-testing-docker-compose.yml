@@ -99,6 +99,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      jaeger:
+        condition: service_healthy
     networks:
       - local
 
