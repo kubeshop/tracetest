@@ -24,8 +24,8 @@ jobs:
       uses: actions/checkout@v2
     - name: Start tracetest
       run: |
-        cp tracetesting/ci/config.yml .
-        cp tracetesting/ci/tracetest-testing-docker-compose.yml docker-compose.yml
+        cp ./tracetesting/ci/config.yml .
+        cp ./tracetesting/ci/tracetest-testing-docker-compose.yml docker-compose.yml
         docker-compose pull
         docker-compose up -d tracetest
     - name: Install CLI
