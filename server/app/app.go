@@ -62,6 +62,7 @@ func spaHandler(staticPath, indexPath string, tplVars map[string]string) http.Ha
 }
 
 func (a *App) Start() error {
+	fmt.Println("Starting tracetest", Version)
 	err := analytics.Init(a.config.GA.Enabled, "tracetest", Version)
 	if err != nil {
 		return err
