@@ -109,6 +109,24 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+echo "----------------------------"
+echo "Installing Tracetest"
+echo "----------------------------"
+echo
+
+helm repo add kubeshop https://kubeshop.github.io/helm-charts
+helm repo update
+
+version=$(helm show chart kubeshop/tracetest | head -2 | tail -1 | awk -F ': ' '{print $2}')
+
+echo
+echo "--> install tracetest version $version to namespace $NAMESPACE"
+helm upgrade --install tracetest kubeshop/tracetest \
+  --namespace $NAMESPACE --create-namespace \
+  --set tracingBackend=$TRACE_BACKEND \
+  --set ${TRACE_BACKEND}ConnectionConfig.endpoint="$TRACE_BACKEND_ENDPOINT"
+
+
 if [ "$SKIP_BACKEND" != "YES" ]; then
     echo
     echo
@@ -153,29 +171,12 @@ if [ "$SKIP_PMA" != "YES" ]; then
       --set 'env[5].value=jaeger-agent.'$NAMESPACE'.svc.cluster.local'
 
     echo "--> waiting for demo app to be ready"
+    sleep 5
     kubectl wait --for=condition=ready pod --namespace demo demo-rabbitmq-0 --timeout 2m
     kubectl wait --for=condition=ready pod --namespace demo -l app.kubernetes.io/name=pokemon-api
     echo "--> demo app ready"
     rm -rf $tmpdir
 fi
-
-
-echo "----------------------------"
-echo "Installing Tracetest"
-echo "----------------------------"
-echo
-
-helm repo add kubeshop https://kubeshop.github.io/helm-charts
-helm repo update
-
-version=$(helm show chart kubeshop/tracetest | head -2 | tail -1 | awk -F ': ' '{print $2}')
-
-echo
-echo "--> install tracetest version $version to namespace $NAMESPACE"
-helm upgrade --install tracetest kubeshop/tracetest \
-  --namespace $NAMESPACE --create-namespace \
-  --set tracingBackend=$TRACE_BACKEND \
-  --set ${TRACE_BACKEND}ConnectionConfig.endpoint="$TRACE_BACKEND_ENDPOINT"
 
 GA_MEASUREMENT_ID="G-WP4XXN1FYN"
 GA_SECRET_KEY="QHaq8ZCHTzGzdcRxJ-NIbw"
@@ -183,7 +184,7 @@ uid=$(uuidgen)
 host=$(hostname)
 os=$(uname -s)
 arch=$(uname -m)
-payload='{"user_id":"'$uid'","client_id":"'$uid'","events":[{"name":"setup_script","params":{"event_count":1,"event_category":"beacon","app_version":"'$version'","app_name":"tracetest","host":"'$host'","machine_id":"'$uid'","operating_system":"'$os'","architecture":"'$arch'"}}]}'
+payload='{"client_id":"'$uid'","events":[{"name":"setup_script","params":{"event_count":1,"event_category":"beacon","app_version":"'$version'","app_name":"tracetest","host":"'$host'","machine_id":"'$uid'","operating_system":"'$os'","architecture":"'$arch'"}}]}'
 curl -X POST "https://www.google-analytics.com/debug/mp/collect?measurement_id=${GA_MEASUREMENT_ID}&api_secret=${GA_SECRET_KEY}" -d $payload > /dev/null
 curl -X POST "https://www.google-analytics.com/mp/collect?measurement_id=${GA_MEASUREMENT_ID}&api_secret=${GA_SECRET_KEY}" -d $payload
 
