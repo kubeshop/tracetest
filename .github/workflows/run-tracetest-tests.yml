@@ -21,6 +21,7 @@ jobs:
         cp ./tracetesting/ci/tracetest-testing-docker-compose.yml docker-compose.yaml
         docker-compose pull
         docker-compose up -d tracetest
+        docker ps
     - name: Install CLI
       run: |
         mkdir -p $GITHUB_WORKSPACE/bin
