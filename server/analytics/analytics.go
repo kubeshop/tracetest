@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/http/httputil"
 	"os"
 	"runtime"
 )
@@ -49,12 +50,20 @@ func Init(enabled bool, serverID, appName, appVersion string) error {
 }
 
 func CreateAndSendEvent(name, category string) error {
+	fmt.Printf(`sending event "%s" (%s)%s`, name, category, "\n")
 	if !defaultClient.ready() {
-		err := fmt.Errorf("uninitalized client. Call analytics.Init")
-		fmt.Printf(`could not send event "%s" (%s): %s \n`, name, category, err.Error())
+		err := fmt.Errorf("uninitalized cliGent. Call analytics.Init")
+		fmt.Printf(`could not send event "%s" (%s): %s%s`, name, category, err.Error(), "\n")
 		return err
 	}
-	return defaultClient.CreateAndSendEvent(name, category)
+	err := defaultClient.CreateAndSendEvent(name, category)
+	if err != nil {
+		fmt.Printf(`could not send event "%s" (%s): %s%s`, name, category, err.Error(), "\n")
+	} else {
+		fmt.Printf(`event sent "%s" (%s)%s`, name, category, "\n")
+	}
+
+	return err
 }
 
 func Ready() bool {
@@ -81,7 +90,7 @@ func (ga ga) ready() bool {
 
 func (ga ga) CreateAndSendEvent(name, category string) error {
 	if !ga.enabled {
-		fmt.Printf(`Ignore event "%s" (%s): ga not enabled`, name, category)
+		fmt.Printf(`Ignore event "%s" (%s): ga not enabled%s`, name, category, "\n")
 		return nil
 	}
 	event, err := ga.newEvent(name, category)
@@ -179,6 +188,8 @@ func (ga ga) sendPayloadToURL(p payload, url string) (*http.Response, []byte, er
 	}
 
 	request.Header.Set("Content-Type", "application/json")
+	d, _ := httputil.DumpRequestOut(request, true)
+	fmt.Println("DEBUG REQUEST", string(d))
 
 	client := http.DefaultClient
 
@@ -191,6 +202,9 @@ func (ga ga) sendPayloadToURL(p payload, url string) (*http.Response, []byte, er
 	if err != nil {
 		return nil, []byte{}, fmt.Errorf("could not read response body: %w", err)
 	}
+
+	d, _ = httputil.DumpResponse(resp, true)
+	fmt.Println("DEBUG RESPONSE", string(d))
 
 	return resp, body, err
 }
