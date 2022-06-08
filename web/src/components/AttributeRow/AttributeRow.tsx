@@ -13,12 +13,10 @@ interface IProps {
   assertionsPassed?: IResult[];
   attribute: TSpanFlatAttribute;
   isCopied: boolean;
-  isGuidedTourOpen: Boolean;
-  guidedTourCurrentStep: number;
   onCopy(value: string): void;
   onCreateAssertion(attribute: TSpanFlatAttribute): void;
   setIsCopied(value: boolean): void;
-  index: number;
+  shouldDisplayActions: boolean;
 }
 
 const AttributeRow = ({
@@ -30,11 +28,8 @@ const AttributeRow = ({
   onCopy,
   onCreateAssertion,
   setIsCopied,
-  index,
-  guidedTourCurrentStep,
-  isGuidedTourOpen,
+  shouldDisplayActions,
 }: IProps) => {
-  const shouldDisplayActions = index === 0 && isGuidedTourOpen && guidedTourCurrentStep === 3;
   const {isHovering, onMouseEnter, onMouseLeave} = useHover();
   const passedCount = assertionsPassed?.length ?? 0;
   const failedCount = assertionsFailed?.length ?? 0;

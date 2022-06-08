@@ -4,7 +4,7 @@ import './index.css';
 import {NextButton} from './NextButton';
 import {PreviousButton} from './PreviousButton';
 
-export const GuidedTourProvider: React.FC = ({children}) => (
+const GuidedTour: React.FC = ({children}) => (
   <TourProvider
     steps={[]}
     maskClassName="tour-mask"
@@ -28,3 +28,5 @@ export const GuidedTourProvider: React.FC = ({children}) => (
     {children}
   </TourProvider>
 );
+
+export default GuidedTour;

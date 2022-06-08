@@ -1,10 +1,9 @@
 import Logo from 'assets/Logo.svg';
 import {FC} from 'react';
 import {Link, useLocation} from 'react-router-dom';
-import HomeAnalyticsService from '../../services/Analytics/HomeAnalytics.service';
+import HomeAnalyticsService from 'services/Analytics/HomeAnalytics.service';
 import * as S from './Header.styled';
 import {HeaderMenu} from './HeaderMenu';
-import './index.css';
 
 const {onGuidedTourClick} = HomeAnalyticsService;
 

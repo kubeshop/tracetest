@@ -43,7 +43,7 @@ const StepList: StepType[] = [
       <StepContent title="Span Details" setIsOpen={setIsOpen}>
         <Typography.Text>
           Details about the selected span are shown here. They are grouped into tabs based on the type of span. The
-          {` 'Attribute list' `} shows all of the attributes
+          {` 'All tab' `} shows all of the attributes
         </Typography.Text>
       </StepContent>
     ),

@@ -1,13 +1,13 @@
 import TestHeader from 'components/TestHeader';
 import {useCallback} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
-import FailedTrace from '../../components/FailedTrace';
-import Trace from '../../components/Trace';
-import TraceActions from '../../components/TraceActions';
-import {TestState} from '../../constants/TestRun.constants';
-import {useTestDefinition} from '../../providers/TestDefinition/TestDefinition.provider';
-import {useTestRun} from '../../providers/TestRun/TestRun.provider';
-import {visiblePortionFuction} from '../../utils/Common';
+import FailedTrace from 'components/FailedTrace';
+import Trace from 'components/Trace';
+import TraceActions from 'components/TraceActions';
+import {TestState} from 'constants/TestRun.constants';
+import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
+import {useTestRun} from 'providers/TestRun/TestRun.provider';
+import {visiblePortionFuction} from 'utils/Common';
 import {useGetResultByIdQueryPolling} from './hooks/useGetResultByIdQueryPolling';
 import * as S from './Trace.styled';
 

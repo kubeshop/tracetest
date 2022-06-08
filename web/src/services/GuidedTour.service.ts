@@ -2,10 +2,15 @@ import LocalStorageGateway from '../gateways/LocalStorage.gateway';
 
 export enum GuidedTours {
   Home = 'home',
-  Assertion = 'assertion',
   Trace = 'trace',
   TestDetails = 'testDetails',
 }
+
+export const GuidedToursPathnameMap = {
+  '/run/': GuidedTours.Trace,
+  '/test/': GuidedTours.TestDetails,
+  '/': GuidedTours.Home,
+};
 
 type TTour = Record<GuidedTours, boolean>;
 
@@ -23,6 +28,12 @@ export const defaultValue = Object.values(GuidedTours).reduce<TTour>(
 
 const GuidedTourService = () => {
   return {
+    getByPathName: (pathname: string) => {
+      const [, value = GuidedTours.Home] =
+        Object.entries(GuidedToursPathnameMap).find(([key]) => pathname.includes(key)) || [];
+
+      return value;
+    },
     get(): TTour {
       const guidedTour = get() || defaultValue;
 

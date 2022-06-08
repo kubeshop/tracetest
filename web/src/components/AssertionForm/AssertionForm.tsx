@@ -3,16 +3,13 @@ import {FieldData} from 'antd/node_modules/rc-field-form/es/interface';
 import {isEmpty} from 'lodash';
 import React, {useCallback, useEffect} from 'react';
 
-import {Steps} from 'components/GuidedTour/assertionStepList';
 import {CompareOperator} from 'constants/Operator.constants';
-import useGuidedTour from 'hooks/useGuidedTour';
 import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
 import {useGetSelectedSpansQuery} from 'redux/apis/TraceTest.api';
 import {useAppSelector} from 'redux/hooks';
 import AssertionSelectors from 'selectors/Assertion.selectors';
 import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
 import CreateAssertionModalAnalyticsService from 'services/Analytics/CreateAssertionModalAnalytics.service';
-import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
 import OperatorService from 'services/Operator.service';
 import SelectorService from 'services/Selector.service';
 import {TAssertion, TPseudoSelector, TSpanSelector} from 'types/Assertion.types';
@@ -57,7 +54,6 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
 }) => {
   const {setAffectedSpans} = useTestDefinition();
   const [form] = Form.useForm<IValues>();
-  useGuidedTour(GuidedTours.Assertion);
 
   const currentSelectorList = Form.useWatch('selectorList', form) || [];
   const currentAssertionList = Form.useWatch('assertionList', form) || [];
@@ -157,7 +153,6 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
                   ),
               },
             ]}
-            data-tour={GuidedTourService.getStep(GuidedTours.Assertion, Steps.Selectors)}
           >
             <AssertionFormSelectorInput attributeList={selectorAttributeList} />
           </Form.Item>
@@ -175,7 +170,7 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
             `}
           />
         </div>
-        <div data-tour={GuidedTourService.getStep(GuidedTours.Assertion, Steps.Checks)}>
+        <div>
           <Form.List name="assertionList">
             {(fields, {add, remove}) => (
               <AssertionFormCheckList

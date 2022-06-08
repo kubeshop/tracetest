@@ -1,10 +1,10 @@
 import {QuestionCircleOutlined} from '@ant-design/icons';
 import {useTour} from '@reactour/tour';
 import {Popover, Typography} from 'antd';
-import {useMemo, useState} from 'react';
+import {useMemo} from 'react';
 import {useParams} from 'react-router-dom';
-import {DOCUMENTATION_URL, GITHUB_URL} from '../../constants/Common.constants';
-import {useOpenGuidedTourForNewUsersEffect} from '../../pages/Trace/useOpenGuidedTourForNewUsersEffect';
+import {DOCUMENTATION_URL, GITHUB_URL} from 'constants/Common.constants';
+import {useGuidedTour} from 'providers/GuidedTour/GuidedTour.provider';
 import * as S from './Header.styled';
 import {ShowOnboardingContent} from './ShowOnboardingContent';
 
@@ -15,17 +15,22 @@ interface IProps {
 
 export const HeaderMenu = ({pathname, onGuidedTourClick}: IProps) => {
   const {setIsOpen} = useTour();
-  const [visible, setVisible] = useState(false);
-  const handleGuidedTourCLick = () => setVisible(o => !o);
-  useOpenGuidedTourForNewUsersEffect(setVisible);
+  const {setIsTriggerVisible, isTriggerVisible} = useGuidedTour();
+
   const content = useMemo(
-    () => ShowOnboardingContent(onGuidedTourClick, setIsOpen, setVisible),
-    [setIsOpen, setVisible, onGuidedTourClick]
+    () =>
+      ShowOnboardingContent(
+        onGuidedTourClick,
+        () => setIsOpen(true),
+        () => setIsTriggerVisible(false)
+      ),
+    [onGuidedTourClick, setIsOpen, setIsTriggerVisible]
   );
+
   const params = useParams();
   return (
     <Popover
-      visible={visible}
+      visible={isTriggerVisible}
       content={content}
       title={() => <Typography.Title level={5}>Take a quick tour of Tracetest?</Typography.Title>}
       arrowContent={null}
@@ -62,7 +67,7 @@ export const HeaderMenu = ({pathname, onGuidedTourClick}: IProps) => {
               {
                 key: 'Onboarding',
                 label: (
-                  <a key="guidedTour" onClick={handleGuidedTourCLick}>
+                  <a key="guidedTour" onClick={() => setIsTriggerVisible(!isTriggerVisible)}>
                     Show Onboarding
                   </a>
                 ),

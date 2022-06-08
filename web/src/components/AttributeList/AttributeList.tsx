@@ -2,11 +2,10 @@ import AttributeRow from 'components/AttributeRow';
 import {useState} from 'react';
 import {TResultAssertions} from 'types/Assertion.types';
 import {TSpanFlatAttribute} from 'types/Span.types';
-import useGuidedTour from '../../hooks/useGuidedTour';
-import {GuidedTours} from '../../services/GuidedTour.service';
+import TraceAnalyticsService from 'services/Analytics/TraceAnalytics.service';
+import {useGuidedTour} from 'providers/GuidedTour/GuidedTour.provider';
 import * as S from './AttributeList.styled';
 import EmptyAttributeList from './EmptyAttributeList';
-import TraceAnalyticsService from '../../services/Analytics/TraceAnalytics.service';
 
 interface IProps {
   assertions?: TResultAssertions;
@@ -22,15 +21,18 @@ const AttributeList: React.FC<IProps> = ({assertions, attributeList, onCreateAss
     navigator.clipboard.writeText(value);
     setIsCopied(true);
   };
-  const {isOpen, currentStep} = useGuidedTour(GuidedTours.Trace);
+
+  const {
+    tour: {isOpen, currentStep},
+  } = useGuidedTour();
+
+  const getShouldDisplayActions = (index: number) => isOpen && currentStep === 3 && !index;
 
   return attributeList.length ? (
     <S.AttributeList data-cy="attribute-list">
       {attributeList.map((attribute, index) => (
         <AttributeRow
-          isGuidedTourOpen={isOpen}
-          guidedTourCurrentStep={currentStep}
-          index={index}
+          shouldDisplayActions={getShouldDisplayActions(index)}
           assertionsFailed={assertions?.[attribute.key]?.failed}
           assertionsPassed={assertions?.[attribute.key]?.passed}
           attribute={attribute}
