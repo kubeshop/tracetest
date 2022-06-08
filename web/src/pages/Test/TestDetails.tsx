@@ -5,7 +5,6 @@ import {Steps} from 'components/GuidedTour/testDetailsStepList';
 import InfiniteScroll from 'components/InfiniteScroll';
 import ResultCardList from 'components/RunCardList';
 import SearchInput from 'components/SearchInput';
-import useGuidedTour from 'hooks/useGuidedTour';
 import useInfiniteScroll from 'hooks/useInfiniteScroll';
 import {useGetRunListQuery, useRunTestMutation} from 'redux/apis/TraceTest.api';
 import TestAnalyticsService from 'services/Analytics/TestAnalytics.service';
@@ -30,8 +29,6 @@ const TestDetails = ({onSelectResult, testId}: IProps) => {
   } = useInfiniteScroll<TTestRun, {testId: string}>(useGetRunListQuery, {
     testId,
   });
-
-  useGuidedTour(GuidedTours.TestDetails);
 
   const handleRunTest = useCallback(async () => {
     if (testId) {

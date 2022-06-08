@@ -1,12 +1,14 @@
 import {DeleteOutlined, DownOutlined, PlusOutlined} from '@ant-design/icons';
 import {Button, Dropdown, Form, FormInstance, Input, Menu, Select, Typography} from 'antd';
-import {camelCase} from 'lodash';
 
 import {Steps} from 'components/GuidedTour/homeStepList';
 import {HTTP_METHOD} from 'constants/Common.constants';
 import {DEFAULT_HEADERS, DemoTestExampleList} from 'constants/Test.constants';
+import {camelCase} from 'lodash';
+import React from 'react';
 import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
 import Validator from 'utils/Validator';
+import {TooltipQuestion} from '../TooltipQuestion/TooltipQuestion';
 import * as S from './CreateTestModal.styled';
 import CreateTestAnalyticsService from '../../services/Analytics/CreateTestAnalytics.service';
 
@@ -83,6 +85,10 @@ const CreateTestForm = ({form, onSelectDemo, onSubmit, onValidation, selectedDem
             {selectedDemo || 'Choose Example'} <DownOutlined />
           </Typography.Link>
         </Dropdown>
+        <TooltipQuestion
+          margin={8}
+          title="We have a microservice based on the Pokemon API installed - pick an example to autofill this form"
+        />
       </S.DemoContainer>
 
       <S.Row>

@@ -1,11 +1,11 @@
-import {useState} from 'react';
-
 import AttributeRow from 'components/AttributeRow';
+import {useState} from 'react';
 import {TResultAssertions} from 'types/Assertion.types';
 import {TSpanFlatAttribute} from 'types/Span.types';
+import TraceAnalyticsService from 'services/Analytics/TraceAnalytics.service';
+import {useGuidedTour} from 'providers/GuidedTour/GuidedTour.provider';
 import * as S from './AttributeList.styled';
 import EmptyAttributeList from './EmptyAttributeList';
-import TraceAnalyticsService from '../../services/Analytics/TraceAnalytics.service';
 
 interface IProps {
   assertions?: TResultAssertions;
@@ -22,10 +22,17 @@ const AttributeList: React.FC<IProps> = ({assertions, attributeList, onCreateAss
     setIsCopied(true);
   };
 
+  const {
+    tour: {isOpen, currentStep},
+  } = useGuidedTour();
+
+  const getShouldDisplayActions = (index: number) => isOpen && currentStep === 3 && !index;
+
   return attributeList.length ? (
     <S.AttributeList data-cy="attribute-list">
-      {attributeList.map(attribute => (
+      {attributeList.map((attribute, index) => (
         <AttributeRow
+          shouldDisplayActions={getShouldDisplayActions(index)}
           assertionsFailed={assertions?.[attribute.key]?.failed}
           assertionsPassed={assertions?.[attribute.key]?.passed}
           attribute={attribute}
