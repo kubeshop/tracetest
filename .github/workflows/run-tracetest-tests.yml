@@ -19,7 +19,7 @@ jobs:
       run: |
         ls
         cp ./tracetesting/ci/config.yml .
-        cp ./tracetesting/ci/tracetest-testing-docker-compose.yml docker-compose.yml
+        cp ./tracetesting/ci/tracetest-testing-docker-compose.yml docker-compose.yaml
         docker-compose pull
         docker-compose up -d tracetest
     - name: Install CLI

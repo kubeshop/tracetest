@@ -91,7 +91,7 @@ services:
       - VERSION=1.0
     volumes:
       - type: bind
-        source: ./server/config.yaml
+        source: config.yaml
         target: /app/config.yaml
     ports:
       - 8080:8080
