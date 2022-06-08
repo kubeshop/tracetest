@@ -50,7 +50,7 @@ jobs:
           build-args: |
             GA_MEASUREMENT_ID=${{ secrets.GA_MEASUREMENT_ID }}
             GA_SECRET_KEY=${{ secrets.GA_SECRET_KEY }}
-            VERSION=sha-${{ steps.vars.outputs.sha_short }}
+            VERSION=beta
 
   publish:
     if: github.event_name == 'push'
