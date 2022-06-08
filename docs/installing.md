@@ -20,7 +20,7 @@ Tools needed for the installation:
 We provide a simple install script that can install all required components:
 
 ```
-curl -L https://raw.githubusercontent.com/kubeshop/main/setup.sh | bash -s
+curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/setup.sh | bash -s
 ```
 
 This command will install Tracetest using the default settings. You can configure the following options:
@@ -39,7 +39,7 @@ This command will install Tracetest using the default settings. You can configur
 Example with custom options:
 
 ```
-curl -L https://raw.githubusercontent.com/kubeshop/main/setup.sh | bash -s -- --skip-pma --namespace my-custom-namespace
+curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/setup.sh | bash -s -- --skip-pma --namespace my-custom-namespace
 ```
 
 ### Using Helm
