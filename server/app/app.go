@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"path/filepath"
 	"regexp"
 	"text/template"
@@ -20,6 +19,8 @@ import (
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"go.opentelemetry.io/otel/trace"
 )
+
+var Version = ""
 
 type App struct {
 	config  config.Config
@@ -61,7 +62,7 @@ func spaHandler(staticPath, indexPath string, tplVars map[string]string) http.Ha
 }
 
 func (a *App) Start() error {
-	err := analytics.Init(a.config.GA, "tracetest", os.Getenv("VERSION"))
+	err := analytics.Init(a.config.GA.Enabled, "tracetest", Version)
 	if err != nil {
 		return err
 	}
@@ -96,7 +97,7 @@ func (a *App) Start() error {
 			"./html",
 			"index.html",
 			map[string]string{
-				"MeasurementId":    a.config.GA.MeasurementID,
+				"MeasurementId":    analytics.MeasurementID,
 				"AnalyticsEnabled": fmt.Sprintf("%t", a.config.GA.Enabled),
 			},
 		),

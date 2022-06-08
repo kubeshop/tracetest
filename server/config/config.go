@@ -22,9 +22,7 @@ type (
 	}
 
 	GoogleAnalytics struct {
-		MeasurementID string `mapstructure:"measurementId"`
-		SecretKey     string `mapstructure:"secretKey"`
-		Enabled       bool   `mapstructure:"enabled"`
+		Enabled bool `mapstructure:"enabled"`
 	}
 
 	PoolingConfig struct {

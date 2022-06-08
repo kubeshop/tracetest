@@ -1,3 +1,10 @@
+VERSION ?= "dev"
+GO_LDFLAGS := $(shell echo \
+		-X "'github.com/kubeshop/tracetest/server/app.Version=$(VERSION)'" \
+		-X "'github.com/kubeshop/tracetest/server/analytics.MeasurementID=$(GA_MEASUREMENT_ID)'" \
+		-X "'github.com/kubeshop/tracetest/server/analytics.SecretKey=$(GA_SECRET_KEY)'" \
+	| sed 's/ / /g')
+
 all: init-submodule proto generate
 
 init-submodule:
@@ -11,7 +18,10 @@ vet:
 	go vet -structtag=false ./...
 
 run:
-	go run main.go
+	go run -ldflags="$(GO_LDFLAGS)" main.go
+
+build:
+	go build -o tracetest-server -ldflags="$(GO_LDFLAGS)" .
 
 OPENAPI_GENERATOR_VER=v5.4.0
 OPENAPI_GENERATOR_IMAGE=openapitools/openapi-generator-cli:$(OPENAPI_GENERATOR_VER)
