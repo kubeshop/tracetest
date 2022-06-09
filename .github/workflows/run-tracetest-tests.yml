@@ -26,9 +26,10 @@ jobs:
         docker-compose up -d tracetest
     - name: Install CLI
       run: |
-        mkdir -p $GITHUB_WORKSPACE/bin
-        curl -L https://github.com/kubeshop/tracetest/releases/download/v0.5.0/tracetest-v0.5.0-linux-amd64.tar.gz --output file.tar.gz
-        tar -xvf file.tar.gz
+        cd cli
+        make build
+        cd ..
+        cp cli/tracetest .
     - name: Configure CLI
       run: |
         echo "scheme: http" > config.yml
