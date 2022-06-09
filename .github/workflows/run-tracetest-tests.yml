@@ -17,6 +17,13 @@ jobs:
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
+    - name: Start tracetest
+      run: |
+        cp ./tracetesting/ci/config.yml server/config.yaml
+        cp ./tracetesting/ci/tracetest-testing-docker-compose.yml docker-compose.yaml
+        docker-compose pull
+        docker-compose up -d pokeshop
+        docker-compose up -d tracetest
     - name: Setup go
       uses: actions/setup-go@v3
       with:
@@ -32,13 +39,6 @@ jobs:
         echo "scheme: http" > config.yml
         echo "endpoint: localhost:8080" >> config.yml
         cat config.yml
-    - name: Start tracetest
-      run: |
-        cp ./tracetesting/ci/config.yml server/config.yaml
-        cp ./tracetesting/ci/tracetest-testing-docker-compose.yml docker-compose.yaml
-        docker-compose pull
-        docker-compose up -d pokeshop
-        docker-compose up -d tracetest
     - name: Run test
       run: |
         cat tracetesting/create_test.yml
