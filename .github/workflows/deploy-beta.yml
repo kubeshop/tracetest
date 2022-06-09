@@ -1,8 +1,8 @@
-name: beta deploy
+name: Deploy Beta
 
 # Cancel any pending or running workflow if the new one is triggered
 concurrency:
-  group: "build"
+  group: "deploy-beta"
   cancel-in-progress: true
 
 on:
@@ -52,7 +52,7 @@ jobs:
             GA_SECRET_KEY=${{ secrets.GA_SECRET_KEY }}
             VERSION=sha-${{ steps.vars.outputs.sha_short }}
 
-  publish:
+  deploy:
     if: github.event_name == 'push'
     needs: build
     name: Deploy
@@ -84,7 +84,7 @@ jobs:
         helm repo update && \
         helm upgrade tracetest-beta kubeshop/tracetest \
           --namespace tracetest-beta \
-          --set analytics.enabled=true \
+          --set analytics.enabled=false \
           --set image.tag=sha-$(git rev-parse --short $GITHUB_SHA) \
           --set tracingBackend=jaeger \
           --set jaegerConnectionConfig.endpoint="jaeger-query.tracetest.svc.cluster.local:16685" \
