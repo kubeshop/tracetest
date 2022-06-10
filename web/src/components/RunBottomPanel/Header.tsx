@@ -1,43 +1,28 @@
 import {PlusOutlined} from '@ant-design/icons';
 import {Badge} from 'antd';
-import * as React from 'react';
 import {MouseEventHandler, useCallback, useMemo} from 'react';
+
+import {useAssertionForm} from 'components/AssertionForm/AssertionFormProvider';
+import {Steps} from 'components/GuidedTour/traceStepList';
+import {OPEN_BOTTOM_PANEL_STATE, useRunLayout} from 'components/RunLayout';
+import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
+import SpanService from 'services/Span.service';
+import TraceService from 'services/Trace.service';
+import {TAssertionResults} from 'types/Assertion.types';
+import {TSpan} from 'types/Span.types';
 import {TTestRun} from 'types/TestRun.types';
 import Date from 'utils/Date';
-import GuidedTourService, {GuidedTours} from '../../services/GuidedTour.service';
-import SpanService from '../../services/Span.service';
-import TraceService from '../../services/Trace.service';
-import {TAssertionResults} from '../../types/Assertion.types';
-import {TSpan} from '../../types/Span.types';
-import {useAssertionForm} from '../AssertionForm/AssertionFormProvider';
-import {Steps} from '../GuidedTour/traceStepList';
-import {useSetIsCollapsedCallbackDirection} from '../ResizableDrawer/useSetIsCollapsedCallback';
-import * as S from './TraceDrawer.styled';
-import {useChevronDirectionMemo} from './useChevronDirectionMemo';
+import * as S from './RunBottomPanel.styled';
 
 interface IProps {
-  visiblePortion: number;
   run: TTestRun;
   assertionResults?: TAssertionResults;
   isDisabled: boolean;
   selectedSpan: TSpan;
-  height?: number;
-  min?: number;
-  max?: number;
 }
 
-const TraceDrawerHeader: React.FC<IProps> = ({
-  run: {createdAt},
-  visiblePortion,
-  assertionResults,
-  isDisabled,
-  selectedSpan,
-  height,
-  max,
-  min,
-}) => {
-  const $isCollapsed = useChevronDirectionMemo(height, max, min);
-  const onClick = useSetIsCollapsedCallbackDirection($isCollapsed);
+const Header: React.FC<IProps> = ({run: {createdAt}, assertionResults, isDisabled, selectedSpan}) => {
+  const {isBottomPanelOpen, openBottomPanel, toggleBottomPanel} = useRunLayout();
   const {open} = useAssertionForm();
   const totalAssertionCount = assertionResults?.resultList.length || 0;
 
@@ -49,6 +34,7 @@ const TraceDrawerHeader: React.FC<IProps> = ({
   const handleAssertionClick: MouseEventHandler<HTMLElement> = useCallback(
     event => {
       event.stopPropagation();
+      openBottomPanel(OPEN_BOTTOM_PANEL_STATE.FORM);
       const {selectorList, pseudoSelector} = SpanService.getSelectorInformation(selectedSpan!);
 
       open({
@@ -59,14 +45,12 @@ const TraceDrawerHeader: React.FC<IProps> = ({
         },
       });
     },
-    [open, selectedSpan]
+    [open, selectedSpan, openBottomPanel]
   );
   return (
     <S.Header
-      visiblePortion={visiblePortion}
       data-tour={GuidedTourService.getStep(GuidedTours.Trace, Steps.Timeline)}
-      style={{height: visiblePortion, minHeight: visiblePortion}}
-      onClick={onClick}
+      onClick={() => toggleBottomPanel()}
     >
       <div>
         <S.HeaderText strong>Test Result</S.HeaderText>
@@ -86,12 +70,12 @@ const TraceDrawerHeader: React.FC<IProps> = ({
         >
           Add Assertion
         </S.AddAssertionButton>
-        <span style={{marginLeft: 16}}>
-          <S.Chevron $isCollapsed={$isCollapsed} />
-        </span>
+        <S.ChevronContainer>
+          <S.Chevron $isCollapsed={isBottomPanelOpen} />
+        </S.ChevronContainer>
       </div>
     </S.Header>
   );
 };
 
-export default TraceDrawerHeader;
+export default Header;

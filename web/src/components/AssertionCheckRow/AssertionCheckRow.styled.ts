@@ -34,9 +34,9 @@ export const Value = styled(Typography.Text)`
   font-size: 12px;
 `;
 
-export const LabelBadge = styled(Badge)<{spanType?: SemanticGroupNames}>`
+export const LabelBadge = styled(Badge)<{$spanType?: SemanticGroupNames}>`
   > sup {
-    background: ${({spanType}) => (spanType ? getNotchColor(spanType) : '#f0f0f0')};
+    background: ${({$spanType}) => ($spanType ? getNotchColor($spanType) : '#f0f0f0')};
     color: black;
     margin-right: 6px;
     border-radius: 2px;

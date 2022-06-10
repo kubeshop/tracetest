@@ -14,6 +14,7 @@ import SpanDetailTabs from './SpanDetailTabs';
 import SpanHeader from './SpanHeader';
 import * as S from './SpanDetail.styled';
 import TraceAnalyticsService from '../../services/Analytics/TraceAnalytics.service';
+import {OPEN_BOTTOM_PANEL_STATE, useRunLayout} from '../RunLayout';
 
 export interface ISpanDetailsComponentProps {
   assertions?: TResultAssertions;
@@ -33,6 +34,7 @@ const getSpanTitle = (span: TSpan) => {
 };
 
 const SpanDetail: React.FC<IProps> = ({span}) => {
+  const {openBottomPanel} = useRunLayout();
   const {open} = useAssertionForm();
   const assertions = useAppSelector(state =>
     TestDefinitionSelectors.selectAssertionResultsBySpan(state, span?.id || '')
@@ -41,6 +43,7 @@ const SpanDetail: React.FC<IProps> = ({span}) => {
 
   const onCreateAssertion = useCallback(
     ({value, key}: TSpanFlatAttribute) => {
+      openBottomPanel(OPEN_BOTTOM_PANEL_STATE.FORM);
       TraceAnalyticsService.onAddAssertionButtonClick();
       const {selectorList, pseudoSelector} = SpanService.getSelectorInformation(span!);
 
@@ -59,7 +62,7 @@ const SpanDetail: React.FC<IProps> = ({span}) => {
         },
       });
     },
-    [open, span]
+    [open, span, openBottomPanel]
   );
 
   return (

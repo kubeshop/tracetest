@@ -1,5 +1,5 @@
 import {Button, Divider, Typography} from 'antd';
-import {AddAssertionButton} from '../TraceDrawer/TraceDrawer.styled';
+import {AddAssertionButton} from '../RunBottomPanel/RunBottomPanel.styled';
 
 export const ShowOnboardingContent = (onGuidedTourClick: () => void, onShow: () => void, onClose: () => void) => (
   <div>

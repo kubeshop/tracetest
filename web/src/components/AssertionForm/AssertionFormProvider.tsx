@@ -3,13 +3,12 @@ import {noop} from 'lodash';
 import VersionMismatchModal from 'components/VersionMismatchModal/VersionMismatchModal';
 import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
-import {createContext, Dispatch, SetStateAction, useCallback, useContext, useMemo, useState} from 'react';
+import {createContext, useCallback, useContext, useMemo, useState} from 'react';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import {clearAffectedSpans, setSelectedAssertion} from 'redux/slices/TestDefinition.slice';
 import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
 import SelectorService from 'services/Selector.service';
 import {TTestDefinitionEntry} from 'types/TestDefinition.types';
-import {DrawerState} from '../ResizableDrawer/ResizableDrawer';
 import {IValues} from './AssertionForm';
 import CreateAssertionModalAnalyticsService from '../../services/Analytics/CreateAssertionModalAnalytics.service';
 
@@ -20,8 +19,6 @@ interface IFormProps {
 }
 
 interface ICreateAssertionModalProviderContext {
-  drawerState: DrawerState;
-  setDrawerState: Dispatch<SetStateAction<DrawerState>>;
   isOpen: boolean;
   open(props?: IFormProps): void;
   close(): void;
@@ -34,8 +31,6 @@ const initialFormProps = {
 };
 
 export const Context = createContext<ICreateAssertionModalProviderContext>({
-  drawerState: DrawerState.INITIAL,
-  setDrawerState: noop,
   isOpen: false,
   open: noop,
   close: noop,
@@ -47,7 +42,6 @@ export const useAssertionForm = () => useContext<ICreateAssertionModalProviderCo
 
 const AssertionFormProvider: React.FC<{testId: string}> = ({children}) => {
   const dispatch = useAppDispatch();
-  const [drawerState, setDrawerState] = useState<DrawerState>(DrawerState.INITIAL);
   const [isOpen, setIsOpen] = useState(false);
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
   const [formProps, setFormProps] = useState<IFormProps>(initialFormProps);
@@ -127,8 +121,8 @@ const AssertionFormProvider: React.FC<{testId: string}> = ({children}) => {
   );
 
   const contextValue = useMemo(
-    () => ({isOpen, open, close, formProps, onSubmit, drawerState, setDrawerState}),
-    [isOpen, open, close, formProps, onSubmit, drawerState, setDrawerState]
+    () => ({isOpen, open, close, formProps, onSubmit}),
+    [isOpen, open, close, formProps, onSubmit]
   );
 
   return (
