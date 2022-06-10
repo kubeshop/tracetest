@@ -12,6 +12,7 @@ import (
 
 type (
 	Config struct {
+		PathPrefix              string                         `mapstructure:"pathPrefix"`
 		PostgresConnString      string                         `mapstructure:"postgresConnString"`
 		JaegerConnectionConfig  *configgrpc.GRPCClientSettings `mapstructure:"jaegerConnectionConfig"`
 		TempoConnectionConfig   *configgrpc.GRPCClientSettings `mapstructure:"tempoConnectionConfig"`

@@ -103,8 +103,12 @@ func (a *App) Start() error {
 	controller := httpServer.NewController(a.db, runner, assertionRunner)
 	apiApiController := openapi.NewApiApiController(controller)
 	customController := httpServer.NewCustomController(controller, apiApiController, openapi.DefaultErrorHandler, a.tracer)
+	httpRouter := customController
+	if a.config.PathPrefix != "" {
+		httpRouter = httpServer.NewPrefixedRouter(httpRouter, a.config.PathPrefix)
+	}
 
-	router := openapi.NewRouter(customController)
+	router := openapi.NewRouter(httpRouter)
 
 	wsRouter := websocket.NewRouter()
 	wsRouter.Add("subscribe", websocket.NewSubscribeCommandExecutor(subscriptionManager))
@@ -112,7 +116,7 @@ func (a *App) Start() error {
 
 	router.Handle("/ws", wsRouter.Handler())
 
-	router.PathPrefix("/").Handler(
+	router.PathPrefix(fmt.Sprintf("%s/", a.config.PathPrefix)).Handler(
 		spaHandler(
 			"./html",
 			"index.html",
