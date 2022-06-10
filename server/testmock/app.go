@@ -11,7 +11,21 @@ import (
 	"go.opentelemetry.io/collector/config/configtls"
 )
 
-func GetTestingApp(demoApp *DemoApp) (*app.App, error) {
+type TestingAppOption func(config *config.Config)
+
+func WithServerPrefix(prefix string) TestingAppOption {
+	return func(config *config.Config) {
+		config.Server.Prefix = prefix
+	}
+}
+
+func WithServerPort(port int) TestingAppOption {
+	return func(config *config.Config) {
+		config.Server.Port = port
+	}
+}
+
+func GetTestingApp(demoApp *DemoApp, options ...TestingAppOption) (*app.App, error) {
 	ctx := context.Background()
 	db, err := GetTestingDatabase("file://../migrations")
 
@@ -33,6 +47,10 @@ func GetTestingApp(demoApp *DemoApp) (*app.App, error) {
 			Exporters:   []string{"console"},
 			ServiceName: "tracetest",
 		},
+	}
+
+	for _, option := range options {
+		option(&config)
 	}
 
 	tracedb, err := tracedb.New(config)

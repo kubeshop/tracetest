@@ -12,7 +12,7 @@ import (
 
 type (
 	Config struct {
-		PathPrefix              string                         `mapstructure:"pathPrefix"`
+		Server                  ServerConfig                   `mapstructure:"server"`
 		PostgresConnString      string                         `mapstructure:"postgresConnString"`
 		JaegerConnectionConfig  *configgrpc.GRPCClientSettings `mapstructure:"jaegerConnectionConfig"`
 		TempoConnectionConfig   *configgrpc.GRPCClientSettings `mapstructure:"tempoConnectionConfig"`
@@ -20,6 +20,11 @@ type (
 		GA                      GoogleAnalytics                `mapstructure:"googleAnalytics"`
 		PoolingRetryDelayString string                         `mapstructure:"poolingRetryDelay"`
 		Telemetry               TelemetryConfig                `mapstructure:"telemetry"`
+	}
+
+	ServerConfig struct {
+		Prefix string
+		Port   int
 	}
 
 	GoogleAnalytics struct {
