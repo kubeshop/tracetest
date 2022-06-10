@@ -123,6 +123,7 @@ func (a *App) Start() error {
 			map[string]string{
 				"MeasurementId":    analytics.MeasurementID,
 				"AnalyticsEnabled": fmt.Sprintf("%t", a.config.GA.Enabled),
+				"ServerPathPrefix": a.config.Server.PathPrefix,
 			},
 		),
 	)
