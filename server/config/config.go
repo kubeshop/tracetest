@@ -19,6 +19,7 @@ type (
 		GA                      GoogleAnalytics                `mapstructure:"googleAnalytics"`
 		PoolingRetryDelayString string                         `mapstructure:"poolingRetryDelay"`
 		Telemetry               TelemetryConfig                `mapstructure:"telemetry"`
+		Http                    HttpServerConfig               `mapstructure:"http"`
 	}
 
 	GoogleAnalytics struct {
@@ -40,6 +41,12 @@ type (
 	JaegerTelemetryConfig struct {
 		Host string `mapstructure:"host"`
 		Port int    `mapstructure:"port"`
+	}
+
+	HttpServerConfig struct {
+		Host   string `mapstructure:"host"`
+		Port   int    `mapstructure:"port"`
+		Prefix string `mapstructure:"prefix"`
 	}
 )
 

@@ -41,7 +41,7 @@ func New(config config.Config, db model.Repository, tracedb tracedb.TraceDB, tra
 }
 
 func spaHandler(staticPath, indexPath string, tplVars map[string]string) http.HandlerFunc {
-	var fileMatcher = regexp.MustCompile(`\.[a-zA-Z]*$`)
+	fileMatcher := regexp.MustCompile(`\.[a-zA-Z]*$`)
 	return func(w http.ResponseWriter, r *http.Request) {
 		if !fileMatcher.MatchString(r.URL.Path) {
 			tpl, err := template.ParseFiles(filepath.Join(staticPath, indexPath))
@@ -106,7 +106,7 @@ func (a *App) Start() error {
 
 	router := openapi.NewRouter(customController)
 
-	router.PathPrefix("/").Handler(
+	router.PathPrefix(fmt.Sprintf("/%s", a.config.Http.Prefix)).Handler(
 		spaHandler(
 			"./html",
 			"index.html",
@@ -130,8 +130,13 @@ func (a *App) Start() error {
 		wsRouter.ListenAndServe(":8081")
 	}()
 
-	log.Printf("HTTP Server started")
-	log.Fatal(http.ListenAndServe(":8080", router))
+	hostPort := ":8080"
+	if a.config.Http.Port > 0 {
+		hostPort = fmt.Sprintf("%s:%d", a.config.Http.Host, a.config.Http.Port)
+	}
+
+	log.Printf("HTTP Server started on %s", hostPort)
+	log.Fatal(http.ListenAndServe(hostPort, router))
 
 	return nil
 }

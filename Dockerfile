@@ -29,4 +29,5 @@ COPY --from=build-go /go/src/tracetest-server ./
 COPY --from=build-go /go/src/migrations/ ./migrations/
 COPY --from=build-js /app/build /app/html
 EXPOSE 8080/tcp
+EXPOSE 8081/tcp
 ENTRYPOINT ["/app/tracetest-server"]
