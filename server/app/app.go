@@ -133,8 +133,8 @@ func (a *App) Start() error {
 	}
 
 	port := 8080
-	if a.config.Server.Port != 0 {
-		port = a.config.Server.Port
+	if a.config.Server.HttpPort != 0 {
+		port = a.config.Server.HttpPort
 	}
 
 	log.Printf("HTTP Server started")

@@ -19,9 +19,15 @@ func WithServerPrefix(prefix string) TestingAppOption {
 	}
 }
 
-func WithServerPort(port int) TestingAppOption {
+func WithHttpPort(port int) TestingAppOption {
 	return func(config *config.Config) {
-		config.Server.Port = port
+		config.Server.HttpPort = port
+	}
+}
+
+func WithWebSocketPort(port int) TestingAppOption {
+	return func(config *config.Config) {
+		config.Server.WebSocketPort = port
 	}
 }
 

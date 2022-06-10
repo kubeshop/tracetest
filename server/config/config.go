@@ -23,8 +23,9 @@ type (
 	}
 
 	ServerConfig struct {
-		Prefix string
-		Port   int
+		Prefix        string
+		HttpPort      int
+		WebSocketPort int
 	}
 
 	GoogleAnalytics struct {
