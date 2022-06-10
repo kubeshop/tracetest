@@ -104,8 +104,8 @@ func (a *App) Start() error {
 	apiApiController := openapi.NewApiApiController(controller)
 	customController := httpServer.NewCustomController(controller, apiApiController, openapi.DefaultErrorHandler, a.tracer)
 	httpRouter := customController
-	if a.config.Server.Prefix != "" {
-		httpRouter = httpServer.NewPrefixedRouter(httpRouter, a.config.Server.Prefix)
+	if a.config.Server.PathPrefix != "" {
+		httpRouter = httpServer.NewPrefixedRouter(httpRouter, a.config.Server.PathPrefix)
 	}
 
 	router := openapi.NewRouter(httpRouter)
@@ -116,7 +116,7 @@ func (a *App) Start() error {
 
 	router.Handle("/ws", wsRouter.Handler())
 
-	router.PathPrefix(fmt.Sprintf("%s/", a.config.Server.Prefix)).Handler(
+	router.PathPrefix(fmt.Sprintf("%s/", a.config.Server.PathPrefix)).Handler(
 		spaHandler(
 			"./html",
 			"index.html",

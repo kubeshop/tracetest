@@ -15,7 +15,7 @@ type TestingAppOption func(config *config.Config)
 
 func WithServerPrefix(prefix string) TestingAppOption {
 	return func(config *config.Config) {
-		config.Server.Prefix = prefix
+		config.Server.PathPrefix = prefix
 	}
 }
 
