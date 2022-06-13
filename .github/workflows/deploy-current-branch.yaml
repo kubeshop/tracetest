@@ -119,7 +119,7 @@ jobs:
         run: |
           kubectl port-forward \
             --namespace tracetest-pr-${{ github.event.pull_request.number }} \
-            svc/tracetest-pr-${{ github.event.pull_request.number }} 8080:3000
+            svc/tracetest-pr-${{ github.event.pull_request.number }} 3000:8080
 
       - name: Run tests
         run: |
