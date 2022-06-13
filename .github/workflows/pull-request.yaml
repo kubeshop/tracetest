@@ -6,10 +6,10 @@ on:
       - synchronize
     branches:
       - main
-    # paths:
-    #   - server/**
-    #   - web/**
-    #   - cli/**
+    paths:
+      - server/**
+      - web/**
+      - cli/**
 
 jobs:
   unit-test-cli:
