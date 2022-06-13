@@ -102,6 +102,8 @@ jobs:
         with:
           node-version: 16.13.x
           cache: npm
+          cache-dependency-path: web/package-lock.json
+
       - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
         with:
           service_account_key: ${{ secrets.GKE_SA_KEY }}
@@ -118,6 +120,7 @@ jobs:
           kubectl port-forward \
             --namespace tracetest-pr-${{ github.event.pull_request.number }} \
             svc/tracetest-pr-${{ github.event.pull_request.number }} 8080:3000
+
       - name: Run tests
         run: |
           cd web/
