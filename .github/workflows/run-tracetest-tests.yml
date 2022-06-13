@@ -8,7 +8,7 @@ on:
     paths:
       - server/**
 
-name: Dogfood tracetest
+name: Run tracetest tests
 jobs:
   run:
     runs-on: ubuntu-latest
@@ -48,7 +48,3 @@ jobs:
       env:
         TRACETEST_URL: "http://localhost:8080"
         POKESHOP_URL: http://pokeshop
-    - name: Debug tracetest container
-      run: docker-compose logs tracetest
-    - name: Debug jaeger container
-      run: docker-compose logs jaeger
