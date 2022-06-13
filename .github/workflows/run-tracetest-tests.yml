@@ -50,5 +50,6 @@ jobs:
         POKESHOP_URL: http://pokeshop
     - name: Debug docker container
       run: |
-        docker ps
-        docker ps -aqf "name=tracetest" | xargs docker logs
+        docker-compose ps
+        docker-compose ps -q tracetest
+         | xargs docker logs
