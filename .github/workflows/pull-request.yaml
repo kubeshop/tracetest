@@ -213,9 +213,7 @@ jobs:
 
       - name: Forward port
         run: |
-          kubectl port-forward \
-            --namespace tracetest-pr-${{ github.event.pull_request.number }} \
-            svc/tracetest-pr-${{ github.event.pull_request.number }} 8080 &
+          kubectl port-forward --namespace tracetest-integration svc/tracetest-integration 8080 &
 
       - name: Build CLI
         run: |
@@ -224,7 +222,10 @@ jobs:
       - name: Run integration tests
         run: |
           echo "http://localhost:8080" | cli/tracetest configure
-          cli/tracetest test list
+          cli/tracetest test run --definition tracetesting/create-test.yaml --wait-for-result
+        with:
+          POKEMON_API_URL: http://demo-pokemon-api.demo.svc.cluster.local
+          TARGET_INSTANCE_URL: http://tracetest-pr-${{ github.event.pull_request.number }}.tracetest-pr-${{ github.event.pull_request.number }}.svc.cluster.local
 
   cleanup:
     runs-on: ubuntu-latest
