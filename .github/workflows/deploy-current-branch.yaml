@@ -80,7 +80,7 @@ jobs:
         helm repo add kubeshop https://kubeshop.github.io/helm-charts && \
         helm repo update && \
         helm upgrade --install tracetest-pr-${{ github.event.pull_request.number }} kubeshop/tracetest \
-          --namespace tracetest-pr-${{ github.event.pull_request.number }} \
+          --namespace tracetest-pr-${{ github.event.pull_request.number }} --create-namespace \
           --set analytics.enabled=false \
           --set image.tag=pr-${{ github.event.pull_request.number }} \
           --set tracingBackend=jaeger \
