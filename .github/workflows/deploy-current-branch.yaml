@@ -121,15 +121,18 @@ jobs:
             --namespace tracetest-pr-${{ github.event.pull_request.number }} \
             svc/tracetest-pr-${{ github.event.pull_request.number }} 3000:8080 &
 
+  
       - name: Install test dependencies
         run: |
           cd web/
           npm ci
-      - name: Run unit tests
-        run: |
-          npm run test
+      # - name: Run unit tests
+      #   run: |
+      #     cd web/
+      #     npm run test
       - name: Run integration tests
         run: |
+          cd web/
           npm run test:integration
 
   run-backend-tests:
@@ -161,10 +164,10 @@ jobs:
             --namespace tracetest-pr-${{ github.event.pull_request.number }} \
             svc/tracetest-pr-${{ github.event.pull_request.number }} 8080 &
 
-      - name: Run unit tests
-        run: |
-          cd server/
-          make test
+      # - name: Run unit tests
+      #   run: |
+      #     cd server/
+      #     make test
       - name: Run integration tests
         run: |
           cd server
