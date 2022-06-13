@@ -4,10 +4,10 @@ jaegerConnectionConfig:
   tls:
     insecure: true
 
-maxWaitTimeForTrace: 60s
+maxWaitTimeForTrace: 1m
 
 googleAnalytics:
-  enabled: true
+  enabled: false
 
 telemetry:
   serviceName: tracetest
