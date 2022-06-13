@@ -121,12 +121,15 @@ jobs:
             --namespace tracetest-pr-${{ github.event.pull_request.number }} \
             svc/tracetest-pr-${{ github.event.pull_request.number }} 3000:8080 &
 
-      - name: Run tests
+      - run: npm ci
+      - name: Run unit tests
+        run: |
+          cd web 
+          npm run test
+      - name: Run integration tests
         run: |
           cd web/
-          npm ci
           npm run test:integration
-          npm run test
 
   run-backend-tests:
     needs: deploy
@@ -136,13 +139,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Setup node
-        uses: actions/setup-node@v3
+      - name: Setup go
+        uses: actions/setup-go@v3
         with:
-          node-version: 16.13.x
-          cache: npm
-          cache-dependency-path: web/package-lock.json
-
+          go-version: '^1.18'
       - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
         with:
           service_account_key: ${{ secrets.GKE_SA_KEY }}
@@ -160,11 +160,15 @@ jobs:
             --namespace tracetest-pr-${{ github.event.pull_request.number }} \
             svc/tracetest-pr-${{ github.event.pull_request.number }} 8080 &
 
-      - name: Run tests
+      - name: Run unit tests
         run: |
           cd server/
-          curl -i "http://localhost:8080/api/tests"
           make test
+      - name: Run integration tests
+        run: |
+          cd server
+          echo "TODO: actually test something"
+          curl -i "http://localhost:8080/api/tests"
 
   cleanup:
     runs-on: ubuntu-latest
@@ -174,5 +178,5 @@ jobs:
       - name: Uninstall tracetest
         run: |
           helm delete tracetest-pr-${{ github.event.pull_request.number }} \
-          --namespace tracetest-pr-${{ github.event.pull_request.number }} && \
+          --namespace tracetest-pr-${{ github.event.pull_request.number }}
           kubectl delete ns tracetest-pr-${{ github.event.pull_request.number }}
