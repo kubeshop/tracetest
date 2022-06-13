@@ -4,7 +4,9 @@ jaegerConnectionConfig:
   tls:
     insecure: true
 
-maxWaitTimeForTrace: 1m
+poolingConfig:
+  maxWaitTimeForTrace: 1m
+  retryDelay: 5s
 
 telemetry:
   serviceName: tracetest

@@ -12,13 +12,12 @@ import (
 
 type (
 	Config struct {
-		PostgresConnString      string                         `mapstructure:"postgresConnString"`
-		JaegerConnectionConfig  *configgrpc.GRPCClientSettings `mapstructure:"jaegerConnectionConfig"`
-		TempoConnectionConfig   *configgrpc.GRPCClientSettings `mapstructure:"tempoConnectionConfig"`
-		PoolingConfig           PoolingConfig                  `mapstructure:"poolingConfig"`
-		GA                      GoogleAnalytics                `mapstructure:"googleAnalytics"`
-		PoolingRetryDelayString string                         `mapstructure:"poolingRetryDelay"`
-		Telemetry               TelemetryConfig                `mapstructure:"telemetry"`
+		PostgresConnString     string                         `mapstructure:"postgresConnString"`
+		JaegerConnectionConfig *configgrpc.GRPCClientSettings `mapstructure:"jaegerConnectionConfig"`
+		TempoConnectionConfig  *configgrpc.GRPCClientSettings `mapstructure:"tempoConnectionConfig"`
+		PoolingConfig          PoolingConfig                  `mapstructure:"poolingConfig"`
+		GA                     GoogleAnalytics                `mapstructure:"googleAnalytics"`
+		Telemetry              TelemetryConfig                `mapstructure:"telemetry"`
 	}
 
 	GoogleAnalytics struct {
