@@ -65,8 +65,8 @@ jobs:
         service_account_key: ${{ secrets.GKE_SA_KEY }}
         project_id: ${{ secrets.GKE_PROJECT }}
 
-    - run: |-
-        gcloud --quiet auth configure-docker
+    # - run: |-
+    #     gcloud --quiet auth configure-docker
 
     - uses: google-github-actions/get-gke-credentials@fb08709ba27618c31c09e014e1d8364b02e5042e
       with:
@@ -83,6 +83,43 @@ jobs:
           --namespace tracetest-pr-${{ github.event.pull_request.number }} --create-namespace \
           --set analytics.enabled=false \
           --set image.tag=pr-${{ github.event.pull_request.number }} \
+          --set image.pullPolocy=Always \
           --set tracingBackend=jaeger \
           --set jaegerConnectionConfig.endpoint="jaeger-query.tracetest.svc.cluster.local:16685" \
-          --set ingress.enabled=false
+          --set ingress.enabled=false \
+          --wait --timeout 3m
+
+  front-end-tests:
+    needs: build-docker
+    name: Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.13.x
+          cache: npm
+      - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
+        with:
+          service_account_key: ${{ secrets.GKE_SA_KEY }}
+          project_id: ${{ secrets.GKE_PROJECT }}
+
+      - uses: google-github-actions/get-gke-credentials@fb08709ba27618c31c09e014e1d8364b02e5042e
+        with:
+          cluster_name: ${{ secrets.GKE_CLUSTER }}
+          location: ${{ secrets.GKE_ZONE }}
+          credentials: ${{ secrets.GKE_SA_KEY }}
+
+      - name: Forward port
+        run: |
+          kubectl port-forward --namespace tracetest svc/tracetest 8080:8080
+      - name: Run tests
+        run: |
+          cd web/
+          npm ci
+          npm run test:integration
+          npm run test
+
