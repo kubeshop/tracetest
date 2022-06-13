@@ -109,7 +109,7 @@ jobs:
         mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
   deploy:
-    needs: [build-docker]
+    needs: build-docker
     name: Deploy
     runs-on: ubuntu-latest
 
@@ -189,7 +189,7 @@ jobs:
           npm run test:integration
 
   trace-testing:
-    needs: [deploy, unit-test-cli]
+    needs: deploy
     name: Run trace testing using tracetest
     runs-on: ubuntu-latest
 
