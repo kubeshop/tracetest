@@ -85,10 +85,7 @@ services:
 
   tracetest:
     container_name: tracetest
-    image: kubeshop/tracetest
-    build: .
-    environment:
-      - VERSION=1.0
+    image: kubeshop/tracetest:v0.5.1
     volumes:
       - type: bind
         source: ./server/config.yaml
