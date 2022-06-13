@@ -48,5 +48,7 @@ jobs:
       env:
         TRACETEST_URL: "http://localhost:8080"
         POKESHOP_URL: http://pokeshop
-    - name: Debug docker container
+    - name: Debug tracetest container
       run: docker-compose logs tracetest
+    - name: Debug jaeger container
+      run: docker-compose logs jaeger
