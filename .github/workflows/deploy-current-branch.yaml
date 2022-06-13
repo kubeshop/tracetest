@@ -89,9 +89,9 @@ jobs:
           --set ingress.enabled=false \
           --wait --timeout 3m
 
-  front-end-tests:
-    needs: build-docker
-    name: Deploy
+  run-frontend-tests:
+    needs: deploy
+    name: Run frontend tests
     runs-on: ubuntu-latest
 
     steps:
@@ -115,7 +115,9 @@ jobs:
 
       - name: Forward port
         run: |
-          kubectl port-forward --namespace tracetest svc/tracetest 8080:8080
+          kubectl port-forward \
+            --namespace tracetest-pr-${{ github.event.pull_request.number }} \
+            svc/tracetest-pr-${{ github.event.pull_request.number }} 8080:3000
       - name: Run tests
         run: |
           cd web/
