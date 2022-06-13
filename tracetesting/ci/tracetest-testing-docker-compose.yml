@@ -85,7 +85,7 @@ services:
 
   tracetest:
     container_name: tracetest
-    image: kubeshop/tracetest:v0.5.1
+    image: kubeshop/tracetest:sha-b6666d6 # TODO: use version tag when it gets released
     volumes:
       - type: bind
         source: ./server/config.yaml
