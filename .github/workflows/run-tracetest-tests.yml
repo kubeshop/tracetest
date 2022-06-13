@@ -24,6 +24,8 @@ jobs:
         docker-compose pull
         docker-compose up -d pokeshop
         docker-compose up -d tracetest
+        echo "Using config"
+        cat server/config.yaml
     - name: Setup go
       uses: actions/setup-go@v3
       with:
