@@ -1,4 +1,4 @@
-import {createTest, deleteTest, testId} from '../utils/common';
+import {createTest, deleteTest, testId} from '../utils/Common';
 
 describe('Show Trace', () => {
   beforeEach(() => {
