@@ -1,5 +1,5 @@
 import {DOCUMENTATION_URL, GITHUB_URL} from '../../../src/constants/Common.constants';
-import {createTest, deleteTest} from '../utils/common';
+import {createTest, deleteTest} from '../utils/Common';
 
 describe('Home', () => {
   before(() => {

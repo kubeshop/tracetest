@@ -1,4 +1,4 @@
-import {createTest, deleteTest, testId} from '../utils/common';
+import {createTest, deleteTest, testId} from '../utils/Common';
 
 const getAttributeListId = (number: number) => `#assertion-form_assertionList_${number}_attribute_list`;
 const getComparatorListId = (number: number) => `#assertion-form_assertionList_${number}_comparator_list`;

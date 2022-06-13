@@ -1,4 +1,4 @@
-import {createTest, deleteTest, getResultId, testId} from '../utils/common';
+import {createTest, deleteTest, getResultId, testId} from '../utils/Common';
 
 describe('Run Test', () => {
   beforeEach(() => {
