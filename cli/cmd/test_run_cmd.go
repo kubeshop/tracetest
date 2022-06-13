@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"context"
-	"os"
 
 	"github.com/kubeshop/tracetest/cli/actions"
 	"github.com/spf13/cobra"
@@ -32,7 +31,6 @@ var testRunCmd = &cobra.Command{
 		err := runTestAction.Run(ctx, actionArgs)
 		if err != nil {
 			cliLogger.Error("failed to run test", zap.Error(err))
-			os.Exit(1)
 			return
 		}
 	},
