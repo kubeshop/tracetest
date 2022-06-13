@@ -196,10 +196,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
       - name: Setup go
         uses: actions/setup-go@v3
         with:
           go-version: '^1.18'
+
       - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
         with:
           service_account_key: ${{ secrets.GKE_SA_KEY }}
@@ -222,7 +224,7 @@ jobs:
       - name: Run integration tests
         run: |
           echo "http://localhost:8080" | cli/tracetest configure
-          cli/tracetest test run --definition tracetesting/create-test.yaml --wait-for-result
+          cli/tracetest test run --definition tracetesting/create_test.yaml --wait-for-result
         env:
           POKEMON_API_URL: http://demo-pokemon-api.demo.svc.cluster.local
           TARGET_INSTANCE_URL: http://tracetest-pr-${{ github.event.pull_request.number }}.tracetest-pr-${{ github.event.pull_request.number }}.svc.cluster.local
