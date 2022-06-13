@@ -4,7 +4,7 @@ jaegerConnectionConfig:
   tls:
     insecure: true
 
-maxWaitTimeForTrace: 30s
+maxWaitTimeForTrace: 60s
 
 googleAnalytics:
   enabled: true
