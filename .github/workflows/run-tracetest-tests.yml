@@ -49,4 +49,6 @@ jobs:
         TRACETEST_URL: "http://localhost:8080"
         POKESHOP_URL: http://pokeshop
     - name: Debug docker container
-      run: docker ps -aqf "name=tracetest" | xargs docker logs
+      run: |
+        docker ps
+        docker ps -aqf "name=tracetest" | xargs docker logs
