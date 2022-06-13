@@ -16,7 +16,7 @@ trigger:
           "serviceUnderTest": {
             "request": {
               "url": "${POKEMON_API_URL}/pokemon/import",
-              "method": "GET",
+              "method": "POST",
               "headers": [
                 {
                   "key": "Content-Type",
