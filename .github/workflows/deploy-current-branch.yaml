@@ -39,8 +39,7 @@ jobs:
       with:
         context: .
         file: Dockerfile
-        tags: pr-${{ github.event.pull_request.number }}
-        labels: ${{ steps.meta.outputs.labels }}
+        tags: kubeshop/tracetest:pr-${{ github.event.pull_request.number }}
         push: true
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache-new
