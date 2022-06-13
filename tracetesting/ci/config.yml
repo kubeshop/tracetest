@@ -6,14 +6,11 @@ jaegerConnectionConfig:
 
 maxWaitTimeForTrace: 1m
 
-googleAnalytics:
-  enabled: false
-
 telemetry:
   serviceName: tracetest
   sampling: 100 # 100%
   jaeger:
-    host: localhost
+    host: jaeger
     port: 6831
   exporters:
     - console
