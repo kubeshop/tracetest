@@ -25,7 +25,6 @@ jobs:
           go-version: '^1.18'
       - name: Run unit tests
         run: |
-          echo "it works!"
           cd server/
           make test
 
@@ -42,7 +41,6 @@ jobs:
           go-version: '^1.18'
       - name: Run unit tests
         run: |
-          echo "it works!"
           cd server/
           make test
       
@@ -70,7 +68,7 @@ jobs:
       #     npm run test
 
   build-docker:
-    needs: [unit-test-frontend, unit-test-backend, unit-test-cli]
+    # needs: [unit-test-frontend, unit-test-backend, unit-test-cli]
     name: "Build Image"
     runs-on: ubuntu-latest
     steps:
@@ -147,46 +145,46 @@ jobs:
           --set ingress.enabled=false \
           --wait --timeout 3m
 
-  e2e:
-    needs: deploy
-    name: Run e2e tests
-    runs-on: ubuntu-latest
+  # e2e:
+  #   needs: deploy
+  #   name: Run e2e tests
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16.13.x
-          cache: npm
-          cache-dependency-path: web/package-lock.json
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v3
+  #     - name: Setup node
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         node-version: 16.13.x
+  #         cache: npm
+  #         cache-dependency-path: web/package-lock.json
 
-      - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
-        with:
-          service_account_key: ${{ secrets.GKE_SA_KEY }}
-          project_id: ${{ secrets.GKE_PROJECT }}
+  #     - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
+  #       with:
+  #         service_account_key: ${{ secrets.GKE_SA_KEY }}
+  #         project_id: ${{ secrets.GKE_PROJECT }}
 
-      - uses: google-github-actions/get-gke-credentials@fb08709ba27618c31c09e014e1d8364b02e5042e
-        with:
-          cluster_name: ${{ secrets.GKE_CLUSTER }}
-          location: ${{ secrets.GKE_ZONE }}
-          credentials: ${{ secrets.GKE_SA_KEY }}
+  #     - uses: google-github-actions/get-gke-credentials@fb08709ba27618c31c09e014e1d8364b02e5042e
+  #       with:
+  #         cluster_name: ${{ secrets.GKE_CLUSTER }}
+  #         location: ${{ secrets.GKE_ZONE }}
+  #         credentials: ${{ secrets.GKE_SA_KEY }}
 
-      - name: Forward port
-        run: |
-          kubectl port-forward \
-            --namespace tracetest-pr-${{ github.event.pull_request.number }} \
-            svc/tracetest-pr-${{ github.event.pull_request.number }} 3000:8080 &
+  #     - name: Forward port
+  #       run: |
+  #         kubectl port-forward \
+  #           --namespace tracetest-pr-${{ github.event.pull_request.number }} \
+  #           svc/tracetest-pr-${{ github.event.pull_request.number }} 3000:8080 &
 
-      - name: Install test dependencies
-        run: |
-          cd web/
-          npm ci
-      - name: Run integration tests
-        run: |
-          cd web/
-          npm run test:integration
+  #     - name: Install test dependencies
+  #       run: |
+  #         cd web/
+  #         npm ci
+  #     - name: Run integration tests
+  #       run: |
+  #         cd web/
+  #         npm run test:integration
 
   trace-testing:
     needs: deploy
@@ -231,7 +229,8 @@ jobs:
 
   cleanup:
     runs-on: ubuntu-latest
-    needs: [trace-testing, e2e]
+    # needs: [trace-testing, e2e]
+    needs: [trace-testing]
     if: always()
     steps:
       - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
