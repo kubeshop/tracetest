@@ -223,7 +223,7 @@ jobs:
         run: |
           echo "http://localhost:8080" | cli/tracetest configure
           cli/tracetest test run --definition tracetesting/create-test.yaml --wait-for-result
-        with:
+        env:
           POKEMON_API_URL: http://demo-pokemon-api.demo.svc.cluster.local
           TARGET_INSTANCE_URL: http://tracetest-pr-${{ github.event.pull_request.number }}.tracetest-pr-${{ github.event.pull_request.number }}.svc.cluster.local
 
