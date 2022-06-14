@@ -45,7 +45,7 @@ jobs:
           echo "it works!"
           cd server/
           make test
-      
+
   unit-test-frontend:
     name: Run frontend unit tests
     runs-on: ubuntu-latest
@@ -134,13 +134,13 @@ jobs:
     # Deploy the Docker image to the GKE cluster
     - name: Deploy
       run: |
-        helm repo add kubeshop https://kubeshop.github.io/helm-charts && \
-        helm repo update && \
+        helm repo add kubeshop https://kubeshop.github.io/helm-charts
+        helm repo update
         helm upgrade --install tracetest-pr-${{ github.event.pull_request.number }} kubeshop/tracetest \
           --namespace tracetest-pr-${{ github.event.pull_request.number }} --create-namespace \
           --set analytics.enabled=false \
           --set image.tag=pr-${{ github.event.pull_request.number }} \
-          --set image.pullPolocy=Always \
+          --set image.pullPolicy=Always \
           --set tracingBackend=jaeger \
           --set jaegerConnectionConfig.endpoint="jaeger-query.tracetest.svc.cluster.local:16685" \
           --set ingress.enabled=false \
