@@ -144,6 +144,7 @@ jobs:
           --set image.pullPolicy=Always \
           --set tracingBackend=jaeger \
           --set jaegerConnectionConfig.endpoint="jaeger-query.tracetest.svc.cluster.local:16685" \
+          --set telemetry.jaeger.host="jaeger-agent.tracetest.svc.cluster.local" \
           --set ingress.enabled=false \
           --wait --timeout 3m
 
