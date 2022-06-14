@@ -23,9 +23,8 @@ type (
 	}
 
 	ServerConfig struct {
-		PathPrefix    string `mapstructure:"pathPrefix"`
-		HttpPort      int    `mapstructure:"httpPort"`
-		WebSocketPort int    `mapstructure:"websocketPort"`
+		PathPrefix string `mapstructure:"pathPrefix"`
+		HttpPort   int    `mapstructure:"httpPort"`
 	}
 
 	GoogleAnalytics struct {

@@ -3,7 +3,7 @@ import Home from 'pages/Home';
 import Test from 'pages/Test';
 import Trace from '../../pages/Trace';
 
-const { serverPathPrefix = '/' } = window.ENV;
+const { serverPathPrefix = '/' } = window.ENV || {};
 
 const Router = (): JSX.Element => {
   return (

@@ -9,9 +9,8 @@ import (
 )
 
 type TracetestAppFixtureConfig struct {
-	Prefix        string
-	HttpPort      int
-	WebSocketPort int
+	Prefix   string
+	HttpPort int
 }
 
 type TracetestAppFixtureOption func(config *TracetestAppFixtureConfig)
@@ -25,12 +24,6 @@ func WithServerPrefix(prefix string) TracetestAppFixtureOption {
 func WithHttpPort(port int) TracetestAppFixtureOption {
 	return func(config *TracetestAppFixtureConfig) {
 		config.HttpPort = port
-	}
-}
-
-func WithWebSocketPort(port int) TracetestAppFixtureOption {
-	return func(config *TracetestAppFixtureConfig) {
-		config.WebSocketPort = port
 	}
 }
 
@@ -68,10 +61,6 @@ func getTracetestApp(options FixtureOptions) (*app.App, error) {
 
 	if arguments.HttpPort != 0 {
 		appOptions = append(appOptions, testmock.WithHttpPort(arguments.HttpPort))
-	}
-
-	if arguments.WebSocketPort != 0 {
-		appOptions = append(appOptions, testmock.WithWebSocketPort(arguments.WebSocketPort))
 	}
 
 	tracetestApp, err := testmock.GetTestingApp(demoApp, appOptions...)

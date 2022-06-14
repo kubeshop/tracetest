@@ -17,7 +17,6 @@ func TestServerPrefix(t *testing.T) {
 	_, err := testfixtures.GetTracetestApp(
 		testfixtures.WithServerPrefix("/tracetest"),
 		testfixtures.WithHttpPort(8000),
-		testfixtures.WithWebSocketPort(8001),
 	)
 	require.NoError(t, err)
 

@@ -25,12 +25,6 @@ func WithHttpPort(port int) TestingAppOption {
 	}
 }
 
-func WithWebSocketPort(port int) TestingAppOption {
-	return func(config *config.Config) {
-		config.Server.WebSocketPort = port
-	}
-}
-
 func GetTestingApp(demoApp *DemoApp, options ...TestingAppOption) (*app.App, error) {
 	ctx := context.Background()
 	db, err := GetTestingDatabase("file://../migrations")
