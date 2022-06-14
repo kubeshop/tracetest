@@ -1,4 +1,6 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
+
+import WebSocketGateway from 'gateways/WebSocket.gateway';
 import {TRecursivePartial} from 'types/Common.types';
 import {TRawTest, TTest} from 'types/Test.types';
 import {HTTP_METHOD} from '../../constants/Common.constants';
@@ -9,6 +11,9 @@ import TestRun from '../../models/TestRun.model';
 import {TAssertion, TAssertionResults, TRawAssertionResults} from '../../types/Assertion.types';
 import {TRawTestDefinition, TTestDefinition} from '../../types/TestDefinition.types';
 import {TRawTestRun, TTestRun} from '../../types/TestRun.types';
+
+const webSocketGateway = WebSocketGateway({url: 'ws://localhost:8081/ws'});
+webSocketGateway.connect();
 
 const PATH = `${document.location.protocol}//${document.location.host}/api/`;
 
@@ -88,11 +93,35 @@ const TraceTestAPI = createApi({
       transformResponse: (rawTestResultList: TRawTestRun[]) =>
         rawTestResultList.map(rawTestResult => TestRun(rawTestResult)),
     }),
+
     getRunById: build.query<TTestRun, {runId: string; testId: string}>({
       query: ({testId, runId}) => `/tests/${testId}/run/${runId}`,
       providesTags: result => (result ? [{type: Tags.TEST_RUN, id: result?.id}] : []),
       transformResponse: (rawTestResult: TRawTestRun) => TestRun(rawTestResult),
+      async onCacheEntryAdded(arg, {cacheDataLoaded, cacheEntryRemoved, updateCachedData}) {
+        try {
+          // wait for the initial query to resolve before proceeding
+          await cacheDataLoaded;
+
+          // subscribe to the websocket connection
+          const listener = (data: any) => {
+            // updates the redux cache data when a message is received
+            updateCachedData(draft => {
+              // draft.push(data);
+            });
+          };
+          webSocketGateway.subscribe(`test/${arg.testId}/run/${arg.runId}`, listener);
+        } catch {
+          // no-op in case `cacheEntryRemoved` resolves before `cacheDataLoaded`,
+          // in which case `cacheDataLoaded` will throw
+        }
+        // cacheEntryRemoved will resolve when the cache subscription is no longer active
+        await cacheEntryRemoved;
+        // perform cleanup steps once the `cacheEntryRemoved` promise resolves
+        webSocketGateway.unsubscribe(`test/${arg.testId}/run/${arg.runId}`, '1234');
+      },
     }),
+
     reRun: build.mutation<TTestRun, {testId: string; runId: string}>({
       query: ({testId, runId}) => ({
         url: `/tests/${testId}/run/${runId}/rerun`,

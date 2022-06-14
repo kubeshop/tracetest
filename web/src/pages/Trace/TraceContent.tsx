@@ -8,7 +8,7 @@ import TraceActions from 'components/TraceActions';
 import {TestState} from 'constants/TestRun.constants';
 import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
-import {useGetResultByIdQueryPolling} from './hooks/useGetResultByIdQueryPolling';
+// import {useGetResultByIdQueryPolling} from './hooks/useGetResultByIdQueryPolling';
 import * as S from './Trace.styled';
 
 const TraceContent = () => {
@@ -19,7 +19,7 @@ const TraceContent = () => {
   const {isError, run, refetch} = useTestRun();
   const isDisplayingError = isError || run.state === TestState.FAILED;
 
-  useGetResultByIdQueryPolling(refetch, isError, run);
+  // useGetResultByIdQueryPolling(refetch, isError, run);
 
   const onRunTest = useCallback(() => {
     console.log('onRunTest');
