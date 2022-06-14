@@ -40,9 +40,9 @@ func New(config config.Config, db model.Repository, tracedb tracedb.TraceDB, tra
 	return app, nil
 }
 
-func spaHandler(staticPath, indexPath string, tplVars map[string]string) http.HandlerFunc {
+func spaHandler(prefix, staticPath, indexPath string, tplVars map[string]string) http.HandlerFunc {
 	var fileMatcher = regexp.MustCompile(`\.[a-zA-Z]*$`)
-	return func(w http.ResponseWriter, r *http.Request) {
+	handler := func(w http.ResponseWriter, r *http.Request) {
 		if !fileMatcher.MatchString(r.URL.Path) {
 			tpl, err := template.ParseFiles(filepath.Join(staticPath, indexPath))
 			if err != nil {
@@ -59,6 +59,8 @@ func spaHandler(staticPath, indexPath string, tplVars map[string]string) http.Ha
 			http.FileServer(http.Dir(staticPath)).ServeHTTP(w, r)
 		}
 	}
+
+	return http.StripPrefix(prefix, http.HandlerFunc(handler)).ServeHTTP
 }
 
 func (a *App) Start() error {
@@ -116,14 +118,15 @@ func (a *App) Start() error {
 
 	router.Handle("/ws", wsRouter.Handler())
 
-	router.PathPrefix(fmt.Sprintf("%s/", a.config.Server.PathPrefix)).Handler(
+	router.PathPrefix(a.config.Server.PathPrefix).Handler(
 		spaHandler(
+			a.config.Server.PathPrefix,
 			"./html",
 			"index.html",
 			map[string]string{
 				"MeasurementId":    analytics.MeasurementID,
 				"AnalyticsEnabled": fmt.Sprintf("%t", a.config.GA.Enabled),
-				"ServerPathPrefix": a.config.Server.PathPrefix,
+				"ServerPathPrefix": fmt.Sprintf("%s/", a.config.Server.PathPrefix),
 			},
 		),
 	)
