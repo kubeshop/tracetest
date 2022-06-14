@@ -15,7 +15,6 @@ describe('Home', () => {
   });
 
   it('should render the layout', () => {
-    cy.get('[data-cy=logo]').should('have.attr', 'src', '/static/media/Logo.da806c8b6e530d5c1a7ec68e4fe407fa.svg');
     cy.get('[data-cy=documentation-link]').should('have.attr', 'href', DOCUMENTATION_URL);
     cy.get('[data-cy=github-link]').should('have.attr', 'href', GITHUB_URL);
     cy.get('[data-cy=onboarding-link]').should('be.visible');
