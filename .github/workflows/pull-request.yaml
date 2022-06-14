@@ -10,6 +10,7 @@ on:
       - server/**
       - web/**
       - cli/**
+      - .github/**
 
 jobs:
   unit-test-cli:
