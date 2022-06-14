@@ -13,19 +13,17 @@ type unsubscribeMessage struct {
 	SubscriptionId string `json:"subscriptionId"`
 }
 
-type UnsubscribeCommandExecutor struct {
+type unsubscribeCommandExecutor struct {
 	subscriptionManager *subscription.Manager
 }
 
-func NewUnsubscribeCommandExecutor(manager *subscription.Manager) UnsubscribeCommandExecutor {
-	return UnsubscribeCommandExecutor{
+func NewUnsubscribeCommandExecutor(manager *subscription.Manager) MessageExecutor {
+	return unsubscribeCommandExecutor{
 		subscriptionManager: manager,
 	}
 }
 
-var _ MessageExecutor = &UnsubscribeCommandExecutor{}
-
-func (e UnsubscribeCommandExecutor) Execute(conn *websocket.Conn, message []byte) {
+func (e unsubscribeCommandExecutor) Execute(conn *websocket.Conn, message []byte) {
 	msg := unsubscribeMessage{}
 	err := json.Unmarshal(message, &msg)
 	if err != nil {
@@ -34,7 +32,7 @@ func (e UnsubscribeCommandExecutor) Execute(conn *websocket.Conn, message []byte
 	}
 
 	if msg.Resource == "" {
-		conn.WriteJSON(ErrorMessage(fmt.Errorf("Resource cannot be empty")))
+		conn.WriteJSON(ErrorMessage(fmt.Errorf("resource cannot be empty")))
 		return
 	}
 
