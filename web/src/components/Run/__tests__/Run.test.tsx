@@ -5,7 +5,7 @@ import TestRunMock from '../../../models/__mocks__/TestRun.mock';
 import {ReduxWrapperProvider} from '../../../redux/ReduxWrapperProvider';
 import Run from '../Run';
 
-test('Run', async () => {
+test.skip('Run', async () => {
   const {getByText} = render(
     <ReactFlowProvider>
       <ReduxWrapperProvider>

@@ -7,6 +7,7 @@ import ResultCardActions from './RunCardCardActions';
 
 interface IResultCardProps {
   run: TTestRun;
+  testId: string;
   onDelete(resultId: string): void;
   onClick(resultId: string): void;
 }
@@ -22,6 +23,7 @@ const ResultCard: React.FC<IResultCardProps> = ({
     createdAt,
     testVersion,
   },
+  testId,
   onClick,
   onDelete,
 }) => {
@@ -50,7 +52,7 @@ const ResultCard: React.FC<IResultCardProps> = ({
       <S.TextContainer>
         <S.Text>{failedAssertionCount}</S.Text>
       </S.TextContainer>
-      <ResultCardActions resultId={runId} onDelete={onDelete} />
+      <ResultCardActions resultId={runId} testId={testId} onDelete={onDelete} />
     </S.ResultCard>
   );
 };

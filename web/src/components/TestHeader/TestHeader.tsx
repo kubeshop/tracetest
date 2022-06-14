@@ -10,6 +10,8 @@ import {TTest} from 'types/Test.types';
 import {TTestRunState} from 'types/TestRun.types';
 import Info from './Info';
 import * as S from './TestHeader.styled';
+import Actions from './Actions';
+import {useTestRun} from '../../providers/TestRun/TestRun.provider';
 
 interface IProps {
   executionTime?: number;
@@ -27,12 +29,13 @@ const TestHeader = ({
   extraContent,
   onBack,
   showInfo,
-  test: {name, referenceTestRun, serviceUnderTest, version = 1},
+  test: {name, referenceTestRun, serviceUnderTest, version = 1, id},
   testState,
   testVersion,
   totalSpans,
 }: IProps) => {
   const {runTest} = useTestDefinition();
+  const {run} = useTestRun();
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
 
   const handleRunTestOnClick = () => {
@@ -67,18 +70,21 @@ const TestHeader = ({
           </S.TestUrl>
         </div>
       </S.Content>
-      {extraContent}
-      {!extraContent && testState && testState !== TestStateEnum.FINISHED && (
-        <S.StateContainer data-cy="test-run-result-status">
-          <S.StateText>Test status:</S.StateText>
-          <TestState testState={testState} />
-        </S.StateContainer>
-      )}
-      {!extraContent && testState && testState === TestStateEnum.FINISHED && (
-        <Button data-cy="run-test-button" ghost onClick={handleRunTestOnClick} type="primary">
-          Run Test
-        </Button>
-      )}
+      <S.RightSection>
+        {extraContent}
+        {!extraContent && testState && testState !== TestStateEnum.FINISHED && (
+          <S.StateContainer data-cy="test-run-result-status">
+            <S.StateText>Test status:</S.StateText>
+            <TestState testState={testState} />
+          </S.StateContainer>
+        )}
+        {!extraContent && testState && testState === TestStateEnum.FINISHED && (
+          <Button data-cy="run-test-button" ghost onClick={handleRunTestOnClick} type="primary">
+            Run Test
+          </Button>
+        )}
+        {run.id && <Actions resultId={run.id} testId={id} />}
+      </S.RightSection>
       <VersionMismatchModal
         description="Running the test will use the latest version of the test."
         currentVersion={testVersion}

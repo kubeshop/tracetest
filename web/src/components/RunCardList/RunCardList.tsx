@@ -57,7 +57,7 @@ const ResultCardList = ({resultList, testId}: IProps) => {
       </S.Header>
       <S.List>
         {resultList.map(run => (
-          <ResultCard key={run.id} run={run} onClick={handleOnResultClick} onDelete={handleOnDelete} />
+          <ResultCard key={run.id} run={run} testId={testId} onClick={handleOnResultClick} onDelete={handleOnDelete} />
         ))}
       </S.List>
     </S.ResultCardList>
