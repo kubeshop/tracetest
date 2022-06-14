@@ -65,9 +65,8 @@ jobs:
           npm ci
       - name: Run unit tests
         run: |
-          echo "it works!"
-      #     cd web/
-      #     npm run test
+          cd web/
+          npm test
 
   build-docker:
     needs: [unit-test-frontend, unit-test-backend, unit-test-cli]
@@ -183,10 +182,6 @@ jobs:
         run: |
           cd web/
           npm ci
-      - name: Run unit tests
-        run: |
-          cd web/
-          npm test
       - name: Run integration tests
         run: |
           cd web/
