@@ -106,6 +106,12 @@ func (a *App) Start() error {
 
 	router := openapi.NewRouter(customController)
 
+	wsRouter := websocket.NewRouter()
+	wsRouter.Add("subscribe", websocket.NewSubscribeCommandExecutor(subscriptionManager))
+	wsRouter.Add("unsubscribe", websocket.NewUnsubscribeCommandExecutor(subscriptionManager))
+
+	router.Handle("/ws", wsRouter.Handler())
+
 	router.PathPrefix("/").Handler(
 		spaHandler(
 			"./html",
@@ -121,14 +127,6 @@ func (a *App) Start() error {
 	if err != nil {
 		return err
 	}
-
-	go func() {
-		wsRouter := websocket.NewRouter()
-		wsRouter.Add("subscribe", websocket.NewSubscribeCommandExecutor(subscriptionManager))
-		wsRouter.Add("unsubscribe", websocket.NewUnsubscribeCommandExecutor(subscriptionManager))
-		log.Printf("WS Server started")
-		wsRouter.ListenAndServe(":8081")
-	}()
 
 	log.Printf("HTTP Server started")
 	log.Fatal(http.ListenAndServe(":8080", router))
