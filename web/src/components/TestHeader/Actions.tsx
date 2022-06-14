@@ -1,16 +1,15 @@
 import {Dropdown, Menu} from 'antd';
-import * as S from './RunCard.styled';
+import * as S from './TestHeader.styled';
 
 interface IProps {
-  resultId: string;
   testId: string;
-  onDelete(resultId: string): void;
+  resultId: string;
 }
 
-const ResultCardActions = ({resultId, testId, onDelete}: IProps) => {
+const Actions = ({testId, resultId}: IProps) => {
   return (
     <span
-      data-cy={`result-actions-button-${resultId}`}
+      data-cy="test-header-actions-button"
       className="ant-dropdown-link"
       onClick={e => e.stopPropagation()}
       style={{textAlign: 'right'}}
@@ -23,16 +22,6 @@ const ResultCardActions = ({resultId, testId, onDelete}: IProps) => {
                 Download JUnit
               </a>
             </Menu.Item>
-            <Menu.Item
-              data-cy="test-delete-button"
-              onClick={({domEvent}) => {
-                domEvent.stopPropagation();
-                onDelete(resultId);
-              }}
-              key="delete"
-            >
-              Delete
-            </Menu.Item>
           </Menu>
         }
         placement="bottomLeft"
@@ -44,4 +33,4 @@ const ResultCardActions = ({resultId, testId, onDelete}: IProps) => {
   );
 };
 
-export default ResultCardActions;
+export default Actions;
