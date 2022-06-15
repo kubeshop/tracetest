@@ -70,6 +70,7 @@ func TestLoadDefinition(t *testing.T) {
 						Assertions: []string{
 							"db.repository.operation = \"create\"",
 							"tracetest.span.duration <= 100",
+							`tracetest.response.body contains "\"id\": 52"`,
 						},
 					},
 				},
