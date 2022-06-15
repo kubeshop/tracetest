@@ -22,6 +22,7 @@ func emptyValue[T comparable]() T {
 
 type FixtureOptions struct {
 	DisableCache bool
+	Arguments    interface{}
 }
 
 type Option func(opt *FixtureOptions)
