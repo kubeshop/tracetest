@@ -11,6 +11,7 @@ on:
       - server/**
       - web/**
       - cli/**
+      - tracetesting/**
       - .github/**
 
 jobs:
