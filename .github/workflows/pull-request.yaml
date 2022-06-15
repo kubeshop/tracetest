@@ -216,8 +216,11 @@ jobs:
       - name: Forward port
         run: |
           kubectl port-forward \
-            --namespace tracetest-pr-${{ github.event.pull_request.number }} \
+            --namespace tracetest-integration \
             svc/tracetest-pr-${{ github.event.pull_request.number }} 8080 &
+          kubectl port-forward \
+            --namespace tracetest-pr-${{ github.event.pull_request.number }} \
+            svc/tracetest-pr-${{ github.event.pull_request.number }} 8081 &
 
       - name: Build CLI
         run: |
@@ -225,8 +228,9 @@ jobs:
           make build
       - name: Run integration tests
         run: |
-          echo "http://localhost:8080" | cli/tracetest configure
-          cli/tracetest test list
+          TRACETEST_CLI="../cli/tracetest" \
+          TARGET_URL="http://tracetest.tracetest:8080" \
+          ./run.bash
 
   cleanup:
     runs-on: ubuntu-latest
