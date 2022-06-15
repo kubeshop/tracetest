@@ -1,12 +1,11 @@
 #!/bin/bash
 
 tracetest_main() {
-  TRACETEST_SCHEME="http" TRACETEST_ENDPOINT=$TRACETEST_MAIN_ENDPOINT $TRACETEST_CMD $@
+   $TRACETEST_CMD --config ./config.main.yml $@
 }
 
 tracetest_target() {
-  >&2 echo TRACETEST_SCHEME="http" TRACETEST_ENDPOINT=$TRACETEST_TARGET_ENDPOINT $TRACETEST_CMD $@
-  TRACETEST_SCHEME="http" TRACETEST_ENDPOINT=$TRACETEST_TARGET_ENDPOINT $TRACETEST_CMD $@
+  $TRACETEST_CMD --config ./config.target.yml $@
 }
 
 tracetest_target_curl() {
