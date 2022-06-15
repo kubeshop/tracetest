@@ -86,9 +86,6 @@ func (a runTestAction) runDefinition(ctx context.Context, definitionFile string,
 			return runTestOutput{}, fmt.Errorf("could not create test from definition: %w", err)
 		}
 
-		variableInjector := variable.NewInjector()
-		variableInjector.Inject(&test)
-
 		definition.Id = *test.Id
 		err = file.SaveDefinition(definitionFile, definition)
 		if err != nil {
@@ -150,6 +147,9 @@ func (a runTestAction) saveJUnitFile(ctx context.Context, testId, testRunId, out
 }
 
 func (a runTestAction) createTestFromDefinition(ctx context.Context, definition definition.Test) (openapi.Test, error) {
+	variableInjector := variable.NewInjector()
+	variableInjector.Inject(&definition)
+
 	openapiTest, err := conversion.ConvertTestDefinitionIntoOpenAPIObject(definition)
 	if err != nil {
 		return openapi.Test{}, err
@@ -173,6 +173,9 @@ func (a runTestAction) createTestFromDefinition(ctx context.Context, definition 
 }
 
 func (a runTestAction) updateTestFromDefinition(ctx context.Context, definition definition.Test) (openapi.Test, error) {
+	variableInjector := variable.NewInjector()
+	variableInjector.Inject(&definition)
+
 	openapiTest, err := conversion.ConvertTestDefinitionIntoOpenAPIObject(definition)
 	if err != nil {
 		return openapi.Test{}, err
