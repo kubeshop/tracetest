@@ -232,7 +232,7 @@ jobs:
         run: |
           cd tracetesting
           TRACETEST_CLI="../cli/tracetest" \
-          TARGET_URL="http://tracetest.tracetest:8080" \
+          TARGET_URL="http://tracetest-pr-${{ github.event.pull_request.number }}.tracetest-pr-${{ github.event.pull_request.number }}:8080" \
           ./run.bash
 
   cleanup:
