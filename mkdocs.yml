@@ -29,6 +29,8 @@ nav:
       - Add Pokemon Endpoint: pokeshop/add-pokemon.md
       - Import Pokemon Endpoint: pokeshop/import-pokemon.md
       - List Pokemon Endpoints: pokeshop/list-pokemon.md
+  - CLI:
+      - Text definition: cli/text-definition.md
   - Selectors: advanced-selectors.md
   - OpenAPI Definition: openapi.md
   - Development: development.md
