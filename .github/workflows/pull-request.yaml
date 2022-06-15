@@ -199,6 +199,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Setup jq
+        run: |
+          sudo apt install -y jq
+          jq --version
       - name: Setup go
         uses: actions/setup-go@v3
         with:
