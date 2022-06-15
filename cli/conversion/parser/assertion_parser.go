@@ -2,6 +2,7 @@ package parser
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/alecthomas/participle/v2"
 	"github.com/alecthomas/participle/v2/lexer"
@@ -16,15 +17,30 @@ type Assertion struct {
 type assertionParserObject struct {
 	Attribute string `@Attribute`
 	Operator  string `@Operator`
-	Value     string `@(Number|QuotedString)`
+	Value     string `@(Number|QuotedString|SingleQuotedString)`
 }
 
-var languageLexer = lexer.MustSimple([]lexer.SimpleRule{
-	{Name: "Operator", Pattern: `!=|<=|>=|=|<|>|contains`},
-	{Name: "Attribute", Pattern: `[a-zA-Z_][a-zA-Z0-9_\.]*`}, // anything that starts with a letter
-	{Name: "whitespace", Pattern: `[ |\t]+`},                 // spaces and tabs
-	{Name: "Number", Pattern: `([0-9]+(\.[0-9]+)?)`},
-	{Name: "QuotedString", Pattern: `("[^"]*")|('[^']*')`},
+var languageLexer = lexer.MustStateful(lexer.Rules{
+	"Root": {
+		{Name: "Operator", Pattern: `!=|<=|>=|=|<|>|contains`},
+		{Name: "Attribute", Pattern: `[a-zA-Z_][a-zA-Z0-9_\.]*`},
+		{Name: "whitespace", Pattern: `\s+`, Action: nil},
+		{Name: "Number", Pattern: `([0-9]+(\.[0-9]+)?)`},
+		{Name: "QuotedString", Pattern: `".*`, Action: lexer.Push("QuotedString")},
+		{Name: "SingleQuotedString", Pattern: `'.*`, Action: lexer.Push("SingleQuotedString")},
+	},
+
+	"QuotedString": {
+		{Name: "EscapedQuote", Pattern: `\\"`, Action: nil},
+		{Name: "QuoteStringEnd", Pattern: `"`, Action: lexer.Pop()},
+		{Name: "QuotedContent", Pattern: `[^"]*`, Action: nil},
+	},
+
+	"SingleQuotedString": {
+		{Name: "EscapedSingleQuote", Pattern: `\\'`, Action: nil},
+		{Name: "SingleQuoteStringEnd", Pattern: `'`, Action: lexer.Pop()},
+		{Name: "SingleQuotedContent", Pattern: `[^']*`, Action: nil},
+	},
 })
 
 var defaultParser *participle.Parser
@@ -73,5 +89,12 @@ func unquote(input string) string {
 		return input
 	}
 
-	return input[1 : len(input)-1]
+	unquotedValue := input[1 : len(input)-1]
+
+	return unescapeQuotes(unquotedValue)
+}
+
+func unescapeQuotes(input string) string {
+	input = strings.Replace(input, "\\\"", "\"", -1)
+	return strings.Replace(input, "\\'", "'", -1)
 }
