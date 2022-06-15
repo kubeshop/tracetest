@@ -12,7 +12,7 @@ import {TAssertion, TAssertionResults, TRawAssertionResults} from '../../types/A
 import {TRawTestDefinition, TTestDefinition} from '../../types/TestDefinition.types';
 import {TRawTestRun, TTestRun} from '../../types/TestRun.types';
 
-const PATH = `${document.location.protocol}//${document.location.host}/api/`;
+const PATH = `${document.baseURI}api/`;
 
 enum Tags {
   TEST = 'test',
