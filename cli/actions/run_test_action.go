@@ -13,6 +13,7 @@ import (
 	"github.com/kubeshop/tracetest/cli/definition"
 	"github.com/kubeshop/tracetest/cli/file"
 	"github.com/kubeshop/tracetest/cli/openapi"
+	"github.com/kubeshop/tracetest/cli/variable"
 	"go.uber.org/zap"
 )
 
@@ -84,6 +85,9 @@ func (a runTestAction) runDefinition(ctx context.Context, definitionFile string,
 		if err != nil {
 			return runTestOutput{}, fmt.Errorf("could not create test from definition: %w", err)
 		}
+
+		variableInjector := variable.NewInjector()
+		variableInjector.Inject(&test)
 
 		definition.Id = *test.Id
 		err = file.SaveDefinition(definitionFile, definition)
