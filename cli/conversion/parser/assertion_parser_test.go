@@ -78,6 +78,15 @@ func TestParseAssertion(t *testing.T) {
 			},
 		},
 		{
+			Name:  "should_parse_escaped_quoted_string",
+			Query: `tracetest.response.body contains '"id":"${TEST_ID}"'`,
+			ExpectedOutput: parser.Assertion{
+				Attribute: "tracetest.response.body",
+				Operator:  "contains",
+				Value:     `"id":"${TEST_ID}"`,
+			},
+		},
+		{
 			Name:  "should_parse_string_values",
 			Query: `db.statement = "create"`,
 			ExpectedOutput: parser.Assertion{
