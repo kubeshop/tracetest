@@ -13,6 +13,7 @@ import (
 	"github.com/kubeshop/tracetest/cli/definition"
 	"github.com/kubeshop/tracetest/cli/file"
 	"github.com/kubeshop/tracetest/cli/openapi"
+	"github.com/kubeshop/tracetest/cli/variable"
 	"go.uber.org/zap"
 )
 
@@ -146,6 +147,9 @@ func (a runTestAction) saveJUnitFile(ctx context.Context, testId, testRunId, out
 }
 
 func (a runTestAction) createTestFromDefinition(ctx context.Context, definition definition.Test) (openapi.Test, error) {
+	variableInjector := variable.NewInjector()
+	variableInjector.Inject(&definition)
+
 	openapiTest, err := conversion.ConvertTestDefinitionIntoOpenAPIObject(definition)
 	if err != nil {
 		return openapi.Test{}, err
@@ -169,6 +173,9 @@ func (a runTestAction) createTestFromDefinition(ctx context.Context, definition 
 }
 
 func (a runTestAction) updateTestFromDefinition(ctx context.Context, definition definition.Test) (openapi.Test, error) {
+	variableInjector := variable.NewInjector()
+	variableInjector.Inject(&definition)
+
 	openapiTest, err := conversion.ConvertTestDefinitionIntoOpenAPIObject(definition)
 	if err != nil {
 		return openapi.Test{}, err
