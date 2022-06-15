@@ -7,7 +7,9 @@ source ./funcs.bash
 EXIT_STATUS=0
 
 # setup
-export TEST_ID=$(tracetest_target test run --definition ./definitions/pokemon_list.yml | jq -rc '.test.id')
+export OUT=$(tracetest_target test run --definition ./definitions/pokemon_list.yml)
+echo $OUT
+TEST_ID=$(echo $OUT | jq -rc '.test.id')
 echo $TEST_ID
 
 #run test
