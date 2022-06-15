@@ -199,10 +199,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Setup jq
-        run: |
-          sudo apt install -y jq
-          jq --version
       - name: Setup go
         uses: actions/setup-go@v3
         with:
@@ -218,6 +214,11 @@ jobs:
           location: ${{ secrets.GKE_ZONE }}
           credentials: ${{ secrets.GKE_SA_KEY }}
 
+      - name: Build CLI
+        run: |
+          cd cli
+          make build
+
       - name: Forward port
         run: |
           kubectl port-forward \
@@ -227,10 +228,6 @@ jobs:
             --namespace tracetest-pr-${{ github.event.pull_request.number }} \
             svc/tracetest-pr-${{ github.event.pull_request.number }} 8081:8080 &
 
-      - name: Build CLI
-        run: |
-          cd cli
-          make build
       - name: Run integration tests
         run: |
           cd tracetesting
