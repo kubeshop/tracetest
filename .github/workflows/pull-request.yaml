@@ -8,11 +8,13 @@ on:
     branches:
       - main
     paths:
-      - server/**
-      - web/**
+      - .github/workflows/**
+      - api/**
       - cli/**
+      - server/**
       - tracetesting/**
-      - .github/**
+      - web/**
+      - Dockerfile
 
 jobs:
   unit-test-cli:
