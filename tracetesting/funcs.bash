@@ -9,6 +9,13 @@ tracetest_target() {
   TRACETEST_ENDPOINT=$TRACETEST_TARGET_ENDPOINT $TRACETEST_CMD $@
 }
 
+tracetest_target_curl() {
+  reqPath=$1
+  shift
+
+  curl "$TRACETEST_SCHEME://$TRACETEST_TARGET_ENDPOINT$reqPath" $@
+}
+
 run_test() {
   name=$1
   definition=$2

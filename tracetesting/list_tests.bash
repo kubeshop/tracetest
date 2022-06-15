@@ -10,5 +10,8 @@ export TEST_ID=$(tracetest_target test run --definition ./definitions/pokemon_li
 #run test
 run_test "list_tests" "./definitions/tracetest_tests_list.yml"  || EXIT_STATUS=$?
 
+# cleanup
+tracetest_target_curl "/api/tests/$TEST_ID" -X DELETE
+
 #exit
 exit $EXIT_STATUS
