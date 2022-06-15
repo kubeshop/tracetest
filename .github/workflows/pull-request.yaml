@@ -31,7 +31,7 @@ jobs:
       - name: Run unit tests
         run: |
           cd server/
-          # make test
+          make test
 
   unit-test-backend:
     name: Run backend unit tests
@@ -47,7 +47,7 @@ jobs:
       - name: Run unit tests
         run: |
           cd server/
-          # make test
+          make test
 
   unit-test-frontend:
     name: Run frontend unit tests
@@ -65,11 +65,11 @@ jobs:
       - name: Install test dependencies
         run: |
           cd web/
-          # npm ci
+          npm ci
       - name: Run unit tests
         run: |
           cd web/
-          # npm test
+          npm test
 
   build-docker:
     needs: [unit-test-frontend, unit-test-backend, unit-test-cli]
@@ -119,14 +119,10 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
 
-    # Setup gcloud CLI
     - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
       with:
         service_account_key: ${{ secrets.GKE_SA_KEY }}
         project_id: ${{ secrets.GKE_PROJECT }}
-
-    # - run: |-
-    #     gcloud --quiet auth configure-docker
 
     - uses: google-github-actions/get-gke-credentials@fb08709ba27618c31c09e014e1d8364b02e5042e
       with:
@@ -134,7 +130,6 @@ jobs:
         location: ${{ secrets.GKE_ZONE }}
         credentials: ${{ secrets.GKE_SA_KEY }}
 
-    # Deploy the Docker image to the GKE cluster
     - name: Deploy
       run: |
         helm repo add kubeshop https://kubeshop.github.io/helm-charts
