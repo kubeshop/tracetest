@@ -36,7 +36,9 @@ func (e subscribeCommandExecutor) Execute(conn *websocket.Conn, message []byte) 
 	}
 
 	messageConverter := subscription.NewSubscriberFunction(func(m subscription.Message) error {
-		err := conn.WriteJSON(ResourceUpdatedEvent(m.Content))
+		event := ResourceUpdatedEvent(m.Content)
+		event.Resource = msg.Resource
+		err := conn.WriteJSON(event)
 		if err != nil {
 			return fmt.Errorf("could not send update message: %w", err)
 		}

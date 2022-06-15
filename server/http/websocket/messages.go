@@ -13,8 +13,9 @@ type Message struct {
 }
 
 type Event struct {
-	Type  string      `json:"type"`
-	Event interface{} `json:"event"`
+	Type     string      `json:"type"`
+	Resource string      `json:"resource"`
+	Event    interface{} `json:"event"`
 }
 
 func SubscriptionSuccess(subscriptionId string) Message {

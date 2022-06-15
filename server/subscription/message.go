@@ -1,6 +1,7 @@
 package subscription
 
 type Message struct {
-	Type    string
-	Content interface{}
+	ResourceID string
+	Type       string
+	Content    interface{}
 }
