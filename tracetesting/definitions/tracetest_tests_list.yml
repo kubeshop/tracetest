@@ -1,0 +1,16 @@
+name: Tests List
+description: List all available tests
+trigger:
+  type: http
+  http_request:
+    url: ${TARGET_URL}/api/tests
+    method: GET
+    headers:
+    - key: Content-Type
+      value: application/json
+testDefinition:
+- selector: span[name="GET /api/tests" tracetest.span.type="http"]
+  assertions:
+  - tracetest.span.duration <= 500
+  - tracetest.response.status = 200
+  - tracetest.response.body contains "${TEST_ID}"

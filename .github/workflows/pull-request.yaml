@@ -8,10 +8,13 @@ on:
     branches:
       - main
     paths:
-      - server/**
-      - web/**
+      - .github/workflows/**
+      - api/**
       - cli/**
-      - .github/**
+      - server/**
+      - tracetesting/**
+      - web/**
+      - Dockerfile
 
 jobs:
   unit-test-cli:
@@ -27,7 +30,6 @@ jobs:
           go-version: '^1.18'
       - name: Run unit tests
         run: |
-          echo "it works!"
           cd server/
           make test
 
@@ -44,7 +46,6 @@ jobs:
           go-version: '^1.18'
       - name: Run unit tests
         run: |
-          echo "it works!"
           cd server/
           make test
 
@@ -118,14 +119,10 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
 
-    # Setup gcloud CLI
     - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
       with:
         service_account_key: ${{ secrets.GKE_SA_KEY }}
         project_id: ${{ secrets.GKE_PROJECT }}
-
-    # - run: |-
-    #     gcloud --quiet auth configure-docker
 
     - uses: google-github-actions/get-gke-credentials@fb08709ba27618c31c09e014e1d8364b02e5042e
       with:
@@ -133,7 +130,6 @@ jobs:
         location: ${{ secrets.GKE_ZONE }}
         credentials: ${{ secrets.GKE_SA_KEY }}
 
-    # Deploy the Docker image to the GKE cluster
     - name: Deploy
       run: |
         helm repo add kubeshop https://kubeshop.github.io/helm-charts
@@ -213,20 +209,26 @@ jobs:
           location: ${{ secrets.GKE_ZONE }}
           credentials: ${{ secrets.GKE_SA_KEY }}
 
-      - name: Forward port
-        run: |
-          kubectl port-forward \
-            --namespace tracetest-pr-${{ github.event.pull_request.number }} \
-            svc/tracetest-pr-${{ github.event.pull_request.number }} 8080 &
-
       - name: Build CLI
         run: |
           cd cli
           make build
+
+      - name: Forward port
+        run: |
+          kubectl port-forward \
+            --namespace tracetest-integration \
+            svc/tracetest-integration 8080 &
+          kubectl port-forward \
+            --namespace tracetest-pr-${{ github.event.pull_request.number }} \
+            svc/tracetest-pr-${{ github.event.pull_request.number }} 8081:8080 &
+
       - name: Run integration tests
         run: |
-          echo "http://localhost:8080" | cli/tracetest configure
-          cli/tracetest test list
+          cd tracetesting
+          TRACETEST_CLI="../cli/tracetest" \
+          TARGET_URL="http://tracetest-pr-${{ github.event.pull_request.number }}.tracetest-pr-${{ github.event.pull_request.number }}:8080" \
+          ./run.bash
 
   cleanup:
     runs-on: ubuntu-latest
