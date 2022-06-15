@@ -220,7 +220,7 @@ jobs:
             svc/tracetest-integration 8080 &
           kubectl port-forward \
             --namespace tracetest-pr-${{ github.event.pull_request.number }} \
-            svc/tracetest-pr-${{ github.event.pull_request.number }} 8081 &
+            svc/tracetest-pr-${{ github.event.pull_request.number }} 8081:8080 &
 
       - name: Build CLI
         run: |
