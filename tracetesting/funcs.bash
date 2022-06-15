@@ -12,7 +12,7 @@ tracetest_target_curl() {
   reqPath=$1
   shift
 
-  curl "http://$TRACETEST_TARGET_ENDPOINT$reqPath" $@
+  curl -sSL "http://$TRACETEST_TARGET_ENDPOINT$reqPath" $@
 }
 
 run_test() {
