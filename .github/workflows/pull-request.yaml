@@ -228,6 +228,7 @@ jobs:
           make build
       - name: Run integration tests
         run: |
+          cd tracetesting
           TRACETEST_CLI="../cli/tracetest" \
           TARGET_URL="http://tracetest.tracetest:8080" \
           ./run.bash
