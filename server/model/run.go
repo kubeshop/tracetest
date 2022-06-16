@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"math"
 	"time"
 
@@ -13,6 +14,10 @@ var (
 		return time.Now()
 	}
 )
+
+func (r Run) ResourceID(testID string) string {
+	return fmt.Sprintf("test/%s/run/%s", testID, r.ID)
+}
 
 func (r Run) Copy() Run {
 	r.ID = uuid.UUID{}

@@ -5,3 +5,9 @@ func WithCacheDisabled() Option {
 		opt.DisableCache = true
 	}
 }
+
+func WithArguments(args interface{}) Option {
+	return func(opt *FixtureOptions) {
+		opt.Arguments = args
+	}
+}

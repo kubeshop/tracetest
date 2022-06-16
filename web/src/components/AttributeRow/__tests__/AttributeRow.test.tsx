@@ -20,6 +20,7 @@ describe('AttributeRow', () => {
         onCreateAssertion={onCreateAssertion}
         onCopy={onCopy}
         setIsCopied={setIsCopied}
+        shouldDisplayActions
       />
     );
 

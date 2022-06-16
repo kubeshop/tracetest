@@ -14,9 +14,3 @@ export const isJson = (str: string) => {
 
   return Number.isNaN(Number(str)) && !isBoolean(str) && true;
 };
-
-const visiblePortion = 64;
-
-export function visiblePortionFuction() {
-  return {visiblePortion, height: `calc(100% - ${visiblePortion}px - 60px)`};
-}

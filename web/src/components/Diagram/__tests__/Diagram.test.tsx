@@ -11,7 +11,7 @@ jest.mock('../../../services/Analytics/Analytics.service', () => {
   };
 });
 
-describe('Diagram', () => {
+describe.skip('Diagram', () => {
   test('Diagram DAG', async () => {
     const {getByText} = render(
       <div style={{width: 200, height: 200}}>

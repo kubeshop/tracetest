@@ -1,11 +1,10 @@
 import {Dropdown, Menu} from 'antd';
 
-import {useAssertionForm} from 'components/AssertionForm/AssertionFormProvider';
+import {useRunLayout} from 'components/RunLayout';
 import useScrollTo from 'hooks/useScrollTo';
 import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
+import TraceAnalyticsService from 'services/Analytics/TraceAnalytics.service';
 import {IResult} from 'types/Assertion.types';
-import TraceAnalyticsService from '../../services/Analytics/TraceAnalytics.service';
-import {DrawerState} from '../ResizableDrawer/ResizableDrawer';
 import * as S from './AttributeRow.styled';
 
 interface IProps {
@@ -14,13 +13,13 @@ interface IProps {
 }
 
 const AttributeCheck = ({items, type}: IProps) => {
+  const {openBottomPanel} = useRunLayout();
   const {setSelectedAssertion} = useTestDefinition();
-  const {setDrawerState} = useAssertionForm();
   const scrollTo = useScrollTo();
 
   const handleOnClick = (id: string) => {
     TraceAnalyticsService.onAttributeCheckClick();
-    setDrawerState(DrawerState.OPEN);
+    openBottomPanel();
     setSelectedAssertion(id);
     scrollTo({elementId: `assertion-${id}`, containerId: 'assertions-container'});
   };

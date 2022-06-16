@@ -12,19 +12,17 @@ type subscriptionMessage struct {
 	Resource string `json:"resource"`
 }
 
-type SubscribeCommandExecutor struct {
+type subscribeCommandExecutor struct {
 	subscriptionManager *subscription.Manager
 }
 
-func NewSubscribeCommandExecutor(manager *subscription.Manager) SubscribeCommandExecutor {
-	return SubscribeCommandExecutor{
+func NewSubscribeCommandExecutor(manager *subscription.Manager) MessageExecutor {
+	return subscribeCommandExecutor{
 		subscriptionManager: manager,
 	}
 }
 
-var _ MessageExecutor = &SubscribeCommandExecutor{}
-
-func (e SubscribeCommandExecutor) Execute(conn *websocket.Conn, message []byte) {
+func (e subscribeCommandExecutor) Execute(conn *websocket.Conn, message []byte) {
 	msg := subscriptionMessage{}
 	err := json.Unmarshal(message, &msg)
 	if err != nil {
@@ -33,12 +31,14 @@ func (e SubscribeCommandExecutor) Execute(conn *websocket.Conn, message []byte) 
 	}
 
 	if msg.Resource == "" {
-		conn.WriteJSON(ErrorMessage(fmt.Errorf("Resource cannot be empty")))
+		conn.WriteJSON(ErrorMessage(fmt.Errorf("resource cannot be empty")))
 		return
 	}
 
 	messageConverter := subscription.NewSubscriberFunction(func(m subscription.Message) error {
-		err := conn.WriteJSON(ResourceUpdatedEvent(m.Content))
+		event := ResourceUpdatedEvent(m.Content)
+		event.Resource = msg.Resource
+		err := conn.WriteJSON(event)
 		if err != nil {
 			return fmt.Errorf("could not send update message: %w", err)
 		}

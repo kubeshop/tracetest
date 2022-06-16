@@ -16,6 +16,11 @@ type MockRepository struct {
 	T mock.TestingT
 }
 
+func (m *MockRepository) ServerID() (string, bool, error) {
+	args := m.Called()
+	return args.String(0), args.Bool(1), args.Error(2)
+}
+
 func (m *MockRepository) CreateTest(_ context.Context, test model.Test) (model.Test, error) {
 	args := m.Called(test)
 	return args.Get(0).(model.Test), args.Error(1)

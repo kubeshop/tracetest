@@ -9,7 +9,7 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/denisbrodbeck/machineid"
+	"github.com/google/uuid"
 )
 
 const (
@@ -24,7 +24,7 @@ var (
 	SecretKey     = ""
 )
 
-func Init(enabled bool, appName, appVersion string) error {
+func Init(enabled bool, serverID, appName, appVersion string) error {
 	// ga not enabled, use dumb settings
 	if !enabled {
 		defaultClient = ga{enabled: false}
@@ -37,11 +37,6 @@ func Init(enabled bool, appName, appVersion string) error {
 		return fmt.Errorf("could not get hostname: %w", err)
 	}
 
-	machineID, err := machineid.ProtectedID(appName)
-	if err != nil {
-		return fmt.Errorf("could not get machineID: %w", err)
-	}
-
 	defaultClient = ga{
 		enabled:       true,
 		measurementID: MeasurementID,
@@ -49,17 +44,27 @@ func Init(enabled bool, appName, appVersion string) error {
 		appVersion:    appVersion,
 		appName:       appName,
 		hostname:      hostname,
-		machineID:     machineID,
+		serverID:      serverID,
 	}
 
 	return nil
 }
 
 func CreateAndSendEvent(name, category string) error {
+	fmt.Printf(`sending event "%s" (%s)%s`, name, category, "\n")
 	if !defaultClient.ready() {
-		return fmt.Errorf("uninitalized client. Call analytics.Init")
+		err := fmt.Errorf("uninitalized cliGent. Call analytics.Init")
+		fmt.Printf(`could not send event "%s" (%s): %s%s`, name, category, err.Error(), "\n")
+		return err
 	}
-	return defaultClient.CreateAndSendEvent(name, category)
+	err := defaultClient.CreateAndSendEvent(name, category)
+	if err != nil {
+		fmt.Printf(`could not send event "%s" (%s): %s%s`, name, category, err.Error(), "\n")
+	} else {
+		fmt.Printf(`event sent "%s" (%s)%s`, name, category, "\n")
+	}
+
+	return err
 }
 
 func Ready() bool {
@@ -73,19 +78,20 @@ type ga struct {
 	measurementID string
 	secretKey     string
 	hostname      string
-	machineID     string
+	serverID      string
 }
 
 func (ga ga) ready() bool {
 	return !ga.enabled || (ga.appVersion != "" &&
 		ga.appName != "" &&
 		ga.hostname != "" &&
-		ga.machineID != "")
+		ga.serverID != "")
 
 }
 
 func (ga ga) CreateAndSendEvent(name, category string) error {
 	if !ga.enabled {
+		fmt.Printf(`Ignore event "%s" (%s): ga not enabled%s`, name, category, "\n")
 		return nil
 	}
 	event, err := ga.newEvent(name, category)
@@ -100,11 +106,12 @@ func (ga ga) newEvent(name, category string) (event, error) {
 	return event{
 		Name: name,
 		Params: params{
+			ID:              uuid.NewString(), // prevent event caching
 			EventCount:      1,
 			EventCategory:   category,
 			AppName:         ga.appName,
 			Host:            ga.hostname,
-			MachineID:       ga.machineID,
+			MachineID:       ga.serverID,
 			AppVersion:      ga.appVersion,
 			Architecture:    runtime.GOARCH,
 			OperatingSystem: runtime.GOOS,
@@ -114,8 +121,7 @@ func (ga ga) newEvent(name, category string) (event, error) {
 
 func (ga ga) sendEvent(e event) error {
 	payload := payload{
-		UserID:   ga.machineID,
-		ClientID: ga.machineID,
+		ClientID: ga.serverID,
 		Events: []event{
 			e,
 		},
@@ -200,6 +206,7 @@ func (ga ga) sendPayloadToURL(p payload, url string) (*http.Response, []byte, er
 }
 
 type params struct {
+	ID               string `json:"tt_event_id,omitempty"`
 	EventCount       int64  `json:"event_count,omitempty"`
 	EventCategory    string `json:"event_category,omitempty"`
 	AppVersion       string `json:"app_version,omitempty"`
@@ -218,7 +225,6 @@ type event struct {
 }
 
 type payload struct {
-	UserID   string  `json:"user_id,omitempty"`
 	ClientID string  `json:"client_id,omitempty"`
 	Events   []event `json:"events,omitempty"`
 }

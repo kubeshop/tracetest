@@ -26,10 +26,32 @@
     -->
     <title>Tracetest</title>
     <script>
-      window.ENV = {
-        measurementId: "{{ .MeasurementId }}",
-        analyticsEnabled: "{{ .AnalyticsEnabled }}"
+      function getTemplateValue(value, defaultValue) {
+        // hack: we cannot add double curly brackets on our code otherwise the go template
+        // module will try to parse it and it will fail.
+        var curlyBracket = String.fromCharCode(123);
+        var startingTemplateToken = `${curlyBracket}${curlyBracket}`;
+        if (!value || value.startsWith(startingTemplateToken)) {
+          return defaultValue
+        }
+
+        return value
+      }
+
+      function injectVariables() {
+
+        window.ENV = {
+          measurementId: getTemplateValue("{{ .MeasurementId }}", ""),
+          analyticsEnabled: getTemplateValue("{{ .AnalyticsEnabled }}", false),
+          serverPathPrefix: getTemplateValue("{{ .ServerPathPrefix }}", "/")
+        };
+
+        var base = document.createElement('base');
+        base.href = window.ENV.serverPathPrefix
+        document.getElementsByTagName('head')[0].appendChild(base);
       };
+
+      injectVariables();
     </script>
   </head>
   <body>

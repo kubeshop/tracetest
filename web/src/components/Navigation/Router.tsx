@@ -3,9 +3,11 @@ import Home from 'pages/Home';
 import Test from 'pages/Test';
 import Trace from '../../pages/Trace';
 
+const { serverPathPrefix = '/' } = window.ENV || {};
+
 const Router = (): JSX.Element => {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={serverPathPrefix}>
       <Routes>
         <Route path="/" element={<Home path="home" />} />
         <Route path="/test/:testId" element={<Test path="test-details" />} />
