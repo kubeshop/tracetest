@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/traces"
 )
 
@@ -13,7 +14,19 @@ var (
 	Now = func() time.Time {
 		return time.Now()
 	}
+
+	IDGen = id.NewRandGenerator()
 )
+
+func NewRun() Run {
+	return Run{
+		ID:        IDGen.UUID(),
+		TraceID:   IDGen.TraceID(),
+		SpanID:    IDGen.SpanID(),
+		State:     RunStateCreated,
+		CreatedAt: Now(),
+	}
+}
 
 func (r Run) ResourceID(testID string) string {
 	return fmt.Sprintf("test/%s/run/%s", testID, r.ID)

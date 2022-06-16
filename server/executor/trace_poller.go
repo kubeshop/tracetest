@@ -29,7 +29,7 @@ type TraceFetcher interface {
 
 func NewTracePoller(
 	tf TraceFetcher,
-	tests model.Repository,
+	updater RunUpdater,
 	retryDelay time.Duration,
 	maxWaitTimeForTrace time.Duration,
 	subscriptionManager *subscription.Manager,
@@ -37,7 +37,7 @@ func NewTracePoller(
 ) PersistentTracePoller {
 	maxTracePollRetry := int(math.Ceil(float64(maxWaitTimeForTrace) / float64(retryDelay)))
 	return tracePoller{
-		tests:               tests,
+		updater:             updater,
 		traceDB:             tf,
 		maxWaitTimeForTrace: maxWaitTimeForTrace,
 		maxTracePollRetry:   maxTracePollRetry,
@@ -50,7 +50,7 @@ func NewTracePoller(
 }
 
 type tracePoller struct {
-	tests               model.Repository
+	updater             RunUpdater
 	traceDB             TraceFetcher
 	maxWaitTimeForTrace time.Duration
 	retryDelay          time.Duration
@@ -140,7 +140,7 @@ func (tp tracePoller) processJob(job tracePollReq) {
 
 	fmt.Printf("completed polling result %s after %d times, number of spans: %d \n", job.run.ID, job.count, len(run.Trace.Flat))
 
-	tp.handleDBError(tp.tests.UpdateRun(job.ctx, run))
+	tp.handleDBError(tp.updater.Update(job.ctx, run))
 
 	tp.subscriptions.PublishUpdate(run.ResourceID(job.test.ID.String()), subscription.Message{
 		Type:       "result_update",
@@ -209,7 +209,7 @@ func (tp tracePoller) handleTraceDBError(job tracePollReq, err error) {
 		fmt.Println("other", err)
 	}
 
-	tp.handleDBError(tp.tests.UpdateRun(job.ctx, run.Failed(err)))
+	tp.handleDBError(tp.updater.Update(job.ctx, run.Failed(err)))
 
 }
 

@@ -44,7 +44,7 @@ func TestExecutorSuccessfulExecution(t *testing.T) {
 			test, run, err := loadTestFile(testCase.Tracefile)
 			require.NoError(t, err)
 
-			assertionExecutor := executor.NewAssertionRunner(repo)
+			assertionExecutor := executor.NewAssertionRunner(executor.NewDBUpdater(repo))
 
 			test, err = repo.CreateTest(ctx, test)
 			require.NoError(t, err)

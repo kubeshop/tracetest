@@ -3,9 +3,7 @@ package executor
 import (
 	"context"
 	"fmt"
-	"time"
 
-	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -26,13 +24,14 @@ type Executor interface {
 func NewPersistentRunner(
 	e Executor,
 	tests model.Repository,
+	updater RunUpdater,
 	tp TracePoller,
 ) PersistentRunner {
 	return persistentRunner{
 		executor:     e,
 		tests:        tests,
+		updater:      updater,
 		tp:           tp,
-		idGen:        id.NewRandGenerator(),
 		executeQueue: make(chan execReq, 5),
 		exit:         make(chan bool, 1),
 	}
@@ -41,8 +40,8 @@ func NewPersistentRunner(
 type persistentRunner struct {
 	executor Executor
 	tp       TracePoller
-	idGen    id.Generator
 	tests    model.Repository
+	updater  RunUpdater
 
 	executeQueue chan execReq
 	exit         chan bool
@@ -93,7 +92,7 @@ func (r persistentRunner) Run(test model.Test) model.Run {
 	// Start a new background context for the async process
 	ctx := context.Background()
 
-	run, err := r.tests.CreateRun(ctx, test, r.newTestRun())
+	run, err := r.tests.CreateRun(ctx, test, model.NewRun())
 	r.handleDBError(err)
 
 	r.executeQueue <- execReq{
@@ -107,7 +106,7 @@ func (r persistentRunner) Run(test model.Test) model.Run {
 
 func (r persistentRunner) processExecQueue(job execReq) {
 	run := job.run.Start()
-	r.handleDBError(r.tests.UpdateRun(job.ctx, run))
+	r.handleDBError(r.updater.Update(job.ctx, run))
 
 	response, err := r.executor.Execute(job.test, job.run.TraceID, job.run.SpanID)
 	run = r.handleExecutionResult(run, response, err)
@@ -117,7 +116,7 @@ func (r persistentRunner) processExecQueue(job execReq) {
 		r.handleDBError(r.tests.UpdateTestVersion(job.ctx, job.test))
 	}
 
-	r.handleDBError(r.tests.UpdateRun(job.ctx, run))
+	r.handleDBError(r.updater.Update(job.ctx, run))
 	if run.State == model.RunStateAwaitingTrace {
 		r.tp.Poll(job.ctx, job.test, run)
 	}
@@ -130,14 +129,4 @@ func (r persistentRunner) handleExecutionResult(run model.Run, resp model.HTTPRe
 	}
 
 	return run.SuccessfullyExecuted()
-}
-
-func (r persistentRunner) newTestRun() model.Run {
-	return model.Run{
-		ID:        r.idGen.UUID(),
-		TraceID:   r.idGen.TraceID(),
-		SpanID:    r.idGen.SpanID(),
-		State:     model.RunStateCreated,
-		CreatedAt: time.Now(),
-	}
 }
