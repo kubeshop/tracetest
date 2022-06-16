@@ -23,13 +23,13 @@ type Executor interface {
 
 func NewPersistentRunner(
 	e Executor,
-	tests model.Repository,
+	runs model.RunRepository,
 	updater RunUpdater,
 	tp TracePoller,
 ) PersistentRunner {
 	return persistentRunner{
 		executor:     e,
-		tests:        tests,
+		runs:         runs,
 		updater:      updater,
 		tp:           tp,
 		executeQueue: make(chan execReq, 5),
@@ -40,7 +40,7 @@ func NewPersistentRunner(
 type persistentRunner struct {
 	executor Executor
 	tp       TracePoller
-	tests    model.Repository
+	runs     model.RunRepository
 	updater  RunUpdater
 
 	executeQueue chan execReq
@@ -92,7 +92,7 @@ func (r persistentRunner) Run(test model.Test) model.Run {
 	// Start a new background context for the async process
 	ctx := context.Background()
 
-	run, err := r.tests.CreateRun(ctx, test, model.NewRun())
+	run, err := r.runs.CreateRun(ctx, test, model.NewRun())
 	r.handleDBError(err)
 
 	r.executeQueue <- execReq{
@@ -110,11 +110,6 @@ func (r persistentRunner) processExecQueue(job execReq) {
 
 	response, err := r.executor.Execute(job.test, job.run.TraceID, job.run.SpanID)
 	run = r.handleExecutionResult(run, response, err)
-
-	if job.test.ReferenceRun == nil {
-		job.test.ReferenceRun = &run
-		r.handleDBError(r.tests.UpdateTestVersion(job.ctx, job.test))
-	}
 
 	r.handleDBError(r.updater.Update(job.ctx, run))
 	if run.State == model.RunStateAwaitingTrace {
