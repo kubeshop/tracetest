@@ -119,6 +119,10 @@ const TraceTestAPI = createApi({
       query: ({testId, runId}) => ({url: `/tests/${testId}/run/${runId}`, method: 'DELETE'}),
       invalidatesTags: (result, error, {testId}) => [{type: Tags.TEST_RUN, id: `${testId}-LIST`}],
     }),
+    getJUnitByRunId: build.query<string, {testId: string; runId: string}>({
+      query: ({testId, runId}) => ({url: `/tests/${testId}/run/${runId}/junit.xml`, responseHandler: 'text'}),
+      providesTags: (result, error, {testId, runId}) => [{type: Tags.TEST_RUN, id: `${testId}-${runId}-junit`}],
+    }),
 
     // Spans
     getSelectedSpans: build.query<string[], {testId: string; runId: string; query: string}>({
@@ -143,6 +147,8 @@ export const {
   useLazyGetRunListQuery,
   useDryRunMutation,
   useDeleteRunByIdMutation,
+  useGetJUnitByRunIdQuery,
+  useLazyGetJUnitByRunIdQuery,
 } = TraceTestAPI;
 export const {endpoints} = TraceTestAPI;
 

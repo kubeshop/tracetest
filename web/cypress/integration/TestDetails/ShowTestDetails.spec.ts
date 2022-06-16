@@ -1,6 +1,6 @@
 import {createMultipleTestRuns, createTest, deleteTest, description, getResultId, name, testId} from '../utils/Common';
 
-describe('Show test details', () => {
+describe.only('Show test details', () => {
   before(() => {
     createTest();
   });
@@ -11,7 +11,7 @@ describe('Show test details', () => {
 
   it('should show the test details for any trace', () => {
     createMultipleTestRuns(testId, 5);
-    cy.get(`[data-cy=collapse-test-${testId}]`).click();
+    cy.get(`[data-cy=collapse-test-${testId}]`, {timeout: 10000}).click();
     cy.get('[data-cy=test-details-link]', {timeout: 10000}).first().click();
 
     cy.location('pathname').should('match', /\/test\/.*/i);
@@ -33,6 +33,30 @@ describe('Show test details', () => {
       cy.get(`[data-cy=result-card-${testRunResultId}]`, {timeout: 10000}).should('be.visible');
       cy.visit(`http://localhost:3000/test/${testId}/run/${testRunResultId}`);
     });
+  });
+
+  it('should display the jUnit report', () => {
+    cy.visit(`http://localhost:3000/test/${testId}`);
+
+    cy.get('[data-cy^=result-actions-button]').first().click();
+    cy.get('[data-cy=view-junit-button]').click();
+
+    cy.get('[data-cy=file-viewer-code-container]').should('be.visible');
+    cy.get('[data-cy=file-viewer-close]').click();
+
+    cy.get('[data-cy=file-viewer-code-container]').should('not.be.visible');
+  });
+
+  it('should display the test definition yaml', () => {
+    cy.visit(`http://localhost:3000/test/${testId}`);
+
+    cy.get('[data-cy^=result-actions-button]').first().click();
+    cy.get('[data-cy=view-test-definition-button]').click();
+
+    cy.get('[data-cy=file-viewer-code-container]').should('be.visible');
+    cy.get('[data-cy=file-viewer-close]').click();
+
+    cy.get('[data-cy=file-viewer-code-container]').should('not.be.visible');
   });
 
   // it('should update the test run result status', () => {

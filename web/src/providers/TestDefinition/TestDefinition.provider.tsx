@@ -53,11 +53,12 @@ export const Context = createContext<IContext>({
 interface IProps {
   testId: string;
   runId: string;
+  children: React.ReactNode;
 }
 
 export const useTestDefinition = () => useContext(Context);
 
-const TestDefinitionProvider: React.FC<IProps> = ({children, testId, runId}) => {
+const TestDefinitionProvider = ({children, testId, runId}: IProps) => {
   const dispatch = useAppDispatch();
   const {run} = useTestRun();
   const assertionResults = useAppSelector(state => TestDefinitionSelectors.selectAssertionResults(state));
@@ -121,21 +122,21 @@ const TestDefinitionProvider: React.FC<IProps> = ({children, testId, runId}) => 
       revert,
     }),
     [
-      revert,
       add,
-      assertionResults,
-      cancel,
-      definitionList,
-      dryRun,
-      isDraftMode,
-      isLoading,
-      publish,
-      runTest,
       remove,
       update,
+      isLoading,
+      isDraftMode,
+      publish,
+      runTest,
+      dryRun,
+      assertionResults,
+      definitionList,
+      cancel,
       test,
       setAffectedSpans,
       setSelectedAssertion,
+      revert,
     ]
   );
 
