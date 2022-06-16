@@ -84,31 +84,26 @@ func waitForRunState(app *app.App, testID, runID, state string, timeout time.Dur
 				outputChannel <- nil
 				return
 			case <-executionTicker.C:
-				testRun := getRunInState(app, testID, runID, state)
-				if testRun != nil {
-					outputChannel <- testRun
+				run, err := getRun(app, testID, runID)
+				if err != nil {
+					return
+				}
+
+				if run.State == string(model.RunStateFailed) {
+					fmt.Println("Run was in FAILED state")
+					outputChannel <- nil
+					return
+				}
+
+				if run.State == state {
+					outputChannel <- &run
 					return
 				}
 			}
 		}
 	}()
 
-	testRun := <-outputChannel
-	return testRun
-}
-
-func getRunInState(app *app.App, testID, resultID, state string) *openapi.TestRun {
-	run, err := getRun(app, testID, resultID)
-	if err != nil {
-		return nil
-	}
-
-	if run.State != state {
-		return nil
-
-	}
-
-	return &run
+	return <-outputChannel
 }
 
 func getRun(app *app.App, testID, runID string) (openapi.TestRun, error) {
