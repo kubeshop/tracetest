@@ -10,6 +10,16 @@ export const Header = styled(Layout.Header)`
   padding: 0 24px;
   background: #fff;
   border-bottom: 1px solid #e2e4e6;
+
+  .ant-popover-title {
+    padding: 16px;
+  }
+  .ant-popover-arrow {
+    display: none;
+  }
+  .ant-popover-inner-content {
+    padding: 0;
+  }
 `;
 
 export const TitleText = styled(Title).attrs({

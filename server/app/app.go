@@ -40,9 +40,9 @@ func New(config config.Config, db model.Repository, tracedb tracedb.TraceDB, tra
 	return app, nil
 }
 
-func spaHandler(staticPath, indexPath string, tplVars map[string]string) http.HandlerFunc {
+func spaHandler(prefix, staticPath, indexPath string, tplVars map[string]string) http.HandlerFunc {
 	var fileMatcher = regexp.MustCompile(`\.[a-zA-Z]*$`)
-	return func(w http.ResponseWriter, r *http.Request) {
+	handler := func(w http.ResponseWriter, r *http.Request) {
 		if !fileMatcher.MatchString(r.URL.Path) {
 			tpl, err := template.ParseFiles(filepath.Join(staticPath, indexPath))
 			if err != nil {
@@ -59,13 +59,29 @@ func spaHandler(staticPath, indexPath string, tplVars map[string]string) http.Ha
 			http.FileServer(http.Dir(staticPath)).ServeHTTP(w, r)
 		}
 	}
+
+	return http.StripPrefix(prefix, http.HandlerFunc(handler)).ServeHTTP
 }
 
 func (a *App) Start() error {
 	fmt.Println("Starting tracetest", Version)
-	err := analytics.Init(a.config.GA.Enabled, "tracetest", Version)
+
+	serverID, isNewInstall, err := a.db.ServerID()
+
 	if err != nil {
 		return err
+	}
+
+	err = analytics.Init(a.config.GA.Enabled, serverID, "tracetest", Version)
+	if err != nil {
+		return err
+	}
+
+	if isNewInstall {
+		err = analytics.CreateAndSendEvent("install_server", "beacon")
+		if err != nil {
+			return err
+		}
 	}
 
 	ex, err := executor.New()
@@ -90,16 +106,28 @@ func (a *App) Start() error {
 	controller := httpServer.NewController(a.db, runner, assertionRunner)
 	apiApiController := openapi.NewApiApiController(controller)
 	customController := httpServer.NewCustomController(controller, apiApiController, openapi.DefaultErrorHandler, a.tracer)
+	httpRouter := customController
+	if a.config.Server.PathPrefix != "" {
+		httpRouter = httpServer.NewPrefixedRouter(httpRouter, a.config.Server.PathPrefix)
+	}
 
-	router := openapi.NewRouter(customController)
+	router := openapi.NewRouter(httpRouter)
 
-	router.PathPrefix("/").Handler(
+	wsRouter := websocket.NewRouter()
+	wsRouter.Add("subscribe", websocket.NewSubscribeCommandExecutor(subscriptionManager))
+	wsRouter.Add("unsubscribe", websocket.NewUnsubscribeCommandExecutor(subscriptionManager))
+
+	router.Handle("/ws", wsRouter.Handler())
+
+	router.PathPrefix(a.config.Server.PathPrefix).Handler(
 		spaHandler(
+			a.config.Server.PathPrefix,
 			"./html",
 			"index.html",
 			map[string]string{
 				"MeasurementId":    analytics.MeasurementID,
 				"AnalyticsEnabled": fmt.Sprintf("%t", a.config.GA.Enabled),
+				"ServerPathPrefix": fmt.Sprintf("%s/", a.config.Server.PathPrefix),
 			},
 		),
 	)
@@ -109,16 +137,13 @@ func (a *App) Start() error {
 		return err
 	}
 
-	go func() {
-		wsRouter := websocket.NewRouter()
-		wsRouter.Add("subscribe", websocket.NewSubscribeCommandExecutor(subscriptionManager))
-		wsRouter.Add("unsubscribe", websocket.NewUnsubscribeCommandExecutor(subscriptionManager))
-		log.Printf("WS Server started")
-		wsRouter.ListenAndServe(":8081")
-	}()
+	port := 8080
+	if a.config.Server.HttpPort != 0 {
+		port = a.config.Server.HttpPort
+	}
 
 	log.Printf("HTTP Server started")
-	log.Fatal(http.ListenAndServe(":8080", router))
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), router))
 
 	return nil
 }

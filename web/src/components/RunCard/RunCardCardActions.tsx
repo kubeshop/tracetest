@@ -1,12 +1,13 @@
 import {Dropdown, Menu} from 'antd';
 import * as S from './RunCard.styled';
 
-interface IResultCardActionsProps {
+interface IProps {
   resultId: string;
+  testId: string;
   onDelete(resultId: string): void;
 }
 
-const ResultCardActions: React.FC<IResultCardActionsProps> = ({resultId, onDelete}) => {
+const ResultCardActions = ({resultId, testId, onDelete}: IProps) => {
   return (
     <span
       data-cy={`result-actions-button-${resultId}`}
@@ -17,6 +18,11 @@ const ResultCardActions: React.FC<IResultCardActionsProps> = ({resultId, onDelet
       <Dropdown
         overlay={
           <Menu>
+            <Menu.Item data-cy="download-junit-button" key="download-junit">
+              <a href={`/api/tests/${testId}/run/${resultId}/junit.xml`} download>
+                Download JUnit
+              </a>
+            </Menu.Item>
             <Menu.Item
               data-cy="test-delete-button"
               onClick={({domEvent}) => {

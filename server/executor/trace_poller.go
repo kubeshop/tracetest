@@ -142,10 +142,10 @@ func (tp tracePoller) processJob(job tracePollReq) {
 
 	tp.handleDBError(tp.tests.UpdateRun(job.ctx, run))
 
-	resource := fmt.Sprintf("test/%s/run/%s", job.test.ID, run.ID)
-	tp.subscriptions.PublishUpdate(resource, subscription.Message{
-		Type:    "result_update",
-		Content: run,
+	tp.subscriptions.PublishUpdate(run.ResourceID(job.test.ID.String()), subscription.Message{
+		Type:       "result_update",
+		ResourceID: run.ResourceID(job.test.ID.String()),
+		Content:    run,
 	})
 
 	err = tp.runAssertions(job.ctx, job.test, run)

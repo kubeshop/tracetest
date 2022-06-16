@@ -1,24 +1,20 @@
 import {useCallback} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
+
+import FailedTrace from 'components/FailedTrace';
+import Run from 'components/Run';
 import TestHeader from 'components/TestHeader';
+import TraceActions from 'components/TraceActions';
+import {TestState} from 'constants/TestRun.constants';
+import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
+import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import {useGetResultByIdQueryPolling} from './hooks/useGetResultByIdQueryPolling';
-import {TestState} from '../../constants/TestRun.constants';
-import useGuidedTour from '../../hooks/useGuidedTour';
-import {visiblePortionFuction} from '../../utils/Common';
-import {GuidedTours} from '../../services/GuidedTour.service';
-import FailedTrace from '../../components/FailedTrace';
-import Trace from '../../components/Trace';
 import * as S from './Trace.styled';
-import {useTestRun} from '../../providers/TestRun/TestRun.provider';
-import {useTestDefinition} from '../../providers/TestDefinition/TestDefinition.provider';
-import TraceActions from '../../components/TraceActions';
 
 const TraceContent = () => {
   const {testId = ''} = useParams();
-  const {visiblePortion, height} = visiblePortionFuction();
   const navigate = useNavigate();
   const {isDraftMode, test} = useTestDefinition();
-  useGuidedTour(GuidedTours.Trace);
 
   const {isError, run, refetch} = useTestRun();
   const isDisplayingError = isError || run.state === TestState.FAILED;
@@ -48,13 +44,7 @@ const TraceContent = () => {
         isDisplayingError={isDisplayingError}
         onEdit={() => console.log('onEdit')}
       />
-      <Trace
-        displayError={isDisplayingError}
-        minHeight={height}
-        run={run}
-        test={test}
-        visiblePortion={visiblePortion}
-      />
+      <Run displayError={isDisplayingError} run={run} test={test} />
     </S.Wrapper>
   ) : null;
 };

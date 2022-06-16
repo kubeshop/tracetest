@@ -1,4 +1,4 @@
-import {LeftOutlined} from '@ant-design/icons';
+import {LeftOutlined, MoreOutlined} from '@ant-design/icons';
 import {Typography} from 'antd';
 import styled from 'styled-components';
 
@@ -58,4 +58,14 @@ export const StateContainer = styled.div`
 
 export const Row = styled.div`
   display: flex;
+`;
+
+export const ActionButton = styled(MoreOutlined).attrs({
+  style: {fontSize: 24, color: '#9AA3AB', cursor: 'pointer'},
+})``;
+
+export const RightSection = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
 `;

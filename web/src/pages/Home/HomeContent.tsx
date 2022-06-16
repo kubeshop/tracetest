@@ -1,24 +1,25 @@
 import {useEffect, useState} from 'react';
 import {delay} from 'lodash';
-import {GuidedTours} from 'services/GuidedTour.service';
-import useGuidedTour from 'hooks/useGuidedTour';
 import TestList from './TestList';
 import * as S from './Home.styled';
 import HomeActions from './HomeActions';
 import CreateTestModal from '../../components/CreateTestModal';
 import SearchInput from '../../components/SearchInput';
+import {useGuidedTour} from '../../providers/GuidedTour/GuidedTour.provider';
 
 const HomeContent: React.FC = () => {
   const [openCreateTestModal, setOpenCreateTestModal] = useState(false);
-  const {setCurrentStep, currentStep, isOpen: isGuidOpen} = useGuidedTour(GuidedTours.Home);
+  const {
+    tour: {setCurrentStep, currentStep, isOpen},
+  } = useGuidedTour();
 
   useEffect(() => {
-    if (currentStep > 0 && !openCreateTestModal && isGuidOpen) {
+    if (currentStep > 0 && !openCreateTestModal && isOpen) {
       setOpenCreateTestModal(true);
       setCurrentStep(2);
       delay(() => setCurrentStep(1), 0);
     }
-  }, [currentStep, openCreateTestModal, setCurrentStep, isGuidOpen]);
+  }, [currentStep, isOpen, openCreateTestModal, setCurrentStep]);
 
   return (
     <>

@@ -3,11 +3,9 @@ package websocket
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/gorilla/websocket"
-	"github.com/kubeshop/tracetest/server/subscription"
 )
 
 type MessageExecutor interface {
@@ -19,8 +17,7 @@ type routingMessage struct {
 }
 
 type Router struct {
-	routes              map[string]MessageExecutor
-	subscriptionManager *subscription.Manager
+	routes map[string]MessageExecutor
 }
 
 func NewRouter() *Router {
@@ -33,7 +30,7 @@ func (r *Router) Add(messageType string, executor MessageExecutor) {
 	r.routes[messageType] = executor
 }
 
-func (r *Router) ListenAndServe(addr string) {
+func (r *Router) Handler() http.HandlerFunc {
 	routingFunction := func(conn *websocket.Conn, message []byte) {
 		messageObject := routingMessage{}
 		err := json.Unmarshal(message, &messageObject)
@@ -46,10 +43,9 @@ func (r *Router) ListenAndServe(addr string) {
 		if messageExecutor, exists := r.routes[messageObject.Type]; exists {
 			messageExecutor.Execute(conn, message)
 		} else {
-			conn.WriteJSON(ErrorMessage(fmt.Errorf("No routes for message type %s", messageObject.Type)))
+			conn.WriteJSON(ErrorMessage(fmt.Errorf("no routes for message type %s", messageObject.Type)))
 		}
 	}
 
-	http.HandleFunc("/ws", createHandler(routingFunction))
-	log.Fatal(http.ListenAndServe(addr, nil))
+	return createHandler(routingFunction)
 }

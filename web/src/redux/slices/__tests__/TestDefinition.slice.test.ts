@@ -111,24 +111,26 @@ describe('TestDefinitionReducer', () => {
     });
 
     it('should handle the revert definition action', () => {
-      const initialSelector = 'span[http.status_code] = "204"]';
+      const initialSelector = 'span[http.status_code = "204"]';
+      const list = [
+        {
+          ...definition,
+          originalSelector: initialSelector,
+        },
+      ];
       const result = Reducer(
         {
           ...state,
-          definitionList: [
-            {
-              ...definition,
-              originalSelector: initialSelector,
-            },
-          ],
+          initialDefinitionList: list,
+          definitionList: list,
         },
         revertDefinition({
-          originalSelector: definitionSelector,
-          selector: '',
+          originalSelector: initialSelector,
         })
       );
 
       expect(result.definitionList[0].originalSelector).toEqual(initialSelector);
+      expect(result.definitionList[0].selector).toEqual(definitionSelector);
     });
 
     it('should handle the remove definition action', () => {

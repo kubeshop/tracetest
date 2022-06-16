@@ -1,6 +1,6 @@
+import HomeAnalyticsService from 'services/Analytics/HomeAnalytics.service';
 import {Steps} from '../../components/GuidedTour/homeStepList';
 import GuidedTourService, {GuidedTours} from '../../services/GuidedTour.service';
-import HomeAnalyticsService from '../../services/Analytics/HomeAnalytics.service';
 import * as S from './Home.styled';
 
 const {onCreateTestClick} = HomeAnalyticsService;

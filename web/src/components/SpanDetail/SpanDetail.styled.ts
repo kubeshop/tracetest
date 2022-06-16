@@ -1,6 +1,7 @@
-import {Tabs, Typography, Button} from 'antd';
+import {Button, Typography} from 'antd';
 import styled from 'styled-components';
-import noResultsIcon from '../../assets/SpanAssertionsEmptyState.svg';
+
+import noResultsIcon from 'assets/SpanAssertionsEmptyState.svg';
 
 export const SpanHeader = styled.div`
   width: 100%;
@@ -13,14 +14,6 @@ export const SpanHeaderTitle = styled(Typography.Title).attrs({
 })`
   && {
     margin-bottom: 5px;
-  }
-`;
-
-export const SpanTabs = styled(Tabs).attrs({
-  style: {marginBottom: 150, overflow: 'hidden'},
-})`
-  .ant-tabs-content-holder {
-    padding-bottom: 100px;
   }
 `;
 
