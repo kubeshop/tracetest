@@ -90,7 +90,10 @@ func (a *App) Start() error {
 
 	subscriptionManager := subscription.NewManager()
 
-	execTestUpdater := executor.NewDBUpdater(a.db)
+	execTestUpdater := (executor.CompositeUpdater{}).
+		Add(executor.NewDBUpdater(a.db)).
+		Add(executor.NewSubscriptionUpdater(subscriptionManager))
+
 	assertionRunner := executor.NewAssertionRunner(execTestUpdater)
 	assertionRunner.Start(5)
 	defer assertionRunner.Stop()

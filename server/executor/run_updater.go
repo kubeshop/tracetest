@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/subscription"
 )
 
 type RunUpdater interface {
@@ -44,14 +45,20 @@ func (u dbUpdater) Update(ctx context.Context, run model.Run) error {
 	return u.repo.UpdateRun(ctx, run)
 }
 
-// type webSockersUpdater struct {
-// 	repo model.RunRepository
-// }
+type subscriptionUpdater struct {
+	manager *subscription.Manager
+}
 
-// func NewWebSockerUpdater(repo model.RunRepository) RunUpdater {
-// 	return webSockersUpdater{repo}
-// }
+func NewSubscriptionUpdater(manager *subscription.Manager) RunUpdater {
+	return subscriptionUpdater{manager}
+}
 
-// func (u webSockersUpdater) Update(ctx context.Context, run model.Run) error {
-// 	return u.repo.UpdateRun(ctx, run)
-// }
+func (u subscriptionUpdater) Update(ctx context.Context, run model.Run) error {
+	u.manager.PublishUpdate(subscription.Message{
+		ResourceID: run.ResourceID(),
+		Type:       "result_update",
+		Content:    run,
+	})
+
+	return nil
+}
