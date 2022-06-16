@@ -60,11 +60,6 @@ const WebSocketGateway = ({url}: IParams): IWebSocketGateway => {
 
   const closeListener = () => {
     debug('closeListener');
-    connect();
-  };
-
-  const errorListener = () => {
-    debug('errorListener');
     isConnected = false;
     cleanUpAttempts();
     reconnect();
@@ -82,7 +77,6 @@ const WebSocketGateway = ({url}: IParams): IWebSocketGateway => {
     socket = new WebSocket(url);
     socket.addEventListener('open', openListener);
     socket.addEventListener('close', closeListener);
-    socket.addEventListener('error', errorListener);
     socket.addEventListener('message', messageListener);
   };
 
@@ -96,7 +90,7 @@ const WebSocketGateway = ({url}: IParams): IWebSocketGateway => {
   };
 
   const reconnect = () => {
-    debug('reconnect');
+    debug('reconnect %d', reconnectionAttempts);
     if (reconnectionAttempts >= MAX_RECONNECTION_ATTEMPTS) {
       disconnect();
       return;
