@@ -1,6 +1,6 @@
 import {createMultipleTestRuns, createTest, deleteTest, description, getResultId, name, testId} from '../utils/Common';
 
-describe.only('Show test details', () => {
+describe('Show test details', () => {
   before(() => {
     createTest();
   });
@@ -11,7 +11,7 @@ describe.only('Show test details', () => {
 
   it('should show the test details for any trace', () => {
     createMultipleTestRuns(testId, 5);
-    cy.get(`[data-cy=collapse-test-${testId}]`, {timeout: 10000}).click();
+    cy.get(`[data-cy=collapse-test-${testId}]`).click();
     cy.get('[data-cy=test-details-link]', {timeout: 10000}).first().click();
 
     cy.location('pathname').should('match', /\/test\/.*/i);
@@ -20,28 +20,13 @@ describe.only('Show test details', () => {
     cy.get('[data-cy^=result-card-]').should('have.length.above', 0);
   });
 
-  it('should run a new test', () => {
-    cy.visit(`http://localhost:3000/test/${testId}`);
-    cy.get(`[data-cy=test-details-run-test-button]`).click();
-    cy.location('pathname').should('match', /\/run\/.*/i);
-
-    cy.location().then(({pathname}) => {
-      const testRunResultId = getResultId(pathname);
-
-      cy.wait(2000);
-      cy.get('[data-cy=test-header-back-button]').click();
-      cy.get(`[data-cy=result-card-${testRunResultId}]`, {timeout: 10000}).should('be.visible');
-      cy.visit(`http://localhost:3000/test/${testId}/run/${testRunResultId}`);
-    });
-  });
-
   it('should display the jUnit report', () => {
     cy.visit(`http://localhost:3000/test/${testId}`);
 
-    cy.get('[data-cy^=result-actions-button]').first().click();
+    cy.get('[data-cy^=result-actions-button]').last().click();
     cy.get('[data-cy=view-junit-button]').click();
 
-    cy.get('[data-cy=file-viewer-code-container]').should('be.visible');
+    cy.get('[data-cy=file-viewer-code-container]', {timeout: 10000}).should('be.visible');
     cy.get('[data-cy=file-viewer-close]').click();
 
     cy.get('[data-cy=file-viewer-code-container]').should('not.be.visible');
@@ -59,20 +44,18 @@ describe.only('Show test details', () => {
     cy.get('[data-cy=file-viewer-code-container]').should('not.be.visible');
   });
 
-  // it('should update the test run result status', () => {
-  //   cy.visit(`http://localhost:3000/test/${testId}`);
-  //   cy.get(`[data-cy=test-details-run-test-button]`).click();
-  //   cy.location('pathname').should('match', /\/result\/.*/i);
+  it('should run a new test', () => {
+    cy.visit(`http://localhost:3000/test/${testId}`);
+    cy.get(`[data-cy=test-details-run-test-button]`).click();
+    cy.location('pathname').should('match', /\/run\/.*/i);
 
-  //   cy.location().then(({pathname}) => {
-  //     const testRunResultId = getResultId(pathname);
+    cy.location().then(({pathname}) => {
+      const testRunResultId = getResultId(pathname);
 
-  //     cy.get('[data-cy=test-run-result-status]', { timeout: 2000 }).should('have.text', 'Test status:Awaiting trace');
-  //     cy.wait(2000);
-  //     cy.get('[data-cy=test-run-result-status]').should('have.text', 'Test status:Finished');
-  //     cy.get('[data-cy=test-header-back-button]').click();
-  //     cy.get(`[data-cy=test-run-result-status-${testRunResultId}]`, { timeout: 10000 }).should('have.text', 'Finished');
-  //     cy.visit(`http://localhost:3000/test/${testId}/result/${testRunResultId}`);
-  //   });
-  // });
+      cy.wait(2000);
+      cy.get('[data-cy=test-header-back-button]').click();
+      cy.get(`[data-cy=result-card-${testRunResultId}]`, {timeout: 10000}).should('be.visible');
+      cy.visit(`http://localhost:3000/test/${testId}/run/${testRunResultId}`);
+    });
+  });
 });

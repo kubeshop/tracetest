@@ -11,7 +11,7 @@ import {TTest} from 'types/Test.types';
 import {TTestRunState} from 'types/TestRun.types';
 import Info from './Info';
 import * as S from './TestHeader.styled';
-import RunActionsDropdown from '../RunActionsDropdown';
+import RunActionsDropdown from '../RunActionsMenu';
 
 interface IProps {
   executionTime?: number;

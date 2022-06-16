@@ -4,7 +4,7 @@ import {useNavigate} from 'react-router-dom';
 import {useDeleteRunByIdMutation} from 'redux/apis/TraceTest.api';
 import TestAnalyticsService from 'services/Analytics/TestAnalytics.service';
 import {useFileViewerModal} from '../FileViewerModal/FileViewerModal.provider';
-import * as S from './RunActionsDropdown.styled';
+import * as S from './RunActionsMenu.styled';
 
 interface IProps {
   resultId: string;
@@ -12,7 +12,7 @@ interface IProps {
   isRunView?: boolean;
 }
 
-const RunActionsDropdown = ({resultId, testId, isRunView = false}: IProps) => {
+const RunActionsMenu = ({resultId, testId, isRunView = false}: IProps) => {
   const {loadJUnit, loadTestDefinitionYaml} = useFileViewerModal();
   const [deleteRunById] = useDeleteRunByIdMutation();
   const navigate = useNavigate();
@@ -24,12 +24,7 @@ const RunActionsDropdown = ({resultId, testId, isRunView = false}: IProps) => {
   }, [deleteRunById, isRunView, navigate, resultId, testId]);
 
   return (
-    <span
-      data-cy={`result-actions-button-${resultId}`}
-      className="ant-dropdown-link"
-      onClick={e => e.stopPropagation()}
-      style={{textAlign: 'right'}}
-    >
+    <span className="ant-dropdown-link" onClick={e => e.stopPropagation()} style={{textAlign: 'right'}}>
       <Dropdown
         overlay={
           <Menu>
@@ -58,10 +53,10 @@ const RunActionsDropdown = ({resultId, testId, isRunView = false}: IProps) => {
         placement="bottomLeft"
         trigger={['click']}
       >
-        <S.ActionButton />
+        <S.ActionButton data-cy={`result-actions-button-${resultId}`} />
       </Dropdown>
     </span>
   );
 };
 
-export default RunActionsDropdown;
+export default RunActionsMenu;

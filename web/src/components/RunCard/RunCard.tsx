@@ -1,7 +1,7 @@
 import {format, parseISO} from 'date-fns';
 import {RESULT_DATE_FORMAT} from '../../constants/Date.constants';
 import {TTestRun} from '../../types/TestRun.types';
-import RunActionsDropdown from '../RunActionsDropdown';
+import RunActionsDropdown from '../RunActionsMenu';
 import TestState from '../TestState';
 import * as S from './RunCard.styled';
 

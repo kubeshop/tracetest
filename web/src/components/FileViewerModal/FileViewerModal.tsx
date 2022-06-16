@@ -1,7 +1,7 @@
 import {useCallback} from 'react';
 import {Button, Typography} from 'antd';
 import SyntaxHighlighter from 'react-syntax-highlighter';
-import {arduinoLight} from 'react-syntax-highlighter/dist/esm/styles/hljs';
+import {arduinoLight} from 'react-syntax-highlighter/dist/cjs/styles/hljs';
 import {DownloadOutlined} from '@ant-design/icons';
 
 import * as S from './FileViewerModal.styled';
