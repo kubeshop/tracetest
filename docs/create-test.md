@@ -1,5 +1,7 @@
 # Create a Test
 
+<em>**Note:** Please follow the [Installation Guide](installing.md) guide to set up all prerequisites and install Tracetest.</em>
+
 Open the [Tracetest application](https://demo.tracetest.io).
 
 ![Main Screen](img/main-screen-mvp.png)
