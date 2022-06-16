@@ -36,9 +36,15 @@ export interface paths {
     /** rerun a test run */
     post: operations["rerunTestRun"];
   };
+  "/tests/{testId}/run/{runId}/junit.xml": {
+    /** get test run results in JUnit xml format */
+    get: operations["getRunResultJUnit"];
+  };
   "/tests/{testId}/run/{runId}": {
     /** get a particular test Run */
     get: operations["getTestRun"];
+    /** delete a test run */
+    delete: operations["deleteTestRun"];
   };
   "/tests/{testId}/definition": {
     /** Gets definition for a test */
@@ -236,6 +242,23 @@ export interface operations {
       };
     };
   };
+  /** get test run results in JUnit xml format */
+  getRunResultJUnit: {
+    parameters: {
+      path: {
+        testId: string;
+        runId: string;
+      };
+    };
+    responses: {
+      /** JUnit formatted file */
+      200: {
+        content: {
+          "application/xml": string;
+        };
+      };
+    };
+  };
   /** get a particular test Run */
   getTestRun: {
     parameters: {
@@ -251,6 +274,19 @@ export interface operations {
           "application/json": external["tests.yaml"]["components"]["schemas"]["TestRun"];
         };
       };
+    };
+  };
+  /** delete a test run */
+  deleteTestRun: {
+    parameters: {
+      path: {
+        testId: string;
+        runId: string;
+      };
+    };
+    responses: {
+      /** OK */
+      204: never;
     };
   };
   /** Gets definition for a test */
@@ -317,7 +353,6 @@ export interface external {
             | "PROPFIND"
             | "VIEW";
           headers?: external["http.yaml"]["components"]["schemas"]["HTTPHeader"][];
-          /** Format: byte */
           body?: string;
           auth?: external["http.yaml"]["components"]["schemas"]["HTTPAuth"];
         };
@@ -325,7 +360,6 @@ export interface external {
           status?: string;
           statusCode?: number;
           headers?: external["http.yaml"]["components"]["schemas"]["HTTPHeader"][];
-          /** Format: byte */
           body?: string;
         };
         HTTPAuth: {
@@ -365,7 +399,6 @@ export interface external {
           };
           /** @description Definition of assertions that are going to be made */
           definition?: external["tests.yaml"]["components"]["schemas"]["TestDefinition"];
-          referenceTestRun?: external["tests.yaml"]["components"]["schemas"]["TestRun"];
         };
         /** @example [object Object] */
         TestDefinition: {
@@ -445,7 +478,6 @@ export interface external {
     components: {
       schemas: {
         Trace: {
-          /** Format: byte */
           traceId?: string;
           tree?: external["trace.yaml"]["components"]["schemas"]["Span"];
           /** @description falttened version, mapped as spanId -> span{} */
@@ -456,9 +488,7 @@ export interface external {
           };
         };
         Span: {
-          /** Format: byte */
           id?: string;
-          /** Format: byte */
           parentId?: string;
           name?: string;
           /** @description span start time in unix milli format */

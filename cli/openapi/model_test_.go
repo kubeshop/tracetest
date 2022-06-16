@@ -23,7 +23,6 @@ type Test struct {
 	Version          *int32                `json:"version,omitempty"`
 	ServiceUnderTest *TestServiceUnderTest `json:"serviceUnderTest,omitempty"`
 	Definition       *TestDefinition       `json:"definition,omitempty"`
-	ReferenceTestRun *TestRun              `json:"referenceTestRun,omitempty"`
 }
 
 // NewTest instantiates a new Test object
@@ -235,38 +234,6 @@ func (o *Test) SetDefinition(v TestDefinition) {
 	o.Definition = &v
 }
 
-// GetReferenceTestRun returns the ReferenceTestRun field value if set, zero value otherwise.
-func (o *Test) GetReferenceTestRun() TestRun {
-	if o == nil || o.ReferenceTestRun == nil {
-		var ret TestRun
-		return ret
-	}
-	return *o.ReferenceTestRun
-}
-
-// GetReferenceTestRunOk returns a tuple with the ReferenceTestRun field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *Test) GetReferenceTestRunOk() (*TestRun, bool) {
-	if o == nil || o.ReferenceTestRun == nil {
-		return nil, false
-	}
-	return o.ReferenceTestRun, true
-}
-
-// HasReferenceTestRun returns a boolean if a field has been set.
-func (o *Test) HasReferenceTestRun() bool {
-	if o != nil && o.ReferenceTestRun != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetReferenceTestRun gets a reference to the given TestRun and assigns it to the ReferenceTestRun field.
-func (o *Test) SetReferenceTestRun(v TestRun) {
-	o.ReferenceTestRun = &v
-}
-
 func (o Test) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.Id != nil {
@@ -286,9 +253,6 @@ func (o Test) MarshalJSON() ([]byte, error) {
 	}
 	if o.Definition != nil {
 		toSerialize["definition"] = o.Definition
-	}
-	if o.ReferenceTestRun != nil {
-		toSerialize["referenceTestRun"] = o.ReferenceTestRun
 	}
 	return json.Marshal(toSerialize)
 }

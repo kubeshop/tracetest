@@ -23,8 +23,6 @@ components:
         definition:
           $ref: "#/components/schemas/TestDefinition"
           description: Definition of assertions that are going to be made
-        referenceTestRun:
-          $ref: "#/components/schemas/TestRun"
 
     TestDefinition:
       type: object
