@@ -13,4 +13,4 @@ testDefinition:
 - selector: span[name="GET /api/tests" tracetest.span.type="http"]
   assertions:
   - tracetest.response.status = 200
-  - tracetest.response.body contains "4b51f318-f32a-42f5-9455-a22c97c63b49"
+  - tracetest.response.body contains "${TEST_ID}"
