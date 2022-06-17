@@ -45,7 +45,7 @@ func convertHTTPRequestDefinitionIntoOpenAPIObject(request definition.HttpReques
 		Url:     ConvertStringIntoOpenAPIString(request.URL),
 		Method:  ConvertStringIntoOpenAPIString(request.Method),
 		Headers: headers,
-		Body:    ConvertStringIntoOpenAPIString(request.Body.Raw),
+		Body:    ConvertStringIntoOpenAPIString(request.Body),
 		Auth: &openapi.HTTPAuth{
 			Type:   ConvertStringIntoOpenAPIString(request.Authentication.Type),
 			ApiKey: getApiKeyAuthFromDefinition(request.Authentication.ApiKey),

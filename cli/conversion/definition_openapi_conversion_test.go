@@ -34,7 +34,7 @@ func TestDefinitionToOpenAPIConversion(t *testing.T) {
 							{Key: "Content-Type", Value: "application/json"},
 						},
 						Authentication: definition.HTTPAuthentication{},
-						Body:           definition.HTTPBody{},
+						Body:           "",
 					},
 				},
 			},
@@ -65,7 +65,7 @@ func TestDefinitionToOpenAPIConversion(t *testing.T) {
 						URL:     "http://localhost:1234",
 						Method:  "POST",
 						Headers: []definition.HTTPHeader{},
-						Body:    definition.HTTPBody{},
+						Body:    "",
 						Authentication: definition.HTTPAuthentication{
 							Basic: definition.HTTPBasicAuth{
 								User:     "matheus",
@@ -105,7 +105,7 @@ func TestDefinitionToOpenAPIConversion(t *testing.T) {
 						URL:     "http://localhost:1234",
 						Method:  "POST",
 						Headers: []definition.HTTPHeader{},
-						Body:    definition.HTTPBody{},
+						Body:    "",
 						Authentication: definition.HTTPAuthentication{
 							ApiKey: definition.HTTPAPIKeyAuth{
 								Key:   "X-Key",
@@ -147,7 +147,7 @@ func TestDefinitionToOpenAPIConversion(t *testing.T) {
 						URL:     "http://localhost:1234",
 						Method:  "POST",
 						Headers: []definition.HTTPHeader{},
-						Body:    definition.HTTPBody{},
+						Body:    "",
 						Authentication: definition.HTTPAuthentication{
 							Bearer: definition.HTTPBearerAuth{
 								Token: "my-token",
@@ -186,10 +186,7 @@ func TestDefinitionToOpenAPIConversion(t *testing.T) {
 						Method:         "POST",
 						Headers:        []definition.HTTPHeader{},
 						Authentication: definition.HTTPAuthentication{},
-						Body: definition.HTTPBody{
-							Type: "raw",
-							Raw:  `{ "message": "hello" }`,
-						},
+						Body:           `{ "message": "hello" }`,
 					},
 				},
 			},
@@ -219,7 +216,7 @@ func TestDefinitionToOpenAPIConversion(t *testing.T) {
 						Method:         "POST",
 						Headers:        []definition.HTTPHeader{},
 						Authentication: definition.HTTPAuthentication{},
-						Body:           definition.HTTPBody{},
+						Body:           "",
 					},
 				},
 				TestDefinition: []definition.TestDefinition{
