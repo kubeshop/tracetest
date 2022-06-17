@@ -28,6 +28,8 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: '^1.18'
+      - name: Install prism
+        run: npm install -g @stoplight/prism-cli
       - name: Run unit tests
         run: |
           cd cli/
