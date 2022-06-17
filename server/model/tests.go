@@ -36,6 +36,8 @@ type (
 
 	Run struct {
 		ID                        uuid.UUID
+		TestID                    uuid.UUID
+		TestVersion               int
 		TraceID                   trace.TraceID
 		SpanID                    trace.SpanID
 		State                     RunState
@@ -49,7 +51,6 @@ type (
 		Response                  HTTPResponse
 		Trace                     *traces.Trace
 		Results                   *RunResults
-		TestVersion               int
 	}
 
 	RunResults struct {
