@@ -13,6 +13,12 @@ export interface IListenerFunction<T = any> {
   (data: IData<T>): void;
 }
 
+interface IMessage {
+  type: 'subscribe' | 'unsubscribe';
+  resource: string;
+  subscriptionId?: string;
+}
+
 interface IWebSocketGateway {
   /** Opens the websocket connection and sets default event listeners */
   connect(): void;
@@ -22,8 +28,8 @@ interface IWebSocketGateway {
   on(event: string, listener: IListenerFunction): void;
   /** Removes all registered listeners for `event` */
   off(event: string): void;
-  /** Sends `data` to the server */
-  send(data: any): void;
+  /** Sends `message` to the server */
+  send(message: IMessage): void;
   /** Subscribes to updates on the given `resource` */
   subscribe(resource: string, listener: IListenerFunction): void;
   /** Cancels a subscription on the given `resource` */
@@ -125,28 +131,28 @@ const WebSocketGateway = ({url}: IParams): IWebSocketGateway => {
       debug('off');
       delete listeners[event];
     },
-    send(data) {
-      debug('send %O', data);
+    send(message) {
+      debug('send %O', message);
       if (!socket) {
         return;
       }
       if (!isConnected) {
         debug('send pending');
-        pendingToSend.push(JSON.stringify(data));
+        pendingToSend.push(JSON.stringify(message));
         return;
       }
-      socket.send(JSON.stringify(data));
+      socket.send(JSON.stringify(message));
     },
     subscribe(resource, listener) {
       debug('subscribe %s', resource);
-      const data = {type: 'subscribe', resource};
-      this.send(data);
+      const message: IMessage = {type: 'subscribe', resource};
+      this.send(message);
       this.on(resource, listener);
     },
     unsubscribe(resource, subscriptionId) {
       debug('unsubscribe %s', resource);
-      const data = {type: 'unsubscribe', resource, subscriptionId};
-      this.send(data);
+      const message: IMessage = {type: 'unsubscribe', resource, subscriptionId};
+      this.send(message);
       this.off(resource);
     },
   };

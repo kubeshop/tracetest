@@ -1,6 +1,6 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
 
-import {initWebSocketSubscription, IListenerFunction} from 'redux/utils';
+import WebSocketService, {IListenerFunction} from 'services/WebSocket.service';
 import {TRecursivePartial} from 'types/Common.types';
 import {TRawTest, TTest} from 'types/Test.types';
 import {HTTP_METHOD} from '../../constants/Common.constants';
@@ -98,7 +98,7 @@ const TraceTestAPI = createApi({
         const listener: IListenerFunction<TRawTestRun> = data => {
           updateCachedData(() => TestRun(data.event));
         };
-        await initWebSocketSubscription({
+        await WebSocketService.initWebSocketSubscription({
           listener,
           resource: `test/${arg.testId}/run/${arg.runId}`,
           waitToCleanSubscription: cacheEntryRemoved,
