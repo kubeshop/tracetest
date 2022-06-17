@@ -3,7 +3,7 @@ package parser_test
 import (
 	"testing"
 
-	"github.com/kubeshop/tracetest/cli/conversion/parser"
+	"github.com/kubeshop/tracetest/server/encoding/yaml/conversion/parser"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
