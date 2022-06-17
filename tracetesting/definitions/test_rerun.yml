@@ -1,0 +1,14 @@
+id: f610ebcc-4ff9-474c-be98-d746317e74ea
+name: Test Rerun
+trigger:
+  type: http
+  http_request:
+    url: ${TARGET_URL}/api/tests/${TEST_ID}/run/${RUN_ID}/rerun
+    method: POST
+    headers:
+    - key: Content-Type
+      value: application/json
+testDefinition:
+- selector: span[name="POST /api/tests/{testId}/run/{runId}/rerun" tracetest.span.type="http"]
+  assertions:
+  - tracetest.response.status = 200

@@ -1,6 +1,5 @@
-id: d3afb126-2270-46da-8020-000e81222a2a
-name: Tests List
-description: List all available tests
+id: 68a4927c-2d60-4039-abd4-323f1d791d4c
+name: Test List
 trigger:
   type: http
   httpRequest:
@@ -12,6 +11,5 @@ trigger:
 testDefinition:
 - selector: span[name="GET /api/tests" tracetest.span.type="http"]
   assertions:
-  - tracetest.span.duration <= 500
   - tracetest.response.status = 200
   - tracetest.response.body contains "${TEST_ID}"

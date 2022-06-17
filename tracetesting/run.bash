@@ -18,7 +18,7 @@ export TARGET_URL=${TARGET_URL:-"http://localhost:8081"}
 mkdir -p results/responses
 
 EXIT_STATUS=0
-bash ./list_tests.bash || EXIT_STATUS=$?
+bash ./tests.bash || EXIT_STATUS=$?
 
 exit $EXIT_STATUS
 
