@@ -30,7 +30,7 @@ jobs:
           go-version: '^1.18'
       - name: Run unit tests
         run: |
-          cd server/
+          cd cli/
           make test
 
   unit-test-backend:
