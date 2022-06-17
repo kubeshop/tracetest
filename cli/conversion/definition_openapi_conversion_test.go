@@ -67,7 +67,7 @@ func TestDefinitionToOpenAPIConversion(t *testing.T) {
 						Headers: []definition.HTTPHeader{},
 						Body:    definition.HTTPBody{},
 						Authentication: definition.HTTPAuthentication{
-							BasicAuth: definition.HTTPBasicAuth{
+							Basic: definition.HTTPBasicAuth{
 								User:     "matheus",
 								Password: "pikachu",
 							},

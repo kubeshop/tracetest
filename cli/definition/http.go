@@ -9,7 +9,7 @@ type HttpRequest struct {
 	Method         string             `yaml:"method"`
 	Headers        []HTTPHeader       `yaml:"headers,omitempty"`
 	Authentication HTTPAuthentication `yaml:"authentication,omitempty"`
-	Body           HTTPBody           `yaml:"body,omitempty"`
+	Body           string             `yaml:"body,omitempty"`
 }
 
 func (r HttpRequest) Validate() error {
@@ -31,10 +31,6 @@ func (r HttpRequest) Validate() error {
 		return fmt.Errorf("http authentication must be valid: %w", err)
 	}
 
-	if err := r.Body.Validate(); err != nil {
-		return fmt.Errorf("http body must be valid: %w", err)
-	}
-
 	return nil
 }
 
@@ -52,16 +48,16 @@ func (h HTTPHeader) Validate() error {
 }
 
 type HTTPAuthentication struct {
-	Type      string         `yaml:"type,omitempty"`
-	BasicAuth HTTPBasicAuth  `yaml:"basicAuth,omitempty"`
-	ApiKey    HTTPAPIKeyAuth `yaml:"apiKey,omitempty"`
-	Bearer    HTTPBearerAuth `yaml:"bearer,omitempty"`
+	Type   string         `yaml:"type,omitempty"`
+	Basic  HTTPBasicAuth  `yaml:"basic,omitempty"`
+	ApiKey HTTPAPIKeyAuth `yaml:"apiKey,omitempty"`
+	Bearer HTTPBearerAuth `yaml:"bearer,omitempty"`
 }
 
 func (a HTTPAuthentication) Validate() error {
 	switch a.Type {
 	case "basic":
-		if err := a.BasicAuth.Validate(); err != nil {
+		if err := a.Basic.Validate(); err != nil {
 			return fmt.Errorf("basic authentication must be valid: %w", err)
 		}
 		return nil
@@ -135,19 +131,6 @@ func (aka HTTPAPIKeyAuth) Validate() error {
 
 	if _, ok := supportedInOptions[aka.In]; !ok {
 		return fmt.Errorf("in option \"%s\" is not supported. Only \"query\" and \"header\" are supported", aka.In)
-	}
-
-	return nil
-}
-
-type HTTPBody struct {
-	Type string `yaml:"type"`
-	Raw  string `yaml:"raw"`
-}
-
-func (b HTTPBody) Validate() error {
-	if b.Type != "" && b.Type != "raw" {
-		return fmt.Errorf("type \"%s\" is not supported. Only \"raw\" is supported", b.Type)
 	}
 
 	return nil

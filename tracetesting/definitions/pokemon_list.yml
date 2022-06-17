@@ -8,9 +8,7 @@ trigger:
     headers:
     - key: Content-Type
       value: application/json
-    body:
-      type: raw
-      raw: '{ "id": 52 }'
+    body: '{ "id": 52 }'
 testDefinition:
 - selector: span[name = "POST /pokemon/import"]
   assertions:

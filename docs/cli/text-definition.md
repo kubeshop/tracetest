@@ -27,9 +27,7 @@ trigger:
     headers:
     - key: Content-Type
       value: application/json
-    body:
-      type: raw
-      raw: '{ "id": 52 }'
+    body: '{ "id": 52 }'
 testDefinition:
 - selector: span[name = "POST /pokemon/import"]
   assertions:
@@ -65,8 +63,6 @@ When defining a HTTP trigger, you are required to define a `http_request` object
 
 > :warning: Note: Some APIs require the `Content-Type` header to respond. If you are not able to trigger your application, check if you are sending this header and if its value is correct.
 
-> :warning: Note: Currently, we only support `raw` body formats. We will add support for other types of bodies in the future. Let us know if you need a specific one by opening an issue.
-
 ```yaml
 trigger:
   type: http
@@ -76,9 +72,7 @@ trigger:
     headers:
     - key: Content-Type
       value: application/json
-    body:
-      type: raw
-      raw: '{ "id": 52 }'
+    body: '{ "id": 52 }'
 ```
 
 #### Authentication
@@ -93,7 +87,7 @@ trigger:
         method: GET
         authentication:
             type: basic
-            basicAuth:
+            basic:
                 user: my-username
                 password: mypassword
 ```
@@ -136,9 +130,7 @@ trigger:
     http_request:
         url: http://my-api.com
         method: POST
-        body:
-            type: raw
-            raw: '{"name": "my Json Object"}'
+        body: '{"name": "my Json Object"}'
 ```
 
 ### Assertions

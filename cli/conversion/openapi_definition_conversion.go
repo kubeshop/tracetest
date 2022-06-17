@@ -71,7 +71,7 @@ func getAuthDefinition(auth *openapi.HTTPAuth) definition.HTTPAuthentication {
 	case "basic":
 		return definition.HTTPAuthentication{
 			Type: "basic",
-			BasicAuth: definition.HTTPBasicAuth{
+			Basic: definition.HTTPBasicAuth{
 				User:     *auth.Basic.Username,
 				Password: *auth.Basic.Password,
 			},

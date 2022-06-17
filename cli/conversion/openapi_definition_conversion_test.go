@@ -155,7 +155,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 						},
 						Authentication: definition.HTTPAuthentication{
 							Type: "basic",
-							BasicAuth: definition.HTTPBasicAuth{
+							Basic: definition.HTTPBasicAuth{
 								User:     "my username",
 								Password: "my password",
 							},
