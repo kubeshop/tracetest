@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/server/model"
-	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/traces"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
@@ -29,38 +28,35 @@ type TraceFetcher interface {
 
 func NewTracePoller(
 	tf TraceFetcher,
-	tests model.Repository,
+	updater RunUpdater,
+	assertionRunner AssertionRunner,
 	retryDelay time.Duration,
 	maxWaitTimeForTrace time.Duration,
-	subscriptionManager *subscription.Manager,
-	assertionRunner AssertionRunner,
 ) PersistentTracePoller {
 	maxTracePollRetry := int(math.Ceil(float64(maxWaitTimeForTrace) / float64(retryDelay)))
 	return tracePoller{
-		tests:               tests,
+		updater:             updater,
 		traceDB:             tf,
 		maxWaitTimeForTrace: maxWaitTimeForTrace,
 		maxTracePollRetry:   maxTracePollRetry,
 		retryDelay:          retryDelay,
 		executeQueue:        make(chan tracePollReq, 5),
 		exit:                make(chan bool, 1),
-		subscriptions:       subscriptionManager,
 		assertionRunner:     assertionRunner,
 	}
 }
 
 type tracePoller struct {
-	tests               model.Repository
+	updater             RunUpdater
 	traceDB             TraceFetcher
 	maxWaitTimeForTrace time.Duration
-	retryDelay          time.Duration
-	maxTracePollRetry   int
+	assertionRunner     AssertionRunner
+
+	retryDelay        time.Duration
+	maxTracePollRetry int
 
 	executeQueue chan tracePollReq
 	exit         chan bool
-
-	subscriptions   *subscription.Manager
-	assertionRunner AssertionRunner
 }
 
 type tracePollReq struct {
@@ -140,13 +136,7 @@ func (tp tracePoller) processJob(job tracePollReq) {
 
 	fmt.Printf("completed polling result %s after %d times, number of spans: %d \n", job.run.ID, job.count, len(run.Trace.Flat))
 
-	tp.handleDBError(tp.tests.UpdateRun(job.ctx, run))
-
-	tp.subscriptions.PublishUpdate(run.ResourceID(job.test.ID.String()), subscription.Message{
-		Type:       "result_update",
-		ResourceID: run.ResourceID(job.test.ID.String()),
-		Content:    run,
-	})
+	tp.handleDBError(tp.updater.Update(job.ctx, run))
 
 	err = tp.runAssertions(job.ctx, job.test, run)
 	if err != nil {
@@ -209,7 +199,7 @@ func (tp tracePoller) handleTraceDBError(job tracePollReq, err error) {
 		fmt.Println("other", err)
 	}
 
-	tp.handleDBError(tp.tests.UpdateRun(job.ctx, run.Failed(err)))
+	tp.handleDBError(tp.updater.Update(job.ctx, run.Failed(err)))
 
 }
 

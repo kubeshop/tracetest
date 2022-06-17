@@ -47,11 +47,11 @@ func (m *Manager) Unsubscribe(resourceID string, subscriptionID string) {
 	m.subscriptions[resourceID] = newArray
 }
 
-func (m *Manager) PublishUpdate(resourceID string, message Message) {
+func (m *Manager) PublishUpdate(message Message) {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
 
-	if subscribers, ok := m.subscriptions[resourceID]; ok {
+	if subscribers, ok := m.subscriptions[message.ResourceID]; ok {
 		for _, subscriber := range subscribers {
 			subscriber.Notify(message)
 		}
