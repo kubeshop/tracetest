@@ -9,9 +9,7 @@ trigger:
     headers:
     - key: Content-Type
       value: application/json
-    body:
-      type: raw
-      raw: |
+    body: |
         {
           "name": "Pokemon - List - Get a Pokemon",
           "serviceUnderTest": {
