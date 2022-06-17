@@ -111,6 +111,12 @@ func (c *ApiApiController) Routes() Routes {
 			c.GetTestRuns,
 		},
 		{
+			"GetTestVersionDefinitionFile",
+			strings.ToUpper("Get"),
+			"/api/tests/{testId}/version/{version}/definition.yaml",
+			c.GetTestVersionDefinitionFile,
+		},
+		{
 			"GetTests",
 			strings.ToUpper("Get"),
 			"/api/tests",
@@ -335,6 +341,28 @@ func (c *ApiApiController) GetTestRuns(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	result, err := c.service.GetTestRuns(r.Context(), testIdParam, takeParam, skipParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// GetTestVersionDefinitionFile - Get the test definition as an YAML file
+func (c *ApiApiController) GetTestVersionDefinitionFile(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	testIdParam := params["testId"]
+
+	versionParam, err := parseInt32Parameter(params["version"], true)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+
+	result, err := c.service.GetTestVersionDefinitionFile(r.Context(), testIdParam, versionParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
