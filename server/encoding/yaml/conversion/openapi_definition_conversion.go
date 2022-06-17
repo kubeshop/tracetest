@@ -5,7 +5,6 @@ import (
 	"strconv"
 
 	"github.com/kubeshop/tracetest/server/encoding/yaml/definition"
-	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
 )
 
@@ -24,65 +23,10 @@ func ConvertOpenAPITestIntoDefinitionObject(test openapi.Test) (definition.Test,
 }
 
 func convertServiceUnderTestIntoTrigger(serviceUnderTest openapi.TestServiceUnderTest) definition.TestTrigger {
-	headers := make([]model.HTTPHeader, 0, len(serviceUnderTest.Request.Headers))
-	for _, header := range serviceUnderTest.Request.Headers {
-		headers = append(headers, model.HTTPHeader{
-			Key:   header.Key,
-			Value: header.Value,
-		})
-	}
-
-	auth := getAuthDefinition(serviceUnderTest.Request.Auth)
-
-	body := serviceUnderTest.Request.Body
-
-	if serviceUnderTest.Request.Url == "" {
-		// Probably the request is empty, so return an empty trigger
-		// TODO: this has to be refactored when new triggering methods are added
-		return definition.TestTrigger{}
-	}
-
 	return definition.TestTrigger{
 		// we only support http for now
-		Type: "http",
-		HTTPRequest: model.HTTPRequest{
-			URL:     serviceUnderTest.Request.Url,
-			Method:  model.HTTPMethod(serviceUnderTest.Request.Method),
-			Headers: headers,
-			Body:    body,
-			Auth:    &auth,
-		},
-	}
-}
-
-func getAuthDefinition(auth openapi.HttpAuth) model.HTTPAuthenticator {
-	switch auth.Type {
-	case "basic":
-		return model.HTTPAuthenticator{
-			Type: "basic",
-			Props: map[string]string{
-				"username": auth.Basic.Username,
-				"password": auth.Basic.Password,
-			},
-		}
-	case "apiKey":
-		return model.HTTPAuthenticator{
-			Type: "apiKey",
-			Props: map[string]string{
-				"key":   auth.ApiKey.Key,
-				"value": auth.ApiKey.Value,
-				"in":    auth.ApiKey.In,
-			},
-		}
-	case "bearer":
-		return model.HTTPAuthenticator{
-			Type: "bearer",
-			Props: map[string]string{
-				"token": auth.Bearer.Token,
-			},
-		}
-	default:
-		return model.HTTPAuthenticator{}
+		Type:        "http",
+		HTTPRequest: serviceUnderTest.Request,
 	}
 }
 

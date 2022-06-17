@@ -3,15 +3,15 @@ package definition
 import (
 	"fmt"
 
-	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/openapi"
 )
 
 type Test struct {
-	Id             string           `yaml:"id"`
-	Name           string           `yaml:"name"`
-	Description    string           `yaml:"description"`
-	Trigger        TestTrigger      `yaml:"trigger"`
-	TestDefinition []TestDefinition `yaml:"testDefinition,omitempty"`
+	Id             string           `yaml:"id" json:"id"`
+	Name           string           `yaml:"name" json:"name"`
+	Description    string           `yaml:"description" json:"description"`
+	Trigger        TestTrigger      `yaml:"trigger" json:"trigger"`
+	TestDefinition []TestDefinition `yaml:"testDefinition,omitempty" json:"testDefinition,omitempty"`
 }
 
 func (t Test) Validate() error {
@@ -27,8 +27,8 @@ func (t Test) Validate() error {
 }
 
 type TestTrigger struct {
-	Type        string            `yaml:"type"`
-	HTTPRequest model.HTTPRequest `yaml:"httpRequest"`
+	Type        string              `yaml:"type" json:"type"`
+	HTTPRequest openapi.HttpRequest `yaml:"httpRequest" json:"httpRequest"`
 }
 
 func (t TestTrigger) Validate() error {
@@ -52,6 +52,6 @@ func (t TestTrigger) Validate() error {
 }
 
 type TestDefinition struct {
-	Selector   string   `yaml:"selector"`
-	Assertions []string `yaml:"assertions"`
+	Selector   string   `yaml:"selector" json:"selector"`
+	Assertions []string `yaml:"assertions" json:"assertions"`
 }

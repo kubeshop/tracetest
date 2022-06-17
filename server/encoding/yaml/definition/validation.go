@@ -3,11 +3,11 @@ package definition
 import (
 	"fmt"
 
-	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/openapi"
 )
 
-func validateRequest(r model.HTTPRequest) error {
-	if r.URL == "" {
+func validateRequest(r openapi.HttpRequest) error {
+	if r.Url == "" {
 		return fmt.Errorf("URL cannot be empty")
 	}
 
@@ -28,7 +28,7 @@ func validateRequest(r model.HTTPRequest) error {
 	return nil
 }
 
-func validateHeader(h model.HTTPHeader) error {
+func validateHeader(h openapi.HttpHeader) error {
 	if h.Key == "" {
 		return fmt.Errorf("key cannot be empty")
 	}
@@ -36,20 +36,20 @@ func validateHeader(h model.HTTPHeader) error {
 	return nil
 }
 
-func validateAuthentication(a *model.HTTPAuthenticator) error {
+func validateAuthentication(a openapi.HttpAuth) error {
 	switch a.Type {
 	case "basic":
-		if err := validateBasicAuth(a); err != nil {
+		if err := validateBasicAuth(a.Basic); err != nil {
 			return fmt.Errorf("basic authentication must be valid: %w", err)
 		}
 		return nil
 	case "bearer":
-		if err := validateBearerAuth(a); err != nil {
+		if err := validateBearerAuth(a.Bearer); err != nil {
 			return fmt.Errorf("bearer authentication must be valid: %w", err)
 		}
 		return nil
 	case "apiKey":
-		if err := validateApiKeyAuth(a); err != nil {
+		if err := validateApiKeyAuth(a.ApiKey); err != nil {
 			return fmt.Errorf("apiKey authentication must be valid: %w", err)
 		}
 		return nil
@@ -62,32 +62,32 @@ func validateAuthentication(a *model.HTTPAuthenticator) error {
 	}
 }
 
-func validateBasicAuth(a *model.HTTPAuthenticator) error {
-	if a.Props["username"] == "" {
+func validateBasicAuth(a openapi.HttpAuthBasic) error {
+	if a.Username == "" {
 		return fmt.Errorf("user cannot be empty")
 	}
 
-	if a.Props["password"] == "" {
+	if a.Password == "" {
 		return fmt.Errorf("password cannot be empty")
 	}
 
 	return nil
 }
 
-func validateBearerAuth(a *model.HTTPAuthenticator) error {
-	if a.Props["token"] == "" {
+func validateBearerAuth(a openapi.HttpAuthBearer) error {
+	if a.Token == "" {
 		return fmt.Errorf("token cannot be empty")
 	}
 
 	return nil
 }
 
-func validateApiKeyAuth(a *model.HTTPAuthenticator) error {
-	if a.Props["key"] == "" {
+func validateApiKeyAuth(a openapi.HttpAuthApiKey) error {
+	if a.Key == "" {
 		return fmt.Errorf("key cannot be empty")
 	}
 
-	if a.Props["value"] == "" {
+	if a.Value == "" {
 		return fmt.Errorf("value cannot be empty")
 	}
 
@@ -96,10 +96,8 @@ func validateApiKeyAuth(a *model.HTTPAuthenticator) error {
 		"header": true,
 	}
 
-	in := a.Props["in"]
-
-	if _, ok := supportedInOptions[in]; !ok {
-		return fmt.Errorf("in option \"%s\" is not supported. Only \"query\" and \"header\" are supported", in)
+	if _, ok := supportedInOptions[a.In]; !ok {
+		return fmt.Errorf("in option \"%s\" is not supported. Only \"query\" and \"header\" are supported", a.In)
 	}
 
 	return nil

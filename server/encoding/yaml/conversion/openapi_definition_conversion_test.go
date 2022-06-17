@@ -5,7 +5,6 @@ import (
 
 	"github.com/kubeshop/tracetest/server/encoding/yaml/conversion"
 	"github.com/kubeshop/tracetest/server/encoding/yaml/definition"
-	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
 
 	"github.com/stretchr/testify/assert"
@@ -29,10 +28,12 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 				Definition:       openapi.TestDefinition{},
 			},
 			ExpectedOutput: definition.Test{
-				Id:             "624a8dea-f152-48d4-a742-30b210094959",
-				Name:           "my test",
-				Description:    "my test description",
-				Trigger:        definition.TestTrigger{},
+				Id:          "624a8dea-f152-48d4-a742-30b210094959",
+				Name:        "my test",
+				Description: "my test description",
+				Trigger: definition.TestTrigger{
+					Type: "http",
+				},
 				TestDefinition: []definition.TestDefinition{},
 			},
 		},
@@ -61,13 +62,13 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 				Description: "my test description",
 				Trigger: definition.TestTrigger{
 					Type: "http",
-					HTTPRequest: model.HTTPRequest{
-						URL:    "http://localhost:1234",
+					HTTPRequest: openapi.HttpRequest{
+						Url:    "http://localhost:1234",
 						Method: "POST",
-						Headers: []model.HTTPHeader{
+						Headers: []openapi.HttpHeader{
 							{Key: "Content-Type", Value: "application/json"},
 						},
-						Auth: &model.HTTPAuthenticator{},
+						Auth: openapi.HttpAuth{},
 						Body: `{ "id": 52 }`,
 					},
 				},
@@ -99,13 +100,13 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 				Description: "my test description",
 				Trigger: definition.TestTrigger{
 					Type: "http",
-					HTTPRequest: model.HTTPRequest{
-						URL:    "http://localhost:1234",
+					HTTPRequest: openapi.HttpRequest{
+						Url:    "http://localhost:1234",
 						Method: "POST",
-						Headers: []model.HTTPHeader{
+						Headers: []openapi.HttpHeader{
 							{Key: "Content-Type", Value: "application/json"},
 						},
-						Auth: &model.HTTPAuthenticator{},
+						Auth: openapi.HttpAuth{},
 					},
 				},
 				TestDefinition: []definition.TestDefinition{},
@@ -142,17 +143,17 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 				Description: "my test description",
 				Trigger: definition.TestTrigger{
 					Type: "http",
-					HTTPRequest: model.HTTPRequest{
-						URL:    "http://localhost:1234",
+					HTTPRequest: openapi.HttpRequest{
+						Url:    "http://localhost:1234",
 						Method: "POST",
-						Headers: []model.HTTPHeader{
+						Headers: []openapi.HttpHeader{
 							{Key: "Content-Type", Value: "application/json"},
 						},
-						Auth: &model.HTTPAuthenticator{
+						Auth: openapi.HttpAuth{
 							Type: "basic",
-							Props: map[string]string{
-								"username": "my username",
-								"password": "my password",
+							Basic: openapi.HttpAuthBasic{
+								Username: "my username",
+								Password: "my password",
 							},
 						},
 						Body: `{ "id": 52 }`,
@@ -193,18 +194,18 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 				Description: "my test description",
 				Trigger: definition.TestTrigger{
 					Type: "http",
-					HTTPRequest: model.HTTPRequest{
-						URL:    "http://localhost:1234",
+					HTTPRequest: openapi.HttpRequest{
+						Url:    "http://localhost:1234",
 						Method: "POST",
-						Headers: []model.HTTPHeader{
+						Headers: []openapi.HttpHeader{
 							{Key: "Content-Type", Value: "application/json"},
 						},
-						Auth: &model.HTTPAuthenticator{
+						Auth: openapi.HttpAuth{
 							Type: "apiKey",
-							Props: map[string]string{
-								"key":   "X-Key",
-								"value": "my-key",
-								"in":    "header",
+							ApiKey: openapi.HttpAuthApiKey{
+								Key:   "X-Key",
+								Value: "my-key",
+								In:    "header",
 							},
 						},
 						Body: `{ "id": 52 }`,
@@ -243,16 +244,16 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 				Description: "my test description",
 				Trigger: definition.TestTrigger{
 					Type: "http",
-					HTTPRequest: model.HTTPRequest{
-						URL:    "http://localhost:1234",
+					HTTPRequest: openapi.HttpRequest{
+						Url:    "http://localhost:1234",
 						Method: "POST",
-						Headers: []model.HTTPHeader{
+						Headers: []openapi.HttpHeader{
 							{Key: "Content-Type", Value: "application/json"},
 						},
-						Auth: &model.HTTPAuthenticator{
+						Auth: openapi.HttpAuth{
 							Type: "bearer",
-							Props: map[string]string{
-								"token": "my token",
+							Bearer: openapi.HttpAuthBearer{
+								Token: "my token",
 							},
 						},
 						Body: `{ "id": 52 }`,
@@ -293,7 +294,9 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 				Id:          "624a8dea-f152-48d4-a742-30b210094959",
 				Name:        "my test",
 				Description: "my test description",
-				Trigger:     definition.TestTrigger{},
+				Trigger: definition.TestTrigger{
+					Type: "http",
+				},
 				TestDefinition: []definition.TestDefinition{
 					{
 						Selector: `span[name = "my span name"]`,
