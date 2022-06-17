@@ -24,7 +24,7 @@ func (t Test) Validate() error {
 
 type TestTrigger struct {
 	Type        string      `yaml:"type"`
-	HTTPRequest HttpRequest `yaml:"http_request"`
+	HTTPRequest HttpRequest `yaml:"httpRequest"`
 }
 
 func (t TestTrigger) Validate() error {
