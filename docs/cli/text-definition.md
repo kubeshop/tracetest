@@ -21,7 +21,7 @@ The definition can be broken into three parts: `test information`, `triggering t
 name: POST import pokemon
 trigger:
   type: http
-  http_request:
+  httpRequest:
     url: http://demo-pokemon-api.demo/pokemon/import
     method: POST
     headers:
@@ -59,14 +59,14 @@ This section defines how Tracetest will interact with your application: send an 
 The attribute `type` defines which trigger method you are going to use to interact with your application. The rest of the attributes in this section rely on the value you define there.
 
 ### HTTP Trigger
-When defining a HTTP trigger, you are required to define a `http_request` object containing the request Tracetest will send to your system, so here you can define: `url`, `method`, `headers`, `authentication`, and `body`.
+When defining a HTTP trigger, you are required to define a `httpRequest` object containing the request Tracetest will send to your system, so here you can define: `url`, `method`, `headers`, `authentication`, and `body`.
 
 > :warning: Note: Some APIs require the `Content-Type` header to respond. If you are not able to trigger your application, check if you are sending this header and if its value is correct.
 
 ```yaml
 trigger:
   type: http
-  http_request:
+  httpRequest:
     url: http://demo-pokemon-api.demo/pokemon/import
     method: POST
     headers:
@@ -82,7 +82,7 @@ Currently, we support three authentication methods for HTTP requests: `basic aut
 ```yaml
 trigger:
     type: http
-    http_request:
+    httpRequest:
         url: http://my-api.com
         method: GET
         authentication:
@@ -96,7 +96,7 @@ trigger:
 ```yaml
 trigger:
     type: http
-    http_request:
+    httpRequest:
         url: http://my-api.com
         method: GET
         authentication:
@@ -111,7 +111,7 @@ trigger:
 ```yaml
 trigger:
     type: http
-    http_request:
+    httpRequest:
         url: http://my-api.com
         method: GET
         authentication:
@@ -127,7 +127,7 @@ Currently, Testkube supports `raw` body types. That basically enables you to sen
 ```yaml
 trigger:
     type: http
-    http_request:
+    httpRequest:
         url: http://my-api.com
         method: POST
         body: '{"name": "my Json Object"}'

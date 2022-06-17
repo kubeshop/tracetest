@@ -2,7 +2,7 @@ name: POST import pokemon
 description: Import a pokemon using its ID
 trigger:
   type: http
-  http_request:
+  httpRequest:
     url: http://demo-pokemon-api.demo/pokemon/import
     method: POST
     headers:

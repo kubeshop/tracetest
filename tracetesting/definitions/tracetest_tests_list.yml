@@ -3,7 +3,7 @@ name: Tests List
 description: List all available tests
 trigger:
   type: http
-  http_request:
+  httpRequest:
     url: ${TARGET_URL}/api/tests
     method: GET
     headers:
