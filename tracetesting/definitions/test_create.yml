@@ -1,5 +1,6 @@
-id: 4c2c4357-e368-493f-8172-e2b21a5a4bfa
+id: ec4a86eb-64f6-4d76-9cb0-fcbafc447e3b
 name: Test Create
+description: ""
 trigger:
   type: http
   http_request:
@@ -27,7 +28,6 @@ trigger:
               }
           }
         }
-
 testDefinition:
 - selector: span[name="POST /api/tests" tracetest.span.type="http"]
   assertions:

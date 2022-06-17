@@ -1,5 +1,6 @@
-id: 68a4927c-2d60-4039-abd4-323f1d791d4c
+id: d9abc9f2-6f84-4529-a3b7-4785dc1bb4d3
 name: Test List
+description: ""
 trigger:
   type: http
   httpRequest:
@@ -12,4 +13,4 @@ testDefinition:
 - selector: span[name="GET /api/tests" tracetest.span.type="http"]
   assertions:
   - tracetest.response.status = 200
-  - tracetest.response.body contains "${TEST_ID}"
+  - tracetest.response.body contains "4b51f318-f32a-42f5-9455-a22c97c63b49"
