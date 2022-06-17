@@ -1127,22 +1127,13 @@ func (a *ApiApiService) GetTestVersionDefinitionFile(ctx context.Context, testId
 }
 
 // Execute executes the request
-<<<<<<< HEAD
 //  @return string
 func (a *ApiApiService) GetTestVersionDefinitionFileExecute(r ApiGetTestVersionDefinitionFileRequest) (string, *http.Response, error) {
-=======
-//  @return Test1
-func (a *ApiApiService) GetTestVersionDefinitionFileExecute(r ApiGetTestVersionDefinitionFileRequest) (*Test1, *http.Response, error) {
->>>>>>> 3ea7698 (fix tests)
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
 		formFiles           []formFile
-<<<<<<< HEAD
 		localVarReturnValue string
-=======
-		localVarReturnValue *Test1
->>>>>>> 3ea7698 (fix tests)
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.GetTestVersionDefinitionFile")
