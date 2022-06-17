@@ -3,7 +3,7 @@ name: Test Delete
 description: ""
 trigger:
   type: http
-  http_request:
+  httpRequest:
     url: ${TARGET_URL}/api/tests/${TEST_ID}
     method: DELETE
     headers:

@@ -3,7 +3,7 @@ name: Test Rerun
 description: ""
 trigger:
   type: http
-  http_request:
+  httpRequest:
     url: ${TARGET_URL}/api/tests/${TEST_ID}/run/${RUN_ID}/rerun
     method: POST
     headers:
