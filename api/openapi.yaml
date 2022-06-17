@@ -414,4 +414,4 @@ paths:
           content:
             application/yaml:
               schema:
-                type: string
+                $ref: "./definition_file.yaml#/components/schemas/Test"
