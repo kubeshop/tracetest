@@ -1103,7 +1103,7 @@ type ApiGetTestVersionDefinitionFileRequest struct {
 	version    int32
 }
 
-func (r ApiGetTestVersionDefinitionFileRequest) Execute() (*Test1, *http.Response, error) {
+func (r ApiGetTestVersionDefinitionFileRequest) Execute() (string, *http.Response, error) {
 	return r.ApiService.GetTestVersionDefinitionFileExecute(r)
 }
 
@@ -1127,13 +1127,13 @@ func (a *ApiApiService) GetTestVersionDefinitionFile(ctx context.Context, testId
 }
 
 // Execute executes the request
-//  @return Test1
-func (a *ApiApiService) GetTestVersionDefinitionFileExecute(r ApiGetTestVersionDefinitionFileRequest) (*Test1, *http.Response, error) {
+//  @return string
+func (a *ApiApiService) GetTestVersionDefinitionFileExecute(r ApiGetTestVersionDefinitionFileRequest) (string, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
 		formFiles           []formFile
-		localVarReturnValue *Test1
+		localVarReturnValue string
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.GetTestVersionDefinitionFile")
