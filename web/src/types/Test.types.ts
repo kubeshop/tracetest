@@ -1,6 +1,5 @@
 import {Model, THttpSchemas, TTestSchemas} from './Common.types';
 import {TTestDefinition} from './TestDefinition.types';
-import {TRawTestRun} from './TestRun.types';
 
 export type TRawTest = TTestSchemas['Test'];
 export type TTest = Model<
@@ -10,6 +9,5 @@ export type TTest = Model<
     serviceUnderTest?: {
       request?: THttpSchemas['HTTPRequest'];
     };
-    referenceTestRun?: TRawTestRun;
   }
 >;

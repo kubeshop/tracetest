@@ -22,8 +22,6 @@ type Test struct {
 	ServiceUnderTest TestServiceUnderTest `json:"serviceUnderTest,omitempty"`
 
 	Definition TestDefinition `json:"definition,omitempty"`
-
-	ReferenceTestRun TestRun `json:"referenceTestRun,omitempty"`
 }
 
 // AssertTestRequired checks if the required fields are not zero-ed
@@ -32,9 +30,6 @@ func AssertTestRequired(obj Test) error {
 		return err
 	}
 	if err := AssertTestDefinitionRequired(obj.Definition); err != nil {
-		return err
-	}
-	if err := AssertTestRunRequired(obj.ReferenceTestRun); err != nil {
 		return err
 	}
 	return nil

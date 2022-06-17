@@ -23,9 +23,8 @@ func (m OpenAPIMapper) Test(in model.Test) openapi.Test {
 		ServiceUnderTest: openapi.TestServiceUnderTest{
 			Request: m.HTTPRequest(in.ServiceUnderTest.Request),
 		},
-		Definition:       m.Definition(in.Definition),
-		ReferenceTestRun: m.Run(in.ReferenceRun),
-		Version:          int32(in.Version),
+		Definition: m.Definition(in.Definition),
+		Version:    int32(in.Version),
 	}
 }
 
@@ -253,9 +252,8 @@ func (m ModelMapper) Test(in openapi.Test) model.Test {
 		ServiceUnderTest: model.ServiceUnderTest{
 			Request: m.HTTPRequest(in.ServiceUnderTest.Request),
 		},
-		ReferenceRun: m.Run(in.ReferenceTestRun),
-		Definition:   m.Definition(in.Definition),
-		Version:      int(in.Version),
+		Definition: m.Definition(in.Definition),
+		Version:    int(in.Version),
 	}
 }
 

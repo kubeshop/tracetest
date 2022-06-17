@@ -29,7 +29,6 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 				Version:          openApiInt(3),
 				ServiceUnderTest: &openapi.TestServiceUnderTest{},
 				Definition:       &openapi.TestDefinition{},
-				ReferenceTestRun: &openapi.TestRun{},
 			},
 			ExpectedOutput: definition.Test{
 				Id:             "624a8dea-f152-48d4-a742-30b210094959",
@@ -303,7 +302,6 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 						},
 					},
 				},
-				ReferenceTestRun: &openapi.TestRun{},
 			},
 			ExpectedOutput: definition.Test{
 				Id:          "624a8dea-f152-48d4-a742-30b210094959",
