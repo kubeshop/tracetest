@@ -11,6 +11,9 @@ if [  "$TARGET_URL" = "" ]; then
   exit 2
 fi
 
+echo "TRACETEST_CLI: $TRACETEST_CLI"
+echo "TARGET_URL: $TARGET_URL"
+
 export TRACETEST_MAIN_ENDPOINT="localhost:8080"
 export TRACETEST_TARGET_ENDPOINT="localhost:8081"
 export TARGET_URL=${TARGET_URL:-"http://localhost:8081"}
@@ -18,7 +21,7 @@ export TARGET_URL=${TARGET_URL:-"http://localhost:8081"}
 mkdir -p results/responses
 
 EXIT_STATUS=0
-bash ./list_tests.bash || EXIT_STATUS=$?
+bash ./tests.bash || EXIT_STATUS=$?
 
 exit $EXIT_STATUS
 

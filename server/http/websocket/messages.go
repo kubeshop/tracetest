@@ -8,8 +8,9 @@ import (
 )
 
 type Message struct {
-	Type    string      `json:"type"`
-	Message interface{} `json:"message"`
+	Type     string      `json:"type"`
+	Resource string      `json:"resource"`
+	Message  interface{} `json:"message"`
 }
 
 type Event struct {
@@ -18,9 +19,10 @@ type Event struct {
 	Event    interface{} `json:"event"`
 }
 
-func SubscriptionSuccess(subscriptionId string) Message {
+func SubscriptionSuccess(resource, subscriptionId string) Message {
 	return Message{
-		Type: "success",
+		Type:     "success",
+		Resource: resource,
 		Message: struct {
 			SubscriptionId string `json:"subscriptionId"`
 		}{SubscriptionId: subscriptionId},

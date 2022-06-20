@@ -1,0 +1,15 @@
+id: 2ec817b5-8087-4e8f-9462-8026f0f54414
+name: Test Run
+description: ""
+trigger:
+  type: http
+  httpRequest:
+    url: ${TARGET_URL}/api/tests/${TEST_ID}/run
+    method: POST
+    headers:
+    - key: Content-Type
+      value: application/json
+testDefinition:
+- selector: span[name="POST /api/tests/{testId}/run" tracetest.span.type="http"]
+  assertions:
+  - tracetest.response.status = 200

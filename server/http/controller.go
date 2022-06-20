@@ -384,3 +384,7 @@ func (c *controller) GetRunResultJUnit(ctx context.Context, testID string, runID
 
 	return openapi.Response(200, res), nil
 }
+
+func (c controller) GetTestVersionDefinitionFile(ctx context.Context, testID string, version int32) (openapi.ImplResponse, error) {
+	return openapi.Response(200, nil), nil
+}

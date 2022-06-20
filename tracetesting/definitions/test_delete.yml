@@ -1,0 +1,15 @@
+id: c342276c-59cb-450f-9f97-ba2da2305788
+name: Test Delete
+description: ""
+trigger:
+  type: http
+  httpRequest:
+    url: ${TARGET_URL}/api/tests/${TEST_ID}
+    method: DELETE
+    headers:
+    - key: Content-Type
+      value: application/json
+testDefinition:
+- selector: span[name="DELETE /api/tests/{testId}/run/{runId}" tracetest.span.type="http"]
+  assertions:
+  - tracetest.response.status = 204

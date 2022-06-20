@@ -1,13 +1,14 @@
 import {useTour} from '@reactour/tour';
 import {Button, Form, Modal, Typography} from 'antd';
-import {useState} from 'react';
-import {useNavigate} from 'react-router-dom';
 
 import {Steps} from 'components/GuidedTour/homeStepList';
+import {useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 import {useCreateTestMutation, useRunTestMutation} from 'redux/apis/TraceTest.api';
-import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
 import CreateTestAnalyticsService from 'services/Analytics/CreateTestAnalytics.service';
-import CreateTestForm, {ICreateTestValues, FORM_ID} from './CreateTestForm';
+import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
+import {Request} from '../../types/Common.types';
+import CreateTestForm, {FORM_ID, ICreateTestValues} from './CreateTestForm';
 
 interface IProps {
   visible: boolean;
@@ -26,10 +27,19 @@ const CreateTestModal = ({onClose, visible}: IProps) => {
   const [form] = Form.useForm<ICreateTestValues>();
 
   const handleOnSubmit = async (values: ICreateTestValues) => {
+    let request: Request = {
+      url: values.url,
+      method: values.method,
+      body: values.body,
+      headers: values.headers,
+    };
+    if (values.auth?.type !== null) {
+      request = {...request, auth: values.auth};
+    }
     const test = await createTest({
       name: values.name,
       serviceUnderTest: {
-        request: {url: values.url, method: values.method, body: values.body, headers: values.headers},
+        request,
       },
     }).unwrap();
     const run = await runTest({testId: test.id}).unwrap();

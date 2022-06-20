@@ -2,7 +2,7 @@ name: POST import pokemon
 description: Import a pokemon using its ID
 trigger:
   type: http
-  http_request:
+  httpRequest:
     url: http://pokemon-demo.tracetest.io/pokemon/import
     method: POST
     headers:
@@ -14,6 +14,4 @@ trigger:
         key: X-Key
         value: ${POKEMON_APP_API_KEY}
         in: header
-    body:
-      type: raw
-      raw: '{ "id": 52 }'
+    body: '{ "id": 52 }'
