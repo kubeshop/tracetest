@@ -7,6 +7,8 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
+	"github.com/kubeshop/tracetest/server/encoding/yaml/conversion"
+	"github.com/kubeshop/tracetest/server/encoding/yaml/definition"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/traces"
@@ -14,6 +16,11 @@ import (
 )
 
 type OpenAPIMapper struct{}
+
+func (m OpenAPIMapper) TestDefinitionFile(in model.Test) definition.Test {
+	testDefinition, _ := conversion.ConvertOpenAPITestIntoDefinitionObject(m.Test(in))
+	return testDefinition
+}
 
 func (m OpenAPIMapper) Test(in model.Test) openapi.Test {
 	return openapi.Test{
@@ -23,9 +30,8 @@ func (m OpenAPIMapper) Test(in model.Test) openapi.Test {
 		ServiceUnderTest: openapi.TestServiceUnderTest{
 			Request: m.HTTPRequest(in.ServiceUnderTest.Request),
 		},
-		Definition:       m.Definition(in.Definition),
-		ReferenceTestRun: m.Run(in.ReferenceRun),
-		Version:          int32(in.Version),
+		Definition: m.Definition(in.Definition),
+		Version:    int32(in.Version),
 	}
 }
 
@@ -253,9 +259,8 @@ func (m ModelMapper) Test(in openapi.Test) model.Test {
 		ServiceUnderTest: model.ServiceUnderTest{
 			Request: m.HTTPRequest(in.ServiceUnderTest.Request),
 		},
-		ReferenceRun: m.Run(in.ReferenceTestRun),
-		Definition:   m.Definition(in.Definition),
-		Version:      int(in.Version),
+		Definition: m.Definition(in.Definition),
+		Version:    int(in.Version),
 	}
 }
 

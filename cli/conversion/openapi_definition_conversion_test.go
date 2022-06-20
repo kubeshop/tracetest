@@ -29,7 +29,6 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 				Version:          openApiInt(3),
 				ServiceUnderTest: &openapi.TestServiceUnderTest{},
 				Definition:       &openapi.TestDefinition{},
-				ReferenceTestRun: &openapi.TestRun{},
 			},
 			ExpectedOutput: definition.Test{
 				Id:             "624a8dea-f152-48d4-a742-30b210094959",
@@ -71,10 +70,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 							{Key: "Content-Type", Value: "application/json"},
 						},
 						Authentication: definition.HTTPAuthentication{},
-						Body: definition.HTTPBody{
-							Type: "raw",
-							Raw:  `{ "id": 52 }`,
-						},
+						Body:           `{ "id": 52 }`,
 					},
 				},
 				TestDefinition: []definition.TestDefinition{},
@@ -156,15 +152,12 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 						},
 						Authentication: definition.HTTPAuthentication{
 							Type: "basic",
-							BasicAuth: definition.HTTPBasicAuth{
+							Basic: definition.HTTPBasicAuth{
 								User:     "my username",
 								Password: "my password",
 							},
 						},
-						Body: definition.HTTPBody{
-							Type: "raw",
-							Raw:  `{ "id": 52 }`,
-						},
+						Body: `{ "id": 52 }`,
 					},
 				},
 				TestDefinition: []definition.TestDefinition{},
@@ -216,10 +209,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 								In:    "header",
 							},
 						},
-						Body: definition.HTTPBody{
-							Type: "raw",
-							Raw:  `{ "id": 52 }`,
-						},
+						Body: `{ "id": 52 }`,
 					},
 				},
 				TestDefinition: []definition.TestDefinition{},
@@ -267,10 +257,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 								Token: "my token",
 							},
 						},
-						Body: definition.HTTPBody{
-							Type: "raw",
-							Raw:  `{ "id": 52 }`,
-						},
+						Body: `{ "id": 52 }`,
 					},
 				},
 				TestDefinition: []definition.TestDefinition{},
@@ -303,7 +290,6 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 						},
 					},
 				},
-				ReferenceTestRun: &openapi.TestRun{},
 			},
 			ExpectedOutput: definition.Test{
 				Id:          "624a8dea-f152-48d4-a742-30b210094959",

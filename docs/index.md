@@ -20,8 +20,8 @@ Tracetest allows you to quickly build integration and e2e tests, powered by your
 - Save your test.
 - Run the tests either manually or via your CI build jobs.
 
-## **Blog-posts**
+## **Blog Posts**
 
 Check out the following blog-posts with Tracetest-related content:
 
-- Coming Soon!
+- Version 0.5 - [Release blog-post](https://kubeshop.io/blog/tracetest-assertions-versioning-ci-cd) - June 8, 2022

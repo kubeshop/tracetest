@@ -31,10 +31,7 @@ func TestLoadDefinition(t *testing.T) {
 						Headers: []definition.HTTPHeader{
 							{Key: "Content-Type", Value: "application/json"},
 						},
-						Body: definition.HTTPBody{
-							Type: "raw",
-							Raw:  `{ "id": 52 }`,
-						},
+						Body: `{ "id": 52 }`,
 					},
 				},
 				TestDefinition: []definition.TestDefinition{
@@ -90,10 +87,7 @@ func TestLoadDefinition(t *testing.T) {
 						Headers: []definition.HTTPHeader{
 							{Key: "Content-Type", Value: "application/json"},
 						},
-						Body: definition.HTTPBody{
-							Type: "raw",
-							Raw:  `{ "id": 52 }`,
-						},
+						Body: `{ "id": 52 }`,
 					},
 				},
 				TestDefinition: []definition.TestDefinition{

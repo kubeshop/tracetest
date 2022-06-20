@@ -4,9 +4,8 @@ import Diagram from 'components/Diagram';
 import {SupportedDiagrams} from 'components/Diagram/Diagram';
 import DiagramSwitcher from 'components/DiagramSwitcher';
 import SpanDetail from 'components/SpanDetail';
-import {useAppSelector} from 'redux/hooks';
-import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
 import TraceAnalyticsService from 'services/Analytics/TraceAnalytics.service';
+import {useSpan} from 'providers/Span/Span.provider';
 import {TSpan} from 'types/Span.types';
 import {TTestRun} from 'types/TestRun.types';
 import * as S from './RunTopPanel.styled';
@@ -19,7 +18,7 @@ interface IProps {
 
 const RunTopPanel = ({onSelectSpan, run, selectedSpan}: IProps) => {
   const [diagramType, setDiagramType] = useState<SupportedDiagrams>(SupportedDiagrams.DAG);
-  const affectedSpans = useAppSelector(TestDefinitionSelectors.selectAffectedSpans);
+  const {affectedSpans} = useSpan();
 
   return (
     <S.Container>

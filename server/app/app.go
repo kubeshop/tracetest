@@ -90,15 +90,19 @@ func (a *App) Start() error {
 
 	subscriptionManager := subscription.NewManager()
 
-	assertionRunner := executor.NewAssertionRunner(a.db)
+	execTestUpdater := (executor.CompositeUpdater{}).
+		Add(executor.NewDBUpdater(a.db)).
+		Add(executor.NewSubscriptionUpdater(subscriptionManager))
+
+	assertionRunner := executor.NewAssertionRunner(execTestUpdater)
 	assertionRunner.Start(5)
 	defer assertionRunner.Stop()
 
-	tracePoller := executor.NewTracePoller(a.traceDB, a.db, a.config.PoolingRetryDelay(), a.config.MaxWaitTimeForTraceDuration(), subscriptionManager, assertionRunner)
+	tracePoller := executor.NewTracePoller(a.traceDB, execTestUpdater, assertionRunner, a.config.PoolingRetryDelay(), a.config.MaxWaitTimeForTraceDuration())
 	tracePoller.Start(5) // worker count. should be configurable
 	defer tracePoller.Stop()
 
-	runner := executor.NewPersistentRunner(ex, a.db, tracePoller)
+	runner := executor.NewPersistentRunner(ex, a.db, execTestUpdater, tracePoller)
 	runner.Start(5) // worker count. should be configurable
 	defer runner.Stop()
 

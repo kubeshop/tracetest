@@ -1,15 +1,7 @@
 import {TRawTest, TTest} from '../types/Test.types';
 import TestDefinition from './TestDefinition.model';
 
-const Test = ({
-  id = '',
-  name = '',
-  description = '',
-  definition,
-  version = 1,
-  serviceUnderTest,
-  referenceTestRun,
-}: TRawTest): TTest => {
+const Test = ({id = '', name = '', description = '', definition, version = 1, serviceUnderTest}: TRawTest): TTest => {
   return {
     id,
     name,
@@ -17,7 +9,6 @@ const Test = ({
     description,
     definition: TestDefinition(definition || {}),
     serviceUnderTest,
-    referenceTestRun,
   };
 };
 

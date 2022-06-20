@@ -1,0 +1,32 @@
+id: d85c3336-5048-4652-b564-63dfe2c83b14
+name: Test Create
+description: ""
+trigger:
+  type: http
+  httpRequest:
+    url: ${TARGET_URL}/api/tests
+    method: POST
+    headers:
+    - key: Content-Type
+      value: application/json
+    body: |
+        {
+          "name": "Pokemon - List - Get a Pokemon",
+          "serviceUnderTest": {
+              "request": {
+                  "url": "http://demo-pokemon-api.demo.svc.cluster.local/pokemon?take=20&skip=0",
+                  "method": "GET",
+                  "body": "",
+                  "headers": [
+                      {
+                          "key": "Content-Type",
+                          "value": "application/json"
+                      }
+                  ]
+              }
+          }
+        }
+testDefinition:
+- selector: span[name="POST /api/tests" tracetest.span.type="http"]
+  assertions:
+  - tracetest.response.status = 200

@@ -40,13 +40,9 @@ func convertServiceUnderTestIntoTrigger(serviceUnderTest *openapi.TestServiceUnd
 
 	auth := getAuthDefinition(serviceUnderTest.Request.Auth)
 
-	body := definition.HTTPBody{}
+	body := ""
 	if serviceUnderTest.Request.Body != nil {
-		body = definition.HTTPBody{
-			// we only support raw for now
-			Type: "raw",
-			Raw:  *serviceUnderTest.Request.Body,
-		}
+		body = *serviceUnderTest.Request.Body
 	}
 
 	return definition.TestTrigger{
@@ -71,7 +67,7 @@ func getAuthDefinition(auth *openapi.HTTPAuth) definition.HTTPAuthentication {
 	case "basic":
 		return definition.HTTPAuthentication{
 			Type: "basic",
-			BasicAuth: definition.HTTPBasicAuth{
+			Basic: definition.HTTPBasicAuth{
 				User:     *auth.Basic.Username,
 				Password: *auth.Basic.Password,
 			},

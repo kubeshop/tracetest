@@ -20,7 +20,7 @@ type AssertionRunner interface {
 }
 
 type defaultAssertionRunner struct {
-	db           model.Repository
+	updater      RunUpdater
 	inputChannel chan AssertionRequest
 	exitChannel  chan bool
 }
@@ -28,9 +28,9 @@ type defaultAssertionRunner struct {
 var _ WorkerPool = &defaultAssertionRunner{}
 var _ AssertionRunner = &defaultAssertionRunner{}
 
-func NewAssertionRunner(db model.Repository) AssertionRunner {
+func NewAssertionRunner(updater RunUpdater) AssertionRunner {
 	return &defaultAssertionRunner{
-		db:           db,
+		updater:      updater,
 		inputChannel: make(chan AssertionRequest, 1),
 	}
 }
@@ -73,10 +73,10 @@ func (e *defaultAssertionRunner) startWorker(ctx context.Context) {
 func (e *defaultAssertionRunner) runAssertionsAndUpdateResult(ctx context.Context, request AssertionRequest) error {
 	run, err := e.executeAssertions(ctx, request)
 	if err != nil {
-		return e.db.UpdateRun(ctx, run.Failed(err))
+		return e.updater.Update(ctx, run.Failed(err))
 	}
 
-	err = e.db.UpdateRun(ctx, run)
+	err = e.updater.Update(ctx, run)
 	if err != nil {
 		return fmt.Errorf("could not save result on database: %w", err)
 	}

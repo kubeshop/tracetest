@@ -4,7 +4,6 @@ import {isEmpty} from 'lodash';
 import React, {useCallback, useEffect} from 'react';
 
 import {CompareOperator} from 'constants/Operator.constants';
-import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
 import {useGetSelectedSpansQuery} from 'redux/apis/TraceTest.api';
 import {useAppSelector} from 'redux/hooks';
 import AssertionSelectors from 'selectors/Assertion.selectors';
@@ -18,6 +17,7 @@ import * as S from './AssertionForm.styled';
 import AssertionFormCheckList from './AssertionFormCheckList';
 import AssertionFormPseudoSelectorInput from './AssertionFormPseudoSelectorInput';
 import AssertionFormSelectorInput from './AssertionFormSelectorInput';
+import {useSpan} from '../../providers/Span/Span.provider';
 
 const {onChecksChange, onSelectorChange} = CreateAssertionModalAnalyticsService;
 
@@ -52,7 +52,7 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
   testId,
   runId,
 }) => {
-  const {setAffectedSpans} = useTestDefinition();
+  const {onSetAffectedSpans, onClearAffectedSpans} = useSpan();
   const [form] = Form.useForm<IValues>();
 
   const currentSelectorList = Form.useWatch('selectorList', form) || [];
@@ -66,8 +66,12 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
   });
 
   useEffect(() => {
-    setAffectedSpans(spanIdList);
-  }, [setAffectedSpans, spanIdList]);
+    onSetAffectedSpans(spanIdList);
+
+    return () => {
+      onClearAffectedSpans();
+    };
+  }, [onClearAffectedSpans, onSetAffectedSpans, spanIdList]);
 
   const attributeList = useAppSelector(state =>
     AssertionSelectors.selectAttributeList(state, testId, runId, spanIdList)

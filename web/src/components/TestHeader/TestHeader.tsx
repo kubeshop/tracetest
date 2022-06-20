@@ -29,7 +29,7 @@ const TestHeader = ({
   extraContent,
   onBack,
   showInfo,
-  test: {name, referenceTestRun, serviceUnderTest, version = 1, id},
+  test: {name, serviceUnderTest, version = 1, id},
   testState,
   testVersion,
   totalSpans,
@@ -58,10 +58,10 @@ const TestHeader = ({
             </S.TestName>
             {showInfo && (
               <Info
-                date={referenceTestRun?.createdAt ?? ''}
+                date={run?.createdAt ?? ''}
                 executionTime={executionTime ?? 0}
                 totalSpans={totalSpans ?? 0}
-                traceId={referenceTestRun?.traceId ?? ''}
+                traceId={run?.traceId ?? ''}
               />
             )}
           </S.Row>

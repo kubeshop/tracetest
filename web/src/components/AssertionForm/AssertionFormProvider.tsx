@@ -5,12 +5,13 @@ import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provide
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import {createContext, useCallback, useContext, useMemo, useState} from 'react';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
-import {clearAffectedSpans, setSelectedAssertion} from 'redux/slices/TestDefinition.slice';
+import {setSelectedAssertion} from 'redux/slices/TestDefinition.slice';
 import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
 import SelectorService from 'services/Selector.service';
 import {TTestDefinitionEntry} from 'types/TestDefinition.types';
+import CreateAssertionModalAnalyticsService from 'services/Analytics/CreateAssertionModalAnalytics.service';
+import {useSpan} from 'providers/Span/Span.provider';
 import {IValues} from './AssertionForm';
-import CreateAssertionModalAnalyticsService from '../../services/Analytics/CreateAssertionModalAnalytics.service';
 
 interface IFormProps {
   defaultValues?: IValues;
@@ -47,6 +48,7 @@ const AssertionFormProvider: React.FC<{testId: string}> = ({children}) => {
   const [formProps, setFormProps] = useState<IFormProps>(initialFormProps);
   const {update, add, test, isDraftMode} = useTestDefinition();
   const {run} = useTestRun();
+  const {onClearAffectedSpans} = useSpan();
   const definitionList = useAppSelector(state => TestDefinitionSelectors.selectDefinitionList(state));
 
   const open = useCallback(
@@ -76,17 +78,17 @@ const AssertionFormProvider: React.FC<{testId: string}> = ({children}) => {
         setIsOpen(true);
       }
 
-      dispatch(setSelectedAssertion(''));
+      dispatch(setSelectedAssertion());
     },
     [dispatch, definitionList, isDraftMode, run.testVersion, test?.version]
   );
 
   const close = useCallback(() => {
     setFormProps(initialFormProps);
-    dispatch(clearAffectedSpans());
+    onClearAffectedSpans();
 
     setIsOpen(false);
-  }, [dispatch]);
+  }, [onClearAffectedSpans]);
 
   const onConfirm = useCallback(() => {
     CreateAssertionModalAnalyticsService.onAssertionFormOpen();
@@ -115,9 +117,9 @@ const AssertionFormProvider: React.FC<{testId: string}> = ({children}) => {
       }
 
       setIsOpen(false);
-      dispatch(clearAffectedSpans());
+      onClearAffectedSpans();
     },
-    [add, formProps, update, dispatch]
+    [formProps, onClearAffectedSpans, update, add]
   );
 
   const contextValue = useMemo(

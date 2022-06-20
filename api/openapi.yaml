@@ -388,3 +388,30 @@ paths:
       responses:
         204:
           description: OK
+
+  /tests/{testId}/version/{version}/definition.yaml:
+    get:
+      tags:
+        - api
+      parameters:
+        - in: path
+          name: testId
+          schema:
+            type: string
+            format: uuid
+          required: true
+        - in: path
+          name: version
+          schema:
+            type: integer
+          required: true
+      summary: Get the test definition as an YAML file
+      description: Get the test definition as an YAML file
+      operationId: getTestVersionDefinitionFile
+      responses:
+        200:
+          description: OK
+          content:
+            application/yaml:
+              schema:
+                type: string

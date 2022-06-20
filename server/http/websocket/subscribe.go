@@ -48,5 +48,5 @@ func (e subscribeCommandExecutor) Execute(conn *websocket.Conn, message []byte) 
 
 	e.subscriptionManager.Subscribe(msg.Resource, messageConverter)
 
-	conn.WriteJSON(SubscriptionSuccess(messageConverter.ID()))
+	conn.WriteJSON(SubscriptionSuccess(msg.Resource, messageConverter.ID()))
 }

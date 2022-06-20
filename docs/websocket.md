@@ -15,7 +15,7 @@ Once the connection is open, you can send a message with the format:
 ```json
 {
     "type": "subscribe",
-    "resource": "test/{testID}/result/{resultID}"
+    "resource": "test/{testID}/run/{runID}"
 }
 ```
 
@@ -50,7 +50,7 @@ But send this message to the websocket connection:
 ```json
 {
     "type": "unsubscribe",
-    "resource": "test/{testID}/result/{resultID}",
+    "resource": "test/{testID}/run/{runID}",
     "subscriptionId": "id returned in the subscription command"
 }
 ```

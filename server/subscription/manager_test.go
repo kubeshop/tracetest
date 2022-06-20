@@ -25,17 +25,19 @@ func TestManagerSubscriptionDifferentResources(t *testing.T) {
 	manager.Subscribe("test:2", subscriber2)
 
 	test1Message := subscription.Message{
-		Type:    "test_update",
-		Content: "test1 update",
+		ResourceID: "test:1",
+		Type:       "test_update",
+		Content:    "test1 update",
 	}
 
 	test2Message := subscription.Message{
-		Type:    "test_update",
-		Content: "test2 update",
+		ResourceID: "test:2",
+		Type:       "test_update",
+		Content:    "test2 update",
 	}
 
-	manager.PublishUpdate("test:1", test1Message)
-	manager.PublishUpdate("test:2", test2Message)
+	manager.PublishUpdate(test1Message)
+	manager.PublishUpdate(test2Message)
 
 	assert.Equal(t, test1Message, messageReceivedBySubscriber1, "received message should be equal to the one sent")
 	assert.Equal(t, test2Message, messageReceivedBySubscriber2, "received message should be equal to the one sent")
@@ -63,7 +65,7 @@ func TestManagerSubscriptionSameResourceDifferentSubscribers(t *testing.T) {
 		Content: "test1 update",
 	}
 
-	manager.PublishUpdate("test:1", test1Message)
+	manager.PublishUpdate(test1Message)
 
 	assert.NotNil(t, messageReceivedBySubscriber1, "message received by subscriber should not be nil")
 	assert.Equal(t, messageReceivedBySubscriber1.Type, messageReceivedBySubscriber2.Type, "subscribers of the same resource should receive the same message")
@@ -80,23 +82,25 @@ func TestManagerUnsubscribe(t *testing.T) {
 	})
 
 	message1 := subscription.Message{
-		Type:    "test_update",
-		Content: "Test was updated",
+		ResourceID: "test:1",
+		Type:       "test_update",
+		Content:    "Test was updated",
 	}
 
 	message2 := subscription.Message{
-		Type:    "test_deleted",
-		Content: "Test was deleted",
+		ResourceID: "test:2",
+		Type:       "test_deleted",
+		Content:    "Test was deleted",
 	}
 
 	manager.Subscribe("test:1", subscriber)
-	manager.PublishUpdate("test:1", message1)
+	manager.PublishUpdate(message1)
 
 	assert.Equal(t, message1.Type, receivedMessage.Type)
 	assert.Equal(t, message1.Content, receivedMessage.Content)
 
 	manager.Unsubscribe("test:1", subscriber.ID())
-	manager.PublishUpdate("test:1", message2)
+	manager.PublishUpdate(message2)
 
 	assert.Equal(t, message1.Type, receivedMessage.Type, "subscriber should not be notified after unsubscribed")
 	assert.Equal(t, message1.Content, receivedMessage.Content, "subscriber should not be notified after unsubscribed")

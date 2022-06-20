@@ -101,7 +101,6 @@ func (f runnerFixture) expectSuccessExec(test model.Test) {
 func (f runnerFixture) expectSuccessResultPersist(test model.Test) {
 	expectCreateRun(f.mockDB, test)
 	f.mockDB.On("UpdateRun", mock.Anything).Return(noError)
-	f.mockDB.On("UpdateTestVersion", mock.Anything).Return(noError)
 	f.mockDB.On("UpdateRun", mock.Anything).Return(noError)
 	f.mockTracePoller.expectPoll(test)
 }
@@ -125,7 +124,7 @@ func runnerSetup(t *testing.T) runnerFixture {
 
 	mtp.Test(t)
 	return runnerFixture{
-		runner:          executor.NewPersistentRunner(me, db, mtp),
+		runner:          executor.NewPersistentRunner(me, db, executor.NewDBUpdater(db), mtp),
 		mockExecutor:    me,
 		mockDB:          db,
 		mockTracePoller: mtp,

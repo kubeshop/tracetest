@@ -21,6 +21,7 @@ func (td *postgresDB) CreateRun(ctx context.Context, test model.Test, run model.
 	defer stmt.Close()
 
 	run.ID = IDGen.UUID()
+	run.TestID = test.ID
 	run.State = model.RunStateCreated
 	run.TestVersion = test.Version
 
@@ -72,7 +73,7 @@ func (td *postgresDB) DeleteRun(ctx context.Context, r model.Run) error {
 }
 
 func (td *postgresDB) GetRun(ctx context.Context, id uuid.UUID) (model.Run, error) {
-	stmt, err := td.db.Prepare("SELECT run, test_version FROM runs WHERE id = $1")
+	stmt, err := td.db.Prepare("SELECT run, test_id, test_version FROM runs WHERE id = $1")
 	if err != nil {
 		return model.Run{}, err
 	}
@@ -86,7 +87,7 @@ func (td *postgresDB) GetRun(ctx context.Context, id uuid.UUID) (model.Run, erro
 }
 
 func (td *postgresDB) GetTestRuns(ctx context.Context, test model.Test, take, skip int32) ([]model.Run, error) {
-	stmt, err := td.db.Prepare("SELECT run, test_version FROM runs WHERE test_id = $1 ORDER BY (run ->> 'CreatedAt')::timestamp DESC LIMIT $2 OFFSET $3")
+	stmt, err := td.db.Prepare("SELECT run, test_id, test_version FROM runs WHERE test_id = $1 ORDER BY (run ->> 'CreatedAt')::timestamp DESC LIMIT $2 OFFSET $3")
 	if err != nil {
 		return nil, err
 	}
@@ -110,7 +111,7 @@ func (td *postgresDB) GetTestRuns(ctx context.Context, test model.Test, take, sk
 }
 
 func (td *postgresDB) GetRunByTraceID(ctx context.Context, test model.Test, traceID trace.TraceID) (model.Run, error) {
-	stmt, err := td.db.Prepare("SELECT run, test_version FROM runs WHERE test_id = $1 AND run ->> 'TraceId' = $2")
+	stmt, err := td.db.Prepare("SELECT run, test_id, test_version FROM runs WHERE test_id = $1 AND run ->> 'TraceId' = $2")
 	if err != nil {
 		return model.Run{}, err
 	}
@@ -132,25 +133,33 @@ func encodeRun(r model.Run) (string, error) {
 	return string(b), nil
 }
 
-func decodeRun(b []byte, testVersion int) (model.Run, error) {
+func decodeRun(b []byte, testID string, testVersion int) (model.Run, error) {
+	tid, err := uuid.Parse(testID)
+	if err != nil {
+		return model.Run{}, fmt.Errorf("unmarshal run testID: %w", err)
+	}
 	var run model.Run
-	err := json.Unmarshal(b, &run)
+	err = json.Unmarshal(b, &run)
 	if err != nil {
 		return model.Run{}, fmt.Errorf("unmarshal run: %w", err)
 	}
 	run.TestVersion = testVersion
+	run.TestID = tid
 	return run, nil
 }
 
 func readRunRow(row scanner) (model.Run, error) {
-	var b []byte
-	var testVersion int
-	err := row.Scan(&b, &testVersion)
+	var (
+		b           []byte
+		testVersion int
+		testID      string
+	)
+	err := row.Scan(&b, &testID, &testVersion)
 	switch err {
 	case sql.ErrNoRows:
 		return model.Run{}, ErrNotFound
 	case nil:
-		return decodeRun(b, testVersion)
+		return decodeRun(b, testID, testVersion)
 	default:
 		return model.Run{}, fmt.Errorf("read run row: %w", err)
 	}
