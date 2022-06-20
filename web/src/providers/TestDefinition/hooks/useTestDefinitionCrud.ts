@@ -9,7 +9,6 @@ import {
   resetDefinitionList,
   updateDefinition,
   reset as resetAction,
-  clearAffectedSpans,
   revertDefinition,
   setSelectedAssertion,
 } from '../../../redux/slices/TestDefinition.slice';
@@ -45,8 +44,7 @@ const useTestDefinitionCrud = ({runId, testId, isDraftMode}: IProps) => {
 
   const publish = useCallback(async () => {
     const {id} = await dispatch(TestDefinitionActions.publish({testId, runId})).unwrap();
-    dispatch(clearAffectedSpans());
-    dispatch(setSelectedAssertion(''));
+    dispatch(setSelectedAssertion());
 
     navigate(`/test/${testId}/run/${id}`);
   }, [dispatch, navigate, runId, testId]);

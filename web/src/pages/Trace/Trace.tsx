@@ -6,6 +6,7 @@ import AssertionFormProvider from 'components/AssertionForm/AssertionFormProvide
 import TestRunProvider from 'providers/TestRun';
 import TestDefinitionProvider from 'providers/TestDefinition';
 import GuidedTourProvider from 'providers/GuidedTour/GuidedTour.provider';
+import SpanProvider from 'providers/Span';
 import TraceContent from './TraceContent';
 
 const TracePage = () => {
@@ -17,9 +18,11 @@ const TracePage = () => {
         <TestRunProvider testId={testId} runId={runId}>
           <TestDefinitionProvider testId={testId} runId={runId}>
             <AssertionFormProvider testId={testId}>
-              <Layout>
-                <TraceContent />
-              </Layout>
+              <SpanProvider>
+                <Layout>
+                  <TraceContent />
+                </Layout>
+              </SpanProvider>
             </AssertionFormProvider>
           </TestDefinitionProvider>
         </TestRunProvider>

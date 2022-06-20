@@ -1,8 +1,7 @@
 import {CaseReducer, PayloadAction} from '@reduxjs/toolkit';
 import {TChange} from '../redux/actions/TestDefinition.actions';
-import {TAssertion, TAssertionResults} from './Assertion.types';
+import {TAssertion, TAssertionResultEntry, TAssertionResults} from './Assertion.types';
 import {Model, TTestSchemas} from './Common.types';
-import {TSpan} from './Span.types';
 
 export type TRawTestDefinition = TTestSchemas['TestDefinition'];
 
@@ -34,9 +33,7 @@ export interface ITestDefinitionState {
   changeList: TChange[];
   isLoading: boolean;
   isInitialized: boolean;
-  affectedSpans: string[];
   selectedAssertion: string;
-  selectedSpan?: TSpan;
   isDraftMode: boolean;
 }
 
@@ -52,8 +49,5 @@ export type TTestDefinitionSliceActions = {
   revertDefinition: CaseReducer<ITestDefinitionState, PayloadAction<{originalSelector: string}>>;
   resetDefinitionList: CaseReducer<ITestDefinitionState>;
   setAssertionResults: CaseReducer<ITestDefinitionState, PayloadAction<TAssertionResults>>;
-  clearAffectedSpans: CaseReducer<ITestDefinitionState>;
-  setAffectedSpans: CaseReducer<ITestDefinitionState, PayloadAction<string[]>>;
-  setSelectedAssertion: CaseReducer<ITestDefinitionState, PayloadAction<string>>;
-  setSelectedSpan: CaseReducer<ITestDefinitionState, PayloadAction<TSpan | undefined>>;
+  setSelectedAssertion: CaseReducer<ITestDefinitionState, PayloadAction<TAssertionResultEntry | undefined>>;
 };

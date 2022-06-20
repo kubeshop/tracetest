@@ -21,12 +21,13 @@ const selectAssertionResultsBySpan = createSelector(
 
     // Map and flat items in one single array
     const results = assertionResults.resultList
-      .flatMap(selector =>
-        selector.resultList.map(assertion => ({
-          id: selector.selector,
+      .flatMap(assertionResult =>
+        assertionResult.resultList.map(assertion => ({
+          id: assertionResult.selector,
           attribute: assertion.assertion.attribute,
-          label: `${selector.selectorList.map(({value}) => value).join(' ')} ${
-            selector.pseudoSelector?.selector ?? ''
+          assertionResult,
+          label: `${assertionResult.selectorList.map(({value}) => value).join(' ')} ${
+            assertionResult.pseudoSelector?.selector ?? ''
           }`,
           result: assertion.spanResults.find(spanResult => spanResult.spanId === spanId),
         }))
@@ -37,8 +38,9 @@ const selectAssertionResultsBySpan = createSelector(
       .reduce((prev: TResultAssertions, curr) => {
         const value = prev[curr.attribute] || {failed: [], passed: []};
 
-        if (curr.result?.passed) value.passed.push({id: curr.id, label: curr.label});
-        else value.failed.push({id: curr.id, label: curr.label});
+        if (curr.result?.passed)
+          value.passed.push({id: curr.id, label: curr.label, assertionResult: curr.assertionResult});
+        else value.failed.push({id: curr.id, label: curr.label, assertionResult: curr.assertionResult});
 
         return {...prev, [curr.attribute]: value};
       }, {});
@@ -59,16 +61,8 @@ const TestDefinitionSelectors = () => ({
   selectDefinitionBySelector: createSelector(selectDefinitionList, selectorSelector, (definitionList, selector) =>
     definitionList.find(def => def.selector === selector)
   ),
-  selectAffectedSpans: createSelector(stateSelector, ({affectedSpans, assertionResults, selectedAssertion}) => {
-    if (!selectedAssertion) return affectedSpans;
-
-    const foundAssertion = assertionResults?.resultList.find(({selector}) => selector === selectedAssertion);
-
-    return !foundAssertion ? [] : affectedSpans;
-  }),
   selectSelectedAssertion: createSelector(stateSelector, ({selectedAssertion}) => selectedAssertion),
   selectAssertionResultsBySpan,
-  selectSelectedSpan: createSelector(stateSelector, ({selectedSpan}) => selectedSpan),
   selectIsDraftMode: createSelector(stateSelector, ({isDraftMode}) => isDraftMode),
 });
 
