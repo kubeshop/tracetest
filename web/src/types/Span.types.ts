@@ -20,3 +20,9 @@ export type TSpan = Model<
     children?: TSpan[];
   }
 >;
+
+export interface ISpanState {
+  affectedSpans: string[],
+  focusedSpan: string,
+  selectedSpan?: TSpan, 
+}

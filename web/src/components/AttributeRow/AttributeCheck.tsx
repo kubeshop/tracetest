@@ -19,8 +19,9 @@ const AttributeCheck = ({items, type}: IProps) => {
 
   const handleOnClick = (id: string) => {
     TraceAnalyticsService.onAttributeCheckClick();
+    const {assertionResult} = items.find(item => item.id === id)!;
     openBottomPanel();
-    setSelectedAssertion(id);
+    setSelectedAssertion(assertionResult);
     scrollTo({elementId: `assertion-${id}`, containerId: 'assertions-container'});
   };
 

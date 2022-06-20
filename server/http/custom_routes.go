@@ -2,8 +2,10 @@ package http
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 	"github.com/kubeshop/tracetest/server/openapi"
@@ -30,6 +32,7 @@ func (c *customController) Routes() openapi.Routes {
 	routes := c.router.Routes()
 
 	routes[c.getRouteIndex("GetRunResultJUnit")].HandlerFunc = c.GetRunResultJUnit
+	routes[c.getRouteIndex("GetTestVersionDefinitionFile")].HandlerFunc = c.GetTestVersionDefinitionFile
 
 	for index, route := range routes {
 		routeName := fmt.Sprintf("%s %s", route.Method, route.Pattern)
@@ -40,6 +43,64 @@ func (c *customController) Routes() openapi.Routes {
 	}
 
 	return routes
+}
+
+// GetRunResultJUnit - get test run results in JUnit xml format
+func (c *customController) GetRunResultJUnit(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	testIdParam := params["testId"]
+
+	runIdParam := params["runId"]
+
+	result, err := c.service.GetRunResultJUnit(r.Context(), testIdParam, runIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/xml; charset=UTF-8")
+	w.Write(result.Body.([]byte))
+}
+
+// GetTestVersionDefinitionFile - Get the test definition as an YAML file
+func (c *customController) GetTestVersionDefinitionFile(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	testIdParam := params["testId"]
+
+	versionParam, err := parseInt32Parameter(params["version"], true)
+	if err != nil {
+		c.errorHandler(w, r, &openapi.ParsingError{Err: err}, nil)
+		return
+	}
+
+	result, err := c.service.GetTestVersionDefinitionFile(r.Context(), testIdParam, versionParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	w.Header().Set("Content-Type", "application/yaml; charset=UTF-8")
+	w.Write(result.Body.([]byte))
+}
+
+const errMsgRequiredMissing = "required parameter is missing"
+
+func parseInt32Parameter(param string, required bool) (int32, error) {
+	if param == "" {
+		if required {
+			return 0, errors.New(errMsgRequiredMissing)
+		}
+
+		return 0, nil
+	}
+
+	val, err := strconv.ParseInt(param, 10, 32)
+	if err != nil {
+		return -1, err
+	}
+
+	return int32(val), nil
 }
 
 func (c *customController) instrumentRoute(name string, route string, f http.HandlerFunc) http.HandlerFunc {
@@ -91,22 +152,4 @@ func (c *customController) getRouteIndex(key string) int {
 	}
 
 	panic(fmt.Errorf(`route "%s" not found`, key))
-}
-
-// GetRunResultJUnit - get test run results in JUnit xml format
-func (c *customController) GetRunResultJUnit(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	testIdParam := params["testId"]
-
-	runIdParam := params["runId"]
-
-	result, err := c.service.GetRunResultJUnit(r.Context(), testIdParam, runIdParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/xml; charset=UTF-8")
-	w.Write(result.Body.([]byte))
 }

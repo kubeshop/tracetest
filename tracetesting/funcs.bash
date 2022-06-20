@@ -26,7 +26,11 @@ test() {
     echo -n "OK"
   else
     echo "FAIL"
+    echo "$name.json:"
     cat results/responses/$name.json
+    echo "$name.xml:"
+    cat results/$name.xml
+
   fi
   echo
   return $res

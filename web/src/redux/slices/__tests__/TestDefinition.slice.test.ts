@@ -15,6 +15,7 @@ import Reducer, {
   revertDefinition,
   setAssertionResults,
   updateDefinition,
+  setSelectedAssertion,
 } from '../TestDefinition.slice';
 
 const {definitionList} = TestDefinitionMock.model();
@@ -197,5 +198,28 @@ describe('TestDefinitionReducer', () => {
     });
 
     expect(result.isDraftMode).toBeFalsy();
+  });
+
+  describe('setSelectedAssertion', () => {
+    it('should handle on setSelectedAssertion', () => {
+      const assertionResultEntry = {
+        id: faker.datatype.uuid(),
+        selector: faker.random.word(),
+        originalSelector: faker.random.word(),
+        spanIds: ['12345', '67890'],
+        selectorList: [],
+        resultList: [],
+      };
+
+      const result = Reducer(initialState, setSelectedAssertion(assertionResultEntry));
+
+      expect(result.selectedAssertion).toEqual(assertionResultEntry.selector);
+    });
+
+    it('should handle on setSelectedAssertion with empty value', () => {
+      const result = Reducer({...initialState, selectedAssertion: '12345'}, setSelectedAssertion());
+
+      expect(result.selectedAssertion).toEqual('');
+    });
   });
 });
