@@ -1103,7 +1103,7 @@ type ApiGetTestVersionDefinitionFileRequest struct {
 	version    int32
 }
 
-func (r ApiGetTestVersionDefinitionFileRequest) Execute() (*DefinitionFile, *http.Response, error) {
+func (r ApiGetTestVersionDefinitionFileRequest) Execute() (string, *http.Response, error) {
 	return r.ApiService.GetTestVersionDefinitionFileExecute(r)
 }
 
@@ -1127,13 +1127,13 @@ func (a *ApiApiService) GetTestVersionDefinitionFile(ctx context.Context, testId
 }
 
 // Execute executes the request
-//  @return DefinitionFile
-func (a *ApiApiService) GetTestVersionDefinitionFileExecute(r ApiGetTestVersionDefinitionFileRequest) (*DefinitionFile, *http.Response, error) {
+//  @return string
+func (a *ApiApiService) GetTestVersionDefinitionFileExecute(r ApiGetTestVersionDefinitionFileRequest) (string, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
 		formFiles           []formFile
-		localVarReturnValue *DefinitionFile
+		localVarReturnValue string
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.GetTestVersionDefinitionFile")
@@ -1159,7 +1159,7 @@ func (a *ApiApiService) GetTestVersionDefinitionFileExecute(r ApiGetTestVersionD
 	}
 
 	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"application/json"}
+	localVarHTTPHeaderAccepts := []string{"application/yaml"}
 
 	// set Accept header
 	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
