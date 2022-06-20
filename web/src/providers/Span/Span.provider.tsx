@@ -1,16 +1,24 @@
 import {noop} from 'lodash';
-import {createContext, useCallback, useContext, useMemo} from 'react';
+import {createContext, useCallback, useContext, useMemo, useState} from 'react';
+import {useStoreActions} from 'react-flow-renderer';
 import {useSelector} from 'react-redux';
 import {useAppDispatch} from 'redux/hooks';
 import {setAffectedSpans, setFocusedSpan, clearAffectedSpans, setSelectedSpan} from 'redux/slices/Span.slice';
 import SpanSelectors from 'selectors/Span.selectors';
 import {TSpan} from 'types/Span.types';
+import SpanService from '../../services/Span.service';
+// import {useLazySearchSpansQuery} from '../../redux/apis/TraceTest.api';
+// import {useTestDefinition} from '../TestDefinition/TestDefinition.provider';
+import {useTestRun} from '../TestRun/TestRun.provider';
 
 interface IContext {
   selectedSpan?: TSpan;
   affectedSpans: string[];
   focusedSpan: string;
-  onSelectSpan(spanId: TSpan): void;
+  matchedSpans: string[];
+  searchText: string;
+  onSearch(searchText: string): void;
+  onSelectSpan(spanId: string): void;
   onSetAffectedSpans(spanIdList: string[]): void;
   onSetFocusedSpan(spanId: string): void;
   onClearAffectedSpans(): void;
@@ -19,6 +27,9 @@ interface IContext {
 export const Context = createContext<IContext>({
   affectedSpans: [],
   focusedSpan: '',
+  matchedSpans: [],
+  searchText: '',
+  onSearch: noop,
   onSelectSpan: noop,
   onSetFocusedSpan: noop,
   onClearAffectedSpans: noop,
@@ -32,16 +43,29 @@ interface IProps {
 export const useSpan = () => useContext(Context);
 
 const SpanProvider = ({children}: IProps) => {
+  const [searchText, setSearchText] = useState('');
+  const [matchedSpans, setMatchedSpans] = useState<string[]>([]);
+
   const dispatch = useAppDispatch();
+  const addSelected = useStoreActions(actions => actions.addSelectedElements);
+  const {
+    run: {trace: {spans = []} = {}},
+  } = useTestRun();
+  // const {test: {id: testId = ''} = {}} = useTestDefinition();
   const selectedSpan = useSelector(SpanSelectors.selectSelectedSpan);
   const affectedSpans = useSelector(SpanSelectors.selectAffectedSpans);
   const focusedSpan = useSelector(SpanSelectors.selectFocusedSpan);
+  // const [triggerSearch, {data: foundSpans = []}] = useLazySearchSpansQuery();
 
   const onSelectSpan = useCallback(
-    (span: TSpan) => {
-      dispatch(setSelectedSpan({span}));
+    (spanId: string) => {
+      const span = spans.find(({id}) => id === spanId);
+      if (span) {
+        addSelected([{id: span?.id}]);
+        dispatch(setSelectedSpan({span}));
+      }
     },
-    [dispatch]
+    [addSelected, dispatch, spans]
   );
 
   const onSetAffectedSpans = useCallback(
@@ -62,17 +86,42 @@ const SpanProvider = ({children}: IProps) => {
     dispatch(clearAffectedSpans());
   }, [dispatch]);
 
+  const onSearch = useCallback(
+    (query: string) => {
+      const spanIdList = SpanService.searchSpanList(spans, query);
+      setMatchedSpans(spanIdList);
+      setSearchText(query);
+
+      console.log('@@query', query, spanIdList);
+    },
+    [spans]
+  );
+
   const value = useMemo<IContext>(
     () => ({
       selectedSpan,
       affectedSpans,
+      matchedSpans,
       focusedSpan,
+      searchText,
+      onSearch,
       onSelectSpan,
       onSetAffectedSpans,
       onSetFocusedSpan,
       onClearAffectedSpans,
     }),
-    [affectedSpans, focusedSpan, onClearAffectedSpans, onSelectSpan, onSetAffectedSpans, onSetFocusedSpan, selectedSpan]
+    [
+      affectedSpans,
+      focusedSpan,
+      matchedSpans,
+      onClearAffectedSpans,
+      onSearch,
+      onSelectSpan,
+      onSetAffectedSpans,
+      onSetFocusedSpan,
+      searchText,
+      selectedSpan,
+    ]
   );
 
   return <Context.Provider value={value}>{children}</Context.Provider>;

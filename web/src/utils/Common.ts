@@ -14,3 +14,12 @@ export const isJson = (str: string) => {
 
   return Number.isNaN(Number(str)) && !isBoolean(str) && true;
 };
+
+export const getObjectIncludesText = (object: unknown, text: string): boolean => {
+  if (!text.length) return false;
+
+  const searchTextLower = text.toLowerCase();
+  const stringSpan = JSON.stringify(object).toLowerCase();
+
+  return stringSpan.includes(searchTextLower);
+};

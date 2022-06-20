@@ -125,6 +125,11 @@ const TraceTestAPI = createApi({
       query: ({testId, runId, query}) => `/tests/${testId}/run/${runId}/select?query=${encodeURIComponent(query)}`,
       providesTags: (result, error, {query}) => (result ? [{type: Tags.SPAN, id: `${query}-LIST`}] : []),
     }),
+    // TODO: add when ready
+    // searchSpans: build.query<string[], {testId: string; runId: string; query: string}>({
+    //   query: ({testId, runId, query}) => `/tests/${testId}/run/${runId}/select?query=${encodeURIComponent(query)}`,
+    //   providesTags: (result, error, {query}) => (result ? [{type: Tags.SPAN, id: `${query}-SEARCH`}] : []),
+    // }),
   }),
 });
 
@@ -143,6 +148,8 @@ export const {
   useLazyGetRunListQuery,
   useDryRunMutation,
   useDeleteRunByIdMutation,
+  // useSearchSpansQuery,
+  // useLazySearchSpansQuery,
 } = TraceTestAPI;
 export const {endpoints} = TraceTestAPI;
 
