@@ -62,7 +62,7 @@ const SpanService = () => ({
     if (!searchText.trim()) return [];
 
     return spanList.reduce<string[]>(
-      (matchList, span) => (getObjectIncludesText(span, searchText) ? [...matchList, span.id] : matchList),
+      (matchList, span) => (getObjectIncludesText(span.attributes, searchText) ? [...matchList, span.id] : matchList),
       []
     );
   },
