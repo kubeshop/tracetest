@@ -1,7 +1,7 @@
 import {format, parseISO} from 'date-fns';
 import {RESULT_DATE_FORMAT} from '../../constants/Date.constants';
 import {TTestRun} from '../../types/TestRun.types';
-import RunActionsDropdown from '../RunActionsMenu';
+import RunActionsMenu from '../RunActionsMenu';
 import TestState from '../TestState';
 import * as S from './RunCard.styled';
 
@@ -50,7 +50,7 @@ const ResultCard: React.FC<IResultCardProps> = ({
       <S.TextContainer>
         <S.Text>{failedAssertionCount}</S.Text>
       </S.TextContainer>
-      <RunActionsDropdown resultId={runId} testId={testId} />
+      <RunActionsMenu resultId={runId} testId={testId} />
     </S.ResultCard>
   );
 };

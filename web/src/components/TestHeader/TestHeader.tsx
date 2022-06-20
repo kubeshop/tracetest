@@ -11,7 +11,7 @@ import {TTest} from 'types/Test.types';
 import {TTestRunState} from 'types/TestRun.types';
 import Info from './Info';
 import * as S from './TestHeader.styled';
-import RunActionsDropdown from '../RunActionsMenu';
+import RunActionsMenu from '../RunActionsMenu';
 
 interface IProps {
   executionTime?: number;
@@ -83,7 +83,7 @@ const TestHeader = ({
             Run Test
           </Button>
         )}
-        {run.id && <RunActionsDropdown resultId={run.id} testId={id} isRunView />}
+        {run.id && <RunActionsMenu resultId={run.id} testId={id} isRunView />}
       </S.RightSection>
       <VersionMismatchModal
         description="Running the test will use the latest version of the test."
