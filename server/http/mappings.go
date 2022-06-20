@@ -7,6 +7,8 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
+	"github.com/kubeshop/tracetest/server/encoding/yaml/conversion"
+	"github.com/kubeshop/tracetest/server/encoding/yaml/definition"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/traces"
@@ -14,6 +16,11 @@ import (
 )
 
 type OpenAPIMapper struct{}
+
+func (m OpenAPIMapper) TestDefinitionFile(in model.Test) definition.Test {
+	testDefinition, _ := conversion.ConvertOpenAPITestIntoDefinitionObject(m.Test(in))
+	return testDefinition
+}
 
 func (m OpenAPIMapper) Test(in model.Test) openapi.Test {
 	return openapi.Test{
