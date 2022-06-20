@@ -9,10 +9,11 @@ import * as S from './RunActionsMenu.styled';
 interface IProps {
   resultId: string;
   testId: string;
+  testVersion: number;
   isRunView?: boolean;
 }
 
-const RunActionsMenu = ({resultId, testId, isRunView = false}: IProps) => {
+const RunActionsMenu = ({resultId, testId, isRunView = false, testVersion}: IProps) => {
   const {loadJUnit, loadTestDefinitionYaml} = useFileViewerModal();
   const [deleteRunById] = useDeleteRunByIdMutation();
   const navigate = useNavigate();
@@ -34,7 +35,7 @@ const RunActionsMenu = ({resultId, testId, isRunView = false}: IProps) => {
             <Menu.Item
               data-cy="view-test-definition-button"
               key="view-test-definition"
-              onClick={() => loadTestDefinitionYaml(testId, 1)}
+              onClick={() => loadTestDefinitionYaml(testId, testVersion)}
             >
               Test Definition
             </Menu.Item>

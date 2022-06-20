@@ -83,7 +83,7 @@ const TestHeader = ({
             Run Test
           </Button>
         )}
-        {run.id && <RunActionsMenu resultId={run.id} testId={id} isRunView />}
+        {run.id && <RunActionsMenu resultId={run.id} testId={id} isRunView testVersion={testVersion} />}
       </S.RightSection>
       <VersionMismatchModal
         description="Running the test will use the latest version of the test."

@@ -50,7 +50,7 @@ const ResultCard: React.FC<IResultCardProps> = ({
       <S.TextContainer>
         <S.Text>{failedAssertionCount}</S.Text>
       </S.TextContainer>
-      <RunActionsMenu resultId={runId} testId={testId} />
+      <RunActionsMenu resultId={runId} testId={testId} testVersion={testVersion} />
     </S.ResultCard>
   );
 };

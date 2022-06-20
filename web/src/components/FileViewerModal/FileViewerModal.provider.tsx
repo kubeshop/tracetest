@@ -1,7 +1,7 @@
 import {noop} from 'lodash';
 import {createContext, useCallback, useContext, useMemo, useState} from 'react';
 import FileViewerModal from 'components/FileViewerModal';
-import {useLazyGetJUnitByRunIdQuery} from 'redux/apis/TraceTest.api';
+import {useLazyGetJUnitByRunIdQuery, useLazyGetTestDefinitionYamlByRunIdQuery} from 'redux/apis/TraceTest.api';
 
 interface IContext {
   loadJUnit(testId: string, runId: string): void;
@@ -41,6 +41,7 @@ const FileViewerModalProvider = ({children}: IProps) => {
     type: 'definition',
   });
   const [getJUnit] = useLazyGetJUnitByRunIdQuery();
+  const [getTestDefinitionYaml] = useLazyGetTestDefinitionYamlByRunIdQuery();
 
   const loadJUnit = useCallback(
     async (testId: string, runId: string) => {
@@ -51,10 +52,14 @@ const FileViewerModalProvider = ({children}: IProps) => {
     [getJUnit]
   );
 
-  const loadTestDefinitionYaml = useCallback((testId: string, version: number) => {
-    setIsFileViewerOpen(true);
-    setFileViewerData({data: `name: ${testId}-${version}`, type: 'definition'});
-  }, []);
+  const loadTestDefinitionYaml = useCallback(
+    async (testId: string, version: number) => {
+      const data = await getTestDefinitionYaml({testId, version}).unwrap();
+      setIsFileViewerOpen(true);
+      setFileViewerData({data, type: 'definition'});
+    },
+    [getTestDefinitionYaml]
+  );
 
   const value: IContext = useMemo(() => ({loadJUnit, loadTestDefinitionYaml}), [loadJUnit, loadTestDefinitionYaml]);
   const fileProps = propsMap[fileViewerData.type];
