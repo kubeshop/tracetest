@@ -4,11 +4,9 @@ import {useStoreActions} from 'react-flow-renderer';
 import RunBottomPanel from 'components/RunBottomPanel';
 import {RunLayoutProvider} from 'components/RunLayout';
 import RunTopPanel from 'components/RunTopPanel';
-import {useAppDispatch, useAppSelector} from 'redux/hooks';
-import {setSelectedSpan} from 'redux/slices/TestDefinition.slice';
-import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
 import {TTest} from 'types/Test.types';
 import {TTestRun} from 'types/TestRun.types';
+import {useSpan} from '../../providers/Span/Span.provider';
 
 interface IProps {
   displayError: boolean;
@@ -17,17 +15,18 @@ interface IProps {
 }
 
 const Run = ({displayError, run, test}: IProps) => {
-  const dispatch = useAppDispatch();
   const addSelected = useStoreActions(actions => actions.addSelectedElements);
-  const selectedSpan = useAppSelector(TestDefinitionSelectors.selectSelectedSpan);
+  const {selectedSpan, onSelectSpan} = useSpan();
 
-  const onSelectSpan = useCallback(
+  const handleSelectSpan = useCallback(
     (spanId: string) => {
       const span = run?.trace?.spans.find(({id}) => id === spanId);
-      if (span) addSelected([{id: span?.id}]);
-      dispatch(setSelectedSpan(span));
+      if (span) {
+        addSelected([{id: span?.id}]);
+        onSelectSpan(span);
+      }
     },
-    [addSelected, dispatch, run?.trace?.spans]
+    [addSelected, onSelectSpan, run?.trace?.spans]
   );
 
   if (displayError) {
@@ -37,9 +36,9 @@ const Run = ({displayError, run, test}: IProps) => {
   return (
     <RunLayoutProvider
       bottomPanel={
-        <RunBottomPanel onSelectSpan={onSelectSpan} run={run} selectedSpan={selectedSpan!} testId={test?.id!} />
+        <RunBottomPanel onSelectSpan={handleSelectSpan} run={run} selectedSpan={selectedSpan!} testId={test?.id!} />
       }
-      topPanel={<RunTopPanel onSelectSpan={onSelectSpan} run={run} selectedSpan={selectedSpan!} />}
+      topPanel={<RunTopPanel onSelectSpan={handleSelectSpan} run={run} selectedSpan={selectedSpan!} />}
     />
   );
 };

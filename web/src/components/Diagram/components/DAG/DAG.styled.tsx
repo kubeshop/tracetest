@@ -1,4 +1,4 @@
-import {Button} from 'antd';
+import {Button, Typography} from 'antd';
 import styled, {css} from 'styled-components';
 
 export const Container = styled.div<{$showAffected: boolean}>`
@@ -23,6 +23,10 @@ export const Controls = styled.div`
   z-index: 9;
 `;
 
+export const SelectorControls = styled(Controls)`
+  left: 0;
+`;
+
 export const ZoomButton = styled(Button)`
   color: rgba(3, 24, 73, 0.3);
   width: 24px;
@@ -31,4 +35,11 @@ export const ZoomButton = styled(Button)`
   &:focus {
     background-color: unset;
   }
+`;
+
+export const ToggleButton = styled(ZoomButton)``;
+
+export const FocusedText = styled(Typography.Text)`
+  color: rgba(3, 24, 73, 0.3);
+  margin-left: 8px;
 `;

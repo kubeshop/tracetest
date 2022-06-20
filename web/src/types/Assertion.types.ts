@@ -55,6 +55,7 @@ export type TAssertionSpanResult = Model<TRawAssertionSpanResult, {}>;
 export interface IResult {
   id: string;
   label: string;
+  assertionResult: TAssertionResultEntry;
 }
 
 export type TResultAssertions = Record<

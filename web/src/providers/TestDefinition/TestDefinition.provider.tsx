@@ -4,12 +4,9 @@ import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import {createContext, useCallback, useContext, useEffect, useMemo} from 'react';
 import {useGetTestByIdQuery} from 'redux/apis/TraceTest.api';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
-import {
-  setAffectedSpans as setAffectedSpansAction,
-  setSelectedAssertion as setSelectedAssertionAction,
-} from 'redux/slices/TestDefinition.slice';
+import {setSelectedAssertion as setSelectedAssertionAction} from 'redux/slices/TestDefinition.slice';
 import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
-import {TAssertionResults} from 'types/Assertion.types';
+import {TAssertionResultEntry, TAssertionResults} from 'types/Assertion.types';
 import {TTest} from 'types/Test.types';
 import {TTestDefinitionEntry} from 'types/TestDefinition.types';
 import useTestDefinitionCrud from './hooks/useTestDefinitionCrud';
@@ -29,8 +26,7 @@ interface IContext {
   isError: boolean;
   isDraftMode: boolean;
   test?: TTest;
-  setAffectedSpans(spanIds: string[]): void;
-  setSelectedAssertion(selectorId: string): void;
+  setSelectedAssertion(assertionResult?: TAssertionResultEntry): void;
 }
 
 export const Context = createContext<IContext>({
@@ -46,7 +42,6 @@ export const Context = createContext<IContext>({
   isError: false,
   isDraftMode: false,
   definitionList: [],
-  setAffectedSpans: noop,
   setSelectedAssertion: noop,
 });
 
@@ -87,16 +82,9 @@ const TestDefinitionProvider: React.FC<IProps> = ({children, testId, runId}) => 
     if (isInitialized && run.state === 'FINISHED') dryRun(definitionList);
   }, [dryRun, definitionList, isInitialized, run.state]);
 
-  const setAffectedSpans = useCallback(
-    spanIds => {
-      dispatch(setAffectedSpansAction(spanIds));
-    },
-    [dispatch]
-  );
-
   const setSelectedAssertion = useCallback(
-    selectorId => {
-      dispatch(setSelectedAssertionAction(selectorId));
+    (assertionResult?: TAssertionResultEntry) => {
+      dispatch(setSelectedAssertionAction(assertionResult));
     },
     [dispatch]
   );
@@ -116,7 +104,6 @@ const TestDefinitionProvider: React.FC<IProps> = ({children, testId, runId}) => 
       definitionList,
       cancel,
       test,
-      setAffectedSpans,
       setSelectedAssertion,
       revert,
     }),
@@ -134,7 +121,6 @@ const TestDefinitionProvider: React.FC<IProps> = ({children, testId, runId}) => 
       remove,
       update,
       test,
-      setAffectedSpans,
       setSelectedAssertion,
     ]
   );

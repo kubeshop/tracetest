@@ -9,9 +9,7 @@ export const initialState: ITestDefinitionState = {
   changeList: [],
   isLoading: false,
   isInitialized: false,
-  affectedSpans: [],
   selectedAssertion: '',
-  selectedSpan: undefined,
   isDraftMode: false,
 };
 
@@ -91,20 +89,9 @@ const testDefinitionSlice = createSlice<ITestDefinitionState, TTestDefinitionSli
     setAssertionResults(state, {payload}) {
       state.assertionResults = payload;
     },
-    clearAffectedSpans(state) {
-      state.affectedSpans = [];
-    },
-    setAffectedSpans(state, {payload: spanIds}) {
-      state.affectedSpans = spanIds;
-    },
-    setSelectedAssertion(state, {payload: selectorId}) {
-      const assertionResult = state?.assertionResults?.resultList?.find(assertion => assertion.selector === selectorId);
-      const spanIds = assertionResult?.spanIds ?? [];
-      state.selectedAssertion = selectorId;
-      state.affectedSpans = spanIds;
-    },
-    setSelectedSpan(state, {payload: span}) {
-      state.selectedSpan = span;
+    setSelectedAssertion(state, {payload: assertionResult}) {
+      if (assertionResult) state.selectedAssertion = assertionResult.selector;
+      else state.selectedAssertion = '';
     },
   },
   extraReducers: builder => {
@@ -145,9 +132,6 @@ export const {
   resetDefinitionList,
   revertDefinition,
   reset,
-  clearAffectedSpans,
-  setAffectedSpans,
   setSelectedAssertion,
-  setSelectedSpan,
 } = testDefinitionSlice.actions;
 export default testDefinitionSlice.reducer;

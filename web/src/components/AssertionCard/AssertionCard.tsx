@@ -4,6 +4,7 @@ import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provide
 import {useCallback} from 'react';
 import {useStore} from 'react-flow-renderer';
 import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
+import {useSpan} from '../../providers/Span/Span.provider';
 import {useAppSelector} from '../../redux/hooks';
 import AssertionAnalyticsService from '../../services/Analytics/AssertionAnalytics.service';
 import {TAssertionResultEntry} from '../../types/Assertion.types';
@@ -25,6 +26,7 @@ const AssertionCard: React.FC<TAssertionCardProps> = ({
   onEdit,
 }) => {
   const {setSelectedAssertion, revert} = useTestDefinition();
+  const {onSetFocusedSpan} = useSpan();
   const store = useStore();
   const {selectedElements} = store.getState();
 
@@ -46,12 +48,13 @@ const AssertionCard: React.FC<TAssertionCardProps> = ({
   );
 
   const handleOnClick = () => {
+    onSetFocusedSpan('');
     if (selectedAssertion === selector) {
-      return setSelectedAssertion('');
+      return setSelectedAssertion();
     }
 
     AssertionAnalyticsService.onAssertionClick();
-    setSelectedAssertion(selector);
+    setSelectedAssertion(assertionResult);
   };
 
   const resetDefinition: React.MouseEventHandler = useCallback(
