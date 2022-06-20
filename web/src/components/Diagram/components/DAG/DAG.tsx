@@ -34,8 +34,9 @@ const DAG: React.FC<IDiagramProps> = ({
         parentIds: span.parentId ? [span.parentId] : [],
         data: span,
         type: TraceNodes.TraceNode,
+        className: affectedSpans.includes(span.id) ? 'affected' : '',
       })),
-    [spans]
+    [affectedSpans, spans]
   );
 
   const elementList = useDAGChart<TSpan>(nodeList, selectedSpan, onSelectSpan);

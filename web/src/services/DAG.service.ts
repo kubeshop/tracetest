@@ -7,6 +7,7 @@ export interface IDAGNode<T> {
   id: string;
   parentIds: string[];
   type: TraceNodes;
+  className?: string;
 }
 
 export type TElementList = Elements<unknown>;
@@ -28,13 +29,14 @@ const DAGService = () => ({
     return dag;
   },
   getDagElementList(dag: Dag<TNode, undefined>) {
-    const dagNodeList: TElementList = dag.descendants().map(({data: {id, data, type}, x, y}) => {
+    const dagNodeList: TElementList = dag.descendants().map(({data: {id, data, type, className}, x, y}) => {
       return {
         id,
         type,
         data,
         position: {x: x!, y: parseFloat(String(y))},
         sourcePosition: Position.Top,
+        className,
       };
     });
 
