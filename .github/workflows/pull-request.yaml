@@ -211,10 +211,11 @@ jobs:
           location: ${{ secrets.GKE_ZONE }}
           credentials: ${{ secrets.GKE_SA_KEY }}
 
-      - name: Build CLI
+      - name: Install CLI
         run: |
-          cd cli
-          make build
+          curl -Lo tracetest.tar.gz https://github.com/kubeshop/tracetest/releases/download/v0.5.3/tracetest-v0.5.3-linux-amd64.tar.gz
+          tar -xvf tracetest.tar.gz
+          cp tracetest cli/
 
       - name: Forward port
         run: |
