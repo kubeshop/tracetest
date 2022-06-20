@@ -25,7 +25,7 @@ const WebSocketService = () => ({
       // in which case `waitToInitSubscription` will throw
     }
     await waitToCleanSubscription;
-    webSocketGateway.unsubscribe(resource, '1234');
+    webSocketGateway.unsubscribe(resource);
   },
 });
 

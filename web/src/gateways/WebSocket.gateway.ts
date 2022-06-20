@@ -33,7 +33,7 @@ interface IWebSocketGateway {
   /** Subscribes to updates on the given `resource` */
   subscribe(resource: string, listener: IListenerFunction): void;
   /** Cancels a subscription on the given `resource` */
-  unsubscribe(resource: string, subscriptionId: string): void;
+  unsubscribe(resource: string): void;
 }
 
 interface IParams {
@@ -42,12 +42,21 @@ interface IParams {
 
 const MAX_RECONNECTION_ATTEMPTS = 4;
 const DELAY_RECONNECTION_ATTEMPTS = 1000;
+enum MESSAGE_REQUEST_TYPE {
+  SUBSCRIBE = 'subscribe',
+  UNSUBSCRIBE = 'unsubscribe',
+}
+enum MESSAGE_RESPONSE_TYPE {
+  SUCCESS = 'success',
+  UPDATE = 'update',
+}
 
 const WebSocketGateway = ({url}: IParams): IWebSocketGateway => {
   let socket: WebSocket | null = null;
   let isConnected: boolean = false;
   let pendingToSend: string[] = [];
   let listeners: Record<string, IListenerFunction[]> = {};
+  let subscriptionIds: Record<string, string> = {};
   let reconnectionAttempts: number = 0;
   let attempts: VoidFunction[] = [];
 
@@ -74,8 +83,16 @@ const WebSocketGateway = ({url}: IParams): IWebSocketGateway => {
   const messageListener = (event: MessageEvent) => {
     const data = JSON.parse(event.data);
     debug('messageListener: %O', data);
-    const eventListeners = listeners[data.resource] || [];
-    eventListeners.forEach(listener => listener(data));
+
+    if (data.type === MESSAGE_RESPONSE_TYPE.UPDATE) {
+      const eventListeners = listeners[data.resource] || [];
+      eventListeners.forEach(listener => listener(data));
+    }
+
+    if (data.type === MESSAGE_RESPONSE_TYPE.SUCCESS && data.resource) {
+      subscriptionIds[data.resource] = data?.message?.subscriptionId;
+      debug('subscriptionIds: %O', subscriptionIds);
+    }
   };
 
   const connect = () => {
@@ -92,6 +109,7 @@ const WebSocketGateway = ({url}: IParams): IWebSocketGateway => {
     isConnected = false;
     pendingToSend = [];
     listeners = {};
+    subscriptionIds = {};
     reconnectionAttempts = 0;
   };
 
@@ -145,13 +163,15 @@ const WebSocketGateway = ({url}: IParams): IWebSocketGateway => {
     },
     subscribe(resource, listener) {
       debug('subscribe %s', resource);
-      const message: IMessage = {type: 'subscribe', resource};
+      const message: IMessage = {type: MESSAGE_REQUEST_TYPE.SUBSCRIBE, resource};
       this.send(message);
       this.on(resource, listener);
     },
-    unsubscribe(resource, subscriptionId) {
+    unsubscribe(resource) {
       debug('unsubscribe %s', resource);
-      const message: IMessage = {type: 'unsubscribe', resource, subscriptionId};
+      const subscriptionId = subscriptionIds?.[resource] ?? '';
+      delete subscriptionIds[resource];
+      const message: IMessage = {type: MESSAGE_REQUEST_TYPE.UNSUBSCRIBE, resource, subscriptionId};
       this.send(message);
       this.off(resource);
     },
