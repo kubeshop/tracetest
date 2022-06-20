@@ -3,7 +3,6 @@ package http
 import (
 	"context"
 	"encoding/hex"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -13,7 +12,6 @@ import (
 	"github.com/kubeshop/tracetest/server/assertions"
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/assertions/selectors"
-	"github.com/kubeshop/tracetest/server/encoding/yaml/definition"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/junit"
@@ -399,45 +397,10 @@ func (c controller) GetTestVersionDefinitionFile(ctx context.Context, testID str
 		return handleDBError(err), err
 	}
 
-	// As openapi-generator just tags the fields using `json`, and we are actively using
-	// openapi.HttpRequest as part of the definition, we need this dirty hack to allow us to
-	// omit empty values.
-	getYamlFileFromDefinition := func(def definition.Test) ([]byte, error) {
-		defMap := make(map[string]interface{}, 0)
-		jsonBytes, err := json.Marshal(def)
-		if err != nil {
-			return []byte{}, nil
-		}
-
-		err = json.Unmarshal(jsonBytes, &defMap)
-		if err != nil {
-			return []byte{}, nil
-		}
-
-		if def.Trigger.HTTPRequest.Auth.Type == "" {
-			// remove auth field so we don't have an unnecessary empty structure in the definition
-			trigger := defMap["trigger"].(map[string]interface{})
-			httpRequest := trigger["httpRequest"].(map[string]interface{})
-			delete(httpRequest, "auth")
-		}
-
-		bytes, err := yaml.Marshal(defMap)
-		if err != nil {
-			return []byte{}, nil
-		}
-
-		return bytes, nil
-	}
-
-	testDefinitionFile := c.openapi.TestDefinitionFile(test)
-	bytes, err := getYamlFileFromDefinition(testDefinitionFile)
+	res, err := yaml.Marshal(test)
 	if err != nil {
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
 	}
 
-	definitionFile := openapi.DefinitionFile{
-		Content: string(bytes),
-	}
-
-	return openapi.Response(200, definitionFile), nil
+	return openapi.Response(200, res), nil
 }

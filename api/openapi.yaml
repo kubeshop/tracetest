@@ -412,6 +412,6 @@ paths:
         200:
           description: OK
           content:
-            application/json:
+            application/yaml:
               schema:
-                $ref: "./tests.yaml#/components/schemas/DefinitionFile"
+                type: string
