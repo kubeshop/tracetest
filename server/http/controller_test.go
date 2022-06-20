@@ -38,7 +38,9 @@ func TestContains_Issue617(t *testing.T) {
 	definition := openapi.TestDefinition{
 		Definitions: []openapi.TestDefinitionDefinitions{
 			{
-				Selector: "span[tracetest.span.type = \"http\"  service.name = \"pokeshop\"  name = \"POST /pokemon/import\"]",
+				Selector: openapi.Selector{
+					Query: `span[tracetest.span.type = "http" service.name = "pokeshop"  name = "POST /pokemon/import"]`,
+				},
 				Assertions: []openapi.Assertion{
 					{
 						Attribute:  "http.response.body",
@@ -54,7 +56,30 @@ func TestContains_Issue617(t *testing.T) {
 		AllPassed: true,
 		Results: []openapi.AssertionResultsResults{
 			{
-				Selector: "span[tracetest.span.type = \"http\"  service.name = \"pokeshop\"  name = \"POST /pokemon/import\"]",
+				Selector: openapi.Selector{
+					Query: `span[tracetest.span.type = "http" service.name = "pokeshop"  name = "POST /pokemon/import"]`,
+					Structure: []openapi.SpanSelector{
+						{
+							Filters: []openapi.SelectorFilter{
+								{
+									Property: "tracetest.span.type",
+									Operator: "=",
+									Value:    "http",
+								},
+								{
+									Property: "service.name",
+									Operator: "=",
+									Value:    "pokeshop",
+								},
+								{
+									Property: "name",
+									Operator: "=",
+									Value:    "POST /pokemon/import",
+								},
+							},
+						},
+					},
+				},
 				Results: []openapi.AssertionResult{
 					{
 						AllPassed: true,
