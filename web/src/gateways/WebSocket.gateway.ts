@@ -1,5 +1,4 @@
 import debugModule from 'debug';
-import {LOCALHOST_URL_WEB_SOCKET} from 'constants/Common.constants';
 
 const debug = debugModule('WebSocketGateway');
 
@@ -178,8 +177,16 @@ const WebSocketGateway = ({url}: IParams): IWebSocketGateway => {
   };
 };
 
-const URL = document.baseURI.includes('localhost') ? LOCALHOST_URL_WEB_SOCKET : `${document.baseURI}ws/`;
-const webSocketGateway = WebSocketGateway({url: URL});
+function getWebSocketURL() {
+  const {serverPathPrefix = '/'} = window.ENV || {};
+  const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+  const hostname = window.location.hostname;
+  const port = process.env.NODE_ENV === 'development' ? '8080' : window.location.port;
+  const pathname = serverPathPrefix === '/' ? '/ws' : `${serverPathPrefix}/ws`;
+  return `${protocol}://${hostname}:${port}${pathname}`;
+}
+
+const webSocketGateway = WebSocketGateway({url: getWebSocketURL()});
 webSocketGateway.connect();
 
 export default webSocketGateway;

@@ -1,5 +1,4 @@
 export const BASE_URL = 'http://localhost:8080';
-export const LOCALHOST_URL_WEB_SOCKET = 'ws://localhost:8080/ws';
 export const SENTRY_DNS = 'https://8411cbb3b7d84c879f711f0e642a28e3@o1229268.ingest.sentry.io/6375361';
 
 export const SENTRY_ALLOWED_URLS = [/.*?localhost:3000/, /.*?tracetest.io/];
