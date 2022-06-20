@@ -91,8 +91,6 @@ const SpanProvider = ({children}: IProps) => {
       const spanIdList = SpanService.searchSpanList(spans, query);
       setMatchedSpans(spanIdList);
       setSearchText(query);
-
-      console.log('@@query', query, spanIdList);
     },
     [spans]
   );
