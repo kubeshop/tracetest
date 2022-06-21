@@ -111,7 +111,7 @@ func convertOpenAPITestDefinitionIntoDefinitionArray(testDefinition *openapi.Tes
 		}
 
 		newDefinition := definition.TestDefinition{
-			Selector:   *def.Selector,
+			Selector:   *def.Selector.Query,
 			Assertions: assertions,
 		}
 		definitionArray = append(definitionArray, newDefinition)

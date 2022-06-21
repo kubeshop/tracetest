@@ -244,7 +244,9 @@ func TestDefinitionToOpenAPIConversion(t *testing.T) {
 				Definition: &openapi.TestDefinition{
 					Definitions: []openapi.TestDefinitionDefinitions{
 						{
-							Selector: openAPIStr(`span[tracetest.span.type="http"]`),
+							Selector: &openapi.Selector{
+								Query: openAPIStr(`span[tracetest.span.type="http"]`),
+							},
 							Assertions: []openapi.Assertion{
 								{
 									Attribute:  openAPIStr("tracetest.span.duration"),

@@ -7,7 +7,7 @@ import AssertionResult from './AssertionResult.model';
 const AssertionResults = ({allPassed = false, results = []}: TRawAssertionResults): TAssertionResults => {
   return {
     allPassed,
-    resultList: results.map(({selector = '', results: resultList = []}) => ({
+    resultList: results.map(({selector: {query: selector = ''} = {}, results: resultList = []}) => ({
       id: uniqueId(),
       selector,
       spanIds: AssertionService.getSpanIds(resultList),

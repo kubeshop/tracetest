@@ -14,7 +14,9 @@ func TestDefinitionsOrder(t *testing.T) {
 	input := openapi.TestDefinition{
 		Definitions: []openapi.TestDefinitionDefinitions{
 			{
-				Selector: "selector 1",
+				Selector: openapi.Selector{
+					Query: "selector 1",
+				},
 				Assertions: []openapi.Assertion{
 					{
 						Attribute:  "attr 1",
@@ -29,7 +31,9 @@ func TestDefinitionsOrder(t *testing.T) {
 				},
 			},
 			{
-				Selector: "selector 2",
+				Selector: openapi.Selector{
+					Query: "selector 2",
+				},
 				Assertions: []openapi.Assertion{
 					{
 						Attribute:  "attr 3",
@@ -48,7 +52,9 @@ func TestDefinitionsOrder(t *testing.T) {
 
 	expectedJSON := `{
 		"definitions": [{
-				"selector": "selector 1",
+				"selector": {
+					"query": "selector 1"
+				},
 				"assertions": [{
 						"attribute": "attr 1",
 						"comparator": "=",
@@ -62,7 +68,9 @@ func TestDefinitionsOrder(t *testing.T) {
 				]
 			},
 			{
-				"selector": "selector 2",
+				"selector": {
+					"query": "selector 2"
+				},
 				"assertions": [{
 						"attribute": "attr 3",
 						"comparator": "=",
@@ -101,7 +109,9 @@ func TestResultsOrder(t *testing.T) {
 	input := openapi.AssertionResults{
 		Results: []openapi.AssertionResultsResults{
 			{
-				Selector: "selector 1",
+				Selector: openapi.Selector{
+					Query: "selector 1",
+				},
 				Results: []openapi.AssertionResult{
 					{
 						Assertion: openapi.Assertion{
@@ -120,7 +130,9 @@ func TestResultsOrder(t *testing.T) {
 				},
 			},
 			{
-				Selector: "selector 2",
+				Selector: openapi.Selector{
+					Query: "selector 2",
+				},
 				Results: []openapi.AssertionResult{
 					{
 						Assertion: openapi.Assertion{
@@ -144,7 +156,9 @@ func TestResultsOrder(t *testing.T) {
 	expectedJSON := `{
 		"results": [
 			{
-				"selector": "selector 1",
+				"selector": {
+					"query": "selector 1"
+				},
 				"results": [
 					{
 						"assertion": {
@@ -163,7 +177,9 @@ func TestResultsOrder(t *testing.T) {
 				]
 			},
 			{
-				"selector": "selector 2",
+				"selector": {
+					"query": "selector 2"
+				},
 				"results": [
 					{
 						"assertion": {

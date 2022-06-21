@@ -9,7 +9,7 @@ const AssertionResultsMock: IMockFactory<TAssertionResults, TRawAssertionResults
     return {
       allPassed: faker.datatype.boolean(),
       results: new Array(faker.datatype.number({min: 2, max: 10})).fill(null).map((item, index) => ({
-        selector: `span[http.status_code] = "20${index}"]`,
+        selector: {query: `span[http.status_code] = "20${index}"]`},
         results: new Array(faker.datatype.number({min: 2, max: 10})).fill(null).map(() => AssertionResultMock.raw()),
       })),
       ...data,

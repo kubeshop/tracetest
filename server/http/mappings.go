@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
+	"github.com/kubeshop/tracetest/server/assertions/selectors"
 	"github.com/kubeshop/tracetest/server/encoding/yaml/conversion"
 	"github.com/kubeshop/tracetest/server/encoding/yaml/definition"
 	"github.com/kubeshop/tracetest/server/model"
@@ -114,7 +115,7 @@ func (m OpenAPIMapper) Definition(in model.OrderedMap[model.SpanQuery, []model.A
 		}
 
 		defs[i] = openapi.TestDefinitionDefinitions{
-			Selector:   string(spanQuery),
+			Selector:   m.Selector(spanQuery),
 			Assertions: assertions,
 		}
 		i++
@@ -122,6 +123,54 @@ func (m OpenAPIMapper) Definition(in model.OrderedMap[model.SpanQuery, []model.A
 
 	return openapi.TestDefinition{
 		Definitions: defs,
+	}
+}
+
+func (m OpenAPIMapper) Selector(in model.SpanQuery) openapi.Selector {
+	structuredSelector := selectors.FromSpanQuery(in)
+
+	spanSelectors := make([]openapi.SpanSelector, 0)
+	for _, spanSelector := range structuredSelector.SpanSelectors {
+		spanSelectors = append(spanSelectors, m.SpanSelector(spanSelector))
+	}
+
+	return openapi.Selector{
+		Query:     string(in),
+		Structure: spanSelectors,
+	}
+}
+
+func (m OpenAPIMapper) SpanSelector(in selectors.SpanSelector) openapi.SpanSelector {
+	filters := make([]openapi.SelectorFilter, 0)
+	for _, filter := range in.Filters {
+		filters = append(filters, openapi.SelectorFilter{
+			Property: filter.Property,
+			Operator: filter.Operation.Name,
+			Value:    filter.Value.AsString(),
+		})
+	}
+
+	var pseudoClass *openapi.SelectorPseudoClass
+	if in.PsedoClass != nil {
+		pseudoClass = &openapi.SelectorPseudoClass{
+			Name: in.PsedoClass.Name(),
+		}
+	}
+
+	if nthChildPseudoClass, ok := in.PsedoClass.(selectors.NthChildPseudoClass); ok {
+		pseudoClass.N = int32(nthChildPseudoClass.N)
+	}
+
+	var child *openapi.SpanSelector
+	if in.ChildSelector != nil {
+		childSelector := m.SpanSelector(*in.ChildSelector)
+		child = &childSelector
+	}
+
+	return openapi.SpanSelector{
+		Filters:       filters,
+		PseudoClass:   pseudoClass,
+		ChildSelector: child,
 	}
 }
 
@@ -194,7 +243,7 @@ func (m OpenAPIMapper) Result(in *model.RunResults) openapi.AssertionResults {
 			}
 		}
 		results[i] = openapi.AssertionResultsResults{
-			Selector: string(query),
+			Selector: m.Selector(query),
 			Results:  res,
 		}
 		i++
@@ -330,11 +379,11 @@ func (m ModelMapper) Tests(in []openapi.Test) []model.Test {
 func (m ModelMapper) ValidateDefinition(in openapi.TestDefinition) error {
 	selectors := map[string]bool{}
 	for _, d := range in.Definitions {
-		if _, exists := selectors[d.Selector]; exists {
-			return fmt.Errorf("duplicated selector %s", d.Selector)
+		if _, exists := selectors[d.Selector.Query]; exists {
+			return fmt.Errorf("duplicated selector %s", d.Selector.Query)
 		}
 
-		selectors[d.Selector] = true
+		selectors[d.Selector.Query] = true
 	}
 
 	return nil
@@ -347,7 +396,7 @@ func (m ModelMapper) Definition(in openapi.TestDefinition) model.OrderedMap[mode
 		for i, a := range d.Assertions {
 			asserts[i] = m.Assertion(a)
 		}
-		defs, _ = defs.Add(model.SpanQuery(d.Selector), asserts)
+		defs, _ = defs.Add(model.SpanQuery(d.Selector.Query), asserts)
 	}
 
 	return defs
@@ -398,7 +447,7 @@ func (m ModelMapper) Result(in openapi.AssertionResults) *model.RunResults {
 				Results:   sars,
 			}
 		}
-		results, _ = results.Add(model.SpanQuery(res.Selector), ars)
+		results, _ = results.Add(model.SpanQuery(res.Selector.Query), ars)
 	}
 
 	return &model.RunResults{

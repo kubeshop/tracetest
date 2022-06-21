@@ -14,7 +14,7 @@ export type TTestDefinitionEntry = {
 };
 
 export type TRawTestDefinitionEntry = {
-  selector: string;
+  selector: {query: string};
   assertions: TAssertion[];
 };
 

@@ -8,7 +8,7 @@ const TestDefinitionMock: IMockFactory<TTestDefinition, TRawTestDefinition> = ()
   raw(data = {}) {
     return {
       definitions: new Array(faker.datatype.number({min: 2, max: 10})).fill(null).map((item, index) => ({
-        selector: `span[http.status_code] = "20${index}"]`,
+        selector: {query: `span[http.status_code] = "20${index}"]`},
         assertions: new Array(faker.datatype.number({min: 2, max: 10})).fill(null).map(() => AssertionMock.raw()),
       })),
       ...data,

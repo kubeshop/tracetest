@@ -49,7 +49,7 @@ func (sb *SelectorParser) Selector(query string) (Selector, error) {
 
 func createSelectorFromParserSelector(parserSelector ParserSelector) (Selector, error) {
 	selector := Selector{
-		spanSelectors: make([]spanSelector, 0, len(parserSelector.SpanSelectors)),
+		SpanSelectors: make([]SpanSelector, 0, len(parserSelector.SpanSelectors)),
 	}
 	for _, parserSpanSelector := range parserSelector.SpanSelectors {
 		spanSelector, err := createSpanSelectorFromParserSpanSelector(parserSpanSelector)
@@ -57,31 +57,31 @@ func createSelectorFromParserSelector(parserSelector ParserSelector) (Selector, 
 			return Selector{}, err
 		}
 
-		selector.spanSelectors = append(selector.spanSelectors, spanSelector)
+		selector.SpanSelectors = append(selector.SpanSelectors, spanSelector)
 	}
 	return selector, nil
 }
 
-func createSpanSelectorFromParserSpanSelector(parserSpanSelector parserSpanSelector) (spanSelector, error) {
-	var childSelector *spanSelector = nil
+func createSpanSelectorFromParserSpanSelector(parserSpanSelector parserSpanSelector) (SpanSelector, error) {
+	var childSelector *SpanSelector = nil
 	if parserSpanSelector.ChildSelector != nil {
 		newChildSelector, err := createSpanSelectorFromParserSpanSelector(*parserSpanSelector.ChildSelector)
 		if err != nil {
-			return spanSelector{}, fmt.Errorf("could not create the child selector: %w", err)
+			return SpanSelector{}, fmt.Errorf("could not create the child selector: %w", err)
 		}
 		childSelector = &newChildSelector
 	}
 
 	pseudoClass, err := createPseudoClass(parserSpanSelector.PseudoClass)
 	if err != nil {
-		return spanSelector{}, err
+		return SpanSelector{}, err
 	}
 
 	filters := make([]filter, 0, len(parserSpanSelector.Filters))
 	for _, parserFilter := range parserSpanSelector.Filters {
 		operatorFunction, err := getOperatorFunction(parserFilter.Operator)
 		if err != nil {
-			return spanSelector{}, fmt.Errorf("could not create filter function: %w", err)
+			return SpanSelector{}, fmt.Errorf("could not create filter function: %w", err)
 		}
 
 		filter := filter{
@@ -93,27 +93,30 @@ func createSpanSelectorFromParserSpanSelector(parserSpanSelector parserSpanSelec
 		filters = append(filters, filter)
 	}
 
-	return spanSelector{
+	return SpanSelector{
 		Filters:       filters,
 		PsedoClass:    pseudoClass,
 		ChildSelector: childSelector,
 	}, nil
 }
 
-func getOperatorFunction(operator string) (filterFunction, error) {
+func getOperatorFunction(operator string) (FilterFunction, error) {
 	comparator, err := getComparatorFromOperator(operator)
 	if err != nil {
-		return nil, err
+		return FilterFunction{}, err
 	}
 
-	return func(span traces.Span, attribute string, value Value) error {
-		var attrValue string
-		if attribute == "name" {
-			attrValue = span.Name
-		} else {
-			attrValue = span.Attributes.Get(attribute)
-		}
-		return comparator.Compare(value.AsString(), attrValue)
+	return FilterFunction{
+		Name: operator,
+		Filter: func(span traces.Span, attribute string, value Value) error {
+			var attrValue string
+			if attribute == "name" {
+				attrValue = span.Name
+			} else {
+				attrValue = span.Attributes.Get(attribute)
+			}
+			return comparator.Compare(value.AsString(), attrValue)
+		},
 	}, nil
 }
 
@@ -121,7 +124,7 @@ func getComparatorFromOperator(operator string) (comparator.Comparator, error) {
 	registry := comparator.DefaultRegistry()
 	comparator, err := registry.Get(operator)
 	if err != nil {
-		return nil, fmt.Errorf("Unsupported comparator %s: %w", operator, err)
+		return nil, fmt.Errorf("unsupported comparator %s: %w", operator, err)
 	}
 
 	return comparator, nil

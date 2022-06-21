@@ -29,7 +29,9 @@ func setDefinition(t *testing.T, test *openapi.Test) {
 	body := openapi.TestDefinition{
 		Definitions: []openapi.TestDefinitionDefinitions{
 			{
-				Selector: `span[tracetest.span.type="http"]`,
+				Selector: openapi.Selector{
+					Query: `span[tracetest.span.type="http"]`,
+				},
 				Assertions: []openapi.Assertion{
 					{
 						Attribute:  "http.status_code",
