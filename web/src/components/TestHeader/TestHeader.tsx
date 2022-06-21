@@ -5,13 +5,13 @@ import TestState from 'components/TestState';
 import VersionMismatchModal from 'components/VersionMismatchModal/VersionMismatchModal';
 import {TestState as TestStateEnum} from 'constants/TestRun.constants';
 import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
+import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import TestAnalyticsService from 'services/Analytics/TestAnalytics.service';
 import {TTest} from 'types/Test.types';
 import {TTestRunState} from 'types/TestRun.types';
 import Info from './Info';
 import * as S from './TestHeader.styled';
-import Actions from './Actions';
-import {useTestRun} from '../../providers/TestRun/TestRun.provider';
+import RunActionsMenu from '../RunActionsMenu';
 
 interface IProps {
   executionTime?: number;
@@ -83,7 +83,7 @@ const TestHeader = ({
             Run Test
           </Button>
         )}
-        {run.id && <Actions resultId={run.id} testId={id} />}
+        {run.id && <RunActionsMenu resultId={run.id} testId={id} isRunView testVersion={testVersion} />}
       </S.RightSection>
       <VersionMismatchModal
         description="Running the test will use the latest version of the test."

@@ -1,7 +1,3 @@
-import debugModule from 'debug';
-
-const debug = debugModule('WebSocketGateway');
-
 interface IData<T> {
   event: T;
   resource: string;
@@ -65,7 +61,6 @@ const WebSocketGateway = ({url}: IParams): IWebSocketGateway => {
   };
 
   const openListener = () => {
-    debug('openListener');
     isConnected = true;
     cleanUpAttempts();
     pendingToSend.forEach(pending => socket?.send(pending));
@@ -73,7 +68,6 @@ const WebSocketGateway = ({url}: IParams): IWebSocketGateway => {
   };
 
   const closeListener = () => {
-    debug('closeListener');
     isConnected = false;
     cleanUpAttempts();
     reconnect();
@@ -81,7 +75,6 @@ const WebSocketGateway = ({url}: IParams): IWebSocketGateway => {
 
   const messageListener = (event: MessageEvent) => {
     const data = JSON.parse(event.data);
-    debug('messageListener: %O', data);
 
     if (data.type === MESSAGE_RESPONSE_TYPE.UPDATE) {
       const eventListeners = listeners[data.resource] || [];
@@ -90,7 +83,6 @@ const WebSocketGateway = ({url}: IParams): IWebSocketGateway => {
 
     if (data.type === MESSAGE_RESPONSE_TYPE.SUCCESS && data.resource) {
       subscriptionIds[data.resource] = data?.message?.subscriptionId;
-      debug('subscriptionIds: %O', subscriptionIds);
     }
   };
 
@@ -113,7 +105,6 @@ const WebSocketGateway = ({url}: IParams): IWebSocketGateway => {
   };
 
   const reconnect = () => {
-    debug('reconnect %d', reconnectionAttempts);
     if (reconnectionAttempts >= MAX_RECONNECTION_ATTEMPTS) {
       disconnect();
       return;
@@ -131,43 +122,35 @@ const WebSocketGateway = ({url}: IParams): IWebSocketGateway => {
 
   return {
     connect() {
-      debug('connect');
       connect();
     },
     disconnect() {
-      debug('disconnect');
       disconnect();
     },
     on(event, listener) {
-      debug('on');
       const eventListeners = listeners[event] || [];
       eventListeners.push(listener);
       listeners = {...listeners, [event]: eventListeners};
     },
     off(event) {
-      debug('off');
       delete listeners[event];
     },
     send(message) {
-      debug('send %O', message);
       if (!socket) {
         return;
       }
       if (!isConnected) {
-        debug('send pending');
         pendingToSend.push(JSON.stringify(message));
         return;
       }
       socket.send(JSON.stringify(message));
     },
     subscribe(resource, listener) {
-      debug('subscribe %s', resource);
       const message: IMessage = {type: MESSAGE_REQUEST_TYPE.SUBSCRIBE, resource};
       this.send(message);
       this.on(resource, listener);
     },
     unsubscribe(resource) {
-      debug('unsubscribe %s', resource);
       const subscriptionId = subscriptionIds?.[resource] ?? '';
       delete subscriptionIds[resource];
       const message: IMessage = {type: MESSAGE_REQUEST_TYPE.UNSUBSCRIBE, resource, subscriptionId};
