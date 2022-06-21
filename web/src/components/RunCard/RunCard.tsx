@@ -1,14 +1,13 @@
 import {format, parseISO} from 'date-fns';
 import {RESULT_DATE_FORMAT} from '../../constants/Date.constants';
 import {TTestRun} from '../../types/TestRun.types';
+import RunActionsMenu from '../RunActionsMenu';
 import TestState from '../TestState';
 import * as S from './RunCard.styled';
-import ResultCardActions from './RunCardCardActions';
 
 interface IResultCardProps {
   run: TTestRun;
   testId: string;
-  onDelete(resultId: string): void;
   onClick(resultId: string): void;
 }
 
@@ -25,7 +24,6 @@ const ResultCard: React.FC<IResultCardProps> = ({
   },
   testId,
   onClick,
-  onDelete,
 }) => {
   const startDate = format(parseISO(createdAt), RESULT_DATE_FORMAT);
 
@@ -52,7 +50,7 @@ const ResultCard: React.FC<IResultCardProps> = ({
       <S.TextContainer>
         <S.Text>{failedAssertionCount}</S.Text>
       </S.TextContainer>
-      <ResultCardActions resultId={runId} testId={testId} onDelete={onDelete} />
+      <RunActionsMenu resultId={runId} testId={testId} testVersion={testVersion} />
     </S.ResultCard>
   );
 };

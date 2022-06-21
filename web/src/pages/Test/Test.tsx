@@ -3,11 +3,10 @@ import {withTracker} from 'ga-4-react';
 import {useNavigate, useParams} from 'react-router-dom';
 import {useGetTestByIdQuery} from 'redux/apis/TraceTest.api';
 import Layout from 'components/Layout';
-
+import {TTestRun} from 'types/TestRun.types';
+import TestHeader from 'components/TestHeader';
 import * as S from './Test.styled';
 import TestDetails from './TestDetails';
-import {TTestRun} from '../../types/TestRun.types';
-import TestHeader from '../../components/TestHeader';
 
 const TestPage: React.FC = () => {
   const navigate = useNavigate();
