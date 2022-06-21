@@ -386,7 +386,7 @@ func (m ModelMapper) Result(in openapi.AssertionResults) *model.RunResults {
 			for j, sar := range r.SpanResults {
 				sid, _ := trace.SpanIDFromHex(sar.SpanId)
 				sars[j] = model.SpanAssertionResult{
-					SpanID:        sid,
+					SpanID:        &sid,
 					ObservedValue: sar.ObservedValue,
 					CompareErr:    fmt.Errorf(sar.Error),
 				}

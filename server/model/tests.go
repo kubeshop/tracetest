@@ -65,7 +65,7 @@ type (
 	}
 
 	SpanAssertionResult struct {
-		SpanID        trace.SpanID
+		SpanID        *trace.SpanID
 		ObservedValue string
 		CompareErr    error
 	}
