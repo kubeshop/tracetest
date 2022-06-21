@@ -62,13 +62,13 @@ func TestAssertion(t *testing.T) {
 			name: "CanAssertOnSpanMatchCount",
 			testDef: (model.OrderedMap[model.SpanQuery, []model.Assertion]{}).MustAdd(`span[service.name="Pokeshop"]`, []model.Assertion{
 				{
-					Attribute:  ":count",
+					Attribute:  "spans_collection.count",
 					Comparator: comparator.Eq,
 					Value:      "1",
 				},
 			}).MustAdd(`span[service.name="NotExists"]`, []model.Assertion{
 				{
-					Attribute:  ":count",
+					Attribute:  "spans_collection.count",
 					Comparator: comparator.Eq,
 					Value:      "0",
 				},
@@ -86,7 +86,7 @@ func TestAssertion(t *testing.T) {
 			expectedResult: (model.OrderedMap[model.SpanQuery, []model.AssertionResult]{}).MustAdd(`span[service.name="Pokeshop"]`, []model.AssertionResult{
 				{
 					Assertion: model.Assertion{
-						Attribute:  ":count",
+						Attribute:  "spans_collection.count",
 						Comparator: comparator.Eq,
 						Value:      "1",
 					},
@@ -101,7 +101,7 @@ func TestAssertion(t *testing.T) {
 			}).MustAdd(`span[service.name="NotExists"]`, []model.AssertionResult{
 				{
 					Assertion: model.Assertion{
-						Attribute:  ":count",
+						Attribute:  "spans_collection.count",
 						Comparator: comparator.Eq,
 						Value:      "0",
 					},

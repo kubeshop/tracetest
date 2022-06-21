@@ -13,12 +13,16 @@ import (
 )
 
 func (sar SpanAssertionResult) MarshalJSON() ([]byte, error) {
+	sid := ""
+	if sar.SpanID != nil {
+		sid = sar.SpanID.String()
+	}
 	return json.Marshal(&struct {
-		SpanID        string
+		SpanID        *string
 		ObservedValue string
 		CompareErr    string
 	}{
-		SpanID:        sar.SpanID.String(),
+		SpanID:        &sid,
 		ObservedValue: sar.ObservedValue,
 		CompareErr:    errToString(sar.CompareErr),
 	})
@@ -34,12 +38,16 @@ func (sar *SpanAssertionResult) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	sid, err := trace.SpanIDFromHex(aux.SpanID)
-	if err != nil {
-		return err
+	var sid *trace.SpanID
+	if aux.SpanID != "" {
+		s, err := trace.SpanIDFromHex(aux.SpanID)
+		if err != nil {
+			return err
+		}
+		sid = &s
 	}
 
-	sar.SpanID = &sid
+	sar.SpanID = sid
 	sar.ObservedValue = aux.ObservedValue
 	if err := stringToErr(aux.CompareErr); err != nil {
 		if err.Error() == comparator.ErrNoMatch.Error() {

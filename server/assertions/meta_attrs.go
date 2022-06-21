@@ -10,7 +10,7 @@ import (
 var (
 	errMetaAttrNotDefined = errors.New("meta attribute not defined")
 	metaAttrsRegistry     = map[string]MetaAttribute{
-		":count": count{},
+		"spans_collection.count": count{},
 	}
 )
 

@@ -74,7 +74,7 @@ type (
 )
 
 func (a Attribute) IsMeta() bool {
-	return a[0] == ':'
+	return len(a) >= 18 && a[0:17] == "spans_collection."
 }
 
 func (a Attribute) String() string {

@@ -27,7 +27,6 @@ func Assert(defs model.OrderedMap[model.SpanQuery, []model.Assertion], trace tra
 }
 
 func assert(a model.Assertion, spans []traces.Span) model.AssertionResult {
-
 	if a.Attribute.IsMeta() {
 		return assertMeta(a, spans)
 	}
@@ -36,7 +35,6 @@ func assert(a model.Assertion, spans []traces.Span) model.AssertionResult {
 }
 
 func assertMeta(a model.Assertion, spans []traces.Span) model.AssertionResult {
-
 	res := func(res model.SpanAssertionResult, err error) model.AssertionResult {
 		return model.AssertionResult{
 			Assertion: a,
