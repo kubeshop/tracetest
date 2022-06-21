@@ -20,6 +20,30 @@ describe('Show test details', () => {
     cy.get('[data-cy^=result-card-]').should('have.length.above', 0);
   });
 
+  it('should display the jUnit report', () => {
+    cy.visit(`http://localhost:3000/test/${testId}`);
+
+    cy.get('[data-cy^=result-actions-button]').last().click();
+    cy.get('[data-cy=view-junit-button]').click();
+
+    cy.get('[data-cy=file-viewer-code-container]', {timeout: 10000}).should('be.visible');
+    cy.get('[data-cy=file-viewer-close]').click();
+
+    cy.get('[data-cy=file-viewer-code-container]').should('not.be.visible');
+  });
+
+  it('should display the test definition yaml', () => {
+    cy.visit(`http://localhost:3000/test/${testId}`);
+
+    cy.get('[data-cy^=result-actions-button]').first().click();
+    cy.get('[data-cy=view-test-definition-button]').click();
+
+    cy.get('[data-cy=file-viewer-code-container]').should('be.visible');
+    cy.get('[data-cy=file-viewer-close]').click();
+
+    cy.get('[data-cy=file-viewer-code-container]').should('not.be.visible');
+  });
+
   it('should run a new test', () => {
     cy.visit(`http://localhost:3000/test/${testId}`);
     cy.get(`[data-cy=test-details-run-test-button]`).click();
@@ -34,21 +58,4 @@ describe('Show test details', () => {
       cy.visit(`http://localhost:3000/test/${testId}/run/${testRunResultId}`);
     });
   });
-
-  // it('should update the test run result status', () => {
-  //   cy.visit(`http://localhost:3000/test/${testId}`);
-  //   cy.get(`[data-cy=test-details-run-test-button]`).click();
-  //   cy.location('pathname').should('match', /\/result\/.*/i);
-
-  //   cy.location().then(({pathname}) => {
-  //     const testRunResultId = getResultId(pathname);
-
-  //     cy.get('[data-cy=test-run-result-status]', { timeout: 2000 }).should('have.text', 'Test status:Awaiting trace');
-  //     cy.wait(2000);
-  //     cy.get('[data-cy=test-run-result-status]').should('have.text', 'Test status:Finished');
-  //     cy.get('[data-cy=test-header-back-button]').click();
-  //     cy.get(`[data-cy=test-run-result-status-${testRunResultId}]`, { timeout: 10000 }).should('have.text', 'Finished');
-  //     cy.visit(`http://localhost:3000/test/${testId}/result/${testRunResultId}`);
-  //   });
-  // });
 });

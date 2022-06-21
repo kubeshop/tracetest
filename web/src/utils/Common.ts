@@ -23,3 +23,12 @@ export const getObjectIncludesText = (object: unknown, text: string): boolean =>
 
   return stringSpan.includes(searchTextLower);
 };
+
+export const downloadFile = (data: string, fileName: string): void => {
+  const element = document.createElement('a');
+  const file = new Blob([data]);
+  element.href = URL.createObjectURL(file);
+  element.download = fileName;
+  document.body.appendChild(element);
+  element.click();
+};

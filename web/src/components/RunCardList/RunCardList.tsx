@@ -1,7 +1,6 @@
 import {Badge} from 'antd';
 import ResultCard from 'components/RunCard';
 import {useNavigate} from 'react-router-dom';
-import {useDeleteRunByIdMutation} from 'redux/apis/TraceTest.api';
 import TestAnalyticsService from '../../services/Analytics/TestAnalytics.service';
 import {TTestRun} from '../../types/TestRun.types';
 import {TooltipQuestion} from '../TooltipQuestion/TooltipQuestion';
@@ -14,16 +13,10 @@ interface IProps {
 
 const ResultCardList = ({resultList, testId}: IProps) => {
   const navigate = useNavigate();
-  const [deleteRunById] = useDeleteRunByIdMutation();
 
   const handleOnResultClick = (runId: string) => {
     TestAnalyticsService.onTestRunClick();
     navigate(`/test/${testId}/run/${runId}`);
-  };
-
-  const handleOnDelete = (runId: string) => {
-    TestAnalyticsService.onDeleteTestRun();
-    deleteRunById({testId, runId});
   };
 
   return (
@@ -57,7 +50,7 @@ const ResultCardList = ({resultList, testId}: IProps) => {
       </S.Header>
       <S.List>
         {resultList.map(run => (
-          <ResultCard key={run.id} run={run} testId={testId} onClick={handleOnResultClick} onDelete={handleOnDelete} />
+          <ResultCard key={run.id} run={run} testId={testId} onClick={handleOnResultClick} />
         ))}
       </S.List>
     </S.ResultCardList>

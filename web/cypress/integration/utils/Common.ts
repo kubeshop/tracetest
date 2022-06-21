@@ -16,7 +16,7 @@ export const createTest = () => {
   $form.get(`[data-cy=demo-example-${camelCase(name)}]`).click();
   $form.get('[data-cy=create-test-submit]').click();
 
-  cy.location('pathname').should('match', /\/test\/.*/i);
+  cy.location('pathname').should('match', /\/test\/.*/i, {timeout: 10000});
   cy.location().then(({pathname}) => {
     const id = getTestId(pathname);
 
@@ -65,7 +65,7 @@ export const createMultipleTestRuns = (id: string, count: number) => {
     cy.get(`[data-cy=test-run-button-${id}]`).click();
     cy.location('pathname').should('match', /\/test\/.*/i);
     cy.wait(500);
-
+ 
     cy.visit('http://localhost:3000/');
   }
 };
