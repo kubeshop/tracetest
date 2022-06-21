@@ -73,8 +73,13 @@ type (
 	}
 )
 
+const (
+	metaPrefix    = "tracetest.selected_spans."
+	metaPrefixLen = len("tracetest.selected_spans.")
+)
+
 func (a Attribute) IsMeta() bool {
-	return len(a) >= 18 && a[0:17] == "spans_collection."
+	return len(a) > metaPrefixLen && a[0:metaPrefixLen] == metaPrefix
 }
 
 func (a Attribute) String() string {
