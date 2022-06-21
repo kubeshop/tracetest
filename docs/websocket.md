@@ -33,6 +33,7 @@ If the operation executes successfully, you will see a response like:
 ```json
 {
     "type": "success",
+    "resource": "test/{testID}/run/{runID}",
     "message": {
         "subscriptionId": "bdbc6cc8-bba6-4208-a8d3-d3c2c5b3e38b"
     }
