@@ -229,8 +229,12 @@ func (m OpenAPIMapper) Result(in *model.RunResults) openapi.AssertionResults {
 		for j, r := range inRes {
 			sres := make([]openapi.AssertionSpanResult, len(r.Results))
 			for k, asr := range r.Results {
+				sid := ""
+				if asr.SpanID != nil {
+					sid = asr.SpanID.String()
+				}
 				sres[k] = openapi.AssertionSpanResult{
-					SpanId:        asr.SpanID.String(),
+					SpanId:        sid,
 					ObservedValue: asr.ObservedValue,
 					Passed:        asr.CompareErr == nil,
 					Error:         errToString(asr.CompareErr),
@@ -256,7 +260,7 @@ func (m OpenAPIMapper) Result(in *model.RunResults) openapi.AssertionResults {
 }
 func (m OpenAPIMapper) Assertion(in model.Assertion) openapi.Assertion {
 	return openapi.Assertion{
-		Attribute:  in.Attribute,
+		Attribute:  in.Attribute.String(),
 		Comparator: in.Comparator.String(),
 		Expected:   in.Value,
 	}
@@ -433,7 +437,11 @@ func (m ModelMapper) Result(in openapi.AssertionResults) *model.RunResults {
 		for i, r := range res.Results {
 			sars := make([]model.SpanAssertionResult, len(r.SpanResults))
 			for j, sar := range r.SpanResults {
-				sid, _ := trace.SpanIDFromHex(sar.SpanId)
+				var sid *trace.SpanID
+				if sar.SpanId != "" {
+					s, _ := trace.SpanIDFromHex(sar.SpanId)
+					sid = &s
+				}
 				sars[j] = model.SpanAssertionResult{
 					SpanID:        sid,
 					ObservedValue: sar.ObservedValue,
@@ -459,7 +467,7 @@ func (m ModelMapper) Result(in openapi.AssertionResults) *model.RunResults {
 func (m ModelMapper) Assertion(in openapi.Assertion) model.Assertion {
 	comp, _ := m.Comparators.Get(in.Comparator)
 	return model.Assertion{
-		Attribute:  in.Attribute,
+		Attribute:  model.Attribute(in.Attribute),
 		Comparator: comp,
 		Value:      in.Expected,
 	}

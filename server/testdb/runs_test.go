@@ -71,7 +71,7 @@ func TestUpdateRun(t *testing.T) {
 				},
 				Results: []model.SpanAssertionResult{
 					{
-						SpanID:        run.Trace.RootSpan.ID,
+						SpanID:        &run.Trace.RootSpan.ID,
 						ObservedValue: "2000",
 						CompareErr:    nil,
 					},

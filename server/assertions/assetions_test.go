@@ -50,8 +50,65 @@ func TestAssertion(t *testing.T) {
 					},
 					Results: []model.SpanAssertionResult{
 						{
-							SpanID:        spanID,
+							SpanID:        &spanID,
 							ObservedValue: "2000",
+							CompareErr:    nil,
+						},
+					},
+				},
+			}),
+		},
+		{
+			name: "CanAssertOnSpanMatchCount",
+			testDef: (model.OrderedMap[model.SpanQuery, []model.Assertion]{}).MustAdd(`span[service.name="Pokeshop"]`, []model.Assertion{
+				{
+					Attribute:  "tracetest.selected_spans.count",
+					Comparator: comparator.Eq,
+					Value:      "1",
+				},
+			}).MustAdd(`span[service.name="NotExists"]`, []model.Assertion{
+				{
+					Attribute:  "tracetest.selected_spans.count",
+					Comparator: comparator.Eq,
+					Value:      "0",
+				},
+			}),
+			trace: traces.Trace{
+				RootSpan: traces.Span{
+					ID: spanID,
+					Attributes: traces.Attributes{
+						"service.name":            "Pokeshop",
+						"tracetest.span.duration": "2000",
+					},
+				},
+			},
+			expectedAllPassed: true,
+			expectedResult: (model.OrderedMap[model.SpanQuery, []model.AssertionResult]{}).MustAdd(`span[service.name="Pokeshop"]`, []model.AssertionResult{
+				{
+					Assertion: model.Assertion{
+						Attribute:  "tracetest.selected_spans.count",
+						Comparator: comparator.Eq,
+						Value:      "1",
+					},
+					Results: []model.SpanAssertionResult{
+						{
+							SpanID:        &spanID,
+							ObservedValue: "1",
+							CompareErr:    nil,
+						},
+					},
+				},
+			}).MustAdd(`span[service.name="NotExists"]`, []model.AssertionResult{
+				{
+					Assertion: model.Assertion{
+						Attribute:  "tracetest.selected_spans.count",
+						Comparator: comparator.Eq,
+						Value:      "0",
+					},
+					Results: []model.SpanAssertionResult{
+						{
+							SpanID:        nil,
+							ObservedValue: "0",
 							CompareErr:    nil,
 						},
 					},
@@ -93,7 +150,7 @@ func TestAssertion(t *testing.T) {
 					},
 					Results: []model.SpanAssertionResult{
 						{
-							SpanID:        spanID,
+							SpanID:        &spanID,
 							ObservedValue: `{"id":52}`,
 							CompareErr:    nil,
 						},
@@ -107,7 +164,7 @@ func TestAssertion(t *testing.T) {
 					},
 					Results: []model.SpanAssertionResult{
 						{
-							SpanID:        spanID,
+							SpanID:        &spanID,
 							ObservedValue: "2000",
 							CompareErr:    nil,
 						},

@@ -31,7 +31,7 @@ func FromRunResult(test model.Test, run model.Run) ([]byte, error) {
 					if errors.Is(sar.CompareErr, comparator.ErrNoMatch) {
 						fails++
 						c.Failure = &failure{
-							Attribute:   res.Assertion.Attribute,
+							Attribute:   res.Assertion.Attribute.String(),
 							ActualValue: sar.ObservedValue,
 						}
 					} else {

@@ -29,10 +29,12 @@ type (
 	SpanQuery string
 
 	Assertion struct {
-		Attribute  string
+		Attribute  Attribute
 		Comparator comparator.Comparator
 		Value      string
 	}
+
+	Attribute string
 
 	Run struct {
 		ID                        uuid.UUID
@@ -65,11 +67,24 @@ type (
 	}
 
 	SpanAssertionResult struct {
-		SpanID        trace.SpanID
+		SpanID        *trace.SpanID
 		ObservedValue string
 		CompareErr    error
 	}
 )
+
+const (
+	metaPrefix    = "tracetest.selected_spans."
+	metaPrefixLen = len("tracetest.selected_spans.")
+)
+
+func (a Attribute) IsMeta() bool {
+	return len(a) > metaPrefixLen && a[0:metaPrefixLen] == metaPrefix
+}
+
+func (a Attribute) String() string {
+	return string(a)
+}
 
 func (a Assertion) String() string {
 	return fmt.Sprintf(`"%s" %s "%s"`, a.Attribute, a.Comparator, a.Value)
