@@ -44,7 +44,7 @@ func convertOpenAPITestDefinitionIntoDefinitionArray(testDefinition openapi.Test
 		}
 
 		newDefinition := definition.TestDefinition{
-			Selector:   def.Selector,
+			Selector:   def.Selector.Query,
 			Assertions: assertions,
 		}
 		definitionArray = append(definitionArray, newDefinition)

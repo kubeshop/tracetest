@@ -107,7 +107,9 @@ func createTestDefinition(testID string) error {
 	body := openapi.TestDefinition{
 		Definitions: []openapi.TestDefinitionDefinitions{
 			{
-				Selector: `span[service.name="pokeshop" tracetest.span.type="http" name="POST /pokemon/import"]`,
+				Selector: openapi.Selector{
+					Query: `span[service.name="pokeshop" tracetest.span.type="http" name="POST /pokemon/import"]`,
+				},
 				Assertions: []openapi.Assertion{
 					{
 						Attribute:  "http.status_code",
