@@ -58,6 +58,63 @@ func TestAssertion(t *testing.T) {
 				},
 			}),
 		},
+		{
+			name: "CanAssertOnSpanMatchCount",
+			testDef: (model.OrderedMap[model.SpanQuery, []model.Assertion]{}).MustAdd(`span[service.name="Pokeshop"]`, []model.Assertion{
+				{
+					Attribute:  ":count",
+					Comparator: comparator.Eq,
+					Value:      "1",
+				},
+			}).MustAdd(`span[service.name="NotExists"]`, []model.Assertion{
+				{
+					Attribute:  ":count",
+					Comparator: comparator.Eq,
+					Value:      "0",
+				},
+			}),
+			trace: traces.Trace{
+				RootSpan: traces.Span{
+					ID: spanID,
+					Attributes: traces.Attributes{
+						"service.name":            "Pokeshop",
+						"tracetest.span.duration": "2000",
+					},
+				},
+			},
+			expectedAllPassed: true,
+			expectedResult: (model.OrderedMap[model.SpanQuery, []model.AssertionResult]{}).MustAdd(`span[service.name="Pokeshop"]`, []model.AssertionResult{
+				{
+					Assertion: model.Assertion{
+						Attribute:  ":count",
+						Comparator: comparator.Eq,
+						Value:      "1",
+					},
+					Results: []model.SpanAssertionResult{
+						{
+							SpanID:        &spanID,
+							ObservedValue: "1",
+							CompareErr:    nil,
+						},
+					},
+				},
+			}).MustAdd(`span[service.name="NotExists"]`, []model.AssertionResult{
+				{
+					Assertion: model.Assertion{
+						Attribute:  ":count",
+						Comparator: comparator.Eq,
+						Value:      "0",
+					},
+					Results: []model.SpanAssertionResult{
+						{
+							SpanID:        nil,
+							ObservedValue: "0",
+							CompareErr:    nil,
+						},
+					},
+				},
+			}),
+		},
 		// https://github.com/kubeshop/tracetest/issues/617
 		{
 			name: "ContainsWithJSON",
