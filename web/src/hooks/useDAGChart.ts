@@ -1,34 +1,25 @@
-import {Dag} from 'd3-dag';
 import {noop} from 'lodash';
-import {useCallback, useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
+
+import DAGService, {TNode} from 'services/DAG.service';
 import {TSpan} from 'types/Span.types';
-import DiagramService, {IDAGNode, TElementList, TNode} from '../services/DAG.service';
 
-export const useDAGChart = <T>(nodeList: TNode<T>[], selectedSpan?: TSpan, onSelectSpan = noop) => {
-  const [dag, setDag] = useState<Dag<IDAGNode<unknown>, undefined>>();
-  const [elementList, setElementList] = useState<TElementList>([]);
-
-  const loadData = useCallback(() => {
-    const info = DiagramService.getDagInfo(nodeList);
-
-    setDag(info.dag);
-    setElementList(info.elementList);
-  }, [nodeList]);
+export const useDAGChart = <T>(items: TNode<T>[], selectedSpan?: TSpan, onSelectSpan = noop) => {
+  const [nodes, setNodes] = useState([]);
+  const [edges, setEdges] = useState([]);
 
   useEffect(() => {
-    if (dag) {
-      const [dagNode] = dag.descendants();
-      const node = elementList.find(({id}) => id === dagNode?.data.id);
+    console.log('### useDAGChart: effect');
+    if (!items.length) return;
 
-      if (!selectedSpan && node) {
-        onSelectSpan(node.id);
-      }
+    const {nodes: generatedNodes, edges: generatedEdges} = DAGService.getNodesAndEdges(items);
+    setNodes(generatedNodes);
+    setEdges(generatedEdges);
+
+    if (!selectedSpan) {
+      onSelectSpan(generatedNodes[0].id);
     }
-  }, [dag, elementList, onSelectSpan, selectedSpan]);
+  }, [items]);
 
-  useEffect(() => {
-    if (nodeList.length) loadData();
-  }, [loadData, nodeList]);
-
-  return elementList;
+  return {nodes, edges};
 };

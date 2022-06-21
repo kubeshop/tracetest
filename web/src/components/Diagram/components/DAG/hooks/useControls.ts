@@ -1,5 +1,5 @@
 import {useCallback, useEffect} from 'react';
-import {useStore, useZoomPanHelper} from 'react-flow-renderer';
+import {useReactFlow, useStoreApi} from 'react-flow-renderer';
 import {useSpan} from 'providers/Span/Span.provider';
 
 interface IProps {
@@ -7,14 +7,15 @@ interface IProps {
 }
 
 const useControls = ({onSelectSpan}: IProps) => {
-  const {setCenter, fitView} = useZoomPanHelper();
+  const {setCenter, fitView} = useReactFlow();
   const {focusedSpan, onSetFocusedSpan, affectedSpans} = useSpan();
-  const {getState} = useStore();
+  const {getState} = useStoreApi();
   const indexOfFocused = affectedSpans.findIndex(spanId => spanId === focusedSpan) + 1;
 
   const getNodePosition = useCallback(
     (nodeId: string) => {
-      const {nodes} = getState();
+      const {nodeInternals} = getState();
+      const nodes = Array.from(nodeInternals).map(([, node]) => node);
       const {position} = nodes.find(node => node.id === nodeId) || {};
 
       return position || {x: 0, y: 0};

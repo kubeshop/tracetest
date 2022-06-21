@@ -1,5 +1,5 @@
 import {useCallback} from 'react';
-import {useStoreActions} from 'react-flow-renderer';
+// import {useStoreActions} from 'react-flow-renderer';
 
 import RunBottomPanel from 'components/RunBottomPanel';
 import {RunLayoutProvider} from 'components/RunLayout';
@@ -15,18 +15,19 @@ interface IProps {
 }
 
 const Run = ({displayError, run, test}: IProps) => {
-  const addSelected = useStoreActions(actions => actions.addSelectedElements);
+  // const addSelected = useStoreActions(actions => actions.addSelectedElements);
   const {selectedSpan, onSelectSpan} = useSpan();
 
   const handleSelectSpan = useCallback(
     (spanId: string) => {
       const span = run?.trace?.spans.find(({id}) => id === spanId);
       if (span) {
-        addSelected([{id: span?.id}]);
+        // addSelected([{id: span?.id}]);
         onSelectSpan(span);
       }
     },
-    [addSelected, onSelectSpan, run?.trace?.spans]
+    // [addSelected, onSelectSpan, run?.trace?.spans]
+    [onSelectSpan, run?.trace?.spans]
   );
 
   if (displayError) {

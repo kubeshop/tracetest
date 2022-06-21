@@ -1,8 +1,8 @@
 import {TNode} from 'services/DAG.service';
 
-export enum TraceNodes {
-  Skeleton = 'SkeletonNode',
-  TraceNode = 'TraceNode',
+export enum NodeTypesEnum {
+  Span = 'span',
+  Skeleton = 'skeleton',
 }
 
 export const skeletonNodeList: TNode<{}>[] = [
@@ -10,31 +10,31 @@ export const skeletonNodeList: TNode<{}>[] = [
     id: '1',
     parentIds: [],
     data: {},
-    type: TraceNodes.Skeleton,
+    type: NodeTypesEnum.Skeleton,
   },
   {
     id: '2',
     parentIds: ['1'],
     data: {},
-    type: TraceNodes.Skeleton,
+    type: NodeTypesEnum.Skeleton,
   },
   {
     id: '3',
     parentIds: ['1'],
     data: {},
-    type: TraceNodes.Skeleton,
+    type: NodeTypesEnum.Skeleton,
   },
   {
     id: '4',
     parentIds: ['2'],
     data: {},
-    type: TraceNodes.Skeleton,
+    type: NodeTypesEnum.Skeleton,
   },
   {
     id: '5',
     parentIds: ['1'],
     data: {},
-    type: TraceNodes.Skeleton,
+    type: NodeTypesEnum.Skeleton,
   },
 ];
 

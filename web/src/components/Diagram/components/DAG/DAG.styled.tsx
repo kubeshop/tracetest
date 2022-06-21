@@ -8,7 +8,7 @@ export const Container = styled.div<{$showAffected: boolean}>`
   ${({$showAffected}) =>
     $showAffected &&
     css`
-      .react-flow__node-TraceNode:not(.affected) > div {
+      .react-flow__node-span:not(.affected) > div {
         opacity: 0.5;
       }
     `}

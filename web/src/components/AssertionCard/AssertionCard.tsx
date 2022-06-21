@@ -2,7 +2,7 @@ import {Tooltip} from 'antd';
 import AssertionCheckRow from 'components/AssertionCheckRow';
 import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
 import {useCallback} from 'react';
-import {useStore} from 'react-flow-renderer';
+// import {useStoreApi} from 'react-flow-renderer';
 import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
 import {useSpan} from '../../providers/Span/Span.provider';
 import {useAppSelector} from '../../redux/hooks';
@@ -27,8 +27,8 @@ const AssertionCard: React.FC<TAssertionCardProps> = ({
 }) => {
   const {setSelectedAssertion, revert} = useTestDefinition();
   const {onSetFocusedSpan} = useSpan();
-  const store = useStore();
-  const {selectedElements} = store.getState();
+  // const store = useStoreApi();
+  // const {selectedElements} = store.getState();
 
   const selectedAssertion = useAppSelector(TestDefinitionSelectors.selectSelectedAssertion);
   const {
@@ -40,11 +40,13 @@ const AssertionCard: React.FC<TAssertionCardProps> = ({
 
   const getIsSelectedSpan = useCallback(
     (id: string): boolean => {
-      const found = selectedElements ? selectedElements.find(element => element.id === id) : undefined;
+      // const found = selectedElements ? selectedElements.find(element => element.id === id) : undefined;
 
-      return Boolean(found);
+      // return Boolean(found);
+      return false;
     },
-    [selectedElements]
+    // [selectedElements]
+    []
   );
 
   const handleOnClick = () => {
