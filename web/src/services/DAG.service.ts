@@ -1,20 +1,16 @@
-import {dagStratify, Dag, sugiyama, layeringSimplex, decrossOpt, coordCenter} from 'd3-dag';
-// import {ArrowHeadType, Elements, Position} from 'react-flow-renderer';
+import {coordCenter, Dag, dagStratify, decrossOpt, layeringSimplex, sugiyama} from 'd3-dag';
 import {MarkerType} from 'react-flow-renderer';
+
 import {NodeTypesEnum} from 'constants/Diagram.constants';
 
-export interface IDAGNode<T> {
+export interface INodeItem<T> {
   data: T;
   id: string;
   parentIds: string[];
   type: NodeTypesEnum;
-  className?: string;
 }
 
-// export type TElementList = Elements<unknown>;
-export type TNode<T = unknown> = IDAGNode<T>;
-
-function getDagLayout(nodeList: TNode[]) {
+function getDagLayout<T>(nodeList: INodeItem<T>[]) {
   const stratify = dagStratify();
   const dag = stratify(nodeList);
 
@@ -26,47 +22,36 @@ function getDagLayout(nodeList: TNode[]) {
 
   dagLayout(dag as never);
 
-  // console.log('### descendants', dag.descendants());
-  // console.log('### links', dag.links());
   return dag;
 }
 
-function getNodes(dag: Dag<TNode, undefined>) {
-  const nodes: any = dag.descendants().map(({data: {id, data, type, className}, x, y}) => {
-    return {
-      id,
-      type,
-      data,
-      position: {x, y},
-      // sourcePosition: Position.Top,
-      className,
-    };
-  });
-  return nodes;
+function getNodes<T>(dagLayout: Dag<INodeItem<T>, undefined>) {
+  return dagLayout.descendants().map(({data: {id, data, type}, x, y}) => ({
+    data,
+    id,
+    position: {x: x ?? 0, y: y ?? 0},
+    type,
+  }));
 }
 
-function getEdges(dag: Dag<TNode, undefined>) {
-  const edges: any = dag.links().map(({source, target}) => {
-    return {
-      id: `${source.data.id}-${target.data.id}`,
-      source: source.data.id,
-      target: target.data.id,
-      animated: true, // for animated edges
-      markerEnd: {type: MarkerType.ArrowClosed}, // arrow at the end of the edge
-    };
-  });
-  return edges;
+function getEdges<T>(dagLayout: Dag<INodeItem<T>, undefined>) {
+  return dagLayout.links().map(({source, target}) => ({
+    animated: true,
+    id: `${source.data.id}-${target.data.id}`,
+    markerEnd: {type: MarkerType.ArrowClosed},
+    source: source.data.id,
+    target: target.data.id,
+  }));
 }
 
 const DAGService = () => ({
-  getNodesAndEdges(nodeList: TNode[]) {
-    console.log('### running getNodesAndEdges');
-    const dag = getDagLayout(nodeList);
-    const nodes = getNodes(dag);
-    const edges = getEdges(dag);
-    // const elementList = this.getDagElementList(dag);
+  getNodesAndEdges<T>(nodeList: INodeItem<T>[]) {
+    console.log('### getNodesAndEdges');
+    const dagLayout = getDagLayout(nodeList);
+    const edges = getEdges(dagLayout);
+    const nodes = getNodes(dagLayout);
 
-    return {nodes, edges};
+    return {edges, nodes};
   },
 });
 

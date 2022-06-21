@@ -4,7 +4,7 @@ import {CompareOperator, PseudoSelector} from 'constants/Operator.constants';
 import {SELECTOR_DEFAULT_ATTRIBUTES, SemanticGroupNameNodeMap} from 'constants/SemanticGroupNames.constants';
 import {TSpan, TSpanFlatAttribute} from 'types/Span.types';
 import {getObjectIncludesText} from 'utils/Common';
-import {IDAGNode} from './DAG.service';
+import {INodeItem} from './DAG.service';
 import OperatorService from './Operator.service';
 
 const itemSelectorKeys = SELECTOR_DEFAULT_ATTRIBUTES.flatMap(el => el.attributes);
@@ -28,6 +28,7 @@ const SpanService = () => ({
       heading: signatureObject[type] || '',
     };
   },
+
   getSelectedSpanListAttributes({attributeList}: TSpan, selectedSpanList: TSpan[]) {
     const intersectedAttributeList = intersectionBy(...selectedSpanList.map(el => el.attributeList), 'key');
 
@@ -67,23 +68,14 @@ const SpanService = () => ({
     );
   },
 
-  getNodeListFromSpanList(
-    spanList: TSpan[],
-    affectedList: string[],
-    matchedList: string[]
-  ): IDAGNode<{label: string}>[] {
-    return spanList.map(span => {
-      const isAffected = affectedList.includes(span.id);
-      const isMatched = matchedList.includes(span.id);
-
-      return {
-        id: span.id,
-        parentIds: span.parentId ? [span.parentId] : [],
-        data: {label: span.name},
-        type: NodeTypesEnum.Span,
-        className: `${isAffected ? 'affected' : ''} ${isMatched ? 'matched' : ''}`,
-      };
-    });
+  getNodeListFromSpanList(spanList: TSpan[]): INodeItem<{label: string}>[] {
+    console.log('### getNodeListFromSpanList');
+    return spanList.map(span => ({
+      data: {label: span.name},
+      id: span.id,
+      parentIds: span.parentId ? [span.parentId] : [],
+      type: NodeTypesEnum.Span,
+    }));
   },
 });
 
