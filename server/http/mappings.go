@@ -207,7 +207,7 @@ func (m OpenAPIMapper) Result(in *model.RunResults) openapi.AssertionResults {
 }
 func (m OpenAPIMapper) Assertion(in model.Assertion) openapi.Assertion {
 	return openapi.Assertion{
-		Attribute:  in.Attribute,
+		Attribute:  in.Attribute.String(),
 		Comparator: in.Comparator.String(),
 		Expected:   in.Value,
 	}
@@ -410,7 +410,7 @@ func (m ModelMapper) Result(in openapi.AssertionResults) *model.RunResults {
 func (m ModelMapper) Assertion(in openapi.Assertion) model.Assertion {
 	comp, _ := m.Comparators.Get(in.Comparator)
 	return model.Assertion{
-		Attribute:  in.Attribute,
+		Attribute:  model.Attribute(in.Attribute),
 		Comparator: comp,
 		Value:      in.Expected,
 	}

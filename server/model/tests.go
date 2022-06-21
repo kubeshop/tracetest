@@ -29,10 +29,12 @@ type (
 	SpanQuery string
 
 	Assertion struct {
-		Attribute  string
+		Attribute  Attribute
 		Comparator comparator.Comparator
 		Value      string
 	}
+
+	Attribute string
 
 	Run struct {
 		ID                        uuid.UUID
@@ -70,6 +72,14 @@ type (
 		CompareErr    error
 	}
 )
+
+func (a Attribute) IsMeta() bool {
+	return a[0] == ':'
+}
+
+func (a Attribute) String() string {
+	return string(a)
+}
 
 func (a Assertion) String() string {
 	return fmt.Sprintf(`"%s" %s "%s"`, a.Attribute, a.Comparator, a.Value)

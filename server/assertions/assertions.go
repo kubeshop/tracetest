@@ -45,7 +45,7 @@ func assert(a model.Assertion, spans []traces.Span) model.AssertionResult {
 
 func apply(a model.Assertion, span traces.Span) model.SpanAssertionResult {
 	expected := a.Value
-	actual := span.Attributes.Get(a.Attribute)
+	actual := span.Attributes.Get(a.Attribute.String())
 	sid := trace.SpanID(span.ID)
 	return model.SpanAssertionResult{
 		SpanID:        &sid,

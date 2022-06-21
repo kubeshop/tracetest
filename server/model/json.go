@@ -58,7 +58,7 @@ func (a Assertion) MarshalJSON() ([]byte, error) {
 		Comparator string
 		Value      string
 	}{
-		Attribute:  a.Attribute,
+		Attribute:  a.Attribute.String(),
 		Comparator: a.Comparator.String(),
 		Value:      a.Value,
 	})
@@ -79,7 +79,7 @@ func (a *Assertion) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	a.Attribute = aux.Attribute
+	a.Attribute = Attribute(aux.Attribute)
 	a.Value = aux.Value
 	a.Comparator = c
 
