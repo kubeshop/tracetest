@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"text/template"
 
+	"github.com/gorilla/handlers"
 	"github.com/kubeshop/tracetest/server/analytics"
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/executor"
@@ -146,7 +147,7 @@ func (a *App) Start() error {
 	}
 
 	log.Printf("HTTP Server started")
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), router))
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), handlers.CompressHandler(router)))
 
 	return nil
 }

@@ -15,6 +15,7 @@ describe('AttributeRow', () => {
   it('should render correctly', () => {
     const {getByText} = render(
       <AttributeRow
+        searchText=""
         attribute={attribute}
         isCopied={false}
         onCreateAssertion={onCreateAssertion}

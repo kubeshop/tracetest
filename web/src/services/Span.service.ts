@@ -1,7 +1,10 @@
 import {differenceBy, intersectionBy} from 'lodash';
-import {CompareOperator, PseudoSelector} from '../constants/Operator.constants';
-import {SELECTOR_DEFAULT_ATTRIBUTES, SemanticGroupNameNodeMap} from '../constants/SemanticGroupNames.constants';
-import {TSpan, TSpanFlatAttribute} from '../types/Span.types';
+import {NodeTypesEnum} from 'constants/Diagram.constants';
+import {CompareOperator, PseudoSelector} from 'constants/Operator.constants';
+import {SELECTOR_DEFAULT_ATTRIBUTES, SemanticGroupNameNodeMap} from 'constants/SemanticGroupNames.constants';
+import {TSpan, TSpanFlatAttribute} from 'types/Span.types';
+import {getObjectIncludesText} from 'utils/Common';
+import {IDAGNode} from './DAG.service';
 import OperatorService from './Operator.service';
 
 const itemSelectorKeys = SELECTOR_DEFAULT_ATTRIBUTES.flatMap(el => el.attributes);
@@ -53,6 +56,34 @@ const SpanService = () => ({
     };
 
     return {selectorList, pseudoSelector};
+  },
+
+  searchSpanList(spanList: TSpan[], searchText: string) {
+    if (!searchText.trim()) return [];
+
+    return spanList.reduce<string[]>(
+      (matchList, span) => (getObjectIncludesText(span.attributes, searchText) ? [...matchList, span.id] : matchList),
+      []
+    );
+  },
+
+  getNodeListFromSpanList(
+    spanList: TSpan[],
+    affectedList: string[],
+    matchedList: string[]
+  ): IDAGNode<{label: string}>[] {
+    return spanList.map(span => {
+      const isAffected = affectedList.includes(span.id);
+      const isMatched = matchedList.includes(span.id);
+
+      return {
+        id: span.id,
+        parentIds: span.parentId ? [span.parentId] : [],
+        data: {label: span.name},
+        type: NodeTypesEnum.Span,
+        className: `${isAffected ? 'affected' : ''} ${isMatched ? 'matched' : ''}`,
+      };
+    });
   },
 });
 

@@ -1,13 +1,13 @@
 import Text from 'antd/lib/typography/Text';
 import {capitalize} from 'lodash';
-import React from 'react';
 import {Handle, Position} from 'react-flow-renderer';
-import {SemanticGroupNames} from '../../../constants/SemanticGroupNames.constants';
-import * as S from '../TraceNode.styled';
-// import SpanService from '../../../services/Span.service';
-import {TTraceNodeProps} from '../TraceNode';
 
-const GenericTraceNode: React.FC<TTraceNodeProps> = ({id, data: span, selected}) => {
+// import {SemanticGroupNamesToText} from 'constants/SemanticGroupNames.constants';
+import * as S from '../TraceNode.styled';
+import {TTraceNodeProps} from '../TraceNode';
+import {SemanticGroupNames} from '../../../constants/SemanticGroupNames.constants';
+
+const GenericTraceNode = ({id, data: span, selected}: TTraceNodeProps) => {
   // const {heading, primary} = SpanService.getSpanNodeInfo(span);
   // const spanTypeText = SemanticGroupNamesToText[type];
 

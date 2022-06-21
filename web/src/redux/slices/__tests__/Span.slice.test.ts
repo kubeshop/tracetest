@@ -6,6 +6,8 @@ import Reducer, {
   setFocusedSpan,
   setSelectedSpan,
   clearAffectedSpans,
+  setMatchedSpans,
+  setSearchText,
 } from '../Span.slice';
 import {setSelectedAssertion} from '../TestDefinition.slice';
 
@@ -88,6 +90,24 @@ describe('Span.slice', () => {
           setSelectedAssertion()
         )
       ).toEqual(initialState);
+    });
+  });
+
+  describe('setMatchedSpans', () => {
+    it('should handle triggering the action', () => {
+      expect(Reducer(undefined, setMatchedSpans({spanIds: ['12345', '567890']}))).toEqual({
+        ...initialState,
+        matchedSpans: ['12345', '567890'],
+      });
+    });
+  });
+
+  describe('setSearchText', () => {
+    it('should handle triggering the action', () => {
+      expect(Reducer(undefined, setSearchText({searchText: 'http'}))).toEqual({
+        ...initialState,
+        searchText: 'http',
+      });
     });
   });
 });

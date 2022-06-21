@@ -5,6 +5,7 @@ import {TSpanFlatAttribute} from 'types/Span.types';
 import GuidedTourService, {GuidedTours} from '../../services/GuidedTour.service';
 import AttributeValue from '../AttributeValue';
 import {Steps} from '../GuidedTour/traceStepList';
+import Highlighted from '../Highlighted';
 import AttributeCheck from './AttributeCheck';
 import * as S from './AttributeRow.styled';
 
@@ -17,6 +18,7 @@ interface IProps {
   onCreateAssertion(attribute: TSpanFlatAttribute): void;
   setIsCopied(value: boolean): void;
   shouldDisplayActions: boolean;
+  searchText: string;
 }
 
 const AttributeRow = ({
@@ -29,6 +31,7 @@ const AttributeRow = ({
   onCreateAssertion,
   setIsCopied,
   shouldDisplayActions,
+  searchText,
 }: IProps) => {
   const {isHovering, onMouseEnter, onMouseLeave} = useHover();
   const passedCount = assertionsPassed?.length ?? 0;
@@ -41,11 +44,13 @@ const AttributeRow = ({
   return (
     <S.AttributeRow onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
       <S.TextContainer>
-        <S.Text type="secondary">{key}</S.Text>
+        <S.Text type="secondary">
+          <Highlighted text={key} highlight={searchText} />
+        </S.Text>
       </S.TextContainer>
 
       <S.AttributeValueRow>
-        <AttributeValue value={value} />
+        <AttributeValue value={value} searchText={searchText} />
         {passedCount > 0 && <AttributeCheck items={assertionsPassed!} type="success" />}
         {failedCount > 0 && <AttributeCheck items={assertionsFailed!} type="error" />}
       </S.AttributeValueRow>
