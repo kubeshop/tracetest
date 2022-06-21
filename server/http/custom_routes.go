@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/kubeshop/tracetest/server/openapi"
 	"go.opentelemetry.io/otel"
@@ -38,8 +37,7 @@ func (c *customController) Routes() openapi.Routes {
 	for index, route := range routes {
 		routeName := fmt.Sprintf("%s %s", route.Method, route.Pattern)
 		newRouteHandlerFunc := c.instrumentRoute(routeName, route.Pattern, route.HandlerFunc)
-		gzipedRoute := handlers.CompressHandler(newRouteHandlerFunc)
-		route.HandlerFunc = gzipedRoute.ServeHTTP
+		route.HandlerFunc = newRouteHandlerFunc
 
 		routes[index] = route
 	}
