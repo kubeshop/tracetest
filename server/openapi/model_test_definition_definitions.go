@@ -10,13 +10,16 @@
 package openapi
 
 type TestDefinitionDefinitions struct {
-	Selector string `json:"selector,omitempty"`
+	Selector Selector `json:"selector,omitempty"`
 
 	Assertions []Assertion `json:"assertions,omitempty"`
 }
 
 // AssertTestDefinitionDefinitionsRequired checks if the required fields are not zero-ed
 func AssertTestDefinitionDefinitionsRequired(obj TestDefinitionDefinitions) error {
+	if err := AssertSelectorRequired(obj.Selector); err != nil {
+		return err
+	}
 	for _, el := range obj.Assertions {
 		if err := AssertAssertionRequired(el); err != nil {
 			return err

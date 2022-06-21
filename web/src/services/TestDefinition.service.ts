@@ -2,9 +2,8 @@ import {TRawTestDefinitionEntry, TTestDefinitionEntry} from '../types/TestDefini
 
 const TestDefinitionService = () => ({
   toRaw({selector, assertionList}: TTestDefinitionEntry): TRawTestDefinitionEntry {
-
     return {
-      selector,
+      selector: {query: selector},
       assertions: assertionList,
     };
   },

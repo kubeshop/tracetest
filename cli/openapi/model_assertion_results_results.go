@@ -16,7 +16,7 @@ import (
 
 // AssertionResultsResults struct for AssertionResultsResults
 type AssertionResultsResults struct {
-	Selector *string           `json:"selector,omitempty"`
+	Selector *Selector         `json:"selector,omitempty"`
 	Results  []AssertionResult `json:"results,omitempty"`
 }
 
@@ -38,9 +38,9 @@ func NewAssertionResultsResultsWithDefaults() *AssertionResultsResults {
 }
 
 // GetSelector returns the Selector field value if set, zero value otherwise.
-func (o *AssertionResultsResults) GetSelector() string {
+func (o *AssertionResultsResults) GetSelector() Selector {
 	if o == nil || o.Selector == nil {
-		var ret string
+		var ret Selector
 		return ret
 	}
 	return *o.Selector
@@ -48,7 +48,7 @@ func (o *AssertionResultsResults) GetSelector() string {
 
 // GetSelectorOk returns a tuple with the Selector field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *AssertionResultsResults) GetSelectorOk() (*string, bool) {
+func (o *AssertionResultsResults) GetSelectorOk() (*Selector, bool) {
 	if o == nil || o.Selector == nil {
 		return nil, false
 	}
@@ -64,8 +64,8 @@ func (o *AssertionResultsResults) HasSelector() bool {
 	return false
 }
 
-// SetSelector gets a reference to the given string and assigns it to the Selector field.
-func (o *AssertionResultsResults) SetSelector(v string) {
+// SetSelector gets a reference to the given Selector and assigns it to the Selector field.
+func (o *AssertionResultsResults) SetSelector(v Selector) {
 	o.Selector = &v
 }
 

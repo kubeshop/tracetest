@@ -41,7 +41,9 @@ func convertTestDefinitionsIntoOpenAPIObject(testDefinitions []definition.TestDe
 		}
 
 		definitions = append(definitions, openapi.TestDefinitionDefinitions{
-			Selector:   testDefinition.Selector,
+			Selector: openapi.Selector{
+				Query: testDefinition.Selector,
+			},
 			Assertions: assertions,
 		})
 	}

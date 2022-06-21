@@ -52,6 +52,10 @@ export interface paths {
     /** Set testDefinition for a particular test */
     put: operations["setTestDefinition"];
   };
+  "/tests/{testId}/version/{version}/definition.yaml": {
+    /** Get the test definition as an YAML file */
+    get: operations["getTestVersionDefinitionFile"];
+  };
 }
 
 export interface components {}
@@ -322,6 +326,23 @@ export interface operations {
       };
     };
   };
+  /** Get the test definition as an YAML file */
+  getTestVersionDefinitionFile: {
+    parameters: {
+      path: {
+        testId: string;
+        version: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/yaml": string;
+        };
+      };
+    };
+  };
 }
 
 export interface external {
@@ -403,7 +424,7 @@ export interface external {
         /** @example [object Object] */
         TestDefinition: {
           definitions?: {
-            selector?: string;
+            selector?: external["tests.yaml"]["components"]["schemas"]["Selector"];
             assertions?: external["tests.yaml"]["components"]["schemas"]["Assertion"][];
           }[];
         };
@@ -454,7 +475,7 @@ export interface external {
         AssertionResults: {
           allPassed?: boolean;
           results?: {
-            selector?: string;
+            selector?: external["tests.yaml"]["components"]["schemas"]["Selector"];
             results?: external["tests.yaml"]["components"]["schemas"]["AssertionResult"][];
           }[];
         };
@@ -469,6 +490,27 @@ export interface external {
           passed?: boolean;
           error?: string;
         };
+        DefinitionFile: {
+          content?: string;
+        };
+        Selector: {
+          query?: string;
+          structure?: external["tests.yaml"]["components"]["schemas"]["SpanSelector"][];
+        };
+        SpanSelector: {
+          filters: external["tests.yaml"]["components"]["schemas"]["SelectorFilter"][];
+          pseudoClass?: external["tests.yaml"]["components"]["schemas"]["SelectorPseudoClass"];
+          childSelector?: external["tests.yaml"]["components"]["schemas"]["SpanSelector"];
+        } | null;
+        SelectorFilter: {
+          property: string;
+          operator: string;
+          value: string;
+        };
+        SelectorPseudoClass: {
+          name: string;
+          N?: number;
+        } | null;
       };
     };
     operations: {};

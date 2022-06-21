@@ -33,14 +33,20 @@ components:
             type: object
             properties:
               selector:
-                type: string
+                $ref: "#/components/schemas/Selector"
               assertions:
                 type: array
                 items:
                   $ref: "#/components/schemas/Assertion"
       example:
         definitions:
-          - selector: 'span[tracetest.span.type="http"]'
+          - selector:
+              query: span[tracetest.span.type="http"]
+              structure:
+                - filters:
+                  - property: tracetest.span.type
+                    operator: '='
+                    value: http
             assertions:
             - attribute: tracetest.span.duration
               comparator: "<"
@@ -121,7 +127,7 @@ components:
             type: object
             properties:
               selector:
-                type: string
+                $ref: "#/components/schemas/Selector"
               results:
                 type: array
                 items:
@@ -129,7 +135,13 @@ components:
       example:
         allPassed: true
         results:
-          - selector: 'span[tracetest.span.type="http"]'
+          - selector:
+              query: span[tracetest.span.type="http"]
+              structure:
+                - filters:
+                  - property: tracetest.span.type
+                    operator: '='
+                    value: http
             results:
             - assertion:
                 attribute: http.status_code
@@ -179,3 +191,53 @@ components:
       properties:
         content:
           type: string
+
+    Selector:
+      type: object
+      properties:
+        query:
+          type: string
+        structure:
+          type: array
+          items:
+            $ref: "#/components/schemas/SpanSelector"
+
+    SpanSelector:
+      type: object
+      nullable: true
+      required:
+        - filters
+      properties:
+        filters:
+          type: array
+          items:
+            $ref: "#/components/schemas/SelectorFilter"
+        pseudoClass:
+          $ref: "#/components/schemas/SelectorPseudoClass"
+        childSelector:
+          $ref: "#/components/schemas/SpanSelector"
+
+    SelectorFilter:
+      type: object
+      required:
+        - property
+        - operator
+        - value
+      properties:
+        property:
+          type: string
+        operator:
+          type: string
+        value:
+          type: string
+
+    SelectorPseudoClass:
+      type: object
+      nullable: true
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        N:
+          type: integer
