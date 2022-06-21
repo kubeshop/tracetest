@@ -6,6 +6,8 @@ export const initialState: ISpanState = {
   affectedSpans: [],
   focusedSpan: '',
   selectedSpan: undefined,
+  searchText: '',
+  matchedSpans: [],
 };
 
 const testDefinitionSlice = createSlice({
@@ -22,6 +24,12 @@ const testDefinitionSlice = createSlice({
     setFocusedSpan(state, {payload: {spanId}}: PayloadAction<{spanId: string}>) {
       state.focusedSpan = spanId;
     },
+    setSearchText(state, {payload: {searchText}}: PayloadAction<{searchText: string}>) {
+      state.searchText = searchText.toLowerCase();
+    },
+    setMatchedSpans(state, {payload: {spanIds}}: PayloadAction<{spanIds: string[]}>) {
+      state.matchedSpans = spanIds;
+    },
     clearAffectedSpans(state) {
       state.affectedSpans = [];
       state.focusedSpan = '';
@@ -35,5 +43,6 @@ const testDefinitionSlice = createSlice({
   },
 });
 
-export const {clearAffectedSpans, setAffectedSpans, setSelectedSpan, setFocusedSpan} = testDefinitionSlice.actions;
+export const {clearAffectedSpans, setAffectedSpans, setSelectedSpan, setFocusedSpan, setMatchedSpans, setSearchText} =
+  testDefinitionSlice.actions;
 export default testDefinitionSlice.reducer;

@@ -22,7 +22,9 @@ export type TSpan = Model<
 >;
 
 export interface ISpanState {
-  affectedSpans: string[],
-  focusedSpan: string,
-  selectedSpan?: TSpan, 
+  affectedSpans: string[];
+  focusedSpan: string;
+  selectedSpan?: TSpan;
+  searchText: string;
+  matchedSpans: string[];
 }

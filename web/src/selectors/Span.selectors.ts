@@ -18,6 +18,8 @@ const SpanSelectors = () => ({
   ),
   selectSelectedSpan: createSelector(spansStateSelector, ({selectedSpan}) => selectedSpan),
   selectFocusedSpan: createSelector(spansStateSelector, ({focusedSpan}) => focusedSpan),
+  selectMatchedSpans: createSelector(spansStateSelector, ({matchedSpans}) => matchedSpans),
+  selectSearchText: createSelector(spansStateSelector, ({searchText}) => searchText),
 });
 
 export default SpanSelectors();
