@@ -5,6 +5,10 @@ export const Container = styled.div<{$showAffected: boolean}>`
   position: relative;
   height: 100%;
 
+  .react-flow__node-TraceNode.matched > div {
+    box-shadow: 0 4px 8px #c9cedb;
+  }
+
   ${({$showAffected}) =>
     $showAffected &&
     css`

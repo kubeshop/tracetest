@@ -1,4 +1,5 @@
 import {TestState} from '../../constants/TestRun.constants';
+import {useSpan} from '../../providers/Span/Span.provider';
 import {TSpan} from '../../types/Span.types';
 import {TTestRunState} from '../../types/TestRun.types';
 import {TTrace} from '../../types/Trace.types';
@@ -12,12 +13,17 @@ export enum SupportedDiagrams {
 }
 
 export interface IDiagramProps {
-  affectedSpans: string[];
-  onSelectSpan?(spanId: string): void;
-  selectedSpan?: TSpan;
   trace: TTrace;
   type: SupportedDiagrams;
   runState: TTestRunState;
+}
+
+export interface IDiagramComponentProps {
+  spanList: TSpan[];
+  affectedSpans: string[];
+  matchedSpans: string[];
+  selectedSpan?: TSpan;
+  onSelectSpan(spanId: string): void;
 }
 
 const ComponentMap: Record<string, typeof DAGComponent | typeof TimelineChart> = {
@@ -25,13 +31,15 @@ const ComponentMap: Record<string, typeof DAGComponent | typeof TimelineChart> =
   [SupportedDiagrams.Timeline]: TimelineChart,
 };
 
-const Diagram: React.FC<IDiagramProps> = ({type, runState, ...props}) => {
+const Diagram: React.FC<IDiagramProps> = ({type, runState, trace}) => {
   const Component = ComponentMap[type || ''] || DAGComponent;
+  const {onSelectSpan, selectedSpan, affectedSpans, matchedSpans} = useSpan();
+  const spanList = trace.spans || [];
 
   return runState === TestState.FINISHED ? (
-    <Component type={type} runState={runState} {...props} />
+    <Component {...{spanList, onSelectSpan, selectedSpan, affectedSpans, matchedSpans}} />
   ) : (
-    <SkeletonDiagram onSelectSpan={props.onSelectSpan} selectedSpan={props.selectedSpan} />
+    <SkeletonDiagram onSelectSpan={onSelectSpan} selectedSpan={selectedSpan} />
   );
 };
 

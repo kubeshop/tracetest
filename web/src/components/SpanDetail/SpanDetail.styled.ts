@@ -57,3 +57,12 @@ export const AddAssertionButton = styled(Button).attrs({
     font-weight: 600;
   }
 `;
+
+export const Dot = styled.div`
+  height: 10px;
+  width: 10px;
+  margin-left: 5px;
+  background-color: #61175e29;
+  border-radius: 50%;
+  display: inline-block;
+`;

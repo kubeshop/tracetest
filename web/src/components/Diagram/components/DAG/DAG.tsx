@@ -1,24 +1,19 @@
 import {Steps} from 'components/GuidedTour/traceStepList';
 import React, {useCallback, useMemo} from 'react';
 import ReactFlow, {Background, FlowElement} from 'react-flow-renderer';
-import {TraceNodes} from 'constants/Diagram.constants';
 import {useDAGChart} from 'hooks/useDAGChart';
 import TraceDiagramAnalyticsService from 'services/Analytics/TraceDiagramAnalytics.service';
 import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
+import SpanService from 'services/Span.service';
 import {TSpan} from 'types/Span.types';
 import TraceNode from 'components/TraceNode';
-import {IDiagramProps} from 'components/Diagram/Diagram';
+import {IDiagramComponentProps} from 'components/Diagram/Diagram';
 import * as S from './DAG.styled';
 import Controls from './Controls';
 
 const {onClickSpan} = TraceDiagramAnalyticsService;
 
-const DAG: React.FC<IDiagramProps> = ({
-  affectedSpans,
-  trace: {spans = []},
-  selectedSpan,
-  onSelectSpan,
-}): JSX.Element => {
+const DAG = ({spanList = [], affectedSpans, onSelectSpan, matchedSpans, selectedSpan}: IDiagramComponentProps) => {
   const handleElementClick = useCallback(
     (event, {id}: FlowElement) => {
       onClickSpan(id);
@@ -28,15 +23,8 @@ const DAG: React.FC<IDiagramProps> = ({
   );
 
   const nodeList = useMemo(
-    () =>
-      spans.map(span => ({
-        id: span.id,
-        parentIds: span.parentId ? [span.parentId] : [],
-        data: span,
-        type: TraceNodes.TraceNode,
-        className: affectedSpans.includes(span.id) ? 'affected' : '',
-      })),
-    [affectedSpans, spans]
+    () => SpanService.getNodeListFromSpanList(spanList, affectedSpans, matchedSpans),
+    [affectedSpans, matchedSpans, spanList]
   );
 
   const elementList = useDAGChart<TSpan>(nodeList, selectedSpan, onSelectSpan);

@@ -1,26 +1,26 @@
 import {useCallback, useEffect, useMemo, useRef} from 'react';
 import * as d3 from 'd3';
-import TraceAnalyticsService from '../../../services/Analytics/TraceAnalytics.service';
-import {IDiagramProps} from '../Diagram';
-import {TSpan} from '../../../types/Span.types';
-import {getNotchColor} from '../../TraceNode/TraceNode.styled';
+import TraceAnalyticsService from 'services/Analytics/TraceAnalytics.service';
+import {TSpan} from 'types/Span.types';
+import {getNotchColor} from 'components/TraceNode/TraceNode.styled';
+import {IDiagramComponentProps} from '../Diagram';
 import * as S from './TimelineChart.styled';
 
 const {onTimelineSpanClick} = TraceAnalyticsService;
 
 const barHeight = 54;
 
-export const TimelineChart = ({affectedSpans, trace, selectedSpan, onSelectSpan}: IDiagramProps) => {
+export const TimelineChart = ({affectedSpans, spanList, selectedSpan, onSelectSpan}: IDiagramComponentProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const treeFactory = d3.tree().size([200, 450]).nodeSize([0, 5]);
 
-  const spanDates = trace.spans.map(span => ({
+  const spanDates = spanList.map(span => ({
     startTime: span.startTime,
     endTime: span.endTime,
     span,
   }));
 
-  const spanMap = trace.spans.reduce(
+  const spanMap = spanList.reduce(
     (acc: {[key: string]: {id: string; parentIds: Array<string | undefined>; data: any}}, span) => {
       acc[span.id] = acc[span.id] || {
         id: span.id,
@@ -94,7 +94,7 @@ export const TimelineChart = ({affectedSpans, trace, selectedSpan, onSelectSpan}
       })
       .attr('y', 20);
     chart.append('g').attr('class', 'container').attr('transform', `translate(0, 50)`);
-  }, [trace]);
+  }, [spanList]);
 
   const drawChart = useCallback(() => {
     const nodes = treeFactory(root);

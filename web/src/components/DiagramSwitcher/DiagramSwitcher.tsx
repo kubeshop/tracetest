@@ -31,7 +31,7 @@ const DiagramSwitcher: React.FC<IProps> = ({onSearch, onTypeChange, selectedType
           />
         </Tooltip>
       </S.Switch>
-      <SearchInput onSearch={onSearch} width="100%" placeholder="Search in trace (Not implemented yet)" />
+      <SearchInput onSearch={onSearch} width="100%" placeholder="Search in trace" />
     </S.DiagramSwitcher>
   );
 };
