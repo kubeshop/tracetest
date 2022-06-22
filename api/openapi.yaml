@@ -295,53 +295,53 @@ paths:
               schema:
                 type: string
 
-  # /tests/{testId}/run/{runId}/export:
-  #   get:
-  #     tags:
-  #       - api
-  #     parameters:
-  #       - in: path
-  #         name: testId
-  #         schema:
-  #           type: string
-  #           format: uuid
-  #         required: true
-  #       - in: path
-  #         name: runId
-  #         schema:
-  #           type: string
-  #           format: uuid
-  #         required: true
-  #     summary: export test and test run information
-  #     description: export test and test run information for debugging
-  #     operationId: exportTestRun
-  #     responses:
-  #       200:
-  #         description: successfuly exported test and test run information
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: "tests.yaml#/components/schemas/ExportedTestInformation"
-
-  /tests/import:
-    post:
+  /tests/{testId}/run/{runId}/export:
+    get:
       tags:
         - api
-      summary: import test and test run information
-      description: import test and test run information for debugging
-      operationId: importTestRun
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "./tests.yaml#/components/schemas/ExportedTestInformation"
+      parameters:
+        - in: path
+          name: testId
+          schema:
+            type: string
+            format: uuid
+          required: true
+        - in: path
+          name: runId
+          schema:
+            type: string
+            format: uuid
+          required: true
+      summary: export test and test run information
+      description: export test and test run information for debugging
+      operationId: exportTestRun
       responses:
         200:
-          description: successfuly imported test and test run information
+          description: successfuly exported test and test run information
           content:
             application/json:
               schema:
                 $ref: "tests.yaml#/components/schemas/ExportedTestInformation"
+
+  # /tests/import:
+  #   post:
+  #     tags:
+  #       - api
+  #     summary: import test and test run information
+  #     description: import test and test run information for debugging
+  #     operationId: importTestRun
+  #     requestBody:
+  #       content:
+  #         application/json:
+  #           schema:
+  #             $ref: "./tests.yaml#/components/schemas/ExportedTestInformation"
+  #     responses:
+  #       200:
+  #         description: successfuly imported test and test run information
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "tests.yaml#/components/schemas/ExportedTestInformation"
 
   /tests/{testId}/run/{runId}:
     get:
