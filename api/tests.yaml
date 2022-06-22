@@ -214,8 +214,8 @@ components:
             $ref: "#/components/schemas/SelectorFilter"
         pseudoClass:
           $ref: "#/components/schemas/SelectorPseudoClass"
-        childSelector:
-          $ref: "#/components/schemas/SpanSelector"
+        # childSelector:
+        #   $ref: "#/components/schemas/SpanSelector"
 
     SelectorFilter:
       type: object
