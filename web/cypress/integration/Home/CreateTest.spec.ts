@@ -10,14 +10,19 @@ describe('Create test', () => {
   it('should create a basic GET test from scratch', () => {
     const $form = openCreateTestModal();
 
-    $form.get('[data-cy=method-select]').click();
-    $form.get('[data-cy=method-select-option-GET]').click();
+    $form.get('[data-cy=create-test-next-button]').click();
     const name = `Test - Pokemon - #${String(Date.now()).slice(-4)}`;
 
-    $form.get('[data-cy=url]').type('http://demo-pokemon-api.demo.svc.cluster.local/pokemon');
-    $form.get('[data-cy=name').type(name);
+    $form.get('[data-cy=create-test-name-input').type(name);
+    $form.get('[data-cy=create-test-description-input').type(name);
 
-    $form.get('[data-cy=create-test-submit]').click();
+    $form.get('[data-cy=create-test-next-button]').last().click();
+
+    $form.get('[data-cy=method-select]').click();
+    $form.get('[data-cy=method-select-option-GET]').click();
+    $form.get('[data-cy=url]').type('http://demo-pokemon-api.demo.svc.cluster.local/pokemon');
+
+    $form.get('[data-cy=create-test-create-button]').last().click();
 
     cy.location('pathname').should('match', /\/test\/.*/i);
     cy.get('[data-cy=test-details-name]').should('have.text', `${name} (v1)`);
@@ -26,13 +31,18 @@ describe('Create test', () => {
 
   it('should create a basic POST test from scratch', () => {
     const $form = openCreateTestModal();
+    $form.get('[data-cy=create-test-next-button]').last().click();
+
+    const name = `Test - Pokemon - #${String(Date.now()).slice(-4)}`;
+
+    $form.get('[data-cy=create-test-name-input').type(name);
+    $form.get('[data-cy=create-test-description-input').type(name);
+
+    $form.get('[data-cy=create-test-next-button]').last().click();
 
     $form.get('[data-cy=method-select]').click();
     $form.get('[data-cy=method-select-option-POST]').click();
-    const name = `Test - Pokemon - #${String(Date.now()).slice(-4)}`;
-
     $form.get('[data-cy=url]').type('http://demo-pokemon-api.demo.svc.cluster.local/pokemon');
-    $form.get('[data-cy=name').type(name);
     $form
       .get('[data-cy=body]')
       .type(
@@ -42,7 +52,7 @@ describe('Create test', () => {
         }
       );
 
-    $form.get('[data-cy=create-test-submit]').click();
+    $form.get('[data-cy=create-test-create-button]').last().click();
 
     cy.location('pathname').should('match', /\/test\/.*/i);
     cy.get('[data-cy=test-details-name]').should('have.text', `${name} (v1)`);
@@ -50,28 +60,36 @@ describe('Create test', () => {
   });
 
   it('should create a GET test from an example', () => {
-    const [{name, description}] = DemoTestExampleList;
+    const [{name}] = DemoTestExampleList;
 
     const $form = openCreateTestModal();
+    $form.get('[data-cy=create-test-next-button]').last().click();
+
     $form.get('[data-cy=example-button]').click();
     $form.get(`[data-cy=demo-example-${camelCase(name)}]`).click();
-    $form.get('[data-cy=create-test-submit]').click();
+
+    $form.get('[data-cy=create-test-next-button]').last().click();
+    $form.get('[data-cy=create-test-create-button]').last().click();
 
     cy.location('pathname').should('match', /\/test\/.*/i);
-    cy.get('[data-cy=test-details-name]').should('have.text', `${name} - ${description} (v1)`);
+    cy.get('[data-cy=test-details-name]').should('have.text', `${name} (v1)`);
     deleteTest();
   });
 
   it('should create a POST test from an example', () => {
-    const [, {name, description}] = DemoTestExampleList;
+    const [, {name}] = DemoTestExampleList;
 
     const $form = openCreateTestModal();
+    $form.get('[data-cy=create-test-next-button]').last().click();
+
     $form.get('[data-cy=example-button]').click();
     $form.get(`[data-cy=demo-example-${camelCase(name)}]`).click();
-    $form.get('[data-cy=create-test-submit]').click();
+
+    $form.get('[data-cy=create-test-next-button]').last().click();
+    $form.get('[data-cy=create-test-create-button]').last().click();
 
     cy.location('pathname').should('match', /\/test\/.*/i);
-    cy.get('[data-cy=test-details-name]').should('have.text', `${name} - ${description} (v1)`);
+    cy.get('[data-cy=test-details-name]').should('have.text', `${name} (v1)`);
     deleteTest();
   });
 });

@@ -1,6 +1,6 @@
 import {HTTP_METHOD} from './Common.constants';
 
-interface DemoTestExample {
+export interface IDemoTestExample {
   name: string;
   url: string;
   method: HTTP_METHOD;
@@ -8,7 +8,7 @@ interface DemoTestExample {
   description: string;
 }
 
-export const DemoTestExampleList: DemoTestExample[] = [
+export const DemoTestExampleList: IDemoTestExample[] = [
   {
     name: 'Pokemon - List',
     url: 'http://demo-pokemon-api.demo.svc.cluster.local/pokemon?take=20&skip=0',
