@@ -50,7 +50,7 @@ const Rest: IPlugin = {
 const Messaging: IPlugin = {
   name: SupportedPlugins.Messaging,
   title: 'Message Queue',
-  description: 'Test and debug your messaging queue',
+  description: 'Put a message on a queue to initiate a Tracetest',
   isActive: false,
   stepList: [],
 };
