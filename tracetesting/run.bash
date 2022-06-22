@@ -6,6 +6,7 @@ if ! command -v "$TRACETEST_CLI" &> /dev/null; then
   exit 2
 fi
 
+export TARGET_URL=${TARGET_URL:-"http://localhost:8081"}
 if [  "$TARGET_URL" = "" ]; then
   echo "\$TARGET_URL not set";
   exit 2
@@ -16,8 +17,8 @@ echo "TARGET_URL: $TARGET_URL"
 
 export TRACETEST_MAIN_ENDPOINT="localhost:8080"
 export TRACETEST_TARGET_ENDPOINT="localhost:8081"
-export TARGET_URL=${TARGET_URL:-"http://localhost:8081"}
-export DEMO_APP_URL="http://demo-pokemon-api.demo.svc.cluster.local"
+
+export DEMO_APP_URL=${DEMO_APP_URL-"http://demo-pokemon-api.demo.svc.cluster.local"}
 
 mkdir -p results/responses
 
