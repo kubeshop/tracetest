@@ -99,7 +99,7 @@ func (a *App) Start() error {
 	assertionRunner.Start(5)
 	defer assertionRunner.Stop()
 
-	pollerExecutor := executor.NewPollerExecutor(execTestUpdater, a.traceDB, a.config.PoolingRetryDelay(), a.config.MaxWaitTimeForTraceDuration())
+	pollerExecutor := executor.NewPollerExecutor(a.tracer, execTestUpdater, a.traceDB, a.config.PoolingRetryDelay(), a.config.MaxWaitTimeForTraceDuration())
 
 	tracePoller := executor.NewTracePoller(pollerExecutor, execTestUpdater, assertionRunner, a.config.PoolingRetryDelay(), a.config.MaxWaitTimeForTraceDuration())
 	tracePoller.Start(5) // worker count. should be configurable
