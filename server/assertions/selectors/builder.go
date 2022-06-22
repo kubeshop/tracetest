@@ -95,7 +95,7 @@ func createSpanSelectorFromParserSpanSelector(parserSpanSelector parserSpanSelec
 
 	return SpanSelector{
 		Filters:       filters,
-		PsedoClass:    pseudoClass,
+		PseudoClass:   pseudoClass,
 		ChildSelector: childSelector,
 	}, nil
 }

@@ -239,7 +239,7 @@ components:
       properties:
         name:
           type: string
-        N:
+        argument:
           type: integer
 
     ExportedTestInformation:
