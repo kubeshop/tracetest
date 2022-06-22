@@ -1,4 +1,4 @@
-id: 2ec817b5-8087-4e8f-9462-8026f0f54414
+id: bdaf9112-24bc-4ac7-a17b-c52636f47d76
 name: Test Run
 description: ""
 trigger:
@@ -13,3 +13,9 @@ testDefinition:
 - selector: span[name="POST /api/tests/{testId}/run" tracetest.span.type="http"]
   assertions:
   - tracetest.response.status = 200
+- selector: span[name="Trigger test"]
+  assertions:
+  - tracetest.selected_spans.count = 1
+  - tracetest.run.trigger.test_id = "0013d04a-d378-4f8e-9f2d-1639f7a303dd"
+  - tracetest.run.trigger.type = "http"
+  - tracetest.run.trigger.http.response_code = 200
