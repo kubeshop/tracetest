@@ -8,6 +8,7 @@ import (
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/traces"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type DefaultPollerExecutor struct {
@@ -16,19 +17,37 @@ type DefaultPollerExecutor struct {
 	maxTracePollRetry int
 }
 
-var _ PollerExecutor = &DefaultPollerExecutor{}
+type InstrumentedPollerExecutor struct {
+	tracer         trace.Tracer
+	pollerExecutor PollerExecutor
+}
+
+func (pe InstrumentedPollerExecutor) ExecuteRequest(request PollingRequest) (bool, model.Run, error) {
+	_, span := pe.tracer.Start(request.ctx, "Fetch trace")
+	defer span.End()
+
+	finished, run, err := pe.pollerExecutor.ExecuteRequest(request)
+
+	return finished, run, err
+}
 
 func NewPollerExecutor(
+	tracer trace.Tracer,
 	updater RunUpdater,
 	traceDB tracedb.TraceDB,
 	retryDelay time.Duration,
 	maxWaitTimeForTrace time.Duration,
 ) PollerExecutor {
 	maxTracePollRetry := int(math.Ceil(float64(maxWaitTimeForTrace) / float64(retryDelay)))
-	return &DefaultPollerExecutor{
+	pollerExecutor := &DefaultPollerExecutor{
 		updater:           updater,
 		traceDB:           traceDB,
 		maxTracePollRetry: maxTracePollRetry,
+	}
+
+	return &InstrumentedPollerExecutor{
+		tracer:         tracer,
+		pollerExecutor: pollerExecutor,
 	}
 }
 
