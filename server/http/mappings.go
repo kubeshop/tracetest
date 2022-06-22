@@ -156,7 +156,7 @@ func (m OpenAPIMapper) SpanSelector(in selectors.SpanSelector) openapi.SpanSelec
 			Name: in.PsedoClass.Name(),
 		}
 
-		if nthChildPseudoClass, ok := in.PsedoClass.(*selectors.NthChildPseudoClass); ok {
+		if nthChildPseudoClass, ok := in.PseudoClass.(*selectors.NthChildPseudoClass); ok {
 			pseudoClass.Argument = int32(nthChildPseudoClass.N)
 		}
 	}
