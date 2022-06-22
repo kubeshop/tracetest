@@ -1,35 +1,31 @@
 import {Tooltip} from 'antd';
-import AssertionCheckRow from 'components/AssertionCheckRow';
-import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
 import {useCallback} from 'react';
-// import {useStoreApi} from 'react-flow-renderer';
+import {useAppSelector} from 'redux/hooks';
+import AssertionCheckRow from 'components/AssertionCheckRow';
+import {useSpan} from 'providers/Span/Span.provider';
+import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
 import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
-import {useSpan} from '../../providers/Span/Span.provider';
-import {useAppSelector} from '../../redux/hooks';
-import AssertionAnalyticsService from '../../services/Analytics/AssertionAnalytics.service';
-import {TAssertionResultEntry} from '../../types/Assertion.types';
+import AssertionAnalyticsService from 'services/Analytics/AssertionAnalytics.service';
+import {TAssertionResultEntry} from 'types/Assertion.types';
 import * as S from './AssertionCard.styled';
 import AssertionCardSelectorList from './AssertionCardSelectorList';
 
-interface TAssertionCardProps {
+interface IProps {
   assertionResult: TAssertionResultEntry;
   onSelectSpan(spanId: string): void;
   onDelete(selector: string): void;
   onEdit(assertionResult: TAssertionResultEntry): void;
 }
 
-const AssertionCard: React.FC<TAssertionCardProps> = ({
+const AssertionCard = ({
   assertionResult: {selector, resultList, selectorList, pseudoSelector, spanIds},
   assertionResult,
   onSelectSpan,
   onDelete,
   onEdit,
-}) => {
+}: IProps) => {
   const {setSelectedAssertion, revert} = useTestDefinition();
-  const {onSetFocusedSpan} = useSpan();
-  // const store = useStoreApi();
-  // const {selectedElements} = store.getState();
-
+  const {onSetFocusedSpan, selectedSpan} = useSpan();
   const selectedAssertion = useAppSelector(TestDefinitionSelectors.selectSelectedAssertion);
   const {
     isDraft = false,
@@ -38,16 +34,7 @@ const AssertionCard: React.FC<TAssertionCardProps> = ({
   } = useAppSelector(state => TestDefinitionSelectors.selectDefinitionBySelector(state, selector)) || {};
   const spanCountText = `${spanIds.length} ${spanIds.length > 1 ? 'spans' : 'span'}`;
 
-  const getIsSelectedSpan = useCallback(
-    (id: string): boolean => {
-      // const found = selectedElements ? selectedElements.find(element => element.id === id) : undefined;
-
-      // return Boolean(found);
-      return false;
-    },
-    // [selectedElements]
-    []
-  );
+  const getIsSelectedSpan = useCallback((id: string) => selectedSpan?.id === id, [selectedSpan]);
 
   const handleOnClick = () => {
     onSetFocusedSpan('');

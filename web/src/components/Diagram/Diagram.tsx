@@ -1,29 +1,30 @@
-import {TestState} from '../../constants/TestRun.constants';
-import {useSpan} from '../../providers/Span/Span.provider';
-import {TSpan} from '../../types/Span.types';
-import {TTestRunState} from '../../types/TestRun.types';
-import {TTrace} from '../../types/Trace.types';
-import SkeletonDiagram from '../SkeletonDiagram';
+import {TestState} from 'constants/TestRun.constants';
+import {DAGProvider} from 'providers/DAG';
+import {useSpan} from 'providers/Span/Span.provider';
+import {TSpan} from 'types/Span.types';
+import {TTestRunState} from 'types/TestRun.types';
+import {TTrace} from 'types/Trace.types';
 import DAGComponent from './components/DAG';
 import {TimelineChart} from './components/TimelineChart';
+import SkeletonDiagram from '../SkeletonDiagram';
 
 export enum SupportedDiagrams {
   DAG = 'dag',
   Timeline = 'timeline',
 }
 
-export interface IDiagramProps {
+export interface IProps {
   trace: TTrace;
   type: SupportedDiagrams;
   runState: TTestRunState;
 }
 
 export interface IDiagramComponentProps {
-  spanList: TSpan[];
   affectedSpans: string[];
   matchedSpans: string[];
-  selectedSpan?: TSpan;
   onSelectSpan(spanId: string): void;
+  selectedSpan?: TSpan;
+  spanList: TSpan[];
 }
 
 const ComponentMap: Record<string, typeof DAGComponent | typeof TimelineChart> = {
@@ -31,15 +32,18 @@ const ComponentMap: Record<string, typeof DAGComponent | typeof TimelineChart> =
   [SupportedDiagrams.Timeline]: TimelineChart,
 };
 
-const Diagram: React.FC<IDiagramProps> = ({type, runState, trace}) => {
+const Diagram = ({type, runState, trace}: IProps) => {
   const Component = ComponentMap[type || ''] || DAGComponent;
-  const {onSelectSpan, selectedSpan, affectedSpans, matchedSpans} = useSpan();
+  const {onClearAffectedSpans, onClearSelectedSpan, onSelectSpan, selectedSpan, affectedSpans, matchedSpans} =
+    useSpan();
   const spanList = trace.spans || [];
 
   return runState === TestState.FINISHED ? (
-    <Component {...{spanList, onSelectSpan, selectedSpan, affectedSpans, matchedSpans}} />
+    <DAGProvider>
+      <Component {...{spanList, onSelectSpan, selectedSpan, affectedSpans, matchedSpans}} />
+    </DAGProvider>
   ) : (
-    <SkeletonDiagram onSelectSpan={onSelectSpan} selectedSpan={selectedSpan} />
+    <SkeletonDiagram onClearAffectedSpans={onClearAffectedSpans} onClearSelectedSpan={onClearSelectedSpan} />
   );
 };
 

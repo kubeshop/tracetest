@@ -4,7 +4,7 @@ import {CompareOperator, PseudoSelector} from 'constants/Operator.constants';
 import {SELECTOR_DEFAULT_ATTRIBUTES, SemanticGroupNameNodeMap} from 'constants/SemanticGroupNames.constants';
 import {TSpan, TSpanFlatAttribute} from 'types/Span.types';
 import {getObjectIncludesText} from 'utils/Common';
-import {INodeItem} from './DAG.service';
+import {INodeItem, ISpanNode} from './DAG.service';
 import OperatorService from './Operator.service';
 
 const itemSelectorKeys = SELECTOR_DEFAULT_ATTRIBUTES.flatMap(el => el.attributes);
@@ -68,10 +68,10 @@ const SpanService = () => ({
     );
   },
 
-  getNodeListFromSpanList(spanList: TSpan[]): INodeItem<{label: string}>[] {
-    console.log('### getNodeListFromSpanList');
+  getNodeListFromSpanList(spanList: TSpan[]): INodeItem<ISpanNode>[] {
+    console.log('### SpanService: getNodeListFromSpanList');
     return spanList.map(span => ({
-      data: {label: span.name},
+      data: {name: span.name, type: span.type, isAffected: false, isMatched: false, ...this.getSpanNodeInfo(span)},
       id: span.id,
       parentIds: span.parentId ? [span.parentId] : [],
       type: NodeTypesEnum.Span,

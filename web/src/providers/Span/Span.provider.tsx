@@ -1,12 +1,12 @@
 import {noop} from 'lodash';
 import {createContext, useCallback, useContext, useMemo} from 'react';
-// import {useStoreActions} from 'react-flow-renderer';
 import {useSelector} from 'react-redux';
 import {useAppDispatch} from 'redux/hooks';
 import {
   setAffectedSpans,
   setFocusedSpan,
   clearAffectedSpans,
+  clearSelectedSpan,
   setSelectedSpan,
   setMatchedSpans,
   setSearchText,
@@ -27,6 +27,7 @@ interface IContext {
   onSetAffectedSpans(spanIdList: string[]): void;
   onSetFocusedSpan(spanId: string): void;
   onClearAffectedSpans(): void;
+  onClearSelectedSpan(): void;
 }
 
 export const Context = createContext<IContext>({
@@ -39,6 +40,7 @@ export const Context = createContext<IContext>({
   onSetFocusedSpan: noop,
   onClearAffectedSpans: noop,
   onSetAffectedSpans: noop,
+  onClearSelectedSpan: noop,
 });
 
 interface IProps {
@@ -49,8 +51,6 @@ export const useSpan = () => useContext(Context);
 
 const SpanProvider = ({children}: IProps) => {
   const dispatch = useAppDispatch();
-  // const addSelected = useStoreActions(actions => actions.addSelectedElements);
-  const addSelected = (span: any) => {};
   const {
     run: {trace: {spans = []} = {}},
   } = useTestRun();
@@ -64,12 +64,15 @@ const SpanProvider = ({children}: IProps) => {
     (spanId: string) => {
       const span = spans.find(({id}) => id === spanId);
       if (span) {
-        addSelected([{id: span?.id}]);
         dispatch(setSelectedSpan({span}));
       }
     },
-    [addSelected, dispatch, spans]
+    [dispatch, spans]
   );
+
+  const onClearSelectedSpan = useCallback(() => {
+    dispatch(clearSelectedSpan());
+  }, [dispatch]);
 
   const onSetAffectedSpans = useCallback(
     (spanIds: string[]) => {
@@ -110,6 +113,7 @@ const SpanProvider = ({children}: IProps) => {
       onSetAffectedSpans,
       onSetFocusedSpan,
       onClearAffectedSpans,
+      onClearSelectedSpan,
     }),
     [
       affectedSpans,
@@ -122,6 +126,7 @@ const SpanProvider = ({children}: IProps) => {
       onSetFocusedSpan,
       searchText,
       selectedSpan,
+      onClearSelectedSpan,
     ]
   );
 

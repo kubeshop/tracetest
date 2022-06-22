@@ -2,12 +2,22 @@ import {coordCenter, Dag, dagStratify, decrossOpt, layeringSimplex, sugiyama} fr
 import {MarkerType} from 'react-flow-renderer';
 
 import {NodeTypesEnum} from 'constants/Diagram.constants';
+import {SemanticGroupNames} from 'constants/SemanticGroupNames.constants';
 
 export interface INodeItem<T> {
   data: T;
   id: string;
   parentIds: string[];
   type: NodeTypesEnum;
+}
+
+export interface ISpanNode {
+  heading: string;
+  name: string;
+  primary: string;
+  type: SemanticGroupNames;
+  isAffected: boolean;
+  isMatched: boolean;
 }
 
 function getDagLayout<T>(nodeList: INodeItem<T>[]) {
@@ -26,10 +36,11 @@ function getDagLayout<T>(nodeList: INodeItem<T>[]) {
 }
 
 function getNodes<T>(dagLayout: Dag<INodeItem<T>, undefined>) {
-  return dagLayout.descendants().map(({data: {id, data, type}, x, y}) => ({
+  return dagLayout.descendants().map(({data: {id, data, type}, x, y}, index) => ({
     data,
     id,
     position: {x: x ?? 0, y: y ?? 0},
+    selected: index === 0,
     type,
   }));
 }
@@ -46,7 +57,9 @@ function getEdges<T>(dagLayout: Dag<INodeItem<T>, undefined>) {
 
 const DAGService = () => ({
   getNodesAndEdges<T>(nodeList: INodeItem<T>[]) {
-    console.log('### getNodesAndEdges');
+    console.log('### DAG.service: getNodesAndEdges');
+    if (!nodeList.length) return {edges: [], nodes: []};
+
     const dagLayout = getDagLayout(nodeList);
     const edges = getEdges(dagLayout);
     const nodes = getNodes(dagLayout);

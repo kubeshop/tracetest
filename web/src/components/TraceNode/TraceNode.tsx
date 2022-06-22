@@ -1,19 +1,30 @@
-import {NodeProps} from 'react-flow-renderer';
-import {SemanticGroupNames} from '../../constants/SemanticGroupNames.constants';
-// import {TSpan} from '../../types/Span.types';
-import GenericTraceNode from './components/GenericTraceNode';
+import Text from 'antd/lib/typography/Text';
+import {capitalize} from 'lodash';
+import {Handle, NodeProps, Position} from 'react-flow-renderer';
 
-export type TTraceNodeProps = NodeProps<{label: string}>;
+import {SemanticGroupNamesToText} from 'constants/SemanticGroupNames.constants';
+import {ISpanNode} from 'services/DAG.service';
+import * as S from './TraceNode.styled';
 
-const ComponentMap: Record<string, typeof GenericTraceNode> = {
-  [SemanticGroupNames.Http]: GenericTraceNode,
-};
+interface IProps extends NodeProps<ISpanNode> {}
 
-const TraceNode: React.FC<TTraceNodeProps> = ({data: span, ...props}) => {
-  // const Component = ComponentMap[span?.type || ''] || GenericTraceNode;
-  const Component = GenericTraceNode;
+const TraceNode = ({data, id, selected}: IProps) => {
+  const spanTypeText = SemanticGroupNamesToText[data.type];
+  const className = `${data.isAffected ? 'affected' : ''} ${data.isMatched ? 'matched' : ''}`;
 
-  return <Component data={span} {...props} />;
+  return (
+    <S.TraceNode className={className} data-cy={`trace-node-${data.type}`} selected={selected}>
+      <S.TraceNotch spanType={data.type}>
+        <Text>{capitalize(data.heading) || spanTypeText}</Text>
+      </S.TraceNotch>
+      <Handle id={id} position={Position.Top} style={{top: 0, visibility: 'hidden'}} type="target" />
+      <S.TextContainer>
+        {data.primary && <S.NameText strong>{data.primary}</S.NameText>}
+        <S.NameText>{data.name}</S.NameText>
+      </S.TextContainer>
+      <Handle id={id} position={Position.Bottom} style={{bottom: 0, visibility: 'hidden'}} type="source" />
+    </S.TraceNode>
+  );
 };
 
 export default TraceNode;

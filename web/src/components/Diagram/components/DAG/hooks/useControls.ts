@@ -16,9 +16,14 @@ const useControls = ({onSelectSpan}: IProps) => {
     (nodeId: string) => {
       const {nodeInternals} = getState();
       const nodes = Array.from(nodeInternals).map(([, node]) => node);
-      const {position} = nodes.find(node => node.id === nodeId) || {};
+      const node = nodes.find(({id}) => id === nodeId);
 
-      return position || {x: 0, y: 0};
+      if (!node) return {x: 0, y: 0};
+
+      const x = node.position.x + (node?.width ?? 0) / 2;
+      const y = node.position.y + (node?.height ?? 0) / 2;
+
+      return {x, y};
     },
     [getState]
   );
@@ -36,8 +41,8 @@ const useControls = ({onSelectSpan}: IProps) => {
     if (focusedSpan) {
       const {x, y} = getNodePosition(focusedSpan);
 
-      setCenter(x, y);
-    } else fitView();
+      setCenter(x, y, {zoom: 1.85, duration: 1000});
+    } else fitView({duration: 1000});
   }, [fitView, focusedSpan, getNodePosition, getState, setCenter]);
 
   const handleNextSpan = useCallback(() => {

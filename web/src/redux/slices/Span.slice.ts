@@ -34,6 +34,9 @@ const testDefinitionSlice = createSlice({
       state.affectedSpans = [];
       state.focusedSpan = '';
     },
+    clearSelectedSpan(state) {
+      state.selectedSpan = undefined;
+    },
   },
   extraReducers: builder => {
     builder.addCase(setSelectedAssertion, (state, {payload: assertionResult}) => {
@@ -43,6 +46,13 @@ const testDefinitionSlice = createSlice({
   },
 });
 
-export const {clearAffectedSpans, setAffectedSpans, setSelectedSpan, setFocusedSpan, setMatchedSpans, setSearchText} =
-  testDefinitionSlice.actions;
+export const {
+  clearAffectedSpans,
+  setAffectedSpans,
+  clearSelectedSpan,
+  setSelectedSpan,
+  setFocusedSpan,
+  setMatchedSpans,
+  setSearchText,
+} = testDefinitionSlice.actions;
 export default testDefinitionSlice.reducer;
