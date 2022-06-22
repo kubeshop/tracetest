@@ -16,6 +16,6 @@ testDefinition:
 - selector: span[name="Trigger test"]
   assertions:
   - tracetest.selected_spans.count = 1
-  - tracetest.run.trigger.test_id = "0013d04a-d378-4f8e-9f2d-1639f7a303dd"
+  - tracetest.run.trigger.test_id = "${TEST_ID}"
   - tracetest.run.trigger.type = "http"
   - tracetest.run.trigger.http.response_code = 200
