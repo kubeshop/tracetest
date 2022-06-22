@@ -84,10 +84,6 @@ func (a *App) Start() error {
 		}
 	}
 
-	if err != nil {
-		return fmt.Errorf("could not create tracer: %w", err)
-	}
-
 	ex, err := executor.NewTriggerer(a.tracer)
 	if err != nil {
 		return fmt.Errorf("could not create executor: %w", err)
