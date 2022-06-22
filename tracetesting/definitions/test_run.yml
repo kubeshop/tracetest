@@ -22,3 +22,7 @@ testDefinition:
 - selector: span[name = "Fetch trace"]
   assertions:
   - tracetest.selected_spans.count > 0
+- selector: span[name = "Fetch trace"]:last
+  assertions:
+  - tracetest.run.trace_poller.test_id = "${TEST_ID}"
+  - tracetest.run.trace_poller.succesful = true

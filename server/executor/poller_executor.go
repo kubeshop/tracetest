@@ -8,6 +8,7 @@ import (
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/traces"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -27,6 +28,11 @@ func (pe InstrumentedPollerExecutor) ExecuteRequest(request PollingRequest) (boo
 	defer span.End()
 
 	finished, run, err := pe.pollerExecutor.ExecuteRequest(request)
+
+	span.SetAttributes(
+		attribute.Bool("tracetest.run.trace_poller.succesful", finished),
+		attribute.String("tracetest.run.trace_poller.test_id", request.test.ID.String()),
+	)
 
 	return finished, run, err
 }
