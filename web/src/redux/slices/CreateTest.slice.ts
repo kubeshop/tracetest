@@ -4,10 +4,7 @@ import {Plugins, SupportedPlugins} from 'constants/Plugins.constants';
 
 export const initialState: ICreateTestState = {
   draftTest: {},
-  stepList: Plugins.REST.stepList.map((step, index) => {
-    if (!index) return {...step, status: 'selected'};
-    return step;
-  }),
+  stepList: Plugins.REST.stepList,
   stepNumber: 0,
   pluginName: SupportedPlugins.REST,
 };

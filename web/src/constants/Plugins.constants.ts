@@ -20,6 +20,7 @@ const Default: IPlugin = {
       title: 'Choose the way of creating a test',
       component: 'SelectPlugin',
       isDefaultValid: true,
+      status: 'selected',
     },
     {
       id: 'basic-details',
