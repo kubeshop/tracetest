@@ -29,7 +29,7 @@ jobs:
         with:
           go-version: '^1.18'
       - name: Install prism
-        run: npm install -g @stoplight/prism-cli@4.9.3
+        run: npm install -g @stoplight/prism-cli@4.8.0
       - name: Run unit tests
         run: |
           cd cli/
