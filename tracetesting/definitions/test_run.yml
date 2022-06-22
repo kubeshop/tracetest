@@ -13,3 +13,9 @@ testDefinition:
 - selector: span[name="POST /api/tests/{testId}/run" tracetest.span.type="http"]
   assertions:
   - tracetest.response.status = 200
+- selector: span[name="Trigger test"]
+  assertions:
+  - tracetest.selected_spans.count = 1
+  - tracetest.run.trigger.test_id = "${TEST_ID}"
+  - tracetest.run.trigger.type = "http"
+  - tracetest.run.trigger.http.response_code = 200

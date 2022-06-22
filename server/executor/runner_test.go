@@ -16,7 +16,7 @@ import (
 )
 
 func TestPersistentRunner(t *testing.T) {
-	t.Run("TestIsExecuted", func(t *testing.T) {
+	t.Run("TestIsTriggerd", func(t *testing.T) {
 		t.Parallel()
 
 		test := model.Test{
@@ -35,7 +35,7 @@ func TestPersistentRunner(t *testing.T) {
 		f.assert(t)
 	})
 
-	t.Run("TestsCanBeExecutedConcurrently", func(t *testing.T) {
+	t.Run("TestsCanBeTriggerdConcurrently", func(t *testing.T) {
 		t.Parallel()
 
 		test1 := model.Test{ID: id.NewRandGenerator().UUID()}
@@ -73,7 +73,7 @@ var (
 
 type runnerFixture struct {
 	runner          executor.PersistentRunner
-	mockExecutor    *mockExecutor
+	mockExecutor    *mockTriggerer
 	mockDB          *mockDB
 	mockTracePoller *mockTracePoller
 }
@@ -82,19 +82,19 @@ func (f runnerFixture) run(tests []model.Test, ttl time.Duration) {
 	f.runner.Start(2)
 	time.Sleep(10 * time.Millisecond)
 	for _, test := range tests {
-		f.runner.Run(test)
+		f.runner.Run(context.TODO(), test)
 	}
 	time.Sleep(ttl)
 	f.runner.Stop()
 }
 
 func (f runnerFixture) expectSuccessExecLong(test model.Test) {
-	f.mockExecutor.expectExecuteTestLong(test)
+	f.mockExecutor.expectTriggerTestLong(test)
 	f.expectSuccessResultPersist(test)
 }
 
 func (f runnerFixture) expectSuccessExec(test model.Test) {
-	f.mockExecutor.expectExecuteTest(test)
+	f.mockExecutor.expectTriggerTest(test)
 	f.expectSuccessResultPersist(test)
 }
 
@@ -111,7 +111,7 @@ func (f runnerFixture) assert(t *testing.T) {
 }
 
 func runnerSetup(t *testing.T) runnerFixture {
-	me := new(mockExecutor)
+	me := new(mockTriggerer)
 	me.t = t
 	me.Test(t)
 
@@ -159,25 +159,25 @@ func (m *mockDB) UpdateRun(_ context.Context, run model.Run) error {
 	return args.Error(0)
 }
 
-type mockExecutor struct {
+type mockTriggerer struct {
 	mock.Mock
 	t *testing.T
 }
 
-func (m *mockExecutor) Execute(test model.Test, tid trace.TraceID, sid trace.SpanID) (model.HTTPResponse, error) {
+func (m *mockTriggerer) Trigger(_ context.Context, test model.Test, tid trace.TraceID, sid trace.SpanID) (model.HTTPResponse, error) {
 	args := m.Called(test.ID)
 	return args.Get(0).(model.HTTPResponse), args.Error(1)
 }
 
-func (m *mockExecutor) expectExecuteTest(test model.Test) *mock.Call {
+func (m *mockTriggerer) expectTriggerTest(test model.Test) *mock.Call {
 	return m.
-		On("Execute", test.ID).
+		On("Trigger", test.ID).
 		Return(sampleResponse, noError)
 }
 
-func (m *mockExecutor) expectExecuteTestLong(test model.Test) *mock.Call {
+func (m *mockTriggerer) expectTriggerTestLong(test model.Test) *mock.Call {
 	return m.
-		On("Execute", test.ID).
+		On("Trigger", test.ID).
 		After(50*time.Millisecond).
 		Return(sampleResponse, noError)
 }

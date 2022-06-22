@@ -272,7 +272,7 @@ func (c *controller) RunTest(ctx context.Context, testID string) (openapi.ImplRe
 		return handleDBError(err), err
 	}
 
-	run := c.runner.Run(test)
+	run := c.runner.Run(ctx, test)
 
 	analytics.CreateAndSendEvent("test_run_backend", "test")
 

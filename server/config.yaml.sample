@@ -4,7 +4,9 @@ jaegerConnectionConfig:
   tls:
     insecure: true
 
-maxWaitTimeForTrace: 30s
+poolingConfig:
+  maxWaitTimeForTrace: 30s
+  retryDelay: 500ms
 
 googleAnalytics:
   enabled: true
