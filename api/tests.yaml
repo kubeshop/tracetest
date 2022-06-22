@@ -202,53 +202,53 @@ components:
           items:
             $ref: "#/components/schemas/SpanSelector"
 
-    SpanSelector:
-      type: object
-      nullable: true
-      required:
-        - filters
-      properties:
-        filters:
-          type: array
-          items:
-            $ref: "#/components/schemas/SelectorFilter"
-        pseudoClass:
-          $ref: "#/components/schemas/SelectorPseudoClass"
-        # childSelector:
-        #   $ref: "#/components/schemas/SpanSelector"
+    # SpanSelector:
+    #   type: object
+    #   nullable: true
+    #   required:
+    #     - filters
+    #   properties:
+    #     filters:
+    #       type: array
+    #       items:
+    #         $ref: "#/components/schemas/SelectorFilter"
+    #     # pseudoClass:
+    #     #   $ref: "#/components/schemas/SelectorPseudoClass"
+    #     # childSelector:
+    #     #   $ref: "#/components/schemas/SpanSelector"
 
-    SelectorFilter:
-      type: object
-      required:
-        - property
-        - operator
-        - value
-      properties:
-        property:
-          type: string
-        operator:
-          type: string
-        value:
-          type: string
+    # SelectorFilter:
+    #   type: object
+    #   required:
+    #     - property
+    #     - operator
+    #     - value
+    #   properties:
+    #     property:
+    #       type: string
+    #     operator:
+    #       type: string
+    #     value:
+    #       type: string
 
-    SelectorPseudoClass:
-      type: object
-      nullable: true
-      required:
-        - name
-      properties:
-        name:
-          type: string
-        N:
-          type: integer
+    # SelectorPseudoClass:
+    #   type: object
+    #   nullable: true
+    #   required:
+    #     - name
+    #   properties:
+    #     name:
+    #       type: string
+    #     N:
+    #       type: integer
 
-    ExportedTestInformation:
-      type: object
-      required:
-        - test
-        - run
-      properties:
-        test:
-          $ref: "#/components/schemas/Test"
-        run:
-          $ref: "#/components/schemas/TestRun"
+    # ExportedTestInformation:
+    #   type: object
+    #   required:
+    #     - test
+    #     - run
+    #   properties:
+    #     test:
+    #       $ref: "#/components/schemas/Test"
+    #     run:
+    #       $ref: "#/components/schemas/TestRun"
