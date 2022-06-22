@@ -20,8 +20,8 @@ func filterSpans(rootSpan traces.Span, spanSelector SpanSelector) []traces.Span 
 
 	uniqueSpans := filterDuplicated(filteredSpans)
 
-	if spanSelector.PsedoClass != nil {
-		return spanSelector.PsedoClass.Filter(uniqueSpans)
+	if spanSelector.PseudoClass != nil {
+		return spanSelector.PseudoClass.Filter(uniqueSpans)
 	}
 
 	return uniqueSpans

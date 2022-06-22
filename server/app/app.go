@@ -84,7 +84,7 @@ func (a *App) Start() error {
 		}
 	}
 
-	ex, err := executor.New()
+	ex, err := executor.NewTriggerer(a.tracer)
 	if err != nil {
 		return fmt.Errorf("could not create executor: %w", err)
 	}

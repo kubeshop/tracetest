@@ -272,7 +272,7 @@ func (c *controller) RunTest(ctx context.Context, testID string) (openapi.ImplRe
 		return handleDBError(err), err
 	}
 
-	run := c.runner.Run(test)
+	run := c.runner.Run(ctx, test)
 
 	analytics.CreateAndSendEvent("test_run_backend", "test")
 
@@ -432,4 +432,62 @@ func getYamlFileFromDefinition(def definition.Test) ([]byte, error) {
 	}
 
 	return bytes, nil
+}
+
+func (c controller) ExportTestRun(ctx context.Context, testID string, runID string) (openapi.ImplResponse, error) {
+	rid, err := uuid.Parse(runID)
+	if err != nil {
+		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
+	}
+
+	run, err := c.testDB.GetRun(ctx, rid)
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	tid, err := uuid.Parse(testID)
+	if err != nil {
+		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
+	}
+
+	test, err := c.testDB.GetTestVersion(ctx, tid, run.TestVersion)
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	response := openapi.ExportedTestInformation{
+		Test: c.openapi.Test(test),
+		Run:  c.openapi.Run(&run),
+	}
+
+	return openapi.Response(http.StatusOK, response), nil
+}
+
+func (c controller) ImportTestRun(ctx context.Context, exportedTest openapi.ExportedTestInformation) (openapi.ImplResponse, error) {
+	test := c.model.Test(exportedTest.Test)
+	run := c.model.Run(exportedTest.Run)
+
+	createdTest, err := c.testDB.CreateTest(ctx, test)
+	if err != nil {
+		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
+	}
+
+	createdRun, err := c.testDB.CreateRun(ctx, createdTest, *run)
+	if err != nil {
+		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
+	}
+
+	createdRun.State = run.State
+
+	err = c.testDB.UpdateRun(ctx, createdRun)
+	if err != nil {
+		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
+	}
+
+	response := openapi.ExportedTestInformation{
+		Test: c.openapi.Test(createdTest),
+		Run:  c.openapi.Run(&createdRun),
+	}
+
+	return openapi.Response(http.StatusOK, response), nil
 }

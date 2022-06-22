@@ -4,6 +4,8 @@ source ./funcs.bash
 
 EXIT_STATUS=0
 
+export DEMO_APP_URL=${DEMO_APP_URL-"http://demo-pokemon-api.demo.svc.cluster.local"}
+
 test "test_create" ./definitions/test_create.yml || EXIT_STATUS=$?
 
 export TEST_ID=$(tracetest_target test list | jq -rc '.[0].id')

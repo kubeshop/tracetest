@@ -239,5 +239,16 @@ components:
       properties:
         name:
           type: string
-        N:
+        argument:
           type: integer
+
+    ExportedTestInformation:
+      type: object
+      required:
+        - test
+        - run
+      properties:
+        test:
+          $ref: "#/components/schemas/Test"
+        run:
+          $ref: "#/components/schemas/TestRun"
