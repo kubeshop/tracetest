@@ -1,4 +1,4 @@
-id: d85c3336-5048-4652-b564-63dfe2c83b14
+id: 438267e4-2ea3-418f-854f-d964dadf5773
 name: Test Create
 description: ""
 trigger:
@@ -10,22 +10,22 @@ trigger:
     - key: Content-Type
       value: application/json
     body: |
-        {
-          "name": "Pokemon - List - Get a Pokemon",
-          "serviceUnderTest": {
-              "request": {
-                  "url": "http://demo-pokemon-api.demo.svc.cluster.local/pokemon?take=20&skip=0",
-                  "method": "GET",
-                  "body": "",
-                  "headers": [
-                      {
-                          "key": "Content-Type",
-                          "value": "application/json"
-                      }
-                  ]
-              }
-          }
+      {
+        "name": "Pokemon - List - Get a Pokemon",
+        "serviceUnderTest": {
+            "request": {
+                "url": "${DEMO_APP_URL}/pokemon?take=20&skip=0",
+                "method": "GET",
+                "body": "",
+                "headers": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ]
+            }
         }
+      }
 testDefinition:
 - selector: span[name="POST /api/tests" tracetest.span.type="http"]
   assertions:

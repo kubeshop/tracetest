@@ -17,6 +17,7 @@ echo "TARGET_URL: $TARGET_URL"
 export TRACETEST_MAIN_ENDPOINT="localhost:8080"
 export TRACETEST_TARGET_ENDPOINT="localhost:8081"
 export TARGET_URL=${TARGET_URL:-"http://localhost:8081"}
+export DEMO_APP_URL="http://demo-pokemon-api.demo.svc.cluster.local"
 
 mkdir -p results/responses
 
