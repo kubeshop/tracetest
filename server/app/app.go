@@ -1,6 +1,7 @@
 package app
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -18,6 +19,7 @@ import (
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/tracedb"
+	"github.com/kubeshop/tracetest/server/tracing"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -84,7 +86,13 @@ func (a *App) Start() error {
 		}
 	}
 
-	ex, err := executor.New()
+	ctx := context.Background()
+	tracer, err := tracing.NewTracer(ctx, a.config)
+	if err != nil {
+		return fmt.Errorf("could not create tracer: %w", err)
+	}
+
+	ex, err := executor.NewTriggerer(tracer)
 	if err != nil {
 		return fmt.Errorf("could not create executor: %w", err)
 	}

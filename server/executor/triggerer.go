@@ -14,6 +14,7 @@ import (
 	"go.opentelemetry.io/contrib/propagators/b3"
 	"go.opentelemetry.io/contrib/propagators/jaeger"
 	"go.opentelemetry.io/contrib/propagators/ot"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
@@ -22,23 +23,48 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-type Triggerer struct {
-	traceProvider *sdktrace.TracerProvider
+type Triggerer interface {
+	Trigger(context.Context, model.Test, trace.TraceID, trace.SpanID) (model.HTTPResponse, error)
 }
 
-func New() (*Triggerer, error) {
+func NewTriggerer(tracer trace.Tracer) (Triggerer, error) {
 	tp, err := initTracing()
 	if err != nil {
 		return nil, err
 	}
-	return &Triggerer{
-		traceProvider: tp,
+	return &instrumentedTriggerer{
+		tracer: tracer,
+		triggerer: &httpTriggerer{
+			traceProvider: tp,
+		},
 	}, nil
 }
 
-// TODO change test input to model.HTTPRequest
-func (te *Triggerer) Trigger(test model.Test, tid trace.TraceID, sid trace.SpanID) (model.HTTPResponse, error) {
+type instrumentedTriggerer struct {
+	tracer    trace.Tracer
+	triggerer Triggerer
+}
 
+func (te *instrumentedTriggerer) Trigger(ctx context.Context, test model.Test, tid trace.TraceID, sid trace.SpanID) (model.HTTPResponse, error) {
+	ctx, span := te.tracer.Start(ctx, "Trigger test")
+	defer span.End()
+
+	resp, err := te.triggerer.Trigger(ctx, test, tid, sid)
+
+	span.SetAttributes(
+		attribute.String("tracetest.run.trigger.test_id", test.ID.String()),
+		attribute.String("tracetest.run.trigger.type", "http"),
+		attribute.Int("tracetest.run.trigger.http.response_code", resp.StatusCode),
+	)
+
+	return resp, err
+}
+
+type httpTriggerer struct {
+	traceProvider *sdktrace.TracerProvider
+}
+
+func (te *httpTriggerer) Trigger(_ context.Context, test model.Test, tid trace.TraceID, sid trace.SpanID) (model.HTTPResponse, error) {
 	client := http.Client{
 		Transport: otelhttp.NewTransport(http.DefaultTransport,
 			otelhttp.WithTracerProvider(te.traceProvider),

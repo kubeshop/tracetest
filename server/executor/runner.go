@@ -5,11 +5,12 @@ import (
 	"fmt"
 
 	"github.com/kubeshop/tracetest/server/model"
-	"go.opentelemetry.io/otel/trace"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/propagation"
 )
 
 type Runner interface {
-	Run(model.Test) model.Run
+	Run(context.Context, model.Test) model.Run
 }
 
 type PersistentRunner interface {
@@ -17,12 +18,8 @@ type PersistentRunner interface {
 	WorkerPool
 }
 
-type Executor interface {
-	Execute(model.Test, trace.TraceID, trace.SpanID) (model.HTTPResponse, error)
-}
-
 func NewPersistentRunner(
-	e Executor,
+	e Triggerer,
 	runs model.RunRepository,
 	updater RunUpdater,
 	tp TracePoller,
@@ -38,7 +35,7 @@ func NewPersistentRunner(
 }
 
 type persistentRunner struct {
-	executor Executor
+	executor Triggerer
 	tp       TracePoller
 	runs     model.RunRepository
 	updater  RunUpdater
@@ -48,9 +45,10 @@ type persistentRunner struct {
 }
 
 type execReq struct {
-	ctx  context.Context
-	test model.Test
-	run  model.Run
+	ctx     context.Context
+	test    model.Test
+	run     model.Run
+	Headers propagation.MapCarrier
 }
 
 func (r persistentRunner) handleDBError(err error) {
@@ -88,9 +86,15 @@ func (r persistentRunner) Stop() {
 	r.exit <- true
 }
 
-func (r persistentRunner) Run(test model.Test) model.Run {
-	// Start a new background context for the async process
-	ctx := context.Background()
+func getNewCtx(ctx context.Context) context.Context {
+	carrier := propagation.MapCarrier{}
+	otel.GetTextMapPropagator().Inject(ctx, carrier)
+
+	return otel.GetTextMapPropagator().Extract(context.Background(), carrier)
+}
+
+func (r persistentRunner) Run(ctx context.Context, test model.Test) model.Run {
+	ctx = getNewCtx(ctx)
 
 	run, err := r.runs.CreateRun(ctx, test, model.NewRun())
 	r.handleDBError(err)
@@ -108,7 +112,7 @@ func (r persistentRunner) processExecQueue(job execReq) {
 	run := job.run.Start()
 	r.handleDBError(r.updater.Update(job.ctx, run))
 
-	response, err := r.executor.Execute(job.test, job.run.TraceID, job.run.SpanID)
+	response, err := r.executor.Trigger(job.ctx, job.test, job.run.TraceID, job.run.SpanID)
 	run = r.handleExecutionResult(run, response, err)
 
 	r.handleDBError(r.updater.Update(job.ctx, run))

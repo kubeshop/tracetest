@@ -1,16 +1,34 @@
 package executor_test
 
 import (
+	"context"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
+	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/tracing"
 	"github.com/stretchr/testify/assert"
 )
+
+func getTriggerer() executor.Triggerer {
+	tr, err := tracing.NewTracer(context.TODO(), config.Config{})
+	if err != nil {
+		panic(err)
+	}
+
+	ex, err := executor.NewTriggerer(tr)
+	if err != nil {
+		panic(err)
+	}
+
+	return ex
+
+}
 
 func TestTriggerGet(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
@@ -35,8 +53,7 @@ func TestTriggerGet(t *testing.T) {
 	}))
 	defer server.Close()
 
-	ex, err := executor.New()
-	assert.NoError(t, err)
+	ex := getTriggerer()
 
 	test := model.Test{
 		Name: "test",
@@ -52,7 +69,7 @@ func TestTriggerGet(t *testing.T) {
 		},
 	}
 
-	resp, err := ex.Trigger(test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
+	resp, err := ex.Trigger(context.TODO(), test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
 	assert.NoError(t, err)
 
 	assert.Equal(t, 200, resp.StatusCode)
@@ -82,8 +99,7 @@ func TestTriggerPost(t *testing.T) {
 	}))
 	defer server.Close()
 
-	ex, err := executor.New()
-	assert.NoError(t, err)
+	ex := getTriggerer()
 
 	test := model.Test{
 		Name: "test",
@@ -99,7 +115,7 @@ func TestTriggerPost(t *testing.T) {
 		},
 	}
 
-	resp, err := ex.Trigger(test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
+	resp, err := ex.Trigger(context.TODO(), test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
 	assert.NoError(t, err)
 
 	assert.Equal(t, 200, resp.StatusCode)
@@ -135,8 +151,7 @@ func TestTriggerPostWithApiKeyAuth(t *testing.T) {
 	}))
 	defer server.Close()
 
-	ex, err := executor.New()
-	assert.NoError(t, err)
+	ex := getTriggerer()
 
 	test := model.Test{
 		Name: "test",
@@ -160,7 +175,7 @@ func TestTriggerPostWithApiKeyAuth(t *testing.T) {
 		},
 	}
 
-	resp, err := ex.Trigger(test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
+	resp, err := ex.Trigger(context.TODO(), test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
 	assert.NoError(t, err)
 
 	assert.Equal(t, 200, resp.StatusCode)
@@ -196,8 +211,7 @@ func TestTriggerPostWithBasicAuth(t *testing.T) {
 	}))
 	defer server.Close()
 
-	ex, err := executor.New()
-	assert.NoError(t, err)
+	ex := getTriggerer()
 
 	test := model.Test{
 		Name: "test",
@@ -220,7 +234,7 @@ func TestTriggerPostWithBasicAuth(t *testing.T) {
 		},
 	}
 
-	resp, err := ex.Trigger(test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
+	resp, err := ex.Trigger(context.TODO(), test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
 	assert.NoError(t, err)
 
 	assert.Equal(t, 200, resp.StatusCode)
@@ -256,8 +270,7 @@ func TestTriggerPostWithBearerAuth(t *testing.T) {
 	}))
 	defer server.Close()
 
-	ex, err := executor.New()
-	assert.NoError(t, err)
+	ex := getTriggerer()
 
 	test := model.Test{
 		Name: "test",
@@ -279,7 +292,7 @@ func TestTriggerPostWithBearerAuth(t *testing.T) {
 		},
 	}
 
-	resp, err := ex.Trigger(test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
+	resp, err := ex.Trigger(context.TODO(), test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
 	assert.NoError(t, err)
 
 	assert.Equal(t, 200, resp.StatusCode)
