@@ -14,7 +14,7 @@ type NthChildPseudoClass struct {
 }
 
 func (nc NthChildPseudoClass) Name() string {
-	return "nth-child"
+	return "nth_child"
 }
 
 func (nc NthChildPseudoClass) Filter(spans []traces.Span) []traces.Span {

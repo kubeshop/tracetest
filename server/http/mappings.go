@@ -155,10 +155,10 @@ func (m OpenAPIMapper) SpanSelector(in selectors.SpanSelector) openapi.SpanSelec
 		pseudoClass = &openapi.SelectorPseudoClass{
 			Name: in.PsedoClass.Name(),
 		}
-	}
 
-	if nthChildPseudoClass, ok := in.PsedoClass.(selectors.NthChildPseudoClass); ok {
-		pseudoClass.N = int32(nthChildPseudoClass.N)
+		if nthChildPseudoClass, ok := in.PsedoClass.(*selectors.NthChildPseudoClass); ok {
+			pseudoClass.Argument = int32(nthChildPseudoClass.N)
+		}
 	}
 
 	var child *openapi.SpanSelector

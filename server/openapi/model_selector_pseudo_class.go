@@ -12,7 +12,7 @@ package openapi
 type SelectorPseudoClass struct {
 	Name string `json:"name"`
 
-	N int32 `json:"N,omitempty"`
+	Argument int32 `json:"argument,omitempty"`
 }
 
 // AssertSelectorPseudoClassRequired checks if the required fields are not zero-ed
