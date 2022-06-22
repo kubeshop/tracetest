@@ -22,22 +22,22 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-type TestExecutor struct {
+type Triggerer struct {
 	traceProvider *sdktrace.TracerProvider
 }
 
-func New() (*TestExecutor, error) {
+func New() (*Triggerer, error) {
 	tp, err := initTracing()
 	if err != nil {
 		return nil, err
 	}
-	return &TestExecutor{
+	return &Triggerer{
 		traceProvider: tp,
 	}, nil
 }
 
 // TODO change test input to model.HTTPRequest
-func (te *TestExecutor) Execute(test model.Test, tid trace.TraceID, sid trace.SpanID) (model.HTTPResponse, error) {
+func (te *Triggerer) Trigger(test model.Test, tid trace.TraceID, sid trace.SpanID) (model.HTTPResponse, error) {
 
 	client := http.Client{
 		Transport: otelhttp.NewTransport(http.DefaultTransport,

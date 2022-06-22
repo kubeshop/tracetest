@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestExecuteGet(t *testing.T) {
+func TestTriggerGet(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		t.Log(req.Header)
 
@@ -52,14 +52,14 @@ func TestExecuteGet(t *testing.T) {
 		},
 	}
 
-	resp, err := ex.Execute(test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
+	resp, err := ex.Trigger(test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
 	assert.NoError(t, err)
 
 	assert.Equal(t, 200, resp.StatusCode)
 	assert.Equal(t, "OK", resp.Body)
 }
 
-func TestExecutePost(t *testing.T) {
+func TestTriggerPost(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		t.Log(req.Header)
 
@@ -99,14 +99,14 @@ func TestExecutePost(t *testing.T) {
 		},
 	}
 
-	resp, err := ex.Execute(test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
+	resp, err := ex.Trigger(test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
 	assert.NoError(t, err)
 
 	assert.Equal(t, 200, resp.StatusCode)
 	assert.Equal(t, "OK", resp.Body)
 }
 
-func TestExecutePostWithApiKeyAuth(t *testing.T) {
+func TestTriggerPostWithApiKeyAuth(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		t.Log(req.Header)
 
@@ -160,14 +160,14 @@ func TestExecutePostWithApiKeyAuth(t *testing.T) {
 		},
 	}
 
-	resp, err := ex.Execute(test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
+	resp, err := ex.Trigger(test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
 	assert.NoError(t, err)
 
 	assert.Equal(t, 200, resp.StatusCode)
 	assert.Equal(t, "OK", resp.Body)
 }
 
-func TestExecutePostWithBasicAuth(t *testing.T) {
+func TestTriggerPostWithBasicAuth(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		t.Log(req.Header)
 
@@ -220,14 +220,14 @@ func TestExecutePostWithBasicAuth(t *testing.T) {
 		},
 	}
 
-	resp, err := ex.Execute(test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
+	resp, err := ex.Trigger(test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
 	assert.NoError(t, err)
 
 	assert.Equal(t, 200, resp.StatusCode)
 	assert.Equal(t, "OK", resp.Body)
 }
 
-func TestExecutePostWithBearerAuth(t *testing.T) {
+func TestTriggerPostWithBearerAuth(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		t.Log(req.Header)
 
@@ -279,7 +279,7 @@ func TestExecutePostWithBearerAuth(t *testing.T) {
 		},
 	}
 
-	resp, err := ex.Execute(test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
+	resp, err := ex.Trigger(test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
 	assert.NoError(t, err)
 
 	assert.Equal(t, 200, resp.StatusCode)
