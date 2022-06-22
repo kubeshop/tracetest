@@ -43,7 +43,7 @@ func getAllSpans(trace traces.Trace) []traces.Span {
 
 type SpanSelector struct {
 	Filters       []filter
-	PsedoClass    PseudoClass
+	PseudoClass   PseudoClass
 	ChildSelector *SpanSelector
 }
 
