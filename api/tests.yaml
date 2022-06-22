@@ -197,10 +197,10 @@ components:
       properties:
         query:
           type: string
-        structure:
-          type: array
-          items:
-            $ref: "#/components/schemas/SpanSelector"
+        # structure:
+        #   type: array
+        #   items:
+        #     $ref: "#/components/schemas/SpanSelector"
 
     # SpanSelector:
     #   type: object
