@@ -20,7 +20,7 @@ generate-client:
 
 	go fmt ./...; cd ..
 
-build: generate-client
+build:
 	go build -o tracetest main.go
 
 test: mockserver

@@ -128,6 +128,12 @@ func (tp tracePoller) processJob(job PollingRequest) {
 		tp.requeue(job)
 	}
 
+	trace = trace.Sort()
+	run = run.SuccessfullyPolledTraces(augmentData(&trace, run.Response))
+
+	fmt.Printf("completed polling result %s after %d times, number of spans: %d \n", job.run.ID, job.count, len(run.Trace.Flat))
+
+	tp.handleDBError(tp.updater.Update(job.ctx, run))
 	err = tp.runAssertions(job.ctx, job.test, run)
 	if err != nil {
 		fmt.Printf("could not run assertions: %s\n", err.Error())
