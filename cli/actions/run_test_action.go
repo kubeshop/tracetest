@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
 	"sync"
 	"time"
@@ -79,24 +80,25 @@ func (a runTestAction) runDefinition(ctx context.Context, definitionFile string,
 
 	var test openapi.Test
 
-	if definition.Id == "" {
-		a.logger.Debug("test doesn't exist. Creating it")
-		test, err = a.createTestFromDefinition(ctx, definition)
-		if err != nil {
-			return runTestOutput{}, fmt.Errorf("could not create test from definition: %w", err)
-		}
+	a.logger.Debug("try to create test")
 
-		definition.Id = *test.Id
-		err = file.SaveDefinition(definitionFile, definition)
-		if err != nil {
-			return runTestOutput{}, fmt.Errorf("could not save definition: %w", err)
-		}
-	} else {
+	test, exists, err := a.createTestFromDefinition(ctx, definition)
+	if err != nil {
+		return runTestOutput{}, fmt.Errorf("could not create test from definition: %w", err)
+	}
+
+	if exists {
 		a.logger.Debug("test exists. Updating it")
 		test, err = a.updateTestFromDefinition(ctx, definition)
 		if err != nil {
 			return runTestOutput{}, fmt.Errorf("could not update test using definition: %w", err)
 		}
+	}
+
+	definition.Id = *test.Id
+	err = file.SaveDefinition(definitionFile, definition)
+	if err != nil {
+		return runTestOutput{}, fmt.Errorf("could not save test definition: %w", err)
 	}
 
 	testRun, err := a.runTest(ctx, definition.Id)
@@ -146,13 +148,13 @@ func (a runTestAction) saveJUnitFile(ctx context.Context, testId, testRunId, out
 
 }
 
-func (a runTestAction) createTestFromDefinition(ctx context.Context, definition definition.Test) (openapi.Test, error) {
+func (a runTestAction) createTestFromDefinition(ctx context.Context, definition definition.Test) (_ openapi.Test, exists bool, _ error) {
 	variableInjector := variable.NewInjector()
 	variableInjector.Inject(&definition)
 
 	openapiTest, err := conversion.ConvertTestDefinitionIntoOpenAPIObject(definition)
 	if err != nil {
-		return openapi.Test{}, err
+		return openapi.Test{}, false, err
 	}
 
 	req := a.client.ApiApi.CreateTest(ctx)
@@ -160,16 +162,22 @@ func (a runTestAction) createTestFromDefinition(ctx context.Context, definition 
 
 	testBytes, err := json.Marshal(openapiTest)
 	if err != nil {
-		return openapi.Test{}, fmt.Errorf("could not marshal test: %w", err)
+		return openapi.Test{}, false, fmt.Errorf("could not marshal test: %w", err)
 	}
 
 	a.logger.Debug("Sending request to create test", zap.ByteString("test", testBytes))
-	createdTest, _, err := a.client.ApiApi.CreateTestExecute(req)
-	if err != nil {
-		return openapi.Test{}, fmt.Errorf("could not execute request: %w", err)
+	createdTest, resp, err := a.client.ApiApi.CreateTestExecute(req)
+
+	if resp.StatusCode == http.StatusBadRequest {
+		// trying to create a test with already exsiting ID
+		return openapi.Test{}, true, nil
 	}
 
-	return *createdTest, nil
+	if err != nil {
+		return openapi.Test{}, false, fmt.Errorf("could not execute request: %w", err)
+	}
+
+	return *createdTest, false, nil
 }
 
 func (a runTestAction) updateTestFromDefinition(ctx context.Context, definition definition.Test) (openapi.Test, error) {
