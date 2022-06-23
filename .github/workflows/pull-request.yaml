@@ -62,10 +62,20 @@ jobs:
           node-version: 16.13.x
           cache: npm
           cache-dependency-path: web/package-lock.json
+
+      - name: Cache node_modules
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: tracetest-npm
+          restore-keys: |
+            tracetest-npm
+
       - name: Install test dependencies
         run: |
           cd web/
           npm ci
+          npm set cache /tmp/.buildx-cache
       - name: Run unit tests
         run: |
           cd web/
@@ -197,10 +207,20 @@ jobs:
             --namespace tracetest-pr-${{ github.event.pull_request.number }} \
             svc/tracetest-pr-${{ github.event.pull_request.number }} 3000:8080 &
 
+      - name: Cache node_modules
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: tracetest-npm
+          restore-keys: |
+            tracetest-npm
+
       - name: Install test dependencies
         run: |
           cd web/
+          npm set cache /tmp/.buildx-cache
           npm ci
+
       - name: Run integration tests
         run: |
           cd web/
