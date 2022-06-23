@@ -132,3 +132,88 @@ func createSpan(name string) *traces.Span {
 		},
 	}
 }
+
+var now = time.Now()
+
+func getTime(n int) time.Time {
+	return now.Add(time.Duration(n) * time.Second)
+}
+
+func TestSort(t *testing.T) {
+	randGenerator := id.NewRandGenerator()
+	trace := traces.Trace{
+		ID: randGenerator.TraceID(),
+		RootSpan: traces.Span{
+			Name:       "root",
+			StartTime:  getTime(0),
+			Attributes: traces.Attributes{},
+			Children: []*traces.Span{
+				{
+					Name:      "child 2",
+					StartTime: getTime(2),
+				},
+				{
+					Name:      "child 3",
+					StartTime: getTime(3),
+				},
+				{
+					Name:      "child 1",
+					StartTime: getTime(1),
+					Children: []*traces.Span{
+						{
+							Name:      "grandchild 1",
+							StartTime: getTime(2),
+						},
+						{
+							Name:      "grandchild 2",
+							StartTime: getTime(3),
+						},
+					},
+				},
+			},
+		},
+	}
+
+	sortedTrace := trace.Sort()
+
+	expectedTrace := traces.Trace{
+		ID: randGenerator.TraceID(),
+		RootSpan: traces.Span{
+			Name:       "root",
+			StartTime:  getTime(0),
+			Attributes: traces.Attributes{},
+			Children: []*traces.Span{
+				{
+					Name:      "child 1",
+					StartTime: getTime(1),
+					Children: []*traces.Span{
+						{
+
+							Name:      "grandchild 1",
+							StartTime: getTime(2),
+							Children:  make([]*traces.Span, 0),
+						},
+						{
+
+							Name:      "grandchild 2",
+							StartTime: getTime(3),
+							Children:  make([]*traces.Span, 0),
+						},
+					},
+				},
+				{
+					Name:      "child 2",
+					StartTime: getTime(2),
+					Children:  make([]*traces.Span, 0),
+				},
+				{
+					Name:      "child 3",
+					StartTime: getTime(3),
+					Children:  make([]*traces.Span, 0),
+				},
+			},
+		},
+	}
+
+	assert.Equal(t, expectedTrace.RootSpan, sortedTrace.RootSpan)
+}
