@@ -1,0 +1,22 @@
+postgresConnString: "host=postgres user=postgres password=postgres port=5432 sslmode=disable"
+jaegerConnectionConfig:
+  endpoint: jaeger:16685
+  tls:
+    insecure: true
+
+poolingConfig:
+  maxWaitTimeForTrace: 30s
+  retryDelay: 500ms
+
+googleAnalytics:
+  enabled: false
+
+telemetry:
+  serviceName: tracetest
+  sampling: 100 # 100%
+  jaeger:
+    host: jaeger
+    port: 6831
+  exporters:
+    - console
+    - jaeger

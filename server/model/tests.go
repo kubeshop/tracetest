@@ -73,6 +73,12 @@ type (
 	}
 )
 
+const emptyUUID = "00000000-0000-0000-0000-000000000000"
+
+func (t Test) HasID() bool {
+	return t.ID.String() != emptyUUID
+}
+
 const (
 	metaPrefix    = "tracetest.selected_spans."
 	metaPrefixLen = len("tracetest.selected_spans.")

@@ -8,11 +8,10 @@ services:
       - VERSION=dev
     volumes:
       - type: bind
-        source: ./server/config.yaml
+        source: ./config.tests.yaml
         target: /app/config.yaml
     ports:
       - 8080:8080
-      - 8081:8080
     depends_on:
       postgres:
         condition: service_healthy

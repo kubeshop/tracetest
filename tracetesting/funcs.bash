@@ -28,6 +28,7 @@ test() {
     echo "FAIL"
     echo "$name.json:"
     cat results/responses/$name.json
+    echo
     echo "$name.xml:"
     cat results/$name.xml
 
