@@ -16,8 +16,8 @@ import (
 
 // SelectorPseudoClass struct for SelectorPseudoClass
 type SelectorPseudoClass struct {
-	Name string `json:"name"`
-	N    *int32 `json:"N,omitempty"`
+	Name     string `json:"name"`
+	Argument *int32 `json:"argument,omitempty"`
 }
 
 // NewSelectorPseudoClass instantiates a new SelectorPseudoClass object
@@ -62,36 +62,36 @@ func (o *SelectorPseudoClass) SetName(v string) {
 	o.Name = v
 }
 
-// GetN returns the N field value if set, zero value otherwise.
-func (o *SelectorPseudoClass) GetN() int32 {
-	if o == nil || o.N == nil {
+// GetArgument returns the Argument field value if set, zero value otherwise.
+func (o *SelectorPseudoClass) GetArgument() int32 {
+	if o == nil || o.Argument == nil {
 		var ret int32
 		return ret
 	}
-	return *o.N
+	return *o.Argument
 }
 
-// GetNOk returns a tuple with the N field value if set, nil otherwise
+// GetArgumentOk returns a tuple with the Argument field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *SelectorPseudoClass) GetNOk() (*int32, bool) {
-	if o == nil || o.N == nil {
+func (o *SelectorPseudoClass) GetArgumentOk() (*int32, bool) {
+	if o == nil || o.Argument == nil {
 		return nil, false
 	}
-	return o.N, true
+	return o.Argument, true
 }
 
-// HasN returns a boolean if a field has been set.
-func (o *SelectorPseudoClass) HasN() bool {
-	if o != nil && o.N != nil {
+// HasArgument returns a boolean if a field has been set.
+func (o *SelectorPseudoClass) HasArgument() bool {
+	if o != nil && o.Argument != nil {
 		return true
 	}
 
 	return false
 }
 
-// SetN gets a reference to the given int32 and assigns it to the N field.
-func (o *SelectorPseudoClass) SetN(v int32) {
-	o.N = &v
+// SetArgument gets a reference to the given int32 and assigns it to the Argument field.
+func (o *SelectorPseudoClass) SetArgument(v int32) {
+	o.Argument = &v
 }
 
 func (o SelectorPseudoClass) MarshalJSON() ([]byte, error) {
@@ -99,8 +99,8 @@ func (o SelectorPseudoClass) MarshalJSON() ([]byte, error) {
 	if true {
 		toSerialize["name"] = o.Name
 	}
-	if o.N != nil {
-		toSerialize["N"] = o.N
+	if o.Argument != nil {
+		toSerialize["argument"] = o.Argument
 	}
 	return json.Marshal(toSerialize)
 }
