@@ -93,14 +93,19 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-buildx-${{ github.ref_name }}
 
-    - name: Fetch layers cache from any branch
+    - name: Fetch layers cache from main branch
       if: steps.branchCache.outputs.cache-hit != 'true'
       uses: actions/cache@v2
       with:
-        path: /tmp/.buildx-cache
-        key: ${{ runner.os }}-buildx
+        path: /tmp/.buildx-cache/main
+        key: ${{ runner.os }}-buildx-main
         restore-keys: |
-          ${{ runner.os }}-buildx-
+          ${{ runner.os }}-buildx-main
+    
+    - name: Move main cache
+      if: steps.branchCache.outputs.cache-hit != 'true'
+      run:
+        mv /tmp/.buildx-cache/main /tmp/.buildx-cache
 
     - name: Login to DockerHub
       uses: docker/login-action@v1
