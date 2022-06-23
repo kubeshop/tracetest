@@ -5,6 +5,10 @@ export const Container = styled.div<{$showAffected: boolean}>`
   position: relative;
   height: 100%;
 
+  .react-flow__attribution {
+    visibility: hidden;
+  }
+
   .react-flow__node-span > div.matched {
     box-shadow: 0 4px 8px #c9cedb;
   }

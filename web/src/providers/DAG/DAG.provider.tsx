@@ -5,8 +5,8 @@ import {Edge, Node, NodeChange} from 'react-flow-renderer';
 import {useSpan} from 'providers/Span/Span.provider';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import {initNodes, onNodesChange as onNodesChangeAction} from 'redux/slices/DAG.slice';
-import DAGSelectors from 'selectors/DAG.selectors';
 import TraceDiagramAnalyticsService from 'services/Analytics/TraceDiagramAnalytics.service';
+import DAGSelectors from 'selectors/DAG.selectors';
 import {TSpan} from 'types/Span.types';
 
 const {onClickSpan} = TraceDiagramAnalyticsService;

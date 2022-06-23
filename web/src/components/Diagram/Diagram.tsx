@@ -1,3 +1,4 @@
+import SkeletonDiagram from 'components/SkeletonDiagram';
 import {TestState} from 'constants/TestRun.constants';
 import {DAGProvider} from 'providers/DAG';
 import {useSpan} from 'providers/Span/Span.provider';
@@ -5,8 +6,7 @@ import {TSpan} from 'types/Span.types';
 import {TTestRunState} from 'types/TestRun.types';
 import {TTrace} from 'types/Trace.types';
 import DAGComponent from './components/DAG';
-import {TimelineChart} from './components/TimelineChart';
-import SkeletonDiagram from '../SkeletonDiagram';
+import TimelineComponent from './components/Timeline';
 
 export enum SupportedDiagrams {
   DAG = 'dag',
@@ -27,9 +27,9 @@ export interface IDiagramComponentProps {
   spanList: TSpan[];
 }
 
-const ComponentMap: Record<string, typeof DAGComponent | typeof TimelineChart> = {
+const ComponentMap: Record<string, typeof DAGComponent | typeof TimelineComponent> = {
   [SupportedDiagrams.DAG]: DAGComponent,
-  [SupportedDiagrams.Timeline]: TimelineChart,
+  [SupportedDiagrams.Timeline]: TimelineComponent,
 };
 
 const Diagram = ({runState, trace, type}: IProps) => {

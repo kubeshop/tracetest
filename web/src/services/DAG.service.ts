@@ -19,7 +19,7 @@ function getDagLayout<T>(nodesDatum: INodeDatum<T>[]) {
 }
 
 function getNodes<T>(dagLayout: Dag<INodeDatum<T>, undefined>) {
-  return dagLayout.descendants().map(({data: {id, data, type}, x, y}, index) => ({
+  return dagLayout.descendants().map(({data: {id, data, type}, x, y}) => ({
     data,
     id,
     position: {x: x ?? 0, y: y ?? 0},
