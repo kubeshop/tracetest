@@ -168,7 +168,7 @@ func (a runTestAction) createTestFromDefinition(ctx context.Context, definition 
 	a.logger.Debug("Sending request to create test", zap.ByteString("test", testBytes))
 	createdTest, resp, err := a.client.ApiApi.CreateTestExecute(req)
 
-	if resp.StatusCode == http.StatusBadRequest {
+	if resp != nil && resp.StatusCode == http.StatusBadRequest {
 		// trying to create a test with already exsiting ID
 		return openapi.Test{}, true, nil
 	}
