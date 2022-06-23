@@ -6,6 +6,8 @@ EXIT_STATUS=0
 
 export DEMO_APP_URL=${DEMO_APP_URL-"http://demo-pokemon-api.demo.svc.cluster.local"}
 
+test "test_create_with_id" ./definitions/test_create_with_id.yml || EXIT_STATUS=$?
+
 test "test_create" ./definitions/test_create.yml || EXIT_STATUS=$?
 
 export TEST_ID=$(tracetest_target test list | jq -rc '.[0].id')
@@ -22,4 +24,5 @@ test "test_rerun" ./definitions/test_rerun.yml || EXIT_STATUS=$?
 test "test_run_delete" ./definitions/test_run_delete.yml || EXIT_STATUS=$?
 test "test_delete" ./definitions/test_delete.yml || EXIT_STATUS=$?
 
+tracetest_target_curl "/api/tests/383d3dce-7b60-4a61-bdea-87f47263af5d" -X DELETE
 exit $EXIT_STATUS
