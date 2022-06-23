@@ -6,7 +6,8 @@ EXIT_STATUS=0
 
 export DEMO_APP_URL=${DEMO_APP_URL-"http://demo-pokemon-api.demo.svc.cluster.local"}
 
-test "test_create_with_id" ./definitions/test_create_with_id.yml || EXIT_STATUS=$?
+test "test_create_with_id_notexists" ./definitions/test_create_with_id_notexists.yml || EXIT_STATUS=$?
+test "test_create_with_id_exists" ./definitions/test_create_with_id_exists.yml || EXIT_STATUS=$?
 
 test "test_create" ./definitions/test_create.yml || EXIT_STATUS=$?
 
