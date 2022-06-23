@@ -3,6 +3,7 @@ package traces
 import (
 	"encoding/json"
 	"fmt"
+	"sort"
 	"time"
 
 	"go.opentelemetry.io/otel/trace"
@@ -12,6 +13,36 @@ type Trace struct {
 	ID       trace.TraceID
 	RootSpan Span
 	Flat     map[trace.SpanID]*Span `json:"-"`
+}
+
+func (t *Trace) Sort() Trace {
+	sortedRoot := sortSpanChildren(t.RootSpan)
+
+	trace := Trace{
+		ID:       t.ID,
+		RootSpan: sortedRoot,
+		Flat:     make(map[trace.SpanID]*Span, 0),
+	}
+
+	flattenSpans(trace.Flat, &sortedRoot)
+
+	return trace
+}
+
+func sortSpanChildren(span Span) Span {
+	sort.SliceStable(span.Children, func(i, j int) bool {
+		return span.Children[i].StartTime.Before(span.Children[j].StartTime)
+	})
+
+	children := make([]*Span, 0, len(span.Children))
+	for _, childSpan := range span.Children {
+		newChild := sortSpanChildren(*childSpan)
+		children = append(children, &newChild)
+	}
+
+	span.Children = children
+
+	return span
 }
 
 func (t *Trace) UnmarshalJSON(data []byte) error {
