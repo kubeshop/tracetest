@@ -5,6 +5,7 @@ import AssertionAnalyticsService from '../../services/Analytics/AssertionAnalyti
 import {TAssertionResultEntry, TAssertionResults} from '../../types/Assertion.types';
 import AssertionCard from '../AssertionCard/AssertionCard';
 import {useAssertionForm} from '../AssertionForm/AssertionFormProvider';
+import {OPEN_BOTTOM_PANEL_STATE, useRunLayout} from '../RunLayout';
 import * as S from './AssertionCardList.styled';
 
 interface TAssertionCardListProps {
@@ -16,10 +17,12 @@ interface TAssertionCardListProps {
 const AssertionCardList: React.FC<TAssertionCardListProps> = ({assertionResults: {resultList}, onSelectSpan}) => {
   const {open} = useAssertionForm();
   const {remove} = useTestDefinition();
+  const {openBottomPanel} = useRunLayout();
 
   const handleEdit = useCallback(
     ({selector, resultList: list, selectorList, pseudoSelector}: TAssertionResultEntry) => {
       AssertionAnalyticsService.onAssertionEdit();
+      openBottomPanel(OPEN_BOTTOM_PANEL_STATE.FORM);
       open({
         isEditing: true,
         selector,
@@ -30,7 +33,7 @@ const AssertionCardList: React.FC<TAssertionCardListProps> = ({assertionResults:
         },
       });
     },
-    [open]
+    [open, openBottomPanel]
   );
 
   const handleDelete = useCallback(
