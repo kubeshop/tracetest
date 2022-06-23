@@ -3,10 +3,10 @@ import {capitalize} from 'lodash';
 import {Handle, NodeProps, Position} from 'react-flow-renderer';
 
 import {SemanticGroupNamesToText} from 'constants/SemanticGroupNames.constants';
-import {ISpanNode} from 'services/DAG.service';
+import {INodeDataSpan} from 'types/DAG.types';
 import * as S from './TraceNode.styled';
 
-interface IProps extends NodeProps<ISpanNode> {}
+interface IProps extends NodeProps<INodeDataSpan> {}
 
 const TraceNode = ({data, id, selected}: IProps) => {
   const spanTypeText = SemanticGroupNamesToText[data.type];

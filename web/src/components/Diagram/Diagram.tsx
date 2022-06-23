@@ -14,9 +14,9 @@ export enum SupportedDiagrams {
 }
 
 export interface IProps {
+  runState: TTestRunState;
   trace: TTrace;
   type: SupportedDiagrams;
-  runState: TTestRunState;
 }
 
 export interface IDiagramComponentProps {
@@ -32,14 +32,14 @@ const ComponentMap: Record<string, typeof DAGComponent | typeof TimelineChart> =
   [SupportedDiagrams.Timeline]: TimelineChart,
 };
 
-const Diagram = ({type, runState, trace}: IProps) => {
+const Diagram = ({runState, trace, type}: IProps) => {
   const Component = ComponentMap[type || ''] || DAGComponent;
   const {onClearAffectedSpans, onClearSelectedSpan, onSelectSpan, selectedSpan, affectedSpans, matchedSpans} =
     useSpan();
   const spanList = trace.spans || [];
 
   return runState === TestState.FINISHED ? (
-    <DAGProvider>
+    <DAGProvider spans={spanList}>
       <Component {...{spanList, onSelectSpan, selectedSpan, affectedSpans, matchedSpans}} />
     </DAGProvider>
   ) : (

@@ -1,5 +1,5 @@
 import {noop} from 'lodash';
-import {createContext, useCallback, useContext, useMemo} from 'react';
+import {createContext, useCallback, useContext, useEffect, useMemo} from 'react';
 import {useSelector} from 'react-redux';
 import {useAppDispatch} from 'redux/hooks';
 import {
@@ -59,6 +59,13 @@ const SpanProvider = ({children}: IProps) => {
   const focusedSpan = useSelector(SpanSelectors.selectFocusedSpan);
   const matchedSpans = useSelector(SpanSelectors.selectMatchedSpans);
   const searchText = useSelector(SpanSelectors.selectSearchText);
+
+  useEffect(() => {
+    return () => {
+      dispatch(clearSelectedSpan());
+      dispatch(clearAffectedSpans());
+    };
+  }, []);
 
   const onSelectSpan = useCallback(
     (spanId: string) => {

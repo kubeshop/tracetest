@@ -3,10 +3,10 @@ import {Typography} from 'antd';
 import ReactFlow from 'react-flow-renderer';
 
 import {TRACE_DOCUMENTATION_URL} from 'constants/Common.constants';
-import {skeletonNodeList} from 'constants/Diagram.constants';
+import {skeletonNodesDatum} from 'constants/DAG.constants';
+import DAGService from 'services/DAG.service';
 import * as S from './SkeletonDiagram.styled';
 import SkeletonNode from './SkeletonNode';
-import DAGService from '../../services/DAG.service';
 
 export interface IProps {
   onClearAffectedSpans(): void;
@@ -17,7 +17,7 @@ export interface IProps {
 const nodeTypes = {skeleton: SkeletonNode};
 
 const SkeletonDiagram = ({onClearAffectedSpans, onClearSelectedSpan}: IProps) => {
-  const {edges, nodes} = useMemo(() => DAGService.getNodesAndEdges(skeletonNodeList), [skeletonNodeList]);
+  const {edges, nodes} = useMemo(() => DAGService.getEdgesAndNodes(skeletonNodesDatum), []);
 
   useEffect(() => {
     onClearAffectedSpans();

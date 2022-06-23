@@ -1,28 +1,11 @@
 import {coordCenter, Dag, dagStratify, decrossOpt, layeringSimplex, sugiyama} from 'd3-dag';
 import {MarkerType} from 'react-flow-renderer';
 
-import {NodeTypesEnum} from 'constants/Diagram.constants';
-import {SemanticGroupNames} from 'constants/SemanticGroupNames.constants';
+import {INodeDatum} from 'types/DAG.types';
 
-export interface INodeItem<T> {
-  data: T;
-  id: string;
-  parentIds: string[];
-  type: NodeTypesEnum;
-}
-
-export interface ISpanNode {
-  heading: string;
-  name: string;
-  primary: string;
-  type: SemanticGroupNames;
-  isAffected: boolean;
-  isMatched: boolean;
-}
-
-function getDagLayout<T>(nodeList: INodeItem<T>[]) {
+function getDagLayout<T>(nodesDatum: INodeDatum<T>[]) {
   const stratify = dagStratify();
-  const dag = stratify(nodeList);
+  const dag = stratify(nodesDatum);
 
   const dagLayout = sugiyama()
     .layering(layeringSimplex())
@@ -35,17 +18,16 @@ function getDagLayout<T>(nodeList: INodeItem<T>[]) {
   return dag;
 }
 
-function getNodes<T>(dagLayout: Dag<INodeItem<T>, undefined>) {
+function getNodes<T>(dagLayout: Dag<INodeDatum<T>, undefined>) {
   return dagLayout.descendants().map(({data: {id, data, type}, x, y}, index) => ({
     data,
     id,
     position: {x: x ?? 0, y: y ?? 0},
-    selected: index === 0,
     type,
   }));
 }
 
-function getEdges<T>(dagLayout: Dag<INodeItem<T>, undefined>) {
+function getEdges<T>(dagLayout: Dag<INodeDatum<T>, undefined>) {
   return dagLayout.links().map(({source, target}) => ({
     animated: true,
     id: `${source.data.id}-${target.data.id}`,
@@ -56,11 +38,10 @@ function getEdges<T>(dagLayout: Dag<INodeItem<T>, undefined>) {
 }
 
 const DAGService = () => ({
-  getNodesAndEdges<T>(nodeList: INodeItem<T>[]) {
-    console.log('### DAG.service: getNodesAndEdges');
-    if (!nodeList.length) return {edges: [], nodes: []};
+  getEdgesAndNodes<T>(nodesDatum: INodeDatum<T>[]) {
+    if (!nodesDatum.length) return {edges: [], nodes: []};
 
-    const dagLayout = getDagLayout(nodeList);
+    const dagLayout = getDagLayout(nodesDatum);
     const edges = getEdges(dagLayout);
     const nodes = getNodes(dagLayout);
 

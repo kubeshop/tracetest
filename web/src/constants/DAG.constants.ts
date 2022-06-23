@@ -1,11 +1,11 @@
-import {INodeItem} from 'services/DAG.service';
+import {INodeDatum} from 'types/DAG.types';
 
 export enum NodeTypesEnum {
   Span = 'span',
   Skeleton = 'skeleton',
 }
 
-export const skeletonNodeList: INodeItem<{}>[] = [
+export const skeletonNodesDatum: INodeDatum<{}>[] = [
   {
     id: '1',
     parentIds: [],

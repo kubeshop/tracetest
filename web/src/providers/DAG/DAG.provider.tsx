@@ -1,12 +1,13 @@
 import {noop} from 'lodash';
-import {createContext, useCallback, useContext, useMemo, MouseEvent} from 'react';
+import {createContext, useCallback, useContext, useEffect, useMemo, MouseEvent} from 'react';
 import {Edge, Node, NodeChange} from 'react-flow-renderer';
 
 import {useSpan} from 'providers/Span/Span.provider';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
-import {onNodesChange as onNodesChangeAction} from 'redux/slices/DAG.slice';
+import {initNodes, onNodesChange as onNodesChangeAction} from 'redux/slices/DAG.slice';
 import DAGSelectors from 'selectors/DAG.selectors';
 import TraceDiagramAnalyticsService from 'services/Analytics/TraceDiagramAnalytics.service';
+import {TSpan} from 'types/Span.types';
 
 const {onClickSpan} = TraceDiagramAnalyticsService;
 
@@ -28,13 +29,20 @@ const useDAG = () => useContext(DagContext);
 
 interface IProps {
   children: React.ReactNode;
+  spans: TSpan[];
 }
 
-const DAGProvider = ({children}: IProps) => {
+const DAGProvider = ({children, spans}: IProps) => {
   const dispatch = useAppDispatch();
   const edges = useAppSelector(DAGSelectors.selectEdges);
   const nodes = useAppSelector(DAGSelectors.selectNodes);
   const {onSelectSpan} = useSpan();
+
+  useEffect(() => {
+    dispatch(initNodes({spans}));
+    const firstSpan = spans.find(span => !span.parentId);
+    onSelectSpan(firstSpan?.id ?? '');
+  }, [dispatch, spans]);
 
   const onNodesChange = useCallback((changes: NodeChange[]) => dispatch(onNodesChangeAction({changes})), [dispatch]);
 

@@ -1,10 +1,8 @@
 import {differenceBy, intersectionBy} from 'lodash';
-import {NodeTypesEnum} from 'constants/Diagram.constants';
 import {CompareOperator, PseudoSelector} from 'constants/Operator.constants';
 import {SELECTOR_DEFAULT_ATTRIBUTES, SemanticGroupNameNodeMap} from 'constants/SemanticGroupNames.constants';
 import {TSpan, TSpanFlatAttribute} from 'types/Span.types';
 import {getObjectIncludesText} from 'utils/Common';
-import {INodeItem, ISpanNode} from './DAG.service';
 import OperatorService from './Operator.service';
 
 const itemSelectorKeys = SELECTOR_DEFAULT_ATTRIBUTES.flatMap(el => el.attributes);
@@ -66,16 +64,6 @@ const SpanService = () => ({
       (matchList, span) => (getObjectIncludesText(span.attributes, searchText) ? [...matchList, span.id] : matchList),
       []
     );
-  },
-
-  getNodeListFromSpanList(spanList: TSpan[]): INodeItem<ISpanNode>[] {
-    console.log('### SpanService: getNodeListFromSpanList');
-    return spanList.map(span => ({
-      data: {name: span.name, type: span.type, isAffected: false, isMatched: false, ...this.getSpanNodeInfo(span)},
-      id: span.id,
-      parentIds: span.parentId ? [span.parentId] : [],
-      type: NodeTypesEnum.Span,
-    }));
   },
 });
 

@@ -1,5 +1,5 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
-import {ISpanState, TSpan} from '../../types/Span.types';
+import {ISpanState, TSpan} from 'types/Span.types';
 import {setSelectedAssertion} from './TestDefinition.slice';
 
 export const initialState: ISpanState = {
