@@ -76,7 +76,7 @@ jobs:
           path: |
             web/node_modules
             ${{ steps.npm-cache.outputs.dir }}
-          key: npm-${{ hashFiles('web/package-lock.json') }}
+          key: npm-cache-${{ hashFiles('web/package-lock.json') }}
           restore-keys: npm-
 
       - name: Install test dependencies
@@ -209,7 +209,7 @@ jobs:
           path: |
             web/node_modules
             ${{ steps.npm-cache.outputs.dir }}
-          key: npm-${{ hashFiles('web/package-lock.json') }}
+          key: npm-cache-${{ hashFiles('web/package-lock.json') }}
           restore-keys: npm-
 
 
