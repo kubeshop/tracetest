@@ -64,11 +64,18 @@ jobs:
           cache: npm
           cache-dependency-path: web/package-lock.json
 
+      - name: Get yarn cache directory path
+        id: npm-cache-dir-path
+        run: |
+            echo "::set-output name=dir::$(npm config cache dir)"
+
       - name: Cache dependencies
         id: cache-nodemodules
         uses: actions/cache@v2
         with:
-          path: web/node_modules
+          path: |
+            web/node_modules
+            ${{ steps.npm-cache.outputs.dir }}
           key: npm-${{ hashFiles('web/package-lock.json') }}
           restore-keys: npm-
 
@@ -190,13 +197,21 @@ jobs:
             --namespace tracetest-pr-${{ github.event.pull_request.number }} \
             svc/tracetest-pr-${{ github.event.pull_request.number }} 3000:8080 &
 
+      - name: Get yarn cache directory path
+        id: npm-cache-dir-path
+        run: |
+            echo "::set-output name=dir::$(npm config cache dir)"
+
       - name: Cache dependencies
         id: cache-nodemodules
         uses: actions/cache@v2
         with:
-          path: web/node_modules
+          path: |
+            web/node_modules
+            ${{ steps.npm-cache.outputs.dir }}
           key: npm-${{ hashFiles('web/package-lock.json') }}
           restore-keys: npm-
+
 
       - name: Install test dependencies
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
