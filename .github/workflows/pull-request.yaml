@@ -66,7 +66,7 @@ jobs:
       - name: Cache dependencies
         uses: actions/cache@v2
         with:
-          path: ~/.npm
+          path: web/node_modules
           key: npm-${{ hashFiles('web/package-lock.json') }}
           restore-keys: npm-
 
@@ -190,7 +190,7 @@ jobs:
       - name: Cache dependencies
         uses: actions/cache@v2
         with:
-          path: ~/.npm
+          path: web/node_modules
           key: npm-${{ hashFiles('web/package-lock.json') }}
           restore-keys: npm-
 
