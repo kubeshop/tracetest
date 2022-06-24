@@ -56,6 +56,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
       - name: Setup node
         uses: actions/setup-node@v3
         with:
@@ -63,10 +64,15 @@ jobs:
           cache: npm
           cache-dependency-path: web/package-lock.json
 
+      - name: Get npm cache directory
+        id: npm-cache-dir
+        run: |
+          echo "::set-output name=dir::$(npm config get cache)"
+
       - name: Cache node_modules
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
-          path: /tmp/.buildx-cache
+          path: ${{ steps.npm-cache-dir.outputs.dir }}
           key: tracetest-npm
           restore-keys: |
             tracetest-npm
@@ -96,7 +102,7 @@ jobs:
 
     - name: Fetch layers cache from this branch
       id: branchCache
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: /tmp/.buildx-cache
         key: ${{ runner.os }}-buildx-${{ github.ref_name }}
@@ -105,7 +111,7 @@ jobs:
 
     - name: Fetch layers cache from main branch
       if: steps.branchCache.outputs.cache-hit != 'true'
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: /tmp/.buildx-cache/main
         key: ${{ runner.os }}-buildx-main
@@ -207,10 +213,15 @@ jobs:
             --namespace tracetest-pr-${{ github.event.pull_request.number }} \
             svc/tracetest-pr-${{ github.event.pull_request.number }} 3000:8080 &
 
+      - name: Get npm cache directory
+        id: npm-cache-dir
+        run: |
+          echo "::set-output name=dir::$(npm config get cache)"
+
       - name: Cache node_modules
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
-          path: /tmp/.buildx-cache
+          path: ${{ steps.npm-cache-dir.outputs.dir }}
           key: tracetest-npm
           restore-keys: |
             tracetest-npm
