@@ -81,7 +81,7 @@ jobs:
         run: |
           cd web/
           npm ci
-          npm set cache /tmp/.buildx-cache
+
       - name: Run unit tests
         run: |
           cd web/
