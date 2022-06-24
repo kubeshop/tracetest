@@ -63,7 +63,9 @@ jobs:
           node-version: 16.13.x
           cache: npm
           cache-dependency-path: web/package-lock.json
+
       - name: Cache dependencies
+        id: cache-nodemodules
         uses: actions/cache@v2
         with:
           path: web/node_modules
@@ -71,6 +73,7 @@ jobs:
           restore-keys: npm-
 
       - name: Install test dependencies
+        if: steps.cache-nodemodules.outputs.cache-hit != 'true'
         run: |
           cd web/
           npm ci
@@ -188,6 +191,7 @@ jobs:
             svc/tracetest-pr-${{ github.event.pull_request.number }} 3000:8080 &
 
       - name: Cache dependencies
+        id: cache-nodemodules
         uses: actions/cache@v2
         with:
           path: web/node_modules
@@ -195,6 +199,7 @@ jobs:
           restore-keys: npm-
 
       - name: Install test dependencies
+        if: steps.cache-nodemodules.outputs.cache-hit != 'true'
         run: |
           cd web/
           npm ci
