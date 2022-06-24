@@ -69,13 +69,13 @@ jobs:
         run: |
           echo "::set-output name=dir::$(npm config get cache)"
 
-      - name: Cache node_modules
-        uses: actions/cache@v3
+      - uses: actions/cache@v3
+        id: npm-cache
         with:
           path: ${{ steps.npm-cache-dir.outputs.dir }}
-          key: tracetest-npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
-            tracetest-npm
+            ${{ runner.os }}-node-
 
       - name: Install test dependencies
         run: |
@@ -117,11 +117,6 @@ jobs:
         key: ${{ runner.os }}-buildx-main
         restore-keys: |
           ${{ runner.os }}-buildx-main
-    
-    - name: Move main cache
-      if: steps.branchCache.outputs.cache-hit != 'true'
-      run:
-        mv /tmp/.buildx-cache/main /tmp/.buildx-cache
 
     - name: Login to DockerHub
       uses: docker/login-action@v1
