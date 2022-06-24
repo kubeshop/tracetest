@@ -71,10 +71,11 @@ jobs:
           path: |
             web/node_modules
             /home/runner/.cache/Cypress
-          key: npm-${{ hashFiles('web/package-lock.json') }}
+          key: npm--${{ hashFiles('web/package-lock.json') }}
           restore-keys: npm-
 
       - name: Install test dependencies
+        if: steps.cache-nodemodules.outputs.cache-hit != 'true'
         run: |
           cd web/
           npm ci
@@ -198,11 +199,12 @@ jobs:
           path: |
             web/node_modules
             /home/runner/.cache/Cypress
-          key: npm-${{ hashFiles('web/package-lock.json') }}
+          key: npm--${{ hashFiles('web/package-lock.json') }}
           restore-keys: npm-
 
 
       - name: Install test dependencies
+        if: steps.cache-nodemodules.outputs.cache-hit != 'true'
         run: |
           cd web/
           npm ci
