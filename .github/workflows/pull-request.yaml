@@ -75,7 +75,6 @@ jobs:
           restore-keys: npm-
 
       - name: Install test dependencies
-        if: steps.cache-nodemodules.outputs.cache-hit != 'true'
         run: |
           cd web/
           npm ci
@@ -204,7 +203,6 @@ jobs:
 
 
       - name: Install test dependencies
-        if: steps.cache-nodemodules.outputs.cache-hit != 'true'
         run: |
           cd web/
           npm ci
