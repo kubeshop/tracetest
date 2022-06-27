@@ -23,7 +23,7 @@ type PersistentTracePoller interface {
 }
 
 type PollerExecutor interface {
-	ExecuteRequest(request PollingRequest) (bool, model.Run, error)
+	ExecuteRequest(request *PollingRequest) (bool, model.Run, error)
 }
 
 type TraceFetcher interface {
@@ -117,7 +117,7 @@ func (tp tracePoller) enqueueJob(job PollingRequest) {
 }
 
 func (tp tracePoller) processJob(job PollingRequest) {
-	finished, run, err := tp.pollerExecutor.ExecuteRequest(job)
+	finished, run, err := tp.pollerExecutor.ExecuteRequest(&job)
 	if err != nil {
 		tp.handleTraceDBError(job, err)
 		return
@@ -126,6 +126,7 @@ func (tp tracePoller) processJob(job PollingRequest) {
 	if !finished {
 		job.count += 1
 		tp.requeue(job)
+		return
 	}
 
 	fmt.Printf("completed polling result %s after %d times, number of spans: %d \n", job.run.ID, job.count, len(run.Trace.Flat))

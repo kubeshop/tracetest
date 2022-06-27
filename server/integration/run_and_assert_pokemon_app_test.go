@@ -29,4 +29,5 @@ func TestExecutorIntegration(t *testing.T) {
 	}
 
 	assert.Equal(t, 2, count)
+	assert.Equal(t, 10, len(testRun.Trace.Flat))
 }
