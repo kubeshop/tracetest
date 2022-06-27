@@ -61,7 +61,7 @@ func TestExecutorSuccessfulExecution(t *testing.T) {
 			}
 
 			assertionExecutor.Start(1)
-			assertionExecutor.RunAssertions(assertionRequest)
+			assertionExecutor.RunAssertions(ctx, assertionRequest)
 			assertionExecutor.Stop()
 
 			dbResult, err := repo.GetRun(ctx, run.ID)

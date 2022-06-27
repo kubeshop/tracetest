@@ -16,7 +16,7 @@ type AssertionRequest struct {
 }
 
 type AssertionRunner interface {
-	RunAssertions(request AssertionRequest)
+	RunAssertions(ctx context.Context, request AssertionRequest)
 	WorkerPool
 }
 
@@ -97,6 +97,7 @@ func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, req Asse
 	return run, nil
 }
 
-func (e *defaultAssertionRunner) RunAssertions(request AssertionRequest) {
+func (e *defaultAssertionRunner) RunAssertions(ctx context.Context, request AssertionRequest) {
+	request.Ctx = ctx
 	e.inputChannel <- request
 }

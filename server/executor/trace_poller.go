@@ -140,12 +140,11 @@ func (tp tracePoller) processJob(job PollingRequest) {
 
 func (tp tracePoller) runAssertions(ctx context.Context, test model.Test, run model.Run) error {
 	assertionRequest := AssertionRequest{
-		Ctx:  ctx,
 		Test: test,
 		Run:  run,
 	}
 
-	tp.assertionRunner.RunAssertions(assertionRequest)
+	tp.assertionRunner.RunAssertions(ctx, assertionRequest)
 
 	return nil
 }
