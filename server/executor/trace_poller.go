@@ -10,6 +10,7 @@ import (
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/traces"
+	"go.opentelemetry.io/otel/trace"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 )
 
@@ -23,7 +24,7 @@ type PersistentTracePoller interface {
 }
 
 type PollerExecutor interface {
-	ExecuteRequest(request *PollingRequest) (bool, model.Run, error)
+	ExecuteRequest(context.Context, *PollingRequest) (bool, model.Run, error)
 }
 
 type TraceFetcher interface {
@@ -34,6 +35,7 @@ func NewTracePoller(
 	pe PollerExecutor,
 	updater RunUpdater,
 	assertionRunner AssertionRunner,
+	tracer trace.Tracer,
 	retryDelay time.Duration,
 	maxWaitTimeForTrace time.Duration,
 ) PersistentTracePoller {
@@ -41,6 +43,7 @@ func NewTracePoller(
 	return tracePoller{
 		updater:             updater,
 		pollerExecutor:      pe,
+		tracer:              tracer,
 		maxWaitTimeForTrace: maxWaitTimeForTrace,
 		maxTracePollRetry:   maxTracePollRetry,
 		retryDelay:          retryDelay,
@@ -55,6 +58,7 @@ type tracePoller struct {
 	pollerExecutor      PollerExecutor
 	maxWaitTimeForTrace time.Duration
 	assertionRunner     AssertionRunner
+	tracer              trace.Tracer
 
 	retryDelay        time.Duration
 	maxTracePollRetry int
@@ -117,7 +121,10 @@ func (tp tracePoller) enqueueJob(job PollingRequest) {
 }
 
 func (tp tracePoller) processJob(job PollingRequest) {
-	finished, run, err := tp.pollerExecutor.ExecuteRequest(&job)
+	ctx, span := tp.tracer.Start(job.ctx, "Wait for trace")
+	defer span.End()
+
+	finished, run, err := tp.pollerExecutor.ExecuteRequest(ctx, &job)
 	if err != nil {
 		tp.handleTraceDBError(job, err)
 		return
@@ -132,7 +139,7 @@ func (tp tracePoller) processJob(job PollingRequest) {
 	fmt.Printf("completed polling result %s after %d times, number of spans: %d \n", job.run.ID, job.count, len(run.Trace.Flat))
 
 	tp.handleDBError(tp.updater.Update(job.ctx, run))
-	err = tp.runAssertions(job.ctx, job.test, run)
+	err = tp.runAssertions(ctx, job.test, run)
 	if err != nil {
 		fmt.Printf("could not run assertions: %s\n", err.Error())
 	}
