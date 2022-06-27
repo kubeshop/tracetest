@@ -30,7 +30,7 @@ install_cert_manager(){
   kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.8.0/cert-manager.yaml
   echo
   echo "--> waiting for cert-manager"
-  kubectl wait --for=condition=ready pod -l app=webhook --namespace cert-manager
+  kubectl wait --for=condition=ready pod -l app=webhook --namespace cert-manager --timeout 2m
   echo "--> cert-manager ready. Create self signed ClusterIssuer"
   cat <<EOF | kubectl apply -f -
 apiVersion: cert-manager.io/v1
@@ -114,7 +114,7 @@ echo "Installing Tracetest"
 echo "----------------------------"
 echo
 
-helm repo add kubeshop https://kubeshop.github.io/helm-charts
+helm repo add --force-update kubeshop https://kubeshop.github.io/helm-charts
 helm repo update
 
 version=$(helm show chart kubeshop/tracetest | head -2 | tail -1 | awk -F ': ' '{print $2}')
