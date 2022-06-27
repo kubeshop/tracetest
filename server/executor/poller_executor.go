@@ -23,7 +23,7 @@ type InstrumentedPollerExecutor struct {
 	pollerExecutor PollerExecutor
 }
 
-func (pe InstrumentedPollerExecutor) ExecuteRequest(request PollingRequest) (bool, model.Run, error) {
+func (pe InstrumentedPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, model.Run, error) {
 	_, span := pe.tracer.Start(request.ctx, "Fetch trace")
 	defer span.End()
 
@@ -57,7 +57,7 @@ func NewPollerExecutor(
 	}
 }
 
-func (pe DefaultPollerExecutor) ExecuteRequest(request PollingRequest) (bool, model.Run, error) {
+func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, model.Run, error) {
 	run := request.run
 	otelTrace, err := pe.traceDB.GetTraceByID(request.ctx, run.TraceID.String())
 	if err != nil {
@@ -66,14 +66,16 @@ func (pe DefaultPollerExecutor) ExecuteRequest(request PollingRequest) (bool, mo
 
 	trace := traces.FromOtel(otelTrace)
 	trace.ID = run.TraceID
-	run.Trace = &trace
-	request.run = run
 
 	if !pe.donePollingTraces(request, trace) {
+		run.Trace = &trace
+		request.run = run
 		return false, model.Run{}, nil
 	}
 
 	trace = trace.Sort()
+	run.Trace = &trace
+	request.run = run
 
 	run = run.SuccessfullyPolledTraces(augmentData(&trace, run.Response))
 
@@ -87,7 +89,7 @@ func (pe DefaultPollerExecutor) ExecuteRequest(request PollingRequest) (bool, mo
 	return true, run, nil
 }
 
-func (pe DefaultPollerExecutor) donePollingTraces(job PollingRequest, trace traces.Trace) bool {
+func (pe DefaultPollerExecutor) donePollingTraces(job *PollingRequest, trace traces.Trace) bool {
 	// we're done if we have the same amount of spans after polling or `maxTracePollRetry` times
 	if job.count == pe.maxTracePollRetry {
 		return true
