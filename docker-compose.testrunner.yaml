@@ -9,6 +9,6 @@ services:
       - TARGET_URL=http://tracetest:8080
       - TRACETEST_MAIN_ENDPOINT=tracetest:8080
       - TRACETEST_TARGET_ENDPOINT=tracetest:8080
-      - DEMO_APP_URL=http://demo:8001
+      - DEMO_APP_URL=http://demo
     depends_on:
       - tracetest
