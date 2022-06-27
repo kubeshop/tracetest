@@ -26,4 +26,7 @@ export type TTestSchemas = external['tests.yaml']['components']['schemas'];
 export type Request = THttpSchemas['HTTPRequest'];
 export type RequestAuth = THttpSchemas['HTTPRequest']['auth'];
 
+export type TStructure = TTestSchemas['SpanSelector'];
+export type TFilter = TTestSchemas['SelectorFilter'];
+
 export type Model<T, R> = Modify<Required<T>, R>;

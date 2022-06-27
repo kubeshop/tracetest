@@ -11,7 +11,7 @@ const AssertionCardSelectorList: React.FC<IProps> = ({selectorList, pseudoSelect
   return (
     <S.SelectorList>
       {selectorList.map(({key, value, operator}) => (
-        <S.Selector key={key}>
+        <S.Selector key={`${key} ${operator} ${value}`}>
           <S.SelectorAttributeText>
             {key} • {OperatorService.getNameFromSymbol(operator)}
           </S.SelectorAttributeText>

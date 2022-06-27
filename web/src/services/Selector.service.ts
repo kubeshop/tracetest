@@ -1,6 +1,7 @@
 import {isNumber} from 'lodash';
 import {PseudoSelector} from '../constants/Operator.constants';
 import {TPseudoSelector, TSpanSelector} from '../types/Assertion.types';
+import {TFilter, TStructure} from '../types/Common.types';
 import {TCompareOperatorSymbol} from '../types/Operator.types';
 import {escapeString, isJson} from '../utils/Common';
 
@@ -16,8 +17,8 @@ const getValue = (value: string): string => {
   return `"${value}"`;
 };
 
-const selectorRegex = /span\[(.*)\]/i;
 const nthChildNumberRegex = /\((.*)\)/i;
+const selectorRegex = /span\[(.*)\]/i;
 const operationRegex = /\s?([=<]+|contains)\s?/;
 
 const getFilters = (selectors: TSpanSelector[]) =>
@@ -43,6 +44,13 @@ const getPseudoSelectorString = (pseudoSelector?: TPseudoSelector): string => {
   return selector;
 };
 
+function flattenStructureFilters(structure: TStructure): TFilter[] {
+  return [
+    ...(structure?.filters || []),
+    ...(structure?.childSelector ? flattenStructureFilters(structure.childSelector) : []),
+  ];
+}
+
 const SelectorService = () => ({
   getSelectorString(selectorList: TSpanSelector[], pseudoSelector?: TPseudoSelector): string {
     return selectorList.length
@@ -55,7 +63,7 @@ const SelectorService = () => ({
 
     if (!matchString) return [];
 
-    const selectorList = matchString.split('  ').reduce<TSpanSelector[]>((list, operation) => {
+    return matchString.split('  ').reduce<TSpanSelector[]>((list, operation) => {
       if (!operation) return list;
       const [key, operator, value] = operation.split(operationRegex);
 
@@ -67,10 +75,23 @@ const SelectorService = () => ({
 
       return list.concat([spanSelector]);
     }, []);
-
-    return selectorList;
+  },
+  getSpanSelectorListFromStructure(structures: TStructure[]): TSpanSelector[] {
+    return structures
+      .flatMap(a => flattenStructureFilters(a))
+      .map(r => ({
+        key: r?.property || '',
+        operator: r?.operator as TCompareOperatorSymbol,
+        value: r?.value || '',
+      }));
   },
 
+  getPseudoSelectorFromStructure(structure: TStructure[]): TPseudoSelector | undefined {
+    const pseudoSelector = structure[0]?.pseudoClass || undefined;
+    return pseudoSelector
+      ? {selector: `:${pseudoSelector.name}` as PseudoSelector, number: pseudoSelector.argument}
+      : undefined;
+  },
   getPseudoSelector(selectorString: string): TPseudoSelector | undefined {
     const index = selectorString.indexOf(']:');
     if (index === -1) return;
