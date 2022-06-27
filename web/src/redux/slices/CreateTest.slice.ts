@@ -1,5 +1,5 @@
-import {createSlice, PayloadAction} from '@reduxjs/toolkit';
-import {ICreateTestState, IPlugin, TDraftTest} from 'types/Plugins.types';
+import {createSlice} from '@reduxjs/toolkit';
+import {ICreateTestState, TCreateTestSliceActions} from 'types/Plugins.types';
 import {Plugins, SupportedPlugins} from 'constants/Plugins.constants';
 
 export const initialState: ICreateTestState = {
@@ -9,19 +9,16 @@ export const initialState: ICreateTestState = {
   pluginName: SupportedPlugins.REST,
 };
 
-const createTestSlice = createSlice({
+const createTestSlice = createSlice<ICreateTestState, TCreateTestSliceActions, 'createTest'>({
   name: 'createTest',
   initialState,
   reducers: {
-    setPlugin(state, {payload: {plugin}}: PayloadAction<{plugin: IPlugin}>) {
+    setPlugin(state, {payload: {plugin}}) {
       state.pluginName = plugin.name;
       state.stepList = plugin.stepList;
       state.draftTest = {};
     },
-    setStepNumber(
-      state,
-      {payload: {stepNumber, completeStep = true}}: PayloadAction<{stepNumber: number; completeStep?: boolean}>
-    ) {
+    setStepNumber(state, {payload: {stepNumber, completeStep = true}}) {
       const currentStep = state.stepList[state.stepNumber];
       if (completeStep) currentStep.status = 'complete';
       else if (currentStep.status !== 'complete') currentStep.status = 'pending';
@@ -30,7 +27,7 @@ const createTestSlice = createSlice({
       state.stepNumber = stepNumber;
       if (nextStep.status !== 'complete') state.stepList[stepNumber].status = 'selected';
     },
-    setDraftTest(state, {payload: {draftTest}}: PayloadAction<{draftTest: TDraftTest}>) {
+    setDraftTest(state, {payload: {draftTest}}) {
       state.draftTest = {
         ...state.draftTest,
         ...draftTest,

@@ -17,7 +17,10 @@ const PluginCard = ({plugin: {title, description, isActive}, plugin, onSelect, i
           {title}{' '}
           {!isActive && (
             <>
-              - <a href={GITHUB_ISSUES_URL}>Coming soon!</a>
+              -{' '}
+              <a href={GITHUB_ISSUES_URL} target="_blank">
+                Coming soon!
+              </a>
             </>
           )}
         </S.Title>
