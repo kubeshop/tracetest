@@ -67,7 +67,7 @@ func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, m
 	trace := traces.FromOtel(otelTrace)
 	trace.ID = run.TraceID
 
-	if !pe.donePollingTraces(*request, trace) {
+	if !pe.donePollingTraces(request, trace) {
 		run.Trace = &trace
 		request.run = run
 		return false, model.Run{}, nil
@@ -89,7 +89,7 @@ func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, m
 	return true, run, nil
 }
 
-func (pe DefaultPollerExecutor) donePollingTraces(job PollingRequest, trace traces.Trace) bool {
+func (pe DefaultPollerExecutor) donePollingTraces(job *PollingRequest, trace traces.Trace) bool {
 	// we're done if we have the same amount of spans after polling or `maxTracePollRetry` times
 	if job.count == pe.maxTracePollRetry {
 		return true
