@@ -114,7 +114,7 @@ echo "Installing Tracetest"
 echo "----------------------------"
 echo
 
-helm repo add kubeshop https://kubeshop.github.io/helm-charts
+helm repo add --force-update kubeshop https://kubeshop.github.io/helm-charts
 helm repo update
 
 version=$(helm show chart kubeshop/tracetest | head -2 | tail -1 | awk -F ': ' '{print $2}')
