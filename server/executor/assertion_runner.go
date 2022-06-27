@@ -10,6 +10,7 @@ import (
 )
 
 type AssertionRequest struct {
+	Ctx  context.Context
 	Test model.Test
 	Run  model.Run
 }
@@ -39,8 +40,7 @@ func (e *defaultAssertionRunner) Start(workers int) {
 	e.exitChannel = make(chan bool, workers)
 
 	for i := 0; i < workers; i++ {
-		ctx := context.Background()
-		go e.startWorker(ctx)
+		go e.startWorker()
 	}
 }
 
@@ -55,14 +55,14 @@ func (e *defaultAssertionRunner) Stop() {
 	}
 }
 
-func (e *defaultAssertionRunner) startWorker(ctx context.Context) {
+func (e *defaultAssertionRunner) startWorker() {
 	for {
 		select {
 		case <-e.exitChannel:
 			fmt.Println("Exiting assertion executor worker")
 			return
 		case assertionRequest := <-e.inputChannel:
-			err := e.runAssertionsAndUpdateResult(ctx, assertionRequest)
+			err := e.runAssertionsAndUpdateResult(assertionRequest.Ctx, assertionRequest)
 			if err != nil {
 				fmt.Println(err.Error())
 			}
