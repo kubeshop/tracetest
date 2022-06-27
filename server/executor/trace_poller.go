@@ -10,7 +10,6 @@ import (
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/traces"
-	"go.opentelemetry.io/otel/trace"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 )
 
@@ -35,7 +34,6 @@ func NewTracePoller(
 	pe PollerExecutor,
 	updater RunUpdater,
 	assertionRunner AssertionRunner,
-	tracer trace.Tracer,
 	retryDelay time.Duration,
 	maxWaitTimeForTrace time.Duration,
 ) PersistentTracePoller {

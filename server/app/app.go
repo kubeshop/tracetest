@@ -107,7 +107,7 @@ func (a *App) Start() error {
 	tracePoller.Start(5) // worker count. should be configurable
 	defer tracePoller.Stop()
 
-	runner := executor.NewPersistentRunner(ex, a.db, execTestUpdater, tracePoller)
+	runner := executor.NewPersistentRunner(ex, a.db, execTestUpdater, tracePoller, a.tracer)
 	runner.Start(5) // worker count. should be configurable
 	defer runner.Stop()
 

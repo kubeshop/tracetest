@@ -122,9 +122,12 @@ func runnerSetup(t *testing.T) runnerFixture {
 	mtp := new(mockTracePoller)
 	mtp.t = t
 
+	tracer := new(mockTracer)
+	tracer.t = t
+
 	mtp.Test(t)
 	return runnerFixture{
-		runner:          executor.NewPersistentRunner(me, db, executor.NewDBUpdater(db), mtp),
+		runner:          executor.NewPersistentRunner(me, db, executor.NewDBUpdater(db), mtp, tracer),
 		mockExecutor:    me,
 		mockDB:          db,
 		mockTracePoller: mtp,
@@ -200,4 +203,15 @@ func (m *mockTracePoller) Poll(_ context.Context, test model.Test, run model.Run
 func (m *mockTracePoller) expectPoll(test model.Test) *mock.Call {
 	return m.
 		On("Poll", test.ID)
+}
+
+type mockTracer struct {
+	mock.Mock
+	t *testing.T
+}
+
+func (m *mockTracer) Start(ctx context.Context, name string, opts ...trace.SpanStartOption) (context.Context, trace.Span) {
+	args := m.Called(ctx, name, opts)
+
+	return args.Get(0).(context.Context), args.Get(1).(trace.Span)
 }
