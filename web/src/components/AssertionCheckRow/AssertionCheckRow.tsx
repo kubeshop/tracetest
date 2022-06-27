@@ -32,7 +32,9 @@ const AssertionCheckRow: React.FC<TAssertionCheckRowProps> = ({
     return (isSelected ? [<S.SelectedLabelBadge count="selected" key="selected" />] : []).concat(
       signatureSelectorList.map(({key, value}, index) => (
         <S.LabelTooltip title={key} key={key}>
-          <S.LabelBadge $spanType={!index ? span?.type : undefined} count={value} />
+          <span>
+            <S.LabelBadge $spanType={!index ? span?.type : undefined} count={value} />
+          </span>
         </S.LabelTooltip>
       ))
     );
