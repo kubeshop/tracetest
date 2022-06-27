@@ -24,7 +24,7 @@ type PersistentTracePoller interface {
 }
 
 type PollerExecutor interface {
-	ExecuteRequest(context.Context, *PollingRequest) (bool, model.Run, error)
+	ExecuteRequest(*PollingRequest) (bool, model.Run, error)
 }
 
 type TraceFetcher interface {
@@ -43,7 +43,6 @@ func NewTracePoller(
 	return tracePoller{
 		updater:             updater,
 		pollerExecutor:      pe,
-		tracer:              tracer,
 		maxWaitTimeForTrace: maxWaitTimeForTrace,
 		maxTracePollRetry:   maxTracePollRetry,
 		retryDelay:          retryDelay,
@@ -58,7 +57,6 @@ type tracePoller struct {
 	pollerExecutor      PollerExecutor
 	maxWaitTimeForTrace time.Duration
 	assertionRunner     AssertionRunner
-	tracer              trace.Tracer
 
 	retryDelay        time.Duration
 	maxTracePollRetry int
@@ -121,10 +119,7 @@ func (tp tracePoller) enqueueJob(job PollingRequest) {
 }
 
 func (tp tracePoller) processJob(job PollingRequest) {
-	ctx, span := tp.tracer.Start(job.ctx, "Wait for trace")
-	defer span.End()
-
-	finished, run, err := tp.pollerExecutor.ExecuteRequest(ctx, &job)
+	finished, run, err := tp.pollerExecutor.ExecuteRequest(&job)
 	if err != nil {
 		tp.handleTraceDBError(job, err)
 		return
@@ -139,7 +134,7 @@ func (tp tracePoller) processJob(job PollingRequest) {
 	fmt.Printf("completed polling result %s after %d times, number of spans: %d \n", job.run.ID, job.count, len(run.Trace.Flat))
 
 	tp.handleDBError(tp.updater.Update(job.ctx, run))
-	err = tp.runAssertions(ctx, job.test, run)
+	err = tp.runAssertions(job.ctx, job.test, run)
 	if err != nil {
 		fmt.Printf("could not run assertions: %s\n", err.Error())
 	}

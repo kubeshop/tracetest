@@ -1,7 +1,6 @@
 package executor
 
 import (
-	"context"
 	"fmt"
 	"math"
 	"time"
@@ -24,11 +23,11 @@ type InstrumentedPollerExecutor struct {
 	pollerExecutor PollerExecutor
 }
 
-func (pe InstrumentedPollerExecutor) ExecuteRequest(ctx context.Context, request *PollingRequest) (bool, model.Run, error) {
-	ctx, span := pe.tracer.Start(ctx, "Fetch trace")
+func (pe InstrumentedPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, model.Run, error) {
+	_, span := pe.tracer.Start(request.ctx, "Fetch trace")
 	defer span.End()
 
-	finished, run, err := pe.pollerExecutor.ExecuteRequest(ctx, request)
+	finished, run, err := pe.pollerExecutor.ExecuteRequest(request)
 
 	span.SetAttributes(
 		attribute.Bool("tracetest.run.trace_poller.succesful", finished),
@@ -58,7 +57,7 @@ func NewPollerExecutor(
 	}
 }
 
-func (pe DefaultPollerExecutor) ExecuteRequest(ctx context.Context, request *PollingRequest) (bool, model.Run, error) {
+func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, model.Run, error) {
 	run := request.run
 	otelTrace, err := pe.traceDB.GetTraceByID(request.ctx, run.TraceID.String())
 	if err != nil {
@@ -82,7 +81,7 @@ func (pe DefaultPollerExecutor) ExecuteRequest(ctx context.Context, request *Pol
 
 	fmt.Printf("completed polling result %s after %d times, number of spans: %d \n", run.ID, request.count, len(run.Trace.Flat))
 
-	err = pe.updater.Update(ctx, run)
+	err = pe.updater.Update(request.ctx, run)
 	if err != nil {
 		return false, model.Run{}, nil
 	}

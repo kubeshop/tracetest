@@ -7,6 +7,7 @@ import (
 	"github.com/kubeshop/tracetest/server/model"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/propagation"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type Runner interface {
@@ -23,12 +24,14 @@ func NewPersistentRunner(
 	runs model.RunRepository,
 	updater RunUpdater,
 	tp TracePoller,
+	tracer trace.Tracer,
 ) PersistentRunner {
 	return persistentRunner{
 		executor:     e,
 		runs:         runs,
 		updater:      updater,
 		tp:           tp,
+		tracer:       tracer,
 		executeQueue: make(chan execReq, 5),
 		exit:         make(chan bool, 1),
 	}
@@ -39,6 +42,7 @@ type persistentRunner struct {
 	tp       TracePoller
 	runs     model.RunRepository
 	updater  RunUpdater
+	tracer   trace.Tracer
 
 	executeQueue chan execReq
 	exit         chan bool
@@ -117,7 +121,9 @@ func (r persistentRunner) processExecQueue(job execReq) {
 
 	r.handleDBError(r.updater.Update(job.ctx, run))
 	if run.State == model.RunStateAwaitingTrace {
-		r.tp.Poll(job.ctx, job.test, run)
+		ctx, span := r.tracer.Start(job.ctx, "Start Polling trace")
+		defer span.End()
+		r.tp.Poll(ctx, job.test, run)
 	}
 }
 
