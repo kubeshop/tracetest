@@ -26,3 +26,7 @@ testDefinition:
   assertions:
   - tracetest.run.trace_poller.test_id = "${TEST_ID}"
   - tracetest.run.trace_poller.succesful = "true"
+- selector: span[name = "Execute assertions"]
+  assertions:
+  - tracetest.selected_spans.count = 1
+  - tracetest.run.assertion_runner.all_assertions_passed = "true"

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/kubeshop/tracetest/server/assertions"
 	"github.com/kubeshop/tracetest/server/model"
 )
 
@@ -21,18 +20,20 @@ type AssertionRunner interface {
 }
 
 type defaultAssertionRunner struct {
-	updater      RunUpdater
-	inputChannel chan AssertionRequest
-	exitChannel  chan bool
+	updater           RunUpdater
+	assertionExecutor AssertionExecutor
+	inputChannel      chan AssertionRequest
+	exitChannel       chan bool
 }
 
 var _ WorkerPool = &defaultAssertionRunner{}
 var _ AssertionRunner = &defaultAssertionRunner{}
 
-func NewAssertionRunner(updater RunUpdater) AssertionRunner {
+func NewAssertionRunner(updater RunUpdater, assertionExecutor AssertionExecutor) AssertionRunner {
 	return &defaultAssertionRunner{
-		updater:      updater,
-		inputChannel: make(chan AssertionRequest, 1),
+		updater:           updater,
+		assertionExecutor: assertionExecutor,
+		inputChannel:      make(chan AssertionRequest, 1),
 	}
 }
 
@@ -91,7 +92,7 @@ func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, req Asse
 	}
 
 	run = run.SuccessfullyAsserted(
-		assertions.Assert(req.Test.Definition, *run.Trace),
+		e.assertionExecutor.Assert(ctx, req.Test.Definition, *run.Trace),
 	)
 
 	return run, nil

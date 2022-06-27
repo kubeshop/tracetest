@@ -44,7 +44,8 @@ func TestExecutorSuccessfulExecution(t *testing.T) {
 			test, run, err := loadTestFile(testCase.Tracefile)
 			require.NoError(t, err)
 
-			assertionExecutor := executor.NewAssertionRunner(executor.NewDBUpdater(repo))
+			assertionExecutor := executor.NewAssertionExecutor()
+			assertionRunner := executor.NewAssertionRunner(executor.NewDBUpdater(repo), assertionExecutor)
 
 			test, err = repo.CreateTest(ctx, test)
 			require.NoError(t, err)
@@ -60,9 +61,9 @@ func TestExecutorSuccessfulExecution(t *testing.T) {
 				Run:  run,
 			}
 
-			assertionExecutor.Start(1)
-			assertionExecutor.RunAssertions(ctx, assertionRequest)
-			assertionExecutor.Stop()
+			assertionRunner.Start(1)
+			assertionRunner.RunAssertions(ctx, assertionRequest)
+			assertionRunner.Stop()
 
 			dbResult, err := repo.GetRun(ctx, run.ID)
 			require.NoError(t, err)
