@@ -28,8 +28,6 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: '^1.18'
-      - name: Install prism
-        run: npm install -g @stoplight/prism-cli@4.8.0
       - name: Run unit tests
         run: |
           cd cli/
@@ -58,23 +56,36 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
       - name: Setup node
         uses: actions/setup-node@v3
         with:
           node-version: 16.13.x
           cache: npm
           cache-dependency-path: web/package-lock.json
+
+      - name: Cache dependencies
+        id: cache-nodemodules
+        uses: actions/cache@v2
+        with:
+          path: |
+            web/node_modules
+            /home/runner/.cache/Cypress
+          key: npm--${{ hashFiles('web/package-lock.json') }}
+          restore-keys: npm-
+
       - name: Install test dependencies
+        if: steps.cache-nodemodules.outputs.cache-hit != 'true'
         run: |
           cd web/
           npm ci
+
       - name: Run unit tests
         run: |
           cd web/
           npm test
 
   build-docker:
-    needs: [unit-test-frontend, unit-test-backend, unit-test-cli]
     name: "Build Image"
     runs-on: ubuntu-latest
     steps:
@@ -113,7 +124,7 @@ jobs:
         mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
   deploy:
-    needs: build-docker
+    needs:  [unit-test-frontend, unit-test-backend, unit-test-cli, build-docker]
     name: Deploy
     runs-on: ubuntu-latest
 
@@ -155,6 +166,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
       - name: Setup node
         uses: actions/setup-node@v3
         with:
@@ -179,10 +191,23 @@ jobs:
             --namespace tracetest-pr-${{ github.event.pull_request.number }} \
             svc/tracetest-pr-${{ github.event.pull_request.number }} 3000:8080 &
 
+      - name: Cache dependencies
+        id: cache-nodemodules
+        uses: actions/cache@v2
+        with:
+          path: |
+            web/node_modules
+            /home/runner/.cache/Cypress
+          key: npm--${{ hashFiles('web/package-lock.json') }}
+          restore-keys: npm-
+
+
       - name: Install test dependencies
+        if: steps.cache-nodemodules.outputs.cache-hit != 'true'
         run: |
           cd web/
           npm ci
+
       - name: Run integration tests
         run: |
           cd web/

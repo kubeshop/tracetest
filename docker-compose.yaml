@@ -5,15 +5,17 @@ services:
     image: kubeshop/tracetest
     build: .
     environment:
-      - VERSION=1.0
+      - VERSION=dev
     volumes:
       - type: bind
-        source: ./server/config.yaml
+        source: ./config.tests.yaml
         target: /app/config.yaml
     ports:
       - 8080:8080
     depends_on:
       postgres:
+        condition: service_healthy
+      jaeger:
         condition: service_healthy
 
   postgres:
@@ -35,3 +37,64 @@ services:
     ports:
       - "6831:6831/udp"
       - "16686:16686"
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "localhost:16686"]
+      interval: 1s
+      timeout: 3s
+      retries: 60
+
+  cache:
+    image: redis:6
+    ports:
+      - 6379:6379
+    healthcheck:
+      test: ["CMD", "redis-cli","ping"]
+      interval: 1s
+      timeout: 3s
+      retries: 60
+  queue:
+    image: rabbitmq:3.9
+    ports:
+      - 5672:5672
+      - 15672:15672
+    healthcheck:
+      test: rabbitmq-diagnostics -q check_running
+      interval: 1s
+      timeout: 5s
+      retries: 60
+
+  demodb:
+    container_name: demodb
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER:  postgres
+      POSTGRES_DB: demodb
+    ports:
+      - 5433:5432
+    healthcheck:
+      test: pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
+      interval: 1s
+      timeout: 5s
+      retries: 60
+
+  demo:
+    image: kubeshop/demo-pokemon-api:latest
+    environment:
+      REDIS_URL: cache
+      DATABASE_URL: postgresql://postgres:postgres@demodb:5433/pokeshop?schema=public
+      RABBITMQ_HOST: queue
+      POKE_API_BASE_URL: https://pokeapi.co/api/v2
+      JAEGER_HOST: jaeger
+      JAEGER_PORT: 6832
+    ports:
+      - 8001:80
+    depends_on:
+      demodb:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
+      queue:
+        condition: service_healthy
+      jaeger:
+        condition: service_healthy

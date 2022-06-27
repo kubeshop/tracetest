@@ -40,6 +40,14 @@ export interface paths {
     /** get test run results in JUnit xml format */
     get: operations["getRunResultJUnit"];
   };
+  "/tests/{testId}/run/{runId}/export": {
+    /** export test and test run information for debugging */
+    get: operations["exportTestRun"];
+  };
+  "/tests/import": {
+    /** import test and test run information for debugging */
+    post: operations["importTestRun"];
+  };
   "/tests/{testId}/run/{runId}": {
     /** get a particular test Run */
     get: operations["getTestRun"];
@@ -260,6 +268,39 @@ export interface operations {
         content: {
           "application/xml": string;
         };
+      };
+    };
+  };
+  /** export test and test run information for debugging */
+  exportTestRun: {
+    parameters: {
+      path: {
+        testId: string;
+        runId: string;
+      };
+    };
+    responses: {
+      /** successfuly exported test and test run information */
+      200: {
+        content: {
+          "application/json": external["tests.yaml"]["components"]["schemas"]["ExportedTestInformation"];
+        };
+      };
+    };
+  };
+  /** import test and test run information for debugging */
+  importTestRun: {
+    responses: {
+      /** successfuly imported test and test run information */
+      200: {
+        content: {
+          "application/json": external["tests.yaml"]["components"]["schemas"]["ExportedTestInformation"];
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": external["tests.yaml"]["components"]["schemas"]["ExportedTestInformation"];
       };
     };
   };
@@ -509,8 +550,12 @@ export interface external {
         };
         SelectorPseudoClass: {
           name: string;
-          N?: number;
+          argument?: number;
         } | null;
+        ExportedTestInformation: {
+          test: external["tests.yaml"]["components"]["schemas"]["Test"];
+          run: external["tests.yaml"]["components"]["schemas"]["TestRun"];
+        };
       };
     };
     operations: {};

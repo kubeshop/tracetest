@@ -14,8 +14,25 @@ import (
 
 var _ model.TestRepository = &postgresDB{}
 
+func (td *postgresDB) IDExists(ctx context.Context, id uuid.UUID) (bool, error) {
+	exists := false
+
+	row := td.db.QueryRowContext(
+		ctx,
+		"SELECT COUNT(*) > 0 as exists FROM tests WHERE id = $1",
+		id.String(),
+	)
+
+	err := row.Scan(&exists)
+
+	return exists, err
+}
+
 func (td *postgresDB) CreateTest(ctx context.Context, test model.Test) (model.Test, error) {
-	test.ID = IDGen.UUID()
+	if !test.HasID() {
+		test.ID = IDGen.UUID()
+	}
+
 	test.CreatedAt = time.Now()
 	test.ReferenceRun = nil
 	test.Version = 1

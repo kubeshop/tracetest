@@ -1,7 +1,6 @@
 import {Badge, Tooltip, Typography} from 'antd';
 import styled from 'styled-components';
-import {SemanticGroupNames} from '../../constants/SemanticGroupNames.constants';
-import {getNotchColor} from '../TraceNode/TraceNode.styled';
+import {SemanticGroupNames, SemanticGroupNamesToColor} from 'constants/SemanticGroupNames.constants';
 
 export const AssertionCheckRow = styled.div`
   display: grid;
@@ -36,7 +35,7 @@ export const Value = styled(Typography.Text)`
 
 export const LabelBadge = styled(Badge)<{$spanType?: SemanticGroupNames}>`
   > sup {
-    background: ${({$spanType}) => ($spanType ? getNotchColor($spanType) : '#f0f0f0')};
+    background: ${({$spanType}) => ($spanType ? SemanticGroupNamesToColor[$spanType] : '#f0f0f0')};
     color: black;
     margin-right: 6px;
     border-radius: 2px;

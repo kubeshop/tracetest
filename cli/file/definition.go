@@ -29,7 +29,7 @@ func SaveDefinition(file string, definition definition.Test) error {
 		return fmt.Errorf("could not marshal definition into YAML: %w", err)
 	}
 
-	err = os.WriteFile(file, yamlContent, 0755)
+	err = os.WriteFile(file, yamlContent, 0644)
 	if err != nil {
 		return fmt.Errorf("could not write file: %w", err)
 	}

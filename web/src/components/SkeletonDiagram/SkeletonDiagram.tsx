@@ -1,25 +1,27 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useMemo} from 'react';
 import {Typography} from 'antd';
-import ReactFlow, {Background, Elements} from 'react-flow-renderer';
-import {useDAGChart} from 'hooks/useDAGChart';
-import {TRACE_DOCUMENTATION_URL} from 'constants/Common.constants';
-import {skeletonNodeList} from 'constants/Diagram.constants';
-import {TSpan} from 'types/Span.types';
-import SkeletonNode from './SkeletonNode';
-import * as S from './SkeletonDiagram.styled';
+import ReactFlow from 'react-flow-renderer';
 
-export type SkeletonElementList = Elements<{}>;
+import {TRACE_DOCUMENTATION_URL} from 'constants/Common.constants';
+import {skeletonNodesDatum} from 'constants/DAG.constants';
+import DAGService from 'services/DAG.service';
+import * as S from './SkeletonDiagram.styled';
+import SkeletonNode from './SkeletonNode';
 
 export interface IProps {
-  onSelectSpan?(spanId: string): void;
-  selectedSpan?: TSpan;
+  onClearAffectedSpans(): void;
+  onClearSelectedSpan(): void;
 }
 
-const SkeletonDiagram = ({onSelectSpan, selectedSpan}: IProps) => {
-  const elementList = useDAGChart(skeletonNodeList, selectedSpan);
+/** Important to define the nodeTypes outside of the component to prevent re-renderings */
+const nodeTypes = {skeleton: SkeletonNode};
+
+const SkeletonDiagram = ({onClearAffectedSpans, onClearSelectedSpan}: IProps) => {
+  const {edges, nodes} = useMemo(() => DAGService.getEdgesAndNodes(skeletonNodesDatum), []);
 
   useEffect(() => {
-    if (onSelectSpan) onSelectSpan('');
+    onClearAffectedSpans();
+    onClearSelectedSpan();
   }, []);
 
   return (
@@ -35,14 +37,17 @@ const SkeletonDiagram = ({onSelectSpan, selectedSpan}: IProps) => {
           </a>
         </Typography.Text>
       </S.SkeletonDiagramMessage>
+
       <ReactFlow
-        nodeTypes={{SkeletonNode}}
-        defaultZoom={0.5}
-        elements={elementList}
-        onLoad={instance => setTimeout(() => instance.fitView(), 0)}
-      >
-        <Background gap={4} size={1} color="#FBFBFF" />
-      </ReactFlow>
+        defaultEdges={edges}
+        defaultNodes={nodes}
+        deleteKeyCode={null}
+        fitView
+        multiSelectionKeyCode={null}
+        nodesConnectable={false}
+        nodeTypes={nodeTypes}
+        selectionKeyCode={null}
+      />
     </S.Container>
   );
 };

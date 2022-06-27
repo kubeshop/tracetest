@@ -5,14 +5,18 @@ export const Container = styled.div<{$showAffected: boolean}>`
   position: relative;
   height: 100%;
 
-  .react-flow__node-TraceNode.matched > div {
+  .react-flow__attribution {
+    visibility: hidden;
+  }
+
+  .react-flow__node-span > div.matched {
     box-shadow: 0 4px 8px #c9cedb;
   }
 
   ${({$showAffected}) =>
     $showAffected &&
     css`
-      .react-flow__node-TraceNode:not(.affected) > div {
+      .react-flow__node-span > div:not(.affected) {
         opacity: 0.5;
       }
     `}

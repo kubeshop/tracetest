@@ -58,7 +58,25 @@ func handleDBError(err error) openapi.ImplResponse {
 }
 
 func (c *controller) CreateTest(ctx context.Context, in openapi.Test) (openapi.ImplResponse, error) {
-	test, err := c.testDB.CreateTest(ctx, c.model.Test(in))
+	test := c.model.Test(in)
+
+	// if they try to create a test with preset ID, we need to make sure that ID doesn't exists already
+	if test.HasID() {
+		exists, err := c.testDB.IDExists(ctx, test.ID)
+
+		if err != nil {
+			return handleDBError(err), err
+		}
+
+		if exists {
+			r := map[string]string{
+				"error": fmt.Sprintf(`test with ID "%s" already exists. try updating instead`, test.ID.String()),
+			}
+			return openapi.Response(http.StatusBadRequest, r), nil
+		}
+	}
+
+	test, err := c.testDB.CreateTest(ctx, test)
 	if err != nil {
 		return openapi.Response(http.StatusInternalServerError, err.Error()), err
 	}

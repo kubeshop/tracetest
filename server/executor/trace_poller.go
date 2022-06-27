@@ -22,12 +22,16 @@ type PersistentTracePoller interface {
 	WorkerPool
 }
 
+type PollerExecutor interface {
+	ExecuteRequest(request PollingRequest) (bool, model.Run, error)
+}
+
 type TraceFetcher interface {
 	GetTraceByID(ctx context.Context, traceID string) (*v1.TracesData, error)
 }
 
 func NewTracePoller(
-	tf TraceFetcher,
+	pe PollerExecutor,
 	updater RunUpdater,
 	assertionRunner AssertionRunner,
 	retryDelay time.Duration,
@@ -36,11 +40,11 @@ func NewTracePoller(
 	maxTracePollRetry := int(math.Ceil(float64(maxWaitTimeForTrace) / float64(retryDelay)))
 	return tracePoller{
 		updater:             updater,
-		traceDB:             tf,
+		pollerExecutor:      pe,
 		maxWaitTimeForTrace: maxWaitTimeForTrace,
 		maxTracePollRetry:   maxTracePollRetry,
 		retryDelay:          retryDelay,
-		executeQueue:        make(chan tracePollReq, 5),
+		executeQueue:        make(chan PollingRequest, 5),
 		exit:                make(chan bool, 1),
 		assertionRunner:     assertionRunner,
 	}
@@ -48,18 +52,18 @@ func NewTracePoller(
 
 type tracePoller struct {
 	updater             RunUpdater
-	traceDB             TraceFetcher
+	pollerExecutor      PollerExecutor
 	maxWaitTimeForTrace time.Duration
 	assertionRunner     AssertionRunner
 
 	retryDelay        time.Duration
 	maxTracePollRetry int
 
-	executeQueue chan tracePollReq
+	executeQueue chan PollingRequest
 	exit         chan bool
 }
 
-type tracePollReq struct {
+type PollingRequest struct {
 	ctx   context.Context
 	test  model.Test
 	run   model.Run
@@ -101,43 +105,32 @@ func (tp tracePoller) Stop() {
 }
 
 func (tp tracePoller) Poll(ctx context.Context, test model.Test, run model.Run) {
-	tp.enqueueJob(tracePollReq{
+	tp.enqueueJob(PollingRequest{
 		ctx:  ctx,
 		test: test,
 		run:  run,
 	})
 }
 
-func (tp tracePoller) enqueueJob(job tracePollReq) {
+func (tp tracePoller) enqueueJob(job PollingRequest) {
 	tp.executeQueue <- job
 }
 
-func (tp tracePoller) processJob(job tracePollReq) {
-	run := job.run
-
-	otelTrace, err := tp.traceDB.GetTraceByID(job.ctx, run.TraceID.String())
+func (tp tracePoller) processJob(job PollingRequest) {
+	finished, run, err := tp.pollerExecutor.ExecuteRequest(job)
 	if err != nil {
 		tp.handleTraceDBError(job, err)
 		return
 	}
 
-	trace := traces.FromOtel(otelTrace)
-	trace.ID = run.TraceID
-	if !tp.donePollingTraces(job, trace) {
-		fmt.Println("Not done polling traces. Requeue")
-		run.Trace = &trace
-		job.run = run
-		job.count = job.count + 1
+	if !finished {
+		job.count += 1
 		tp.requeue(job)
-		return
 	}
-
-	run = run.SuccessfullyPolledTraces(augmentData(&trace, run.Response))
 
 	fmt.Printf("completed polling result %s after %d times, number of spans: %d \n", job.run.ID, job.count, len(run.Trace.Flat))
 
 	tp.handleDBError(tp.updater.Update(job.ctx, run))
-
 	err = tp.runAssertions(job.ctx, job.test, run)
 	if err != nil {
 		fmt.Printf("could not run assertions: %s\n", err.Error())
@@ -167,25 +160,7 @@ func augmentData(trace *traces.Trace, resp model.HTTPResponse) *traces.Trace {
 	return trace
 }
 
-func (tp tracePoller) donePollingTraces(job tracePollReq, trace traces.Trace) bool {
-	// we're done if we have the same amount of spans after polling or `maxTracePollRetry` times
-	if job.count == tp.maxTracePollRetry {
-		return true
-	}
-
-	if job.run.Trace == nil {
-		return false
-	}
-
-	if len(trace.Flat) > 0 && len(trace.Flat) == len(job.run.Trace.Flat) {
-		return true
-	}
-
-	return false
-
-}
-
-func (tp tracePoller) handleTraceDBError(job tracePollReq, err error) {
+func (tp tracePoller) handleTraceDBError(job PollingRequest, err error) {
 	run := job.run
 	if errors.Is(err, tracedb.ErrTraceNotFound) {
 		if time.Since(run.ServiceTriggeredAt) < tp.maxWaitTimeForTrace {
@@ -203,7 +178,7 @@ func (tp tracePoller) handleTraceDBError(job tracePollReq, err error) {
 
 }
 
-func (tp tracePoller) requeue(job tracePollReq) {
+func (tp tracePoller) requeue(job PollingRequest) {
 	go func() {
 		fmt.Printf("requeuing result %s for %d time\n", job.run.ID, job.count)
 		time.Sleep(tp.retryDelay)

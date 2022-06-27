@@ -20,7 +20,7 @@ generate-client:
 
 	go fmt ./...; cd ..
 
-build: generate-client
+build:
 	go build -o tracetest main.go
 
 test: mockserver
@@ -28,6 +28,9 @@ test: mockserver
 	@make --no-print-directory kill-mock
 
 mockserver:
+ifeq (, $(shell which prism))
+	npm install -g @stoplight/prism-cli@4.8.0
+endif
 	@make --no-print-directory kill-mock
 	@echo "Starting prism mock server"
 	@prism mock ../api/openapi.yaml &

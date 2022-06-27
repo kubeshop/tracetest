@@ -1,4 +1,5 @@
 import {act, fireEvent, screen} from '@testing-library/react';
+import {TFilter} from '../types/Common.types';
 
 export async function typeInputValue(key: string, value: string, input?: 'input' | 'textarea') {
   const byTestId = screen.getByTestId(key);
@@ -27,3 +28,8 @@ export async function clickButton(testId: string) {
     fireEvent.click(byTestId as Element);
   });
 }
+
+export const filterList: TFilter[] = [
+  {value: 'pokeshop', operator: '=', property: 'service.name'},
+  {value: 'http', operator: '=', property: 'tracetest.span.type'},
+];
