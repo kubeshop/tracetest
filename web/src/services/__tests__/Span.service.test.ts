@@ -67,20 +67,4 @@ describe('SpanService', () => {
       expect(selectorInfo.pseudoSelector).toEqual({selector: PseudoSelector.ALL});
     });
   });
-
-  describe('getNodeListFromSpanList', () => {
-    it('should return the node list from the span list', () => {
-      const span1 = SpanMock.model({id: '1'});
-      const span2 = SpanMock.model({id: '2'});
-      const spanList = [span1, span2];
-      const affectedList = [span1.id];
-      const matchedList = [span2.id];
-
-      const nodeList = SpanService.getNodeListFromSpanList(spanList, affectedList, matchedList);
-
-      expect(nodeList).toHaveLength(spanList.length);
-      expect(nodeList[0].className?.trim()).toContain('affected');
-      expect(nodeList[1].className?.trim()).toContain('matched');
-    });
-  });
 });

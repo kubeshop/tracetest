@@ -4,6 +4,10 @@ import styled from 'styled-components';
 export const Container = styled.div`
   position: relative;
   height: 100%;
+
+  > .react-flow {
+    height: calc(100% - 76px);
+  }
 `;
 
 export const SkeletonDiagramMessage = styled.div`

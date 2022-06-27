@@ -1,2 +1,2 @@
 // eslint-disable-next-line no-restricted-exports
-export {default} from './TraceNode';
+export {default} from './Timeline';

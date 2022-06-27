@@ -1,16 +1,17 @@
 import {useCallback, useEffect, useMemo, useRef} from 'react';
 import * as d3 from 'd3';
+
+import {SemanticGroupNamesToColor} from 'constants/SemanticGroupNames.constants';
 import TraceAnalyticsService from 'services/Analytics/TraceAnalytics.service';
 import {TSpan} from 'types/Span.types';
-import {getNotchColor} from 'components/TraceNode/TraceNode.styled';
-import {IDiagramComponentProps} from '../Diagram';
-import * as S from './TimelineChart.styled';
+import * as S from './Timeline.styled';
+import {IDiagramComponentProps} from '../../Diagram';
 
 const {onTimelineSpanClick} = TraceAnalyticsService;
 
 const barHeight = 54;
 
-export const TimelineChart = ({affectedSpans, spanList, selectedSpan, onSelectSpan}: IDiagramComponentProps) => {
+const Timeline = ({affectedSpans, spanList, selectedSpan, onSelectSpan}: IDiagramComponentProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const treeFactory = d3.tree().size([200, 450]).nodeSize([0, 5]);
 
@@ -168,7 +169,7 @@ export const TimelineChart = ({affectedSpans, spanList, selectedSpan, onSelectSp
       .attr('fill', e => {
         const span: TSpan = e.data.data;
 
-        const color = getNotchColor(span.type);
+        const color = SemanticGroupNamesToColor[span.type];
 
         return color;
       });
@@ -228,3 +229,5 @@ export const TimelineChart = ({affectedSpans, spanList, selectedSpan, onSelectSp
     </S.Container>
   );
 };
+
+export default Timeline;

@@ -20,7 +20,18 @@ export const SemanticGroupNamesToText = {
   [SemanticGroupNames.Exception]: 'Exception',
   [SemanticGroupNames.General]: 'General',
   [SemanticGroupNames.Compatibility]: 'Compatibility',
-};
+} as const;
+
+export const SemanticGroupNamesToColor = {
+  [SemanticGroupNames.Database]: '#EFDBFF',
+  [SemanticGroupNames.Http]: '#C1E095',
+  [SemanticGroupNames.Rpc]: '#9AD4D6',
+  [SemanticGroupNames.Messaging]: '#BFBFBF',
+  [SemanticGroupNames.Faas]: '#FFBB96',
+  [SemanticGroupNames.Exception]: '#FFBB96',
+  [SemanticGroupNames.General]: '#FFBB96',
+  [SemanticGroupNames.Compatibility]: '#FFBB96',
+} as const;
 
 export const SemanticGroupNameNodeMap: Record<SemanticGroupNames, {primary: string[]; type: string}> = {
   [SemanticGroupNames.Http]: {

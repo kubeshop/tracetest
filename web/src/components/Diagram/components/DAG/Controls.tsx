@@ -1,5 +1,5 @@
 import {LeftOutlined, RightOutlined, ZoomInOutlined, ZoomOutOutlined} from '@ant-design/icons';
-import {useZoomPanHelper} from 'react-flow-renderer';
+import {useReactFlow} from 'react-flow-renderer';
 import {useSpan} from 'providers/Span/Span.provider';
 import * as S from './DAG.styled';
 import useControls from './hooks/useControls';
@@ -9,7 +9,7 @@ interface IProps {
 }
 
 const Controls = ({onSelectSpan}: IProps) => {
-  const {zoomIn, zoomOut} = useZoomPanHelper();
+  const {zoomIn, zoomOut} = useReactFlow();
   const {affectedSpans} = useSpan();
   const {handleNextSpan, handlePrevSpan, indexOfFocused} = useControls({onSelectSpan});
 
