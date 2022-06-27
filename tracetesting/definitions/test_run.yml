@@ -10,12 +10,19 @@ trigger:
     - key: Content-Type
       value: application/json
 testDefinition:
-- selector: span[name="POST /api/tests/{testId}/run" tracetest.span.type="http"]
+- selector: span[name = "POST /api/tests/{testId}/run" tracetest.span.type = "http"]
   assertions:
   - tracetest.response.status = 200
-- selector: span[name="Trigger test"]
+- selector: span[name = "Trigger test"]
   assertions:
   - tracetest.selected_spans.count = 1
   - tracetest.run.trigger.test_id = "${TEST_ID}"
   - tracetest.run.trigger.type = "http"
   - tracetest.run.trigger.http.response_code = 200
+- selector: span[name = "Fetch trace"]
+  assertions:
+  - tracetest.selected_spans.count > 0
+- selector: span[name = "Fetch trace"]:last
+  assertions:
+  - tracetest.run.trace_poller.test_id = "${TEST_ID}"
+  - tracetest.run.trace_poller.succesful = "true"

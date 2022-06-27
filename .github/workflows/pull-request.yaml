@@ -86,7 +86,6 @@ jobs:
           npm test
 
   build-docker:
-    needs: [unit-test-frontend, unit-test-backend, unit-test-cli]
     name: "Build Image"
     runs-on: ubuntu-latest
     steps:
@@ -125,7 +124,7 @@ jobs:
         mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
   deploy:
-    needs: build-docker
+    needs:  [unit-test-frontend, unit-test-backend, unit-test-cli, build-docker]
     name: Deploy
     runs-on: ubuntu-latest
 
