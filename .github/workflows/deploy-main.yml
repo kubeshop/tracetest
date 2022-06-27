@@ -135,8 +135,8 @@ jobs:
           --namespace tracetest-integration \
           --set analytics.enabled=false \
           --set image.tag=sha-$(git rev-parse --short $GITHUB_SHA) \
-          --set poolingConfig.maxWaitTimeForTrace=15s
-          --set poolingConfig.retryDelay=3s
+          --set poolingConfig.maxWaitTimeForTrace=15s \
+          --set poolingConfig.retryDelay=3s \
           --set tracingBackend=jaeger \
           --set jaegerConnectionConfig.endpoint="jaeger-query.tracetest.svc.cluster.local:16685" \
           --set telemetry.jaeger.host="jaeger-agent.tracetest.svc.cluster.local" \
