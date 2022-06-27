@@ -5,10 +5,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/testdb"
+	"github.com/kubeshop/tracetest/server/tracing"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -122,8 +124,7 @@ func runnerSetup(t *testing.T) runnerFixture {
 	mtp := new(mockTracePoller)
 	mtp.t = t
 
-	tracer := new(mockTracer)
-	tracer.t = t
+	tracer, _ := tracing.NewTracer(config.Config{})
 
 	mtp.Test(t)
 	return runnerFixture{
@@ -203,15 +204,4 @@ func (m *mockTracePoller) Poll(_ context.Context, test model.Test, run model.Run
 func (m *mockTracePoller) expectPoll(test model.Test) *mock.Call {
 	return m.
 		On("Poll", test.ID)
-}
-
-type mockTracer struct {
-	mock.Mock
-	t *testing.T
-}
-
-func (m *mockTracer) Start(ctx context.Context, name string, opts ...trace.SpanStartOption) (context.Context, trace.Span) {
-	args := m.Called(ctx, name, opts)
-
-	return args.Get(0).(context.Context), args.Get(1).(trace.Span)
 }
