@@ -95,7 +95,7 @@ func (a *App) Start() error {
 		Add(executor.NewDBUpdater(a.db)).
 		Add(executor.NewSubscriptionUpdater(subscriptionManager))
 
-	assertionExecutor := executor.NewAssertionExecutor()
+	assertionExecutor := executor.NewAssertionExecutor(a.tracer)
 
 	assertionRunner := executor.NewAssertionRunner(execTestUpdater, assertionExecutor)
 	assertionRunner.Start(5)
