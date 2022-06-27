@@ -12,9 +12,13 @@ export const createTest = () => {
   cy.visit('http://localhost:3000/');
   const $form = openCreateTestModal();
 
+  $form.get('[data-cy=create-test-next-button]').click();
+
   $form.get('[data-cy=example-button]').click();
   $form.get(`[data-cy=demo-example-${camelCase(name)}]`).click();
-  $form.get('[data-cy=create-test-submit]').click();
+
+  $form.get('[data-cy=create-test-next-button]').last().click();
+  $form.get('[data-cy=create-test-create-button]').last().click();
 
   cy.location('pathname').should('match', /\/test\/.*/i, {timeout: 10000});
   cy.location().then(({pathname}) => {
@@ -28,7 +32,7 @@ export const createTest = () => {
 export const openCreateTestModal = () => {
   cy.get('[data-cy=create-test-button]').click();
 
-  const $form = cy.get('[data-cy=create-test-modal]');
+  const $form = cy.get('[data-cy=create-test-header]');
   $form.should('be.visible');
 
   return $form;
@@ -65,7 +69,7 @@ export const createMultipleTestRuns = (id: string, count: number) => {
     cy.get(`[data-cy=test-run-button-${id}]`).click();
     cy.location('pathname').should('match', /\/test\/.*/i);
     cy.wait(500);
- 
+
     cy.visit('http://localhost:3000/');
   }
 };

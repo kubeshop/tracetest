@@ -1,15 +1,17 @@
 import {Action, configureStore, ThunkAction} from '@reduxjs/toolkit';
-import TestAPI from './apis/TraceTest.api';
-import DAG from './slices/DAG.slice';
-import SpanS from './slices/Span.slice';
-import TestDefinition from './slices/TestDefinition.slice';
+import TestAPI from 'redux/apis/TraceTest.api';
+import TestDefinition from 'redux/slices/TestDefinition.slice';
+import Spans from 'redux/slices/Span.slice';
+import CreateTest from 'redux/slices/CreateTest.slice';
+import DAG from 'redux/slices/DAG.slice';
 
 export const store = configureStore({
   reducer: {
     [TestAPI.reducerPath]: TestAPI.reducer,
+    spans: Spans,
     dag: DAG,
-    spans: SpanS,
     testDefinition: TestDefinition,
+    createTest: CreateTest,
   },
   middleware: getDefaultMiddleware => getDefaultMiddleware().concat(TestAPI.middleware),
 });
