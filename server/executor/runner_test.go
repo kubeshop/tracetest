@@ -124,7 +124,7 @@ func runnerSetup(t *testing.T) runnerFixture {
 	mtp := new(mockTracePoller)
 	mtp.t = t
 
-	tracer, _ := tracing.NewTracer(config.Config{})
+	tracer, _ := tracing.NewTracer(context.Background(), config.Config{})
 
 	mtp.Test(t)
 	return runnerFixture{
