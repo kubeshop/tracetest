@@ -18,9 +18,7 @@ type AssertionRequest struct {
 
 func (r AssertionRequest) Context() context.Context {
 	ctx := context.Background()
-	otel.GetTextMapPropagator().Extract(ctx, r.carrier)
-
-	return ctx
+	return otel.GetTextMapPropagator().Extract(ctx, r.carrier)
 }
 
 type AssertionRunner interface {
