@@ -76,7 +76,7 @@ func (e *defaultAssertionRunner) startWorker() {
 
 func (e *defaultAssertionRunner) getCtxFromRequest(req AssertionRequest) context.Context {
 	ctx := context.Background()
-	otel.GetTextMapPropagator().Inject(ctx, req.carrier)
+	otel.GetTextMapPropagator().Extract(ctx, req.carrier)
 
 	return ctx
 }
@@ -111,6 +111,7 @@ func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, req Asse
 func (e *defaultAssertionRunner) RunAssertions(ctx context.Context, request AssertionRequest) {
 	carrier := propagation.MapCarrier{}
 	otel.GetTextMapPropagator().Inject(ctx, carrier)
+
 	request.carrier = carrier
 
 	e.inputChannel <- request
