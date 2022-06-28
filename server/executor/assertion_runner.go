@@ -16,6 +16,13 @@ type AssertionRequest struct {
 	Run     model.Run
 }
 
+func (r AssertionRequest) Context() context.Context {
+	ctx := context.Background()
+	otel.GetTextMapPropagator().Extract(ctx, r.carrier)
+
+	return ctx
+}
+
 type AssertionRunner interface {
 	RunAssertions(ctx context.Context, request AssertionRequest)
 	WorkerPool
@@ -65,20 +72,13 @@ func (e *defaultAssertionRunner) startWorker() {
 			fmt.Println("Exiting assertion executor worker")
 			return
 		case assertionRequest := <-e.inputChannel:
-			ctx := e.getCtxFromRequest(assertionRequest)
+			ctx := assertionRequest.Context()
 			err := e.runAssertionsAndUpdateResult(ctx, assertionRequest)
 			if err != nil {
 				fmt.Println(err.Error())
 			}
 		}
 	}
-}
-
-func (e *defaultAssertionRunner) getCtxFromRequest(req AssertionRequest) context.Context {
-	ctx := context.Background()
-	otel.GetTextMapPropagator().Extract(ctx, req.carrier)
-
-	return ctx
 }
 
 func (e *defaultAssertionRunner) runAssertionsAndUpdateResult(ctx context.Context, request AssertionRequest) error {
