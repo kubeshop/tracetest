@@ -4,13 +4,13 @@ import {HTTP_METHOD} from 'constants/Common.constants';
 import {useCreateTest} from 'providers/CreateTest/CreateTest.provider';
 import CreateStepFooter from 'components/CreateTestSteps/CreateTestStepFooter';
 import * as Step from 'components/CreateTestPlugins/Step.styled';
+import {TRequestAuth, TRequest} from 'types/Test.types';
 import RequestDetailsForm from './RequestDetailsForm';
-import {Request, RequestAuth} from '../../../../../types/Common.types';
 
 export interface IRequestDetailsValues {
   body: string;
-  auth: RequestAuth;
-  headers: Request['headers'];
+  auth: TRequestAuth;
+  headers: TRequest['headers'];
   method: HTTP_METHOD;
   name: string;
   url: string;

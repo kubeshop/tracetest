@@ -4,15 +4,23 @@ import {useOnDeleteCallback} from './useOnDeleteCallback';
 
 interface IProps {
   testId: string;
-
+  onEdit(): void;
   onDelete(): void;
 }
 
-const TestCardActions: React.FC<IProps> = ({testId, onDelete}) => {
+const TestCardActions: React.FC<IProps> = ({testId, onDelete, onEdit}) => {
   const onClick = useOnDeleteCallback(onDelete);
+
   return (
     <Dropdown
-      overlay={<Menu items={[{key: 'delete', label: <span data-cy="test-card-delete">Delete</span>, onClick}]} />}
+      overlay={
+        <Menu
+          items={[
+            {key: 'edit', label: <span data-cy="test-card-edit">Edit</span>, onClick: onEdit},
+            {key: 'delete', label: <span data-cy="test-card-delete">Delete</span>, onClick},
+          ]}
+        />
+      }
       placement="bottomLeft"
       trigger={['click']}
     >
