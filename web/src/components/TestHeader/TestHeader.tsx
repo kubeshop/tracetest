@@ -30,6 +30,7 @@ const TestHeader = ({
   onBack,
   showInfo,
   test: {name, serviceUnderTest, version = 1, id},
+  test,
   testState,
   testVersion,
   totalSpans,
@@ -83,7 +84,7 @@ const TestHeader = ({
             Run Test
           </Button>
         )}
-        {run.id && <RunActionsMenu resultId={run.id} testId={id} isRunView testVersion={testVersion} />}
+        {run.id && <RunActionsMenu testId={id} testVersion={version} test={test} resultId={run.id} isRunView />}
       </S.RightSection>
       <VersionMismatchModal
         description="Running the test will use the latest version of the test."
