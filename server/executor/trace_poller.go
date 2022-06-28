@@ -23,7 +23,7 @@ type PersistentTracePoller interface {
 }
 
 type PollerExecutor interface {
-	ExecuteRequest(request *PollingRequest) (bool, model.Run, error)
+	ExecuteRequest(*PollingRequest) (bool, model.Run, error)
 }
 
 type TraceFetcher interface {
@@ -144,7 +144,7 @@ func (tp tracePoller) runAssertions(ctx context.Context, test model.Test, run mo
 		Run:  run,
 	}
 
-	tp.assertionRunner.RunAssertions(assertionRequest)
+	tp.assertionRunner.RunAssertions(ctx, assertionRequest)
 
 	return nil
 }

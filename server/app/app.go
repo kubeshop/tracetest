@@ -95,7 +95,9 @@ func (a *App) Start() error {
 		Add(executor.NewDBUpdater(a.db)).
 		Add(executor.NewSubscriptionUpdater(subscriptionManager))
 
-	assertionRunner := executor.NewAssertionRunner(execTestUpdater)
+	assertionExecutor := executor.NewAssertionExecutor(a.tracer)
+
+	assertionRunner := executor.NewAssertionRunner(execTestUpdater, assertionExecutor)
 	assertionRunner.Start(5)
 	defer assertionRunner.Stop()
 
@@ -105,7 +107,7 @@ func (a *App) Start() error {
 	tracePoller.Start(5) // worker count. should be configurable
 	defer tracePoller.Stop()
 
-	runner := executor.NewPersistentRunner(ex, a.db, execTestUpdater, tracePoller)
+	runner := executor.NewPersistentRunner(ex, a.db, execTestUpdater, tracePoller, a.tracer)
 	runner.Start(5) // worker count. should be configurable
 	defer runner.Stop()
 

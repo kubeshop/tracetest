@@ -5,33 +5,42 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/kubeshop/tracetest/server/assertions"
 	"github.com/kubeshop/tracetest/server/model"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/propagation"
 )
 
 type AssertionRequest struct {
-	Test model.Test
-	Run  model.Run
+	carrier propagation.MapCarrier
+	Test    model.Test
+	Run     model.Run
+}
+
+func (r AssertionRequest) Context() context.Context {
+	ctx := context.Background()
+	return otel.GetTextMapPropagator().Extract(ctx, r.carrier)
 }
 
 type AssertionRunner interface {
-	RunAssertions(request AssertionRequest)
+	RunAssertions(ctx context.Context, request AssertionRequest)
 	WorkerPool
 }
 
 type defaultAssertionRunner struct {
-	updater      RunUpdater
-	inputChannel chan AssertionRequest
-	exitChannel  chan bool
+	updater           RunUpdater
+	assertionExecutor AssertionExecutor
+	inputChannel      chan AssertionRequest
+	exitChannel       chan bool
 }
 
 var _ WorkerPool = &defaultAssertionRunner{}
 var _ AssertionRunner = &defaultAssertionRunner{}
 
-func NewAssertionRunner(updater RunUpdater) AssertionRunner {
+func NewAssertionRunner(updater RunUpdater, assertionExecutor AssertionExecutor) AssertionRunner {
 	return &defaultAssertionRunner{
-		updater:      updater,
-		inputChannel: make(chan AssertionRequest, 1),
+		updater:           updater,
+		assertionExecutor: assertionExecutor,
+		inputChannel:      make(chan AssertionRequest, 1),
 	}
 }
 
@@ -39,8 +48,7 @@ func (e *defaultAssertionRunner) Start(workers int) {
 	e.exitChannel = make(chan bool, workers)
 
 	for i := 0; i < workers; i++ {
-		ctx := context.Background()
-		go e.startWorker(ctx)
+		go e.startWorker()
 	}
 }
 
@@ -55,13 +63,14 @@ func (e *defaultAssertionRunner) Stop() {
 	}
 }
 
-func (e *defaultAssertionRunner) startWorker(ctx context.Context) {
+func (e *defaultAssertionRunner) startWorker() {
 	for {
 		select {
 		case <-e.exitChannel:
 			fmt.Println("Exiting assertion executor worker")
 			return
 		case assertionRequest := <-e.inputChannel:
+			ctx := assertionRequest.Context()
 			err := e.runAssertionsAndUpdateResult(ctx, assertionRequest)
 			if err != nil {
 				fmt.Println(err.Error())
@@ -91,12 +100,17 @@ func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, req Asse
 	}
 
 	run = run.SuccessfullyAsserted(
-		assertions.Assert(req.Test.Definition, *run.Trace),
+		e.assertionExecutor.Assert(ctx, req.Test.Definition, *run.Trace),
 	)
 
 	return run, nil
 }
 
-func (e *defaultAssertionRunner) RunAssertions(request AssertionRequest) {
+func (e *defaultAssertionRunner) RunAssertions(ctx context.Context, request AssertionRequest) {
+	carrier := propagation.MapCarrier{}
+	otel.GetTextMapPropagator().Inject(ctx, carrier)
+
+	request.carrier = carrier
+
 	e.inputChannel <- request
 }

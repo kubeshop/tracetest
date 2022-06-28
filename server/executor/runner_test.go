@@ -5,10 +5,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/testdb"
+	"github.com/kubeshop/tracetest/server/tracing"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -122,9 +124,11 @@ func runnerSetup(t *testing.T) runnerFixture {
 	mtp := new(mockTracePoller)
 	mtp.t = t
 
+	tracer, _ := tracing.NewTracer(context.Background(), config.Config{})
+
 	mtp.Test(t)
 	return runnerFixture{
-		runner:          executor.NewPersistentRunner(me, db, executor.NewDBUpdater(db), mtp),
+		runner:          executor.NewPersistentRunner(me, db, executor.NewDBUpdater(db), mtp, tracer),
 		mockExecutor:    me,
 		mockDB:          db,
 		mockTracePoller: mtp,

@@ -274,7 +274,7 @@ func (c *controller) RerunTestRun(ctx context.Context, testID string, runID stri
 		Run:  newTestRun,
 	}
 
-	c.assertionRunner.RunAssertions(assertionRequest)
+	c.assertionRunner.RunAssertions(ctx, assertionRequest)
 
 	return openapi.Response(http.StatusOK, c.openapi.Run(&newTestRun)), nil
 }
