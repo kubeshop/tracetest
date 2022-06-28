@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"time"
 
@@ -140,8 +139,14 @@ func (td *postgresDB) DeleteTest(ctx context.Context, test model.Test) error {
 	return nil
 }
 
+const getTestSQL = `
+SELECT t.test, d.definition
+	FROM tests t
+	JOIN definitions d ON d.test_id = t.id AND d.test_version = t.version
+`
+
 func (td *postgresDB) GetTestVersion(ctx context.Context, id uuid.UUID, version int) (model.Test, error) {
-	stmt, err := td.db.Prepare("SELECT test FROM tests WHERE id = $1 AND version = $2")
+	stmt, err := td.db.Prepare(getTestSQL + " WHERE t.id = $1 AND t.version = $2")
 	if err != nil {
 		return model.Test{}, fmt.Errorf("prepare: %w", err)
 	}
@@ -156,7 +161,7 @@ func (td *postgresDB) GetTestVersion(ctx context.Context, id uuid.UUID, version 
 }
 
 func (td *postgresDB) GetLatestTestVersion(ctx context.Context, id uuid.UUID) (model.Test, error) {
-	stmt, err := td.db.Prepare("SELECT test FROM tests WHERE id = $1 ORDER BY version DESC LIMIT 1")
+	stmt, err := td.db.Prepare(getTestSQL + " WHERE t.id = $1 ORDER BY t.version DESC LIMIT 1")
 	if err != nil {
 		return model.Test{}, fmt.Errorf("prepare: %w", err)
 	}
@@ -171,11 +176,14 @@ func (td *postgresDB) GetLatestTestVersion(ctx context.Context, id uuid.UUID) (m
 }
 
 func (td *postgresDB) GetTests(ctx context.Context, take, skip int32) ([]model.Test, error) {
-	stmt, err := td.db.Prepare(`SELECT test FROM tests INNER JOIN (
+	stmt, err := td.db.Prepare(getTestSQL + `
+	INNER JOIN (
 		SELECT id as idx, max(version) as latest_version FROM tests GROUP BY idx
-	) as latestTests ON latestTests.idx = id WHERE version = latestTests.latest_version
-	ORDER BY (test ->> 'CreatedAt')::timestamp DESC
-	LIMIT $1 OFFSET $2`)
+	) as latestTests ON latestTests.idx = t.id
+	WHERE t.version = latestTests.latest_version
+	ORDER BY (t.test ->> 'CreatedAt')::timestamp DESC
+	LIMIT $1 OFFSET $2
+	`)
 	if err != nil {
 		return nil, err
 	}
@@ -218,22 +226,22 @@ func decodeTest(b []byte) (model.Test, error) {
 }
 
 func (td *postgresDB) readTestRow(ctx context.Context, row scanner) (model.Test, error) {
-	var b []byte
-	err := row.Scan(&b)
+	var testB, defB []byte
+	err := row.Scan(&testB, &defB)
 	switch err {
 	case sql.ErrNoRows:
 		return model.Test{}, ErrNotFound
 	case nil:
-		test, err := decodeTest(b)
+		test, err := decodeTest(testB)
 		if err != nil {
 			return model.Test{}, err
 		}
 
-		defs, err := td.GetDefiniton(ctx, test)
-		if err != nil && !errors.Is(err, ErrNotFound) {
-			err = fmt.Errorf("aca 1. %w", err)
+		defs, err := decodeDefinition(defB)
+		if err != nil {
 			return model.Test{}, err
 		}
+
 		test.Definition = defs
 
 		return test, nil

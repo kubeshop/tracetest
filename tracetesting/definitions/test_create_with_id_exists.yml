@@ -1,5 +1,5 @@
-id: d85c3336-5048-4652-b564-63dfe2c83b14
-name: Test Create
+id: 7761457a-0a4b-4ada-8eab-d26c8ba48f90
+name: Test Create with existing ID
 description: ""
 trigger:
   type: http

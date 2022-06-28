@@ -63,26 +63,11 @@ services:
       timeout: 5s
       retries: 60
 
-  demodb:
-    container_name: demodb
-    image: postgres
-    environment:
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_USER:  postgres
-      POSTGRES_DB: demodb
-    ports:
-      - 5433:5432
-    healthcheck:
-      test: pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
-      interval: 1s
-      timeout: 5s
-      retries: 60
-
   demo:
     image: kubeshop/demo-pokemon-api:latest
     environment:
       REDIS_URL: cache
-      DATABASE_URL: postgresql://postgres:postgres@demodb:5433/pokeshop?schema=public
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres?schema=public
       RABBITMQ_HOST: queue
       POKE_API_BASE_URL: https://pokeapi.co/api/v2
       JAEGER_HOST: jaeger
@@ -90,7 +75,7 @@ services:
     ports:
       - 8001:80
     depends_on:
-      demodb:
+      postgres:
         condition: service_healthy
       cache:
         condition: service_healthy

@@ -23,15 +23,15 @@ echo "TRACETEST_MAIN_ENDPOINT: $TRACETEST_MAIN_ENDPOINT"
 echo "TRACETEST_TARGET_ENDPOINT: $TRACETEST_TARGET_ENDPOINT"
 echo "DEMO_APP_URL: $DEMO_APP_URL"
 
-tee config.main.yml << END
+cat << EOF > config.main.yml
 scheme: http
 endpoint: $TRACETEST_MAIN_ENDPOINT
-END
+EOF
 
-tee config.target.yml << END
+cat << EOF > config.target.yml
 scheme: http
 endpoint: $TRACETEST_TARGET_ENDPOINT
-END
+EOF
 
 
 

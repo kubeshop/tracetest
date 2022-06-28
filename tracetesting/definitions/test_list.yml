@@ -14,3 +14,6 @@ testDefinition:
   assertions:
   - tracetest.response.status = 200
   - tracetest.response.body contains "${TEST_ID}"
+- selector: span[name="query"]
+  assertions:
+  - tracetest.selected_spans.count = 1
