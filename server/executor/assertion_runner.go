@@ -6,12 +6,14 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/server/model"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/propagation"
 )
 
 type AssertionRequest struct {
-	Ctx  context.Context
-	Test model.Test
-	Run  model.Run
+	carrier propagation.MapCarrier
+	Test    model.Test
+	Run     model.Run
 }
 
 type AssertionRunner interface {
@@ -63,12 +65,20 @@ func (e *defaultAssertionRunner) startWorker() {
 			fmt.Println("Exiting assertion executor worker")
 			return
 		case assertionRequest := <-e.inputChannel:
-			err := e.runAssertionsAndUpdateResult(assertionRequest.Ctx, assertionRequest)
+			ctx := e.getCtxFromRequest(assertionRequest)
+			err := e.runAssertionsAndUpdateResult(ctx, assertionRequest)
 			if err != nil {
 				fmt.Println(err.Error())
 			}
 		}
 	}
+}
+
+func (e *defaultAssertionRunner) getCtxFromRequest(req AssertionRequest) context.Context {
+	ctx := context.Background()
+	otel.GetTextMapPropagator().Inject(ctx, req.carrier)
+
+	return ctx
 }
 
 func (e *defaultAssertionRunner) runAssertionsAndUpdateResult(ctx context.Context, request AssertionRequest) error {
@@ -99,6 +109,9 @@ func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, req Asse
 }
 
 func (e *defaultAssertionRunner) RunAssertions(ctx context.Context, request AssertionRequest) {
-	request.Ctx = ctx
+	carrier := propagation.MapCarrier{}
+	otel.GetTextMapPropagator().Inject(ctx, carrier)
+	request.carrier = carrier
+
 	e.inputChannel <- request
 }
