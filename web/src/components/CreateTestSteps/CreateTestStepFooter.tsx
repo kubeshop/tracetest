@@ -1,5 +1,5 @@
 import {Button} from 'antd';
-import {useCreateTest} from '../../providers/CreateTest/CreateTest.provider';
+import {useCreateTest} from 'providers/CreateTest/CreateTest.provider';
 import * as S from './CreateTestSteps.styled';
 
 interface IProps {
@@ -8,12 +8,12 @@ interface IProps {
 }
 
 const CreateStepFooter = ({isValid, onNext}: IProps) => {
-  const {stepNumber, stepList, onPrev, onCreateTest, isLoading} = useCreateTest();
+  const {stepNumber, stepList, onPrev, isLoading} = useCreateTest();
 
   return (
     <S.Footer>
       {Boolean(stepNumber) && (
-        <Button data-cy="create-test-prev-button" type="text" onClick={() => onPrev()}>
+        <Button data-cy="create-test-prev-button" type="text" onClick={onPrev}>
           Previous
         </Button>
       )}
@@ -25,7 +25,7 @@ const CreateStepFooter = ({isValid, onNext}: IProps) => {
         <Button
           data-cy="create-test-create-button"
           disabled={!isValid}
-          onClick={onCreateTest}
+          onClick={onNext}
           type="primary"
           loading={isLoading}
         >

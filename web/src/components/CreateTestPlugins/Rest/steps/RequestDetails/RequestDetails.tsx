@@ -19,7 +19,7 @@ export interface IRequestDetailsValues {
 const RequestDetails = () => {
   const [isFormValid, setIsFormValid] = useState(false);
   const [form] = Form.useForm<IRequestDetailsValues>();
-  const {onNext, onUpdateDraftTest} = useCreateTest();
+  const {onNext} = useCreateTest();
   const {
     draftTest: {serviceUnderTest: {request} = {}},
   } = useCreateTest();
@@ -30,10 +30,9 @@ const RequestDetails = () => {
 
   const handleSubmit = useCallback(
     (values: IRequestDetailsValues) => {
-      onUpdateDraftTest({serviceUnderTest: {request: values}});
-      onNext();
+      onNext({serviceUnderTest: {request: values}});
     },
-    [onNext, onUpdateDraftTest]
+    [onNext]
   );
 
   const onRefreshData = useCallback(async () => {
