@@ -1,6 +1,27 @@
 #!/bin/sh
 
+STOP=yes
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --no-stop)
+      STOP=no
+      shift
+      shift
+      ;;
+    -*|--*)
+      echo "Unknown option $1"
+      help_message
+      exit 1
+      ;;
+  esac
+done
+
+
 docker compose -f docker-compose.yaml up -d --build --remove-orphans
 docker compose -f docker-compose.yaml -f docker-compose.testrunner.yaml build
 docker compose -f docker-compose.yaml -f docker-compose.testrunner.yaml run testrunner
-docker compose -f docker-compose.yaml stop
+
+if [ "$STOP" == "yes" ]; then
+  docker compose -f docker-compose.yaml stop
+fi
