@@ -31,3 +31,8 @@ window.ResizeObserver =
   }));
 
 configure({testIdAttribute: 'data-cy'});
+
+Object.defineProperty(URL, 'createObjectURL', {
+  writable: true,
+  value: jest.fn(),
+});

@@ -1,7 +1,7 @@
 import {Form, Input} from 'antd';
 import React from 'react';
 import * as S from '../RequestDetails.styled';
-import * as R from './CreateTestFormAuthInput.styled';
+import * as R from './RequestDetailsAuthInput.styled';
 
 export const basicFields: React.ReactElement = (
   <S.Row>

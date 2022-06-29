@@ -91,9 +91,8 @@
       "/node_modules/(?!antd|@ant-design|d3-array|d3|internmap|delaunator|robust-predicates|rc-.+?|@babel/runtime).+(js|jsx)$"
     ],
     "collectCoverageFrom": [
-      "src/(components|redux|hooks|models|services|gateways)/**/*.(ts|tsx)",
-      "!src/(components|redux|hooks|models|services|gateways)/**/*.stories.(ts|tsx)",
-      "!src/(components|redux|hooks|models|services|gateways)/**/*.test.(ts|tsx)"
+      "src/**/*.(ts|tsx)",
+      "!src/assets/**/*"
     ],
     "resetMocks": false
   },

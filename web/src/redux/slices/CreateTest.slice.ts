@@ -25,7 +25,7 @@ const createTestSlice = createSlice<ICreateTestState, TCreateTestSliceActions, '
 
       const nextStep = state.stepList[stepNumber];
       state.stepNumber = stepNumber;
-      if (nextStep.status !== 'complete') state.stepList[stepNumber].status = 'selected';
+      if (nextStep && nextStep.status !== 'complete') state.stepList[stepNumber].status = 'selected';
     },
     setDraftTest(state, {payload: {draftTest}}) {
       state.draftTest = {

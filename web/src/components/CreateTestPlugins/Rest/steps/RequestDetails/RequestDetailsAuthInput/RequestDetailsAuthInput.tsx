@@ -4,13 +4,17 @@ import {IRequestDetailsValues} from '../RequestDetails';
 import {apiKeyFields} from './apiKeyFields';
 import {basicFields} from './basicFields';
 import {bearerFields} from './bearerFields';
-import {CreateTestFormAuthTypeInput} from './CreateTestFormAuthTypeInput';
+import TypeInput from './TypeInput';
 
-const RequestDetailsAuthInput: React.FC<{form: FormInstance<IRequestDetailsValues>}> = ({form}) => {
+interface IProps {
+  form: FormInstance<IRequestDetailsValues>;
+}
+
+const RequestDetailsAuthInput = ({form}: IProps) => {
   return (
     <div>
-      <CreateTestFormAuthTypeInput form={form} />
-      <Form.Item noStyle style={{width: '100%'}} shouldUpdate>
+      <TypeInput form={form} />
+      <Form.Item noStyle shouldUpdate style={{marginBottom: 0, width: '100%'}}>
         {({getFieldValue}) => {
           const method = getFieldValue('auth')?.type;
           switch (method) {

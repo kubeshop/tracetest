@@ -9,6 +9,7 @@ const selectorSelector = (state: RootState, selector: string) => selector;
 const spanIdSelector = (state: RootState, spanId: string) => spanId;
 
 const selectDefinitionList = createSelector(stateSelector, ({definitionList}) => definitionList);
+
 const selectDefinitionSelectorList = createSelector(selectDefinitionList, definitionList =>
   definitionList.map(({selector}) => selector)
 );
@@ -21,32 +22,32 @@ const selectAssertionResultsBySpan = createSelector(
     if (!assertionResults) return {};
 
     // Map and flat items in one single array
-    const results = assertionResults.resultList
-      .flatMap(assertionResult =>
-        assertionResult.resultList.map(assertion => ({
-          id: assertionResult.selector,
-          attribute: assertion.assertion.attribute,
-          assertionResult,
-          label: `${assertionResult.selectorList.map(({value}) => value).join(' ')} ${
-            assertionResult.pseudoSelector?.selector ?? ''
-          }`,
-          result: assertion.spanResults.find(spanResult => spanResult.spanId === spanId),
-        }))
-      )
-      // Filter if it has result for the spanId
-      .filter(assertion => Boolean(assertion?.result))
-      // Hash items by attribute
-      .reduce((prev: TResultAssertions, curr) => {
-        const value = prev[curr.attribute] || {failed: [], passed: []};
+    return (
+      assertionResults.resultList
+        .flatMap(assertionResult =>
+          assertionResult.resultList.map(assertion => ({
+            id: assertionResult.selector,
+            attribute: assertion.assertion.attribute,
+            assertionResult,
+            label: `${assertionResult.selectorList.map(({value}) => value).join(' ')} ${
+              assertionResult.pseudoSelector?.selector ?? ''
+            }`,
+            result: assertion.spanResults.find(spanResult => spanResult.spanId === spanId),
+          }))
+        )
+        // Filter if it has result for the spanId
+        .filter(assertion => Boolean(assertion?.result))
+        // Hash items by attribute
+        .reduce((prev: TResultAssertions, curr) => {
+          const value = prev[curr.attribute] || {failed: [], passed: []};
 
-        if (curr.result?.passed)
-          value.passed.push({id: curr.id, label: curr.label, assertionResult: curr.assertionResult});
-        else value.failed.push({id: curr.id, label: curr.label, assertionResult: curr.assertionResult});
+          if (curr.result?.passed)
+            value.passed.push({id: curr.id, label: curr.label, assertionResult: curr.assertionResult});
+          else value.failed.push({id: curr.id, label: curr.label, assertionResult: curr.assertionResult});
 
-        return {...prev, [curr.attribute]: value};
-      }, {});
-
-    return results;
+          return {...prev, [curr.attribute]: value};
+        }, {})
+    );
   }
 );
 

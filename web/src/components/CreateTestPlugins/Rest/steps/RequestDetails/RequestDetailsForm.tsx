@@ -3,7 +3,7 @@ import {IRequestDetailsValues} from './RequestDetails';
 import * as S from './RequestDetails.styled';
 import useValidate from './hooks/useValidate';
 import RequestDetailsUrlInput from './RequestDetailsUrlInput';
-import RequestDetailsAuthInput from './RequestDetailsAuthInput/CreateTestFormAuthInput';
+import RequestDetailsAuthInput from './RequestDetailsAuthInput/RequestDetailsAuthInput';
 import RequestDetailsHeadersInput from './RequestDetailsHeadersInput';
 
 export const FORM_ID = 'create-test';

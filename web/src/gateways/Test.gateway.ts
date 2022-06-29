@@ -1,5 +1,5 @@
-import {endpoints} from '../redux/apis/TraceTest.api';
-import {TTest} from '../types/Test.types';
+import {endpoints} from 'redux/apis/TraceTest.api';
+import {TDraftTest} from 'types/Plugins.types';
 
 const {createTest, getTestById, getTestList, runTest} = endpoints;
 
@@ -10,7 +10,7 @@ const TestGateway = () => ({
   getById(testId: string) {
     return getTestById.initiate({testId});
   },
-  create(test: Partial<TTest>) {
+  create(test: TDraftTest) {
     return createTest.initiate(test);
   },
   run(testId: string) {
