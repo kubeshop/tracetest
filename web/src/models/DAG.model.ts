@@ -3,9 +3,9 @@ import {Attributes} from 'constants/SpanAttribute.constants';
 import DAGService from 'services/DAG.service';
 import SpanService from 'services/Span.service';
 import {INodeDataSpan, INodeDatum} from 'types/DAG.types';
-import {TSpan, TSpansResult} from 'types/Span.types';
+import {TSpan} from 'types/Span.types';
 
-function getNodesDatumFromSpans(spans: TSpan[], spansResult: TSpansResult): INodeDatum<INodeDataSpan>[] {
+function getNodesDatumFromSpans(spans: TSpan[]): INodeDatum<INodeDataSpan>[] {
   return spans.map(span => ({
     data: {
       duration: span.duration,
@@ -17,8 +17,6 @@ function getNodesDatumFromSpans(spans: TSpan[], spansResult: TSpansResult): INod
       programmingLanguage: span.attributes?.[Attributes.TELEMETRY_SDK_LANGUAGE]?.value ?? '',
       serviceName: span.attributes?.[Attributes.SERVICE_NAME]?.value ?? '',
       totalAttributes: span.attributeList.length,
-      totalChecksFailed: spansResult?.[span.id]?.failed ?? 0,
-      totalChecksPassed: spansResult?.[span.id]?.passed ?? 0,
       type: span.type,
       ...SpanService.getSpanNodeInfo(span),
     },
@@ -28,8 +26,8 @@ function getNodesDatumFromSpans(spans: TSpan[], spansResult: TSpansResult): INod
   }));
 }
 
-function DAG(spans: TSpan[], spansResult: TSpansResult) {
-  const nodesDatum = getNodesDatumFromSpans(spans, spansResult);
+function DAG(spans: TSpan[]) {
+  const nodesDatum = getNodesDatumFromSpans(spans);
   return DAGService.getEdgesAndNodes(nodesDatum);
 }
 

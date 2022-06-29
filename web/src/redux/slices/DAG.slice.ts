@@ -3,7 +3,7 @@ import {applyNodeChanges, Edge, MarkerType, Node, NodeChange} from 'react-flow-r
 
 import {Colors} from 'constants/DAG.constants';
 import DAGModel from 'models/DAG.model';
-import {TSpan, TSpansResult} from 'types/Span.types';
+import {TSpan} from 'types/Span.types';
 import {clearAffectedSpans, setAffectedSpans, setMatchedSpans, setSelectedSpan} from './Span.slice';
 import {setSelectedAssertion} from './TestDefinition.slice';
 
@@ -21,8 +21,8 @@ const dagSlice = createSlice({
   name: 'dag',
   initialState,
   reducers: {
-    initNodes(state, {payload}: PayloadAction<{spans: TSpan[]; spansResult: TSpansResult}>) {
-      const {edges, nodes} = DAGModel(payload.spans, payload.spansResult);
+    initNodes(state, {payload}: PayloadAction<{spans: TSpan[]}>) {
+      const {edges, nodes} = DAGModel(payload.spans);
       state.edges = edges;
       state.nodes = nodes;
     },

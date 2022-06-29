@@ -7,7 +7,6 @@ import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import {initNodes, onNodesChange as onNodesChangeAction} from 'redux/slices/DAG.slice';
 import TraceDiagramAnalyticsService from 'services/Analytics/TraceDiagramAnalytics.service';
 import DAGSelectors from 'selectors/DAG.selectors';
-import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
 import {TSpan} from 'types/Span.types';
 
 const {onClickSpan} = TraceDiagramAnalyticsService;
@@ -37,14 +36,13 @@ const DAGProvider = ({children, spans}: IProps) => {
   const dispatch = useAppDispatch();
   const edges = useAppSelector(DAGSelectors.selectEdges);
   const nodes = useAppSelector(DAGSelectors.selectNodes);
-  const spansResult = useAppSelector(TestDefinitionSelectors.selectSpansResult);
   const {onSelectSpan} = useSpan();
 
   useEffect(() => {
-    dispatch(initNodes({spans, spansResult}));
+    dispatch(initNodes({spans}));
     const firstSpan = spans.find(span => !span.parentId);
     onSelectSpan(firstSpan?.id ?? '');
-  }, [dispatch, onSelectSpan, spans, spansResult]);
+  }, [dispatch, onSelectSpan, spans]);
 
   const onNodesChange = useCallback((changes: NodeChange[]) => dispatch(onNodesChangeAction({changes})), [dispatch]);
 

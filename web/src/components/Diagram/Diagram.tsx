@@ -34,6 +34,7 @@ const ComponentMap: Record<string, typeof DAGComponent | typeof TimelineComponen
 
 const Diagram = ({runState, trace, type}: IProps) => {
   const Component = ComponentMap[type || ''] || DAGComponent;
+
   const {onClearAffectedSpans, onClearSelectedSpan, onSelectSpan, selectedSpan, affectedSpans, matchedSpans} =
     useSpan();
   const spanList = trace.spans || [];

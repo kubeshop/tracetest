@@ -22,7 +22,7 @@ describe('Create Assertion', () => {
     cy.location('href').should('match', /\/run\/.*/i);
 
     cy.get('[data-cy^=trace-node-]', {timeout: 10000}).should('be.visible');
-    cy.get(`[data-cy=trace-node-db]`, {timeout: 20000}).first().click();
+    cy.get(`[data-cy=trace-node-database]`, {timeout: 20000}).first().click();
 
     cy.get('[data-cy=add-assertion-button]').click();
     cy.get('[data-cy=assertion-form]', {timeout: 10000}).should('be.visible');
@@ -117,7 +117,7 @@ describe('Create Assertion', () => {
   });
 
   it('should create an assertion and revert all changes', () => {
-    cy.get(`[data-cy=trace-node-db]`, {timeout: 20000}).last().click();
+    cy.get(`[data-cy=trace-node-database]`, {timeout: 20000}).last().click();
     cy.get('[data-cy=add-assertion-button]').click();
     cy.get('[data-cy=assertion-form]', {timeout: 10000}).should('be.visible');
 

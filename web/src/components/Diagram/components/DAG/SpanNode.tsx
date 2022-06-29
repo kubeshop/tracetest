@@ -3,12 +3,15 @@ import {Handle, NodeProps, Position} from 'react-flow-renderer';
 
 import {SemanticGroupNamesToIcon} from 'constants/SemanticGroupNames.constants';
 import {SpanKindToText} from 'constants/Span.constants';
+import {useAppSelector} from 'redux/hooks';
+import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
 import {INodeDataSpan} from 'types/DAG.types';
 import * as S from './SpanNode.styled';
 
 interface IProps extends NodeProps<INodeDataSpan> {}
 
 const SpanNode = ({data, id, selected}: IProps) => {
+  const spansResult = useAppSelector(TestDefinitionSelectors.selectSpansResult);
   const className = `${data.isAffected ? 'affected' : ''} ${data.isMatched ? 'matched' : ''}`;
   const Icon = SemanticGroupNamesToIcon[data.type];
 
@@ -34,7 +37,7 @@ const SpanNode = ({data, id, selected}: IProps) => {
         </S.Badge>
       </S.Body>
       <S.Footer>
-        {Boolean(data.totalChecksPassed) && (
+        {Boolean(spansResult[data.id]?.passed) && (
           <S.DotContainer>
             <S.DotContent1>
               <S.DotContent2 $type="success">
@@ -44,7 +47,7 @@ const SpanNode = ({data, id, selected}: IProps) => {
           </S.DotContainer>
         )}
 
-        {Boolean(data.totalChecksFailed) && (
+        {Boolean(spansResult[data.id]?.failed) && (
           <S.DotContainer>
             <S.DotContent1>
               <S.DotContent2 $type="error">

@@ -21,7 +21,5 @@ export interface INodeDataSpan {
   programmingLanguage: string;
   serviceName: string;
   totalAttributes: number;
-  totalChecksFailed: number;
-  totalChecksPassed: number;
   type: SemanticGroupNames;
 }
