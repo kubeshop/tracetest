@@ -11,3 +11,7 @@ export type TTest = Model<
     };
   }
 >;
+
+export type TRequest = THttpSchemas['HTTPRequest'];
+export type TRequestAuth = THttpSchemas['HTTPRequest']['auth'];
+export type TMethod = THttpSchemas['HTTPRequest']['method'];

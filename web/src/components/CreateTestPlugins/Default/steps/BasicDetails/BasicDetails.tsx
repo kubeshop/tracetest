@@ -16,7 +16,7 @@ const BasicDetails = () => {
   const [isFormValid, setIsFormValid] = useState(false);
   const [selectedDemo, setSelectedDemo] = useState<IDemoTestExample>();
   const [form] = Form.useForm<IBasicDetailsValues>();
-  const {onNext, onUpdateDraftTest} = useCreateTest();
+  const {onNext} = useCreateTest();
 
   const handleNext = useCallback(() => {
     form.submit();
@@ -25,11 +25,9 @@ const BasicDetails = () => {
   const handleSubmit = useCallback(
     ({name, description}: IBasicDetailsValues) => {
       const {url, body, method} = selectedDemo || {};
-
-      onUpdateDraftTest({name, description, serviceUnderTest: {request: {url, body, method}}});
-      onNext();
+      onNext({name, description, serviceUnderTest: {request: {url, body, method}}});
     },
-    [onNext, onUpdateDraftTest, selectedDemo]
+    [onNext, selectedDemo]
   );
 
   return (
