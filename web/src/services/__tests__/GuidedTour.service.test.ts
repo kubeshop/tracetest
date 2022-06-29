@@ -1,6 +1,11 @@
 import GuidedTourService, {defaultValue, GuidedTours} from '../GuidedTour.service';
 
 describe('GuidedTourService', () => {
+  it('should getByPathName', () => {
+    const guidedTour = GuidedTourService.getByPathName('/run/');
+
+    expect(guidedTour).toEqual('trace');
+  });
   it('should get the default guided tour object from the local storage', () => {
     const guidedTour = GuidedTourService.get();
 

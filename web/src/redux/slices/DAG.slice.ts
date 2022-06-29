@@ -6,12 +6,12 @@ import {TSpan} from 'types/Span.types';
 import {clearAffectedSpans, setAffectedSpans, setMatchedSpans, setSelectedSpan} from './Span.slice';
 import {setSelectedAssertion} from './TestDefinition.slice';
 
-interface IState {
+export interface IDagState {
   edges: Edge[];
   nodes: Node[];
 }
 
-const initialState: IState = {
+const initialState: IDagState = {
   edges: [],
   nodes: [],
 };
