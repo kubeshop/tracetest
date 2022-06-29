@@ -260,12 +260,12 @@ flowchart TD
     I -->|9| J
     J -->|10| K
 
-    A:::selectedSpan
-    B:::selectedSpan
-    D:::selectedSpan
-    F:::selectedSpan
-    G:::selectedSpan
-    I:::selectedSpan
+    class A selectedSpan
+    class B selectedSpan
+    class D selectedSpan
+    class F selectedSpan
+    class G selectedSpan
+    class I selectedSpan
 
     classDef selectedSpan fill:#439846, color:#ffffff
     classDef candidateSpan fill:#FF6905, color:#ffffff
@@ -381,8 +381,8 @@ flowchart TD
     I -->|9| J
     J -->|10| K
 
-    A:::selectedSpan
-    F:::selectedSpan
+    class A selectedSpan
+    class F selectedSpan
 
     classDef selectedSpan fill:#439846, color:#ffffff
     classDef candidateSpan fill:#FF6905, color:#ffffff
@@ -498,16 +498,16 @@ flowchart TD
     I -->|9| J
     J -->|10| K
 
-    A:::selectedSpan
-    B:::selectedSpan
-    C:::selectedSpan
-    D:::selectedSpan
-    E:::selectedSpan
-    F:::selectedSpan
-    G:::selectedSpan
-    H:::selectedSpan
-    I:::selectedSpan
-    J:::selectedSpan
+    class A selectedSpan
+    class B selectedSpan
+    class C selectedSpan
+    class D selectedSpan
+    class E selectedSpan
+    class F selectedSpan
+    class G selectedSpan
+    class H selectedSpan
+    class I selectedSpan
+    class J selectedSpan
 
     classDef selectedSpan fill:#439846, color:#ffffff
     classDef candidateSpan fill:#FF6905, color:#ffffff
@@ -625,16 +625,16 @@ flowchart TD
     I -->|9| J
     J -->|10| K
 
-    A:::selectedSpan
-    B:::selectedSpan
-    C:::selectedSpan
-    D:::selectedSpan
-    E:::selectedSpan
-    F:::selectedSpan
-    G:::selectedSpan
-    H:::selectedSpan
-    I:::selectedSpan
-    J:::selectedSpan
+    class A selectedSpan
+    class B selectedSpan
+    class C selectedSpan
+    class D selectedSpan
+    class E selectedSpan
+    class F selectedSpan
+    class G selectedSpan
+    class H selectedSpan
+    class I selectedSpan
+    class J selectedSpan
 
     classDef selectedSpan fill:#439846, color:#ffffff
     classDef candidateSpan fill:#FF6905, color:#ffffff
@@ -756,12 +756,12 @@ flowchart TD
     I -->|9| J
     J -->|10| K
 
-    A:::selectedSpan
-    B:::selectedSpan
-    D:::selectedSpan
-    F:::selectedSpan
-    G:::selectedSpan
-    I:::selectedSpan
+    class A selectedSpan
+    class B selectedSpan
+    class D selectedSpan
+    class F selectedSpan
+    class G selectedSpan
+    class I selectedSpan
 
     classDef selectedSpan fill:#439846, color:#ffffff
     classDef candidateSpan fill:#FF6905, color:#ffffff
@@ -875,12 +875,12 @@ flowchart TD
     I -->|9| J
     J -->|10| K
 
-    A:::selectedSpan
-    B:::candidateSpan
-    D:::candidateSpan
-    F:::candidateSpan
-    G:::candidateSpan
-    I:::candidateSpan
+    class A selectedSpan
+    class B candidateSpan
+    class D candidateSpan
+    class F candidateSpan
+    class G candidateSpan
+    class I candidateSpan
 
     classDef selectedSpan fill:#439846, color:#ffffff
     classDef candidateSpan fill:#FF6905, color:#ffffff
@@ -994,12 +994,12 @@ flowchart TD
     I -->|9| J
     J -->|10| K
 
-    A:::candidateSpan
-    B:::candidateSpan
-    D:::candidateSpan
-    F:::candidateSpan
-    G:::candidateSpan
-    I:::selectedSpan
+    class A candidateSpan
+    class B candidateSpan
+    class D candidateSpan
+    class F candidateSpan
+    class G candidateSpan
+    class I selectedSpan
 
     classDef selectedSpan fill:#439846, color:#ffffff
     classDef candidateSpan fill:#FF6905, color:#ffffff
@@ -1113,12 +1113,12 @@ flowchart TD
     I -->|9| J
     J -->|10| K
 
-    A:::candidateSpan
-    B:::candidateSpan
-    D:::selectedSpan
-    F:::candidateSpan
-    G:::candidateSpan
-    I:::candidateSpan
+    class A candidateSpan
+    class B candidateSpan
+    class D selectedSpan
+    class F candidateSpan
+    class G candidateSpan
+    class I candidateSpan
 
     classDef selectedSpan fill:#439846, color:#ffffff
     classDef candidateSpan fill:#FF6905, color:#ffffff
@@ -1242,8 +1242,8 @@ flowchart TD
     I -->|9| J
     J -->|10| K
 
-    D:::selectedSpan
-    G:::selectedSpan
+    class D selectedSpan
+    class G selectedSpan
 
     classDef selectedSpan fill:#439846, color:#ffffff
     classDef candidateSpan fill:#FF6905, color:#ffffff
@@ -1360,8 +1360,8 @@ flowchart TD
     I -->|9| J
     J -->|10| K
 
-    F:::parentSpan
-    G:::selectedSpan
+    class F parentSpan
+    class G selectedSpan
 
     classDef selectedSpan fill:#439846, color:#ffffff
     classDef parentSpan fill:#3792cb, color:#ffffff
