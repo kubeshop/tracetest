@@ -51,7 +51,6 @@ extra:
 plugins:
   - render_swagger
   - search
-  - mermaid2
 
 # Extensions
 markdown_extensions:
