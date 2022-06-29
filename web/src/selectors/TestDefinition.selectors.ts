@@ -2,6 +2,7 @@ import {createSelector} from '@reduxjs/toolkit';
 
 import {RootState} from 'redux/store';
 import {TResultAssertions} from 'types/Assertion.types';
+import {TSpansResult} from 'types/Span.types';
 
 const stateSelector = (state: RootState) => state.testDefinition;
 const selectorSelector = (state: RootState, selector: string) => selector;
@@ -49,6 +50,26 @@ const selectAssertionResultsBySpan = createSelector(
   }
 );
 
+const selectSpansResult = createSelector(selectAssertionResults, assertionResults => {
+  if (!assertionResults) return {};
+
+  // Map and flat items in one single array
+  const results = assertionResults.resultList
+    .flatMap(resultItem => resultItem.resultList)
+    .flatMap(resultItem => resultItem.spanResults)
+    // Hash items by spanId
+    .reduce((prev: TSpansResult, curr) => {
+      const value = prev[curr?.spanId] || {failed: 0, passed: 0};
+
+      if (curr?.passed) value.passed += 1;
+      else value.failed += 1;
+
+      return {...prev, [curr?.spanId]: value};
+    }, {});
+
+  return results;
+});
+
 const TestDefinitionSelectors = () => ({
   selectDefinitionList,
   selectDefinitionSelectorList,
@@ -64,6 +85,7 @@ const TestDefinitionSelectors = () => ({
   selectSelectedAssertion: createSelector(stateSelector, ({selectedAssertion}) => selectedAssertion),
   selectAssertionResultsBySpan,
   selectIsDraftMode: createSelector(stateSelector, ({isDraftMode}) => isDraftMode),
+  selectSpansResult,
 });
 
 export default TestDefinitionSelectors();

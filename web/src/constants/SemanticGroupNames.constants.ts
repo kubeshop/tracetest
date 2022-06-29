@@ -1,3 +1,13 @@
+import {
+  AlertFilled,
+  CodeFilled,
+  DatabaseFilled,
+  DeliveredProcedureOutlined,
+  DeploymentUnitOutlined,
+  FunctionOutlined,
+  MergeCellsOutlined,
+  ProfileFilled,
+} from '@ant-design/icons';
 import {Attributes} from './SpanAttribute.constants';
 
 export enum SemanticGroupNames {
@@ -8,7 +18,7 @@ export enum SemanticGroupNames {
   Exception = 'exception',
   General = 'general',
   Compatibility = 'compatibility',
-  Database = 'db',
+  Database = 'database',
 }
 
 export const SemanticGroupNamesToText = {
@@ -31,6 +41,28 @@ export const SemanticGroupNamesToColor = {
   [SemanticGroupNames.Exception]: '#FFBB96',
   [SemanticGroupNames.General]: '#FFBB96',
   [SemanticGroupNames.Compatibility]: '#FFBB96',
+} as const;
+
+export const SemanticGroupNamesToDarkColor = {
+  [SemanticGroupNames.Database]: '#623488',
+  [SemanticGroupNames.Http]: '#67863b',
+  [SemanticGroupNames.Rpc]: '#2b8286',
+  [SemanticGroupNames.Messaging]: '#676767',
+  [SemanticGroupNames.Faas]: '#a16341',
+  [SemanticGroupNames.Exception]: '#FFBB96',
+  [SemanticGroupNames.General]: '#a16341',
+  [SemanticGroupNames.Compatibility]: '#FFBB96',
+} as const;
+
+export const SemanticGroupNamesToIcon = {
+  [SemanticGroupNames.Database]: DatabaseFilled,
+  [SemanticGroupNames.Http]: CodeFilled,
+  [SemanticGroupNames.Rpc]: DeliveredProcedureOutlined,
+  [SemanticGroupNames.Messaging]: DeploymentUnitOutlined,
+  [SemanticGroupNames.Faas]: FunctionOutlined,
+  [SemanticGroupNames.Exception]: AlertFilled,
+  [SemanticGroupNames.General]: ProfileFilled,
+  [SemanticGroupNames.Compatibility]: MergeCellsOutlined,
 } as const;
 
 export const SemanticGroupNameNodeMap: Record<SemanticGroupNames, {primary: string[]; type: string}> = {

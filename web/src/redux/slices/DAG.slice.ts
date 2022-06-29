@@ -1,8 +1,9 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
-import {Node, Edge, NodeChange, applyNodeChanges} from 'react-flow-renderer';
+import {applyNodeChanges, Edge, MarkerType, Node, NodeChange} from 'react-flow-renderer';
 
+import {Colors} from 'constants/DAG.constants';
 import DAGModel from 'models/DAG.model';
-import {TSpan} from 'types/Span.types';
+import {TSpan, TSpansResult} from 'types/Span.types';
 import {clearAffectedSpans, setAffectedSpans, setMatchedSpans, setSelectedSpan} from './Span.slice';
 import {setSelectedAssertion} from './TestDefinition.slice';
 
@@ -20,8 +21,8 @@ const dagSlice = createSlice({
   name: 'dag',
   initialState,
   reducers: {
-    initNodes(state, {payload}: PayloadAction<{spans: TSpan[]}>) {
-      const {edges, nodes} = DAGModel(payload.spans);
+    initNodes(state, {payload}: PayloadAction<{spans: TSpan[]; spansResult: TSpansResult}>) {
+      const {edges, nodes} = DAGModel(payload.spans, payload.spansResult);
       state.edges = edges;
       state.nodes = nodes;
     },
@@ -56,6 +57,16 @@ const dagSlice = createSlice({
         });
       })
       .addCase(setSelectedSpan, (state, {payload: {span}}) => {
+        state.edges = state.edges.map(edge => {
+          const selected = span.id === edge.source;
+          return {
+            ...edge,
+            animated: selected,
+            markerEnd: {color: selected ? Colors.Selected : Colors.Default, type: MarkerType.ArrowClosed},
+            style: {stroke: selected ? Colors.Selected : Colors.Default},
+          };
+        });
+
         state.nodes = state.nodes.map(node => {
           const selected = span.id === node.id;
           return {...node, selected};

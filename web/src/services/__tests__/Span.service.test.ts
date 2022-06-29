@@ -9,6 +9,7 @@ describe('SpanService', () => {
         attributes: {
           'db.system': 'mysql',
           'service.name': 'test',
+          'tracetest.span.type': 'database',
         },
       });
       const info = SpanService.getSpanNodeInfo(span);

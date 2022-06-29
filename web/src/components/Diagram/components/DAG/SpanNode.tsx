@@ -1,27 +1,59 @@
-import Text from 'antd/lib/typography/Text';
-import {capitalize} from 'lodash';
+import {ClockCircleOutlined} from '@ant-design/icons';
 import {Handle, NodeProps, Position} from 'react-flow-renderer';
 
-import {SemanticGroupNamesToText} from 'constants/SemanticGroupNames.constants';
+import {SemanticGroupNamesToIcon} from 'constants/SemanticGroupNames.constants';
+import {SpanKindToText} from 'constants/Span.constants';
 import {INodeDataSpan} from 'types/DAG.types';
 import * as S from './SpanNode.styled';
 
 interface IProps extends NodeProps<INodeDataSpan> {}
 
 const SpanNode = ({data, id, selected}: IProps) => {
-  const spanTypeText = SemanticGroupNamesToText[data.type];
   const className = `${data.isAffected ? 'affected' : ''} ${data.isMatched ? 'matched' : ''}`;
+  const Icon = SemanticGroupNamesToIcon[data.type];
 
   return (
-    <S.Container className={className} data-cy={`trace-node-${data.type}`} selected={selected}>
-      <S.Header type={data.type}>
-        <Text>{capitalize(data.heading) || spanTypeText}</Text>
-      </S.Header>
+    <S.Container className={className} data-cy={`trace-node-${data.type}`} $selected={selected} $type={data.type}>
       <Handle id={id} position={Position.Top} style={{top: 0, visibility: 'hidden'}} type="target" />
+      <S.Header>
+        <S.Logo $type={data.type}>
+          <Icon />
+        </S.Logo>
+        <S.HeaderText ellipsis={{rows: 2}} strong $type={data.type}>
+          {data.name}
+        </S.HeaderText>
+      </S.Header>
       <S.Body>
-        {data.primary && <S.BodyText strong>{data.primary}</S.BodyText>}
-        <S.BodyText>{data.name}</S.BodyText>
+        <S.BodyText>
+          {data.serviceName} {SpanKindToText[data.kind]}
+        </S.BodyText>
+
+        <S.Badge>
+          <ClockCircleOutlined style={{color: '#031849', marginRight: 4}} />
+          <S.BadgeText>{data.duration}ms</S.BadgeText>
+        </S.Badge>
       </S.Body>
+      <S.Footer>
+        {Boolean(data.totalChecksPassed) && (
+          <S.DotContainer>
+            <S.DotContent1>
+              <S.DotContent2 $type="success">
+                <S.Dot $type="success" />
+              </S.DotContent2>
+            </S.DotContent1>
+          </S.DotContainer>
+        )}
+
+        {Boolean(data.totalChecksFailed) && (
+          <S.DotContainer>
+            <S.DotContent1>
+              <S.DotContent2 $type="error">
+                <S.Dot $type="error" />
+              </S.DotContent2>
+            </S.DotContent1>
+          </S.DotContainer>
+        )}
+      </S.Footer>
       <Handle id={id} position={Position.Bottom} style={{bottom: 0, visibility: 'hidden'}} type="source" />
     </S.Container>
   );
