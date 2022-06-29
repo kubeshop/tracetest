@@ -2,12 +2,24 @@ import {Form, FormInstance, Select} from 'antd';
 import {IRequestDetailsValues} from '../RequestDetails';
 import * as S from '../RequestDetails.styled';
 
-const methodNamingMap: Record<string, string> = {
-  apiKey: 'API Key',
-  bearer: 'Bearer Token',
-  basic: 'Basic Auth',
-  none: 'No Auth',
-};
+const authMethodList = [
+  {
+    name: 'No Auth',
+    value: null,
+  },
+  {
+    name: 'API Key',
+    value: 'apiKey',
+  },
+  {
+    name: 'Bearer Token',
+    value: 'bearer',
+  },
+  {
+    name: 'Basic Auth',
+    value: 'basic',
+  },
+] as const;
 
 interface IProps {
   form: FormInstance<IRequestDetailsValues>;
@@ -34,9 +46,9 @@ const TypeInput = ({form}: IProps) => (
           form.setFieldsValue({auth: {type: e as any}});
         }}
       >
-        {[null, 'apiKey', 'basic', 'bearer'].map(method => (
-          <Select.Option data-cy={`auth-type-select-option-${method}`} key={method} value={method}>
-            {method ? methodNamingMap[method] : methodNamingMap.none}
+        {authMethodList.map(({name, value}) => (
+          <Select.Option data-cy={`auth-type-select-option-${value}`} key={value} value={value}>
+            {name}
           </Select.Option>
         ))}
       </Select>
