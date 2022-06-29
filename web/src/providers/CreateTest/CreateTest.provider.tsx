@@ -10,9 +10,9 @@ import {useCreateTestMutation, useRunTestMutation} from 'redux/apis/TraceTest.ap
 interface IContext extends ICreateTestState {
   activeStep: string;
   isLoading: boolean;
-  onNext(): void;
+  onNext(draftTest?: TDraftTest): void;
   onPrev(): void;
-  onCreateTest(): void;
+  onCreateTest(draftTest: TDraftTest): void;
   onUpdateDraftTest(draftTest: TDraftTest): void;
   onUpdatePlugin(plugin: IPlugin): void;
   onGoTo(stepId: string): void;
@@ -47,10 +47,34 @@ const CreateTestProvider = ({children}: IProps) => {
   const stepNumber = useAppSelector(CreateTestSelectors.selectStepNumber);
   const pluginName = useAppSelector(CreateTestSelectors.selectPlugin);
   const activeStep = useAppSelector(CreateTestSelectors.selectActiveStep);
+  const isFinalStep = stepNumber === stepList.length - 1;
 
-  const onNext = useCallback(() => {
-    dispatch(setStepNumber({stepNumber: stepNumber + 1}));
-  }, [dispatch, stepNumber]);
+  const onCreateTest = useCallback(
+    async (draft: TDraftTest) => {
+      const test = await createTest(draft).unwrap();
+      const run = await runTest({testId: test.id}).unwrap();
+
+      navigate(`/test/${test.id}/run/${run.id}`);
+    },
+    [createTest, navigate, runTest]
+  );
+
+  const onUpdateDraftTest = useCallback(
+    (update: TDraftTest) => {
+      dispatch(setDraftTest({draftTest: update}));
+    },
+    [dispatch]
+  );
+
+  const onNext = useCallback(
+    (draft: TDraftTest = {}) => {
+      if (isFinalStep) onCreateTest({...draftTest, ...draft});
+      else dispatch(setStepNumber({stepNumber: stepNumber + 1}));
+
+      onUpdateDraftTest(draft);
+    },
+    [dispatch, draftTest, isFinalStep, onCreateTest, onUpdateDraftTest, stepNumber]
+  );
 
   const onPrev = useCallback(() => {
     dispatch(setStepNumber({stepNumber: stepNumber - 1}));
@@ -66,20 +90,6 @@ const CreateTestProvider = ({children}: IProps) => {
         dispatch(setStepNumber({stepNumber: stepIndex, completeStep: false}));
     },
     [dispatch, stepList, stepNumber]
-  );
-
-  const onCreateTest = useCallback(async () => {
-    const test = await createTest(draftTest).unwrap();
-    const run = await runTest({testId: test.id}).unwrap();
-
-    navigate(`/test/${test.id}/run/${run.id}`);
-  }, [createTest, draftTest, navigate, runTest]);
-
-  const onUpdateDraftTest = useCallback(
-    (update: TDraftTest) => {
-      dispatch(setDraftTest({draftTest: update}));
-    },
-    [dispatch]
   );
 
   const onUpdatePlugin = useCallback(

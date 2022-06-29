@@ -2,20 +2,30 @@ import {Form, FormInstance, Select} from 'antd';
 import {IRequestDetailsValues} from '../RequestDetails';
 import * as S from '../RequestDetails.styled';
 
-function methodNaming(method: string | null) {
-  switch (method) {
-    case 'apiKey':
-      return 'API Key';
-    case 'bearer':
-      return 'Bearer Token';
-    case 'basic':
-      return 'Basic Auth';
-    default:
-      return 'No Auth';
-  }
+const authMethodList = [
+  {
+    name: 'No Auth',
+    value: null,
+  },
+  {
+    name: 'API Key',
+    value: 'apiKey',
+  },
+  {
+    name: 'Bearer Token',
+    value: 'bearer',
+  },
+  {
+    name: 'Basic Auth',
+    value: 'basic',
+  },
+] as const;
+
+interface IProps {
+  form: FormInstance<IRequestDetailsValues>;
 }
 
-export const CreateTestFormAuthTypeInput: React.FC<{form: FormInstance<IRequestDetailsValues>}> = ({form}) => (
+const TypeInput = ({form}: IProps) => (
   <S.Row>
     <Form.Item
       style={{minWidth: '100%'}}
@@ -36,12 +46,14 @@ export const CreateTestFormAuthTypeInput: React.FC<{form: FormInstance<IRequestD
           form.setFieldsValue({auth: {type: e as any}});
         }}
       >
-        {[null, 'apiKey', 'basic', 'bearer'].map(method => (
-          <Select.Option data-cy={`auth-type-select-option-${method}`} key={method} value={method}>
-            {methodNaming(method)}
+        {authMethodList.map(({name, value}) => (
+          <Select.Option data-cy={`auth-type-select-option-${value}`} key={value} value={value}>
+            {name}
           </Select.Option>
         ))}
       </Select>
     </Form.Item>
   </S.Row>
 );
+
+export default TypeInput;

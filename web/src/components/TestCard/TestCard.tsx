@@ -8,6 +8,7 @@ import {TTest} from 'types/Test.types';
 import * as S from './TestCard.styled';
 import TestCardActions from './TestCardActions';
 import TestAnalyticsService from '../../services/Analytics/TestAnalytics.service';
+import {useEditTestModal} from '../EditTestModal/EditTestModal.provider';
 
 interface IProps {
   onClick(testId: string): void;
@@ -19,6 +20,7 @@ interface IProps {
 const TestCard = ({onClick, onDelete, onRunTest, test: {name, serviceUnderTest, id: testId}, test}: IProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [loadResultList, {data: resultList = []}] = useLazyGetRunListQuery();
+  const {open} = useEditTestModal();
 
   const onCollapse = useCallback(async () => {
     TestAnalyticsService.onTestCardCollapse();
@@ -67,7 +69,7 @@ const TestCard = ({onClick, onDelete, onRunTest, test: {name, serviceUnderTest, 
             Run Test
           </Button>
         </S.ButtonContainer>
-        <TestCardActions testId={testId} onDelete={() => onDelete(test)} />
+        <TestCardActions testId={testId} onEdit={() => open(test)} onDelete={() => onDelete(test)} />
       </S.InfoContainer>
 
       {isCollapsed && Boolean(resultList.length) && (

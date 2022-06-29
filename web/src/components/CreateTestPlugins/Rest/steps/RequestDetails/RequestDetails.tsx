@@ -4,13 +4,13 @@ import {HTTP_METHOD} from 'constants/Common.constants';
 import {useCreateTest} from 'providers/CreateTest/CreateTest.provider';
 import CreateStepFooter from 'components/CreateTestSteps/CreateTestStepFooter';
 import * as Step from 'components/CreateTestPlugins/Step.styled';
+import {TRequestAuth, TRequest} from 'types/Test.types';
 import RequestDetailsForm from './RequestDetailsForm';
-import {Request, RequestAuth} from '../../../../../types/Common.types';
 
 export interface IRequestDetailsValues {
   body: string;
-  auth: RequestAuth;
-  headers: Request['headers'];
+  auth: TRequestAuth;
+  headers: TRequest['headers'];
   method: HTTP_METHOD;
   name: string;
   url: string;
@@ -19,7 +19,7 @@ export interface IRequestDetailsValues {
 const RequestDetails = () => {
   const [isFormValid, setIsFormValid] = useState(false);
   const [form] = Form.useForm<IRequestDetailsValues>();
-  const {onNext, onUpdateDraftTest} = useCreateTest();
+  const {onNext} = useCreateTest();
   const {
     draftTest: {serviceUnderTest: {request} = {}},
   } = useCreateTest();
@@ -30,10 +30,9 @@ const RequestDetails = () => {
 
   const handleSubmit = useCallback(
     (values: IRequestDetailsValues) => {
-      onUpdateDraftTest({serviceUnderTest: {request: values}});
-      onNext();
+      onNext({serviceUnderTest: {request: values}});
     },
-    [onNext, onUpdateDraftTest]
+    [onNext]
   );
 
   const onRefreshData = useCallback(async () => {
