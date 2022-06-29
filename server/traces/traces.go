@@ -24,7 +24,7 @@ func (t *Trace) Sort() Trace {
 		Flat:     make(map[trace.SpanID]*Span, 0),
 	}
 
-	flattenSpans(trace.Flat, &sortedRoot)
+	flattenSpans(trace.Flat, sortedRoot)
 
 	return trace
 }
@@ -63,7 +63,7 @@ func (t *Trace) UnmarshalJSON(data []byte) error {
 
 	t.ID = tid
 	t.Flat = map[trace.SpanID]*Span{}
-	flattenSpans(t.Flat, &t.RootSpan)
+	flattenSpans(t.Flat, t.RootSpan)
 	return nil
 }
 
@@ -77,17 +77,18 @@ func (t Trace) MarshalJSON() ([]byte, error) {
 	})
 }
 
-func flattenSpans(res map[trace.SpanID]*Span, root *Span) {
-	res[root.ID] = root
+func flattenSpans(res map[trace.SpanID]*Span, root Span) {
+	rootPtr := &root
+
+	// We don't need the parent in the flat structure
+	rootPtr.Parent = nil
+	res[root.ID] = rootPtr
 	for _, child := range root.Children {
-		res[child.ID] = child
-		if len(child.Children) > 0 {
-			flattenSpans(res, child)
-		}
+		flattenSpans(res, *child)
 	}
 
-	// Remove children because they are now part of the flatten structure
-	root.Children = []*Span{}
+	// Remove children and parent because they are now part of the flatten structure
+	rootPtr.Children = nil
 }
 
 type Attributes map[string]string
