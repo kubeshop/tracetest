@@ -63,6 +63,7 @@ const EditTestForm = ({
           label="Description"
           name="description"
           style={{marginBottom: 0}}
+          rules={[{required: true, message: 'Please enter a test description'}]}
         >
           <Input.TextArea placeholder="Enter a brief description" />
         </Form.Item>
