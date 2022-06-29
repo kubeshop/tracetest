@@ -31,13 +31,10 @@ const GuidedTourService = () => {
     getByPathName: (pathname: string) => {
       const [, value = GuidedTours.Home] =
         Object.entries(GuidedToursPathnameMap).find(([key]) => pathname.includes(key)) || [];
-
       return value;
     },
     get(): TTour {
-      const guidedTour = get() || defaultValue;
-
-      return guidedTour;
+      return get() || defaultValue;
     },
     getIsComplete(tour: GuidedTours): boolean {
       const {[tour]: isComplete} = this.get();
