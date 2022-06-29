@@ -85,6 +85,9 @@ func flattenSpans(res map[trace.SpanID]*Span, root *Span) {
 			flattenSpans(res, child)
 		}
 	}
+
+	// Remove children because they are now part of the flatten structure
+	root.Children = []*Span{}
 }
 
 type Attributes map[string]string
