@@ -263,7 +263,7 @@ func getPokeshopInstance(config pokeshopConfig) (*gnomock.Container, *gnomock.Co
 	}
 
 	apiContainer, err := gnomock.StartCustom(
-		"kubeshop/demo-pokemon-api:0.0.11",
+		"kubeshop/demo-pokemon-api:latest",
 		gnomock.DefaultTCP(80),
 		gnomock.WithEnv(fmt.Sprintf("DATABASE_URL=%s", databaseUrl)),
 		gnomock.WithEnv(fmt.Sprintf("REDIS_URL=%s", config.redis.endpoint)),
@@ -283,7 +283,7 @@ func getPokeshopInstance(config pokeshopConfig) (*gnomock.Container, *gnomock.Co
 	}
 
 	workerContainer, err := gnomock.StartCustom(
-		"kubeshop/demo-pokemon-api:0.0.11",
+		"kubeshop/demo-pokemon-api:latest",
 		gnomock.DefaultTCP(80),
 		gnomock.WithEnv(fmt.Sprintf("DATABASE_URL=%s", databaseUrl)),
 		gnomock.WithEnv(fmt.Sprintf("REDIS_URL=%s", config.redis.endpoint)),

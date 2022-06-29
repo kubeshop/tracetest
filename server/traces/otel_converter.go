@@ -46,6 +46,7 @@ func convertOtelSpanIntoSpan(span *v1.Span) *Span {
 	}
 
 	attributes["name"] = span.Name
+	attributes["kind"] = span.Kind.String()
 	attributes["tracetest.span.type"] = spanType(attributes)
 	attributes["tracetest.span.duration"] = spanDuration(span)
 
