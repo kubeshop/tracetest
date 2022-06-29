@@ -166,6 +166,8 @@ if [ "$SKIP_PMA" != "YES" ]; then
     helm upgrade --install demo . \
       --namespace demo --create-namespace \
       -f values.yaml \
+      --set image.tag=latest \
+      --set image.pullPolicy=Always \
       --set postgres.auth.username=ashketchum,postgres.auth.password=squirtle123,postgres.auth.database=pokeshop \
       --set rabbitmq.auth.username=guest,rabbitmq.auth.password=guest,rabbitmq.auth.erlangCookie=secretcookie \
       --set 'env[5].value=jaeger-agent.'$NAMESPACE'.svc.cluster.local'
