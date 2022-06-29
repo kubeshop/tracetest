@@ -57,11 +57,21 @@ plugins:
 markdown_extensions:
   - pymdownx.highlight
   - pymdownx.inlinehilite
+  # - pymdownx.superfences:
+  #     # make exceptions to highlighting of code:
+  #     custom_fences:
+  #       - name: mermaid
+  #         class: mermaid
+  #         format: !!python/name:mermaid2.fence_mermaid
   - pymdownx.superfences:
-      # make exceptions to highlighting of code:
       custom_fences:
         - name: mermaid
           class: mermaid
-          format: !!python/name:mermaid2.fence_mermaid
+          format: !!python/name:pymdownx.superfences.fence_div_format
+
+extra_css:
+  - https://unpkg.com/mermaid@9.1.3/dist/mermaid.css
+extra_javascript:
+  - https://unpkg.com/mermaid@9.1.3/dist/mermaid.min.js
 
 copyright: Copyright &copy; 2022 <a href="https://kubeshop.io">Kubeshop</a>
