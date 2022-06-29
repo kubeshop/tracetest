@@ -27,6 +27,7 @@
     "ga-4-react": "0.1.281",
     "jmespath": "0.16.0",
     "lodash": "4.17.21",
+    "protobufjs": "6.11.3",
     "rc-menu": "^9.6.0",
     "react": "17.0.2",
     "react-dom": "17.0.2",

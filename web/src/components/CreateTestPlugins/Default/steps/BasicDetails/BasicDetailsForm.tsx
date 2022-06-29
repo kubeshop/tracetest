@@ -1,13 +1,13 @@
 import {Form, FormInstance, Input} from 'antd';
-
 import {Steps} from 'components/GuidedTour/homeStepList';
-import React from 'react';
 import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
+import {IDemoTestExample} from 'constants/Test.constants';
+import {useCreateTest} from 'providers/CreateTest/CreateTest.provider';
+import {SupportedPlugins} from 'constants/Plugins.constants';
 import {IBasicDetailsValues} from './BasicDetails';
 import BasicDetailsDemoHelper from './BasicDetailsDemoHelper';
 import * as S from './BasicDetails.styled';
 import useValidate from './hooks/useValidate';
-import {IDemoTestExample} from '../../../../../constants/Test.constants';
 
 export const FORM_ID = 'create-test';
 
@@ -21,6 +21,7 @@ interface IProps {
 
 const BasicDetailsForm = ({form, onSubmit, onSelectDemo, onValidation, selectedDemo}: IProps) => {
   const handleOnValuesChange = useValidate(onValidation);
+  const {pluginName} = useCreateTest();
 
   return (
     <Form
@@ -33,13 +34,15 @@ const BasicDetailsForm = ({form, onSubmit, onSelectDemo, onValidation, selectedD
       onValuesChange={handleOnValuesChange}
     >
       <S.GlobalStyle />
-      <BasicDetailsDemoHelper
-        selectedDemo={selectedDemo}
-        form={form}
-        onSelectDemo={onSelectDemo}
-        onValidation={onValidation}
-      />
       <S.InputContainer>
+        {pluginName === SupportedPlugins.REST && (
+          <BasicDetailsDemoHelper
+            selectedDemo={selectedDemo}
+            form={form}
+            onSelectDemo={onSelectDemo}
+            onValidation={onValidation}
+          />
+        )}
         <Form.Item
           className="input-name"
           data-cy="create-test-name-input"

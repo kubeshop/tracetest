@@ -1,5 +1,5 @@
 import {Form, FormInstance, Select} from 'antd';
-import {IRequestDetailsValues} from '../RequestDetails';
+import {TRequestAuth} from 'types/Test.types';
 import * as S from '../RequestDetails.styled';
 
 const methodNamingMap: Record<string, string> = {
@@ -10,7 +10,7 @@ const methodNamingMap: Record<string, string> = {
 };
 
 interface IProps {
-  form: FormInstance<IRequestDetailsValues>;
+  form: FormInstance<{auth: TRequestAuth}>;
 }
 
 const TypeInput = ({form}: IProps) => (
