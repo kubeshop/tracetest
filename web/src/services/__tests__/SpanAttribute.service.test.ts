@@ -39,10 +39,6 @@ describe('SpanAttributeService', () => {
           attributeList: [attribute],
         },
         {
-          section: SectionNames.operation,
-          attributeList: [],
-        },
-        {
           section: SectionNames.custom,
           attributeList: [],
         },
@@ -70,14 +66,6 @@ describe('SpanAttributeService', () => {
         {
           section: SectionNames.metadata,
           attributeList: [attribute],
-        },
-        {
-          section: SectionNames.producer,
-          attributeList: [],
-        },
-        {
-          section: SectionNames.consumer,
-          attributeList: [],
         },
         {
           section: SectionNames.custom,
