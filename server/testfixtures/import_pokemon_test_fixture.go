@@ -119,7 +119,7 @@ func createTestDefinition(testID string) error {
 					{
 						Attribute:  "tracetest.span.duration",
 						Comparator: "<",
-						Expected:   "200",
+						Expected:   "200ms",
 					},
 				},
 			},

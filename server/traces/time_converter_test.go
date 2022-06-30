@@ -146,8 +146,8 @@ func TestConversionBetweenDurationToNanoSeconds(t *testing.T) {
 		},
 		{
 			Name:           "should convert h with decimal",
-			Input:          "2.5m",
-			ExpectedOutput: 8000000000000,
+			Input:          "2.5h",
+			ExpectedOutput: 9000000000000,
 		},
 	}
 
