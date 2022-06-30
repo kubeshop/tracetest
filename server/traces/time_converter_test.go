@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestTimeConvertion(t *testing.T) {
+func TestConversionBetweenNanoSecondsToDuration(t *testing.T) {
 	testCases := []struct {
 		Name           string
 		Input          int
@@ -78,6 +78,82 @@ func TestTimeConvertion(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.Name, func(t *testing.T) {
 			output := traces.ConvertNanoSecondsIntoProperTimeUnit(testCase.Input)
+			assert.Equal(t, testCase.ExpectedOutput, output)
+		})
+	}
+}
+
+func TestConversionBetweenDurationToNanoSeconds(t *testing.T) {
+	testCases := []struct {
+		Name           string
+		Input          string
+		ExpectedOutput int
+	}{
+		{
+			Name:           "should convert ns",
+			Input:          "120ns",
+			ExpectedOutput: 120,
+		},
+		{
+			Name:           "should floor ns with decimals",
+			Input:          "120.5ns",
+			ExpectedOutput: 120,
+		},
+		{
+			Name:           "should convert μs",
+			Input:          "35μs",
+			ExpectedOutput: 35000,
+		},
+		{
+			Name:           "should convert μs with decimal",
+			Input:          "35.8μs",
+			ExpectedOutput: 35800,
+		},
+		{
+			Name:           "should convert ms",
+			Input:          "68ms",
+			ExpectedOutput: 68000000,
+		},
+		{
+			Name:           "should convert ms with decimal",
+			Input:          "68.35ms",
+			ExpectedOutput: 68350000,
+		},
+		{
+			Name:           "should convert s",
+			Input:          "1s",
+			ExpectedOutput: 1000000000,
+		},
+		{
+			Name:           "should convert s with decimal",
+			Input:          "1.23s",
+			ExpectedOutput: 1230000000,
+		},
+		{
+			Name:           "should convert m",
+			Input:          "1m",
+			ExpectedOutput: 60000000000,
+		},
+		{
+			Name:           "should convert m with decimal",
+			Input:          "1.5m",
+			ExpectedOutput: 90000000000,
+		},
+		{
+			Name:           "should convert h",
+			Input:          "1h",
+			ExpectedOutput: 3600000000000,
+		},
+		{
+			Name:           "should convert h with decimal",
+			Input:          "2.5m",
+			ExpectedOutput: 8000000000000,
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.Name, func(t *testing.T) {
+			output := traces.ConvertTimeFieldIntoNanoSeconds(testCase.Input)
 			assert.Equal(t, testCase.ExpectedOutput, output)
 		})
 	}

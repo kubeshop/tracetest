@@ -3,6 +3,8 @@ package traces
 import (
 	"fmt"
 	"math"
+	"regexp"
+	"strconv"
 )
 
 const (
@@ -62,4 +64,30 @@ func convertSecondsIntoPropertTimeUnit(number float64) string {
 
 func isWholeNumber(number float64) bool {
 	return math.Mod(number, 1.0) == 0
+}
+
+var timeFieldRegex = regexp.MustCompile(`^([0-9]+(\.[0-9]+)?)(ns|μs|ms|s|m|h)$`)
+
+func ConvertTimeFieldIntoNanoSeconds(value string) int {
+	result := timeFieldRegex.FindAllStringSubmatch(value, -1)
+	number, err := strconv.ParseFloat(result[0][1], 64)
+	if err != nil {
+		return 0
+	}
+
+	unit := result[0][3]
+	scale := scaleOfUnit(unit)
+
+	return int(math.Floor(number * scale))
+}
+
+func scaleOfUnit(unit string) float64 {
+	scaleIndex := 0
+	for index, item := range timeUnits {
+		if item == unit {
+			scaleIndex = index
+		}
+	}
+
+	return math.Pow(1000, float64(scaleIndex))
 }

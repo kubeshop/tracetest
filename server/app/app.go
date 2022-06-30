@@ -108,7 +108,7 @@ func (a *App) Start() error {
 		"tracetest.span.duration",
 	)
 
-	pollerExecutor := executor.NewPollerExecutor(a.tracer, execTestUpdater, a.traceDB, a.config.PoolingRetryDelay(), a.config.MaxWaitTimeForTraceDuration(), traceConversionConfig)
+	pollerExecutor := executor.NewPollerExecutor(a.tracer, execTestUpdater, a.traceDB, a.config.PoolingRetryDelay(), a.config.MaxWaitTimeForTraceDuration())
 
 	tracePoller := executor.NewTracePoller(pollerExecutor, execTestUpdater, assertionRunner, a.config.PoolingRetryDelay(), a.config.MaxWaitTimeForTraceDuration())
 	tracePoller.Start(5) // worker count. should be configurable
@@ -118,7 +118,7 @@ func (a *App) Start() error {
 	runner.Start(5) // worker count. should be configurable
 	defer runner.Stop()
 
-	controller := httpServer.NewController(a.db, runner, assertionRunner)
+	controller := httpServer.NewController(a.db, runner, assertionRunner, traceConversionConfig)
 	apiApiController := openapi.NewApiApiController(controller)
 	customController := httpServer.NewCustomController(controller, apiApiController, openapi.DefaultErrorHandler, a.tracer)
 	httpRouter := customController

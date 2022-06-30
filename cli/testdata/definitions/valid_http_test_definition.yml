@@ -1,9 +1,10 @@
+id: ea8003c5-c93b-41a6-ac1b-63569552f4ff
 name: POST import pokemon
 description: Import a pokemon using its ID
 trigger:
   type: http
   httpRequest:
-    url: http://pokemon-demo.tracetest.io/pokemon/import
+    url: http://localhost:3001/pokemon/import
     method: POST
     headers:
     - key: Content-Type
@@ -12,7 +13,7 @@ trigger:
 testDefinition:
 - selector: span[name = "POST /pokemon/import"]
   assertions:
-  - tracetest.span.duration <= 100
+  - tracetest.span.duration <= 100ms
   - http.status_code = 200
 - selector: span[name = "send message to queue"]
   assertions:
@@ -20,13 +21,13 @@ testDefinition:
 - selector: span[name = "consume message from queue"]:last
   assertions:
   - messaging.message.payload contains 52
-- selector: span[name = "consume message from queue"]:last span[name = "import
-    pokemon from pokeapi"]
+- selector: span[name = "consume message from queue"]:last span[name = "import pokemon
+    from pokeapi"]
   assertions:
   - http.status_code = 200
-- selector: span[name = "consume message from queue"]:last span[name = "save
-    pokemon on database"]
+- selector: span[name = "consume message from queue"]:last span[name = "save pokemon
+    on database"]
   assertions:
   - db.repository.operation = "create"
-  - tracetest.span.duration <= 100
+  - tracetest.span.duration <= 100ms
   - 'tracetest.response.body contains "\"id\": 52"'

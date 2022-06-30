@@ -3,6 +3,7 @@ package http
 import (
 	"errors"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/google/uuid"
@@ -16,7 +17,9 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-type OpenAPIMapper struct{}
+type OpenAPIMapper struct {
+	traceConversionConfig traces.ConversionConfig
+}
 
 func (m OpenAPIMapper) TestDefinitionFile(in model.Test) definition.Test {
 	testDefinition, _ := conversion.ConvertOpenAPITestIntoDefinitionObject(m.Test(in))
@@ -197,12 +200,21 @@ func (m OpenAPIMapper) Span(in traces.Span) openapi.Span {
 		parentID = in.Parent.ID.String()
 	}
 
+	attributes := make(map[string]string, len(in.Attributes))
+	for name, value := range in.Attributes {
+		attributes[name] = value
+		if m.traceConversionConfig.IsTimeField(name) {
+			valueAsInt, _ := strconv.Atoi(value)
+			attributes[name] = traces.ConvertNanoSecondsIntoProperTimeUnit(valueAsInt)
+		}
+	}
+
 	return openapi.Span{
 		Id:         in.ID.String(),
 		ParentId:   parentID,
 		StartTime:  int32(in.StartTime.UnixMilli()),
 		EndTime:    int32(in.EndTime.UnixMilli()),
-		Attributes: map[string]string(in.Attributes),
+		Attributes: attributes,
 		Children:   m.Spans(in.Children),
 	}
 }
@@ -240,6 +252,15 @@ func (m OpenAPIMapper) Result(in *model.RunResults) openapi.AssertionResults {
 					Error:         errToString(asr.CompareErr),
 				}
 			}
+
+			if m.traceConversionConfig.IsTimeField(r.Assertion.Attribute.String()) {
+				for i, result := range sres {
+					intValue, _ := strconv.Atoi(result.ObservedValue)
+					result.ObservedValue = traces.ConvertNanoSecondsIntoProperTimeUnit(intValue)
+					sres[i] = result
+				}
+			}
+
 			res[j] = openapi.AssertionResult{
 				AllPassed:   r.AllPassed,
 				Assertion:   m.Assertion(r.Assertion),
@@ -259,10 +280,16 @@ func (m OpenAPIMapper) Result(in *model.RunResults) openapi.AssertionResults {
 	}
 }
 func (m OpenAPIMapper) Assertion(in model.Assertion) openapi.Assertion {
+	value := in.Value
+	if m.traceConversionConfig.IsTimeField(in.Attribute.String()) {
+		intValue, _ := strconv.Atoi(in.Value)
+		value = traces.ConvertNanoSecondsIntoProperTimeUnit(intValue)
+	}
+
 	return openapi.Assertion{
 		Attribute:  in.Attribute.String(),
 		Comparator: in.Comparator.String(),
-		Expected:   in.Value,
+		Expected:   value,
 	}
 }
 
@@ -300,7 +327,8 @@ func (m OpenAPIMapper) Runs(in []model.Run) []openapi.TestRun {
 }
 
 type ModelMapper struct {
-	Comparators comparator.Registry
+	Comparators           comparator.Registry
+	traceConversionConfig traces.ConversionConfig
 }
 
 func (m ModelMapper) Test(in openapi.Test) model.Test {
@@ -466,10 +494,16 @@ func (m ModelMapper) Result(in openapi.AssertionResults) *model.RunResults {
 
 func (m ModelMapper) Assertion(in openapi.Assertion) model.Assertion {
 	comp, _ := m.Comparators.Get(in.Comparator)
+	expectedValue := in.Expected
+	if m.traceConversionConfig.IsTimeField(in.Attribute) {
+		fieldInNanoSeconds := traces.ConvertTimeFieldIntoNanoSeconds(expectedValue)
+		expectedValue = fmt.Sprintf("%d", fieldInNanoSeconds)
+	}
+
 	return model.Assertion{
 		Attribute:  model.Attribute(in.Attribute),
 		Comparator: comp,
-		Value:      in.Expected,
+		Value:      expectedValue,
 	}
 }
 

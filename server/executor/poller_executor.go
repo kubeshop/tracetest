@@ -16,7 +16,6 @@ type DefaultPollerExecutor struct {
 	updater           RunUpdater
 	traceDB           tracedb.TraceDB
 	maxTracePollRetry int
-	conversionConfig  traces.ConversionConfig
 }
 
 type InstrumentedPollerExecutor struct {
@@ -44,14 +43,12 @@ func NewPollerExecutor(
 	traceDB tracedb.TraceDB,
 	retryDelay time.Duration,
 	maxWaitTimeForTrace time.Duration,
-	conversionConfig traces.ConversionConfig,
 ) PollerExecutor {
 	maxTracePollRetry := int(math.Ceil(float64(maxWaitTimeForTrace) / float64(retryDelay)))
 	pollerExecutor := &DefaultPollerExecutor{
 		updater:           updater,
 		traceDB:           traceDB,
 		maxTracePollRetry: maxTracePollRetry,
-		conversionConfig:  conversionConfig,
 	}
 
 	return &InstrumentedPollerExecutor{
@@ -67,7 +64,7 @@ func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, m
 		return false, model.Run{}, err
 	}
 
-	trace := traces.FromOtel(otelTrace, pe.conversionConfig)
+	trace := traces.FromOtel(otelTrace)
 	trace.ID = run.TraceID
 
 	if !pe.donePollingTraces(request, trace) {

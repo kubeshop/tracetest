@@ -131,6 +131,60 @@ func TestParseAssertion(t *testing.T) {
 				Value:     "199.99",
 			},
 		},
+		{
+			Name:  "should_parse_nanosecond_duration",
+			Query: `tracetest.span.duration <= 100ns`,
+			ExpectedOutput: parser.Assertion{
+				Attribute: "tracetest.span.duration",
+				Operator:  "<=",
+				Value:     "100ns",
+			},
+		},
+		{
+			Name:  "should_parse_microsecond_duration",
+			Query: `tracetest.span.duration <= 100μs`,
+			ExpectedOutput: parser.Assertion{
+				Attribute: "tracetest.span.duration",
+				Operator:  "<=",
+				Value:     "100μs",
+			},
+		},
+		{
+			Name:  "should_parse_millisecond_duration",
+			Query: `tracetest.span.duration <= 100ms`,
+			ExpectedOutput: parser.Assertion{
+				Attribute: "tracetest.span.duration",
+				Operator:  "<=",
+				Value:     "100ms",
+			},
+		},
+		{
+			Name:  "should_parse_second_duration",
+			Query: `tracetest.span.duration <= 100s`,
+			ExpectedOutput: parser.Assertion{
+				Attribute: "tracetest.span.duration",
+				Operator:  "<=",
+				Value:     "100s",
+			},
+		},
+		{
+			Name:  "should_parse_minute_duration",
+			Query: `tracetest.span.duration <= 100m`,
+			ExpectedOutput: parser.Assertion{
+				Attribute: "tracetest.span.duration",
+				Operator:  "<=",
+				Value:     "100m",
+			},
+		},
+		{
+			Name:  "should_parse_hour_duration",
+			Query: `tracetest.span.duration <= 100h`,
+			ExpectedOutput: parser.Assertion{
+				Attribute: "tracetest.span.duration",
+				Operator:  "<=",
+				Value:     "100h",
+			},
+		},
 	}
 
 	for _, testCase := range testCases {
