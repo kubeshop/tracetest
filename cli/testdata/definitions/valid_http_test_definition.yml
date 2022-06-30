@@ -1,10 +1,9 @@
-id: ea8003c5-c93b-41a6-ac1b-63569552f4ff
 name: POST import pokemon
 description: Import a pokemon using its ID
 trigger:
   type: http
   httpRequest:
-    url: http://localhost:3001/pokemon/import
+    url: http://pokemon-demo.tracetest.io/pokemon/import
     method: POST
     headers:
     - key: Content-Type

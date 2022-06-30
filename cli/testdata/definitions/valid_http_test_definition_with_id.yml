@@ -13,7 +13,7 @@ trigger:
 testDefinition:
 - selector: span[name = "POST /pokemon/import"]
   assertions:
-  - tracetest.span.duration <= 100
+  - tracetest.span.duration <= 100ms
   - http.status_code = 200
 - selector: span[name = "send message to queue"]
   assertions:
@@ -27,4 +27,4 @@ testDefinition:
 - selector: span[name = "consume message from queue"]:last span[name = "save pokemon on database"]
   assertions:
   - db.repository.operation = "create"
-  - tracetest.span.duration <= 100
+  - tracetest.span.duration <= 100ms
