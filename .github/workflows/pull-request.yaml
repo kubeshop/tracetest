@@ -155,6 +155,8 @@ jobs:
           --set tracingBackend=jaeger \
           --set jaegerConnectionConfig.endpoint="jaeger-query.tracetest.svc.cluster.local:16685" \
           --set telemetry.jaeger.host="jaeger-agent.tracetest.svc.cluster.local" \
+          --set poolingConfig.maxWaitTimeForTrace="60s" \
+          --set poolingConfig.retryDelay="5s" \
           --set ingress.enabled=false \
           --wait --timeout 3m
 
