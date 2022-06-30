@@ -11,6 +11,7 @@ export type TTestDefinitionEntry = {
   assertionList: TAssertion[];
   isDraft: boolean;
   isDeleted?: boolean;
+  isAdvancedSelector: boolean;
 };
 
 export type TRawTestDefinitionEntry = {
@@ -26,6 +27,7 @@ export type TTestDefinition = Model<
   }
 >;
 
+export type TViewResultsMode = 'wizard' | 'advanced';
 export interface ITestDefinitionState {
   initialDefinitionList: TTestDefinitionEntry[];
   definitionList: TTestDefinitionEntry[];
@@ -35,6 +37,7 @@ export interface ITestDefinitionState {
   isInitialized: boolean;
   selectedAssertion: string;
   isDraftMode: boolean;
+  viewResultsMode: TViewResultsMode;
 }
 
 export type TTestDefinitionSliceActions = {

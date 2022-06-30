@@ -65,6 +65,7 @@ const TestDefinitionSelectors = () => ({
   selectSelectedAssertion: createSelector(stateSelector, ({selectedAssertion}) => selectedAssertion),
   selectAssertionResultsBySpan,
   selectIsDraftMode: createSelector(stateSelector, ({isDraftMode}) => isDraftMode),
+  selectViewResultsMode: createSelector(stateSelector, ({viewResultsMode}) => viewResultsMode),
 });
 
 export default TestDefinitionSelectors();

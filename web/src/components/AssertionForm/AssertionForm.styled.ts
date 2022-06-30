@@ -16,7 +16,7 @@ export const SelectorContainer = styled.div`
 
 export const SelectorInputContainer = styled.div`
   display: grid;
-  align-items: center;
+  align-items: start;
   grid-template-columns: 850px 170px;
   gap: 14px;
 `;
@@ -53,6 +53,7 @@ export const AssertionForm = styled.div`
   width: 100%;
   padding: 16px;
   border: 1px solid rgba(3, 24, 73, 0.1);
+  background-color: #fff;
 `;
 
 export const AssertionFormTitle = styled(Typography.Text).attrs({
@@ -81,4 +82,17 @@ export const CheckActions = styled.div`
   gap: 14px;
   margin-left: 14px;
   height: 100%;
+`;
+
+export const AdvancedSelectorContainer = styled.div`
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+`;
+
+export const AffectedSpansContainer = styled.div`
+  display: flex;
+  gap: 4px;
+  align-items: center;
 `;

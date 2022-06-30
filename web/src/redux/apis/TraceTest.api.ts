@@ -176,6 +176,7 @@ export const {
   useGetRunByIdQuery,
   useGetRunListQuery,
   useGetSelectedSpansQuery,
+  useLazyGetSelectedSpansQuery,
   useReRunMutation,
   useLazyGetRunListQuery,
   useDryRunMutation,

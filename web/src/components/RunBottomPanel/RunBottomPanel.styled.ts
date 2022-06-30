@@ -42,6 +42,7 @@ export const AddAssertionButton = styled(Button).attrs({
 })`
   && {
     font-weight: 600;
+    margin-left: 14px;
   }
 `;
 
@@ -61,4 +62,10 @@ export const Chevron = styled.img.attrs({
 
 export const ChevronContainer = styled.span`
   margin-left: 16px;
+`;
+
+export const Row = styled.div`
+  display: flex;
+  gap: 8px;
+  align-items: center;
 `;
