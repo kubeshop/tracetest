@@ -36,13 +36,13 @@ func ConvertNanoSecondsIntoProperTimeUnit(value int) string {
 	unit := timeUnits[int(scale)]
 
 	if scale == SECOND_SCALE {
-		return convertSecondsIntoPropertTimeUnit(convertedNumber)
+		return convertSecondsIntoProperTimeUnit(convertedNumber)
 	}
 
 	return fmt.Sprintf("%.0f%s", convertedNumber, unit)
 }
 
-func convertSecondsIntoPropertTimeUnit(number float64) string {
+func convertSecondsIntoProperTimeUnit(number float64) string {
 	scale := SECOND_SCALE
 	if number >= 60 {
 		number = number / 60
