@@ -5,6 +5,11 @@ export enum NodeTypesEnum {
   Skeleton = 'skeleton',
 }
 
+export enum Colors {
+  Default = '#CDD1DB',
+  Selected = '#2d62ff',
+}
+
 export const skeletonNodesDatum: INodeDatum<{}>[] = [
   {
     id: '1',
@@ -37,5 +42,3 @@ export const skeletonNodesDatum: INodeDatum<{}>[] = [
     type: NodeTypesEnum.Skeleton,
   },
 ];
-
-export const strokeColor = '#C9CEDB';

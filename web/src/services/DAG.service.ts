@@ -1,6 +1,7 @@
 import {coordCenter, Dag, dagStratify, decrossOpt, layeringSimplex, sugiyama} from 'd3-dag';
 import {MarkerType} from 'react-flow-renderer';
 
+import {Colors} from 'constants/DAG.constants';
 import {INodeDatum} from 'types/DAG.types';
 
 function getDagLayout<T>(nodesDatum: INodeDatum<T>[]) {
@@ -11,7 +12,7 @@ function getDagLayout<T>(nodesDatum: INodeDatum<T>[]) {
     .layering(layeringSimplex())
     .decross(decrossOpt())
     .coord(coordCenter())
-    .nodeSize(() => [200, 150]);
+    .nodeSize(() => [220, 180]);
 
   dagLayout(dag as never);
 
@@ -29,10 +30,11 @@ function getNodes<T>(dagLayout: Dag<INodeDatum<T>, undefined>) {
 
 function getEdges<T>(dagLayout: Dag<INodeDatum<T>, undefined>) {
   return dagLayout.links().map(({source, target}) => ({
-    animated: true,
+    animated: false,
     id: `${source.data.id}-${target.data.id}`,
-    markerEnd: {type: MarkerType.ArrowClosed},
+    markerEnd: {color: Colors.Default, type: MarkerType.ArrowClosed},
     source: source.data.id,
+    style: {stroke: Colors.Default},
     target: target.data.id,
   }));
 }
