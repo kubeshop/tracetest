@@ -12,7 +12,28 @@ import (
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 )
 
-func FromOtel(input *v1.TracesData) Trace {
+type ConversionConfig struct {
+	timeFields map[string]bool
+}
+
+func NewConversionConfig() ConversionConfig {
+	return ConversionConfig{
+		timeFields: make(map[string]bool, 0),
+	}
+}
+
+func (c ConversionConfig) AddTimeFields(fields ...string) {
+	for _, field := range fields {
+		c.timeFields[field] = true
+	}
+}
+
+func (c ConversionConfig) IsTimeField(field string) bool {
+	_, ok := c.timeFields[field]
+	return ok
+}
+
+func FromOtel(input *v1.TracesData, config ConversionConfig) Trace {
 	flattenSpans := make([]*v1.Span, 0)
 	for _, resource := range input.ResourceSpans {
 		for _, librarySpans := range resource.InstrumentationLibrarySpans {
@@ -22,14 +43,14 @@ func FromOtel(input *v1.TracesData) Trace {
 
 	spansMap := map[trace.SpanID]*Span{}
 	for _, span := range flattenSpans {
-		newSpan := convertOtelSpanIntoSpan(span)
+		newSpan := convertOtelSpanIntoSpan(span, config)
 		spansMap[newSpan.ID] = newSpan
 	}
 
 	return createTrace(flattenSpans, spansMap)
 }
 
-func convertOtelSpanIntoSpan(span *v1.Span) *Span {
+func convertOtelSpanIntoSpan(span *v1.Span, config ConversionConfig) *Span {
 	attributes := make(Attributes, 0)
 	for _, attribute := range span.Attributes {
 		attributes[attribute.Key] = getAttributeValue(attribute.Value)
@@ -50,6 +71,15 @@ func convertOtelSpanIntoSpan(span *v1.Span) *Span {
 	attributes["tracetest.span.type"] = spanType(attributes)
 	attributes["tracetest.span.duration"] = spanDuration(span)
 
+	for name, value := range attributes {
+		if config.IsTimeField(name) {
+			valueAsInt, err := strconv.Atoi(value)
+			if err == nil {
+				attributes[name] = ConvertNanoSecondsIntoProperTimeUnit(valueAsInt)
+			}
+		}
+	}
+
 	spanID := createSpanID(span.SpanId)
 	return &Span{
 		ID:         spanID,
@@ -64,7 +94,7 @@ func convertOtelSpanIntoSpan(span *v1.Span) *Span {
 
 func spanDuration(span *v1.Span) string {
 	if span.GetStartTimeUnixNano() != 0 && span.GetEndTimeUnixNano() != 0 {
-		spanDuration := (span.GetEndTimeUnixNano() - span.GetStartTimeUnixNano()) / 1000 / 1000 // in milliseconds
+		spanDuration := (span.GetEndTimeUnixNano() - span.GetStartTimeUnixNano())
 		return strconv.FormatUint(spanDuration, 10)
 	}
 
