@@ -6,7 +6,7 @@ export enum NodeTypesEnum {
 }
 
 export enum Colors {
-  Default = '#b1b1b7',
+  Default = '#CDD1DB',
   Selected = '#2d62ff',
 }
 

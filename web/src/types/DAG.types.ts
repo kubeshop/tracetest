@@ -11,15 +11,14 @@ export interface INodeDatum<T> {
 
 export interface INodeDataSpan {
   duration: number;
-  heading: string;
   id: string;
   isAffected: boolean;
   isMatched: boolean;
   kind: SpanKind;
   name: string;
-  primary: string;
   programmingLanguage: string;
   serviceName: string;
+  system: string;
   totalAttributes: number;
   type: SemanticGroupNames;
 }

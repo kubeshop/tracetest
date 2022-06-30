@@ -43,17 +43,6 @@ export const SemanticGroupNamesToColor = {
   [SemanticGroupNames.Compatibility]: '#FFBB96',
 } as const;
 
-export const SemanticGroupNamesToDarkColor = {
-  [SemanticGroupNames.Database]: '#623488',
-  [SemanticGroupNames.Http]: '#67863b',
-  [SemanticGroupNames.Rpc]: '#2b8286',
-  [SemanticGroupNames.Messaging]: '#676767',
-  [SemanticGroupNames.Faas]: '#a16341',
-  [SemanticGroupNames.Exception]: '#FFBB96',
-  [SemanticGroupNames.General]: '#a16341',
-  [SemanticGroupNames.Compatibility]: '#FFBB96',
-} as const;
-
 export const SemanticGroupNamesToIcon = {
   [SemanticGroupNames.Database]: DatabaseFilled,
   [SemanticGroupNames.Http]: CodeFilled,
@@ -63,6 +52,17 @@ export const SemanticGroupNamesToIcon = {
   [SemanticGroupNames.Exception]: AlertFilled,
   [SemanticGroupNames.General]: ProfileFilled,
   [SemanticGroupNames.Compatibility]: MergeCellsOutlined,
+} as const;
+
+export const SemanticGroupNamesToSystem = {
+  [SemanticGroupNames.Database]: Attributes.DB_SYSTEM,
+  [SemanticGroupNames.Http]: '',
+  [SemanticGroupNames.Rpc]: Attributes.RPC_SYSTEM,
+  [SemanticGroupNames.Messaging]: Attributes.MESSAGING_SYSTEM,
+  [SemanticGroupNames.Faas]: Attributes.CLOUD_PROVIDER,
+  [SemanticGroupNames.Exception]: '',
+  [SemanticGroupNames.General]: '',
+  [SemanticGroupNames.Compatibility]: '',
 } as const;
 
 export const SemanticGroupNameNodeMap: Record<SemanticGroupNames, {primary: string[]; type: string}> = {
