@@ -23,7 +23,8 @@ A span contains the data about the operation it represents. This data includes:
 
 - Start and end timestamp.
 
-- List of events (if instrumented)
+- List of events (if instrumented).
+
 - Attributes
 
 ### What are Attributes?
