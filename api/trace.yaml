@@ -25,9 +25,11 @@ components:
           type: string
         startTime:
           type: integer
+          format: int64
           description: span start time in unix milli format
         endTime:
           type: integer
+          format: int64
           description: span end time in unix milli format
         attributes:
           type: object

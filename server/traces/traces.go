@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"sort"
+	"strconv"
 	"time"
 
 	"go.opentelemetry.io/otel/trace"
@@ -126,8 +127,8 @@ func encodeSpan(s Span) encodedSpan {
 	return encodedSpan{
 		ID:         s.ID.String(),
 		Name:       s.Name,
-		StartTime:  s.StartTime.Format(time.RFC3339),
-		EndTime:    s.EndTime.Format(time.RFC3339),
+		StartTime:  fmt.Sprintf("%d", s.StartTime.UnixNano()),
+		EndTime:    fmt.Sprintf("%d", s.EndTime.UnixNano()),
 		Attributes: s.Attributes,
 		Children:   encodeChildren(s.Children),
 	}
@@ -161,12 +162,12 @@ func (s *Span) decodeSpan(aux encodedSpan) error {
 		return fmt.Errorf("unmarshal span: %w", err)
 	}
 
-	startTime, err := time.Parse(time.RFC3339, aux.StartTime)
+	startTime, err := getTimeFromString(aux.StartTime)
 	if err != nil {
 		return fmt.Errorf("unmarshal span: %w", err)
 	}
 
-	endTime, err := time.Parse(time.RFC3339, aux.EndTime)
+	endTime, err := getTimeFromString(aux.EndTime)
 	if err != nil {
 		return fmt.Errorf("unmarshal span: %w", err)
 	}
@@ -179,6 +180,21 @@ func (s *Span) decodeSpan(aux encodedSpan) error {
 	s.Children = children
 
 	return nil
+}
+
+func getTimeFromString(value string) (time.Time, error) {
+	nanoSeconds, err := strconv.Atoi(value)
+	if err != nil {
+		// Maybe it is in RFC3339 format. Convert it for compatibility sake
+		output, err := time.Parse(time.RFC3339, value)
+		if err != nil {
+			return time.Time{}, fmt.Errorf("could not convert string (%s) to time: %w", value, err)
+		}
+
+		return output, nil
+	}
+
+	return time.Unix(0, int64(nanoSeconds)), nil
 }
 
 func decodeChildren(parent *Span, children []encodedSpan) ([]*Span, error) {
