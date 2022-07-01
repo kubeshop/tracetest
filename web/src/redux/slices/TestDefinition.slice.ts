@@ -1,12 +1,8 @@
 import {createAction, createSlice} from '@reduxjs/toolkit';
 import {TAssertionResults} from 'types/Assertion.types';
-import {
-  ITestDefinitionState,
-  TTestDefinitionEntry,
-  TTestDefinitionSliceActions,
-  TViewResultsMode,
-} from 'types/TestDefinition.types';
-import UserPreferencesService from '../../services/UserPreferences.service';
+import {ITestDefinitionState, TTestDefinitionEntry, TTestDefinitionSliceActions} from 'types/TestDefinition.types';
+import {ResultViewModes} from 'constants/Test.constants';
+import UserPreferencesService from 'services/UserPreferences.service';
 import TestDefinitionActions from '../actions/TestDefinition.actions';
 
 export const initialState: ITestDefinitionState = {
@@ -31,7 +27,7 @@ export const assertionResultsToDefinitionList = (assertionResults: TAssertionRes
   }));
 };
 
-export const setViewResultsMode = createAction('testDefinition/setViewResultsMode', (mode: TViewResultsMode) => {
+export const setViewResultsMode = createAction('testDefinition/setViewResultsMode', (mode: ResultViewModes) => {
   UserPreferencesService.setPreference('viewResultsMode', mode);
 
   return {

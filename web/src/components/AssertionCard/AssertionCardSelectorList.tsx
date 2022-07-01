@@ -1,6 +1,6 @@
-import OperatorService from '../../services/Operator.service';
-import {TPseudoSelector, TSpanSelector} from '../../types/Assertion.types';
-import {TViewResultsMode} from '../../types/TestDefinition.types';
+import {ResultViewModes} from 'constants/Test.constants';
+import OperatorService from 'services/Operator.service';
+import {TPseudoSelector, TSpanSelector} from 'types/Assertion.types';
 import * as S from './AssertionCard.styled';
 
 interface IProps {
@@ -8,7 +8,7 @@ interface IProps {
   pseudoSelector?: TPseudoSelector;
   isAdvancedSelector: boolean;
   selector: string;
-  viewResultsMode: TViewResultsMode;
+  viewResultsMode: ResultViewModes;
 }
 
 const AssertionCardSelectorList = ({
@@ -18,7 +18,7 @@ const AssertionCardSelectorList = ({
   selector,
   viewResultsMode,
 }: IProps) => {
-  return isAdvancedSelector || viewResultsMode === 'advanced' ? (
+  return isAdvancedSelector || viewResultsMode === ResultViewModes.Advanced ? (
     <S.Selector>
       <S.SelectorAttributeText>selector</S.SelectorAttributeText>
       <S.SelectorValueText>{selector}</S.SelectorValueText>

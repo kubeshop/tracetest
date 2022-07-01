@@ -1,16 +1,16 @@
-import LocalStorageGateway from '../gateways/LocalStorage.gateway';
-import {TViewResultsMode} from '../types/TestDefinition.types';
+import {ResultViewModes} from 'constants/Test.constants';
+import LocalStorageGateway from 'gateways/LocalStorage.gateway';
 
 const storageKey = 'user_preferences';
 
 interface IUserPreferences {
-  viewResultsMode: TViewResultsMode;
+  viewResultsMode: ResultViewModes;
 }
 
 const localStorageGateway = LocalStorageGateway<IUserPreferences>(storageKey);
 
 const initialUserPreferences: IUserPreferences = {
-  viewResultsMode: 'wizard',
+  viewResultsMode: ResultViewModes.Wizard,
 };
 
 const UserPreferencesService = () => ({

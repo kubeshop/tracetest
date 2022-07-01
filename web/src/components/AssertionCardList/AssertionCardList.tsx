@@ -1,8 +1,9 @@
 import {Typography} from 'antd';
 import {useCallback} from 'react';
-import {useTestDefinition} from '../../providers/TestDefinition/TestDefinition.provider';
-import AssertionAnalyticsService from '../../services/Analytics/AssertionAnalytics.service';
-import {TAssertionResultEntry, TAssertionResults} from '../../types/Assertion.types';
+import { ResultViewModes } from 'constants/Test.constants';
+import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
+import AssertionAnalyticsService from 'services/Analytics/AssertionAnalytics.service';
+import {TAssertionResultEntry, TAssertionResults} from 'types/Assertion.types';
 import AssertionCard from '../AssertionCard/AssertionCard';
 import {useAssertionForm} from '../AssertionForm/AssertionForm.provider';
 import {OPEN_BOTTOM_PANEL_STATE, useRunLayout} from '../RunLayout';
@@ -32,7 +33,7 @@ const AssertionCardList: React.FC<TAssertionCardListProps> = ({assertionResults:
           selectorList,
           selector,
           pseudoSelector,
-          isAdvancedSelector: viewResultsMode === 'advanced' || isAdvancedSelector,
+          isAdvancedSelector: viewResultsMode === ResultViewModes.Advanced || isAdvancedSelector,
         },
       });
     },

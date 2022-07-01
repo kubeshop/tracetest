@@ -12,6 +12,7 @@ import {TAssertionResults} from 'types/Assertion.types';
 import {TSpan} from 'types/Span.types';
 import {TTestRun} from 'types/TestRun.types';
 import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
+import {ResultViewModes} from 'constants/Test.constants';
 import Date from 'utils/Date';
 import SelectorService from 'services/Selector.service';
 import * as S from './RunBottomPanel.styled';
@@ -48,7 +49,7 @@ const Header: React.FC<IProps> = ({run: {createdAt}, assertionResults, isDisable
           pseudoSelector,
           selectorList,
           selector,
-          isAdvancedSelector: viewResultsMode === 'advanced',
+          isAdvancedSelector: viewResultsMode === ResultViewModes.Advanced,
         },
       });
     },
@@ -79,11 +80,11 @@ const Header: React.FC<IProps> = ({run: {createdAt}, assertionResults, isDisable
             disabled={isDisabled}
             checkedChildren="Advanced"
             unCheckedChildren="Wizard"
-            checked={viewResultsMode === 'advanced'}
+            checked={viewResultsMode === ResultViewModes.Advanced}
             onChange={(isChecked, event) => {
               event.preventDefault();
               event.stopPropagation();
-              changeViewResultsMode(isChecked ? 'advanced' : 'wizard');
+              changeViewResultsMode(isChecked ? ResultViewModes.Advanced : ResultViewModes.Wizard);
             }}
           />
         </Tooltip>

@@ -9,14 +9,15 @@ import {useAppSelector} from 'redux/hooks';
 import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
 import {TResultAssertions} from 'types/Assertion.types';
 import {useAssertionForm} from 'components/AssertionForm/AssertionForm.provider';
+import TraceAnalyticsService from 'services/Analytics/TraceAnalytics.service';
+import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
+import SelectorService from 'services/Selector.service';
+import { ResultViewModes } from 'constants/Test.constants';
 
 import SpanDetailTabs from './SpanDetailTabs';
 import SpanHeader from './SpanHeader';
 import * as S from './SpanDetail.styled';
-import TraceAnalyticsService from '../../services/Analytics/TraceAnalytics.service';
 import {OPEN_BOTTOM_PANEL_STATE, useRunLayout} from '../RunLayout';
-import {useTestDefinition} from '../../providers/TestDefinition/TestDefinition.provider';
-import SelectorService from '../../services/Selector.service';
 
 export interface ISpanDetailsComponentProps {
   assertions?: TResultAssertions;
@@ -51,8 +52,6 @@ const SpanDetail: React.FC<IProps> = ({span}) => {
       const {selectorList, pseudoSelector} = SpanService.getSelectorInformation(span!);
       const selector = SelectorService.getSelectorString(selectorList, pseudoSelector);
 
-      console.log('opening with selector', selector);
-
       open({
         isEditing: false,
         selector,
@@ -67,7 +66,7 @@ const SpanDetail: React.FC<IProps> = ({span}) => {
           ],
           selectorList,
           selector,
-          isAdvancedSelector: viewResultsMode === 'advanced',
+          isAdvancedSelector: viewResultsMode === ResultViewModes.Advanced,
         },
       });
     },

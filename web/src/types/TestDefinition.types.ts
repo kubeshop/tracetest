@@ -1,4 +1,5 @@
 import {CaseReducer, PayloadAction} from '@reduxjs/toolkit';
+import { ResultViewModes } from '../constants/Test.constants';
 import {TChange} from '../redux/actions/TestDefinition.actions';
 import {TAssertion, TAssertionResultEntry, TAssertionResults} from './Assertion.types';
 import {Model, TTestSchemas} from './Common.types';
@@ -26,8 +27,6 @@ export type TTestDefinition = Model<
     definitions?: TRawTestDefinition;
   }
 >;
-
-export type TViewResultsMode = 'wizard' | 'advanced';
 export interface ITestDefinitionState {
   initialDefinitionList: TTestDefinitionEntry[];
   definitionList: TTestDefinitionEntry[];
@@ -37,7 +36,7 @@ export interface ITestDefinitionState {
   isInitialized: boolean;
   selectedAssertion: string;
   isDraftMode: boolean;
-  viewResultsMode: TViewResultsMode;
+  viewResultsMode: ResultViewModes;
 }
 
 export type TTestDefinitionSliceActions = {

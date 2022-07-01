@@ -11,7 +11,8 @@ import {
 import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
 import {TAssertionResultEntry, TAssertionResults} from 'types/Assertion.types';
 import {TTest} from 'types/Test.types';
-import {TTestDefinitionEntry, TViewResultsMode} from 'types/TestDefinition.types';
+import {TTestDefinitionEntry} from 'types/TestDefinition.types';
+import {ResultViewModes} from 'constants/Test.constants';
 import useTestDefinitionCrud from './hooks/useTestDefinitionCrud';
 
 interface IContext {
@@ -29,9 +30,9 @@ interface IContext {
   isError: boolean;
   isDraftMode: boolean;
   test?: TTest;
-  viewResultsMode: TViewResultsMode;
+  viewResultsMode: ResultViewModes;
   setSelectedAssertion(assertionResult?: TAssertionResultEntry): void;
-  changeViewResultsMode(viewResultsMode: TViewResultsMode): void;
+  changeViewResultsMode(viewResultsMode: ResultViewModes): void;
 }
 
 export const Context = createContext<IContext>({
@@ -48,7 +49,7 @@ export const Context = createContext<IContext>({
   isError: false,
   isDraftMode: false,
   definitionList: [],
-  viewResultsMode: 'wizard',
+  viewResultsMode: ResultViewModes.Wizard,
   setSelectedAssertion: noop,
 });
 
@@ -99,7 +100,7 @@ const TestDefinitionProvider = ({children, testId, runId}: IProps) => {
   );
 
   const changeViewResultsMode = useCallback(
-    (mode: TViewResultsMode) => {
+    (mode: ResultViewModes) => {
       dispatch(setViewResultsMode(mode));
     },
     [dispatch]
