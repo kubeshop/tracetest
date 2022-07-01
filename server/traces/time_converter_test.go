@@ -14,6 +14,11 @@ func TestConversionBetweenNanoSecondsToDuration(t *testing.T) {
 		ExpectedOutput string
 	}{
 		{
+			Name:           "should convert zero",
+			Input:          0,
+			ExpectedOutput: "0ns",
+		},
+		{
 			Name:           "should convert nanoseconds",
 			Input:          38,
 			ExpectedOutput: "38ns",
