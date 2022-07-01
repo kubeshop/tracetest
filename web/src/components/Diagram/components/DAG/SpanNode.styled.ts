@@ -1,20 +1,53 @@
-import {Typography} from 'antd';
+import {Badge, Typography} from 'antd';
 import styled, {css} from 'styled-components';
 
 import {Colors} from 'constants/DAG.constants';
-import {SemanticGroupNames, SemanticGroupNamesToColor} from 'constants/SemanticGroupNames.constants';
+import {
+  SemanticGroupNames,
+  SemanticGroupNamesToColor,
+  SemanticGroupNamesToLightColor,
+} from 'constants/SemanticGroupNames.constants';
 
-export const Badge = styled.div`
-  align-items: center;
-  display: flex;
-  margin-top: 2px;
-  color: rgba(3, 24, 73, 0.4);
+export const BadgeCheck = styled(Badge)`
+  font-size: 10px;
+  line-height: 10px;
+  padding: 0 2px;
+  vertical-align: bottom;
+
+  .ant-badge-status-dot {
+    height: 8px;
+    top: 0;
+    width: 8px;
+  }
+
+  .ant-badge-status-text {
+    color: #031849;
+    font-size: 10px;
+    margin-left: 2px;
+  }
 `;
 
-export const BadgeText = styled(Typography.Text)`
-  font-size: 12px;
-  color: inherit;
-  margin-left: 4px;
+export const BadgeContainer = styled.div`
+  display: flex;
+`;
+
+export const BadgeType = styled(Badge)<{$type: SemanticGroupNames}>`
+  &.ant-badge-not-a-wrapper:not(.ant-badge-status) {
+    display: block;
+    vertical-align: unset;
+  }
+
+  > sup {
+    background-color: ${({$type}) => SemanticGroupNamesToLightColor[$type]};
+    border-radius: 2px;
+    color: #031849;
+    font-size: 8px;
+    font-weight: 600;
+    height: 12px;
+    line-height: 12px;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+  }
 `;
 
 export const Body = styled.div`
@@ -23,22 +56,19 @@ export const Body = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 6px;
+  padding: 0 10px 10px;
   width: 100%;
-`;
-
-export const BodyText = styled(Typography.Text).attrs({ellipsis: true})<{$secondary?: boolean}>`
-  color: ${({$secondary}) => $secondary && 'rgba(3, 24, 73, 0.4)'};
-  font-size: 12px;
 `;
 
 export const Container = styled.div<{$affected: boolean; $selected: boolean}>`
   align-items: center;
+  background-color: #ffffff;
   border: ${({$selected}) => ($selected ? `1px solid ${Colors.Selected}` : `1px solid ${Colors.Default}`)};
-  border-radius: 4px;
+  border-radius: 10px;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  overflow: hidden;
   width: 180px;
 
   ${({$affected}) =>
@@ -49,51 +79,41 @@ export const Container = styled.div<{$affected: boolean; $selected: boolean}>`
     `}
 `;
 
-export const Dot = styled.div<{$type: 'success' | 'error'}>`
-  background-color: ${({$type}) => ($type === 'success' ? '#49aa19' : '#ff4d4f')};
-  border-radius: 50%;
-  height: 8px;
-  width: 8px;
-`;
-
 export const Footer = styled.div`
-  bottom: 10px;
-  display: flex;
-  justify-content: space-between;
+  bottom: 12px;
   position: absolute;
-  right: 6px;
-  width: 22px;
+  right: 10px;
 `;
 
-export const Header = styled.div<{$type: SemanticGroupNames}>`
-  background-color: ${({$type}) => SemanticGroupNamesToColor[$type]};
-  border-top-left-radius: 4px;
-  border-top-right-radius: 4px;
-  padding: 4px 24px 4px 6px;
+export const Header = styled.div`
+  padding: 10px 10px 4px;
   position: relative;
   width: 100%;
 `;
 
 export const HeaderText = styled(Typography.Paragraph).attrs({ellipsis: {rows: 2}, strong: true})`
   font-size: 12px;
+  text-align: center;
 
   &.ant-typography {
     margin-bottom: 0;
   }
 `;
 
-export const IconContainer = styled.div<{$type: SemanticGroupNames}>`
+export const Item = styled.div`
   align-items: center;
-  background-color: ${({$type}) => SemanticGroupNamesToColor[$type]};
-  border: 2px solid #ffffff;
-  border-radius: 50%;
-  bottom: -12px;
-  color: #ffffff;
   display: flex;
-  font-size: 12px;
-  height: 24px;
-  justify-content: center;
-  position: absolute;
-  right: 4px;
-  width: 24px;
+  color: #031849;
+  font-size: 10px;
+`;
+
+export const ItemText = styled(Typography.Text)`
+  color: inherit;
+  margin-left: 5px;
+`;
+
+export const TopLine = styled.div<{$type: SemanticGroupNames}>`
+  background-color: ${({$type}) => SemanticGroupNamesToColor[$type]};
+  height: 7px;
+  width: 100%;
 `;
