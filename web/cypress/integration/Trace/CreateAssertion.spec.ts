@@ -83,7 +83,7 @@ describe('Create Assertion', () => {
   });
 
   it('should create a basic assertion using the advanced mode', () => {
-    cy.get(`[data-cy=trace-node-db]`).last().click();
+    cy.get(`[data-cy=trace-node-database]`).last().click();
     cy.get('[data-cy=add-assertion-button]').click();
     cy.get('[data-cy=assertion-form]', {timeout: 10000}).should('be.visible');
 
