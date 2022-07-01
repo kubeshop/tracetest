@@ -20,6 +20,10 @@ const (
 var timeUnits = []string{"ns", "us", "ms", "s", "m", "h"}
 
 func ConvertNanoSecondsIntoProperTimeUnit(value int) string {
+	if value <= 0 {
+		return "0ns"
+	}
+
 	// Scale is basically how many times we can divide value by 1000.
 	// To achieve that, we use Log1000(value). However, go doesn't support that,
 	// so we need to use the math transformation:
