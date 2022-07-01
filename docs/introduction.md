@@ -45,7 +45,7 @@ In Tracetest, an assertion is comprised of two parts:
 ### What is a Selector?
 
 
-A selector contains criteria to limit the scope of the spans from a trace that we wish to assert against. A selector can be very narrow, only selecting on one span, or very wide, selecting all spans or all spans of a certain type or other characteristics. Underlying this capability is a [selector language](/docs/installing.md).
+A selector contains criteria to limit the scope of the spans from a trace that we wish to assert against. A selector can be very narrow, only selecting on one span, or very wide, selecting all spans or all spans of a certain type or other characteristics. Underlying this capability is a [selector language](/docs//docs/advanced-selectors.md).
 
 
 ### What is a Check?
