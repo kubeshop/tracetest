@@ -42,7 +42,7 @@ const Span = ({id = '', attributes = {}, startTime = 0, endTime = 0, parentId = 
 
   const name = attributes[Attributes.NAME] || '';
   const kind = SpanKindList.find(spanKind => spanKind === attributes[Attributes.KIND]) || SpanKind.INTERNAL;
-  const duration = Number(attributes[Attributes.TRACETEST_SPAN_DURATION]) || 0;
+  const duration = attributes[Attributes.TRACETEST_SPAN_DURATION] || '0ns';
   const type =
     SemanticGroupNamesList.find(
       semanticGroupName => semanticGroupName === attributes[Attributes.TRACETEST_SPAN_TYPE]

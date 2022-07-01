@@ -184,7 +184,7 @@ const Timeline = ({affectedSpans, spanList, selectedSpan, onSelectSpan}: IDiagra
       .append('text')
       .attr('class', 'span-duration')
       .attr('y', 30)
-      .text((d: any) => `${d.data.data?.duration} ms`);
+      .text((d: any) => d.data.data?.duration);
 
     const nodeUpdate = node.merge(nodeEnter as any);
 
