@@ -6,6 +6,8 @@ Trace Based Testing is a means of conducting deep integration or system tests by
 
 A Distributed Trace, more commonly known as a Trace, records the paths taken by requests (made by an application or end-user) take as they propagate through multi-service architectures, like microservice and serverless applications. [Source - OpenTelemetry.io](https://opentelemetry.io/docs/concepts/observability-primer/)
 
+![Trace & Spans Diagram](img/trace-explainer.gif)
+
 ## What is a Span?
 
 Traces are comprised of spans. A span represents a single operation in a trace. Spans are nested, typically with a parent child relationship to form a deeply nested tree.
@@ -32,7 +34,7 @@ In Tracetest an assertion is comprised of two parts:
 
 ## What is a selector / filter?
 
-A selector / filter contains criteria to limit the scope of the spans from a trace that we wish to assert against. A selector / filter can be very narrow, only selecting on span, or very wide, selecting all spans or all spans of a certain type or other characteristic.
+A selector / filter contains criteria to limit the scope of the spans from a trace that we wish to assert against. A selector / filter can be very narrow, only selecting on span, or very wide, selecting all spans or all spans of a certain type or other characteristic. Underlying this capability is a [selector language](/docs/installing.md).
 
 ## What is a check?
 
