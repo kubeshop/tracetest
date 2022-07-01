@@ -1,4 +1,5 @@
-# Introduction to Trace Based Testing
+# Introduction to Trace-Based Testing
+
 
 Trace Based Testing is a means of conducting deep integration or system tests by utilizing the rich data contained in a distributed system trace.
 
