@@ -20,6 +20,7 @@ import (
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/testdb"
+	"github.com/kubeshop/tracetest/server/traces"
 	"gopkg.in/yaml.v3"
 )
 
@@ -38,13 +39,14 @@ func NewController(
 	testDB model.Repository,
 	runner executor.Runner,
 	assertionRunner executor.AssertionRunner,
+	traceConversionConfig traces.ConversionConfig,
 ) openapi.ApiApiServicer {
 	return &controller{
 		testDB:          testDB,
 		runner:          runner,
 		assertionRunner: assertionRunner,
-		openapi:         OpenAPIMapper{},
-		model:           ModelMapper{Comparators: comparator.DefaultRegistry()},
+		openapi:         OpenAPIMapper{traceConversionConfig},
+		model:           ModelMapper{Comparators: comparator.DefaultRegistry(), traceConversionConfig: traceConversionConfig},
 	}
 }
 

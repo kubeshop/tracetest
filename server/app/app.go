@@ -18,6 +18,7 @@ import (
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/tracedb"
+	"github.com/kubeshop/tracetest/server/traces"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -101,6 +102,12 @@ func (a *App) Start() error {
 	assertionRunner.Start(5)
 	defer assertionRunner.Stop()
 
+	traceConversionConfig := traces.NewConversionConfig()
+	// hardcoded for now. In the future we will get those values from the database
+	traceConversionConfig.AddTimeFields(
+		"tracetest.span.duration",
+	)
+
 	pollerExecutor := executor.NewPollerExecutor(a.tracer, execTestUpdater, a.traceDB, a.config.PoolingRetryDelay(), a.config.MaxWaitTimeForTraceDuration())
 
 	tracePoller := executor.NewTracePoller(pollerExecutor, execTestUpdater, assertionRunner, a.config.PoolingRetryDelay(), a.config.MaxWaitTimeForTraceDuration())
@@ -111,7 +118,7 @@ func (a *App) Start() error {
 	runner.Start(5) // worker count. should be configurable
 	defer runner.Stop()
 
-	controller := httpServer.NewController(a.db, runner, assertionRunner)
+	controller := httpServer.NewController(a.db, runner, assertionRunner, traceConversionConfig)
 	apiApiController := openapi.NewApiApiController(controller)
 	customController := httpServer.NewCustomController(controller, apiApiController, openapi.DefaultErrorHandler, a.tracer)
 	httpRouter := customController

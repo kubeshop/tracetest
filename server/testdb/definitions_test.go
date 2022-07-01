@@ -20,7 +20,7 @@ func TestDefinitions(t *testing.T) {
 		{
 			Attribute:  "tracetest.span.duration",
 			Comparator: comparator.Eq,
-			Value:      "2000",
+			Value:      "2000000000",
 		},
 	})
 

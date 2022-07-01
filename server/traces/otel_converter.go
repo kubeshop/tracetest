@@ -64,7 +64,7 @@ func convertOtelSpanIntoSpan(span *v1.Span) *Span {
 
 func spanDuration(span *v1.Span) string {
 	if span.GetStartTimeUnixNano() != 0 && span.GetEndTimeUnixNano() != 0 {
-		spanDuration := (span.GetEndTimeUnixNano() - span.GetStartTimeUnixNano()) / 1000 / 1000 // in milliseconds
+		spanDuration := (span.GetEndTimeUnixNano() - span.GetStartTimeUnixNano())
 		return strconv.FormatUint(spanDuration, 10)
 	}
 

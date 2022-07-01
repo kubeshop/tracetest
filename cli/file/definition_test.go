@@ -38,7 +38,7 @@ func TestLoadDefinition(t *testing.T) {
 					{
 						Selector: "span[name = \"POST /pokemon/import\"]",
 						Assertions: []string{
-							"tracetest.span.duration <= 100",
+							"tracetest.span.duration <= 100ms",
 							"http.status_code = 200",
 						},
 					},
@@ -64,7 +64,7 @@ func TestLoadDefinition(t *testing.T) {
 						Selector: "span[name = \"consume message from queue\"]:last span[name = \"save pokemon on database\"]",
 						Assertions: []string{
 							"db.repository.operation = \"create\"",
-							"tracetest.span.duration <= 100",
+							"tracetest.span.duration <= 100ms",
 							`tracetest.response.body contains "\"id\": 52"`,
 						},
 					},
@@ -94,7 +94,7 @@ func TestLoadDefinition(t *testing.T) {
 					{
 						Selector: "span[name = \"POST /pokemon/import\"]",
 						Assertions: []string{
-							"tracetest.span.duration <= 100",
+							"tracetest.span.duration <= 100ms",
 							"http.status_code = 200",
 						},
 					},
@@ -120,7 +120,7 @@ func TestLoadDefinition(t *testing.T) {
 						Selector: "span[name = \"consume message from queue\"]:last span[name = \"save pokemon on database\"]",
 						Assertions: []string{
 							"db.repository.operation = \"create\"",
-							"tracetest.span.duration <= 100",
+							"tracetest.span.duration <= 100ms",
 						},
 					},
 				},

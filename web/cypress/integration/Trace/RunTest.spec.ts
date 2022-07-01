@@ -17,7 +17,7 @@ describe('Run Test', () => {
     cy.get(`[data-cy^=test-run-result-]`).first().click();
     cy.location('href').should('match', /\/run\/.*/i);
 
-    cy.get('[data-cy=run-test-button]', {timeout: 10000}).should('be.visible');
+    cy.get('[data-cy=run-test-button]', {timeout: 20000}).should('be.visible');
     cy.get(`[data-cy^=run-test-button]`).first().click();
 
     cy.wait(2000);
