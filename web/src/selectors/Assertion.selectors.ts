@@ -4,6 +4,7 @@ import {endpoints} from 'redux/apis/TraceTest.api';
 import {RootState} from 'redux/store';
 import SpanAttributeService from '../services/SpanAttribute.service';
 import {TSpanSelector} from '../types/Assertion.types';
+import SpanSelectors from './Span.selectors';
 
 const stateSelector = (state: RootState) => state;
 const paramsSelector = (state: RootState, testId: string, runId: string, spanIdList: string[]) => ({
@@ -27,15 +28,20 @@ const selectAffectedSpanList = createSelector(stateSelector, paramsSelector, (st
   return trace?.spans.filter(({id}) => spanIdList.includes(id)) || [];
 });
 
-const AssertionSelectors = () => ({
-  selectAffectedSpanList,
-  selectAttributeList: createSelector(selectAffectedSpanList, spanList => spanList.flatMap(span => span.attributeList)),
-  selectSelectorAttributeList: createSelector(
+const AssertionSelectors = () => {
+  return {
     selectAffectedSpanList,
-    currentSelectorListSelector,
-    (spanList, currentSelectorList) =>
-      SpanAttributeService.getFilteredSelectorAttributeList(spanList.flatMap(span => span.attributeList), currentSelectorList)
-  ),
-});
+    selectAttributeList: createSelector(selectAffectedSpanList, SpanSelectors.selectAffectedSpans, (spanList, affectedSpans) => spanList.flatMap(span => span.attributeList).concat(SpanAttributeService.getPseudoAttributeList(affectedSpans.length))),
+    selectSelectorAttributeList: createSelector(
+      selectAffectedSpanList,
+      currentSelectorListSelector,
+      (spanList, currentSelectorList) =>
+        SpanAttributeService.getFilteredSelectorAttributeList(
+          spanList.flatMap(span => span.attributeList),
+          currentSelectorList
+        )
+    ),
+  };
+};
 
 export default AssertionSelectors();

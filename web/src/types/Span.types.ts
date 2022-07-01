@@ -15,7 +15,7 @@ export type TSpan = Model<
   {
     attributes: Record<string, TSpanAttribute>;
     type: SemanticGroupNames;
-    duration: number;
+    duration: string;
     signature: TSpanFlatAttribute[];
     attributeList: TSpanFlatAttribute[];
     children?: TSpan[];

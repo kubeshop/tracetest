@@ -8,12 +8,15 @@ import OperatorService from 'services/Operator.service';
 import {useAppSelector} from 'redux/hooks';
 import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
 import {TResultAssertions} from 'types/Assertion.types';
-import {useAssertionForm} from 'components/AssertionForm/AssertionFormProvider';
+import {useAssertionForm} from 'components/AssertionForm/AssertionForm.provider';
+import TraceAnalyticsService from 'services/Analytics/TraceAnalytics.service';
+import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
+import SelectorService from 'services/Selector.service';
+import { ResultViewModes } from 'constants/Test.constants';
 
 import SpanDetailTabs from './SpanDetailTabs';
 import SpanHeader from './SpanHeader';
 import * as S from './SpanDetail.styled';
-import TraceAnalyticsService from '../../services/Analytics/TraceAnalytics.service';
 import {OPEN_BOTTOM_PANEL_STATE, useRunLayout} from '../RunLayout';
 
 export interface ISpanDetailsComponentProps {
@@ -36,6 +39,7 @@ const getSpanTitle = (span: TSpan) => {
 const SpanDetail: React.FC<IProps> = ({span}) => {
   const {openBottomPanel} = useRunLayout();
   const {open} = useAssertionForm();
+  const {viewResultsMode} = useTestDefinition();
   const assertions = useAppSelector(state =>
     TestDefinitionSelectors.selectAssertionResultsBySpan(state, span?.id || '')
   );
@@ -46,9 +50,11 @@ const SpanDetail: React.FC<IProps> = ({span}) => {
       openBottomPanel(OPEN_BOTTOM_PANEL_STATE.FORM);
       TraceAnalyticsService.onAddAssertionButtonClick();
       const {selectorList, pseudoSelector} = SpanService.getSelectorInformation(span!);
+      const selector = SelectorService.getSelectorString(selectorList, pseudoSelector);
 
       open({
         isEditing: false,
+        selector,
         defaultValues: {
           pseudoSelector,
           assertionList: [
@@ -59,10 +65,12 @@ const SpanDetail: React.FC<IProps> = ({span}) => {
             },
           ],
           selectorList,
+          selector,
+          isAdvancedSelector: viewResultsMode === ResultViewModes.Advanced,
         },
       });
     },
-    [open, span, openBottomPanel]
+    [openBottomPanel, span, open, viewResultsMode]
   );
 
   return (

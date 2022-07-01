@@ -20,9 +20,9 @@ type Span struct {
 	ParentId *string `json:"parentId,omitempty"`
 	Name     *string `json:"name,omitempty"`
 	// span start time in unix milli format
-	StartTime *int32 `json:"startTime,omitempty"`
+	StartTime *int64 `json:"startTime,omitempty"`
 	// span end time in unix milli format
-	EndTime *int32 `json:"endTime,omitempty"`
+	EndTime *int64 `json:"endTime,omitempty"`
 	// Key-Value of span attributes
 	Attributes *map[string]string `json:"attributes,omitempty"`
 	Children   []Span             `json:"children,omitempty"`
@@ -142,9 +142,9 @@ func (o *Span) SetName(v string) {
 }
 
 // GetStartTime returns the StartTime field value if set, zero value otherwise.
-func (o *Span) GetStartTime() int32 {
+func (o *Span) GetStartTime() int64 {
 	if o == nil || o.StartTime == nil {
-		var ret int32
+		var ret int64
 		return ret
 	}
 	return *o.StartTime
@@ -152,7 +152,7 @@ func (o *Span) GetStartTime() int32 {
 
 // GetStartTimeOk returns a tuple with the StartTime field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Span) GetStartTimeOk() (*int32, bool) {
+func (o *Span) GetStartTimeOk() (*int64, bool) {
 	if o == nil || o.StartTime == nil {
 		return nil, false
 	}
@@ -168,15 +168,15 @@ func (o *Span) HasStartTime() bool {
 	return false
 }
 
-// SetStartTime gets a reference to the given int32 and assigns it to the StartTime field.
-func (o *Span) SetStartTime(v int32) {
+// SetStartTime gets a reference to the given int64 and assigns it to the StartTime field.
+func (o *Span) SetStartTime(v int64) {
 	o.StartTime = &v
 }
 
 // GetEndTime returns the EndTime field value if set, zero value otherwise.
-func (o *Span) GetEndTime() int32 {
+func (o *Span) GetEndTime() int64 {
 	if o == nil || o.EndTime == nil {
-		var ret int32
+		var ret int64
 		return ret
 	}
 	return *o.EndTime
@@ -184,7 +184,7 @@ func (o *Span) GetEndTime() int32 {
 
 // GetEndTimeOk returns a tuple with the EndTime field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Span) GetEndTimeOk() (*int32, bool) {
+func (o *Span) GetEndTimeOk() (*int64, bool) {
 	if o == nil || o.EndTime == nil {
 		return nil, false
 	}
@@ -200,8 +200,8 @@ func (o *Span) HasEndTime() bool {
 	return false
 }
 
-// SetEndTime gets a reference to the given int32 and assigns it to the EndTime field.
-func (o *Span) SetEndTime(v int32) {
+// SetEndTime gets a reference to the given int64 and assigns it to the EndTime field.
+func (o *Span) SetEndTime(v int64) {
 	o.EndTime = &v
 }
 

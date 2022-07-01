@@ -1,7 +1,6 @@
-import {ClockCircleOutlined} from '@ant-design/icons';
+import {ClockCircleOutlined, SettingOutlined, ToolOutlined} from '@ant-design/icons';
 import {Handle, NodeProps, Position} from 'react-flow-renderer';
 
-import {SemanticGroupNamesToIcon} from 'constants/SemanticGroupNames.constants';
 import {SpanKindToText} from 'constants/Span.constants';
 import {useAppSelector} from 'redux/hooks';
 import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
@@ -12,8 +11,9 @@ interface IProps extends NodeProps<INodeDataSpan> {}
 
 const SpanNode = ({data, id, selected}: IProps) => {
   const spansResult = useAppSelector(TestDefinitionSelectors.selectSpansResult);
+  const passedChecks = spansResult[data.id]?.passed;
+  const failedChecks = spansResult[data.id]?.failed;
   const className = `${data.isAffected ? 'affected' : ''} ${data.isMatched ? 'matched' : ''}`;
-  const Icon = SemanticGroupNamesToIcon[data.type];
 
   return (
     <S.Container
@@ -24,27 +24,37 @@ const SpanNode = ({data, id, selected}: IProps) => {
     >
       <Handle id={id} position={Position.Top} style={{top: 0, visibility: 'hidden'}} type="target" />
 
-      <S.Header $type={data.type}>
+      <S.TopLine $type={data.type} />
+
+      <S.Header>
+        <S.BadgeContainer>
+          <S.BadgeType count={data.type} $type={data.type} />
+        </S.BadgeContainer>
         <S.HeaderText>{data.name}</S.HeaderText>
-        <S.IconContainer $type={data.type}>
-          <Icon />
-        </S.IconContainer>
       </S.Header>
 
       <S.Body>
-        <S.BodyText>
-          {data.serviceName} {SpanKindToText[data.kind]}
-        </S.BodyText>
-        <S.BodyText $secondary>{data.system}</S.BodyText>
-        <S.Badge>
+        <S.Item>
+          <SettingOutlined />
+          <S.ItemText>
+            {data.serviceName} {SpanKindToText[data.kind]}
+          </S.ItemText>
+        </S.Item>
+        {Boolean(data.system) && (
+          <S.Item>
+            <ToolOutlined />
+            <S.ItemText>{data.system}</S.ItemText>
+          </S.Item>
+        )}
+        <S.Item>
           <ClockCircleOutlined />
-          <S.BadgeText>{data.duration}ms</S.BadgeText>
-        </S.Badge>
+          <S.ItemText>{data.duration}</S.ItemText>
+        </S.Item>
       </S.Body>
 
       <S.Footer>
-        {Boolean(spansResult[data.id]?.passed) && <S.Dot $type="success" />}
-        {Boolean(spansResult[data.id]?.failed) && <S.Dot $type="error" />}
+        {Boolean(passedChecks) && <S.BadgeCheck status="success" text={passedChecks} />}
+        {Boolean(failedChecks) && <S.BadgeCheck status="error" text={failedChecks} />}
       </S.Footer>
 
       <Handle id={id} position={Position.Bottom} style={{bottom: 0, visibility: 'hidden'}} type="source" />

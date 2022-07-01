@@ -1,10 +1,11 @@
 import {Typography} from 'antd';
 import {useCallback} from 'react';
-import {useTestDefinition} from '../../providers/TestDefinition/TestDefinition.provider';
-import AssertionAnalyticsService from '../../services/Analytics/AssertionAnalytics.service';
-import {TAssertionResultEntry, TAssertionResults} from '../../types/Assertion.types';
+import { ResultViewModes } from 'constants/Test.constants';
+import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
+import AssertionAnalyticsService from 'services/Analytics/AssertionAnalytics.service';
+import {TAssertionResultEntry, TAssertionResults} from 'types/Assertion.types';
 import AssertionCard from '../AssertionCard/AssertionCard';
-import {useAssertionForm} from '../AssertionForm/AssertionFormProvider';
+import {useAssertionForm} from '../AssertionForm/AssertionForm.provider';
 import {OPEN_BOTTOM_PANEL_STATE, useRunLayout} from '../RunLayout';
 import * as S from './AssertionCardList.styled';
 
@@ -16,24 +17,27 @@ interface TAssertionCardListProps {
 
 const AssertionCardList: React.FC<TAssertionCardListProps> = ({assertionResults: {resultList}, onSelectSpan}) => {
   const {open} = useAssertionForm();
-  const {remove} = useTestDefinition();
+  const {remove, viewResultsMode} = useTestDefinition();
   const {openBottomPanel} = useRunLayout();
 
   const handleEdit = useCallback(
-    ({selector, resultList: list, selectorList, pseudoSelector}: TAssertionResultEntry) => {
+    ({selector, resultList: list, selectorList, pseudoSelector, isAdvancedSelector}: TAssertionResultEntry) => {
       AssertionAnalyticsService.onAssertionEdit();
       openBottomPanel(OPEN_BOTTOM_PANEL_STATE.FORM);
+
       open({
         isEditing: true,
         selector,
         defaultValues: {
           assertionList: list.map(({assertion}) => assertion),
           selectorList,
+          selector,
           pseudoSelector,
+          isAdvancedSelector: viewResultsMode === ResultViewModes.Advanced || isAdvancedSelector,
         },
       });
     },
-    [open, openBottomPanel]
+    [open, openBottomPanel, viewResultsMode]
   );
 
   const handleDelete = useCallback(

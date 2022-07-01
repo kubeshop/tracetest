@@ -20,8 +20,18 @@ Tracetest allows you to quickly build integration and e2e tests, powered by your
 - Save your test.
 - Run the tests either manually or via your CI build jobs.
 
-## **Blog Posts**
+## **Blog & Video Posts**
 
 Check out the following blog-posts with Tracetest-related content:
 
-- Version 0.5 - [Release blog-post](https://kubeshop.io/blog/tracetest-assertions-versioning-ci-cd) - June 8, 2022
+- [Integrating Tracetest with GitHub Actions in a CI pipeline](https://kubeshop.io/blog/integrating-tracetest-with-github-actions-in-a-ci-pipeline) - June 24, 2022
+
+- Recorded live stream: [Introduction to Tracetest - E2E Tests Powered by OpenTelemetry](https://youtu.be/mqwJRxqBNCg) - June 23, 2022
+
+- [Tracetest — Assertions, Versioning & CI/CD - Release 0.5](https://kubeshop.io/blog/tracetest-assertions-versioning-ci-cd) - June 8, 2022
+
+- [Tracing the History of Distributed Tracing & OpenTelemetry](https://kubeshop.io/blog/tracing-the-history-of-distributed-tracing-opentelemetryt) - May 26, 2022
+
+- [Tracetest is released. What’s next?](https://kubeshop.io/blog/tracetest-is-released-whats-next) - May 6, 2022
+
+- [Introducing Tracetest - Trace-based Testing with OpenTelemetry](https://kubeshop.io/blog/introducing-tracetest-trace-based-testing-with-opentelemetry) - April 26, 2022

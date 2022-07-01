@@ -33,3 +33,8 @@ export const DemoTestExampleList: IDemoTestExample[] = [
 ];
 
 export const DEFAULT_HEADERS = [{key: 'Content-Type', value: 'application/json'}];
+
+export enum ResultViewModes {
+  Advanced = 'advanced',
+  Wizard = 'wizard',
+}

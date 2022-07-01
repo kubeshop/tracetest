@@ -1,6 +1,7 @@
 import {render} from '@testing-library/react';
+import {ReactFlowProvider} from 'react-flow-renderer';
+import {ReduxWrapperProvider} from 'redux/ReduxWrapperProvider';
 import AssertionForm from '../AssertionForm';
-import {ReduxWrapperProvider} from '../../../redux/ReduxWrapperProvider';
 
 const defaultProps = {
   onSubmit: jest.fn(),
@@ -12,7 +13,12 @@ const defaultProps = {
 describe('AssertionForm', () => {
   it('should render correctly', () => {
     fetchMock.mockResponse(JSON.stringify(['spanId']));
-    const {container} = render(<AssertionForm {...defaultProps} />, {wrapper: ReduxWrapperProvider}); 
+    const {container} = render(
+      <ReactFlowProvider>
+        <AssertionForm {...defaultProps} />
+      </ReactFlowProvider>,
+      {wrapper: ReduxWrapperProvider}
+    );
 
     expect(container.querySelector('form')).toBeInTheDocument();
   });

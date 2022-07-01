@@ -10,6 +10,7 @@ const AssertionResults = ({allPassed = false, results = []}: TRawAssertionResult
     resultList: results.map(({selector: {query: selector = '', structure = []} = {}, results: resultList = []}) => ({
       id: uniqueId(),
       selector,
+      isAdvancedSelector: SelectorService.getIsAdvancedSelector(selector),
       spanIds: AssertionService.getSpanIds(resultList),
       originalSelector: selector,
       pseudoSelector: SelectorService.getPseudoSelectorFromStructure(structure),

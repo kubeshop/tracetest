@@ -18,13 +18,13 @@ interface IProps {
 }
 
 const AssertionCard = ({
-  assertionResult: {selector, resultList, selectorList, pseudoSelector, spanIds},
+  assertionResult: {selector, resultList, selectorList, pseudoSelector, spanIds, isAdvancedSelector},
   assertionResult,
   onSelectSpan,
   onDelete,
   onEdit,
 }: IProps) => {
-  const {setSelectedAssertion, revert} = useTestDefinition();
+  const {setSelectedAssertion, revert, viewResultsMode} = useTestDefinition();
   const {onSetFocusedSpan, selectedSpan} = useSpan();
   const selectedAssertion = useAppSelector(TestDefinitionSelectors.selectSelectedAssertion);
   const {
@@ -63,7 +63,13 @@ const AssertionCard = ({
     >
       <S.Header onClick={handleOnClick}>
         <div>
-          <AssertionCardSelectorList selectorList={selectorList} pseudoSelector={pseudoSelector} />
+          <AssertionCardSelectorList
+            viewResultsMode={viewResultsMode}
+            isAdvancedSelector={isAdvancedSelector}
+            selector={selector}
+            selectorList={selectorList}
+            pseudoSelector={pseudoSelector}
+          />
         </div>
         <S.ActionsContainer>
           {isDraft && <S.StatusTag>draft</S.StatusTag>}

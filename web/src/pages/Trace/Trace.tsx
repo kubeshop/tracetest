@@ -2,7 +2,7 @@ import {withTracker} from 'ga-4-react';
 import {useParams} from 'react-router-dom';
 import {ReactFlowProvider} from 'react-flow-renderer';
 import Layout from 'components/Layout';
-import AssertionFormProvider from 'components/AssertionForm/AssertionFormProvider';
+import AssertionFormProvider from 'components/AssertionForm/AssertionForm.provider';
 import EditTestModalProvider from 'components/EditTestModal/EditTestModal.provider';
 import TestRunProvider from 'providers/TestRun';
 import TestDefinitionProvider from 'providers/TestDefinition';

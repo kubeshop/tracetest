@@ -53,7 +53,16 @@ const AssertionFormProvider: React.FC<{testId: string}> = ({children}) => {
 
   const open = useCallback(
     (props: IFormProps = {}) => {
-      const {isEditing, defaultValues: {selectorList = [], pseudoSelector, assertionList = []} = {}} = props;
+      const {
+        isEditing,
+        defaultValues: {
+          selectorList = [],
+          pseudoSelector,
+          assertionList = [],
+          isAdvancedSelector,
+          selector: defaultSelector,
+        } = {},
+      } = props;
       const selectorString = SelectorService.getSelectorString(selectorList, pseudoSelector);
       const definition = definitionList.find(({selector}) => selectorString === selector);
 
@@ -63,9 +72,11 @@ const AssertionFormProvider: React.FC<{testId: string}> = ({children}) => {
           isEditing: true,
           selector: selectorString,
           defaultValues: {
+            selector: defaultSelector,
             pseudoSelector,
             assertionList: isEditing ? assertionList : [...definition.assertionList, ...assertionList],
             selectorList,
+            isAdvancedSelector,
           },
         });
       else setFormProps(props);
@@ -97,15 +108,22 @@ const AssertionFormProvider: React.FC<{testId: string}> = ({children}) => {
   }, []);
 
   const onSubmit = useCallback(
-    async ({selectorList, assertionList = [], pseudoSelector}: IValues) => {
+    async ({
+      selectorList = [],
+      assertionList = [],
+      pseudoSelector,
+      isAdvancedSelector = false,
+      selector: newSelectorString = '',
+    }: IValues) => {
       const {isEditing, selector = ''} = formProps;
       const newSelector = SelectorService.getSelectorString(selectorList, pseudoSelector);
 
       const definition: TTestDefinitionEntry = {
-        selector: newSelector,
+        selector: isAdvancedSelector ? newSelectorString : newSelector,
         assertionList,
         originalSelector: newSelector,
         isDraft: true,
+        isAdvancedSelector,
       };
 
       if (isEditing) {

@@ -25,10 +25,14 @@ components:
           type: string
         startTime:
           type: integer
+          format: int64
           description: span start time in unix milli format
+          example: 1656701595277
         endTime:
           type: integer
+          format: int64
           description: span end time in unix milli format
+          example: 1656701595800
         attributes:
           type: object
           description: Key-Value of span attributes
