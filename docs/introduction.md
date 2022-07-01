@@ -8,11 +8,11 @@ A Distributed Trace, more commonly known as a Trace, records the paths taken by 
 
 ![Trace & Spans Diagram](img/trace-explainer.gif)
 
-## What is a Span?
+### What is a Span?
 
 Traces are comprised of spans. A span represents a single operation in a trace. Spans are nested, typically with a parent child relationship to form a deeply nested tree.
 
-## What data do Spans contain?
+### What data do Spans contain?
 
 A span contains the data about the operation it represents. This data includes:
 
@@ -21,7 +21,7 @@ A span contains the data about the operation it represents. This data includes:
 - List of events (if instrumented)
 - Attributes
 
-## What are Attributes?
+### What are Attributes?
 
 Attributes are a key-value pair, and they contain information about the operation. A developer can manually add additional attributes to a span, enriching the data. There are [Semantic Conventions](https://opentelemetry.io/docs/reference/specification/trace/semantic_conventions/) that provide recommended names for the attributes for common types of calls such as database, http, messaging, etc.
 
@@ -29,17 +29,19 @@ Attributes are a key-value pair, and they contain information about the operatio
 
 In Tracetest an assertion is comprised of two parts:
 
-- Selector / filters
+- Selector
 - Checks
 
-## What is a selector / filter?
+![Selectors and Checks](img/assertion-explainer.gif)
 
-A selector / filter contains criteria to limit the scope of the spans from a trace that we wish to assert against. A selector / filter can be very narrow, only selecting on span, or very wide, selecting all spans or all spans of a certain type or other characteristic. Underlying this capability is a [selector language](/docs/installing.md).
+### What is a selector?
 
-## What is a check?
+A selector contains criteria to limit the scope of the spans from a trace that we wish to assert against. A selector can be very narrow, only selecting on span, or very wide, selecting all spans or all spans of a certain type or other characteristic. Underlying this capability is a [selector language](/docs/installing.md).
 
-A check is a logical verification that will be performed on all spans that match the selector / filter. It is comprised of an attribute, a comparison operator, and a value.
+### What is a check?
 
-## What is a span signature?
+A check is a logical verification that will be performed on all spans that match the selector. It is comprised of an attribute, a comparison operator, and a value.
 
-A span signature is an automatically computed selector / filter that has enough elements to specify a single span. It uses a combination of attributes in the selected span to automatically build the filter. If a trace has multiple spans that are almost identical, the span signature may still match more than one span. You can alter the selector / filter in this case to be more specific by adding other attributes or specifying an ancestor span.
+### What is a span signature?
+
+A span signature is an automatically computed selector that has enough elements to specify a single span. It uses a combination of attributes in the selected span to automatically build the selector. If a trace has multiple spans that are almost identical, the span signature may still match more than one span. You can alter the selector in this case to be more specific by adding other attributes or specifying an ancestor span.
