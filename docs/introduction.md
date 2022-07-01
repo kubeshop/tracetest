@@ -31,7 +31,8 @@ A span contains the data about the operation it represents. This data includes:
 
 Attributes are a key-value pair, and they contain information about the operation. A developer can manually add additional attributes to a span, enriching the data. There are [Semantic Conventions](https://opentelemetry.io/docs/reference/specification/trace/semantic_conventions/) that provide recommended names for the attributes for common types of calls such as database, http, messaging, etc.
 
-## What is an assertion?
+## What is an Assertion?
+
 
 In Tracetest an assertion is comprised of two parts:
 
