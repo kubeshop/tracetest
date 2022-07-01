@@ -127,8 +127,8 @@ func encodeSpan(s Span) encodedSpan {
 	return encodedSpan{
 		ID:         s.ID.String(),
 		Name:       s.Name,
-		StartTime:  fmt.Sprintf("%d", s.StartTime.UnixNano()),
-		EndTime:    fmt.Sprintf("%d", s.EndTime.UnixNano()),
+		StartTime:  fmt.Sprintf("%d", s.StartTime.UnixMilli()),
+		EndTime:    fmt.Sprintf("%d", s.EndTime.UnixMilli()),
 		Attributes: s.Attributes,
 		Children:   encodeChildren(s.Children),
 	}
