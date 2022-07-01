@@ -9,7 +9,8 @@ Our web interface makes it easier to visualize your traces and add assertions, b
 Here is a list of all available commands and how to use them:
 
 ### Configure
-Configure your CLI to connect to your tracetest server
+Configure your CLI to connect to your Tracetest server.
+
 
 **How to Use**: 
 
