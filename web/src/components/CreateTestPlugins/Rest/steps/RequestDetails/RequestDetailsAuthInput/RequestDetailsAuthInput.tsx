@@ -1,13 +1,13 @@
 import {Form, FormInstance} from 'antd';
 import React from 'react';
-import {IRequestDetailsValues} from '../RequestDetails';
+import {TRequestAuth} from 'types/Test.types';
 import {apiKeyFields} from './apiKeyFields';
 import {basicFields} from './basicFields';
 import {bearerFields} from './bearerFields';
 import TypeInput from './TypeInput';
 
 interface IProps {
-  form: FormInstance<IRequestDetailsValues>;
+  form: FormInstance<{auth: TRequestAuth}>;
 }
 
 const RequestDetailsAuthInput = ({form}: IProps) => {

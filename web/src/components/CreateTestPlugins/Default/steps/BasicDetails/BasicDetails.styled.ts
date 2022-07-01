@@ -21,5 +21,6 @@ export const DemoContainer = styled.div`
 export const InputContainer = styled.div`
   display: grid;
   gap: 26px;
-  grid-template-columns: 50% 50%;
+  grid-template-columns: 55%;
+  justify-content: center;
 `;
