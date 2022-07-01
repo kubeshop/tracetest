@@ -22,6 +22,7 @@ export const Body = styled.div`
   display: flex;
   flex-direction: column;
   gap: 9px;
+  background-color: #fff;
 `;
 
 export const SpanCountText = styled(Typography.Text)`

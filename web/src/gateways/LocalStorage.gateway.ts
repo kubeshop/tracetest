@@ -1,4 +1,4 @@
-const LocalStorageService = <T>(defaultKey = '') => {
+const LocalStorageGateway = <T>(defaultKey = '') => {
   const localstorage = window.localStorage;
 
   return {
@@ -15,4 +15,4 @@ const LocalStorageService = <T>(defaultKey = '') => {
   };
 };
 
-export default LocalStorageService;
+export default LocalStorageGateway;

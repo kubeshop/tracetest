@@ -126,6 +126,13 @@ const SelectorService = () => ({
       return Promise.resolve(true);
     return Promise.reject(new Error('Selector already exists'));
   },
+
+  getIsAdvancedSelector(selector: string): boolean {
+    const matches = (selector.match(/span\[/g) || []).length;
+    const hasOrOperator = selector.includes('],');
+
+    return matches > 1 || hasOrOperator;
+  },
 });
 
 export default SelectorService();

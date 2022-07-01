@@ -1,5 +1,5 @@
 import AssertionForm from 'components/AssertionForm';
-import {useAssertionForm} from 'components/AssertionForm/AssertionFormProvider';
+import {useAssertionForm} from 'components/AssertionForm/AssertionForm.provider';
 import LoadingSpinner from 'components/LoadingSpinner';
 import TestResults from 'components/TestResults';
 import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';

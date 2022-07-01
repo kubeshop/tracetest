@@ -1,6 +1,8 @@
-import {createSlice} from '@reduxjs/toolkit';
+import {createAction, createSlice} from '@reduxjs/toolkit';
 import {TAssertionResults} from 'types/Assertion.types';
 import {ITestDefinitionState, TTestDefinitionEntry, TTestDefinitionSliceActions} from 'types/TestDefinition.types';
+import {ResultViewModes} from 'constants/Test.constants';
+import UserPreferencesService from 'services/UserPreferences.service';
 import TestDefinitionActions from '../actions/TestDefinition.actions';
 
 export const initialState: ITestDefinitionState = {
@@ -11,17 +13,29 @@ export const initialState: ITestDefinitionState = {
   isInitialized: false,
   selectedAssertion: '',
   isDraftMode: false,
+  viewResultsMode: UserPreferencesService.getUserPreference('viewResultsMode'),
 };
 
 export const assertionResultsToDefinitionList = (assertionResults: TAssertionResults): TTestDefinitionEntry[] => {
-  return assertionResults.resultList.map(({selector, resultList}) => ({
+  return assertionResults.resultList.map(({selector, resultList, isAdvancedSelector}) => ({
     isDraft: false,
     isDeleted: false,
     selector,
     originalSelector: selector,
     assertionList: resultList.flatMap(({assertion}) => [assertion]),
+    isAdvancedSelector,
   }));
 };
+
+export const setViewResultsMode = createAction('testDefinition/setViewResultsMode', (mode: ResultViewModes) => {
+  UserPreferencesService.setPreference('viewResultsMode', mode);
+
+  return {
+    payload: {
+      mode,
+    },
+  };
+});
 
 const testDefinitionSlice = createSlice<ITestDefinitionState, TTestDefinitionSliceActions, 'testDefinition'>({
   name: 'testDefinition',
@@ -96,6 +110,9 @@ const testDefinitionSlice = createSlice<ITestDefinitionState, TTestDefinitionSli
   },
   extraReducers: builder => {
     builder
+      .addCase(setViewResultsMode, (state, {payload: {mode}}) => {
+        state.viewResultsMode = mode;
+      })
       .addCase(TestDefinitionActions.dryRun.fulfilled, (state, {payload}) => {
         state.assertionResults = payload;
       })

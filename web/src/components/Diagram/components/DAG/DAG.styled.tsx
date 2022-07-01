@@ -45,9 +45,16 @@ export const ZoomButton = styled(Button)`
   }
 `;
 
-export const ToggleButton = styled(ZoomButton)``;
+export const ToggleButton = styled(ZoomButton)`
+  color: #61175e;
+
+  &:hover,
+  &:focus {
+    color: #61175e;
+  }
+`;
 
 export const FocusedText = styled(Typography.Text)`
-  color: rgba(3, 24, 73, 0.3);
+  color: #61175e;
   margin-left: 8px;
 `;

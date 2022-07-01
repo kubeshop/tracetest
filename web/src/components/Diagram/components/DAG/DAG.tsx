@@ -12,7 +12,7 @@ import SpanNode from './SpanNode';
 /** Important to define the nodeTypes outside of the component to prevent re-renderings */
 const nodeTypes = {span: SpanNode};
 
-const DAG = ({affectedSpans, onSelectSpan}: IDiagramComponentProps) => {
+const DAG = ({affectedSpans}: IDiagramComponentProps) => {
   const {edges, nodes, onNodesChange, onNodeClick} = useDAG();
 
   return (
@@ -21,7 +21,7 @@ const DAG = ({affectedSpans, onSelectSpan}: IDiagramComponentProps) => {
       $showAffected={affectedSpans.length > 0}
       data-cy="diagram-dag"
     >
-      <Controls onSelectSpan={onSelectSpan!} />
+      <Controls />
       <ReactFlow
         edges={edges}
         nodes={nodes}
