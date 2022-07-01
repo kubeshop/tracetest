@@ -19,7 +19,8 @@ extra_css:
 
 nav:
   - Welcome: index.md
-  - Introduction: introduction.md
+  - Introduction: 
+    - Introduction: introduction.md
     - Architecture: architecture.md
   - Getting Started: 
     - Installation: installing.md
