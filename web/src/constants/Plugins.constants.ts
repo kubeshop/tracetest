@@ -47,6 +47,22 @@ const Rest: IPlugin = {
   ],
 };
 
+const RPC: IPlugin = {
+  name: SupportedPlugins.RPC,
+  title: 'RPC Request',
+  description: 'Test and debug your RPC request',
+  isActive: false,
+  stepList: [
+    ...Default.stepList,
+    {
+      id: 'request-details',
+      name: 'Request Details',
+      title: 'Provide additional information',
+      component: 'RequestDetails',
+    },
+  ],
+};
+
 const Messaging: IPlugin = {
   name: SupportedPlugins.Messaging,
   title: 'Message Queue',
@@ -55,16 +71,8 @@ const Messaging: IPlugin = {
   stepList: [],
 };
 
-const RPC: IPlugin = {
-  name: SupportedPlugins.RPC,
-  title: 'RPC Request',
-  description: 'Test and debug your RPC request',
-  isActive: false,
-  stepList: [],
-};
-
 const Postman: IPlugin = {
-  name: SupportedPlugins.RPC,
+  name: SupportedPlugins.Postman,
   title: 'Postman Collection',
   description: 'Define your HTTP Request via a Postman Collection',
   isActive: false,
@@ -72,7 +80,7 @@ const Postman: IPlugin = {
 };
 
 const OpenAPI: IPlugin = {
-  name: SupportedPlugins.RPC,
+  name: SupportedPlugins.OpenAPI,
   title: 'OpenAPI',
   description: 'Define your HTTP request via an OpenAPI definition',
   isActive: false,
@@ -81,8 +89,8 @@ const OpenAPI: IPlugin = {
 
 export const Plugins: Record<SupportedPlugins, IPlugin> = {
   [SupportedPlugins.REST]: Rest,
-  [SupportedPlugins.Messaging]: Messaging,
   [SupportedPlugins.RPC]: RPC,
+  [SupportedPlugins.Messaging]: Messaging,
   [SupportedPlugins.Postman]: Postman,
   [SupportedPlugins.OpenAPI]: OpenAPI,
 };

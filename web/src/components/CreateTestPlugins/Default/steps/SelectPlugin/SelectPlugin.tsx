@@ -1,4 +1,4 @@
-import {useCallback, useState} from 'react';
+import {useCallback} from 'react';
 import PluginCard from 'components/PluginCard';
 import {useCreateTest} from 'providers/CreateTest/CreateTest.provider';
 import {Plugins} from 'constants/Plugins.constants';
@@ -10,13 +10,10 @@ const pluginList = Object.values(Plugins);
 
 const SelectPlugin = () => {
   const {onUpdatePlugin, pluginName, onNext} = useCreateTest();
-  const [selectedPlugin, setSelectedPlugin] = useState(pluginName);
 
   const handleNext = useCallback(() => {
-    const plugin = pluginList.find(({name}) => name === selectedPlugin)!;
-    onUpdatePlugin(plugin);
     onNext();
-  }, [onNext, onUpdatePlugin, selectedPlugin]);
+  }, [onNext]);
 
   return (
     <Step.Step>
@@ -27,8 +24,8 @@ const SelectPlugin = () => {
             <PluginCard
               plugin={plugin}
               key={plugin.name}
-              onSelect={({name}) => setSelectedPlugin(name)}
-              isSelected={selectedPlugin === plugin.name}
+              onSelect={onUpdatePlugin}
+              isSelected={pluginName === plugin.name}
             />
           ))}
         </S.PluginCardList>

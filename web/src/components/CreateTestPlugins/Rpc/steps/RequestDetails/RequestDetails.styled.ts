@@ -1,3 +1,4 @@
+import {Button} from 'antd';
 import styled, {createGlobalStyle} from 'styled-components';
 
 export const GlobalStyle = createGlobalStyle`
@@ -17,8 +18,14 @@ export const GlobalStyle = createGlobalStyle`
 export const InputContainer = styled.div`
   display: grid;
   gap: 26px;
-  grid-template-columns: 55%;
-  justify-content: center;
+  grid-template-columns: 50%;
+  justify-content: start;
+`;
+
+export const DoubleInputContainer = styled(InputContainer)`
+  display: grid;
+  gap: 26px;
+  grid-template-columns: 50% 50%;
 `;
 
 export const Row = styled.div`
@@ -34,4 +41,11 @@ export const HeaderContainer = styled.div`
   align-items: center;
   display: flex;
   margin-bottom: 8px;
+`;
+
+export const UploadButton = styled(Button).attrs({
+  type: 'primary',
+  ghost: true,
+})`
+  width: 490px;
 `;

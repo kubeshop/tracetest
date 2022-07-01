@@ -6,12 +6,12 @@ import * as S from './CreateTest.styled';
 
 const CreateTestContent: React.FC = () => {
   const navigate = useNavigate();
-  const {stepList, activeStep, pluginName, onGoTo} = useCreateTest();
+  const {stepList, activeStep, pluginName, onGoTo, isLoading} = useCreateTest();
 
   return (
     <S.Wrapper>
       <CreateTestHeader onBack={() => navigate('/')} />
-      <CreateTestSteps onGoTo={onGoTo} stepList={stepList} selectedKey={activeStep} pluginName={pluginName} />
+      <CreateTestSteps isLoading={isLoading} onGoTo={onGoTo} stepList={stepList} selectedKey={activeStep} pluginName={pluginName} />
     </S.Wrapper>
   );
 };
