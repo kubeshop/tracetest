@@ -21,7 +21,7 @@ nav:
   - Welcome: index.md
   - Introduction: introduction.md
     - Architecture: architecture.md
-  - Getting Started: getting-started.md
+  - Getting Started: 
     - Installation: installing.md
     - Accessing Tracetest Dashboard: accessing-dashboard.md
   - Using Tracetest:
@@ -29,7 +29,6 @@ nav:
     - Adding Assertions: adding-assertions.md
     - Versioning: versioning.md
   - Automating Tests for CI/CD:
-    - CI/CD Overview: ci-cd-overview.md
     - Command Line Tool: command-line-tool.md
     - Test Definition File: test-definition-file.md
     - Specifying Selectors: advanced-selectors.md
