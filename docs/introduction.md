@@ -19,7 +19,8 @@ Traces are comprised of spans. A span represents a single operation in a trace. 
 
 A span contains the data about the operation it represents. This data includes:
 
-- The span name
+- The span name.
+
 - Start and end timestamp
 - List of events (if instrumented)
 - Attributes
