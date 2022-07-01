@@ -21,12 +21,12 @@ func TestConversionBetweenNanoSecondsToDuration(t *testing.T) {
 		{
 			Name:           "should convert microseconds",
 			Input:          93000,
-			ExpectedOutput: "93μs",
+			ExpectedOutput: "93us",
 		},
 		{
 			Name:           "should not render decimals when time is in microseconds",
 			Input:          93400,
-			ExpectedOutput: "93μs",
+			ExpectedOutput: "93us",
 		},
 		{
 			Name:           "should convert milliseconds",
@@ -100,13 +100,13 @@ func TestConversionBetweenDurationToNanoSeconds(t *testing.T) {
 			ExpectedOutput: 120,
 		},
 		{
-			Name:           "should convert μs",
-			Input:          "35μs",
+			Name:           "should convert us",
+			Input:          "35us",
 			ExpectedOutput: 35000,
 		},
 		{
-			Name:           "should convert μs with decimal",
-			Input:          "35.8μs",
+			Name:           "should convert us with decimal",
+			Input:          "35.8us",
 			ExpectedOutput: 35800,
 		},
 		{

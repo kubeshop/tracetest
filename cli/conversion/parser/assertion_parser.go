@@ -25,7 +25,7 @@ var languageLexer = lexer.MustStateful(lexer.Rules{
 		{Name: "Operator", Pattern: `!=|<=|>=|=|<|>|contains`},
 		{Name: "Attribute", Pattern: `[a-zA-Z_][a-zA-Z0-9_\.]*`},
 		{Name: "whitespace", Pattern: `\s+`, Action: nil},
-		{Name: "Duration", Pattern: `([0-9]+(\.[0-9]+)?)(ns|μs|ms|s|m|h)`},
+		{Name: "Duration", Pattern: `([0-9]+(\.[0-9]+)?)(ns|us|ms|s|m|h)`},
 		{Name: "Number", Pattern: `([0-9]+(\.[0-9]+)?)`},
 		{Name: "QuotedString", Pattern: `".*`, Action: lexer.Push("QuotedString")},
 		{Name: "SingleQuotedString", Pattern: `'.*`, Action: lexer.Push("SingleQuotedString")},

@@ -17,7 +17,7 @@ const (
 	HOUR_SCALE        = 5
 )
 
-var timeUnits = []string{"ns", "μs", "ms", "s", "m", "h"}
+var timeUnits = []string{"ns", "us", "ms", "s", "m", "h"}
 
 func ConvertNanoSecondsIntoProperTimeUnit(value int) string {
 	// Scale is basically how many times we can divide value by 1000.
@@ -67,10 +67,10 @@ func isWholeNumber(number float64) bool {
 	return math.Mod(number, 1.0) == 0
 }
 
-var timeFieldRegex = regexp.MustCompile(`^([0-9]+(\.[0-9]+)?)(ns|μs|ms|s|m|h)$`)
+var timeFieldRegex = regexp.MustCompile(`^([0-9]+(\.[0-9]+)?)(ns|us|ms|s|m|h)$`)
 var unitScale = map[string]time.Duration{
 	"ns": time.Nanosecond,
-	"μs": time.Microsecond,
+	"us": time.Microsecond,
 	"ms": time.Millisecond,
 	"s":  time.Second,
 	"m":  time.Minute,

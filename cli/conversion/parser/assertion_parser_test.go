@@ -142,11 +142,11 @@ func TestParseAssertion(t *testing.T) {
 		},
 		{
 			Name:  "should_parse_microsecond_duration",
-			Query: `tracetest.span.duration <= 100μs`,
+			Query: `tracetest.span.duration <= 100us`,
 			ExpectedOutput: parser.Assertion{
 				Attribute: "tracetest.span.duration",
 				Operator:  "<=",
-				Value:     "100μs",
+				Value:     "100us",
 			},
 		},
 		{
