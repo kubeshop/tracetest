@@ -42,7 +42,7 @@ const DAGProvider = ({children, spans}: IProps) => {
     dispatch(initNodes({spans}));
     const firstSpan = spans.find(span => !span.parentId);
     onSelectSpan(firstSpan?.id ?? '');
-  }, [dispatch, spans]);
+  }, [dispatch, onSelectSpan, spans]);
 
   const onNodesChange = useCallback((changes: NodeChange[]) => dispatch(onNodesChangeAction({changes})), [dispatch]);
 

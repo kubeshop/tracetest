@@ -8,6 +8,10 @@ export const Container = styled.div`
   > .react-flow {
     height: calc(100% - 76px);
   }
+
+  .react-flow__attribution {
+    visibility: hidden;
+  }
 `;
 
 export const SkeletonDiagramMessage = styled.div`
