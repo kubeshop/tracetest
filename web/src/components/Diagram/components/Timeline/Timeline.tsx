@@ -164,7 +164,7 @@ const Timeline = ({affectedSpans, spanList, selectedSpan, onSelectSpan}: IDiagra
         return scaleTime(Number(d.data.startTime || minNano) - minNano);
       })
       .attr('width', d => {
-        return scaleTime(d.data.data.duration) - 250;
+        return Number(d.data.endTime) - Number(d.data.startTime);
       })
       .attr('fill', e => {
         const span: TSpan = e.data.data;
