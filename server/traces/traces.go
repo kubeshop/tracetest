@@ -174,8 +174,8 @@ func (s *Span) decodeSpan(aux encodedSpan) error {
 
 	s.ID = sid
 	s.Name = aux.Name
-	s.StartTime = startTime
-	s.EndTime = endTime
+	s.StartTime = startTime.UTC()
+	s.EndTime = endTime.UTC()
 	s.Attributes = aux.Attributes
 	s.Children = children
 
@@ -183,7 +183,7 @@ func (s *Span) decodeSpan(aux encodedSpan) error {
 }
 
 func getTimeFromString(value string) (time.Time, error) {
-	nanoSeconds, err := strconv.Atoi(value)
+	milliseconds, err := strconv.Atoi(value)
 	if err != nil {
 		// Maybe it is in RFC3339 format. Convert it for compatibility sake
 		output, err := time.Parse(time.RFC3339, value)
@@ -194,7 +194,7 @@ func getTimeFromString(value string) (time.Time, error) {
 		return output, nil
 	}
 
-	return time.Unix(0, int64(nanoSeconds)), nil
+	return time.UnixMilli(int64(milliseconds)), nil
 }
 
 func decodeChildren(parent *Span, children []encodedSpan) ([]*Span, error) {

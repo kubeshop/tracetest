@@ -86,6 +86,17 @@ func TestUpdateRun(t *testing.T) {
 	actual, err := db.GetRun(context.TODO(), run.ID)
 	require.NoError(t, err)
 
+	updatedList, err := db.GetTestRuns(context.TODO(), test, 20, 0)
+	require.NoError(t, err)
+
+	// Ignore time fields in this test
+	actual.Trace.RootSpan.StartTime = time.Time{}
+	actual.Trace.RootSpan.EndTime = time.Time{}
+
+	runFromList := updatedList[0]
+	runFromList.Trace.RootSpan.StartTime = time.Time{}
+	runFromList.Trace.RootSpan.EndTime = time.Time{}
+
 	assert.Equal(t, run.SpanID.String(), actual.SpanID.String())
 	assert.Equal(t, run.CreatedAt.Unix(), actual.CreatedAt.Unix())
 	assert.Equal(t, run.Request, actual.Request)
@@ -93,7 +104,5 @@ func TestUpdateRun(t *testing.T) {
 	assert.Equal(t, run.Trace, actual.Trace)
 	assert.Equal(t, run.Results, actual.Results)
 
-	updatedList, err := db.GetTestRuns(context.TODO(), test, 20, 0)
-	require.NoError(t, err)
-	assert.Equal(t, actual, updatedList[0])
+	assert.Equal(t, actual, runFromList)
 }
