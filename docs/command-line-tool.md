@@ -35,6 +35,8 @@ Allows you to run a test by referencing a [test definition file](/docs/test-defi
 
 > Note: if your definition file contain the field `id`, this command will not create a new test. Instead, it will update the test with that id. In case that test doesn't exist, a new one will be created with that id on your server.
 
+Every time you run the test, we detect changes, and if any change is introduced, we use our [versioning](/docs/versioning.md) mechanism to ensure that it will not cause problems with your old test runs.
+
 **How to use**:
 
 ```sh
