@@ -14,7 +14,8 @@ A Distributed Trace, more commonly known as a Trace, records the paths taken by 
 
 Traces are comprised of spans. A span represents a single operation in a trace. Spans are nested, typically with a parent child relationship to form a deeply nested tree.
 
-### What data do Spans contain?
+### What Data do Spans Contain?
+
 
 A span contains the data about the operation it represents. This data includes:
 
