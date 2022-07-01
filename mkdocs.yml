@@ -20,7 +20,7 @@ extra_css:
 nav:
   - Welcome: index.md
   - Introduction: 
-    - Introduction: introduction.md
+    - Introduction to Trace-Based Testing: introduction.md
     - Architecture: architecture.md
   - Getting Started: 
     - Installation: installing.md
