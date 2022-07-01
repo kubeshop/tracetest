@@ -4,7 +4,7 @@ import {endpoints} from 'redux/apis/TraceTest.api';
 import {RootState} from 'redux/store';
 import SpanAttributeService from '../services/SpanAttribute.service';
 import {TSpanSelector} from '../types/Assertion.types';
-import {selectAffectedSpans} from './Span.selectors';
+import SpanSelectors from './Span.selectors';
 
 const stateSelector = (state: RootState) => state;
 const paramsSelector = (state: RootState, testId: string, runId: string, spanIdList: string[]) => ({
@@ -31,7 +31,7 @@ const selectAffectedSpanList = createSelector(stateSelector, paramsSelector, (st
 const AssertionSelectors = () => {
   return {
     selectAffectedSpanList,
-    selectAttributeList: createSelector(selectAffectedSpanList, selectAffectedSpans, (spanList, affectedSpans) => spanList.flatMap(span => span.attributeList).concat(SpanAttributeService.additionalAttributes(affectedSpans.length))),
+    selectAttributeList: createSelector(selectAffectedSpanList, SpanSelectors.selectAffectedSpans, (spanList, affectedSpans) => spanList.flatMap(span => span.attributeList).concat(SpanAttributeService.getPseudoAttributeList(affectedSpans.length))),
     selectSelectorAttributeList: createSelector(
       selectAffectedSpanList,
       currentSelectorListSelector,

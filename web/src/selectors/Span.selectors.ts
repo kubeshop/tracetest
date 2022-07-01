@@ -4,7 +4,7 @@ import {RootState} from 'redux/store';
 const spansStateSelector = (state: RootState) => state.spans;
 const stateSelector = (state: RootState) => state;
 
-export const selectAffectedSpans = createSelector(
+const selectAffectedSpans = createSelector(
   spansStateSelector,
   stateSelector,
   ({affectedSpans}, {testDefinition: {assertionResults, selectedAssertion}}) => {

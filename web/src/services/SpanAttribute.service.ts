@@ -37,7 +37,7 @@ const getCustomAttributeList = (attributeList: TSpanFlatAttribute[]) => {
 };
 
 const SpanAttributeService = () => ({
-  additionalAttributes: (count: number): TSpanFlatAttribute[] => [{key: 'tracetest.selected_spans.count', value: count.toString()}],
+  getPseudoAttributeList: (count: number): TSpanFlatAttribute[] => [{key: TraceTestAttributes.TRACETEST_SELECTED_SPANS_COUNT, value: count.toString()}],
   getSpanAttributeSectionsList(
     attributeList: TSpanFlatAttribute[],
     type: SemanticGroupNames
