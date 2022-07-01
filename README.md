@@ -52,7 +52,7 @@ Once the test is built, it can be run automatically as part of a build process. 
 
 <div style="text-align:center;"><img src="/assets/creatingatestdiagram.gif"></div>
 
-# Try the demo & give us feedback
+# Try the demo & give us feedback!
 
 We have a live demo environment with a couple systems you can test against. Use the 'Try The Demo' button below to launch it. You will need to know the urls you can test against - here are some examples that work:
 
