@@ -48,7 +48,8 @@ In Tracetest, an assertion is comprised of two parts:
 A selector contains criteria to limit the scope of the spans from a trace that we wish to assert against. A selector can be very narrow, only selecting on one span, or very wide, selecting all spans or all spans of a certain type or other characteristics. Underlying this capability is a [selector language](/docs/installing.md).
 
 
-### What is a check?
+### What is a Check?
+
 
 A check is a logical verification that will be performed on all spans that match the selector. It is comprised of an attribute, a comparison operator, and a value.
 
