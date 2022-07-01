@@ -34,7 +34,8 @@ Attributes are a key-value pair, and they contain information about the operatio
 ## What is an Assertion?
 
 
-In Tracetest an assertion is comprised of two parts:
+In Tracetest, an assertion is comprised of two parts:
+
 
 - Selector
 - Checks
