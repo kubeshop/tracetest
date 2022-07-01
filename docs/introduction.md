@@ -42,6 +42,7 @@ A selector contains criteria to limit the scope of the spans from a trace that w
 
 A check is a logical verification that will be performed on all spans that match the selector. It is comprised of an attribute, a comparison operator, and a value.
 
-### What is a span signature?
+### What is a Span Signature?
+
 
 A span signature is an automatically computed selector that has enough elements to specify a single span. It uses a combination of attributes in the selected span to automatically build the selector. If a trace has multiple spans that are almost identical, the span signature may still match more than one span. You can alter the selector in this case to be more specific by adding other attributes or specifying an ancestor span.
