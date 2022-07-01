@@ -8,6 +8,7 @@ export const TraceTestAttributes = {
   TRACETEST_RESPONSE_STATUS: 'tracetest.response.status',
   TRACETEST_RESPONSE_BODY: 'tracetest.response.body',
   TRACETEST_RESPONSE_HEADERS: 'tracetest.response.headers',
+  TRACETEST_SELECTED_SPANS_COUNT: 'tracetest.selected_spans.count'
 };
 
 export const Attributes = {

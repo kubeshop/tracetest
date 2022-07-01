@@ -1,4 +1,3 @@
-import {isEmpty, remove} from 'lodash';
 import {SemanticGroupNames} from 'constants/SemanticGroupNames.constants';
 import {
   SectionNames,
@@ -7,6 +6,7 @@ import {
   SpanAttributeSections,
 } from 'constants/Span.constants';
 import {Attributes, TraceTestAttributes} from 'constants/SpanAttribute.constants';
+import {isEmpty, remove} from 'lodash';
 import {TSpanFlatAttribute} from 'types/Span.types';
 import {isJson} from 'utils/Common';
 
@@ -37,10 +37,11 @@ const getCustomAttributeList = (attributeList: TSpanFlatAttribute[]) => {
 };
 
 const SpanAttributeService = () => ({
+  getPseudoAttributeList: (count: number): TSpanFlatAttribute[] => [{key: TraceTestAttributes.TRACETEST_SELECTED_SPANS_COUNT, value: count.toString()}],
   getSpanAttributeSectionsList(
     attributeList: TSpanFlatAttribute[],
     type: SemanticGroupNames
-  ): {section: string; attributeList: TSpanFlatAttribute[]}[] {
+  ): { section: string; attributeList: TSpanFlatAttribute[] }[] {
     const sections = SpanAttributeSections[type] || {};
     const defaultSectionList = [
       {
@@ -53,7 +54,7 @@ const SpanAttributeService = () => ({
       },
     ];
 
-    const sectionList = Object.entries(sections).reduce<{section: string; attributeList: TSpanFlatAttribute[]}[]>(
+    const sectionList = Object.entries(sections).reduce<{ section: string; attributeList: TSpanFlatAttribute[] }[]>(
       (list, [key, attrKeyList]) =>
         list.concat([{section: key, attributeList: filterAttributeList(attributeList, attrKeyList)}]),
       []
@@ -71,9 +72,7 @@ const SpanAttributeService = () => ({
     const blackListFiltered = removeFromAttributeList(whiteListFiltered, SelectorAttributesBlackList);
     const customList = getCustomAttributeList(attributeList);
 
-    const parsedList = blackListFiltered.concat(customList).filter(attr => !isJson(attr.value) && !isEmpty(attr));
-
-    return parsedList;
+    return blackListFiltered.concat(customList).filter(attr => !isJson(attr.value) && !isEmpty(attr));
   },
 });
 
