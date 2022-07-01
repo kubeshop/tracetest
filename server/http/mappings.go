@@ -212,8 +212,8 @@ func (m OpenAPIMapper) Span(in traces.Span) openapi.Span {
 	return openapi.Span{
 		Id:         in.ID.String(),
 		ParentId:   parentID,
-		StartTime:  int32(in.StartTime.UnixMilli()),
-		EndTime:    int32(in.EndTime.UnixMilli()),
+		StartTime:  in.StartTime.UnixMilli(),
+		EndTime:    in.EndTime.UnixMilli(),
 		Attributes: attributes,
 		Children:   m.Spans(in.Children),
 	}

@@ -44,8 +44,8 @@ func TestJSONEncoding(t *testing.T) {
 		"RootSpan": {
 			"ID": "%s",
 			"Name":"root",
-			"StartTime":"%s",
-			"EndTime":"%s",
+			"StartTime":"%d",
+			"EndTime":"%d",
 			"Attributes": {
 				"service.name": "root"
 			},
@@ -53,16 +53,16 @@ func TestJSONEncoding(t *testing.T) {
 				{
 					"ID": "%s",
 					"Name":"subSpan1",
-					"StartTime":"%s",
-					"EndTime":"%s",
+					"StartTime":"%d",
+					"EndTime":"%d",
 					"Attributes": {
 						"service.name": "subSpan1"
 					},
 					"Children": [
 						{
 							"ID": "%s",
-							"StartTime":"%s",
-							"EndTime":"%s",
+							"StartTime":"%d",
+							"EndTime":"%d",
 							"Name":"subSubSpan1",
 							"Attributes": {
 								"service.name": "subSubSpan1"
@@ -74,8 +74,8 @@ func TestJSONEncoding(t *testing.T) {
 				{
 					"ID": "%s",
 					"Name":"subSpan2",
-					"StartTime":"%s",
-					"EndTime":"%s",
+					"StartTime":"%d",
+					"EndTime":"%d",
 					"Attributes": {
 						"service.name": "subSpan2"
 					},
@@ -87,20 +87,20 @@ func TestJSONEncoding(t *testing.T) {
 		tid.String(),
 
 		rootSpan.ID.String(),
-		rootSpan.StartTime.Format(time.RFC3339),
-		rootSpan.EndTime.Format(time.RFC3339),
+		rootSpan.StartTime.UnixMilli(),
+		rootSpan.EndTime.UnixMilli(),
 
 		subSpan1.ID.String(),
-		subSpan1.StartTime.Format(time.RFC3339),
-		subSpan1.EndTime.Format(time.RFC3339),
+		subSpan1.StartTime.UnixMilli(),
+		subSpan1.EndTime.UnixMilli(),
 
 		subSubSpan1.ID.String(),
-		subSubSpan1.StartTime.Format(time.RFC3339),
-		subSubSpan1.EndTime.Format(time.RFC3339),
+		subSubSpan1.StartTime.UnixMilli(),
+		subSubSpan1.EndTime.UnixMilli(),
 
 		subSpan2.ID.String(),
-		subSpan2.StartTime.Format(time.RFC3339),
-		subSpan2.EndTime.Format(time.RFC3339),
+		subSpan2.StartTime.UnixMilli(),
+		subSpan2.EndTime.UnixMilli(),
 	)
 
 	t.Run("encode", func(t *testing.T) {
