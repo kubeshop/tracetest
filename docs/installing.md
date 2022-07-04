@@ -25,16 +25,14 @@ curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/setup.sh | bas
 
 This command will install Tracetest using the default settings. You can configure the following options:
 
-
 | Option                   | description                                  | Default value      |
-|--------------------------|----------------------------------------------|--------------------|
+| ------------------------ | -------------------------------------------- | ------------------ |
 | --help                   | show help message                            | n/a                |
 | --namespace              | target installation k8s namespace            | tracetest          |
 | --trace-backend          | trace backend (jaeger or tempo)              | jaeger             |
 | --trace-backend-endpoint | trace backend endpoint                       | jaeger-query:16685 |
 | --skip-pma               | if set, don't install the sample application | n/a                |
 | --skip-backend           | if set, don't install the jaeger backend     | n/a                |
-
 
 Example with custom options:
 
@@ -68,7 +66,6 @@ helm install tracetest kubeshop/tracetest \
 
 Tracetest uses [Grafana Tempo's Server's `9095` port](https://grafana.com/docs/tempo/latest/configuration/#server) to find Traces using gRPC protocol.
 
-
 The commands below will install the Tracetest application connecting to the Grafana Tempo tracing backend on `grafana-tempo:9095`:
 
 ```sh
@@ -80,6 +77,10 @@ helm install tracetest kubeshop/tracetest \
   --set tracingBackend=tempo \
   --set tempoConnectionConfig.endpoint="grafana-tempo:9095"  # update this value to point to your tempo install
 ```
+
+### **Have a different backend trace data store?**
+
+[Tell us](https://github.com/kubeshop/tracetest/issues/new?assignees=&labels=&template=feature_request.md&title=) which one you have and we will see if we can add support for it!
 
 ## **Uninstallation**
 
