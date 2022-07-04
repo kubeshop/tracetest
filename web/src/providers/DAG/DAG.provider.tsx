@@ -1,5 +1,5 @@
 import {noop} from 'lodash';
-import {createContext, useCallback, useContext, useEffect, useMemo, MouseEvent} from 'react';
+import {createContext, MouseEvent, useCallback, useContext, useEffect, useMemo, useState} from 'react';
 import {Edge, Node, NodeChange} from 'react-flow-renderer';
 
 import {useSpan} from 'providers/Span/Span.provider';
@@ -13,14 +13,18 @@ const {onClickSpan} = TraceDiagramAnalyticsService;
 
 interface IContext {
   edges: Edge[];
+  isMiniMapActive: boolean;
   nodes: Node[];
+  onMiniMapToggle(): void;
   onNodesChange(changes: NodeChange[]): void;
   onNodeClick(event: MouseEvent, node: Node): void;
 }
 
 const DagContext = createContext<IContext>({
   edges: [],
+  isMiniMapActive: false,
   nodes: [],
+  onMiniMapToggle: noop,
   onNodesChange: noop,
   onNodeClick: noop,
 });
@@ -36,6 +40,7 @@ const DAGProvider = ({children, spans}: IProps) => {
   const dispatch = useAppDispatch();
   const edges = useAppSelector(DAGSelectors.selectEdges);
   const nodes = useAppSelector(DAGSelectors.selectNodes);
+  const [isMiniMapActive, setIsMiniMapActive] = useState(false);
   const {onSelectSpan} = useSpan();
 
   useEffect(() => {
@@ -43,6 +48,10 @@ const DAGProvider = ({children, spans}: IProps) => {
     const firstSpan = spans.find(span => !span.parentId);
     onSelectSpan(firstSpan?.id ?? '');
   }, [dispatch, onSelectSpan, spans]);
+
+  const onMiniMapToggle = useCallback(() => {
+    setIsMiniMapActive(isActive => !isActive);
+  }, []);
 
   const onNodesChange = useCallback((changes: NodeChange[]) => dispatch(onNodesChangeAction({changes})), [dispatch]);
 
@@ -57,11 +66,13 @@ const DAGProvider = ({children, spans}: IProps) => {
   const value = useMemo(
     () => ({
       edges,
+      isMiniMapActive,
       nodes,
+      onMiniMapToggle,
       onNodesChange,
       onNodeClick,
     }),
-    [edges, nodes, onNodesChange, onNodeClick]
+    [edges, isMiniMapActive, nodes, onMiniMapToggle, onNodesChange, onNodeClick]
   );
 
   return <DagContext.Provider value={value}>{children}</DagContext.Provider>;

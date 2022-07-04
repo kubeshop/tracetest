@@ -72,9 +72,7 @@ const Header: React.FC<IProps> = ({run: {createdAt}, assertionResults, isDisable
       <S.Row>
         <Tooltip
           color="#FBFBFF"
-          title={`
-            You can decided wether you want to see the results using the key-value (wizard) mode or the query language. 
-            `}
+          title="You can decide whether you want to see the results using the key-value (wizard) mode or the query language (advanced)."
         >
           <Switch
             disabled={isDisabled}

@@ -1,5 +1,4 @@
-import React from 'react';
-import ReactFlow from 'react-flow-renderer';
+import ReactFlow, {MiniMap} from 'react-flow-renderer';
 
 import {IDiagramComponentProps} from 'components/Diagram/Diagram';
 import {Steps} from 'components/GuidedTour/traceStepList';
@@ -13,7 +12,7 @@ import SpanNode from './SpanNode';
 const nodeTypes = {span: SpanNode};
 
 const DAG = ({affectedSpans}: IDiagramComponentProps) => {
-  const {edges, nodes, onNodesChange, onNodeClick} = useDAG();
+  const {edges, isMiniMapActive, nodes, onMiniMapToggle, onNodesChange, onNodeClick} = useDAG();
 
   return (
     <S.Container
@@ -21,7 +20,7 @@ const DAG = ({affectedSpans}: IDiagramComponentProps) => {
       $showAffected={affectedSpans.length > 0}
       data-cy="diagram-dag"
     >
-      <Controls />
+      <Controls isMiniMapActive={isMiniMapActive} onMiniMapToggle={onMiniMapToggle} />
       <ReactFlow
         edges={edges}
         nodes={nodes}
@@ -33,7 +32,9 @@ const DAG = ({affectedSpans}: IDiagramComponentProps) => {
         onNodeClick={onNodeClick}
         onNodesChange={onNodesChange}
         selectionKeyCode={null}
-      />
+      >
+        {isMiniMapActive && <MiniMap />}
+      </ReactFlow>
     </S.Container>
   );
 };
