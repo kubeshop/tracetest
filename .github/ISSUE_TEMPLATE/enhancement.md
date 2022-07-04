@@ -2,7 +2,7 @@
 name: Enhancement
 about: Suggest an enhancement to existing functionality
 title: ''
-labels: ''
+labels: 'enhancement, triage'
 assignees: ''
 
 ---
