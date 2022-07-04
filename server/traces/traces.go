@@ -81,8 +81,6 @@ func (t Trace) MarshalJSON() ([]byte, error) {
 func flattenSpans(res map[trace.SpanID]*Span, root Span) {
 	rootPtr := &root
 
-	// We don't need the parent in the flat structure
-	rootPtr.Parent = nil
 	res[root.ID] = rootPtr
 	for _, child := range root.Children {
 		flattenSpans(res, *child)

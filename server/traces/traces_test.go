@@ -20,9 +20,13 @@ func TestJSONEncoding(t *testing.T) {
 	subSubSpan1 := createSpan("subSubSpan1")
 	subSpan2 := createSpan("subSpan2")
 
+	subSpan1.Parent = rootSpan
+	subSpan2.Parent = rootSpan
+	subSubSpan1.Parent = subSpan1
+
 	flat := map[trace.SpanID]*traces.Span{
-		// We copy those spans so they don't have children and parents injected into them
-		// the flat structure shouldn't have children nor parent.
+		// We copy those spans so they don't have children injected into them
+		// the flat structure shouldn't have children.
 		rootSpan.ID:    copySpan(rootSpan),
 		subSpan1.ID:    copySpan(subSpan1),
 		subSubSpan1.ID: copySpan(subSubSpan1),
@@ -30,11 +34,7 @@ func TestJSONEncoding(t *testing.T) {
 	}
 
 	rootSpan.Children = []*traces.Span{subSpan1, subSpan2}
-	subSpan1.Parent = rootSpan
-	subSpan2.Parent = rootSpan
-
 	subSpan1.Children = []*traces.Span{subSubSpan1}
-	subSubSpan1.Parent = subSpan1
 
 	tid := id.NewRandGenerator().TraceID()
 	trace := traces.Trace{
