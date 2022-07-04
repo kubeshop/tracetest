@@ -14,7 +14,7 @@ testDefinition:
   assertions:
   - tracetest.selected_spans.count = 1
   - tracetest.response.status = 204
-- selector: span[name = "query DELETE"]
+- selector: span[name = "exec DELETE"]
   assertions:
   # must delete test, definition, and runs. That's why we need 3 deletes
   - tracetest.selected_spans.count = 3

@@ -21,7 +21,7 @@ func dbSpanNameFormatter(ctx context.Context, method string, query string) strin
 		queryName = splitQuery[0]
 	}
 
-	method = strings.ReplaceAll(method, "\n", "")
+	queryName = strings.ReplaceAll(queryName, "\n", "")
 
 	return fmt.Sprintf("%s %s", method, queryName)
 }
