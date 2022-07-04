@@ -20,15 +20,6 @@ func TestJSONEncoding(t *testing.T) {
 	subSubSpan1 := createSpan("subSubSpan1")
 	subSpan2 := createSpan("subSpan2")
 
-	flat := map[trace.SpanID]*traces.Span{
-		// We copy those spans so they don't have children and parents injected into them
-		// the flat structure shouldn't have children nor parent.
-		rootSpan.ID:    copySpan(rootSpan),
-		subSpan1.ID:    copySpan(subSpan1),
-		subSubSpan1.ID: copySpan(subSubSpan1),
-		subSpan2.ID:    copySpan(subSpan2),
-	}
-
 	rootSpan.Children = []*traces.Span{subSpan1, subSpan2}
 	subSpan1.Parent = rootSpan
 	subSpan2.Parent = rootSpan
@@ -40,7 +31,12 @@ func TestJSONEncoding(t *testing.T) {
 	trace := traces.Trace{
 		ID:       tid,
 		RootSpan: *rootSpan,
-		Flat:     flat,
+		Flat: map[trace.SpanID]*traces.Span{
+			rootSpan.ID:    rootSpan,
+			subSpan1.ID:    subSpan1,
+			subSubSpan1.ID: subSubSpan1,
+			subSpan2.ID:    subSpan2,
+		},
 	}
 
 	jsonEncoded := fmt.Sprintf(`{
@@ -119,20 +115,10 @@ func TestJSONEncoding(t *testing.T) {
 		err := json.Unmarshal([]byte(jsonEncoded), &actual)
 		require.NoError(t, err)
 
-		// I've added more specific validations to be easier to find where the problem is
-		require.Equal(t, trace.ID, actual.ID)
-		require.Equal(t, trace.RootSpan, actual.RootSpan)
-		require.Equal(t, trace.Flat, actual.Flat)
+		fmt.Printf("%+v\n", actual.RootSpan.Children[0].Children[0])
 
-		// I left this as a guarantee we won't forget to change this test in case we add
-		// another attribute to our traces.
 		assert.Equal(t, trace, actual)
 	})
-}
-
-func copySpan(span *traces.Span) *traces.Span {
-	newSpan := *span
-	return &newSpan
 }
 
 func createSpan(name string) *traces.Span {
@@ -144,7 +130,6 @@ func createSpan(name string) *traces.Span {
 		Attributes: traces.Attributes{
 			"service.name": name,
 		},
-		Children: nil,
 	}
 }
 
