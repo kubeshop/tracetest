@@ -9,6 +9,7 @@ import (
 	"github.com/j2gg0s/otsql"
 	"github.com/j2gg0s/otsql/hook/trace"
 	pq "github.com/lib/pq"
+	"go.opentelemetry.io/otel/attribute"
 )
 
 type PostgresOption func(*postgresDB) error
@@ -19,6 +20,8 @@ func dbSpanNameFormatter(ctx context.Context, method string, query string) strin
 	if len(splitQuery) > 0 {
 		queryName = splitQuery[0]
 	}
+
+	method = strings.ReplaceAll(method, "\n", "")
 
 	return fmt.Sprintf("%s %s", method, queryName)
 }
@@ -37,6 +40,7 @@ func WithDSN(dsn string) PostgresOption {
 						trace.WithQueryParams(true),
 						trace.WithRowsAffected(true),
 						trace.WithSpanNameFormatter(dbSpanNameFormatter),
+						trace.WithDefaultAttributes(attribute.String("service.name", "tracetest")),
 					),
 				),
 			),
