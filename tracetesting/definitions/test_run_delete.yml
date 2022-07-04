@@ -13,3 +13,6 @@ testDefinition:
 - selector: span[name="DELETE /api/tests/{testId}/run/{runId}" tracetest.span.type="http"]
   assertions:
   - tracetest.response.status = 204
+- selector: span[name = "exec DELETE"]
+  assertions:
+  - tracetest.selected_spans.count = 1

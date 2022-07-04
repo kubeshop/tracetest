@@ -13,3 +13,12 @@ testDefinition:
 - selector: span[name="POST /api/tests/{testId}/run/{runId}/rerun" tracetest.span.type="http"]
   assertions:
   - tracetest.response.status = 200
+- selector: span[name = "exec INSERT"]
+  assertions:
+  - tracetest.selected_spans.count = 1
+- selector: span[name = "exec UPDATE"]
+  assertions:
+  - tracetest.selected_spans.count = 1
+- selector: span[name = "Execute assertions"]
+  assertions:
+  - tracetest.run.assertion_runner.all_assertions_passed = "true"
