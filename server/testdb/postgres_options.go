@@ -1,8 +1,10 @@
 package testdb
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
+	"strings"
 
 	"github.com/j2gg0s/otsql"
 	"github.com/j2gg0s/otsql/hook/trace"
@@ -10,6 +12,16 @@ import (
 )
 
 type PostgresOption func(*postgresDB) error
+
+func dbSpanNameFormatter(ctx context.Context, method string, query string) string {
+	splitQuery := strings.Split(query, " ")
+	queryName := ""
+	if len(splitQuery) > 0 {
+		queryName = splitQuery[0]
+	}
+
+	return fmt.Sprintf("%s %s", method, queryName)
+}
 
 func WithDSN(dsn string) PostgresOption {
 	return func(pd *postgresDB) error {
@@ -24,6 +36,7 @@ func WithDSN(dsn string) PostgresOption {
 						trace.WithQuery(true),
 						trace.WithQueryParams(true),
 						trace.WithRowsAffected(true),
+						trace.WithSpanNameFormatter(dbSpanNameFormatter),
 					),
 				),
 			),
