@@ -4,13 +4,9 @@ const getAttributeListId = (number: number) => `#assertion-form_assertionList_${
 const getComparatorListId = (number: number) => `#assertion-form_assertionList_${number}_comparator_list`;
 
 describe('Create Assertion', () => {
-  before(() => {
-    createTest();
-  });
+  before(() => createTest());
 
-  after(() => {
-    deleteTest();
-  });
+  after(() => deleteTest());
 
   it('should create a basic assertion', () => {
     cy.visit(`http://localhost:3000/test/${testId}`);
@@ -21,7 +17,7 @@ describe('Create Assertion', () => {
     cy.get(`[data-cy^=test-run-result-]`).first().click();
     cy.location('href').should('match', /\/run\/.*/i);
 
-    cy.get('[data-cy^=trace-node-]', {timeout: 10000}).should('be.visible');
+    cy.get('[data-cy^=trace-node-]', {timeout: 20000}).should('be.visible');
     cy.get(`[data-cy=trace-node-database]`, {timeout: 20000}).first().click();
 
     cy.get('[data-cy=add-assertion-button]').click();
@@ -76,6 +72,24 @@ describe('Create Assertion', () => {
       .last()
       .click();
     cy.get('[data-cy=assertion-check-operator] .ant-select-selection-item').last().should('have.text', 'Contains');
+
+    cy.get('[data-cy=add-assertion-form-add-check]').click();
+
+    cy.get('[data-cy=assertion-check-attribute]').last().type('duration');
+    cy.wait(500);
+    cy.get(`${getAttributeListId(2)} + div .ant-select-item`)
+      .first()
+      .click();
+
+    cy.get('[data-cy=assertion-check-operator]').last().click();
+    cy.get(`${getComparatorListId(2)} + div .ant-select-item`)
+      .last()
+      .click();
+
+    cy.get('[data-cy=assertion-check-value]').last().type('s');
+    cy.get('[data-cy=duration]').click();
+    cy.get(`[data-cy=duration-unit-μs]`).click();
+
     cy.get('[data-cy=assertion-form-submit-button]').click();
 
     cy.get('[data-cy=assertion-card-list]').should('be.visible');
@@ -88,7 +102,9 @@ describe('Create Assertion', () => {
     cy.get('[data-cy=assertion-form]', {timeout: 10000}).should('be.visible');
 
     cy.get('[data-cy=mode-selector-switch]').click();
-    cy.get('[data-cy=advanced-selector]').clear().type('span[tracetest.span.type = "http"] span[tracetest.span.type = "database"]:first');
+    cy.get('[data-cy=advanced-selector]')
+      .clear()
+      .type('span[tracetest.span.type = "http"] span[tracetest.span.type = "database"]:first');
 
     cy.get('[data-cy=assertion-check-attribute]').type('db');
     cy.wait(500);

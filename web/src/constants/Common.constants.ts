@@ -32,3 +32,5 @@ export enum HTTP_METHOD {
   PROPFIND = 'PROPFIND',
   VIEW = 'VIEW',
 }
+
+export const durationRegExp = /(\d+)(ns|μs|ms|s|m|h)/;
