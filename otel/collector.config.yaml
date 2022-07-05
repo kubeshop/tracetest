@@ -16,7 +16,7 @@ exporters:
   logging:
     logLevel: debug
   jaeger:
-    endpoint: jaeger:14250
+    endpoint: ${JAEGER_ENDPOINT}
     tls:
       insecure: true
 
