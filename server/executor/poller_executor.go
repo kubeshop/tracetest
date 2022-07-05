@@ -28,6 +28,10 @@ func (pe InstrumentedPollerExecutor) ExecuteRequest(request *PollingRequest) (bo
 	defer span.End()
 
 	finished, run, err := pe.pollerExecutor.ExecuteRequest(request)
+	if err != nil {
+		span.RecordError(err)
+		return finished, run, err
+	}
 
 	spanCount := len(run.Trace.Flat)
 
@@ -86,7 +90,7 @@ func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, m
 
 	err = pe.updater.Update(request.ctx, run)
 	if err != nil {
-		return false, model.Run{}, nil
+		return false, model.Run{}, err
 	}
 
 	return true, run, nil
