@@ -14,9 +14,4 @@ googleAnalytics:
 telemetry:
   serviceName: tracetest
   sampling: 100 # 100%
-  jaeger:
-    host: localhost
-    port: 6831
-  exporters:
-    - console
-    - jaeger
+  otelCollectorEndpoint: localhost:4317
