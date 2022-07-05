@@ -9,6 +9,12 @@ export const Container = styled.div<{$showAffected: boolean}>`
     visibility: hidden;
   }
 
+  .react-flow__minimap {
+    bottom: 0;
+    background-color: #fbfbff;
+    right: 0;
+  }
+
   .react-flow__node-span > div.matched {
     box-shadow: 0 4px 8px #c9cedb;
   }
@@ -35,13 +41,18 @@ export const SelectorControls = styled(Controls)`
   left: 0;
 `;
 
-export const ZoomButton = styled(Button)`
-  color: rgba(3, 24, 73, 0.3);
+export const ZoomButton = styled(Button)<{$isActive?: boolean}>`
+  color: ${({$isActive}) => ($isActive ? '#2d62ff' : 'rgba(3, 24, 73, 0.3)')};
   width: 24px;
 
-  &:hover,
   &:focus {
     background-color: unset;
+    color: ${({$isActive}) => ($isActive ? '#2d62ff' : 'rgba(3, 24, 73, 0.3)')};
+  }
+
+  &:hover {
+    background-color: unset;
+    color: #031849;
   }
 `;
 

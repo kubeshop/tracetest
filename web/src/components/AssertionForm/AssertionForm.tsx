@@ -92,8 +92,8 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
           <Typography.Text>Filter to limit the span(s) included in this assertion</Typography.Text>
           <TooltipQuestion
             title={`
-            You can decided which spans will be tested by this assertion by altering the filter. 
-            Use the dropdown to the right to select the first matching span, last, n-th, or all.  
+            You can decide which spans will be tested by this assertion by altering the filter.
+            Use the dropdown to the right to select the first matching span, last, n-th, or all.
             `}
           />
         </div>
@@ -110,9 +110,7 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
           </Form.Item>
           <TooltipQuestion
             margin={0}
-            title={`
-            You can decided if you want to use the wizard to create the span selector or the query language. 
-            `}
+            title="You can decide if you want to use the wizard to create the span selector or the query language."
           />
         </S.AdvancedSelectorContainer>
         <AssertionFormSelector
@@ -129,8 +127,8 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
           <Typography.Text>Define the checks to run against each span selected</Typography.Text>
           <TooltipQuestion
             title={`
-            Add one of more checks to be run against the span(s) that match your filter.  
-            For example, create one assertion to check all http spans to make sure they return status code 200... 
+            Add one of more checks to be run against the span(s) that match your filter.
+            For example, create one assertion to check all http spans to make sure they return status code 200...
             all in one assertion.
             `}
           />
