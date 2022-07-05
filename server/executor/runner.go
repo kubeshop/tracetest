@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/kubeshop/tracetest/server/executor/trigger"
 	"github.com/kubeshop/tracetest/server/model"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/propagation"
@@ -20,14 +21,14 @@ type PersistentRunner interface {
 }
 
 func NewPersistentRunner(
-	e Triggerer,
+	triggers *trigger.Registry,
 	runs model.RunRepository,
 	updater RunUpdater,
 	tp TracePoller,
 	tracer trace.Tracer,
 ) PersistentRunner {
 	return persistentRunner{
-		executor:     e,
+		triggers:     triggers,
 		runs:         runs,
 		updater:      updater,
 		tp:           tp,
@@ -38,7 +39,7 @@ func NewPersistentRunner(
 }
 
 type persistentRunner struct {
-	executor Triggerer
+	triggers *trigger.Registry
 	tp       TracePoller
 	runs     model.RunRepository
 	updater  RunUpdater
@@ -116,8 +117,14 @@ func (r persistentRunner) processExecQueue(job execReq) {
 	run := job.run.Start()
 	r.handleDBError(r.updater.Update(job.ctx, run))
 
-	response, err := r.executor.Trigger(job.ctx, job.test, job.run.TraceID, job.run.SpanID)
-	run = r.handleExecutionResult(run, response, err)
+	trigger, err := r.triggers.Get("http")
+	if err != nil {
+		// TODO
+	}
+
+	response, err := trigger.Trigger(job.ctx, job.test, job.run.TraceID, job.run.SpanID)
+	// TODO: hardcoded response type.
+	run = r.handleExecutionResult(run, response.Response.(model.HTTPResponse), err)
 
 	r.handleDBError(r.updater.Update(job.ctx, run))
 	if run.State == model.RunStateAwaitingTrace {

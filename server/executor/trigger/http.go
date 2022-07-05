@@ -1,4 +1,4 @@
-package executor
+package trigger
 
 import (
 	"bytes"
@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/kubeshop/tracetest/server/model"
@@ -14,7 +15,6 @@ import (
 	"go.opentelemetry.io/contrib/propagators/b3"
 	"go.opentelemetry.io/contrib/propagators/jaeger"
 	"go.opentelemetry.io/contrib/propagators/ot"
-	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
@@ -23,48 +23,17 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-type Triggerer interface {
-	Trigger(context.Context, model.Test, trace.TraceID, trace.SpanID) (model.HTTPResponse, error)
-}
-
-func NewTriggerer(tracer trace.Tracer) (Triggerer, error) {
-	tp, err := initTracing()
-	if err != nil {
-		return nil, err
+func HTTP() Triggerer {
+	return &httpTriggerer{
+		traceProvider: traceProvider(),
 	}
-	return &instrumentedTriggerer{
-		tracer: tracer,
-		triggerer: &httpTriggerer{
-			traceProvider: tp,
-		},
-	}, nil
-}
-
-type instrumentedTriggerer struct {
-	tracer    trace.Tracer
-	triggerer Triggerer
-}
-
-func (te *instrumentedTriggerer) Trigger(ctx context.Context, test model.Test, tid trace.TraceID, sid trace.SpanID) (model.HTTPResponse, error) {
-	ctx, span := te.tracer.Start(ctx, "Trigger test")
-	defer span.End()
-
-	resp, err := te.triggerer.Trigger(ctx, test, tid, sid)
-
-	span.SetAttributes(
-		attribute.String("tracetest.run.trigger.test_id", test.ID.String()),
-		attribute.String("tracetest.run.trigger.type", "http"),
-		attribute.Int("tracetest.run.trigger.http.response_code", resp.StatusCode),
-	)
-
-	return resp, err
 }
 
 type httpTriggerer struct {
 	traceProvider *sdktrace.TracerProvider
 }
 
-func (te *httpTriggerer) Trigger(_ context.Context, test model.Test, tid trace.TraceID, sid trace.SpanID) (model.HTTPResponse, error) {
+func (te *httpTriggerer) Trigger(_ context.Context, test model.Test, tid trace.TraceID, sid trace.SpanID) (Response, error) {
 	client := http.Client{
 		Transport: otelhttp.NewTransport(http.DefaultTransport,
 			otelhttp.WithTracerProvider(te.traceProvider),
@@ -94,7 +63,7 @@ func (te *httpTriggerer) Trigger(_ context.Context, test model.Test, tid trace.T
 	}
 	req, err := http.NewRequest(strings.ToUpper(string(tReq.Method)), tReq.URL, body)
 	if err != nil {
-		return model.HTTPResponse{}, err
+		return Response{}, err
 	}
 	for _, h := range tReq.Headers {
 		req.Header.Set(h.Key, h.Value)
@@ -104,13 +73,17 @@ func (te *httpTriggerer) Trigger(_ context.Context, test model.Test, tid trace.T
 
 	resp, err := client.Do(req.WithContext(trace.ContextWithSpanContext(context.Background(), sc)))
 	if err != nil {
-		return model.HTTPResponse{}, err
+		return Response{}, err
 	}
 
 	return mapResp(resp), nil
 }
 
-func mapResp(resp *http.Response) model.HTTPResponse {
+func (t *httpTriggerer) Type() string {
+	return "http"
+}
+
+func mapResp(resp *http.Response) Response {
 	var mappedHeaders []model.HTTPHeader
 	for key, headers := range resp.Header {
 		for _, val := range headers {
@@ -128,31 +101,32 @@ func mapResp(resp *http.Response) model.HTTPResponse {
 		fmt.Println(err)
 	}
 
-	return model.HTTPResponse{
-		Status:     resp.Status,
-		StatusCode: resp.StatusCode,
-		Headers:    mappedHeaders,
-		Body:       body,
+	return Response{
+		SpanAttributes: map[string]string{
+			"tracetest.run.trigger.http.response_code": strconv.Itoa(resp.StatusCode),
+		},
+		Response: model.HTTPResponse{
+			Status:     resp.Status,
+			StatusCode: resp.StatusCode,
+			Headers:    mappedHeaders,
+			Body:       body,
+		},
 	}
 }
 
-func initTracing() (*sdktrace.TracerProvider, error) {
+func traceProvider() *sdktrace.TracerProvider {
 	// Set standard attributes per semantic conventions
 	res := resource.NewWithAttributes(
 		semconv.SchemaURL,
 		semconv.ServiceNameKey.String("tracetest"),
 	)
 
-	spanExporter, err := stdouttrace.New(stdouttrace.WithWriter(io.Discard))
-	if err != nil {
-		return nil, err
-	}
-	// Create and set the TraceProvider
-	tp := sdktrace.NewTracerProvider(
+	// this is in fact a noop exporter, so we can ignore errors
+	spanExporter, _ := stdouttrace.New(stdouttrace.WithWriter(io.Discard))
+
+	return sdktrace.NewTracerProvider(
 		sdktrace.WithSyncer(spanExporter),
 		sdktrace.WithResource(res),
 		sdktrace.WithSampler(sdktrace.ParentBased(sdktrace.AlwaysSample())),
 	)
-
-	return tp, nil
 }
