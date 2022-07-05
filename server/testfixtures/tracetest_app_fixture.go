@@ -1,7 +1,6 @@
 package testfixtures
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/kubeshop/tracetest/server/app"
@@ -48,11 +47,6 @@ func init() {
 }
 
 func getTracetestApp(options FixtureOptions) (*app.App, error) {
-	demoApp, err := GetFixtureValue[*testmock.DemoApp](POKESHOP_APP)
-	if err != nil {
-		return nil, fmt.Errorf("could not get pokeshop app: %w", err)
-	}
-
 	appOptions := make([]testmock.TestingAppOption, 0)
 	arguments := options.Arguments.(TracetestAppFixtureConfig)
 	if arguments.Prefix != "" {
@@ -63,7 +57,7 @@ func getTracetestApp(options FixtureOptions) (*app.App, error) {
 		appOptions = append(appOptions, testmock.WithHttpPort(arguments.HttpPort))
 	}
 
-	tracetestApp, err := testmock.GetTestingApp(demoApp, appOptions...)
+	tracetestApp, err := testmock.GetTestingApp(appOptions...)
 	if err != nil {
 		return nil, err
 	}

@@ -25,7 +25,7 @@ func WithHttpPort(port int) TestingAppOption {
 	}
 }
 
-func GetTestingApp(demoApp *DemoApp, options ...TestingAppOption) (*app.App, error) {
+func GetTestingApp(options ...TestingAppOption) (*app.App, error) {
 	ctx := context.Background()
 	db, err := GetTestingDatabase("file://../migrations")
 
@@ -35,7 +35,7 @@ func GetTestingApp(demoApp *DemoApp, options ...TestingAppOption) (*app.App, err
 
 	config := config.Config{
 		JaegerConnectionConfig: &configgrpc.GRPCClientSettings{
-			Endpoint: demoApp.JaegerEndpoint(),
+			Endpoint: "",
 			TLSSetting: configtls.TLSClientSetting{
 				Insecure: true,
 			},
