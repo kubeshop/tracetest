@@ -12,6 +12,7 @@ import (
 	"github.com/kubeshop/tracetest/server/analytics"
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/executor"
+	"github.com/kubeshop/tracetest/server/executor/trigger"
 	httpServer "github.com/kubeshop/tracetest/server/http"
 	"github.com/kubeshop/tracetest/server/http/websocket"
 	"github.com/kubeshop/tracetest/server/model"
@@ -85,10 +86,8 @@ func (a *App) Start() error {
 		}
 	}
 
-	ex, err := executor.NewTriggerer(a.tracer)
-	if err != nil {
-		return fmt.Errorf("could not create executor: %w", err)
-	}
+	triggerReg := trigger.NewRegsitry(a.tracer)
+	triggerReg.Add(trigger.HTTP())
 
 	subscriptionManager := subscription.NewManager()
 
@@ -114,7 +113,7 @@ func (a *App) Start() error {
 	tracePoller.Start(5) // worker count. should be configurable
 	defer tracePoller.Stop()
 
-	runner := executor.NewPersistentRunner(ex, a.db, execTestUpdater, tracePoller, a.tracer)
+	runner := executor.NewPersistentRunner(triggerReg, a.db, execTestUpdater, tracePoller, a.tracer)
 	runner.Start(5) // worker count. should be configurable
 	defer runner.Stop()
 

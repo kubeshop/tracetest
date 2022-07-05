@@ -7,6 +7,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/executor"
+	"github.com/kubeshop/tracetest/server/executor/trigger"
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/testdb"
@@ -64,11 +65,16 @@ func TestPersistentRunner(t *testing.T) {
 var (
 	noError error = nil
 
-	sampleResponse = model.HTTPResponse{
-		StatusCode: 200,
-		Body:       "this is the body",
-		Headers: []model.HTTPHeader{
-			{Key: "Content-Type", Value: "text/plain"},
+	sampleResponse = trigger.Response{
+		SpanAttributes: map[string]string{
+			"tracetest.run.trigger.http.response_code": "200",
+		},
+		Response: model.HTTPResponse{
+			StatusCode: 200,
+			Body:       "this is the body",
+			Headers: []model.HTTPHeader{
+				{Key: "Content-Type", Value: "text/plain"},
+			},
 		},
 	}
 )
@@ -113,9 +119,13 @@ func (f runnerFixture) assert(t *testing.T) {
 }
 
 func runnerSetup(t *testing.T) runnerFixture {
+	tr, _ := tracing.NewTracer(context.TODO(), config.Config{})
+	reg := trigger.NewRegsitry(tr)
+
 	me := new(mockTriggerer)
 	me.t = t
 	me.Test(t)
+	reg.Add(me)
 
 	db := new(mockDB)
 	db.T = t
@@ -128,7 +138,7 @@ func runnerSetup(t *testing.T) runnerFixture {
 
 	mtp.Test(t)
 	return runnerFixture{
-		runner:          executor.NewPersistentRunner(me, db, executor.NewDBUpdater(db), mtp, tracer),
+		runner:          executor.NewPersistentRunner(reg, db, executor.NewDBUpdater(db), mtp, tracer),
 		mockExecutor:    me,
 		mockDB:          db,
 		mockTracePoller: mtp,
@@ -168,9 +178,13 @@ type mockTriggerer struct {
 	t *testing.T
 }
 
-func (m *mockTriggerer) Trigger(_ context.Context, test model.Test, tid trace.TraceID, sid trace.SpanID) (model.HTTPResponse, error) {
+func (m *mockTriggerer) Type() string {
+	return "http"
+}
+
+func (m *mockTriggerer) Trigger(_ context.Context, test model.Test, tid trace.TraceID, sid trace.SpanID) (trigger.Response, error) {
 	args := m.Called(test.ID)
-	return args.Get(0).(model.HTTPResponse), args.Error(1)
+	return args.Get(0).(trigger.Response), args.Error(1)
 }
 
 func (m *mockTriggerer) expectTriggerTest(test model.Test) *mock.Call {
