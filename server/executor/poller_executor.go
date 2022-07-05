@@ -1,6 +1,7 @@
 package executor
 
 import (
+	"encoding/hex"
 	"fmt"
 	"math"
 	"time"
@@ -36,6 +37,8 @@ func (pe InstrumentedPollerExecutor) ExecuteRequest(request *PollingRequest) (bo
 	spanCount := len(run.Trace.Flat)
 
 	span.SetAttributes(
+		attribute.String("tracetest.run.trace_poller.trace_id", hex.EncodeToString(request.run.TraceID[:])),
+		attribute.String("tracetest.run.trace_poller.span_id", hex.EncodeToString(request.run.SpanID[:])),
 		attribute.Bool("tracetest.run.trace_poller.succesful", finished),
 		attribute.String("tracetest.run.trace_poller.test_id", request.test.ID.String()),
 		attribute.Int("tracetest.run.trace_poller.amount_retrieved_spans", spanCount),
