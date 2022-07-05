@@ -114,7 +114,7 @@ func (td *postgresDB) UpdateTestVersion(ctx context.Context, test model.Test) er
 		return fmt.Errorf("encoding error: %w", err)
 	}
 
-	_, err = stmt.Exec(test.ID, b, test.Version)
+	_, err = stmt.ExecContext(ctx, test.ID, b, test.Version)
 	if err != nil {
 		return fmt.Errorf("sql exec: %w", err)
 	}
@@ -130,7 +130,7 @@ func (td *postgresDB) DeleteTest(ctx context.Context, test model.Test) error {
 	}
 
 	for _, sql := range queries {
-		_, err := td.db.Exec(sql, test.ID)
+		_, err := td.db.ExecContext(ctx, sql, test.ID)
 		if err != nil {
 			return fmt.Errorf("sql error: %w", err)
 		}

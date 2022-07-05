@@ -29,4 +29,14 @@ trigger:
 testDefinition:
 - selector: span[name="POST /api/tests" tracetest.span.type="http"]
   assertions:
+  - tracetest.selected_spans.count = 1
   - tracetest.response.status = 200
+- selector: span[name = "exec INSERT"]
+  assertions:
+  - tracetest.selected_spans.count = 2
+- selector: span[name = "exec INSERT"]:first
+  assertions:
+  - sql.query contains "INSERT INTO tests"
+- selector: span[name = "exec INSERT"]:last
+  assertions:
+  - sql.query contains "INSERT INTO definitions"

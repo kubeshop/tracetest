@@ -1,15 +1,30 @@
 package testdb
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
+	"strings"
 
 	"github.com/j2gg0s/otsql"
 	"github.com/j2gg0s/otsql/hook/trace"
 	pq "github.com/lib/pq"
+	"go.opentelemetry.io/otel/attribute"
 )
 
 type PostgresOption func(*postgresDB) error
+
+func dbSpanNameFormatter(ctx context.Context, method string, query string) string {
+	splitQuery := strings.Split(query, " ")
+	queryName := ""
+	if len(splitQuery) > 0 {
+		queryName = splitQuery[0]
+	}
+
+	queryName = strings.ReplaceAll(queryName, "\n", "")
+
+	return fmt.Sprintf("%s %s", method, queryName)
+}
 
 func WithDSN(dsn string) PostgresOption {
 	return func(pd *postgresDB) error {
@@ -24,6 +39,8 @@ func WithDSN(dsn string) PostgresOption {
 						trace.WithQuery(true),
 						trace.WithQueryParams(true),
 						trace.WithRowsAffected(true),
+						trace.WithSpanNameFormatter(dbSpanNameFormatter),
+						trace.WithDefaultAttributes(attribute.String("service.name", "tracetest")),
 					),
 				),
 			),
