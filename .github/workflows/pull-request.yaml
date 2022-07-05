@@ -157,7 +157,7 @@ jobs:
           --set telemetry.enabled="true" \
           --set telemetry.otelCollectorEndpoint="otel-collector.tracetest.svc.cluster.local:4317" \
           --set poolingConfig.maxWaitTimeForTrace="60s" \
-          --set poolingConfig.retryDelay="1s" \
+          --set poolingConfig.retryDelay="3s" \
           --set ingress.enabled=false \
           --wait --timeout 3m
 
