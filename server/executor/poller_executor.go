@@ -29,9 +29,12 @@ func (pe InstrumentedPollerExecutor) ExecuteRequest(request *PollingRequest) (bo
 
 	finished, run, err := pe.pollerExecutor.ExecuteRequest(request)
 
+	spanCount := len(run.Trace.Flat)
+
 	span.SetAttributes(
 		attribute.Bool("tracetest.run.trace_poller.succesful", finished),
 		attribute.String("tracetest.run.trace_poller.test_id", request.test.ID.String()),
+		attribute.Int("tracetest.run.trace_poller.amount_retrieved_spans", spanCount),
 	)
 
 	return finished, run, err
@@ -70,7 +73,7 @@ func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, m
 	if !pe.donePollingTraces(request, trace) {
 		run.Trace = &trace
 		request.run = run
-		return false, model.Run{}, nil
+		return false, run, nil
 	}
 
 	trace = trace.Sort()
