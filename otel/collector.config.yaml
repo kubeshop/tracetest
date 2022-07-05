@@ -2,6 +2,7 @@ receivers:
   otlp:
     protocols:
       grpc:
+      http:
 
 
 processors:
@@ -19,10 +20,15 @@ exporters:
     endpoint: ${JAEGER_ENDPOINT}
     tls:
       insecure: true
+  otlphttp:
+    traces_endpoint: https://ingest.lightstep.com:443/traces/otlp/v0.6
+    metrics_endpoint: https://ingest.lightstep.com:443/metrics/otlp/v0.9
+    headers: {"lightstep-access-token": "${LIGHTSTEP_TOKEN}"}
+    compression: gzip
 
 service:
   pipelines:
     traces:
       receivers: [otlp]
       processors: [batch, probabilistic_sampler]
-      exporters: [jaeger]
+      exporters: [jaeger, otlphttp]
