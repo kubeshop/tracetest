@@ -31,6 +31,24 @@ func NewTracer(ctx context.Context, config config.Config) (trace.Tracer, error) 
 	propagator := propagation.NewCompositeTextMapPropagator(propagation.Baggage{}, propagation.TraceContext{})
 	otel.SetTextMapPropagator(propagator)
 
+	tracerProvider, err := getTracerProvider(ctx, config)
+	if err != nil {
+		return nil, fmt.Errorf("could not get trace provider: %w", err)
+	}
+
+	tracerProviderInstance = tracerProvider
+
+	otel.SetTracerProvider(tracerProvider)
+
+	tracer := tracerProvider.Tracer("tracetest")
+	return tracer, nil
+}
+
+func getTracerProvider(ctx context.Context, config config.Config) (*sdktrace.TracerProvider, error) {
+	if !config.Telemetry.Enabled {
+		return sdktrace.NewTracerProvider(), nil
+	}
+
 	r, err := resource.Merge(
 		resource.Default(),
 		resource.NewWithAttributes(
@@ -38,6 +56,7 @@ func NewTracer(ctx context.Context, config config.Config) (trace.Tracer, error) 
 			semconv.ServiceNameKey.String(config.Telemetry.ServiceName),
 		),
 	)
+
 	if err != nil {
 		return nil, fmt.Errorf("could not get provider resource: %w", err)
 	}
@@ -50,18 +69,11 @@ func NewTracer(ctx context.Context, config config.Config) (trace.Tracer, error) 
 	processor := sdktrace.NewBatchSpanProcessor(exporter)
 	sampleRate := config.Telemetry.Sampling / 100.0
 
-	tracerProvider := sdktrace.NewTracerProvider(
+	return sdktrace.NewTracerProvider(
 		sdktrace.WithResource(r),
 		sdktrace.WithSampler(sdktrace.TraceIDRatioBased(sampleRate)),
 		sdktrace.WithSpanProcessor(processor),
-	)
-
-	tracerProviderInstance = tracerProvider
-
-	otel.SetTracerProvider(tracerProvider)
-
-	tracer := tracerProvider.Tracer("tracetest")
-	return tracer, nil
+	), nil
 }
 
 func getExporter(ctx context.Context, config config.Config) (sdktrace.SpanExporter, error) {

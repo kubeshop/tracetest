@@ -12,6 +12,7 @@ googleAnalytics:
   enabled: true
 
 telemetry:
+  enabled: true
   serviceName: tracetest
   sampling: 100 # 100%
   otelCollectorEndpoint: localhost:4317

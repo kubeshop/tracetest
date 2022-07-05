@@ -49,6 +49,7 @@ services:
       - "./otel/collector.config.yaml:/otel-local-config.yaml"
     environment:
       - JAEGER_ENDPOINT=jaeger:14250
+      - LIGHTSTEP_TOKEN=<PLACE-YOUR-TOKEN-HERE>
     depends_on:
       jaeger:
         condition: service_healthy

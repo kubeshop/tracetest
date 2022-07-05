@@ -37,6 +37,7 @@ type (
 	}
 
 	TelemetryConfig struct {
+		Enabled               bool    `mapstructure:"enabled"`
 		ServiceName           string  `mapstructure:"serviceName"`
 		Sampling              float64 `mapstructure:"sampling"`
 		OTelCollectorEndpoint string  `mapstructure:"otelCollectorEndpoint"`
