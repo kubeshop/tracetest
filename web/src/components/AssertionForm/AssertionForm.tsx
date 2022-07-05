@@ -1,17 +1,17 @@
-import {Typography, Form, Button, Switch} from 'antd';
-import React, {useState} from 'react';
+import {Button, Form, Switch, Typography} from 'antd';
 import {CompareOperator} from 'constants/Operator.constants';
+import React, {useState} from 'react';
 import {useAppSelector} from 'redux/hooks';
 import AssertionSelectors from 'selectors/Assertion.selectors';
 import OperatorService from 'services/Operator.service';
 import {TAssertion, TPseudoSelector, TSpanSelector} from 'types/Assertion.types';
+import SpanSelectors from '../../selectors/Span.selectors';
+import AffectedSpanControls from '../Diagram/components/DAG/AffectedSpanControls';
 import {TooltipQuestion} from '../TooltipQuestion/TooltipQuestion';
 import * as S from './AssertionForm.styled';
 import AssertionFormCheckList from './AssertionFormCheckList';
 import AssertionFormSelector from './AssertionFormSelector';
-import SpanSelectors from '../../selectors/Span.selectors';
 import useOnFieldsChange from './hooks/useOnFieldsChange';
-import AffectedSpanControls from '../Diagram/components/DAG/AffectedSpanControls';
 
 export interface IValues {
   assertionList?: TAssertion[];
@@ -110,7 +110,9 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
           </Form.Item>
           <TooltipQuestion
             margin={0}
-            title="You can decide if you want to use the wizard to create the span selector or the query language."
+            title={`
+            You can decided if you want to use the wizard to create the span selector or the query language.
+            `}
           />
         </S.AdvancedSelectorContainer>
         <AssertionFormSelector
@@ -138,6 +140,7 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
             {(fields, {add, remove}) => (
               <AssertionFormCheckList
                 assertionList={currentAssertionList}
+                form={form}
                 fields={fields}
                 add={add}
                 remove={remove}

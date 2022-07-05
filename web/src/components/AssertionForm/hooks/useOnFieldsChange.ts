@@ -2,11 +2,11 @@ import {Form, FormInstance} from 'antd';
 import {FieldData} from 'antd/node_modules/rc-field-form/es/interface';
 import {isEmpty} from 'lodash';
 import {useCallback} from 'react';
-import SelectorService from 'services/Selector.service';
 import CreateAssertionModalAnalyticsService from 'services/Analytics/CreateAssertionModalAnalytics.service';
+import SelectorService from 'services/Selector.service';
 import {TAssertion} from 'types/Assertion.types';
-import {IValues} from '../AssertionForm';
 import {TSpanFlatAttribute} from '../../../types/Span.types';
+import {IValues} from '../AssertionForm';
 
 const {onChecksChange, onSelectorChange} = CreateAssertionModalAnalyticsService;
 
@@ -24,42 +24,42 @@ const useOnFieldsChange = ({form, attributeList}: IProps) => {
     ? currentSelector
     : SelectorService.getSelectorString(currentSelectorList, currentPseudoSelector);
 
-  const onFieldsChange = useCallback(
+  return useCallback(
     (changedFields: FieldData[]) => {
       const [field] = changedFields;
 
-      const [fieldName = '', entry = 0, keyName = ''] = field.name as Array<string | number>;
+      if (field?.name) {
+        const [fieldName = '', entry = 0, keyName = ''] = field.name as Array<string | number>;
 
-      if (fieldName === 'isAdvancedSelector' && field.value) {
-        form.setFieldsValue({
-          selector: query,
-        });
-      }
+        if (fieldName === 'isAdvancedSelector' && field.value) {
+          form.setFieldsValue({
+            selector: query,
+          });
+        }
 
-      if (fieldName === 'selectorList') onSelectorChange();
-      if (fieldName === 'assertionList') onChecksChange();
+        if (fieldName === 'selectorList') onSelectorChange();
+        if (fieldName === 'assertionList') onChecksChange();
 
-      if (fieldName === 'assertionList' && keyName === 'attribute' && field.value) {
-        const list: TAssertion[] = form.getFieldValue('assertionList') || [];
+        if (fieldName === 'assertionList' && keyName === 'attribute' && field.value) {
+          const list: TAssertion[] = form.getFieldValue('assertionList') || [];
 
-        form.setFieldsValue({
-          assertionList: list.map((assertionEntry, index) => {
-            if (index === entry) {
-              const {value = ''} = attributeList?.find((el: any) => el.key === list[index].attribute) || {};
-              const isValid = typeof value === 'number' || !isEmpty(value);
+          form.setFieldsValue({
+            assertionList: list.map((assertionEntry, index) => {
+              if (index === entry) {
+                const {value = ''} = attributeList?.find((el: any) => el.key === list[index].attribute) || {};
+                const isValid = typeof value === 'number' || !isEmpty(value);
 
-              return {...assertionEntry, expected: isValid ? String(value) : ''};
-            }
+                return {...assertionEntry, expected: isValid ? String(value) : ''};
+              }
 
-            return assertionEntry;
-          }),
-        });
+              return assertionEntry;
+            }),
+          });
+        }
       }
     },
     [attributeList, form, query]
   );
-
-  return onFieldsChange;
 };
 
 export default useOnFieldsChange;
