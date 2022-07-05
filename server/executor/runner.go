@@ -117,9 +117,10 @@ func (r persistentRunner) processExecQueue(job execReq) {
 	run := job.run.Start()
 	r.handleDBError(r.updater.Update(job.ctx, run))
 
+	// TODO: hardcoded trigger type.
 	trigger, err := r.triggers.Get("http")
 	if err != nil {
-		// TODO
+		panic(err)
 	}
 
 	response, err := trigger.Trigger(job.ctx, job.test, job.run.TraceID, job.run.SpanID)
