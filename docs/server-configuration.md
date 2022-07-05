@@ -19,7 +19,7 @@ poolingConfig:
     # and the test will be marked as failed.
     maxWaitTimeForTrace: 90s
 
-    # How much time tracetest should wait before trying to fetch the trace since the last execution? 
+    # How much time tracetest should wait before trying to fetch the trace since the last execution?
     retryDelay: 5s
 
 # Server configuration
@@ -38,12 +38,7 @@ googleAnalytics:
 telemetry:
   serviceName: tracetest
   sampling: 100
-  jaeger:
-    host: localhost
-    port: 6831
-  exporters:
-    - console
-    - jaeger
+  otelCollectorEndpoint: localhost:4317
 ```
 
 ## Providing a configuration when running a container
