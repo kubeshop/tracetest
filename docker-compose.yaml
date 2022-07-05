@@ -17,6 +17,8 @@ services:
         condition: service_healthy
       jaeger:
         condition: service_healthy
+    networks:
+      - local
 
   postgres:
     container_name: postgres
@@ -31,6 +33,27 @@ services:
       interval: 1s
       timeout: 5s
       retries: 60
+    networks:
+      - local
+
+  otel-collector:
+    image: otel/opentelemetry-collector:0.54.0
+    ports:
+      - "55679:55679"
+      - "4317:4317"
+      - "8888:8888"
+    command:
+      - "--config"
+      - "/otel-local-config.yaml"
+    volumes:
+      - "./otel/collector.config.yaml:/otel-local-config.yaml"
+    environment:
+      - JAEGER_ENDPOINT=jaeger:14250
+    depends_on:
+      jaeger:
+        condition: service_healthy
+    networks:
+      - local
 
   jaeger:
     image: jaegertracing/all-in-one:latest
@@ -42,6 +65,8 @@ services:
       interval: 1s
       timeout: 3s
       retries: 60
+    networks:
+      - local
 
   cache:
     image: redis:6
@@ -52,6 +77,9 @@ services:
       interval: 1s
       timeout: 3s
       retries: 60
+    networks:
+      - local
+
   queue:
     image: rabbitmq:3.9
     ports:
@@ -62,6 +90,8 @@ services:
       interval: 1s
       timeout: 5s
       retries: 60
+    networks:
+      - local
 
   demo:
     image: kubeshop/demo-pokemon-api:latest
@@ -83,3 +113,8 @@ services:
         condition: service_healthy
       jaeger:
         condition: service_healthy
+    networks:
+      - local
+
+networks:
+  local:

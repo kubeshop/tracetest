@@ -3,17 +3,18 @@ package tracing
 import (
 	"context"
 	"fmt"
-	"os"
+	"time"
 
 	"github.com/kubeshop/tracetest/server/config"
 	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/exporters/jaeger"
-	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.10.0"
 	"go.opentelemetry.io/otel/trace"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 var tracerProviderInstance *sdktrace.TracerProvider
@@ -41,23 +42,18 @@ func NewTracer(ctx context.Context, config config.Config) (trace.Tracer, error) 
 		return nil, fmt.Errorf("could not get provider resource: %w", err)
 	}
 
-	tracerOptions := make([]sdktrace.TracerProviderOption, 0, len(config.Telemetry.Exporters))
-	for _, exporterName := range config.Telemetry.Exporters {
-		exporter, err := getExporter(ctx, config, exporterName)
-		if err != nil {
-			return nil, fmt.Errorf(`could not create "%s" exporter: %w`, exporterName, err)
-		}
-
-		processor := sdktrace.NewSimpleSpanProcessor(exporter)
-		tracerOptions = append(tracerOptions, sdktrace.WithSpanProcessor(processor))
+	exporter, err := getExporter(ctx, config)
+	if err != nil {
+		return nil, fmt.Errorf("could not create exporter: %w", err)
 	}
 
+	processor := sdktrace.NewBatchSpanProcessor(exporter)
 	sampleRate := config.Telemetry.Sampling / 100.0
-	tracerOptions = append(tracerOptions, sdktrace.WithResource(r))
-	tracerOptions = append(tracerOptions, sdktrace.WithSampler(sdktrace.TraceIDRatioBased(sampleRate)))
 
 	tracerProvider := sdktrace.NewTracerProvider(
-		tracerOptions...,
+		sdktrace.WithResource(r),
+		sdktrace.WithSampler(sdktrace.TraceIDRatioBased(sampleRate)),
+		sdktrace.WithSpanProcessor(processor),
 	)
 
 	tracerProviderInstance = tracerProvider
@@ -68,33 +64,19 @@ func NewTracer(ctx context.Context, config config.Config) (trace.Tracer, error) 
 	return tracer, nil
 }
 
-func getExporter(ctx context.Context, config config.Config, name string) (sdktrace.SpanExporter, error) {
-	switch name {
-	case "jaeger":
-		return newJaegerExporter(ctx, config)
-	case "console":
-		return newConsoleExporter(ctx, config)
+func getExporter(ctx context.Context, config config.Config) (sdktrace.SpanExporter, error) {
+	ctx, cancel := context.WithTimeout(ctx, time.Second)
+	defer cancel()
+
+	conn, err := grpc.DialContext(ctx, config.Telemetry.OTelCollectorEndpoint, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
+	if err != nil {
+		return nil, fmt.Errorf("could not create gRPC connection to collector: %w", err)
 	}
 
-	return nil, nil
-}
-
-func newJaegerExporter(ctx context.Context, config config.Config) (sdktrace.SpanExporter, error) {
-	exporter, err := jaeger.New(
-		jaeger.WithAgentEndpoint(
-			jaeger.WithAgentHost(config.Telemetry.Jaeger.Host),
-			jaeger.WithAgentPort(fmt.Sprintf("%d", config.Telemetry.Jaeger.Port)),
-		),
-	)
+	exporter, err := otlptracegrpc.New(ctx, otlptracegrpc.WithGRPCConn(conn))
 	if err != nil {
-		return nil, fmt.Errorf("could not get jaeger exporter: %w", err)
+		return nil, fmt.Errorf("could not create trace exporter: %w", err)
 	}
 
 	return exporter, nil
-}
-
-func newConsoleExporter(ctx context.Context, config config.Config) (sdktrace.SpanExporter, error) {
-	return stdouttrace.New(
-		stdouttrace.WithWriter(os.Stdout),
-	)
 }
