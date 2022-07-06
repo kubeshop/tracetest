@@ -165,6 +165,11 @@ jobs:
     needs: deploy
     name: Run e2e tests
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # run copies of the current job in parallel
+        containers: [1, 2, 3, 4, 5, 6, 7, 8]
 
     steps:
       - name: Checkout
@@ -204,7 +209,6 @@ jobs:
           key: npm--${{ hashFiles('web/package-lock.json') }}
           restore-keys: npm-
 
-
       - name: Install test dependencies
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
         run: |
@@ -214,7 +218,9 @@ jobs:
       - name: Run integration tests
         run: |
           cd web/
-          npm run test:integration
+          npm run cy:ci
+        env:
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
 
   trace-testing:
     needs: deploy

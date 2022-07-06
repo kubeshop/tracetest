@@ -58,6 +58,7 @@
     "eject": "react-scripts eject",
     "cy:open": "cypress open",
     "cy:run": "cypress run",
+    "cy:ci": "cypress run --parallel --record --key $CYPRESS_RECORD_KEY",
     "prettier": "prettier --write ./src",
     "storybook": "start-storybook -p 6006 -s public",
     "build-storybook": "build-storybook -s public"
