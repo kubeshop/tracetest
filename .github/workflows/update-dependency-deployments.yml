@@ -6,6 +6,11 @@ on:
       - main
     paths:
       - k8s/**
+  pull_request:
+    branches:
+      - main
+    paths:
+      - k8s/**
 
 jobs:
   deploy-collector:
@@ -33,6 +38,8 @@ jobs:
       run: |
         chmod +x ./k8s/deploy-collector.sh
         ./k8s/deploy-collector.sh
+      env:
+        LIGHTSTEP_TOKEN: ${{ secrets.LIGHTSTEP_TOKEN }}
 
 
 
