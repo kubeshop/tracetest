@@ -1,4 +1,4 @@
-import {Form, FormInstance, Input} from 'antd';
+import {Form, FormInstance} from 'antd';
 import {useEffect, useMemo} from 'react';
 import {debounce} from 'lodash';
 import {useSpan} from 'providers/Span/Span.provider';
@@ -13,6 +13,7 @@ import * as S from './AssertionForm.styled';
 import AssertionFormSelectorInput from './AssertionFormSelectorInput';
 import AssertionFormPseudoSelectorInput from './AssertionFormPseudoSelectorInput';
 import useAssertionFormValues from './hooks/useAssertionFormValues';
+import AdvancedEditor from '../AdvancedEditor';
 
 interface IProps {
   form: FormInstance<IValues>;
@@ -112,23 +113,18 @@ const AssertionFormSelector = ({
       </Form.Item>
     </S.SelectorInputContainer>
   ) : (
-    <Form.Item
-      name="selector"
-      rules={[{required: true, message: 'The selector cannot be empty'}]}
-      validateTrigger={[]}
-      hasFeedback
-      help={isInvalidSelector ? 'Invalid selector' : ''}
-      validateStatus={isInvalidSelector ? 'error' : ''}
-      style={{maxWidth: '60%'}}
-    >
-      <Input.TextArea
-        data-cy="advanced-selector"
-        spellCheck={false}
-        placeholder="Enter the selector query"
-        autoSize
-        allowClear
-      />
-    </Form.Item>
+    <S.AdvancedSelectorInputContainer>
+      <Form.Item
+        name="selector"
+        rules={[{required: true, message: 'The selector cannot be empty'}]}
+        validateTrigger={[]}
+        hasFeedback
+        help={isInvalidSelector ? 'Invalid selector' : ''}
+        validateStatus={isInvalidSelector ? 'error' : ''}
+      >
+        <AdvancedEditor runId={runId} testId={testId} />
+      </Form.Item>
+    </S.AdvancedSelectorInputContainer>
   );
 };
 

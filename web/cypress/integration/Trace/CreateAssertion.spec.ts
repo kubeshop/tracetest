@@ -102,7 +102,7 @@ describe('Create Assertion', () => {
     cy.get('[data-cy=assertion-form]', {timeout: 10000}).should('be.visible');
 
     cy.get('[data-cy=mode-selector-switch]').click();
-    cy.get('[data-cy=advanced-selector]')
+    cy.get('[data-cy=advanced-selector] [contenteditable]')
       .clear()
       .type('span[tracetest.span.type = "http"] span[tracetest.span.type = "database"]:first');
 
@@ -157,7 +157,7 @@ describe('Create Assertion', () => {
     cy.get('[data-cy=edit-assertion-button]').last().click();
     cy.get('[data-cy=assertion-form]').should('be.visible');
 
-    cy.get('[data-cy=advanced-selector]').clear().type('span[tracetest.span.type = "database"]:last');
+    cy.get('[data-cy=advanced-selector] [contenteditable]').clear().type('span[tracetest.span.type = "database"]:last');
 
     cy.get('[data-cy=assertion-check-operator]').first().click();
     cy.get(`${getComparatorListId(0)} + div .ant-select-item`)

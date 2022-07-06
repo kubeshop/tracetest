@@ -5,13 +5,15 @@ import {useAppSelector} from 'redux/hooks';
 import AssertionSelectors from 'selectors/Assertion.selectors';
 import OperatorService from 'services/Operator.service';
 import {TAssertion, TPseudoSelector, TSpanSelector} from 'types/Assertion.types';
-import SpanSelectors from '../../selectors/Span.selectors';
+import SpanSelectors from 'selectors/Span.selectors';
+import {ADVANCE_SELECTORS_DOCUMENTATION_URL} from 'constants/Common.constants';
 import AffectedSpanControls from '../Diagram/components/DAG/AffectedSpanControls';
 import {TooltipQuestion} from '../TooltipQuestion/TooltipQuestion';
 import * as S from './AssertionForm.styled';
 import AssertionFormCheckList from './AssertionFormCheckList';
 import AssertionFormSelector from './AssertionFormSelector';
 import useOnFieldsChange from './hooks/useOnFieldsChange';
+import useAssertionFormValues from './hooks/useAssertionFormValues';
 
 export interface IValues {
   assertionList?: TAssertion[];
@@ -49,7 +51,8 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
   runId,
 }) => {
   const [form] = Form.useForm<IValues>();
-  const currentAssertionList = Form.useWatch('assertionList', form) || [];
+
+  const {currentIsAdvancedSelector, currentAssertionList} = useAssertionFormValues(form);
   const [isValid, setIsValid] = useState(false);
 
   const spanIdList = useAppSelector(SpanSelectors.selectAffectedSpans);
@@ -114,6 +117,13 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
             You can decided if you want to use the wizard to create the span selector or the query language.
             `}
           />
+          {currentIsAdvancedSelector && (
+            <S.ReferenceLink>
+              <a href={ADVANCE_SELECTORS_DOCUMENTATION_URL} target="_blank">
+                Query Language Reference
+              </a>
+            </S.ReferenceLink>
+          )}
         </S.AdvancedSelectorContainer>
         <AssertionFormSelector
           selectorList={selectorList}

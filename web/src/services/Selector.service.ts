@@ -54,7 +54,7 @@ function flattenStructureFilters(structure: TStructure): TFilter[] {
 const SelectorService = () => ({
   getSelectorString(selectorList: TSpanSelector[], pseudoSelector?: TPseudoSelector): string {
     return selectorList.length
-      ? `span[${getFilters(selectorList).join('  ')}]${getPseudoSelectorString(pseudoSelector)}`
+      ? `span[${getFilters(selectorList).join(' ')}]${getPseudoSelectorString(pseudoSelector)}`
       : '';
   },
 

@@ -21,6 +21,10 @@ export const SelectorInputContainer = styled.div`
   gap: 14px;
 `;
 
+export const AdvancedSelectorInputContainer = styled(SelectorInputContainer)`
+  grid-template-columns: 80%;
+`;
+
 export const PseudoSelector = styled.div`
   display: flex;
   align-items: center;
@@ -89,10 +93,16 @@ export const AdvancedSelectorContainer = styled.div`
   gap: 8px;
   align-items: center;
   margin-bottom: 8px;
+  max-width: 80%;
 `;
 
 export const AffectedSpansContainer = styled.div`
   display: flex;
   gap: 4px;
   align-items: center;
+`;
+
+export const ReferenceLink = styled(Typography.Text)`
+  margin: 0;
+  margin-left: auto;
 `;
