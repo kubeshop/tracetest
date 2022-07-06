@@ -165,6 +165,11 @@ jobs:
     needs: deploy
     name: Run e2e tests
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # run copies of the current job in parallel
+        containers: [1, 2, 3, 4, 5]
 
     steps:
       - name: Checkout
