@@ -46,7 +46,7 @@ services:
       - "--config"
       - "/otel-local-config.yaml"
     volumes:
-      - "./otel/collector.config.yaml:/otel-local-config.yaml"
+      - "./local-config/collector.config.yaml:/otel-local-config.yaml"
     environment:
       - JAEGER_ENDPOINT=jaeger:14250
       - LIGHTSTEP_TOKEN=<PLACE-YOUR-TOKEN-HERE>
