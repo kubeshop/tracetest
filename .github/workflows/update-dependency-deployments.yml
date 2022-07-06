@@ -2,19 +2,18 @@ name: Update dependency deployments
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
     paths:
-      - k8s
+      - k8s/**
 
 jobs:
-  apply:
+  deploy-collector:
+    name: Deploy OTEL Collector
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
       uses: actions/checkout@v3
-
-    - name: Install envsubst
-      run: apt-get install -y gettext-base
 
     - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
       with:
@@ -28,8 +27,7 @@ jobs:
         credentials: ${{ secrets.GKE_SA_KEY }}
 
     - name: Apply
-      run: ./k8s/deploy-collector.sh
-
-
-
-
+      run: |
+        ./k8s/deploy-collector.sh
+      env:
+        LIGHTSTEP_TOKEN: ${{ secrets.LIGHTSTEP_TOKEN }}

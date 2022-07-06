@@ -11,12 +11,12 @@ data:
           http:
 
     processors:
-      batch:
-
       # Data sources: traces
       probabilistic_sampler:
         hash_seed: 22
         sampling_percentage: 10
+
+      batch: {}
 
     exporters:
       logging:
@@ -35,7 +35,7 @@ data:
       pipelines:
         traces:
           receivers: [otlp]
-          processors: [batch, probabilistic_sampler]
+          processors: [probabilistic_sampler, batch]
           exporters: [jaeger, otlphttp]
 ---
 
