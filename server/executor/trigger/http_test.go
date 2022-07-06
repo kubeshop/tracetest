@@ -40,8 +40,9 @@ func TestTriggerGet(t *testing.T) {
 
 	test := model.Test{
 		Name: "test",
-		ServiceUnderTest: model.ServiceUnderTest{
-			Request: model.HTTPRequest{
+		ServiceUnderTest: model.Trigger{
+			Type: model.TriggerTypeHTTP,
+			HTTP: &model.HTTPRequest{
 				URL:    server.URL,
 				Method: model.HTTPMethodGET,
 				Headers: []model.HTTPHeader{
@@ -55,8 +56,8 @@ func TestTriggerGet(t *testing.T) {
 	resp, err := ex.Trigger(context.TODO(), test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
 	assert.NoError(t, err)
 
-	assert.Equal(t, 200, resp.Response.(model.HTTPResponse).StatusCode)
-	assert.Equal(t, "OK", resp.Response.(model.HTTPResponse).Body)
+	assert.Equal(t, 200, resp.Result.HTTP.StatusCode)
+	assert.Equal(t, "OK", resp.Result.HTTP.Body)
 }
 
 func TestTriggerPost(t *testing.T) {
@@ -86,8 +87,9 @@ func TestTriggerPost(t *testing.T) {
 
 	test := model.Test{
 		Name: "test",
-		ServiceUnderTest: model.ServiceUnderTest{
-			Request: model.HTTPRequest{
+		ServiceUnderTest: model.Trigger{
+			Type: model.TriggerTypeHTTP,
+			HTTP: &model.HTTPRequest{
 				URL:    server.URL,
 				Method: model.HTTPMethodPOST,
 				Headers: []model.HTTPHeader{
@@ -101,8 +103,8 @@ func TestTriggerPost(t *testing.T) {
 	resp, err := ex.Trigger(context.TODO(), test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
 	assert.NoError(t, err)
 
-	assert.Equal(t, 200, resp.Response.(model.HTTPResponse).StatusCode)
-	assert.Equal(t, "OK", resp.Response.(model.HTTPResponse).Body)
+	assert.Equal(t, 200, resp.Result.HTTP.StatusCode)
+	assert.Equal(t, "OK", resp.Result.HTTP.Body)
 }
 
 func TestTriggerPostWithApiKeyAuth(t *testing.T) {
@@ -138,8 +140,9 @@ func TestTriggerPostWithApiKeyAuth(t *testing.T) {
 
 	test := model.Test{
 		Name: "test",
-		ServiceUnderTest: model.ServiceUnderTest{
-			Request: model.HTTPRequest{
+		ServiceUnderTest: model.Trigger{
+			Type: model.TriggerTypeHTTP,
+			HTTP: &model.HTTPRequest{
 				URL:    server.URL,
 				Method: model.HTTPMethodPOST,
 				Headers: []model.HTTPHeader{
@@ -161,8 +164,8 @@ func TestTriggerPostWithApiKeyAuth(t *testing.T) {
 	resp, err := ex.Trigger(context.TODO(), test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
 	assert.NoError(t, err)
 
-	assert.Equal(t, 200, resp.Response.(model.HTTPResponse).StatusCode)
-	assert.Equal(t, "OK", resp.Response.(model.HTTPResponse).Body)
+	assert.Equal(t, 200, resp.Result.HTTP.StatusCode)
+	assert.Equal(t, "OK", resp.Result.HTTP.Body)
 }
 
 func TestTriggerPostWithBasicAuth(t *testing.T) {
@@ -198,8 +201,9 @@ func TestTriggerPostWithBasicAuth(t *testing.T) {
 
 	test := model.Test{
 		Name: "test",
-		ServiceUnderTest: model.ServiceUnderTest{
-			Request: model.HTTPRequest{
+		ServiceUnderTest: model.Trigger{
+			Type: model.TriggerTypeHTTP,
+			HTTP: &model.HTTPRequest{
 				URL:    server.URL,
 				Method: model.HTTPMethodPOST,
 				Headers: []model.HTTPHeader{
@@ -220,8 +224,8 @@ func TestTriggerPostWithBasicAuth(t *testing.T) {
 	resp, err := ex.Trigger(context.TODO(), test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
 	assert.NoError(t, err)
 
-	assert.Equal(t, 200, resp.Response.(model.HTTPResponse).StatusCode)
-	assert.Equal(t, "OK", resp.Response.(model.HTTPResponse).Body)
+	assert.Equal(t, 200, resp.Result.HTTP.StatusCode)
+	assert.Equal(t, "OK", resp.Result.HTTP.Body)
 }
 
 func TestTriggerPostWithBearerAuth(t *testing.T) {
@@ -257,8 +261,9 @@ func TestTriggerPostWithBearerAuth(t *testing.T) {
 
 	test := model.Test{
 		Name: "test",
-		ServiceUnderTest: model.ServiceUnderTest{
-			Request: model.HTTPRequest{
+		ServiceUnderTest: model.Trigger{
+			Type: model.TriggerTypeHTTP,
+			HTTP: &model.HTTPRequest{
 				URL:    server.URL,
 				Method: model.HTTPMethodPOST,
 				Headers: []model.HTTPHeader{
@@ -278,6 +283,6 @@ func TestTriggerPostWithBearerAuth(t *testing.T) {
 	resp, err := ex.Trigger(context.TODO(), test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
 	assert.NoError(t, err)
 
-	assert.Equal(t, 200, resp.Response.(model.HTTPResponse).StatusCode)
-	assert.Equal(t, "OK", resp.Response.(model.HTTPResponse).Body)
+	assert.Equal(t, 200, resp.Result.HTTP.StatusCode)
+	assert.Equal(t, "OK", resp.Result.HTTP.Body)
 }

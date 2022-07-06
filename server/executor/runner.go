@@ -117,15 +117,15 @@ func (r persistentRunner) processExecQueue(job execReq) {
 	run := job.run.Start()
 	r.handleDBError(r.updater.Update(job.ctx, run))
 
-	// TODO: hardcoded trigger type.
-	trigger, err := r.triggers.Get("http")
+	trigger := job.test.ServiceUnderTest
+	triggerer, err := r.triggers.Get(trigger.Type)
 	if err != nil {
+		// TODO: actually handle the error
 		panic(err)
 	}
 
-	response, err := trigger.Trigger(job.ctx, job.test, job.run.TraceID, job.run.SpanID)
-	// TODO: hardcoded response type.
-	run = r.handleExecutionResult(run, response.Response.(model.HTTPResponse), err)
+	response, err := triggerer.Trigger(job.ctx, job.test, job.run.TraceID, job.run.SpanID)
+	run = r.handleExecutionResult(run, response, err)
 
 	r.handleDBError(r.updater.Update(job.ctx, run))
 	if run.State == model.RunStateAwaitingTrace {
@@ -135,8 +135,8 @@ func (r persistentRunner) processExecQueue(job execReq) {
 	}
 }
 
-func (r persistentRunner) handleExecutionResult(run model.Run, resp model.HTTPResponse, err error) model.Run {
-	run.Response = resp
+func (r persistentRunner) handleExecutionResult(run model.Run, response trigger.Response, err error) model.Run {
+	run.TriggerResult = response.Result
 	if err != nil {
 		return run.Failed(err)
 	}

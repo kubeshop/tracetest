@@ -12,25 +12,25 @@ import (
 
 type Triggerer interface {
 	Trigger(context.Context, model.Test, trace.TraceID, trace.SpanID) (Response, error)
-	Type() string
+	Type() model.TriggerType
 }
 
 type Response struct {
 	SpanAttributes map[string]string
-	Response       any
+	Result         model.TriggerResult
 }
 
 func NewRegsitry(tracer trace.Tracer) *Registry {
 	return &Registry{
 		tracer: tracer,
-		reg:    map[string]Triggerer{},
+		reg:    map[model.TriggerType]Triggerer{},
 	}
 }
 
 type Registry struct {
 	sync.Mutex
 	tracer trace.Tracer
-	reg    map[string]Triggerer
+	reg    map[model.TriggerType]Triggerer
 }
 
 func (r *Registry) Add(t Triggerer) {
@@ -42,7 +42,7 @@ func (r *Registry) Add(t Triggerer) {
 
 var ErrTriggererTypeNotRegistered = errors.New("triggerer type not found")
 
-func (r *Registry) Get(triggererType string) (Triggerer, error) {
+func (r *Registry) Get(triggererType model.TriggerType) (Triggerer, error) {
 	r.Lock()
 	defer r.Unlock()
 

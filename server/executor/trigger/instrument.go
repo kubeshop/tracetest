@@ -20,8 +20,8 @@ type instrumentedTriggerer struct {
 	triggerer Triggerer
 }
 
-func (t *instrumentedTriggerer) Type() string {
-	return "instrumented"
+func (t *instrumentedTriggerer) Type() model.TriggerType {
+	return model.TriggerType("instrumented")
 }
 
 func (t *instrumentedTriggerer) Trigger(ctx context.Context, test model.Test, tid trace.TraceID, sid trace.SpanID) (Response, error) {
@@ -32,7 +32,7 @@ func (t *instrumentedTriggerer) Trigger(ctx context.Context, test model.Test, ti
 
 	attrs := []attribute.KeyValue{
 		attribute.String("tracetest.run.trigger.test_id", test.ID.String()),
-		attribute.String("tracetest.run.trigger.type", t.triggerer.Type()),
+		attribute.String("tracetest.run.trigger.type", string(t.triggerer.Type())),
 	}
 
 	for k, v := range resp.SpanAttributes {
