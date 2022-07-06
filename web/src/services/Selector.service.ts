@@ -4,6 +4,7 @@ import {TPseudoSelector, TSpanSelector} from '../types/Assertion.types';
 import {TFilter, TStructure} from '../types/Common.types';
 import {TCompareOperatorSymbol} from '../types/Operator.types';
 import {escapeString, isJson} from '../utils/Common';
+import {tracetestLang} from '../utils/grammar';
 
 const getValue = (value: string): string => {
   if (isNumber(value)) {
@@ -132,6 +133,15 @@ const SelectorService = () => ({
     const hasOrOperator = selector.includes('],');
 
     return matches > 1 || hasOrOperator;
+  },
+
+  getIsValidSelector(query: string): boolean {
+    try {
+      tracetestLang.parser.configure({strict: true}).parse(query);
+      return true;
+    } catch (e) {
+      return false;
+    }
   },
 });
 
