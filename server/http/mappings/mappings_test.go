@@ -1,11 +1,11 @@
-package http_test
+package mappings_test
 
 import (
 	"encoding/json"
 	"testing"
 
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
-	"github.com/kubeshop/tracetest/server/http"
+	"github.com/kubeshop/tracetest/server/http/mappings"
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/stretchr/testify/require"
 )
@@ -89,10 +89,10 @@ func TestDefinitionsOrder(t *testing.T) {
 	// try multiple times to hit the map iteration randomization
 	attempts := 50
 	for i := 0; i < attempts; i++ {
-		m := http.ModelMapper{
+		m := mappings.Model{
 			Comparators: comparator.DefaultRegistry(),
 		}
-		oapi := http.OpenAPIMapper{}
+		oapi := mappings.OpenAPI{}
 
 		actual := oapi.Definition(m.Definition(input))
 		actualJSON, err := json.Marshal(actual)
@@ -203,10 +203,10 @@ func TestResultsOrder(t *testing.T) {
 	// try multiple times to hit the map iteration randomization
 	attempts := 50
 	for i := 0; i < attempts; i++ {
-		m := http.ModelMapper{
+		m := mappings.Model{
 			Comparators: comparator.DefaultRegistry(),
 		}
-		oapi := http.OpenAPIMapper{}
+		oapi := mappings.OpenAPI{}
 
 		actual := oapi.Result(m.Result(input))
 		actualJSON, err := json.Marshal(actual)

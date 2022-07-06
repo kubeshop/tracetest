@@ -38,8 +38,7 @@ type HTTPRequest struct {
 	Auth    *HTTPAuthenticator
 }
 
-func (a HTTPRequest) AuthenticateGRPC() {}
-func (a HTTPRequest) AuthenticateHTTP(req *http.Request) {
+func (a HTTPRequest) Authenticate(req *http.Request) {
 	if a.Auth == nil {
 		return
 	}

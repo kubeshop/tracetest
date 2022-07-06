@@ -7,7 +7,7 @@ type GRPCHeader struct {
 }
 
 type GRPCRequest struct {
-	ProtobufFile []byte
+	ProtobufFile string
 	Address      string
 	Service      string
 	Method       string

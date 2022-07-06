@@ -14,7 +14,6 @@ components:
       properties:
         protobufFile:
           type: string
-          format: binary
         address:
           type: string
         service:
@@ -26,7 +25,7 @@ components:
           items:
             $ref: "#/components/schemas/GRPCHeader"
         auth:
-          $ref: "#/components/schemas/GRPCAuth"
+          $ref: "./http.yaml#/components/schemas/HTTPAuth"
         request:
           type: string
 
@@ -41,32 +40,3 @@ components:
             $ref: "#/components/schemas/GRPCHeader"
         body:
           type: string
-
-    GRPCAuth:
-      type: object
-      properties:
-        type:
-          type: string
-          enum: [apiKey, basic, bearer]
-        apiKey:
-          type: object
-          properties:
-            key:
-              type: string
-            value:
-              type: string
-            in:
-              type: string
-              enum: [query, header]
-        basic:
-          type: object
-          properties:
-            username:
-              type: string
-            password:
-              type: string
-        bearer:
-          type: object
-          properties:
-            token:
-              type: string

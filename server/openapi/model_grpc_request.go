@@ -9,12 +9,8 @@
 
 package openapi
 
-import (
-	"os"
-)
-
 type GrpcRequest struct {
-	ProtobufFile *os.File `json:"protobufFile,omitempty"`
+	ProtobufFile string `json:"protobufFile,omitempty"`
 
 	Address string `json:"address,omitempty"`
 
@@ -24,7 +20,7 @@ type GrpcRequest struct {
 
 	Metadata []GrpcHeader `json:"metadata,omitempty"`
 
-	Auth GrpcAuth `json:"auth,omitempty"`
+	Auth HttpAuth `json:"auth,omitempty"`
 
 	Request string `json:"request,omitempty"`
 }
@@ -36,7 +32,7 @@ func AssertGrpcRequestRequired(obj GrpcRequest) error {
 			return err
 		}
 	}
-	if err := AssertGrpcAuthRequired(obj.Auth); err != nil {
+	if err := AssertHttpAuthRequired(obj.Auth); err != nil {
 		return err
 	}
 	return nil
