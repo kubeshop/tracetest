@@ -2,12 +2,14 @@ name: Update dependency deployments
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
     paths:
-      - k8s
+      - k8s/**
 
 jobs:
-  apply:
+  deploy-collector:
+    name: Deploy OTEL Collector
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
