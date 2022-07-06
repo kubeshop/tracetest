@@ -165,9 +165,6 @@ jobs:
     needs: deploy
     name: Run e2e tests
     runs-on: ubuntu-latest
-    defaults:
-        run:
-          working-directory: ./web
     strategy:
       fail-fast: false
       matrix:
@@ -202,14 +199,26 @@ jobs:
             --namespace tracetest-pr-${{ github.event.pull_request.number }} \
             svc/tracetest-pr-${{ github.event.pull_request.number }} 3000:8080 &
 
-      - name: 'UI Tests - Chrome'
-        uses: cypress-io/github-action@v4
+      - name: Cache dependencies
+        id: cache-nodemodules
+        uses: actions/cache@v2
         with:
-          browser: chrome
-          record: true
-          parallel: true
-          group: 'UI - Chrome'
-          spec: cypress/integration/*
+          path: |
+            web/node_modules
+            /home/runner/.cache/Cypress
+          key: npm--${{ hashFiles('web/package-lock.json') }}
+          restore-keys: npm-
+
+      - name: Install test dependencies
+        if: steps.cache-nodemodules.outputs.cache-hit != 'true'
+        run: |
+          cd web/
+          npm ci
+
+      - name: Run integration tests
+        run: |
+          cd web/
+          npm run cy:ci
         env:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
           # Recommended: pass the GitHub token lets this action correctly
