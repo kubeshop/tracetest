@@ -210,6 +210,7 @@ jobs:
           parallel: true
           group: 'UI - Chrome'
           spec: cypress/integration/*
+          project: ./web
         env:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
           # Recommended: pass the GitHub token lets this action correctly
