@@ -9,6 +9,7 @@ describe('TestDefinitionService', () => {
         isDraft: false,
         originalSelector: '',
         selector: '',
+        isAdvancedSelector: false,
       });
       expect(testResultCount).toEqual({
         assertions: [],

@@ -32,7 +32,6 @@ const RequestDetailsForm = ({form, onSubmit, onValidation, methodList}: IProps) 
         metadata: [{key: '', value: ''}],
       }}
     >
-      <S.GlobalStyle />
       <S.InputContainer>
         <Form.Item data-cy="protoFile" name="protoFile" label="Upload Protobuf File">
           <RequestDetailsFileInput />

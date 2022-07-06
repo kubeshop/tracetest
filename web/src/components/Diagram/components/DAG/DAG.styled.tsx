@@ -11,12 +11,12 @@ export const Container = styled.div<{$showAffected: boolean}>`
 
   .react-flow__minimap {
     bottom: 0;
-    background-color: #fbfbff;
+    background-color: ${({theme}) => theme.color.bg};
     right: 0;
   }
 
   .react-flow__node-span > div.matched {
-    box-shadow: 0 4px 8px #c9cedb;
+    box-shadow: ${({theme}) => `0 4px 8px ${theme.color.borderShadow}`};
   }
 
   ${({$showAffected}) =>
@@ -29,7 +29,7 @@ export const Container = styled.div<{$showAffected: boolean}>`
 `;
 
 export const Controls = styled.div`
-  background-color: #fbfbff;
+  background-color: ${({theme}) => theme.color.bg};
   border-bottom-left-radius: 8px;
   position: absolute;
   right: 0;
@@ -42,30 +42,30 @@ export const SelectorControls = styled(Controls)`
 `;
 
 export const ZoomButton = styled(Button)<{$isActive?: boolean}>`
-  color: ${({$isActive}) => ($isActive ? '#2d62ff' : 'rgba(3, 24, 73, 0.3)')};
+  color: ${({theme, $isActive}) => ($isActive ? theme.color.interactive : theme.color.textLight)};
   width: 24px;
 
   &:focus {
     background-color: unset;
-    color: ${({$isActive}) => ($isActive ? '#2d62ff' : 'rgba(3, 24, 73, 0.3)')};
+    color: ${({theme, $isActive}) => ($isActive ? theme.color.interactive : theme.color.textLight)};
   }
 
   &:hover {
     background-color: unset;
-    color: #031849;
+    color: ${({theme}) => theme.color.text};
   }
 `;
 
 export const ToggleButton = styled(ZoomButton)`
-  color: #61175e;
+  color: ${({theme}) => theme.color.primary};
 
   &:hover,
   &:focus {
-    color: #61175e;
+    color: ${({theme}) => theme.color.primary};
   }
 `;
 
 export const FocusedText = styled(Typography.Text)`
-  color: #61175e;
+  color: ${({theme}) => theme.color.primary};
   margin-left: 8px;
 `;

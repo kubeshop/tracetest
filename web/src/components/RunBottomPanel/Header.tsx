@@ -1,6 +1,7 @@
 import {PlusOutlined} from '@ant-design/icons';
 import {Badge, Switch, Tooltip} from 'antd';
 import {MouseEventHandler, useCallback, useMemo} from 'react';
+import {useTheme} from 'styled-components';
 
 import {useAssertionForm} from 'components/AssertionForm/AssertionForm.provider';
 import {Steps} from 'components/GuidedTour/traceStepList';
@@ -25,6 +26,7 @@ interface IProps {
 }
 
 const Header: React.FC<IProps> = ({run: {createdAt}, assertionResults, isDisabled, selectedSpan}) => {
+  const theme = useTheme();
   const {isBottomPanelOpen, openBottomPanel, toggleBottomPanel} = useRunLayout();
   const {open} = useAssertionForm();
   const {viewResultsMode, changeViewResultsMode} = useTestDefinition();
@@ -65,15 +67,14 @@ const Header: React.FC<IProps> = ({run: {createdAt}, assertionResults, isDisable
         <S.StartDateText>{Date.format(createdAt)}</S.StartDateText>
         <S.HeaderText strong>
           {totalAssertionCount} assertion(s) • {totalPassedCount + totalFailedCount} check(s) •{' '}
-          <Badge count="P" style={{backgroundColor: '#49AA19'}} /> <S.CountNumber>{totalPassedCount}</S.CountNumber>
-          <Badge count="F" /> <S.CountNumber>{totalFailedCount}</S.CountNumber>
+          <Badge count="P" style={{backgroundColor: theme.color.success}} />{' '}
+          <S.CountNumber>{totalPassedCount}</S.CountNumber>
+          <Badge count="F" style={{backgroundColor: theme.color.error}} />{' '}
+          <S.CountNumber>{totalFailedCount}</S.CountNumber>
         </S.HeaderText>
       </div>
       <S.Row>
-        <Tooltip
-          color="#FBFBFF"
-          title="You can decide whether you want to see the results using the key-value (wizard) mode or the query language (advanced)."
-        >
+        <Tooltip title="You can decide whether you want to see the results using the key-value (wizard) mode or the query language (advanced).">
           <Switch
             disabled={isDisabled}
             checkedChildren="Advanced"

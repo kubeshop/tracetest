@@ -2,7 +2,7 @@ import {Modal} from 'antd';
 import styled from 'styled-components';
 
 export const CodeContainer = styled.div`
-  border: 1px solid rgba(3, 24, 73, 0.1);
+  border: ${({theme}) => `1px solid ${theme.color.border}`};
   min-height: 370px;
 
   pre {
@@ -13,7 +13,7 @@ export const CodeContainer = styled.div`
 
 export const FileViewerModal = styled(Modal)`
   & .ant-modal-body {
-    background: #fbfbff;
+    background: ${({theme}) => theme.color.bg};
   }
 `;
 

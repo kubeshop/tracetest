@@ -26,7 +26,6 @@ const BasicDetailsForm = ({form, onSubmit, onValidation}: IProps) => {
       onFinish={onSubmit}
       onValuesChange={handleOnValuesChange}
     >
-      <S.GlobalStyle />
       <S.InputContainer>
         <RequestDetailsUrlInput />
         <RequestDetailsAuthInput form={form} />

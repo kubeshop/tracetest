@@ -14,7 +14,7 @@ export const LeftPanel = styled.div`
 `;
 
 export const RightPanel = styled.div`
-  background: #fff;
+  background: ${({theme}) => theme.color.white};
   box-shadow: 0 20px 24px rgba(153, 155, 168, 0.18);
   flex-basis: 50%;
   overflow-y: scroll;

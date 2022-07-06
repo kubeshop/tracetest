@@ -1,7 +1,7 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {applyNodeChanges, Edge, MarkerType, Node, NodeChange} from 'react-flow-renderer';
 
-import {Colors} from 'constants/DAG.constants';
+import {theme} from 'constants/Theme.constants';
 import DAGModel from 'models/DAG.model';
 import {TSpan} from 'types/Span.types';
 import {clearAffectedSpans, setAffectedSpans, setMatchedSpans, setSelectedSpan} from './Span.slice';
@@ -62,8 +62,8 @@ const dagSlice = createSlice({
           return {
             ...edge,
             animated: selected,
-            markerEnd: {color: selected ? Colors.Selected : Colors.Default, type: MarkerType.ArrowClosed},
-            style: {stroke: selected ? Colors.Selected : Colors.Default},
+            markerEnd: {color: selected ? theme.color.interactive : theme.color.border, type: MarkerType.ArrowClosed},
+            style: {stroke: selected ? theme.color.interactive : theme.color.border},
           };
         });
 

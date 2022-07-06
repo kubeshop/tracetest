@@ -1,6 +1,6 @@
 import {Typography} from 'antd';
 import {useCallback} from 'react';
-import { ResultViewModes } from 'constants/Test.constants';
+import {ResultViewModes} from 'constants/Test.constants';
 import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
 import AssertionAnalyticsService from 'services/Analytics/AssertionAnalytics.service';
 import {TAssertionResultEntry, TAssertionResults} from 'types/Assertion.types';

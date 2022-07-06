@@ -18,9 +18,9 @@ export const HeaderText = styled(Typography.Text)``;
 
 export const StartDateText = styled(Typography.Text)`
   && {
+    font-size: ${({theme}) => theme.size.sm};
     margin-left: 14px;
     margin-right: 40px;
-    font-size: 12px;
   }
 `;
 

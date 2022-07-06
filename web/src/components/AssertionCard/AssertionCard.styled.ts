@@ -4,14 +4,15 @@ import styled, {css} from 'styled-components';
 
 export const AssertionCard = styled.div<{$isSelected: boolean}>`
   border-radius: 2px;
-  border: ${({$isSelected}) => ($isSelected ? '1px solid #031849' : '1px solid rgba(3, 24, 73, 0.1)')};
+  border: ${({$isSelected, theme}) =>
+    $isSelected ? `1px solid ${theme.color.text}` : `1px solid ${theme.color.borderLight}`};
 `;
 
 export const Header = styled.div`
   cursor: pointer;
   display: flex;
   background: #fbfbff;
-  border-bottom: 1px solid rgba(3, 24, 73, 0.1);
+  border-bottom: ${({theme}) => `1px solid ${theme.color.borderLight}`};
   padding: 8px 14px;
   justify-content: space-between;
   border-radius: 2px 2px 0 0;
@@ -22,18 +23,18 @@ export const Body = styled.div`
   display: flex;
   flex-direction: column;
   gap: 9px;
-  background-color: #fff;
+  background-color: ${({theme}) => theme.color.white};
 `;
 
 export const SpanCountText = styled(Typography.Text)`
-  font-size: 12px;
+  font-size: ${({theme}) => theme.size.sm};
   margin-right: 14px;
 `;
 
 const baseIcon = css`
-  font-size: 18px;
-  color: #61175e;
+  color: ${({theme}) => theme.color.primary};
   cursor: pointer;
+  font-size: ${({theme}) => theme.size.xl};
 `;
 
 export const EditIcon = styled(EditOutlined)`
@@ -55,9 +56,7 @@ export const ActionsContainer = styled.div`
   align-items: center;
 `;
 
-export const StatusTag = styled(Tag).attrs({
-  color: '#61175E',
-})``;
+export const StatusTag = styled(Tag)``;
 
 export const Selector = styled.div`
   display: flex;
@@ -74,6 +73,6 @@ export const SelectorValueText = styled(Typography.Text)``;
 export const SelectorAttributeText = styled(Typography.Text).attrs({
   type: 'secondary',
 })`
-  font-size: 10px;
+  font-size: ${({theme}) => theme.size.xs};
   margin-bottom: -3px;
 `;

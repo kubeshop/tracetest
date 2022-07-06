@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom';
 import * as Sentry from '@sentry/react';
 import {BrowserTracing} from '@sentry/tracing';
 import 'react-reflex/styles.css';
-import './index.css';
 import App from './App';
 
 import * as serviceWorker from './serviceWorker';

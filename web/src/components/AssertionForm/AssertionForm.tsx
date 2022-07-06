@@ -65,10 +65,10 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
   return (
     <S.AssertionForm>
       <S.AssertionFormHeader>
-        <S.AssertionFormTitle strong>{isEditing ? 'Edit Assertion' : 'Add New Assertion'}</S.AssertionFormTitle>
+        <S.AssertionFormTitle>{isEditing ? 'Edit Assertion' : 'Add New Assertion'}</S.AssertionFormTitle>
         <S.AffectedSpansContainer>
           <AffectedSpanControls />
-          <Typography.Text style={{color: '#61175e'}}>selected span(s)</Typography.Text>
+          <S.AffectedSpansLabel>selected span(s)</S.AffectedSpansLabel>
         </S.AffectedSpansContainer>
       </S.AssertionFormHeader>
       <Form<IValues>

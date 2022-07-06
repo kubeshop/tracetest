@@ -1,13 +1,7 @@
-import {render, waitFor} from '@testing-library/react';
-import {MemoryRouter} from 'react-router-dom';
+import {render, waitFor} from 'test-utils';
 import Header from '../index';
 
 test('Header', async () => {
-  const {getByTestId} = render(
-    <MemoryRouter>
-      <Header />
-    </MemoryRouter>
-  );
-
+  const {getByTestId} = render(<Header />);
   await waitFor(() => getByTestId('github-link'));
 });

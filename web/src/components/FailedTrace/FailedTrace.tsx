@@ -32,7 +32,7 @@ const FailedTrace: React.FC<IFailedTraceProps> = ({
       <S.Container>
         <S.FailedIcon />
         <S.TextContainer>
-          <Typography.Title level={3}>Test Run Failed</Typography.Title>
+          <Typography.Title level={1}>Test Run Failed</Typography.Title>
           <Typography.Text type="secondary">{lastErrorState}</Typography.Text>
           <Typography.Text type="secondary">
             Please let us know about this issue - <a href={GITHUB_ISSUES_URL}>create an issue</a> or contact us via{' '}

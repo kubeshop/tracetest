@@ -9,12 +9,8 @@ export const AttributeRow = styled.div`
   align-items: start;
   padding: 8px;
 
-  .ant-tooltip-inner {
-    color: yellow;
-  }
-
   &:hover {
-    background-color: #fbfbff;
+    background-color: ${({theme}) => theme.color.bg};
   }
 `;
 
@@ -24,13 +20,13 @@ export const AttributeValueRow = styled.div`
 `;
 
 export const CopyIcon = styled(CopyOutlined)`
+  color: ${({theme}) => theme.color.primary};
   cursor: pointer;
-  color: #61175e;
 `;
 
 export const AddAssertionIcon = styled(PlusOutlined)`
+  color: ${({theme}) => theme.color.primary};
   cursor: pointer;
-  color: #61175e;
 `;
 
 export const TextContainer = styled.div`
@@ -40,7 +36,7 @@ export const TextContainer = styled.div`
 `;
 
 export const Text = styled(Typography.Text)`
-  font-size: 12px;
+  font-size: ${({theme}) => theme.size.sm};
 `;
 
 export const IconContainer = styled.div`
@@ -51,13 +47,12 @@ export const IconContainer = styled.div`
 `;
 
 export const CustomTooltip = styled(Tooltip).attrs({
-  color: '#FBFBFF',
   placement: 'top',
   arrowPointAtCenter: true,
 })``;
 
 export const CustomBadge = styled(Badge)`
-  border: 1px solid rgba(3, 24, 73, 0.5);
+  border: ${({theme}) => `1px solid ${theme.color.textSecondary}`};
   border-radius: 9999px;
   cursor: pointer;
   line-height: 19px;
@@ -66,8 +61,8 @@ export const CustomBadge = styled(Badge)`
   white-space: nowrap;
 
   .ant-badge-status-text {
-    color: rgba(3, 24, 73, 0.5);
-    font-size: 12px;
+    color: ${({theme}) => theme.color.textSecondary};
+    font-size: ${({theme}) => theme.size.sm};
     margin-left: 3px;
   }
 `;

@@ -17,11 +17,10 @@ export const TextContainer = styled.div`
   overflow: hidden;
 `;
 
-export const Text = styled(Typography.Text).attrs({
-  strong: true,
-})`
-  overflow-x: ellipsis;
-  font-size: 12px;
+export const Title = styled(Typography.Title).attrs({level: 4})`
+  && {
+    margin: 0;
+  }
 `;
 
 export const FailedContainer = styled.div`
