@@ -18,7 +18,7 @@ export const ValueJson = styled(Typography.Text)<{$isCollapsed: boolean}>`
 
   pre {
     margin: 0;
-    background: ${({theme}) => theme.color.bg};
+    background: ${({theme}) => theme.color.background};
     border: ${({theme}) => `1px solid ${theme.color.borderLight}`};
     font-size: ${({theme}) => theme.size.sm};
 

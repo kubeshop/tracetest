@@ -9,7 +9,7 @@ export const ResultCard = styled.div`
   padding: 16px 12px;
   border: ${({theme}) => `1px solid ${theme.color.borderLight}`};
   border-radius: 2px;
-  background: ${({theme}) => theme.color.bg};
+  background: ${({theme}) => theme.color.background};
   cursor: pointer;
 `;
 

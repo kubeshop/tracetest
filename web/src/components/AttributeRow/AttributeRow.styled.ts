@@ -10,7 +10,7 @@ export const AttributeRow = styled.div`
   padding: 8px;
 
   &:hover {
-    background-color: ${({theme}) => theme.color.bg};
+    background-color: ${({theme}) => theme.color.background};
   }
 `;
 

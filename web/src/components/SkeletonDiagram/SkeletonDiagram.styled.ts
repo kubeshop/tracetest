@@ -35,7 +35,7 @@ export const SkeletonNode = styled.div`
 `;
 
 export const SkeletonNotch = styled.div`
-  background-color: ${({theme}) => theme.color.bg};
+  background-color: ${({theme}) => theme.color.background};
   position: absolute;
   top: 0;
   margin-top: 1px;

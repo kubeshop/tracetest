@@ -6,7 +6,7 @@ export const PluginCard = styled.div<{$isSelected: boolean; $isActive: boolean}>
   border-radius: 4px;
   border: 1px solid ${({$isSelected, theme}) => ($isSelected ? theme.color.primary : theme.color.borderLight)};
   padding: 20px;
-  background: ${({$isSelected, theme}) => ($isSelected ? theme.color.bg : theme.color.white)};
+  background: ${({$isSelected, theme}) => ($isSelected ? theme.color.background : theme.color.white)};
   gap: 20px;
   opacity: ${({$isActive}) => ($isActive ? 1 : 0.5)};
   min-width: 490px;

@@ -2,10 +2,9 @@ import {DefaultTheme} from 'styled-components';
 
 export const theme: DefaultTheme = {
   color: {
-    bg: '#FBFBFF',
+    background: '#FBFBFF',
     border: '#CDD1DB',
     borderLight: 'rgba(3, 24, 73, 0.1)',
-    borderShadow: '#C9CEDB',
     error: '#FF4D4F',
     interactive: '#2D62FF',
     primary: '#61175E',

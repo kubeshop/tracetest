@@ -87,7 +87,7 @@ const EditTestModal = ({onClose, isOpen, test}: IProps) => {
 
   return (
     <Modal
-      bodyStyle={{backgroundColor: theme.color.bg, overflowY: 'auto'}}
+      bodyStyle={{backgroundColor: theme.color.background, overflowY: 'auto'}}
       footer={footer}
       width="40%"
       onCancel={handleOnCancel}

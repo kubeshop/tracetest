@@ -11,12 +11,12 @@ export const Container = styled.div<{$showAffected: boolean}>`
 
   .react-flow__minimap {
     bottom: 0;
-    background-color: ${({theme}) => theme.color.bg};
+    background-color: ${({theme}) => theme.color.background};
     right: 0;
   }
 
   .react-flow__node-span > div.matched {
-    box-shadow: ${({theme}) => `0 4px 8px ${theme.color.borderShadow}`};
+    box-shadow: ${({theme}) => `0 4px 8px ${theme.color.border}`};
   }
 
   ${({$showAffected}) =>
@@ -29,7 +29,7 @@ export const Container = styled.div<{$showAffected: boolean}>`
 `;
 
 export const Controls = styled.div`
-  background-color: ${({theme}) => theme.color.bg};
+  background-color: ${({theme}) => theme.color.background};
   border-bottom-left-radius: 8px;
   position: absolute;
   right: 0;

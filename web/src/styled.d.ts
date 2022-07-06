@@ -6,10 +6,9 @@ declare module 'styled-components' {
   export interface DefaultTheme {
     /** Colors */
     color: {
-      bg: string;
+      background: string;
       border: string;
       borderLight: string;
-      borderShadow: string;
       error: string;
       interactive: string;
       primary: string;

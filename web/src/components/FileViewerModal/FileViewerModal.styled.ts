@@ -13,7 +13,7 @@ export const CodeContainer = styled.div`
 
 export const FileViewerModal = styled(Modal)`
   & .ant-modal-body {
-    background: ${({theme}) => theme.color.bg};
+    background: ${({theme}) => theme.color.background};
   }
 `;
 
