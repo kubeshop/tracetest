@@ -20,6 +20,10 @@ func FromOtel(input *v1.TracesData) Trace {
 		}
 	}
 
+	if len(flattenSpans) == 0 {
+		return Trace{}
+	}
+
 	spansMap := map[trace.SpanID]*Span{}
 	for _, span := range flattenSpans {
 		newSpan := convertOtelSpanIntoSpan(span)

@@ -1,6 +1,7 @@
 package executor
 
 import (
+	"encoding/hex"
 	"fmt"
 	"math"
 	"time"
@@ -28,10 +29,19 @@ func (pe InstrumentedPollerExecutor) ExecuteRequest(request *PollingRequest) (bo
 	defer span.End()
 
 	finished, run, err := pe.pollerExecutor.ExecuteRequest(request)
+	if err != nil {
+		span.RecordError(err)
+		return finished, run, err
+	}
+
+	spanCount := len(run.Trace.Flat)
 
 	span.SetAttributes(
+		attribute.String("tracetest.run.trace_poller.trace_id", hex.EncodeToString(request.run.TraceID[:])),
+		attribute.String("tracetest.run.trace_poller.span_id", hex.EncodeToString(request.run.SpanID[:])),
 		attribute.Bool("tracetest.run.trace_poller.succesful", finished),
 		attribute.String("tracetest.run.trace_poller.test_id", request.test.ID.String()),
+		attribute.Int("tracetest.run.trace_poller.amount_retrieved_spans", spanCount),
 	)
 
 	return finished, run, err
@@ -70,7 +80,7 @@ func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, m
 	if !pe.donePollingTraces(request, trace) {
 		run.Trace = &trace
 		request.run = run
-		return false, model.Run{}, nil
+		return false, run, nil
 	}
 
 	trace = trace.Sort()
@@ -83,7 +93,7 @@ func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, m
 
 	err = pe.updater.Update(request.ctx, run)
 	if err != nil {
-		return false, model.Run{}, nil
+		return false, model.Run{}, err
 	}
 
 	return true, run, nil

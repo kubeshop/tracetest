@@ -44,7 +44,6 @@ func GetTestingApp(options ...TestingAppOption) (*app.App, error) {
 			RetryDelay: "5s",
 		},
 		Telemetry: config.TelemetryConfig{
-			Exporters:   []string{"console"},
 			ServiceName: "tracetest",
 		},
 	}
