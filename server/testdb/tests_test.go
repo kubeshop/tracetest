@@ -17,8 +17,9 @@ func TestCreateTest(t *testing.T) {
 	test := model.Test{
 		Name:        "first test",
 		Description: "description",
-		ServiceUnderTest: model.ServiceUnderTest{
-			Request: model.HTTPRequest{
+		ServiceUnderTest: model.Trigger{
+			Type: model.TriggerTypeHTTP,
+			HTTP: &model.HTTPRequest{
 				URL: "http://localhost:3030/hello-instrumented",
 			},
 		},
