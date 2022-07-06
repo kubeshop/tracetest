@@ -28,7 +28,6 @@ jobs:
 
     - name: Apply
       run: |
-        chmod +x ./k8s/deploy-collector.sh
         ./k8s/deploy-collector.sh
       env:
         LIGHTSTEP_TOKEN: ${{ secrets.LIGHTSTEP_TOKEN }}
