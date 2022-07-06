@@ -23,8 +23,8 @@ export const Container = styled.div<{$barHeight: number; $showAffected: boolean}
   .span-name {
     width: 180px;
     height ${({$barHeight}) => `${$barHeight}px`};
-    fill: #000;
-    font-size: 14px;
+    fill: ${({theme}) => theme.color.text};
+    font-size: ${({theme}) => theme.size.md};
     pointer-events: none;
     alignment-baseline: middle;
     dominant-baseline: middle;
@@ -33,8 +33,8 @@ export const Container = styled.div<{$barHeight: number; $showAffected: boolean}
   .span-duration {
     width: 100px;
     height: ${({$barHeight}) => `${$barHeight}px`};
-    fill: #9AA3AB;
-    font-size: 14px;
+    fill: ${({theme}) => theme.color.textSecondary};
+    font-size: ${({theme}) => theme.size.md};
     pointer-events: none;
     alignment-baseline: middle;
     dominant-baseline: middle;
@@ -76,13 +76,13 @@ export const Container = styled.div<{$barHeight: number; $showAffected: boolean}
 
   .duration-ms-text {
     text-anchor: end;
-    fill: #9AA3AB;
+    fill: ${({theme}) => theme.color.textSecondary};
   }
 
   .tick {
-    fill: #9AA3AB;
+    fill: ${({theme}) => theme.color.textSecondary};
     stroke: none;
-    font-size: 14px;
+    font-size: ${({theme}) => theme.size.md};
   }
 
   ${({$showAffected}) =>

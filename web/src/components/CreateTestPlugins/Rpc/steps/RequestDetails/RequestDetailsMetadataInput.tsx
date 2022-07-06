@@ -1,4 +1,4 @@
-import {DeleteOutlined, PlusOutlined} from '@ant-design/icons';
+import {PlusOutlined} from '@ant-design/icons';
 import {Button, Form, Input} from 'antd';
 import React from 'react';
 import * as S from './RequestDetails.styled';
@@ -20,7 +20,7 @@ const RequestDetailsMetadataInput: React.FC = () => (
 
               <Form.Item noStyle>
                 <Button
-                  icon={<DeleteOutlined style={{fontSize: 12, color: 'rgba(3, 24, 73, 0.5)'}} />}
+                  icon={<S.DeleteIcon />}
                   onClick={() => remove(field.name)}
                   style={{marginLeft: 12}}
                   type="link"

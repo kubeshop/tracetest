@@ -33,7 +33,6 @@ const BasicDetailsForm = ({form, onSubmit, onSelectDemo, onValidation, selectedD
       onFinish={onSubmit}
       onValuesChange={handleOnValuesChange}
     >
-      <S.GlobalStyle />
       <S.InputContainer>
         {pluginName === SupportedPlugins.REST && (
           <BasicDetailsDemoHelper

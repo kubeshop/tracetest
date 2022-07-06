@@ -14,7 +14,7 @@ export const Wrapper = styled.div<{detail?: boolean}>`
   display: flex;
   flex-grow: 1;
   flex-direction: column;
-  background: #fff;
+  background: ${({theme}) => theme.color.white};
 `;
 
 export const EmptyStateIcon = styled.img.attrs({

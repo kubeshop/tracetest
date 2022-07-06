@@ -1,5 +1,6 @@
 import {Button, Popover, Typography} from 'antd';
 import {InfoCircleOutlined} from '@ant-design/icons';
+import {useTheme} from 'styled-components';
 
 import Date from 'utils/Date';
 import TestAnalyticsService from '../../services/Analytics/TestAnalytics.service';
@@ -12,6 +13,8 @@ interface IProps {
 }
 
 const Info = ({date, executionTime, totalSpans, traceId}: IProps) => {
+  const theme = useTheme();
+
   const content = (
     <>
       <div>
@@ -42,7 +45,7 @@ const Info = ({date, executionTime, totalSpans, traceId}: IProps) => {
       }}
     >
       <Button
-        icon={<InfoCircleOutlined style={{color: 'rgba(3, 24, 73, 0.6)'}} />}
+        icon={<InfoCircleOutlined style={{color: theme.color.textSecondary}} />}
         shape="circle"
         size="small"
         type="text"

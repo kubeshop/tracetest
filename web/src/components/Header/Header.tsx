@@ -12,9 +12,7 @@ const Header: FC = () => {
   return (
     <S.Header>
       <Link to="/">
-        <S.TitleText>
-          <img alt="tracetest_log" data-cy="logo" src={Logo} />
-        </S.TitleText>
+        <img alt="tracetest_log" data-cy="logo" src={Logo} />
       </Link>
       <HeaderMenu onGuidedTourClick={onGuidedTourClick} pathname={pathname} />
     </S.Header>

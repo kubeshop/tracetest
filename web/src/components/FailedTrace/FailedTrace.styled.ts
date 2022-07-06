@@ -15,14 +15,12 @@ export const Container = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  text-align: center;
 `;
 
-export const FailedIcon = styled(CloseCircleFilled).attrs({
-  style: {
-    color: '#e84749',
-    fontSize: 32,
-  },
-})`
+export const FailedIcon = styled(CloseCircleFilled)`
+  color: ${({theme}) => theme.color.error};
+  font-size: 32px;
   margin-bottom: 26px;
 `;
 

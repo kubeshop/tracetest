@@ -6,7 +6,7 @@ import {TStepStatus} from 'types/Plugins.types';
 export const CreateTestSteps = styled.div`
   margin: 24px;
   height: inherit;
-  border: 1px solid rgba(3, 24, 73, 0.1);
+  border: ${({theme}) => `1px solid ${theme.color.borderLight}`};
 
   .ant-tabs {
     height: 100%;
@@ -21,8 +21,8 @@ export const CreateTestSteps = styled.div`
   }
 
   > .ant-tabs-card .ant-tabs-content > .ant-tabs-tabpane {
+    background: ${({theme}) => theme.color.white};
     padding: 16px;
-    background: #fff;
   }
 
   > .ant-tabs-card > .ant-tabs-nav::before {
@@ -32,13 +32,13 @@ export const CreateTestSteps = styled.div`
   > .ant-tabs-card .ant-tabs-tab {
     background: transparent;
     border-color: transparent;
-    border-bottom: 1px solid rgba(3, 24, 73, 0.1);
+    border-bottom: ${({theme}) => `1px solid ${theme.color.borderLight}`};
   }
 
   > .ant-tabs-card .ant-tabs-tab-active {
-    background: #fff;
-    border-color: #fff;
-    border-bottom: 1px solid rgba(3, 24, 73, 0.1);
+    background: ${({theme}) => theme.color.white};
+    border-color: ${({theme}) => theme.color.white};
+    border-bottom: ${({theme}) => `1px solid ${theme.color.borderLight}`};
   }
 
   .ant-tabs-card.ant-tabs-left > .ant-tabs-nav .ant-tabs-tab + .ant-tabs-tab {
@@ -48,23 +48,12 @@ export const CreateTestSteps = styled.div`
   .ant-tabs-card.ant-tabs-left > .ant-tabs-nav .ant-tabs-tab {
     border-radius: 0;
   }
-
-  #components-tabs-demo-card-top .code-box-demo {
-    padding: 24px;
-    overflow: hidden;
-    background: #f5f5f5;
-  }
 `;
 
-const colorToStatusMap: Record<TStepStatus, string> = {
-  complete: '#66BB6A',
-  selected: '#031849',
-  pending: 'rgba(3, 24, 73, 0.2);',
-};
-
 export const StatusIcon = styled(CheckCircleOutlined)<{$status?: TStepStatus}>`
+  color: ${({$status, theme}) => ($status === 'complete' ? theme.color.success : theme.color.text)};
   font-size: 20px;
-  color: ${({$status = 'pending'}) => colorToStatusMap[$status]};
+  opacity: ${({$status = 'pending'}) => $status === 'pending' && '0.2'};
 `;
 
 export const CreateTestStepsTab = styled.div`

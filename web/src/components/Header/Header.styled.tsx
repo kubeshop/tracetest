@@ -1,15 +1,14 @@
+import {QuestionCircleOutlined} from '@ant-design/icons';
+import {Layout, Menu} from 'antd';
 import styled from 'styled-components';
-import Layout from 'antd/lib/layout';
-import Title from 'antd/lib/typography/Title';
-import Menu from 'antd/lib/menu';
 
 export const Header = styled(Layout.Header)`
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0 24px;
-  background: #fff;
-  border-bottom: 1px solid #e2e4e6;
+  background: ${({theme}) => theme.color.white};
+  border-bottom: ${({theme}) => `1px solid ${theme.color.borderLight}`};
 
   .ant-popover-title {
     padding: 16px;
@@ -22,16 +21,6 @@ export const Header = styled(Layout.Header)`
   }
 `;
 
-export const TitleText = styled(Title).attrs({
-  level: 2,
-})`
-  && {
-    font-weight: 700;
-    color: white;
-    margin: 0;
-  }
-`;
-
 export const NavMenu = styled(Menu).attrs({
   mode: 'horizontal',
   disabledOverflow: true,
@@ -41,8 +30,12 @@ export const NavMenu = styled(Menu).attrs({
   }
 
   .ant-menu-item > span > a {
-    color: #61175e;
+    color: ${({theme}) => theme.color.primary};
   }
 `;
 
-export const NavMenuItem = styled(Menu.Item)``;
+export const QuestionIcon = styled(QuestionCircleOutlined)<{$disabled: boolean}>`
+  color: ${({theme}) => theme.color.primary};
+  font-size: ${({theme}) => theme.size.lg};
+  opacity: ${({$disabled}) => ($disabled ? 0.5 : 1)};
+`;

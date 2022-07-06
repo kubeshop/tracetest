@@ -1,14 +1,18 @@
 import {FC, ReactElement} from 'react';
 import {render, RenderOptions} from '@testing-library/react';
 import {MemoryRouter} from 'react-router-dom';
+import {ThemeProvider} from 'styled-components';
 
+import {theme} from 'constants/Theme.constants';
 import {ReduxWrapperProvider} from 'redux/ReduxWrapperProvider';
 
 const Providers: FC = ({children}) => {
   return (
-    <ReduxWrapperProvider>
-      <MemoryRouter>{children}</MemoryRouter>
-    </ReduxWrapperProvider>
+    <ThemeProvider theme={theme}>
+      <ReduxWrapperProvider>
+        <MemoryRouter>{children}</MemoryRouter>
+      </ReduxWrapperProvider>
+    </ThemeProvider>
   );
 };
 

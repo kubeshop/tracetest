@@ -6,7 +6,7 @@ import SearchInput from '../../components/SearchInput';
 const HomeContent: React.FC = () => {
   return (
     <S.Wrapper>
-      <S.TitleText level={4}>All Tests</S.TitleText>
+      <S.TitleText>All Tests</S.TitleText>
       <S.PageHeader>
         <SearchInput onSearch={() => console.log('onSearch')} placeholder="Search test (Not implemented yet)" />
         <HomeActions />

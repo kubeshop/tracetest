@@ -8,14 +8,7 @@ interface IProps {
 
 const TestStateProgress = ({label, percent}: IProps) => (
   <S.Container hasMinWidth>
-    <Progress
-      percent={percent}
-      showInfo={false}
-      status="active"
-      strokeLinecap="square"
-      strokeWidth={6}
-      trailColor="rgba(154, 163, 171, 0.3)"
-    />
+    <Progress percent={percent} showInfo={false} status="active" strokeLinecap="square" strokeWidth={6} />
     <S.Text>{label}</S.Text>
   </S.Container>
 );

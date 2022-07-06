@@ -1,8 +1,8 @@
-import {QuestionCircleOutlined} from '@ant-design/icons';
 import {useTour} from '@reactour/tour';
 import {Popover, Typography} from 'antd';
 import {useMemo} from 'react';
 import {useParams} from 'react-router-dom';
+
 import {DOCUMENTATION_URL, GITHUB_URL} from 'constants/Common.constants';
 import {useGuidedTour} from 'providers/GuidedTour/GuidedTour.provider';
 import * as S from './Header.styled';
@@ -32,7 +32,7 @@ export const HeaderMenu = ({pathname, onGuidedTourClick}: IProps) => {
     <Popover
       visible={isTriggerVisible}
       content={content}
-      title={() => <Typography.Title level={5}>Take a quick tour of Tracetest?</Typography.Title>}
+      title={() => <Typography.Title level={2}>Take a quick tour of Tracetest?</Typography.Title>}
       arrowContent={null}
     >
       <S.NavMenu
@@ -56,12 +56,7 @@ export const HeaderMenu = ({pathname, onGuidedTourClick}: IProps) => {
           },
           {
             key: 'SubMenu',
-            label: (
-              <QuestionCircleOutlined
-                data-cy="onboarding-link"
-                style={{color: '#61175e', fontSize: 16, opacity: !params.runId ? 0.5 : 1}}
-              />
-            ),
+            label: <S.QuestionIcon $disabled={!params.runId} data-cy="onboarding-link" />,
             disabled: !params.runId,
             children: [
               {
