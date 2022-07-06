@@ -28,7 +28,7 @@ jobs:
         credentials: ${{ secrets.GKE_SA_KEY }}
 
     - name: Apply
-      run: envsubst < k8s/collector.yml | kubectl apply -n tracetest -f -
+      run: ./k8s/deploy-collector.sh
 
 
 
