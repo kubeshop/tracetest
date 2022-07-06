@@ -1,8 +1,9 @@
 import {useCallback} from 'react';
+import {uniqBy} from 'lodash';
 import {syntaxTree} from '@codemirror/language';
 import {Diagnostic, LintSource} from '@codemirror/lint';
-import {useAppStore} from '../../../redux/hooks';
-import AssertionSelectors from '../../../selectors/Assertion.selectors';
+import {useAppStore} from 'redux/hooks';
+import AssertionSelectors from 'selectors/Assertion.selectors';
 
 interface IProps {
   testId: string;
@@ -12,18 +13,17 @@ interface IProps {
 const useLint = ({runId, testId}: IProps): LintSource => {
   const {getState} = useAppStore();
 
-  const getAttributeList = useCallback(() => {
+  const getValidAttributeList = useCallback(() => {
     const state = getState();
-    const defaultList = AssertionSelectors.selectAllAttributeList(state, testId, runId);
+    const attributeList = uniqBy(AssertionSelectors.selectAllAttributeList(state, testId, runId), 'key');
 
-    return defaultList;
+    return attributeList.map(({key}) => key);
   }, [getState, runId, testId]);
 
   return useCallback(
     async view => {
       let diagnostics: Diagnostic[] = [];
-      const attributeList = getAttributeList();
-      const validAttributeList = attributeList.map(({key}) => key);
+      const validAttributeList = getValidAttributeList();
 
       syntaxTree(view.state)
         .cursor()
@@ -44,7 +44,7 @@ const useLint = ({runId, testId}: IProps): LintSource => {
 
       return diagnostics;
     },
-    [getAttributeList]
+    [getValidAttributeList]
   );
 };
 

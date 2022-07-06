@@ -10,9 +10,9 @@ import {
   pseudoSelectorList,
   Tokens,
 } from 'constants/AdvancedEditor.constants';
-import {useAppStore} from '../../../redux/hooks';
-import AssertionSelectors from '../../../selectors/Assertion.selectors';
-import {escapeString} from '../../../utils/Common';
+import {useAppStore} from 'redux/hooks';
+import AssertionSelectors from 'selectors/Assertion.selectors';
+import {escapeString} from 'utils/Common';
 
 interface IProps {
   testId: string;
