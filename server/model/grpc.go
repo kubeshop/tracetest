@@ -1,6 +1,6 @@
 package model
 
-const GRPCTriggerType TriggerType = "grpc"
+const TriggerTypeGRPC TriggerType = "grpc"
 
 type GRPCHeader struct {
 	Key, Value string

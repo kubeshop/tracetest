@@ -105,19 +105,14 @@ type encodedRun struct {
 	ServiceTriggerCompletedAt time.Time
 	ObtainedTraceAt           time.Time
 	CompletedAt               time.Time
-	Request                   HTTPRequest
-	Response                  *HTTPResponse
+	Trigger                   Trigger
+	TriggerResult             TriggerResult
 	Trace                     *traces.Trace
 	Results                   *RunResults
 	TestVersion               int
 }
 
 func (r Run) MarshalJSON() ([]byte, error) {
-	var resp *HTTPResponse
-	if r.Response.StatusCode != 0 {
-		resp = &r.Response
-	}
-
 	return json.Marshal(&encodedRun{
 		ID:                        r.ID.String(),
 		TraceID:                   r.TraceID.String(),
@@ -130,8 +125,8 @@ func (r Run) MarshalJSON() ([]byte, error) {
 		ObtainedTraceAt:           r.ObtainedTraceAt,
 		CompletedAt:               r.CompletedAt,
 		TestVersion:               r.TestVersion,
-		Request:                   r.Request,
-		Response:                  resp,
+		Trigger:                   r.Trigger,
+		TriggerResult:             r.TriggerResult,
 		Trace:                     r.Trace,
 		Results:                   r.Results,
 	})
@@ -170,11 +165,8 @@ func (r *Run) UnmarshalJSON(data []byte) error {
 	r.ObtainedTraceAt = aux.ObtainedTraceAt
 	r.CompletedAt = aux.CompletedAt
 	r.TestVersion = aux.TestVersion
-	r.Request = aux.Request
-
-	if aux.Response != nil {
-		r.Response = *aux.Response
-	}
+	r.Trigger = aux.Trigger
+	r.TriggerResult = aux.TriggerResult
 
 	r.Trace = aux.Trace
 	r.Results = aux.Results

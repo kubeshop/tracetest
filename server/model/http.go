@@ -4,7 +4,7 @@ import (
 	"net/http"
 )
 
-const HTTPTriggerType TriggerType = "http"
+const TriggerTypeHTTP TriggerType = "http"
 
 type HTTPMethod string
 
