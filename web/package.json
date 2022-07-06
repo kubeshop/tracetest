@@ -57,7 +57,7 @@
     "eslint": "eslint ./src/**/*.{ts,tsx}",
     "eject": "react-scripts eject",
     "cy:open": "cypress open",
-    "cy:run": "cypress run --parallel",
+    "cy:run": "cypress run --record --parallel",
     "prettier": "prettier --write ./src",
     "storybook": "start-storybook -p 6006 -s public",
     "build-storybook": "build-storybook -s public"
