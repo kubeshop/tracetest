@@ -1,0 +1,30 @@
+openapi: 3.0.0
+components:
+  schemas:
+    Trigger:
+      type: object
+      properties:
+        triggerType:
+          type: string
+          enum: ["http", "grpc"]
+        triggerSettings:
+          type: object
+          properties:
+            http:
+              $ref: "./http.yaml#/components/schemas/HTTPRequest"
+            grpc:
+              $ref: "./grpc.yaml#/components/schemas/GRPCRequest"
+
+    TriggerResult:
+      type: object
+      properties:
+        triggerType:
+          type: string
+          enum: ["http", "grpc"]
+        triggerResult:
+          type: object
+          properties:
+            http:
+              $ref: "./http.yaml#/components/schemas/HTTPResponse"
+            grpc:
+              $ref: "./grpc.yaml#/components/schemas/GRPCResponse"

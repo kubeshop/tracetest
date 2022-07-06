@@ -4,6 +4,8 @@ import (
 	"net/http"
 )
 
+const HTTPTriggerType TriggerType = "http"
+
 type HTTPMethod string
 
 var (
@@ -36,12 +38,13 @@ type HTTPRequest struct {
 	Auth    *HTTPAuthenticator
 }
 
-func (a HTTPRequest) Authenticate(req *http.Request) {
+func (a HTTPRequest) AuthenticateGRPC() {}
+func (a HTTPRequest) AuthenticateHTTP(req *http.Request) {
 	if a.Auth == nil {
 		return
 	}
 
-	a.Auth.Authenticate(req)
+	a.Auth.AuthenticateHTTP(req)
 }
 
 type HTTPResponse struct {
@@ -56,7 +59,8 @@ type HTTPAuthenticator struct {
 	Props map[string]string
 }
 
-func (a HTTPAuthenticator) Authenticate(req *http.Request) {
+func (a HTTPAuthenticator) AuthenticateGRPC() {}
+func (a HTTPAuthenticator) AuthenticateHTTP(req *http.Request) {
 	var auth authenticator
 	switch a.Type {
 	case "apiKey":
@@ -78,7 +82,7 @@ func (a HTTPAuthenticator) Authenticate(req *http.Request) {
 		return
 	}
 
-	auth.Authenticate(req)
+	auth.AuthenticateHTTP(req)
 }
 
 type APIKeyPosition string
@@ -89,7 +93,8 @@ const (
 )
 
 type authenticator interface {
-	Authenticate(req *http.Request)
+	AuthenticateHTTP(req *http.Request)
+	AuthenticateGRPC()
 }
 
 type APIKeyAuthenticator struct {
@@ -98,7 +103,8 @@ type APIKeyAuthenticator struct {
 	In    APIKeyPosition
 }
 
-func (a APIKeyAuthenticator) Authenticate(req *http.Request) {
+func (a APIKeyAuthenticator) AuthenticateGRPC() {}
+func (a APIKeyAuthenticator) AuthenticateHTTP(req *http.Request) {
 	switch a.In {
 	case APIKeyPositionHeader:
 		req.Header.Set(a.Key, a.Value)
@@ -114,7 +120,8 @@ type BasicAuthenticator struct {
 	Password string
 }
 
-func (a BasicAuthenticator) Authenticate(req *http.Request) {
+func (a BasicAuthenticator) AuthenticateGRPC() {}
+func (a BasicAuthenticator) AuthenticateHTTP(req *http.Request) {
 	req.SetBasicAuth(a.Username, a.Password)
 }
 
@@ -122,6 +129,7 @@ type BearerAuthenticator struct {
 	Bearer string
 }
 
-func (a BearerAuthenticator) Authenticate(req *http.Request) {
+func (a BearerAuthenticator) AuthenticateGRPC() {}
+func (a BearerAuthenticator) AuthenticateHTTP(req *http.Request) {
 	req.Header.Add("Authorization", a.Bearer)
 }

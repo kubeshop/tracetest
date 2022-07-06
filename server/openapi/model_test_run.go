@@ -42,9 +42,9 @@ type TestRun struct {
 
 	CompletedAt time.Time `json:"completedAt,omitempty"`
 
-	Request HttpRequest `json:"request,omitempty"`
+	Trigger Trigger `json:"trigger,omitempty"`
 
-	Response HttpResponse `json:"response,omitempty"`
+	TriggerResult TriggerResult `json:"triggerResult,omitempty"`
 
 	Trace Trace `json:"trace,omitempty"`
 
@@ -53,10 +53,10 @@ type TestRun struct {
 
 // AssertTestRunRequired checks if the required fields are not zero-ed
 func AssertTestRunRequired(obj TestRun) error {
-	if err := AssertHttpRequestRequired(obj.Request); err != nil {
+	if err := AssertTriggerRequired(obj.Trigger); err != nil {
 		return err
 	}
-	if err := AssertHttpResponseRequired(obj.Response); err != nil {
+	if err := AssertTriggerResultRequired(obj.TriggerResult); err != nil {
 		return err
 	}
 	if err := AssertTraceRequired(obj.Trace); err != nil {

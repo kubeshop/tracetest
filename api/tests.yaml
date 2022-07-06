@@ -16,10 +16,7 @@ components:
           type: integer
           description: version number of the test
         serviceUnderTest:
-          type: object
-          properties:
-            request:
-              $ref: "./http.yaml#/components/schemas/HTTPRequest"
+          $ref: "./triggers.yaml#/components/schemas/Trigger"
         definition:
           $ref: "#/components/schemas/TestDefinition"
           description: Definition of assertions that are going to be made
@@ -106,11 +103,10 @@ components:
         completedAt:
           type: string
           format: date-time
-        request:
-          $ref: "./http.yaml#/components/schemas/HTTPRequest"
-        response:
-          $ref: "./http.yaml#/components/schemas/HTTPResponse"
-          description: TODO(pov) This is HTTP Response object for now, at some point it might be GRPC/SOAP/...
+        trigger:
+          $ref: "./triggers.yaml#/components/schemas/Trigger"
+        triggerResult:
+          $ref: "./triggers.yaml#/components/schemas/TriggerResult"
         trace:
           $ref: "./trace.yaml#/components/schemas/Trace"
         result:
