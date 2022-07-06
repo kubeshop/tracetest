@@ -6,11 +6,6 @@ on:
       - main
     paths:
       - k8s/**
-  pull_request:
-    branches:
-      - main
-    paths:
-      - k8s/**
 
 jobs:
   deploy-collector:
