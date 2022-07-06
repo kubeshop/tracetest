@@ -16,7 +16,7 @@ data:
       # Data sources: traces
       probabilistic_sampler:
         hash_seed: 22
-        sampling_percentage: 15
+        sampling_percentage: 10
 
     exporters:
       logging:
