@@ -40,7 +40,7 @@ describe('AssertionService', () => {
           value: 'http',
         },
       ]);
-      expect(result).toStrictEqual(`span[service.name = "pokeshop"  tracetest.span.type contains "http"]`);
+      expect(result).toStrictEqual(`span[service.name = "pokeshop" tracetest.span.type contains "http"]`);
     });
 
     test('with a number value', () => {
