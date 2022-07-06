@@ -4,7 +4,9 @@ import (
 	"context"
 	"testing"
 
+	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/http"
+	"github.com/kubeshop/tracetest/server/http/mappings"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/testdb"
@@ -117,7 +119,7 @@ func setupController(t *testing.T) controllerFixture {
 	mdb.Test(t)
 	return controllerFixture{
 		db: mdb,
-		c:  http.NewController(mdb, nil, nil, traces.NewConversionConfig()),
+		c:  http.NewController(mdb, nil, nil, mappings.New(traces.NewConversionConfig(), comparator.DefaultRegistry())),
 	}
 }
 

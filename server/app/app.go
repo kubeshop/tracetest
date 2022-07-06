@@ -10,10 +10,12 @@ import (
 
 	"github.com/gorilla/handlers"
 	"github.com/kubeshop/tracetest/server/analytics"
+	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/executor/trigger"
 	httpServer "github.com/kubeshop/tracetest/server/http"
+	"github.com/kubeshop/tracetest/server/http/mappings"
 	"github.com/kubeshop/tracetest/server/http/websocket"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
@@ -117,7 +119,9 @@ func (a *App) Start() error {
 	runner.Start(5) // worker count. should be configurable
 	defer runner.Stop()
 
-	controller := httpServer.NewController(a.db, runner, assertionRunner, traceConversionConfig)
+	mappers := mappings.New(traceConversionConfig, comparator.DefaultRegistry())
+
+	controller := httpServer.NewController(a.db, runner, assertionRunner, mappers)
 	apiApiController := openapi.NewApiApiController(controller)
 	customController := httpServer.NewCustomController(controller, apiApiController, openapi.DefaultErrorHandler, a.tracer)
 	httpRouter := customController
@@ -128,7 +132,7 @@ func (a *App) Start() error {
 	router := openapi.NewRouter(httpRouter)
 
 	wsRouter := websocket.NewRouter()
-	wsRouter.Add("subscribe", websocket.NewSubscribeCommandExecutor(subscriptionManager))
+	wsRouter.Add("subscribe", websocket.NewSubscribeCommandExecutor(subscriptionManager, mappers))
 	wsRouter.Add("unsubscribe", websocket.NewUnsubscribeCommandExecutor(subscriptionManager))
 
 	router.Handle("/ws", wsRouter.Handler())

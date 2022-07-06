@@ -238,7 +238,7 @@ func (m OpenAPI) Runs(in []model.Run) []openapi.TestRun {
 
 // in
 type Model struct {
-	Comparators           comparator.Registry
+	comparators           comparator.Registry
 	traceConversionConfig traces.ConversionConfig
 }
 
@@ -365,7 +365,7 @@ func (m Model) Result(in openapi.AssertionResults) *model.RunResults {
 }
 
 func (m Model) Assertion(in openapi.Assertion) model.Assertion {
-	comp, _ := m.Comparators.Get(in.Comparator)
+	comp, _ := m.comparators.Get(in.Comparator)
 	expectedValue := in.Expected
 	if m.traceConversionConfig.IsTimeField(in.Attribute) {
 		fieldInNanoSeconds := traces.ConvertTimeFieldIntoNanoSeconds(expectedValue)

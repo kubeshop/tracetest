@@ -7,6 +7,7 @@ import (
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/http/mappings"
 	"github.com/kubeshop/tracetest/server/openapi"
+	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/stretchr/testify/require"
 )
 
@@ -89,12 +90,8 @@ func TestDefinitionsOrder(t *testing.T) {
 	// try multiple times to hit the map iteration randomization
 	attempts := 50
 	for i := 0; i < attempts; i++ {
-		m := mappings.Model{
-			Comparators: comparator.DefaultRegistry(),
-		}
-		oapi := mappings.OpenAPI{}
-
-		actual := oapi.Definition(m.Definition(input))
+		maps := mappings.New(traces.ConversionConfig{}, comparator.DefaultRegistry())
+		actual := maps.Out.Definition(maps.In.Definition(input))
 		actualJSON, err := json.Marshal(actual)
 
 		require.NoError(t, err)
@@ -203,12 +200,9 @@ func TestResultsOrder(t *testing.T) {
 	// try multiple times to hit the map iteration randomization
 	attempts := 50
 	for i := 0; i < attempts; i++ {
-		m := mappings.Model{
-			Comparators: comparator.DefaultRegistry(),
-		}
-		oapi := mappings.OpenAPI{}
+		maps := mappings.New(traces.ConversionConfig{}, comparator.DefaultRegistry())
 
-		actual := oapi.Result(m.Result(input))
+		actual := maps.Out.Result(maps.In.Result(input))
 		actualJSON, err := json.Marshal(actual)
 
 		require.NoError(t, err)
