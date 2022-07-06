@@ -11,7 +11,7 @@ export const AssertionCard = styled.div<{$isSelected: boolean}>`
 export const Header = styled.div`
   cursor: pointer;
   display: flex;
-  background: #fbfbff;
+  background: ${({theme}) => theme.color.background};
   border-bottom: ${({theme}) => `1px solid ${theme.color.borderLight}`};
   padding: 8px 14px;
   justify-content: space-between;

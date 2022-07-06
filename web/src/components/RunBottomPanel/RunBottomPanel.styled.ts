@@ -11,7 +11,6 @@ export const Header = styled.div`
   background: #f5f5fa;
   height: 64px;
   padding: 0 24px;
-  color: rgb(213, 215, 224);
 `;
 
 export const HeaderText = styled(Typography.Text)``;
