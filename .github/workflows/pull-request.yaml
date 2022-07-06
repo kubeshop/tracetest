@@ -202,15 +202,12 @@ jobs:
       - name: 'UI Tests - Chrome'
         uses: cypress-io/github-action@v4
         with:
-          start: npm cy:run
-          wait-on: 'http://localhost:3000'
-          wait-on-timeout: 120
+          project: ./web
           browser: chrome
           record: true
           parallel: true
           group: 'UI - Chrome'
           spec: cypress/integration/*
-          project: ./web
         env:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
           # Recommended: pass the GitHub token lets this action correctly
