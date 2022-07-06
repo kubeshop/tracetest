@@ -28,7 +28,8 @@ Check out the following blog-posts with Tracetest-related content:
 
 - [Integrating Tracetest with GitHub Actions in a CI pipeline](https://kubeshop.io/blog/integrating-tracetest-with-github-actions-in-a-ci-pipeline) - June 24, 2022
 
-- Recorded live stream: [Introduction to Tracetest - E2E Tests Powered by OpenTelemetry](https://youtu.be/mqwJRxqBNCg) - June 23, 2022
+And our recorded live stream: [Introduction to Tracetest - E2E Tests Powered by OpenTelemetry](https://youtu.be/mqwJRxqBNCg) - June 23, 2022
+
 
 - [Tracetest — Assertions, Versioning & CI/CD - Release 0.5](https://kubeshop.io/blog/tracetest-assertions-versioning-ci-cd) - June 8, 2022
 
