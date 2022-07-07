@@ -1,4 +1,5 @@
 const CracoLessPlugin = require('craco-less');
+const webpack = require('webpack');
 
 module.exports = {
   plugins: [
@@ -33,4 +34,28 @@ module.exports = {
       },
     },
   ],
+  webpack: {
+    configure: webpackConfig => {
+      return {
+        ...webpackConfig,
+        plugins: [
+          ...webpackConfig.plugins,
+          new webpack.ProvidePlugin({
+            Buffer: ['buffer', 'Buffer'],
+          }),
+          new webpack.ProvidePlugin({
+            process: 'process/browser',
+          }),
+        ],
+        resolve: {
+          ...webpackConfig.resolve,
+          fallback: {
+            stream: require.resolve('stream-browserify'),
+            buffer: require.resolve('buffer'),
+            path: require.resolve('path-browserify'),
+          },
+        },
+      };
+    },
+  },
 };

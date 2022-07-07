@@ -7,14 +7,16 @@ import * as S from './RequestDetails.styled';
 interface IProps {
   onChange?(file?: UploadFile): void;
   value?: UploadFile;
+  // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#accept
+  accept?: string;
 }
 
-const RequestDetailsFileInput = ({value: file, onChange = noop}: IProps) => (
+const RequestDetailsFileInput = ({accept = '.proto', value: file, onChange = noop}: IProps) => (
   <Upload
     multiple={false}
     fileList={file ? [file] : []}
     onRemove={() => onChange()}
-    accept=".proto"
+    accept={accept}
     beforeUpload={newFile => {
       onChange(newFile);
 
