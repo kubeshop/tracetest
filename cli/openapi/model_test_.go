@@ -20,9 +20,9 @@ type Test struct {
 	Name        *string `json:"name,omitempty"`
 	Description *string `json:"description,omitempty"`
 	// version number of the test
-	Version          *int32                `json:"version,omitempty"`
-	ServiceUnderTest *TestServiceUnderTest `json:"serviceUnderTest,omitempty"`
-	Definition       *TestDefinition       `json:"definition,omitempty"`
+	Version          *int32          `json:"version,omitempty"`
+	ServiceUnderTest *Trigger        `json:"serviceUnderTest,omitempty"`
+	Definition       *TestDefinition `json:"definition,omitempty"`
 }
 
 // NewTest instantiates a new Test object
@@ -171,9 +171,9 @@ func (o *Test) SetVersion(v int32) {
 }
 
 // GetServiceUnderTest returns the ServiceUnderTest field value if set, zero value otherwise.
-func (o *Test) GetServiceUnderTest() TestServiceUnderTest {
+func (o *Test) GetServiceUnderTest() Trigger {
 	if o == nil || o.ServiceUnderTest == nil {
-		var ret TestServiceUnderTest
+		var ret Trigger
 		return ret
 	}
 	return *o.ServiceUnderTest
@@ -181,7 +181,7 @@ func (o *Test) GetServiceUnderTest() TestServiceUnderTest {
 
 // GetServiceUnderTestOk returns a tuple with the ServiceUnderTest field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Test) GetServiceUnderTestOk() (*TestServiceUnderTest, bool) {
+func (o *Test) GetServiceUnderTestOk() (*Trigger, bool) {
 	if o == nil || o.ServiceUnderTest == nil {
 		return nil, false
 	}
@@ -197,8 +197,8 @@ func (o *Test) HasServiceUnderTest() bool {
 	return false
 }
 
-// SetServiceUnderTest gets a reference to the given TestServiceUnderTest and assigns it to the ServiceUnderTest field.
-func (o *Test) SetServiceUnderTest(v TestServiceUnderTest) {
+// SetServiceUnderTest gets a reference to the given Trigger and assigns it to the ServiceUnderTest field.
+func (o *Test) SetServiceUnderTest(v Trigger) {
 	o.ServiceUnderTest = &v
 }
 

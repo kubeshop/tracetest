@@ -16,6 +16,14 @@ func ConvertStringIntoOpenAPIString(in string) *string {
 	return &in
 }
 
+func ConvertOpenapiStringIntoString(in *string) string {
+	if in == nil {
+		return ""
+	}
+
+	return *in
+}
+
 func ConvertTestDefinitionIntoOpenAPIObject(definition definition.Test) (openapi.Test, error) {
 	testDefinition, err := convertTestDefinitionsIntoOpenAPIObject(definition.TestDefinition)
 	if err != nil {
@@ -25,11 +33,58 @@ func ConvertTestDefinitionIntoOpenAPIObject(definition definition.Test) (openapi
 		Id:          ConvertStringIntoOpenAPIString(definition.Id),
 		Name:        ConvertStringIntoOpenAPIString(definition.Name),
 		Description: ConvertStringIntoOpenAPIString(definition.Description),
-		ServiceUnderTest: &openapi.TestServiceUnderTest{
-			Request: convertHTTPRequestDefinitionIntoOpenAPIObject(definition.Trigger.HTTPRequest),
+		ServiceUnderTest: &openapi.Trigger{
+			TriggerType:     &definition.Trigger.Type,
+			TriggerSettings: openapiTriggerSettings(definition.Trigger),
 		},
 		Definition: testDefinition,
 	}, nil
+}
+
+func openapiTriggerSettings(in definition.TestTrigger) *openapi.TriggerTriggerSettings {
+	var (
+		httpRequest *openapi.HTTPRequest
+		grpcRequest *openapi.GRPCRequest
+	)
+
+	if err := in.HTTPRequest.Validate(); err == nil {
+		httpRequest = convertHTTPRequestDefinitionIntoOpenAPIObject(in.HTTPRequest)
+	}
+
+	if err := in.GRPC.Validate(); err == nil {
+		grpcRequest = convertGRPCDefinitionIntoOpenAPIObject(in.GRPC)
+	}
+
+	return &openapi.TriggerTriggerSettings{
+		Http: httpRequest,
+		Grpc: grpcRequest,
+	}
+
+}
+
+func convertGRPCDefinitionIntoOpenAPIObject(request definition.GrpcRequest) *openapi.GRPCRequest {
+	metadata := make([]openapi.GRPCHeader, 0, len(request.Metadata))
+	for _, meta := range request.Metadata {
+		metadata = append(metadata, openapi.GRPCHeader{
+			Key:   ConvertStringIntoOpenAPIString(meta.Key),
+			Value: ConvertStringIntoOpenAPIString(meta.Value),
+		})
+	}
+
+	return &openapi.GRPCRequest{
+		ProtobufFile: ConvertStringIntoOpenAPIString(request.ProtobufFile),
+		Address:      ConvertStringIntoOpenAPIString(request.Address),
+		Service:      ConvertStringIntoOpenAPIString(request.Service),
+		Method:       ConvertStringIntoOpenAPIString(request.Method),
+		Metadata:     metadata,
+		Auth: &openapi.HTTPAuth{
+			Type:   ConvertStringIntoOpenAPIString(request.Auth.Type),
+			ApiKey: getApiKeyAuthFromDefinition(request.Auth.ApiKey),
+			Basic:  getBasicAuthFromDefinition(request.Auth.Basic),
+			Bearer: getBearerAuthFromDefinition(request.Auth.Bearer),
+		},
+		Request: ConvertStringIntoOpenAPIString(request.Request),
+	}
 }
 
 func convertHTTPRequestDefinitionIntoOpenAPIObject(request definition.HttpRequest) *openapi.HTTPRequest {

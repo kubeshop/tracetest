@@ -25,36 +25,61 @@ func ConvertOpenAPITestIntoDefinitionObject(test openapi.Test) (definition.Test,
 	}, nil
 }
 
-func convertServiceUnderTestIntoTrigger(serviceUnderTest *openapi.TestServiceUnderTest) definition.TestTrigger {
-	if serviceUnderTest == nil || serviceUnderTest.Request == nil {
+func convertServiceUnderTestIntoTrigger(trigger *openapi.Trigger) definition.TestTrigger {
+	if trigger == nil || trigger.TriggerSettings == nil {
 		return definition.TestTrigger{}
 	}
 
-	headers := make([]definition.HTTPHeader, 0, len(serviceUnderTest.Request.Headers))
-	for _, header := range serviceUnderTest.Request.Headers {
-		headers = append(headers, definition.HTTPHeader{
-			Key:   *header.Key,
-			Value: *header.Value,
+	return definition.TestTrigger{
+		Type:        *trigger.TriggerType,
+		HTTPRequest: convertHTTPRequestOpenAPIIntoDefinition(trigger.TriggerSettings.Http),
+		GRPC:        convertGRPCOpenAPIIntoDefinition(trigger.TriggerSettings.Grpc),
+	}
+}
+
+func convertGRPCOpenAPIIntoDefinition(request *openapi.GRPCRequest) definition.GrpcRequest {
+	if request == nil {
+		return definition.GrpcRequest{}
+	}
+
+	metadata := make([]definition.GRPCHeader, 0, len(request.Metadata))
+	for _, meta := range request.Metadata {
+		metadata = append(metadata, definition.GRPCHeader{
+			Key:   ConvertOpenapiStringIntoString(meta.Key),
+			Value: ConvertOpenapiStringIntoString(meta.Value),
 		})
 	}
 
-	auth := getAuthDefinition(serviceUnderTest.Request.Auth)
+	return definition.GrpcRequest{
+		ProtobufFile: ConvertOpenapiStringIntoString(request.ProtobufFile),
+		Address:      ConvertOpenapiStringIntoString(request.Address),
+		Service:      ConvertOpenapiStringIntoString(request.Service),
+		Method:       ConvertOpenapiStringIntoString(request.Method),
+		Metadata:     metadata,
+		Auth:         getAuthDefinition(request.Auth),
+		Request:      ConvertOpenapiStringIntoString(request.Request),
+	}
+}
 
-	body := ""
-	if serviceUnderTest.Request.Body != nil {
-		body = *serviceUnderTest.Request.Body
+func convertHTTPRequestOpenAPIIntoDefinition(request *openapi.HTTPRequest) definition.HttpRequest {
+	if request == nil {
+		return definition.HttpRequest{}
 	}
 
-	return definition.TestTrigger{
-		// we only support http for now
-		Type: "http",
-		HTTPRequest: definition.HttpRequest{
-			URL:            *serviceUnderTest.Request.Url,
-			Method:         *serviceUnderTest.Request.Method,
-			Headers:        headers,
-			Body:           body,
-			Authentication: auth,
-		},
+	headers := make([]definition.HTTPHeader, 0, len(request.Headers))
+	for _, header := range request.Headers {
+		headers = append(headers, definition.HTTPHeader{
+			Key:   ConvertOpenapiStringIntoString(header.Key),
+			Value: ConvertOpenapiStringIntoString(header.Value),
+		})
+	}
+
+	return definition.HttpRequest{
+		URL:            ConvertOpenapiStringIntoString(request.Url),
+		Method:         ConvertOpenapiStringIntoString(request.Method),
+		Headers:        headers,
+		Body:           ConvertOpenapiStringIntoString(request.Body),
+		Authentication: getAuthDefinition(request.Auth),
 	}
 }
 
