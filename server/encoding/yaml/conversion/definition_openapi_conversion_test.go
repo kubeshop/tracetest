@@ -61,10 +61,12 @@ func TestDefinitionToOpenAPIConversion(t *testing.T) {
 				Trigger: definition.TestTrigger{
 					Type: "http",
 					HTTPRequest: openapi.HttpRequest{
-						Url:     "http://localhost:1234",
-						Method:  "POST",
-						Headers: []openapi.HttpHeader{},
-						Body:    "",
+						Url:    "http://localhost:1234",
+						Method: "POST",
+						Headers: []openapi.HttpHeader{
+							{Key: "Content-Type", Value: "application/json"},
+						},
+						Body: "",
 						Auth: openapi.HttpAuth{
 							Type: "basic",
 							Basic: openapi.HttpAuthBasic{
@@ -108,10 +110,12 @@ func TestDefinitionToOpenAPIConversion(t *testing.T) {
 				Trigger: definition.TestTrigger{
 					Type: "http",
 					HTTPRequest: openapi.HttpRequest{
-						Url:     "http://localhost:1234",
-						Method:  "POST",
-						Headers: []openapi.HttpHeader{},
-						Body:    "",
+						Url:    "http://localhost:1234",
+						Method: "POST",
+						Headers: []openapi.HttpHeader{
+							{Key: "Content-Type", Value: "application/json"},
+						},
+						Body: "",
 						Auth: openapi.HttpAuth{
 							Type: "apiKey",
 							ApiKey: openapi.HttpAuthApiKey{
@@ -157,10 +161,12 @@ func TestDefinitionToOpenAPIConversion(t *testing.T) {
 				Trigger: definition.TestTrigger{
 					Type: "http",
 					HTTPRequest: openapi.HttpRequest{
-						Url:     "http://localhost:1234",
-						Method:  "POST",
-						Headers: []openapi.HttpHeader{},
-						Body:    "",
+						Url:    "http://localhost:1234",
+						Method: "POST",
+						Headers: []openapi.HttpHeader{
+							{Key: "Content-Type", Value: "application/json"},
+						},
+						Body: "",
 						Auth: openapi.HttpAuth{
 							Type: "bearer",
 							Bearer: openapi.HttpAuthBearer{
@@ -202,11 +208,13 @@ func TestDefinitionToOpenAPIConversion(t *testing.T) {
 				Trigger: definition.TestTrigger{
 					Type: "http",
 					HTTPRequest: openapi.HttpRequest{
-						Url:     "http://localhost:1234",
-						Method:  "POST",
-						Headers: []openapi.HttpHeader{},
-						Auth:    openapi.HttpAuth{},
-						Body:    `{ "message": "hello" }`,
+						Url:    "http://localhost:1234",
+						Method: "POST",
+						Headers: []openapi.HttpHeader{
+							{Key: "Content-Type", Value: "application/json"},
+						},
+						Auth: openapi.HttpAuth{},
+						Body: `{ "message": "hello" }`,
 					},
 				},
 			},

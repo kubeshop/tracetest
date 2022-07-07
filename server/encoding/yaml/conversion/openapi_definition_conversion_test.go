@@ -20,12 +20,14 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 		{
 			Name: "Should_convert_basic_test_information",
 			Input: openapi.Test{
-				Id:               "624a8dea-f152-48d4-a742-30b210094959",
-				Name:             "my test",
-				Description:      "my test description",
-				Version:          3,
-				ServiceUnderTest: openapi.Trigger{},
-				Definition:       openapi.TestDefinition{},
+				Id:          "624a8dea-f152-48d4-a742-30b210094959",
+				Name:        "my test",
+				Description: "my test description",
+				Version:     3,
+				ServiceUnderTest: openapi.Trigger{
+					TriggerType: "http",
+				},
+				Definition: openapi.TestDefinition{},
 			},
 			ExpectedOutput: definition.Test{
 				Id:          "624a8dea-f152-48d4-a742-30b210094959",
@@ -280,11 +282,13 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 		{
 			Name: "Should_convert_test_definition",
 			Input: openapi.Test{
-				Id:               "624a8dea-f152-48d4-a742-30b210094959",
-				Name:             "my test",
-				Description:      "my test description",
-				Version:          3,
-				ServiceUnderTest: openapi.Trigger{},
+				Id:          "624a8dea-f152-48d4-a742-30b210094959",
+				Name:        "my test",
+				Description: "my test description",
+				Version:     3,
+				ServiceUnderTest: openapi.Trigger{
+					TriggerType: "http",
+				},
 				Definition: openapi.TestDefinition{
 					Definitions: []openapi.TestDefinitionDefinitions{
 						{

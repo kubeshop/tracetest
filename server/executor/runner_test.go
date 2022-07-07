@@ -23,7 +23,8 @@ func TestPersistentRunner(t *testing.T) {
 		t.Parallel()
 
 		test := model.Test{
-			ID: id.NewRandGenerator().UUID(),
+			ID:               id.NewRandGenerator().UUID(),
+			ServiceUnderTest: sampleTrigger,
 		}
 
 		f := runnerSetup(t)
@@ -41,8 +42,8 @@ func TestPersistentRunner(t *testing.T) {
 	t.Run("TestsCanBeTriggerdConcurrently", func(t *testing.T) {
 		t.Parallel()
 
-		test1 := model.Test{ID: id.NewRandGenerator().UUID()}
-		test2 := model.Test{ID: id.NewRandGenerator().UUID()}
+		test1 := model.Test{ID: id.NewRandGenerator().UUID(), ServiceUnderTest: sampleTrigger}
+		test2 := model.Test{ID: id.NewRandGenerator().UUID(), ServiceUnderTest: sampleTrigger}
 
 		f := runnerSetup(t)
 
@@ -79,6 +80,10 @@ var (
 				},
 			},
 		},
+	}
+
+	sampleTrigger = model.Trigger{
+		Type: model.TriggerTypeHTTP,
 	}
 )
 
