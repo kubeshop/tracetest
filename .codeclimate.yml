@@ -4,3 +4,11 @@ exclude_patterns:
 - "server/internal/"
 - "cli/openapi/"
 
+plugins:
+  rubocop:
+    enabled: true
+    checks:
+      # Disable method length check for all go tests
+      Rubocop/Metrics/MethodLength:
+        Exclude:
+          - "server/**/*_test.go"
