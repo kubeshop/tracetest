@@ -11,16 +11,15 @@ import (
 	"github.com/google/uuid"
 	"github.com/kubeshop/tracetest/server/analytics"
 	"github.com/kubeshop/tracetest/server/assertions"
-	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/assertions/selectors"
 	"github.com/kubeshop/tracetest/server/encoding/yaml/definition"
 	"github.com/kubeshop/tracetest/server/executor"
+	"github.com/kubeshop/tracetest/server/http/mappings"
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/junit"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/testdb"
-	"github.com/kubeshop/tracetest/server/traces"
 	"gopkg.in/yaml.v3"
 )
 
@@ -30,23 +29,20 @@ type controller struct {
 	testDB          model.Repository
 	runner          executor.Runner
 	assertionRunner executor.AssertionRunner
-
-	openapi OpenAPIMapper
-	model   ModelMapper
+	mappers         mappings.Mappings
 }
 
 func NewController(
 	testDB model.Repository,
 	runner executor.Runner,
 	assertionRunner executor.AssertionRunner,
-	traceConversionConfig traces.ConversionConfig,
+	mappers mappings.Mappings,
 ) openapi.ApiApiServicer {
 	return &controller{
 		testDB:          testDB,
 		runner:          runner,
 		assertionRunner: assertionRunner,
-		openapi:         OpenAPIMapper{traceConversionConfig},
-		model:           ModelMapper{Comparators: comparator.DefaultRegistry(), traceConversionConfig: traceConversionConfig},
+		mappers:         mappers,
 	}
 }
 
@@ -60,7 +56,7 @@ func handleDBError(err error) openapi.ImplResponse {
 }
 
 func (c *controller) CreateTest(ctx context.Context, in openapi.Test) (openapi.ImplResponse, error) {
-	test := c.model.Test(in)
+	test := c.mappers.In.Test(in)
 
 	// if they try to create a test with preset ID, we need to make sure that ID doesn't exists already
 	if test.HasID() {
@@ -85,7 +81,7 @@ func (c *controller) CreateTest(ctx context.Context, in openapi.Test) (openapi.I
 
 	analytics.CreateAndSendEvent("test_created_backend", "test")
 
-	return openapi.Response(200, c.openapi.Test(test)), nil
+	return openapi.Response(200, c.mappers.Out.Test(test)), nil
 }
 
 func (c *controller) DeleteTest(ctx context.Context, testID string) (openapi.ImplResponse, error) {
@@ -121,7 +117,7 @@ func (c *controller) GetTest(ctx context.Context, testID string) (openapi.ImplRe
 		return handleDBError(err), err
 	}
 
-	return openapi.Response(200, c.openapi.Test(test)), nil
+	return openapi.Response(200, c.mappers.Out.Test(test)), nil
 }
 
 func (c *controller) GetTestDefinition(ctx context.Context, testID string) (openapi.ImplResponse, error) {
@@ -135,7 +131,7 @@ func (c *controller) GetTestDefinition(ctx context.Context, testID string) (open
 		return handleDBError(err), err
 	}
 
-	return openapi.Response(200, c.openapi.Definition(test.Definition)), nil
+	return openapi.Response(200, c.mappers.Out.Definition(test.Definition)), nil
 }
 
 func (c *controller) GetTestResultSelectedSpans(ctx context.Context, _ string, runID string, selectorQuery string) (openapi.ImplResponse, error) {
@@ -179,7 +175,7 @@ func (c *controller) GetTestRun(ctx context.Context, _ string, runID string) (op
 		return handleDBError(err), err
 	}
 
-	return openapi.Response(200, c.openapi.Run(&run)), nil
+	return openapi.Response(200, c.mappers.Out.Run(&run)), nil
 }
 
 func (c *controller) DeleteTestRun(ctx context.Context, _ string, runID string) (openapi.ImplResponse, error) {
@@ -223,7 +219,7 @@ func (c *controller) GetTestRuns(ctx context.Context, testID string, take, skip 
 		return handleDBError(err), err
 	}
 
-	return openapi.Response(200, c.openapi.Runs(runs)), nil
+	return openapi.Response(200, c.mappers.Out.Runs(runs)), nil
 }
 
 func (c *controller) GetTests(ctx context.Context, take, skip int32) (openapi.ImplResponse, error) {
@@ -236,7 +232,7 @@ func (c *controller) GetTests(ctx context.Context, take, skip int32) (openapi.Im
 		return handleDBError(err), err
 	}
 
-	return openapi.Response(200, c.openapi.Tests(tests)), nil
+	return openapi.Response(200, c.mappers.Out.Tests(tests)), nil
 }
 
 func (c *controller) RerunTestRun(ctx context.Context, testID string, runID string) (openapi.ImplResponse, error) {
@@ -278,7 +274,7 @@ func (c *controller) RerunTestRun(ctx context.Context, testID string, runID stri
 
 	c.assertionRunner.RunAssertions(ctx, assertionRequest)
 
-	return openapi.Response(http.StatusOK, c.openapi.Run(&newTestRun)), nil
+	return openapi.Response(http.StatusOK, c.mappers.Out.Run(&newTestRun)), nil
 }
 
 func (c *controller) RunTest(ctx context.Context, testID string) (openapi.ImplResponse, error) {
@@ -296,7 +292,7 @@ func (c *controller) RunTest(ctx context.Context, testID string) (openapi.ImplRe
 
 	analytics.CreateAndSendEvent("test_run_backend", "test")
 
-	return openapi.Response(200, c.openapi.Run(&run)), nil
+	return openapi.Response(200, c.mappers.Out.Run(&run)), nil
 }
 
 func (c *controller) SetTestDefinition(ctx context.Context, testID string, def openapi.TestDefinition) (openapi.ImplResponse, error) {
@@ -305,7 +301,7 @@ func (c *controller) SetTestDefinition(ctx context.Context, testID string, def o
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
 	}
 
-	if err := c.model.ValidateDefinition(def); err != nil {
+	if err := c.mappers.In.ValidateDefinition(def); err != nil {
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
 	}
 
@@ -314,7 +310,7 @@ func (c *controller) SetTestDefinition(ctx context.Context, testID string, def o
 		return handleDBError(err), err
 	}
 
-	newDefinition := c.model.Definition(def)
+	newDefinition := c.mappers.In.Definition(def)
 
 	newTest, err := model.BumpVersionIfDefinitionChanged(test, newDefinition)
 	if err != nil {
@@ -342,7 +338,7 @@ func (c *controller) UpdateTest(ctx context.Context, testID string, in openapi.T
 		return handleDBError(err), err
 	}
 
-	updated := c.model.Test(in)
+	updated := c.mappers.In.Test(in)
 	updated.Version = test.Version
 	updated.ID = test.ID
 	updated.ReferenceRun = nil
@@ -370,8 +366,8 @@ func (c *controller) DryRunAssertion(ctx context.Context, _, runID string, def o
 		return openapi.Response(http.StatusUnprocessableEntity, fmt.Sprintf(`run "%s" has no trace associated`, runID)), nil
 	}
 
-	results, allPassed := assertions.Assert(c.model.Definition(def), *run.Trace)
-	res := c.openapi.Result(&model.RunResults{
+	results, allPassed := assertions.Assert(c.mappers.In.Definition(def), *run.Trace)
+	res := c.mappers.Out.Result(&model.RunResults{
 		AllPassed: allPassed,
 		Results:   results,
 	})
@@ -419,7 +415,7 @@ func (c controller) GetTestVersionDefinitionFile(ctx context.Context, testID str
 		return handleDBError(err), err
 	}
 
-	res, err := getYamlFileFromDefinition(c.openapi.TestDefinitionFile(test))
+	res, err := getYamlFileFromDefinition(c.mappers.Out.TestDefinitionFile(test))
 	if err != nil {
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
 	}
@@ -476,16 +472,16 @@ func (c controller) ExportTestRun(ctx context.Context, testID string, runID stri
 	}
 
 	response := openapi.ExportedTestInformation{
-		Test: c.openapi.Test(test),
-		Run:  c.openapi.Run(&run),
+		Test: c.mappers.Out.Test(test),
+		Run:  c.mappers.Out.Run(&run),
 	}
 
 	return openapi.Response(http.StatusOK, response), nil
 }
 
 func (c controller) ImportTestRun(ctx context.Context, exportedTest openapi.ExportedTestInformation) (openapi.ImplResponse, error) {
-	test := c.model.Test(exportedTest.Test)
-	run := c.model.Run(exportedTest.Run)
+	test := c.mappers.In.Test(exportedTest.Test)
+	run := c.mappers.In.Run(exportedTest.Run)
 
 	createdTest, err := c.testDB.CreateTest(ctx, test)
 	if err != nil {
@@ -505,8 +501,8 @@ func (c controller) ImportTestRun(ctx context.Context, exportedTest openapi.Expo
 	}
 
 	response := openapi.ExportedTestInformation{
-		Test: c.openapi.Test(createdTest),
-		Run:  c.openapi.Run(&createdRun),
+		Test: c.mappers.Out.Test(createdTest),
+		Run:  c.mappers.Out.Run(&createdRun),
 	}
 
 	return openapi.Response(http.StatusOK, response), nil

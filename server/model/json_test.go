@@ -57,13 +57,16 @@ func TestRunEncoding(t *testing.T) {
 				CreatedAt:          t1,
 				ServiceTriggeredAt: t1,
 				CompletedAt:        t1,
-				Request: model.HTTPRequest{
-					Method: model.HTTPMethodPOST,
-					URL:    "http://google.com",
-					Headers: []model.HTTPHeader{
-						{"Content-Type", "application/json"},
+				Trigger: model.Trigger{
+					Type: model.TriggerTypeHTTP,
+					HTTP: &model.HTTPRequest{
+						Method: model.HTTPMethodPOST,
+						URL:    "http://google.com",
+						Headers: []model.HTTPHeader{
+							{"Content-Type", "application/json"},
+						},
+						Body: `{"id":52}`,
 					},
-					Body: `{"id":52}`,
 				},
 				TestVersion: 1,
 			},
@@ -81,22 +84,28 @@ func TestRunEncoding(t *testing.T) {
 				ServiceTriggerCompletedAt: t2,
 				ObtainedTraceAt:           t3,
 				CompletedAt:               t4,
-				Request: model.HTTPRequest{
-					Method: model.HTTPMethodPOST,
-					URL:    "http://google.com",
-					Headers: []model.HTTPHeader{
-						{"Content-Type", "application/json"},
+				Trigger: model.Trigger{
+					Type: model.TriggerTypeHTTP,
+					HTTP: &model.HTTPRequest{
+						Method: model.HTTPMethodPOST,
+						URL:    "http://google.com",
+						Headers: []model.HTTPHeader{
+							{"Content-Type", "application/json"},
+						},
+						Body: `{"name":"Larry"}`,
 					},
-					Body: `{"name":"Larry"}`,
 				},
-				Response: model.HTTPResponse{
-					Status:     "OK",
-					StatusCode: 200,
-					Headers: []model.HTTPHeader{
-						{"Content-Type", "application/json"},
-						{"Length", "9"},
+				TriggerResult: model.TriggerResult{
+					Type: model.TriggerTypeHTTP,
+					HTTP: &model.HTTPResponse{
+						Status:     "OK",
+						StatusCode: 200,
+						Headers: []model.HTTPHeader{
+							{"Content-Type", "application/json"},
+							{"Length", "9"},
+						},
+						Body: `{"id":52}`,
 					},
-					Body: `{"id":52}`,
 				},
 				Trace:       exampleTrace,
 				TestVersion: 2,

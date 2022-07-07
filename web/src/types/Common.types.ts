@@ -22,6 +22,8 @@ export interface IMockFactory<T, R> {
 export type THttpSchemas = external['http.yaml']['components']['schemas'];
 export type TTraceSchemas = external['trace.yaml']['components']['schemas'];
 export type TTestSchemas = external['tests.yaml']['components']['schemas'];
+export type TTriggerSchemas = external['triggers.yaml']['components']['schemas'];
+export type TGrpcSchemas = external['grpc.yaml']['components']['schemas'];
 
 export type TStructure = TTestSchemas['SpanSelector'];
 export type TFilter = TTestSchemas['SelectorFilter'];

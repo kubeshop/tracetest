@@ -37,15 +37,18 @@ func TestDefinitionToOpenAPIConversion(t *testing.T) {
 			ExpectedOutput: openapi.Test{
 				Name:        "A test",
 				Description: "A test description",
-				ServiceUnderTest: openapi.TestServiceUnderTest{
-					Request: openapi.HttpRequest{
-						Url:    "http://localhost:1234",
-						Method: "POST",
-						Headers: []openapi.HttpHeader{
-							{Key: "Content-Type", Value: "application/json"},
+				ServiceUnderTest: openapi.Trigger{
+					TriggerType: "http",
+					TriggerSettings: openapi.TriggerTriggerSettings{
+						Http: openapi.HttpRequest{
+							Url:    "http://localhost:1234",
+							Method: "POST",
+							Headers: []openapi.HttpHeader{
+								{Key: "Content-Type", Value: "application/json"},
+							},
+							Body: "",
+							Auth: openapi.HttpAuth{},
 						},
-						Body: "",
-						Auth: openapi.HttpAuth{},
 					},
 				},
 			},
@@ -58,10 +61,12 @@ func TestDefinitionToOpenAPIConversion(t *testing.T) {
 				Trigger: definition.TestTrigger{
 					Type: "http",
 					HTTPRequest: openapi.HttpRequest{
-						Url:     "http://localhost:1234",
-						Method:  "POST",
-						Headers: []openapi.HttpHeader{},
-						Body:    "",
+						Url:    "http://localhost:1234",
+						Method: "POST",
+						Headers: []openapi.HttpHeader{
+							{Key: "Content-Type", Value: "application/json"},
+						},
+						Body: "",
 						Auth: openapi.HttpAuth{
 							Type: "basic",
 							Basic: openapi.HttpAuthBasic{
@@ -75,17 +80,22 @@ func TestDefinitionToOpenAPIConversion(t *testing.T) {
 			ExpectedOutput: openapi.Test{
 				Name:        "A test",
 				Description: "A test description",
-				ServiceUnderTest: openapi.TestServiceUnderTest{
-					Request: openapi.HttpRequest{
-						Url:     "http://localhost:1234",
-						Method:  "POST",
-						Headers: []openapi.HttpHeader{},
-						Body:    "",
-						Auth: openapi.HttpAuth{
-							Type: "basic",
-							Basic: openapi.HttpAuthBasic{
-								Username: "matheus",
-								Password: "pikachu",
+				ServiceUnderTest: openapi.Trigger{
+					TriggerType: "http",
+					TriggerSettings: openapi.TriggerTriggerSettings{
+						Http: openapi.HttpRequest{
+							Url:    "http://localhost:1234",
+							Method: "POST",
+							Headers: []openapi.HttpHeader{
+								{Key: "Content-Type", Value: "application/json"},
+							},
+							Body: "",
+							Auth: openapi.HttpAuth{
+								Type: "basic",
+								Basic: openapi.HttpAuthBasic{
+									Username: "matheus",
+									Password: "pikachu",
+								},
 							},
 						},
 					},
@@ -100,10 +110,12 @@ func TestDefinitionToOpenAPIConversion(t *testing.T) {
 				Trigger: definition.TestTrigger{
 					Type: "http",
 					HTTPRequest: openapi.HttpRequest{
-						Url:     "http://localhost:1234",
-						Method:  "POST",
-						Headers: []openapi.HttpHeader{},
-						Body:    "",
+						Url:    "http://localhost:1234",
+						Method: "POST",
+						Headers: []openapi.HttpHeader{
+							{Key: "Content-Type", Value: "application/json"},
+						},
+						Body: "",
 						Auth: openapi.HttpAuth{
 							Type: "apiKey",
 							ApiKey: openapi.HttpAuthApiKey{
@@ -118,18 +130,23 @@ func TestDefinitionToOpenAPIConversion(t *testing.T) {
 			ExpectedOutput: openapi.Test{
 				Name:        "A test",
 				Description: "A test description",
-				ServiceUnderTest: openapi.TestServiceUnderTest{
-					Request: openapi.HttpRequest{
-						Url:     "http://localhost:1234",
-						Method:  "POST",
-						Headers: []openapi.HttpHeader{},
-						Body:    "",
-						Auth: openapi.HttpAuth{
-							Type: "apiKey",
-							ApiKey: openapi.HttpAuthApiKey{
-								Key:   "X-Key",
-								Value: "my-api-key",
-								In:    "header",
+				ServiceUnderTest: openapi.Trigger{
+					TriggerType: "http",
+					TriggerSettings: openapi.TriggerTriggerSettings{
+						Http: openapi.HttpRequest{
+							Url:    "http://localhost:1234",
+							Method: "POST",
+							Headers: []openapi.HttpHeader{
+								{Key: "Content-Type", Value: "application/json"},
+							},
+							Body: "",
+							Auth: openapi.HttpAuth{
+								Type: "apiKey",
+								ApiKey: openapi.HttpAuthApiKey{
+									Key:   "X-Key",
+									Value: "my-api-key",
+									In:    "header",
+								},
 							},
 						},
 					},
@@ -144,10 +161,12 @@ func TestDefinitionToOpenAPIConversion(t *testing.T) {
 				Trigger: definition.TestTrigger{
 					Type: "http",
 					HTTPRequest: openapi.HttpRequest{
-						Url:     "http://localhost:1234",
-						Method:  "POST",
-						Headers: []openapi.HttpHeader{},
-						Body:    "",
+						Url:    "http://localhost:1234",
+						Method: "POST",
+						Headers: []openapi.HttpHeader{
+							{Key: "Content-Type", Value: "application/json"},
+						},
+						Body: "",
 						Auth: openapi.HttpAuth{
 							Type: "bearer",
 							Bearer: openapi.HttpAuthBearer{
@@ -160,16 +179,21 @@ func TestDefinitionToOpenAPIConversion(t *testing.T) {
 			ExpectedOutput: openapi.Test{
 				Name:        "A test",
 				Description: "A test description",
-				ServiceUnderTest: openapi.TestServiceUnderTest{
-					Request: openapi.HttpRequest{
-						Url:     "http://localhost:1234",
-						Method:  "POST",
-						Headers: []openapi.HttpHeader{},
-						Body:    "",
-						Auth: openapi.HttpAuth{
-							Type: "bearer",
-							Bearer: openapi.HttpAuthBearer{
-								Token: "my-token",
+				ServiceUnderTest: openapi.Trigger{
+					TriggerType: "http",
+					TriggerSettings: openapi.TriggerTriggerSettings{
+						Http: openapi.HttpRequest{
+							Url:    "http://localhost:1234",
+							Method: "POST",
+							Headers: []openapi.HttpHeader{
+								{Key: "Content-Type", Value: "application/json"},
+							},
+							Body: "",
+							Auth: openapi.HttpAuth{
+								Type: "bearer",
+								Bearer: openapi.HttpAuthBearer{
+									Token: "my-token",
+								},
 							},
 						},
 					},
@@ -184,24 +208,31 @@ func TestDefinitionToOpenAPIConversion(t *testing.T) {
 				Trigger: definition.TestTrigger{
 					Type: "http",
 					HTTPRequest: openapi.HttpRequest{
-						Url:     "http://localhost:1234",
-						Method:  "POST",
-						Headers: []openapi.HttpHeader{},
-						Auth:    openapi.HttpAuth{},
-						Body:    `{ "message": "hello" }`,
+						Url:    "http://localhost:1234",
+						Method: "POST",
+						Headers: []openapi.HttpHeader{
+							{Key: "Content-Type", Value: "application/json"},
+						},
+						Auth: openapi.HttpAuth{},
+						Body: `{ "message": "hello" }`,
 					},
 				},
 			},
 			ExpectedOutput: openapi.Test{
 				Name:        "A test",
 				Description: "A test description",
-				ServiceUnderTest: openapi.TestServiceUnderTest{
-					Request: openapi.HttpRequest{
-						Url:     "http://localhost:1234",
-						Method:  "POST",
-						Headers: []openapi.HttpHeader{},
-						Body:    `{ "message": "hello" }`,
-						Auth:    openapi.HttpAuth{},
+				ServiceUnderTest: openapi.Trigger{
+					TriggerType: "http",
+					TriggerSettings: openapi.TriggerTriggerSettings{
+						Http: openapi.HttpRequest{
+							Url:    "http://localhost:1234",
+							Method: "POST",
+							Headers: []openapi.HttpHeader{
+								{Key: "Content-Type", Value: "application/json"},
+							},
+							Body: `{ "message": "hello" }`,
+							Auth: openapi.HttpAuth{},
+						},
 					},
 				},
 			},
@@ -234,13 +265,16 @@ func TestDefinitionToOpenAPIConversion(t *testing.T) {
 			ExpectedOutput: openapi.Test{
 				Name:        "A test",
 				Description: "A test description",
-				ServiceUnderTest: openapi.TestServiceUnderTest{
-					Request: openapi.HttpRequest{
-						Url:     "http://localhost:1234",
-						Method:  "POST",
-						Headers: []openapi.HttpHeader{},
-						Body:    "",
-						Auth:    openapi.HttpAuth{},
+				ServiceUnderTest: openapi.Trigger{
+					TriggerType: "http",
+					TriggerSettings: openapi.TriggerTriggerSettings{
+						Http: openapi.HttpRequest{
+							Url:     "http://localhost:1234",
+							Method:  "POST",
+							Headers: []openapi.HttpHeader{},
+							Body:    "",
+							Auth:    openapi.HttpAuth{},
+						},
 					},
 				},
 				Definition: openapi.TestDefinition{

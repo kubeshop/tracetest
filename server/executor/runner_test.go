@@ -23,7 +23,8 @@ func TestPersistentRunner(t *testing.T) {
 		t.Parallel()
 
 		test := model.Test{
-			ID: id.NewRandGenerator().UUID(),
+			ID:               id.NewRandGenerator().UUID(),
+			ServiceUnderTest: sampleTrigger,
 		}
 
 		f := runnerSetup(t)
@@ -41,8 +42,8 @@ func TestPersistentRunner(t *testing.T) {
 	t.Run("TestsCanBeTriggerdConcurrently", func(t *testing.T) {
 		t.Parallel()
 
-		test1 := model.Test{ID: id.NewRandGenerator().UUID()}
-		test2 := model.Test{ID: id.NewRandGenerator().UUID()}
+		test1 := model.Test{ID: id.NewRandGenerator().UUID(), ServiceUnderTest: sampleTrigger}
+		test2 := model.Test{ID: id.NewRandGenerator().UUID(), ServiceUnderTest: sampleTrigger}
 
 		f := runnerSetup(t)
 
@@ -69,13 +70,20 @@ var (
 		SpanAttributes: map[string]string{
 			"tracetest.run.trigger.http.response_code": "200",
 		},
-		Response: model.HTTPResponse{
-			StatusCode: 200,
-			Body:       "this is the body",
-			Headers: []model.HTTPHeader{
-				{Key: "Content-Type", Value: "text/plain"},
+		Result: model.TriggerResult{
+			Type: model.TriggerTypeHTTP,
+			HTTP: &model.HTTPResponse{
+				StatusCode: 200,
+				Body:       "this is the body",
+				Headers: []model.HTTPHeader{
+					{Key: "Content-Type", Value: "text/plain"},
+				},
 			},
 		},
+	}
+
+	sampleTrigger = model.Trigger{
+		Type: model.TriggerTypeHTTP,
 	}
 )
 
@@ -178,8 +186,8 @@ type mockTriggerer struct {
 	t *testing.T
 }
 
-func (m *mockTriggerer) Type() string {
-	return "http"
+func (m *mockTriggerer) Type() model.TriggerType {
+	return model.TriggerTypeHTTP
 }
 
 func (m *mockTriggerer) Trigger(_ context.Context, test model.Test, tid trace.TraceID, sid trace.SpanID) (trigger.Response, error) {

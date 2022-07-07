@@ -14,17 +14,20 @@ trigger:
         "id": "383d3dce-7b60-4a61-bdea-87f47263af5d",
         "name": "Pokemon - List - Get a Pokemon",
         "serviceUnderTest": {
-            "request": {
-                "url": "${DEMO_APP_URL}/pokemon?take=20&skip=0",
-                "method": "GET",
-                "body": "",
-                "headers": [
-                    {
-                        "key": "Content-Type",
-                        "value": "application/json"
-                    }
-                ]
+          "triggerType": "http",
+          "triggerSettings": {
+            "http": {
+              "url": "${DEMO_APP_URL}/pokemon?take=20&skip=0",
+              "method": "GET",
+              "body": "",
+              "headers": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ]
             }
+          }
         }
       }
 testDefinition:

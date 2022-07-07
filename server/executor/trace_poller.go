@@ -2,6 +2,7 @@ package executor
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"math"
@@ -149,14 +150,25 @@ func (tp tracePoller) runAssertions(ctx context.Context, test model.Test, run mo
 	return nil
 }
 
-func augmentData(trace *traces.Trace, resp model.HTTPResponse) *traces.Trace {
+func augmentData(trace *traces.Trace, result model.TriggerResult) *traces.Trace {
 	if trace == nil {
 		return trace
 	}
 
-	trace.RootSpan.Attributes["tracetest.response.status"] = fmt.Sprintf("%d", resp.StatusCode)
-	trace.RootSpan.Attributes["tracetest.response.body"] = resp.Body
-	trace.RootSpan.Attributes["tracetest.response.headers"] = fmt.Sprintf("%d", resp.StatusCode)
+	switch result.Type {
+	case model.TriggerTypeHTTP:
+		resp := result.HTTP
+		jsonheaders, _ := json.Marshal(resp.Headers)
+		trace.RootSpan.Attributes["tracetest.response.status"] = fmt.Sprintf("%d", resp.StatusCode)
+		trace.RootSpan.Attributes["tracetest.response.body"] = resp.Body
+		trace.RootSpan.Attributes["tracetest.response.headers"] = string(jsonheaders)
+	case model.TriggerTypeGRPC:
+		resp := result.GRPC
+		jsonheaders, _ := json.Marshal(resp.Metadata)
+		trace.RootSpan.Attributes["tracetest.response.status"] = fmt.Sprintf("%d", resp.StatusCode)
+		trace.RootSpan.Attributes["tracetest.response.body"] = resp.Body
+		trace.RootSpan.Attributes["tracetest.response.headers"] = string(jsonheaders)
+	}
 
 	return trace
 }

@@ -25,6 +25,7 @@ func (t Test) Validate() error {
 type TestTrigger struct {
 	Type        string      `yaml:"type"`
 	HTTPRequest HttpRequest `yaml:"httpRequest"`
+	GRPC        GrpcRequest `yaml:"grpc"`
 }
 
 func (t TestTrigger) Validate() error {

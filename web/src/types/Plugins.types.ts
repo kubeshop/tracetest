@@ -1,7 +1,7 @@
 import {CaseReducer, PayloadAction} from '@reduxjs/toolkit';
 import {SupportedPlugins} from 'constants/Plugins.constants';
 import {TRecursivePartial} from './Common.types';
-import {TRawTest} from './Test.types';
+import {TRawTest, TTriggerType} from './Test.types';
 
 export type TStepStatus = 'complete' | 'pending' | 'selected';
 export type TDraftTest = TRecursivePartial<TRawTest>;
@@ -20,6 +20,7 @@ export interface IPlugin {
   description: string;
   stepList: ICreateTestStep[];
   isActive: boolean;
+  type: TTriggerType;
 }
 
 export interface IPluginStepProps {}

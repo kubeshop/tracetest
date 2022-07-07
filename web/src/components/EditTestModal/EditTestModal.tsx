@@ -7,8 +7,9 @@ import {useTheme} from 'styled-components';
 import {IBasicDetailsValues} from 'components/CreateTestPlugins/Default/steps/BasicDetails/BasicDetails';
 import {IRequestDetailsValues} from 'components/CreateTestPlugins/Rest/steps/RequestDetails/RequestDetails';
 import {useEditTestMutation, useRunTestMutation} from 'redux/apis/TraceTest.api';
+import {TRawHTTPRequest, TTest} from 'types/Test.types';
 import TestDefinitionService from 'services/TestDefinition.service';
-import {TRequest, TTest} from 'types/Test.types';
+import {TriggerTypes} from 'constants/Test.constants';
 import EditTestForm, {FORM_ID} from './EditTestForm';
 
 export type TEditTest = IRequestDetailsValues & IBasicDetailsValues;
@@ -31,7 +32,7 @@ const EditTestModal = ({onClose, isOpen, test}: IProps) => {
 
   const handleOnSubmit = useCallback(
     async (values: TEditTest) => {
-      const request: TRequest = {
+      const request: TRawHTTPRequest = {
         url: values.url,
         method: values.method,
         body: values.body,
@@ -43,7 +44,10 @@ const EditTestModal = ({onClose, isOpen, test}: IProps) => {
           name: values.name,
           description: values.description,
           serviceUnderTest: {
-            request,
+            triggerType: TriggerTypes.http,
+            triggerSettings: {
+              http: request,
+            },
           },
           definition: {
             definitions: test.definition.definitionList.map(def => TestDefinitionService.toRaw(def)),

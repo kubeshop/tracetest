@@ -17,13 +17,23 @@ type (
 		Name             string
 		Description      string
 		Version          int
-		ServiceUnderTest ServiceUnderTest
+		ServiceUnderTest Trigger
 		ReferenceRun     *Run
 		Definition       OrderedMap[SpanQuery, []Assertion]
 	}
 
-	ServiceUnderTest struct {
-		Request HTTPRequest
+	TriggerType string
+
+	Trigger struct {
+		Type TriggerType
+		HTTP *HTTPRequest
+		GRPC *GRPCRequest
+	}
+
+	TriggerResult struct {
+		Type TriggerType
+		HTTP *HTTPResponse
+		GRPC *GRPCResponse
 	}
 
 	SpanQuery string
@@ -49,8 +59,8 @@ type (
 		ServiceTriggerCompletedAt time.Time
 		ObtainedTraceAt           time.Time
 		CompletedAt               time.Time
-		Request                   HTTPRequest
-		Response                  HTTPResponse
+		Trigger                   Trigger
+		TriggerResult             TriggerResult
 		Trace                     *traces.Trace
 		Results                   *RunResults
 	}

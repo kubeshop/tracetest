@@ -34,6 +34,18 @@ type httpTriggerer struct {
 }
 
 func (te *httpTriggerer) Trigger(_ context.Context, test model.Test, tid trace.TraceID, sid trace.SpanID) (Response, error) {
+
+	response := Response{
+		Result: model.TriggerResult{
+			Type: te.Type(),
+		},
+	}
+
+	trigger := test.ServiceUnderTest
+	if trigger.Type != model.TriggerTypeHTTP {
+		return response, fmt.Errorf(`trigger type "%s" not supported by HTTP triggerer`, trigger.Type)
+	}
+
 	client := http.Client{
 		Transport: otelhttp.NewTransport(http.DefaultTransport,
 			otelhttp.WithTracerProvider(te.traceProvider),
@@ -56,34 +68,40 @@ func (te *httpTriggerer) Trigger(_ context.Context, test model.Test, tid trace.T
 	})
 
 	var req *http.Request
-	tReq := test.ServiceUnderTest.Request
+	tReq := trigger.HTTP
 	var body io.Reader
 	if tReq.Body != "" {
 		body = bytes.NewBufferString(tReq.Body)
 	}
 	req, err := http.NewRequest(strings.ToUpper(string(tReq.Method)), tReq.URL, body)
 	if err != nil {
-		return Response{}, err
+		return response, err
 	}
 	for _, h := range tReq.Headers {
 		req.Header.Set(h.Key, h.Value)
 	}
 
-	test.ServiceUnderTest.Request.Authenticate(req)
+	tReq.Authenticate(req)
 
 	resp, err := client.Do(req.WithContext(trace.ContextWithSpanContext(context.Background(), sc)))
 	if err != nil {
-		return Response{}, err
+		return response, err
 	}
 
-	return mapResp(resp), nil
+	mapped := mapResp(resp)
+	response.Result.HTTP = &mapped
+	response.SpanAttributes = map[string]string{
+		"tracetest.run.trigger.http.response_code": strconv.Itoa(resp.StatusCode),
+	}
+
+	return response, nil
 }
 
-func (t *httpTriggerer) Type() string {
-	return "http"
+func (t *httpTriggerer) Type() model.TriggerType {
+	return model.TriggerTypeHTTP
 }
 
-func mapResp(resp *http.Response) Response {
+func mapResp(resp *http.Response) model.HTTPResponse {
 	var mappedHeaders []model.HTTPHeader
 	for key, headers := range resp.Header {
 		for _, val := range headers {
@@ -101,16 +119,11 @@ func mapResp(resp *http.Response) Response {
 		fmt.Println(err)
 	}
 
-	return Response{
-		SpanAttributes: map[string]string{
-			"tracetest.run.trigger.http.response_code": strconv.Itoa(resp.StatusCode),
-		},
-		Response: model.HTTPResponse{
-			Status:     resp.Status,
-			StatusCode: resp.StatusCode,
-			Headers:    mappedHeaders,
-			Body:       body,
-		},
+	return model.HTTPResponse{
+		Status:     resp.Status,
+		StatusCode: resp.StatusCode,
+		Headers:    mappedHeaders,
+		Body:       body,
 	}
 }
 

@@ -3,7 +3,11 @@ import {ICreateTestState, TCreateTestSliceActions} from 'types/Plugins.types';
 import {Plugins, SupportedPlugins} from 'constants/Plugins.constants';
 
 export const initialState: ICreateTestState = {
-  draftTest: {},
+  draftTest: {
+    serviceUnderTest: {
+      triggerType: Plugins.REST.type,
+    },
+  },
   stepList: Plugins.REST.stepList,
   stepNumber: 0,
   pluginName: SupportedPlugins.REST,
@@ -13,10 +17,21 @@ const createTestSlice = createSlice<ICreateTestState, TCreateTestSliceActions, '
   name: 'createTest',
   initialState,
   reducers: {
-    setPlugin(state, {payload: {plugin}}) {
-      state.pluginName = plugin.name;
-      state.stepList = plugin.stepList;
-      state.draftTest = {};
+    setPlugin(
+      state,
+      {
+        payload: {
+          plugin: {name, stepList, type},
+        },
+      }
+    ) {
+      state.pluginName = name;
+      state.stepList = stepList;
+      state.draftTest = {
+        serviceUnderTest: {
+          triggerType: type,
+        },
+      };
     },
     setStepNumber(state, {payload: {stepNumber, completeStep = true}}) {
       const currentStep = state.stepList[state.stepNumber];
@@ -31,6 +46,10 @@ const createTestSlice = createSlice<ICreateTestState, TCreateTestSliceActions, '
       state.draftTest = {
         ...state.draftTest,
         ...draftTest,
+        serviceUnderTest: {
+          ...state.draftTest.serviceUnderTest,
+          ...draftTest.serviceUnderTest,
+        },
       };
     },
   },

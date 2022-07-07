@@ -4,13 +4,13 @@ import {HTTP_METHOD} from 'constants/Common.constants';
 import {useCreateTest} from 'providers/CreateTest/CreateTest.provider';
 import CreateStepFooter from 'components/CreateTestSteps/CreateTestStepFooter';
 import * as Step from 'components/CreateTestPlugins/Step.styled';
-import {TRequestAuth, TRequest} from 'types/Test.types';
+import {TRequestAuth, THTTPRequest} from 'types/Test.types';
 import RequestDetailsForm from './RequestDetailsForm';
 
 export interface IRequestDetailsValues {
   body: string;
   auth: TRequestAuth;
-  headers: TRequest['headers'];
+  headers: THTTPRequest['headers'];
   method: HTTP_METHOD;
   name: string;
   url: string;
@@ -21,7 +21,7 @@ const RequestDetails = () => {
   const [form] = Form.useForm<IRequestDetailsValues>();
   const {onNext} = useCreateTest();
   const {
-    draftTest: {serviceUnderTest: {request} = {}},
+    draftTest: {serviceUnderTest: {triggerSettings: {http: request = {}} = {}} = {}},
   } = useCreateTest();
 
   const handleNext = useCallback(() => {
@@ -30,13 +30,13 @@ const RequestDetails = () => {
 
   const handleSubmit = useCallback(
     (values: IRequestDetailsValues) => {
-      onNext({serviceUnderTest: {request: values}});
+      onNext({serviceUnderTest: {triggerSettings: {http: values}}});
     },
     [onNext]
   );
 
   const onRefreshData = useCallback(async () => {
-    const {url = '', body = '', method = HTTP_METHOD.GET} = request || {};
+    const {url = '', body = '', method = HTTP_METHOD.GET} = request;
 
     form.setFieldsValue({url, body, method: method as HTTP_METHOD});
 

@@ -24,7 +24,7 @@ func TestCreateRun(t *testing.T) {
 		TraceID:   testdb.IDGen.TraceID(),
 		SpanID:    testdb.IDGen.SpanID(),
 		CreatedAt: time.Now(),
-		Request:   test.ServiceUnderTest.Request,
+		Trigger:   test.ServiceUnderTest,
 	}
 
 	updated, err := db.CreateRun(context.TODO(), test, run)
@@ -36,7 +36,7 @@ func TestCreateRun(t *testing.T) {
 	assert.Equal(t, run.TraceID, actual.TraceID)
 	assert.Equal(t, run.SpanID, actual.SpanID)
 	assert.Equal(t, run.CreatedAt.Unix(), actual.CreatedAt.Unix())
-	assert.Equal(t, run.Request, actual.Request)
+	assert.Equal(t, run.Trigger, actual.Trigger)
 }
 
 func TestUpdateRun(t *testing.T) {
@@ -99,7 +99,7 @@ func TestUpdateRun(t *testing.T) {
 
 	assert.Equal(t, run.SpanID.String(), actual.SpanID.String())
 	assert.Equal(t, run.CreatedAt.Unix(), actual.CreatedAt.Unix())
-	assert.Equal(t, run.Request, actual.Request)
+	assert.Equal(t, run.Trigger, actual.Trigger)
 	assert.Equal(t, run.State, actual.State)
 	assert.Equal(t, run.Trace, actual.Trace)
 	assert.Equal(t, run.Results, actual.Results)

@@ -99,6 +99,8 @@ export interface operations {
           "application/json": external["tests.yaml"]["components"]["schemas"]["Test"];
         };
       };
+      /** trying to create a test with an already existing ID */
+      400: unknown;
       /** problem with creating test */
       500: unknown;
     };
@@ -387,6 +389,32 @@ export interface operations {
 }
 
 export interface external {
+  "grpc.yaml": {
+    paths: {};
+    components: {
+      schemas: {
+        GRPCHeader: {
+          key?: string;
+          value?: string;
+        };
+        GRPCRequest: {
+          protobufFile?: string;
+          address?: string;
+          service?: string;
+          method?: string;
+          metadata?: external["grpc.yaml"]["components"]["schemas"]["GRPCHeader"][];
+          auth?: external["http.yaml"]["components"]["schemas"]["HTTPAuth"];
+          request?: string;
+        };
+        GRPCResponse: {
+          statusCode?: number;
+          metadata?: external["grpc.yaml"]["components"]["schemas"]["GRPCHeader"][];
+          body?: string;
+        };
+      };
+    };
+    operations: {};
+  };
   "http.yaml": {
     paths: {};
     components: {
@@ -456,9 +484,7 @@ export interface external {
           description?: string;
           /** @description version number of the test */
           version?: number;
-          serviceUnderTest?: {
-            request?: external["http.yaml"]["components"]["schemas"]["HTTPRequest"];
-          };
+          serviceUnderTest?: external["triggers.yaml"]["components"]["schemas"]["Trigger"];
           /** @description Definition of assertions that are going to be made */
           definition?: external["tests.yaml"]["components"]["schemas"]["TestDefinition"];
         };
@@ -506,9 +532,8 @@ export interface external {
           obtainedTraceAt?: string;
           /** Format: date-time */
           completedAt?: string;
-          request?: external["http.yaml"]["components"]["schemas"]["HTTPRequest"];
-          /** @description TODO(pov) This is HTTP Response object for now, at some point it might be GRPC/SOAP/... */
-          response?: external["http.yaml"]["components"]["schemas"]["HTTPResponse"];
+          trigger?: external["triggers.yaml"]["components"]["schemas"]["Trigger"];
+          triggerResult?: external["triggers.yaml"]["components"]["schemas"]["TriggerResult"];
           trace?: external["trace.yaml"]["components"]["schemas"]["Trace"];
           result?: external["tests.yaml"]["components"]["schemas"]["AssertionResults"];
         };
@@ -578,9 +603,17 @@ export interface external {
           id?: string;
           parentId?: string;
           name?: string;
-          /** @description span start time in unix milli format */
+          /**
+           * Format: int64
+           * @description span start time in unix milli format
+           * @example 1656701595277
+           */
           startTime?: number;
-          /** @description span end time in unix milli format */
+          /**
+           * Format: int64
+           * @description span end time in unix milli format
+           * @example 1656701595800
+           */
           endTime?: number;
           /**
            * @description Key-Value of span attributes
@@ -588,6 +621,30 @@ export interface external {
            */
           attributes?: { [key: string]: string };
           children?: external["trace.yaml"]["components"]["schemas"]["Span"][];
+        };
+      };
+    };
+    operations: {};
+  };
+  "triggers.yaml": {
+    paths: {};
+    components: {
+      schemas: {
+        Trigger: {
+          /** @enum {string} */
+          triggerType?: "http" | "grpc";
+          triggerSettings?: {
+            http?: external["http.yaml"]["components"]["schemas"]["HTTPRequest"];
+            grpc?: external["grpc.yaml"]["components"]["schemas"]["GRPCRequest"];
+          };
+        };
+        TriggerResult: {
+          /** @enum {string} */
+          triggerType?: "http" | "grpc";
+          triggerResult?: {
+            http?: external["http.yaml"]["components"]["schemas"]["HTTPResponse"];
+            grpc?: external["grpc.yaml"]["components"]["schemas"]["GRPCResponse"];
+          };
         };
       };
     };

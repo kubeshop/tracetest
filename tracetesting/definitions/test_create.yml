@@ -13,17 +13,19 @@ trigger:
       {
         "name": "Pokemon - List - Get a Pokemon",
         "serviceUnderTest": {
-            "request": {
-                "url": "${DEMO_APP_URL}/pokemon?take=20&skip=0",
-                "method": "GET",
-                "body": "",
-                "headers": [
-                    {
-                        "key": "Content-Type",
-                        "value": "application/json"
-                    }
-                ]
+          "triggerType": "http",
+          "triggerSettings": {
+            "http": {
+              "url": "${DEMO_APP_URL}/pokemon?take=20&skip=0",
+              "method": "GET",
+              "headers": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ]
             }
+          }
         }
       }
 testDefinition:

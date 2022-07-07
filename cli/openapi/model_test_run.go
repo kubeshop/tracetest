@@ -33,8 +33,8 @@ type TestRun struct {
 	ServiceTriggerCompletedAt *time.Time        `json:"serviceTriggerCompletedAt,omitempty"`
 	ObtainedTraceAt           *time.Time        `json:"obtainedTraceAt,omitempty"`
 	CompletedAt               *time.Time        `json:"completedAt,omitempty"`
-	Request                   *HTTPRequest      `json:"request,omitempty"`
-	Response                  *HTTPResponse     `json:"response,omitempty"`
+	Trigger                   *Trigger          `json:"trigger,omitempty"`
+	TriggerResult             *TriggerResult    `json:"triggerResult,omitempty"`
 	Trace                     *Trace            `json:"trace,omitempty"`
 	Result                    *AssertionResults `json:"result,omitempty"`
 }
@@ -440,68 +440,68 @@ func (o *TestRun) SetCompletedAt(v time.Time) {
 	o.CompletedAt = &v
 }
 
-// GetRequest returns the Request field value if set, zero value otherwise.
-func (o *TestRun) GetRequest() HTTPRequest {
-	if o == nil || o.Request == nil {
-		var ret HTTPRequest
+// GetTrigger returns the Trigger field value if set, zero value otherwise.
+func (o *TestRun) GetTrigger() Trigger {
+	if o == nil || o.Trigger == nil {
+		var ret Trigger
 		return ret
 	}
-	return *o.Request
+	return *o.Trigger
 }
 
-// GetRequestOk returns a tuple with the Request field value if set, nil otherwise
+// GetTriggerOk returns a tuple with the Trigger field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *TestRun) GetRequestOk() (*HTTPRequest, bool) {
-	if o == nil || o.Request == nil {
+func (o *TestRun) GetTriggerOk() (*Trigger, bool) {
+	if o == nil || o.Trigger == nil {
 		return nil, false
 	}
-	return o.Request, true
+	return o.Trigger, true
 }
 
-// HasRequest returns a boolean if a field has been set.
-func (o *TestRun) HasRequest() bool {
-	if o != nil && o.Request != nil {
+// HasTrigger returns a boolean if a field has been set.
+func (o *TestRun) HasTrigger() bool {
+	if o != nil && o.Trigger != nil {
 		return true
 	}
 
 	return false
 }
 
-// SetRequest gets a reference to the given HTTPRequest and assigns it to the Request field.
-func (o *TestRun) SetRequest(v HTTPRequest) {
-	o.Request = &v
+// SetTrigger gets a reference to the given Trigger and assigns it to the Trigger field.
+func (o *TestRun) SetTrigger(v Trigger) {
+	o.Trigger = &v
 }
 
-// GetResponse returns the Response field value if set, zero value otherwise.
-func (o *TestRun) GetResponse() HTTPResponse {
-	if o == nil || o.Response == nil {
-		var ret HTTPResponse
+// GetTriggerResult returns the TriggerResult field value if set, zero value otherwise.
+func (o *TestRun) GetTriggerResult() TriggerResult {
+	if o == nil || o.TriggerResult == nil {
+		var ret TriggerResult
 		return ret
 	}
-	return *o.Response
+	return *o.TriggerResult
 }
 
-// GetResponseOk returns a tuple with the Response field value if set, nil otherwise
+// GetTriggerResultOk returns a tuple with the TriggerResult field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *TestRun) GetResponseOk() (*HTTPResponse, bool) {
-	if o == nil || o.Response == nil {
+func (o *TestRun) GetTriggerResultOk() (*TriggerResult, bool) {
+	if o == nil || o.TriggerResult == nil {
 		return nil, false
 	}
-	return o.Response, true
+	return o.TriggerResult, true
 }
 
-// HasResponse returns a boolean if a field has been set.
-func (o *TestRun) HasResponse() bool {
-	if o != nil && o.Response != nil {
+// HasTriggerResult returns a boolean if a field has been set.
+func (o *TestRun) HasTriggerResult() bool {
+	if o != nil && o.TriggerResult != nil {
 		return true
 	}
 
 	return false
 }
 
-// SetResponse gets a reference to the given HTTPResponse and assigns it to the Response field.
-func (o *TestRun) SetResponse(v HTTPResponse) {
-	o.Response = &v
+// SetTriggerResult gets a reference to the given TriggerResult and assigns it to the TriggerResult field.
+func (o *TestRun) SetTriggerResult(v TriggerResult) {
+	o.TriggerResult = &v
 }
 
 // GetTrace returns the Trace field value if set, zero value otherwise.
@@ -606,11 +606,11 @@ func (o TestRun) MarshalJSON() ([]byte, error) {
 	if o.CompletedAt != nil {
 		toSerialize["completedAt"] = o.CompletedAt
 	}
-	if o.Request != nil {
-		toSerialize["request"] = o.Request
+	if o.Trigger != nil {
+		toSerialize["trigger"] = o.Trigger
 	}
-	if o.Response != nil {
-		toSerialize["response"] = o.Response
+	if o.TriggerResult != nil {
+		toSerialize["triggerResult"] = o.TriggerResult
 	}
 	if o.Trace != nil {
 		toSerialize["trace"] = o.Trace
