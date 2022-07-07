@@ -1,6 +1,6 @@
 # Exclude all generated code
 exclude_patterns:
-- "server/openapi/**"
-- "server/internal/**"
-- "cli/openapi/**"
+- "server/openapi/"
+- "server/internal/"
+- "cli/openapi/"
 
