@@ -7,6 +7,7 @@ const useAssertionFormValues = (form: FormInstance<IValues>) => {
   const currentPseudoSelector = Form.useWatch('pseudoSelector', form);
   const currentIsAdvancedSelector = Form.useWatch('isAdvancedSelector', form);
   const currentSelector = Form.useWatch('selector', form);
+  const currentAssertionList = Form.useWatch('assertionList', form);
 
   return useMemo(
     () => ({
@@ -14,8 +15,9 @@ const useAssertionFormValues = (form: FormInstance<IValues>) => {
       currentPseudoSelector: currentPseudoSelector || undefined,
       currentIsAdvancedSelector: currentIsAdvancedSelector || false,
       currentSelector: currentSelector || '',
+      currentAssertionList: currentAssertionList || [],
     }),
-    [currentIsAdvancedSelector, currentPseudoSelector, currentSelector, currentSelectorList]
+    [currentAssertionList, currentIsAdvancedSelector, currentPseudoSelector, currentSelector, currentSelectorList]
   );
 };
 

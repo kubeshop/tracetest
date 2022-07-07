@@ -1,8 +1,4 @@
-import {Form, FormInstance, Input} from 'antd';
-import {useEffect, useMemo} from 'react';
-import {debounce} from 'lodash';
-import {useSpan} from 'providers/Span/Span.provider';
-import {useLazyGetSelectedSpansQuery} from 'redux/apis/TraceTest.api';
+import {Form, FormInstance} from 'antd';
 import SelectorService from 'services/Selector.service';
 import {useAppSelector} from 'redux/hooks';
 import AssertionSelectors from 'selectors/Assertion.selectors';
@@ -12,6 +8,8 @@ import {IValues} from './AssertionForm';
 import * as S from './AssertionForm.styled';
 import AssertionFormSelectorInput from './AssertionFormSelectorInput';
 import AssertionFormPseudoSelectorInput from './AssertionFormPseudoSelectorInput';
+import AdvancedEditor from '../AdvancedEditor';
+import useQuerySelector from './hooks/useQuerySelector';
 import useAssertionFormValues from './hooks/useAssertionFormValues';
 
 interface IProps {
@@ -33,53 +31,13 @@ const AssertionFormSelector = ({
   pseudoSelector,
   onValidSelector,
 }: IProps) => {
-  const {onSetAffectedSpans, onClearAffectedSpans} = useSpan();
-  const [onTriggerSelectedSpans, {data: spanIdList = [], isError: isInvalidSelector}] = useLazyGetSelectedSpansQuery();
-
-  const {currentIsAdvancedSelector, currentPseudoSelector, currentSelector, currentSelectorList} =
-    useAssertionFormValues(form);
-
-  const query = useMemo(
-    () =>
-      currentIsAdvancedSelector
-        ? currentSelector
-        : SelectorService.getSelectorString(currentSelectorList || [], currentPseudoSelector),
-    [currentIsAdvancedSelector, currentPseudoSelector, currentSelector, currentSelectorList]
-  );
-
-  const handleSelector = useMemo(
-    () =>
-      debounce(async ({q, tId, rId}: {q: string; rId: string; tId: string}) => {
-        const idList = await onTriggerSelectedSpans({
-          query: q,
-          testId: tId,
-          runId: rId,
-        }).unwrap();
-
-        onSetAffectedSpans(idList);
-      }, 500),
-    [onSetAffectedSpans, onTriggerSelectedSpans]
-  );
-
-  useEffect(() => {
-    handleSelector({q: query, tId: testId, rId: runId});
-  }, [handleSelector, query, runId, testId]);
-
-  useEffect(() => {
-    form.setFields([
-      {
-        name: 'selector',
-        errors: isInvalidSelector ? ['Invalid selector'] : [],
-      },
-    ]);
-    onValidSelector(!isInvalidSelector);
-  }, [form, isInvalidSelector, onValidSelector]);
-
-  useEffect(() => {
-    return () => {
-      onClearAffectedSpans();
-    };
-  }, []);
+  const {spanIdList, isValid} = useQuerySelector({
+    form,
+    runId,
+    testId,
+    onValidSelector,
+  });
+  const {currentIsAdvancedSelector, currentPseudoSelector, currentSelectorList} = useAssertionFormValues(form);
 
   const selectorAttributeList = useAppSelector(state =>
     AssertionSelectors.selectSelectorAttributeList(state, testId, runId, spanIdList, currentSelectorList)
@@ -112,23 +70,18 @@ const AssertionFormSelector = ({
       </Form.Item>
     </S.SelectorInputContainer>
   ) : (
-    <Form.Item
-      name="selector"
-      rules={[{required: true, message: 'The selector cannot be empty'}]}
-      validateTrigger={[]}
-      hasFeedback
-      help={isInvalidSelector ? 'Invalid selector' : ''}
-      validateStatus={isInvalidSelector ? 'error' : ''}
-      style={{maxWidth: '60%'}}
-    >
-      <Input.TextArea
-        data-cy="advanced-selector"
-        spellCheck={false}
-        placeholder="Enter the selector query"
-        autoSize
-        allowClear
-      />
-    </Form.Item>
+    <S.AdvancedSelectorInputContainer>
+      <Form.Item
+        name="selector"
+        rules={[{required: true, message: 'The selector cannot be empty'}]}
+        validateTrigger={[]}
+        hasFeedback
+        help={!isValid ? 'Invalid selector' : ''}
+        validateStatus={!isValid ? 'error' : ''}
+      >
+        <AdvancedEditor runId={runId} testId={testId} />
+      </Form.Item>
+    </S.AdvancedSelectorInputContainer>
   );
 };
 

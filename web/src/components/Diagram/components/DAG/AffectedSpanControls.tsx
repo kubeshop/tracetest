@@ -7,7 +7,7 @@ const AffectedSpanControls = () => {
   const {affectedSpans, onSelectSpan} = useSpan();
   const {handleNextSpan, handlePrevSpan, indexOfFocused} = useControls({onSelectSpan});
 
-  return affectedSpans.length ? (
+  return (
     <div>
       <S.ToggleButton onClick={handlePrevSpan} icon={<LeftOutlined />} type="text" />
       <S.ToggleButton onClick={handleNextSpan} icon={<RightOutlined />} type="text" />
@@ -15,7 +15,7 @@ const AffectedSpanControls = () => {
         {indexOfFocused} of {affectedSpans.length} total
       </S.FocusedText>
     </div>
-  ) : null;
+  );
 };
 
 export default AffectedSpanControls;

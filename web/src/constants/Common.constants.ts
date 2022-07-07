@@ -15,6 +15,9 @@ export const RESOURCE_SEMANTIC_CONVENTIONS_URL =
 export const TRACE_DOCUMENTATION_URL =
   'https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/api.md';
 
+export const ADVANCE_SELECTORS_DOCUMENTATION_URL =
+  'https://github.com/kubeshop/tracetest/blob/main/docs/advanced-selectors.md';
+
 export enum HTTP_METHOD {
   GET = 'GET',
   PUT = 'PUT',

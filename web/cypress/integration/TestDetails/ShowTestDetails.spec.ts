@@ -25,6 +25,7 @@ describe('Show test details', () => {
     cy.visit(`http://localhost:3000/test/${testId}`);
 
     cy.get('[data-cy^=result-actions-button]').last().click();
+    cy.wait(5000);
     cy.get('[data-cy=view-junit-button]').click();
 
     cy.get('[data-cy=file-viewer-code-container]', {timeout: 10000}).should('be.visible');
