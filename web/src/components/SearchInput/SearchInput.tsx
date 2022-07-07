@@ -1,4 +1,3 @@
-import {SearchOutlined} from '@ant-design/icons';
 import {debounce} from 'lodash';
 import {useMemo} from 'react';
 import * as S from './SearchInput.styled';
@@ -28,7 +27,7 @@ const SearchInput: React.FC<ISearchInputProps> = ({
 
   return (
     <S.SearchInput
-      prefix={<SearchOutlined style={{color: 'rgba(3, 24, 73, 0.4)'}} />}
+      prefix={<S.SearchIcon />}
       placeholder={placeholder}
       width={width}
       height={height}

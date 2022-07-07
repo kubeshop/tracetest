@@ -1,9 +1,11 @@
 import {Tooltip} from 'antd';
 import {useCallback} from 'react';
-import {useAppSelector} from 'redux/hooks';
+import {useTheme} from 'styled-components';
+
 import AssertionCheckRow from 'components/AssertionCheckRow';
 import {useSpan} from 'providers/Span/Span.provider';
 import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
+import {useAppSelector} from 'redux/hooks';
 import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
 import AssertionAnalyticsService from 'services/Analytics/AssertionAnalytics.service';
 import {TAssertionResultEntry} from 'types/Assertion.types';
@@ -24,6 +26,7 @@ const AssertionCard = ({
   onDelete,
   onEdit,
 }: IProps) => {
+  const theme = useTheme();
   const {setSelectedAssertion, revert, viewResultsMode} = useTestDefinition();
   const {onSetFocusedSpan, selectedSpan} = useSpan();
   const selectedAssertion = useAppSelector(TestDefinitionSelectors.selectSelectedAssertion);
@@ -72,15 +75,15 @@ const AssertionCard = ({
           />
         </div>
         <S.ActionsContainer>
-          {isDraft && <S.StatusTag>draft</S.StatusTag>}
-          {isDeleted && <S.StatusTag color="#61175E">deleted</S.StatusTag>}
+          {isDraft && <S.StatusTag color={theme.color.primary}>draft</S.StatusTag>}
+          {isDeleted && <S.StatusTag color={theme.color.primary}>deleted</S.StatusTag>}
           <S.SpanCountText>{spanCountText}</S.SpanCountText>
           {isDraft && (
-            <Tooltip color="white" title="Revert Assertion">
+            <Tooltip title="Revert Assertion">
               <S.UndoIcon data-cy="assertion-action-revert" onClick={resetDefinition} />
             </Tooltip>
           )}
-          <Tooltip color="white" title="Edit Assertion">
+          <Tooltip title="Edit Assertion">
             <S.EditIcon
               data-cy="edit-assertion-button"
               onClick={e => {
@@ -89,7 +92,7 @@ const AssertionCard = ({
               }}
             />
           </Tooltip>
-          <Tooltip color="white" title="Delete Assertion">
+          <Tooltip title="Delete Assertion">
             <S.DeleteIcon
               onClick={e => {
                 e.stopPropagation();

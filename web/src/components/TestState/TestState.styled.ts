@@ -16,7 +16,7 @@ export const Container = styled.div<{hasMinWidth?: boolean}>`
 `;
 
 export const Text = styled(Typography.Text)`
-  color: rgba(3, 24, 73, 0.3);
-  font-size: 12px;
+  color: ${({theme}) => theme.color.textSecondary};
+  font-size: ${({theme}) => theme.size.sm};
   margin-top: 2px;
 `;

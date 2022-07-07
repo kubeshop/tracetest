@@ -25,10 +25,8 @@ export const Divider = styled(AntdDivider)`
   margin-bottom: 12px;
 `;
 
-export const Title = styled(Typography.Title)`
+export const Title = styled(Typography.Title).attrs({level: 3})`
   && {
     margin-bottom: 0;
-    line-height: 24px;
-    font-size: 14px;
   }
 `;

@@ -6,8 +6,8 @@ import emptyStateIcon from 'assets/SpanAssertionsEmptyState.svg';
 
 export const TestCard = styled.div<{$isCollapsed: boolean}>`
   box-shadow: 0 4px 8px rgba(153, 155, 168, 0.1);
-  background: #fff;
-  border-left: ${({$isCollapsed}) => $isCollapsed && `2px solid #61175E`};
+  background: ${({theme}) => theme.color.white};
+  border-left: ${({$isCollapsed, theme}) => $isCollapsed && `2px solid ${theme.color.primary}`};
   border-radius: 2px;
 `;
 
@@ -35,16 +35,19 @@ export const ButtonContainer = styled.div`
   justify-content: flex-end;
 `;
 
-export const NameText = styled(Typography.Text)`
-  font-weight: 700;
-  overflow-x: ellipsis;
+export const NameText = styled(Typography.Title).attrs({ellipsis: true, level: 3})`
+  && {
+    margin: 0;
+  }
 `;
 
 export const Text = styled(Typography.Text)``;
 
-export const ActionButton = styled(MoreOutlined).attrs({
-  style: {fontSize: 24, color: '#9AA3AB', cursor: 'pointer'},
-})``;
+export const ActionButton = styled(MoreOutlined)`
+  color: ${({theme}) => theme.color.textSecondary};
+  cursor: pointer;
+  font-size: 24px;
+`;
 
 export const TestDetails = styled.div`
   text-align: right;
@@ -55,7 +58,7 @@ export const TestDetails = styled.div`
 export const TestDetailsLink = styled(Button).attrs({
   type: 'link',
 })`
-  color: #61175e;
+  color: ${({theme}) => theme.color.primary};
   font-weight: 600;
   padding: 0;
 `;

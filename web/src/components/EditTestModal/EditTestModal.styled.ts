@@ -1,19 +1,5 @@
 import {Typography} from 'antd';
-import styled, {createGlobalStyle} from 'styled-components';
-
-export const GlobalStyle = createGlobalStyle`
-  .select-method.ant-select .ant-select-selector,
-  .select-dropdown-method .ant-select-item-option-selected {
-    background-color: #fafafa;
-  }
-
-  .select-method .ant-select-arrow,
-  .input-name .ant-form-item-label > label,
-  .input-headers .ant-form-item-label > label,
-  .input-body .ant-form-item-label > label {
-    color: #031849;
-  }
-`;
+import styled from 'styled-components';
 
 export const DemoContainer = styled.div`
   margin-bottom: 24px;
@@ -30,10 +16,11 @@ export const Row = styled.div`
 `;
 
 export const FormSection = styled.div`
-  border: 1px solid #e8e8e8;
-  padding: 16px;
+  background-color: ${({theme}) => theme.color.white};
+  border: ${({theme}) => `1px solid ${theme.color.borderLight}`};
   border-radius: 4px;
   margin-bottom: 16px;
+  padding: 16px;
 `;
 
 export const FormSectionTitle = styled(Typography.Text).attrs({strong: true})`

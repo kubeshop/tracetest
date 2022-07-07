@@ -1,7 +1,6 @@
 import {Badge, Typography} from 'antd';
 import styled, {css} from 'styled-components';
 
-import {Colors} from 'constants/DAG.constants';
 import {
   SemanticGroupNames,
   SemanticGroupNamesToColor,
@@ -9,7 +8,7 @@ import {
 } from 'constants/SemanticGroupNames.constants';
 
 export const BadgeCheck = styled(Badge)`
-  font-size: 10px;
+  font-size: ${({theme}) => theme.size.xs};
   line-height: 10px;
   padding: 0 2px;
   vertical-align: bottom;
@@ -21,8 +20,7 @@ export const BadgeCheck = styled(Badge)`
   }
 
   .ant-badge-status-text {
-    color: #031849;
-    font-size: 10px;
+    font-size: ${({theme}) => theme.size.xs};
     margin-left: 2px;
   }
 `;
@@ -40,7 +38,7 @@ export const BadgeType = styled(Badge)<{$type: SemanticGroupNames}>`
   > sup {
     background-color: ${({$type}) => SemanticGroupNamesToLightColor[$type]};
     border-radius: 2px;
-    color: #031849;
+    color: ${({theme}) => theme.color.text};
     font-size: 8px;
     font-weight: 600;
     height: 12px;
@@ -51,7 +49,7 @@ export const BadgeType = styled(Badge)<{$type: SemanticGroupNames}>`
 `;
 
 export const Body = styled.div`
-  background-color: white;
+  background-color: ${({theme}) => theme.color.white};
   border-radius: 8px;
   display: flex;
   flex-direction: column;
@@ -62,8 +60,9 @@ export const Body = styled.div`
 
 export const Container = styled.div<{$affected: boolean; $selected: boolean}>`
   align-items: center;
-  background-color: #ffffff;
-  border: ${({$selected}) => ($selected ? `1px solid ${Colors.Selected}` : `1px solid ${Colors.Default}`)};
+  background-color: ${({theme}) => theme.color.white};
+  border: ${({theme, $selected}) =>
+    $selected ? `1px solid ${theme.color.interactive}` : `1px solid ${theme.color.border}`};
   border-radius: 10px;
   display: flex;
   flex-direction: column;
@@ -74,8 +73,8 @@ export const Container = styled.div<{$affected: boolean; $selected: boolean}>`
   ${({$affected}) =>
     $affected &&
     css`
-      border: 1px solid #031849;
-      box-shadow: 2px 2px 0px #031849;
+      border: ${({theme}) => `1px solid ${theme.color.text}`};
+      box-shadow: ${({theme}) => `2px 2px 0px ${theme.color.text}`};
     `}
 `;
 
@@ -92,7 +91,7 @@ export const Header = styled.div`
 `;
 
 export const HeaderText = styled(Typography.Paragraph).attrs({ellipsis: {rows: 2}, strong: true})`
-  font-size: 12px;
+  font-size: ${({theme}) => theme.size.sm};
   text-align: center;
 
   &.ant-typography {
@@ -103,8 +102,8 @@ export const HeaderText = styled(Typography.Paragraph).attrs({ellipsis: {rows: 2
 export const Item = styled.div`
   align-items: center;
   display: flex;
-  color: #031849;
-  font-size: 10px;
+  color: ${({theme}) => theme.color.text};
+  font-size: ${({theme}) => theme.size.xs};
 `;
 
 export const ItemText = styled(Typography.Text)`

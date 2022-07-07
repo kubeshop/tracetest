@@ -47,26 +47,19 @@ export const AddCheckButton = styled(Button).attrs({
   font-weight: 600;
 `;
 
-export const DeleteCheckIcon = styled(DeleteOutlined).attrs({
-  style: {color: 'rgb(140, 140, 140)'},
-})`
+export const DeleteCheckIcon = styled(DeleteOutlined)`
+  color: ${({theme}) => theme.color.textSecondary};
   cursor: pointer;
 `;
 
 export const AssertionForm = styled.div`
-  width: 100%;
+  background-color: ${({theme}) => theme.color.white};
+  border: ${({theme}) => `1px solid ${theme.color.borderLight}`};
   padding: 16px;
-  border: 1px solid rgba(3, 24, 73, 0.1);
-  background-color: #fff;
+  width: 100%;
 `;
 
-export const AssertionFormTitle = styled(Typography.Text).attrs({
-  as: 'p',
-})`
-  margin: 0;
-  margin-bottom: 16px;
-  font-weight: 600;
-`;
+export const AssertionFormTitle = styled(Typography.Title).attrs({level: 3})``;
 
 export const AssertionFormHeader = styled.div`
   display: flex;
@@ -105,4 +98,8 @@ export const AffectedSpansContainer = styled.div`
 export const ReferenceLink = styled(Typography.Text)`
   margin: 0;
   margin-left: auto;
+`;
+
+export const AffectedSpansLabel = styled(Typography.Text)`
+  color: ${({theme}) => theme.color.primary};
 `;

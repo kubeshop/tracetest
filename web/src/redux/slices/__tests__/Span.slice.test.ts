@@ -66,6 +66,7 @@ describe('Span.slice', () => {
         spanIds: ['12345', '67890'],
         selectorList: [],
         resultList: [],
+        isAdvancedSelector: false,
       };
       expect(
         Reducer(

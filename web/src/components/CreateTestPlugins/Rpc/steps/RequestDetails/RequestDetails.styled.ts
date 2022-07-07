@@ -1,19 +1,6 @@
+import {DeleteOutlined} from '@ant-design/icons';
 import {Button} from 'antd';
-import styled, {createGlobalStyle} from 'styled-components';
-
-export const GlobalStyle = createGlobalStyle`
-  .select-method.ant-select .ant-select-selector,
-  .select-dropdown-method .ant-select-item-option-selected {
-    background-color: #fafafa;
-  }
-
-  .select-method .ant-select-arrow,
-  .input-name .ant-form-item-label > label,
-  .input-headers .ant-form-item-label > label,
-  .input-body .ant-form-item-label > label {
-    color: #031849;
-  }
-`;
+import styled from 'styled-components';
 
 export const InputContainer = styled.div`
   display: grid;
@@ -48,4 +35,9 @@ export const UploadButton = styled(Button).attrs({
   ghost: true,
 })`
   width: 490px;
+`;
+
+export const DeleteIcon = styled(DeleteOutlined)`
+  color: ${({theme}) => theme.color.textSecondary};
+  font-size: ${({theme}) => theme.size.md};
 `;

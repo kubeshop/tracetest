@@ -1,24 +1,21 @@
-import {LeftOutlined, MoreOutlined} from '@ant-design/icons';
+import {LeftOutlined} from '@ant-design/icons';
 import {Typography} from 'antd';
 import styled from 'styled-components';
 
 export const TestHeader = styled.div`
-  background-color: #fff;
+  background-color: ${({theme}) => theme.color.white};
   display: flex;
   gap: 14px;
   align-items: center;
   justify-content: space-between;
   padding: 19px 24px;
-  border-bottom: 1px solid rgba(3, 24, 73, 0.1);
+  border-bottom: ${({theme}) => `1px solid ${theme.color.borderLight}`};
   width: 100%;
 `;
 
-export const TestName = styled(Typography.Title).attrs({
-  level: 4,
-})`
+export const TestName = styled(Typography.Title).attrs({level: 1})`
   && {
     margin: 0;
-    font-size: 16px;
   }
 `;
 
@@ -26,21 +23,21 @@ export const TestUrl = styled(Typography.Text).attrs({
   type: 'secondary',
 })`
   && {
+    font-size: ${({theme}) => theme.size.sm};
     margin: 0;
-    font-size: 12px;
   }
 `;
 
 export const StateText = styled(Typography.Text)`
   && {
     margin-right: 8px;
-    color: #8c8c8c;
+    color: ${({theme}) => theme.color.textSecondary};
   }
 `;
 
 export const BackIcon = styled(LeftOutlined)`
   cursor: pointer;
-  font-size: 18px;
+  font-size: ${({theme}) => theme.size.xl};
 `;
 
 export const Content = styled.div`
@@ -59,10 +56,6 @@ export const StateContainer = styled.div`
 export const Row = styled.div`
   display: flex;
 `;
-
-export const ActionButton = styled(MoreOutlined).attrs({
-  style: {fontSize: 24, color: '#9AA3AB', cursor: 'pointer'},
-})``;
 
 export const RightSection = styled.div`
   display: flex;
