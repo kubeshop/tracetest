@@ -77,7 +77,7 @@ func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, m
 	run.Trace = &trace
 	request.run = run
 
-	run = run.SuccessfullyPolledTraces(augmentData(&trace, run.Response))
+	run = run.SuccessfullyPolledTraces(augmentData(&trace, run.TriggerResult))
 
 	fmt.Printf("completed polling result %s after %d times, number of spans: %d \n", run.ID, request.count, len(run.Trace.Flat))
 

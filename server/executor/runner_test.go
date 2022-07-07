@@ -69,11 +69,14 @@ var (
 		SpanAttributes: map[string]string{
 			"tracetest.run.trigger.http.response_code": "200",
 		},
-		Response: model.HTTPResponse{
-			StatusCode: 200,
-			Body:       "this is the body",
-			Headers: []model.HTTPHeader{
-				{Key: "Content-Type", Value: "text/plain"},
+		Result: model.TriggerResult{
+			Type: model.TriggerTypeHTTP,
+			HTTP: &model.HTTPResponse{
+				StatusCode: 200,
+				Body:       "this is the body",
+				Headers: []model.HTTPHeader{
+					{Key: "Content-Type", Value: "text/plain"},
+				},
 			},
 		},
 	}
@@ -178,8 +181,8 @@ type mockTriggerer struct {
 	t *testing.T
 }
 
-func (m *mockTriggerer) Type() string {
-	return "http"
+func (m *mockTriggerer) Type() model.TriggerType {
+	return model.TriggerTypeHTTP
 }
 
 func (m *mockTriggerer) Trigger(_ context.Context, test model.Test, tid trace.TraceID, sid trace.SpanID) (trigger.Response, error) {
