@@ -19,9 +19,7 @@ export const FormContainer = styled.div`
   height: 100%;
 `;
 
-export const Title = styled(Typography.Title).attrs({
-  level: 5,
-})`
+export const Title = styled(Typography.Title).attrs({level: 2})`
   && {
     margin-bottom: 24px;
   }

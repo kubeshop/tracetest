@@ -2,12 +2,14 @@ import {useTour} from '@reactour/tour';
 import {Button, Form, FormInstance, Modal, Typography} from 'antd';
 import {useCallback, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
+import {useTheme} from 'styled-components';
+
+import {IBasicDetailsValues} from 'components/CreateTestPlugins/Default/steps/BasicDetails/BasicDetails';
+import {IRequestDetailsValues} from 'components/CreateTestPlugins/Rest/steps/RequestDetails/RequestDetails';
 import {useEditTestMutation, useRunTestMutation} from 'redux/apis/TraceTest.api';
 import {TRawHTTPRequest, TTest} from 'types/Test.types';
 import TestDefinitionService from 'services/TestDefinition.service';
 import {TriggerTypes} from 'constants/Test.constants';
-import {IBasicDetailsValues} from '../CreateTestPlugins/Default/steps/BasicDetails/BasicDetails';
-import {IRequestDetailsValues} from '../CreateTestPlugins/Rest/steps/RequestDetails/RequestDetails';
 import EditTestForm, {FORM_ID} from './EditTestForm';
 
 export type TEditTest = IRequestDetailsValues & IBasicDetailsValues;
@@ -20,6 +22,7 @@ interface IProps {
 }
 
 const EditTestModal = ({onClose, isOpen, test}: IProps) => {
+  const theme = useTheme();
   const [isFormValid, setIsFormValid] = useState(true);
   const navigate = useNavigate();
   const {setIsOpen} = useTour();
@@ -88,12 +91,12 @@ const EditTestModal = ({onClose, isOpen, test}: IProps) => {
 
   return (
     <Modal
-      bodyStyle={{backgroundColor: '#FBFBFF', overflowY: 'auto'}}
+      bodyStyle={{backgroundColor: theme.color.background, overflowY: 'auto'}}
       footer={footer}
       width="40%"
       onCancel={handleOnCancel}
       title={
-        <Typography.Title level={5} style={{marginBottom: 0}}>
+        <Typography.Title level={2} style={{marginBottom: 0}}>
           Edit Test - {test.name}
         </Typography.Title>
       }

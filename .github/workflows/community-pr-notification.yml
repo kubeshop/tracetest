@@ -1,0 +1,35 @@
+# Send us messages on slack when users from the community either open new issues or PRs
+on:
+  pull_request:
+    types:
+      - opened
+
+jobs:
+  notify_slack:
+    name: Notify team
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Check if it's team member
+        id: is_team_member
+        if: github.event.action == 'opened'
+        uses: mathnogueira/user-blocklist@1.0.0
+        with:
+          blocked_users: cescoferraro, jfermi, jorgeepc, kdhamric, mathnogueira, olha23, schoren, xoscar
+
+      - name: Notify us if not a kubeshop member
+        if: |
+          steps.is_team_member.outputs.result == 'false'
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_CHANNEL: tracetest
+          SLACK_COLOR: good
+          SLACK_ICON: https://github.com/rtCamp.png?size=48
+          SLACK_TITLE: A PR was opened by a user
+          SLACK_MESSAGE: ${{ github.event.pull_request.title }}
+          SLACK_USERNAME: GitHub
+          SLACK_LINK_NAMES: true
+          SLACK_FOOTER: ${{ github.event.pull_request.html_url }}
+          MSG_MINIMAL: true
+

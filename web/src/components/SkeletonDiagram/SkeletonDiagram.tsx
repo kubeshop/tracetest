@@ -27,7 +27,7 @@ const SkeletonDiagram = ({onClearAffectedSpans, onClearSelectedSpan}: IProps) =>
   return (
     <S.Container data-cy="skeleton-diagram">
       <S.SkeletonDiagramMessage>
-        <Typography.Title level={5} type="secondary">
+        <Typography.Title level={3} type="secondary">
           We are working on your trace…
         </Typography.Title>
         <Typography.Text type="secondary">

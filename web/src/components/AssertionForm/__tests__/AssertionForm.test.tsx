@@ -1,6 +1,5 @@
-import {render} from '@testing-library/react';
+import {render} from 'test-utils';
 import {ReactFlowProvider} from 'react-flow-renderer';
-import {ReduxWrapperProvider} from 'redux/ReduxWrapperProvider';
 import AssertionForm from '../AssertionForm';
 
 const defaultProps = {
@@ -16,8 +15,7 @@ describe('AssertionForm', () => {
     const {container} = render(
       <ReactFlowProvider>
         <AssertionForm {...defaultProps} />
-      </ReactFlowProvider>,
-      {wrapper: ReduxWrapperProvider}
+      </ReactFlowProvider>
     );
 
     expect(container.querySelector('form')).toBeInTheDocument();

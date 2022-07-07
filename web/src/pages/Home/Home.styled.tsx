@@ -12,11 +12,8 @@ export const PageHeader = styled.div`
   margin: 14px 0;
 `;
 
-export const TitleText = styled(Typography.Title).attrs({
-  level: 4,
-})`
+export const TitleText = styled(Typography.Title).attrs({level: 1})`
   && {
-    font-size: 18px;
     margin: 14px 0;
   }
 `;

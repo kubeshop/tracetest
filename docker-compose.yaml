@@ -32,6 +32,24 @@ services:
       timeout: 5s
       retries: 60
 
+  otel-collector:
+    image: otel/opentelemetry-collector:0.54.0
+    ports:
+      - "55679:55679"
+      - "4317:4317"
+      - "8888:8888"
+    command:
+      - "--config"
+      - "/otel-local-config.yaml"
+    volumes:
+      - "./local-config/collector.config.yaml:/otel-local-config.yaml"
+    environment:
+      - JAEGER_ENDPOINT=jaeger:14250
+      - LIGHTSTEP_TOKEN=<PLACE-YOUR-TOKEN-HERE>
+    depends_on:
+      jaeger:
+        condition: service_healthy
+
   jaeger:
     image: jaegertracing/all-in-one:latest
     ports:
@@ -52,6 +70,7 @@ services:
       interval: 1s
       timeout: 3s
       retries: 60
+
   queue:
     image: rabbitmq:3.9
     ports:

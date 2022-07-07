@@ -12,19 +12,17 @@ interface IProps {
   selectedType: SupportedDiagrams;
 }
 
-const color = '#FFFFFF';
-
 const DiagramSwitcher: React.FC<IProps> = ({onSearch, onTypeChange, selectedType}) => {
   return (
     <S.DiagramSwitcher>
       <S.Switch data-tour={GuidedTourService.getStep(GuidedTours.Trace, Steps.Switcher)}>
-        <Tooltip title="Graph view" color={color}>
+        <Tooltip title="Graph view">
           <S.DAGIcon
             $isSelected={selectedType === SupportedDiagrams.DAG}
             onClick={() => onTypeChange(SupportedDiagrams.DAG)}
           />
         </Tooltip>
-        <Tooltip title="Timeline view" color={color}>
+        <Tooltip title="Timeline view">
           <S.TimelineIcon
             $isSelected={selectedType === SupportedDiagrams.Timeline}
             onClick={() => onTypeChange(SupportedDiagrams.Timeline)}

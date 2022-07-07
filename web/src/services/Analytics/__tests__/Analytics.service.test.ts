@@ -12,13 +12,10 @@ jest.mock('ga-4-react', () => {
 
 describe('AnalyticsService', () => {
   describe('event', () => {
-    it('should handle sending an event', async () => {
-      expect.assertions(2);
-
+    it('should not send an event if analyticsEnabled is false', async () => {
       await AnalyticsService.event(Categories.Home, 'test', 'test');
 
-      expect(instance.event).toBeCalledTimes(1);
-      expect(instance.event).toBeCalledWith('test', 'test', Categories.Home);
+      expect(instance.event).not.toBeCalled();
     });
   });
 });

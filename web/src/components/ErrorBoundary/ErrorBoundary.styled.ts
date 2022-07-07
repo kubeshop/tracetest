@@ -1,3 +1,4 @@
+import {CloseCircleFilled} from '@ant-design/icons';
 import styled from 'styled-components';
 
 export const Container = styled.div`
@@ -6,4 +7,15 @@ export const Container = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
+`;
+
+export const Content = styled.div`
+  display: flex;
+  max-width: 800px;
+  padding: 24px;
+`;
+
+export const Icon = styled(CloseCircleFilled)`
+  color: ${({theme}) => theme.color.error};
+  font-size: 32px;
 `;

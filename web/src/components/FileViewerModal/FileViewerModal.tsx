@@ -38,7 +38,7 @@ const FileViewerModal = ({data, isOpen, onClose, title, language = 'javascript',
       footer={footer}
       onCancel={onClose}
       title={
-        <Typography.Title level={5} style={{marginBottom: 0}}>
+        <Typography.Title level={2} style={{marginBottom: 0}}>
           {title}
         </Typography.Title>
       }

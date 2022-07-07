@@ -1,4 +1,3 @@
-import {Typography} from 'antd';
 import styled from 'styled-components';
 
 export const Container = styled.div`
@@ -23,8 +22,8 @@ export const SkeletonDiagramMessage = styled.div`
 `;
 
 export const SkeletonNode = styled.div`
-  background-color: white;
-  border: 1px solid #c9cedb;
+  background-color: ${({theme}) => theme.color.white};
+  border: ${({theme}) => `1px solid ${theme.color.border}`};
   border-radius: 2px;
   min-width: fit-content;
   display: flex;
@@ -36,7 +35,7 @@ export const SkeletonNode = styled.div`
 `;
 
 export const SkeletonNotch = styled.div`
-  background-color: #fbfbff;
+  background-color: ${({theme}) => theme.color.background};
   position: absolute;
   top: 0;
   margin-top: 1px;
@@ -46,13 +45,6 @@ export const SkeletonNotch = styled.div`
   font-weight: 700;
   height: 40px;
   padding-top: 10px;
-`;
-
-export const NameText = styled(Typography.Text).attrs({
-  ellipsis: true,
-})`
-  margin: 0;
-  font-size: 12px;
 `;
 
 export const TextContainer = styled.div`

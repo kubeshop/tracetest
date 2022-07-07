@@ -11,16 +11,15 @@ export const Header = styled.div`
   background: #f5f5fa;
   height: 64px;
   padding: 0 24px;
-  color: rgb(213, 215, 224);
 `;
 
 export const HeaderText = styled(Typography.Text)``;
 
 export const StartDateText = styled(Typography.Text)`
   && {
+    font-size: ${({theme}) => theme.size.sm};
     margin-left: 14px;
     margin-right: 40px;
-    font-size: 12px;
   }
 `;
 

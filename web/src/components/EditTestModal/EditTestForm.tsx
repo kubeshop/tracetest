@@ -46,7 +46,6 @@ const EditTestForm = ({
       onValuesChange={handleOnValuesChange}
       initialValues={initialValues}
     >
-      <S.GlobalStyle />
       <S.FormSection>
         <S.FormSectionTitle>Basic Details</S.FormSectionTitle>
         <Form.Item

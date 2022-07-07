@@ -1,7 +1,10 @@
 import {renderHook} from '@testing-library/react-hooks';
 import useAnalytics from '../useAnalytics';
 
-test('useAnalytics', () => {
-  const {result} = renderHook(() => useAnalytics());
-  expect(result.current.isEnabled).toBeTruthy();
+describe('useAnalytics', () => {
+  it('should render the hook', () => {
+    const {result} = renderHook(() => useAnalytics());
+
+    expect(result.current.isEnabled).toBeFalsy();
+  });
 });

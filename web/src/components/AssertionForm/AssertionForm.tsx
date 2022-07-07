@@ -5,13 +5,15 @@ import {useAppSelector} from 'redux/hooks';
 import AssertionSelectors from 'selectors/Assertion.selectors';
 import OperatorService from 'services/Operator.service';
 import {TAssertion, TPseudoSelector, TSpanSelector} from 'types/Assertion.types';
-import SpanSelectors from '../../selectors/Span.selectors';
+import SpanSelectors from 'selectors/Span.selectors';
+import {ADVANCE_SELECTORS_DOCUMENTATION_URL} from 'constants/Common.constants';
 import AffectedSpanControls from '../Diagram/components/DAG/AffectedSpanControls';
 import {TooltipQuestion} from '../TooltipQuestion/TooltipQuestion';
 import * as S from './AssertionForm.styled';
 import AssertionFormCheckList from './AssertionFormCheckList';
 import AssertionFormSelector from './AssertionFormSelector';
 import useOnFieldsChange from './hooks/useOnFieldsChange';
+import useAssertionFormValues from './hooks/useAssertionFormValues';
 
 export interface IValues {
   assertionList?: TAssertion[];
@@ -49,7 +51,8 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
   runId,
 }) => {
   const [form] = Form.useForm<IValues>();
-  const currentAssertionList = Form.useWatch('assertionList', form) || [];
+
+  const {currentIsAdvancedSelector, currentAssertionList} = useAssertionFormValues(form);
   const [isValid, setIsValid] = useState(false);
 
   const spanIdList = useAppSelector(SpanSelectors.selectAffectedSpans);
@@ -65,10 +68,10 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
   return (
     <S.AssertionForm>
       <S.AssertionFormHeader>
-        <S.AssertionFormTitle strong>{isEditing ? 'Edit Assertion' : 'Add New Assertion'}</S.AssertionFormTitle>
+        <S.AssertionFormTitle>{isEditing ? 'Edit Assertion' : 'Add New Assertion'}</S.AssertionFormTitle>
         <S.AffectedSpansContainer>
           <AffectedSpanControls />
-          <Typography.Text style={{color: '#61175e'}}>selected span(s)</Typography.Text>
+          <S.AffectedSpansLabel>selected span(s)</S.AffectedSpansLabel>
         </S.AffectedSpansContainer>
       </S.AssertionFormHeader>
       <Form<IValues>
@@ -88,21 +91,19 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
         data-cy="assertion-form"
         onFieldsChange={onFieldsChange}
       >
-        <div style={{marginBottom: 8}}>
+        <S.AdvancedSelectorContainer>
           <Typography.Text>Filter to limit the span(s) included in this assertion</Typography.Text>
           <TooltipQuestion
+            margin={0}
             title={`
             You can decide which spans will be tested by this assertion by altering the filter.
             Use the dropdown to the right to select the first matching span, last, n-th, or all.
             `}
           />
-        </div>
-        <S.AdvancedSelectorContainer>
-          <Typography.Text>Mode</Typography.Text>
+          <Typography.Text style={{marginLeft: '16px'}}>Advanced mode</Typography.Text>
           <Form.Item name="isAdvancedSelector" noStyle>
             <Switch
-              checkedChildren="Advanced"
-              unCheckedChildren="Wizard"
+              size="small"
               disabled={isAdvancedSelector}
               defaultChecked={isAdvancedSelector}
               data-cy="mode-selector-switch"
@@ -114,6 +115,13 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
             You can decided if you want to use the wizard to create the span selector or the query language.
             `}
           />
+          {currentIsAdvancedSelector && (
+            <S.ReferenceLink>
+              <a href={ADVANCE_SELECTORS_DOCUMENTATION_URL} target="_blank">
+                Query Language Reference
+              </a>
+            </S.ReferenceLink>
+          )}
         </S.AdvancedSelectorContainer>
         <AssertionFormSelector
           selectorList={selectorList}

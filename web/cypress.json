@@ -3,5 +3,6 @@
   "testFiles": "**/*.spec.{js,ts,jsx,tsx}",
   "viewportWidth": 1440,
   "viewportHeight": 1080,
-  "responseTimeout": 30000
+  "responseTimeout": 30000,
+  "projectId": "dhaoea"
 }
