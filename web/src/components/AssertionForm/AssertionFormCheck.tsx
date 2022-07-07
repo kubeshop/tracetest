@@ -88,12 +88,14 @@ export const AssertionFormCheck = ({
         </Form.Item>
       )}
       <S.CheckActions>
-        <S.DeleteCheckIcon
-          onClick={() => {
-            CreateAssertionModalAnalyticsService.onRemoveCheck();
-            remove(name);
-          }}
-        />
+        {index !== 0 && (
+          <S.DeleteCheckIcon
+            onClick={() => {
+              CreateAssertionModalAnalyticsService.onRemoveCheck();
+              remove(name);
+            }}
+          />
+        )}
         {index === length - 1 && (
           <S.AddCheckButton
             icon={<PlusOutlined />}
