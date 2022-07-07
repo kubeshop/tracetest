@@ -29,6 +29,7 @@ func (t Test) Validate() error {
 type TestTrigger struct {
 	Type        string              `yaml:"type" json:"type"`
 	HTTPRequest openapi.HttpRequest `yaml:"httpRequest" json:"httpRequest"`
+	GRPC        openapi.GrpcRequest `yaml:"httpRequest" json:"grpc"`
 }
 
 func (t TestTrigger) Validate() error {

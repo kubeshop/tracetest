@@ -22,11 +22,11 @@ func ConvertOpenAPITestIntoDefinitionObject(test openapi.Test) (definition.Test,
 	}, nil
 }
 
-func convertServiceUnderTestIntoTrigger(serviceUnderTest openapi.TestServiceUnderTest) definition.TestTrigger {
+func convertServiceUnderTestIntoTrigger(trigger openapi.Trigger) definition.TestTrigger {
 	return definition.TestTrigger{
-		// we only support http for now
-		Type:        "http",
-		HTTPRequest: serviceUnderTest.Request,
+		Type:        trigger.TriggerType,
+		HTTPRequest: trigger.TriggerSettings.Http,
+		GRPC:        trigger.TriggerSettings.Grpc,
 	}
 }
 
