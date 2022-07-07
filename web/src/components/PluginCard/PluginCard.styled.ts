@@ -8,8 +8,7 @@ export const PluginCard = styled.div<{$isSelected: boolean; $isActive: boolean}>
   padding: 20px;
   background: ${({$isSelected, theme}) => ($isSelected ? theme.color.background : theme.color.white)};
   gap: 20px;
-  opacity: ${({$isActive}) => ($isActive ? 1 : 0.5)};
-  min-width: 490px;
+  width: 48%;
   cursor: ${({$isActive}) => ($isActive ? 'pointer' : 'default')};
 `;
 
@@ -20,19 +19,31 @@ export const Content = styled.div`
 
 export const Title = styled(Typography.Text).attrs({
   strong: true,
-})``;
-export const Description = styled(Typography.Text)``;
+})<{$isActive: boolean}>`
+  display: inline-block;
+  opacity: ${({$isActive}) => ($isActive ? 1 : 0.5)};
 
-export const Circle = styled.div`
+  a {
+    opacity: 1;
+  }
+`;
+export const Description = styled(Typography.Text)<{$isActive: boolean}>`
+  opacity: ${({$isActive}) => ($isActive ? 1 : 0.5)};
+`;
+
+export const Circle = styled.div<{$isActive: boolean}>`
   margin-top: 4px;
-  height: 16px;
-  width: 16px;
+  min-height: 16px;
+  min-width: 16px;
+  max-height: 16px;
+  max-width: 16px;
   margin-left: 5px;
   border: ${({theme}) => `1px solid ${theme.color.primary}`};
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  opacity: ${({$isActive}) => ($isActive ? 1 : 0.5)};
 `;
 
 export const Check = styled.div`
