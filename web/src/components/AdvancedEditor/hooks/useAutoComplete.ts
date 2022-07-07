@@ -62,7 +62,7 @@ const useAutoComplete = ({testId, runId}: IProps) => {
           to: isIdentifier ? nodeBefore.to : word.to,
           options: list.map(({key, value}) => ({
             label: key,
-            type: 'keyword',
+            type: 'variableName',
             apply: `${key} = ${JSON.stringify(value)}`,
           })),
         };
@@ -94,7 +94,7 @@ const useAutoComplete = ({testId, runId}: IProps) => {
 
       return {
         from: planeWord.from,
-        options: [{label: 'span', apply: 'span[', type: 'keyword', name: 'Span'}],
+        options: [{label: 'span', apply: 'span[', type: 'variableName'}],
       };
     },
     [getAttributeList]

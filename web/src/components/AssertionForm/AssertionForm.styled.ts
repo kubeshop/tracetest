@@ -22,7 +22,9 @@ export const SelectorInputContainer = styled.div`
 `;
 
 export const AdvancedSelectorInputContainer = styled(SelectorInputContainer)`
-  grid-template-columns: 80%;
+  max-width: 85%;
+  width: 85%;
+  grid-template-columns: 100%;
 `;
 
 export const PseudoSelector = styled.div`
@@ -86,7 +88,7 @@ export const AdvancedSelectorContainer = styled.div`
   gap: 8px;
   align-items: center;
   margin-bottom: 8px;
-  max-width: 80%;
+  max-width: 85%;
 `;
 
 export const AffectedSpansContainer = styled.div`

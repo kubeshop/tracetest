@@ -91,21 +91,19 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
         data-cy="assertion-form"
         onFieldsChange={onFieldsChange}
       >
-        <div style={{marginBottom: 8}}>
+        <S.AdvancedSelectorContainer>
           <Typography.Text>Filter to limit the span(s) included in this assertion</Typography.Text>
           <TooltipQuestion
+            margin={0}
             title={`
             You can decide which spans will be tested by this assertion by altering the filter.
             Use the dropdown to the right to select the first matching span, last, n-th, or all.
             `}
           />
-        </div>
-        <S.AdvancedSelectorContainer>
-          <Typography.Text>Mode</Typography.Text>
+          <Typography.Text style={{marginLeft: '16px'}}>Advanced mode</Typography.Text>
           <Form.Item name="isAdvancedSelector" noStyle>
             <Switch
-              checkedChildren="Advanced"
-              unCheckedChildren="Wizard"
+              size="small"
               disabled={isAdvancedSelector}
               defaultChecked={isAdvancedSelector}
               data-cy="mode-selector-switch"

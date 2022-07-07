@@ -6,6 +6,8 @@ import {tracetest} from 'utils/grammar';
 import {linter} from '@codemirror/lint';
 import useAutoComplete from './hooks/useAutoComplete';
 import useLint from './hooks/useLint';
+import useEditorTheme from './hooks/useEditorTheme';
+import * as S from './AdvancedEditor.styled';
 
 interface IProps {
   testId: string;
@@ -17,6 +19,7 @@ interface IProps {
 const AdvancedEditor = ({testId, runId, onChange = noop, value = ''}: IProps) => {
   const completionFn = useAutoComplete({testId, runId});
   const lintFn = useLint({testId, runId});
+  const editorTheme = useEditorTheme();
 
   const extensionList = useMemo(
     () => [autocompletion({override: [completionFn]}), linter(lintFn), tracetest()],
@@ -24,14 +27,18 @@ const AdvancedEditor = ({testId, runId, onChange = noop, value = ''}: IProps) =>
   );
 
   return (
-    <CodeMirror
-      data-cy="advanced-selector"
-      value={value}
-      maxHeight="100px"
-      extensions={extensionList}
-      onChange={onChange}
-      spellCheck={false}
-    />
+    <S.AdvancedEditor>
+      <CodeMirror
+        data-cy="advanced-selector"
+        value={value}
+        maxHeight="120px"
+        extensions={extensionList}
+        onChange={onChange}
+        spellCheck={false}
+        autoFocus
+        theme={editorTheme}
+      />
+    </S.AdvancedEditor>
   );
 };
 

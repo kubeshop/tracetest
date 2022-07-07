@@ -38,18 +38,15 @@ export const operatorList = [
 
 export const pseudoSelectorList = [
   {
-    label: 'First',
-    apply: PseudoSelector.FIRST,
+    label: PseudoSelector.FIRST,
     type: 'operatorKeyword',
   },
   {
-    label: 'Last',
-    apply: PseudoSelector.LAST,
+    label: PseudoSelector.LAST,
     type: 'operatorKeyword',
   },
   {
-    label: 'Nth Child',
-    apply: PseudoSelector.NTH,
+    label: PseudoSelector.NTH,
     type: 'operatorKeyword',
   },
 ];
