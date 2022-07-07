@@ -11,20 +11,22 @@ interface IProps {
 const PluginCard = ({plugin: {title, description, isActive}, plugin, onSelect, isSelected}: IProps) => {
   return (
     <S.PluginCard $isSelected={isSelected} $isActive={isActive} onClick={() => isActive && onSelect(plugin)}>
-      <S.Circle>{isSelected && <S.Check />}</S.Circle>
+      <S.Circle $isActive={isActive}>{isSelected && <S.Check />}</S.Circle>
       <S.Content>
-        <S.Title>
-          {title}{' '}
-          {!isActive && (
-            <>
-              -{' '}
-              <a href={GITHUB_ISSUES_URL} target="_blank">
-                Coming soon!
-              </a>
-            </>
-          )}
-        </S.Title>
-        <S.Description>{description}</S.Description>
+        <div>
+          <S.Title $isActive={isActive}>{title} </S.Title>
+          <S.Title $isActive>
+            {!isActive && (
+              <>
+                &nbsp;-{' '}
+                <a href={GITHUB_ISSUES_URL} target="_blank">
+                  Coming soon!
+                </a>
+              </>
+            )}
+          </S.Title>
+        </div>
+        <S.Description $isActive={isActive}>{description}</S.Description>
       </S.Content>
     </S.PluginCard>
   );
