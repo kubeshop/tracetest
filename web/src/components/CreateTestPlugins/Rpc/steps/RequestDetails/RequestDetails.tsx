@@ -4,13 +4,13 @@ import {useCreateTest} from 'providers/CreateTest/CreateTest.provider';
 import CreateStepFooter from 'components/CreateTestSteps/CreateTestStepFooter';
 import * as Step from 'components/CreateTestPlugins/Step.styled';
 import RpcService from 'services/Rpc.service';
-import {TRequestAuth, TRequest} from 'types/Test.types';
+import {TRequestAuth, TGRPCRequest} from 'types/Test.types';
 import RequestDetailsForm from './RequestDetailsForm';
 
 export interface IRequestDetailsValues {
   message: string;
   auth: TRequestAuth;
-  metadata: TRequest['headers'];
+  metadata: TGRPCRequest['metadata'];
   url: string;
   method: string;
   protoFile: File;

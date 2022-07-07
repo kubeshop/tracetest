@@ -68,7 +68,15 @@ const CreateTestProvider = ({children}: IProps) => {
 
   const onNext = useCallback(
     (draft: TDraftTest = {}) => {
-      if (isFinalStep) onCreateTest({...draftTest, ...draft});
+      if (isFinalStep)
+        onCreateTest({
+          ...draftTest,
+          ...draft,
+          serviceUnderTest: {
+            ...draftTest.serviceUnderTest,
+            ...draft.serviceUnderTest,
+          },
+        });
       else dispatch(setStepNumber({stepNumber: stepNumber + 1}));
 
       onUpdateDraftTest(draft);

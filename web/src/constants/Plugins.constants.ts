@@ -1,4 +1,5 @@
 import {IPlugin} from '../types/Plugins.types';
+import {TriggerTypes} from './Test.constants';
 
 export enum SupportedPlugins {
   REST = 'REST',
@@ -13,6 +14,7 @@ const Default: IPlugin = {
   title: 'Default',
   description: '',
   isActive: false,
+  type: TriggerTypes.http,
   stepList: [
     {
       id: 'plugin-selection',
@@ -36,6 +38,7 @@ const Rest: IPlugin = {
   title: 'HTTP Request',
   description: 'Create a basic HTTP request',
   isActive: true,
+  type: TriggerTypes.http,
   stepList: [
     ...Default.stepList,
     {
@@ -52,6 +55,7 @@ const RPC: IPlugin = {
   title: 'RPC Request',
   description: 'Test and debug your RPC request',
   isActive: false,
+  type: TriggerTypes.grpc,
   stepList: [
     ...Default.stepList,
     {
@@ -69,6 +73,7 @@ const Messaging: IPlugin = {
   description: 'Put a message on a queue to initiate a Tracetest',
   isActive: false,
   stepList: [],
+  type: TriggerTypes.http,
 };
 
 const Postman: IPlugin = {
@@ -77,6 +82,7 @@ const Postman: IPlugin = {
   description: 'Define your HTTP Request via a Postman Collection',
   isActive: false,
   stepList: [],
+  type: TriggerTypes.http,
 };
 
 const OpenAPI: IPlugin = {
@@ -85,6 +91,7 @@ const OpenAPI: IPlugin = {
   description: 'Define your HTTP request via an OpenAPI definition',
   isActive: false,
   stepList: [],
+  type: TriggerTypes.http,
 };
 
 export const Plugins: Record<SupportedPlugins, IPlugin> = {

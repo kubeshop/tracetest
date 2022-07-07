@@ -38,3 +38,8 @@ export enum ResultViewModes {
   Advanced = 'advanced',
   Wizard = 'wizard',
 }
+
+export enum TriggerTypes {
+  http = 'http',
+  grpc = 'grpc',
+}

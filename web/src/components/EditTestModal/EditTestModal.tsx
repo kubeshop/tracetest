@@ -3,8 +3,9 @@ import {Button, Form, FormInstance, Modal, Typography} from 'antd';
 import {useCallback, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useEditTestMutation, useRunTestMutation} from 'redux/apis/TraceTest.api';
-import {TRequest, TTest} from 'types/Test.types';
-import TestDefinitionService from '../../services/TestDefinition.service';
+import {TRawHTTPRequest, TTest} from 'types/Test.types';
+import TestDefinitionService from 'services/TestDefinition.service';
+import {TriggerTypes} from 'constants/Test.constants';
 import {IBasicDetailsValues} from '../CreateTestPlugins/Default/steps/BasicDetails/BasicDetails';
 import {IRequestDetailsValues} from '../CreateTestPlugins/Rest/steps/RequestDetails/RequestDetails';
 import EditTestForm, {FORM_ID} from './EditTestForm';
@@ -28,7 +29,7 @@ const EditTestModal = ({onClose, isOpen, test}: IProps) => {
 
   const handleOnSubmit = useCallback(
     async (values: TEditTest) => {
-      const request: TRequest = {
+      const request: TRawHTTPRequest = {
         url: values.url,
         method: values.method,
         body: values.body,
@@ -40,7 +41,10 @@ const EditTestModal = ({onClose, isOpen, test}: IProps) => {
           name: values.name,
           description: values.description,
           serviceUnderTest: {
-            request,
+            triggerType: TriggerTypes.http,
+            triggerSettings: {
+              http: request,
+            },
           },
           definition: {
             definitions: test.definition.definitionList.map(def => TestDefinitionService.toRaw(def)),

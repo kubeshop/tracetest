@@ -1,5 +1,5 @@
 import {Form, Input} from 'antd';
-import {TMethod, TTest} from 'types/Test.types';
+import {THTTPRequest, TTest} from 'types/Test.types';
 import EditRequestDetails from './EditRequestDetails/EditRequestDetails';
 import {TEditTest, TEditTestForm} from './EditTestModal';
 import * as S from './EditTestModal.styled';
@@ -21,9 +21,10 @@ const EditTestForm = ({
   test: {
     name,
     description,
-    serviceUnderTest: {request: {method = 'GET' as TMethod, url = '', body = '', headers = []} = {}} = {},
+    trigger: {request},
   },
 }: IProps) => {
+  const {method, url, body, headers} = request as THTTPRequest;
   const handleOnValuesChange = useValidate(onValidation);
   const initialValues = {
     name,

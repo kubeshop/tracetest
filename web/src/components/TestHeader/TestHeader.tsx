@@ -29,7 +29,7 @@ const TestHeader = ({
   extraContent,
   onBack,
   showInfo,
-  test: {name, serviceUnderTest, version = 1, id},
+  test: {name, trigger, version = 1, id},
   test,
   testState,
   testVersion,
@@ -67,7 +67,7 @@ const TestHeader = ({
             )}
           </S.Row>
           <S.TestUrl>
-            {serviceUnderTest?.request?.method?.toUpperCase()} - {serviceUnderTest?.request?.url}
+            {trigger.method.toUpperCase()} - {trigger.entryPoint}
           </S.TestUrl>
         </div>
       </S.Content>

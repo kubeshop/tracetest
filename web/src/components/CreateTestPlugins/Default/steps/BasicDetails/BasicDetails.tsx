@@ -25,7 +25,7 @@ const BasicDetails = () => {
   const handleSubmit = useCallback(
     ({name, description}: IBasicDetailsValues) => {
       const {url, body, method} = selectedDemo || {};
-      onNext({name, description, serviceUnderTest: {request: {url, body, method}}});
+      onNext({name, description, serviceUnderTest: {triggerSettings: {http: {url, body, method}}}});
     },
     [onNext, selectedDemo]
   );
