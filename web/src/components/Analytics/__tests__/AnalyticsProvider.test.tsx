@@ -1,15 +1,14 @@
-import {render} from '@testing-library/react';
-import {Provider} from 'react-redux';
-import {store} from '../../../redux/store';
-import AnalyticsProvider from '../index';
+import {render} from 'test-utils';
+import AnalyticsProvider from '../AnalyticsProvider';
 
-test('AnalyticsProvider', () => {
-  const {getAllByTestId} = render(
-    <Provider store={store}>
+describe('AnalyticsProvider', () => {
+  it('should render the Provider with its children', () => {
+    const {getByTestId} = render(
       <AnalyticsProvider>
-        <h2 data-cy="sample">Cesco</h2>
+        <h2 data-cy="sample">Children</h2>
       </AnalyticsProvider>
-    </Provider>
-  );
-  expect(getAllByTestId('not_initialized').length).toBe(1);
+    );
+
+    expect(getByTestId('sample')).toBeInTheDocument();
+  });
 });
