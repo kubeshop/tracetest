@@ -73,14 +73,15 @@ func NewPollerExecutor(
 
 func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, model.Run, error) {
 	run := request.run
-	traceID := run.TraceID.String()
-
-	otelTrace, err := pe.traceDB.GetTraceByID(request.ctx, traceID)
+	traceIdentification := traces.TraceIdentification{
+		TraceID:    run.TraceID,
+		RootSpanID: run.SpanID,
+	}
+	trace, err := pe.traceDB.GetTraceByIdentification(request.ctx, traceIdentification)
 	if err != nil {
 		return false, model.Run{}, err
 	}
 
-	trace := traces.FromOtel(otelTrace)
 	trace.ID = run.TraceID
 
 	if !pe.donePollingTraces(request, trace) {

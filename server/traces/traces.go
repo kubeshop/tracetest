@@ -10,6 +10,11 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
+type TraceIdentification struct {
+	TraceID    trace.TraceID
+	RootSpanID trace.SpanID
+}
+
 type Trace struct {
 	ID       trace.TraceID
 	RootSpan Span

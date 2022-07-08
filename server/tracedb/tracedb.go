@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/kubeshop/tracetest/server/config"
-	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
+	"github.com/kubeshop/tracetest/server/traces"
 )
 
 var ErrTraceNotFound = errors.New("trace not found")
@@ -17,7 +17,7 @@ const (
 )
 
 type TraceDB interface {
-	GetTraceByID(ctx context.Context, traceID string) (*v1.TracesData, error)
+	GetTraceByIdentification(ctx context.Context, traceIdentification traces.TraceIdentification) (traces.Trace, error)
 	Close() error
 }
 
