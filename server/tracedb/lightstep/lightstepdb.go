@@ -7,34 +7,24 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/kubeshop/tracetest/server/tracedb"
+	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/traces"
 )
 
-type LightstepAPIConfig struct {
-	Organization string
-	Project      string
-	Token        string
+type LightstepDB struct {
+	Config config.LightstepConfig
 }
 
-type lightstepDB struct {
-	config LightstepAPIConfig
-}
-
-func New(config LightstepAPIConfig) tracedb.TraceDB {
-	return &lightstepDB{config}
-}
-
-func (db *lightstepDB) Close() error {
+func (db *LightstepDB) Close() error {
 	// As it doesn't keep an open connection, we don't need to close anything here
 	return nil
 }
 
-func (db *lightstepDB) GetTraceByIdentification(ctx context.Context, identification traces.TraceIdentification) (traces.Trace, error) {
+func (db *LightstepDB) GetTraceByIdentification(ctx context.Context, identification traces.TraceIdentification) (traces.Trace, error) {
 	url := fmt.Sprintf(
 		"https://api.lightstep.com/public/v0.2/%s/projects/%s/stored-traces?span-id=%s",
-		db.config.Organization,
-		db.config.Project,
+		db.Config.Organization,
+		db.Config.Project,
 		identification.RootSpanID.String(),
 	)
 
@@ -43,7 +33,7 @@ func (db *lightstepDB) GetTraceByIdentification(ctx context.Context, identificat
 		return traces.Trace{}, fmt.Errorf("could not create request: %s", err)
 	}
 
-	request.Header.Add("Authorization", db.config.Token)
+	request.Header.Add("Authorization", db.Config.Token)
 
 	// TODO: inject a configured client here
 	response, err := http.DefaultClient.Do(request)
@@ -65,5 +55,3 @@ func (db *lightstepDB) GetTraceByIdentification(ctx context.Context, identificat
 
 	return ConvertResponseToOtelFormat(traceResponse), nil
 }
-
-var _ tracedb.TraceDB = &lightstepDB{}

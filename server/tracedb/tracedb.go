@@ -6,14 +6,16 @@ import (
 	"fmt"
 
 	"github.com/kubeshop/tracetest/server/config"
+	"github.com/kubeshop/tracetest/server/tracedb/lightstep"
 	"github.com/kubeshop/tracetest/server/traces"
 )
 
 var ErrTraceNotFound = errors.New("trace not found")
 
 const (
-	JAEGER_BACKEND string = "jaeger"
-	TEMPO_BACKEND  string = "tempo"
+	JAEGER_BACKEND    string = "jaeger"
+	TEMPO_BACKEND     string = "tempo"
+	LIGHTSTEP_BACKEND string = "lightstep"
 )
 
 type TraceDB interface {
@@ -36,7 +38,13 @@ func New(c config.Config) (db TraceDB, err error) {
 		db, err = newJaegerDB(&selectedDataStore.Jaeger)
 	case selectedDataStore.Type == TEMPO_BACKEND:
 		db, err = newTempoDB(&selectedDataStore.Tempo)
+	case selectedDataStore.Type == LIGHTSTEP_BACKEND:
+		db, err = newLightstep(&selectedDataStore.Lightstep)
 	}
 
 	return
+}
+
+func newLightstep(lightstepConfig *config.LightstepConfig) (TraceDB, error) {
+	return &lightstep.LightstepDB{Config: *lightstepConfig}, nil
 }
