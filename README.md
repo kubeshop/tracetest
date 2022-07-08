@@ -9,7 +9,8 @@
 
 <p align="center">
   <!--<a href="https://tracetest.io">Website</a>&nbsp;|&nbsp; -->
-  <a href="https://github.com/kubeshop/tracetest#try-the-demo--give-us-feedback">Live Demo</a>&nbsp;|&nbsp; 
+  <!--<a href="https://github.com/kubeshop/tracetest#try-the-demo--give-us-feedback">Live Demo</a>&nbsp;|&nbsp;-->
+  <a href="https://kubeshop.github.io/tracetest/installing/">Install</a>&nbsp;|&nbsp;
   <a href="https://kubeshop.github.io/tracetest">Documentation</a>&nbsp;|&nbsp; 
   <a href="https://twitter.com/tracetest_io">Twitter</a>&nbsp;|&nbsp; 
   <a href="https://discord.gg/eBvEQRVyKX">Discord</a>&nbsp;|&nbsp; 
@@ -51,25 +52,6 @@ Once the test is built, it can be run automatically as part of a build process. 
 # Creating a Trace Based Test
 
 <div style="text-align:center;"><img src="/assets/creatingatestdiagram.gif"></div>
-
-# Try the demo & give us feedback!
-
-We have a live demo environment with a couple systems you can test against. Use the 'Try The Demo' button below to launch it. You will need to know the urls you can test against - here are some examples that work:
-
-| System               | Description      | URL                                                                   | Method | Request Body                                                                                                                           |
-| -------------------- | ---------------- | --------------------------------------------------------------------- | ------ | -------------------------------------------------------------------------------------------------------------------------------------- |
-| Shopping app         | Generic get      | http://shop/buy                                                       | GET    |
-| Pokemon Microservice | Get a Pokemon    | http://demo-pokemon-api.demo.svc.cluster.local/pokemon?take=20&skip=0 | GET    |
-| Pokemon Microservice | Add a Pokemon    | http://demo-pokemon-api.demo.svc.cluster.local/pokemon                | POST   | { "name": "meowth", "type": "normal","imageUrl": "https://assets.pokemon.com/assets/cms2/img/pokedex/full/052.png","isFeatured": true} |
-| Pokemon Microservice | Import a Pokemon | http://demo-pokemon-api.demo.svc.cluster.local/pokemon/import         | POST   | { "id": 52 }                                                                                                                           |
-
-More documentation about the installed Pokemon Microservice App, PMA, is at [Pokemon Microservice App github](https://github.com/kubeshop/pokeshop/blob/master/docs/overview.md)
-
-Wanna play with it? [Try the Live Demo](https://demo.tracetest.io/)
-
-[![button](/assets/button_try_tracetest.png)](https://demo.tracetest.io/)
-
-We’re looking for feedback to help make Tracetest even better for developers, QA testers, and DevOPs. Please give us feedback on [Discord](https://discord.gg/eBvEQRVyKX) or [create an issue on Github](https://github.com/kubeshop/tracetest/issues/new/choose)
 
 # Getting Started
 
