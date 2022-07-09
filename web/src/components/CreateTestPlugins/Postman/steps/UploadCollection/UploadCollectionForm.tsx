@@ -1,7 +1,6 @@
 import {Form, FormInstance, Input} from 'antd';
 import useValidate from 'components/CreateTestPlugins/Postman/steps/UploadCollection/hooks/useValidate';
 import {IRequestDetailsValues} from 'components/CreateTestPlugins/Postman/steps/UploadCollection/UploadCollection';
-import * as S from 'components/CreateTestPlugins/Rpc/steps/RequestDetails/RequestDetails.styled';
 import RequestDetailsFileInput from 'components/CreateTestPlugins/Rpc/steps/RequestDetails/RequestDetailsFileInput';
 import React, {Dispatch, SetStateAction, useState} from 'react';
 import RequestDetailsAuthInput from '../../../Rest/steps/RequestDetails/RequestDetailsAuthInput/RequestDetailsAuthInput';
@@ -35,7 +34,6 @@ const UploadCollectionForm = ({form, onSubmit, onValidation, setTransientUrl}: I
       onFinish={onSubmit}
       onValuesChange={handleOnValuesChange}
     >
-      <S.GlobalStyle />
       <div style={{display: 'grid'}}>
         <Form.Item
           rules={[{required: true, message: 'Please enter a request url'}]}

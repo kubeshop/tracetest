@@ -3,9 +3,9 @@ import * as Step from 'components/CreateTestPlugins/Step.styled';
 import CreateStepFooter from 'components/CreateTestSteps/CreateTestStepFooter';
 import {useCreateTest} from 'providers/CreateTest/CreateTest.provider';
 import {useCallback, useEffect, useState} from 'react';
-import {HTTP_METHOD} from '../../../../../constants/Common.constants';
-import {TRequest, TRequestAuth} from '../../../../../types/Test.types';
-import Validator from '../../../../../utils/Validator';
+import {HTTP_METHOD} from 'constants/Common.constants';
+import {THTTPRequest, TRequestAuth} from 'types/Test.types';
+import Validator from 'utils/Validator';
 import UploadCollectionForm from './UploadCollectionForm';
 
 export interface IRequestDetailsValues {
@@ -14,7 +14,7 @@ export interface IRequestDetailsValues {
   collectionTest?: string;
   body: string;
   auth: TRequestAuth;
-  headers: TRequest['headers'];
+  headers: THTTPRequest['headers'];
   method: HTTP_METHOD;
   name: string;
   url: string;
@@ -32,7 +32,10 @@ const UploadCollection = () => {
 
   const handleSubmit = useCallback(
     ({collectionFile, envFile, collectionTest, ...values}: IRequestDetailsValues) => {
-      onNext({serviceUnderTest: {request: {...values}}});
+      console.log(collectionFile);
+      console.log(envFile);
+      console.log(collectionTest);
+      onNext({serviceUnderTest: {triggerSettings: {http: values}}});
     },
     [onNext]
   );

@@ -38,14 +38,22 @@ module.exports = {
     configure: webpackConfig => {
       return {
         ...webpackConfig,
+        module: {
+          ...webpackConfig.module,
+          rules: [
+            ...webpackConfig.module.rules,
+            {
+              test: /\.m?js/,
+              resolve: {
+                fullySpecified: false,
+              },
+            },
+          ],
+        },
         plugins: [
           ...webpackConfig.plugins,
-          new webpack.ProvidePlugin({
-            Buffer: ['buffer', 'Buffer'],
-          }),
-          new webpack.ProvidePlugin({
-            process: 'process/browser',
-          }),
+          new webpack.ProvidePlugin({Buffer: ['buffer', 'Buffer']}),
+          new webpack.ProvidePlugin({process: 'process/browser'}),
         ],
         resolve: {
           ...webpackConfig.resolve,
