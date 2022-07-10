@@ -8,7 +8,7 @@ services:
       - VERSION=dev
     volumes:
       - type: bind
-        source: ./config.tests.yaml
+        source: ./local-config/config.tests.yaml
         target: /app/config.yaml
     ports:
       - 8080:8080

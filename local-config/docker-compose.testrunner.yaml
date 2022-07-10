@@ -10,5 +10,6 @@ services:
       - TRACETEST_MAIN_ENDPOINT=tracetest:8080
       - TRACETEST_TARGET_ENDPOINT=tracetest:8080
       - DEMO_APP_URL=http://demo
+      - DEMO_APP_GRPC_URL=demo:8082
     depends_on:
       - tracetest
