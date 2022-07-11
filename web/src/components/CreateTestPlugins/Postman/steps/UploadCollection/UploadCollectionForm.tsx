@@ -1,15 +1,15 @@
-import {Form, FormInstance, Input} from 'antd';
+import {Col, Form, FormInstance, Input, Row} from 'antd';
 import useValidate from 'components/CreateTestPlugins/Postman/steps/UploadCollection/hooks/useValidate';
 import {IRequestDetailsValues} from 'components/CreateTestPlugins/Postman/steps/UploadCollection/UploadCollection';
-import RequestDetailsFileInput from 'components/CreateTestPlugins/Rpc/steps/RequestDetails/RequestDetailsFileInput';
 import React, {Dispatch, SetStateAction, useState} from 'react';
 import RequestDetailsAuthInput from '../../../Rest/steps/RequestDetails/RequestDetailsAuthInput/RequestDetailsAuthInput';
 import RequestDetailsHeadersInput from '../../../Rest/steps/RequestDetails/RequestDetailsHeadersInput';
 import RequestDetailsUrlInput from '../../../Rest/steps/RequestDetails/RequestDetailsUrlInput';
+import {CollectionFileField} from './fields/CollectionFileField';
+import {EnvFileField} from './fields/EnvFileField';
 import {useSelectTestCallback} from './hooks/useSelectTestCallback';
-import {State, useUploadCollectionCallback} from './hooks/useUploadCollectionCallback';
-import {useUploadEnvFileCallback} from './hooks/useUploadEnvFileCallback';
-import {SelectTestFromCollection} from './SelectTestFromCollection';
+import {State} from './hooks/useUploadCollectionCallback';
+import {SelectTestFromCollection} from './fields/SelectTestFromCollection';
 
 export const FORM_ID = 'upload-collection-test';
 
@@ -22,7 +22,7 @@ interface IProps {
 
 const UploadCollectionForm = ({form, onSubmit, onValidation, setTransientUrl}: IProps) => {
   const handleOnValuesChange = useValidate(onValidation, setTransientUrl);
-  const [state, setState] = useState<State>({requests: []});
+  const [state, setState] = useState<State>({requests: [], variables: []});
 
   return (
     <Form
@@ -35,46 +35,30 @@ const UploadCollectionForm = ({form, onSubmit, onValidation, setTransientUrl}: I
       onValuesChange={handleOnValuesChange}
     >
       <div style={{display: 'grid'}}>
-        <Form.Item
-          rules={[{required: true, message: 'Please enter a request url'}]}
-          data-cy="collectionFile"
-          name="collectionFile"
-          label="Upload Postman Collection"
-        >
-          <RequestDetailsFileInput accept=".json" onChange={useUploadCollectionCallback(setState)} />
-        </Form.Item>
-        <Form.Item data-cy="envFile" name="envFile" label="Upload environment file (optional)">
-          <RequestDetailsFileInput accept=".json" onChange={useUploadEnvFileCallback()} />
-        </Form.Item>
-        <Form.Item
-          rules={[{required: true, message: 'Please enter a request url'}]}
-          data-cy="collectionTest"
-          name="collectionTest"
-          label="Select test from Postman Collection"
-        >
-          <SelectTestFromCollection
-            requests={state.requests}
-            onChange={useSelectTestCallback(state, form, setTransientUrl)}
-          />
-        </Form.Item>
-        <div style={{display: 'flex', paddingTop: 32}}>
-          <span style={{flexBasis: '50%', paddingRight: 8}}>
+        <CollectionFileField setState={setState} />
+        <EnvFileField state={state} form={form} setState={setState} setTransientUrl={setTransientUrl} />
+        <SelectTestFromCollection
+          requests={state.requests}
+          onChange={useSelectTestCallback(state, form, setTransientUrl)}
+        />
+        <Row gutter={12}>
+          <Col span={12}>
             <RequestDetailsUrlInput />
-          </span>
-          <span style={{flexBasis: '50%', paddingLeft: 8}}>
-            <RequestDetailsAuthInput form={form} />
-          </span>
-        </div>
-        <div style={{display: 'flex'}}>
-          <span style={{flexBasis: '50%', paddingRight: 8}}>
-            <RequestDetailsHeadersInput />
-          </span>
-          <span style={{flexBasis: '50%', paddingLeft: 8}}>
+          </Col>
+          <Col span={12}>
             <Form.Item className="input-body" data-cy="body" label="Request body" name="body" style={{marginBottom: 0}}>
               <Input.TextArea placeholder="Enter request body text" />
             </Form.Item>
-          </span>
-        </div>
+          </Col>
+        </Row>
+        <Row gutter={12}>
+          <Col span={12}>
+            <RequestDetailsHeadersInput />
+          </Col>
+          <Col span={12}>
+            <RequestDetailsAuthInput form={form} />
+          </Col>
+        </Row>
       </div>
     </Form>
   );

@@ -1,6 +1,7 @@
-import {RequestAuthDefinition} from 'postman-collection';
+import {RequestAuthDefinition, VariableDefinition} from 'postman-collection';
 import {TRequestAuth} from '../../../../../../types/Test.types';
 import {RequestDefinitionExtended} from './getRequestsFromCollection';
+import {substituteVariable} from './substituteVariable';
 
 type AuthType = 'apiKey' | 'basic' | 'bearer';
 
@@ -17,7 +18,10 @@ function translateType(type: NonNullable<RequestAuthDefinition['type']>): AuthTy
   }
 }
 
-export function transformAuthSettings(request: RequestDefinitionExtended): TRequestAuth {
+export function transformAuthSettings(
+  request: RequestDefinitionExtended,
+  variables: VariableDefinition[]
+): TRequestAuth {
   if (request?.auth) {
     if (['apikey', 'basic', 'bearer'].includes(request?.auth.type)) {
       const authParameters = request?.auth?.parameters().all();
@@ -26,8 +30,8 @@ export function transformAuthSettings(request: RequestDefinitionExtended): TRequ
           type: translateType(request.auth.type),
           apiKey: {
             in: authParameters?.find(({key}) => key === 'in')?.value || 'header',
-            key: authParameters?.find(({key}) => key === 'key')?.value,
-            value: authParameters?.find(({key}) => key === 'value')?.value,
+            key: substituteVariable(variables, authParameters?.find(({key}) => key === 'key')?.value),
+            value: substituteVariable(variables, authParameters?.find(({key}) => key === 'value')?.value),
           },
         };
       }
@@ -35,8 +39,8 @@ export function transformAuthSettings(request: RequestDefinitionExtended): TRequ
         return {
           type: translateType(request.auth.type),
           basic: {
-            username: authParameters?.find(({key}) => key === 'username')?.value || '',
-            password: authParameters?.find(({key}) => key === 'password')?.value,
+            username: substituteVariable(variables, authParameters?.find(({key}) => key === 'username')?.value || ''),
+            password: substituteVariable(variables, authParameters?.find(({key}) => key === 'password')?.value),
           },
         };
       }
@@ -44,7 +48,7 @@ export function transformAuthSettings(request: RequestDefinitionExtended): TRequ
         return {
           type: translateType(request.auth.type),
           bearer: {
-            token: authParameters?.find(({key}) => key === 'token')?.value || '',
+            token: substituteVariable(variables, authParameters?.find(({key}) => key === 'token')?.value || ''),
           },
         };
       }

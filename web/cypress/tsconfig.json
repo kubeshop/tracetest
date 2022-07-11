@@ -5,5 +5,8 @@
     "lib": ["es2015", "dom"],
     "types": ["cypress"]
   },
-  "include": ["**/*.ts*"]
+  "include": [
+    "**/*.ts*",
+    "../node_modules/cypress-file-upload/types/index.d.ts"
+  ]
 }

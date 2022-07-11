@@ -8,9 +8,14 @@ interface IProps {
   onSelect(plugin: IPlugin): void;
 }
 
-const PluginCard = ({plugin: {title, description, isActive}, plugin, onSelect, isSelected}: IProps) => {
+const PluginCard = ({plugin: {name, title, description, isActive}, plugin, onSelect, isSelected}: IProps) => {
   return (
-    <S.PluginCard $isSelected={isSelected} $isActive={isActive} onClick={() => isActive && onSelect(plugin)}>
+    <S.PluginCard
+      data-cy={`${name.toLowerCase()}-plugin`}
+      $isSelected={isSelected}
+      $isActive={isActive}
+      onClick={() => isActive && onSelect(plugin)}
+    >
       <S.Circle $isActive={isActive}>{isSelected && <S.Check />}</S.Circle>
       <S.Content>
         <div>

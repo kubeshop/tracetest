@@ -68,18 +68,18 @@
 							"type": "apikey",
 							"apikey": [
 								{
-									"key": "in",
-									"value": "header",
+									"key": "key",
+									"value": "{{API_KEY}}",
 									"type": "string"
 								},
 								{
 									"key": "value",
-									"value": "sdfsdf",
+									"value": "{{API_KEY}}",
 									"type": "string"
 								},
 								{
-									"key": "key",
-									"value": "AUTHKEY",
+									"key": "in",
+									"value": "header",
 									"type": "string"
 								}
 							]
@@ -87,8 +87,8 @@
 						"method": "POST",
 						"header": [
 							{
-								"key": "CESCO",
-								"value": "sdfsdf",
+								"key": "CESCO-{{API_KEY}}",
+								"value": "{{API_KEY}}-sdfsdfsdf",
 								"type": "text"
 							}
 						],
@@ -97,7 +97,7 @@
 							"raw": "{id:33}"
 						},
 						"url": {
-							"raw": "http://demo-pokemon-api.demo.svc.cluster.local/pokemon?take=20&skip=0",
+							"raw": "http://demo-pokemon-api.demo.svc.cluster.local/pokemon?take=20&skip={{API_KEY}}",
 							"protocol": "http",
 							"host": [
 								"demo-pokemon-api",
@@ -116,7 +116,7 @@
 								},
 								{
 									"key": "skip",
-									"value": "0"
+									"value": "{{API_KEY}}"
 								}
 							]
 						}

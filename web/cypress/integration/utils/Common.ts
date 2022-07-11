@@ -10,7 +10,7 @@ export let testId = '';
 
 export const createTest = () => {
   cy.visit('http://localhost:3000/');
-  const $form = openCreateTestModal();
+  const $form = navigateToTestCreationPage();
 
   $form.get('[data-cy=create-test-next-button]').click();
 
@@ -29,7 +29,7 @@ export const createTest = () => {
   cy.visit('http://localhost:3000/');
 };
 
-export const openCreateTestModal = () => {
+export const navigateToTestCreationPage = () => {
   cy.get('[data-cy=create-test-button]').click();
 
   const $form = cy.get('[data-cy=create-test-header]');
