@@ -88,7 +88,6 @@ export interface ICreateTestState {
   stepList: ICreateTestStep[];
   stepNumber: number;
   pluginName: SupportedPlugins;
-  plugin: IPlugin;
 }
 
 export type TCreateTestSliceActions = {

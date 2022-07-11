@@ -8,10 +8,12 @@ import CreateTestSelectors from 'selectors/CreateTest.selectors';
 import {useCreateTestMutation, useRunTestMutation} from 'redux/apis/TraceTest.api';
 import {ICreateTestState, TDraftTest} from 'types/Test.types';
 import TestService from '../../services/Test.service';
+import {Plugins} from '../../constants/Plugins.constants';
 
 interface IContext extends ICreateTestState {
   activeStep: string;
   isLoading: boolean;
+  plugin: IPlugin;
   onNext(draftTest?: TDraftTest): void;
   onPrev(): void;
   onCreateTest(draftTest: TDraftTest): void;
@@ -24,6 +26,7 @@ export const Context = createContext<IContext>({
   ...initialState,
   activeStep: '',
   isLoading: false,
+  plugin: Plugins.REST,
   onNext: noop,
   onPrev: noop,
   onCreateTest: noop,

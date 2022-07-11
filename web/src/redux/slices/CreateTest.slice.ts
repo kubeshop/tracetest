@@ -7,7 +7,6 @@ export const initialState: ICreateTestState = {
   stepList: Plugins.REST.stepList,
   stepNumber: 0,
   pluginName: SupportedPlugins.REST,
-  plugin: Plugins.REST,
 };
 
 const createTestSlice = createSlice<ICreateTestState, TCreateTestSliceActions, 'createTest'>({
