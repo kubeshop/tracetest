@@ -1,16 +1,13 @@
 import {createSlice} from '@reduxjs/toolkit';
-import {ICreateTestState, TCreateTestSliceActions} from 'types/Plugins.types';
+import {ICreateTestState, TCreateTestSliceActions} from 'types/Test.types';
 import {Plugins, SupportedPlugins} from 'constants/Plugins.constants';
 
 export const initialState: ICreateTestState = {
-  draftTest: {
-    serviceUnderTest: {
-      triggerType: Plugins.REST.type,
-    },
-  },
+  draftTest: {},
   stepList: Plugins.REST.stepList,
   stepNumber: 0,
   pluginName: SupportedPlugins.REST,
+  plugin: Plugins.REST,
 };
 
 const createTestSlice = createSlice<ICreateTestState, TCreateTestSliceActions, 'createTest'>({
@@ -21,17 +18,13 @@ const createTestSlice = createSlice<ICreateTestState, TCreateTestSliceActions, '
       state,
       {
         payload: {
-          plugin: {name, stepList, type},
+          plugin: {name, stepList},
         },
       }
     ) {
       state.pluginName = name;
       state.stepList = stepList;
-      state.draftTest = {
-        serviceUnderTest: {
-          triggerType: type,
-        },
-      };
+      state.draftTest = {};
     },
     setStepNumber(state, {payload: {stepNumber, completeStep = true}}) {
       const currentStep = state.stepList[state.stepNumber];
@@ -46,10 +39,6 @@ const createTestSlice = createSlice<ICreateTestState, TCreateTestSliceActions, '
       state.draftTest = {
         ...state.draftTest,
         ...draftTest,
-        serviceUnderTest: {
-          ...state.draftTest.serviceUnderTest,
-          ...draftTest.serviceUnderTest,
-        },
       };
     },
   },

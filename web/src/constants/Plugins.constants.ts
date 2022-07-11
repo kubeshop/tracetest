@@ -54,7 +54,7 @@ const RPC: IPlugin = {
   name: SupportedPlugins.RPC,
   title: 'RPC Request',
   description: 'Test and debug your RPC request',
-  isActive: false,
+  isActive: true,
   type: TriggerTypes.grpc,
   stepList: [
     ...Default.stepList,

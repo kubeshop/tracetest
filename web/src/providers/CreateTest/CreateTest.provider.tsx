@@ -1,11 +1,13 @@
 import {createContext, useCallback, useContext, useMemo} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {noop} from 'lodash';
-import {ICreateTestState, IPlugin, TDraftTest} from 'types/Plugins.types';
+import {IPlugin} from 'types/Plugins.types';
 import {initialState, setDraftTest, setPlugin, setStepNumber} from 'redux/slices/CreateTest.slice';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import CreateTestSelectors from 'selectors/CreateTest.selectors';
 import {useCreateTestMutation, useRunTestMutation} from 'redux/apis/TraceTest.api';
+import {ICreateTestState, TDraftTest} from 'types/Test.types';
+import TestService from '../../services/Test.service';
 
 interface IContext extends ICreateTestState {
   activeStep: string;
@@ -45,18 +47,19 @@ const CreateTestProvider = ({children}: IProps) => {
   const stepList = useAppSelector(CreateTestSelectors.selectStepList);
   const draftTest = useAppSelector(CreateTestSelectors.selectDraftTest);
   const stepNumber = useAppSelector(CreateTestSelectors.selectStepNumber);
-  const pluginName = useAppSelector(CreateTestSelectors.selectPlugin);
+  const plugin = useAppSelector(CreateTestSelectors.selectPlugin);
   const activeStep = useAppSelector(CreateTestSelectors.selectActiveStep);
   const isFinalStep = stepNumber === stepList.length - 1;
 
   const onCreateTest = useCallback(
     async (draft: TDraftTest) => {
-      const test = await createTest(draft).unwrap();
+      const rawTest = await TestService.getRequest(plugin.type, draft);
+      const test = await createTest(rawTest).unwrap();
       const run = await runTest({testId: test.id}).unwrap();
 
       navigate(`/test/${test.id}/run/${run.id}`);
     },
-    [createTest, navigate, runTest]
+    [createTest, navigate, plugin.type, runTest]
   );
 
   const onUpdateDraftTest = useCallback(
@@ -72,10 +75,6 @@ const CreateTestProvider = ({children}: IProps) => {
         onCreateTest({
           ...draftTest,
           ...draft,
-          serviceUnderTest: {
-            ...draftTest.serviceUnderTest,
-            ...draft.serviceUnderTest,
-          },
         });
       else dispatch(setStepNumber({stepNumber: stepNumber + 1}));
 
@@ -101,8 +100,8 @@ const CreateTestProvider = ({children}: IProps) => {
   );
 
   const onUpdatePlugin = useCallback(
-    (plugin: IPlugin) => {
-      dispatch(setPlugin({plugin}));
+    (newPlugin: IPlugin) => {
+      dispatch(setPlugin({plugin: newPlugin}));
     },
     [dispatch]
   );
@@ -112,7 +111,8 @@ const CreateTestProvider = ({children}: IProps) => {
       stepList,
       draftTest,
       stepNumber,
-      pluginName,
+      pluginName: plugin.name,
+      plugin,
       activeStep,
       isLoading: isLoadingCreateTest || isLoadingRunTest,
       onNext,
@@ -126,7 +126,7 @@ const CreateTestProvider = ({children}: IProps) => {
       stepList,
       draftTest,
       stepNumber,
-      pluginName,
+      plugin,
       activeStep,
       isLoadingCreateTest,
       isLoadingRunTest,

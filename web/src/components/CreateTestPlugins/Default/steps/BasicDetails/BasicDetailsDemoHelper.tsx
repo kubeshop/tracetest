@@ -1,35 +1,24 @@
 import {DownOutlined} from '@ant-design/icons';
-import {Dropdown, FormInstance, Menu, Typography} from 'antd';
+import {Dropdown, Menu, Typography} from 'antd';
 import {camelCase} from 'lodash';
 import React from 'react';
 import {DemoTestExampleList, IDemoTestExample} from 'constants/Test.constants';
 import CreateTestAnalyticsService from 'services/Analytics/CreateTestAnalytics.service';
 import {TooltipQuestion} from 'components/TooltipQuestion/TooltipQuestion';
-import {IBasicDetailsValues} from './BasicDetails';
 import * as S from './BasicDetails.styled';
 
 interface IProps {
-  form: FormInstance<IBasicDetailsValues>;
   onSelectDemo(demo: IDemoTestExample): void;
-  onValidation(isValid: boolean): void;
   selectedDemo?: IDemoTestExample;
 }
 
-const BasicDetailsDemoHelper: React.FC<IProps> = ({selectedDemo, onSelectDemo, onValidation, form}) => {
+const BasicDetailsDemoHelper = ({selectedDemo, onSelectDemo}: IProps) => {
   const handleOnDemoClick = ({key}: {key: string}) => {
     CreateTestAnalyticsService.onDemoTestClick();
     const demo = DemoTestExampleList.find(({name}) => name === key)!;
     onSelectDemo(demo);
-
-    const {description, name} = demo;
-
-    form.setFieldsValue({
-      name,
-      description,
-    });
-
-    onValidation(true);
   };
+
   return (
     <S.DemoContainer>
       <Typography.Text>Try these examples in our demo env: </Typography.Text>

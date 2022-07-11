@@ -12,7 +12,7 @@ export const InputContainer = styled.div`
 export const DoubleInputContainer = styled(InputContainer)`
   display: grid;
   gap: 26px;
-  grid-template-columns: 50% 50%;
+  grid-template-columns: 48% 48%;
 `;
 
 export const Row = styled.div`

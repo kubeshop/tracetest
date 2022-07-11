@@ -3,29 +3,45 @@ import {useCallback, useState} from 'react';
 import {useCreateTest} from 'providers/CreateTest/CreateTest.provider';
 import CreateStepFooter from 'components/CreateTestSteps/CreateTestStepFooter';
 import * as Step from 'components/CreateTestPlugins/Step.styled';
+import {IDemoTestExample} from 'constants/Test.constants';
+import useValidateTestDraft from 'hooks/useValidateTestDraft';
+import {SupportedPlugins} from 'constants/Plugins.constants';
+import {IBasicValues} from 'types/Test.types';
 import BasicDetailsForm from './BasicDetailsForm';
-import {IDemoTestExample} from '../../../../../constants/Test.constants';
-
-export interface IBasicDetailsValues {
-  name: string;
-  description: string;
-  testSuite: string;
-}
 
 const BasicDetails = () => {
-  const [isFormValid, setIsFormValid] = useState(false);
   const [selectedDemo, setSelectedDemo] = useState<IDemoTestExample>();
-  const [form] = Form.useForm<IBasicDetailsValues>();
+  const [form] = Form.useForm<IBasicValues>();
   const {onNext} = useCreateTest();
+
+  const {
+    plugin: {type, name: pluginName},
+  } = useCreateTest();
+  const {setIsValid, isValid, onValidate} = useValidateTestDraft({type, isBasicDetails: true});
+
+  const handleSelectDemo = useCallback(
+    (demo: IDemoTestExample) => {
+      const {name, description} = demo;
+
+      form.setFieldsValue({
+        name,
+        description,
+      });
+
+      setIsValid(true);
+      setSelectedDemo(demo);
+    },
+    [form, setIsValid]
+  );
 
   const handleNext = useCallback(() => {
     form.submit();
   }, [form]);
 
   const handleSubmit = useCallback(
-    ({name, description}: IBasicDetailsValues) => {
+    ({name, description}: IBasicValues) => {
       const {url, body, method} = selectedDemo || {};
-      onNext({name, description, serviceUnderTest: {triggerSettings: {http: {url, body, method}}}});
+      onNext({name, description, url, body, method});
     },
     [onNext, selectedDemo]
   );
@@ -34,15 +50,22 @@ const BasicDetails = () => {
     <Step.Step>
       <Step.FormContainer>
         <Step.Title>Provide needed basic information</Step.Title>
-        <BasicDetailsForm
+        <Form<IBasicValues>
+          autoComplete="off"
+          data-cy="create-test-modal"
           form={form}
-          onSubmit={handleSubmit}
-          onSelectDemo={setSelectedDemo}
-          onValidation={setIsFormValid}
-          selectedDemo={selectedDemo}
-        />
+          layout="vertical"
+          onFinish={handleSubmit}
+          onValuesChange={onValidate}
+        >
+          <BasicDetailsForm
+            onSelectDemo={handleSelectDemo}
+            selectedDemo={selectedDemo}
+            showDemo={pluginName === SupportedPlugins.REST}
+          />
+        </Form>
       </Step.FormContainer>
-      <CreateStepFooter isValid={isFormValid} onNext={handleNext} />
+      <CreateStepFooter isValid={isValid} onNext={handleNext} />
     </Step.Step>
   );
 };

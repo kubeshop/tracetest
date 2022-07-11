@@ -7,7 +7,7 @@ import {bearerFields} from './bearerFields';
 import TypeInput from './TypeInput';
 
 interface IProps {
-  form: FormInstance<{auth: TRequestAuth}>;
+  form: FormInstance<Partial<{auth: TRequestAuth}>>;
 }
 
 const RequestDetailsAuthInput = ({form}: IProps) => {

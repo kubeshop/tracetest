@@ -1,13 +1,6 @@
 import {DeleteOutlined} from '@ant-design/icons';
 import styled from 'styled-components';
 
-export const InputContainer = styled.div`
-  display: grid;
-  gap: 26px;
-  grid-template-columns: 55%;
-  justify-content: center;
-`;
-
 export const Row = styled.div`
   display: flex;
 `;
