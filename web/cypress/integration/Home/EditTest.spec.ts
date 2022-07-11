@@ -17,8 +17,8 @@ describe('Edit Test', () => {
     cy.get(`[data-cy=test-actions-button-${testId}]`).click();
     cy.get('[data-cy=test-card-edit]').click();
 
-    cy.get('[data-cy=edit-test-modal]').should('be.visible');
-    cy.get('[data-cy=name]').clear().type('Edited Test');
+    cy.get('[data-cy=edit-test-form]').should('be.visible');
+    cy.get('[data-cy=create-test-name-input] input').clear().type('Edited Test');
 
     cy.get('[data-cy=edit-test-submit]').click();
     cy.get('[data-cy=test-details-name]').should('have.text', `Edited Test (v2)`);
@@ -32,8 +32,8 @@ describe('Edit Test', () => {
     cy.get(`[data-cy=test-actions-button-${testId}]`).click();
     cy.get('[data-cy=test-card-edit]').click();
 
-    cy.get('[data-cy=edit-test-modal]').should('be.visible');
-    cy.get('[data-cy=name]').clear().type('Edited Test');
+    cy.get('[data-cy=edit-test-form]').should('be.visible');
+    cy.get('[data-cy=create-test-name-input] input').clear().type('Edited Test');
 
     cy.get('[data-cy=edit-test-submit]').click();
     cy.get('[data-cy=test-details-name]').should('have.text', `Edited Test (v2)`);

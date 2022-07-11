@@ -44,12 +44,18 @@ const EditTestContent = ({test}: IProps) => {
   );
 
   return (
-    <S.Wrapper>
+    <S.Wrapper data-cy="edit-test-form">
       <CreateTestHeader onBack={() => navigate('/')} title="Edit Test" />
       <S.FormContainer>
         <EditTestForm form={form} test={test} onSubmit={handleOnSubmit} onValidation={onValidate} />
         <S.ButtonsContainer>
-          <Button loading={isLoading} disabled={!isValid} type="primary" onClick={() => form.submit()}>
+          <Button
+            data-cy="edit-test-submit"
+            loading={isLoading}
+            disabled={!isValid}
+            type="primary"
+            onClick={() => form.submit()}
+          >
             Save
           </Button>
         </S.ButtonsContainer>
