@@ -1,4 +1,4 @@
-package lightstep
+package tracedb
 
 import (
 	"context"
@@ -8,15 +8,20 @@ import (
 	"net/http"
 
 	"github.com/kubeshop/tracetest/server/config"
+	"github.com/kubeshop/tracetest/server/tracedb/lightstep"
 	"github.com/kubeshop/tracetest/server/traces"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type LightstepDB struct {
 	Config config.LightstepConfig
 }
 
-func (db *LightstepDB) Close() error {
-	// As it doesn't keep an open connection, we don't need to close anything here
+func (*LightstepDB) Close() error {
+	return nil
+}
+
+func (*LightstepDB) SendSpan(context.Context, trace.Span) error {
 	return nil
 }
 
@@ -41,17 +46,29 @@ func (db *LightstepDB) GetTraceByIdentification(ctx context.Context, identificat
 		return traces.Trace{}, fmt.Errorf("could not execute request: %w", err)
 	}
 
+	if response.StatusCode == 404 {
+		return traces.Trace{}, ErrTraceNotFound
+	}
+
+	if response.StatusCode >= 300 {
+		return traces.Trace{}, fmt.Errorf("unexpected status code: %d", response.StatusCode)
+	}
+
 	defer response.Body.Close()
 	body, err := ioutil.ReadAll(request.Body)
 	if err != nil {
 		return traces.Trace{}, fmt.Errorf("could not read response body: %w", err)
 	}
 
-	var traceResponse GetTraceResponse
+	var traceResponse lightstep.GetTraceResponse
 	err = json.Unmarshal(body, &traceResponse)
 	if err != nil {
 		return traces.Trace{}, fmt.Errorf("could not unmarshall json: %w", err)
 	}
 
-	return ConvertResponseToOtelFormat(traceResponse), nil
+	return lightstep.ConvertResponseToOtelFormat(traceResponse), nil
+}
+
+func newLightstepDB(lightstepConfig config.LightstepConfig) (TraceDB, error) {
+	return &LightstepDB{Config: lightstepConfig}, nil
 }

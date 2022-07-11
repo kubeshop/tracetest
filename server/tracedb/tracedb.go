@@ -6,8 +6,8 @@ import (
 	"fmt"
 
 	"github.com/kubeshop/tracetest/server/config"
-	"github.com/kubeshop/tracetest/server/tracedb/lightstep"
 	"github.com/kubeshop/tracetest/server/traces"
+	"go.opentelemetry.io/otel/trace"
 )
 
 var ErrTraceNotFound = errors.New("trace not found")
@@ -19,7 +19,8 @@ const (
 )
 
 type TraceDB interface {
-	GetTraceByIdentification(ctx context.Context, traceIdentification traces.TraceIdentification) (traces.Trace, error)
+	SendSpan(context.Context, trace.Span) error
+	GetTraceByIdentification(context.Context, traces.TraceIdentification) (traces.Trace, error)
 	Close() error
 }
 
@@ -39,12 +40,8 @@ func New(c config.Config) (db TraceDB, err error) {
 	case selectedDataStore.Type == TEMPO_BACKEND:
 		db, err = newTempoDB(&selectedDataStore.Tempo)
 	case selectedDataStore.Type == LIGHTSTEP_BACKEND:
-		db, err = newLightstep(&selectedDataStore.Lightstep)
+		db, err = newLightstepDB(selectedDataStore.Lightstep)
 	}
 
 	return
-}
-
-func newLightstep(lightstepConfig *config.LightstepConfig) (TraceDB, error) {
-	return &lightstep.LightstepDB{Config: *lightstepConfig}, nil
 }
