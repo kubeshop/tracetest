@@ -57,8 +57,49 @@ paths:
                 $ref: "./tests.yaml#/components/schemas/Test"
         400:
           description: "trying to create a test with an already existing ID"
+
+  /tests/definition.yaml:
+    post:
+      tags:
+        - api
+      summary: "Create new test using the yaml definition"
+      description: "Create new test using the yaml definition"
+      operationId: createTestFromDefinition
+      requestBody:
+        content:
+          application/yaml:
+            schema:
+              type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "./tests.yaml#/components/schemas/Test"
+        400:
+          description: "trying to create a test with an already existing ID"
         500:
           description: "problem with creating test"
+    put:
+      tags:
+        - api
+      summary: "update test from definition file"
+      description: "update test action from definition file"
+      operationId: updateTestFromDefinition
+      requestBody:
+        content:
+          application/yaml:
+            schema:
+              type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "./tests.yaml#/components/schemas/Test"
+
   /tests/{testId}:
     get:
       tags:

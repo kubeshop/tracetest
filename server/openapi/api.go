@@ -19,6 +19,7 @@ import (
 // pass the data to a ApiApiServicer to perform the required actions, then write the service results to the http response.
 type ApiApiRouter interface {
 	CreateTest(http.ResponseWriter, *http.Request)
+	CreateTestFromDefinition(http.ResponseWriter, *http.Request)
 	DeleteTest(http.ResponseWriter, *http.Request)
 	DeleteTestRun(http.ResponseWriter, *http.Request)
 	DryRunAssertion(http.ResponseWriter, *http.Request)
@@ -44,6 +45,7 @@ type ApiApiRouter interface {
 // and updated with the logic required for the API.
 type ApiApiServicer interface {
 	CreateTest(context.Context, Test) (ImplResponse, error)
+	CreateTestFromDefinition(context.Context, string) (ImplResponse, error)
 	DeleteTest(context.Context, string) (ImplResponse, error)
 	DeleteTestRun(context.Context, string, string) (ImplResponse, error)
 	DryRunAssertion(context.Context, string, string, TestDefinition) (ImplResponse, error)
