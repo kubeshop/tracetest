@@ -94,8 +94,8 @@ jobs:
           --namespace tracetest-beta \
           --set analytics.enabled=false \
           --set image.tag=sha-$(git rev-parse --short $GITHUB_SHA) \
-          --set tracingBackend=jaeger \
-          --set jaegerConnectionConfig.endpoint="jaeger-query.tracetest.svc.cluster.local:16685" \
+          --set tracingBackend.dataStore.type=jaeger \
+          --set tracingBackend.dataStore.jaeger.endpoint="jaeger-query.tracetest.svc.cluster.local:16685" \
           --set telemetry.enabled="true" \
           --set telemetry.otelCollectorEndpoint="otel-collector.tracetest.svc.cluster.local:4317" \
           --set service.annotations."cloud\.google\.com/backend-config"='\{\"default\":\"tracetest-beta\"\}' \
@@ -138,8 +138,8 @@ jobs:
           --set image.tag=sha-$(git rev-parse --short $GITHUB_SHA) \
           --set poolingConfig.maxWaitTimeForTrace=60s \
           --set poolingConfig.retryDelay=6s \
-          --set tracingBackend=jaeger \
-          --set jaegerConnectionConfig.endpoint="jaeger-query.tracetest.svc.cluster.local:16685" \
+          --set tracingBackend.dataStore.type=jaeger \
+          --set tracingBackend.dataStore.jaeger.endpoint="jaeger-query.tracetest.svc.cluster.local:16685" \
           --set telemetry.enabled="true" \
           --set telemetry.otelCollectorEndpoint="otel-collector.tracetest.svc.cluster.local:4317" \
           --set ingress.enabled=false

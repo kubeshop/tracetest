@@ -58,8 +58,8 @@ helm repo add kubeshop https://kubeshop.github.io/helm-charts
 helm repo update
 
 helm install tracetest kubeshop/tracetest \
-  --set tracingBackend=jaeger \
-  --set jaegerConnectionConfig.endpoint="jaeger-query:16685" # update this value to point to your jaeger install
+  --set tracingBackend.dataStore.type=jaeger \
+  --set tracingBackend.dataStore.jaeger.endpoint="jaeger-query:16685" # update this value to point to your jaeger install
 ```
 
 #### **Grafana Tempo**

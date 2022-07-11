@@ -17,9 +17,14 @@ import (
 func TestJaegerGetTraceByID(t *testing.T) {
 	t.Skip("TODO: docker-compose jaeger")
 	db, err := tracedb.New(config.Config{
-		JaegerConnectionConfig: &configgrpc.GRPCClientSettings{
-			Endpoint:   "localhost:16685",
-			TLSSetting: configtls.TLSClientSetting{Insecure: true},
+		TracingBackend: config.TracingBackend{
+			DataStore: config.TracingBackendDataStoreConfig{
+				Type: tracedb.JAEGER_BACKEND,
+				Jaeger: configgrpc.GRPCClientSettings{
+					Endpoint:   "localhost:16685",
+					TLSSetting: configtls.TLSClientSetting{Insecure: true},
+				},
+			},
 		},
 	})
 	assert.NoError(t, err)

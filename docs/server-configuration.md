@@ -8,10 +8,13 @@ Tracetest can be configured using a config.yaml file placed on the same director
 postgresConnString: "host=localhost user=postgres password=postgres port=5432 sslmode=disable"
 
 # Instance of jaeger that will be used to retrieve the trace of the service under test
-jaegerConnectionConfig:
-  endpoint: localhost:16685
-  tls:
-    insecure: true
+tracingBackend:
+  dataStore:
+    type: jaeger
+    jaeger:
+      endpoint: localhost:16685
+      tls:
+        insecure: true
 
 # Configure how traces should be pooled from the tracing storage.
 poolingConfig:
