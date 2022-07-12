@@ -2,7 +2,10 @@ poolingConfig:
   maxWaitTimeForTrace: 1m
   retryDelay: 1s
 postgresConnString: "host=postgres user=postgres password=postgres port=5432 sslmode=disable"
-tempoConnectionConfig:
-  endpoint: tempo:9095
-  tls:
-    insecure: true
+tracingBackend:
+  dataStore:
+    type: tempo
+    tempo:
+      endpoint: tempo:9095
+      tls:
+        insecure: true

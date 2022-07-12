@@ -34,10 +34,13 @@ func GetTestingApp(options ...TestingAppOption) (*app.App, error) {
 	}
 
 	config := config.Config{
-		JaegerConnectionConfig: &configgrpc.GRPCClientSettings{
-			Endpoint: "",
-			TLSSetting: configtls.TLSClientSetting{
-				Insecure: true,
+		TracingBackend: config.TracingBackend{
+			DataStore: config.TracingBackendDataStoreConfig{
+				Type: "jaeger",
+				Jaeger: configgrpc.GRPCClientSettings{
+					Endpoint:   "",
+					TLSSetting: configtls.TLSClientSetting{Insecure: true},
+				},
 			},
 		},
 		PoolingConfig: config.PoolingConfig{

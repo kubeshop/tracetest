@@ -123,8 +123,8 @@ echo
 echo "--> install tracetest version $version to namespace $NAMESPACE"
 helm upgrade --install tracetest kubeshop/tracetest \
   --namespace $NAMESPACE --create-namespace \
-  --set tracingBackend=$TRACE_BACKEND \
-  --set ${TRACE_BACKEND}ConnectionConfig.endpoint="$TRACE_BACKEND_ENDPOINT"
+  --set tracingBackend.dataStore.type=$TRACE_BACKEND \
+  --set tracingBackend.dataStore.${TRACE_BACKEND}.endpoint="$TRACE_BACKEND_ENDPOINT"
 
 
 if [ "$SKIP_BACKEND" != "YES" ]; then
