@@ -79,8 +79,7 @@ paths:
                 $ref: "./tests.yaml#/components/schemas/Test"
         400:
           description: "trying to create a test with an already existing ID"
-        500:
-          description: "problem with creating test"
+
   /tests/{testId}/definition.yaml:
     put:
       tags:

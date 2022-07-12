@@ -20,6 +20,11 @@ components:
         definition:
           $ref: "#/components/schemas/TestDefinition"
           description: Definition of assertions that are going to be made
+      example:
+        id: 2062208d-b441-2e6f-b2e9-5718e32eae0a
+        name: Example
+        description: test example
+        version: 1
 
     TestDefinition:
       type: object
