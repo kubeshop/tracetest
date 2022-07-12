@@ -67,9 +67,9 @@ paths:
       operationId: createTestFromDefinition
       requestBody:
         content:
-          application/yaml:
+          text/json:
             schema:
-              type: string
+              $ref: "./tests.yaml#/components/schemas/TextDefinition"
       responses:
         200:
           description: successful operation
@@ -89,9 +89,9 @@ paths:
       operationId: updateTestFromDefinition
       requestBody:
         content:
-          application/yaml:
+          text/json:
             schema:
-              type: string
+              $ref: "./tests.yaml#/components/schemas/TextDefinition"
       responses:
         200:
           description: successful operation

@@ -152,15 +152,18 @@ func (a runTestAction) createTestFromDefinition(ctx context.Context, definition 
 	variableInjector := variable.NewInjector()
 	variableInjector.Inject(&definition)
 
-	yamlContent, err := yaml.Marshal(definition)
+	yamlContentBytes, err := yaml.Marshal(definition)
 	if err != nil {
 		return openapi.Test{}, false, fmt.Errorf("could not marshal yaml: %w", err)
 	}
 
-	req := a.client.ApiApi.CreateTestFromDefinition(ctx)
-	req = req.Body(string(yamlContent))
+	yamlContent := string(yamlContentBytes)
 
-	a.logger.Debug("Sending request to create test", zap.ByteString("test", yamlContent))
+	textDefinition := openapi.TextDefinition{Content: &yamlContent}
+	req := a.client.ApiApi.CreateTestFromDefinition(ctx)
+	req = req.TextDefinition(textDefinition)
+
+	a.logger.Debug("Sending request to create test", zap.ByteString("test", yamlContentBytes))
 	createdTest, resp, err := a.client.ApiApi.CreateTestFromDefinitionExecute(req)
 
 	if resp != nil && resp.StatusCode == http.StatusBadRequest {
@@ -179,15 +182,18 @@ func (a runTestAction) updateTestFromDefinition(ctx context.Context, definition 
 	variableInjector := variable.NewInjector()
 	variableInjector.Inject(&definition)
 
-	yamlContent, err := yaml.Marshal(definition)
+	yamlContentBytes, err := yaml.Marshal(definition)
 	if err != nil {
 		return openapi.Test{}, fmt.Errorf("could not marshal yaml: %w", err)
 	}
 
-	req := a.client.ApiApi.UpdateTestFromDefinition(ctx)
-	req = req.Body(string(yamlContent))
+	yamlContent := string(yamlContentBytes)
+	textDefinition := openapi.TextDefinition{Content: &yamlContent}
 
-	a.logger.Debug("Sending request to update test", zap.ByteString("test", yamlContent))
+	req := a.client.ApiApi.UpdateTestFromDefinition(ctx)
+	req = req.TextDefinition(textDefinition)
+
+	a.logger.Debug("Sending request to update test", zap.ByteString("test", yamlContentBytes))
 	openapiTest, _, err := a.client.ApiApi.UpdateTestFromDefinitionExecute(req)
 	if err != nil {
 		return openapi.Test{}, fmt.Errorf("could not execute request: %w", err)

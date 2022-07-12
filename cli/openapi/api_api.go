@@ -135,13 +135,13 @@ func (a *ApiApiService) CreateTestExecute(r ApiCreateTestRequest) (*Test, *http.
 }
 
 type ApiCreateTestFromDefinitionRequest struct {
-	ctx        context.Context
-	ApiService *ApiApiService
-	body       *string
+	ctx            context.Context
+	ApiService     *ApiApiService
+	textDefinition *TextDefinition
 }
 
-func (r ApiCreateTestFromDefinitionRequest) Body(body string) ApiCreateTestFromDefinitionRequest {
-	r.body = &body
+func (r ApiCreateTestFromDefinitionRequest) TextDefinition(textDefinition TextDefinition) ApiCreateTestFromDefinitionRequest {
+	r.textDefinition = &textDefinition
 	return r
 }
 
@@ -186,7 +186,7 @@ func (a *ApiApiService) CreateTestFromDefinitionExecute(r ApiCreateTestFromDefin
 	localVarFormParams := url.Values{}
 
 	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{"application/yaml"}
+	localVarHTTPContentTypes := []string{"text/json"}
 
 	// set Content-Type header
 	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
@@ -203,7 +203,7 @@ func (a *ApiApiService) CreateTestFromDefinitionExecute(r ApiCreateTestFromDefin
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	// body params
-	localVarPostBody = r.body
+	localVarPostBody = r.textDefinition
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -2054,13 +2054,13 @@ func (a *ApiApiService) UpdateTestExecute(r ApiUpdateTestRequest) (*http.Respons
 }
 
 type ApiUpdateTestFromDefinitionRequest struct {
-	ctx        context.Context
-	ApiService *ApiApiService
-	body       *string
+	ctx            context.Context
+	ApiService     *ApiApiService
+	textDefinition *TextDefinition
 }
 
-func (r ApiUpdateTestFromDefinitionRequest) Body(body string) ApiUpdateTestFromDefinitionRequest {
-	r.body = &body
+func (r ApiUpdateTestFromDefinitionRequest) TextDefinition(textDefinition TextDefinition) ApiUpdateTestFromDefinitionRequest {
+	r.textDefinition = &textDefinition
 	return r
 }
 
@@ -2105,7 +2105,7 @@ func (a *ApiApiService) UpdateTestFromDefinitionExecute(r ApiUpdateTestFromDefin
 	localVarFormParams := url.Values{}
 
 	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{"application/yaml"}
+	localVarHTTPContentTypes := []string{"text/json"}
 
 	// set Content-Type header
 	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
@@ -2122,7 +2122,7 @@ func (a *ApiApiService) UpdateTestFromDefinitionExecute(r ApiUpdateTestFromDefin
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	// body params
-	localVarPostBody = r.body
+	localVarPostBody = r.textDefinition
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return localVarReturnValue, nil, err
