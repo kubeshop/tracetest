@@ -14,8 +14,6 @@ components:
               $ref: "./http.yaml#/components/schemas/HTTPRequest"
             grpc:
               $ref: "./grpc.yaml#/components/schemas/GRPCRequest"
-      example:
-        triggerType: http
 
     TriggerResult:
       type: object
