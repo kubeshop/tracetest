@@ -1,3 +1,4 @@
+id: 5f4d775e-779a-4937-a44b-ddd80ed1418d
 name: POST import pokemon
 description: Import a pokemon using its ID
 trigger:
@@ -8,11 +9,16 @@ trigger:
     headers:
     - key: Content-Type
       value: application/json
-    body: '{ "id": 52 }'
+    body: '{ "id": 53 }'
+  grpc:
+    protobuf_file: ""
+    address: ""
+    service: ""
+    method: ""
 testDefinition:
 - selector: span[name = "POST /pokemon/import"]
   assertions:
-  - tracetest.span.duration <= 100ms
+  - tracetest.span.duration <= 200ms
   - http.status_code = 200
 - selector: span[name = "send message to queue"]
   assertions:

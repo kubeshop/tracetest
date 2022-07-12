@@ -64,5 +64,5 @@ type ApiApiServicer interface {
 	RunTest(context.Context, string) (ImplResponse, error)
 	SetTestDefinition(context.Context, string, TestDefinition) (ImplResponse, error)
 	UpdateTest(context.Context, string, Test) (ImplResponse, error)
-	UpdateTestFromDefinition(context.Context, TextDefinition) (ImplResponse, error)
+	UpdateTestFromDefinition(context.Context, string, TextDefinition) (ImplResponse, error)
 }

@@ -167,7 +167,7 @@ func (c *ApiApiController) Routes() Routes {
 		{
 			"UpdateTestFromDefinition",
 			strings.ToUpper("Put"),
-			"/api/tests/definition.yaml",
+			"/api/tests/{testId}/definition.yaml",
 			c.UpdateTestFromDefinition,
 		},
 	}
@@ -577,6 +577,9 @@ func (c *ApiApiController) UpdateTest(w http.ResponseWriter, r *http.Request) {
 
 // UpdateTestFromDefinition - update test from definition file
 func (c *ApiApiController) UpdateTestFromDefinition(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	testIdParam := params["testId"]
+
 	textDefinitionParam := TextDefinition{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
@@ -588,7 +591,7 @@ func (c *ApiApiController) UpdateTestFromDefinition(w http.ResponseWriter, r *ht
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	result, err := c.service.UpdateTestFromDefinition(r.Context(), textDefinitionParam)
+	result, err := c.service.UpdateTestFromDefinition(r.Context(), testIdParam, textDefinitionParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

@@ -190,7 +190,7 @@ func (a runTestAction) updateTestFromDefinition(ctx context.Context, definition 
 	yamlContent := string(yamlContentBytes)
 	textDefinition := openapi.TextDefinition{Content: &yamlContent}
 
-	req := a.client.ApiApi.UpdateTestFromDefinition(ctx)
+	req := a.client.ApiApi.UpdateTestFromDefinition(ctx, definition.Id)
 	req = req.TextDefinition(textDefinition)
 
 	a.logger.Debug("Sending request to update test", zap.ByteString("test", yamlContentBytes))

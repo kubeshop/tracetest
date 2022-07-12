@@ -524,7 +524,7 @@ func (c *controller) CreateTestFromDefinition(ctx context.Context, testDefinitio
 	return c.CreateTest(ctx, openapiObject)
 }
 
-func (c *controller) UpdateTestFromDefinition(ctx context.Context, testDefinition openapi.TextDefinition) (openapi.ImplResponse, error) {
+func (c *controller) UpdateTestFromDefinition(ctx context.Context, testId string, testDefinition openapi.TextDefinition) (openapi.ImplResponse, error) {
 	var definitionObject definition.Test
 	err := yaml.Unmarshal([]byte(testDefinition.Content), &definitionObject)
 	if err != nil {
@@ -536,7 +536,7 @@ func (c *controller) UpdateTestFromDefinition(ctx context.Context, testDefinitio
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
 	}
 
-	response, err := c.UpdateTest(ctx, openapiObject.Id, openapiObject)
+	response, err := c.UpdateTest(ctx, testId, openapiObject)
 	if err != nil {
 		return response, err
 	}

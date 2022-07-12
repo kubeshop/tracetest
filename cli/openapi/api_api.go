@@ -2056,6 +2056,7 @@ func (a *ApiApiService) UpdateTestExecute(r ApiUpdateTestRequest) (*http.Respons
 type ApiUpdateTestFromDefinitionRequest struct {
 	ctx            context.Context
 	ApiService     *ApiApiService
+	testId         string
 	textDefinition *TextDefinition
 }
 
@@ -2074,12 +2075,14 @@ UpdateTestFromDefinition update test from definition file
 update test action from definition file
 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param testId
  @return ApiUpdateTestFromDefinitionRequest
 */
-func (a *ApiApiService) UpdateTestFromDefinition(ctx context.Context) ApiUpdateTestFromDefinitionRequest {
+func (a *ApiApiService) UpdateTestFromDefinition(ctx context.Context, testId string) ApiUpdateTestFromDefinitionRequest {
 	return ApiUpdateTestFromDefinitionRequest{
 		ApiService: a,
 		ctx:        ctx,
+		testId:     testId,
 	}
 }
 
@@ -2098,7 +2101,8 @@ func (a *ApiApiService) UpdateTestFromDefinitionExecute(r ApiUpdateTestFromDefin
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/tests/definition.yaml"
+	localVarPath := localBasePath + "/tests/{testId}/definition.yaml"
+	localVarPath = strings.Replace(localVarPath, "{"+"testId"+"}", url.PathEscape(parameterToString(r.testId, "")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
