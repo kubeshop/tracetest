@@ -20,7 +20,6 @@ export interface IRequestDetailsValues {
   auth: TRequestAuth;
   headers: THTTPRequest['headers'];
   method: HTTP_METHOD;
-  name: string;
   url: string;
 }
 

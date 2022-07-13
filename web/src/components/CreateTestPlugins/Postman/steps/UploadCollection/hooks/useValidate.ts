@@ -1,10 +1,10 @@
-import {useCallback} from 'react';
-import Validator from '../../../../../../utils/Validator';
+import {Dispatch, SetStateAction, useCallback} from 'react';
+import Validator from 'utils/Validator';
 import {IRequestDetailsValues} from '../UploadCollection';
 
 const useValidate = (
   onValidation: (isValid: boolean) => void,
-  setTransientUrl: (value: ((prevState: string) => string) | string) => void
+  setTransientUrl: Dispatch<SetStateAction<string>>
 ): ((changedValues: any, allValues: IRequestDetailsValues) => void) => {
   return useCallback(
     (changedValues, allValues: IRequestDetailsValues) => {
@@ -13,7 +13,7 @@ const useValidate = (
         setTransientUrl(changedValues.url);
       }
     },
-    [onValidation]
+    [onValidation, setTransientUrl]
   );
 };
 

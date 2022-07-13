@@ -26,13 +26,17 @@ const UploadCollectionForm = ({form, onSubmit, onValidation, setTransientUrl}: I
       form={form}
       layout="vertical"
       name={FORM_ID}
-      initialValues={{url: ''}}
+      initialValues={{url: '', requests: [], variables: []}}
       onFinish={onSubmit}
       onValuesChange={handleOnValuesChange}
     >
       <div style={{display: 'grid'}}>
-        <Form.Item name="requests" style={{display: 'none'}} />
-        <Form.Item name="variables" style={{display: 'none'}} />
+        <Form.Item name="requests" hidden>
+          <Input type="hidden" />
+        </Form.Item>
+        <Form.Item name="variables" hidden>
+          <Input type="hidden" />
+        </Form.Item>
         <CollectionFileField form={form} />
         <EnvFileField form={form} setTransientUrl={setTransientUrl} />
         <SelectTestFromCollection form={form} setTransientUrl={setTransientUrl} />
