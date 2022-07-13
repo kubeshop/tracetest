@@ -7,7 +7,7 @@ import {useCallback, useEffect, useState} from 'react';
 import {HTTP_METHOD} from 'constants/Common.constants';
 import {THTTPRequest, TRequestAuth} from 'types/Test.types';
 import Validator from 'utils/Validator';
-import {RequestDefinitionExtended} from './hooks/getRequestsFromCollection';
+import {RequestDefinitionExtended} from 'services/PostmanService.service';
 import UploadCollectionForm from './UploadCollectionForm';
 
 export interface IRequestDetailsValues {
