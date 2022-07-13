@@ -74,7 +74,7 @@ The Tracetest [test definition files](https://kubeshop.github.io/tracetest/test-
 
 - executes POST against the pokemon/import endpoint.
 - verifies that the HTTP blocks return a 200 status code
-- verifies all database calls execute in less than 200ms
+- verifies all database calls execute in less than 200ms.
 
 ```
 description: ""
