@@ -44,7 +44,7 @@ Tracetest is a trace-based testing tool that leverages the data contained in you
 - Specify which spans to check in assertions via the [advanced selector language](https://kubeshop.github.io/tracetest/advanced-selectors/).
 - Define checks against the attributes in these spans, including properties, return status, or timing.
 - Tests can be created via graphical UI or via [Yaml-based test definition file](https://kubeshop.github.io/tracetest/test-definition-file/).
-- Use the test definition file to [enables Gitops flows](https://kubeshop.io/blog/integrating-tracetest-with-github-actions-in-a-ci-pipelinehttps://kubeshop.io/blog/integrating-tracetest-with-github-actions-in-a-ci-pipeline).
+- Use the test definition file to [enable Gitops flows](https://kubeshop.io/blog/integrating-tracetest-with-github-actions-in-a-ci-pipelinehttps://kubeshop.io/blog/integrating-tracetest-with-github-actions-in-a-ci-pipeline).
 - [Tracetest CLI](https://kubeshop.github.io/tracetest/command-line-tool/) allows importing & exporting tests, running tests, and more.
 - Tests are [versioned](https://kubeshop.github.io/tracetest/versioning/) as the definition of the test is altered.
 - Supports [numerous backend trace datastores](https://kubeshop.github.io/tracetest/architecture/), including Jeager and Grafana Tempo. Tell us which others you want!
