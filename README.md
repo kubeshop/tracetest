@@ -34,7 +34,7 @@
 
 # Tracetest
 
-Tracetest is a trace-based testing tool that leverages the data contained in your distributed traces to empower easy to create, yet super powerful integration tests. You can verify activity deep inside your system, even events that occur on 'the other side' of an async message queue. Verifying timing of different steps in your process via an automated test is also a valuable use case.
+Tracetest is a trace-based testing tool that leverages the data contained in your distributed traces to produce easy to create, yet super powerful integration tests. You can verify activity deep inside your system, even events that occur on 'the other side' of an async message queue. Verifying the timing of different steps in your process via an automated test is also a valuable use case.
 
 # Features
 
