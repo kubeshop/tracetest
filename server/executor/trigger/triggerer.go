@@ -37,6 +37,7 @@ func (r *Registry) Add(t Triggerer) {
 	r.Lock()
 	defer r.Unlock()
 
+	fmt.Println("*****", t.Type())
 	r.reg[t.Type()] = t
 }
 
@@ -47,6 +48,7 @@ func (r *Registry) Get(triggererType model.TriggerType) (Triggerer, error) {
 	defer r.Unlock()
 
 	t, found := r.reg[triggererType]
+	fmt.Println("*****", triggererType, found)
 	if !found {
 		return nil, fmt.Errorf(`cannot get trigger type "%s": %w`, triggererType, ErrTriggererTypeNotRegistered)
 	}

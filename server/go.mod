@@ -7,13 +7,16 @@ replace k8s.io/client-go => k8s.io/client-go v0.18.0
 require (
 	github.com/alecthomas/participle/v2 v2.0.0-alpha8
 	github.com/denisbrodbeck/machineid v1.0.1
+	github.com/fullstorydev/grpcurl v1.8.6
 	github.com/gogo/protobuf v1.3.2
 	github.com/golang-migrate/migrate/v4 v4.15.2
+	github.com/golang/protobuf v1.5.2
 	github.com/google/uuid v1.3.0
 	github.com/gorilla/handlers v1.5.1
 	github.com/gorilla/mux v1.8.0
 	github.com/gorilla/websocket v1.5.0
 	github.com/j2gg0s/otsql v0.14.0
+	github.com/jhump/protoreflect v1.12.0
 	github.com/lib/pq v1.10.5
 	github.com/mitchellh/mapstructure v1.4.3
 	github.com/orlangure/gnomock v0.20.0
@@ -49,7 +52,6 @@ require (
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-redis/redis/v7 v7.4.1 // indirect
-	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect

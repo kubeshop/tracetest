@@ -29,20 +29,19 @@ type TestTrigger struct {
 }
 
 func (t TestTrigger) Validate() error {
-	validTypes := map[string]bool{
-		"http": true,
-	}
-
-	if t.Type == "" {
+	switch t.Type {
+	case "http":
+		if err := t.HTTPRequest.Validate(); err != nil {
+			return fmt.Errorf("http request must be valid: %w", err)
+		}
+	case "grpc":
+		if err := t.GRPC.Validate(); err != nil {
+			return fmt.Errorf("grpc request must be valid: %w", err)
+		}
+	case "":
 		return fmt.Errorf("type cannot be empty")
-	}
-
-	if _, ok := validTypes[t.Type]; !ok {
+	default:
 		return fmt.Errorf("type \"%s\" is not supported", t.Type)
-	}
-
-	if err := t.HTTPRequest.Validate(); err != nil {
-		return fmt.Errorf("http request must be valid: %w", err)
 	}
 
 	return nil

@@ -61,7 +61,6 @@ func convertGRPCOpenAPIIntoDefinition(request *openapi.GRPCRequest) definition.G
 	return definition.GrpcRequest{
 		ProtobufFile: ConvertOpenapiStringIntoString(request.ProtobufFile),
 		Address:      ConvertOpenapiStringIntoString(request.Address),
-		Service:      ConvertOpenapiStringIntoString(request.Service),
 		Method:       ConvertOpenapiStringIntoString(request.Method),
 		Metadata:     metadata,
 		Auth:         getAuthDefinition(request.Auth),

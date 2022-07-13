@@ -5,9 +5,8 @@ import (
 )
 
 type GrpcRequest struct {
-	ProtobufFile string             `yaml:"protobuf_file"`
+	ProtobufFile string             `yaml:"protobufFile"`
 	Address      string             `yaml:"address"`
-	Service      string             `yaml:"service"`
 	Method       string             `yaml:"method"`
 	Metadata     []GRPCHeader       `yaml:"metadata,omitempty"`
 	Auth         HTTPAuthentication `yaml:"authentication,omitempty"`
@@ -16,15 +15,11 @@ type GrpcRequest struct {
 
 func (r GrpcRequest) Validate() error {
 	if r.ProtobufFile == "" {
-		return fmt.Errorf("protobuf_file cannot be empty")
+		return fmt.Errorf("protobufFile cannot be empty")
 	}
 
 	if r.Address == "" {
 		return fmt.Errorf("address cannot be empty")
-	}
-
-	if r.Service == "" {
-		return fmt.Errorf("service cannot be empty")
 	}
 
 	if r.Method == "" {

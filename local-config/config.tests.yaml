@@ -8,7 +8,7 @@ tracingBackend:
         insecure: true
 
 poolingConfig:
-  maxWaitTimeForTrace: 30s
+  maxWaitTimeForTrace: 10s
   retryDelay: 500ms
 
 googleAnalytics:

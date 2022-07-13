@@ -91,6 +91,7 @@ func (a *App) Start() error {
 
 	triggerReg := trigger.NewRegsitry(a.tracer)
 	triggerReg.Add(trigger.HTTP())
+	triggerReg.Add(trigger.GRPC())
 
 	subscriptionManager := subscription.NewManager()
 

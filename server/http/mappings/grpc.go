@@ -63,7 +63,6 @@ func (m Model) GRPCRequest(in openapi.GrpcRequest) *model.GRPCRequest {
 	return &model.GRPCRequest{
 		ProtobufFile: in.ProtobufFile,
 		Address:      in.Address,
-		Service:      in.Service,
 		Method:       in.Method,
 		Metadata:     m.GRPCHeaders(in.Metadata),
 		Auth:         m.Auth(in.Auth),

@@ -1,0 +1,44 @@
+id: d85c3336-5048-4652-b564-63dfe2c83b14
+name: Test Create with gRCP trigger
+description: ""
+trigger:
+  type: http
+  httpRequest:
+    url: ${TARGET_URL}/api/tests
+    method: POST
+    headers:
+    - key: Content-Type
+      value: application/json
+    body: |
+      {
+        "name": "gRPC pokemon lis",
+        "serviceUnderTest": {
+          "triggerType": "grpc",
+          "triggerSettings": {
+            "grpc": {
+              "addresss": "${DEMO_APP_GRPC_URL}",
+              "method": "GET",
+              "headers": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ]
+            }
+          }
+        }
+      }
+testDefinition:
+- selector: span[name="POST /api/tests" tracetest.span.type="http"]
+  assertions:
+  - tracetest.selected_spans.count = 1
+  - tracetest.response.status = 200
+- selector: span[name = "exec INSERT"]
+  assertions:
+  - tracetest.selected_spans.count = 2
+- selector: span[name = "exec INSERT"]:first
+  assertions:
+  - sql.query contains "INSERT INTO tests"
+- selector: span[name = "exec INSERT"]:last
+  assertions:
+  - sql.query contains "INSERT INTO definitions"
