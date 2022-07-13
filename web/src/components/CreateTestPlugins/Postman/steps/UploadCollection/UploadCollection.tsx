@@ -1,17 +1,21 @@
 import {Form} from 'antd';
 import * as Step from 'components/CreateTestPlugins/Step.styled';
 import CreateStepFooter from 'components/CreateTestSteps/CreateTestStepFooter';
+import {VariableDefinition} from 'postman-collection';
 import {useCreateTest} from 'providers/CreateTest/CreateTest.provider';
 import {useCallback, useEffect, useState} from 'react';
 import {HTTP_METHOD} from 'constants/Common.constants';
 import {THTTPRequest, TRequestAuth} from 'types/Test.types';
 import Validator from 'utils/Validator';
+import {RequestDefinitionExtended} from './hooks/getRequestsFromCollection';
 import UploadCollectionForm from './UploadCollectionForm';
 
 export interface IRequestDetailsValues {
   collectionFile?: File;
   envFile?: File;
   collectionTest?: string;
+  requests: RequestDefinitionExtended[];
+  variables: VariableDefinition[];
   body: string;
   auth: TRequestAuth;
   headers: THTTPRequest['headers'];
@@ -31,10 +35,9 @@ const UploadCollection = () => {
   }, [form]);
 
   const handleSubmit = useCallback(
-    ({collectionFile, envFile, collectionTest, ...values}: IRequestDetailsValues) => {
-      console.log(collectionFile);
-      console.log(envFile);
-      console.log(collectionTest);
+    ({collectionFile, envFile, collectionTest, requests, variables, ...values}: IRequestDetailsValues) => {
+      // eslint-disable-next-line no-console
+      console.log(collectionFile, envFile, collectionTest, requests, variables);
       onNext({serviceUnderTest: {triggerSettings: {http: values}}});
     },
     [onNext]

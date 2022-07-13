@@ -1,31 +1,27 @@
-import {UploadFile} from 'antd/es/upload/interface';
-import {Collection, VariableDefinition} from 'postman-collection';
-import {Dispatch, SetStateAction, useCallback} from 'react';
-import {getRequestsFromCollection, RequestDefinitionExtended} from './getRequestsFromCollection';
+import {FormInstance} from 'antd';
+import {RcFile} from 'antd/lib/upload';
+import {Collection} from 'postman-collection';
+import {useCallback} from 'react';
+import {IRequestDetailsValues} from '../UploadCollection';
+import {getRequestsFromCollection} from './getRequestsFromCollection';
 
-export function useUploadCollectionCallback(setState: Dispatch<SetStateAction<State>>): (file?: UploadFile) => void {
+export function useUploadCollectionCallback(form: FormInstance<IRequestDetailsValues>): (file?: RcFile) => void {
   return useCallback(
-    (file?: UploadFile) => {
-      console.log('here');
-      const readFile = new FileReader();
-      readFile.onload = (e: ProgressEvent<FileReader>) => {
-        const contents = e?.target?.result;
-        if (contents && typeof contents === 'string') {
-          try {
-            const collection = new Collection(JSON.parse(contents));
-            setState({variables: collection.variables.all(), requests: getRequestsFromCollection(collection)});
-          } catch (r) {
-            console.error('erro');
-          }
+    async (file?: RcFile) => {
+      const contents = await file?.text();
+      if (contents && typeof contents === 'string') {
+        try {
+          const collection = new Collection(JSON.parse(contents));
+          form.setFieldsValue({
+            variables: collection.variables.all(),
+            requests: getRequestsFromCollection(collection),
+          });
+        } catch (r) {
+          // eslint-disable-next-line no-console
+          console.error('error');
         }
-      };
-      readFile.readAsText(file as any);
+      }
     },
-    [setState]
+    [form]
   );
-}
-
-export interface State {
-  requests: RequestDefinitionExtended[];
-  variables: VariableDefinition[];
 }

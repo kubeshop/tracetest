@@ -1,14 +1,12 @@
 import {Col, Form, FormInstance, Input, Row} from 'antd';
 import useValidate from 'components/CreateTestPlugins/Postman/steps/UploadCollection/hooks/useValidate';
 import {IRequestDetailsValues} from 'components/CreateTestPlugins/Postman/steps/UploadCollection/UploadCollection';
-import React, {Dispatch, SetStateAction, useState} from 'react';
+import React, {Dispatch, SetStateAction} from 'react';
 import RequestDetailsAuthInput from '../../../Rest/steps/RequestDetails/RequestDetailsAuthInput/RequestDetailsAuthInput';
 import RequestDetailsHeadersInput from '../../../Rest/steps/RequestDetails/RequestDetailsHeadersInput';
 import RequestDetailsUrlInput from '../../../Rest/steps/RequestDetails/RequestDetailsUrlInput';
 import {CollectionFileField} from './fields/CollectionFileField';
 import {EnvFileField} from './fields/EnvFileField';
-import {useSelectTestCallback} from './hooks/useSelectTestCallback';
-import {State} from './hooks/useUploadCollectionCallback';
 import {SelectTestFromCollection} from './fields/SelectTestFromCollection';
 
 export const FORM_ID = 'upload-collection-test';
@@ -22,8 +20,6 @@ interface IProps {
 
 const UploadCollectionForm = ({form, onSubmit, onValidation, setTransientUrl}: IProps) => {
   const handleOnValuesChange = useValidate(onValidation, setTransientUrl);
-  const [state, setState] = useState<State>({requests: [], variables: []});
-
   return (
     <Form
       autoComplete="off"
@@ -35,12 +31,11 @@ const UploadCollectionForm = ({form, onSubmit, onValidation, setTransientUrl}: I
       onValuesChange={handleOnValuesChange}
     >
       <div style={{display: 'grid'}}>
-        <CollectionFileField setState={setState} />
-        <EnvFileField state={state} form={form} setState={setState} setTransientUrl={setTransientUrl} />
-        <SelectTestFromCollection
-          requests={state.requests}
-          onChange={useSelectTestCallback(state, form, setTransientUrl)}
-        />
+        <Form.Item name="requests" style={{display: 'none'}} />
+        <Form.Item name="variables" style={{display: 'none'}} />
+        <CollectionFileField form={form} />
+        <EnvFileField form={form} setTransientUrl={setTransientUrl} />
+        <SelectTestFromCollection form={form} setTransientUrl={setTransientUrl} />
         <Row gutter={12}>
           <Col span={12}>
             <RequestDetailsUrlInput />

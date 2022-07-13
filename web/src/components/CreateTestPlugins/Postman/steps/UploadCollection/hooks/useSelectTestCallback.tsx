@@ -1,14 +1,16 @@
 import {FormInstance} from 'antd';
-import {Dispatch, SetStateAction, useCallback} from 'react';
+import {VariableDefinition} from 'postman-collection';
+import {useCallback} from 'react';
 import {RecursivePartial} from 'utils/Common';
 import {HTTP_METHOD} from '../../../../../../constants/Common.constants';
 import {IRequestDetailsValues} from '../UploadCollection';
+import {RequestDefinitionExtended} from './getRequestsFromCollection';
 import {substituteVariable} from './substituteVariable';
 import {transformAuthSettings} from './transformAuthSettings';
-import {State} from './useUploadCollectionCallback';
 
 export function valuesFromRequest(
-  {requests, variables}: State,
+  requests: RequestDefinitionExtended[],
+  variables: VariableDefinition[],
   identifier: string
 ): undefined | RecursivePartial<IRequestDetailsValues> {
   const request = requests.find(({id}) => identifier === id);
@@ -30,12 +32,13 @@ export function valuesFromRequest(
 }
 
 export function updateForm(
-  state: State,
+  requests: RequestDefinitionExtended[],
+  variables: VariableDefinition[],
   identifier: string,
   form: FormInstance<IRequestDetailsValues>,
   setTransientUrl: (value: ((prevState: string) => string) | string) => void
 ): void {
-  const input = valuesFromRequest(state, identifier);
+  const input = valuesFromRequest(requests, variables, identifier);
   if (input) {
     form.setFieldsValue(input);
     if (input?.url) {
@@ -45,14 +48,15 @@ export function updateForm(
 }
 
 export function useSelectTestCallback(
-  state: State,
   form: FormInstance<IRequestDetailsValues>,
-  setTransientUrl: Dispatch<SetStateAction<string>>
+  setTransientUrl: React.Dispatch<React.SetStateAction<string>>,
+  requests: RequestDefinitionExtended[],
+  variables: VariableDefinition[]
 ) {
   return useCallback(
     (identifier: string) => {
-      updateForm(state, identifier, form, setTransientUrl);
+      updateForm(requests, variables, identifier, form, setTransientUrl);
     },
-    [state, form, setTransientUrl]
+    [form, setTransientUrl, requests, variables]
   );
 }

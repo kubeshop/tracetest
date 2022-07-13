@@ -1,28 +1,32 @@
-import {Form, Select} from 'antd';
-import React from 'react';
+import {Form, FormInstance, Select} from 'antd';
+import {useWatch} from 'antd/es/form/Form';
+import React, {Dispatch, SetStateAction} from 'react';
 import {RequestDefinitionExtended} from '../hooks/getRequestsFromCollection';
+import {useSelectTestCallback} from '../hooks/useSelectTestCallback';
+import {IRequestDetailsValues} from '../UploadCollection';
 
 interface IProps {
-  requests: RequestDefinitionExtended[];
-  onChange?: (value: string) => void;
+  form: FormInstance<IRequestDetailsValues>;
+  setTransientUrl: Dispatch<SetStateAction<string>>;
 }
 
-export const SelectTestFromCollection = ({onChange, requests}: IProps) => {
+export const SelectTestFromCollection = ({form, setTransientUrl}: IProps) => {
+  const requests = useWatch<RequestDefinitionExtended[]>('requests');
+  const variables = useWatch<any[]>('variables');
   return (
     <Form.Item
       rules={[{required: true, message: 'Please enter a request url'}]}
-      data-cy="collectionTest"
       name="collectionTest"
       label="Select test from Postman Collection"
     >
       <Select<string>
         style={{width: 490}}
-        data-cy="collection-test-select"
+        data-cy="collectionTest-select"
         placeholder="Select test from uploaded collection"
-        onChange={onChange}
+        onChange={useSelectTestCallback(form, setTransientUrl, requests, variables)}
       >
-        {requests.map(({id, name}) => (
-          <Select.Option data-cy={`postman-test-${id}`} key={id} value={id}>
+        {(requests || []).map(({id, name}, index) => (
+          <Select.Option data-cy={`collectionTest-${index}`} key={id} value={id}>
             {name}
           </Select.Option>
         ))}

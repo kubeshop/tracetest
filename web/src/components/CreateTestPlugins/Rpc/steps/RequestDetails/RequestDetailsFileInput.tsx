@@ -1,11 +1,12 @@
 import {UploadOutlined} from '@ant-design/icons';
 import {Upload} from 'antd';
 import type {UploadFile} from 'antd/es/upload/interface';
+import {RcFile} from 'antd/lib/upload';
 import {noop} from 'lodash';
 import * as S from './RequestDetails.styled';
 
 interface IProps {
-  onChange?(file?: UploadFile): void;
+  onChange?(file?: RcFile): void;
   value?: UploadFile;
   // accept values https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#accept
   accept?: string;

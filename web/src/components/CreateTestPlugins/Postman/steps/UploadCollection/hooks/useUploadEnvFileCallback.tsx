@@ -5,15 +5,13 @@ import {VariableScope} from 'postman-collection';
 import {Dispatch, SetStateAction, useCallback} from 'react';
 import {IRequestDetailsValues} from '../UploadCollection';
 import {updateForm} from './useSelectTestCallback';
-import {State} from './useUploadCollectionCallback';
 
 export function useUploadEnvFileCallback(
-  state: State,
   form: FormInstance<IRequestDetailsValues>,
-  setState: Dispatch<SetStateAction<State>>,
   setTransientUrl: Dispatch<SetStateAction<string>>
 ): (file?: UploadFile) => void {
-  const test = Form.useWatch('collectionTest');
+  const collectionTest = Form.useWatch('collectionTest');
+  const requests = Form.useWatch('requests');
   return useCallback(
     (file?: UploadFile) => {
       const readFile = new FileReader();
@@ -22,10 +20,9 @@ export function useUploadEnvFileCallback(
         if (contents && typeof contents === 'string') {
           try {
             const variables = new VariableScope(JSON.parse(contents))?.values?.map(d => d) || [];
-            const nextState = {requests: state.requests, variables};
-            await setState(nextState);
-            if (test) {
-              await updateForm(nextState, test, form, setTransientUrl);
+            form.setFieldsValue({requests, variables});
+            if (collectionTest) {
+              await updateForm(requests, variables, collectionTest, form, setTransientUrl);
             }
           } catch (r) {
             console.info('erro');
@@ -36,6 +33,6 @@ export function useUploadEnvFileCallback(
 
       readFile.readAsText(file as any);
     },
-    [form, setState, setTransientUrl, state, test]
+    [form, requests, collectionTest, setTransientUrl]
   );
 }
