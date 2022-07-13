@@ -89,3 +89,21 @@ The following command will uninstall Tracetest with Postgres:
 ```sh
 helm delete tracetest
 ```
+
+## CLI Instalation
+Every time we release a new version of Tracetest, we generate binaries for Linux, MacOS, and Windows. Supporting both amd64, and ARM64 architectures. You can find the latest version [here](https://github.com/kubeshop/tracetest/releases/latest).
+
+### Linux
+
+```sh
+curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/install-cli.sh | bash
+```
+
+### MacOS
+
+```sh
+curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/install-cli.sh | sh
+```
+
+### Windows
+Download one of the files from the latest tag, extract to your machine, and then [add the tracetest binary to your PATH variable](https://stackoverflow.com/a/41895179)
