@@ -29,7 +29,7 @@ export const BadgeContainer = styled.div`
   display: flex;
 `;
 
-export const BadgeType = styled(Badge)<{$type: SemanticGroupNames}>`
+export const BadgeType = styled(Badge)<{$hasMargin?: boolean; $type: SemanticGroupNames}>`
   &.ant-badge-not-a-wrapper:not(.ant-badge-status) {
     display: block;
     vertical-align: unset;
@@ -43,7 +43,7 @@ export const BadgeType = styled(Badge)<{$type: SemanticGroupNames}>`
     font-weight: 600;
     height: 12px;
     line-height: 12px;
-    margin-bottom: 4px;
+    margin-bottom: ${({$hasMargin}) => $hasMargin && '4px'};
     text-transform: uppercase;
   }
 `;

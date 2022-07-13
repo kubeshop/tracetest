@@ -1,24 +1,24 @@
 import styled from 'styled-components';
-import noResultsIcon from '../../assets/SpanAssertionsEmptyState.svg';
+import noResultsIcon from 'assets/SpanAssertionsEmptyState.svg';
 
-export const AssertionCardList = styled.div`
+export const Container = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
 `;
 
 export const EmptyStateContainer = styled.div`
-  display: flex;
-  justify-content: center;
   align-items: center;
-  margin-top: 40px;
+  display: flex;
   flex-direction: column;
   gap: 14px;
+  justify-content: center;
+  margin-top: 40px;
 `;
 
 export const EmptyStateIcon = styled.img.attrs({
   src: noResultsIcon,
 })`
-  width: 90px;
   height: auto;
+  width: 90px;
 `;

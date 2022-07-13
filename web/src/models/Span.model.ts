@@ -1,4 +1,8 @@
-import {SemanticGroupNames, SemanticGroupsSignature} from 'constants/SemanticGroupNames.constants';
+import {
+  SemanticGroupNames,
+  SemanticGroupNamesToSystem,
+  SemanticGroupsSignature,
+} from 'constants/SemanticGroupNames.constants';
 import {Attributes} from 'constants/SpanAttribute.constants';
 import {SpanKind} from 'constants/Span.constants';
 import {TRawSpan, TSpan, TSpanFlatAttribute} from 'types/Span.types';
@@ -47,6 +51,8 @@ const Span = ({id = '', attributes = {}, startTime = 0, endTime = 0, parentId = 
     SemanticGroupNamesList.find(
       semanticGroupName => semanticGroupName === attributes[Attributes.TRACETEST_SPAN_TYPE]
     ) || SemanticGroupNames.General;
+  const service = attributes?.[Attributes.SERVICE_NAME] ?? '';
+  const system = attributes?.[SemanticGroupNamesToSystem[type]] ?? '';
 
   return {
     id,
@@ -60,6 +66,8 @@ const Span = ({id = '', attributes = {}, startTime = 0, endTime = 0, parentId = 
     type,
     duration,
     signature: getSpanSignature(attributesMap, type),
+    service,
+    system,
   };
 };
 

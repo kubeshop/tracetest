@@ -14,6 +14,7 @@ module.exports = {
               '@heading-color': '#031849',
               '@text-color': '#031849',
               '@text-color-secondary': '#687492',
+              '@border-color-base': '#CDD1DB',
               /** Tooltip */
               '@tooltip-color': '#031849',
               '@tooltip-bg': '#FBFBFF',

@@ -20,6 +20,8 @@ export type TSpan = Model<
     attributeList: TSpanFlatAttribute[];
     children?: TSpan[];
     kind: SpanKind;
+    service: string;
+    system: string;
   }
 >;
 

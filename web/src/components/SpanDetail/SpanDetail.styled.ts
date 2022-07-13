@@ -1,29 +1,44 @@
 import {Typography} from 'antd';
 import styled from 'styled-components';
 
-export const SpanHeader = styled.div`
-  width: 100%;
-  align-items: center;
-  margin-bottom: 24px;
+export const Header = styled.div`
+  margin-bottom: 8px;
 `;
 
-export const SpanHeaderTitle = styled(Typography.Title).attrs({level: 2})`
+export const HeaderItem = styled.div`
+  align-items: center;
+  color: ${({theme}) => theme.color.text};
+  display: flex;
+  font-size: ${({theme}) => theme.size.sm};
+`;
+
+export const HeaderItemText = styled(Typography.Text)`
+  color: inherit;
+  margin-left: 5px;
+`;
+
+export const HeaderTitle = styled(Typography.Title)`
   && {
-    margin-bottom: 5px;
+    margin: 0 0 0 8px;
   }
 `;
 
+export const Row = styled.div`
+  align-items: center;
+  display: flex;
+`;
+
 export const SpanDetail = styled.div`
-  padding: 24px;
   display: flex;
   flex-direction: column;
+  padding: 24px;
 `;
 
 export const Dot = styled.div`
-  height: 10px;
-  width: 10px;
-  margin-left: 5px;
   background-color: ${({theme}) => theme.color.textHighlight};
   border-radius: 50%;
   display: inline-block;
+  height: 10px;
+  margin-left: 5px;
+  width: 10px;
 `;
