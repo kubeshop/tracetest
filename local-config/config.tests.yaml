@@ -15,11 +15,7 @@ googleAnalytics:
   enabled: false
 
 telemetry:
+  enabled: true
   serviceName: tracetest
   sampling: 100 # 100%
-  jaeger:
-    host: jaeger
-    port: 6831
-  exporters:
-    - console
-    - jaeger
+  otelCollectorEndpoint: otel-collector:4317
