@@ -16,7 +16,7 @@ fi
 export TRACETEST_MAIN_ENDPOINT=${TRACETEST_MAIN_ENDPOINT:-"localhost:8080"}
 export TRACETEST_TARGET_ENDPOINT=${TRACETEST_TARGET_ENDPOINT:-"localhost:8081"}
 export DEMO_APP_URL=${DEMO_APP_URL-"http://demo-pokemon-api.demo.svc.cluster.local"}
-export DEMO_APP_GRPC_URL=${DEMO_APP_URL-"http://demo-pokemon-api.demo.svc.cluster.local:8082"}
+export DEMO_APP_GRPC_URL=${DEMO_APP_GRPC_URL-"demo-pokemon-api.demo.svc.cluster.local:8082"}
 
 
 echo "TRACETEST_CLI: $TRACETEST_CLI"
@@ -43,5 +43,6 @@ mkdir -p results/responses
 
 EXIT_STATUS=0
 bash ./tests.bash || EXIT_STATUS=$?
+bash ./grpc.bash || EXIT_STATUS=$?
 
 exit $EXIT_STATUS
