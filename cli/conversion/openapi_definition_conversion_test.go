@@ -14,6 +14,10 @@ func openApiInt(in int32) *int32 {
 	return &in
 }
 
+func openAPIStr(in string) *string {
+	return &in
+}
+
 func TestOpenAPIToDefinitionConversion(t *testing.T) {
 	testCases := []struct {
 		Name           string

@@ -17,14 +17,38 @@ type Assertion struct {
 type assertionParserObject struct {
 	Attribute string `@Attribute`
 	Operator  string `@Operator`
-	Value     string `@(Number|QuotedString|SingleQuotedString)`
+	Value     Expr   `@@`
+}
+
+type Expr struct {
+	Exp1     *ExprLiteral `@@`
+	Operator string       `@(ExprOp)?`
+	Exp2     *Expr        `@@?`
+}
+
+type ExprLiteral struct {
+	Literal string `@(Attribute|Duration|Number|QuotedString|SingleQuotedString)`
+}
+
+func (e Expr) String() string {
+	if e.Operator == "" {
+		return e.Exp1.Literal
+	}
+
+	if e.Exp2 == nil {
+		return e.Exp1.Literal
+	}
+
+	return fmt.Sprintf("%s %s %s", e.Exp1.Literal, e.Operator, e.Exp2.String())
 }
 
 var languageLexer = lexer.MustStateful(lexer.Rules{
 	"Root": {
-		{Name: "Operator", Pattern: `!=|<=|>=|=|<|>|contains`},
-		{Name: "Attribute", Pattern: `[a-zA-Z_][a-zA-Z0-9_\.]*`},
 		{Name: "whitespace", Pattern: `\s+`, Action: nil},
+		{Name: "Operator", Pattern: `!=|<=|>=|=|<|>|contains`},
+		{Name: "ExprOp", Pattern: `[\\+|-|\\*|/]`, Action: nil},
+		{Name: "Attribute", Pattern: `[a-zA-Z_][a-zA-Z0-9_\.]*`},
+		{Name: "Duration", Pattern: `([0-9]+(\.[0-9]+)?)(ns|us|ms|s|m|h)`},
 		{Name: "Number", Pattern: `([0-9]+(\.[0-9]+)?)`},
 		{Name: "QuotedString", Pattern: `".*`, Action: lexer.Push("QuotedString")},
 		{Name: "SingleQuotedString", Pattern: `'.*`, Action: lexer.Push("SingleQuotedString")},
@@ -72,7 +96,7 @@ func ParseAssertion(assertionQuery string) (Assertion, error) {
 		return Assertion{}, fmt.Errorf("could not parse assertion (%s): %w", assertionQuery, err)
 	}
 
-	value := unquote(assertionParserObject.Value)
+	value := unquote(assertionParserObject.Value.String())
 
 	assertion := Assertion{
 		Attribute: assertionParserObject.Attribute,

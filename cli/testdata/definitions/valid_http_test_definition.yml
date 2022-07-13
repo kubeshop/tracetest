@@ -9,6 +9,11 @@ trigger:
     - key: Content-Type
       value: application/json
     body: '{ "id": 52 }'
+  grpc:
+    protobuf_file: ""
+    address: ""
+    service: ""
+    method: ""
 testDefinition:
 - selector: span[name = "POST /pokemon/import"]
   assertions:

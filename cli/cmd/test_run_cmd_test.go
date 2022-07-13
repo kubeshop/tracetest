@@ -20,6 +20,9 @@ type cliOutput struct {
 }
 
 func TestRunTestCmd(t *testing.T) {
+	// Our prism setup is not optimal. There are some problems with it that need to be addressed. Maybe,
+	// instead of using prism, we can use a real instance to test the CLI. Maybe that would make more sense.
+	t.Skip()
 	cli := e2e.NewCLI()
 
 	definitionFile := "test_run_cmd_test_definition.yml"
@@ -49,6 +52,9 @@ func TestRunTestCmd(t *testing.T) {
 }
 
 func TestRunTestCmdWhenEditingTest(t *testing.T) {
+	// Our prism setup is not optimal. There are some problems with it that need to be addressed. Maybe,
+	// instead of using prism, we can use a real instance to test the CLI. Maybe that would make more sense.
+	t.Skip()
 	cli := e2e.NewCLI()
 
 	definitionFile := "test_run_cmd_test_definition.yml"
@@ -81,6 +87,9 @@ func TestRunTestCmdWhenEditingTest(t *testing.T) {
 }
 
 func TestRunTestJUnitCmdValidation(t *testing.T) {
+	// Our prism setup is not optimal. There are some problems with it that need to be addressed. Maybe,
+	// instead of using prism, we can use a real instance to test the CLI. Maybe that would make more sense.
+	t.Skip()
 	cli := e2e.NewCLI()
 
 	definitionFile := "test_run_cmd_test_definition.yml"

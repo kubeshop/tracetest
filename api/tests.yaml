@@ -248,3 +248,9 @@ components:
           $ref: "#/components/schemas/Test"
         run:
           $ref: "#/components/schemas/TestRun"
+
+    TextDefinition:
+      type: object
+      properties:
+        content:
+          type: string
