@@ -37,6 +37,11 @@ func (t *instrumentedTriggerer) Trigger(ctx context.Context, test model.Test, ti
 		attribute.String("tracetest.run.trigger.type", string(t.triggerer.Type())),
 	}
 
+	if err != nil {
+		span.RecordError(err)
+		attrs = append(attrs, attribute.String("tracetest.run.trigger.error", err.Error()))
+	}
+
 	for k, v := range resp.SpanAttributes {
 		attrs = append(attrs, attribute.String(k, v))
 	}

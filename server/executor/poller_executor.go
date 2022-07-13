@@ -34,19 +34,20 @@ func (pe InstrumentedPollerExecutor) ExecuteRequest(request *PollingRequest) (bo
 		spanCount = len(run.Trace.Flat)
 	}
 
-	span.SetAttributes(
+	attrs := []attribute.KeyValue{
 		attribute.String("tracetest.run.trace_poller.trace_id", request.run.TraceID.String()),
 		attribute.String("tracetest.run.trace_poller.span_id", request.run.SpanID.String()),
 		attribute.Bool("tracetest.run.trace_poller.succesful", finished),
 		attribute.String("tracetest.run.trace_poller.test_id", request.test.ID.String()),
 		attribute.Int("tracetest.run.trace_poller.amount_retrieved_spans", spanCount),
-	)
-
-	if err != nil {
-		span.RecordError(err)
-		return finished, run, err
 	}
 
+	if err != nil {
+		attrs = append(attrs, attribute.String("tracetest.run.trace_poller.error", err.Error()))
+		span.RecordError(err)
+	}
+
+	span.SetAttributes(attrs...)
 	return finished, run, err
 }
 
