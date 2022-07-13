@@ -59,8 +59,8 @@ download_file() {
 install_cli() {
     compressed_file_path=$1
 
-    tar -xvf $compressed_file_path
-    sudo cp tracetest /usr/local/bin/tracetest
+    tar -xvf $compressed_file_path -C /tmp
+    sudo mv /tmp/tracetest /usr/local/bin/tracetest
 }
 
 run() {
