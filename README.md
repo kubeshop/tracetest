@@ -43,8 +43,8 @@ Tracetest is a trace-based testing tool that leverages the data contained in you
 - Enables white box testing in which internal structure, design and coding of software are tested to verify flow of input-output and to improve design, usability and security.
 - Specify which spans to check in assertions via the [advanced selector language](https://kubeshop.github.io/tracetest/advanced-selectors/).
 - Define checks against the attributes in these spans, including properties, return status, or timing.
-- Tests can be created via graphical UI or via [Yaml-based test definition file](https://kubeshop.github.io/tracetest/test-definition-file/).
-- Use the test definition file to [enable Gitops flows](https://kubeshop.io/blog/integrating-tracetest-with-github-actions-in-a-ci-pipelinehttps://kubeshop.io/blog/integrating-tracetest-with-github-actions-in-a-ci-pipeline).
+- Tests can be created via graphical UI or via [YAML-based test definition file](https://kubeshop.github.io/tracetest/test-definition-file/).
+- Use the test definition file to [enable Gitops flows](https://kubeshop.io/blog/integrating-tracetest-with-github-actions-in-a-ci-pipeline).
 - [Tracetest CLI](https://kubeshop.github.io/tracetest/command-line-tool/) allows importing & exporting tests, running tests, and more.
 - Tests are [versioned](https://kubeshop.github.io/tracetest/versioning/) as the definition of the test is altered.
 - Supports [numerous backend trace datastores](https://kubeshop.github.io/tracetest/architecture/), including Jeager and Grafana Tempo. Tell us which others you want!
@@ -67,6 +67,36 @@ Once the test is built, it can be run automatically as part of a build process. 
 The [install](https://kubeshop.github.io/tracetest/installing/) only takes a few minutes, and is done with via a Helm command. After installing, take a look at the
 [Getting Started](https://kubeshop.github.io/tracetest/getting-started/) guides to set up Tracetest and
 run your first test.
+
+# What does the test definition file look like?
+
+The Tracetest [test definition files](https://kubeshop.github.io/tracetest/test-definition-file/) are written in a simple YAML format. You can write them directly or build them graphically via the UI. Here is an example of a test which:
+
+- executes POST against the pokemon/import endpoint
+- verifies that the HTTP blocks return a 200 status code
+- verifies all database calls execute in less than 200ms
+
+```
+description: ""
+id: 5dd03dda-fad2-49f0-b9d9-5143b746c1d0
+name: DEMO Pokemon - Import - Import a Pokemon
+testDefinition:
+    - assertions:
+        - http.status_code = 200
+      selector: span[tracetest.span.type = "http"]
+    - assertions:
+        - tracetest.span.duration < "50ms"
+      selector: span[tracetest.span.type = "database"]
+trigger:
+    httpRequest:
+        body: '{"id":52}'
+        headers:
+            - key: Content-Type
+              value: application/json
+        method: POST
+        url: http://demo-pokemon-api.demo.svc.cluster.local/pokemon/import
+    type: http
+```
 
 # Feedback
 
