@@ -1,11 +1,11 @@
 import {Form, FormInstance} from 'antd';
+import RequestDetailsFileInput from 'components/CreateTestPlugins/Rpc/steps/RequestDetails/RequestDetailsFileInput';
 import React from 'react';
-import RequestDetailsFileInput from '../../../../Rpc/steps/RequestDetails/RequestDetailsFileInput';
 import {useUploadCollectionCallback} from '../hooks/useUploadCollectionCallback';
-import {IRequestDetailsValues} from '../UploadCollection';
+import {IUploadCollectionValues} from '../UploadCollection';
 
 interface IProps {
-  form: FormInstance<IRequestDetailsValues>;
+  form: FormInstance<IUploadCollectionValues>;
 }
 
 export const CollectionFileField = ({form}: IProps): React.ReactElement => (

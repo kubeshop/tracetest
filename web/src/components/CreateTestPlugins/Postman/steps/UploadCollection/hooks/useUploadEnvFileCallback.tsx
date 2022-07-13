@@ -3,10 +3,10 @@ import {RcFile} from 'antd/lib/upload';
 import {VariableScope} from 'postman-collection';
 import {Dispatch, SetStateAction, useCallback} from 'react';
 import PostmanService from 'services/PostmanService.service';
-import {IRequestDetailsValues} from '../UploadCollection';
+import {IUploadCollectionValues} from '../UploadCollection';
 
 export function useUploadEnvFileCallback(
-  form: FormInstance<IRequestDetailsValues>,
+  form: FormInstance<IUploadCollectionValues>,
   setTransientUrl: Dispatch<SetStateAction<string>>
 ): (file?: RcFile) => Promise<void> {
   const collectionTest = Form.useWatch('collectionTest');

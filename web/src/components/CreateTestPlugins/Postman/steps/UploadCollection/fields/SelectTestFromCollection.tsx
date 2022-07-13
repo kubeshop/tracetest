@@ -3,10 +3,10 @@ import {useWatch} from 'antd/es/form/Form';
 import React, {Dispatch, SetStateAction} from 'react';
 import {RequestDefinitionExtended} from 'services/PostmanService.service';
 import {useSelectTestCallback} from '../hooks/useSelectTestCallback';
-import {IRequestDetailsValues} from '../UploadCollection';
+import {IUploadCollectionValues} from '../UploadCollection';
 
 interface IProps {
-  form: FormInstance<IRequestDetailsValues>;
+  form: FormInstance<IUploadCollectionValues>;
   setTransientUrl: Dispatch<SetStateAction<string>>;
 }
 

@@ -1,6 +1,6 @@
 import {Col, Form, FormInstance, Input, Row} from 'antd';
 import useValidate from 'components/CreateTestPlugins/Postman/steps/UploadCollection/hooks/useValidate';
-import {IRequestDetailsValues} from 'components/CreateTestPlugins/Postman/steps/UploadCollection/UploadCollection';
+import {IUploadCollectionValues} from 'components/CreateTestPlugins/Postman/steps/UploadCollection/UploadCollection';
 import React, {Dispatch, SetStateAction} from 'react';
 import RequestDetailsAuthInput from '../../../Rest/steps/RequestDetails/RequestDetailsAuthInput/RequestDetailsAuthInput';
 import RequestDetailsHeadersInput from '../../../Rest/steps/RequestDetails/RequestDetailsHeadersInput';
@@ -12,9 +12,9 @@ import {SelectTestFromCollection} from './fields/SelectTestFromCollection';
 export const FORM_ID = 'upload-collection-test';
 
 interface IProps {
-  form: FormInstance<IRequestDetailsValues>;
+  form: FormInstance<IUploadCollectionValues>;
   setTransientUrl: Dispatch<SetStateAction<string>>;
-  onSubmit(values: IRequestDetailsValues): void;
+  onSubmit(values: IUploadCollectionValues): void;
   onValidation(isValid: boolean): void;
 }
 

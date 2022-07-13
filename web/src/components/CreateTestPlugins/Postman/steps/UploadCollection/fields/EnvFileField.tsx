@@ -2,10 +2,10 @@ import {Form, FormInstance} from 'antd';
 import React, {Dispatch, SetStateAction} from 'react';
 import RequestDetailsFileInput from '../../../../Rpc/steps/RequestDetails/RequestDetailsFileInput';
 import {useUploadEnvFileCallback} from '../hooks/useUploadEnvFileCallback';
-import {IRequestDetailsValues} from '../UploadCollection';
+import {IUploadCollectionValues} from '../UploadCollection';
 
 interface IProps {
-  form: FormInstance<IRequestDetailsValues>;
+  form: FormInstance<IUploadCollectionValues>;
   setTransientUrl: Dispatch<SetStateAction<string>>;
 }
 

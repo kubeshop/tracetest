@@ -1,6 +1,6 @@
 import {FormInstance} from 'antd';
 import {Collection, Item, ItemGroup, Request, RequestAuthDefinition, VariableDefinition} from 'postman-collection';
-import {IRequestDetailsValues} from '../components/CreateTestPlugins/Postman/steps/UploadCollection/UploadCollection';
+import {IUploadCollectionValues} from '../components/CreateTestPlugins/Postman/steps/UploadCollection/UploadCollection';
 import {HTTP_METHOD} from '../constants/Common.constants';
 import {TRequestAuth} from '../types/Test.types';
 import {RecursivePartial} from '../utils/Common';
@@ -17,7 +17,7 @@ const Postman = () => ({
     requests: RequestDefinitionExtended[],
     variables: VariableDefinition[],
     identifier: string
-  ): undefined | RecursivePartial<IRequestDetailsValues> {
+  ): undefined | RecursivePartial<IUploadCollectionValues> {
     const request = requests.find(({id}) => identifier === id);
     if (request) {
       const url = request?.url.toString();
@@ -39,7 +39,7 @@ const Postman = () => ({
     requests: RequestDefinitionExtended[],
     variables: VariableDefinition[],
     identifier: string,
-    form: FormInstance<IRequestDetailsValues>,
+    form: FormInstance<IUploadCollectionValues>,
     setTransientUrl: (value: ((prevState: string) => string) | string) => void
   ): void {
     const input = this.valuesFromRequest(requests, variables, identifier);

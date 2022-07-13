@@ -2,10 +2,10 @@ import {FormInstance} from 'antd';
 import {VariableDefinition} from 'postman-collection';
 import {useCallback} from 'react';
 import PostmanServiceService, {RequestDefinitionExtended} from 'services/PostmanService.service';
-import {IRequestDetailsValues} from '../UploadCollection';
+import {IUploadCollectionValues} from '../UploadCollection';
 
 export function useSelectTestCallback(
-  form: FormInstance<IRequestDetailsValues>,
+  form: FormInstance<IUploadCollectionValues>,
   setTransientUrl: React.Dispatch<React.SetStateAction<string>>,
   requests: RequestDefinitionExtended[],
   variables: VariableDefinition[]

@@ -3,9 +3,9 @@ import {RcFile} from 'antd/lib/upload';
 import {Collection} from 'postman-collection';
 import {useCallback} from 'react';
 import PostmanService from '../../../../../../services/PostmanService.service';
-import {IRequestDetailsValues} from '../UploadCollection';
+import {IUploadCollectionValues} from '../UploadCollection';
 
-export function useUploadCollectionCallback(form: FormInstance<IRequestDetailsValues>): (file?: RcFile) => void {
+export function useUploadCollectionCallback(form: FormInstance<IUploadCollectionValues>): (file?: RcFile) => void {
   return useCallback(
     async (file?: RcFile) => {
       try {
