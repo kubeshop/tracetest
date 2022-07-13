@@ -32,34 +32,45 @@
   </a>
 </p>
 
-# Overview
+# Tracetest
 
-Testing and debugging software built on microservices architectures is not an easy task. Multiple services, teams, programming languages, and technologies are involved. We want to help you write tests across all this complexity by leveraging your existing investment in OpenTelemetry tracing.
+Tracetest is a trace-based testing tool that leverages the data contained in your distributed traces to empower easy to create, yet super powerful integration tests. You can verify activity deep inside your system, even events that occur on 'the other side' of an async message queue. Verifying timing of different steps in your process via an automated test is also a valuable use case.
 
-Tracetest makes it easy:
+# Features
 
-1. Pick an API to test.
+- Test by executing a REST or gRPC call to trigger the test. Can also import your Postman Collections.
+- [Add assertions](https://kubeshop.github.io/tracetest/adding-assertions/) based on return data from trigger call and/or data contained in the spans in your distributed trace.
+- Enables white box testing in which internal structure, design and coding of software are tested to verify flow of input-output and to improve design, usability and security.
+- Specify which spans to check in assertions via the [advanced selector language](https://kubeshop.github.io/tracetest/advanced-selectors/).
+- Define checks against the attributes in these spans, including properties, return status, or timing.
+- Tests can be created via graphical UI or via [Yaml-based test definition file](https://kubeshop.github.io/tracetest/test-definition-file/).
+- Use the test definition file to [enables Gitops flows](https://kubeshop.io/blog/integrating-tracetest-with-github-actions-in-a-ci-pipelinehttps://kubeshop.io/blog/integrating-tracetest-with-github-actions-in-a-ci-pipeline).
+- [Tracetest CLI](https://kubeshop.github.io/tracetest/command-line-tool/) allows importing & exporting tests, running tests, and more.
+- Tests are [versioned](https://kubeshop.github.io/tracetest/versioning/) as the definition of the test is altered.
+- Supports [numerous backend trace datastores](https://kubeshop.github.io/tracetest/architecture/), including Jeager and Grafana Tempo. Tell us which others you want!
+- Easy [install via Helm command](https://kubeshop.github.io/tracetest/installing/).
+- Install can include [an example microservice](https://kubeshop.github.io/tracetest/pokeshop/) that is instrumented with OpenTelemetry to use as an example application under test.
+
+# How does Tracetest work?
+
+1. Pick an endpoint to test.
 2. Run a test, and get the trace.
 3. The trace is the blueprint of your system under test. It shows all the steps the system has taken to execute the request.
 4. Use this blueprint to define assertions through Tracetest UI.
 5. Add assertions on different services, checking return statuses, data, or even execution times of a system.
 6. Run the tests.
 
-![Assertions](/assets/assertions.png)
-
 Once the test is built, it can be run automatically as part of a build process. Every test has a trace attached, allowing you to immediately see what worked, and what did not, reducing the need to reproduce the problem to see the underlying issue.
-
-# Creating a Trace Based Test
-
-<div style="text-align:center;"><img src="/assets/creatingatestdiagram.gif"></div>
 
 # Getting Started
 
-Check out the [Installation](https://kubeshop.github.io/tracetest/installing/) and
+The [install](https://kubeshop.github.io/tracetest/installing/) only takes a few minutes, and is done with via a Helm command. After installing, take a look at the
 [Getting Started](https://kubeshop.github.io/tracetest/getting-started/) guides to set up Tracetest and
-run your first tests! It is still a 'work in progress' so please provide us with any and all [feedback](https://github.com/kubeshop/tracetest/issues/new/choose) - we live for input and will respond!
+run your first test.
 
-We are in the our early days with the project and need your help. Have an idea to improve it? Please Create an issue here or join our community on [Discord](https://discord.gg/eBvEQRVyKX).
+# Feedback
+
+We are in the our early days with the project and need your help. Have an idea to improve it? Please [Create an issue here](https://github.com/kubeshop/tracetest/issues/new/choose) or join our community on [Discord](https://discord.gg/eBvEQRVyKX).
 
 Follow us on [Twitter at @tracetest_io](https://twitter.com/tracetest_io) for updates
 
@@ -68,3 +79,7 @@ Give us a star on Github if you're interested in the project!
 # Documentation
 
 Is available at [https://kubeshop.github.io/tracetest](https://kubeshop.github.io/tracetest)
+
+# License
+
+[MIT License](/LICENSE)
