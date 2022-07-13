@@ -25,6 +25,7 @@ func (a GRPCRequest) Authenticate() {
 }
 
 type GRPCResponse struct {
+	Status     string
 	StatusCode int
 	Metadata   []GRPCHeader
 	Body       string

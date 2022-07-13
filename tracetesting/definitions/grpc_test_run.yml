@@ -18,7 +18,8 @@ testDefinition:
   - tracetest.selected_spans.count = 1
   - tracetest.run.trigger.test_id = "${TEST_ID}"
   - tracetest.run.trigger.type = "grpc"
-  - tracetest.run.trigger.grpc.response_code = 0
+  - tracetest.run.trigger.grpc.response_status_code = 0
+  - tracetest.run.trigger.grpc.response_status = "OK"
 - selector: span[name = "Fetch trace"]
   assertions:
   - tracetest.selected_spans.count > 0

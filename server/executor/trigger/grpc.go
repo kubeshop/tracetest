@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/fullstorydev/grpcurl"
@@ -12,9 +13,11 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/kubeshop/tracetest/server/model"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
@@ -57,9 +60,6 @@ func (te *grpcTriggerer) Trigger(_ context.Context, test model.Test, tid trace.T
 	ctx := trace.ContextWithSpanContext(context.Background(), sc)
 
 	tReq := trigger.GRPC
-	fmt.Printf("**** grpc %+v\n", tReq)
-
-	body := strings.NewReader(tReq.Request)
 
 	conn, err := dial(ctx, tReq.Address)
 	if err != nil {
@@ -77,7 +77,7 @@ func (te *grpcTriggerer) Trigger(_ context.Context, test model.Test, tid trace.T
 		AllowUnknownFields:    true,
 	}
 
-	rf, _, err := grpcurl.RequestParserAndFormatter(grpcurl.FormatJSON, desc, body, options)
+	rf, _, err := grpcurl.RequestParserAndFormatter(grpcurl.FormatJSON, desc, strings.NewReader(tReq.Request), options)
 	if err != nil {
 		return response, fmt.Errorf("failed to construct request parser and formatter for %q", err)
 	}
@@ -98,11 +98,17 @@ func (te *grpcTriggerer) Trigger(_ context.Context, test model.Test, tid trace.T
 		return response, err
 	}
 
-	// mapped := mapResp(resp)
-	// response.Result.GRPC = &mapped
-	// response.SpanAttributes = map[string]string{
-	// 	"tracetest.run.trigger.grpc.response_status": strconv.Itoa(resp.StatusCode),
-	// }
+	response.Result.GRPC = &model.GRPCResponse{
+		Metadata:   mapHeaders(h.respMD),
+		StatusCode: int(h.respCode),
+		Status:     h.respCode.String(),
+		Body:       h.respBody,
+	}
+
+	response.SpanAttributes = map[string]string{
+		"tracetest.run.trigger.grpc.response_status_code": strconv.Itoa(int(h.respCode)),
+		"tracetest.run.trigger.grpc.response_status":      h.respCode.String(),
+	}
 
 	return response, nil
 }
@@ -135,54 +141,46 @@ func protoDescription(content string) (grpcurl.DescriptorSource, error) {
 
 }
 
-// func mapResp(resp *grpc.Response) model.GRPCResponse {
-// 	var mappedHeaders []model.GRPCHeader
-// 	for key, headers := range resp.Header {
-// 		for _, val := range headers {
-// 			val := model.GRPCHeader{
-// 				Key:   key,
-// 				Value: val,
-// 			}
-// 			mappedHeaders = append(mappedHeaders, val)
-// 		}
-// 	}
-// 	var body string
-// 	if b, err := io.ReadAll(resp.Body); err == nil {
-// 		body = string(b)
-// 	} else {
-// 		fmt.Println(err)
-// 	}
+func mapHeaders(md metadata.MD) []model.GRPCHeader {
+	var mappedHeaders []model.GRPCHeader
+	for key, headers := range md {
+		for _, val := range headers {
+			val := model.GRPCHeader{
+				Key:   key,
+				Value: val,
+			}
+			mappedHeaders = append(mappedHeaders, val)
+		}
+	}
 
-// 	return model.GRPCResponse{
-// 		// Status:     resp.Status,
-// 		StatusCode: resp.StatusCode,
-// 		// Headers:    mappedHeaders,
-// 		Body: body,
-// 	}
-// }
+	return mappedHeaders
+}
 
 func dial(ctx context.Context, address string) (*grpc.ClientConn, error) {
 	var creds credentials.TransportCredentials
 	network := "tcp"
 
-	return grpcurl.BlockingDial(ctx, network, address, creds)
+	return grpcurl.BlockingDial(
+		ctx, network, address, creds,
+		grpc.WithUnaryInterceptor(otelgrpc.UnaryClientInterceptor()),
+	)
 }
 
 var _ grpcurl.InvocationEventHandler = (*eventHandler)(nil)
 
 type eventHandler struct {
 	marshaller jsonpb.Marshaler
+	respBody   string
+	respCode   codes.Code
+	respMD     metadata.MD
 }
 
-func (h *eventHandler) OnResolveMethod(md *desc.MethodDescriptor) {
-}
+func (h *eventHandler) OnResolveMethod(md *desc.MethodDescriptor) {}
 
-func (h *eventHandler) OnSendHeaders(md metadata.MD) {
-
-}
+func (h *eventHandler) OnSendHeaders(md metadata.MD) {}
 
 func (h *eventHandler) OnReceiveHeaders(md metadata.MD) {
-
+	h.respMD = md
 }
 
 func (h *eventHandler) OnReceiveResponse(resp proto.Message) {
@@ -191,9 +189,9 @@ func (h *eventHandler) OnReceiveResponse(resp proto.Message) {
 		panic(err)
 	}
 
-	fmt.Println(j)
+	h.respBody = j
 }
 
 func (h *eventHandler) OnReceiveTrailers(stat *status.Status, md metadata.MD) {
-
+	h.respCode = stat.Code()
 }
