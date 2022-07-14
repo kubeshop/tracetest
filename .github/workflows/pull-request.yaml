@@ -118,6 +118,7 @@ jobs:
         cache-to: type=local,dest=/tmp/.buildx-cache-new
         build-args: |
           VERSION=pr-${{ github.event.pull_request.number }}
+          ENV=pr
     - name: Update docker cache
       run: |
         rm -rf /tmp/.buildx-cache
