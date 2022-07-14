@@ -1,4 +1,4 @@
-import {openCreateTestModal} from '../utils/Common';
+import {navigateToTestCreationPage} from '../utils/Common';
 import {createTestWithAuth} from './createTestWithAuth';
 
 describe('Create test with authentication', () => {
@@ -7,7 +7,7 @@ describe('Create test with authentication', () => {
   });
 
   it('should create a basic GET test with api key authentication method', () => {
-    const $form = openCreateTestModal();
+    const $form = navigateToTestCreationPage();
     $form.get('[data-cy=create-test-next-button]').click();
 
     createTestWithAuth($form, 'apiKey', ['key', 'value'], () => {
@@ -17,14 +17,14 @@ describe('Create test with authentication', () => {
   });
 
   it('should create a basic GET test with basic authentication method', () => {
-    const $form = openCreateTestModal();
+    const $form = navigateToTestCreationPage();
     $form.get('[data-cy=create-test-next-button]').click();
 
     createTestWithAuth($form, 'basic', ['username', 'password']);
   });
 
   it('should create a basic GET test with bearer authentication method', () => {
-    const $form = openCreateTestModal();
+    const $form = navigateToTestCreationPage();
     $form.get('[data-cy=create-test-next-button]').click();
 
     createTestWithAuth($form, 'bearer', ['token']);
