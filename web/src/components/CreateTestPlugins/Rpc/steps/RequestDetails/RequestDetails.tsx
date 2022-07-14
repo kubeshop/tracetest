@@ -11,9 +11,9 @@ const RequestDetails = () => {
   const [form] = Form.useForm<IRpcValues>();
   const {
     onNext,
-    plugin: {type},
+    pluginName,
   } = useCreateTest();
-  const {isValid, onValidate} = useValidateTestDraft({type});
+  const {isValid, onValidate} = useValidateTestDraft({pluginName});
 
   const handleNext = useCallback(() => {
     form.submit();

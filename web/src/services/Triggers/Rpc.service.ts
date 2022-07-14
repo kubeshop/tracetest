@@ -1,5 +1,5 @@
 import {parse, NamespaceBase, Service} from 'protobufjs';
-import {IRpcValues, ITriggerService, TDraftTest, TRawGRPCRequest} from 'types/Test.types';
+import {IRpcValues, ITriggerService} from 'types/Test.types';
 import Validator from 'utils/Validator';
 
 interface IRpcTriggerService extends ITriggerService {
@@ -7,7 +7,7 @@ interface IRpcTriggerService extends ITriggerService {
 }
 
 const RpcTriggerService = (): IRpcTriggerService => ({
-  getMethodList(protoFile: string): string[] {
+  getMethodList(protoFile) {
     const parsedData = parse(protoFile);
 
     const methodList = parsedData.root.nestedArray.flatMap(a =>
@@ -22,7 +22,7 @@ const RpcTriggerService = (): IRpcTriggerService => ({
       []
     );
   },
-  async validateDraft(draft: TDraftTest): Promise<boolean> {
+  async validateDraft(draft) {
     const {protoFile, method, url} = draft as IRpcValues;
 
     const isValid =
@@ -30,7 +30,7 @@ const RpcTriggerService = (): IRpcTriggerService => ({
 
     return isValid;
   },
-  async getRequest(values: TDraftTest): Promise<TRawGRPCRequest> {
+  async getRequest(values) {
     const {protoFile, message: request, metadata, method, auth, url: address} = values as IRpcValues;
     const protobufFile = await protoFile.text();
 

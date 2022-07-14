@@ -11,11 +11,8 @@ import RequestDetailsForm from './RequestDetailsForm';
 const RequestDetails = () => {
   const [form] = Form.useForm<IHttpValues>();
   const {onNext} = useCreateTest();
-  const {
-    draftTest,
-    plugin: {type},
-  } = useCreateTest();
-  const {isValid, onValidate, setIsValid} = useValidateTestDraft({type});
+  const {draftTest, pluginName} = useCreateTest();
+  const {isValid, onValidate, setIsValid} = useValidateTestDraft({pluginName});
   const {url = '', body = '', method = HTTP_METHOD.GET} = draftTest as IHttpValues;
 
   const handleNext = useCallback(() => {

@@ -1,4 +1,5 @@
 import {Dropdown, Menu} from 'antd';
+import {Link} from 'react-router-dom';
 import * as S from './TestCard.styled';
 import {useOnDeleteCallback} from './useOnDeleteCallback';
 
@@ -18,9 +19,9 @@ const TestCardActions: React.FC<IProps> = ({testId, onDelete}) => {
             {
               key: 'edit',
               label: (
-                <a data-cy="test-card-edit" href={`/test/${testId}/edit`}>
+                <Link data-cy="test-card-edit" to={`/test/${testId}/edit`}>
                   Edit
-                </a>
+                </Link>
               ),
             },
             {key: 'delete', label: <span data-cy="test-card-delete">Delete</span>, onClick},

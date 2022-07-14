@@ -1,48 +1,56 @@
 import {Form} from 'antd';
 import * as Step from 'components/CreateTestPlugins/Step.styled';
 import CreateStepFooter from 'components/CreateTestSteps/CreateTestStepFooter';
-import {HTTP_METHOD} from 'constants/Common.constants';
-import {VariableDefinition} from 'postman-collection';
-import {useCallback, useState} from 'react';
-import {RequestDefinitionExtended} from 'services/PostmanService.service';
-import {THTTPRequest, TRequestAuth} from 'types/Test.types';
-import Validator from 'utils/Validator';
-import {useOnSubmitCallback} from './hooks/useOnSubmitCallback';
-import {useValidateFormEffect} from './hooks/useValidateFormEffect';
+import {useCallback, useEffect} from 'react';
+import useValidateTestDraft from 'hooks/useValidateTestDraft';
+import {useCreateTest} from 'providers/CreateTest/CreateTest.provider';
+import {IPostmanValues} from 'types/Test.types';
 import UploadCollectionForm from './UploadCollectionForm';
 
-export interface IUploadCollectionValues {
-  collectionFile?: File;
-  envFile?: File;
-  collectionTest?: string;
-  requests: RequestDefinitionExtended[];
-  variables: VariableDefinition[];
-  body: string;
-  auth: TRequestAuth;
-  headers: THTTPRequest['headers'];
-  method: HTTP_METHOD;
-  url: string;
-}
-
 const UploadCollection = () => {
-  const [transientUrl, setTransientUrl] = useState('');
-  const [form] = Form.useForm<IUploadCollectionValues>();
-  const [isFormValid, setIsFormValid] = useValidateFormEffect(form);
+  const [form] = Form.useForm<IPostmanValues>();
+  const {onNext, pluginName} = useCreateTest();
+
+  const {isValid, onValidate, setIsValid} = useValidateTestDraft({pluginName});
+
+  const handleOnSubmit = useCallback(
+    (values: IPostmanValues) => {
+      onNext(values);
+    },
+    [onNext]
+  );
+
+  const url = Form.useWatch('url', form);
+
+  const onValidateUrlChange = useCallback(async () => {
+    try {
+      await form.validateFields();
+      setIsValid(true);
+    } catch (err) {
+      setIsValid(false);
+    }
+  }, [form, setIsValid]);
+
+  useEffect(() => {
+    onValidateUrlChange();
+  }, [url, onValidateUrlChange]);
+
   return (
     <Step.Step>
       <Step.FormContainer>
         <Step.Title>Method Selection Information</Step.Title>
-        <UploadCollectionForm
-          setTransientUrl={setTransientUrl}
+        <Form<IPostmanValues>
+          autoComplete="off"
           form={form}
-          onSubmit={useOnSubmitCallback()}
-          onValidation={setIsFormValid}
-        />
+          layout="vertical"
+          initialValues={{url: '', requests: [], variables: []}}
+          onFinish={handleOnSubmit}
+          onValuesChange={onValidate}
+        >
+          <UploadCollectionForm form={form} />
+        </Form>
       </Step.FormContainer>
-      <CreateStepFooter
-        isValid={isFormValid && Validator.url(transientUrl)}
-        onNext={useCallback(() => form.submit(), [form])}
-      />
+      <CreateStepFooter isValid={isValid} onNext={useCallback(() => form.submit(), [form])} />
     </Step.Step>
   );
 };

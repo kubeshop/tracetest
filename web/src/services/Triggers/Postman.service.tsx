@@ -1,9 +1,8 @@
-import {FormInstance} from 'antd';
 import {Collection, Item, ItemGroup, Request, RequestAuthDefinition, VariableDefinition} from 'postman-collection';
-import {IUploadCollectionValues} from '../components/CreateTestPlugins/Postman/steps/UploadCollection/UploadCollection';
-import {HTTP_METHOD} from '../constants/Common.constants';
-import {TRequestAuth} from '../types/Test.types';
-import {RecursivePartial} from '../utils/Common';
+import {HTTP_METHOD} from 'constants/Common.constants';
+import {IPostmanValues, ITriggerService, TDraftTestForm, TRequestAuth} from 'types/Test.types';
+import Validator from '../../utils/Validator';
+import HttpService from './Http.service';
 
 export interface RequestDefinitionExtended extends Request {
   id: string;
@@ -12,45 +11,65 @@ export interface RequestDefinitionExtended extends Request {
 
 type AuthType = 'apiKey' | 'basic' | 'bearer';
 
-const Postman = () => ({
+interface IPostmanTriggerService extends ITriggerService {
   valuesFromRequest(
     requests: RequestDefinitionExtended[],
     variables: VariableDefinition[],
     identifier: string
-  ): undefined | RecursivePartial<IUploadCollectionValues> {
+  ): undefined | Partial<IPostmanValues>;
+  updateForm(
+    requests: RequestDefinitionExtended[],
+    variables: VariableDefinition[],
+    identifier: string,
+    form: TDraftTestForm<IPostmanValues>
+  ): void;
+  flattenCollectionItemsIntoRequestDefinition(structure: Item | ItemGroup<Item>): RequestDefinitionExtended[];
+  getRequestsFromCollection(collection: Collection): RequestDefinitionExtended[];
+  substituteVariable(variables: VariableDefinition[], value: string | undefined): any;
+  translateType(type: NonNullable<RequestAuthDefinition['type']>): AuthType | undefined;
+  transformAuthSettings(request: RequestDefinitionExtended, variables: VariableDefinition[]): TRequestAuth;
+}
+
+const Postman = (): IPostmanTriggerService => ({
+  async getRequest(draft) {
+    const {url, method, auth, headers, body} = draft as IPostmanValues;
+
+    return {url, method, auth, headers, body};
+  },
+  async validateDraft(draft) {
+    const {collectionTest} = draft as IPostmanValues;
+
+    const isValid = Validator.required(collectionTest) && Validator.required(collectionTest);
+
+    return isValid && HttpService.validateDraft(draft);
+  },
+  valuesFromRequest(requests, variables, identifier) {
     const request = requests.find(({id}) => identifier === id);
     if (request) {
-      const url = request?.url.toString();
+      const url = request?.url.toString() || '';
+      const headers =
+        request?.headers?.all()?.map(({key, value}) => ({
+          value: this.substituteVariable(variables, value) || '',
+          key: this.substituteVariable(variables, key) || '',
+        })) || [];
+
       return {
         url: this.substituteVariable(variables, url),
         method: request?.method as HTTP_METHOD,
-        headers:
-          request?.headers?.all()?.map(({key, value}) => ({
-            value: this.substituteVariable(variables, value),
-            key: this.substituteVariable(variables, key),
-          })) || [],
+        headers,
         body: request?.body?.raw || '',
         auth: this.transformAuthSettings(request, variables),
       };
     }
     return undefined;
   },
-  updateForm(
-    requests: RequestDefinitionExtended[],
-    variables: VariableDefinition[],
-    identifier: string,
-    form: FormInstance<IUploadCollectionValues>,
-    setTransientUrl: (value: ((prevState: string) => string) | string) => void
-  ): void {
+  updateForm(requests, variables, identifier, form) {
     const input = this.valuesFromRequest(requests, variables, identifier);
     if (input) {
       form.setFieldsValue(input);
-      if (input?.url) {
-        setTransientUrl(input?.url);
-      }
     }
   },
-  flattenCollectionItemsIntoRequestDefinition(structure: Item | ItemGroup<Item>): RequestDefinitionExtended[] {
+  flattenCollectionItemsIntoRequestDefinition(structure) {
     const itemRequest: RequestDefinitionExtended[] =
       'request' in structure ? [{...structure.request, name: structure.name, id: structure.id} as Request] : [];
     const groupRequest: RequestDefinitionExtended[] =
@@ -62,14 +81,14 @@ const Postman = () => ({
         : [];
     return [...itemRequest, ...groupRequest];
   },
-  getRequestsFromCollection(collection: Collection): RequestDefinitionExtended[] {
+  getRequestsFromCollection(collection) {
     try {
       return collection.items.all().flatMap(test => this.flattenCollectionItemsIntoRequestDefinition(test));
     } catch (e) {
       return [];
     }
   },
-  substituteVariable(variables: VariableDefinition[], value: string | undefined) {
+  substituteVariable(variables, value) {
     const regExpMatchArray = (value || '').match(/\{{([^}]+)}}/);
     return regExpMatchArray
       ? value
@@ -81,7 +100,7 @@ const Postman = () => ({
       : value;
   },
 
-  translateType(type: NonNullable<RequestAuthDefinition['type']>): AuthType | undefined {
+  translateType(type) {
     switch (type) {
       case 'apikey':
         return 'apiKey';
@@ -93,7 +112,7 @@ const Postman = () => ({
         return undefined;
     }
   },
-  transformAuthSettings(request: RequestDefinitionExtended, variables: VariableDefinition[]): TRequestAuth {
+  transformAuthSettings(request, variables) {
     if (request?.auth) {
       if (['apikey', 'basic', 'bearer'].includes(request?.auth.type)) {
         const authParameters = request?.auth?.parameters().all();

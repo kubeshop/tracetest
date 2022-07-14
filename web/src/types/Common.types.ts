@@ -29,3 +29,13 @@ export type TStructure = TTestSchemas['SpanSelector'];
 export type TFilter = TTestSchemas['SelectorFilter'];
 
 export type Model<T, R> = Modify<Required<T>, R>;
+
+export declare type RecursivePartial<T> = T extends object
+  ? {
+      [P in keyof T]?: T[P] extends (infer U)[]
+        ? RecursivePartial<U>[]
+        : T[P] extends object
+        ? RecursivePartial<T[P]>
+        : T[P];
+    }
+  : any;

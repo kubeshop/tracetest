@@ -109,3 +109,8 @@ export const Plugins: Record<SupportedPlugins, IPlugin> = {
   [SupportedPlugins.Postman]: Postman,
   [SupportedPlugins.OpenAPI]: OpenAPI,
 };
+
+export const TriggerTypeToPlugin = {
+  [TriggerTypes.http]: Plugins.REST,
+  [TriggerTypes.grpc]: Plugins.RPC,
+} as const; 

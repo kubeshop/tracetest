@@ -15,9 +15,9 @@ const BasicDetails = () => {
   const {onNext} = useCreateTest();
 
   const {
-    plugin: {type, name: pluginName},
+    plugin: {name: pluginName},
   } = useCreateTest();
-  const {setIsValid, isValid, onValidate} = useValidateTestDraft({type, isBasicDetails: true});
+  const {setIsValid, isValid, onValidate} = useValidateTestDraft({pluginName, isBasicDetails: true});
 
   const handleSelectDemo = useCallback(
     (demo: IDemoTestExample) => {

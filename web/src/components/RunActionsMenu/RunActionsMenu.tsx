@@ -1,6 +1,6 @@
 import {Dropdown, Menu} from 'antd';
 import {useCallback} from 'react';
-import {useNavigate} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import {useDeleteRunByIdMutation} from 'redux/apis/TraceTest.api';
 import TestAnalyticsService from 'services/Analytics/TestAnalytics.service';
 import {TTest} from 'types/Test.types';
@@ -43,7 +43,7 @@ const RunActionsMenu = ({resultId, testId, testVersion, test, isRunView = false}
             </Menu.Item>
             {test && (
               <Menu.Item data-cy="test-edit-button" key="edit">
-                <a href={`/test/${testId}/edit`}>Edit Test</a>
+                <Link to={`/test/${testId}/edit`}>Edit Test</Link>
               </Menu.Item>
             )}
             <Menu.Item

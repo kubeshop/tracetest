@@ -8,6 +8,7 @@ import {TDraftTest, TTest} from 'types/Test.types';
 import EditTestForm from 'components/EditTestForm';
 import TestService from 'services/Test.service';
 import useValidateTestDraft from 'hooks/useValidateTestDraft';
+import {TriggerTypeToPlugin} from 'constants/Plugins.constants';
 import * as S from './EditTest.styled';
 
 interface IProps {
@@ -20,15 +21,16 @@ const EditTestContent = ({test}: IProps) => {
   const {setIsOpen} = useTour();
   const [editTest, {isLoading: isLoadingCreateTest}] = useEditTestMutation();
   const [runTest, {isLoading: isLoadingRunTest}] = useRunTestMutation();
+  const plugin = TriggerTypeToPlugin[test.trigger.type];
 
-  const {isValid, onValidate} = useValidateTestDraft({type: test.trigger.type, isDefaultValid: true});
+  const {isValid, onValidate} = useValidateTestDraft({pluginName: plugin.name, isDefaultValid: true});
 
   const isLoading = isLoadingCreateTest || isLoadingRunTest;
   const [form] = Form.useForm<TDraftTest>();
 
   const handleOnSubmit = useCallback(
     async (values: TDraftTest) => {
-      const rawTest = await TestService.getRequest(test.trigger.type, values, test);
+      const rawTest = await TestService.getRequest(plugin, values, test);
 
       await editTest({
         test: rawTest,

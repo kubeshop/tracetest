@@ -1,14 +1,11 @@
-import {Form, FormInstance} from 'antd';
+import {Form} from 'antd';
 import {RcFile} from 'antd/lib/upload';
 import {VariableScope} from 'postman-collection';
-import {Dispatch, SetStateAction, useCallback} from 'react';
-import PostmanService from 'services/PostmanService.service';
-import {IUploadCollectionValues} from '../UploadCollection';
+import {useCallback} from 'react';
+import PostmanService from 'services/Triggers/Postman.service';
+import {IPostmanValues, TDraftTestForm} from 'types/Test.types';
 
-export function useUploadEnvFileCallback(
-  form: FormInstance<IUploadCollectionValues>,
-  setTransientUrl: Dispatch<SetStateAction<string>>
-): (file?: RcFile) => Promise<void> {
+export function useUploadEnvFileCallback(form: TDraftTestForm<IPostmanValues>): (file?: RcFile) => Promise<void> {
   const collectionTest = Form.useWatch('collectionTest');
   const requests = Form.useWatch('requests');
   return useCallback(
@@ -19,7 +16,7 @@ export function useUploadEnvFileCallback(
           const variables = new VariableScope(JSON.parse(contents))?.values?.map(d => d) || [];
           form.setFieldsValue({requests, variables});
           if (collectionTest) {
-            await PostmanService.updateForm(requests, variables, collectionTest, form, setTransientUrl);
+            await PostmanService.updateForm(requests, variables, collectionTest, form);
           }
         }
       } catch (r) {
@@ -27,6 +24,6 @@ export function useUploadEnvFileCallback(
         console.error(r);
       }
     },
-    [form, requests, collectionTest, setTransientUrl]
+    [form, requests, collectionTest]
   );
 }

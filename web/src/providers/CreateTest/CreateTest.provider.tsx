@@ -56,13 +56,13 @@ const CreateTestProvider = ({children}: IProps) => {
 
   const onCreateTest = useCallback(
     async (draft: TDraftTest) => {
-      const rawTest = await TestService.getRequest(plugin.type, draft);
+      const rawTest = await TestService.getRequest(plugin, draft);
       const test = await createTest(rawTest).unwrap();
       const run = await runTest({testId: test.id}).unwrap();
 
       navigate(`/test/${test.id}/run/${run.id}`);
     },
-    [createTest, navigate, plugin.type, runTest]
+    [createTest, navigate, plugin, runTest]
   );
 
   const onUpdateDraftTest = useCallback(

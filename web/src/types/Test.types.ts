@@ -1,8 +1,9 @@
 import {FormInstance} from 'antd';
+import {VariableDefinition, Request} from 'postman-collection';
 import {CaseReducer, PayloadAction} from '@reduxjs/toolkit';
 import {TriggerTypes} from 'constants/Test.constants';
 import {HTTP_METHOD} from 'constants/Common.constants';
-import {Model, TGrpcSchemas, THttpSchemas, TTestSchemas, TTriggerSchemas, TRecursivePartial} from './Common.types';
+import {Model, TGrpcSchemas, THttpSchemas, TTestSchemas, TTriggerSchemas} from './Common.types';
 import {TTestDefinition} from './TestDefinition.types';
 
 import {ICreateTestStep, IPlugin} from './Plugins.types';
@@ -68,19 +69,32 @@ export interface IHttpValues {
   url: string;
 }
 
+export interface RequestDefinitionExtended extends Request {
+  id: string;
+  name: string;
+}
+
+export interface IPostmanValues extends IHttpValues {
+  collectionFile?: File;
+  envFile?: File;
+  collectionTest?: string;
+  requests: RequestDefinitionExtended[];
+  variables: VariableDefinition[];
+}
+
 export interface IBasicValues {
   name: string;
   description: string;
   testSuite: string;
 }
 
-export type TTestRequestDetailsValues = IRpcValues | IHttpValues;
+export type TTestRequestDetailsValues = IRpcValues | IHttpValues | IPostmanValues;
 export type TDraftTest<T = TTestRequestDetailsValues> = Partial<IBasicValues & T>;
 export type TDraftTestForm<T = TTestRequestDetailsValues> = FormInstance<TDraftTest<T>>;
 
 export interface ITriggerService {
-  getRequest: (values: TDraftTest) => Promise<TTriggerRequest>;
-  validateDraft: (draft: TDraftTest) => Promise<boolean>;
+  getRequest(values: TDraftTest): Promise<TTriggerRequest>;
+  validateDraft(draft: TDraftTest): Promise<boolean>;
 }
 
 export interface ICreateTestState {

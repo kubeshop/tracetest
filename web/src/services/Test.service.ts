@@ -1,14 +1,11 @@
-import {
-  TRawTest,
-  TTest,
-  TDraftTest,
-  // IBasicValues,
-} from 'types/Test.types';
-import {TriggerTypes} from 'constants/Test.constants';
+import {TRawTest, TTest, TDraftTest} from 'types/Test.types';
+import { SupportedPlugins } from 'constants/Plugins.constants';
+import { IPlugin } from 'types/Plugins.types';
 import TestDefinitionService from './TestDefinition.service';
 import Validator from '../utils/Validator';
 import RpcService from './Triggers/Rpc.service';
 import HttpService from './Triggers/Http.service';
+import PostmanService from './Triggers/Postman.service';
 
 const authValidation = ({auth}: TDraftTest): boolean => {
   switch (auth?.type) {
@@ -28,14 +25,17 @@ const basicDetailsValidation = ({name, description}: TDraftTest): boolean => {
 };
 
 const TriggerServiceMap = {
-  [TriggerTypes.grpc]: RpcService,
-  [TriggerTypes.http]: HttpService,
+  [SupportedPlugins.RPC]: RpcService,
+  [SupportedPlugins.REST]: HttpService,
+  [SupportedPlugins.Messaging]: HttpService,
+  [SupportedPlugins.OpenAPI]: HttpService,
+  [SupportedPlugins.Postman]: PostmanService,
 } as const;
 
 const TestService = () => ({
-  async getRequest(type: TriggerTypes, draft: TDraftTest, original?: TTest): Promise<TRawTest> {
+  async getRequest({type, name: pluginName}: IPlugin, draft: TDraftTest, original?: TTest): Promise<TRawTest> {
     const {name, description} = draft;
-    const triggerService = TriggerServiceMap[type];
+    const triggerService = TriggerServiceMap[pluginName];
     const request = await triggerService.getRequest(draft);
 
     return {
@@ -57,8 +57,8 @@ const TestService = () => ({
     };
   },
 
-  async validateDraft(type: TriggerTypes, draft: TDraftTest, isBasicDetails = false): Promise<boolean> {
-    const triggerService = TriggerServiceMap[type];
+  async validateDraft(pluginName: SupportedPlugins, draft: TDraftTest, isBasicDetails = false): Promise<boolean> {
+    const triggerService = TriggerServiceMap[pluginName];
     const isTriggerValid = await triggerService.validateDraft(draft);
 
     return (isBasicDetails && basicDetailsValidation(draft)) || (isTriggerValid && authValidation(draft));
