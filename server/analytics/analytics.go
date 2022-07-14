@@ -28,7 +28,7 @@ func Init(enabled bool, serverID, appVersion string) error {
 		return fmt.Errorf("could not get hostname: %w", err)
 	}
 
-	defaultClient = newGATracker(hostname, serverID, appVersion)
+	defaultClient = newSegmentTracker(hostname, serverID, appVersion)
 
 	return nil
 }
@@ -36,7 +36,7 @@ func Init(enabled bool, serverID, appVersion string) error {
 var defaultClient Tracker
 
 func Ready() bool {
-	return defaultClient.Ready()
+	return defaultClient != nil && defaultClient.Ready()
 }
 
 func SendEvent(name, category string) error {

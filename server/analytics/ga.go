@@ -18,11 +18,11 @@ const (
 
 var (
 	MeasurementID = ""
-	SecretKey     = ""
+	// SecretKey     = ""
 )
 
 func newGATracker(hostname, serverID, appVersion string) Tracker {
-	return ga{
+	return gaTracker{
 		measurementID: MeasurementID,
 		secretKey:     SecretKey,
 		appVersion:    appVersion,
@@ -31,7 +31,7 @@ func newGATracker(hostname, serverID, appVersion string) Tracker {
 	}
 }
 
-type ga struct {
+type gaTracker struct {
 	measurementID string
 	secretKey     string
 	appVersion    string
@@ -39,14 +39,14 @@ type ga struct {
 	serverID      string
 }
 
-func (ga ga) Ready() bool {
+func (ga gaTracker) Ready() bool {
 	return ga.appVersion != "" &&
 		ga.hostname != "" &&
 		ga.serverID != ""
 
 }
 
-func (ga ga) Track(name string, props map[string]string) error {
+func (ga gaTracker) Track(name string, props map[string]string) error {
 	category := ""
 	if cat, ok := props["category"]; ok {
 		category = cat
@@ -60,7 +60,7 @@ func (ga ga) Track(name string, props map[string]string) error {
 	return ga.sendEvent(event)
 }
 
-func (ga ga) newEvent(name, category string) (event, error) {
+func (ga gaTracker) newEvent(name, category string) (event, error) {
 	return event{
 		Name: name,
 		Params: params{
@@ -76,7 +76,7 @@ func (ga ga) newEvent(name, category string) (event, error) {
 	}, nil
 }
 
-func (ga ga) sendEvent(e event) error {
+func (ga gaTracker) sendEvent(e event) error {
 	payload := payload{
 		ClientID: ga.serverID,
 		Events: []event{
@@ -97,7 +97,7 @@ func (ga ga) sendEvent(e event) error {
 	return nil
 }
 
-func (ga ga) sendValidationRequest(p payload) error {
+func (ga gaTracker) sendValidationRequest(p payload) error {
 	response, body, err := ga.sendPayloadToURL(p, gaValidationURL)
 
 	if err != nil {
@@ -121,7 +121,7 @@ func (ga ga) sendValidationRequest(p payload) error {
 	return nil
 }
 
-func (ga ga) sendDataToGA(p payload) error {
+func (ga gaTracker) sendDataToGA(p payload) error {
 	response, _, err := ga.sendPayloadToURL(p, gaURL)
 	if err != nil {
 		return fmt.Errorf("could not send event to google analytics: %w", err)
@@ -134,7 +134,7 @@ func (ga ga) sendDataToGA(p payload) error {
 	return nil
 }
 
-func (ga ga) sendPayloadToURL(p payload, url string) (*http.Response, []byte, error) {
+func (ga gaTracker) sendPayloadToURL(p payload, url string) (*http.Response, []byte, error) {
 	jsonData, err := json.Marshal(p)
 	if err != nil {
 		return nil, []byte{}, fmt.Errorf("could not marshal json payload: %w", err)
