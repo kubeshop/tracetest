@@ -1,7 +1,6 @@
 import * as Sentry from '@sentry/react';
 import {ThemeProvider} from 'styled-components';
 
-import AnalyticsProvider from 'components/Analytics/AnalyticsProvider';
 import ErrorBoundary from 'components/ErrorBoundary';
 import GuidedTour from 'components/GuidedTour/GuidedTour';
 import Router from 'components/Navigation';
@@ -15,11 +14,9 @@ const App = () => {
     <ThemeProvider theme={theme}>
       <Sentry.ErrorBoundary fallback={({error}) => <ErrorBoundary error={error} />}>
         <GuidedTour>
-          <AnalyticsProvider>
-            <ReduxWrapperProvider>
-              <Router />
-            </ReduxWrapperProvider>
-          </AnalyticsProvider>
+          <ReduxWrapperProvider>
+            <Router />
+          </ReduxWrapperProvider>
         </GuidedTour>
       </Sentry.ErrorBoundary>
     </ThemeProvider>

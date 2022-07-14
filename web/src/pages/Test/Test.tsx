@@ -1,7 +1,7 @@
-import {withTracker} from 'ga-4-react';
 import Layout from 'components/Layout';
 import EditTestModalProvider from '../../components/EditTestModal/EditTestModal.provider';
 import TestContent from './TestContent';
+import withAnalytics from '../../components/WithAnalytics/WithAnalytics';
 
 const TestPage: React.FC = () => {
   return (
@@ -13,4 +13,4 @@ const TestPage: React.FC = () => {
   );
 };
 
-export default withTracker(TestPage);
+export default withAnalytics(TestPage, 'test-details');

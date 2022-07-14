@@ -29,3 +29,9 @@ export type TStructure = TTestSchemas['SpanSelector'];
 export type TFilter = TTestSchemas['SelectorFilter'];
 
 export type Model<T, R> = Modify<Required<T>, R>;
+
+export interface IAnalytics {
+  identify(userId: string, traits: {name: string; email: string}): void;
+  track(event: string, traits: {[key: string]: any}): void;
+  page(pageName: string): void;
+}

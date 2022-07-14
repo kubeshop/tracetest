@@ -1,6 +1,6 @@
 import Layout from 'components/Layout';
-import {withTracker} from 'ga-4-react';
 import CreateTestProvider from 'providers/CreateTest/CreateTest.provider';
+import withAnalytics from '../../components/WithAnalytics/WithAnalytics';
 import CreateTestContent from './CreateTestContent';
 
 const CreateTestPage = () => {
@@ -13,4 +13,4 @@ const CreateTestPage = () => {
   );
 };
 
-export default withTracker(CreateTestPage);
+export default withAnalytics(CreateTestPage, 'create-test');
