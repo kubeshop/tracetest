@@ -10,8 +10,8 @@ RUN npm run build
 FROM golang:1.18-alpine AS build-go
 WORKDIR /go/src
 
-ARG GA_MEASUREMENT_ID
-ARG GA_SECRET_KEY
+ARG ANALYTICS_BE_KEY
+ARG ANALYTICS_FE_KEY
 ARG VERSION
 
 RUN apk add --update make

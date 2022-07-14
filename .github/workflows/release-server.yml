@@ -59,8 +59,8 @@ jobs:
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache-new
         build-args: |
-          GA_MEASUREMENT_ID=${{ secrets.GA_MEASUREMENT_ID }}
-          GA_SECRET_KEY=${{ secrets.GA_SECRET_KEY }}
+          ANALYTICS_BE_KEY=${{ secrets.ANALYTICS_BE_KEY }}
+          ANALYTICS_FE_KEY=${{ secrets.ANALYTICS_FE_KEY }}
           VERSION=${{ github.ref_name}}
 
     - name: Run GoReleaser to publish release notes
@@ -170,8 +170,8 @@ jobs:
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache-new
         build-args: |
-          GA_MEASUREMENT_ID=${{ secrets.GA_MEASUREMENT_ID_DEMO }}
-          GA_SECRET_KEY=${{ secrets.GA_SECRET_KEY_DEMO }}
+          ANALYTICS_BE_KEY=${{ secrets.ANALYTICS_BE_KEY }}
+          ANALYTICS_FE_KEY=${{ secrets.ANALYTICS_FE_KEY }}
           VERSION=${{ github.ref_name}}-demo
     - name: Set ouput docker tag
       run: echo "::set-output tag=${{ steps.meta.outputs.tags }}"

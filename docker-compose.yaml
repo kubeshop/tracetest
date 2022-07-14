@@ -3,9 +3,10 @@ services:
   tracetest:
     container_name: tracetest
     image: kubeshop/tracetest
-    build: .
-    environment:
-      - VERSION=dev
+    build:
+      context: .
+      args:
+        VERSION: dev
     volumes:
       - type: bind
         source: ./local-config/config.tests.yaml

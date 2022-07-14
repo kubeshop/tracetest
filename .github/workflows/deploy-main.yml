@@ -58,8 +58,8 @@ jobs:
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache-new
         build-args: |
-          GA_MEASUREMENT_ID=${{ secrets.GA_MEASUREMENT_ID }}
-          GA_SECRET_KEY=${{ secrets.GA_SECRET_KEY }}
+          ANALYTICS_BE_KEY=${{ secrets.ANALYTICS_BE_KEY }}
+          ANALYTICS_FE_KEY=${{ secrets.ANALYTICS_FE_KEY }}
           VERSION=sha-${{ steps.vars.outputs.sha_short }}
 
   deploy-beta:

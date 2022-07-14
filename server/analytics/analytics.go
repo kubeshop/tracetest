@@ -22,6 +22,7 @@ var defaultClient ga
 var (
 	MeasurementID = ""
 	SecretKey     = ""
+	FrontendKey   = ""
 )
 
 func Init(enabled bool, serverID, appName, appVersion string) error {
