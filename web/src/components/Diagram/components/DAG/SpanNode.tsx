@@ -1,6 +1,7 @@
 import {ClockCircleOutlined, SettingOutlined, ToolOutlined} from '@ant-design/icons';
 import {Handle, NodeProps, Position} from 'react-flow-renderer';
 
+import {SemanticGroupNamesToText} from 'constants/SemanticGroupNames.constants';
 import {SpanKindToText} from 'constants/Span.constants';
 import {useAppSelector} from 'redux/hooks';
 import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
@@ -28,7 +29,7 @@ const SpanNode = ({data, id, selected}: IProps) => {
 
       <S.Header>
         <S.BadgeContainer>
-          <S.BadgeType count={data.type} $type={data.type} />
+          <S.BadgeType count={SemanticGroupNamesToText[data.type]} $hasMargin $type={data.type} />
         </S.BadgeContainer>
         <S.HeaderText>{data.name}</S.HeaderText>
       </S.Header>
@@ -37,7 +38,7 @@ const SpanNode = ({data, id, selected}: IProps) => {
         <S.Item>
           <SettingOutlined />
           <S.ItemText>
-            {data.serviceName} {SpanKindToText[data.kind]}
+            {data.service} {SpanKindToText[data.kind]}
           </S.ItemText>
         </S.Item>
         {Boolean(data.system) && (

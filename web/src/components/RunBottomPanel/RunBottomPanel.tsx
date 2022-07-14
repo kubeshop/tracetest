@@ -1,10 +1,10 @@
 import AssertionForm from 'components/AssertionForm';
+import AssertionList from 'components/AssertionList';
 import {useAssertionForm} from 'components/AssertionForm/AssertionForm.provider';
 import LoadingSpinner from 'components/LoadingSpinner';
-import TestResults from 'components/TestResults';
+import {useSpan} from 'providers/Span/Span.provider';
 import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
 import {TTestRun} from 'types/TestRun.types';
-import { useSpan } from '../../providers/Span/Span.provider';
 import Header from './Header';
 import * as S from './RunBottomPanel.styled';
 
@@ -45,7 +45,7 @@ const RunBottomPanel = ({run: {id: runId}, run, testId}: IProps) => {
             />
           )}
           {!isLoading && !isAssertionFormOpen && Boolean(assertionResults) && (
-            <TestResults testId={testId} assertionResults={assertionResults!} onSelectSpan={onSelectSpan} />
+            <AssertionList assertionResults={assertionResults!} onSelectSpan={onSelectSpan} />
           )}
         </S.Content>
       </S.Container>

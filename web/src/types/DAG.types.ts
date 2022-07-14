@@ -17,7 +17,7 @@ export interface INodeDataSpan {
   kind: SpanKind;
   name: string;
   programmingLanguage: string;
-  serviceName: string;
+  service: string;
   system: string;
   totalAttributes: number;
   type: SemanticGroupNames;
