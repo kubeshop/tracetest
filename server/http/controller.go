@@ -80,7 +80,7 @@ func (c *controller) CreateTest(ctx context.Context, in openapi.Test) (openapi.I
 		return openapi.Response(http.StatusInternalServerError, err.Error()), err
 	}
 
-	analytics.CreateAndSendEvent("test_created_backend", "test")
+	analytics.SendEvent("test_created_backend", "test")
 
 	return openapi.Response(200, c.mappers.Out.Test(test)), nil
 }
@@ -101,7 +101,7 @@ func (c *controller) DeleteTest(ctx context.Context, testID string) (openapi.Imp
 		return openapi.Response(http.StatusInternalServerError, err.Error()), err
 	}
 
-	analytics.CreateAndSendEvent("test_deleted_backend", "test")
+	analytics.SendEvent("test_deleted_backend", "test")
 
 	return openapi.Response(204, nil), nil
 
@@ -195,7 +195,7 @@ func (c *controller) DeleteTestRun(ctx context.Context, _ string, runID string) 
 		return openapi.Response(http.StatusInternalServerError, err.Error()), err
 	}
 
-	analytics.CreateAndSendEvent("test_deleted_backend", "test")
+	analytics.SendEvent("test_deleted_backend", "test")
 
 	return openapi.Response(204, nil), nil
 }
@@ -291,7 +291,7 @@ func (c *controller) RunTest(ctx context.Context, testID string) (openapi.ImplRe
 
 	run := c.runner.Run(ctx, test)
 
-	analytics.CreateAndSendEvent("test_run_backend", "test")
+	analytics.SendEvent("test_run_backend", "test")
 
 	return openapi.Response(200, c.mappers.Out.Run(&run)), nil
 }
