@@ -25,7 +25,7 @@ var (
 	FrontendKey   = ""
 )
 
-func Init(enabled bool, serverID, appName, appVersion string) error {
+func Init(enabled bool, serverID, appVersion string) error {
 	// ga not enabled, use dumb settings
 	if !enabled {
 		defaultClient = ga{enabled: false}
@@ -43,7 +43,6 @@ func Init(enabled bool, serverID, appName, appVersion string) error {
 		measurementID: MeasurementID,
 		secretKey:     SecretKey,
 		appVersion:    appVersion,
-		appName:       appName,
 		hostname:      hostname,
 		serverID:      serverID,
 	}
@@ -75,7 +74,6 @@ func Ready() bool {
 type ga struct {
 	enabled       bool
 	appVersion    string
-	appName       string
 	measurementID string
 	secretKey     string
 	hostname      string
@@ -84,7 +82,6 @@ type ga struct {
 
 func (ga ga) ready() bool {
 	return !ga.enabled || (ga.appVersion != "" &&
-		ga.appName != "" &&
 		ga.hostname != "" &&
 		ga.serverID != "")
 
@@ -110,7 +107,6 @@ func (ga ga) newEvent(name, category string) (event, error) {
 			ID:              uuid.NewString(), // prevent event caching
 			EventCount:      1,
 			EventCategory:   category,
-			AppName:         ga.appName,
 			Host:            ga.hostname,
 			MachineID:       ga.serverID,
 			AppVersion:      ga.appVersion,

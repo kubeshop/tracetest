@@ -8,19 +8,19 @@ import (
 )
 
 func TestReadyness(t *testing.T) {
-	analytics.Init(false, "serverID", "test", "1.0")
+	analytics.Init(false, "serverID", "1.0")
 	assert.True(t, analytics.Ready())
 
-	analytics.Init(true, "serverID", "test", "1.0")
+	analytics.Init(true, "serverID", "1.0")
 	assert.True(t, analytics.Ready())
 
-	analytics.Init(true, "serverID", "", "1.0")
+	analytics.Init(true, "serverID", "1.0")
 	assert.False(t, analytics.Ready())
 
-	analytics.Init(true, "serverID", "test", "")
+	analytics.Init(true, "serverID", "")
 	assert.False(t, analytics.Ready())
 
-	analytics.Init(true, "", "test", "1.0")
+	analytics.Init(true, "", "1.0")
 	assert.False(t, analytics.Ready())
 
 }

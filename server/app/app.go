@@ -77,7 +77,7 @@ func (a *App) Start() error {
 		return err
 	}
 
-	err = analytics.Init(a.config.GA.Enabled, serverID, "tracetest", Version)
+	err = analytics.Init(a.config.GA.Enabled, serverID, Version)
 	if err != nil {
 		return err
 	}
