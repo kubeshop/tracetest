@@ -8,6 +8,14 @@ import (
 	"github.com/kubeshop/tracetest/cli/openapi"
 )
 
+func ConvertOpenapiStringIntoString(in *string) string {
+	if in == nil {
+		return ""
+	}
+
+	return *in
+}
+
 func ConvertOpenAPITestIntoDefinitionObject(test openapi.Test) (definition.Test, error) {
 	trigger := convertServiceUnderTestIntoTrigger(test.ServiceUnderTest)
 	testDefinition := convertOpenAPITestDefinitionIntoDefinitionArray(test.Definition)

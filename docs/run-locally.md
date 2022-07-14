@@ -46,8 +46,8 @@ helm repo add kubeshop https://kubeshop.github.io/helm-charts
 helm repo update
 
 helm install tracetest kubeshop/tracetest \
-  --set tracingBackend=jaeger \
-  --set jaegerConnectionConfig.endpoint="jaeger-query:16685"
+  --set tracingBackend.dataStore.type=jaeger \
+  --set tracingBacking.dataStore.jaeger.endpoint="jaeger-query:16685"
 ```
 
 You can now expose the Tracetest service using a `LoadBalancer`, `NodePort` or even a simple `port-forward`:

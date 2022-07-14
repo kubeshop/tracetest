@@ -210,8 +210,8 @@ jobs:
           --namespace tracetest-demo \
           --set image.tag=${{ github.ref_name}}-demo \
           --set analytics.enabled=true \
-          --set tracingBackend=jaeger \
-          --set jaegerConnectionConfig.endpoint="jaeger-query.tracetest.svc.cluster.local:16685" \
+          --set tracingBackend.dataStore.type=jaeger \
+          --set tracingBackend.dataStore.jaeger.endpoint="jaeger-query.tracetest.svc.cluster.local:16685" \
           --set telemetry.enabled="true" \
           --set telemetry.otelCollectorEndpoint="otel-collector.tracetest.svc.cluster.local:4317" \
           --set service.annotations."cloud\.google\.com/backend-config"='\{\"default\":\"tracetest-beta\"\}' \

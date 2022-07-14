@@ -12,6 +12,7 @@ import (
 	"github.com/kubeshop/tracetest/server/analytics"
 	"github.com/kubeshop/tracetest/server/assertions"
 	"github.com/kubeshop/tracetest/server/assertions/selectors"
+	"github.com/kubeshop/tracetest/server/encoding/yaml/conversion"
 	"github.com/kubeshop/tracetest/server/encoding/yaml/definition"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/http/mappings"
@@ -506,4 +507,39 @@ func (c controller) ImportTestRun(ctx context.Context, exportedTest openapi.Expo
 	}
 
 	return openapi.Response(http.StatusOK, response), nil
+}
+
+func (c *controller) CreateTestFromDefinition(ctx context.Context, testDefinition openapi.TextDefinition) (openapi.ImplResponse, error) {
+	var definitionObject definition.Test
+	err := yaml.Unmarshal([]byte(testDefinition.Content), &definitionObject)
+	if err != nil {
+		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
+	}
+
+	openapiObject, err := conversion.ConvertTestDefinitionIntoOpenAPIObject(definitionObject)
+	if err != nil {
+		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
+	}
+
+	return c.CreateTest(ctx, openapiObject)
+}
+
+func (c *controller) UpdateTestFromDefinition(ctx context.Context, testId string, testDefinition openapi.TextDefinition) (openapi.ImplResponse, error) {
+	var definitionObject definition.Test
+	err := yaml.Unmarshal([]byte(testDefinition.Content), &definitionObject)
+	if err != nil {
+		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
+	}
+
+	openapiObject, err := conversion.ConvertTestDefinitionIntoOpenAPIObject(definitionObject)
+	if err != nil {
+		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
+	}
+
+	response, err := c.UpdateTest(ctx, testId, openapiObject)
+	if err != nil {
+		return response, err
+	}
+
+	return openapi.Response(http.StatusOK, openapiObject), nil
 }

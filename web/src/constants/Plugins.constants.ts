@@ -80,9 +80,17 @@ const Postman: IPlugin = {
   name: SupportedPlugins.Postman,
   title: 'Postman Collection',
   description: 'Define your HTTP Request via a Postman Collection',
-  isActive: false,
-  stepList: [],
   type: TriggerTypes.http,
+  isActive: true,
+  stepList: [
+    ...Default.stepList,
+    {
+      id: 'import-postman-collection',
+      name: 'Import Postman collection',
+      title: 'Upload Postman collection',
+      component: 'UploadCollection',
+    },
+  ],
 };
 
 const OpenAPI: IPlugin = {

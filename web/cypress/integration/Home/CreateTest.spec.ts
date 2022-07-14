@@ -1,6 +1,7 @@
 import {camelCase} from 'lodash';
 import {DemoTestExampleList} from '../../../src/constants/Test.constants';
-import {deleteTest, openCreateTestModal} from '../utils/Common';
+import {deleteTest, navigateToTestCreationPage} from '../utils/Common';
+import {fillCreateFormBasicStep} from './fillCreateFormBasicStep';
 
 describe('Create test', () => {
   beforeEach(() => {
@@ -8,15 +9,10 @@ describe('Create test', () => {
   });
 
   it('should create a basic GET test from scratch', () => {
-    const $form = openCreateTestModal();
-
-    $form.get('[data-cy=create-test-next-button]').click();
+    const $form = navigateToTestCreationPage();
     const name = `Test - Pokemon - #${String(Date.now()).slice(-4)}`;
 
-    $form.get('[data-cy=create-test-name-input').type(name);
-    $form.get('[data-cy=create-test-description-input').type(name);
-
-    $form.get('[data-cy=create-test-next-button]').last().click();
+    fillCreateFormBasicStep($form, name);
 
     $form.get('[data-cy=method-select]').click();
     $form.get('[data-cy=method-select-option-GET]').click();
@@ -30,7 +26,7 @@ describe('Create test', () => {
   });
 
   it('should create a basic POST test from scratch', () => {
-    const $form = openCreateTestModal();
+    const $form = navigateToTestCreationPage();
     $form.get('[data-cy=create-test-next-button]').last().click();
 
     const name = `Test - Pokemon - #${String(Date.now()).slice(-4)}`;
@@ -62,7 +58,7 @@ describe('Create test', () => {
   it('should create a GET test from an example', () => {
     const [{name}] = DemoTestExampleList;
 
-    const $form = openCreateTestModal();
+    const $form = navigateToTestCreationPage();
     $form.get('[data-cy=create-test-next-button]').last().click();
 
     $form.get('[data-cy=example-button]').click();
@@ -79,7 +75,7 @@ describe('Create test', () => {
   it('should create a POST test from an example', () => {
     const [, {name}] = DemoTestExampleList;
 
-    const $form = openCreateTestModal();
+    const $form = navigateToTestCreationPage();
     $form.get('[data-cy=create-test-next-button]').last().click();
 
     $form.get('[data-cy=example-button]').click();

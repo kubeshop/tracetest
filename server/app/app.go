@@ -72,6 +72,7 @@ func (a *App) Start() error {
 	fmt.Println("Starting tracetest", Version)
 
 	serverID, isNewInstall, err := a.db.ServerID()
+
 	if err != nil {
 		return err
 	}

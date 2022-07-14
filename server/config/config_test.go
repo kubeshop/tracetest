@@ -26,9 +26,14 @@ func TestFromFileSuccess(t *testing.T) {
 					RetryDelay:          "3s",
 				},
 				PostgresConnString: "host=postgres user=postgres password=postgres port=5432 sslmode=disable",
-				JaegerConnectionConfig: &configgrpc.GRPCClientSettings{
-					Endpoint:   "jaeger-query:16685",
-					TLSSetting: configtls.TLSClientSetting{Insecure: true},
+				TracingBackend: config.TracingBackend{
+					DataStore: config.TracingBackendDataStoreConfig{
+						Type: "jaeger",
+						Jaeger: configgrpc.GRPCClientSettings{
+							Endpoint:   "jaeger-query:16685",
+							TLSSetting: configtls.TLSClientSetting{Insecure: true},
+						},
+					},
 				},
 			},
 		},
@@ -41,9 +46,14 @@ func TestFromFileSuccess(t *testing.T) {
 					RetryDelay:          "1s",
 				},
 				PostgresConnString: "host=postgres user=postgres password=postgres port=5432 sslmode=disable",
-				TempoConnectionConfig: &configgrpc.GRPCClientSettings{
-					Endpoint:   "tempo:9095",
-					TLSSetting: configtls.TLSClientSetting{Insecure: true},
+				TracingBackend: config.TracingBackend{
+					DataStore: config.TracingBackendDataStoreConfig{
+						Type: "tempo",
+						Tempo: configgrpc.GRPCClientSettings{
+							Endpoint:   "tempo:9095",
+							TLSSetting: configtls.TLSClientSetting{Insecure: true},
+						},
+					},
 				},
 			},
 		},

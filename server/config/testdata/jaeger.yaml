@@ -2,7 +2,10 @@ poolingConfig:
   maxWaitTimeForTrace: 1m
   retryDelay: 3s
 postgresConnString: "host=postgres user=postgres password=postgres port=5432 sslmode=disable"
-jaegerConnectionConfig:
-  endpoint: jaeger-query:16685
-  tls:
-    insecure: true
+tracingBackend:
+  dataStore:
+    type: jaeger
+    jaeger:
+      endpoint: jaeger-query:16685
+      tls:
+        insecure: true

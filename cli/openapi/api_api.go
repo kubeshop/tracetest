@@ -134,6 +134,113 @@ func (a *ApiApiService) CreateTestExecute(r ApiCreateTestRequest) (*Test, *http.
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
+type ApiCreateTestFromDefinitionRequest struct {
+	ctx            context.Context
+	ApiService     *ApiApiService
+	textDefinition *TextDefinition
+}
+
+func (r ApiCreateTestFromDefinitionRequest) TextDefinition(textDefinition TextDefinition) ApiCreateTestFromDefinitionRequest {
+	r.textDefinition = &textDefinition
+	return r
+}
+
+func (r ApiCreateTestFromDefinitionRequest) Execute() (*Test, *http.Response, error) {
+	return r.ApiService.CreateTestFromDefinitionExecute(r)
+}
+
+/*
+CreateTestFromDefinition Create new test using the yaml definition
+
+Create new test using the yaml definition
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiCreateTestFromDefinitionRequest
+*/
+func (a *ApiApiService) CreateTestFromDefinition(ctx context.Context) ApiCreateTestFromDefinitionRequest {
+	return ApiCreateTestFromDefinitionRequest{
+		ApiService: a,
+		ctx:        ctx,
+	}
+}
+
+// Execute executes the request
+//  @return Test
+func (a *ApiApiService) CreateTestFromDefinitionExecute(r ApiCreateTestFromDefinitionRequest) (*Test, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodPost
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *Test
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.CreateTestFromDefinition")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/tests/definition.yaml"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"text/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.textDefinition
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
 type ApiDeleteTestRequest struct {
 	ctx        context.Context
 	ApiService *ApiApiService
@@ -1944,4 +2051,115 @@ func (a *ApiApiService) UpdateTestExecute(r ApiUpdateTestRequest) (*http.Respons
 	}
 
 	return localVarHTTPResponse, nil
+}
+
+type ApiUpdateTestFromDefinitionRequest struct {
+	ctx            context.Context
+	ApiService     *ApiApiService
+	testId         string
+	textDefinition *TextDefinition
+}
+
+func (r ApiUpdateTestFromDefinitionRequest) TextDefinition(textDefinition TextDefinition) ApiUpdateTestFromDefinitionRequest {
+	r.textDefinition = &textDefinition
+	return r
+}
+
+func (r ApiUpdateTestFromDefinitionRequest) Execute() (*Test, *http.Response, error) {
+	return r.ApiService.UpdateTestFromDefinitionExecute(r)
+}
+
+/*
+UpdateTestFromDefinition update test from definition file
+
+update test action from definition file
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param testId
+ @return ApiUpdateTestFromDefinitionRequest
+*/
+func (a *ApiApiService) UpdateTestFromDefinition(ctx context.Context, testId string) ApiUpdateTestFromDefinitionRequest {
+	return ApiUpdateTestFromDefinitionRequest{
+		ApiService: a,
+		ctx:        ctx,
+		testId:     testId,
+	}
+}
+
+// Execute executes the request
+//  @return Test
+func (a *ApiApiService) UpdateTestFromDefinitionExecute(r ApiUpdateTestFromDefinitionRequest) (*Test, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodPut
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *Test
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.UpdateTestFromDefinition")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/tests/{testId}/definition.yaml"
+	localVarPath = strings.Replace(localVarPath, "{"+"testId"+"}", url.PathEscape(parameterToString(r.testId, "")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"text/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.textDefinition
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
 }
