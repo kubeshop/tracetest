@@ -79,7 +79,7 @@ func (te *grpcTriggerer) Trigger(_ context.Context, test model.Test, tid trace.T
 
 	rf, _, err := grpcurl.RequestParserAndFormatter(grpcurl.FormatJSON, desc, strings.NewReader(tReq.Request), options)
 	if err != nil {
-		return response, fmt.Errorf("failed to construct request parser and formatter for %q", err)
+		return response, fmt.Errorf("failed to construct request parser and formatter for %w", err)
 	}
 
 	anyResolver := grpcurl.AnyResolverFromDescriptorSource(desc)
