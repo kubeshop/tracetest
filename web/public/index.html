@@ -41,7 +41,7 @@
       function injectVariables() {
 
         window.ENV = {
-          measurementId: getTemplateValue("{{ .MeasurementId }}", ""),
+          measurementId: getTemplateValue("{{ .AnalyticsKey }}", ""),
           analyticsEnabled: getTemplateValue("{{ .AnalyticsEnabled }}", false),
           serverPathPrefix: getTemplateValue("{{ .ServerPathPrefix }}", "/")
         };

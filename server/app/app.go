@@ -144,7 +144,7 @@ func (a *App) Start() error {
 			"./html",
 			"index.html",
 			map[string]string{
-				"MeasurementId":    analytics.MeasurementID,
+				"AnalyticsKey":     analytics.FrontendKey,
 				"AnalyticsEnabled": fmt.Sprintf("%t", a.config.GA.Enabled),
 				"ServerPathPrefix": fmt.Sprintf("%s/", a.config.Server.PathPrefix),
 			},

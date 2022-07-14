@@ -1,8 +1,8 @@
 VERSION ?= "dev"
 GO_LDFLAGS := $(shell echo \
 		-X "'github.com/kubeshop/tracetest/server/app.Version=$(VERSION)'" \
-		-X "'github.com/kubeshop/tracetest/server/analytics.MeasurementID=$(GA_MEASUREMENT_ID)'" \
-		-X "'github.com/kubeshop/tracetest/server/analytics.SecretKey=$(GA_SECRET_KEY)'" \
+		-X "'github.com/kubeshop/tracetest/server/analytics.SecretKey=$(ANALYTICS_BE_KEY)'" \
+		-X "'github.com/kubeshop/tracetest/server/analytics.FrontendKey=$(ANALYTICS_FE_KEY)'" \
 	| sed 's/ / /g')
 
 all: init-submodule proto generate
