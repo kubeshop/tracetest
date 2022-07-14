@@ -83,7 +83,7 @@ func (a *App) Start() error {
 	}
 
 	if isNewInstall {
-		err = analytics.SendEvent("install_server", "beacon")
+		err = analytics.SendEvent("Install", "beacon")
 		if err != nil {
 			return err
 		}
@@ -152,7 +152,7 @@ func (a *App) Start() error {
 		),
 	)
 
-	err = analytics.SendEvent("server_started_backend", "beacon")
+	err = analytics.SendEvent("Server Started", "beacon")
 	if err != nil {
 		return err
 	}
