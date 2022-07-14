@@ -41,7 +41,7 @@ func Ready() bool {
 
 func SendEvent(name, category string) error {
 	fmt.Printf(`sending event "%s" (%s)%s`, name, category, "\n")
-	if !defaultClient.Ready() {
+	if !Ready() {
 		err := fmt.Errorf("uninitalized client. Call analytics.Init")
 		fmt.Printf(`could not send event "%s" (%s): %s%s`, name, category, err.Error(), "\n")
 		return err
