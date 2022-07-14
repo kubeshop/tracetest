@@ -1,3 +1,5 @@
+import {useMemo} from 'react';
+
 import {SemanticGroupNames} from 'constants/SemanticGroupNames.constants';
 import {useAppSelector} from 'redux/hooks';
 import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
@@ -26,7 +28,7 @@ interface IProps {
 }
 
 const AssertionItem = ({
-  assertionResult: {selector, resultList, selectorList, pseudoSelector, spanIds, isAdvancedSelector},
+  assertionResult: {resultList, selector, spanIds},
   assertionResult,
   onDelete,
   onEdit,
@@ -43,8 +45,8 @@ const AssertionItem = ({
     isDraft = false,
     originalSelector = '',
   } = useAppSelector(state => TestDefinitionSelectors.selectDefinitionBySelector(state, selector)) || {};
-  const totalPassedChecks = AssertionService.getTotalPassedChecks(resultList);
-  const results = AssertionService.getResultsHashedBySpanId(resultList);
+  const totalPassedChecks = useMemo(() => AssertionService.getTotalPassedChecks(resultList), [resultList]);
+  const results = useMemo(() => AssertionService.getResultsHashedBySpanId(resultList), [resultList]);
 
   return (
     <div data-cy="assertion-card" id={`assertion-${selector}`}>
