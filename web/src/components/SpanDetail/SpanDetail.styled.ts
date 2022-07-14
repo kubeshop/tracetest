@@ -9,7 +9,8 @@ export const HeaderItem = styled.div`
   align-items: center;
   color: ${({theme}) => theme.color.text};
   display: flex;
-  font-size: ${({theme}) => theme.size.sm};
+  font-size: ${({theme}) => theme.size.md};
+  margin-right: 8px;
 `;
 
 export const HeaderItemText = styled(Typography.Text)`
@@ -26,6 +27,7 @@ export const HeaderTitle = styled(Typography.Title)`
 export const Row = styled.div`
   align-items: center;
   display: flex;
+  margin-bottom: 4px;
 `;
 
 export const SpanDetail = styled.div`

@@ -22,16 +22,18 @@ const SpanHeader = ({span}: IProps) => {
         <SSpanNode.BadgeType count={SemanticGroupNamesToText[type]} $type={type} />
         <S.HeaderTitle level={2}>{name}</S.HeaderTitle>
       </S.Row>
-      <S.HeaderItem>
-        <SettingOutlined />
-        <S.HeaderItemText>{`${service} ${SpanKindToText[kind]}`}</S.HeaderItemText>
-      </S.HeaderItem>
-      {Boolean(system) && (
+      <S.Row>
         <S.HeaderItem>
-          <ToolOutlined />
-          <S.HeaderItemText>{system}</S.HeaderItemText>
+          <SettingOutlined />
+          <S.HeaderItemText>{`${service} ${SpanKindToText[kind]}`}</S.HeaderItemText>
         </S.HeaderItem>
-      )}
+        {Boolean(system) && (
+          <S.HeaderItem>
+            <ToolOutlined />
+            <S.HeaderItemText>{system}</S.HeaderItemText>
+          </S.HeaderItem>
+        )}
+      </S.Row>
     </S.Header>
   );
 };
