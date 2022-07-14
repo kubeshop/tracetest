@@ -19,8 +19,8 @@ done
 
 
 docker compose -f docker-compose.yaml up -d --build --remove-orphans
-docker compose -f docker-compose.yaml -f docker-compose.testrunner.yaml build
-docker compose -f docker-compose.yaml -f docker-compose.testrunner.yaml run testrunner
+docker compose -f docker-compose.yaml -f local-config/docker-compose.testrunner.yaml build
+docker compose -f docker-compose.yaml -f local-config/docker-compose.testrunner.yaml run testrunner
 
 if [ "$STOP" == "yes" ]; then
   docker compose -f docker-compose.yaml stop

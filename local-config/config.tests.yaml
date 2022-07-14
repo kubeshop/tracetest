@@ -8,18 +8,14 @@ tracingBackend:
         insecure: true
 
 poolingConfig:
-  maxWaitTimeForTrace: 30s
-  retryDelay: 500ms
+  maxWaitTimeForTrace: 60s
+  retryDelay: 6s
 
 googleAnalytics:
   enabled: false
 
 telemetry:
+  enabled: true
   serviceName: tracetest
   sampling: 100 # 100%
-  jaeger:
-    host: jaeger
-    port: 6831
-  exporters:
-    - console
-    - jaeger
+  otelCollectorEndpoint: otel-collector:4317

@@ -8,7 +8,7 @@ services:
       - VERSION=dev
     volumes:
       - type: bind
-        source: ./config.tests.yaml
+        source: ./local-config/config.tests.yaml
         target: /app/config.yaml
     ports:
       - 8080:8080
@@ -82,8 +82,9 @@ services:
       timeout: 5s
       retries: 60
 
-  demo:
+  demo-api:
     image: kubeshop/demo-pokemon-api:latest
+    pull_policy: always
     environment:
       REDIS_URL: cache
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres?schema=public
@@ -91,8 +92,7 @@ services:
       POKE_API_BASE_URL: https://pokeapi.co/api/v2
       JAEGER_HOST: jaeger
       JAEGER_PORT: 6832
-    ports:
-      - 8001:80
+      NPM_RUN_COMMAND: api
     depends_on:
       postgres:
         condition: service_healthy
@@ -102,3 +102,25 @@ services:
         condition: service_healthy
       jaeger:
         condition: service_healthy
+
+  demo-rpc:
+    image: kubeshop/demo-pokemon-api:latest
+    pull_policy: always
+    environment:
+      REDIS_URL: cache
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres?schema=public
+      RABBITMQ_HOST: queue
+      POKE_API_BASE_URL: https://pokeapi.co/api/v2
+      JAEGER_HOST: jaeger
+      JAEGER_PORT: 6832
+      NPM_RUN_COMMAND: rpc
+    depends_on:
+      postgres:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
+      queue:
+        condition: service_healthy
+      jaeger:
+        condition: service_healthy
+

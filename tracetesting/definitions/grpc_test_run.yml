@@ -1,5 +1,5 @@
-id: 2ec817b5-8087-4e8f-9462-8026f0f54414
-name: Test Run
+id: 9638ee3a-0952-492f-8380-7f85a7379c93
+name: gRPC Test Run
 description: ""
 trigger:
   type: http
@@ -17,8 +17,9 @@ testDefinition:
   assertions:
   - tracetest.selected_spans.count = 1
   - tracetest.run.trigger.test_id = "${TEST_ID}"
-  - tracetest.run.trigger.type = "http"
-  - tracetest.run.trigger.http.response_code = 200
+  - tracetest.run.trigger.type = "grpc"
+  - tracetest.run.trigger.grpc.response_status_code = 0
+  - tracetest.run.trigger.grpc.response_status = "OK"
 - selector: span[name = "Fetch trace"]
   assertions:
   - tracetest.selected_spans.count > 0

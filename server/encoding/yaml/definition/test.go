@@ -35,6 +35,7 @@ type TestTrigger struct {
 func (t TestTrigger) Validate() error {
 	validTypes := map[string]bool{
 		"http": true,
+		"grpc": true,
 	}
 
 	if t.Type == "" {
