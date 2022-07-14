@@ -76,26 +76,30 @@ The Tracetest [test definition files](https://kubeshop.github.io/tracetest/test-
 - verifies that the HTTP blocks return a 200 status code.
 - verifies all database calls execute in less than 200ms.
 
-```
-description: ""
+```yaml
 id: 5dd03dda-fad2-49f0-b9d9-5143b746c1d0
 name: DEMO Pokemon - Import - Import a Pokemon
-testDefinition:
-    - assertions:
-        - http.status_code = 200
-      selector: span[tracetest.span.type = "http"]
-    - assertions:
-        - tracetest.span.duration < "50ms"
-      selector: span[tracetest.span.type = "database"]
+description: "Import a pokemon"
+
+# Configure how tracetest triggers the operation on your application
 trigger:
+    type: http
     httpRequest:
-        body: '{"id":52}'
+        method: POST
+        url: http://demo-pokemon-api.demo.svc.cluster.local/pokemon/import
         headers:
             - key: Content-Type
               value: application/json
-        method: POST
-        url: http://demo-pokemon-api.demo.svc.cluster.local/pokemon/import
-    type: http
+        body: '{"id":52}'
+
+# Setup what will be asserted on the resulting trace
+testDefinition:
+    selector: span[tracetest.span.type = "http"]
+    - assertions:
+        - http.status_code = 200
+    selector: span[tracetest.span.type = "database"]
+    - assertions:
+        - tracetest.span.duration < "50ms"
 ```
 
 # Feedback
