@@ -7,7 +7,6 @@ services:
       context: .
       args:
         VERSION: dev
-        ANALYTICS_FE_KEY: thisisthekey
     volumes:
       - type: bind
         source: ./config.tests.yaml
