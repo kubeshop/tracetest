@@ -25,7 +25,10 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-var Version = ""
+var (
+	Version = "dev"
+	Env     = "dev"
+)
 
 type App struct {
 	config  config.Config
@@ -77,7 +80,7 @@ func (a *App) Start() error {
 		return err
 	}
 
-	err = analytics.Init(a.config.GA.Enabled, serverID, Version)
+	err = analytics.Init(a.config.GA.Enabled, serverID, Version, Env)
 	if err != nil {
 		return err
 	}

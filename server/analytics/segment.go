@@ -9,17 +9,19 @@ var (
 	FrontendKey = ""
 )
 
-func newSegmentTracker(hostname, serverID, appVersion string) Tracker {
+func newSegmentTracker(hostname, serverID, appVersion, env string) Tracker {
 	client := segment.New(SecretKey)
 
 	client.Enqueue(segment.Identify{
 		UserId: serverID,
 		Traits: segment.NewTraits().
+			Set("env", env).
 			Set("appVersion", appVersion).
 			Set("hostname", hostname),
 	})
 	return segmentTracker{
 		client:     client,
+		env:        env,
 		appVersion: appVersion,
 		hostname:   hostname,
 		serverID:   serverID,
@@ -28,6 +30,7 @@ func newSegmentTracker(hostname, serverID, appVersion string) Tracker {
 
 type segmentTracker struct {
 	client     segment.Client
+	env        string
 	appVersion string
 	hostname   string
 	serverID   string
@@ -36,12 +39,14 @@ type segmentTracker struct {
 func (t segmentTracker) Ready() bool {
 	return t.appVersion != "" &&
 		t.hostname != "" &&
-		t.serverID != ""
+		t.serverID != "" &&
+		t.env != ""
 
 }
 
 func (t segmentTracker) Track(name string, props map[string]string) error {
 	p := segment.NewProperties().
+		Set("env", t.env).
 		Set("appVersion", t.appVersion).
 		Set("hostname", t.hostname)
 
