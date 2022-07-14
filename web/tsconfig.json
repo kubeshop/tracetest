@@ -20,6 +20,13 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "baseUrl": "./src",
+    "types": [
+      "node",
+      "jest",
+      "cypress",
+      "cypress-file-upload",
+      "@testing-library/jest-dom"
+    ]
   },
   "include": [
     "src"

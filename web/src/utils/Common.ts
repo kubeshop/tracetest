@@ -37,3 +37,13 @@ export const downloadFile = (data: string, fileName: string): Element => {
 export function enumKeys<O extends object, K extends keyof O = keyof O>(obj: O): K[] {
   return Object.keys(obj).filter(k => Number.isNaN(Number(k))) as K[];
 }
+
+export declare type RecursivePartial<T> = T extends object
+  ? {
+      [P in keyof T]?: T[P] extends (infer U)[]
+        ? RecursivePartial<U>[]
+        : T[P] extends object
+        ? RecursivePartial<T[P]>
+        : T[P];
+    }
+  : any;

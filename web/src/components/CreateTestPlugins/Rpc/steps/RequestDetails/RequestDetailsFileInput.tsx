@@ -1,27 +1,42 @@
 import {UploadOutlined} from '@ant-design/icons';
-import type {UploadFile} from 'antd/es/upload/interface';
-import {noop} from 'lodash';
 import {Upload} from 'antd';
+import type {UploadFile} from 'antd/es/upload/interface';
+import {RcFile} from 'antd/lib/upload';
+import {noop} from 'lodash';
 import * as S from './RequestDetails.styled';
 
 interface IProps {
-  onChange?(file?: UploadFile): void;
+  onChange?(file?: RcFile): void;
   value?: UploadFile;
+  // accept values https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#accept
+  accept?: string;
+  disabled?: boolean;
+  'data-cy'?: string;
 }
 
-const RequestDetailsFileInput = ({value: file, onChange = noop}: IProps) => (
+const RequestDetailsFileInput = ({
+  disabled = false,
+  accept = '.proto',
+  value: file,
+  onChange = noop,
+  ...props
+}: IProps) => (
   <Upload
+    disabled={disabled}
+    data-cy={props['data-cy']}
     multiple={false}
     fileList={file ? [file] : []}
     onRemove={() => onChange()}
-    accept=".proto"
+    accept={accept}
     beforeUpload={newFile => {
       onChange(newFile);
 
       return false;
     }}
   >
-    <S.UploadButton icon={<UploadOutlined />}>Choose File</S.UploadButton>
+    <S.UploadButton data-cy={`${props['data-cy'] || 'upload'}-button`} disabled={disabled} icon={<UploadOutlined />}>
+      Choose File
+    </S.UploadButton>
   </Upload>
 );
 
