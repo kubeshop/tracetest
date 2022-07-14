@@ -6,13 +6,7 @@ import TestRunMock from '../../../models/__mocks__/TestRun.mock';
 test('FailedTrace', () => {
   const test = TestMock.model();
   const {getByText} = render(
-    <FailedTrace
-      onRunTest={jest.fn()}
-      testId={test.id}
-      isDisplayingError
-      onEdit={jest.fn()}
-      run={TestRunMock.model()}
-    />
+    <FailedTrace onRunTest={jest.fn()} testId={test.id} isDisplayingError run={TestRunMock.model()} />
   );
   expect(getByText('Rerun Test')).toBeTruthy();
 });

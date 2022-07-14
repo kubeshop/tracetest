@@ -8,12 +8,10 @@ export const InputContainer = styled.div<{$isEditing?: boolean}>`
   display: grid;
   gap: 26px;
   grid-template-columns: 55%;
-  justify-content: center;
 
   ${({$isEditing = false}) =>
     $isEditing &&
     css`
       grid-template-columns: 100%;
-      justify-content: start;
     `};
 `;

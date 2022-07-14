@@ -1,4 +1,3 @@
-import {useCallback} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 
 import FailedTrace from 'components/FailedTrace';
@@ -13,14 +12,10 @@ import * as S from './Trace.styled';
 const TraceContent = () => {
   const {testId = ''} = useParams();
   const navigate = useNavigate();
-  const {isDraftMode, test} = useTestDefinition();
+  const {isDraftMode, test, runTest} = useTestDefinition();
 
   const {isError, run} = useTestRun();
   const isDisplayingError = isError || run.state === TestState.FAILED;
-
-  const onRunTest = useCallback(() => {
-    console.log('onRunTest');
-  }, []);
 
   return test ? (
     <S.Wrapper>
@@ -34,13 +29,7 @@ const TraceContent = () => {
         testVersion={run.testVersion}
         totalSpans={run?.trace?.spans?.length}
       />
-      <FailedTrace
-        onRunTest={onRunTest}
-        testId={testId}
-        run={run}
-        isDisplayingError={isDisplayingError}
-        onEdit={() => console.log('onEdit')}
-      />
+      <FailedTrace onRunTest={runTest} testId={testId} run={run} isDisplayingError={isDisplayingError} />
       <Run displayError={isDisplayingError} run={run} test={test} />
     </S.Wrapper>
   ) : null;
