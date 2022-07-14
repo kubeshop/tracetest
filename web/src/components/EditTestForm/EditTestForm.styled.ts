@@ -1,16 +1,6 @@
 import {Typography} from 'antd';
 import styled from 'styled-components';
 
-export const DemoContainer = styled.div`
-  margin-bottom: 24px;
-`;
-
-export const HeaderContainer = styled.div`
-  align-items: center;
-  display: flex;
-  margin-bottom: 8px;
-`;
-
 export const Row = styled.div`
   display: flex;
 `;

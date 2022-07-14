@@ -4,7 +4,6 @@ import {useGetTestByIdQuery} from 'redux/apis/TraceTest.api';
 import {TTestRun} from 'types/TestRun.types';
 import TestHeader from 'components/TestHeader';
 import TestCardActions from 'components/TestCard/TestCardActions';
-import {useEditTestModal} from 'components/EditTestModal/EditTestModal.provider';
 import * as S from './Test.styled';
 import TestDetails from './TestDetails';
 import {useMenuDeleteCallback} from '../Home/useMenuDeleteCallback';
@@ -13,7 +12,6 @@ const TestContent = () => {
   const navigate = useNavigate();
   const {testId = ''} = useParams();
   const {data: test} = useGetTestByIdQuery({testId});
-  const {open} = useEditTestModal();
 
   const handleSelectTestResult = useCallback(
     (result: TTestRun) => {
@@ -31,7 +29,7 @@ const TestContent = () => {
         showInfo={false}
         test={test}
         testVersion={test.version}
-        extraContent={<TestCardActions testId={testId} onEdit={() => open(test)} onDelete={() => onDelete(test)} />}
+        extraContent={<TestCardActions testId={testId} onDelete={() => onDelete(test)} />}
       />
       <S.Wrapper>
         <TestDetails testId={test.id} onSelectResult={handleSelectTestResult} />

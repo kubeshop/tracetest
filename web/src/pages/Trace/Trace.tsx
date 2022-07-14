@@ -3,7 +3,6 @@ import {useParams} from 'react-router-dom';
 import {ReactFlowProvider} from 'react-flow-renderer';
 import Layout from 'components/Layout';
 import AssertionFormProvider from 'components/AssertionForm/AssertionForm.provider';
-import EditTestModalProvider from 'components/EditTestModal/EditTestModal.provider';
 import TestRunProvider from 'providers/TestRun';
 import TestDefinitionProvider from 'providers/TestDefinition';
 import GuidedTourProvider from 'providers/GuidedTour/GuidedTour.provider';
@@ -19,13 +18,11 @@ const TracePage = () => {
         <TestRunProvider testId={testId} runId={runId}>
           <TestDefinitionProvider testId={testId} runId={runId}>
             <AssertionFormProvider testId={testId}>
-              <EditTestModalProvider>
-                <SpanProvider>
-                  <Layout>
-                    <TraceContent />
-                  </Layout>
-                </SpanProvider>
-              </EditTestModalProvider>
+              <SpanProvider>
+                <Layout>
+                  <TraceContent />
+                </Layout>
+              </SpanProvider>
             </AssertionFormProvider>
           </TestDefinitionProvider>
         </TestRunProvider>

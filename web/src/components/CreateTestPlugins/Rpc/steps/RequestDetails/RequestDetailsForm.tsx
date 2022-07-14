@@ -1,37 +1,42 @@
-import {Form, FormInstance, Input, Select} from 'antd';
+import {Form, Input, Select} from 'antd';
+import {useCallback, useState, useEffect} from 'react';
 import * as Step from 'components/CreateTestPlugins/Step.styled';
+import {IRpcValues, TDraftTestForm} from 'types/Test.types';
+import RpcService from 'services/Triggers/Rpc.service';
 import RequestDetailsAuthInput from '../../../Rest/steps/RequestDetails/RequestDetailsAuthInput/RequestDetailsAuthInput';
 import RequestDetailsUrlInput from '../../../Rest/steps/RequestDetails/RequestDetailsUrlInput';
-import {IRequestDetailsValues} from './RequestDetails';
 import * as S from './RequestDetails.styled';
-import useValidate from './hooks/useValidate';
 import RequestDetailsMetadataInput from './RequestDetailsMetadataInput';
 import RequestDetailsFileInput from './RequestDetailsFileInput';
 
-export const FORM_ID = 'create-test';
-
 interface IProps {
-  form: FormInstance<IRequestDetailsValues>;
-  onSubmit(values: IRequestDetailsValues): void;
-  onValidation(isValid: boolean): void;
-  methodList: string[];
+  form: TDraftTestForm<IRpcValues>;
 }
 
-const RequestDetailsForm = ({form, onSubmit, onValidation, methodList}: IProps) => {
-  const handleOnValuesChange = useValidate(onValidation);
+const RequestDetailsForm = ({form}: IProps) => {
+  const [methodList, setMethodList] = useState<string[]>([]);
+  const protoFile = Form.useWatch('protoFile', form);
+
+  const getMethodList = useCallback(async () => {
+    if (protoFile) {
+      const fileText = await protoFile.text();
+      const list = RpcService.getMethodList(fileText);
+
+      setMethodList(list);
+    } else {
+      setMethodList([]);
+      form.setFieldsValue({
+        method: '',
+      });
+    }
+  }, [form, protoFile]);
+
+  useEffect(() => {
+    getMethodList();
+  }, [getMethodList]);
 
   return (
-    <Form
-      autoComplete="off"
-      form={form}
-      layout="vertical"
-      name={FORM_ID}
-      onFinish={onSubmit}
-      onValuesChange={handleOnValuesChange}
-      initialValues={{
-        metadata: [{key: '', value: ''}],
-      }}
-    >
+    <>
       <S.InputContainer>
         <Form.Item data-cy="protoFile" name="protoFile" label="Upload Protobuf File">
           <RequestDetailsFileInput />
@@ -55,7 +60,7 @@ const RequestDetailsForm = ({form, onSubmit, onValidation, methodList}: IProps) 
           <Input.TextArea placeholder="Enter message" />
         </Form.Item>
       </S.DoubleInputContainer>
-    </Form>
+    </>
   );
 };
 

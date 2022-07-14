@@ -54,7 +54,7 @@ const RPC: IPlugin = {
   name: SupportedPlugins.RPC,
   title: 'RPC Request',
   description: 'Test and debug your RPC request',
-  isActive: false,
+  isActive: true,
   type: TriggerTypes.grpc,
   stepList: [
     ...Default.stepList,
@@ -109,3 +109,8 @@ export const Plugins: Record<SupportedPlugins, IPlugin> = {
   [SupportedPlugins.Postman]: Postman,
   [SupportedPlugins.OpenAPI]: OpenAPI,
 };
+
+export const TriggerTypeToPlugin = {
+  [TriggerTypes.http]: Plugins.REST,
+  [TriggerTypes.grpc]: Plugins.RPC,
+} as const; 

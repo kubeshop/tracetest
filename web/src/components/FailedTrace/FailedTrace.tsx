@@ -9,17 +9,10 @@ interface IFailedTraceProps {
   isDisplayingError: boolean;
   run: TTestRun;
   testId: string;
-  onEdit(): void;
   onRunTest(result: TTestRun): void;
 }
 
-const FailedTrace: React.FC<IFailedTraceProps> = ({
-  onRunTest,
-  onEdit,
-  testId,
-  isDisplayingError,
-  run: {lastErrorState},
-}) => {
+const FailedTrace: React.FC<IFailedTraceProps> = ({onRunTest, testId, isDisplayingError, run: {lastErrorState}}) => {
   const [runNewTest] = useRunTestMutation();
 
   const onReRun = useCallback(async () => {
@@ -41,7 +34,7 @@ const FailedTrace: React.FC<IFailedTraceProps> = ({
           <Typography.Text type="secondary">We will check it out and respond to you.</Typography.Text>
         </S.TextContainer>
         <S.ButtonContainer>
-          <Button type="primary" ghost onClick={onEdit}>
+          <Button type="primary" ghost href={`test/${testId}/edit`}>
             Edit Test
           </Button>
           <Button type="primary" ghost onClick={onReRun}>

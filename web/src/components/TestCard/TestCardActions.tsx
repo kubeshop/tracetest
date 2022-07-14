@@ -1,14 +1,14 @@
 import {Dropdown, Menu} from 'antd';
+import {Link} from 'react-router-dom';
 import * as S from './TestCard.styled';
 import {useOnDeleteCallback} from './useOnDeleteCallback';
 
 interface IProps {
   testId: string;
-  onEdit(): void;
   onDelete(): void;
 }
 
-const TestCardActions: React.FC<IProps> = ({testId, onDelete, onEdit}) => {
+const TestCardActions: React.FC<IProps> = ({testId, onDelete}) => {
   const onClick = useOnDeleteCallback(onDelete);
 
   return (
@@ -16,7 +16,14 @@ const TestCardActions: React.FC<IProps> = ({testId, onDelete, onEdit}) => {
       overlay={
         <Menu
           items={[
-            {key: 'edit', label: <span data-cy="test-card-edit">Edit</span>, onClick: onEdit},
+            {
+              key: 'edit',
+              label: (
+                <Link data-cy="test-card-edit" to={`/test/${testId}/edit`}>
+                  Edit
+                </Link>
+              ),
+            },
             {key: 'delete', label: <span data-cy="test-card-delete">Delete</span>, onClick},
           ]}
         />

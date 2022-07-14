@@ -22,7 +22,7 @@ const authMethodList = [
 ] as const;
 
 interface IProps {
-  form: FormInstance<{auth: TRequestAuth}>;
+  form: FormInstance<Partial<{auth: TRequestAuth}>>;
 }
 
 const TypeInput = ({form}: IProps) => (

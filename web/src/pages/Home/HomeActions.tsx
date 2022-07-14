@@ -12,7 +12,7 @@ const HomeActions = () => {
         data-tour={GuidedTourService.getStep(GuidedTours.Home, Steps.CreateTest)}
         data-cy="create-test-button"
         type="primary"
-        href="/create-test"
+        href="/test/create"
         onClick={() => {
           onCreateTestClick();
         }}

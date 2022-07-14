@@ -1,16 +1,14 @@
-import {Form, FormInstance, Select} from 'antd';
+import {Form, Select} from 'antd';
 import {useWatch} from 'antd/es/form/Form';
-import React, {Dispatch, SetStateAction} from 'react';
-import {RequestDefinitionExtended} from 'services/PostmanService.service';
+import {RequestDefinitionExtended} from 'services/Triggers/Postman.service';
+import {IPostmanValues, TDraftTestForm} from 'types/Test.types';
 import {useSelectTestCallback} from '../hooks/useSelectTestCallback';
-import {IUploadCollectionValues} from '../UploadCollection';
 
 interface IProps {
-  form: FormInstance<IUploadCollectionValues>;
-  setTransientUrl: Dispatch<SetStateAction<string>>;
+  form: TDraftTestForm<IPostmanValues>;
 }
 
-export const SelectTestFromCollection = ({form, setTransientUrl}: IProps) => {
+export const SelectTestFromCollection = ({form}: IProps) => {
   const requests = useWatch<RequestDefinitionExtended[]>('requests');
   const variables = useWatch<any[]>('variables');
   return (
@@ -23,7 +21,7 @@ export const SelectTestFromCollection = ({form, setTransientUrl}: IProps) => {
         style={{width: 490}}
         data-cy="collectionTest-select"
         placeholder="Select test from uploaded collection"
-        onChange={useSelectTestCallback(form, setTransientUrl, requests, variables)}
+        onChange={useSelectTestCallback(form, requests, variables)}
       >
         {(requests || []).map(({id, name}, index) => (
           <Select.Option data-cy={`collectionTest-${index}`} key={id} value={id}>
