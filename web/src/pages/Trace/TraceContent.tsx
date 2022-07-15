@@ -12,7 +12,7 @@ import * as S from './Trace.styled';
 const TraceContent = () => {
   const {testId = ''} = useParams();
   const navigate = useNavigate();
-  const {isDraftMode, test, runTest} = useTestDefinition();
+  const {isDraftMode, test} = useTestDefinition();
 
   const {isError, run} = useTestRun();
   const isDisplayingError = isError || run.state === TestState.FAILED;
@@ -29,7 +29,7 @@ const TraceContent = () => {
         testVersion={run.testVersion}
         totalSpans={run?.trace?.spans?.length}
       />
-      <FailedTrace onRunTest={runTest} testId={testId} run={run} isDisplayingError={isDisplayingError} />
+      <FailedTrace testId={testId} run={run} isDisplayingError={isDisplayingError} />
       <Run displayError={isDisplayingError} run={run} test={test} />
     </S.Wrapper>
   ) : null;

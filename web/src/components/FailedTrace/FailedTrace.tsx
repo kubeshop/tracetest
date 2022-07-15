@@ -1,7 +1,8 @@
 import {Button, Typography} from 'antd';
 import {useCallback} from 'react';
+import {Link, useNavigate} from 'react-router-dom';
 import {DISCORD_URL, GITHUB_ISSUES_URL} from '../../constants/Common.constants';
-import {useRunTestMutation} from '../../redux/apis/TraceTest.api';
+import {useReRunMutation} from '../../redux/apis/TraceTest.api';
 import {TTestRun} from '../../types/TestRun.types';
 import * as S from './FailedTrace.styled';
 
@@ -9,16 +10,17 @@ interface IFailedTraceProps {
   isDisplayingError: boolean;
   run: TTestRun;
   testId: string;
-  onRunTest(result: TTestRun): void;
 }
 
-const FailedTrace: React.FC<IFailedTraceProps> = ({onRunTest, testId, isDisplayingError, run: {lastErrorState}}) => {
-  const [runNewTest] = useRunTestMutation();
+const FailedTrace: React.FC<IFailedTraceProps> = ({testId, isDisplayingError, run: {lastErrorState, id}}) => {
+  const [reRunTest] = useReRunMutation();
+  const navigate = useNavigate();
 
   const onReRun = useCallback(async () => {
-    const result = await runNewTest({testId}).unwrap();
-    onRunTest(result);
-  }, [onRunTest, runNewTest, testId]);
+    const result = await reRunTest({testId, runId: id}).unwrap();
+
+    navigate(`/test/${testId}/run/${result.id}`);
+  }, [id, navigate, reRunTest, testId]);
 
   return isDisplayingError ? (
     <S.FailedTrace>
@@ -34,9 +36,11 @@ const FailedTrace: React.FC<IFailedTraceProps> = ({onRunTest, testId, isDisplayi
           <Typography.Text type="secondary">We will check it out and respond to you.</Typography.Text>
         </S.TextContainer>
         <S.ButtonContainer>
-          <Button type="primary" ghost href={`test/${testId}/edit`}>
-            Edit Test
-          </Button>
+          <Link to={`test/${testId}/edit`}>
+            <Button type="primary" ghost>
+              Edit Test
+            </Button>
+          </Link>
           <Button type="primary" ghost onClick={onReRun}>
             Rerun Test
           </Button>
