@@ -36,7 +36,7 @@ const FailedTrace: React.FC<IFailedTraceProps> = ({testId, isDisplayingError, ru
           <Typography.Text type="secondary">We will check it out and respond to you.</Typography.Text>
         </S.TextContainer>
         <S.ButtonContainer>
-          <Link to={`test/${testId}/edit`}>
+          <Link to={`/test/${testId}/edit`}>
             <Button type="primary" ghost>
               Edit Test
             </Button>
