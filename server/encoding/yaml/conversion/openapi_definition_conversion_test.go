@@ -6,7 +6,6 @@ import (
 	"github.com/kubeshop/tracetest/server/encoding/yaml/conversion"
 	"github.com/kubeshop/tracetest/server/encoding/yaml/definition"
 	"github.com/kubeshop/tracetest/server/openapi"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -20,21 +19,24 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 		{
 			Name: "Should_convert_basic_test_information",
 			Input: openapi.Test{
-				Id:          "624a8dea-f152-48d4-a742-30b210094959",
-				Name:        "my test",
-				Description: "my test description",
-				Version:     3,
-				ServiceUnderTest: openapi.Trigger{
-					TriggerType: "http",
-				},
-				Definition: openapi.TestDefinition{},
+				Id:               "624a8dea-f152-48d4-a742-30b210094959",
+				Name:             "my test",
+				Description:      "my test description",
+				Version:          (3),
+				ServiceUnderTest: openapi.Trigger{},
+				Definition:       openapi.TestDefinition{},
 			},
 			ExpectedOutput: definition.Test{
 				Id:          "624a8dea-f152-48d4-a742-30b210094959",
 				Name:        "my test",
 				Description: "my test description",
 				Trigger: definition.TestTrigger{
-					Type: "http",
+					HTTPRequest: definition.HTTPRequest{
+						Headers: []definition.HTTPHeader{},
+					},
+					GRPC: definition.GRPC{
+						Metadata: []definition.GRPCHeader{},
+					},
 				},
 				TestDefinition: []definition.TestDefinition{},
 			},
@@ -45,7 +47,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 				Id:          "624a8dea-f152-48d4-a742-30b210094959",
 				Name:        "my test",
 				Description: "my test description",
-				Version:     3,
+				Version:     (3),
 				ServiceUnderTest: openapi.Trigger{
 					TriggerType: "http",
 					TriggerSettings: openapi.TriggerTriggerSettings{
@@ -55,7 +57,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 							Headers: []openapi.HttpHeader{
 								{Key: "Content-Type", Value: "application/json"},
 							},
-							Body: `{ "id": 52 }`,
+							Body: (`{ "id": 52 }`),
 							Auth: openapi.HttpAuth{},
 						},
 					},
@@ -67,14 +69,17 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 				Description: "my test description",
 				Trigger: definition.TestTrigger{
 					Type: "http",
-					HTTPRequest: openapi.HttpRequest{
-						Url:    "http://localhost:1234",
+					HTTPRequest: definition.HTTPRequest{
+						URL:    "http://localhost:1234",
 						Method: "POST",
-						Headers: []openapi.HttpHeader{
+						Headers: []definition.HTTPHeader{
 							{Key: "Content-Type", Value: "application/json"},
 						},
-						Auth: openapi.HttpAuth{},
-						Body: `{ "id": 52 }`,
+						Authentication: definition.HTTPAuthentication{},
+						Body:           `{ "id": 52 }`,
+					},
+					GRPC: definition.GRPC{
+						Metadata: []definition.GRPCHeader{},
 					},
 				},
 				TestDefinition: []definition.TestDefinition{},
@@ -86,7 +91,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 				Id:          "624a8dea-f152-48d4-a742-30b210094959",
 				Name:        "my test",
 				Description: "my test description",
-				Version:     3,
+				Version:     (3),
 				ServiceUnderTest: openapi.Trigger{
 					TriggerType: "http",
 					TriggerSettings: openapi.TriggerTriggerSettings{
@@ -108,13 +113,16 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 				Description: "my test description",
 				Trigger: definition.TestTrigger{
 					Type: "http",
-					HTTPRequest: openapi.HttpRequest{
-						Url:    "http://localhost:1234",
+					HTTPRequest: definition.HTTPRequest{
+						URL:    "http://localhost:1234",
 						Method: "POST",
-						Headers: []openapi.HttpHeader{
+						Headers: []definition.HTTPHeader{
 							{Key: "Content-Type", Value: "application/json"},
 						},
-						Auth: openapi.HttpAuth{},
+						Authentication: definition.HTTPAuthentication{},
+					},
+					GRPC: definition.GRPC{
+						Metadata: []definition.GRPCHeader{},
 					},
 				},
 				TestDefinition: []definition.TestDefinition{},
@@ -126,7 +134,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 				Id:          "624a8dea-f152-48d4-a742-30b210094959",
 				Name:        "my test",
 				Description: "my test description",
-				Version:     3,
+				Version:     (3),
 				ServiceUnderTest: openapi.Trigger{
 					TriggerType: "http",
 					TriggerSettings: openapi.TriggerTriggerSettings{
@@ -136,7 +144,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 							Headers: []openapi.HttpHeader{
 								{Key: "Content-Type", Value: "application/json"},
 							},
-							Body: `{ "id": 52 }`,
+							Body: (`{ "id": 52 }`),
 							Auth: openapi.HttpAuth{
 								Type: "basic",
 								Basic: openapi.HttpAuthBasic{
@@ -154,20 +162,23 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 				Description: "my test description",
 				Trigger: definition.TestTrigger{
 					Type: "http",
-					HTTPRequest: openapi.HttpRequest{
-						Url:    "http://localhost:1234",
+					HTTPRequest: definition.HTTPRequest{
+						URL:    "http://localhost:1234",
 						Method: "POST",
-						Headers: []openapi.HttpHeader{
+						Headers: []definition.HTTPHeader{
 							{Key: "Content-Type", Value: "application/json"},
 						},
-						Auth: openapi.HttpAuth{
+						Authentication: definition.HTTPAuthentication{
 							Type: "basic",
-							Basic: openapi.HttpAuthBasic{
-								Username: "my username",
+							Basic: definition.HTTPBasicAuth{
+								User:     "my username",
 								Password: "my password",
 							},
 						},
 						Body: `{ "id": 52 }`,
+					},
+					GRPC: definition.GRPC{
+						Metadata: []definition.GRPCHeader{},
 					},
 				},
 				TestDefinition: []definition.TestDefinition{},
@@ -179,7 +190,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 				Id:          "624a8dea-f152-48d4-a742-30b210094959",
 				Name:        "my test",
 				Description: "my test description",
-				Version:     3,
+				Version:     (3),
 				ServiceUnderTest: openapi.Trigger{
 					TriggerType: "http",
 					TriggerSettings: openapi.TriggerTriggerSettings{
@@ -189,9 +200,9 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 							Headers: []openapi.HttpHeader{
 								{Key: "Content-Type", Value: "application/json"},
 							},
-							Body: `{ "id": 52 }`,
+							Body: (`{ "id": 52 }`),
 							Auth: openapi.HttpAuth{
-								Type: "apiKey",
+								Type: "apikey",
 								ApiKey: openapi.HttpAuthApiKey{
 									Key:   "X-Key",
 									Value: "my-key",
@@ -208,21 +219,24 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 				Description: "my test description",
 				Trigger: definition.TestTrigger{
 					Type: "http",
-					HTTPRequest: openapi.HttpRequest{
-						Url:    "http://localhost:1234",
+					HTTPRequest: definition.HTTPRequest{
+						URL:    "http://localhost:1234",
 						Method: "POST",
-						Headers: []openapi.HttpHeader{
+						Headers: []definition.HTTPHeader{
 							{Key: "Content-Type", Value: "application/json"},
 						},
-						Auth: openapi.HttpAuth{
-							Type: "apiKey",
-							ApiKey: openapi.HttpAuthApiKey{
+						Authentication: definition.HTTPAuthentication{
+							Type: "apikey",
+							ApiKey: definition.HTTPAPIKeyAuth{
 								Key:   "X-Key",
 								Value: "my-key",
 								In:    "header",
 							},
 						},
 						Body: `{ "id": 52 }`,
+					},
+					GRPC: definition.GRPC{
+						Metadata: []definition.GRPCHeader{},
 					},
 				},
 				TestDefinition: []definition.TestDefinition{},
@@ -234,7 +248,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 				Id:          "624a8dea-f152-48d4-a742-30b210094959",
 				Name:        "my test",
 				Description: "my test description",
-				Version:     3,
+				Version:     (3),
 				ServiceUnderTest: openapi.Trigger{
 					TriggerType: "http",
 					TriggerSettings: openapi.TriggerTriggerSettings{
@@ -244,7 +258,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 							Headers: []openapi.HttpHeader{
 								{Key: "Content-Type", Value: "application/json"},
 							},
-							Body: `{ "id": 52 }`,
+							Body: (`{ "id": 52 }`),
 							Auth: openapi.HttpAuth{
 								Type: "bearer",
 								Bearer: openapi.HttpAuthBearer{
@@ -261,19 +275,22 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 				Description: "my test description",
 				Trigger: definition.TestTrigger{
 					Type: "http",
-					HTTPRequest: openapi.HttpRequest{
-						Url:    "http://localhost:1234",
+					HTTPRequest: definition.HTTPRequest{
+						URL:    "http://localhost:1234",
 						Method: "POST",
-						Headers: []openapi.HttpHeader{
+						Headers: []definition.HTTPHeader{
 							{Key: "Content-Type", Value: "application/json"},
 						},
-						Auth: openapi.HttpAuth{
+						Authentication: definition.HTTPAuthentication{
 							Type: "bearer",
-							Bearer: openapi.HttpAuthBearer{
+							Bearer: definition.HTTPBearerAuth{
 								Token: "my token",
 							},
 						},
 						Body: `{ "id": 52 }`,
+					},
+					GRPC: definition.GRPC{
+						Metadata: []definition.GRPCHeader{},
 					},
 				},
 				TestDefinition: []definition.TestDefinition{},
@@ -282,18 +299,16 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 		{
 			Name: "Should_convert_test_definition",
 			Input: openapi.Test{
-				Id:          "624a8dea-f152-48d4-a742-30b210094959",
-				Name:        "my test",
-				Description: "my test description",
-				Version:     3,
-				ServiceUnderTest: openapi.Trigger{
-					TriggerType: "http",
-				},
+				Id:               "624a8dea-f152-48d4-a742-30b210094959",
+				Name:             "my test",
+				Description:      "my test description",
+				Version:          (3),
+				ServiceUnderTest: openapi.Trigger{},
 				Definition: openapi.TestDefinition{
 					Definitions: []openapi.TestDefinitionDefinitions{
 						{
 							Selector: openapi.Selector{
-								Query: `span[name = "my span name"]`,
+								Query: (`span[name = "my span name"]`),
 							},
 							Assertions: []openapi.Assertion{
 								{
@@ -316,7 +331,12 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 				Name:        "my test",
 				Description: "my test description",
 				Trigger: definition.TestTrigger{
-					Type: "http",
+					HTTPRequest: definition.HTTPRequest{
+						Headers: []definition.HTTPHeader{},
+					},
+					GRPC: definition.GRPC{
+						Metadata: []definition.GRPCHeader{},
+					},
 				},
 				TestDefinition: []definition.TestDefinition{
 					{

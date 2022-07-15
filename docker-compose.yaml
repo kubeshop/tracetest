@@ -116,6 +116,8 @@ services:
       JAEGER_HOST: jaeger
       JAEGER_PORT: 6832
       NPM_RUN_COMMAND: rpc
+    ports:
+      - 8082:8082
     depends_on:
       postgres:
         condition: service_healthy

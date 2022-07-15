@@ -443,7 +443,7 @@ func getYamlFileFromDefinition(def definition.Test) ([]byte, error) {
 		return []byte{}, nil
 	}
 
-	if def.Trigger.HTTPRequest.Auth.Type == "" {
+	if def.Trigger.HTTPRequest.Authentication.Type == "" {
 		// remove auth field so we don't have an unnecessary empty structure in the definition
 		trigger := defMap["trigger"].(map[string]interface{})
 		httpRequest := trigger["httpRequest"].(map[string]interface{})
