@@ -65,8 +65,8 @@ Once the test is built, it can be run automatically as part of a build process. 
 # Getting Started
 
 The [install](https://kubeshop.github.io/tracetest/installing/) only takes a few minutes, and is done with via a Helm command. After installing, take a look at the
-[Getting Started](https://kubeshop.github.io/tracetest/getting-started/) guides to set up Tracetest and
-run your first test.
+[Accessing the Dashboard](https://kubeshop.github.io/tracetest/accessing-dashboard/) guide to access the Tracetest Dashboard and
+create and run your first test.
 
 # What does the test definition file look like?
 
