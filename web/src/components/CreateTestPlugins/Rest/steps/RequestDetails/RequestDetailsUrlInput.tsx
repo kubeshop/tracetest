@@ -4,9 +4,10 @@ import * as S from './RequestDetails.styled';
 
 interface IProps {
   showMethodSelector?: boolean;
+  shouldValidateUrl?: boolean;
 }
 
-const RequestDetailsUrlInput = ({showMethodSelector = true}: IProps) => {
+const RequestDetailsUrlInput = ({showMethodSelector = true, shouldValidateUrl = true}: IProps) => {
   return (
     <div>
       <S.URLInputContainer>
@@ -35,7 +36,7 @@ const RequestDetailsUrlInput = ({showMethodSelector = true}: IProps) => {
           name="url"
           rules={[
             {required: true, message: 'Please enter a request url'},
-            {type: 'url', message: 'Request url is not valid'},
+            shouldValidateUrl ? {type: 'url', message: 'Request url is not valid'} : {},
           ]}
           style={{flex: 1}}
           label={!showMethodSelector ? 'URL' : ''}

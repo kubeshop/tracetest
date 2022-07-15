@@ -10,23 +10,25 @@ const RpcTriggerService = (): IRpcTriggerService => ({
   getMethodList(protoFile) {
     const parsedData = parse(protoFile);
 
-    const methodList = parsedData.root.nestedArray.flatMap(a =>
-      (a as NamespaceBase).nestedArray.flatMap(b => {
+    const methodList = parsedData.root.nestedArray.flatMap(a => {
+      const namespace = a as NamespaceBase;
+
+      return namespace.nestedArray.flatMap(b => {
         const service = b as Service;
         return service.methods ? service.methodsArray : [];
-      })
-    );
+      });
+    });
 
     return methodList.reduce<string[]>(
-      (list, {requestStream, responseStream, name}) => (!requestStream && !responseStream ? list.concat(name) : list),
+      (list, {requestStream, responseStream, fullName}) =>
+        !requestStream && !responseStream ? list.concat(fullName.slice(1, fullName.length)) : list,
       []
     );
   },
   async validateDraft(draft) {
     const {protoFile, method, url} = draft as IRpcValues;
 
-    const isValid =
-      Validator.required(url) && Validator.required(method) && Validator.required(protoFile) && Validator.url(url);
+    const isValid = Validator.required(url) && Validator.required(method) && Validator.required(protoFile);
 
     return isValid;
   },
