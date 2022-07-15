@@ -61,6 +61,7 @@ jobs:
           ANALYTICS_BE_KEY=${{ secrets.ANALYTICS_BE_KEY }}
           ANALYTICS_FE_KEY=${{ secrets.ANALYTICS_FE_KEY }}
           VERSION=sha-${{ steps.vars.outputs.sha_short }}
+          ENV=main
 
   deploy-beta:
     if: github.event_name == 'push'

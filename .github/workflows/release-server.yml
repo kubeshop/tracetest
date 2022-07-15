@@ -62,6 +62,7 @@ jobs:
           ANALYTICS_BE_KEY=${{ secrets.ANALYTICS_BE_KEY }}
           ANALYTICS_FE_KEY=${{ secrets.ANALYTICS_FE_KEY }}
           VERSION=${{ github.ref_name}}
+          ENV=main
 
     - name: Run GoReleaser to publish release notes
       uses: goreleaser/goreleaser-action@v2
@@ -173,6 +174,7 @@ jobs:
           ANALYTICS_BE_KEY=${{ secrets.ANALYTICS_BE_KEY }}
           ANALYTICS_FE_KEY=${{ secrets.ANALYTICS_FE_KEY }}
           VERSION=${{ github.ref_name}}-demo
+          ENV=demo
     - name: Set ouput docker tag
       run: echo "::set-output tag=${{ steps.meta.outputs.tags }}"
 
