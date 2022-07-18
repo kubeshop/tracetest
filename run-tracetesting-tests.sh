@@ -18,6 +18,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 
+docker compose -f docker-compose.yaml down
 docker compose -f docker-compose.yaml up -d --build --remove-orphans
 docker compose -f docker-compose.yaml -f local-config/docker-compose.testrunner.yaml build
 docker compose -f docker-compose.yaml -f local-config/docker-compose.testrunner.yaml run testrunner
