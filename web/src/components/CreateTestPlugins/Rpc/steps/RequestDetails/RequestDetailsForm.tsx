@@ -53,7 +53,7 @@ const RequestDetailsForm = ({form}: IProps) => {
       </S.InputContainer>
       <Step.Title>Provide Additional Information</Step.Title>
       <S.DoubleInputContainer>
-        <RequestDetailsUrlInput showMethodSelector={false} />
+        <RequestDetailsUrlInput showMethodSelector={false} shouldValidateUrl={false} />
         <RequestDetailsAuthInput form={form} />
         <RequestDetailsMetadataInput />
         <Form.Item data-cy="message" label="Message" name="message" style={{marginBottom: 0}}>

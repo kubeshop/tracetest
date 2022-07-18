@@ -10,7 +10,7 @@ describe('Create Assertion', () => {
 
   it('should create a basic assertion', () => {
     cy.visit(`http://localhost:3000/test/${testId}`);
-    cy.get('[data-cy^=result-card]').first().click();
+    cy.get('[data-cy^=result-card]', {timeout: 20000}).first().click();
 
     cy.location('href').should('match', /\/test\/.*/i);
 
