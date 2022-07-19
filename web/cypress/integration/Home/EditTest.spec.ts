@@ -1,8 +1,9 @@
-import {createTest, deleteTest, getTestId} from '../utils/Common';
+import {createTest, deleteTest} from '../utils/Common';
 
 describe('Edit Test', () => {
+  let testId;
   before(() => {
-    createTest();
+    testId = createTest();
   });
 
   after(() => {
@@ -14,7 +15,7 @@ describe('Edit Test', () => {
   });
 
   it('should edit a test', () => {
-    cy.get(`[data-cy=test-actions-button-${getTestId()}]`).click();
+    cy.get(`[data-cy=test-actions-button-${testId}]`).click();
     cy.get('[data-cy=test-card-edit]').click();
 
     cy.get('[data-cy=edit-test-form]').should('be.visible');
@@ -27,9 +28,9 @@ describe('Edit Test', () => {
   });
 
   it('should edit a test from the test details', () => {
-    cy.visit(`http://localhost:3000/test/${getTestId()}`);
+    cy.visit(`http://localhost:3000/test/${testId}`);
 
-    cy.get(`[data-cy=test-actions-button-${getTestId()}]`).click();
+    cy.get(`[data-cy=test-actions-button-${testId}]`).click();
     cy.get('[data-cy=test-card-edit]').click();
 
     cy.get('[data-cy=edit-test-form]').should('be.visible');

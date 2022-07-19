@@ -1,8 +1,9 @@
-import {createTest, deleteTest, getTestId} from '../utils/Common';
+import {createTest, deleteTest} from '../utils/Common';
 
 describe('Show Trace', () => {
+  let testId;
   beforeEach(() => {
-    createTest();
+    testId = createTest();
   });
 
   afterEach(() => {
@@ -10,7 +11,7 @@ describe('Show Trace', () => {
   });
 
   it('should show the trace components', () => {
-    cy.visit(`http://localhost:3000/test/${getTestId()}`);
+    cy.visit(`http://localhost:3000/test/${testId}`);
     cy.get('[data-cy^=result-card]', {timeout: 20000}).first().click();
 
     cy.location('href').should('match', /\/test\/.*/i);

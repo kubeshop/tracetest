@@ -5,12 +5,8 @@ Cypress.on('uncaught:exception', err => !err.message.includes('ResizeObserver lo
 
 export const [{name, description}] = DemoTestExampleList;
 
-// eslint-disable-next-line import/no-mutable-exports
-export let testId = '';
-
-export const getTestId = () => testId;
-
 export const createTest = () => {
+  let testId = '';
   cy.visit('http://localhost:3000/');
   const $form = navigateToTestCreationPage();
 
@@ -29,6 +25,7 @@ export const createTest = () => {
     testId = id;
   });
   cy.visit('http://localhost:3000/');
+  return testId;
 };
 
 export const navigateToTestCreationPage = () => {
