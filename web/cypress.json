@@ -3,7 +3,7 @@
   "testFiles": "**/*.spec.{js,ts,jsx,tsx}",
   "viewportWidth": 1440,
   "viewportHeight": 1080,
-  "defaultCommandTimeout": 15000,
+  "defaultCommandTimeout": 20000,
   "responseTimeout": 30000,
   "projectId": "6dm1if"
 }
