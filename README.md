@@ -114,6 +114,10 @@ Give us a star on Github if you're interested in the project!
 
 Is available at [https://kubeshop.github.io/tracetest](https://kubeshop.github.io/tracetest)
 
+# Tests
+
+We strive to produce quality code and improve Tracetest rapidly and safely. Therefore, we have a full suite of both frontend and backend tests. We are using Cypress to test our frontend code and (surprise, surprise) Tracetest for our backend code. You can see the [test runs here](https://github.com/kubeshop/tracetest/actions/workflows/pull-request.yaml), and a blog post describing our [testing pipelines here](https://kubeshop.io/blog/integrating-tracetest-with-github-actions-in-a-ci-pipeline).
+
 # License
 
 [MIT License](/LICENSE)
