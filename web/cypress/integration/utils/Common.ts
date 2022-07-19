@@ -24,7 +24,7 @@ export const createTest = () => {
 
   cy.location('pathname').should('match', /\/test\/.*/i, {timeout: 20000});
   cy.location().then(({pathname}) => {
-    const id = getTestId(pathname);
+    const id = getTestIdFromPath(pathname);
 
     testId = id;
   });
@@ -42,7 +42,7 @@ export const navigateToTestCreationPage = () => {
 
 export const deleteTest = () => {
   cy.location().then(({pathname}) => {
-    const localTestId = getTestId(pathname);
+    const localTestId = getTestIdFromPath(pathname);
     cy.visit('http://localhost:3000/');
 
     cy.get(`[data-cy=test-actions-button-${localTestId}]`).click();
@@ -52,7 +52,7 @@ export const deleteTest = () => {
   });
 };
 
-export const getTestId = (pathname: string) => {
+export const getTestIdFromPath = (pathname: string) => {
   const [, , localTestId] = pathname.split('/').reverse();
 
   return localTestId;
