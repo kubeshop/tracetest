@@ -23,14 +23,14 @@ func TestDefinitionToOpenAPIConversion(t *testing.T) {
 				Description: "A test description",
 				Trigger: definition.TestTrigger{
 					Type: "http",
-					HTTPRequest: openapi.HttpRequest{
-						Url:    "http://localhost:1234",
+					HTTPRequest: definition.HTTPRequest{
+						URL:    "http://localhost:1234",
 						Method: "POST",
-						Headers: []openapi.HttpHeader{
+						Headers: []definition.HTTPHeader{
 							{Key: "Content-Type", Value: "application/json"},
 						},
-						Auth: openapi.HttpAuth{},
-						Body: "",
+						Authentication: definition.HTTPAuthentication{},
+						Body:           "",
 					},
 				},
 			},
@@ -49,6 +49,9 @@ func TestDefinitionToOpenAPIConversion(t *testing.T) {
 							Body: "",
 							Auth: openapi.HttpAuth{},
 						},
+						Grpc: openapi.GrpcRequest{
+							Metadata: []openapi.GrpcHeader{},
+						},
 					},
 				},
 			},
@@ -60,17 +63,17 @@ func TestDefinitionToOpenAPIConversion(t *testing.T) {
 				Description: "A test description",
 				Trigger: definition.TestTrigger{
 					Type: "http",
-					HTTPRequest: openapi.HttpRequest{
-						Url:    "http://localhost:1234",
+					HTTPRequest: definition.HTTPRequest{
+						URL:    "http://localhost:1234",
 						Method: "POST",
-						Headers: []openapi.HttpHeader{
+						Headers: []definition.HTTPHeader{
 							{Key: "Content-Type", Value: "application/json"},
 						},
 						Body: "",
-						Auth: openapi.HttpAuth{
+						Authentication: definition.HTTPAuthentication{
 							Type: "basic",
-							Basic: openapi.HttpAuthBasic{
-								Username: "matheus",
+							Basic: definition.HTTPBasicAuth{
+								User:     "matheus",
 								Password: "pikachu",
 							},
 						},
@@ -98,6 +101,9 @@ func TestDefinitionToOpenAPIConversion(t *testing.T) {
 								},
 							},
 						},
+						Grpc: openapi.GrpcRequest{
+							Metadata: []openapi.GrpcHeader{},
+						},
 					},
 				},
 			},
@@ -109,16 +115,16 @@ func TestDefinitionToOpenAPIConversion(t *testing.T) {
 				Description: "A test description",
 				Trigger: definition.TestTrigger{
 					Type: "http",
-					HTTPRequest: openapi.HttpRequest{
-						Url:    "http://localhost:1234",
+					HTTPRequest: definition.HTTPRequest{
+						URL:    "http://localhost:1234",
 						Method: "POST",
-						Headers: []openapi.HttpHeader{
+						Headers: []definition.HTTPHeader{
 							{Key: "Content-Type", Value: "application/json"},
 						},
 						Body: "",
-						Auth: openapi.HttpAuth{
-							Type: "apiKey",
-							ApiKey: openapi.HttpAuthApiKey{
+						Authentication: definition.HTTPAuthentication{
+							Type: "apikey",
+							ApiKey: definition.HTTPAPIKeyAuth{
 								Key:   "X-Key",
 								Value: "my-api-key",
 								In:    "header",
@@ -141,13 +147,16 @@ func TestDefinitionToOpenAPIConversion(t *testing.T) {
 							},
 							Body: "",
 							Auth: openapi.HttpAuth{
-								Type: "apiKey",
+								Type: "apikey",
 								ApiKey: openapi.HttpAuthApiKey{
 									Key:   "X-Key",
 									Value: "my-api-key",
 									In:    "header",
 								},
 							},
+						},
+						Grpc: openapi.GrpcRequest{
+							Metadata: []openapi.GrpcHeader{},
 						},
 					},
 				},
@@ -160,16 +169,16 @@ func TestDefinitionToOpenAPIConversion(t *testing.T) {
 				Description: "A test description",
 				Trigger: definition.TestTrigger{
 					Type: "http",
-					HTTPRequest: openapi.HttpRequest{
-						Url:    "http://localhost:1234",
+					HTTPRequest: definition.HTTPRequest{
+						URL:    "http://localhost:1234",
 						Method: "POST",
-						Headers: []openapi.HttpHeader{
+						Headers: []definition.HTTPHeader{
 							{Key: "Content-Type", Value: "application/json"},
 						},
 						Body: "",
-						Auth: openapi.HttpAuth{
+						Authentication: definition.HTTPAuthentication{
 							Type: "bearer",
-							Bearer: openapi.HttpAuthBearer{
+							Bearer: definition.HTTPBearerAuth{
 								Token: "my-token",
 							},
 						},
@@ -196,6 +205,9 @@ func TestDefinitionToOpenAPIConversion(t *testing.T) {
 								},
 							},
 						},
+						Grpc: openapi.GrpcRequest{
+							Metadata: []openapi.GrpcHeader{},
+						},
 					},
 				},
 			},
@@ -207,14 +219,14 @@ func TestDefinitionToOpenAPIConversion(t *testing.T) {
 				Description: "A test description",
 				Trigger: definition.TestTrigger{
 					Type: "http",
-					HTTPRequest: openapi.HttpRequest{
-						Url:    "http://localhost:1234",
+					HTTPRequest: definition.HTTPRequest{
+						URL:    "http://localhost:1234",
 						Method: "POST",
-						Headers: []openapi.HttpHeader{
+						Headers: []definition.HTTPHeader{
 							{Key: "Content-Type", Value: "application/json"},
 						},
-						Auth: openapi.HttpAuth{},
-						Body: `{ "message": "hello" }`,
+						Authentication: definition.HTTPAuthentication{},
+						Body:           `{ "message": "hello" }`,
 					},
 				},
 			},
@@ -233,6 +245,9 @@ func TestDefinitionToOpenAPIConversion(t *testing.T) {
 							Body: `{ "message": "hello" }`,
 							Auth: openapi.HttpAuth{},
 						},
+						Grpc: openapi.GrpcRequest{
+							Metadata: []openapi.GrpcHeader{},
+						},
 					},
 				},
 			},
@@ -244,12 +259,12 @@ func TestDefinitionToOpenAPIConversion(t *testing.T) {
 				Description: "A test description",
 				Trigger: definition.TestTrigger{
 					Type: "http",
-					HTTPRequest: openapi.HttpRequest{
-						Url:     "http://localhost:1234",
-						Method:  "POST",
-						Headers: []openapi.HttpHeader{},
-						Auth:    openapi.HttpAuth{},
-						Body:    "",
+					HTTPRequest: definition.HTTPRequest{
+						URL:            "http://localhost:1234",
+						Method:         "POST",
+						Headers:        []definition.HTTPHeader{},
+						Authentication: definition.HTTPAuthentication{},
+						Body:           "",
 					},
 				},
 				TestDefinition: []definition.TestDefinition{
@@ -274,6 +289,9 @@ func TestDefinitionToOpenAPIConversion(t *testing.T) {
 							Headers: []openapi.HttpHeader{},
 							Body:    "",
 							Auth:    openapi.HttpAuth{},
+						},
+						Grpc: openapi.GrpcRequest{
+							Metadata: []openapi.GrpcHeader{},
 						},
 					},
 				},
