@@ -1,4 +1,4 @@
-<p align="center">  
+<p align="center">
   <img style="width:66%" src="assets/tracetest-logo-color-w-white-text.svg#gh-dark-mode-only" alt="Tracetest Logo Light"/>
   <img style="width:66%" src="assets/tracetest-logo-color-w-black-text.svg#gh-light-mode-only" alt="Tracetest Logo Dark" />
 </p>
@@ -11,9 +11,9 @@
   <!--<a href="https://tracetest.io">Website</a>&nbsp;|&nbsp; -->
   <!--<a href="https://github.com/kubeshop/tracetest#try-the-demo--give-us-feedback">Live Demo</a>&nbsp;|&nbsp;-->
   <a href="https://kubeshop.github.io/tracetest/installing/">Install</a>&nbsp;|&nbsp;
-  <a href="https://kubeshop.github.io/tracetest">Documentation</a>&nbsp;|&nbsp; 
-  <a href="https://twitter.com/tracetest_io">Twitter</a>&nbsp;|&nbsp; 
-  <a href="https://discord.gg/eBvEQRVyKX">Discord</a>&nbsp;|&nbsp; 
+  <a href="https://kubeshop.github.io/tracetest">Documentation</a>&nbsp;|&nbsp;
+  <a href="https://twitter.com/tracetest_io">Twitter</a>&nbsp;|&nbsp;
+  <a href="https://discord.gg/eBvEQRVyKX">Discord</a>&nbsp;|&nbsp;
   <a href="https://kubeshop.io/blog-projects/tracetest">Blog</a>
 </p>
 
@@ -57,6 +57,14 @@ Tracetest is a trace-based testing tool that leverages the data contained in you
 - Install can include [an example microservice](https://kubeshop.github.io/tracetest/pokeshop/) that is instrumented with OpenTelemetry to use as an example application under test.
 
 # Getting Started
+
+You can install tracetest by running:
+
+```sh
+curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/setup.sh | bash -s
+```
+
+> :gear: you can customize your Tracetest installation. Go to our [installation guide](https://kubeshop.github.io/tracetest/installing/) for more information.
 
 The [install](https://kubeshop.github.io/tracetest/installing/) only takes a few minutes and is done with via a Helm command. After installing, take a look at the
 [Accessing the Dashboard](https://kubeshop.github.io/tracetest/accessing-dashboard/) guide to access the Tracetest Dashboard and
