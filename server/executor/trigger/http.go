@@ -11,15 +11,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/model"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
-	"go.opentelemetry.io/contrib/propagators/aws/xray"
-	"go.opentelemetry.io/contrib/propagators/b3"
-	"go.opentelemetry.io/contrib/propagators/jaeger"
-	"go.opentelemetry.io/contrib/propagators/ot"
-	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
-	"go.opentelemetry.io/otel/propagation"
-	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
-	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -49,12 +41,7 @@ func (te *httpTriggerer) Trigger(_ context.Context, test model.Test, tid trace.T
 	client := http.Client{
 		Transport: otelhttp.NewTransport(http.DefaultTransport,
 			otelhttp.WithTracerProvider(te.traceProvider),
-			otelhttp.WithPropagators(propagation.NewCompositeTextMapPropagator(propagation.Baggage{},
-				b3.New(),
-				jaeger.Jaeger{},
-				ot.OT{},
-				xray.Propagator{},
-				propagation.TraceContext{})),
+			otelhttp.WithPropagators(propagators()),
 		),
 	}
 
@@ -125,21 +112,4 @@ func mapResp(resp *http.Response) model.HTTPResponse {
 		Headers:    mappedHeaders,
 		Body:       body,
 	}
-}
-
-func traceProvider() *sdktrace.TracerProvider {
-	// Set standard attributes per semantic conventions
-	res := resource.NewWithAttributes(
-		semconv.SchemaURL,
-		semconv.ServiceNameKey.String("tracetest"),
-	)
-
-	// this is in fact a noop exporter, so we can ignore errors
-	spanExporter, _ := stdouttrace.New(stdouttrace.WithWriter(io.Discard))
-
-	return sdktrace.NewTracerProvider(
-		sdktrace.WithSyncer(spanExporter),
-		sdktrace.WithResource(res),
-		sdktrace.WithSampler(sdktrace.ParentBased(sdktrace.AlwaysSample())),
-	)
 }

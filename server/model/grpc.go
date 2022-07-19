@@ -16,6 +16,16 @@ type GRPCRequest struct {
 	Request      string
 }
 
+func (a GRPCRequest) Headers() []string {
+	h := []string{}
+
+	for _, md := range a.Metadata {
+		h = append(h, md.Key+": "+md.Value)
+	}
+
+	return h
+}
+
 func (a GRPCRequest) Authenticate() {
 	if a.Auth == nil {
 		return
