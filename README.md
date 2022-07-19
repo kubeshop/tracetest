@@ -58,7 +58,7 @@ Tracetest is a trace-based testing tool that leverages the data contained in you
 
 # Getting Started
 
-The [install](https://kubeshop.github.io/tracetest/installing/) only takes a few minutes, and is done with via a Helm command. After installing, take a look at the
+The [install](https://kubeshop.github.io/tracetest/installing/) only takes a few minutes and is done with via a Helm command. After installing, take a look at the
 [Accessing the Dashboard](https://kubeshop.github.io/tracetest/accessing-dashboard/) guide to access the Tracetest Dashboard and
 create and run your first test.
 
