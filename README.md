@@ -116,7 +116,7 @@ Is available at [https://kubeshop.github.io/tracetest](https://kubeshop.github.i
 
 # Tests
 
-We strive to produce quality code and to be able to improve Tracetest rapidly, and safely. Thus, we have a full suite of both frontend and backend code. We are using Cypress for our frontend code, and, surprise surprise, Tracetest for our backend code. You can see the [test runs here](https://github.com/kubeshop/tracetest/actions/workflows/pull-request.yaml), and a blog post describing our [testing pipelines here](https://kubeshop.io/blog/integrating-tracetest-with-github-actions-in-a-ci-pipeline).
+We strive to produce quality code and improve Tracetest rapidly and safely. Therefore, we have a full suite of both frontend and backend code. We are using Cypress for our frontend code and (surprise surprise) Tracetest for our backend code. You can see the [test runs here](https://github.com/kubeshop/tracetest/actions/workflows/pull-request.yaml), and a blog post describing our [testing pipelines here](https://kubeshop.io/blog/integrating-tracetest-with-github-actions-in-a-ci-pipeline).
 
 # License
 
