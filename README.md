@@ -34,13 +34,18 @@
 
 # Tracetest
 
-Tracetest is a trace-based testing tool that leverages the data contained in your distributed traces to produce easy to create, yet super powerful integration tests. You can verify activity deep inside your system, even events that occur on 'the other side' of an async message queue. Verifying the timing of different steps in your process via an automated test is also a valuable use case.
+Tracetest is a trace-based testing tool that leverages the data contained in your distributed traces to produce easy to create, yet super powerful integration tests. You can verify activity deep inside your system by asserting on data and flow information contained in the OpenTelemetry traces and span attributes. This can include:
+
+- testing events that occur on 'the other side' of an async message queue, even though the original async call has returned earlier.
+- assertions based on the timing of different steps in your process.
+- wildcard assertions across common types of activities, ie all gRPC return codes should be 0, all database calls should happen in less than 100ms.
+- test long running processes instrumented with OpenTelemetry tracing to assert proper operation deep in the process.
+- verify the quality of your OpenTelemetry instrumentation and enforce standards.
 
 # Features
 
 - Test by executing a REST or gRPC call to trigger the test. Can also import your Postman Collections.
 - [Add assertions](https://kubeshop.github.io/tracetest/adding-assertions/) based on return data from trigger call and/or data contained in the spans in your distributed trace.
-- Enables white box testing in which internal structure, design and coding of software are tested to verify flow of input-output and to improve design, usability and security.
 - Specify which spans to check in assertions via the [advanced selector language](https://kubeshop.github.io/tracetest/advanced-selectors/).
 - Define checks against the attributes in these spans, including properties, return status, or timing.
 - Tests can be created via graphical UI or via [YAML-based test definition file](https://kubeshop.github.io/tracetest/test-definition-file/).
@@ -50,6 +55,12 @@ Tracetest is a trace-based testing tool that leverages the data contained in you
 - Supports [numerous backend trace datastores](https://kubeshop.github.io/tracetest/architecture/), including Jeager and Grafana Tempo. Tell us which others you want!
 - Easy [install via Helm command](https://kubeshop.github.io/tracetest/installing/).
 - Install can include [an example microservice](https://kubeshop.github.io/tracetest/pokeshop/) that is instrumented with OpenTelemetry to use as an example application under test.
+
+# Getting Started
+
+The [install](https://kubeshop.github.io/tracetest/installing/) only takes a few minutes and is done with via a Helm command. After installing, take a look at the
+[Accessing the Dashboard](https://kubeshop.github.io/tracetest/accessing-dashboard/) guide to access the Tracetest Dashboard and
+create and run your first test.
 
 # How does Tracetest work?
 
@@ -61,12 +72,6 @@ Tracetest is a trace-based testing tool that leverages the data contained in you
 6. Run the tests.
 
 Once the test is built, it can be run automatically as part of a build process. Every test has a trace attached, allowing you to immediately see what worked, and what did not, reducing the need to reproduce the problem to see the underlying issue.
-
-# Getting Started
-
-The [install](https://kubeshop.github.io/tracetest/installing/) only takes a few minutes, and is done with via a Helm command. After installing, take a look at the
-[Accessing the Dashboard](https://kubeshop.github.io/tracetest/accessing-dashboard/) guide to access the Tracetest Dashboard and
-create and run your first test.
 
 # What does the test definition file look like?
 
