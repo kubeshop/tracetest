@@ -45,7 +45,12 @@ func NewTracer(ctx context.Context, config config.Config) (trace.Tracer, error) 
 }
 
 func getTracerProvider(ctx context.Context, config config.Config) (*sdktrace.TracerProvider, error) {
-	if !config.Telemetry.Enabled {
+	exporterConfig, err := config.Exporter()
+	if err != nil {
+		return nil, fmt.Errorf("could not get exporter: %w", err)
+	}
+
+	if exporterConfig == nil {
 		return sdktrace.NewTracerProvider(), nil
 	}
 
@@ -53,7 +58,7 @@ func getTracerProvider(ctx context.Context, config config.Config) (*sdktrace.Tra
 		resource.Default(),
 		resource.NewWithAttributes(
 			semconv.SchemaURL,
-			semconv.ServiceNameKey.String(config.Telemetry.ServiceName),
+			semconv.ServiceNameKey.String(exporterConfig.ServiceName),
 		),
 	)
 
@@ -61,13 +66,13 @@ func getTracerProvider(ctx context.Context, config config.Config) (*sdktrace.Tra
 		return nil, fmt.Errorf("could not get provider resource: %w", err)
 	}
 
-	exporter, err := getExporter(ctx, config)
+	exporter, err := getExporter(ctx, exporterConfig.Exporter)
 	if err != nil {
 		return nil, fmt.Errorf("could not create exporter: %w", err)
 	}
 
 	processor := sdktrace.NewBatchSpanProcessor(exporter)
-	sampleRate := config.Telemetry.Sampling / 100.0
+	sampleRate := exporterConfig.Sampling / 100.0
 
 	return sdktrace.NewTracerProvider(
 		sdktrace.WithResource(r),
@@ -76,11 +81,20 @@ func getTracerProvider(ctx context.Context, config config.Config) (*sdktrace.Tra
 	), nil
 }
 
-func getExporter(ctx context.Context, config config.Config) (sdktrace.SpanExporter, error) {
+func getExporter(ctx context.Context, exporterConfig config.ExporterConfig) (sdktrace.SpanExporter, error) {
+	switch exporterConfig.Type {
+	case "collector":
+		return getOtelCollectorExporter(ctx, exporterConfig)
+	}
+
+	return nil, fmt.Errorf("invalid exporter type: %s", exporterConfig.Type)
+}
+
+func getOtelCollectorExporter(ctx context.Context, exporterConfig config.ExporterConfig) (sdktrace.SpanExporter, error) {
 	ctx, cancel := context.WithTimeout(ctx, time.Second)
 	defer cancel()
 
-	conn, err := grpc.DialContext(ctx, config.Telemetry.OTelCollectorEndpoint, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
+	conn, err := grpc.DialContext(ctx, exporterConfig.CollectorConfiguration.Endpoint, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
 	if err != nil {
 		return nil, fmt.Errorf("could not create gRPC connection to collector: %w", err)
 	}
