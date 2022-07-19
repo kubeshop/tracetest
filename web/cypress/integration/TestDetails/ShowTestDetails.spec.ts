@@ -13,7 +13,7 @@ describe('Show test details', () => {
     createMultipleTestRuns(testId, 5);
 
     cy.get(`[data-cy=collapse-test-${testId}]`).click();
-    cy.get('[data-cy=test-details-link]', {timeout: 10000}).first().click();
+    cy.get('[data-cy=test-details-link]', {timeout: 20000}).first().click();
 
     cy.location('pathname').should('match', /\/test\/.*/i);
     cy.get('[data-cy=test-details-name]').should('have.text', `${name} (v1)`);
@@ -28,7 +28,7 @@ describe('Show test details', () => {
     cy.wait(5000);
     cy.get('[data-cy=view-junit-button]').click();
 
-    cy.get('[data-cy=file-viewer-code-container]', {timeout: 10000}).should('be.visible');
+    cy.get('[data-cy=file-viewer-code-container]', {timeout: 20000}).should('be.visible');
     cy.get('[data-cy=file-viewer-close]').click();
 
     cy.get('[data-cy=file-viewer-code-container]').should('not.be.visible');
@@ -56,7 +56,7 @@ describe('Show test details', () => {
 
       cy.wait(2000);
       cy.get('[data-cy=test-header-back-button]').click();
-      cy.get(`[data-cy=result-card-${testRunResultId}]`, {timeout: 10000}).should('be.visible');
+      cy.get(`[data-cy=result-card-${testRunResultId}]`, {timeout: 20000}).should('be.visible');
       cy.visit(`http://localhost:3000/test/${testId}/run/${testRunResultId}`);
     });
   });

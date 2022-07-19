@@ -21,7 +21,7 @@ describe('Create Assertion', () => {
     cy.get(`[data-cy=trace-node-database]`, {timeout: 20000}).first().click();
 
     cy.get('[data-cy=add-assertion-button]').click();
-    cy.get('[data-cy=assertion-form]', {timeout: 10000}).should('be.visible');
+    cy.get('[data-cy=assertion-form]', {timeout: 20000}).should('be.visible');
 
     cy.get('[data-cy=assertion-check-attribute]').type('db');
     cy.wait(500);
@@ -99,7 +99,7 @@ describe('Create Assertion', () => {
   it('should create a basic assertion using the advanced mode', () => {
     cy.get(`[data-cy=trace-node-database]`).last().click();
     cy.get('[data-cy=add-assertion-button]').click();
-    cy.get('[data-cy=assertion-form]', {timeout: 10000}).should('be.visible');
+    cy.get('[data-cy=assertion-form]', {timeout: 20000}).should('be.visible');
 
     cy.get('[data-cy=mode-selector-switch]').click();
     cy.get('[data-cy=advanced-selector] [contenteditable]')
@@ -186,13 +186,13 @@ describe('Create Assertion', () => {
 
   it('should publish the changes', () => {
     cy.get('[data-cy=trace-actions-publish').click();
-    cy.get('[data-cy=assertion-card]', {timeout: 10000}).should('have.lengthOf', 3);
+    cy.get('[data-cy=assertion-card]', {timeout: 20000}).should('have.lengthOf', 3);
   });
 
   it('should create an assertion and revert all changes', () => {
     cy.get(`[data-cy=trace-node-database]`, {timeout: 20000}).last().click();
     cy.get('[data-cy=add-assertion-button]').click();
-    cy.get('[data-cy=assertion-form]', {timeout: 10000}).should('be.visible');
+    cy.get('[data-cy=assertion-form]', {timeout: 20000}).should('be.visible');
 
     cy.get('[data-cy=assertion-check-attribute]').type('db');
     cy.wait(500);

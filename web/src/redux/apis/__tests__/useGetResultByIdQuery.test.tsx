@@ -9,6 +9,6 @@ test('useGetResultByIdQuery', async () => {
     wrapper: ReduxWrapperProvider,
   });
   expect(result.current.isLoading).toBeTruthy();
-  await waitForNextUpdate({timeout: 5000});
+  await waitForNextUpdate({timeout: 10000});
   expect(result.current.isLoading).toBeFalsy();
 });

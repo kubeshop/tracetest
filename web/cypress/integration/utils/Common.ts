@@ -20,7 +20,7 @@ export const createTest = () => {
   $form.get('[data-cy=create-test-next-button]').last().click();
   $form.get('[data-cy=create-test-create-button]').last().click();
 
-  cy.location('pathname').should('match', /\/test\/.*/i, {timeout: 10000});
+  cy.location('pathname').should('match', /\/test\/.*/i, {timeout: 20000});
   cy.location().then(({pathname}) => {
     const id = getTestId(pathname);
 

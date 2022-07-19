@@ -11,7 +11,7 @@ describe('Show Trace', () => {
 
   it('should show the trace components', () => {
     cy.visit(`http://localhost:3000/test/${testId}`);
-    cy.get('[data-cy^=result-card]', {timeout: 10000}).first().click();
+    cy.get('[data-cy^=result-card]', {timeout: 20000}).first().click();
 
     cy.location('href').should('match', /\/test\/.*/i);
 

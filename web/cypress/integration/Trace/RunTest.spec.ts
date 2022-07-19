@@ -11,7 +11,7 @@ describe('Run Test', () => {
 
   it('should show and click the Run Test button when the test has finished', () => {
     cy.visit(`http://localhost:3000/test/${testId}`);
-    cy.get('[data-cy^=result-card]', {timeout: 10000}).first().click();
+    cy.get('[data-cy^=result-card]', {timeout: 20000}).first().click();
     cy.location('href').should('match', /\/test\/.*/i);
 
     cy.get(`[data-cy^=test-run-result-]`).first().click();

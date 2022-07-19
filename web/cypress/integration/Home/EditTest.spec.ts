@@ -23,7 +23,7 @@ describe('Edit Test', () => {
     cy.get('[data-cy=edit-test-submit]').click();
     cy.get('[data-cy=test-details-name]').should('have.text', `Edited Test (v2)`);
 
-    cy.location('pathname').should('match', /\/test\/.*/i, {timeout: 10000});
+    cy.location('pathname').should('match', /\/test\/.*/i, {timeout: 20000});
   });
 
   it('should edit a test from the test details', () => {
@@ -38,6 +38,6 @@ describe('Edit Test', () => {
     cy.get('[data-cy=edit-test-submit]').click();
     cy.get('[data-cy=test-details-name]').should('have.text', `Edited Test (v2)`);
 
-    cy.location('pathname').should('match', /\/run\/.*/i, {timeout: 10000});
+    cy.location('pathname').should('match', /\/run\/.*/i, {timeout: 20000});
   });
 });
