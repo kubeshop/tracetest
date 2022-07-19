@@ -1,4 +1,4 @@
-import {createTest, deleteTest, getResultId, testId} from '../utils/Common';
+import {createTest, deleteTest, getResultId, getTestId} from '../utils/Common';
 
 describe('Run Test', () => {
   beforeEach(() => {
@@ -10,7 +10,7 @@ describe('Run Test', () => {
   });
 
   it('should show and click the Run Test button when the test has finished', () => {
-    cy.visit(`http://localhost:3000/test/${testId}`);
+    cy.visit(`http://localhost:3000/test/${getTestId()}`);
     cy.get('[data-cy^=result-card]', {timeout: 20000}).first().click();
     cy.location('href').should('match', /\/test\/.*/i);
 
@@ -23,7 +23,7 @@ describe('Run Test', () => {
     cy.wait(2000);
     cy.location().then(({pathname}) => {
       const testRunResultId = getResultId(pathname);
-      cy.location('pathname').should('eq', `/test/${testId}/run/${testRunResultId}`);
+      cy.location('pathname').should('eq', `/test/${getTestId()}/run/${testRunResultId}`);
     });
   });
 });

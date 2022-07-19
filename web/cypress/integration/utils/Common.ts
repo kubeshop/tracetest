@@ -8,6 +8,8 @@ export const [{name, description}] = DemoTestExampleList;
 // eslint-disable-next-line import/no-mutable-exports
 export let testId = '';
 
+export const getTestId = () => testId;
+
 export const createTest = () => {
   cy.visit('http://localhost:3000/');
   const $form = navigateToTestCreationPage();

@@ -1,4 +1,4 @@
-import {createMultipleTestRuns, createTest, deleteTest, getResultId, name, testId} from '../utils/Common';
+import {createMultipleTestRuns, createTest, deleteTest, getResultId, name, getTestId} from '../utils/Common';
 
 describe('Show test details', () => {
   before(() => {
@@ -10,9 +10,9 @@ describe('Show test details', () => {
   });
 
   it('should show the test details for any trace', () => {
-    createMultipleTestRuns(testId, 5);
+    createMultipleTestRuns(getTestId(), 5);
 
-    cy.get(`[data-cy=collapse-test-${testId}]`).click();
+    cy.get(`[data-cy=collapse-test-${getTestId()}]`).click();
     cy.get('[data-cy=test-details-link]', {timeout: 20000}).first().click();
 
     cy.location('pathname').should('match', /\/test\/.*/i);
@@ -22,7 +22,7 @@ describe('Show test details', () => {
   });
 
   it('should display the jUnit report', () => {
-    cy.visit(`http://localhost:3000/test/${testId}`);
+    cy.visit(`http://localhost:3000/test/${getTestId()}`);
 
     cy.get('[data-cy^=result-actions-button]').last().click();
     cy.wait(5000);
@@ -35,7 +35,7 @@ describe('Show test details', () => {
   });
 
   it('should display the test definition yaml', () => {
-    cy.visit(`http://localhost:3000/test/${testId}`);
+    cy.visit(`http://localhost:3000/test/${getTestId()}`);
 
     cy.get('[data-cy^=result-actions-button]').first().click();
     cy.get('[data-cy=view-test-definition-button]').click();
@@ -47,7 +47,7 @@ describe('Show test details', () => {
   });
 
   it('should run a new test', () => {
-    cy.visit(`http://localhost:3000/test/${testId}`);
+    cy.visit(`http://localhost:3000/test/${getTestId()}`);
     cy.get(`[data-cy=test-details-run-test-button]`).click();
     cy.location('pathname').should('match', /\/run\/.*/i);
 
@@ -57,7 +57,7 @@ describe('Show test details', () => {
       cy.wait(2000);
       cy.get('[data-cy=test-header-back-button]').click();
       cy.get(`[data-cy=result-card-${testRunResultId}]`, {timeout: 20000}).should('be.visible');
-      cy.visit(`http://localhost:3000/test/${testId}/run/${testRunResultId}`);
+      cy.visit(`http://localhost:3000/test/${getTestId()}/run/${testRunResultId}`);
     });
   });
 });

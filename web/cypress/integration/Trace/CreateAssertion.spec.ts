@@ -1,4 +1,4 @@
-import {createTest, deleteTest, testId} from '../utils/Common';
+import {createTest, deleteTest, getTestId} from '../utils/Common';
 
 const getAttributeListId = (number: number) => `#assertion-form_assertionList_${number}_attribute_list`;
 const getComparatorListId = (number: number) => `#assertion-form_assertionList_${number}_comparator_list`;
@@ -9,7 +9,7 @@ describe('Create Assertion', () => {
   after(() => deleteTest());
 
   it('should create a basic assertion', () => {
-    cy.visit(`http://localhost:3000/test/${testId}`);
+    cy.visit(`http://localhost:3000/test/${getTestId()}`);
     cy.get('[data-cy^=result-card]', {timeout: 20000}).first().click();
 
     cy.location('href').should('match', /\/test\/.*/i);
