@@ -66,7 +66,7 @@ curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/setup.sh | bas
 
 > :gear: To customize your Tracetest installation. Go to our [installation guide](https://kubeshop.github.io/tracetest/installing/) for more information.
 
-The [install](https://kubeshop.github.io/tracetest/installing/) only takes a few minutes and is done with via a Helm command. After installing, take a look at the
+Installation only takes a few minutes and is done with via a Helm command. After installing, take a look at the
 [Accessing the Dashboard](https://kubeshop.github.io/tracetest/accessing-dashboard/) guide to access the Tracetest Dashboard and
 create and run your first test.
 
