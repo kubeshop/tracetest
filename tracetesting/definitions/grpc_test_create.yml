@@ -31,9 +31,9 @@ trigger:
               },
               "assertions": [
                 {
-                  "attribute": "kind",
-                  "comparator": "=",
-                  "expected": "SPAN_KIND_PRODUCER"
+                  "attribute": "tracetest.selected_spans.count",
+                  "comparator": ">",
+                  "expected": "0"
                 }
               ]
             }
