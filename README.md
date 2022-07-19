@@ -34,7 +34,7 @@
 
 # Tracetest
 
-Tracetest is a trace-based testing tool that leverages the data contained in your distributed traces to produce easy to create, yet super powerful integration tests. You can verify activity deep inside your system by asserting on data and flow information contained in the OpenTelemetry traces and span attrbitutes. This can include:
+Tracetest is a trace-based testing tool that leverages the data contained in your distributed traces to produce easy to create, yet super powerful integration tests. You can verify activity deep inside your system by asserting on data and flow information contained in the OpenTelemetry traces and span attributes. This can include:
 
 - testing events that occur on 'the other side' of an async message queue, even though the original async call has returned earlier.
 - assertions based on the timing of different steps in your process.
