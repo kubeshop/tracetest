@@ -45,9 +45,6 @@ trigger:
         }
       }
 testDefinition:
-- selector: span[name = "Tracetest Trigger"]
-  assertions:
-  - tracetest.selected_spans.count = 1
 - selector: span[name="POST /api/tests" tracetest.span.type="http"]
   assertions:
   - tracetest.selected_spans.count = 1

@@ -10,9 +10,6 @@ trigger:
     - key: Content-Type
       value: application/json
 testDefinition:
-- selector: span[name = "Tracetest Trigger"]
-  assertions:
-  - tracetest.selected_spans.count = 1
 - selector: span[name="DELETE /api/tests/{testId}/run/{runId}" tracetest.span.type="http"]
   assertions:
   - tracetest.response.status = 204
