@@ -7,7 +7,6 @@ import (
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/tracing"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
-	"go.opentelemetry.io/otel/trace"
 )
 
 func getTracerProvider(config config.Config) (*sdktrace.TracerProvider, error) {
@@ -17,8 +16,4 @@ func getTracerProvider(config config.Config) (*sdktrace.TracerProvider, error) {
 	}
 
 	return tracing.NewTracerProvider(context.Background(), appExporterConfig)
-}
-
-func getTracer(spanContext *sdktrace.TracerProvider) trace.Tracer {
-	return spanContext.Tracer("tracetest")
 }

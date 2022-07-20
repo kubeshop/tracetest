@@ -14,6 +14,7 @@ import (
 	"github.com/jhump/protoreflect/desc"
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/tracing"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	"go.opentelemetry.io/otel/trace"
@@ -30,9 +31,14 @@ func GRPC(config config.Config) (Triggerer, error) {
 		return nil, fmt.Errorf("could not create HTTP triggerer: %w", err)
 	}
 
+	tracer, err := tracing.NewTracerFromTracerProvider(context.Background(), tracerProvider)
+	if err != nil {
+		return nil, fmt.Errorf("could not create tracer from tracer provider: %w", err)
+	}
+
 	return &grpcTriggerer{
 		traceProvider: tracerProvider,
-		tracer:        getTracer(tracerProvider),
+		tracer:        tracer,
 	}, nil
 }
 
