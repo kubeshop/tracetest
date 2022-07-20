@@ -61,7 +61,7 @@ func (te *grpcTriggerer) Trigger(_ context.Context, test model.Test, tid trace.T
 
 	tReq := trigger.GRPC
 
-	conn, err := dial(ctx, tReq.Address)
+	conn, err := te.dial(ctx, tReq.Address)
 	if err != nil {
 		return response, fmt.Errorf("cannot dial service: %w", err)
 	}
@@ -93,7 +93,7 @@ func (te *grpcTriggerer) Trigger(_ context.Context, test model.Test, tid trace.T
 		marshaller: marshaler,
 	}
 
-	err = grpcurl.InvokeRPC(ctx, desc, conn, tReq.Method, []string{}, h, rf.Next)
+	err = grpcurl.InvokeRPC(ctx, desc, conn, tReq.Method, tReq.Headers(), h, rf.Next)
 	if err != nil {
 		return response, err
 	}
@@ -156,13 +156,16 @@ func mapHeaders(md metadata.MD) []model.GRPCHeader {
 	return mappedHeaders
 }
 
-func dial(ctx context.Context, address string) (*grpc.ClientConn, error) {
+func (t *grpcTriggerer) dial(ctx context.Context, address string) (*grpc.ClientConn, error) {
 	var creds credentials.TransportCredentials
 	network := "tcp"
 
 	return grpcurl.BlockingDial(
 		ctx, network, address, creds,
-		grpc.WithUnaryInterceptor(otelgrpc.UnaryClientInterceptor()),
+		grpc.WithUnaryInterceptor(otelgrpc.UnaryClientInterceptor(
+			otelgrpc.WithTracerProvider(t.traceProvider),
+			otelgrpc.WithPropagators(propagators()),
+		)),
 	)
 }
 
@@ -177,7 +180,9 @@ type eventHandler struct {
 
 func (h *eventHandler) OnResolveMethod(md *desc.MethodDescriptor) {}
 
-func (h *eventHandler) OnSendHeaders(md metadata.MD) {}
+func (h *eventHandler) OnSendHeaders(md metadata.MD) {
+	fmt.Printf("******** headers %v\n", md)
+}
 
 func (h *eventHandler) OnReceiveHeaders(md metadata.MD) {
 	h.respMD = md

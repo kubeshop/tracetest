@@ -26,6 +26,22 @@ trigger:
               ]
             }
           }
+        },
+        "definition": {
+          "definitions": [
+            {
+              "selector": {
+                "query": "span[name = \"pg.query:SELECT\"]"
+              },
+              "assertions": [
+                {
+                  "attribute": "tracetest.selected_spans.count",
+                  "comparator": ">",
+                  "expected": "0"
+                }
+              ]
+            }
+          ]
         }
       }
 testDefinition:
