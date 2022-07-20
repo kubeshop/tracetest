@@ -159,7 +159,7 @@ jobs:
           --set poolingConfig.maxWaitTimeForTrace="60s" \
           --set poolingConfig.retryDelay="6s" \
           --set ingress.enabled=false \
-          --wait --timeout 3m
+          --wait --timeout 10m
 
   e2e:
     needs: deploy
