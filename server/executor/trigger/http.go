@@ -57,6 +57,9 @@ func (te *httpTriggerer) Trigger(_ context.Context, test model.Test, tid trace.T
 		Transport: otelhttp.NewTransport(http.DefaultTransport,
 			otelhttp.WithTracerProvider(te.traceProvider),
 			otelhttp.WithPropagators(propagators()),
+			otelhttp.WithSpanNameFormatter(func(operation string, r *http.Request) string {
+				return "Tracetest Trigger"
+			}),
 		),
 	}
 
@@ -70,9 +73,6 @@ func (te *httpTriggerer) Trigger(_ context.Context, test model.Test, tid trace.T
 	})
 
 	ctx = trace.ContextWithSpanContext(ctx, sc)
-	span := trace.SpanFromContext(ctx)
-	span.SetName("Tracetest Trigger")
-	defer span.End()
 
 	var req *http.Request
 	tReq := trigger.HTTP
