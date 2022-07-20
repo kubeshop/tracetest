@@ -7,10 +7,12 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/executor/trigger"
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestTriggerGet(t *testing.T) {
@@ -36,8 +38,6 @@ func TestTriggerGet(t *testing.T) {
 	}))
 	defer server.Close()
 
-	ex := trigger.HTTP()
-
 	test := model.Test{
 		Name: "test",
 		ServiceUnderTest: model.Trigger{
@@ -52,6 +52,9 @@ func TestTriggerGet(t *testing.T) {
 			},
 		},
 	}
+
+	ex, err := trigger.HTTP(config.Config{})
+	require.NoError(t, err)
 
 	resp, err := ex.Trigger(context.TODO(), test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
 	assert.NoError(t, err)
@@ -83,8 +86,6 @@ func TestTriggerPost(t *testing.T) {
 	}))
 	defer server.Close()
 
-	ex := trigger.HTTP()
-
 	test := model.Test{
 		Name: "test",
 		ServiceUnderTest: model.Trigger{
@@ -99,6 +100,9 @@ func TestTriggerPost(t *testing.T) {
 			},
 		},
 	}
+
+	ex, err := trigger.HTTP(config.Config{})
+	require.NoError(t, err)
 
 	resp, err := ex.Trigger(context.TODO(), test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
 	assert.NoError(t, err)
@@ -136,8 +140,6 @@ func TestTriggerPostWithApiKeyAuth(t *testing.T) {
 	}))
 	defer server.Close()
 
-	ex := trigger.HTTP()
-
 	test := model.Test{
 		Name: "test",
 		ServiceUnderTest: model.Trigger{
@@ -160,6 +162,9 @@ func TestTriggerPostWithApiKeyAuth(t *testing.T) {
 			},
 		},
 	}
+
+	ex, err := trigger.HTTP(config.Config{})
+	require.NoError(t, err)
 
 	resp, err := ex.Trigger(context.TODO(), test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
 	assert.NoError(t, err)
@@ -197,8 +202,6 @@ func TestTriggerPostWithBasicAuth(t *testing.T) {
 	}))
 	defer server.Close()
 
-	ex := trigger.HTTP()
-
 	test := model.Test{
 		Name: "test",
 		ServiceUnderTest: model.Trigger{
@@ -220,6 +223,9 @@ func TestTriggerPostWithBasicAuth(t *testing.T) {
 			},
 		},
 	}
+
+	ex, err := trigger.HTTP(config.Config{})
+	require.NoError(t, err)
 
 	resp, err := ex.Trigger(context.TODO(), test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
 	assert.NoError(t, err)
@@ -257,8 +263,6 @@ func TestTriggerPostWithBearerAuth(t *testing.T) {
 	}))
 	defer server.Close()
 
-	ex := trigger.HTTP()
-
 	test := model.Test{
 		Name: "test",
 		ServiceUnderTest: model.Trigger{
@@ -279,6 +283,9 @@ func TestTriggerPostWithBearerAuth(t *testing.T) {
 			},
 		},
 	}
+
+	ex, err := trigger.HTTP(config.Config{})
+	require.NoError(t, err)
 
 	resp, err := ex.Trigger(context.TODO(), test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
 	assert.NoError(t, err)
