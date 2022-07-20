@@ -64,7 +64,8 @@ func (te *httpTriggerer) Trigger(_ context.Context, test model.Test, tid trace.T
 	})
 
 	ctx = trace.ContextWithSpanContext(ctx, sc)
-	ctx, span := te.tracer.Start(ctx, "Tracetest Trigger")
+	span := trace.SpanFromContext(ctx)
+	span.SetName("Tracetest Trigger")
 	defer span.End()
 
 	var req *http.Request
