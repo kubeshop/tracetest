@@ -92,9 +92,19 @@ func (a *App) Start() error {
 		}
 	}
 
+	httpTriggerer, err := trigger.HTTP(a.config)
+	if err != nil {
+		return err
+	}
+
+	grpcTriggerer, err := trigger.GRPC(a.config)
+	if err != nil {
+		return err
+	}
+
 	triggerReg := trigger.NewRegsitry(a.tracer)
-	triggerReg.Add(trigger.HTTP())
-	triggerReg.Add(trigger.GRPC())
+	triggerReg.Add(httpTriggerer)
+	triggerReg.Add(grpcTriggerer)
 
 	subscriptionManager := subscription.NewManager()
 

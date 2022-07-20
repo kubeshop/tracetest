@@ -12,6 +12,7 @@ import (
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
 	"github.com/jhump/protoreflect/desc"
+	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/model"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
@@ -23,14 +24,21 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func GRPC() Triggerer {
-	return &grpcTriggerer{
-		traceProvider: traceProvider(),
+func GRPC(config config.Config) (Triggerer, error) {
+	tracerProvider, err := getTracerProvider(config)
+	if err != nil {
+		return nil, fmt.Errorf("could not create HTTP triggerer: %w", err)
 	}
+
+	return &grpcTriggerer{
+		traceProvider: tracerProvider,
+		tracer:        getTracer(tracerProvider),
+	}, nil
 }
 
 type grpcTriggerer struct {
 	traceProvider *sdktrace.TracerProvider
+	tracer        trace.Tracer
 }
 
 func (te *grpcTriggerer) Trigger(_ context.Context, test model.Test, tid trace.TraceID, sid trace.SpanID) (Response, error) {
@@ -58,6 +66,8 @@ func (te *grpcTriggerer) Trigger(_ context.Context, test model.Test, tid trace.T
 		Remote:     true,
 	})
 	ctx := trace.ContextWithSpanContext(context.Background(), sc)
+	ctx, span := te.tracer.Start(ctx, "Tracetest Trigger")
+	defer span.End()
 
 	tReq := trigger.GRPC
 

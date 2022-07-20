@@ -23,6 +23,8 @@ services:
         condition: service_healthy
       demo-rpc:
         condition: service_healthy
+      otel-collector:
+        condition: service_started
 
   postgres:
     container_name: postgres
@@ -55,6 +57,7 @@ services:
     depends_on:
       jaeger:
         condition: service_healthy
+
 
   jaeger:
     image: jaegertracing/all-in-one:latest
