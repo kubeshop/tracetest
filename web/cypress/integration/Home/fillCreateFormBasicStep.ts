@@ -1,5 +1,5 @@
 export function fillCreateFormBasicStep(
-  $form: Cypress.Chainable<JQuery<HTMLElement>>,
+  $form: Cypress.Chainable<JQuery>,
   name: string,
   description?: string
 ) {

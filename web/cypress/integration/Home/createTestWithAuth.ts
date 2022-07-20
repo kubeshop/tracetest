@@ -1,13 +1,26 @@
-import {deleteTest} from '../utils/Common';
+import {
+  deleteTest,
+  extractTestIdFromTracePage,
+  inteceptHomeApiCall,
+  interceptTracePageApiCalls,
+  makeSureUserisOnTracePage,
+  waitForTracePageApiCalls,
+} from '../utils/Common';
 
-export function createTestWithAuth(
-  $form: Cypress.Chainable<JQuery<HTMLElement>>,
+export async function getIdFromTracePageAndDeleteTest() {
+  const testId = await extractTestIdFromTracePage();
+  inteceptHomeApiCall();
+  deleteTest(testId);
+}
+
+export async function createTestWithAuth(
+  $form: Cypress.Chainable<JQuery>,
   method: string,
   keys: string[],
   callback?: () => void
-) {
+): Promise<void> {
   const name = `Test - Pokemon - #${String(Date.now()).slice(-4)}`;
-  
+
   $form.get('[data-cy=create-test-name-input').type(name);
   $form.get('[data-cy=create-test-description-input').type(name);
 
@@ -28,8 +41,9 @@ export function createTestWithAuth(
 
   $form.get('[data-cy=create-test-create-button]').last().click();
 
-  cy.location('pathname').should('match', /\/test\/.*/i);
+  interceptTracePageApiCalls();
+  makeSureUserisOnTracePage();
+  waitForTracePageApiCalls();
   cy.get('[data-cy=test-details-name]').should('have.text', `${name} (v1)`);
-  deleteTest();
-  return name;
+  await getIdFromTracePageAndDeleteTest();
 }
