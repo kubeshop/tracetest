@@ -66,7 +66,8 @@ func (te *grpcTriggerer) Trigger(_ context.Context, test model.Test, tid trace.T
 		Remote:     true,
 	})
 	ctx := trace.ContextWithSpanContext(context.Background(), sc)
-	ctx, span := te.tracer.Start(ctx, "Tracetest Trigger")
+	span := trace.SpanFromContext(ctx)
+	span.SetName("Tracetest Trigger")
 	defer span.End()
 
 	tReq := trigger.GRPC

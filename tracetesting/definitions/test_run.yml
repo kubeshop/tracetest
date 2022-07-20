@@ -10,6 +10,9 @@ trigger:
     - key: Content-Type
       value: application/json
 testDefinition:
+- selector: span[name = "Tracetest Trigger"]
+  assertions:
+  - tracetest.selected_spans.count = 1
 - selector: span[name = "POST /api/tests/{testId}/run" tracetest.span.type = "http"]
   assertions:
   - tracetest.response.status = 200
