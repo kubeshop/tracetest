@@ -125,6 +125,9 @@ func (te *grpcTriggerer) Trigger(_ context.Context, test model.Test) (Response, 
 		"tracetest.run.trigger.grpc.response_status":      h.respCode.String(),
 	}
 
+	response.Result.SpanID = span.SpanContext().SpanID()
+	response.Result.TraceID = span.SpanContext().TraceID()
+
 	return response, nil
 }
 
