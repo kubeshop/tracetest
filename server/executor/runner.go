@@ -124,8 +124,11 @@ func (r persistentRunner) processExecQueue(job execReq) {
 		panic(err)
 	}
 
-	response, err := triggerer.Trigger(job.ctx, job.test, job.run.TraceID, job.run.SpanID)
+	response, err := triggerer.Trigger(job.ctx, job.test)
 	run = r.handleExecutionResult(run, response, err)
+
+	run.TraceID = response.Result.TraceID
+	run.SpanID = response.Result.SpanID
 
 	r.handleDBError(r.updater.Update(job.ctx, run))
 	if run.State == model.RunStateAwaitingTrace {

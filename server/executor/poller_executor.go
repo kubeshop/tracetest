@@ -13,9 +13,10 @@ import (
 )
 
 type DefaultPollerExecutor struct {
-	updater           RunUpdater
-	traceDB           tracedb.TraceDB
-	maxTracePollRetry int
+	updater                RunUpdater
+	traceDB                tracedb.TraceDB
+	maxTracePollRetry      int
+	repeatedTraceSizeCache map[string]int
 }
 
 type InstrumentedPollerExecutor struct {
@@ -60,9 +61,10 @@ func NewPollerExecutor(
 ) PollerExecutor {
 	maxTracePollRetry := int(math.Ceil(float64(maxWaitTimeForTrace) / float64(retryDelay)))
 	pollerExecutor := &DefaultPollerExecutor{
-		updater:           updater,
-		traceDB:           traceDB,
-		maxTracePollRetry: maxTracePollRetry,
+		updater:                updater,
+		traceDB:                traceDB,
+		maxTracePollRetry:      maxTracePollRetry,
+		repeatedTraceSizeCache: make(map[string]int, 0),
 	}
 
 	return &InstrumentedPollerExecutor{
@@ -73,9 +75,15 @@ func NewPollerExecutor(
 
 func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, model.Run, error) {
 	run := request.run
-	otelTrace, err := pe.traceDB.GetTraceByID(request.ctx, run.TraceID.String())
+	traceId := run.TraceID.String()
+
+	otelTrace, err := pe.traceDB.GetTraceByID(request.ctx, traceId)
 	if err != nil {
 		return false, model.Run{}, err
+	}
+
+	if _, found := pe.repeatedTraceSizeCache[traceId]; !found {
+		pe.repeatedTraceSizeCache[traceId] = 0
 	}
 
 	trace := traces.FromOtel(otelTrace)
@@ -113,7 +121,14 @@ func (pe DefaultPollerExecutor) donePollingTraces(job *PollingRequest, trace tra
 		return false
 	}
 
-	if len(trace.Flat) > 0 && len(trace.Flat) == len(job.run.Trace.Flat) {
+	// We always expect to get the tracetest trigger span, so it has to have more than 1 span
+	if len(trace.Flat) > 1 && len(trace.Flat) == len(job.run.Trace.Flat) {
+		pe.repeatedTraceSizeCache[trace.ID.String()] = pe.repeatedTraceSizeCache[trace.ID.String()] + 1
+	} else {
+		pe.repeatedTraceSizeCache[trace.ID.String()] = 0
+	}
+
+	if pe.repeatedTraceSizeCache[trace.ID.String()] >= 3 {
 		return true
 	}
 

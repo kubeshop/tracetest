@@ -14,7 +14,6 @@ import (
 	"github.com/jhump/protoreflect/desc"
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/model"
-	"github.com/kubeshop/tracetest/server/tracing"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	"go.opentelemetry.io/otel/trace"
@@ -31,14 +30,9 @@ func GRPC(config config.Config) (Triggerer, error) {
 		return nil, fmt.Errorf("could not create HTTP triggerer: %w", err)
 	}
 
-	tracer, err := tracing.NewTracerFromTracerProvider(context.Background(), tracerProvider)
-	if err != nil {
-		return nil, fmt.Errorf("could not create tracer from tracer provider: %w", err)
-	}
-
 	return &grpcTriggerer{
 		traceProvider: tracerProvider,
-		tracer:        tracer,
+		tracer:        tracerProvider.Tracer("tracetest"),
 	}, nil
 }
 
@@ -47,7 +41,7 @@ type grpcTriggerer struct {
 	tracer        trace.Tracer
 }
 
-func (te *grpcTriggerer) Trigger(_ context.Context, test model.Test, tid trace.TraceID, sid trace.SpanID) (Response, error) {
+func (te *grpcTriggerer) Trigger(_ context.Context, test model.Test) (Response, error) {
 
 	response := Response{
 		Result: model.TriggerResult{
@@ -63,17 +57,21 @@ func (te *grpcTriggerer) Trigger(_ context.Context, test model.Test, tid trace.T
 	if trigger.GRPC == nil {
 		return response, fmt.Errorf("no settings provided for GRPC triggerer")
 	}
+
+	ctx, span := te.tracer.Start(context.Background(), "Tracetest Trigger")
+	defer span.End()
+
 	var tf trace.TraceFlags
 	sc := trace.NewSpanContext(trace.SpanContextConfig{
-		TraceID:    tid,
-		SpanID:     sid,
+		TraceID:    span.SpanContext().TraceID(),
+		SpanID:     span.SpanContext().SpanID(),
 		TraceFlags: tf.WithSampled(true),
 		TraceState: trace.TraceState{},
 		Remote:     true,
 	})
-	ctx := trace.ContextWithSpanContext(context.Background(), sc)
-	span := trace.SpanFromContext(ctx)
-	span.SetName("Tracetest Trigger")
+
+	ctx = trace.ContextWithSpanContext(context.Background(), sc)
+
 	defer span.End()
 
 	tReq := trigger.GRPC
@@ -180,7 +178,7 @@ func (t *grpcTriggerer) dial(ctx context.Context, address string) (*grpc.ClientC
 	return grpcurl.BlockingDial(
 		ctx, network, address, creds,
 		grpc.WithUnaryInterceptor(otelgrpc.UnaryClientInterceptor(
-			otelgrpc.WithTracerProvider(t.traceProvider),
+			otelgrpc.WithTracerProvider(noopTracerProvider()),
 			otelgrpc.WithPropagators(propagators()),
 		)),
 	)

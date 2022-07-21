@@ -11,7 +11,6 @@ import (
 
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/model"
-	"github.com/kubeshop/tracetest/server/tracing"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	"go.opentelemetry.io/otel/trace"
@@ -23,14 +22,9 @@ func HTTP(config config.Config) (Triggerer, error) {
 		return nil, fmt.Errorf("could not create HTTP triggerer: %w", err)
 	}
 
-	tracer, err := tracing.NewTracerFromTracerProvider(context.Background(), tracerProvider)
-	if err != nil {
-		return nil, fmt.Errorf("could not create tracer from tracer provider: %w", err)
-	}
-
 	return &httpTriggerer{
 		traceProvider: tracerProvider,
-		tracer:        tracer,
+		tracer:        tracerProvider.Tracer("tracetest"),
 	}, nil
 }
 
@@ -39,7 +33,7 @@ type httpTriggerer struct {
 	tracer        trace.Tracer
 }
 
-func (te *httpTriggerer) Trigger(_ context.Context, test model.Test, tid trace.TraceID, sid trace.SpanID) (Response, error) {
+func (te *httpTriggerer) Trigger(_ context.Context, test model.Test) (Response, error) {
 	ctx := context.Background()
 
 	response := Response{
@@ -55,18 +49,18 @@ func (te *httpTriggerer) Trigger(_ context.Context, test model.Test, tid trace.T
 
 	client := http.Client{
 		Transport: otelhttp.NewTransport(http.DefaultTransport,
-			otelhttp.WithTracerProvider(te.traceProvider),
+			otelhttp.WithTracerProvider(noopTracerProvider()),
 			otelhttp.WithPropagators(propagators()),
-			otelhttp.WithSpanNameFormatter(func(operation string, r *http.Request) string {
-				return "Tracetest Trigger"
-			}),
 		),
 	}
 
+	ctx, span := te.tracer.Start(ctx, "Tracetest Trigger")
+	defer span.End()
+
 	var tf trace.TraceFlags
 	sc := trace.NewSpanContext(trace.SpanContextConfig{
-		TraceID:    tid,
-		SpanID:     sid,
+		TraceID:    span.SpanContext().TraceID(),
+		SpanID:     span.SpanContext().SpanID(),
 		TraceFlags: tf.WithSampled(true),
 		TraceState: trace.TraceState{},
 		Remote:     true,
@@ -100,6 +94,9 @@ func (te *httpTriggerer) Trigger(_ context.Context, test model.Test, tid trace.T
 	response.SpanAttributes = map[string]string{
 		"tracetest.run.trigger.http.response_code": strconv.Itoa(resp.StatusCode),
 	}
+
+	response.Result.SpanID = span.SpanContext().SpanID()
+	response.Result.TraceID = span.SpanContext().TraceID()
 
 	return response, nil
 }

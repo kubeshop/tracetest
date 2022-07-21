@@ -31,9 +31,11 @@ type (
 	}
 
 	TriggerResult struct {
-		Type TriggerType
-		HTTP *HTTPResponse
-		GRPC *GRPCResponse
+		Type    TriggerType
+		HTTP    *HTTPResponse
+		GRPC    *GRPCResponse
+		SpanID  trace.SpanID
+		TraceID trace.TraceID
 	}
 
 	SpanQuery string

@@ -9,7 +9,6 @@ import (
 
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/executor/trigger"
-	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -56,7 +55,7 @@ func TestTriggerGet(t *testing.T) {
 	ex, err := trigger.HTTP(config.Config{})
 	require.NoError(t, err)
 
-	resp, err := ex.Trigger(context.TODO(), test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
+	resp, err := ex.Trigger(context.TODO(), test)
 	assert.NoError(t, err)
 
 	assert.Equal(t, 200, resp.Result.HTTP.StatusCode)
@@ -104,7 +103,7 @@ func TestTriggerPost(t *testing.T) {
 	ex, err := trigger.HTTP(config.Config{})
 	require.NoError(t, err)
 
-	resp, err := ex.Trigger(context.TODO(), test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
+	resp, err := ex.Trigger(context.TODO(), test)
 	assert.NoError(t, err)
 
 	assert.Equal(t, 200, resp.Result.HTTP.StatusCode)
@@ -166,7 +165,7 @@ func TestTriggerPostWithApiKeyAuth(t *testing.T) {
 	ex, err := trigger.HTTP(config.Config{})
 	require.NoError(t, err)
 
-	resp, err := ex.Trigger(context.TODO(), test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
+	resp, err := ex.Trigger(context.TODO(), test)
 	assert.NoError(t, err)
 
 	assert.Equal(t, 200, resp.Result.HTTP.StatusCode)
@@ -227,7 +226,7 @@ func TestTriggerPostWithBasicAuth(t *testing.T) {
 	ex, err := trigger.HTTP(config.Config{})
 	require.NoError(t, err)
 
-	resp, err := ex.Trigger(context.TODO(), test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
+	resp, err := ex.Trigger(context.TODO(), test)
 	assert.NoError(t, err)
 
 	assert.Equal(t, 200, resp.Result.HTTP.StatusCode)
@@ -287,7 +286,7 @@ func TestTriggerPostWithBearerAuth(t *testing.T) {
 	ex, err := trigger.HTTP(config.Config{})
 	require.NoError(t, err)
 
-	resp, err := ex.Trigger(context.TODO(), test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
+	resp, err := ex.Trigger(context.TODO(), test)
 	assert.NoError(t, err)
 
 	assert.Equal(t, 200, resp.Result.HTTP.StatusCode)
