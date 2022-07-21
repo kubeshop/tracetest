@@ -181,7 +181,6 @@ type eventHandler struct {
 func (h *eventHandler) OnResolveMethod(md *desc.MethodDescriptor) {}
 
 func (h *eventHandler) OnSendHeaders(md metadata.MD) {
-	fmt.Printf("******** headers %v\n", md)
 }
 
 func (h *eventHandler) OnReceiveHeaders(md metadata.MD) {
