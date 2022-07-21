@@ -2,7 +2,7 @@ postgresConnString: "host=postgres user=postgres password=postgres port=5432 ssl
 
 poolingConfig:
   maxWaitTimeForTrace: 30s
-  retryDelay: 200ms
+  retryDelay: 500ms
 
 googleAnalytics:
   enabled: false
