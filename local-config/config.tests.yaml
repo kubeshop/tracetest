@@ -1,11 +1,4 @@
 postgresConnString: "host=postgres user=postgres password=postgres port=5432 sslmode=disable"
-tracingBackend:
-  dataStore:
-    type: jaeger
-    jaeger:
-      endpoint: jaeger:16685
-      tls:
-        insecure: true
 
 poolingConfig:
   maxWaitTimeForTrace: 60s
@@ -15,7 +8,24 @@ googleAnalytics:
   enabled: false
 
 telemetry:
-  enabled: true
-  serviceName: tracetest
-  sampling: 100 # 100%
-  otelCollectorEndpoint: otel-collector:4317
+  dataStores:
+    jaeger:
+      type: jaeger
+      jaeger:
+        endpoint: jaeger:16685
+        tls:
+          insecure: true
+
+  exporters:
+    collector:
+      serviceName: tracetest
+      sampling: 100 # 100%
+      exporter:
+        type: collector
+        collector:
+          endpoint: otel-collector:4317
+
+server:
+  telemetry:
+    exporter: collector
+    dataStore: jaeger
