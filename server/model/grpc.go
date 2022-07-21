@@ -20,6 +20,11 @@ func (a GRPCRequest) Headers() []string {
 	h := []string{}
 
 	for _, md := range a.Metadata {
+		// ignore invalid values
+		if md.Key == "" {
+			continue
+		}
+
 		h = append(h, md.Key+": "+md.Value)
 	}
 
