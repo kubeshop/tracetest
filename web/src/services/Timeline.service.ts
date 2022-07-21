@@ -24,6 +24,23 @@ const TimelineService = () => ({
     return nodes;
   },
 
+  getFilteredNodes(nodes: TNode[], collapsedNodesId: string[]) {
+    const filteredNodes: TNode[] = [];
+
+    nodes.forEach(node => {
+      const parentId = node.data.parentId;
+      const isParentPresent = filteredNodes.some(filteredNode => filteredNode.data.id === parentId);
+
+      if (parentId && (collapsedNodesId.includes(parentId) || !isParentPresent)) {
+        return;
+      }
+
+      filteredNodes.push(node);
+    });
+
+    return filteredNodes;
+  },
+
   getMinMax(nodes: TNode[]) {
     const startTimes = nodes.map(node => node.data.startTime);
     const endTimes = nodes.map(node => node.data.endTime);

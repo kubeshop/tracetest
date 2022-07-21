@@ -2,7 +2,7 @@ import {Axis, Orientation} from '@visx/axis';
 import {Group} from '@visx/group';
 import {scaleLinear} from '@visx/scale';
 import without from 'lodash/without';
-import {useMemo, useState} from 'react';
+import {useCallback, useMemo, useState} from 'react';
 import {useTheme} from 'styled-components';
 
 import {IDiagramComponentProps} from 'components/Diagram/Diagram';
@@ -10,7 +10,6 @@ import {AxisHeight, AxisOffset, NodeHeight} from 'constants/Timeline.constants';
 import TimelineModel from 'models/Timeline.model';
 import TraceAnalyticsService from 'services/Analytics/TraceAnalytics.service';
 import TimelineService from 'services/Timeline.service';
-import {TNode} from 'types/Timeline.types';
 import SpanNode from './SpanNode';
 
 const {onTimelineSpanClick} = TraceAnalyticsService;
@@ -32,43 +31,30 @@ const Visualization = ({affectedSpans, onSelectSpan, selectedSpan, spanList, wid
   const [collapsed, setCollapsed] = useState<string[]>([]);
 
   const nodes = useMemo(() => TimelineModel(spanList), [spanList]);
+  const filteredNodes = useMemo(() => TimelineService.getFilteredNodes(nodes, collapsed), [collapsed, nodes]);
   const [min, max] = useMemo(() => TimelineService.getMinMax(nodes), [nodes]);
-
-  const filteredNodes = useMemo(() => {
-    const validNodes: TNode[] = [];
-
-    nodes.forEach(node => {
-      const parentId = node.data.parentId;
-      const isParentPresent = validNodes.some(validNode => validNode.data.id === parentId);
-
-      if (parentId && (collapsed.includes(parentId) || !isParentPresent)) {
-        return;
-      }
-
-      validNodes.push(node);
-    });
-
-    return validNodes;
-  }, [collapsed, nodes]);
 
   const xScale = scaleLinear({
     domain: [0, max - min],
     range: [0, width - AxisOffset],
   });
 
-  const handleOnClick = (id: string) => {
-    onTimelineSpanClick();
-    onSelectSpan(id);
-  };
+  const handleOnClick = useCallback(
+    (id: string) => {
+      onTimelineSpanClick();
+      onSelectSpan(id);
+    },
+    [onSelectSpan]
+  );
 
-  const handleOnCollapse = (id: string) => {
+  const handleOnCollapse = useCallback((id: string) => {
     setCollapsed(prevCollapsed => {
       if (prevCollapsed.includes(id)) {
         return without(prevCollapsed, id);
       }
       return [...prevCollapsed, id];
     });
-  };
+  }, []);
 
   return width < AxisOffset ? null : (
     <svg height={nodes.length * NodeHeight + AxisHeight} width={width}>
