@@ -168,14 +168,21 @@ func (r *Run) UnmarshalJSON(data []byte) error {
 		return fmt.Errorf("unmarshal run: %w", err)
 	}
 
-	triggerResultSpanId, err := trace.SpanIDFromHex(aux.TriggerResult.SpanID)
-	if err != nil && err.Error() != "span-id can't be all zero" {
-		return err
+	triggerResultSpanId := IDGen.SpanID()
+	if aux.TriggerResult.SpanID != "" {
+		triggerResultSpanId, err = trace.SpanIDFromHex(aux.TriggerResult.SpanID)
+		if err != nil && err.Error() != "span-id can't be all zero" {
+			return err
+		}
+
 	}
 
-	triggerResultTraceId, err := trace.TraceIDFromHex(aux.TriggerResult.TraceID)
-	if err != nil && err.Error() != "trace-id can't be all zero" {
-		return err
+	triggerResultTraceId := IDGen.TraceID()
+	if aux.TriggerResult.TraceID != "" {
+		triggerResultTraceId, err = trace.TraceIDFromHex(aux.TriggerResult.TraceID)
+		if err != nil && err.Error() != "trace-id can't be all zero" {
+			return err
+		}
 	}
 
 	triggerResult := TriggerResult{
