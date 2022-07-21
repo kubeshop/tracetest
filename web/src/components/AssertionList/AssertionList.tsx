@@ -74,6 +74,7 @@ const AssertionList = ({assertionResults: {resultList}, onSelectSpan}: IProps) =
               selectedAssertion={selectedAssertion}
               selectedSpan={selectedSpan?.id}
               trace={trace}
+              viewResultsMode={viewResultsMode}
             />
           ) : null
         )

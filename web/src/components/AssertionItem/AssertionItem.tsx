@@ -1,6 +1,7 @@
 import {useMemo} from 'react';
 
 import {SemanticGroupNames} from 'constants/SemanticGroupNames.constants';
+import {ResultViewModes} from 'constants/Test.constants';
 import {useAppSelector} from 'redux/hooks';
 import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
 import AssertionAnalyticsService from 'services/Analytics/AssertionAnalytics.service';
@@ -25,10 +26,11 @@ interface IProps {
   selectedAssertion: string;
   selectedSpan?: string;
   trace?: TTrace;
+  viewResultsMode: ResultViewModes;
 }
 
 const AssertionItem = ({
-  assertionResult: {resultList, selector, spanIds},
+  assertionResult: {isAdvancedSelector, pseudoSelector, resultList, selector, selectorList, spanIds},
   assertionResult,
   onDelete,
   onEdit,
@@ -39,6 +41,7 @@ const AssertionItem = ({
   selectedAssertion,
   selectedSpan,
   trace,
+  viewResultsMode,
 }: IProps) => {
   const {
     isDeleted = false,
@@ -82,7 +85,11 @@ const AssertionItem = ({
             <AssertionHeader
               affectedSpans={spanIds.length}
               failedChecks={totalPassedChecks?.false ?? 0}
+              isAdvancedMode={viewResultsMode === ResultViewModes.Advanced}
+              isAdvancedSelector={isAdvancedSelector}
               passedChecks={totalPassedChecks?.true ?? 0}
+              pseudoSelector={pseudoSelector}
+              selectorList={selectorList}
               title={selector}
             />
           }
