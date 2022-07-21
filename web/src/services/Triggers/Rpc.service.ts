@@ -35,13 +35,14 @@ const RpcTriggerService = (): IRpcTriggerService => ({
   async getRequest(values) {
     const {protoFile, message: request, metadata, method, auth, url: address} = values as IRpcValues;
     const protobufFile = await protoFile.text();
+    const parsedMetadata = metadata.filter(({key}) => key);
 
     return {
       address,
       request,
       auth,
       method,
-      metadata,
+      metadata: parsedMetadata,
       protobufFile,
     };
   },
