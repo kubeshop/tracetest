@@ -136,8 +136,8 @@ jobs:
           --namespace tracetest-integration \
           --set analytics.enabled=false \
           --set image.tag=sha-$(git rev-parse --short $GITHUB_SHA) \
-          --set poolingConfig.maxWaitTimeForTrace=60s \
-          --set poolingConfig.retryDelay=6s \
+          --set poolingConfig.maxWaitTimeForTrace=30s \
+          --set poolingConfig.retryDelay=500ms \
           --set telemetry.dataStores.jaeger.jaeger.endpoint="jaeger-query.tracetest.svc.cluster.local:16685" \
           --set telemetry.exporters.collector.exporter.collector.endpoint="otel-collector.tracetest.svc.cluster.local:4317" \
           --set server.telemetry.dataStore="jaeger" \

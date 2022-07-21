@@ -71,7 +71,7 @@ func getTracerProvider(ctx context.Context, config config.Config) (*sdktrace.Tra
 		return nil, fmt.Errorf("could not create exporter: %w", err)
 	}
 
-	processor := sdktrace.NewBatchSpanProcessor(exporter)
+	processor := sdktrace.NewBatchSpanProcessor(exporter, sdktrace.WithBatchTimeout(100*time.Millisecond))
 	sampleRate := exporterConfig.Sampling / 100.0
 
 	return sdktrace.NewTracerProvider(
