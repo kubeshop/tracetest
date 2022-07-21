@@ -118,7 +118,7 @@ func TestRunEncoding(t *testing.T) {
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			cl := c
-			// t.Parallel()
+			t.Parallel()
 
 			run := cl.run
 
