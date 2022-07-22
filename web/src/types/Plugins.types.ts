@@ -1,5 +1,6 @@
 import {SupportedPlugins} from 'constants/Plugins.constants';
 import {TriggerTypes} from '../constants/Test.constants';
+import { TDraftTest } from './Test.types';
 
 export type TStepStatus = 'complete' | 'pending' | 'selected';
 
@@ -17,6 +18,7 @@ export interface IPlugin {
   title: string;
   description: string;
   stepList: ICreateTestStep[];
+  demoList: TDraftTest[];
   isActive: boolean;
   type: TriggerTypes;
 }
