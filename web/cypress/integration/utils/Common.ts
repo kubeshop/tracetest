@@ -1,9 +1,9 @@
 import {camelCase} from 'lodash';
-import {DemoTestExampleList} from '../../../src/constants/Test.constants';
+import {Plugins} from '../../../src/constants/Plugins.constants';
 
 Cypress.on('uncaught:exception', err => !err.message.includes('ResizeObserver loop limit exceeded'));
 
-export const [{name, description}] = DemoTestExampleList;
+export const [{name, description}] = Plugins.REST.demoList;
 
 // eslint-disable-next-line import/no-mutable-exports
 export let testId = '';

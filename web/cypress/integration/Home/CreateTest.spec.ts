@@ -1,7 +1,9 @@
 import {camelCase} from 'lodash';
-import {DemoTestExampleList} from '../../../src/constants/Test.constants';
+import {Plugins} from '../../../src/constants/Plugins.constants';
 import {deleteTest, navigateToTestCreationPage} from '../utils/Common';
 import {fillCreateFormBasicStep} from './fillCreateFormBasicStep';
+
+const DemoTestExampleList = Plugins.REST.demoList;
 
 describe('Create test', () => {
   beforeEach(() => {
