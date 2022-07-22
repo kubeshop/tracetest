@@ -1,6 +1,6 @@
 import {Categories} from '../../constants/Analytics.constants';
 
-const {analyticsEnabled = 'false', serverId = '', appVersion = '', env = ''} = window.ENV || {};
+const {analyticsEnabled = 'false', serverID = '', appVersion = '', env = ''} = window.ENV || {};
 const {analytics} = window;
 
 export const isEnabled = analyticsEnabled === 'true';
@@ -26,9 +26,9 @@ const AnalyticsService = (): TAnalyticsService => ({
   identify() {
     if (!isEnabled) return;
     analytics.identify({
-      serverId,
+      serverID,
       appVersion,
-      env
+      env,
     });
   },
 });

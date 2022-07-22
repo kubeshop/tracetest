@@ -8,7 +8,7 @@ export interface IEnv {
   measurementId: string;
   analyticsEnabled: string;
   serverPathPrefix: string;
-  serverId: string;
+  serverID: string;
   appVersion: string;
   env: string;
 }
