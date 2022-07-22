@@ -9,6 +9,8 @@ export interface IEnv {
   analyticsEnabled: string;
   serverPathPrefix: string;
   serverId: string;
+  appVersion: string;
+  env: string;
 }
 
 export type Modify<T, R> = Omit<T, keyof R> & R;

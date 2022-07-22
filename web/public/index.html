@@ -41,6 +41,8 @@
           analyticsEnabled: getTemplateValue('{{ .AnalyticsEnabled }}', 'false'),
           serverPathPrefix: getTemplateValue('{{ .ServerPathPrefix }}', '/'),
           serverId: getTemplateValue('{{ .ServerID }}', ''),
+          appVersion: getTemplateValue('{{ .AppVersion }}', ''),
+          env: getTemplateValue('{{ .Env }}', ''),
         };
 
         var base = document.createElement('base');
