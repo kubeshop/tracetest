@@ -8,6 +8,9 @@ export interface IEnv {
   measurementId: string;
   analyticsEnabled: string;
   serverPathPrefix: string;
+  serverID: string;
+  appVersion: string;
+  env: string;
 }
 
 export type Modify<T, R> = Omit<T, keyof R> & R;
@@ -29,6 +32,12 @@ export type TStructure = TTestSchemas['SpanSelector'];
 export type TFilter = TTestSchemas['SelectorFilter'];
 
 export type Model<T, R> = Modify<Required<T>, R>;
+
+export interface IAnalytics {
+  identify(traits: Record<string, string>): void;
+  track(event: string, traits: {[key: string]: any}): void;
+  page(pageName: string): void;
+}
 
 export declare type RecursivePartial<T> = T extends object
   ? {

@@ -1,10 +1,11 @@
-import pokeshopProtoData from 'assets/pokeshop.proto.json';
-import pokeshopPostmanData from 'assets/pokeshop.postman_collection.json';
 import {IPlugin} from 'types/Plugins.types';
+import pokeshopProtoData from '../assets/pokeshop.proto.json';
+import pokeshopPostmanData from '../assets/pokeshop.postman_collection.json';
+
 import {HTTP_METHOD} from './Common.constants';
 import {TriggerTypes} from './Test.constants';
 
-const pokeshopProtoFile = new File([pokeshopProtoData.proto], 'pokeshop.proto');
+const pokeshopProtoFile = new File([pokeshopProtoData?.proto], 'pokeshop.proto');
 const pokeshopPostmanFile = new File([JSON.stringify(pokeshopPostmanData)], 'pokeshop.postman_collection.json');
 
 export enum SupportedPlugins {
