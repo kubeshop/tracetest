@@ -26,6 +26,12 @@ export const AssertionCollapse = styled(Collapse)<{$isSelected: boolean}>`
   }
 `;
 
+export const CheckContainer = styled.div`
+  span {
+    overflow-wrap: anywhere;
+  }
+`;
+
 export const Column = styled.div`
   display: flex;
   flex-direction: column;
