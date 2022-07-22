@@ -102,7 +102,7 @@ const RPC: IPlugin = {
         '{"name":"meowth","type":"normal","imageUrl":"https://assets.pokemon.com/assets/cms2/img/pokedex/full/052.png","isFeatured":true}',
       method: 'pokeshop.Pokeshop.createPokemon',
       protoFile: pokeshopProtoFile,
-      description: 'Import a Pokemon',
+      description: 'Add a Pokemon',
     },
     {
       name: 'GRPC - Pokemon - Import',
