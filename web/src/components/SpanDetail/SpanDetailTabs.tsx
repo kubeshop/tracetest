@@ -2,15 +2,15 @@ import {Tabs} from 'antd';
 import {capitalize} from 'lodash';
 import React, {useMemo} from 'react';
 
-import {getObjectIncludesText} from 'utils/Common';
-import {useSpan} from 'providers/Span/Span.provider';
 import AttributeList from 'components/AttributeList';
+import {useSpan} from 'providers/Span/Span.provider';
 import TraceAnalyticsService from 'services/Analytics/TraceAnalytics.service';
 import SpanAttributeService from 'services/SpanAttribute.service';
-import {ISpanDetailsComponentProps} from './SpanDetail';
+import {getObjectIncludesText} from 'utils/Common';
+import {ISpanDetailComponentProps} from './SpanDetail';
 import * as S from './SpanDetail.styled';
 
-const SpanDetailTabs: React.FC<ISpanDetailsComponentProps> = ({
+const SpanDetailTabs: React.FC<ISpanDetailComponentProps> = ({
   span: {attributeList = [], type} = {},
   onCreateAssertion,
   assertions,

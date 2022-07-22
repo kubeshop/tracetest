@@ -1,65 +1,62 @@
 import {Form} from 'antd';
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect} from 'react';
 import {useCreateTest} from 'providers/CreateTest/CreateTest.provider';
 import CreateStepFooter from 'components/CreateTestSteps/CreateTestStepFooter';
 import * as Step from 'components/CreateTestPlugins/Step.styled';
-import RpcService from 'services/Rpc.service';
-import {TRequestAuth, TGRPCRequest} from 'types/Test.types';
+import {IRpcValues} from 'types/Test.types';
 import RequestDetailsForm from './RequestDetailsForm';
-
-export interface IRequestDetailsValues {
-  message: string;
-  auth: TRequestAuth;
-  metadata: TGRPCRequest['metadata'];
-  url: string;
-  method: string;
-  protoFile: File;
-}
+import useValidateTestDraft from '../../../../../hooks/useValidateTestDraft';
 
 const RequestDetails = () => {
-  const [isFormValid, setIsFormValid] = useState(false);
-  const [methodList, setMethodList] = useState<string[]>([]);
-  const [form] = Form.useForm<IRequestDetailsValues>();
-  const {onNext} = useCreateTest();
+  const [form] = Form.useForm<IRpcValues>();
+  const {onNext, pluginName, draftTest} = useCreateTest();
+  const {isValid, onValidate, setIsValid} = useValidateTestDraft({pluginName});
+  const {url = '', message = '', method = '', auth, metadata = [{}], protoFile} = draftTest as IRpcValues;
 
   const handleNext = useCallback(() => {
     form.submit();
   }, [form]);
 
+  const onRefreshData = useCallback(async () => {
+    form.setFieldsValue({url, auth, metadata, message, method, protoFile});
+
+    try {
+      await form.validateFields();
+      setIsValid(true);
+    } catch (err) {
+      setIsValid(false);
+    }
+  }, [auth, message, metadata, method, protoFile, url]);
+
+  useEffect(() => {
+    onRefreshData();
+  }, [onRefreshData]);
+
   const handleSubmit = useCallback(
-    (values: IRequestDetailsValues) => {
-      console.log('@@values', values);
-      onNext();
+    async (values: IRpcValues) => {
+      onNext(values);
     },
     [onNext]
   );
-
-  const protoFile = Form.useWatch('protoFile', form);
-
-  const getMethodList = useCallback(async () => {
-    if (protoFile) {
-      const list = await RpcService.getMethodList(protoFile);
-
-      setMethodList(list);
-    } else {
-      setMethodList([]);
-      form.setFieldsValue({
-        method: '',
-      });
-    }
-  }, [form, protoFile]);
-
-  useEffect(() => {
-    getMethodList();
-  }, [getMethodList]);
 
   return (
     <Step.Step>
       <Step.FormContainer>
         <Step.Title>Method Selection Information</Step.Title>
-        <RequestDetailsForm form={form} methodList={methodList} onSubmit={handleSubmit} onValidation={setIsFormValid} />
+        <Form<IRpcValues>
+          autoComplete="off"
+          form={form}
+          layout="vertical"
+          onFinish={handleSubmit}
+          onValuesChange={onValidate}
+          initialValues={{
+            metadata: [{key: '', value: ''}],
+          }}
+        >
+          <RequestDetailsForm form={form} />
+        </Form>
       </Step.FormContainer>
-      <CreateStepFooter isValid={isFormValid} onNext={handleNext} />
+      <CreateStepFooter isValid={isValid} onNext={handleNext} />
     </Step.Step>
   );
 };

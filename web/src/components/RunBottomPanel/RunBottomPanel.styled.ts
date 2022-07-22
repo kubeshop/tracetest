@@ -28,6 +28,7 @@ export const CountNumber = styled.span`
 `;
 
 export const Container = styled.div`
+  background-color: ${({theme}) => theme.color.white};
   height: calc(100% - 64px);
   overflow-y: scroll;
 `;

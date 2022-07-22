@@ -1,9 +1,9 @@
 import {camelCase} from 'lodash';
-import {DemoTestExampleList} from '../../../src/constants/Test.constants';
+import {Plugins} from '../../../src/constants/Plugins.constants';
 
 Cypress.on('uncaught:exception', err => !err.message.includes('ResizeObserver loop limit exceeded'));
 
-export const [{name, description}] = DemoTestExampleList;
+export const [{name, description}] = Plugins.REST.demoList;
 
 // eslint-disable-next-line import/no-mutable-exports
 export let testId = '';
@@ -20,6 +20,7 @@ export const createTest = () => {
   $form.get('[data-cy=create-test-next-button]').last().click();
   $form.get('[data-cy=create-test-create-button]').last().click();
 
+  cy.wait(1000);
   cy.location('pathname').should('match', /\/test\/.*/i, {timeout: 10000});
   cy.location().then(({pathname}) => {
     const id = getTestId(pathname);

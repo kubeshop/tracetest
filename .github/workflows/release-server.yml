@@ -59,9 +59,10 @@ jobs:
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache-new
         build-args: |
-          GA_MEASUREMENT_ID=${{ secrets.GA_MEASUREMENT_ID }}
-          GA_SECRET_KEY=${{ secrets.GA_SECRET_KEY }}
+          ANALYTICS_BE_KEY=${{ secrets.ANALYTICS_BE_KEY }}
+          ANALYTICS_FE_KEY=${{ secrets.ANALYTICS_FE_KEY }}
           VERSION=${{ github.ref_name}}
+          ENV=main
 
     - name: Run GoReleaser to publish release notes
       uses: goreleaser/goreleaser-action@v2
@@ -170,9 +171,10 @@ jobs:
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache-new
         build-args: |
-          GA_MEASUREMENT_ID=${{ secrets.GA_MEASUREMENT_ID_DEMO }}
-          GA_SECRET_KEY=${{ secrets.GA_SECRET_KEY_DEMO }}
+          ANALYTICS_BE_KEY=${{ secrets.ANALYTICS_BE_KEY }}
+          ANALYTICS_FE_KEY=${{ secrets.ANALYTICS_FE_KEY }}
           VERSION=${{ github.ref_name}}-demo
+          ENV=demo
     - name: Set ouput docker tag
       run: echo "::set-output tag=${{ steps.meta.outputs.tags }}"
 
@@ -210,10 +212,9 @@ jobs:
           --namespace tracetest-demo \
           --set image.tag=${{ github.ref_name}}-demo \
           --set analytics.enabled=true \
-          --set tracingBackend.dataStore.type=jaeger \
-          --set tracingBackend.dataStore.jaeger.endpoint="jaeger-query.tracetest.svc.cluster.local:16685" \
-          --set telemetry.enabled="true" \
-          --set telemetry.otelCollectorEndpoint="otel-collector.tracetest.svc.cluster.local:4317" \
+          --set telemetry.dataStores.jaeger.jaeger.endpoint="jaeger-query.tracetest.svc.cluster.local:16685" \
+          --set telemetry.exporters.collector.exporter.collector.endpoint="otel-collector.tracetest.svc.cluster.local:4317" \
+          --set server.telemetry.dataStore="jaeger" \
           --set service.annotations."cloud\.google\.com/backend-config"='\{\"default\":\"tracetest-beta\"\}' \
           --set ingress.enabled=true \
           --set 'ingress.hosts[0].host=demo.tracetest.io,ingress.hosts[0].paths[0].path=/,ingress.hosts[0].paths[0].pathType=Prefix' \

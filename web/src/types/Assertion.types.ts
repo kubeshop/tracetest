@@ -66,3 +66,8 @@ export type TResultAssertions = Record<
     passed: IResult[];
   }
 >;
+
+export interface ICheckResult {
+  result: TAssertionSpanResult;
+  assertion: TAssertion;
+}

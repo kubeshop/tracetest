@@ -58,9 +58,10 @@ jobs:
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache-new
         build-args: |
-          GA_MEASUREMENT_ID=${{ secrets.GA_MEASUREMENT_ID }}
-          GA_SECRET_KEY=${{ secrets.GA_SECRET_KEY }}
+          ANALYTICS_BE_KEY=${{ secrets.ANALYTICS_BE_KEY }}
+          ANALYTICS_FE_KEY=${{ secrets.ANALYTICS_FE_KEY }}
           VERSION=sha-${{ steps.vars.outputs.sha_short }}
+          ENV=main
 
   deploy-beta:
     if: github.event_name == 'push'
@@ -94,10 +95,9 @@ jobs:
           --namespace tracetest-beta \
           --set analytics.enabled=false \
           --set image.tag=sha-$(git rev-parse --short $GITHUB_SHA) \
-          --set tracingBackend.dataStore.type=jaeger \
-          --set tracingBackend.dataStore.jaeger.endpoint="jaeger-query.tracetest.svc.cluster.local:16685" \
-          --set telemetry.enabled="true" \
-          --set telemetry.otelCollectorEndpoint="otel-collector.tracetest.svc.cluster.local:4317" \
+          --set telemetry.dataStores.jaeger.jaeger.endpoint="jaeger-query.tracetest.svc.cluster.local:16685" \
+          --set telemetry.exporters.collector.exporter.collector.endpoint="otel-collector.tracetest.svc.cluster.local:4317" \
+          --set server.telemetry.dataStore="jaeger" \
           --set service.annotations."cloud\.google\.com/backend-config"='\{\"default\":\"tracetest-beta\"\}' \
           --set ingress.enabled=true \
           --set 'ingress.hosts[0].host=beta.tracetest.io,ingress.hosts[0].paths[0].path=/,ingress.hosts[0].paths[0].pathType=Prefix' \
@@ -136,10 +136,9 @@ jobs:
           --namespace tracetest-integration \
           --set analytics.enabled=false \
           --set image.tag=sha-$(git rev-parse --short $GITHUB_SHA) \
-          --set poolingConfig.maxWaitTimeForTrace=60s \
-          --set poolingConfig.retryDelay=6s \
-          --set tracingBackend.dataStore.type=jaeger \
-          --set tracingBackend.dataStore.jaeger.endpoint="jaeger-query.tracetest.svc.cluster.local:16685" \
-          --set telemetry.enabled="true" \
-          --set telemetry.otelCollectorEndpoint="otel-collector.tracetest.svc.cluster.local:4317" \
+          --set poolingConfig.maxWaitTimeForTrace=30s \
+          --set poolingConfig.retryDelay=500ms \
+          --set telemetry.dataStores.jaeger.jaeger.endpoint="jaeger-query.tracetest.svc.cluster.local:16685" \
+          --set telemetry.exporters.collector.exporter.collector.endpoint="otel-collector.tracetest.svc.cluster.local:4317" \
+          --set server.telemetry.dataStore="jaeger" \
           --set ingress.enabled=false

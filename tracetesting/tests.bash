@@ -4,10 +4,8 @@ source ./funcs.bash
 
 EXIT_STATUS=0
 
-export DEMO_APP_URL=${DEMO_APP_URL-"http://demo-pokemon-api.demo.svc.cluster.local"}
-
 # ensure test not exists
-tracetest_target_curl "/api/tests/383d3dce-7b60-4a61-bdea-87f47263af5d" -X DELETE
+tracetest_target_curl "/api/tests/383d3dce-7b60-4a61-bdea-87f47263af5d" -X DELETE > /dev/null 2>&1
 test "test_create_with_id_notexists" ./definitions/test_create_with_id_notexists.yml || EXIT_STATUS=$?
 test "test_create_with_id_exists" ./definitions/test_create_with_id_exists.yml || EXIT_STATUS=$?
 tracetest_target_curl "/api/tests/383d3dce-7b60-4a61-bdea-87f47263af5d" -X DELETE

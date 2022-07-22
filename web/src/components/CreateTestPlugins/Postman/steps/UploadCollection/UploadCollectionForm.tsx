@@ -1,7 +1,5 @@
-import {Col, Form, FormInstance, Input, Row} from 'antd';
-import useValidate from 'components/CreateTestPlugins/Postman/steps/UploadCollection/hooks/useValidate';
-import {IUploadCollectionValues} from 'components/CreateTestPlugins/Postman/steps/UploadCollection/UploadCollection';
-import React, {Dispatch, SetStateAction} from 'react';
+import {Col, Form, Input, Row} from 'antd';
+import {IPostmanValues, TDraftTestForm} from 'types/Test.types';
 import RequestDetailsAuthInput from '../../../Rest/steps/RequestDetails/RequestDetailsAuthInput/RequestDetailsAuthInput';
 import RequestDetailsHeadersInput from '../../../Rest/steps/RequestDetails/RequestDetailsHeadersInput';
 import RequestDetailsUrlInput from '../../../Rest/steps/RequestDetails/RequestDetailsUrlInput';
@@ -12,54 +10,40 @@ import {SelectTestFromCollection} from './fields/SelectTestFromCollection';
 export const FORM_ID = 'upload-collection-test';
 
 interface IProps {
-  form: FormInstance<IUploadCollectionValues>;
-  setTransientUrl: Dispatch<SetStateAction<string>>;
-  onSubmit(values: IUploadCollectionValues): void;
-  onValidation(isValid: boolean): void;
+  form: TDraftTestForm<IPostmanValues>;
 }
 
-const UploadCollectionForm = ({form, onSubmit, onValidation, setTransientUrl}: IProps) => {
-  const handleOnValuesChange = useValidate(onValidation, setTransientUrl);
+const UploadCollectionForm = ({form}: IProps) => {
   return (
-    <Form
-      autoComplete="off"
-      form={form}
-      layout="vertical"
-      name={FORM_ID}
-      initialValues={{url: '', requests: [], variables: []}}
-      onFinish={onSubmit}
-      onValuesChange={handleOnValuesChange}
-    >
-      <div style={{display: 'grid'}}>
-        <Form.Item name="requests" hidden>
-          <Input type="hidden" />
-        </Form.Item>
-        <Form.Item name="variables" hidden>
-          <Input type="hidden" />
-        </Form.Item>
-        <CollectionFileField form={form} />
-        <EnvFileField form={form} setTransientUrl={setTransientUrl} />
-        <SelectTestFromCollection form={form} setTransientUrl={setTransientUrl} />
-        <Row gutter={12}>
-          <Col span={12}>
-            <RequestDetailsUrlInput />
-          </Col>
-          <Col span={12}>
-            <Form.Item className="input-body" data-cy="body" label="Request body" name="body" style={{marginBottom: 0}}>
-              <Input.TextArea placeholder="Enter request body text" />
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row gutter={12}>
-          <Col span={12}>
-            <RequestDetailsHeadersInput />
-          </Col>
-          <Col span={12}>
-            <RequestDetailsAuthInput form={form} />
-          </Col>
-        </Row>
-      </div>
-    </Form>
+    <div style={{display: 'grid'}}>
+      <Form.Item name="requests" hidden>
+        <Input type="hidden" />
+      </Form.Item>
+      <Form.Item name="variables" hidden>
+        <Input type="hidden" />
+      </Form.Item>
+      <CollectionFileField form={form} />
+      <EnvFileField form={form} />
+      <SelectTestFromCollection form={form} />
+      <Row gutter={12}>
+        <Col span={12}>
+          <RequestDetailsUrlInput />
+        </Col>
+        <Col span={12}>
+          <Form.Item className="input-body" data-cy="body" label="Request body" name="body" style={{marginBottom: 0}}>
+            <Input.TextArea placeholder="Enter request body text" />
+          </Form.Item>
+        </Col>
+      </Row>
+      <Row gutter={12}>
+        <Col span={12}>
+          <RequestDetailsHeadersInput />
+        </Col>
+        <Col span={12}>
+          <RequestDetailsAuthInput form={form} />
+        </Col>
+      </Row>
+    </div>
   );
 };
 

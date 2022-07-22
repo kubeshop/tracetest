@@ -55,46 +55,6 @@ export const SemanticGroupNamesToSystem = {
   [SemanticGroupNames.Compatibility]: '',
 } as const;
 
-export const SemanticGroupNameNodeMap: Record<SemanticGroupNames, {primary: string[]; type: string}> = {
-  [SemanticGroupNames.Http]: {
-    primary: [Attributes.HTTP_TARGET, Attributes.SERVICE_NAME],
-    type: '',
-  },
-  [SemanticGroupNames.Database]: {
-    primary: [
-      Attributes.DB_MONGODB_COLLECTION,
-      Attributes.DB_SQL_TABLE,
-      Attributes.DB_CASSANDRA_TABLE,
-      Attributes.SERVICE_NAME,
-    ],
-    type: Attributes.DB_SYSTEM,
-  },
-  [SemanticGroupNames.Rpc]: {
-    primary: [Attributes.RPC_SYSTEM, Attributes.SERVICE_NAME],
-    type: Attributes.RPC_SYSTEM,
-  },
-  [SemanticGroupNames.Messaging]: {
-    primary: [Attributes.MESSAGING_DESTINATION, Attributes.SERVICE_NAME],
-    type: Attributes.MESSAGING_SYSTEM,
-  },
-  [SemanticGroupNames.Faas]: {
-    primary: [Attributes.NAME, Attributes.SERVICE_NAME],
-    type: '',
-  },
-  [SemanticGroupNames.Exception]: {
-    primary: [Attributes.EXCEPTION_TYPE, Attributes.SERVICE_NAME],
-    type: '',
-  },
-  [SemanticGroupNames.General]: {
-    primary: [Attributes.NAME, Attributes.SERVICE_NAME],
-    type: '',
-  },
-  [SemanticGroupNames.Compatibility]: {
-    primary: [Attributes.NAME, Attributes.SERVICE_NAME],
-    type: '',
-  },
-};
-
 export const BASE_ATTRIBUTES = [Attributes.TRACETEST_SPAN_TYPE, Attributes.SERVICE_NAME, Attributes.NAME];
 
 export const SELECTOR_DEFAULT_ATTRIBUTES = [

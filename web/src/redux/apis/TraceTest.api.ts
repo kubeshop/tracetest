@@ -2,15 +2,14 @@ import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
 import {uniq} from 'lodash';
 import WebSocketService, {IListenerFunction} from 'services/WebSocket.service';
 import {TRawTest, TTest} from 'types/Test.types';
-import {HTTP_METHOD} from '../../constants/Common.constants';
-import AssertionResults from '../../models/AssertionResults.model';
-import Test from '../../models/Test.model';
-import TestDefinition from '../../models/TestDefinition.model';
-import TestRun from '../../models/TestRun.model';
-import {TAssertion, TAssertionResults, TRawAssertionResults} from '../../types/Assertion.types';
-import {TDraftTest} from '../../types/Plugins.types';
-import {TRawTestDefinition, TTestDefinition} from '../../types/TestDefinition.types';
-import {TRawTestRun, TTestRun} from '../../types/TestRun.types';
+import {HTTP_METHOD} from 'constants/Common.constants';
+import AssertionResults from 'models/AssertionResults.model';
+import Test from 'models/Test.model';
+import TestDefinition from 'models/TestDefinition.model';
+import TestRun from 'models/TestRun.model';
+import {TAssertion, TAssertionResults, TRawAssertionResults} from 'types/Assertion.types';
+import {TRawTestDefinition, TTestDefinition} from 'types/TestDefinition.types';
+import {TRawTestRun, TTestRun} from 'types/TestRun.types';
 
 const PATH = `${document.baseURI}api/`;
 
@@ -29,7 +28,7 @@ const TraceTestAPI = createApi({
   tagTypes: Object.values(Tags),
   endpoints: build => ({
     // Tests
-    createTest: build.mutation<TTest, TDraftTest>({
+    createTest: build.mutation<TTest, TRawTest>({
       query: newTest => ({
         url: '/tests',
         method: HTTP_METHOD.POST,
@@ -38,7 +37,7 @@ const TraceTestAPI = createApi({
       transformResponse: (rawTest: TRawTest) => Test(rawTest),
       invalidatesTags: [{type: Tags.TEST, id: 'LIST'}],
     }),
-    editTest: build.mutation<TTest, {test: TDraftTest; testId: string}>({
+    editTest: build.mutation<TTest, {test: TRawTest; testId: string}>({
       query: ({test, testId}) => ({
         url: `/tests/${testId}`,
         method: HTTP_METHOD.PUT,

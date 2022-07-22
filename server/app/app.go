@@ -25,7 +25,10 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-var Version = ""
+var (
+	Version = "dev"
+	Env     = "dev"
+)
 
 type App struct {
 	config  config.Config
@@ -77,13 +80,13 @@ func (a *App) Start() error {
 		return err
 	}
 
-	err = analytics.Init(a.config.GA.Enabled, serverID, "tracetest", Version)
+	err = analytics.Init(a.config.GA.Enabled, serverID, Version, Env)
 	if err != nil {
 		return err
 	}
 
 	if isNewInstall {
-		err = analytics.CreateAndSendEvent("install_server", "beacon")
+		err = analytics.SendEvent("Install", "beacon")
 		if err != nil {
 			return err
 		}
@@ -91,6 +94,7 @@ func (a *App) Start() error {
 
 	triggerReg := trigger.NewRegsitry(a.tracer)
 	triggerReg.Add(trigger.HTTP())
+	triggerReg.Add(trigger.GRPC())
 
 	subscriptionManager := subscription.NewManager()
 
@@ -144,14 +148,14 @@ func (a *App) Start() error {
 			"./html",
 			"index.html",
 			map[string]string{
-				"MeasurementId":    analytics.MeasurementID,
+				"AnalyticsKey":     analytics.FrontendKey,
 				"AnalyticsEnabled": fmt.Sprintf("%t", a.config.GA.Enabled),
 				"ServerPathPrefix": fmt.Sprintf("%s/", a.config.Server.PathPrefix),
 			},
 		),
 	)
 
-	err = analytics.CreateAndSendEvent("server_started_backend", "beacon")
+	err = analytics.SendEvent("Server Started", "beacon")
 	if err != nil {
 		return err
 	}

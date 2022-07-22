@@ -19,9 +19,16 @@ describe('Validator', () => {
       expect(Validator.url(value)).toBeFalsy();
     });
 
-    it('should handle valid value', () => {
-      const value = 'https://tracetest.io/';
-      expect(Validator.required(value)).toBeTruthy();
+    it('should be invalid', () => {
+      expect(Validator.url('http://demo.@')).toBe(false);
+      expect(Validator.url('htt://demo')).toBe(false);
+    });
+
+    it('should be valid', () => {
+      expect(Validator.required('https://tracetest.io/')).toBeTruthy();
+      expect(Validator.url('http://demo')).toBe(true);
+      expect(Validator.url('http://demo.com')).toBe(true);
+      expect(Validator.url('https://www.demo.com')).toBe(true);
     });
   });
 });

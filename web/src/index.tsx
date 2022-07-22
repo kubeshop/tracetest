@@ -8,6 +8,7 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 import {IAnalytics, IEnv} from './types/Common.types';
 import {SENTRY_ALLOWED_URLS, SENTRY_DNS} from './constants/Common.constants';
+import AnalyticsService from './services/Analytics/Analytics.service';
 
 declare global {
   interface Window {
@@ -22,6 +23,8 @@ Sentry.init({
   integrations: [new BrowserTracing()],
   tracesSampleRate: 1.0,
 });
+
+AnalyticsService.identify();
 
 ReactDOM.render(
   <React.StrictMode>

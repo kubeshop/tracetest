@@ -1,12 +1,14 @@
 import {Form, Input, Select} from 'antd';
 import {HTTP_METHOD} from 'constants/Common.constants';
+import Validator from "utils/Validator";
 import * as S from './RequestDetails.styled';
 
 interface IProps {
   showMethodSelector?: boolean;
+  shouldValidateUrl?: boolean;
 }
 
-const RequestDetailsUrlInput = ({showMethodSelector = true}: IProps) => {
+const RequestDetailsUrlInput = ({showMethodSelector = true, shouldValidateUrl = true}: IProps) => {
   return (
     <div>
       <S.URLInputContainer>
@@ -34,8 +36,21 @@ const RequestDetailsUrlInput = ({showMethodSelector = true}: IProps) => {
         <Form.Item
           name="url"
           rules={[
-            {required: true, message: 'Please enter a request url'},
-            {type: 'url', message: 'Request url is not valid'},
+            {
+              validator: async (_, value: string) => {
+                if (!shouldValidateUrl) {
+                  return Promise.resolve(true);
+                }
+                if (value === '') {
+                  return Promise.reject(new Error('Please enter a request url'));
+                }
+                const isValid = Validator.url(value);
+                if (isValid) {
+                  return Promise.resolve(isValid);
+                }
+                return Promise.reject(new Error('Request url is not valid'));
+              },
+            },
           ]}
           style={{flex: 1}}
           label={!showMethodSelector ? 'URL' : ''}

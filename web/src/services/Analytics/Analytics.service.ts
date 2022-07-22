@@ -1,6 +1,6 @@
 import {Categories} from '../../constants/Analytics.constants';
 
-const {analyticsEnabled = 'false'} = window.ENV || {};
+const {analyticsEnabled = 'false', serverId = ''} = window.ENV || {};
 const {analytics} = window;
 
 export const isEnabled = analyticsEnabled === 'true';
@@ -8,10 +8,11 @@ export const isEnabled = analyticsEnabled === 'true';
 type TAnalyticsService = {
   event<A>(category: Categories, action: A, label: string): void;
   page(page: string): void;
+  identify(): void;
 };
 
 const AnalyticsService = (): TAnalyticsService => ({
-  async event<A>(category: Categories, action: A, label: string) {
+  event<A>(category: Categories, action: A, label: string) {
     if (!isEnabled) return;
     analytics.track(String(action), {
       label,
@@ -21,6 +22,12 @@ const AnalyticsService = (): TAnalyticsService => ({
   page(name: string) {
     if (!isEnabled) return;
     analytics.page(name);
+  },
+  identify() {
+    if (!isEnabled) return;
+    analytics.identify({
+      serverId,
+    });
   },
 });
 

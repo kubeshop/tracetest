@@ -118,6 +118,7 @@ jobs:
         cache-to: type=local,dest=/tmp/.buildx-cache-new
         build-args: |
           VERSION=pr-${{ github.event.pull_request.number }}
+          ENV=pr
     - name: Update docker cache
       run: |
         rm -rf /tmp/.buildx-cache
@@ -152,14 +153,13 @@ jobs:
           --set analytics.enabled=false \
           --set image.tag=pr-${{ github.event.pull_request.number }} \
           --set image.pullPolicy=Always \
-          --set tracingBackend.dataStore.type=jaeger \
-          --set tracingBackend.dataStore.jaeger.endpoint="jaeger-query.tracetest.svc.cluster.local:16685" \
-          --set telemetry.enabled="true" \
-          --set telemetry.otelCollectorEndpoint="otel-collector.tracetest.svc.cluster.local:4317" \
-          --set poolingConfig.maxWaitTimeForTrace="60s" \
-          --set poolingConfig.retryDelay="1s" \
+          --set telemetry.dataStores.jaeger.jaeger.endpoint="jaeger-query.tracetest.svc.cluster.local:16685" \
+          --set telemetry.exporters.collector.exporter.collector.endpoint="otel-collector.tracetest.svc.cluster.local:4317" \
+          --set server.telemetry.dataStore="jaeger" \
+          --set poolingConfig.maxWaitTimeForTrace="30s" \
+          --set poolingConfig.retryDelay="500ms" \
           --set ingress.enabled=false \
-          --wait --timeout 3m
+          --wait --timeout 10m
 
   e2e:
     needs: deploy

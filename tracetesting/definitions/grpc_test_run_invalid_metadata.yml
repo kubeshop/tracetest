@@ -1,0 +1,33 @@
+id: 9638ee3a-0952-492f-8380-7f85a7379c93
+name: gRPC Test Run
+description: ""
+trigger:
+  type: http
+  httpRequest:
+    url: ${TARGET_URL}/api/tests/${TEST_ID}/run
+    method: POST
+    headers:
+    - key: Content-Type
+      value: application/json
+testDefinition:
+- selector: span[name = "POST /api/tests/{testId}/run" tracetest.span.type = "http"]
+  assertions:
+  - tracetest.response.status = 200
+- selector: span[name = "Trigger test"]
+  assertions:
+  - tracetest.selected_spans.count = 1
+  - tracetest.run.trigger.test_id = "${TEST_ID}"
+  - tracetest.run.trigger.type = "grpc"
+  - tracetest.run.trigger.grpc.response_status_code = 0
+  - tracetest.run.trigger.grpc.response_status = "OK"
+- selector: span[name = "Fetch trace"]
+  assertions:
+  - tracetest.selected_spans.count > 0
+  - tracetest.run.trace_poller.test_id = "${TEST_ID}"
+- selector: span[name = "Fetch trace"]:last
+  assertions:
+  - tracetest.run.trace_poller.succesful = "true"
+- selector: span[name = "Execute assertions"]
+  assertions:
+  - tracetest.selected_spans.count = 1
+  - tracetest.run.assertion_runner.all_assertions_passed = "true"

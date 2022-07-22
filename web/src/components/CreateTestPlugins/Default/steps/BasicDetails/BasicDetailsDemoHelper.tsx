@@ -1,42 +1,31 @@
 import {DownOutlined} from '@ant-design/icons';
-import {Dropdown, FormInstance, Menu, Typography} from 'antd';
+import {Dropdown, Menu, Typography} from 'antd';
 import {camelCase} from 'lodash';
-import React from 'react';
-import {DemoTestExampleList, IDemoTestExample} from 'constants/Test.constants';
+import {TDraftTest} from 'types/Test.types';
 import CreateTestAnalyticsService from 'services/Analytics/CreateTestAnalytics.service';
 import {TooltipQuestion} from 'components/TooltipQuestion/TooltipQuestion';
-import {IBasicDetailsValues} from './BasicDetails';
 import * as S from './BasicDetails.styled';
 
 interface IProps {
-  form: FormInstance<IBasicDetailsValues>;
-  onSelectDemo(demo: IDemoTestExample): void;
-  onValidation(isValid: boolean): void;
-  selectedDemo?: IDemoTestExample;
+  onSelectDemo(demo: TDraftTest): void;
+  selectedDemo?: TDraftTest;
+  demoList?: TDraftTest[];
 }
 
-const BasicDetailsDemoHelper: React.FC<IProps> = ({selectedDemo, onSelectDemo, onValidation, form}) => {
+const BasicDetailsDemoHelper = ({selectedDemo, onSelectDemo, demoList = []}: IProps) => {
   const handleOnDemoClick = ({key}: {key: string}) => {
     CreateTestAnalyticsService.onDemoTestClick();
-    const demo = DemoTestExampleList.find(({name}) => name === key)!;
+    const demo = demoList.find(({name}) => name === key)!;
     onSelectDemo(demo);
-
-    const {description, name} = demo;
-
-    form.setFieldsValue({
-      name,
-      description,
-    });
-
-    onValidation(true);
   };
+
   return (
     <S.DemoContainer>
       <Typography.Text>Try these examples in our demo env: </Typography.Text>
       <Dropdown
         overlay={() => (
           <Menu
-            items={DemoTestExampleList.map(({name}) => ({
+            items={demoList.map(({name = ''}) => ({
               key: name,
               label: <span data-cy={`demo-example-${camelCase(name)}`}>{name}</span>,
             }))}

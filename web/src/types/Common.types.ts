@@ -8,6 +8,7 @@ export interface IEnv {
   measurementId: string;
   analyticsEnabled: string;
   serverPathPrefix: string;
+  serverId: string;
 }
 
 export type Modify<T, R> = Omit<T, keyof R> & R;
@@ -31,7 +32,17 @@ export type TFilter = TTestSchemas['SelectorFilter'];
 export type Model<T, R> = Modify<Required<T>, R>;
 
 export interface IAnalytics {
-  identify(userId: string, traits: {name: string; email: string}): void;
+  identify(traits: Record<string, string>): void;
   track(event: string, traits: {[key: string]: any}): void;
   page(pageName: string): void;
 }
+
+export declare type RecursivePartial<T> = T extends object
+  ? {
+      [P in keyof T]?: T[P] extends (infer U)[]
+        ? RecursivePartial<U>[]
+        : T[P] extends object
+        ? RecursivePartial<T[P]>
+        : T[P];
+    }
+  : any;

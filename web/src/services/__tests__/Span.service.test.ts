@@ -3,32 +3,6 @@ import SpanMock from '../../models/__mocks__/Span.mock';
 import SpanService from '../Span.service';
 
 describe('SpanService', () => {
-  describe('getSpanNodeInfo', () => {
-    it('should return the span node info', () => {
-      const span = SpanMock.model({
-        attributes: {
-          'db.system': 'mysql',
-          'service.name': 'test',
-          'tracetest.span.type': 'database',
-        },
-      });
-      const info = SpanService.getSpanNodeInfo(span);
-
-      expect(info.primary).toEqual('test');
-      expect(info.heading).toEqual('mysql');
-    });
-
-    it('should handle empty attributes array', () => {
-      const span = SpanMock.model({
-        attributes: {},
-      });
-      const info = SpanService.getSpanNodeInfo(span);
-
-      expect(info.primary).toEqual('');
-      expect(info.heading).toEqual('');
-    });
-  });
-
   describe('getSelectedSpanListAttributes', () => {
     it('should return the selected span list attributes', () => {
       const span = SpanMock.model();

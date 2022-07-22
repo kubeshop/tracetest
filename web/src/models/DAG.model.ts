@@ -1,5 +1,4 @@
 import {NodeTypesEnum} from 'constants/DAG.constants';
-import {SemanticGroupNamesToSystem} from 'constants/SemanticGroupNames.constants';
 import {Attributes} from 'constants/SpanAttribute.constants';
 import DAGService from 'services/DAG.service';
 import {INodeDataSpan, INodeDatum} from 'types/DAG.types';
@@ -15,8 +14,8 @@ function getNodesDatumFromSpans(spans: TSpan[]): INodeDatum<INodeDataSpan>[] {
       kind: span.kind,
       name: span.name,
       programmingLanguage: span.attributes?.[Attributes.TELEMETRY_SDK_LANGUAGE]?.value ?? '',
-      serviceName: span.attributes?.[Attributes.SERVICE_NAME]?.value ?? '',
-      system: span.attributes?.[SemanticGroupNamesToSystem[span.type]]?.value ?? '',
+      service: span.service,
+      system: span.system,
       totalAttributes: span.attributeList.length,
       type: span.type,
     },
