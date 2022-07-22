@@ -7,7 +7,7 @@ services:
       context: .
       args:
         VERSION: dev
-        ENV: docker-compose
+        TRACETEST_ENV: docker-compose
     volumes:
       - type: bind
         source: ./local-config/config.tests.yaml
