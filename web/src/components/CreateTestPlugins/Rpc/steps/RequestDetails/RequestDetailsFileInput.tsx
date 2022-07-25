@@ -1,5 +1,4 @@
 import {UploadOutlined} from '@ant-design/icons';
-import {Upload} from 'antd';
 import type {UploadFile} from 'antd/es/upload/interface';
 import {RcFile} from 'antd/lib/upload';
 import {noop} from 'lodash';
@@ -21,7 +20,7 @@ const RequestDetailsFileInput = ({
   onChange = noop,
   ...props
 }: IProps) => (
-  <Upload
+  <S.UploadContainer
     disabled={disabled}
     data-cy={props['data-cy']}
     multiple={false}
@@ -37,7 +36,7 @@ const RequestDetailsFileInput = ({
     <S.UploadButton data-cy={`${props['data-cy'] || 'upload'}-button`} disabled={disabled} icon={<UploadOutlined />}>
       Choose File
     </S.UploadButton>
-  </Upload>
+  </S.UploadContainer>
 );
 
 export default RequestDetailsFileInput;

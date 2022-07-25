@@ -9,12 +9,6 @@ export const Step = styled.div`
   height: 100%;
 `;
 
-export const Footer = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-`;
-
 export const FormContainer = styled.div`
   height: 100%;
 `;

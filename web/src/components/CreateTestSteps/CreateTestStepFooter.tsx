@@ -13,7 +13,7 @@ const CreateStepFooter = ({isValid, onNext}: IProps) => {
   return (
     <S.Footer>
       {Boolean(stepNumber) && (
-        <Button data-cy="create-test-prev-button" type="text" onClick={onPrev}>
+        <Button data-cy="create-test-prev-button" type="primary" ghost onClick={onPrev}>
           Previous
         </Button>
       )}
