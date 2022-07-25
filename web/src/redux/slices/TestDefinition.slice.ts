@@ -11,7 +11,7 @@ export const initialState: ITestDefinitionState = {
   changeList: [],
   isLoading: false,
   isInitialized: false,
-  selectedAssertion: '',
+  selectedAssertion: undefined,
   isDraftMode: false,
   viewResultsMode: UserPreferencesService.getUserPreference('viewResultsMode'),
 };
@@ -105,7 +105,7 @@ const testDefinitionSlice = createSlice<ITestDefinitionState, TTestDefinitionSli
     },
     setSelectedAssertion(state, {payload: assertionResult}) {
       if (assertionResult) state.selectedAssertion = assertionResult.selector;
-      else state.selectedAssertion = '';
+      else state.selectedAssertion = undefined;
     },
   },
   extraReducers: builder => {

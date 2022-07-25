@@ -221,7 +221,7 @@ describe('TestDefinitionReducer', () => {
     it('should handle on setSelectedAssertion with empty value', () => {
       const result = Reducer({...initialState, selectedAssertion: '12345'}, setSelectedAssertion());
 
-      expect(result.selectedAssertion).toEqual('');
+      expect(result.selectedAssertion).toBeUndefined();
     });
   });
 });

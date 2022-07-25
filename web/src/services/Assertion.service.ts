@@ -5,7 +5,7 @@ import {TAssertionResult, ICheckResult, TRawAssertionResult} from 'types/Asserti
 
 const AssertionService = () => ({
   getSpanIds(resultList: TRawAssertionResult[]) {
-    const spanIds = resultList.flatMap(assertion => assertion?.spanResults?.map(span => span.spanId ?? '') ?? []);
+    const spanIds = resultList.flatMap(assertion => assertion?.spanResults?.map(span => span.spanId ?? '') ?? []).filter(spanId => Boolean(spanId));
     return uniq(spanIds);
   },
 
