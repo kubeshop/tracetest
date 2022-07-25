@@ -5,7 +5,7 @@ import {useGetTestListQuery} from '../TraceTest.api';
 
 test('useGetTestListQuery', async () => {
   fetchMock.mockResponse(JSON.stringify([{testId: '24'}]));
-  const {result, waitForNextUpdate} = renderHook(() => useGetTestListQuery(), {
+  const {result, waitForNextUpdate} = renderHook(() => useGetTestListQuery({}), {
     wrapper: ReduxWrapperProvider,
   });
   expect(result.current.isLoading).toBeTruthy();

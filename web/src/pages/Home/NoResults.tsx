@@ -6,8 +6,8 @@ const NoResults: FC = () => {
   return (
     <S.NoResultsContainer>
       <S.NoResultsIcon />
-      <S.NoResultsTitle>The are no test to show</S.NoResultsTitle>
-      <Typography.Text>Please create the new test</Typography.Text>
+      <S.NoResultsTitle>There are no test to show</S.NoResultsTitle>
+      <Typography.Text>Start by creating a new test</Typography.Text>
     </S.NoResultsContainer>
   );
 };

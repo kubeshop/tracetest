@@ -5,7 +5,7 @@ const {createTest, getTestById, getTestList, runTest} = endpoints;
 
 const TestGateway = () => ({
   getList() {
-    return getTestList.initiate();
+    return getTestList.initiate({});
   },
   getById(testId: string) {
     return getTestById.initiate({testId});

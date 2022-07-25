@@ -48,8 +48,8 @@ const TraceTestAPI = createApi({
         {type: Tags.TEST, id: test?.id},
       ],
     }),
-    getTestList: build.query<TTest[], void>({
-      query: () => '/tests',
+    getTestList: build.query<TTest[], {take?: number; skip?: number}>({
+      query: ({take = 25, skip = 0}) => `/tests?take=${take}&skip=${skip}`,
       providesTags: () => [{type: Tags.TEST, id: 'LIST'}],
       transformResponse: (rawTestList: TTest[]) => rawTestList.map(rawTest => Test(rawTest)),
     }),
