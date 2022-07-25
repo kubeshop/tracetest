@@ -49,7 +49,6 @@ const AssertionFormSelector = ({
       <Form.Item
         name="selectorList"
         rules={[
-          {required: true, message: 'At least one selector is required'},
           {
             validator: (_, value: TSpanSelector[]) =>
               SelectorService.validateSelector(
@@ -73,7 +72,6 @@ const AssertionFormSelector = ({
     <S.AdvancedSelectorInputContainer>
       <Form.Item
         name="selector"
-        rules={[{required: true, message: 'The selector cannot be empty'}]}
         validateTrigger={[]}
         hasFeedback
         help={!isValid ? 'Invalid selector' : ''}
