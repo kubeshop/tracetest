@@ -26,10 +26,15 @@ const AssertionHeader = ({
   <S.Column>
     {isAdvancedMode || isAdvancedSelector ? (
       <div>
-        <S.HeaderText>{title}</S.HeaderText>
+        <S.HeaderText>{title || 'All Spans'}</S.HeaderText>
       </div>
     ) : (
       <S.SelectorContainer>
+        {!selectorList.length && (
+          <S.Selector>
+            <S.HeaderText>All Spans</S.HeaderText>
+          </S.Selector>
+        )}
         {selectorList.map(({key, value, operator}) => (
           <S.Selector key={`${key} ${operator} ${value}`}>
             <S.HeaderTextSecondary>
