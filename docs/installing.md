@@ -31,6 +31,7 @@ This command will install Tracetest using the default settings. You can configur
 | --namespace              | target installation k8s namespace            | tracetest          |
 | --trace-backend          | trace backend (jaeger or tempo)              | jaeger             |
 | --trace-backend-endpoint | trace backend endpoint                       | jaeger-query:16685 |
+| --skip-collector         | if set, don't install the otel-collector     | n/a                |
 | --skip-pma               | if set, don't install the sample application | n/a                |
 | --skip-backend           | if set, don't install the jaeger backend     | n/a                |
 
