@@ -34,7 +34,7 @@ export interface ITestDefinitionState {
   changeList: TChange[];
   isLoading: boolean;
   isInitialized: boolean;
-  selectedAssertion: string;
+  selectedAssertion: string | undefined;
   isDraftMode: boolean;
   viewResultsMode: ResultViewModes;
 }

@@ -23,7 +23,7 @@ interface IProps {
   onSelectSpan(spanId: string): void;
   onSetFocusedSpan(spanId: string): void;
   onSetSelectedAssertion(assertionResult?: TAssertionResultEntry): void;
-  selectedAssertion: string;
+  selectedAssertion?: string;
   selectedSpan?: string;
   trace?: TTrace;
   viewResultsMode: ResultViewModes;
