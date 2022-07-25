@@ -1,6 +1,6 @@
 import {TRawTest, TTest, TDraftTest} from 'types/Test.types';
-import { SupportedPlugins } from 'constants/Plugins.constants';
-import { IPlugin } from 'types/Plugins.types';
+import {SupportedPlugins} from 'constants/Plugins.constants';
+import {IPlugin} from 'types/Plugins.types';
 import TestDefinitionService from './TestDefinition.service';
 import Validator from '../utils/Validator';
 import RpcService from './Triggers/Rpc.service';

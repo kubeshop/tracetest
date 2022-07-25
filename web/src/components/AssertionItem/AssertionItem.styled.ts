@@ -26,6 +26,12 @@ export const AssertionCollapse = styled(Collapse)<{$isSelected: boolean}>`
   }
 `;
 
+export const CheckContainer = styled.div`
+  span {
+    overflow-wrap: anywhere;
+  }
+`;
+
 export const Column = styled.div`
   display: flex;
   flex-direction: column;
@@ -71,6 +77,15 @@ export const HeaderSpansIcon = styled(ApartmentOutlined)`
   margin-right: 4px;
 `;
 
+export const HeaderText = styled(Typography.Text)``;
+
+export const HeaderTextSecondary = styled(Typography.Text).attrs({
+  type: 'secondary',
+})`
+  font-size: ${({theme}) => theme.size.xs};
+  margin-bottom: -3px;
+`;
+
 export const HeaderTitle = styled(Typography.Title)`
   && {
     margin-bottom: 0;
@@ -94,6 +109,16 @@ export const Row = styled.div<{$align?: string}>`
 export const SecondaryText = styled(Typography.Text)`
   color: ${({theme}) => theme.color.textSecondary};
   font-size: ${({theme}) => theme.size.sm};
+`;
+
+export const Selector = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+export const SelectorContainer = styled.div`
+  display: flex;
+  gap: 12px;
 `;
 
 export const SpanCard = styled(Card)<{$isSelected: boolean; $type: SemanticGroupNames}>`

@@ -22,6 +22,22 @@ trigger:
               "request": "{\"id\": 52}"
             }
           }
+        },
+        "definition": {
+          "definitions": [
+            {
+              "selector": {
+                "query": "span[name = \"queue.synchronizePokemon send\"]"
+              },
+              "assertions": [
+                {
+                  "attribute": "tracetest.selected_spans.count",
+                  "comparator": ">",
+                  "expected": "0"
+                }
+              ]
+            }
+          ]
         }
       }
 testDefinition:

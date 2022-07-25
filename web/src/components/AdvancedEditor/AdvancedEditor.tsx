@@ -37,6 +37,7 @@ const AdvancedEditor = ({testId, runId, onChange = noop, value = ''}: IProps) =>
         spellCheck={false}
         autoFocus
         theme={editorTheme}
+        placeholder="Selecting All Spans"
       />
     </S.AdvancedEditor>
   );

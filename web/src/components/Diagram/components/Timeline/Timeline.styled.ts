@@ -1,97 +1,92 @@
-import styled, {css} from 'styled-components';
+import {Group} from '@visx/group';
+import styled from 'styled-components';
 
-export const Container = styled.div<{$barHeight: number; $showAffected: boolean}>`
-  overflow-y: scroll;
+import {
+  SemanticGroupNames,
+  SemanticGroupNamesToColor,
+  SemanticGroupNamesToLightColor,
+} from 'constants/SemanticGroupNames.constants';
 
-  .rect-svg {
-    width: 100%;
-    height: ${({$barHeight}) => `${$barHeight}px`};
-    stroke: none;
-    fill: none;
+export const CircleArrow = styled.circle`
+  fill: transparent;
+`;
 
-    &:hover {
-      fill: rgb(229, 231, 239);
-    }
+export const CircleNumber = styled.circle`
+  fill: ${({theme}) => theme.color.borderLight};
+`;
+
+export const GroupCollapse = styled(Group)`
+  cursor: pointer;
+`;
+
+export const Image = styled.image`
+  height: 8px;
+  width: 8px;
+`;
+
+export const LineConnector = styled.line`
+  stroke: ${({theme}) => theme.color.textLight};
+`;
+
+export const PathArrow = styled.path`
+  fill: ${({theme}) => theme.color.textLight};
+  transform: scale(0.6);
+`;
+
+export const RectBadge = styled.rect<{$type: SemanticGroupNames}>`
+  fill: ${({$type}) => SemanticGroupNamesToLightColor[$type]};
+  height: 12px;
+  width: 50px;
+  pointer-events: none;
+`;
+
+export const RectDuration = styled.rect<{$type: SemanticGroupNames}>`
+  fill: ${({$type}) => SemanticGroupNamesToColor[$type]};
+  height: 6px;
+  pointer-events: none;
+`;
+
+export const RectDurationGuideline = styled.rect`
+  fill: ${({theme}) => theme.color.borderLight};
+  height: 1px;
+  pointer-events: none;
+  width: 100%;
+`;
+
+export const RectOverlay = styled.rect<{$isAffected: boolean; $isSelected: boolean}>`
+  cursor: pointer;
+  fill: ${({$isSelected, theme}) => ($isSelected ? theme.color.backgroundInteractive : 'transparent')};
+  stroke: ${({$isSelected, theme}) => $isSelected && theme.color.interactive};
+  stroke: ${({$isAffected, theme}) => $isAffected && theme.color.text};
+  width: 100%;
+
+  :hover {
+    fill: ${({theme}) => theme.color.backgroundInteractive};
   }
+`;
 
-  .rect-svg-selected {
-    fill: rgba(72, 88, 108, 0.1);
-    stroke-width: 1px;
-    stroke: rgba(72, 88, 108, 0.5);
-  }
+export const TextBadge = styled.text`
+  fill: ${({theme}) => theme.color.text};
+  font-size: 8px;
+  pointer-events: none;
+  text-transform: uppercase;
+`;
 
-  .span-name {
-    width: 180px;
-    height ${({$barHeight}) => `${$barHeight}px`};
-    fill: ${({theme}) => theme.color.text};
-    font-size: ${({theme}) => theme.size.md};
-    pointer-events: none;
-    alignment-baseline: middle;
-    dominant-baseline: middle;
-  }
+export const TextDescription = styled.text`
+  fill: ${({theme}) => theme.color.text};
+  font-size: ${({theme}) => theme.size.xs};
+  pointer-events: none;
+`;
 
-  .span-duration {
-    width: 100px;
-    height: ${({$barHeight}) => `${$barHeight}px`};
-    fill: ${({theme}) => theme.color.textSecondary};
-    font-size: ${({theme}) => theme.size.md};
-    pointer-events: none;
-    alignment-baseline: middle;
-    dominant-baseline: middle;
-  }
+export const TextName = styled.text`
+  fill: ${({theme}) => theme.color.text};
+  font-size: ${({theme}) => theme.size.sm};
+  font-weight: 600;
+  pointer-events: none;
+`;
 
-  .duration-line {
-    height: 10px;
-    stroke: none;
-    pointer-events: none;
-  }
-
-  .grey-line {
-    width: 100%;
-    height: 1px;
-    stroke: none;
-    fill: rgba(154, 163, 171, 0.7);
-    pointer-events: none;
-  }
-
-  .node {
-    height: ${({$barHeight}) => `${$barHeight}px`};
-    cursor: pointer;
-    pointer-events: bounding-box;
-  }
-
-  .checkpoint-mark {
-    width: 1px;
-    height: 10px;
-    stroke: none;
-    fill: rgb(213, 215, 224);
-  }
-
-  .cross-line {
-    width: 100%;
-    height: 1px;
-    stroke: none;
-    fill: rgb(213, 215, 224);
-  }
-
-  .duration-ms-text {
-    text-anchor: end;
-    fill: ${({theme}) => theme.color.textSecondary};
-  }
-
-  .tick {
-    fill: ${({theme}) => theme.color.textSecondary};
-    stroke: none;
-    font-size: ${({theme}) => theme.size.md};
-  }
-
-  ${({$showAffected}) =>
-    $showAffected &&
-    css`
-      .rect-svg:not(.rect-svg-affected) ~ .span-name,
-      .rect-svg:not(.rect-svg-affected) ~ .span-duration,
-      .rect-svg:not(.rect-svg-affected) ~ .duration-line {
-        opacity: 0.5;
-      }
-    `}
+export const TextNumber = styled.text`
+  fill: ${({theme}) => theme.color.textLight};
+  font-size: ${({theme}) => theme.size.sm};
+  pointer-events: none;
 `;

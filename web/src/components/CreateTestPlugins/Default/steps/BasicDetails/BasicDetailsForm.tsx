@@ -2,23 +2,25 @@ import {Form, Input} from 'antd';
 import {noop} from 'lodash';
 import {Steps} from 'components/GuidedTour/homeStepList';
 import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
-import {IDemoTestExample} from 'constants/Test.constants';
+import {TDraftTest} from 'types/Test.types';
 import BasicDetailsDemoHelper from './BasicDetailsDemoHelper';
 import * as S from './BasicDetails.styled';
 
 export const FORM_ID = 'create-test';
 
 interface IProps {
-  onSelectDemo?(demo: IDemoTestExample): void;
-  showDemo?: boolean;
-  selectedDemo?: IDemoTestExample;
+  onSelectDemo?(demo: TDraftTest): void;
+  demoList?: TDraftTest[];
+  selectedDemo?: TDraftTest;
   isEditing?: boolean;
 }
 
-const BasicDetailsForm = ({onSelectDemo = noop, selectedDemo, showDemo = false, isEditing = false}: IProps) => {
+const BasicDetailsForm = ({onSelectDemo = noop, selectedDemo, isEditing = false, demoList = []}: IProps) => {
   return (
     <S.InputContainer $isEditing={isEditing}>
-      {showDemo && <BasicDetailsDemoHelper selectedDemo={selectedDemo} onSelectDemo={onSelectDemo} />}
+      {!isEditing && Boolean(demoList.length) && (
+        <BasicDetailsDemoHelper selectedDemo={selectedDemo} onSelectDemo={onSelectDemo} demoList={demoList} />
+      )}
       <Form.Item
         className="input-name"
         data-cy="create-test-name-input"

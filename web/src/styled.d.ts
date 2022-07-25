@@ -7,6 +7,7 @@ declare module 'styled-components' {
     /** Colors */
     color: {
       background: string;
+      backgroundInteractive: string;
       border: string;
       borderLight: string;
       error: string;

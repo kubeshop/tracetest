@@ -16,7 +16,8 @@ data:
         hash_seed: 22
         sampling_percentage: 100
 
-      batch: {}
+      batch:
+        timeout: 100ms
 
     exporters:
       logging:

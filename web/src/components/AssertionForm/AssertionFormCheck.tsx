@@ -65,6 +65,7 @@ export const AssertionFormCheck = ({
         name={[name, 'comparator']}
         rules={[{required: true, message: 'Operator is required'}]}
         data-cy="assertion-check-operator"
+        initialValue={operatorList[0].value}
       >
         <S.Select style={{margin: 0}} placeholder="Assertion Type">
           {operatorList.map(({value, label}) => (

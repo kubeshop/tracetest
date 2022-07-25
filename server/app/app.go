@@ -72,7 +72,7 @@ func spaHandler(prefix, staticPath, indexPath string, tplVars map[string]string)
 }
 
 func (a *App) Start() error {
-	fmt.Println("Starting tracetest", Version)
+	fmt.Printf("Starting tracetest (version %s, env %s)\n", Version, Env)
 
 	serverID, isNewInstall, err := a.db.ServerID()
 
@@ -151,6 +151,9 @@ func (a *App) Start() error {
 				"AnalyticsKey":     analytics.FrontendKey,
 				"AnalyticsEnabled": fmt.Sprintf("%t", a.config.GA.Enabled),
 				"ServerPathPrefix": fmt.Sprintf("%s/", a.config.Server.PathPrefix),
+				"ServerID":         serverID,
+				"AppVersion":       Version,
+				"Env":              Env,
 			},
 		),
 	)

@@ -1,23 +1,36 @@
-import GA4React from 'ga-4-react';
 import {Categories} from '../../constants/Analytics.constants';
 
-const {analyticsEnabled = 'false', measurementId = ''} = window.ENV || {};
-
-export const instance = new GA4React(measurementId);
+const {analyticsEnabled = 'false', serverID = '', appVersion = '', env = ''} = window.ENV || {};
+const {analytics} = window;
 
 export const isEnabled = analyticsEnabled === 'true';
 
 type TAnalyticsService = {
   event<A>(category: Categories, action: A, label: string): void;
+  page(page: string): void;
+  identify(): void;
 };
 
-const AnalyticsService = (): TAnalyticsService => {
-  const event = async <A>(category: Categories, action: A, label: string) => {
+const AnalyticsService = (): TAnalyticsService => ({
+  event<A>(category: Categories, action: A, label: string) {
     if (!isEnabled) return;
-    instance.event(String(action), label, category);
-  };
-
-  return {event};
-};
+    analytics.track(String(action), {
+      label,
+      category,
+    });
+  },
+  page(name: string) {
+    if (!isEnabled) return;
+    analytics.page(name);
+  },
+  identify() {
+    if (!isEnabled) return;
+    analytics.identify({
+      serverID,
+      appVersion,
+      env,
+    });
+  },
+});
 
 export default AnalyticsService();

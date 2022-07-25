@@ -7,7 +7,7 @@ services:
       context: .
       args:
         VERSION: dev
-        ENV: docker-compose
+        TRACETEST_ENV: docker-compose
     volumes:
       - type: bind
         source: ./local-config/config.tests.yaml
@@ -18,6 +18,10 @@ services:
       postgres:
         condition: service_healthy
       jaeger:
+        condition: service_healthy
+      demo-api:
+        condition: service_healthy
+      demo-rpc:
         condition: service_healthy
 
   postgres:
@@ -98,6 +102,11 @@ services:
       NPM_RUN_COMMAND: api
     ports:
       - "8081:8081"
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "localhost:8081"]
+      interval: 1s
+      timeout: 3s
+      retries: 60
     depends_on:
       postgres:
         condition: service_healthy
@@ -121,6 +130,11 @@ services:
       NPM_RUN_COMMAND: rpc
     ports:
       - 8082:8082
+    healthcheck:
+      test: ["CMD","lsof", "-i", "8082"]
+      interval: 1s
+      timeout: 3s
+      retries: 60
     depends_on:
       postgres:
         condition: service_healthy
