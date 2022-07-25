@@ -36,7 +36,7 @@ describe('TestGateway', () => {
     expect.assertions(1);
     await TestGateway.getList();
 
-    expect(getTestList.initiate).toBeCalledWith();
+    expect(getTestList.initiate).toBeCalledWith({});
   });
 
   it('should execute the runTest function', async () => {
