@@ -16,16 +16,20 @@ interface IProps {
 const UploadCollectionForm = ({form}: IProps) => {
   return (
     <div style={{display: 'grid'}}>
-      <Form.Item name="requests" hidden>
-        <Input type="hidden" />
-      </Form.Item>
-      <Form.Item name="variables" hidden>
-        <Input type="hidden" />
-      </Form.Item>
-      <CollectionFileField form={form} />
-      <EnvFileField form={form} />
-      <SelectTestFromCollection form={form} />
       <Row gutter={12}>
+        <Col span={12}>
+          <Form.Item name="requests" hidden>
+            <Input type="hidden" />
+          </Form.Item>
+          <Form.Item name="variables" hidden>
+            <Input type="hidden" />
+          </Form.Item>
+          <CollectionFileField form={form} />
+          <EnvFileField form={form} />
+          <SelectTestFromCollection form={form} />
+        </Col>
+      </Row>
+      <Row gutter={12} style={{marginTop: 16}}>
         <Col span={12}>
           <RequestDetailsUrlInput />
         </Col>

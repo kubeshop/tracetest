@@ -1,27 +1,9 @@
 import {DeleteOutlined} from '@ant-design/icons';
-import {Button} from 'antd';
+import {Button, Upload} from 'antd';
 import styled from 'styled-components';
-
-export const InputContainer = styled.div`
-  display: grid;
-  gap: 26px;
-  grid-template-columns: 50%;
-  justify-content: start;
-`;
-
-export const DoubleInputContainer = styled(InputContainer)`
-  display: grid;
-  gap: 26px;
-  grid-template-columns: 48% 48%;
-`;
 
 export const Row = styled.div`
   display: flex;
-`;
-
-export const URLInputContainer = styled.div`
-  display: flex;
-  align-items: end;
 `;
 
 export const HeaderContainer = styled.div`
@@ -30,11 +12,17 @@ export const HeaderContainer = styled.div`
   margin-bottom: 8px;
 `;
 
+export const UploadContainer = styled(Upload)`
+  .ant-upload {
+    width: 100%;
+  }
+`;
+
 export const UploadButton = styled(Button).attrs({
   type: 'primary',
   ghost: true,
 })`
-  width: 490px;
+  width: 100%;
 `;
 
 export const DeleteIcon = styled(DeleteOutlined)`

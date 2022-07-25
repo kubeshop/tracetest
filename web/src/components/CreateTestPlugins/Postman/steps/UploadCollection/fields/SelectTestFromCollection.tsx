@@ -18,7 +18,6 @@ export const SelectTestFromCollection = ({form}: IProps) => {
       label="Select test from Postman Collection"
     >
       <Select<string>
-        style={{width: 490}}
         data-cy="collectionTest-select"
         placeholder="Select test from uploaded collection"
         onChange={useSelectTestCallback(form, requests, variables)}
