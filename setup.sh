@@ -5,6 +5,7 @@ set -e
 NAMESPACE="tracetest"
 TRACE_BACKEND="jaeger"
 TRACE_BACKEND_ENDPOINT="jaeger-query:16685"
+SKIP_COLLECTOR=""
 SKIP_PMA=""
 SKIP_BACKEND=""
 
@@ -16,8 +17,9 @@ help_message() {
   echo "  --namespace [tracetest]                        target installation k8s namespace"
   echo "  --trace-backend [jaeger]                       trace backend (jaeger or tempo)"
   echo "  --trace-backend-endpoint [jaeger-query:16685]  trace backend endpoint"
+  echo "  --skip-collector                               if set, don't install otel-collector"
   echo "  --skip-pma                                     if set, don't install the sample application"
-  echo "  --skip-backend                                  if set, don't install jaeger"
+  echo "  --skip-backend                                 if set, don't install jaeger"
   echo
 }
 
@@ -97,6 +99,10 @@ while [[ $# -gt 0 ]]; do
       SKIP_BACKEND="YES"
       shift # past argument
       ;;
+     --skip-collector)
+      SKIP_COLLECTOR="YES"
+      shift # past argument
+      ;;
     -h|--help)
       help_message
       exit
@@ -126,6 +132,18 @@ helm upgrade --install tracetest kubeshop/tracetest \
   --set telemetry.dataStores.${TRACE_BACKEND}.${TRACE_BACKEND}.endpoint="$TRACE_BACKEND_ENDPOINT" \
   --set server.telemetry.dataStore="${TRACE_BACKEND}"
 
+
+if [ "$SKIP_COLLECTOR" != "YES" ]; then
+    echo
+    echo
+    echo "----------------------------"
+    echo "Installing OTEL Collector"
+    echo "----------------------------"
+    echo
+    echo
+
+    ./k8s/deploy-collector.sh
+fi
 
 if [ "$SKIP_BACKEND" != "YES" ]; then
     echo
@@ -182,11 +200,10 @@ fi
 
 GA_MEASUREMENT_ID="G-WP4XXN1FYN"
 GA_SECRET_KEY="QHaq8ZCHTzGzdcRxJ-NIbw"
-uid=$(uuidgen)
 host=$(hostname)
 os=$(uname -s)
 arch=$(uname -m)
-payload='{"client_id":"'$uid'","events":[{"name":"setup_script","params":{"event_count":1,"event_category":"beacon","app_version":"'$version'","app_name":"tracetest","host":"'$host'","machine_id":"'$uid'","operating_system":"'$os'","architecture":"'$arch'"}}]}'
+payload='{"events":[{"name":"setup_script","params":{"event_count":1,"event_category":"beacon","app_version":"'$version'","app_name":"tracetest","host":"'$host'","operating_system":"'$os'","architecture":"'$arch'"}}]}'
 curl -X POST "https://www.google-analytics.com/debug/mp/collect?measurement_id=${GA_MEASUREMENT_ID}&api_secret=${GA_SECRET_KEY}" -d $payload > /dev/null
 curl -X POST "https://www.google-analytics.com/mp/collect?measurement_id=${GA_MEASUREMENT_ID}&api_secret=${GA_SECRET_KEY}" -d $payload
 
