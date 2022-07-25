@@ -69,6 +69,9 @@ func (td *postgresDB) UpdateTest(ctx context.Context, test model.Test) (model.Te
 		return model.Test{}, fmt.Errorf("could not get latest test version while updating test: %w", err)
 	}
 
+	// keep the same creation date to keep sort order
+	test.CreatedAt = oldTest.CreatedAt
+
 	testToUpdate, err := model.BumpTestVersionIfNeeded(oldTest, test)
 	if err != nil {
 		return model.Test{}, fmt.Errorf("could not bump test version: %w", err)
@@ -141,8 +144,8 @@ func (td *postgresDB) DeleteTest(ctx context.Context, test model.Test) error {
 
 const getTestSQL = `
 SELECT t.test, d.definition
-	FROM tests t
-	JOIN definitions d ON d.test_id = t.id AND d.test_version = t.version
+FROM tests t
+JOIN definitions d ON d.test_id = t.id AND d.test_version = t.version
 `
 
 func (td *postgresDB) GetTestVersion(ctx context.Context, id uuid.UUID, version int) (model.Test, error) {
