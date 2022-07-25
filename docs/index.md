@@ -24,6 +24,8 @@ Tracetest allows you to quickly build integration and e2e tests, powered by your
 
 Check out the following blog-posts with Tracetest-related content:
 
+- [Creating a Custom Language Code Editor Using React](https://kubeshop.io/blog/creating-a-custom-language-code-editor-using-react) - July 22, 2022
+
 - [Integration Tests: Pros and Cons of Doubles vs. Trace-Based Testing](https://kubeshop.io/blog/integration-tests-pros-and-cons-of-doubles-vs-trace-based-testing) - July 13, 2022
 
 - [Detect & Fix Performance Issues Using Tracetest](https://kubeshop.io/blog/detect-fix-performance-issues-using-tracetest) - July 6, 2022

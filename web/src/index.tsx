@@ -6,12 +6,14 @@ import 'react-reflex/styles.css';
 import App from './App';
 
 import * as serviceWorker from './serviceWorker';
-import {IEnv} from './types/Common.types';
+import {IAnalytics, IEnv} from './types/Common.types';
 import {SENTRY_ALLOWED_URLS, SENTRY_DNS} from './constants/Common.constants';
+import AnalyticsService from './services/Analytics/Analytics.service';
 
 declare global {
   interface Window {
     ENV: IEnv;
+    analytics: IAnalytics;
   }
 }
 
@@ -21,6 +23,8 @@ Sentry.init({
   integrations: [new BrowserTracing()],
   tracesSampleRate: 1.0,
 });
+
+AnalyticsService.identify();
 
 ReactDOM.render(
   <React.StrictMode>

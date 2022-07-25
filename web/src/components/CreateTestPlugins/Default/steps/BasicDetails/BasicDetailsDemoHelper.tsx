@@ -1,21 +1,21 @@
 import {DownOutlined} from '@ant-design/icons';
 import {Dropdown, Menu, Typography} from 'antd';
 import {camelCase} from 'lodash';
-import React from 'react';
-import {DemoTestExampleList, IDemoTestExample} from 'constants/Test.constants';
+import {TDraftTest} from 'types/Test.types';
 import CreateTestAnalyticsService from 'services/Analytics/CreateTestAnalytics.service';
 import {TooltipQuestion} from 'components/TooltipQuestion/TooltipQuestion';
 import * as S from './BasicDetails.styled';
 
 interface IProps {
-  onSelectDemo(demo: IDemoTestExample): void;
-  selectedDemo?: IDemoTestExample;
+  onSelectDemo(demo: TDraftTest): void;
+  selectedDemo?: TDraftTest;
+  demoList?: TDraftTest[];
 }
 
-const BasicDetailsDemoHelper = ({selectedDemo, onSelectDemo}: IProps) => {
+const BasicDetailsDemoHelper = ({selectedDemo, onSelectDemo, demoList = []}: IProps) => {
   const handleOnDemoClick = ({key}: {key: string}) => {
     CreateTestAnalyticsService.onDemoTestClick();
-    const demo = DemoTestExampleList.find(({name}) => name === key)!;
+    const demo = demoList.find(({name}) => name === key)!;
     onSelectDemo(demo);
   };
 
@@ -25,7 +25,7 @@ const BasicDetailsDemoHelper = ({selectedDemo, onSelectDemo}: IProps) => {
       <Dropdown
         overlay={() => (
           <Menu
-            items={DemoTestExampleList.map(({name}) => ({
+            items={demoList.map(({name = ''}) => ({
               key: name,
               label: <span data-cy={`demo-example-${camelCase(name)}`}>{name}</span>,
             }))}

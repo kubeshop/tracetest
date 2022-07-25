@@ -133,7 +133,7 @@ const AssertionFormSelectorInput: React.FC<TItemSelectorDropdownProps> = ({
   return (
     <S.SelectorContainer data-cy="assertion-form-selector-input">
       <MultiSelectInput
-        placeholder="Filter Spans"
+        placeholder="Selecting All Spans"
         onClear={handleClear}
         entryList={entryList}
         onStepEntry={handleOnStepEntry}

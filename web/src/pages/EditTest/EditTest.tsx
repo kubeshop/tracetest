@@ -1,6 +1,6 @@
 import Layout from 'components/Layout';
-import {withTracker} from 'ga-4-react';
 import {useParams} from 'react-router-dom';
+import withAnalytics from '../../components/WithAnalytics/WithAnalytics';
 import {useGetTestByIdQuery} from '../../redux/apis/TraceTest.api';
 import EditTestContent from './EditTestContent';
 
@@ -15,4 +15,4 @@ const EditTestPage = () => {
   ) : null;
 };
 
-export default withTracker(EditTestPage);
+export default withAnalytics(EditTestPage, 'edit-test');

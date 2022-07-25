@@ -123,7 +123,7 @@ echo
 echo "--> install tracetest version $version to namespace $NAMESPACE"
 helm upgrade --install tracetest kubeshop/tracetest \
   --namespace $NAMESPACE --create-namespace \
-  --set telemetry.dataStores.${TRACE_BACKEND}.${TRACE_BACKEND}.endpoint="$TRACE_BACKEND_ENDPOINT"
+  --set telemetry.dataStores.${TRACE_BACKEND}.${TRACE_BACKEND}.endpoint="$TRACE_BACKEND_ENDPOINT" \
   --set server.telemetry.dataStore="${TRACE_BACKEND}"
 
 

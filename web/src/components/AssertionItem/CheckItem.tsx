@@ -12,7 +12,7 @@ const CheckItem = ({check}: IProps) => (
   <S.GridContainer>
     <S.Row>
       {check.result.passed ? <S.IconSuccess /> : <S.IconError />}
-      <div>
+      <S.CheckContainer>
         {check.assertion.attribute}
         {` `}
         <S.SecondaryText>
@@ -20,7 +20,7 @@ const CheckItem = ({check}: IProps) => (
         </S.SecondaryText>
         {` `}
         <AttributeValue value={check.assertion.expected} />
-      </div>
+      </S.CheckContainer>
     </S.Row>
 
     <S.Row $align="end">

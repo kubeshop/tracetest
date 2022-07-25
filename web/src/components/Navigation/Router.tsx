@@ -11,11 +11,11 @@ const Router = (): JSX.Element => {
   return (
     <BrowserRouter basename={serverPathPrefix}>
       <Routes>
-        <Route path="/" element={<Home path="home" />} />
-        <Route path="/test/:testId/edit" element={<EditTest path="edit-test" />} />
-        <Route path="/test/create" element={<CreateTest path="create-test" />} />
-        <Route path="/test/:testId" element={<Test path="test-details" />} />
-        <Route path="/test/:testId/run/:runId" element={<Trace path="trace" />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/test/:testId/edit" element={<EditTest />} />
+        <Route path="/test/create" element={<CreateTest />} />
+        <Route path="/test/:testId" element={<Test />} />
+        <Route path="/test/:testId/run/:runId" element={<Trace />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </BrowserRouter>

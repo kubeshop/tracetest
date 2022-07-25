@@ -1,4 +1,3 @@
-import {withTracker} from 'ga-4-react';
 import {useParams} from 'react-router-dom';
 import {ReactFlowProvider} from 'react-flow-renderer';
 import Layout from 'components/Layout';
@@ -8,6 +7,7 @@ import TestDefinitionProvider from 'providers/TestDefinition';
 import GuidedTourProvider from 'providers/GuidedTour/GuidedTour.provider';
 import SpanProvider from 'providers/Span';
 import TraceContent from './TraceContent';
+import withAnalytics from '../../components/WithAnalytics/WithAnalytics';
 
 const TracePage = () => {
   const {testId = '', runId = ''} = useParams();
@@ -31,4 +31,4 @@ const TracePage = () => {
   );
 };
 
-export default withTracker(TracePage);
+export default withAnalytics(TracePage, 'trace');
