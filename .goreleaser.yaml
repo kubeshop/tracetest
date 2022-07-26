@@ -6,7 +6,7 @@ changelog:
       - '^docs:'
       - '^test:'
 release:
-  discussion_category_name: General
+  # discussion_category_name: General
   draft: false
   prerelease: auto
 before:
