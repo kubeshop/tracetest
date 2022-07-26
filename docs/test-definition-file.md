@@ -143,7 +143,9 @@ Imagine you have to ensure that all your `database select statements` take `less
 1. Select all spans in your trace related to `select statements`.
 2. Check if all those spans lasted `less than 500ms`.
 
-For the first task, we use a selector: `span[db.statement contains "SELECT"]`. While the second one is achieved by using an assertion: `tracetest.span.duration < 500`.
+For the first task, we use a selector: `span[db.statement contains "SELECT"]`. While the second one is achieved by using an assertion: `tracetest.span.duration < 500ms`.
+
+> :information_source: When asserting time fields, you can use the following time units: `ns` (nanoseconds), `us` (microseconds), `ms` (milliseconds), `s` (seconds), `m` (minutes), and `h` (hours). Instead of defining `tracetest.span.duration <= 3600s`, you can set it as `tracetest.span.duration <= 1h`.
 
 To write that in your test definition, you can define the following YAML definition:
 
@@ -151,7 +153,7 @@ To write that in your test definition, you can define the following YAML definit
 testDefinition:
     - selector: span[db.statement contains "SELECT"]
       assertions:
-        - tracetest.span.duration < 500
+        - tracetest.span.duration < 500ms
 ```
 
 As you probably noticed in the test definition structure, you can have multiple assertions for the same selector. This is useful to group related validations. For example, ensuring that all your HTTP calls are successful and take less than 1000ms:
