@@ -1,7 +1,3 @@
-builds:
-  - id: tracetest
-    skip: true
-
 changelog:
   sort: asc
   filters:
@@ -20,3 +16,46 @@ release:
   # Tags that have the format v1.0.0-rc1 will mark the release as a pre-release (i.e. not ready for production)
   # Other tags will be marked as ready for production
   prerelease: auto
+project_name: tracetest
+before:
+  hooks:
+    # You may remove this if you don't use go modules.
+    - go mod tidy
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+archives:
+  - replacements:
+      darwin: Darwin
+      linux: Linux
+      windows: Windows
+      386: i386
+      amd64: x86_64
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+universal_binaries:
+- id: tracetest
+  replace: true
+nfpms:
+- id: tracetest
+  vendor: Kubeshop
+  homepage: https://tracetest.kubeshop.io/
+  license: MIT
+  formats:
+    - deb
+    - rpm
+brews:
+- tap:
+    owner: kubeshop
+    name: homebrew-tracetest
+  commit_author:
+    name: Brew Bot
+    email: brewbot@kubeshop.io
+  homepage: https://tracetest.kubeshop.io/
+  license: "MIT"
