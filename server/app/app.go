@@ -1,6 +1,7 @@
 package app
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -22,6 +23,7 @@ import (
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/traces"
+	"github.com/kubeshop/tracetest/server/tracing"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -73,6 +75,7 @@ func spaHandler(prefix, staticPath, indexPath string, tplVars map[string]string)
 
 func (a *App) Start() error {
 	fmt.Printf("Starting tracetest (version %s, env %s)\n", Version, Env)
+	ctx := context.Background()
 
 	serverID, isNewInstall, err := a.db.ServerID()
 
@@ -92,19 +95,9 @@ func (a *App) Start() error {
 		}
 	}
 
-	httpTriggerer, err := trigger.HTTP(a.config)
-	if err != nil {
-		return err
-	}
-
-	grpcTriggerer, err := trigger.GRPC(a.config)
-	if err != nil {
-		return err
-	}
-
 	triggerReg := trigger.NewRegsitry(a.tracer)
-	triggerReg.Add(httpTriggerer)
-	triggerReg.Add(grpcTriggerer)
+	triggerReg.Add(trigger.HTTP())
+	triggerReg.Add(trigger.GRPC())
 
 	subscriptionManager := subscription.NewManager()
 
@@ -130,7 +123,12 @@ func (a *App) Start() error {
 	tracePoller.Start(5) // worker count. should be configurable
 	defer tracePoller.Stop()
 
-	runner := executor.NewPersistentRunner(triggerReg, a.db, execTestUpdater, tracePoller, a.tracer)
+	applicationTracer, err := tracing.GetApplicationTracer(ctx, a.config)
+	if err != nil {
+		return fmt.Errorf("could not create trigger span tracer: %w", err)
+	}
+
+	runner := executor.NewPersistentRunner(triggerReg, a.db, execTestUpdater, tracePoller, a.tracer, applicationTracer)
 	runner.Start(5) // worker count. should be configurable
 	defer runner.Stop()
 

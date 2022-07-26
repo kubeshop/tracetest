@@ -106,8 +106,6 @@ func TestRunEncoding(t *testing.T) {
 						},
 						Body: `{"id":52}`,
 					},
-					TraceID: tid,
-					SpanID:  sid,
 				},
 				Trace:       exampleTrace,
 				TestVersion: 2,

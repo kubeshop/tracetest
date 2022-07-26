@@ -9,33 +9,18 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/model"
-	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
-	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/trace"
 )
 
-func HTTP(config config.Config) (Triggerer, error) {
-	tracerProvider, err := getTracerProvider(config)
-	if err != nil {
-		return nil, fmt.Errorf("could not create HTTP triggerer: %w", err)
-	}
-
-	return &httpTriggerer{
-		traceProvider: tracerProvider,
-		tracer:        tracerProvider.Tracer("tracetest"),
-	}, nil
+func HTTP() Triggerer {
+	return &httpTriggerer{}
 }
 
-type httpTriggerer struct {
-	traceProvider *sdktrace.TracerProvider
-	tracer        trace.Tracer
-}
+type httpTriggerer struct{}
 
-func (te *httpTriggerer) Trigger(_ context.Context, test model.Test) (Response, error) {
-	ctx := context.Background()
-
+func (te *httpTriggerer) Trigger(_ context.Context, ctx context.Context, test model.Test, tid trace.TraceID, sid trace.SpanID) (Response, error) {
 	response := Response{
 		Result: model.TriggerResult{
 			Type: te.Type(),
@@ -47,20 +32,12 @@ func (te *httpTriggerer) Trigger(_ context.Context, test model.Test) (Response, 
 		return response, fmt.Errorf(`trigger type "%s" not supported by HTTP triggerer`, trigger.Type)
 	}
 
-	client := http.Client{
-		Transport: otelhttp.NewTransport(http.DefaultTransport,
-			otelhttp.WithTracerProvider(noopTracerProvider()),
-			otelhttp.WithPropagators(propagators()),
-		),
-	}
-
-	ctx, span := te.tracer.Start(ctx, "Tracetest Trigger")
-	defer span.End()
+	client := http.DefaultClient
 
 	var tf trace.TraceFlags
 	sc := trace.NewSpanContext(trace.SpanContextConfig{
-		TraceID:    span.SpanContext().TraceID(),
-		SpanID:     span.SpanContext().SpanID(),
+		TraceID:    tid,
+		SpanID:     sid,
 		TraceFlags: tf.WithSampled(true),
 		TraceState: trace.TraceState{},
 		Remote:     true,
@@ -83,6 +60,7 @@ func (te *httpTriggerer) Trigger(_ context.Context, test model.Test) (Response, 
 	}
 
 	tReq.Authenticate(req)
+	propagators().Inject(ctx, propagation.HeaderCarrier(req.Header))
 
 	resp, err := client.Do(req.WithContext(ctx))
 	if err != nil {
@@ -94,9 +72,6 @@ func (te *httpTriggerer) Trigger(_ context.Context, test model.Test) (Response, 
 	response.SpanAttributes = map[string]string{
 		"tracetest.run.trigger.http.response_code": strconv.Itoa(resp.StatusCode),
 	}
-
-	response.Result.SpanID = span.SpanContext().SpanID()
-	response.Result.TraceID = span.SpanContext().TraceID()
 
 	return response, nil
 }

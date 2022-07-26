@@ -106,18 +106,10 @@ type encodedRun struct {
 	ObtainedTraceAt           time.Time
 	CompletedAt               time.Time
 	Trigger                   Trigger
-	TriggerResult             encodedTriggerResult
+	TriggerResult             TriggerResult
 	Trace                     *traces.Trace
 	Results                   *RunResults
 	TestVersion               int
-}
-
-type encodedTriggerResult struct {
-	Type    TriggerType
-	HTTP    *HTTPResponse
-	GRPC    *GRPCResponse
-	SpanID  string
-	TraceID string
 }
 
 func (r Run) MarshalJSON() ([]byte, error) {
@@ -136,13 +128,7 @@ func (r Run) MarshalJSON() ([]byte, error) {
 		Trigger:                   r.Trigger,
 		Trace:                     r.Trace,
 		Results:                   r.Results,
-		TriggerResult: encodedTriggerResult{
-			Type:    r.TriggerResult.Type,
-			HTTP:    r.TriggerResult.HTTP,
-			GRPC:    r.TriggerResult.GRPC,
-			SpanID:  r.TriggerResult.SpanID.String(),
-			TraceID: r.TriggerResult.TraceID.String(),
-		},
+		TriggerResult:             r.TriggerResult,
 	})
 }
 
@@ -168,29 +154,10 @@ func (r *Run) UnmarshalJSON(data []byte) error {
 		return fmt.Errorf("unmarshal run: %w", err)
 	}
 
-	triggerResultSpanId := IDGen.SpanID()
-	if aux.TriggerResult.SpanID != "" {
-		triggerResultSpanId, err = trace.SpanIDFromHex(aux.TriggerResult.SpanID)
-		if err != nil && err.Error() != "span-id can't be all zero" {
-			return err
-		}
-
-	}
-
-	triggerResultTraceId := IDGen.TraceID()
-	if aux.TriggerResult.TraceID != "" {
-		triggerResultTraceId, err = trace.TraceIDFromHex(aux.TriggerResult.TraceID)
-		if err != nil && err.Error() != "trace-id can't be all zero" {
-			return err
-		}
-	}
-
 	triggerResult := TriggerResult{
-		Type:    aux.TriggerResult.Type,
-		HTTP:    aux.TriggerResult.HTTP,
-		GRPC:    aux.TriggerResult.GRPC,
-		SpanID:  triggerResultSpanId,
-		TraceID: triggerResultTraceId,
+		Type: aux.TriggerResult.Type,
+		HTTP: aux.TriggerResult.HTTP,
+		GRPC: aux.TriggerResult.GRPC,
 	}
 
 	r.ID = id

@@ -7,11 +7,10 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/executor/trigger"
+	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestTriggerGet(t *testing.T) {
@@ -52,10 +51,9 @@ func TestTriggerGet(t *testing.T) {
 		},
 	}
 
-	ex, err := trigger.HTTP(config.Config{})
-	require.NoError(t, err)
+	ex := trigger.HTTP()
 
-	resp, err := ex.Trigger(context.TODO(), test)
+	resp, err := ex.Trigger(context.TODO(), context.TODO(), test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
 	assert.NoError(t, err)
 
 	assert.Equal(t, 200, resp.Result.HTTP.StatusCode)
@@ -100,10 +98,9 @@ func TestTriggerPost(t *testing.T) {
 		},
 	}
 
-	ex, err := trigger.HTTP(config.Config{})
-	require.NoError(t, err)
+	ex := trigger.HTTP()
 
-	resp, err := ex.Trigger(context.TODO(), test)
+	resp, err := ex.Trigger(context.TODO(), context.TODO(), test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
 	assert.NoError(t, err)
 
 	assert.Equal(t, 200, resp.Result.HTTP.StatusCode)
@@ -162,10 +159,9 @@ func TestTriggerPostWithApiKeyAuth(t *testing.T) {
 		},
 	}
 
-	ex, err := trigger.HTTP(config.Config{})
-	require.NoError(t, err)
+	ex := trigger.HTTP()
 
-	resp, err := ex.Trigger(context.TODO(), test)
+	resp, err := ex.Trigger(context.TODO(), context.TODO(), test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
 	assert.NoError(t, err)
 
 	assert.Equal(t, 200, resp.Result.HTTP.StatusCode)
@@ -223,10 +219,9 @@ func TestTriggerPostWithBasicAuth(t *testing.T) {
 		},
 	}
 
-	ex, err := trigger.HTTP(config.Config{})
-	require.NoError(t, err)
+	ex := trigger.HTTP()
 
-	resp, err := ex.Trigger(context.TODO(), test)
+	resp, err := ex.Trigger(context.TODO(), context.TODO(), test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
 	assert.NoError(t, err)
 
 	assert.Equal(t, 200, resp.Result.HTTP.StatusCode)
@@ -283,10 +278,9 @@ func TestTriggerPostWithBearerAuth(t *testing.T) {
 		},
 	}
 
-	ex, err := trigger.HTTP(config.Config{})
-	require.NoError(t, err)
+	ex := trigger.HTTP()
 
-	resp, err := ex.Trigger(context.TODO(), test)
+	resp, err := ex.Trigger(context.TODO(), context.TODO(), test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
 	assert.NoError(t, err)
 
 	assert.Equal(t, 200, resp.Result.HTTP.StatusCode)

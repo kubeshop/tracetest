@@ -15,6 +15,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/otel/trace"
 )
 
 func TestPersistentRunner(t *testing.T) {
@@ -145,7 +146,7 @@ func runnerSetup(t *testing.T) runnerFixture {
 
 	mtp.Test(t)
 	return runnerFixture{
-		runner:          executor.NewPersistentRunner(reg, db, executor.NewDBUpdater(db), mtp, tracer),
+		runner:          executor.NewPersistentRunner(reg, db, executor.NewDBUpdater(db), mtp, tracer, tracer),
 		mockExecutor:    me,
 		mockDB:          db,
 		mockTracePoller: mtp,
@@ -189,7 +190,7 @@ func (m *mockTriggerer) Type() model.TriggerType {
 	return model.TriggerTypeHTTP
 }
 
-func (m *mockTriggerer) Trigger(_ context.Context, test model.Test) (trigger.Response, error) {
+func (m *mockTriggerer) Trigger(_ context.Context, test model.Test, tid trace.TraceID, sid trace.SpanID) (trigger.Response, error) {
 	args := m.Called(test.ID)
 	return args.Get(0).(trigger.Response), args.Error(1)
 }

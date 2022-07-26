@@ -12,10 +12,8 @@ import (
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
 	"github.com/jhump/protoreflect/desc"
-	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/model"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
-	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -24,25 +22,13 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func GRPC(config config.Config) (Triggerer, error) {
-	tracerProvider, err := getTracerProvider(config)
-	if err != nil {
-		return nil, fmt.Errorf("could not create HTTP triggerer: %w", err)
-	}
-
-	return &grpcTriggerer{
-		traceProvider: tracerProvider,
-		tracer:        tracerProvider.Tracer("tracetest"),
-	}, nil
+func GRPC() Triggerer {
+	return &grpcTriggerer{}
 }
 
-type grpcTriggerer struct {
-	traceProvider *sdktrace.TracerProvider
-	tracer        trace.Tracer
-}
+type grpcTriggerer struct{}
 
-func (te *grpcTriggerer) Trigger(_ context.Context, test model.Test) (Response, error) {
-
+func (te *grpcTriggerer) Trigger(_ context.Context, ctx context.Context, test model.Test, tid trace.TraceID, sid trace.SpanID) (Response, error) {
 	response := Response{
 		Result: model.TriggerResult{
 			Type: te.Type(),
@@ -58,21 +44,16 @@ func (te *grpcTriggerer) Trigger(_ context.Context, test model.Test) (Response, 
 		return response, fmt.Errorf("no settings provided for GRPC triggerer")
 	}
 
-	ctx, span := te.tracer.Start(context.Background(), "Tracetest Trigger")
-	defer span.End()
-
 	var tf trace.TraceFlags
 	sc := trace.NewSpanContext(trace.SpanContextConfig{
-		TraceID:    span.SpanContext().TraceID(),
-		SpanID:     span.SpanContext().SpanID(),
+		TraceID:    tid,
+		SpanID:     sid,
 		TraceFlags: tf.WithSampled(true),
 		TraceState: trace.TraceState{},
 		Remote:     true,
 	})
 
-	ctx = trace.ContextWithSpanContext(context.Background(), sc)
-
-	defer span.End()
+	ctx = trace.ContextWithSpanContext(ctx, sc)
 
 	tReq := trigger.GRPC
 
@@ -124,9 +105,6 @@ func (te *grpcTriggerer) Trigger(_ context.Context, test model.Test) (Response, 
 		"tracetest.run.trigger.grpc.response_status_code": strconv.Itoa(int(h.respCode)),
 		"tracetest.run.trigger.grpc.response_status":      h.respCode.String(),
 	}
-
-	response.Result.SpanID = span.SpanContext().SpanID()
-	response.Result.TraceID = span.SpanContext().TraceID()
 
 	return response, nil
 }
