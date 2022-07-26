@@ -18,8 +18,8 @@ on:
       - "v[0-9]+.[0-9]+.[0-9]+"
       - "v[0-9]+.[0-9]+.[0-9]+-*"
 jobs:
-  release:
-    name: Create and upload release-artifacts, triggers Helm charts release
+  release-server:
+    name: Build and push server docker image
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
@@ -68,6 +68,7 @@ jobs:
           TRACETEST_ENV=main
 
   release-cli:
+    name: Build CLI release arctifacts
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
