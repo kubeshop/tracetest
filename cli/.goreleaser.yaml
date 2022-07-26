@@ -38,3 +38,12 @@ nfpms:
   formats:
     - deb
     - rpm
+brews:
+- tap:
+    owner: kubeshop
+    name: homebrew-tracetest
+  commit_author:
+    name: Brew Bot
+    email: brewbot@kubeshop.io
+  homepage: https://tracetest.kubeshop.io/
+  license: "MIT"
