@@ -35,8 +35,8 @@ jobs:
           # either 'goreleaser' (default) or 'goreleaser-pro'
           distribution: goreleaser
           version: latest
-          path: 'cli/'
-          args: release --rm-dist
+          workdir: 'cli/'
+          args: release --rm-dist --skip-validate # TODO remove this skip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # Your GoReleaser Pro key, if you are using the 'goreleaser-pro' distribution
