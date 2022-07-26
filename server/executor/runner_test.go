@@ -190,7 +190,7 @@ func (m *mockTriggerer) Type() model.TriggerType {
 	return model.TriggerTypeHTTP
 }
 
-func (m *mockTriggerer) Trigger(_ context.Context, test model.Test, tid trace.TraceID, sid trace.SpanID) (trigger.Response, error) {
+func (m *mockTriggerer) Trigger(_ context.Context, _ context.Context, test model.Test, tid trace.TraceID, sid trace.SpanID) (trigger.Response, error) {
 	args := m.Called(test.ID)
 	return args.Get(0).(trigger.Response), args.Error(1)
 }
