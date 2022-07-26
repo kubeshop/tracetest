@@ -164,7 +164,7 @@ testDefinition:
       assertions:
         - http.status_code >= 200
         - http.status_code < 300
-        - tracetest.span.duration < 1000
+        - tracetest.span.duration < 1000ms
 ```
 
 For more information about selectors or assertions, take a look at the documentation for those topics.
