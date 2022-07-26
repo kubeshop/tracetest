@@ -1,5 +1,4 @@
-# This is an example .goreleaser.yml file with some sensible defaults.
-# Make sure to check the documentation at https://goreleaser.com
+project_name: tracetest
 before:
   hooks:
     # You may remove this if you don't use go modules.
@@ -29,4 +28,13 @@ changelog:
       - '^docs:'
       - '^test:'
 universal_binaries:
-- replace: true
+- id: tracetest
+  replace: true
+nfpms:
+- id: tracetest
+  vendor: Kubeshop
+  homepage: https://tracetest.kubeshop.io/
+  license: MIT
+  formats:
+    - deb
+    - rpm
