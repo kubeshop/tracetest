@@ -29,4 +29,4 @@ changelog:
       - '^docs:'
       - '^test:'
 universal_binaries:
-  replace: true
+- replace: true
