@@ -13,7 +13,6 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/kubeshop/tracetest/server/model"
-	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -89,6 +88,8 @@ func (te *grpcTriggerer) Trigger(_ context.Context, ctx context.Context, test mo
 		marshaller: marshaler,
 	}
 
+	propagators().Inject(ctx, NewGRPCHeaderCarrier(&tReq.Metadata))
+
 	err = grpcurl.InvokeRPC(ctx, desc, conn, tReq.Method, tReq.Headers(), h, rf.Next)
 	if err != nil {
 		return response, err
@@ -158,10 +159,6 @@ func (t *grpcTriggerer) dial(ctx context.Context, address string) (*grpc.ClientC
 
 	return grpcurl.BlockingDial(
 		ctx, network, address, creds,
-		grpc.WithUnaryInterceptor(otelgrpc.UnaryClientInterceptor(
-			otelgrpc.WithTracerProvider(noopTracerProvider()),
-			otelgrpc.WithPropagators(propagators()),
-		)),
 	)
 }
 

@@ -2,7 +2,6 @@ package trigger
 
 import (
 	"context"
-	"io"
 
 	"github.com/kubeshop/tracetest/server/model"
 	"go.opentelemetry.io/contrib/propagators/aws/xray"
@@ -10,11 +9,7 @@ import (
 	"go.opentelemetry.io/contrib/propagators/jaeger"
 	"go.opentelemetry.io/contrib/propagators/ot"
 	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
 	"go.opentelemetry.io/otel/propagation"
-	"go.opentelemetry.io/otel/sdk/resource"
-	sdktrace "go.opentelemetry.io/otel/sdk/trace"
-	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -68,21 +63,4 @@ func propagators() propagation.TextMapPropagator {
 		ot.OT{},
 		xray.Propagator{},
 		propagation.TraceContext{})
-}
-
-func traceProvider() *sdktrace.TracerProvider {
-	// Set standard attributes per semantic conventions
-	res := resource.NewWithAttributes(
-		semconv.SchemaURL,
-		semconv.ServiceNameKey.String("tracetest"),
-	)
-
-	// this is in fact a noop exporter, so we can ignore errors
-	spanExporter, _ := stdouttrace.New(stdouttrace.WithWriter(io.Discard))
-
-	return sdktrace.NewTracerProvider(
-		sdktrace.WithSyncer(spanExporter),
-		sdktrace.WithResource(res),
-		sdktrace.WithSampler(sdktrace.ParentBased(sdktrace.AlwaysSample())),
-	)
 }
