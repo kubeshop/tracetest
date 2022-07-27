@@ -65,10 +65,12 @@ func (a Assertion) MarshalJSON() ([]byte, error) {
 		Attribute  string
 		Comparator string
 		Value      string
+		Expression *AssertionExpression
 	}{
 		Attribute:  a.Attribute.String(),
 		Comparator: a.Comparator.String(),
 		Value:      a.Value,
+		Expression: a.Expression,
 	})
 }
 
@@ -77,6 +79,7 @@ func (a *Assertion) UnmarshalJSON(data []byte) error {
 		Attribute  string
 		Comparator string
 		Value      string
+		Expression *AssertionExpression
 	}{}
 	if err := json.Unmarshal(data, &aux); err != nil {
 		return err
@@ -90,6 +93,7 @@ func (a *Assertion) UnmarshalJSON(data []byte) error {
 	a.Attribute = Attribute(aux.Attribute)
 	a.Value = aux.Value
 	a.Comparator = c
+	a.Expression = aux.Expression
 
 	return nil
 }
