@@ -13,6 +13,9 @@ const createTestSlice = createSlice<ICreateTestState, TCreateTestSliceActions, '
   name: 'createTest',
   initialState,
   reducers: {
+    reset() {
+      return initialState;
+    },
     setPlugin(
       state,
       {
@@ -43,5 +46,5 @@ const createTestSlice = createSlice<ICreateTestState, TCreateTestSliceActions, '
   },
 });
 
-export const {setPlugin, setStepNumber, setDraftTest} = createTestSlice.actions;
+export const {setPlugin, setStepNumber, setDraftTest, reset} = createTestSlice.actions;
 export default createTestSlice.reducer;

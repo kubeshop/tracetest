@@ -1,5 +1,5 @@
 import {useCallback, useEffect} from 'react';
-import RequestDetailsForm from 'components/CreateTestPlugins/Rpc/steps/RequestDetails/RequestDetailsForm';
+import RequestDetailsForm from 'components/CreateTestPlugins/Grpc/steps/RequestDetails/RequestDetailsForm';
 import {IRpcValues, TDraftTestForm, TGRPCRequest} from 'types/Test.types';
 import * as S from '../../EditTestForm.styled';
 import {IFormProps} from '../EditRequestDetails';

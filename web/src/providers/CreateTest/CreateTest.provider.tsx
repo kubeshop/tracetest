@@ -2,7 +2,7 @@ import {createContext, useCallback, useContext, useMemo} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {noop} from 'lodash';
 import {IPlugin} from 'types/Plugins.types';
-import {initialState, setDraftTest, setPlugin, setStepNumber} from 'redux/slices/CreateTest.slice';
+import {initialState, setDraftTest, setPlugin, setStepNumber, reset} from 'redux/slices/CreateTest.slice';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import CreateTestSelectors from 'selectors/CreateTest.selectors';
 import {useCreateTestMutation, useRunTestMutation} from 'redux/apis/TraceTest.api';
@@ -20,6 +20,7 @@ interface IContext extends ICreateTestState {
   onUpdateDraftTest(draftTest: TDraftTest): void;
   onUpdatePlugin(plugin: IPlugin): void;
   onGoTo(stepId: string): void;
+  onReset(): void;
 }
 
 export const Context = createContext<IContext>({
@@ -33,6 +34,7 @@ export const Context = createContext<IContext>({
   onUpdateDraftTest: noop,
   onUpdatePlugin: noop,
   onGoTo: noop,
+  onReset: noop,
 });
 
 interface IProps {
@@ -109,6 +111,10 @@ const CreateTestProvider = ({children}: IProps) => {
     [dispatch]
   );
 
+  const onReset = useCallback(() => {
+    dispatch(reset());
+  }, [dispatch]);
+
   const value = useMemo<IContext>(
     () => ({
       stepList,
@@ -124,6 +130,7 @@ const CreateTestProvider = ({children}: IProps) => {
       onCreateTest,
       onUpdateDraftTest,
       onUpdatePlugin,
+      onReset,
     }),
     [
       stepList,
@@ -139,6 +146,7 @@ const CreateTestProvider = ({children}: IProps) => {
       onCreateTest,
       onUpdateDraftTest,
       onUpdatePlugin,
+      onReset,
     ]
   );
 

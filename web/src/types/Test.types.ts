@@ -105,6 +105,7 @@ export interface ICreateTestState {
 }
 
 export type TCreateTestSliceActions = {
+  reset: CaseReducer<ICreateTestState>;
   setPlugin: CaseReducer<ICreateTestState, PayloadAction<{plugin: IPlugin}>>;
   setStepNumber: CaseReducer<ICreateTestState, PayloadAction<{stepNumber: number; completeStep?: boolean}>>;
   setDraftTest: CaseReducer<ICreateTestState, PayloadAction<{draftTest: TDraftTest}>>;
