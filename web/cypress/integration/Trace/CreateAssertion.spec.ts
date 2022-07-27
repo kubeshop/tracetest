@@ -5,11 +5,6 @@ describe('Create Assertion', () => {
   it('should create a basic assertion', () => {
     (async () => {
       const testId = await createTest();
-      // cy.visit(`http://localhost:3000/test/${testId}`);
-      // cy.get('[data-cy^=result-card]', {timeout: 20000}).first().click();
-      // cy.location('href').should('match', /\/test\/.*/i);
-      // cy.get(`[data-cy^=test-run-result-]`, {timeout: 20000}).first().click();
-      // cy.location('href').should('match', /\/run\/.*/i);
       cy.get('[data-cy^=trace-node-]', {timeout: 20000}).should('be.visible');
       cy.log('createAssertion');
       createAssertion();
@@ -27,7 +22,6 @@ describe('Create Assertion', () => {
       cy.get('[data-cy=assertion-form]').should('be.visible');
 
       cy.get('[data-cy=assertion-check-attribute]').type('http');
-      cy.wait(500);
       cy.get(`${getAttributeListId(0)} + div .ant-select-item`)
         .first()
         .click();
@@ -41,7 +35,6 @@ describe('Create Assertion', () => {
       cy.get('[data-cy=add-assertion-form-add-check]').click();
 
       cy.get('[data-cy=assertion-check-attribute]').last().type('service');
-      cy.wait(500);
       cy.get(`${getAttributeListId(1)} + div .ant-select-item`)
         .first()
         .click();
@@ -55,7 +48,6 @@ describe('Create Assertion', () => {
       cy.get('[data-cy=add-assertion-form-add-check]').click();
 
       cy.get('[data-cy=assertion-check-attribute]').last().type('duration');
-      cy.wait(500);
       cy.get(`${getAttributeListId(2)} + div .ant-select-item`)
         .first()
         .click();
@@ -90,7 +82,6 @@ describe('Create Assertion', () => {
         .type('span[tracetest.span.type = "http"] span[tracetest.span.type = "database"]:first');
 
       cy.get('[data-cy=assertion-check-attribute]').type('db');
-      cy.wait(500);
       cy.get(`${getAttributeListId(0)} + div .ant-select-item`)
         .first()
         .click();
@@ -127,7 +118,6 @@ describe('Create Assertion', () => {
       cy.get('[data-cy=add-assertion-form-add-check]').click();
 
       cy.get('[data-cy=assertion-check-attribute]').last().type('service');
-      cy.wait(500);
       cy.get(`${getAttributeListId(1)} + div .ant-select-item`)
         .first()
         .click();
@@ -167,7 +157,6 @@ describe('Create Assertion', () => {
       cy.get('[data-cy=add-assertion-form-add-check]').click();
 
       cy.get('[data-cy=assertion-check-attribute]').last().type('service');
-      cy.wait(500);
       cy.get(`${getAttributeListId(1)} + div .ant-select-item`)
         .first()
         .click();
@@ -203,7 +192,6 @@ describe('Create Assertion', () => {
       cy.get('[data-cy=assertion-form]', {timeout: 10000}).should('be.visible');
 
       cy.get('[data-cy=assertion-check-attribute]').type('db');
-      cy.wait(500);
       cy.get(`${getAttributeListId(0)} + div .ant-select-item`)
         .first()
         .click();

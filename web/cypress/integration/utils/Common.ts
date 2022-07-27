@@ -12,6 +12,7 @@ function promisify(chain): Bluebird<unknown> {
   return new Cypress.Promise((resolve, reject) => {
     // We must subscribe to failures and bail. Without this, the Cypress runner would never stop
     Cypress.on('fail', rejectPromise);
+
     // // unsubscribe from test failure on both success and failure. This cleanup is essential
     function resolvePromise(value) {
       resolve(value);
@@ -44,12 +45,19 @@ export function waitForTracePageApiCalls() {
 }
 
 export function makeSureUserisOnTracePage() {
-  cy.location('pathname').should('match', testRunPageRegex, {timeout: 20000}).wait(2000);
+  cy.location('pathname').should('match', testRunPageRegex, {timeout: 20000});
+}
+
+async function getPathname(): Promise<string> {
+  return (await promisify(cy.location('pathname'))) as string;
 }
 
 export async function extractTestIdFromTracePage(): Promise<string> {
-  const pathname = (await promisify(cy.location('pathname'))) as string;
-  return getTestId(pathname);
+  return getTestId(await getPathname());
+}
+
+export async function extractTestRunIdFromTracePage(): Promise<string> {
+  return getResultId(await getPathname());
 }
 
 export const createTest = async (): Promise<string> => {
@@ -89,7 +97,7 @@ function deleteTestByID(localTestId: string) {
 
 export const deleteTest = (testId?: string) => {
   cy.visit(`http://localhost:3000`);
-  cy.wait('@testList').wait(2000);
+  cy.wait('@testList');
   deleteTestByID(testId);
 };
 
@@ -111,7 +119,6 @@ export const createMultipleTestRuns = (id: string, count: number) => {
   for (let i = 0; i < count; i += 1) {
     cy.get(`[data-cy=test-run-button-${id}]`).click();
     cy.location('pathname').should('match', testRunPageRegex);
-    cy.wait(500);
 
     cy.visit('http://localhost:3000/');
   }

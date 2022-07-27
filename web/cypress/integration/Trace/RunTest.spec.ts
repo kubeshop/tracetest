@@ -1,4 +1,4 @@
-import {deleteTest, getResultId, createTest} from '../utils/Common';
+import {createTest, deleteTest, extractTestRunIdFromTracePage} from '../utils/Common';
 
 describe('Run Test', () => {
   it('should show and click the Run Test button when the test has finished', () => {
@@ -14,11 +14,8 @@ describe('Run Test', () => {
       cy.get('[data-cy=run-test-button]', {timeout: 20000}).should('be.visible');
       cy.get(`[data-cy^=run-test-button]`).first().click();
 
-      cy.wait(2000);
-      cy.location().then(({pathname}) => {
-        const testRunResultId = getResultId(pathname);
-        cy.location('pathname').should('eq', `/test/${testId}/run/${testRunResultId}`);
-      });
+      const testRunResultId = await extractTestRunIdFromTracePage();
+      cy.location('pathname').should('eq', `/test/${testId}/run/${testRunResultId}`);
       deleteTest(testId);
     })();
   });
