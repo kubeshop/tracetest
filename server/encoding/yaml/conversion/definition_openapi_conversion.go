@@ -125,7 +125,7 @@ func convertTestDefinitionsIntoOpenAPIObject(testDefinitions []definition.TestDe
 			Assertions: assertions,
 		})
 	}
-
+	// TODO: convert string into assertion (using a parser?)
 	return openapi.TestDefinition{
 		Definitions: definitions,
 	}, nil
@@ -142,5 +142,6 @@ func convertStringIntoAssertion(assertion string) (openapi.Assertion, error) {
 		Attribute:  parsedAssertion.Attribute,
 		Comparator: parsedAssertion.Operator,
 		Expected:   parsedAssertion.Value,
+		Expression: assertion,
 	}, nil
 }

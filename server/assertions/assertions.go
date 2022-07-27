@@ -58,11 +58,23 @@ func assertIndividualSpans(a model.Assertion, spans []traces.Span) model.Asserti
 	allPassed := true
 	for i, span := range spans {
 		spanID := span.ID
+		var err error = nil
+		var value string
+		if a.Expression != nil {
+			value, err = ExecuteExpression(*a.Expression, span)
+		} else {
+			value = span.Attributes.Get(a.Attribute.String())
+		}
+
 		res[i] = apply(
 			a,
-			span.Attributes.Get(a.Attribute.String()),
+			value,
 			&spanID,
 		)
+		if err != nil {
+			res[i].CompareErr = err
+		}
+
 		if res[i].CompareErr != nil {
 			allPassed = false
 		}
