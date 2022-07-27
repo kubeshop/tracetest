@@ -8,7 +8,7 @@ export const ShowOnboardingContent = (onGuidedTourClick: () => void, onShow: () 
     </div>
     <Divider style={{margin: 0}} />
     <div style={{display: 'flex', justifyContent: 'flex-end', padding: 16}}>
-      <Button style={{marginRight: 16}} ghost onClick={() => onClose()} type="primary">
+      <Button data-cy="no-thanks" style={{marginRight: 16}} ghost onClick={() => onClose()} type="primary">
         No thanks
       </Button>
       <AddAssertionButton
