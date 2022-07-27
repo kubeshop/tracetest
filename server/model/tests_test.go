@@ -20,14 +20,14 @@ func TestSpec(t *testing.T) {
 	t.Run("Add", func(t *testing.T) {
 		spec := (model.Test{}).Specs
 
-		spec, err := spec.Add(model.SpanQuery("1"), []model.Assertion{{"1", comparator.Eq, "1"}})
+		spec, err := spec.Add(model.SpanQuery("1"), []model.Assertion{{"1", comparator.Eq, "1", nil}})
 		require.NoError(t, err)
 
-		spec, err = spec.Add(model.SpanQuery("2"), []model.Assertion{{"2", comparator.Eq, "2"}})
+		spec, err = spec.Add(model.SpanQuery("2"), []model.Assertion{{"2", comparator.Eq, "2", nil}})
 		require.NoError(t, err)
 		assert.Equal(t, 2, spec.Len())
 
-		spec, err = spec.Add(model.SpanQuery("2"), []model.Assertion{{"2", comparator.Eq, "2"}})
+		spec, err = spec.Add(model.SpanQuery("2"), []model.Assertion{{"2", comparator.Eq, "2", nil}})
 		assert.ErrorContains(t, err, "selector already exists")
 		assert.Equal(t, 0, spec.Len())
 
@@ -36,8 +36,8 @@ func TestSpec(t *testing.T) {
 	generateSpec := func() model.OrderedMap[model.SpanQuery, []model.Assertion] {
 		spec := (model.Test{}).Specs
 
-		spec, _ = spec.Add(model.SpanQuery("1"), []model.Assertion{{"1", comparator.Eq, "1"}})
-		spec, _ = spec.Add(model.SpanQuery("2"), []model.Assertion{{"2", comparator.Eq, "2"}})
+		spec, _ = spec.Add(model.SpanQuery("1"), []model.Assertion{{"1", comparator.Eq, "1", nil}})
+		spec, _ = spec.Add(model.SpanQuery("2"), []model.Assertion{{"2", comparator.Eq, "2", nil}})
 
 		return spec
 	}
@@ -47,8 +47,8 @@ func TestSpec(t *testing.T) {
 		spec := generateSpec()
 
 		expected := map[string][]model.Assertion{
-			"1": {{"1", comparator.Eq, "1"}},
-			"2": {{"2", comparator.Eq, "2"}},
+			"1": {{"1", comparator.Eq, "1", nil}},
+			"2": {{"2", comparator.Eq, "2", nil}},
 		}
 
 		actual := map[string][]model.Assertion{}
@@ -64,7 +64,7 @@ func TestSpec(t *testing.T) {
 
 		spec := generateSpec()
 
-		expected := []model.Assertion{{"1", comparator.Eq, "1"}}
+		expected := []model.Assertion{{"1", comparator.Eq, "1", nil}}
 		actual := spec.Get(model.SpanQuery("1"))
 
 		assert.Equal(t, expected, actual)
@@ -93,14 +93,14 @@ func TestResults(t *testing.T) {
 	t.Run("Add", func(t *testing.T) {
 		def := (model.RunResults{}).Results
 
-		def, err := def.Add(model.SpanQuery("1"), []model.AssertionResult{{Assertion: model.Assertion{"1", comparator.Eq, "1"}}})
+		def, err := def.Add(model.SpanQuery("1"), []model.AssertionResult{{Assertion: model.Assertion{"1", comparator.Eq, "1", nil}}})
 		require.NoError(t, err)
 
-		def, err = def.Add(model.SpanQuery("2"), []model.AssertionResult{{Assertion: model.Assertion{"2", comparator.Eq, "2"}}})
+		def, err = def.Add(model.SpanQuery("2"), []model.AssertionResult{{Assertion: model.Assertion{"2", comparator.Eq, "2", nil}}})
 		require.NoError(t, err)
 		assert.Equal(t, 2, def.Len())
 
-		def, err = def.Add(model.SpanQuery("2"), []model.AssertionResult{{Assertion: model.Assertion{"2", comparator.Eq, "2"}}})
+		def, err = def.Add(model.SpanQuery("2"), []model.AssertionResult{{Assertion: model.Assertion{"2", comparator.Eq, "2", nil}}})
 		assert.ErrorContains(t, err, "selector already exists")
 		assert.Equal(t, 0, def.Len())
 
@@ -109,8 +109,8 @@ func TestResults(t *testing.T) {
 	generateDef := func() model.OrderedMap[model.SpanQuery, []model.AssertionResult] {
 		def := (model.RunResults{}).Results
 
-		def, _ = def.Add(model.SpanQuery("1"), []model.AssertionResult{{Assertion: model.Assertion{"1", comparator.Eq, "1"}}})
-		def, _ = def.Add(model.SpanQuery("2"), []model.AssertionResult{{Assertion: model.Assertion{"2", comparator.Eq, "2"}}})
+		def, _ = def.Add(model.SpanQuery("1"), []model.AssertionResult{{Assertion: model.Assertion{"1", comparator.Eq, "1", nil}}})
+		def, _ = def.Add(model.SpanQuery("2"), []model.AssertionResult{{Assertion: model.Assertion{"2", comparator.Eq, "2", nil}}})
 
 		return def
 	}
@@ -120,8 +120,8 @@ func TestResults(t *testing.T) {
 		def := generateDef()
 
 		expected := map[string][]model.AssertionResult{
-			"1": {{Assertion: model.Assertion{"1", comparator.Eq, "1"}}},
-			"2": {{Assertion: model.Assertion{"2", comparator.Eq, "2"}}},
+			"1": {{Assertion: model.Assertion{"1", comparator.Eq, "1", nil}}},
+			"2": {{Assertion: model.Assertion{"2", comparator.Eq, "2", nil}}},
 		}
 
 		actual := map[string][]model.AssertionResult{}
@@ -137,7 +137,7 @@ func TestResults(t *testing.T) {
 
 		def := generateDef()
 
-		expected := []model.AssertionResult{{Assertion: model.Assertion{"1", comparator.Eq, "1"}}}
+		expected := []model.AssertionResult{{Assertion: model.Assertion{"1", comparator.Eq, "1", nil}}}
 		actual := def.Get(model.SpanQuery("1"))
 
 		assert.Equal(t, expected, actual)

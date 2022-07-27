@@ -42,6 +42,18 @@ type (
 		Attribute  Attribute
 		Comparator comparator.Comparator
 		Value      string
+		Expression *AssertionExpression
+	}
+
+	AssertionExpression struct {
+		LiteralValue LiteralValue
+		Operation    string
+		Expression   *AssertionExpression
+	}
+
+	LiteralValue struct {
+		Value string
+		Type  string
 	}
 
 	Attribute string

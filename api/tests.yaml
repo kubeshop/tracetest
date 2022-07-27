@@ -61,6 +61,8 @@ components:
           type: string
         expected:
           type: string
+        expression:
+          type: string
 
     TestRun:
       type: object

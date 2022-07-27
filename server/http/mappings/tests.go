@@ -8,6 +8,7 @@ import (
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/assertions/selectors"
 	"github.com/kubeshop/tracetest/server/encoding/yaml/conversion"
+	"github.com/kubeshop/tracetest/server/encoding/yaml/conversion/parser"
 	"github.com/kubeshop/tracetest/server/encoding/yaml/definition"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
@@ -374,10 +375,28 @@ func (m Model) Assertion(in openapi.Assertion) model.Assertion {
 		expectedValue = fmt.Sprintf("%d", fieldInNanoSeconds)
 	}
 
+	assertion, _ := parser.ParseAssertion(in.Expression)
+
 	return model.Assertion{
 		Attribute:  model.Attribute(in.Attribute),
 		Comparator: comp,
 		Value:      expectedValue,
+		Expression: m.AssertionExpression(assertion.Expression),
+	}
+}
+
+func (m Model) AssertionExpression(in *parser.Expression) *model.AssertionExpression {
+	if in == nil {
+		return nil
+	}
+
+	return &model.AssertionExpression{
+		LiteralValue: model.LiteralValue{
+			Value: in.LiteralValue.String(),
+			Type:  in.LiteralValue.Type(),
+		},
+		Operation:  in.Operation,
+		Expression: m.AssertionExpression(in.Expression),
 	}
 }
 
