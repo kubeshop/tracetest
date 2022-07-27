@@ -181,6 +181,24 @@ func TestSimpleExpressions(t *testing.T) {
 			Span:           traces.Span{},
 			ExpectedOutput: "4",
 		},
+		{
+			Name: "should_sum_durations",
+			Expression: model.AssertionExpression{
+				LiteralValue: model.LiteralValue{
+					Value: "60s",
+					Type:  "duration",
+				},
+				Operation: "+",
+				Expression: &model.AssertionExpression{
+					LiteralValue: model.LiteralValue{
+						Value: "800ms",
+						Type:  "duration",
+					},
+				},
+			},
+			Span:           traces.Span{},
+			ExpectedOutput: "60800000000", // 60.8s in nanoseconds
+		},
 	}
 
 	for _, testCase := range testCases {

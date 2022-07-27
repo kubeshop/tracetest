@@ -55,8 +55,23 @@ func (*divideOperation) Execute(value1 model.LiteralValue, value2 model.LiteralV
 var _ ExpressionOperation = &divideOperation{}
 
 func runMathOperationOnNumbers(value1 model.LiteralValue, value2 model.LiteralValue, operation func(float64, float64) float64) (model.LiteralValue, error) {
-	if value1.Type != "number" || value2.Type != "number" {
-		return model.LiteralValue{}, fmt.Errorf("sum operation is only allowed on numbers")
+	if err := validateFieldType(value1); err != nil {
+		return model.LiteralValue{}, err
+	}
+
+	if err := validateFieldType(value2); err != nil {
+		return model.LiteralValue{}, err
+	}
+
+	operationType := "number"
+	if value1.Type == "duration" {
+		value1.Value = fmt.Sprintf("%d", traces.ConvertTimeFieldIntoNanoSeconds(value1.Value))
+		operationType = "duration"
+	}
+
+	if value2.Type == "duration" {
+		value2.Value = fmt.Sprintf("%d", traces.ConvertTimeFieldIntoNanoSeconds(value2.Value))
+		operationType = "duration"
 	}
 
 	number1, _ := strconv.ParseFloat(value1.Value, 64)
@@ -71,8 +86,16 @@ func runMathOperationOnNumbers(value1 model.LiteralValue, value2 model.LiteralVa
 
 	return model.LiteralValue{
 		Value: resultStr,
-		Type:  "number",
+		Type:  operationType,
 	}, nil
+}
+
+func validateFieldType(field model.LiteralValue) error {
+	if field.Type != "number" && field.Type != "duration" {
+		return fmt.Errorf("operation is only allowed on numbers and duration fields")
+	}
+
+	return nil
 }
 
 func getOperationExecutor(operation string) (ExpressionOperation, error) {
