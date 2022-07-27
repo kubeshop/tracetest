@@ -3,7 +3,6 @@ import {FieldData} from 'antd/node_modules/rc-field-form/es/interface';
 import {isEmpty} from 'lodash';
 import {useCallback} from 'react';
 import CreateAssertionModalAnalyticsService from 'services/Analytics/CreateAssertionModalAnalytics.service';
-import SelectorService from 'services/Selector.service';
 import {TAssertion} from 'types/Assertion.types';
 import {TSpanFlatAttribute} from '../../../types/Span.types';
 import {IValues} from '../AssertionForm';
@@ -16,13 +15,8 @@ interface IProps {
 }
 
 const useOnFieldsChange = ({form, attributeList}: IProps) => {
-  const currentPseudoSelector = Form.useWatch('pseudoSelector', form) || undefined;
-  const currentSelectorList = Form.useWatch('selectorList', form) || [];
-  const currentIsAdvancedSelector = Form.useWatch('isAdvancedSelector', form) || false;
   const currentSelector = Form.useWatch('selector', form) || '';
-  const query = currentIsAdvancedSelector
-    ? currentSelector
-    : SelectorService.getSelectorString(currentSelectorList, currentPseudoSelector);
+  const query = currentSelector;
 
   return useCallback(
     (changedFields: FieldData[]) => {
@@ -31,13 +25,7 @@ const useOnFieldsChange = ({form, attributeList}: IProps) => {
       if (field?.name) {
         const [fieldName = '', entry = 0, keyName = ''] = field.name as Array<string | number>;
 
-        if (fieldName === 'isAdvancedSelector' && field.value) {
-          form.setFieldsValue({
-            selector: query,
-          });
-        }
-
-        if (fieldName === 'selectorList') onSelectorChange();
+        if (fieldName === 'selector') onSelectorChange();
         if (fieldName === 'assertionList') onChecksChange();
 
         if (fieldName === 'assertionList' && keyName === 'attribute' && field.value) {

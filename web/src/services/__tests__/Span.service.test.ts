@@ -45,10 +45,9 @@ describe('SpanService', () => {
     it('should return the selector information', () => {
       const span = SpanMock.model();
 
-      const selectorInfo = SpanService.getSelectorInformation(span);
+      const selector = SpanService.getSelectorInformation(span);
 
-      expect(selectorInfo.selectorList).toHaveLength(2);
-      expect(selectorInfo.pseudoSelector).toEqual({selector: PseudoSelector.ALL});
+      expect(typeof selector === 'string').toBeTruthy();
     });
   });
 });

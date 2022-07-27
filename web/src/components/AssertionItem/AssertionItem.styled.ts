@@ -3,6 +3,7 @@ import {Card, Collapse, Tag, Typography} from 'antd';
 import styled from 'styled-components';
 
 import {SemanticGroupNames, SemanticGroupNamesToColor} from 'constants/SemanticGroupNames.constants';
+import ReactCodeMirror from '@uiw/react-codemirror';
 
 export const ActionTag = styled(Tag)`
   background-color: ${({theme}) => theme.color.primary};
@@ -77,8 +78,6 @@ export const HeaderSpansIcon = styled(ApartmentOutlined)`
   margin-right: 4px;
 `;
 
-export const HeaderText = styled(Typography.Text)``;
-
 export const HeaderTextSecondary = styled(Typography.Text).attrs({
   type: 'secondary',
 })`
@@ -144,4 +143,37 @@ export const SpanHeaderContainer = styled.div`
   align-items: center;
   display: flex;
   gap: 8px;
+`;
+
+export const HeaderTitleText = styled(ReactCodeMirror)`
+  .cm-gutterElement {
+    display: none;
+  }
+
+  .cm-scroller {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .cm-scroller::-webkit-scrollbar {
+    display: none;
+    -webkit-appearance: none;
+    width: 0;
+    height: 0;
+  }
+`;
+
+export const HeaderContainer = styled(Column)`
+  max-width: 80%;
+  overflow-x: scroll;
+
+  &::-webkit-scrollbar {
+    display: none;
+    -webkit-appearance: none;
+    width: 0;
+    height: 0;
+  }
+
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 `;
