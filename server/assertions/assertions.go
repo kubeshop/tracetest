@@ -48,7 +48,16 @@ func assertMeta(a model.Assertion, spans []traces.Span) model.AssertionResult {
 		return res(model.SpanAssertionResult{}, err)
 	}
 
-	sar := apply(a, ma.Value(spans), nil)
+	expectedValue := a.Value
+	actualValue := ma.Value(spans)
+	if a.Expression != nil {
+		expectedValue, err = ExecuteExpression(*a.Expression, traces.Span{})
+	}
+
+	sar := apply(a, expectedValue, actualValue, nil)
+	if err != nil {
+		sar.CompareErr = err
+	}
 
 	return res(sar, sar.CompareErr)
 }
@@ -59,16 +68,16 @@ func assertIndividualSpans(a model.Assertion, spans []traces.Span) model.Asserti
 	for i, span := range spans {
 		spanID := span.ID
 		var err error = nil
-		var value string
+		expectedValue := a.Value
+		actualValue := span.Attributes.Get(a.Attribute.String())
 		if a.Expression != nil {
-			value, err = ExecuteExpression(*a.Expression, span)
-		} else {
-			value = span.Attributes.Get(a.Attribute.String())
+			expectedValue, err = ExecuteExpression(*a.Expression, span)
 		}
 
 		res[i] = apply(
 			a,
-			value,
+			expectedValue,
+			actualValue,
 			&spanID,
 		)
 		if err != nil {
@@ -87,8 +96,7 @@ func assertIndividualSpans(a model.Assertion, spans []traces.Span) model.Asserti
 	}
 }
 
-func apply(a model.Assertion, actual string, spanID *trace.SpanID) model.SpanAssertionResult {
-	expected := a.Value
+func apply(a model.Assertion, expected, actual string, spanID *trace.SpanID) model.SpanAssertionResult {
 	return model.SpanAssertionResult{
 		SpanID:        spanID,
 		ObservedValue: actual,

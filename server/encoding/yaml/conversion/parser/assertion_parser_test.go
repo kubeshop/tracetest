@@ -354,6 +354,26 @@ func TestParseAssertion(t *testing.T) {
 				},
 			},
 		},
+		{
+			Name:  "should_parse_numbers_expression",
+			Query: `http.status_code <= 300 - 1`,
+			ExpectedOutput: parser.Assertion{
+				Attribute: "http.status_code",
+				Operator:  "<=",
+				Value:     "300 - 1",
+				Expression: &parser.Expression{
+					LiteralValue: parser.ExprLiteral{
+						Number: strp("300"),
+					},
+					Operation: "-",
+					Expression: &parser.Expression{
+						LiteralValue: parser.ExprLiteral{
+							Number: strp("1"),
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, testCase := range testCases {
