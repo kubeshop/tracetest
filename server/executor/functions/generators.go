@@ -40,6 +40,10 @@ func generateCreditCardCVV(args ...FunctionArg) string {
 	return gofakeit.CreditCardCvv()
 }
 
+func generateCreditCardExpiration(args ...FunctionArg) string {
+	return gofakeit.CreditCardExp()
+}
+
 func generateRandomInt(args ...FunctionArg) string {
 	min, _ := strconv.Atoi(args[0].Value)
 	max, _ := strconv.Atoi(args[1].Value)

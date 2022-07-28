@@ -58,6 +58,11 @@ func TestParser(t *testing.T) {
 			ShouldMatch: `^[0-9]{3}$`,
 		},
 		{
+			Name:        "should_parse_credit_card_expiration_date",
+			Input:       "creditCardExpDate()",
+			ShouldMatch: `^[0-9]{2}/[0-9]{2}$`,
+		},
+		{
 			Name:        "should_parse_random_int_one_digit",
 			Input:       "randomInt(1, 9)",
 			ShouldMatch: `^[0-9]{1}$`,
