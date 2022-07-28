@@ -10,7 +10,6 @@ ensure_dependency_exist() {
 
 ensure_required_dependencies_are_present() {
     ensure_dependency_exist "curl"
-    ensure_dependency_exist "tar"
     ensure_dependency_exist "uname"
 }
 
@@ -65,6 +64,12 @@ install_cli() {
 
 run() {
     ensure_required_dependencies_are_present
+
+    os=$(get_os)
+    if [ "$os" != "linux" ]; then
+      echo $os 'OS not supported by this script. See https://kubeshop.github.io/tracetest/installing/#cli-installation'
+      exit 1
+    fi
 
     latest_version=`get_latest_version`
     os=`get_os`
