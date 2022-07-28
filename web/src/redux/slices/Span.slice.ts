@@ -26,12 +26,15 @@ const testDefinitionSlice = createSlice({
     },
     setSearchText(state, {payload: {searchText}}: PayloadAction<{searchText: string}>) {
       state.searchText = searchText.toLowerCase();
+      if (searchText) {
+        state.affectedSpans = [];
+        state.focusedSpan = '';
+      }
     },
     setMatchedSpans(state, {payload: {spanIds}}: PayloadAction<{spanIds: string[]}>) {
       state.matchedSpans = spanIds;
     },
     clearAffectedSpans(state) {
-      state.affectedSpans = [];
       state.focusedSpan = '';
     },
     clearSelectedSpan(state) {
@@ -42,6 +45,7 @@ const testDefinitionSlice = createSlice({
     builder.addCase(setSelectedAssertion, (state, {payload: assertionResult}) => {
       state.affectedSpans = assertionResult?.spanIds ?? [];
       state.focusedSpan = state.affectedSpans[0] || '';
+      state.searchText = '';
     });
   },
 });

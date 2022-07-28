@@ -4,6 +4,7 @@ import {ITestDefinitionState, TTestDefinitionEntry, TTestDefinitionSliceActions}
 import {ResultViewModes} from 'constants/Test.constants';
 import UserPreferencesService from 'services/UserPreferences.service';
 import TestDefinitionActions from '../actions/TestDefinition.actions';
+import {setSearchText} from './Span.slice';
 
 export const initialState: ITestDefinitionState = {
   initialDefinitionList: [],
@@ -124,6 +125,9 @@ const testDefinitionSlice = createSlice<ITestDefinitionState, TTestDefinitionSli
 
         state.assertionResults = result;
         state.initialDefinitionList = definitionList;
+      })
+      .addCase(setSearchText, (state, {payload: {searchText}}) => {
+        if (searchText) state.selectedAssertion = undefined;
       })
       .addMatcher(
         action => action.type.startsWith('testDefinition') && action.type.endsWith('/pending'),
