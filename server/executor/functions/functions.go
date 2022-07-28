@@ -49,6 +49,7 @@ func GetFunctionRegistry() FunctionRegistry {
 	registry.Add("phone", generatePhoneNumber, emptyArgsConfig)
 	registry.Add("creditCard", generateCreditCard, emptyArgsConfig)
 	registry.Add("creditCardCvv", generateCreditCardCVV, emptyArgsConfig)
+	registry.Add("creditCardExpDate", generateCreditCardExpiration, emptyArgsConfig)
 	registry.Add("randomInt", generateRandomInt, FunctionArgConfig{
 		NumberArgs: 2,
 		ArgsType:   []string{"number", "number"},
