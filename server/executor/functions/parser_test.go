@@ -50,7 +50,7 @@ func TestParser(t *testing.T) {
 		{
 			Name:        "should_parse_credit_card",
 			Input:       "creditCard()",
-			ShouldMatch: `^[0-9]{14,19}$`,
+			ShouldMatch: `^[0-9]{12,19}$`,
 		},
 		{
 			Name:        "should_parse_credit_card_ccv",
