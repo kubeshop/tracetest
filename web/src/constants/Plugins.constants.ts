@@ -11,7 +11,7 @@ const pokeshopPostmanFile = new File([JSON.stringify(pokeshopPostmanData)], 'pok
 export enum SupportedPlugins {
   REST = 'REST',
   Messaging = 'Messaging',
-  RPC = 'RPC',
+  GRPC = 'GRPC',
   Postman = 'Postman',
   OpenAPI = 'OpenAPI',
 }
@@ -26,7 +26,7 @@ const Default: IPlugin = {
   stepList: [
     {
       id: 'plugin-selection',
-      name: 'Select a plugin',
+      name: 'Select test type',
       title: 'Choose the way of creating a test',
       component: 'SelectPlugin',
       isDefaultValid: true,
@@ -81,10 +81,10 @@ const Rest: IPlugin = {
   ],
 };
 
-const RPC: IPlugin = {
-  name: SupportedPlugins.RPC,
-  title: 'RPC Request',
-  description: 'Test and debug your RPC request',
+const GRPC: IPlugin = {
+  name: SupportedPlugins.GRPC,
+  title: 'GRPC Request',
+  description: 'Test and debug your GRPC request',
   isActive: true,
   type: TriggerTypes.grpc,
   demoList: [
@@ -193,7 +193,7 @@ const OpenAPI: IPlugin = {
 
 export const Plugins: Record<SupportedPlugins, IPlugin> = {
   [SupportedPlugins.REST]: Rest,
-  [SupportedPlugins.RPC]: RPC,
+  [SupportedPlugins.GRPC]: GRPC,
   [SupportedPlugins.Postman]: Postman,
   [SupportedPlugins.Messaging]: Messaging,
   [SupportedPlugins.OpenAPI]: OpenAPI,
@@ -201,5 +201,5 @@ export const Plugins: Record<SupportedPlugins, IPlugin> = {
 
 export const TriggerTypeToPlugin = {
   [TriggerTypes.http]: Plugins.REST,
-  [TriggerTypes.grpc]: Plugins.RPC,
+  [TriggerTypes.grpc]: Plugins.GRPC,
 } as const;

@@ -3,7 +3,7 @@ import {SupportedPlugins} from 'constants/Plugins.constants';
 import {IPlugin} from 'types/Plugins.types';
 import TestDefinitionService from './TestDefinition.service';
 import Validator from '../utils/Validator';
-import RpcService from './Triggers/Rpc.service';
+import GrpcService from './Triggers/Grpc.service';
 import HttpService from './Triggers/Http.service';
 import PostmanService from './Triggers/Postman.service';
 
@@ -25,7 +25,7 @@ const basicDetailsValidation = ({name, description}: TDraftTest): boolean => {
 };
 
 const TriggerServiceMap = {
-  [SupportedPlugins.RPC]: RpcService,
+  [SupportedPlugins.GRPC]: GrpcService,
   [SupportedPlugins.REST]: HttpService,
   [SupportedPlugins.Messaging]: HttpService,
   [SupportedPlugins.OpenAPI]: HttpService,

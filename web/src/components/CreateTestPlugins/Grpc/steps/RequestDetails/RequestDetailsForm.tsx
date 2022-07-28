@@ -1,7 +1,7 @@
 import {Col, Form, Input, Row, Select} from 'antd';
 import * as Step from 'components/CreateTestPlugins/Step.styled';
 import {useCallback, useEffect, useState} from 'react';
-import RpcService from 'services/Triggers/Rpc.service';
+import GrpcService from 'services/Triggers/Grpc.service';
 import {IRpcValues, TDraftTestForm} from 'types/Test.types';
 import RequestDetailsAuthInput from '../../../Rest/steps/RequestDetails/RequestDetailsAuthInput/RequestDetailsAuthInput';
 import RequestDetailsUrlInput from '../../../Rest/steps/RequestDetails/RequestDetailsUrlInput';
@@ -19,7 +19,7 @@ const RequestDetailsForm = ({form}: IProps) => {
   const getMethodList = useCallback(async () => {
     if (protoFile) {
       const fileText = await protoFile.text();
-      const list = RpcService.getMethodList(fileText);
+      const list = GrpcService.getMethodList(fileText);
 
       setMethodList(list);
     } else {

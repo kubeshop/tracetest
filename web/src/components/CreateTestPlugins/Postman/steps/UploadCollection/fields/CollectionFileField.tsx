@@ -1,5 +1,5 @@
 import {Form} from 'antd';
-import RequestDetailsFileInput from 'components/CreateTestPlugins/Rpc/steps/RequestDetails/RequestDetailsFileInput';
+import RequestDetailsFileInput from 'components/CreateTestPlugins/Grpc/steps/RequestDetails/RequestDetailsFileInput';
 import React from 'react';
 import {IPostmanValues, TDraftTestForm} from '../../../../../../types/Test.types';
 import {useUploadCollectionCallback} from '../hooks/useUploadCollectionCallback';

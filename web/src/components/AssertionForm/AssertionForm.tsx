@@ -134,7 +134,9 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
         />
 
         <div style={{marginBottom: 8}}>
-          <Typography.Text>Define the checks to run against each span selected</Typography.Text>
+          <Typography.Text>
+            Define the checks to run as some checks are against the collection ({spanIdList.length} spans)
+          </Typography.Text>
           <TooltipQuestion
             title={`
             Add one of more checks to be run against the span(s) that match your filter.

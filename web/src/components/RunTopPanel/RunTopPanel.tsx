@@ -1,4 +1,5 @@
 import {useState} from 'react';
+import {ReflexSplitter} from 'react-reflex';
 
 import Diagram from 'components/Diagram';
 import {SupportedDiagrams} from 'components/Diagram/Diagram';
@@ -18,8 +19,8 @@ const RunTopPanel = ({run}: IProps) => {
   const {onSearch, selectedSpan} = useSpan();
 
   return (
-    <S.Container>
-      <S.LeftPanel>
+    <S.Container orientation="vertical">
+      <S.LeftPanel minSize={600}>
         <DiagramSwitcher
           onTypeChange={type => {
             TraceAnalyticsService.onSwitchDiagramView(type);
@@ -30,7 +31,8 @@ const RunTopPanel = ({run}: IProps) => {
         />
         <Diagram trace={run.trace!} runState={run.state} type={diagramType} />
       </S.LeftPanel>
-      <S.RightPanel>
+      <ReflexSplitter />
+      <S.RightPanel minSize={500}>
         <SpanDetail span={selectedSpan} />
       </S.RightPanel>
     </S.Container>

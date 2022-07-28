@@ -1,6 +1,6 @@
 import {Form} from 'antd';
 import {IPostmanValues, TDraftTestForm} from 'types/Test.types';
-import RequestDetailsFileInput from '../../../../Rpc/steps/RequestDetails/RequestDetailsFileInput';
+import RequestDetailsFileInput from '../../../../Grpc/steps/RequestDetails/RequestDetailsFileInput';
 import {useUploadEnvFileCallback} from '../hooks/useUploadEnvFileCallback';
 
 interface IProps {
