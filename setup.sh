@@ -142,7 +142,7 @@ if [ "$SKIP_COLLECTOR" != "YES" ]; then
     echo
     echo
 
-    ./k8s/deploy-collector.sh
+    kubectl apply -f https://raw.githubusercontent.com/kubeshop/tracetest/main/k8s/collector.yml
 fi
 
 if [ "$SKIP_BACKEND" != "YES" ]; then
