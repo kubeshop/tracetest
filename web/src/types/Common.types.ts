@@ -34,9 +34,9 @@ export type TFilter = TTestSchemas['SelectorFilter'];
 export type Model<T, R> = Modify<Required<T>, R>;
 
 export interface IAnalytics {
-  identify(traits: Record<string, string>): void;
-  track(event: string, traits: {[key: string]: any}): void;
-  page(pageName: string): void;
+  identify(traits: Record<string, any>): void;
+  track(event: string, traits: Record<string, any>): void;
+  page(pageName: string, traits: Record<string, any>): void;
 }
 
 export declare type RecursivePartial<T> = T extends object
