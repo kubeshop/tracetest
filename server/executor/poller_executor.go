@@ -73,7 +73,9 @@ func NewPollerExecutor(
 
 func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, model.Run, error) {
 	run := request.run
-	otelTrace, err := pe.traceDB.GetTraceByID(request.ctx, run.TraceID.String())
+	traceID := run.TraceID.String()
+
+	otelTrace, err := pe.traceDB.GetTraceByID(request.ctx, traceID)
 	if err != nil {
 		return false, model.Run{}, err
 	}
@@ -113,7 +115,8 @@ func (pe DefaultPollerExecutor) donePollingTraces(job *PollingRequest, trace tra
 		return false
 	}
 
-	if len(trace.Flat) > 0 && len(trace.Flat) == len(job.run.Trace.Flat) {
+	// We always expect to get the tracetest trigger span, so it has to have more than 1 span
+	if len(trace.Flat) > 1 && len(trace.Flat) == len(job.run.Trace.Flat) {
 		return true
 	}
 

@@ -1,6 +1,7 @@
 package app
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -22,6 +23,7 @@ import (
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/traces"
+	"github.com/kubeshop/tracetest/server/tracing"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -73,6 +75,7 @@ func spaHandler(prefix, staticPath, indexPath string, tplVars map[string]string)
 
 func (a *App) Start() error {
 	fmt.Printf("Starting tracetest (version %s, env %s)\n", Version, Env)
+	ctx := context.Background()
 
 	serverID, isNewInstall, err := a.db.ServerID()
 
@@ -92,7 +95,12 @@ func (a *App) Start() error {
 		}
 	}
 
-	triggerReg := trigger.NewRegsitry(a.tracer)
+	applicationTracer, err := tracing.GetApplicationTracer(ctx, a.config)
+	if err != nil {
+		return fmt.Errorf("could not create trigger span tracer: %w", err)
+	}
+
+	triggerReg := trigger.NewRegsitry(a.tracer, applicationTracer)
 	triggerReg.Add(trigger.HTTP())
 	triggerReg.Add(trigger.GRPC())
 

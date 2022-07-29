@@ -14,8 +14,6 @@ import (
 	"github.com/jhump/protoreflect/desc"
 	"github.com/kubeshop/tracetest/server/model"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
-	sdktrace "go.opentelemetry.io/otel/sdk/trace"
-	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
@@ -24,17 +22,12 @@ import (
 )
 
 func GRPC() Triggerer {
-	return &grpcTriggerer{
-		traceProvider: traceProvider(),
-	}
+	return &grpcTriggerer{}
 }
 
-type grpcTriggerer struct {
-	traceProvider *sdktrace.TracerProvider
-}
+type grpcTriggerer struct{}
 
-func (te *grpcTriggerer) Trigger(_ context.Context, test model.Test, tid trace.TraceID, sid trace.SpanID) (Response, error) {
-
+func (te *grpcTriggerer) Trigger(ctx context.Context, test model.Test) (Response, error) {
 	response := Response{
 		Result: model.TriggerResult{
 			Type: te.Type(),
@@ -49,15 +42,6 @@ func (te *grpcTriggerer) Trigger(_ context.Context, test model.Test, tid trace.T
 	if trigger.GRPC == nil {
 		return response, fmt.Errorf("no settings provided for GRPC triggerer")
 	}
-	var tf trace.TraceFlags
-	sc := trace.NewSpanContext(trace.SpanContextConfig{
-		TraceID:    tid,
-		SpanID:     sid,
-		TraceFlags: tf.WithSampled(true),
-		TraceState: trace.TraceState{},
-		Remote:     true,
-	})
-	ctx := trace.ContextWithSpanContext(context.Background(), sc)
 
 	tReq := trigger.GRPC
 
@@ -93,7 +77,10 @@ func (te *grpcTriggerer) Trigger(_ context.Context, test model.Test, tid trace.T
 		marshaller: marshaler,
 	}
 
-	err = grpcurl.InvokeRPC(ctx, desc, conn, tReq.Method, tReq.Headers(), h, rf.Next)
+	md := tReq.MD()
+	otelgrpc.Inject(ctx, md, otelgrpc.WithPropagators(propagators()))
+
+	err = grpcurl.InvokeRPC(ctx, desc, conn, tReq.Method, mdToHeaders(md), h, rf.Next)
 	if err != nil {
 		return response, err
 	}
@@ -115,6 +102,16 @@ func (te *grpcTriggerer) Trigger(_ context.Context, test model.Test, tid trace.T
 
 func (t *grpcTriggerer) Type() model.TriggerType {
 	return model.TriggerTypeGRPC
+}
+
+func mdToHeaders(md *metadata.MD) []string {
+	h := []string{}
+
+	for k, vs := range *md {
+		h = append(h, k+": "+strings.Join(vs, " "))
+	}
+
+	return h
 }
 
 func protoDescription(content string) (grpcurl.DescriptorSource, error) {
@@ -162,10 +159,6 @@ func (t *grpcTriggerer) dial(ctx context.Context, address string) (*grpc.ClientC
 
 	return grpcurl.BlockingDial(
 		ctx, network, address, creds,
-		grpc.WithUnaryInterceptor(otelgrpc.UnaryClientInterceptor(
-			otelgrpc.WithTracerProvider(t.traceProvider),
-			otelgrpc.WithPropagators(propagators()),
-		)),
 	)
 }
 
