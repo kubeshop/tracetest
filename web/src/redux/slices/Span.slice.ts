@@ -35,6 +35,7 @@ const testDefinitionSlice = createSlice({
       state.matchedSpans = spanIds;
     },
     clearAffectedSpans(state) {
+      state.affectedSpans = [];
       state.focusedSpan = '';
     },
     clearSelectedSpan(state) {
