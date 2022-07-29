@@ -64,13 +64,11 @@ func (a Assertion) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&struct {
 		Attribute  string
 		Comparator string
-		Value      string
-		Expression *AssertionExpression
+		Value      *AssertionExpression
 	}{
 		Attribute:  a.Attribute.String(),
 		Comparator: a.Comparator.String(),
 		Value:      a.Value,
-		Expression: a.Expression,
 	})
 }
 
@@ -78,8 +76,7 @@ func (a *Assertion) UnmarshalJSON(data []byte) error {
 	aux := struct {
 		Attribute  string
 		Comparator string
-		Value      string
-		Expression *AssertionExpression
+		Value      *AssertionExpression
 	}{}
 	if err := json.Unmarshal(data, &aux); err != nil {
 		return err
@@ -93,7 +90,6 @@ func (a *Assertion) UnmarshalJSON(data []byte) error {
 	a.Attribute = Attribute(aux.Attribute)
 	a.Value = aux.Value
 	a.Comparator = c
-	a.Expression = aux.Expression
 
 	return nil
 }

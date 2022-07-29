@@ -15,8 +15,6 @@ type Assertion struct {
 	Comparator string `json:"comparator,omitempty"`
 
 	Expected string `json:"expected,omitempty"`
-
-	Expression string `json:"expression,omitempty"`
 }
 
 // AssertAssertionRequired checks if the required fields are not zero-ed

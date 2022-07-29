@@ -25,8 +25,7 @@ func TestParseAssertion(t *testing.T) {
 			ExpectedOutput: parser.Assertion{
 				Attribute: "http.status_code",
 				Operator:  "=",
-				Value:     "200",
-				Expression: &parser.Expression{
+				Value: &parser.Expression{
 					LiteralValue: parser.ExprLiteral{
 						Number: strp("200"),
 					},
@@ -39,8 +38,7 @@ func TestParseAssertion(t *testing.T) {
 			ExpectedOutput: parser.Assertion{
 				Attribute: "tracetest.span.duration",
 				Operator:  "<",
-				Value:     "100",
-				Expression: &parser.Expression{
+				Value: &parser.Expression{
 					LiteralValue: parser.ExprLiteral{
 						Number: strp("100"),
 					},
@@ -53,8 +51,7 @@ func TestParseAssertion(t *testing.T) {
 			ExpectedOutput: parser.Assertion{
 				Attribute: "tracetest.span.duration",
 				Operator:  "<=",
-				Value:     "100",
-				Expression: &parser.Expression{
+				Value: &parser.Expression{
 					LiteralValue: parser.ExprLiteral{
 						Number: strp("100"),
 					},
@@ -67,8 +64,7 @@ func TestParseAssertion(t *testing.T) {
 			ExpectedOutput: parser.Assertion{
 				Attribute: "tracetest.span.type",
 				Operator:  "!=",
-				Value:     "http",
-				Expression: &parser.Expression{
+				Value: &parser.Expression{
 					LiteralValue: parser.ExprLiteral{
 						QuotedString: strp("http"),
 					},
@@ -81,8 +77,7 @@ func TestParseAssertion(t *testing.T) {
 			ExpectedOutput: parser.Assertion{
 				Attribute: "tracetest.span.duration",
 				Operator:  ">",
-				Value:     "0",
-				Expression: &parser.Expression{
+				Value: &parser.Expression{
 					LiteralValue: parser.ExprLiteral{
 						Number: strp("0"),
 					},
@@ -95,8 +90,7 @@ func TestParseAssertion(t *testing.T) {
 			ExpectedOutput: parser.Assertion{
 				Attribute: "tracetest.span.duration",
 				Operator:  ">=",
-				Value:     "0",
-				Expression: &parser.Expression{
+				Value: &parser.Expression{
 					LiteralValue: parser.ExprLiteral{
 						Number: strp("0"),
 					},
@@ -109,8 +103,7 @@ func TestParseAssertion(t *testing.T) {
 			ExpectedOutput: parser.Assertion{
 				Attribute: "db.statement",
 				Operator:  "contains",
-				Value:     "INSERT INTO",
-				Expression: &parser.Expression{
+				Value: &parser.Expression{
 					LiteralValue: parser.ExprLiteral{
 						QuotedString: strp("INSERT INTO"),
 					},
@@ -132,8 +125,7 @@ func TestParseAssertion(t *testing.T) {
 			ExpectedOutput: parser.Assertion{
 				Attribute: "tracetest.response.body",
 				Operator:  "contains",
-				Value:     `"id":"${TEST_ID}"`,
-				Expression: &parser.Expression{
+				Value: &parser.Expression{
 					LiteralValue: parser.ExprLiteral{
 						QuotedString: strp(`"id":"${TEST_ID}"`),
 					},
@@ -146,8 +138,7 @@ func TestParseAssertion(t *testing.T) {
 			ExpectedOutput: parser.Assertion{
 				Attribute: "tracetest.response.body",
 				Operator:  "contains",
-				Value:     `"id":"${TEST_ID}"`,
-				Expression: &parser.Expression{
+				Value: &parser.Expression{
 					LiteralValue: parser.ExprLiteral{
 						QuotedString: strp(`"id":"${TEST_ID}"`),
 					},
@@ -160,8 +151,7 @@ func TestParseAssertion(t *testing.T) {
 			ExpectedOutput: parser.Assertion{
 				Attribute: "tracetest.response.body",
 				Operator:  "contains",
-				Value:     `'single quoted value'`,
-				Expression: &parser.Expression{
+				Value: &parser.Expression{
 					LiteralValue: parser.ExprLiteral{
 						QuotedString: strp(`'single quoted value'`),
 					},
@@ -174,8 +164,7 @@ func TestParseAssertion(t *testing.T) {
 			ExpectedOutput: parser.Assertion{
 				Attribute: "tracetest.response.body",
 				Operator:  "contains",
-				Value:     `'id':'${TEST_ID}'`,
-				Expression: &parser.Expression{
+				Value: &parser.Expression{
 					LiteralValue: parser.ExprLiteral{
 						QuotedString: strp(`'id':'${TEST_ID}'`),
 					},
@@ -188,8 +177,7 @@ func TestParseAssertion(t *testing.T) {
 			ExpectedOutput: parser.Assertion{
 				Attribute: "db.statement",
 				Operator:  "=",
-				Value:     "create",
-				Expression: &parser.Expression{
+				Value: &parser.Expression{
 					LiteralValue: parser.ExprLiteral{
 						QuotedString: strp("create"),
 					},
@@ -202,8 +190,7 @@ func TestParseAssertion(t *testing.T) {
 			ExpectedOutput: parser.Assertion{
 				Attribute: "custom.item.value",
 				Operator:  "=",
-				Value:     "199.99",
-				Expression: &parser.Expression{
+				Value: &parser.Expression{
 					LiteralValue: parser.ExprLiteral{
 						Number: strp("199.99"),
 					},
@@ -216,8 +203,7 @@ func TestParseAssertion(t *testing.T) {
 			ExpectedOutput: parser.Assertion{
 				Attribute: "tracetest.span.duration",
 				Operator:  "<=",
-				Value:     "100ns",
-				Expression: &parser.Expression{
+				Value: &parser.Expression{
 					LiteralValue: parser.ExprLiteral{
 						Duration: strp("100ns"),
 					},
@@ -230,8 +216,7 @@ func TestParseAssertion(t *testing.T) {
 			ExpectedOutput: parser.Assertion{
 				Attribute: "tracetest.span.duration",
 				Operator:  "<=",
-				Value:     "100us",
-				Expression: &parser.Expression{
+				Value: &parser.Expression{
 					LiteralValue: parser.ExprLiteral{
 						Duration: strp("100us"),
 					},
@@ -244,8 +229,7 @@ func TestParseAssertion(t *testing.T) {
 			ExpectedOutput: parser.Assertion{
 				Attribute: "tracetest.span.duration",
 				Operator:  "<=",
-				Value:     "100ms",
-				Expression: &parser.Expression{
+				Value: &parser.Expression{
 					LiteralValue: parser.ExprLiteral{
 						Duration: strp("100ms"),
 					},
@@ -258,8 +242,7 @@ func TestParseAssertion(t *testing.T) {
 			ExpectedOutput: parser.Assertion{
 				Attribute: "tracetest.span.duration",
 				Operator:  "<=",
-				Value:     "100s",
-				Expression: &parser.Expression{
+				Value: &parser.Expression{
 					LiteralValue: parser.ExprLiteral{
 						Duration: strp("100s"),
 					},
@@ -272,8 +255,7 @@ func TestParseAssertion(t *testing.T) {
 			ExpectedOutput: parser.Assertion{
 				Attribute: "tracetest.span.duration",
 				Operator:  "<=",
-				Value:     "100m",
-				Expression: &parser.Expression{
+				Value: &parser.Expression{
 					LiteralValue: parser.ExprLiteral{
 						Duration: strp("100m"),
 					},
@@ -286,8 +268,7 @@ func TestParseAssertion(t *testing.T) {
 			ExpectedOutput: parser.Assertion{
 				Attribute: "tracetest.span.duration",
 				Operator:  "<=",
-				Value:     "100h",
-				Expression: &parser.Expression{
+				Value: &parser.Expression{
 					LiteralValue: parser.ExprLiteral{
 						Duration: strp("100h"),
 					},
@@ -300,8 +281,7 @@ func TestParseAssertion(t *testing.T) {
 			ExpectedOutput: parser.Assertion{
 				Attribute: "tracetest.span.endTime",
 				Operator:  "<=",
-				Value:     "tracetest.span.startTime + 200ms",
-				Expression: &parser.Expression{
+				Value: &parser.Expression{
 					LiteralValue: parser.ExprLiteral{
 						Attribute: strp("tracetest.span.startTime"),
 					},
@@ -320,8 +300,7 @@ func TestParseAssertion(t *testing.T) {
 			ExpectedOutput: parser.Assertion{
 				Attribute: "myapp.variable",
 				Operator:  ">",
-				Value:     "myapp.old_value + 1",
-				Expression: &parser.Expression{
+				Value: &parser.Expression{
 					LiteralValue: parser.ExprLiteral{
 						Attribute: strp("myapp.old_value"),
 					},
@@ -340,8 +319,7 @@ func TestParseAssertion(t *testing.T) {
 			ExpectedOutput: parser.Assertion{
 				Attribute: "myapp.variable",
 				Operator:  ">",
-				Value:     "myapp.old_value * 2",
-				Expression: &parser.Expression{
+				Value: &parser.Expression{
 					LiteralValue: parser.ExprLiteral{
 						Attribute: strp("myapp.old_value"),
 					},
@@ -360,8 +338,7 @@ func TestParseAssertion(t *testing.T) {
 			ExpectedOutput: parser.Assertion{
 				Attribute: "http.status_code",
 				Operator:  "<=",
-				Value:     "300 - 1",
-				Expression: &parser.Expression{
+				Value: &parser.Expression{
 					LiteralValue: parser.ExprLiteral{
 						Number: strp("300"),
 					},
@@ -385,7 +362,7 @@ func TestParseAssertion(t *testing.T) {
 			assert.Equal(t, testCase.ExpectedOutput.Operator, output.Operator)
 			assert.Equal(t, testCase.ExpectedOutput.Value, output.Value)
 
-			assertExpression(t, testCase.ExpectedOutput.Expression, output.Expression)
+			assertExpression(t, testCase.ExpectedOutput.Value, output.Value)
 		})
 	}
 }

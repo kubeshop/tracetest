@@ -190,17 +190,27 @@ func (m OpenAPI) Result(in *model.RunResults) openapi.AssertionResults {
 		Results:   results,
 	}
 }
-func (m OpenAPI) Assertion(in model.Assertion) openapi.Assertion {
-	value := in.Value
-	if m.traceConversionConfig.IsTimeField(in.Attribute.String()) {
-		intValue, _ := strconv.Atoi(in.Value)
-		value = traces.ConvertNanoSecondsIntoProperTimeUnit(intValue)
-	}
 
+func (m OpenAPI) Assertion(in model.Assertion) openapi.Assertion {
 	return openapi.Assertion{
 		Attribute:  in.Attribute.String(),
 		Comparator: in.Comparator.String(),
-		Expected:   value,
+		Expected:   in.Value.String(),
+	}
+}
+
+func (m OpenAPI) AssertionExpression(in *parser.Expression) *model.AssertionExpression {
+	if in == nil {
+		return nil
+	}
+
+	return &model.AssertionExpression{
+		LiteralValue: model.LiteralValue{
+			Value: in.LiteralValue.String(),
+			Type:  in.LiteralValue.Type(),
+		},
+		Operation:  in.Operation,
+		Expression: m.AssertionExpression(in.Expression),
 	}
 }
 
@@ -369,19 +379,12 @@ func (m Model) Result(in openapi.AssertionResults) *model.RunResults {
 
 func (m Model) Assertion(in openapi.Assertion) model.Assertion {
 	comp, _ := m.comparators.Get(in.Comparator)
-	expectedValue := in.Expected
-	if m.traceConversionConfig.IsTimeField(in.Attribute) {
-		fieldInNanoSeconds := traces.ConvertTimeFieldIntoNanoSeconds(expectedValue)
-		expectedValue = fmt.Sprintf("%d", fieldInNanoSeconds)
-	}
-
-	assertion, _ := parser.ParseAssertion(in.Expression)
+	expression, _ := parser.ParseAssertionExpression(in.Expected)
 
 	return model.Assertion{
 		Attribute:  model.Attribute(in.Attribute),
 		Comparator: comp,
-		Value:      expectedValue,
-		Expression: m.AssertionExpression(assertion.Expression),
+		Value:      m.AssertionExpression(expression),
 	}
 }
 

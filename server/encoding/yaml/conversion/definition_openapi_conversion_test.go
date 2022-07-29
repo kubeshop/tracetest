@@ -306,13 +306,11 @@ func TestDefinitionToOpenAPIConversion(t *testing.T) {
 									Attribute:  "tracetest.span.duration",
 									Comparator: "<=",
 									Expected:   "200ms",
-									Expression: "tracetest.span.duration <= 200ms",
 								},
 								{
 									Attribute:  "http.status_code",
 									Comparator: "=",
 									Expected:   "200",
-									Expression: "http.status_code = 200",
 								},
 							},
 						},
