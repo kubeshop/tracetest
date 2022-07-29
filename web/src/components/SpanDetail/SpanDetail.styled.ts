@@ -5,6 +5,23 @@ export const Header = styled.div`
   margin-bottom: 8px;
 `;
 
+export const HeaderCheck = styled(Typography.Text)`
+  color: ${({theme}) => theme.color.text};
+  font-size: ${({theme}) => theme.size.sm};
+  margin-right: 8px;
+`;
+
+export const HeaderDot = styled.span<{$passed: boolean}>`
+  background-color: ${({$passed, theme}) => ($passed ? theme.color.success : theme.color.error)};
+  height: 10px;
+  width: 10px;
+  display: inline-block;
+  margin-right: 4px;
+  line-height: 0;
+  vertical-align: -0.1em;
+  border-radius: 50%;
+`;
+
 export const HeaderItem = styled.div`
   align-items: center;
   color: ${({theme}) => theme.color.text};
@@ -28,6 +45,10 @@ export const Row = styled.div`
   align-items: center;
   display: flex;
   margin-bottom: 4px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
 `;
 
 export const SpanDetail = styled.div`

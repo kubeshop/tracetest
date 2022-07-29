@@ -18,6 +18,8 @@ interface IProps {
   node: TNode;
   onClick(id: string): void;
   onCollapse(id: string): void;
+  totalFailedChecks?: number;
+  totalPassedChecks?: number;
   xScale: AxisScale;
 }
 
@@ -31,6 +33,8 @@ const SpanNode = ({
   node,
   onClick,
   onCollapse,
+  totalFailedChecks,
+  totalPassedChecks,
   xScale,
 }: IProps) => {
   const isParent = Boolean(node.children);
@@ -62,6 +66,8 @@ const SpanNode = ({
           name={node.data.name}
           service={node.data.service}
           system={node.data.system}
+          totalFailedChecks={totalFailedChecks}
+          totalPassedChecks={totalPassedChecks}
           type={node.data.type}
         />
 
