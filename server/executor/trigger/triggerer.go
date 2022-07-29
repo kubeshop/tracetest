@@ -11,7 +11,7 @@ import (
 )
 
 type Triggerer interface {
-	Trigger(context.Context, context.Context, model.Test, trace.TraceID, trace.SpanID) (Response, error)
+	Trigger(ctx context.Context, triggerSpanCtx context.Context, test model.Test, tid trace.TraceID, sid trace.SpanID) (Response, error)
 	Type() model.TriggerType
 }
 

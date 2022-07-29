@@ -20,7 +20,7 @@ func HTTP() Triggerer {
 
 type httpTriggerer struct{}
 
-func (te *httpTriggerer) Trigger(_ context.Context, ctx context.Context, test model.Test, tid trace.TraceID, sid trace.SpanID) (Response, error) {
+func (te *httpTriggerer) Trigger(_ context.Context, triggerSpanCtx context.Context, test model.Test, tid trace.TraceID, sid trace.SpanID) (Response, error) {
 	response := Response{
 		Result: model.TriggerResult{
 			Type: te.Type(),
@@ -43,7 +43,7 @@ func (te *httpTriggerer) Trigger(_ context.Context, ctx context.Context, test mo
 		Remote:     true,
 	})
 
-	ctx = trace.ContextWithSpanContext(ctx, sc)
+	ctx := trace.ContextWithSpanContext(triggerSpanCtx, sc)
 
 	var req *http.Request
 	tReq := trigger.HTTP
@@ -60,7 +60,7 @@ func (te *httpTriggerer) Trigger(_ context.Context, ctx context.Context, test mo
 	}
 
 	tReq.Authenticate(req)
-	propagators().Inject(ctx, propagation.HeaderCarrier(req.Header))
+	getPropagators().Inject(ctx, propagation.HeaderCarrier(req.Header))
 
 	resp, err := client.Do(req.WithContext(ctx))
 	if err != nil {

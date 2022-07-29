@@ -13,6 +13,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/kubeshop/tracetest/server/model"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -27,7 +28,7 @@ func GRPC() Triggerer {
 
 type grpcTriggerer struct{}
 
-func (te *grpcTriggerer) Trigger(_ context.Context, ctx context.Context, test model.Test, tid trace.TraceID, sid trace.SpanID) (Response, error) {
+func (te *grpcTriggerer) Trigger(_ context.Context, triggerSpanCtx context.Context, test model.Test, tid trace.TraceID, sid trace.SpanID) (Response, error) {
 	response := Response{
 		Result: model.TriggerResult{
 			Type: te.Type(),
@@ -52,7 +53,7 @@ func (te *grpcTriggerer) Trigger(_ context.Context, ctx context.Context, test mo
 		Remote:     true,
 	})
 
-	ctx = trace.ContextWithSpanContext(ctx, sc)
+	ctx := trace.ContextWithSpanContext(triggerSpanCtx, sc)
 
 	tReq := trigger.GRPC
 
@@ -88,9 +89,10 @@ func (te *grpcTriggerer) Trigger(_ context.Context, ctx context.Context, test mo
 		marshaller: marshaler,
 	}
 
-	propagators().Inject(ctx, NewGRPCHeaderCarrier(&tReq.Metadata))
+	md := tReq.MD()
+	otelgrpc.Inject(ctx, md, otelgrpc.WithPropagators(propagators()))
 
-	err = grpcurl.InvokeRPC(ctx, desc, conn, tReq.Method, tReq.Headers(), h, rf.Next)
+	err = grpcurl.InvokeRPC(ctx, desc, conn, tReq.Method, mdToHeaders(md), h, rf.Next)
 	if err != nil {
 		return response, err
 	}
@@ -112,6 +114,16 @@ func (te *grpcTriggerer) Trigger(_ context.Context, ctx context.Context, test mo
 
 func (t *grpcTriggerer) Type() model.TriggerType {
 	return model.TriggerTypeGRPC
+}
+
+func mdToHeaders(md *metadata.MD) []string {
+	h := []string{}
+
+	for k, vs := range *md {
+		h = append(h, k+": "+strings.Join(vs, " "))
+	}
+
+	return h
 }
 
 func protoDescription(content string) (grpcurl.DescriptorSource, error) {
