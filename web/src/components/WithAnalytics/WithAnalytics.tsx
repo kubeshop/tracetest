@@ -5,7 +5,7 @@ const withAnalytics = <P extends object>(Component: React.ComponentType<P>, name
   const FunctionComponent = (props: P) => {
     useEffect(() => {
       AnalyticsService.page(name);
-    }, []);
+    }, [props]);
 
     return <Component {...props} />;
   };

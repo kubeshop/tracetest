@@ -1,5 +1,7 @@
 package model
 
+import "google.golang.org/grpc/metadata"
+
 const TriggerTypeGRPC TriggerType = "grpc"
 
 type GRPCHeader struct {
@@ -29,6 +31,21 @@ func (a GRPCRequest) Headers() []string {
 	}
 
 	return h
+}
+
+func (a GRPCRequest) MD() *metadata.MD {
+	md := metadata.MD{}
+
+	for _, header := range a.Metadata {
+		// ignore invalid values
+		if header.Key == "" {
+			continue
+		}
+
+		md[header.Key] = []string{header.Value}
+	}
+
+	return &md
 }
 
 func (a GRPCRequest) Authenticate() {

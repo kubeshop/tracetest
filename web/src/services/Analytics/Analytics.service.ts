@@ -15,13 +15,20 @@ const AnalyticsService = (): TAnalyticsService => ({
   event<A>(category: Categories, action: A, label: string) {
     if (!isEnabled) return;
     analytics.track(String(action), {
+      serverID,
+      appVersion,
+      env,
       label,
       category,
     });
   },
   page(name: string) {
     if (!isEnabled) return;
-    analytics.page(name);
+    analytics.page(name, {
+      serverID,
+      appVersion,
+      env,
+    });
   },
   identify() {
     if (!isEnabled) return;

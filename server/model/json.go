@@ -126,9 +126,9 @@ func (r Run) MarshalJSON() ([]byte, error) {
 		CompletedAt:               r.CompletedAt,
 		TestVersion:               r.TestVersion,
 		Trigger:                   r.Trigger,
-		TriggerResult:             r.TriggerResult,
 		Trace:                     r.Trace,
 		Results:                   r.Results,
+		TriggerResult:             r.TriggerResult,
 	})
 }
 
@@ -154,6 +154,12 @@ func (r *Run) UnmarshalJSON(data []byte) error {
 		return fmt.Errorf("unmarshal run: %w", err)
 	}
 
+	triggerResult := TriggerResult{
+		Type: aux.TriggerResult.Type,
+		HTTP: aux.TriggerResult.HTTP,
+		GRPC: aux.TriggerResult.GRPC,
+	}
+
 	r.ID = id
 	r.TraceID = tid
 	r.SpanID = sid
@@ -166,7 +172,7 @@ func (r *Run) UnmarshalJSON(data []byte) error {
 	r.CompletedAt = aux.CompletedAt
 	r.TestVersion = aux.TestVersion
 	r.Trigger = aux.Trigger
-	r.TriggerResult = aux.TriggerResult
+	r.TriggerResult = triggerResult
 
 	r.Trace = aux.Trace
 	r.Results = aux.Results

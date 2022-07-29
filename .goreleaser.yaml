@@ -1,22 +1,50 @@
-builds:
-  - id: tracetest
-    skip: true
-
+project_name: tracetest
 changelog:
   sort: asc
   filters:
     exclude:
       - '^docs:'
       - '^test:'
-
 release:
-  # Create a thread in the General category in the repo's discussion tab.
-  discussion_category_name: General
-
-  # If set to true, will not auto-publish the release.
-  # Default is false.
+  # discussion_category_name: General
   draft: false
-
-  # Tags that have the format v1.0.0-rc1 will mark the release as a pre-release (i.e. not ready for production)
-  # Other tags will be marked as ready for production
   prerelease: auto
+before:
+  hooks:
+    - go mod tidy
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+archives:
+- replacements:
+    386: i386
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+universal_binaries:
+- id: tracetest
+  replace: true
+nfpms:
+- id: tracetest
+  vendor: Kubeshop
+  homepage: https://tracetest.kubeshop.io/
+  license: MIT
+  formats:
+    - deb
+    - rpm
+  replacements:
+    386: i386
+brews:
+- tap:
+    owner: kubeshop
+    name: homebrew-tracetest
+  commit_author:
+    name: Brew Bot
+    email: brewbot@kubeshop.io
+  homepage: https://tracetest.kubeshop.io/
+  license: "MIT"

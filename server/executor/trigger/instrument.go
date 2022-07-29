@@ -2,7 +2,6 @@ package trigger
 
 import (
 	"context"
-	"io"
 
 	"github.com/kubeshop/tracetest/server/model"
 	"go.opentelemetry.io/contrib/propagators/aws/xray"
@@ -10,35 +9,42 @@ import (
 	"go.opentelemetry.io/contrib/propagators/jaeger"
 	"go.opentelemetry.io/contrib/propagators/ot"
 	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
 	"go.opentelemetry.io/otel/propagation"
-	"go.opentelemetry.io/otel/sdk/resource"
-	sdktrace "go.opentelemetry.io/otel/sdk/trace"
-	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
 	"go.opentelemetry.io/otel/trace"
 )
 
-func Instrument(tracer trace.Tracer, wrapped Triggerer) Triggerer {
+func Instrument(tracer, triggerSpanTracer trace.Tracer, wrapped Triggerer) Triggerer {
 	return &instrumentedTriggerer{
-		tracer:    tracer,
-		triggerer: wrapped,
+		tracer:            tracer,
+		triggerSpanTracer: triggerSpanTracer,
+		triggerer:         wrapped,
 	}
 }
 
 type instrumentedTriggerer struct {
-	tracer    trace.Tracer
-	triggerer Triggerer
+	tracer            trace.Tracer
+	triggerSpanTracer trace.Tracer
+	triggerer         Triggerer
 }
 
 func (t *instrumentedTriggerer) Type() model.TriggerType {
 	return model.TriggerType("instrumented")
 }
 
-func (t *instrumentedTriggerer) Trigger(ctx context.Context, test model.Test, tid trace.TraceID, sid trace.SpanID) (Response, error) {
-	ctx, span := t.tracer.Start(ctx, "Trigger test")
+func (t *instrumentedTriggerer) Trigger(ctx context.Context, test model.Test) (Response, error) {
+	_, span := t.tracer.Start(ctx, "Trigger test")
 	defer span.End()
 
-	resp, err := t.triggerer.Trigger(ctx, test, tid, sid)
+	triggerSpanCtx, triggerSpan := t.triggerSpanTracer.Start(context.Background(), "Tracetest trigger")
+	defer triggerSpan.End()
+
+	tid := triggerSpan.SpanContext().TraceID()
+	sid := triggerSpan.SpanContext().SpanID()
+
+	resp, err := t.triggerer.Trigger(triggerSpanCtx, test)
+
+	resp.TraceID = tid
+	resp.SpanID = sid
 
 	attrs := []attribute.KeyValue{
 		attribute.String("tracetest.run.trigger.trace_id", tid.String()),
@@ -68,21 +74,4 @@ func propagators() propagation.TextMapPropagator {
 		ot.OT{},
 		xray.Propagator{},
 		propagation.TraceContext{})
-}
-
-func traceProvider() *sdktrace.TracerProvider {
-	// Set standard attributes per semantic conventions
-	res := resource.NewWithAttributes(
-		semconv.SchemaURL,
-		semconv.ServiceNameKey.String("tracetest"),
-	)
-
-	// this is in fact a noop exporter, so we can ignore errors
-	spanExporter, _ := stdouttrace.New(stdouttrace.WithWriter(io.Discard))
-
-	return sdktrace.NewTracerProvider(
-		sdktrace.WithSyncer(spanExporter),
-		sdktrace.WithResource(res),
-		sdktrace.WithSampler(sdktrace.ParentBased(sdktrace.AlwaysSample())),
-	)
 }
