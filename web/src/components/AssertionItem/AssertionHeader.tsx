@@ -1,5 +1,6 @@
 import {tracetest} from '../../utils/grammar';
 import useEditorTheme from '../AdvancedEditor/hooks/useEditorTheme';
+import ShadowScroll from '../ShadowScroll';
 import * as S from './AssertionItem.styled';
 
 interface IProps {
@@ -14,15 +15,17 @@ const AssertionHeader = ({affectedSpans, failedChecks, passedChecks, title}: IPr
 
   return (
     <S.HeaderContainer>
-      <S.HeaderTitleText
-        editable={false}
-        data-cy="advanced-selector"
-        value={(title || 'All Spans').replace(/\n/g, '')}
-        maxHeight="120px"
-        spellCheck={false}
-        extensions={[tracetest(), editorTheme]}
-        placeholder="Selecting All Spans"
-      />
+      <ShadowScroll>
+        <S.HeaderTitleText
+          editable={false}
+          data-cy="advanced-selector"
+          value={title || 'All Spans'}
+          maxHeight="120px"
+          spellCheck={false}
+          extensions={[tracetest(), editorTheme]}
+          placeholder="Selecting All Spans"
+        />
+      </ShadowScroll>
 
       <div>
         {Boolean(passedChecks) && (

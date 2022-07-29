@@ -153,6 +153,7 @@ export const HeaderTitleText = styled(ReactCodeMirror)`
   .cm-scroller {
     scrollbar-width: none;
     -ms-overflow-style: none;
+    overflow: inherit;
   }
 
   .cm-scroller::-webkit-scrollbar {
@@ -161,11 +162,16 @@ export const HeaderTitleText = styled(ReactCodeMirror)`
     width: 0;
     height: 0;
   }
+
+  .cm-content {
+    font-weight: 700;
+  }
 `;
 
 export const HeaderContainer = styled(Column)`
   max-width: 80%;
-  overflow-x: scroll;
+  min-width: 80%;
+  overflow-x: hidden;
 
   &::-webkit-scrollbar {
     display: none;
