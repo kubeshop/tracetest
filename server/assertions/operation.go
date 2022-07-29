@@ -123,6 +123,15 @@ func resolveLiteralValue(literalValue model.LiteralValue, span traces.Span) mode
 		}
 	}
 
+	if literalValue.Type == "duration" {
+		value := traces.ConvertTimeFieldIntoNanoSeconds(literalValue.Value)
+
+		return model.LiteralValue{
+			Value: fmt.Sprintf("%d", value),
+			Type:  "number",
+		}
+	}
+
 	return literalValue
 }
 

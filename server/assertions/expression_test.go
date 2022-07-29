@@ -48,7 +48,7 @@ func TestLiteralValues(t *testing.T) {
 				},
 			},
 			Span:           traces.Span{},
-			ExpectedOutput: "3s",
+			ExpectedOutput: "3000000000",
 		},
 		{
 			Name: "should_return_span_attribute",

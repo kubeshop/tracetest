@@ -9,19 +9,23 @@ import (
 )
 
 type Assertion struct {
-	Attribute  string
-	Operator   string
-	Expression *Expression
-
-	// Deprecated: this value is here due to retrocompatibility but it should be removed in our next release.
-	// Reason: it was replaced by Expression as it is more flexible and powerful
-	Value string
+	Attribute string
+	Operator  string
+	Value     *Expression
 }
 
 type Expression struct {
 	LiteralValue ExprLiteral
 	Operation    string
 	Expression   *Expression
+}
+
+func (e *Expression) String() string {
+	if e.Expression == nil {
+		return e.LiteralValue.String()
+	}
+
+	return fmt.Sprintf("%s %s %s", e.LiteralValue.String(), e.Operation, e.Expression.String())
 }
 
 type assertionParserObject struct {
@@ -131,11 +135,12 @@ var languageLexer = lexer.MustStateful(lexer.Rules{
 	},
 })
 
-var defaultParser *participle.Parser
+var defaultAssertionParser *participle.Parser
+var defaultAssertionExpressionParser *participle.Parser
 
-func createParser() (*participle.Parser, error) {
-	if defaultParser != nil {
-		return defaultParser, nil
+func createAssertionParser() (*participle.Parser, error) {
+	if defaultAssertionParser != nil {
+		return defaultAssertionParser, nil
 	}
 
 	parser, err := participle.Build(&assertionParserObject{}, participle.Lexer(languageLexer))
@@ -143,13 +148,28 @@ func createParser() (*participle.Parser, error) {
 		return nil, fmt.Errorf("could not create parser: %w", err)
 	}
 
-	defaultParser = parser
+	defaultAssertionParser = parser
 
-	return defaultParser, nil
+	return defaultAssertionParser, nil
+}
+
+func createAssertionExpressionParser() (*participle.Parser, error) {
+	if defaultAssertionExpressionParser != nil {
+		return defaultAssertionExpressionParser, nil
+	}
+
+	parser, err := participle.Build(&Expr{}, participle.Lexer(languageLexer))
+	if err != nil {
+		return nil, fmt.Errorf("could not create parser: %w", err)
+	}
+
+	defaultAssertionExpressionParser = parser
+
+	return defaultAssertionExpressionParser, nil
 }
 
 func ParseAssertion(assertionQuery string) (Assertion, error) {
-	parser, err := createParser()
+	parser, err := createAssertionParser()
 	if err != nil {
 		return Assertion{}, fmt.Errorf("could not create assertion parser: %w", err)
 	}
@@ -160,16 +180,28 @@ func ParseAssertion(assertionQuery string) (Assertion, error) {
 		return Assertion{}, fmt.Errorf("could not parse assertion (%s): %w", assertionQuery, err)
 	}
 
-	value := unquote(assertionParserObject.Value.String())
-
 	assertion := Assertion{
-		Attribute:  assertionParserObject.Attribute,
-		Operator:   assertionParserObject.Operator,
-		Value:      value,
-		Expression: createExpression(&assertionParserObject.Value),
+		Attribute: assertionParserObject.Attribute,
+		Operator:  assertionParserObject.Operator,
+		Value:     createExpression(&assertionParserObject.Value),
 	}
 
 	return assertion, nil
+}
+
+func ParseAssertionExpression(expressionQuery string) (*Expression, error) {
+	parser, err := createAssertionExpressionParser()
+	if err != nil {
+		return nil, fmt.Errorf("could not create assertion parser: %w", err)
+	}
+
+	var expr Expr
+	err = parser.ParseString("", expressionQuery, &expr)
+	if err != nil {
+		return nil, fmt.Errorf("could not parse assertion (%s): %w", expressionQuery, err)
+	}
+
+	return createExpression(&expr), nil
 }
 
 func createExpression(expr *Expr) *Expression {
