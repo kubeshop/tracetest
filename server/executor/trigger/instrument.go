@@ -13,27 +13,38 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-func Instrument(tracer trace.Tracer, wrapped Triggerer) Triggerer {
+func Instrument(tracer, triggerSpanTracer trace.Tracer, wrapped Triggerer) Triggerer {
 	return &instrumentedTriggerer{
-		tracer:    tracer,
-		triggerer: wrapped,
+		tracer:            tracer,
+		triggerSpanTracer: triggerSpanTracer,
+		triggerer:         wrapped,
 	}
 }
 
 type instrumentedTriggerer struct {
-	tracer    trace.Tracer
-	triggerer Triggerer
+	tracer            trace.Tracer
+	triggerSpanTracer trace.Tracer
+	triggerer         Triggerer
 }
 
 func (t *instrumentedTriggerer) Type() model.TriggerType {
 	return model.TriggerType("instrumented")
 }
 
-func (t *instrumentedTriggerer) Trigger(ctx context.Context, triggerSpanCtx context.Context, test model.Test, tid trace.TraceID, sid trace.SpanID) (Response, error) {
-	ctx, span := t.tracer.Start(ctx, "Trigger test")
+func (t *instrumentedTriggerer) Trigger(ctx context.Context, test model.Test) (Response, error) {
+	_, span := t.tracer.Start(ctx, "Trigger test")
 	defer span.End()
 
-	resp, err := t.triggerer.Trigger(ctx, triggerSpanCtx, test, tid, sid)
+	triggerSpanCtx, triggerSpan := t.triggerSpanTracer.Start(context.Background(), "Tracetest trigger")
+	defer triggerSpan.End()
+
+	tid := triggerSpan.SpanContext().TraceID()
+	sid := triggerSpan.SpanContext().SpanID()
+
+	resp, err := t.triggerer.Trigger(triggerSpanCtx, test)
+
+	resp.TraceID = tid
+	resp.SpanID = sid
 
 	attrs := []attribute.KeyValue{
 		attribute.String("tracetest.run.trigger.trace_id", tid.String()),

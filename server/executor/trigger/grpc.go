@@ -14,7 +14,6 @@ import (
 	"github.com/jhump/protoreflect/desc"
 	"github.com/kubeshop/tracetest/server/model"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
-	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
@@ -28,7 +27,7 @@ func GRPC() Triggerer {
 
 type grpcTriggerer struct{}
 
-func (te *grpcTriggerer) Trigger(_ context.Context, triggerSpanCtx context.Context, test model.Test, tid trace.TraceID, sid trace.SpanID) (Response, error) {
+func (te *grpcTriggerer) Trigger(ctx context.Context, test model.Test) (Response, error) {
 	response := Response{
 		Result: model.TriggerResult{
 			Type: te.Type(),
@@ -43,17 +42,6 @@ func (te *grpcTriggerer) Trigger(_ context.Context, triggerSpanCtx context.Conte
 	if trigger.GRPC == nil {
 		return response, fmt.Errorf("no settings provided for GRPC triggerer")
 	}
-
-	var tf trace.TraceFlags
-	sc := trace.NewSpanContext(trace.SpanContextConfig{
-		TraceID:    tid,
-		SpanID:     sid,
-		TraceFlags: tf.WithSampled(true),
-		TraceState: trace.TraceState{},
-		Remote:     true,
-	})
-
-	ctx := trace.ContextWithSpanContext(triggerSpanCtx, sc)
 
 	tReq := trigger.GRPC
 

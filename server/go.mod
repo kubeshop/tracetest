@@ -24,8 +24,6 @@ require (
 	github.com/segmentio/analytics-go/v3 v3.2.1
 	github.com/stretchr/testify v1.7.1
 	go.opentelemetry.io/collector v0.44.0
-	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.28.0
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.28.0
 	go.opentelemetry.io/contrib/propagators/aws v1.5.0
 	go.opentelemetry.io/contrib/propagators/b3 v1.5.0
 	go.opentelemetry.io/contrib/propagators/jaeger v1.5.0
@@ -73,9 +71,9 @@ require (
 	github.com/streadway/amqp v1.0.0 // indirect
 	github.com/stretchr/objx v0.2.0 // indirect
 	go.opentelemetry.io/collector/model v0.44.0 // indirect
+	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.28.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/internal/retry v1.7.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.6.0 // indirect
-	go.opentelemetry.io/otel/internal/metric v0.26.0 // indirect
 	go.opentelemetry.io/otel/metric v0.26.0 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect

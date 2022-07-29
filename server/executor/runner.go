@@ -26,27 +26,24 @@ func NewPersistentRunner(
 	updater RunUpdater,
 	tp TracePoller,
 	tracer trace.Tracer,
-	triggerSpanTracer trace.Tracer,
 ) PersistentRunner {
 	return persistentRunner{
-		triggers:          triggers,
-		runs:              runs,
-		updater:           updater,
-		tp:                tp,
-		tracer:            tracer,
-		triggerSpanTracer: triggerSpanTracer,
-		executeQueue:      make(chan execReq, 5),
-		exit:              make(chan bool, 1),
+		triggers:     triggers,
+		runs:         runs,
+		updater:      updater,
+		tp:           tp,
+		tracer:       tracer,
+		executeQueue: make(chan execReq, 5),
+		exit:         make(chan bool, 1),
 	}
 }
 
 type persistentRunner struct {
-	triggers          *trigger.Registry
-	tp                TracePoller
-	runs              model.RunRepository
-	updater           RunUpdater
-	tracer            trace.Tracer
-	triggerSpanTracer trace.Tracer
+	triggers *trigger.Registry
+	tp       TracePoller
+	runs     model.RunRepository
+	updater  RunUpdater
+	tracer   trace.Tracer
 
 	executeQueue chan execReq
 	exit         chan bool
@@ -127,14 +124,11 @@ func (r persistentRunner) processExecQueue(job execReq) {
 		panic(err)
 	}
 
-	triggerSpanCtx, span := r.triggerSpanTracer.Start(context.Background(), "Tracetest trigger")
-	defer span.End()
-
-	response, err := triggerer.Trigger(job.ctx, triggerSpanCtx, job.test, span.SpanContext().TraceID(), span.SpanContext().SpanID())
+	response, err := triggerer.Trigger(job.ctx, job.test)
 	run = r.handleExecutionResult(run, response, err)
 
-	run.TraceID = span.SpanContext().TraceID()
-	run.SpanID = span.SpanContext().SpanID()
+	run.TraceID = response.TraceID
+	run.SpanID = response.SpanID
 
 	r.handleDBError(r.updater.Update(job.ctx, run))
 	if run.State == model.RunStateAwaitingTrace {

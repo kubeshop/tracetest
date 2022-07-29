@@ -95,7 +95,12 @@ func (a *App) Start() error {
 		}
 	}
 
-	triggerReg := trigger.NewRegsitry(a.tracer)
+	applicationTracer, err := tracing.GetApplicationTracer(ctx, a.config)
+	if err != nil {
+		return fmt.Errorf("could not create trigger span tracer: %w", err)
+	}
+
+	triggerReg := trigger.NewRegsitry(a.tracer, applicationTracer)
 	triggerReg.Add(trigger.HTTP())
 	triggerReg.Add(trigger.GRPC())
 
@@ -123,12 +128,7 @@ func (a *App) Start() error {
 	tracePoller.Start(5) // worker count. should be configurable
 	defer tracePoller.Stop()
 
-	applicationTracer, err := tracing.GetApplicationTracer(ctx, a.config)
-	if err != nil {
-		return fmt.Errorf("could not create trigger span tracer: %w", err)
-	}
-
-	runner := executor.NewPersistentRunner(triggerReg, a.db, execTestUpdater, tracePoller, a.tracer, applicationTracer)
+	runner := executor.NewPersistentRunner(triggerReg, a.db, execTestUpdater, tracePoller, a.tracer)
 	runner.Start(5) // worker count. should be configurable
 	defer runner.Stop()
 

@@ -20,7 +20,28 @@ func HTTP() Triggerer {
 
 type httpTriggerer struct{}
 
-func (te *httpTriggerer) Trigger(_ context.Context, triggerSpanCtx context.Context, test model.Test, tid trace.TraceID, sid trace.SpanID) (Response, error) {
+func newSpanContext(ctx context.Context) trace.SpanContext {
+	spanCtx := trace.SpanContextFromContext(ctx)
+	var (
+		tid trace.TraceID
+		sid trace.SpanID
+	)
+	if spanCtx.IsValid() {
+		tid = spanCtx.TraceID()
+		sid = spanCtx.SpanID()
+	}
+
+	var tf trace.TraceFlags
+	return trace.NewSpanContext(trace.SpanContextConfig{
+		TraceID:    tid,
+		SpanID:     sid,
+		TraceFlags: tf.WithSampled(true),
+		TraceState: trace.TraceState{},
+		Remote:     true,
+	})
+}
+
+func (te *httpTriggerer) Trigger(ctx context.Context, test model.Test) (Response, error) {
 	response := Response{
 		Result: model.TriggerResult{
 			Type: te.Type(),
@@ -34,16 +55,7 @@ func (te *httpTriggerer) Trigger(_ context.Context, triggerSpanCtx context.Conte
 
 	client := http.DefaultClient
 
-	var tf trace.TraceFlags
-	sc := trace.NewSpanContext(trace.SpanContextConfig{
-		TraceID:    tid,
-		SpanID:     sid,
-		TraceFlags: tf.WithSampled(true),
-		TraceState: trace.TraceState{},
-		Remote:     true,
-	})
-
-	ctx := trace.ContextWithSpanContext(triggerSpanCtx, sc)
+	ctx = trace.ContextWithSpanContext(ctx, newSpanContext(ctx))
 
 	var req *http.Request
 	tReq := trigger.HTTP
@@ -60,7 +72,7 @@ func (te *httpTriggerer) Trigger(_ context.Context, triggerSpanCtx context.Conte
 	}
 
 	tReq.Authenticate(req)
-	getPropagators().Inject(ctx, propagation.HeaderCarrier(req.Header))
+	propagators().Inject(ctx, propagation.HeaderCarrier(req.Header))
 
 	resp, err := client.Do(req.WithContext(ctx))
 	if err != nil {
