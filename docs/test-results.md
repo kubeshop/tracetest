@@ -1,6 +1,6 @@
 # Test Results
 
-From the **All Tests** screen, you can access the results of any test that has been run.  
+From the **All Tests** screen, you can access all your existing tests, create new tests and see the results of any test that has been run.  
 
 ![All Tests List](img/all-tests-list-0.6.png)
 
