@@ -10,10 +10,13 @@ trigger:
     - key: Content-Type
       value: application/json
 testDefinition:
+- selector: span[name = "Tracetest trigger"]
+  assertions:
+    - tracetest.selected_spans.count = 1
+    - tracetest.response.status = 204
 - selector: span[name="DELETE /api/tests/{testId}" tracetest.span.type="http"]
   assertions:
   - tracetest.selected_spans.count = 1
-  - tracetest.response.status = 204
 - selector: span[name = "exec DELETE"]
   assertions:
   # must delete test, definition, and runs. That's why we need 3 deletes
