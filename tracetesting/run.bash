@@ -1,24 +1,48 @@
 #/bin/bash
 
-export TRACETEST_CMD=${TRACETEST_CLI:-"../cli/tracetest"}
+export TRACETEST_CLI=${TRACETEST_CLI:-"../cli/tracetest"}
 if ! command -v "$TRACETEST_CLI" &> /dev/null; then
   echo "\$TRACETEST_CLI not set to executable. set to $TRACETEST_CLI";
   exit 2
 fi
 
+export TARGET_URL=${TARGET_URL:-"http://localhost:8081"}
 if [  "$TARGET_URL" = "" ]; then
   echo "\$TARGET_URL not set";
   exit 2
 fi
 
-export TRACETEST_MAIN_ENDPOINT="localhost:8080"
-export TRACETEST_TARGET_ENDPOINT="localhost:8081"
-export TARGET_URL=${TARGET_URL:-"http://localhost:8081"}
+
+export TRACETEST_MAIN_ENDPOINT=${TRACETEST_MAIN_ENDPOINT:-"localhost:8080"}
+export TRACETEST_TARGET_ENDPOINT=${TRACETEST_TARGET_ENDPOINT:-"localhost:8081"}
+export DEMO_APP_URL=${DEMO_APP_URL-"http://demo-pokemon-api.demo.svc.cluster.local"}
+export DEMO_APP_GRPC_URL=${DEMO_APP_GRPC_URL-"demo-pokemon-api.demo.svc.cluster.local:8082"}
+
+
+echo "TRACETEST_CLI: $TRACETEST_CLI"
+echo "TARGET_URL: $TARGET_URL"
+echo "TRACETEST_MAIN_ENDPOINT: $TRACETEST_MAIN_ENDPOINT"
+echo "TRACETEST_TARGET_ENDPOINT: $TRACETEST_TARGET_ENDPOINT"
+echo "DEMO_APP_URL: $DEMO_APP_URL"
+echo "DEMO_APP_GRPC_URL: $DEMO_APP_GRPC_URL"
+
+
+cat << EOF > config.main.yml
+scheme: http
+endpoint: $TRACETEST_MAIN_ENDPOINT
+EOF
+
+cat << EOF > config.target.yml
+scheme: http
+endpoint: $TRACETEST_TARGET_ENDPOINT
+EOF
+
+
 
 mkdir -p results/responses
 
 EXIT_STATUS=0
-bash ./list_tests.bash || EXIT_STATUS=$?
+bash ./tests.bash || EXIT_STATUS=$?
+bash ./grpc.bash || EXIT_STATUS=$?
 
 exit $EXIT_STATUS
-

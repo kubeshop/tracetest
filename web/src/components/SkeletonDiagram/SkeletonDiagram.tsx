@@ -1,53 +1,33 @@
 import React, {useEffect, useMemo} from 'react';
 import {Typography} from 'antd';
-import ReactFlow, {ArrowHeadType, Background, Elements, Position} from 'react-flow-renderer';
-import SkeletonNode from './SkeletonNode';
-import * as S from './SkeletonDiagram.styled';
-import {useDAGChart} from '../../hooks/useDAGChart';
-import {TRACE_DOCUMENTATION_URL} from '../../constants/Common.constants';
-import {skeletonNodeList, strokeColor, TraceNodes} from '../../constants/Diagram.constants';
+import ReactFlow from 'react-flow-renderer';
 
-export type SkeletonElementList = Elements<{}>;
+import {TRACE_DOCUMENTATION_URL} from 'constants/Common.constants';
+import {skeletonNodesDatum} from 'constants/DAG.constants';
+import DAGService from 'services/DAG.service';
+import * as S from './SkeletonDiagram.styled';
+import SkeletonNode from './SkeletonNode';
 
 export interface IProps {
-  onSelectSpan?(spanId: string): void;
+  onClearAffectedSpans(): void;
+  onClearSelectedSpan(): void;
 }
 
-const SkeletonDiagram = ({onSelectSpan}: IProps) => {
-  const {dag} = useDAGChart(skeletonNodeList);
+/** Important to define the nodeTypes outside of the component to prevent re-renderings */
+const nodeTypes = {skeleton: SkeletonNode};
+
+const SkeletonDiagram = ({onClearAffectedSpans, onClearSelectedSpan}: IProps) => {
+  const {edges, nodes} = useMemo(() => DAGService.getEdgesAndNodes(skeletonNodesDatum), []);
 
   useEffect(() => {
-    if (onSelectSpan) onSelectSpan('');
+    onClearAffectedSpans();
+    onClearSelectedSpan();
   }, []);
-
-  const dagElementList = useMemo<SkeletonElementList>(() => {
-    const dagNodeList: SkeletonElementList =
-      dag?.descendants().map(({data, x, y}) => ({
-        id: data.id,
-        type: TraceNodes.Skeleton,
-        position: {x: x!, y: parseFloat(String(y))},
-        data,
-        sourcePosition: Position.Top,
-      })) || [];
-
-    dag?.links().forEach(({source, target}) => {
-      dagNodeList.push({
-        id: `${source.data.id}_${target.data.id}`,
-        source: source.data.id,
-        target: target.data.id,
-        animated: true,
-        arrowHeadType: ArrowHeadType.ArrowClosed,
-        style: {stroke: strokeColor},
-      });
-    });
-
-    return dagNodeList;
-  }, [dag]);
 
   return (
     <S.Container data-cy="skeleton-diagram">
       <S.SkeletonDiagramMessage>
-        <Typography.Title level={5} type="secondary">
+        <Typography.Title level={3} type="secondary">
           We are working on your trace…
         </Typography.Title>
         <Typography.Text type="secondary">
@@ -57,14 +37,17 @@ const SkeletonDiagram = ({onSelectSpan}: IProps) => {
           </a>
         </Typography.Text>
       </S.SkeletonDiagramMessage>
+
       <ReactFlow
-        nodeTypes={{SkeletonNode}}
-        defaultZoom={0.5}
-        elements={dagElementList}
-        onLoad={instance => setTimeout(() => instance.fitView(), 0)}
-      >
-        <Background gap={4} size={1} color="#FBFBFF" />
-      </ReactFlow>
+        defaultEdges={edges}
+        defaultNodes={nodes}
+        deleteKeyCode={null}
+        fitView
+        multiSelectionKeyCode={null}
+        nodesConnectable={false}
+        nodeTypes={nodeTypes}
+        selectionKeyCode={null}
+      />
     </S.Container>
   );
 };

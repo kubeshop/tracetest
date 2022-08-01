@@ -16,7 +16,7 @@ interface IProps {
   test: TTest;
 }
 
-const TestCard = ({onClick, onDelete, onRunTest, test: {name, serviceUnderTest, id: testId}, test}: IProps) => {
+const TestCard = ({onClick, onDelete, onRunTest, test: {name, trigger, id: testId}, test}: IProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [loadResultList, {data: resultList = []}] = useLazyGetRunListQuery();
 
@@ -47,10 +47,10 @@ const TestCard = ({onClick, onDelete, onRunTest, test: {name, serviceUnderTest, 
           <S.NameText>{name}</S.NameText>
         </S.TextContainer>
         <S.TextContainer>
-          <S.Text>{serviceUnderTest?.request?.method}</S.Text>
+          <S.Text>{trigger.method}</S.Text>
         </S.TextContainer>
         <S.TextContainer data-cy={`test-url-${testId}`}>
-          <S.Text>{serviceUnderTest?.request?.url}</S.Text>
+          <S.Text>{trigger.entryPoint}</S.Text>
         </S.TextContainer>
         <S.TextContainer />
         <S.ButtonContainer>

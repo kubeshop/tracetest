@@ -16,7 +16,7 @@ import (
 
 // TestDefinitionDefinitions struct for TestDefinitionDefinitions
 type TestDefinitionDefinitions struct {
-	Selector   *string     `json:"selector,omitempty"`
+	Selector   *Selector   `json:"selector,omitempty"`
 	Assertions []Assertion `json:"assertions,omitempty"`
 }
 
@@ -38,9 +38,9 @@ func NewTestDefinitionDefinitionsWithDefaults() *TestDefinitionDefinitions {
 }
 
 // GetSelector returns the Selector field value if set, zero value otherwise.
-func (o *TestDefinitionDefinitions) GetSelector() string {
+func (o *TestDefinitionDefinitions) GetSelector() Selector {
 	if o == nil || o.Selector == nil {
-		var ret string
+		var ret Selector
 		return ret
 	}
 	return *o.Selector
@@ -48,7 +48,7 @@ func (o *TestDefinitionDefinitions) GetSelector() string {
 
 // GetSelectorOk returns a tuple with the Selector field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *TestDefinitionDefinitions) GetSelectorOk() (*string, bool) {
+func (o *TestDefinitionDefinitions) GetSelectorOk() (*Selector, bool) {
 	if o == nil || o.Selector == nil {
 		return nil, false
 	}
@@ -64,8 +64,8 @@ func (o *TestDefinitionDefinitions) HasSelector() bool {
 	return false
 }
 
-// SetSelector gets a reference to the given string and assigns it to the Selector field.
-func (o *TestDefinitionDefinitions) SetSelector(v string) {
+// SetSelector gets a reference to the given Selector and assigns it to the Selector field.
+func (o *TestDefinitionDefinitions) SetSelector(v Selector) {
 	o.Selector = &v
 }
 

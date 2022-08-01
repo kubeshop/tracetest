@@ -1,21 +1,25 @@
+import {ReflexContainer, ReflexElement} from 'react-reflex';
 import styled from 'styled-components';
 
-export const Container = styled.main`
+export const Container = styled(ReflexContainer)`
   display: flex;
   height: 100%;
   width: 100%;
+
+  &.vertical > .reflex-splitter {
+    border-color: transparent;
+    background: transparent;
+  }
 `;
 
-export const LeftPanel = styled.div`
+export const LeftPanel = styled(ReflexElement)`
   display: flex;
-  flex-basis: 50%;
   flex-direction: column;
   padding: 24px;
 `;
 
-export const RightPanel = styled.div`
-  background: #fff;
+export const RightPanel = styled(ReflexElement)`
+  background: ${({theme}) => theme.color.white};
   box-shadow: 0 20px 24px rgba(153, 155, 168, 0.18);
-  flex-basis: 50%;
   overflow-y: scroll;
 `;

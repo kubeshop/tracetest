@@ -1,30 +1,26 @@
-import {Typography, Form, Button} from 'antd';
-import {FieldData} from 'antd/node_modules/rc-field-form/es/interface';
-import {isEmpty} from 'lodash';
-import React, {useCallback, useEffect} from 'react';
-
+import {Button, Form, Switch, Typography} from 'antd';
 import {CompareOperator} from 'constants/Operator.constants';
-import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
-import {useGetSelectedSpansQuery} from 'redux/apis/TraceTest.api';
+import React, {useState} from 'react';
 import {useAppSelector} from 'redux/hooks';
 import AssertionSelectors from 'selectors/Assertion.selectors';
-import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
-import CreateAssertionModalAnalyticsService from 'services/Analytics/CreateAssertionModalAnalytics.service';
 import OperatorService from 'services/Operator.service';
-import SelectorService from 'services/Selector.service';
 import {TAssertion, TPseudoSelector, TSpanSelector} from 'types/Assertion.types';
+import SpanSelectors from 'selectors/Span.selectors';
+import {ADVANCE_SELECTORS_DOCUMENTATION_URL} from 'constants/Common.constants';
+import AffectedSpanControls from '../Diagram/components/DAG/AffectedSpanControls';
 import {TooltipQuestion} from '../TooltipQuestion/TooltipQuestion';
 import * as S from './AssertionForm.styled';
 import AssertionFormCheckList from './AssertionFormCheckList';
-import AssertionFormPseudoSelectorInput from './AssertionFormPseudoSelectorInput';
-import AssertionFormSelectorInput from './AssertionFormSelectorInput';
-
-const {onChecksChange, onSelectorChange} = CreateAssertionModalAnalyticsService;
+import AssertionFormSelector from './AssertionFormSelector';
+import useOnFieldsChange from './hooks/useOnFieldsChange';
+import useAssertionFormValues from './hooks/useAssertionFormValues';
 
 export interface IValues {
   assertionList?: TAssertion[];
   selectorList: TSpanSelector[];
   pseudoSelector?: TPseudoSelector;
+  selector?: string;
+  isAdvancedSelector?: boolean;
 }
 
 interface TAssertionFormProps {
@@ -45,6 +41,8 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
     ],
     selectorList = [],
     pseudoSelector,
+    selector = '',
+    isAdvancedSelector = false,
   } = {},
   onSubmit,
   onCancel,
@@ -52,67 +50,31 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
   testId,
   runId,
 }) => {
-  const {setAffectedSpans} = useTestDefinition();
   const [form] = Form.useForm<IValues>();
 
-  const currentSelectorList = Form.useWatch('selectorList', form) || [];
-  const currentAssertionList = Form.useWatch('assertionList', form) || [];
-  const currentPseudoSelector = Form.useWatch('pseudoSelector', form) || undefined;
+  const {currentIsAdvancedSelector, currentAssertionList} = useAssertionFormValues(form);
+  const [isValid, setIsValid] = useState(false);
 
-  const {data: spanIdList = []} = useGetSelectedSpansQuery({
-    query: SelectorService.getSelectorString(currentSelectorList, currentPseudoSelector),
-    testId,
-    runId,
-  });
-
-  useEffect(() => {
-    setAffectedSpans(spanIdList);
-  }, [setAffectedSpans, spanIdList]);
-
+  const spanIdList = useAppSelector(SpanSelectors.selectAffectedSpans);
   const attributeList = useAppSelector(state =>
     AssertionSelectors.selectAttributeList(state, testId, runId, spanIdList)
   );
-  const selectorAttributeList = useAppSelector(state =>
-    AssertionSelectors.selectSelectorAttributeList(state, testId, runId, spanIdList, currentSelectorList)
-  );
-  const definitionSelectorList = useAppSelector(state => TestDefinitionSelectors.selectDefinitionSelectorList(state));
 
-  const onFieldsChange = useCallback(
-    (changedFields: FieldData[]) => {
-      const [field] = changedFields;
-
-      const [fieldName = '', entry = 0, keyName = ''] = field.name as Array<string | number>;
-
-      if (fieldName === 'selectorList') onSelectorChange();
-      if (fieldName === 'assertionList') onChecksChange();
-
-      if (fieldName === 'assertionList' && keyName === 'attribute' && field.value) {
-        const list: TAssertion[] = form.getFieldValue('assertionList') || [];
-
-        form.setFieldsValue({
-          assertionList: list.map((assertionEntry, index) => {
-            if (index === entry) {
-              const {value = ''} = attributeList?.find((el: any) => el.key === list[index].attribute) || {};
-              const isValid = typeof value === 'number' || !isEmpty(value);
-
-              return {...assertionEntry, expected: isValid ? String(value) : ''};
-            }
-
-            return assertionEntry;
-          }),
-        });
-      }
-    },
-    [attributeList, form]
-  );
+  const onFieldsChange = useOnFieldsChange({
+    form,
+    attributeList,
+  });
 
   return (
     <S.AssertionForm>
       <S.AssertionFormHeader>
-        <S.AssertionFormTitle strong>{isEditing ? 'Edit Assertion' : 'Add New Assertion'}</S.AssertionFormTitle>
-        <Typography.Text type="secondary">Affects {spanIdList.length} span(s)</Typography.Text>
+        <S.AssertionFormTitle>{isEditing ? 'Edit Assertion' : 'Add New Assertion'}</S.AssertionFormTitle>
+        <S.AffectedSpansContainer>
+          <AffectedSpanControls />
+          <S.AffectedSpansLabel>selected span(s)</S.AffectedSpansLabel>
+        </S.AffectedSpansContainer>
       </S.AssertionFormHeader>
-      <Form
+      <Form<IValues>
         name="assertion-form"
         form={form}
         initialValues={{
@@ -120,6 +82,8 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
           assertionList,
           selectorList,
           pseudoSelector,
+          isAdvancedSelector,
+          selector,
         }}
         onFinish={onSubmit}
         autoComplete="off"
@@ -127,45 +91,56 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
         data-cy="assertion-form"
         onFieldsChange={onFieldsChange}
       >
-        <div style={{marginBottom: 8}}>
+        <S.AdvancedSelectorContainer>
           <Typography.Text>Filter to limit the span(s) included in this assertion</Typography.Text>
           <TooltipQuestion
+            margin={0}
             title={`
-            You can decided which spans will be tested by this assertion by altering the filter. 
-            Use the dropdown to the right to select the first matching span, last, n-th, or all.  
+            You can decide which spans will be tested by this assertion by altering the filter.
+            Use the dropdown to the right to select the first matching span, last, n-th, or all.
             `}
           />
-        </div>
-        <S.SelectorInputContainer>
-          <Form.Item
-            name="selectorList"
-            rules={[
-              {required: true, message: 'At least one selector is required'},
-              {
-                validator: (_, value: TSpanSelector[]) =>
-                  SelectorService.validateSelector(
-                    definitionSelectorList,
-                    isEditing,
-                    selectorList,
-                    value,
-                    currentPseudoSelector,
-                    pseudoSelector
-                  ),
-              },
-            ]}
-          >
-            <AssertionFormSelectorInput attributeList={selectorAttributeList} />
+          <Typography.Text style={{marginLeft: '16px'}}>Advanced mode</Typography.Text>
+          <Form.Item name="isAdvancedSelector" noStyle>
+            <Switch
+              size="small"
+              disabled={isAdvancedSelector}
+              defaultChecked={isAdvancedSelector}
+              data-cy="mode-selector-switch"
+            />
           </Form.Item>
-          <Form.Item name="pseudoSelector">
-            <AssertionFormPseudoSelectorInput />
-          </Form.Item>
-        </S.SelectorInputContainer>
+          <TooltipQuestion
+            margin={0}
+            title={`
+            You can decided if you want to use the wizard to create the span selector or the query language.
+            `}
+          />
+          {currentIsAdvancedSelector && (
+            <S.ReferenceLink>
+              <a href={ADVANCE_SELECTORS_DOCUMENTATION_URL} target="_blank">
+                Query Language Reference
+              </a>
+            </S.ReferenceLink>
+          )}
+        </S.AdvancedSelectorContainer>
+        <AssertionFormSelector
+          selectorList={selectorList}
+          pseudoSelector={pseudoSelector}
+          form={form}
+          testId={testId}
+          runId={runId}
+          isEditing={isEditing}
+          onValidSelector={setIsValid}
+        />
+
         <div style={{marginBottom: 8}}>
-          <Typography.Text>Define the checks to run against each span selected</Typography.Text>
+          <Typography.Text>
+            Define the checks to run as some checks are against the collection ({spanIdList.length} spans)
+          </Typography.Text>
           <TooltipQuestion
             title={`
-            Add one of more checks to be run against the span(s) that match your filter.  
-            For example, create one assertion to check all http spans to make sure they return status code 200... 
+            Add one of more checks to be run against the span(s) that match your filter.
+            For example, create one assertion to check all http spans to make sure they return status code 200...
             all in one assertion.
             `}
           />
@@ -175,6 +150,7 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
             {(fields, {add, remove}) => (
               <AssertionFormCheckList
                 assertionList={currentAssertionList}
+                form={form}
                 fields={fields}
                 add={add}
                 remove={remove}
@@ -185,7 +161,7 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
         </div>
         <S.AssertionFromActions>
           <Button onClick={onCancel}>Cancel</Button>
-          <Button type="primary" onClick={form.submit} data-cy="assertion-form-submit-button">
+          <Button type="primary" disabled={!isValid} onClick={form.submit} data-cy="assertion-form-submit-button">
             {isEditing ? 'Save' : 'Add'}
           </Button>
         </S.AssertionFromActions>

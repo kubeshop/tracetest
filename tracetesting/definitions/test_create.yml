@@ -1,0 +1,60 @@
+id: d85c3336-5048-4652-b564-63dfe2c83b14
+name: Test Create
+description: ""
+trigger:
+  type: http
+  httpRequest:
+    url: ${TARGET_URL}/api/tests
+    method: POST
+    headers:
+    - key: Content-Type
+      value: application/json
+    body: |
+      {
+        "name": "Pokemon - List - Get a Pokemon",
+        "serviceUnderTest": {
+          "triggerType": "http",
+          "triggerSettings": {
+            "http": {
+              "url": "${DEMO_APP_URL}/pokemon?take=20&skip=0",
+              "method": "GET",
+              "headers": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ]
+            }
+          }
+        },
+        "definition": {
+          "definitions": [
+            {
+              "selector": {
+                "query": "span[name = \"pg.query:SELECT\"]"
+              },
+              "assertions": [
+                {
+                  "attribute": "tracetest.selected_spans.count",
+                  "comparator": ">",
+                  "expected": "0"
+                }
+              ]
+            }
+          ]
+        }
+      }
+testDefinition:
+- selector: span[name="POST /api/tests" tracetest.span.type="http"]
+  assertions:
+  - tracetest.selected_spans.count = 1
+  - tracetest.response.status = 200
+- selector: span[name = "exec INSERT"]
+  assertions:
+  - tracetest.selected_spans.count = 2
+- selector: span[name = "exec INSERT"]:first
+  assertions:
+  - sql.query contains "INSERT INTO tests"
+- selector: span[name = "exec INSERT"]:last
+  assertions:
+  - sql.query contains "INSERT INTO definitions"

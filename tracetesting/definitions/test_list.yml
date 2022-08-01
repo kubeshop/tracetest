@@ -1,0 +1,19 @@
+id: 327d1226-b221-4f88-bf08-a54a7fbbb325
+name: Test List
+description: ""
+trigger:
+  type: http
+  httpRequest:
+    url: ${TARGET_URL}/api/tests
+    method: GET
+    headers:
+    - key: Content-Type
+      value: application/json
+testDefinition:
+- selector: span[name="GET /api/tests" tracetest.span.type="http"]
+  assertions:
+  - tracetest.response.status = 200
+  - tracetest.response.body contains "${TEST_ID}"
+- selector: span[name = "query SELECT"]
+  assertions:
+  - tracetest.selected_spans.count = 1

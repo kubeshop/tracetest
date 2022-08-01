@@ -1,6 +1,8 @@
 name: Release Tracetest
 
-# Cancel any pending or running workflow if the new one is triggered
+permissions:
+  contents: write
+
 concurrency:
   group: "release-server"
   cancel-in-progress: true
@@ -15,8 +17,8 @@ on:
       - "v[0-9]+.[0-9]+.[0-9]+"
       - "v[0-9]+.[0-9]+.[0-9]+-*"
 jobs:
-  release:
-    name: Create and upload release-artifacts, triggers Helm charts release
+  release-server:
+    name: Build and push server docker image
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
@@ -59,22 +61,38 @@ jobs:
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache-new
         build-args: |
-          GA_MEASUREMENT_ID=${{ secrets.GA_MEASUREMENT_ID }}
-          GA_SECRET_KEY=${{ secrets.GA_SECRET_KEY }}
+          ANALYTICS_BE_KEY=${{ secrets.ANALYTICS_BE_KEY }}
+          ANALYTICS_FE_KEY=${{ secrets.ANALYTICS_FE_KEY }}
           VERSION=${{ github.ref_name}}
+          TRACETEST_ENV=main
 
-    - name: Run GoReleaser to publish release notes
-      uses: goreleaser/goreleaser-action@v2
-      with:
-        distribution: goreleaser
-        version: latest
-        args: release --rm-dist --skip-sign
-      env:
-        GITHUB_TOKEN: ${{ secrets.CI_BOT_TOKEN }}
-  # This job runs when we there is no changed resources in the upstream job
+  release-cli:
+    name: Build CLI release arctifacts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Fetch all tags
+        run: git fetch --force --tags
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.18
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v2
+        with:
+          distribution: goreleaser
+          version: latest
+          workdir: ./cli/
+          args: release --rm-dist -f ../.goreleaser.yaml
+        env:
+          GITHUB_TOKEN: ${{ secrets.CI_BOT_TOKEN }}
+
   helm_chart_version_bump:
       name: "Trigger Helm chart appVersion update"
-      needs: "release"
+      needs: "release-server"
       runs-on: ubuntu-latest
       steps:
       - name: Checkout
@@ -170,9 +188,10 @@ jobs:
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache-new
         build-args: |
-          GA_MEASUREMENT_ID=${{ secrets.GA_MEASUREMENT_ID_DEMO }}
-          GA_SECRET_KEY=${{ secrets.GA_SECRET_KEY_DEMO }}
+          ANALYTICS_BE_KEY=${{ secrets.ANALYTICS_BE_KEY }}
+          ANALYTICS_FE_KEY=${{ secrets.ANALYTICS_FE_KEY }}
           VERSION=${{ github.ref_name}}-demo
+          TRACETEST_ENV=demo
     - name: Set ouput docker tag
       run: echo "::set-output tag=${{ steps.meta.outputs.tags }}"
 
@@ -186,7 +205,6 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
 
-    # Setup gcloud CLI
     - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
       with:
         service_account_key: ${{ secrets.GKE_SA_KEY }}
@@ -201,7 +219,6 @@ jobs:
         location: ${{ secrets.GKE_ZONE }}
         credentials: ${{ secrets.GKE_SA_KEY }}
 
-    # Deploy the Docker image to the GKE cluster
     - name: Deploy
       run: |
         helm repo add kubeshop https://kubeshop.github.io/helm-charts && \
@@ -210,9 +227,9 @@ jobs:
           --namespace tracetest-demo \
           --set image.tag=${{ github.ref_name}}-demo \
           --set analytics.enabled=true \
-          --set tracingBackend=jaeger \
-          --set jaegerConnectionConfig.endpoint="jaeger-query.tracetest.svc.cluster.local:16685" \
-          --set telemetry.jaeger.host="jaeger-agent.tracetest.svc.cluster.local" \
+          --set telemetry.dataStores.jaeger.jaeger.endpoint="jaeger-query.tracetest.svc.cluster.local:16685" \
+          --set telemetry.exporters.collector.exporter.collector.endpoint="otel-collector.tracetest.svc.cluster.local:4317" \
+          --set server.telemetry.dataStore="jaeger" \
           --set service.annotations."cloud\.google\.com/backend-config"='\{\"default\":\"tracetest-beta\"\}' \
           --set ingress.enabled=true \
           --set 'ingress.hosts[0].host=demo.tracetest.io,ingress.hosts[0].paths[0].path=/,ingress.hosts[0].paths[0].pathType=Prefix' \

@@ -3,6 +3,7 @@ import {useState} from 'react';
 import {TResultAssertions} from 'types/Assertion.types';
 import {TSpanFlatAttribute} from 'types/Span.types';
 import TraceAnalyticsService from 'services/Analytics/TraceAnalytics.service';
+import {useSpan} from 'providers/Span/Span.provider';
 import {useGuidedTour} from 'providers/GuidedTour/GuidedTour.provider';
 import * as S from './AttributeList.styled';
 import EmptyAttributeList from './EmptyAttributeList';
@@ -15,6 +16,7 @@ interface IProps {
 
 const AttributeList: React.FC<IProps> = ({assertions, attributeList, onCreateAssertion}) => {
   const [isCopied, setIsCopied] = useState(false);
+  const {searchText} = useSpan();
 
   const onCopy = (value: string) => {
     TraceAnalyticsService.onAttributeCopy();
@@ -32,6 +34,7 @@ const AttributeList: React.FC<IProps> = ({assertions, attributeList, onCreateAss
     <S.AttributeList data-cy="attribute-list">
       {attributeList.map((attribute, index) => (
         <AttributeRow
+          searchText={searchText}
           shouldDisplayActions={getShouldDisplayActions(index)}
           assertionsFailed={assertions?.[attribute.key]?.failed}
           assertionsPassed={assertions?.[attribute.key]?.passed}

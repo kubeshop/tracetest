@@ -24,6 +24,7 @@ export type TRawAssertionResults = TTestSchemas['AssertionResults'];
 export type TAssertionResultEntry = {
   id: string;
   selector: string;
+  isAdvancedSelector: boolean;
   originalSelector: string;
   spanIds: string[];
   pseudoSelector?: TPseudoSelector;
@@ -55,6 +56,7 @@ export type TAssertionSpanResult = Model<TRawAssertionSpanResult, {}>;
 export interface IResult {
   id: string;
   label: string;
+  assertionResult: TAssertionResultEntry;
 }
 
 export type TResultAssertions = Record<
@@ -64,3 +66,8 @@ export type TResultAssertions = Record<
     passed: IResult[];
   }
 >;
+
+export interface ICheckResult {
+  result: TAssertionSpanResult;
+  assertion: TAssertion;
+}

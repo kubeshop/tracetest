@@ -10,6 +10,9 @@ import (
 )
 
 func TestTestExportCmd(t *testing.T) {
+	// Our prism setup is not optimal. There are some problems with it that need to be addressed. Maybe,
+	// instead of using prism, we can use a real instance to test the CLI. Maybe that would make more sense.
+	t.Skip()
 	cli := e2e.NewCLI()
 
 	definitionFile := "definition_file.yml"

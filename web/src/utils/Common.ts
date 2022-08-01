@@ -14,3 +14,26 @@ export const isJson = (str: string) => {
 
   return Number.isNaN(Number(str)) && !isBoolean(str) && true;
 };
+
+export const getObjectIncludesText = (object: unknown, text: string): boolean => {
+  if (!text.length) return false;
+
+  const searchTextLower = text.toLowerCase();
+  const stringSpan = JSON.stringify(object).toLowerCase();
+
+  return stringSpan.includes(searchTextLower);
+};
+
+export const downloadFile = (data: string, fileName: string): Element => {
+  const element = document.createElement('a');
+  const file = new Blob([data]);
+  element.href = URL.createObjectURL(file);
+  element.download = fileName;
+  document.body.appendChild(element);
+  element.click();
+  return element;
+};
+
+export function enumKeys<O extends object, K extends keyof O = keyof O>(obj: O): K[] {
+  return Object.keys(obj).filter(k => Number.isNaN(Number(k))) as K[];
+}

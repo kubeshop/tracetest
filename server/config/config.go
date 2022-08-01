@@ -12,19 +12,11 @@ import (
 
 type (
 	Config struct {
-		Server                  ServerConfig                   `mapstructure:"server"`
-		PostgresConnString      string                         `mapstructure:"postgresConnString"`
-		JaegerConnectionConfig  *configgrpc.GRPCClientSettings `mapstructure:"jaegerConnectionConfig"`
-		TempoConnectionConfig   *configgrpc.GRPCClientSettings `mapstructure:"tempoConnectionConfig"`
-		PoolingConfig           PoolingConfig                  `mapstructure:"poolingConfig"`
-		GA                      GoogleAnalytics                `mapstructure:"googleAnalytics"`
-		PoolingRetryDelayString string                         `mapstructure:"poolingRetryDelay"`
-		Telemetry               TelemetryConfig                `mapstructure:"telemetry"`
-	}
-
-	ServerConfig struct {
-		PathPrefix string `mapstructure:"pathPrefix"`
-		HttpPort   int    `mapstructure:"httpPort"`
+		Server             ServerConfig    `mapstructure:"server"`
+		PostgresConnString string          `mapstructure:"postgresConnString"`
+		PoolingConfig      PoolingConfig   `mapstructure:"poolingConfig"`
+		GA                 GoogleAnalytics `mapstructure:"googleAnalytics"`
+		Telemetry          Telemetry       `mapstructure:"telemetry"`
 	}
 
 	GoogleAnalytics struct {
@@ -36,16 +28,42 @@ type (
 		RetryDelay          string `mapstructure:"retryDelay"`
 	}
 
-	TelemetryConfig struct {
-		ServiceName string                `mapstructure:"serviceName"`
-		Sampling    float64               `mapstructure:"sampling"`
-		Exporters   []string              `mapstructure:"exporters"`
-		Jaeger      JaegerTelemetryConfig `mapstructure:"jaeger"`
+	ServerConfig struct {
+		PathPrefix string                `mapstructure:"pathPrefix"`
+		HttpPort   int                   `mapstructure:"httpPort"`
+		Telemetry  ServerTelemetryConfig `mapstructure:"telemetry"`
 	}
 
-	JaegerTelemetryConfig struct {
-		Host string `mapstructure:"host"`
-		Port int    `mapstructure:"port"`
+	ServerTelemetryConfig struct {
+		Exporter            string `mapstructure:"exporter"`
+		ApplicationExporter string `mapstructure:"applicationExporter"`
+		DataStore           string `mapstructure:"dataStore"`
+	}
+
+	Telemetry struct {
+		DataStores map[string]TracingBackendDataStoreConfig `mapstructure:"dataStores"`
+		Exporters  map[string]TelemetryExporterOption       `mapstructure:"exporters"`
+	}
+
+	TracingBackendDataStoreConfig struct {
+		Type   string                        `mapstructure:"type"`
+		Jaeger configgrpc.GRPCClientSettings `mapstructure:"jaeger"`
+		Tempo  configgrpc.GRPCClientSettings `mapstructure:"tempo"`
+	}
+
+	TelemetryExporterOption struct {
+		ServiceName string         `mapstructure:"serviceName"`
+		Sampling    float64        `mapstructure:"sampling"`
+		Exporter    ExporterConfig `mapstructure:"exporter"`
+	}
+
+	ExporterConfig struct {
+		Type                   string              `mapstructure:"type"`
+		CollectorConfiguration OTELCollectorConfig `mapstructure:"collector"`
+	}
+
+	OTELCollectorConfig struct {
+		Endpoint string `mapstructure:"endpoint"`
 	}
 )
 
@@ -67,6 +85,40 @@ func (c Config) MaxWaitTimeForTraceDuration() time.Duration {
 	return maxWaitTimeForTrace
 }
 
+func (c Config) DataStore() (*TracingBackendDataStoreConfig, error) {
+	selectedStore := c.Server.Telemetry.DataStore
+	dataStoreConfig, found := c.Telemetry.DataStores[selectedStore]
+	if !found {
+		availableOptions := mapKeys(c.Telemetry.DataStores)
+		return nil, fmt.Errorf(`invalid data store option: "%s". Available options: %v`, selectedStore, availableOptions)
+	}
+
+	return &dataStoreConfig, nil
+}
+
+func (c Config) Exporter() (*TelemetryExporterOption, error) {
+	return c.getExporter(c.Server.Telemetry.Exporter)
+}
+
+func (c Config) ApplicationExporter() (*TelemetryExporterOption, error) {
+	return c.getExporter(c.Server.Telemetry.ApplicationExporter)
+}
+
+func (c Config) getExporter(name string) (*TelemetryExporterOption, error) {
+	// Exporters are optional: if no name was provided we consider that the user don't want to have them enabled
+	if name == "" {
+		return nil, nil
+	}
+
+	exporterConfig, found := c.Telemetry.Exporters[name]
+	if !found {
+		availableOptions := mapKeys(c.Telemetry.DataStores)
+		return nil, fmt.Errorf(`invalid exporter option: "%s". Available options: %v`, name, availableOptions)
+	}
+
+	return &exporterConfig, nil
+}
+
 func FromFile(file string) (Config, error) {
 	yamlFile, err := ioutil.ReadFile(file)
 	if err != nil {
@@ -86,4 +138,13 @@ func FromFile(file string) (Config, error) {
 	}
 
 	return c, nil
+}
+
+func mapKeys[T any](m map[string]T) []string {
+	keys := make([]string, 0)
+	for key, _ := range m {
+		keys = append(keys, key)
+	}
+
+	return keys
 }

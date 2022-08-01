@@ -14,6 +14,10 @@ func openApiInt(in int32) *int32 {
 	return &in
 }
 
+func openAPIStr(in string) *string {
+	return &in
+}
+
 func TestOpenAPIToDefinitionConversion(t *testing.T) {
 	testCases := []struct {
 		Name           string
@@ -27,9 +31,8 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 				Name:             openAPIStr("my test"),
 				Description:      openAPIStr("my test description"),
 				Version:          openApiInt(3),
-				ServiceUnderTest: &openapi.TestServiceUnderTest{},
+				ServiceUnderTest: &openapi.Trigger{},
 				Definition:       &openapi.TestDefinition{},
-				ReferenceTestRun: &openapi.TestRun{},
 			},
 			ExpectedOutput: definition.Test{
 				Id:             "624a8dea-f152-48d4-a742-30b210094959",
@@ -46,15 +49,18 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 				Name:        openAPIStr("my test"),
 				Description: openAPIStr("my test description"),
 				Version:     openApiInt(3),
-				ServiceUnderTest: &openapi.TestServiceUnderTest{
-					Request: &openapi.HTTPRequest{
-						Url:    openAPIStr("http://localhost:1234"),
-						Method: openAPIStr("POST"),
-						Headers: []openapi.HTTPHeader{
-							{Key: openAPIStr("Content-Type"), Value: openAPIStr("application/json")},
+				ServiceUnderTest: &openapi.Trigger{
+					TriggerType: openAPIStr("http"),
+					TriggerSettings: &openapi.TriggerTriggerSettings{
+						Http: &openapi.HTTPRequest{
+							Url:    openAPIStr("http://localhost:1234"),
+							Method: openAPIStr("POST"),
+							Headers: []openapi.HTTPHeader{
+								{Key: openAPIStr("Content-Type"), Value: openAPIStr("application/json")},
+							},
+							Body: openAPIStr(`{ "id": 52 }`),
+							Auth: &openapi.HTTPAuth{},
 						},
-						Body: openAPIStr(`{ "id": 52 }`),
-						Auth: &openapi.HTTPAuth{},
 					},
 				},
 			},
@@ -71,10 +77,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 							{Key: "Content-Type", Value: "application/json"},
 						},
 						Authentication: definition.HTTPAuthentication{},
-						Body: definition.HTTPBody{
-							Type: "raw",
-							Raw:  `{ "id": 52 }`,
-						},
+						Body:           `{ "id": 52 }`,
 					},
 				},
 				TestDefinition: []definition.TestDefinition{},
@@ -87,15 +90,18 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 				Name:        openAPIStr("my test"),
 				Description: openAPIStr("my test description"),
 				Version:     openApiInt(3),
-				ServiceUnderTest: &openapi.TestServiceUnderTest{
-					Request: &openapi.HTTPRequest{
-						Url:    openAPIStr("http://localhost:1234"),
-						Method: openAPIStr("POST"),
-						Headers: []openapi.HTTPHeader{
-							{Key: openAPIStr("Content-Type"), Value: openAPIStr("application/json")},
+				ServiceUnderTest: &openapi.Trigger{
+					TriggerType: openAPIStr("http"),
+					TriggerSettings: &openapi.TriggerTriggerSettings{
+						Http: &openapi.HTTPRequest{
+							Url:    openAPIStr("http://localhost:1234"),
+							Method: openAPIStr("POST"),
+							Headers: []openapi.HTTPHeader{
+								{Key: openAPIStr("Content-Type"), Value: openAPIStr("application/json")},
+							},
+							Body: nil,
+							Auth: &openapi.HTTPAuth{},
 						},
-						Body: nil,
-						Auth: &openapi.HTTPAuth{},
 					},
 				},
 			},
@@ -124,19 +130,22 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 				Name:        openAPIStr("my test"),
 				Description: openAPIStr("my test description"),
 				Version:     openApiInt(3),
-				ServiceUnderTest: &openapi.TestServiceUnderTest{
-					Request: &openapi.HTTPRequest{
-						Url:    openAPIStr("http://localhost:1234"),
-						Method: openAPIStr("POST"),
-						Headers: []openapi.HTTPHeader{
-							{Key: openAPIStr("Content-Type"), Value: openAPIStr("application/json")},
-						},
-						Body: openAPIStr(`{ "id": 52 }`),
-						Auth: &openapi.HTTPAuth{
-							Type: openAPIStr("basic"),
-							Basic: &openapi.HTTPAuthBasic{
-								Username: openAPIStr("my username"),
-								Password: openAPIStr("my password"),
+				ServiceUnderTest: &openapi.Trigger{
+					TriggerType: openAPIStr("http"),
+					TriggerSettings: &openapi.TriggerTriggerSettings{
+						Http: &openapi.HTTPRequest{
+							Url:    openAPIStr("http://localhost:1234"),
+							Method: openAPIStr("POST"),
+							Headers: []openapi.HTTPHeader{
+								{Key: openAPIStr("Content-Type"), Value: openAPIStr("application/json")},
+							},
+							Body: openAPIStr(`{ "id": 52 }`),
+							Auth: &openapi.HTTPAuth{
+								Type: openAPIStr("basic"),
+								Basic: &openapi.HTTPAuthBasic{
+									Username: openAPIStr("my username"),
+									Password: openAPIStr("my password"),
+								},
 							},
 						},
 					},
@@ -156,15 +165,12 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 						},
 						Authentication: definition.HTTPAuthentication{
 							Type: "basic",
-							BasicAuth: definition.HTTPBasicAuth{
+							Basic: definition.HTTPBasicAuth{
 								User:     "my username",
 								Password: "my password",
 							},
 						},
-						Body: definition.HTTPBody{
-							Type: "raw",
-							Raw:  `{ "id": 52 }`,
-						},
+						Body: `{ "id": 52 }`,
 					},
 				},
 				TestDefinition: []definition.TestDefinition{},
@@ -177,20 +183,23 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 				Name:        openAPIStr("my test"),
 				Description: openAPIStr("my test description"),
 				Version:     openApiInt(3),
-				ServiceUnderTest: &openapi.TestServiceUnderTest{
-					Request: &openapi.HTTPRequest{
-						Url:    openAPIStr("http://localhost:1234"),
-						Method: openAPIStr("POST"),
-						Headers: []openapi.HTTPHeader{
-							{Key: openAPIStr("Content-Type"), Value: openAPIStr("application/json")},
-						},
-						Body: openAPIStr(`{ "id": 52 }`),
-						Auth: &openapi.HTTPAuth{
-							Type: openAPIStr("apikey"),
-							ApiKey: &openapi.HTTPAuthApiKey{
-								Key:   openAPIStr("X-Key"),
-								Value: openAPIStr("my-key"),
-								In:    openAPIStr("header"),
+				ServiceUnderTest: &openapi.Trigger{
+					TriggerType: openAPIStr("http"),
+					TriggerSettings: &openapi.TriggerTriggerSettings{
+						Http: &openapi.HTTPRequest{
+							Url:    openAPIStr("http://localhost:1234"),
+							Method: openAPIStr("POST"),
+							Headers: []openapi.HTTPHeader{
+								{Key: openAPIStr("Content-Type"), Value: openAPIStr("application/json")},
+							},
+							Body: openAPIStr(`{ "id": 52 }`),
+							Auth: &openapi.HTTPAuth{
+								Type: openAPIStr("apikey"),
+								ApiKey: &openapi.HTTPAuthApiKey{
+									Key:   openAPIStr("X-Key"),
+									Value: openAPIStr("my-key"),
+									In:    openAPIStr("header"),
+								},
 							},
 						},
 					},
@@ -216,10 +225,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 								In:    "header",
 							},
 						},
-						Body: definition.HTTPBody{
-							Type: "raw",
-							Raw:  `{ "id": 52 }`,
-						},
+						Body: `{ "id": 52 }`,
 					},
 				},
 				TestDefinition: []definition.TestDefinition{},
@@ -232,18 +238,21 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 				Name:        openAPIStr("my test"),
 				Description: openAPIStr("my test description"),
 				Version:     openApiInt(3),
-				ServiceUnderTest: &openapi.TestServiceUnderTest{
-					Request: &openapi.HTTPRequest{
-						Url:    openAPIStr("http://localhost:1234"),
-						Method: openAPIStr("POST"),
-						Headers: []openapi.HTTPHeader{
-							{Key: openAPIStr("Content-Type"), Value: openAPIStr("application/json")},
-						},
-						Body: openAPIStr(`{ "id": 52 }`),
-						Auth: &openapi.HTTPAuth{
-							Type: openAPIStr("bearer"),
-							Bearer: &openapi.HTTPAuthBearer{
-								Token: openAPIStr("my token"),
+				ServiceUnderTest: &openapi.Trigger{
+					TriggerType: openAPIStr("http"),
+					TriggerSettings: &openapi.TriggerTriggerSettings{
+						Http: &openapi.HTTPRequest{
+							Url:    openAPIStr("http://localhost:1234"),
+							Method: openAPIStr("POST"),
+							Headers: []openapi.HTTPHeader{
+								{Key: openAPIStr("Content-Type"), Value: openAPIStr("application/json")},
+							},
+							Body: openAPIStr(`{ "id": 52 }`),
+							Auth: &openapi.HTTPAuth{
+								Type: openAPIStr("bearer"),
+								Bearer: &openapi.HTTPAuthBearer{
+									Token: openAPIStr("my token"),
+								},
 							},
 						},
 					},
@@ -267,10 +276,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 								Token: "my token",
 							},
 						},
-						Body: definition.HTTPBody{
-							Type: "raw",
-							Raw:  `{ "id": 52 }`,
-						},
+						Body: `{ "id": 52 }`,
 					},
 				},
 				TestDefinition: []definition.TestDefinition{},
@@ -283,11 +289,13 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 				Name:             openAPIStr("my test"),
 				Description:      openAPIStr("my test description"),
 				Version:          openApiInt(3),
-				ServiceUnderTest: &openapi.TestServiceUnderTest{},
+				ServiceUnderTest: &openapi.Trigger{},
 				Definition: &openapi.TestDefinition{
 					Definitions: []openapi.TestDefinitionDefinitions{
 						{
-							Selector: openAPIStr(`span[name = "my span name"]`),
+							Selector: &openapi.Selector{
+								Query: openAPIStr(`span[name = "my span name"]`),
+							},
 							Assertions: []openapi.Assertion{
 								{
 									Attribute:  openAPIStr("tracetest.span.duration"),
@@ -303,7 +311,6 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 						},
 					},
 				},
-				ReferenceTestRun: &openapi.TestRun{},
 			},
 			ExpectedOutput: definition.Test{
 				Id:          "624a8dea-f152-48d4-a742-30b210094959",

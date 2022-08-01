@@ -1,14 +1,15 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
-import {TRecursivePartial} from 'types/Common.types';
+import {uniq} from 'lodash';
+import WebSocketService, {IListenerFunction} from 'services/WebSocket.service';
 import {TRawTest, TTest} from 'types/Test.types';
-import {HTTP_METHOD} from '../../constants/Common.constants';
-import AssertionResults from '../../models/AssertionResults.model';
-import Test from '../../models/Test.model';
-import TestDefinition from '../../models/TestDefinition.model';
-import TestRun from '../../models/TestRun.model';
-import {TAssertion, TAssertionResults, TRawAssertionResults} from '../../types/Assertion.types';
-import {TRawTestDefinition, TTestDefinition} from '../../types/TestDefinition.types';
-import {TRawTestRun, TTestRun} from '../../types/TestRun.types';
+import {HTTP_METHOD} from 'constants/Common.constants';
+import AssertionResults from 'models/AssertionResults.model';
+import Test from 'models/Test.model';
+import TestDefinition from 'models/TestDefinition.model';
+import TestRun from 'models/TestRun.model';
+import {TAssertion, TAssertionResults, TRawAssertionResults} from 'types/Assertion.types';
+import {TRawTestDefinition, TTestDefinition} from 'types/TestDefinition.types';
+import {TRawTestRun, TTestRun} from 'types/TestRun.types';
 
 const PATH = `${document.baseURI}api/`;
 
@@ -27,7 +28,7 @@ const TraceTestAPI = createApi({
   tagTypes: Object.values(Tags),
   endpoints: build => ({
     // Tests
-    createTest: build.mutation<TTest, TRecursivePartial<TTest>>({
+    createTest: build.mutation<TTest, TRawTest>({
       query: newTest => ({
         url: '/tests',
         method: HTTP_METHOD.POST,
@@ -36,8 +37,19 @@ const TraceTestAPI = createApi({
       transformResponse: (rawTest: TRawTest) => Test(rawTest),
       invalidatesTags: [{type: Tags.TEST, id: 'LIST'}],
     }),
-    getTestList: build.query<TTest[], void>({
-      query: () => '/tests',
+    editTest: build.mutation<TTest, {test: TRawTest; testId: string}>({
+      query: ({test, testId}) => ({
+        url: `/tests/${testId}`,
+        method: HTTP_METHOD.PUT,
+        body: test,
+      }),
+      invalidatesTags: test => [
+        {type: Tags.TEST, id: 'LIST'},
+        {type: Tags.TEST, id: test?.id},
+      ],
+    }),
+    getTestList: build.query<TTest[], {take?: number; skip?: number}>({
+      query: ({take = 25, skip = 0}) => `/tests?take=${take}&skip=${skip}`,
       providesTags: () => [{type: Tags.TEST, id: 'LIST'}],
       transformResponse: (rawTestList: TTest[]) => rawTestList.map(rawTest => Test(rawTest)),
     }),
@@ -92,6 +104,17 @@ const TraceTestAPI = createApi({
       query: ({testId, runId}) => `/tests/${testId}/run/${runId}`,
       providesTags: result => (result ? [{type: Tags.TEST_RUN, id: result?.id}] : []),
       transformResponse: (rawTestResult: TRawTestRun) => TestRun(rawTestResult),
+      async onCacheEntryAdded(arg, {cacheDataLoaded, cacheEntryRemoved, updateCachedData}) {
+        const listener: IListenerFunction<TRawTestRun> = data => {
+          updateCachedData(() => TestRun(data.event));
+        };
+        await WebSocketService.initWebSocketSubscription({
+          listener,
+          resource: `test/${arg.testId}/run/${arg.runId}`,
+          waitToCleanSubscription: cacheEntryRemoved,
+          waitToInitSubscription: cacheDataLoaded,
+        });
+      },
     }),
     reRun: build.mutation<TTestRun, {testId: string; runId: string}>({
       query: ({testId, runId}) => ({
@@ -119,11 +142,25 @@ const TraceTestAPI = createApi({
       query: ({testId, runId}) => ({url: `/tests/${testId}/run/${runId}`, method: 'DELETE'}),
       invalidatesTags: (result, error, {testId}) => [{type: Tags.TEST_RUN, id: `${testId}-LIST`}],
     }),
+    getJUnitByRunId: build.query<string, {testId: string; runId: string}>({
+      query: ({testId, runId}) => ({url: `/tests/${testId}/run/${runId}/junit.xml`, responseHandler: 'text'}),
+      providesTags: (result, error, {testId, runId}) => [{type: Tags.TEST_RUN, id: `${testId}-${runId}-junit`}],
+    }),
+    getTestDefinitionYamlByRunId: build.query<string, {testId: string; version: number}>({
+      query: ({testId, version}) => ({
+        url: `/tests/${testId}/version/${version}/definition.yaml`,
+        responseHandler: 'text',
+      }),
+      providesTags: (result, error, {testId, version}) => [
+        {type: Tags.TEST_RUN, id: `${testId}-${version}-definition`},
+      ],
+    }),
 
     // Spans
     getSelectedSpans: build.query<string[], {testId: string; runId: string; query: string}>({
       query: ({testId, runId, query}) => `/tests/${testId}/run/${runId}/select?query=${encodeURIComponent(query)}`,
       providesTags: (result, error, {query}) => (result ? [{type: Tags.SPAN, id: `${query}-LIST`}] : []),
+      transformResponse: (rawSpanList: string[]) => uniq(rawSpanList),
     }),
   }),
 });
@@ -139,10 +176,16 @@ export const {
   useGetRunByIdQuery,
   useGetRunListQuery,
   useGetSelectedSpansQuery,
+  useLazyGetSelectedSpansQuery,
   useReRunMutation,
   useLazyGetRunListQuery,
   useDryRunMutation,
   useDeleteRunByIdMutation,
+  useGetJUnitByRunIdQuery,
+  useLazyGetJUnitByRunIdQuery,
+  useGetTestDefinitionYamlByRunIdQuery,
+  useLazyGetTestDefinitionYamlByRunIdQuery,
+  useEditTestMutation,
 } = TraceTestAPI;
 export const {endpoints} = TraceTestAPI;
 

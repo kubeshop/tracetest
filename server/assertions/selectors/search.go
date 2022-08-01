@@ -5,7 +5,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-func filterSpans(rootSpan traces.Span, spanSelector spanSelector) []traces.Span {
+func filterSpans(rootSpan traces.Span, spanSelector SpanSelector) []traces.Span {
 	filteredSpans := make([]traces.Span, 0)
 	traverseTree(rootSpan, func(span traces.Span) {
 		if spanSelector.MatchesFilters(span) {
@@ -20,8 +20,8 @@ func filterSpans(rootSpan traces.Span, spanSelector spanSelector) []traces.Span 
 
 	uniqueSpans := filterDuplicated(filteredSpans)
 
-	if spanSelector.PsedoClass != nil {
-		return spanSelector.PsedoClass.Filter(uniqueSpans)
+	if spanSelector.PseudoClass != nil {
+		return spanSelector.PseudoClass.Filter(uniqueSpans)
 	}
 
 	return uniqueSpans

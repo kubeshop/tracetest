@@ -1,59 +1,46 @@
-import {Button, Typography} from 'antd';
+import {Typography} from 'antd';
 import styled from 'styled-components';
 
-import noResultsIcon from 'assets/SpanAssertionsEmptyState.svg';
-
-export const SpanHeader = styled.div`
-  width: 100%;
-  align-items: center;
-  margin-bottom: 24px;
+export const Header = styled.div`
+  margin-bottom: 8px;
 `;
 
-export const SpanHeaderTitle = styled(Typography.Title).attrs({
-  level: 5,
-})`
+export const HeaderItem = styled.div`
+  align-items: center;
+  color: ${({theme}) => theme.color.text};
+  display: flex;
+  font-size: ${({theme}) => theme.size.md};
+  margin-right: 8px;
+`;
+
+export const HeaderItemText = styled(Typography.Text)`
+  color: inherit;
+  margin-left: 5px;
+`;
+
+export const HeaderTitle = styled(Typography.Title)`
   && {
-    margin-bottom: 5px;
+    margin: 0 0 0 8px;
   }
 `;
 
-export const DetailsContainer = styled.div`
-  padding: 24px;
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  margin-bottom: 16px;
-`;
-
-export const DetailsEmptyStateContainer = styled.div`
-  display: flex;
-  justify-content: center;
+export const Row = styled.div`
   align-items: center;
-  margin-top: 40px;
-  flex-direction: column;
-  gap: 14px;
-  overflow-y: auto;
+  display: flex;
+  margin-bottom: 4px;
 `;
-
-export const DetailsTableEmptyStateIcon = styled.img.attrs({
-  src: noResultsIcon,
-})``;
 
 export const SpanDetail = styled.div`
-  padding: 24px;
   display: flex;
   flex-direction: column;
+  padding: 24px;
 `;
 
-export const AssertionActionsContainer = styled.div`
-  margin-bottom: 24px;
-  margin-top: 16px;
-  display: flex;
-  justify-content: flex-end;
-`;
-
-export const AddAssertionButton = styled(Button).attrs({
-  type: 'primary',
-})`
-  && {
-    font-weight: 600;
-  }
+export const Dot = styled.div`
+  background-color: ${({theme}) => theme.color.textHighlight};
+  border-radius: 50%;
+  display: inline-block;
+  height: 10px;
+  margin-left: 5px;
+  width: 10px;
 `;

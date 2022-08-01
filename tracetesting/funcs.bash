@@ -1,11 +1,11 @@
 #!/bin/bash
 
 tracetest_main() {
-   $TRACETEST_CMD --config ./config.main.yml $@
+   $TRACETEST_CLI --config ./config.main.yml $@
 }
 
 tracetest_target() {
-  $TRACETEST_CMD --config ./config.target.yml $@
+  $TRACETEST_CLI --config ./config.target.yml $@
 }
 
 tracetest_target_curl() {
@@ -15,6 +15,28 @@ tracetest_target_curl() {
   curl -sSL "http://$TRACETEST_TARGET_ENDPOINT$reqPath" $@
 }
 
+test() {
+  name=$1
+  definition=$2
+
+  echo -n "-> $name "
+  run_test $name $definition
+  res=$?
+  if [ "$res" = 0 ]; then
+    echo -n "OK"
+  else
+    echo "FAIL"
+    echo "$name.json:"
+    cat results/responses/$name.json
+    echo
+    echo "$name.xml:"
+    cat results/$name.xml
+
+  fi
+  echo
+  return $res
+}
+
 run_test() {
   name=$1
   definition=$2
@@ -22,10 +44,21 @@ run_test() {
 
   allPassed=$(cat results/responses/$name.json | jq -rc '.testRun.result.allPassed')
   if [ ! "$allPassed" = "true" ]; then
-    echo "-> $name FAIL"
     return 1
   else
-    echo "-> $name OK"
     return 0
   fi
+}
+
+require_not_empty() {
+  case $1 in
+    "" | "null")
+      echo $2
+      return 1
+      ;;
+
+    *)
+      return 0
+      ;;
+  esac
 }

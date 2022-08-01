@@ -1,0 +1,188 @@
+{
+	"info": {
+		"_postman_id": "d357f1b8-858f-43c6-b823-917a47f81f34",
+		"name": "Tracetest",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "3017692"
+	},
+	"item": [
+		{
+			"name": "Actions",
+			"item": [
+				{
+					"name": "Remove",
+					"item": [
+						{
+							"name": "delete test",
+							"request": {
+								"auth": {
+									"type": "basic",
+									"basic": [
+										{
+											"key": "password",
+											"value": "password",
+											"type": "string"
+										},
+										{
+											"key": "username",
+											"value": "username",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://demo-pokemon-api.demo.svc.cluster.local/pokemon?take=20&skip=0",
+									"protocol": "http",
+									"host": [
+										"demo-pokemon-api",
+										"demo",
+										"svc",
+										"cluster",
+										"local"
+									],
+									"path": [
+										"pokemon"
+									],
+									"query": [
+										{
+											"key": "take",
+											"value": "20"
+										},
+										{
+											"key": "skip",
+											"value": "0"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "create Test",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "key",
+									"value": "{{API_KEY}}",
+									"type": "string"
+								},
+								{
+									"key": "value",
+									"value": "{{API_KEY}}",
+									"type": "string"
+								},
+								{
+									"key": "in",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "CESCO-{{API_KEY}}",
+								"value": "{{API_KEY}}-sdfsdfsdf",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{id:33}"
+						},
+						"url": {
+							"raw": "http://demo-pokemon-api.demo.svc.cluster.local/pokemon?take=20&skip={{API_KEY}}",
+							"protocol": "http",
+							"host": [
+								"demo-pokemon-api",
+								"demo",
+								"svc",
+								"cluster",
+								"local"
+							],
+							"path": [
+								"pokemon"
+							],
+							"query": [
+								{
+									"key": "take",
+									"value": "20"
+								},
+								{
+									"key": "skip",
+									"value": "{{API_KEY}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "List Test",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "wsfdagsdfgsdfg",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept-Charset",
+						"value": "asdkj",
+						"type": "text"
+					},
+					{
+						"key": "Cache-Control",
+						"value": "33232",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://demo-pokemon-api.demo.svc.cluster.local/pokemon?take=20&skip=0",
+					"protocol": "http",
+					"host": [
+						"demo-pokemon-api",
+						"demo",
+						"svc",
+						"cluster",
+						"local"
+					],
+					"path": [
+						"pokemon"
+					],
+					"query": [
+						{
+							"key": "take",
+							"value": "20"
+						},
+						{
+							"key": "skip",
+							"value": "0"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "API_KEY",
+			"value": "api from Variable"
+		}
+	]
+}

@@ -1,8 +1,8 @@
 import {CaseReducer, PayloadAction} from '@reduxjs/toolkit';
+import { ResultViewModes } from '../constants/Test.constants';
 import {TChange} from '../redux/actions/TestDefinition.actions';
-import {TAssertion, TAssertionResults} from './Assertion.types';
+import {TAssertion, TAssertionResultEntry, TAssertionResults} from './Assertion.types';
 import {Model, TTestSchemas} from './Common.types';
-import {TSpan} from './Span.types';
 
 export type TRawTestDefinition = TTestSchemas['TestDefinition'];
 
@@ -12,10 +12,11 @@ export type TTestDefinitionEntry = {
   assertionList: TAssertion[];
   isDraft: boolean;
   isDeleted?: boolean;
+  isAdvancedSelector: boolean;
 };
 
 export type TRawTestDefinitionEntry = {
-  selector: string;
+  selector: {query: string};
   assertions: TAssertion[];
 };
 
@@ -26,7 +27,6 @@ export type TTestDefinition = Model<
     definitions?: TRawTestDefinition;
   }
 >;
-
 export interface ITestDefinitionState {
   initialDefinitionList: TTestDefinitionEntry[];
   definitionList: TTestDefinitionEntry[];
@@ -34,10 +34,9 @@ export interface ITestDefinitionState {
   changeList: TChange[];
   isLoading: boolean;
   isInitialized: boolean;
-  affectedSpans: string[];
-  selectedAssertion: string;
-  selectedSpan?: TSpan;
+  selectedAssertion: string | undefined;
   isDraftMode: boolean;
+  viewResultsMode: ResultViewModes;
 }
 
 export type TTestDefinitionSliceActions = {
@@ -52,8 +51,5 @@ export type TTestDefinitionSliceActions = {
   revertDefinition: CaseReducer<ITestDefinitionState, PayloadAction<{originalSelector: string}>>;
   resetDefinitionList: CaseReducer<ITestDefinitionState>;
   setAssertionResults: CaseReducer<ITestDefinitionState, PayloadAction<TAssertionResults>>;
-  clearAffectedSpans: CaseReducer<ITestDefinitionState>;
-  setAffectedSpans: CaseReducer<ITestDefinitionState, PayloadAction<string[]>>;
-  setSelectedAssertion: CaseReducer<ITestDefinitionState, PayloadAction<string>>;
-  setSelectedSpan: CaseReducer<ITestDefinitionState, PayloadAction<TSpan | undefined>>;
+  setSelectedAssertion: CaseReducer<ITestDefinitionState, PayloadAction<TAssertionResultEntry | undefined>>;
 };

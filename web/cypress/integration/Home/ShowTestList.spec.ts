@@ -1,18 +1,7 @@
 import {DOCUMENTATION_URL, GITHUB_URL} from '../../../src/constants/Common.constants';
-import {createTest, deleteTest} from '../utils/Common';
 
 describe('Home', () => {
-  before(() => {
-    createTest();
-  });
-
-  after(() => {
-    deleteTest();
-  });
-
-  beforeEach(() => {
-    cy.visit('http://localhost:3000/');
-  });
+  beforeEach(() => cy.visit('http://localhost:3000/'));
 
   it('should render the layout', () => {
     cy.get('[data-cy=documentation-link]').should('have.attr', 'href', DOCUMENTATION_URL);

@@ -1,17 +1,16 @@
-import {SemanticGroupNames, SemanticGroupsSignature} from '../constants/SemanticGroupNames.constants';
-
-import {TRawSpan, TSpan, TSpanFlatAttribute} from '../types/Span.types';
-import {TSpanAttribute} from '../types/SpanAttribute.types';
+import {
+  SemanticGroupNames,
+  SemanticGroupNamesToSystem,
+  SemanticGroupsSignature,
+} from 'constants/SemanticGroupNames.constants';
+import {Attributes} from 'constants/SpanAttribute.constants';
+import {SpanKind} from 'constants/Span.constants';
+import {TRawSpan, TSpan, TSpanFlatAttribute} from 'types/Span.types';
+import {TSpanAttribute} from 'types/SpanAttribute.types';
 import SpanAttribute from './SpanAttribute.model';
 
 const SemanticGroupNamesList = Object.values(SemanticGroupNames);
-
-const getSpanType = (attributeList: TSpanFlatAttribute[]) => {
-  const findAttribute = (groupName: SemanticGroupNames) =>
-    attributeList.find(({key}) => key.trim().startsWith(groupName));
-
-  return SemanticGroupNamesList.find(groupName => Boolean(findAttribute(groupName))) || SemanticGroupNames.General;
-};
+const SpanKindList = Object.values(SpanKind);
 
 const getSpanSignature = (
   attributes: Record<string, TSpanAttribute>,
@@ -45,14 +44,21 @@ const Span = ({id = '', attributes = {}, startTime = 0, endTime = 0, parentId = 
     return {...map, [spanAttribute.name]: SpanAttribute(rawSpanAttribute)};
   }, {});
 
-  const duration = Number(attributes['tracetest.span.duration']) || 0;
-  const name = attributes.name || '';
-  const type = getSpanType(attributeList);
+  const name = attributes[Attributes.NAME] || '';
+  const kind = SpanKindList.find(spanKind => spanKind === attributes[Attributes.KIND]) || SpanKind.INTERNAL;
+  const duration = attributes[Attributes.TRACETEST_SPAN_DURATION] || '0ns';
+  const type =
+    SemanticGroupNamesList.find(
+      semanticGroupName => semanticGroupName === attributes[Attributes.TRACETEST_SPAN_TYPE]
+    ) || SemanticGroupNames.General;
+  const service = attributes?.[Attributes.SERVICE_NAME] ?? '';
+  const system = attributes?.[SemanticGroupNamesToSystem[type]] ?? '';
 
   return {
     id,
     parentId,
     name,
+    kind,
     startTime,
     endTime,
     attributes: attributesMap,
@@ -60,6 +66,8 @@ const Span = ({id = '', attributes = {}, startTime = 0, endTime = 0, parentId = 
     type,
     duration,
     signature: getSpanSignature(attributesMap, type),
+    service,
+    system,
   };
 };
 

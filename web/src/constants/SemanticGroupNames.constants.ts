@@ -1,66 +1,59 @@
 import {Attributes} from './SpanAttribute.constants';
 
 export enum SemanticGroupNames {
+  General = 'general',
   Http = 'http',
+  Database = 'database',
   Rpc = 'rpc',
   Messaging = 'messaging',
   Faas = 'faas',
   Exception = 'exception',
-  General = 'general',
   Compatibility = 'compatibility',
-  Database = 'db',
 }
 
 export const SemanticGroupNamesToText = {
-  [SemanticGroupNames.Database]: 'Database',
+  [SemanticGroupNames.General]: 'General',
   [SemanticGroupNames.Http]: 'HTTP',
+  [SemanticGroupNames.Database]: 'Database',
   [SemanticGroupNames.Rpc]: 'RPC',
   [SemanticGroupNames.Messaging]: 'Messaging',
-  [SemanticGroupNames.Faas]: 'FASS',
+  [SemanticGroupNames.Faas]: 'FaaS',
   [SemanticGroupNames.Exception]: 'Exception',
-  [SemanticGroupNames.General]: 'General',
   [SemanticGroupNames.Compatibility]: 'Compatibility',
-};
+} as const;
 
-export const SemanticGroupNameNodeMap: Record<SemanticGroupNames, {primary: string[]; type: string}> = {
-  [SemanticGroupNames.Http]: {
-    primary: [Attributes.HTTP_TARGET, Attributes.SERVICE_NAME],
-    type: '',
-  },
-  [SemanticGroupNames.Database]: {
-    primary: [
-      Attributes.DB_MONGODB_COLLECTION,
-      Attributes.DB_SQL_TABLE,
-      Attributes.DB_CASSANDRA_TABLE,
-      Attributes.SERVICE_NAME,
-    ],
-    type: Attributes.DB_SYSTEM,
-  },
-  [SemanticGroupNames.Rpc]: {
-    primary: [Attributes.RPC_SYSTEM, Attributes.SERVICE_NAME],
-    type: Attributes.RPC_SYSTEM,
-  },
-  [SemanticGroupNames.Messaging]: {
-    primary: [Attributes.MESSAGING_DESTINATION, Attributes.SERVICE_NAME],
-    type: Attributes.MESSAGING_SYSTEM,
-  },
-  [SemanticGroupNames.Faas]: {
-    primary: [Attributes.NAME, Attributes.SERVICE_NAME],
-    type: '',
-  },
-  [SemanticGroupNames.Exception]: {
-    primary: [Attributes.EXCEPTION_TYPE, Attributes.SERVICE_NAME],
-    type: '',
-  },
-  [SemanticGroupNames.General]: {
-    primary: [Attributes.NAME, Attributes.SERVICE_NAME],
-    type: '',
-  },
-  [SemanticGroupNames.Compatibility]: {
-    primary: [Attributes.NAME, Attributes.SERVICE_NAME],
-    type: '',
-  },
-};
+export const SemanticGroupNamesToColor = {
+  [SemanticGroupNames.General]: '#FFBB96',
+  [SemanticGroupNames.Http]: '#C1E095',
+  [SemanticGroupNames.Database]: '#EFDBFF',
+  [SemanticGroupNames.Rpc]: '#87E8DE',
+  [SemanticGroupNames.Messaging]: '#91D5FF',
+  [SemanticGroupNames.Faas]: '#FFD591',
+  [SemanticGroupNames.Exception]: '#FFFB8F',
+  [SemanticGroupNames.Compatibility]: '#ADC6FF',
+} as const;
+
+export const SemanticGroupNamesToLightColor = {
+  [SemanticGroupNames.General]: 'rgba(255, 187, 150, 0.3)',
+  [SemanticGroupNames.Http]: 'rgba(193, 224, 149, 0.3)',
+  [SemanticGroupNames.Database]: 'rgba(239, 219, 255, 0.3)',
+  [SemanticGroupNames.Rpc]: 'rgba(135, 232, 222, 0.3)',
+  [SemanticGroupNames.Messaging]: 'rgba(145, 213, 255, 0.3)',
+  [SemanticGroupNames.Faas]: 'rgba(255, 213, 145, 0.3)',
+  [SemanticGroupNames.Exception]: 'rgba(255, 251, 143, 0.3)',
+  [SemanticGroupNames.Compatibility]: 'rgba(173, 198, 255, 0.3)',
+} as const;
+
+export const SemanticGroupNamesToSystem = {
+  [SemanticGroupNames.General]: '',
+  [SemanticGroupNames.Http]: '',
+  [SemanticGroupNames.Database]: Attributes.DB_SYSTEM,
+  [SemanticGroupNames.Rpc]: Attributes.RPC_SYSTEM,
+  [SemanticGroupNames.Messaging]: Attributes.MESSAGING_SYSTEM,
+  [SemanticGroupNames.Faas]: Attributes.CLOUD_PROVIDER,
+  [SemanticGroupNames.Exception]: '',
+  [SemanticGroupNames.Compatibility]: '',
+} as const;
 
 export const BASE_ATTRIBUTES = [Attributes.TRACETEST_SPAN_TYPE, Attributes.SERVICE_NAME, Attributes.NAME];
 

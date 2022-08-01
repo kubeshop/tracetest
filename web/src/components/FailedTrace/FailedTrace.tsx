@@ -1,7 +1,8 @@
 import {Button, Typography} from 'antd';
 import {useCallback} from 'react';
+import {Link, useNavigate} from 'react-router-dom';
 import {DISCORD_URL, GITHUB_ISSUES_URL} from '../../constants/Common.constants';
-import {useRunTestMutation} from '../../redux/apis/TraceTest.api';
+import {useReRunMutation} from '../../redux/apis/TraceTest.api';
 import {TTestRun} from '../../types/TestRun.types';
 import * as S from './FailedTrace.styled';
 
@@ -9,30 +10,24 @@ interface IFailedTraceProps {
   isDisplayingError: boolean;
   run: TTestRun;
   testId: string;
-  onEdit(): void;
-  onRunTest(result: TTestRun): void;
 }
 
-const FailedTrace: React.FC<IFailedTraceProps> = ({
-  onRunTest,
-  onEdit,
-  testId,
-  isDisplayingError,
-  run: {lastErrorState},
-}) => {
-  const [runNewTest] = useRunTestMutation();
+const FailedTrace: React.FC<IFailedTraceProps> = ({testId, isDisplayingError, run: {lastErrorState, id}}) => {
+  const [reRunTest] = useReRunMutation();
+  const navigate = useNavigate();
 
   const onReRun = useCallback(async () => {
-    const result = await runNewTest({testId}).unwrap();
-    onRunTest(result);
-  }, [onRunTest, runNewTest, testId]);
+    const result = await reRunTest({testId, runId: id}).unwrap();
+
+    navigate(`/test/${testId}/run/${result.id}`);
+  }, [id, navigate, reRunTest, testId]);
 
   return isDisplayingError ? (
     <S.FailedTrace>
       <S.Container>
         <S.FailedIcon />
         <S.TextContainer>
-          <Typography.Title level={3}>Test Run Failed</Typography.Title>
+          <Typography.Title level={1}>Test Run Failed</Typography.Title>
           <Typography.Text type="secondary">{lastErrorState}</Typography.Text>
           <Typography.Text type="secondary">
             Please let us know about this issue - <a href={GITHUB_ISSUES_URL}>create an issue</a> or contact us via{' '}
@@ -41,9 +36,11 @@ const FailedTrace: React.FC<IFailedTraceProps> = ({
           <Typography.Text type="secondary">We will check it out and respond to you.</Typography.Text>
         </S.TextContainer>
         <S.ButtonContainer>
-          <Button type="primary" ghost onClick={onEdit}>
-            Edit Test
-          </Button>
+          <Link to={`/test/${testId}/edit`}>
+            <Button type="primary" ghost>
+              Edit Test
+            </Button>
+          </Link>
           <Button type="primary" ghost onClick={onReRun}>
             Rerun Test
           </Button>

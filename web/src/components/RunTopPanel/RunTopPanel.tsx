@@ -1,47 +1,38 @@
 import {useState} from 'react';
+import {ReflexSplitter} from 'react-reflex';
 
 import Diagram from 'components/Diagram';
 import {SupportedDiagrams} from 'components/Diagram/Diagram';
 import DiagramSwitcher from 'components/DiagramSwitcher';
 import SpanDetail from 'components/SpanDetail';
-import {useAppSelector} from 'redux/hooks';
-import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
 import TraceAnalyticsService from 'services/Analytics/TraceAnalytics.service';
-import {TSpan} from 'types/Span.types';
+import {useSpan} from 'providers/Span/Span.provider';
 import {TTestRun} from 'types/TestRun.types';
 import * as S from './RunTopPanel.styled';
 
 interface IProps {
-  onSelectSpan: (spanId: string) => void;
   run: TTestRun;
-  selectedSpan: TSpan;
 }
 
-const RunTopPanel = ({onSelectSpan, run, selectedSpan}: IProps) => {
+const RunTopPanel = ({run}: IProps) => {
   const [diagramType, setDiagramType] = useState<SupportedDiagrams>(SupportedDiagrams.DAG);
-  const affectedSpans = useAppSelector(TestDefinitionSelectors.selectAffectedSpans);
+  const {onSearch, selectedSpan} = useSpan();
 
   return (
-    <S.Container>
-      <S.LeftPanel>
+    <S.Container orientation="vertical">
+      <S.LeftPanel minSize={600}>
         <DiagramSwitcher
           onTypeChange={type => {
             TraceAnalyticsService.onSwitchDiagramView(type);
             setDiagramType(type);
           }}
-          onSearch={() => console.log('onSearch')}
+          onSearch={onSearch}
           selectedType={diagramType}
         />
-        <Diagram
-          affectedSpans={affectedSpans}
-          onSelectSpan={onSelectSpan}
-          selectedSpan={selectedSpan}
-          trace={run.trace!}
-          runState={run.state}
-          type={diagramType}
-        />
+        <Diagram trace={run.trace!} runState={run.state} type={diagramType} />
       </S.LeftPanel>
-      <S.RightPanel>
+      <ReflexSplitter />
+      <S.RightPanel minSize={500}>
         <SpanDetail span={selectedSpan} />
       </S.RightPanel>
     </S.Container>

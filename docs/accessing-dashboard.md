@@ -10,6 +10,6 @@ Run:
 kubectl port-forward svc/tracetest 8080
 ```
 
-Launch the dashboard in a browser to [http://localhost:8080/](http://localhost:8080/).
+Then launch a browser to [http://localhost:8080/](http://localhost:8080/).
 
-To learn how to create your first test, see [Create a Test](create-test.md).
+To learn how to create your first test, see [create a test](create-test.md).

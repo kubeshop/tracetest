@@ -1,6 +1,8 @@
-import {createSlice} from '@reduxjs/toolkit';
+import {createAction, createSlice} from '@reduxjs/toolkit';
 import {TAssertionResults} from 'types/Assertion.types';
 import {ITestDefinitionState, TTestDefinitionEntry, TTestDefinitionSliceActions} from 'types/TestDefinition.types';
+import {ResultViewModes} from 'constants/Test.constants';
+import UserPreferencesService from 'services/UserPreferences.service';
 import TestDefinitionActions from '../actions/TestDefinition.actions';
 
 export const initialState: ITestDefinitionState = {
@@ -9,21 +11,31 @@ export const initialState: ITestDefinitionState = {
   changeList: [],
   isLoading: false,
   isInitialized: false,
-  affectedSpans: [],
-  selectedAssertion: '',
-  selectedSpan: undefined,
+  selectedAssertion: undefined,
   isDraftMode: false,
+  viewResultsMode: UserPreferencesService.getUserPreference('viewResultsMode'),
 };
 
 export const assertionResultsToDefinitionList = (assertionResults: TAssertionResults): TTestDefinitionEntry[] => {
-  return assertionResults.resultList.map(({selector, resultList}) => ({
+  return assertionResults.resultList.map(({selector, resultList, isAdvancedSelector}) => ({
     isDraft: false,
     isDeleted: false,
     selector,
     originalSelector: selector,
     assertionList: resultList.flatMap(({assertion}) => [assertion]),
+    isAdvancedSelector,
   }));
 };
+
+export const setViewResultsMode = createAction('testDefinition/setViewResultsMode', (mode: ResultViewModes) => {
+  UserPreferencesService.setPreference('viewResultsMode', mode);
+
+  return {
+    payload: {
+      mode,
+    },
+  };
+});
 
 const testDefinitionSlice = createSlice<ITestDefinitionState, TTestDefinitionSliceActions, 'testDefinition'>({
   name: 'testDefinition',
@@ -91,24 +103,16 @@ const testDefinitionSlice = createSlice<ITestDefinitionState, TTestDefinitionSli
     setAssertionResults(state, {payload}) {
       state.assertionResults = payload;
     },
-    clearAffectedSpans(state) {
-      state.affectedSpans = [];
-    },
-    setAffectedSpans(state, {payload: spanIds}) {
-      state.affectedSpans = spanIds;
-    },
-    setSelectedAssertion(state, {payload: selectorId}) {
-      const assertionResult = state?.assertionResults?.resultList?.find(assertion => assertion.selector === selectorId);
-      const spanIds = assertionResult?.spanIds ?? [];
-      state.selectedAssertion = selectorId;
-      state.affectedSpans = spanIds;
-    },
-    setSelectedSpan(state, {payload: span}) {
-      state.selectedSpan = span;
+    setSelectedAssertion(state, {payload: assertionResult}) {
+      if (assertionResult) state.selectedAssertion = assertionResult.selector;
+      else state.selectedAssertion = undefined;
     },
   },
   extraReducers: builder => {
     builder
+      .addCase(setViewResultsMode, (state, {payload: {mode}}) => {
+        state.viewResultsMode = mode;
+      })
       .addCase(TestDefinitionActions.dryRun.fulfilled, (state, {payload}) => {
         state.assertionResults = payload;
       })
@@ -145,9 +149,6 @@ export const {
   resetDefinitionList,
   revertDefinition,
   reset,
-  clearAffectedSpans,
-  setAffectedSpans,
   setSelectedAssertion,
-  setSelectedSpan,
 } = testDefinitionSlice.actions;
 export default testDefinitionSlice.reducer;

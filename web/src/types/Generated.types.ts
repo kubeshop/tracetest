@@ -36,15 +36,33 @@ export interface paths {
     /** rerun a test run */
     post: operations["rerunTestRun"];
   };
+  "/tests/{testId}/run/{runId}/junit.xml": {
+    /** get test run results in JUnit xml format */
+    get: operations["getRunResultJUnit"];
+  };
+  "/tests/{testId}/run/{runId}/export": {
+    /** export test and test run information for debugging */
+    get: operations["exportTestRun"];
+  };
+  "/tests/import": {
+    /** import test and test run information for debugging */
+    post: operations["importTestRun"];
+  };
   "/tests/{testId}/run/{runId}": {
     /** get a particular test Run */
     get: operations["getTestRun"];
+    /** delete a test run */
+    delete: operations["deleteTestRun"];
   };
   "/tests/{testId}/definition": {
     /** Gets definition for a test */
     get: operations["getTestDefinition"];
     /** Set testDefinition for a particular test */
     put: operations["setTestDefinition"];
+  };
+  "/tests/{testId}/version/{version}/definition.yaml": {
+    /** Get the test definition as an YAML file */
+    get: operations["getTestVersionDefinitionFile"];
   };
 }
 
@@ -81,6 +99,8 @@ export interface operations {
           "application/json": external["tests.yaml"]["components"]["schemas"]["Test"];
         };
       };
+      /** trying to create a test with an already existing ID */
+      400: unknown;
       /** problem with creating test */
       500: unknown;
     };
@@ -236,6 +256,56 @@ export interface operations {
       };
     };
   };
+  /** get test run results in JUnit xml format */
+  getRunResultJUnit: {
+    parameters: {
+      path: {
+        testId: string;
+        runId: string;
+      };
+    };
+    responses: {
+      /** JUnit formatted file */
+      200: {
+        content: {
+          "application/xml": string;
+        };
+      };
+    };
+  };
+  /** export test and test run information for debugging */
+  exportTestRun: {
+    parameters: {
+      path: {
+        testId: string;
+        runId: string;
+      };
+    };
+    responses: {
+      /** successfuly exported test and test run information */
+      200: {
+        content: {
+          "application/json": external["tests.yaml"]["components"]["schemas"]["ExportedTestInformation"];
+        };
+      };
+    };
+  };
+  /** import test and test run information for debugging */
+  importTestRun: {
+    responses: {
+      /** successfuly imported test and test run information */
+      200: {
+        content: {
+          "application/json": external["tests.yaml"]["components"]["schemas"]["ExportedTestInformation"];
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": external["tests.yaml"]["components"]["schemas"]["ExportedTestInformation"];
+      };
+    };
+  };
   /** get a particular test Run */
   getTestRun: {
     parameters: {
@@ -251,6 +321,19 @@ export interface operations {
           "application/json": external["tests.yaml"]["components"]["schemas"]["TestRun"];
         };
       };
+    };
+  };
+  /** delete a test run */
+  deleteTestRun: {
+    parameters: {
+      path: {
+        testId: string;
+        runId: string;
+      };
+    };
+    responses: {
+      /** OK */
+      204: never;
     };
   };
   /** Gets definition for a test */
@@ -286,9 +369,52 @@ export interface operations {
       };
     };
   };
+  /** Get the test definition as an YAML file */
+  getTestVersionDefinitionFile: {
+    parameters: {
+      path: {
+        testId: string;
+        version: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/yaml": string;
+        };
+      };
+    };
+  };
 }
 
 export interface external {
+  "grpc.yaml": {
+    paths: {};
+    components: {
+      schemas: {
+        GRPCHeader: {
+          key?: string;
+          value?: string;
+        };
+        GRPCRequest: {
+          protobufFile?: string;
+          address?: string;
+          service?: string;
+          method?: string;
+          metadata?: external["grpc.yaml"]["components"]["schemas"]["GRPCHeader"][];
+          auth?: external["http.yaml"]["components"]["schemas"]["HTTPAuth"];
+          request?: string;
+        };
+        GRPCResponse: {
+          statusCode?: number;
+          metadata?: external["grpc.yaml"]["components"]["schemas"]["GRPCHeader"][];
+          body?: string;
+        };
+      };
+    };
+    operations: {};
+  };
   "http.yaml": {
     paths: {};
     components: {
@@ -317,7 +443,6 @@ export interface external {
             | "PROPFIND"
             | "VIEW";
           headers?: external["http.yaml"]["components"]["schemas"]["HTTPHeader"][];
-          /** Format: byte */
           body?: string;
           auth?: external["http.yaml"]["components"]["schemas"]["HTTPAuth"];
         };
@@ -325,7 +450,6 @@ export interface external {
           status?: string;
           statusCode?: number;
           headers?: external["http.yaml"]["components"]["schemas"]["HTTPHeader"][];
-          /** Format: byte */
           body?: string;
         };
         HTTPAuth: {
@@ -360,17 +484,14 @@ export interface external {
           description?: string;
           /** @description version number of the test */
           version?: number;
-          serviceUnderTest?: {
-            request?: external["http.yaml"]["components"]["schemas"]["HTTPRequest"];
-          };
+          serviceUnderTest?: external["triggers.yaml"]["components"]["schemas"]["Trigger"];
           /** @description Definition of assertions that are going to be made */
           definition?: external["tests.yaml"]["components"]["schemas"]["TestDefinition"];
-          referenceTestRun?: external["tests.yaml"]["components"]["schemas"]["TestRun"];
         };
         /** @example [object Object] */
         TestDefinition: {
           definitions?: {
-            selector?: string;
+            selector?: external["tests.yaml"]["components"]["schemas"]["Selector"];
             assertions?: external["tests.yaml"]["components"]["schemas"]["Assertion"][];
           }[];
         };
@@ -411,9 +532,8 @@ export interface external {
           obtainedTraceAt?: string;
           /** Format: date-time */
           completedAt?: string;
-          request?: external["http.yaml"]["components"]["schemas"]["HTTPRequest"];
-          /** @description TODO(pov) This is HTTP Response object for now, at some point it might be GRPC/SOAP/... */
-          response?: external["http.yaml"]["components"]["schemas"]["HTTPResponse"];
+          trigger?: external["triggers.yaml"]["components"]["schemas"]["Trigger"];
+          triggerResult?: external["triggers.yaml"]["components"]["schemas"]["TriggerResult"];
           trace?: external["trace.yaml"]["components"]["schemas"]["Trace"];
           result?: external["tests.yaml"]["components"]["schemas"]["AssertionResults"];
         };
@@ -421,7 +541,7 @@ export interface external {
         AssertionResults: {
           allPassed?: boolean;
           results?: {
-            selector?: string;
+            selector?: external["tests.yaml"]["components"]["schemas"]["Selector"];
             results?: external["tests.yaml"]["components"]["schemas"]["AssertionResult"][];
           }[];
         };
@@ -436,6 +556,31 @@ export interface external {
           passed?: boolean;
           error?: string;
         };
+        DefinitionFile: {
+          content?: string;
+        };
+        Selector: {
+          query?: string;
+          structure?: external["tests.yaml"]["components"]["schemas"]["SpanSelector"][];
+        };
+        SpanSelector: {
+          filters: external["tests.yaml"]["components"]["schemas"]["SelectorFilter"][];
+          pseudoClass?: external["tests.yaml"]["components"]["schemas"]["SelectorPseudoClass"];
+          childSelector?: external["tests.yaml"]["components"]["schemas"]["SpanSelector"];
+        } | null;
+        SelectorFilter: {
+          property: string;
+          operator: string;
+          value: string;
+        };
+        SelectorPseudoClass: {
+          name: string;
+          argument?: number;
+        } | null;
+        ExportedTestInformation: {
+          test: external["tests.yaml"]["components"]["schemas"]["Test"];
+          run: external["tests.yaml"]["components"]["schemas"]["TestRun"];
+        };
       };
     };
     operations: {};
@@ -445,7 +590,6 @@ export interface external {
     components: {
       schemas: {
         Trace: {
-          /** Format: byte */
           traceId?: string;
           tree?: external["trace.yaml"]["components"]["schemas"]["Span"];
           /** @description falttened version, mapped as spanId -> span{} */
@@ -456,14 +600,20 @@ export interface external {
           };
         };
         Span: {
-          /** Format: byte */
           id?: string;
-          /** Format: byte */
           parentId?: string;
           name?: string;
-          /** @description span start time in unix milli format */
+          /**
+           * Format: int64
+           * @description span start time in unix milli format
+           * @example 1656701595277
+           */
           startTime?: number;
-          /** @description span end time in unix milli format */
+          /**
+           * Format: int64
+           * @description span end time in unix milli format
+           * @example 1656701595800
+           */
           endTime?: number;
           /**
            * @description Key-Value of span attributes
@@ -471,6 +621,30 @@ export interface external {
            */
           attributes?: { [key: string]: string };
           children?: external["trace.yaml"]["components"]["schemas"]["Span"][];
+        };
+      };
+    };
+    operations: {};
+  };
+  "triggers.yaml": {
+    paths: {};
+    components: {
+      schemas: {
+        Trigger: {
+          /** @enum {string} */
+          triggerType?: "http" | "grpc";
+          triggerSettings?: {
+            http?: external["http.yaml"]["components"]["schemas"]["HTTPRequest"];
+            grpc?: external["grpc.yaml"]["components"]["schemas"]["GRPCRequest"];
+          };
+        };
+        TriggerResult: {
+          /** @enum {string} */
+          triggerType?: "http" | "grpc";
+          triggerResult?: {
+            http?: external["http.yaml"]["components"]["schemas"]["HTTPResponse"];
+            grpc?: external["grpc.yaml"]["components"]["schemas"]["GRPCResponse"];
+          };
         };
       };
     };

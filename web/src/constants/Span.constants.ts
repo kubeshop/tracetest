@@ -58,8 +58,9 @@ export const SpanAttributeSections: Record<SemanticGroupNames, Record<string, TV
       Attributes.DB_CASSANDRA_SPECULATIVE_EXECUTION_COUNT,
       Attributes.DB_CASSANDRA_COORDINATOR_ID,
       Attributes.DB_CASSANDRA_COORDINATOR_DC,
+      Attributes.DB_OPERATION,
+      Attributes.DB_STATEMENT,
     ],
-    [SectionNames.operation]: [Attributes.DB_OPERATION, Attributes.DB_STATEMENT],
   },
   [SemanticGroupNames.Messaging]: {
     [SectionNames.metadata]: [
@@ -70,16 +71,12 @@ export const SpanAttributeSections: Record<SemanticGroupNames, Record<string, TV
       Attributes.MESSAGING_KAFKA_CLIENT_ID,
       Attributes.MESSAGING_KAFKA_PARTITION,
       Attributes.MESSAGING_KAFKA_TOMBSTONE,
-    ],
-    [SectionNames.producer]: [
       Attributes.MESSAGING_DESTINATION,
       Attributes.MESSAGING_DESTINATION_KIND,
       Attributes.MESSAGING_TEMP_DESTINATION,
       Attributes.MESSAGING_CONVERSATION_ID,
       Attributes.MESSAGING_RABBITMQ_ROUTING_KEY,
       Attributes.MESSAGING_KAFKA_MESSAGE_KEY,
-    ],
-    [SectionNames.consumer]: [
       Attributes.MESSAGING_OPERATION,
       Attributes.MESSAGING_CONSUMER_ID,
       Attributes.MESSAGING_KAFKA_CONSUMER_GROUP,
@@ -110,3 +107,19 @@ export const SelectorAttributesWhiteList = uniq([
     return sectionAttributes;
   }),
 ]);
+
+export enum SpanKind {
+  SERVER = 'SPAN_KIND_SERVER',
+  CLIENT = 'SPAN_KIND_CLIENT',
+  PRODUCER = 'SPAN_KIND_PRODUCER',
+  CONSUMER = 'SPAN_KIND_CONSUMER',
+  INTERNAL = 'SPAN_KIND_INTERNAL',
+}
+
+export const SpanKindToText = {
+  [SpanKind.SERVER]: 'server',
+  [SpanKind.CLIENT]: 'client',
+  [SpanKind.PRODUCER]: 'producer',
+  [SpanKind.CONSUMER]: 'consumer',
+  [SpanKind.INTERNAL]: 'internal',
+};

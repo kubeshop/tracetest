@@ -21,14 +21,38 @@ func TestCreateClient(t *testing.T) {
 		{
 			name: "Jaeger",
 			config: config.Config{
-				JaegerConnectionConfig: &configgrpc.GRPCClientSettings{},
+				Telemetry: config.Telemetry{
+					DataStores: map[string]config.TracingBackendDataStoreConfig{
+						"jaeger": {
+							Type:   tracedb.JAEGER_BACKEND,
+							Jaeger: configgrpc.GRPCClientSettings{},
+						},
+					},
+				},
+				Server: config.ServerConfig{
+					Telemetry: config.ServerTelemetryConfig{
+						DataStore: "jaeger",
+					},
+				},
 			},
 			expectedType: "*tracedb.jaegerTraceDB",
 		},
 		{
 			name: "Tempo",
 			config: config.Config{
-				TempoConnectionConfig: &configgrpc.GRPCClientSettings{},
+				Telemetry: config.Telemetry{
+					DataStores: map[string]config.TracingBackendDataStoreConfig{
+						"tempo": {
+							Type:   tracedb.TEMPO_BACKEND,
+							Jaeger: configgrpc.GRPCClientSettings{},
+						},
+					},
+				},
+				Server: config.ServerConfig{
+					Telemetry: config.ServerTelemetryConfig{
+						DataStore: "tempo",
+					},
+				},
 			},
 			expectedType: "*tracedb.tempoTraceDB",
 		},

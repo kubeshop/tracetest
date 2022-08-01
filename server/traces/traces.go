@@ -3,6 +3,8 @@ package traces
 import (
 	"encoding/json"
 	"fmt"
+	"sort"
+	"strconv"
 	"time"
 
 	"go.opentelemetry.io/otel/trace"
@@ -12,6 +14,36 @@ type Trace struct {
 	ID       trace.TraceID
 	RootSpan Span
 	Flat     map[trace.SpanID]*Span `json:"-"`
+}
+
+func (t *Trace) Sort() Trace {
+	sortedRoot := sortSpanChildren(t.RootSpan)
+
+	trace := Trace{
+		ID:       t.ID,
+		RootSpan: sortedRoot,
+		Flat:     make(map[trace.SpanID]*Span, 0),
+	}
+
+	flattenSpans(trace.Flat, sortedRoot)
+
+	return trace
+}
+
+func sortSpanChildren(span Span) Span {
+	sort.SliceStable(span.Children, func(i, j int) bool {
+		return span.Children[i].StartTime.Before(span.Children[j].StartTime)
+	})
+
+	children := make([]*Span, 0, len(span.Children))
+	for _, childSpan := range span.Children {
+		newChild := sortSpanChildren(*childSpan)
+		children = append(children, &newChild)
+	}
+
+	span.Children = children
+
+	return span
 }
 
 func (t *Trace) UnmarshalJSON(data []byte) error {
@@ -32,7 +64,7 @@ func (t *Trace) UnmarshalJSON(data []byte) error {
 
 	t.ID = tid
 	t.Flat = map[trace.SpanID]*Span{}
-	flattenSpans(t.Flat, &t.RootSpan)
+	flattenSpans(t.Flat, t.RootSpan)
 	return nil
 }
 
@@ -46,14 +78,16 @@ func (t Trace) MarshalJSON() ([]byte, error) {
 	})
 }
 
-func flattenSpans(res map[trace.SpanID]*Span, root *Span) {
-	res[root.ID] = root
+func flattenSpans(res map[trace.SpanID]*Span, root Span) {
+	rootPtr := &root
+
+	res[root.ID] = rootPtr
 	for _, child := range root.Children {
-		res[child.ID] = child
-		if len(child.Children) > 0 {
-			flattenSpans(res, child)
-		}
+		flattenSpans(res, *child)
 	}
+
+	// Remove children and parent because they are now part of the flatten structure
+	rootPtr.Children = nil
 }
 
 type Attributes map[string]string
@@ -95,8 +129,8 @@ func encodeSpan(s Span) encodedSpan {
 	return encodedSpan{
 		ID:         s.ID.String(),
 		Name:       s.Name,
-		StartTime:  s.StartTime.Format(time.RFC3339),
-		EndTime:    s.EndTime.Format(time.RFC3339),
+		StartTime:  fmt.Sprintf("%d", s.StartTime.UnixMilli()),
+		EndTime:    fmt.Sprintf("%d", s.EndTime.UnixMilli()),
 		Attributes: s.Attributes,
 		Children:   encodeChildren(s.Children),
 	}
@@ -130,24 +164,39 @@ func (s *Span) decodeSpan(aux encodedSpan) error {
 		return fmt.Errorf("unmarshal span: %w", err)
 	}
 
-	startTime, err := time.Parse(time.RFC3339, aux.StartTime)
+	startTime, err := getTimeFromString(aux.StartTime)
 	if err != nil {
 		return fmt.Errorf("unmarshal span: %w", err)
 	}
 
-	endTime, err := time.Parse(time.RFC3339, aux.EndTime)
+	endTime, err := getTimeFromString(aux.EndTime)
 	if err != nil {
 		return fmt.Errorf("unmarshal span: %w", err)
 	}
 
 	s.ID = sid
 	s.Name = aux.Name
-	s.StartTime = startTime
-	s.EndTime = endTime
+	s.StartTime = startTime.UTC()
+	s.EndTime = endTime.UTC()
 	s.Attributes = aux.Attributes
 	s.Children = children
 
 	return nil
+}
+
+func getTimeFromString(value string) (time.Time, error) {
+	milliseconds, err := strconv.Atoi(value)
+	if err != nil {
+		// Maybe it is in RFC3339 format. Convert it for compatibility sake
+		output, err := time.Parse(time.RFC3339, value)
+		if err != nil {
+			return time.Time{}, fmt.Errorf("could not convert string (%s) to time: %w", value, err)
+		}
+
+		return output, nil
+	}
+
+	return time.UnixMilli(int64(milliseconds)), nil
 }
 
 func decodeChildren(parent *Span, children []encodedSpan) ([]*Span, error) {

@@ -1,4 +1,4 @@
-<p align="center">  
+<p align="center">
   <img style="width:66%" src="assets/tracetest-logo-color-w-white-text.svg#gh-dark-mode-only" alt="Tracetest Logo Light"/>
   <img style="width:66%" src="assets/tracetest-logo-color-w-black-text.svg#gh-light-mode-only" alt="Tracetest Logo Dark" />
 </p>
@@ -9,10 +9,11 @@
 
 <p align="center">
   <!--<a href="https://tracetest.io">Website</a>&nbsp;|&nbsp; -->
-  <a href="https://github.com/kubeshop/tracetest#try-the-demo--give-us-feedback">Live Demo</a>&nbsp;|&nbsp; 
-  <a href="https://kubeshop.github.io/tracetest">Documentation</a>&nbsp;|&nbsp; 
-  <a href="https://twitter.com/tracetest_io">Twitter</a>&nbsp;|&nbsp; 
-  <a href="https://discord.gg/eBvEQRVyKX">Discord</a>&nbsp;|&nbsp; 
+  <!--<a href="https://github.com/kubeshop/tracetest#try-the-demo--give-us-feedback">Live Demo</a>&nbsp;|&nbsp;-->
+  <a href="https://kubeshop.github.io/tracetest/installing/">Install</a>&nbsp;|&nbsp;
+  <a href="https://kubeshop.github.io/tracetest">Documentation</a>&nbsp;|&nbsp;
+  <a href="https://twitter.com/tracetest_io">Twitter</a>&nbsp;|&nbsp;
+  <a href="https://discord.gg/eBvEQRVyKX">Discord</a>&nbsp;|&nbsp;
   <a href="https://kubeshop.io/blog-projects/tracetest">Blog</a>
 </p>
 
@@ -31,53 +32,92 @@
   </a>
 </p>
 
-# Overview
+# Tracetest
 
-Testing and debugging software built on microservices architectures is not an easy task. Multiple services, teams, programming languages, and technologies are involved. We want to help you write tests across all this complexity by leveraging your existing investment in OpenTelemetry tracing.
+Tracetest is a trace-based testing tool that leverages the data contained in your distributed traces to produce easy to create, yet super powerful integration tests. You can verify activity deep inside your system by asserting on data and flow information contained in the OpenTelemetry traces and span attributes. This can include:
 
-Tracetest makes it easy:
+- testing events that occur on 'the other side' of an async message queue, even though the original async call has returned earlier.
+- assertions based on the timing of different steps in your process.
+- wildcard assertions across common types of activities, ie all gRPC return codes should be 0, all database calls should happen in less than 100ms.
+- test long running processes instrumented with OpenTelemetry tracing to assert proper operation deep in the process.
+- verify the quality of your OpenTelemetry instrumentation and enforce standards.
 
-1. Pick an API to test.
+# Features
+
+- Test by executing a REST or gRPC call to trigger the test. Can also import your Postman Collections.
+- [Add assertions](https://kubeshop.github.io/tracetest/adding-assertions/) based on return data from trigger call and/or data contained in the spans in your distributed trace.
+- Specify which spans to check in assertions via the [advanced selector language](https://kubeshop.github.io/tracetest/advanced-selectors/).
+- Define checks against the attributes in these spans, including properties, return status, or timing.
+- Tests can be created via graphical UI or via [YAML-based test definition file](https://kubeshop.github.io/tracetest/test-definition-file/).
+- Use the test definition file to [enable Gitops flows](https://kubeshop.io/blog/integrating-tracetest-with-github-actions-in-a-ci-pipeline).
+- [Tracetest CLI](https://kubeshop.github.io/tracetest/command-line-tool/) allows importing & exporting tests, running tests, and more.
+- Tests are [versioned](https://kubeshop.github.io/tracetest/versioning/) as the definition of the test is altered.
+- Supports [numerous backend trace datastores](https://kubeshop.github.io/tracetest/architecture/), including Jeager and Grafana Tempo. Tell us which others you want!
+- Easy [install via Helm command](https://kubeshop.github.io/tracetest/installing/).
+- Install can include [an example microservice](https://kubeshop.github.io/tracetest/pokeshop/) that is instrumented with OpenTelemetry to use as an example application under test.
+
+# Getting Started
+
+You can install tracetest by running:
+
+```sh
+curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/setup.sh | bash -s
+```
+
+> :gear: To customize your Tracetest installation. Go to our [installation guide](https://kubeshop.github.io/tracetest/installing/) for more information.
+
+Installation only takes a few minutes and is done with via a Helm command. After installing, take a look at the
+[Accessing the Dashboard](https://kubeshop.github.io/tracetest/accessing-dashboard/) guide to access the Tracetest Dashboard and
+create and run your first test.
+
+# How does Tracetest work?
+
+1. Pick an endpoint to test.
 2. Run a test, and get the trace.
 3. The trace is the blueprint of your system under test. It shows all the steps the system has taken to execute the request.
 4. Use this blueprint to define assertions through Tracetest UI.
 5. Add assertions on different services, checking return statuses, data, or even execution times of a system.
 6. Run the tests.
 
-![Assertions](/assets/assertions.png)
-
 Once the test is built, it can be run automatically as part of a build process. Every test has a trace attached, allowing you to immediately see what worked, and what did not, reducing the need to reproduce the problem to see the underlying issue.
 
-# System Diagram
+# What does the test definition file look like?
 
-<div style="text-align:center;"><img src="/assets/tracetest-diagram-01.png"></div>
+The Tracetest [test definition files](https://kubeshop.github.io/tracetest/test-definition-file/) are written in a simple YAML format. You can write them directly or build them graphically via the UI. Here is an example of a test which:
 
-# Try the demo & give us feedback
+- executes POST against the pokemon/import endpoint.
+- verifies that the HTTP blocks return a 200 status code.
+- verifies all database calls execute in less than 200ms.
 
-We have a live demo environment with a couple systems you can test against. Use the 'Try The Demo' button below to launch it. You will need to know the urls you can test against - here are some examples that work:
+```yaml
+id: 5dd03dda-fad2-49f0-b9d9-5143b746c1d0
+name: DEMO Pokemon - Import - Import a Pokemon
+description: "Import a pokemon"
 
-| System               | Description      | URL                                                                   | Method | Request Body                                                                                                                           |
-| -------------------- | ---------------- | --------------------------------------------------------------------- | ------ | -------------------------------------------------------------------------------------------------------------------------------------- |
-| Shopping app         | Generic get      | http://shop/buy                                                       | GET    |
-| Pokemon Microservice | Get a Pokemon    | http://demo-pokemon-api.demo.svc.cluster.local/pokemon?take=20&skip=0 | GET    |
-| Pokemon Microservice | Add a Pokemon    | http://demo-pokemon-api.demo.svc.cluster.local/pokemon                | POST   | { "name": "meowth", "type": "normal","imageUrl": "https://assets.pokemon.com/assets/cms2/img/pokedex/full/052.png","isFeatured": true} |
-| Pokemon Microservice | Import a Pokemon | http://demo-pokemon-api.demo.svc.cluster.local/pokemon/import         | POST   | { "id": 52 }                                                                                                                           |
+# Configure how tracetest triggers the operation on your application
+trigger:
+    type: http
+    httpRequest:
+        method: POST
+        url: http://demo-pokemon-api.demo.svc.cluster.local/pokemon/import
+        headers:
+            - key: Content-Type
+              value: application/json
+        body: '{"id":52}'
 
-More documentation about the installed Pokemon Microservice App, PMA, is at [Pokemon Microservice App github](https://github.com/kubeshop/pokeshop/blob/master/docs/overview.md)
+# Setup what will be asserted on the resulting trace
+testDefinition:
+    selector: span[tracetest.span.type = "http"]
+    - assertions:
+        - http.status_code = 200
+    selector: span[tracetest.span.type = "database"]
+    - assertions:
+        - tracetest.span.duration < "50ms"
+```
 
-Wanna play with it? [Try the Live Demo](https://demo.tracetest.io/)
+# Feedback
 
-[![button](/assets/button_try_tracetest.png)](https://demo.tracetest.io/)
-
-We’re looking for feedback to help make Tracetest even better for developers, QA testers, and DevOPs. Please give us feedback on [Discord](https://discord.gg/eBvEQRVyKX) or [create an issue on Github](https://github.com/kubeshop/tracetest/issues/new/choose)
-
-# Getting Started
-
-Check out the [Installation](https://kubeshop.github.io/tracetest/installing/) and
-[Getting Started](https://kubeshop.github.io/tracetest/getting-started/) guides to set up Tracetest and
-run your first tests! It is still a 'work in progress' so please provide us with any and all [feedback](https://github.com/kubeshop/tracetest/issues/new/choose) - we live for input and will respond!
-
-We are in the our early days with the project and need your help. Have an idea to improve it? Please Create an issue here or join our community on [Discord](https://discord.gg/eBvEQRVyKX).
+We are in the our early days with the project and need your help. Have an idea to improve it? Please [Create an issue here](https://github.com/kubeshop/tracetest/issues/new/choose) or join our community on [Discord](https://discord.gg/eBvEQRVyKX).
 
 Follow us on [Twitter at @tracetest_io](https://twitter.com/tracetest_io) for updates
 
@@ -86,3 +126,11 @@ Give us a star on Github if you're interested in the project!
 # Documentation
 
 Is available at [https://kubeshop.github.io/tracetest](https://kubeshop.github.io/tracetest)
+
+# Tests
+
+We strive to produce quality code and improve Tracetest rapidly and safely. Therefore, we have a full suite of both frontend and backend tests. We are using Cypress to test our frontend code and (surprise, surprise) Tracetest for our backend code. You can see the [test runs here](https://github.com/kubeshop/tracetest/actions/workflows/pull-request.yaml), and a blog post describing our [testing pipelines here](https://kubeshop.io/blog/integrating-tracetest-with-github-actions-in-a-ci-pipeline).
+
+# License
+
+[MIT License](/LICENSE)

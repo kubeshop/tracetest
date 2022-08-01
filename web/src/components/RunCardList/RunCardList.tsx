@@ -1,10 +1,9 @@
 import {Badge} from 'antd';
+import {useTheme} from 'styled-components';
+
 import ResultCard from 'components/RunCard';
-import {useNavigate} from 'react-router-dom';
-import {useDeleteRunByIdMutation} from 'redux/apis/TraceTest.api';
-import TestAnalyticsService from '../../services/Analytics/TestAnalytics.service';
-import {TTestRun} from '../../types/TestRun.types';
-import {TooltipQuestion} from '../TooltipQuestion/TooltipQuestion';
+import {TooltipQuestion} from 'components/TooltipQuestion/TooltipQuestion';
+import {TTestRun} from 'types/TestRun.types';
 import * as S from './RunCardList.styled';
 
 interface IProps {
@@ -13,51 +12,40 @@ interface IProps {
 }
 
 const ResultCardList = ({resultList, testId}: IProps) => {
-  const navigate = useNavigate();
-  const [deleteRunById] = useDeleteRunByIdMutation();
-
-  const handleOnResultClick = (runId: string) => {
-    TestAnalyticsService.onTestRunClick();
-    navigate(`/test/${testId}/run/${runId}`);
-  };
-
-  const handleOnDelete = (runId: string) => {
-    TestAnalyticsService.onDeleteTestRun();
-    deleteRunById({testId, runId});
-  };
+  const theme = useTheme();
 
   return (
     <S.ResultCardList data-cy="result-card-list">
       <S.Header>
         <S.TextContainer>
-          <S.Text>Time</S.Text>
+          <S.Title>Time</S.Title>
         </S.TextContainer>
         <S.TextContainer>
-          <S.Text>Execution time</S.Text>
+          <S.Title>Execution time</S.Title>
         </S.TextContainer>
         <S.TextContainer>
-          <S.Text>Version</S.Text>
+          <S.Title>Version</S.Title>
         </S.TextContainer>
         <S.TextContainer>
-          <S.Text>Status</S.Text>
+          <S.Title>Status</S.Title>
         </S.TextContainer>
         <S.TextContainer>
-          <S.Text>Total</S.Text>
+          <S.Title>Total</S.Title>
         </S.TextContainer>
         <S.TextContainer>
-          <Badge count="P" style={{backgroundColor: '#49AA19'}} />
+          <Badge count="P" style={{backgroundColor: theme.color.success}} />
         </S.TextContainer>
         <S.FailedContainer>
-          <Badge count="F" />
-          <TooltipQuestion margin={0} title="The number of Total/Pass/Fail assertions" />
+          <Badge count="F" style={{backgroundColor: theme.color.error}} />
+          <TooltipQuestion margin={0} title="The number of Total/Pass/Fail checks" />
         </S.FailedContainer>
         <S.TextContainer style={{textAlign: 'right'}}>
-          <S.Text>Actions</S.Text>
+          <S.Title>Actions</S.Title>
         </S.TextContainer>
       </S.Header>
       <S.List>
         {resultList.map(run => (
-          <ResultCard key={run.id} run={run} testId={testId} onClick={handleOnResultClick} onDelete={handleOnDelete} />
+          <ResultCard key={run.id} run={run} testId={testId} />
         ))}
       </S.List>
     </S.ResultCardList>

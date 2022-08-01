@@ -25,16 +25,15 @@ curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/setup.sh | bas
 
 This command will install Tracetest using the default settings. You can configure the following options:
 
-
 | Option                   | description                                  | Default value      |
-|--------------------------|----------------------------------------------|--------------------|
+| ------------------------ | -------------------------------------------- | ------------------ |
 | --help                   | show help message                            | n/a                |
 | --namespace              | target installation k8s namespace            | tracetest          |
 | --trace-backend          | trace backend (jaeger or tempo)              | jaeger             |
 | --trace-backend-endpoint | trace backend endpoint                       | jaeger-query:16685 |
+| --skip-collector         | if set, don't install the otel-collector     | n/a                |
 | --skip-pma               | if set, don't install the sample application | n/a                |
 | --skip-backend           | if set, don't install the jaeger backend     | n/a                |
-
 
 Example with custom options:
 
@@ -60,14 +59,14 @@ helm repo add kubeshop https://kubeshop.github.io/helm-charts
 helm repo update
 
 helm install tracetest kubeshop/tracetest \
-  --set tracingBackend=jaeger \
-  --set jaegerConnectionConfig.endpoint="jaeger-query:16685" # update this value to point to your jaeger install
+  --set telemetry.dataStores.jaeger.jaeger.endpoint="jaeger-query:16685" \ # update this value to point to your jaeger install
+  --set telemetry.exporters.collector.exporter.collector.endpoint="otel-collector:4317" \ # update this value to point to your collector install
+  --set server.telemetry.dataStore="jaeger"
 ```
 
 #### **Grafana Tempo**
 
 Tracetest uses [Grafana Tempo's Server's `9095` port](https://grafana.com/docs/tempo/latest/configuration/#server) to find Traces using gRPC protocol.
-
 
 The commands below will install the Tracetest application connecting to the Grafana Tempo tracing backend on `grafana-tempo:9095`:
 
@@ -77,9 +76,14 @@ helm repo add kubeshop https://kubeshop.github.io/helm-charts
 helm repo update
 
 helm install tracetest kubeshop/tracetest \
-  --set tracingBackend=tempo \
-  --set tempoConnectionConfig.endpoint="grafana-tempo:9095"  # update this value to point to your tempo install
+  --set telemetry.dataStores.tempo.tempo.endpoint="grafana-tempo:9095" \ # update this value to point to your tempo install
+  --set telemetry.exporters.collector.exporter.collector.endpoint="otel-collector:4317" \ # update this value to point to your collector install
+  --set server.telemetry.dataStore="tempo"
 ```
+
+### **Have a different backend trace data store?**
+
+[Tell us](https://github.com/kubeshop/tracetest/issues/new?assignees=&labels=&template=feature_request.md&title=) which one you have and we will see if we can add support for it!
 
 ## **Uninstallation**
 
@@ -88,3 +92,21 @@ The following command will uninstall Tracetest with Postgres:
 ```sh
 helm delete tracetest
 ```
+
+## CLI Installation
+Every time we release a new version of Tracetest, we generate binaries for Linux, MacOS, and Windows. Supporting both amd64, and ARM64 architectures. You can find the latest version [here](https://github.com/kubeshop/tracetest/releases/latest).
+
+### Linux
+
+```sh
+curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/install-cli.sh | bash
+```
+
+### MacOS
+
+```sh
+brew install kubeshop/tracetest/tracetest
+```
+
+### Windows
+Download one of the files from the latest tag, extract to your machine, and then [add the tracetest binary to your PATH variable](https://stackoverflow.com/a/41895179)

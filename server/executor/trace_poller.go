@@ -2,13 +2,13 @@ package executor
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"math"
 	"time"
 
 	"github.com/kubeshop/tracetest/server/model"
-	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/traces"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
@@ -23,47 +23,48 @@ type PersistentTracePoller interface {
 	WorkerPool
 }
 
+type PollerExecutor interface {
+	ExecuteRequest(*PollingRequest) (bool, model.Run, error)
+}
+
 type TraceFetcher interface {
 	GetTraceByID(ctx context.Context, traceID string) (*v1.TracesData, error)
 }
 
 func NewTracePoller(
-	tf TraceFetcher,
-	tests model.Repository,
+	pe PollerExecutor,
+	updater RunUpdater,
+	assertionRunner AssertionRunner,
 	retryDelay time.Duration,
 	maxWaitTimeForTrace time.Duration,
-	subscriptionManager *subscription.Manager,
-	assertionRunner AssertionRunner,
 ) PersistentTracePoller {
 	maxTracePollRetry := int(math.Ceil(float64(maxWaitTimeForTrace) / float64(retryDelay)))
 	return tracePoller{
-		tests:               tests,
-		traceDB:             tf,
+		updater:             updater,
+		pollerExecutor:      pe,
 		maxWaitTimeForTrace: maxWaitTimeForTrace,
 		maxTracePollRetry:   maxTracePollRetry,
 		retryDelay:          retryDelay,
-		executeQueue:        make(chan tracePollReq, 5),
+		executeQueue:        make(chan PollingRequest, 5),
 		exit:                make(chan bool, 1),
-		subscriptions:       subscriptionManager,
 		assertionRunner:     assertionRunner,
 	}
 }
 
 type tracePoller struct {
-	tests               model.Repository
-	traceDB             TraceFetcher
+	updater             RunUpdater
+	pollerExecutor      PollerExecutor
 	maxWaitTimeForTrace time.Duration
-	retryDelay          time.Duration
-	maxTracePollRetry   int
+	assertionRunner     AssertionRunner
 
-	executeQueue chan tracePollReq
+	retryDelay        time.Duration
+	maxTracePollRetry int
+
+	executeQueue chan PollingRequest
 	exit         chan bool
-
-	subscriptions   *subscription.Manager
-	assertionRunner AssertionRunner
 }
 
-type tracePollReq struct {
+type PollingRequest struct {
 	ctx   context.Context
 	test  model.Test
 	run   model.Run
@@ -105,49 +106,33 @@ func (tp tracePoller) Stop() {
 }
 
 func (tp tracePoller) Poll(ctx context.Context, test model.Test, run model.Run) {
-	tp.enqueueJob(tracePollReq{
+	tp.enqueueJob(PollingRequest{
 		ctx:  ctx,
 		test: test,
 		run:  run,
 	})
 }
 
-func (tp tracePoller) enqueueJob(job tracePollReq) {
+func (tp tracePoller) enqueueJob(job PollingRequest) {
 	tp.executeQueue <- job
 }
 
-func (tp tracePoller) processJob(job tracePollReq) {
-	run := job.run
-
-	otelTrace, err := tp.traceDB.GetTraceByID(job.ctx, run.TraceID.String())
+func (tp tracePoller) processJob(job PollingRequest) {
+	finished, run, err := tp.pollerExecutor.ExecuteRequest(&job)
 	if err != nil {
 		tp.handleTraceDBError(job, err)
 		return
 	}
 
-	trace := traces.FromOtel(otelTrace)
-	trace.ID = run.TraceID
-	if !tp.donePollingTraces(job, trace) {
-		fmt.Println("Not done polling traces. Requeue")
-		run.Trace = &trace
-		job.run = run
-		job.count = job.count + 1
+	if !finished {
+		job.count += 1
 		tp.requeue(job)
 		return
 	}
 
-	run = run.SuccessfullyPolledTraces(augmentData(&trace, run.Response))
-
 	fmt.Printf("completed polling result %s after %d times, number of spans: %d \n", job.run.ID, job.count, len(run.Trace.Flat))
 
-	tp.handleDBError(tp.tests.UpdateRun(job.ctx, run))
-
-	tp.subscriptions.PublishUpdate(run.ResourceID(job.test.ID.String()), subscription.Message{
-		Type:       "result_update",
-		ResourceID: run.ResourceID(job.test.ID.String()),
-		Content:    run,
-	})
-
+	tp.handleDBError(tp.updater.Update(job.ctx, run))
 	err = tp.runAssertions(job.ctx, job.test, run)
 	if err != nil {
 		fmt.Printf("could not run assertions: %s\n", err.Error())
@@ -160,42 +145,35 @@ func (tp tracePoller) runAssertions(ctx context.Context, test model.Test, run mo
 		Run:  run,
 	}
 
-	tp.assertionRunner.RunAssertions(assertionRequest)
+	tp.assertionRunner.RunAssertions(ctx, assertionRequest)
 
 	return nil
 }
 
-func augmentData(trace *traces.Trace, resp model.HTTPResponse) *traces.Trace {
+func augmentData(trace *traces.Trace, result model.TriggerResult) *traces.Trace {
 	if trace == nil {
 		return trace
 	}
 
-	trace.RootSpan.Attributes["tracetest.response.status"] = fmt.Sprintf("%d", resp.StatusCode)
-	trace.RootSpan.Attributes["tracetest.response.body"] = resp.Body
-	trace.RootSpan.Attributes["tracetest.response.headers"] = fmt.Sprintf("%d", resp.StatusCode)
+	switch result.Type {
+	case model.TriggerTypeHTTP:
+		resp := result.HTTP
+		jsonheaders, _ := json.Marshal(resp.Headers)
+		trace.RootSpan.Attributes["tracetest.response.status"] = fmt.Sprintf("%d", resp.StatusCode)
+		trace.RootSpan.Attributes["tracetest.response.body"] = resp.Body
+		trace.RootSpan.Attributes["tracetest.response.headers"] = string(jsonheaders)
+	case model.TriggerTypeGRPC:
+		resp := result.GRPC
+		jsonheaders, _ := json.Marshal(resp.Metadata)
+		trace.RootSpan.Attributes["tracetest.response.status"] = fmt.Sprintf("%d", resp.StatusCode)
+		trace.RootSpan.Attributes["tracetest.response.body"] = resp.Body
+		trace.RootSpan.Attributes["tracetest.response.headers"] = string(jsonheaders)
+	}
 
 	return trace
 }
 
-func (tp tracePoller) donePollingTraces(job tracePollReq, trace traces.Trace) bool {
-	// we're done if we have the same amount of spans after polling or `maxTracePollRetry` times
-	if job.count == tp.maxTracePollRetry {
-		return true
-	}
-
-	if job.run.Trace == nil {
-		return false
-	}
-
-	if len(trace.Flat) > 0 && len(trace.Flat) == len(job.run.Trace.Flat) {
-		return true
-	}
-
-	return false
-
-}
-
-func (tp tracePoller) handleTraceDBError(job tracePollReq, err error) {
+func (tp tracePoller) handleTraceDBError(job PollingRequest, err error) {
 	run := job.run
 	if errors.Is(err, tracedb.ErrTraceNotFound) {
 		if time.Since(run.ServiceTriggeredAt) < tp.maxWaitTimeForTrace {
@@ -209,11 +187,11 @@ func (tp tracePoller) handleTraceDBError(job tracePollReq, err error) {
 		fmt.Println("other", err)
 	}
 
-	tp.handleDBError(tp.tests.UpdateRun(job.ctx, run.Failed(err)))
+	tp.handleDBError(tp.updater.Update(job.ctx, run.Failed(err)))
 
 }
 
-func (tp tracePoller) requeue(job tracePollReq) {
+func (tp tracePoller) requeue(job PollingRequest) {
 	go func() {
 		fmt.Printf("requeuing result %s for %d time\n", job.run.ID, job.count)
 		time.Sleep(tp.retryDelay)

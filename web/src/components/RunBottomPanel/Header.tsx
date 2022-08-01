@@ -1,8 +1,9 @@
 import {PlusOutlined} from '@ant-design/icons';
-import {Badge} from 'antd';
+import {Badge, Switch, Tooltip} from 'antd';
 import {MouseEventHandler, useCallback, useMemo} from 'react';
+import {useTheme} from 'styled-components';
 
-import {useAssertionForm} from 'components/AssertionForm/AssertionFormProvider';
+import {useAssertionForm} from 'components/AssertionForm/AssertionForm.provider';
 import {Steps} from 'components/GuidedTour/traceStepList';
 import {OPEN_BOTTOM_PANEL_STATE, useRunLayout} from 'components/RunLayout';
 import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
@@ -11,7 +12,10 @@ import TraceService from 'services/Trace.service';
 import {TAssertionResults} from 'types/Assertion.types';
 import {TSpan} from 'types/Span.types';
 import {TTestRun} from 'types/TestRun.types';
+import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
+import {ResultViewModes} from 'constants/Test.constants';
 import Date from 'utils/Date';
+import SelectorService from 'services/Selector.service';
 import * as S from './RunBottomPanel.styled';
 
 interface IProps {
@@ -22,8 +26,10 @@ interface IProps {
 }
 
 const Header: React.FC<IProps> = ({run: {createdAt}, assertionResults, isDisabled, selectedSpan}) => {
+  const theme = useTheme();
   const {isBottomPanelOpen, openBottomPanel, toggleBottomPanel} = useRunLayout();
   const {open} = useAssertionForm();
+  const {viewResultsMode, changeViewResultsMode} = useTestDefinition();
   const totalAssertionCount = assertionResults?.resultList.length || 0;
 
   const {totalPassedCount, totalFailedCount} = useMemo(
@@ -36,16 +42,20 @@ const Header: React.FC<IProps> = ({run: {createdAt}, assertionResults, isDisable
       event.stopPropagation();
       openBottomPanel(OPEN_BOTTOM_PANEL_STATE.FORM);
       const {selectorList, pseudoSelector} = SpanService.getSelectorInformation(selectedSpan!);
+      const selector = SelectorService.getSelectorString(selectorList, pseudoSelector);
 
       open({
         isEditing: false,
+        selector,
         defaultValues: {
           pseudoSelector,
           selectorList,
+          selector,
+          isAdvancedSelector: viewResultsMode === ResultViewModes.Advanced,
         },
       });
     },
-    [open, selectedSpan, openBottomPanel]
+    [openBottomPanel, selectedSpan, open, viewResultsMode]
   );
   return (
     <S.Header
@@ -57,11 +67,26 @@ const Header: React.FC<IProps> = ({run: {createdAt}, assertionResults, isDisable
         <S.StartDateText>{Date.format(createdAt)}</S.StartDateText>
         <S.HeaderText strong>
           {totalAssertionCount} assertion(s) • {totalPassedCount + totalFailedCount} check(s) •{' '}
-          <Badge count="P" style={{backgroundColor: '#49AA19'}} /> <S.CountNumber>{totalPassedCount}</S.CountNumber>
-          <Badge count="F" /> <S.CountNumber>{totalFailedCount}</S.CountNumber>
+          <Badge count="P" style={{backgroundColor: theme.color.success}} />{' '}
+          <S.CountNumber>{totalPassedCount}</S.CountNumber>
+          <Badge count="F" style={{backgroundColor: theme.color.error}} />{' '}
+          <S.CountNumber>{totalFailedCount}</S.CountNumber>
         </S.HeaderText>
       </div>
-      <div>
+      <S.Row>
+        <Tooltip title="You can decide whether you want to see the results using the key-value (wizard) mode or the query language (advanced).">
+          <Switch
+            disabled={isDisabled}
+            checkedChildren="Advanced"
+            unCheckedChildren="Wizard"
+            checked={viewResultsMode === ResultViewModes.Advanced}
+            onChange={(isChecked, event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              changeViewResultsMode(isChecked ? ResultViewModes.Advanced : ResultViewModes.Wizard);
+            }}
+          />
+        </Tooltip>
         <S.AddAssertionButton
           data-cy="add-assertion-button"
           icon={<PlusOutlined />}
@@ -73,7 +98,7 @@ const Header: React.FC<IProps> = ({run: {createdAt}, assertionResults, isDisable
         <S.ChevronContainer>
           <S.Chevron $isCollapsed={isBottomPanelOpen} />
         </S.ChevronContainer>
-      </div>
+      </S.Row>
     </S.Header>
   );
 };

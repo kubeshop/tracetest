@@ -1,20 +1,38 @@
 postgresConnString: "host=postgres user=postgres password=postgres port=5432 sslmode=disable"
-jaegerConnectionConfig:
-  endpoint: jaeger-query:16685
-  tls:
-    insecure: true
 
-maxWaitTimeForTrace: 30s
+poolingConfig:
+  maxWaitTimeForTrace: 30s
+  retryDelay: 500ms
 
 googleAnalytics:
   enabled: true
 
 telemetry:
-  serviceName: tracetest
-  sampling: 100 # 100%
-  jaeger:
-    host: localhost
-    port: 6831
+  dataStores:
+    jaeger:
+      type: jaeger
+      jaeger:
+        endpoint: jaeger-query:16685
+        tls:
+          insecure: true
+
+    tempo:
+      type: tempo
+      tempo:
+        endpoint: tempo:9095
+      tls:
+        insecure: true
+
   exporters:
-    - console
-    - jaeger
+    collector:
+      serviceName: tracetest
+      sampling: 100 # 100%
+      exporter:
+        type: collector
+        collector:
+          endpoint: localhost:4317
+
+server:
+  telemetry:
+    exporter: collector
+    dataStore: jaeger

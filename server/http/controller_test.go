@@ -4,7 +4,9 @@ import (
 	"context"
 	"testing"
 
+	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/http"
+	"github.com/kubeshop/tracetest/server/http/mappings"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/testdb"
@@ -38,7 +40,9 @@ func TestContains_Issue617(t *testing.T) {
 	definition := openapi.TestDefinition{
 		Definitions: []openapi.TestDefinitionDefinitions{
 			{
-				Selector: "span[tracetest.span.type = \"http\"  service.name = \"pokeshop\"  name = \"POST /pokemon/import\"]",
+				Selector: openapi.Selector{
+					Query: `span[tracetest.span.type = "http" service.name = "pokeshop"  name = "POST /pokemon/import"]`,
+				},
 				Assertions: []openapi.Assertion{
 					{
 						Attribute:  "http.response.body",
@@ -54,7 +58,30 @@ func TestContains_Issue617(t *testing.T) {
 		AllPassed: true,
 		Results: []openapi.AssertionResultsResults{
 			{
-				Selector: "span[tracetest.span.type = \"http\"  service.name = \"pokeshop\"  name = \"POST /pokemon/import\"]",
+				Selector: openapi.Selector{
+					Query: `span[tracetest.span.type = "http" service.name = "pokeshop"  name = "POST /pokemon/import"]`,
+					Structure: []openapi.SpanSelector{
+						{
+							Filters: []openapi.SelectorFilter{
+								{
+									Property: "tracetest.span.type",
+									Operator: "=",
+									Value:    "http",
+								},
+								{
+									Property: "service.name",
+									Operator: "=",
+									Value:    "pokeshop",
+								},
+								{
+									Property: "name",
+									Operator: "=",
+									Value:    "POST /pokemon/import",
+								},
+							},
+						},
+					},
+				},
 				Results: []openapi.AssertionResult{
 					{
 						AllPassed: true,
@@ -92,7 +119,7 @@ func setupController(t *testing.T) controllerFixture {
 	mdb.Test(t)
 	return controllerFixture{
 		db: mdb,
-		c:  http.NewController(mdb, nil, nil),
+		c:  http.NewController(mdb, nil, nil, mappings.New(traces.NewConversionConfig(), comparator.DefaultRegistry())),
 	}
 }
 

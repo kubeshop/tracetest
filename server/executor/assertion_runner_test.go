@@ -8,10 +8,12 @@ import (
 	"os"
 	"testing"
 
+	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/testmock"
+	"github.com/kubeshop/tracetest/server/tracing"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -44,7 +46,9 @@ func TestExecutorSuccessfulExecution(t *testing.T) {
 			test, run, err := loadTestFile(testCase.Tracefile)
 			require.NoError(t, err)
 
-			assertionExecutor := executor.NewAssertionRunner(repo)
+			tracer, _ := tracing.NewTracer(ctx, config.Config{})
+			assertionExecutor := executor.NewAssertionExecutor(tracer)
+			assertionRunner := executor.NewAssertionRunner(executor.NewDBUpdater(repo), assertionExecutor)
 
 			test, err = repo.CreateTest(ctx, test)
 			require.NoError(t, err)
@@ -60,9 +64,9 @@ func TestExecutorSuccessfulExecution(t *testing.T) {
 				Run:  run,
 			}
 
-			assertionExecutor.Start(1)
-			assertionExecutor.RunAssertions(assertionRequest)
-			assertionExecutor.Stop()
+			assertionRunner.Start(1)
+			assertionRunner.RunAssertions(ctx, assertionRequest)
+			assertionRunner.Stop()
 
 			dbResult, err := repo.GetRun(ctx, run.ID)
 			require.NoError(t, err)

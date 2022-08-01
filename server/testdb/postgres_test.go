@@ -31,8 +31,9 @@ func createTestWithName(t *testing.T, db model.Repository, name string) model.Te
 	test := model.Test{
 		Name:        name,
 		Description: "description",
-		ServiceUnderTest: model.ServiceUnderTest{
-			Request: model.HTTPRequest{
+		ServiceUnderTest: model.Trigger{
+			Type: model.TriggerTypeHTTP,
+			HTTP: &model.HTTPRequest{
 				URL: "http://localhost:3030/hello-instrumented",
 			},
 		},
@@ -55,7 +56,7 @@ func createRun(t *testing.T, db model.Repository, test model.Test) model.Run {
 		TraceID:   testdb.IDGen.TraceID(),
 		SpanID:    testdb.IDGen.SpanID(),
 		CreatedAt: time.Now(),
-		Request:   test.ServiceUnderTest.Request,
+		Trigger:   test.ServiceUnderTest,
 	}
 	updated, err := db.CreateRun(context.TODO(), test, run)
 	if err != nil {

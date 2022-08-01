@@ -5,6 +5,7 @@ set -e
 NAMESPACE="tracetest"
 TRACE_BACKEND="jaeger"
 TRACE_BACKEND_ENDPOINT="jaeger-query:16685"
+SKIP_COLLECTOR=""
 SKIP_PMA=""
 SKIP_BACKEND=""
 
@@ -16,8 +17,9 @@ help_message() {
   echo "  --namespace [tracetest]                        target installation k8s namespace"
   echo "  --trace-backend [jaeger]                       trace backend (jaeger or tempo)"
   echo "  --trace-backend-endpoint [jaeger-query:16685]  trace backend endpoint"
+  echo "  --skip-collector                               if set, don't install otel-collector"
   echo "  --skip-pma                                     if set, don't install the sample application"
-  echo "  --skip-backend                                  if set, don't install jaeger"
+  echo "  --skip-backend                                 if set, don't install jaeger"
   echo
 }
 
@@ -30,7 +32,7 @@ install_cert_manager(){
   kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.8.0/cert-manager.yaml
   echo
   echo "--> waiting for cert-manager"
-  kubectl wait --for=condition=ready pod -l app=webhook --namespace cert-manager
+  kubectl wait --for=condition=ready pod -l app=webhook --namespace cert-manager --timeout 2m
   echo "--> cert-manager ready. Create self signed ClusterIssuer"
   cat <<EOF | kubectl apply -f -
 apiVersion: cert-manager.io/v1
@@ -97,6 +99,10 @@ while [[ $# -gt 0 ]]; do
       SKIP_BACKEND="YES"
       shift # past argument
       ;;
+     --skip-collector)
+      SKIP_COLLECTOR="YES"
+      shift # past argument
+      ;;
     -h|--help)
       help_message
       exit
@@ -114,7 +120,7 @@ echo "Installing Tracetest"
 echo "----------------------------"
 echo
 
-helm repo add kubeshop https://kubeshop.github.io/helm-charts
+helm repo add --force-update kubeshop https://kubeshop.github.io/helm-charts
 helm repo update
 
 version=$(helm show chart kubeshop/tracetest | head -2 | tail -1 | awk -F ': ' '{print $2}')
@@ -123,9 +129,21 @@ echo
 echo "--> install tracetest version $version to namespace $NAMESPACE"
 helm upgrade --install tracetest kubeshop/tracetest \
   --namespace $NAMESPACE --create-namespace \
-  --set tracingBackend=$TRACE_BACKEND \
-  --set ${TRACE_BACKEND}ConnectionConfig.endpoint="$TRACE_BACKEND_ENDPOINT"
+  --set telemetry.dataStores.${TRACE_BACKEND}.${TRACE_BACKEND}.endpoint="$TRACE_BACKEND_ENDPOINT" \
+  --set server.telemetry.dataStore="${TRACE_BACKEND}"
 
+
+if [ "$SKIP_COLLECTOR" != "YES" ]; then
+    echo
+    echo
+    echo "----------------------------"
+    echo "Installing OTEL Collector"
+    echo "----------------------------"
+    echo
+    echo
+
+    kubectl apply -f https://raw.githubusercontent.com/kubeshop/tracetest/main/k8s/collector.yml
+fi
 
 if [ "$SKIP_BACKEND" != "YES" ]; then
     echo
@@ -166,6 +184,8 @@ if [ "$SKIP_PMA" != "YES" ]; then
     helm upgrade --install demo . \
       --namespace demo --create-namespace \
       -f values.yaml \
+      --set image.tag=latest \
+      --set image.pullPolicy=Always \
       --set postgres.auth.username=ashketchum,postgres.auth.password=squirtle123,postgres.auth.database=pokeshop \
       --set rabbitmq.auth.username=guest,rabbitmq.auth.password=guest,rabbitmq.auth.erlangCookie=secretcookie \
       --set 'env[5].value=jaeger-agent.'$NAMESPACE'.svc.cluster.local'
@@ -180,11 +200,10 @@ fi
 
 GA_MEASUREMENT_ID="G-WP4XXN1FYN"
 GA_SECRET_KEY="QHaq8ZCHTzGzdcRxJ-NIbw"
-uid=$(uuidgen)
 host=$(hostname)
 os=$(uname -s)
 arch=$(uname -m)
-payload='{"client_id":"'$uid'","events":[{"name":"setup_script","params":{"event_count":1,"event_category":"beacon","app_version":"'$version'","app_name":"tracetest","host":"'$host'","machine_id":"'$uid'","operating_system":"'$os'","architecture":"'$arch'"}}]}'
+payload='{"events":[{"name":"setup_script","params":{"event_count":1,"event_category":"beacon","app_version":"'$version'","app_name":"tracetest","host":"'$host'","operating_system":"'$os'","architecture":"'$arch'"}}]}'
 curl -X POST "https://www.google-analytics.com/debug/mp/collect?measurement_id=${GA_MEASUREMENT_ID}&api_secret=${GA_SECRET_KEY}" -d $payload > /dev/null
 curl -X POST "https://www.google-analytics.com/mp/collect?measurement_id=${GA_MEASUREMENT_ID}&api_secret=${GA_SECRET_KEY}" -d $payload
 

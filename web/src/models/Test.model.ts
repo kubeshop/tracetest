@@ -1,5 +1,6 @@
 import {TRawTest, TTest} from '../types/Test.types';
 import TestDefinition from './TestDefinition.model';
+import Trigger from './Trigger.model';
 
 const Test = ({
   id = '',
@@ -7,8 +8,7 @@ const Test = ({
   description = '',
   definition,
   version = 1,
-  serviceUnderTest,
-  referenceTestRun,
+  serviceUnderTest: rawTrigger,
 }: TRawTest): TTest => {
   return {
     id,
@@ -16,8 +16,7 @@ const Test = ({
     version,
     description,
     definition: TestDefinition(definition || {}),
-    serviceUnderTest,
-    referenceTestRun,
+    trigger: Trigger(rawTrigger || {}),
   };
 };
 

@@ -1,0 +1,42 @@
+openapi: 3.0.0
+components:
+  schemas:
+    GRPCHeader:
+      type: object
+      properties:
+        key:
+          type: string
+        value:
+          type: string
+
+    GRPCRequest:
+      type: object
+      properties:
+        protobufFile:
+          type: string
+        address:
+          type: string
+        service:
+          type: string
+        method:
+          type: string
+        metadata:
+          type: array
+          items:
+            $ref: "#/components/schemas/GRPCHeader"
+        auth:
+          $ref: "./http.yaml#/components/schemas/HTTPAuth"
+        request:
+          type: string
+
+    GRPCResponse:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+        metadata:
+          type: array
+          items:
+            $ref: "#/components/schemas/GRPCHeader"
+        body:
+          type: string

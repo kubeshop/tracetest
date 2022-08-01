@@ -5,11 +5,16 @@ import (
 )
 
 type PseudoClass interface {
+	Name() string
 	Filter(spans []traces.Span) []traces.Span
 }
 
 type NthChildPseudoClass struct {
 	N int64
+}
+
+func (nc NthChildPseudoClass) Name() string {
+	return "nth_child"
 }
 
 func (nc NthChildPseudoClass) Filter(spans []traces.Span) []traces.Span {
@@ -22,6 +27,10 @@ func (nc NthChildPseudoClass) Filter(spans []traces.Span) []traces.Span {
 
 type FirstPseudoClass struct{}
 
+func (fpc FirstPseudoClass) Name() string {
+	return "first"
+}
+
 func (fpc FirstPseudoClass) Filter(spans []traces.Span) []traces.Span {
 	if len(spans) == 0 {
 		return []traces.Span{}
@@ -31,6 +40,10 @@ func (fpc FirstPseudoClass) Filter(spans []traces.Span) []traces.Span {
 }
 
 type LastPseudoClass struct{}
+
+func (lpc LastPseudoClass) Name() string {
+	return "last"
+}
 
 func (lpc LastPseudoClass) Filter(spans []traces.Span) []traces.Span {
 	length := len(spans)

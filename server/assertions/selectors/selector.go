@@ -14,17 +14,17 @@ func FromSpanQuery(sq model.SpanQuery) Selector {
 }
 
 type Selector struct {
-	spanSelectors []spanSelector
+	SpanSelectors []SpanSelector
 }
 
 func (s Selector) Filter(trace traces.Trace) []traces.Span {
-	if len(s.spanSelectors) == 0 {
+	if len(s.SpanSelectors) == 0 {
 		// empty selector should select everything
 		return getAllSpans(trace)
 	}
 
 	allFilteredSpans := make([]traces.Span, 0)
-	for _, spanSelector := range s.spanSelectors {
+	for _, spanSelector := range s.SpanSelectors {
 		spans := filterSpans(trace.RootSpan, spanSelector)
 		allFilteredSpans = append(allFilteredSpans, spans...)
 	}
@@ -41,13 +41,13 @@ func getAllSpans(trace traces.Trace) []traces.Span {
 	return allSpans
 }
 
-type spanSelector struct {
+type SpanSelector struct {
 	Filters       []filter
-	PsedoClass    PseudoClass
-	ChildSelector *spanSelector
+	PseudoClass   PseudoClass
+	ChildSelector *SpanSelector
 }
 
-func (ss spanSelector) MatchesFilters(span traces.Span) bool {
+func (ss SpanSelector) MatchesFilters(span traces.Span) bool {
 	for _, filter := range ss.Filters {
 		if err := filter.Filter(span); err != nil {
 			return false
@@ -57,16 +57,19 @@ func (ss spanSelector) MatchesFilters(span traces.Span) bool {
 	return true
 }
 
-type filterFunction func(traces.Span, string, Value) error
+type FilterFunction struct {
+	Filter func(traces.Span, string, Value) error
+	Name   string
+}
 
 type filter struct {
 	Property  string
-	Operation filterFunction
+	Operation FilterFunction
 	Value     Value
 }
 
 func (f filter) Filter(span traces.Span) error {
-	return f.Operation(span, f.Property, f.Value)
+	return f.Operation.Filter(span, f.Property, f.Value)
 }
 
 var (

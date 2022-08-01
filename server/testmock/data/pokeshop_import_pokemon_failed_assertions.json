@@ -32,7 +32,7 @@
             {
               "attribute": "tracetest.span.duration",
               "comparator": "<",
-              "value": "100"
+              "value": "100000000"
             }
           ]
         },
@@ -42,7 +42,7 @@
             {
               "attribute": "tracetest.span.duration",
               "comparator": "<",
-              "value": "1000"
+              "value": "1000000000"
             }
           ]
         }
@@ -106,7 +106,7 @@
             "http.response.body":  "{\"id\":52}",
             "tracetest.response.status": "200",
             "tracetest.response.body": "{\"id\":52}",
-            "tracetest.span.duration": "2",
+            "tracetest.span.duration": "2000000",
             "tracetest.span.type": "http"
           },
           "Children": [
@@ -118,7 +118,7 @@
               "Attributes": {
                 "service.name": "pokeshop-worker",
                 "messaging.destination": "/queue/syncronizePokemon",
-                "tracetest.span.duration": "234",
+                "tracetest.span.duration": "234000000",
                 "tracetest.span.type": "messaging"
               },
               "Children": []
@@ -132,7 +132,7 @@
                 "service.name": "pokeshop-worker",
                 "db.name": "pokeshop",
                 "db.system": "postgresql",
-                "tracetest.span.duration": "2",
+                "tracetest.span.duration": "2000000",
                 "tracetest.span.type": "database"
               },
               "Children": []

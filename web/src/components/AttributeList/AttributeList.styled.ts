@@ -17,13 +17,13 @@ export const EmptyAttributeList = styled.div`
 `;
 
 export const EmptyIcon = styled(QuestionCircleOutlined)`
+  color: ${({theme}) => theme.color.textSecondary};
   font-size: 28px;
-  color: #687492;
   margin-bottom: 16px;
 `;
 
 export const EmptyTitle = styled(Typography.Title).attrs({
-  level: 5,
+  level: 3,
   type: 'secondary',
 })``;
 

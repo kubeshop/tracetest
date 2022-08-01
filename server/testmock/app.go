@@ -25,7 +25,7 @@ func WithHttpPort(port int) TestingAppOption {
 	}
 }
 
-func GetTestingApp(demoApp *DemoApp, options ...TestingAppOption) (*app.App, error) {
+func GetTestingApp(options ...TestingAppOption) (*app.App, error) {
 	ctx := context.Background()
 	db, err := GetTestingDatabase("file://../migrations")
 
@@ -34,18 +34,24 @@ func GetTestingApp(demoApp *DemoApp, options ...TestingAppOption) (*app.App, err
 	}
 
 	config := config.Config{
-		JaegerConnectionConfig: &configgrpc.GRPCClientSettings{
-			Endpoint: demoApp.JaegerEndpoint(),
-			TLSSetting: configtls.TLSClientSetting{
-				Insecure: true,
+		Telemetry: config.Telemetry{
+			DataStores: map[string]config.TracingBackendDataStoreConfig{
+				"jaeger": {
+					Type: "jaeger",
+					Jaeger: configgrpc.GRPCClientSettings{
+						Endpoint:   "",
+						TLSSetting: configtls.TLSClientSetting{Insecure: true},
+					},
+				},
+			},
+		},
+		Server: config.ServerConfig{
+			Telemetry: config.ServerTelemetryConfig{
+				DataStore: "jaeger",
 			},
 		},
 		PoolingConfig: config.PoolingConfig{
 			RetryDelay: "5s",
-		},
-		Telemetry: config.TelemetryConfig{
-			Exporters:   []string{"console"},
-			ServiceName: "tracetest",
 		},
 	}
 

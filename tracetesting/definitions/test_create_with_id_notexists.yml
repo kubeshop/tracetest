@@ -1,0 +1,37 @@
+id: 4ab71eaa-7356-454a-b1c0-8064e2a7135d
+name: Test Create with non-existing ID
+description: ""
+trigger:
+  type: http
+  httpRequest:
+    url: ${TARGET_URL}/api/tests
+    method: POST
+    headers:
+    - key: Content-Type
+      value: application/json
+    body: |
+      {
+        "id": "383d3dce-7b60-4a61-bdea-87f47263af5d",
+        "name": "Pokemon - List - Get a Pokemon",
+        "serviceUnderTest": {
+          "triggerType": "http",
+          "triggerSettings": {
+            "http": {
+              "url": "${DEMO_APP_URL}/pokemon?take=20&skip=0",
+              "method": "GET",
+              "body": "",
+              "headers": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ]
+            }
+          }
+        }
+      }
+testDefinition:
+- selector: span[name="POST /api/tests" tracetest.span.type="http"]
+  assertions:
+  - tracetest.response.status = 200
+  - tracetest.response.body contains '"id":"383d3dce-7b60-4a61-bdea-87f47263af5d"'

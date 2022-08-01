@@ -12,11 +12,8 @@ export const PageHeader = styled.div`
   margin: 14px 0;
 `;
 
-export const TitleText = styled(Typography.Title).attrs({
-  level: 4,
-})`
+export const TitleText = styled(Typography.Title).attrs({level: 1})`
   && {
-    font-size: 18px;
     margin: 14px 0;
   }
 `;
@@ -45,9 +42,7 @@ export const NoResultsIcon = styled.img.attrs({
   src: noResultsIcon,
 })``;
 
-export const NoResultsTitle = styled(Typography.Title).attrs({
-  level: 3,
-})`
+export const NoResultsTitle = styled(Typography.Title)`
   margin-top: 32px;
 `;
 

@@ -4,17 +4,18 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
 	"sync"
 	"time"
 
 	"github.com/kubeshop/tracetest/cli/config"
-	"github.com/kubeshop/tracetest/cli/conversion"
 	"github.com/kubeshop/tracetest/cli/definition"
 	"github.com/kubeshop/tracetest/cli/file"
 	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/kubeshop/tracetest/cli/variable"
 	"go.uber.org/zap"
+	"gopkg.in/yaml.v3"
 )
 
 type RunTestConfig struct {
@@ -79,24 +80,25 @@ func (a runTestAction) runDefinition(ctx context.Context, definitionFile string,
 
 	var test openapi.Test
 
-	if definition.Id == "" {
-		a.logger.Debug("test doesn't exist. Creating it")
-		test, err = a.createTestFromDefinition(ctx, definition)
-		if err != nil {
-			return runTestOutput{}, fmt.Errorf("could not create test from definition: %w", err)
-		}
+	a.logger.Debug("try to create test")
 
-		definition.Id = *test.Id
-		err = file.SaveDefinition(definitionFile, definition)
-		if err != nil {
-			return runTestOutput{}, fmt.Errorf("could not save definition: %w", err)
-		}
-	} else {
+	test, exists, err := a.createTestFromDefinition(ctx, definition)
+	if err != nil {
+		return runTestOutput{}, fmt.Errorf("could not create test from definition: %w", err)
+	}
+
+	if exists {
 		a.logger.Debug("test exists. Updating it")
 		test, err = a.updateTestFromDefinition(ctx, definition)
 		if err != nil {
 			return runTestOutput{}, fmt.Errorf("could not update test using definition: %w", err)
 		}
+	}
+
+	definition.Id = *test.Id
+	err = file.SaveDefinition(definitionFile, definition)
+	if err != nil {
+		return runTestOutput{}, fmt.Errorf("could not save test definition: %w", err)
 	}
 
 	testRun, err := a.runTest(ctx, definition.Id)
@@ -146,56 +148,58 @@ func (a runTestAction) saveJUnitFile(ctx context.Context, testId, testRunId, out
 
 }
 
-func (a runTestAction) createTestFromDefinition(ctx context.Context, definition definition.Test) (openapi.Test, error) {
+func (a runTestAction) createTestFromDefinition(ctx context.Context, definition definition.Test) (_ openapi.Test, exists bool, _ error) {
 	variableInjector := variable.NewInjector()
 	variableInjector.Inject(&definition)
 
-	openapiTest, err := conversion.ConvertTestDefinitionIntoOpenAPIObject(definition)
+	yamlContentBytes, err := yaml.Marshal(definition)
 	if err != nil {
-		return openapi.Test{}, err
+		return openapi.Test{}, false, fmt.Errorf("could not marshal yaml: %w", err)
 	}
 
-	req := a.client.ApiApi.CreateTest(ctx)
-	req = req.Test(openapiTest)
+	yamlContent := string(yamlContentBytes)
 
-	testBytes, err := json.Marshal(openapiTest)
-	if err != nil {
-		return openapi.Test{}, fmt.Errorf("could not marshal test: %w", err)
+	textDefinition := openapi.TextDefinition{Content: &yamlContent}
+	req := a.client.ApiApi.CreateTestFromDefinition(ctx)
+	req = req.TextDefinition(textDefinition)
+
+	a.logger.Debug("Sending request to create test", zap.ByteString("test", yamlContentBytes))
+	createdTest, resp, err := a.client.ApiApi.CreateTestFromDefinitionExecute(req)
+
+	if resp != nil && resp.StatusCode == http.StatusBadRequest {
+		// trying to create a test with already exsiting ID
+		return openapi.Test{}, true, nil
 	}
 
-	a.logger.Debug("Sending request to create test", zap.ByteString("test", testBytes))
-	createdTest, _, err := a.client.ApiApi.CreateTestExecute(req)
 	if err != nil {
-		return openapi.Test{}, fmt.Errorf("could not execute request: %w", err)
+		return openapi.Test{}, false, fmt.Errorf("could not execute request: %w", err)
 	}
 
-	return *createdTest, nil
+	return *createdTest, false, nil
 }
 
 func (a runTestAction) updateTestFromDefinition(ctx context.Context, definition definition.Test) (openapi.Test, error) {
 	variableInjector := variable.NewInjector()
 	variableInjector.Inject(&definition)
 
-	openapiTest, err := conversion.ConvertTestDefinitionIntoOpenAPIObject(definition)
+	yamlContentBytes, err := yaml.Marshal(definition)
 	if err != nil {
-		return openapi.Test{}, err
+		return openapi.Test{}, fmt.Errorf("could not marshal yaml: %w", err)
 	}
 
-	req := a.client.ApiApi.UpdateTest(ctx, definition.Id)
-	req = req.Test(openapiTest)
+	yamlContent := string(yamlContentBytes)
+	textDefinition := openapi.TextDefinition{Content: &yamlContent}
 
-	testBytes, err := json.Marshal(openapiTest)
-	if err != nil {
-		return openapi.Test{}, fmt.Errorf("could not marshal test: %w", err)
-	}
+	req := a.client.ApiApi.UpdateTestFromDefinition(ctx, definition.Id)
+	req = req.TextDefinition(textDefinition)
 
-	a.logger.Debug("Sending request to update test", zap.ByteString("test", testBytes))
-	_, err = a.client.ApiApi.UpdateTestExecute(req)
+	a.logger.Debug("Sending request to update test", zap.ByteString("test", yamlContentBytes))
+	openapiTest, _, err := a.client.ApiApi.UpdateTestFromDefinitionExecute(req)
 	if err != nil {
 		return openapi.Test{}, fmt.Errorf("could not execute request: %w", err)
 	}
 
-	return openapiTest, nil
+	return *openapiTest, nil
 }
 
 func (a runTestAction) runTest(ctx context.Context, testID string) (openapi.TestRun, error) {

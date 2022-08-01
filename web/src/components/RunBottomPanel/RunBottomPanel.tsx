@@ -1,23 +1,22 @@
 import AssertionForm from 'components/AssertionForm';
-import {useAssertionForm} from 'components/AssertionForm/AssertionFormProvider';
+import AssertionList from 'components/AssertionList';
+import {useAssertionForm} from 'components/AssertionForm/AssertionForm.provider';
 import LoadingSpinner from 'components/LoadingSpinner';
-import TestResults from 'components/TestResults';
+import {useSpan} from 'providers/Span/Span.provider';
 import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
-import {TSpan} from 'types/Span.types';
 import {TTestRun} from 'types/TestRun.types';
 import Header from './Header';
 import * as S from './RunBottomPanel.styled';
 
 interface IProps {
-  onSelectSpan: (spanId: string) => void;
   run: TTestRun;
-  selectedSpan: TSpan;
   testId: string;
 }
 
-const RunBottomPanel = ({onSelectSpan, run: {id: runId}, run, selectedSpan, testId}: IProps) => {
+const RunBottomPanel = ({run: {id: runId}, run, testId}: IProps) => {
   const {isOpen: isAssertionFormOpen, formProps, onSubmit, close} = useAssertionForm();
   const {isLoading, assertionResults} = useTestDefinition();
+  const {selectedSpan, onSelectSpan} = useSpan();
 
   return (
     <>
@@ -25,7 +24,7 @@ const RunBottomPanel = ({onSelectSpan, run: {id: runId}, run, selectedSpan, test
         assertionResults={assertionResults}
         isDisabled={isAssertionFormOpen}
         run={run}
-        selectedSpan={selectedSpan}
+        selectedSpan={selectedSpan!}
       />
       <S.Container id="assertions-container">
         <S.Content>
@@ -46,7 +45,7 @@ const RunBottomPanel = ({onSelectSpan, run: {id: runId}, run, selectedSpan, test
             />
           )}
           {!isLoading && !isAssertionFormOpen && Boolean(assertionResults) && (
-            <TestResults testId={testId} assertionResults={assertionResults!} onSelectSpan={onSelectSpan} />
+            <AssertionList assertionResults={assertionResults!} onSelectSpan={onSelectSpan} />
           )}
         </S.Content>
       </S.Container>

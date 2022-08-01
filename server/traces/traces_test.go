@@ -20,23 +20,27 @@ func TestJSONEncoding(t *testing.T) {
 	subSubSpan1 := createSpan("subSubSpan1")
 	subSpan2 := createSpan("subSpan2")
 
-	rootSpan.Children = []*traces.Span{subSpan1, subSpan2}
 	subSpan1.Parent = rootSpan
 	subSpan2.Parent = rootSpan
-
-	subSpan1.Children = []*traces.Span{subSubSpan1}
 	subSubSpan1.Parent = subSpan1
+
+	flat := map[trace.SpanID]*traces.Span{
+		// We copy those spans so they don't have children injected into them
+		// the flat structure shouldn't have children.
+		rootSpan.ID:    copySpan(rootSpan),
+		subSpan1.ID:    copySpan(subSpan1),
+		subSubSpan1.ID: copySpan(subSubSpan1),
+		subSpan2.ID:    copySpan(subSpan2),
+	}
+
+	rootSpan.Children = []*traces.Span{subSpan1, subSpan2}
+	subSpan1.Children = []*traces.Span{subSubSpan1}
 
 	tid := id.NewRandGenerator().TraceID()
 	trace := traces.Trace{
 		ID:       tid,
 		RootSpan: *rootSpan,
-		Flat: map[trace.SpanID]*traces.Span{
-			rootSpan.ID:    rootSpan,
-			subSpan1.ID:    subSpan1,
-			subSubSpan1.ID: subSubSpan1,
-			subSpan2.ID:    subSpan2,
-		},
+		Flat:     flat,
 	}
 
 	jsonEncoded := fmt.Sprintf(`{
@@ -44,8 +48,8 @@ func TestJSONEncoding(t *testing.T) {
 		"RootSpan": {
 			"ID": "%s",
 			"Name":"root",
-			"StartTime":"%s",
-			"EndTime":"%s",
+			"StartTime":"%d",
+			"EndTime":"%d",
 			"Attributes": {
 				"service.name": "root"
 			},
@@ -53,16 +57,16 @@ func TestJSONEncoding(t *testing.T) {
 				{
 					"ID": "%s",
 					"Name":"subSpan1",
-					"StartTime":"%s",
-					"EndTime":"%s",
+					"StartTime":"%d",
+					"EndTime":"%d",
 					"Attributes": {
 						"service.name": "subSpan1"
 					},
 					"Children": [
 						{
 							"ID": "%s",
-							"StartTime":"%s",
-							"EndTime":"%s",
+							"StartTime":"%d",
+							"EndTime":"%d",
 							"Name":"subSubSpan1",
 							"Attributes": {
 								"service.name": "subSubSpan1"
@@ -74,8 +78,8 @@ func TestJSONEncoding(t *testing.T) {
 				{
 					"ID": "%s",
 					"Name":"subSpan2",
-					"StartTime":"%s",
-					"EndTime":"%s",
+					"StartTime":"%d",
+					"EndTime":"%d",
 					"Attributes": {
 						"service.name": "subSpan2"
 					},
@@ -87,20 +91,20 @@ func TestJSONEncoding(t *testing.T) {
 		tid.String(),
 
 		rootSpan.ID.String(),
-		rootSpan.StartTime.Format(time.RFC3339),
-		rootSpan.EndTime.Format(time.RFC3339),
+		rootSpan.StartTime.UnixMilli(),
+		rootSpan.EndTime.UnixMilli(),
 
 		subSpan1.ID.String(),
-		subSpan1.StartTime.Format(time.RFC3339),
-		subSpan1.EndTime.Format(time.RFC3339),
+		subSpan1.StartTime.UnixMilli(),
+		subSpan1.EndTime.UnixMilli(),
 
 		subSubSpan1.ID.String(),
-		subSubSpan1.StartTime.Format(time.RFC3339),
-		subSubSpan1.EndTime.Format(time.RFC3339),
+		subSubSpan1.StartTime.UnixMilli(),
+		subSubSpan1.EndTime.UnixMilli(),
 
 		subSpan2.ID.String(),
-		subSpan2.StartTime.Format(time.RFC3339),
-		subSpan2.EndTime.Format(time.RFC3339),
+		subSpan2.StartTime.UnixMilli(),
+		subSpan2.EndTime.UnixMilli(),
 	)
 
 	t.Run("encode", func(t *testing.T) {
@@ -115,10 +119,20 @@ func TestJSONEncoding(t *testing.T) {
 		err := json.Unmarshal([]byte(jsonEncoded), &actual)
 		require.NoError(t, err)
 
-		fmt.Printf("%+v\n", actual.RootSpan.Children[0].Children[0])
+		// I've added more specific validations to be easier to find where the problem is
+		require.Equal(t, trace.ID, actual.ID)
+		require.Equal(t, trace.RootSpan, actual.RootSpan)
+		require.Equal(t, trace.Flat, actual.Flat)
 
+		// I left this as a guarantee we won't forget to change this test in case we add
+		// another attribute to our traces.
 		assert.Equal(t, trace, actual)
 	})
+}
+
+func copySpan(span *traces.Span) *traces.Span {
+	newSpan := *span
+	return &newSpan
 }
 
 func createSpan(name string) *traces.Span {
@@ -130,5 +144,91 @@ func createSpan(name string) *traces.Span {
 		Attributes: traces.Attributes{
 			"service.name": name,
 		},
+		Children: nil,
 	}
+}
+
+var now = time.Now()
+
+func getTime(n int) time.Time {
+	return now.Add(time.Duration(n) * time.Second)
+}
+
+func TestSort(t *testing.T) {
+	randGenerator := id.NewRandGenerator()
+	trace := traces.Trace{
+		ID: randGenerator.TraceID(),
+		RootSpan: traces.Span{
+			Name:       "root",
+			StartTime:  getTime(0),
+			Attributes: traces.Attributes{},
+			Children: []*traces.Span{
+				{
+					Name:      "child 2",
+					StartTime: getTime(2),
+				},
+				{
+					Name:      "child 3",
+					StartTime: getTime(3),
+				},
+				{
+					Name:      "child 1",
+					StartTime: getTime(1),
+					Children: []*traces.Span{
+						{
+							Name:      "grandchild 1",
+							StartTime: getTime(2),
+						},
+						{
+							Name:      "grandchild 2",
+							StartTime: getTime(3),
+						},
+					},
+				},
+			},
+		},
+	}
+
+	sortedTrace := trace.Sort()
+
+	expectedTrace := traces.Trace{
+		ID: randGenerator.TraceID(),
+		RootSpan: traces.Span{
+			Name:       "root",
+			StartTime:  getTime(0),
+			Attributes: traces.Attributes{},
+			Children: []*traces.Span{
+				{
+					Name:      "child 1",
+					StartTime: getTime(1),
+					Children: []*traces.Span{
+						{
+
+							Name:      "grandchild 1",
+							StartTime: getTime(2),
+							Children:  make([]*traces.Span, 0),
+						},
+						{
+
+							Name:      "grandchild 2",
+							StartTime: getTime(3),
+							Children:  make([]*traces.Span, 0),
+						},
+					},
+				},
+				{
+					Name:      "child 2",
+					StartTime: getTime(2),
+					Children:  make([]*traces.Span, 0),
+				},
+				{
+					Name:      "child 3",
+					StartTime: getTime(3),
+					Children:  make([]*traces.Span, 0),
+				},
+			},
+		},
+	}
+
+	assert.Equal(t, expectedTrace.RootSpan, sortedTrace.RootSpan)
 }

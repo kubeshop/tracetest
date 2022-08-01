@@ -20,6 +20,10 @@ func FromOtel(input *v1.TracesData) Trace {
 		}
 	}
 
+	if len(flattenSpans) == 0 {
+		return Trace{}
+	}
+
 	spansMap := map[trace.SpanID]*Span{}
 	for _, span := range flattenSpans {
 		newSpan := convertOtelSpanIntoSpan(span)
@@ -46,6 +50,7 @@ func convertOtelSpanIntoSpan(span *v1.Span) *Span {
 	}
 
 	attributes["name"] = span.Name
+	attributes["kind"] = span.Kind.String()
 	attributes["tracetest.span.type"] = spanType(attributes)
 	attributes["tracetest.span.duration"] = spanDuration(span)
 
@@ -63,7 +68,7 @@ func convertOtelSpanIntoSpan(span *v1.Span) *Span {
 
 func spanDuration(span *v1.Span) string {
 	if span.GetStartTimeUnixNano() != 0 && span.GetEndTimeUnixNano() != 0 {
-		spanDuration := (span.GetEndTimeUnixNano() - span.GetStartTimeUnixNano()) / 1000 / 1000 // in milliseconds
+		spanDuration := (span.GetEndTimeUnixNano() - span.GetStartTimeUnixNano())
 		return strconv.FormatUint(spanDuration, 10)
 	}
 

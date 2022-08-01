@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"time"
 
@@ -14,8 +13,25 @@ import (
 
 var _ model.TestRepository = &postgresDB{}
 
+func (td *postgresDB) IDExists(ctx context.Context, id uuid.UUID) (bool, error) {
+	exists := false
+
+	row := td.db.QueryRowContext(
+		ctx,
+		"SELECT COUNT(*) > 0 as exists FROM tests WHERE id = $1",
+		id.String(),
+	)
+
+	err := row.Scan(&exists)
+
+	return exists, err
+}
+
 func (td *postgresDB) CreateTest(ctx context.Context, test model.Test) (model.Test, error) {
-	test.ID = IDGen.UUID()
+	if !test.HasID() {
+		test.ID = IDGen.UUID()
+	}
+
 	test.CreatedAt = time.Now()
 	test.ReferenceRun = nil
 	test.Version = 1
@@ -52,6 +68,9 @@ func (td *postgresDB) UpdateTest(ctx context.Context, test model.Test) (model.Te
 	if err != nil {
 		return model.Test{}, fmt.Errorf("could not get latest test version while updating test: %w", err)
 	}
+
+	// keep the same creation date to keep sort order
+	test.CreatedAt = oldTest.CreatedAt
 
 	testToUpdate, err := model.BumpTestVersionIfNeeded(oldTest, test)
 	if err != nil {
@@ -98,7 +117,7 @@ func (td *postgresDB) UpdateTestVersion(ctx context.Context, test model.Test) er
 		return fmt.Errorf("encoding error: %w", err)
 	}
 
-	_, err = stmt.Exec(test.ID, b, test.Version)
+	_, err = stmt.ExecContext(ctx, test.ID, b, test.Version)
 	if err != nil {
 		return fmt.Errorf("sql exec: %w", err)
 	}
@@ -114,7 +133,7 @@ func (td *postgresDB) DeleteTest(ctx context.Context, test model.Test) error {
 	}
 
 	for _, sql := range queries {
-		_, err := td.db.Exec(sql, test.ID)
+		_, err := td.db.ExecContext(ctx, sql, test.ID)
 		if err != nil {
 			return fmt.Errorf("sql error: %w", err)
 		}
@@ -123,8 +142,14 @@ func (td *postgresDB) DeleteTest(ctx context.Context, test model.Test) error {
 	return nil
 }
 
+const getTestSQL = `
+SELECT t.test, d.definition
+FROM tests t
+JOIN definitions d ON d.test_id = t.id AND d.test_version = t.version
+`
+
 func (td *postgresDB) GetTestVersion(ctx context.Context, id uuid.UUID, version int) (model.Test, error) {
-	stmt, err := td.db.Prepare("SELECT test FROM tests WHERE id = $1 AND version = $2")
+	stmt, err := td.db.Prepare(getTestSQL + " WHERE t.id = $1 AND t.version = $2")
 	if err != nil {
 		return model.Test{}, fmt.Errorf("prepare: %w", err)
 	}
@@ -139,7 +164,7 @@ func (td *postgresDB) GetTestVersion(ctx context.Context, id uuid.UUID, version 
 }
 
 func (td *postgresDB) GetLatestTestVersion(ctx context.Context, id uuid.UUID) (model.Test, error) {
-	stmt, err := td.db.Prepare("SELECT test FROM tests WHERE id = $1 ORDER BY version DESC LIMIT 1")
+	stmt, err := td.db.Prepare(getTestSQL + " WHERE t.id = $1 ORDER BY t.version DESC LIMIT 1")
 	if err != nil {
 		return model.Test{}, fmt.Errorf("prepare: %w", err)
 	}
@@ -154,11 +179,14 @@ func (td *postgresDB) GetLatestTestVersion(ctx context.Context, id uuid.UUID) (m
 }
 
 func (td *postgresDB) GetTests(ctx context.Context, take, skip int32) ([]model.Test, error) {
-	stmt, err := td.db.Prepare(`SELECT test FROM tests INNER JOIN (
+	stmt, err := td.db.Prepare(getTestSQL + `
+	INNER JOIN (
 		SELECT id as idx, max(version) as latest_version FROM tests GROUP BY idx
-	) as latestTests ON latestTests.idx = id WHERE version = latestTests.latest_version
-	ORDER BY (test ->> 'CreatedAt')::timestamp DESC
-	LIMIT $1 OFFSET $2`)
+	) as latestTests ON latestTests.idx = t.id
+	WHERE t.version = latestTests.latest_version
+	ORDER BY (t.test ->> 'CreatedAt')::timestamp DESC
+	LIMIT $1 OFFSET $2
+	`)
 	if err != nil {
 		return nil, err
 	}
@@ -201,22 +229,22 @@ func decodeTest(b []byte) (model.Test, error) {
 }
 
 func (td *postgresDB) readTestRow(ctx context.Context, row scanner) (model.Test, error) {
-	var b []byte
-	err := row.Scan(&b)
+	var testB, defB []byte
+	err := row.Scan(&testB, &defB)
 	switch err {
 	case sql.ErrNoRows:
 		return model.Test{}, ErrNotFound
 	case nil:
-		test, err := decodeTest(b)
+		test, err := decodeTest(testB)
 		if err != nil {
 			return model.Test{}, err
 		}
 
-		defs, err := td.GetDefiniton(ctx, test)
-		if err != nil && !errors.Is(err, ErrNotFound) {
-			err = fmt.Errorf("aca 1. %w", err)
+		defs, err := decodeDefinition(defB)
+		if err != nil {
 			return model.Test{}, err
 		}
+
 		test.Definition = defs
 
 		return test, nil

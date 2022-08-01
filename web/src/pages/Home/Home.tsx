@@ -1,6 +1,6 @@
 import Layout from 'components/Layout';
-import {withTracker} from 'ga-4-react';
 import HomeContent from './HomeContent';
+import withAnalytics from '../../components/WithAnalytics/WithAnalytics';
 
 const Home = (): JSX.Element => {
   return (
@@ -10,4 +10,4 @@ const Home = (): JSX.Element => {
   );
 };
 
-export default withTracker(Home);
+export default withAnalytics(Home, 'home');

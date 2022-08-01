@@ -5,22 +5,25 @@ import (
 	"testing"
 	"time"
 
+	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/executor"
+	"github.com/kubeshop/tracetest/server/executor/trigger"
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/testdb"
+	"github.com/kubeshop/tracetest/server/tracing"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
-	"go.opentelemetry.io/otel/trace"
 )
 
 func TestPersistentRunner(t *testing.T) {
-	t.Run("TestIsExecuted", func(t *testing.T) {
+	t.Run("TestIsTriggerd", func(t *testing.T) {
 		t.Parallel()
 
 		test := model.Test{
-			ID: id.NewRandGenerator().UUID(),
+			ID:               id.NewRandGenerator().UUID(),
+			ServiceUnderTest: sampleTrigger,
 		}
 
 		f := runnerSetup(t)
@@ -35,11 +38,11 @@ func TestPersistentRunner(t *testing.T) {
 		f.assert(t)
 	})
 
-	t.Run("TestsCanBeExecutedConcurrently", func(t *testing.T) {
+	t.Run("TestsCanBeTriggerdConcurrently", func(t *testing.T) {
 		t.Parallel()
 
-		test1 := model.Test{ID: id.NewRandGenerator().UUID()}
-		test2 := model.Test{ID: id.NewRandGenerator().UUID()}
+		test1 := model.Test{ID: id.NewRandGenerator().UUID(), ServiceUnderTest: sampleTrigger}
+		test2 := model.Test{ID: id.NewRandGenerator().UUID(), ServiceUnderTest: sampleTrigger}
 
 		f := runnerSetup(t)
 
@@ -62,18 +65,30 @@ func TestPersistentRunner(t *testing.T) {
 var (
 	noError error = nil
 
-	sampleResponse = model.HTTPResponse{
-		StatusCode: 200,
-		Body:       "this is the body",
-		Headers: []model.HTTPHeader{
-			{Key: "Content-Type", Value: "text/plain"},
+	sampleResponse = trigger.Response{
+		SpanAttributes: map[string]string{
+			"tracetest.run.trigger.http.response_code": "200",
 		},
+		Result: model.TriggerResult{
+			Type: model.TriggerTypeHTTP,
+			HTTP: &model.HTTPResponse{
+				StatusCode: 200,
+				Body:       "this is the body",
+				Headers: []model.HTTPHeader{
+					{Key: "Content-Type", Value: "text/plain"},
+				},
+			},
+		},
+	}
+
+	sampleTrigger = model.Trigger{
+		Type: model.TriggerTypeHTTP,
 	}
 )
 
 type runnerFixture struct {
 	runner          executor.PersistentRunner
-	mockExecutor    *mockExecutor
+	mockExecutor    *mockTriggerer
 	mockDB          *mockDB
 	mockTracePoller *mockTracePoller
 }
@@ -82,26 +97,25 @@ func (f runnerFixture) run(tests []model.Test, ttl time.Duration) {
 	f.runner.Start(2)
 	time.Sleep(10 * time.Millisecond)
 	for _, test := range tests {
-		f.runner.Run(test)
+		f.runner.Run(context.TODO(), test)
 	}
 	time.Sleep(ttl)
 	f.runner.Stop()
 }
 
 func (f runnerFixture) expectSuccessExecLong(test model.Test) {
-	f.mockExecutor.expectExecuteTestLong(test)
+	f.mockExecutor.expectTriggerTestLong(test)
 	f.expectSuccessResultPersist(test)
 }
 
 func (f runnerFixture) expectSuccessExec(test model.Test) {
-	f.mockExecutor.expectExecuteTest(test)
+	f.mockExecutor.expectTriggerTest(test)
 	f.expectSuccessResultPersist(test)
 }
 
 func (f runnerFixture) expectSuccessResultPersist(test model.Test) {
 	expectCreateRun(f.mockDB, test)
 	f.mockDB.On("UpdateRun", mock.Anything).Return(noError)
-	f.mockDB.On("UpdateTestVersion", mock.Anything).Return(noError)
 	f.mockDB.On("UpdateRun", mock.Anything).Return(noError)
 	f.mockTracePoller.expectPoll(test)
 }
@@ -112,9 +126,13 @@ func (f runnerFixture) assert(t *testing.T) {
 }
 
 func runnerSetup(t *testing.T) runnerFixture {
-	me := new(mockExecutor)
+	tr, _ := tracing.NewTracer(context.TODO(), config.Config{})
+	reg := trigger.NewRegsitry(tr, tr)
+
+	me := new(mockTriggerer)
 	me.t = t
 	me.Test(t)
+	reg.Add(me)
 
 	db := new(mockDB)
 	db.T = t
@@ -123,9 +141,11 @@ func runnerSetup(t *testing.T) runnerFixture {
 	mtp := new(mockTracePoller)
 	mtp.t = t
 
+	tracer, _ := tracing.NewTracer(context.Background(), config.Config{})
+
 	mtp.Test(t)
 	return runnerFixture{
-		runner:          executor.NewPersistentRunner(me, db, mtp),
+		runner:          executor.NewPersistentRunner(reg, db, executor.NewDBUpdater(db), mtp, tracer),
 		mockExecutor:    me,
 		mockDB:          db,
 		mockTracePoller: mtp,
@@ -160,25 +180,29 @@ func (m *mockDB) UpdateRun(_ context.Context, run model.Run) error {
 	return args.Error(0)
 }
 
-type mockExecutor struct {
+type mockTriggerer struct {
 	mock.Mock
 	t *testing.T
 }
 
-func (m *mockExecutor) Execute(test model.Test, tid trace.TraceID, sid trace.SpanID) (model.HTTPResponse, error) {
-	args := m.Called(test.ID)
-	return args.Get(0).(model.HTTPResponse), args.Error(1)
+func (m *mockTriggerer) Type() model.TriggerType {
+	return model.TriggerTypeHTTP
 }
 
-func (m *mockExecutor) expectExecuteTest(test model.Test) *mock.Call {
+func (m *mockTriggerer) Trigger(_ context.Context, test model.Test) (trigger.Response, error) {
+	args := m.Called(test.ID)
+	return args.Get(0).(trigger.Response), args.Error(1)
+}
+
+func (m *mockTriggerer) expectTriggerTest(test model.Test) *mock.Call {
 	return m.
-		On("Execute", test.ID).
+		On("Trigger", test.ID).
 		Return(sampleResponse, noError)
 }
 
-func (m *mockExecutor) expectExecuteTestLong(test model.Test) *mock.Call {
+func (m *mockTriggerer) expectTriggerTestLong(test model.Test) *mock.Call {
 	return m.
-		On("Execute", test.ID).
+		On("Trigger", test.ID).
 		After(50*time.Millisecond).
 		Return(sampleResponse, noError)
 }

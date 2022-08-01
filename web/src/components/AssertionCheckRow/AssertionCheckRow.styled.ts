@@ -1,7 +1,6 @@
 import {Badge, Tooltip, Typography} from 'antd';
 import styled from 'styled-components';
-import {SemanticGroupNames} from '../../constants/SemanticGroupNames.constants';
-import {getNotchColor} from '../TraceNode/TraceNode.styled';
+import {SemanticGroupNames, SemanticGroupNamesToColor} from 'constants/SemanticGroupNames.constants';
 
 export const AssertionCheckRow = styled.div`
   display: grid;
@@ -27,16 +26,16 @@ export const SelectorEntry = styled.div`
 export const Label = styled(Typography.Text).attrs({
   type: 'secondary',
 })`
-  font-size: 12px;
+  font-size: ${({theme}) => theme.size.sm};
 `;
 
 export const Value = styled(Typography.Text)`
-  font-size: 12px;
+  font-size: ${({theme}) => theme.size.sm};
 `;
 
 export const LabelBadge = styled(Badge)<{$spanType?: SemanticGroupNames}>`
   > sup {
-    background: ${({$spanType}) => ($spanType ? getNotchColor($spanType) : '#f0f0f0')};
+    background: ${({$spanType, theme}) => ($spanType ? SemanticGroupNamesToColor[$spanType] : theme.color.borderLight)};
     color: black;
     margin-right: 6px;
     border-radius: 2px;
@@ -45,14 +44,13 @@ export const LabelBadge = styled(Badge)<{$spanType?: SemanticGroupNames}>`
 `;
 
 export const LabelTooltip = styled(Tooltip).attrs({
-  color: '#FBFBFF',
   placement: 'top',
   arrowPointAtCenter: true,
 })``;
 
 export const SelectedLabelBadge = styled(LabelBadge)`
   > sup {
-    color: #61175e;
-    border: 1px solid #61175e;
+    color: ${({theme}) => theme.color.primary};
+    border: ${({theme}) => `1px solid ${theme.color.primary}`};
   }
 `;

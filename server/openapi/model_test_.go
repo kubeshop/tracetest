@@ -19,22 +19,17 @@ type Test struct {
 	// version number of the test
 	Version int32 `json:"version,omitempty"`
 
-	ServiceUnderTest TestServiceUnderTest `json:"serviceUnderTest,omitempty"`
+	ServiceUnderTest Trigger `json:"serviceUnderTest,omitempty"`
 
 	Definition TestDefinition `json:"definition,omitempty"`
-
-	ReferenceTestRun TestRun `json:"referenceTestRun,omitempty"`
 }
 
 // AssertTestRequired checks if the required fields are not zero-ed
 func AssertTestRequired(obj Test) error {
-	if err := AssertTestServiceUnderTestRequired(obj.ServiceUnderTest); err != nil {
+	if err := AssertTriggerRequired(obj.ServiceUnderTest); err != nil {
 		return err
 	}
 	if err := AssertTestDefinitionRequired(obj.Definition); err != nil {
-		return err
-	}
-	if err := AssertTestRunRequired(obj.ReferenceTestRun); err != nil {
 		return err
 	}
 	return nil

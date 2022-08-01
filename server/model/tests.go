@@ -17,25 +17,39 @@ type (
 		Name             string
 		Description      string
 		Version          int
-		ServiceUnderTest ServiceUnderTest
+		ServiceUnderTest Trigger
 		ReferenceRun     *Run
 		Definition       OrderedMap[SpanQuery, []Assertion]
 	}
 
-	ServiceUnderTest struct {
-		Request HTTPRequest
+	TriggerType string
+
+	Trigger struct {
+		Type TriggerType
+		HTTP *HTTPRequest
+		GRPC *GRPCRequest
+	}
+
+	TriggerResult struct {
+		Type TriggerType
+		HTTP *HTTPResponse
+		GRPC *GRPCResponse
 	}
 
 	SpanQuery string
 
 	Assertion struct {
-		Attribute  string
+		Attribute  Attribute
 		Comparator comparator.Comparator
 		Value      string
 	}
 
+	Attribute string
+
 	Run struct {
 		ID                        uuid.UUID
+		TestID                    uuid.UUID
+		TestVersion               int
 		TraceID                   trace.TraceID
 		SpanID                    trace.SpanID
 		State                     RunState
@@ -45,11 +59,10 @@ type (
 		ServiceTriggerCompletedAt time.Time
 		ObtainedTraceAt           time.Time
 		CompletedAt               time.Time
-		Request                   HTTPRequest
-		Response                  HTTPResponse
+		Trigger                   Trigger
+		TriggerResult             TriggerResult
 		Trace                     *traces.Trace
 		Results                   *RunResults
-		TestVersion               int
 	}
 
 	RunResults struct {
@@ -64,11 +77,30 @@ type (
 	}
 
 	SpanAssertionResult struct {
-		SpanID        trace.SpanID
+		SpanID        *trace.SpanID
 		ObservedValue string
 		CompareErr    error
 	}
 )
+
+const emptyUUID = "00000000-0000-0000-0000-000000000000"
+
+func (t Test) HasID() bool {
+	return t.ID.String() != emptyUUID
+}
+
+const (
+	metaPrefix    = "tracetest.selected_spans."
+	metaPrefixLen = len("tracetest.selected_spans.")
+)
+
+func (a Attribute) IsMeta() bool {
+	return len(a) > metaPrefixLen && a[0:metaPrefixLen] == metaPrefix
+}
+
+func (a Attribute) String() string {
+	return string(a)
+}
 
 func (a Assertion) String() string {
 	return fmt.Sprintf(`"%s" %s "%s"`, a.Attribute, a.Comparator, a.Value)

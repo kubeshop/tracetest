@@ -1,10 +1,10 @@
 # Advanced Selectors
 
-If you find yourself in a position where you cannot select complex spans, you can use our advanced selectors to help in that task. It enables you selecting spans that are impossible to select using just basic selectors.
+If you find yourself in a position where you cannot select complex spans, you can use our advanced selectors to help with that task. Advanced selectors enable selecting spans that are impossible to select using just basic selectors.
 
 In order to present each selector feature as easily as possible, we will use a theoretical scenario of an e-commerce application.
 
-The system we will inspect has this flow:
+The system that we will inspect has this flow:
 
 ```mermaid
 flowchart LR
@@ -145,13 +145,13 @@ flowchart TD
     J -->|10| K
 ```
 
-# Features
+## **Features**
 
-## Empty selector
+### **Empty Selector**
 By providing an empty selector, all spans from the trace are selected. Note that an empty selector is an empty string. Providing `span` or `span[]` as a selector will result as a syntax error.
 
-## Filter by attributes
-The most basic way of filtering the spans you want to apply an assertion on is by using its attributes. A good starting example would be filtering all spans of type `http`:
+### **Filter by Attributes**
+The most basic way of filtering the spans to apply an assertion to is to use the span's attributes. A good starting example would be filtering all spans of type `http`:
 
 ```css
 span[tracetest.span.type="http"]
@@ -260,19 +260,19 @@ flowchart TD
     I -->|9| J
     J -->|10| K
 
-    A:::selectedSpan
-    B:::selectedSpan
-    D:::selectedSpan
-    F:::selectedSpan
-    G:::selectedSpan
-    I:::selectedSpan
-
     classDef selectedSpan fill:#439846, color:#ffffff
     classDef candidateSpan fill:#FF6905, color:#ffffff
+
+    class A selectedSpan
+    class B selectedSpan
+    class D selectedSpan
+    class F selectedSpan
+    class G selectedSpan
+    class I selectedSpan
 ```
 
-### AND condition
-If you need to narrow down your results, you can provide multiple properties in the selector by separating them usign a space. So, let's say we want all `http` spans **AND** were created by the service `cart-api`:
+#### **AND Condition**
+If you need to narrow down your results, you can provide multiple properties in the selector by separating them using a space. The following will select all `http` spans **AND** spans that were created by the service `cart-api`:
 
 ```css
 span[tracetest.span.type="http" service.name="cart-api"]
@@ -381,14 +381,14 @@ flowchart TD
     I -->|9| J
     J -->|10| K
 
-    A:::selectedSpan
-    F:::selectedSpan
-
     classDef selectedSpan fill:#439846, color:#ffffff
     classDef candidateSpan fill:#FF6905, color:#ffffff
+
+    class A selectedSpan
+    class F selectedSpan
 ```
 
-### OR condition
+#### **OR Condition**
 Sometimes we want to have a broader result by selecting spans that match different selectors. Let's say we have to get all spans from our services, but not from any other external service.
 
 ```css
@@ -498,24 +498,24 @@ flowchart TD
     I -->|9| J
     J -->|10| K
 
-    A:::selectedSpan
-    B:::selectedSpan
-    C:::selectedSpan
-    D:::selectedSpan
-    E:::selectedSpan
-    F:::selectedSpan
-    G:::selectedSpan
-    H:::selectedSpan
-    I:::selectedSpan
-    J:::selectedSpan
-
     classDef selectedSpan fill:#439846, color:#ffffff
     classDef candidateSpan fill:#FF6905, color:#ffffff
+
+    class A selectedSpan
+    class B selectedSpan
+    class C selectedSpan
+    class D selectedSpan
+    class E selectedSpan
+    class F selectedSpan
+    class G selectedSpan
+    class H selectedSpan
+    class I selectedSpan
+    class J selectedSpan
 ```
 
 Each span selector will be executed individually and the results will be merged together, creating a list of all spans that match any of the provided span selectors.
 
-### Contains operator
+#### **Contains Operator**
 Although it is possible to filter several span selectors at once to get a broader result, it might become verbose very quickly. The previous example can be written in another way to reduce its complexity:
 
 ```css
@@ -625,29 +625,29 @@ flowchart TD
     I -->|9| J
     J -->|10| K
 
-    A:::selectedSpan
-    B:::selectedSpan
-    C:::selectedSpan
-    D:::selectedSpan
-    E:::selectedSpan
-    F:::selectedSpan
-    G:::selectedSpan
-    H:::selectedSpan
-    I:::selectedSpan
-    J:::selectedSpan
-
     classDef selectedSpan fill:#439846, color:#ffffff
     classDef candidateSpan fill:#FF6905, color:#ffffff
+
+    class A selectedSpan
+    class B selectedSpan
+    class C selectedSpan
+    class D selectedSpan
+    class E selectedSpan
+    class F selectedSpan
+    class G selectedSpan
+    class H selectedSpan
+    class I selectedSpan
+    class J selectedSpan
 ```
-## pseudo-classes support
+### **Pseudo-classes Support**
 
-Sometimes filtering by attributes is not enough because we might have two or three identical spans in the tree, but we only want to assert one of them. For example, imagine a system that has a `retry` policy for all the HTTP requests it sends. How would we allow a user to validate if the `third` execution was successful without asserting the other two spans?
+Sometimes filtering by attributes is not enough because we might have two or three identical spans in the tree but we only want to assert one of them. For example, imagine a system that has a `retry` policy for all the HTTP requests it sends. How would we allow a user to validate if the `third` execution was successful without asserting the other two spans?
 
-This is where pseudo-classes enter the scene. Those are ways of filtering spans by data that is not present in the span itself. For example, the order which the span appears.
+This is where pseudo-classes enter the scene. Pseudo-classes are ways of filtering spans by data that is not present in the span itself. For example, the order which the span appears.
 
-> :warning: Today we support only `first`, `last`, and `nth_child`. If you think we should implement another one, please open an issue and explain why it is important and how it should behave.
+> **Note**: Today we support only `first`, `last`, and `nth_child`. If you think we should implement others, please open an issue and explain why it is important and how it should behave.
 
-For the examples of the three pseudo-classes, let's consider we want to select a specific `http` span based on when it happens.
+For the examples of the three pseudo-classes, let's consider that we want to select a specific `http` span based on when it happens.
 
 ```css
 span[tracetest.span.type="http"]
@@ -756,19 +756,19 @@ flowchart TD
     I -->|9| J
     J -->|10| K
 
-    A:::selectedSpan
-    B:::selectedSpan
-    D:::selectedSpan
-    F:::selectedSpan
-    G:::selectedSpan
-    I:::selectedSpan
-
     classDef selectedSpan fill:#439846, color:#ffffff
     classDef candidateSpan fill:#FF6905, color:#ffffff
+
+    class A selectedSpan
+    class B selectedSpan
+    class D selectedSpan
+    class F selectedSpan
+    class G selectedSpan
+    class I selectedSpan
 ```
 
-### :first
-This would return the first appearing span from the list
+#### **:first**
+This would return the first appearing span from the list:
 
 ```css
 span[tracetest.span.type="http"]:first
@@ -875,19 +875,19 @@ flowchart TD
     I -->|9| J
     J -->|10| K
 
-    A:::selectedSpan
-    B:::candidateSpan
-    D:::candidateSpan
-    F:::candidateSpan
-    G:::candidateSpan
-    I:::candidateSpan
-
     classDef selectedSpan fill:#439846, color:#ffffff
     classDef candidateSpan fill:#FF6905, color:#ffffff
+
+    class A selectedSpan
+    class B candidateSpan
+    class D candidateSpan
+    class F candidateSpan
+    class G candidateSpan
+    class I candidateSpan
 ```
 
-### :last
-This would return the last appearing span from the list
+#### **:last**
+This would return the last appearing span from the list:
 
 ```css
 span[tracetest.span.type="http"]:last
@@ -994,19 +994,19 @@ flowchart TD
     I -->|9| J
     J -->|10| K
 
-    A:::candidateSpan
-    B:::candidateSpan
-    D:::candidateSpan
-    F:::candidateSpan
-    G:::candidateSpan
-    I:::selectedSpan
-
     classDef selectedSpan fill:#439846, color:#ffffff
     classDef candidateSpan fill:#FF6905, color:#ffffff
+
+    class A candidateSpan
+    class B candidateSpan
+    class D candidateSpan
+    class F candidateSpan
+    class G candidateSpan
+    class I selectedSpan
 ```
 
-### :nth_child
-This enables you to fetch any item from the list based on its index. `n` starts at 1 (first element) and ends at `length` (last element). Any invalid `n` value will return in an empty list of spans being returned
+#### **:nth_child**
+This enables you to fetch any item from the list based on its index. `n` starts at 1 (first element) and ends at `length` (last element). Any invalid `n` value will return in an empty list of spans being returned:
 
 ```css
 span[tracetest.span.type="http"]:nth_child(3)
@@ -1113,26 +1113,26 @@ flowchart TD
     I -->|9| J
     J -->|10| K
 
-    A:::candidateSpan
-    B:::candidateSpan
-    D:::selectedSpan
-    F:::candidateSpan
-    G:::candidateSpan
-    I:::candidateSpan
-
     classDef selectedSpan fill:#439846, color:#ffffff
     classDef candidateSpan fill:#FF6905, color:#ffffff
+
+    class A candidateSpan
+    class B candidateSpan
+    class D selectedSpan
+    class F candidateSpan
+    class G candidateSpan
+    class I candidateSpan
 ```
 
 
-## Parent-child relation filtering
+### **Parent-child Relation Filtering**
 Even with all those capabilities, we might have problems with ambiguous selectors returning several spans when just a few were intended.
 
-In our example, you can notice that `auth-api` is called twice from different parts of the trace. At first by `product-api` and later by `cart-api`.
+In our example, `auth-api` is called twice from different parts of the trace. At first by `product-api` and later by `cart-api`.
 
-What if I want to test if a product only available in US can be bought in UK? The product can be seen by the user, but it cannot be bought if the user is outside US. Certainly I cannot apply the same assertions on all `auth-api` spans, otherwise the test will not pass.
+What if I want to test if a product only available in US can be bought in UK? The product can be seen by the user, but it cannot be bought if the user is outside the US. Certainly, I cannot apply the same assertions on all `auth-api` spans, otherwise the test will not pass.
 
-> :information_source: When you filter by parent-child relation, it matches spans recursively in all levels bellow the parent. This doesn't match only direct children of the parent, but all other spans in the sub-tree.
+> :information_source: When you filter by the parent-child relationship, spans are matched recursively in all levels below the parent. This doesn't match only direct children of the parent, but all other spans in the sub-tree.
 
 For example:
 
@@ -1242,14 +1242,14 @@ flowchart TD
     I -->|9| J
     J -->|10| K
 
-    D:::selectedSpan
-    G:::selectedSpan
-
     classDef selectedSpan fill:#439846, color:#ffffff
     classDef candidateSpan fill:#FF6905, color:#ffffff
+
+    class D selectedSpan
+    class G selectedSpan
 ```
 
-This is a problem, because if we apply the same assertion to both spans, one of them will fail. We could try to use `nth_child` but that could break if a http request failed and the retry policy kicked in. Thus, the only way of filtering that is based on the context when it was generated. For example: using its parent span to do so.
+This is a problem, because if we apply the same assertion to both spans, one of them will fail. We could try to use `nth_child` but that could break if a http request failed and the retry policy kicked in. Thus, the only way of filtering in this scenario is based on the context when it was generated. For example: using its parent span to do so.
 
 We could use the `purchase products` parent to ensure just `http` class to the `auth-api` triggered by the `purchase-api` would be selected:
 
@@ -1360,9 +1360,9 @@ flowchart TD
     I -->|9| J
     J -->|10| K
 
-    F:::parentSpan
-    G:::selectedSpan
-
     classDef selectedSpan fill:#439846, color:#ffffff
     classDef parentSpan fill:#3792cb, color:#ffffff
+
+    class F parentSpan
+    class G selectedSpan
 ```

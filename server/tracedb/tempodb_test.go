@@ -18,9 +18,21 @@ import (
 func TestGetTraceByID(t *testing.T) {
 	t.Skip("TODO: docker-compose tempo")
 	db, err := tracedb.New(config.Config{
-		TempoConnectionConfig: &configgrpc.GRPCClientSettings{
-			Endpoint:   "localhost:9095",
-			TLSSetting: configtls.TLSClientSetting{Insecure: true},
+		Telemetry: config.Telemetry{
+			DataStores: map[string]config.TracingBackendDataStoreConfig{
+				"tempo": {
+					Type: tracedb.TEMPO_BACKEND,
+					Tempo: configgrpc.GRPCClientSettings{
+						Endpoint:   "localhost:9095",
+						TLSSetting: configtls.TLSClientSetting{Insecure: true},
+					},
+				},
+			},
+		},
+		Server: config.ServerConfig{
+			Telemetry: config.ServerTelemetryConfig{
+				DataStore: "tempo",
+			},
 		},
 	})
 	require.NoError(t, err)

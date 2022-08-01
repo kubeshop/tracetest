@@ -1,0 +1,10 @@
+exclude_patterns:
+# Exclude all generated code
+- "server/openapi/"
+- "server/internal/"
+- "cli/openapi/"
+- "web/src/types/Generated.types.ts"
+# Ignore test files as they tend to have big functions due to table testing
+- "**/*_test.go"
+- "**/__tests__/"
+- "**/__mocks__/"

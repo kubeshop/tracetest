@@ -5,13 +5,13 @@ import TestState from 'components/TestState';
 import VersionMismatchModal from 'components/VersionMismatchModal/VersionMismatchModal';
 import {TestState as TestStateEnum} from 'constants/TestRun.constants';
 import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
+import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import TestAnalyticsService from 'services/Analytics/TestAnalytics.service';
 import {TTest} from 'types/Test.types';
 import {TTestRunState} from 'types/TestRun.types';
 import Info from './Info';
 import * as S from './TestHeader.styled';
-import Actions from './Actions';
-import {useTestRun} from '../../providers/TestRun/TestRun.provider';
+import RunActionsMenu from '../RunActionsMenu';
 
 interface IProps {
   executionTime?: number;
@@ -29,7 +29,8 @@ const TestHeader = ({
   extraContent,
   onBack,
   showInfo,
-  test: {name, referenceTestRun, serviceUnderTest, version = 1, id},
+  test: {name, trigger, version = 1, id},
+  test,
   testState,
   testVersion,
   totalSpans,
@@ -58,15 +59,15 @@ const TestHeader = ({
             </S.TestName>
             {showInfo && (
               <Info
-                date={referenceTestRun?.createdAt ?? ''}
+                date={run?.createdAt ?? ''}
                 executionTime={executionTime ?? 0}
                 totalSpans={totalSpans ?? 0}
-                traceId={referenceTestRun?.traceId ?? ''}
+                traceId={run?.traceId ?? ''}
               />
             )}
           </S.Row>
           <S.TestUrl>
-            {serviceUnderTest?.request?.method?.toUpperCase()} - {serviceUnderTest?.request?.url}
+            {trigger.method.toUpperCase()} - {trigger.entryPoint}
           </S.TestUrl>
         </div>
       </S.Content>
@@ -83,7 +84,7 @@ const TestHeader = ({
             Run Test
           </Button>
         )}
-        {run.id && <Actions resultId={run.id} testId={id} />}
+        {run.id && <RunActionsMenu testId={id} testVersion={version} test={test} resultId={run.id} isRunView />}
       </S.RightSection>
       <VersionMismatchModal
         description="Running the test will use the latest version of the test."

@@ -11,16 +11,15 @@ export const Header = styled.div`
   background: #f5f5fa;
   height: 64px;
   padding: 0 24px;
-  color: rgb(213, 215, 224);
 `;
 
 export const HeaderText = styled(Typography.Text)``;
 
 export const StartDateText = styled(Typography.Text)`
   && {
+    font-size: ${({theme}) => theme.size.sm};
     margin-left: 14px;
     margin-right: 40px;
-    font-size: 12px;
   }
 `;
 
@@ -29,6 +28,7 @@ export const CountNumber = styled.span`
 `;
 
 export const Container = styled.div`
+  background-color: ${({theme}) => theme.color.white};
   height: calc(100% - 64px);
   overflow-y: scroll;
 `;
@@ -42,6 +42,7 @@ export const AddAssertionButton = styled(Button).attrs({
 })`
   && {
     font-weight: 600;
+    margin-left: 14px;
   }
 `;
 
@@ -61,4 +62,10 @@ export const Chevron = styled.img.attrs({
 
 export const ChevronContainer = styled.span`
   margin-left: 16px;
+`;
+
+export const Row = styled.div`
+  display: flex;
+  gap: 8px;
+  align-items: center;
 `;

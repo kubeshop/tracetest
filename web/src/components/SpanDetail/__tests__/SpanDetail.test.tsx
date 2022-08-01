@@ -1,13 +1,9 @@
-import {render} from '@testing-library/react';
+import {render} from 'test-utils';
 import SpanMock from '../../../models/__mocks__/Span.mock';
-import {ReduxWrapperProvider} from '../../../redux/ReduxWrapperProvider';
 import SpanDetail from '../SpanDetail';
 
 test('Layout', () => {
-  const {getByText} = render(
-    <ReduxWrapperProvider>
-      <SpanDetail span={SpanMock.model()} />
-    </ReduxWrapperProvider>
-  );
+  const {getByText} = render(<SpanDetail span={SpanMock.model()} />);
+
   expect(getByText('All')).toBeTruthy();
 });

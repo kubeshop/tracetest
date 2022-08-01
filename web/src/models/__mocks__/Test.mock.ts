@@ -13,7 +13,7 @@ const TestMock: IMockFactory<TTest, TRawTest> = () => ({
       definition: {
         definitions: [
           {
-            selector: faker.random.word(),
+            selector: {query: faker.random.word()},
             assertionList: [AssertionResultMock.raw()],
           },
         ],

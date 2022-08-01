@@ -1,6 +1,7 @@
 package app
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -8,19 +9,28 @@ import (
 	"regexp"
 	"text/template"
 
+	"github.com/gorilla/handlers"
 	"github.com/kubeshop/tracetest/server/analytics"
+	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/executor"
+	"github.com/kubeshop/tracetest/server/executor/trigger"
 	httpServer "github.com/kubeshop/tracetest/server/http"
+	"github.com/kubeshop/tracetest/server/http/mappings"
 	"github.com/kubeshop/tracetest/server/http/websocket"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/tracedb"
+	"github.com/kubeshop/tracetest/server/traces"
+	"github.com/kubeshop/tracetest/server/tracing"
 	"go.opentelemetry.io/otel/trace"
 )
 
-var Version = ""
+var (
+	Version = "dev"
+	Env     = "dev"
+)
 
 type App struct {
 	config  config.Config
@@ -64,7 +74,8 @@ func spaHandler(prefix, staticPath, indexPath string, tplVars map[string]string)
 }
 
 func (a *App) Start() error {
-	fmt.Println("Starting tracetest", Version)
+	fmt.Printf("Starting tracetest (version %s, env %s)\n", Version, Env)
+	ctx := context.Background()
 
 	serverID, isNewInstall, err := a.db.ServerID()
 
@@ -72,38 +83,58 @@ func (a *App) Start() error {
 		return err
 	}
 
-	err = analytics.Init(a.config.GA.Enabled, serverID, "tracetest", Version)
+	err = analytics.Init(a.config.GA.Enabled, serverID, Version, Env)
 	if err != nil {
 		return err
 	}
 
 	if isNewInstall {
-		err = analytics.CreateAndSendEvent("install_server", "beacon")
+		err = analytics.SendEvent("Install", "beacon")
 		if err != nil {
 			return err
 		}
 	}
 
-	ex, err := executor.New()
+	applicationTracer, err := tracing.GetApplicationTracer(ctx, a.config)
 	if err != nil {
-		return fmt.Errorf("could not create executor: %w", err)
+		return fmt.Errorf("could not create trigger span tracer: %w", err)
 	}
+
+	triggerReg := trigger.NewRegsitry(a.tracer, applicationTracer)
+	triggerReg.Add(trigger.HTTP())
+	triggerReg.Add(trigger.GRPC())
 
 	subscriptionManager := subscription.NewManager()
 
-	assertionRunner := executor.NewAssertionRunner(a.db)
+	execTestUpdater := (executor.CompositeUpdater{}).
+		Add(executor.NewDBUpdater(a.db)).
+		Add(executor.NewSubscriptionUpdater(subscriptionManager))
+
+	assertionExecutor := executor.NewAssertionExecutor(a.tracer)
+
+	assertionRunner := executor.NewAssertionRunner(execTestUpdater, assertionExecutor)
 	assertionRunner.Start(5)
 	defer assertionRunner.Stop()
 
-	tracePoller := executor.NewTracePoller(a.traceDB, a.db, a.config.PoolingRetryDelay(), a.config.MaxWaitTimeForTraceDuration(), subscriptionManager, assertionRunner)
+	traceConversionConfig := traces.NewConversionConfig()
+	// hardcoded for now. In the future we will get those values from the database
+	traceConversionConfig.AddTimeFields(
+		"tracetest.span.duration",
+	)
+
+	pollerExecutor := executor.NewPollerExecutor(a.tracer, execTestUpdater, a.traceDB, a.config.PoolingRetryDelay(), a.config.MaxWaitTimeForTraceDuration())
+
+	tracePoller := executor.NewTracePoller(pollerExecutor, execTestUpdater, assertionRunner, a.config.PoolingRetryDelay(), a.config.MaxWaitTimeForTraceDuration())
 	tracePoller.Start(5) // worker count. should be configurable
 	defer tracePoller.Stop()
 
-	runner := executor.NewPersistentRunner(ex, a.db, tracePoller)
+	runner := executor.NewPersistentRunner(triggerReg, a.db, execTestUpdater, tracePoller, a.tracer)
 	runner.Start(5) // worker count. should be configurable
 	defer runner.Stop()
 
-	controller := httpServer.NewController(a.db, runner, assertionRunner)
+	mappers := mappings.New(traceConversionConfig, comparator.DefaultRegistry())
+
+	controller := httpServer.NewController(a.db, runner, assertionRunner, mappers)
 	apiApiController := openapi.NewApiApiController(controller)
 	customController := httpServer.NewCustomController(controller, apiApiController, openapi.DefaultErrorHandler, a.tracer)
 	httpRouter := customController
@@ -114,7 +145,7 @@ func (a *App) Start() error {
 	router := openapi.NewRouter(httpRouter)
 
 	wsRouter := websocket.NewRouter()
-	wsRouter.Add("subscribe", websocket.NewSubscribeCommandExecutor(subscriptionManager))
+	wsRouter.Add("subscribe", websocket.NewSubscribeCommandExecutor(subscriptionManager, mappers))
 	wsRouter.Add("unsubscribe", websocket.NewUnsubscribeCommandExecutor(subscriptionManager))
 
 	router.Handle("/ws", wsRouter.Handler())
@@ -125,14 +156,17 @@ func (a *App) Start() error {
 			"./html",
 			"index.html",
 			map[string]string{
-				"MeasurementId":    analytics.MeasurementID,
+				"AnalyticsKey":     analytics.FrontendKey,
 				"AnalyticsEnabled": fmt.Sprintf("%t", a.config.GA.Enabled),
 				"ServerPathPrefix": fmt.Sprintf("%s/", a.config.Server.PathPrefix),
+				"ServerID":         serverID,
+				"AppVersion":       Version,
+				"Env":              Env,
 			},
 		),
 	)
 
-	err = analytics.CreateAndSendEvent("server_started_backend", "beacon")
+	err = analytics.SendEvent("Server Started", "beacon")
 	if err != nil {
 		return err
 	}
@@ -143,7 +177,7 @@ func (a *App) Start() error {
 	}
 
 	log.Printf("HTTP Server started")
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), router))
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), handlers.CompressHandler(router)))
 
 	return nil
 }

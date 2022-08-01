@@ -1,0 +1,24 @@
+id: 368a334a-cd2b-4ed6-bb50-e71aca2d2728
+name: Test Rerun
+description: ""
+trigger:
+  type: http
+  httpRequest:
+    url: ${TARGET_URL}/api/tests/${TEST_ID}/run/${RUN_ID}/rerun
+    method: POST
+    headers:
+    - key: Content-Type
+      value: application/json
+testDefinition:
+- selector: span[name="POST /api/tests/{testId}/run/{runId}/rerun" tracetest.span.type="http"]
+  assertions:
+  - tracetest.response.status = 200
+- selector: span[name = "exec INSERT"]
+  assertions:
+  - tracetest.selected_spans.count = 1
+- selector: span[name = "exec UPDATE"]
+  assertions:
+  - tracetest.selected_spans.count = 1
+- selector: span[name = "Execute assertions"]
+  assertions:
+  - tracetest.run.assertion_runner.all_assertions_passed = "true"

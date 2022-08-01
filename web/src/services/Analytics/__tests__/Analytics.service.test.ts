@@ -1,24 +1,18 @@
 import {Categories} from 'constants/Analytics.constants';
-import AnalyticsService, {instance} from '../Analytics.service';
+import AnalyticsService from '../Analytics.service';
 
-jest.mock('ga-4-react', () => {
-  return jest.fn(() => {
-    return {
-      initialize: jest.fn(() => Promise.resolve()),
-      event: jest.fn(),
-    };
-  });
-});
+const eventMock = jest.fn();
+
+Object.defineProperty(window, 'analytics', {
+  event: eventMock,
+} as any);
 
 describe('AnalyticsService', () => {
   describe('event', () => {
-    it('should handle sending an event', async () => {
-      expect.assertions(2);
-
+    it('should not send an event if analyticsEnabled is false', async () => {
       await AnalyticsService.event(Categories.Home, 'test', 'test');
 
-      expect(instance.event).toBeCalledTimes(1);
-      expect(instance.event).toBeCalledWith('test', 'test', Categories.Home);
+      expect(eventMock).not.toBeCalled();
     });
   });
 });

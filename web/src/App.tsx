@@ -1,22 +1,25 @@
 import * as Sentry from '@sentry/react';
-import AnalyticsProvider from 'components/Analytics/AnalyticsProvider';
+import {ThemeProvider} from 'styled-components';
+
 import ErrorBoundary from 'components/ErrorBoundary';
 import GuidedTour from 'components/GuidedTour/GuidedTour';
 import Router from 'components/Navigation';
+import {theme} from 'constants/Theme.constants';
 import {ReduxWrapperProvider} from 'redux/ReduxWrapperProvider';
+
 import './App.less';
 
 const App = () => {
   return (
-    <Sentry.ErrorBoundary fallback={({error}) => <ErrorBoundary error={error} />}>
-      <GuidedTour>
-        <AnalyticsProvider>
+    <ThemeProvider theme={theme}>
+      <Sentry.ErrorBoundary fallback={({error}) => <ErrorBoundary error={error} />}>
+        <GuidedTour>
           <ReduxWrapperProvider>
             <Router />
           </ReduxWrapperProvider>
-        </AnalyticsProvider>
-      </GuidedTour>
-    </Sentry.ErrorBoundary>
+        </GuidedTour>
+      </Sentry.ErrorBoundary>
+    </ThemeProvider>
   );
 };
 

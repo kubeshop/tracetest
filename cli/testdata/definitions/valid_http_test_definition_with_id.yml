@@ -3,19 +3,17 @@ name: POST import pokemon
 description: Import a pokemon using its ID
 trigger:
   type: http
-  http_request:
+  httpRequest:
     url: http://pokemon-demo.tracetest.io/pokemon/import
     method: POST
     headers:
     - key: Content-Type
       value: application/json
-    body:
-      type: raw
-      raw: '{ "id": 52 }'
+    body: '{ "id": 52 }'
 testDefinition:
 - selector: span[name = "POST /pokemon/import"]
   assertions:
-  - tracetest.span.duration <= 100
+  - tracetest.span.duration <= 100ms
   - http.status_code = 200
 - selector: span[name = "send message to queue"]
   assertions:
@@ -29,4 +27,4 @@ testDefinition:
 - selector: span[name = "consume message from queue"]:last span[name = "save pokemon on database"]
   assertions:
   - db.repository.operation = "create"
-  - tracetest.span.duration <= 100
+  - tracetest.span.duration <= 100ms

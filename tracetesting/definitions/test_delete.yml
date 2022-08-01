@@ -1,0 +1,20 @@
+id: c342276c-59cb-450f-9f97-ba2da2305788
+name: Test Delete
+description: ""
+trigger:
+  type: http
+  httpRequest:
+    url: ${TARGET_URL}/api/tests/${TEST_ID}
+    method: DELETE
+    headers:
+    - key: Content-Type
+      value: application/json
+testDefinition:
+- selector: span[name="DELETE /api/tests/{testId}" tracetest.span.type="http"]
+  assertions:
+  - tracetest.selected_spans.count = 1
+  - tracetest.response.status = 204
+- selector: span[name = "exec DELETE"]
+  assertions:
+  # must delete test, definition, and runs. That's why we need 3 deletes
+  - tracetest.selected_spans.count = 3

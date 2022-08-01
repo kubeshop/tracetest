@@ -3,15 +3,16 @@ package executor
 import (
 	"context"
 	"fmt"
-	"time"
 
-	"github.com/kubeshop/tracetest/server/id"
+	"github.com/kubeshop/tracetest/server/executor/trigger"
 	"github.com/kubeshop/tracetest/server/model"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/trace"
 )
 
 type Runner interface {
-	Run(model.Test) model.Run
+	Run(context.Context, model.Test) model.Run
 }
 
 type PersistentRunner interface {
@@ -19,39 +20,40 @@ type PersistentRunner interface {
 	WorkerPool
 }
 
-type Executor interface {
-	Execute(model.Test, trace.TraceID, trace.SpanID) (model.HTTPResponse, error)
-}
-
 func NewPersistentRunner(
-	e Executor,
-	tests model.Repository,
+	triggers *trigger.Registry,
+	runs model.RunRepository,
+	updater RunUpdater,
 	tp TracePoller,
+	tracer trace.Tracer,
 ) PersistentRunner {
 	return persistentRunner{
-		executor:     e,
-		tests:        tests,
+		triggers:     triggers,
+		runs:         runs,
+		updater:      updater,
 		tp:           tp,
-		idGen:        id.NewRandGenerator(),
+		tracer:       tracer,
 		executeQueue: make(chan execReq, 5),
 		exit:         make(chan bool, 1),
 	}
 }
 
 type persistentRunner struct {
-	executor Executor
+	triggers *trigger.Registry
 	tp       TracePoller
-	idGen    id.Generator
-	tests    model.Repository
+	runs     model.RunRepository
+	updater  RunUpdater
+	tracer   trace.Tracer
 
 	executeQueue chan execReq
 	exit         chan bool
 }
 
 type execReq struct {
-	ctx  context.Context
-	test model.Test
-	run  model.Run
+	ctx     context.Context
+	test    model.Test
+	run     model.Run
+	Headers propagation.MapCarrier
 }
 
 func (r persistentRunner) handleDBError(err error) {
@@ -89,11 +91,17 @@ func (r persistentRunner) Stop() {
 	r.exit <- true
 }
 
-func (r persistentRunner) Run(test model.Test) model.Run {
-	// Start a new background context for the async process
-	ctx := context.Background()
+func getNewCtx(ctx context.Context) context.Context {
+	carrier := propagation.MapCarrier{}
+	otel.GetTextMapPropagator().Inject(ctx, carrier)
 
-	run, err := r.tests.CreateRun(ctx, test, r.newTestRun())
+	return otel.GetTextMapPropagator().Extract(context.Background(), carrier)
+}
+
+func (r persistentRunner) Run(ctx context.Context, test model.Test) model.Run {
+	ctx = getNewCtx(ctx)
+
+	run, err := r.runs.CreateRun(ctx, test, model.NewRun())
 	r.handleDBError(err)
 
 	r.executeQueue <- execReq{
@@ -107,37 +115,34 @@ func (r persistentRunner) Run(test model.Test) model.Run {
 
 func (r persistentRunner) processExecQueue(job execReq) {
 	run := job.run.Start()
-	r.handleDBError(r.tests.UpdateRun(job.ctx, run))
+	r.handleDBError(r.updater.Update(job.ctx, run))
 
-	response, err := r.executor.Execute(job.test, job.run.TraceID, job.run.SpanID)
-	run = r.handleExecutionResult(run, response, err)
-
-	if job.test.ReferenceRun == nil {
-		job.test.ReferenceRun = &run
-		r.handleDBError(r.tests.UpdateTestVersion(job.ctx, job.test))
+	trigger := job.test.ServiceUnderTest
+	triggerer, err := r.triggers.Get(trigger.Type)
+	if err != nil {
+		// TODO: actually handle the error
+		panic(err)
 	}
 
-	r.handleDBError(r.tests.UpdateRun(job.ctx, run))
+	response, err := triggerer.Trigger(job.ctx, job.test)
+	run = r.handleExecutionResult(run, response, err)
+
+	run.TraceID = response.TraceID
+	run.SpanID = response.SpanID
+
+	r.handleDBError(r.updater.Update(job.ctx, run))
 	if run.State == model.RunStateAwaitingTrace {
-		r.tp.Poll(job.ctx, job.test, run)
+		ctx, pollingSpan := r.tracer.Start(job.ctx, "Start Polling trace")
+		defer pollingSpan.End()
+		r.tp.Poll(ctx, job.test, run)
 	}
 }
 
-func (r persistentRunner) handleExecutionResult(run model.Run, resp model.HTTPResponse, err error) model.Run {
-	run.Response = resp
+func (r persistentRunner) handleExecutionResult(run model.Run, response trigger.Response, err error) model.Run {
+	run.TriggerResult = response.Result
 	if err != nil {
 		return run.Failed(err)
 	}
 
 	return run.SuccessfullyExecuted()
-}
-
-func (r persistentRunner) newTestRun() model.Run {
-	return model.Run{
-		ID:        r.idGen.UUID(),
-		TraceID:   r.idGen.TraceID(),
-		SpanID:    r.idGen.SpanID(),
-		State:     model.RunStateCreated,
-		CreatedAt: time.Now(),
-	}
 }

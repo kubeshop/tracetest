@@ -24,7 +24,7 @@ func TestCreateRun(t *testing.T) {
 		TraceID:   testdb.IDGen.TraceID(),
 		SpanID:    testdb.IDGen.SpanID(),
 		CreatedAt: time.Now(),
-		Request:   test.ServiceUnderTest.Request,
+		Trigger:   test.ServiceUnderTest,
 	}
 
 	updated, err := db.CreateRun(context.TODO(), test, run)
@@ -36,7 +36,7 @@ func TestCreateRun(t *testing.T) {
 	assert.Equal(t, run.TraceID, actual.TraceID)
 	assert.Equal(t, run.SpanID, actual.SpanID)
 	assert.Equal(t, run.CreatedAt.Unix(), actual.CreatedAt.Unix())
-	assert.Equal(t, run.Request, actual.Request)
+	assert.Equal(t, run.Trigger, actual.Trigger)
 }
 
 func TestUpdateRun(t *testing.T) {
@@ -71,7 +71,7 @@ func TestUpdateRun(t *testing.T) {
 				},
 				Results: []model.SpanAssertionResult{
 					{
-						SpanID:        run.Trace.RootSpan.ID,
+						SpanID:        &run.Trace.RootSpan.ID,
 						ObservedValue: "2000",
 						CompareErr:    nil,
 					},
@@ -86,14 +86,23 @@ func TestUpdateRun(t *testing.T) {
 	actual, err := db.GetRun(context.TODO(), run.ID)
 	require.NoError(t, err)
 
+	updatedList, err := db.GetTestRuns(context.TODO(), test, 20, 0)
+	require.NoError(t, err)
+
+	// Ignore time fields in this test
+	actual.Trace.RootSpan.StartTime = time.Time{}
+	actual.Trace.RootSpan.EndTime = time.Time{}
+
+	runFromList := updatedList[0]
+	runFromList.Trace.RootSpan.StartTime = time.Time{}
+	runFromList.Trace.RootSpan.EndTime = time.Time{}
+
 	assert.Equal(t, run.SpanID.String(), actual.SpanID.String())
 	assert.Equal(t, run.CreatedAt.Unix(), actual.CreatedAt.Unix())
-	assert.Equal(t, run.Request, actual.Request)
+	assert.Equal(t, run.Trigger, actual.Trigger)
 	assert.Equal(t, run.State, actual.State)
 	assert.Equal(t, run.Trace, actual.Trace)
 	assert.Equal(t, run.Results, actual.Results)
 
-	updatedList, err := db.GetTestRuns(context.TODO(), test, 20, 0)
-	require.NoError(t, err)
-	assert.Equal(t, actual, updatedList[0])
+	assert.Equal(t, actual, runFromList)
 }
