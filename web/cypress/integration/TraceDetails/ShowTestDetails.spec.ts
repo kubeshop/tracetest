@@ -1,33 +1,32 @@
-import {
-  createMultipleTestRuns,
-  createTest,
-  deleteTest,
-  extractTestRunIdFromTracePage,
-  name,
-  testRunPageRegex,
-} from '../utils/Common';
+import {Plugins} from '../../../src/constants/Plugins.constants';
+import {getResultId, getTestId} from '../utils/Common';
 
 describe('Show test details', () => {
+  beforeEach(() => cy.createTest());
+  afterEach(() => cy.deleteTest());
+
   it('should show the test details for any trace', () => {
-    (async () => {
-      const testId = await createTest();
-      createMultipleTestRuns(testId, 5);
+    cy.location('pathname').then(pathname => {
+      const testId = getTestId(pathname);
+      cy.createMultipleTestRuns(testId, 5);
 
       cy.get(`[data-cy=collapse-test-${testId}]`).click();
       cy.get('[data-cy=test-details-link]', {timeout: 10000}).first().click();
 
       cy.location('pathname').should('match', /\/test\/.*/i);
-      cy.get('[data-cy=test-details-name]').should('have.text', `${name} (v1)`);
+      cy.get('[data-cy=test-details-name]').should('have.text', `${Plugins.REST.demoList[0].name} (v1)`);
       cy.get('[data-cy=result-card-list]').should('be.visible');
       cy.get('[data-cy^=result-card-]').should('have.length.above', 0);
-      deleteTest(testId);
-    })();
+
+      cy.get(`[data-cy=test-details-run-test-button]`).click();
+      cy.matchTestRunPageUrl();
+    });
   });
 
   it('should display the test definition yaml', () => {
-    (async () => {
-      const testId = await createTest();
-      cy.visit(`http://localhost:3000/test/${testId}`);
+    cy.location('pathname').then(pathname => {
+      const testId = getTestId(pathname);
+      cy.visit(`/test/${testId}`);
 
       cy.get('[data-cy^=result-actions-button]').first().click();
       cy.get('[data-cy=view-test-definition-button]').click();
@@ -36,40 +35,37 @@ describe('Show test details', () => {
       cy.get('[data-cy=file-viewer-close]').click();
 
       cy.get('[data-cy=file-viewer-code-container]').should('not.be.visible');
-      deleteTest(testId);
-    })();
+
+      cy.get(`[data-cy=test-details-run-test-button]`).click();
+      cy.matchTestRunPageUrl();
+    });
   });
 
   it('should run a new test', () => {
-    (async () => {
-      const testId = await createTest();
-      cy.visit(`http://localhost:3000/test/${testId}`);
+    cy.location('pathname').then(pathname => {
+      const testId = getTestId(pathname);
+      const testRunResultId = getResultId(pathname);
+      cy.visit(`/test/${testId}`);
+      cy.wait('@testObject');
       cy.get(`[data-cy=test-details-run-test-button]`).click();
-      cy.location('pathname').should('match', testRunPageRegex);
-
-      const testRunResultId = await extractTestRunIdFromTracePage();
-
+      cy.matchTestRunPageUrl();
       cy.get('[data-cy=test-header-back-button]').click();
       cy.get(`[data-cy=result-card-${testRunResultId}]`, {timeout: 10000}).should('be.visible');
-      cy.visit(`http://localhost:3000/test/${testId}/run/${testRunResultId}`);
-      deleteTest(testId);
-    })();
+      cy.visit(`/test/${testId}/run/${testRunResultId}`);
+      cy.matchTestRunPageUrl();
+    });
   });
   it('should display the jUnit report', () => {
-    (async () => {
-      const testId = await createTest();
-      cy.visit(`http://localhost:3000/test/${testId}`);
-
+    cy.location('pathname').then(pathname => {
+      const testId = getTestId(pathname);
+      cy.visit(`/test/${testId}`);
       cy.get('[data-cy^=result-actions-button]').last().click();
-      cy.wait(25000);
       cy.get('[data-cy=view-junit-button]').click();
-
-      // the modal does not show up sometimes
       cy.get('[data-cy=file-viewer-code-container]').should('be.visible');
       cy.get('[data-cy=file-viewer-close]').click();
-
       cy.get('[data-cy=file-viewer-code-container]').should('not.be.visible');
-      deleteTest(testId);
-    })();
+      cy.get(`[data-cy=test-details-run-test-button]`).click();
+      cy.matchTestRunPageUrl();
+    });
   });
 });

@@ -80,6 +80,11 @@ jobs:
           cd web/
           npm ci
 
+      - name: Run eslint
+        run: |
+          cd web/
+          npm run eslint | true
+
       - name: Run unit tests
         run: |
           cd web/
