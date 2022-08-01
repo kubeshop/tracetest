@@ -84,6 +84,10 @@ jobs:
         run: |
           cd web/
           npm test
+      - name: Run eslint
+        run: |
+          cd web/
+          npm run eslint
 
   build-docker:
     name: "Build Image"
