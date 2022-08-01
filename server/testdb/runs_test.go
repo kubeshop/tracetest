@@ -67,7 +67,12 @@ func TestUpdateRun(t *testing.T) {
 				Assertion: model.Assertion{
 					Attribute:  "tracetest.span.duration",
 					Comparator: comparator.Eq,
-					Value:      "2000",
+					Value: &model.AssertionExpression{
+						LiteralValue: model.LiteralValue{
+							Value: "2000",
+							Type:  "number",
+						},
+					},
 				},
 				Results: []model.SpanAssertionResult{
 					{
