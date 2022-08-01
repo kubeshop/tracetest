@@ -28,7 +28,7 @@ type PollerExecutor interface {
 }
 
 type TraceFetcher interface {
-	GetTraceByID(ctx context.Context, traceID string) (*v1.TracesData, error)
+	GetTraceByIdentification(ctx context.Context, traceID string) (*v1.TracesData, error)
 }
 
 func NewTracePoller(

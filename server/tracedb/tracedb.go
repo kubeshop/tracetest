@@ -6,18 +6,19 @@ import (
 	"fmt"
 
 	"github.com/kubeshop/tracetest/server/config"
-	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
+	"github.com/kubeshop/tracetest/server/traces"
 )
 
 var ErrTraceNotFound = errors.New("trace not found")
 
 const (
-	JAEGER_BACKEND string = "jaeger"
-	TEMPO_BACKEND  string = "tempo"
+	JAEGER_BACKEND    string = "jaeger"
+	TEMPO_BACKEND     string = "tempo"
+	LIGHTSTEP_BACKEND string = "lightstep"
 )
 
 type TraceDB interface {
-	GetTraceByID(ctx context.Context, traceID string) (*v1.TracesData, error)
+	GetTraceByIdentification(context.Context, traces.TraceIdentification) (traces.Trace, error)
 	Close() error
 }
 
@@ -36,6 +37,8 @@ func New(c config.Config) (db TraceDB, err error) {
 		db, err = newJaegerDB(&selectedDataStore.Jaeger)
 	case selectedDataStore.Type == TEMPO_BACKEND:
 		db, err = newTempoDB(&selectedDataStore.Tempo)
+	case selectedDataStore.Type == LIGHTSTEP_BACKEND:
+		db, err = newLightstepDB(selectedDataStore.Lightstep)
 	}
 
 	return

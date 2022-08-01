@@ -104,9 +104,9 @@ services:
       JAEGER_PORT: 6832
       NPM_RUN_COMMAND: api
     ports:
-      - "8081:8081"
+      - "8081:80"
     healthcheck:
-      test: ["CMD", "wget", "--spider", "localhost:8081"]
+      test: ["CMD", "wget", "--spider", "localhost/pokemon/healthcheck"]
       interval: 1s
       timeout: 3s
       retries: 60

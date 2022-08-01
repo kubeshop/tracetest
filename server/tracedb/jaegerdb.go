@@ -6,6 +6,7 @@ import (
 	"io"
 
 	pb "github.com/kubeshop/tracetest/server/internal/proto-gen-go/api_v3"
+	"github.com/kubeshop/tracetest/server/traces"
 	"go.opentelemetry.io/collector/component/componenttest"
 	"go.opentelemetry.io/collector/config/configgrpc"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
@@ -34,12 +35,12 @@ func newJaegerDB(config *configgrpc.GRPCClientSettings) (TraceDB, error) {
 	}, nil
 }
 
-func (jtd *jaegerTraceDB) GetTraceByID(ctx context.Context, traceID string) (*v1.TracesData, error) {
+func (jtd *jaegerTraceDB) GetTraceByIdentification(ctx context.Context, identification traces.TraceIdentification) (traces.Trace, error) {
 	stream, err := jtd.query.GetTrace(ctx, &pb.GetTraceRequest{
-		TraceId: traceID,
+		TraceId: identification.TraceID.String(),
 	})
 	if err != nil {
-		return nil, fmt.Errorf("jaeger get trace: %w", err)
+		return traces.Trace{}, fmt.Errorf("jaeger get trace: %w", err)
 	}
 
 	// jaeger-query v3 API returns otel spans
@@ -53,20 +54,22 @@ func (jtd *jaegerTraceDB) GetTraceByID(ctx context.Context, traceID string) (*v1
 		if err != nil {
 			st, ok := status.FromError(err)
 			if !ok {
-				return nil, fmt.Errorf("jaeger stream recv: %w", err)
+				return traces.Trace{}, fmt.Errorf("jaeger stream recv: %w", err)
 			}
 			if st.Message() == "trace not found" {
-				return nil, ErrTraceNotFound
+				return traces.Trace{}, ErrTraceNotFound
 			}
-			return nil, fmt.Errorf("jaeger stream recv err: %w", err)
+			return traces.Trace{}, fmt.Errorf("jaeger stream recv err: %w", err)
 		}
 
 		spans = append(spans, in.ResourceSpans...)
 	}
 
-	return &v1.TracesData{
+	otelTrace := &v1.TracesData{
 		ResourceSpans: spans,
-	}, nil
+	}
+
+	return traces.FromOtel(otelTrace), nil
 }
 
 func (jtd *jaegerTraceDB) Close() error {

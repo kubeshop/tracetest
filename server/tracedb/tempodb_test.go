@@ -1,21 +1,20 @@
 package tracedb_test
 
 import (
-	"bytes"
 	"context"
-	"fmt"
 	"testing"
 
-	"github.com/gogo/protobuf/jsonpb"
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/tracedb"
+	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/config/configgrpc"
 	"go.opentelemetry.io/collector/config/configtls"
+	"go.opentelemetry.io/otel/trace"
 )
 
-func TestGetTraceByID(t *testing.T) {
+func TestGetTraceByIdentification(t *testing.T) {
 	t.Skip("TODO: docker-compose tempo")
 	db, err := tracedb.New(config.Config{
 		Telemetry: config.Telemetry{
@@ -38,12 +37,13 @@ func TestGetTraceByID(t *testing.T) {
 	require.NoError(t, err)
 
 	defer db.Close()
-	trace, err := db.GetTraceByID(context.Background(), "0194fdc2fa2ffcc041d3ff12045b73c9")
+	traceId, _ := trace.TraceIDFromHex("0194fdc2fa2ffcc041d3ff12045b73c9")
+	traceIdentification := traces.TraceIdentification{
+		TraceID: traceId,
+	}
+
+	trace, err := db.GetTraceByIdentification(context.Background(), traceIdentification)
 	assert.NoError(t, err)
 
-	buf := bytes.Buffer{}
-	m := jsonpb.Marshaler{}
-	err = m.Marshal(&buf, trace)
-	assert.NoError(t, err)
-	fmt.Printf("\n%s\n", buf.String())
+	assert.NotEmpty(t, trace.ID)
 }
