@@ -9,7 +9,6 @@ import (
 	"github.com/kubeshop/tracetest/server/traces"
 	"go.opentelemetry.io/collector/component/componenttest"
 	"go.opentelemetry.io/collector/config/configgrpc"
-	"go.opentelemetry.io/otel/trace"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/status"
@@ -34,10 +33,6 @@ func newJaegerDB(config *configgrpc.GRPCClientSettings) (TraceDB, error) {
 		conn:  conn,
 		query: pb.NewQueryServiceClient(conn),
 	}, nil
-}
-
-func (*jaegerTraceDB) SendSpan(context.Context, trace.Span) error {
-	return nil
 }
 
 func (jtd *jaegerTraceDB) GetTraceByIdentification(ctx context.Context, identification traces.TraceIdentification) (traces.Trace, error) {

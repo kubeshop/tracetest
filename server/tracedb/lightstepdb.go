@@ -10,7 +10,6 @@ import (
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/tracedb/lightstep"
 	"github.com/kubeshop/tracetest/server/traces"
-	"go.opentelemetry.io/otel/trace"
 )
 
 type LightstepDB struct {
@@ -18,10 +17,6 @@ type LightstepDB struct {
 }
 
 func (*LightstepDB) Close() error {
-	return nil
-}
-
-func (*LightstepDB) SendSpan(context.Context, trace.Span) error {
 	return nil
 }
 

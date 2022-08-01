@@ -7,7 +7,6 @@ import (
 
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/traces"
-	"go.opentelemetry.io/otel/trace"
 )
 
 var ErrTraceNotFound = errors.New("trace not found")
@@ -19,7 +18,6 @@ const (
 )
 
 type TraceDB interface {
-	SendSpan(context.Context, trace.Span) error
 	GetTraceByIdentification(context.Context, traces.TraceIdentification) (traces.Trace, error)
 	Close() error
 }
