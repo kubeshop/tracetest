@@ -5,15 +5,17 @@ import {Steps} from 'components/GuidedTour/traceStepList';
 import {SemanticGroupNamesToText} from 'constants/SemanticGroupNames.constants';
 import {SpanKindToText} from 'constants/Span.constants';
 import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
+import SpanService from 'services/Span.service';
 import {TSpan} from 'types/Span.types';
 import * as S from './SpanDetail.styled';
-import SpanService from '../../services/Span.service';
 
 interface IProps {
   span?: TSpan;
+  totalFailedChecks?: number;
+  totalPassedChecks?: number;
 }
 
-const SpanHeader = ({span}: IProps) => {
+const SpanHeader = ({span, totalFailedChecks, totalPassedChecks}: IProps) => {
   const {kind, name, service, system, type} = SpanService.getSpanInfo(span);
 
   return (
@@ -32,6 +34,20 @@ const SpanHeader = ({span}: IProps) => {
             <ToolOutlined />
             <S.HeaderItemText>{system}</S.HeaderItemText>
           </S.HeaderItem>
+        )}
+      </S.Row>
+      <S.Row>
+        {Boolean(totalPassedChecks) && (
+          <S.HeaderCheck>
+            <S.HeaderDot $passed />
+            {totalPassedChecks}
+          </S.HeaderCheck>
+        )}
+        {Boolean(totalFailedChecks) && (
+          <S.HeaderCheck>
+            <S.HeaderDot $passed={false} />
+            {totalFailedChecks}
+          </S.HeaderCheck>
         )}
       </S.Row>
     </S.Header>

@@ -11,6 +11,10 @@ export const CircleArrow = styled.circle`
   fill: transparent;
 `;
 
+export const CircleCheck = styled.circle<{$passed: boolean}>`
+  fill: ${({$passed, theme}) => ($passed ? theme.color.success : theme.color.error)};
+`;
+
 export const CircleNumber = styled.circle`
   fill: ${({theme}) => theme.color.borderLight};
 `;

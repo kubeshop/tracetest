@@ -8,6 +8,8 @@ import {useTheme} from 'styled-components';
 import {IDiagramComponentProps} from 'components/Diagram/Diagram';
 import {AxisHeight, AxisOffset, NodeHeight} from 'constants/Timeline.constants';
 import TimelineModel from 'models/Timeline.model';
+import {useAppSelector} from 'redux/hooks';
+import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
 import TraceAnalyticsService from 'services/Analytics/TraceAnalytics.service';
 import TimelineService from 'services/Timeline.service';
 import SpanNode from './SpanNode';
@@ -29,6 +31,7 @@ interface IProps extends IDiagramComponentProps {
 const Visualization = ({affectedSpans, onSelectSpan, selectedSpan, spanList, width = 600}: IProps) => {
   const theme = useTheme();
   const [collapsed, setCollapsed] = useState<string[]>([]);
+  const spansResult = useAppSelector(TestDefinitionSelectors.selectSpansResult);
 
   const nodes = useMemo(() => TimelineModel(spanList), [spanList]);
   const filteredNodes = useMemo(() => TimelineService.getFilteredNodes(nodes, collapsed), [collapsed, nodes]);
@@ -90,6 +93,8 @@ const Visualization = ({affectedSpans, onSelectSpan, selectedSpan, spanList, wid
             node={node}
             onClick={handleOnClick}
             onCollapse={handleOnCollapse}
+            totalFailedChecks={spansResult[node.data.id]?.failed}
+            totalPassedChecks={spansResult[node.data.id]?.passed}
             xScale={xScale}
           />
         ))}
