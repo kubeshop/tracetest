@@ -2,6 +2,7 @@ module.exports = {
   env: {
     browser: true,
     es2021: true,
+    'cypress/globals': true,
   },
   extends: ['plugin:react/recommended', 'airbnb', 'prettier'],
   parser: '@typescript-eslint/parser',
@@ -10,8 +11,9 @@ module.exports = {
     ecmaVersion: 12,
     sourceType: 'module',
   },
-  plugins: ['react', '@typescript-eslint', 'react-hooks', 'unused-imports', 'prettier'],
+  plugins: ['react', '@typescript-eslint', 'react-hooks', 'unused-imports', 'prettier', 'cypress'],
   rules: {
+    'cypress/no-unnecessary-waiting': 'error',
     'no-underscore-dangle': 'off',
     'react/jsx-uses-react': 'off',
     'react/react-in-jsx-scope': 'off',
