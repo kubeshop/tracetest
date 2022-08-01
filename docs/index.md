@@ -1,6 +1,6 @@
 # Tracetest
 
-Tracetest - Trace-based testing. End-to-end tests powered by your OpenTelemetry Traces.
+Trace-based testing. End-to-end tests powered by your OpenTelemetry Traces.
 
 <p align="center">
   <a target="_new" href="https://www.youtube.com/watch?v=WMRicNlaehc">

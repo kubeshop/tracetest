@@ -19,19 +19,28 @@ extra_css:
 
 nav:
   - Welcome: index.md
-  - Installation: installing.md
-  - Getting Started: getting-started.md
-  - Architecture: architecture.md
-  - Creating Tests: create-test.md
-  - Adding Assertions: adding-assertions.md
-  - Example - Pokeshop Service:
+  - Introduction: 
+    - Introduction to Trace-Based Testing: introduction.md
+    - Architecture: architecture.md
+  - Getting Started: 
+    - Installation: installing.md
+    - Accessing Tracetest Dashboard: accessing-dashboard.md
+  - Using Tracetest:
+    - Creating Tests: create-test.md
+    - Adding Assertions: adding-assertions.md
+    - Versioning: versioning.md
+  - Automating Tests for CI/CD:
+    - Command Line Tool: command-line-tool.md
+    - Test Definition File: test-definition-file.md
+    - Specifying Selectors: advanced-selectors.md
+    - CI/CD Best practices: ci-cd-best-practices.md
+  - OpenAPI Definition: openapi.md
+  - Development: development.md
+  - Installable Example - Pokeshop Service:
       - Overview: pokeshop.md
       - Add Pokemon Endpoint: pokeshop/add-pokemon.md
       - Import Pokemon Endpoint: pokeshop/import-pokemon.md
-      - List Pokemon Endpoints: pokeshop/list-pokemon.md
-  - Selectors: advanced-selectors.md
-  - OpenAPI Definition: openapi.md
-  - Development: development.md
+      - List Pokemon Endpoints: pokeshop/list-pokemon.md  
 
 extra:
   analytics:

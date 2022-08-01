@@ -42,7 +42,7 @@ Example with custom options:
 curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/setup.sh | bash -s -- --skip-pma --namespace my-custom-namespace
 ```
 
-### Using Helm
+### **Using Helm**
 
 Container images are hosted on the Docker Hub [Tracetest repository](https://hub.docker.com/r/kubeshop/tracetest).
 
