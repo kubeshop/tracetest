@@ -1,0 +1,2272 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Tracetest - Trace based testing.  Leverage your investment in tracing to easily create integration tests.">
+      
+      
+        <meta name="author" content="Kubeshop Tracetest Team">
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.3.1, mkdocs-material-8.3.9">
+    
+    
+      
+        <title>Specifying Selectors - Tracetest</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.1d29e8d0.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.cbb835fc.min.css">
+        
+      
+      
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="https://unpkg.com/mermaid@9.1.3/dist/mermaid.css">
+    
+    <script>__md_scope=new URL("..",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+  
+
+
+  
+  
+
+
+  <script>function gtag(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],gtag("js",new Date),gtag("config","G-175WMKCFBZ"),document.addEventListener("DOMContentLoaded",function(){document.forms.search&&document.forms.search.query.addEventListener("blur",function(){this.value&&gtag("event","search",{search_term:this.value})}),"undefined"!=typeof location$&&location$.subscribe(function(e){gtag("config","G-175WMKCFBZ",{page_path:e.pathname})})})</script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-175WMKCFBZ"></script>
+
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="none" data-md-color-accent="none">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#advanced-selectors" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Tracetest" class="md-header__button md-logo" aria-label="Tracetest" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Tracetest
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Specifying Selectors
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/kubeshop/tracetest" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    kubeshop/tracetest
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Tracetest" class="md-nav__button md-logo" aria-label="Tracetest" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    Tracetest
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/kubeshop/tracetest" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    kubeshop/tracetest
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        Welcome
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2">
+          Introduction
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Introduction" data-md-level="1">
+        <label class="md-nav__title" for="__nav_2">
+          <span class="md-nav__icon md-icon"></span>
+          Introduction
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../introduction/" class="md-nav__link">
+        Introduction to Trace-Based Testing
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        Architecture
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3">
+          Getting Started
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Getting Started" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Getting Started
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../installing/" class="md-nav__link">
+        Installation
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../accessing-dashboard/" class="md-nav__link">
+        Accessing Tracetest Dashboard
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_4">
+          Using Tracetest
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Using Tracetest" data-md-level="1">
+        <label class="md-nav__title" for="__nav_4">
+          <span class="md-nav__icon md-icon"></span>
+          Using Tracetest
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../create-test/" class="md-nav__link">
+        Creating Tests
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adding-assertions/" class="md-nav__link">
+        Adding Assertions
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../versioning/" class="md-nav__link">
+        Versioning
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_5">
+          Automating Tests for CI/CD
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Automating Tests for CI/CD" data-md-level="1">
+        <label class="md-nav__title" for="__nav_5">
+          <span class="md-nav__icon md-icon"></span>
+          Automating Tests for CI/CD
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../command-line-tool/" class="md-nav__link">
+        Command Line Tool
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../test-definition-file/" class="md-nav__link">
+        Test Definition File
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Specifying Selectors
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Specifying Selectors
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#features" class="md-nav__link">
+    Features
+  </a>
+  
+    <nav class="md-nav" aria-label="Features">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#empty-selector" class="md-nav__link">
+    Empty Selector
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filter-by-attributes" class="md-nav__link">
+    Filter by Attributes
+  </a>
+  
+    <nav class="md-nav" aria-label="Filter by Attributes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#and-condition" class="md-nav__link">
+    AND Condition
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#or-condition" class="md-nav__link">
+    OR Condition
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#contains-operator" class="md-nav__link">
+    Contains Operator
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pseudo-classes-support" class="md-nav__link">
+    Pseudo-classes Support
+  </a>
+  
+    <nav class="md-nav" aria-label="Pseudo-classes Support">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#first" class="md-nav__link">
+    :first
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#last" class="md-nav__link">
+    :last
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nth_child" class="md-nav__link">
+    :nth_child
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parent-child-relation-filtering" class="md-nav__link">
+    Parent-child Relation Filtering
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ci-cd-best-practices/" class="md-nav__link">
+        CI/CD Best practices
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../openapi/" class="md-nav__link">
+        OpenAPI Definition
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../development/" class="md-nav__link">
+        Development
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_8" type="checkbox" id="__nav_8" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_8">
+          Installable Example - Pokeshop Service
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Installable Example - Pokeshop Service" data-md-level="1">
+        <label class="md-nav__title" for="__nav_8">
+          <span class="md-nav__icon md-icon"></span>
+          Installable Example - Pokeshop Service
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pokeshop/" class="md-nav__link">
+        Overview
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pokeshop/add-pokemon/" class="md-nav__link">
+        Add Pokemon Endpoint
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pokeshop/import-pokemon/" class="md-nav__link">
+        Import Pokemon Endpoint
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pokeshop/list-pokemon/" class="md-nav__link">
+        List Pokemon Endpoints
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#features" class="md-nav__link">
+    Features
+  </a>
+  
+    <nav class="md-nav" aria-label="Features">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#empty-selector" class="md-nav__link">
+    Empty Selector
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filter-by-attributes" class="md-nav__link">
+    Filter by Attributes
+  </a>
+  
+    <nav class="md-nav" aria-label="Filter by Attributes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#and-condition" class="md-nav__link">
+    AND Condition
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#or-condition" class="md-nav__link">
+    OR Condition
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#contains-operator" class="md-nav__link">
+    Contains Operator
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pseudo-classes-support" class="md-nav__link">
+    Pseudo-classes Support
+  </a>
+  
+    <nav class="md-nav" aria-label="Pseudo-classes Support">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#first" class="md-nav__link">
+    :first
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#last" class="md-nav__link">
+    :last
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nth_child" class="md-nav__link">
+    :nth_child
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parent-child-relation-filtering" class="md-nav__link">
+    Parent-child Relation Filtering
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+  <a href="https://github.com/kubeshop/tracetest/blob/main/docs/advanced-selectors.md" title="Edit this page" class="md-content__button md-icon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
+  </a>
+
+
+
+<h1 id="advanced-selectors">Advanced Selectors</h1>
+<p>If you find yourself in a position where you cannot select complex spans, you can use our advanced selectors to help with that task. Advanced selectors enable selecting spans that are impossible to select using just basic selectors.</p>
+<p>In order to present each selector feature as easily as possible, we will use a theoretical scenario of an e-commerce application.</p>
+<p>The system that we will inspect has this flow:</p>
+<div class="mermaid">flowchart LR
+    start((start))
+    subgraph purchase
+        cart-api
+        purchase-api
+    end
+    subgraph auth
+        auth-api
+        auth-storage[(db)]
+    end
+    subgraph product
+        product-api
+        product-storage[(db)]
+    end
+    subgraph notification
+        notification-api
+        kafka{{kafka}}
+        external-notification-service{{external service}}
+    end
+
+    start --&gt;|1. Close order| cart-api
+    cart-api--&gt;|5. send buy action| purchase-api
+    purchase-api --&gt; |7. Send notification to user|notification-api
+    purchase-api --&gt;|6. can product be bought by user?| auth-api 
+    auth-api --&gt; auth-storage
+    cart-api --&gt;|2. is product available?| product-api
+    product-api --&gt;|4. can user view product?| auth-api
+    product-api --&gt;|3. retrieve product| product-storage
+
+    notification-api --&gt;|8| kafka
+    kafka --&gt;|9| external-notification-service</div>
+<p>And it generates the following trace:</p>
+<div class="mermaid">flowchart TD
+    A[" id: 1
+        close order
+
+        attributes:
+        service.name: cart-api
+        tracetest.span.type: http
+        http.method: POST
+    "]
+    B[" id: 2
+        is product available
+
+        attributes:
+        service.name: product-api
+        tracetest.span.type: http
+        http.method: GET
+    "]
+    C[" id: 3
+        get product information
+
+        attributes:
+        service.name: product-api
+        tracetest.span.type: db
+        db.statement: SELECT * FROM ...
+    "]
+    D[" id: 4
+        get user can access
+
+        attributes:
+        service.name: auth-api
+        tracetest.span.type: http
+        http.method: GET
+    "]
+    E[" id: 5
+        get user auth information
+
+        attributes:
+        service.name: auth-api
+        tracetest.span.type: db
+        db.statement: SELECT * FROM ...
+    "]
+    F[" id: 6
+        purchase products
+
+        attributes:
+        service.name: cart-api
+        tracetest.span.type: http
+        http.method: POST
+    "]
+    G[" id: 7
+        get user can access
+
+        attributes:
+        service.name: auth-api
+        tracetest.span.type: http
+        http.method: GET
+    "]
+    H[" id: 8
+        get user auth information
+
+        attributes:
+        service.name: auth-api
+        tracetest.span.type: db
+        db.statement: SELECT * FROM ...
+    "]
+    I[" id: 9
+        notify user
+
+        attributes:
+        service.name: notification-api
+        tracetest.span.type: http
+        http.method: POST
+    "]
+    J[" id: 10
+        send message to kafka
+
+        attributes:
+        service.name: notification-api
+        tracetest.span.type: messaging
+    "]
+    K[" id: 10
+        send message to users
+
+        attributes:
+        service.name: external-service
+        tracetest.span.type: messaging
+    "]
+
+
+    A --&gt;|1| B
+    B --&gt;|2| C
+    B --&gt;|3| D
+    D --&gt;|4| E
+    A --&gt;|5| F
+    F --&gt;|6| G
+    G --&gt;|7| H
+    F --&gt;|8| I
+    I --&gt;|9| J
+    J --&gt;|10| K</div>
+<h2 id="features"><strong>Features</strong></h2>
+<h3 id="empty-selector"><strong>Empty Selector</strong></h3>
+<p>By providing an empty selector, all spans from the trace are selected. Note that an empty selector is an empty string. Providing <code>span</code> or <code>span[]</code> as a selector will result as a syntax error.</p>
+<h3 id="filter-by-attributes"><strong>Filter by Attributes</strong></h3>
+<p>The most basic way of filtering the spans to apply an assertion to is to use the span's attributes. A good starting example would be filtering all spans of type <code>http</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">span</span><span class="o">[</span><span class="nt">tracetest</span><span class="p">.</span><span class="nc">span</span><span class="p">.</span><span class="nc">type</span><span class="o">=</span><span class="s2">&quot;http&quot;</span><span class="o">]</span><span class="w"></span>
+</code></pre></div>
+<p>This would select the following spans:</p>
+<div class="mermaid">flowchart TD
+    A[" id: 1
+        close order
+
+        attributes:
+        service.name: cart-api
+        tracetest.span.type: http
+        http.method: POST
+    "]
+    B[" id: 2
+        is product available
+
+        attributes:
+        service.name: product-api
+        tracetest.span.type: http
+        http.method: GET
+    "]
+    C[" id: 3
+        get product information
+
+        attributes:
+        service.name: product-api
+        tracetest.span.type: db
+        db.statement: SELECT * FROM ...
+    "]
+    D[" id: 4
+        get user can access
+
+        attributes:
+        service.name: auth-api
+        tracetest.span.type: http
+        http.method: GET
+    "]
+    E[" id: 5
+        get user auth information
+
+        attributes:
+        service.name: auth-api
+        tracetest.span.type: db
+        db.statement: SELECT * FROM ...
+    "]
+    F[" id: 6
+        purchase products
+
+        attributes:
+        service.name: cart-api
+        tracetest.span.type: http
+        http.method: POST
+    "]
+    G[" id: 7
+        get user can access
+
+        attributes:
+        service.name: auth-api
+        tracetest.span.type: http
+        http.method: GET
+    "]
+    H[" id: 8
+        get user auth information
+
+        attributes:
+        service.name: auth-api
+        tracetest.span.type: db
+        db.statement: SELECT * FROM ...
+    "]
+    I[" id: 9
+        notify user
+
+        attributes:
+        service.name: notification-api
+        tracetest.span.type: http
+        http.method: POST
+    "]
+    J[" id: 10
+        send message to kafka
+
+        attributes:
+        service.name: notification-api
+        tracetest.span.type: messaging
+    "]
+    K[" id: 10
+        send message to users
+
+        attributes:
+        service.name: external-service
+        tracetest.span.type: messaging
+    "]
+
+
+    A --&gt;|1| B
+    B --&gt;|2| C
+    B --&gt;|3| D
+    D --&gt;|4| E
+    A --&gt;|5| F
+    F --&gt;|6| G
+    G --&gt;|7| H
+    F --&gt;|8| I
+    I --&gt;|9| J
+    J --&gt;|10| K
+
+    classDef selectedSpan fill:#439846, color:#ffffff
+    classDef candidateSpan fill:#FF6905, color:#ffffff
+
+    class A selectedSpan
+    class B selectedSpan
+    class D selectedSpan
+    class F selectedSpan
+    class G selectedSpan
+    class I selectedSpan</div>
+<h4 id="and-condition"><strong>AND Condition</strong></h4>
+<p>If you need to narrow down your results, you can provide multiple properties in the selector by separating them using a space. The following will select all <code>http</code> spans <strong>AND</strong> spans that were created by the service <code>cart-api</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">span</span><span class="o">[</span><span class="nt">tracetest</span><span class="p">.</span><span class="nc">span</span><span class="p">.</span><span class="nc">type</span><span class="o">=</span><span class="s2">&quot;http&quot;</span><span class="w"> </span><span class="nt">service</span><span class="p">.</span><span class="nc">name</span><span class="o">=</span><span class="s2">&quot;cart-api&quot;</span><span class="o">]</span><span class="w"></span>
+</code></pre></div>
+<p>This would select the following spans:</p>
+<div class="mermaid">flowchart TD
+    A[" id: 1
+        close order
+
+        attributes:
+        service.name: cart-api
+        tracetest.span.type: http
+        http.method: POST
+    "]
+    B[" id: 2
+        is product available
+
+        attributes:
+        service.name: product-api
+        tracetest.span.type: http
+        http.method: GET
+    "]
+    C[" id: 3
+        get product information
+
+        attributes:
+        service.name: product-api
+        tracetest.span.type: db
+        db.statement: SELECT * FROM ...
+    "]
+    D[" id: 4
+        get user can access
+
+        attributes:
+        service.name: auth-api
+        tracetest.span.type: http
+        http.method: GET
+    "]
+    E[" id: 5
+        get user auth information
+
+        attributes:
+        service.name: auth-api
+        tracetest.span.type: db
+        db.statement: SELECT * FROM ...
+    "]
+    F[" id: 6
+        purchase products
+
+        attributes:
+        service.name: cart-api
+        tracetest.span.type: http
+        http.method: POST
+    "]
+    G[" id: 7
+        get user can access
+
+        attributes:
+        service.name: auth-api
+        tracetest.span.type: http
+        http.method: GET
+    "]
+    H[" id: 8
+        get user auth information
+
+        attributes:
+        service.name: auth-api
+        tracetest.span.type: db
+        db.statement: SELECT * FROM ...
+    "]
+    I[" id: 9
+        notify user
+
+        attributes:
+        service.name: notification-api
+        tracetest.span.type: http
+        http.method: POST
+    "]
+    J[" id: 10
+        send message to kafka
+
+        attributes:
+        service.name: notification-api
+        tracetest.span.type: messaging
+    "]
+    K[" id: 10
+        send message to users
+
+        attributes:
+        service.name: external-service
+        tracetest.span.type: messaging
+    "]
+
+
+    A --&gt;|1| B
+    B --&gt;|2| C
+    B --&gt;|3| D
+    D --&gt;|4| E
+    A --&gt;|5| F
+    F --&gt;|6| G
+    G --&gt;|7| H
+    F --&gt;|8| I
+    I --&gt;|9| J
+    J --&gt;|10| K
+
+    classDef selectedSpan fill:#439846, color:#ffffff
+    classDef candidateSpan fill:#FF6905, color:#ffffff
+
+    class A selectedSpan
+    class F selectedSpan</div>
+<h4 id="or-condition"><strong>OR Condition</strong></h4>
+<p>Sometimes we want to have a broader result by selecting spans that match different selectors. Let's say we have to get all spans from our services, but not from any other external service.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">span</span><span class="o">[</span><span class="nt">service</span><span class="p">.</span><span class="nc">name</span><span class="o">=</span><span class="s2">&quot;api-product&quot;</span><span class="o">],</span><span class="w"> </span><span class="nt">span</span><span class="o">[</span><span class="nt">service</span><span class="p">.</span><span class="nc">name</span><span class="o">=</span><span class="s2">&quot;api-auth&quot;</span><span class="o">],</span><span class="w"> </span><span class="nt">span</span><span class="o">[</span><span class="nt">service</span><span class="p">.</span><span class="nc">name</span><span class="o">=</span><span class="s2">&quot;api-notification&quot;</span><span class="o">],</span><span class="w"> </span><span class="nt">span</span><span class="o">[</span><span class="nt">service</span><span class="p">.</span><span class="nc">name</span><span class="o">=</span><span class="s2">&quot;api-cart&quot;</span><span class="o">]</span><span class="w"></span>
+</code></pre></div>
+<p>This would select the following spans:</p>
+<div class="mermaid">flowchart TD
+    A[" id: 1
+        close order
+
+        attributes:
+        service.name: cart-api
+        tracetest.span.type: http
+        http.method: POST
+    "]
+    B[" id: 2
+        is product available
+
+        attributes:
+        service.name: product-api
+        tracetest.span.type: http
+        http.method: GET
+    "]
+    C[" id: 3
+        get product information
+
+        attributes:
+        service.name: product-api
+        tracetest.span.type: db
+        db.statement: SELECT * FROM ...
+    "]
+    D[" id: 4
+        get user can access
+
+        attributes:
+        service.name: auth-api
+        tracetest.span.type: http
+        http.method: GET
+    "]
+    E[" id: 5
+        get user auth information
+
+        attributes:
+        service.name: auth-api
+        tracetest.span.type: db
+        db.statement: SELECT * FROM ...
+    "]
+    F[" id: 6
+        purchase products
+
+        attributes:
+        service.name: cart-api
+        tracetest.span.type: http
+        http.method: POST
+    "]
+    G[" id: 7
+        get user can access
+
+        attributes:
+        service.name: auth-api
+        tracetest.span.type: http
+        http.method: GET
+    "]
+    H[" id: 8
+        get user auth information
+
+        attributes:
+        service.name: auth-api
+        tracetest.span.type: db
+        db.statement: SELECT * FROM ...
+    "]
+    I[" id: 9
+        notify user
+
+        attributes:
+        service.name: notification-api
+        tracetest.span.type: http
+        http.method: POST
+    "]
+    J[" id: 10
+        send message to kafka
+
+        attributes:
+        service.name: notification-api
+        tracetest.span.type: messaging
+    "]
+    K[" id: 10
+        send message to users
+
+        attributes:
+        service.name: external-service
+        tracetest.span.type: messaging
+    "]
+
+
+    A --&gt;|1| B
+    B --&gt;|2| C
+    B --&gt;|3| D
+    D --&gt;|4| E
+    A --&gt;|5| F
+    F --&gt;|6| G
+    G --&gt;|7| H
+    F --&gt;|8| I
+    I --&gt;|9| J
+    J --&gt;|10| K
+
+    classDef selectedSpan fill:#439846, color:#ffffff
+    classDef candidateSpan fill:#FF6905, color:#ffffff
+
+    class A selectedSpan
+    class B selectedSpan
+    class C selectedSpan
+    class D selectedSpan
+    class E selectedSpan
+    class F selectedSpan
+    class G selectedSpan
+    class H selectedSpan
+    class I selectedSpan
+    class J selectedSpan</div>
+<p>Each span selector will be executed individually and the results will be merged together, creating a list of all spans that match any of the provided span selectors.</p>
+<h4 id="contains-operator"><strong>Contains Operator</strong></h4>
+<p>Although it is possible to filter several span selectors at once to get a broader result, it might become verbose very quickly. The previous example can be written in another way to reduce its complexity:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">span</span><span class="o">[</span><span class="nt">service</span><span class="p">.</span><span class="nc">name</span><span class="w"> </span><span class="nt">contains</span><span class="w"> </span><span class="s2">&quot;api&quot;</span><span class="o">]</span><span class="w"></span>
+</code></pre></div>
+<p>This would select the same spans as the previous example:</p>
+<div class="mermaid">flowchart TD
+    A[" id: 1
+        close order
+
+        attributes:
+        service.name: cart-api
+        tracetest.span.type: http
+        http.method: POST
+    "]
+    B[" id: 2
+        is product available
+
+        attributes:
+        service.name: product-api
+        tracetest.span.type: http
+        http.method: GET
+    "]
+    C[" id: 3
+        get product information
+
+        attributes:
+        service.name: product-api
+        tracetest.span.type: db
+        db.statement: SELECT * FROM ...
+    "]
+    D[" id: 4
+        get user can access
+
+        attributes:
+        service.name: auth-api
+        tracetest.span.type: http
+        http.method: GET
+    "]
+    E[" id: 5
+        get user auth information
+
+        attributes:
+        service.name: auth-api
+        tracetest.span.type: db
+        db.statement: SELECT * FROM ...
+    "]
+    F[" id: 6
+        purchase products
+
+        attributes:
+        service.name: cart-api
+        tracetest.span.type: http
+        http.method: POST
+    "]
+    G[" id: 7
+        get user can access
+
+        attributes:
+        service.name: auth-api
+        tracetest.span.type: http
+        http.method: GET
+    "]
+    H[" id: 8
+        get user auth information
+
+        attributes:
+        service.name: auth-api
+        tracetest.span.type: db
+        db.statement: SELECT * FROM ...
+    "]
+    I[" id: 9
+        notify user
+
+        attributes:
+        service.name: notification-api
+        tracetest.span.type: http
+        http.method: POST
+    "]
+    J[" id: 10
+        send message to kafka
+
+        attributes:
+        service.name: notification-api
+        tracetest.span.type: messaging
+    "]
+    K[" id: 10
+        send message to users
+
+        attributes:
+        service.name: external-service
+        tracetest.span.type: messaging
+    "]
+
+
+    A --&gt;|1| B
+    B --&gt;|2| C
+    B --&gt;|3| D
+    D --&gt;|4| E
+    A --&gt;|5| F
+    F --&gt;|6| G
+    G --&gt;|7| H
+    F --&gt;|8| I
+    I --&gt;|9| J
+    J --&gt;|10| K
+
+    classDef selectedSpan fill:#439846, color:#ffffff
+    classDef candidateSpan fill:#FF6905, color:#ffffff
+
+    class A selectedSpan
+    class B selectedSpan
+    class C selectedSpan
+    class D selectedSpan
+    class E selectedSpan
+    class F selectedSpan
+    class G selectedSpan
+    class H selectedSpan
+    class I selectedSpan
+    class J selectedSpan</div>
+<h3 id="pseudo-classes-support"><strong>Pseudo-classes Support</strong></h3>
+<p>Sometimes filtering by attributes is not enough because we might have two or three identical spans in the tree but we only want to assert one of them. For example, imagine a system that has a <code>retry</code> policy for all the HTTP requests it sends. How would we allow a user to validate if the <code>third</code> execution was successful without asserting the other two spans?</p>
+<p>This is where pseudo-classes enter the scene. Pseudo-classes are ways of filtering spans by data that is not present in the span itself. For example, the order which the span appears.</p>
+<blockquote>
+<p><strong>Note</strong>: Today we support only <code>first</code>, <code>last</code>, and <code>nth_child</code>. If you think we should implement others, please open an issue and explain why it is important and how it should behave.</p>
+</blockquote>
+<p>For the examples of the three pseudo-classes, let's consider that we want to select a specific <code>http</code> span based on when it happens.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">span</span><span class="o">[</span><span class="nt">tracetest</span><span class="p">.</span><span class="nc">span</span><span class="p">.</span><span class="nc">type</span><span class="o">=</span><span class="s2">&quot;http&quot;</span><span class="o">]</span><span class="w"></span>
+</code></pre></div>
+<p>This will select the following spans:</p>
+<div class="mermaid">flowchart TD
+    A[" id: 1
+        close order
+
+        attributes:
+        service.name: cart-api
+        tracetest.span.type: http
+        http.method: POST
+    "]
+    B[" id: 2
+        is product available
+
+        attributes:
+        service.name: product-api
+        tracetest.span.type: http
+        http.method: GET
+    "]
+    C[" id: 3
+        get product information
+
+        attributes:
+        service.name: product-api
+        tracetest.span.type: db
+        db.statement: SELECT * FROM ...
+    "]
+    D[" id: 4
+        get user can access
+
+        attributes:
+        service.name: auth-api
+        tracetest.span.type: http
+        http.method: GET
+    "]
+    E[" id: 5
+        get user auth information
+
+        attributes:
+        service.name: auth-api
+        tracetest.span.type: db
+        db.statement: SELECT * FROM ...
+    "]
+    F[" id: 6
+        purchase products
+
+        attributes:
+        service.name: cart-api
+        tracetest.span.type: http
+        http.method: POST
+    "]
+    G[" id: 7
+        get user can access
+
+        attributes:
+        service.name: auth-api
+        tracetest.span.type: http
+        http.method: GET
+    "]
+    H[" id: 8
+        get user auth information
+
+        attributes:
+        service.name: auth-api
+        tracetest.span.type: db
+        db.statement: SELECT * FROM ...
+    "]
+    I[" id: 9
+        notify user
+
+        attributes:
+        service.name: notification-api
+        tracetest.span.type: http
+        http.method: POST
+    "]
+    J[" id: 10
+        send message to kafka
+
+        attributes:
+        service.name: notification-api
+        tracetest.span.type: messaging
+    "]
+    K[" id: 10
+        send message to users
+
+        attributes:
+        service.name: external-service
+        tracetest.span.type: messaging
+    "]
+
+
+    A --&gt;|1| B
+    B --&gt;|2| C
+    B --&gt;|3| D
+    D --&gt;|4| E
+    A --&gt;|5| F
+    F --&gt;|6| G
+    G --&gt;|7| H
+    F --&gt;|8| I
+    I --&gt;|9| J
+    J --&gt;|10| K
+
+    classDef selectedSpan fill:#439846, color:#ffffff
+    classDef candidateSpan fill:#FF6905, color:#ffffff
+
+    class A selectedSpan
+    class B selectedSpan
+    class D selectedSpan
+    class F selectedSpan
+    class G selectedSpan
+    class I selectedSpan</div>
+<h4 id="first"><strong>:first</strong></h4>
+<p>This would return the first appearing span from the list:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">span</span><span class="o">[</span><span class="nt">tracetest</span><span class="p">.</span><span class="nc">span</span><span class="p">.</span><span class="nc">type</span><span class="o">=</span><span class="s2">&quot;http&quot;</span><span class="o">]</span><span class="p">:</span><span class="nd">first</span><span class="w"></span>
+</code></pre></div>
+<div class="mermaid">flowchart TD
+    A[" id: 1
+        close order
+
+        attributes:
+        service.name: cart-api
+        tracetest.span.type: http
+        http.method: POST
+    "]
+    B[" id: 2
+        is product available
+
+        attributes:
+        service.name: product-api
+        tracetest.span.type: http
+        http.method: GET
+    "]
+    C[" id: 3
+        get product information
+
+        attributes:
+        service.name: product-api
+        tracetest.span.type: db
+        db.statement: SELECT * FROM ...
+    "]
+    D[" id: 4
+        get user can access
+
+        attributes:
+        service.name: auth-api
+        tracetest.span.type: http
+        http.method: GET
+    "]
+    E[" id: 5
+        get user auth information
+
+        attributes:
+        service.name: auth-api
+        tracetest.span.type: db
+        db.statement: SELECT * FROM ...
+    "]
+    F[" id: 6
+        purchase products
+
+        attributes:
+        service.name: cart-api
+        tracetest.span.type: http
+        http.method: POST
+    "]
+    G[" id: 7
+        get user can access
+
+        attributes:
+        service.name: auth-api
+        tracetest.span.type: http
+        http.method: GET
+    "]
+    H[" id: 8
+        get user auth information
+
+        attributes:
+        service.name: auth-api
+        tracetest.span.type: db
+        db.statement: SELECT * FROM ...
+    "]
+    I[" id: 9
+        notify user
+
+        attributes:
+        service.name: notification-api
+        tracetest.span.type: http
+        http.method: POST
+    "]
+    J[" id: 10
+        send message to kafka
+
+        attributes:
+        service.name: notification-api
+        tracetest.span.type: messaging
+    "]
+    K[" id: 10
+        send message to users
+
+        attributes:
+        service.name: external-service
+        tracetest.span.type: messaging
+    "]
+
+
+    A --&gt;|1| B
+    B --&gt;|2| C
+    B --&gt;|3| D
+    D --&gt;|4| E
+    A --&gt;|5| F
+    F --&gt;|6| G
+    G --&gt;|7| H
+    F --&gt;|8| I
+    I --&gt;|9| J
+    J --&gt;|10| K
+
+    classDef selectedSpan fill:#439846, color:#ffffff
+    classDef candidateSpan fill:#FF6905, color:#ffffff
+
+    class A selectedSpan
+    class B candidateSpan
+    class D candidateSpan
+    class F candidateSpan
+    class G candidateSpan
+    class I candidateSpan</div>
+<h4 id="last"><strong>:last</strong></h4>
+<p>This would return the last appearing span from the list:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">span</span><span class="o">[</span><span class="nt">tracetest</span><span class="p">.</span><span class="nc">span</span><span class="p">.</span><span class="nc">type</span><span class="o">=</span><span class="s2">&quot;http&quot;</span><span class="o">]</span><span class="p">:</span><span class="nd">last</span><span class="w"></span>
+</code></pre></div>
+<div class="mermaid">flowchart TD
+    A[" id: 1
+        close order
+
+        attributes:
+        service.name: cart-api
+        tracetest.span.type: http
+        http.method: POST
+    "]
+    B[" id: 2
+        is product available
+
+        attributes:
+        service.name: product-api
+        tracetest.span.type: http
+        http.method: GET
+    "]
+    C[" id: 3
+        get product information
+
+        attributes:
+        service.name: product-api
+        tracetest.span.type: db
+        db.statement: SELECT * FROM ...
+    "]
+    D[" id: 4
+        get user can access
+
+        attributes:
+        service.name: auth-api
+        tracetest.span.type: http
+        http.method: GET
+    "]
+    E[" id: 5
+        get user auth information
+
+        attributes:
+        service.name: auth-api
+        tracetest.span.type: db
+        db.statement: SELECT * FROM ...
+    "]
+    F[" id: 6
+        purchase products
+
+        attributes:
+        service.name: cart-api
+        tracetest.span.type: http
+        http.method: POST
+    "]
+    G[" id: 7
+        get user can access
+
+        attributes:
+        service.name: auth-api
+        tracetest.span.type: http
+        http.method: GET
+    "]
+    H[" id: 8
+        get user auth information
+
+        attributes:
+        service.name: auth-api
+        tracetest.span.type: db
+        db.statement: SELECT * FROM ...
+    "]
+    I[" id: 9
+        notify user
+
+        attributes:
+        service.name: notification-api
+        tracetest.span.type: http
+        http.method: POST
+    "]
+    J[" id: 10
+        send message to kafka
+
+        attributes:
+        service.name: notification-api
+        tracetest.span.type: messaging
+    "]
+    K[" id: 10
+        send message to users
+
+        attributes:
+        service.name: external-service
+        tracetest.span.type: messaging
+    "]
+
+
+    A --&gt;|1| B
+    B --&gt;|2| C
+    B --&gt;|3| D
+    D --&gt;|4| E
+    A --&gt;|5| F
+    F --&gt;|6| G
+    G --&gt;|7| H
+    F --&gt;|8| I
+    I --&gt;|9| J
+    J --&gt;|10| K
+
+    classDef selectedSpan fill:#439846, color:#ffffff
+    classDef candidateSpan fill:#FF6905, color:#ffffff
+
+    class A candidateSpan
+    class B candidateSpan
+    class D candidateSpan
+    class F candidateSpan
+    class G candidateSpan
+    class I selectedSpan</div>
+<h4 id="nth_child"><strong>:nth_child</strong></h4>
+<p>This enables you to fetch any item from the list based on its index. <code>n</code> starts at 1 (first element) and ends at <code>length</code> (last element). Any invalid <code>n</code> value will return in an empty list of spans being returned:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">span</span><span class="o">[</span><span class="nt">tracetest</span><span class="p">.</span><span class="nc">span</span><span class="p">.</span><span class="nc">type</span><span class="o">=</span><span class="s2">&quot;http&quot;</span><span class="o">]</span><span class="p">:</span><span class="nd">nth_child</span><span class="o">(</span><span class="nt">3</span><span class="o">)</span><span class="w"></span>
+</code></pre></div>
+<div class="mermaid">flowchart TD
+    A[" id: 1
+        close order
+
+        attributes:
+        service.name: cart-api
+        tracetest.span.type: http
+        http.method: POST
+    "]
+    B[" id: 2
+        is product available
+
+        attributes:
+        service.name: product-api
+        tracetest.span.type: http
+        http.method: GET
+    "]
+    C[" id: 3
+        get product information
+
+        attributes:
+        service.name: product-api
+        tracetest.span.type: db
+        db.statement: SELECT * FROM ...
+    "]
+    D[" id: 4
+        get user can access
+
+        attributes:
+        service.name: auth-api
+        tracetest.span.type: http
+        http.method: GET
+    "]
+    E[" id: 5
+        get user auth information
+
+        attributes:
+        service.name: auth-api
+        tracetest.span.type: db
+        db.statement: SELECT * FROM ...
+    "]
+    F[" id: 6
+        purchase products
+
+        attributes:
+        service.name: cart-api
+        tracetest.span.type: http
+        http.method: POST
+    "]
+    G[" id: 7
+        get user can access
+
+        attributes:
+        service.name: auth-api
+        tracetest.span.type: http
+        http.method: GET
+    "]
+    H[" id: 8
+        get user auth information
+
+        attributes:
+        service.name: auth-api
+        tracetest.span.type: db
+        db.statement: SELECT * FROM ...
+    "]
+    I[" id: 9
+        notify user
+
+        attributes:
+        service.name: notification-api
+        tracetest.span.type: http
+        http.method: POST
+    "]
+    J[" id: 10
+        send message to kafka
+
+        attributes:
+        service.name: notification-api
+        tracetest.span.type: messaging
+    "]
+    K[" id: 10
+        send message to users
+
+        attributes:
+        service.name: external-service
+        tracetest.span.type: messaging
+    "]
+
+
+    A --&gt;|1| B
+    B --&gt;|2| C
+    B --&gt;|3| D
+    D --&gt;|4| E
+    A --&gt;|5| F
+    F --&gt;|6| G
+    G --&gt;|7| H
+    F --&gt;|8| I
+    I --&gt;|9| J
+    J --&gt;|10| K
+
+    classDef selectedSpan fill:#439846, color:#ffffff
+    classDef candidateSpan fill:#FF6905, color:#ffffff
+
+    class A candidateSpan
+    class B candidateSpan
+    class D selectedSpan
+    class F candidateSpan
+    class G candidateSpan
+    class I candidateSpan</div>
+<h3 id="parent-child-relation-filtering"><strong>Parent-child Relation Filtering</strong></h3>
+<p>Even with all those capabilities, we might have problems with ambiguous selectors returning several spans when just a few were intended.</p>
+<p>In our example, <code>auth-api</code> is called twice from different parts of the trace. At first by <code>product-api</code> and later by <code>cart-api</code>.</p>
+<p>What if I want to test if a product only available in US can be bought in UK? The product can be seen by the user, but it cannot be bought if the user is outside the US. Certainly, I cannot apply the same assertions on all <code>auth-api</code> spans, otherwise the test will not pass.</p>
+<blockquote>
+<p>:information_source: When you filter by the parent-child relationship, spans are matched recursively in all levels below the parent. This doesn't match only direct children of the parent, but all other spans in the sub-tree.</p>
+</blockquote>
+<p>For example:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">span</span><span class="o">[</span><span class="nt">service</span><span class="p">.</span><span class="nc">name</span><span class="o">=</span><span class="s2">&quot;auth-api&quot;</span><span class="w"> </span><span class="nt">tracetest</span><span class="p">.</span><span class="nc">span</span><span class="p">.</span><span class="nc">type</span><span class="o">=</span><span class="s2">&quot;http&quot;</span><span class="o">]</span><span class="w"></span>
+</code></pre></div>
+<p>Will return:
+<div class="mermaid">flowchart TD
+    A[" id: 1
+        close order
+
+        attributes:
+        service.name: cart-api
+        tracetest.span.type: http
+        http.method: POST
+    "]
+    B[" id: 2
+        is product available
+
+        attributes:
+        service.name: product-api
+        tracetest.span.type: http
+        http.method: GET
+    "]
+    C[" id: 3
+        get product information
+
+        attributes:
+        service.name: product-api
+        tracetest.span.type: db
+        db.statement: SELECT * FROM ...
+    "]
+    D[" id: 4
+        get user can access
+
+        attributes:
+        service.name: auth-api
+        tracetest.span.type: http
+        http.method: GET
+    "]
+    E[" id: 5
+        get user auth information
+
+        attributes:
+        service.name: auth-api
+        tracetest.span.type: db
+        db.statement: SELECT * FROM ...
+    "]
+    F[" id: 6
+        purchase products
+
+        attributes:
+        service.name: cart-api
+        tracetest.span.type: http
+        http.method: POST
+    "]
+    G[" id: 7
+        get user can access
+
+        attributes:
+        service.name: auth-api
+        tracetest.span.type: http
+        http.method: GET
+    "]
+    H[" id: 8
+        get user auth information
+
+        attributes:
+        service.name: auth-api
+        tracetest.span.type: db
+        db.statement: SELECT * FROM ...
+    "]
+    I[" id: 9
+        notify user
+
+        attributes:
+        service.name: notification-api
+        tracetest.span.type: http
+        http.method: POST
+    "]
+    J[" id: 10
+        send message to kafka
+
+        attributes:
+        service.name: notification-api
+        tracetest.span.type: messaging
+    "]
+    K[" id: 10
+        send message to users
+
+        attributes:
+        service.name: external-service
+        tracetest.span.type: messaging
+    "]
+
+
+    A --&gt;|1| B
+    B --&gt;|2| C
+    B --&gt;|3| D
+    D --&gt;|4| E
+    A --&gt;|5| F
+    F --&gt;|6| G
+    G --&gt;|7| H
+    F --&gt;|8| I
+    I --&gt;|9| J
+    J --&gt;|10| K
+
+    classDef selectedSpan fill:#439846, color:#ffffff
+    classDef candidateSpan fill:#FF6905, color:#ffffff
+
+    class D selectedSpan
+    class G selectedSpan</div></p>
+<p>This is a problem, because if we apply the same assertion to both spans, one of them will fail. We could try to use <code>nth_child</code> but that could break if a http request failed and the retry policy kicked in. Thus, the only way of filtering in this scenario is based on the context when it was generated. For example: using its parent span to do so.</p>
+<p>We could use the <code>purchase products</code> parent to ensure just <code>http</code> class to the <code>auth-api</code> triggered by the <code>purchase-api</code> would be selected:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">span</span><span class="o">[</span><span class="nt">service</span><span class="p">.</span><span class="nc">name</span><span class="o">=</span><span class="s2">&quot;cart-api&quot;</span><span class="o">,</span><span class="w"> </span><span class="nt">name</span><span class="o">=</span><span class="s2">&quot;purchase products&quot;</span><span class="o">]</span><span class="w"> </span><span class="nt">span</span><span class="o">[</span><span class="nt">service</span><span class="p">.</span><span class="nc">name</span><span class="o">=</span><span class="s2">&quot;auth-api&quot;</span><span class="w"> </span><span class="nt">tracetest</span><span class="p">.</span><span class="nc">span</span><span class="p">.</span><span class="nc">type</span><span class="o">=</span><span class="s2">&quot;http&quot;</span><span class="o">]</span><span class="w"></span>
+</code></pre></div>
+<p>This would find the parent span and only select the spans that are descedents of that parent and match the provided filter:</p>
+<div class="mermaid">flowchart TD
+    A[" id: 1
+        close order
+
+        attributes:
+        service.name: cart-api
+        tracetest.span.type: http
+        http.method: POST
+    "]
+    B[" id: 2
+        is product available
+
+        attributes:
+        service.name: product-api
+        tracetest.span.type: http
+        http.method: GET
+    "]
+    C[" id: 3
+        get product information
+
+        attributes:
+        service.name: product-api
+        tracetest.span.type: db
+        db.statement: SELECT * FROM ...
+    "]
+    D[" id: 4
+        get user can access
+
+        attributes:
+        service.name: auth-api
+        tracetest.span.type: http
+        http.method: GET
+    "]
+    E[" id: 5
+        get user auth information
+
+        attributes:
+        service.name: auth-api
+        tracetest.span.type: db
+        db.statement: SELECT * FROM ...
+    "]
+    F[" id: 6
+        purchase products
+
+        attributes:
+        service.name: cart-api
+        tracetest.span.type: http
+        http.method: POST
+    "]
+    G[" id: 7
+        get user can access
+
+        attributes:
+        service.name: auth-api
+        tracetest.span.type: http
+        http.method: GET
+    "]
+    H[" id: 8
+        get user auth information
+
+        attributes:
+        service.name: auth-api
+        tracetest.span.type: db
+        db.statement: SELECT * FROM ...
+    "]
+    I[" id: 9
+        notify user
+
+        attributes:
+        service.name: notification-api
+        tracetest.span.type: http
+        http.method: POST
+    "]
+    J[" id: 10
+        send message to kafka
+
+        attributes:
+        service.name: notification-api
+        tracetest.span.type: messaging
+    "]
+    K[" id: 10
+        send message to users
+
+        attributes:
+        service.name: external-service
+        tracetest.span.type: messaging
+    "]
+
+
+    A --&gt;|1| B
+    B --&gt;|2| C
+    B --&gt;|3| D
+    D --&gt;|4| E
+    A --&gt;|5| F
+    F --&gt;|6| G
+    G --&gt;|7| H
+    F --&gt;|8| I
+    I --&gt;|9| J
+    J --&gt;|10| K
+
+    classDef selectedSpan fill:#439846, color:#ffffff
+    classDef parentSpan fill:#3792cb, color:#ffffff
+
+    class F parentSpan
+    class G selectedSpan</div>
+
+              
+            </article>
+            
+          </div>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+    <nav class="md-footer__inner md-grid" aria-label="Footer" >
+      
+        
+        <a href="../test-definition-file/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Test Definition File" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Test Definition File
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../ci-cd-best-practices/" class="md-footer__link md-footer__link--next" aria-label="Next: CI/CD Best practices" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              CI/CD Best practices
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2022 <a href="https://kubeshop.io">Kubeshop</a>
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.expand"], "search": "../assets/javascripts/workers/search.b97dbffb.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.6c7ad80a.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid@9.1.3/dist/mermaid.min.js"></script>
+      
+    
+  </body>
+</html>
