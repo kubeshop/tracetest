@@ -32,6 +32,7 @@ const SearchInput: React.FC<ISearchInputProps> = ({
       width={width}
       height={height}
       onChange={handleSearch}
+      allowClear
     />
   );
 };
