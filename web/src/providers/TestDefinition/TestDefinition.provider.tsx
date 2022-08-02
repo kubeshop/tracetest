@@ -4,15 +4,11 @@ import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import {createContext, useCallback, useContext, useEffect, useMemo} from 'react';
 import {useGetTestByIdQuery} from 'redux/apis/TraceTest.api';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
-import {
-  setSelectedAssertion as setSelectedAssertionAction,
-  setViewResultsMode,
-} from 'redux/slices/TestDefinition.slice';
+import {setSelectedAssertion as setSelectedAssertionAction} from 'redux/slices/TestDefinition.slice';
 import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
 import {TAssertionResultEntry, TAssertionResults} from 'types/Assertion.types';
 import {TTest} from 'types/Test.types';
 import {TTestDefinitionEntry} from 'types/TestDefinition.types';
-import {ResultViewModes} from 'constants/Test.constants';
 import useTestDefinitionCrud from './hooks/useTestDefinitionCrud';
 
 interface IContext {
@@ -30,9 +26,7 @@ interface IContext {
   isError: boolean;
   isDraftMode: boolean;
   test?: TTest;
-  viewResultsMode: ResultViewModes;
   setSelectedAssertion(assertionResult?: TAssertionResultEntry): void;
-  changeViewResultsMode(viewResultsMode: ResultViewModes): void;
 }
 
 export const Context = createContext<IContext>({
@@ -44,12 +38,10 @@ export const Context = createContext<IContext>({
   runTest: noop,
   dryRun: noop,
   cancel: noop,
-  changeViewResultsMode: noop,
   isLoading: false,
   isError: false,
   isDraftMode: false,
   definitionList: [],
-  viewResultsMode: ResultViewModes.Wizard,
   setSelectedAssertion: noop,
 });
 
@@ -69,7 +61,6 @@ const TestDefinitionProvider = ({children, testId, runId}: IProps) => {
   const isDraftMode = useAppSelector(state => TestDefinitionSelectors.selectIsDraftMode(state));
   const isLoading = useAppSelector(state => TestDefinitionSelectors.selectIsLoading(state));
   const isInitialized = useAppSelector(state => TestDefinitionSelectors.selectIsInitialized(state));
-  const viewResultsMode = useAppSelector(state => TestDefinitionSelectors.selectViewResultsMode(state));
   const {data: test} = useGetTestByIdQuery({testId});
 
   const {add, cancel, publish, runTest, remove, dryRun, update, init, reset, revert} = useTestDefinitionCrud({
@@ -99,13 +90,6 @@ const TestDefinitionProvider = ({children, testId, runId}: IProps) => {
     [dispatch]
   );
 
-  const changeViewResultsMode = useCallback(
-    (mode: ResultViewModes) => {
-      dispatch(setViewResultsMode(mode));
-    },
-    [dispatch]
-  );
-
   const value = useMemo<IContext>(
     () => ({
       add,
@@ -119,12 +103,10 @@ const TestDefinitionProvider = ({children, testId, runId}: IProps) => {
       dryRun,
       assertionResults,
       definitionList,
-      viewResultsMode,
       cancel,
       test,
       setSelectedAssertion,
       revert,
-      changeViewResultsMode,
     }),
     [
       add,
@@ -137,12 +119,10 @@ const TestDefinitionProvider = ({children, testId, runId}: IProps) => {
       dryRun,
       assertionResults,
       definitionList,
-      viewResultsMode,
       cancel,
       test,
       setSelectedAssertion,
       revert,
-      changeViewResultsMode,
     ]
   );
 

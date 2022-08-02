@@ -1,5 +1,5 @@
 import {differenceBy, intersectionBy} from 'lodash';
-import {CompareOperator, PseudoSelector} from 'constants/Operator.constants';
+import {CompareOperator} from 'constants/Operator.constants';
 import {SELECTOR_DEFAULT_ATTRIBUTES, SemanticGroupNames} from 'constants/SemanticGroupNames.constants';
 import {SpanKind} from 'constants/Span.constants';
 import {TSpan, TSpanFlatAttribute} from 'types/Span.types';
@@ -35,18 +35,13 @@ const SpanService = () => ({
   },
 
   getSelectorInformation(span: TSpan) {
-    const selectorList =
-      span?.signature.map(attribute => ({
-        value: attribute.value,
-        key: attribute.key,
-        operator: OperatorService.getOperatorSymbol(CompareOperator.EQUALS),
-      })) || [];
-
-    const pseudoSelector = {
-      selector: PseudoSelector.ALL,
-    };
-
-    return {selectorList, pseudoSelector};
+    return `span[${(
+      span?.signature.reduce<string>(
+        (selector, {value, key}) =>
+          `${selector}${key}${OperatorService.getOperatorSymbol(CompareOperator.EQUALS)}"${value}" `,
+        ''
+      ) || ''
+    ).trim()}]`;
   },
 
   searchSpanList(spanList: TSpan[], searchText: string) {

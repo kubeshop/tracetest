@@ -1,5 +1,5 @@
 import {PlusOutlined} from '@ant-design/icons';
-import {Badge, Switch, Tooltip} from 'antd';
+import {Badge} from 'antd';
 import {MouseEventHandler, useCallback, useMemo} from 'react';
 import {useTheme} from 'styled-components';
 
@@ -12,10 +12,7 @@ import TraceService from 'services/Trace.service';
 import {TAssertionResults} from 'types/Assertion.types';
 import {TSpan} from 'types/Span.types';
 import {TTestRun} from 'types/TestRun.types';
-import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
-import {ResultViewModes} from 'constants/Test.constants';
 import Date from 'utils/Date';
-import SelectorService from 'services/Selector.service';
 import * as S from './RunBottomPanel.styled';
 
 interface IProps {
@@ -29,7 +26,6 @@ const Header: React.FC<IProps> = ({run: {createdAt}, assertionResults, isDisable
   const theme = useTheme();
   const {isBottomPanelOpen, openBottomPanel, toggleBottomPanel} = useRunLayout();
   const {open} = useAssertionForm();
-  const {viewResultsMode, changeViewResultsMode} = useTestDefinition();
   const totalAssertionCount = assertionResults?.resultList.length || 0;
 
   const {totalPassedCount, totalFailedCount} = useMemo(
@@ -41,21 +37,17 @@ const Header: React.FC<IProps> = ({run: {createdAt}, assertionResults, isDisable
     event => {
       event.stopPropagation();
       openBottomPanel(OPEN_BOTTOM_PANEL_STATE.FORM);
-      const {selectorList, pseudoSelector} = SpanService.getSelectorInformation(selectedSpan!);
-      const selector = SelectorService.getSelectorString(selectorList, pseudoSelector);
+      const selector = SpanService.getSelectorInformation(selectedSpan!);
 
       open({
         isEditing: false,
         selector,
         defaultValues: {
-          pseudoSelector,
-          selectorList,
           selector,
-          isAdvancedSelector: viewResultsMode === ResultViewModes.Advanced,
         },
       });
     },
-    [openBottomPanel, selectedSpan, open, viewResultsMode]
+    [openBottomPanel, selectedSpan, open]
   );
   return (
     <S.Header
@@ -74,19 +66,6 @@ const Header: React.FC<IProps> = ({run: {createdAt}, assertionResults, isDisable
         </S.HeaderText>
       </div>
       <S.Row>
-        <Tooltip title="You can decide whether you want to see the results using the key-value (wizard) mode or the query language (advanced).">
-          <Switch
-            disabled={isDisabled}
-            checkedChildren="Advanced"
-            unCheckedChildren="Wizard"
-            checked={viewResultsMode === ResultViewModes.Advanced}
-            onChange={(isChecked, event) => {
-              event.preventDefault();
-              event.stopPropagation();
-              changeViewResultsMode(isChecked ? ResultViewModes.Advanced : ResultViewModes.Wizard);
-            }}
-          />
-        </Tooltip>
         <S.AddAssertionButton
           data-cy="add-assertion-button"
           icon={<PlusOutlined />}

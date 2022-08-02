@@ -27,7 +27,6 @@ const definition: TTestDefinitionEntry = {
   isDraft: true,
   assertionList: new Array(faker.datatype.number({min: 2, max: 10})).fill(null).map(() => AssertionMock.model()),
   originalSelector: definitionSelector,
-  isAdvancedSelector: false,
 };
 
 const state = {
@@ -208,9 +207,6 @@ describe('TestDefinitionReducer', () => {
         selector: faker.random.word(),
         originalSelector: faker.random.word(),
         spanIds: ['12345', '67890'],
-        selectorList: [],
-        resultList: [],
-        isAdvancedSelector: false,
       };
 
       const result = Reducer(initialState, setSelectedAssertion(assertionResultEntry));
