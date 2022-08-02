@@ -10,10 +10,14 @@ trigger:
     - key: Content-Type
       value: application/json
 testDefinition:
+- selector: span[name = "Tracetest trigger"]
+  assertions:
+    - tracetest.selected_spans.count = 1
+    - tracetest.response.status = 200
+    - tracetest.response.body contains "${TEST_ID}"
 - selector: span[name="GET /api/tests" tracetest.span.type="http"]
   assertions:
-  - tracetest.response.status = 200
-  - tracetest.response.body contains "${TEST_ID}"
+  - tracetest.selected_spans.count = 1
 - selector: span[name = "query SELECT"]
   assertions:
   - tracetest.selected_spans.count = 1
