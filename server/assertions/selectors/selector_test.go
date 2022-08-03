@@ -118,6 +118,11 @@ func TestSelector(t *testing.T) {
 			Expression:      `span[tracetest.span.type="db"]:nth_child(2)`,
 			ExpectedSpanIds: []trace.SpanID{updatePokemonDatabaseSpanID},
 		},
+		{
+			Name:            "Selector should not match parent when children are specified",
+			Expression:      `span[service.name = "Pokeshop-worker"] span[service.name = "Pokeshop-worker"]`,
+			ExpectedSpanIds: []trace.SpanID{updatePokemonDatabaseSpanID},
+		},
 	}
 
 	for _, testCase := range testCases {
