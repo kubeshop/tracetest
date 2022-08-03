@@ -61,10 +61,12 @@ describe('Show test details', () => {
       cy.visit(`http://localhost:3000/test/${testId}`);
 
       cy.get('[data-cy^=result-actions-button]').last().click();
+      // we need the to wait here because the api takes
+      // some time to be able to return the junit result
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
       cy.wait(25000);
       cy.get('[data-cy=view-junit-button]').click();
 
-      // the modal does not show up sometimes
       cy.get('[data-cy=file-viewer-code-container]').should('be.visible');
       cy.get('[data-cy=file-viewer-close]').click();
 

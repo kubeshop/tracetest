@@ -34,7 +34,7 @@ const useInfiniteScroll = <T, P>(
 
       setLastCount(currentList.length);
     }
-  }, [currentList]);
+  }, [currentList, localPage]);
 
   const refresh = useCallback(() => {
     setLocalPage(1);
