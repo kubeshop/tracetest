@@ -1,23 +1,25 @@
-import {useCallback} from 'react';
-import {useNavigate} from 'react-router-dom';
-
 import InfiniteScroll from 'components/InfiniteScroll';
 import TestCard from 'components/TestCard';
-import useInfiniteScroll from 'hooks/useInfiniteScroll';
-import {useGetTestListQuery, useRunTestMutation} from 'redux/apis/TraceTest.api';
+import {useCallback} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {useRunTestMutation} from 'redux/apis/TraceTest.api';
 import HomeAnalyticsService from 'services/Analytics/HomeAnalytics.service';
 import TestAnalyticsService from 'services/Analytics/TestAnalytics.service';
-import {TTest} from 'types/Test.types';
+import {InfiniteScrollModel} from '../../hooks/useInfiniteScroll';
+import {TTest} from '../../types/Test.types';
 import * as S from './Home.styled';
 import NoResults from './NoResults';
 import {useMenuDeleteCallback} from './useMenuDeleteCallback';
 
 const {onTestClick} = HomeAnalyticsService;
 
-const TestList = () => {
+interface IProps {
+  query: InfiniteScrollModel<TTest>;
+}
+
+const TestList = ({query: {hasMore, loadMore, isLoading, list}}: IProps) => {
   const navigate = useNavigate();
   const [runTest] = useRunTestMutation();
-  const {list: resultList, hasMore, loadMore, isLoading} = useInfiniteScroll<TTest, {}>(useGetTestListQuery, {});
 
   const onClick = useCallback(
     (testId: string) => {
@@ -45,11 +47,11 @@ const TestList = () => {
       loadMore={loadMore}
       isLoading={isLoading}
       hasMore={hasMore}
-      shouldTrigger={Boolean(resultList.length)}
+      shouldTrigger={Boolean(list.length)}
       emptyComponent={<NoResults />}
     >
       <S.TestListContainer data-cy="test-list">
-        {resultList?.map(test => (
+        {list?.map(test => (
           <TestCard test={test} onClick={onClick} onDelete={onDelete} onRunTest={onRunTest} key={test.id} />
         ))}
       </S.TestListContainer>

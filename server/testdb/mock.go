@@ -56,8 +56,8 @@ func (m *MockRepository) GetLatestTestVersion(_ context.Context, id uuid.UUID) (
 	return args.Get(0).(model.Test), args.Error(1)
 }
 
-func (m *MockRepository) GetTests(_ context.Context, take int32, skip int32) ([]model.Test, error) {
-	args := m.Called(take, skip)
+func (m *MockRepository) GetTests(_ context.Context, take, skip int32, query string) ([]model.Test, error) {
+	args := m.Called(take, skip, query)
 	return args.Get(0).([]model.Test), args.Error(1)
 }
 
