@@ -34,17 +34,17 @@
 
 # Tracetest
 
-Tracetest is a trace-based testing tool that leverages the data contained in your distributed traces to produce easy to create, yet super powerful integration tests. You can verify activity deep inside your system by asserting on data and flow information contained in the OpenTelemetry traces and span attributes. This can include:
+Tracetest is a trace-based testing tool that leverages the data captured by your exiting Open Telemetry distributed traces to produce easy to create, yet super powerful integration tests. You can verify activity deep inside your system by asserting on data and flow information contained in the OpenTelemetry traces and span attributes. This can include:
 
+- verify the quality of your OpenTelemetry instrumentation and enforce standards.
 - testing events that occur on 'the other side' of an async message queue, even though the original async call has returned earlier.
 - assertions based on the timing of different steps in your process.
 - wildcard assertions across common types of activities, ie all gRPC return codes should be 0, all database calls should happen in less than 100ms.
 - test long running processes instrumented with OpenTelemetry tracing to assert proper operation deep in the process.
-- verify the quality of your OpenTelemetry instrumentation and enforce standards.
 
 # Features
 
-- Test by executing a REST or gRPC call to trigger the test. Can also import your Postman Collections.
+- Supports multiple ways of creating a test, including HTTP, GRPC and Postman Collections.
 - [Add assertions](https://kubeshop.github.io/tracetest/adding-assertions/) based on return data from trigger call and/or data contained in the spans in your distributed trace.
 - Specify which spans to check in assertions via the [advanced selector language](https://kubeshop.github.io/tracetest/advanced-selectors/).
 - Define checks against the attributes in these spans, including properties, return status, or timing.
@@ -53,7 +53,6 @@ Tracetest is a trace-based testing tool that leverages the data contained in you
 - [Tracetest CLI](https://kubeshop.github.io/tracetest/command-line-tool/) allows importing & exporting tests, running tests, and more.
 - Tests are [versioned](https://kubeshop.github.io/tracetest/versioning/) as the definition of the test is altered.
 - Supports [numerous backend trace datastores](https://kubeshop.github.io/tracetest/architecture/), including Jeager and Grafana Tempo. Tell us which others you want!
-- Easy [install via Helm command](https://kubeshop.github.io/tracetest/installing/).
 - Install can include [an example microservice](https://kubeshop.github.io/tracetest/pokeshop/) that is instrumented with OpenTelemetry to use as an example application under test.
 
 # Getting Started
@@ -117,7 +116,7 @@ testDefinition:
 
 # Feedback
 
-We are in the our early days with the project and need your help. Have an idea to improve it? Please [Create an issue here](https://github.com/kubeshop/tracetest/issues/new/choose) or join our community on [Discord](https://discord.gg/eBvEQRVyKX).
+Have an idea to improve Tracetest? Please [Create an issue here](https://github.com/kubeshop/tracetest/issues/new/choose) or join our community on [Discord](https://discord.gg/eBvEQRVyKX).
 
 Follow us on [Twitter at @tracetest_io](https://twitter.com/tracetest_io) for updates
 
