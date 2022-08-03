@@ -47,7 +47,7 @@ interface IProps {
   children: React.ReactNode;
 }
 
-export const useSpan = () => useContext(Context);
+export const useSpan = (): IContext => useContext(Context);
 
 const SpanProvider = ({children}: IProps) => {
   const dispatch = useAppDispatch();
@@ -65,7 +65,7 @@ const SpanProvider = ({children}: IProps) => {
       dispatch(clearSelectedSpan());
       dispatch(clearAffectedSpans());
     };
-  }, []);
+  }, [dispatch]);
 
   const onSelectSpan = useCallback(
     (spanId: string) => {

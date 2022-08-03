@@ -28,16 +28,18 @@ export const Container = styled.div<{$showAffected: boolean}>`
     `}
 `;
 
-export const Controls = styled.div`
+export const Controls = styled.div<{mode?: ControlsMode}>`
   background-color: ${({theme}) => theme.color.background};
   border-bottom-left-radius: 8px;
-  position: absolute;
+  position: ${({mode}) => (mode === 'timeline' ? 'unset' : 'absolute')};
   right: 0;
   top: -14px;
   z-index: 9;
 `;
 
-export const SelectorControls = styled(Controls)`
+export type ControlsMode = 'timeline' | 'dag';
+
+export const SelectorControls = styled(Controls)<{mode: ControlsMode}>`
   left: 0;
 `;
 

@@ -1,5 +1,5 @@
 import {Tooltip} from 'antd';
-import React from 'react';
+import React, {useMemo} from 'react';
 import GuidedTourService, {GuidedTours} from '../../services/GuidedTour.service';
 import {SupportedDiagrams} from '../Diagram/Diagram';
 import {Steps} from '../GuidedTour/traceStepList';
@@ -13,8 +13,9 @@ interface IProps {
 }
 
 const DiagramSwitcher: React.FC<IProps> = ({onSearch, onTypeChange, selectedType}) => {
+  const isTimeline = useMemo(() => SupportedDiagrams.Timeline === selectedType, [selectedType]);
   return (
-    <S.DiagramSwitcher>
+    <S.DiagramSwitcher $isTimeline={isTimeline}>
       <S.Switch data-tour={GuidedTourService.getStep(GuidedTours.Trace, Steps.Switcher)}>
         <Tooltip title="Graph view">
           <S.DAGIcon
