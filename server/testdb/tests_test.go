@@ -96,7 +96,7 @@ func TestGetTests(t *testing.T) {
 	createTestWithName(t, db, "2")
 	createTestWithName(t, db, "3")
 
-	actual, err := db.GetTests(context.TODO(), 20, 0)
+	actual, err := db.GetTests(context.TODO(), 20, 0, "")
 	require.NoError(t, err)
 	assert.Len(t, actual, 3)
 
@@ -105,7 +105,7 @@ func TestGetTests(t *testing.T) {
 	assert.Equal(t, "2", actual[1].Name)
 	assert.Equal(t, "1", actual[2].Name)
 
-	actual, err = db.GetTests(context.TODO(), 20, 10)
+	actual, err = db.GetTests(context.TODO(), 20, 10, "")
 	require.NoError(t, err)
 	assert.Len(t, actual, 0)
 }
@@ -126,7 +126,7 @@ func TestGetTestsWithMultipleVersions(t *testing.T) {
 	_, err = db.UpdateTest(context.TODO(), test2)
 	require.NoError(t, err)
 
-	tests, err := db.GetTests(context.TODO(), 20, 0)
+	tests, err := db.GetTests(context.TODO(), 20, 0, "")
 	assert.NoError(t, err)
 	assert.Len(t, tests, 2)
 

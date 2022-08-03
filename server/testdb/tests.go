@@ -177,14 +177,25 @@ func (td *postgresDB) GetLatestTestVersion(ctx context.Context, id uuid.UUID) (m
 
 	return test, nil
 }
+func Ternary[T any](condition bool, If, Else T) T {
+	if condition {
+		return If
+	}
+	return Else
+}
 
-func (td *postgresDB) GetTests(ctx context.Context, take, skip int32) ([]model.Test, error) {
+func (td *postgresDB) GetTests(ctx context.Context, take, skip int32, query string) ([]model.Test, error) {
+	var err error
+	isEmpty := query == ""
+	query = query + ":*"
+
 	stmt, err := td.db.Prepare(getTestSQL + `
 	INNER JOIN (
 		SELECT id as idx, max(version) as latest_version FROM tests GROUP BY idx
 	) as latestTests ON latestTests.idx = t.id
-	WHERE t.version = latestTests.latest_version
-	ORDER BY (t.test ->> 'CreatedAt')::timestamp DESC
+	WHERE t.version = latestTests.latest_version ` +
+		Ternary(isEmpty, "", ` AND to_tsquery($3) @@ to_tsvector((t.test ->> 'Name'))`) +
+		` ORDER BY (t.test ->> 'CreatedAt')::timestamp DESC
 	LIMIT $1 OFFSET $2
 	`)
 	if err != nil {
@@ -192,7 +203,13 @@ func (td *postgresDB) GetTests(ctx context.Context, take, skip int32) ([]model.T
 	}
 	defer stmt.Close()
 
-	rows, err := stmt.QueryContext(ctx, take, skip)
+	var rows *sql.Rows
+
+	if isEmpty {
+		rows, err = stmt.QueryContext(ctx, take, skip)
+	} else {
+		rows, err = stmt.QueryContext(ctx, take, skip, query)
+	}
 	if err != nil {
 		return nil, err
 	}
