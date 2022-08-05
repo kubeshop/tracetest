@@ -27,6 +27,7 @@ interface IProps {
 const SpanDetail = ({span}: IProps) => {
   const {openBottomPanel} = useRunLayout();
   const {open} = useAssertionForm();
+  const spansResult = useAppSelector(TestDefinitionSelectors.selectSpansResult);
   const assertions = useAppSelector(state =>
     TestDefinitionSelectors.selectAssertionResultsBySpan(state, span?.id || '')
   );
@@ -57,7 +58,11 @@ const SpanDetail = ({span}: IProps) => {
 
   return (
     <S.SpanDetail>
-      <SpanHeader span={span} />
+      <SpanHeader
+        span={span}
+        totalFailedChecks={span?.id ? spansResult[span.id]?.failed : 0}
+        totalPassedChecks={span?.id ? spansResult[span?.id]?.passed : 0}
+      />
       <SpanDetailTabs assertions={assertions} onCreateAssertion={onCreateAssertion} span={span} />
     </S.SpanDetail>
   );
