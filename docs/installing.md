@@ -41,7 +41,7 @@ Example with custom options:
 curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/setup.sh | bash -s -- --skip-pma --namespace my-custom-namespace
 ```
 
-### Using Helm
+### **Using Helm**
 
 Container images are hosted on the Docker Hub [Tracetest repository](https://hub.docker.com/r/kubeshop/tracetest).
 
@@ -93,7 +93,7 @@ The following command will uninstall Tracetest with Postgres:
 helm delete tracetest
 ```
 
-## CLI Instalation
+## CLI Installation
 Every time we release a new version of Tracetest, we generate binaries for Linux, MacOS, and Windows. Supporting both amd64, and ARM64 architectures. You can find the latest version [here](https://github.com/kubeshop/tracetest/releases/latest).
 
 ### Linux
@@ -105,7 +105,7 @@ curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/install-cli.sh
 ### MacOS
 
 ```sh
-curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/install-cli.sh | sh
+brew install kubeshop/tracetest/tracetest
 ```
 
 ### Windows

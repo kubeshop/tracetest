@@ -14,14 +14,11 @@ export const SelectorContainer = styled.div`
   align-items: center;
 `;
 
-export const SelectorInputContainer = styled.div`
+export const AdvancedSelectorInputContainer = styled.div`
   display: grid;
   align-items: start;
   grid-template-columns: 850px 170px;
   gap: 14px;
-`;
-
-export const AdvancedSelectorInputContainer = styled(SelectorInputContainer)`
   max-width: 85%;
   width: 85%;
   grid-template-columns: 100%;

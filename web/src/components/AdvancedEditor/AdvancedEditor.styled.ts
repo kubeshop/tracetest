@@ -21,5 +21,17 @@ export const AdvancedEditor = styled.div`
         0px 3px 6px -4px rgba(0, 0, 0, 0.12);
       border-radius: 2px;
     }
+
+    .cm-scroller {
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .cm-scroller::-webkit-scrollbar {
+      display: none;
+      -webkit-appearance: none;
+      width: 0;
+      height: 0;
+    }
   }
 `;

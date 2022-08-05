@@ -1,77 +1,52 @@
-import OperatorService from 'services/Operator.service';
-import {TPseudoSelector, TSpanSelector} from 'types/Assertion.types';
+import {tracetest} from '../../utils/grammar';
+import useEditorTheme from '../AdvancedEditor/hooks/useEditorTheme';
+import ShadowScroll from '../ShadowScroll';
 import * as S from './AssertionItem.styled';
 
 interface IProps {
   affectedSpans: number;
   failedChecks: number;
-  isAdvancedMode: boolean;
-  isAdvancedSelector: boolean;
   passedChecks: number;
-  pseudoSelector?: TPseudoSelector;
-  selectorList: TSpanSelector[];
   title: string;
 }
 
-const AssertionHeader = ({
-  affectedSpans,
-  failedChecks,
-  isAdvancedMode,
-  isAdvancedSelector,
-  passedChecks,
-  pseudoSelector,
-  selectorList,
-  title,
-}: IProps) => (
-  <S.Column>
-    {isAdvancedMode || isAdvancedSelector ? (
+const AssertionHeader = ({affectedSpans, failedChecks, passedChecks, title}: IProps) => {
+  const editorTheme = useEditorTheme({isEditable: false});
+
+  return (
+    <S.HeaderContainer>
+      <ShadowScroll>
+        <S.HeaderTitleText
+          editable={false}
+          data-cy="advanced-selector"
+          value={title || 'All Spans'}
+          maxHeight="120px"
+          spellCheck={false}
+          extensions={[tracetest(), editorTheme]}
+          placeholder="Selecting All Spans"
+        />
+      </ShadowScroll>
+
       <div>
-        <S.HeaderText>{title || 'All Spans'}</S.HeaderText>
+        {Boolean(passedChecks) && (
+          <S.HeaderDetail>
+            <S.HeaderDot $passed />
+            {passedChecks}
+          </S.HeaderDetail>
+        )}
+        {Boolean(failedChecks) && (
+          <S.HeaderDetail>
+            <S.HeaderDot $passed={false} />
+            {failedChecks}
+          </S.HeaderDetail>
+        )}
+        <S.HeaderDetail>
+          <S.HeaderSpansIcon />
+          {`${affectedSpans} ${affectedSpans > 1 ? 'spans' : 'span'}`}
+        </S.HeaderDetail>
       </div>
-    ) : (
-      <S.SelectorContainer>
-        {!selectorList.length && (
-          <S.Selector>
-            <S.HeaderText>All Spans</S.HeaderText>
-          </S.Selector>
-        )}
-        {selectorList.map(({key, value, operator}) => (
-          <S.Selector key={`${key} ${operator} ${value}`}>
-            <S.HeaderTextSecondary>
-              {key} • {OperatorService.getNameFromSymbol(operator)}
-            </S.HeaderTextSecondary>
-            <S.HeaderText>{value}</S.HeaderText>
-          </S.Selector>
-        ))}
-        {pseudoSelector && (
-          <S.Selector key="pseudo-selector">
-            <S.HeaderTextSecondary>pseudo selector</S.HeaderTextSecondary>
-            <S.HeaderText>
-              {pseudoSelector.selector} {pseudoSelector.number ? `(${pseudoSelector.number})` : ''}
-            </S.HeaderText>
-          </S.Selector>
-        )}
-      </S.SelectorContainer>
-    )}
-    <div>
-      {Boolean(passedChecks) && (
-        <S.HeaderDetail>
-          <S.HeaderDot $passed />
-          {passedChecks}
-        </S.HeaderDetail>
-      )}
-      {Boolean(failedChecks) && (
-        <S.HeaderDetail>
-          <S.HeaderDot $passed={false} />
-          {failedChecks}
-        </S.HeaderDetail>
-      )}
-      <S.HeaderDetail>
-        <S.HeaderSpansIcon />
-        {`${affectedSpans} ${affectedSpans > 1 ? 'spans' : 'span'}`}
-      </S.HeaderDetail>
-    </div>
-  </S.Column>
-);
+    </S.HeaderContainer>
+  );
+};
 
 export default AssertionHeader;

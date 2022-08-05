@@ -11,7 +11,15 @@ import (
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/stretchr/testify/assert"
+	"go.opentelemetry.io/otel/trace"
 )
+
+func createContext() context.Context {
+	return trace.ContextWithSpanContext(context.TODO(), trace.NewSpanContext(trace.SpanContextConfig{
+		TraceID: id.NewRandGenerator().TraceID(),
+		SpanID:  id.NewRandGenerator().SpanID(),
+	}))
+}
 
 func TestTriggerGet(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
@@ -36,8 +44,6 @@ func TestTriggerGet(t *testing.T) {
 	}))
 	defer server.Close()
 
-	ex := trigger.HTTP()
-
 	test := model.Test{
 		Name: "test",
 		ServiceUnderTest: model.Trigger{
@@ -53,7 +59,9 @@ func TestTriggerGet(t *testing.T) {
 		},
 	}
 
-	resp, err := ex.Trigger(context.TODO(), test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
+	ex := trigger.HTTP()
+
+	resp, err := ex.Trigger(createContext(), test)
 	assert.NoError(t, err)
 
 	assert.Equal(t, 200, resp.Result.HTTP.StatusCode)
@@ -83,8 +91,6 @@ func TestTriggerPost(t *testing.T) {
 	}))
 	defer server.Close()
 
-	ex := trigger.HTTP()
-
 	test := model.Test{
 		Name: "test",
 		ServiceUnderTest: model.Trigger{
@@ -100,7 +106,9 @@ func TestTriggerPost(t *testing.T) {
 		},
 	}
 
-	resp, err := ex.Trigger(context.TODO(), test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
+	ex := trigger.HTTP()
+
+	resp, err := ex.Trigger(createContext(), test)
 	assert.NoError(t, err)
 
 	assert.Equal(t, 200, resp.Result.HTTP.StatusCode)
@@ -136,8 +144,6 @@ func TestTriggerPostWithApiKeyAuth(t *testing.T) {
 	}))
 	defer server.Close()
 
-	ex := trigger.HTTP()
-
 	test := model.Test{
 		Name: "test",
 		ServiceUnderTest: model.Trigger{
@@ -161,7 +167,9 @@ func TestTriggerPostWithApiKeyAuth(t *testing.T) {
 		},
 	}
 
-	resp, err := ex.Trigger(context.TODO(), test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
+	ex := trigger.HTTP()
+
+	resp, err := ex.Trigger(createContext(), test)
 	assert.NoError(t, err)
 
 	assert.Equal(t, 200, resp.Result.HTTP.StatusCode)
@@ -197,8 +205,6 @@ func TestTriggerPostWithBasicAuth(t *testing.T) {
 	}))
 	defer server.Close()
 
-	ex := trigger.HTTP()
-
 	test := model.Test{
 		Name: "test",
 		ServiceUnderTest: model.Trigger{
@@ -221,7 +227,9 @@ func TestTriggerPostWithBasicAuth(t *testing.T) {
 		},
 	}
 
-	resp, err := ex.Trigger(context.TODO(), test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
+	ex := trigger.HTTP()
+
+	resp, err := ex.Trigger(createContext(), test)
 	assert.NoError(t, err)
 
 	assert.Equal(t, 200, resp.Result.HTTP.StatusCode)
@@ -257,8 +265,6 @@ func TestTriggerPostWithBearerAuth(t *testing.T) {
 	}))
 	defer server.Close()
 
-	ex := trigger.HTTP()
-
 	test := model.Test{
 		Name: "test",
 		ServiceUnderTest: model.Trigger{
@@ -280,7 +286,9 @@ func TestTriggerPostWithBearerAuth(t *testing.T) {
 		},
 	}
 
-	resp, err := ex.Trigger(context.TODO(), test, id.NewRandGenerator().TraceID(), id.NewRandGenerator().SpanID())
+	ex := trigger.HTTP()
+
+	resp, err := ex.Trigger(createContext(), test)
 	assert.NoError(t, err)
 
 	assert.Equal(t, 200, resp.Result.HTTP.StatusCode)

@@ -29,9 +29,7 @@ const selectAssertionResultsBySpan = createSelector(
             id: assertionResult.selector,
             attribute: assertion.assertion.attribute,
             assertionResult,
-            label: `${assertionResult.selectorList.map(({value}) => value).join(' ')} ${
-              assertionResult.pseudoSelector?.selector ?? ''
-            }`,
+            label: assertionResult.selector,
             result: assertion.spanResults.find(spanResult => spanResult.spanId === spanId),
           }))
         )
@@ -86,7 +84,6 @@ const TestDefinitionSelectors = () => ({
   selectSelectedAssertion: createSelector(stateSelector, ({selectedAssertion}) => selectedAssertion),
   selectAssertionResultsBySpan,
   selectIsDraftMode: createSelector(stateSelector, ({isDraftMode}) => isDraftMode),
-  selectViewResultsMode: createSelector(stateSelector, ({viewResultsMode}) => viewResultsMode),
   selectSpansResult,
 });
 

@@ -11,26 +11,30 @@ import (
 )
 
 type Triggerer interface {
-	Trigger(context.Context, model.Test, trace.TraceID, trace.SpanID) (Response, error)
+	Trigger(context.Context, model.Test) (Response, error)
 	Type() model.TriggerType
 }
 
 type Response struct {
 	SpanAttributes map[string]string
 	Result         model.TriggerResult
+	TraceID        trace.TraceID
+	SpanID         trace.SpanID
 }
 
-func NewRegsitry(tracer trace.Tracer) *Registry {
+func NewRegsitry(tracer, triggerSpanTracer trace.Tracer) *Registry {
 	return &Registry{
-		tracer: tracer,
-		reg:    map[model.TriggerType]Triggerer{},
+		tracer:            tracer,
+		triggerSpanTracer: triggerSpanTracer,
+		reg:               map[model.TriggerType]Triggerer{},
 	}
 }
 
 type Registry struct {
 	sync.Mutex
-	tracer trace.Tracer
-	reg    map[model.TriggerType]Triggerer
+	tracer            trace.Tracer
+	triggerSpanTracer trace.Tracer
+	reg               map[model.TriggerType]Triggerer
 }
 
 func (r *Registry) Add(t Triggerer) {
@@ -51,5 +55,5 @@ func (r *Registry) Get(triggererType model.TriggerType) (Triggerer, error) {
 		return nil, fmt.Errorf(`cannot get trigger type "%s": %w`, triggererType, ErrTriggererTypeNotRegistered)
 	}
 
-	return Instrument(r.tracer, t), nil
+	return Instrument(r.tracer, r.triggerSpanTracer, t), nil
 }

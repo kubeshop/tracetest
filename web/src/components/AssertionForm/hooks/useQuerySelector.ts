@@ -22,18 +22,9 @@ interface IProps {
 
 const useQuerySelector = ({form, runId, testId, onValidSelector}: IProps) => {
   const {onSetAffectedSpans, onClearAffectedSpans} = useSpan();
-  const {currentIsAdvancedSelector, currentPseudoSelector, currentSelector, currentSelectorList} =
-    useAssertionFormValues(form);
+  const {currentSelector} = useAssertionFormValues(form);
   const [onTriggerSelectedSpans, {data: spanIdList = [], isError}] = useLazyGetSelectedSpansQuery();
   const [isValid, setIsValid] = useState(!isError);
-
-  const query = useMemo(
-    () =>
-      currentIsAdvancedSelector
-        ? currentSelector
-        : SelectorService.getSelectorString(currentSelectorList || [], currentPseudoSelector),
-    [currentIsAdvancedSelector, currentPseudoSelector, currentSelector, currentSelectorList]
-  );
 
   const handleSelector = useMemo(
     () =>
@@ -55,8 +46,8 @@ const useQuerySelector = ({form, runId, testId, onValidSelector}: IProps) => {
   );
 
   useEffect(() => {
-    handleSelector({q: query, tId: testId, rId: runId});
-  }, [handleSelector, query, runId, testId]);
+    handleSelector({q: currentSelector, tId: testId, rId: runId});
+  }, [handleSelector, currentSelector, runId, testId]);
 
   useEffect(() => {
     return () => {
@@ -81,7 +72,6 @@ const useQuerySelector = ({form, runId, testId, onValidSelector}: IProps) => {
   return {
     spanIdList,
     isValid,
-    currentIsAdvancedSelector,
   };
 };
 
