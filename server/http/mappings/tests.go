@@ -213,7 +213,7 @@ func (m OpenAPI) Run(in *model.Run) openapi.TestRun {
 		SpanId:                    in.SpanID.String(),
 		State:                     string(in.State),
 		LastErrorState:            errToString(in.LastError),
-		ExectutionTime:            int32(in.ExecutionTime()),
+		ExecutionTime:             int32(in.ExecutionTime()),
 		CreatedAt:                 in.CreatedAt,
 		ServiceTriggeredAt:        in.ServiceTriggeredAt,
 		ServiceTriggerCompletedAt: in.ServiceTriggerCompletedAt,

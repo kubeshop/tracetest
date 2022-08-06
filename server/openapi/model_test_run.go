@@ -30,7 +30,7 @@ type TestRun struct {
 	LastErrorState string `json:"lastErrorState,omitempty"`
 
 	// time it took for the test to complete, either success or fail. If the test is still running, it will show the time up to the time of the request
-	ExectutionTime int32 `json:"exectutionTime,omitempty"`
+	ExecutionTime int32 `json:"executionTime,omitempty"`
 
 	CreatedAt time.Time `json:"createdAt,omitempty"`
 
