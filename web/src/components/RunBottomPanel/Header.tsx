@@ -1,5 +1,5 @@
 import {PlusOutlined} from '@ant-design/icons';
-import {Badge} from 'antd';
+import {Badge, Button} from 'antd';
 import {MouseEventHandler, useCallback, useMemo} from 'react';
 import {useTheme} from 'styled-components';
 
@@ -49,7 +49,22 @@ const Header: React.FC<IProps> = ({run: {createdAt}, assertionResults, isDisable
     },
     [openBottomPanel, selectedSpan, open]
   );
-  return (
+  const b = true;
+  return b ? (
+    <S.Header
+      data-tour={GuidedTourService.getStep(GuidedTours.Trace, Steps.Timeline)}
+      onClick={() => toggleBottomPanel()}
+      style={{display: 'flex', width: 85, minWidth: 85, overflow: 'hidden'}}
+    >
+      <Button
+        disabled={isDisabled}
+        onClick={handleAssertionClick}
+        type="primary"
+        shape="circle"
+        icon={<PlusOutlined />}
+      />
+    </S.Header>
+  ) : (
     <S.Header
       data-tour={GuidedTourService.getStep(GuidedTours.Trace, Steps.Timeline)}
       onClick={() => toggleBottomPanel()}

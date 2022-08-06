@@ -6,6 +6,7 @@
   "dependencies": {
     "@ant-design/icons": "4.7.0",
     "@codemirror/autocomplete": "6.0.3",
+    "@codemirror/gutter": "0.19.9",
     "@codemirror/language": "6.2.0",
     "@codemirror/lint": "6.0.0",
     "@emotion/react": "11.9.0",

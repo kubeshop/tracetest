@@ -15,7 +15,7 @@ export const Container = styled(ReflexContainer)`
 export const LeftPanel = styled(ReflexElement)`
   display: flex;
   flex-direction: column;
-  padding: 24px;
+  //padding: 24px;
 `;
 
 export const RightPanel = styled(ReflexElement)`

@@ -31,7 +31,7 @@ const AssertionFormCheckList: React.FC<IProps> = ({form, fields, add, remove, at
   );
 
   return (
-    <>
+    <div style={{display: 'flex', flexDirection: 'row'}}>
       {fields.map(({key, name, ...field}, index) => {
         return (
           <AssertionFormCheck
@@ -48,7 +48,7 @@ const AssertionFormCheckList: React.FC<IProps> = ({form, fields, add, remove, at
           />
         );
       })}
-    </>
+    </div>
   );
 };
 

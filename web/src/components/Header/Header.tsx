@@ -7,9 +7,10 @@ import {HeaderMenu} from './HeaderMenu';
 
 const {onGuidedTourClick} = HomeAnalyticsService;
 
+export const testRunPageRegex = /\/test\/(.*)\/run\/(.*)/;
 const Header: FC = () => {
   const {pathname} = useLocation();
-  return (
+  return pathname.match(testRunPageRegex) ? null : (
     <S.Header>
       <Link to="/">
         <img alt="tracetest_log" data-cy="logo" src={Logo} />

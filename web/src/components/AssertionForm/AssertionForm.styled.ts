@@ -15,13 +15,13 @@ export const SelectorContainer = styled.div`
 `;
 
 export const AdvancedSelectorInputContainer = styled.div`
-  display: grid;
-  align-items: start;
-  grid-template-columns: 850px 170px;
-  gap: 14px;
-  max-width: 85%;
-  width: 85%;
-  grid-template-columns: 100%;
+  display: flex;
+  //align-items: start;
+  //grid-template-columns: 850px 170px;
+  //gap: 14px;
+  //max-width: 85%;
+  //width: 85%;
+  //grid-template-columns: 100%;
 `;
 
 export const PseudoSelector = styled.div`
@@ -32,11 +32,11 @@ export const PseudoSelector = styled.div`
 `;
 
 export const Check = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 210px) 1fr;
-  gap: 4px;
-  align-items: start;
-  margin-bottom: 16px;
+  display: flex;
+  //grid-template-columns: repeat(3, 210px) 1fr;
+  //gap: 4px;
+  //align-items: start;
+  //margin-bottom: 16px;
 `;
 
 export const AddCheckButton = styled(Button).attrs({

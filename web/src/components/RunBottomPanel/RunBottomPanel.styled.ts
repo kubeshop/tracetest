@@ -7,10 +7,11 @@ export const Header = styled.div`
   align-items: center;
   cursor: pointer;
   justify-content: space-between;
-  width: 100%;
+  width: 85px;
+  min-width: 85px;
   background: #f5f5fa;
-  height: 64px;
-  padding: 0 24px;
+  //height: 64px;
+  //padding: 0 24px;
 `;
 
 export const HeaderText = styled(Typography.Text)``;
@@ -29,12 +30,13 @@ export const CountNumber = styled.span`
 
 export const Container = styled.div`
   background-color: ${({theme}) => theme.color.white};
-  height: calc(100% - 64px);
-  overflow-y: scroll;
+  //height: calc(100% - 64px);
+  width: calc(100% - 85px);
+  //overflow-y: scroll;
 `;
 
 export const Content = styled.div`
-  padding: 24px;
+  margin: 24px;
 `;
 
 export const AddAssertionButton = styled(Button).attrs({

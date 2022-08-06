@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 export const AdvancedEditor = styled.div`
-  width: 100%;
+  //width: 100%;
 
   && {
     .cm-editor {

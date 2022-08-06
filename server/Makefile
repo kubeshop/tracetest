@@ -22,6 +22,9 @@ vet:
 run:
 	go run -ldflags="$(GO_LDFLAGS)" main.go
 
+reflex:
+	reflex -g '\.go' -R '^vendor/' -s -- make run
+
 build:
 	go build -o tracetest-server -ldflags="$(GO_LDFLAGS)" .
 
