@@ -45,7 +45,7 @@ Tracetest is a trace-based testing tool that leverages the data captured by your
 # Features
 
 - Supporting multiple ways of creating a test, including HTTP, GRPC and Postman Collections.
-- [Add assertions](https://kubeshop.github.io/tracetest/adding-assertions/) based on return data from trigger call and/or data contained in the spans in your distributed trace.
+- [Adding assertions](https://kubeshop.github.io/tracetest/adding-assertions/) based on return data from trigger call and/or data contained in the spans in your distributed trace.
 - Specify which spans to check in assertions via the [advanced selector language](https://kubeshop.github.io/tracetest/advanced-selectors/).
 - Define checks against the attributes in these spans, including properties, return status, or timing.
 - Tests can be created via graphical UI or via [YAML-based test definition file](https://kubeshop.github.io/tracetest/test-definition-file/).
