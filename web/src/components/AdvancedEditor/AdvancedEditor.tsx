@@ -29,6 +29,7 @@ const AdvancedEditor = ({testId, runId, onChange = noop, value = ''}: IProps) =>
   return (
     <S.AdvancedEditor>
       <CodeMirror
+        id="advanced-editor"
         data-cy="advanced-selector"
         value={value}
         maxHeight="120px"

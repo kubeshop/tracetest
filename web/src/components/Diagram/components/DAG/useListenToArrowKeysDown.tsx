@@ -8,7 +8,11 @@ export function useListenToArrowKeysDown(
   useEffect(() => {
     function downHandler({key}: KeyboardEvent) {
       if (affectedSpans.length > 0) {
-        const searchElement = document.activeElement?.tagName.toLowerCase() || '';
+        const focusedElement = document.activeElement;
+        const advancedEditorId = 'advanced-editor';
+        const isAdvancedEditor = focusedElement?.parentElement?.parentElement?.parentElement?.id === advancedEditorId;
+        if (isAdvancedEditor) return;
+        const searchElement = focusedElement?.tagName.toLowerCase() || '';
         if (!['input', 'textarea'].includes(searchElement)) {
           if (key === 'ArrowRight') {
             handleNextSpan();
