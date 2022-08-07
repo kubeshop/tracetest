@@ -38,7 +38,7 @@ Tracetest is a trace-based testing tool that leverages the data captured by your
 
 - verify the quality of your OpenTelemetry instrumentation and enforce standards.
 - Testing events that occur on 'the other side' of an async message queue, even though the original async call has returned earlier.
-- assertions based on the timing of different steps in your process.
+- Assertions based on the timing of different steps in your process.
 - wildcard assertions across common types of activities, ie all gRPC return codes should be 0, all database calls should happen in less than 100ms.
 - test long running processes instrumented with OpenTelemetry tracing to assert proper operation deep in the process.
 
