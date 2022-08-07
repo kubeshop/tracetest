@@ -27,7 +27,7 @@ type TestRun struct {
 	// Details of the cause for the last `FAILED` state
 	LastErrorState *string `json:"lastErrorState,omitempty"`
 	// time it took for the test to complete, either success or fail. If the test is still running, it will show the time up to the time of the request
-	ExectutionTime            *int32            `json:"exectutionTime,omitempty"`
+	ExecutionTime             *int32            `json:"executionTime,omitempty"`
 	CreatedAt                 *time.Time        `json:"createdAt,omitempty"`
 	ServiceTriggeredAt        *time.Time        `json:"serviceTriggeredAt,omitempty"`
 	ServiceTriggerCompletedAt *time.Time        `json:"serviceTriggerCompletedAt,omitempty"`
@@ -248,36 +248,36 @@ func (o *TestRun) SetLastErrorState(v string) {
 	o.LastErrorState = &v
 }
 
-// GetExectutionTime returns the ExectutionTime field value if set, zero value otherwise.
-func (o *TestRun) GetExectutionTime() int32 {
-	if o == nil || o.ExectutionTime == nil {
+// GetExecutionTime returns the ExecutionTime field value if set, zero value otherwise.
+func (o *TestRun) GetExecutionTime() int32 {
+	if o == nil || o.ExecutionTime == nil {
 		var ret int32
 		return ret
 	}
-	return *o.ExectutionTime
+	return *o.ExecutionTime
 }
 
-// GetExectutionTimeOk returns a tuple with the ExectutionTime field value if set, nil otherwise
+// GetExecutionTimeOk returns a tuple with the ExecutionTime field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *TestRun) GetExectutionTimeOk() (*int32, bool) {
-	if o == nil || o.ExectutionTime == nil {
+func (o *TestRun) GetExecutionTimeOk() (*int32, bool) {
+	if o == nil || o.ExecutionTime == nil {
 		return nil, false
 	}
-	return o.ExectutionTime, true
+	return o.ExecutionTime, true
 }
 
-// HasExectutionTime returns a boolean if a field has been set.
-func (o *TestRun) HasExectutionTime() bool {
-	if o != nil && o.ExectutionTime != nil {
+// HasExecutionTime returns a boolean if a field has been set.
+func (o *TestRun) HasExecutionTime() bool {
+	if o != nil && o.ExecutionTime != nil {
 		return true
 	}
 
 	return false
 }
 
-// SetExectutionTime gets a reference to the given int32 and assigns it to the ExectutionTime field.
-func (o *TestRun) SetExectutionTime(v int32) {
-	o.ExectutionTime = &v
+// SetExecutionTime gets a reference to the given int32 and assigns it to the ExecutionTime field.
+func (o *TestRun) SetExecutionTime(v int32) {
+	o.ExecutionTime = &v
 }
 
 // GetCreatedAt returns the CreatedAt field value if set, zero value otherwise.
@@ -588,8 +588,8 @@ func (o TestRun) MarshalJSON() ([]byte, error) {
 	if o.LastErrorState != nil {
 		toSerialize["lastErrorState"] = o.LastErrorState
 	}
-	if o.ExectutionTime != nil {
-		toSerialize["exectutionTime"] = o.ExectutionTime
+	if o.ExecutionTime != nil {
+		toSerialize["executionTime"] = o.ExecutionTime
 	}
 	if o.CreatedAt != nil {
 		toSerialize["createdAt"] = o.CreatedAt
