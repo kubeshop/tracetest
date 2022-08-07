@@ -116,7 +116,7 @@ testDefinition:
 
 # Feedback
 
-Have an idea to improve Tracetest? Please [Create an issue here](https://github.com/kubeshop/tracetest/issues/new/choose) or join our community on [Discord](https://discord.gg/eBvEQRVyKX).
+Have an idea to improve Tracetest? Please [create an issue here](https://github.com/kubeshop/tracetest/issues/new/choose) or join our community on [Discord](https://discord.gg/eBvEQRVyKX).
 
 Follow us on [Twitter at @tracetest_io](https://twitter.com/tracetest_io) for updates
 
