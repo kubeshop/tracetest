@@ -1,10 +1,10 @@
-import {Button, Form, Switch, Typography} from 'antd';
+import {Button, Form, Typography} from 'antd';
 import {CompareOperator} from 'constants/Operator.constants';
 import React, {useState} from 'react';
 import {useAppSelector} from 'redux/hooks';
 import AssertionSelectors from 'selectors/Assertion.selectors';
 import OperatorService from 'services/Operator.service';
-import {TAssertion, TPseudoSelector, TSpanSelector} from 'types/Assertion.types';
+import {TAssertion} from 'types/Assertion.types';
 import SpanSelectors from 'selectors/Span.selectors';
 import {ADVANCE_SELECTORS_DOCUMENTATION_URL} from 'constants/Common.constants';
 import AffectedSpanControls from '../Diagram/components/DAG/AffectedSpanControls';
@@ -17,10 +17,7 @@ import useAssertionFormValues from './hooks/useAssertionFormValues';
 
 export interface IValues {
   assertionList?: TAssertion[];
-  selectorList: TSpanSelector[];
-  pseudoSelector?: TPseudoSelector;
   selector?: string;
-  isAdvancedSelector?: boolean;
 }
 
 interface TAssertionFormProps {
@@ -39,10 +36,7 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
         comparator: OperatorService.getOperatorSymbol(CompareOperator.EQUALS),
       },
     ],
-    selectorList = [],
-    pseudoSelector,
     selector = '',
-    isAdvancedSelector = false,
   } = {},
   onSubmit,
   onCancel,
@@ -51,14 +45,13 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
   runId,
 }) => {
   const [form] = Form.useForm<IValues>();
-
-  const {currentIsAdvancedSelector, currentAssertionList} = useAssertionFormValues(form);
   const [isValid, setIsValid] = useState(false);
 
   const spanIdList = useAppSelector(SpanSelectors.selectAffectedSpans);
   const attributeList = useAppSelector(state =>
     AssertionSelectors.selectAttributeList(state, testId, runId, spanIdList)
   );
+  const {currentAssertionList} = useAssertionFormValues(form);
 
   const onFieldsChange = useOnFieldsChange({
     form,
@@ -80,9 +73,6 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
         initialValues={{
           remember: true,
           assertionList,
-          selectorList,
-          pseudoSelector,
-          isAdvancedSelector,
           selector,
         }}
         onFinish={onSubmit}
@@ -100,38 +90,13 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
             Use the dropdown to the right to select the first matching span, last, n-th, or all.
             `}
           />
-          <Typography.Text style={{marginLeft: '16px'}}>Advanced mode</Typography.Text>
-          <Form.Item name="isAdvancedSelector" noStyle>
-            <Switch
-              size="small"
-              disabled={isAdvancedSelector}
-              defaultChecked={isAdvancedSelector}
-              data-cy="mode-selector-switch"
-            />
-          </Form.Item>
-          <TooltipQuestion
-            margin={0}
-            title={`
-            You can decided if you want to use the wizard to create the span selector or the query language.
-            `}
-          />
-          {currentIsAdvancedSelector && (
-            <S.ReferenceLink>
-              <a href={ADVANCE_SELECTORS_DOCUMENTATION_URL} target="_blank">
-                Query Language Reference
-              </a>
-            </S.ReferenceLink>
-          )}
+          <S.ReferenceLink>
+            <a href={ADVANCE_SELECTORS_DOCUMENTATION_URL} target="_blank">
+              Query Language Reference
+            </a>
+          </S.ReferenceLink>
         </S.AdvancedSelectorContainer>
-        <AssertionFormSelector
-          selectorList={selectorList}
-          pseudoSelector={pseudoSelector}
-          form={form}
-          testId={testId}
-          runId={runId}
-          isEditing={isEditing}
-          onValidSelector={setIsValid}
-        />
+        <AssertionFormSelector form={form} testId={testId} runId={runId} onValidSelector={setIsValid} />
 
         <div style={{marginBottom: 8}}>
           <Typography.Text>

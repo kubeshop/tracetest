@@ -1,15 +1,12 @@
 import {useCallback} from 'react';
 
 import {CompareOperator} from 'constants/Operator.constants';
-import {ResultViewModes} from 'constants/Test.constants';
 import {useAssertionForm} from 'components/AssertionForm/AssertionForm.provider';
 import {OPEN_BOTTOM_PANEL_STATE, useRunLayout} from 'components/RunLayout';
-import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
 import {useAppSelector} from 'redux/hooks';
 import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
 import TraceAnalyticsService from 'services/Analytics/TraceAnalytics.service';
 import OperatorService from 'services/Operator.service';
-import SelectorService from 'services/Selector.service';
 import SpanService from 'services/Span.service';
 import {TResultAssertions} from 'types/Assertion.types';
 import {TSpan, TSpanFlatAttribute} from 'types/Span.types';
@@ -30,7 +27,7 @@ interface IProps {
 const SpanDetail = ({span}: IProps) => {
   const {openBottomPanel} = useRunLayout();
   const {open} = useAssertionForm();
-  const {viewResultsMode} = useTestDefinition();
+  const spansResult = useAppSelector(TestDefinitionSelectors.selectSpansResult);
   const assertions = useAppSelector(state =>
     TestDefinitionSelectors.selectAssertionResultsBySpan(state, span?.id || '')
   );
@@ -39,14 +36,12 @@ const SpanDetail = ({span}: IProps) => {
     ({value, key}: TSpanFlatAttribute) => {
       openBottomPanel(OPEN_BOTTOM_PANEL_STATE.FORM);
       TraceAnalyticsService.onAddAssertionButtonClick();
-      const {selectorList, pseudoSelector} = SpanService.getSelectorInformation(span!);
-      const selector = SelectorService.getSelectorString(selectorList, pseudoSelector);
+      const selector = SpanService.getSelectorInformation(span!);
 
       open({
         isEditing: false,
         selector,
         defaultValues: {
-          pseudoSelector,
           assertionList: [
             {
               comparator: OperatorService.getOperatorSymbol(CompareOperator.EQUALS),
@@ -54,18 +49,20 @@ const SpanDetail = ({span}: IProps) => {
               attribute: key,
             },
           ],
-          selectorList,
           selector,
-          isAdvancedSelector: viewResultsMode === ResultViewModes.Advanced,
         },
       });
     },
-    [openBottomPanel, span, open, viewResultsMode]
+    [openBottomPanel, span, open]
   );
 
   return (
     <S.SpanDetail>
-      <SpanHeader span={span} />
+      <SpanHeader
+        span={span}
+        totalFailedChecks={span?.id ? spansResult[span.id]?.failed : 0}
+        totalPassedChecks={span?.id ? spansResult[span?.id]?.passed : 0}
+      />
       <SpanDetailTabs assertions={assertions} onCreateAssertion={onCreateAssertion} span={span} />
     </S.SpanDetail>
   );

@@ -23,6 +23,8 @@ services:
         condition: service_healthy
       demo-rpc:
         condition: service_healthy
+      otel-collector:
+        condition: service_started
 
   postgres:
     container_name: postgres
@@ -55,6 +57,7 @@ services:
     depends_on:
       jaeger:
         condition: service_healthy
+
 
   jaeger:
     image: jaegertracing/all-in-one:latest
@@ -107,6 +110,27 @@ services:
       interval: 1s
       timeout: 3s
       retries: 60
+    depends_on:
+      postgres:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
+      queue:
+        condition: service_healthy
+      jaeger:
+        condition: service_healthy
+
+  demo-worker:
+    image: kubeshop/demo-pokemon-api:latest
+    pull_policy: always
+    environment:
+      REDIS_URL: cache
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres?schema=public
+      RABBITMQ_HOST: queue
+      POKE_API_BASE_URL: https://pokeapi.co/api/v2
+      JAEGER_HOST: jaeger
+      JAEGER_PORT: 6832
+      NPM_RUN_COMMAND: worker
     depends_on:
       postgres:
         condition: service_healthy

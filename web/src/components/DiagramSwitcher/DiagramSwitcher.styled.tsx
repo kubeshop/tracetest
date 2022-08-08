@@ -1,11 +1,11 @@
 import {BarsOutlined, ClusterOutlined} from '@ant-design/icons';
 import styled from 'styled-components';
 
-export const DiagramSwitcher = styled.div`
+export const DiagramSwitcher = styled.div<{$isTimeline?: boolean}>`
   display: flex;
   gap: 12px;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: ${({$isTimeline}) => ($isTimeline ? 10 : 24)}px;
 `;
 
 export const Switch = styled.div`

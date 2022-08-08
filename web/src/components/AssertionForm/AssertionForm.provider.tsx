@@ -7,7 +7,6 @@ import {createContext, useCallback, useContext, useMemo, useState} from 'react';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import {setSelectedAssertion} from 'redux/slices/TestDefinition.slice';
 import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
-import SelectorService from 'services/Selector.service';
 import {TTestDefinitionEntry} from 'types/TestDefinition.types';
 import CreateAssertionModalAnalyticsService from 'services/Analytics/CreateAssertionModalAnalytics.service';
 import {useSpan} from 'providers/Span/Span.provider';
@@ -56,27 +55,20 @@ const AssertionFormProvider: React.FC<{testId: string}> = ({children}) => {
       const {
         isEditing,
         defaultValues: {
-          selectorList = [],
-          pseudoSelector,
           assertionList = [],
-          isAdvancedSelector,
           selector: defaultSelector,
         } = {},
       } = props;
-      const selectorString = SelectorService.getSelectorString(selectorList, pseudoSelector);
-      const definition = definitionList.find(({selector}) => selectorString === selector);
+      const definition = definitionList.find(({selector}) => defaultSelector === selector);
 
       if (definition)
         setFormProps({
           ...props,
           isEditing: true,
-          selector: selectorString,
+          selector: defaultSelector,
           defaultValues: {
             selector: defaultSelector,
-            pseudoSelector,
             assertionList: isEditing ? assertionList : [...definition.assertionList, ...assertionList],
-            selectorList,
-            isAdvancedSelector,
           },
         });
       else setFormProps(props);
@@ -109,21 +101,16 @@ const AssertionFormProvider: React.FC<{testId: string}> = ({children}) => {
 
   const onSubmit = useCallback(
     async ({
-      selectorList = [],
       assertionList = [],
-      pseudoSelector,
-      isAdvancedSelector = false,
       selector: newSelectorString = '',
     }: IValues) => {
       const {isEditing, selector = ''} = formProps;
-      const newSelector = SelectorService.getSelectorString(selectorList, pseudoSelector);
 
       const definition: TTestDefinitionEntry = {
-        selector: isAdvancedSelector ? newSelectorString : newSelector,
+        selector: newSelectorString,
         assertionList,
-        originalSelector: newSelector,
+        originalSelector: newSelectorString,
         isDraft: true,
-        isAdvancedSelector,
       };
 
       if (isEditing) {

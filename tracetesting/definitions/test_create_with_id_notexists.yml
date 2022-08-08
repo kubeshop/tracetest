@@ -31,7 +31,11 @@ trigger:
         }
       }
 testDefinition:
+- selector: span[name = "Tracetest trigger"]
+  assertions:
+    - tracetest.selected_spans.count = 1
+    - tracetest.response.status = 200
+    - tracetest.response.body contains '"id":"383d3dce-7b60-4a61-bdea-87f47263af5d"'
 - selector: span[name="POST /api/tests" tracetest.span.type="http"]
   assertions:
-  - tracetest.response.status = 200
-  - tracetest.response.body contains '"id":"383d3dce-7b60-4a61-bdea-87f47263af5d"'
+  - tracetest.selected_spans.count = 1

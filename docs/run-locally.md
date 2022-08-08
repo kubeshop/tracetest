@@ -69,7 +69,7 @@ We can use kubectl's port forwarding capabilites for this
 (trap "kill 0" SIGINT; kubectl port-forward svc/tracetest-postgresql 5432:5432 & kubectl port-forward svc/jaeger-query 16685:16685)
 ```
 
-### Start Development Server
+### **Start Development Server**
 
 When running the development version, the frontend and backend are built and run separately. You need to have both services running to access the tool.
 

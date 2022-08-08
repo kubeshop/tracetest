@@ -7,17 +7,21 @@ import Collapse from './Collapse';
 import Connector from './Connector';
 import Label from './Label';
 import * as S from './Timeline.styled';
+import {useScrollSpanNodeGroupIntoView} from './useScrollSpanNodeGroupIntoView';
 
 interface IProps {
   index: number;
   indexParent: number;
   isAffected?: boolean;
   isCollapsed?: boolean;
+
   isSelected?: boolean;
   minStartTime: number;
   node: TNode;
   onClick(id: string): void;
   onCollapse(id: string): void;
+  totalFailedChecks?: number;
+  totalPassedChecks?: number;
   xScale: AxisScale;
 }
 
@@ -31,17 +35,20 @@ const SpanNode = ({
   node,
   onClick,
   onCollapse,
+  totalFailedChecks,
+  totalPassedChecks,
   xScale,
 }: IProps) => {
+  const id = `span-node-${index}`;
   const isParent = Boolean(node.children);
   const hasParent = indexParent !== -1;
   const positionTop = index * NodeHeight;
   const durationWidth = node.data.endTime - node.data.startTime;
   const durationX = node.data.startTime - minStartTime;
   const leftPadding = node.depth * BaseLeftPadding;
-
+  useScrollSpanNodeGroupIntoView({id, index, isSelected});
   return (
-    <Group left={0} top={positionTop}>
+    <Group id={id} left={0} top={positionTop} opacity={['29138j'].includes(node.data.id) ? 0.5 : 1}>
       {hasParent && <Connector distance={index - indexParent} leftPadding={leftPadding} />}
 
       <Group left={0} onClick={() => onClick(node.data.id)} top={0}>
@@ -62,6 +69,8 @@ const SpanNode = ({
           name={node.data.name}
           service={node.data.service}
           system={node.data.system}
+          totalFailedChecks={totalFailedChecks}
+          totalPassedChecks={totalPassedChecks}
           type={node.data.type}
         />
 

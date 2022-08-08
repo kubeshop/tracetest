@@ -29,3 +29,4 @@ server:
   telemetry:
     exporter: collector
     dataStore: jaeger
+    applicationExporter: collector

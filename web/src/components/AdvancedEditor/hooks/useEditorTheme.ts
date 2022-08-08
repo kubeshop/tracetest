@@ -3,7 +3,11 @@ import {createTheme} from '@uiw/codemirror-themes';
 import {useMemo} from 'react';
 import {useTheme} from 'styled-components';
 
-const useEditorTheme = () => {
+interface IProps {
+  isEditable?: boolean;
+}
+
+const useEditorTheme = ({isEditable = true}: IProps = {}) => {
   const {
     color: {white, text},
   } = useTheme();
@@ -19,8 +23,16 @@ const useEditorTheme = () => {
           selection: text,
           selectionMatch: white,
           lineHighlight: white,
-          gutterBackground: white,
-          gutterBorder: white,
+          ...(isEditable
+            ? {
+                gutterBackground: white,
+                gutterBorder: white,
+              }
+            : {
+                gutterBackground: white,
+                gutterBorder: white,
+                gutterForeground: white,
+              }),
         },
         styles: [
           {tag: t.tagName, color: '#66BB6A'},

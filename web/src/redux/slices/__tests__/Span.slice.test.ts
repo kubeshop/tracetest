@@ -64,9 +64,6 @@ describe('Span.slice', () => {
         selector: faker.random.word(),
         originalSelector: faker.random.word(),
         spanIds: ['12345', '67890'],
-        selectorList: [],
-        resultList: [],
-        isAdvancedSelector: false,
       };
       expect(
         Reducer(

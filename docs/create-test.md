@@ -1,41 +1,47 @@
 # Create a Test
 
-<em>**Note:** Please follow the [Installation Guide](installing.md) guide to set up all prerequisites and install Tracetest.</em>
+Access the [Tracetest application](accessing-dashboard.md).
 
-Open the [Tracetest application](https://demo.tracetest.io).
-
-![Main Screen](img/main-screen-mvp.png)
+![Main Screen](img/main-screen-0.6.png)
 
 Click the **Create Test** button and the **Create New Test** dialog appears:
 
-![Create a Test](img/create-test-mvp.png)
+![Create a Test Button](img/create-test-button-0.6.png)
 
-Use the **Choose Example** drop down list to populate the dialog screen and create a test for the following:
+![Create a Test](img/create-test-0.6.png)
 
-- List (Get) - List the current Pokemon.
-- Add (Post) - Create any Pokemon - name it, give it a type and set an image for it.
-- Import (Post) - Set a pokemon ID and retrieve all the information from that Pokemon using pokeapi.co. Only Pokemons that exist in the games can be imported.
+The option to choose the kind of trigger to initiate the trace is presented:
 
-![Choose Example](img/choose-example-mvp.png)
+- HTTP Request - Create a basic HTTP request.
+- RPC Request - Test and debug your RPC request.
+- Postman Collection - Define your HTTP request via a Postman collection.
 
-Or input your own test details. The screenshot below shows one of the examples from the Tracetest GitHub [Readme](https://github.com/kubeshop/tracetest#readmed) document. Then click **Create**.
+Choose the trigger and click **Next**:
 
-![Create New Test](img/run-test-mvp.png)
+![Choose Trigger](img/choose-trigger-0.6.png)
 
-The trace will start:
+In this example, HTTP Request has been chosen.
 
-![Awaiting Trace](img/awaiting-trace-mvp.png)
+![Choose Example](img/choose-example-0.6.png)
 
-When the trace is finished, you will get the following results:
+Input the **Name** of the test and the **Description** or select one of the example privided in the drop down:
 
-![Finished Trace](img/finished-trace-mvp.png)
+![Choose Example Pokemon](img/choose-example-pokemon-0.6.png)
 
-The trace results include:
+The **Pokemon - List** example has been chosen. Then click **Next**.
 
-- A diagram of the trace steps that can be viewed in diagram or timeline form by toggling the icons at the top left of the image below. This panel also contains a **search** field which can be useful when working with large diagrams and timelines.
-![Trace Diagram](img/trace-diagram-mvp.png)
-![Trace Timeline](img/trace-timeline-mvp.png)
+![Choose Example Pokemon](img/choose-example-pokemon-list-0.6.png)
 
-- The span details of the trace:
-![Span Details](img/span-details-mvp.gif)
+Add any additional information and click **Create**:
 
+![Create Test](img/provide-addl-information-0.6.png)
+
+The test will start:
+
+![Awaiting Trace](img/awaiting-trace-0.6.png)
+
+When the test is finished, you will get the following results:
+
+![Finished Trace](img/finished-trace-0.6.png)
+
+Please visit the [Test Results](test-results.md) document for an explanation of viewing the results of a test..

@@ -31,7 +31,12 @@ func NewTracer(ctx context.Context, config config.Config) (trace.Tracer, error) 
 	propagator := propagation.NewCompositeTextMapPropagator(propagation.Baggage{}, propagation.TraceContext{})
 	otel.SetTextMapPropagator(propagator)
 
-	tracerProvider, err := getTracerProvider(ctx, config)
+	exporterConfig, err := config.Exporter()
+	if err != nil {
+		return nil, fmt.Errorf("could not get exporter config: %w", err)
+	}
+
+	tracerProvider, err := NewTracerProvider(ctx, exporterConfig)
 	if err != nil {
 		return nil, fmt.Errorf("could not get trace provider: %w", err)
 	}
@@ -44,12 +49,7 @@ func NewTracer(ctx context.Context, config config.Config) (trace.Tracer, error) 
 	return tracer, nil
 }
 
-func getTracerProvider(ctx context.Context, config config.Config) (*sdktrace.TracerProvider, error) {
-	exporterConfig, err := config.Exporter()
-	if err != nil {
-		return nil, fmt.Errorf("could not get exporter: %w", err)
-	}
-
+func NewTracerProvider(ctx context.Context, exporterConfig *config.TelemetryExporterOption) (*sdktrace.TracerProvider, error) {
 	if exporterConfig == nil {
 		return sdktrace.NewTracerProvider(), nil
 	}
