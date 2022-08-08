@@ -2,12 +2,12 @@ import ReactFlow, {MiniMap} from 'react-flow-renderer';
 
 import {IDiagramComponentProps} from 'components/Diagram/Diagram';
 import {Steps} from 'components/GuidedTour/traceStepList';
+import {useAssertionForm} from 'components/AssertionForm/AssertionForm.provider';
 import {useDAG} from 'providers/DAG';
 import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
 import Controls from './Controls';
 import * as S from './DAG.styled';
 import SpanNode from './SpanNode';
-import { useAssertionForm } from 'components/AssertionForm/AssertionForm.provider';
 
 /** Important to define the nodeTypes outside of the component to prevent re-renderings */
 const nodeTypes = {span: SpanNode};
