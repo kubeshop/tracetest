@@ -16,7 +16,8 @@ export const Container = styled.div<{$showAffected: boolean}>`
   }
 
   .react-flow__node-span > div.matched {
-    box-shadow: ${({theme}) => `0 4px 8px ${theme.color.border}`};
+    border: ${({theme}) => `1px solid ${theme.color.text}`};
+    box-shadow: ${({theme}) => `4px 4px 0px ${theme.color.text}`};
   }
 
   ${({$showAffected}) =>
