@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -177,39 +178,30 @@ func (td *postgresDB) GetLatestTestVersion(ctx context.Context, id uuid.UUID) (m
 
 	return test, nil
 }
-func Ternary[T any](condition bool, If, Else T) T {
-	if condition {
-		return If
-	}
-	return Else
-}
 
 func (td *postgresDB) GetTests(ctx context.Context, take, skip int32, query string) ([]model.Test, error) {
-	var err error
-	isEmpty := query == ""
-	query = query + ":*"
+	hasSearchQuery := query != ""
+	params := []any{take, skip}
 
-	stmt, err := td.db.Prepare(getTestSQL + `
+	sql := getTestSQL + `
 	INNER JOIN (
 		SELECT id as idx, max(version) as latest_version FROM tests GROUP BY idx
 	) as latestTests ON latestTests.idx = t.id
-	WHERE t.version = latestTests.latest_version ` +
-		Ternary(isEmpty, "", ` AND to_tsquery($3) @@ to_tsvector((t.test ->> 'Name'))`) +
-		` ORDER BY (t.test ->> 'CreatedAt')::timestamp DESC
-	LIMIT $1 OFFSET $2
-	`)
+	WHERE t.version = latestTests.latest_version `
+	if hasSearchQuery {
+		params = append(params, "%"+strings.ReplaceAll(query, " ", "%")+"%")
+		sql += ` AND (t.test ->> 'Name') ilike $3`
+	}
+
+	sql += ` ORDER BY (t.test ->> 'CreatedAt')::timestamp DESC LIMIT $1 OFFSET $2`
+
+	stmt, err := td.db.Prepare(sql)
 	if err != nil {
 		return nil, err
 	}
 	defer stmt.Close()
 
-	var rows *sql.Rows
-
-	if isEmpty {
-		rows, err = stmt.QueryContext(ctx, take, skip)
-	} else {
-		rows, err = stmt.QueryContext(ctx, take, skip, query)
-	}
+	rows, err := stmt.QueryContext(ctx, params...)
 	if err != nil {
 		return nil, err
 	}

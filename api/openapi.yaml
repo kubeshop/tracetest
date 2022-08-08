@@ -26,6 +26,11 @@ paths:
           schema:
             type: integer
             default: 0
+        - in: query
+          name: query
+          description: "query to search tests"
+          schema:
+            type: string
       responses:
         200:
           description: successful operation

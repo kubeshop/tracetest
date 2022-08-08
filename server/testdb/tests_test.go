@@ -92,22 +92,29 @@ func TestGetTests(t *testing.T) {
 	db, clean := getDB()
 	defer clean()
 
-	createTestWithName(t, db, "1")
-	createTestWithName(t, db, "2")
-	createTestWithName(t, db, "3")
+	createTestWithName(t, db, "one")
+	createTestWithName(t, db, "two")
+	createTestWithName(t, db, "three")
 
 	actual, err := db.GetTests(context.TODO(), 20, 0, "")
 	require.NoError(t, err)
 	assert.Len(t, actual, 3)
 
 	// test order
-	assert.Equal(t, "3", actual[0].Name)
-	assert.Equal(t, "2", actual[1].Name)
-	assert.Equal(t, "1", actual[2].Name)
+	assert.Equal(t, "three", actual[0].Name)
+	assert.Equal(t, "two", actual[1].Name)
+	assert.Equal(t, "one", actual[2].Name)
 
 	actual, err = db.GetTests(context.TODO(), 20, 10, "")
 	require.NoError(t, err)
 	assert.Len(t, actual, 0)
+
+	actual, err = db.GetTests(context.TODO(), 10, 0, "o")
+	require.NoError(t, err)
+	assert.Len(t, actual, 2)
+
+	assert.Equal(t, "two", actual[0].Name)
+	assert.Equal(t, "one", actual[1].Name)
 }
 
 func TestGetTestsWithMultipleVersions(t *testing.T) {

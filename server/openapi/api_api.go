@@ -452,7 +452,8 @@ func (c *ApiApiController) GetTests(w http.ResponseWriter, r *http.Request) {
 		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
 		return
 	}
-	result, err := c.service.GetTests(r.Context(), takeParam, skipParam, query.Get("query"))
+	queryParam := query.Get("query")
+	result, err := c.service.GetTests(r.Context(), takeParam, skipParam, queryParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
