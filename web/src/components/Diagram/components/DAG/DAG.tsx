@@ -28,6 +28,7 @@ const DAG = ({affectedSpans}: IDiagramComponentProps) => {
         nodes={nodes}
         deleteKeyCode={null}
         fitView
+        minZoom={0.1}
         multiSelectionKeyCode={null}
         nodesConnectable={false}
         nodeTypes={nodeTypes}
