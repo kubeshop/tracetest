@@ -7,9 +7,6 @@ export const AdvancedEditor = styled.div`
     .cm-editor {
       border-radius: 2px;
       font-size: ${({theme}) => theme.size.md};
-    }
-
-    .cm-focused {
       outline: 1px solid ${({theme}) => theme.color.primary};
     }
 

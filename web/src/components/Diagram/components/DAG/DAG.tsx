@@ -2,6 +2,7 @@ import ReactFlow, {MiniMap} from 'react-flow-renderer';
 
 import {IDiagramComponentProps} from 'components/Diagram/Diagram';
 import {Steps} from 'components/GuidedTour/traceStepList';
+import {useAssertionForm} from 'components/AssertionForm/AssertionForm.provider';
 import {useDAG} from 'providers/DAG';
 import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
 import Controls from './Controls';
@@ -13,11 +14,12 @@ const nodeTypes = {span: SpanNode};
 
 const DAG = ({affectedSpans}: IDiagramComponentProps) => {
   const {edges, isMiniMapActive, nodes, onMiniMapToggle, onNodesChange, onNodeClick} = useDAG();
+  const {isOpen} = useAssertionForm();
 
   return (
     <S.Container
       data-tour={GuidedTourService.getStep(GuidedTours.Trace, Steps.Graph)}
-      $showAffected={affectedSpans.length > 0}
+      $showAffected={affectedSpans.length > 0 || isOpen}
       data-cy="diagram-dag"
     >
       <Controls isMiniMapActive={isMiniMapActive} onMiniMapToggle={onMiniMapToggle} />
