@@ -96,17 +96,21 @@ helm delete tracetest
 ## CLI Installation
 Every time we release a new version of Tracetest, we generate binaries for Linux, MacOS, and Windows. Supporting both amd64, and ARM64 architectures. You can find the latest version [here](https://github.com/kubeshop/tracetest/releases/latest).
 
-### Linux
+### Linux/Mac
+
+We provide an install script that automatically uses the best available method for install. 
 
 ```sh
 curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/install-cli.sh | bash
 ```
 
-### MacOS
+You can also manually use homebrew:
 
 ```sh
 brew install kubeshop/tracetest/tracetest
 ```
+
+Or you can manually download the release packages from our [release page](https://github.com/kubeshop/tracetest/releases)
 
 ### Windows
 Download one of the files from the latest tag, extract to your machine, and then [add the tracetest binary to your PATH variable](https://stackoverflow.com/a/41895179)

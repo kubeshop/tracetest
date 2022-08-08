@@ -84,11 +84,15 @@ install_rpm() {
   sudo rpm -i $file_path
 }
 
+install_homebrew() {
+  brew install kubeshop/tracetest/tracetest
+}
+
 run() {
     ensure_required_dependencies_are_present
 
     os=$(get_os)
-    if [ "$os" != "linux" ]; then
+    if [ "$os" = "windows" ]; then
       echo $os 'OS not supported by this script. See https://kubeshop.github.io/tracetest/installing/#cli-installation'
       exit 1
     fi
@@ -96,13 +100,10 @@ run() {
     latest_version=`get_latest_version`
     arch=`get_arch`
 
-    if cmd_exists dpkg; then
+    if cmd_exists brew; then
+      install_homebrew
+    elif cmd_exists dpkg; then
       download_link=`get_download_link $os $arch $latest_version deb`
-      echo
-      echo
-      echo $download_link
-      echo
-      echo
       install_dpkg $download_link
     elif cmd_exists rpm; then
       download_link=`get_download_link $os $arch $latest_version rpm`
