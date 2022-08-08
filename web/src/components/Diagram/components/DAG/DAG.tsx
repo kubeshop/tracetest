@@ -7,7 +7,7 @@ import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
 import Controls from './Controls';
 import * as S from './DAG.styled';
 import SpanNode from './SpanNode';
-import { useAssertionForm } from '../../../AssertionForm/AssertionForm.provider';
+import { useAssertionForm } from 'components/AssertionForm/AssertionForm.provider';
 
 /** Important to define the nodeTypes outside of the component to prevent re-renderings */
 const nodeTypes = {span: SpanNode};
