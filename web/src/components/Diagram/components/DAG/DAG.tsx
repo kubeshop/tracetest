@@ -7,17 +7,19 @@ import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
 import Controls from './Controls';
 import * as S from './DAG.styled';
 import SpanNode from './SpanNode';
+import { useAssertionForm } from '../../../AssertionForm/AssertionForm.provider';
 
 /** Important to define the nodeTypes outside of the component to prevent re-renderings */
 const nodeTypes = {span: SpanNode};
 
 const DAG = ({affectedSpans}: IDiagramComponentProps) => {
   const {edges, isMiniMapActive, nodes, onMiniMapToggle, onNodesChange, onNodeClick} = useDAG();
+  const {isOpen} = useAssertionForm();
 
   return (
     <S.Container
       data-tour={GuidedTourService.getStep(GuidedTours.Trace, Steps.Graph)}
-      $showAffected={affectedSpans.length > 0}
+      $showAffected={affectedSpans.length > 0 || isOpen}
       data-cy="diagram-dag"
     >
       <Controls isMiniMapActive={isMiniMapActive} onMiniMapToggle={onMiniMapToggle} />
