@@ -90,6 +90,8 @@ jobs:
           workdir: ./cli/
           args: release --rm-dist -f ../.goreleaser.yaml
         env:
+          GORELEASER_PREVIOUS_TAG: v0.6.2
+          GORELEASER_CURRENT_TAG: v0.6.3
           GITHUB_TOKEN: ${{ secrets.CI_BOT_TOKEN }}
           GORELEASER_KEY: ${{ secrets.GORELEASER_LICENSE }}
 
