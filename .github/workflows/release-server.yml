@@ -85,7 +85,7 @@ jobs:
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v2
         with:
-          distribution: goreleaser-por
+          distribution: goreleaser-pro
           version: latest
           workdir: ./cli/
           args: release --rm-dist -f ../.goreleaser.yaml
