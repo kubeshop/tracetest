@@ -83,12 +83,14 @@ jobs:
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v2
         with:
-          distribution: goreleaser
+          distribution: goreleaser-pro
           version: latest
           workdir: ./cli/
           args: release --rm-dist -f ../.goreleaser.yaml
         env:
           GITHUB_TOKEN: ${{ secrets.CI_BOT_TOKEN }}
+          GORELEASER_KEY: ${{ secrets.GORELEASER_LICENSE }}
+          FURY_TOKEN: ${{ secrets.FURY_TOKEN }}
 
   helm_chart_version_bump:
       name: "Trigger Helm chart appVersion update"
@@ -247,7 +249,7 @@ jobs:
       uses: rtCamp/action-slack-notify@v2
       env:
         SLACK_CHANNEL: tracetest
-        SLACK_COLOR: ${{ needs.helm_chart_version_bump.result }} # or a specific color like 'good' or '#ff00ff'
+        SLACK_COLOR: ${{ needs.helm_chart_version_bump.result }}
         SLACK_ICON: https://github.githubassets.com/images/modules/site/features/actions-icon-actions.svg
         SLACK_TITLE: Helm Chart version bump action failed :boom:!
         SLACK_USERNAME: GitHub
