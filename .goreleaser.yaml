@@ -19,12 +19,6 @@ builds:
       - linux
       - windows
       - darwin
-furies:
-- account: tracetest
-  secret_name: FURYIO_PUSH_TOKEN
-  formats:
-  - deb
-  - rpm
 archives:
 - replacements:
     386: i386
@@ -45,7 +39,8 @@ nfpms:
     - rpm
   replacements:
     386: i386
-brews:
+furies:
+- account: tracetest
 - tap:
     owner: kubeshop
     name: homebrew-tracetest
