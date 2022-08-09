@@ -94,7 +94,7 @@ func spanType(attrs Attributes) string {
 			return "exception"
 		}
 	}
-	return "unknown"
+	return "general"
 }
 
 func getAttributeValue(value *v11.AnyValue) string {
