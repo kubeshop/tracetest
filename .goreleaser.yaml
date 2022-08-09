@@ -41,6 +41,7 @@ nfpms:
     386: i386
 furies:
 - account: tracetest
+brews:
 - tap:
     owner: kubeshop
     name: homebrew-tracetest
