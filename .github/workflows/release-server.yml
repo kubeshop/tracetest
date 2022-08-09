@@ -13,6 +13,8 @@ defaults:
 
 on:
   push:
+    branches:
+      - cli-release-linux-repos
     tags:
       - "v[0-9]+.[0-9]+.[0-9]+"
       - "v[0-9]+.[0-9]+.[0-9]+-*"
@@ -83,12 +85,13 @@ jobs:
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v2
         with:
-          distribution: goreleaser
+          distribution: goreleaser-por
           version: latest
           workdir: ./cli/
           args: release --rm-dist -f ../.goreleaser.yaml
         env:
           GITHUB_TOKEN: ${{ secrets.CI_BOT_TOKEN }}
+          GORELEASER_KEY: ${{ secrets.GORELEASER_LICENSE }}
 
   helm_chart_version_bump:
       name: "Trigger Helm chart appVersion update"
