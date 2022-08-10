@@ -13,7 +13,7 @@ export interface InfiniteScrollModel<T> {
   hasMore: boolean;
   isFetching: boolean;
   refresh: () => void;
-  list: [T[], React.Dispatch<React.SetStateAction<T[]>>][0];
+  list: T[];
 }
 
 const useInfiniteScroll = <T, P>(
