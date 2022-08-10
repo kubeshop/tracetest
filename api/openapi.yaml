@@ -28,7 +28,7 @@ paths:
             default: 0
         - in: query
           name: query
-          description: "query to search tests"
+          description: "query to search tests, based on test name and description"
           schema:
             type: string
       responses:

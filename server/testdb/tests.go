@@ -190,7 +190,10 @@ func (td *postgresDB) GetTests(ctx context.Context, take, skip int32, query stri
 	WHERE t.version = latestTests.latest_version `
 	if hasSearchQuery {
 		params = append(params, "%"+strings.ReplaceAll(query, " ", "%")+"%")
-		sql += ` AND (t.test ->> 'Name') ilike $3`
+		sql += ` AND (
+			(t.test ->> 'Name') ilike $3
+			OR (t.test ->> 'Description') ilike $3
+		)`
 	}
 
 	sql += ` ORDER BY (t.test ->> 'CreatedAt')::timestamp DESC LIMIT $1 OFFSET $2`
