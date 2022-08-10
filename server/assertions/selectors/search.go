@@ -11,6 +11,8 @@ func filterSpans(rootSpan traces.Span, spanSelector SpanSelector) []traces.Span 
 		if spanSelector.MatchesFilters(span) {
 			if spanSelector.ChildSelector != nil {
 				childFilteredSpans := filterSpans(span, *spanSelector.ChildSelector)
+				// filteredSpans include the parent span, so we have to remove it
+				childFilteredSpans = removeSpanFromList(childFilteredSpans, span.ID)
 				filteredSpans = append(filteredSpans, childFilteredSpans...)
 			} else {
 				filteredSpans = append(filteredSpans, span)
@@ -47,4 +49,16 @@ func filterDuplicated(spans []traces.Span) []traces.Span {
 	}
 
 	return uniqueSpans
+}
+
+func removeSpanFromList(spans []traces.Span, id trace.SpanID) []traces.Span {
+	idString := id.String()
+	list := make([]traces.Span, 0, len(spans))
+	for _, span := range spans {
+		if span.ID.String() != idString {
+			list = append(list, span)
+		}
+	}
+
+	return list
 }
