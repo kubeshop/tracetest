@@ -24,6 +24,8 @@ Tracetest allows you to quickly build integration and e2e tests, powered by your
 
 Check out the following blog-posts with Tracetest-related content:
 
+- [Tracetest 0.6 Release - gRPC, Postman and More](https://kubeshop.io/blog/tracetest-0-6-release-grpc-postman-and-more) - July 27, 2022
+
 - [Creating a Custom Language Code Editor Using React](https://kubeshop.io/blog/creating-a-custom-language-code-editor-using-react) - July 22, 2022
 
 - [Integration Tests: Pros and Cons of Doubles vs. Trace-Based Testing](https://kubeshop.io/blog/integration-tests-pros-and-cons-of-doubles-vs-trace-based-testing) - July 13, 2022
@@ -41,3 +43,9 @@ And our recorded live stream: [Introduction to Tracetest - E2E Tests Powered by 
 - [Tracetest is released. What’s next?](https://kubeshop.io/blog/tracetest-is-released-whats-next) - May 6, 2022
 
 - [Introducing Tracetest - Trace-based Testing with OpenTelemetry](https://kubeshop.io/blog/introducing-tracetest-trace-based-testing-with-opentelemetry) - April 26, 2022
+
+And please watch our recorded live streams: 
+
+- [Tracetest v0.6 Release - gRPC, Postman and More](https://youtu.be/mqwJRxqBNCg) - June 27, 2022
+
+- [Introduction to Tracetest - E2E Tests Powered by OpenTelemetry](https://youtu.be/mqwJRxqBNCg) - June 23, 2022
