@@ -19,6 +19,13 @@ builds:
       - linux
       - windows
       - darwin
+    goarch:
+    - "386"
+    - amd64
+    - arm
+    - arm64
+    goarm:
+    - "7"
 archives:
 - replacements:
     386: i386
@@ -33,14 +40,24 @@ nfpms:
 - id: tracetest
   vendor: Kubeshop
   homepage: https://tracetest.kubeshop.io/
+  maintainer: Sebastian Choren <sebastian@kubeshop.io>
   license: MIT
   formats:
     - deb
     - rpm
   replacements:
     386: i386
-furies:
-- account: tracetest
+  deb:
+    lintian_overrides:
+      - statically-linked-binary
+
+publishers:
+  - name: fury.io
+    env:
+    - 'FURY_TOKEN={{ .Env.FURY_TOKEN }}'
+    # relative to cli/, where goreleaser runs from
+    cmd: ../scripts/fury-upload.sh {{ .ArtifactName }}
+
 brews:
 - tap:
     owner: kubeshop

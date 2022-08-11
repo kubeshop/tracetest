@@ -83,13 +83,12 @@ jobs:
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v2
         with:
-          distribution: goreleaser-pro
+          distribution: goreleaser
           version: latest
           workdir: ./cli/
           args: release --rm-dist -f ../.goreleaser.yaml
         env:
           GITHUB_TOKEN: ${{ secrets.CI_BOT_TOKEN }}
-          GORELEASER_KEY: ${{ secrets.GORELEASER_LICENSE }}
           FURY_TOKEN: ${{ secrets.FURY_TOKEN }}
 
   helm_chart_version_bump:
