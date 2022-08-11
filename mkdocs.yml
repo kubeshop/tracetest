@@ -19,9 +19,10 @@ extra_css:
 
 nav:
   - Welcome: index.md
-  - Introduction: 
+  - Concepts: 
     - Introduction to Trace-Based Testing: introduction.md
     - Architecture: architecture.md
+    - Specifying Selectors: advanced-selectors.md
   - Getting Started: 
     - Installation: installing.md
     - Accessing Tracetest Dashboard: accessing-dashboard.md
@@ -29,13 +30,12 @@ nav:
     - Creating Tests: create-test.md
     - Adding Assertions: adding-assertions.md
     - Versioning: versioning.md
-  - Automating Tests for CI/CD:
+  - Command Line Interface: 
     - Command Line Tool: command-line-tool.md
     - Test Definition File: test-definition-file.md
-    - Specifying Selectors: advanced-selectors.md
+  - Automating Tests for CI/CD:
     - CI/CD Best practices: ci-cd-best-practices.md
   - OpenAPI Definition: openapi.md
-  - Development: development.md
   - Installable Example - Pokeshop Service:
       - Overview: pokeshop.md
       - Add Pokemon Endpoint: pokeshop/add-pokemon.md
