@@ -94,18 +94,54 @@ helm delete tracetest
 ```
 
 ## CLI Installation
-Every time we release a new version of Tracetest, we generate binaries for Linux, MacOS, and Windows. Supporting both amd64, and ARM64 architectures. You can find the latest version [here](https://github.com/kubeshop/tracetest/releases/latest).
+Every time we release a new version of Tracetest, we generate binaries for Linux, MacOS, and Windows. Supporting both amd64, and ARM64 architectures, in `tar.gz`, `deb`, `rpm` and `exe` formats
+You can find the latest version [here](https://github.com/kubeshop/tracetest/releases/latest).
 
-### Linux
+### Linux/MacOS
 
+Tracetest CLI can be installed automatically using the following script:
 ```sh
 curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/install-cli.sh | bash
 ```
 
-### MacOS
+It works for systems with Hombrew, `apt-get`, `dpkg`, `yum`, `rpm` installed, and if no package manager is available, it will try to download the build and install it manually.
+
+You can also manually install with one of the following methods
+
+#### Homebrew
 
 ```sh
 brew install kubeshop/tracetest/tracetest
+```
+
+#### apt
+
+```sh
+# requirements for our deb repo to work
+sudo apt-get update && sudo apt-get install -y apt-transport-https ca-certificates
+
+# add repo
+echo "deb [trusted=yes] https://apt.fury.io/tracetest/ /" | sudo tee /etc/apt/sources.list.d/fury.list
+
+# update and install
+sudo apt-get update
+sudo apt-get install tracetest
+```
+
+#### yum
+
+```sh
+# add repository
+cat <<EOF | sudo tee /etc/yum.repos.d/fury.repo
+[fury]
+name=Tracetest
+baseurl=https://yum.fury.io/tracetest/
+enabled=1
+gpgcheck=0
+EOF
+
+# install
+sudo yum install tracetest --refresh
 ```
 
 ### Windows
