@@ -12,6 +12,7 @@ ensure_dependency_exist() {
 }
 
 ensure_required_dependencies_are_present() {
+    ensure_dependency_exist "sudo"
     ensure_dependency_exist "curl"
     ensure_dependency_exist "uname"
 }
@@ -84,6 +85,25 @@ install_rpm() {
   sudo rpm -i $file_path
 }
 
+install_apt() {
+  sudo apt-get update
+  sudo apt-get install -y apt-transport-https ca-certificates
+  echo "deb [trusted=yes] https://apt.fury.io/tracetest/ /" | sudo tee /etc/apt/sources.list.d/fury.list
+  sudo apt-get update
+  sudo apt-get install -y tracetest
+}
+
+install_yum() {
+  cat <<EOF | sudo tee /etc/yum.repos.d/fury.repo
+[fury]
+name=Tracetest
+baseurl=https://yum.fury.io/tracetest/
+enabled=1
+gpgcheck=0
+EOF
+  sudo yum install tracetest --refresh
+}
+
 run() {
     ensure_required_dependencies_are_present
 
@@ -96,13 +116,12 @@ run() {
     latest_version=`get_latest_version`
     arch=`get_arch`
 
-    if cmd_exists dpkg; then
+    if cmd_exists apt; then
+      install_apt
+    elif cmd_exists yum; then
+      install_yum
+    elif cmd_exists dpkg; then
       download_link=`get_download_link $os $arch $latest_version deb`
-      echo
-      echo
-      echo $download_link
-      echo
-      echo
       install_dpkg $download_link
     elif cmd_exists rpm; then
       download_link=`get_download_link $os $arch $latest_version rpm`
