@@ -25,17 +25,15 @@ func ConvertResponseToOtelFormat(response GetTraceResponse) traces.Trace {
 
 	data := response.Data[0]
 
-	return traces.Trace{
-		ID:       traceId(data.ID),
-		RootSpan: *getSpanTree(data),
-	}
+	return traces.NewTrace(traceId(data.ID), *getSpanTree(data))
 }
 
 func getSpanTree(data traceData) *traces.Span {
 	var rootSpan *traces.Span
 	spans := make(map[string]*traces.Span, len(data.Attributes.Spans))
+	reporters := data.Relationships.Reporters
 	for _, span := range data.Attributes.Spans {
-		traceSpan, isRootSpan := convertSpan(span)
+		traceSpan, isRootSpan := convertSpan(span, reporters)
 		spans[traceSpan.ID.String()] = &traceSpan
 		if isRootSpan {
 			rootSpan = &traceSpan
@@ -47,22 +45,39 @@ func getSpanTree(data traceData) *traces.Span {
 	return rootSpan
 }
 
-func convertSpan(span span) (traces.Span, bool) {
-	attributes := make(map[string]string, len(span.Tags))
+func convertSpan(span span, reporters []reporter) (traces.Span, bool) {
+	attributes := make(map[string]string)
 	for key, value := range span.Tags {
+		attributes[key] = fmt.Sprintf("%v", value)
+	}
+
+	reporterAttributes := getReporterAttributes(reporters, span.ReporterID)
+	for key, value := range reporterAttributes {
 		attributes[key] = fmt.Sprintf("%v", value)
 	}
 
 	_, hasParent := attributes["parent_span_guid"]
 	isRootSpan := !hasParent
 
+	attributes["kind"] = attributes["span.kind"]
+
 	return traces.Span{
 		ID:         spanId(span.SpanID),
 		Name:       span.SpanName,
-		StartTime:  time.UnixMicro(span.StartTimeMicros),
-		EndTime:    time.UnixMicro(span.EndTimeMicros),
+		StartTime:  time.Unix(0, span.StartTimeMicros*1000),
+		EndTime:    time.Unix(0, span.EndTimeMicros*1000),
 		Attributes: attributes,
 	}, isRootSpan
+}
+
+func getReporterAttributes(reporters []reporter, id string) map[string]interface{} {
+	for _, reporter := range reporters {
+		if reporter.ReporterID == id {
+			return reporter.Attributes
+		}
+	}
+
+	return map[string]interface{}{}
 }
 
 func buildSpanTree(spans map[string]*traces.Span) {

@@ -21,6 +21,26 @@ type Trace struct {
 	Flat     map[trace.SpanID]*Span `json:"-"`
 }
 
+func NewTrace(id trace.TraceID, rootSpan Span) Trace {
+	trace := &Trace{
+		ID:       id,
+		RootSpan: rootSpan,
+	}
+
+	trace.Sort()
+	injectInformationInSpans(trace)
+
+	return *trace
+}
+
+func injectInformationInSpans(trace *Trace) {
+	for _, span := range trace.Flat {
+		span.Attributes["name"] = span.Name
+		span.Attributes["tracetest.span.type"] = spanType(span.Attributes)
+		span.Attributes["tracetest.span.duration"] = (span.EndTime.Sub(span.StartTime) * time.Nanosecond).String()
+	}
+}
+
 func (t *Trace) Sort() Trace {
 	sortedRoot := sortSpanChildren(t.RootSpan)
 
@@ -81,6 +101,11 @@ func (t Trace) MarshalJSON() ([]byte, error) {
 		ID:       t.ID.String(),
 		RootSpan: t.RootSpan,
 	})
+}
+
+func (t *Trace) Flatten() {
+	t.Flat = make(map[trace.SpanID]*Span)
+	flattenSpans(t.Flat, t.RootSpan)
 }
 
 func flattenSpans(res map[trace.SpanID]*Span, root Span) {

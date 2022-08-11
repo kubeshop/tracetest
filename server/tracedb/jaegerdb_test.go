@@ -37,8 +37,10 @@ func TestJaegerGetTraceByIdentification(t *testing.T) {
 
 	defer db.Close()
 	traceId, _ := trace.TraceIDFromHex("0194fdc2fa2ffcc041d3ff12045b73c8")
+	spanId, _ := trace.SpanIDFromHex("d3382bc1a287880c")
 	traceIdentification := traces.TraceIdentification{
-		TraceID: traceId,
+		TraceID:    traceId,
+		RootSpanID: spanId,
 	}
 	trace, err := db.GetTraceByIdentification(context.Background(), traceIdentification)
 	assert.NoError(t, err)

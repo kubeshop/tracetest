@@ -50,7 +50,7 @@ func (db *LightstepDB) GetTraceByIdentification(ctx context.Context, identificat
 	}
 
 	defer response.Body.Close()
-	body, err := ioutil.ReadAll(request.Body)
+	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		return traces.Trace{}, fmt.Errorf("could not read response body: %w", err)
 	}

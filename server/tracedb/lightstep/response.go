@@ -15,10 +15,7 @@ type traceData struct {
 		Spans           []span `json:"spans"`
 	} `json:"attributes"`
 	Relationships struct {
-		Reporters []struct {
-			ReporterID string                 `json:"reporter-id"`
-			Attributes map[string]interface{} `json:"attributes"`
-		} `json:"reporters"`
+		Reporters []reporter `json:"reporters"`
 	} `json:"relationships"`
 }
 
@@ -31,4 +28,9 @@ type span struct {
 	TraceID         string                 `json:"trace-id"`
 	ReporterID      string                 `json:"reporter-id"`
 	Tags            map[string]interface{} `json:"tags,omitempty"`
+}
+
+type reporter struct {
+	ReporterID string                 `json:"reporter-id"`
+	Attributes map[string]interface{} `json:"attributes"`
 }
