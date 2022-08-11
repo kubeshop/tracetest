@@ -26,7 +26,7 @@ func TestFunctionWithArgs(t *testing.T) {
 	function, err := registry.Get("randomInt")
 	require.NoError(t, err)
 
-	args := []functions.FunctionArg{
+	args := []functions.Arg{
 		{
 			Value: "1",
 			Type:  "number",
@@ -63,7 +63,7 @@ func TestFunctionWithWrongArgType(t *testing.T) {
 	function, err := registry.Get("randomInt")
 	require.NoError(t, err)
 
-	args := []functions.FunctionArg{
+	args := []functions.Arg{
 		{
 			Value: "1",
 			Type:  "number",

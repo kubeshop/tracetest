@@ -2,22 +2,22 @@ package functions
 
 import "fmt"
 
-type FunctionRegistry interface {
-	Add(string, FunctionInvoker, FunctionArgConfig)
+type Registry interface {
+	Add(string, Invoker, ArgConfig)
 	Get(string) (Function, error)
 }
 
-func newFunctionRegistry() FunctionRegistry {
-	return &functionRegistry{
+func newRegistry() Registry {
+	return &registry{
 		functions: make(map[string]Function, 0),
 	}
 }
 
-type functionRegistry struct {
+type registry struct {
 	functions map[string]Function
 }
 
-func (r *functionRegistry) Add(name string, function FunctionInvoker, argsConfig FunctionArgConfig) {
+func (r *registry) Add(name string, function Invoker, argsConfig ArgConfig) {
 	r.functions[name] = Function{
 		name:      name,
 		invoker:   function,
@@ -25,7 +25,7 @@ func (r *functionRegistry) Add(name string, function FunctionInvoker, argsConfig
 	}
 }
 
-func (r *functionRegistry) Get(name string) (Function, error) {
+func (r *registry) Get(name string) (Function, error) {
 	if function, found := r.functions[name]; found {
 		return function, nil
 	}

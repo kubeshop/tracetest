@@ -85,26 +85,26 @@ func createParser() (*participle.Parser, error) {
 	return defaultParser, nil
 }
 
-func ParseFunction(input string) (Function, []FunctionArg, error) {
+func ParseFunction(input string) (Function, []Arg, error) {
 	parser, err := createParser()
 	if err != nil {
-		return Function{}, []FunctionArg{}, fmt.Errorf("could not create parser: %w", err)
+		return Function{}, []Arg{}, fmt.Errorf("could not create parser: %w", err)
 	}
 
 	var parserObject functionParserObject
 	err = parser.ParseString("", input, &parserObject)
 	if err != nil {
-		return Function{}, []FunctionArg{}, fmt.Errorf(`could not parse input: "%s": %w`, input, err)
+		return Function{}, []Arg{}, fmt.Errorf(`could not parse input: "%s": %w`, input, err)
 	}
 
 	function, err := defaultFunctionRegistry.Get(parserObject.FunctionName)
 	if err != nil {
-		return Function{}, []FunctionArg{}, fmt.Errorf(`could not find function: %w`, err)
+		return Function{}, []Arg{}, fmt.Errorf(`could not find function: %w`, err)
 	}
 
-	args := make([]FunctionArg, 0, len(parserObject.Args))
+	args := make([]Arg, 0, len(parserObject.Args))
 	for _, arg := range parserObject.Args {
-		args = append(args, FunctionArg{
+		args = append(args, Arg{
 			Value: arg.Value(),
 			Type:  arg.Type(),
 		})
