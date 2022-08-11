@@ -11,13 +11,9 @@ ensure_dependency_exist() {
     fi
 }
 
-ensure_required_dependencies_are_present() {
-    ensure_dependency_exist "sudo"
-    ensure_dependency_exist "curl"
-    ensure_dependency_exist "uname"
-}
-
 get_latest_version() {
+  ensure_dependency_exist "curl"
+
   curl --silent "https://api.github.com/repos/kubeshop/tracetest/releases/latest" |
     grep '"tag_name":' |
     sed -E 's/.*"([^"]+)".*/\1/'
@@ -41,9 +37,9 @@ get_arch() {
 }
 
 get_download_link() {
-    os=$1
-    arch=$2
-    version=$3
+    os=$(get_os)
+    version=$(get_latest_version)
+    arch=$(get_arch)
     pkg=$4
     raw_version=`echo $version | sed 's/v//'`
 
@@ -61,75 +57,74 @@ download_file() {
 }
 
 install_tar() {
-  download_link=$1
+  download_link=$(get_download_link "tar.gz")
   file_path="/tmp/cli.tar.gz"
   download_file "$download_link" "$file_path"
 
   tar -xvf $compressed_file_path -C /tmp
-  sudo mv /tmp/tracetest /usr/local/bin/tracetest
+  $SUDO mv /tmp/tracetest /usr/local/bin/tracetest
 }
 
 install_dpkg() {
-  download_link=$1
+  download_link=$(get_download_link "deb")
   file_path="/tmp/cli.deb"
   download_file "$download_link" "$file_path"
 
-  sudo dpkg -i $file_path
+  $SUDO dpkg -i $file_path
 }
 
 install_rpm() {
-  download_link=$1
+  download_link=$(get_download_link "rpm")
   file_path="/tmp/cli.rpm"
   download_file "$download_link" "$file_path"
 
-  sudo rpm -i $file_path
+  $SUDO rpm -i $file_path
 }
 
 install_apt() {
-  sudo apt-get update
-  sudo apt-get install -y apt-transport-https ca-certificates
-  echo "deb [trusted=yes] https://apt.fury.io/tracetest/ /" | sudo tee /etc/apt/sources.list.d/fury.list
-  sudo apt-get update
-  sudo apt-get install -y tracetest
+  $SUDO apt-get update
+  $SUDO apt-get install -y apt-transport-https ca-certificates
+  echo "deb [trusted=yes] https://apt.fury.io/tracetest/ /" | $SUDO tee /etc/apt/sources.list.d/fury.list
+  $SUDO apt-get update
+  $SUDO apt-get install -y tracetest
 }
 
 install_yum() {
-  cat <<EOF | sudo tee /etc/yum.repos.d/fury.repo
+  cat <<EOF | $SUDO tee /etc/yum.repos.d/fury.repo
 [fury]
 name=Tracetest
 baseurl=https://yum.fury.io/tracetest/
 enabled=1
 gpgcheck=0
 EOF
-  sudo yum install tracetest --refresh
+  $SUDO yum install -y tracetest --refresh
 }
 
 run() {
-    ensure_required_dependencies_are_present
-
+    ensure_dependency_exist "uname"
     os=$(get_os)
-    if [ "$os" != "linux" ]; then
-      echo $os 'OS not supported by this script. See https://kubeshop.github.io/tracetest/installing/#cli-installation'
+    if [ "$os" = "windows" ]; then
+      echo 'OS not supported by this script. See https://kubeshop.github.io/tracetest/installing/#cli-installation'
       exit 1
     fi
 
-    latest_version=`get_latest_version`
-    arch=`get_arch`
-
-    if cmd_exists apt; then
+    if cmd_exists apt-get; then
       install_apt
     elif cmd_exists yum; then
       install_yum
     elif cmd_exists dpkg; then
-      download_link=`get_download_link $os $arch $latest_version deb`
-      install_dpkg $download_link
+      install_dpkg
     elif cmd_exists rpm; then
-      download_link=`get_download_link $os $arch $latest_version rpm`
-      install_rpm $download_link
+      install_rpm
     else
-      download_link=`get_download_link $os $arch $latest_version tar.gz`
-      install_tar $download_link
+      install_tar
     fi
 }
+
+SUDO=""
+if [ `id -un` != "root" ]; then
+  ensure_dependency_exist "sudo"
+  SUDO="sudo"
+fi
 
 run
