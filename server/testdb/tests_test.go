@@ -92,22 +92,45 @@ func TestGetTests(t *testing.T) {
 	db, clean := getDB()
 	defer clean()
 
-	createTestWithName(t, db, "1")
-	createTestWithName(t, db, "2")
-	createTestWithName(t, db, "3")
+	createTestWithName(t, db, "one")
+	createTestWithName(t, db, "two")
+	createTestWithName(t, db, "three")
 
-	actual, err := db.GetTests(context.TODO(), 20, 0)
-	require.NoError(t, err)
-	assert.Len(t, actual, 3)
+	t.Run("Order", func(t *testing.T) {
+		actual, err := db.GetTests(context.TODO(), 20, 0, "")
+		require.NoError(t, err)
+		assert.Len(t, actual, 3)
 
-	// test order
-	assert.Equal(t, "3", actual[0].Name)
-	assert.Equal(t, "2", actual[1].Name)
-	assert.Equal(t, "1", actual[2].Name)
+		// test order
+		assert.Equal(t, "three", actual[0].Name)
+		assert.Equal(t, "two", actual[1].Name)
+		assert.Equal(t, "one", actual[2].Name)
+	})
 
-	actual, err = db.GetTests(context.TODO(), 20, 10)
-	require.NoError(t, err)
-	assert.Len(t, actual, 0)
+	t.Run("Pagination", func(t *testing.T) {
+		actual, err := db.GetTests(context.TODO(), 20, 10, "")
+		require.NoError(t, err)
+		assert.Len(t, actual, 0)
+	})
+
+	t.Run("SearchByName", func(t *testing.T) {
+		_, _ = db.CreateTest(context.TODO(), model.Test{Name: "VerySpecificName"})
+		actual, err := db.GetTests(context.TODO(), 10, 0, "specif")
+		require.NoError(t, err)
+		assert.Len(t, actual, 1)
+
+		assert.Equal(t, "VerySpecificName", actual[0].Name)
+	})
+
+	t.Run("SearchByDescription", func(t *testing.T) {
+		_, _ = db.CreateTest(context.TODO(), model.Test{Description: "VeryUniqueText"})
+
+		actual, err := db.GetTests(context.TODO(), 10, 0, "nique")
+		require.NoError(t, err)
+		assert.Len(t, actual, 1)
+
+		assert.Equal(t, "VeryUniqueText", actual[0].Description)
+	})
 }
 
 func TestGetTestsWithMultipleVersions(t *testing.T) {
@@ -126,7 +149,7 @@ func TestGetTestsWithMultipleVersions(t *testing.T) {
 	_, err = db.UpdateTest(context.TODO(), test2)
 	require.NoError(t, err)
 
-	tests, err := db.GetTests(context.TODO(), 20, 0)
+	tests, err := db.GetTests(context.TODO(), 20, 0, "")
 	assert.NoError(t, err)
 	assert.Len(t, tests, 2)
 

@@ -6,10 +6,20 @@ type TUseInfiniteScrollParams<P> = P & {
   take?: number;
 };
 
+export interface InfiniteScrollModel<T> {
+  isLoading: boolean;
+  localPage: number;
+  loadMore: () => void;
+  hasMore: boolean;
+  isFetching: boolean;
+  refresh: () => void;
+  list: T[];
+}
+
 const useInfiniteScroll = <T, P>(
   useGetDataListQuery: UseQuery<any>,
   {take = 20, ...queryParams}: TUseInfiniteScrollParams<P>
-) => {
+): InfiniteScrollModel<T> => {
   const [localPage, setLocalPage] = useState(0);
   const [list, setList] = useState<T[]>([]);
   const [lastCount, setLastCount] = useState(0);
@@ -34,7 +44,7 @@ const useInfiniteScroll = <T, P>(
 
       setLastCount(currentList.length);
     }
-  }, [currentList]);
+  }, [currentList, localPage]);
 
   const refresh = useCallback(() => {
     setLocalPage(1);

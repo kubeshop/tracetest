@@ -224,13 +224,13 @@ func (c *controller) GetTestRuns(ctx context.Context, testID string, take, skip 
 	return openapi.Response(200, c.mappers.Out.Runs(runs)), nil
 }
 
-func (c *controller) GetTests(ctx context.Context, take, skip int32) (openapi.ImplResponse, error) {
+func (c *controller) GetTests(ctx context.Context, take, skip int32, query string) (openapi.ImplResponse, error) {
 	analytics.SendEvent("Test List", "test")
 	if take == 0 {
 		take = 20
 	}
 
-	tests, err := c.testDB.GetTests(ctx, take, skip)
+	tests, err := c.testDB.GetTests(ctx, take, skip, query)
 	if err != nil {
 		return handleDBError(err), err
 	}

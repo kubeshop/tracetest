@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -178,21 +179,32 @@ func (td *postgresDB) GetLatestTestVersion(ctx context.Context, id uuid.UUID) (m
 	return test, nil
 }
 
-func (td *postgresDB) GetTests(ctx context.Context, take, skip int32) ([]model.Test, error) {
-	stmt, err := td.db.Prepare(getTestSQL + `
+func (td *postgresDB) GetTests(ctx context.Context, take, skip int32, query string) ([]model.Test, error) {
+	hasSearchQuery := query != ""
+	params := []any{take, skip}
+
+	sql := getTestSQL + `
 	INNER JOIN (
 		SELECT id as idx, max(version) as latest_version FROM tests GROUP BY idx
 	) as latestTests ON latestTests.idx = t.id
-	WHERE t.version = latestTests.latest_version
-	ORDER BY (t.test ->> 'CreatedAt')::timestamp DESC
-	LIMIT $1 OFFSET $2
-	`)
+	WHERE t.version = latestTests.latest_version `
+	if hasSearchQuery {
+		params = append(params, "%"+strings.ReplaceAll(query, " ", "%")+"%")
+		sql += ` AND (
+			(t.test ->> 'Name') ilike $3
+			OR (t.test ->> 'Description') ilike $3
+		)`
+	}
+
+	sql += ` ORDER BY (t.test ->> 'CreatedAt')::timestamp DESC LIMIT $1 OFFSET $2`
+
+	stmt, err := td.db.Prepare(sql)
 	if err != nil {
 		return nil, err
 	}
 	defer stmt.Close()
 
-	rows, err := stmt.QueryContext(ctx, take, skip)
+	rows, err := stmt.QueryContext(ctx, params...)
 	if err != nil {
 		return nil, err
 	}
