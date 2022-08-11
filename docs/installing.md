@@ -132,8 +132,8 @@ sudo apt-get install tracetest
 
 ```sh
 # add repository
-cat <<EOF | sudo tee /etc/yum.repos.d/fury.repo
-[fury]
+cat <<EOF | $SUDO tee /etc/yum.repos.d/tracetest.repo
+[tracetest]
 name=Tracetest
 baseurl=https://yum.fury.io/tracetest/
 enabled=1
