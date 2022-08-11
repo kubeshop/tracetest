@@ -8,12 +8,14 @@ import (
 
 var defaultInjector *Injector = nil
 
-func ReplaceTestPlaceholders(test model.Test) (model.Test, error) {
+func init() {
 	if defaultInjector == nil {
 		injector := NewInjector()
 		defaultInjector = &injector
 	}
+}
 
+func ReplaceTestPlaceholders(test model.Test) (model.Test, error) {
 	err := defaultInjector.Inject(&test)
 	if err != nil {
 		return model.Test{}, fmt.Errorf("could not replace expressions in test: %w", err)
