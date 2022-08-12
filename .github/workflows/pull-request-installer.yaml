@@ -18,17 +18,28 @@ jobs:
         options: -v ${{ github.workspace }}:/app -e GITHUB_SHA
         run: |
          case "${{ matrix.distro }}" in
-            ubuntu*|jessie|stretch|buster|bullseye)
+            ubuntu)
               apt-get update -q -y
               apt-get install -q -y curl
               ;;
-            fedora*)
+            fedora)
               yum install -y curl --refresh
               ;;
-            alpine*)
+            alpine)
               apk add --update curl
               ;;
           esac
 
           curl -L https://raw.githubusercontent.com/kubeshop/tracetest/${GITHUB_SHA}/install-cli.sh | sh
           tracetest
+
+  macos:
+    name: MacOS
+    runs-on: macos-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - run: |
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        curl -L https://raw.githubusercontent.com/kubeshop/tracetest/${GITHUB_SHA}/install-cli.sh | sh
+        tracetest
