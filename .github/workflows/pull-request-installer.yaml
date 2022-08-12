@@ -27,7 +27,12 @@ jobs:
       with:
         distro: ${{ matrix.distro }}
         arch: ${{ matrix.arch }}
-        install: |
+        run: |
+          echo
+          echo "ARCH"
+          uname -p
+          echo
+
           case "${{ matrix.distro }}" in
             ubuntu*|jessie|stretch|buster|bullseye)
               apt-get update -q -y
@@ -40,11 +45,6 @@ jobs:
               apk add --update curl
               ;;
           esac
-        run: |
-          echo
-          echo "ARCH"
-          uname -p
-          echo
 
           curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/install-cli.sh | sh
           tracetest
