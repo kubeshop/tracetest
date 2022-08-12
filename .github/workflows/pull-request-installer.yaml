@@ -26,12 +26,7 @@ jobs:
         image: ${{matrix.distro}}
         options: -v ${{ github.workspace }}:/app -e GITHUB_SHA
         run: |
-          echo
-          echo "ARCH"
-          uname -p
-          echo
-
-          case "${{ matrix.distro }}" in
+         case "${{ matrix.distro }}" in
             ubuntu*|jessie|stretch|buster|bullseye)
               apt-get update -q -y
               apt-get install -q -y curl
