@@ -27,7 +27,10 @@ get_os() {
 
 get_arch() {
   arch=$(uname -p)
-    case "$arch" in
+  if [ "$arch" = "unknown" ]; then
+    arch=$(uname -m)
+  fi
+  case "$arch" in
     "x86_64")
       echo "amd64"
       ;;
