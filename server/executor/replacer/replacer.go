@@ -6,14 +6,7 @@ import (
 	"github.com/kubeshop/tracetest/server/model"
 )
 
-var defaultInjector *Injector = nil
-
-func init() {
-	if defaultInjector == nil {
-		injector := NewInjector()
-		defaultInjector = &injector
-	}
-}
+var defaultInjector Injector = NewInjector()
 
 func ReplaceTestPlaceholders(test model.Test) (model.Test, error) {
 	err := defaultInjector.Inject(&test)

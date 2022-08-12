@@ -1,6 +1,9 @@
 package functions
 
-import "fmt"
+import (
+	"fmt"
+	"sync"
+)
 
 type Registry interface {
 	Add(string, Invoker, ArgConfig)
@@ -15,9 +18,13 @@ func newRegistry() Registry {
 
 type registry struct {
 	functions map[string]Function
+	mutex     sync.Mutex
 }
 
 func (r *registry) Add(name string, function Invoker, argsConfig ArgConfig) {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+
 	r.functions[name] = Function{
 		name:      name,
 		invoker:   function,
