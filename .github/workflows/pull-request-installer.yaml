@@ -15,7 +15,7 @@ jobs:
     name: Linux
     strategy:
       matrix:
-        distro: [ubuntu]
+        distro: [ubuntu, fedora]
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
@@ -44,6 +44,5 @@ jobs:
               ;;
           esac
 
-          echo https://raw.githubusercontent.com/kubeshop/tracetest/${GITHUB_SHA}/install-cli.sh
           curl -L https://raw.githubusercontent.com/kubeshop/tracetest/${GITHUB_SHA}/install-cli.sh | sh
           tracetest
