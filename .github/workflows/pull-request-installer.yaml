@@ -1,14 +1,5 @@
 name: Installer Pull Request
-on:
-  pull_request:
-    types:
-      - opened
-      - reopened
-      - synchronize
-    branches:
-      - main
-    paths:
-      - install-cli.sh
+on: [push]
 
 jobs:
   linux:
