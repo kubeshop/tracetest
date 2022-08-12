@@ -1,0 +1,43 @@
+name: Installer Pull Request
+on:
+  push:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+    branches:
+      - main
+    paths:
+      - install-cli.sh
+
+jobs:
+  linux:
+    name: Linux
+    strategy:
+      matrix:
+        distro: [ubuntu_latest, fedora_latest, alpine_latest]
+        arch: [armv7, aarch64]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - uses: uraimo/run-on-arch-action@v2
+      name: install on ${{ matrix.distro }} ${{ matrix.arch }}
+      with:
+        distro: ${{ matrix.distro }}
+        arch: ${{ matrix.arch }}
+        run: |
+          curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/install-cli.sh | bash
+          tracetest
+  mac:
+    name: MacOS
+    runs-on: macos-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: install
+      run: |
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/install-cli.sh | bash
+        tracetest
