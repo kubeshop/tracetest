@@ -37,7 +37,7 @@ get_arch() {
       ;;
 
     *)
-      echo ""
+      echo $arch
       ;;
   esac
 }
