@@ -1,0 +1,34 @@
+name: Installer Pull Request
+on: [push]
+
+jobs:
+  linux:
+    name: Linux
+    strategy:
+      matrix:
+        distro: [ubuntu, fedora, alpine]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: ${{ matrix.distro }}
+      uses: addnab/docker-run-action@v3
+      with:
+        image: ${{matrix.distro}}
+        options: -v ${{ github.workspace }}:/app -e GITHUB_SHA
+        run: |
+         case "${{ matrix.distro }}" in
+            ubuntu)
+              apt-get update -q -y
+              apt-get install -q -y curl
+              ;;
+            fedora)
+              yum install -y curl --refresh
+              ;;
+            alpine)
+              apk add --update curl
+              ;;
+          esac
+
+          curl -L https://raw.githubusercontent.com/kubeshop/tracetest/${GITHUB_SHA}/install-cli.sh | sh
+          tracetest

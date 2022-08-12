@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 cmd_exists() {
   command -v $1 &> /dev/null
@@ -27,7 +27,10 @@ get_os() {
 
 get_arch() {
   arch=$(uname -p)
-    case "$arch" in
+  if [ "$arch" = "unknown" ]; then
+    arch=$(uname -m)
+  fi
+  case "$arch" in
     "x86_64")
       echo "amd64"
       ;;
@@ -37,7 +40,7 @@ get_arch() {
       ;;
 
     *)
-      echo ""
+      echo $arch
       ;;
   esac
 }
