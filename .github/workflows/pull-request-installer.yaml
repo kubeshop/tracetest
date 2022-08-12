@@ -24,7 +24,7 @@ jobs:
       uses: addnab/docker-run-action@v3
       with:
         image: ${{matrix.distro}}
-        options: -v ${{ github.workspace }}:/app -e COMMIT=$GITHUB_SHA
+        options: -v ${{ github.workspace }}:/app -e GITHUB_SHA
         run: |
           echo
           echo "ARCH"
@@ -44,6 +44,6 @@ jobs:
               ;;
           esac
 
-          echo "Commit: " ${COMMIT}
+          echo "Commit: " ${GITHUB_SHA}
           curl -L https://raw.githubusercontent.com/kubeshop/tracetest/${COMMIT}/install-cli.sh | sh
           tracetest
