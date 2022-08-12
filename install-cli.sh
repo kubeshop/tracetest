@@ -141,5 +141,9 @@ if [ `id -un` != "root" ]; then
   ensure_dependency_exist "sudo"
   SUDO="sudo"
 fi
+echo
+echo "ARCH"
+uname -p
+echo
 
 run
