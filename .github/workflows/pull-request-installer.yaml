@@ -16,17 +16,16 @@ jobs:
     name: Linux
     strategy:
       matrix:
-        distro: [ubuntu_latest, fedora_latest, alpine_latest]
-        arch: [armv7, aarch64]
+        distro: [ubuntu, fedora, alpine]
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
       uses: actions/checkout@v3
-    - uses: uraimo/run-on-arch-action@v2
-      name: install on ${{ matrix.distro }} ${{ matrix.arch }}
+    - name: ${{ matrix.distro }}
+      uses: addnab/docker-run-action@v3
       with:
-        distro: ${{ matrix.distro }}
-        arch: ${{ matrix.arch }}
+        image: ${{matrix.distro}}
+        options: -v ${{ github.workspace }}:/app -e COMMIT=$GITHUB_SHA
         run: |
           echo
           echo "ARCH"
@@ -46,5 +45,5 @@ jobs:
               ;;
           esac
 
-          curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/install-cli.sh | sh
+          curl -L https://raw.githubusercontent.com/kubeshop/tracetest/${COMMIT}/install-cli.sh | sh
           tracetest
