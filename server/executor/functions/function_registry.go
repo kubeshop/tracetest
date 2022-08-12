@@ -33,6 +33,9 @@ func (r *registry) Add(name string, function Invoker, argsConfig ArgConfig) {
 }
 
 func (r *registry) Get(name string) (Function, error) {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+
 	if function, found := r.functions[name]; found {
 		return function, nil
 	}
