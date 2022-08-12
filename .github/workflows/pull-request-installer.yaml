@@ -44,5 +44,6 @@ jobs:
               ;;
           esac
 
+          echo "Commit: " ${COMMIT}
           curl -L https://raw.githubusercontent.com/kubeshop/tracetest/${COMMIT}/install-cli.sh | sh
           tracetest
