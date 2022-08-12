@@ -27,6 +27,19 @@ jobs:
       with:
         distro: ${{ matrix.distro }}
         arch: ${{ matrix.arch }}
+        install: |
+          case "${{ matrix.distro }}" in
+            ubuntu*|jessie|stretch|buster|bullseye)
+              apt-get update -q -y
+              apt-get install -q -y curl
+              ;;
+            fedora*)
+              yum install -y curl --refresh
+              ;;
+            alpine*)
+              apk add --update curl
+              ;;
+          esac
         run: |
           curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/install-cli.sh | bash
           tracetest
