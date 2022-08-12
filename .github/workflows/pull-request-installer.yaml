@@ -44,6 +44,6 @@ jobs:
               ;;
           esac
 
-          echo "Commit: " ${GITHUB_SHA}
-          curl -L https://raw.githubusercontent.com/kubeshop/tracetest/${COMMIT}/install-cli.sh | sh
+          echo https://raw.githubusercontent.com/kubeshop/tracetest/${GITHUB_SHA}/install-cli.sh
+          curl -L https://raw.githubusercontent.com/kubeshop/tracetest/${GITHUB_SHA}/install-cli.sh | sh
           tracetest
