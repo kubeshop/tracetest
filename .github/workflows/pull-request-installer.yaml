@@ -15,7 +15,7 @@ jobs:
     name: Linux
     strategy:
       matrix:
-        distro: [ubuntu, fedora]
+        distro: [ubuntu, fedora, alpine]
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
