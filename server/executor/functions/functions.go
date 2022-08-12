@@ -8,22 +8,20 @@ type Arg struct {
 	Type  string
 }
 
-type ArgConfig struct {
-	Types []string
-}
+type ArgTypes []string
 
 type Function struct {
-	name      string
-	invoker   Invoker
-	argConfig ArgConfig
+	name     string
+	invoker  Invoker
+	argTypes ArgTypes
 }
 
 func (f Function) Invoke(args ...Arg) (string, error) {
-	if len(args) != len(f.argConfig.Types) {
-		return "", fmt.Errorf(`wrong number of arguments for "%s". Expected %d args, got %d`, f.name, len(f.argConfig.Types), len(args))
+	if len(args) != len(f.argTypes) {
+		return "", fmt.Errorf(`wrong number of arguments for "%s". Expected %d args, got %d`, f.name, len(f.argTypes), len(args))
 	}
 
-	for i, argType := range f.argConfig.Types {
+	for i, argType := range f.argTypes {
 		if args[i].Type != argType {
 			return "", fmt.Errorf("wrong argument type: argument %d should be of type %s, but it is %s", i, argType, args[i].Type)
 		}
@@ -32,9 +30,7 @@ func (f Function) Invoke(args ...Arg) (string, error) {
 	return f.invoker(args...), nil
 }
 
-var emptyArgsConfig = ArgConfig{
-	Types: []string{},
-}
+var emptyArgsConfig = ArgTypes{}
 
 func GetFunctionRegistry() Registry {
 	registry := newRegistry()
@@ -48,9 +44,7 @@ func GetFunctionRegistry() Registry {
 	registry.Add("creditCard", generateCreditCard, emptyArgsConfig)
 	registry.Add("creditCardCvv", generateCreditCardCVV, emptyArgsConfig)
 	registry.Add("creditCardExpDate", generateCreditCardExpiration, emptyArgsConfig)
-	registry.Add("randomInt", generateRandomInt, ArgConfig{
-		Types: []string{"number", "number"},
-	})
+	registry.Add("randomInt", generateRandomInt, ArgTypes{"number", "number"})
 
 	return registry
 }

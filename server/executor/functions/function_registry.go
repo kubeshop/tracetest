@@ -6,7 +6,7 @@ import (
 )
 
 type Registry interface {
-	Add(string, Invoker, ArgConfig)
+	Add(string, Invoker, ArgTypes)
 	Get(string) (Function, error)
 }
 
@@ -21,14 +21,14 @@ type registry struct {
 	mutex     sync.Mutex
 }
 
-func (r *registry) Add(name string, function Invoker, argsConfig ArgConfig) {
+func (r *registry) Add(name string, function Invoker, argsConfig ArgTypes) {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 
 	r.functions[name] = Function{
-		name:      name,
-		invoker:   function,
-		argConfig: argsConfig,
+		name:     name,
+		invoker:  function,
+		argTypes: argsConfig,
 	}
 }
 
