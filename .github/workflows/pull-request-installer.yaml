@@ -30,29 +30,3 @@ jobs:
         run: |
           curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/install-cli.sh | bash
           tracetest
-  mac:
-    name: MacOS
-    runs-on: macos-latest
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-    - name: install
-      run: |
-        echo "running on ${{ matrix.distro }}"
-        case "${{ matrix.distro }}" in
-          ubuntu*|jessie|stretch|buster|bullseye)
-            apt-get update -q -y
-            apt-get install -q -y curl
-            ;;
-          fedora*)
-            dnf -y update
-            dnf -y install curl
-            ;;
-          alpine*)
-            apk update
-            apk add curl
-            ;;
-        esac
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-        curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/install-cli.sh | bash
-        tracetest
