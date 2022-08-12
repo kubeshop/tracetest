@@ -133,7 +133,28 @@ trigger:
         body: '{"name": "my Json Object"}'
 ```
 
-### Assertions
+### Generator functions
+
+Sometimes we want to randomize our test data. Maybe because we want to try new values or maybe because we know our API will fail if the same id is provided more than once. Thinking in this usecase, you can define generator functions in your test trigger.
+
+To use a generator function, you have to wrap it in doulbe curly brackets: `{{ uuid() }}`.
+
+Available functions:
+| Function | Description |
+|----------|-------------|
+| `uuid()` | generates a random v4 uuid |
+| `firstName()` | generates a random english first name |
+| `lastName()` | generates a random english last name |
+| `fullName()` | generates a random english first and last name |
+| `email()` | generates a random email address |
+| `phone()` | generates a random phone number |
+| `creditCard()` | generates a random credit card number (from 12 to 19 digits) |
+| `creditCardCvv()` | generates a random credit card cvv (3 digits)  |
+| `creditCardExpDate()` | generates a random credit card expiration date (mm/yy) |
+| `randomInt(min, max)` | generates a random integer contained in the closed interval defined by [`min`, `max`] |
+
+
+## Assertions
 Assertions are as important as how you trigger your test. Without them, your test is just a fancy way of executing a request using a CLI command. In this section, we will discuss how you can declare your assertions in your definition file.
 
 Before we start, there are two concepts that you must understand to write your tests: [selectors](https://kubeshop.github.io/tracetest/advanced-selectors/), and assertions. Selectors are queries that are executed against your trace tree and select a set of spans based on some attributes. They are responsible for defining which spans will be tested against your assertions. Assertions are tests against a specific span based on its attributes. A practical example might be useful:
