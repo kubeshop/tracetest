@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/google/uuid"
 	"github.com/kubeshop/tracetest/server/model"
@@ -86,14 +87,27 @@ func (td *postgresDB) GetRun(ctx context.Context, id uuid.UUID) (model.Run, erro
 	return run, nil
 }
 
-func (td *postgresDB) GetTestRuns(ctx context.Context, test model.Test, take, skip int32) ([]model.Run, error) {
-	stmt, err := td.db.Prepare("SELECT run, test_id, test_version FROM runs WHERE test_id = $1 ORDER BY (run ->> 'CreatedAt')::timestamp DESC LIMIT $2 OFFSET $3")
+func (td *postgresDB) GetTestRuns(ctx context.Context, test model.Test, take, skip int32, query string) ([]model.Run, error) {
+
+	hasSearchQuery := query != ""
+	params := []any{test.ID, take, skip}
+
+	sql := `SELECT run, test_id, test_version FROM runs WHERE test_id = $1 `
+	if hasSearchQuery {
+		params = append(params, "%"+strings.ReplaceAll(query, " ", "%")+"%")
+		sql += ` AND (
+			(run ->> 'State') ilike $4
+		) `
+	}
+	sql += ` ORDER BY (run ->> 'CreatedAt')::timestamp DESC LIMIT $2 OFFSET $3`
+
+	stmt, err := td.db.Prepare(sql)
 	if err != nil {
 		return nil, err
 	}
 	defer stmt.Close()
 
-	rows, err := stmt.QueryContext(ctx, test.ID, take, skip)
+	rows, err := stmt.QueryContext(ctx, params...)
 	if err != nil {
 		return nil, err
 	}

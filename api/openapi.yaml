@@ -217,6 +217,12 @@ paths:
           schema:
             type: integer
             default: 0
+        - in: query
+          name: query
+          description: "indicates a keyword that will filter the results"
+          schema:
+            type: string
+            default: ''
       summary: "get the runs for a test"
       description: "get the runs from a particular test"
       operationId: getTestRuns

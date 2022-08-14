@@ -27,7 +27,7 @@ const TestCard = ({onClick, onDelete, onRunTest, test: {name, trigger, id: testI
       setIsCollapsed(true);
       return;
     }
-    await loadResultList({testId, take: 5});
+    await loadResultList({testId, take: 5, query: ''});
     setIsCollapsed(true);
   }, [loadResultList, resultList.length, testId]);
 

@@ -91,8 +91,8 @@ func (m *MockRepository) GetRun(_ context.Context, id uuid.UUID) (model.Run, err
 	return args.Get(0).(model.Run), args.Error(1)
 }
 
-func (m *MockRepository) GetTestRuns(_ context.Context, test model.Test, take int32, skip int32) ([]model.Run, error) {
-	args := m.Called(test, take, skip)
+func (m *MockRepository) GetTestRuns(_ context.Context, test model.Test, take int32, skip int32, query string) ([]model.Run, error) {
+	args := m.Called(test, take, skip, query)
 	return args.Get(0).([]model.Run), args.Error(1)
 }
 

@@ -20,7 +20,7 @@ describe('TestRunGateway', () => {
     expect.assertions(1);
     await TestRunResultGateway.get('testId');
 
-    expect(getRunList.initiate).toBeCalledWith({testId: 'testId', take: 25, skip: 0});
+    expect(getRunList.initiate).toBeCalledWith({testId: 'testId', take: 25, skip: 0, query: ''});
   });
 
   it('should execute the getById function', async () => {

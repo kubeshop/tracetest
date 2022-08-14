@@ -1,11 +1,11 @@
 import {Button, Typography} from 'antd';
-import {useCallback} from 'react';
 
 import {Steps} from 'components/GuidedTour/testDetailsStepList';
 import InfiniteScroll from 'components/InfiniteScroll';
 import ResultCardList from 'components/RunCardList';
 import SearchInput from 'components/SearchInput';
 import useInfiniteScroll from 'hooks/useInfiniteScroll';
+import {useCallback, useState} from 'react';
 import {useGetRunListQuery, useRunTestMutation} from 'redux/apis/TraceTest.api';
 import TestAnalyticsService from 'services/Analytics/TestAnalytics.service';
 import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
@@ -21,13 +21,15 @@ interface IProps {
 
 const TestDetails = ({onSelectResult, testId}: IProps) => {
   const [runTest, result] = useRunTestMutation();
+  const [query, setQuery] = useState<string>('');
   const {
     list: resultList,
     hasMore,
     loadMore,
     isLoading,
-  } = useInfiniteScroll<TTestRun, {testId: string}>(useGetRunListQuery, {
+  } = useInfiniteScroll<TTestRun, {testId: string; query: string}>(useGetRunListQuery, {
     testId,
+    query,
   });
 
   const handleRunTest = useCallback(async () => {
@@ -41,7 +43,7 @@ const TestDetails = ({onSelectResult, testId}: IProps) => {
   return (
     <>
       <S.TestDetailsHeader>
-        <SearchInput onSearch={() => console.log('onSearch')} placeholder="Search test result (Not implemented yet)" />
+        <SearchInput onSearch={q => setQuery(q)} placeholder="Search test result" />
         <Button
           onClick={handleRunTest}
           loading={result.isLoading}

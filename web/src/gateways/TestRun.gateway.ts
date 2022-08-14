@@ -4,8 +4,8 @@ import {TRawTestDefinition} from 'types/TestDefinition.types';
 const {getRunList, getRunById, reRun, dryRun, runTest} = endpoints;
 
 const TestRunGateway = () => ({
-  get(testId: string, take = 25, skip = 0) {
-    return getRunList.initiate({testId, take, skip});
+  get(testId: string, take = 25, skip = 0, query = '') {
+    return getRunList.initiate({testId, take, skip, query});
   },
   getById(testId: string, runId: string) {
     return getRunById.initiate({testId, runId});

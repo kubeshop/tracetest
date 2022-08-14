@@ -200,7 +200,7 @@ func (c *controller) DeleteTestRun(ctx context.Context, _ string, runID string) 
 	return openapi.Response(204, nil), nil
 }
 
-func (c *controller) GetTestRuns(ctx context.Context, testID string, take, skip int32) (openapi.ImplResponse, error) {
+func (c *controller) GetTestRuns(ctx context.Context, testID string, take, skip int32, query string) (openapi.ImplResponse, error) {
 	analytics.SendEvent("Test Runs List", "test")
 	if take == 0 {
 		take = 20
@@ -216,7 +216,7 @@ func (c *controller) GetTestRuns(ctx context.Context, testID string, take, skip 
 		return handleDBError(err), err
 	}
 
-	runs, err := c.testDB.GetTestRuns(ctx, test, take, skip)
+	runs, err := c.testDB.GetTestRuns(ctx, test, take, skip, query)
 	if err != nil {
 		return handleDBError(err), err
 	}

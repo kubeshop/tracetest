@@ -406,7 +406,8 @@ func (c *ApiApiController) GetTestRuns(w http.ResponseWriter, r *http.Request) {
 		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
 		return
 	}
-	result, err := c.service.GetTestRuns(r.Context(), testIdParam, takeParam, skipParam)
+	get := query.Get("query")
+	result, err := c.service.GetTestRuns(r.Context(), testIdParam, takeParam, skipParam, get)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

@@ -86,7 +86,7 @@ func TestUpdateRun(t *testing.T) {
 	actual, err := db.GetRun(context.TODO(), run.ID)
 	require.NoError(t, err)
 
-	updatedList, err := db.GetTestRuns(context.TODO(), test, 20, 0)
+	updatedList, err := db.GetTestRuns(context.TODO(), test, 20, 0, "")
 	require.NoError(t, err)
 
 	// Ignore time fields in this test
