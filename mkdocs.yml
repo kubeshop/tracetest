@@ -9,13 +9,8 @@ edit_uri: blob/main/docs/
 theme:
   name: material
   locale: en
-  #logo: img/logo.png
-  #favicon: img/favicon.ico
   features:
     - navigation.expand
-
-extra_css:
-  - css/extra.css
 
 nav:
   - Welcome: index.md
@@ -64,12 +59,6 @@ markdown_extensions:
   - pymdownx.highlight
   - pymdownx.inlinehilite
   - tables
-  # - pymdownx.superfences:
-  #     # make exceptions to highlighting of code:
-  #     custom_fences:
-  #       - name: mermaid
-  #         class: mermaid
-  #         format: !!python/name:mermaid2.fence_mermaid
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
@@ -78,6 +67,7 @@ markdown_extensions:
 
 extra_css:
   - https://unpkg.com/mermaid@9.1.3/dist/mermaid.css
+  - css/extra.css
 extra_javascript:
   - https://unpkg.com/mermaid@9.1.3/dist/mermaid.min.js
 
