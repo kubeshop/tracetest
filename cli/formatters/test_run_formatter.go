@@ -26,7 +26,8 @@ func FormatTestRunOutput(test openapi.Test, run openapi.TestRun) string {
 }
 
 func formatSuccessfulTest(test openapi.Test) string {
-	return fmt.Sprintf("%s %s\n", PASSED_TEST_ICON, *test.Name)
+	message := fmt.Sprintf("%s %s\n", PASSED_TEST_ICON, *test.Name)
+	return getColoredText(true, message)
 }
 
 type spanAssertionResult struct {
@@ -43,11 +44,12 @@ type assertionResult struct {
 func formatFailedTest(test openapi.Test, run openapi.TestRun) string {
 	var buffer bytes.Buffer
 
-	buffer.WriteString(fmt.Sprintf("%s %s\n", FAILED_TEST_ICON, *test.Name))
+	message := fmt.Sprintf("%s %s\n", FAILED_TEST_ICON, *test.Name)
+	message = getColoredText(false, message)
+	buffer.WriteString(message)
 	for _, specResult := range run.Result.Results {
-		buffer.WriteString(fmt.Sprintf("\t%s\n", *specResult.Selector.Query))
-
 		results := make(map[string]spanAssertionResult, 0)
+		allPassed := true
 
 		for _, result := range specResult.Results {
 			assertionQuery := fmt.Sprintf(
@@ -76,11 +78,17 @@ func formatFailedTest(test openapi.Test, run openapi.TestRun) string {
 
 				if !spanAssertionPassed {
 					spanResults.allPassed = false
+					allPassed = false
 				}
 
 				results[*spanResult.SpanId] = spanResults
 			}
 		}
+
+		icon := getStateIcon(allPassed)
+		message := fmt.Sprintf("\t%s %s\n", icon, *specResult.Selector.Query)
+		message = getColoredText(allPassed, message)
+		buffer.WriteString(message)
 
 		for spanId, spanResult := range results {
 			icon := getStateIcon(spanResult.allPassed)

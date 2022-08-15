@@ -22,6 +22,7 @@ func TestSuccessfulTestOutput(t *testing.T) {
 	}
 
 	run := openapi.TestRun{
+		State: strp("FINISHED"),
 		Result: &openapi.AssertionResults{
 			AllPassed: boolp(true),
 		},
