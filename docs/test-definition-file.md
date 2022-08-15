@@ -140,17 +140,18 @@ Sometimes we want to randomize our test data. Maybe because we want to try new v
 To use a generator function, you have to wrap it in doulbe curly brackets: `{{ uuid() }}`.
 
 Available functions:
-| Function | Description |
-|----------|-------------|
-| `uuid()` | generates a random v4 uuid |
-| `firstName()` | generates a random english first name |
-| `lastName()` | generates a random english last name |
-| `fullName()` | generates a random english first and last name |
-| `email()` | generates a random email address |
-| `phone()` | generates a random phone number |
-| `creditCard()` | generates a random credit card number (from 12 to 19 digits) |
-| `creditCardCvv()` | generates a random credit card cvv (3 digits)  |
-| `creditCardExpDate()` | generates a random credit card expiration date (mm/yy) |
+
+| Function              | Description |
+| :-------------------- | ------------------------------------------------------------------------------------- |
+| `uuid()`              | generates a random v4 uuid                                                            |
+| `firstName()`         | generates a random english first name                                                 |
+| `lastName()`          | generates a random english last name                                                  |
+| `fullName()`          | generates a random english first and last name                                        |
+| `email()`             | generates a random email address                                                      |
+| `phone()`             | generates a random phone number                                                       |
+| `creditCard()`        | generates a random credit card number (from 12 to 19 digits)                          |
+| `creditCardCvv()`     | generates a random credit card cvv (3 digits)                                         |
+| `creditCardExpDate()` | generates a random credit card expiration date (mm/yy)                                |
 | `randomInt(min, max)` | generates a random integer contained in the closed interval defined by [`min`, `max`] |
 
 

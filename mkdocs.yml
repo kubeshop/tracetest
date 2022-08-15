@@ -9,28 +9,23 @@ edit_uri: blob/main/docs/
 theme:
   name: material
   locale: en
-  #logo: img/logo.png
-  #favicon: img/favicon.ico
   features:
     - navigation.expand
 
-extra_css:
-  - css/extra.css
-
 nav:
   - Welcome: index.md
-  - Concepts: 
+  - Concepts:
     - Introduction to Trace-Based Testing: introduction.md
     - Architecture: architecture.md
     - Specifying Selectors: advanced-selectors.md
-  - Getting Started: 
+  - Getting Started:
     - Installation: installing.md
     - Accessing Tracetest Dashboard: accessing-dashboard.md
   - Using Tracetest:
     - Creating Tests: create-test.md
     - Adding Assertions: adding-assertions.md
     - Versioning: versioning.md
-  - Command Line Interface: 
+  - Command Line Interface:
     - Command Line Tool: command-line-tool.md
     - Test Definition File: test-definition-file.md
   - Automating Tests for CI/CD:
@@ -40,7 +35,7 @@ nav:
       - Overview: pokeshop.md
       - Add Pokemon Endpoint: pokeshop/add-pokemon.md
       - Import Pokemon Endpoint: pokeshop/import-pokemon.md
-      - List Pokemon Endpoints: pokeshop/list-pokemon.md  
+      - List Pokemon Endpoints: pokeshop/list-pokemon.md
 
 extra:
   analytics:
@@ -63,12 +58,7 @@ plugins:
 markdown_extensions:
   - pymdownx.highlight
   - pymdownx.inlinehilite
-  # - pymdownx.superfences:
-  #     # make exceptions to highlighting of code:
-  #     custom_fences:
-  #       - name: mermaid
-  #         class: mermaid
-  #         format: !!python/name:mermaid2.fence_mermaid
+  - tables
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
@@ -77,6 +67,7 @@ markdown_extensions:
 
 extra_css:
   - https://unpkg.com/mermaid@9.1.3/dist/mermaid.css
+  - css/extra.css
 extra_javascript:
   - https://unpkg.com/mermaid@9.1.3/dist/mermaid.min.js
 
