@@ -46,7 +46,6 @@ Check out the following blog posts & videos with Tracetest-related content:
 
 - [Introducing Tracetest - Trace-based Testing with OpenTelemetry](https://kubeshop.io/blog/introducing-tracetest-trace-based-testing-with-opentelemetry) - April 26, 2022
 
-And please watch our recorded live streams: 
 
 
 
