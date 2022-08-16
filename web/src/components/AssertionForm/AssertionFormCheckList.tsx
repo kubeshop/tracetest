@@ -2,10 +2,15 @@ import {FormInstance, Select} from 'antd';
 import {FormListFieldData} from 'antd/lib/form/FormList';
 import {uniqBy} from 'lodash';
 import {useMemo} from 'react';
+import AttributesTags from '../../constants/AttributesTags.json';
 import {TAssertion} from '../../types/Assertion.types';
 import {TSpanFlatAttribute} from '../../types/Span.types';
 import {IValues} from './AssertionForm';
 import {AssertionFormCheck} from './AssertionFormCheck';
+import {
+  OtelReference,
+  useGetOTELSemanticConvertionAttributesInfo,
+} from './hooks/useGetOTELSemanticConvertionAttributesInfo';
 
 interface IProps {
   form: FormInstance<IValues>;
@@ -20,15 +25,20 @@ interface IProps {
 }
 
 const AssertionFormCheckList: React.FC<IProps> = ({form, fields, add, remove, attributeList, assertionList}) => {
-  const attributeOptionList = useMemo(
-    () =>
-      uniqBy(attributeList, 'key').map(({key}) => (
-        <Select.Option key={key} value={key}>
-          {key}
-        </Select.Option>
-      )),
-    [attributeList]
-  );
+  const reference = useGetOTELSemanticConvertionAttributesInfo();
+  const attributeOptionList = useMemo(() => {
+    return uniqBy(attributeList, 'key').map(({key}) => (
+      <Select.Option key={key} value={key}>
+        {`${key} ${
+          reference[key] || (AttributesTags as OtelReference)[key]
+            ? reference[key]
+              ? ` - ${reference[key].description}`
+              : ` - ${(AttributesTags as OtelReference)[key].description}`
+            : ''
+        }`}
+      </Select.Option>
+    ));
+  }, [attributeList, reference]);
 
   return (
     <>
@@ -36,6 +46,7 @@ const AssertionFormCheckList: React.FC<IProps> = ({form, fields, add, remove, at
         return (
           <AssertionFormCheck
             key={key}
+            reference={reference}
             form={form}
             add={add}
             remove={remove}
