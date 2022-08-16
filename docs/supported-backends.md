@@ -1,6 +1,6 @@
 # Supported Backends
 
-Currently, Tracetest supports the following backend datastores:
+Currently, Tracetest supports the following backend data stores:
 
 - Jaeger
 - Grafana Tempo
