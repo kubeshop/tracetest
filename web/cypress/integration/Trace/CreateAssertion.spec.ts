@@ -148,7 +148,7 @@ describe('Create Assertion', () => {
   });
   it('should publish the changes', () => {
     createAssertion();
-    cy.get('[data-cy=trace-actions-publish').click();
+    cy.get('[data-cy=trace-actions-publish').click({force: true});
     cy.get('[data-cy=assertion-card]', {timeout: 10000}).should('have.lengthOf', 1);
   });
 
