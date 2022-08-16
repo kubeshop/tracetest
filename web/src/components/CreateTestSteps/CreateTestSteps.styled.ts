@@ -74,7 +74,7 @@ export const Step = styled.div`
 
 export const Footer = styled.div`
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: 8px;
 `;
 
