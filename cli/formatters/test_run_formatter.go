@@ -14,7 +14,7 @@ const (
 )
 
 func FormatTestRunOutput(test openapi.Test, run openapi.TestRun) string {
-	if *run.State == "FAILED" {
+	if run.State != nil && *run.State == "FAILED" {
 		return color.RedString(fmt.Sprintf("Failed to execute test: %s", *run.LastErrorState))
 	}
 

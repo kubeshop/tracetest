@@ -110,10 +110,10 @@ func TestFailingTestOutput(t *testing.T) {
 
 	output := formatters.FormatTestRunOutput(test, run)
 	expectedOutput := `✘ Testcase 2
-	span[name = "my span"]
+	✔ span[name = "my span"]
 		✔ #123456
 			✔ tracetest.span.duration <= 200ms (157ms)
-	span[name = "my other span"]
+	✘ span[name = "my other span"]
 		✘ #456789
 			✔ tracetest.span.duration <= 200ms (68ms)
 			✘ http.status = 200 (404)
