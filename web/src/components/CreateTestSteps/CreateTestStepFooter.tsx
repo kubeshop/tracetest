@@ -14,13 +14,13 @@ const CreateStepFooter = ({isValid, onNext}: IProps) => {
   const navigateFunction = useNavigate();
   return (
     <S.Footer>
-      {stepNumber > 0 ? (
-        <Button data-cy="create-test-prev-button" type="primary" ghost onClick={onPrev}>
-          Previous
-        </Button>
-      ) : (
-        <div />
-      )}
+      <span>
+        {stepNumber > 0 && (
+          <Button data-cy="create-test-prev-button" type="primary" ghost onClick={onPrev}>
+            Previous
+          </Button>
+        )}
+      </span>
       <span>
         <Button
           style={{marginRight: 16}}

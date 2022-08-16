@@ -11,7 +11,7 @@ describe('Create test', () => {
     cy.visit('http://localhost:3000/');
   });
 
-  it.only('should cancel a create test flow', () => {
+  it('should cancel a create test flow', () => {
     (async () => {
       const $form = navigateToTestCreationPage();
       $form.get('[data-cy=create-test-cancel]').click();
