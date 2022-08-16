@@ -44,6 +44,6 @@ Check out the following blog-posts with Tracetest-related content:
 
 And please watch our recorded live streams: 
 
-- [Tracetest v0.6 Release - gRPC, Postman and More](https://youtu.be/mqwJRxqBNCg) - June 27, 2022
+- [Tracetest v0.6 Release - gRPC, Postman and More](https://www.youtube.com/watch?v=xpEKHK5VXB0) - July 27, 2022
 
 - [Introduction to Tracetest - E2E Tests Powered by OpenTelemetry](https://youtu.be/mqwJRxqBNCg) - June 23, 2022
