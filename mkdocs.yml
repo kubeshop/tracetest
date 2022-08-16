@@ -19,6 +19,7 @@ nav:
     - Architecture: architecture.md
     - Specifying Selectors: advanced-selectors.md
   - Getting Started:
+    - Supported Backends: supported-backends.md
     - Installation: installing.md
     - Accessing Tracetest Dashboard: accessing-dashboard.md
   - Using Tracetest:
