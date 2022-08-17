@@ -12,8 +12,9 @@ import (
 var ErrTraceNotFound = errors.New("trace not found")
 
 const (
-	JAEGER_BACKEND string = "jaeger"
-	TEMPO_BACKEND  string = "tempo"
+	JAEGER_BACKEND     string = "jaeger"
+	TEMPO_BACKEND      string = "tempo"
+	OPENSEARCH_BACKEND string = "opensearch"
 )
 
 type TraceDB interface {
@@ -36,6 +37,8 @@ func New(c config.Config) (db TraceDB, err error) {
 		db, err = newJaegerDB(&selectedDataStore.Jaeger)
 	case selectedDataStore.Type == TEMPO_BACKEND:
 		db, err = newTempoDB(&selectedDataStore.Tempo)
+	case selectedDataStore.Type == OPENSEARCH_BACKEND:
+		db, err = newOpenSearchDB(selectedDataStore.OpenSearch)
 	}
 
 	return
