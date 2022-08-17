@@ -3,8 +3,8 @@ package executor
 import (
 	"fmt"
 	"math"
-	"time"
 
+	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/traces"
@@ -13,6 +13,7 @@ import (
 )
 
 type DefaultPollerExecutor struct {
+	config            config.Config
 	updater           RunUpdater
 	traceDB           tracedb.TraceDB
 	maxTracePollRetry int
@@ -52,14 +53,17 @@ func (pe InstrumentedPollerExecutor) ExecuteRequest(request *PollingRequest) (bo
 }
 
 func NewPollerExecutor(
+	config config.Config,
 	tracer trace.Tracer,
 	updater RunUpdater,
 	traceDB tracedb.TraceDB,
-	retryDelay time.Duration,
-	maxWaitTimeForTrace time.Duration,
 ) PollerExecutor {
+	retryDelay := config.PoolingRetryDelay()
+	maxWaitTimeForTrace := config.MaxWaitTimeForTraceDuration()
+
 	maxTracePollRetry := int(math.Ceil(float64(maxWaitTimeForTrace) / float64(retryDelay)))
 	pollerExecutor := &DefaultPollerExecutor{
+		config:            config,
 		updater:           updater,
 		traceDB:           traceDB,
 		maxTracePollRetry: maxTracePollRetry,
@@ -114,7 +118,14 @@ func (pe DefaultPollerExecutor) donePollingTraces(job *PollingRequest, trace tra
 		return false
 	}
 
-	if len(trace.Flat) > 0 && len(trace.Flat) == len(job.run.Trace.Flat) {
+	minimalNumberOfSpans := 0
+	if pe.config.Server.Telemetry.ApplicationExporter != "" {
+		// The triggering span will be sent to the application data storage, so we need to
+		// expect at least 1 span in the trace.
+		minimalNumberOfSpans = 1
+	}
+
+	if len(trace.Flat) > minimalNumberOfSpans && len(trace.Flat) == len(job.run.Trace.Flat) {
 		return true
 	}
 
