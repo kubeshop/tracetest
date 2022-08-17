@@ -81,6 +81,24 @@ helm install tracetest kubeshop/tracetest \
   --set server.telemetry.dataStore="tempo"
 ```
 
+#### **Opensearch**
+
+The commands below will install the Tracetest application connecting to the Opensearchtracing backend on `opensearch:9200`:
+
+```sh
+# Install Kubeshop Helm repo and update it
+helm repo add kubeshop https://kubeshop.github.io/helm-charts
+helm repo update
+
+helm install tracetest kubeshop/tracetest \
+  --set telemetry.dataStores.opensearch.opensearch.addresses={"http://opensearch:9200"} \ # update this value to point to your opensearch install
+  --set telemetry.dataStores.opensearch.opensearch.index="traces" \ # update this value to use the index where your traces are being stored
+  --set telemetry.dataStores.opensearch.opensearch.username="admin" \ # update this value with your opensearch username
+  --set telemetry.dataStores.opensearch.opensearch.password="admin" \ # update this value with your opensearch password
+  --set server.telemetry.dataStore="opensearch"
+```
+
+
 ### **Have a different backend trace data store?**
 
 [Tell us](https://github.com/kubeshop/tracetest/issues/new?assignees=&labels=&template=feature_request.md&title=) which one you have and we will see if we can add support for it!
