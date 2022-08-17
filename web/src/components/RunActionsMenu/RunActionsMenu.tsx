@@ -3,7 +3,6 @@ import {useCallback} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import {useDeleteRunByIdMutation} from 'redux/apis/TraceTest.api';
 import TestAnalyticsService from 'services/Analytics/TestAnalytics.service';
-import {TTest} from 'types/Test.types';
 import {useFileViewerModal} from '../FileViewerModal/FileViewerModal.provider';
 import * as S from './RunActionsMenu.styled';
 
@@ -11,11 +10,10 @@ interface IProps {
   resultId: string;
   testId: string;
   testVersion: number;
-  test?: TTest;
   isRunView?: boolean;
 }
 
-const RunActionsMenu = ({resultId, testId, testVersion, test, isRunView = false}: IProps) => {
+const RunActionsMenu = ({resultId, testId, testVersion, isRunView = false}: IProps) => {
   const {loadJUnit, loadTestDefinitionYaml} = useFileViewerModal();
   const [deleteRunById] = useDeleteRunByIdMutation();
   const navigate = useNavigate();
@@ -41,7 +39,7 @@ const RunActionsMenu = ({resultId, testId, testVersion, test, isRunView = false}
             >
               Test Definition
             </Menu.Item>
-            {test && (
+            {testId && (
               <Menu.Item data-cy="test-edit-button" key="edit">
                 <Link to={`/test/${testId}/edit`}>Edit Test</Link>
               </Menu.Item>

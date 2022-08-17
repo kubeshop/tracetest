@@ -105,7 +105,9 @@ Cypress.Commands.add('makeSureUserIsOnTracePage', (shouldCancelOnboarding = true
 });
 
 Cypress.Commands.add('cancelOnBoarding', () => {
-  cy.get('[data-cy=no-thanks]', {timeout: 10000}).click();
+  if (cy.get('[data-cy=no-thanks]', {timeout: 10000})) {
+    cy.get('[data-cy=no-thanks]', {timeout: 10000}).click();
+  }
 });
 
 Cypress.Commands.add('submitCreateTestForm', () => {

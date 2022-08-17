@@ -25,10 +25,9 @@
       "jest",
       "cypress",
       "cypress-file-upload",
-      "@testing-library/jest-dom"
     ]
   },
   "include": [
-    "src"
+    "src",
   ]
 }

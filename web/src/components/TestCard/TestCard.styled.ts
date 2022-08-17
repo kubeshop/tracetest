@@ -1,4 +1,4 @@
-import {MoreOutlined} from '@ant-design/icons';
+import {SettingOutlined} from '@ant-design/icons';
 import {Button, Typography} from 'antd';
 import styled from 'styled-components';
 
@@ -43,10 +43,10 @@ export const NameText = styled(Typography.Title).attrs({ellipsis: true, level: 3
 
 export const Text = styled(Typography.Text)``;
 
-export const ActionButton = styled(MoreOutlined)`
-  color: ${({theme}) => theme.color.textSecondary};
+export const ActionButton = styled(SettingOutlined)`
+  color: ${({theme}) => theme.color.primary};
   cursor: pointer;
-  font-size: 24px;
+  font-size: ${({theme}) => theme.size.lg};
 `;
 
 export const TestDetails = styled.div`

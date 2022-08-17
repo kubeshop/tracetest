@@ -17,7 +17,8 @@ test('useCreateTestMutation', async () => {
     const newTest = await createTest({
       name: 'New test',
       serviceUnderTest: {
-        request: {url: 'https://google.com', method: HTTP_METHOD.GET},
+        triggerType: 'http',
+        triggerSettings: {http: {url: 'https://google.com', method: HTTP_METHOD.GET}},
       },
     }).unwrap();
     expect(newTest!.id).toBe(test.id);

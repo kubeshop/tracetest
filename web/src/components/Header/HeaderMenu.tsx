@@ -1,19 +1,19 @@
 import {useTour} from '@reactour/tour';
 import {Popover, Typography} from 'antd';
 import {useMemo} from 'react';
-import {useParams} from 'react-router-dom';
+import {useLocation, useParams} from 'react-router-dom';
 
 import {DOCUMENTATION_URL, GITHUB_URL} from 'constants/Common.constants';
 import {useGuidedTour} from 'providers/GuidedTour/GuidedTour.provider';
+import HomeAnalyticsService from 'services/Analytics/HomeAnalytics.service';
 import * as S from './Header.styled';
 import {ShowOnboardingContent} from './ShowOnboardingContent';
 
-interface IProps {
-  pathname: string;
-  onGuidedTourClick: () => void;
-}
+const {onGuidedTourClick} = HomeAnalyticsService;
 
-export const HeaderMenu = ({pathname, onGuidedTourClick}: IProps) => {
+export const HeaderMenu = () => {
+  const {pathname} = useLocation();
+  const params = useParams();
   const {setIsOpen} = useTour();
   const {setIsTriggerVisible, isTriggerVisible} = useGuidedTour();
 
@@ -24,43 +24,42 @@ export const HeaderMenu = ({pathname, onGuidedTourClick}: IProps) => {
         () => setIsOpen(true),
         () => setIsTriggerVisible(false)
       ),
-    [onGuidedTourClick, setIsOpen, setIsTriggerVisible]
+    [setIsOpen, setIsTriggerVisible]
   );
 
-  const params = useParams();
   return (
     <Popover
-      visible={isTriggerVisible}
+      arrowContent={null}
       content={content}
       title={() => <Typography.Title level={2}>Take a quick tour of Tracetest?</Typography.Title>}
-      arrowContent={null}
+      visible={isTriggerVisible}
     >
       <S.NavMenu
         selectedKeys={[pathname]}
         items={[
           {
-            key: 'github',
-            label: (
-              <a href={GITHUB_URL} target="_blank" data-cy="github-link">
-                GitHub
-              </a>
-            ),
-          },
-          {
-            key: 'docs',
-            label: (
-              <a href={DOCUMENTATION_URL} target="_blank" data-cy="documentation-link">
-                Documentation
-              </a>
-            ),
-          },
-          {
             key: 'SubMenu',
-            label: <S.QuestionIcon $disabled={!params.runId} data-cy="onboarding-link" />,
-            disabled: !params.runId,
+            label: <S.QuestionIcon data-cy="menu-link" />,
             children: [
               {
+                key: 'github',
+                label: (
+                  <a data-cy="github-link" href={GITHUB_URL} target="_blank">
+                    GitHub
+                  </a>
+                ),
+              },
+              {
+                key: 'docs',
+                label: (
+                  <a data-cy="documentation-link" href={DOCUMENTATION_URL} target="_blank">
+                    Documentation
+                  </a>
+                ),
+              },
+              {
                 key: 'Onboarding',
+                disabled: !params.runId,
                 label: (
                   <a key="guidedTour" onClick={() => setIsTriggerVisible(!isTriggerVisible)}>
                     Show Onboarding

@@ -45,7 +45,7 @@ const Info = ({date, executionTime, totalSpans, traceId}: IProps) => {
       }}
     >
       <Button
-        icon={<InfoCircleOutlined style={{color: theme.color.textSecondary}} />}
+        icon={<InfoCircleOutlined style={{color: theme.color.primary}} />}
         shape="circle"
         size="small"
         type="text"
