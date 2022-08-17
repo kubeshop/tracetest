@@ -53,7 +53,6 @@ export const AssertionFormCheck = ({
         style={{margin: 0}}
         rules={[{required: true, message: 'Attribute is required'}]}
         data-cy="assertion-check-attribute"
-        id="assertion-check-attribute"
       >
         <S.Select style={{margin: 0}} placeholder="Attribute" showSearch>
           {attributeOptionList}

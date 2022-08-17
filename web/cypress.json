@@ -5,5 +5,7 @@
   "viewportHeight": 1080,
   "responseTimeout": 30000,
   "pageLoadTimeout": 20000,
-  "projectId": "6dm1if"
+  "projectId": "6dm1if",
+  "requestTimeout": 30000,
+  "baseUrl": "http://localhost:3000"
 }

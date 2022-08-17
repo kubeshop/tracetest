@@ -1,4 +1,3 @@
-import {PseudoSelector} from '../../constants/Operator.constants';
 import SpanMock from '../../models/__mocks__/Span.mock';
 import SpanService from '../Span.service';
 
