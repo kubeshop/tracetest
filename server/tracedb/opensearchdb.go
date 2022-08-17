@@ -6,11 +6,13 @@ import (
 	"fmt"
 	"io/ioutil"
 	"strings"
+	"time"
 
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/opensearch-project/opensearch-go"
 	"github.com/opensearch-project/opensearch-go/opensearchapi"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type opensearchDb struct {
@@ -49,11 +51,11 @@ func (db opensearchDb) GetTraceByID(ctx context.Context, traceID string) (traces
 		return traces.Trace{}, fmt.Errorf("could not unmarshal search response into struct: %w", err)
 	}
 
-	if len(searchResponse.Hits.Hits) == 0 {
+	if len(searchResponse.Hits.Results) == 0 {
 		return traces.Trace{}, ErrTraceNotFound
 	}
 
-	return traces.Trace{}, nil
+	return convertOpensearchFormatIntoTrace(traceID, searchResponse), nil
 }
 
 func newOpenSearchDB(cfg config.OpensearchDataStoreConfig) (TraceDB, error) {
@@ -72,12 +74,59 @@ func newOpenSearchDB(cfg config.OpensearchDataStoreConfig) (TraceDB, error) {
 	}, nil
 }
 
+func convertOpensearchFormatIntoTrace(traceID string, searchResponse searchResponse) traces.Trace {
+	spans := make([]traces.Span, 0)
+	for _, result := range searchResponse.Hits.Results {
+		span := convertOpensearchSpanIntoSpan(result.Source)
+		spans = append(spans, span)
+	}
+
+	return traces.NewTrace(traceID, spans...)
+}
+
+func convertOpensearchSpanIntoSpan(input map[string]interface{}) traces.Span {
+	spanId, _ := trace.SpanIDFromHex(input["spanId"].(string))
+
+	startTime, _ := time.Parse(time.RFC3339, input["startTime"].(string))
+	endTime, _ := time.Parse(time.RFC3339, input["endTime"].(string))
+
+	attributes := make(traces.Attributes, 0)
+
+	for attrName, attrValue := range input {
+		if !strings.HasPrefix(attrName, "span.attributes.") && !strings.HasPrefix(attrName, "resource.attributes.") {
+			// Not an attribute we care about
+			continue
+		}
+
+		name := attrName
+		name = strings.ReplaceAll(name, "span.attributes.", "")
+		name = strings.ReplaceAll(name, "resource.attributes.", "")
+		// Opensearch's data-prepper replaces "_" with "@". We have to revert it. Example:
+		// "service_name" becomes "service@name"
+		name = strings.ReplaceAll(name, "@", "_")
+		attributes[name] = fmt.Sprintf("%v", attrValue)
+	}
+
+	attributes["kind"] = input["kind"].(string)
+	attributes["parent_id"] = input["parentSpanId"].(string)
+
+	return traces.Span{
+		ID:         spanId,
+		Name:       input["name"].(string),
+		StartTime:  startTime,
+		EndTime:    endTime,
+		Attributes: attributes,
+		Parent:     nil,
+		Children:   []*traces.Span{},
+	}
+}
+
 type searchResponse struct {
 	Hits searchHits `json:"hits"`
 }
 
 type searchHits struct {
-	Hits []searchResult `json:"hits"`
+	Results []searchResult `json:"hits"`
 }
 
 type searchResult struct {

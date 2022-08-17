@@ -16,6 +16,50 @@ type Trace struct {
 	Flat     map[trace.SpanID]*Span `json:"-"`
 }
 
+func NewTrace(traceID string, spans ...Span) Trace {
+	spanMap := make(map[string]*Span, 0)
+	for _, span := range spans {
+		spanCopy := span
+		spanID := span.ID.String()
+		augmentSpanData(&spanCopy)
+		spanMap[spanID] = &spanCopy
+	}
+
+	var rootSpan *Span = nil
+	for _, span := range spanMap {
+		parentID := span.Attributes["parent_id"]
+		if parentID == "" {
+			rootSpan = span
+			continue
+		}
+
+		parentSpan := spanMap[parentID]
+		parentSpan.Children = append(parentSpan.Children, span)
+		span.Parent = parentSpan
+	}
+
+	id, _ := trace.TraceIDFromHex(traceID)
+	trace := Trace{
+		ID:       id,
+		RootSpan: *rootSpan,
+	}
+
+	trace = trace.Sort()
+
+	return trace
+}
+
+func augmentSpanData(span *Span) {
+	span.Attributes["name"] = span.Name
+	span.Attributes["tracetest.span.type"] = spanType(span.Attributes)
+	span.Attributes["tracetest.span.duration"] = getSpanDuration(*span)
+}
+
+func getSpanDuration(span Span) string {
+	timeDifference := span.EndTime.Sub(span.StartTime)
+	return fmt.Sprintf("%d", int64(timeDifference))
+}
+
 func (t *Trace) Sort() Trace {
 	sortedRoot := sortSpanChildren(t.RootSpan)
 

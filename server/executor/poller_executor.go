@@ -114,8 +114,7 @@ func (pe DefaultPollerExecutor) donePollingTraces(job *PollingRequest, trace tra
 		return false
 	}
 
-	// We always expect to get the tracetest trigger span, so it has to have more than 1 span
-	if len(trace.Flat) > 1 && len(trace.Flat) == len(job.run.Trace.Flat) {
+	if len(trace.Flat) > 0 && len(trace.Flat) == len(job.run.Trace.Flat) {
 		return true
 	}
 
