@@ -119,7 +119,8 @@ func (pe DefaultPollerExecutor) donePollingTraces(job *PollingRequest, trace tra
 	}
 
 	minimalNumberOfSpans := 0
-	if pe.config.Server.Telemetry.ApplicationExporter != "" {
+	applicationExporter, _ := pe.config.ApplicationExporter()
+	if applicationExporter != nil {
 		// The triggering span will be sent to the application data storage, so we need to
 		// expect at least 1 span in the trace.
 		minimalNumberOfSpans = 1
