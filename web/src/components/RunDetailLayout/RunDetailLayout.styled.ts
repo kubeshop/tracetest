@@ -63,7 +63,6 @@ export const Section = styled.div<{$justifyContent: string}>`
   display: flex;
   gap: 14px;
   justify-content: ${({$justifyContent}) => $justifyContent};
-  // width: 250px;
   width: calc((100vw / 2) - 150px);
 `;
 
@@ -93,7 +92,6 @@ export const Text = styled(Typography.Text).attrs({
 export const Title = styled(Typography.Title).attrs({ellipsis: true, level: 2})`
   && {
     margin: 0;
-    // max-width: calc(100% - 24px);
     max-width: calc((100vw / 2) - 150px - 54px);
   }
 `;

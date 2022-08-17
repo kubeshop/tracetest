@@ -153,7 +153,6 @@ describe('Create Assertion', () => {
   });
 
   it('should create an assertion and revert all changes', () => {
-    // cy.cancelOnBoarding();
     createAssertion();
     cy.get(`[data-cy=trace-node-database]`, {timeout: 20000}).last().click();
     cy.get('[data-cy=add-assertion-button]').click();

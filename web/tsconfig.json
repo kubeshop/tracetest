@@ -24,10 +24,10 @@
       "node",
       "jest",
       "cypress",
-      "cypress-file-upload",
+      "cypress-file-upload"
     ]
   },
   "include": [
-    "src",
+    "src"
   ]
 }

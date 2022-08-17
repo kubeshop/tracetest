@@ -3,7 +3,7 @@ import {ThemeProvider} from 'styled-components';
 
 import ErrorBoundary from 'components/ErrorBoundary';
 import GuidedTour from 'components/GuidedTour/GuidedTour';
-import Router from 'components/Router/Router';
+import Router from 'components/Router';
 import {theme} from 'constants/Theme.constants';
 import {ReduxWrapperProvider} from 'redux/ReduxWrapperProvider';
 import './App.less';
