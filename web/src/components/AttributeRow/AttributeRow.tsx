@@ -5,7 +5,6 @@ import {TSpanFlatAttribute} from 'types/Span.types';
 import GuidedTourService, {GuidedTours} from '../../services/GuidedTour.service';
 import AttributeValue from '../AttributeValue';
 import {Steps} from '../GuidedTour/traceStepList';
-import Highlighted from '../Highlighted';
 import AttributeCheck from './AttributeCheck';
 import * as S from './AttributeRow.styled';
 
@@ -43,11 +42,7 @@ const AttributeRow = ({
 
   return (
     <S.AttributeRow onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
-      <S.TextContainer>
-        <S.Text type="secondary">
-          <Highlighted text={key} highlight={searchText} />
-        </S.Text>
-      </S.TextContainer>
+      <S.AttributeTitle title={key} searchText={searchText} />
 
       <S.AttributeValueRow>
         <AttributeValue value={value} searchText={searchText} />
