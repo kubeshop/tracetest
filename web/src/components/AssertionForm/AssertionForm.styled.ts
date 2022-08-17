@@ -33,7 +33,7 @@ export const PseudoSelector = styled.div`
 
 export const Check = styled.div`
   display: grid;
-  grid-template-columns: repeat(3, 210px) 1fr;
+  grid-template-columns: repeat(3, 280px) 1fr;
   gap: 4px;
   align-items: start;
   margin-bottom: 16px;

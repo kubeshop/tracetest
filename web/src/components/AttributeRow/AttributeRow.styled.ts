@@ -2,6 +2,8 @@ import {CopyOutlined, PlusOutlined} from '@ant-design/icons';
 import {Badge, Tooltip, Typography} from 'antd';
 import styled from 'styled-components';
 
+export {default as AttributeTitle} from './AttributeTitle';
+
 export const AttributeRow = styled.div`
   display: grid;
   grid-template-columns: 160px 1fr 60px;
