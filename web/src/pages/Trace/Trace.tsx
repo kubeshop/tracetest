@@ -13,21 +13,21 @@ const TracePage = () => {
   const {testId = '', runId = ''} = useParams();
 
   return (
-    <GuidedTourProvider>
-      <ReactFlowProvider>
-        <TestRunProvider testId={testId} runId={runId}>
-          <TestDefinitionProvider testId={testId} runId={runId}>
-            <AssertionFormProvider testId={testId}>
-              <SpanProvider>
-                <Layout>
+    <Layout>
+      <GuidedTourProvider>
+        <ReactFlowProvider>
+          <TestRunProvider testId={testId} runId={runId}>
+            <TestDefinitionProvider testId={testId} runId={runId}>
+              <AssertionFormProvider testId={testId}>
+                <SpanProvider>
                   <TraceContent />
-                </Layout>
-              </SpanProvider>
-            </AssertionFormProvider>
-          </TestDefinitionProvider>
-        </TestRunProvider>
-      </ReactFlowProvider>
-    </GuidedTourProvider>
+                </SpanProvider>
+              </AssertionFormProvider>
+            </TestDefinitionProvider>
+          </TestRunProvider>
+        </ReactFlowProvider>
+      </GuidedTourProvider>
+    </Layout>
   );
 };
 

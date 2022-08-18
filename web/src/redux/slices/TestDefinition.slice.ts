@@ -113,13 +113,13 @@ const testDefinitionSlice = createSlice<ITestDefinitionState, TTestDefinitionSli
         if (searchText) state.selectedAssertion = undefined;
       })
       .addMatcher(
-        action => action.type.startsWith('testDefinition') && action.type.endsWith('/pending'),
+        ({type}) => type.startsWith('testDefinition') && type.endsWith('/pending'),
         state => {
           state.isLoading = true;
         }
       )
       .addMatcher(
-        action => action.type.startsWith('testDefinition') && action.type.endsWith('/fulfilled'),
+        ({type}) => type.startsWith('testDefinition') && type.endsWith('/fulfilled'),
         state => {
           state.isLoading = false;
         }
