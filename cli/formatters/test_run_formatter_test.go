@@ -19,10 +19,12 @@ func boolp(in bool) *bool {
 
 func TestSuccessfulTestOutput(t *testing.T) {
 	test := openapi.Test{
+		Id:   strp("9876543"),
 		Name: strp("Testcase 1"),
 	}
 
 	run := openapi.TestRun{
+		Id:    strp("123456"),
 		State: strp("FINISHED"),
 		Result: &openapi.AssertionResults{
 			AllPassed: boolp(true),
@@ -35,15 +37,17 @@ func TestSuccessfulTestOutput(t *testing.T) {
 	})
 	output := formatter.FormatTestRunOutput(test, run)
 
-	assert.Equal(t, "✔ Testcase 1\n", output)
+	assert.Equal(t, "✔ Testcase 1 (http://localhost:8080/test/9876543/run/123456)\n", output)
 }
 
 func TestFailingTestOutput(t *testing.T) {
 	test := openapi.Test{
+		Id:   strp("9876543"),
 		Name: strp("Testcase 2"),
 	}
 
 	run := openapi.TestRun{
+		Id: strp("123456"),
 		Result: &openapi.AssertionResults{
 			AllPassed: boolp(false),
 			Results: []openapi.AssertionResultsResults{
@@ -118,7 +122,7 @@ func TestFailingTestOutput(t *testing.T) {
 		Endpoint: "localhost:8080",
 	})
 	output := formatter.FormatTestRunOutput(test, run)
-	expectedOutput := `✘ Testcase 2
+	expectedOutput := `✘ Testcase 2 (http://localhost:8080/test/9876543/run/123456)
 	✔ span[name = "my span"]
 		✔ #123456
 			✔ tracetest.span.duration <= 200ms (157ms)
