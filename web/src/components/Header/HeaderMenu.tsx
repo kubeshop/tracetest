@@ -15,16 +15,16 @@ export const HeaderMenu = () => {
   const {pathname} = useLocation();
   const params = useParams();
   const {setIsOpen} = useTour();
-  const {setIsTriggerVisible, isTriggerVisible} = useGuidedTour();
+  const {isTriggerVisible, onCloseTrigger, setIsTriggerVisible} = useGuidedTour();
 
   const content = useMemo(
     () =>
       ShowOnboardingContent(
         onGuidedTourClick,
         () => setIsOpen(true),
-        () => setIsTriggerVisible(false)
+        () => onCloseTrigger()
       ),
-    [setIsOpen, setIsTriggerVisible]
+    [onCloseTrigger, setIsOpen]
   );
 
   return (
