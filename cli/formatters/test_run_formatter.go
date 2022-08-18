@@ -111,28 +111,41 @@ func (f TestRunFormatter) formatFailedTest(test openapi.Test, run openapi.TestRu
 		message = f.getColoredText(allPassed, message)
 		buffer.WriteString(message)
 
+		if metaResult, exists := results["meta"]; exists {
+			// meta assertions should be placed at the top
+			// of the selector section. That's why we treat it as a special case
+			// and remove it from the results map afterwards.
+
+			f.generateSpanResult(&buffer, "meta", metaResult)
+			delete(results, "meta")
+		}
+
 		for spanId, spanResult := range results {
-			icon := f.getStateIcon(spanResult.allPassed)
-			message := fmt.Sprintf("\t\t%s #%s\n", icon, spanId)
-			message = f.getColoredText(spanResult.allPassed, message)
-			buffer.WriteString(message)
-
-			for _, assertionResult := range spanResult.results {
-				icon := f.getStateIcon(assertionResult.passed)
-				var message string
-				if assertionResult.observedValue != nil {
-					message = fmt.Sprintf("\t\t\t%s %s (%s)\n", icon, assertionResult.assertion, *assertionResult.observedValue)
-				} else {
-					message = fmt.Sprintf("\t\t\t%s %s\n", icon, assertionResult.assertion)
-				}
-				message = f.getColoredText(assertionResult.passed, message)
-
-				buffer.WriteString(message)
-			}
+			f.generateSpanResult(&buffer, spanId, spanResult)
 		}
 	}
 
 	return buffer.String()
+}
+
+func (f TestRunFormatter) generateSpanResult(buffer *bytes.Buffer, spanId string, spanResult spanAssertionResult) {
+	icon := f.getStateIcon(spanResult.allPassed)
+	message := fmt.Sprintf("\t\t%s #%s\n", icon, spanId)
+	message = f.getColoredText(spanResult.allPassed, message)
+	buffer.WriteString(message)
+
+	for _, assertionResult := range spanResult.results {
+		icon := f.getStateIcon(assertionResult.passed)
+		var message string
+		if assertionResult.observedValue != nil {
+			message = fmt.Sprintf("\t\t\t%s %s (%s)\n", icon, assertionResult.assertion, *assertionResult.observedValue)
+		} else {
+			message = fmt.Sprintf("\t\t\t%s %s\n", icon, assertionResult.assertion)
+		}
+		message = f.getColoredText(assertionResult.passed, message)
+
+		buffer.WriteString(message)
+	}
 }
 
 func (f TestRunFormatter) getStateIcon(passed bool) string {
