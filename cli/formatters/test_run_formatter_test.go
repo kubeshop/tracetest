@@ -3,6 +3,7 @@ package formatters_test
 import (
 	"testing"
 
+	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/stretchr/testify/assert"
@@ -28,7 +29,11 @@ func TestSuccessfulTestOutput(t *testing.T) {
 		},
 	}
 
-	output := formatters.FormatTestRunOutput(test, run)
+	formatter := formatters.NewTestRunFormatter(config.Config{
+		Scheme:   "http",
+		Endpoint: "localhost:8080",
+	})
+	output := formatter.FormatTestRunOutput(test, run)
 
 	assert.Equal(t, "✔ Testcase 1\n", output)
 }
@@ -108,7 +113,11 @@ func TestFailingTestOutput(t *testing.T) {
 		},
 	}
 
-	output := formatters.FormatTestRunOutput(test, run)
+	formatter := formatters.NewTestRunFormatter(config.Config{
+		Scheme:   "http",
+		Endpoint: "localhost:8080",
+	})
+	output := formatter.FormatTestRunOutput(test, run)
 	expectedOutput := `✘ Testcase 2
 	✔ span[name = "my span"]
 		✔ #123456
