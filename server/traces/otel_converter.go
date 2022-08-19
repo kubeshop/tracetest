@@ -1,10 +1,9 @@
 package traces
 
 import (
+	"encoding/hex"
 	"fmt"
 	"math"
-	"strconv"
-	"strings"
 	"time"
 
 	"go.opentelemetry.io/otel/trace"
@@ -20,17 +19,15 @@ func FromOtel(input *v1.TracesData) Trace {
 		}
 	}
 
-	if len(flattenSpans) == 0 {
-		return Trace{}
-	}
-
-	spansMap := map[trace.SpanID]*Span{}
+	traceID := ""
+	spans := make([]Span, 0)
 	for _, span := range flattenSpans {
 		newSpan := convertOtelSpanIntoSpan(span)
-		spansMap[newSpan.ID] = newSpan
+		traceID = hex.EncodeToString(span.TraceId)
+		spans = append(spans, *newSpan)
 	}
 
-	return createTrace(flattenSpans, spansMap)
+	return New(traceID, spans)
 }
 
 func convertOtelSpanIntoSpan(span *v1.Span) *Span {
@@ -49,11 +46,6 @@ func convertOtelSpanIntoSpan(span *v1.Span) *Span {
 		endTime = time.Unix(0, int64(span.GetEndTimeUnixNano()))
 	}
 
-	attributes["name"] = span.Name
-	attributes["kind"] = span.Kind.String()
-	attributes["tracetest.span.type"] = spanType(attributes)
-	attributes["tracetest.span.duration"] = spanDurationFromOtel(span)
-
 	spanID := createSpanID(span.SpanId)
 	return &Span{
 		ID:         spanID,
@@ -64,37 +56,6 @@ func convertOtelSpanIntoSpan(span *v1.Span) *Span {
 		Children:   make([]*Span, 0),
 		Attributes: attributes,
 	}
-}
-
-func spanDurationFromOtel(span *v1.Span) string {
-	if span.GetStartTimeUnixNano() != 0 && span.GetEndTimeUnixNano() != 0 {
-		spanDuration := (span.GetEndTimeUnixNano() - span.GetStartTimeUnixNano())
-		return strconv.FormatUint(spanDuration, 10)
-	}
-
-	return "0"
-}
-
-func spanType(attrs Attributes) string {
-	// based on https://github.com/open-telemetry/opentelemetry-specification/tree/main/specification/trace/semantic_conventions
-	// using the first required attribute for each type
-	for key := range attrs {
-		switch true {
-		case strings.HasPrefix(key, "http."):
-			return "http"
-		case strings.HasPrefix(key, "db."):
-			return "database"
-		case strings.HasPrefix(key, "rpc."):
-			return "rpc"
-		case strings.HasPrefix(key, "messaging."):
-			return "messaging"
-		case strings.HasPrefix(key, "faas."):
-			return "faas"
-		case strings.HasPrefix(key, "exception."):
-			return "exception"
-		}
-	}
-	return "general"
 }
 
 func getAttributeValue(value *v11.AnyValue) string {
@@ -131,27 +92,4 @@ func createSpanID(id []byte) trace.SpanID {
 	copy(sid[:], id[:8])
 
 	return trace.SpanID(sid)
-}
-
-func createTrace(spans []*v1.Span, spansMap map[trace.SpanID]*Span) Trace {
-	rootSpanID := trace.SpanID{}
-	for _, span := range spans {
-		spanID := createSpanID(span.SpanId)
-		parentSpanID := createSpanID(span.ParentSpanId)
-		parentSpan, hasParent := spansMap[parentSpanID]
-		if !hasParent {
-			rootSpanID = spanID
-		} else {
-			thisSpan := spansMap[spanID]
-			thisSpan.Parent = parentSpan
-			parentSpan.Children = append(parentSpan.Children, thisSpan)
-		}
-	}
-
-	rootSpan := spansMap[rootSpanID]
-
-	return Trace{
-		RootSpan: *rootSpan,
-		Flat:     spansMap,
-	}
 }
