@@ -94,6 +94,7 @@ name: DEMO Pokemon - Import - Import a Pokemon
 description: "Import a pokemon"
 
 # Configure how tracetest triggers the operation on your application
+# triggers can be http, grpc, etc
 trigger:
     type: http
     httpRequest:
@@ -104,11 +105,17 @@ trigger:
               value: application/json
         body: '{"id":52}'
 
-# Setup what will be asserted on the resulting trace
+# Definition of the test specs which is a combination of a selector
+# and an assertion
 testDefinition:
+    # the selector defines which spans will be targeted by the assertions
     selector: span[tracetest.span.type = "http"]
+    # the assertions define the checks to be run. In this case, all
+    # http spans will be checked for a status code = 200
     - assertions:
         - http.status_code = 200
+    # this next test ensures all the database spans execute in less
+    # than 50 ms
     selector: span[tracetest.span.type = "database"]
     - assertions:
         - tracetest.span.duration < "50ms"
