@@ -81,7 +81,7 @@ func convertOpensearchFormatIntoTrace(traceID string, searchResponse searchRespo
 		spans = append(spans, span)
 	}
 
-	return traces.NewTrace(traceID, spans...)
+	return traces.New(traceID, spans)
 }
 
 func convertOpensearchSpanIntoSpan(input map[string]interface{}) traces.Span {

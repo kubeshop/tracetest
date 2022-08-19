@@ -16,7 +16,7 @@ type Trace struct {
 	Flat     map[trace.SpanID]*Span `json:"-"`
 }
 
-func NewTrace(traceID string, spans ...Span) Trace {
+func New(traceID string, spans []Span) Trace {
 	spanMap := make(map[string]*Span, 0)
 	for _, span := range spans {
 		spanCopy := span
