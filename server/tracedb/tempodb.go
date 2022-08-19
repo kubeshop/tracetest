@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	tempopb "github.com/kubeshop/tracetest/server/internal/proto-gen-go/tempo-idl"
+	"github.com/kubeshop/tracetest/server/traces"
 	"go.opentelemetry.io/collector/component/componenttest"
 	"go.opentelemetry.io/collector/config/configgrpc"
 	"go.opentelemetry.io/otel/trace"
@@ -28,16 +29,17 @@ func newTempoDB(config *configgrpc.GRPCClientSettings) (TraceDB, error) {
 	if err != nil {
 		return nil, fmt.Errorf("tempodb grpc dial: %w", err)
 	}
+
 	return &tempoTraceDB{
 		conn:  conn,
 		query: tempopb.NewQuerierClient(conn),
 	}, nil
 }
 
-func (ttd *tempoTraceDB) GetTraceByID(ctx context.Context, traceID string) (*v1.TracesData, error) {
+func (ttd *tempoTraceDB) GetTraceByID(ctx context.Context, traceID string) (traces.Trace, error) {
 	trID, err := trace.TraceIDFromHex(traceID)
 	if err != nil {
-		return nil, err
+		return traces.Trace{}, err
 	}
 	resp, err := ttd.query.FindTraceByID(ctx, &tempopb.TraceByIDRequest{
 		TraceID: []byte(trID[:]),
@@ -45,21 +47,24 @@ func (ttd *tempoTraceDB) GetTraceByID(ctx context.Context, traceID string) (*v1.
 	if err != nil {
 		st, ok := status.FromError(err)
 		if !ok {
-			return nil, fmt.Errorf("tempo FindTraceByID %w", err)
+			return traces.Trace{}, fmt.Errorf("tempo FindTraceByID %w", err)
 		}
 		if st.Message() == "trace not found" {
-			return nil, ErrTraceNotFound
+			return traces.Trace{}, ErrTraceNotFound
 		}
-		return nil, fmt.Errorf("tempo err: %w", err)
+		return traces.Trace{}, fmt.Errorf("tempo err: %w", err)
 	}
 
 	fmt.Printf("tempo resp: %#v\n", resp.Trace.Batches)
 	if len(resp.Trace.Batches) == 0 {
-		return nil, ErrTraceNotFound
+		return traces.Trace{}, ErrTraceNotFound
 	}
-	return &v1.TracesData{
+
+	trace := &v1.TracesData{
 		ResourceSpans: resp.GetTrace().GetBatches(),
-	}, nil
+	}
+
+	return traces.FromOtel(trace), nil
 }
 
 func (ttd *tempoTraceDB) Close() error {

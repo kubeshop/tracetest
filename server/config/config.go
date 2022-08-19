@@ -46,9 +46,10 @@ type (
 	}
 
 	TracingBackendDataStoreConfig struct {
-		Type   string                        `mapstructure:"type"`
-		Jaeger configgrpc.GRPCClientSettings `mapstructure:"jaeger"`
-		Tempo  configgrpc.GRPCClientSettings `mapstructure:"tempo"`
+		Type       string                        `mapstructure:"type"`
+		Jaeger     configgrpc.GRPCClientSettings `mapstructure:"jaeger"`
+		Tempo      configgrpc.GRPCClientSettings `mapstructure:"tempo"`
+		OpenSearch OpensearchDataStoreConfig     `mapstructure:"opensearch"`
 	}
 
 	TelemetryExporterOption struct {
@@ -64,6 +65,13 @@ type (
 
 	OTELCollectorConfig struct {
 		Endpoint string `mapstructure:"endpoint"`
+	}
+
+	OpensearchDataStoreConfig struct {
+		Addresses []string
+		Username  string
+		Password  string
+		Index     string
 	}
 )
 

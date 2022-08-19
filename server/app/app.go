@@ -122,7 +122,7 @@ func (a *App) Start() error {
 		"tracetest.span.duration",
 	)
 
-	pollerExecutor := executor.NewPollerExecutor(a.tracer, execTestUpdater, a.traceDB, a.config.PoolingRetryDelay(), a.config.MaxWaitTimeForTraceDuration())
+	pollerExecutor := executor.NewPollerExecutor(a.config, a.tracer, execTestUpdater, a.traceDB)
 
 	tracePoller := executor.NewTracePoller(pollerExecutor, execTestUpdater, assertionRunner, a.config.PoolingRetryDelay(), a.config.MaxWaitTimeForTraceDuration())
 	tracePoller.Start(5) // worker count. should be configurable

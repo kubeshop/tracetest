@@ -16,6 +16,13 @@ telemetry:
         tls:
           insecure: true
 
+    opensearch:
+      type: opensearch
+      opensearch:
+        addresses:
+          - http://localhost:9200
+        index: traces
+
   exporters:
     collector:
       serviceName: tracetest
