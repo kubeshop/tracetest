@@ -25,8 +25,6 @@ services:
         condition: service_healthy
       otel-collector:
         condition: service_started
-    networks:
-      - local
 
   postgres:
     container_name: postgres
@@ -41,8 +39,6 @@ services:
       interval: 1s
       timeout: 5s
       retries: 60
-    networks:
-      - local
 
   otel-collector:
     image: otel/opentelemetry-collector:0.54.0
@@ -61,8 +57,6 @@ services:
     depends_on:
       jaeger:
         condition: service_healthy
-    networks:
-      - local
 
 
   jaeger:
@@ -76,8 +70,6 @@ services:
       interval: 1s
       timeout: 3s
       retries: 60
-    networks:
-      - local
 
   cache:
     image: redis:6
@@ -88,8 +80,6 @@ services:
       interval: 1s
       timeout: 3s
       retries: 60
-    networks:
-      - local
 
   queue:
     image: rabbitmq:3.9
@@ -101,8 +91,6 @@ services:
       interval: 1s
       timeout: 5s
       retries: 60
-    networks:
-      - local
 
   demo-api:
     image: kubeshop/demo-pokemon-api:latest
@@ -131,8 +119,6 @@ services:
         condition: service_healthy
       jaeger:
         condition: service_healthy
-    networks:
-      - local
 
   demo-worker:
     image: kubeshop/demo-pokemon-api:latest
@@ -154,8 +140,6 @@ services:
         condition: service_healthy
       jaeger:
         condition: service_healthy
-    networks:
-      - local
 
   demo-rpc:
     image: kubeshop/demo-pokemon-api:latest
@@ -184,8 +168,6 @@ services:
         condition: service_healthy
       jaeger:
         condition: service_healthy
-    networks:
-      - local
 
   data-prepper:
     restart: unless-stopped
@@ -198,8 +180,6 @@ services:
       - "21890:21890"
     depends_on:
       - "opensearch"
-    networks:
-      - local
 
   opensearch:
     image: opensearchproject/opensearch:latest
@@ -219,8 +199,6 @@ services:
     ports:
       - 9200:9200
       - 9600:9600 # required for Performance Analyzer
-    networks:
-      - local
 
   dashboards:
     image: opensearchproject/opensearch-dashboards:latest
@@ -235,8 +213,3 @@ services:
       OPENSEARCH_PASSWORD: admin
     depends_on:
       - opensearch
-    networks:
-      - local
-
-networks:
-  local:
