@@ -52,7 +52,7 @@ func convertOtelSpanIntoSpan(span *v1.Span) *Span {
 	attributes["name"] = span.Name
 	attributes["kind"] = span.Kind.String()
 	attributes["tracetest.span.type"] = spanType(attributes)
-	attributes["tracetest.span.duration"] = spanDuration(span)
+	attributes["tracetest.span.duration"] = spanDurationFromOtel(span)
 
 	spanID := createSpanID(span.SpanId)
 	return &Span{
@@ -66,7 +66,7 @@ func convertOtelSpanIntoSpan(span *v1.Span) *Span {
 	}
 }
 
-func spanDuration(span *v1.Span) string {
+func spanDurationFromOtel(span *v1.Span) string {
 	if span.GetStartTimeUnixNano() != 0 && span.GetEndTimeUnixNano() != 0 {
 		spanDuration := (span.GetEndTimeUnixNano() - span.GetStartTimeUnixNano())
 		return strconv.FormatUint(spanDuration, 10)

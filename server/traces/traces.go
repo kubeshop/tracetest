@@ -52,10 +52,10 @@ func New(traceID string, spans []Span) Trace {
 func augmentSpanData(span *Span) {
 	span.Attributes["name"] = span.Name
 	span.Attributes["tracetest.span.type"] = spanType(span.Attributes)
-	span.Attributes["tracetest.span.duration"] = getSpanDuration(*span)
+	span.Attributes["tracetest.span.duration"] = spanDuration(*span)
 }
 
-func getSpanDuration(span Span) string {
+func spanDuration(span Span) string {
 	timeDifference := span.EndTime.Sub(span.StartTime)
 	return fmt.Sprintf("%d", int64(timeDifference))
 }
