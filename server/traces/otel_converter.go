@@ -47,6 +47,7 @@ func convertOtelSpanIntoSpan(span *v1.Span) *Span {
 	}
 
 	spanID := createSpanID(span.SpanId)
+	attributes["parent_id"] = createSpanID(span.ParentSpanId).String()
 	return &Span{
 		ID:         spanID,
 		Name:       span.Name,

@@ -29,12 +29,12 @@ func New(traceID string, spans []Span) Trace {
 	var rootSpan *Span = nil
 	for _, span := range spanMap {
 		parentID := span.Attributes["parent_id"]
-		if parentID == "" {
+		parentSpan, found := spanMap[parentID]
+		if !found {
 			rootSpan = span
 			continue
 		}
 
-		parentSpan := spanMap[parentID]
 		parentSpan.Children = append(parentSpan.Children, span)
 		span.Parent = parentSpan
 	}
