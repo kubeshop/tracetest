@@ -198,7 +198,7 @@ func TestComparators(t *testing.T) {
 	for _, c := range comps {
 		t.Run(c.name, func(t *testing.T) {
 			comp := c
-			// t.Parallel()
+			t.Parallel()
 
 			assert.Equal(t, comp.symbol, comp.comparator.String())
 			found, err := registry.Get(comp.comparator.String())
