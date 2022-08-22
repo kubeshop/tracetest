@@ -62,12 +62,12 @@ func (a exportTestAction) getDefinitionFromServer(ctx context.Context, testID st
 		return definition.Test{}, fmt.Errorf("could not get test from server: %w", err)
 	}
 
-	testDefinition, err := conversion.ConvertOpenAPITestIntoDefinitionObject(openapiTest)
+	spec, err := conversion.ConvertOpenAPITestIntoSpecObject(openapiTest)
 	if err != nil {
 		return definition.Test{}, fmt.Errorf("could not convert openapi object into a defintion object: %w", err)
 	}
 
-	return testDefinition, nil
+	return spec, nil
 }
 
 func (a exportTestAction) getTestFromServer(ctx context.Context, testID string) (openapi.Test, error) {

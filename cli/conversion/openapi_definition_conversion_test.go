@@ -332,7 +332,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.Name, func(t *testing.T) {
-			output, err := conversion.ConvertOpenAPITestIntoDefinitionObject(testCase.Input)
+			output, err := conversion.ConvertOpenAPITestIntoSpecObject(testCase.Input)
 
 			require.NoError(t, err)
 			assert.Equal(t, testCase.ExpectedOutput, output)

@@ -16,7 +16,7 @@ func ConvertOpenapiStringIntoString(in *string) string {
 	return *in
 }
 
-func ConvertOpenAPITestIntoDefinitionObject(test openapi.Test) (definition.Test, error) {
+func ConvertOpenAPITestIntoSpecObject(test openapi.Test) (definition.Test, error) {
 	trigger := convertServiceUnderTestIntoTrigger(test.ServiceUnderTest)
 	testSpec := convertOpenAPITestSpecIntoSpecArray(test.Spec)
 	description := ""
