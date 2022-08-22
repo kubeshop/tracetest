@@ -32,7 +32,7 @@ func (m OpenAPI) Test(in model.Test) openapi.Test {
 		Name:             in.Name,
 		Description:      in.Description,
 		ServiceUnderTest: m.Trigger(in.ServiceUnderTest),
-		Spec:             m.Definition(in.Definition),
+		Spec:             m.Definition(in.Spec),
 		Version:          int32(in.Version),
 	}
 }
@@ -249,7 +249,7 @@ func (m Model) Test(in openapi.Test) model.Test {
 		Name:             in.Name,
 		Description:      in.Description,
 		ServiceUnderTest: m.Trigger(in.ServiceUnderTest),
-		Definition:       m.Definition(in.Spec),
+		Spec:             m.Definition(in.Spec),
 		Version:          int(in.Version),
 	}
 }

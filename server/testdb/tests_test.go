@@ -34,7 +34,7 @@ func TestCreateTest(t *testing.T) {
 	assert.Equal(t, test.Description, actual.Description)
 	assert.Equal(t, test.ServiceUnderTest, actual.ServiceUnderTest)
 	assert.Equal(t, test.ReferenceRun, actual.ReferenceRun)
-	assert.Equal(t, test.Definition, actual.Definition)
+	assert.Equal(t, test.Spec, actual.Spec)
 	assert.False(t, actual.CreatedAt.IsZero())
 }
 

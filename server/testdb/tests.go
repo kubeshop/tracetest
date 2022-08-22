@@ -52,7 +52,7 @@ func (td *postgresDB) CreateTest(ctx context.Context, test model.Test) (model.Te
 		return model.Test{}, fmt.Errorf("sql exec: %w", err)
 	}
 
-	err = td.SetDefiniton(ctx, test, test.Definition)
+	err = td.SetDefiniton(ctx, test, test.Spec)
 	if err != nil {
 		return model.Test{}, fmt.Errorf("setDefinition error: %w", err)
 	}
@@ -98,7 +98,7 @@ func (td *postgresDB) UpdateTest(ctx context.Context, test model.Test) (model.Te
 		return model.Test{}, fmt.Errorf("sql exec: %w", err)
 	}
 
-	err = td.SetDefiniton(ctx, testToUpdate, testToUpdate.Definition)
+	err = td.SetDefiniton(ctx, testToUpdate, testToUpdate.Spec)
 	if err != nil {
 		return model.Test{}, fmt.Errorf("setDefinition error: %w", err)
 	}
@@ -257,7 +257,7 @@ func (td *postgresDB) readTestRow(ctx context.Context, row scanner) (model.Test,
 			return model.Test{}, err
 		}
 
-		test.Definition = defs
+		test.Spec = defs
 
 		return test, nil
 	default:

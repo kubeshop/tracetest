@@ -131,7 +131,7 @@ func (c *controller) GetTestSpec(ctx context.Context, testID string) (openapi.Im
 		return handleDBError(err), err
 	}
 
-	return openapi.Response(200, c.mappers.Out.Definition(test.Definition)), nil
+	return openapi.Response(200, c.mappers.Out.Definition(test.Spec)), nil
 }
 
 func (c *controller) GetTestResultSelectedSpans(ctx context.Context, _ string, runID string, selectorQuery string) (openapi.ImplResponse, error) {
@@ -321,7 +321,7 @@ func (c *controller) SetTestSpec(ctx context.Context, testID string, def openapi
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
 	}
 
-	newTest.Definition = newDefinition
+	newTest.Spec = newDefinition
 
 	newTest, err = c.testDB.UpdateTest(ctx, newTest)
 	if err != nil {
@@ -526,7 +526,7 @@ func (c *controller) CreateTestFromDefinition(ctx context.Context, testDefinitio
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
 	}
 
-	openapiObject, err := conversion.ConvertTestSpecIntoOpenAPIObject(definitionObject)
+	openapiObject, err := conversion.ConvertTestDefinitionIntoOpenAPIObject(definitionObject)
 	if err != nil {
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
 	}
@@ -542,7 +542,7 @@ func (c *controller) UpdateTestFromDefinition(ctx context.Context, testId string
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
 	}
 
-	openapiObject, err := conversion.ConvertTestSpecIntoOpenAPIObject(definitionObject)
+	openapiObject, err := conversion.ConvertTestDefinitionIntoOpenAPIObject(definitionObject)
 	if err != nil {
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
 	}

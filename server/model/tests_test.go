@@ -18,7 +18,7 @@ func TestAttributeIsMeta(t *testing.T) {
 
 func TestDefinition(t *testing.T) {
 	t.Run("Add", func(t *testing.T) {
-		def := (model.Test{}).Definition
+		def := (model.Test{}).Spec
 
 		def, err := def.Add(model.SpanQuery("1"), []model.Assertion{{"1", comparator.Eq, "1"}})
 		require.NoError(t, err)
@@ -34,7 +34,7 @@ func TestDefinition(t *testing.T) {
 	})
 
 	generateDef := func() model.OrderedMap[model.SpanQuery, []model.Assertion] {
-		def := (model.Test{}).Definition
+		def := (model.Test{}).Spec
 
 		def, _ = def.Add(model.SpanQuery("1"), []model.Assertion{{"1", comparator.Eq, "1"}})
 		def, _ = def.Add(model.SpanQuery("2"), []model.Assertion{{"2", comparator.Eq, "2"}})
