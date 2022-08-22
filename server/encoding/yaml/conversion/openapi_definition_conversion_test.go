@@ -24,7 +24,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 				Description:      "my test description",
 				Version:          (3),
 				ServiceUnderTest: openapi.Trigger{},
-				Definition:       openapi.TestDefinition{},
+				Spec:             openapi.TestSpec{},
 			},
 			ExpectedOutput: definition.Test{
 				Id:          "624a8dea-f152-48d4-a742-30b210094959",
@@ -304,8 +304,8 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 				Description:      "my test description",
 				Version:          (3),
 				ServiceUnderTest: openapi.Trigger{},
-				Definition: openapi.TestDefinition{
-					Definitions: []openapi.TestDefinitionDefinitions{
+				Spec: openapi.TestSpec{
+					Specs: []openapi.TestSpecSpecs{
 						{
 							Selector: openapi.Selector{
 								Query: (`span[name = "my span name"]`),

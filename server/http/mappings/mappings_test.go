@@ -12,8 +12,8 @@ import (
 )
 
 func TestDefinitionsOrder(t *testing.T) {
-	input := openapi.TestDefinition{
-		Definitions: []openapi.TestDefinitionDefinitions{
+	input := openapi.TestSpec{
+		Specs: []openapi.TestSpecSpecs{
 			{
 				Selector: openapi.Selector{
 					Query: "selector 1",
@@ -52,7 +52,7 @@ func TestDefinitionsOrder(t *testing.T) {
 	}
 
 	expectedJSON := `{
-		"definitions": [{
+		"specs": [{
 				"selector": {
 					"query": "selector 1"
 				},

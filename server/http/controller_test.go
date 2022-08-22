@@ -37,8 +37,8 @@ var (
 // https://github.com/kubeshop/tracetest/issues/617
 func TestContains_Issue617(t *testing.T) {
 
-	definition := openapi.TestDefinition{
-		Definitions: []openapi.TestDefinitionDefinitions{
+	spec := openapi.TestSpec{
+		Specs: []openapi.TestSpecSpecs{
 			{
 				Selector: openapi.Selector{
 					Query: `span[tracetest.span.type = "http" service.name = "pokeshop"  name = "POST /pokemon/import"]`,
@@ -107,7 +107,7 @@ func TestContains_Issue617(t *testing.T) {
 	f := setupController(t)
 	f.expectGetRun(exampleRun)
 
-	actual, err := f.c.DryRunAssertion(context.TODO(), "", exampleRun.ID.String(), definition)
+	actual, err := f.c.DryRunAssertion(context.TODO(), "", exampleRun.ID.String(), spec)
 	require.NoError(t, err)
 
 	assert.Equal(t, 200, actual.Code)

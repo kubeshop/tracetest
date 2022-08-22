@@ -295,8 +295,8 @@ func TestDefinitionToOpenAPIConversion(t *testing.T) {
 						},
 					},
 				},
-				Definition: openapi.TestDefinition{
-					Definitions: []openapi.TestDefinitionDefinitions{
+				Spec: openapi.TestSpec{
+					Specs: []openapi.TestSpecSpecs{
 						{
 							Selector: openapi.Selector{
 								Query: `span[tracetest.span.type="http"]`,
