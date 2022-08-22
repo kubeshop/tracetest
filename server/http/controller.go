@@ -526,7 +526,7 @@ func (c *controller) CreateTestFromDefinition(ctx context.Context, testDefinitio
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
 	}
 
-	openapiObject, err := conversion.ConvertTestDefinitionIntoOpenAPIObject(definitionObject)
+	openapiObject, err := conversion.ConvertTestSpecIntoOpenAPIObject(definitionObject)
 	if err != nil {
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
 	}
@@ -542,7 +542,7 @@ func (c *controller) UpdateTestFromDefinition(ctx context.Context, testId string
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
 	}
 
-	openapiObject, err := conversion.ConvertTestDefinitionIntoOpenAPIObject(definitionObject)
+	openapiObject, err := conversion.ConvertTestSpecIntoOpenAPIObject(definitionObject)
 	if err != nil {
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
 	}

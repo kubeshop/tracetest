@@ -10,7 +10,7 @@ import (
 )
 
 func ConvertTestDefinitionIntoOpenAPIObject(definition definition.Test) (openapi.Test, error) {
-	testDefinition, err := convertTestSpecIntoOpenAPIObject(definition.TestDefinition)
+	spec, err := convertTestSpecIntoOpenAPIObject(definition.Spec)
 	if err != nil {
 		return openapi.Test{}, fmt.Errorf("could not convert test definition: %w", err)
 	}
@@ -19,7 +19,7 @@ func ConvertTestDefinitionIntoOpenAPIObject(definition definition.Test) (openapi
 		Name:             definition.Name,
 		Description:      definition.Description,
 		ServiceUnderTest: convertTriggerIntoServiceUnderTest(definition.Trigger),
-		Spec:             testDefinition,
+		Spec:             spec,
 	}, nil
 }
 
