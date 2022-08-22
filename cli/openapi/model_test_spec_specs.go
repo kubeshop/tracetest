@@ -14,31 +14,31 @@ import (
 	"encoding/json"
 )
 
-// TestDefinitionDefinitions struct for TestDefinitionDefinitions
-type TestDefinitionDefinitions struct {
+// TestSpecSpecs struct for TestSpecSpecs
+type TestSpecSpecs struct {
 	Selector   *Selector   `json:"selector,omitempty"`
 	Assertions []Assertion `json:"assertions,omitempty"`
 }
 
-// NewTestDefinitionDefinitions instantiates a new TestDefinitionDefinitions object
+// NewTestSpecSpecs instantiates a new TestSpecSpecs object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewTestDefinitionDefinitions() *TestDefinitionDefinitions {
-	this := TestDefinitionDefinitions{}
+func NewTestSpecSpecs() *TestSpecSpecs {
+	this := TestSpecSpecs{}
 	return &this
 }
 
-// NewTestDefinitionDefinitionsWithDefaults instantiates a new TestDefinitionDefinitions object
+// NewTestSpecSpecsWithDefaults instantiates a new TestSpecSpecs object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewTestDefinitionDefinitionsWithDefaults() *TestDefinitionDefinitions {
-	this := TestDefinitionDefinitions{}
+func NewTestSpecSpecsWithDefaults() *TestSpecSpecs {
+	this := TestSpecSpecs{}
 	return &this
 }
 
 // GetSelector returns the Selector field value if set, zero value otherwise.
-func (o *TestDefinitionDefinitions) GetSelector() Selector {
+func (o *TestSpecSpecs) GetSelector() Selector {
 	if o == nil || o.Selector == nil {
 		var ret Selector
 		return ret
@@ -48,7 +48,7 @@ func (o *TestDefinitionDefinitions) GetSelector() Selector {
 
 // GetSelectorOk returns a tuple with the Selector field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *TestDefinitionDefinitions) GetSelectorOk() (*Selector, bool) {
+func (o *TestSpecSpecs) GetSelectorOk() (*Selector, bool) {
 	if o == nil || o.Selector == nil {
 		return nil, false
 	}
@@ -56,7 +56,7 @@ func (o *TestDefinitionDefinitions) GetSelectorOk() (*Selector, bool) {
 }
 
 // HasSelector returns a boolean if a field has been set.
-func (o *TestDefinitionDefinitions) HasSelector() bool {
+func (o *TestSpecSpecs) HasSelector() bool {
 	if o != nil && o.Selector != nil {
 		return true
 	}
@@ -65,12 +65,12 @@ func (o *TestDefinitionDefinitions) HasSelector() bool {
 }
 
 // SetSelector gets a reference to the given Selector and assigns it to the Selector field.
-func (o *TestDefinitionDefinitions) SetSelector(v Selector) {
+func (o *TestSpecSpecs) SetSelector(v Selector) {
 	o.Selector = &v
 }
 
 // GetAssertions returns the Assertions field value if set, zero value otherwise.
-func (o *TestDefinitionDefinitions) GetAssertions() []Assertion {
+func (o *TestSpecSpecs) GetAssertions() []Assertion {
 	if o == nil || o.Assertions == nil {
 		var ret []Assertion
 		return ret
@@ -80,7 +80,7 @@ func (o *TestDefinitionDefinitions) GetAssertions() []Assertion {
 
 // GetAssertionsOk returns a tuple with the Assertions field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *TestDefinitionDefinitions) GetAssertionsOk() ([]Assertion, bool) {
+func (o *TestSpecSpecs) GetAssertionsOk() ([]Assertion, bool) {
 	if o == nil || o.Assertions == nil {
 		return nil, false
 	}
@@ -88,7 +88,7 @@ func (o *TestDefinitionDefinitions) GetAssertionsOk() ([]Assertion, bool) {
 }
 
 // HasAssertions returns a boolean if a field has been set.
-func (o *TestDefinitionDefinitions) HasAssertions() bool {
+func (o *TestSpecSpecs) HasAssertions() bool {
 	if o != nil && o.Assertions != nil {
 		return true
 	}
@@ -97,11 +97,11 @@ func (o *TestDefinitionDefinitions) HasAssertions() bool {
 }
 
 // SetAssertions gets a reference to the given []Assertion and assigns it to the Assertions field.
-func (o *TestDefinitionDefinitions) SetAssertions(v []Assertion) {
+func (o *TestSpecSpecs) SetAssertions(v []Assertion) {
 	o.Assertions = v
 }
 
-func (o TestDefinitionDefinitions) MarshalJSON() ([]byte, error) {
+func (o TestSpecSpecs) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.Selector != nil {
 		toSerialize["selector"] = o.Selector
@@ -112,38 +112,38 @@ func (o TestDefinitionDefinitions) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-type NullableTestDefinitionDefinitions struct {
-	value *TestDefinitionDefinitions
+type NullableTestSpecSpecs struct {
+	value *TestSpecSpecs
 	isSet bool
 }
 
-func (v NullableTestDefinitionDefinitions) Get() *TestDefinitionDefinitions {
+func (v NullableTestSpecSpecs) Get() *TestSpecSpecs {
 	return v.value
 }
 
-func (v *NullableTestDefinitionDefinitions) Set(val *TestDefinitionDefinitions) {
+func (v *NullableTestSpecSpecs) Set(val *TestSpecSpecs) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableTestDefinitionDefinitions) IsSet() bool {
+func (v NullableTestSpecSpecs) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableTestDefinitionDefinitions) Unset() {
+func (v *NullableTestSpecSpecs) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableTestDefinitionDefinitions(val *TestDefinitionDefinitions) *NullableTestDefinitionDefinitions {
-	return &NullableTestDefinitionDefinitions{value: val, isSet: true}
+func NewNullableTestSpecSpecs(val *TestSpecSpecs) *NullableTestSpecSpecs {
+	return &NullableTestSpecSpecs{value: val, isSet: true}
 }
 
-func (v NullableTestDefinitionDefinitions) MarshalJSON() ([]byte, error) {
+func (v NullableTestSpecSpecs) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableTestDefinitionDefinitions) UnmarshalJSON(src []byte) error {
+func (v *NullableTestSpecSpecs) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

@@ -18,7 +18,7 @@ func ConvertOpenapiStringIntoString(in *string) string {
 
 func ConvertOpenAPITestIntoDefinitionObject(test openapi.Test) (definition.Test, error) {
 	trigger := convertServiceUnderTestIntoTrigger(test.ServiceUnderTest)
-	testDefinition := convertOpenAPITestDefinitionIntoDefinitionArray(test.Definition)
+	testSpec := convertOpenAPITestSpecIntoSpecArray(test.Spec)
 	description := ""
 	if test.Description != nil {
 		description = *test.Description
@@ -29,7 +29,7 @@ func ConvertOpenAPITestIntoDefinitionObject(test openapi.Test) (definition.Test,
 		Name:           *test.Name,
 		Description:    description,
 		Trigger:        trigger,
-		TestDefinition: testDefinition,
+		TestDefinition: testSpec,
 	}, nil
 }
 
@@ -125,13 +125,13 @@ func getAuthDefinition(auth *openapi.HTTPAuth) definition.HTTPAuthentication {
 	}
 }
 
-func convertOpenAPITestDefinitionIntoDefinitionArray(testDefinition *openapi.TestDefinition) []definition.TestDefinition {
-	if testDefinition == nil {
+func convertOpenAPITestSpecIntoSpecArray(testSpec *openapi.TestSpec) []definition.TestDefinition {
+	if testSpec == nil {
 		return []definition.TestDefinition{}
 	}
 
-	definitionArray := make([]definition.TestDefinition, 0, len(testDefinition.Definitions))
-	for _, def := range testDefinition.Definitions {
+	definitionArray := make([]definition.TestDefinition, 0, len(testSpec.Specs))
+	for _, def := range testSpec.Specs {
 		assertions := make([]string, 0, len(def.Assertions))
 		for _, assertion := range def.Assertions {
 			assertionFormat := `%s %s "%s"`
