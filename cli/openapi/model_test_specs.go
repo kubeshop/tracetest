@@ -14,32 +14,32 @@ import (
 	"encoding/json"
 )
 
-// TestSpec struct for TestSpec
-type TestSpec struct {
-	Specs []TestSpecSpecs `json:"specs,omitempty"`
+// TestSpecs struct for TestSpecs
+type TestSpecs struct {
+	Specs []TestSpecsSpecs `json:"specs,omitempty"`
 }
 
-// NewTestSpec instantiates a new TestSpec object
+// NewTestSpecs instantiates a new TestSpecs object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewTestSpec() *TestSpec {
-	this := TestSpec{}
+func NewTestSpecs() *TestSpecs {
+	this := TestSpecs{}
 	return &this
 }
 
-// NewTestSpecWithDefaults instantiates a new TestSpec object
+// NewTestSpecsWithDefaults instantiates a new TestSpecs object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewTestSpecWithDefaults() *TestSpec {
-	this := TestSpec{}
+func NewTestSpecsWithDefaults() *TestSpecs {
+	this := TestSpecs{}
 	return &this
 }
 
 // GetSpecs returns the Specs field value if set, zero value otherwise.
-func (o *TestSpec) GetSpecs() []TestSpecSpecs {
+func (o *TestSpecs) GetSpecs() []TestSpecsSpecs {
 	if o == nil || o.Specs == nil {
-		var ret []TestSpecSpecs
+		var ret []TestSpecsSpecs
 		return ret
 	}
 	return o.Specs
@@ -47,7 +47,7 @@ func (o *TestSpec) GetSpecs() []TestSpecSpecs {
 
 // GetSpecsOk returns a tuple with the Specs field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *TestSpec) GetSpecsOk() ([]TestSpecSpecs, bool) {
+func (o *TestSpecs) GetSpecsOk() ([]TestSpecsSpecs, bool) {
 	if o == nil || o.Specs == nil {
 		return nil, false
 	}
@@ -55,7 +55,7 @@ func (o *TestSpec) GetSpecsOk() ([]TestSpecSpecs, bool) {
 }
 
 // HasSpecs returns a boolean if a field has been set.
-func (o *TestSpec) HasSpecs() bool {
+func (o *TestSpecs) HasSpecs() bool {
 	if o != nil && o.Specs != nil {
 		return true
 	}
@@ -63,12 +63,12 @@ func (o *TestSpec) HasSpecs() bool {
 	return false
 }
 
-// SetSpecs gets a reference to the given []TestSpecSpecs and assigns it to the Specs field.
-func (o *TestSpec) SetSpecs(v []TestSpecSpecs) {
+// SetSpecs gets a reference to the given []TestSpecsSpecs and assigns it to the Specs field.
+func (o *TestSpecs) SetSpecs(v []TestSpecsSpecs) {
 	o.Specs = v
 }
 
-func (o TestSpec) MarshalJSON() ([]byte, error) {
+func (o TestSpecs) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.Specs != nil {
 		toSerialize["specs"] = o.Specs
@@ -76,38 +76,38 @@ func (o TestSpec) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-type NullableTestSpec struct {
-	value *TestSpec
+type NullableTestSpecs struct {
+	value *TestSpecs
 	isSet bool
 }
 
-func (v NullableTestSpec) Get() *TestSpec {
+func (v NullableTestSpecs) Get() *TestSpecs {
 	return v.value
 }
 
-func (v *NullableTestSpec) Set(val *TestSpec) {
+func (v *NullableTestSpecs) Set(val *TestSpecs) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableTestSpec) IsSet() bool {
+func (v NullableTestSpecs) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableTestSpec) Unset() {
+func (v *NullableTestSpecs) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableTestSpec(val *TestSpec) *NullableTestSpec {
-	return &NullableTestSpec{value: val, isSet: true}
+func NewNullableTestSpecs(val *TestSpecs) *NullableTestSpecs {
+	return &NullableTestSpecs{value: val, isSet: true}
 }
 
-func (v NullableTestSpec) MarshalJSON() ([]byte, error) {
+func (v NullableTestSpecs) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableTestSpec) UnmarshalJSON(src []byte) error {
+func (v *NullableTestSpecs) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

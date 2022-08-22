@@ -18,7 +18,7 @@ func ConvertOpenapiStringIntoString(in *string) string {
 
 func ConvertOpenAPITestIntoSpecObject(test openapi.Test) (definition.Test, error) {
 	trigger := convertServiceUnderTestIntoTrigger(test.ServiceUnderTest)
-	testSpec := convertOpenAPITestSpecIntoSpecArray(test.Spec)
+	testSpec := convertOpenAPITestSpecIntoSpecArray(test.Specs)
 	description := ""
 	if test.Description != nil {
 		description = *test.Description
@@ -125,7 +125,7 @@ func getAuthDefinition(auth *openapi.HTTPAuth) definition.HTTPAuthentication {
 	}
 }
 
-func convertOpenAPITestSpecIntoSpecArray(testSpec *openapi.TestSpec) []definition.TestSpec {
+func convertOpenAPITestSpecIntoSpecArray(testSpec *openapi.TestSpecs) []definition.TestSpec {
 	if testSpec == nil {
 		return []definition.TestSpec{}
 	}

@@ -7,7 +7,7 @@ type Test struct {
 	Name        string      `yaml:"name"`
 	Description string      `yaml:"description"`
 	Trigger     TestTrigger `yaml:"trigger"`
-	Spec        []TestSpec  `yaml:"spec,omitempty"`
+	Spec        []TestSpec  `yaml:"specs,omitempty"`
 }
 
 func (t Test) Validate() error {

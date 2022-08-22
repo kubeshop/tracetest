@@ -434,11 +434,11 @@ type ApiDryRunAssertionRequest struct {
 	ApiService *ApiApiService
 	testId     string
 	runId      string
-	testSpec   *TestSpec
+	testSpecs  *TestSpecs
 }
 
-func (r ApiDryRunAssertionRequest) TestSpec(testSpec TestSpec) ApiDryRunAssertionRequest {
-	r.testSpec = &testSpec
+func (r ApiDryRunAssertionRequest) TestSpecs(testSpecs TestSpecs) ApiDryRunAssertionRequest {
+	r.testSpecs = &testSpecs
 	return r
 }
 
@@ -506,7 +506,7 @@ func (a *ApiApiService) DryRunAssertionExecute(r ApiDryRunAssertionRequest) (*As
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	// body params
-	localVarPostBody = r.testSpec
+	localVarPostBody = r.testSpecs
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -1207,27 +1207,27 @@ func (a *ApiApiService) GetTestRunsExecute(r ApiGetTestRunsRequest) ([]TestRun, 
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
-type ApiGetTestSpecRequest struct {
+type ApiGetTestSpecsRequest struct {
 	ctx        context.Context
 	ApiService *ApiApiService
 	testId     string
 }
 
-func (r ApiGetTestSpecRequest) Execute() ([]TestSpec, *http.Response, error) {
-	return r.ApiService.GetTestSpecExecute(r)
+func (r ApiGetTestSpecsRequest) Execute() ([]TestSpecs, *http.Response, error) {
+	return r.ApiService.GetTestSpecsExecute(r)
 }
 
 /*
-GetTestSpec Get definition for a test
+GetTestSpecs Get definition for a test
 
 Gets definition for a test
 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @param testId
- @return ApiGetTestSpecRequest
+ @return ApiGetTestSpecsRequest
 */
-func (a *ApiApiService) GetTestSpec(ctx context.Context, testId string) ApiGetTestSpecRequest {
-	return ApiGetTestSpecRequest{
+func (a *ApiApiService) GetTestSpecs(ctx context.Context, testId string) ApiGetTestSpecsRequest {
+	return ApiGetTestSpecsRequest{
 		ApiService: a,
 		ctx:        ctx,
 		testId:     testId,
@@ -1235,16 +1235,16 @@ func (a *ApiApiService) GetTestSpec(ctx context.Context, testId string) ApiGetTe
 }
 
 // Execute executes the request
-//  @return []TestSpec
-func (a *ApiApiService) GetTestSpecExecute(r ApiGetTestSpecRequest) ([]TestSpec, *http.Response, error) {
+//  @return []TestSpecs
+func (a *ApiApiService) GetTestSpecsExecute(r ApiGetTestSpecsRequest) ([]TestSpecs, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
 		formFiles           []formFile
-		localVarReturnValue []TestSpec
+		localVarReturnValue []TestSpecs
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.GetTestSpec")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.GetTestSpecs")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -1863,33 +1863,33 @@ func (a *ApiApiService) RunTestExecute(r ApiRunTestRequest) (*TestRun, *http.Res
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
-type ApiSetTestSpecRequest struct {
+type ApiSetTestSpecsRequest struct {
 	ctx        context.Context
 	ApiService *ApiApiService
 	testId     string
-	testSpec   *TestSpec
+	testSpecs  *TestSpecs
 }
 
-func (r ApiSetTestSpecRequest) TestSpec(testSpec TestSpec) ApiSetTestSpecRequest {
-	r.testSpec = &testSpec
+func (r ApiSetTestSpecsRequest) TestSpecs(testSpecs TestSpecs) ApiSetTestSpecsRequest {
+	r.testSpecs = &testSpecs
 	return r
 }
 
-func (r ApiSetTestSpecRequest) Execute() (*http.Response, error) {
-	return r.ApiService.SetTestSpecExecute(r)
+func (r ApiSetTestSpecsRequest) Execute() (*http.Response, error) {
+	return r.ApiService.SetTestSpecsExecute(r)
 }
 
 /*
-SetTestSpec Set spec for a test
+SetTestSpecs Set spec for a test
 
 Set spec for a particular test
 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @param testId
- @return ApiSetTestSpecRequest
+ @return ApiSetTestSpecsRequest
 */
-func (a *ApiApiService) SetTestSpec(ctx context.Context, testId string) ApiSetTestSpecRequest {
-	return ApiSetTestSpecRequest{
+func (a *ApiApiService) SetTestSpecs(ctx context.Context, testId string) ApiSetTestSpecsRequest {
+	return ApiSetTestSpecsRequest{
 		ApiService: a,
 		ctx:        ctx,
 		testId:     testId,
@@ -1897,14 +1897,14 @@ func (a *ApiApiService) SetTestSpec(ctx context.Context, testId string) ApiSetTe
 }
 
 // Execute executes the request
-func (a *ApiApiService) SetTestSpecExecute(r ApiSetTestSpecRequest) (*http.Response, error) {
+func (a *ApiApiService) SetTestSpecsExecute(r ApiSetTestSpecsRequest) (*http.Response, error) {
 	var (
 		localVarHTTPMethod = http.MethodPut
 		localVarPostBody   interface{}
 		formFiles          []formFile
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.SetTestSpec")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.SetTestSpecs")
 	if err != nil {
 		return nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -1934,7 +1934,7 @@ func (a *ApiApiService) SetTestSpecExecute(r ApiSetTestSpecRequest) (*http.Respo
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	// body params
-	localVarPostBody = r.testSpec
+	localVarPostBody = r.testSpecs
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return nil, err

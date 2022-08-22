@@ -10,7 +10,7 @@ trigger:
     - key: Content-Type
       value: application/json
     body: '{ "id": 52 }'
-spec:
+specs:
 - selector: span[name = "POST /pokemon/import"]
   assertions:
   - tracetest.span.duration <= 100ms

@@ -20,9 +20,9 @@ type Test struct {
 	Name        *string `json:"name,omitempty"`
 	Description *string `json:"description,omitempty"`
 	// version number of the test
-	Version          *int32    `json:"version,omitempty"`
-	ServiceUnderTest *Trigger  `json:"serviceUnderTest,omitempty"`
-	Spec             *TestSpec `json:"spec,omitempty"`
+	Version          *int32     `json:"version,omitempty"`
+	ServiceUnderTest *Trigger   `json:"serviceUnderTest,omitempty"`
+	Specs            *TestSpecs `json:"specs,omitempty"`
 }
 
 // NewTest instantiates a new Test object
@@ -202,36 +202,36 @@ func (o *Test) SetServiceUnderTest(v Trigger) {
 	o.ServiceUnderTest = &v
 }
 
-// GetSpec returns the Spec field value if set, zero value otherwise.
-func (o *Test) GetSpec() TestSpec {
-	if o == nil || o.Spec == nil {
-		var ret TestSpec
+// GetSpecs returns the Specs field value if set, zero value otherwise.
+func (o *Test) GetSpecs() TestSpecs {
+	if o == nil || o.Specs == nil {
+		var ret TestSpecs
 		return ret
 	}
-	return *o.Spec
+	return *o.Specs
 }
 
-// GetSpecOk returns a tuple with the Spec field value if set, nil otherwise
+// GetSpecsOk returns a tuple with the Specs field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Test) GetSpecOk() (*TestSpec, bool) {
-	if o == nil || o.Spec == nil {
+func (o *Test) GetSpecsOk() (*TestSpecs, bool) {
+	if o == nil || o.Specs == nil {
 		return nil, false
 	}
-	return o.Spec, true
+	return o.Specs, true
 }
 
-// HasSpec returns a boolean if a field has been set.
-func (o *Test) HasSpec() bool {
-	if o != nil && o.Spec != nil {
+// HasSpecs returns a boolean if a field has been set.
+func (o *Test) HasSpecs() bool {
+	if o != nil && o.Specs != nil {
 		return true
 	}
 
 	return false
 }
 
-// SetSpec gets a reference to the given TestSpec and assigns it to the Spec field.
-func (o *Test) SetSpec(v TestSpec) {
-	o.Spec = &v
+// SetSpecs gets a reference to the given TestSpecs and assigns it to the Specs field.
+func (o *Test) SetSpecs(v TestSpecs) {
+	o.Specs = &v
 }
 
 func (o Test) MarshalJSON() ([]byte, error) {
@@ -251,8 +251,8 @@ func (o Test) MarshalJSON() ([]byte, error) {
 	if o.ServiceUnderTest != nil {
 		toSerialize["serviceUnderTest"] = o.ServiceUnderTest
 	}
-	if o.Spec != nil {
-		toSerialize["spec"] = o.Spec
+	if o.Specs != nil {
+		toSerialize["specs"] = o.Specs
 	}
 	return json.Marshal(toSerialize)
 }
