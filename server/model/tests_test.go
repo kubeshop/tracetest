@@ -16,7 +16,7 @@ func TestAttributeIsMeta(t *testing.T) {
 	assert.False(t, model.Attribute("db.system").IsMeta())
 }
 
-func TestDefinition(t *testing.T) {
+func TestSpec(t *testing.T) {
 	t.Run("Add", func(t *testing.T) {
 		spec := (model.Test{}).Spec
 

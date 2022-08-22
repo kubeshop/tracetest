@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestDefinitions(t *testing.T) {
+func TestSpecs(t *testing.T) {
 	db, clean := getDB()
 	defer clean()
 
