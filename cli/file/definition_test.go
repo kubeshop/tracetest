@@ -34,7 +34,7 @@ func TestLoadDefinition(t *testing.T) {
 						Body: `{ "id": 52 }`,
 					},
 				},
-				Spec: []definition.TestSpec{
+				Specs: []definition.TestSpec{
 					{
 						Selector: "span[name = \"POST /pokemon/import\"]",
 						Assertions: []string{
@@ -90,7 +90,7 @@ func TestLoadDefinition(t *testing.T) {
 						Body: `{ "id": 52 }`,
 					},
 				},
-				Spec: []definition.TestSpec{
+				Specs: []definition.TestSpec{
 					{
 						Selector: "span[name = \"POST /pokemon/import\"]",
 						Assertions: []string{

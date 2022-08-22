@@ -39,7 +39,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 				Name:        "my test",
 				Description: "my test description",
 				Trigger:     definition.TestTrigger{},
-				Spec:        []definition.TestSpec{},
+				Specs:       []definition.TestSpec{},
 			},
 		},
 		{
@@ -80,7 +80,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 						Body:           `{ "id": 52 }`,
 					},
 				},
-				Spec: []definition.TestSpec{},
+				Specs: []definition.TestSpec{},
 			},
 		},
 		{
@@ -120,7 +120,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 						Authentication: definition.HTTPAuthentication{},
 					},
 				},
-				Spec: []definition.TestSpec{},
+				Specs: []definition.TestSpec{},
 			},
 		},
 		{
@@ -173,7 +173,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 						Body: `{ "id": 52 }`,
 					},
 				},
-				Spec: []definition.TestSpec{},
+				Specs: []definition.TestSpec{},
 			},
 		},
 		{
@@ -228,7 +228,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 						Body: `{ "id": 52 }`,
 					},
 				},
-				Spec: []definition.TestSpec{},
+				Specs: []definition.TestSpec{},
 			},
 		},
 		{
@@ -279,7 +279,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 						Body: `{ "id": 52 }`,
 					},
 				},
-				Spec: []definition.TestSpec{},
+				Specs: []definition.TestSpec{},
 			},
 		},
 		{
@@ -317,7 +317,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 				Name:        "my test",
 				Description: "my test description",
 				Trigger:     definition.TestTrigger{},
-				Spec: []definition.TestSpec{
+				Specs: []definition.TestSpec{
 					{
 						Selector: `span[name = "my span name"]`,
 						Assertions: []string{

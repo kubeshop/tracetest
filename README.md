@@ -107,7 +107,7 @@ trigger:
 
 # Definition of the test specs which is a combination of a selector
 # and an assertion
-spec:
+specs:
     # the selector defines which spans will be targeted by the assertions
     selector: span[tracetest.span.type = "http"]
     # the assertions define the checks to be run. In this case, all

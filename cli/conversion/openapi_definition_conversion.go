@@ -29,7 +29,7 @@ func ConvertOpenAPITestIntoSpecObject(test openapi.Test) (definition.Test, error
 		Name:        *test.Name,
 		Description: description,
 		Trigger:     trigger,
-		Spec:        testSpec,
+		Specs:       testSpec,
 	}, nil
 }
 

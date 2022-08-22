@@ -38,7 +38,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 						Metadata: []definition.GRPCHeader{},
 					},
 				},
-				Spec: []definition.TestSpec{},
+				Specs: []definition.TestSpec{},
 			},
 		},
 		{
@@ -82,7 +82,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 						Metadata: []definition.GRPCHeader{},
 					},
 				},
-				Spec: []definition.TestSpec{},
+				Specs: []definition.TestSpec{},
 			},
 		},
 		{
@@ -125,7 +125,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 						Metadata: []definition.GRPCHeader{},
 					},
 				},
-				Spec: []definition.TestSpec{},
+				Specs: []definition.TestSpec{},
 			},
 		},
 		{
@@ -181,7 +181,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 						Metadata: []definition.GRPCHeader{},
 					},
 				},
-				Spec: []definition.TestSpec{},
+				Specs: []definition.TestSpec{},
 			},
 		},
 		{
@@ -239,7 +239,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 						Metadata: []definition.GRPCHeader{},
 					},
 				},
-				Spec: []definition.TestSpec{},
+				Specs: []definition.TestSpec{},
 			},
 		},
 		{
@@ -293,7 +293,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 						Metadata: []definition.GRPCHeader{},
 					},
 				},
-				Spec: []definition.TestSpec{},
+				Specs: []definition.TestSpec{},
 			},
 		},
 		{
@@ -338,7 +338,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 						Metadata: []definition.GRPCHeader{},
 					},
 				},
-				Spec: []definition.TestSpec{
+				Specs: []definition.TestSpec{
 					{
 						Selector: `span[name = "my span name"]`,
 						Assertions: []string{

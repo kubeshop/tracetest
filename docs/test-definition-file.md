@@ -28,7 +28,7 @@ trigger:
     - key: Content-Type
       value: application/json
     body: '{ "id": 52 }'
-spec:
+specs:
 - selector: span[name = "POST /pokemon/import"]
   assertions:
   - tracetest.span.duration <= 500ms
@@ -172,7 +172,7 @@ For the first task, we use a selector: `span[db.statement contains "SELECT"]`. W
 To write that in your test definition, you can define the following YAML definition:
 
 ```yaml
-spec:
+specs:
     - selector: span[db.statement contains "SELECT"]
       assertions:
         - tracetest.span.duration < 500ms
@@ -181,7 +181,7 @@ spec:
 As you probably noticed in the test definition structure, you can have multiple assertions for the same selector. This is useful to group related validations. For example, ensuring that all your HTTP calls are successful and take less than 1000ms:
 
 ```yaml
-spec:
+specs:
     - selector: span[tracetest.span.type="http"]
       assertions:
         - http.status_code >= 200

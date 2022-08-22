@@ -46,7 +46,7 @@ trigger:
       {
         "id": 52
       }
-spec:
+specs:
 - selector: span[tracetest.span.type="rpc"]
   assertions:
   - tracetest.selected_spans.count = 1

@@ -15,7 +15,7 @@ func ConvertOpenAPITestIntoDefinitionObject(test openapi.Test) (definition.Test,
 		Name:        test.Name,
 		Description: test.Description,
 		Trigger:     convertServiceUnderTestIntoTrigger(test.ServiceUnderTest),
-		Spec:        convertOpenAPITestSpecIntoSpecArray(test.Specs),
+		Specs:       convertOpenAPITestSpecIntoSpecArray(test.Specs),
 	}, nil
 }
 
