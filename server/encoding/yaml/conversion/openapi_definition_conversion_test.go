@@ -38,7 +38,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 						Metadata: []definition.GRPCHeader{},
 					},
 				},
-				TestDefinition: []definition.TestDefinition{},
+				TestDefinition: []definition.TestSpec{},
 			},
 		},
 		{
@@ -82,7 +82,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 						Metadata: []definition.GRPCHeader{},
 					},
 				},
-				TestDefinition: []definition.TestDefinition{},
+				TestDefinition: []definition.TestSpec{},
 			},
 		},
 		{
@@ -125,7 +125,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 						Metadata: []definition.GRPCHeader{},
 					},
 				},
-				TestDefinition: []definition.TestDefinition{},
+				TestDefinition: []definition.TestSpec{},
 			},
 		},
 		{
@@ -181,7 +181,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 						Metadata: []definition.GRPCHeader{},
 					},
 				},
-				TestDefinition: []definition.TestDefinition{},
+				TestDefinition: []definition.TestSpec{},
 			},
 		},
 		{
@@ -239,7 +239,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 						Metadata: []definition.GRPCHeader{},
 					},
 				},
-				TestDefinition: []definition.TestDefinition{},
+				TestDefinition: []definition.TestSpec{},
 			},
 		},
 		{
@@ -293,7 +293,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 						Metadata: []definition.GRPCHeader{},
 					},
 				},
-				TestDefinition: []definition.TestDefinition{},
+				TestDefinition: []definition.TestSpec{},
 			},
 		},
 		{
@@ -338,7 +338,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 						Metadata: []definition.GRPCHeader{},
 					},
 				},
-				TestDefinition: []definition.TestDefinition{
+				TestDefinition: []definition.TestSpec{
 					{
 						Selector: `span[name = "my span name"]`,
 						Assertions: []string{

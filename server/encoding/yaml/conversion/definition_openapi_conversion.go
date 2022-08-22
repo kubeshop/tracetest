@@ -10,7 +10,7 @@ import (
 )
 
 func ConvertTestDefinitionIntoOpenAPIObject(definition definition.Test) (openapi.Test, error) {
-	testDefinition, err := convertTestDefinitionsIntoOpenAPIObject(definition.TestDefinition)
+	testDefinition, err := convertTestSpecIntoOpenAPIObject(definition.TestDefinition)
 	if err != nil {
 		return openapi.Test{}, fmt.Errorf("could not convert test definition: %w", err)
 	}
@@ -19,7 +19,7 @@ func ConvertTestDefinitionIntoOpenAPIObject(definition definition.Test) (openapi
 		Name:             definition.Name,
 		Description:      definition.Description,
 		ServiceUnderTest: convertTriggerIntoServiceUnderTest(definition.Trigger),
-		Definition:       testDefinition,
+		Spec:             testDefinition,
 	}, nil
 }
 
@@ -102,32 +102,32 @@ func getAuthOpenAPI(auth definition.HTTPAuthentication) openapi.HttpAuth {
 	}
 }
 
-func convertTestDefinitionsIntoOpenAPIObject(testDefinitions []definition.TestDefinition) (openapi.TestDefinition, error) {
-	if len(testDefinitions) == 0 {
-		return openapi.TestDefinition{}, nil
+func convertTestSpecIntoOpenAPIObject(testSpec []definition.TestSpec) (openapi.TestSpec, error) {
+	if len(testSpec) == 0 {
+		return openapi.TestSpec{}, nil
 	}
 
-	definitions := make([]openapi.TestDefinitionDefinitions, 0, len(testDefinitions))
-	for _, testDefinition := range testDefinitions {
-		assertions := make([]openapi.Assertion, 0, len(testDefinition.Assertions))
-		for _, assertion := range testDefinition.Assertions {
+	definitions := make([]openapi.TestSpecSpecs, 0, len(testSpec))
+	for _, testSpec := range testSpec {
+		assertions := make([]openapi.Assertion, 0, len(testSpec.Assertions))
+		for _, assertion := range testSpec.Assertions {
 			assertionObject, err := convertStringIntoAssertion(assertion)
 			if err != nil {
-				return openapi.TestDefinition{}, err
+				return openapi.TestSpec{}, err
 			}
 			assertions = append(assertions, assertionObject)
 		}
 
-		definitions = append(definitions, openapi.TestDefinitionDefinitions{
+		definitions = append(definitions, openapi.TestSpecSpecs{
 			Selector: openapi.Selector{
-				Query: testDefinition.Selector,
+				Query: testSpec.Selector,
 			},
 			Assertions: assertions,
 		})
 	}
 
-	return openapi.TestDefinition{
-		Definitions: definitions,
+	return openapi.TestSpec{
+		Specs: definitions,
 	}, nil
 }
 

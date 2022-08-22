@@ -15,7 +15,7 @@ func ConvertOpenAPITestIntoDefinitionObject(test openapi.Test) (definition.Test,
 		Name:           test.Name,
 		Description:    test.Description,
 		Trigger:        convertServiceUnderTestIntoTrigger(test.ServiceUnderTest),
-		TestDefinition: convertOpenAPITestDefinitionIntoDefinitionArray(test.Definition),
+		TestDefinition: convertOpenAPITestSpecIntoSpecArray(test.Spec),
 	}, nil
 }
 
@@ -96,9 +96,9 @@ func getAuthDefinition(auth openapi.HttpAuth) definition.HTTPAuthentication {
 	}
 }
 
-func convertOpenAPITestDefinitionIntoDefinitionArray(testDefinition openapi.TestDefinition) []definition.TestDefinition {
-	definitionArray := make([]definition.TestDefinition, 0, len(testDefinition.Definitions))
-	for _, def := range testDefinition.Definitions {
+func convertOpenAPITestSpecIntoSpecArray(testSpec openapi.TestSpec) []definition.TestSpec {
+	definitionArray := make([]definition.TestSpec, 0, len(testSpec.Specs))
+	for _, def := range testSpec.Specs {
 		assertions := make([]string, 0, len(def.Assertions))
 		for _, assertion := range def.Assertions {
 			assertionFormat := `%s %s "%s"`
@@ -109,7 +109,7 @@ func convertOpenAPITestDefinitionIntoDefinitionArray(testDefinition openapi.Test
 			assertions = append(assertions, assertionString)
 		}
 
-		newDefinition := definition.TestDefinition{
+		newDefinition := definition.TestSpec{
 			Selector:   def.Selector.Query,
 			Assertions: assertions,
 		}

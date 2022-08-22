@@ -21,7 +21,7 @@ type Test struct {
 
 	ServiceUnderTest Trigger `json:"serviceUnderTest,omitempty"`
 
-	Definition TestDefinition `json:"definition,omitempty"`
+	Spec TestSpec `json:"spec,omitempty"`
 }
 
 // AssertTestRequired checks if the required fields are not zero-ed
@@ -29,7 +29,7 @@ func AssertTestRequired(obj Test) error {
 	if err := AssertTriggerRequired(obj.ServiceUnderTest); err != nil {
 		return err
 	}
-	if err := AssertTestDefinitionRequired(obj.Definition); err != nil {
+	if err := AssertTestSpecRequired(obj.Spec); err != nil {
 		return err
 	}
 	return nil

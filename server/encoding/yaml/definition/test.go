@@ -5,11 +5,11 @@ import (
 )
 
 type Test struct {
-	Id             string           `yaml:"id" json:"id"`
-	Name           string           `yaml:"name" json:"name"`
-	Description    string           `yaml:"description" json:"description"`
-	Trigger        TestTrigger      `yaml:"trigger" json:"trigger"`
-	TestDefinition []TestDefinition `yaml:"testDefinition,omitempty" json:"testDefinition,omitempty"`
+	Id             string      `yaml:"id" json:"id"`
+	Name           string      `yaml:"name" json:"name"`
+	Description    string      `yaml:"description" json:"description"`
+	Trigger        TestTrigger `yaml:"trigger" json:"trigger"`
+	TestDefinition []TestSpec  `yaml:"testDefinition,omitempty" json:"testDefinition,omitempty"`
 }
 
 func (t Test) Validate() error {
@@ -49,7 +49,7 @@ func (t TestTrigger) Validate() error {
 	return nil
 }
 
-type TestDefinition struct {
+type TestSpec struct {
 	Selector   string   `yaml:"selector" json:"selector"`
 	Assertions []string `yaml:"assertions" json:"assertions"`
 }

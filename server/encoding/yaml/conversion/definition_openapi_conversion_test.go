@@ -267,7 +267,7 @@ func TestDefinitionToOpenAPIConversion(t *testing.T) {
 						Body:           "",
 					},
 				},
-				TestDefinition: []definition.TestDefinition{
+				TestDefinition: []definition.TestSpec{
 					{
 						Selector: `span[tracetest.span.type="http"]`,
 						Assertions: []string{

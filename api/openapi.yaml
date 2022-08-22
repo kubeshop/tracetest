@@ -286,7 +286,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "./tests.yaml#/components/schemas/TestDefinition"
+              $ref: "./tests.yaml#/components/schemas/TestSpec"
       responses:
         200:
           description: successful operation
@@ -458,7 +458,7 @@ paths:
             type: string
             format: uuid
           required: true
-      operationId: getTestDefinition
+      operationId: getTestSpec
       summary: "Get definition for a test"
       description: "Gets definition for a test"
       responses:
@@ -469,7 +469,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "./tests.yaml#/components/schemas/TestDefinition"
+                  $ref: "./tests.yaml#/components/schemas/TestSpec"
     put:
       tags:
         - api
@@ -480,14 +480,14 @@ paths:
             type: string
             format: uuid
           required: true
-      summary: "Set testDefinition for a test"
-      description: "Set testDefinition for a particular test"
-      operationId: setTestDefinition
+      summary: "Set spec for a test"
+      description: "Set spec for a particular test"
+      operationId: setTestSpec
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "./tests.yaml#/components/schemas/TestDefinition"
+              $ref: "./tests.yaml#/components/schemas/TestSpec"
       responses:
         204:
           description: OK

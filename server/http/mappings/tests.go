@@ -32,7 +32,7 @@ func (m OpenAPI) Test(in model.Test) openapi.Test {
 		Name:             in.Name,
 		Description:      in.Description,
 		ServiceUnderTest: m.Trigger(in.ServiceUnderTest),
-		Definition:       m.Definition(in.Definition),
+		Spec:             m.Definition(in.Definition),
 		Version:          int32(in.Version),
 	}
 }
@@ -67,9 +67,9 @@ func (m OpenAPI) Tests(in []model.Test) []openapi.Test {
 	return tests
 }
 
-func (m OpenAPI) Definition(in model.OrderedMap[model.SpanQuery, []model.Assertion]) openapi.TestDefinition {
+func (m OpenAPI) Definition(in model.OrderedMap[model.SpanQuery, []model.Assertion]) openapi.TestSpec {
 
-	defs := make([]openapi.TestDefinitionDefinitions, in.Len())
+	specs := make([]openapi.TestSpecSpecs, in.Len())
 
 	i := 0
 	in.Map(func(spanQuery model.SpanQuery, asserts []model.Assertion) {
@@ -78,15 +78,15 @@ func (m OpenAPI) Definition(in model.OrderedMap[model.SpanQuery, []model.Asserti
 			assertions[j] = m.Assertion(a)
 		}
 
-		defs[i] = openapi.TestDefinitionDefinitions{
+		specs[i] = openapi.TestSpecSpecs{
 			Selector:   m.Selector(spanQuery),
 			Assertions: assertions,
 		}
 		i++
 	})
 
-	return openapi.TestDefinition{
-		Definitions: defs,
+	return openapi.TestSpec{
+		Specs: specs,
 	}
 }
 
@@ -249,7 +249,7 @@ func (m Model) Test(in openapi.Test) model.Test {
 		Name:             in.Name,
 		Description:      in.Description,
 		ServiceUnderTest: m.Trigger(in.ServiceUnderTest),
-		Definition:       m.Definition(in.Definition),
+		Definition:       m.Definition(in.Spec),
 		Version:          int(in.Version),
 	}
 }
@@ -263,9 +263,9 @@ func (m Model) Tests(in []openapi.Test) []model.Test {
 	return tests
 }
 
-func (m Model) ValidateDefinition(in openapi.TestDefinition) error {
+func (m Model) ValidateDefinition(in openapi.TestSpec) error {
 	selectors := map[string]bool{}
-	for _, d := range in.Definitions {
+	for _, d := range in.Specs {
 		if _, exists := selectors[d.Selector.Query]; exists {
 			return fmt.Errorf("duplicated selector %s", d.Selector.Query)
 		}
@@ -276,17 +276,17 @@ func (m Model) ValidateDefinition(in openapi.TestDefinition) error {
 	return nil
 }
 
-func (m Model) Definition(in openapi.TestDefinition) model.OrderedMap[model.SpanQuery, []model.Assertion] {
-	defs := model.OrderedMap[model.SpanQuery, []model.Assertion]{}
-	for _, d := range in.Definitions {
-		asserts := make([]model.Assertion, len(d.Assertions))
-		for i, a := range d.Assertions {
+func (m Model) Definition(in openapi.TestSpec) model.OrderedMap[model.SpanQuery, []model.Assertion] {
+	specs := model.OrderedMap[model.SpanQuery, []model.Assertion]{}
+	for _, spec := range in.Specs {
+		asserts := make([]model.Assertion, len(spec.Assertions))
+		for i, a := range spec.Assertions {
 			asserts[i] = m.Assertion(a)
 		}
-		defs, _ = defs.Add(model.SpanQuery(d.Selector.Query), asserts)
+		specs, _ = specs.Add(model.SpanQuery(spec.Selector.Query), asserts)
 	}
 
-	return defs
+	return specs
 }
 
 func (m Model) Run(in openapi.TestRun) *model.Run {
