@@ -15,7 +15,7 @@
               "Body": "{ \"id\": 52 }"
           }
       },
-      "Spec": [
+      "Specs": [
         {
           "Key": "span[service.name=\"pokeshop\" tracetest.span.type=\"http\" name=\"POST /pokemon/import\"]",
           "Value": [

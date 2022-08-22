@@ -9,7 +9,7 @@ type Test struct {
 	Name        string      `yaml:"name" json:"name"`
 	Description string      `yaml:"description" json:"description"`
 	Trigger     TestTrigger `yaml:"trigger" json:"trigger"`
-	Spec        []TestSpec  `yaml:"spec,omitempty" json:"spec,omitempty"`
+	Spec        []TestSpec  `yaml:"specs,omitempty" json:"specs,omitempty"`
 }
 
 func (t Test) Validate() error {

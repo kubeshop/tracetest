@@ -131,7 +131,7 @@ func (c *controller) GetTestSpecs(ctx context.Context, testID string) (openapi.I
 		return handleDBError(err), err
 	}
 
-	return openapi.Response(200, c.mappers.Out.Specs(test.Spec)), nil
+	return openapi.Response(200, c.mappers.Out.Specs(test.Specs)), nil
 }
 
 func (c *controller) GetTestResultSelectedSpans(ctx context.Context, _ string, runID string, selectorQuery string) (openapi.ImplResponse, error) {
@@ -321,7 +321,7 @@ func (c *controller) SetTestSpecs(ctx context.Context, testID string, def openap
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
 	}
 
-	newTest.Spec = newDefinition
+	newTest.Specs = newDefinition
 
 	newTest, err = c.testDB.UpdateTest(ctx, newTest)
 	if err != nil {

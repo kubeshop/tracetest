@@ -100,7 +100,7 @@ func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, req Asse
 	}
 
 	run = run.SuccessfullyAsserted(
-		e.assertionExecutor.Assert(ctx, req.Test.Spec, *run.Trace),
+		e.assertionExecutor.Assert(ctx, req.Test.Specs, *run.Trace),
 	)
 
 	return run, nil

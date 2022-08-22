@@ -53,7 +53,7 @@ func TestExecutorSuccessfulExecution(t *testing.T) {
 			test, err = repo.CreateTest(ctx, test)
 			require.NoError(t, err)
 
-			err = repo.SetSpec(ctx, test, test.Spec)
+			err = repo.SetSpec(ctx, test, test.Specs)
 			require.NoError(t, err)
 
 			run, err = repo.CreateRun(ctx, test, run)
