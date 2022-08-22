@@ -16,7 +16,7 @@ func TestDefinitions(t *testing.T) {
 
 	test := createTest(t, db)
 
-	def := (model.OrderedMap[model.SpanQuery, []model.Assertion]{}).MustAdd(`span[service.name="Pokeshop"]`, []model.Assertion{
+	spec := (model.OrderedMap[model.SpanQuery, []model.Assertion]{}).MustAdd(`span[service.name="Pokeshop"]`, []model.Assertion{
 		{
 			Attribute:  "tracetest.span.duration",
 			Comparator: comparator.Eq,
@@ -24,10 +24,10 @@ func TestDefinitions(t *testing.T) {
 		},
 	})
 
-	err := db.SetDefiniton(context.TODO(), test, def)
+	err := db.SetSpec(context.TODO(), test, spec)
 	require.NoError(t, err)
 
-	actual, err := db.GetDefiniton(context.TODO(), test)
+	actual, err := db.GetSpec(context.TODO(), test)
 	require.NoError(t, err)
-	assert.Equal(t, def, actual)
+	assert.Equal(t, spec, actual)
 }
