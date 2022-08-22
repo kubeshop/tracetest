@@ -35,11 +35,11 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 				Spec:             &openapi.TestSpec{},
 			},
 			ExpectedOutput: definition.Test{
-				Id:             "624a8dea-f152-48d4-a742-30b210094959",
-				Name:           "my test",
-				Description:    "my test description",
-				Trigger:        definition.TestTrigger{},
-				TestDefinition: []definition.TestDefinition{},
+				Id:          "624a8dea-f152-48d4-a742-30b210094959",
+				Name:        "my test",
+				Description: "my test description",
+				Trigger:     definition.TestTrigger{},
+				Spec:        []definition.TestSpec{},
 			},
 		},
 		{
@@ -80,7 +80,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 						Body:           `{ "id": 52 }`,
 					},
 				},
-				TestDefinition: []definition.TestDefinition{},
+				Spec: []definition.TestSpec{},
 			},
 		},
 		{
@@ -120,7 +120,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 						Authentication: definition.HTTPAuthentication{},
 					},
 				},
-				TestDefinition: []definition.TestDefinition{},
+				Spec: []definition.TestSpec{},
 			},
 		},
 		{
@@ -173,7 +173,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 						Body: `{ "id": 52 }`,
 					},
 				},
-				TestDefinition: []definition.TestDefinition{},
+				Spec: []definition.TestSpec{},
 			},
 		},
 		{
@@ -228,7 +228,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 						Body: `{ "id": 52 }`,
 					},
 				},
-				TestDefinition: []definition.TestDefinition{},
+				Spec: []definition.TestSpec{},
 			},
 		},
 		{
@@ -279,7 +279,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 						Body: `{ "id": 52 }`,
 					},
 				},
-				TestDefinition: []definition.TestDefinition{},
+				Spec: []definition.TestSpec{},
 			},
 		},
 		{
@@ -317,7 +317,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 				Name:        "my test",
 				Description: "my test description",
 				Trigger:     definition.TestTrigger{},
-				TestDefinition: []definition.TestDefinition{
+				Spec: []definition.TestSpec{
 					{
 						Selector: `span[name = "my span name"]`,
 						Assertions: []string{

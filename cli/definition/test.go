@@ -3,11 +3,11 @@ package definition
 import "fmt"
 
 type Test struct {
-	Id             string           `yaml:"id"`
-	Name           string           `yaml:"name"`
-	Description    string           `yaml:"description"`
-	Trigger        TestTrigger      `yaml:"trigger"`
-	TestDefinition []TestDefinition `yaml:"testDefinition,omitempty"`
+	Id          string      `yaml:"id"`
+	Name        string      `yaml:"name"`
+	Description string      `yaml:"description"`
+	Trigger     TestTrigger `yaml:"trigger"`
+	Spec        []TestSpec  `yaml:"spec,omitempty"`
 }
 
 func (t Test) Validate() error {
@@ -47,7 +47,7 @@ func (t TestTrigger) Validate() error {
 	return nil
 }
 
-type TestDefinition struct {
+type TestSpec struct {
 	Selector   string   `yaml:"selector"`
 	Assertions []string `yaml:"assertions"`
 }

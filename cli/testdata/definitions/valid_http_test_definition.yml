@@ -14,7 +14,7 @@ trigger:
     address: ""
     service: ""
     method: ""
-testDefinition:
+spec:
 - selector: span[name = "POST /pokemon/import"]
   assertions:
   - tracetest.span.duration <= 100ms
