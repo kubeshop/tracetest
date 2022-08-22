@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestDefinitionsOrder(t *testing.T) {
+func TestSpecOrder(t *testing.T) {
 	input := openapi.TestSpec{
 		Specs: []openapi.TestSpecSpecs{
 			{
