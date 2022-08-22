@@ -19,7 +19,7 @@ func ConvertTestDefinitionIntoOpenAPIObject(definition definition.Test) (openapi
 		Name:             definition.Name,
 		Description:      definition.Description,
 		ServiceUnderTest: convertTriggerIntoServiceUnderTest(definition.Trigger),
-		Spec:             spec,
+		Specs:            spec,
 	}, nil
 }
 
@@ -102,23 +102,23 @@ func getAuthOpenAPI(auth definition.HTTPAuthentication) openapi.HttpAuth {
 	}
 }
 
-func convertTestSpecIntoOpenAPIObject(testSpec []definition.TestSpec) (openapi.TestSpec, error) {
+func convertTestSpecIntoOpenAPIObject(testSpec []definition.TestSpec) (openapi.TestSpecs, error) {
 	if len(testSpec) == 0 {
-		return openapi.TestSpec{}, nil
+		return openapi.TestSpecs{}, nil
 	}
 
-	definitions := make([]openapi.TestSpecSpecs, 0, len(testSpec))
+	definitions := make([]openapi.TestSpecsSpecs, 0, len(testSpec))
 	for _, testSpec := range testSpec {
 		assertions := make([]openapi.Assertion, 0, len(testSpec.Assertions))
 		for _, assertion := range testSpec.Assertions {
 			assertionObject, err := convertStringIntoAssertion(assertion)
 			if err != nil {
-				return openapi.TestSpec{}, err
+				return openapi.TestSpecs{}, err
 			}
 			assertions = append(assertions, assertionObject)
 		}
 
-		definitions = append(definitions, openapi.TestSpecSpecs{
+		definitions = append(definitions, openapi.TestSpecsSpecs{
 			Selector: openapi.Selector{
 				Query: testSpec.Selector,
 			},
@@ -126,7 +126,7 @@ func convertTestSpecIntoOpenAPIObject(testSpec []definition.TestSpec) (openapi.T
 		})
 	}
 
-	return openapi.TestSpec{
+	return openapi.TestSpecs{
 		Specs: definitions,
 	}, nil
 }

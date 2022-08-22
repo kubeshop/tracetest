@@ -32,7 +32,7 @@ func (m OpenAPI) Test(in model.Test) openapi.Test {
 		Name:             in.Name,
 		Description:      in.Description,
 		ServiceUnderTest: m.Trigger(in.ServiceUnderTest),
-		Spec:             m.Definition(in.Spec),
+		Specs:            m.Specs(in.Spec),
 		Version:          int32(in.Version),
 	}
 }
@@ -67,9 +67,9 @@ func (m OpenAPI) Tests(in []model.Test) []openapi.Test {
 	return tests
 }
 
-func (m OpenAPI) Definition(in model.OrderedMap[model.SpanQuery, []model.Assertion]) openapi.TestSpec {
+func (m OpenAPI) Specs(in model.OrderedMap[model.SpanQuery, []model.Assertion]) openapi.TestSpecs {
 
-	specs := make([]openapi.TestSpecSpecs, in.Len())
+	specs := make([]openapi.TestSpecsSpecs, in.Len())
 
 	i := 0
 	in.Map(func(spanQuery model.SpanQuery, asserts []model.Assertion) {
@@ -78,14 +78,14 @@ func (m OpenAPI) Definition(in model.OrderedMap[model.SpanQuery, []model.Asserti
 			assertions[j] = m.Assertion(a)
 		}
 
-		specs[i] = openapi.TestSpecSpecs{
+		specs[i] = openapi.TestSpecsSpecs{
 			Selector:   m.Selector(spanQuery),
 			Assertions: assertions,
 		}
 		i++
 	})
 
-	return openapi.TestSpec{
+	return openapi.TestSpecs{
 		Specs: specs,
 	}
 }
@@ -249,7 +249,7 @@ func (m Model) Test(in openapi.Test) model.Test {
 		Name:             in.Name,
 		Description:      in.Description,
 		ServiceUnderTest: m.Trigger(in.ServiceUnderTest),
-		Spec:             m.Definition(in.Spec),
+		Spec:             m.Definition(in.Specs),
 		Version:          int(in.Version),
 	}
 }
@@ -263,7 +263,7 @@ func (m Model) Tests(in []openapi.Test) []model.Test {
 	return tests
 }
 
-func (m Model) ValidateDefinition(in openapi.TestSpec) error {
+func (m Model) ValidateDefinition(in openapi.TestSpecs) error {
 	selectors := map[string]bool{}
 	for _, d := range in.Specs {
 		if _, exists := selectors[d.Selector.Query]; exists {
@@ -276,7 +276,7 @@ func (m Model) ValidateDefinition(in openapi.TestSpec) error {
 	return nil
 }
 
-func (m Model) Definition(in openapi.TestSpec) model.OrderedMap[model.SpanQuery, []model.Assertion] {
+func (m Model) Definition(in openapi.TestSpecs) model.OrderedMap[model.SpanQuery, []model.Assertion] {
 	specs := model.OrderedMap[model.SpanQuery, []model.Assertion]{}
 	for _, spec := range in.Specs {
 		asserts := make([]model.Assertion, len(spec.Assertions))

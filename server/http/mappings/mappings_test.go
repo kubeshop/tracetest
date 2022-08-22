@@ -12,8 +12,8 @@ import (
 )
 
 func TestSpecOrder(t *testing.T) {
-	input := openapi.TestSpec{
-		Specs: []openapi.TestSpecSpecs{
+	input := openapi.TestSpecs{
+		Specs: []openapi.TestSpecsSpecs{
 			{
 				Selector: openapi.Selector{
 					Query: "selector 1",
@@ -91,7 +91,7 @@ func TestSpecOrder(t *testing.T) {
 	attempts := 50
 	for i := 0; i < attempts; i++ {
 		maps := mappings.New(traces.ConversionConfig{}, comparator.DefaultRegistry())
-		actual := maps.Out.Definition(maps.In.Definition(input))
+		actual := maps.Out.Specs(maps.In.Definition(input))
 		actualJSON, err := json.Marshal(actual)
 
 		require.NoError(t, err)

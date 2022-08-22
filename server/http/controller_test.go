@@ -37,8 +37,8 @@ var (
 // https://github.com/kubeshop/tracetest/issues/617
 func TestContains_Issue617(t *testing.T) {
 
-	spec := openapi.TestSpec{
-		Specs: []openapi.TestSpecSpecs{
+	spec := openapi.TestSpecs{
+		Specs: []openapi.TestSpecsSpecs{
 			{
 				Selector: openapi.Selector{
 					Query: `span[tracetest.span.type = "http" service.name = "pokeshop"  name = "POST /pokemon/import"]`,

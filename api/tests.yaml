@@ -17,11 +17,11 @@ components:
           description: version number of the test
         serviceUnderTest:
           $ref: "./triggers.yaml#/components/schemas/Trigger"
-        spec:
-          $ref: "#/components/schemas/TestSpec"
+        specs:
+          $ref: "#/components/schemas/TestSpecs"
           description: specification of assertions that are going to be made
 
-    TestSpec:
+    TestSpecs:
       type: object
       properties:
         specs:

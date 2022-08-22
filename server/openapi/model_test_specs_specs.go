@@ -9,14 +9,14 @@
 
 package openapi
 
-type TestSpecSpecs struct {
+type TestSpecsSpecs struct {
 	Selector Selector `json:"selector,omitempty"`
 
 	Assertions []Assertion `json:"assertions,omitempty"`
 }
 
-// AssertTestSpecSpecsRequired checks if the required fields are not zero-ed
-func AssertTestSpecSpecsRequired(obj TestSpecSpecs) error {
+// AssertTestSpecsSpecsRequired checks if the required fields are not zero-ed
+func AssertTestSpecsSpecsRequired(obj TestSpecsSpecs) error {
 	if err := AssertSelectorRequired(obj.Selector); err != nil {
 		return err
 	}
@@ -28,14 +28,14 @@ func AssertTestSpecSpecsRequired(obj TestSpecSpecs) error {
 	return nil
 }
 
-// AssertRecurseTestSpecSpecsRequired recursively checks if required fields are not zero-ed in a nested slice.
-// Accepts only nested slice of TestSpecSpecs (e.g. [][]TestSpecSpecs), otherwise ErrTypeAssertionError is thrown.
-func AssertRecurseTestSpecSpecsRequired(objSlice interface{}) error {
+// AssertRecurseTestSpecsSpecsRequired recursively checks if required fields are not zero-ed in a nested slice.
+// Accepts only nested slice of TestSpecsSpecs (e.g. [][]TestSpecsSpecs), otherwise ErrTypeAssertionError is thrown.
+func AssertRecurseTestSpecsSpecsRequired(objSlice interface{}) error {
 	return AssertRecurseInterfaceRequired(objSlice, func(obj interface{}) error {
-		aTestSpecSpecs, ok := obj.(TestSpecSpecs)
+		aTestSpecsSpecs, ok := obj.(TestSpecsSpecs)
 		if !ok {
 			return ErrTypeAssertionError
 		}
-		return AssertTestSpecSpecsRequired(aTestSpecSpecs)
+		return AssertTestSpecsSpecsRequired(aTestSpecsSpecs)
 	})
 }
