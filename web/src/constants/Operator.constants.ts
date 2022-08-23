@@ -8,6 +8,7 @@ export enum CompareOperator {
   GREATOREQUALS = 'GREATOREQUALS',
   LESSOREQUAL = 'LESSOREQUAL',
   CONTAINS = 'CONTAINS',
+  NOTCONTAINS = 'NOTCONTAINS',
 }
 
 export const CompareOperatorNameMap: Record<CompareOperator, TCompareOperatorName> = {
@@ -18,6 +19,7 @@ export const CompareOperatorNameMap: Record<CompareOperator, TCompareOperatorNam
   [CompareOperator.GREATOREQUALS]: 'greater or equals',
   [CompareOperator.LESSOREQUAL]: 'less or equals',
   [CompareOperator.CONTAINS]: 'contains',
+  [CompareOperator.NOTCONTAINS]: 'does not contain',
 };
 
 export const CompareOperatorSymbolMap: Record<CompareOperator, TCompareOperatorSymbol> = {
@@ -28,6 +30,7 @@ export const CompareOperatorSymbolMap: Record<CompareOperator, TCompareOperatorS
   [CompareOperator.GREATOREQUALS]: '>=',
   [CompareOperator.LESSOREQUAL]: '<=',
   [CompareOperator.CONTAINS]: 'contains',
+  [CompareOperator.NOTCONTAINS]: 'not-contains',
 };
 
 export const CompareOperatorSymbolNameMap: Record<TCompareOperatorSymbol, TCompareOperatorName> = {
@@ -38,6 +41,7 @@ export const CompareOperatorSymbolNameMap: Record<TCompareOperatorSymbol, TCompa
   '>=': 'greater or equals',
   '<=': 'less or equals',
   contains: 'contains',
+  'not-contains': 'does not contain',
 };
 
 export enum PseudoSelector {

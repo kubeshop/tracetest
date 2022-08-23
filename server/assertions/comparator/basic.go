@@ -15,6 +15,7 @@ var (
 		Lt,
 		Lte,
 		Contains,
+		NotContains,
 		StartsWith,
 		EndsWith,
 	}
@@ -175,6 +176,23 @@ func (c contains) Compare(expected, actual string) error {
 
 func (c contains) String() string {
 	return "contains"
+}
+
+// Not contains
+var NotContains Comparator = notContains{}
+
+type notContains struct{}
+
+func (c notContains) Compare(expected, actual string) error {
+	if strings.Contains(actual, expected) {
+		return ErrNoMatch
+	}
+
+	return nil
+}
+
+func (c notContains) String() string {
+	return "not-contains"
 }
 
 // StartsWith

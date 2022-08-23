@@ -1,0 +1,22 @@
+entry-pipeline:
+  delay: "100"
+  source:
+    otel_trace_source:
+      ssl: false
+  sink:
+    - pipeline:
+        name: "raw-pipeline"
+
+raw-pipeline:
+  source:
+    pipeline:
+      name: "entry-pipeline"
+  prepper:
+    - otel_trace_raw_prepper:
+  sink:
+    - opensearch:
+        hosts:
+          - "http://opensearch:9200"
+        insecure: true
+        trace-analytics-raw: true
+        index: traces

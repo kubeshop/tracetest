@@ -15,17 +15,6 @@ processors:
     sampling_percentage: 100
 
 exporters:
-  logging:
-    logLevel: debug
-  jaeger:
-    endpoint: ${JAEGER_ENDPOINT}
-    tls:
-      insecure: true
-  otlphttp:
-    traces_endpoint: https://ingest.lightstep.com:443/traces/otlp/v0.6
-    metrics_endpoint: https://ingest.lightstep.com:443/metrics/otlp/v0.9
-    headers: {"lightstep-access-token": "${LIGHTSTEP_TOKEN}"}
-    compression: gzip
   otlp/2:
     endpoint: data-prepper:21890
     tls:
@@ -37,4 +26,4 @@ service:
     traces:
       receivers: [otlp]
       processors: [probabilistic_sampler, batch]
-      exporters: [logging, jaeger, otlp/2]
+      exporters: [otlp/2]

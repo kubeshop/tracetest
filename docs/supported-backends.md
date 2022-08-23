@@ -4,6 +4,7 @@ Currently, Tracetest supports the following backend data stores:
 
 - Jaeger
 - Grafana Tempo
+- OpenSearch
 
 Details of configuring Tracetest to access these is discussed in the [installation instructions](/docs/installing.md).
 

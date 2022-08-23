@@ -24,6 +24,8 @@ Tracetest allows you to quickly build integration and e2e tests, powered by your
 
 Check out the following blog posts & videos with Tracetest-related content:
 
+- [Common Cypress Testing Pitfalls & How to Avoid Them](https://kubeshop.io/blog/common-cypress-testing-pitfalls-how-to-avoid-them) - Aug 18, 2022
+
 - Recorded livestream: [Tracetest v0.6 Release - gRPC, Postman and More](https://www.youtube.com/watch?v=xpEKHK5VXB0) - July 27, 2022
 
 - [Tracetest 0.6 Release - gRPC, Postman and More](https://kubeshop.io/blog/tracetest-0-6-release-grpc-postman-and-more) - July 27, 2022
