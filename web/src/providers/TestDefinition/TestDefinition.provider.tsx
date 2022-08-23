@@ -9,8 +9,9 @@ import {TAssertionResultEntry, TAssertionResults} from 'types/Assertion.types';
 import {TTest} from 'types/Test.types';
 import {TTestDefinitionEntry} from 'types/TestDefinition.types';
 import RouterActions from 'redux/actions/Router.actions';
+import {RouterSearchFields} from 'constants/Common.constants';
+import {encryptString} from 'utils/Common';
 import useTestDefinitionCrud from './hooks/useTestDefinitionCrud';
-import {RouterSearchFields} from '../../constants/Common.constants';
 
 interface IContext {
   revert: (originalSelector: string) => void;
@@ -86,7 +87,11 @@ const TestDefinitionProvider = ({children, testId, runId}: IProps) => {
 
   const setSelectedAssertion = useCallback(
     (assertionResult?: TAssertionResultEntry) => {
-      dispatch(RouterActions.updateSearch({[RouterSearchFields.SelectedAssertion]: assertionResult?.selector}));
+      dispatch(
+        RouterActions.updateSearch({
+          [RouterSearchFields.SelectedAssertion]: encryptString(assertionResult?.selector || ''),
+        })
+      );
     },
     [dispatch]
   );

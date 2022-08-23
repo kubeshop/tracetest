@@ -1,3 +1,5 @@
+import {AES, enc} from 'crypto-js';
+
 export const escapeString = (str: string): string => {
   // eslint-disable-next-line no-control-regex
   return str.replace(/[\\"']/g, '\\$&').replace(/\u0000/g, '\\0');
@@ -37,3 +39,14 @@ export const downloadFile = (data: string, fileName: string): Element => {
 export function enumKeys<O extends object, K extends keyof O = keyof O>(obj: O): K[] {
   return Object.keys(obj).filter(k => Number.isNaN(Number(k))) as K[];
 }
+
+const encryptKey = 'tracetest';
+export const encryptString = (data: string): string => {
+  return AES.encrypt(data, encryptKey).toString();
+};
+
+export const decryptString = (data: string): string => {
+  const bytes = AES.decrypt(data, encryptKey);
+
+  return bytes.toString(enc.Utf8);
+};

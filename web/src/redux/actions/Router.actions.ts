@@ -5,6 +5,7 @@ import {push} from 'redux-first-history';
 import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
 import {RouterSearchFields} from '../../constants/Common.constants';
 import SpanSelectors from '../../selectors/Span.selectors';
+import {decryptString} from '../../utils/Common';
 import {setSelectedSpan} from '../slices/Span.slice';
 import {setSelectedAssertion} from '../slices/TestDefinition.slice';
 import {RootState} from '../store';
@@ -20,9 +21,11 @@ const RouterActions = () => ({
     async ({search}, {getState, dispatch}) => {
       const {[RouterSearchFields.SelectedAssertion]: selector = ''} = search;
 
+      const decryptedSelector = decryptString(String(selector));
+
       const assertionResult = TestDefinitionSelectors.selectAssertionBySelector(
         getState() as RootState,
-        String(selector)
+        decryptedSelector
       );
 
       if (assertionResult) dispatch(setSelectedAssertion(assertionResult));
