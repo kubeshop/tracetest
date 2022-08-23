@@ -190,3 +190,16 @@ testDefinition:
 ```
 
 For more information about selectors or assertions, take a look at the documentation for those topics.
+
+### Available operations
+
+| Operator              | Description |
+| :------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `=`            | check if two values are equal                                                                                            |
+| `!=`           | check if two values have different values                                                                                |
+| `<`            | check if value from left side is smaller than the one on the right side of the operation                                 |
+| `<=`           | check if value from left side is smaller or equal to the one on the right side of the operation                          |
+| `>`            | check if value from left side is larger than the one on the right side of the operation                                  |
+| `>=`           | check if value from left side is larger or equal to the one on the right side of the operation                           |
+| `contains`     | check if value on the right side of the operation is contained inside of the value of the left side of the operation     |
+| `not-contains` | check if value on the right side of the operation is not contained inside of the value of the left side of the operation |

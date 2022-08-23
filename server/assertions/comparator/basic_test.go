@@ -143,6 +143,25 @@ func TestComparators(t *testing.T) {
 			},
 		},
 
+		{
+			name:       "Not contains",
+			symbol:     "not-contains",
+			comparator: comparator.NotContains,
+			// actual NOT CONTAINS expected
+			expectSuccess: []compInput{
+				{"hello", "not"},
+				{"hello", "ella"},
+				{"hello", "helloo"},
+				{`{"id":52}`, "56"},
+			},
+			expectNoMatch: []compInput{
+				{"hello", "he"},
+				{"hello", "hel"},
+				{"hello", "ell"},
+				{"hello", "ello"},
+			},
+		},
+
 		// ***********
 		{
 			name:       "StartsWith",

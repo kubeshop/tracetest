@@ -1,26 +1,19 @@
 postgresConnString: "host=postgres user=postgres password=postgres port=5432 sslmode=disable"
 
 poolingConfig:
-  maxWaitTimeForTrace: 30s
-  retryDelay: 500ms
+  maxWaitTimeForTrace: 10m
+  retryDelay: 5s
 
 googleAnalytics:
-  enabled: false
+  enabled: true
 
 telemetry:
   dataStores:
-    jaeger:
-      type: jaeger
-      jaeger:
-        endpoint: jaeger:16685
-        tls:
-          insecure: true
-
     opensearch:
       type: opensearch
       opensearch:
         addresses:
-          - http://localhost:9200
+          - http://opensearch:9200
         index: traces
 
   exporters:
@@ -34,6 +27,6 @@ telemetry:
 
 server:
   telemetry:
+    dataStore: opensearch
     exporter: collector
-    dataStore: jaeger
     applicationExporter: collector
