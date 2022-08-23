@@ -3,6 +3,8 @@ services:
   tracetest:
     container_name: tracetest
     image: kubeshop/tracetest
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     build:
       context: .
       args:
@@ -18,10 +20,6 @@ services:
       postgres:
         condition: service_healthy
       jaeger:
-        condition: service_healthy
-      demo-api:
-        condition: service_healthy
-      demo-rpc:
         condition: service_healthy
       otel-collector:
         condition: service_started
@@ -57,14 +55,18 @@ services:
     depends_on:
       jaeger:
         condition: service_healthy
-
-
   jaeger:
     image: jaegertracing/all-in-one:latest
     ports:
-      - "6831:6831/udp"
-      - "16686:16686"
-      - "16685:16685"
+      - 5775:5775/udp
+      - 6831:6831/udp
+      - 6832:6832/udp
+      - 5778:5778
+      - 4318:4318
+      - 16685:16685
+      - 16686:16686
+      - 14268:14268
+      - 9411:9411
     healthcheck:
       test: ["CMD", "wget", "--spider", "localhost:16686"]
       interval: 1s
@@ -103,6 +105,8 @@ services:
       JAEGER_HOST: jaeger
       JAEGER_PORT: 6832
       NPM_RUN_COMMAND: api
+    profiles:
+      - demo
     ports:
       - "8081:8081"
     healthcheck:
@@ -123,6 +127,8 @@ services:
   demo-worker:
     image: kubeshop/demo-pokemon-api:latest
     pull_policy: always
+    profiles:
+      - demo
     environment:
       REDIS_URL: cache
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres?schema=public
@@ -144,6 +150,8 @@ services:
   demo-rpc:
     image: kubeshop/demo-pokemon-api:latest
     pull_policy: always
+    profiles:
+      - demo
     environment:
       REDIS_URL: cache
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres?schema=public

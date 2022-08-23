@@ -1,0 +1,10 @@
+http:
+  prefix: someprefix
+maxWaitTimeForTrace: 10s
+postgresConnString: "host=127.0.0.1 user=tracetest password=not-secure-database-password  port=5432 sslmode=disable"
+jaegerConnectionConfig:
+  endpoint: localhost:16685
+  tls:
+    insecure: true
+googleAnalytics:
+  enabled: false
