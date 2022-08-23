@@ -42,7 +42,7 @@ const EditTestContent = ({test}: IProps) => {
 
       navigate(`/test/${test.id}/run/${run.id}`);
     },
-    [editTest, navigate, runTest, setIsOpen, test]
+    [editTest, navigate, plugin, runTest, setIsOpen, test]
   );
 
   return (
