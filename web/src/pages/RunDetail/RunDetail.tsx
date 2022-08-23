@@ -14,8 +14,8 @@ const RunDetail = () => {
   const {testId = '', runId = ''} = useParams();
 
   return (
-    <Layout>
-      <GuidedTourProvider>
+    <GuidedTourProvider>
+      <Layout>
         <ReactFlowProvider>
           <TestRunProvider testId={testId} runId={runId}>
             <TestDefinitionProvider testId={testId} runId={runId}>
@@ -27,8 +27,8 @@ const RunDetail = () => {
             </TestDefinitionProvider>
           </TestRunProvider>
         </ReactFlowProvider>
-      </GuidedTourProvider>
-    </Layout>
+      </Layout>
+    </GuidedTourProvider>
   );
 };
 
