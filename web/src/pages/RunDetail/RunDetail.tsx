@@ -1,15 +1,16 @@
 import {useParams} from 'react-router-dom';
 import {ReactFlowProvider} from 'react-flow-renderer';
-import Layout from 'components/Layout';
+
 import AssertionFormProvider from 'components/AssertionForm/AssertionForm.provider';
-import TestRunProvider from 'providers/TestRun';
-import TestDefinitionProvider from 'providers/TestDefinition';
+import Layout from 'components/Layout';
+import withAnalytics from 'components/WithAnalytics/WithAnalytics';
 import GuidedTourProvider from 'providers/GuidedTour/GuidedTour.provider';
 import SpanProvider from 'providers/Span';
-import TraceContent from './TraceContent';
-import withAnalytics from '../../components/WithAnalytics/WithAnalytics';
+import TestDefinitionProvider from 'providers/TestDefinition';
+import TestRunProvider from 'providers/TestRun';
+import Content from './Content';
 
-const TracePage = () => {
+const RunDetail = () => {
   const {testId = '', runId = ''} = useParams();
 
   return (
@@ -20,7 +21,7 @@ const TracePage = () => {
             <AssertionFormProvider testId={testId}>
               <SpanProvider>
                 <Layout>
-                  <TraceContent />
+                  <Content />
                 </Layout>
               </SpanProvider>
             </AssertionFormProvider>
@@ -31,4 +32,4 @@ const TracePage = () => {
   );
 };
 
-export default withAnalytics(TracePage, 'trace');
+export default withAnalytics(RunDetail, 'run-detail');

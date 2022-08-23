@@ -1,7 +1,7 @@
 import {render, waitFor} from 'test-utils';
-import Header from '../index';
+import Header from '../Header';
 
-test('Header', async () => {
+it('Header', async () => {
   const {getByTestId} = render(<Header />);
-  await waitFor(() => getByTestId('github-link'));
+  await waitFor(() => getByTestId('menu-link'));
 });

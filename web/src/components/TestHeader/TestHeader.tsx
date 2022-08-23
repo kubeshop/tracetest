@@ -1,104 +1,33 @@
-import {Button} from 'antd';
-import {useState} from 'react';
-
-import TestState from 'components/TestState';
-import VersionMismatchModal from 'components/VersionMismatchModal/VersionMismatchModal';
-import {TestState as TestStateEnum} from 'constants/TestRun.constants';
-import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
-import {useTestRun} from 'providers/TestRun/TestRun.provider';
-import TestAnalyticsService from 'services/Analytics/TestAnalytics.service';
+import TestCardActions from 'components/TestCard/TestCardActions';
+import {useMenuDeleteCallback} from 'pages/Home/useMenuDeleteCallback';
 import {TTest} from 'types/Test.types';
-import {TTestRunState} from 'types/TestRun.types';
-import Info from './Info';
 import * as S from './TestHeader.styled';
-import RunActionsMenu from '../RunActionsMenu';
 
 interface IProps {
-  executionTime?: number;
-  extraContent?: React.ReactElement;
   onBack(): void;
-  showInfo: boolean;
   test: TTest;
-  testState?: TTestRunState;
-  testVersion: number;
-  totalSpans?: number;
 }
 
-const TestHeader = ({
-  executionTime,
-  extraContent,
-  onBack,
-  showInfo,
-  test: {name, trigger, version = 1, id},
-  test,
-  testState,
-  testVersion,
-  totalSpans,
-}: IProps) => {
-  const {runTest} = useTestDefinition();
-  const {run} = useTestRun();
-  const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
-
-  const handleRunTestOnClick = () => {
-    TestAnalyticsService.onRunTest();
-    if (testVersion !== version) {
-      setIsConfirmationModalOpen(true);
-      return;
-    }
-    runTest();
-  };
+const TestHeader = ({onBack, test: {id, name, trigger, version = 1}, test}: IProps) => {
+  const onDelete = useMenuDeleteCallback();
 
   return (
-    <S.TestHeader>
-      <S.Content>
+    <S.Container>
+      <S.Section>
         <S.BackIcon data-cy="test-header-back-button" onClick={onBack} />
         <div>
-          <S.Row>
-            <S.TestName data-cy="test-details-name">
-              {name} (v{testVersion})
-            </S.TestName>
-            {showInfo && (
-              <Info
-                date={run?.createdAt ?? ''}
-                executionTime={executionTime ?? 0}
-                totalSpans={totalSpans ?? 0}
-                traceId={run?.traceId ?? ''}
-              />
-            )}
-          </S.Row>
-          <S.TestUrl>
-            {trigger.method.toUpperCase()} - {trigger.entryPoint}
-          </S.TestUrl>
+          <S.Title data-cy="test-details-name">
+            {name} (v{version})
+          </S.Title>
+          <S.Text>
+            {trigger.type.toUpperCase()} - {trigger.method.toUpperCase()} - {trigger.entryPoint}
+          </S.Text>
         </div>
-      </S.Content>
-      <S.RightSection>
-        {extraContent}
-        {!extraContent && testState && testState !== TestStateEnum.FINISHED && (
-          <S.StateContainer data-cy="test-run-result-status">
-            <S.StateText>Test status:</S.StateText>
-            <TestState testState={testState} />
-          </S.StateContainer>
-        )}
-        {!extraContent && testState && testState === TestStateEnum.FINISHED && (
-          <Button data-cy="run-test-button" ghost onClick={handleRunTestOnClick} type="primary">
-            Run Test
-          </Button>
-        )}
-        {run.id && <RunActionsMenu testId={id} testVersion={version} test={test} resultId={run.id} isRunView />}
-      </S.RightSection>
-      <VersionMismatchModal
-        description="Running the test will use the latest version of the test."
-        currentVersion={testVersion}
-        isOpen={isConfirmationModalOpen}
-        latestVersion={version}
-        okText="Run Test"
-        onCancel={() => setIsConfirmationModalOpen(false)}
-        onConfirm={() => {
-          setIsConfirmationModalOpen(false);
-          runTest();
-        }}
-      />
-    </S.TestHeader>
+      </S.Section>
+      <S.Section>
+        <TestCardActions testId={id} onDelete={() => onDelete(test)} />
+      </S.Section>
+    </S.Container>
   );
 };
 

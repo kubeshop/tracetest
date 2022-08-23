@@ -1,12 +1,8 @@
-import {DOCUMENTATION_URL, GITHUB_URL} from '../../../src/constants/Common.constants';
-
 describe('Home', () => {
   beforeEach(() => cy.visit('/'));
 
   it('should render the layout', () => {
-    cy.get('[data-cy=documentation-link]').should('have.attr', 'href', DOCUMENTATION_URL);
-    cy.get('[data-cy=github-link]').should('have.attr', 'href', GITHUB_URL);
-    cy.get('[data-cy=onboarding-link]').should('be.visible');
+    cy.get('[data-cy=menu-link]').should('be.visible');
   });
 
   it('should render the list of tests', () => {
