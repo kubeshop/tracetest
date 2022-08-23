@@ -1,10 +1,10 @@
-import {createAssertion, getAttributeListId, getComparatorListId} from './CreateAssertion';
+import {getAttributeListId} from '../../support/commands';
 
 describe('Create Assertion', () => {
   beforeEach(() => cy.createTest());
   afterEach(() => cy.deleteTest());
 
-  it('should create a basic assertion', () => createAssertion());
+  it('should create a basic assertion', () => cy.createAssertion());
 
   it('should create an assertion with multiple checks', () => {
     cy.get(`[data-cy=trace-node-http]`, {timeout: 20000}).first().click();
@@ -17,11 +17,7 @@ describe('Create Assertion', () => {
       .first()
       .click();
 
-    cy.get('[data-cy=assertion-check-operator]').click();
-    cy.get(`${getComparatorListId(0)} + div .ant-select-item`)
-      .first()
-      .click();
-    cy.get('[data-cy=assertion-check-operator] .ant-select-selection-item').first().should('have.text', 'Equals');
+    cy.selectOperator(0);
 
     cy.get('[data-cy=add-assertion-form-add-check]').click();
 
@@ -30,11 +26,7 @@ describe('Create Assertion', () => {
       .first()
       .click();
 
-    cy.get('[data-cy=assertion-check-operator]').last().click();
-    cy.get(`${getComparatorListId(1)} + div .ant-select-item`)
-      .last()
-      .click();
-    cy.get('[data-cy=assertion-check-operator] .ant-select-selection-item').last().should('have.text', 'Contains');
+    cy.selectOperator(1);
 
     cy.get('[data-cy=add-assertion-form-add-check]').click();
 
@@ -43,10 +35,7 @@ describe('Create Assertion', () => {
       .first()
       .click();
 
-    cy.get('[data-cy=assertion-check-operator]').last().click();
-    cy.get(`${getComparatorListId(2)} + div .ant-select-item`)
-      .last()
-      .click();
+    cy.selectOperator(2);
 
     cy.get('[data-cy=assertion-check-value]').last().type('s');
     cy.get('[data-cy=duration]').click();
@@ -72,11 +61,7 @@ describe('Create Assertion', () => {
       .first()
       .click();
 
-    cy.get('[data-cy=assertion-check-operator]').click();
-    cy.get(`${getComparatorListId(0)} + div .ant-select-item`)
-      .last()
-      .click();
-    cy.get('[data-cy=assertion-check-operator] .ant-select-selection-item').should('have.text', 'Contains');
+    cy.selectOperator(0);
 
     cy.get('[data-cy=assertion-form-submit-button]').click();
 
@@ -85,17 +70,13 @@ describe('Create Assertion', () => {
   });
   //
   it('should update an assertion', () => {
-    createAssertion();
+    cy.createAssertion();
     cy.get(`[data-cy=edit-assertion-button]`, {timeout: 20000});
 
     cy.get('[data-cy=edit-assertion-button]').first().click();
     cy.get('[data-cy=assertion-form]').should('be.visible');
 
-    cy.get('[data-cy=assertion-check-operator]').first().click();
-    cy.get(`${getComparatorListId(0)} + div .ant-select-item`)
-      .first()
-      .click();
-    cy.get('[data-cy=assertion-check-operator] .ant-select-selection-item').first().should('have.text', 'Equals');
+    cy.selectOperator(0);
 
     cy.get('[data-cy=add-assertion-form-add-check]').click();
 
@@ -104,11 +85,8 @@ describe('Create Assertion', () => {
       .first()
       .click();
 
-    cy.get('[data-cy=assertion-check-operator]').last().click();
-    cy.get(`${getComparatorListId(1)} + div .ant-select-item`)
-      .last()
-      .click();
-    cy.get('[data-cy=assertion-check-operator] .ant-select-selection-item').last().should('have.text', 'Contains');
+    cy.selectOperator(1);
+
     cy.get('[data-cy=assertion-form-submit-button]').click();
 
     cy.get('[data-cy=assertion-card-list]').should('be.visible');
@@ -116,18 +94,14 @@ describe('Create Assertion', () => {
   });
 
   it('should update an assertion with advanced mode', () => {
-    createAssertion();
+    cy.createAssertion();
 
     cy.get('[data-cy=edit-assertion-button]').last().click();
     cy.get('[data-cy=assertion-form]').should('be.visible');
 
     cy.get('[data-cy=advanced-selector] [contenteditable]').clear().type('span[tracetest.span.type = "database"]:last');
 
-    cy.get('[data-cy=assertion-check-operator]').first().click();
-    cy.get(`${getComparatorListId(0)} + div .ant-select-item`)
-      .first()
-      .click();
-    cy.get('[data-cy=assertion-check-operator] .ant-select-selection-item').first().should('have.text', 'Equals');
+    cy.selectOperator(0);
 
     cy.get('[data-cy=add-assertion-form-add-check]').click();
 
@@ -136,24 +110,22 @@ describe('Create Assertion', () => {
       .first()
       .click();
 
-    cy.get('[data-cy=assertion-check-operator]').last().click();
-    cy.get(`${getComparatorListId(1)} + div .ant-select-item`)
-      .last()
-      .click();
-    cy.get('[data-cy=assertion-check-operator] .ant-select-selection-item').last().should('have.text', 'Contains');
+    cy.selectOperator(1);
+
     cy.get('[data-cy=assertion-form-submit-button]').click();
 
     cy.get('[data-cy=assertion-card-list]').should('be.visible');
     cy.get('[data-cy=assertion-card]').should('have.lengthOf', 1);
   });
   it('should publish the changes', () => {
-    createAssertion();
+    cy.createAssertion();
     cy.get('[data-cy=trace-actions-publish').click({force: true});
     cy.get('[data-cy=assertion-card]', {timeout: 10000}).should('have.lengthOf', 1);
   });
 
   it('should create an assertion and revert all changes', () => {
-    createAssertion();
+    cy.createAssertion();
+    cy.cancelOnBoarding();
     cy.get(`[data-cy=trace-node-database]`, {timeout: 20000}).last().click();
     cy.get('[data-cy=add-assertion-button]').click();
     cy.get('[data-cy=assertion-form]', {timeout: 10000}).should('be.visible');
@@ -163,11 +135,7 @@ describe('Create Assertion', () => {
       .first()
       .click();
 
-    cy.get('[data-cy=assertion-check-operator]').click();
-    cy.get(`${getComparatorListId(0)} + div .ant-select-item`)
-      .last()
-      .click();
-    cy.get('[data-cy=assertion-check-operator] .ant-select-selection-item').should('have.text', 'Contains');
+    cy.selectOperator(0);
 
     cy.get('[data-cy=assertion-form-submit-button]').click();
 
