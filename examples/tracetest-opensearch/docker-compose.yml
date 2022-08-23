@@ -2,7 +2,6 @@ version: '3'
 services:
 
     tracetest:
-        container_name: tracetest
         image: kubeshop/tracetest:v0.6.4
         volumes:
             - type: bind
@@ -17,7 +16,6 @@ services:
                 condition: service_started
 
     postgres:
-        container_name: postgres
         image: postgres:14
         environment:
             POSTGRES_PASSWORD: postgres
@@ -46,7 +44,6 @@ services:
 
     data-prepper:
         restart: unless-stopped
-        container_name: data-prepper
         image: opensearchproject/data-prepper:latest
         volumes:
             - ./opensearch/opensearch-analytics.yaml:/usr/share/data-prepper/pipelines.yaml
