@@ -1,8 +1,8 @@
-import {MoreOutlined} from '@ant-design/icons';
+import {SettingOutlined} from '@ant-design/icons';
 import styled from 'styled-components';
 
-export const ActionButton = styled(MoreOutlined)`
-  color: ${({theme}) => theme.color.textSecondary};
+export const ActionButton = styled(SettingOutlined)`
+  color: ${({theme}) => theme.color.primary};
   cursor: pointer;
-  font-size: 24px;
+  font-size: ${({theme}) => theme.size.lg};
 `;

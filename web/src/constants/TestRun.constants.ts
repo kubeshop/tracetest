@@ -39,3 +39,9 @@ export const TestStateMap: Record<
     label: 'Finished',
   },
 };
+
+export enum RunDetailModes {
+  TRIGGER = 'trigger',
+  TRACE = 'trace',
+  TEST = 'test',
+}

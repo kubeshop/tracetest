@@ -24,8 +24,7 @@
       "node",
       "jest",
       "cypress",
-      "cypress-file-upload",
-      "@testing-library/jest-dom"
+      "cypress-file-upload"
     ]
   },
   "include": [

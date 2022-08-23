@@ -110,7 +110,12 @@ Cypress.Commands.add('makeSureUserIsOnTracePage', (shouldCancelOnboarding = true
 });
 
 Cypress.Commands.add('cancelOnBoarding', () => {
-  cy.get('[data-cy=no-thanks]', {timeout: 10000}).click({force: true});
+  const value = localStorage.getItem('guided_tour');
+  const parsedValue = value ? JSON.parse(value) : undefined;
+
+  if (!parsedValue || parsedValue.trace === false) {
+    cy.get('[data-cy=no-thanks]').click();
+  }
 });
 
 Cypress.Commands.add('submitCreateTestForm', () => {
@@ -175,6 +180,7 @@ Cypress.Commands.add('createTest', () => {
   cy.submitCreateTestForm();
   cy.makeSureUserIsOnTracePage();
   cy.waitForTracePageApiCalls();
+  cy.cancelOnBoarding();
 });
 
 Cypress.Commands.add('createAssertion', (index = 0) => {

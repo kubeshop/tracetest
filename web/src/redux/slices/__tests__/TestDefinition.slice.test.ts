@@ -207,6 +207,7 @@ describe('TestDefinitionReducer', () => {
         selector: faker.random.word(),
         originalSelector: faker.random.word(),
         spanIds: ['12345', '67890'],
+        resultList: [],
       };
 
       const result = Reducer(initialState, setSelectedAssertion(assertionResultEntry));
