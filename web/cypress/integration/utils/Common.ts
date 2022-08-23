@@ -1,7 +1,5 @@
 Cypress.on('uncaught:exception', err => !err.message.includes('ResizeObserver loop limit exceeded'));
 
-export const testRunPageRegex = /\/test\/(.*)\/run\/(.*)/;
-
 export const getTestId = (pathname: string) => {
   cy.log(pathname);
   const [, , localTestId] = pathname.split('/').reverse();

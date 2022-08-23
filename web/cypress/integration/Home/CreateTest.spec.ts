@@ -9,12 +9,6 @@ describe('Create test', () => {
   });
   afterEach(() => cy.deleteTest(true));
 
-  it('should cancel a create test flow', () => {
-    (async () => {
-      const $form = navigateToTestCreationPage();
-      $form.get('[data-cy=create-test-cancel]').click();
-    })();
-  });
   it('should create a basic GET test from scratch', () => {
     const name = `Test - Pokemon - #${String(Date.now()).slice(-4)}`;
     cy.navigateToTestCreationPage();

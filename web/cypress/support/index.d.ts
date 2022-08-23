@@ -1,6 +1,7 @@
 declare namespace Cypress {
   interface Chainable {
     createMultipleTestRuns(id: string, count: number): Chainable<Element>;
+    createAssertion(index?: number): Chainable<Element>;
     navigateToTestCreationPage(): Chainable<Element>;
     interceptTracePageApiCalls(): Chainable<Element>;
     inteceptHomeApiCall(): Chainable<Element>;
@@ -8,6 +9,7 @@ declare namespace Cypress {
     createTest(): Chainable<Element>;
     clickNextOnCreateTestWizard(): Chainable<Element>;
     selectTestFromDemoList(): Chainable<Element>;
+    selectOperator(index: number, text?: string): Chainable<Element>;
     editTestByTestId(testId: string): Chainable<Element>;
     submitCreateTestForm(): Chainable<Element>;
     deleteTest(shouldIntercept?: boolean): Chainable<Element>;
