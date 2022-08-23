@@ -15,8 +15,6 @@ services:
                 condition: service_healthy
             otel-collector:
                 condition: service_started
-        networks:
-            - local
 
     postgres:
         container_name: postgres
@@ -31,8 +29,6 @@ services:
             interval: 1s
             timeout: 5s
             retries: 60
-        networks:
-            - local
 
     otel-collector:
         image: otel/opentelemetry-collector:0.54.0
@@ -47,8 +43,6 @@ services:
             - ./collector.config.yaml:/otel-local-config.yaml
         depends_on:
             - data-prepper
-        networks:
-            - local
 
     data-prepper:
         restart: unless-stopped
@@ -62,8 +56,6 @@ services:
         depends_on:
             opensearch:
                 condition: service_healthy
-        networks:
-            - local
 
     opensearch:
         image: opensearchproject/opensearch:latest
@@ -88,8 +80,3 @@ services:
             interval: 5s
             timeout: 10s
             retries: 5
-        networks:
-            - local
-
-networks:
-    local:
