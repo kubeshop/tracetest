@@ -96,7 +96,7 @@ func (a runTestAction) runDefinition(ctx context.Context, definitionFile string,
 	}
 
 	definition.Id = *test.Id
-	err = file.SaveDefinition(definitionFile, definition)
+	err = file.SetTestID(definitionFile, *test.Id)
 	if err != nil {
 		return runTestOutput{}, fmt.Errorf("could not save test definition: %w", err)
 	}

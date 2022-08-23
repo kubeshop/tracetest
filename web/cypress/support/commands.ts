@@ -1,7 +1,11 @@
 import 'cypress-file-upload';
 import {camelCase} from 'lodash';
 import {Plugins} from '../../src/constants/Plugins.constants';
-import {getTestId, testRunPageRegex} from '../integration/utils/Common';
+import {getTestId} from '../integration/utils/Common';
+
+export const testRunPageRegex = /\/test\/(.*)\/run\/(.*)/;
+export const getAttributeListId = (number: number) => `#assertion-form_assertionList_${number}_attribute_list`;
+export const getComparatorListId = (number: number) => `#assertion-form_assertionList_${number}_comparator_list`;
 
 Cypress.Commands.add('createMultipleTestRuns', (id: string, count: number) => {
   cy.visit('/');
@@ -29,6 +33,7 @@ Cypress.Commands.add('deleteTest', (shoudlIntercept = false) => {
     }
     cy.visit(`http://localhost:3000`);
     cy.wait('@testList');
+    cy.get('[data-cy=test-list]').should('exist', {timeout: 10000});
     cy.get(`[data-cy=test-actions-button-${localTestId}]`).should('be.visible');
     cy.get(`[data-cy=test-actions-button-${localTestId}]`).click({force: true});
     cy.get('[data-cy=test-card-delete]').click();
@@ -146,6 +151,15 @@ Cypress.Commands.add('editTestByTestId', (testId: string) => {
   cy.matchTestRunPageUrl();
 });
 
+Cypress.Commands.add('selectOperator', (index: number, text?: string) => {
+  cy.get('[data-cy=assertion-check-operator]').last().click();
+  cy.get(`${getComparatorListId(index)} + div .ant-select-item`)
+    .last()
+    .click();
+  if (text) {
+    cy.get('[data-cy=assertion-check-operator] .ant-select-selection-item').last().should('have.text', text);
+  }
+});
 Cypress.Commands.add('selectTestFromDemoList', () => {
   cy.get('[data-cy=example-button]').click();
   cy.get(`[data-cy=demo-example-${camelCase(Plugins.REST.demoList[0].name)}]`).click();
@@ -167,4 +181,23 @@ Cypress.Commands.add('createTest', () => {
   cy.makeSureUserIsOnTracePage();
   cy.waitForTracePageApiCalls();
   cy.cancelOnBoarding();
+});
+
+Cypress.Commands.add('createAssertion', (index = 0) => {
+  cy.get(`[data-cy=trace-node-database]`, {timeout: 25000}).first().click({force: true});
+  cy.get('[data-cy=add-assertion-button]').click({force: true});
+  cy.get('[data-cy=assertion-form]', {timeout: 10000}).should('be.visible');
+  cy.get('[data-cy=assertion-check-attribute]').type('db');
+  const attributeListId = getAttributeListId(index);
+  cy.get(`${attributeListId} + div .ant-select-item`).first().click({force: true});
+  cy.get('[data-cy=assertion-check-operator]').click({force: true});
+
+  // const comparatorListId = getComparatorListId(index);
+  // cy.get(`${comparatorListId} + div .ant-select-item`).last().click({force: true});
+  // cy.get('[data-cy=assertion-check-value]').click({force: true});
+  // cy.get('[data-cy=assertion-check-operator] + div .ant-select-selection-item').should('have.text', 'Contains');
+
+  cy.get('[data-cy=assertion-form-submit-button]').click();
+  cy.get('[data-cy=assertion-card-list]').should('be.visible');
+  cy.get('[data-cy=assertion-card]').should('have.lengthOf', 1);
 });

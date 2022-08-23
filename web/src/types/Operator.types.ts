@@ -5,6 +5,7 @@ export type TCompareOperatorName =
   | 'less than'
   | 'greater or equals'
   | 'less or equals'
-  | 'contains';
+  | 'contains'
+  | 'does not contain';
 
-export type TCompareOperatorSymbol = '=' | '<' | '>' | '!=' | '>=' | '<=' | 'contains';
+export type TCompareOperatorSymbol = '=' | '<' | '>' | '!=' | '>=' | '<=' | 'contains' | 'not-contains';

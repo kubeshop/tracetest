@@ -45,7 +45,7 @@ func (e Expr) String() string {
 var languageLexer = lexer.MustStateful(lexer.Rules{
 	"Root": {
 		{Name: "whitespace", Pattern: `\s+`, Action: nil},
-		{Name: "Operator", Pattern: `!=|<=|>=|=|<|>|contains`},
+		{Name: "Operator", Pattern: `!=|<=|>=|=|<|>|contains|not-contains`},
 		{Name: "ExprOp", Pattern: `[\\+|-|\\*|/]`, Action: nil},
 		{Name: "Attribute", Pattern: `[a-zA-Z_][a-zA-Z0-9_\.]*`},
 		{Name: "Duration", Pattern: `([0-9]+(\.[0-9]+)?)(ns|us|ms|s|m|h)`},

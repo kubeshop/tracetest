@@ -78,6 +78,15 @@ func TestParseAssertion(t *testing.T) {
 			},
 		},
 		{
+			Name:  "should_parse_not_contains_operator",
+			Query: `db.statement not-contains "INSERT INTO"`,
+			ExpectedOutput: parser.Assertion{
+				Attribute: "db.statement",
+				Operator:  "not-contains",
+				Value:     "INSERT INTO",
+			},
+		},
+		{
 			Name:  "should_parse_quoted_string_wrapped_on_single_quotes",
 			Query: `tracetest.response.body contains '"id":"${TEST_ID}"'`,
 			ExpectedOutput: parser.Assertion{
