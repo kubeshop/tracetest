@@ -58,15 +58,10 @@ services:
   jaeger:
     image: jaegertracing/all-in-one:latest
     ports:
-      - 5775:5775/udp
+      - 16686:16686
+      - 16685:16685
       - 6831:6831/udp
       - 6832:6832/udp
-      - 5778:5778
-      - 4318:4318
-      - 16685:16685
-      - 16686:16686
-      - 14268:14268
-      - 9411:9411
     healthcheck:
       test: ["CMD", "wget", "--spider", "localhost:16686"]
       interval: 1s
