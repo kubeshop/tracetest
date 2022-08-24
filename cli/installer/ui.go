@@ -24,8 +24,9 @@ type UI interface {
 	Green(string) string
 	Red(string) string
 
-	Confirm(prompt string) bool
+	Confirm(prompt string, defaultValue bool) bool
 	Select(prompt string, options []option) (selected option)
+	TextInput(msg, defaultValue string) string
 }
 
 type option struct {
@@ -68,9 +69,10 @@ func (ui ptermUI) Red(msg string) string {
 	return pterm.Red(msg)
 }
 
-func (ui ptermUI) Confirm(msg string) bool {
+func (ui ptermUI) Confirm(msg string, defaultValue bool) bool {
 	confirm, err := pterm.
 		DefaultInteractiveConfirm.
+		WithDefaultValue(defaultValue).
 		WithDefaultText(msg).
 		Show()
 	if err != nil {
@@ -78,7 +80,23 @@ func (ui ptermUI) Confirm(msg string) bool {
 	}
 
 	return confirm
+}
 
+func (ui ptermUI) TextInput(msg, defaultValue string) string {
+	text, err := pterm.
+		DefaultInteractiveTextInput.
+		WithDefaultText(fmt.Sprintf("%s [%s]", msg, defaultValue)).
+		Show()
+	ui.Println("")
+	if err != nil {
+		ui.Panic(err)
+	}
+
+	if text == "" {
+		return defaultValue
+	}
+
+	return text
 }
 
 func (ui ptermUI) Select(prompt string, options []option) (selected option) {

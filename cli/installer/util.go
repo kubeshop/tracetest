@@ -146,7 +146,7 @@ func (c cmd) exec(ui UI, args ...interface{}) interface{} {
 		ui.Warning("During the execution, you might be asked your `sudo` password.")
 	}
 
-	if !ui.Confirm("Do you want to execute?") {
+	if !ui.Confirm("Do you want to execute?", false) {
 		ui.Println(c.notConfirmMsg)
 		os.Exit(1)
 	}
@@ -166,4 +166,12 @@ func (c cmd) exec(ui UI, args ...interface{}) interface{} {
 	}
 
 	return nil
+}
+
+func fileExists(path string) bool {
+	if _, err := os.Stat(path); err == nil {
+		return true
+	}
+
+	return false
 }

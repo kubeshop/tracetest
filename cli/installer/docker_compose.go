@@ -1,10 +1,16 @@
 package installer
 
 import (
+	_ "embed"
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"regexp"
+
+	"github.com/compose-spec/compose-go/loader"
+	"github.com/compose-spec/compose-go/types"
+	"gopkg.in/yaml.v3"
 )
 
 var DockerCompose = Installer{
@@ -13,6 +19,126 @@ var DockerCompose = Installer{
 		DockerReadyChecker,
 		DockerComposeChecker,
 	},
+	configs: []configurator{
+		ConfigureDemoApp,
+		ConfigureDockerComposeFilename,
+	},
+	installer: dockerComposeInstaller,
+}
+
+func ConfigureDockerComposeFilename(conf configuration, ui UI) configuration {
+	conf["docker-compose.filename"] = ui.TextInput("Output file name", "docker-compose.yaml")
+	return conf
+}
+
+func dockerComposeInstaller(config configuration, ui UI) {
+	project := getCompleteProject(ui)
+	include := []string{"tracetest", "postgres", "otel-collector", "jaeger"}
+
+	if includeDemo, err := config.Bool("demo.enable"); err != nil {
+		ui.Exit(err.Error())
+	} else if includeDemo {
+		include = append(include, "cache", "queue", "demo-api", "demo-worker", "demo-rpc")
+	}
+
+	if err := project.ForServices(include); err != nil {
+		ui.Exit(err.Error())
+	}
+
+	// todo: use CLI build version
+	if err := useTracetestImageVersion(project, "v0.6.4"); err != nil {
+		ui.Exit(err.Error())
+	}
+
+	output, err := yaml.Marshal(project)
+	if err != nil {
+		ui.Exit(err.Error())
+	}
+
+	outFName, err := config.String("docker-compose.filename")
+	if err != nil {
+		ui.Exit(err.Error())
+	}
+
+	if fileExists(outFName) {
+		ui.Warning(fmt.Sprintf(`file "%s" already exists.`, outFName))
+		if !ui.Confirm("Do you want to overwrite it?", false) {
+			ui.Exit(fmt.Sprintf(
+				`You choose NOT to overwrite "%s". Installation did not succeed`,
+				outFName,
+			))
+		}
+	}
+
+	err = os.WriteFile(outFName, output, 0644)
+	if err != nil {
+		ui.Exit(err.Error())
+	}
+
+	ui.Success("Install successful!")
+	ui.Println(fmt.Sprintf(`
+To start tracetest:
+
+  docker compose -f %s up -d
+
+Then, use your browser to navigate to:
+
+  http://localhost:8080
+
+Happy TraceTesting =)
+`, outFName))
+
+}
+
+func useTracetestImageVersion(project *types.Project, version string) error {
+	tts, err := project.GetService("tracetest")
+	if err != nil {
+		return err
+	}
+
+	tts.Image = "kubeshop/tracetest:" + version
+	tts.Build = nil
+
+	for i, s := range project.Services {
+		if s.Name != "tracetest" {
+			continue
+		}
+
+		project.Services[i] = tts
+		break
+	}
+
+	return nil
+}
+
+func getCompleteProject(ui UI) *types.Project {
+	resp, err := http.Get("https://raw.githubusercontent.com/kubeshop/tracetest/main/docker-compose.yaml")
+	if err != nil {
+		ui.Exit(fmt.Errorf("Cannot get docker-compose file: %w", err).Error())
+	}
+
+	contents, err := io.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	if err != nil {
+		ui.Exit(fmt.Errorf("Cannot read docker-compose file: %w", err).Error())
+	}
+
+	workingDir, err := os.Getwd()
+	if err != nil {
+		ui.Panic(err)
+	}
+
+	project, err := loader.Load(types.ConfigDetails{
+		WorkingDir: workingDir,
+		ConfigFiles: []types.ConfigFile{
+			{Filename: "docker-compose.yaml", Content: contents},
+		},
+	})
+	if err != nil {
+		ui.Exit(fmt.Errorf("Cannot parse docker-compose file: %w", err).Error())
+	}
+
+	return project
 }
 
 func DockerChecker(ui UI) {
