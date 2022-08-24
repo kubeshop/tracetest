@@ -1,13 +1,15 @@
-import {useMemo} from 'react';
-import {noop} from 'lodash';
-import CodeMirror from '@uiw/react-codemirror';
 import {autocompletion} from '@codemirror/autocomplete';
-import {tracetest} from 'utils/grammar';
 import {linter} from '@codemirror/lint';
-import useAutoComplete from './hooks/useAutoComplete';
-import useLint from './hooks/useLint';
-import useEditorTheme from './hooks/useEditorTheme';
+import {EditorView} from '@codemirror/view';
+import CodeMirror from '@uiw/react-codemirror';
+import {noop} from 'lodash';
+import {useMemo} from 'react';
+
+import {tracetest} from 'utils/grammar';
 import * as S from './AdvancedEditor.styled';
+import useAutoComplete from './hooks/useAutoComplete';
+import useEditorTheme from './hooks/useEditorTheme';
+import useLint from './hooks/useLint';
 
 interface IProps {
   testId: string;
@@ -22,7 +24,7 @@ const AdvancedEditor = ({testId, runId, onChange = noop, value = ''}: IProps) =>
   const editorTheme = useEditorTheme();
 
   const extensionList = useMemo(
-    () => [autocompletion({override: [completionFn]}), linter(lintFn), tracetest()],
+    () => [autocompletion({override: [completionFn]}), linter(lintFn), tracetest(), EditorView.lineWrapping],
     [completionFn, lintFn]
   );
 
@@ -38,7 +40,7 @@ const AdvancedEditor = ({testId, runId, onChange = noop, value = ''}: IProps) =>
         spellCheck={false}
         autoFocus
         theme={editorTheme}
-        placeholder="Selecting All Spans"
+        placeholder="Leaving it empty will select All Spans"
       />
     </S.AdvancedEditor>
   );

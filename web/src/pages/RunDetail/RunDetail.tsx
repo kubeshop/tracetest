@@ -1,7 +1,7 @@
 import {useParams} from 'react-router-dom';
 import {ReactFlowProvider} from 'react-flow-renderer';
 
-import AssertionFormProvider from 'components/AssertionForm/AssertionForm.provider';
+import TestSpecFormProvider from 'components/TestSpecForm/TestSpecForm.provider';
 import Layout from 'components/Layout';
 import withAnalytics from 'components/WithAnalytics/WithAnalytics';
 import GuidedTourProvider from 'providers/GuidedTour/GuidedTour.provider';
@@ -18,13 +18,13 @@ const RunDetail = () => {
       <ReactFlowProvider>
         <TestRunProvider testId={testId} runId={runId}>
           <TestDefinitionProvider testId={testId} runId={runId}>
-            <AssertionFormProvider testId={testId}>
+            <TestSpecFormProvider testId={testId}>
               <SpanProvider>
                 <Layout>
                   <Content />
                 </Layout>
               </SpanProvider>
-            </AssertionFormProvider>
+            </TestSpecFormProvider>
           </TestDefinitionProvider>
         </TestRunProvider>
       </ReactFlowProvider>

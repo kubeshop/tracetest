@@ -9,7 +9,7 @@ interface IProps {
 
 const useEditorTheme = ({isEditable = true}: IProps = {}) => {
   const {
-    color: {white, text},
+    color: {white, text, textLight},
   } = useTheme();
 
   return useMemo(
@@ -20,7 +20,7 @@ const useEditorTheme = ({isEditable = true}: IProps = {}) => {
           background: white,
           foreground: text,
           caret: text,
-          selection: text,
+          selection: textLight,
           selectionMatch: white,
           lineHighlight: white,
           ...(isEditable
@@ -35,9 +35,9 @@ const useEditorTheme = ({isEditable = true}: IProps = {}) => {
               }),
         },
         styles: [
-          {tag: t.tagName, color: '#66BB6A'},
-          {tag: t.string, color: '#F03950'},
-          {tag: t.operatorKeyword, color: text},
+          {tag: t.tagName, color: '#994cc3'},
+          {tag: t.string, color: '#4876d6'},
+          {tag: t.operatorKeyword, color: '#994cc3'},
           {tag: t.keyword, color: text},
         ],
       }),

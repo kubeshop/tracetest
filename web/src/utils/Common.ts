@@ -37,3 +37,8 @@ export const downloadFile = (data: string, fileName: string): Element => {
 export function enumKeys<O extends object, K extends keyof O = keyof O>(obj: O): K[] {
   return Object.keys(obj).filter(k => Number.isNaN(Number(k))) as K[];
 }
+
+export function singularOrPlural(noun: string, quantity: number) {
+  if (quantity === 1) return noun;
+  return `${noun}s`;
+}

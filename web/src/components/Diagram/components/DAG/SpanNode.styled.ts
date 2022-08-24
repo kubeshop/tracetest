@@ -70,10 +70,10 @@ export const Container = styled.div<{$affected: boolean; $selected: boolean}>`
   overflow: hidden;
   width: 180px;
 
-  ${({$affected}) =>
+  ${({$affected, $selected}) =>
     $affected &&
     css`
-      border: ${({theme}) => `1px solid ${theme.color.text}`};
+      border: ${({theme}) => !$selected && `1px solid ${theme.color.text}`};
       box-shadow: ${({theme}) => `2px 2px 0px ${theme.color.text}`};
     `}
 `;

@@ -9,8 +9,8 @@ interface IProps {
 }
 
 export function useScrollSpanNodeGroupIntoView({index, isSelected, id}: IProps): void {
-  const {onSelectSpan, affectedSpans} = useSpan();
-  const {indexOfFocused} = useControls({onSelectSpan});
+  const {affectedSpans} = useSpan();
+  const {indexOfFocused} = useControls();
 
   const hasAffectedSpans = affectedSpans.length > 0;
   useEffect(() => {

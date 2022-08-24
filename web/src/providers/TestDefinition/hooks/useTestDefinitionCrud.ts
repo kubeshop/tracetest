@@ -46,7 +46,7 @@ const useTestDefinitionCrud = ({runId, testId, isDraftMode}: IProps) => {
     const {id} = await dispatch(TestDefinitionActions.publish({testId, runId})).unwrap();
     dispatch(setSelectedAssertion());
 
-    navigate(`/test/${testId}/run/${id}`);
+    navigate(`/test/${testId}/run/${id}/test`);
   }, [dispatch, navigate, runId, testId]);
 
   const runTest = useCallback(async () => {

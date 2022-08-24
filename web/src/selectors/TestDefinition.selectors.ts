@@ -69,6 +69,22 @@ const selectSpansResult = createSelector(selectAssertionResults, assertionResult
   return results;
 });
 
+const selectTotalSpecs = createSelector(selectAssertionResults, assertionResults => {
+  if (!assertionResults) return {totalFailedSpecs: 0, totalPassedSpecs: 0};
+
+  return assertionResults.resultList.reduce<{totalFailedSpecs: number; totalPassedSpecs: number}>(
+    ({totalFailedSpecs, totalPassedSpecs}, {resultList}) => {
+      const someAssertionFailed = resultList.some(({allPassed}) => !allPassed);
+
+      return {
+        totalFailedSpecs: someAssertionFailed ? totalFailedSpecs + 1 : totalFailedSpecs,
+        totalPassedSpecs: !someAssertionFailed ? totalPassedSpecs + 1 : totalPassedSpecs,
+      };
+    },
+    {totalFailedSpecs: 0, totalPassedSpecs: 0}
+  );
+});
+
 const TestDefinitionSelectors = () => ({
   selectDefinitionList,
   selectDefinitionSelectorList,
@@ -85,6 +101,7 @@ const TestDefinitionSelectors = () => ({
   selectAssertionResultsBySpan,
   selectIsDraftMode: createSelector(stateSelector, ({isDraftMode}) => isDraftMode),
   selectSpansResult,
+  selectTotalSpecs,
 });
 
 export default TestDefinitionSelectors();

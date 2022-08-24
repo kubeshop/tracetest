@@ -3,7 +3,8 @@ import {useMemo} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 
 import FailedTrace from 'components/FailedTrace';
-import Run from 'components/Run';
+// import Run from 'components/Run';
+import RunDetailTest from 'components/RunDetailTest';
 import {RunDetailModes, TestState as TestStateEnum} from 'constants/TestRun.constants';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import {TTest} from 'types/Test.types';
@@ -16,12 +17,12 @@ interface IProps {
 }
 
 const renderTabBar: TabsProps['renderTabBar'] = (props, DefaultTabBar) => (
-  <S.ContainerHeader>
+  <S.ContainerHeader data-cy="run-detail-header">
     <DefaultTabBar {...props} className="site-custom-tab-bar" />
   </S.ContainerHeader>
 );
 
-const RunDetailLayout = ({test: {id, name, trigger, version = 1}, test}: IProps) => {
+const RunDetailLayout = ({test: {id, name, trigger, version = 1}}: IProps) => {
   const navigate = useNavigate();
   const {mode = RunDetailModes.TRIGGER} = useParams();
   const {isError, run} = useTestRun();
@@ -50,13 +51,13 @@ const RunDetailLayout = ({test: {id, name, trigger, version = 1}, test}: IProps)
           tabBarExtraContent={tabBarExtraContent}
         >
           <Tabs.TabPane tab="Trigger" key={RunDetailModes.TRIGGER}>
-            <Run displayError={shouldDisplayError} run={run} test={test} />
+            {/* <Run run={run} /> */}
           </Tabs.TabPane>
           <Tabs.TabPane tab="Trace" key={RunDetailModes.TRACE}>
             Trace
           </Tabs.TabPane>
           <Tabs.TabPane tab="Test" key={RunDetailModes.TEST}>
-            Test
+            <RunDetailTest run={run} testId={id} />
           </Tabs.TabPane>
         </Tabs>
       )}
