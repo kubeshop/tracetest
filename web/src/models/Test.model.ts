@@ -6,7 +6,7 @@ const Test = ({
   id = '',
   name = '',
   description = '',
-  definition,
+  specs,
   version = 1,
   serviceUnderTest: rawTrigger,
 }: TRawTest): TTest => {
@@ -15,7 +15,7 @@ const Test = ({
     name,
     version,
     description,
-    definition: TestDefinition(definition || {}),
+    definition: TestDefinition(specs || {}),
     trigger: Trigger(rawTrigger || {}),
   };
 };

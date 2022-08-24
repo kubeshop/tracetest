@@ -3,7 +3,7 @@ import {TChange} from '../redux/actions/TestDefinition.actions';
 import {TAssertion, TAssertionResultEntry, TAssertionResults} from './Assertion.types';
 import {Model, TTestSchemas} from './Common.types';
 
-export type TRawTestDefinition = TTestSchemas['TestDefinition'];
+export type TRawTestDefinition = TTestSchemas['TestSpecs'];
 
 export type TTestDefinitionEntry = {
   originalSelector?: string;
@@ -23,6 +23,7 @@ export type TTestDefinition = Model<
   {
     definitionList: TTestDefinitionEntry[];
     definitions?: TRawTestDefinition;
+    specs?: TRawTestDefinition;
   }
 >;
 export interface ITestDefinitionState {
