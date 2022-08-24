@@ -1,4 +1,4 @@
-# Tracetest + Opensearch
+# Tracetest + SignalFX
 
 This repository objective is to show how you can configure your tracetest instance to connect to a signalFX account.
 
