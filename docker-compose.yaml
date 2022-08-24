@@ -1,7 +1,6 @@
 version: "3.2"
 services:
   tracetest:
-    container_name: tracetest
     image: kubeshop/tracetest
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -25,7 +24,6 @@ services:
         condition: service_started
 
   postgres:
-    container_name: postgres
     image: postgres
     environment:
       POSTGRES_PASSWORD: postgres
@@ -174,7 +172,6 @@ services:
 
   data-prepper:
     restart: unless-stopped
-    container_name: data-prepper
     image: opensearchproject/data-prepper:latest
     volumes:
       - ./local-config/opensearch/opensearch-analytics.yaml:/usr/share/data-prepper/pipelines.yaml
@@ -205,7 +202,6 @@ services:
 
   dashboards:
     image: opensearchproject/opensearch-dashboards:latest
-    container_name: opensearch-dashboards
     ports:
       - 5601:5601
     expose:
