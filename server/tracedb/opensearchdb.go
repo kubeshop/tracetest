@@ -101,9 +101,9 @@ func convertOpensearchSpanIntoSpan(input map[string]interface{}) traces.Span {
 		name := attrName
 		name = strings.ReplaceAll(name, "span.attributes.", "")
 		name = strings.ReplaceAll(name, "resource.attributes.", "")
-		// Opensearch's data-prepper replaces "_" with "@". We have to revert it. Example:
-		// "service_name" becomes "service@name"
-		name = strings.ReplaceAll(name, "@", "_")
+		// Opensearch's data-prepper replaces "." with "@". We have to revert it. Example:
+		// "service.name" becomes "service@name"
+		name = strings.ReplaceAll(name, "@", ".")
 		attributes[name] = fmt.Sprintf("%v", attrValue)
 	}
 
