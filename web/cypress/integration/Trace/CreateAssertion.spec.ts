@@ -30,10 +30,10 @@ describe('Create Assertion', () => {
 
     cy.get('[data-cy=add-assertion-form-add-check]').click();
 
-    cy.get('[data-cy=assertion-check-attribute]').last().type('duration');
-    cy.get(`${getAttributeListId(2)} + div .ant-select-item`)
-      .first()
-      .click();
+      cy.get('[data-cy=assertion-check-attribute]').last().type('time');
+      cy.get(`${getAttributeListId(2)} + div .ant-select-item`)
+        .first()
+        .click();
 
     cy.selectOperator(2);
 

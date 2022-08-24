@@ -1,13 +1,13 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
-import {uniq} from 'lodash';
-import WebSocketService, {IListenerFunction} from 'services/WebSocket.service';
-import {TRawTest, TTest} from 'types/Test.types';
 import {HTTP_METHOD} from 'constants/Common.constants';
+import {uniq} from 'lodash';
 import AssertionResults from 'models/AssertionResults.model';
 import Test from 'models/Test.model';
 import TestDefinition from 'models/TestDefinition.model';
 import TestRun from 'models/TestRun.model';
+import WebSocketService, {IListenerFunction} from 'services/WebSocket.service';
 import {TAssertion, TAssertionResults, TRawAssertionResults} from 'types/Assertion.types';
+import {TRawTest, TTest} from 'types/Test.types';
 import {TRawTestDefinition, TTestDefinition} from 'types/TestDefinition.types';
 import {TRawTestRun, TTestRun} from 'types/TestRun.types';
 
@@ -155,7 +155,6 @@ const TraceTestAPI = createApi({
         {type: Tags.TEST_RUN, id: `${testId}-${version}-definition`},
       ],
     }),
-
     // Spans
     getSelectedSpans: build.query<string[], {testId: string; runId: string; query: string}>({
       query: ({testId, runId, query}) => `/tests/${testId}/run/${runId}/select?query=${encodeURIComponent(query)}`,
