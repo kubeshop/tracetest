@@ -1,3 +1,11 @@
+VERSION ?= "dev"
+TRACETEST_ENV ?= "dev"
+GO_LDFLAGS := $(shell echo \
+		-X "'github.com/kubeshop/tracetest/cli/config.Version=$(VERSION)'" \
+		-X "'github.com/kubeshop/tracetest/cli/config.Env=$(TRACETEST_ENV)'" \
+		-X "'github.com/kubeshop/tracetest/cli/analytics.SecretKey=$(ANALYTICS_BE_KEY)'" \
+	| sed 's/ / /g')
+
 PROJECT_ROOT=${shell dirname $${PWD}}
 
 OPENAPI_GENERATOR_VER=v5.4.0
@@ -21,7 +29,7 @@ generate-client:
 	go fmt ./...; cd ..
 
 build:
-	go build -o tracetest main.go
+	go build -ldflags="$(GO_LDFLAGS)" -o tracetest main.go
 
 test: mockserver
 	@go test -coverprofile=coverage.out ./...

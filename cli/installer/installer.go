@@ -1,6 +1,8 @@
 package installer
 
-import "errors"
+import (
+	"errors"
+)
 
 func Start() {
 	DockerCompose.Install(DefaultUI)

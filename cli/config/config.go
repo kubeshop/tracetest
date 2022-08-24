@@ -10,7 +10,10 @@ import (
 	"github.com/spf13/viper"
 )
 
-const AppVersion = "v0.6.4"
+var (
+	Version = "dev"
+	Env     = "dev"
+)
 
 type Config struct {
 	Scheme     string  `yaml:"scheme"`

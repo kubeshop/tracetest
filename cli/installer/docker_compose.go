@@ -92,7 +92,7 @@ func getDockerComposeFileContents(ui UI, config configuration) []byte {
 	if err != nil {
 		ui.Exit(err.Error())
 	}
-	if err := fixTracetestContainer(project, ttfile, cliConfig.AppVersion); err != nil {
+	if err := fixTracetestContainer(project, ttfile, cliConfig.Version); err != nil {
 		ui.Exit(err.Error())
 	}
 
@@ -113,7 +113,7 @@ func getDockerComposeFileContents(ui UI, config configuration) []byte {
 }
 
 func getCollectorConfigFileContents(ui UI, config configuration) []byte {
-	contents, err := getFileContentsForVersion("local-config/collector.config.yaml", cliConfig.AppVersion)
+	contents, err := getFileContentsForVersion("local-config/collector.config.yaml", cliConfig.Version)
 	if err != nil {
 		ui.Exit(fmt.Errorf("Cannot get docker-compose file: %w", err).Error())
 	}
@@ -122,7 +122,7 @@ func getCollectorConfigFileContents(ui UI, config configuration) []byte {
 }
 
 func getTracetestConfigFileContents(ui UI, config configuration) []byte {
-	contents, err := getFileContentsForVersion("local-config/config.tests.yaml", cliConfig.AppVersion)
+	contents, err := getFileContentsForVersion("local-config/config.tests.yaml", cliConfig.Version)
 	if err != nil {
 		ui.Exit(fmt.Errorf("Cannot get docker-compose file: %w", err).Error())
 	}
@@ -152,6 +152,10 @@ func fixTracetestContainer(project *types.Project, tracetestConfigFile, version 
 	tts, err := project.GetService(serviceName)
 	if err != nil {
 		return err
+	}
+
+	if version == "dev" {
+		version = "latest"
 	}
 
 	tts.Image = "kubeshop/tracetest:" + version
@@ -186,6 +190,9 @@ func replaceService(project *types.Project, service string, sc types.ServiceConf
 }
 
 func getFileContentsForVersion(path, version string) ([]byte, error) {
+	if version == "dev" {
+		version = "main"
+	}
 	url := fmt.Sprintf("https://raw.githubusercontent.com/kubeshop/tracetest/%s/%s", version, path)
 	resp, err := http.Get(url)
 	if err != nil {
@@ -203,7 +210,7 @@ func getFileContentsForVersion(path, version string) ([]byte, error) {
 }
 
 func getCompleteProject(ui UI) *types.Project {
-	contents, err := getFileContentsForVersion("docker-compose.yaml", cliConfig.AppVersion)
+	contents, err := getFileContentsForVersion("docker-compose.yaml", cliConfig.Version)
 	if err != nil {
 		ui.Exit(fmt.Errorf("Cannot get docker-compose file: %w", err).Error())
 	}
