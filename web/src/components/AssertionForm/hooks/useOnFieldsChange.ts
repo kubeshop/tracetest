@@ -1,4 +1,4 @@
-import {Form, FormInstance} from 'antd';
+import {FormInstance} from 'antd';
 import {FieldData} from 'antd/node_modules/rc-field-form/es/interface';
 import {isEmpty} from 'lodash';
 import {useCallback} from 'react';
@@ -15,9 +15,6 @@ interface IProps {
 }
 
 const useOnFieldsChange = ({form, attributeList}: IProps) => {
-  const currentSelector = Form.useWatch('selector', form) || '';
-  const query = currentSelector;
-
   return useCallback(
     (changedFields: FieldData[]) => {
       const [field] = changedFields;
@@ -46,7 +43,7 @@ const useOnFieldsChange = ({form, attributeList}: IProps) => {
         }
       }
     },
-    [attributeList, form, query]
+    [attributeList, form]
   );
 };
 

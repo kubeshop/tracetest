@@ -7,8 +7,6 @@ import {CollectionFileField} from './fields/CollectionFileField';
 import {EnvFileField} from './fields/EnvFileField';
 import {SelectTestFromCollection} from './fields/SelectTestFromCollection';
 
-export const FORM_ID = 'upload-collection-test';
-
 interface IProps {
   form: TDraftTestForm<IPostmanValues>;
 }

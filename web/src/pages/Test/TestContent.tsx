@@ -1,12 +1,11 @@
 import {useCallback} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
+
+import TestHeader from 'components/TestHeader';
 import {useGetTestByIdQuery} from 'redux/apis/TraceTest.api';
 import {TTestRun} from 'types/TestRun.types';
-import TestHeader from 'components/TestHeader';
-import TestCardActions from 'components/TestCard/TestCardActions';
 import * as S from './Test.styled';
 import TestDetails from './TestDetails';
-import {useMenuDeleteCallback} from '../Home/useMenuDeleteCallback';
 
 const TestContent = () => {
   const navigate = useNavigate();
@@ -19,18 +18,11 @@ const TestContent = () => {
     },
     [navigate, testId]
   );
-  const onDelete = useMenuDeleteCallback();
 
   // TODO: Add proper loading states
   return test ? (
     <>
-      <TestHeader
-        onBack={() => navigate('/')}
-        showInfo={false}
-        test={test}
-        testVersion={test.version}
-        extraContent={<TestCardActions testId={testId} onDelete={() => onDelete(test)} />}
-      />
+      <TestHeader onBack={() => navigate('/')} test={test} />
       <S.Wrapper>
         <TestDetails testId={test.id} onSelectResult={handleSelectTestResult} />
       </S.Wrapper>

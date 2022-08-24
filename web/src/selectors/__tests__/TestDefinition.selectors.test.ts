@@ -3,10 +3,20 @@ import {ITestDefinitionState} from '../../types/TestDefinition.types';
 import TestDefinitionSelectors from '../TestDefinition.selectors';
 
 describe('TestDefinitionSelectors', () => {
+  const initialTestDefinitionState = {
+    initialDefinitionList: [],
+    definitionList: [],
+    changeList: [],
+    isLoading: false,
+    isInitialized: false,
+    selectedAssertion: undefined,
+    isDraftMode: false,
+  };
+
   describe('selectDefinitionList', () => {
     it('should return empty', () => {
       const result = TestDefinitionSelectors.selectDefinitionList({
-        testDefinition: {definitionList: []} as ITestDefinitionState,
+        testDefinition: {...initialTestDefinitionState} as ITestDefinitionState,
       } as RootState);
       expect(result).toStrictEqual([]);
     });
@@ -51,6 +61,7 @@ describe('TestDefinitionSelectors', () => {
       const assertionResults = {allPassed: false, resultList: [], results: undefined};
       const result = TestDefinitionSelectors.selectAssertionResults({
         testDefinition: {
+          ...initialTestDefinitionState,
           assertionResults,
         } as ITestDefinitionState,
       } as RootState);
@@ -85,6 +96,7 @@ describe('TestDefinitionSelectors', () => {
       const result = TestDefinitionSelectors.selectAssertionResultsBySpan(
         {
           testDefinition: {
+            ...initialTestDefinitionState,
             assertionResults,
           } as ITestDefinitionState,
         } as RootState,

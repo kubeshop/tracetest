@@ -98,6 +98,22 @@ helm install tracetest kubeshop/tracetest \
   --set server.telemetry.dataStore="opensearch"
 ```
 
+#### **SignalFX**
+
+The commands below will install the Tracetest application connecting to the Opensearchtracing backend on `opensearch:9200`:
+
+```sh
+# Install Kubeshop Helm repo and update it
+helm repo add kubeshop https://kubeshop.github.io/helm-charts
+helm repo update
+
+helm install tracetest kubeshop/tracetest \
+  --set telemetry.dataStores.signalfx.signalfx.token="your signalfx token" \ # update this value to point to your signalfx account
+  --set telemetry.dataStores.signalfx.signalfx.realm="your realm (us1?)" \ # update this value to point to your signalfx account
+  --set telemetry.dataStores.signalfx.signalfx.url="your custom url" \ # update this value to point to your signalfx custom url. This is optional.
+  --set server.telemetry.dataStore="signalfx"
+```
+
 
 ### **Have a different backend trace data store?**
 

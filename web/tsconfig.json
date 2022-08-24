@@ -4,7 +4,8 @@
     "lib": [
       "dom",
       "dom.iterable",
-      "esnext"
+      "esnext",
+      "es2019"
     ],
     "allowJs": true,
     "skipLibCheck": true,
@@ -24,8 +25,7 @@
       "node",
       "jest",
       "cypress",
-      "cypress-file-upload",
-      "@testing-library/jest-dom"
+      "cypress-file-upload"
     ]
   },
   "include": [
