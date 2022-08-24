@@ -2,15 +2,11 @@ import {FormInstance, Select} from 'antd';
 import {FormListFieldData} from 'antd/lib/form/FormList';
 import {uniqBy} from 'lodash';
 import {useMemo} from 'react';
-import AttributesTags from '../../constants/AttributesTags.json';
 import {TAssertion} from '../../types/Assertion.types';
 import {TSpanFlatAttribute} from '../../types/Span.types';
 import {IValues} from './AssertionForm';
 import {AssertionFormCheck} from './AssertionFormCheck';
-import {
-  OtelReference,
-  useGetOTELSemanticConvertionAttributesInfo,
-} from './hooks/useGetOTELSemanticConvertionAttributesInfo';
+import {useGetOTELSemanticConvertionAttributesInfo} from './hooks/useGetOTELSemanticConvertionAttributesInfo';
 
 interface IProps {
   form: FormInstance<IValues>;
@@ -29,16 +25,10 @@ const AssertionFormCheckList: React.FC<IProps> = ({form, fields, add, remove, at
   const attributeOptionList = useMemo(() => {
     return uniqBy(attributeList, 'key').map(({key}) => (
       <Select.Option key={key} value={key}>
-        {`${key} ${
-          reference[key] || (AttributesTags as OtelReference)[key]
-            ? reference[key]
-              ? ` - ${reference[key].description}`
-              : ` - ${(AttributesTags as OtelReference)[key].description}`
-            : ''
-        }`}
+        {key}
       </Select.Option>
     ));
-  }, [attributeList, reference]);
+  }, [attributeList]);
 
   return (
     <>
