@@ -1,0 +1,41 @@
+version: '3'
+services:
+
+    tracetest:
+        image: kubeshop/tracetest:v0.6.4
+        volumes:
+            - type: bind
+              source: ./tracetest-config.yaml
+              target: /app/config.yaml
+        ports:
+            - 8080:8080
+        depends_on:
+            postgres:
+                condition: service_healthy
+            otel-collector:
+                condition: service_started
+
+    postgres:
+        image: postgres:14
+        environment:
+            POSTGRES_PASSWORD: postgres
+            POSTGRES_USER: postgres
+        ports:
+            - 5432:5432
+        healthcheck:
+            test: pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
+            interval: 1s
+            timeout: 5s
+            retries: 60
+
+    otel-collector:
+        image: otel/opentelemetry-collector-contrib:0.54.0
+        ports:
+            - "55679:55679"
+            - "4317:4317"
+            - "8888:8888"
+        command:
+            - "--config"
+            - "/otel-local-config.yaml"
+        volumes:
+            - ./collector.config.yaml:/otel-local-config.yaml
