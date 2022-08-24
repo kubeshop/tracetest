@@ -10,6 +10,7 @@ import (
 
 	"github.com/compose-spec/compose-go/loader"
 	"github.com/compose-spec/compose-go/types"
+	cliConfig "github.com/kubeshop/tracetest/cli/config"
 	"gopkg.in/yaml.v3"
 )
 
@@ -21,17 +22,59 @@ var DockerCompose = Installer{
 	},
 	configs: []configurator{
 		ConfigureDemoApp,
-		ConfigureDockerComposeFilename,
+		ConfigureDockerCompose,
 	},
 	installer: dockerComposeInstaller,
 }
 
-func ConfigureDockerComposeFilename(conf configuration, ui UI) configuration {
-	conf["docker-compose.filename"] = ui.TextInput("Output file name", "docker-compose.yaml")
+func ConfigureDockerCompose(conf configuration, ui UI) configuration {
+	conf["docker-compose.filename"] = ui.TextInput("Docker Compose output file name", "docker-compose.yaml")
+	conf["tracetest-config.filename"] = ui.TextInput("TraceTest Config output file name", "tracetest.yaml")
+	conf["collector-config.filename"] = ui.TextInput("OTel-Collector Config output file name", "collector.yaml")
+
 	return conf
 }
 
 func dockerComposeInstaller(config configuration, ui UI) {
+
+	collectorConfigFile := getCollectorConfigFileContents(ui, config)
+	collectorConfigFName, err := config.String("collector-config.filename")
+	if err != nil {
+		ui.Exit(err.Error())
+	}
+
+	tracetestConfigFile := getTracetestConfigFileContents(ui, config)
+	tracetestConfigFName, err := config.String("tracetest-config.filename")
+	if err != nil {
+		ui.Exit(err.Error())
+	}
+
+	dockerComposeFile := getDockerComposeFileContents(ui, config)
+	dockerComposeFName, err := config.String("docker-compose.filename")
+	if err != nil {
+		ui.Exit(err.Error())
+	}
+
+	saveFile(ui, collectorConfigFName, collectorConfigFile)
+	saveFile(ui, tracetestConfigFName, tracetestConfigFile)
+	saveFile(ui, dockerComposeFName, dockerComposeFile)
+
+	ui.Success("Install successful!")
+	ui.Println(fmt.Sprintf(`
+To start tracetest:
+
+  docker compose -f %s up -d
+
+Then, use your browser to navigate to:
+
+  http://localhost:8080
+
+Happy TraceTesting =)
+`, dockerComposeFName))
+
+}
+
+func getDockerComposeFileContents(ui UI, config configuration) []byte {
 	project := getCompleteProject(ui)
 	include := []string{"tracetest", "postgres", "otel-collector", "jaeger"}
 
@@ -45,8 +88,19 @@ func dockerComposeInstaller(config configuration, ui UI) {
 		ui.Exit(err.Error())
 	}
 
-	// todo: use CLI build version
-	if err := useTracetestImageVersion(project, "v0.6.4"); err != nil {
+	ttfile, err := config.String("tracetest-config.filename")
+	if err != nil {
+		ui.Exit(err.Error())
+	}
+	if err := fixTracetestContainer(project, ttfile, cliConfig.AppVersion); err != nil {
+		ui.Exit(err.Error())
+	}
+
+	ocfile, err := config.String("collector-config.filename")
+	if err != nil {
+		ui.Exit(err.Error())
+	}
+	if err := fixOtelCollectorContainer(project, ocfile); err != nil {
 		ui.Exit(err.Error())
 	}
 
@@ -55,72 +109,103 @@ func dockerComposeInstaller(config configuration, ui UI) {
 		ui.Exit(err.Error())
 	}
 
-	outFName, err := config.String("docker-compose.filename")
+	return output
+}
+
+func getCollectorConfigFileContents(ui UI, config configuration) []byte {
+	contents, err := getFileContentsForVersion("local-config/collector.config.yaml", cliConfig.AppVersion)
 	if err != nil {
-		ui.Exit(err.Error())
+		ui.Exit(fmt.Errorf("Cannot get docker-compose file: %w", err).Error())
 	}
 
-	if fileExists(outFName) {
-		ui.Warning(fmt.Sprintf(`file "%s" already exists.`, outFName))
+	return contents
+}
+
+func getTracetestConfigFileContents(ui UI, config configuration) []byte {
+	contents, err := getFileContentsForVersion("local-config/config.tests.yaml", cliConfig.AppVersion)
+	if err != nil {
+		ui.Exit(fmt.Errorf("Cannot get docker-compose file: %w", err).Error())
+	}
+
+	return contents
+}
+
+func saveFile(ui UI, fname string, contents []byte) {
+	if fileExists(fname) {
+		ui.Warning(fmt.Sprintf(`file "%s" already exists.`, fname))
 		if !ui.Confirm("Do you want to overwrite it?", false) {
 			ui.Exit(fmt.Sprintf(
 				`You choose NOT to overwrite "%s". Installation did not succeed`,
-				outFName,
+				fname,
 			))
 		}
 	}
 
-	err = os.WriteFile(outFName, output, 0644)
+	err := os.WriteFile(fname, contents, 0644)
 	if err != nil {
 		ui.Exit(err.Error())
 	}
-
-	ui.Success("Install successful!")
-	ui.Println(fmt.Sprintf(`
-To start tracetest:
-
-  docker compose -f %s up -d
-
-Then, use your browser to navigate to:
-
-  http://localhost:8080
-
-Happy TraceTesting =)
-`, outFName))
-
 }
 
-func useTracetestImageVersion(project *types.Project, version string) error {
-	tts, err := project.GetService("tracetest")
+func fixTracetestContainer(project *types.Project, tracetestConfigFile, version string) error {
+	const serviceName = "tracetest"
+	tts, err := project.GetService(serviceName)
 	if err != nil {
 		return err
 	}
 
 	tts.Image = "kubeshop/tracetest:" + version
 	tts.Build = nil
+	tts.Volumes[0].Source = tracetestConfigFile
 
-	for i, s := range project.Services {
-		if s.Name != "tracetest" {
-			continue
-		}
-
-		project.Services[i] = tts
-		break
-	}
+	replaceService(project, serviceName, tts)
 
 	return nil
 }
 
-func getCompleteProject(ui UI) *types.Project {
-	resp, err := http.Get("https://raw.githubusercontent.com/kubeshop/tracetest/main/docker-compose.yaml")
+func fixOtelCollectorContainer(project *types.Project, collectorConfigFile string) error {
+	ocs, err := project.GetService("otel-collector")
 	if err != nil {
-		ui.Exit(fmt.Errorf("Cannot get docker-compose file: %w", err).Error())
+		return err
+	}
+
+	ocs.Volumes[0].Source = collectorConfigFile
+
+	return nil
+}
+
+func replaceService(project *types.Project, service string, sc types.ServiceConfig) {
+	for i, s := range project.Services {
+		if s.Name != service {
+			continue
+		}
+
+		project.Services[i] = sc
+		break
+	}
+}
+
+func getFileContentsForVersion(path, version string) ([]byte, error) {
+	url := fmt.Sprintf("https://raw.githubusercontent.com/kubeshop/tracetest/%s/%s", version, path)
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, fmt.Errorf("cannot download file: %w", err)
 	}
 
 	contents, err := io.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if err != nil {
-		ui.Exit(fmt.Errorf("Cannot read docker-compose file: %w", err).Error())
+		return nil, fmt.Errorf("cannot download file: %w", err)
+	}
+
+	return contents, nil
+
+}
+
+func getCompleteProject(ui UI) *types.Project {
+	contents, err := getFileContentsForVersion("docker-compose.yaml", cliConfig.AppVersion)
+	if err != nil {
+		ui.Exit(fmt.Errorf("Cannot get docker-compose file: %w", err).Error())
 	}
 
 	workingDir, err := os.Getwd()
