@@ -1,19 +1,19 @@
 import {Button, Form, Typography} from 'antd';
+import {ADVANCE_SELECTORS_DOCUMENTATION_URL} from 'constants/Common.constants';
 import {CompareOperator} from 'constants/Operator.constants';
 import React, {useState} from 'react';
 import {useAppSelector} from 'redux/hooks';
 import AssertionSelectors from 'selectors/Assertion.selectors';
+import SpanSelectors from 'selectors/Span.selectors';
 import OperatorService from 'services/Operator.service';
 import {TAssertion} from 'types/Assertion.types';
-import SpanSelectors from 'selectors/Span.selectors';
-import {ADVANCE_SELECTORS_DOCUMENTATION_URL} from 'constants/Common.constants';
 import AffectedSpanControls from '../Diagram/components/DAG/AffectedSpanControls';
 import {TooltipQuestion} from '../TooltipQuestion/TooltipQuestion';
 import * as S from './AssertionForm.styled';
 import AssertionFormCheckList from './AssertionFormCheckList';
 import AssertionFormSelector from './AssertionFormSelector';
-import useOnFieldsChange from './hooks/useOnFieldsChange';
 import useAssertionFormValues from './hooks/useAssertionFormValues';
+import useOnFieldsChange from './hooks/useOnFieldsChange';
 
 export interface IValues {
   assertionList?: TAssertion[];
@@ -57,7 +57,6 @@ const AssertionForm: React.FC<TAssertionFormProps> = ({
     form,
     attributeList,
   });
-
   return (
     <S.AssertionForm>
       <S.AssertionFormHeader>

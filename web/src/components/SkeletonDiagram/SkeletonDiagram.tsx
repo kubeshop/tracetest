@@ -22,7 +22,7 @@ const SkeletonDiagram = ({onClearAffectedSpans, onClearSelectedSpan}: IProps) =>
   useEffect(() => {
     onClearAffectedSpans();
     onClearSelectedSpan();
-  }, []);
+  }, [onClearAffectedSpans, onClearSelectedSpan]);
 
   return (
     <S.Container data-cy="skeleton-diagram">

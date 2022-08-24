@@ -62,6 +62,7 @@ jobs:
           ANALYTICS_FE_KEY=${{ secrets.ANALYTICS_FE_KEY }}
           VERSION=sha-${{ steps.vars.outputs.sha_short }}
           TRACETEST_ENV=main
+          PUBLIC_PATH=/
 
   deploy-beta:
     if: github.event_name == 'push'

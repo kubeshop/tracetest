@@ -7,6 +7,7 @@ import Spans from 'redux/slices/Span.slice';
 import CreateTest from 'redux/slices/CreateTest.slice';
 import DAG from 'redux/slices/DAG.slice';
 import RouterMiddleware from './Router.middleware';
+import OtelRepoApi from './apis/OtelRepo.api';
 
 const {createReduxHistory, routerMiddleware, routerReducer} = createReduxHistoryContext({
   history: createBrowserHistory(),
@@ -15,6 +16,8 @@ const {createReduxHistory, routerMiddleware, routerReducer} = createReduxHistory
 export const store = configureStore({
   reducer: {
     [TestAPI.reducerPath]: TestAPI.reducer,
+    [OtelRepoApi.reducerPath]: OtelRepoApi.reducer,
+
     router: routerReducer,
     spans: Spans,
     dag: DAG,
@@ -22,7 +25,9 @@ export const store = configureStore({
     createTest: CreateTest,
   },
   middleware: getDefaultMiddleware =>
-    getDefaultMiddleware().prepend(RouterMiddleware.middleware).concat(TestAPI.middleware, routerMiddleware),
+    getDefaultMiddleware()
+      .prepend(RouterMiddleware.middleware)
+      .concat(TestAPI.middleware, routerMiddleware, OtelRepoApi.middleware),
 });
 
 export const history = createReduxHistory(store);

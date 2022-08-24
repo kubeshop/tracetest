@@ -152,7 +152,7 @@ Cypress.Commands.add('editTestByTestId', (testId: string) => {
 });
 
 Cypress.Commands.add('selectOperator', (index: number, text?: string) => {
-  cy.get('[data-cy=assertion-check-operator]').last().click();
+  cy.get('[data-cy=assertion-check-operator]').last().click({force: true});
   cy.get(`${getComparatorListId(index)} + div .ant-select-item`)
     .last()
     .click();

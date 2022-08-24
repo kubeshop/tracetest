@@ -3,6 +3,7 @@ import {Form, FormInstance, Input, Select} from 'antd';
 import {FormListFieldData} from 'antd/lib/form/FormList';
 import {capitalize} from 'lodash';
 import {useMemo} from 'react';
+import AttributesTags from '../../constants/AttributesTags.json';
 import {durationRegExp} from '../../constants/Common.constants';
 import {CompareOperator} from '../../constants/Operator.constants';
 import CreateAssertionModalAnalyticsService from '../../services/Analytics/CreateAssertionModalAnalytics.service';
@@ -11,6 +12,7 @@ import {TAssertion} from '../../types/Assertion.types';
 import {IValues} from './AssertionForm';
 import * as S from './AssertionForm.styled';
 import {DurationFields} from './DurationFields';
+import {OtelReference} from './hooks/useGetOTELSemanticConvertionAttributesInfo';
 
 const operatorList = Object.values(CompareOperator).map(value => ({
   value: OperatorService.getOperatorSymbol(value),
@@ -23,6 +25,7 @@ const getIsValid = ({attribute, comparator, expected}: TAssertion): boolean =>
 interface IProps {
   add(): void;
   remove(name: number): void;
+  reference: OtelReference;
   form: FormInstance<IValues>;
   field: Pick<FormListFieldData, never>;
   name: number;
@@ -42,6 +45,7 @@ export const AssertionFormCheck = ({
   form,
   add,
   remove,
+  reference,
 }: IProps) => {
   const assertion = assertionList?.[index];
   const match = useMemo(() => assertion?.expected?.match(durationRegExp), [assertion?.expected]);
@@ -53,8 +57,24 @@ export const AssertionFormCheck = ({
         style={{margin: 0}}
         rules={[{required: true, message: 'Attribute is required'}]}
         data-cy="assertion-check-attribute"
+        id="assertion-check-attribute"
       >
-        <S.Select style={{margin: 0}} placeholder="Attribute" showSearch>
+        <S.Select
+          style={{margin: 0}}
+          placeholder="Attribute"
+          showSearch
+          filterOption={(input, option) => {
+            const key = option?.key || '';
+            const attributesTags: Record<string, {tags: string[]; description: string}> = AttributesTags;
+            const ref = reference[key] || attributesTags[key] || {description: '', tags: []};
+            const availableTagsMatchInput = Boolean(
+              ref.tags.find(tag => tag.toString().toLowerCase().includes(input.toLowerCase()))
+            );
+            const currentOptionMatchInput = option?.key.includes(input);
+            const currentDescriptionMatchInput = ref?.description.includes(input);
+            return availableTagsMatchInput || currentOptionMatchInput || currentDescriptionMatchInput;
+          }}
+        >
           {attributeOptionList}
         </S.Select>
       </Form.Item>

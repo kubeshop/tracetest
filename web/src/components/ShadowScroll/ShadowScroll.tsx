@@ -39,7 +39,7 @@ const ShadowScroll = ({children}: IProps) => {
       updateHorizontalShadow(contentRef.current!);
       updateVerticalShadow(contentRef.current!);
     }
-  }, [getIsReady]);
+  }, [contentRef, getIsReady, updateHorizontalShadow, updateVerticalShadow]);
 
   return (
     <div style={{position: 'relative'}} ref={wrapperRef}>

@@ -50,6 +50,7 @@ type (
 		Jaeger     configgrpc.GRPCClientSettings `mapstructure:"jaeger"`
 		Tempo      configgrpc.GRPCClientSettings `mapstructure:"tempo"`
 		OpenSearch OpensearchDataStoreConfig     `mapstructure:"opensearch"`
+		SignalFX   SignalFXDataStoreConfig       `mapstructure:"signalfx"`
 	}
 
 	TelemetryExporterOption struct {
@@ -72,6 +73,11 @@ type (
 		Username  string
 		Password  string
 		Index     string
+	}
+
+	SignalFXDataStoreConfig struct {
+		Realm string
+		Token string
 	}
 )
 
