@@ -4,11 +4,13 @@ import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import {createContext, useCallback, useContext, useEffect, useMemo} from 'react';
 import {useGetTestByIdQuery} from 'redux/apis/TraceTest.api';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
-import {setSelectedAssertion as setSelectedAssertionAction} from 'redux/slices/TestDefinition.slice';
 import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
 import {TAssertionResultEntry, TAssertionResults} from 'types/Assertion.types';
 import {TTest} from 'types/Test.types';
 import {TTestDefinitionEntry} from 'types/TestDefinition.types';
+import RouterActions from 'redux/actions/Router.actions';
+import {RouterSearchFields} from 'constants/Common.constants';
+import {encryptString} from 'utils/Common';
 import useTestDefinitionCrud from './hooks/useTestDefinitionCrud';
 
 interface IContext {
@@ -85,7 +87,11 @@ const TestDefinitionProvider = ({children, testId, runId}: IProps) => {
 
   const setSelectedAssertion = useCallback(
     (assertionResult?: TAssertionResultEntry) => {
-      dispatch(setSelectedAssertionAction(assertionResult));
+      dispatch(
+        RouterActions.updateSearch({
+          [RouterSearchFields.SelectedAssertion]: encryptString(assertionResult?.selector || ''),
+        })
+      );
     },
     [dispatch]
   );

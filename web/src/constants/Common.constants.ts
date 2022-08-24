@@ -36,3 +36,8 @@ export enum HTTP_METHOD {
 }
 
 export const durationRegExp = /(\d+)(ns|μs|ms|s|m|h)/;
+
+export enum RouterSearchFields {
+  SelectedAssertion = 'selectedAssertion',
+  SelectedSpan = 'selectedSpan',
+}

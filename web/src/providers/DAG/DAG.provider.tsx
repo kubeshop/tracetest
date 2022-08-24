@@ -41,13 +41,18 @@ const DAGProvider = ({children, spans}: IProps) => {
   const edges = useAppSelector(DAGSelectors.selectEdges);
   const nodes = useAppSelector(DAGSelectors.selectNodes);
   const [isMiniMapActive, setIsMiniMapActive] = useState(false);
-  const {onSelectSpan} = useSpan();
+  const {onSelectSpan, selectedSpan} = useSpan();
 
   useEffect(() => {
     dispatch(initNodes({spans}));
-    const firstSpan = spans.find(span => !span.parentId);
-    onSelectSpan(firstSpan?.id ?? '');
-  }, [dispatch, onSelectSpan, spans]);
+  }, [dispatch, spans]);
+
+  useEffect(() => {
+    if (!selectedSpan) {
+      const firstSpan = spans.find(span => !span.parentId);
+      onSelectSpan(firstSpan?.id ?? '');
+    }
+  }, [dispatch, onSelectSpan, selectedSpan, spans]);
 
   const onMiniMapToggle = useCallback(() => {
     setIsMiniMapActive(isActive => !isActive);

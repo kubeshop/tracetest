@@ -1,8 +1,10 @@
 import {createSelector} from '@reduxjs/toolkit';
 import {RootState} from 'redux/store';
+import {endpoints} from '../redux/apis/TraceTest.api';
 
 const spansStateSelector = (state: RootState) => state.spans;
 const stateSelector = (state: RootState) => state;
+const paramsSelector = (state: RootState, spanId: string, testId: string, runId: string) => ({spanId, testId, runId});
 
 const selectAffectedSpans = createSelector(
   spansStateSelector,
@@ -17,6 +19,13 @@ const selectAffectedSpans = createSelector(
 );
 const SpanSelectors = () => ({
   selectAffectedSpans,
+  selectSpanById: createSelector(stateSelector, paramsSelector, (state, {spanId, testId, runId}) => {
+    const {data: {trace} = {}} = endpoints.getRunById.select({testId, runId})(state);
+
+    const spanList = trace?.spans || [];
+
+    return spanList.find(span => span.id === spanId);
+  }),
   selectSelectedSpan: createSelector(spansStateSelector, ({selectedSpan}) => selectedSpan),
   selectFocusedSpan: createSelector(spansStateSelector, ({focusedSpan}) => focusedSpan),
   selectMatchedSpans: createSelector(spansStateSelector, ({matchedSpans}) => matchedSpans),
