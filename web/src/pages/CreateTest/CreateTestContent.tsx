@@ -13,7 +13,7 @@ const CreateTestContent: React.FC = () => {
     return () => {
       onReset();
     };
-  }, []);
+  }, [onReset]);
 
   return (
     <S.Wrapper>

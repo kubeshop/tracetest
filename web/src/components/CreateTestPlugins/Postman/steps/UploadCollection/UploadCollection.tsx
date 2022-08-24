@@ -31,7 +31,7 @@ const UploadCollection = () => {
     form.setFieldsValue({url, body, method: method as HTTP_METHOD, collectionFile, collectionTest});
     getCollectionValues(collectionFile as RcFile);
     setIsValid(true);
-  }, [body, form, method, collectionFile, url, collectionTest]);
+  }, [form, url, body, method, collectionFile, collectionTest, getCollectionValues, setIsValid]);
 
   useEffect(() => {
     onRefreshData();

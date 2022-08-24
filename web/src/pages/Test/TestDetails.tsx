@@ -41,7 +41,13 @@ const TestDetails = ({onSelectResult, testId}: IProps) => {
   return (
     <>
       <S.TestDetailsHeader>
-        <SearchInput onSearch={() => console.log('onSearch')} placeholder="Search test result (Not implemented yet)" />
+        <SearchInput
+          onSearch={() => {
+            // eslint-disable-next-line no-console
+            console.log('onSearch');
+          }}
+          placeholder="Search test result (Not implemented yet)"
+        />
         <Button
           onClick={handleRunTest}
           loading={result.isLoading}

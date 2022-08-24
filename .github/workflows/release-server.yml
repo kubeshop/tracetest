@@ -65,6 +65,7 @@ jobs:
           ANALYTICS_FE_KEY=${{ secrets.ANALYTICS_FE_KEY }}
           VERSION=${{ github.ref_name}}
           TRACETEST_ENV=main
+          PUBLIC_PATH=/
 
   release-cli:
     name: Build CLI release arctifacts
