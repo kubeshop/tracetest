@@ -89,7 +89,9 @@ const TestDefinitionProvider = ({children, testId, runId}: IProps) => {
     (assertionResult?: TAssertionResultEntry) => {
       dispatch(
         RouterActions.updateSearch({
-          [RouterSearchFields.SelectedAssertion]: encryptString(assertionResult?.selector || ''),
+          [RouterSearchFields.SelectedAssertion]: assertionResult?.selector
+            ? encryptString(assertionResult?.selector)
+            : '',
         })
       );
     },
