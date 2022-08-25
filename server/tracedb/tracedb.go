@@ -15,6 +15,7 @@ const (
 	JAEGER_BACKEND     string = "jaeger"
 	TEMPO_BACKEND      string = "tempo"
 	OPENSEARCH_BACKEND string = "opensearch"
+	SIGNALFX           string = "signalfx"
 )
 
 type TraceDB interface {
@@ -39,6 +40,8 @@ func New(c config.Config) (db TraceDB, err error) {
 		db, err = newTempoDB(&selectedDataStore.Tempo)
 	case selectedDataStore.Type == OPENSEARCH_BACKEND:
 		db, err = newOpenSearchDB(selectedDataStore.OpenSearch)
+	case selectedDataStore.Type == SIGNALFX:
+		db, err = newSignalFXDB(selectedDataStore.SignalFX)
 	}
 
 	return

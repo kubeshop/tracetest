@@ -53,7 +53,7 @@ const useQuerySelector = ({form, runId, testId, onValidSelector}: IProps) => {
     return () => {
       onClearAffectedSpans();
     };
-  }, []);
+  }, [onClearAffectedSpans]);
 
   useEffect(() => {
     setIsValid(!isError);

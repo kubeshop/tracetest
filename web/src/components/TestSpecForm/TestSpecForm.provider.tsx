@@ -2,11 +2,12 @@ import {noop} from 'lodash';
 import {createContext, useCallback, useContext, useMemo, useState} from 'react';
 
 import VersionMismatchModal from 'components/VersionMismatchModal/VersionMismatchModal';
+import {RouterSearchFields} from 'constants/Common.constants';
 import {useSpan} from 'providers/Span/Span.provider';
 import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
-import {setSelectedAssertion} from 'redux/slices/TestDefinition.slice';
+import RouterActions from 'redux/actions/Router.actions';
 import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
 import CreateAssertionModalAnalyticsService from 'services/Analytics/CreateAssertionModalAnalytics.service';
 import {TTestDefinitionEntry} from 'types/TestDefinition.types';
@@ -75,7 +76,7 @@ const TestSpecFormProvider: React.FC<{testId: string}> = ({children}) => {
         setIsOpen(true);
       }
 
-      dispatch(setSelectedAssertion());
+      dispatch(RouterActions.updateSearch({[RouterSearchFields.SelectedAssertion]: ''}));
     },
     [dispatch, definitionList, isDraftMode, run.testVersion, test?.version]
   );

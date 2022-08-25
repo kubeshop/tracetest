@@ -1,8 +1,8 @@
 import {useParams} from 'react-router-dom';
 import {ReactFlowProvider} from 'react-flow-renderer';
 
-import TestSpecFormProvider from 'components/TestSpecForm/TestSpecForm.provider';
 import Layout from 'components/Layout';
+import TestSpecFormProvider from 'components/TestSpecForm/TestSpecForm.provider';
 import withAnalytics from 'components/WithAnalytics/WithAnalytics';
 import GuidedTourProvider from 'providers/GuidedTour/GuidedTour.provider';
 import SpanProvider from 'providers/Span';
@@ -15,19 +15,19 @@ const RunDetail = () => {
 
   return (
     <GuidedTourProvider>
-      <ReactFlowProvider>
-        <TestRunProvider testId={testId} runId={runId}>
-          <TestDefinitionProvider testId={testId} runId={runId}>
-            <TestSpecFormProvider testId={testId}>
-              <SpanProvider>
-                <Layout>
+      <Layout>
+        <ReactFlowProvider>
+          <TestRunProvider testId={testId} runId={runId}>
+            <TestDefinitionProvider testId={testId} runId={runId}>
+              <TestSpecFormProvider testId={testId}>
+                <SpanProvider>
                   <Content />
-                </Layout>
-              </SpanProvider>
-            </TestSpecFormProvider>
-          </TestDefinitionProvider>
-        </TestRunProvider>
-      </ReactFlowProvider>
+                </SpanProvider>
+              </TestSpecFormProvider>
+            </TestDefinitionProvider>
+          </TestRunProvider>
+        </ReactFlowProvider>
+      </Layout>
     </GuidedTourProvider>
   );
 };

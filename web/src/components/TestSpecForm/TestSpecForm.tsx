@@ -59,7 +59,6 @@ const TestSpecForm = ({
     form,
     attributeList,
   });
-
   return (
     <S.AssertionForm>
       <S.AssertionFormHeader>

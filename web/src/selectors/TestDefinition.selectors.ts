@@ -97,6 +97,9 @@ const TestDefinitionSelectors = () => ({
   selectDefinitionBySelector: createSelector(selectDefinitionList, selectorSelector, (definitionList, selector) =>
     definitionList.find(def => def.selector === selector)
   ),
+  selectAssertionBySelector: createSelector(stateSelector, selectorSelector, ({assertionResults}, selector) =>
+    assertionResults?.resultList.find(def => def.selector === selector)
+  ),
   selectSelectedAssertion: createSelector(stateSelector, ({selectedAssertion}) => selectedAssertion),
   selectAssertionResultsBySpan,
   selectIsDraftMode: createSelector(stateSelector, ({isDraftMode}) => isDraftMode),

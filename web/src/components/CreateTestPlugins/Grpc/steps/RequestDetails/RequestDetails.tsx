@@ -26,7 +26,7 @@ const RequestDetails = () => {
     } catch (err) {
       setIsValid(false);
     }
-  }, [auth, message, metadata, method, protoFile, url]);
+  }, [auth, form, message, metadata, method, protoFile, setIsValid, url]);
 
   useEffect(() => {
     onRefreshData();

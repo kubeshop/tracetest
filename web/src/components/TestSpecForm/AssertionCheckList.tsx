@@ -9,6 +9,7 @@ import {IValues} from './TestSpecForm';
 import {AssertionCheck} from './AssertionCheck';
 import * as S from './TestSpecForm.styled';
 import CreateAssertionModalAnalyticsService from '../../services/Analytics/CreateAssertionModalAnalytics.service';
+import {useGetOTELSemanticConventionAttributesInfo} from './hooks/useGetOTELSemanticConventionAttributesInfo';
 
 interface IProps {
   form: FormInstance<IValues>;
@@ -23,15 +24,14 @@ interface IProps {
 }
 
 const AssertionCheckList: React.FC<IProps> = ({form, fields, add, remove, attributeList, assertionList}) => {
-  const attributeOptionList = useMemo(
-    () =>
-      uniqBy(attributeList, 'key').map(({key}) => (
-        <Select.Option key={key} value={key}>
-          {key}
-        </Select.Option>
-      )),
-    [attributeList]
-  );
+  const reference = useGetOTELSemanticConventionAttributesInfo();
+  const attributeOptionList = useMemo(() => {
+    return uniqBy(attributeList, 'key').map(({key}) => (
+      <Select.Option key={key} value={key}>
+        {key}
+      </Select.Option>
+    ));
+  }, [attributeList]);
 
   return (
     <S.AssertionsContainer>
@@ -47,6 +47,7 @@ const AssertionCheckList: React.FC<IProps> = ({form, fields, add, remove, attrib
               name={name}
               index={index}
               assertionList={assertionList}
+              reference={reference}
             />
           );
         })}
