@@ -10,11 +10,9 @@ import (
 	"text/template"
 )
 
-func exitOption(msg string) func(ui UI, args ...interface{}) interface{} {
-
-	return func(ui UI, args ...interface{}) interface{} {
+func exitOption(msg string) func(ui UI) {
+	return func(ui UI) {
 		ui.Exit(msg)
-		return nil
 	}
 }
 

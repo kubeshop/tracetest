@@ -21,32 +21,25 @@ or reach us on Discord https://discord.gg/6zupCZFQbe
 `)
 
 	option := ui.Select("How do you want to run TraceTest?", []option{
-		{"Using Docker Compose", installFn(DockerCompose)},
+		{"Using Docker Compose", dockerCompose.Install},
 	})
 
 	option.fn(ui)
 }
 
-func installFn(installer Installer) func(ui UI, args ...interface{}) interface{} {
-	return func(ui UI, args ...interface{}) interface{} {
-		installer.Install(ui)
-		return nil
-	}
-}
-
-type Installer struct {
+type installer struct {
 	preChecks []preChecker
 	configs   []configurator
-	installer installer
+	installFn func(config configuration, ui UI)
 }
 
-func (i Installer) PreCheck(ui UI) {
+func (i installer) PreCheck(ui UI) {
 	for _, pc := range i.preChecks {
 		pc(ui)
 	}
 }
 
-func (i Installer) Configure(ui UI) configuration {
+func (i installer) Configure(ui UI) configuration {
 	config := configuration{}
 	for _, confFn := range i.configs {
 		config = confFn(config, ui)
@@ -55,10 +48,10 @@ func (i Installer) Configure(ui UI) configuration {
 	return config
 }
 
-func (i Installer) Install(ui UI) {
+func (i installer) Install(ui UI) {
 	i.PreCheck(ui)
 	conf := i.Configure(ui)
-	i.installer(conf, ui)
+	i.installFn(conf, ui)
 }
 
 type preChecker func(ui UI)
@@ -97,4 +90,3 @@ func (c configuration) String(key string) (string, error) {
 }
 
 type configurator func(config configuration, ui UI) configuration
-type installer func(config configuration, ui UI)

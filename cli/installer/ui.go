@@ -34,7 +34,7 @@ type UI interface {
 
 type option struct {
 	text string
-	fn   func(ui UI, args ...interface{}) interface{}
+	fn   func(ui UI)
 }
 
 type ptermUI struct{}

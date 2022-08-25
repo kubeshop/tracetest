@@ -14,20 +14,20 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-var DockerCompose = Installer{
+var dockerCompose = installer{
 	preChecks: []preChecker{
-		DockerChecker,
-		DockerReadyChecker,
-		DockerComposeChecker,
+		dockerChecker,
+		dockerReadyChecker,
+		dockerComposeChecker,
 	},
 	configs: []configurator{
-		ConfigureDemoApp,
-		ConfigureDockerCompose,
+		configureDemoApp,
+		configureDockerCompose,
 	},
-	installer: dockerComposeInstaller,
+	installFn: dockerComposeInstaller,
 }
 
-func ConfigureDockerCompose(conf configuration, ui UI) configuration {
+func configureDockerCompose(conf configuration, ui UI) configuration {
 	conf["docker-compose.filename"] = ui.TextInput("Docker Compose output file name", "docker-compose.yaml")
 	conf["tracetest-config.filename"] = ui.TextInput("TraceTest Config output file name", "tracetest.yaml")
 	conf["collector-config.filename"] = ui.TextInput("OTel-Collector Config output file name", "collector.yaml")
@@ -233,7 +233,7 @@ func getCompleteProject(ui UI) *types.Project {
 	return project
 }
 
-func DockerChecker(ui UI) {
+func dockerChecker(ui UI) {
 	if commandExists("docker") {
 		ui.Println(ui.Green("✔ docker installed"))
 		return
@@ -257,7 +257,7 @@ func DockerChecker(ui UI) {
 	}
 }
 
-func DockerReadyChecker(ui UI) {
+func dockerReadyChecker(ui UI) {
 	if commandSuccess("docker ps") {
 		ui.Println(ui.Green("✔ docker ready"))
 		return
@@ -273,7 +273,7 @@ func DockerReadyChecker(ui UI) {
 	)
 }
 
-func DockerComposeChecker(ui UI) {
+func dockerComposeChecker(ui UI) {
 	if commandSuccess("docker compose") {
 		ui.Println(ui.Green("✔ docker compose installed"))
 		return
@@ -296,8 +296,8 @@ func DockerComposeChecker(ui UI) {
 	}
 }
 
-func installDockerCompose(ui UI, args ...interface{}) interface{} {
-	return (cmd{
+func installDockerCompose(ui UI) {
+	(cmd{
 		sudo:          true,
 		notConfirmMsg: "No worries. You can try installing Docker Engine manually. See https://docs.docker.com/compose/install/",
 		args: map[string]string{
@@ -355,10 +355,10 @@ func installDockerCompose(ui UI, args ...interface{}) interface{} {
 		macAppleChipManual: "TODO", // todo. see https://apple.stackexchange.com/a/73931
 		windows:            "Check the install docks: https://docs.docker.com/compose/install/",
 		other:              "Check the install docks: https://docs.docker.com/compose/install/",
-	}).exec(ui, args...)
+	}).exec(ui)
 }
 
-func installDockerEngine(ui UI, args ...interface{}) interface{} {
+func installDockerEngine(ui UI) {
 	post := `
 			# post-install. not neccesary for root
 			if [ "$(id -u)" != "0" ]; then
@@ -367,7 +367,7 @@ func installDockerEngine(ui UI, args ...interface{}) interface{} {
 				newgrp docker
 			fi
 			`
-	return (cmd{
+	(cmd{
 		sudo:          true,
 		notConfirmMsg: "No worries. You can try installing Docker Engine manually. See https://docs.docker.com/engine/install/",
 		args: map[string]string{
@@ -455,11 +455,11 @@ func installDockerEngine(ui UI, args ...interface{}) interface{} {
 		macAppleChipManual: "TODO", // todo. see https://apple.stackexchange.com/a/73931
 		windows:            "Check the install docks: https://docs.docker.com/engine/install/",
 		other:              "Check the install docks: https://docs.docker.com/engine/install/",
-	}).exec(ui, args...)
+	}).exec(ui)
 }
 
-func installDockerDesktop(ui UI, args ...interface{}) interface{} {
-	return (cmd{
+func installDockerDesktop(ui UI) {
+	(cmd{
 		sudo:          true,
 		notConfirmMsg: "No worries. You can try installing Docker Desktop manually. See https://docs.docker.com/desktop/install/",
 		args: map[string]string{
@@ -513,7 +513,7 @@ func installDockerDesktop(ui UI, args ...interface{}) interface{} {
 		homebrew: "brew install --cask docker",
 		windows:  "Check the install docks: https://docs.docker.com/desktop/install/windows-install/",
 		other:    "Check the install docks: https://docs.docker.com/desktop/#download-and-install",
-	}).exec(ui, args...)
+	}).exec(ui)
 }
 
 func dockerVersion(ui UI) string {
