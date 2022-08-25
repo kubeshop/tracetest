@@ -1,10 +1,7 @@
 VERSION ?= "dev"
 TRACETEST_ENV ?= "dev"
-GO_LDFLAGS := $(shell echo \
-		-X "'github.com/kubeshop/tracetest/cli/config.Version=$(VERSION)'" \
-		-X "'github.com/kubeshop/tracetest/cli/config.Env=$(TRACETEST_ENV)'" \
-		-X "'github.com/kubeshop/tracetest/cli/analytics.SecretKey=$(ANALYTICS_BE_KEY)'" \
-	| sed 's/ / /g')
+ANALYTICS_BE_KEY ?= ""
+
 
 PROJECT_ROOT=${shell dirname $${PWD}}
 
@@ -29,7 +26,10 @@ generate-client:
 	go fmt ./...; cd ..
 
 build:
-	go build -ldflags="$(GO_LDFLAGS)" -o tracetest main.go
+	VERSION=$(VERSION) \
+	TRACETEST_ENV=$(TRACETEST_ENV) \
+	ANALYTICS_BE_KEY=$(ANALYTICS_BE_KEY) \
+	goreleaser --rm-dist --snapshot -f ../.goreleaser.yaml
 
 test: mockserver
 	@go test -coverprofile=coverage.out ./...
