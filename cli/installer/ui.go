@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/pterm/pterm"
+	"github.com/pterm/pterm/putils"
 )
 
 const createIssueMsg = "If you need help, please create an issue: https://github.com/kubeshop/tracetest/issues/new/choose"
@@ -12,6 +13,8 @@ const createIssueMsg = "If you need help, please create an issue: https://github
 var DefaultUI UI = ptermUI{}
 
 type UI interface {
+	Banner()
+
 	Panic(error)
 	Exit(string)
 
@@ -35,6 +38,17 @@ type option struct {
 }
 
 type ptermUI struct{}
+
+func (ui ptermUI) Banner() {
+	pterm.Print("\n\n")
+
+	pterm.DefaultBigText.
+		WithLetters(putils.LettersFromString("TraceTest")).
+		Render()
+
+	pterm.Print("\n\n")
+
+}
 
 func (ui ptermUI) Panic(err error) {
 	pterm.Error.WithFatal(true).Println(err)
@@ -113,6 +127,7 @@ func (ui ptermUI) Select(prompt string, options []option) (selected option) {
 
 	selectedText, err := pterm.
 		DefaultInteractiveSelect.
+		WithDefaultText(prompt).
 		WithOptions(textOpts).
 		WithDefaultOption(textOpts[0]).
 		Show()

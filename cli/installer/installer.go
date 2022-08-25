@@ -5,7 +5,33 @@ import (
 )
 
 func Start() {
-	DockerCompose.Install(DefaultUI)
+	ui := DefaultUI
+
+	ui.Banner()
+
+	ui.Println(`
+Hi! Welcome to the TraceTest server installer. I'll help you set up your TraceTest server by asking you a few questions
+and configuring your system with all the requirements, so you can start TraceTesting right away!
+
+To get more info about TraceTest, you can check our docs at https://kubeshop.github.io/tracetest/
+
+If you have any issues, please let us know by creating an issue (https://github.com/kubeshop/tracetest/issues/new/choose)
+or reach us on Discord https://discord.gg/6zupCZFQbe
+
+`)
+
+	option := ui.Select("How do you want to run TraceTest?", []option{
+		{"Using Docker Compose", installFn(DockerCompose)},
+	})
+
+	option.fn(ui)
+}
+
+func installFn(installer Installer) func(ui UI, args ...interface{}) interface{} {
+	return func(ui UI, args ...interface{}) interface{} {
+		installer.Install(ui)
+		return nil
+	}
 }
 
 type Installer struct {
