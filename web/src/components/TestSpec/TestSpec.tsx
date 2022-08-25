@@ -34,7 +34,6 @@ const TestSpec = ({
   return (
     <S.Container
       data-cy="assertion-card"
-      id={`assertion-${selector}`}
       onClick={() => {
         onOpen(selector);
       }}

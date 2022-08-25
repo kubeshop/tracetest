@@ -41,7 +41,7 @@ const useEditorTheme = ({isEditable = true}: IProps = {}) => {
           {tag: t.keyword, color: text},
         ],
       }),
-    [isEditable, text, white]
+    [isEditable, text, textLight, white]
   );
 };
 

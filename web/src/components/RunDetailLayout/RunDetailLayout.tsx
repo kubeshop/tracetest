@@ -3,7 +3,6 @@ import {useMemo} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 
 import FailedTrace from 'components/FailedTrace';
-// import Run from 'components/Run';
 import RunDetailTest from 'components/RunDetailTest';
 import {RunDetailModes, TestState as TestStateEnum} from 'constants/TestRun.constants';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
@@ -51,7 +50,7 @@ const RunDetailLayout = ({test: {id, name, trigger, version = 1}}: IProps) => {
           tabBarExtraContent={tabBarExtraContent}
         >
           <Tabs.TabPane tab="Trigger" key={RunDetailModes.TRIGGER}>
-            {/* <Run run={run} /> */}
+            Trigger
           </Tabs.TabPane>
           <Tabs.TabPane tab="Trace" key={RunDetailModes.TRACE}>
             Trace

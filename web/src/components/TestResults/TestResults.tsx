@@ -78,7 +78,7 @@ const TestResults = () => {
   );
 
   return (
-    <S.Container id="assertions-container">
+    <S.Container>
       <Header selectedSpan={selectedSpan!} totalFailedSpecs={totalFailedSpecs} totalPassedSpecs={totalPassedSpecs} />
 
       {(isLoading || !assertionResults) && (

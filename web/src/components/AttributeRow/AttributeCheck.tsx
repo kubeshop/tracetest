@@ -1,6 +1,5 @@
 import {Dropdown, Menu} from 'antd';
 
-import useScrollTo from 'hooks/useScrollTo';
 import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
 import TraceAnalyticsService from 'services/Analytics/TraceAnalytics.service';
 import {IResult} from 'types/Assertion.types';
@@ -13,13 +12,11 @@ interface IProps {
 
 const AttributeCheck = ({items, type}: IProps) => {
   const {setSelectedAssertion} = useTestDefinition();
-  const scrollTo = useScrollTo();
 
   const handleOnClick = (id: string) => {
     TraceAnalyticsService.onAttributeCheckClick();
     const {assertionResult} = items.find(item => item.id === id)!;
     setSelectedAssertion(assertionResult);
-    scrollTo({elementId: `assertion-${id}`, containerId: 'assertions-container'});
   };
 
   const menuLayout = (
