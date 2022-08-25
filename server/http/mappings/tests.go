@@ -224,6 +224,7 @@ func (m OpenAPI) Run(in *model.Run) openapi.TestRun {
 		TestVersion:               int32(in.TestVersion),
 		Trace:                     m.Trace(in.Trace),
 		Result:                    m.Result(in.Results),
+		Metadata:                  in.Metadata,
 	}
 }
 
@@ -309,6 +310,7 @@ func (m Model) Run(in openapi.TestRun) *model.Run {
 		TriggerResult:             m.TriggerResult(in.TriggerResult),
 		Trace:                     m.Trace(in.Trace),
 		Results:                   m.Result(in.Result),
+		Metadata:                  in.Metadata,
 	}
 }
 

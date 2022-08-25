@@ -281,7 +281,7 @@ func (c *controller) RerunTestRun(ctx context.Context, testID string, runID stri
 	return openapi.Response(http.StatusOK, c.mappers.Out.Run(&newTestRun)), nil
 }
 
-func (c *controller) RunTest(ctx context.Context, testID string) (openapi.ImplResponse, error) {
+func (c *controller) RunTest(ctx context.Context, testID string, runInformation openapi.TestRunInformation) (openapi.ImplResponse, error) {
 	analytics.SendEvent("Test Run Start", "test")
 	id, err := uuid.Parse(testID)
 	if err != nil {
@@ -293,7 +293,11 @@ func (c *controller) RunTest(ctx context.Context, testID string) (openapi.ImplRe
 		return handleDBError(err), err
 	}
 
-	run := c.runner.Run(ctx, test)
+	metadata := model.RunMetadata{}
+	if runInformation.Metadata != nil {
+		metadata = model.RunMetadata(*runInformation.Metadata)
+	}
+	run := c.runner.Run(ctx, test, metadata)
 
 	return openapi.Response(200, c.mappers.Out.Run(&run)), nil
 }

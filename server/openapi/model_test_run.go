@@ -49,6 +49,8 @@ type TestRun struct {
 	Trace Trace `json:"trace,omitempty"`
 
 	Result AssertionResults `json:"result,omitempty"`
+
+	Metadata map[string]string `json:"metadata,omitempty"`
 }
 
 // AssertTestRunRequired checks if the required fields are not zero-ed
