@@ -1,7 +1,7 @@
 import {useCallback} from 'react';
 import {useNavigate} from 'react-router-dom';
-import TestDefinitionActions from '../../../redux/actions/TestDefinition.actions';
-import {useAppDispatch} from '../../../redux/hooks';
+import TestDefinitionActions from 'redux/actions/TestDefinition.actions';
+import {useAppDispatch} from 'redux/hooks';
 import {
   addDefinition,
   initDefinitionList,
@@ -10,12 +10,13 @@ import {
   updateDefinition,
   reset as resetAction,
   revertDefinition,
-  setSelectedAssertion,
-} from '../../../redux/slices/TestDefinition.slice';
-import {TAssertionResults} from '../../../types/Assertion.types';
-import {TTestDefinitionEntry} from '../../../types/TestDefinition.types';
-import TestRunGateway from '../../../gateways/TestRun.gateway';
-import useBlockNavigation from '../../../hooks/useBlockNavigation';
+} from 'redux/slices/TestDefinition.slice';
+import {TAssertionResults} from 'types/Assertion.types';
+import {TTestDefinitionEntry} from 'types/TestDefinition.types';
+import TestRunGateway from 'gateways/TestRun.gateway';
+import useBlockNavigation from 'hooks/useBlockNavigation';
+import RouterActions from 'redux/actions/Router.actions';
+import { RouterSearchFields } from 'constants/Common.constants';
 
 interface IProps {
   runId: string;
@@ -44,7 +45,7 @@ const useTestDefinitionCrud = ({runId, testId, isDraftMode}: IProps) => {
 
   const publish = useCallback(async () => {
     const {id} = await dispatch(TestDefinitionActions.publish({testId, runId})).unwrap();
-    dispatch(setSelectedAssertion());
+    dispatch(RouterActions.updateSearch({[RouterSearchFields.SelectedAssertion]: ''}));
 
     navigate(`/test/${testId}/run/${id}`);
   }, [dispatch, navigate, runId, testId]);

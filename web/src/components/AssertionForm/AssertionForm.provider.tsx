@@ -5,12 +5,13 @@ import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provide
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import {createContext, useCallback, useContext, useMemo, useState} from 'react';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
-import {setSelectedAssertion} from 'redux/slices/TestDefinition.slice';
 import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
 import {TTestDefinitionEntry} from 'types/TestDefinition.types';
 import CreateAssertionModalAnalyticsService from 'services/Analytics/CreateAssertionModalAnalytics.service';
 import {useSpan} from 'providers/Span/Span.provider';
 import {IValues} from './AssertionForm';
+import RouterActions from '../../redux/actions/Router.actions';
+import { RouterSearchFields } from '../../constants/Common.constants';
 
 interface IFormProps {
   defaultValues?: IValues;
@@ -52,13 +53,7 @@ const AssertionFormProvider: React.FC<{testId: string}> = ({children}) => {
 
   const open = useCallback(
     (props: IFormProps = {}) => {
-      const {
-        isEditing,
-        defaultValues: {
-          assertionList = [],
-          selector: defaultSelector,
-        } = {},
-      } = props;
+      const {isEditing, defaultValues: {assertionList = [], selector: defaultSelector} = {}} = props;
       const definition = definitionList.find(({selector}) => defaultSelector === selector);
 
       if (definition)
@@ -81,7 +76,7 @@ const AssertionFormProvider: React.FC<{testId: string}> = ({children}) => {
         setIsOpen(true);
       }
 
-      dispatch(setSelectedAssertion());
+      dispatch(RouterActions.updateSearch({[RouterSearchFields.SelectedAssertion]: ''}));
     },
     [dispatch, definitionList, isDraftMode, run.testVersion, test?.version]
   );
@@ -100,10 +95,7 @@ const AssertionFormProvider: React.FC<{testId: string}> = ({children}) => {
   }, []);
 
   const onSubmit = useCallback(
-    async ({
-      assertionList = [],
-      selector: newSelectorString = '',
-    }: IValues) => {
+    async ({assertionList = [], selector: newSelectorString = ''}: IValues) => {
       const {isEditing, selector = ''} = formProps;
 
       const definition: TTestDefinitionEntry = {

@@ -15,19 +15,19 @@ const RunDetail = () => {
 
   return (
     <GuidedTourProvider>
-      <ReactFlowProvider>
-        <TestRunProvider testId={testId} runId={runId}>
-          <TestDefinitionProvider testId={testId} runId={runId}>
-            <AssertionFormProvider testId={testId}>
-              <SpanProvider>
-                <Layout>
+      <Layout>
+        <ReactFlowProvider>
+          <TestRunProvider testId={testId} runId={runId}>
+            <TestDefinitionProvider testId={testId} runId={runId}>
+              <AssertionFormProvider testId={testId}>
+                <SpanProvider>
                   <Content />
-                </Layout>
-              </SpanProvider>
-            </AssertionFormProvider>
-          </TestDefinitionProvider>
-        </TestRunProvider>
-      </ReactFlowProvider>
+                </SpanProvider>
+              </AssertionFormProvider>
+            </TestDefinitionProvider>
+          </TestRunProvider>
+        </ReactFlowProvider>
+      </Layout>
     </GuidedTourProvider>
   );
 };

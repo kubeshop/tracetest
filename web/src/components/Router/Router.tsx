@@ -1,4 +1,6 @@
-import {BrowserRouter, Navigate, Route, Routes} from 'react-router-dom';
+import {Navigate, Route, Routes} from 'react-router-dom';
+import {HistoryRouter} from 'redux-first-history/rr6';
+import {history} from 'redux/store';
 
 import Home from 'pages/Home';
 import Test from 'pages/Test';
@@ -9,7 +11,7 @@ import EditTest from 'pages/EditTest';
 const {serverPathPrefix = '/'} = window.ENV || {};
 
 const Router = () => (
-  <BrowserRouter basename={serverPathPrefix}>
+  <HistoryRouter history={history} basename={serverPathPrefix}>
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/test/:testId/edit" element={<EditTest />} />
@@ -22,7 +24,7 @@ const Router = () => (
 
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
-  </BrowserRouter>
+  </HistoryRouter>
 );
 
 export default Router;

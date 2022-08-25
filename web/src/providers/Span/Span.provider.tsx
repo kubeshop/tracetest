@@ -7,12 +7,13 @@ import {
   setFocusedSpan,
   clearAffectedSpans,
   clearSelectedSpan,
-  setSelectedSpan,
   setMatchedSpans,
   setSearchText,
 } from 'redux/slices/Span.slice';
 import SpanSelectors from 'selectors/Span.selectors';
 import {TSpan} from 'types/Span.types';
+import {RouterSearchFields} from '../../constants/Common.constants';
+import RouterActions from '../../redux/actions/Router.actions';
 import SpanService from '../../services/Span.service';
 import {useTestRun} from '../TestRun/TestRun.provider';
 
@@ -62,19 +63,16 @@ const SpanProvider = ({children}: IProps) => {
 
   useEffect(() => {
     return () => {
-      dispatch(clearSelectedSpan());
+      dispatch(RouterActions.updateSearch({[RouterSearchFields.SelectedSpan]: ''}));
       dispatch(clearAffectedSpans());
     };
   }, [dispatch]);
 
   const onSelectSpan = useCallback(
     (spanId: string) => {
-      const span = spans.find(({id}) => id === spanId);
-      if (span) {
-        dispatch(setSelectedSpan({span}));
-      }
+      dispatch(RouterActions.updateSearch({[RouterSearchFields.SelectedSpan]: spanId}));
     },
-    [dispatch, spans]
+    [dispatch]
   );
 
   const onClearSelectedSpan = useCallback(() => {

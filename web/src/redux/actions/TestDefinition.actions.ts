@@ -6,7 +6,7 @@ import TestDefinitionSelectors from '../../selectors/TestDefinition.selectors';
 import TestDefinitionService from '../../services/TestDefinition.service';
 import {TAssertionResults} from '../../types/Assertion.types';
 import {TRawTestDefinitionEntry, TTestDefinitionEntry} from '../../types/TestDefinition.types';
-import { TTestRun } from '../../types/TestRun.types';
+import {TTestRun} from '../../types/TestRun.types';
 import {RootState} from '../store';
 
 export type TChange = {
