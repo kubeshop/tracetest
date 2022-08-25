@@ -23,6 +23,7 @@ type UI interface {
 	Success(string)
 
 	Println(string)
+	Title(string)
 
 	Green(string) string
 	Red(string) string
@@ -73,6 +74,10 @@ func (ui ptermUI) Success(msg string) {
 
 func (ui ptermUI) Println(msg string) {
 	pterm.Println(msg)
+}
+
+func (ui ptermUI) Title(msg string) {
+	pterm.Println(pterm.Yellow("\n-> ", msg, "\n"))
 }
 
 func (ui ptermUI) Green(msg string) string {

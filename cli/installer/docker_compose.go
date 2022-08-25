@@ -235,15 +235,15 @@ func getCompleteProject(ui UI) *types.Project {
 
 func dockerChecker(ui UI) {
 	if commandExists("docker") {
-		ui.Println(ui.Green("✔ docker installed"))
+		ui.Println(ui.Green("✔ docker already installed"))
 		return
 	}
 
-	ui.Warning("We didn't find docker in your system")
+	ui.Warning("I didn't find docker in your system")
 	option := ui.Select("What do you want to do?", []option{
 		{"Install Docker Engine", installDockerEngine},
 		{"Install Docker Desktop", installDockerDesktop},
-		{"Install manually", exitOption(
+		{"Fix manually", exitOption(
 			"Check the docker install docks on https://docs.docker.com/get-docker/",
 		)},
 	})
@@ -251,15 +251,15 @@ func dockerChecker(ui UI) {
 	option.fn(ui)
 
 	if commandExists("docker") {
-		ui.Println(ui.Green("✔ docker installed"))
+		ui.Println(ui.Green("✔ docker was successfully installed"))
 	} else {
-		ui.Exit(ui.Red("✘ docker not installed. Check output for errors. " + createIssueMsg))
+		ui.Exit(ui.Red("✘ docker could not be installed. Check output for errors. " + createIssueMsg))
 	}
 }
 
 func dockerReadyChecker(ui UI) {
 	if commandSuccess("docker ps") {
-		ui.Println(ui.Green("✔ docker ready"))
+		ui.Println(ui.Green("✔ docker is ready"))
 		return
 	}
 
@@ -275,14 +275,14 @@ func dockerReadyChecker(ui UI) {
 
 func dockerComposeChecker(ui UI) {
 	if commandSuccess("docker compose") {
-		ui.Println(ui.Green("✔ docker compose installed"))
+		ui.Println(ui.Green("✔ docker compose already installed"))
 		return
 	}
 
-	ui.Warning("We didn't find docker compose in your system")
+	ui.Warning("I didn't find docker compose in your system")
 	option := ui.Select("What do you want to do?", []option{
 		{"Install Docker Compose", installDockerCompose},
-		{"Install manually", exitOption(
+		{"Fix manually", exitOption(
 			"Check the docker compose install docks on https://docs.docker.com/compose/install/",
 		)},
 	})
@@ -290,16 +290,16 @@ func dockerComposeChecker(ui UI) {
 	option.fn(ui)
 
 	if commandSuccess("docker compose") {
-		ui.Println(ui.Green("✔ docker compose installed"))
+		ui.Println(ui.Green("✔ docker compose was successfully installed"))
 	} else {
-		ui.Exit(ui.Red("✘ docker compose not installed. Check output for errors. " + createIssueMsg))
+		ui.Exit(ui.Red("✘ docker compose could not be installed. Check output for errors. " + createIssueMsg))
 	}
 }
 
 func installDockerCompose(ui UI) {
 	(cmd{
 		sudo:          true,
-		notConfirmMsg: "No worries. You can try installing Docker Engine manually. See https://docs.docker.com/compose/install/",
+		notConfirmMsg: "No worries. You can try installing Docker Compose manually. See https://docs.docker.com/compose/install/",
 		args: map[string]string{
 			"DockerVersion": dockerVersion(ui),
 			"Architecture":  detectArchitecture(),

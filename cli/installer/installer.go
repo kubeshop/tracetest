@@ -34,9 +34,12 @@ type installer struct {
 }
 
 func (i installer) PreCheck(ui UI) {
+	ui.Title("Let's check if your system has everything we need")
 	for _, pc := range i.preChecks {
 		pc(ui)
 	}
+
+	ui.Title("Your system is ready! Now, let's configure TraceTest")
 }
 
 func (i installer) Configure(ui UI) configuration {
@@ -51,6 +54,9 @@ func (i installer) Configure(ui UI) configuration {
 func (i installer) Install(ui UI) {
 	i.PreCheck(ui)
 	conf := i.Configure(ui)
+
+	ui.Title("Thanks! We are ready to install TraceTest now")
+
 	i.installFn(conf, ui)
 }
 
