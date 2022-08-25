@@ -63,6 +63,7 @@ type (
 		TriggerResult             TriggerResult
 		Trace                     *traces.Trace
 		Results                   *RunResults
+		Metadata                  map[string]string
 	}
 
 	RunResults struct {
