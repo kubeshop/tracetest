@@ -1,4 +1,4 @@
-import {MinusOutlined, PlusOutlined} from '@ant-design/icons';
+import {DoubleLeftOutlined, DoubleRightOutlined} from '@ant-design/icons';
 import {Button} from 'antd';
 import {useState} from 'react';
 
@@ -30,7 +30,7 @@ const RunDetailTest = ({run, testId}: IProps) => {
         </S.AsideContent>
         <S.AsideButtonContainer>
           <Button
-            icon={isAsideOpen ? <MinusOutlined /> : <PlusOutlined />}
+            icon={isAsideOpen ? <DoubleLeftOutlined /> : <DoubleRightOutlined />}
             onClick={() => setIsAsideOpen(isOpen => !isOpen)}
             shape="circle"
             size="small"

@@ -1,4 +1,4 @@
-import {useCallback, useState} from 'react';
+import {useCallback} from 'react';
 
 import LoadingSpinner from 'components/LoadingSpinner';
 import TestSpecDetail from 'components/TestSpecDetail';
@@ -18,27 +18,24 @@ const TestResults = () => {
   const {isLoading, assertionResults, remove, revert, setSelectedAssertion} = useTestDefinition();
   const {selectedSpan, onSetFocusedSpan} = useSpan();
   const {totalFailedSpecs, totalPassedSpecs} = useAppSelector(TestDefinitionSelectors.selectTotalSpecs);
-  const [isTestSpecDetailOpen, setTestSpecDetailOpen] = useState(false);
-  const [selectedTestSpec, setSelectedTestSpec] = useState<TAssertionResultEntry>();
+  const selectedAssertion = useAppSelector(TestDefinitionSelectors.selectSelectedAssertion);
+  const selectedTestSpec = useAppSelector(state =>
+    TestDefinitionSelectors.selectAssertionBySelector(state, selectedAssertion ?? '')
+  );
 
   const handleOpen = useCallback(
     (selector: string) => {
       AssertionAnalyticsService.onAssertionClick();
-
       const testSpec = assertionResults?.resultList?.find(specResult => specResult.selector === selector);
-      setSelectedTestSpec(testSpec);
       onSetFocusedSpan('');
       setSelectedAssertion(testSpec);
-      setTestSpecDetailOpen(true);
     },
     [assertionResults?.resultList, onSetFocusedSpan, setSelectedAssertion]
   );
 
   const handleClose = useCallback(() => {
-    setSelectedTestSpec(undefined);
     onSetFocusedSpan('');
     setSelectedAssertion();
-    setTestSpecDetailOpen(false);
   }, [onSetFocusedSpan, setSelectedAssertion]);
 
   const handleEdit = useCallback(
@@ -101,7 +98,7 @@ const TestResults = () => {
       )}
 
       <TestSpecDetail
-        isOpen={isTestSpecDetailOpen}
+        isOpen={Boolean(selectedAssertion)}
         onClose={handleClose}
         onDelete={handleDelete}
         onEdit={handleEdit}
