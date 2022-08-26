@@ -370,6 +370,7 @@ func installDockerEngine(ui UI) {
 	(cmd{
 		sudo:          true,
 		notConfirmMsg: "No worries. You can try installing Docker Engine manually. See https://docs.docker.com/engine/install/",
+		installDocs:   "https://docs.docker.com/engine/install/",
 		args: map[string]string{
 			"DockerVersion": dockerVersion(ui),
 			"Architecture":  detectArchitecture(),
@@ -451,10 +452,10 @@ func installDockerEngine(ui UI) {
 			sudo systemctl start docker
 			` + post,
 		homebrew:           "brew install docker",
-		macIntelChipManual: "TODO", // todo. see https://apple.stackexchange.com/a/73931
-		macAppleChipManual: "TODO", // todo. see https://apple.stackexchange.com/a/73931
-		windows:            "Check the install docks: https://docs.docker.com/engine/install/",
-		other:              "Check the install docks: https://docs.docker.com/engine/install/",
+		macIntelChipManual: "", // empty means not supported
+		macAppleChipManual: "", // empty means not supported
+		windows:            "", // empty means not supported
+		other:              "", // empty means not supported
 	}).exec(ui)
 }
 
@@ -462,6 +463,7 @@ func installDockerDesktop(ui UI) {
 	(cmd{
 		sudo:          true,
 		notConfirmMsg: "No worries. You can try installing Docker Desktop manually. See https://docs.docker.com/desktop/install/",
+		installDocs:   "https://docs.docker.com/desktop/",
 		args: map[string]string{
 			"DockerVersion": dockerVersion(ui),
 			"Architecture":  detectArchitecture(),
@@ -511,8 +513,22 @@ func installDockerDesktop(ui UI) {
 			systemctl --user enable docker-desktop
 			`,
 		homebrew: "brew install --cask docker",
-		windows:  "Check the install docks: https://docs.docker.com/desktop/install/windows-install/",
-		other:    "Check the install docks: https://docs.docker.com/desktop/#download-and-install",
+		macIntelChipManual: `
+			curl -LO https://desktop.docker.com/mac/main/amd64/Docker.dmg
+			sudo hdiutil attach $(pwd)/Docker.dmg
+			sudo cp -R /Volumes/Docker/Docker.app /Applications
+			sudo hdiutil detach /Volumes/Docker
+			rm -f Docker.dmg
+			`,
+		macAppleChipManual: `
+			curl -LO https://desktop.docker.com/mac/main/arm64/Docker.dmg
+			sudo hdiutil attach $(pwd)/Docker.dmg
+			sudo cp -R /Volumes/Docker/Docker.app /Applications
+			sudo hdiutil detach /Volumes/Docker
+			rm -f Docker.dmg
+		`,
+		windows: "", // empty means not supported
+		other:   "", // empty means not supported
 	}).exec(ui)
 }
 

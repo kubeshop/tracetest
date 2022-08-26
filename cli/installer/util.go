@@ -92,6 +92,7 @@ type cmd struct {
 	args               interface{}
 	sudo               bool
 	notConfirmMsg      string
+	installDocs        string
 	apt                string
 	yum                string
 	dnf                string
@@ -118,13 +119,17 @@ func (c cmd) exec(ui UI, args ...interface{}) interface{} {
 	case macAppleChipManual:
 		cmd = c.macAppleChipManual
 	case windows:
-		ui.Exit(
-			fmt.Sprintf("We don't support windows yet =(. %s", c.windows),
-		)
+		cmd = c.windows
 	case other:
-		ui.Exit(
-			fmt.Sprintf("OS not supported. %s", c.other),
-		)
+		cmd = c.other
+	}
+
+	if cmd == "" {
+		ui.Exit(fmt.Sprintf(
+			`We don't support your system for this action. Try again using another method.
+			If you want to manually fix this issue, chech the install docs: %s`,
+			c.installDocs,
+		))
 	}
 
 	renderedCmd := &strings.Builder{}
