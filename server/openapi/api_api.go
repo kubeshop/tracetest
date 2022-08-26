@@ -99,12 +99,6 @@ func (c *ApiApiController) Routes() Routes {
 			c.GetTest,
 		},
 		{
-			"GetTestDefinition",
-			strings.ToUpper("Get"),
-			"/api/tests/{testId}/definition",
-			c.GetTestDefinition,
-		},
-		{
 			"GetTestResultSelectedSpans",
 			strings.ToUpper("Get"),
 			"/api/tests/{testId}/run/{runId}/select",
@@ -121,6 +115,12 @@ func (c *ApiApiController) Routes() Routes {
 			strings.ToUpper("Get"),
 			"/api/tests/{testId}/run",
 			c.GetTestRuns,
+		},
+		{
+			"GetTestSpecs",
+			strings.ToUpper("Get"),
+			"/api/tests/{testId}/definition",
+			c.GetTestSpecs,
 		},
 		{
 			"GetTestVersionDefinitionFile",
@@ -153,10 +153,10 @@ func (c *ApiApiController) Routes() Routes {
 			c.RunTest,
 		},
 		{
-			"SetTestDefinition",
+			"SetTestSpecs",
 			strings.ToUpper("Put"),
 			"/api/tests/{testId}/definition",
-			c.SetTestDefinition,
+			c.SetTestSpecs,
 		},
 		{
 			"UpdateTest",
@@ -262,18 +262,18 @@ func (c *ApiApiController) DryRunAssertion(w http.ResponseWriter, r *http.Reques
 
 	runIdParam := params["runId"]
 
-	testDefinitionParam := TestDefinition{}
+	testSpecsParam := TestSpecs{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
-	if err := d.Decode(&testDefinitionParam); err != nil {
+	if err := d.Decode(&testSpecsParam); err != nil {
 		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
 		return
 	}
-	if err := AssertTestDefinitionRequired(testDefinitionParam); err != nil {
+	if err := AssertTestSpecsRequired(testSpecsParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	result, err := c.service.DryRunAssertion(r.Context(), testIdParam, runIdParam, testDefinitionParam)
+	result, err := c.service.DryRunAssertion(r.Context(), testIdParam, runIdParam, testSpecsParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -326,22 +326,6 @@ func (c *ApiApiController) GetTest(w http.ResponseWriter, r *http.Request) {
 	testIdParam := params["testId"]
 
 	result, err := c.service.GetTest(r.Context(), testIdParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
-// GetTestDefinition - Get definition for a test
-func (c *ApiApiController) GetTestDefinition(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	testIdParam := params["testId"]
-
-	result, err := c.service.GetTestDefinition(r.Context(), testIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -407,6 +391,22 @@ func (c *ApiApiController) GetTestRuns(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	result, err := c.service.GetTestRuns(r.Context(), testIdParam, takeParam, skipParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// GetTestSpecs - Get definition for a test
+func (c *ApiApiController) GetTestSpecs(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	testIdParam := params["testId"]
+
+	result, err := c.service.GetTestSpecs(r.Context(), testIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -522,23 +522,23 @@ func (c *ApiApiController) RunTest(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// SetTestDefinition - Set testDefinition for a test
-func (c *ApiApiController) SetTestDefinition(w http.ResponseWriter, r *http.Request) {
+// SetTestSpecs - Set spec for a test
+func (c *ApiApiController) SetTestSpecs(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	testIdParam := params["testId"]
 
-	testDefinitionParam := TestDefinition{}
+	testSpecsParam := TestSpecs{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
-	if err := d.Decode(&testDefinitionParam); err != nil {
+	if err := d.Decode(&testSpecsParam); err != nil {
 		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
 		return
 	}
-	if err := AssertTestDefinitionRequired(testDefinitionParam); err != nil {
+	if err := AssertTestSpecsRequired(testSpecsParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	result, err := c.service.SetTestDefinition(r.Context(), testIdParam, testDefinitionParam)
+	result, err := c.service.SetTestSpecs(r.Context(), testIdParam, testSpecsParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

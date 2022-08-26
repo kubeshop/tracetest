@@ -1,9 +1,9 @@
 import {TRawTestDefinition, TTestDefinition} from '../types/TestDefinition.types';
 import Assertion from './Assertion.model';
 
-const TestDefinition = ({definitions = []}: TRawTestDefinition): TTestDefinition => {
+const TestDefinition = ({specs = []}: TRawTestDefinition): TTestDefinition => {
   return {
-    definitionList: definitions.map(({selector: {query = ''} = {}, assertions = []}) => ({
+    definitionList: specs.map(({selector: {query = ''} = {}, assertions = []}) => ({
       isDraft: false,
       isDeleted: false,
       selector: query,

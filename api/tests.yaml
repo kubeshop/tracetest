@@ -17,14 +17,14 @@ components:
           description: version number of the test
         serviceUnderTest:
           $ref: "./triggers.yaml#/components/schemas/Trigger"
-        definition:
-          $ref: "#/components/schemas/TestDefinition"
-          description: Definition of assertions that are going to be made
+        specs:
+          $ref: "#/components/schemas/TestSpecs"
+          description: specification of assertions that are going to be made
 
-    TestDefinition:
+    TestSpecs:
       type: object
       properties:
-        definitions:
+        specs:
           type: array
           items:
             type: object
@@ -36,7 +36,7 @@ components:
                 items:
                   $ref: "#/components/schemas/Assertion"
       example:
-        definitions:
+        specs:
           - selector:
               query: span[tracetest.span.type="http"]
               structure:

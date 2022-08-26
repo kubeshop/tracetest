@@ -40,7 +40,7 @@ func TestInjectorWithStruct(t *testing.T) {
 				Method: "GET",
 			},
 		},
-		TestDefinition: []definition.TestDefinition{
+		Specs: []definition.TestSpec{
 			{
 				Selector: "http.url = \"${POKEMON_API_URL}\"",
 				Assertions: []string{
@@ -60,7 +60,7 @@ func TestInjectorWithStruct(t *testing.T) {
 				Method: "GET",
 			},
 		},
-		TestDefinition: []definition.TestDefinition{
+		Specs: []definition.TestSpec{
 			{
 				Selector: "http.url = \"http://pokemon.api:8080\"",
 				Assertions: []string{

@@ -48,6 +48,7 @@ export type TTest = Model<
     definition: TTestDefinition;
     serviceUnderTest?: undefined;
     trigger: TTrigger;
+    specs?: TTestDefinition;
   }
 >;
 

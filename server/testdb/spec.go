@@ -11,7 +11,7 @@ import (
 
 var _ model.RunRepository = &postgresDB{}
 
-func (td *postgresDB) GetDefiniton(ctx context.Context, test model.Test) (model.OrderedMap[model.SpanQuery, []model.Assertion], error) {
+func (td *postgresDB) GetSpec(ctx context.Context, test model.Test) (model.OrderedMap[model.SpanQuery, []model.Assertion], error) {
 	stmt, err := td.db.Prepare("SELECT definition FROM definitions WHERE test_id = $1 and test_version = $2")
 	if err != nil {
 		return model.OrderedMap[model.SpanQuery, []model.Assertion]{}, fmt.Errorf("prepare: %w", err)
@@ -25,9 +25,9 @@ func (td *postgresDB) GetDefiniton(ctx context.Context, test model.Test) (model.
 	return def, nil
 }
 
-func (td *postgresDB) SetDefiniton(ctx context.Context, t model.Test, d model.OrderedMap[model.SpanQuery, []model.Assertion]) error {
+func (td *postgresDB) SetSpec(ctx context.Context, t model.Test, d model.OrderedMap[model.SpanQuery, []model.Assertion]) error {
 	sql := `UPDATE definitions SET definition = $3 WHERE test_id = $1 AND test_version = $2`
-	if _, err := td.GetDefiniton(ctx, t); err == ErrNotFound {
+	if _, err := td.GetSpec(ctx, t); err == ErrNotFound {
 		sql = `INSERT INTO definitions (test_id, test_version, "definition") VALUES ($1, $2, $3)`
 	}
 

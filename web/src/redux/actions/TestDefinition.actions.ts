@@ -30,7 +30,7 @@ const TestDefinitionActions = () => ({
 
       await dispatch(
         TestDefinitionGateway.set(testId, {
-          definitions: rawDefinitionList,
+          specs: rawDefinitionList,
         })
       );
 
@@ -42,7 +42,7 @@ const TestDefinitionActions = () => ({
     ({definitionList, testId, runId}, {dispatch}) => {
       const rawDefinitionList = definitionList.map(def => TestDefinitionService.toRaw(def));
 
-      return dispatch(TestRunGateway.dryRun(testId, runId, {definitions: rawDefinitionList})).unwrap();
+      return dispatch(TestRunGateway.dryRun(testId, runId, {specs: rawDefinitionList})).unwrap();
     }
   ),
 });
