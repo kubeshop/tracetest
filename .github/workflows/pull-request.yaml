@@ -163,7 +163,7 @@ jobs:
           --set server.telemetry.dataStore="jaeger" \
           --set server.telemetry.applicationExporter="collector" \
           --set poolingConfig.maxWaitTimeForTrace="30s" \
-          --set poolingConfig.retryDelay="1s" \
+          --set poolingConfig.retryDelay="500ms" \
           --set ingress.enabled=false \
           --wait --timeout 10m
 
