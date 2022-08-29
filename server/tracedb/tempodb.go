@@ -55,7 +55,6 @@ func (ttd *tempoTraceDB) GetTraceByID(ctx context.Context, traceID string) (trac
 		return traces.Trace{}, fmt.Errorf("tempo err: %w", err)
 	}
 
-	fmt.Printf("tempo resp: %#v\n", resp.Trace.Batches)
 	if len(resp.Trace.Batches) == 0 {
 		return traces.Trace{}, ErrTraceNotFound
 	}
