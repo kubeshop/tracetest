@@ -123,6 +123,10 @@ func getAttributeValue(value *v11.AnyValue) string {
 }
 
 func createSpanID(id []byte) trace.SpanID {
+	if id == nil {
+		return trace.SpanID{}
+	}
+
 	var sid [8]byte
 	copy(sid[:], id[:8])
 
