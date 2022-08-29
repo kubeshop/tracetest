@@ -119,7 +119,7 @@ func (c *controller) GetTest(ctx context.Context, testID string) (openapi.ImplRe
 	return openapi.Response(200, c.mappers.Out.Test(test)), nil
 }
 
-func (c *controller) GetTestDefinition(ctx context.Context, testID string) (openapi.ImplResponse, error) {
+func (c *controller) GetTestSpecs(ctx context.Context, testID string) (openapi.ImplResponse, error) {
 	analytics.SendEvent("Test Get Definition", "test")
 	id, err := uuid.Parse(testID)
 	if err != nil {
@@ -131,7 +131,7 @@ func (c *controller) GetTestDefinition(ctx context.Context, testID string) (open
 		return handleDBError(err), err
 	}
 
-	return openapi.Response(200, c.mappers.Out.Definition(test.Definition)), nil
+	return openapi.Response(200, c.mappers.Out.Specs(test.Specs)), nil
 }
 
 func (c *controller) GetTestResultSelectedSpans(ctx context.Context, _ string, runID string, selectorQuery string) (openapi.ImplResponse, error) {
@@ -298,7 +298,7 @@ func (c *controller) RunTest(ctx context.Context, testID string) (openapi.ImplRe
 	return openapi.Response(200, c.mappers.Out.Run(&run)), nil
 }
 
-func (c *controller) SetTestDefinition(ctx context.Context, testID string, def openapi.TestDefinition) (openapi.ImplResponse, error) {
+func (c *controller) SetTestSpecs(ctx context.Context, testID string, def openapi.TestSpecs) (openapi.ImplResponse, error) {
 	analytics.SendEvent("Test Definition Updated", "test")
 	id, err := uuid.Parse(testID)
 	if err != nil {
@@ -321,7 +321,7 @@ func (c *controller) SetTestDefinition(ctx context.Context, testID string, def o
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
 	}
 
-	newTest.Definition = newDefinition
+	newTest.Specs = newDefinition
 
 	newTest, err = c.testDB.UpdateTest(ctx, newTest)
 	if err != nil {
@@ -356,7 +356,7 @@ func (c *controller) UpdateTest(ctx context.Context, testID string, in openapi.T
 	return openapi.Response(204, nil), nil
 }
 
-func (c *controller) DryRunAssertion(ctx context.Context, _, runID string, def openapi.TestDefinition) (openapi.ImplResponse, error) {
+func (c *controller) DryRunAssertion(ctx context.Context, _, runID string, def openapi.TestSpecs) (openapi.ImplResponse, error) {
 	analytics.SendEvent("Test Dry Run", "test")
 	rid, err := uuid.Parse(runID)
 	if err != nil {

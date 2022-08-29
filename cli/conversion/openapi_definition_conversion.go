@@ -16,20 +16,20 @@ func ConvertOpenapiStringIntoString(in *string) string {
 	return *in
 }
 
-func ConvertOpenAPITestIntoDefinitionObject(test openapi.Test) (definition.Test, error) {
+func ConvertOpenAPITestIntoSpecObject(test openapi.Test) (definition.Test, error) {
 	trigger := convertServiceUnderTestIntoTrigger(test.ServiceUnderTest)
-	testDefinition := convertOpenAPITestDefinitionIntoDefinitionArray(test.Definition)
+	testSpec := convertOpenAPITestSpecIntoSpecArray(test.Specs)
 	description := ""
 	if test.Description != nil {
 		description = *test.Description
 	}
 
 	return definition.Test{
-		Id:             *test.Id,
-		Name:           *test.Name,
-		Description:    description,
-		Trigger:        trigger,
-		TestDefinition: testDefinition,
+		Id:          *test.Id,
+		Name:        *test.Name,
+		Description: description,
+		Trigger:     trigger,
+		Specs:       testSpec,
 	}, nil
 }
 
@@ -125,13 +125,13 @@ func getAuthDefinition(auth *openapi.HTTPAuth) definition.HTTPAuthentication {
 	}
 }
 
-func convertOpenAPITestDefinitionIntoDefinitionArray(testDefinition *openapi.TestDefinition) []definition.TestDefinition {
-	if testDefinition == nil {
-		return []definition.TestDefinition{}
+func convertOpenAPITestSpecIntoSpecArray(testSpec *openapi.TestSpecs) []definition.TestSpec {
+	if testSpec == nil {
+		return []definition.TestSpec{}
 	}
 
-	definitionArray := make([]definition.TestDefinition, 0, len(testDefinition.Definitions))
-	for _, def := range testDefinition.Definitions {
+	definitionArray := make([]definition.TestSpec, 0, len(testSpec.Specs))
+	for _, def := range testSpec.Specs {
 		assertions := make([]string, 0, len(def.Assertions))
 		for _, assertion := range def.Assertions {
 			assertionFormat := `%s %s "%s"`
@@ -142,7 +142,7 @@ func convertOpenAPITestDefinitionIntoDefinitionArray(testDefinition *openapi.Tes
 			assertions = append(assertions, assertionString)
 		}
 
-		newDefinition := definition.TestDefinition{
+		newDefinition := definition.TestSpec{
 			Selector:   *def.Selector.Query,
 			Assertions: assertions,
 		}

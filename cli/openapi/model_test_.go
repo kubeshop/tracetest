@@ -20,9 +20,9 @@ type Test struct {
 	Name        *string `json:"name,omitempty"`
 	Description *string `json:"description,omitempty"`
 	// version number of the test
-	Version          *int32          `json:"version,omitempty"`
-	ServiceUnderTest *Trigger        `json:"serviceUnderTest,omitempty"`
-	Definition       *TestDefinition `json:"definition,omitempty"`
+	Version          *int32     `json:"version,omitempty"`
+	ServiceUnderTest *Trigger   `json:"serviceUnderTest,omitempty"`
+	Specs            *TestSpecs `json:"specs,omitempty"`
 }
 
 // NewTest instantiates a new Test object
@@ -202,36 +202,36 @@ func (o *Test) SetServiceUnderTest(v Trigger) {
 	o.ServiceUnderTest = &v
 }
 
-// GetDefinition returns the Definition field value if set, zero value otherwise.
-func (o *Test) GetDefinition() TestDefinition {
-	if o == nil || o.Definition == nil {
-		var ret TestDefinition
+// GetSpecs returns the Specs field value if set, zero value otherwise.
+func (o *Test) GetSpecs() TestSpecs {
+	if o == nil || o.Specs == nil {
+		var ret TestSpecs
 		return ret
 	}
-	return *o.Definition
+	return *o.Specs
 }
 
-// GetDefinitionOk returns a tuple with the Definition field value if set, nil otherwise
+// GetSpecsOk returns a tuple with the Specs field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Test) GetDefinitionOk() (*TestDefinition, bool) {
-	if o == nil || o.Definition == nil {
+func (o *Test) GetSpecsOk() (*TestSpecs, bool) {
+	if o == nil || o.Specs == nil {
 		return nil, false
 	}
-	return o.Definition, true
+	return o.Specs, true
 }
 
-// HasDefinition returns a boolean if a field has been set.
-func (o *Test) HasDefinition() bool {
-	if o != nil && o.Definition != nil {
+// HasSpecs returns a boolean if a field has been set.
+func (o *Test) HasSpecs() bool {
+	if o != nil && o.Specs != nil {
 		return true
 	}
 
 	return false
 }
 
-// SetDefinition gets a reference to the given TestDefinition and assigns it to the Definition field.
-func (o *Test) SetDefinition(v TestDefinition) {
-	o.Definition = &v
+// SetSpecs gets a reference to the given TestSpecs and assigns it to the Specs field.
+func (o *Test) SetSpecs(v TestSpecs) {
+	o.Specs = &v
 }
 
 func (o Test) MarshalJSON() ([]byte, error) {
@@ -251,8 +251,8 @@ func (o Test) MarshalJSON() ([]byte, error) {
 	if o.ServiceUnderTest != nil {
 		toSerialize["serviceUnderTest"] = o.ServiceUnderTest
 	}
-	if o.Definition != nil {
-		toSerialize["definition"] = o.Definition
+	if o.Specs != nil {
+		toSerialize["specs"] = o.Specs
 	}
 	return json.Marshal(toSerialize)
 }

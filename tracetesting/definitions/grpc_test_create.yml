@@ -40,7 +40,7 @@ trigger:
           ]
         }
       }
-testDefinition:
+specs:
 - selector: span[name = "Tracetest trigger"]
   assertions:
     - tracetest.selected_spans.count = 1

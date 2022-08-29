@@ -18,7 +18,7 @@ func BumpTestVersionIfNeeded(in, updated Test) (Test, error) {
 }
 
 func BumpVersionIfDefinitionChanged(test Test, newDef OrderedMap[SpanQuery, []Assertion]) (Test, error) {
-	definitionHasChanged, err := testFieldHasChanged(test.Definition, newDef)
+	definitionHasChanged, err := testFieldHasChanged(test.Specs, newDef)
 	if err != nil {
 		return test, err
 	}
@@ -31,7 +31,7 @@ func BumpVersionIfDefinitionChanged(test Test, newDef OrderedMap[SpanQuery, []As
 }
 
 func testHasChanged(oldTest Test, newTest Test) (bool, error) {
-	definitionHasChanged, err := testFieldHasChanged(oldTest.Definition, newTest.Definition)
+	definitionHasChanged, err := testFieldHasChanged(oldTest.Specs, newTest.Specs)
 	if err != nil {
 		return false, err
 	}

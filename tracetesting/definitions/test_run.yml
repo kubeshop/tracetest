@@ -9,7 +9,7 @@ trigger:
     headers:
     - key: Content-Type
       value: application/json
-testDefinition:
+specs:
 - selector: span[name = "Tracetest trigger"]
   assertions:
     - tracetest.selected_spans.count = 1

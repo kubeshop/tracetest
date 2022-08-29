@@ -32,14 +32,14 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 				Description:      openAPIStr("my test description"),
 				Version:          openApiInt(3),
 				ServiceUnderTest: &openapi.Trigger{},
-				Definition:       &openapi.TestDefinition{},
+				Specs:            &openapi.TestSpecs{},
 			},
 			ExpectedOutput: definition.Test{
-				Id:             "624a8dea-f152-48d4-a742-30b210094959",
-				Name:           "my test",
-				Description:    "my test description",
-				Trigger:        definition.TestTrigger{},
-				TestDefinition: []definition.TestDefinition{},
+				Id:          "624a8dea-f152-48d4-a742-30b210094959",
+				Name:        "my test",
+				Description: "my test description",
+				Trigger:     definition.TestTrigger{},
+				Specs:       []definition.TestSpec{},
 			},
 		},
 		{
@@ -80,7 +80,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 						Body:           `{ "id": 52 }`,
 					},
 				},
-				TestDefinition: []definition.TestDefinition{},
+				Specs: []definition.TestSpec{},
 			},
 		},
 		{
@@ -120,7 +120,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 						Authentication: definition.HTTPAuthentication{},
 					},
 				},
-				TestDefinition: []definition.TestDefinition{},
+				Specs: []definition.TestSpec{},
 			},
 		},
 		{
@@ -173,7 +173,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 						Body: `{ "id": 52 }`,
 					},
 				},
-				TestDefinition: []definition.TestDefinition{},
+				Specs: []definition.TestSpec{},
 			},
 		},
 		{
@@ -228,7 +228,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 						Body: `{ "id": 52 }`,
 					},
 				},
-				TestDefinition: []definition.TestDefinition{},
+				Specs: []definition.TestSpec{},
 			},
 		},
 		{
@@ -279,7 +279,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 						Body: `{ "id": 52 }`,
 					},
 				},
-				TestDefinition: []definition.TestDefinition{},
+				Specs: []definition.TestSpec{},
 			},
 		},
 		{
@@ -290,8 +290,8 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 				Description:      openAPIStr("my test description"),
 				Version:          openApiInt(3),
 				ServiceUnderTest: &openapi.Trigger{},
-				Definition: &openapi.TestDefinition{
-					Definitions: []openapi.TestDefinitionDefinitions{
+				Specs: &openapi.TestSpecs{
+					Specs: []openapi.TestSpecsSpecs{
 						{
 							Selector: &openapi.Selector{
 								Query: openAPIStr(`span[name = "my span name"]`),
@@ -317,7 +317,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 				Name:        "my test",
 				Description: "my test description",
 				Trigger:     definition.TestTrigger{},
-				TestDefinition: []definition.TestDefinition{
+				Specs: []definition.TestSpec{
 					{
 						Selector: `span[name = "my span name"]`,
 						Assertions: []string{
@@ -332,7 +332,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.Name, func(t *testing.T) {
-			output, err := conversion.ConvertOpenAPITestIntoDefinitionObject(testCase.Input)
+			output, err := conversion.ConvertOpenAPITestIntoSpecObject(testCase.Input)
 
 			require.NoError(t, err)
 			assert.Equal(t, testCase.ExpectedOutput, output)
