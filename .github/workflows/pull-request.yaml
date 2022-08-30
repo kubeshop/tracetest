@@ -254,8 +254,7 @@ jobs:
       - name: Build CLI
         run: |
           cd cli
-          go build -o ./cli main.go
-          cp ./cli ../../cli
+          go build -o ./tracetest main.go
 
       - name: Forward port
         run: |
