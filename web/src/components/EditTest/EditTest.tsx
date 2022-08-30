@@ -9,6 +9,7 @@ import TestService from 'services/Test.service';
 import useValidateTestDraft from 'hooks/useValidateTestDraft';
 import {TriggerTypeToPlugin} from 'constants/Plugins.constants';
 import * as S from './EditTest.styled';
+import {useTestDefinition} from '../../providers/TestDefinition/TestDefinition.provider';
 
 interface IProps {
   test: TTest;
@@ -22,6 +23,7 @@ const EditTest = ({test}: IProps) => {
   const [runTest, {isLoading: isLoadingRunTest}] = useRunTestMutation();
   const plugin = TriggerTypeToPlugin[test.trigger.type];
 
+  const {updateIsInitialized} = useTestDefinition();
   const {isValid, onValidate} = useValidateTestDraft({pluginName: plugin.name, isDefaultValid: true});
 
   const isLoading = isLoadingCreateTest || isLoadingRunTest;
@@ -29,6 +31,7 @@ const EditTest = ({test}: IProps) => {
 
   const handleOnSubmit = useCallback(
     async (values: TDraftTest) => {
+      updateIsInitialized(false);
       const rawTest = await TestService.getRequest(plugin, values, test);
 
       await editTest({
@@ -41,7 +44,7 @@ const EditTest = ({test}: IProps) => {
 
       navigate(`/test/${test.id}/run/${run.id}`);
     },
-    [editTest, navigate, plugin, runTest, setIsOpen, test]
+    [editTest, navigate, plugin, runTest, setIsOpen, test, updateIsInitialized]
   );
 
   return (
@@ -50,7 +53,7 @@ const EditTest = ({test}: IProps) => {
         <S.Title>Edit Test</S.Title>
         <EditTestForm form={form} test={test} onSubmit={handleOnSubmit} onValidation={onValidate} />
         <S.ButtonsContainer>
-          <Button data-cy="edit-test-submit" onClick={() => form.resetFields()}>
+          <Button data-cy="edit-test-reset" onClick={() => form.resetFields()}>
             Reset
           </Button>
           <Button

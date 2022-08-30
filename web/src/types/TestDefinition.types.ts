@@ -50,4 +50,5 @@ export type TTestDefinitionSliceActions = {
   resetDefinitionList: CaseReducer<ITestDefinitionState>;
   setAssertionResults: CaseReducer<ITestDefinitionState, PayloadAction<TAssertionResults>>;
   setSelectedAssertion: CaseReducer<ITestDefinitionState, PayloadAction<TAssertionResultEntry | undefined>>;
+  setIsInitialized: CaseReducer<ITestDefinitionState, PayloadAction<{isInitialized: boolean}>>;
 };
