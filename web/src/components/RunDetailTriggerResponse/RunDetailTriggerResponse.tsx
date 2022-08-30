@@ -1,7 +1,8 @@
 import {Tabs} from 'antd';
 import {TriggerTypes} from '../../constants/Test.constants';
 import {TTriggerResult} from '../../types/Test.types';
-import HeaderRow from './HeaderRow';
+import ResponseBody from './ResponseBody';
+import ResponseHeaders from './ResponseHeaders';
 import * as S from './RunDetailTriggerResponse.styled';
 
 interface IProps {
@@ -11,17 +12,12 @@ interface IProps {
 
 const RunDetailTriggerResponse = ({
   executionTime = 0,
-  triggerResult: {headers = [], body = '{}', statusCode = 200} = {
-    headers: [],
-    body: '{}',
+  triggerResult: {headers, body = '', statusCode = 200} = {
+    body: '',
     type: TriggerTypes.http,
     statusCode: 200,
   },
 }: IProps) => {
-  const onCopy = (value: string) => {
-    navigator.clipboard.writeText(value);
-  };
-
   return (
     <S.Container>
       <S.TitleContainer>
@@ -38,14 +34,10 @@ const RunDetailTriggerResponse = ({
       <S.TabsContainer>
         <Tabs defaultActiveKey="1" data-cy="run-detail-trigger-response" size="small">
           <Tabs.TabPane key="1" tab="Body">
-            <S.ValueJson>
-              <pre>{JSON.stringify(JSON.parse(body), null, 2)}</pre>
-            </S.ValueJson>
+            <ResponseBody body={body} />
           </Tabs.TabPane>
           <Tabs.TabPane key="2" tab="Headers">
-            {headers.map(header => (
-              <HeaderRow onCopy={onCopy} header={header} key={header.key} />
-            ))}
+            <ResponseHeaders headers={headers} />
           </Tabs.TabPane>
         </Tabs>
       </S.TabsContainer>

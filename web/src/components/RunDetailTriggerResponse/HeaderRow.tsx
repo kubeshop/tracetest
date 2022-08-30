@@ -1,11 +1,11 @@
 import {MoreOutlined} from '@ant-design/icons';
 import {Dropdown, Menu, message} from 'antd';
-import {TRawHeader} from 'types/Test.types';
+import {THeader} from 'types/Test.types';
 import AttributeValue from '../AttributeValue';
 import * as S from './RunDetailTriggerResponse.styled';
 
 interface IProps {
-  header: TRawHeader;
+  header: THeader;
   onCopy(value: string): void;
 }
 

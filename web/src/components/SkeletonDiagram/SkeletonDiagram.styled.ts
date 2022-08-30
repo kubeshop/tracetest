@@ -60,7 +60,7 @@ export const TextContainer = styled.div`
   box-sizing: content-box;
 `;
 
-export const TextHolder = styled.div`
+export const TextHolder = styled.div<{$width?: number}>`
   @keyframes skeleton-loading {
     0% {
       background-color: hsl(200, 20%, 80%);
@@ -73,5 +73,5 @@ export const TextHolder = styled.div`
   animation: skeleton-loading 1s linear infinite alternate;
   height: 8px;
   border-radius: 2px;
-  width: 100%;
+  width: ${({$width = 100}) => $width}%;
 `;

@@ -3,13 +3,12 @@ import {DISCORD_URL, GITHUB_ISSUES_URL} from 'constants/Common.constants';
 import {TTestRun} from 'types/TestRun.types';
 import * as S from './FailedTrace.styled';
 
-interface IFailedTraceProps {
+interface IProps {
   isDisplayingError: boolean;
   run: TTestRun;
-  testId: string;
 }
 
-const FailedTrace: React.FC<IFailedTraceProps> = ({isDisplayingError, run: {lastErrorState}}) => {
+const FailedTrace = ({isDisplayingError, run: {lastErrorState}}: IProps) => {
   return isDisplayingError ? (
     <S.FailedTrace>
       <S.Container>

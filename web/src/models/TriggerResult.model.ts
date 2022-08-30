@@ -23,8 +23,8 @@ const getResponseData = (type: TriggerTypes, response: object) => {
   const entryStatusCodeField = entryStatusCodeMap[type];
 
   return {
-    body: get(response, entryBodyField, '{}'),
-    headers: get(response, entryHeadersField, []),
+    body: get(response, entryBodyField, ''),
+    headers: get(response, entryHeadersField, undefined),
     statusCode: get(response, entryStatusCodeField, 200),
   };
 };

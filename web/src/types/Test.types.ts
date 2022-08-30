@@ -16,18 +16,19 @@ export type TRawGRPCHeader = TGrpcSchemas['GRPCHeader'];
 export type TTriggerType = Required<TTriggerSchemas['Trigger']['triggerType']>;
 
 export type TRawHTTPRequest = THttpSchemas['HTTPRequest'];
+export type THeader = Model<TRawHeader, {}>;
 export type THTTPRequest = Model<
   TRawHTTPRequest,
   {
-    headers: Model<TRawHeader, {}>[];
+    headers: THeader[];
   }
 >;
 
 export type TRawTriggerResult = TTriggerSchemas['TriggerResult'];
 export type TTriggerResult = {
   type: TriggerTypes;
-  headers: Model<TRawHeader, {}>[];
-  body: string;
+  headers?: THeader[];
+  body?: string;
   statusCode: number;
 };
 
