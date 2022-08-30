@@ -70,7 +70,7 @@ See https://kubeshop.github.io/tracetest/supported-backends/
 
 		// default values
 		conf.set("tracetest.backend.type", "jaeger")
-		conf.set("tracetest.backend.endpoint", "jaeger-query:16685")
+		conf.set("tracetest.backend.endpoint", "jaeger:16685")
 		conf.set("tracetest.backend.tls.insecure", true)
 	}
 
@@ -95,6 +95,7 @@ func configureBackendOptions(conf configuration, ui UI) configuration {
 			conf.set("tracetest.backend.type", "opensearch")
 			conf.set("tracetest.backend.addresses", ui.TextInput("Addresses (comma separated list)", "http://opensearch:9200"))
 			conf.set("tracetest.backend.index", ui.TextInput("Index", "traces"))
+			conf.set("tracetest.backend.data-prepper", ui.TextInput("Data Prepper", "data-prepper:21890"))
 		}},
 		{"SignalFX", func(ui UI) {
 			conf.set("tracetest.backend.type", "signalfx")
@@ -140,9 +141,25 @@ func getTracetestConfigFileContents(ui UI, config configuration) []byte {
 func telemetryConfig(ui UI, conf configuration) serverConfig.Telemetry {
 	return serverConfig.Telemetry{
 		DataStores: dataStoreConfig(ui, conf),
+		Exporters:  exportersConfig(ui, conf),
 	}
 }
 
+func exportersConfig(ui UI, conf configuration) map[string]serverConfig.TelemetryExporterOption {
+	return map[string]serverConfig.TelemetryExporterOption{
+		"collector": {
+			ServiceName: "tracetest",
+			Sampling:    100,
+			Exporter: serverConfig.ExporterConfig{
+				Type: "collector",
+				CollectorConfiguration: serverConfig.OTELCollectorConfig{
+					Endpoint: conf.String("tracetest.collector.endpoint"),
+				},
+			},
+		},
+	}
+
+}
 func dataStoreConfig(ui UI, conf configuration) map[string]serverConfig.TracingBackendDataStoreConfig {
 	dstype := conf.String("tracetest.backend.type")
 	var c serverConfig.TracingBackendDataStoreConfig

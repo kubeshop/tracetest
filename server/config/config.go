@@ -61,7 +61,7 @@ type (
 
 	ExporterConfig struct {
 		Type                   string              `yaml:",omitempty" mapstructure:"type"`
-		CollectorConfiguration OTELCollectorConfig `yaml:",omitempty" mapstructure:"collector"`
+		CollectorConfiguration OTELCollectorConfig `yaml:"collector,omitempty" mapstructure:"collector"`
 	}
 
 	OTELCollectorConfig struct {

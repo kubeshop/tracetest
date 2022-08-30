@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 
 	"github.com/compose-spec/compose-go/loader"
 	"github.com/compose-spec/compose-go/types"
@@ -105,7 +106,9 @@ func getDockerComposeFileContents(ui UI, config configuration) []byte {
 		ui.Exit(err.Error())
 	}
 
-	return output
+	sout := strings.ReplaceAll(string(output), "$", "$$")
+
+	return []byte(sout)
 }
 
 func filterContainers(ui UI, project *types.Project, included []string) {
@@ -138,10 +141,66 @@ func filterContainers(ui UI, project *types.Project, included []string) {
 func getCollectorConfigFileContents(ui UI, config configuration) []byte {
 	contents, err := getFileContentsForVersion("local-config/collector.config.yaml", cliConfig.Version)
 	if err != nil {
-		ui.Exit(fmt.Errorf("Cannot get docker-compose file: %w", err).Error())
+		ui.Exit(fmt.Errorf("Cannot get collector config file: %w", err).Error())
 	}
 
-	return contents
+	type msa = map[string]any
+	otelConfig := msa{}
+
+	err = yaml.Unmarshal(contents, &otelConfig)
+	if err != nil {
+		ui.Exit(err.Error())
+	}
+
+	exporters := msa{}
+	exporter := ""
+
+	switch config.String("tracetest.backend.type") {
+	case "jaeger":
+		exporter = "jaeger"
+		exporters["jaeger"] = msa{
+			"endpoint": config.String("tracetest.backend.endpoint"),
+			"tls": msa{
+				"insecure": config.Bool("tracetest.backend.tls.insecure"),
+			},
+		}
+	case "tempo":
+		exporter = "otlp/2"
+		exporters["otlp/2"] = msa{
+			"endpoint": config.String("tracetest.backend.endpoint"),
+			"tls": msa{
+				"insecure": config.Bool("tracetest.backend.tls.insecure"),
+			},
+		}
+	case "opensearch":
+		exporter = "otlp/2"
+		exporters["otlp/2"] = msa{
+			"endpoint": config.String("tracetest.backend.endpoint"),
+			"tls": msa{
+				"insecure":             config.Bool("tracetest.backend.tls.insecure"),
+				"insecure_skip_verify": true,
+			},
+		}
+	case "signalfx":
+		exporter = "sapm"
+		exporters["sapm"] = msa{
+			"access_token":             config.String("tracetest.backend.token"),
+			"access_token_passthrough": true,
+			"endpoint":                 fmt.Sprintf("https://ingest.%s.signalfx.com/v2/trace", config.String("tracetest.backend.realm")),
+			"max_connections":          100,
+			"num_workers":              8,
+		}
+	}
+
+	otelConfig["exporters"] = exporters
+	otelConfig["service"].(msa)["pipelines"].(msa)["traces"].(msa)["exporters"] = []string{exporter}
+
+	updated, err := yaml.Marshal(otelConfig)
+	if err != nil {
+		ui.Exit(fmt.Errorf("Cannot get collector config file: %w", err).Error())
+	}
+
+	return updated
 }
 
 func createDir(ui UI, name string) {
