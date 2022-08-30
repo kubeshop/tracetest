@@ -1,7 +1,7 @@
 version: "3.2"
 services:
   tracetest:
-    container_name: tracetest
+    restart: unless-stopped
     image: kubeshop/tracetest
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -25,7 +25,6 @@ services:
         condition: service_started
 
   postgres:
-    container_name: postgres
     image: postgres
     environment:
       POSTGRES_PASSWORD: postgres
@@ -40,6 +39,7 @@ services:
 
   otel-collector:
     image: otel/opentelemetry-collector:0.54.0
+    restart: unless-stopped
     ports:
       - "55679:55679"
       - "4317:4317"
@@ -51,12 +51,13 @@ services:
       - ./local-config/collector.config.yaml:/otel-local-config.yaml
     environment:
       - JAEGER_ENDPOINT=jaeger:14250
-      - LIGHTSTEP_TOKEN=<PLACE-YOUR-TOKEN-HERE>
     depends_on:
       jaeger:
         condition: service_healthy
+
   jaeger:
     image: jaegertracing/all-in-one:latest
+    restart: unless-stopped
     ports:
       - 16686:16686
       - 16685:16685
@@ -70,6 +71,7 @@ services:
 
   cache:
     image: redis:6
+    restart: unless-stopped
     ports:
       - 6379:6379
     healthcheck:
@@ -80,6 +82,7 @@ services:
 
   queue:
     image: rabbitmq:3.9
+    restart: unless-stopped
     ports:
       - 5672:5672
       - 15672:15672
@@ -91,6 +94,7 @@ services:
 
   demo-api:
     image: kubeshop/demo-pokemon-api:latest
+    restart: unless-stopped
     pull_policy: always
     environment:
       REDIS_URL: cache
@@ -100,8 +104,6 @@ services:
       JAEGER_HOST: jaeger
       JAEGER_PORT: 6832
       NPM_RUN_COMMAND: api
-    profiles:
-      - demo
     ports:
       - "8081:8081"
     healthcheck:
@@ -121,9 +123,8 @@ services:
 
   demo-worker:
     image: kubeshop/demo-pokemon-api:latest
+    restart: unless-stopped
     pull_policy: always
-    profiles:
-      - demo
     environment:
       REDIS_URL: cache
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres?schema=public
@@ -144,9 +145,8 @@ services:
 
   demo-rpc:
     image: kubeshop/demo-pokemon-api:latest
+    restart: unless-stopped
     pull_policy: always
-    profiles:
-      - demo
     environment:
       REDIS_URL: cache
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres?schema=public
@@ -174,7 +174,6 @@ services:
 
   data-prepper:
     restart: unless-stopped
-    container_name: data-prepper
     image: opensearchproject/data-prepper:latest
     volumes:
       - ./local-config/opensearch/opensearch-analytics.yaml:/usr/share/data-prepper/pipelines.yaml
@@ -205,7 +204,6 @@ services:
 
   dashboards:
     image: opensearchproject/opensearch-dashboards:latest
-    container_name: opensearch-dashboards
     ports:
       - 5601:5601
     expose:

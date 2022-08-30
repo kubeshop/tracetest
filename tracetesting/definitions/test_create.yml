@@ -27,8 +27,8 @@ trigger:
             }
           }
         },
-        "definition": {
-          "definitions": [
+        "specs": {
+          "specs": [
             {
               "selector": {
                 "query": "span[name = \"pg.query:SELECT\"]"

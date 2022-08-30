@@ -27,16 +27,17 @@ type TestRun struct {
 	// Details of the cause for the last `FAILED` state
 	LastErrorState *string `json:"lastErrorState,omitempty"`
 	// time it took for the test to complete, either success or fail. If the test is still running, it will show the time up to the time of the request
-	ExecutionTime             *int32            `json:"executionTime,omitempty"`
-	CreatedAt                 *time.Time        `json:"createdAt,omitempty"`
-	ServiceTriggeredAt        *time.Time        `json:"serviceTriggeredAt,omitempty"`
-	ServiceTriggerCompletedAt *time.Time        `json:"serviceTriggerCompletedAt,omitempty"`
-	ObtainedTraceAt           *time.Time        `json:"obtainedTraceAt,omitempty"`
-	CompletedAt               *time.Time        `json:"completedAt,omitempty"`
-	Trigger                   *Trigger          `json:"trigger,omitempty"`
-	TriggerResult             *TriggerResult    `json:"triggerResult,omitempty"`
-	Trace                     *Trace            `json:"trace,omitempty"`
-	Result                    *AssertionResults `json:"result,omitempty"`
+	ExecutionTime             *int32             `json:"executionTime,omitempty"`
+	CreatedAt                 *time.Time         `json:"createdAt,omitempty"`
+	ServiceTriggeredAt        *time.Time         `json:"serviceTriggeredAt,omitempty"`
+	ServiceTriggerCompletedAt *time.Time         `json:"serviceTriggerCompletedAt,omitempty"`
+	ObtainedTraceAt           *time.Time         `json:"obtainedTraceAt,omitempty"`
+	CompletedAt               *time.Time         `json:"completedAt,omitempty"`
+	Trigger                   *Trigger           `json:"trigger,omitempty"`
+	TriggerResult             *TriggerResult     `json:"triggerResult,omitempty"`
+	Trace                     *Trace             `json:"trace,omitempty"`
+	Result                    *AssertionResults  `json:"result,omitempty"`
+	Metadata                  *map[string]string `json:"metadata,omitempty"`
 }
 
 // NewTestRun instantiates a new TestRun object
@@ -568,6 +569,38 @@ func (o *TestRun) SetResult(v AssertionResults) {
 	o.Result = &v
 }
 
+// GetMetadata returns the Metadata field value if set, zero value otherwise.
+func (o *TestRun) GetMetadata() map[string]string {
+	if o == nil || o.Metadata == nil {
+		var ret map[string]string
+		return ret
+	}
+	return *o.Metadata
+}
+
+// GetMetadataOk returns a tuple with the Metadata field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *TestRun) GetMetadataOk() (*map[string]string, bool) {
+	if o == nil || o.Metadata == nil {
+		return nil, false
+	}
+	return o.Metadata, true
+}
+
+// HasMetadata returns a boolean if a field has been set.
+func (o *TestRun) HasMetadata() bool {
+	if o != nil && o.Metadata != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetMetadata gets a reference to the given map[string]string and assigns it to the Metadata field.
+func (o *TestRun) SetMetadata(v map[string]string) {
+	o.Metadata = &v
+}
+
 func (o TestRun) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.Id != nil {
@@ -617,6 +650,9 @@ func (o TestRun) MarshalJSON() ([]byte, error) {
 	}
 	if o.Result != nil {
 		toSerialize["result"] = o.Result
+	}
+	if o.Metadata != nil {
+		toSerialize["metadata"] = o.Metadata
 	}
 	return json.Marshal(toSerialize)
 }

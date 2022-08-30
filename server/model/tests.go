@@ -46,6 +46,8 @@ type (
 
 	Attribute string
 
+	RunMetadata map[string]string
+
 	Run struct {
 		ID                        uuid.UUID
 		TestID                    uuid.UUID
@@ -63,6 +65,7 @@ type (
 		TriggerResult             TriggerResult
 		Trace                     *traces.Trace
 		Results                   *RunResults
+		Metadata                  RunMetadata
 	}
 
 	RunResults struct {

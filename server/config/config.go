@@ -12,60 +12,60 @@ import (
 
 type (
 	Config struct {
-		Server             ServerConfig    `mapstructure:"server"`
-		PostgresConnString string          `mapstructure:"postgresConnString"`
-		PoolingConfig      PoolingConfig   `mapstructure:"poolingConfig"`
-		GA                 GoogleAnalytics `mapstructure:"googleAnalytics"`
-		Telemetry          Telemetry       `mapstructure:"telemetry"`
+		Server             ServerConfig    `yaml:",omitempty" mapstructure:"server"`
+		PostgresConnString string          `yaml:",omitempty" mapstructure:"postgresConnString"`
+		PoolingConfig      PoolingConfig   `yaml:",omitempty" mapstructure:"poolingConfig"`
+		GA                 GoogleAnalytics `yaml:",omitempty" mapstructure:"googleAnalytics"`
+		Telemetry          Telemetry       `yaml:",omitempty" mapstructure:"telemetry"`
 	}
 
 	GoogleAnalytics struct {
-		Enabled bool `mapstructure:"enabled"`
+		Enabled bool `yaml:",omitempty" mapstructure:"enabled"`
 	}
 
 	PoolingConfig struct {
-		MaxWaitTimeForTrace string `mapstructure:"maxWaitTimeForTrace"`
-		RetryDelay          string `mapstructure:"retryDelay"`
+		MaxWaitTimeForTrace string `yaml:",omitempty" mapstructure:"maxWaitTimeForTrace"`
+		RetryDelay          string `yaml:",omitempty" mapstructure:"retryDelay"`
 	}
 
 	ServerConfig struct {
-		PathPrefix string                `mapstructure:"pathPrefix"`
-		HttpPort   int                   `mapstructure:"httpPort"`
-		Telemetry  ServerTelemetryConfig `mapstructure:"telemetry"`
+		PathPrefix string                `yaml:",omitempty" mapstructure:"pathPrefix"`
+		HttpPort   int                   `yaml:",omitempty" mapstructure:"httpPort"`
+		Telemetry  ServerTelemetryConfig `yaml:",omitempty" mapstructure:"telemetry"`
 	}
 
 	ServerTelemetryConfig struct {
-		Exporter            string `mapstructure:"exporter"`
-		ApplicationExporter string `mapstructure:"applicationExporter"`
-		DataStore           string `mapstructure:"dataStore"`
+		Exporter            string `yaml:",omitempty" mapstructure:"exporter"`
+		ApplicationExporter string `yaml:",omitempty" mapstructure:"applicationExporter"`
+		DataStore           string `yaml:",omitempty" mapstructure:"dataStore"`
 	}
 
 	Telemetry struct {
-		DataStores map[string]TracingBackendDataStoreConfig `mapstructure:"dataStores"`
-		Exporters  map[string]TelemetryExporterOption       `mapstructure:"exporters"`
+		DataStores map[string]TracingBackendDataStoreConfig `yaml:",omitempty" mapstructure:"dataStores"`
+		Exporters  map[string]TelemetryExporterOption       `yaml:",omitempty" mapstructure:"exporters"`
 	}
 
 	TracingBackendDataStoreConfig struct {
-		Type       string                        `mapstructure:"type"`
-		Jaeger     configgrpc.GRPCClientSettings `mapstructure:"jaeger"`
-		Tempo      configgrpc.GRPCClientSettings `mapstructure:"tempo"`
-		OpenSearch OpensearchDataStoreConfig     `mapstructure:"opensearch"`
-		SignalFX   SignalFXDataStoreConfig       `mapstructure:"signalfx"`
+		Type       string                        `yaml:",omitempty" mapstructure:"type"`
+		Jaeger     configgrpc.GRPCClientSettings `yaml:",omitempty" mapstructure:"jaeger"`
+		Tempo      configgrpc.GRPCClientSettings `yaml:",omitempty" mapstructure:"tempo"`
+		OpenSearch OpensearchDataStoreConfig     `yaml:",omitempty" mapstructure:"opensearch"`
+		SignalFX   SignalFXDataStoreConfig       `yaml:",omitempty" mapstructure:"signalfx"`
 	}
 
 	TelemetryExporterOption struct {
-		ServiceName string         `mapstructure:"serviceName"`
-		Sampling    float64        `mapstructure:"sampling"`
-		Exporter    ExporterConfig `mapstructure:"exporter"`
+		ServiceName string         `yaml:",omitempty" mapstructure:"serviceName"`
+		Sampling    float64        `yaml:",omitempty" mapstructure:"sampling"`
+		Exporter    ExporterConfig `yaml:",omitempty" mapstructure:"exporter"`
 	}
 
 	ExporterConfig struct {
-		Type                   string              `mapstructure:"type"`
-		CollectorConfiguration OTELCollectorConfig `mapstructure:"collector"`
+		Type                   string              `yaml:",omitempty" mapstructure:"type"`
+		CollectorConfiguration OTELCollectorConfig `yaml:"collector,omitempty" mapstructure:"collector"`
 	}
 
 	OTELCollectorConfig struct {
-		Endpoint string `mapstructure:"endpoint"`
+		Endpoint string `yaml:",omitempty" mapstructure:"endpoint"`
 	}
 
 	OpensearchDataStoreConfig struct {
@@ -156,7 +156,7 @@ func FromFile(file string) (Config, error) {
 
 func mapKeys[T any](m map[string]T) []string {
 	keys := make([]string, 0)
-	for key, _ := range m {
+	for key := range m {
 		keys = append(keys, key)
 	}
 

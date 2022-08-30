@@ -23,8 +23,8 @@ trigger:
             }
           }
         },
-        "definition": {
-          "definitions": [
+        "specs": {
+          "specs": [
             {
               "selector": {
                 "query": "span[name = \"queue.synchronizePokemon send\"]"

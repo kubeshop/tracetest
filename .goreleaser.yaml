@@ -13,7 +13,11 @@ before:
   hooks:
     - go mod tidy
 builds:
-  - env:
+  - ldflags:
+    - -X github.com/kubeshop/tracetest/cli/config.Version={{ .Env.VERSION }}
+    - -X github.com/kubeshop/tracetest/cli/config.Env={{ .Env.TRACETEST_ENV }}
+    - -X github.com/kubeshop/tracetest/cli/analytics.SecretKey={{ .Env.ANALYTICS_BE_KEY }}
+    env:
       - CGO_ENABLED=0
     goos:
       - linux

@@ -45,6 +45,7 @@ const TestRun = ({
   obtainedTraceAt = '',
   serviceTriggerCompletedAt = '',
   serviceTriggeredAt = '',
+  metadata = {},
 }: TRawTestRun): TTestRun => {
   return {
     obtainedTraceAt,
@@ -66,6 +67,7 @@ const TestRun = ({
     totalAssertionCount: getTestResultCount(result),
     failedAssertionCount: getTestResultCount(result, 'failed'),
     passedAssertionCount: getTestResultCount(result, 'passed'),
+    metadata,
   };
 };
 

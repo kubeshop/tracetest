@@ -110,6 +110,7 @@ type encodedRun struct {
 	Trace                     *traces.Trace
 	Results                   *RunResults
 	TestVersion               int
+	Metadata                  map[string]string
 }
 
 func (r Run) MarshalJSON() ([]byte, error) {
@@ -129,6 +130,7 @@ func (r Run) MarshalJSON() ([]byte, error) {
 		Trace:                     r.Trace,
 		Results:                   r.Results,
 		TriggerResult:             r.TriggerResult,
+		Metadata:                  r.Metadata,
 	})
 }
 
@@ -176,6 +178,7 @@ func (r *Run) UnmarshalJSON(data []byte) error {
 
 	r.Trace = aux.Trace
 	r.Results = aux.Results
+	r.Metadata = aux.Metadata
 
 	return nil
 }

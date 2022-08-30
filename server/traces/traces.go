@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"sort"
 	"strconv"
+	"strings"
 	"time"
 
 	"go.opentelemetry.io/otel/trace"
@@ -28,12 +29,12 @@ func New(traceID string, spans []Span) Trace {
 	var rootSpan *Span = nil
 	for _, span := range spanMap {
 		parentID := span.Attributes["parent_id"]
-		if parentID == "" {
+		parentSpan, found := spanMap[parentID]
+		if !found {
 			rootSpan = span
 			continue
 		}
 
-		parentSpan := spanMap[parentID]
 		parentSpan.Children = append(parentSpan.Children, span)
 		span.Parent = parentSpan
 	}
@@ -53,6 +54,28 @@ func augmentSpanData(span *Span) {
 	span.Attributes["name"] = span.Name
 	span.Attributes["tracetest.span.type"] = spanType(span.Attributes)
 	span.Attributes["tracetest.span.duration"] = spanDuration(*span)
+}
+
+func spanType(attrs Attributes) string {
+	// based on https://github.com/open-telemetry/opentelemetry-specification/tree/main/specification/trace/semantic_conventions
+	// using the first required attribute for each type
+	for key := range attrs {
+		switch true {
+		case strings.HasPrefix(key, "http."):
+			return "http"
+		case strings.HasPrefix(key, "db."):
+			return "database"
+		case strings.HasPrefix(key, "rpc."):
+			return "rpc"
+		case strings.HasPrefix(key, "messaging."):
+			return "messaging"
+		case strings.HasPrefix(key, "faas."):
+			return "faas"
+		case strings.HasPrefix(key, "exception."):
+			return "exception"
+		}
+	}
+	return "general"
 }
 
 func spanDuration(span Span) string {

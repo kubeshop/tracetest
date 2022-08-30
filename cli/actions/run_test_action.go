@@ -9,6 +9,7 @@ import (
 	"sync"
 	"time"
 
+	cienvironment "github.com/cucumber/ci-environment/go"
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/definition"
 	"github.com/kubeshop/tracetest/cli/file"
@@ -38,6 +39,13 @@ type runTestOutput struct {
 	RunWebURL string          `json:"testRunWebUrl"`
 }
 
+type runTestParams struct {
+	DefinitionFile string
+	WaitForResult  bool
+	JunitFile      string
+	Metadata       map[string]string
+}
+
 func NewRunTestAction(config config.Config, logger *zap.Logger, client *openapi.APIClient) runTestAction {
 	return runTestAction{config, logger, client}
 }
@@ -51,8 +59,15 @@ func (a runTestAction) Run(ctx context.Context, args RunTestConfig) error {
 		return fmt.Errorf("--junit option requires --wait-for-result")
 	}
 
+	metadata := a.getMetadata()
 	a.logger.Debug("Running test from definition", zap.String("definitionFile", args.DefinitionFile))
-	output, err := a.runDefinition(ctx, args.DefinitionFile, args.WaitForResult, args.JUnit)
+	params := runTestParams{
+		DefinitionFile: args.DefinitionFile,
+		WaitForResult:  args.WaitForResult,
+		JunitFile:      args.JUnit,
+		Metadata:       metadata,
+	}
+	output, err := a.runDefinition(ctx, params)
 
 	if err != nil {
 		return fmt.Errorf("could not run definition: %w", err)
@@ -67,8 +82,8 @@ func (a runTestAction) Run(ctx context.Context, args RunTestConfig) error {
 	return nil
 }
 
-func (a runTestAction) runDefinition(ctx context.Context, definitionFile string, waitForResult bool, junit string) (runTestOutput, error) {
-	definition, err := file.LoadDefinition(definitionFile)
+func (a runTestAction) runDefinition(ctx context.Context, params runTestParams) (runTestOutput, error) {
+	definition, err := file.LoadDefinition(params.DefinitionFile)
 	if err != nil {
 		return runTestOutput{}, err
 	}
@@ -96,17 +111,17 @@ func (a runTestAction) runDefinition(ctx context.Context, definitionFile string,
 	}
 
 	definition.Id = *test.Id
-	err = file.SetTestID(definitionFile, *test.Id)
+	err = file.SetTestID(params.DefinitionFile, *test.Id)
 	if err != nil {
 		return runTestOutput{}, fmt.Errorf("could not save test definition: %w", err)
 	}
 
-	testRun, err := a.runTest(ctx, definition.Id)
+	testRun, err := a.runTest(ctx, definition.Id, params.Metadata)
 	if err != nil {
 		return runTestOutput{}, fmt.Errorf("could not run test: %w", err)
 	}
 
-	if waitForResult {
+	if params.WaitForResult {
 		updatedTestRun, err := a.waitForResult(ctx, definition.Id, *testRun.Id)
 		if err != nil {
 			return runTestOutput{}, fmt.Errorf("could not wait for result: %w", err)
@@ -114,7 +129,7 @@ func (a runTestAction) runDefinition(ctx context.Context, definitionFile string,
 
 		testRun = updatedTestRun
 
-		if err := a.saveJUnitFile(ctx, definition.Id, *testRun.Id, junit); err != nil {
+		if err := a.saveJUnitFile(ctx, definition.Id, *testRun.Id, params.JunitFile); err != nil {
 			return runTestOutput{}, fmt.Errorf("could not save junit file: %w", err)
 		}
 	}
@@ -202,8 +217,11 @@ func (a runTestAction) updateTestFromDefinition(ctx context.Context, definition 
 	return *openapiTest, nil
 }
 
-func (a runTestAction) runTest(ctx context.Context, testID string) (openapi.TestRun, error) {
+func (a runTestAction) runTest(ctx context.Context, testID string, metadata map[string]string) (openapi.TestRun, error) {
 	req := a.client.ApiApi.RunTest(ctx, testID)
+	req = req.TestRunInformation(openapi.TestRunInformation{
+		Metadata: metadata,
+	})
 	run, _, err := a.client.ApiApi.RunTestExecute(req)
 	if err != nil {
 		return openapi.TestRun{}, fmt.Errorf("could not execute request: %w", err)
@@ -258,4 +276,25 @@ func (a runTestAction) isTestReady(ctx context.Context, testId string, testRunId
 	}
 
 	return nil, nil
+}
+
+func (a runTestAction) getMetadata() map[string]string {
+	ci := cienvironment.DetectCIEnvironment()
+	if ci == nil {
+		return map[string]string{}
+	}
+
+	metadata := map[string]string{
+		"name":        ci.Name,
+		"url":         ci.URL,
+		"buildNumber": ci.BuildNumber,
+	}
+
+	if ci.Git != nil {
+		metadata["branch"] = ci.Git.Branch
+		metadata["tag"] = ci.Git.Tag
+		metadata["revision"] = ci.Git.Revision
+	}
+
+	return metadata
 }

@@ -10,6 +10,11 @@ import (
 	"github.com/spf13/viper"
 )
 
+var (
+	Version = "dev"
+	Env     = "dev"
+)
+
 type Config struct {
 	Scheme     string  `yaml:"scheme"`
 	Endpoint   string  `yaml:"endpoint"`
