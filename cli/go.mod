@@ -6,6 +6,7 @@ replace github.com/kubeshop/tracetest/server => ../server
 
 require (
 	github.com/compose-spec/compose-go v1.5.0
+	github.com/cucumber/ci-environment/go v0.0.0-20220824023145-61292c03da10
 	github.com/kubeshop/tracetest/server v0.0.0-00010101000000-000000000000
 	github.com/pterm/pterm v0.12.45
 	github.com/spf13/cobra v1.4.0
@@ -20,7 +21,6 @@ require (
 )
 
 require (
-	github.com/cucumber/ci-environment/go v0.0.0-20220824023145-61292c03da10 // indirect
 	atomicgo.dev/cursor v0.1.1 // indirect
 	atomicgo.dev/keyboard v0.2.8 // indirect
 	github.com/containerd/console v1.0.3 // indirect
