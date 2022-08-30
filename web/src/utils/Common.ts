@@ -40,7 +40,13 @@ export function enumKeys<O extends object, K extends keyof O = keyof O>(obj: O):
   return Object.keys(obj).filter(k => Number.isNaN(Number(k))) as K[];
 }
 
+export function singularOrPlural(noun: string, quantity: number) {
+  if (quantity === 1) return noun;
+  return `${noun}s`;
+}
+
 const encryptKey = 'tracetest';
+
 export const encryptString = (data: string): string => {
   return AES.encrypt(data, encryptKey).toString();
 };

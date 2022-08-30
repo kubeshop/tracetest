@@ -6,8 +6,8 @@ const useRouterSync = () => {
   const params = useParams();
 
   useEffect(() => {
-    return RouterMiddleware.startListening(params);
-  }, [params]);
+    return RouterMiddleware.startListening({testId: params.testId, runId: params.runId});
+  }, [params.runId, params.testId]);
 };
 
 export default useRouterSync;

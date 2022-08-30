@@ -7,22 +7,13 @@ const attribute: TSpanFlatAttribute = {
   value: 'value',
 };
 
-const onCreateAssertion = jest.fn();
+const onCreateTestSpec = jest.fn();
 const onCopy = jest.fn();
-const setIsCopied = jest.fn();
 
 describe('AttributeRow', () => {
   it('should render correctly', () => {
     const {getByText} = render(
-      <AttributeRow
-        searchText=""
-        attribute={attribute}
-        isCopied={false}
-        onCreateAssertion={onCreateAssertion}
-        onCopy={onCopy}
-        setIsCopied={setIsCopied}
-        shouldDisplayActions
-      />
+      <AttributeRow searchText="" attribute={attribute} onCreateTestSpec={onCreateTestSpec} onCopy={onCopy} />
     );
 
     expect(getByText(attribute.key)).toBeInTheDocument();

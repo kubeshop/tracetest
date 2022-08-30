@@ -1,8 +1,8 @@
-import {Typography} from 'antd';
+import {Divider, Typography} from 'antd';
 import styled from 'styled-components';
 
 export const Header = styled.div`
-  margin-bottom: 8px;
+  padding: 16px 12px 0;
 `;
 
 export const HeaderCheck = styled(Typography.Text)`
@@ -22,6 +22,10 @@ export const HeaderDot = styled.span<{$passed: boolean}>`
   border-radius: 50%;
 `;
 
+export const HeaderDivider = styled(Divider)`
+  margin: 16px 0;
+`;
+
 export const HeaderItem = styled.div`
   align-items: center;
   color: ${({theme}) => theme.color.text};
@@ -37,24 +41,21 @@ export const HeaderItemText = styled(Typography.Text)`
 
 export const HeaderTitle = styled(Typography.Title)`
   && {
-    margin: 0 0 0 8px;
+    margin: 0;
   }
+`;
+
+export const Column = styled.div`
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 4px;
 `;
 
 export const Row = styled.div`
   align-items: center;
   display: flex;
   margin-bottom: 4px;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-`;
-
-export const SpanDetail = styled.div`
-  display: flex;
-  flex-direction: column;
-  padding: 24px;
 `;
 
 export const Dot = styled.div`
@@ -64,4 +65,18 @@ export const Dot = styled.div`
   height: 10px;
   margin-left: 5px;
   width: 10px;
+`;
+
+export const TabContainer = styled.div<{$top: number}>`
+  height: calc(100% - ${({$top}) => `${$top}px`});
+
+  .ant-tabs-nav {
+    padding: 0 12px;
+    margin-bottom: 0;
+  }
+
+  .ant-tabs-content-holder {
+    height: calc(100% - 38px);
+    overflow-y: scroll;
+  }
 `;

@@ -160,6 +160,7 @@ Cypress.Commands.add('selectOperator', (index: number, text?: string) => {
     cy.get('[data-cy=assertion-check-operator] .ant-select-selection-item').last().should('have.text', text);
   }
 });
+
 Cypress.Commands.add('selectTestFromDemoList', () => {
   cy.get('[data-cy=example-button]').click();
   cy.get(`[data-cy=demo-example-${camelCase(Plugins.REST.demoList[0].name)}]`).click();
@@ -184,20 +185,24 @@ Cypress.Commands.add('createTest', () => {
 });
 
 Cypress.Commands.add('createAssertion', (index = 0) => {
+  cy.selectRunDetailMode(3);
+
   cy.get(`[data-cy=trace-node-database]`, {timeout: 25000}).first().click({force: true});
-  cy.get('[data-cy=add-assertion-button]').click({force: true});
+  cy.get('[data-cy=add-test-spec-button]').click({force: true});
   cy.get('[data-cy=assertion-form]', {timeout: 10000}).should('be.visible');
   cy.get('[data-cy=assertion-check-attribute]').type('db');
   const attributeListId = getAttributeListId(index);
   cy.get(`${attributeListId} + div .ant-select-item`).first().click({force: true});
   cy.get('[data-cy=assertion-check-operator]').click({force: true});
-
-  // const comparatorListId = getComparatorListId(index);
-  // cy.get(`${comparatorListId} + div .ant-select-item`).last().click({force: true});
-  // cy.get('[data-cy=assertion-check-value]').click({force: true});
-  // cy.get('[data-cy=assertion-check-operator] + div .ant-select-selection-item').should('have.text', 'Contains');
-
   cy.get('[data-cy=assertion-form-submit-button]').click();
   cy.get('[data-cy=assertion-card-list]').should('be.visible');
   cy.get('[data-cy=assertion-card]').should('have.lengthOf', 1);
+});
+
+/**
+ * Click the test run detail mode tabs
+ * index: 1 = trigger, 2 = trace, 3 = test
+ */
+Cypress.Commands.add('selectRunDetailMode', (index: number) => {
+  cy.get(`[data-cy=run-detail-header] .ant-tabs-nav-list div:nth-child(${index})`).click();
 });

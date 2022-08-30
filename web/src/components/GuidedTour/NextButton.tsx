@@ -1,10 +1,10 @@
 import {BtnFnProps} from '@reactour/tour/dist/types';
-import {AddAssertionButton} from 'components/RunBottomPanel/RunBottomPanel.styled';
+import {PrimaryButton} from 'components/TestResults/TestResults.styled';
 
 export const NextButton: React.FC<BtnFnProps> = ({currentStep, setCurrentStep, stepsLength, setIsOpen}) => {
   const isLast = currentStep === stepsLength - 1;
   return (
-    <AddAssertionButton
+    <PrimaryButton
       onClick={() => {
         if (isLast) {
           setIsOpen(false);
@@ -15,6 +15,6 @@ export const NextButton: React.FC<BtnFnProps> = ({currentStep, setCurrentStep, s
       }}
     >
       {isLast ? 'Ok' : 'Next'}
-    </AddAssertionButton>
+    </PrimaryButton>
   );
 };

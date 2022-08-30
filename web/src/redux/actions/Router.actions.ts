@@ -28,6 +28,12 @@ const RouterActions = () => ({
         decryptedSelector
       );
 
+      const selectedAssertion = TestDefinitionSelectors.selectSelectedAssertion(getState() as RootState);
+
+      if (selectedAssertion === decryptedSelector || (!selectedAssertion && !decryptedSelector)) {
+        return;
+      }
+
       if (assertionResult) dispatch(setSelectedAssertion(assertionResult));
       else if (!selector) dispatch(setSelectedAssertion());
     }

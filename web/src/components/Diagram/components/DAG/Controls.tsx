@@ -1,35 +1,35 @@
 import {ApartmentOutlined, ExpandOutlined, ZoomInOutlined, ZoomOutOutlined} from '@ant-design/icons';
 import {noop} from 'lodash';
 import {useReactFlow} from 'react-flow-renderer';
-import AffectedSpanControls from './AffectedSpanControls';
+
+import ControlNavigator from './ControlNavigator';
 import * as S from './DAG.styled';
-import {ControlsMode} from './DAG.styled';
 
 interface IProps {
   isMiniMapActive?: boolean;
-  mode?: ControlsMode;
+  mode?: 'timeline' | 'dag';
   onMiniMapToggle?: () => void;
 }
 
-const Controls = ({mode = 'dag', isMiniMapActive = false, onMiniMapToggle = noop}: IProps) => {
+const Controls = ({isMiniMapActive = false, mode = 'dag', onMiniMapToggle = noop}: IProps) => {
   const {fitView, zoomIn, zoomOut} = useReactFlow();
+
   return (
     <>
-      <S.SelectorControls mode={mode}>
-        <AffectedSpanControls />
-      </S.SelectorControls>
+      <ControlNavigator />
+
       {mode === 'dag' && (
-        <S.Controls>
-          <S.ZoomButton icon={<ZoomInOutlined />} onClick={() => zoomIn()} type="text" />
-          <S.ZoomButton icon={<ZoomOutOutlined />} onClick={() => zoomOut()} type="text" />
-          <S.ZoomButton icon={<ExpandOutlined />} onClick={() => fitView()} type="text" />
-          <S.ZoomButton
+        <S.DAGActionsPanel>
+          <S.ActionButton icon={<ZoomInOutlined />} onClick={() => zoomIn()} type="text" />
+          <S.ActionButton icon={<ZoomOutOutlined />} onClick={() => zoomOut()} type="text" />
+          <S.ActionButton icon={<ExpandOutlined />} onClick={() => fitView()} type="text" />
+          <S.ActionButton
             icon={<ApartmentOutlined />}
             onClick={onMiniMapToggle}
             type="text"
             $isActive={isMiniMapActive}
           />
-        </S.Controls>
+        </S.DAGActionsPanel>
       )}
     </>
   );

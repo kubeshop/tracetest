@@ -29,22 +29,24 @@ export const Container = styled.div<{$showAffected: boolean}>`
     `}
 `;
 
-export const Controls = styled.div<{mode?: ControlsMode}>`
+export const Panel = styled.div`
   background-color: ${({theme}) => theme.color.background};
-  border-bottom-left-radius: 8px;
-  position: ${({mode}) => (mode === 'timeline' ? 'unset' : 'absolute')};
-  right: 0;
-  top: -14px;
+  border-radius: 8px;
+  padding: 0 8px;
+  position: absolute;
+  top: 16px;
   z-index: 9;
 `;
 
-export type ControlsMode = 'timeline' | 'dag';
-
-export const SelectorControls = styled(Controls)<{mode: ControlsMode}>`
-  left: 0;
+export const DAGActionsPanel = styled(Panel)`
+  right: 16px;
 `;
 
-export const ZoomButton = styled(Button)<{$isActive?: boolean}>`
+export const NavigatorPanel = styled(Panel)`
+  left: 16px;
+`;
+
+export const ActionButton = styled(Button)<{$isActive?: boolean}>`
   color: ${({theme, $isActive}) => ($isActive ? theme.color.interactive : theme.color.textLight)};
   width: 24px;
 
@@ -59,7 +61,7 @@ export const ZoomButton = styled(Button)<{$isActive?: boolean}>`
   }
 `;
 
-export const ToggleButton = styled(ZoomButton)`
+export const ToggleButton = styled(ActionButton)`
   color: ${({theme}) => theme.color.primary};
 
   &:hover,

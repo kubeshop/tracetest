@@ -37,11 +37,14 @@ const getCustomAttributeList = (attributeList: TSpanFlatAttribute[]) => {
 };
 
 const SpanAttributeService = () => ({
-  getPseudoAttributeList: (count: number): TSpanFlatAttribute[] => [{key: TraceTestAttributes.TRACETEST_SELECTED_SPANS_COUNT, value: count.toString()}],
+  getPseudoAttributeList: (count: number): TSpanFlatAttribute[] => [
+    {key: TraceTestAttributes.TRACETEST_SELECTED_SPANS_COUNT, value: count.toString()},
+  ],
+
   getSpanAttributeSectionsList(
     attributeList: TSpanFlatAttribute[],
     type: SemanticGroupNames
-  ): { section: string; attributeList: TSpanFlatAttribute[] }[] {
+  ): {section: string; attributeList: TSpanFlatAttribute[]}[] {
     const sections = SpanAttributeSections[type] || {};
     const defaultSectionList = [
       {
@@ -54,7 +57,7 @@ const SpanAttributeService = () => ({
       },
     ];
 
-    const sectionList = Object.entries(sections).reduce<{ section: string; attributeList: TSpanFlatAttribute[] }[]>(
+    const sectionList = Object.entries(sections).reduce<{section: string; attributeList: TSpanFlatAttribute[]}[]>(
       (list, [key, attrKeyList]) =>
         list.concat([{section: key, attributeList: filterAttributeList(attributeList, attrKeyList)}]),
       []

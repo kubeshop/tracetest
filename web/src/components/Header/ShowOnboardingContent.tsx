@@ -1,5 +1,5 @@
 import {Button, Divider, Typography} from 'antd';
-import {AddAssertionButton} from '../RunBottomPanel/RunBottomPanel.styled';
+import {PrimaryButton} from '../TestResults/TestResults.styled';
 
 export const ShowOnboardingContent = (onGuidedTourClick: () => void, onShow: () => void, onClose: () => void) => (
   <div>
@@ -11,7 +11,7 @@ export const ShowOnboardingContent = (onGuidedTourClick: () => void, onShow: () 
       <Button data-cy="no-thanks" style={{marginRight: 16}} ghost onClick={() => onClose()} type="primary">
         No thanks
       </Button>
-      <AddAssertionButton
+      <PrimaryButton
         onClick={() => {
           onShow();
           onClose();
@@ -19,7 +19,7 @@ export const ShowOnboardingContent = (onGuidedTourClick: () => void, onShow: () 
         }}
       >
         Show me around
-      </AddAssertionButton>
+      </PrimaryButton>
     </div>
   </div>
 );
