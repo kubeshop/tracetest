@@ -31,7 +31,7 @@ const RequestDetailsForm = ({form}: IProps) => {
   }, [getMethodList]);
 
   return (
-    <div style={{display: 'grid', gap: '25px'}}>
+    <>
       <Row gutter={12}>
         <Col span={12}>
           <span>
@@ -74,7 +74,7 @@ const RequestDetailsForm = ({form}: IProps) => {
           </Form.Item>
         </Col>
       </Row>
-    </div>
+    </>
   );
 };
 

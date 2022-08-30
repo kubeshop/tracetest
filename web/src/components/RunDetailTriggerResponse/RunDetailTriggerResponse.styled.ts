@@ -52,6 +52,7 @@ export const LoadingResponseBody = styled.div`
   margin-top: 25px;
   display: flex;
   flex-direction: column;
+  justify-items: center;
   gap: 8px;
   height: 100px;
   padding: 0.4em 0.6em;
