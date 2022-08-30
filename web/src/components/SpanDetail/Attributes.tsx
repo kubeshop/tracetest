@@ -4,7 +4,6 @@ import {useEffect, useMemo, useRef, useState} from 'react';
 
 import AttributeList from 'components/AttributeList';
 import {SemanticGroupNames} from 'constants/SemanticGroupNames.constants';
-import {useSpan} from 'providers/Span/Span.provider';
 import TraceAnalyticsService from 'services/Analytics/TraceAnalytics.service';
 import SpanAttributeService from 'services/SpanAttribute.service';
 import {TResultAssertions} from 'types/Assertion.types';
@@ -12,17 +11,17 @@ import {TSpanFlatAttribute} from 'types/Span.types';
 import {getObjectIncludesText} from 'utils/Common';
 import * as S from './SpanDetail.styled';
 
-export interface ISpanDetailComponentProps {
+interface IProps {
   assertions?: TResultAssertions;
   attributeList: TSpanFlatAttribute[];
   onCreateTestSpec(attribute: TSpanFlatAttribute): void;
+  searchText?: string;
   type: SemanticGroupNames;
 }
 
-const Attributes = ({assertions, attributeList, onCreateTestSpec, type}: ISpanDetailComponentProps) => {
+const Attributes = ({assertions, attributeList, onCreateTestSpec, searchText, type}: IProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [topPosition, setTopPosition] = useState(0);
-  const {searchText} = useSpan();
   const sectionList = useMemo(
     () => SpanAttributeService.getSpanAttributeSectionsList(attributeList, type!),
     [attributeList, type]
@@ -48,7 +47,12 @@ const Attributes = ({assertions, attributeList, onCreateTestSpec, type}: ISpanDe
             }
             key={section}
           >
-            <AttributeList assertions={assertions} attributeList={attrList} onCreateTestSpec={onCreateTestSpec} />
+            <AttributeList
+              assertions={assertions}
+              attributeList={attrList}
+              onCreateTestSpec={onCreateTestSpec}
+              searchText={searchText}
+            />
           </Tabs.TabPane>
         ))}
       </Tabs>

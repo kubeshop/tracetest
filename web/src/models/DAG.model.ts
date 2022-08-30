@@ -9,7 +9,6 @@ function getNodesDatumFromSpans(spans: TSpan[]): INodeDatum<INodeDataSpan>[] {
     data: {
       duration: span.duration,
       id: span.id,
-      isAffected: false,
       isMatched: false,
       kind: span.kind,
       name: span.name,

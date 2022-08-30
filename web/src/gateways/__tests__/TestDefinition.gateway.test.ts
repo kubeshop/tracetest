@@ -25,7 +25,7 @@ describe('TestDefinitionGateway', () => {
 
   it('should execute the createAssertion function', async () => {
     expect.assertions(1);
-    const testDefinition: TRawTestDefinition = {definitions: []};
+    const testDefinition: TRawTestDefinition = {specs: []};
     await TestDefinitionGateway.set('testId', testDefinition);
 
     expect(setTestDefinition.initiate).toBeCalledWith({testId: 'testId', testDefinition});

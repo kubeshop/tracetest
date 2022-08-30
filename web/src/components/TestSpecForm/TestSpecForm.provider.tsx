@@ -48,7 +48,7 @@ const TestSpecFormProvider: React.FC<{testId: string}> = ({children}) => {
   const [formProps, setFormProps] = useState<IFormProps>(initialFormProps);
   const {update, add, test, isDraftMode} = useTestDefinition();
   const {run} = useTestRun();
-  const {onClearAffectedSpans} = useSpan();
+  const {onClearMatchedSpans} = useSpan();
   const definitionList = useAppSelector(state => TestDefinitionSelectors.selectDefinitionList(state));
 
   const open = useCallback(
@@ -83,10 +83,10 @@ const TestSpecFormProvider: React.FC<{testId: string}> = ({children}) => {
 
   const close = useCallback(() => {
     setFormProps(initialFormProps);
-    onClearAffectedSpans();
+    onClearMatchedSpans();
 
     setIsOpen(false);
-  }, [onClearAffectedSpans]);
+  }, [onClearMatchedSpans]);
 
   const onConfirm = useCallback(() => {
     CreateAssertionModalAnalyticsService.onAssertionFormOpen();
@@ -114,9 +114,9 @@ const TestSpecFormProvider: React.FC<{testId: string}> = ({children}) => {
       }
 
       setIsOpen(false);
-      onClearAffectedSpans();
+      onClearMatchedSpans();
     },
-    [formProps, onClearAffectedSpans, update, add]
+    [formProps, onClearMatchedSpans, update, add]
   );
 
   const contextValue = useMemo(

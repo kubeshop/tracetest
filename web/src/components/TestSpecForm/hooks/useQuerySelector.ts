@@ -21,7 +21,7 @@ interface IProps {
 }
 
 const useQuerySelector = ({form, runId, testId, onValidSelector}: IProps) => {
-  const {onSetAffectedSpans, onClearAffectedSpans} = useSpan();
+  const {onSetMatchedSpans, onClearMatchedSpans} = useSpan();
   const {currentSelector} = useAssertionFormValues(form);
   const [onTriggerSelectedSpans, {data: spanIdList = [], isError}] = useLazyGetSelectedSpansQuery();
   const [isValid, setIsValid] = useState(!isError);
@@ -39,10 +39,10 @@ const useQuerySelector = ({form, runId, testId, onValidSelector}: IProps) => {
             runId: rId,
           }).unwrap();
 
-          onSetAffectedSpans(idList);
+          onSetMatchedSpans(idList);
         }
       }, 500),
-    [onSetAffectedSpans, onTriggerSelectedSpans]
+    [onSetMatchedSpans, onTriggerSelectedSpans]
   );
 
   useEffect(() => {
@@ -51,9 +51,9 @@ const useQuerySelector = ({form, runId, testId, onValidSelector}: IProps) => {
 
   useEffect(() => {
     return () => {
-      onClearAffectedSpans();
+      onClearMatchedSpans();
     };
-  }, [onClearAffectedSpans]);
+  }, [onClearMatchedSpans]);
 
   useEffect(() => {
     setIsValid(!isError);

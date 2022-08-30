@@ -2,12 +2,10 @@ import faker from '@faker-js/faker';
 import SpanMock from 'models/__mocks__/Span.mock';
 import Reducer, {
   initialState,
-  setAffectedSpans,
+  setMatchedSpans,
   setFocusedSpan,
   setSelectedSpan,
-  clearAffectedSpans,
-  setMatchedSpans,
-  setSearchText,
+  clearMatchedSpans,
 } from '../Span.slice';
 import {setSelectedAssertion} from '../TestDefinition.slice';
 
@@ -16,17 +14,17 @@ describe('Span.slice', () => {
     expect(Reducer(undefined, {type: 'any-action'})).toEqual(initialState);
   });
 
-  describe('setAffectedSpans', () => {
+  describe('setMatchedSpans', () => {
     it('should handle triggering the action', () => {
-      expect(Reducer(undefined, setAffectedSpans({spanIds: ['12345', '567890']}))).toEqual({
+      expect(Reducer(undefined, setMatchedSpans({spanIds: ['12345', '567890']}))).toEqual({
         ...initialState,
-        affectedSpans: ['12345', '567890'],
+        matchedSpans: ['12345', '567890'],
         focusedSpan: '12345',
       });
     });
 
     it('should handle an empty array', () => {
-      expect(Reducer(undefined, setAffectedSpans({spanIds: []}))).toEqual(initialState);
+      expect(Reducer(undefined, setMatchedSpans({spanIds: []}))).toEqual(initialState);
     });
   });
 
@@ -49,10 +47,10 @@ describe('Span.slice', () => {
     });
   });
 
-  describe('clearAffectedSpans', () => {
+  describe('clearMatchedSpans', () => {
     it('should handle triggering the action', () => {
       expect(
-        Reducer({...initialState, focusedSpan: '', affectedSpans: ['12345', '67890']}, clearAffectedSpans())
+        Reducer({...initialState, focusedSpan: '', matchedSpans: ['12345', '67890']}, clearMatchedSpans())
       ).toEqual(initialState);
     });
   });
@@ -68,12 +66,12 @@ describe('Span.slice', () => {
       };
       expect(
         Reducer(
-          {...initialState, focusedSpan: '', affectedSpans: ['12345', '67890']},
+          {...initialState, focusedSpan: '', matchedSpans: ['12345', '67890']},
           setSelectedAssertion(assertionResultEntry)
         )
       ).toEqual({
         ...initialState,
-        affectedSpans: ['12345', '67890'],
+        matchedSpans: ['12345', '67890'],
         focusedSpan: '12345',
       });
     });
@@ -83,30 +81,12 @@ describe('Span.slice', () => {
         Reducer(
           {
             ...initialState,
-            affectedSpans: ['12345', '67890'],
+            matchedSpans: ['12345', '67890'],
             focusedSpan: '12345',
           },
           setSelectedAssertion()
         )
       ).toEqual(initialState);
-    });
-  });
-
-  describe('setMatchedSpans', () => {
-    it('should handle triggering the action', () => {
-      expect(Reducer(undefined, setMatchedSpans({spanIds: ['12345', '567890']}))).toEqual({
-        ...initialState,
-        matchedSpans: ['12345', '567890'],
-      });
-    });
-  });
-
-  describe('setSearchText', () => {
-    it('should handle triggering the action', () => {
-      expect(Reducer(undefined, setSearchText({searchText: 'http'}))).toEqual({
-        ...initialState,
-        searchText: 'http',
-      });
     });
   });
 });

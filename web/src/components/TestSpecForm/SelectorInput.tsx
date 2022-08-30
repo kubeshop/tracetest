@@ -20,7 +20,7 @@ const SelectorInput = ({form, testId, runId, onValidSelector}: IProps) => {
 
   return (
     <Form.Item name="selector" validateTrigger={[]}>
-      <AdvancedEditor runId={runId} testId={testId} />
+      <AdvancedEditor lineNumbers runId={runId} testId={testId} />
     </Form.Item>
   );
 };

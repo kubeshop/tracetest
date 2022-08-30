@@ -13,7 +13,7 @@ interface IProps {
   attribute: TSpanFlatAttribute;
   onCopy(value: string): void;
   onCreateTestSpec(attribute: TSpanFlatAttribute): void;
-  searchText: string;
+  searchText?: string;
 }
 
 enum Action {

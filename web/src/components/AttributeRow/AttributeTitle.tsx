@@ -3,11 +3,11 @@ import Highlighted from '../Highlighted';
 import {Text, TextContainer} from './AttributeRow.styled';
 
 interface IProps {
+  searchText?: string;
   title: string;
-  searchText: string;
 }
 
-export default ({searchText, title}: IProps): JSX.Element => {
+export default ({title, searchText = ''}: IProps): JSX.Element => {
   const textContainer = (
     <TextContainer>
       <Text type="secondary">

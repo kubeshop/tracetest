@@ -4,6 +4,7 @@ import {useNavigate, useParams} from 'react-router-dom';
 
 import FailedTrace from 'components/FailedTrace';
 import RunDetailTest from 'components/RunDetailTest';
+import RunDetailTrace from 'components/RunDetailTrace';
 import {RunDetailModes, TestState as TestStateEnum} from 'constants/TestRun.constants';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import {TTest} from 'types/Test.types';
@@ -53,7 +54,7 @@ const RunDetailLayout = ({test: {id, name, trigger, version = 1}}: IProps) => {
             Trigger
           </Tabs.TabPane>
           <Tabs.TabPane tab="Trace" key={RunDetailModes.TRACE}>
-            Trace
+            <RunDetailTrace run={run} testId={id} />
           </Tabs.TabPane>
           <Tabs.TabPane tab="Test" key={RunDetailModes.TEST}>
             <RunDetailTest run={run} testId={id} />

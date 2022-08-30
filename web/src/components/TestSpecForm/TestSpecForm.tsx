@@ -49,7 +49,7 @@ const TestSpecForm = ({
   const [form] = Form.useForm<IValues>();
   const [isValid, setIsValid] = useState(false);
 
-  const spanIdList = useAppSelector(SpanSelectors.selectAffectedSpans);
+  const spanIdList = useAppSelector(SpanSelectors.selectMatchedSpans);
   const attributeList = useAppSelector(state =>
     AssertionSelectors.selectAttributeList(state, testId, runId, spanIdList)
   );

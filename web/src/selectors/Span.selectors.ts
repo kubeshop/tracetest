@@ -6,19 +6,19 @@ const spansStateSelector = (state: RootState) => state.spans;
 const stateSelector = (state: RootState) => state;
 const paramsSelector = (state: RootState, spanId: string, testId: string, runId: string) => ({spanId, testId, runId});
 
-const selectAffectedSpans = createSelector(
+const selectMatchedSpans = createSelector(
   spansStateSelector,
   stateSelector,
-  ({affectedSpans}, {testDefinition: {assertionResults, selectedAssertion}}) => {
-    if (!selectedAssertion) return affectedSpans;
+  ({matchedSpans}, {testDefinition: {assertionResults, selectedAssertion}}) => {
+    if (!selectedAssertion) return matchedSpans;
 
     const foundAssertion = assertionResults?.resultList.find(({selector}) => selector === selectedAssertion);
 
-    return !foundAssertion ? [] : affectedSpans;
+    return !foundAssertion ? [] : matchedSpans;
   }
 );
 const SpanSelectors = () => ({
-  selectAffectedSpans,
+  selectMatchedSpans,
   selectSpanById: createSelector(stateSelector, paramsSelector, (state, {spanId, testId, runId}) => {
     const {data: {trace} = {}} = endpoints.getRunById.select({testId, runId})(state);
 
@@ -28,8 +28,6 @@ const SpanSelectors = () => ({
   }),
   selectSelectedSpan: createSelector(spansStateSelector, ({selectedSpan}) => selectedSpan),
   selectFocusedSpan: createSelector(spansStateSelector, ({focusedSpan}) => focusedSpan),
-  selectMatchedSpans: createSelector(spansStateSelector, ({matchedSpans}) => matchedSpans),
-  selectSearchText: createSelector(spansStateSelector, ({searchText}) => searchText),
 });
 
 export default SpanSelectors();

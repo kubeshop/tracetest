@@ -24,7 +24,7 @@ export const SkeletonDiagramMessage = styled.div`
 export const SkeletonNode = styled.div`
   background-color: ${({theme}) => theme.color.white};
   border: ${({theme}) => `1px solid ${theme.color.border}`};
-  border-radius: 2px;
+  border-radius: 10px;
   min-width: fit-content;
   display: flex;
   width: 150px;
@@ -32,6 +32,7 @@ export const SkeletonNode = styled.div`
   height: 75px;
   justify-content: center;
   align-items: center;
+  overflow: hidden;
 `;
 
 export const SkeletonNotch = styled.div`
@@ -40,7 +41,7 @@ export const SkeletonNotch = styled.div`
   top: 0;
   margin-top: 1px;
   padding: 3px 6px;
-  border-radius: 2px 2px 0 0;
+  border-radius: 10px 10px 0 0;
   width: 99%;
   font-weight: 700;
   height: 40px;
@@ -72,6 +73,6 @@ export const TextHolder = styled.div`
 
   animation: skeleton-loading 1s linear infinite alternate;
   height: 8px;
-  border-radius: 2px;
+  border-radius: 10px;
   width: 100%;
 `;

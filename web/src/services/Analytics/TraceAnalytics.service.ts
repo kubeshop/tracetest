@@ -1,4 +1,4 @@
-import {SupportedDiagrams} from 'components/Diagram/Diagram';
+import {VisualizationType} from 'components/RunDetailTrace/RunDetailTrace';
 import {Categories, Labels} from 'constants/Analytics.constants';
 import AnalyticsService from './Analytics.service';
 
@@ -22,15 +22,15 @@ const TraceAnalyticsService = () => {
     AnalyticsService.event(Categories.Trace, Actions.AddAssertionButtonClick, Labels.Button);
   };
 
-  const onTimelineSpanClick = () => {
-    AnalyticsService.event(Categories.Trace, Actions.TimelineSpanClick, Labels.Button);
+  const onTimelineSpanClick = (spanId: string) => {
+    AnalyticsService.event(Categories.Trace, Actions.TimelineSpanClick, spanId);
   };
 
   const onAttributeCopy = () => {
     AnalyticsService.event(Categories.SpanDetail, Actions.AttributeCopy, Labels.Button);
   };
 
-  const onSwitchDiagramView = (diagramType: SupportedDiagrams) => {
+  const onSwitchDiagramView = (diagramType: VisualizationType) => {
     AnalyticsService.event(Categories.Trace, `${Actions.SwitchDiagramView}-${diagramType}`, Labels.Button);
   };
 
