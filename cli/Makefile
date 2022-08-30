@@ -26,9 +26,7 @@ generate-client:
 	go fmt ./...; cd ..
 
 build:
-ifeq (, $(shell which goreleaser))
 	go install github.com/goreleaser/goreleaser@latest
-endif
 	VERSION=$(VERSION) \
 	TRACETEST_ENV=$(TRACETEST_ENV) \
 	ANALYTICS_BE_KEY=$(ANALYTICS_BE_KEY) \
