@@ -251,16 +251,11 @@ jobs:
           location: ${{ secrets.GKE_ZONE }}
           credentials: ${{ secrets.GKE_SA_KEY }}
 
-      - name: Clone CLI code
-        uses: actions/checkout@v3
-        with:
-          path: 'tracetest-main'
-          ref: 'main'
       - name: Build CLI
         run: |
-          cd tracetest-main/cli
+          cd cli
           make build
-          cp tracetest ../../cli
+          cp dist/tracetest_linux_386/tracetest ../../cli
 
       - name: Forward port
         run: |
