@@ -19,20 +19,8 @@ test() {
   name=$1
   definition=$2
 
-  echo -n "-> $name "
   run_test $name $definition
   res=$?
-  if [ "$res" = 0 ]; then
-    echo -n "OK"
-  else
-    echo "FAIL"
-    echo "$name.json:"
-    cat results/responses/$name.json
-    echo
-    echo "$name.xml:"
-    cat results/$name.xml
-
-  fi
   echo
   return $res
 }
