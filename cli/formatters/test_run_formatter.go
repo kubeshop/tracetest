@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/gookit/color"
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/openapi"
+	"github.com/pterm/pterm"
 )
 
 const (
@@ -26,7 +26,7 @@ func NewTestRunFormatter(config config.Config) TestRunFormatter {
 
 func (f TestRunFormatter) FormatTestRunOutput(test openapi.Test, run openapi.TestRun) string {
 	if run.State != nil && *run.State == "FAILED" {
-		return color.Red.Render(fmt.Sprintf("Failed to execute test: %s", *run.LastErrorState))
+		return pterm.FgRed.Sprintf("Failed to execute test: %s", *run.LastErrorState)
 	}
 
 	if run.Result.AllPassed == nil || !*run.Result.AllPassed {
@@ -158,10 +158,10 @@ func (f TestRunFormatter) getStateIcon(passed bool) string {
 
 func (f TestRunFormatter) getColoredText(passed bool, text string) string {
 	if passed {
-		return color.Green.Render(text)
+		return pterm.FgGreen.Sprintf(text)
 	}
 
-	return color.Red.Render(text)
+	return pterm.FgRed.Sprintf(text)
 }
 
 func (f TestRunFormatter) getLink(test openapi.Test, run openapi.TestRun) string {
