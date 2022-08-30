@@ -13,7 +13,7 @@ func ExecuteExpression(expression model.AssertionExpression, span traces.Span) (
 		return getLiteralValue(expression.LiteralValue, span), nil
 	}
 
-	operationExecutor, err := getOperationExecutor(expression.Operation)
+	operation, err := getOperationRegistry().Get(expression.Operation)
 	if err != nil {
 		return "", fmt.Errorf("could not execute expression: %w", err)
 	}
@@ -21,7 +21,7 @@ func ExecuteExpression(expression model.AssertionExpression, span traces.Span) (
 	firstValue := resolveLiteralValue(expression.LiteralValue, span)
 	secondValue := resolveLiteralValue(expression.Expression.LiteralValue, span)
 
-	literalValue, err := operationExecutor.Execute(firstValue, secondValue)
+	literalValue, err := operation(firstValue, secondValue)
 	if err != nil {
 		return "", err
 	}

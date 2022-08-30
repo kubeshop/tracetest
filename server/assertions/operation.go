@@ -10,49 +10,31 @@ import (
 	"github.com/kubeshop/tracetest/server/traces"
 )
 
-type ExpressionOperation interface {
-	Execute(model.LiteralValue, model.LiteralValue) (model.LiteralValue, error)
-}
+type ExpressionOperation func(model.LiteralValue, model.LiteralValue) (model.LiteralValue, error)
 
-type sumOperation struct{}
-
-func (*sumOperation) Execute(value1 model.LiteralValue, value2 model.LiteralValue) (model.LiteralValue, error) {
+func sum(value1 model.LiteralValue, value2 model.LiteralValue) (model.LiteralValue, error) {
 	return runMathOperationOnNumbers(value1, value2, func(f1, f2 float64) float64 {
 		return f1 + f2
 	})
 }
 
-var _ ExpressionOperation = &sumOperation{}
-
-type subtractOperation struct{}
-
-func (*subtractOperation) Execute(value1 model.LiteralValue, value2 model.LiteralValue) (model.LiteralValue, error) {
+func subtract(value1 model.LiteralValue, value2 model.LiteralValue) (model.LiteralValue, error) {
 	return runMathOperationOnNumbers(value1, value2, func(f1, f2 float64) float64 {
 		return f1 - f2
 	})
 }
 
-var _ ExpressionOperation = &subtractOperation{}
-
-type multiplyOperation struct{}
-
-func (*multiplyOperation) Execute(value1 model.LiteralValue, value2 model.LiteralValue) (model.LiteralValue, error) {
+func multiply(value1 model.LiteralValue, value2 model.LiteralValue) (model.LiteralValue, error) {
 	return runMathOperationOnNumbers(value1, value2, func(f1, f2 float64) float64 {
 		return f1 * f2
 	})
 }
 
-var _ ExpressionOperation = &multiplyOperation{}
-
-type divideOperation struct{}
-
-func (*divideOperation) Execute(value1 model.LiteralValue, value2 model.LiteralValue) (model.LiteralValue, error) {
+func divide(value1 model.LiteralValue, value2 model.LiteralValue) (model.LiteralValue, error) {
 	return runMathOperationOnNumbers(value1, value2, func(f1, f2 float64) float64 {
 		return f1 / f2
 	})
 }
-
-var _ ExpressionOperation = &divideOperation{}
 
 func runMathOperationOnNumbers(value1 model.LiteralValue, value2 model.LiteralValue, operation func(float64, float64) float64) (model.LiteralValue, error) {
 	if err := validateFieldType(value1); err != nil {
@@ -96,21 +78,6 @@ func validateFieldType(field model.LiteralValue) error {
 	}
 
 	return nil
-}
-
-func getOperationExecutor(operation string) (ExpressionOperation, error) {
-	switch operation {
-	case "+":
-		return &sumOperation{}, nil
-	case "-":
-		return &subtractOperation{}, nil
-	case "*":
-		return &multiplyOperation{}, nil
-	case "/":
-		return &divideOperation{}, nil
-	}
-
-	return nil, fmt.Errorf(`unsupported operation "%s"`, operation)
 }
 
 func resolveLiteralValue(literalValue model.LiteralValue, span traces.Span) model.LiteralValue {
