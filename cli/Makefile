@@ -1,3 +1,8 @@
+VERSION ?= "dev"
+TRACETEST_ENV ?= "dev"
+ANALYTICS_BE_KEY ?= ""
+
+
 PROJECT_ROOT=${shell dirname $${PWD}}
 
 OPENAPI_GENERATOR_VER=v5.4.0
@@ -21,7 +26,10 @@ generate-client:
 	go fmt ./...; cd ..
 
 build:
-	go build -o tracetest main.go
+	VERSION=$(VERSION) \
+	TRACETEST_ENV=$(TRACETEST_ENV) \
+	ANALYTICS_BE_KEY=$(ANALYTICS_BE_KEY) \
+	goreleaser --rm-dist --snapshot -f ../.goreleaser.yaml
 
 test: mockserver
 	@go test -coverprofile=coverage.out ./...
