@@ -50,6 +50,13 @@ func dockerComposeInstaller(config configuration, ui UI) {
 
 	dir := config.String("output.dir")
 
+	if Force {
+		err := os.RemoveAll(dir)
+		if err != nil {
+			ui.Exit(err.Error())
+		}
+	}
+
 	collectorConfigFile := getCollectorConfigFileContents(ui, config)
 	tracetestConfigFile := getTracetestConfigFileContents(ui, config)
 	dockerComposeFile := getDockerComposeFileContents(ui, config)
@@ -326,7 +333,7 @@ func dockerChecker(ui UI) {
 		{"Fix manually", exitOption(
 			"Check the docker install docks on https://docs.docker.com/get-docker/",
 		)},
-	})
+	}, 0)
 
 	option.fn(ui)
 
@@ -365,7 +372,7 @@ func dockerComposeChecker(ui UI) {
 		{"Fix manually", exitOption(
 			"Check the docker compose install docks on https://docs.docker.com/compose/install/",
 		)},
-	})
+	}, 0)
 
 	option.fn(ui)
 

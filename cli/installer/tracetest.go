@@ -102,7 +102,7 @@ func configureBackendOptions(conf configuration, ui UI) configuration {
 			conf.set("tracetest.backend.token", ui.TextInput("Token", ""))
 			conf.set("tracetest.backend.realm", ui.TextInput("Realm", "us1"))
 		}},
-	})
+	}, 0)
 
 	option.fn(ui)
 

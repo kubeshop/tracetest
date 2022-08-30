@@ -29,7 +29,7 @@ type UI interface {
 	Red(string) string
 
 	Confirm(prompt string, defaultValue bool) bool
-	Select(prompt string, options []option) (selected option)
+	Select(prompt string, options []option, defaultIndex int) (selected option)
 	TextInput(msg, defaultValue string) string
 }
 
@@ -126,7 +126,7 @@ func (ui ptermUI) TextInput(msg, defaultValue string) string {
 	return text
 }
 
-func (ui ptermUI) Select(prompt string, options []option) (selected option) {
+func (ui ptermUI) Select(prompt string, options []option, defaultIndex int) (selected option) {
 	textOpts := make([]string, len(options))
 	lookupMap := make(map[string]int)
 
@@ -143,7 +143,7 @@ func (ui ptermUI) Select(prompt string, options []option) (selected option) {
 		DefaultText:   prompt,
 		Options:       textOpts,
 		OptionStyle:   &pterm.ThemeDefault.DefaultText,
-		DefaultOption: textOpts[0],
+		DefaultOption: textOpts[defaultIndex],
 		MaxHeight:     5,
 		Selector:      ">",
 		SelectorStyle: &pterm.ThemeDefault.SecondaryStyle,

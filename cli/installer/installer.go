@@ -4,6 +4,10 @@ import (
 	"fmt"
 )
 
+var (
+	Force = false
+)
+
 func Start() {
 	ui := DefaultUI
 
@@ -22,7 +26,7 @@ or reach us on Discord https://discord.gg/6zupCZFQbe
 
 	option := ui.Select("How do you want to run TraceTest?", []option{
 		{"Using Docker Compose", dockerCompose.Install},
-	})
+	}, 0)
 
 	option.fn(ui)
 }
