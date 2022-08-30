@@ -111,6 +111,19 @@ components:
           $ref: "./trace.yaml#/components/schemas/Trace"
         result:
           $ref: "#/components/schemas/AssertionResults"
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+
+    TestRunInformation:
+      type: object
+      properties:
+        metadata:
+          type: object
+          nullable: true
+          additionalProperties:
+            type: string
 
     AssertionResults:
       type: object

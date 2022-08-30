@@ -243,6 +243,11 @@ export interface operations {
         };
       };
     };
+    requestBody: {
+      content: {
+        "application/json": external["tests.yaml"]["components"]["schemas"]["TestRunInformation"];
+      };
+    };
   };
   /** get the spans ids that would be selected by a specific selector query */
   getTestResultSelectedSpans: {
@@ -583,6 +588,10 @@ export interface external {
           triggerResult?: external["triggers.yaml"]["components"]["schemas"]["TriggerResult"];
           trace?: external["trace.yaml"]["components"]["schemas"]["Trace"];
           result?: external["tests.yaml"]["components"]["schemas"]["AssertionResults"];
+          metadata?: { [key: string]: string };
+        };
+        TestRunInformation: {
+          metadata?: { [key: string]: string } | null;
         };
         /** @example [object Object] */
         AssertionResults: {

@@ -1761,9 +1761,15 @@ func (a *ApiApiService) RerunTestRunExecute(r ApiRerunTestRunRequest) (*TestRun,
 }
 
 type ApiRunTestRequest struct {
-	ctx        context.Context
-	ApiService *ApiApiService
-	testId     string
+	ctx                context.Context
+	ApiService         *ApiApiService
+	testId             string
+	testRunInformation *TestRunInformation
+}
+
+func (r ApiRunTestRequest) TestRunInformation(testRunInformation TestRunInformation) ApiRunTestRequest {
+	r.testRunInformation = &testRunInformation
+	return r
 }
 
 func (r ApiRunTestRequest) Execute() (*TestRun, *http.Response, error) {
@@ -1810,7 +1816,7 @@ func (a *ApiApiService) RunTestExecute(r ApiRunTestRequest) (*TestRun, *http.Res
 	localVarFormParams := url.Values{}
 
 	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{}
+	localVarHTTPContentTypes := []string{"application/json"}
 
 	// set Content-Type header
 	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
@@ -1826,6 +1832,8 @@ func (a *ApiApiService) RunTestExecute(r ApiRunTestRequest) (*TestRun, *http.Res
 	if localVarHTTPHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
+	// body params
+	localVarPostBody = r.testRunInformation
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return localVarReturnValue, nil, err

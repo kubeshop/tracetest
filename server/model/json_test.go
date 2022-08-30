@@ -69,6 +69,7 @@ func TestRunEncoding(t *testing.T) {
 					},
 				},
 				TestVersion: 1,
+				Metadata:    map[string]string{"key": "value"},
 			},
 		},
 		{
@@ -109,6 +110,7 @@ func TestRunEncoding(t *testing.T) {
 				},
 				Trace:       exampleTrace,
 				TestVersion: 2,
+				Metadata:    map[string]string{"another_key": "value"},
 			},
 		},
 	}

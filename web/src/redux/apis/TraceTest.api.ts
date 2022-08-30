@@ -87,6 +87,7 @@ const TraceTestAPI = createApi({
       query: ({testId}) => ({
         url: `/tests/${testId}/run`,
         method: HTTP_METHOD.POST,
+        body: {},
       }),
       invalidatesTags: (response, error, {testId}) => [
         {type: Tags.TEST_RUN, id: `${testId}-LIST`},
