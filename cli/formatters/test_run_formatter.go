@@ -15,18 +15,20 @@ const (
 )
 
 type TestRunFormatter struct {
-	config config.Config
+	config        config.Config
+	colorsEnabled bool
 }
 
-func NewTestRunFormatter(config config.Config) TestRunFormatter {
+func NewTestRunFormatter(config config.Config, colorsEnabled bool) TestRunFormatter {
 	return TestRunFormatter{
-		config: config,
+		config:        config,
+		colorsEnabled: colorsEnabled,
 	}
 }
 
 func (f TestRunFormatter) FormatTestRunOutput(test openapi.Test, run openapi.TestRun) string {
 	if run.State != nil && *run.State == "FAILED" {
-		return pterm.FgRed.Sprintf("Failed to execute test: %s", *run.LastErrorState)
+		return f.getColoredText(false, fmt.Sprintf("Failed to execute test: %s", *run.LastErrorState))
 	}
 
 	if run.Result.AllPassed == nil || !*run.Result.AllPassed {
@@ -157,6 +159,10 @@ func (f TestRunFormatter) getStateIcon(passed bool) string {
 }
 
 func (f TestRunFormatter) getColoredText(passed bool, text string) string {
+	if !f.colorsEnabled {
+		return text
+	}
+
 	if passed {
 		return pterm.FgGreen.Sprintf(text)
 	}

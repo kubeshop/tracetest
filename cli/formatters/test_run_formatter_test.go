@@ -34,7 +34,7 @@ func TestSuccessfulTestOutput(t *testing.T) {
 	formatter := formatters.NewTestRunFormatter(config.Config{
 		Scheme:   "http",
 		Endpoint: "localhost:8080",
-	})
+	}, false)
 	output := formatter.FormatTestRunOutput(test, run)
 
 	assert.Equal(t, "✔ Testcase 1 (http://localhost:8080/test/9876543/run/123456)\n", output)
@@ -120,7 +120,7 @@ func TestFailingTestOutput(t *testing.T) {
 	formatter := formatters.NewTestRunFormatter(config.Config{
 		Scheme:   "http",
 		Endpoint: "localhost:8080",
-	})
+	}, false)
 	output := formatter.FormatTestRunOutput(test, run)
 	expectedOutput := `✘ Testcase 2 (http://localhost:8080/test/9876543/run/123456)
 	✔ span[name = "my span"]

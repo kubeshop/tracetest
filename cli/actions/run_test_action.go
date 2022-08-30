@@ -127,7 +127,7 @@ func (a runTestAction) runDefinition(ctx context.Context, params runTestParams) 
 			return runTestOutput{}, fmt.Errorf("could not save junit file: %w", err)
 		}
 
-		formatter := formatters.NewTestRunFormatter(a.config)
+		formatter := formatters.NewTestRunFormatter(a.config, true)
 		formattedOutput := formatter.FormatTestRunOutput(test, testRun)
 		fmt.Print(formattedOutput)
 	}
