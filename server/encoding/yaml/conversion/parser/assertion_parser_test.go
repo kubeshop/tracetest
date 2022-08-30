@@ -116,7 +116,11 @@ func TestParseAssertion(t *testing.T) {
 			ExpectedOutput: parser.Assertion{
 				Attribute: "db.statement",
 				Operator:  "not-contains",
-				Value:     "INSERT INTO",
+				Value: &parser.Expression{
+					LiteralValue: parser.ExprLiteral{
+						QuotedString: strp("INSERT INTO"),
+					},
+				},
 			},
 		},
 		{
