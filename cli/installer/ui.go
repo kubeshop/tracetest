@@ -10,7 +10,7 @@ import (
 
 const createIssueMsg = "If you need help, please create an issue: https://github.com/kubeshop/tracetest/issues/new/choose"
 
-var DefaultUI UI = ptermUI{}
+var DefaultUI UI = &ptermUI{}
 
 type UI interface {
 	Banner()
@@ -89,10 +89,16 @@ func (ui ptermUI) Red(msg string) string {
 }
 
 func (ui ptermUI) Confirm(msg string, defaultValue bool) bool {
-	confirm, err := pterm.
-		DefaultInteractiveConfirm.
-		WithDefaultValue(defaultValue).
-		WithDefaultText(msg).
+	confirm, err := (&pterm.InteractiveConfirmPrinter{
+		DefaultValue: defaultValue,
+		DefaultText:  msg,
+		TextStyle:    &pterm.ThemeDefault.PrimaryStyle,
+		ConfirmText:  "Yes",
+		ConfirmStyle: &pterm.ThemeDefault.SuccessMessageStyle,
+		RejectText:   "No",
+		RejectStyle:  &pterm.ThemeDefault.ErrorMessageStyle,
+		SuffixStyle:  &pterm.ThemeDefault.SecondaryStyle,
+	}).
 		Show()
 	if err != nil {
 		ui.Panic(err)
@@ -102,9 +108,11 @@ func (ui ptermUI) Confirm(msg string, defaultValue bool) bool {
 }
 
 func (ui ptermUI) TextInput(msg, defaultValue string) string {
-	text, err := pterm.
-		DefaultInteractiveTextInput.
-		WithDefaultText(fmt.Sprintf("%s [%s]", msg, defaultValue)).
+	text, err := (&pterm.InteractiveTextInputPrinter{
+		TextStyle:   &pterm.ThemeDefault.PrimaryStyle,
+		DefaultText: fmt.Sprintf("%s [%s]", msg, defaultValue),
+		MultiLine:   false,
+	}).
 		Show()
 	ui.Println("")
 	if err != nil {
@@ -130,11 +138,16 @@ func (ui ptermUI) Select(prompt string, options []option) (selected option) {
 		lookupMap[opt.text] = ix
 	}
 
-	selectedText, err := pterm.
-		DefaultInteractiveSelect.
-		WithDefaultText(prompt).
-		WithOptions(textOpts).
-		WithDefaultOption(textOpts[0]).
+	selectedText, err := (&pterm.InteractiveSelectPrinter{
+		TextStyle:     &pterm.ThemeDefault.PrimaryStyle,
+		DefaultText:   prompt,
+		Options:       textOpts,
+		OptionStyle:   &pterm.ThemeDefault.DefaultText,
+		DefaultOption: textOpts[0],
+		MaxHeight:     5,
+		Selector:      ">",
+		SelectorStyle: &pterm.ThemeDefault.SecondaryStyle,
+	}).
 		Show()
 	if err != nil {
 		panic(err)

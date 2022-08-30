@@ -1,7 +1,7 @@
 package installer
 
 import (
-	"errors"
+	"fmt"
 )
 
 func Start() {
@@ -43,7 +43,7 @@ func (i installer) PreCheck(ui UI) {
 }
 
 func (i installer) Configure(ui UI) configuration {
-	config := configuration{}
+	config := newConfiguration(ui)
 	for _, confFn := range i.configs {
 		config = confFn(config, ui)
 	}
@@ -62,37 +62,51 @@ func (i installer) Install(ui UI) {
 
 type preChecker func(ui UI)
 
-type configuration map[string]interface{}
-
-var (
-	errConfigNotExists = errors.New("configuration key not set")
-	errConfigWrongType = errors.New("configuration value is not the correct type")
-)
-
-func (c configuration) Bool(key string) (bool, error) {
-	v, exists := c[key]
-	if !exists {
-		return false, errConfigNotExists
-	}
-	b, ok := v.(bool)
-	if !ok {
-		return false, errConfigWrongType
-	}
-
-	return b, nil
+type configuration struct {
+	db map[string]interface{}
+	ui UI
 }
 
-func (c configuration) String(key string) (string, error) {
-	v, exists := c[key]
-	if !exists {
-		return "", errConfigNotExists
+func newConfiguration(ui UI) configuration {
+	return configuration{
+		db: map[string]interface{}{},
+		ui: ui,
 	}
-	b, ok := v.(string)
-	if !ok {
-		return "", errConfigWrongType
+}
+
+func (c configuration) set(key string, value interface{}) {
+	if _, exists := c.db[key]; exists {
+		c.ui.Panic(fmt.Errorf("config key %s already exists", key))
 	}
 
-	return b, nil
+	c.db[key] = value
+}
+
+func (c configuration) get(key string) interface{} {
+	v, exists := c.db[key]
+	if !exists {
+		c.ui.Panic(fmt.Errorf("config key %s not exists", key))
+	}
+
+	return v
+}
+
+func (c configuration) Bool(key string) bool {
+	b, ok := c.get(key).(bool)
+	if !ok {
+		c.ui.Panic(fmt.Errorf("config key %s is not a bool", key))
+	}
+
+	return b
+}
+
+func (c configuration) String(key string) string {
+	s, ok := c.get(key).(string)
+	if !ok {
+		c.ui.Panic(fmt.Errorf("config key %s is not a string", key))
+	}
+
+	return s
 }
 
 type configurator func(config configuration, ui UI) configuration

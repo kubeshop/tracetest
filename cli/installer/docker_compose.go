@@ -6,11 +6,13 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"path/filepath"
 	"regexp"
 
 	"github.com/compose-spec/compose-go/loader"
 	"github.com/compose-spec/compose-go/types"
 	cliConfig "github.com/kubeshop/tracetest/cli/config"
+	"golang.org/x/exp/slices"
 	"gopkg.in/yaml.v3"
 )
 
@@ -21,6 +23,7 @@ var dockerCompose = installer{
 		dockerComposeChecker,
 	},
 	configs: []configurator{
+		configureTracetest,
 		configureDemoApp,
 		configureDockerCompose,
 	},
@@ -28,36 +31,33 @@ var dockerCompose = installer{
 }
 
 func configureDockerCompose(conf configuration, ui UI) configuration {
-	conf["docker-compose.filename"] = ui.TextInput("Docker Compose output file name", "docker-compose.yaml")
-	conf["tracetest-config.filename"] = ui.TextInput("TraceTest Config output file name", "tracetest.yaml")
-	conf["collector-config.filename"] = ui.TextInput("OTel-Collector Config output file name", "collector.yaml")
+	conf.set(
+		"output.dir",
+		ui.TextInput("Tracetest output directory", "tracetest/"),
+	)
 
 	return conf
 }
 
+const (
+	dockerComposeFilename       = "docker-compose.yaml"
+	tracetestConfigFilename     = "tracetest.yaml"
+	otelCollectorConfigFilename = "otel-collector.yaml"
+)
+
 func dockerComposeInstaller(config configuration, ui UI) {
 
+	dir := config.String("output.dir")
+
 	collectorConfigFile := getCollectorConfigFileContents(ui, config)
-	collectorConfigFName, err := config.String("collector-config.filename")
-	if err != nil {
-		ui.Exit(err.Error())
-	}
-
 	tracetestConfigFile := getTracetestConfigFileContents(ui, config)
-	tracetestConfigFName, err := config.String("tracetest-config.filename")
-	if err != nil {
-		ui.Exit(err.Error())
-	}
-
 	dockerComposeFile := getDockerComposeFileContents(ui, config)
-	dockerComposeFName, err := config.String("docker-compose.filename")
-	if err != nil {
-		ui.Exit(err.Error())
-	}
+	dockerComposeFName := filepath.Join(dir, dockerComposeFilename)
 
-	saveFile(ui, collectorConfigFName, collectorConfigFile)
-	saveFile(ui, tracetestConfigFName, tracetestConfigFile)
+	createDir(ui, dir)
 	saveFile(ui, dockerComposeFName, dockerComposeFile)
+	saveFile(ui, filepath.Join(dir, tracetestConfigFilename), tracetestConfigFile)
+	saveFile(ui, filepath.Join(dir, otelCollectorConfigFilename), collectorConfigFile)
 
 	ui.Success("Install successful!")
 	ui.Println(fmt.Sprintf(`
@@ -76,31 +76,27 @@ Happy TraceTesting =)
 
 func getDockerComposeFileContents(ui UI, config configuration) []byte {
 	project := getCompleteProject(ui)
-	include := []string{"tracetest", "postgres", "otel-collector", "jaeger"}
+	include := []string{"tracetest", "postgres"}
 
-	if includeDemo, err := config.Bool("demo.enable"); err != nil {
-		ui.Exit(err.Error())
-	} else if includeDemo {
+	if config.Bool("tracetest.backend.install") {
+		include = append(include, "jaeger")
+	}
+
+	if config.Bool("tracetest.collector.install") {
+		include = append(include, "otel-collector")
+	}
+
+	if config.Bool("demo.enable") {
 		include = append(include, "cache", "queue", "demo-api", "demo-worker", "demo-rpc")
 	}
 
-	if err := project.ForServices(include); err != nil {
+	filterContainers(ui, project, include)
+
+	if err := fixTracetestContainer(project, cliConfig.Version); err != nil {
 		ui.Exit(err.Error())
 	}
 
-	ttfile, err := config.String("tracetest-config.filename")
-	if err != nil {
-		ui.Exit(err.Error())
-	}
-	if err := fixTracetestContainer(project, ttfile, cliConfig.Version); err != nil {
-		ui.Exit(err.Error())
-	}
-
-	ocfile, err := config.String("collector-config.filename")
-	if err != nil {
-		ui.Exit(err.Error())
-	}
-	if err := fixOtelCollectorContainer(project, ocfile); err != nil {
+	if err := fixOtelCollectorContainer(project); err != nil {
 		ui.Exit(err.Error())
 	}
 
@@ -112,6 +108,33 @@ func getDockerComposeFileContents(ui UI, config configuration) []byte {
 	return output
 }
 
+func filterContainers(ui UI, project *types.Project, included []string) {
+	containers := make(types.Services, 0, len(included))
+	if err := project.ForServices(included); err != nil {
+		ui.Exit(err.Error())
+	}
+
+	for _, sc := range project.Services {
+		if !slices.Contains(included, sc.Name) {
+			continue
+		}
+
+		depMap := types.DependsOnConfig{}
+		for sn, sv := range sc.DependsOn {
+			if !slices.Contains(included, sn) {
+				continue
+			}
+
+			depMap[sn] = sv
+		}
+		sc.DependsOn = depMap
+
+		containers = append(containers, sc)
+	}
+
+	project.Services = containers
+}
+
 func getCollectorConfigFileContents(ui UI, config configuration) []byte {
 	contents, err := getFileContentsForVersion("local-config/collector.config.yaml", cliConfig.Version)
 	if err != nil {
@@ -121,13 +144,11 @@ func getCollectorConfigFileContents(ui UI, config configuration) []byte {
 	return contents
 }
 
-func getTracetestConfigFileContents(ui UI, config configuration) []byte {
-	contents, err := getFileContentsForVersion("local-config/config.tests.yaml", cliConfig.Version)
+func createDir(ui UI, name string) {
+	err := os.Mkdir(name, 0755)
 	if err != nil {
-		ui.Exit(fmt.Errorf("Cannot get docker-compose file: %w", err).Error())
+		ui.Exit(err.Error())
 	}
-
-	return contents
 }
 
 func saveFile(ui UI, fname string, contents []byte) {
@@ -147,7 +168,7 @@ func saveFile(ui UI, fname string, contents []byte) {
 	}
 }
 
-func fixTracetestContainer(project *types.Project, tracetestConfigFile, version string) error {
+func fixTracetestContainer(project *types.Project, version string) error {
 	const serviceName = "tracetest"
 	tts, err := project.GetService(serviceName)
 	if err != nil {
@@ -160,20 +181,20 @@ func fixTracetestContainer(project *types.Project, tracetestConfigFile, version 
 
 	tts.Image = "kubeshop/tracetest:" + version
 	tts.Build = nil
-	tts.Volumes[0].Source = tracetestConfigFile
+	tts.Volumes[0].Source = tracetestConfigFilename
 
 	replaceService(project, serviceName, tts)
 
 	return nil
 }
 
-func fixOtelCollectorContainer(project *types.Project, collectorConfigFile string) error {
+func fixOtelCollectorContainer(project *types.Project) error {
 	ocs, err := project.GetService("otel-collector")
 	if err != nil {
 		return err
 	}
 
-	ocs.Volumes[0].Source = collectorConfigFile
+	ocs.Volumes[0].Source = otelCollectorConfigFilename
 
 	return nil
 }
