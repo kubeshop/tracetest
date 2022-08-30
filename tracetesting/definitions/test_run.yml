@@ -9,6 +9,7 @@ trigger:
     headers:
     - key: Content-Type
       value: application/json
+
 specs:
 - selector: span[name = "Tracetest trigger"]
   assertions:
