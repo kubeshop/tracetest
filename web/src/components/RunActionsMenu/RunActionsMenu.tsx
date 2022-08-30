@@ -1,6 +1,6 @@
 import {Dropdown, Menu} from 'antd';
 import {useCallback} from 'react';
-import {Link, useNavigate} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import {useDeleteRunByIdMutation} from 'redux/apis/TraceTest.api';
 import TestAnalyticsService from 'services/Analytics/TestAnalytics.service';
 import {useFileViewerModal} from '../FileViewerModal/FileViewerModal.provider';
@@ -39,11 +39,6 @@ const RunActionsMenu = ({resultId, testId, testVersion, isRunView = false}: IPro
             >
               Test Definition
             </Menu.Item>
-            {testId && (
-              <Menu.Item data-cy="test-edit-button" key="edit">
-                <Link to={`/test/${testId}/edit`}>Edit Test</Link>
-              </Menu.Item>
-            )}
             <Menu.Item
               data-cy="test-delete-button"
               onClick={({domEvent}) => {

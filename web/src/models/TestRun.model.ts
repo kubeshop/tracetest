@@ -1,7 +1,8 @@
-import {TRawAssertionResults} from '../types/Assertion.types';
-import {TRawTestRun, TTestRun} from '../types/TestRun.types';
+import {TRawAssertionResults} from 'types/Assertion.types';
+import {TRawTestRun, TTestRun} from 'types/TestRun.types';
 import AssertionResults from './AssertionResults.model';
 import Trace from './Trace.model';
+import TriggerResult from './TriggerResult.model';
 
 const getTestResultCount = (
   {results: resultList = []}: TRawAssertionResults = {},
@@ -38,7 +39,7 @@ const TestRun = ({
   result,
   lastErrorState,
   trigger,
-  triggerResult,
+  triggerResult: rawTriggerResult,
   testVersion = 1,
   executionTime = 0,
   obtainedTraceAt = '',
@@ -52,7 +53,7 @@ const TestRun = ({
     executionTime,
     lastErrorState,
     trigger,
-    triggerResult,
+    triggerResult: rawTriggerResult ? TriggerResult(rawTriggerResult) : undefined,
     createdAt,
     completedAt,
     result: AssertionResults(result!),

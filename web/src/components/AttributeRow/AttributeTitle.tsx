@@ -4,10 +4,10 @@ import {Text, TextContainer} from './AttributeRow.styled';
 
 interface IProps {
   title: string;
-  searchText: string;
+  searchText?: string;
 }
 
-export default ({searchText, title}: IProps): JSX.Element => {
+export default ({searchText = '', title}: IProps): JSX.Element => {
   const textContainer = (
     <TextContainer>
       <Text type="secondary">

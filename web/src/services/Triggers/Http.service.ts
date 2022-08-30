@@ -1,5 +1,6 @@
-import {IHttpValues, ITriggerService, TRawHTTPRequest} from 'types/Test.types';
+import {IHttpValues, ITriggerService, THTTPRequest, TRawHTTPRequest} from 'types/Test.types';
 import Validator from 'utils/Validator';
+import {HTTP_METHOD} from '../../constants/Common.constants';
 
 const HttpTriggerService = (): ITriggerService => ({
   async getRequest(values): Promise<TRawHTTPRequest> {
@@ -14,6 +15,18 @@ const HttpTriggerService = (): ITriggerService => ({
     const isValid = Validator.required(url) && Validator.required(method) && Validator.url(url);
 
     return isValid;
+  },
+
+  getInitialValues(request) {
+    const {url, method, headers, body, auth} = request as THTTPRequest;
+
+    return {
+      url,
+      auth,
+      method: method as HTTP_METHOD,
+      headers,
+      body,
+    };
   },
 });
 

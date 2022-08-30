@@ -23,6 +23,14 @@ export type THTTPRequest = Model<
   }
 >;
 
+export type TRawTriggerResult = TTriggerSchemas['TriggerResult'];
+export type TTriggerResult = {
+  type: TriggerTypes;
+  headers: Model<TRawHeader, {}>[];
+  body: string;
+  statusCode: number;
+};
+
 export type TRawGRPCRequest = TGrpcSchemas['GRPCRequest'];
 export type TGRPCRequest = Model<
   TRawGRPCRequest,
@@ -96,6 +104,7 @@ export type TDraftTestForm<T = TTestRequestDetailsValues> = FormInstance<TDraftT
 export interface ITriggerService {
   getRequest(values: TDraftTest): Promise<TTriggerRequest>;
   validateDraft(draft: TDraftTest): Promise<boolean>;
+  getInitialValues?(draft: TTriggerRequest): TDraftTest;
 }
 
 export interface ICreateTestState {
