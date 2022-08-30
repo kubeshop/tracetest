@@ -254,8 +254,8 @@ jobs:
       - name: Build CLI
         run: |
           cd cli
-          make build
-          cp dist/tracetest_linux_386/tracetest ../../cli
+          go build -o ./cli main.go
+          cp ./cli ../../cli
 
       - name: Forward port
         run: |
