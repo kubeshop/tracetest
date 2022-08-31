@@ -27,8 +27,3 @@ export const FailedIcon = styled(CloseCircleFilled)`
 export const TextContainer = styled(Container)`
   margin-bottom: 26px;
 `;
-
-export const ButtonContainer = styled.div`
-  display: flex;
-  gap: 8px;
-`;

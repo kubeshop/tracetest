@@ -1,5 +1,5 @@
 import {parse, NamespaceBase, Service} from 'protobufjs';
-import {IRpcValues, ITriggerService} from 'types/Test.types';
+import {IRpcValues, ITriggerService, TGRPCRequest} from 'types/Test.types';
 import Validator from 'utils/Validator';
 
 interface IRpcTriggerService extends ITriggerService {
@@ -44,6 +44,20 @@ const RpcTriggerService = (): IRpcTriggerService => ({
       method,
       metadata: parsedMetadata,
       protobufFile,
+    };
+  },
+
+  getInitialValues(request) {
+    const {address: url, method, metadata, request: message, auth, protobufFile} = request as TGRPCRequest;
+    const protoFile = new File([protobufFile], 'file.proto');
+
+    return {
+      url,
+      auth,
+      method,
+      message,
+      metadata,
+      protoFile,
     };
   },
 });

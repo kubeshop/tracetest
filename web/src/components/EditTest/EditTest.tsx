@@ -1,7 +1,6 @@
 import {useNavigate} from 'react-router-dom';
 import {useTour} from '@reactour/tour';
 import {Button, Form} from 'antd';
-import CreateTestHeader from 'components/CreateTestHeader';
 import {useCallback} from 'react';
 import {useEditTestMutation, useRunTestMutation} from 'redux/apis/TraceTest.api';
 import {TDraftTest, TTest} from 'types/Test.types';
@@ -10,12 +9,13 @@ import TestService from 'services/Test.service';
 import useValidateTestDraft from 'hooks/useValidateTestDraft';
 import {TriggerTypeToPlugin} from 'constants/Plugins.constants';
 import * as S from './EditTest.styled';
+import {useTestDefinition} from '../../providers/TestDefinition/TestDefinition.provider';
 
 interface IProps {
   test: TTest;
 }
 
-const EditTestContent = ({test}: IProps) => {
+const EditTest = ({test}: IProps) => {
   const navigate = useNavigate();
 
   const {setIsOpen} = useTour();
@@ -23,6 +23,7 @@ const EditTestContent = ({test}: IProps) => {
   const [runTest, {isLoading: isLoadingRunTest}] = useRunTestMutation();
   const plugin = TriggerTypeToPlugin[test.trigger.type];
 
+  const {updateIsInitialized} = useTestDefinition();
   const {isValid, onValidate} = useValidateTestDraft({pluginName: plugin.name, isDefaultValid: true});
 
   const isLoading = isLoadingCreateTest || isLoadingRunTest;
@@ -30,6 +31,7 @@ const EditTestContent = ({test}: IProps) => {
 
   const handleOnSubmit = useCallback(
     async (values: TDraftTest) => {
+      updateIsInitialized(false);
       const rawTest = await TestService.getRequest(plugin, values, test);
 
       await editTest({
@@ -42,15 +44,18 @@ const EditTestContent = ({test}: IProps) => {
 
       navigate(`/test/${test.id}/run/${run.id}`);
     },
-    [editTest, navigate, plugin, runTest, setIsOpen, test]
+    [editTest, navigate, plugin, runTest, setIsOpen, test, updateIsInitialized]
   );
 
   return (
     <S.Wrapper data-cy="edit-test-form">
-      <CreateTestHeader onBack={() => navigate('/')} title="Edit Test" />
       <S.FormContainer>
+        <S.Title>Edit Test</S.Title>
         <EditTestForm form={form} test={test} onSubmit={handleOnSubmit} onValidation={onValidate} />
         <S.ButtonsContainer>
+          <Button data-cy="edit-test-reset" onClick={() => form.resetFields()}>
+            Reset
+          </Button>
           <Button
             data-cy="edit-test-submit"
             loading={isLoading}
@@ -58,7 +63,7 @@ const EditTestContent = ({test}: IProps) => {
             type="primary"
             onClick={() => form.submit()}
           >
-            Save
+            Save & Run
           </Button>
         </S.ButtonsContainer>
       </S.FormContainer>
@@ -66,4 +71,4 @@ const EditTestContent = ({test}: IProps) => {
   );
 };
 
-export default EditTestContent;
+export default EditTest;

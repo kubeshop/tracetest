@@ -1,3 +1,8 @@
+import {
+  OtelReference,
+  OtelReferenceModel,
+} from 'components/TestSpecForm/hooks/useGetOTELSemanticConventionAttributesInfo';
+import AttributesTags from 'constants/AttributesTags.json';
 import {SemanticGroupNames} from 'constants/SemanticGroupNames.constants';
 import {
   SectionNames,
@@ -10,6 +15,7 @@ import {isEmpty, remove} from 'lodash';
 import {TSpanFlatAttribute} from 'types/Span.types';
 import {isJson} from 'utils/Common';
 
+const attributesTags: Record<string, OtelReferenceModel> = AttributesTags;
 const flatAttributes = Object.values(Attributes);
 const flatTraceTestAttributes = Object.values(TraceTestAttributes);
 
@@ -76,6 +82,9 @@ const SpanAttributeService = () => ({
     const customList = getCustomAttributeList(attributeList);
 
     return blackListFiltered.concat(customList).filter(attr => !isJson(attr.value) && !isEmpty(attr));
+  },
+  referencePicker(reference: OtelReference, key: string): OtelReferenceModel {
+    return reference[key] || attributesTags[key] || {description: '', tags: []};
   },
 });
 

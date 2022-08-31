@@ -2,10 +2,10 @@ import {Tabs, TabsProps} from 'antd';
 import {useMemo} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 
-import FailedTrace from 'components/FailedTrace';
 import RunDetailTest from 'components/RunDetailTest';
 import RunDetailTrace from 'components/RunDetailTrace';
-import {RunDetailModes, TestState as TestStateEnum} from 'constants/TestRun.constants';
+import RunDetailTrigger from 'components/RunDetailTrigger';
+import {RunDetailModes} from 'constants/TestRun.constants';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import {TTest} from 'types/Test.types';
 import HeaderLeft from './HeaderLeft';
@@ -22,11 +22,10 @@ const renderTabBar: TabsProps['renderTabBar'] = (props, DefaultTabBar) => (
   </S.ContainerHeader>
 );
 
-const RunDetailLayout = ({test: {id, name, trigger, version = 1}}: IProps) => {
+const RunDetailLayout = ({test: {id, name, trigger, version = 1}, test}: IProps) => {
   const navigate = useNavigate();
   const {mode = RunDetailModes.TRIGGER} = useParams();
   const {isError, run} = useTestRun();
-  const shouldDisplayError = isError || run.state === TestStateEnum.FAILED;
 
   const tabBarExtraContent = useMemo(
     () => ({
@@ -38,29 +37,25 @@ const RunDetailLayout = ({test: {id, name, trigger, version = 1}}: IProps) => {
 
   return (
     <S.Container>
-      <FailedTrace isDisplayingError={shouldDisplayError} run={run} testId={id} />
-
-      {!shouldDisplayError && (
-        <Tabs
-          activeKey={mode}
-          centered
-          onChange={activeKey => {
-            navigate(`/test/${id}/run/${run.id}/${activeKey}`);
-          }}
-          renderTabBar={renderTabBar}
-          tabBarExtraContent={tabBarExtraContent}
-        >
-          <Tabs.TabPane tab="Trigger" key={RunDetailModes.TRIGGER}>
-            Trigger
-          </Tabs.TabPane>
-          <Tabs.TabPane tab="Trace" key={RunDetailModes.TRACE}>
-            <RunDetailTrace run={run} testId={id} />
-          </Tabs.TabPane>
-          <Tabs.TabPane tab="Test" key={RunDetailModes.TEST}>
-            <RunDetailTest run={run} testId={id} />
-          </Tabs.TabPane>
-        </Tabs>
-      )}
+      <Tabs
+        activeKey={mode}
+        centered
+        onChange={activeKey => {
+          navigate(`/test/${id}/run/${run.id}/${activeKey}`);
+        }}
+        renderTabBar={renderTabBar}
+        tabBarExtraContent={tabBarExtraContent}
+      >
+        <Tabs.TabPane tab="Trigger" key={RunDetailModes.TRIGGER}>
+          <RunDetailTrigger test={test} run={run} isError={isError} />
+        </Tabs.TabPane>
+        <Tabs.TabPane tab="Trace" key={RunDetailModes.TRACE}>
+          <RunDetailTrace run={run} testId={id} />
+        </Tabs.TabPane>
+        <Tabs.TabPane tab="Test" key={RunDetailModes.TEST}>
+          <RunDetailTest run={run} testId={id} />
+        </Tabs.TabPane>
+      </Tabs>
     </S.Container>
   );
 };

@@ -10,13 +10,14 @@ import {
   updateDefinition,
   reset as resetAction,
   revertDefinition,
+  setIsInitialized,
 } from 'redux/slices/TestDefinition.slice';
 import {TAssertionResults} from 'types/Assertion.types';
 import {TTestDefinitionEntry} from 'types/TestDefinition.types';
 import TestRunGateway from 'gateways/TestRun.gateway';
 import useBlockNavigation from 'hooks/useBlockNavigation';
 import RouterActions from 'redux/actions/Router.actions';
-import { RouterSearchFields } from 'constants/Common.constants';
+import {RouterSearchFields} from 'constants/Common.constants';
 
 interface IProps {
   runId: string;
@@ -89,11 +90,18 @@ const useTestDefinitionCrud = ({runId, testId, isDraftMode}: IProps) => {
     [dispatch]
   );
 
+  const updateIsInitialized = useCallback(
+    isInitialized => {
+      dispatch(setIsInitialized({isInitialized}));
+    },
+    [dispatch]
+  );
+
   const reset = useCallback(() => {
     dispatch(resetAction());
   }, [dispatch]);
 
-  return {revert, init, reset, add, remove, update, publish, runTest, cancel, dryRun};
+  return {revert, init, updateIsInitialized, reset, add, remove, update, publish, runTest, cancel, dryRun};
 };
 
 export default useTestDefinitionCrud;

@@ -2,7 +2,6 @@ package actions
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -13,6 +12,7 @@ import (
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/definition"
 	"github.com/kubeshop/tracetest/cli/file"
+	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/kubeshop/tracetest/cli/variable"
 	"go.uber.org/zap"
@@ -73,12 +73,12 @@ func (a runTestAction) Run(ctx context.Context, args RunTestConfig) error {
 		return fmt.Errorf("could not run definition: %w", err)
 	}
 
-	bytes, err := json.Marshal(output)
-	if err != nil {
-		return fmt.Errorf("could not marshal output json: %w", err)
+	allPassed := output.Run.Result.AllPassed
+	if allPassed == nil || !*allPassed {
+		// It failed, so we have to return an error status
+		os.Exit(1)
 	}
 
-	fmt.Print(string(bytes))
 	return nil
 }
 
@@ -132,6 +132,10 @@ func (a runTestAction) runDefinition(ctx context.Context, params runTestParams) 
 		if err := a.saveJUnitFile(ctx, definition.Id, *testRun.Id, params.JunitFile); err != nil {
 			return runTestOutput{}, fmt.Errorf("could not save junit file: %w", err)
 		}
+
+		formatter := formatters.NewTestRunFormatter(a.config, true)
+		formattedOutput := formatter.FormatTestRunOutput(test, testRun)
+		fmt.Print(formattedOutput)
 	}
 
 	return runTestOutput{

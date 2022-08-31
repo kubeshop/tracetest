@@ -7,7 +7,7 @@ interface IProps {
   title: string;
 }
 
-export default ({title, searchText = ''}: IProps): JSX.Element => {
+const AttributeTitle = ({searchText = '', title}: IProps) => {
   const textContainer = (
     <TextContainer>
       <Text type="secondary">
@@ -15,6 +15,7 @@ export default ({title, searchText = ''}: IProps): JSX.Element => {
       </Text>
     </TextContainer>
   );
+
   return title.length > 26 ? (
     <Tooltip title={title} arrowContent={null}>
       {textContainer}
@@ -23,3 +24,5 @@ export default ({title, searchText = ''}: IProps): JSX.Element => {
     textContainer
   );
 };
+
+export default AttributeTitle;

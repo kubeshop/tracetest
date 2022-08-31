@@ -168,7 +168,7 @@ jobs:
           --wait --timeout 10m
 
   e2e:
-    needs: deploy
+    needs: [deploy, trace-testing]
     name: Run e2e tests
     runs-on: ubuntu-latest
     strategy:

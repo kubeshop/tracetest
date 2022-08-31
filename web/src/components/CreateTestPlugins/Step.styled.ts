@@ -11,6 +11,14 @@ export const Step = styled.div`
 
 export const FormContainer = styled.div`
   height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 23px;
+  margin-bottom: 24px;
+
+  .ant-form-item {
+    margin: 0;
+  }
 `;
 
 export const Title = styled(Typography.Title).attrs({level: 2})`

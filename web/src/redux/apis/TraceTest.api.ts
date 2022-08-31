@@ -43,10 +43,7 @@ const TraceTestAPI = createApi({
         method: HTTP_METHOD.PUT,
         body: test,
       }),
-      invalidatesTags: test => [
-        {type: Tags.TEST, id: 'LIST'},
-        {type: Tags.TEST, id: test?.id},
-      ],
+      invalidatesTags: test => [{type: Tags.TEST, id: 'LIST'}, {type: Tags.TEST, id: test?.id}],
     }),
     getTestList: build.query<TTest[], {take?: number; skip?: number; query?: string}>({
       query: ({take = 25, skip = 0, query = ''}) => `/tests?take=${take}&skip=${skip}&query=${query}`,

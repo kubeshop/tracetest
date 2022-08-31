@@ -1,5 +1,6 @@
 import {TAssertionResults} from './Assertion.types';
 import {Model, TTestSchemas, TTriggerSchemas} from './Common.types';
+import {TTriggerResult} from './Test.types';
 import {TTrace} from './Trace.types';
 
 export type TRawTestRun = TTestSchemas['TestRun'];
@@ -15,7 +16,7 @@ export type TTestRun = Model<
     executionTime: number;
     lastErrorState?: string;
     trigger?: TTriggerSchemas['Trigger'];
-    triggerResult?: TTriggerSchemas['TriggerResult'];
+    triggerResult?: TTriggerResult;
   }
 >;
 
