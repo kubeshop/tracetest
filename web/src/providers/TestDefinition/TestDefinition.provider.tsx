@@ -22,6 +22,7 @@ interface IContext {
   runTest(): void;
   cancel(): void;
   dryRun(definitionList: TTestDefinitionEntry[]): void;
+  updateIsInitialized(isInitialized: boolean): void;
   assertionResults?: TAssertionResults;
   definitionList: TTestDefinitionEntry[];
   isLoading: boolean;
@@ -45,6 +46,7 @@ export const Context = createContext<IContext>({
   isDraftMode: false,
   definitionList: [],
   setSelectedAssertion: noop,
+  updateIsInitialized: noop,
 });
 
 interface IProps {
@@ -65,11 +67,12 @@ const TestDefinitionProvider = ({children, testId, runId}: IProps) => {
   const isInitialized = useAppSelector(state => TestDefinitionSelectors.selectIsInitialized(state));
   const {data: test} = useGetTestByIdQuery({testId});
 
-  const {add, cancel, publish, runTest, remove, dryRun, update, init, reset, revert} = useTestDefinitionCrud({
-    testId,
-    runId,
-    isDraftMode,
-  });
+  const {add, cancel, publish, runTest, remove, dryRun, update, init, reset, revert, updateIsInitialized} =
+    useTestDefinitionCrud({
+      testId,
+      runId,
+      isDraftMode,
+    });
 
   useEffect(() => {
     if (run.state === 'FINISHED') init(run.result);
@@ -115,6 +118,7 @@ const TestDefinitionProvider = ({children, testId, runId}: IProps) => {
       test,
       setSelectedAssertion,
       revert,
+      updateIsInitialized,
     }),
     [
       add,
@@ -131,6 +135,7 @@ const TestDefinitionProvider = ({children, testId, runId}: IProps) => {
       test,
       setSelectedAssertion,
       revert,
+      updateIsInitialized,
     ]
   );
 

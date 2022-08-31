@@ -24,5 +24,6 @@ declare namespace Cypress {
     fillCreateFormBasicStep(name: string, description?: string): Chainable<Element>;
     setCreateFormUrl(method: string, url: string): Chainable<Element>;
     selectRunDetailMode(index: number): Chainable<Element>;
+    interceptEditTestCall(): Chainable<Element>;
   }
 }

@@ -39,6 +39,9 @@ const testDefinitionSlice = createSlice<ITestDefinitionState, TTestDefinitionSli
       state.isInitialized = true;
       state.isDraftMode = false;
     },
+    setIsInitialized(state, {payload: {isInitialized}}) {
+      state.isInitialized = isInitialized;
+    },
     addDefinition(state, {payload: {definition}}) {
       state.isDraftMode = true;
       state.definitionList = [...state.definitionList, definition];
@@ -137,5 +140,6 @@ export const {
   revertDefinition,
   reset,
   setSelectedAssertion,
+  setIsInitialized,
 } = testDefinitionSlice.actions;
 export default testDefinitionSlice.reducer;

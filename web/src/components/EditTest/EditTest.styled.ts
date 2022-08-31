@@ -1,4 +1,13 @@
+import {Typography} from 'antd';
 import styled from 'styled-components';
+
+export const Title = styled(Typography.Title)`
+  && {
+    font-size: ${({theme}) => theme.size.lg};
+    margin-bottom: 25px;
+    font-weight: 700;
+  }
+`;
 
 export const Wrapper = styled.div`
   display: flex;
@@ -8,13 +17,11 @@ export const Wrapper = styled.div`
 
 export const FormContainer = styled.div`
   padding: 24px;
-  display: grid;
-  grid-template-columns: 750px;
-  justify-content: center;
 `;
 
 export const ButtonsContainer = styled.div`
   display: flex;
   justify-content: flex-end;
   gap: 8px;
+  margin-top: 23px;
 `;

@@ -16,12 +16,21 @@ export type TRawGRPCHeader = TGrpcSchemas['GRPCHeader'];
 export type TTriggerType = Required<TTriggerSchemas['Trigger']['triggerType']>;
 
 export type TRawHTTPRequest = THttpSchemas['HTTPRequest'];
+export type THeader = Model<TRawHeader, {}>;
 export type THTTPRequest = Model<
   TRawHTTPRequest,
   {
-    headers: Model<TRawHeader, {}>[];
+    headers: THeader[];
   }
 >;
+
+export type TRawTriggerResult = TTriggerSchemas['TriggerResult'];
+export type TTriggerResult = {
+  type: TriggerTypes;
+  headers?: THeader[];
+  body?: string;
+  statusCode: number;
+};
 
 export type TRawGRPCRequest = TGrpcSchemas['GRPCRequest'];
 export type TGRPCRequest = Model<
@@ -96,6 +105,7 @@ export type TDraftTestForm<T = TTestRequestDetailsValues> = FormInstance<TDraftT
 export interface ITriggerService {
   getRequest(values: TDraftTest): Promise<TTriggerRequest>;
   validateDraft(draft: TDraftTest): Promise<boolean>;
+  getInitialValues?(draft: TTriggerRequest): TDraftTest;
 }
 
 export interface ICreateTestState {
