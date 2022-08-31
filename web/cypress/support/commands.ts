@@ -1,7 +1,7 @@
 import 'cypress-file-upload';
 import {camelCase} from 'lodash';
 import {Plugins} from '../../src/constants/Plugins.constants';
-import {getTestId} from '../integration/utils/Common';
+import {getTestId} from '../e2e/utils/Common';
 
 export const testRunPageRegex = /\/test\/(.*)\/run\/(.*)/;
 export const getAttributeListId = (number: number) => `#assertion-form_assertions_${number}_attribute_list`;
@@ -31,8 +31,8 @@ Cypress.Commands.add('deleteTest', (shoudlIntercept = false) => {
     if (shoudlIntercept) {
       cy.inteceptHomeApiCall();
     }
-    cy.visit(`http://localhost:3000`);
-    cy.wait('@testList');
+    cy.visit(`/`);
+    // cy.wait('@testList');
     cy.get('[data-cy=test-list]').should('exist', {timeout: 10000});
     cy.get(`[data-cy=test-actions-button-${localTestId}]`, {timeout: 10000}).should('be.visible');
     cy.get(`[data-cy=test-actions-button-${localTestId}]`).click({force: true});
@@ -40,7 +40,7 @@ Cypress.Commands.add('deleteTest', (shoudlIntercept = false) => {
     cy.get('[data-cy=delete-confirmation-modal] .ant-btn-primary').click();
     cy.wait('@testDelete');
     cy.get(`[data-cy=test-actions-button-${localTestId}]`).should('not.exist');
-    cy.wait('@testList');
+    // cy.wait('@testList');
   });
 });
 
@@ -96,7 +96,7 @@ Cypress.Commands.add('matchTestRunPageUrl', () => {
 
 Cypress.Commands.add('goToTestDetailPageAndRunTest', (pathname: string) => {
   const testId = getTestId(pathname);
-  cy.visit(`http://localhost:3000/test/${testId}`);
+  cy.visit(`/test/${testId}`);
   cy.get('[data-cy^=result-card]', {timeout: 10000}).first().click();
   cy.makeSureUserIsOnTestDetailPage();
   cy.get(`[data-cy^=test-run-result-]`).first().click();

@@ -1,0 +1,24 @@
+import {defineConfig} from 'cypress';
+
+export default defineConfig({
+  viewportWidth: 1440,
+  viewportHeight: 1080,
+  responseTimeout: 30000,
+  pageLoadTimeout: 20000,
+  projectId: '6dm1if',
+  requestTimeout: 30000,
+  e2e: {
+    // We've imported your old cypress plugins here.
+    // You may want to clean this up later by importing these.
+    setupNodeEvents(on, config) {
+      // eslint-disable-next-line global-require
+      return require('./cypress/plugins/index.js')(on, config);
+    },
+    specPattern: 'cypress/e2e/**/*.spec.{js,ts,jsx,tsx}',
+    baseUrl: 'http://localhost:3000',
+  },
+  component: {
+    setupNodeEvents() {},
+    specPattern: 'cypress/components/**/*.spec.{js,ts,jsx,tsx}',
+  },
+});
