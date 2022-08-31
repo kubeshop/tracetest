@@ -182,9 +182,9 @@ func getCollectorConfigFileContents(ui UI, config configuration) []byte {
 	case "opensearch":
 		exporter = "otlp/2"
 		exporters["otlp/2"] = msa{
-			"endpoint": config.String("tracetest.backend.endpoint"),
+			"endpoint": config.String("tracetest.backend.data-prepper.endpoint"),
 			"tls": msa{
-				"insecure":             config.Bool("tracetest.backend.tls.insecure"),
+				"insecure":             config.Bool("tracetest.backend.data-prepper.insecure"),
 				"insecure_skip_verify": true,
 			},
 		}

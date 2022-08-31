@@ -26,10 +26,14 @@ generate-client:
 	go fmt ./...; cd ..
 
 build:
+ifeq (, $(shell which goreleaser))
+	go install github.com/goreleaser/goreleaser@latest
+endif
 	VERSION=$(VERSION) \
 	TRACETEST_ENV=$(TRACETEST_ENV) \
 	ANALYTICS_BE_KEY=$(ANALYTICS_BE_KEY) \
 	goreleaser --rm-dist --snapshot -f ../.goreleaser.yaml
+
 
 test: mockserver
 	@go test -coverprofile=coverage.out ./...
