@@ -1,4 +1,4 @@
-import {TRawTest, TTest, TDraftTest} from 'types/Test.types';
+import {TRawTest, TTest, TDraftTest, TTriggerRequest} from 'types/Test.types';
 import {SupportedPlugins} from 'constants/Plugins.constants';
 import {IPlugin} from 'types/Plugins.types';
 import TestDefinitionService from './TestDefinition.service';
@@ -6,6 +6,7 @@ import Validator from '../utils/Validator';
 import GrpcService from './Triggers/Grpc.service';
 import HttpService from './Triggers/Http.service';
 import PostmanService from './Triggers/Postman.service';
+import {TriggerTypes} from '../constants/Test.constants';
 
 const authValidation = ({auth}: TDraftTest): boolean => {
   switch (auth?.type) {
@@ -32,6 +33,11 @@ const TriggerServiceMap = {
   [SupportedPlugins.Postman]: PostmanService,
 } as const;
 
+const TriggerServiceByTypeMap = {
+  [TriggerTypes.grpc]: GrpcService,
+  [TriggerTypes.http]: HttpService,
+} as const;
+
 const TestService = () => ({
   async getRequest({type, name: pluginName}: IPlugin, draft: TDraftTest, original?: TTest): Promise<TRawTest> {
     const {name, description} = draft;
@@ -49,8 +55,8 @@ const TestService = () => ({
       },
       ...(original
         ? {
-            definition: {
-              definitions: original.definition.definitionList.map(def => TestDefinitionService.toRaw(def)),
+            specs: {
+              specs: original.definition.definitionList.map(def => TestDefinitionService.toRaw(def)),
             },
           }
         : {}),
@@ -62,6 +68,12 @@ const TestService = () => ({
     const isTriggerValid = await triggerService.validateDraft(draft);
 
     return (isBasicDetails && basicDetailsValidation(draft)) || (isTriggerValid && authValidation(draft));
+  },
+
+  getInitialValues(type: TriggerTypes, trigger: TTriggerRequest) {
+    const triggerService = TriggerServiceByTypeMap[type];
+
+    return triggerService.getInitialValues!(trigger);
   },
 });
 

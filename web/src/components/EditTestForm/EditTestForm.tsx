@@ -1,5 +1,7 @@
 import {Form} from 'antd';
+import {useMemo} from 'react';
 import {TDraftTest, TDraftTestForm, TTest} from 'types/Test.types';
+import TestService from '../../services/Test.service';
 import BasicDetailsForm from '../CreateTestPlugins/Default/steps/BasicDetails/BasicDetailsForm';
 import EditRequestDetails from './EditRequestDetails/EditRequestDetails';
 import * as S from './EditTestForm.styled';
@@ -23,6 +25,16 @@ const EditTestForm = ({
   },
   onValidation,
 }: IProps) => {
+  const initialValues = useMemo(
+    () => ({
+      name,
+      description,
+      type,
+      ...TestService.getInitialValues(type, request),
+    }),
+    [description, name, request, type]
+  );
+
   return (
     <Form<TDraftTest>
       autoComplete="off"
@@ -32,18 +44,13 @@ const EditTestForm = ({
       name={FORM_ID}
       onFinish={onSubmit}
       onValuesChange={onValidation}
-      initialValues={{
-        name,
-        description,
-        type,
-      }}
+      initialValues={initialValues}
     >
-      <S.FormSection>
-        <S.FormSectionTitle>Basic Details</S.FormSectionTitle>
+      <S.FormContainer>
         <BasicDetailsForm isEditing />
-      </S.FormSection>
 
-      <EditRequestDetails form={form} type={type} request={request} />
+        <EditRequestDetails form={form} type={type} request={request} />
+      </S.FormContainer>
     </Form>
   );
 };

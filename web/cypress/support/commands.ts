@@ -34,7 +34,7 @@ Cypress.Commands.add('deleteTest', (shoudlIntercept = false) => {
     cy.visit(`http://localhost:3000`);
     cy.wait('@testList');
     cy.get('[data-cy=test-list]').should('exist', {timeout: 10000});
-    cy.get(`[data-cy=test-actions-button-${localTestId}]`).should('be.visible');
+    cy.get(`[data-cy=test-actions-button-${localTestId}]`, {timeout: 10000}).should('be.visible');
     cy.get(`[data-cy=test-actions-button-${localTestId}]`).click({force: true});
     cy.get('[data-cy=test-card-delete]').click();
     cy.get('[data-cy=delete-confirmation-modal] .ant-btn-primary').click();
@@ -53,6 +53,10 @@ Cypress.Commands.add('interceptTracePageApiCalls', () => {
   cy.intercept({method: 'GET', url: '/api/tests/**/run/**'}).as('testRun');
   cy.intercept({method: 'GET', url: '/api/tests/**'}).as('testObject');
   cy.intercept({method: 'PUT', url: '/api/tests/**/run/**/dry-run'}).as('testRuns');
+});
+
+Cypress.Commands.add('interceptEditTestCall', () => {
+  cy.intercept({method: 'PUT', url: '/api/tests/*'}).as('testEdit');
 });
 
 Cypress.Commands.add('inteceptHomeApiCall', () => {
@@ -142,12 +146,14 @@ Cypress.Commands.add('createTestByName', (name: string) => {
   cy.get('[data-cy=test-details-name]').should('have.text', `${name} (v1)`);
 });
 
-Cypress.Commands.add('editTestByTestId', (testId: string) => {
-  cy.get(`[data-cy=test-actions-button-${testId}]`).click();
-  cy.get('[data-cy=test-card-edit]').click();
+Cypress.Commands.add('editTestByTestId', () => {
+  cy.interceptEditTestCall();
   cy.get('[data-cy=edit-test-form]').should('be.visible');
   cy.get('[data-cy=create-test-name-input] input').clear().type('Edited Test');
   cy.get('[data-cy=edit-test-submit]').click();
+  cy.wait('@testEdit');
+  cy.wait('@testObject');
+  cy.wait('@testRun');
   cy.get('[data-cy=test-details-name]').should('have.text', `Edited Test (v2)`);
   cy.matchTestRunPageUrl();
 });

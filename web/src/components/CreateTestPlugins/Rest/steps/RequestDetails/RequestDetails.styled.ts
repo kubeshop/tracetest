@@ -8,6 +8,10 @@ export const Row = styled.div`
 export const URLInputContainer = styled.div`
   display: flex;
   align-items: end;
+
+  .ant-form-item {
+    margin: 0;
+  }
 `;
 
 export const HeaderContainer = styled.div`

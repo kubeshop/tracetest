@@ -10,6 +10,7 @@ import {
   updateDefinition,
   reset as resetAction,
   revertDefinition,
+  setIsInitialized,
 } from 'redux/slices/TestDefinition.slice';
 import {TAssertionResults} from 'types/Assertion.types';
 import {TTestDefinitionEntry} from 'types/TestDefinition.types';
@@ -97,11 +98,18 @@ const useTestDefinitionCrud = ({runId, testId, isDraftMode}: IProps) => {
     [dispatch]
   );
 
+  const updateIsInitialized = useCallback(
+    isInitialized => {
+      dispatch(setIsInitialized({isInitialized}));
+    },
+    [dispatch]
+  );
+
   const reset = useCallback(() => {
     dispatch(resetAction());
   }, [dispatch]);
 
-  return {revert, init, reset, add, remove, update, publish, runTest, cancel, dryRun};
+  return {revert, init, updateIsInitialized, reset, add, remove, update, publish, runTest, cancel, dryRun};
 };
 
 export default useTestDefinitionCrud;

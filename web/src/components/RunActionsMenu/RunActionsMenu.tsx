@@ -1,5 +1,4 @@
 import {Dropdown, Menu} from 'antd';
-import {Link} from 'react-router-dom';
 import useDeleteTestRun from '../../hooks/useDeleteTestRun';
 import {useFileViewerModal} from '../FileViewerModal/FileViewerModal.provider';
 import * as S from './RunActionsMenu.styled';
@@ -31,11 +30,6 @@ const RunActionsMenu = ({resultId, testId, testVersion, isRunView = false}: IPro
             >
               Test Definition
             </Menu.Item>
-            {testId && (
-              <Menu.Item data-cy="test-edit-button" key="edit">
-                <Link to={`/test/${testId}/edit`}>Edit Test</Link>
-              </Menu.Item>
-            )}
             <Menu.Item
               data-cy="test-delete-button"
               onClick={({domEvent}) => {
