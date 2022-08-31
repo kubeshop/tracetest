@@ -1,5 +1,5 @@
 id: 8540b712-8ad6-48f0-a261-457c7da68921
-name: gRPC Test Create
+name: gRPC Test Create with invalid metadata
 description: ""
 trigger:
   type: http
