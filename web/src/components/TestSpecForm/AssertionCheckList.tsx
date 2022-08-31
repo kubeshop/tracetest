@@ -1,15 +1,13 @@
 import {PlusOutlined} from '@ant-design/icons';
-import {FormInstance, Select} from 'antd';
+import {FormInstance} from 'antd';
 import {FormListFieldData} from 'antd/lib/form/FormList';
-import {uniqBy} from 'lodash';
-import {useMemo} from 'react';
+import CreateAssertionModalAnalyticsService from '../../services/Analytics/CreateAssertionModalAnalytics.service';
 import {TAssertion} from '../../types/Assertion.types';
 import {TSpanFlatAttribute} from '../../types/Span.types';
-import {IValues} from './TestSpecForm';
 import {AssertionCheck} from './AssertionCheck';
-import * as S from './TestSpecForm.styled';
-import CreateAssertionModalAnalyticsService from '../../services/Analytics/CreateAssertionModalAnalytics.service';
 import {useGetOTELSemanticConventionAttributesInfo} from './hooks/useGetOTELSemanticConventionAttributesInfo';
+import {IValues} from './TestSpecForm';
+import * as S from './TestSpecForm.styled';
 
 interface IProps {
   form: FormInstance<IValues>;
@@ -25,13 +23,6 @@ interface IProps {
 
 const AssertionCheckList: React.FC<IProps> = ({form, fields, add, remove, attributeList, assertionList}) => {
   const reference = useGetOTELSemanticConventionAttributesInfo();
-  const attributeOptionList = useMemo(() => {
-    return uniqBy(attributeList, 'key').map(({key}) => (
-      <Select.Option key={key} value={key}>
-        {key}
-      </Select.Option>
-    ));
-  }, [attributeList]);
 
   return (
     <S.AssertionsContainer>
@@ -43,7 +34,7 @@ const AssertionCheckList: React.FC<IProps> = ({form, fields, add, remove, attrib
               form={form}
               remove={remove}
               field={field}
-              attributeOptionList={attributeOptionList}
+              attributeList={attributeList}
               name={name}
               index={index}
               assertionList={assertionList}

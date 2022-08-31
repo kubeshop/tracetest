@@ -2,17 +2,17 @@ import {Form, FormInstance, Input, Select} from 'antd';
 import {FormListFieldData} from 'antd/lib/form/FormList';
 import {capitalize} from 'lodash';
 import {useMemo} from 'react';
-
-import AttributesTags from '../../constants/AttributesTags.json';
 import {durationRegExp} from '../../constants/Common.constants';
 import {CompareOperator} from '../../constants/Operator.constants';
 import CreateAssertionModalAnalyticsService from '../../services/Analytics/CreateAssertionModalAnalytics.service';
 import OperatorService from '../../services/Operator.service';
 import {TAssertion} from '../../types/Assertion.types';
+import {TSpanFlatAttribute} from '../../types/Span.types';
+import {DurationFields} from './DurationFields';
+import {AttributeField} from './Fields/AttributeField';
+import {OtelReference} from './hooks/useGetOTELSemanticConventionAttributesInfo';
 import {IValues} from './TestSpecForm';
 import * as S from './TestSpecForm.styled';
-import {DurationFields} from './DurationFields';
-import {OtelReference} from './hooks/useGetOTELSemanticConventionAttributesInfo';
 
 const operatorList = Object.values(CompareOperator).map(value => ({
   value: OperatorService.getOperatorSymbol(value),
@@ -25,53 +25,17 @@ interface IProps {
   form: FormInstance<IValues>;
   field: Pick<FormListFieldData, never>;
   name: number;
-  attributeOptionList: JSX.Element[];
+  attributeList: TSpanFlatAttribute[];
   index: number;
   assertionList: TAssertion[];
 }
 
-export const AssertionCheck = ({
-  attributeOptionList,
-  field,
-  index,
-  name,
-  assertionList,
-  form,
-  remove,
-  reference,
-}: IProps) => {
+export const AssertionCheck = ({attributeList, field, index, name, assertionList, form, remove, reference}: IProps) => {
   const assertion = assertionList?.[index];
   const match = useMemo(() => assertion?.expected?.match(durationRegExp), [assertion?.expected]);
   return (
     <>
-      <Form.Item
-        {...field}
-        name={[name, 'attribute']}
-        style={{margin: 0}}
-        rules={[{required: true, message: 'Attribute is required'}]}
-        data-cy="assertion-check-attribute"
-        id="assertion-check-attribute"
-      >
-        <S.Select
-          style={{margin: 0}}
-          placeholder="Attribute"
-          showSearch
-          filterOption={(input, option) => {
-            const key = option?.key || '';
-            const attributesTags: Record<string, {tags: string[]; description: string}> = AttributesTags;
-            const ref = reference[key] || attributesTags[key] || {description: '', tags: []};
-            const availableTagsMatchInput = Boolean(
-              ref.tags.find(tag => tag.toString().toLowerCase().includes(input.toLowerCase()))
-            );
-            const currentOptionMatchInput = option?.key.includes(input);
-            const currentDescriptionMatchInput = ref?.description.includes(input);
-            return availableTagsMatchInput || currentOptionMatchInput || currentDescriptionMatchInput;
-          }}
-        >
-          {attributeOptionList}
-        </S.Select>
-      </Form.Item>
-
+      <AttributeField field={field} name={name} attributeList={attributeList} reference={reference} />
       <Form.Item
         {...field}
         style={{margin: 0}}
