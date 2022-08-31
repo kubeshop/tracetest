@@ -1,6 +1,6 @@
 import TestCardActions from 'components/TestCard/TestCardActions';
-import {useMenuDeleteCallback} from 'pages/Home/useMenuDeleteCallback';
 import {TTest} from 'types/Test.types';
+import useDeleteTest from 'hooks/useDeleteTest';
 import * as S from './TestHeader.styled';
 
 interface IProps {
@@ -9,7 +9,7 @@ interface IProps {
 }
 
 const TestHeader = ({onBack, test: {id, name, trigger, version = 1}, test}: IProps) => {
-  const onDelete = useMenuDeleteCallback();
+  const onDelete = useDeleteTest();
 
   return (
     <S.Container>

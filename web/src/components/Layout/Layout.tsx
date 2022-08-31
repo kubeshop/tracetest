@@ -1,5 +1,6 @@
 import {FC} from 'react';
 import useRouterSync from 'hooks/useRouterSync';
+import ConfirmationModalProvider from 'providers/ConfirmationModal';
 import * as S from './Layout.styled';
 import Header from '../Header';
 import FileViewerModalProvider from '../FileViewerModal/FileViewerModal.provider';
@@ -9,8 +10,10 @@ const Layout: FC = ({children}) => {
 
   return (
     <FileViewerModalProvider>
-      <Header />
-      <S.Content>{children}</S.Content>
+      <ConfirmationModalProvider>
+        <Header />
+        <S.Content>{children}</S.Content>
+      </ConfirmationModalProvider>
     </FileViewerModalProvider>
   );
 };
