@@ -67,10 +67,15 @@ func (a runTestAction) Run(ctx context.Context, args RunTestConfig) error {
 		JunitFile:      args.JUnit,
 		Metadata:       metadata,
 	}
-	_, err := a.runDefinition(ctx, params)
+	output, err := a.runDefinition(ctx, params)
 
 	if err != nil {
 		return fmt.Errorf("could not run definition: %w", err)
+	}
+
+	if *output.Run.State != "FINISHED" {
+		// It failed, so we have to return an error status
+		os.Exit(1)
 	}
 
 	return nil
