@@ -29,6 +29,10 @@ const traceSlice = createSlice({
       const {edges, nodes} = DAGModel(payload.spans);
       state.edges = edges;
       state.nodes = nodes;
+      // Clear state
+      state.matchedSpans = [];
+      state.searchText = '';
+      state.selectedSpan = '';
     },
     changeNodes(state, {payload}: PayloadAction<{changes: NodeChange[]}>) {
       state.nodes = applyNodeChanges(payload.changes, state.nodes);
