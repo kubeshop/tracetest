@@ -141,7 +141,7 @@ const TraceTestAPI = createApi({
     }),
     deleteRunById: build.mutation<TTest, {testId: string; runId: string}>({
       query: ({testId, runId}) => ({url: `/tests/${testId}/run/${runId}`, method: 'DELETE'}),
-      invalidatesTags: (result, error, {testId}) => [{type: Tags.TEST_RUN, id: `${testId}-LIST`}],
+      invalidatesTags: (result, error, {testId}) => [{type: Tags.TEST_RUN}, {type: Tags.TEST, id: `${testId}-LIST`}],
     }),
     getJUnitByRunId: build.query<string, {testId: string; runId: string}>({
       query: ({testId, runId}) => ({url: `/tests/${testId}/run/${runId}/junit.xml`, responseHandler: 'text'}),
