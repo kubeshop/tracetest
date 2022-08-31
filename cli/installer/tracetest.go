@@ -95,7 +95,8 @@ func configureBackendOptions(conf configuration, ui UI) configuration {
 			conf.set("tracetest.backend.type", "opensearch")
 			conf.set("tracetest.backend.addresses", ui.TextInput("Addresses (comma separated list)", "http://opensearch:9200"))
 			conf.set("tracetest.backend.index", ui.TextInput("Index", "traces"))
-			conf.set("tracetest.backend.data-prepper", ui.TextInput("Data Prepper", "data-prepper:21890"))
+			conf.set("tracetest.backend.data-prepper.endpoint", ui.TextInput("Data Prepper Endpont", "data-prepper:21890"))
+			conf.set("tracetest.backend.data-prepper.insecure", ui.Confirm("Insecure", true))
 		}},
 		{"SignalFX", func(ui UI) {
 			conf.set("tracetest.backend.type", "signalfx")
