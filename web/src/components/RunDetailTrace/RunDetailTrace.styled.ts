@@ -12,8 +12,9 @@ export const SearchContainer = styled.div`
 
 export const Section = styled.div`
   flex: 1;
-  z-index: 1;
+  overflow: hidden;
   width: 100%;
+  z-index: 1;
 `;
 
 export const VisualizationContainer = styled.div`

@@ -21,7 +21,7 @@ const Timeline = (props: IProps) => {
   return (
     <S.Container $showMatched={isMatchedMode}>
       <Navigation matchedSpans={matchedSpans} onNavigateToSpan={onNavigateToSpan} selectedSpan={selectedSpan} />
-      <ParentSize parentSizeStyles={{height: '100%', overflowY: 'scroll', paddingTop: 32}}>
+      <ParentSize parentSizeStyles={{height: '100%', overflowY: 'scroll', paddingTop: 32, width: '100%'}}>
         {({width}) => <Visualization {...props} width={width} />}
       </ParentSize>
     </S.Container>

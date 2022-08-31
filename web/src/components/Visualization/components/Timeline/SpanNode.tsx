@@ -74,8 +74,8 @@ const SpanNode = ({
 
       <S.RectDuration
         rx={3}
-        width={xScale(durationWidth) as number}
-        x={(xScale(durationX) as number) + AxisOffset}
+        width={Math.ceil(xScale(durationWidth)?.valueOf() ?? 0)}
+        x={Math.ceil(xScale(durationX)?.valueOf() ?? 0) + AxisOffset}
         y={52}
         $type={node.data.type}
       />
