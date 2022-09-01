@@ -1,4 +1,5 @@
-import {useState} from 'react';
+import {useCallback, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 
 import Drawer from 'components/Drawer';
 import SpanDetail from 'components/SpanDetail';
@@ -27,12 +28,17 @@ const RunDetailTrace = ({run, testId}: IProps) => {
   const selectedSpan = useAppSelector(TraceSelectors.selectSelectedSpan);
   const searchText = useAppSelector(TraceSelectors.selectSearchText);
   const span = useAppSelector(state => SpanSelectors.selectSpanById(state, selectedSpan, testId, run.id));
+  const navigate = useNavigate();
   const [visualizationType, setVisualizationType] = useState(VisualizationType.Dag);
+
+  const handleOnCreateSpec = useCallback(() => {
+    navigate(`/test/${testId}/run/${run.id}/test`);
+  }, [navigate, run.id, testId]);
 
   return (
     <S.Container>
       <Drawer>
-        <SpanDetail searchText={searchText} span={span} />
+        <SpanDetail onCreateTestSpec={handleOnCreateSpec} searchText={searchText} span={span} />
       </Drawer>
 
       <S.Section>
