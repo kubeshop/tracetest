@@ -144,7 +144,10 @@ describe('TestDefinitionReducer', () => {
 
       expect(result).toEqual({
         ...initialState,
-        definitionList: [...definitionList.slice(1, definitionList.length)],
+        definitionList: [
+          {...definitionList[0], isDraft: true, isDeleted: true},
+          ...definitionList.slice(1, definitionList.length),
+        ],
         isDraftMode: true,
       });
     });

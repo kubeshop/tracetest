@@ -60,7 +60,16 @@ const testDefinitionSlice = createSlice<ITestDefinitionState, TTestDefinitionSli
     },
     removeDefinition(state, {payload: {selector}}) {
       state.isDraftMode = true;
-      state.definitionList = state.definitionList.filter(def => def.selector !== selector);
+      state.definitionList = state.definitionList.map(def => {
+        if (def.selector === selector)
+          return {
+            ...def,
+            isDraft: true,
+            isDeleted: true,
+          };
+
+        return def;
+      });
     },
     revertDefinition(state, {payload: {originalSelector}}) {
       const initialDefinition = state.initialDefinitionList.find(
