@@ -22,7 +22,7 @@ const currentSelectorListSelector = (
   currentSelectorList: TSpanSelector[] = []
 ) => currentSelectorList.map(({key}) => key);
 
-const selectAffectedSpanList = createSelector(stateSelector, paramsSelector, (state, {spanIdList, testId, runId}) => {
+const selectMatchedSpanList = createSelector(stateSelector, paramsSelector, (state, {spanIdList, testId, runId}) => {
   const {data: {trace} = {}} = endpoints.getRunById.select({testId, runId})(state);
   if (!spanIdList.length) return trace?.spans || [];
 
@@ -31,14 +31,14 @@ const selectAffectedSpanList = createSelector(stateSelector, paramsSelector, (st
 
 const AssertionSelectors = () => {
   return {
-    selectAffectedSpanList,
+    selectMatchedSpanList,
     selectAttributeList: createSelector(
-      selectAffectedSpanList,
-      SpanSelectors.selectAffectedSpans,
-      (spanList, affectedSpans) =>
+      selectMatchedSpanList,
+      SpanSelectors.selectMatchedSpans,
+      (spanList, matchedSpans) =>
         spanList
           .flatMap(span => span.attributeList)
-          .concat(SpanAttributeService.getPseudoAttributeList(affectedSpans.length))
+          .concat(SpanAttributeService.getPseudoAttributeList(matchedSpans.length))
     ),
     selectAllAttributeList: createSelector(stateSelector, paramsSelector, (state, {testId, runId}) => {
       const {data: {trace} = {}} = endpoints.getRunById.select({testId, runId})(state);
@@ -48,7 +48,7 @@ const AssertionSelectors = () => {
       return spanList.flatMap(span => span.attributeList);
     }),
     selectSelectorAttributeList: createSelector(
-      selectAffectedSpanList,
+      selectMatchedSpanList,
       currentSelectorListSelector,
       (spanList, currentSelectorList) =>
         sortBy(

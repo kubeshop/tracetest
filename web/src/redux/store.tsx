@@ -6,6 +6,7 @@ import TestDefinition from 'redux/slices/TestDefinition.slice';
 import Spans from 'redux/slices/Span.slice';
 import CreateTest from 'redux/slices/CreateTest.slice';
 import DAG from 'redux/slices/DAG.slice';
+import Trace from 'redux/slices/Trace.slice';
 import RouterMiddleware from './Router.middleware';
 import OtelRepoApi from './apis/OtelRepo.api';
 
@@ -21,6 +22,7 @@ export const store = configureStore({
     router: routerReducer,
     spans: Spans,
     dag: DAG,
+    trace: Trace,
     testDefinition: TestDefinition,
     createTest: CreateTest,
   },

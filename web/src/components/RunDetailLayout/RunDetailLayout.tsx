@@ -3,13 +3,14 @@ import {useMemo} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 
 import RunDetailTest from 'components/RunDetailTest';
+import RunDetailTrace from 'components/RunDetailTrace';
+import RunDetailTrigger from 'components/RunDetailTrigger';
 import {RunDetailModes} from 'constants/TestRun.constants';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import {TTest} from 'types/Test.types';
 import HeaderLeft from './HeaderLeft';
 import HeaderRight from './HeaderRight';
 import * as S from './RunDetailLayout.styled';
-import RunDetailTrigger from '../RunDetailTrigger';
 
 interface IProps {
   test: TTest;
@@ -49,7 +50,7 @@ const RunDetailLayout = ({test: {id, name, trigger, version = 1}, test}: IProps)
           <RunDetailTrigger test={test} run={run} isError={isError} />
         </Tabs.TabPane>
         <Tabs.TabPane tab="Trace" key={RunDetailModes.TRACE}>
-          Trace
+          <RunDetailTrace run={run} testId={id} />
         </Tabs.TabPane>
         <Tabs.TabPane tab="Test" key={RunDetailModes.TEST}>
           <RunDetailTest run={run} testId={id} />

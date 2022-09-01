@@ -2,45 +2,30 @@ import {noop} from 'lodash';
 import {createContext, useCallback, useContext, useEffect, useMemo} from 'react';
 import {useSelector} from 'react-redux';
 import {useAppDispatch} from 'redux/hooks';
-import {
-  setAffectedSpans,
-  setFocusedSpan,
-  clearAffectedSpans,
-  clearSelectedSpan,
-  setMatchedSpans,
-  setSearchText,
-} from 'redux/slices/Span.slice';
+import {setMatchedSpans, setFocusedSpan, clearMatchedSpans, clearSelectedSpan} from 'redux/slices/Span.slice';
 import SpanSelectors from 'selectors/Span.selectors';
 import {TSpan} from 'types/Span.types';
 import {RouterSearchFields} from '../../constants/Common.constants';
 import RouterActions from '../../redux/actions/Router.actions';
-import SpanService from '../../services/Span.service';
-import {useTestRun} from '../TestRun/TestRun.provider';
 
 interface IContext {
   selectedSpan?: TSpan;
-  affectedSpans: string[];
-  focusedSpan: string;
   matchedSpans: string[];
-  searchText: string;
-  onSearch(searchText: string): void;
+  focusedSpan: string;
   onSelectSpan(spanId: string): void;
-  onSetAffectedSpans(spanIdList: string[]): void;
+  onSetMatchedSpans(spanIdList: string[]): void;
   onSetFocusedSpan(spanId: string): void;
-  onClearAffectedSpans(): void;
+  onClearMatchedSpans(): void;
   onClearSelectedSpan(): void;
 }
 
 export const Context = createContext<IContext>({
-  affectedSpans: [],
-  focusedSpan: '',
   matchedSpans: [],
-  searchText: '',
-  onSearch: noop,
+  focusedSpan: '',
   onSelectSpan: noop,
   onSetFocusedSpan: noop,
-  onClearAffectedSpans: noop,
-  onSetAffectedSpans: noop,
+  onClearMatchedSpans: noop,
+  onSetMatchedSpans: noop,
   onClearSelectedSpan: noop,
 });
 
@@ -52,19 +37,14 @@ export const useSpan = (): IContext => useContext(Context);
 
 const SpanProvider = ({children}: IProps) => {
   const dispatch = useAppDispatch();
-  const {
-    run: {trace: {spans = []} = {}},
-  } = useTestRun();
   const selectedSpan = useSelector(SpanSelectors.selectSelectedSpan);
-  const affectedSpans = useSelector(SpanSelectors.selectAffectedSpans);
-  const focusedSpan = useSelector(SpanSelectors.selectFocusedSpan);
   const matchedSpans = useSelector(SpanSelectors.selectMatchedSpans);
-  const searchText = useSelector(SpanSelectors.selectSearchText);
+  const focusedSpan = useSelector(SpanSelectors.selectFocusedSpan);
 
   useEffect(() => {
     return () => {
       dispatch(RouterActions.updateSearch({[RouterSearchFields.SelectedSpan]: ''}));
-      dispatch(clearAffectedSpans());
+      dispatch(clearMatchedSpans());
     };
   }, [dispatch]);
 
@@ -79,9 +59,9 @@ const SpanProvider = ({children}: IProps) => {
     dispatch(clearSelectedSpan());
   }, [dispatch]);
 
-  const onSetAffectedSpans = useCallback(
+  const onSetMatchedSpans = useCallback(
     (spanIds: string[]) => {
-      dispatch(setAffectedSpans({spanIds}));
+      dispatch(setMatchedSpans({spanIds}));
     },
     [dispatch]
   );
@@ -93,43 +73,28 @@ const SpanProvider = ({children}: IProps) => {
     [dispatch]
   );
 
-  const onClearAffectedSpans = useCallback(() => {
-    dispatch(clearAffectedSpans());
+  const onClearMatchedSpans = useCallback(() => {
+    dispatch(clearMatchedSpans());
   }, [dispatch]);
-
-  const onSearch = useCallback(
-    (query: string) => {
-      const spanIds = SpanService.searchSpanList(spans, query);
-      dispatch(setMatchedSpans({spanIds}));
-      dispatch(setSearchText({searchText: query}));
-    },
-    [dispatch, spans]
-  );
 
   const value = useMemo<IContext>(
     () => ({
       selectedSpan,
-      affectedSpans,
       matchedSpans,
       focusedSpan,
-      searchText,
-      onSearch,
       onSelectSpan,
-      onSetAffectedSpans,
+      onSetMatchedSpans,
       onSetFocusedSpan,
-      onClearAffectedSpans,
+      onClearMatchedSpans,
       onClearSelectedSpan,
     }),
     [
-      affectedSpans,
-      focusedSpan,
       matchedSpans,
-      onClearAffectedSpans,
-      onSearch,
+      focusedSpan,
+      onClearMatchedSpans,
       onSelectSpan,
-      onSetAffectedSpans,
+      onSetMatchedSpans,
       onSetFocusedSpan,
-      searchText,
       selectedSpan,
       onClearSelectedSpan,
     ]

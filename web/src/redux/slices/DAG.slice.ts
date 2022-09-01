@@ -4,7 +4,7 @@ import {applyNodeChanges, Edge, MarkerType, Node, NodeChange} from 'react-flow-r
 import {theme} from 'constants/Theme.constants';
 import DAGModel from 'models/DAG.model';
 import {TSpan} from 'types/Span.types';
-import {clearAffectedSpans, setAffectedSpans, setMatchedSpans, setSelectedSpan} from './Span.slice';
+import {clearMatchedSpans, setMatchedSpans, setSelectedSpan} from './Span.slice';
 import {setSelectedAssertion} from './TestDefinition.slice';
 
 export interface IDagState {
@@ -32,15 +32,9 @@ const dagSlice = createSlice({
   },
   extraReducers: builder => {
     builder
-      .addCase(clearAffectedSpans, state => {
+      .addCase(clearMatchedSpans, state => {
         state.nodes = state.nodes.map(node => {
-          return {...node, data: {...node.data, isAffected: false}};
-        });
-      })
-      .addCase(setAffectedSpans, (state, {payload: {spanIds}}) => {
-        state.nodes = state.nodes.map(node => {
-          const isAffected = spanIds.includes(node.id);
-          return {...node, data: {...node.data, isAffected}};
+          return {...node, data: {...node.data, isMatched: false}};
         });
       })
       .addCase(setMatchedSpans, (state, {payload: {spanIds}}) => {
@@ -52,8 +46,8 @@ const dagSlice = createSlice({
       .addCase(setSelectedAssertion, (state, {payload: assertionResult}) => {
         const spanIds = assertionResult?.spanIds ?? [];
         state.nodes = state.nodes.map(node => {
-          const isAffected = spanIds.includes(node.id);
-          return {...node, data: {...node.data, isAffected}};
+          const isMatched = spanIds.includes(node.id);
+          return {...node, data: {...node.data, isMatched}};
         });
       })
       .addCase(setSelectedSpan, (state, {payload: {span}}) => {

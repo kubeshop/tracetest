@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo} from 'react';
+import React, {useMemo} from 'react';
 import {Typography} from 'antd';
 import ReactFlow from 'react-flow-renderer';
 
@@ -8,30 +8,20 @@ import DAGService from 'services/DAG.service';
 import * as S from './SkeletonDiagram.styled';
 import SkeletonNode from './SkeletonNode';
 
-export interface IProps {
-  onClearAffectedSpans(): void;
-  onClearSelectedSpan(): void;
-}
-
-/** Important to define the nodeTypes outside of the component to prevent re-renderings */
+/** Important to define the nodeTypes outside the component to prevent re-renderings */
 const nodeTypes = {skeleton: SkeletonNode};
 
-const SkeletonDiagram = ({onClearAffectedSpans, onClearSelectedSpan}: IProps) => {
+const SkeletonDiagram = () => {
   const {edges, nodes} = useMemo(() => DAGService.getEdgesAndNodes(skeletonNodesDatum), []);
-
-  useEffect(() => {
-    onClearAffectedSpans();
-    onClearSelectedSpan();
-  }, [onClearAffectedSpans, onClearSelectedSpan]);
 
   return (
     <S.Container data-cy="skeleton-diagram">
       <S.SkeletonDiagramMessage>
         <Typography.Title level={3} type="secondary">
-          We are working on your trace…
+          We are working on your trace
         </Typography.Title>
         <Typography.Text type="secondary">
-          Want to know more about traces? head to the official{' '}
+          Want to know more about traces? Head to the official{' '}
           <a href={TRACE_DOCUMENTATION_URL} target="_blank">
             Open Telemetry Documentation
           </a>

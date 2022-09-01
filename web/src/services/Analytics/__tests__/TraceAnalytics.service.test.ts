@@ -1,7 +1,7 @@
+import {VisualizationType} from 'components/RunDetailTrace/RunDetailTrace';
 import {Categories, Labels} from 'constants/Analytics.constants';
 import TraceAnalyticsService, {Actions} from '../TraceAnalytics.service';
 import AnalyticsService from '../Analytics.service';
-import {SupportedDiagrams} from '../../../components/Diagram/Diagram';
 
 jest.mock('../Analytics.service', () => {
   return {
@@ -27,23 +27,24 @@ describe('TraceAnalyticsService', () => {
   });
 
   it('should trigger the onTimelineSpanClick event', () => {
-    TraceAnalyticsService.onTimelineSpanClick();
+    const spanId = '1234';
+    TraceAnalyticsService.onTimelineSpanClick(spanId);
 
-    expect(AnalyticsService.event).toHaveBeenCalledWith(Categories.Trace, Actions.TimelineSpanClick, Labels.Button);
+    expect(AnalyticsService.event).toHaveBeenCalledWith(Categories.Trace, Actions.TimelineSpanClick, spanId);
   });
 
   it('should trigger the onAttributeCopy event', () => {
     TraceAnalyticsService.onAttributeCopy();
 
-    expect(AnalyticsService.event).toHaveBeenCalledWith(Categories.Trace, Actions.TimelineSpanClick, Labels.Button);
+    expect(AnalyticsService.event).toHaveBeenCalledWith(Categories.SpanDetail, Actions.AttributeCopy, Labels.Button);
   });
 
   it('should trigger the onSwitchDiagramView event', () => {
-    TraceAnalyticsService.onSwitchDiagramView(SupportedDiagrams.DAG);
+    TraceAnalyticsService.onSwitchDiagramView(VisualizationType.Dag);
 
     expect(AnalyticsService.event).toHaveBeenCalledWith(
       Categories.Trace,
-      `${Actions.SwitchDiagramView}-${SupportedDiagrams.DAG}`,
+      `${Actions.SwitchDiagramView}-${VisualizationType.Dag}`,
       Labels.Button
     );
   });

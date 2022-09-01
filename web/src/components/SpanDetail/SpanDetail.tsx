@@ -1,6 +1,7 @@
 import {useCallback} from 'react';
 
 import {CompareOperator} from 'constants/Operator.constants';
+import {SemanticGroupNames} from 'constants/SemanticGroupNames.constants';
 import {useTestSpecForm} from 'components/TestSpecForm/TestSpecForm.provider';
 import {useAppSelector} from 'redux/hooks';
 import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
@@ -11,13 +12,13 @@ import {TSpan, TSpanFlatAttribute} from 'types/Span.types';
 import Attributes from './Attributes';
 import Header from './Header';
 import * as S from './SpanDetail.styled';
-import {SemanticGroupNames} from '../../constants/SemanticGroupNames.constants';
 
 interface IProps {
+  searchText?: string;
   span?: TSpan;
 }
 
-const SpanDetail = ({span}: IProps) => {
+const SpanDetail = ({searchText, span}: IProps) => {
   const {open} = useTestSpecForm();
   const spansResult = useAppSelector(TestDefinitionSelectors.selectSpansResult);
   const assertions = useAppSelector(state =>
@@ -59,6 +60,7 @@ const SpanDetail = ({span}: IProps) => {
         assertions={assertions}
         attributeList={span?.attributeList ?? []}
         onCreateTestSpec={handleCreateTestSpec}
+        searchText={searchText}
         type={span?.type ?? SemanticGroupNames.General}
       />
     </>

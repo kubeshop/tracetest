@@ -5,32 +5,34 @@ import {TAssertionResultEntry} from 'types/Assertion.types';
 import {ISpanState, TSpan} from 'types/Span.types';
 
 describe('SpanSelectors', () => {
-  describe('selectAffectedSpans', () => {
-    it('should return affectedSpans when selectedAssertion not present', () => {
-      const affectedSpans = ['pokeshop'];
-      const result = SpanSelectors.selectAffectedSpans({
-        spans: {affectedSpans},
+  describe('selectMatchedSpans', () => {
+    it('should return matchedSpans when selectedAssertion not present', () => {
+      const matchedSpans = ['pokeshop'];
+      const result = SpanSelectors.selectMatchedSpans({
+        spans: {matchedSpans},
         testDefinition: {},
       } as RootState);
-      expect(result).toBe(affectedSpans);
+      expect(result).toBe(matchedSpans);
     });
-    it('should return affectedSpans when selector matches', () => {
-      const affectedSpans = ['pokeshop'];
+
+    it('should return matchedSpans when selector matches', () => {
+      const matchedSpans = ['pokeshop'];
       const selector = `span[tracetest.span.type="http"]`;
-      const result = SpanSelectors.selectAffectedSpans({
-        spans: {affectedSpans},
+      const result = SpanSelectors.selectMatchedSpans({
+        spans: {matchedSpans},
         testDefinition: {
           assertionResults: {resultList: [{selector} as TAssertionResultEntry]},
           selectedAssertion: selector,
         },
       } as RootState);
-      expect(result).toBe(affectedSpans);
+      expect(result).toBe(matchedSpans);
     });
-    it('should return affectedSpans when selector does not matches', () => {
+
+    it('should return matchedSpans when selector does not matches', () => {
       const selector = `span[tracetest.span.type="http"]`;
       const selectedAssertion = `span[tracetest.span.type="gRPC"]`;
-      const result = SpanSelectors.selectAffectedSpans({
-        spans: {affectedSpans: ['pokeshop']},
+      const result = SpanSelectors.selectMatchedSpans({
+        spans: {matchedSpans: ['pokeshop']},
         testDefinition: {
           assertionResults: {resultList: [{selector} as TAssertionResultEntry]},
           selectedAssertion,
@@ -39,6 +41,7 @@ describe('SpanSelectors', () => {
       expect(result).toStrictEqual([]);
     });
   });
+
   describe('selectSelectedSpan', () => {
     it('should return span', () => {
       const selectedSpan: TSpan = SpanMock.model();
@@ -56,25 +59,6 @@ describe('SpanSelectors', () => {
         spans: {focusedSpan} as ISpanState,
       } as RootState);
       expect(result).toBe(focusedSpan);
-    });
-  });
-  describe('selectMatchedSpans', () => {
-    it('should return matchedSpans', () => {
-      const matchedSpans = ['string'];
-      const result = SpanSelectors.selectMatchedSpans({
-        spans: {matchedSpans} as ISpanState,
-      } as RootState);
-      expect(result).toBe(matchedSpans);
-    });
-  });
-
-  describe('selectSearchText', () => {
-    it('should return searchText', () => {
-      const searchText = 'string';
-      const result = SpanSelectors.selectSearchText({
-        spans: {searchText} as ISpanState,
-      } as RootState);
-      expect(result).toBe(searchText);
     });
   });
 });

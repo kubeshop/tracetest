@@ -12,13 +12,22 @@ import useEditorTheme from './hooks/useEditorTheme';
 import useLint from './hooks/useLint';
 
 interface IProps {
-  testId: string;
-  runId: string;
-  value?: string;
+  lineNumbers?: boolean;
   onChange?(value: string): void;
+  placeholder?: string;
+  runId: string;
+  testId: string;
+  value?: string;
 }
 
-const AdvancedEditor = ({testId, runId, onChange = noop, value = ''}: IProps) => {
+const AdvancedEditor = ({
+  lineNumbers = false,
+  onChange = noop,
+  placeholder = 'Leaving it empty will select All Spans',
+  runId,
+  testId,
+  value = '',
+}: IProps) => {
   const completionFn = useAutoComplete({testId, runId});
   const lintFn = useLint({testId, runId});
   const editorTheme = useEditorTheme();
@@ -32,6 +41,7 @@ const AdvancedEditor = ({testId, runId, onChange = noop, value = ''}: IProps) =>
     <S.AdvancedEditor>
       <CodeMirror
         id="advanced-editor"
+        basicSetup={{lineNumbers}}
         data-cy="advanced-selector"
         value={value}
         maxHeight="120px"
@@ -40,7 +50,7 @@ const AdvancedEditor = ({testId, runId, onChange = noop, value = ''}: IProps) =>
         spellCheck={false}
         autoFocus
         theme={editorTheme}
-        placeholder="Leaving it empty will select All Spans"
+        placeholder={placeholder}
       />
     </S.AdvancedEditor>
   );

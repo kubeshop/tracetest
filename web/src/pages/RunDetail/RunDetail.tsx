@@ -1,5 +1,4 @@
 import {useParams} from 'react-router-dom';
-import {ReactFlowProvider} from 'react-flow-renderer';
 
 import Layout from 'components/Layout';
 import TestSpecFormProvider from 'components/TestSpecForm/TestSpecForm.provider';
@@ -16,17 +15,15 @@ const RunDetail = () => {
   return (
     <GuidedTourProvider>
       <Layout>
-        <ReactFlowProvider>
-          <TestRunProvider testId={testId} runId={runId}>
-            <TestDefinitionProvider testId={testId} runId={runId}>
-              <TestSpecFormProvider testId={testId}>
-                <SpanProvider>
-                  <Content />
-                </SpanProvider>
-              </TestSpecFormProvider>
-            </TestDefinitionProvider>
-          </TestRunProvider>
-        </ReactFlowProvider>
+        <TestRunProvider testId={testId} runId={runId}>
+          <TestDefinitionProvider testId={testId} runId={runId}>
+            <TestSpecFormProvider testId={testId}>
+              <SpanProvider>
+                <Content />
+              </SpanProvider>
+            </TestSpecFormProvider>
+          </TestDefinitionProvider>
+        </TestRunProvider>
       </Layout>
     </GuidedTourProvider>
   );

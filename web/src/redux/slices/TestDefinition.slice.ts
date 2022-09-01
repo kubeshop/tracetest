@@ -2,7 +2,6 @@ import {createSlice} from '@reduxjs/toolkit';
 import {TAssertionResults} from 'types/Assertion.types';
 import {ITestDefinitionState, TTestDefinitionEntry, TTestDefinitionSliceActions} from 'types/TestDefinition.types';
 import TestDefinitionActions from '../actions/TestDefinition.actions';
-import {setSearchText} from './Span.slice';
 
 export const initialState: ITestDefinitionState = {
   initialDefinitionList: [],
@@ -111,9 +110,6 @@ const testDefinitionSlice = createSlice<ITestDefinitionState, TTestDefinitionSli
 
         state.assertionResults = result;
         state.initialDefinitionList = definitionList;
-      })
-      .addCase(setSearchText, (state, {payload: {searchText}}) => {
-        if (searchText) state.selectedAssertion = undefined;
       })
       .addMatcher(
         ({type}) => type.startsWith('testDefinition') && type.endsWith('/pending'),

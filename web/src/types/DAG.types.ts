@@ -12,7 +12,6 @@ export interface INodeDatum<T> {
 export interface INodeDataSpan {
   duration: string;
   id: string;
-  isAffected: boolean;
   isMatched: boolean;
   kind: SpanKind;
   name: string;

@@ -3,11 +3,11 @@ import Highlighted from '../Highlighted';
 import {Text, TextContainer} from './AttributeRow.styled';
 
 interface IProps {
-  title: string;
   searchText?: string;
+  title: string;
 }
 
-export default ({searchText = '', title}: IProps): JSX.Element => {
+const AttributeTitle = ({searchText = '', title}: IProps) => {
   const textContainer = (
     <TextContainer>
       <Text type="secondary">
@@ -15,6 +15,7 @@ export default ({searchText = '', title}: IProps): JSX.Element => {
       </Text>
     </TextContainer>
   );
+
   return title.length > 26 ? (
     <Tooltip title={title} arrowContent={null}>
       {textContainer}
@@ -23,3 +24,5 @@ export default ({searchText = '', title}: IProps): JSX.Element => {
     textContainer
   );
 };
+
+export default AttributeTitle;
