@@ -12,6 +12,7 @@ export const Section = styled.div`
 
 export const SectionLeft = styled(Section)`
   background-color: ${({theme}) => theme.color.white};
+  overflow-y: scroll;
   z-index: 1;
 `;
 

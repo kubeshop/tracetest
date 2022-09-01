@@ -3,6 +3,7 @@ import styled from 'styled-components';
 
 export const Header = styled.div`
   padding: 16px 12px 0;
+  min-width: 270px;
 `;
 
 export const HeaderCheck = styled(Typography.Text)`
