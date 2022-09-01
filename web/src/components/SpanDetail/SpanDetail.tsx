@@ -1,3 +1,4 @@
+import {noop} from 'lodash';
 import {useCallback} from 'react';
 
 import {CompareOperator} from 'constants/Operator.constants';
@@ -14,11 +15,12 @@ import Header from './Header';
 import * as S from './SpanDetail.styled';
 
 interface IProps {
+  onCreateTestSpec?(): void;
   searchText?: string;
   span?: TSpan;
 }
 
-const SpanDetail = ({searchText, span}: IProps) => {
+const SpanDetail = ({onCreateTestSpec = noop, searchText, span}: IProps) => {
   const {open} = useTestSpecForm();
   const spansResult = useAppSelector(TestDefinitionSelectors.selectSpansResult);
   const assertions = useAppSelector(state =>
@@ -44,8 +46,10 @@ const SpanDetail = ({searchText, span}: IProps) => {
           selector,
         },
       });
+
+      onCreateTestSpec();
     },
-    [span, open]
+    [onCreateTestSpec, open, span]
   );
 
   return (
