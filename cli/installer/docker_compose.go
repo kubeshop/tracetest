@@ -340,7 +340,7 @@ func dockerChecker(ui UI) {
 		{"Install Docker Engine", installDockerEngine},
 		{"Install Docker Desktop", installDockerDesktop},
 		{"Fix manually", exitOption(
-			"Check the docker install docks on https://docs.docker.com/get-docker/",
+			"Check the docker install docs on https://docs.docker.com/get-docker/",
 		)},
 	}, 0)
 
@@ -379,7 +379,7 @@ func dockerComposeChecker(ui UI) {
 	option := ui.Select("What do you want to do?", []option{
 		{"Install Docker Compose", installDockerCompose},
 		{"Fix manually", exitOption(
-			"Check the docker compose install docks on https://docs.docker.com/compose/install/",
+			"Check the docker compose install docs on https://docs.docker.com/compose/install/",
 		)},
 	}, 0)
 
@@ -449,8 +449,8 @@ func installDockerCompose(ui UI) {
 		homebrew:           "brew install docker-compose",
 		macIntelChipManual: "TODO", // todo. see https://apple.stackexchange.com/a/73931
 		macAppleChipManual: "TODO", // todo. see https://apple.stackexchange.com/a/73931
-		windows:            "Check the install docks: https://docs.docker.com/compose/install/",
-		other:              "Check the install docks: https://docs.docker.com/compose/install/",
+		windows:            "Check the install docs: https://docs.docker.com/compose/install/",
+		other:              "Check the install docs: https://docs.docker.com/compose/install/",
 	}).exec(ui)
 }
 
@@ -472,11 +472,6 @@ func installDockerEngine(ui UI) {
 			"Architecture":  detectArchitecture(),
 		},
 		apt: `
-			DISTRO=$(lsb_release -is | tr '[:upper:]' '[:lower:]')
-
-			# cleanup. see https://docs.docker.com/engine/install/$DISTRO/#uninstall-old-versions
-			sudo apt-get -y remove docker docker-engine docker.io containerd runc
-
 			# Repo install. see https://docs.docker.com/engine/install/$DISTRO/#install-using-the-repository
 			# setup repo
 			sudo apt-get -y update
@@ -485,6 +480,12 @@ func installDockerEngine(ui UI) {
 				curl \
 				gnupg \
 				lsb-release
+
+			DISTRO=$(lsb_release -is | tr '[:upper:]' '[:lower:]')
+
+			# cleanup. see https://docs.docker.com/engine/install/$DISTRO/#uninstall-old-versions
+			sudo apt-get -y remove docker docker-engine docker.io containerd runc
+
 			sudo mkdir -p /etc/apt/keyrings
 			curl -fsSL https://download.docker.com/linux/$DISTRO/gpg | sudo gpg --batch --yes --dearmor -o /etc/apt/keyrings/docker.gpg
 
@@ -565,12 +566,6 @@ func installDockerDesktop(ui UI) {
 			"Architecture":  detectArchitecture(),
 		},
 		apt: `
-			DISTRO=$(lsb_release -is | tr '[:upper:]' '[:lower:]')
-			# cleanup old installs. See https://docs.docker.com/desktop/install/$DISTRO/#prerequisites
-			rm -rf $HOME/.docker/desktop
-			sudo rm -f /usr/local/bin/com.docker.cli
-			sudo apt-get -y purge docker-desktop
-
 			# add docker repo. See https://docs.docker.com/engine/install/$DISTRO/#set-up-the-repository
 			sudo apt-get -y update
 			sudo apt-get -y install \
@@ -578,6 +573,14 @@ func installDockerDesktop(ui UI) {
 				curl \
 				gnupg \
 				lsb-release
+
+			DISTRO=$(lsb_release -is | tr '[:upper:]' '[:lower:]')
+
+			# cleanup old installs. See https://docs.docker.com/desktop/install/$DISTRO/#prerequisites
+			rm -rf $HOME/.docker/desktop
+			sudo rm -f /usr/local/bin/com.docker.cli
+			sudo apt-get -y purge docker-desktop
+
 			sudo mkdir -p /etc/apt/keyrings
 			curl -fsSL https://download.docker.com/linux/$DISTRO/gpg | sudo gpg --yes --dearmor -o /etc/apt/keyrings/docker.gpg
 			echo \
