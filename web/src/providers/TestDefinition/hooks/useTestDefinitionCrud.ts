@@ -18,6 +18,7 @@ import TestRunGateway from 'gateways/TestRun.gateway';
 import useBlockNavigation from 'hooks/useBlockNavigation';
 import RouterActions from 'redux/actions/Router.actions';
 import {RouterSearchFields} from 'constants/Common.constants';
+import {useConfirmationModal} from 'providers/ConfirmationModal/ConfirmationModal.provider';
 
 interface IProps {
   runId: string;
@@ -29,6 +30,7 @@ const useTestDefinitionCrud = ({runId, testId, isDraftMode}: IProps) => {
   useBlockNavigation(isDraftMode);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const {onOpen} = useConfirmationModal();
 
   const revert = useCallback(
     (originalSelector: string) => {
@@ -76,11 +78,17 @@ const useTestDefinitionCrud = ({runId, testId, isDraftMode}: IProps) => {
     [dispatch]
   );
 
-  const remove = useCallback(
+  const onConfirmRemove = useCallback(
     async (selector: string) => {
       dispatch(removeDefinition({selector}));
     },
     [dispatch]
+  );
+  const remove = useCallback(
+    (selector: string) => {
+      onOpen('Are you sure you want to remove this test spec?', () => onConfirmRemove(selector));
+    },
+    [onConfirmRemove, onOpen]
   );
 
   const init = useCallback(

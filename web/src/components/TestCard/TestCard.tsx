@@ -1,6 +1,6 @@
 import {DownOutlined, RightOutlined} from '@ant-design/icons';
 import {Button, Typography} from 'antd';
-import React, {useCallback, useState} from 'react';
+import {useCallback, useState} from 'react';
 
 import ResultCardList from 'components/RunCardList';
 import {useLazyGetRunListQuery} from 'redux/apis/TraceTest.api';

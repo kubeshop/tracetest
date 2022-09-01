@@ -5,11 +5,11 @@ import {useNavigate} from 'react-router-dom';
 import {useGetTestListQuery, useRunTestMutation} from 'redux/apis/TraceTest.api';
 import HomeAnalyticsService from 'services/Analytics/HomeAnalytics.service';
 import TestAnalyticsService from 'services/Analytics/TestAnalytics.service';
-import useInfiniteScroll from '../../hooks/useInfiniteScroll';
-import {TTest} from '../../types/Test.types';
+import useDeleteTest from 'hooks/useDeleteTest';
+import useInfiniteScroll from 'hooks/useInfiniteScroll';
+import {TTest} from 'types/Test.types';
 import * as S from './Home.styled';
 import NoResults from './NoResults';
-import {useMenuDeleteCallback} from './useMenuDeleteCallback';
 
 const {onTestClick} = HomeAnalyticsService;
 
@@ -18,6 +18,7 @@ interface IProps {
 }
 
 const TestList = ({query}: IProps) => {
+  const onDelete = useDeleteTest();
   const {list, isLoading, loadMore, hasMore} = useInfiniteScroll<TTest, {query: string}>(useGetTestListQuery, {query});
   const navigate = useNavigate();
   const [runTest] = useRunTestMutation();
@@ -40,8 +41,6 @@ const TestList = ({query}: IProps) => {
     },
     [navigate, runTest]
   );
-
-  const onDelete = useMenuDeleteCallback();
 
   return (
     <InfiniteScroll

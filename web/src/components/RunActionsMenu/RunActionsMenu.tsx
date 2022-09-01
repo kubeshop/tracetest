@@ -1,8 +1,5 @@
 import {Dropdown, Menu} from 'antd';
-import {useCallback} from 'react';
-import {useNavigate} from 'react-router-dom';
-import {useDeleteRunByIdMutation} from 'redux/apis/TraceTest.api';
-import TestAnalyticsService from 'services/Analytics/TestAnalytics.service';
+import useDeleteTestRun from '../../hooks/useDeleteTestRun';
 import {useFileViewerModal} from '../FileViewerModal/FileViewerModal.provider';
 import * as S from './RunActionsMenu.styled';
 
@@ -15,14 +12,8 @@ interface IProps {
 
 const RunActionsMenu = ({resultId, testId, testVersion, isRunView = false}: IProps) => {
   const {loadJUnit, loadTestDefinitionYaml} = useFileViewerModal();
-  const [deleteRunById] = useDeleteRunByIdMutation();
-  const navigate = useNavigate();
 
-  const handleOnDelete = useCallback(() => {
-    TestAnalyticsService.onDeleteTestRun();
-    deleteRunById({testId, runId: resultId});
-    if (isRunView) navigate(`/test/${testId}`);
-  }, [deleteRunById, isRunView, navigate, resultId, testId]);
+  const onDelete = useDeleteTestRun({isRunView, testId});
 
   return (
     <span className="ant-dropdown-link" onClick={e => e.stopPropagation()} style={{textAlign: 'right'}}>
@@ -43,7 +34,7 @@ const RunActionsMenu = ({resultId, testId, testVersion, isRunView = false}: IPro
               data-cy="test-delete-button"
               onClick={({domEvent}) => {
                 domEvent.stopPropagation();
-                handleOnDelete();
+                onDelete(resultId);
               }}
               key="delete"
             >
