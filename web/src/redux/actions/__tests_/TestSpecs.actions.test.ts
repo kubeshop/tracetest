@@ -4,8 +4,8 @@ import {HTTP_METHOD} from '../../../constants/Common.constants';
 import TestSpecsSelectors from '../../../selectors/TestSpecs.selectors';
 import TestRunMock from '../../../models/__mocks__/TestRun.mock';
 
-jest.mock('../../../selectors/TestDefinition.selectors', () => ({
-  selectDefinitionList: jest.fn(),
+jest.mock('../../../selectors/TestSpecs.selectors', () => ({
+  selectSpecs: jest.fn(),
 }));
 
 const selectTestMock = TestSpecsSelectors.selectSpecs as unknown as jest.Mock;

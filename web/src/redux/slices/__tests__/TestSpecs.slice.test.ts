@@ -66,7 +66,7 @@ describe('TestSpecs slice', () => {
 
       expect(result).toEqual({
         ...state,
-        definitionList: [],
+        specs: [],
       });
     });
   });
@@ -138,7 +138,7 @@ describe('TestSpecs slice', () => {
 
       expect(result).toEqual({
         ...initialState,
-        definitionList: [{...specs[0], isDraft: true, isDeleted: true}, ...specs.slice(1, specs.length)],
+        specs: [{...specs[0], isDraft: true, isDeleted: true}, ...specs.slice(1, specs.length)],
         isDraftMode: true,
       });
     });
