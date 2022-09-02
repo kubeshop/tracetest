@@ -32,7 +32,7 @@ Cypress.Commands.add('deleteTest', (shoudlIntercept = false) => {
       cy.inteceptHomeApiCall();
     }
     cy.visit(`/`);
-    // cy.wait('@testList');
+    cy.wait('@testList');
     cy.get('[data-cy=test-list]').should('exist', {timeout: 10000});
     cy.get(`[data-cy=test-actions-button-${localTestId}]`, {timeout: 10000}).should('be.visible');
     cy.get(`[data-cy=test-actions-button-${localTestId}]`).click({force: true});
@@ -40,7 +40,7 @@ Cypress.Commands.add('deleteTest', (shoudlIntercept = false) => {
     cy.get('[data-cy=delete-confirmation-modal] .ant-btn-primary').click();
     cy.wait('@testDelete');
     cy.get(`[data-cy=test-actions-button-${localTestId}]`).should('not.exist');
-    // cy.wait('@testList');
+    cy.wait('@testList');
   });
 });
 
@@ -96,9 +96,8 @@ Cypress.Commands.add('matchTestRunPageUrl', () => {
 Cypress.Commands.add('goToTestDetailPageAndRunTest', (pathname: string) => {
   const testId = getTestId(pathname);
   cy.visit(`/test/${testId}`);
-  cy.get('[data-cy^=result-card]', {timeout: 10000}).first().click();
   cy.makeSureUserIsOnTestDetailPage();
-  cy.get(`[data-cy^=test-run-result-]`).first().click();
+  cy.get('[data-cy^=result-card]', {timeout: 10000}).first().click();
   cy.makeSureUserIsOnTracePage(false);
 });
 
