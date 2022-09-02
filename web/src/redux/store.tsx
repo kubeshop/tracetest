@@ -2,7 +2,7 @@ import {Action, configureStore, ThunkAction} from '@reduxjs/toolkit';
 import {createReduxHistoryContext} from 'redux-first-history';
 import {createBrowserHistory} from 'history';
 import TestAPI from 'redux/apis/TraceTest.api';
-import TestDefinition from 'redux/slices/TestDefinition.slice';
+import TestSpecs from 'redux/slices/TestSpecs.slice';
 import Spans from 'redux/slices/Span.slice';
 import CreateTest from 'redux/slices/CreateTest.slice';
 import DAG from 'redux/slices/DAG.slice';
@@ -23,7 +23,7 @@ export const store = configureStore({
     spans: Spans,
     dag: DAG,
     trace: Trace,
-    testDefinition: TestDefinition,
+    testSpecs: TestSpecs,
     createTest: CreateTest,
   },
   middleware: getDefaultMiddleware =>

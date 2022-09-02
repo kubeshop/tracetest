@@ -21,26 +21,26 @@ export type TRawTestSpecEntry = {
 
 export type TTestSpecs = Model<TRawTestSpecs, {specs: TTestSpecEntry[]}>;
 
-export interface ITestDefinitionState {
-  initialDefinitionList: TTestSpecEntry[];
-  definitionList: TTestSpecEntry[];
+export interface ITestSpecsState {
+  initialSpecs: TTestSpecEntry[];
+  specs: TTestSpecEntry[];
   assertionResults?: TAssertionResults;
   changeList: TChange[];
   isLoading: boolean;
   isInitialized: boolean;
-  selectedAssertion: string | undefined;
+  selectedSpec: string | undefined;
   isDraftMode: boolean;
 }
 
-export type TTestDefinitionSliceActions = {
-  reset: CaseReducer<ITestDefinitionState>;
-  initDefinitionList: CaseReducer<ITestDefinitionState, PayloadAction<{assertionResults: TAssertionResults}>>;
-  addDefinition: CaseReducer<ITestDefinitionState, PayloadAction<{definition: TTestSpecEntry}>>;
-  updateDefinition: CaseReducer<ITestDefinitionState, PayloadAction<{definition: TTestSpecEntry; selector: string}>>;
-  removeDefinition: CaseReducer<ITestDefinitionState, PayloadAction<{selector: string}>>;
-  revertDefinition: CaseReducer<ITestDefinitionState, PayloadAction<{originalSelector: string}>>;
-  resetDefinitionList: CaseReducer<ITestDefinitionState>;
-  setAssertionResults: CaseReducer<ITestDefinitionState, PayloadAction<TAssertionResults>>;
-  setSelectedAssertion: CaseReducer<ITestDefinitionState, PayloadAction<TAssertionResultEntry | undefined>>;
-  setIsInitialized: CaseReducer<ITestDefinitionState, PayloadAction<{isInitialized: boolean}>>;
+export type TTestSpecsSliceActions = {
+  reset: CaseReducer<ITestSpecsState>;
+  initSpecs: CaseReducer<ITestSpecsState, PayloadAction<{assertionResults: TAssertionResults}>>;
+  addSpec: CaseReducer<ITestSpecsState, PayloadAction<{spec: TTestSpecEntry}>>;
+  updateSpec: CaseReducer<ITestSpecsState, PayloadAction<{spec: TTestSpecEntry; selector: string}>>;
+  removeSpec: CaseReducer<ITestSpecsState, PayloadAction<{selector: string}>>;
+  revertSpec: CaseReducer<ITestSpecsState, PayloadAction<{originalSelector: string}>>;
+  resetSpecs: CaseReducer<ITestSpecsState>;
+  setAssertionResults: CaseReducer<ITestSpecsState, PayloadAction<TAssertionResults>>;
+  setSelectedSpec: CaseReducer<ITestSpecsState, PayloadAction<TAssertionResultEntry | undefined>>;
+  setIsInitialized: CaseReducer<ITestSpecsState, PayloadAction<{isInitialized: boolean}>>;
 };

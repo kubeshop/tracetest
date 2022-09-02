@@ -7,7 +7,7 @@ import {RouterSearchFields} from '../../constants/Common.constants';
 import SpanSelectors from '../../selectors/Span.selectors';
 import {decryptString} from '../../utils/Common';
 import {setSelectedSpan} from '../slices/Span.slice';
-import {setSelectedAssertion} from '../slices/TestDefinition.slice';
+import {setSelectedSpec} from '../slices/TestSpecs.slice';
 import {RootState} from '../store';
 
 export interface IQuery {
@@ -34,8 +34,8 @@ const RouterActions = () => ({
         return;
       }
 
-      if (assertionResult) dispatch(setSelectedAssertion(assertionResult));
-      else if (!selector) dispatch(setSelectedAssertion());
+      if (assertionResult) dispatch(setSelectedSpec(assertionResult));
+      else if (!selector) dispatch(setSelectedSpec());
     }
   ),
   updateSelectedSpan: createAsyncThunk<void, IQuery>(

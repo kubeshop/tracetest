@@ -5,7 +5,7 @@ import {theme} from 'constants/Theme.constants';
 import DAGModel from 'models/DAG.model';
 import {TSpan} from 'types/Span.types';
 import {clearMatchedSpans, setMatchedSpans, setSelectedSpan} from './Span.slice';
-import {setSelectedAssertion} from './TestDefinition.slice';
+import {setSelectedSpec} from './TestSpecs.slice';
 
 export interface IDagState {
   edges: Edge[];
@@ -43,7 +43,7 @@ const dagSlice = createSlice({
           return {...node, data: {...node.data, isMatched}};
         });
       })
-      .addCase(setSelectedAssertion, (state, {payload: assertionResult}) => {
+      .addCase(setSelectedSpec, (state, {payload: assertionResult}) => {
         const spanIds = assertionResult?.spanIds ?? [];
         state.nodes = state.nodes.map(node => {
           const isMatched = spanIds.includes(node.id);

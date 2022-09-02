@@ -11,12 +11,12 @@ import {TTestSpecEntry} from 'types/TestSpecs.types';
 import RouterActions from 'redux/actions/Router.actions';
 import {RouterSearchFields} from 'constants/Common.constants';
 import {encryptString} from 'utils/Common';
-import useTestDefinitionCrud from './hooks/useTestDefinitionCrud';
+import useTestSpecsCrud from './hooks/useTestSpecsCrud';
 
 interface IContext {
   revert: (originalSelector: string) => void;
-  add(testDefinition: TTestSpecEntry): void;
-  update(selector: string, testDefinition: TTestSpecEntry): void;
+  add(spec: TTestSpecEntry): void;
+  update(selector: string, spec: TTestSpecEntry): void;
   remove(selector: string): void;
   publish(): void;
   runTest(): void;
@@ -24,12 +24,12 @@ interface IContext {
   dryRun(definitionList: TTestSpecEntry[]): void;
   updateIsInitialized(isInitialized: boolean): void;
   assertionResults?: TAssertionResults;
-  definitionList: TTestSpecEntry[];
+  specs: TTestSpecEntry[];
   isLoading: boolean;
   isError: boolean;
   isDraftMode: boolean;
   test?: TTest;
-  setSelectedAssertion(assertionResult?: TAssertionResultEntry): void;
+  setSelectedSpec(assertionResult?: TAssertionResultEntry): void;
 }
 
 export const Context = createContext<IContext>({
@@ -44,8 +44,8 @@ export const Context = createContext<IContext>({
   isLoading: false,
   isError: false,
   isDraftMode: false,
-  definitionList: [],
-  setSelectedAssertion: noop,
+  specs: [],
+  setSelectedSpec: noop,
   updateIsInitialized: noop,
 });
 
@@ -55,20 +55,20 @@ interface IProps {
   children: React.ReactNode;
 }
 
-export const useTestDefinition = () => useContext(Context);
+export const useTestSpecs = () => useContext(Context);
 
-const TestDefinitionProvider = ({children, testId, runId}: IProps) => {
+const TestSpecsProvider = ({children, testId, runId}: IProps) => {
   const dispatch = useAppDispatch();
   const {run} = useTestRun();
   const assertionResults = useAppSelector(state => TestDefinitionSelectors.selectAssertionResults(state));
-  const definitionList = useAppSelector(state => TestDefinitionSelectors.selectDefinitionList(state));
+  const specs = useAppSelector(state => TestDefinitionSelectors.selectDefinitionList(state));
   const isDraftMode = useAppSelector(state => TestDefinitionSelectors.selectIsDraftMode(state));
   const isLoading = useAppSelector(state => TestDefinitionSelectors.selectIsLoading(state));
   const isInitialized = useAppSelector(state => TestDefinitionSelectors.selectIsInitialized(state));
   const {data: test} = useGetTestByIdQuery({testId});
 
   const {add, cancel, publish, runTest, remove, dryRun, update, init, reset, revert, updateIsInitialized} =
-    useTestDefinitionCrud({
+    useTestSpecsCrud({
       testId,
       runId,
       isDraftMode,
@@ -85,10 +85,10 @@ const TestDefinitionProvider = ({children, testId, runId}: IProps) => {
   }, [reset]);
 
   useEffect(() => {
-    if (isInitialized && run.state === 'FINISHED') dryRun(definitionList);
-  }, [dryRun, definitionList, isInitialized, run.state]);
+    if (isInitialized && run.state === 'FINISHED') dryRun(specs);
+  }, [dryRun, specs, isInitialized, run.state]);
 
-  const setSelectedAssertion = useCallback(
+  const setSelectedSpec = useCallback(
     (assertionResult?: TAssertionResultEntry) => {
       dispatch(
         RouterActions.updateSearch({
@@ -113,10 +113,10 @@ const TestDefinitionProvider = ({children, testId, runId}: IProps) => {
       runTest,
       dryRun,
       assertionResults,
-      definitionList,
+      specs,
       cancel,
       test,
-      setSelectedAssertion,
+      setSelectedSpec,
       revert,
       updateIsInitialized,
     }),
@@ -130,10 +130,10 @@ const TestDefinitionProvider = ({children, testId, runId}: IProps) => {
       runTest,
       dryRun,
       assertionResults,
-      definitionList,
+      specs,
       cancel,
       test,
-      setSelectedAssertion,
+      setSelectedSpec,
       revert,
       updateIsInitialized,
     ]
@@ -142,4 +142,4 @@ const TestDefinitionProvider = ({children, testId, runId}: IProps) => {
   return <Context.Provider value={value}>{children}</Context.Provider>;
 };
 
-export default TestDefinitionProvider;
+export default TestSpecsProvider;
