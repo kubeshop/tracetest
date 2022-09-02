@@ -5,7 +5,10 @@ COPY ./web/package.json ./
 COPY ./web/package-lock.json ./
 RUN npm ci --silent
 COPY ./web ./
-RUN npm run build
+
+ARG REACT_APP_POKE_API
+
+RUN REACT_APP_POKE_API=$REACT_APP_POKE_API npm run build
 
 FROM golang:1.18-alpine AS build-go
 WORKDIR /go/src

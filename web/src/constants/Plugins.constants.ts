@@ -1,6 +1,6 @@
 import {IPlugin} from 'types/Plugins.types';
-import pokeshopProtoData from '../assets/pokeshop.proto.json';
 import pokeshopPostmanData from '../assets/pokeshop.postman_collection.json';
+import pokeshopProtoData from '../assets/pokeshop.proto.json';
 
 import {HTTP_METHOD} from './Common.constants';
 import {TriggerTypes} from './Test.constants';
@@ -41,6 +41,8 @@ const Default: IPlugin = {
   ],
 };
 
+const pokeApi = process.env.REACT_APP_POKE_API || 'http://demo-pokemon-api.demo.svc.cluster.local';
+
 const Rest: IPlugin = {
   name: SupportedPlugins.REST,
   title: 'HTTP Request',
@@ -50,21 +52,21 @@ const Rest: IPlugin = {
   demoList: [
     {
       name: 'Pokemon - List',
-      url: 'http://demo-pokemon-api.demo.svc.cluster.local/pokemon?take=20&skip=0',
+      url: `${pokeApi}/pokemon?take=20&skip=0`,
       method: HTTP_METHOD.GET,
       body: '',
       description: 'Get a Pokemon',
     },
     {
       name: 'Pokemon - Add',
-      url: 'http://demo-pokemon-api.demo.svc.cluster.local/pokemon',
+      url: `${pokeApi}/pokemon`,
       method: HTTP_METHOD.POST,
       body: '{"name":"meowth","type":"normal","imageUrl":"https://assets.pokemon.com/assets/cms2/img/pokedex/full/052.png","isFeatured":true}',
       description: 'Add a Pokemon',
     },
     {
       name: 'Pokemon - Import',
-      url: 'http://demo-pokemon-api.demo.svc.cluster.local/pokemon/import',
+      url: `${pokeApi}/pokemon/import`,
       method: HTTP_METHOD.POST,
       body: '{"id":52}',
       description: 'Import a Pokemon',

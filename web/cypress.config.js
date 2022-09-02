@@ -1,6 +1,6 @@
-import {defineConfig} from 'cypress';
+const {defineConfig} = require('cypress');
 
-export default defineConfig({
+module.exports = defineConfig({
   viewportWidth: 1440,
   viewportHeight: 1080,
   responseTimeout: 30000,
@@ -17,6 +17,7 @@ export default defineConfig({
     specPattern: 'cypress/e2e/**/*.spec.{js,ts,jsx,tsx}',
     baseUrl: 'http://localhost:3000',
   },
+  // @ts-ignore
   component: {
     setupNodeEvents() {},
     specPattern: 'cypress/components/**/*.spec.{js,ts,jsx,tsx}',

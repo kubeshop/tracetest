@@ -10,6 +10,7 @@ services:
       args:
         VERSION: dev
         TRACETEST_ENV: docker-compose
+        REACT_APP_POKE_API: http://demo-api:8081
     volumes:
       - type: bind
         source: ./local-config/config.tests.yaml
@@ -33,7 +34,7 @@ services:
     image: postgres
     environment:
       POSTGRES_PASSWORD: postgres
-      POSTGRES_USER:  postgres
+      POSTGRES_USER: postgres
     ports:
       - 5432:5432
     healthcheck:
@@ -69,7 +70,7 @@ services:
       - 6831:6831/udp
       - 6832:6832/udp
     healthcheck:
-      test: ["CMD", "wget", "--spider", "localhost:16686"]
+      test: [ "CMD", "wget", "--spider", "localhost:16686" ]
       interval: 1s
       timeout: 3s
       retries: 60
@@ -80,7 +81,7 @@ services:
     ports:
       - 6379:6379
     healthcheck:
-      test: ["CMD", "redis-cli","ping"]
+      test: [ "CMD", "redis-cli","ping" ]
       interval: 1s
       timeout: 3s
       retries: 60
@@ -112,7 +113,7 @@ services:
     ports:
       - "8081:8081"
     healthcheck:
-      test: ["CMD", "wget", "--spider", "localhost:8081"]
+      test: [ "CMD", "wget", "--spider", "localhost:8081" ]
       interval: 1s
       timeout: 3s
       retries: 60
@@ -163,7 +164,7 @@ services:
     ports:
       - 8082:8082
     healthcheck:
-      test: ["CMD","lsof", "-i", "8082"]
+      test: [ "CMD","lsof", "-i", "8082" ]
       interval: 1s
       timeout: 3s
       retries: 60
@@ -219,3 +220,20 @@ services:
       OPENSEARCH_PASSWORD: admin
     depends_on:
       - opensearch
+  cypress:
+    image: cypress/browsers:node16.14.2-slim-chrome100-ff99-edge
+    entrypoint: [ "/bin/sh", "-c" , "npm ci && npx cypress run --spec /e2e/cypress/e2e/Home/EditTest.spec.ts --config baseUrl=http://tracetest:8080" ]
+    working_dir: /e2e
+    command:
+      - npm ci
+    build:
+      context: .
+    volumes:
+      - ./web/package.json:/e2e/package.json
+      - ./web/tsconfig.json:/e2e/tsconfig.json
+      - ./web/package-lock.json:/e2e/package-lock.json
+      - ./web/cypress.config.js:/e2e/cypress.config.js
+      - ./web/cypress:/e2e/cypress
+      - ./web/src:/e2e/src
+    depends_on:
+      - tracetest
