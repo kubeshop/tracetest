@@ -39,6 +39,7 @@ export const DurationFields = ({form, index, assertion}: IProps) => {
     value: assertion?.expected?.match(/(\d+)/)?.[0],
     duration: (assertion?.expected?.match(/[a-zA-Z]+/g)?.[0] || 'ms') as Duration,
   };
+
   return (
     <div style={{display: 'flex'}}>
       <Input

@@ -33,6 +33,7 @@ interface IProps {
 export const AssertionCheck = ({attributeList, field, index, name, assertions, form, remove, reference}: IProps) => {
   const assertion = assertions?.[index];
   const match = useMemo(() => assertion?.expected?.match(durationRegExp), [assertion?.expected]);
+
   return (
     <>
       <AttributeField field={field} name={name} attributeList={attributeList} reference={reference} />
