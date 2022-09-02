@@ -18,11 +18,6 @@ type TestRepository interface {
 	GetTests(_ context.Context, take, skip int32, query string) ([]Test, error)
 }
 
-type SpecRepository interface {
-	GetSpec(context.Context, Test) (OrderedMap[SpanQuery, []Assertion], error)
-	SetSpec(context.Context, Test, OrderedMap[SpanQuery, []Assertion]) error
-}
-
 type RunRepository interface {
 	CreateRun(context.Context, Test, Run) (Run, error)
 	UpdateRun(context.Context, Run) error
@@ -34,7 +29,6 @@ type RunRepository interface {
 
 type Repository interface {
 	TestRepository
-	SpecRepository
 	RunRepository
 
 	ServerID() (id string, isNew bool, _ error)
