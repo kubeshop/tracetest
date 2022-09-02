@@ -1,6 +1,6 @@
 import {endpoints} from '../../redux/apis/TraceTest.api';
 import {TRawTestSpecs} from '../../types/TestSpecs.types';
-import TestDefinitionGateway from '../TestDefinition.gateway';
+import TestSpecsGateway from '../TestSpecs.gateway';
 
 const {setTestDefinition} = endpoints;
 
@@ -15,11 +15,11 @@ jest.mock('../../redux/apis/TraceTest.api', () => {
   };
 });
 
-describe('TestDefinitionGateway', () => {
+describe('TestSpecsGateway', () => {
   it('should execute the createAssertion function', async () => {
     expect.assertions(1);
     const testDefinition: TRawTestSpecs = {specs: []};
-    await TestDefinitionGateway.set('testId', testDefinition);
+    await TestSpecsGateway.set('testId', testDefinition);
 
     expect(setTestDefinition.initiate).toBeCalledWith({testId: 'testId', testDefinition});
   });

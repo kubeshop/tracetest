@@ -1,6 +1,6 @@
 import {CaseReducer, PayloadAction} from '@reduxjs/toolkit';
 
-import {TChange} from 'redux/actions/TestDefinition.actions';
+import {TChange} from 'redux/actions/TestSpecs.actions';
 import {TAssertion, TAssertionResultEntry, TAssertionResults} from './Assertion.types';
 import {Model, TTestSchemas} from './Common.types';
 

@@ -1,6 +1,6 @@
 import {useCallback} from 'react';
 import {useNavigate} from 'react-router-dom';
-import TestDefinitionActions from 'redux/actions/TestDefinition.actions';
+import TestSpecsActions from 'redux/actions/TestSpecs.actions';
 import {useAppDispatch} from 'redux/hooks';
 import {
   initSpecs,
@@ -41,13 +41,13 @@ const useTestSpecsCrud = ({runId, testId, isDraftMode}: IProps) => {
 
   const dryRun = useCallback(
     (definitionList: TTestSpecEntry[]) => {
-      return dispatch(TestDefinitionActions.dryRun({testId, runId, definitionList})).unwrap();
+      return dispatch(TestSpecsActions.dryRun({testId, runId, definitionList})).unwrap();
     },
     [dispatch, runId, testId]
   );
 
   const publish = useCallback(async () => {
-    const {id} = await dispatch(TestDefinitionActions.publish({testId, runId})).unwrap();
+    const {id} = await dispatch(TestSpecsActions.publish({testId, runId})).unwrap();
     dispatch(RouterActions.updateSearch({[RouterSearchFields.SelectedAssertion]: ''}));
 
     navigate(`/test/${testId}/run/${id}/test`);

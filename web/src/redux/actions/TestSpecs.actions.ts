@@ -1,6 +1,6 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 import {PatchCollection} from '@reduxjs/toolkit/dist/query/core/buildThunks';
-import TestDefinitionGateway from '../../gateways/TestDefinition.gateway';
+import TestSpecsGateway from '../../gateways/TestSpecs.gateway';
 import TestRunGateway from '../../gateways/TestRun.gateway';
 import TestSpecsSelectors from '../../selectors/TestSpecs.selectors';
 import TestDefinitionService from '../../services/TestDefinition.service';
@@ -20,7 +20,7 @@ export type TCrudResponse = {
   change: TChange;
 };
 
-const TestDefinitionActions = () => ({
+const TestSpecsActions = () => ({
   publish: createAsyncThunk<TTestRun, {testId: string; runId: string}>(
     'testDefinition/publish',
     async ({testId, runId}, {dispatch, getState}) => {
@@ -30,7 +30,7 @@ const TestDefinitionActions = () => ({
       );
 
       await dispatch(
-        TestDefinitionGateway.set(testId, {
+        TestSpecsGateway.set(testId, {
           specs: rawDefinitionList,
         })
       );
@@ -48,4 +48,4 @@ const TestDefinitionActions = () => ({
   ),
 });
 
-export default TestDefinitionActions();
+export default TestSpecsActions();

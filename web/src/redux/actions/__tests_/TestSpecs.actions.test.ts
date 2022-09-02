@@ -1,4 +1,4 @@
-import TestDefinitionActions from '../TestDefinition.actions';
+import TestSpecsActions from '../TestSpecs.actions';
 import {store} from '../../store';
 import {HTTP_METHOD} from '../../../constants/Common.constants';
 import TestSpecsSelectors from '../../../selectors/TestSpecs.selectors';
@@ -23,7 +23,7 @@ describe('TestDefinitionActions', () => {
       fetchMock.mockResponseOnce(JSON.stringify(TestRunMock.raw()));
 
       await store.dispatch(
-        TestDefinitionActions.publish({
+        TestSpecsActions.publish({
           testId: 'testId',
           runId: 'runId',
         })
@@ -48,7 +48,7 @@ describe('TestDefinitionActions', () => {
 
       fetchMock.mockResponseOnce(JSON.stringify(TestRunMock.raw()));
       await store.dispatch(
-        TestDefinitionActions.dryRun({
+        TestSpecsActions.dryRun({
           testId: 'testId',
           runId: 'runId',
           definitionList: [],

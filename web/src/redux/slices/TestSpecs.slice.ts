@@ -1,7 +1,7 @@
 import {createSlice} from '@reduxjs/toolkit';
 import {TAssertionResults} from 'types/Assertion.types';
 import {TTestSpecEntry, TTestSpecsSliceActions, ITestSpecsState} from 'types/TestSpecs.types';
-import TestDefinitionActions from '../actions/TestDefinition.actions';
+import TestSpecsActions from '../actions/TestSpecs.actions';
 
 export const initialState: ITestSpecsState = {
   initialSpecs: [],
@@ -88,13 +88,13 @@ const testSpecsSlice = createSlice<ITestSpecsState, TTestSpecsSliceActions, 'tes
   },
   extraReducers: builder => {
     builder
-      .addCase(TestDefinitionActions.dryRun.fulfilled, (state, {payload}) => {
+      .addCase(TestSpecsActions.dryRun.fulfilled, (state, {payload}) => {
         state.assertionResults = payload;
       })
-      .addCase(TestDefinitionActions.publish.pending, state => {
+      .addCase(TestSpecsActions.publish.pending, state => {
         state.isDraftMode = false;
       })
-      .addCase(TestDefinitionActions.publish.fulfilled, (state, {payload: {result}}) => {
+      .addCase(TestSpecsActions.publish.fulfilled, (state, {payload: {result}}) => {
         const specs = assertionResultsToSpecs(result);
 
         state.assertionResults = result;
