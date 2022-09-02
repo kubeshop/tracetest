@@ -56,7 +56,7 @@ const TestService = () => ({
       ...(original
         ? {
             specs: {
-              specs: original.definition.definitionList.map(def => TestDefinitionService.toRaw(def)),
+              specs: original.definition.specs.map(def => TestDefinitionService.toRaw(def)),
             },
           }
         : {}),

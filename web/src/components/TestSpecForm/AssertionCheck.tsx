@@ -27,11 +27,11 @@ interface IProps {
   name: number;
   attributeList: TSpanFlatAttribute[];
   index: number;
-  assertionList: TAssertion[];
+  assertions: TAssertion[];
 }
 
-export const AssertionCheck = ({attributeList, field, index, name, assertionList, form, remove, reference}: IProps) => {
-  const assertion = assertionList?.[index];
+export const AssertionCheck = ({attributeList, field, index, name, assertions, form, remove, reference}: IProps) => {
+  const assertion = assertions?.[index];
   const match = useMemo(() => assertion?.expected?.match(durationRegExp), [assertion?.expected]);
   return (
     <>

@@ -46,7 +46,7 @@ const TestResults = () => {
         isEditing: true,
         selector,
         defaultValues: {
-          assertionList: list.map(({assertion}) => assertion),
+          assertions: list.map(({assertion}) => assertion),
           selector,
         },
       });

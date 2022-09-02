@@ -20,9 +20,9 @@ interface DurationState {
 
 function setDurationFieldValue(form: FormInstance<IValues>, index: number, state: DurationState) {
   form.setFieldsValue({
-    assertionList: form
+    assertions: form
       .getFieldsValue()
-      .assertionList?.map((as, i) => (i === index ? {...as, expected: `${state.value}${state.duration}`} : as)),
+      .assertions?.map((as, i) => (i === index ? {...as, expected: `${state.value}${state.duration}`} : as)),
   });
 }
 

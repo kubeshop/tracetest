@@ -10,7 +10,7 @@ import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import RouterActions from 'redux/actions/Router.actions';
 import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
 import CreateAssertionModalAnalyticsService from 'services/Analytics/CreateAssertionModalAnalytics.service';
-import {TTestDefinitionEntry} from 'types/TestDefinition.types';
+import {TTestSpecEntry} from 'types/TestSpecs.types';
 import {IValues} from './TestSpecForm';
 
 interface IFormProps {
@@ -53,7 +53,7 @@ const TestSpecFormProvider: React.FC<{testId: string}> = ({children}) => {
 
   const open = useCallback(
     (props: IFormProps = {}) => {
-      const {isEditing, defaultValues: {assertionList = [], selector: defaultSelector} = {}} = props;
+      const {isEditing, defaultValues: {assertions = [], selector: defaultSelector} = {}} = props;
       const definition = definitionList.find(({selector}) => defaultSelector === selector);
 
       if (definition)
@@ -63,7 +63,7 @@ const TestSpecFormProvider: React.FC<{testId: string}> = ({children}) => {
           selector: defaultSelector,
           defaultValues: {
             selector: defaultSelector,
-            assertionList: isEditing ? assertionList : [...definition.assertionList, ...assertionList],
+            assertions: isEditing ? assertions : [...definition.assertions, ...assertions],
           },
         });
       else setFormProps(props);
@@ -95,12 +95,12 @@ const TestSpecFormProvider: React.FC<{testId: string}> = ({children}) => {
   }, []);
 
   const onSubmit = useCallback(
-    async ({assertionList = [], selector: newSelectorString = ''}: IValues) => {
+    async ({assertions = [], selector: newSelectorString = ''}: IValues) => {
       const {isEditing, selector = ''} = formProps;
 
-      const definition: TTestDefinitionEntry = {
+      const definition: TTestSpecEntry = {
         selector: newSelectorString,
-        assertionList,
+        assertions,
         originalSelector: newSelectorString,
         isDraft: true,
       };

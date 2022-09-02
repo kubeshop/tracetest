@@ -1,34 +1,29 @@
 import {CaseReducer, PayloadAction} from '@reduxjs/toolkit';
-import {TChange} from '../redux/actions/TestDefinition.actions';
+
+import {TChange} from 'redux/actions/TestDefinition.actions';
 import {TAssertion, TAssertionResultEntry, TAssertionResults} from './Assertion.types';
 import {Model, TTestSchemas} from './Common.types';
 
-export type TRawTestDefinition = TTestSchemas['TestSpecs'];
+export type TRawTestSpecs = TTestSchemas['TestSpecs'];
 
-export type TTestDefinitionEntry = {
+export type TTestSpecEntry = {
+  assertions: TAssertion[];
+  isDeleted?: boolean;
+  isDraft: boolean;
   originalSelector?: string;
   selector: string;
-  assertionList: TAssertion[];
-  isDraft: boolean;
-  isDeleted?: boolean;
 };
 
-export type TRawTestDefinitionEntry = {
+export type TRawTestSpecEntry = {
   selector: {query: string};
   assertions: TAssertion[];
 };
 
-export type TTestDefinition = Model<
-  TRawTestDefinition,
-  {
-    definitionList: TTestDefinitionEntry[];
-    definitions?: TRawTestDefinition;
-    specs?: TRawTestDefinition;
-  }
->;
+export type TTestSpecs = Model<TRawTestSpecs, {specs: TTestSpecEntry[]}>;
+
 export interface ITestDefinitionState {
-  initialDefinitionList: TTestDefinitionEntry[];
-  definitionList: TTestDefinitionEntry[];
+  initialDefinitionList: TTestSpecEntry[];
+  definitionList: TTestSpecEntry[];
   assertionResults?: TAssertionResults;
   changeList: TChange[];
   isLoading: boolean;
@@ -40,11 +35,8 @@ export interface ITestDefinitionState {
 export type TTestDefinitionSliceActions = {
   reset: CaseReducer<ITestDefinitionState>;
   initDefinitionList: CaseReducer<ITestDefinitionState, PayloadAction<{assertionResults: TAssertionResults}>>;
-  addDefinition: CaseReducer<ITestDefinitionState, PayloadAction<{definition: TTestDefinitionEntry}>>;
-  updateDefinition: CaseReducer<
-    ITestDefinitionState,
-    PayloadAction<{definition: TTestDefinitionEntry; selector: string}>
-  >;
+  addDefinition: CaseReducer<ITestDefinitionState, PayloadAction<{definition: TTestSpecEntry}>>;
+  updateDefinition: CaseReducer<ITestDefinitionState, PayloadAction<{definition: TTestSpecEntry; selector: string}>>;
   removeDefinition: CaseReducer<ITestDefinitionState, PayloadAction<{selector: string}>>;
   revertDefinition: CaseReducer<ITestDefinitionState, PayloadAction<{originalSelector: string}>>;
   resetDefinitionList: CaseReducer<ITestDefinitionState>;

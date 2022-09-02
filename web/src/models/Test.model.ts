@@ -1,5 +1,5 @@
-import {TRawTest, TTest} from '../types/Test.types';
-import TestDefinition from './TestDefinition.model';
+import {TRawTest, TTest} from 'types/Test.types';
+import TestSpecs from './TestSpecs.model';
 import Trigger from './Trigger.model';
 
 const Test = ({
@@ -9,15 +9,13 @@ const Test = ({
   specs,
   version = 1,
   serviceUnderTest: rawTrigger,
-}: TRawTest): TTest => {
-  return {
-    id,
-    name,
-    version,
-    description,
-    definition: TestDefinition(specs || {}),
-    trigger: Trigger(rawTrigger || {}),
-  };
-};
+}: TRawTest): TTest => ({
+  id,
+  name,
+  version,
+  description,
+  definition: TestSpecs(specs || {}),
+  trigger: Trigger(rawTrigger || {}),
+});
 
 export default Test;

@@ -1,6 +1,6 @@
 import {createSlice} from '@reduxjs/toolkit';
 import {TAssertionResults} from 'types/Assertion.types';
-import {ITestDefinitionState, TTestDefinitionEntry, TTestDefinitionSliceActions} from 'types/TestDefinition.types';
+import {ITestDefinitionState, TTestSpecEntry, TTestDefinitionSliceActions} from 'types/TestSpecs.types';
 import TestDefinitionActions from '../actions/TestDefinition.actions';
 
 export const initialState: ITestDefinitionState = {
@@ -13,13 +13,13 @@ export const initialState: ITestDefinitionState = {
   isDraftMode: false,
 };
 
-export const assertionResultsToDefinitionList = (assertionResults: TAssertionResults): TTestDefinitionEntry[] => {
+export const assertionResultsToDefinitionList = (assertionResults: TAssertionResults): TTestSpecEntry[] => {
   return assertionResults.resultList.map(({selector, resultList}) => ({
     isDraft: false,
     isDeleted: false,
     selector,
     originalSelector: selector,
-    assertionList: resultList.flatMap(({assertion}) => [assertion]),
+    assertions: resultList.flatMap(({assertion}) => [assertion]),
   }));
 };
 

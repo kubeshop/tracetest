@@ -1,5 +1,5 @@
 import {RootState} from '../../redux/store';
-import {ITestDefinitionState} from '../../types/TestDefinition.types';
+import {ITestDefinitionState} from '../../types/TestSpecs.types';
 import TestDefinitionSelectors from '../TestDefinition.selectors';
 
 describe('TestDefinitionSelectors', () => {

@@ -36,7 +36,7 @@ const SpanDetail = ({onCreateTestSpec = noop, searchText, span}: IProps) => {
         isEditing: false,
         selector,
         defaultValues: {
-          assertionList: [
+          assertions: [
             {
               comparator: OperatorService.getOperatorSymbol(CompareOperator.EQUALS),
               expected: value,

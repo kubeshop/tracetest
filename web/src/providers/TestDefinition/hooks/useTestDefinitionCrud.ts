@@ -13,7 +13,7 @@ import {
   setIsInitialized,
 } from 'redux/slices/TestDefinition.slice';
 import {TAssertionResults} from 'types/Assertion.types';
-import {TTestDefinitionEntry} from 'types/TestDefinition.types';
+import {TTestSpecEntry} from 'types/TestSpecs.types';
 import TestRunGateway from 'gateways/TestRun.gateway';
 import useBlockNavigation from 'hooks/useBlockNavigation';
 import RouterActions from 'redux/actions/Router.actions';
@@ -40,7 +40,7 @@ const useTestDefinitionCrud = ({runId, testId, isDraftMode}: IProps) => {
   );
 
   const dryRun = useCallback(
-    (definitionList: TTestDefinitionEntry[]) => {
+    (definitionList: TTestSpecEntry[]) => {
       return dispatch(TestDefinitionActions.dryRun({testId, runId, definitionList})).unwrap();
     },
     [dispatch, runId, testId]
@@ -65,14 +65,14 @@ const useTestDefinitionCrud = ({runId, testId, isDraftMode}: IProps) => {
   }, [dispatch]);
 
   const add = useCallback(
-    async (definition: TTestDefinitionEntry) => {
+    async (definition: TTestSpecEntry) => {
       dispatch(addDefinition({definition}));
     },
     [dispatch]
   );
 
   const update = useCallback(
-    async (selector: string, definition: TTestDefinitionEntry) => {
+    async (selector: string, definition: TTestSpecEntry) => {
       dispatch(updateDefinition({definition, selector}));
     },
     [dispatch]

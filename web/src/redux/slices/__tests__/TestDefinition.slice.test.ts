@@ -1,9 +1,9 @@
 import faker from '@faker-js/faker';
 import AssertionMock from '../../../models/__mocks__/Assertion.mock';
 import AssertionResultsMock from '../../../models/__mocks__/AssertionResults.mock';
-import TestDefinitionMock from '../../../models/__mocks__/TestDefinition.mock';
+import TestDefinitionMock from '../../../models/__mocks__/TestSpecs.mock';
 import TestRunMock from '../../../models/__mocks__/TestRun.mock';
-import {TTestDefinitionEntry} from '../../../types/TestDefinition.types';
+import {TTestSpecEntry} from '../../../types/TestSpecs.types';
 import Reducer, {
   addDefinition,
   assertionResultsToDefinitionList,
@@ -22,10 +22,10 @@ const {definitionList} = TestDefinitionMock.model();
 
 const definitionSelector = `span[http.status_code] = "304"]`;
 
-const definition: TTestDefinitionEntry = {
+const definition: TTestSpecEntry = {
   selector: definitionSelector,
   isDraft: true,
-  assertionList: new Array(faker.datatype.number({min: 2, max: 10})).fill(null).map(() => AssertionMock.model()),
+  assertions: new Array(faker.datatype.number({min: 2, max: 10})).fill(null).map(() => AssertionMock.model()),
   originalSelector: definitionSelector,
 };
 

@@ -4,8 +4,8 @@ import {Plugins} from '../../src/constants/Plugins.constants';
 import {getTestId} from '../integration/utils/Common';
 
 export const testRunPageRegex = /\/test\/(.*)\/run\/(.*)/;
-export const getAttributeListId = (number: number) => `#assertion-form_assertionList_${number}_attribute_list`;
-export const getComparatorListId = (number: number) => `#assertion-form_assertionList_${number}_comparator_list`;
+export const getAttributeListId = (number: number) => `#assertion-form_assertions_${number}_attribute_list`;
+export const getComparatorListId = (number: number) => `#assertion-form_assertions_${number}_comparator_list`;
 
 Cypress.Commands.add('createMultipleTestRuns', (id: string, count: number) => {
   cy.visit('/');
