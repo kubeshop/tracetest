@@ -1,7 +1,7 @@
 import {useMemo} from 'react';
 
 import {useAppSelector} from 'redux/hooks';
-import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
+import TestSpecsSelectors from 'selectors/TestSpecs.selectors';
 import AssertionService from 'services/Assertion.service';
 import {TAssertionResultEntry} from 'types/Assertion.types';
 import Actions from './Actions';
@@ -28,7 +28,7 @@ const TestSpec = ({
     isDeleted = false,
     isDraft = false,
     originalSelector = '',
-  } = useAppSelector(state => TestDefinitionSelectors.selectDefinitionBySelector(state, selector)) || {};
+  } = useAppSelector(state => TestSpecsSelectors.selectSpecBySelector(state, selector)) || {};
   const totalPassedChecks = useMemo(() => AssertionService.getTotalPassedChecks(resultList), [resultList]);
 
   return (

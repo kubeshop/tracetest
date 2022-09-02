@@ -2,7 +2,7 @@ import {createAsyncThunk} from '@reduxjs/toolkit';
 import {parse, ParsedQuery, stringify} from 'query-string';
 import {Params} from 'react-router-dom';
 import {push} from 'redux-first-history';
-import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
+import TestSpecsSelectors from 'selectors/TestSpecs.selectors';
 import {RouterSearchFields} from '../../constants/Common.constants';
 import SpanSelectors from '../../selectors/Span.selectors';
 import {decryptString} from '../../utils/Common';
@@ -23,14 +23,11 @@ const RouterActions = () => ({
 
       const decryptedSelector = decryptString(String(selector));
 
-      const assertionResult = TestDefinitionSelectors.selectAssertionBySelector(
-        getState() as RootState,
-        decryptedSelector
-      );
+      const assertionResult = TestSpecsSelectors.selectAssertionBySelector(getState() as RootState, decryptedSelector);
 
-      const selectedAssertion = TestDefinitionSelectors.selectSelectedAssertion(getState() as RootState);
+      const selectedSpec = TestSpecsSelectors.selectSelectedSpec(getState() as RootState);
 
-      if (selectedAssertion === decryptedSelector || (!selectedAssertion && !decryptedSelector)) {
+      if (selectedSpec === decryptedSelector || (!selectedSpec && !decryptedSelector)) {
         return;
       }
 

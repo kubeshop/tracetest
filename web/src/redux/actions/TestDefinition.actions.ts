@@ -2,7 +2,7 @@ import {createAsyncThunk} from '@reduxjs/toolkit';
 import {PatchCollection} from '@reduxjs/toolkit/dist/query/core/buildThunks';
 import TestDefinitionGateway from '../../gateways/TestDefinition.gateway';
 import TestRunGateway from '../../gateways/TestRun.gateway';
-import TestDefinitionSelectors from '../../selectors/TestDefinition.selectors';
+import TestSpecsSelectors from '../../selectors/TestSpecs.selectors';
 import TestDefinitionService from '../../services/TestDefinition.service';
 import {TAssertionResults} from '../../types/Assertion.types';
 import {TRawTestSpecEntry, TTestSpecEntry} from '../../types/TestSpecs.types';
@@ -24,9 +24,10 @@ const TestDefinitionActions = () => ({
   publish: createAsyncThunk<TTestRun, {testId: string; runId: string}>(
     'testDefinition/publish',
     async ({testId, runId}, {dispatch, getState}) => {
-      const rawDefinitionList = TestDefinitionSelectors.selectDefinitionList(getState() as RootState).reduce<
-        TRawTestSpecEntry[]
-      >((list, def) => (!def.isDeleted ? list.concat([TestDefinitionService.toRaw(def)]) : list), []);
+      const rawDefinitionList = TestSpecsSelectors.selectSpecs(getState() as RootState).reduce<TRawTestSpecEntry[]>(
+        (list, def) => (!def.isDeleted ? list.concat([TestDefinitionService.toRaw(def)]) : list),
+        []
+      );
 
       await dispatch(
         TestDefinitionGateway.set(testId, {

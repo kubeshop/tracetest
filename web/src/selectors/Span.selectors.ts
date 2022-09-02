@@ -9,14 +9,15 @@ const paramsSelector = (state: RootState, spanId: string, testId: string, runId:
 const selectMatchedSpans = createSelector(
   spansStateSelector,
   stateSelector,
-  ({matchedSpans}, {testDefinition: {assertionResults, selectedAssertion}}) => {
-    if (!selectedAssertion) return matchedSpans;
+  ({matchedSpans}, {testSpecs: {assertionResults, selectedSpec}}) => {
+    if (!selectedSpec) return matchedSpans;
 
-    const foundAssertion = assertionResults?.resultList.find(({selector}) => selector === selectedAssertion);
+    const foundAssertion = assertionResults?.resultList.find(({selector}) => selector === selectedSpec);
 
     return !foundAssertion ? [] : matchedSpans;
   }
 );
+
 const SpanSelectors = () => ({
   selectMatchedSpans,
   selectSpanById: createSelector(stateSelector, paramsSelector, (state, {spanId, testId, runId}) => {

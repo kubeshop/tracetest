@@ -7,7 +7,7 @@ import TestSpecs from 'components/TestSpecs';
 import {useSpan} from 'providers/Span/Span.provider';
 import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
 import {useAppSelector} from 'redux/hooks';
-import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
+import TestSpecsSelectors from 'selectors/TestSpecs.selectors';
 import AssertionAnalyticsService from 'services/Analytics/AssertionAnalytics.service';
 import {TAssertionResultEntry} from 'types/Assertion.types';
 import Header from './Header';
@@ -17,10 +17,10 @@ const TestResults = () => {
   const {open} = useTestSpecForm();
   const {isLoading, assertionResults, remove, revert, setSelectedSpec} = useTestSpecs();
   const {selectedSpan, onSetFocusedSpan} = useSpan();
-  const {totalFailedSpecs, totalPassedSpecs} = useAppSelector(TestDefinitionSelectors.selectTotalSpecs);
-  const selectedAssertion = useAppSelector(TestDefinitionSelectors.selectSelectedAssertion);
+  const {totalFailedSpecs, totalPassedSpecs} = useAppSelector(TestSpecsSelectors.selectTotalSpecs);
+  const selectedSpec = useAppSelector(TestSpecsSelectors.selectSelectedSpec);
   const selectedTestSpec = useAppSelector(state =>
-    TestDefinitionSelectors.selectAssertionBySelector(state, selectedAssertion ?? '')
+    TestSpecsSelectors.selectAssertionBySelector(state, selectedSpec ?? '')
   );
 
   const handleOpen = useCallback(
@@ -98,7 +98,7 @@ const TestResults = () => {
       )}
 
       <TestSpecDetail
-        isOpen={Boolean(selectedAssertion)}
+        isOpen={Boolean(selectedSpec)}
         onClose={handleClose}
         onDelete={handleDelete}
         onEdit={handleEdit}

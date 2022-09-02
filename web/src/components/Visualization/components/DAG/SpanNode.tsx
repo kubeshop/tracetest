@@ -4,14 +4,14 @@ import {Handle, NodeProps, Position} from 'react-flow-renderer';
 import {SemanticGroupNamesToText} from 'constants/SemanticGroupNames.constants';
 import {SpanKindToText} from 'constants/Span.constants';
 import {useAppSelector} from 'redux/hooks';
-import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
+import TestSpecsSelectors from 'selectors/TestSpecs.selectors';
 import {INodeDataSpan} from 'types/DAG.types';
 import * as S from './SpanNode.styled';
 
 interface IProps extends NodeProps<INodeDataSpan> {}
 
 const SpanNode = ({data, id, selected}: IProps) => {
-  const spansResult = useAppSelector(TestDefinitionSelectors.selectSpansResult);
+  const spansResult = useAppSelector(TestSpecsSelectors.selectSpansResult);
   const passedChecks = spansResult[data.id]?.passed;
   const failedChecks = spansResult[data.id]?.failed;
   const className = data.isMatched ? 'matched' : '';

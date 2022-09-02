@@ -8,7 +8,7 @@ import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import RouterActions from 'redux/actions/Router.actions';
-import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
+import TestSpecsSelectors from 'selectors/TestSpecs.selectors';
 import CreateAssertionModalAnalyticsService from 'services/Analytics/CreateAssertionModalAnalytics.service';
 import {TTestSpecEntry} from 'types/TestSpecs.types';
 import {IValues} from './TestSpecForm';
@@ -49,21 +49,21 @@ const TestSpecFormProvider: React.FC<{testId: string}> = ({children}) => {
   const {update, add, test, isDraftMode} = useTestSpecs();
   const {run} = useTestRun();
   const {onClearMatchedSpans} = useSpan();
-  const definitionList = useAppSelector(state => TestDefinitionSelectors.selectDefinitionList(state));
+  const specs = useAppSelector(state => TestSpecsSelectors.selectSpecs(state));
 
   const open = useCallback(
     (props: IFormProps = {}) => {
       const {isEditing, defaultValues: {assertions = [], selector: defaultSelector} = {}} = props;
-      const definition = definitionList.find(({selector}) => defaultSelector === selector);
+      const spec = specs.find(({selector}) => defaultSelector === selector);
 
-      if (definition)
+      if (spec)
         setFormProps({
           ...props,
           isEditing: true,
           selector: defaultSelector,
           defaultValues: {
             selector: defaultSelector,
-            assertions: isEditing ? assertions : [...definition.assertions, ...assertions],
+            assertions: isEditing ? assertions : [...spec.assertions, ...assertions],
           },
         });
       else setFormProps(props);
@@ -78,7 +78,7 @@ const TestSpecFormProvider: React.FC<{testId: string}> = ({children}) => {
 
       dispatch(RouterActions.updateSearch({[RouterSearchFields.SelectedAssertion]: ''}));
     },
-    [dispatch, definitionList, isDraftMode, run.testVersion, test?.version]
+    [dispatch, specs, isDraftMode, run.testVersion, test?.version]
   );
 
   const close = useCallback(() => {

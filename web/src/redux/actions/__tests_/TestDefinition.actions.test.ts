@@ -1,14 +1,14 @@
 import TestDefinitionActions from '../TestDefinition.actions';
 import {store} from '../../store';
 import {HTTP_METHOD} from '../../../constants/Common.constants';
-import TestDefinitionSelectors from '../../../selectors/TestDefinition.selectors';
+import TestSpecsSelectors from '../../../selectors/TestSpecs.selectors';
 import TestRunMock from '../../../models/__mocks__/TestRun.mock';
 
 jest.mock('../../../selectors/TestDefinition.selectors', () => ({
   selectDefinitionList: jest.fn(),
 }));
 
-const selectTestMock = TestDefinitionSelectors.selectDefinitionList as unknown as jest.Mock;
+const selectTestMock = TestSpecsSelectors.selectSpecs as unknown as jest.Mock;
 
 describe('TestDefinitionActions', () => {
   beforeEach(() => {

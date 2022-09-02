@@ -4,15 +4,13 @@ import {RootState} from 'redux/store';
 import {TResultAssertions} from 'types/Assertion.types';
 import {TSpansResult} from 'types/Span.types';
 
-const stateSelector = (state: RootState) => state.testDefinition;
+const stateSelector = (state: RootState) => state.testSpecs;
 const selectorSelector = (state: RootState, selector: string) => selector;
 const spanIdSelector = (state: RootState, spanId: string) => spanId;
 
-const selectDefinitionList = createSelector(stateSelector, ({definitionList}) => definitionList);
+const selectSpecs = createSelector(stateSelector, ({specs}) => specs);
 
-const selectDefinitionSelectorList = createSelector(selectDefinitionList, definitionList =>
-  definitionList.map(({selector}) => selector)
-);
+const selectSpecsSelectorList = createSelector(selectSpecs, specs => specs.map(({selector}) => selector));
 const selectAssertionResults = createSelector(stateSelector, ({assertionResults}) => assertionResults);
 
 const selectAssertionResultsBySpan = createSelector(
@@ -85,26 +83,26 @@ const selectTotalSpecs = createSelector(selectAssertionResults, assertionResults
   );
 });
 
-const TestDefinitionSelectors = () => ({
-  selectDefinitionList,
-  selectDefinitionSelectorList,
-  selectIsSelectorExist: createSelector(selectDefinitionSelectorList, selectorSelector, (selectorList, selector) =>
+const TestSpecsSelectors = () => ({
+  selectSpecs,
+  selectSpecsSelectorList,
+  selectIsSelectorExist: createSelector(selectSpecsSelectorList, selectorSelector, (selectorList, selector) =>
     selectorList.includes(selector)
   ),
   selectIsLoading: createSelector(stateSelector, ({isLoading}) => isLoading),
   selectIsInitialized: createSelector(stateSelector, ({isInitialized}) => isInitialized),
   selectAssertionResults,
-  selectDefinitionBySelector: createSelector(selectDefinitionList, selectorSelector, (definitionList, selector) =>
-    definitionList.find(def => def.selector === selector)
+  selectSpecBySelector: createSelector(selectSpecs, selectorSelector, (specs, selector) =>
+    specs.find(spec => spec.selector === selector)
   ),
   selectAssertionBySelector: createSelector(stateSelector, selectorSelector, ({assertionResults}, selector) =>
     assertionResults?.resultList.find(def => def.selector === selector)
   ),
-  selectSelectedAssertion: createSelector(stateSelector, ({selectedAssertion}) => selectedAssertion),
+  selectSelectedSpec: createSelector(stateSelector, ({selectedSpec}) => selectedSpec),
   selectAssertionResultsBySpan,
   selectIsDraftMode: createSelector(stateSelector, ({isDraftMode}) => isDraftMode),
   selectSpansResult,
   selectTotalSpecs,
 });
 
-export default TestDefinitionSelectors();
+export default TestSpecsSelectors();
