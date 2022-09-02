@@ -2,7 +2,6 @@ package installer
 
 var kubernetes = installer{
 	preChecks: []preChecker{
-		k8sEnvironmentChecker,
 		kubectlChecker,
 		helmChecker,
 	},
@@ -56,15 +55,9 @@ func kubectlChecker(ui UI) {
 	} else {
 		ui.Exit(ui.Red("✘ kubectl could not be installed. Check output for errors. " + createIssueMsg))
 	}
-}
 
-func k8sEnvironmentChecker(ui UI) {
-	option := ui.Select("Are you going to run it locally or in a remote cluster?", []option{
-		{"Locally", minikubeChecker},
-		{"Remote cluster", nil}, // Nothing needs to be done
-	}, 0)
-
-	option.fn(ui)
+	// If user doesn't have kubectl, it probably doesn't have minikube either, so suggest installig it
+	minikubeChecker(ui)
 }
 
 func minikubeChecker(ui UI) {
