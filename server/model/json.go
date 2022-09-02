@@ -64,7 +64,7 @@ func (a Assertion) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&struct {
 		Attribute  string
 		Comparator string
-		Value      *AssertionExpression
+		Value      string
 	}{
 		Attribute:  a.Attribute.String(),
 		Comparator: a.Comparator.String(),
@@ -76,7 +76,7 @@ func (a *Assertion) UnmarshalJSON(data []byte) error {
 	aux := struct {
 		Attribute  string
 		Comparator string
-		Value      *AssertionExpression
+		Value      string
 	}{}
 	if err := json.Unmarshal(data, &aux); err != nil {
 		return err

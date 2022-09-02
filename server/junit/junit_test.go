@@ -28,12 +28,7 @@ func TestConversion(t *testing.T) {
 					Assertion: model.Assertion{
 						Attribute:  "db.statement",
 						Comparator: comparator.Contains,
-						Value: &model.AssertionExpression{
-							LiteralValue: model.LiteralValue{
-								Value: "INSERT",
-								Type:  "string",
-							},
-						},
+						Value:      "INSERT",
 					},
 					Results: []model.SpanAssertionResult{
 						{
@@ -46,12 +41,7 @@ func TestConversion(t *testing.T) {
 					Assertion: model.Assertion{
 						Attribute:  "tracetest.span.duration",
 						Comparator: comparator.Lt,
-						Value: &model.AssertionExpression{
-							LiteralValue: model.LiteralValue{
-								Value: "500",
-								Type:  "number",
-							},
-						},
+						Value:      "500",
 					},
 					Results: []model.SpanAssertionResult{
 						{
@@ -64,12 +54,7 @@ func TestConversion(t *testing.T) {
 					Assertion: model.Assertion{
 						Attribute:  "tracetest.span.type",
 						Comparator: comparator.Eq,
-						Value: &model.AssertionExpression{
-							LiteralValue: model.LiteralValue{
-								Value: "http",
-								Type:  "string",
-							},
-						},
+						Value:      "http",
 					},
 					Results: []model.SpanAssertionResult{
 						{

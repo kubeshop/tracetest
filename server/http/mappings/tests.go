@@ -8,7 +8,6 @@ import (
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/assertions/selectors"
 	"github.com/kubeshop/tracetest/server/encoding/yaml/conversion"
-	"github.com/kubeshop/tracetest/server/encoding/yaml/conversion/parser"
 	"github.com/kubeshop/tracetest/server/encoding/yaml/definition"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
@@ -190,27 +189,17 @@ func (m OpenAPI) Result(in *model.RunResults) openapi.AssertionResults {
 		Results:   results,
 	}
 }
-
 func (m OpenAPI) Assertion(in model.Assertion) openapi.Assertion {
+	value := in.Value
+	if m.traceConversionConfig.IsTimeField(in.Attribute.String()) {
+		intValue, _ := strconv.Atoi(in.Value)
+		value = traces.ConvertNanoSecondsIntoProperTimeUnit(intValue)
+	}
+
 	return openapi.Assertion{
 		Attribute:  in.Attribute.String(),
 		Comparator: in.Comparator.String(),
-		Expected:   in.Value.String(),
-	}
-}
-
-func (m OpenAPI) AssertionExpression(in *parser.Expression) *model.AssertionExpression {
-	if in == nil {
-		return nil
-	}
-
-	return &model.AssertionExpression{
-		LiteralValue: model.LiteralValue{
-			Value: in.LiteralValue.String(),
-			Type:  in.LiteralValue.Type(),
-		},
-		Operation:  in.Operation,
-		Expression: m.AssertionExpression(in.Expression),
+		Expected:   value,
 	}
 }
 
@@ -379,27 +368,16 @@ func (m Model) Result(in openapi.AssertionResults) *model.RunResults {
 
 func (m Model) Assertion(in openapi.Assertion) model.Assertion {
 	comp, _ := m.comparators.Get(in.Comparator)
-	expression, _ := parser.ParseAssertionExpression(in.Expected)
+	expectedValue := in.Expected
+	if m.traceConversionConfig.IsTimeField(in.Attribute) {
+		fieldInNanoSeconds := traces.ConvertTimeFieldIntoNanoSeconds(expectedValue)
+		expectedValue = fmt.Sprintf("%d", fieldInNanoSeconds)
+	}
 
 	return model.Assertion{
 		Attribute:  model.Attribute(in.Attribute),
 		Comparator: comp,
-		Value:      m.AssertionExpression(expression),
-	}
-}
-
-func (m Model) AssertionExpression(in *parser.Expression) *model.AssertionExpression {
-	if in == nil {
-		return nil
-	}
-
-	return &model.AssertionExpression{
-		LiteralValue: model.LiteralValue{
-			Value: in.LiteralValue.String(),
-			Type:  in.LiteralValue.Type(),
-		},
-		Operation:  in.Operation,
-		Expression: m.AssertionExpression(in.Expression),
+		Value:      expectedValue,
 	}
 }
 

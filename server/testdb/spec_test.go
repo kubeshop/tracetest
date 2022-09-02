@@ -20,12 +20,7 @@ func TestSpecs(t *testing.T) {
 		{
 			Attribute:  "tracetest.span.duration",
 			Comparator: comparator.Eq,
-			Value: &model.AssertionExpression{
-				LiteralValue: model.LiteralValue{
-					Value: "2000000000",
-					Type:  "number",
-				},
-			},
+			Value:      "2000000000",
 		},
 	})
 

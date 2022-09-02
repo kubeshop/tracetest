@@ -28,12 +28,7 @@ func TestAssertion(t *testing.T) {
 				{
 					Attribute:  "tracetest.span.duration",
 					Comparator: comparator.Eq,
-					Value: &model.AssertionExpression{
-						LiteralValue: model.LiteralValue{
-							Value: "2000ns",
-							Type:  "duration",
-						},
-					},
+					Value:      "2000",
 				},
 			}),
 			trace: traces.Trace{
@@ -51,12 +46,7 @@ func TestAssertion(t *testing.T) {
 					Assertion: model.Assertion{
 						Attribute:  "tracetest.span.duration",
 						Comparator: comparator.Eq,
-						Value: &model.AssertionExpression{
-							LiteralValue: model.LiteralValue{
-								Value: "2000ns",
-								Type:  "duration",
-							},
-						},
+						Value:      "2000",
 					},
 					Results: []model.SpanAssertionResult{
 						{
@@ -74,23 +64,13 @@ func TestAssertion(t *testing.T) {
 				{
 					Attribute:  "tracetest.selected_spans.count",
 					Comparator: comparator.Eq,
-					Value: &model.AssertionExpression{
-						LiteralValue: model.LiteralValue{
-							Value: "1",
-							Type:  "number",
-						},
-					},
+					Value:      "1",
 				},
 			}).MustAdd(`span[service.name="NotExists"]`, []model.Assertion{
 				{
 					Attribute:  "tracetest.selected_spans.count",
 					Comparator: comparator.Eq,
-					Value: &model.AssertionExpression{
-						LiteralValue: model.LiteralValue{
-							Value: "0",
-							Type:  "number",
-						},
-					},
+					Value:      "0",
 				},
 			}),
 			trace: traces.Trace{
@@ -108,12 +88,7 @@ func TestAssertion(t *testing.T) {
 					Assertion: model.Assertion{
 						Attribute:  "tracetest.selected_spans.count",
 						Comparator: comparator.Eq,
-						Value: &model.AssertionExpression{
-							LiteralValue: model.LiteralValue{
-								Value: "1",
-								Type:  "number",
-							},
-						},
+						Value:      "1",
 					},
 					Results: []model.SpanAssertionResult{
 						{
@@ -128,12 +103,7 @@ func TestAssertion(t *testing.T) {
 					Assertion: model.Assertion{
 						Attribute:  "tracetest.selected_spans.count",
 						Comparator: comparator.Eq,
-						Value: &model.AssertionExpression{
-							LiteralValue: model.LiteralValue{
-								Value: "0",
-								Type:  "number",
-							},
-						},
+						Value:      "0",
 					},
 					Results: []model.SpanAssertionResult{
 						{
@@ -152,22 +122,12 @@ func TestAssertion(t *testing.T) {
 				{
 					Attribute:  "http.response.body",
 					Comparator: comparator.Contains,
-					Value: &model.AssertionExpression{
-						LiteralValue: model.LiteralValue{
-							Value: "52",
-							Type:  "number",
-						},
-					},
+					Value:      "52",
 				},
 				{
 					Attribute:  "tracetest.span.duration",
 					Comparator: comparator.Lt,
-					Value: &model.AssertionExpression{
-						LiteralValue: model.LiteralValue{
-							Value: "2001",
-							Type:  "number",
-						},
-					},
+					Value:      "2001",
 				},
 			}),
 			trace: traces.Trace{
@@ -186,12 +146,7 @@ func TestAssertion(t *testing.T) {
 					Assertion: model.Assertion{
 						Attribute:  "http.response.body",
 						Comparator: comparator.Contains,
-						Value: &model.AssertionExpression{
-							LiteralValue: model.LiteralValue{
-								Value: "52",
-								Type:  "number",
-							},
-						},
+						Value:      "52",
 					},
 					Results: []model.SpanAssertionResult{
 						{
@@ -205,12 +160,7 @@ func TestAssertion(t *testing.T) {
 					Assertion: model.Assertion{
 						Attribute:  "tracetest.span.duration",
 						Comparator: comparator.Lt,
-						Value: &model.AssertionExpression{
-							LiteralValue: model.LiteralValue{
-								Value: "2001",
-								Type:  "number",
-							},
-						},
+						Value:      "2001",
 					},
 					Results: []model.SpanAssertionResult{
 						{
@@ -227,7 +177,7 @@ func TestAssertion(t *testing.T) {
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			cl := c
-			// t.Parallel()
+			t.Parallel()
 
 			actual, allPassed := assertions.Assert(cl.testDef, cl.trace)
 
