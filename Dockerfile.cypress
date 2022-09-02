@@ -1,9 +1,0 @@
-FROM cypress/browsers:node16.14.2-slim-chrome100-ff99-edge
-WORKDIR /e2e
-ADD ./web/package.json ./
-ADD ./web/package-lock.json ./
-ADD ./web/cypress ./cypress
-ADD ./web/cypress.config.js ./
-ADD ./web/src  ./src
-RUN npm ci
-ENTRYPOINT ["npx", "cypress", "run", "--config", "baseUrl=http://localhost:8080"]
