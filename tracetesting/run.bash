@@ -1,6 +1,6 @@
 #/bin/bash
 
-export TRACETEST_CLI=${TRACETEST_CLI:-"../cli/tracetest"}
+export TRACETEST_CLI=${TRACETEST_CLI:-"tracetest"}
 if ! command -v "$TRACETEST_CLI" &> /dev/null; then
   echo "\$TRACETEST_CLI not set to executable. set to $TRACETEST_CLI";
   exit 2
