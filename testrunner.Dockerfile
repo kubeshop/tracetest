@@ -1,19 +1,10 @@
-FROM golang:1.18-alpine AS build-cli
-WORKDIR /go/src
+FROM ubuntu
 
-RUN apk add --update make
-
-COPY ./cli/go.mod ./cli/go.sum ./
-RUN go mod download
-COPY ./cli ./
-RUN make build
-
-FROM alpine
-
-RUN apk add bash jq curl
+RUN apt-get update && apt-get -y install \
+  curl \
+  && curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/install-cli.sh | sh
 
 WORKDIR /app
-COPY --from=build-cli /go/src/tracetest /app/cli/tracetest
 COPY ./tracetesting ./tracetesting
 
 WORKDIR /app/tracetesting
