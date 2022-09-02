@@ -2,7 +2,7 @@ import {noop} from 'lodash';
 
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import {createContext, useCallback, useContext, useEffect, useMemo} from 'react';
-import {useGetTestByIdQuery} from 'redux/apis/TraceTest.api';
+import {useGetTestVersionByIdQuery} from 'redux/apis/TraceTest.api';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
 import {TAssertionResultEntry, TAssertionResults} from 'types/Assertion.types';
@@ -65,7 +65,8 @@ const TestDefinitionProvider = ({children, testId, runId}: IProps) => {
   const isDraftMode = useAppSelector(state => TestDefinitionSelectors.selectIsDraftMode(state));
   const isLoading = useAppSelector(state => TestDefinitionSelectors.selectIsLoading(state));
   const isInitialized = useAppSelector(state => TestDefinitionSelectors.selectIsInitialized(state));
-  const {data: test} = useGetTestByIdQuery({testId});
+  const version = run.testVersion || 1;
+  const {data: test} = useGetTestVersionByIdQuery({testId, version});
 
   const {add, cancel, publish, runTest, remove, dryRun, update, init, reset, revert, updateIsInitialized} =
     useTestDefinitionCrud({
