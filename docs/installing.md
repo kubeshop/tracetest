@@ -59,7 +59,7 @@ helm repo add kubeshop https://kubeshop.github.io/helm-charts
 helm repo update
 
 helm install tracetest kubeshop/tracetest \
-  --set telemetry.dataStores.jaeger.jaeger.endpoint="jaeger-query.observability.svc.cluster.local:16685" `# update this value to point to your jaeger` install` \
+  --set telemetry.dataStores.jaeger.jaeger.endpoint="jaeger-query.observability.svc.cluster.local:16685" `# update this value to point to your jaeger install` \
   --set telemetry.exporters.collector.exporter.collector.endpoint="otel-collector.tracetest.svc.cluster.local:4317" `# update this value to point to your collector install` \
   --set server.telemetry.dataStore="jaeger"
 ```
