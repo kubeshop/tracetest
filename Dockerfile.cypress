@@ -3,6 +3,7 @@ WORKDIR /e2e
 ADD ./web/package.json ./
 ADD ./web/package-lock.json ./
 ADD ./web/cypress ./cypress
+ADD ./web/cypress.config.js ./
+ADD ./web/src  ./src
 RUN npm ci
-ADD web/cypress.config.js ./
 ENTRYPOINT ["npx", "cypress", "run", "--config", "baseUrl=http://localhost:8080"]

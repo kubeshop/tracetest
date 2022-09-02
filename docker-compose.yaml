@@ -222,7 +222,7 @@ services:
       - opensearch
   cypress:
     image: cypress/browsers:node16.14.2-slim-chrome100-ff99-edge
-    entrypoint: [ "/bin/sh", "-c" , "npm ci && npx cypress run --spec /e2e/cypress/e2e/Home/EditTest.spec.ts --config baseUrl=http://tracetest:8080" ]
+    entrypoint: [ "/bin/sh", "-c" , "npm ci && npx cypress run --config baseUrl=http://tracetest:8080" ]
     working_dir: /e2e
     command:
       - npm ci
