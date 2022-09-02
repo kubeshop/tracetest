@@ -20,4 +20,4 @@ specs:
 - selector: span[name = "exec DELETE"]
   assertions:
   # must delete test, definition, and runs. That's why we need 3 deletes
-  - tracetest.selected_spans.count = 3
+  - tracetest.selected_spans.count = 2
