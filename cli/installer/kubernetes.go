@@ -61,9 +61,6 @@ func kubectlChecker(ui UI) {
 }
 
 func minikubeChecker(ui UI) {
-	// We require docker to be able to run minikube
-	dockerChecker(ui)
-
 	if commandExists("minikube") {
 		ui.Println(ui.Green("✔ minikube already installed"))
 		return
@@ -84,6 +81,9 @@ func minikubeChecker(ui UI) {
 	} else {
 		ui.Exit(ui.Red("✘ minikube could not be installed. Check output for errors. " + createIssueMsg))
 	}
+
+	// We require docker to be able to run minikube
+	dockerChecker(ui)
 }
 
 func installHelm(ui UI) {
