@@ -41,7 +41,18 @@ type (
 	Assertion struct {
 		Attribute  Attribute
 		Comparator comparator.Comparator
-		Value      string
+		Value      *AssertionExpression
+	}
+
+	AssertionExpression struct {
+		LiteralValue LiteralValue
+		Operation    string
+		Expression   *AssertionExpression
+	}
+
+	LiteralValue struct {
+		Value string
+		Type  string
 	}
 
 	Attribute string
@@ -107,6 +118,14 @@ func (a Attribute) String() string {
 
 func (a Assertion) String() string {
 	return fmt.Sprintf(`"%s" %s "%s"`, a.Attribute, a.Comparator, a.Value)
+}
+
+func (e AssertionExpression) String() string {
+	if e.Expression == nil {
+		return e.LiteralValue.Value
+	}
+
+	return fmt.Sprintf("%s %s %s", e.LiteralValue.Value, e.Operation, e.Expression.String())
 }
 
 type RunState string
