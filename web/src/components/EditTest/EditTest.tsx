@@ -8,8 +8,8 @@ import EditTestForm from 'components/EditTestForm';
 import TestService from 'services/Test.service';
 import useValidateTestDraft from 'hooks/useValidateTestDraft';
 import {TriggerTypeToPlugin} from 'constants/Plugins.constants';
+import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
 import * as S from './EditTest.styled';
-import {useTestDefinition} from '../../providers/TestDefinition/TestDefinition.provider';
 
 interface IProps {
   test: TTest;
@@ -23,7 +23,7 @@ const EditTest = ({test}: IProps) => {
   const [runTest, {isLoading: isLoadingRunTest}] = useRunTestMutation();
   const plugin = TriggerTypeToPlugin[test.trigger.type];
 
-  const {updateIsInitialized} = useTestDefinition();
+  const {updateIsInitialized} = useTestSpecs();
   const {isValid, onValidate} = useValidateTestDraft({pluginName: plugin.name, isDefaultValid: true});
 
   const isLoading = isLoadingCreateTest || isLoadingRunTest;

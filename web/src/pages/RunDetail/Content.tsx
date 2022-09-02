@@ -1,8 +1,8 @@
 import RunDetailLayout from 'components/RunDetailLayout';
-import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
+import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
 
 const Content = () => {
-  const {test} = useTestDefinition();
+  const {test} = useTestSpecs();
 
   return test ? <RunDetailLayout test={test} /> : null;
 };

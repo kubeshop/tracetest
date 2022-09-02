@@ -6,7 +6,7 @@ import TestState from 'components/TestState';
 import TraceActions from 'components/TraceActions';
 import VersionMismatchModal from 'components/VersionMismatchModal';
 import {TestState as TestStateEnum} from 'constants/TestRun.constants';
-import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
+import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import TestAnalyticsService from 'services/Analytics/TestAnalytics.service';
 import * as S from './RunDetailLayout.styled';
@@ -17,7 +17,7 @@ interface IProps {
 }
 
 const HeaderRight = ({testId, testVersion}: IProps) => {
-  const {isDraftMode, runTest} = useTestDefinition();
+  const {isDraftMode, runTest} = useTestSpecs();
   const {run} = useTestRun();
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
   const state = run.state;
