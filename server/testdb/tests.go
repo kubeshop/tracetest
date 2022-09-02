@@ -120,7 +120,6 @@ func (td *postgresDB) UpdateTestVersion(ctx context.Context, test model.Test) er
 func (td *postgresDB) DeleteTest(ctx context.Context, test model.Test) error {
 	queries := []string{
 		"DELETE FROM runs WHERE test_id = $1",
-		"DELETE FROM definitions WHERE test_id = $1",
 		"DELETE FROM tests WHERE id = $1",
 	}
 
