@@ -51,7 +51,7 @@ Tracetest currently supports two traces backend: Jaeger and Grafana Tempo.
 
 Tracetest uses [Jaeger Query Service `16685` port](https://www.jaegertracing.io/docs/1.32/deployment/#query-service--ui) to find Traces using gRPC protocol.
 
-The commands below will install Tracetest connecting to the Jaeger tracing backend on `jaeger-query:16685`.
+The commands below will install Tracetest connecting to the Jaeger tracing backend on `jaeger-query.observability.svc.cluster.local:16685`.
 
 ```sh
 # Install Kubeshop Helm repo and update it
@@ -59,8 +59,8 @@ helm repo add kubeshop https://kubeshop.github.io/helm-charts
 helm repo update
 
 helm install tracetest kubeshop/tracetest \
-  --set telemetry.dataStores.jaeger.jaeger.endpoint="jaeger-query:16685" \ # update this value to point to your jaeger install
-  --set telemetry.exporters.collector.exporter.collector.endpoint="otel-collector:4317" \ # update this value to point to your collector install
+  --set telemetry.dataStores.jaeger.jaeger.endpoint="jaeger-query.observability.svc.cluster.local:16685" `# update this value to point to your jaeger install` \
+  --set telemetry.exporters.collector.exporter.collector.endpoint="otel-collector.tracetest.svc.cluster.local:4317" `# update this value to point to your collector install` \
   --set server.telemetry.dataStore="jaeger"
 ```
 
