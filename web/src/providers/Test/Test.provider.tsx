@@ -42,17 +42,21 @@ const TestProvider = ({children, testId}: IProps) => {
   const {
     run: {testVersion},
   } = useTestRun();
-  const version = testVersion || 1;
+  const {runTest, edit, isEditLoading} = useTestCrud();
   const {
     data: test,
     isLoading: isCurrentLoading,
     isError: isCurrentError,
-  } = useGetTestVersionByIdQuery({testId, version});
-  const {runTest, edit, isEditLoading} = useTestCrud();
+  } = useGetTestVersionByIdQuery({testId, version: testVersion}, {skip: !testVersion});
   const {data: latestTest, isLoading: isLatestLoading, isError: isLatestError} = useGetTestByIdQuery({testId});
-  const isLatestVersion = useMemo(() => version === latestTest?.version, [latestTest?.version, version]);
+
+  const isLatestVersion = useMemo(
+    () => Boolean(testVersion) && testVersion === latestTest?.version,
+    [latestTest?.version, testVersion]
+  );
   const isLoading = isLatestLoading || isCurrentLoading;
   const isError = isLatestError || isCurrentError;
+  const currentTest = (test || latestTest)!;
 
   const onEdit = useCallback(
     (values: TDraftTest) => {
@@ -87,15 +91,15 @@ const TestProvider = ({children, testId}: IProps) => {
       onRun,
       isLoading,
       isError,
-      test: test!,
+      test: currentTest,
       latestTest: latestTest!,
       isLatestVersion,
       isEditLoading,
     }),
-    [onEdit, onRun, isLoading, isError, test, latestTest, isLatestVersion, isEditLoading]
+    [onEdit, onRun, isLoading, isError, currentTest, latestTest, isLatestVersion, isEditLoading]
   );
 
-  return test && latestTest ? (
+  return currentTest && latestTest ? (
     <>
       <Context.Provider value={value}>{children}</Context.Provider>
       <VersionMismatchModal
@@ -104,7 +108,7 @@ const TestProvider = ({children, testId}: IProps) => {
             ? 'Changing and saving changes will result in a new version that will become the latest.'
             : 'Running the test will use the latest version of the test.'
         }
-        currentVersion={test.version}
+        currentVersion={currentTest.version}
         isOpen={isVersionModalOpen}
         latestVersion={latestTest.version}
         okText="Run Test"
