@@ -2,9 +2,9 @@ import InfiniteScroll from 'components/InfiniteScroll';
 import TestCard from 'components/TestCard';
 import {useCallback} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {useGetTestListQuery, useRunTestMutation} from 'redux/apis/TraceTest.api';
+import {useGetTestListQuery} from 'redux/apis/TraceTest.api';
 import HomeAnalyticsService from 'services/Analytics/HomeAnalytics.service';
-import TestAnalyticsService from 'services/Analytics/TestAnalytics.service';
+import useTestCrud from 'providers/Test/hooks/useTestCrud';
 import useDeleteTest from 'hooks/useDeleteTest';
 import useInfiniteScroll from 'hooks/useInfiniteScroll';
 import {TTest} from 'types/Test.types';
@@ -21,7 +21,7 @@ const TestList = ({query}: IProps) => {
   const onDelete = useDeleteTest();
   const {list, isLoading, loadMore, hasMore} = useInfiniteScroll<TTest, {query: string}>(useGetTestListQuery, {query});
   const navigate = useNavigate();
-  const [runTest] = useRunTestMutation();
+  const {runTest} = useTestCrud();
 
   const onClick = useCallback(
     (testId: string) => {
@@ -32,14 +32,10 @@ const TestList = ({query}: IProps) => {
   );
 
   const onRunTest = useCallback(
-    async (testId: string) => {
-      if (testId) {
-        TestAnalyticsService.onRunTest();
-        const testRun = await runTest({testId}).unwrap();
-        navigate(`/test/${testId}/run/${testRun.id}`);
-      }
+    (testId: string) => {
+      if (testId) runTest(testId);
     },
-    [navigate, runTest]
+    [runTest]
   );
 
   return (

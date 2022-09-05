@@ -2,11 +2,9 @@ import {noop} from 'lodash';
 
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import {createContext, useCallback, useContext, useEffect, useMemo} from 'react';
-import {useGetTestVersionByIdQuery} from 'redux/apis/TraceTest.api';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
 import {TAssertionResultEntry, TAssertionResults} from 'types/Assertion.types';
-import {TTest} from 'types/Test.types';
 import {TTestDefinitionEntry} from 'types/TestDefinition.types';
 import RouterActions from 'redux/actions/Router.actions';
 import {RouterSearchFields} from 'constants/Common.constants';
@@ -19,7 +17,6 @@ interface IContext {
   update(selector: string, testDefinition: TTestDefinitionEntry): void;
   remove(selector: string): void;
   publish(): void;
-  runTest(): void;
   cancel(): void;
   dryRun(definitionList: TTestDefinitionEntry[]): void;
   updateIsInitialized(isInitialized: boolean): void;
@@ -28,7 +25,6 @@ interface IContext {
   isLoading: boolean;
   isError: boolean;
   isDraftMode: boolean;
-  test?: TTest;
   setSelectedAssertion(assertionResult?: TAssertionResultEntry): void;
 }
 
@@ -38,7 +34,6 @@ export const Context = createContext<IContext>({
   update: noop,
   remove: noop,
   publish: noop,
-  runTest: noop,
   dryRun: noop,
   cancel: noop,
   isLoading: false,
@@ -65,10 +60,8 @@ const TestDefinitionProvider = ({children, testId, runId}: IProps) => {
   const isDraftMode = useAppSelector(state => TestDefinitionSelectors.selectIsDraftMode(state));
   const isLoading = useAppSelector(state => TestDefinitionSelectors.selectIsLoading(state));
   const isInitialized = useAppSelector(state => TestDefinitionSelectors.selectIsInitialized(state));
-  const version = run.testVersion || 1;
-  const {data: test} = useGetTestVersionByIdQuery({testId, version});
 
-  const {add, cancel, publish, runTest, remove, dryRun, update, init, reset, revert, updateIsInitialized} =
+  const {add, cancel, publish, remove, dryRun, update, init, reset, revert, updateIsInitialized} =
     useTestDefinitionCrud({
       testId,
       runId,
@@ -111,12 +104,10 @@ const TestDefinitionProvider = ({children, testId, runId}: IProps) => {
       isError: false,
       isDraftMode,
       publish,
-      runTest,
       dryRun,
       assertionResults,
       definitionList,
       cancel,
-      test,
       setSelectedAssertion,
       revert,
       updateIsInitialized,
@@ -128,12 +119,10 @@ const TestDefinitionProvider = ({children, testId, runId}: IProps) => {
       isLoading,
       isDraftMode,
       publish,
-      runTest,
       dryRun,
       assertionResults,
       definitionList,
       cancel,
-      test,
       setSelectedAssertion,
       revert,
       updateIsInitialized,

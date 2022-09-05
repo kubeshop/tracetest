@@ -6,21 +6,17 @@ import InfiniteScroll from 'components/InfiniteScroll';
 import ResultCardList from 'components/RunCardList';
 import SearchInput from 'components/SearchInput';
 import useInfiniteScroll from 'hooks/useInfiniteScroll';
-import {useGetRunListQuery, useRunTestMutation} from 'redux/apis/TraceTest.api';
-import TestAnalyticsService from 'services/Analytics/TestAnalytics.service';
+import {useGetRunListQuery} from 'redux/apis/TraceTest.api';
 import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
 import {TTestRun} from 'types/TestRun.types';
 import * as S from './Test.styled';
-
-const {onRunTest} = TestAnalyticsService;
+import useTestCrud from '../../providers/Test/hooks/useTestCrud';
 
 interface IProps {
-  onSelectResult: (result: TTestRun) => void;
   testId: string;
 }
 
-const TestDetails = ({onSelectResult, testId}: IProps) => {
-  const [runTest, result] = useRunTestMutation();
+const TestDetails = ({testId}: IProps) => {
   const {
     list: resultList,
     hasMore,
@@ -30,13 +26,11 @@ const TestDetails = ({onSelectResult, testId}: IProps) => {
     testId,
   });
 
+  const {runTest, isLoadingRunTest} = useTestCrud();
+
   const handleRunTest = useCallback(async () => {
-    if (testId) {
-      onRunTest();
-      const testResult = await runTest({testId}).unwrap();
-      onSelectResult(testResult);
-    }
-  }, [onSelectResult, runTest, testId]);
+    if (testId) runTest(testId);
+  }, [runTest, testId]);
 
   return (
     <>
@@ -50,7 +44,7 @@ const TestDetails = ({onSelectResult, testId}: IProps) => {
         />
         <Button
           onClick={handleRunTest}
-          loading={result.isLoading}
+          loading={isLoadingRunTest}
           type="primary"
           data-cy="test-details-run-test-button"
           ghost

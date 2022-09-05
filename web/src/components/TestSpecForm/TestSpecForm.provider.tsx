@@ -5,6 +5,7 @@ import VersionMismatchModal from 'components/VersionMismatchModal/VersionMismatc
 import {RouterSearchFields} from 'constants/Common.constants';
 import {useSpan} from 'providers/Span/Span.provider';
 import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
+import {useTest} from 'providers/Test/Test.provider';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import RouterActions from 'redux/actions/Router.actions';
@@ -46,7 +47,8 @@ const TestSpecFormProvider: React.FC<{testId: string}> = ({children}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
   const [formProps, setFormProps] = useState<IFormProps>(initialFormProps);
-  const {update, add, test, isDraftMode} = useTestDefinition();
+  const {update, add, isDraftMode} = useTestDefinition();
+  const {test} = useTest();
   const {run} = useTestRun();
   const {onClearMatchedSpans} = useSpan();
   const definitionList = useAppSelector(state => TestDefinitionSelectors.selectDefinitionList(state));

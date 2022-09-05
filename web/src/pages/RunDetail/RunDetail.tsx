@@ -7,6 +7,7 @@ import GuidedTourProvider from 'providers/GuidedTour/GuidedTour.provider';
 import SpanProvider from 'providers/Span';
 import TestDefinitionProvider from 'providers/TestDefinition';
 import TestRunProvider from 'providers/TestRun';
+import TestProvider from 'providers/Test';
 import Content from './Content';
 
 const RunDetail = () => {
@@ -17,11 +18,13 @@ const RunDetail = () => {
       <Layout>
         <TestRunProvider testId={testId} runId={runId}>
           <TestDefinitionProvider testId={testId} runId={runId}>
-            <TestSpecFormProvider testId={testId}>
-              <SpanProvider>
-                <Content />
-              </SpanProvider>
-            </TestSpecFormProvider>
+            <TestProvider testId={testId}>
+              <TestSpecFormProvider testId={testId}>
+                <SpanProvider>
+                  <Content />
+                </SpanProvider>
+              </TestSpecFormProvider>
+            </TestProvider>
           </TestDefinitionProvider>
         </TestRunProvider>
       </Layout>

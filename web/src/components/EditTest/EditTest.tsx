@@ -1,50 +1,29 @@
-import {useNavigate} from 'react-router-dom';
-import {useTour} from '@reactour/tour';
 import {Button, Form} from 'antd';
 import {useCallback} from 'react';
-import {useEditTestMutation, useRunTestMutation} from 'redux/apis/TraceTest.api';
 import {TDraftTest, TTest} from 'types/Test.types';
 import EditTestForm from 'components/EditTestForm';
-import TestService from 'services/Test.service';
 import useValidateTestDraft from 'hooks/useValidateTestDraft';
 import {TriggerTypeToPlugin} from 'constants/Plugins.constants';
+import {useTest} from 'providers/Test/Test.provider';
 import * as S from './EditTest.styled';
-import {useTestDefinition} from '../../providers/TestDefinition/TestDefinition.provider';
 
 interface IProps {
   test: TTest;
 }
 
 const EditTest = ({test}: IProps) => {
-  const navigate = useNavigate();
-
-  const {setIsOpen} = useTour();
-  const [editTest, {isLoading: isLoadingCreateTest}] = useEditTestMutation();
-  const [runTest, {isLoading: isLoadingRunTest}] = useRunTestMutation();
+  const {onEdit, isEditLoading} = useTest();
   const plugin = TriggerTypeToPlugin[test.trigger.type];
 
-  const {updateIsInitialized} = useTestDefinition();
   const {isValid, onValidate} = useValidateTestDraft({pluginName: plugin.name, isDefaultValid: true});
 
-  const isLoading = isLoadingCreateTest || isLoadingRunTest;
   const [form] = Form.useForm<TDraftTest>();
 
   const handleOnSubmit = useCallback(
     async (values: TDraftTest) => {
-      updateIsInitialized(false);
-      const rawTest = await TestService.getRequest(plugin, values, test);
-
-      await editTest({
-        test: rawTest,
-        testId: test.id,
-      }).unwrap();
-
-      const run = await runTest({testId: test.id}).unwrap();
-      setIsOpen(false);
-
-      navigate(`/test/${test.id}/run/${run.id}`);
+      onEdit(values);
     },
-    [editTest, navigate, plugin, runTest, setIsOpen, test, updateIsInitialized]
+    [onEdit]
   );
 
   return (
@@ -58,7 +37,7 @@ const EditTest = ({test}: IProps) => {
           </Button>
           <Button
             data-cy="edit-test-submit"
-            loading={isLoading}
+            loading={isEditLoading}
             disabled={!isValid}
             type="primary"
             onClick={() => form.submit()}

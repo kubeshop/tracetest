@@ -60,7 +60,6 @@ const TestCard = ({onClick, onDelete, onRunTest, test: {name, trigger, id: testI
             data-cy={`test-run-button-${testId}`}
             onClick={event => {
               event.stopPropagation();
-              TestAnalyticsService.onRunTest();
               onRunTest(testId);
             }}
           >

@@ -14,7 +14,6 @@ import {
 } from 'redux/slices/TestDefinition.slice';
 import {TAssertionResults} from 'types/Assertion.types';
 import {TTestDefinitionEntry} from 'types/TestDefinition.types';
-import TestRunGateway from 'gateways/TestRun.gateway';
 import useBlockNavigation from 'hooks/useBlockNavigation';
 import RouterActions from 'redux/actions/Router.actions';
 import {RouterSearchFields} from 'constants/Common.constants';
@@ -52,13 +51,6 @@ const useTestDefinitionCrud = ({runId, testId, isDraftMode}: IProps) => {
 
     navigate(`/test/${testId}/run/${id}/test`);
   }, [dispatch, navigate, runId, testId]);
-
-  const runTest = useCallback(async () => {
-    const {id} = await dispatch(TestRunGateway.runTest(testId)).unwrap();
-    dispatch(resetAction());
-
-    navigate(`/test/${testId}/run/${id}`);
-  }, [dispatch, navigate, testId]);
 
   const cancel = useCallback(() => {
     dispatch(resetDefinitionList());
@@ -109,7 +101,7 @@ const useTestDefinitionCrud = ({runId, testId, isDraftMode}: IProps) => {
     dispatch(resetAction());
   }, [dispatch]);
 
-  return {revert, init, updateIsInitialized, reset, add, remove, update, publish, runTest, cancel, dryRun};
+  return {revert, init, updateIsInitialized, reset, add, remove, update, publish, cancel, dryRun};
 };
 
 export default useTestDefinitionCrud;
