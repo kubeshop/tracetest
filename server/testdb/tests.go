@@ -47,7 +47,7 @@ func (td *postgresDB) CreateTest(ctx context.Context, test model.Test) (model.Te
 	if err != nil {
 		return model.Test{}, fmt.Errorf("encoding error: %w", err)
 	}
-	fmt.Println(string(b))
+
 	_, err = stmt.ExecContext(ctx, test.ID, b, test.Version)
 	if err != nil {
 		return model.Test{}, fmt.Errorf("sql exec: %w", err)
