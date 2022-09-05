@@ -1,17 +1,19 @@
 import {Button} from 'antd';
-import {useTestSpecs} from '../../providers/TestSpecs/TestSpecs.provider';
-import TraceAnalyticsService from '../../services/Analytics/TraceAnalytics.service';
-import * as S from './TraceActions.styled';
 
-const TraceActions: React.FC = () => {
+import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
+import TraceAnalyticsService from 'services/Analytics/TraceAnalytics.service';
+import {singularOrPlural} from 'utils/Common';
+import * as S from './TestActions.styled';
+
+const TestActions = () => {
   const {specs, publish, cancel} = useTestSpecs();
   const pendingCount = specs.filter(({isDraft}) => isDraft).length;
 
   return (
-    <S.TraceActions>
-      <S.ChangesTag data-cy={`trace-actions-pending-count-${pendingCount}`}>
-        {pendingCount} pending change(s)
-      </S.ChangesTag>
+    <S.Container>
+      <S.PendingTag>
+        {pendingCount} pending {singularOrPlural('change', pendingCount)}
+      </S.PendingTag>
       <Button
         type="link"
         data-cy="trace-actions-revert-all"
@@ -32,8 +34,8 @@ const TraceActions: React.FC = () => {
       >
         Publish
       </Button>
-    </S.TraceActions>
+    </S.Container>
   );
 };
 
-export default TraceActions;
+export default TestActions;

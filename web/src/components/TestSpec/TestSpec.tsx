@@ -33,7 +33,8 @@ const TestSpec = ({
 
   return (
     <S.Container
-      data-cy="assertion-card"
+      $isDeleted={isDeleted}
+      data-cy="test-spec-container"
       onClick={() => {
         onOpen(selector);
       }}

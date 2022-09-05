@@ -2,8 +2,8 @@ import {Button} from 'antd';
 import {useState} from 'react';
 
 import RunActionsMenu from 'components/RunActionsMenu';
+import TestActions from 'components/TestActions';
 import TestState from 'components/TestState';
-import TraceActions from 'components/TraceActions';
 import VersionMismatchModal from 'components/VersionMismatchModal';
 import {TestState as TestStateEnum} from 'constants/TestRun.constants';
 import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
@@ -34,7 +34,7 @@ const HeaderRight = ({testId, testVersion}: IProps) => {
   return (
     <>
       <S.Section $justifyContent="flex-end">
-        {isDraftMode && <TraceActions />}
+        {isDraftMode && <TestActions />}
         {!isDraftMode && state && state !== TestStateEnum.FINISHED && (
           <S.StateContainer data-cy="test-run-result-status">
             <S.StateText>Test status:</S.StateText>

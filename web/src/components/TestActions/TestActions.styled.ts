@@ -1,13 +1,13 @@
-import { Tag } from 'antd';
+import {Tag} from 'antd';
 import styled from 'styled-components';
 
-export const TraceActions = styled.div`
+export const Container = styled.div`
   display: flex;
   gap: 8px;
   align-items: center;
 `;
 
-export const ChangesTag = styled(Tag)`
+export const PendingTag = styled(Tag)`
   border: none;
   padding: 8px;
 `;

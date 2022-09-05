@@ -28,29 +28,33 @@ const Actions = ({isDeleted, isDraft, onDelete, onEdit, onRevert}: IProps) => (
         />
       </Tooltip>
     )}
-    <Tooltip title="Edit spec">
-      <Button
-        data-cy="edit-assertion-button"
-        icon={<EditOutlined />}
-        onClick={event => {
-          event.stopPropagation();
-          onEdit();
-        }}
-        size="small"
-        type="link"
-      />
-    </Tooltip>
-    <Tooltip title="Delete spec">
-      <Button
-        icon={<DeleteOutlined />}
-        onClick={event => {
-          event.stopPropagation();
-          onDelete();
-        }}
-        size="small"
-        type="link"
-      />
-    </Tooltip>
+    {!isDeleted && (
+      <Tooltip title="Edit spec">
+        <Button
+          data-cy="edit-test-spec-button"
+          icon={<EditOutlined />}
+          onClick={event => {
+            event.stopPropagation();
+            onEdit();
+          }}
+          size="small"
+          type="link"
+        />
+      </Tooltip>
+    )}
+    {!isDeleted && (
+      <Tooltip title="Delete spec">
+        <Button
+          icon={<DeleteOutlined />}
+          onClick={event => {
+            event.stopPropagation();
+            onDelete();
+          }}
+          size="small"
+          type="link"
+        />
+      </Tooltip>
+    )}
   </S.ActionsContainer>
 );
 

@@ -202,8 +202,8 @@ Cypress.Commands.add('createAssertion', (index = 0) => {
   cy.get(`${attributeListId} + div .ant-select-item`).first().click({force: true});
   cy.get('[data-cy=assertion-check-operator]').click({force: true});
   cy.get('[data-cy=assertion-form-submit-button]').click();
-  cy.get('[data-cy=assertion-card-list]').should('be.visible');
-  cy.get('[data-cy=assertion-card]').should('have.lengthOf', 1);
+  cy.get('[data-cy=test-specs-container]').should('be.visible');
+  cy.get('[data-cy=test-spec-container]').should('have.lengthOf', 1);
 });
 
 /**
