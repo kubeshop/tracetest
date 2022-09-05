@@ -6,7 +6,7 @@ RUN apk add --update make
 COPY ./cli/go.mod ./cli/go.sum ./
 RUN go mod download
 COPY ./cli ./
-RUN make build
+RUN go build -o /go/src/tracetest ./main.go
 
 FROM alpine
 

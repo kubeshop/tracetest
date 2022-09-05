@@ -497,6 +497,35 @@ paths:
         204:
           description: OK
 
+  /tests/{testId}/version/{version}:
+    get:
+      tags:
+        - api
+      parameters:
+        - in: path
+          name: testId
+          schema:
+            type: string
+            format: uuid
+          required: true
+        - in: path
+          name: version
+          schema:
+            type: integer
+          required: true
+      summary: "get a test specific version"
+      description: "get a test specific version"
+      operationId: getTestVersion
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "./tests.yaml#/components/schemas/Test"
+        500:
+          description: "problem with getting a test"
+
   /tests/{testId}/version/{version}/definition.yaml:
     get:
       tags:

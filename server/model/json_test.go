@@ -7,12 +7,46 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/otel/trace"
 )
+
+func TestTestEncoding(t *testing.T) {
+	id := uuid.MustParse("ccf94a15-e33e-4c75-ae94-d0b401c53da1")
+	t1 := time.Date(2022, 06, 07, 13, 03, 24, 100, time.UTC)
+
+	test := model.Test{
+		ID:          id,
+		CreatedAt:   t1,
+		Name:        "the name",
+		Description: "the description",
+		Version:     1,
+		ServiceUnderTest: model.Trigger{
+			Type: model.TriggerTypeHTTP,
+			HTTP: &model.HTTPRequest{
+				URL:    "http://localhost:8080/list",
+				Method: model.HTTPMethodGET,
+			},
+		},
+		Specs: (model.OrderedMap[model.SpanQuery, []model.Assertion]{}).
+			MustAdd(model.SpanQuery(`span[name="test"]`), []model.Assertion{
+				{"name", comparator.Eq, "test"},
+			}),
+	}
+
+	encoded, err := json.Marshal(test)
+	require.NoError(t, err)
+
+	var actual model.Test
+	err = json.Unmarshal(encoded, &actual)
+	require.NoError(t, err)
+
+	assert.Equal(t, test, actual)
+}
 
 func TestRunEncoding(t *testing.T) {
 	id := uuid.MustParse("ccf94a15-e33e-4c75-ae94-d0b401c53da1")

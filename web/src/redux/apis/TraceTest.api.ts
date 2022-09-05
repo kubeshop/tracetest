@@ -57,6 +57,11 @@ const TraceTestAPI = createApi({
       providesTags: result => [{type: Tags.TEST, id: result?.id}],
       transformResponse: (rawTest: TRawTest) => Test(rawTest),
     }),
+    getTestVersionById: build.query<TTest, {testId: string, version: number}>({
+      query: ({testId, version}) => `/tests/${testId}/version/${version}`,
+      providesTags: result => [{type: Tags.TEST, id: result?.id}],
+      transformResponse: (rawTest: TRawTest) => Test(rawTest),
+    }),
     deleteTestById: build.mutation<TTest, {testId: string}>({
       query: ({testId}) => ({url: `/tests/${testId}`, method: 'DELETE'}),
       invalidatesTags: [{type: Tags.TEST, id: 'LIST'}],
@@ -158,6 +163,7 @@ const TraceTestAPI = createApi({
 export const {
   useCreateTestMutation,
   useGetTestByIdQuery,
+  useGetTestVersionByIdQuery,
   useGetTestListQuery,
   useRunTestMutation,
   useDeleteTestByIdMutation,

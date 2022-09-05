@@ -2,7 +2,7 @@ import {noop} from 'lodash';
 
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import {createContext, useCallback, useContext, useEffect, useMemo} from 'react';
-import {useGetTestByIdQuery} from 'redux/apis/TraceTest.api';
+import {useGetTestVersionByIdQuery} from 'redux/apis/TraceTest.api';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import TestSpecsSelectors from 'selectors/TestSpecs.selectors';
 import {TAssertionResultEntry, TAssertionResults} from 'types/Assertion.types';
@@ -60,12 +60,14 @@ export const useTestSpecs = () => useContext(Context);
 const TestSpecsProvider = ({children, testId, runId}: IProps) => {
   const dispatch = useAppDispatch();
   const {run} = useTestRun();
+
   const assertionResults = useAppSelector(state => TestSpecsSelectors.selectAssertionResults(state));
   const specs = useAppSelector(state => TestSpecsSelectors.selectSpecs(state));
   const isDraftMode = useAppSelector(state => TestSpecsSelectors.selectIsDraftMode(state));
   const isLoading = useAppSelector(state => TestSpecsSelectors.selectIsLoading(state));
   const isInitialized = useAppSelector(state => TestSpecsSelectors.selectIsInitialized(state));
-  const {data: test} = useGetTestByIdQuery({testId});
+  const version = run.testVersion || 1;
+  const {data: test} = useGetTestVersionByIdQuery({testId, version});
 
   const {add, cancel, publish, runTest, remove, dryRun, update, init, reset, revert, updateIsInitialized} =
     useTestSpecsCrud({
