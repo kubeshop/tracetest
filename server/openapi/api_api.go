@@ -123,6 +123,12 @@ func (c *ApiApiController) Routes() Routes {
 			c.GetTestSpecs,
 		},
 		{
+			"GetTestVersion",
+			strings.ToUpper("Get"),
+			"/api/tests/{testId}/version/{version}",
+			c.GetTestVersion,
+		},
+		{
 			"GetTestVersionDefinitionFile",
 			strings.ToUpper("Get"),
 			"/api/tests/{testId}/version/{version}/definition.yaml",
@@ -407,6 +413,28 @@ func (c *ApiApiController) GetTestSpecs(w http.ResponseWriter, r *http.Request) 
 	testIdParam := params["testId"]
 
 	result, err := c.service.GetTestSpecs(r.Context(), testIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// GetTestVersion - get a test specific version
+func (c *ApiApiController) GetTestVersion(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	testIdParam := params["testId"]
+
+	versionParam, err := parseInt32Parameter(params["version"], true)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+
+	result, err := c.service.GetTestVersion(r.Context(), testIdParam, versionParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

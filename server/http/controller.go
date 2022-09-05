@@ -415,6 +415,21 @@ func (c *controller) GetRunResultJUnit(ctx context.Context, testID string, runID
 	return openapi.Response(200, res), nil
 }
 
+func (c controller) GetTestVersion(ctx context.Context, testID string, version int32) (openapi.ImplResponse, error) {
+	analytics.SendEvent("Test Get Definition File", "test")
+	tid, err := uuid.Parse(testID)
+	if err != nil {
+		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
+	}
+
+	test, err := c.testDB.GetTestVersion(ctx, tid, int(version))
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	return openapi.Response(200, c.mappers.Out.Test(test)), nil
+}
+
 func (c controller) GetTestVersionDefinitionFile(ctx context.Context, testID string, version int32) (openapi.ImplResponse, error) {
 	analytics.SendEvent("Test Get Definition File", "test")
 	tid, err := uuid.Parse(testID)

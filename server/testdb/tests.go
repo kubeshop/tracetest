@@ -47,14 +47,10 @@ func (td *postgresDB) CreateTest(ctx context.Context, test model.Test) (model.Te
 	if err != nil {
 		return model.Test{}, fmt.Errorf("encoding error: %w", err)
 	}
+
 	_, err = stmt.ExecContext(ctx, test.ID, b, test.Version)
 	if err != nil {
 		return model.Test{}, fmt.Errorf("sql exec: %w", err)
-	}
-
-	err = td.SetSpec(ctx, test, test.Specs)
-	if err != nil {
-		return model.Test{}, fmt.Errorf("setDefinition error: %w", err)
 	}
 
 	return test, nil
@@ -98,11 +94,6 @@ func (td *postgresDB) UpdateTest(ctx context.Context, test model.Test) (model.Te
 		return model.Test{}, fmt.Errorf("sql exec: %w", err)
 	}
 
-	err = td.SetSpec(ctx, testToUpdate, testToUpdate.Specs)
-	if err != nil {
-		return model.Test{}, fmt.Errorf("setDefinition error: %w", err)
-	}
-
 	return testToUpdate, nil
 }
 
@@ -129,7 +120,6 @@ func (td *postgresDB) UpdateTestVersion(ctx context.Context, test model.Test) er
 func (td *postgresDB) DeleteTest(ctx context.Context, test model.Test) error {
 	queries := []string{
 		"DELETE FROM runs WHERE test_id = $1",
-		"DELETE FROM definitions WHERE test_id = $1",
 		"DELETE FROM tests WHERE id = $1",
 	}
 
@@ -143,11 +133,7 @@ func (td *postgresDB) DeleteTest(ctx context.Context, test model.Test) error {
 	return nil
 }
 
-const getTestSQL = `
-SELECT t.test, d.definition
-FROM tests t
-JOIN definitions d ON d.test_id = t.id AND d.test_version = t.version
-`
+const getTestSQL = `SELECT t.test FROM tests t`
 
 func (td *postgresDB) GetTestVersion(ctx context.Context, id uuid.UUID, version int) (model.Test, error) {
 	stmt, err := td.db.Prepare(getTestSQL + " WHERE t.id = $1 AND t.version = $2")
@@ -241,8 +227,8 @@ func decodeTest(b []byte) (model.Test, error) {
 }
 
 func (td *postgresDB) readTestRow(ctx context.Context, row scanner) (model.Test, error) {
-	var testB, defB []byte
-	err := row.Scan(&testB, &defB)
+	var testB []byte
+	err := row.Scan(&testB)
 	switch err {
 	case sql.ErrNoRows:
 		return model.Test{}, ErrNotFound
@@ -251,13 +237,6 @@ func (td *postgresDB) readTestRow(ctx context.Context, row scanner) (model.Test,
 		if err != nil {
 			return model.Test{}, err
 		}
-
-		defs, err := decodeDefinition(defB)
-		if err != nil {
-			return model.Test{}, err
-		}
-
-		test.Specs = defs
 
 		return test, nil
 	default:

@@ -2,12 +2,10 @@ module github.com/kubeshop/tracetest/cli
 
 go 1.18
 
-replace github.com/kubeshop/tracetest/server => ../server
-
 require (
 	github.com/compose-spec/compose-go v1.5.0
 	github.com/cucumber/ci-environment/go v0.0.0-20220824023145-61292c03da10
-	github.com/kubeshop/tracetest/server v0.0.0-00010101000000-000000000000
+	github.com/kubeshop/tracetest/server v0.0.0-20220902195955-1f247678e978
 	github.com/pterm/pterm v0.12.45
 	github.com/spf13/cobra v1.4.0
 	github.com/spf13/viper v1.11.0
