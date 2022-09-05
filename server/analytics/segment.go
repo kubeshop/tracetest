@@ -14,6 +14,7 @@ func newSegmentTracker(hostname, serverID, appVersion, env string) Tracker {
 
 	client.Enqueue(segment.Identify{
 		Traits: segment.NewTraits().
+			Set("source", "server").
 			Set("serverID", serverID).
 			Set("env", env).
 			Set("appVersion", appVersion).
@@ -46,6 +47,7 @@ func (t segmentTracker) Ready() bool {
 
 func (t segmentTracker) Track(name string, props map[string]string) error {
 	p := segment.NewProperties().
+		Set("source", "server").
 		Set("serverID", t.serverID).
 		Set("env", t.env).
 		Set("appVersion", t.appVersion).
