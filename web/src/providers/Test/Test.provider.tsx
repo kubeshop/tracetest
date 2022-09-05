@@ -5,6 +5,7 @@ import {useGetTestByIdQuery, useGetTestVersionByIdQuery} from 'redux/apis/TraceT
 import {TDraftTest, TTest} from 'types/Test.types';
 import VersionMismatchModal from 'components/VersionMismatchModal';
 import useTestCrud from './hooks/useTestCrud';
+import TestService from '../../services/Test.service';
 
 interface IContext {
   onEdit(values: TDraftTest): void;
@@ -56,7 +57,7 @@ const TestProvider = ({children, testId}: IProps) => {
   );
   const isLoading = isLatestLoading || isCurrentLoading;
   const isError = isLatestError || isCurrentError;
-  const currentTest = (test || latestTest)!;
+  const currentTest = (testVersion ? test : latestTest)!;
 
   const onEdit = useCallback(
     (values: TDraftTest) => {
@@ -80,10 +81,13 @@ const TestProvider = ({children, testId}: IProps) => {
 
   const onConfirm = useCallback(() => {
     if (state === 'edit') edit(test!, draft);
-    else runTest(testId);
+    else {
+      const initialValues = TestService.getInitialValues(test!);
+      edit(test!, initialValues);
+    }
 
     setIsVersionModalOpen(false);
-  }, [draft, edit, runTest, state, test, testId]);
+  }, [draft, edit, state, test]);
 
   const value = useMemo<IContext>(
     () => ({
