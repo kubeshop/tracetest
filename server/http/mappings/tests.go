@@ -379,7 +379,12 @@ func (m Model) Result(in openapi.AssertionResults) *model.RunResults {
 
 func (m Model) Assertion(in openapi.Assertion) model.Assertion {
 	comp, _ := m.comparators.Get(in.Comparator)
-	expression, _ := parser.ParseAssertionExpression(in.Expected)
+	expression, err := parser.ParseAssertionExpression(in.Expected)
+	if err != nil {
+		// Maybe it's a string without quotes, try quoting it and see if it works
+		quotedValue := fmt.Sprintf(`"%s"`, in.Expected)
+		expression, _ = parser.ParseAssertionExpression(quotedValue)
+	}
 
 	return model.Assertion{
 		Attribute:  model.Attribute(in.Attribute),
