@@ -1,7 +1,7 @@
 import {render} from 'test-utils';
 import TestDefinitionProvider from '../TestSpecs.provider';
 
-jest.mock('../../Test/Test.Provider', () => {
+jest.mock('providers/Test/Test.Provider', () => {
   const Provider = ({children}: {children: React.ReactElement}) => children;
 
   return Provider;
