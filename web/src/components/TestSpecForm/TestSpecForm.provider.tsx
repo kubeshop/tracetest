@@ -4,6 +4,7 @@ import {createContext, useCallback, useContext, useMemo, useState} from 'react';
 import VersionMismatchModal from 'components/VersionMismatchModal/VersionMismatchModal';
 import {RouterSearchFields} from 'constants/Common.constants';
 import {useSpan} from 'providers/Span/Span.provider';
+import {useTest} from 'providers/Test/Test.provider';
 import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
@@ -46,7 +47,8 @@ const TestSpecFormProvider: React.FC<{testId: string}> = ({children}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
   const [formProps, setFormProps] = useState<IFormProps>(initialFormProps);
-  const {update, add, test, isDraftMode} = useTestSpecs();
+  const {test} = useTest();
+  const {update, add, isDraftMode} = useTestSpecs();
   const {run} = useTestRun();
   const {onClearMatchedSpans} = useSpan();
   const specs = useAppSelector(state => TestSpecsSelectors.selectSpecs(state));

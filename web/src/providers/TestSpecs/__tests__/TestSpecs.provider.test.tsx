@@ -1,6 +1,12 @@
 import {render} from 'test-utils';
 import TestDefinitionProvider from '../TestSpecs.provider';
 
+jest.mock('../../Test/Test.provider', () => {
+  const Provider = ({children}: {children: React.ReactElement}) => children;
+
+  return Provider;
+});
+
 describe('TestDefinitionProvider', () => {
   it('should render with the proper values', () => {
     const {getByText} = render(
