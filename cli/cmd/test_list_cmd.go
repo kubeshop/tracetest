@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/kubeshop/tracetest/cli/actions"
+	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 )
@@ -14,6 +15,8 @@ var testListCmd = &cobra.Command{
 	Long:   "list all test",
 	PreRun: setupCommand,
 	Run: func(cmd *cobra.Command, args []string) {
+		analytics.Track("Test List", "cmd", map[string]string{})
+
 		ctx := context.Background()
 		cliLogger.Debug("Retrieving list of tests", zap.String("endpoint", cliConfig.Endpoint))
 		client := getAPIClient()

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/kubeshop/tracetest/cli/actions"
+	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 )
@@ -16,6 +17,8 @@ var configureCmd = &cobra.Command{
 	Long:   "Configure your tracetest CLI",
 	PreRun: setupLogger,
 	Run: func(cmd *cobra.Command, args []string) {
+		analytics.Track("Configure", "cmd", map[string]string{})
+
 		ctx := context.Background()
 		client := getAPIClient()
 		action := actions.NewConfigureAction(cliConfig, cliLogger, client)
