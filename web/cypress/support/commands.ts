@@ -96,13 +96,15 @@ Cypress.Commands.add('matchTestRunPageUrl', () => {
 Cypress.Commands.add('goToTestDetailPageAndRunTest', (pathname: string) => {
   const testId = getTestId(pathname);
   cy.visit(`/test/${testId}`);
-  cy.makeSureUserIsOnTestDetailPage();
   cy.get('[data-cy^=result-card]', {timeout: 10000}).first().click();
+  cy.makeSureUserIsOnTestDetailPage();
+  cy.get(`[data-cy^=test-run-result-]`).first().click();
   cy.makeSureUserIsOnTracePage(false);
 });
 
 Cypress.Commands.add('makeSureUserIsOnTestDetailPage', () => {
   cy.location('href').should('match', /\/test\/.*/i);
+  cy.wait('@testObject');
 });
 
 Cypress.Commands.add('makeSureUserIsOnTracePage', (shouldCancelOnboarding = true) => {
