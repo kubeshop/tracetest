@@ -34,7 +34,7 @@ func TestTestEncoding(t *testing.T) {
 		},
 		Specs: (model.OrderedMap[model.SpanQuery, []model.Assertion]{}).
 			MustAdd(model.SpanQuery(`span[name="test"]`), []model.Assertion{
-				{"name", comparator.Eq, "test"},
+				{"name", comparator.Eq, createExpressionFromString("test")},
 			}),
 	}
 
@@ -213,4 +213,27 @@ func TestRunEncoding(t *testing.T) {
 			assert.WithinDuration(t, expectedCompletedAt, actualCompletedAt, 0)
 		})
 	}
+}
+
+func TestOldAssertionSerialization(t *testing.T) {
+	var newAssertion model.Assertion
+	oldAssertion := struct {
+		Attribute  string
+		Comparator string
+		Value      string
+	}{
+		Attribute:  "tracetest.span.type",
+		Comparator: "=",
+		Value:      "http",
+	}
+
+	oldAssertionJson, err := json.Marshal(oldAssertion)
+	require.NoError(t, err)
+
+	err = json.Unmarshal(oldAssertionJson, &newAssertion)
+	require.NoError(t, err)
+
+	assert.Equal(t, oldAssertion.Attribute, newAssertion.Attribute.String())
+	assert.Equal(t, oldAssertion.Comparator, newAssertion.Comparator.String())
+	assert.Equal(t, oldAssertion.Value, newAssertion.Value.String())
 }
