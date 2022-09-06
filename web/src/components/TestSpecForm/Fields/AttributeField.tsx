@@ -24,6 +24,7 @@ export const AttributeField = ({field, name, reference, attributeList}: IProps):
       rules={[{required: true, message: 'Attribute is required'}]}
       data-cy="assertion-check-attribute"
       id="assertion-check-attribute"
+      style={{flexBasis: '30%', width: 0}}
     >
       <S.Select
         placeholder="Attribute"
