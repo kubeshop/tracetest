@@ -4,7 +4,7 @@ import {CaseReducer, PayloadAction} from '@reduxjs/toolkit';
 import {TriggerTypes} from 'constants/Test.constants';
 import {HTTP_METHOD} from 'constants/Common.constants';
 import {Model, TGrpcSchemas, THttpSchemas, TTestSchemas, TTriggerSchemas} from './Common.types';
-import {TTestDefinition} from './TestDefinition.types';
+import {TTestSpecs} from './TestSpecs.types';
 
 import {ICreateTestStep, IPlugin} from './Plugins.types';
 import {SupportedPlugins} from '../constants/Plugins.constants';
@@ -54,10 +54,10 @@ export type TRawTest = TTestSchemas['Test'];
 export type TTest = Model<
   TRawTest,
   {
-    definition: TTestDefinition;
+    definition: TTestSpecs;
     serviceUnderTest?: undefined;
     trigger: TTrigger;
-    specs?: TTestDefinition;
+    specs?: TTestSpecs;
   }
 >;
 

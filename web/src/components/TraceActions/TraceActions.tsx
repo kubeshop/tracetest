@@ -1,11 +1,11 @@
 import {Button} from 'antd';
-import {useTestDefinition} from '../../providers/TestDefinition/TestDefinition.provider';
+import {useTestSpecs} from '../../providers/TestSpecs/TestSpecs.provider';
 import TraceAnalyticsService from '../../services/Analytics/TraceAnalytics.service';
 import * as S from './TraceActions.styled';
 
 const TraceActions: React.FC = () => {
-  const {definitionList, publish, cancel} = useTestDefinition();
-  const pendingCount = definitionList.filter(({isDraft}) => isDraft).length;
+  const {specs, publish, cancel} = useTestSpecs();
+  const pendingCount = specs.filter(({isDraft}) => isDraft).length;
 
   return (
     <S.TraceActions>

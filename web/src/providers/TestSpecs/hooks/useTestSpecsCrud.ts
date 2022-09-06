@@ -1,19 +1,19 @@
 import {useCallback} from 'react';
 import {useNavigate} from 'react-router-dom';
-import TestDefinitionActions from 'redux/actions/TestDefinition.actions';
+import TestSpecsActions from 'redux/actions/TestSpecs.actions';
 import {useAppDispatch} from 'redux/hooks';
 import {
-  addDefinition,
-  initDefinitionList,
-  removeDefinition,
-  resetDefinitionList,
-  updateDefinition,
+  initSpecs,
+  resetSpecs,
+  addSpec,
+  removeSpec,
+  revertSpec,
+  updateSpec,
   reset as resetAction,
-  revertDefinition,
   setIsInitialized,
-} from 'redux/slices/TestDefinition.slice';
+} from 'redux/slices/TestSpecs.slice';
 import {TAssertionResults} from 'types/Assertion.types';
-import {TTestDefinitionEntry} from 'types/TestDefinition.types';
+import {TTestSpecEntry} from 'types/TestSpecs.types';
 import useBlockNavigation from 'hooks/useBlockNavigation';
 import RouterActions from 'redux/actions/Router.actions';
 import {RouterSearchFields} from 'constants/Common.constants';
@@ -25,7 +25,7 @@ interface IProps {
   isDraftMode: boolean;
 }
 
-const useTestDefinitionCrud = ({runId, testId, isDraftMode}: IProps) => {
+const useTestSpecsCrud = ({runId, testId, isDraftMode}: IProps) => {
   useBlockNavigation(isDraftMode);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -33,46 +33,46 @@ const useTestDefinitionCrud = ({runId, testId, isDraftMode}: IProps) => {
 
   const revert = useCallback(
     (originalSelector: string) => {
-      return dispatch(revertDefinition({originalSelector}));
+      return dispatch(revertSpec({originalSelector}));
     },
     [dispatch]
   );
 
   const dryRun = useCallback(
-    (definitionList: TTestDefinitionEntry[]) => {
-      return dispatch(TestDefinitionActions.dryRun({testId, runId, definitionList})).unwrap();
+    (definitionList: TTestSpecEntry[]) => {
+      return dispatch(TestSpecsActions.dryRun({testId, runId, definitionList})).unwrap();
     },
     [dispatch, runId, testId]
   );
 
   const publish = useCallback(async () => {
-    const {id} = await dispatch(TestDefinitionActions.publish({testId, runId})).unwrap();
+    const {id} = await dispatch(TestSpecsActions.publish({testId, runId})).unwrap();
     dispatch(RouterActions.updateSearch({[RouterSearchFields.SelectedAssertion]: ''}));
 
     navigate(`/test/${testId}/run/${id}/test`);
   }, [dispatch, navigate, runId, testId]);
 
   const cancel = useCallback(() => {
-    dispatch(resetDefinitionList());
+    dispatch(resetSpecs());
   }, [dispatch]);
 
   const add = useCallback(
-    async (definition: TTestDefinitionEntry) => {
-      dispatch(addDefinition({definition}));
+    async (spec: TTestSpecEntry) => {
+      dispatch(addSpec({spec}));
     },
     [dispatch]
   );
 
   const update = useCallback(
-    async (selector: string, definition: TTestDefinitionEntry) => {
-      dispatch(updateDefinition({definition, selector}));
+    async (selector: string, spec: TTestSpecEntry) => {
+      dispatch(updateSpec({spec, selector}));
     },
     [dispatch]
   );
 
   const onConfirmRemove = useCallback(
     async (selector: string) => {
-      dispatch(removeDefinition({selector}));
+      dispatch(removeSpec({selector}));
     },
     [dispatch]
   );
@@ -85,7 +85,7 @@ const useTestDefinitionCrud = ({runId, testId, isDraftMode}: IProps) => {
 
   const init = useCallback(
     (assertionResults: TAssertionResults) => {
-      dispatch(initDefinitionList({assertionResults}));
+      dispatch(initSpecs({assertionResults}));
     },
     [dispatch]
   );
@@ -104,4 +104,4 @@ const useTestDefinitionCrud = ({runId, testId, isDraftMode}: IProps) => {
   return {revert, init, updateIsInitialized, reset, add, remove, update, publish, cancel, dryRun};
 };
 
-export default useTestDefinitionCrud;
+export default useTestSpecsCrud;

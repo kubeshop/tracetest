@@ -7,7 +7,7 @@ import Reducer, {
   setSelectedSpan,
   clearMatchedSpans,
 } from '../Span.slice';
-import {setSelectedAssertion} from '../TestDefinition.slice';
+import {setSelectedSpec} from '../TestSpecs.slice';
 
 describe('Span.slice', () => {
   it('should return the initial state', () => {
@@ -67,7 +67,7 @@ describe('Span.slice', () => {
       expect(
         Reducer(
           {...initialState, focusedSpan: '', matchedSpans: ['12345', '67890']},
-          setSelectedAssertion(assertionResultEntry)
+          setSelectedSpec(assertionResultEntry)
         )
       ).toEqual({
         ...initialState,
@@ -84,7 +84,7 @@ describe('Span.slice', () => {
             matchedSpans: ['12345', '67890'],
             focusedSpan: '12345',
           },
-          setSelectedAssertion()
+          setSelectedSpec()
         )
       ).toEqual(initialState);
     });

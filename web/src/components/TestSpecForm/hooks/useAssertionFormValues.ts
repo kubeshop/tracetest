@@ -4,14 +4,14 @@ import {IValues} from '../TestSpecForm';
 
 const useAssertionFormValues = (form: FormInstance<IValues>) => {
   const currentSelector = Form.useWatch('selector', form);
-  const currentAssertionList = Form.useWatch('assertionList', form);
+  const currentAssertions = Form.useWatch('assertions', form);
 
   return useMemo(
     () => ({
       currentSelector: currentSelector || '',
-      currentAssertionList: currentAssertionList || [],
+      currentAssertions: currentAssertions || [],
     }),
-    [currentAssertionList, currentSelector]
+    [currentAssertions, currentSelector]
   );
 };
 

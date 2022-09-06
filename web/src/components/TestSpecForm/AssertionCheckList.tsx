@@ -10,18 +10,15 @@ import {IValues} from './TestSpecForm';
 import * as S from './TestSpecForm.styled';
 
 interface IProps {
-  form: FormInstance<IValues>;
-  fields: FormListFieldData[];
-  assertionList: TAssertion[];
-
   add(): void;
-
-  remove(name: number): void;
-
+  assertions: TAssertion[];
   attributeList: TSpanFlatAttribute[];
+  fields: FormListFieldData[];
+  form: FormInstance<IValues>;
+  remove(name: number): void;
 }
 
-const AssertionCheckList: React.FC<IProps> = ({form, fields, add, remove, attributeList, assertionList}) => {
+const AssertionCheckList = ({form, fields, add, remove, attributeList, assertions}: IProps) => {
   const reference = useGetOTELSemanticConventionAttributesInfo();
 
   return (
@@ -37,7 +34,7 @@ const AssertionCheckList: React.FC<IProps> = ({form, fields, add, remove, attrib
               attributeList={attributeList}
               name={name}
               index={index}
-              assertionList={assertionList}
+              assertions={assertions}
               reference={reference}
             />
           );

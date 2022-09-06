@@ -3,12 +3,11 @@ import {HTTP_METHOD} from 'constants/Common.constants';
 import {uniq} from 'lodash';
 import AssertionResults from 'models/AssertionResults.model';
 import Test from 'models/Test.model';
-import TestDefinition from 'models/TestDefinition.model';
 import TestRun from 'models/TestRun.model';
 import WebSocketService, {IListenerFunction} from 'services/WebSocket.service';
 import {TAssertion, TAssertionResults, TRawAssertionResults} from 'types/Assertion.types';
 import {TRawTest, TTest} from 'types/Test.types';
-import {TRawTestDefinition, TTestDefinition} from 'types/TestDefinition.types';
+import {TRawTestSpecs} from 'types/TestSpecs.types';
 import {TRawTestRun, TTestRun} from 'types/TestRun.types';
 
 const PATH = `${document.baseURI}api/`;
@@ -43,7 +42,10 @@ const TraceTestAPI = createApi({
         method: HTTP_METHOD.PUT,
         body: test,
       }),
-      invalidatesTags: test => [{type: Tags.TEST, id: 'LIST'}, {type: Tags.TEST, id: test?.id}],
+      invalidatesTags: test => [
+        {type: Tags.TEST, id: 'LIST'},
+        {type: Tags.TEST, id: test?.id},
+      ],
     }),
     getTestList: build.query<TTest[], {take?: number; skip?: number; query?: string}>({
       query: ({take = 25, skip = 0, query = ''}) => `/tests?take=${take}&skip=${skip}&query=${query}`,
@@ -66,13 +68,7 @@ const TraceTestAPI = createApi({
     }),
 
     // Test Definition
-    getTestDefinition: build.query<TTestDefinition[], {testId: string}>({
-      query: ({testId}) => `/tests/${testId}/definition`,
-      providesTags: (result, error, {testId}) => [{type: Tags.TEST_DEFINITION, id: testId}],
-      transformResponse: (testDefinitionList: TRawTestDefinition[]) =>
-        testDefinitionList.map(rawTestDefinition => TestDefinition(rawTestDefinition)),
-    }),
-    setTestDefinition: build.mutation<TAssertion, {testId: string; testDefinition: Partial<TRawTestDefinition>}>({
+    setTestDefinition: build.mutation<TAssertion, {testId: string; testDefinition: Partial<TRawTestSpecs>}>({
       query: ({testId, testDefinition}) => ({
         url: `/tests/${testId}/definition`,
         method: HTTP_METHOD.PUT,
@@ -130,10 +126,7 @@ const TraceTestAPI = createApi({
       ],
       transformResponse: (rawTestRun: TRawTestRun) => TestRun(rawTestRun),
     }),
-    dryRun: build.mutation<
-      TAssertionResults,
-      {testId: string; runId: string; testDefinition: Partial<TRawTestDefinition>}
-    >({
+    dryRun: build.mutation<TAssertionResults, {testId: string; runId: string; testDefinition: Partial<TRawTestSpecs>}>({
       query: ({testId, runId, testDefinition}) => ({
         url: `/tests/${testId}/run/${runId}/dry-run`,
         method: HTTP_METHOD.PUT,
@@ -174,7 +167,6 @@ export const {
   useGetTestListQuery,
   useRunTestMutation,
   useDeleteTestByIdMutation,
-  useGetTestDefinitionQuery,
   useSetTestDefinitionMutation,
   useGetRunByIdQuery,
   useGetRunListQuery,

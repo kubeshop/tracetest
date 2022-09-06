@@ -3,7 +3,7 @@ import RunActionsMenu from 'components/RunActionsMenu';
 import TestState from 'components/TestState';
 import TraceActions from 'components/TraceActions';
 import {TestState as TestStateEnum} from 'constants/TestRun.constants';
-import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
+import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import {useTest} from 'providers/Test/Test.provider';
 import * as S from './RunDetailLayout.styled';
@@ -14,7 +14,7 @@ interface IProps {
 }
 
 const HeaderRight = ({testId, testVersion}: IProps) => {
-  const {isDraftMode} = useTestDefinition();
+  const {isDraftMode} = useTestSpecs();
   const {run} = useTestRun();
   const {onRun} = useTest();
   const state = run.state;

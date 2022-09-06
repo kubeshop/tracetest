@@ -1,14 +1,14 @@
-import TestDefinitionActions from '../TestDefinition.actions';
+import TestSpecsActions from '../TestSpecs.actions';
 import {store} from '../../store';
 import {HTTP_METHOD} from '../../../constants/Common.constants';
-import TestDefinitionSelectors from '../../../selectors/TestDefinition.selectors';
+import TestSpecsSelectors from '../../../selectors/TestSpecs.selectors';
 import TestRunMock from '../../../models/__mocks__/TestRun.mock';
 
-jest.mock('../../../selectors/TestDefinition.selectors', () => ({
-  selectDefinitionList: jest.fn(),
+jest.mock('../../../selectors/TestSpecs.selectors', () => ({
+  selectSpecs: jest.fn(),
 }));
 
-const selectTestMock = TestDefinitionSelectors.selectDefinitionList as unknown as jest.Mock;
+const selectTestMock = TestSpecsSelectors.selectSpecs as unknown as jest.Mock;
 
 describe('TestDefinitionActions', () => {
   beforeEach(() => {
@@ -23,7 +23,7 @@ describe('TestDefinitionActions', () => {
       fetchMock.mockResponseOnce(JSON.stringify(TestRunMock.raw()));
 
       await store.dispatch(
-        TestDefinitionActions.publish({
+        TestSpecsActions.publish({
           testId: 'testId',
           runId: 'runId',
         })
@@ -48,7 +48,7 @@ describe('TestDefinitionActions', () => {
 
       fetchMock.mockResponseOnce(JSON.stringify(TestRunMock.raw()));
       await store.dispatch(
-        TestDefinitionActions.dryRun({
+        TestSpecsActions.dryRun({
           testId: 'testId',
           runId: 'runId',
           definitionList: [],

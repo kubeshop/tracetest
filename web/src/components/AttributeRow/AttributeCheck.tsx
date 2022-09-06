@@ -1,6 +1,6 @@
 import {Dropdown, Menu} from 'antd';
 
-import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
+import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
 import TraceAnalyticsService from 'services/Analytics/TraceAnalytics.service';
 import {IResult} from 'types/Assertion.types';
 import * as S from './AttributeRow.styled';
@@ -11,12 +11,12 @@ interface IProps {
 }
 
 const AttributeCheck = ({items, type}: IProps) => {
-  const {setSelectedAssertion} = useTestDefinition();
+  const {setSelectedSpec} = useTestSpecs();
 
   const handleOnClick = (id: string) => {
     TraceAnalyticsService.onAttributeCheckClick();
     const {assertionResult} = items.find(item => item.id === id)!;
-    setSelectedAssertion(assertionResult);
+    setSelectedSpec(assertionResult);
   };
 
   const menuLayout = (

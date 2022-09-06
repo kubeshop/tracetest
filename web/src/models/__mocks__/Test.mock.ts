@@ -14,7 +14,7 @@ const TestMock: IMockFactory<TTest, TRawTest> = () => ({
         definitions: [
           {
             selector: {query: faker.random.word()},
-            assertionList: [AssertionResultMock.raw()],
+            assertions: [AssertionResultMock.raw()],
           },
         ],
       },
