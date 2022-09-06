@@ -8,6 +8,5 @@ export const Container = styled.div`
 `;
 
 export const PendingTag = styled(Tag)`
-  border: none;
   padding: 8px;
 `;

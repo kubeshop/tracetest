@@ -1,5 +1,5 @@
 import {DeleteOutlined, EditOutlined, UndoOutlined} from '@ant-design/icons';
-import {Button, Tooltip} from 'antd';
+import {Button, Tag, Tooltip} from 'antd';
 
 import * as S from './TestSpec.styled';
 
@@ -13,8 +13,7 @@ interface IProps {
 
 const Actions = ({isDeleted, isDraft, onDelete, onEdit, onRevert}: IProps) => (
   <S.ActionsContainer>
-    {isDraft && <S.ActionTag>pending</S.ActionTag>}
-    {isDeleted && <S.ActionTag>deleted</S.ActionTag>}
+    {isDraft && <Tag>pending {isDeleted && '/ deleted'}</Tag>}
     {isDraft && (
       <Tooltip title="Revert spec">
         <Button
