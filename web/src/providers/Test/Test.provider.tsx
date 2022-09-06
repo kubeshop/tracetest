@@ -1,5 +1,4 @@
 import {noop} from 'lodash';
-import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import {createContext, useCallback, useContext, useMemo, useState} from 'react';
 import {useGetTestByIdQuery, useGetTestVersionByIdQuery} from 'redux/apis/TraceTest.api';
 import {TDraftTest, TTest} from 'types/Test.types';
@@ -31,33 +30,31 @@ export const Context = createContext<IContext>({
 
 interface IProps {
   testId: string;
+  version?: number;
   children: React.ReactNode;
 }
 
 export const useTest = () => useContext(Context);
 
-const TestProvider = ({children, testId}: IProps) => {
+const TestProvider = ({children, testId, version = 0}: IProps) => {
   const [isVersionModalOpen, setIsVersionModalOpen] = useState(false);
   const [draft, setDraft] = useState<TDraftTest>({});
   const [state, setState] = useState<'edit' | 'run'>();
-  const {
-    run: {testVersion},
-  } = useTestRun();
   const {runTest, edit, isEditLoading} = useTestCrud();
   const {
     data: test,
     isLoading: isCurrentLoading,
     isError: isCurrentError,
-  } = useGetTestVersionByIdQuery({testId, version: testVersion}, {skip: !testVersion});
+  } = useGetTestVersionByIdQuery({testId, version}, {skip: !version});
   const {data: latestTest, isLoading: isLatestLoading, isError: isLatestError} = useGetTestByIdQuery({testId});
 
   const isLatestVersion = useMemo(
-    () => Boolean(testVersion) && testVersion === latestTest?.version,
-    [latestTest?.version, testVersion]
+    () => Boolean(version) && version === latestTest?.version,
+    [latestTest?.version, version]
   );
   const isLoading = isLatestLoading || isCurrentLoading;
   const isError = isLatestError || isCurrentError;
-  const currentTest = (testVersion ? test : latestTest)!;
+  const currentTest = (version ? test : latestTest)!;
 
   const onEdit = useCallback(
     (values: TDraftTest) => {

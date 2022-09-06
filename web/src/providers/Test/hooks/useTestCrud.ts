@@ -1,9 +1,9 @@
 import {useCallback} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useAppDispatch} from 'redux/hooks';
-import {reset} from 'redux/slices/TestDefinition.slice';
+import {reset} from 'redux/slices/TestSpecs.slice';
 import {TDraftTest, TTest} from 'types/Test.types';
-import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
+import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
 import TestAnalyticsService from 'services/Analytics/TestAnalytics.service';
 import {TriggerTypeToPlugin} from 'constants/Plugins.constants';
 import {TriggerTypes} from 'constants/Test.constants';
@@ -13,7 +13,7 @@ import {useEditTestMutation, useRunTestMutation} from 'redux/apis/TraceTest.api'
 const useTestCrud = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const {updateIsInitialized} = useTestDefinition();
+  const {updateIsInitialized} = useTestSpecs();
   const [editTest, {isLoading: isLoadingEditTest}] = useEditTestMutation();
   const [runTestAction, {isLoading: isLoadingRunTest}] = useRunTestMutation();
   const isEditLoading = isLoadingEditTest || isLoadingRunTest;

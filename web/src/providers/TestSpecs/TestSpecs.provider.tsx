@@ -9,6 +9,7 @@ import {TTestSpecEntry} from 'types/TestSpecs.types';
 import RouterActions from 'redux/actions/Router.actions';
 import {RouterSearchFields} from 'constants/Common.constants';
 import {encryptString} from 'utils/Common';
+import TestProvider from 'providers/Test/Test.provider';
 import useTestSpecsCrud from './hooks/useTestSpecsCrud';
 
 interface IContext {
@@ -129,7 +130,13 @@ const TestSpecsProvider = ({children, testId, runId}: IProps) => {
     ]
   );
 
-  return <Context.Provider value={value}>{children}</Context.Provider>;
+  return (
+    <Context.Provider value={value}>
+      <TestProvider testId={testId} version={run.testVersion}>
+        {children}
+      </TestProvider>
+    </Context.Provider>
+  );
 };
 
 export default TestSpecsProvider;
