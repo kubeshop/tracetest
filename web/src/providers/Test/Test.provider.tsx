@@ -39,7 +39,7 @@ export const useTest = () => useContext(Context);
 const TestProvider = ({children, testId, version = 0}: IProps) => {
   const [isVersionModalOpen, setIsVersionModalOpen] = useState(false);
   const [draft, setDraft] = useState<TDraftTest>({});
-  const [state, setState] = useState<'edit' | 'run'>();
+  const [action, setAction] = useState<'edit' | 'run'>();
   const {runTest, edit, isEditLoading} = useTestCrud();
   const {
     data: test,
@@ -60,7 +60,7 @@ const TestProvider = ({children, testId, version = 0}: IProps) => {
     (values: TDraftTest) => {
       if (isLatestVersion) edit(test!, values);
       else {
-        setState('edit');
+        setAction('edit');
         setDraft(values);
         setIsVersionModalOpen(true);
       }
@@ -71,20 +71,20 @@ const TestProvider = ({children, testId, version = 0}: IProps) => {
   const onRun = useCallback(() => {
     if (isLatestVersion) runTest(testId);
     else {
-      setState('run');
+      setAction('run');
       setIsVersionModalOpen(true);
     }
   }, [isLatestVersion, runTest, testId]);
 
   const onConfirm = useCallback(() => {
-    if (state === 'edit') edit(test!, draft);
+    if (action === 'edit') edit(test!, draft);
     else {
       const initialValues = TestService.getInitialValues(test!);
       edit(test!, initialValues);
     }
 
     setIsVersionModalOpen(false);
-  }, [draft, edit, state, test]);
+  }, [action, draft, edit, test]);
 
   const value = useMemo<IContext>(
     () => ({
@@ -105,8 +105,8 @@ const TestProvider = ({children, testId, version = 0}: IProps) => {
       <Context.Provider value={value}>{children}</Context.Provider>
       <VersionMismatchModal
         description={
-          state === 'edit'
-            ? 'Changing and saving changes will result in a new version that will become the latest.'
+          action === 'edit'
+            ? 'Editing it will result in a new version that will become the latest.'
             : 'Running the test will use the latest version of the test.'
         }
         currentVersion={currentTest.version}
@@ -118,7 +118,7 @@ const TestProvider = ({children, testId, version = 0}: IProps) => {
       />
     </>
   ) : (
-    <div data-cy="loading test" />
+    <div data-cy="loading-test" />
   );
 };
 

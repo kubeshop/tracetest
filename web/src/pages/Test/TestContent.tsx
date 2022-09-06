@@ -1,14 +1,17 @@
+import {useNavigate} from 'react-router-dom';
+
 import TestHeader from 'components/TestHeader';
+import {useTest} from 'providers/Test/Test.provider';
 import * as S from './Test.styled';
 import TestDetails from './TestDetails';
-import {useTest} from '../../providers/Test/Test.provider';
 
 const TestContent = () => {
+  const navigate = useNavigate();
   const {test} = useTest();
 
   return (
     <>
-      <TestHeader test={test} />
+      <TestHeader onBack={() => navigate('/')} test={test} />
       <S.Wrapper>
         <TestDetails testId={test.id} />
       </S.Wrapper>

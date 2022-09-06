@@ -1,21 +1,20 @@
-import {useNavigate} from 'react-router-dom';
 import TestCardActions from 'components/TestCard/TestCardActions';
 import {TTest} from 'types/Test.types';
 import useDeleteTest from 'hooks/useDeleteTest';
 import * as S from './TestHeader.styled';
 
 interface IProps {
+  onBack(): void;
   test: TTest;
 }
 
-const TestHeader = ({test: {id, name, trigger, version = 1}, test}: IProps) => {
+const TestHeader = ({onBack, test: {id, name, trigger, version = 1}, test}: IProps) => {
   const onDelete = useDeleteTest();
-  const navigate = useNavigate();
 
   return (
     <S.Container>
       <S.Section>
-        <S.BackIcon data-cy="test-header-back-button" onClick={() => navigate(-1)} />
+        <S.BackIcon data-cy="test-header-back-button" onClick={onBack} />
         <div>
           <S.Title data-cy="test-details-name">
             {name} (v{version})
