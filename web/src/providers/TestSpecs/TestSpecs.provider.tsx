@@ -9,7 +9,7 @@ import {TTestSpecEntry} from 'types/TestSpecs.types';
 import RouterActions from 'redux/actions/Router.actions';
 import {RouterSearchFields} from 'constants/Common.constants';
 import {encryptString} from 'utils/Common';
-import TestProvider from 'providers/Test/Test.provider';
+import TestProvider from 'providers/Test';
 import useTestSpecsCrud from './hooks/useTestSpecsCrud';
 
 interface IContext {
