@@ -157,7 +157,7 @@ func filterContainers(ui UI, project *types.Project, included []string) {
 func getCollectorConfigFileContents(ui UI, config configuration) []byte {
 	contents, err := getFileContentsForVersion("local-config/collector.config.yaml", cliConfig.Version)
 	if err != nil {
-		ui.Exit(fmt.Errorf("Cannot get collector config file: %w", err).Error())
+		ui.Exit(fmt.Errorf("cannot get collector config file: %w", err).Error())
 	}
 
 	type msa = map[string]any
@@ -213,7 +213,7 @@ func getCollectorConfigFileContents(ui UI, config configuration) []byte {
 
 	updated, err := yaml.Marshal(otelConfig)
 	if err != nil {
-		ui.Exit(fmt.Errorf("Cannot get collector config file: %w", err).Error())
+		ui.Exit(fmt.Errorf("cannot get collector config file: %w", err).Error())
 	}
 
 	return updated
@@ -308,7 +308,7 @@ func getFileContentsForVersion(path, version string) ([]byte, error) {
 func getCompleteProject(ui UI) *types.Project {
 	contents, err := getFileContentsForVersion("docker-compose.yaml", cliConfig.Version)
 	if err != nil {
-		ui.Exit(fmt.Errorf("Cannot get docker-compose file: %w", err).Error())
+		ui.Exit(fmt.Errorf("cannot get docker-compose file: %w", err).Error())
 	}
 
 	workingDir, err := os.Getwd()
@@ -323,7 +323,7 @@ func getCompleteProject(ui UI) *types.Project {
 		},
 	})
 	if err != nil {
-		ui.Exit(fmt.Errorf("Cannot parse docker-compose file: %w", err).Error())
+		ui.Exit(fmt.Errorf("cannot parse docker-compose file: %w", err).Error())
 	}
 
 	return project

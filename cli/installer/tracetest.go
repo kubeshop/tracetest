@@ -133,7 +133,7 @@ func getTracetestConfigFileContents(ui UI, config configuration) []byte {
 
 	out, err := yaml.Marshal(sc)
 	if err != nil {
-		ui.Exit(fmt.Errorf("Cannot marshal tracetest config file: %w", err).Error())
+		ui.Exit(fmt.Errorf("cannot marshal tracetest config file: %w", err).Error())
 	}
 
 	return out

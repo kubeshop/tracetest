@@ -1,5 +1,7 @@
 package installer
 
+import "strings"
+
 var kubernetes = installer{
 	preChecks: []preChecker{
 		kubectlChecker,
@@ -181,20 +183,23 @@ func installMinikube(ui UI) {
 		sudo:          true,
 		notConfirmMsg: "No worries, you can try installing minikube manually. See https://minikube.sigs.k8s.io/docs/start/",
 		installDocs:   "https://minikube.sigs.k8s.io/docs/start/",
-		args:          map[string]string{},
+		args: map[string]string{
+			"Architecture":    detectArchitecture(),
+			"RpmArchitecture": strings.Replace(detectArchitecture(), "amd64", "x86_64", 1),
+		},
 		apt: `
 			sudo apt update
 			sudo apt install curl -y
-			curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb
-			sudo dpkg -i minikube_latest_amd64.deb
+			curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube_latest_{{.Architecture}}.deb
+			sudo dpkg -i minikube_latest_{{.Architecture}}.deb
 		`,
 		yum: `
-			curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-latest.x86_64.rpm
-			sudo rpm -Uvh minikube-latest.x86_64.rpm
+			curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-latest.{{.RpmArchitecture}}.rpm
+			sudo rpm -Uvh minikube-latest.{{.RpmArchitecture}}.rpm
 		`,
 		dnf: `
-			curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-latest.x86_64.rpm
-			sudo rpm -Uvh minikube-latest.x86_64.rpm
+			curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-latest.{{.RpmArchitecture}}.rpm
+			sudo rpm -Uvh minikube-latest.{{.RpmArchitecture}}.rpm
 		`,
 		homebrew: "brew install minikube",
 		macIntelChipManual: `
