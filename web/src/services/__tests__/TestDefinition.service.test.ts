@@ -4,7 +4,7 @@ describe('TestDefinitionService', () => {
   describe('toRaw', () => {
     it('should return empty response', () => {
       const testResultCount = TestDefinitionService.toRaw({
-        assertionList: [],
+        assertions: [],
         isDeleted: false,
         isDraft: false,
         originalSelector: '',

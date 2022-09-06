@@ -1,11 +1,11 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 import {PatchCollection} from '@reduxjs/toolkit/dist/query/core/buildThunks';
-import TestDefinitionGateway from '../../gateways/TestDefinition.gateway';
+import TestSpecsGateway from '../../gateways/TestSpecs.gateway';
 import TestRunGateway from '../../gateways/TestRun.gateway';
-import TestDefinitionSelectors from '../../selectors/TestDefinition.selectors';
+import TestSpecsSelectors from '../../selectors/TestSpecs.selectors';
 import TestDefinitionService from '../../services/TestDefinition.service';
 import {TAssertionResults} from '../../types/Assertion.types';
-import {TRawTestDefinitionEntry, TTestDefinitionEntry} from '../../types/TestDefinition.types';
+import {TRawTestSpecEntry, TTestSpecEntry} from '../../types/TestSpecs.types';
 import {TTestRun} from '../../types/TestRun.types';
 import {RootState} from '../store';
 
@@ -16,20 +16,21 @@ export type TChange = {
 };
 
 export type TCrudResponse = {
-  definitionList: TTestDefinitionEntry[];
+  definitionList: TTestSpecEntry[];
   change: TChange;
 };
 
-const TestDefinitionActions = () => ({
+const TestSpecsActions = () => ({
   publish: createAsyncThunk<TTestRun, {testId: string; runId: string}>(
     'testDefinition/publish',
     async ({testId, runId}, {dispatch, getState}) => {
-      const rawDefinitionList = TestDefinitionSelectors.selectDefinitionList(getState() as RootState).reduce<
-        TRawTestDefinitionEntry[]
-      >((list, def) => (!def.isDeleted ? list.concat([TestDefinitionService.toRaw(def)]) : list), []);
+      const rawDefinitionList = TestSpecsSelectors.selectSpecs(getState() as RootState).reduce<TRawTestSpecEntry[]>(
+        (list, def) => (!def.isDeleted ? list.concat([TestDefinitionService.toRaw(def)]) : list),
+        []
+      );
 
       await dispatch(
-        TestDefinitionGateway.set(testId, {
+        TestSpecsGateway.set(testId, {
           specs: rawDefinitionList,
         })
       );
@@ -37,7 +38,7 @@ const TestDefinitionActions = () => ({
       return dispatch(TestRunGateway.reRun(testId, runId)).unwrap();
     }
   ),
-  dryRun: createAsyncThunk<TAssertionResults, {definitionList: TTestDefinitionEntry[]; testId: string; runId: string}>(
+  dryRun: createAsyncThunk<TAssertionResults, {definitionList: TTestSpecEntry[]; testId: string; runId: string}>(
     'testDefinition/dryRun',
     ({definitionList, testId, runId}, {dispatch}) => {
       const rawDefinitionList = definitionList.map(def => TestDefinitionService.toRaw(def));
@@ -47,4 +48,4 @@ const TestDefinitionActions = () => ({
   ),
 });
 
-export default TestDefinitionActions();
+export default TestSpecsActions();

@@ -4,13 +4,13 @@ import {createContext, useCallback, useContext, useMemo, useState} from 'react';
 import VersionMismatchModal from 'components/VersionMismatchModal/VersionMismatchModal';
 import {RouterSearchFields} from 'constants/Common.constants';
 import {useSpan} from 'providers/Span/Span.provider';
-import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
+import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import RouterActions from 'redux/actions/Router.actions';
-import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
+import TestSpecsSelectors from 'selectors/TestSpecs.selectors';
 import CreateAssertionModalAnalyticsService from 'services/Analytics/CreateAssertionModalAnalytics.service';
-import {TTestDefinitionEntry} from 'types/TestDefinition.types';
+import {TTestSpecEntry} from 'types/TestSpecs.types';
 import {IValues} from './TestSpecForm';
 
 interface IFormProps {
@@ -46,24 +46,24 @@ const TestSpecFormProvider: React.FC<{testId: string}> = ({children}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
   const [formProps, setFormProps] = useState<IFormProps>(initialFormProps);
-  const {update, add, test, isDraftMode} = useTestDefinition();
+  const {update, add, test, isDraftMode} = useTestSpecs();
   const {run} = useTestRun();
   const {onClearMatchedSpans} = useSpan();
-  const definitionList = useAppSelector(state => TestDefinitionSelectors.selectDefinitionList(state));
+  const specs = useAppSelector(state => TestSpecsSelectors.selectSpecs(state));
 
   const open = useCallback(
     (props: IFormProps = {}) => {
-      const {isEditing, defaultValues: {assertionList = [], selector: defaultSelector} = {}} = props;
-      const definition = definitionList.find(({selector}) => defaultSelector === selector);
+      const {isEditing, defaultValues: {assertions = [], selector: defaultSelector} = {}} = props;
+      const spec = specs.find(({selector}) => defaultSelector === selector);
 
-      if (definition)
+      if (spec)
         setFormProps({
           ...props,
           isEditing: true,
           selector: defaultSelector,
           defaultValues: {
             selector: defaultSelector,
-            assertionList: isEditing ? assertionList : [...definition.assertionList, ...assertionList],
+            assertions: isEditing ? assertions : [...spec.assertions, ...assertions],
           },
         });
       else setFormProps(props);
@@ -78,7 +78,7 @@ const TestSpecFormProvider: React.FC<{testId: string}> = ({children}) => {
 
       dispatch(RouterActions.updateSearch({[RouterSearchFields.SelectedAssertion]: ''}));
     },
-    [dispatch, definitionList, isDraftMode, run.testVersion, test?.version]
+    [dispatch, specs, isDraftMode, run.testVersion, test?.version]
   );
 
   const close = useCallback(() => {
@@ -95,12 +95,12 @@ const TestSpecFormProvider: React.FC<{testId: string}> = ({children}) => {
   }, []);
 
   const onSubmit = useCallback(
-    async ({assertionList = [], selector: newSelectorString = ''}: IValues) => {
+    async ({assertions = [], selector: newSelectorString = ''}: IValues) => {
       const {isEditing, selector = ''} = formProps;
 
-      const definition: TTestDefinitionEntry = {
+      const definition: TTestSpecEntry = {
         selector: newSelectorString,
-        assertionList,
+        assertions,
         originalSelector: newSelectorString,
         isDraft: true,
       };

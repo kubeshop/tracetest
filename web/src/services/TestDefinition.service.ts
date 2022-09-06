@@ -1,10 +1,10 @@
-import {TRawTestDefinitionEntry, TTestDefinitionEntry} from '../types/TestDefinition.types';
+import {TRawTestSpecEntry, TTestSpecEntry} from '../types/TestSpecs.types';
 
 const TestDefinitionService = () => ({
-  toRaw({selector, assertionList}: TTestDefinitionEntry): TRawTestDefinitionEntry {
+  toRaw({selector, assertions}: TTestSpecEntry): TRawTestSpecEntry {
     return {
       selector: {query: selector},
-      assertions: assertionList,
+      assertions,
     };
   },
 });

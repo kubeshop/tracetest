@@ -3,7 +3,7 @@ import {useMemo} from 'react';
 import {SemanticGroupNames} from 'constants/SemanticGroupNames.constants';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import {useAppSelector} from 'redux/hooks';
-import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
+import TestSpecsSelectors from 'selectors/TestSpecs.selectors';
 import AssertionService from 'services/Assertion.service';
 import {TAssertionResultEntry} from 'types/Assertion.types';
 import Assertion from './Assertion';
@@ -38,7 +38,7 @@ const Content = ({
     isDeleted = false,
     isDraft = false,
     originalSelector = '',
-  } = useAppSelector(state => TestDefinitionSelectors.selectDefinitionBySelector(state, selector)) || {};
+  } = useAppSelector(state => TestSpecsSelectors.selectSpecBySelector(state, selector)) || {};
   const totalPassedChecks = useMemo(() => AssertionService.getTotalPassedChecks(resultList), [resultList]);
   const results = useMemo(() => AssertionService.getResultsHashedBySpanId(resultList), [resultList]);
 

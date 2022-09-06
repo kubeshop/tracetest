@@ -23,13 +23,13 @@ const useOnFieldsChange = ({form, attributeList}: IProps) => {
         const [fieldName = '', entry = 0, keyName = ''] = field.name as Array<string | number>;
 
         if (fieldName === 'selector') onSelectorChange();
-        if (fieldName === 'assertionList') onChecksChange();
+        if (fieldName === 'assertions') onChecksChange();
 
-        if (fieldName === 'assertionList' && keyName === 'attribute' && field.value) {
-          const list: TAssertion[] = form.getFieldValue('assertionList') || [];
+        if (fieldName === 'assertions' && keyName === 'attribute' && field.value) {
+          const list: TAssertion[] = form.getFieldValue('assertions') || [];
 
           form.setFieldsValue({
-            assertionList: list.map((assertionEntry, index) => {
+            assertions: list.map((assertionEntry, index) => {
               if (index === entry) {
                 const {value = ''} = attributeList?.find((el: any) => el.key === list[index].attribute) || {};
                 const isValid = typeof value === 'number' || !isEmpty(value);

@@ -5,7 +5,7 @@ import {CompareOperator} from 'constants/Operator.constants';
 import {SemanticGroupNames} from 'constants/SemanticGroupNames.constants';
 import {useTestSpecForm} from 'components/TestSpecForm/TestSpecForm.provider';
 import {useAppSelector} from 'redux/hooks';
-import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
+import TestSpecsSelectors from 'selectors/TestSpecs.selectors';
 import TraceAnalyticsService from 'services/Analytics/TraceAnalytics.service';
 import OperatorService from 'services/Operator.service';
 import SpanService from 'services/Span.service';
@@ -22,10 +22,8 @@ interface IProps {
 
 const SpanDetail = ({onCreateTestSpec = noop, searchText, span}: IProps) => {
   const {open} = useTestSpecForm();
-  const spansResult = useAppSelector(TestDefinitionSelectors.selectSpansResult);
-  const assertions = useAppSelector(state =>
-    TestDefinitionSelectors.selectAssertionResultsBySpan(state, span?.id || '')
-  );
+  const spansResult = useAppSelector(TestSpecsSelectors.selectSpansResult);
+  const assertions = useAppSelector(state => TestSpecsSelectors.selectAssertionResultsBySpan(state, span?.id || ''));
 
   const handleCreateTestSpec = useCallback(
     ({value, key}: TSpanFlatAttribute) => {
@@ -36,7 +34,7 @@ const SpanDetail = ({onCreateTestSpec = noop, searchText, span}: IProps) => {
         isEditing: false,
         selector,
         defaultValues: {
-          assertionList: [
+          assertions: [
             {
               comparator: OperatorService.getOperatorSymbol(CompareOperator.EQUALS),
               expected: value,

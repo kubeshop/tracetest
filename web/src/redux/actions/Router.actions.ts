@@ -2,12 +2,12 @@ import {createAsyncThunk} from '@reduxjs/toolkit';
 import {parse, ParsedQuery, stringify} from 'query-string';
 import {Params} from 'react-router-dom';
 import {push} from 'redux-first-history';
-import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
+import TestSpecsSelectors from 'selectors/TestSpecs.selectors';
 import {RouterSearchFields} from '../../constants/Common.constants';
 import SpanSelectors from '../../selectors/Span.selectors';
 import {decryptString} from '../../utils/Common';
 import {setSelectedSpan} from '../slices/Span.slice';
-import {setSelectedAssertion} from '../slices/TestDefinition.slice';
+import {setSelectedSpec} from '../slices/TestSpecs.slice';
 import {RootState} from '../store';
 
 export interface IQuery {
@@ -23,19 +23,16 @@ const RouterActions = () => ({
 
       const decryptedSelector = decryptString(String(selector));
 
-      const assertionResult = TestDefinitionSelectors.selectAssertionBySelector(
-        getState() as RootState,
-        decryptedSelector
-      );
+      const assertionResult = TestSpecsSelectors.selectAssertionBySelector(getState() as RootState, decryptedSelector);
 
-      const selectedAssertion = TestDefinitionSelectors.selectSelectedAssertion(getState() as RootState);
+      const selectedSpec = TestSpecsSelectors.selectSelectedSpec(getState() as RootState);
 
-      if (selectedAssertion === decryptedSelector || (!selectedAssertion && !decryptedSelector)) {
+      if (selectedSpec === decryptedSelector || (!selectedSpec && !decryptedSelector)) {
         return;
       }
 
-      if (assertionResult) dispatch(setSelectedAssertion(assertionResult));
-      else if (!selector) dispatch(setSelectedAssertion());
+      if (assertionResult) dispatch(setSelectedSpec(assertionResult));
+      else if (!selector) dispatch(setSelectedSpec());
     }
   ),
   updateSelectedSpan: createAsyncThunk<void, IQuery>(

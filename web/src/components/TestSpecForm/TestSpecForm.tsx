@@ -16,7 +16,7 @@ import SelectorInput from './SelectorInput';
 import * as S from './TestSpecForm.styled';
 
 export interface IValues {
-  assertionList?: TAssertion[];
+  assertions?: TAssertion[];
   selector?: string;
 }
 
@@ -31,7 +31,7 @@ interface IProps {
 
 const TestSpecForm = ({
   defaultValues: {
-    assertionList = [
+    assertions = [
       {
         attribute: '',
         comparator: OperatorService.getOperatorSymbol(CompareOperator.EQUALS),
@@ -53,7 +53,7 @@ const TestSpecForm = ({
   const attributeList = useAppSelector(state =>
     AssertionSelectors.selectAttributeList(state, testId, runId, spanIdList)
   );
-  const {currentAssertionList} = useAssertionFormValues(form);
+  const {currentAssertions} = useAssertionFormValues(form);
 
   const onFieldsChange = useOnFieldsChange({
     form,
@@ -71,7 +71,7 @@ const TestSpecForm = ({
         form={form}
         initialValues={{
           remember: true,
-          assertionList,
+          assertions,
           selector,
         }}
         onFinish={onSubmit}
@@ -99,10 +99,10 @@ const TestSpecForm = ({
           <S.FormSectionRow>
             <S.FormSectionText>Add assertions using the attributes from the selected spans</S.FormSectionText>
           </S.FormSectionRow>
-          <Form.List name="assertionList">
+          <Form.List name="assertions">
             {(fields, {add, remove}) => (
               <AssertionCheckList
-                assertionList={currentAssertionList}
+                assertions={currentAssertions}
                 form={form}
                 fields={fields}
                 add={add}

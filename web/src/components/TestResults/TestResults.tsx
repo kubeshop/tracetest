@@ -5,9 +5,9 @@ import TestSpecDetail from 'components/TestSpecDetail';
 import {useTestSpecForm} from 'components/TestSpecForm/TestSpecForm.provider';
 import TestSpecs from 'components/TestSpecs';
 import {useSpan} from 'providers/Span/Span.provider';
-import {useTestDefinition} from 'providers/TestDefinition/TestDefinition.provider';
+import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
 import {useAppSelector} from 'redux/hooks';
-import TestDefinitionSelectors from 'selectors/TestDefinition.selectors';
+import TestSpecsSelectors from 'selectors/TestSpecs.selectors';
 import AssertionAnalyticsService from 'services/Analytics/AssertionAnalytics.service';
 import {TAssertionResultEntry} from 'types/Assertion.types';
 import Header from './Header';
@@ -15,12 +15,12 @@ import * as S from './TestResults.styled';
 
 const TestResults = () => {
   const {open} = useTestSpecForm();
-  const {isLoading, assertionResults, remove, revert, setSelectedAssertion} = useTestDefinition();
+  const {isLoading, assertionResults, remove, revert, setSelectedSpec} = useTestSpecs();
   const {selectedSpan, onSetFocusedSpan} = useSpan();
-  const {totalFailedSpecs, totalPassedSpecs} = useAppSelector(TestDefinitionSelectors.selectTotalSpecs);
-  const selectedAssertion = useAppSelector(TestDefinitionSelectors.selectSelectedAssertion);
+  const {totalFailedSpecs, totalPassedSpecs} = useAppSelector(TestSpecsSelectors.selectTotalSpecs);
+  const selectedSpec = useAppSelector(TestSpecsSelectors.selectSelectedSpec);
   const selectedTestSpec = useAppSelector(state =>
-    TestDefinitionSelectors.selectAssertionBySelector(state, selectedAssertion ?? '')
+    TestSpecsSelectors.selectAssertionBySelector(state, selectedSpec ?? '')
   );
 
   const handleOpen = useCallback(
@@ -28,15 +28,15 @@ const TestResults = () => {
       AssertionAnalyticsService.onAssertionClick();
       const testSpec = assertionResults?.resultList?.find(specResult => specResult.selector === selector);
       onSetFocusedSpan('');
-      setSelectedAssertion(testSpec);
+      setSelectedSpec(testSpec);
     },
-    [assertionResults?.resultList, onSetFocusedSpan, setSelectedAssertion]
+    [assertionResults?.resultList, onSetFocusedSpan, setSelectedSpec]
   );
 
   const handleClose = useCallback(() => {
     onSetFocusedSpan('');
-    setSelectedAssertion();
-  }, [onSetFocusedSpan, setSelectedAssertion]);
+    setSelectedSpec();
+  }, [onSetFocusedSpan, setSelectedSpec]);
 
   const handleEdit = useCallback(
     ({selector, resultList: list}: TAssertionResultEntry) => {
@@ -46,7 +46,7 @@ const TestResults = () => {
         isEditing: true,
         selector,
         defaultValues: {
-          assertionList: list.map(({assertion}) => assertion),
+          assertions: list.map(({assertion}) => assertion),
           selector,
         },
       });
@@ -98,7 +98,7 @@ const TestResults = () => {
       )}
 
       <TestSpecDetail
-        isOpen={Boolean(selectedAssertion)}
+        isOpen={Boolean(selectedSpec)}
         onClose={handleClose}
         onDelete={handleDelete}
         onEdit={handleEdit}

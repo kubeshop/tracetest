@@ -1,51 +1,48 @@
 import faker from '@faker-js/faker';
 import AssertionMock from '../../../models/__mocks__/Assertion.mock';
 import AssertionResultsMock from '../../../models/__mocks__/AssertionResults.mock';
-import TestDefinitionMock from '../../../models/__mocks__/TestDefinition.mock';
+import TestDefinitionMock from '../../../models/__mocks__/TestSpecs.mock';
 import TestRunMock from '../../../models/__mocks__/TestRun.mock';
-import {TTestDefinitionEntry} from '../../../types/TestDefinition.types';
+import {TTestSpecEntry} from '../../../types/TestSpecs.types';
 import Reducer, {
-  addDefinition,
-  assertionResultsToDefinitionList,
-  initDefinitionList,
+  addSpec,
+  assertionResultsToSpecs,
+  initSpecs,
   initialState,
-  removeDefinition,
+  removeSpec,
   reset,
-  resetDefinitionList,
-  revertDefinition,
+  resetSpecs,
+  revertSpec,
   setAssertionResults,
-  updateDefinition,
-  setSelectedAssertion,
-} from '../TestDefinition.slice';
+  updateSpec,
+  setSelectedSpec,
+} from '../TestSpecs.slice';
 
-const {definitionList} = TestDefinitionMock.model();
+const {specs} = TestDefinitionMock.model();
 
-const definitionSelector = `span[http.status_code] = "304"]`;
+const specSelector = `span[http.status_code] = "304"]`;
 
-const definition: TTestDefinitionEntry = {
-  selector: definitionSelector,
+const spec: TTestSpecEntry = {
+  selector: specSelector,
   isDraft: true,
-  assertionList: new Array(faker.datatype.number({min: 2, max: 10})).fill(null).map(() => AssertionMock.model()),
-  originalSelector: definitionSelector,
+  assertions: new Array(faker.datatype.number({min: 2, max: 10})).fill(null).map(() => AssertionMock.model()),
+  originalSelector: specSelector,
 };
 
-const state = {
-  ...initialState,
-  definitionList,
-};
+const state = {...initialState, specs};
 
-describe('TestDefinitionReducer', () => {
+describe('TestSpecs slice', () => {
   it('should return the initial state', () => {
     expect(Reducer(undefined, {type: 'any-action'})).toEqual(initialState);
   });
 
-  describe('initDefinitionList', () => {
+  describe('initSpecs', () => {
     it('should handle triggering the action', () => {
       const assertionResults = AssertionResultsMock.model();
-      expect(Reducer(undefined, initDefinitionList({assertionResults}))).toEqual({
+      expect(Reducer(undefined, initSpecs({assertionResults}))).toEqual({
         ...initialState,
-        initialDefinitionList: assertionResultsToDefinitionList(assertionResults),
-        definitionList: assertionResultsToDefinitionList(assertionResults),
+        initialSpecs: assertionResultsToSpecs(assertionResults),
+        specs: assertionResultsToSpecs(assertionResults),
         isInitialized: true,
       });
     });
@@ -63,13 +60,13 @@ describe('TestDefinitionReducer', () => {
     });
   });
 
-  describe('resetDefinitionList', () => {
-    it('should handle resetting the definition list', () => {
-      const result = Reducer(state, resetDefinitionList());
+  describe('resetSpecs', () => {
+    it('should handle resetting the specs', () => {
+      const result = Reducer(state, resetSpecs());
 
       expect(result).toEqual({
         ...state,
-        definitionList: [],
+        specs: [],
       });
     });
   });
@@ -82,72 +79,66 @@ describe('TestDefinitionReducer', () => {
     });
   });
 
-  describe('definition cRUD', () => {
-    it('should handle the add definition action', () => {
-      expect(Reducer(state, addDefinition({definition}))).toEqual({
+  describe('spec CRUD', () => {
+    it('should handle the add spec action', () => {
+      expect(Reducer(state, addSpec({spec}))).toEqual({
         ...initialState,
-        definitionList: [...definitionList, definition],
+        specs: [...specs, spec],
         isDraftMode: true,
       });
     });
 
-    it('should handle the updating definition action', () => {
+    it('should handle the update spec action', () => {
       const result = Reducer(
         state,
-        updateDefinition({
-          selector: definitionList[0].selector,
-          definition,
+        updateSpec({
+          selector: specs[0].selector,
+          spec,
         })
       );
 
-      expect(result.definitionList[0]).toEqual({...definition, originalSelector: undefined});
+      expect(result.specs[0]).toEqual({...spec, originalSelector: undefined});
       expect(result).toEqual({
         ...initialState,
-        definitionList: [
-          {...definition, originalSelector: undefined},
-          ...definitionList.slice(1, definitionList.length),
-        ],
+        specs: [{...spec, originalSelector: undefined}, ...specs.slice(1, specs.length)],
         isDraftMode: true,
       });
     });
 
-    it('should handle the revert definition action', () => {
+    it('should handle the revert spec action', () => {
       const initialSelector = 'span[http.status_code = "204"]';
       const list = [
         {
-          ...definition,
+          ...spec,
           originalSelector: initialSelector,
         },
       ];
       const result = Reducer(
         {
           ...state,
-          initialDefinitionList: list,
-          definitionList: list,
+          initialSpecs: list,
+          specs: list,
         },
-        revertDefinition({
+        revertSpec({
           originalSelector: initialSelector,
         })
       );
 
-      expect(result.definitionList[0].originalSelector).toEqual(initialSelector);
-      expect(result.definitionList[0].selector).toEqual(definitionSelector);
+      expect(result.specs[0].originalSelector).toEqual(initialSelector);
+      expect(result.specs[0].selector).toEqual(specSelector);
     });
 
-    it('should handle the remove definition action', () => {
+    it('should handle the remove spec action', () => {
       const result = Reducer(
         state,
-        removeDefinition({
-          selector: definitionList[0].selector,
+        removeSpec({
+          selector: specs[0].selector,
         })
       );
 
       expect(result).toEqual({
         ...initialState,
-        definitionList: [
-          {...definitionList[0], isDraft: true, isDeleted: true},
-          ...definitionList.slice(1, definitionList.length),
-        ],
+        specs: [{...specs[0], isDraft: true, isDeleted: true}, ...specs.slice(1, specs.length)],
         isDraftMode: true,
       });
     });
@@ -188,7 +179,7 @@ describe('TestDefinitionReducer', () => {
       });
 
       expect(result.assertionResults).toEqual(run.result);
-      expect(result.initialDefinitionList).toEqual(assertionResultsToDefinitionList(run.result));
+      expect(result.initialSpecs).toEqual(assertionResultsToSpecs(run.result));
     });
   });
 
@@ -200,7 +191,7 @@ describe('TestDefinitionReducer', () => {
     expect(result.isDraftMode).toBeFalsy();
   });
 
-  describe('setSelectedAssertion', () => {
+  describe('setSelectedSpec', () => {
     it('should handle on setSelectedAssertion', () => {
       const assertionResultEntry = {
         id: faker.datatype.uuid(),
@@ -210,15 +201,15 @@ describe('TestDefinitionReducer', () => {
         resultList: [],
       };
 
-      const result = Reducer(initialState, setSelectedAssertion(assertionResultEntry));
+      const result = Reducer(initialState, setSelectedSpec(assertionResultEntry));
 
-      expect(result.selectedAssertion).toEqual(assertionResultEntry.selector);
+      expect(result.selectedSpec).toEqual(assertionResultEntry.selector);
     });
 
-    it('should handle on setSelectedAssertion with empty value', () => {
-      const result = Reducer({...initialState, selectedAssertion: '12345'}, setSelectedAssertion());
+    it('should handle on setSelectedSpec with empty value', () => {
+      const result = Reducer({...initialState, selectedSpec: '12345'}, setSelectedSpec());
 
-      expect(result.selectedAssertion).toBeUndefined();
+      expect(result.selectedSpec).toBeUndefined();
     });
   });
 });

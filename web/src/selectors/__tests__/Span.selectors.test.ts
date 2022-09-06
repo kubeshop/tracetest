@@ -10,7 +10,7 @@ describe('SpanSelectors', () => {
       const matchedSpans = ['pokeshop'];
       const result = SpanSelectors.selectMatchedSpans({
         spans: {matchedSpans},
-        testDefinition: {},
+        testSpecs: {},
       } as RootState);
       expect(result).toBe(matchedSpans);
     });
@@ -20,9 +20,9 @@ describe('SpanSelectors', () => {
       const selector = `span[tracetest.span.type="http"]`;
       const result = SpanSelectors.selectMatchedSpans({
         spans: {matchedSpans},
-        testDefinition: {
+        testSpecs: {
           assertionResults: {resultList: [{selector} as TAssertionResultEntry]},
-          selectedAssertion: selector,
+          selectedSpec: selector,
         },
       } as RootState);
       expect(result).toBe(matchedSpans);
@@ -30,12 +30,12 @@ describe('SpanSelectors', () => {
 
     it('should return matchedSpans when selector does not matches', () => {
       const selector = `span[tracetest.span.type="http"]`;
-      const selectedAssertion = `span[tracetest.span.type="gRPC"]`;
+      const selectedSpec = `span[tracetest.span.type="gRPC"]`;
       const result = SpanSelectors.selectMatchedSpans({
         spans: {matchedSpans: ['pokeshop']},
-        testDefinition: {
+        testSpecs: {
           assertionResults: {resultList: [{selector} as TAssertionResultEntry]},
-          selectedAssertion,
+          selectedSpec,
         },
       } as RootState);
       expect(result).toStrictEqual([]);

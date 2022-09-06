@@ -5,7 +5,7 @@ import TestSpecFormProvider from 'components/TestSpecForm/TestSpecForm.provider'
 import withAnalytics from 'components/WithAnalytics/WithAnalytics';
 import GuidedTourProvider from 'providers/GuidedTour/GuidedTour.provider';
 import SpanProvider from 'providers/Span';
-import TestDefinitionProvider from 'providers/TestDefinition';
+import TestSpecsProvider from 'providers/TestSpecs';
 import TestRunProvider from 'providers/TestRun';
 import Content from './Content';
 
@@ -16,13 +16,13 @@ const RunDetail = () => {
     <GuidedTourProvider>
       <Layout>
         <TestRunProvider testId={testId} runId={runId}>
-          <TestDefinitionProvider testId={testId} runId={runId}>
+          <TestSpecsProvider testId={testId} runId={runId}>
             <TestSpecFormProvider testId={testId}>
               <SpanProvider>
                 <Content />
               </SpanProvider>
             </TestSpecFormProvider>
-          </TestDefinitionProvider>
+          </TestSpecsProvider>
         </TestRunProvider>
       </Layout>
     </GuidedTourProvider>

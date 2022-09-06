@@ -1,5 +1,5 @@
 import {render} from 'test-utils';
-import TestDefinitionProvider from '../TestDefinition.provider';
+import TestDefinitionProvider from '../TestSpecs.provider';
 
 describe('TestDefinitionProvider', () => {
   it('should render with the proper values', () => {

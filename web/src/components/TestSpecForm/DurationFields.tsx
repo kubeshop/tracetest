@@ -20,9 +20,9 @@ interface DurationState {
 
 function setDurationFieldValue(form: FormInstance<IValues>, index: number, state: DurationState) {
   form.setFieldsValue({
-    assertionList: form
+    assertions: form
       .getFieldsValue()
-      .assertionList?.map((as, i) => (i === index ? {...as, expected: `${state.value}${state.duration}`} : as)),
+      .assertions?.map((as, i) => (i === index ? {...as, expected: `${state.value}${state.duration}`} : as)),
   });
 }
 
@@ -39,6 +39,7 @@ export const DurationFields = ({form, index, assertion}: IProps) => {
     value: assertion?.expected?.match(/(\d+)/)?.[0],
     duration: (assertion?.expected?.match(/[a-zA-Z]+/g)?.[0] || 'ms') as Duration,
   };
+
   return (
     <div style={{display: 'flex'}}>
       <Input
