@@ -6,6 +6,7 @@ var kubernetes = installer{
 	preChecks: []preChecker{
 		kubectlChecker,
 		helmChecker,
+		localEnvironmentChecker,
 	},
 	configs:   []configurator{},
 	installFn: kubernetesInstaller,
@@ -57,9 +58,20 @@ func kubectlChecker(ui UI) {
 	} else {
 		ui.Exit(ui.Red("✘ kubectl could not be installed. Check output for errors. " + createIssueMsg))
 	}
+}
 
-	// If user doesn't have kubectl, it probably doesn't have minikube either, so suggest installig it
-	minikubeChecker(ui)
+func localEnvironmentChecker(ui UI) {
+	localK8sRunning := ui.Confirm("Do you have a local kubernentes running?", true)
+	if !localK8sRunning {
+		option := ui.Select("We can fix that:", []option{
+			{"Install minikube", minikubeChecker},
+			{"Fix manually", exitOption(
+				"Check the minikube install docs on https://minikube.sigs.k8s.io/docs/start/",
+			)},
+		}, 0)
+
+		option.fn(ui)
+	}
 }
 
 func minikubeChecker(ui UI) {
@@ -68,15 +80,7 @@ func minikubeChecker(ui UI) {
 		return
 	}
 
-	ui.Warning("I didn't find minikube in your system")
-	option := ui.Select("What do you want to do?", []option{
-		{"Install Minikube", installMinikube},
-		{"Fix it manually", exitOption(
-			"Check the helm install docs on https://minikube.sigs.k8s.io/docs/start/",
-		)},
-	}, 0)
-
-	option.fn(ui)
+	installMinikube(ui)
 
 	if commandExists("minikube") {
 		ui.Println(ui.Green("✔ minikube was successfully installed"))
@@ -84,8 +88,10 @@ func minikubeChecker(ui UI) {
 		ui.Exit(ui.Red("✘ minikube could not be installed. Check output for errors. " + createIssueMsg))
 	}
 
-	// We require docker to be able to run minikube
-	dockerChecker(ui)
+	if !commandExists("docker") {
+		ui.Warning("Docker is required to run your minikube instance")
+		dockerChecker(ui)
+	}
 }
 
 func installHelm(ui UI) {
