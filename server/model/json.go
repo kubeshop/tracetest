@@ -79,7 +79,27 @@ func (a *Assertion) UnmarshalJSON(data []byte) error {
 		Value      *AssertionExpression
 	}{}
 	if err := json.Unmarshal(data, &aux); err != nil {
-		return err
+		// This might be an older assertion that has its value as a string
+		// we have to try convert it before returning the error
+		oldAssertion := struct {
+			Attribute  string
+			Comparator string
+			Value      string
+		}{}
+
+		if err := json.Unmarshal(data, &oldAssertion); err != nil {
+			// It isn't the old format either, so it's an error
+			return err
+		}
+
+		aux.Attribute = oldAssertion.Attribute
+		aux.Comparator = oldAssertion.Comparator
+		aux.Value = &AssertionExpression{
+			LiteralValue: LiteralValue{
+				Type:  "string",
+				Value: oldAssertion.Value,
+			},
+		}
 	}
 
 	c, err := comparator.DefaultRegistry().Get(aux.Comparator)

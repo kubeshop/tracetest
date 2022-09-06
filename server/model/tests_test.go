@@ -25,6 +25,15 @@ func createExpressionFromNumber(number string) *model.AssertionExpression {
 	}
 }
 
+func createExpressionFromString(str string) *model.AssertionExpression {
+	return &model.AssertionExpression{
+		LiteralValue: model.LiteralValue{
+			Value: str,
+			Type:  "string",
+		},
+	}
+}
+
 func TestSpec(t *testing.T) {
 	t.Run("Add", func(t *testing.T) {
 		spec := (model.Test{}).Specs
