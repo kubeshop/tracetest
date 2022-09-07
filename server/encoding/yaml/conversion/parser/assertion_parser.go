@@ -20,6 +20,10 @@ type Expression struct {
 	Expression   *Expression
 }
 
+func (e *Expression) IsSimple() bool {
+	return e.Expression == nil
+}
+
 func (e *Expression) String() string {
 	if e.Expression == nil {
 		return e.LiteralValue.String()
