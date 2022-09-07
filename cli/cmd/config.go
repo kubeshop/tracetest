@@ -3,6 +3,7 @@ package cmd
 import (
 	"os"
 
+	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/spf13/cobra"
@@ -16,6 +17,7 @@ var cliLogger *zap.Logger
 func setupCommand(cmd *cobra.Command, args []string) {
 	setupLogger(cmd, args)
 	loadConfig(cmd, args)
+	analytics.Init(cliConfig)
 }
 
 func loadConfig(cmd *cobra.Command, args []string) {
@@ -46,6 +48,7 @@ func setupLogger(cmd *cobra.Command, args []string) {
 
 func teardownCommand(cmd *cobra.Command, args []string) {
 	cliLogger.Sync()
+	analytics.Close()
 }
 
 func getAPIClient() *openapi.APIClient {

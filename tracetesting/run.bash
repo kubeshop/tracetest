@@ -30,14 +30,14 @@ echo "DEMO_APP_GRPC_URL: $DEMO_APP_GRPC_URL"
 cat << EOF > config.main.yml
 scheme: http
 endpoint: $TRACETEST_MAIN_ENDPOINT
+analyticsEnabled: false
 EOF
 
 cat << EOF > config.target.yml
 scheme: http
 endpoint: $TRACETEST_TARGET_ENDPOINT
+analyticsEnabled: false
 EOF
-
-
 
 mkdir -p results/responses
 

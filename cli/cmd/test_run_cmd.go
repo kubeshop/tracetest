@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/kubeshop/tracetest/cli/actions"
+	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 )
@@ -19,6 +20,8 @@ var testRunCmd = &cobra.Command{
 	Long:   "run a test using a definition or an id",
 	PreRun: setupCommand,
 	Run: func(cmd *cobra.Command, args []string) {
+		analytics.Track("Test Run", "cmd", map[string]string{})
+
 		ctx := context.Background()
 		client := getAPIClient()
 

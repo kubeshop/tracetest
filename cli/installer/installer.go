@@ -2,6 +2,8 @@ package installer
 
 import (
 	"fmt"
+
+	"github.com/kubeshop/tracetest/cli/analytics"
 )
 
 var (
@@ -9,6 +11,7 @@ var (
 )
 
 func Start() {
+	analytics.Track("Start", "installer", map[string]string{})
 	ui := DefaultUI
 
 	ui.Banner()
@@ -56,7 +59,10 @@ func (i installer) Configure(ui UI) configuration {
 }
 
 func (i installer) Install(ui UI) {
+	analytics.Track("PreCheck", "installer", map[string]string{})
 	i.PreCheck(ui)
+
+	analytics.Track("Configure", "installer", map[string]string{})
 	conf := i.Configure(ui)
 
 	ui.Title("Thanks! We are ready to install TraceTest now")

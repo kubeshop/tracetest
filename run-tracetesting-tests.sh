@@ -23,7 +23,7 @@ done
 
 
 if [ "$RESTART" == "yes" ]; then
-  docker compose -f docker-compose.yaml down
+  docker compose -f docker-compose.yaml -f local-config/docker-compose.testrunner.yaml down
 fi
 docker compose -f docker-compose.yaml up -d --build --remove-orphans
 docker compose -f docker-compose.yaml -f local-config/docker-compose.testrunner.yaml build

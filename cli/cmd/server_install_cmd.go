@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/kubeshop/tracetest/cli/installer"
 	"github.com/spf13/cobra"
 )
@@ -16,6 +17,7 @@ var serverInstallCmd = &cobra.Command{
 	PreRun: setupCommand,
 	Run: func(cmd *cobra.Command, args []string) {
 		installer.Force = force
+		analytics.Track("Server Install", "cmd", map[string]string{})
 		installer.Start()
 	},
 	PostRun: teardownCommand,
