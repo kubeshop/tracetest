@@ -1,6 +1,6 @@
 import {ApartmentOutlined} from '@ant-design/icons';
 import ReactCodeMirror from '@uiw/react-codemirror';
-import {Tag, Typography} from 'antd';
+import {Typography} from 'antd';
 import styled from 'styled-components';
 
 export const ActionsContainer = styled.div`
@@ -10,13 +10,7 @@ export const ActionsContainer = styled.div`
   justify-content: flex-end;
 `;
 
-export const ActionTag = styled(Tag)`
-  background-color: ${({theme}) => theme.color.primary};
-  border-color: transparent;
-  color: ${({theme}) => theme.color.white};
-`;
-
-export const Container = styled.div`
+export const Container = styled.div<{$isDeleted: boolean}>`
   align-items: center;
   background-color: ${({theme}) => theme.color.white};
   border: ${({theme}) => `1px solid ${theme.color.border}`};
@@ -24,6 +18,10 @@ export const Container = styled.div`
   display: flex;
   gap: 12px;
   padding: 16px;
+
+  > div:first-child {
+    opacity: ${({$isDeleted}) => ($isDeleted ? 0.5 : 1)};
+  }
 `;
 
 export const Column = styled.div`

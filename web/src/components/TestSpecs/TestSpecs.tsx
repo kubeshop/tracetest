@@ -17,7 +17,7 @@ const TestSpecs = ({assertionResults: {resultList}, onDelete, onEdit, onOpen, on
   }
 
   return (
-    <S.Container data-cy="assertion-card-list">
+    <S.Container data-cy="test-specs-container">
       {resultList.map(specResult =>
         specResult.resultList.length ? (
           <TestSpec

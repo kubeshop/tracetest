@@ -45,8 +45,8 @@ describe('Create Assertion', () => {
 
     cy.get('[data-cy=assertion-form-submit-button]').click();
 
-    cy.get('[data-cy=assertion-card-list]').should('be.visible');
-    cy.get('[data-cy=assertion-card]').should('have.lengthOf', 1);
+    cy.get('[data-cy=test-specs-container]').should('be.visible');
+    cy.get('[data-cy=test-spec-container]').should('have.lengthOf', 1);
   });
 
   it('should create a basic assertion using the advanced mode', () => {
@@ -69,15 +69,15 @@ describe('Create Assertion', () => {
 
     cy.get('[data-cy=assertion-form-submit-button]').click();
 
-    cy.get('[data-cy=assertion-card-list]').should('be.visible');
-    cy.get('[data-cy=assertion-card]').should('have.lengthOf', 1);
+    cy.get('[data-cy=test-specs-container]').should('be.visible');
+    cy.get('[data-cy=test-spec-container]').should('have.lengthOf', 1);
   });
 
   it('should update an assertion', () => {
     cy.createAssertion();
-    cy.get(`[data-cy=edit-assertion-button]`, {timeout: 20000});
+    cy.get(`[data-cy=edit-test-spec-button]`, {timeout: 20000});
 
-    cy.get('[data-cy=edit-assertion-button]').first().click();
+    cy.get('[data-cy=edit-test-spec-button]').first().click();
     cy.get('[data-cy=assertion-form]').should('be.visible');
 
     cy.selectOperator(0);
@@ -93,14 +93,14 @@ describe('Create Assertion', () => {
 
     cy.get('[data-cy=assertion-form-submit-button]').click();
 
-    cy.get('[data-cy=assertion-card-list]').should('be.visible');
-    cy.get('[data-cy=assertion-card]').should('have.lengthOf', 1);
+    cy.get('[data-cy=test-specs-container]').should('be.visible');
+    cy.get('[data-cy=test-spec-container]').should('have.lengthOf', 1);
   });
 
   it('should update an assertion with advanced mode', () => {
     cy.createAssertion();
 
-    cy.get('[data-cy=edit-assertion-button]').last().click();
+    cy.get('[data-cy=edit-test-spec-button]').last().click();
     cy.get('[data-cy=assertion-form]').should('be.visible');
 
     cy.get('[data-cy=advanced-selector] [contenteditable]').clear().type('span[tracetest.span.type = "database"]:last');
@@ -118,14 +118,14 @@ describe('Create Assertion', () => {
 
     cy.get('[data-cy=assertion-form-submit-button]').click();
 
-    cy.get('[data-cy=assertion-card-list]').should('be.visible');
-    cy.get('[data-cy=assertion-card]').should('have.lengthOf', 1);
+    cy.get('[data-cy=test-specs-container]').should('be.visible');
+    cy.get('[data-cy=test-spec-container]').should('have.lengthOf', 1);
   });
 
   it('should publish the changes', () => {
     cy.createAssertion();
     cy.get('[data-cy=trace-actions-publish').click({force: true});
-    cy.get('[data-cy=assertion-card]', {timeout: 10000}).should('have.lengthOf', 1);
+    cy.get('[data-cy=test-spec-container]', {timeout: 10000}).should('have.lengthOf', 1);
   });
 
   it('should create an assertion and revert all changes', () => {
@@ -143,10 +143,10 @@ describe('Create Assertion', () => {
 
     cy.get('[data-cy=assertion-form-submit-button]').click();
 
-    cy.get('[data-cy=assertion-card-list]').should('exist');
-    cy.get('[data-cy=assertion-card]').should('have.lengthOf', 2);
+    cy.get('[data-cy=test-specs-container]').should('exist');
+    cy.get('[data-cy=test-spec-container]').should('have.lengthOf', 2);
 
     cy.get('[data-cy=trace-actions-revert-all').click();
-    cy.get('[data-cy=assertion-card]').should('have.lengthOf', 0);
+    cy.get('[data-cy=test-spec-container]').should('have.lengthOf', 0);
   });
 });
