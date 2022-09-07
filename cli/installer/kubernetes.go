@@ -208,6 +208,7 @@ func installMinikube(ui UI) {
 			sudo apt install curl -y
 			curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube_latest_{{.Architecture}}.deb
 			sudo dpkg -i minikube_latest_{{.Architecture}}.deb
+			rm minikube_latest_{{.Architecture}}.deb
 		`,
 		yum: `
 			curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-latest.{{.RpmArchitecture}}.rpm
