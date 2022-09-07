@@ -378,19 +378,34 @@ func (m Model) Result(in openapi.AssertionResults) *model.RunResults {
 }
 
 func (m Model) Assertion(in openapi.Assertion) model.Assertion {
-	comp, _ := m.comparators.Get(in.Comparator)
 	expression, err := parser.ParseAssertionExpression(in.Expected)
 	if err != nil {
 		// Maybe it's a string without quotes, try quoting it and see if it works
-		quotedValue := fmt.Sprintf(`"%s"`, in.Expected)
-		expression, _ = parser.ParseAssertionExpression(quotedValue)
+		expression = parseQuotedAssertionValue(in)
 	}
 
+	// this totally breaks the purpose of having expressions
+	// but expressions will not work unless we receive the assertion as a string
+	// instead of an object.
+	// So we have to remove this after we start receiving the assertion as a string
+	// TODO: remove this after assertions are sent as strings
+	if expression.LiteralValue.Type() == "attribute" {
+		expression = parseQuotedAssertionValue(in)
+	}
+
+	comp, _ := m.comparators.Get(in.Comparator)
 	return model.Assertion{
 		Attribute:  model.Attribute(in.Attribute),
 		Comparator: comp,
 		Value:      m.AssertionExpression(expression),
 	}
+}
+
+func parseQuotedAssertionValue(in openapi.Assertion) *parser.Expression {
+	quotedValue := fmt.Sprintf(`"%s"`, in.Expected)
+	expression, _ := parser.ParseAssertionExpression(quotedValue)
+
+	return expression
 }
 
 func (m Model) AssertionExpression(in *parser.Expression) *model.AssertionExpression {

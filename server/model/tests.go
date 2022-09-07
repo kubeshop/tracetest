@@ -120,7 +120,11 @@ func (a Assertion) String() string {
 	return fmt.Sprintf(`"%s" %s "%s"`, a.Attribute, a.Comparator, a.Value)
 }
 
-func (e AssertionExpression) String() string {
+func (e *AssertionExpression) String() string {
+	if e == nil {
+		return ""
+	}
+
 	if e.Expression == nil {
 		return e.LiteralValue.Value
 	}
