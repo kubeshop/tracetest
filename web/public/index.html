@@ -37,6 +37,7 @@
 
       function injectVariables() {
         window.ENV = {
+          pokeApi: getTemplateValue('{{ .PokeApi }}', ''),
           measurementId: getTemplateValue('{{ .AnalyticsKey }}', ''),
           analyticsEnabled: getTemplateValue('{{ .AnalyticsEnabled }}', 'false'),
           serverPathPrefix: getTemplateValue('{{ .ServerPathPrefix }}', '/'),

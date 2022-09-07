@@ -11,6 +11,7 @@ services:
         VERSION: dev
         TRACETEST_ENV: docker-compose
         REACT_APP_POKE_API: http://demo-api:8081
+        POKE_API: http://demo-api:8081
     volumes:
       - type: bind
         source: ./local-config/config.tests.yaml
@@ -220,20 +221,4 @@ services:
       OPENSEARCH_PASSWORD: admin
     depends_on:
       - opensearch
-  cypress:
-    image: cypress/browsers:node16.14.2-slim-chrome100-ff99-edge
-    entrypoint: [ "/bin/sh", "-c" , "npm ci && npx cypress run --config baseUrl=http://tracetest:8080" ]
-    working_dir: /e2e
-    command:
-      - npm ci
-    build:
-      context: .
-    volumes:
-      - ./web/package.json:/e2e/package.json
-      - ./web/tsconfig.json:/e2e/tsconfig.json
-      - ./web/package-lock.json:/e2e/package-lock.json
-      - ./web/cypress.config.js:/e2e/cypress.config.js
-      - ./web/cypress:/e2e/cypress
-      - ./web/src:/e2e/src
-    depends_on:
-      - tracetest
+

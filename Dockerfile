@@ -6,9 +6,7 @@ COPY ./web/package-lock.json ./
 RUN npm ci --silent
 COPY ./web ./
 
-ARG REACT_APP_POKE_API
-
-RUN REACT_APP_POKE_API=$REACT_APP_POKE_API npm run build
+RUN npm run build
 
 FROM golang:1.18-alpine AS build-go
 WORKDIR /go/src
@@ -17,6 +15,7 @@ ARG ANALYTICS_BE_KEY
 ARG ANALYTICS_FE_KEY
 ARG VERSION
 ARG TRACETEST_ENV
+ARG POKE_API
 
 RUN apk add --update make
 
