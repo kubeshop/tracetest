@@ -29,7 +29,7 @@ or reach us on Discord https://discord.gg/6zupCZFQbe
 
 	option := ui.Select("How do you want to run TraceTest?", []option{
 		{"Using Docker Compose", dockerCompose.Install},
-		{"Using Kubernetes cluster", kubernetes.Install},
+		{"Using Kubernetes", kubernetes.Install},
 	}, 0)
 
 	option.fn(ui)
