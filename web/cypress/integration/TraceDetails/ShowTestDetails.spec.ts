@@ -15,8 +15,8 @@ describe('Show test details', () => {
 
       cy.location('pathname').should('match', /\/test\/.*/i);
       cy.get('[data-cy=test-details-name]').should('have.text', `${Plugins.REST.demoList[0].name} (v1)`);
-      cy.get('[data-cy=result-card-list]').should('be.visible');
-      cy.get('[data-cy^=result-card-]').should('have.length.above', 0);
+      cy.get('[data-cy=run-card-list]').should('be.visible');
+      cy.get('[data-cy^=run-card-]').should('have.length.above', 0);
 
       cy.get(`[data-cy=test-details-run-test-button]`).click();
       cy.matchTestRunPageUrl();
@@ -50,7 +50,7 @@ describe('Show test details', () => {
       cy.get(`[data-cy=test-details-run-test-button]`).click();
       cy.matchTestRunPageUrl();
       cy.get('[data-cy=test-header-back-button]').click();
-      cy.get(`[data-cy=result-card-${testRunResultId}]`, {timeout: 10000}).should('be.visible');
+      cy.get(`[data-cy=run-card-${testRunResultId}]`, {timeout: 10000}).should('be.visible');
       cy.visit(`/test/${testId}/run/${testRunResultId}`);
       cy.matchTestRunPageUrl();
     });

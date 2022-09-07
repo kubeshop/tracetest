@@ -1,57 +1,84 @@
-import {format, parseISO} from 'date-fns';
+import {Tooltip} from 'antd';
 import {Link} from 'react-router-dom';
-import {RESULT_DATE_FORMAT} from '../../constants/Date.constants';
-import {TTestRun} from '../../types/TestRun.types';
-import RunActionsMenu from '../RunActionsMenu';
-import TestState from '../TestState';
+
+import RunActionsMenu from 'components/RunActionsMenu';
+import TestState from 'components/TestState';
+import {TestState as TestStateEnum} from 'constants/TestRun.constants';
+import {TTestRun} from 'types/TestRun.types';
+import Date from 'utils/Date';
 import * as S from './RunCard.styled';
 
-interface IResultCardProps {
+interface IProps {
   run: TTestRun;
   testId: string;
 }
 
-const ResultCard: React.FC<IResultCardProps> = ({
-  run: {
-    id: runId,
-    executionTime,
-    totalAssertionCount,
-    passedAssertionCount,
-    failedAssertionCount,
-    state,
-    createdAt,
-    testVersion,
-  },
+function getIcon(state: TTestRun['state'], failedAssertions: number) {
+  if (state !== TestStateEnum.FAILED && state !== TestStateEnum.FINISHED) {
+    return null;
+  }
+  if (state === TestStateEnum.FAILED || failedAssertions > 0) {
+    return <S.IconFail />;
+  }
+  return <S.IconSuccess />;
+}
+
+const ResultCard = ({
+  run: {id: runId, executionTime, passedAssertionCount, failedAssertionCount, state, createdAt, testVersion, metadata},
   testId,
-}) => {
-  const startDate = format(parseISO(createdAt), RESULT_DATE_FORMAT);
+}: IProps) => {
+  const metadataName = metadata?.name;
+  const metadataBuildNumber = metadata?.buildNumber;
+  const metadataBranch = metadata?.branch;
+  const metadataUrl = metadata?.url;
 
   return (
     <Link to={`/test/${testId}/run/${runId}`}>
-      <S.ResultCard data-cy={`result-card-${runId}`}>
-        <S.TextContainer>
-          <S.Text>{startDate}</S.Text>
-        </S.TextContainer>
-        <S.TextContainer>
-          <S.Text>{executionTime}s</S.Text>
-        </S.TextContainer>
-        <S.TextContainer>
-          <S.Text>v{testVersion}</S.Text>
-        </S.TextContainer>
-        <S.TextContainer data-cy={`test-run-result-status-${runId}`}>
+      <S.Container data-cy={`run-card-${runId}`}>
+        <div>{getIcon(state, failedAssertionCount)}</div>
+
+        <S.Info>
+          <div>
+            <S.Title>v{testVersion}</S.Title>
+          </div>
+          <div>
+            <Tooltip title={Date.format(createdAt)}>
+              <S.Text>{Date.getTimeAgo(createdAt)}</S.Text>
+            </Tooltip>
+            <S.Text> - {executionTime}s</S.Text>
+
+            {metadataName && (
+              <a href={metadataUrl} target="_blank" onClick={event => event.stopPropagation()}>
+                <S.Text $hasLink={Boolean(metadataUrl)}> - {`${metadataName} ${metadataBuildNumber}`}</S.Text>
+              </a>
+            )}
+            {metadataBranch && <S.Text> - Branch: {metadataBranch}</S.Text>}
+          </div>
+        </S.Info>
+
+        <div>
+          <Tooltip title="Passed assertions">
+            <S.HeaderDetail>
+              <S.HeaderDot $passed />
+              {passedAssertionCount}
+            </S.HeaderDetail>
+          </Tooltip>
+          <Tooltip title="Failed assertions">
+            <S.HeaderDetail>
+              <S.HeaderDot $passed={false} />
+              {failedAssertionCount}
+            </S.HeaderDetail>
+          </Tooltip>
+        </div>
+
+        <S.TestStateContainer>
           <TestState testState={state} />
-        </S.TextContainer>
-        <S.TextContainer>
-          <S.Text>{totalAssertionCount}</S.Text>
-        </S.TextContainer>
-        <S.TextContainer>
-          <S.Text>{passedAssertionCount}</S.Text>
-        </S.TextContainer>
-        <S.TextContainer>
-          <S.Text>{failedAssertionCount}</S.Text>
-        </S.TextContainer>
-        <RunActionsMenu resultId={runId} testId={testId} testVersion={testVersion} />
-      </S.ResultCard>
+        </S.TestStateContainer>
+
+        <div>
+          <RunActionsMenu resultId={runId} testId={testId} testVersion={testVersion} />
+        </div>
+      </S.Container>
     </Link>
   );
 };
