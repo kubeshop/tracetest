@@ -1,8 +1,6 @@
 package analytics
 
 import (
-	"fmt"
-
 	"github.com/denisbrodbeck/machineid"
 	"github.com/kubeshop/tracetest/cli/config"
 	segment "github.com/segmentio/analytics-go/v3"
@@ -21,10 +19,10 @@ func Init(conf config.Config) {
 
 	client = segment.New(SecretKey)
 	id, err := machineid.ProtectedID("tracetest")
-	if err != nil {
-		panic(fmt.Errorf("could not get machineID: %w", err))
-	}
-	mid = id
+	if err == nil {
+		// only use id if available.
+		mid = id
+	} // ignore errors and continue with an empty ID if neccesary
 
 	client.Enqueue(segment.Identify{
 		Traits: segment.NewTraits().
