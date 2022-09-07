@@ -71,7 +71,7 @@ const ResultCard = ({
           </Tooltip>
         </div>
 
-        <S.TestStateContainer>
+        <S.TestStateContainer data-cy={`test-run-result-status-${runId}`}>
           <TestState testState={state} />
         </S.TestStateContainer>
 
