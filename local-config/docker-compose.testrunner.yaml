@@ -12,4 +12,9 @@ services:
       - DEMO_APP_URL=http://demo-api:8081
       - DEMO_APP_GRPC_URL=demo-rpc:8082
     depends_on:
-      - tracetest
+      tracetest:
+        condition: service_healthy
+      demo-api:
+        condition: service_healthy
+      demo-rpc:
+        condition: service_healthy
