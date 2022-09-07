@@ -39,14 +39,17 @@ func Ready() bool {
 	return defaultClient != nil && defaultClient.Ready()
 }
 
-func SendEvent(name, category string) error {
+func SendEvent(name, category, clientID string) error {
 	fmt.Printf(`sending event "%s" (%s)%s`, name, category, "\n")
 	if !Ready() {
 		err := fmt.Errorf("uninitalized client. Call analytics.Init")
 		fmt.Printf(`could not send event "%s" (%s): %s%s`, name, category, err.Error(), "\n")
 		return err
 	}
-	err := defaultClient.Track(name, map[string]string{"category": category})
+	err := defaultClient.Track(name, map[string]string{
+		"category": category,
+		"clientID": clientID,
+	})
 	if err != nil {
 		fmt.Printf(`could not send event "%s" (%s): %s%s`, name, category, err.Error(), "\n")
 	} else {

@@ -12,6 +12,10 @@ var (
 	mid       string
 )
 
+func ClientID() string {
+	return mid
+}
+
 func Init(conf config.Config) {
 	if !conf.AnalyticsEnabled {
 		return

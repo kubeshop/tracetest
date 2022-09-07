@@ -53,6 +53,7 @@ func teardownCommand(cmd *cobra.Command, args []string) {
 
 func getAPIClient() *openapi.APIClient {
 	config := openapi.NewConfiguration()
+	config.AddDefaultHeader("x-client-id", analytics.ClientID())
 	config.Scheme = cliConfig.Scheme
 	config.Host = cliConfig.Endpoint
 	if cliConfig.ServerPath != nil {
