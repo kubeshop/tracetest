@@ -61,6 +61,16 @@ func kubectlChecker(ui UI) {
 }
 
 func localEnvironmentChecker(ui UI) {
+
+	option := ui.Select("Are you going to run it locally or in a remote cluster?", []option{
+		{"Locally", confirmLocalK8sRunning},
+		{"Remote cluster", func(ui UI) {}},
+	}, 0)
+
+	option.fn(ui)
+}
+
+func confirmLocalK8sRunning(ui UI) {
 	localK8sRunning := ui.Confirm("Do you have a local kubernentes running?", true)
 	if !localK8sRunning {
 		option := ui.Select("We can fix that:", []option{
