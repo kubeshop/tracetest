@@ -31,12 +31,13 @@ func newSpanContext(ctx context.Context) trace.SpanContext {
 		sid = spanCtx.SpanID()
 	}
 
+	tracestate, _ := trace.ParseTraceState("tracetest=true")
 	var tf trace.TraceFlags
 	return trace.NewSpanContext(trace.SpanContextConfig{
 		TraceID:    tid,
 		SpanID:     sid,
 		TraceFlags: tf.WithSampled(true),
-		TraceState: trace.TraceState{},
+		TraceState: tracestate,
 		Remote:     true,
 	})
 }

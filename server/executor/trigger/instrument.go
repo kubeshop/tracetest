@@ -2,6 +2,7 @@ package trigger
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/kubeshop/tracetest/server/model"
 	"go.opentelemetry.io/contrib/propagators/aws/xray"
@@ -35,8 +36,21 @@ func (t *instrumentedTriggerer) Trigger(ctx context.Context, test model.Test) (R
 	_, span := t.tracer.Start(ctx, "Trigger test")
 	defer span.End()
 
-	triggerSpanCtx, triggerSpan := t.triggerSpanTracer.Start(context.Background(), "Tracetest trigger")
+	tracestate, err := trace.ParseTraceState("tracetest=true")
+	if err != nil {
+		return Response{}, fmt.Errorf("could not create tracestate: %w", err)
+	}
+
+	spanContext := trace.NewSpanContext(trace.SpanContextConfig{
+		TraceState: tracestate,
+	})
+
+	triggerCtx := trace.ContextWithSpanContext(context.Background(), spanContext)
+
+	triggerSpanCtx, triggerSpan := t.triggerSpanTracer.Start(triggerCtx, "Tracetest trigger")
 	defer triggerSpan.End()
+
+	triggerSpan.SpanContext().TraceState().Insert("tracetest", "true")
 
 	tid := triggerSpan.SpanContext().TraceID()
 	sid := triggerSpan.SpanContext().SpanID()
