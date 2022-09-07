@@ -117,7 +117,7 @@ func (a Attribute) String() string {
 }
 
 func (a Assertion) String() string {
-	return fmt.Sprintf(`"%s" %s "%s"`, a.Attribute, a.Comparator, a.Value)
+	return fmt.Sprintf(`%s %s %s`, a.Attribute, a.Comparator, a.Value.String())
 }
 
 func (e *AssertionExpression) String() string {
@@ -126,10 +126,18 @@ func (e *AssertionExpression) String() string {
 	}
 
 	if e.Expression == nil {
-		return e.LiteralValue.Value
+		return e.LiteralValue.String()
 	}
 
 	return fmt.Sprintf("%s %s %s", e.LiteralValue.Value, e.Operation, e.Expression.String())
+}
+
+func (v LiteralValue) String() string {
+	if v.Type == "string" {
+		return fmt.Sprintf(`"%s"`, v.Value)
+	}
+
+	return v.Value
 }
 
 type RunState string

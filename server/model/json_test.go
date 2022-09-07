@@ -235,5 +235,5 @@ func TestOldAssertionSerialization(t *testing.T) {
 
 	assert.Equal(t, oldAssertion.Attribute, newAssertion.Attribute.String())
 	assert.Equal(t, oldAssertion.Comparator, newAssertion.Comparator.String())
-	assert.Equal(t, oldAssertion.Value, newAssertion.Value.String())
+	assert.Equal(t, `"http"`, newAssertion.Value.String())
 }

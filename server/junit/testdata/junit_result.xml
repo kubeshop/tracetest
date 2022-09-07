@@ -5,11 +5,11 @@
     failures="1"
     errors="1"
     skipped="0">
-    <testcase name="&quot;db.statement&quot; contains &quot;INSERT&quot;"></testcase>
-    <testcase name="&quot;tracetest.span.duration&quot; &lt; &quot;500&quot;">
+    <testcase name="db.statement contains &quot;INSERT&quot;"></testcase>
+    <testcase name="tracetest.span.duration &lt; 500">
       <error type="error" message="cannot parse &quot;notANumber&quot; as integer" />
     </testcase>
-    <testcase name="&quot;tracetest.span.type&quot; = &quot;http&quot;">
+    <testcase name="tracetest.span.type = &quot;http&quot;">
       <failure type="tracetest.span.type" message="database" />
     </testcase>
   </testsuite>

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/kubeshop/tracetest/server/encoding/yaml/conversion/parser"
 	"github.com/kubeshop/tracetest/server/encoding/yaml/definition"
 	"github.com/kubeshop/tracetest/server/openapi"
 )
@@ -109,48 +108,15 @@ func convertTestSpecIntoOpenAPIObject(testSpec []definition.TestSpec) (openapi.T
 
 	definitions := make([]openapi.TestSpecsSpecs, 0, len(testSpec))
 	for _, testSpec := range testSpec {
-		assertions := make([]openapi.Assertion, 0, len(testSpec.Assertions))
-		for _, assertion := range testSpec.Assertions {
-			assertionObject, err := convertStringIntoAssertion(assertion)
-			if err != nil {
-				return openapi.TestSpecs{}, err
-			}
-			assertions = append(assertions, assertionObject)
-		}
-
 		definitions = append(definitions, openapi.TestSpecsSpecs{
 			Selector: openapi.Selector{
 				Query: testSpec.Selector,
 			},
-			Assertions: assertions,
+			Assertions: testSpec.Assertions,
 		})
 	}
 
 	return openapi.TestSpecs{
 		Specs: definitions,
-	}, nil
-}
-
-func convertStringIntoAssertion(assertion string) (openapi.Assertion, error) {
-	// TODO: convert string into assertion (using a parser?)
-	parsedAssertion, err := parser.ParseAssertion(assertion)
-	if err != nil {
-		return openapi.Assertion{}, err
-	}
-
-	value := parsedAssertion.Value.String()
-	if parsedAssertion.Value.IsSimple() {
-		if parsedAssertion.Value.LiteralValue.Type() == "string" {
-			// This is a simple string comparison, so we need to wrap it
-			// in quotes for it to work. Otherwise the parser will think
-			// this is an attribute
-			value = fmt.Sprintf(`"%s"`, value)
-		}
-	}
-
-	return openapi.Assertion{
-		Attribute:  parsedAssertion.Attribute,
-		Comparator: parsedAssertion.Operator,
-		Expected:   value,
 	}, nil
 }

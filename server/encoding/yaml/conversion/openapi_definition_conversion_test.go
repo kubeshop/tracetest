@@ -310,17 +310,9 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 							Selector: openapi.Selector{
 								Query: (`span[name = "my span name"]`),
 							},
-							Assertions: []openapi.Assertion{
-								{
-									Attribute:  "tracetest.span.duration",
-									Comparator: "<=",
-									Expected:   "200",
-								},
-								{
-									Attribute:  "db.operation",
-									Comparator: "=",
-									Expected:   "create",
-								},
+							Assertions: []string{
+								"tracetest.span.duration <= 200ms",
+								`db.operation = "create"`,
 							},
 						},
 					},
@@ -342,7 +334,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 					{
 						Selector: `span[name = "my span name"]`,
 						Assertions: []string{
-							"tracetest.span.duration <= 200",
+							"tracetest.span.duration <= 200ms",
 							`db.operation = "create"`,
 						},
 					},

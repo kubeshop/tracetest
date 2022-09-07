@@ -74,7 +74,7 @@ func (m OpenAPI) Specs(in model.OrderedMap[model.SpanQuery, []model.Assertion]) 
 
 	i := 0
 	in.Map(func(spanQuery model.SpanQuery, asserts []model.Assertion) {
-		assertions := make([]openapi.Assertion, len(asserts))
+		assertions := make([]string, len(asserts))
 		for j, a := range asserts {
 			assertions[j] = m.Assertion(a)
 		}
@@ -191,12 +191,8 @@ func (m OpenAPI) Result(in *model.RunResults) openapi.AssertionResults {
 	}
 }
 
-func (m OpenAPI) Assertion(in model.Assertion) openapi.Assertion {
-	return openapi.Assertion{
-		Attribute:  in.Attribute.String(),
-		Comparator: in.Comparator.String(),
-		Expected:   in.Value.String(),
-	}
+func (m OpenAPI) Assertion(in model.Assertion) string {
+	return in.String()
 }
 
 func (m OpenAPI) AssertionExpression(in *parser.Expression) *model.AssertionExpression {
@@ -377,35 +373,15 @@ func (m Model) Result(in openapi.AssertionResults) *model.RunResults {
 	}
 }
 
-func (m Model) Assertion(in openapi.Assertion) model.Assertion {
-	expression, err := parser.ParseAssertionExpression(in.Expected)
-	if err != nil {
-		// Maybe it's a string without quotes, try quoting it and see if it works
-		expression = parseQuotedAssertionValue(in)
-	}
+func (m Model) Assertion(in string) model.Assertion {
+	assertion, _ := parser.ParseAssertion(in)
+	comp, _ := m.comparators.Get(assertion.Operator)
 
-	// this totally breaks the purpose of having expressions
-	// but expressions will not work unless we receive the assertion as a string
-	// instead of an object.
-	// So we have to remove this after we start receiving the assertion as a string
-	// TODO: remove this after assertions are sent as strings
-	if expression.LiteralValue.Type() == "attribute" {
-		expression = parseQuotedAssertionValue(in)
-	}
-
-	comp, _ := m.comparators.Get(in.Comparator)
 	return model.Assertion{
-		Attribute:  model.Attribute(in.Attribute),
+		Attribute:  model.Attribute(assertion.Attribute),
 		Comparator: comp,
-		Value:      m.AssertionExpression(expression),
+		Value:      m.AssertionExpression(assertion.Value),
 	}
-}
-
-func parseQuotedAssertionValue(in openapi.Assertion) *parser.Expression {
-	quotedValue := fmt.Sprintf(`"%s"`, in.Expected)
-	expression, _ := parser.ParseAssertionExpression(quotedValue)
-
-	return expression
 }
 
 func (m Model) AssertionExpression(in *parser.Expression) *model.AssertionExpression {

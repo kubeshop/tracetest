@@ -10,7 +10,7 @@
 package openapi
 
 type AssertionResult struct {
-	Assertion Assertion `json:"assertion,omitempty"`
+	Assertion string `json:"assertion,omitempty"`
 
 	AllPassed bool `json:"allPassed,omitempty"`
 
@@ -19,9 +19,6 @@ type AssertionResult struct {
 
 // AssertAssertionResultRequired checks if the required fields are not zero-ed
 func AssertAssertionResultRequired(obj AssertionResult) error {
-	if err := AssertAssertionRequired(obj.Assertion); err != nil {
-		return err
-	}
 	for _, el := range obj.SpanResults {
 		if err := AssertAssertionSpanResultRequired(el); err != nil {
 			return err
