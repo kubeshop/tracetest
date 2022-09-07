@@ -35,9 +35,6 @@ endif
 	goreleaser build --single-target --rm-dist --snapshot -f ../.goreleaser.yaml
 	cp `cat ./dist/artifacts.json | jq -rc '.[0].path'` ./dist/tracetest
 
-simple-build:
-	go build -o tracetest main.go
-
 test: mockserver
 	@go test -coverprofile=coverage.out ./...
 	@make --no-print-directory kill-mock
