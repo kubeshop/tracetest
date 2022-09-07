@@ -32,8 +32,8 @@ endif
 	VERSION=$(VERSION) \
 	TRACETEST_ENV=$(TRACETEST_ENV) \
 	ANALYTICS_BE_KEY=$(ANALYTICS_BE_KEY) \
-	goreleaser --rm-dist --snapshot -f ../.goreleaser.yaml
-
+	goreleaser build --single-target --rm-dist --snapshot -f ../.goreleaser.yaml
+	cp `cat ./dist/artifacts.json | jq -rc '.[0].path'` ./dist/tracetest
 
 test: mockserver
 	@go test -coverprofile=coverage.out ./...

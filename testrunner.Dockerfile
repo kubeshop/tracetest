@@ -1,19 +1,22 @@
-FROM golang:1.18-alpine AS build-cli
-WORKDIR /go/src
+FROM goreleaser/goreleaser:v1.11.2 AS build-cli
+WORKDIR /app
 
-RUN apk add --update make
+RUN apk add --update jq make
 
-COPY ./cli/go.mod ./cli/go.sum ./
-RUN go mod download
-COPY ./cli ./
-RUN go build -o /go/src/tracetest ./main.go
+COPY ./.goreleaser.yaml ./
+
+COPY ./cli/go.mod ./cli/go.sum ./cli/
+RUN cd cli && go mod download
+
+COPY ./cli ./cli
+RUN ls -la && cd ./cli && make build
 
 FROM alpine
 
-RUN apk add bash jq curl
+RUN apk --update add bash jq curl
 
 WORKDIR /app
-COPY --from=build-cli /go/src/tracetest /app/cli/tracetest
+COPY --from=build-cli /app/cli/dist/tracetest /app/cli/tracetest
 COPY ./tracetesting ./tracetesting
 
 WORKDIR /app/tracetesting

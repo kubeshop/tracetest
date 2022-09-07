@@ -1,7 +1,7 @@
 version: "3.2"
 services:
   testrunner:
-    container_name: testrunner
+    image: kubeshop/tracetest-testrunner
     build:
       context: .
       dockerfile: testrunner.Dockerfile
