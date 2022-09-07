@@ -1,6 +1,10 @@
 package installer
 
-import "strings"
+import (
+	"encoding/csv"
+	"fmt"
+	"strings"
+)
 
 var kubernetes = installer{
 	preChecks: []preChecker{
@@ -8,11 +12,67 @@ var kubernetes = installer{
 		helmChecker,
 		localEnvironmentChecker,
 	},
-	configs:   []configurator{},
+	configs: []configurator{
+		configureTracetest,
+		configureDemoApp,
+		configureKubernetes,
+	},
 	installFn: kubernetesInstaller,
 }
 
-func kubernetesInstaller(config configuration, ui UI) {}
+func kubernetesInstaller(config configuration, ui UI) {
+	fmt.Println("********", config)
+}
+
+type k8sContext struct {
+	name     string
+	selected bool
+}
+
+func getK8sContexts(conf configuration, ui UI) []k8sContext {
+	output := getCmdOutput(`kubectl config get-contexts --no-headers  | tr -s " " | sed -e "s/ /,/g"`)
+
+	records, err := csv.NewReader(strings.NewReader(output)).ReadAll()
+	if err != nil {
+		ui.Exit(fmt.Sprintf("cannot get kubectl contexts: %s", err.Error()))
+	}
+
+	results := []k8sContext{}
+	for _, r := range records {
+		results = append(results, k8sContext{
+			name:     r[1],
+			selected: r[0] == "*",
+		})
+	}
+
+	return results
+}
+
+func configureKubernetes(conf configuration, ui UI) configuration {
+	conf.set("k8s.kubeconfig", ui.TextInput("Kubeconfig file", "${HOME}/.kube/config"))
+
+	contexts := getK8sContexts(conf, ui)
+	options := []option{}
+	defaultIndex := 0
+	for i, c := range contexts {
+		if c.selected {
+			defaultIndex = i
+		}
+		options = append(options, option{text: c.name, fn: func(ui UI) {
+			conf.set("k8s.context", c.name)
+		}})
+	}
+
+	ui.Select("Kubectl context", options, defaultIndex)
+	ui.TextInput("Namespace", "tracetest")
+	expose := ui.Confirm("Do you want to expose tracetest (via ingress)?", false)
+	if expose {
+		conf.set("k8s.ingress-host", ui.TextInput("Host", ""))
+	}
+	conf.set("k8s.expose", expose)
+
+	return conf
+}
 
 func helmChecker(ui UI) {
 	if commandExists("helm") {
