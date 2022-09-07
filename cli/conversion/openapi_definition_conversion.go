@@ -1,7 +1,6 @@
 package conversion
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/kubeshop/tracetest/cli/definition"
@@ -132,19 +131,9 @@ func convertOpenAPITestSpecIntoSpecArray(testSpec *openapi.TestSpecs) []definiti
 
 	definitionArray := make([]definition.TestSpec, 0, len(testSpec.Specs))
 	for _, def := range testSpec.Specs {
-		assertions := make([]string, 0, len(def.Assertions))
-		for _, assertion := range def.Assertions {
-			assertionFormat := `%s %s "%s"`
-			if isNumber(*assertion.Expected) {
-				assertionFormat = "%s %s %s"
-			}
-			assertionString := fmt.Sprintf(assertionFormat, *assertion.Attribute, *assertion.Comparator, *assertion.Expected)
-			assertions = append(assertions, assertionString)
-		}
-
 		newDefinition := definition.TestSpec{
 			Selector:   *def.Selector.Query,
-			Assertions: assertions,
+			Assertions: def.Assertions,
 		}
 		definitionArray = append(definitionArray, newDefinition)
 	}
