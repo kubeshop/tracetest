@@ -141,7 +141,7 @@ func convertStringIntoAssertion(assertion string) (openapi.Assertion, error) {
 	value := parsedAssertion.Value.String()
 	if parsedAssertion.Value.IsSimple() {
 		if parsedAssertion.Value.LiteralValue.Type() == "string" {
-			// This is a simple string comparasion, so we need to wrap it
+			// This is a simple string comparison, so we need to wrap it
 			// in quotes for it to work. Otherwise the parser will think
 			// this is an attribute
 			value = fmt.Sprintf(`"%s"`, value)
