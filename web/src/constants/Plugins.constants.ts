@@ -41,7 +41,7 @@ const Default: IPlugin = {
   ],
 };
 
-export const pokeApi = window.ENV.pokeApi || 'http://demo-pokemon-api.demo.svc.cluster.local';
+export const pokeApi = window?.ENV?.pokeApi || 'http://demo-pokemon-api.demo.svc.cluster.local';
 
 const Rest: IPlugin = {
   name: SupportedPlugins.REST,
