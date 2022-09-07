@@ -124,6 +124,8 @@ func (c *customController) analytics(name string, f http.HandlerFunc) http.Handl
 	return func(w http.ResponseWriter, r *http.Request) {
 		machineID := r.Header.Get("x-client-id")
 		analytics.SendEvent(toWords(name), "test", machineID)
+
+		f(w, r)
 	}
 }
 
