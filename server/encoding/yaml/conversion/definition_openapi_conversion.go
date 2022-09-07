@@ -141,6 +141,6 @@ func convertStringIntoAssertion(assertion string) (openapi.Assertion, error) {
 	return openapi.Assertion{
 		Attribute:  parsedAssertion.Attribute,
 		Comparator: parsedAssertion.Operator,
-		Expected:   parsedAssertion.Value,
+		Expected:   parsedAssertion.Value.String(),
 	}, nil
 }

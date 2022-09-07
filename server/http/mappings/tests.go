@@ -8,6 +8,7 @@ import (
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/assertions/selectors"
 	"github.com/kubeshop/tracetest/server/encoding/yaml/conversion"
+	"github.com/kubeshop/tracetest/server/encoding/yaml/conversion/parser"
 	"github.com/kubeshop/tracetest/server/encoding/yaml/definition"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
@@ -189,17 +190,27 @@ func (m OpenAPI) Result(in *model.RunResults) openapi.AssertionResults {
 		Results:   results,
 	}
 }
-func (m OpenAPI) Assertion(in model.Assertion) openapi.Assertion {
-	value := in.Value
-	if m.traceConversionConfig.IsTimeField(in.Attribute.String()) {
-		intValue, _ := strconv.Atoi(in.Value)
-		value = traces.ConvertNanoSecondsIntoProperTimeUnit(intValue)
-	}
 
+func (m OpenAPI) Assertion(in model.Assertion) openapi.Assertion {
 	return openapi.Assertion{
 		Attribute:  in.Attribute.String(),
 		Comparator: in.Comparator.String(),
-		Expected:   value,
+		Expected:   in.Value.String(),
+	}
+}
+
+func (m OpenAPI) AssertionExpression(in *parser.Expression) *model.AssertionExpression {
+	if in == nil {
+		return nil
+	}
+
+	return &model.AssertionExpression{
+		LiteralValue: model.LiteralValue{
+			Value: in.LiteralValue.String(),
+			Type:  in.LiteralValue.Type(),
+		},
+		Operation:  in.Operation,
+		Expression: m.AssertionExpression(in.Expression),
 	}
 }
 
@@ -368,16 +379,32 @@ func (m Model) Result(in openapi.AssertionResults) *model.RunResults {
 
 func (m Model) Assertion(in openapi.Assertion) model.Assertion {
 	comp, _ := m.comparators.Get(in.Comparator)
-	expectedValue := in.Expected
-	if m.traceConversionConfig.IsTimeField(in.Attribute) {
-		fieldInNanoSeconds := traces.ConvertTimeFieldIntoNanoSeconds(expectedValue)
-		expectedValue = fmt.Sprintf("%d", fieldInNanoSeconds)
+	expression, err := parser.ParseAssertionExpression(in.Expected)
+	if err != nil {
+		// Maybe it's a string without quotes, try quoting it and see if it works
+		quotedValue := fmt.Sprintf(`"%s"`, in.Expected)
+		expression, _ = parser.ParseAssertionExpression(quotedValue)
 	}
 
 	return model.Assertion{
 		Attribute:  model.Attribute(in.Attribute),
 		Comparator: comp,
-		Value:      expectedValue,
+		Value:      m.AssertionExpression(expression),
+	}
+}
+
+func (m Model) AssertionExpression(in *parser.Expression) *model.AssertionExpression {
+	if in == nil {
+		return nil
+	}
+
+	return &model.AssertionExpression{
+		LiteralValue: model.LiteralValue{
+			Value: in.LiteralValue.String(),
+			Type:  in.LiteralValue.Type(),
+		},
+		Operation:  in.Operation,
+		Expression: m.AssertionExpression(in.Expression),
 	}
 }
 

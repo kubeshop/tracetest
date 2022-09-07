@@ -1,14 +1,11 @@
 import {Button} from 'antd';
-import {useState} from 'react';
-
 import RunActionsMenu from 'components/RunActionsMenu';
 import TestActions from 'components/TestActions';
 import TestState from 'components/TestState';
-import VersionMismatchModal from 'components/VersionMismatchModal';
 import {TestState as TestStateEnum} from 'constants/TestRun.constants';
 import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
-import TestAnalyticsService from 'services/Analytics/TestAnalytics.service';
+import {useTest} from 'providers/Test/Test.provider';
 import * as S from './RunDetailLayout.styled';
 
 interface IProps {
@@ -17,51 +14,27 @@ interface IProps {
 }
 
 const HeaderRight = ({testId, testVersion}: IProps) => {
-  const {isDraftMode, runTest} = useTestSpecs();
+  const {isDraftMode} = useTestSpecs();
   const {run} = useTestRun();
-  const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
+  const {onRun} = useTest();
   const state = run.state;
 
-  const handleRunTestOnClick = () => {
-    TestAnalyticsService.onRunTest();
-    if (run.testVersion !== testVersion) {
-      setIsConfirmationModalOpen(true);
-      return;
-    }
-    runTest();
-  };
-
   return (
-    <>
-      <S.Section $justifyContent="flex-end">
-        {isDraftMode && <TestActions />}
-        {!isDraftMode && state && state !== TestStateEnum.FINISHED && (
-          <S.StateContainer data-cy="test-run-result-status">
-            <S.StateText>Test status:</S.StateText>
-            <TestState testState={state} />
-          </S.StateContainer>
-        )}
-        {!isDraftMode && state && state === TestStateEnum.FINISHED && (
-          <Button data-cy="run-test-button" ghost onClick={handleRunTestOnClick} type="primary">
-            Run Test
-          </Button>
-        )}
-        <RunActionsMenu isRunView resultId={run.id} testId={testId} testVersion={testVersion} />
-      </S.Section>
-
-      <VersionMismatchModal
-        description="Running the test will use the latest version of the test."
-        currentVersion={run.testVersion}
-        isOpen={isConfirmationModalOpen}
-        latestVersion={testVersion}
-        okText="Run Test"
-        onCancel={() => setIsConfirmationModalOpen(false)}
-        onConfirm={() => {
-          setIsConfirmationModalOpen(false);
-          runTest();
-        }}
-      />
-    </>
+    <S.Section $justifyContent="flex-end">
+      {isDraftMode && <TestActions />}
+      {!isDraftMode && state && state !== TestStateEnum.FINISHED && (
+        <S.StateContainer data-cy="test-run-result-status">
+          <S.StateText>Test status:</S.StateText>
+          <TestState testState={state} />
+        </S.StateContainer>
+      )}
+      {!isDraftMode && state && state === TestStateEnum.FINISHED && (
+        <Button data-cy="run-test-button" ghost onClick={onRun} type="primary">
+          Run Test
+        </Button>
+      )}
+      <RunActionsMenu isRunView resultId={run.id} testId={testId} testVersion={testVersion} />
+    </S.Section>
   );
 };
 

@@ -19,21 +19,12 @@ const EditTestForm = ({
   form,
   onSubmit,
   test: {
-    name,
-    description,
     trigger: {request, type},
   },
+  test,
   onValidation,
 }: IProps) => {
-  const initialValues = useMemo(
-    () => ({
-      name,
-      description,
-      type,
-      ...TestService.getInitialValues(type, request),
-    }),
-    [description, name, request, type]
-  );
+  const initialValues = useMemo(() => TestService.getInitialValues(test), [test]);
 
   return (
     <Form<TDraftTest>

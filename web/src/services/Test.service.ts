@@ -1,4 +1,4 @@
-import {TRawTest, TTest, TDraftTest, TTriggerRequest} from 'types/Test.types';
+import {TRawTest, TTest, TDraftTest} from 'types/Test.types';
 import {SupportedPlugins} from 'constants/Plugins.constants';
 import {IPlugin} from 'types/Plugins.types';
 import TestDefinitionService from './TestDefinition.service';
@@ -70,10 +70,15 @@ const TestService = () => ({
     return (isBasicDetails && basicDetailsValidation(draft)) || (isTriggerValid && authValidation(draft));
   },
 
-  getInitialValues(type: TriggerTypes, trigger: TTriggerRequest) {
+  getInitialValues({trigger: {request, type}, name, description}: TTest) {
     const triggerService = TriggerServiceByTypeMap[type];
 
-    return triggerService.getInitialValues!(trigger);
+    return {
+      name,
+      description,
+      type,
+      ...triggerService.getInitialValues!(request),
+    };
   },
 });
 

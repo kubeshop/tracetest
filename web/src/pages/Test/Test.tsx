@@ -1,11 +1,16 @@
 import Layout from 'components/Layout';
+import {useParams} from 'react-router-dom';
+import withAnalytics from 'components/WithAnalytics/WithAnalytics';
+import TestProvider from 'providers/Test';
 import TestContent from './TestContent';
-import withAnalytics from '../../components/WithAnalytics/WithAnalytics';
 
 const TestPage: React.FC = () => {
+  const {testId = ''} = useParams();
   return (
     <Layout>
-      <TestContent />
+      <TestProvider testId={testId}>
+        <TestContent />
+      </TestProvider>
     </Layout>
   );
 };

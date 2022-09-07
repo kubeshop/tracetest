@@ -189,6 +189,25 @@ specs:
         - tracetest.span.duration < 1000ms
 ```
 
+#### Referencing other fields from the same span
+You also can reference fields from the same span in your assertions. For example, you can define an assertion to ensure the output number is greater than the input number.
+
+```yaml
+testDefinition:
+    - selector: span[name = "my operation"]
+      assertions:
+        - myapp.output > myapp.input
+```
+
+You also can use basic arithmetic expressions in your assertions:
+```yaml
+assertions:
+  - myapp.output = myapp.input + 1
+```
+> :warning: This does not take into account the order of operators yet. So an expression `1 + 2 * 3` will be resolved as `9` instead of `7`. This will be fixed in future releases.
+
+Available operations in an expression are: `+`, `-`, `*`, and `/`.
+
 For more information about selectors or assertions, take a look at the documentation for those topics.
 
 ### Available operations
