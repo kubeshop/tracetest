@@ -213,10 +213,12 @@ func installMinikube(ui UI) {
 		yum: `
 			curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-latest.{{.RpmArchitecture}}.rpm
 			sudo rpm -Uvh minikube-latest.{{.RpmArchitecture}}.rpm
+			rm minikube-latest.{{.RpmArchitecture}}.rpm
 		`,
 		dnf: `
 			curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-latest.{{.RpmArchitecture}}.rpm
 			sudo rpm -Uvh minikube-latest.{{.RpmArchitecture}}.rpm
+			rm minikube-latest.{{.RpmArchitecture}}.rpm
 		`,
 		homebrew: "brew install minikube",
 		macIntelChipManual: `
