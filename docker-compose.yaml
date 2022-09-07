@@ -10,7 +10,6 @@ services:
       args:
         VERSION: dev
         TRACETEST_ENV: docker-compose
-        REACT_APP_POKE_API: http://demo-api:8081
         POKE_API: http://demo-api:8081
     volumes:
       - type: bind

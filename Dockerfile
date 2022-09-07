@@ -5,7 +5,6 @@ COPY ./web/package.json ./
 COPY ./web/package-lock.json ./
 RUN npm ci --silent
 COPY ./web ./
-
 RUN npm run build
 
 FROM golang:1.18-alpine AS build-go
