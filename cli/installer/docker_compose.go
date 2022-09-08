@@ -113,8 +113,10 @@ func getDockerComposeFileContents(ui UI, config configuration) []byte {
 		ui.Exit(fmt.Sprintf("cannot configure tracetest container: %s", err.Error()))
 	}
 
-	if err := fixOtelCollectorContainer(project); err != nil {
-		ui.Exit(fmt.Sprintf("cannot configure otel-collector container: %s", err.Error()))
+	if config.Bool("tracetest.collector.install") {
+		if err := fixOtelCollectorContainer(project); err != nil {
+			ui.Exit(fmt.Sprintf("cannot configure otel-collector container: %s", err.Error()))
+		}
 	}
 
 	output, err := yaml.Marshal(project)
