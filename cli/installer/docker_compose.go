@@ -237,7 +237,7 @@ func getCollectorConfigFileContents(ui UI, config configuration) []byte {
 	case "jaeger":
 		exporter = "jaeger"
 		exporters["jaeger"] = msa{
-			"endpoint": config.String("tracetest.backend.endpoint.query"),
+			"endpoint": config.String("tracetest.backend.endpoint.collector"),
 			"tls": msa{
 				"insecure": config.Bool("tracetest.backend.tls.insecure"),
 			},
