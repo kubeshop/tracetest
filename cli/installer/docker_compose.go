@@ -110,16 +110,18 @@ func getDockerComposeFileContents(ui UI, config configuration) []byte {
 	filterContainers(ui, project, include)
 
 	if err := fixTracetestContainer(project, cliConfig.Version); err != nil {
-		ui.Exit(err.Error())
+		ui.Exit(fmt.Sprintf("cannot configure tracetest container: %s", err.Error()))
 	}
 
-	if err := fixOtelCollectorContainer(project); err != nil {
-		ui.Exit(err.Error())
+	if config.Bool("tracetest.collector.install") {
+		if err := fixOtelCollectorContainer(project); err != nil {
+			ui.Exit(fmt.Sprintf("cannot configure otel-collector container: %s", err.Error()))
+		}
 	}
 
 	output, err := yaml.Marshal(project)
 	if err != nil {
-		ui.Exit(err.Error())
+		ui.Exit(fmt.Sprintf("cannot encode docker-compose file: %s", err.Error()))
 	}
 
 	sout := strings.ReplaceAll(string(output), "$", "$$")
