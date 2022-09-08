@@ -58,8 +58,23 @@ func dockerComposeInstaller(config configuration, ui UI) {
 	})
 
 	dir := config.String("output.dir")
+	force := Force
+	if fileExists(dir) && !force {
+		ui.Warning(fmt.Sprintf(`Directory "%s" already exists.`, dir))
+		force = ui.Confirm("Do you want to overwrite it?", true)
 
-	if Force {
+		if !force {
+			ui.Exit(fmt.Sprintf(`
+Output directory "%s" already exists. Choose a diferent output dir or manually remove it.
+
+You can run this command again with the -f option to overwrite it.
+
+%s`, dir, createIssueMsg),
+			)
+		}
+	}
+
+	if force {
 		err := os.RemoveAll(dir)
 		if err != nil {
 			ui.Exit(err.Error())
