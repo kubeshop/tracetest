@@ -52,6 +52,13 @@ func configureKubernetes(conf configuration, ui UI) configuration {
 	conf.set("k8s.kubeconfig", ui.TextInput("Kubeconfig file", "${HOME}/.kube/config"))
 
 	contexts := getK8sContexts(conf, ui)
+	if len(contexts) == 0 {
+		ui.Exit(
+			"We didn't detect any kubectl contexts available. " +
+				"Make sure your kubectl tool is correctly configured and try again. \n" +
+				createIssueMsg,
+		)
+	}
 	options := []option{}
 	defaultIndex := 0
 	for i, c := range contexts {
