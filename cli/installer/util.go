@@ -171,6 +171,14 @@ func (c cmd) exec(ui UI, args ...interface{}) interface{} {
 	return nil
 }
 
+func getCmdOutput(cmd string) string {
+	execCmd := exec.Command("/bin/sh", "-c", cmd)
+
+	out, _ := execCmd.CombinedOutput()
+
+	return string(out)
+}
+
 func fileExists(path string) bool {
 	if _, err := os.Stat(path); err == nil {
 		return true
