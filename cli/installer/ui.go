@@ -18,6 +18,7 @@ type UI interface {
 	Panic(error)
 	Exit(string)
 
+	Error(string)
 	Warning(string)
 	Info(string)
 	Success(string)
@@ -58,6 +59,10 @@ func (ui ptermUI) Panic(err error) {
 func (ui ptermUI) Exit(msg string) {
 	pterm.Error.Println(msg)
 	os.Exit(1)
+}
+
+func (ui ptermUI) Error(msg string) {
+	pterm.Error.Println(msg)
 }
 
 func (ui ptermUI) Warning(msg string) {

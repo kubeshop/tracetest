@@ -70,7 +70,8 @@ See https://kubeshop.github.io/tracetest/supported-backends/
 
 		// default values
 		conf.set("tracetest.backend.type", "jaeger")
-		conf.set("tracetest.backend.endpoint", "jaeger:16685")
+		conf.set("tracetest.backend.endpoint.query", "jaeger:16685")
+		conf.set("tracetest.backend.endpoint.collector", "jaeger:14250")
 		conf.set("tracetest.backend.tls.insecure", true)
 	}
 
@@ -83,7 +84,9 @@ func configureBackendOptions(conf configuration, ui UI) configuration {
 	option := ui.Select("Which tracing backend do you want to use?", []option{
 		{"Jaeger", func(ui UI) {
 			conf.set("tracetest.backend.type", "jaeger")
-			conf.set("tracetest.backend.endpoint", ui.TextInput("Endpoint", "jaeger-query:16685"))
+			conf.set("tracetest.backend.endpoint.query", ui.TextInput("Query Endpoint", "jaeger:16685"))
+			conf.set("tracetest.backend.endpoint.collector", ui.TextInput("Collector Endpoint", "jaeger:14250"))
+			conf.set("tracetest.backend.endpoint.exporter", "")
 			conf.set("tracetest.backend.tls.insecure", ui.Confirm("TLS/Insecure", true))
 		}},
 		{"Tempo", func(ui UI) {
@@ -136,7 +139,46 @@ func getTracetestConfigFileContents(ui UI, config configuration) []byte {
 		ui.Exit(fmt.Errorf("cannot marshal tracetest config file: %w", err).Error())
 	}
 
+	out, err = fixConfigs(out)
+	if err != nil {
+		ui.Exit(fmt.Errorf("cannot fix tracertest config: %w", err).Error())
+	}
+
 	return out
+}
+
+func fixConfigs(conf []byte) ([]byte, error) {
+	encoded := msa{}
+
+	err := yaml.Unmarshal(conf, &encoded)
+	if err != nil {
+		return nil, fmt.Errorf("cannot decode mapstructure: %w", err)
+	}
+
+	ds := encoded["telemetry"].(msa)["datastores"].(msa)
+
+	var (
+		target msa
+		key    string
+	)
+
+	if d, ok := ds["jaeger"]; ok {
+		target = d.(msa)["jaeger"].(msa)
+		key = "jaeger"
+	} else if d, ok := ds["tempo"]; ok {
+		target = d.(msa)["tempo"].(msa)
+		key = "tempo"
+	} else {
+		// we only need to fix tempo/jaeger
+		return yaml.Marshal(encoded)
+	}
+
+	target["tls"] = target["tlssetting"]
+	delete(target, "tlssetting")
+
+	encoded["telemetry"].(msa)["datastores"].(msa)[key].(msa)[key] = target
+
+	return yaml.Marshal(encoded)
 }
 
 func telemetryConfig(ui UI, conf configuration) serverConfig.Telemetry {
@@ -169,7 +211,7 @@ func dataStoreConfig(ui UI, conf configuration) map[string]serverConfig.TracingB
 		c = serverConfig.TracingBackendDataStoreConfig{
 			Type: dstype,
 			Jaeger: configgrpc.GRPCClientSettings{
-				Endpoint: conf.String("tracetest.backend.endpoint"),
+				Endpoint: conf.String("tracetest.backend.endpoint.query"),
 				TLSSetting: configtls.TLSClientSetting{
 					Insecure: conf.Bool("tracetest.backend.tls.insecure"),
 				},

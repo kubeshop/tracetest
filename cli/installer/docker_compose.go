@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"path"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -25,14 +26,33 @@ var dockerCompose = installer{
 		dockerComposeChecker,
 	},
 	configs: []configurator{
+		configureDockerCompose,
 		configureTracetest,
 		configureDemoApp,
-		configureDockerCompose,
+		configureDockerComposeOutput,
 	},
 	installFn: dockerComposeInstaller,
 }
 
 func configureDockerCompose(conf configuration, ui UI) configuration {
+	dcf := ui.TextInput("Project's docker-compose file", dockerComposeFilename)
+	create := false
+	if !fileExists(dcf) {
+		ui.Error(fmt.Sprintf(`File "%s" does not exist. You need an existing docker-compose file.`, dcf))
+		create = ui.Confirm("Do you want me to create an empty docker-compose file?", true)
+		if !create {
+			ui.Exit("Cannot proceed without a docker-compose file. Please create one and re run the command. " + createIssueMsg)
+		}
+		dcf = dockerComposeFilename
+
+	}
+	conf.set("project.docker-compose.filename", dcf)
+	conf.set("project.docker-compose.create", create)
+
+	return conf
+}
+
+func configureDockerComposeOutput(conf configuration, ui UI) configuration {
 	conf.set(
 		"output.dir",
 		ui.TextInput("Tracetest output directory", "tracetest/"),
@@ -58,18 +78,44 @@ func dockerComposeInstaller(config configuration, ui UI) {
 	})
 
 	dir := config.String("output.dir")
+	force := Force
+	if fileExists(dir) && !force {
+		ui.Warning(fmt.Sprintf(`Directory "%s" already exists.`, dir))
+		force = ui.Confirm("Do you want to overwrite it?", true)
 
-	if Force {
+		if !force {
+			ui.Exit(fmt.Sprintf(`
+Output directory "%s" already exists. Choose a diferent output dir or manually remove it.
+
+You can run this command again with the -f option to overwrite it.
+
+%s`, dir, createIssueMsg),
+			)
+		}
+	}
+
+	if force {
 		err := os.RemoveAll(dir)
 		if err != nil {
 			ui.Exit(err.Error())
 		}
 	}
 
+	cwdDockerComposeFname := config.String("project.docker-compose.filename")
+	if config.Bool("project.docker-compose.create") {
+		createEmptyDockerComposeFile(cwdDockerComposeFname, ui)
+	}
+
 	collectorConfigFile := getCollectorConfigFileContents(ui, config)
 	tracetestConfigFile := getTracetestConfigFileContents(ui, config)
 	dockerComposeFile := getDockerComposeFileContents(ui, config)
 	dockerComposeFName := filepath.Join(dir, dockerComposeFilename)
+
+	dockerCmd := fmt.Sprintf(
+		"docker compose -f %s -f %s up -d",
+		cwdDockerComposeFname,
+		dockerComposeFName,
+	)
 
 	createDir(ui, dir)
 	saveFile(ui, dockerComposeFName, dockerComposeFile)
@@ -80,15 +126,28 @@ func dockerComposeInstaller(config configuration, ui UI) {
 	ui.Println(fmt.Sprintf(`
 To start tracetest:
 
-  docker compose -f %s up -d
+	%s
 
 Then, use your browser to navigate to:
 
   http://localhost:8080
 
 Happy TraceTesting =)
-`, dockerComposeFName))
+`, dockerCmd))
 
+}
+
+func createEmptyDockerComposeFile(fname string, ui UI) {
+	project := &types.Project{}
+	output, err := yaml.Marshal(project)
+	if err != nil {
+		ui.Exit(fmt.Sprintf("cannot encode docker-compose file: %s", err.Error()))
+	}
+
+	err = os.WriteFile(fname, output, 0644)
+	if err != nil {
+		ui.Exit(fmt.Sprintf("cannot write docker-compose file: %s", err.Error()))
+	}
 }
 
 func getDockerComposeFileContents(ui UI, config configuration) []byte {
@@ -109,12 +168,12 @@ func getDockerComposeFileContents(ui UI, config configuration) []byte {
 
 	filterContainers(ui, project, include)
 
-	if err := fixTracetestContainer(project, cliConfig.Version); err != nil {
+	if err := fixTracetestContainer(config, project, cliConfig.Version); err != nil {
 		ui.Exit(fmt.Sprintf("cannot configure tracetest container: %s", err.Error()))
 	}
 
 	if config.Bool("tracetest.collector.install") {
-		if err := fixOtelCollectorContainer(project); err != nil {
+		if err := fixOtelCollectorContainer(config, project); err != nil {
 			ui.Exit(fmt.Sprintf("cannot configure otel-collector container: %s", err.Error()))
 		}
 	}
@@ -156,13 +215,14 @@ func filterContainers(ui UI, project *types.Project, included []string) {
 	project.Services = containers
 }
 
+type msa = map[string]any
+
 func getCollectorConfigFileContents(ui UI, config configuration) []byte {
 	contents, err := getFileContentsForVersion("local-config/collector.config.yaml", cliConfig.Version)
 	if err != nil {
 		ui.Exit(fmt.Errorf("cannot get collector config file: %w", err).Error())
 	}
 
-	type msa = map[string]any
 	otelConfig := msa{}
 
 	err = yaml.Unmarshal(contents, &otelConfig)
@@ -177,7 +237,7 @@ func getCollectorConfigFileContents(ui UI, config configuration) []byte {
 	case "jaeger":
 		exporter = "jaeger"
 		exporters["jaeger"] = msa{
-			"endpoint": config.String("tracetest.backend.endpoint"),
+			"endpoint": config.String("tracetest.backend.endpoint.query"),
 			"tls": msa{
 				"insecure": config.Bool("tracetest.backend.tls.insecure"),
 			},
@@ -245,7 +305,7 @@ func saveFile(ui UI, fname string, contents []byte) {
 	}
 }
 
-func fixTracetestContainer(project *types.Project, version string) error {
+func fixTracetestContainer(config configuration, project *types.Project, version string) error {
 	const serviceName = "tracetest"
 	tts, err := project.GetService(serviceName)
 	if err != nil {
@@ -258,20 +318,22 @@ func fixTracetestContainer(project *types.Project, version string) error {
 
 	tts.Image = "kubeshop/tracetest:" + version
 	tts.Build = nil
-	tts.Volumes[0].Source = tracetestConfigFilename
+	tts.Volumes[0].Source = path.Join(config.String("output.dir"), tracetestConfigFilename)
 
 	replaceService(project, serviceName, tts)
 
 	return nil
 }
 
-func fixOtelCollectorContainer(project *types.Project) error {
+func fixOtelCollectorContainer(config configuration, project *types.Project) error {
 	ocs, err := project.GetService("otel-collector")
 	if err != nil {
 		return err
 	}
 
-	ocs.Volumes[0].Source = otelCollectorConfigFilename
+	ocs.Volumes[0].Source = path.Join(config.String("output.dir"), otelCollectorConfigFilename)
+	je := config.String("tracetest.backend.endpoint.collector")
+	ocs.Environment["JAEGER_ENDPOINT"] = &je
 
 	return nil
 }
