@@ -57,11 +57,7 @@ func TestFailingTestOutput(t *testing.T) {
 					},
 					Results: []openapi.AssertionResult{
 						{
-							Assertion: &openapi.Assertion{
-								Attribute:  strp("tracetest.span.duration"),
-								Comparator: strp("<="),
-								Expected:   strp("200ms"),
-							},
+							Assertion: strp("tracetest.span.duration <= 200ms"),
 							AllPassed: boolp(true),
 							SpanResults: []openapi.AssertionSpanResult{
 								{
@@ -80,11 +76,7 @@ func TestFailingTestOutput(t *testing.T) {
 					},
 					Results: []openapi.AssertionResult{
 						{
-							Assertion: &openapi.Assertion{
-								Attribute:  strp("tracetest.span.duration"),
-								Comparator: strp("<="),
-								Expected:   strp("200ms"),
-							},
+							Assertion: strp("tracetest.span.duration <= 200ms"),
 							AllPassed: boolp(true),
 							SpanResults: []openapi.AssertionSpanResult{
 								{
@@ -96,11 +88,7 @@ func TestFailingTestOutput(t *testing.T) {
 							},
 						},
 						{
-							Assertion: &openapi.Assertion{
-								Attribute:  strp("http.status"),
-								Comparator: strp("="),
-								Expected:   strp("200"),
-							},
+							Assertion: strp("http.status = 200"),
 							AllPassed: boolp(true),
 							SpanResults: []openapi.AssertionSpanResult{
 								{
