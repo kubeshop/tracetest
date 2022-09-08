@@ -1,6 +1,6 @@
 VERSION ?= "dev"
 TRACETEST_ENV ?= "dev"
-POKE_API?= ""
+POKE_API?= "http://demo-api:8081"
 GO_LDFLAGS := $(shell echo \
 		-X "'github.com/kubeshop/tracetest/server/app.Version=$(VERSION)'" \
 		-X "'github.com/kubeshop/tracetest/server/app.Env=$(TRACETEST_ENV)'" \
