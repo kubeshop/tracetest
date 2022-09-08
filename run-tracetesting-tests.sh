@@ -27,7 +27,7 @@ if [ "$RESTART" == "yes" ]; then
 fi
 docker compose -f docker-compose.yaml up -d --build --remove-orphans
 docker compose -f docker-compose.yaml -f local-config/docker-compose.testrunner.yaml build
-docker compose -f docker-compose.yaml -f local-config/docker-compose.testrunner.yaml run cypress
+docker compose -f docker-compose.yaml -f local-config/docker-compose.testrunner.yaml run testrunner
 
 if [ "$STOP" == "yes" ]; then
   docker compose -f docker-compose.yaml stop
