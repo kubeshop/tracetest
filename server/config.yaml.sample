@@ -7,6 +7,11 @@ poolingConfig:
 googleAnalytics:
   enabled: true
 
+demo:
+  enabled: true
+  baseUrl: http://demo-api
+  type: pokeshop
+
 telemetry:
   dataStores:
     jaeger:

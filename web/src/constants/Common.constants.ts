@@ -41,3 +41,11 @@ export enum RouterSearchFields {
   SelectedAssertion = 'selectedAssertion',
   SelectedSpan = 'selectedSpan',
 }
+
+export enum SupportedPlugins {
+  REST = 'REST',
+  Messaging = 'Messaging',
+  GRPC = 'GRPC',
+  Postman = 'Postman',
+  OpenAPI = 'OpenAPI',
+}

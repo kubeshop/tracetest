@@ -1,5 +1,5 @@
 import {ComponentStory, ComponentMeta} from '@storybook/react';
-import {SupportedPlugins} from 'constants/Plugins.constants';
+import {SupportedPlugins} from 'constants/Common.constants';
 
 import CreateTestSteps from '../CreateTestSteps';
 

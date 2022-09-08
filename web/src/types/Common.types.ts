@@ -11,6 +11,10 @@ export interface IEnv {
   serverID: string;
   appVersion: string;
   env: string;
+  pokeshopDemoEnabled: string;
+  otelDemoEnabled: string;
+  pokeshopDemoHostname: string;
+  otelDemoEndpoints: string;
 }
 
 export type Modify<T, R> = Omit<T, keyof R> & R;

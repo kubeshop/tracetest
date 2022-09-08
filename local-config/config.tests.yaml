@@ -1,8 +1,15 @@
+---
 postgresConnString: "host=postgres user=postgres password=postgres port=5432 sslmode=disable"
 
 poolingConfig:
   maxWaitTimeForTrace: 30s
   retryDelay: 500ms
+
+demo:
+  pokeshopDemoEnabled: true
+  otelDemoEnabled: true
+  pokeshopDemoHostname: demo-api
+  otelDemoEndpoints: '{"frontend": "otel-frontend:8084", "productCatalog": "otel-productcatalogservice:3550", "checkout": "otel-checkoutservice:5050", "cart": "otel-cartservice:7070"}'
 
 googleAnalytics:
   enabled: false

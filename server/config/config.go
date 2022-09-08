@@ -1,6 +1,7 @@
 package config
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"time"
@@ -17,6 +18,14 @@ type (
 		PoolingConfig      PoolingConfig   `yaml:",omitempty" mapstructure:"poolingConfig"`
 		GA                 GoogleAnalytics `yaml:",omitempty" mapstructure:"googleAnalytics"`
 		Telemetry          Telemetry       `yaml:",omitempty" mapstructure:"telemetry"`
+		Demo               Demo            `yaml:",omitempty" mapstructure:"demo"`
+	}
+
+	Demo struct {
+		PokeshopDemoEnabled  bool   `yaml:",omitempty" mapstructure:"pokeshopDemoEnabled"`
+		OtelDemoEnabled      bool   `yaml:",omitempty" mapstructure:"otelDemoEnabled"`
+		PokeshopDemoHostname string `yaml:",omitempty" mapstructure:"pokeshopDemoHostname"`
+		OtelDemoEndpoints    string `yaml:",omitempty" mapstructure:"otelDemoEndpoints"`
 	}
 
 	GoogleAnalytics struct {
@@ -131,6 +140,30 @@ func (c Config) getExporter(name string) (*TelemetryExporterOption, error) {
 	}
 
 	return &exporterConfig, nil
+}
+
+func (c Config) GetFrontendConfig(analyticsKey string, serverID string, version string, env string) map[string]string {
+	return map[string]string{
+		"AnalyticsKey":         analyticsKey,
+		"AnalyticsEnabled":     fmt.Sprintf("%t", c.GA.Enabled),
+		"ServerPathPrefix":     fmt.Sprintf("%s/", c.Server.PathPrefix),
+		"ServerID":             serverID,
+		"AppVersion":           version,
+		"Env":                  env,
+		"PokeshopDemoEnabled":  fmt.Sprintf("%t", c.Demo.PokeshopDemoEnabled),
+		"OtelDemoEnabled":      fmt.Sprintf("%t", c.Demo.OtelDemoEnabled),
+		"PokeshopDemoHostname": c.Demo.PokeshopDemoHostname,
+		"OtelDemoEndpoints":    jsonEscape(c.Demo.OtelDemoEndpoints),
+	}
+}
+
+func jsonEscape(text string) string {
+	b, err := json.Marshal(text)
+	if err != nil {
+		panic(err)
+	}
+	s := string(b)
+	return s[1 : len(s)-1]
 }
 
 func FromFile(file string) (Config, error) {

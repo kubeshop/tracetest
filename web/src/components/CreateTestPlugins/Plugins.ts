@@ -1,5 +1,5 @@
 import {IPluginComponentMap} from 'types/Plugins.types';
-import {SupportedPlugins} from 'constants/Plugins.constants';
+import {SupportedPlugins} from 'constants/Common.constants';
 import Postman from './Postman';
 import Rest from './Rest';
 import Grpc from './Grpc';

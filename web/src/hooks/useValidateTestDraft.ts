@@ -1,7 +1,7 @@
 import {useCallback, useState} from 'react';
 import TestService from 'services/Test.service';
 import {TDraftTest} from 'types/Test.types';
-import {SupportedPlugins} from 'constants/Plugins.constants';
+import {SupportedPlugins} from 'constants/Common.constants';
 
 interface IProps {
   isDefaultValid?: boolean;

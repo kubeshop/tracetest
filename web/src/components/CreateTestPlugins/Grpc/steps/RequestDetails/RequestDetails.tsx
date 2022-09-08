@@ -11,13 +11,13 @@ const RequestDetails = () => {
   const [form] = Form.useForm<IRpcValues>();
   const {onNext, pluginName, draftTest} = useCreateTest();
   const {isValid, onValidate, setIsValid} = useValidateTestDraft({pluginName});
-  const {url = '', message = '', method = '', auth, metadata = [{}], protoFile} = draftTest as IRpcValues;
 
   const handleNext = useCallback(() => {
     form.submit();
   }, [form]);
 
   const onRefreshData = useCallback(async () => {
+    const {url = '', message = '', method = '', auth, metadata = [{}], protoFile} = draftTest as IRpcValues;
     form.setFieldsValue({url, auth, metadata, message, method, protoFile});
 
     try {
@@ -26,7 +26,7 @@ const RequestDetails = () => {
     } catch (err) {
       setIsValid(false);
     }
-  }, [auth, form, message, metadata, method, protoFile, setIsValid, url]);
+  }, [draftTest, form, setIsValid]);
 
   useEffect(() => {
     onRefreshData();
