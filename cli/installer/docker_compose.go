@@ -236,7 +236,7 @@ func getCollectorConfigFileContents(ui UI, config configuration) []byte {
 	case "jaeger":
 		exporter = "jaeger"
 		exporters["jaeger"] = msa{
-			"endpoint": config.String("tracetest.backend.endpoint"),
+			"endpoint": config.String("tracetest.backend.endpoint.query"),
 			"tls": msa{
 				"insecure": config.Bool("tracetest.backend.tls.insecure"),
 			},
@@ -331,6 +331,8 @@ func fixOtelCollectorContainer(config configuration, project *types.Project) err
 	}
 
 	ocs.Volumes[0].Source = path.Join(config.String("output.dir"), otelCollectorConfigFilename)
+	je := config.String("tracetest.backend.endpoint.collector")
+	ocs.Environment["JAEGER_ENDPOINT"] = &je
 
 	return nil
 }
