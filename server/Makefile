@@ -1,10 +1,10 @@
 VERSION ?= "dev"
 TRACETEST_ENV ?= "dev"
-POKE_API?= "dev"
+POKE_API?= ""
 GO_LDFLAGS := $(shell echo \
 		-X "'github.com/kubeshop/tracetest/server/app.Version=$(VERSION)'" \
 		-X "'github.com/kubeshop/tracetest/server/app.Env=$(TRACETEST_ENV)'" \
-		-X "'github.com/kubeshop/tracetest/server/app.PokeApi=$(POKE_API)'" \
+		-X "'github.com/kubeshop/tracetest/server/app.PokeAPI=$(POKE_API)'" \
 		-X "'github.com/kubeshop/tracetest/server/analytics.SecretKey=$(ANALYTICS_BE_KEY)'" \
 		-X "'github.com/kubeshop/tracetest/server/analytics.FrontendKey=$(ANALYTICS_FE_KEY)'" \
 	| sed 's/ / /g')

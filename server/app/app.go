@@ -30,7 +30,7 @@ import (
 var (
 	Version = "dev"
 	Env     = "dev"
-	PokeApi = "dev"
+	PokeAPI = "dev"
 )
 
 type App struct {
@@ -160,7 +160,7 @@ func (a *App) Start() error {
 				"AnalyticsKey":     analytics.FrontendKey,
 				"AnalyticsEnabled": fmt.Sprintf("%t", a.config.GA.Enabled),
 				"ServerPathPrefix": fmt.Sprintf("%s/", a.config.Server.PathPrefix),
-				"PokeApi":          PokeApi,
+				"PokeAPI":          PokeAPI,
 				"ServerID":         serverID,
 				"AppVersion":       Version,
 				"Env":              Env,

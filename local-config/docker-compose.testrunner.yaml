@@ -18,7 +18,6 @@ services:
         condition: service_healthy
       demo-rpc:
         condition: service_healthy
-      - tracetest
   cypress:
     image: cypress/browsers:node16.14.2-slim-chrome100-ff99-edge
     entrypoint: [ "/bin/sh", "-c" , "npm ci && npx cypress run --config baseUrl=http://tracetest:8080" ]
