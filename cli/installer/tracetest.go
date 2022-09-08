@@ -173,10 +173,8 @@ func fixConfigs(conf []byte) ([]byte, error) {
 		return yaml.Marshal(encoded)
 	}
 
-	fmt.Printf("1 **** \n %+v\n", target["tlssetting"])
 	target["tls"] = target["tlssetting"]
 	delete(target, "tlssetting")
-	fmt.Printf("1 **** \n %+v\n", target["tls"])
 
 	encoded["telemetry"].(msa)["datastores"].(msa)[key].(msa)[key] = target
 
