@@ -215,13 +215,14 @@ func filterContainers(ui UI, project *types.Project, included []string) {
 	project.Services = containers
 }
 
+type msa = map[string]any
+
 func getCollectorConfigFileContents(ui UI, config configuration) []byte {
 	contents, err := getFileContentsForVersion("local-config/collector.config.yaml", cliConfig.Version)
 	if err != nil {
 		ui.Exit(fmt.Errorf("cannot get collector config file: %w", err).Error())
 	}
 
-	type msa = map[string]any
 	otelConfig := msa{}
 
 	err = yaml.Unmarshal(contents, &otelConfig)

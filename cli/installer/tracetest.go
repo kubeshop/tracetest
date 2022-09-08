@@ -139,7 +139,48 @@ func getTracetestConfigFileContents(ui UI, config configuration) []byte {
 		ui.Exit(fmt.Errorf("cannot marshal tracetest config file: %w", err).Error())
 	}
 
+	out, err = fixConfigs(out)
+	if err != nil {
+		ui.Exit(fmt.Errorf("cannot fix tracertest config: %w", err).Error())
+	}
+
 	return out
+}
+
+func fixConfigs(conf []byte) ([]byte, error) {
+	encoded := msa{}
+
+	err := yaml.Unmarshal(conf, &encoded)
+	if err != nil {
+		return nil, fmt.Errorf("cannot decode mapstructure: %w", err)
+	}
+
+	ds := encoded["telemetry"].(msa)["datastores"].(msa)
+
+	var (
+		target msa
+		key    string
+	)
+
+	if d, ok := ds["jaeger"]; ok {
+		target = d.(msa)["jaeger"].(msa)
+		key = "jaeger"
+	} else if d, ok := ds["tempo"]; ok {
+		target = d.(msa)["tempo"].(msa)
+		key = "tempo"
+	} else {
+		// we only need to fix tempo/jaeger
+		return yaml.Marshal(encoded)
+	}
+
+	fmt.Printf("1 **** \n %+v\n", target["tlssetting"])
+	target["tls"] = target["tlssetting"]
+	delete(target, "tlssetting")
+	fmt.Printf("1 **** \n %+v\n", target["tls"])
+
+	encoded["telemetry"].(msa)["datastores"].(msa)[key].(msa)[key] = target
+
+	return yaml.Marshal(encoded)
 }
 
 func telemetryConfig(ui UI, conf configuration) serverConfig.Telemetry {
