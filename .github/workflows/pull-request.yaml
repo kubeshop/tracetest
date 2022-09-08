@@ -210,7 +210,7 @@ jobs:
               timeout 30s bash -c 'until nc -z -w 1 localhost '$PORT' > /dev/null 2>&1; do echo "port '$PORT' not available, retry"; sleep 1; done; echo "port '$PORT' ready"'
           }
 
-          checkPort "3000"
+          checkPort "8080"
 
       - name: Cache dependencies
         id: cache-nodemodules
