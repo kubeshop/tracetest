@@ -71,6 +71,11 @@ func dockerComposeInstaller(config configuration, ui UI) {
 	dockerComposeFile := getDockerComposeFileContents(ui, config)
 	dockerComposeFName := filepath.Join(dir, dockerComposeFilename)
 
+	dockerCmd := fmt.Sprintf("docker compose -f %s up -d", dockerComposeFName)
+	if f := getCWDDockerComposeIfExists(); f != "" {
+		dockerCmd = fmt.Sprintf("docker compose -f %s -f %s up -d", f, dockerComposeFName)
+	}
+
 	createDir(ui, dir)
 	saveFile(ui, dockerComposeFName, dockerComposeFile)
 	saveFile(ui, filepath.Join(dir, tracetestConfigFilename), tracetestConfigFile)
@@ -80,15 +85,29 @@ func dockerComposeInstaller(config configuration, ui UI) {
 	ui.Println(fmt.Sprintf(`
 To start tracetest:
 
-  docker compose -f %s up -d
+	%s
 
 Then, use your browser to navigate to:
 
   http://localhost:8080
 
 Happy TraceTesting =)
-`, dockerComposeFName))
+`, dockerCmd))
 
+}
+
+func getCWDDockerComposeIfExists() string {
+	opts := []string{
+		"./docker-compose.yaml",
+		"./docker-compose.yml",
+	}
+	for _, f := range opts {
+		if fileExists(f) {
+			return f
+		}
+	}
+
+	return ""
 }
 
 func getDockerComposeFileContents(ui UI, config configuration) []byte {
