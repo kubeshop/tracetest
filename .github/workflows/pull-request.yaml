@@ -154,8 +154,7 @@ jobs:
           echo "http://localhost:8080" | ./tracetest configure -g
       - name: Run example test
         run: |
-
-          ./cli/tracetest test run -d examples/${{ matrix.example_dir }}/tests/list-tests.yaml
+          ./cli/tracetest test run -d examples/${{ matrix.example_dir }}/tests/list-tests.yaml --wait-for-result
 
   deploy:
     needs:  [unit-test-frontend, unit-test-backend, unit-test-cli, build-docker]
