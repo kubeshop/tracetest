@@ -1,6 +1,6 @@
-import pokeshopProtoData from 'assets/pokeshop.proto.json';
-import otelProtoData from 'assets/otel-demo.proto.json';
-import pokeshopPostmanData from 'assets/pokeshop.postman_collection.json';
+import pokeshopProtoData from '../assets/pokeshop.proto.json';
+import otelProtoData from '../assets/otel-demo.proto.json';
+import pokeshopPostmanData from '../assets/pokeshop.postman_collection.json';
 import {HTTP_METHOD, SupportedPlugins} from './Common.constants';
 
 const pokeshopProtoFile = new File([pokeshopProtoData?.proto], 'pokeshop.proto');
@@ -8,7 +8,7 @@ const otelProtoFile = new File([otelProtoData?.proto], 'otel-demo.proto');
 const pokeshopPostmanFile = new File([JSON.stringify(pokeshopPostmanData)], 'pokeshop.postman_collection.json');
 
 const {
-  pokeshopDemoEnabled = 'false',
+  pokeshopDemoEnabled = 'true',
   pokeshopDemoHostname = '',
   otelDemoEndpoints = '{}',
   otelDemoEnabled = 'false',

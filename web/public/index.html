@@ -43,7 +43,7 @@
           serverID: getTemplateValue('{{ .ServerID }}', ''),
           appVersion: getTemplateValue('{{ .AppVersion }}', ''),
           env: getTemplateValue('{{ .Env }}', ''),
-          pokeshopDemoEnabled: getTemplateValue('{{ .PokeshopDemoEnabled }}', 'false'),
+          pokeshopDemoEnabled: getTemplateValue('{{ .PokeshopDemoEnabled }}', 'true'),
           otelDemoEnabled: getTemplateValue('{{ .OtelDemoEnabled }}', 'false'),
           pokeshopDemoHostname: getTemplateValue('{{ .PokeshopDemoHostname }}', 'demo-pokemon-api.demo.svc.cluster.local'),
           otelDemoEndpoints: getTemplateValue('{{ .OtelDemoEndpoints }}', '{}'),
