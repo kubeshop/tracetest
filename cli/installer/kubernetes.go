@@ -3,6 +3,7 @@ package installer
 import (
 	"encoding/csv"
 	"fmt"
+	"os"
 	"strings"
 )
 
@@ -22,6 +23,105 @@ var kubernetes = installer{
 
 func kubernetesInstaller(config configuration, ui UI) {
 	trackInstall("kubernetes", config, nil)
+
+	execCmdIgnoreErrors(kubectlCmd(config, "create namespace "+config.String("k8s.namespace")))
+
+	installJaeger(config, ui)
+	installCollector(config, ui)
+}
+
+const (
+	jaegerOperatorYaml = "https://github.com/jaegertracing/jaeger-operator/releases/download/v1.32.0/jaeger-operator.yaml"
+	jaegerManifest     = `
+apiVersion: jaegertracing.io/v1
+kind: Jaeger
+metadata:
+  name: jaeger
+`
+)
+
+func installCollector(config configuration, ui UI) {
+	if !config.Bool("tracetest.collector.install") {
+		return
+	}
+
+}
+
+func installJaeger(config configuration, ui UI) {
+	if !config.Bool("tracetest.backend.install") {
+		return
+	}
+
+	// operator
+	if crdExists(config, "jaegers.jaegertracing.io") {
+		ui.Warning("Jaeger operator CRD exists, I will not install it")
+	} else {
+		execCmd(
+			kubectlCmd(config, "--namespace observability create -f "+jaegerOperatorYaml),
+			ui,
+		)
+
+		execCmd(
+			kubectlCmd(config, "--namespace observability wait --for=condition=ready pod -l name=jaeger-operator --timeout 5m"),
+			ui,
+		)
+
+		ui.Println(ui.Green("✔ jaeger-operator ready"))
+	}
+
+	// instance
+	jmf := createTmpFile("tracetest-jaeger", jaegerManifest, ui)
+	defer os.Remove(jmf.Name())
+
+	execCmd(
+		kubectlNamespaceCmd(config, "apply -f "+jmf.Name()),
+		ui,
+	)
+	ui.Println(ui.Green("✔ jaeger instance ready"))
+
+}
+
+func createTmpFile(name, contents string, ui UI) *os.File {
+	f, err := os.CreateTemp("", name)
+	if err != nil {
+		ui.Exit(fmt.Sprintf("Cannot create temp %s file: %s", name, err))
+	}
+
+	if _, err := f.Write([]byte(contents)); err != nil {
+		ui.Exit(fmt.Sprintf("Cannot write temp %s file: %s", name, err))
+	}
+
+	if err := f.Close(); err != nil {
+		ui.Exit(fmt.Sprintf("Cannot close temp %s file: %s", name, err))
+	}
+
+	return f
+}
+
+func crdExists(config configuration, crd string) bool {
+	cmd := fmt.Sprintf(
+		"%s > /dev/null 2>&1; echo $?",
+		kubectlCmd(config, "get crd "+crd),
+	)
+	out := getCmdOutputClean(cmd)
+
+	// if output is 0, it means the CRD exists
+	return out == "0"
+}
+
+func kubectlNamespaceCmd(config configuration, cmd ...string) string {
+	ns := "--namespace " + config.String("k8s.namespace")
+
+	return kubectlCmd(config, append([]string{ns}, cmd...)...)
+}
+
+func kubectlCmd(config configuration, cmd ...string) string {
+	return fmt.Sprintf(
+		"kubectl --kubeconfig %s --context %s %s",
+		config.String("k8s.kubeconfig"),
+		config.String("k8s.context"),
+		strings.Join(cmd, " "),
+	)
 }
 
 type k8sContext struct {
@@ -30,7 +130,10 @@ type k8sContext struct {
 }
 
 func getK8sContexts(conf configuration, ui UI) []k8sContext {
-	output := getCmdOutput(`kubectl config get-contexts --no-headers  | tr -s " " | sed -e "s/ /,/g"`)
+	output := getCmdOutput(fmt.Sprintf(
+		`kubectl --kubeconfig %s config get-contexts --no-headers  | tr -s " " | sed -e "s/ /,/g"`,
+		conf.String("k8s.kubeconfig"),
+	))
 
 	records, err := csv.NewReader(strings.NewReader(output)).ReadAll()
 	if err != nil {
@@ -65,13 +168,13 @@ func configureKubernetes(conf configuration, ui UI) configuration {
 		if c.selected {
 			defaultIndex = i
 		}
-		options = append(options, option{text: c.name, fn: func(ui UI) {
-			conf.set("k8s.context", c.name)
-		}})
+		options = append(options, option{text: c.name, fn: func(ui UI) {}})
 	}
 
-	ui.Select("Kubectl context", options, defaultIndex)
-	ui.TextInput("Namespace", "tracetest")
+	selected := ui.Select("Kubectl context", options, defaultIndex)
+	conf.set("k8s.context", selected.text)
+
+	conf.set("k8s.namespace", ui.TextInput("Namespace", "tracetest"))
 	expose := ui.Confirm("Do you want to expose tracetest (via ingress)?", false)
 	if expose {
 		conf.set("k8s.ingress-host", ui.TextInput("Host", ""))
