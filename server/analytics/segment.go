@@ -10,7 +10,9 @@ var (
 )
 
 func newSegmentTracker(hostname, serverID, appVersion, env string) Tracker {
-	client := segment.New(SecretKey)
+	client, _ := segment.NewWithConfig(SecretKey, segment.Config{
+		BatchSize: 1,
+	})
 
 	client.Enqueue(segment.Identify{
 		Traits: segment.NewTraits().
