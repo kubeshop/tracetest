@@ -129,6 +129,27 @@ jobs:
         rm -rf /tmp/.buildx-cache
         mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
+  test-examples:
+    needs:  [build-docker]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        example_dir: [tracetest-opensearch, tracetest-tempo]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build example
+        run: |
+          cd examples/${{ matrix.example_dir }}
+          sed -i 's/kubeshop\/tracetest:.*/kubeshop\/tracetest:${{ github.event.pull_request.number }}/g' docker-compose.yml
+          docker-compose up -d
+      - name: Build CLI
+        run: |
+          cd cli
+          go build -o ./tracetest main.go
+      - name: Run example test
+        run: |
+          ./cli/tracetest test run examples/${{ matrix.example_dir }}/tests/list-tests.yaml
+
   deploy:
     needs:  [unit-test-frontend, unit-test-backend, unit-test-cli, build-docker]
     name: Deploy
