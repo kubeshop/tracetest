@@ -147,6 +147,7 @@ jobs:
           cd examples/${{ matrix.example_dir }}
           sed -i 's/kubeshop\/tracetest:.*/kubeshop\/tracetest:pr-${{ github.event.pull_request.number }}/g' docker-compose.yml
           docker-compose up -d
+          timeout 30 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:8080)" != "200" ]]; do sleep 5; done' || false
       - name: Build CLI
         run: |
           cd cli
