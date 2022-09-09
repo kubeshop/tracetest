@@ -9,10 +9,10 @@ googleAnalytics:
 
 telemetry:
   dataStores:
-    tempo:
-      type: tempo
-      tempo:
-        endpoint: tempo:9095
+    jaeger:
+      type: jaeger
+      jaeger:
+        endpoint: jaeger:16685
         tls:
           insecure: true
 
@@ -27,6 +27,6 @@ telemetry:
 
 server:
   telemetry:
-    dataStore: tempo
+    dataStore: jaeger
     exporter: collector
     applicationExporter: collector
