@@ -1,14 +1,14 @@
 # Command Line Tool
 
-Our web interface makes it easier to visualize your traces and add assertions, but sometimes we need a CLI to automate our work. We developed the CLI thinking about users creating tests and executing them every time a new change is made in the system, so you can use Tracetest to detect regressions and check your service SLOs.
+Our web interface makes it easier to visualize your traces and add assertions, but sometimes a CLI is needed for automation. The CLI was developed for users creating tests and executing them each time a change is made in the system, so Tracetest can detect regressions and check service SLOs.
 
 
-## Available Commands
+## **Available Commands**
 
 
 Here is a list of all available commands and how to use them:
 
-### Configure
+### **Configure**
 Configure your CLI to connect to your Tracetest server.
 
 
@@ -24,7 +24,7 @@ or
 echo "your-server-url" | tracetest configure
 ```
 
-### Test List
+### **Test List**
 
 
 Allows you to list all tests.
@@ -37,14 +37,14 @@ Allows you to list all tests.
 tracetest test list
 ```
 
-### Run a Test
+### **Run a Test**
 
 Allows you to run a test by referencing a [test definition file](/docs/test-definition-file.md).
 
-> Note: If your definition file contains the field `id`, this command will not create a new test. Instead, it will update the test with that ID. If that test doesn't exist, a new one will be created with that ID on your server.
+> Note: If the definition file contains the field `id`, this command will not create a new test. Instead, it will update the test with that ID. If that test doesn't exist, a new one will be created with that ID on the server.
 
 
-Every time you run the test, we detect changes, and if any change is introduced, we use our [versioning](/docs/versioning.md) mechanism to ensure that it will not cause problems with your old test runs.
+Every time the test is run, changes are detected and, if any change is introduced, we use Tractest's [versioning](/docs/versioning.md) mechanism to ensure that it will not cause problems with previous test runs.
 
 **How to Use**:
 
