@@ -147,7 +147,6 @@ jobs:
           cd examples/${{ matrix.example_dir }}
           sed -i 's/kubeshop\/tracetest:.*/kubeshop\/tracetest:pr-${{ github.event.pull_request.number }}/g' docker-compose.yml
           docker-compose up -d
-          timeout 30 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:8080)" != "200" ]]; do sleep 5; done' || false
       - name: Build CLI
         run: |
           cd cli
@@ -155,6 +154,7 @@ jobs:
           echo "http://localhost:8080" | ./tracetest configure -g
       - name: Run example test
         run: |
+          timeout 30 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:8080)" != "200" ]]; do sleep 5; done' || false
           ./cli/tracetest test run -d examples/${{ matrix.example_dir }}/tests/list-tests.yaml --wait-for-result
 
   deploy:
