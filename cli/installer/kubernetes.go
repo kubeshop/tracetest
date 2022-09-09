@@ -21,7 +21,7 @@ var kubernetes = installer{
 }
 
 func kubernetesInstaller(config configuration, ui UI) {
-	fmt.Println("********", config)
+	trackInstall("kubernetes", config, nil)
 }
 
 type k8sContext struct {

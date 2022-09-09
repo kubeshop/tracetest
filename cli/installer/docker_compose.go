@@ -13,7 +13,6 @@ import (
 
 	"github.com/compose-spec/compose-go/loader"
 	"github.com/compose-spec/compose-go/types"
-	"github.com/kubeshop/tracetest/cli/analytics"
 	cliConfig "github.com/kubeshop/tracetest/cli/config"
 	"golang.org/x/exp/slices"
 	"gopkg.in/yaml.v3"
@@ -68,14 +67,7 @@ const (
 )
 
 func dockerComposeInstaller(config configuration, ui UI) {
-	analytics.Track("Apply", "installer", map[string]string{
-		"type":                    "docker-compose",
-		"install_backend":         fmt.Sprintf("%t", config.Bool("tracetest.backend.install")),
-		"install_collector":       fmt.Sprintf("%t", config.Bool("tracetest.collector.install")),
-		"install_demo":            fmt.Sprintf("%t", config.Bool("demo.enable")),
-		"enable_server_analytics": fmt.Sprintf("%t", config.Bool("tracetest.analytics")),
-		"backend_type":            config.String("tracetest.backend.type"),
-	})
+	trackInstall("docker-compose", config, nil)
 
 	dir := config.String("output.dir")
 	force := Force

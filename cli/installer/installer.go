@@ -121,3 +121,20 @@ func (c configuration) String(key string) string {
 }
 
 type configurator func(config configuration, ui UI) configuration
+
+func trackInstall(name string, config configuration, extra map[string]string) {
+	props := map[string]string{
+		"type":                    "kubernetes",
+		"install_backend":         fmt.Sprintf("%t", config.Bool("tracetest.backend.install")),
+		"install_collector":       fmt.Sprintf("%t", config.Bool("tracetest.collector.install")),
+		"install_demo":            fmt.Sprintf("%t", config.Bool("demo.enable")),
+		"enable_server_analytics": fmt.Sprintf("%t", config.Bool("tracetest.analytics")),
+		"backend_type":            config.String("tracetest.backend.type"),
+	}
+
+	for k, v := range extra {
+		props[k] = v
+	}
+
+	analytics.Track("Apply", "installer", props)
+}
