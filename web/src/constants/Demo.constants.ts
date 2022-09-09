@@ -12,7 +12,7 @@ const {
   pokeshopDemoHostname = '',
   otelDemoEndpoints = '{}',
   otelDemoEnabled = 'false',
-} = window.ENV;
+} = window.ENV || {};
 
 const isPokeshopEnabled = pokeshopDemoEnabled === 'true';
 const isOtelEnabled = otelDemoEnabled === 'true';
