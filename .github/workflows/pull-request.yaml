@@ -133,6 +133,7 @@ jobs:
     needs:  [build-docker]
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         example_dir: [tracetest-jaeger, tracetest-opensearch, tracetest-tempo]
     steps:
