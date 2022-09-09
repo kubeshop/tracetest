@@ -124,6 +124,7 @@ jobs:
         build-args: |
           VERSION=pr-${{ github.event.pull_request.number }}
           TRACETEST_ENV=pr
+          POKE_API=http://demo-pokemon-api.demo.svc.cluster.local
     - name: Update docker cache
       run: |
         rm -rf /tmp/.buildx-cache
