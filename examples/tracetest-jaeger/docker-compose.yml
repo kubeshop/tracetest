@@ -14,6 +14,11 @@ services:
                 condition: service_healthy
             otel-collector:
                 condition: service_started
+        healthcheck:
+            test: ["CMD", "wget", "--spider", "localhost:8080"]
+            interval: 1s
+            timeout: 3s
+            retries: 60
 
     postgres:
         image: postgres:14
