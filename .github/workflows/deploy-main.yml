@@ -62,7 +62,7 @@ jobs:
           ANALYTICS_FE_KEY=${{ secrets.ANALYTICS_FE_KEY }}
           VERSION=sha-${{ steps.vars.outputs.sha_short }}
           TRACETEST_ENV=main
-          POKE_API=http://demo-api:8081
+          POKE_API=http://demo-pokemon-api.demo.svc.cluster.local
           PUBLIC_PATH=/
 
   deploy-beta:
