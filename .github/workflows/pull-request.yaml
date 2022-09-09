@@ -134,7 +134,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        example_dir: [tracetest-opensearch, tracetest-tempo]
+        example_dir: [tracetest-jaeger, tracetest-opensearch, tracetest-tempo]
     steps:
       - name: Checkout
         uses: actions/checkout@v3

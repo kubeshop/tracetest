@@ -1,0 +1,32 @@
+postgresConnString: "host=postgres user=postgres password=postgres port=5432 sslmode=disable"
+
+poolingConfig:
+  maxWaitTimeForTrace: 10m
+  retryDelay: 5s
+
+googleAnalytics:
+  enabled: true
+
+telemetry:
+  dataStores:
+    tempo:
+      type: tempo
+      tempo:
+        endpoint: tempo:9095
+        tls:
+          insecure: true
+
+  exporters:
+    collector:
+      serviceName: tracetest
+      sampling: 100 # 100%
+      exporter:
+        type: collector
+        collector:
+          endpoint: otel-collector:4317
+
+server:
+  telemetry:
+    dataStore: tempo
+    exporter: collector
+    applicationExporter: collector
