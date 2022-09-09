@@ -40,7 +40,7 @@ services:
         volumes:
             - ./collector.config.yaml:/otel-local-config.yaml
         depends_on:
-            - tempo
+            - jaeger
 
     jaeger:
         image: jaegertracing/all-in-one:latest
