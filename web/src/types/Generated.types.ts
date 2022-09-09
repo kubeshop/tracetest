@@ -68,6 +68,10 @@ export interface paths {
     /** Set spec for a particular test */
     put: operations["setTestSpecs"];
   };
+  "/tests/{testId}/version/{version}": {
+    /** get a test specific version */
+    get: operations["getTestVersion"];
+  };
   "/tests/{testId}/version/{version}/definition.yaml": {
     /** Get the test definition as an YAML file */
     get: operations["getTestVersionDefinitionFile"];
@@ -421,6 +425,25 @@ export interface operations {
       };
     };
   };
+  /** get a test specific version */
+  getTestVersion: {
+    parameters: {
+      path: {
+        testId: string;
+        version: number;
+      };
+    };
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["tests.yaml"]["components"]["schemas"]["Test"];
+        };
+      };
+      /** problem with getting a test */
+      500: unknown;
+    };
+  };
   /** Get the test definition as an YAML file */
   getTestVersionDefinitionFile: {
     parameters: {
@@ -544,13 +567,8 @@ export interface external {
         TestSpecs: {
           specs?: {
             selector?: external["tests.yaml"]["components"]["schemas"]["Selector"];
-            assertions?: external["tests.yaml"]["components"]["schemas"]["Assertion"][];
+            assertions?: string[];
           }[];
-        };
-        Assertion: {
-          attribute?: string;
-          comparator?: string;
-          expected?: string;
         };
         TestRun: {
           /** Format: uuid */
@@ -602,7 +620,7 @@ export interface external {
           }[];
         };
         AssertionResult: {
-          assertion?: external["tests.yaml"]["components"]["schemas"]["Assertion"];
+          assertion?: string;
           allPassed?: boolean;
           spanResults?: external["tests.yaml"]["components"]["schemas"]["AssertionSpanResult"][];
         };

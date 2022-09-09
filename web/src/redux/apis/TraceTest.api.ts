@@ -57,7 +57,7 @@ const TraceTestAPI = createApi({
       providesTags: result => [{type: Tags.TEST, id: result?.id}],
       transformResponse: (rawTest: TRawTest) => Test(rawTest),
     }),
-    getTestVersionById: build.query<TTest, {testId: string, version: number}>({
+    getTestVersionById: build.query<TTest, {testId: string; version: number}>({
       query: ({testId, version}) => `/tests/${testId}/version/${version}`,
       providesTags: result => [{type: Tags.TEST, id: result?.id}],
       transformResponse: (rawTest: TRawTest) => Test(rawTest),
@@ -127,16 +127,29 @@ const TraceTestAPI = createApi({
       transformResponse: (rawTestRun: TRawTestRun) => TestRun(rawTestRun),
     }),
     dryRun: build.mutation<TAssertionResults, {testId: string; runId: string; testDefinition: Partial<TRawTestSpecs>}>({
-      query: ({testId, runId, testDefinition}) => ({
-        url: `/tests/${testId}/run/${runId}/dry-run`,
-        method: HTTP_METHOD.PUT,
-        body: testDefinition,
-      }),
+      query: ({testId, runId, testDefinition}) => {
+        return {
+          url: `/tests/${testId}/run/${runId}/dry-run`,
+          method: HTTP_METHOD.PUT,
+          body: {
+            specs: (testDefinition?.specs || []).map(spec => ({
+              ...spec,
+              assertions: (spec?.assertions || []).map(a => `${a?.attribute} ${a?.comparator} "${a?.expected}"`),
+            })),
+          },
+        };
+      },
       transformResponse: (rawTestResults: TRawAssertionResults) => AssertionResults(rawTestResults),
     }),
     deleteRunById: build.mutation<TTest, {testId: string; runId: string}>({
       query: ({testId, runId}) => ({url: `/tests/${testId}/run/${runId}`, method: 'DELETE'}),
-      invalidatesTags: (result, error, {testId}) => [{type: Tags.TEST_RUN}, {type: Tags.TEST, id: `${testId}-LIST`}],
+      invalidatesTags: (result, error, {testId}) => [
+        {type: Tags.TEST_RUN},
+        {
+          type: Tags.TEST,
+          id: `${testId}-LIST`,
+        },
+      ],
     }),
     getJUnitByRunId: build.query<string, {testId: string; runId: string}>({
       query: ({testId, runId}) => ({url: `/tests/${testId}/run/${runId}/junit.xml`, responseHandler: 'text'}),
