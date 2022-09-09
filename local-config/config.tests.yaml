@@ -7,7 +7,7 @@ poolingConfig:
 
 demo:
   pokeshopDemoEnabled: true
-  otelDemoEnabled: true
+  otelDemoEnabled: false
   pokeshopDemoHostname: demo-api
   otelDemoEndpoints: '{"frontend": "otel-frontend:8084", "productCatalog": "otel-productcatalogservice:3550", "checkout": "otel-checkoutservice:5050", "cart": "otel-cartservice:7070"}'
 

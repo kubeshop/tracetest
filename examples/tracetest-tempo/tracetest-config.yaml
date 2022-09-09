@@ -7,6 +7,10 @@ poolingConfig:
 googleAnalytics:
   enabled: true
 
+demo:
+  pokeshopDemoEnabled: true
+  otelDemoEnabled: false
+
 telemetry:
   dataStores:
     tempo:
