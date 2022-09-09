@@ -228,12 +228,12 @@ export const OtelDemo = {
 
 export const DemoByPluginMap = {
   [SupportedPlugins.REST]: [
-    ...((isOtelEnabled && OtelDemo[SupportedPlugins.REST]) || []),
     ...((isPokeshopEnabled && PokeshopDemo[SupportedPlugins.REST]) || []),
+    ...((isOtelEnabled && OtelDemo[SupportedPlugins.REST]) || []),
   ],
   [SupportedPlugins.GRPC]: [
-    ...((isOtelEnabled && OtelDemo[SupportedPlugins.GRPC]) || []),
     ...((isPokeshopEnabled && PokeshopDemo[SupportedPlugins.GRPC]) || []),
+    ...((isOtelEnabled && OtelDemo[SupportedPlugins.GRPC]) || []),
   ],
   [SupportedPlugins.Postman]: (isPokeshopEnabled && PokeshopDemo[SupportedPlugins.Postman]) || [],
 };
