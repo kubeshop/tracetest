@@ -21,7 +21,10 @@ func Init(conf config.Config) {
 		return
 	}
 
-	client = segment.New(SecretKey)
+	client, _ = segment.NewWithConfig(SecretKey, segment.Config{
+		BatchSize: 1,
+	})
+
 	id, err := machineid.ProtectedID("tracetest")
 	if err == nil {
 		// only use id if available.
@@ -34,6 +37,9 @@ func Init(conf config.Config) {
 			Set("clientID", mid).
 			Set("env", config.Env).
 			Set("appVersion", config.Version),
+		Context: &segment.Context{
+			Direct: true,
+		},
 	})
 }
 
@@ -57,6 +63,9 @@ func Track(name, category string, props map[string]string) error {
 		Event:      name,
 		UserId:     mid,
 		Properties: p,
+		Context: &segment.Context{
+			Direct: true,
+		},
 	})
 
 	return err
