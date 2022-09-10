@@ -7,6 +7,7 @@ module.exports = defineConfig({
   pageLoadTimeout: 20000,
   projectId: '6dm1if',
   requestTimeout: 30000,
+  retries: 2,
   e2e: {
     // We've imported your old cypress plugins here.
     // You may want to clean this up later by importing these.
