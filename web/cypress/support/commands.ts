@@ -68,7 +68,8 @@ Cypress.Commands.add('inteceptHomeApiCall', () => {
 Cypress.Commands.add('waitForTracePageApiCalls', () => {
   cy.wait('@testRun');
   cy.wait('@testObject');
-  cy.wait('@testRuns');
+  // traces take some time to return
+  cy.wait('@testRuns', {timeout: 30000});
 });
 
 Cypress.Commands.add('createTestWithAuth', (authMethod: string, keys: string[]): any => {
