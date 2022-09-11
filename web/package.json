@@ -31,7 +31,6 @@
     "@visx/responsive": "2.10.0",
     "@visx/scale": "2.2.2",
     "antd": "4.20.4",
-    "crypto-js": "4.1.1",
     "d3-dag": "0.9.1",
     "date-fns": "2.28.0",
     "html-react-parser": "3.0.4",

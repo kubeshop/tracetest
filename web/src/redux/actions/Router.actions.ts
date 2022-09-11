@@ -5,7 +5,6 @@ import {push} from 'redux-first-history';
 import TestSpecsSelectors from 'selectors/TestSpecs.selectors';
 import {RouterSearchFields} from '../../constants/Common.constants';
 import SpanSelectors from '../../selectors/Span.selectors';
-import {decryptString} from '../../utils/Common';
 import {setSelectedSpan} from '../slices/Span.slice';
 import {setSelectedSpec} from '../slices/TestSpecs.slice';
 import {RootState} from '../store';
@@ -19,20 +18,21 @@ const RouterActions = () => ({
   updateSelectedAssertion: createAsyncThunk<void, IQuery>(
     'router/addAssertionResult',
     async ({search}, {getState, dispatch}) => {
-      const {[RouterSearchFields.SelectedAssertion]: selector = ''} = search;
+      const {[RouterSearchFields.SelectedAssertion]: positionIndex = ''} = search;
 
-      const decryptedSelector = decryptString(String(selector));
-
-      const assertionResult = TestSpecsSelectors.selectAssertionBySelector(getState() as RootState, decryptedSelector);
-
-      const selectedSpec = TestSpecsSelectors.selectSelectedSpec(getState() as RootState);
-
-      if (selectedSpec === decryptedSelector || (!selectedSpec && !decryptedSelector)) {
+      if (!positionIndex) {
+        dispatch(setSelectedSpec());
         return;
       }
 
+      const assertionResult = TestSpecsSelectors.selectAssertionByPositionIndex(
+        getState() as RootState,
+        Number(positionIndex)
+      );
+      const selectedSpec = TestSpecsSelectors.selectSelectedSpec(getState() as RootState);
+
+      if (selectedSpec === assertionResult?.selector) return;
       if (assertionResult) dispatch(setSelectedSpec(assertionResult));
-      else if (!selector) dispatch(setSelectedSpec());
     }
   ),
   updateSelectedSpan: createAsyncThunk<void, IQuery>(
