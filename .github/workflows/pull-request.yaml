@@ -146,7 +146,8 @@ jobs:
       - name: Build example
         run: |
           cd examples/${{ matrix.example_dir }}
-          docker-compose run -d -e VERSION=pr-${{ github.event.pull_request.number }} tracetest
+          echo "VERSION: pr-${{ github.event.pull_request.number }}" > .env
+          docker-compose up -d
       - name: Build CLI
         run: |
           cd cli
