@@ -83,8 +83,19 @@ const SpanAttributeService = () => ({
 
     return blackListFiltered.concat(customList).filter(attr => !isJson(attr.value) && !isEmpty(attr));
   },
-  referencePicker(reference: OtelReference, key: string): OtelReferenceModel {
-    return reference[key] || attributesTags[key] || {description: '', tags: []};
+  getReferencePicker(reference: OtelReference, attrName: string): OtelReferenceModel {
+    return reference[attrName] || attributesTags[attrName] || {description: '', tags: []};
+  },
+  getItMatchesAttributeByKey(reference: OtelReference, attrName: string, search: string): boolean {
+    const {tags = [], description} = reference[attrName] || attributesTags[attrName] || {description: '', tags: []};
+
+    const availableTagsMatchInput = Boolean(
+      tags.find(tag => tag.toString().toLowerCase().includes(search.toLowerCase()))
+    );
+    const currentOptionMatchInput = attrName.includes(search);
+    const currentDescriptionMatchInput = description.includes(search);
+
+    return availableTagsMatchInput || currentOptionMatchInput || currentDescriptionMatchInput;
   },
 });
 

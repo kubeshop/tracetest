@@ -7,10 +7,11 @@ import * as S from './AttributeField.styled';
 
 export function useDropDownRenderComponent(
   reference: OtelReference,
-  hoveredKey?: string
+  hoveredKey = ''
 ): (menu: React.ReactElement) => React.ReactElement {
-  const otelReferenceModel = SpanAttributeService.referencePicker(reference, hoveredKey || '');
+  const otelReferenceModel = SpanAttributeService.getReferencePicker(reference, hoveredKey || '');
   const description = useMemo(() => parse(MarkdownIt().render(otelReferenceModel.description)), [otelReferenceModel]);
+
   return menu => {
     return hoveredKey ? (
       <S.Container>
