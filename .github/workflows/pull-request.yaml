@@ -147,8 +147,7 @@ jobs:
       - name: Build example
         run: |
           cd examples/${{ matrix.example_dir }}
-          echo "TAG=pr-${{ github.event.pull_request.number }}" > .env
-          docker-compose --env-file ./.env up -d
+          TAG=pr-${{ github.event.pull_request.number }} docker-compose up -d
       - name: Build CLI
         run: |
           cd cli
