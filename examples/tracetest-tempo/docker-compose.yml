@@ -2,7 +2,7 @@ version: '3'
 services:
 
     tracetest:
-        image: kubeshop/tracetest:v0.6.8
+        image: kubeshop/tracetest:${VERSION:-latest}
         volumes:
             - type: bind
               source: ./tracetest-config.yaml

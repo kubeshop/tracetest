@@ -146,8 +146,7 @@ jobs:
       - name: Build example
         run: |
           cd examples/${{ matrix.example_dir }}
-          sed -i 's/kubeshop\/tracetest:.*/kubeshop\/tracetest:pr-${{ github.event.pull_request.number }}/g' docker-compose.yml
-          docker-compose up -d
+          docker-compose run -d -e VERSION=pr-${{ github.event.pull_request.number }}
       - name: Build CLI
         run: |
           cd cli
