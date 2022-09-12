@@ -153,12 +153,10 @@ jobs:
           cd cli
           go build -o ./tracetest main.go
           echo "http://localhost:8080" | ./tracetest configure -g
-      - name: Run integration tests
+      - name: Run example test
         run: |
-          cd tracetesting
-          TRACETEST_CLI="../cli/tracetest" \
-          TARGET_URL="http://localhost:8080" \
-          ./run.bash
+          timeout 60 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:8080)" != "200" ]]; do sleep 5; done' || false
+          ./cli/tracetest test run -d examples/${{ matrix.example_dir }}/tests/list-tests.yaml --wait-for-result
 
   deploy:
     needs:  [unit-test-frontend, unit-test-backend, unit-test-cli, build-docker]
