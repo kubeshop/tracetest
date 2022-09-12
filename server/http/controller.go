@@ -3,7 +3,6 @@ package http
 import (
 	"context"
 	"encoding/hex"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -424,39 +423,12 @@ func (c controller) GetTestVersionDefinitionFile(ctx context.Context, testID str
 		return handleDBError(err), err
 	}
 
-	res, err := getYamlFileFromDefinition(c.mappers.Out.TestDefinitionFile(test))
+	res, err := conversion.GetYamlFileFromDefinition(c.mappers.Out.TestDefinitionFile(test))
 	if err != nil {
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
 	}
 
 	return openapi.Response(200, res), nil
-}
-
-func getYamlFileFromDefinition(def definition.Test) ([]byte, error) {
-	defMap := make(map[string]interface{}, 0)
-	jsonBytes, err := json.Marshal(def)
-	if err != nil {
-		return []byte{}, nil
-	}
-
-	err = json.Unmarshal(jsonBytes, &defMap)
-	if err != nil {
-		return []byte{}, nil
-	}
-
-	if def.Trigger.HTTPRequest.Authentication.Type == "" {
-		// remove auth field so we don't have an unnecessary empty structure in the definition
-		trigger := defMap["trigger"].(map[string]interface{})
-		httpRequest := trigger["httpRequest"].(map[string]interface{})
-		delete(httpRequest, "auth")
-	}
-
-	bytes, err := yaml.Marshal(defMap)
-	if err != nil {
-		return []byte{}, nil
-	}
-
-	return bytes, nil
 }
 
 func (c controller) ExportTestRun(ctx context.Context, testID string, runID string) (openapi.ImplResponse, error) {
