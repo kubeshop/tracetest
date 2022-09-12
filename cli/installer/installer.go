@@ -36,6 +36,7 @@ or reach us on Discord https://discord.gg/6zupCZFQbe
 }
 
 type installer struct {
+	name      string
 	preChecks []preChecker
 	configs   []configurator
 	installFn func(config configuration, ui UI)
@@ -52,6 +53,7 @@ func (i installer) PreCheck(ui UI) {
 
 func (i installer) Configure(ui UI) configuration {
 	config := newConfiguration(ui)
+	config.set("installer", i.name)
 	for _, confFn := range i.configs {
 		config = confFn(config, ui)
 	}

@@ -4,10 +4,13 @@ import (
 	"encoding/csv"
 	"fmt"
 	"os"
+	"path"
 	"strings"
+	"time"
 )
 
 var kubernetes = installer{
+	name: "kubernetes",
 	preChecks: []preChecker{
 		kubectlChecker,
 		helmChecker,
@@ -24,19 +27,131 @@ var kubernetes = installer{
 func kubernetesInstaller(config configuration, ui UI) {
 	trackInstall("kubernetes", config, nil)
 
+	installCertManager(config, ui)
+	installJaegerOperator(config, ui)
+
 	execCmdIgnoreErrors(kubectlCmd(config, "create namespace "+config.String("k8s.namespace")))
 
 	installJaeger(config, ui)
 	installCollector(config, ui)
+
+	installTracetest(config, ui)
+
+}
+
+func installTracetest(conf configuration, ui UI) {
+	execCmd(
+		helmCmd(conf, "repo add --force-update kubeshop https://kubeshop.github.io/helm-charts"),
+		ui,
+	)
+	execCmd(
+		helmCmd(conf, "repo update"),
+		ui,
+	)
+
+	cmd := []string{
+		"upgrade --install tracetest kubeshop/tracetest",
+		"--namespace " + conf.String("k8s.namespace") + " --create-namespace",
+	}
+
+	if conf.Bool("k8s.expose") {
+		cmd = append(cmd,
+			"--set 'ingress.hosts[0].host="+conf.String("k8s.ingress-host")+
+				",ingress.hosts[0].paths[0].path=/,ingress.hosts[0].paths[0].pathType=Prefix'",
+		)
+	}
+
+	execCmd(helmCmd(conf, cmd...), ui)
+
+	psql := "host=tracetest-postgresql user=tracetest password=not-secure-database-password  port=5432 sslmode=disable"
+	c := getTracetestConfigFileContents(psql, ui, conf)
+	ttc := createTmpFile("tracetest-config", string(c), ui)
+	defer os.Remove(ttc.Name())
+	execCmd(
+		kubectlNamespaceCmd(conf,
+			"create configmap tracetest --from-file="+ttc.Name()+" -o yaml --dry-run=client",
+			"| sed 's#"+path.Base(ttc.Name())+"#config.yaml#' |",
+			kubectlNamespaceCmd(conf, "replace -f -"),
+		),
+		ui,
+	)
+
+	cc := createTmpFile("collector-config", string(getCollectorConfigFileContents(ui, conf)), ui)
+	defer os.Remove(cc.Name())
+
+	execCmd(
+		kubectlNamespaceCmd(conf,
+			"create configmap collector-config --from-file="+cc.Name()+" -o yaml --dry-run=client",
+			"| sed 's#"+path.Base(cc.Name())+"#collector.yaml#' |",
+			kubectlNamespaceCmd(conf, "replace -f -"),
+		),
+		ui,
+	)
+
+	execCmd(kubectlNamespaceCmd(conf, "delete pods -l app.kubernetes.io/name=tracetest"), ui)
+	execCmd(kubectlNamespaceCmd(conf, "delete pods -l app.kubernetes.io/name=otel-collector"), ui)
+
+	if conf.Bool("demo.enable") {
+		execCmd(fmt.Sprintf(demoScript, conf.String("k8s.namespace")), ui)
+	}
+
+	ui.Success("Install successful!")
+	ui.Println(fmt.Sprintf(`
+To access tracetest:
+
+	%s
+
+Then, use your browser to navigate to:
+
+  http://localhost:8080
+
+Happy TraceTesting =)
+`, kubectlNamespaceCmd(conf, "port-forward svc/tracetest 8080")))
+
+}
+
+func helmCmd(config configuration, cmd ...string) string {
+	return fmt.Sprintf(
+		"helm --kubeconfig %s --kube-context %s %s",
+		config.String("k8s.kubeconfig"),
+		config.String("k8s.context"),
+		strings.Join(cmd, " "),
+	)
 }
 
 const (
+	certManagerYaml          = "https://github.com/cert-manager/cert-manager/releases/download/v1.8.0/cert-manager.yaml"
+	certManagerClusterIssuer = `
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: selfsigned
+spec:
+  selfSigned: {}
+`
 	jaegerOperatorYaml = "https://github.com/jaegertracing/jaeger-operator/releases/download/v1.32.0/jaeger-operator.yaml"
 	jaegerManifest     = `
 apiVersion: jaegertracing.io/v1
 kind: Jaeger
 metadata:
   name: jaeger
+`
+	collectorYaml = "https://raw.githubusercontent.com/kubeshop/tracetest/main/k8s/collector.yml"
+
+	demoScript = `
+tmpdir=$(mktemp -d)
+curl -L https://github.com/kubeshop/pokeshop/tarball/master | tar -xz --strip-components 1 -C  $tmpdir
+cd $tmpdir/helm-chart
+helm dependency update
+
+helm upgrade --install demo . \
+  --namespace demo --create-namespace \
+  -f values.yaml \
+  --set image.tag=latest \
+  --set image.pullPolicy=Always \
+  --set postgres.auth.username=ashketchum,postgres.auth.password=squirtle123,postgres.auth.database=pokeshop \
+  --set rabbitmq.auth.username=guest,rabbitmq.auth.password=guest,rabbitmq.auth.erlangCookie=secretcookie \
+  --set 'env[5].value=%s'
 `
 )
 
@@ -45,6 +160,64 @@ func installCollector(config configuration, ui UI) {
 		return
 	}
 
+	execCmd(
+		kubectlNamespaceCmd(config, "create -f "+collectorYaml),
+		ui,
+	)
+
+	ui.Println(ui.Green("✔ collector ready"))
+
+}
+
+func installCertManager(config configuration, ui UI) {
+	if !config.Bool("k8s.cert-manager.install") {
+		return
+	}
+
+	execCmd(
+		kubectlCmd(config, "create -f "+certManagerYaml),
+		ui,
+	)
+
+	execCmd(
+		kubectlCmd(config, "--namespace cert-manager wait --for=condition=ready pod -l app=webhook --timeout 5m"),
+		ui,
+	)
+	// give it a sec just in case
+	time.Sleep(time.Second)
+
+	f := createTmpFile("cert-manager", certManagerClusterIssuer, ui)
+	defer os.Remove(f.Name())
+
+	execCmd(
+		kubectlCmd(config, "apply -f "+f.Name()),
+		ui,
+	)
+
+	ui.Println(ui.Green("✔ cert-manager ready"))
+}
+
+func installJaegerOperator(config configuration, ui UI) {
+	if !config.Bool("k8s.jaeger-operator.install") {
+		return
+	}
+
+	execCmdIgnoreError(
+		kubectlCmd(config, "create namespace observability "),
+		ui,
+	)
+	execCmd(
+		kubectlCmd(config, "--namespace observability create -f "+jaegerOperatorYaml),
+		ui,
+	)
+
+	execCmd(
+		kubectlCmd(config, "--namespace observability wait --for=condition=ready pod -l name=jaeger-operator --timeout 5m"),
+		ui,
+	)
+
+	ui.Println(ui.Green("✔ jaeger-operator ready"))
+
 }
 
 func installJaeger(config configuration, ui UI) {
@@ -52,24 +225,6 @@ func installJaeger(config configuration, ui UI) {
 		return
 	}
 
-	// operator
-	if crdExists(config, "jaegers.jaegertracing.io") {
-		ui.Warning("Jaeger operator CRD exists, I will not install it")
-	} else {
-		execCmd(
-			kubectlCmd(config, "--namespace observability create -f "+jaegerOperatorYaml),
-			ui,
-		)
-
-		execCmd(
-			kubectlCmd(config, "--namespace observability wait --for=condition=ready pod -l name=jaeger-operator --timeout 5m"),
-			ui,
-		)
-
-		ui.Println(ui.Green("✔ jaeger-operator ready"))
-	}
-
-	// instance
 	jmf := createTmpFile("tracetest-jaeger", jaegerManifest, ui)
 	defer os.Remove(jmf.Name())
 
@@ -180,6 +335,35 @@ func configureKubernetes(conf configuration, ui UI) configuration {
 		conf.set("k8s.ingress-host", ui.TextInput("Host", ""))
 	}
 	conf.set("k8s.expose", expose)
+
+	installCertManager := false
+	installJaegerOperator := false
+	if conf.Bool("tracetest.backend.install") {
+		ui.Warning("I am going to install Jaeger in your cluster!")
+		ui.Println("This requires the Jaeger Operator and cert-manager")
+
+		if crdExists(conf, "certificates.cert-manager.io") {
+			ui.Println(ui.Green("✔ cert-manager ready"))
+		} else {
+			ui.Println(ui.Red("✘ cert-manager not available"))
+			installCertManager = ui.Confirm("Do you want me to install it?", false)
+			if !installCertManager {
+				ui.Exit("cert-manager is requried to run the Jaeger Operator. Check the docs at https://cert-manager.io/. " + createIssueMsg)
+			}
+		}
+
+		if crdExists(conf, "jaegers.jaegertracing.io") {
+			ui.Println(ui.Green("✔ jaeger-operator ready"))
+		} else {
+			ui.Println(ui.Red("✘ jaeger-operator not available"))
+			installJaegerOperator = ui.Confirm("Do you want me to install it?", false)
+			if !installJaegerOperator {
+				ui.Exit("jaeger-operator is requried. Check the docs at https://www.jaegertracing.io/docs/latest/operator/. " + createIssueMsg)
+			}
+		}
+	}
+	conf.set("k8s.cert-manager.install", installCertManager)
+	conf.set("k8s.jaeger-operator.install", installJaegerOperator)
 
 	return conf
 }

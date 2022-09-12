@@ -19,6 +19,7 @@ import (
 )
 
 var dockerCompose = installer{
+	name: "docker-compose",
 	preChecks: []preChecker{
 		dockerChecker,
 		dockerReadyChecker,
@@ -98,8 +99,9 @@ You can run this command again with the -f option to overwrite it.
 		createEmptyDockerComposeFile(cwdDockerComposeFname, ui)
 	}
 
+	psql := "host=postgres user=postgres password=postgres port=5432 sslmode=disable"
+	tracetestConfigFile := getTracetestConfigFileContents(psql, ui, config)
 	collectorConfigFile := getCollectorConfigFileContents(ui, config)
-	tracetestConfigFile := getTracetestConfigFileContents(ui, config)
 	dockerComposeFile := getDockerComposeFileContents(ui, config)
 	dockerComposeFName := filepath.Join(dir, dockerComposeFilename)
 

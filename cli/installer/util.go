@@ -160,10 +160,13 @@ func (c cmd) exec(ui UI, args ...interface{}) interface{} {
 }
 
 func execCmd(cmd string, ui UI) {
-
 	if err := _execCmd(cmd); err != nil {
 		ui.Panic(err)
 	}
+}
+
+func execCmdIgnoreError(cmd string, ui UI) {
+	_execCmd(cmd)
 }
 
 func _execCmd(cmd string) error {
