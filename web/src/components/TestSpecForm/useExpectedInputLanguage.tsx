@@ -29,7 +29,9 @@ export function useExpectedInputLanguage() {
                 ? durationOtions
                 : [
                     {label: 'minus', value: '-', apply: '- '},
+                    {label: '+', value: '-', apply: '- '},
                     {label: 'plus', value: '+', apply: '+ '},
+                    {label: '-', value: '+', apply: '+ '},
                   ],
             };
           },

@@ -1,11 +1,46 @@
 import countBy from 'lodash/countBy';
 import uniq from 'lodash/uniq';
 
-import {TAssertionResult, ICheckResult, TRawAssertionResult} from 'types/Assertion.types';
+import {ICheckResult, TAssertionResult, TRawAssertionResult} from 'types/Assertion.types';
+import {durationRegExp} from '../constants/Common.constants';
+import {Attributes} from '../constants/SpanAttribute.constants';
+
+const isNumeric = (num: string): boolean => /^-?\d+(?:\.\d+)?$/.test(num);
+const isNumericTime = (num: string): boolean => durationRegExp.test(num);
 
 const AssertionService = () => ({
+  extractExpectedString(input?: string): string | undefined {
+    if (!input) return input;
+    const formatted = input.trim();
+    if (Object.values(Attributes).includes(formatted)) {
+      // console.log('is attribute');
+      return formatted;
+    }
+    if (
+      Object.values(Attributes).some(aa => {
+        return formatted.includes(aa);
+      })
+    ) {
+      // console.log('is expression');
+      return formatted;
+    }
+    if (isNumeric(formatted) || isNumericTime(formatted)) {
+      // console.log('is numberic');
+      return formatted;
+    }
+
+    if (['true', 'false'].includes(formatted)) {
+      // console.log('is boolean string');
+    }
+    return this.quotedString(formatted);
+  },
+  quotedString(str: string): string {
+    return `\"${str}\"`;
+  },
   getSpanIds(resultList: TRawAssertionResult[]) {
-    const spanIds = resultList.flatMap(assertion => assertion?.spanResults?.map(span => span.spanId ?? '') ?? []).filter(spanId => Boolean(spanId));
+    const spanIds = resultList
+      .flatMap(assertion => assertion?.spanResults?.map(span => span.spanId ?? '') ?? [])
+      .filter(spanId => Boolean(spanId));
     return uniq(spanIds);
   },
 
