@@ -17,6 +17,8 @@ export const isJson = (str: string) => {
   return Number.isNaN(Number(str)) && !isBoolean(str) && true;
 };
 
+export const isHTML = (text: string) => /^/.test(text);
+
 export const getObjectIncludesText = (object: unknown, text: string = ''): boolean => {
   if (!text.length) return false;
 

@@ -24,7 +24,7 @@ export const VisualizationContainer = styled.div`
 
 export const SwitchContainer = styled.div<{$hasSpace: boolean}>`
   position: absolute;
-  right: ${({$hasSpace}) => ($hasSpace ? '24px' : '132px')};
-  top: 16px;
   z-index: 9;
+  left: 16px;
+  bottom: 163px;
 `;
