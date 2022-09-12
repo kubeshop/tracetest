@@ -6,7 +6,7 @@ describe('Create Assertion', () => {
 
   it('should create a basic assertion', () => cy.createAssertion());
 
-  it('should create an assertion with multiple checks', () => {
+  it.only('should create an assertion with multiple checks', () => {
     cy.selectRunDetailMode(3);
 
     cy.get(`[data-cy=trace-node-http]`, {timeout: 20000}).first().click();
@@ -38,10 +38,6 @@ describe('Create Assertion', () => {
       .click();
 
     cy.selectOperator(2);
-
-    cy.get('[data-cy=assertion-check-value]').last().type('s');
-    cy.get('[data-cy=duration]').click();
-    cy.get(`[data-cy=duration-unit-μs]`).click();
 
     cy.get('[data-cy=assertion-form-submit-button]').click();
 

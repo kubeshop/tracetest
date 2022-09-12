@@ -19,6 +19,9 @@ export function useExpectedInputLanguage() {
               {label: `${message?.text.toString()}ms`, value: `${message?.text.toString()}ms`},
               {label: `${message?.text.toString()}s`, value: `${message?.text.toString()}s`},
             ];
+            console.log(context.state.doc);
+            console.log(message);
+            console.log(message?.text);
             const isN = isNumber(message?.text);
             if (message?.from === 0) {
               return {from: 0, options: isN ? durationOtions : attributeOptions};
@@ -28,9 +31,7 @@ export function useExpectedInputLanguage() {
               options: isN
                 ? durationOtions
                 : [
-                    {label: 'minus', value: '-', apply: '- '},
                     {label: '+', value: '-', apply: '- '},
-                    {label: 'plus', value: '+', apply: '+ '},
                     {label: '-', value: '+', apply: '+ '},
                   ],
             };
