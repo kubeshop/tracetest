@@ -17,9 +17,11 @@ var kubernetes = installer{
 		localEnvironmentChecker,
 	},
 	configs: []configurator{
-		configureTracetest,
-		configureDemoApp,
 		configureKubernetes,
+		configureTracetest,
+		configureKubernetesInstalls,
+		configureIngress,
+		configureDemoApp,
 	},
 	installFn: kubernetesInstaller,
 }
@@ -93,7 +95,11 @@ func installTracetest(conf configuration, ui UI) {
 	execCmd(kubectlNamespaceCmd(conf, "delete pods -l app.kubernetes.io/name=otel-collector"), ui)
 
 	if conf.Bool("demo.enable") {
-		execCmd(fmt.Sprintf(demoScript, conf.String("k8s.namespace")), ui)
+		helm := helmCmd(conf, "")
+		script := strings.ReplaceAll(demoScript, "#helm#", helm)
+		script = fmt.Sprintf(script, conf.String("tracetest.backend.endpoint.agent"))
+
+		execCmd(script, ui)
 	}
 
 	ui.Success("Install successful!")
@@ -143,9 +149,9 @@ metadata:
 tmpdir=$(mktemp -d)
 curl -L https://github.com/kubeshop/pokeshop/tarball/master | tar -xz --strip-components 1 -C  $tmpdir
 cd $tmpdir/helm-chart
-helm dependency update
+#helm# dependency update
 
-helm upgrade --install demo . \
+#helm# upgrade --install demo . \
   --namespace demo --create-namespace \
   -f values.yaml \
   --set image.tag=latest \
@@ -331,12 +337,20 @@ func configureKubernetes(conf configuration, ui UI) configuration {
 	conf.set("k8s.context", selected.text)
 
 	conf.set("k8s.namespace", ui.TextInput("Namespace", "tracetest"))
+
+	return conf
+}
+
+func configureIngress(conf configuration, ui UI) configuration {
 	expose := ui.Confirm("Do you want to expose tracetest (via ingress)?", false)
 	if expose {
 		conf.set("k8s.ingress-host", ui.TextInput("Host", ""))
 	}
 	conf.set("k8s.expose", expose)
+	return conf
+}
 
+func configureKubernetesInstalls(conf configuration, ui UI) configuration {
 	installCertManager := false
 	installJaegerOperator := false
 	if conf.Bool("tracetest.backend.install") {

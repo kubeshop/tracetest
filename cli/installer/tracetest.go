@@ -15,6 +15,27 @@ func configureDemoApp(conf configuration, ui UI) configuration {
 		"demo.enable",
 		ui.Confirm("Do you want to enable the demo app?", true),
 	)
+	if conf.Bool("demo.enable") {
+		if conf.String("tracetest.backend.type") != "jaeger" {
+			ui.Error("The demo app requires the jaeger backend.")
+			opt := ui.Select("What do you want to do?", []option{
+				{"Continue without the demo", func(ui UI) {
+					conf.set("demo.enable", false)
+					ui.Warning("demo disabled")
+				}},
+				{"Fix manually", exitOption(
+					"Check the docker install docs on https://docs.docker.com/get-docker/",
+				)},
+			}, 0)
+			opt.fn(ui)
+		} else if !conf.has("tracetest.backend.endpoint.agent") {
+			defaultAgent := "jaeger-agent"
+			if conf.String("installer") == "kubernetes" {
+				defaultAgent = "jaeger-agent." + conf.String("k8s.namespace")
+			}
+			conf.set("tracetest.backend.endpoint.agent", ui.TextInput("Jaeger Agent endpoint", defaultAgent))
+		}
+	}
 	return conf
 }
 
@@ -74,12 +95,14 @@ See https://kubeshop.github.io/tracetest/supported-backends/
 			conf.set("tracetest.backend.type", "jaeger")
 			conf.set("tracetest.backend.endpoint.query", "jaeger:16685")
 			conf.set("tracetest.backend.endpoint.collector", "jaeger:14250")
+			conf.set("tracetest.backend.endpoint.agent", "jaeger")
 			conf.set("tracetest.backend.tls.insecure", true)
 		case "kubernetes":
 			conf.set("tracetest.backend.type", "jaeger")
 			conf.set("tracetest.backend.endpoint.query", "jaeger-query:16685")
 			conf.set("tracetest.backend.endpoint.collector", "jaeger-collector:14250")
 			conf.set("tracetest.backend.tls.insecure", true)
+			conf.set("tracetest.backend.endpoint.agent", "jaeger-agent."+conf.String("k8s.namespace"))
 
 		}
 

@@ -95,6 +95,11 @@ func (c configuration) set(key string, value interface{}) {
 	c.db[key] = value
 }
 
+func (c configuration) has(key string) bool {
+	_, exists := c.db[key]
+	return exists
+}
+
 func (c configuration) get(key string) interface{} {
 	v, exists := c.db[key]
 	if !exists {
