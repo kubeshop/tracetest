@@ -55,10 +55,11 @@ func installTracetest(conf configuration, ui UI) {
 	}
 
 	if conf.Bool("k8s.expose") {
-		cmd = append(cmd,
-			"--set 'ingress.hosts[0].host="+conf.String("k8s.ingress-host")+
+		cmd = append(cmd, []string{
+			"--set ingress.enabled=true",
+			"--set 'ingress.hosts[0].host=" + conf.String("k8s.ingress-host") +
 				",ingress.hosts[0].paths[0].path=/,ingress.hosts[0].paths[0].pathType=Prefix'",
-		)
+		}...)
 	}
 
 	execCmd(helmCmd(conf, cmd...), ui)
