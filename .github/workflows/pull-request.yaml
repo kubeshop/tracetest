@@ -11,6 +11,7 @@ on:
       - .github/workflows/pull-request.yaml
       - api/**
       - cli/**
+      - examples/
       - server/**
       - tracetesting/**
       - web/**
@@ -129,6 +130,34 @@ jobs:
       run: |
         rm -rf /tmp/.buildx-cache
         mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+
+  test-examples:
+    needs:  [build-docker]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        example_dir: [tracetest-jaeger, tracetest-opensearch, tracetest-tempo]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '^1.18'
+      - name: Build example
+        run: |
+          cd examples/${{ matrix.example_dir }}
+          TAG=pr-${{ github.event.pull_request.number }} docker-compose up -d
+      - name: Build CLI
+        run: |
+          cd cli
+          go build -o ./tracetest main.go
+          echo "http://localhost:8080" | ./tracetest configure -g
+      - name: Run example test
+        run: |
+          timeout 60 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:8080)" != "200" ]]; do sleep 5; done' || false
+          ./cli/tracetest test run -d examples/${{ matrix.example_dir }}/tests/list-tests.yaml --wait-for-result
 
   deploy:
     needs:  [unit-test-frontend, unit-test-backend, unit-test-cli, build-docker]
