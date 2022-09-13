@@ -30,6 +30,7 @@ export type TTriggerResult = {
   headers?: THeader[];
   body?: string;
   statusCode: number;
+  bodyMimeType?: string;
 };
 
 export type TRawGRPCRequest = TGrpcSchemas['GRPCRequest'];

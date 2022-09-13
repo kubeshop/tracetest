@@ -23,6 +23,7 @@
     "@types/react": "^17.0.39",
     "@types/react-dom": "16.9.14",
     "@types/react-redux": "7.1.22",
+    "@uiw/codemirror-extensions-langs": "4.12.2",
     "@uiw/codemirror-themes": "4.10.4",
     "@uiw/react-codemirror": "4.10.4",
     "@visx/axis": "2.11.1",
