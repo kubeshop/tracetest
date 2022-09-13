@@ -4,7 +4,7 @@ This endpoint showcases a more complex scenario involving an async process. Usua
 
 ![](../img/516816935/518193157.png)![](../img/516816935/517898257.png)
 
-### **Endpoint specification**
+## **Endpoint Specification**
 
 Route: `/pokemon/import`
 
@@ -42,11 +42,11 @@ Response:
 
 ```
 
-### **Trace**
+## **Trace**
 
 ![](../img/516816935/517406782.png)
 
-### **Assertions**
+## **Assertions**
 
 Here are some key points that are relevant to this query.
 

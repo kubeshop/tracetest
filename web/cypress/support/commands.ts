@@ -1,7 +1,7 @@
 import 'cypress-file-upload';
 import {camelCase} from 'lodash';
 import {Plugins} from '../../src/constants/Plugins.constants';
-import {getTestId} from '../integration/utils/Common';
+import {getTestId} from '../e2e/utils/Common';
 
 export const testRunPageRegex = /\/test\/(.*)\/run\/(.*)/;
 export const getAttributeListId = (number: number) => `#assertion-form_assertions_${number}_attribute_list`;
@@ -31,7 +31,7 @@ Cypress.Commands.add('deleteTest', (shoudlIntercept = false) => {
     if (shoudlIntercept) {
       cy.inteceptHomeApiCall();
     }
-    cy.visit(`http://localhost:3000`);
+    cy.visit(`/`);
     cy.wait('@testList');
     cy.get('[data-cy=test-list]').should('exist', {timeout: 10000});
     cy.get(`[data-cy=test-actions-button-${localTestId}]`, {timeout: 10000}).should('be.visible');
@@ -68,17 +68,17 @@ Cypress.Commands.add('inteceptHomeApiCall', () => {
 Cypress.Commands.add('waitForTracePageApiCalls', () => {
   cy.wait('@testRun');
   cy.wait('@testObject');
-  cy.wait('@testRuns');
+  // traces take some time to return
+  cy.wait('@testRuns', {timeout: 30000});
 });
 
-Cypress.Commands.add('createTestWithAuth', (authMethod: string, keys: string[]) => {
-  const name = `Test - Pokemon - #${String(Date.now()).slice(-4)}`;
-  cy.fillCreateFormBasicStep(name);
-  cy.setCreateFormUrl('GET', 'http://demo-pokemon-api.demo.svc.cluster.local/pokemon');
+Cypress.Commands.add('createTestWithAuth', (authMethod: string, keys: string[]): any => {
+  cy.get('[data-cy=create-test-next-button]').last().click();
+  cy.selectTestFromDemoList();
   cy.get('[data-cy=auth-type-select]').click();
   cy.get(`[data-cy=auth-type-select-option-${authMethod}]`).click();
   keys.forEach(key => cy.get(`[data-cy=${authMethod}-${key}]`).type(key));
-  return cy.wrap(name);
+  return cy.wrap(Plugins.REST.demoList[0].name);
 });
 
 Cypress.Commands.add('submitAndMakeSureTestIsCreated', (name: string) => {
@@ -96,8 +96,8 @@ Cypress.Commands.add('matchTestRunPageUrl', () => {
 
 Cypress.Commands.add('goToTestDetailPageAndRunTest', (pathname: string) => {
   const testId = getTestId(pathname);
-  cy.visit(`http://localhost:3000/test/${testId}`);
-  cy.get('[data-cy^=run-card]', {timeout: 10000}).first().click();
+  cy.visit(`/test/${testId}`);
+  cy.get('[data-cy^=result-card]', {timeout: 10000}).first().click();
   cy.makeSureUserIsOnTestDetailPage();
   // cy.get(`[data-cy^=test-run-result-]`).first().click();
   cy.makeSureUserIsOnTracePage(false);
@@ -105,6 +105,7 @@ Cypress.Commands.add('goToTestDetailPageAndRunTest', (pathname: string) => {
 
 Cypress.Commands.add('makeSureUserIsOnTestDetailPage', () => {
   cy.location('href').should('match', /\/test\/.*/i);
+  cy.wait('@testObject');
 });
 
 Cypress.Commands.add('makeSureUserIsOnTracePage', (shouldCancelOnboarding = true) => {

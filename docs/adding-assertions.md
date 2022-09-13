@@ -1,22 +1,39 @@
-# Adding Assertions
+# Adding Test Specifications
 
-Assertions may be added to a trace to set a value for a step in the trace to determine success or failure. If assertions have already been added to a test, they will be listed at the bottom of the screen:
+Test Specifications may be added to a trace to set a value for a step in the trace to determine success or failure. If test specs have already been added to a test, they will be on the Test screen:
 
-![Assertion List](img/assertion-list-0.6.png)
+![Test Spec List](img/test-spec-list-0.6.png)
 
-The assertion results can be viewed using the key-value (wizard) mode or the query language (advanced):
+After you have created a test and your test run is complete, click the **Add Test Spec** button at the bottom right of the Test screen.
 
-![Wizard/Advanced](img/wizard-advanced-0.6.gif)
+![Add Test Spec](img/add-test-spec-0.6.png)
 
-After you have created a test and your test run is complete, click the **Add Assertion** button at the bottom right of the trace screen.
+The **Add Test Spec** dialog opens.
 
-![Add Assertion](img/add-assertion-0.6.png)
+![Create Test Spec](img/create-test-spec-0.6.png)
 
-The **Add Assertion** dialog opens.
+The span that the new test spec will apply to is hightlighted in the graph view on the left:
 
-![Create Assertion](img/create-new-assertion-0.6.png)
+![Selected Span](img/selected-span-0.6.png)
 
-You can also create assertions by hovering over the **+** sign to the right of an attribute in the trace. 
+To add an assertion to a span, click the first drop down to see the list of attributes that apply to the selected span:
+
+![Assertion Attributes](img/assertion-attributes-0.6.png)
+
+Then select the operator for your assertion:
+
+![Assertion Operators](img/assertion-operators-0.6.png)
+
+And add the value for comparison:
+
+![Assertion Values](img/assertion-values-0.6.png)
+
+Finally, you can give your test spec an optional name and click **Save Test Spec**:
+
+![Save Test Spec](img/save-test-spec-0.6.png)
+
+
+<!--- You can also create assertions by hovering over the **+** sign to the right of an attribute in the trace. 
 
 ![Add Assertion Hover](img/add-assertion-hover-0.6.png)
 

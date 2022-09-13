@@ -10,7 +10,9 @@ var (
 )
 
 func newSegmentTracker(hostname, serverID, appVersion, env string) Tracker {
-	client := segment.New(SecretKey)
+	client, _ := segment.NewWithConfig(SecretKey, segment.Config{
+		BatchSize: 1,
+	})
 
 	client.Enqueue(segment.Identify{
 		Traits: segment.NewTraits().
@@ -19,6 +21,9 @@ func newSegmentTracker(hostname, serverID, appVersion, env string) Tracker {
 			Set("env", env).
 			Set("appVersion", appVersion).
 			Set("hostname", hostname),
+		Context: &segment.Context{
+			Direct: true,
+		},
 	})
 	return segmentTracker{
 		client:     client,
@@ -61,5 +66,8 @@ func (t segmentTracker) Track(name string, props map[string]string) error {
 		Event:      name,
 		UserId:     t.serverID,
 		Properties: p,
+		Context: &segment.Context{
+			Direct: true,
+		},
 	})
 }

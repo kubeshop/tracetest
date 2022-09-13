@@ -24,7 +24,7 @@ In this example, HTTP Request has been chosen.
 
 ![Choose Example](img/choose-example-0.6.png)
 
-Input the **Name** of the test and the **Description** or select one of the example privided in the drop down:
+Input the **Name** of the test and the **Description** or select one of the example provided in the drop down:
 
 ![Choose Example Pokemon](img/choose-example-pokemon-0.6.png)
 

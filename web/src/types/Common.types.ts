@@ -10,6 +10,7 @@ export interface IEnv {
   serverPathPrefix: string;
   serverID: string;
   appVersion: string;
+  pokeApi: string;
   env: string;
 }
 

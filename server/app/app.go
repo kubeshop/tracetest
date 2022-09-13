@@ -30,6 +30,7 @@ import (
 var (
 	Version = "dev"
 	Env     = "dev"
+	PokeAPI = "dev"
 )
 
 type App struct {
@@ -89,7 +90,7 @@ func (a *App) Start() error {
 	}
 
 	if isNewInstall {
-		err = analytics.SendEvent("Install", "beacon")
+		err = analytics.SendEvent("Install", "beacon", "")
 		if err != nil {
 			return err
 		}
@@ -159,6 +160,7 @@ func (a *App) Start() error {
 				"AnalyticsKey":     analytics.FrontendKey,
 				"AnalyticsEnabled": fmt.Sprintf("%t", a.config.GA.Enabled),
 				"ServerPathPrefix": fmt.Sprintf("%s/", a.config.Server.PathPrefix),
+				"PokeAPI":          PokeAPI,
 				"ServerID":         serverID,
 				"AppVersion":       Version,
 				"Env":              Env,
@@ -166,7 +168,7 @@ func (a *App) Start() error {
 		),
 	)
 
-	err = analytics.SendEvent("Server Started", "beacon")
+	err = analytics.SendEvent("Server Started", "beacon", "")
 	if err != nil {
 		return err
 	}

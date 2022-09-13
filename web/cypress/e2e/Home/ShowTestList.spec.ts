@@ -11,8 +11,10 @@ describe('Home', () => {
   });
 
   it('should run a test from the home page', () => {
+    cy.createTest();
     cy.visit('/');
     cy.get('[data-cy^=test-run-button]:not([data-cy*=button-00])', {timeout: 10000}).first().click();
     cy.location('href').should('match', /\/test\/.*/i);
+    cy.deleteTest();
   });
 });

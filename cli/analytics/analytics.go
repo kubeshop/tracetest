@@ -1,8 +1,6 @@
 package analytics
 
 import (
-	"fmt"
-
 	"github.com/denisbrodbeck/machineid"
 	"github.com/kubeshop/tracetest/cli/config"
 	segment "github.com/segmentio/analytics-go/v3"
@@ -14,17 +12,24 @@ var (
 	mid       string
 )
 
+func ClientID() string {
+	return mid
+}
+
 func Init(conf config.Config) {
 	if !conf.AnalyticsEnabled {
 		return
 	}
 
-	client = segment.New(SecretKey)
+	client, _ = segment.NewWithConfig(SecretKey, segment.Config{
+		BatchSize: 1,
+	})
+
 	id, err := machineid.ProtectedID("tracetest")
-	if err != nil {
-		panic(fmt.Errorf("could not get machineID: %w", err))
-	}
-	mid = id
+	if err == nil {
+		// only use id if available.
+		mid = id
+	} // ignore errors and continue with an empty ID if neccesary
 
 	client.Enqueue(segment.Identify{
 		Traits: segment.NewTraits().
@@ -32,6 +37,9 @@ func Init(conf config.Config) {
 			Set("clientID", mid).
 			Set("env", config.Env).
 			Set("appVersion", config.Version),
+		Context: &segment.Context{
+			Direct: true,
+		},
 	})
 }
 
@@ -55,6 +63,9 @@ func Track(name, category string, props map[string]string) error {
 		Event:      name,
 		UserId:     mid,
 		Properties: p,
+		Context: &segment.Context{
+			Direct: true,
+		},
 	})
 
 	return err

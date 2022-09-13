@@ -3,13 +3,11 @@ package http
 import (
 	"context"
 	"encoding/hex"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
 
 	"github.com/google/uuid"
-	"github.com/kubeshop/tracetest/server/analytics"
 	"github.com/kubeshop/tracetest/server/assertions"
 	"github.com/kubeshop/tracetest/server/assertions/selectors"
 	"github.com/kubeshop/tracetest/server/encoding/yaml/conversion"
@@ -57,7 +55,6 @@ func handleDBError(err error) openapi.ImplResponse {
 }
 
 func (c *controller) CreateTest(ctx context.Context, in openapi.Test) (openapi.ImplResponse, error) {
-	analytics.SendEvent("Test Created", "test")
 	test := c.mappers.In.Test(in)
 
 	// if they try to create a test with preset ID, we need to make sure that ID doesn't exists already
@@ -85,7 +82,6 @@ func (c *controller) CreateTest(ctx context.Context, in openapi.Test) (openapi.I
 }
 
 func (c *controller) DeleteTest(ctx context.Context, testID string) (openapi.ImplResponse, error) {
-	analytics.SendEvent("Test Deleted", "test")
 	id, err := uuid.Parse(testID)
 	if err != nil {
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
@@ -105,7 +101,6 @@ func (c *controller) DeleteTest(ctx context.Context, testID string) (openapi.Imp
 }
 
 func (c *controller) GetTest(ctx context.Context, testID string) (openapi.ImplResponse, error) {
-	analytics.SendEvent("Test Get", "test")
 	id, err := uuid.Parse(testID)
 	if err != nil {
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
@@ -120,7 +115,6 @@ func (c *controller) GetTest(ctx context.Context, testID string) (openapi.ImplRe
 }
 
 func (c *controller) GetTestSpecs(ctx context.Context, testID string) (openapi.ImplResponse, error) {
-	analytics.SendEvent("Test Get Definition", "test")
 	id, err := uuid.Parse(testID)
 	if err != nil {
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
@@ -135,7 +129,6 @@ func (c *controller) GetTestSpecs(ctx context.Context, testID string) (openapi.I
 }
 
 func (c *controller) GetTestResultSelectedSpans(ctx context.Context, _ string, runID string, selectorQuery string) (openapi.ImplResponse, error) {
-	analytics.SendEvent("Test Test Result Selected Spans", "test")
 	rid, err := uuid.Parse(runID)
 	if err != nil {
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
@@ -166,7 +159,6 @@ func (c *controller) GetTestResultSelectedSpans(ctx context.Context, _ string, r
 }
 
 func (c *controller) GetTestRun(ctx context.Context, _ string, runID string) (openapi.ImplResponse, error) {
-	analytics.SendEvent("Test Run Get", "test")
 	rid, err := uuid.Parse(runID)
 	if err != nil {
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
@@ -181,7 +173,6 @@ func (c *controller) GetTestRun(ctx context.Context, _ string, runID string) (op
 }
 
 func (c *controller) DeleteTestRun(ctx context.Context, _ string, runID string) (openapi.ImplResponse, error) {
-	analytics.SendEvent("Test Run Deleted", "test")
 	rid, err := uuid.Parse(runID)
 	if err != nil {
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
@@ -201,7 +192,6 @@ func (c *controller) DeleteTestRun(ctx context.Context, _ string, runID string) 
 }
 
 func (c *controller) GetTestRuns(ctx context.Context, testID string, take, skip int32) (openapi.ImplResponse, error) {
-	analytics.SendEvent("Test Runs List", "test")
 	if take == 0 {
 		take = 20
 	}
@@ -225,7 +215,6 @@ func (c *controller) GetTestRuns(ctx context.Context, testID string, take, skip 
 }
 
 func (c *controller) GetTests(ctx context.Context, take, skip int32, query string) (openapi.ImplResponse, error) {
-	analytics.SendEvent("Test List", "test")
 	if take == 0 {
 		take = 20
 	}
@@ -239,7 +228,6 @@ func (c *controller) GetTests(ctx context.Context, take, skip int32, query strin
 }
 
 func (c *controller) RerunTestRun(ctx context.Context, testID string, runID string) (openapi.ImplResponse, error) {
-	analytics.SendEvent("Test Rerun Start", "test")
 	id, err := uuid.Parse(testID)
 	if err != nil {
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
@@ -282,7 +270,6 @@ func (c *controller) RerunTestRun(ctx context.Context, testID string, runID stri
 }
 
 func (c *controller) RunTest(ctx context.Context, testID string, runInformation openapi.TestRunInformation) (openapi.ImplResponse, error) {
-	analytics.SendEvent("Test Run Start", "test")
 	id, err := uuid.Parse(testID)
 	if err != nil {
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
@@ -303,7 +290,6 @@ func (c *controller) RunTest(ctx context.Context, testID string, runInformation 
 }
 
 func (c *controller) SetTestSpecs(ctx context.Context, testID string, def openapi.TestSpecs) (openapi.ImplResponse, error) {
-	analytics.SendEvent("Test Definition Updated", "test")
 	id, err := uuid.Parse(testID)
 	if err != nil {
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
@@ -336,7 +322,6 @@ func (c *controller) SetTestSpecs(ctx context.Context, testID string, def openap
 }
 
 func (c *controller) UpdateTest(ctx context.Context, testID string, in openapi.Test) (openapi.ImplResponse, error) {
-	analytics.SendEvent("Test Updated", "test")
 	id, err := uuid.Parse(testID)
 	if err != nil {
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
@@ -361,7 +346,6 @@ func (c *controller) UpdateTest(ctx context.Context, testID string, in openapi.T
 }
 
 func (c *controller) DryRunAssertion(ctx context.Context, _, runID string, def openapi.TestSpecs) (openapi.ImplResponse, error) {
-	analytics.SendEvent("Test Dry Run", "test")
 	rid, err := uuid.Parse(runID)
 	if err != nil {
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
@@ -386,7 +370,6 @@ func (c *controller) DryRunAssertion(ctx context.Context, _, runID string, def o
 }
 
 func (c *controller) GetRunResultJUnit(ctx context.Context, testID string, runID string) (openapi.ImplResponse, error) {
-	analytics.SendEvent("Test Get JUnit", "test")
 	rid, err := uuid.Parse(runID)
 	if err != nil {
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
@@ -416,7 +399,6 @@ func (c *controller) GetRunResultJUnit(ctx context.Context, testID string, runID
 }
 
 func (c controller) GetTestVersion(ctx context.Context, testID string, version int32) (openapi.ImplResponse, error) {
-	analytics.SendEvent("Test Get Definition File", "test")
 	tid, err := uuid.Parse(testID)
 	if err != nil {
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
@@ -431,7 +413,6 @@ func (c controller) GetTestVersion(ctx context.Context, testID string, version i
 }
 
 func (c controller) GetTestVersionDefinitionFile(ctx context.Context, testID string, version int32) (openapi.ImplResponse, error) {
-	analytics.SendEvent("Test Get Definition File", "test")
 	tid, err := uuid.Parse(testID)
 	if err != nil {
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
@@ -442,7 +423,7 @@ func (c controller) GetTestVersionDefinitionFile(ctx context.Context, testID str
 		return handleDBError(err), err
 	}
 
-	res, err := getYamlFileFromDefinition(c.mappers.Out.TestDefinitionFile(test))
+	res, err := conversion.GetYamlFileFromDefinition(c.mappers.Out.TestDefinitionFile(test))
 	if err != nil {
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
 	}
@@ -450,35 +431,7 @@ func (c controller) GetTestVersionDefinitionFile(ctx context.Context, testID str
 	return openapi.Response(200, res), nil
 }
 
-func getYamlFileFromDefinition(def definition.Test) ([]byte, error) {
-	defMap := make(map[string]interface{}, 0)
-	jsonBytes, err := json.Marshal(def)
-	if err != nil {
-		return []byte{}, nil
-	}
-
-	err = json.Unmarshal(jsonBytes, &defMap)
-	if err != nil {
-		return []byte{}, nil
-	}
-
-	if def.Trigger.HTTPRequest.Authentication.Type == "" {
-		// remove auth field so we don't have an unnecessary empty structure in the definition
-		trigger := defMap["trigger"].(map[string]interface{})
-		httpRequest := trigger["httpRequest"].(map[string]interface{})
-		delete(httpRequest, "auth")
-	}
-
-	bytes, err := yaml.Marshal(defMap)
-	if err != nil {
-		return []byte{}, nil
-	}
-
-	return bytes, nil
-}
-
 func (c controller) ExportTestRun(ctx context.Context, testID string, runID string) (openapi.ImplResponse, error) {
-	analytics.SendEvent("Test Export", "test")
 	rid, err := uuid.Parse(runID)
 	if err != nil {
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
@@ -508,7 +461,6 @@ func (c controller) ExportTestRun(ctx context.Context, testID string, runID stri
 }
 
 func (c controller) ImportTestRun(ctx context.Context, exportedTest openapi.ExportedTestInformation) (openapi.ImplResponse, error) {
-	analytics.SendEvent("Test Import", "test")
 	test := c.mappers.In.Test(exportedTest.Test)
 	run := c.mappers.In.Run(exportedTest.Run)
 
@@ -538,7 +490,6 @@ func (c controller) ImportTestRun(ctx context.Context, exportedTest openapi.Expo
 }
 
 func (c *controller) CreateTestFromDefinition(ctx context.Context, testDefinition openapi.TextDefinition) (openapi.ImplResponse, error) {
-	analytics.SendEvent("Test Create From Definition", "test")
 	var definitionObject definition.Test
 	err := yaml.Unmarshal([]byte(testDefinition.Content), &definitionObject)
 	if err != nil {
@@ -554,7 +505,6 @@ func (c *controller) CreateTestFromDefinition(ctx context.Context, testDefinitio
 }
 
 func (c *controller) UpdateTestFromDefinition(ctx context.Context, testId string, testDefinition openapi.TextDefinition) (openapi.ImplResponse, error) {
-	analytics.SendEvent("Test Update From Definition", "test")
 	var definitionObject definition.Test
 	err := yaml.Unmarshal([]byte(testDefinition.Content), &definitionObject)
 	if err != nil {
