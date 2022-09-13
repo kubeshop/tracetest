@@ -96,8 +96,8 @@ func (m *MockRepository) GetTestRuns(_ context.Context, test model.Test, take in
 	return args.Get(0).([]model.Run), args.Error(1)
 }
 
-func (m *MockRepository) GetRunByTraceID(_ context.Context, test model.Test, tid trace.TraceID) (model.Run, error) {
-	args := m.Called(test, tid)
+func (m *MockRepository) GetRunByTraceID(_ context.Context, tid trace.TraceID) (model.Run, error) {
+	args := m.Called(tid)
 	return args.Get(0).(model.Run), args.Error(1)
 }
 

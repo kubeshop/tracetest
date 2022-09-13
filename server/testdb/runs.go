@@ -110,14 +110,14 @@ func (td *postgresDB) GetTestRuns(ctx context.Context, test model.Test, take, sk
 	return runs, nil
 }
 
-func (td *postgresDB) GetRunByTraceID(ctx context.Context, test model.Test, traceID trace.TraceID) (model.Run, error) {
-	stmt, err := td.db.Prepare("SELECT run, test_id, test_version FROM runs WHERE test_id = $1 AND run ->> 'TraceId' = $2")
+func (td *postgresDB) GetRunByTraceID(ctx context.Context, traceID trace.TraceID) (model.Run, error) {
+	stmt, err := td.db.Prepare("SELECT run, test_id, test_version FROM runs WHERE run ->> 'TraceId' = $1")
 	if err != nil {
 		return model.Run{}, err
 	}
 	defer stmt.Close()
 
-	run, err := readRunRow(stmt.QueryRowContext(ctx, test.ID, traceID))
+	run, err := readRunRow(stmt.QueryRowContext(ctx, traceID.String()))
 	if err != nil {
 		return model.Run{}, fmt.Errorf("cannot read row: %w", err)
 	}

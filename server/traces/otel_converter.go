@@ -12,8 +12,12 @@ import (
 )
 
 func FromOtel(input *v1.TracesData) Trace {
+	return fromOtelResourceSpans(input.ResourceSpans)
+}
+
+func fromOtelResourceSpans(resourceSpans []*v1.ResourceSpans) Trace {
 	flattenSpans := make([]*v1.Span, 0)
-	for _, resource := range input.ResourceSpans {
+	for _, resource := range resourceSpans {
 		for _, scopeSpans := range resource.ScopeSpans {
 			flattenSpans = append(flattenSpans, scopeSpans.Spans...)
 		}
@@ -22,7 +26,7 @@ func FromOtel(input *v1.TracesData) Trace {
 	traceID := ""
 	spans := make([]Span, 0)
 	for _, span := range flattenSpans {
-		newSpan := convertOtelSpanIntoSpan(span)
+		newSpan := ConvertOtelSpanIntoSpan(span)
 		traceID = hex.EncodeToString(span.TraceId)
 		spans = append(spans, *newSpan)
 	}
@@ -30,7 +34,7 @@ func FromOtel(input *v1.TracesData) Trace {
 	return New(traceID, spans)
 }
 
-func convertOtelSpanIntoSpan(span *v1.Span) *Span {
+func ConvertOtelSpanIntoSpan(span *v1.Span) *Span {
 	attributes := make(Attributes, 0)
 	for _, attribute := range span.Attributes {
 		attributes[attribute.Key] = getAttributeValue(attribute.Value)
@@ -93,4 +97,14 @@ func createSpanID(id []byte) trace.SpanID {
 	copy(sid[:], id[:8])
 
 	return trace.SpanID(sid)
+}
+
+func CreateTraceID(id []byte) trace.TraceID {
+	if id == nil {
+		return trace.TraceID{}
+	}
+
+	var tid [16]byte
+	copy(tid[:], id[:16])
+	return trace.TraceID(tid)
 }
