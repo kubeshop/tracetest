@@ -1,6 +1,6 @@
 import {TriggerTypes} from 'constants/Test.constants';
 import {get} from 'lodash';
-import {TRawTriggerResult, TTriggerResult} from 'types/Test.types';
+import {THeader, TRawTriggerResult, TTriggerResult} from 'types/Test.types';
 
 const entryBodyMap = {
   [TriggerTypes.http]: 'body',
@@ -24,7 +24,7 @@ const getResponseData = (type: TriggerTypes, response: object) => {
 
   return {
     body: get(response, entryBodyField, ''),
-    headers: get(response, entryHeadersField, undefined),
+    headers: get(response, entryHeadersField, undefined) as THeader[],
     statusCode: get(response, entryStatusCodeField, 200),
   };
 };
@@ -35,13 +35,16 @@ const TriggerResult = ({
 }: TRawTriggerResult): TTriggerResult => {
   const type = triggerType as TriggerTypes;
   const request = type === TriggerTypes.http ? http : grpc;
-  const {body, headers, statusCode} = getResponseData(type, request);
+  const {body, headers = [], statusCode} = getResponseData(type, request);
+
+  const bodyMimeType = headers.find(({key}) => key.toLowerCase() === 'content-type')?.value;
 
   return {
     type,
     body,
     headers,
     statusCode,
+    bodyMimeType,
   };
 };
 

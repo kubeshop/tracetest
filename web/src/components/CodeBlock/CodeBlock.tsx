@@ -1,19 +1,15 @@
 import ReactCodeMirror from '@uiw/react-codemirror';
-import {loadLanguage, LanguageName} from '@uiw/codemirror-extensions-langs';
+import {loadLanguage, LanguageName, langNames} from '@uiw/codemirror-extensions-langs';
 import {useMemo} from 'react';
-import {isHTML, isJson} from 'utils/Common';
 import * as S from './CodeBlock.styled';
 
 interface IProps {
   value: string;
+  mimeType: string;
 }
 
-const getInitialLang = (value: string): LanguageName | undefined => {
-  if (isJson(value)) return 'json';
-  if (isHTML(value)) return 'html';
-
-  return undefined;
-};
+const getInitialLang = (mimeType: string): LanguageName | undefined =>
+  langNames.find(lang => mimeType.includes(`/${lang}`));
 
 const formatValue = (value: string, lang: LanguageName | undefined): string => {
   switch (lang) {
@@ -25,8 +21,8 @@ const formatValue = (value: string, lang: LanguageName | undefined): string => {
   }
 };
 
-const CodeBlock = ({value}: IProps) => {
-  const lang = useMemo(() => getInitialLang(value), [value]);
+const CodeBlock = ({value, mimeType}: IProps) => {
+  const lang = useMemo(() => getInitialLang(mimeType), [mimeType]);
   const extensionList = useMemo(() => (lang ? [loadLanguage(lang)!] : []), [lang]);
 
   return (
