@@ -20,7 +20,7 @@ module.exports = {
               '@tooltip-color': '#031849',
               '@tooltip-bg': '#FBFBFF',
               /** Select */
-              '@select-background': '#FAFAFA',
+              '@select-background': '#FFFFFF',
               '@select-item-selected-bg': '#FAFAFA',
               /** Heading */
               '@heading-1-size': '18px',
