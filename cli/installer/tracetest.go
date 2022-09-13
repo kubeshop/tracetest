@@ -20,11 +20,11 @@ func configureDemoApp(conf configuration, ui UI) configuration {
 			ui.Error("The demo app requires the jaeger backend.")
 			opt := ui.Select("What do you want to do?", []option{
 				{"Continue without the demo", func(ui UI) {
-					conf.set("demo.enable", false)
+					conf.overwrite("demo.enable", false)
 					ui.Warning("demo disabled")
 				}},
 				{"Fix manually", exitOption(
-					"Check the docker install docs on https://docs.docker.com/get-docker/",
+					"You can restart the installer and select a different backend, or disable the demo. " + createIssueMsg,
 				)},
 			}, 0)
 			opt.fn(ui)
