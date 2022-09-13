@@ -14,8 +14,8 @@ import (
 func FromOtel(input *v1.TracesData) Trace {
 	flattenSpans := make([]*v1.Span, 0)
 	for _, resource := range input.ResourceSpans {
-		for _, scopeSpan := range resource.ScopeSpans {
-			flattenSpans = append(flattenSpans, scopeSpan.Spans...)
+		for _, scopeSpans := range resource.ScopeSpans {
+			flattenSpans = append(flattenSpans, scopeSpans.Spans...)
 		}
 	}
 
