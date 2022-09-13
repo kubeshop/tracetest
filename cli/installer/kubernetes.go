@@ -79,20 +79,22 @@ func installTracetest(conf configuration, ui UI) {
 		ui,
 	)
 
-	cc := createTmpFile("collector-config", string(getCollectorConfigFileContents(ui, conf)), ui)
-	defer os.Remove(cc.Name())
+	if conf.Bool("tracetest.collector.install") {
+		cc := createTmpFile("collector-config", string(getCollectorConfigFileContents(ui, conf)), ui)
+		defer os.Remove(cc.Name())
 
-	execCmd(
-		kubectlNamespaceCmd(conf,
-			"create configmap collector-config --from-file="+cc.Name()+" -o yaml --dry-run=client",
-			"| sed 's#"+path.Base(cc.Name())+"#collector.yaml#' |",
-			kubectlNamespaceCmd(conf, "replace -f -"),
-		),
-		ui,
-	)
+		execCmd(
+			kubectlNamespaceCmd(conf,
+				"create configmap collector-config --from-file="+cc.Name()+" -o yaml --dry-run=client",
+				"| sed 's#"+path.Base(cc.Name())+"#collector.yaml#' |",
+				kubectlNamespaceCmd(conf, "replace -f -"),
+			),
+			ui,
+		)
+		execCmd(kubectlNamespaceCmd(conf, "delete pods -l app.kubernetes.io/name=otel-collector"), ui)
+	}
 
 	execCmd(kubectlNamespaceCmd(conf, "delete pods -l app.kubernetes.io/name=tracetest"), ui)
-	execCmd(kubectlNamespaceCmd(conf, "delete pods -l app.kubernetes.io/name=otel-collector"), ui)
 
 	if conf.Bool("demo.enable") {
 		helm := helmCmd(conf, "")
