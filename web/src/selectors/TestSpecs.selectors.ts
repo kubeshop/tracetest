@@ -7,6 +7,7 @@ import {TSpansResult} from 'types/Span.types';
 const stateSelector = (state: RootState) => state.testSpecs;
 const selectorSelector = (state: RootState, selector: string) => selector;
 const spanIdSelector = (state: RootState, spanId: string) => spanId;
+const positionIndexSelector = (state: RootState, positionIndex: number) => positionIndex;
 
 const selectSpecs = createSelector(stateSelector, ({specs}) => specs);
 
@@ -97,6 +98,11 @@ const TestSpecsSelectors = () => ({
   ),
   selectAssertionBySelector: createSelector(stateSelector, selectorSelector, ({assertionResults}, selector) =>
     assertionResults?.resultList.find(def => def.selector === selector)
+  ),
+  selectAssertionByPositionIndex: createSelector(
+    stateSelector,
+    positionIndexSelector,
+    ({assertionResults}, positionIndex) => assertionResults?.resultList[positionIndex]
   ),
   selectSelectedSpec: createSelector(stateSelector, ({selectedSpec}) => selectedSpec),
   selectAssertionResultsBySpan,
