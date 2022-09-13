@@ -1,10 +1,12 @@
 import {Button, Form} from 'antd';
+import EditTestForm from 'components/EditTestForm';
+import {TriggerTypeToPlugin} from 'constants/Plugins.constants';
+import useValidateTestDraft from 'hooks/useValidateTestDraft';
+import {useTest} from 'providers/Test/Test.provider';
 import {useCallback} from 'react';
 import {TDraftTest, TTest} from 'types/Test.types';
-import EditTestForm from 'components/EditTestForm';
-import useValidateTestDraft from 'hooks/useValidateTestDraft';
-import {TriggerTypeToPlugin} from 'constants/Plugins.constants';
-import {useTest} from 'providers/Test/Test.provider';
+import {TestState as TestStateEnum} from '../../constants/TestRun.constants';
+import {useTestRun} from '../../providers/TestRun/TestRun.provider';
 import * as S from './EditTest.styled';
 
 interface IProps {
@@ -26,6 +28,8 @@ const EditTest = ({test}: IProps) => {
     [onEdit]
   );
 
+  const {run} = useTestRun();
+  const stateIsFinished = run.state === TestStateEnum.FINISHED;
   return (
     <S.Wrapper data-cy="edit-test-form">
       <S.FormContainer>
@@ -37,8 +41,8 @@ const EditTest = ({test}: IProps) => {
           </Button>
           <Button
             data-cy="edit-test-submit"
-            loading={isEditLoading}
-            disabled={!isValid}
+            loading={!stateIsFinished || isEditLoading}
+            disabled={!isValid || !stateIsFinished}
             type="primary"
             onClick={() => form.submit()}
           >
