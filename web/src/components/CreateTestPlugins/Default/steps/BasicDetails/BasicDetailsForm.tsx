@@ -7,9 +7,9 @@ import BasicDetailsDemoHelper from './BasicDetailsDemoHelper';
 import * as S from './BasicDetails.styled';
 
 export const FORM_ID = 'create-test';
-const {pokeshopDemoEnabled = 'false', otelDemoEnabled = 'false'} = window.ENV;
+const {demoEnabled = 'true'} = window.ENV || {};
 
-const isDemoEnabled = pokeshopDemoEnabled === 'true' || otelDemoEnabled === 'true';
+const isDemoEnabled = demoEnabled === 'true';
 
 interface IProps {
   onSelectDemo?(demo: TDraftTest): void;

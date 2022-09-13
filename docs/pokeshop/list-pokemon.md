@@ -1,10 +1,10 @@
-# Pokeshop - List Pokemons Endpoint
+# Pokeshop - List Pokemon Endpoint
 
 This endpoint returns the list of Pokemon directly from the database (Postgres) based on the provided query. The idea of this query is to showcase a straightforward scenario, where the API layer receives a request from the outside and needs to trigger a database query to get some data and return it to the client.
 
 ![](../img/516521996/517275672.png)
 
-### **Endpoint specification**
+## **Endpoint Specification**
 
 Route: `/pokemon?take=20&skip=0`
 
@@ -48,11 +48,11 @@ Response:
 
 ```
 
-### **Trace**
+## **Trace**
 
 ![](../img/516521996/517341205.png)
 
-### **Assertions**
+## **Assertions**
 
 Here are some key points that are relevant for this query.
 
@@ -82,7 +82,7 @@ This way the assertion form will have the selected attribute added as a check fr
 
 We can compare it directly by using **equals** or using **contains** to match a substring.
 
-After selecting **add** it should show as part of the assertions in edit mode.
+After selecting **add**, it should show as part of the assertions in edit mode.
 
 ![](../img/516521996/517406739.png)
 
@@ -90,10 +90,10 @@ After selecting **add** it should show as part of the assertions in edit mode.
 
 To achieve this, we can add an assertion targeting the select query span to contain the limit and offset parameters.
 
-To do that we need to select the specific span and click **add assertion,** we can add a check for the `db.statement` to contain `LIMIT 20 OFFSET 0` like:
+To do that we need to select the specific span and click **add assertion**. Then, we can add a check for the `db.statement` to contain `LIMIT 20 OFFSET 0` like:
 
 ![](../img/516521996/517308433.png)
 
-And by selecting **add** it should show up like this:
+And by selecting **add**, it should show up like this:
 
 ![](../img/516521996/517472269.png)

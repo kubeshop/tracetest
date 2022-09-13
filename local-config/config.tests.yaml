@@ -6,10 +6,11 @@ poolingConfig:
   retryDelay: 500ms
 
 demo:
-  pokeshopDemoEnabled: true
-  otelDemoEnabled: false
-  pokeshopDemoHostname: demo-api
-  otelDemoEndpoints: '{"frontend": "otel-frontend:8084", "productCatalog": "otel-productcatalogservice:3550", "checkout": "otel-checkoutservice:5050", "cart": "otel-cartservice:7070"}'
+  enabled: true
+  type: [pokeshop]
+  endpoints:
+    pokeshopHttp: http://demo-pokemon-api.demo.svc.cluster.local
+    pokeshopGrpc: demo-pokemon-api.demo.svc.cluster.local:8082
 
 googleAnalytics:
   enabled: false

@@ -4,7 +4,7 @@ This endpoint showcases the different checkpoints that can be added to an applic
 
 ![](../img/516849692/518193163.png)
 
-### **Endpoint specification**
+## **Endpoint Specification**
 
 Route: `/pokemon`
 
@@ -48,11 +48,11 @@ Response:
 
 ```
 
-### **Trace Details**
+## **Trace Details**
 
 ![](../img/516849692/517701666.png)
 
-### **Assertions**
+## **Assertions**
 
 Here are some key points that are relevant to this query.
 
@@ -62,7 +62,7 @@ To demonstrate the custom span capability from OTEL, this trace contains a check
 
 To add an assertion to this checkpoint simply click the General span and then head into the custom tab where the custom attribute `validation.isValid` is displayed.
 
-Then click the add **assertion** button to open the form with the prefilled data.
+Then click the **add assertion** button to open the form with the prefilled data.
 
 ![](../img/516849692/517406776.png)
 

@@ -66,6 +66,7 @@ jobs:
           VERSION=${{ github.ref_name}}
           TRACETEST_ENV=main
           PUBLIC_PATH=/
+          POKE_API=http://demo-pokemon-api.demo.svc.cluster.local
 
   release-cli:
     name: Build CLI release arctifacts
@@ -197,6 +198,7 @@ jobs:
           ANALYTICS_FE_KEY=${{ secrets.ANALYTICS_FE_KEY }}
           VERSION=${{ github.ref_name}}-demo
           TRACETEST_ENV=demo
+          POKE_API=http://demo-pokemon-api.demo.svc.cluster.local
     - name: Set ouput docker tag
       run: echo "::set-output tag=${{ steps.meta.outputs.tags }}"
 

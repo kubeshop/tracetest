@@ -10,6 +10,7 @@ services:
       args:
         VERSION: dev
         TRACETEST_ENV: docker-compose
+        POKE_API: http://demo-api:8081
     volumes:
       - type: bind
         source: ./local-config/config.tests.yaml
@@ -33,7 +34,7 @@ services:
     image: postgres
     environment:
       POSTGRES_PASSWORD: postgres
-      POSTGRES_USER:  postgres
+      POSTGRES_USER: postgres
     ports:
       - 5432:5432
     healthcheck:
@@ -81,7 +82,7 @@ services:
     ports:
       - 6379:6379
     healthcheck:
-      test: ["CMD", "redis-cli","ping"]
+      test: ["CMD", "redis-cli", "ping"]
       interval: 1s
       timeout: 3s
       retries: 60
@@ -164,7 +165,7 @@ services:
     ports:
       - 8082:8082
     healthcheck:
-      test: ["CMD","lsof", "-i", "8082"]
+      test: ["CMD", "lsof", "-i", "8082"]
       interval: 1s
       timeout: 3s
       retries: 60
@@ -220,179 +221,3 @@ services:
       OPENSEARCH_PASSWORD: admin
     depends_on:
       - opensearch
-
-  # Otel demo
-  otel-adservice:
-    image: otel/demo:v0.3.4-alpha-adservice
-    ports:
-      - "${AD_SERVICE_PORT}"
-    environment:
-      - AD_SERVICE_PORT
-      - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
-      - OTEL_EXPORTER_OTLP_METRICS_ENDPOINT
-      - OTEL_SERVICE_NAME=adservice
-    depends_on:
-      - otel-collector
-
-  # CartService
-  otel-cartservice:
-    image: otel/demo:v0.3.4-alpha-cartservice
-    ports:
-      - "${CART_SERVICE_PORT}"
-    environment:
-      - CART_SERVICE_PORT
-      - REDIS_ADDR
-      - OTEL_EXPORTER_OTLP_ENDPOINT
-      - OTEL_SERVICE_NAME=cartservice
-      - ASPNETCORE_URLS=http://*:${CART_SERVICE_PORT}
-    depends_on:
-      - cache
-      - otel-collector
-
-  # CheckoutService
-  otel-checkoutservice:
-    image: otel/demo:v0.3.4-alpha-checkoutservice
-    ports:
-      - "${CHECKOUT_SERVICE_PORT}"
-    environment:
-      - CHECKOUT_SERVICE_PORT
-      - CART_SERVICE_ADDR
-      - CURRENCY_SERVICE_ADDR
-      - EMAIL_SERVICE_ADDR
-      - PAYMENT_SERVICE_ADDR
-      - PRODUCT_CATALOG_SERVICE_ADDR
-      - SHIPPING_SERVICE_ADDR
-      - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
-      - OTEL_SERVICE_NAME=checkoutservice
-    depends_on:
-      - otel-cartservice
-      - otel-currencyservice
-      - otel-emailservice
-      - otel-paymentservice
-      - otel-productcatalogservice
-      - otel-shippingservice
-      - otel-collector
-
-  # CurrencyService
-  otel-currencyservice:
-    image: otel/demo:v0.3.4-alpha-currencyservice
-    ports:
-      - "${CURRENCY_SERVICE_PORT}"
-    environment:
-      - CURRENCY_SERVICE_PORT
-      - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
-      - OTEL_RESOURCE_ATTRIBUTES=service.name=currencyservice   # The C++ SDK does not support OTEL_SERVICE_NAME
-    depends_on:
-      - otel-collector
-
-  # EmailService
-  otel-emailservice:
-    image: otel/demo:v0.3.4-alpha-emailservice
-    ports:
-      - "${EMAIL_SERVICE_PORT}"
-    environment:
-      - APP_ENV=production
-      - EMAIL_SERVICE_PORT
-      - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://otelcol:4318/v1/traces
-      - OTEL_SERVICE_NAME=emailservice
-    depends_on:
-      - otel-collector
-
-  # Frontend
-  otel-frontend:
-    image: otel/demo:v0.3.4-alpha-frontend
-    ports:
-      - "${FRONTEND_PORT}:${FRONTEND_PORT}"
-    environment:
-      - PORT=${FRONTEND_PORT}
-      - FRONTEND_ADDR
-      - AD_SERVICE_ADDR
-      - CART_SERVICE_ADDR
-      - CHECKOUT_SERVICE_ADDR
-      - CURRENCY_SERVICE_ADDR
-      - PRODUCT_CATALOG_SERVICE_ADDR
-      - RECOMMENDATION_SERVICE_ADDR
-      - SHIPPING_SERVICE_ADDR
-      - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
-      - OTEL_RESOURCE_ATTRIBUTES=service.name=frontend
-      - OTEL_EXPORTER_OTLP_ENDPOINT
-      - ENV_PLATFORM
-      - OTEL_SERVICE_NAME=frontend
-    depends_on:
-      - otel-adservice
-      - otel-cartservice
-      - otel-checkoutservice
-      - otel-currencyservice
-      - otel-productcatalogservice
-      - otel-recommendationservice
-      - otel-shippingservice
-      - otel-collector
-
-  # PaymentService
-  otel-paymentservice:
-    image: otel/demo:v0.3.4-alpha-paymentservice
-    ports:
-      - "${PAYMENT_SERVICE_PORT}"
-    environment:
-      - PAYMENT_SERVICE_PORT
-      - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
-      - OTEL_SERVICE_NAME=paymentservice
-    depends_on:
-      - otel-collector
-
-  # ProductCatalogService
-  otel-productcatalogservice:
-    image: otel/demo:v0.3.4-alpha-productcatalogservice
-    ports:
-      - "${PRODUCT_CATALOG_SERVICE_PORT}"
-    environment:
-      - PRODUCT_CATALOG_SERVICE_PORT
-      - FEATURE_FLAG_GRPC_SERVICE_ADDR
-      - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
-      - OTEL_SERVICE_NAME=productcatalogservice
-    depends_on:
-      - otel-collector
-
-  # RecommendationService
-  otel-recommendationservice:
-    image: otel/demo:v0.3.4-alpha-recommendationservice
-    ports:
-      - "${RECOMMENDATION_SERVICE_PORT}"
-    depends_on:
-      - otel-productcatalogservice
-      - otel-collector
-    environment:
-      - RECOMMENDATION_SERVICE_PORT
-      - PRODUCT_CATALOG_SERVICE_ADDR
-      - OTEL_PYTHON_LOG_CORRELATION=true
-      - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
-      - OTEL_SERVICE_NAME=recommendationservice
-
-  # ShippingService
-  otel-shippingservice:
-    image: otel/demo:v0.3.4-alpha-shippingservice
-    ports:
-      - "${SHIPPING_SERVICE_PORT}"
-    environment:
-      - SHIPPING_SERVICE_PORT
-      - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
-      - OTEL_SERVICE_NAME=shippingservice
-    depends_on:
-      - otel-collector
-
-  # FeatureFlagService
-  otel-featureflagservice:
-    image: otel/demo:v0.3.4-alpha-featureflagservice
-    ports:
-      - "${FEATURE_FLAG_SERVICE_PORT}:${FEATURE_FLAG_SERVICE_PORT}"     # Feature Flag Service UI
-      - "${FEATURE_FLAG_GRPC_SERVICE_PORT}"                             # Feature Flag Service gRPC API
-    environment:
-      - FEATURE_FLAG_SERVICE_PORT
-      - FEATURE_FLAG_GRPC_SERVICE_PORT
-      - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
-      - OTEL_EXPORTER_OTLP_TRACES_PROTOCOL=grpc
-      - OTEL_SERVICE_NAME=featureflagservice
-      - DATABASE_URL=postgres://postgres:postgres@postgres:5432/postgres
-    depends_on:
-      postgres:
-        condition: service_healthy

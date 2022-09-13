@@ -8,10 +8,15 @@ googleAnalytics:
   enabled: true
 
 demo:
-  pokeshopDemoEnabled: true
-  otelDemoEnabled: true
-  pokeshopDemoHostname: demo-api
-  otelDemoEndpoints: '{"frontend": "otel-frontend:8084", "productCatalog": "otel-productcatalogservice:3550", "checkout": "otel-checkoutservice:5050", "cart": "otel-cartservice:7070"}'
+  enabled: true
+  type: [pokeshop, otel]
+  endpoints:
+    pokeshopHttp: http://demo-api
+    pokeshopGrpc: demo-api:8082
+    otelFrontend: otel-frontend:8084
+    otelProductCatalog: otel-productcatalogservice:3550
+    otelCart: otel-cartservice:7070
+    otelCheckout: otel-checkoutservice:5050
 
 telemetry:
   dataStores:

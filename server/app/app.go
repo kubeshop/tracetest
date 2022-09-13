@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -30,6 +31,7 @@ import (
 var (
 	Version = "dev"
 	Env     = "dev"
+	PokeAPI = "dev"
 )
 
 type App struct {
@@ -150,12 +152,25 @@ func (a *App) Start() error {
 
 	router.Handle("/ws", wsRouter.Handler())
 
+	demoTypes, _ := json.Marshal(a.config.Demo.Type)
+	demoEndpoints, _ := json.Marshal(a.config.Demo.Endpoints)
+
 	router.PathPrefix(a.config.Server.PathPrefix).Handler(
 		spaHandler(
 			a.config.Server.PathPrefix,
 			"./html",
 			"index.html",
-			a.config.GetFrontendConfig(analytics.FrontendKey, serverID, Version, Env),
+			map[string]string{
+				"AnalyticsKey":     analytics.FrontendKey,
+				"AnalyticsEnabled": fmt.Sprintf("%t", a.config.GA.Enabled),
+				"ServerPathPrefix": fmt.Sprintf("%s/", a.config.Server.PathPrefix),
+				"ServerID":         serverID,
+				"AppVersion":       Version,
+				"Env":              Env,
+				"DemoEnabled":      fmt.Sprintf("%t", a.config.Demo.Enabled),
+				"DemoType":         config.JsonEscape(string(demoTypes)),
+				"DemoEndpoints":    config.JsonEscape(string(demoEndpoints)),
+			},
 		),
 	)
 

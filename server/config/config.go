@@ -22,10 +22,18 @@ type (
 	}
 
 	Demo struct {
-		PokeshopDemoEnabled  bool   `yaml:",omitempty" mapstructure:"pokeshopDemoEnabled"`
-		OtelDemoEnabled      bool   `yaml:",omitempty" mapstructure:"otelDemoEnabled"`
-		PokeshopDemoHostname string `yaml:",omitempty" mapstructure:"pokeshopDemoHostname"`
-		OtelDemoEndpoints    string `yaml:",omitempty" mapstructure:"otelDemoEndpoints"`
+		Enabled   bool          `yaml:",omitempty" mapstructure:"enabled"`
+		Type      []string      `yaml:",omitempty" mapstructure:"type"`
+		Endpoints DemoEndpoints `yaml:",omitempty" mapstructure:"endpoints"`
+	}
+
+	DemoEndpoints struct {
+		PokeshopHttp       string `yaml:",omitempty" mapstructure:"pokeshopHttp"`
+		PokeshopGrpc       string `yaml:",omitempty" mapstructure:"pokeshopGrpc"`
+		OtelFrontend       string `yaml:",omitempty" mapstructure:"otelFrontend"`
+		OtelProductCatalog string `yaml:",omitempty" mapstructure:"otelProductCatalog"`
+		OtelCart           string `yaml:",omitempty" mapstructure:"otelCart"`
+		OtelCheckout       string `yaml:",omitempty" mapstructure:"otelCheckout"`
 	}
 
 	GoogleAnalytics struct {
@@ -142,22 +150,7 @@ func (c Config) getExporter(name string) (*TelemetryExporterOption, error) {
 	return &exporterConfig, nil
 }
 
-func (c Config) GetFrontendConfig(analyticsKey string, serverID string, version string, env string) map[string]string {
-	return map[string]string{
-		"AnalyticsKey":         analyticsKey,
-		"AnalyticsEnabled":     fmt.Sprintf("%t", c.GA.Enabled),
-		"ServerPathPrefix":     fmt.Sprintf("%s/", c.Server.PathPrefix),
-		"ServerID":             serverID,
-		"AppVersion":           version,
-		"Env":                  env,
-		"PokeshopDemoEnabled":  fmt.Sprintf("%t", c.Demo.PokeshopDemoEnabled),
-		"OtelDemoEnabled":      fmt.Sprintf("%t", c.Demo.OtelDemoEnabled),
-		"PokeshopDemoHostname": c.Demo.PokeshopDemoHostname,
-		"OtelDemoEndpoints":    jsonEscape(c.Demo.OtelDemoEndpoints),
-	}
-}
-
-func jsonEscape(text string) string {
+func JsonEscape(text string) string {
 	b, err := json.Marshal(text)
 	if err != nil {
 		panic(err)

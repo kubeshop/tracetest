@@ -7,43 +7,40 @@ const pokeshopProtoFile = new File([pokeshopProtoData?.proto], 'pokeshop.proto')
 const otelProtoFile = new File([otelProtoData?.proto], 'otel-demo.proto');
 const pokeshopPostmanFile = new File([JSON.stringify(pokeshopPostmanData)], 'pokeshop.postman_collection.json');
 
-const {
-  pokeshopDemoEnabled = 'true',
-  pokeshopDemoHostname = '',
-  otelDemoEndpoints = '{}',
-  otelDemoEnabled = 'false',
-} = window.ENV || {};
+const {demoEnabled = 'true', demoEndpoints = '{}', demoType = '["pokeshop"]'} = window.ENV || {};
 
-const isPokeshopEnabled = pokeshopDemoEnabled === 'true';
-const isOtelEnabled = otelDemoEnabled === 'true';
+const isPokeshopEnabled = demoEnabled === 'true' && demoType.includes('pokeshop');
+const isOtelEnabled = demoEnabled === 'true' && demoType.includes('otel');
 
 const {
-  frontend = '',
-  productCatalog = '',
-  cart = '',
-  checkout = '',
-}: Record<string, string> = JSON.parse(otelDemoEndpoints);
+  PokeshopHttp = '',
+  PokeshopGrpc = '',
+  OtelFrontend = '',
+  OtelProductCatalog = '',
+  OtelCart = '',
+  OtelCheckout = '',
+}: Record<string, string> = JSON.parse(demoEndpoints);
 const userId = '2491f868-88f1-4345-8836-d5d8511a9f83';
 
 export const PokeshopDemo = {
   [SupportedPlugins.REST]: [
     {
       name: 'Pokeshop - List',
-      url: `http://${pokeshopDemoHostname}/pokemon?take=20&skip=0`,
+      url: `${PokeshopHttp}/pokemon?take=20&skip=0`,
       method: HTTP_METHOD.GET,
       body: '',
       description: 'Get a Pokemon',
     },
     {
       name: 'Pokeshop - Add',
-      url: `http:/${pokeshopDemoHostname}/pokemon`,
+      url: `${PokeshopHttp}/pokemon`,
       method: HTTP_METHOD.POST,
-      body: '/{"name":"meowth","type":"normal","imageUrl":"https://assets.pokemon.com/assets/cms2/img/pokedex/full/052.png","isFeatured":true}',
+      body: '{"name":"meowth","type":"normal","imageUrl":"https://assets.pokemon.com/assets/cms2/img/pokedex/full/052.png","isFeatured":true}',
       description: 'Add a Pokemon',
     },
     {
       name: 'Pokeshop - Import',
-      url: `http://${pokeshopDemoHostname}/pokemon/import`,
+      url: `${PokeshopHttp}/pokemon/import`,
       method: HTTP_METHOD.POST,
       body: '{"id":52}',
       description: 'Import a Pokemon',
@@ -52,7 +49,7 @@ export const PokeshopDemo = {
   [SupportedPlugins.GRPC]: [
     {
       name: 'Pokeshop - List',
-      url: `${pokeshopDemoHostname}:8082`,
+      url: PokeshopGrpc,
       message: '',
       method: 'pokeshop.Pokeshop.getPokemonList',
       description: 'Get a Pokemon',
@@ -60,7 +57,7 @@ export const PokeshopDemo = {
     },
     {
       name: 'Pokeshop - Add',
-      url: `${pokeshopDemoHostname}:8082`,
+      url: PokeshopGrpc,
       message:
         '{"name":"meowth","type":"normal","imageUrl":"https://assets.pokemon.com/assets/cms2/img/pokedex/full/052.png","isFeatured":true}',
       method: 'pokeshop.Pokeshop.createPokemon',
@@ -69,7 +66,7 @@ export const PokeshopDemo = {
     },
     {
       name: 'Pokeshop - Import',
-      url: `${pokeshopDemoHostname}:8082`,
+      url: PokeshopGrpc,
       message: '{"id":52}',
       method: 'pokeshop.Pokeshop.importPokemon',
       protoFile: pokeshopProtoFile,
@@ -79,7 +76,7 @@ export const PokeshopDemo = {
   [SupportedPlugins.Postman]: [
     {
       name: 'Pokeshop - List',
-      url: `http://${pokeshopDemoHostname}/pokemon?take=20&skip=0`,
+      url: `${PokeshopHttp}/pokemon?take=20&skip=0`,
       method: HTTP_METHOD.GET,
       body: '',
       description: 'Get a Pokemon',
@@ -88,7 +85,7 @@ export const PokeshopDemo = {
     },
     {
       name: 'Pokeshop - Add',
-      url: `http://${pokeshopDemoHostname}/pokemon`,
+      url: `${PokeshopHttp}/pokemon`,
       method: HTTP_METHOD.POST,
       body: '{"name":"meowth","type":"normal","imageUrl":"https://assets.pokemon.com/assets/cms2/img/pokedex/full/052.png","isFeatured":true}',
       description: 'Add a Pokemon',
@@ -97,7 +94,7 @@ export const PokeshopDemo = {
     },
     {
       name: 'Pokeshop - Import',
-      url: `http://${pokeshopDemoHostname}/pokemon/import`,
+      url: `${PokeshopHttp}/pokemon/import`,
       method: HTTP_METHOD.POST,
       body: '{"id":52}',
       description: 'Import a Pokemon',
@@ -111,21 +108,21 @@ export const OtelDemo = {
   [SupportedPlugins.REST]: [
     {
       name: 'Otel - List Products',
-      url: `http://${frontend}/api/products`,
+      url: `${OtelFrontend}/api/products`,
       method: HTTP_METHOD.GET,
       body: '',
       description: 'Otel - List Products',
     },
     {
       name: 'Otel - Get Product',
-      url: `http://${frontend}/api/products/OLJCESPC7Z`,
+      url: `${OtelFrontend}/api/products/OLJCESPC7Z`,
       method: HTTP_METHOD.GET,
       body: '',
       description: 'Otel - Get Product',
     },
     {
       name: 'Otel - Add To Cart',
-      url: `http://${frontend}/api/cart`,
+      url: `${OtelFrontend}/api/cart`,
       method: HTTP_METHOD.POST,
       body: JSON.stringify({
         item: {productId: 'OLJCESPC7Z', quantity: 1},
@@ -135,14 +132,14 @@ export const OtelDemo = {
     },
     {
       name: 'Otel - Get Cart',
-      url: `http://${frontend}/api/cart?sessionId=${userId}`,
+      url: `${OtelFrontend}/api/cart?sessionId=${userId}`,
       method: HTTP_METHOD.GET,
       body: '',
       description: 'Otel - Get Cart',
     },
     {
       name: 'Otel - Checkout',
-      url: `http://${frontend}/api/checkout`,
+      url: `${OtelFrontend}/api/checkout`,
       method: HTTP_METHOD.POST,
       body: JSON.stringify({
         userId,
@@ -168,7 +165,7 @@ export const OtelDemo = {
   [SupportedPlugins.GRPC]: [
     {
       name: 'Otel - List Products',
-      url: productCatalog,
+      url: OtelProductCatalog,
       message: '',
       method: 'hipstershop.ProductCatalogService.ListProducts',
       description: 'Otel - List Products',
@@ -176,7 +173,7 @@ export const OtelDemo = {
     },
     {
       name: 'Otel - Get Product',
-      url: productCatalog,
+      url: OtelProductCatalog,
       message: '{"id": "OLJCESPC7Z"}',
       method: 'hipstershop.ProductCatalogService.GetProduct',
       description: 'Otel - Get Product',
@@ -184,7 +181,7 @@ export const OtelDemo = {
     },
     {
       name: 'Otel - Add To Cart',
-      url: cart,
+      url: OtelCart,
       message: JSON.stringify({item: {product_id: 'OLJCESPC7Z', quantity: 1}, user_id: userId}),
       method: 'hipstershop.CartService.AddItem',
       description: 'Otel - Add To Cart',
@@ -192,7 +189,7 @@ export const OtelDemo = {
     },
     {
       name: 'Otel - Get Cart',
-      url: cart,
+      url: OtelCart,
       message: `{"user_id": "${userId}"}`,
       method: 'hipstershop.CartService.GetCart',
       description: 'Otel - Get Cart',
@@ -200,7 +197,7 @@ export const OtelDemo = {
     },
     {
       name: 'Otel - Checkout',
-      url: checkout,
+      url: OtelCheckout,
       message: JSON.stringify({
         user_id: userId,
         user_currency: 'USD',
