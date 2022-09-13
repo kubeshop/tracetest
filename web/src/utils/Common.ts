@@ -1,5 +1,3 @@
-import {AES, enc} from 'crypto-js';
-
 export const escapeString = (str: string): string => {
   // eslint-disable-next-line no-control-regex
   return str.replace(/[\\"']/g, '\\$&').replace(/\u0000/g, '\\0');
@@ -44,15 +42,3 @@ export function singularOrPlural(noun: string, quantity: number) {
   if (quantity === 1) return noun;
   return `${noun}s`;
 }
-
-const encryptKey = 'tracetest';
-
-export const encryptString = (data: string): string => {
-  return AES.encrypt(data, encryptKey).toString();
-};
-
-export const decryptString = (data: string): string => {
-  const bytes = AES.decrypt(data, encryptKey);
-
-  return bytes.toString(enc.Utf8);
-};
