@@ -125,3 +125,10 @@ export const StatusSpan = styled.span<{$isError: boolean}>`
   color: ${({$isError, theme}) => ($isError ? theme.color.error : theme.color.success)};
   font-weight: 700;
 `;
+
+export const HeadersList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 0;
+`;

@@ -1,6 +1,6 @@
 import {Form, Input, Select} from 'antd';
 import {HTTP_METHOD} from 'constants/Common.constants';
-import Validator from "utils/Validator";
+import Validator from 'utils/Validator';
 import * as S from './RequestDetails.styled';
 
 interface IProps {
@@ -11,15 +11,18 @@ interface IProps {
 const RequestDetailsUrlInput = ({showMethodSelector = true, shouldValidateUrl = true}: IProps) => {
   return (
     <div>
+      <S.Label>URL</S.Label>
       <S.URLInputContainer>
         {showMethodSelector && (
           <div>
-            <Form.Item name="method" initialValue={HTTP_METHOD.GET} valuePropName="value" label="URL">
+            <Form.Item name="method" initialValue={HTTP_METHOD.GET} valuePropName="value">
               <Select
+                showSearch
                 className="select-method"
                 data-cy="method-select"
                 dropdownClassName="select-dropdown-method"
                 style={{minWidth: 120}}
+                filterOption={(input, option) => option?.key?.toLowerCase().includes(input.toLowerCase())}
               >
                 {Object.keys(HTTP_METHOD).map(method => {
                   return (
@@ -53,7 +56,6 @@ const RequestDetailsUrlInput = ({showMethodSelector = true, shouldValidateUrl = 
             },
           ]}
           style={{flex: 1}}
-          label={!showMethodSelector ? 'URL' : ''}
         >
           <Input data-cy="url" placeholder="Enter request url" />
         </Form.Item>

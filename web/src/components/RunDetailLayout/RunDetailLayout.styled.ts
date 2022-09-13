@@ -34,11 +34,27 @@ export const ContainerHeader = styled.div`
     }
   }
 
+  .ant-tabs-nav-list {
+    border-radius: 2px;
+  }
+
   .ant-tabs-tab {
-    border: ${({theme}) => `1px solid ${theme.color.borderLight}`};
     font-weight: 600;
     padding: 5px 16px;
     margin: 7px 0;
+    border: ${({theme}) => `1px solid ${theme.color.borderLight}`};
+    border-right: none;
+
+    &:nth-of-type(1) {
+      border-top-left-radius: 2px;
+      border-bottom-left-radius: 2px;
+    }
+
+    &:nth-last-child(2) {
+      border-right: ${({theme}) => `1px solid ${theme.color.borderLight}`};
+      border-top-right-radius: 2px;
+      border-bottom-right-radius: 2px;
+    }
 
     &.ant-tabs-tab-active {
       background-color: ${({theme}) => theme.color.primary};
