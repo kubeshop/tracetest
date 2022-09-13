@@ -10,10 +10,10 @@ interface IProps {
 
 const Switch = ({onChange, type}: IProps) => (
   <S.Container>
-    <Tooltip title="Graph view">
+    <Tooltip title="Graph view" placement="right">
       <S.DAGIcon $isSelected={type === VisualizationType.Dag} onClick={() => onChange(VisualizationType.Dag)} />
     </Tooltip>
-    <Tooltip title="Timeline view">
+    <Tooltip title="Timeline view" placement="right">
       <S.TimelineIcon
         $isSelected={type === VisualizationType.Timeline}
         onClick={() => onChange(VisualizationType.Timeline)}

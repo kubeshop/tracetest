@@ -6,6 +6,7 @@ export const Container = styled.div`
   border: ${({theme}) => `1px solid ${theme.color.borderLight}`};
   border-radius: 2px;
   display: flex;
+  flex-direction: column;
   gap: 12px;
   padding: 7px;
 `;
