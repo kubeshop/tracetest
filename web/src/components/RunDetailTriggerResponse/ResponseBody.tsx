@@ -1,18 +1,10 @@
 import SkeletonResponse from './SkeletonResponse';
-import * as S from './RunDetailTriggerResponse.styled';
+import CodeBlock from '../CodeBlock';
 
 interface IProps {
   body?: string;
 }
 
-const ResponseBody = ({body = ''}: IProps) => {
-  return !body ? (
-    <SkeletonResponse />
-  ) : (
-    <S.ValueJson>
-      <pre>{JSON.stringify(JSON.parse(body), null, 2)}</pre>
-    </S.ValueJson>
-  );
-};
+const ResponseBody = ({body = ''}: IProps) => (!body ? <SkeletonResponse /> : <CodeBlock value={body} />);
 
 export default ResponseBody;

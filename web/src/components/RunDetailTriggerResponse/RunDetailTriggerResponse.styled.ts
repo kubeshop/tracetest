@@ -77,40 +77,6 @@ export const TextHolder = styled.div<{$width?: number}>`
   width: ${({$width = 100}) => $width}%;
 `;
 
-export const ValueJson = styled(Typography.Text)`
-  margin-top: 25px;
-  display: block;
-
-  pre {
-    margin: 0;
-    background: ${({theme}) => theme.color.background};
-    border: ${({theme}) => `1px solid ${theme.color.borderLight}`};
-    font-size: ${({theme}) => theme.size.sm};
-  }
-`;
-
-export const HeaderContainer = styled.div`
-  align-items: center;
-  background-color: ${({theme}) => theme.color.white};
-  display: flex;
-  margin-bottom: 4px;
-  padding: 12px;
-  transition: background-color 0.2s ease;
-
-  &:hover {
-    background-color: ${({theme}) => theme.color.background};
-  }
-`;
-
-export const Header = styled.div`
-  flex: 1;
-`;
-
-export const AttributeValueRow = styled.div`
-  display: flex;
-  word-break: break-word;
-`;
-
 export const TextContainer = styled.div`
   text-overflow: ellipsis;
   white-space: nowrap;
