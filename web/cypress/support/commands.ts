@@ -97,9 +97,8 @@ Cypress.Commands.add('matchTestRunPageUrl', () => {
 Cypress.Commands.add('goToTestDetailPageAndRunTest', (pathname: string) => {
   const testId = getTestId(pathname);
   cy.visit(`/test/${testId}`);
-  cy.get('[data-cy^=result-card]', {timeout: 10000}).first().click();
+  cy.get('[data-cy^=run-card]', {timeout: 10000}).first().click();
   cy.makeSureUserIsOnTestDetailPage();
-  // cy.get(`[data-cy^=test-run-result-]`).first().click();
   cy.makeSureUserIsOnTracePage(false);
 });
 
