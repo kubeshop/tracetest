@@ -45,7 +45,11 @@ const RunActionsMenu = ({resultId, testId, testVersion, isRunView = false}: IPro
         placement="bottomLeft"
         trigger={['click']}
       >
-        <S.ActionButton data-cy={`result-actions-button-${resultId}`} />
+        {isRunView ? (
+          <S.ActionButtonRunView data-cy={`result-actions-button-${resultId}`} />
+        ) : (
+          <S.ActionButton data-cy={`result-actions-button-${resultId}`} />
+        )}
       </Dropdown>
     </span>
   );
