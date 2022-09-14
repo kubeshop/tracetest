@@ -2,12 +2,13 @@ import {createAsyncThunk} from '@reduxjs/toolkit';
 import {parse, ParsedQuery, stringify} from 'query-string';
 import {Params} from 'react-router-dom';
 import {push} from 'redux-first-history';
+import {RouterSearchFields} from 'constants/Common.constants';
 import TestSpecsSelectors from 'selectors/TestSpecs.selectors';
-import {RouterSearchFields} from '../../constants/Common.constants';
-import SpanSelectors from '../../selectors/Span.selectors';
-import {setSelectedSpan} from '../slices/Span.slice';
-import {setSelectedSpec} from '../slices/TestSpecs.slice';
-import {RootState} from '../store';
+import DAGSelectors from 'selectors/DAG.selectors';
+import SpanSelectors from 'selectors/Span.selectors';
+import {setSelectedSpan} from 'redux/slices/Span.slice';
+import {setSelectedSpec} from 'redux/slices/TestSpecs.slice';
+import {RootState} from 'redux/store';
 
 export interface IQuery {
   search: ParsedQuery<string>;
@@ -29,9 +30,10 @@ const RouterActions = () => ({
         Number(positionIndex)
       );
       const selectedSpec = TestSpecsSelectors.selectSelectedSpec(getState() as RootState);
+      const isDagReady = DAGSelectors.selectNodes(getState() as RootState).length > 0;
 
       if (selectedSpec === assertionResult?.selector) return;
-      if (assertionResult) dispatch(setSelectedSpec(assertionResult));
+      if (assertionResult && isDagReady) dispatch(setSelectedSpec(assertionResult));
     }
   ),
   updateSelectedSpan: createAsyncThunk<void, IQuery>(
