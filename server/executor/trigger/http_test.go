@@ -61,11 +61,11 @@ func TestTriggerGet(t *testing.T) {
 
 	ex := trigger.HTTP()
 
-	resp, err := ex.Trigger(createContext(), test)
+	resp, err := ex.Trigger(createContext(), test, nil)
 	assert.NoError(t, err)
 
 	assert.Equal(t, 200, resp.Result.HTTP.StatusCode)
-	assert.Equal(t, `{"content": "OK"}`, resp.Result.HTTP.Body)
+	assert.Equal(t, "OK", resp.Result.HTTP.Body)
 }
 
 func TestTriggerPost(t *testing.T) {
@@ -108,11 +108,11 @@ func TestTriggerPost(t *testing.T) {
 
 	ex := trigger.HTTP()
 
-	resp, err := ex.Trigger(createContext(), test)
+	resp, err := ex.Trigger(createContext(), test, nil)
 	assert.NoError(t, err)
 
 	assert.Equal(t, 200, resp.Result.HTTP.StatusCode)
-	assert.Equal(t, `{"content": "OK"}`, resp.Result.HTTP.Body)
+	assert.Equal(t, "OK", resp.Result.HTTP.Body)
 }
 
 func TestTriggerPostWithApiKeyAuth(t *testing.T) {
@@ -169,11 +169,11 @@ func TestTriggerPostWithApiKeyAuth(t *testing.T) {
 
 	ex := trigger.HTTP()
 
-	resp, err := ex.Trigger(createContext(), test)
+	resp, err := ex.Trigger(createContext(), test, nil)
 	assert.NoError(t, err)
 
 	assert.Equal(t, 200, resp.Result.HTTP.StatusCode)
-	assert.Equal(t, `{"content": "OK"}`, resp.Result.HTTP.Body)
+	assert.Equal(t, "OK", resp.Result.HTTP.Body)
 }
 
 func TestTriggerPostWithBasicAuth(t *testing.T) {
@@ -229,11 +229,11 @@ func TestTriggerPostWithBasicAuth(t *testing.T) {
 
 	ex := trigger.HTTP()
 
-	resp, err := ex.Trigger(createContext(), test)
+	resp, err := ex.Trigger(createContext(), test, nil)
 	assert.NoError(t, err)
 
 	assert.Equal(t, 200, resp.Result.HTTP.StatusCode)
-	assert.Equal(t, `{"content": "OK"}`, resp.Result.HTTP.Body)
+	assert.Equal(t, "OK", resp.Result.HTTP.Body)
 }
 
 func TestTriggerPostWithBearerAuth(t *testing.T) {
@@ -288,9 +288,9 @@ func TestTriggerPostWithBearerAuth(t *testing.T) {
 
 	ex := trigger.HTTP()
 
-	resp, err := ex.Trigger(createContext(), test)
+	resp, err := ex.Trigger(createContext(), test, nil)
 	assert.NoError(t, err)
 
 	assert.Equal(t, 200, resp.Result.HTTP.StatusCode)
-	assert.Equal(t, `{"content": "OK"}`, resp.Result.HTTP.Body)
+	assert.Equal(t, "OK", resp.Result.HTTP.Body)
 }

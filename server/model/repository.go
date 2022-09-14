@@ -24,7 +24,7 @@ type RunRepository interface {
 	DeleteRun(context.Context, Run) error
 	GetRun(context.Context, uuid.UUID) (Run, error)
 	GetTestRuns(_ context.Context, _ Test, take, skip int32) ([]Run, error)
-	GetRunByTraceID(context.Context, Test, trace.TraceID) (Run, error)
+	GetRunByTraceID(context.Context, trace.TraceID) (Run, error)
 }
 
 type Repository interface {

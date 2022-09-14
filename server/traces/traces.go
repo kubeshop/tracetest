@@ -97,6 +97,19 @@ func (t *Trace) Sort() Trace {
 	return trace
 }
 
+func (t *Trace) Spans() []Span {
+	if t == nil {
+		return []Span{}
+	}
+
+	spans := make([]Span, 0, len(t.Flat))
+	for _, span := range t.Flat {
+		spans = append(spans, *span)
+	}
+
+	return spans
+}
+
 func sortSpanChildren(span Span) Span {
 	sort.SliceStable(span.Children, func(i, j int) bool {
 		return span.Children[i].StartTime.Before(span.Children[j].StartTime)

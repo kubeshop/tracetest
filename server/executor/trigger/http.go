@@ -3,7 +3,6 @@ package trigger
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -32,17 +31,18 @@ func newSpanContext(ctx context.Context) trace.SpanContext {
 		sid = spanCtx.SpanID()
 	}
 
+	tracestate, _ := trace.ParseTraceState("tracetest=true")
 	var tf trace.TraceFlags
 	return trace.NewSpanContext(trace.SpanContextConfig{
 		TraceID:    tid,
 		SpanID:     sid,
 		TraceFlags: tf.WithSampled(true),
-		TraceState: trace.TraceState{},
+		TraceState: tracestate,
 		Remote:     true,
 	})
 }
 
-func (te *httpTriggerer) Trigger(ctx context.Context, test model.Test) (Response, error) {
+func (te *httpTriggerer) Trigger(ctx context.Context, test model.Test, opts *TriggerOptions) (Response, error) {
 	response := Response{
 		Result: model.TriggerResult{
 			Type: te.Type(),
@@ -106,11 +106,7 @@ func mapResp(resp *http.Response) model.HTTPResponse {
 	}
 	var body string
 	if b, err := io.ReadAll(resp.Body); err == nil {
-		if isJson(b) {
-			body = string(b)
-		} else {
-			body = fmt.Sprintf(`{"content": "%s"}`, string(b))
-		}
+		body = string(b)
 	} else {
 		fmt.Println(err)
 	}
@@ -121,11 +117,4 @@ func mapResp(resp *http.Response) model.HTTPResponse {
 		Headers:    mappedHeaders,
 		Body:       body,
 	}
-}
-
-func isJson(content []byte) bool {
-	var ignored map[string]interface{}
-	err := json.Unmarshal(content, &ignored)
-
-	return err == nil
 }
