@@ -41,7 +41,7 @@ const EditTest = ({test}: IProps) => {
           </Button>
           <Button
             data-cy="edit-test-submit"
-            loading={!stateIsFinished || isEditLoading}
+            loading={isEditLoading}
             disabled={!isValid || !stateIsFinished}
             type="primary"
             onClick={() => form.submit()}
