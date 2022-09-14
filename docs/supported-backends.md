@@ -63,3 +63,24 @@ service:
       processors: [tail_sampling, batch] # make sure to have the tail_sampling before your batch processor
       exporters: [otlp/1] # your exporter pointing to your tracetest instance
 ```
+
+#### Configuring your Tracetest instance
+
+You also have to configure your Tracetest instance to make it aware that there's no tracing backend to poll traces from. Just change your configuration file to include this configuration:
+
+```yaml
+# your tracetest config YAML file
+
+telemetry:
+    dataStores:
+        otlp:
+            type: otlp
+
+    # rest of your telemetry configuration
+
+server:
+  telemetry:
+    dataStore: otlp
+
+# rest of the configuration file
+```
