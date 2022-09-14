@@ -6,8 +6,7 @@ poolingConfig:
   retryDelay: 500ms
 
 demo:
-  enabled: true
-  type: [pokeshop]
+  enabled: [pokeshop]
   endpoints:
     pokeshopHttp: http://demo-pokemon-api.demo.svc.cluster.local
     pokeshopGrpc: demo-pokemon-api.demo.svc.cluster.local:8082

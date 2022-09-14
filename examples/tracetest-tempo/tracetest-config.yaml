@@ -8,8 +8,7 @@ googleAnalytics:
   enabled: false
 
 demo:
-  enabled: true
-  type: [pokeshop]
+  enabled: []
 
 telemetry:
   dataStores:

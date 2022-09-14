@@ -7,6 +7,9 @@ poolingConfig:
 googleAnalytics:
   enabled: false
 
+demo:
+  enabled: []
+
 telemetry:
   dataStores:
     jaeger:
