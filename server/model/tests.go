@@ -132,6 +132,23 @@ func (e *AssertionExpression) String() string {
 	return fmt.Sprintf("%s %s %s", e.LiteralValue.Value, e.Operation, e.Expression.String())
 }
 
+func (e *AssertionExpression) Type() string {
+	if e == nil {
+		return "string"
+	}
+
+	if e.Expression == nil {
+		return e.LiteralValue.Type
+	}
+
+	if e.LiteralValue.Type == "attribute" {
+		// in case of attributes, we check the rest of the expression to know its type
+		return e.Expression.Type()
+	}
+
+	return e.LiteralValue.Type
+}
+
 type RunState string
 
 const (
