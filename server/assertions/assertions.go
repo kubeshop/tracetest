@@ -1,6 +1,9 @@
 package assertions
 
 import (
+	"fmt"
+	"strconv"
+
 	"github.com/kubeshop/tracetest/server/assertions/selectors"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/traces"
@@ -68,6 +71,11 @@ func assertIndividualSpans(a model.Assertion, spans []traces.Span) model.Asserti
 		expectedValue, err := ExecuteExpression(*a.Value, span)
 		actualValue := span.Attributes.Get(a.Attribute.String())
 
+		// See https://github.com/kubeshop/tracetest/issues/1203
+		if a.Value.Type() == "duration" {
+			actualValue = getRoundedDurationValue(actualValue)
+		}
+
 		res[i] = apply(
 			a,
 			expectedValue,
@@ -88,6 +96,14 @@ func assertIndividualSpans(a model.Assertion, spans []traces.Span) model.Asserti
 		AllPassed: allPassed,
 		Results:   res,
 	}
+}
+
+func getRoundedDurationValue(value string) string {
+	numberValue, _ := strconv.Atoi(value)
+	valueAsDuration := traces.ConvertNanoSecondsIntoProperTimeUnit(numberValue)
+	roundedValue := traces.ConvertTimeFieldIntoNanoSeconds(valueAsDuration)
+
+	return fmt.Sprintf("%d", roundedValue)
 }
 
 func apply(a model.Assertion, expected, actual string, spanID *trace.SpanID) model.SpanAssertionResult {

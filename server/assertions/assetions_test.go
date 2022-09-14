@@ -222,6 +222,54 @@ func TestAssertion(t *testing.T) {
 				},
 			}),
 		},
+		// https://github.com/kubeshop/tracetest/issues/1203
+		{
+			name: "DurationComparison",
+			testDef: (model.OrderedMap[model.SpanQuery, []model.Assertion]{}).MustAdd(`span[service.name="Pokeshop"]`, []model.Assertion{
+				{
+					Attribute:  "tracetest.span.duration",
+					Comparator: comparator.Lte,
+					Value: &model.AssertionExpression{
+						LiteralValue: model.LiteralValue{
+							Value: "25ms",
+							Type:  "duration",
+						},
+					},
+				},
+			}),
+			trace: traces.Trace{
+				RootSpan: traces.Span{
+					ID: spanID,
+					Attributes: traces.Attributes{
+						"service.name":            "Pokeshop",
+						"http.response.body":      `{"id":52}`,
+						"tracetest.span.duration": "25187564", // 25ms
+					},
+				},
+			},
+			expectedAllPassed: true,
+			expectedResult: (model.OrderedMap[model.SpanQuery, []model.AssertionResult]{}).MustAdd(`span[service.name="Pokeshop"]`, []model.AssertionResult{
+				{
+					Assertion: model.Assertion{
+						Attribute:  "tracetest.span.duration",
+						Comparator: comparator.Lte,
+						Value: &model.AssertionExpression{
+							LiteralValue: model.LiteralValue{
+								Value: "25ms",
+								Type:  "duration",
+							},
+						},
+					},
+					Results: []model.SpanAssertionResult{
+						{
+							SpanID:        &spanID,
+							ObservedValue: "25000000",
+							CompareErr:    nil,
+						},
+					},
+				},
+			}),
+		},
 	}
 
 	for _, c := range cases {
