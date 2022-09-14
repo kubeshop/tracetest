@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/kubeshop/tracetest/server/config"
+	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/traces"
 )
 
@@ -16,6 +17,7 @@ const (
 	TEMPO_BACKEND      string = "tempo"
 	OPENSEARCH_BACKEND string = "opensearch"
 	SIGNALFX           string = "signalfx"
+	OTLP               string = "otlp"
 )
 
 type TraceDB interface {
@@ -25,7 +27,7 @@ type TraceDB interface {
 
 var ErrInvalidTraceDBProvider = fmt.Errorf("invalid traceDB provider: available options are (jaeger, tempo)")
 
-func New(c config.Config) (db TraceDB, err error) {
+func New(c config.Config, repository model.Repository) (db TraceDB, err error) {
 	selectedDataStore, err := c.DataStore()
 	if err != nil {
 		return nil, ErrInvalidTraceDBProvider
@@ -42,6 +44,8 @@ func New(c config.Config) (db TraceDB, err error) {
 		db, err = newOpenSearchDB(selectedDataStore.OpenSearch)
 	case selectedDataStore.Type == SIGNALFX:
 		db, err = newSignalFXDB(selectedDataStore.SignalFX)
+	case selectedDataStore.Type == OTLP:
+		db, err = newCollectorDB(repository)
 	}
 
 	return

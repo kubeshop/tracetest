@@ -59,7 +59,7 @@ func GetTestingApp(options ...TestingAppOption) (*app.App, error) {
 		option(&config)
 	}
 
-	tracedb, err := tracedb.New(config)
+	tracedb, err := tracedb.New(config, db)
 	if err != nil {
 		return nil, err
 	}

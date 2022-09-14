@@ -108,3 +108,10 @@ func CreateTraceID(id []byte) trace.TraceID {
 	copy(tid[:], id[:16])
 	return trace.TraceID(tid)
 }
+
+func DecodeTraceID(id string) trace.TraceID {
+	bytes, _ := hex.DecodeString(id)
+	var tid [16]byte
+	copy(tid[:], bytes[:16])
+	return trace.TraceID(tid)
+}

@@ -43,7 +43,7 @@ func newSpanContext(ctx context.Context) trace.SpanContext {
 	})
 }
 
-func (te *httpTriggerer) Trigger(ctx context.Context, test model.Test) (Response, error) {
+func (te *httpTriggerer) Trigger(ctx context.Context, test model.Test, opts *TriggerOptions) (Response, error) {
 	response := Response{
 		Result: model.TriggerResult{
 			Type: te.Type(),

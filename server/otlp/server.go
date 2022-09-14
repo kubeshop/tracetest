@@ -51,7 +51,11 @@ func (s Server) Export(ctx context.Context, request *pb.ExportTraceServiceReques
 		s.saveSpansIntoTest(ctx, traceID, spans)
 	}
 
-	return &pb.ExportTraceServiceResponse{}, nil
+	return &pb.ExportTraceServiceResponse{
+		PartialSuccess: &pb.ExportTracePartialSuccess{
+			RejectedSpans: 0,
+		},
+	}, nil
 }
 
 func (s Server) getSpansByTrace(request *pb.ExportTraceServiceRequest) map[trace.TraceID][]traces.Span {
@@ -67,7 +71,7 @@ func (s Server) getSpansByTrace(request *pb.ExportTraceServiceRequest) map[trace
 	for _, span := range otelSpans {
 		traceID := traces.CreateTraceID(span.TraceId)
 		var existingArray []traces.Span
-		if spansArray, ok := spansByTrace[traceID]; !ok {
+		if spansArray, ok := spansByTrace[traceID]; ok {
 			existingArray = spansArray
 		} else {
 			existingArray = make([]traces.Span, 0)
@@ -82,7 +86,7 @@ func (s Server) getSpansByTrace(request *pb.ExportTraceServiceRequest) map[trace
 
 func (s Server) saveSpansIntoTest(ctx context.Context, traceID trace.TraceID, spans []traces.Span) error {
 	run, err := s.db.GetRunByTraceID(ctx, traceID)
-	if strings.Contains(err.Error(), "record not found") {
+	if err != nil && strings.Contains(err.Error(), "record not found") {
 		// span is not part of any known test run. So it will be ignored
 		return nil
 	}

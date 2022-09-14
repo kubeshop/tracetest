@@ -37,7 +37,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	traceDB, err := tracedb.New(cfg)
+	traceDB, err := tracedb.New(cfg, testDB)
 	if err != nil {
 		log.Fatal(err)
 	}

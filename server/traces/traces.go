@@ -98,7 +98,11 @@ func (t *Trace) Sort() Trace {
 }
 
 func (t *Trace) Spans() []Span {
-	spans := make([]Span, len(t.Flat))
+	if t == nil {
+		return []Span{}
+	}
+
+	spans := make([]Span, 0, len(t.Flat))
 	for _, span := range t.Flat {
 		spans = append(spans, *span)
 	}

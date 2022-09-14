@@ -9,12 +9,8 @@ googleAnalytics:
 
 telemetry:
   dataStores:
-    jaeger:
-      type: jaeger
-      jaeger:
-        endpoint: jaeger:16685
-        tls:
-          insecure: true
+    otlp:
+      type: otlp
 
 
   exporters:
@@ -28,6 +24,6 @@ telemetry:
 
 server:
   telemetry:
-    dataStore: jaeger
+    dataStore: otlp
     exporter: collector
     applicationExporter: collector

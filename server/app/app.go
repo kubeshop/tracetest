@@ -175,7 +175,7 @@ func (a *App) Start() error {
 	}
 
 	// Start otlp endpoint
-	go func() { otlp.StartServer(5415, a.db) }()
+	go func() { otlp.StartServer(21321, a.db) }()
 
 	port := 8080
 	if a.config.Server.HttpPort != 0 {

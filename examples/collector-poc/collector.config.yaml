@@ -20,26 +20,15 @@ exporters:
   logging:
     loglevel: debug
 
-  jaeger:
-    endpoint: ${JAEGER_ENDPOINT}
+  otlp/1:
+    endpoint: ${TRACETEST_ENDPOINT}
     tls:
       insecure: true
 
-  jaeger/2:
-    endpoint: ${JAEGER2_ENDPOINT}
-    tls:
-      insecure: true
 
 service:
   pipelines:
-    # normal pipeline
     traces/1:
       receivers: [otlp]
-      processors: [batch]
-      exporters: [logging, jaeger]
-
-    # filtered pipeline
-    traces/2:
-      receivers: [otlp]
       processors: [tail_sampling, batch]
-      exporters: [jaeger/2]
+      exporters: [otlp/1]

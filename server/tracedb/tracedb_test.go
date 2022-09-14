@@ -68,7 +68,7 @@ func TestCreateClient(t *testing.T) {
 			cl := c
 			t.Parallel()
 
-			actual, err := tracedb.New(cl.config)
+			actual, err := tracedb.New(cl.config, nil)
 
 			if cl.expectedType != "" {
 				require.NoError(t, err)

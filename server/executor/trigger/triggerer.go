@@ -10,8 +10,12 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
+type TriggerOptions struct {
+	TraceID trace.TraceID
+}
+
 type Triggerer interface {
-	Trigger(context.Context, model.Test) (Response, error)
+	Trigger(context.Context, model.Test, *TriggerOptions) (Response, error)
 	Type() model.TriggerType
 }
 

@@ -111,7 +111,7 @@ func (td *postgresDB) GetTestRuns(ctx context.Context, test model.Test, take, sk
 }
 
 func (td *postgresDB) GetRunByTraceID(ctx context.Context, traceID trace.TraceID) (model.Run, error) {
-	stmt, err := td.db.Prepare("SELECT run, test_id, test_version FROM runs WHERE run ->> 'TraceId' = $1")
+	stmt, err := td.db.Prepare("SELECT run, test_id, test_version FROM runs WHERE run ->> 'TraceID' = $1")
 	if err != nil {
 		return model.Run{}, err
 	}
