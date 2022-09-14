@@ -2,8 +2,7 @@ version: '3'
 services:
 
     tracetest:
-        build:
-            context: ../../
+        image: kubeshop/tracetest:${TAG:-latest}
         volumes:
             - type: bind
               source: ./tracetest-config.yaml
