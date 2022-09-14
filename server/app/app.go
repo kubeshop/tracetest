@@ -153,7 +153,7 @@ func (a *App) Start() error {
 
 	router.Handle("/ws", wsRouter.Handler())
 
-	demoTypes, _ := json.Marshal(a.config.Demo.Type)
+	demoEnabled, _ := json.Marshal(a.config.Demo.Enabled)
 	demoEndpoints, _ := json.Marshal(a.config.Demo.Endpoints)
 
 	router.PathPrefix(a.config.Server.PathPrefix).Handler(
@@ -168,8 +168,7 @@ func (a *App) Start() error {
 				"ServerID":         serverID,
 				"AppVersion":       Version,
 				"Env":              Env,
-				"DemoEnabled":      fmt.Sprintf("%t", a.config.Demo.Enabled),
-				"DemoType":         config.JsonEscape(string(demoTypes)),
+				"DemoEnabled":      config.JsonEscape(string(demoEnabled)),
 				"DemoEndpoints":    config.JsonEscape(string(demoEndpoints)),
 			},
 		),

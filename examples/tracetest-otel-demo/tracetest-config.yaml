@@ -6,8 +6,7 @@ poolingConfig:
   retryDelay: 500ms
 
 demo:
-  enabled: true
-  type: [otel]
+  enabled: [otel]
   endpoints:
     otelFrontend: http://otel-frontend:8084
     otelProductCatalog: otel-productcatalogservice:3550

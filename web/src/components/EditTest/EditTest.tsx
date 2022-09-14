@@ -5,8 +5,8 @@ import useValidateTestDraft from 'hooks/useValidateTestDraft';
 import {useTest} from 'providers/Test/Test.provider';
 import {useCallback} from 'react';
 import {TDraftTest, TTest} from 'types/Test.types';
-import {TestState as TestStateEnum} from '../../constants/TestRun.constants';
-import {useTestRun} from '../../providers/TestRun/TestRun.provider';
+import {TestState} from 'constants/TestRun.constants';
+import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import * as S from './EditTest.styled';
 
 interface IProps {
@@ -29,7 +29,8 @@ const EditTest = ({test}: IProps) => {
   );
 
   const {run} = useTestRun();
-  const stateIsFinished = run.state === TestStateEnum.FINISHED;
+  const stateIsFinished = ([TestState.FINISHED, TestState.FAILED] as string[]).includes(run.state);
+
   return (
     <S.Wrapper data-cy="edit-test-form">
       <S.FormContainer>

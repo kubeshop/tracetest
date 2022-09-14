@@ -13,7 +13,6 @@ export interface IEnv {
   pokeApi: string;
   env: string;
   demoEnabled: string;
-  demoType: string;
   demoEndpoints: string;
 }
 

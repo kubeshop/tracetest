@@ -7,10 +7,10 @@ const pokeshopProtoFile = new File([pokeshopProtoData?.proto], 'pokeshop.proto')
 const otelProtoFile = new File([otelProtoData?.proto], 'otel-demo.proto');
 const pokeshopPostmanFile = new File([JSON.stringify(pokeshopPostmanData)], 'pokeshop.postman_collection.json');
 
-const {demoEnabled = 'true', demoEndpoints = '{}', demoType = '["pokeshop"]'} = window.ENV || {};
+const {demoEndpoints = '{}', demoEnabled = '[]'} = window.ENV || {};
 
-const isPokeshopEnabled = demoEnabled === 'true' && demoType.includes('pokeshop');
-const isOtelEnabled = demoEnabled === 'true' && demoType.includes('otel');
+const isPokeshopEnabled = demoEnabled.includes('pokeshop');
+const isOtelEnabled = demoEnabled.includes('otel');
 
 const {
   PokeshopHttp = '',

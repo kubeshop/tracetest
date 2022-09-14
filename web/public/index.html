@@ -43,9 +43,8 @@
           serverID: getTemplateValue('{{ .ServerID }}', ''),
           appVersion: getTemplateValue('{{ .AppVersion }}', ''),
           env: getTemplateValue('{{ .Env }}', ''),
-          demoEnabled: getTemplateValue('{{ .DemoEnabled }}', 'true'),
-          demoType: getTemplateValue('{{ .DemoType }}', '["pokeshop"]'),
-          demoEndpoints: getTemplateValue('{{ .DemoEndpoints }}', '{"pokeshopHttp": "http://demo-pokemon-api.demo.svc.cluster.local", "pokeshopGrpc": "demo-pokemon-api.demo.svc.cluster.local:8082"}'),
+          demoEnabled: getTemplateValue('{{ .DemoEnabled }}', '["pokeshop", "otel"]'),
+          demoEndpoints: getTemplateValue('{{ .DemoEndpoints }}', '{"PokeshopHttp": "http://demo-pokemon-api.demo.svc.cluster.local", "PokeshopGrpc": "demo-pokemon-api.demo.svc.cluster.local:8082", "OtelFrontend": "http://otel-frontend:8084" }'),
         };
 
         var base = document.createElement('base');

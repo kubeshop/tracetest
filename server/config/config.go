@@ -22,8 +22,7 @@ type (
 	}
 
 	Demo struct {
-		Enabled   bool          `yaml:",omitempty" mapstructure:"enabled"`
-		Type      []string      `yaml:",omitempty" mapstructure:"type"`
+		Enabled   []string      `yaml:",omitempty" mapstructure:"enabled"`
 		Endpoints DemoEndpoints `yaml:",omitempty" mapstructure:"endpoints"`
 	}
 

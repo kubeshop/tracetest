@@ -7,9 +7,8 @@ import BasicDetailsDemoHelper from './BasicDetailsDemoHelper';
 import * as S from './BasicDetails.styled';
 
 export const FORM_ID = 'create-test';
-const {demoEnabled = 'true'} = window.ENV || {};
-
-const isDemoEnabled = demoEnabled === 'true';
+const {demoEnabled = '[]'} = window.ENV || {};
+const isDemoEnabled = JSON.parse(demoEnabled).length > 0;
 
 interface IProps {
   onSelectDemo?(demo: TDraftTest): void;
