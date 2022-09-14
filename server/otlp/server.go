@@ -45,8 +45,6 @@ func (s Server) Export(ctx context.Context, request *pb.ExportTraceServiceReques
 
 	spansByTrace := s.getSpansByTrace(request)
 
-	fmt.Println(spansByTrace)
-
 	for traceID, spans := range spansByTrace {
 		s.saveSpansIntoTest(ctx, traceID, spans)
 	}

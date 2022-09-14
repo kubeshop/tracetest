@@ -27,7 +27,7 @@ type TraceDB interface {
 
 var ErrInvalidTraceDBProvider = fmt.Errorf("invalid traceDB provider: available options are (jaeger, tempo)")
 
-func New(c config.Config, repository model.Repository) (db TraceDB, err error) {
+func New(c config.Config, repository model.RunRepository) (db TraceDB, err error) {
 	selectedDataStore, err := c.DataStore()
 	if err != nil {
 		return nil, ErrInvalidTraceDBProvider

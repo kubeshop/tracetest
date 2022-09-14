@@ -9,10 +9,10 @@ import (
 )
 
 type OTLPTraceDB struct {
-	db model.Repository
+	db model.RunRepository
 }
 
-func newCollectorDB(repository model.Repository) (TraceDB, error) {
+func newCollectorDB(repository model.RunRepository) (TraceDB, error) {
 	return &OTLPTraceDB{
 		db: repository,
 	}, nil
