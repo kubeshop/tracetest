@@ -15,6 +15,27 @@ func configureDemoApp(conf configuration, ui UI) configuration {
 		"demo.enable",
 		ui.Confirm("Do you want to enable the demo app?", true),
 	)
+	if conf.Bool("demo.enable") {
+		if conf.String("tracetest.backend.type") != "jaeger" {
+			ui.Error("The demo app requires the jaeger backend.")
+			opt := ui.Select("What do you want to do?", []option{
+				{"Continue without the demo", func(ui UI) {
+					conf.overwrite("demo.enable", false)
+					ui.Warning("demo disabled")
+				}},
+				{"Fix manually", exitOption(
+					"You can restart the installer and select a different backend, or disable the demo. " + createIssueMsg,
+				)},
+			}, 0)
+			opt.fn(ui)
+		} else if !conf.has("tracetest.backend.endpoint.agent") {
+			defaultAgent := "jaeger-agent"
+			if conf.String("installer") == "kubernetes" {
+				defaultAgent = "jaeger-agent." + conf.String("k8s.namespace")
+			}
+			conf.set("tracetest.backend.endpoint.agent", ui.TextInput("Jaeger Agent endpoint", defaultAgent))
+		}
+	}
 	return conf
 }
 
@@ -69,10 +90,22 @@ See https://kubeshop.github.io/tracetest/supported-backends/
 		installBackend = true
 
 		// default values
-		conf.set("tracetest.backend.type", "jaeger")
-		conf.set("tracetest.backend.endpoint.query", "jaeger:16685")
-		conf.set("tracetest.backend.endpoint.collector", "jaeger:14250")
-		conf.set("tracetest.backend.tls.insecure", true)
+		switch conf.String("installer") {
+		case "docker-compose":
+			conf.set("tracetest.backend.type", "jaeger")
+			conf.set("tracetest.backend.endpoint.query", "jaeger:16685")
+			conf.set("tracetest.backend.endpoint.collector", "jaeger:14250")
+			conf.set("tracetest.backend.endpoint.agent", "jaeger")
+			conf.set("tracetest.backend.tls.insecure", true)
+		case "kubernetes":
+			conf.set("tracetest.backend.type", "jaeger")
+			conf.set("tracetest.backend.endpoint.query", "jaeger-query:16685")
+			conf.set("tracetest.backend.endpoint.collector", "jaeger-collector:14250")
+			conf.set("tracetest.backend.tls.insecure", true)
+			conf.set("tracetest.backend.endpoint.agent", "jaeger-agent."+conf.String("k8s.namespace"))
+
+		}
+
 	}
 
 	conf.set("tracetest.backend.install", installBackend)
@@ -113,9 +146,9 @@ func configureBackendOptions(conf configuration, ui UI) configuration {
 	return conf
 }
 
-func getTracetestConfigFileContents(ui UI, config configuration) []byte {
+func getTracetestConfigFileContents(psql string, ui UI, config configuration) []byte {
 	sc := serverConfig.Config{
-		PostgresConnString: "host=postgres user=postgres password=postgres port=5432 sslmode=disable",
+		PostgresConnString: psql,
 		PoolingConfig: serverConfig.PoolingConfig{
 			MaxWaitTimeForTrace: "2m",
 			RetryDelay:          "1s",

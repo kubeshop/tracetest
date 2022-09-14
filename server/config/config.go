@@ -2,7 +2,7 @@ package config
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"time"
 
 	"github.com/mitchellh/mapstructure"
@@ -15,7 +15,7 @@ type (
 		Server             ServerConfig    `yaml:",omitempty" mapstructure:"server"`
 		PostgresConnString string          `yaml:",omitempty" mapstructure:"postgresConnString"`
 		PoolingConfig      PoolingConfig   `yaml:",omitempty" mapstructure:"poolingConfig"`
-		GA                 GoogleAnalytics `yaml:",omitempty" mapstructure:"googleAnalytics"`
+		GA                 GoogleAnalytics `yaml:"googleAnalytics,omitempty" mapstructure:"googleAnalytics"`
 		Telemetry          Telemetry       `yaml:",omitempty" mapstructure:"telemetry"`
 	}
 
@@ -134,7 +134,7 @@ func (c Config) getExporter(name string) (*TelemetryExporterOption, error) {
 }
 
 func FromFile(file string) (Config, error) {
-	yamlFile, err := ioutil.ReadFile(file)
+	yamlFile, err := os.ReadFile(file)
 	if err != nil {
 		return Config{}, fmt.Errorf("read file: %w", err)
 	}
