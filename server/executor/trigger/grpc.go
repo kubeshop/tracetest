@@ -27,7 +27,7 @@ func GRPC() Triggerer {
 
 type grpcTriggerer struct{}
 
-func (te *grpcTriggerer) Trigger(ctx context.Context, test model.Test) (Response, error) {
+func (te *grpcTriggerer) Trigger(ctx context.Context, test model.Test, opts *TriggerOptions) (Response, error) {
 	response := Response{
 		Result: model.TriggerResult{
 			Type: te.Type(),

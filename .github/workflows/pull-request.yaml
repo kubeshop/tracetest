@@ -137,7 +137,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        example_dir: [tracetest-jaeger, tracetest-opensearch, tracetest-tempo]
+        example_dir: [collector-poc, tracetest-jaeger, tracetest-opensearch, tracetest-tempo]
     steps:
       - name: Checkout
         uses: actions/checkout@v3

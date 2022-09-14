@@ -20,6 +20,7 @@ import (
 	"github.com/kubeshop/tracetest/server/http/websocket"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
+	"github.com/kubeshop/tracetest/server/otlp"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/traces"
@@ -172,6 +173,9 @@ func (a *App) Start() error {
 	if err != nil {
 		return err
 	}
+
+	// Start otlp endpoint
+	go func() { otlp.StartServer(21321, a.db) }()
 
 	port := 8080
 	if a.config.Server.HttpPort != 0 {

@@ -120,8 +120,7 @@ func (r persistentRunner) processExecQueue(job execReq) {
 	run := job.run.Start()
 	r.handleDBError(r.updater.Update(job.ctx, run))
 
-	trigger := job.test.ServiceUnderTest
-	triggerer, err := r.triggers.Get(trigger.Type)
+	triggerer, err := r.triggers.Get(job.test.ServiceUnderTest.Type)
 	if err != nil {
 		// TODO: actually handle the error
 		panic(err)
@@ -135,10 +134,15 @@ func (r persistentRunner) processExecQueue(job execReq) {
 
 	job.test = newTest
 
-	response, err := triggerer.Trigger(job.ctx, job.test)
+	traceID := model.IDGen.TraceID()
+	run.TraceID = traceID
+	r.handleDBError(r.updater.Update(job.ctx, run))
+
+	response, err := triggerer.Trigger(job.ctx, job.test, &trigger.TriggerOptions{
+		TraceID: traceID,
+	})
 	run = r.handleExecutionResult(run, response, err)
 
-	run.TraceID = response.TraceID
 	run.SpanID = response.SpanID
 
 	r.handleDBError(r.updater.Update(job.ctx, run))

@@ -61,7 +61,7 @@ func TestTriggerGet(t *testing.T) {
 
 	ex := trigger.HTTP()
 
-	resp, err := ex.Trigger(createContext(), test)
+	resp, err := ex.Trigger(createContext(), test, nil)
 	assert.NoError(t, err)
 
 	assert.Equal(t, 200, resp.Result.HTTP.StatusCode)
@@ -108,7 +108,7 @@ func TestTriggerPost(t *testing.T) {
 
 	ex := trigger.HTTP()
 
-	resp, err := ex.Trigger(createContext(), test)
+	resp, err := ex.Trigger(createContext(), test, nil)
 	assert.NoError(t, err)
 
 	assert.Equal(t, 200, resp.Result.HTTP.StatusCode)
@@ -169,7 +169,7 @@ func TestTriggerPostWithApiKeyAuth(t *testing.T) {
 
 	ex := trigger.HTTP()
 
-	resp, err := ex.Trigger(createContext(), test)
+	resp, err := ex.Trigger(createContext(), test, nil)
 	assert.NoError(t, err)
 
 	assert.Equal(t, 200, resp.Result.HTTP.StatusCode)
@@ -229,7 +229,7 @@ func TestTriggerPostWithBasicAuth(t *testing.T) {
 
 	ex := trigger.HTTP()
 
-	resp, err := ex.Trigger(createContext(), test)
+	resp, err := ex.Trigger(createContext(), test, nil)
 	assert.NoError(t, err)
 
 	assert.Equal(t, 200, resp.Result.HTTP.StatusCode)
@@ -288,7 +288,7 @@ func TestTriggerPostWithBearerAuth(t *testing.T) {
 
 	ex := trigger.HTTP()
 
-	resp, err := ex.Trigger(createContext(), test)
+	resp, err := ex.Trigger(createContext(), test, nil)
 	assert.NoError(t, err)
 
 	assert.Equal(t, 200, resp.Result.HTTP.StatusCode)
