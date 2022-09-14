@@ -9,11 +9,12 @@ googleAnalytics:
 
 telemetry:
   dataStores:
-    signalfx:
-      type: signalfx
-      signalfx:
-        token: <YOUR_TOKEN> # UPDATE THIS
-        realm: us1 # UPDATE THIS IF NEEDED
+    jaeger:
+      type: jaeger
+      jaeger:
+        endpoint: jaeger:16685
+        tls:
+          insecure: true
 
   exporters:
     collector:
@@ -26,6 +27,6 @@ telemetry:
 
 server:
   telemetry:
-    dataStore: signalfx
+    dataStore: jaeger
     exporter: collector
     applicationExporter: collector

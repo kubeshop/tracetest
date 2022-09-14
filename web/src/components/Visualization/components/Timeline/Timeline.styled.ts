@@ -10,6 +10,7 @@ import {
 export const Container = styled.div<{$showMatched: boolean}>`
   height: 100%;
   padding: 24px;
+  padding-left: 50px;
   position: relative;
 
   ${({$showMatched}) =>

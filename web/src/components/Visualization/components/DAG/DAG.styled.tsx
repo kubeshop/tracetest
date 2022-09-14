@@ -19,11 +19,13 @@ export const ActionButton = styled(Button)<{$isActive?: boolean}>`
 export const ActionsContainer = styled.div`
   background-color: ${({theme}) => theme.color.background};
   border-radius: 8px;
-  padding: 0 8px;
+  padding: 0 5px;
   position: absolute;
-  right: 16px;
-  top: 16px;
+  left: 16px;
+  bottom: 25px;
   z-index: 9;
+  display: flex;
+  flex-direction: column;
 `;
 
 export const Container = styled.div<{$showMatched: boolean}>`

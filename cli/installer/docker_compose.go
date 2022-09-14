@@ -13,13 +13,13 @@ import (
 
 	"github.com/compose-spec/compose-go/loader"
 	"github.com/compose-spec/compose-go/types"
-	"github.com/kubeshop/tracetest/cli/analytics"
 	cliConfig "github.com/kubeshop/tracetest/cli/config"
 	"golang.org/x/exp/slices"
 	"gopkg.in/yaml.v3"
 )
 
 var dockerCompose = installer{
+	name: "docker-compose",
 	preChecks: []preChecker{
 		dockerChecker,
 		dockerReadyChecker,
@@ -68,14 +68,7 @@ const (
 )
 
 func dockerComposeInstaller(config configuration, ui UI) {
-	analytics.Track("Apply", "installer", map[string]string{
-		"type":                    "docker-compose",
-		"install_backend":         fmt.Sprintf("%t", config.Bool("tracetest.backend.install")),
-		"install_collector":       fmt.Sprintf("%t", config.Bool("tracetest.collector.install")),
-		"install_demo":            fmt.Sprintf("%t", config.Bool("demo.enable")),
-		"enable_server_analytics": fmt.Sprintf("%t", config.Bool("tracetest.analytics")),
-		"backend_type":            config.String("tracetest.backend.type"),
-	})
+	trackInstall("docker-compose", config, nil)
 
 	dir := config.String("output.dir")
 	force := Force
@@ -106,8 +99,9 @@ You can run this command again with the -f option to overwrite it.
 		createEmptyDockerComposeFile(cwdDockerComposeFname, ui)
 	}
 
+	psql := "host=postgres user=postgres password=postgres port=5432 sslmode=disable"
+	tracetestConfigFile := getTracetestConfigFileContents(psql, ui, config)
 	collectorConfigFile := getCollectorConfigFileContents(ui, config)
-	tracetestConfigFile := getTracetestConfigFileContents(ui, config)
 	dockerComposeFile := getDockerComposeFileContents(ui, config)
 	dockerComposeFName := filepath.Join(dir, dockerComposeFilename)
 

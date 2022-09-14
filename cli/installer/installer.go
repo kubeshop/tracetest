@@ -36,6 +36,7 @@ or reach us on Discord https://discord.gg/6zupCZFQbe
 }
 
 type installer struct {
+	name      string
 	preChecks []preChecker
 	configs   []configurator
 	installFn func(config configuration, ui UI)
@@ -52,6 +53,7 @@ func (i installer) PreCheck(ui UI) {
 
 func (i installer) Configure(ui UI) configuration {
 	config := newConfiguration(ui)
+	config.set("installer", i.name)
 	for _, confFn := range i.configs {
 		config = confFn(config, ui)
 	}
@@ -93,6 +95,15 @@ func (c configuration) set(key string, value interface{}) {
 	c.db[key] = value
 }
 
+func (c configuration) overwrite(key string, value interface{}) {
+	c.db[key] = value
+}
+
+func (c configuration) has(key string) bool {
+	_, exists := c.db[key]
+	return exists
+}
+
 func (c configuration) get(key string) interface{} {
 	v, exists := c.db[key]
 	if !exists {
@@ -121,3 +132,20 @@ func (c configuration) String(key string) string {
 }
 
 type configurator func(config configuration, ui UI) configuration
+
+func trackInstall(name string, config configuration, extra map[string]string) {
+	props := map[string]string{
+		"type":                    name,
+		"install_backend":         fmt.Sprintf("%t", config.Bool("tracetest.backend.install")),
+		"install_collector":       fmt.Sprintf("%t", config.Bool("tracetest.collector.install")),
+		"install_demo":            fmt.Sprintf("%t", config.Bool("demo.enable")),
+		"enable_server_analytics": fmt.Sprintf("%t", config.Bool("tracetest.analytics")),
+		"backend_type":            config.String("tracetest.backend.type"),
+	}
+
+	for k, v := range extra {
+		props[k] = v
+	}
+
+	analytics.Track("Apply", "installer", props)
+}

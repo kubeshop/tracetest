@@ -3,7 +3,7 @@ package config
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"time"
 
 	"github.com/mitchellh/mapstructure"
@@ -16,7 +16,7 @@ type (
 		Server             ServerConfig    `yaml:",omitempty" mapstructure:"server"`
 		PostgresConnString string          `yaml:",omitempty" mapstructure:"postgresConnString"`
 		PoolingConfig      PoolingConfig   `yaml:",omitempty" mapstructure:"poolingConfig"`
-		GA                 GoogleAnalytics `yaml:",omitempty" mapstructure:"googleAnalytics"`
+		GA                 GoogleAnalytics `yaml:"googleAnalytics,omitempty" mapstructure:"googleAnalytics"`
 		Telemetry          Telemetry       `yaml:",omitempty" mapstructure:"telemetry"`
 		Demo               Demo            `yaml:",omitempty" mapstructure:"demo"`
 	}
@@ -160,7 +160,7 @@ func JsonEscape(text string) string {
 }
 
 func FromFile(file string) (Config, error) {
-	yamlFile, err := ioutil.ReadFile(file)
+	yamlFile, err := os.ReadFile(file)
 	if err != nil {
 		return Config{}, fmt.Errorf("read file: %w", err)
 	}

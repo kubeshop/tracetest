@@ -2,7 +2,7 @@ version: '3'
 services:
 
     tracetest:
-        image: kubeshop/tracetest:v0.6.5
+        image: kubeshop/tracetest:${TAG:-latest}
         volumes:
             - type: bind
               source: ./tracetest-config.yaml
@@ -14,6 +14,11 @@ services:
                 condition: service_healthy
             otel-collector:
                 condition: service_started
+        healthcheck:
+            test: ["CMD", "wget", "--spider", "localhost:8080"]
+            interval: 1s
+            timeout: 3s
+            retries: 60
 
     postgres:
         image: postgres:14

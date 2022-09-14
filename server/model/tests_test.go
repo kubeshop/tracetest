@@ -5,6 +5,8 @@ import (
 	"testing"
 
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
+	"github.com/kubeshop/tracetest/server/encoding/yaml/conversion/parser"
+	"github.com/kubeshop/tracetest/server/http/mappings"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -178,4 +180,65 @@ func TestResults(t *testing.T) {
 		assert.Equal(t, def, decoded)
 	})
 
+}
+
+func TestExpressionType(t *testing.T) {
+	testCases := []struct {
+		Name         string
+		Expression   string
+		ExpectedType string
+	}{
+		{
+			Name:         "simple string",
+			Expression:   `"my string"`,
+			ExpectedType: "string",
+		},
+		{
+			Name:         "integer",
+			Expression:   `12`,
+			ExpectedType: "number",
+		},
+		{
+			Name:         "float",
+			Expression:   `12.75`,
+			ExpectedType: "number",
+		},
+		{
+			Name:         "attribute",
+			Expression:   `tracetest.myattribute`,
+			ExpectedType: "attribute",
+		},
+		{
+			Name:         "duration",
+			Expression:   `17ms`,
+			ExpectedType: "duration",
+		},
+		{
+			Name:         "attribute with duration",
+			Expression:   `my.duration.attr + 17ms`,
+			ExpectedType: "duration",
+		},
+		{
+			Name:         "attribute with number",
+			Expression:   `my.number.attr + 28`,
+			ExpectedType: "number",
+		},
+		{
+			Name:         "attribute with attribute",
+			Expression:   `my.attr + my.other.attribute`,
+			ExpectedType: "attribute",
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.Name, func(t *testing.T) {
+			mapping := mappings.OpenAPI{}
+			parserExpression, err := parser.ParseAssertionExpression(testCase.Expression)
+			require.NoError(t, err)
+
+			expression := mapping.AssertionExpression(parserExpression)
+
+			assert.Equal(t, testCase.ExpectedType, expression.Type())
+		})
+	}
 }

@@ -3,6 +3,7 @@ package trigger
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -105,7 +106,11 @@ func mapResp(resp *http.Response) model.HTTPResponse {
 	}
 	var body string
 	if b, err := io.ReadAll(resp.Body); err == nil {
-		body = string(b)
+		if isJson(b) {
+			body = string(b)
+		} else {
+			body = fmt.Sprintf(`{"content": "%s"}`, string(b))
+		}
 	} else {
 		fmt.Println(err)
 	}
@@ -116,4 +121,11 @@ func mapResp(resp *http.Response) model.HTTPResponse {
 		Headers:    mappedHeaders,
 		Body:       body,
 	}
+}
+
+func isJson(content []byte) bool {
+	var ignored map[string]interface{}
+	err := json.Unmarshal(content, &ignored)
+
+	return err == nil
 }

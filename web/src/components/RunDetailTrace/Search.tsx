@@ -1,16 +1,15 @@
-import {Button, Col, Form, Row} from 'antd';
+import {Col, Row} from 'antd';
 
 import AdvancedEditor from 'components/AdvancedEditor';
+import {debounce} from 'lodash';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
+import {useCallback, useMemo, useState} from 'react';
 import {useLazyGetSelectedSpansQuery} from 'redux/apis/TraceTest.api';
 import {useAppDispatch} from 'redux/hooks';
 import {matchSpans, selectSpan, setSearchText} from 'redux/slices/Trace.slice';
 import SelectorService from 'services/Selector.service';
 import SpanService from 'services/Span.service';
-
-interface IValues {
-  query: string;
-}
+import * as S from './RunDetailTrace.styled';
 
 interface IProps {
   runId: string;
@@ -18,61 +17,58 @@ interface IProps {
 }
 
 const Search = ({runId, testId}: IProps) => {
+  const [search, setSearch] = useState('');
   const dispatch = useAppDispatch();
   const {
     run: {trace: {spans = []} = {}},
   } = useTestRun();
   const [getSelectedSpans] = useLazyGetSelectedSpansQuery();
 
-  const [form] = Form.useForm<IValues>();
+  const handleSearch = useCallback(
+    async (query: string) => {
+      const isValidSelector = SelectorService.getIsValidSelector(query);
+      if (!query) {
+        dispatch(matchSpans({spanIds: []}));
+        dispatch(selectSpan({spanId: ''}));
+        return;
+      }
 
-  const onFinish = async (values: IValues) => {
-    const {query} = values;
-    const isValidSelector = SelectorService.getIsValidSelector(query);
+      let spanIds = [];
+      if (isValidSelector) {
+        spanIds = await getSelectedSpans({query, runId, testId}).unwrap();
+      } else {
+        dispatch(setSearchText({searchText: query}));
+        spanIds = SpanService.searchSpanList(spans, query);
+      }
 
-    let spanIds = [];
-    if (isValidSelector) {
-      spanIds = await getSelectedSpans({query, runId, testId}).unwrap();
-    } else {
-      dispatch(setSearchText({searchText: query}));
-      spanIds = SpanService.searchSpanList(spans, values.query);
-    }
+      dispatch(matchSpans({spanIds}));
+      dispatch(selectSpan({spanId: spanIds[0]}));
+    },
+    [dispatch, getSelectedSpans, runId, spans, testId]
+  );
 
-    dispatch(matchSpans({spanIds}));
-    dispatch(selectSpan({spanId: spanIds[0]}));
-  };
-
-  const onClear = () => {
-    form.resetFields();
-    dispatch(setSearchText({searchText: ''}));
-    dispatch(matchSpans({spanIds: []}));
-  };
+  const onSearch = useMemo(() => debounce(handleSearch, 500), [handleSearch]);
+  const onClear = useCallback(() => {
+    onSearch('');
+    setSearch('');
+  }, [onSearch]);
 
   return (
-    <Form form={form} name="search" onFinish={onFinish}>
-      <Row>
-        <Col flex="auto">
-          <Form.Item
-            name="query"
-            rules={[
-              {
-                required: true,
-                message: 'Try with a search term or a query using our Selector Language',
-              },
-            ]}
-          >
-            <AdvancedEditor placeholder="Search in trace" runId={runId} testId={testId} />
-          </Form.Item>
-        </Col>
-
-        <Col flex="150px">
-          <Button type="primary" htmlType="submit">
-            Search
-          </Button>
-          <Button onClick={onClear}>Clear</Button>
-        </Col>
-      </Row>
-    </Form>
+    <Row>
+      <Col flex="auto">
+        <AdvancedEditor
+          placeholder="Search in trace"
+          runId={runId}
+          testId={testId}
+          onChange={query => {
+            onSearch(query);
+            setSearch(query);
+          }}
+          value={search}
+        />
+        {Boolean(search) && <S.ClearSearchIcon onClick={onClear} />}
+      </Col>
+    </Row>
   );
 };
 

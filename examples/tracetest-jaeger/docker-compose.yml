@@ -45,14 +45,18 @@ services:
         volumes:
             - ./collector.config.yaml:/otel-local-config.yaml
         depends_on:
-            - tempo
+            - jaeger
 
-    tempo:
-        image: grafana/tempo:1.5.0
-        command: ["-config.file=/etc/tempo.yaml"]
+    jaeger:
+        image: jaegertracing/all-in-one:latest
+        restart: unless-stopped
         ports:
-        - "3100:3100"
-        - "9095:9095"
-        - "4317"
-        volumes:
-        - ./tempo.config.yaml:/etc/tempo.yaml
+        - 16686:16686
+        - 16685:16685
+        - 6831:6831/udp
+        - 6832:6832/udp
+        healthcheck:
+            test: ["CMD", "wget", "--spider", "localhost:16686"]
+            interval: 1s
+            timeout: 3s
+            retries: 60

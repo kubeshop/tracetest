@@ -8,7 +8,6 @@ import {TAssertionResultEntry, TAssertionResults} from 'types/Assertion.types';
 import {TTestSpecEntry} from 'types/TestSpecs.types';
 import RouterActions from 'redux/actions/Router.actions';
 import {RouterSearchFields} from 'constants/Common.constants';
-import {encryptString} from 'utils/Common';
 import TestProvider from 'providers/Test';
 import useTestSpecsCrud from './hooks/useTestSpecsCrud';
 
@@ -85,15 +84,16 @@ const TestSpecsProvider = ({children, testId, runId}: IProps) => {
 
   const setSelectedSpec = useCallback(
     (assertionResult?: TAssertionResultEntry) => {
+      const resultList = assertionResults?.resultList || [];
+      const positionIndex = resultList.findIndex(({selector}) => selector === assertionResult?.selector);
+
       dispatch(
         RouterActions.updateSearch({
-          [RouterSearchFields.SelectedAssertion]: assertionResult?.selector
-            ? encryptString(assertionResult?.selector)
-            : '',
+          [RouterSearchFields.SelectedAssertion]: positionIndex >= 0 ? `${positionIndex}` : '',
         })
       );
     },
-    [dispatch]
+    [assertionResults?.resultList, dispatch]
   );
 
   const value = useMemo<IContext>(

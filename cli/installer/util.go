@@ -154,21 +154,38 @@ func (c cmd) exec(ui UI, args ...interface{}) interface{} {
 		os.Exit(1)
 	}
 
-	execCmd := exec.Command("/bin/sh", "-o", "xtrace", "-c", renderedCmd.String())
+	execCmd(renderedCmd.String(), ui)
+
+	return nil
+}
+
+func execCmd(cmd string, ui UI) {
+	if err := _execCmd(cmd); err != nil {
+		ui.Panic(err)
+	}
+}
+
+func execCmdIgnoreError(cmd string, ui UI) {
+	_execCmd(cmd)
+}
+
+func _execCmd(cmd string) error {
+	execCmd := exec.Command("/bin/sh", "-o", "xtrace", "-c", cmd)
 	execCmd.Stderr = os.Stderr
 	execCmd.Stdin = os.Stdin
 	execCmd.Stdout = os.Stdout
 
-	err = execCmd.Run()
+	err := execCmd.Run()
 
 	execCmd.Stderr = nil
 	execCmd.Stdin = nil
 	execCmd.Stdout = nil
-	if err != nil {
-		ui.Panic(err)
-	}
 
-	return nil
+	return err
+}
+
+func execCmdIgnoreErrors(cmd string) {
+	_execCmd(cmd)
 }
 
 func getCmdOutput(cmd string) string {
@@ -177,6 +194,12 @@ func getCmdOutput(cmd string) string {
 	out, _ := execCmd.CombinedOutput()
 
 	return string(out)
+}
+
+func getCmdOutputClean(cmd string) string {
+	out := getCmdOutput(cmd)
+
+	return strings.TrimSpace(out)
 }
 
 func fileExists(path string) bool {

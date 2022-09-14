@@ -97,9 +97,8 @@ Cypress.Commands.add('matchTestRunPageUrl', () => {
 Cypress.Commands.add('goToTestDetailPageAndRunTest', (pathname: string) => {
   const testId = getTestId(pathname);
   cy.visit(`/test/${testId}`);
-  cy.get('[data-cy^=result-card]', {timeout: 10000}).first().click();
+  cy.get('[data-cy^=run-card]', {timeout: 10000}).first().click();
   cy.makeSureUserIsOnTestDetailPage();
-  cy.get(`[data-cy^=test-run-result-]`).first().click();
   cy.makeSureUserIsOnTracePage(false);
 });
 
@@ -120,7 +119,7 @@ Cypress.Commands.add('cancelOnBoarding', () => {
   const parsedValue = value ? JSON.parse(value) : undefined;
 
   if (!parsedValue || parsedValue.trace === false) {
-    cy.get('[data-cy=no-thanks]').click();
+    // cy.get('[data-cy=no-thanks]').click();
   }
 });
 
@@ -200,7 +199,7 @@ Cypress.Commands.add('createAssertion', (index = 0) => {
   cy.get('[data-cy=assertion-form]', {timeout: 10000}).should('be.visible');
   cy.get('[data-cy=assertion-check-attribute]').type('db');
   const attributeListId = getAttributeListId(index);
-  cy.get(`${attributeListId} + div .ant-select-item`).first().click({force: true});
+  cy.get(`${attributeListId} + div .ant-select-item:nth-child(2)`).first().click({force: true});
   cy.get('[data-cy=assertion-check-operator]').click({force: true});
   cy.get('[data-cy=assertion-form-submit-button]').click();
   cy.get('[data-cy=test-specs-container]').should('be.visible');

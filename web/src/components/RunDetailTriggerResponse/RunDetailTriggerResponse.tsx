@@ -12,10 +12,11 @@ interface IProps {
 
 const RunDetailTriggerResponse = ({
   executionTime = 0,
-  triggerResult: {headers, body = '', statusCode = 200} = {
+  triggerResult: {headers, body = '', statusCode = 200, bodyMimeType} = {
     body: '',
     type: TriggerTypes.http,
     statusCode: 200,
+    bodyMimeType: '',
   },
 }: IProps) => {
   return (
@@ -34,7 +35,7 @@ const RunDetailTriggerResponse = ({
       <S.TabsContainer>
         <Tabs defaultActiveKey="1" data-cy="run-detail-trigger-response" size="small">
           <Tabs.TabPane key="1" tab="Body">
-            <ResponseBody body={body} />
+            <ResponseBody body={body} bodyMimeType={bodyMimeType} />
           </Tabs.TabPane>
           <Tabs.TabPane key="2" tab="Headers">
             <ResponseHeaders headers={headers} />

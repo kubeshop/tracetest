@@ -1,3 +1,4 @@
+import { escapeRegExp } from 'lodash';
 import * as S from './Highlighted.styled';
 
 interface IProps {
@@ -8,7 +9,7 @@ interface IProps {
 const Highlighted = ({text, highlight}: IProps) => {
   if (!highlight.trim()) return <span>{text}</span>;
 
-  const regex = new RegExp(`(${highlight})`, 'gi');
+  const regex = new RegExp(`(${escapeRegExp(highlight)})`, 'gi');
   const partList = text.split(regex);
 
   return (

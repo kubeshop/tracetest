@@ -1,3 +1,4 @@
+import {CloseCircleFilled} from '@ant-design/icons';
 import styled from 'styled-components';
 
 export const Container = styled.div`
@@ -24,7 +25,15 @@ export const VisualizationContainer = styled.div`
 
 export const SwitchContainer = styled.div<{$hasSpace: boolean}>`
   position: absolute;
-  right: ${({$hasSpace}) => ($hasSpace ? '24px' : '132px')};
-  top: 16px;
   z-index: 9;
+  left: 16px;
+  bottom: 163px;
+`;
+
+export const ClearSearchIcon = styled(CloseCircleFilled)`
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  color: ${({theme}) => theme.color.textLight};
+  cursor: pointer;
 `;
