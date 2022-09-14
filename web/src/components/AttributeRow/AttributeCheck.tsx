@@ -16,7 +16,7 @@ const AttributeCheck = ({items, type}: IProps) => {
   const handleOnClick = (id: string) => {
     TraceAnalyticsService.onAttributeCheckClick();
     const {assertionResult} = items.find(item => item.id === id)!;
-    setSelectedSpec(assertionResult);
+    setSelectedSpec(assertionResult.selector);
   };
 
   const menuLayout = (

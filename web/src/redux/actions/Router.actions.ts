@@ -18,13 +18,12 @@ const RouterActions = () => ({
   updateSelectedAssertion: createAsyncThunk<void, IQuery>(
     'router/addAssertionResult',
     async ({search}, {getState, dispatch}) => {
-      const {[RouterSearchFields.SelectedAssertion]: positionIndex = ''} = search;
+      const {[RouterSearchFields.SelectedAssertion]: positionIndex} = search;
 
-      if (!positionIndex) {
+      if (typeof positionIndex === 'undefined') {
         dispatch(setSelectedSpec());
         return;
       }
-
       const assertionResult = TestSpecsSelectors.selectAssertionByPositionIndex(
         getState() as RootState,
         Number(positionIndex)

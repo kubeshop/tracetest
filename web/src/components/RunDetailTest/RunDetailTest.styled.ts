@@ -54,9 +54,9 @@ export const SectionLeft = styled(Section)`
   z-index: 1;
 `;
 
-export const SectionRight = styled(Section)`
+export const SectionRight = styled(Section)<{$shouldScroll: boolean}>`
   background-color: ${({theme}) => theme.color.white};
   box-shadow: 0 20px 24px rgba(153, 155, 168, 0.18);
-  overflow-y: scroll;
+  overflow-y: ${({$shouldScroll}) => $shouldScroll ? 'scroll' : 'hidden'};
   z-index: 2;
 `;

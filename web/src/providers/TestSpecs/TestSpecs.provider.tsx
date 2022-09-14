@@ -1,13 +1,11 @@
 import {noop} from 'lodash';
 
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
-import {createContext, useCallback, useContext, useEffect, useMemo} from 'react';
-import {useAppDispatch, useAppSelector} from 'redux/hooks';
+import {createContext, useContext, useEffect, useMemo} from 'react';
+import {useAppSelector} from 'redux/hooks';
 import TestSpecsSelectors from 'selectors/TestSpecs.selectors';
 import {TAssertionResultEntry, TAssertionResults} from 'types/Assertion.types';
 import {TTestSpecEntry} from 'types/TestSpecs.types';
-import RouterActions from 'redux/actions/Router.actions';
-import {RouterSearchFields} from 'constants/Common.constants';
 import TestProvider from 'providers/Test';
 import useTestSpecsCrud from './hooks/useTestSpecsCrud';
 
@@ -20,12 +18,13 @@ interface IContext {
   cancel(): void;
   dryRun(definitionList: TTestSpecEntry[]): void;
   updateIsInitialized(isInitialized: boolean): void;
+  selectedTestSpec?: TAssertionResultEntry;
   assertionResults?: TAssertionResults;
   specs: TTestSpecEntry[];
   isLoading: boolean;
   isError: boolean;
   isDraftMode: boolean;
-  setSelectedSpec(assertionResult?: TAssertionResultEntry): void;
+  setSelectedSpec(selector?: string): void;
 }
 
 export const Context = createContext<IContext>({
@@ -53,7 +52,6 @@ interface IProps {
 export const useTestSpecs = () => useContext(Context);
 
 const TestSpecsProvider = ({children, testId, runId}: IProps) => {
-  const dispatch = useAppDispatch();
   const {run} = useTestRun();
 
   const assertionResults = useAppSelector(state => TestSpecsSelectors.selectAssertionResults(state));
@@ -62,11 +60,16 @@ const TestSpecsProvider = ({children, testId, runId}: IProps) => {
   const isLoading = useAppSelector(state => TestSpecsSelectors.selectIsLoading(state));
   const isInitialized = useAppSelector(state => TestSpecsSelectors.selectIsInitialized(state));
 
-  const {add, cancel, publish, remove, dryRun, update, init, reset, revert, updateIsInitialized} = useTestSpecsCrud({
-    testId,
-    runId,
-    isDraftMode,
-  });
+  const selectedSpec = useAppSelector(TestSpecsSelectors.selectSelectedSpec);
+  const selectedTestSpec = useAppSelector(state => TestSpecsSelectors.selectAssertionBySelector(state, selectedSpec!));
+
+  const {add, cancel, publish, remove, dryRun, update, init, reset, revert, updateIsInitialized, setSelectedSpec} =
+    useTestSpecsCrud({
+      assertionResults,
+      testId,
+      runId,
+      isDraftMode,
+    });
 
   useEffect(() => {
     if (run.state === 'FINISHED') init(run.result);
@@ -82,20 +85,6 @@ const TestSpecsProvider = ({children, testId, runId}: IProps) => {
     if (isInitialized && run.state === 'FINISHED') dryRun(specs);
   }, [dryRun, specs, isInitialized, run.state]);
 
-  const setSelectedSpec = useCallback(
-    (assertionResult?: TAssertionResultEntry) => {
-      const resultList = assertionResults?.resultList || [];
-      const positionIndex = resultList.findIndex(({selector}) => selector === assertionResult?.selector);
-
-      dispatch(
-        RouterActions.updateSearch({
-          [RouterSearchFields.SelectedAssertion]: positionIndex >= 0 ? `${positionIndex}` : '',
-        })
-      );
-    },
-    [assertionResults?.resultList, dispatch]
-  );
-
   const value = useMemo<IContext>(
     () => ({
       add,
@@ -108,6 +97,7 @@ const TestSpecsProvider = ({children, testId, runId}: IProps) => {
       dryRun,
       assertionResults,
       specs,
+      selectedTestSpec,
       cancel,
       setSelectedSpec,
       revert,
@@ -123,6 +113,7 @@ const TestSpecsProvider = ({children, testId, runId}: IProps) => {
       dryRun,
       assertionResults,
       specs,
+      selectedTestSpec,
       cancel,
       setSelectedSpec,
       revert,
