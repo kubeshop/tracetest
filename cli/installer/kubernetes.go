@@ -42,67 +42,16 @@ func kubernetesInstaller(config configuration, ui UI) {
 }
 
 func installTracetest(conf configuration, ui UI) {
-	execCmd(
-		helmCmd(conf, "repo add --force-update kubeshop https://kubeshop.github.io/helm-charts"),
-		ui,
-	)
-	execCmd(
-		helmCmd(conf, "repo update"),
-		ui,
-	)
+	setupHelmRepo(conf, ui)
 
-	cmd := []string{
-		"upgrade --install tracetest kubeshop/tracetest",
-		"--namespace " + conf.String("k8s.namespace") + " --create-namespace",
-	}
+	installTracetestChart(conf, ui)
+	fixTracetestConfiguration(conf, ui)
 
-	if conf.Bool("k8s.expose") {
-		cmd = append(cmd, []string{
-			"--set ingress.enabled=true",
-			"--set 'ingress.hosts[0].host=" + conf.String("k8s.ingress-host") +
-				",ingress.hosts[0].paths[0].path=/,ingress.hosts[0].paths[0].pathType=Prefix'",
-		}...)
-	}
-
-	execCmd(helmCmd(conf, cmd...), ui)
-
-	psql := "host=tracetest-postgresql user=tracetest password=not-secure-database-password  port=5432 sslmode=disable"
-	c := getTracetestConfigFileContents(psql, ui, conf)
-	ttc := createTmpFile("tracetest-config", string(c), ui)
-	defer os.Remove(ttc.Name())
-	execCmd(
-		kubectlNamespaceCmd(conf,
-			"create configmap tracetest --from-file="+ttc.Name()+" -o yaml --dry-run=client",
-			"| sed 's#"+path.Base(ttc.Name())+"#config.yaml#' |",
-			kubectlNamespaceCmd(conf, "replace -f -"),
-		),
-		ui,
-	)
-
-	if conf.Bool("tracetest.collector.install") {
-		cc := createTmpFile("collector-config", string(getCollectorConfigFileContents(ui, conf)), ui)
-		defer os.Remove(cc.Name())
-
-		execCmd(
-			kubectlNamespaceCmd(conf,
-				"create configmap collector-config --from-file="+cc.Name()+" -o yaml --dry-run=client",
-				"| sed 's#"+path.Base(cc.Name())+"#collector.yaml#' |",
-				kubectlNamespaceCmd(conf, "replace -f -"),
-			),
-			ui,
-		)
-		execCmd(kubectlNamespaceCmd(conf, "delete pods -l app.kubernetes.io/name=otel-collector"), ui)
-	}
+	installOtelCollector(conf, ui)
 
 	execCmd(kubectlNamespaceCmd(conf, "delete pods -l app.kubernetes.io/name=tracetest"), ui)
 
-	if conf.Bool("demo.enable") {
-		helm := helmCmd(conf, "")
-		script := strings.ReplaceAll(demoScript, "#helm#", helm)
-		script = fmt.Sprintf(script, conf.String("tracetest.backend.endpoint.agent"))
-
-		execCmd(script, ui)
-	}
+	installDemo(conf, ui)
 
 	ui.Success("Install successful!")
 	ui.Println(fmt.Sprintf(`
@@ -117,6 +66,80 @@ Then, use your browser to navigate to:
 Happy TraceTesting =)
 `, kubectlNamespaceCmd(conf, "port-forward svc/tracetest 8080")))
 
+}
+
+func installDemo(conf configuration, ui UI) {
+	if !conf.Bool("demo.enable") {
+		return
+	}
+
+	helm := helmCmd(conf, "")
+	script := strings.ReplaceAll(demoScript, "#helm#", helm)
+	script = fmt.Sprintf(script, conf.String("tracetest.backend.endpoint.agent"))
+
+	execCmd(script, ui)
+}
+
+func installOtelCollector(conf configuration, ui UI) {
+	if !conf.Bool("tracetest.collector.install") {
+		return
+	}
+
+	cc := createTmpFile("collector-config", string(getCollectorConfigFileContents(ui, conf)), ui)
+	defer os.Remove(cc.Name())
+
+	execCmd(
+		kubectlNamespaceCmd(conf,
+			"create configmap collector-config --from-file="+cc.Name()+" -o yaml --dry-run=client",
+			"| sed 's#"+path.Base(cc.Name())+"#collector.yaml#' |",
+			kubectlNamespaceCmd(conf, "replace -f -"),
+		),
+		ui,
+	)
+	execCmd(kubectlNamespaceCmd(conf, "delete pods -l app.kubernetes.io/name=otel-collector"), ui)
+}
+
+func fixTracetestConfiguration(conf configuration, ui UI) {
+	psql := "host=tracetest-postgresql user=tracetest password=not-secure-database-password  port=5432 sslmode=disable"
+	c := getTracetestConfigFileContents(psql, ui, conf)
+	ttc := createTmpFile("tracetest-config", string(c), ui)
+	defer os.Remove(ttc.Name())
+	execCmd(
+		kubectlNamespaceCmd(conf,
+			"create configmap tracetest --from-file="+ttc.Name()+" -o yaml --dry-run=client",
+			"| sed 's#"+path.Base(ttc.Name())+"#config.yaml#' |",
+			kubectlNamespaceCmd(conf, "replace -f -"),
+		),
+		ui,
+	)
+}
+
+func installTracetestChart(conf configuration, ui UI) {
+	cmd := []string{
+		"upgrade --install tracetest kubeshop/tracetest",
+		"--namespace " + conf.String("k8s.namespace") + " --create-namespace",
+	}
+
+	if conf.Bool("k8s.expose") {
+		cmd = append(cmd, []string{
+			"--set ingress.enabled=true",
+			"--set 'ingress.hosts[0].host=" + conf.String("k8s.ingress-host") +
+				",ingress.hosts[0].paths[0].path=/,ingress.hosts[0].paths[0].pathType=Prefix'",
+		}...)
+	}
+
+	execCmd(helmCmd(conf, cmd...), ui)
+}
+
+func setupHelmRepo(conf configuration, ui UI) {
+	execCmd(
+		helmCmd(conf, "repo add --force-update kubeshop https://kubeshop.github.io/helm-charts"),
+		ui,
+	)
+	execCmd(
+		helmCmd(conf, "repo update"),
+		ui,
+	)
 }
 
 func helmCmd(config configuration, cmd ...string) string {
@@ -160,7 +183,7 @@ cd $tmpdir/helm-chart
   --set image.pullPolicy=Always \
   --set postgres.auth.username=ashketchum,postgres.auth.password=squirtle123,postgres.auth.database=pokeshop \
   --set rabbitmq.auth.username=guest,rabbitmq.auth.password=guest,rabbitmq.auth.erlangCookie=secretcookie \
-  --set 'env[5].value=%s'
+  --set 'env[4].value=%s'
 `
 )
 
