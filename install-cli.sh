@@ -80,8 +80,6 @@ install_tar() {
   echo "Installing to /usr/local/bin/tracetest"
   $SUDO mv /tmp/tracetest /usr/local/bin/tracetest
   rm -f $file_path
-  echo
-  echo "Succesfull install"
 }
 
 install_dpkg() {
@@ -146,6 +144,13 @@ run() {
     echo 'OS not supported by this script. See https://kubeshop.github.io/tracetest/installing/#cli-installation'
     exit 1
   fi
+
+  echo
+  echo "Succesfull install!"
+  echo
+  echo "run 'tracetest --help' to see what you can do"
+  echo
+  echo "To setup a new server, run 'tracetest server install'"
 }
 
 SUDO=""
