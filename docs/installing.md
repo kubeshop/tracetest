@@ -78,7 +78,7 @@ Download one of the files from the latest tag, extract to your machine, and then
 
 ### Docker Compose
 
-You can run Tracetest locally using docker compose. This setup is great for a development environment. In this form, tracetest runs in parallel to your dockerized application,
+You can run Tracetest locally using Docker Compose. This setup is great for a development environment. In this form, Tracetest runs in parallel to your Dockerized application,
 allowing you to interact with your app and its traces, create and run tests over them, etc.
 
 ![Installer using docker compose](img/installer/1_docker-compose_0.7.0.png)
