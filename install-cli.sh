@@ -35,7 +35,7 @@ get_arch() {
       echo "amd64"
       ;;
 
-    "arm"|"aarch64")
+    "arm"*|"aarch64")
       echo "arm64"
       ;;
 
@@ -51,6 +51,8 @@ get_download_link() {
   arch=$(get_arch)
   raw_version=`echo $version | sed 's/v//'`
   pkg=$1
+
+  if [[ "$(get_os)" = "darwin" ]]; then arch="all";fi
 
   echo "https://github.com/kubeshop/tracetest/releases/download/${version}/tracetest_${raw_version}_${os}_${arch}.${pkg}"
 }
@@ -115,10 +117,14 @@ EOF
   $SUDO yum install -y tracetest --refresh
 }
 
-run() {
-  os=$(get_os)
+install_brew() {
+  brew install kubeshop/tracetest/tracetest
+}
 
+run() {
   ensure_dependency_exist "uname"
+  # if cmd_exists brew; then
+  #   install_brew
   if cmd_exists apt-get; then
     install_apt
   elif cmd_exists yum; then
@@ -127,11 +133,10 @@ run() {
     install_dpkg
   elif cmd_exists rpm; then
     install_rpm
-  elif [ "$os" = "linux" ]; then
-    if [ "$(get_arch)" == "unknown" ]; then
-      echo "unknown system architecture. Try manual install. See https://kubeshop.github.io/tracetest/installing/#cli-installation"
-      exit 1;
-    fi
+  elif [ "$(get_arch)" == "unknown" ]; then
+    echo "unknown system architecture. Try manual install. See https://kubeshop.github.io/tracetest/installing/#cli-installation"
+    exit 1;
+  elif [[ "$(get_os)" =~ ^(darwin|linux)$ ]]; then
     install_tar
   else
     echo 'OS not supported by this script. See https://kubeshop.github.io/tracetest/installing/#cli-installation'
