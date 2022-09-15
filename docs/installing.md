@@ -89,22 +89,22 @@ allowing you to interact with your app and its traces, create and run tests over
 
 **Requirements**:
 - Jaeger or other compatible backend. If missing, the installer will help you configure one.
-- OpenTelemetry Collector. If you don't have one, the installer will help you configuring it
-- A `docker-compose.yaml` (configurable) file in the project directory. If you don't have one, the installer will create an empty file for you
+- OpenTelemetry Collector. If missing, the installer will help you configure one.
+- A `docker-compose.yaml` (configurable) file in the project directory. If missing, the installer will create an empty file.
 
 **Optionals**:
 - [PokeShop demo app](https://github.com/kubeshop/pokeshop/)
 
 **Result**:
-- `tracetest/` directory (configurable) with a `docker-compose.yaml` and other config files
-- [Jager](https://www.jaegertracing.io/) instance, if selected
-- [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/), if selected
-- [PokeShop demo app](https://github.com/kubeshop/pokeshop/), if selected
+- `tracetest/` directory (configurable) with a `docker-compose.yaml` and other config files.
+- [Jaeger](https://www.jaegertracing.io/) instance, if selected.
+- [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/), if selected.
+- [PokeShop demo app](https://github.com/kubeshop/pokeshop/), if selected.
 
 ### Kubernetes
 
 You can run Tracetest in a Kubernetes cluster. This setup is ideal for a CI/CD environment, QA teams working on shared environments, etc.
-You can use a remote or local (minikube, etc) cluster. We'll even help you setup a local cluster if you need one
+You can use a remote or local (minikube, etc) cluster. We'll even help you setup a local cluster, if you need one.
 
 ![Installer using Kubernetes](img/installer/1_kubernetes_0.7.0.png)
 
@@ -112,20 +112,20 @@ You can use a remote or local (minikube, etc) cluster. We'll even help you setup
 - kubectl
 - helm
 
-If you selected to run locally, and want the installer to set up [minikube](https://minikube.sigs.k8s.io/docs/) for you:
+If you selected to run locally and want the installer to set up [minikube](https://minikube.sigs.k8s.io/docs/) for you:
 - Docker
 
 **Requirements**:
-- Jaeger or other compatible backend. If you don't have one, the installer will help you configuring it
-- OpenTelemetry Collector. If you don't have one, the installer will help you configuring it
+- Jaeger or other compatible backend. If missing, the installer will help you configure one.
+- OpenTelemetry Collector. If missing, the installer will help you configure one.
 
 **Optionals**:
 - [PokeShop demo app](https://github.com/kubeshop/pokeshop/)
 
 **Result**:
-- `tracetest` helm chart deployed in the `tracetest` (configurable) namespace
-- [Jager](https://www.jaegertracing.io/) instance deployed in the `tracetest` namespace, if selected
-- [Cert Manager](https://cert-manager.io/), if selected
-- [Jaeger Operator](https://www.jaegertracing.io/docs/latest/operator/), if selected
-- [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/) deployed in the `tracetest` (configurable) namespace, if selected
-- [PokeShop demo app](https://github.com/kubeshop/pokeshop/) deployed in the `demo` namespace, if selected
+- `tracetest` helm chart deployed in the `tracetest` (configurable) namespace.
+- [Jaeger](https://www.jaegertracing.io/) instance deployed in the `tracetest` namespace, if selected.
+- [Cert Manager](https://cert-manager.io/), if selected.
+- [Jaeger Operator](https://www.jaegertracing.io/docs/latest/operator/), if selected.
+- [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/) deployed in the `tracetest` (configurable) namespace, if selected.
+- [PokeShop demo app](https://github.com/kubeshop/pokeshop/) deployed in the `demo` namespace, if selected.
