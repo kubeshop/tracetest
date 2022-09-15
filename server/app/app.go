@@ -36,6 +36,8 @@ var (
 	PokeAPI = "dev"
 )
 
+var EmptyDemoEnabled []string
+
 type App struct {
 	config  config.Config
 	db      model.Repository
@@ -54,14 +56,19 @@ func New(config config.Config, db model.Repository, tracedb tracedb.TraceDB, tra
 	return app, nil
 }
 
-func jsonEscape(text string) string {
-	b, err := json.Marshal(text)
+func jsonEscape(text any) string {
+	initial, err := json.Marshal(text)
 	if err != nil {
 		panic(err)
 	}
 
-	s := string(b)
-	return strings.Trim(s, `"`)
+	encoded, err := json.Marshal(string(initial))
+	if err != nil {
+		panic(err)
+	}
+
+	formatted := string(encoded)
+	return strings.Trim(formatted, `"`)
 }
 
 func spaHandler(prefix, staticPath, indexPath string, tplVars map[string]string) http.HandlerFunc {
@@ -164,8 +171,10 @@ func (a *App) Start() error {
 
 	router.Handle("/ws", wsRouter.Handler())
 
-	demoEnabled, _ := json.Marshal(a.config.Demo.Enabled)
-	demoEndpoints, _ := json.Marshal(a.config.Demo.Endpoints)
+	enabledDemo := jsonEscape(a.config.Demo.Enabled)
+	if len(a.config.Demo.Enabled) == 0 {
+		enabledDemo = jsonEscape([0]string{})
+	}
 
 	router.PathPrefix(a.config.Server.PathPrefix).Handler(
 		spaHandler(
@@ -179,8 +188,8 @@ func (a *App) Start() error {
 				"ServerID":         serverID,
 				"AppVersion":       Version,
 				"Env":              Env,
-				"DemoEnabled":      jsonEscape(string(demoEnabled)),
-				"DemoEndpoints":    jsonEscape(string(demoEndpoints)),
+				"DemoEnabled":      enabledDemo,
+				"DemoEndpoints":    jsonEscape(a.config.Demo.Endpoints),
 			},
 		),
 	)
