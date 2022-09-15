@@ -75,9 +75,13 @@ install_tar() {
   file_path="/tmp/cli.tar.gz"
   download_file "$download_link" "$file_path"
 
-  tar -xvf $file_path -C /tmp
+  echo "Extracting file"
+  tar -xf $file_path -C /tmp
+  echo "Installing to /usr/local/bin/tracetest"
   $SUDO mv /tmp/tracetest /usr/local/bin/tracetest
   rm -f $file_path
+  echo
+  echo "Succesfull install"
 }
 
 install_dpkg() {
