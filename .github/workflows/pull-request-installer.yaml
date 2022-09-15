@@ -26,9 +26,9 @@ jobs:
               yum install -y curl --refresh
               ;;
             alpine)
-              apk add --update curl
+              apk add --update curl bash
               ;;
           esac
 
-          curl -L https://raw.githubusercontent.com/kubeshop/tracetest/${GITHUB_SHA}/install-cli.sh | sh
+          curl -L https://raw.githubusercontent.com/kubeshop/tracetest/${GITHUB_SHA}/install-cli.sh | bash
           tracetest
