@@ -135,7 +135,7 @@ You can find the latest version [here](https://github.com/kubeshop/tracetest/rel
 
 Tracetest CLI can be installed automatically using the following script:
 ```sh
-curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/install-cli.sh | sh
+curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/install-cli.sh | bash
 ```
 
 It works for systems with Hombrew, `apt-get`, `dpkg`, `yum`, `rpm` installed, and if no package manager is available, it will try to download the build and install it manually.
