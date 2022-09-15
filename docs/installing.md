@@ -1,133 +1,26 @@
 # Installation
 
-During the setup, we'll deploy Tracetest and Postgres with Helm.
+## TL;DR
 
-For the architectural overview of the components, please check the [Architecture](architecture.md) page.
-
-## **Prerequsities**
-
-### **Installation Requirements**
-
-Tools needed for the installation:
-
-- [Helm v3](https://helm.sh/docs/intro/install/)
-- [Kubectl](https://kubernetes.io/docs/tasks/tools/)
-
-## **Installation**
-
-### Install script
-
-We provide a simple install script that can install all required components:
+Install the CLI and use it to setup a server:
 
 ```
-curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/setup.sh | bash -s
+$ curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/install-cli.sh | sh
+$ tracetest server install
+
+# Follow the install wizard
 ```
 
-This command will install Tracetest using the default settings. You can configure the following options:
+## How it works
 
-| Option                   | description                                  | Default value      |
-| ------------------------ | -------------------------------------------- | ------------------ |
-| --help                   | show help message                            | n/a                |
-| --namespace              | target installation k8s namespace            | tracetest          |
-| --trace-backend          | trace backend (jaeger or tempo)              | jaeger             |
-| --trace-backend-endpoint | trace backend endpoint                       | jaeger-query:16685 |
-| --skip-collector         | if set, don't install the otel-collector     | n/a                |
-| --skip-pma               | if set, don't install the sample application | n/a                |
-| --skip-backend           | if set, don't install the jaeger backend     | n/a                |
+Tracetest is a relatively complex system, with a few intercontected dependencies. It relies on a Postgres database, a Data Store to retrive your application's traces,
+on the OpenTelemetry Collector connected to the Data Store, etc. If you are new to the tracing world, it might be overwhelming, and a bit tricky to connect everything togheter.
 
-Example with custom options:
-
-```
-curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/setup.sh | bash -s -- --skip-pma --namespace my-custom-namespace
-```
-
-### **Using Helm**
-
-Container images are hosted on the Docker Hub [Tracetest repository](https://hub.docker.com/r/kubeshop/tracetest).
-
-Tracetest currently supports two traces backend: Jaeger and Grafana Tempo.
-
-#### **Jaeger**
-
-Tracetest uses [Jaeger Query Service `16685` port](https://www.jaegertracing.io/docs/1.32/deployment/#query-service--ui) to find Traces using gRPC protocol.
-
-The commands below will install Tracetest connecting to the Jaeger tracing backend on `jaeger-query.observability.svc.cluster.local:16685`.
-
-```sh
-# Install Kubeshop Helm repo and update it
-helm repo add kubeshop https://kubeshop.github.io/helm-charts
-helm repo update
-
-helm install tracetest kubeshop/tracetest \
-  --set telemetry.dataStores.jaeger.jaeger.endpoint="jaeger-query.observability.svc.cluster.local:16685" `# update this value to point to your jaeger install` \
-  --set telemetry.exporters.collector.exporter.collector.endpoint="otel-collector.tracetest.svc.cluster.local:4317" `# update this value to point to your collector install` \
-  --set server.telemetry.dataStore="jaeger"
-```
-
-#### **Grafana Tempo**
-
-Tracetest uses [Grafana Tempo's Server's `9095` port](https://grafana.com/docs/tempo/latest/configuration/#server) to find Traces using gRPC protocol.
-
-The commands below will install the Tracetest application connecting to the Grafana Tempo tracing backend on `grafana-tempo:9095`:
-
-```sh
-# Install Kubeshop Helm repo and update it
-helm repo add kubeshop https://kubeshop.github.io/helm-charts
-helm repo update
-
-helm install tracetest kubeshop/tracetest \
-  --set telemetry.dataStores.tempo.tempo.endpoint="grafana-tempo:9095" \ # update this value to point to your tempo install
-  --set telemetry.exporters.collector.exporter.collector.endpoint="otel-collector:4317" \ # update this value to point to your collector install
-  --set server.telemetry.dataStore="tempo"
-```
-
-#### **Opensearch**
-
-The commands below will install the Tracetest application connecting to the Opensearchtracing backend on `opensearch:9200`:
-
-```sh
-# Install Kubeshop Helm repo and update it
-helm repo add kubeshop https://kubeshop.github.io/helm-charts
-helm repo update
-
-helm install tracetest kubeshop/tracetest \
-  --set telemetry.dataStores.opensearch.opensearch.addresses={"http://opensearch:9200"} \ # update this value to point to your opensearch install
-  --set telemetry.dataStores.opensearch.opensearch.index="traces" \ # update this value to use the index where your traces are being stored
-  --set telemetry.dataStores.opensearch.opensearch.username="admin" \ # update this value with your opensearch username
-  --set telemetry.dataStores.opensearch.opensearch.password="admin" \ # update this value with your opensearch password
-  --set server.telemetry.dataStore="opensearch"
-```
-
-#### **SignalFX**
-
-The commands below will install the Tracetest application connecting to the Opensearchtracing backend on `opensearch:9200`:
-
-```sh
-# Install Kubeshop Helm repo and update it
-helm repo add kubeshop https://kubeshop.github.io/helm-charts
-helm repo update
-
-helm install tracetest kubeshop/tracetest \
-  --set telemetry.dataStores.signalfx.signalfx.token="your signalfx token" \ # update this value to point to your signalfx account
-  --set telemetry.dataStores.signalfx.signalfx.realm="your realm (us1?)" \ # update this value to point to your signalfx account
-  --set telemetry.dataStores.signalfx.signalfx.url="your custom url" \ # update this value to point to your signalfx custom url. This is optional.
-  --set server.telemetry.dataStore="signalfx"
-```
-
-
-### **Have a different backend trace data store?**
-
-[Tell us](https://github.com/kubeshop/tracetest/issues/new?assignees=&labels=&template=feature_request.md&title=) which one you have and we will see if we can add support for it!
-
-## **Uninstallation**
-
-The following command will uninstall Tracetest with Postgres:
-
-```sh
-helm delete tracetest
-```
+Our CLI offers an install "wizard" that helps you with the process. You can use it to install it locally using docker compose, or to a local or remote Kubernetes cluster.
+It installs all the tools required to set up the desired environment, and creates all the configurations, tailored to your case.
 
 ## CLI Installation
+
 Every time we release a new version of Tracetest, we generate binaries for Linux, MacOS, and Windows. Supporting both amd64, and ARM64 architectures, in `tar.gz`, `deb`, `rpm` and `exe` formats
 You can find the latest version [here](https://github.com/kubeshop/tracetest/releases/latest).
 
@@ -180,3 +73,59 @@ sudo yum install tracetest --refresh
 
 ### Windows
 Download one of the files from the latest tag, extract to your machine, and then [add the tracetest binary to your PATH variable](https://stackoverflow.com/a/41895179)
+
+## Server deployments
+
+### Docker Compose
+
+You can run Tracetest locally using docker compose. This setup is great for a development environment. In this form, tracetest runs in parallel to your dockerized application,
+allowing you to interact with your app and its traces, create and run tests over them, etc.
+
+![Installer using docker compose](img/installer/1_docker-compose_0.7.0.png)
+
+**Tools required (installed if missing)**:
+- Docker
+- Docker Compose
+
+**Requirements**:
+- Jaeger or other compatible backend. If you don't have one, the installer will help you configuring it
+- OpenTelemetry Collector. If you don't have one, the installer will help you configuring it
+- A `docker-compose.yaml` (configurable) file in the project directory. If you don't have one, the installer will create an empty file for you
+
+**Optionals**:
+- [PokeShop demo app](https://github.com/kubeshop/pokeshop/)
+
+**Result**:
+- `tracetest/` directory (configurable) with a `docker-compose.yaml` and other config files
+- [Jager](https://www.jaegertracing.io/) instance, if selected
+- [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/), if selected
+- [PokeShop demo app](https://github.com/kubeshop/pokeshop/), if selected
+
+### Kubernetes
+
+You can run Tracetest in a Kubernetes cluster. This setup is ideal for a CI/CD environment, QA teams working on shared environments, etc.
+You can use a remote or local (minikube, etc) cluster. We'll even help you setup a local cluster if you need one
+
+![Installer using Kubernetes](img/installer/1_kubernetes_0.7.0.png)
+
+**Tools required (installed if missing)**:
+- kubectl
+- helm
+
+If you selected to run locally, and want the installer to set up [minikube](https://minikube.sigs.k8s.io/docs/) for you:
+- Docker
+
+**Requirements**:
+- Jaeger or other compatible backend. If you don't have one, the installer will help you configuring it
+- OpenTelemetry Collector. If you don't have one, the installer will help you configuring it
+
+**Optionals**:
+- [PokeShop demo app](https://github.com/kubeshop/pokeshop/)
+
+**Result**:
+- `tracetest` helm chart deployed in the `tracetest` (configurable) namespace
+- [Jager](https://www.jaegertracing.io/) instance deployed in the `tracetest` namespace, if selected
+- [Cert Manager](https://cert-manager.io/), if selected
+- [Jaeger Operator](https://www.jaegertracing.io/docs/latest/operator/), if selected
+- [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/) deployed in the `tracetest` (configurable) namespace, if selected
+- [PokeShop demo app](https://github.com/kubeshop/pokeshop/) deployed in the `demo` namespace, if selected
