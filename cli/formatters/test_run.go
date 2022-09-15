@@ -14,19 +14,19 @@ const (
 	FAILED_TEST_ICON = "✘"
 )
 
-type TestRunFormatter struct {
+type testRun struct {
 	config        config.Config
 	colorsEnabled bool
 }
 
-func NewTestRunFormatter(config config.Config, colorsEnabled bool) TestRunFormatter {
-	return TestRunFormatter{
+func TestRun(config config.Config, colorsEnabled bool) testRun {
+	return testRun{
 		config:        config,
 		colorsEnabled: colorsEnabled,
 	}
 }
 
-func (f TestRunFormatter) FormatTestRunOutput(test openapi.Test, run openapi.TestRun) string {
+func (f testRun) Format(test openapi.Test, run openapi.TestRun) string {
 	if run.State != nil && *run.State == "FAILED" {
 		return f.getColoredText(false, fmt.Sprintf("Failed to execute test: %s", *run.LastErrorState))
 	}
@@ -38,7 +38,7 @@ func (f TestRunFormatter) FormatTestRunOutput(test openapi.Test, run openapi.Tes
 	return f.formatSuccessfulTest(test, run)
 }
 
-func (f TestRunFormatter) formatSuccessfulTest(test openapi.Test, run openapi.TestRun) string {
+func (f testRun) formatSuccessfulTest(test openapi.Test, run openapi.TestRun) string {
 	link := f.getLink(test, run)
 	message := fmt.Sprintf("%s %s (%s)\n", PASSED_TEST_ICON, *test.Name, link)
 	return f.getColoredText(true, message)
@@ -55,7 +55,7 @@ type assertionResult struct {
 	passed        bool
 }
 
-func (f TestRunFormatter) formatFailedTest(test openapi.Test, run openapi.TestRun) string {
+func (f testRun) formatFailedTest(test openapi.Test, run openapi.TestRun) string {
 	var buffer bytes.Buffer
 
 	link := f.getLink(test, run)
@@ -130,7 +130,7 @@ func (f TestRunFormatter) formatFailedTest(test openapi.Test, run openapi.TestRu
 	return buffer.String()
 }
 
-func (f TestRunFormatter) generateSpanResult(buffer *bytes.Buffer, spanId string, spanResult spanAssertionResult) {
+func (f testRun) generateSpanResult(buffer *bytes.Buffer, spanId string, spanResult spanAssertionResult) {
 	icon := f.getStateIcon(spanResult.allPassed)
 	message := fmt.Sprintf("\t\t%s #%s\n", icon, spanId)
 	message = f.getColoredText(spanResult.allPassed, message)
@@ -150,7 +150,7 @@ func (f TestRunFormatter) generateSpanResult(buffer *bytes.Buffer, spanId string
 	}
 }
 
-func (f TestRunFormatter) getStateIcon(passed bool) string {
+func (f testRun) getStateIcon(passed bool) string {
 	if passed {
 		return PASSED_TEST_ICON
 	}
@@ -158,7 +158,7 @@ func (f TestRunFormatter) getStateIcon(passed bool) string {
 	return FAILED_TEST_ICON
 }
 
-func (f TestRunFormatter) getColoredText(passed bool, text string) string {
+func (f testRun) getColoredText(passed bool, text string) string {
 	if !f.colorsEnabled {
 		return text
 	}
@@ -170,6 +170,6 @@ func (f TestRunFormatter) getColoredText(passed bool, text string) string {
 	return pterm.FgRed.Sprintf(text)
 }
 
-func (f TestRunFormatter) getLink(test openapi.Test, run openapi.TestRun) string {
+func (f testRun) getLink(test openapi.Test, run openapi.TestRun) string {
 	return fmt.Sprintf("%s://%s/test/%s/run/%s", f.config.Scheme, f.config.Endpoint, *test.Id, *run.Id)
 }
