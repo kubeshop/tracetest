@@ -60,7 +60,8 @@ Tracetest is a trace-based testing tool that leverages the data captured by your
 You can install tracetest by running:
 
 ```sh
-curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/setup.sh | bash -s
+curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/install-cli.sh | bash -s
+tracetest server install
 ```
 
 > :gear: To customize your Tracetest installation. Go to our [installation guide](https://kubeshop.github.io/tracetest/installing/) for more information.
