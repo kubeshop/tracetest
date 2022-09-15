@@ -26,7 +26,7 @@ jobs:
               yum install -y curl --refresh
               ;;
             alpine)
-              apk add --update curl
+              apk add --update curl bash
               ;;
           esac
 
