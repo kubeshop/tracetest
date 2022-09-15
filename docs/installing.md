@@ -88,7 +88,7 @@ allowing you to interact with your app and its traces, create and run tests over
 - Docker Compose
 
 **Requirements**:
-- Jaeger or other compatible backend. If you don't have one, the installer will help you configuring it
+- Jaeger or other compatible backend. If missing, the installer will help you configure one.
 - OpenTelemetry Collector. If you don't have one, the installer will help you configuring it
 - A `docker-compose.yaml` (configurable) file in the project directory. If you don't have one, the installer will create an empty file for you
 
