@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"path/filepath"
 	"regexp"
+	"strings"
 	"text/template"
 
 	"github.com/gorilla/handlers"
@@ -51,6 +52,16 @@ func New(config config.Config, db model.Repository, tracedb tracedb.TraceDB, tra
 	}
 
 	return app, nil
+}
+
+func jsonEscape(text string) string {
+	b, err := json.Marshal(text)
+	if err != nil {
+		panic(err)
+	}
+
+	s := string(b)
+	return strings.Trim(s, `"`)
 }
 
 func spaHandler(prefix, staticPath, indexPath string, tplVars map[string]string) http.HandlerFunc {
@@ -168,8 +179,8 @@ func (a *App) Start() error {
 				"ServerID":         serverID,
 				"AppVersion":       Version,
 				"Env":              Env,
-				"DemoEnabled":      config.JsonEscape(string(demoEnabled)),
-				"DemoEndpoints":    config.JsonEscape(string(demoEndpoints)),
+				"DemoEnabled":      jsonEscape(string(demoEnabled)),
+				"DemoEndpoints":    jsonEscape(string(demoEndpoints)),
 			},
 		),
 	)

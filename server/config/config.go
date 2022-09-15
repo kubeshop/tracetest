@@ -1,7 +1,6 @@
 package config
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"time"
@@ -147,15 +146,6 @@ func (c Config) getExporter(name string) (*TelemetryExporterOption, error) {
 	}
 
 	return &exporterConfig, nil
-}
-
-func JsonEscape(text string) string {
-	b, err := json.Marshal(text)
-	if err != nil {
-		panic(err)
-	}
-	s := string(b)
-	return s[1 : len(s)-1]
 }
 
 func FromFile(file string) (Config, error) {
