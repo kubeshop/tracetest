@@ -25,7 +25,7 @@ nav:
   - Using Tracetest:
     - Creating Tests: create-test.md
     - Test Results: test-results.md
-    - Adding Test Speciifcations: adding-assertions.md
+    - Adding Test Specifications: adding-assertions.md
     - Versioning: versioning.md
   - Command Line Interface:
     - Command Line Tool: command-line-tool.md
