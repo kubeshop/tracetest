@@ -129,7 +129,7 @@ run() {
   ensure_dependency_exist "uname"
   if cmd_exists brew; then
     install_brew
-  if cmd_exists apt-get; then
+  elif cmd_exists apt-get; then
     install_apt
   elif cmd_exists yum; then
     install_yum
