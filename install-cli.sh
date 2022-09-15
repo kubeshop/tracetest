@@ -35,7 +35,7 @@ get_arch() {
       echo "amd64"
       ;;
 
-    "arm"|"aarch64")
+    "arm"*|"aarch64")
       echo "arm64"
       ;;
 
@@ -51,6 +51,8 @@ get_download_link() {
   arch=$(get_arch)
   raw_version=`echo $version | sed 's/v//'`
   pkg=$1
+
+  if [[ "$(get_os)" = "darwin" ]]; then arch="all";fi
 
   echo "https://github.com/kubeshop/tracetest/releases/download/${version}/tracetest_${raw_version}_${os}_${arch}.${pkg}"
 }
@@ -73,7 +75,9 @@ install_tar() {
   file_path="/tmp/cli.tar.gz"
   download_file "$download_link" "$file_path"
 
-  tar -xvf $file_path -C /tmp
+  echo "Extracting file"
+  tar -xf $file_path -C /tmp
+  echo "Installing to /usr/local/bin/tracetest"
   $SUDO mv /tmp/tracetest /usr/local/bin/tracetest
   rm -f $file_path
 }
@@ -115,11 +119,15 @@ EOF
   $SUDO yum install -y tracetest --refresh
 }
 
-run() {
-  os=$(get_os)
+install_brew() {
+  brew install kubeshop/tracetest/tracetest
+}
 
+run() {
   ensure_dependency_exist "uname"
-  if cmd_exists apt-get; then
+  if cmd_exists brew; then
+    install_brew
+  elif cmd_exists apt-get; then
     install_apt
   elif cmd_exists yum; then
     install_yum
@@ -127,16 +135,22 @@ run() {
     install_dpkg
   elif cmd_exists rpm; then
     install_rpm
-  elif [ "$os" = "linux" ]; then
-    if [ "$(get_arch)" == "unknown" ]; then
-      echo "unknown system architecture. Try manual install. See https://kubeshop.github.io/tracetest/installing/#cli-installation"
-      exit 1;
-    fi
+  elif [ "$(get_arch)" == "unknown" ]; then
+    echo "unknown system architecture. Try manual install. See https://kubeshop.github.io/tracetest/installing/#cli-installation"
+    exit 1;
+  elif [[ "$(get_os)" =~ ^(darwin|linux)$ ]]; then
     install_tar
   else
     echo 'OS not supported by this script. See https://kubeshop.github.io/tracetest/installing/#cli-installation'
     exit 1
   fi
+
+  echo
+  echo "Succesfull install!"
+  echo
+  echo "run 'tracetest --help' to see what you can do"
+  echo
+  echo "To setup a new server, run 'tracetest server install'"
 }
 
 SUDO=""
