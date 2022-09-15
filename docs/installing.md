@@ -74,7 +74,7 @@ sudo yum install tracetest --refresh
 ### Windows
 Download one of the files from the latest tag, extract to your machine, and then [add the tracetest binary to your PATH variable](https://stackoverflow.com/a/41895179)
 
-## Server deployments
+## Server Deployments
 
 ### Docker Compose
 
