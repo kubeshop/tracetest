@@ -13,7 +13,7 @@ $ tracetest server install
 
 ## How It Works
 
-Tracetest is a relatively complex system, with a few intercontected dependencies. It relies on a Postgres database, a Data Store to retrive your application's traces,
+Tracetest is a relatively complex system, with a few interconnected dependencies. It relies on a Postgres database, a Data Store to retrieve your application's traces
 on the OpenTelemetry Collector connected to the Data Store, etc. If you are new to the tracing world, it might be overwhelming and a bit tricky to connect everything together.
 
 Our CLI offers an install "wizard" that helps you with the process. You can use it to install it locally using docker compose, or to a local or remote Kubernetes cluster.
