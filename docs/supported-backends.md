@@ -11,16 +11,16 @@ Details of configuring Tracetest to access these is discussed in the [installati
 
 We will be adding new data stores over the next couple of months - [let us know](https://github.com/kubeshop/tracetest/issues/new/choose) the ones you would to see us add support for.
 
-## Using Tracetest without a backend
+## Using Tracetest Without a Backend
 
-Another option is to not use any backend and instead send all traces directly to Tracetest using your OpenTelemetry Collector. And you don't have to change your existing pipelines to do so.
+Another option is to not use a backend and send all traces directly to Tracetest using your OpenTelemetry Collector. And, you don't have to change your existing pipelines to do so.
 
-### Configuring your collector to send traces to tracetest
+### Configuring Your Collector to Send Traces to Tracetest
 
-> :warning: It is important to notice that this relies on the [tailsampling](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/tailsamplingprocessor) processor, which at the moment is only available in the [contrib](https://github.com/open-telemetry/opentelemetry-collector-contrib/) version of the collector.
+> :warning: It is important to notice that this relies on the [tailsampling](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/tailsamplingprocessor) processor, which, at the moment, is only available in the [contrib](https://github.com/open-telemetry/opentelemetry-collector-contrib/) version of the collector.
 
 
-#### Creating a new pipeline for your traces
+#### Creating a New Pipeline for Your Traces
 
 ```yaml
 # your collector configuration file
@@ -64,9 +64,9 @@ service:
       exporters: [otlp/1] # your exporter pointing to your tracetest instance
 ```
 
-#### Configuring your Tracetest instance
+#### Configuring your Tracetest Instance
 
-You also have to configure your Tracetest instance to make it aware that there's no tracing backend to poll traces from. Just change your configuration file to include this configuration:
+You also have to configure your Tracetest instance to make it aware that there's no tracing backend to pull traces from. Just change your configuration file to include this configuration:
 
 ```yaml
 # your tracetest config YAML file
