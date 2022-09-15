@@ -88,7 +88,7 @@ func TestFailingTestOutput(t *testing.T) {
 							AllPassed: boolp(true),
 							SpanResults: []openapi.AssertionSpanResult{
 								{
-									SpanId:        strp("456789"),
+									SpanId:        strp("123456"),
 									ObservedValue: strp("68ms"),
 									Passed:        boolp(true),
 									Error:         nil,
@@ -129,7 +129,7 @@ func TestFailingTestOutput(t *testing.T) {
 	✘ span[name = "my other span"]
 		✘ #456789
 			✔ tracetest.span.duration <= 200ms (68ms)
-			✘ http.status = 200 (404)
+			✘ http.status = 200 (404) (http://localhost:8080/test/9876543/run/123456??selectedAssertion=1&spanId=456789)
 `
 	assert.Equal(t, expectedOutput, output)
 }
