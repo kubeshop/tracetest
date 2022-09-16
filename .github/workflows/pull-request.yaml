@@ -16,6 +16,7 @@ on:
       - tracetesting/**
       - web/**
       - Dockerfile
+      - k8s/*
 
 jobs:
   unit-test-cli:
