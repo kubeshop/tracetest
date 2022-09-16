@@ -21,15 +21,40 @@ func TestObjectToYamlConversion(t *testing.T) {
 				Method: "GET",
 			},
 		},
+		Specs: []definition.TestSpec{
+			{
+				Selector: `span[name="My span"]`,
+				Assertions: []string{
+					"assertion 1",
+					"assertion 2",
+				},
+			},
+			{
+				Selector: `span[name="My other span"]`,
+				Assertions: []string{
+					"assertion 3",
+					"assertion 4",
+				},
+			},
+		},
 	}
 
 	expectedYaml := `id: abcdeef
 name: This is a value
 trigger:
-  httpRequest:
-    method: GET
-    url: http://localhost:8080
   type: http
+  httpRequest:
+    url: http://localhost:8080
+    method: GET
+specs:
+- selector: span[name="My span"]
+  assertions:
+  - assertion 1
+  - assertion 2
+- selector: span[name="My other span"]
+  assertions:
+  - assertion 3
+  - assertion 4
 `
 
 	yamlBytes, err := conversion.GetYamlFileFromDefinition(def)
