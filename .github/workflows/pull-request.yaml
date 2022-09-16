@@ -181,21 +181,19 @@ jobs:
 
     - name: Deploy
       run: |
+        export NAME=tracetest-pr-${{ github.event.pull_request.number }}
         helm repo add kubeshop https://kubeshop.github.io/helm-charts
         helm repo update
-        helm upgrade --install tracetest-pr-${{ github.event.pull_request.number }} kubeshop/tracetest \
-          --namespace tracetest-pr-${{ github.event.pull_request.number }} --create-namespace \
-          --set analytics.enabled=false \
+        helm upgrade --install $NAME kubeshop/tracetest \
+          --namespace $NAME --create-namespace \
           --set image.tag=pr-${{ github.event.pull_request.number }} \
           --set image.pullPolicy=Always \
-          --set telemetry.dataStores.jaeger.jaeger.endpoint="jaeger-query.tracetest.svc.cluster.local:16685" \
-          --set telemetry.exporters.collector.exporter.collector.endpoint="otel-collector.tracetest.svc.cluster.local:4317" \
-          --set server.telemetry.dataStore="jaeger" \
-          --set server.telemetry.applicationExporter="collector" \
-          --set poolingConfig.maxWaitTimeForTrace="30s" \
-          --set poolingConfig.retryDelay="500ms" \
           --set ingress.enabled=false \
           --wait --timeout 10m
+
+        kubectl --namespace $NAME create configmap --from-file ./k8s/tracetest.beta.yaml \
+          | sed 's#tracetest.beta.yaml#config.yaml#' | \
+          kubectl --namespace $NAME replace -f -
 
   e2e:
     needs: [deploy, trace-testing]
