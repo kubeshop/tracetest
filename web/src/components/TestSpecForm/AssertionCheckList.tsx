@@ -23,23 +23,21 @@ const AssertionCheckList = ({form, fields, add, remove, attributeList, assertion
 
   return (
     <S.AssertionsContainer>
-      <S.CheckContainer>
-        {fields.map(({key, name, ...field}, index) => {
-          return (
-            <AssertionCheck
-              key={key}
-              form={form}
-              remove={remove}
-              field={field}
-              attributeList={attributeList}
-              name={name}
-              index={index}
-              assertions={assertions}
-              reference={reference}
-            />
-          );
-        })}
-      </S.CheckContainer>
+      {fields.map(({key, name, ...field}, index) => {
+        return (
+          <AssertionCheck
+            key={key}
+            form={form}
+            remove={remove}
+            field={field}
+            attributeList={attributeList}
+            name={name}
+            index={index}
+            assertions={assertions}
+            reference={reference}
+          />
+        );
+      })}
       <S.AddCheckButton
         icon={<PlusOutlined />}
         onClick={() => {

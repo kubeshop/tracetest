@@ -4,6 +4,7 @@ import styled from 'styled-components';
 
 export const Select = styled(AntSelect)`
   min-width: 88px;
+
   > .ant-select-selector {
     min-height: 100%;
   }
@@ -15,15 +16,27 @@ export const Check = styled.div`
   gap: 8px 12px;
 `;
 
-export const CheckContainer = styled.div`
-  display: grid;
-  gap: 8px 12px;
-  grid-template-columns: repeat(3, 1fr) 14px;
-  margin-bottom: 8px;
-`;
-
 export const AssertionsContainer = styled.div`
   margin-bottom: 24px;
+`;
+
+export const Container = styled.div`
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 8px;
+`;
+
+export const FieldsContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  flex-basis: 95%;
+`;
+
+export const ActionContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-self: center;
+  flex-basis: 5%;
 `;
 
 export const AddCheckButton = styled(Button).attrs({
