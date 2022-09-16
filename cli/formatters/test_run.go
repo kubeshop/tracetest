@@ -188,5 +188,10 @@ func (f testRun) getRunLink(test openapi.Test, run openapi.TestRun) string {
 }
 
 func (f testRun) getDeepLink(baseLink string, index int, spanID string) string {
-	return fmt.Sprintf("%s?selectedAssertion=%d&spanId=%s", baseLink, index, spanID)
+	link := fmt.Sprintf("%s?selectedAssertion=%d", baseLink, index)
+	if spanID != "meta" {
+		link = fmt.Sprintf("%s&spanId=%s", link, spanID)
+	}
+
+	return link
 }
