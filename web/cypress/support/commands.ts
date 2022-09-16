@@ -119,7 +119,7 @@ Cypress.Commands.add('cancelOnBoarding', () => {
   const parsedValue = value ? JSON.parse(value) : undefined;
 
   if (!parsedValue || parsedValue.trace === false) {
-    // cy.get('[data-cy=no-thanks]').click();
+    cy.get('[data-cy=no-thanks]').click();
   }
 });
 

@@ -1,18 +1,38 @@
+import {useTour} from '@reactour/tour';
 import {Popover, Typography} from 'antd';
+import {useMemo} from 'react';
+import {useLocation, useParams} from 'react-router-dom';
 
 import {DOCUMENTATION_URL, GITHUB_URL} from 'constants/Common.constants';
-import {useLocation} from 'react-router-dom';
+import {useGuidedTour} from 'providers/GuidedTour/GuidedTour.provider';
+import HomeAnalyticsService from 'services/Analytics/HomeAnalytics.service';
 import * as S from './Header.styled';
+import {ShowOnboardingContent} from './ShowOnboardingContent';
+
+const {onGuidedTourClick} = HomeAnalyticsService;
 
 const HeaderMenu = () => {
   const {pathname} = useLocation();
+  const params = useParams();
+  const {setIsOpen} = useTour();
+  const {isTriggerVisible, onCloseTrigger, setIsTriggerVisible} = useGuidedTour();
+
+  const content = useMemo(
+    () =>
+      ShowOnboardingContent(
+        onGuidedTourClick,
+        () => setIsOpen(true),
+        () => onCloseTrigger()
+      ),
+    [onCloseTrigger, setIsOpen]
+  );
 
   return (
     <Popover
       arrowContent={null}
-      content={() => null}
+      content={content}
       title={() => <Typography.Title level={2}>Take a quick tour of Tracetest?</Typography.Title>}
-      visible={false}
+      visible={isTriggerVisible}
     >
       <S.NavMenu
         selectedKeys={[pathname]}
@@ -39,9 +59,9 @@ const HeaderMenu = () => {
               },
               {
                 key: 'Onboarding',
-                disabled: true,
+                disabled: !params.runId,
                 label: (
-                  <a key="guidedTour" aria-disabled>
+                  <a key="guidedTour" onClick={() => setIsTriggerVisible(!isTriggerVisible)}>
                     Show Onboarding
                   </a>
                 ),
