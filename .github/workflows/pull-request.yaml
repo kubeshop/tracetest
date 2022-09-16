@@ -190,12 +190,14 @@ jobs:
           --set image.tag=pr-${{ github.event.pull_request.number }} \
           --set image.pullPolicy=Always \
           --set ingress.enabled=false \
-          --wait --timeout 10m
 
-        echo
         kubectl --namespace $NAME create configmap --from-file ./k8s/tracetest.beta.yaml \
           | sed 's#tracetest.beta.yaml#config.yaml#' | \
           kubectl --namespace $NAME replace -f -
+
+        kubectl --namespace $NAME delete pods -l app.kubernetes.io/name=tracetest
+
+        kubectl --namespace $NAME wait --for=condition=ready pod -l app.kubernetes.io/name=tracetest --timeout 10m
 
   e2e:
     needs: [deploy, trace-testing]
