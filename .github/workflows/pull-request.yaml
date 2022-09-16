@@ -192,11 +192,7 @@ jobs:
           --set image.pullPolicy=Always \
           --set ingress.enabled=false \
 
-        kubectl --namespace $NAME create configmap --from-file ./k8s/tracetest.beta.yaml \
-          | envsubst \
-          | sed 's#tracetest.beta.yaml#config.yaml#'
-
-        kubectl --namespace $NAME create configmap --from-file ./k8s/tracetest.beta.yaml \
+        kubectl --namespace $NAME create configmap $NAME --from-file ./k8s/tracetest.beta.yaml \
           | envsubst \
           | sed 's#tracetest.beta.yaml#config.yaml#' \
           | kubectl --namespace $NAME replace -f -
