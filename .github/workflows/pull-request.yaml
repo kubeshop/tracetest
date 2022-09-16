@@ -161,7 +161,8 @@ jobs:
           ./cli/tracetest test run -d examples/${{ matrix.example_dir }}/tests/list-tests.yaml --wait-for-result
 
   deploy:
-    needs:  [unit-test-frontend, unit-test-backend, unit-test-cli, build-docker]
+    # needs:  [unit-test-frontend, unit-test-backend, unit-test-cli, build-docker]
+    needs: [build-docker] # TODO revert this
     name: Deploy
     runs-on: ubuntu-latest
 
@@ -190,6 +191,10 @@ jobs:
           --set image.tag=pr-${{ github.event.pull_request.number }} \
           --set image.pullPolicy=Always \
           --set ingress.enabled=false \
+
+        kubectl --namespace $NAME create configmap --from-file ./k8s/tracetest.beta.yaml \
+          | envsubst \
+          | sed 's#tracetest.beta.yaml#config.yaml#'
 
         kubectl --namespace $NAME create configmap --from-file ./k8s/tracetest.beta.yaml \
           | envsubst \
