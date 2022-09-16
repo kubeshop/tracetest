@@ -10,7 +10,6 @@ services:
       args:
         VERSION: dev
         TRACETEST_ENV: docker-compose
-        POKE_API: http://demo-api:8081
     volumes:
       - type: bind
         source: ./local-config/config.tests.yaml
@@ -108,8 +107,7 @@ services:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres?schema=public
       RABBITMQ_HOST: queue
       POKE_API_BASE_URL: https://pokeapi.co/api/v2
-      JAEGER_HOST: jaeger
-      JAEGER_PORT: 6832
+      COLLECTOR_ENDPOINT: http://otel-collector:4317
       NPM_RUN_COMMAND: api
     ports:
       - "8081:8081"
@@ -137,8 +135,7 @@ services:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres?schema=public
       RABBITMQ_HOST: queue
       POKE_API_BASE_URL: https://pokeapi.co/api/v2
-      JAEGER_HOST: jaeger
-      JAEGER_PORT: 6832
+      COLLECTOR_ENDPOINT: http://otel-collector:4317
       NPM_RUN_COMMAND: worker
     depends_on:
       postgres:
@@ -159,8 +156,7 @@ services:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres?schema=public
       RABBITMQ_HOST: queue
       POKE_API_BASE_URL: https://pokeapi.co/api/v2
-      JAEGER_HOST: jaeger
-      JAEGER_PORT: 6832
+      COLLECTOR_ENDPOINT: http://otel-collector:4317
       NPM_RUN_COMMAND: rpc
     ports:
       - 8082:8082
