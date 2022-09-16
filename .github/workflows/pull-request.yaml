@@ -192,6 +192,7 @@ jobs:
           --set ingress.enabled=false \
           --wait --timeout 10m
 
+        echo
         kubectl --namespace $NAME create configmap --from-file ./k8s/tracetest.beta.yaml \
           | sed 's#tracetest.beta.yaml#config.yaml#' | \
           kubectl --namespace $NAME replace -f -
