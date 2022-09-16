@@ -1,10 +1,10 @@
 import {Form} from 'antd';
-import {useCallback, useEffect} from 'react';
-import {HTTP_METHOD} from 'constants/Common.constants';
-import {useCreateTest} from 'providers/CreateTest/CreateTest.provider';
-import CreateStepFooter from 'components/CreateTestSteps/CreateTestStepFooter';
 import * as Step from 'components/CreateTestPlugins/Step.styled';
+import CreateStepFooter from 'components/CreateTestSteps/CreateTestStepFooter';
+import {HTTP_METHOD} from 'constants/Common.constants';
 import useValidateTestDraft from 'hooks/useValidateTestDraft';
+import {useCreateTest} from 'providers/CreateTest/CreateTest.provider';
+import {useCallback, useEffect} from 'react';
 import {IHttpValues} from 'types/Test.types';
 import RequestDetailsForm from './RequestDetailsForm';
 
@@ -30,7 +30,7 @@ const RequestDetails = () => {
     form.setFieldsValue({url, body, method: method as HTTP_METHOD});
 
     try {
-      await form.validateFields();
+      form.validateFields();
       setIsValid(true);
     } catch (err) {
       setIsValid(false);
