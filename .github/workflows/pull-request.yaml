@@ -161,8 +161,7 @@ jobs:
           ./cli/tracetest test run -d examples/${{ matrix.example_dir }}/tests/list-tests.yaml --wait-for-result
 
   deploy:
-    # needs:  [unit-test-frontend, unit-test-backend, unit-test-cli, build-docker]
-    needs: [build-docker] # TODO revert this
+    needs:  [unit-test-frontend, unit-test-backend, unit-test-cli, build-docker]
     name: Deploy
     runs-on: ubuntu-latest
 
