@@ -1,5 +1,4 @@
-postgresConnString: "host=tracetest-beta-postgresql user=tracetest password=not-secure-database-password  port=5432 sslmode=disable"
-
+postgresConnString: "host=${NAME}-postgresql user=tracetest password=not-secure-database-password  port=5432 sslmode=disable"
 
 poolingConfig:
   maxWaitTimeForTrace: 10s

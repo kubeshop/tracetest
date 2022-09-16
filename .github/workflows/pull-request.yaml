@@ -192,8 +192,9 @@ jobs:
           --set ingress.enabled=false \
 
         kubectl --namespace $NAME create configmap --from-file ./k8s/tracetest.beta.yaml \
-          | sed 's#tracetest.beta.yaml#config.yaml#' | \
-          kubectl --namespace $NAME replace -f -
+          | envsubst \
+          | sed 's#tracetest.beta.yaml#config.yaml#' \
+          | kubectl --namespace $NAME replace -f -
 
         kubectl --namespace $NAME delete pods -l app.kubernetes.io/name=tracetest
 
