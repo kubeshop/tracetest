@@ -17,10 +17,21 @@ if [ -z "$CONFIG_FILE" ];then
   exit 1
 fi
 
-echo $NAME
-echo $TAG
-echo $CONFIG_FILE
-basename $CONFIG_FILE
+extraParams=()
+
+if [ -n "$EXPOSE_HOST" ]; then
+  extraParams=("${extraParams[@]}" "--set ingress.enabled=true" )
+  extraParams=("${extraParams[@]}" "--set 'ingress.hosts[0].host=$EXPOSE_HOST,ingress.hosts[0].paths[0].path=/,ingress.hosts[0].paths[0].pathType=Prefix'" )
+fi
+
+if [ -n "$CERT_NAME" ]; then
+    extraParams=("${extraParams[@]}" '--set ingress.annotations."networking\.gke\.io/managed-certificates"='$CERT_NAME)
+    extraParams=("${extraParams[@]}" '--set ingress.annotations."networking\.gke\.io/v1beta1\.FrontendConfig"="ssl-redirect"')
+fi
+
+if [ -n "$BACKEND_CONFIG" ]; then
+    extraParams=("${extraParams[@]}" "--set service.annotations.\"cloud\\.google\\.com/backend-config\"='\{\\\"default\\\":\\\"$BACKEND_CONFIG\\\"\\}'")
+fi
 
 helm repo add kubeshop https://kubeshop.github.io/helm-charts
 helm repo update
@@ -28,7 +39,7 @@ helm upgrade --install $NAME kubeshop/tracetest \
   --namespace $NAME --create-namespace \
   --set image.tag=$TAG \
   --set image.pullPolicy=Always \
-  --set ingress.enabled=false
+  ${extraParams[@]}
 
 kubectl --namespace $NAME create configmap $NAME --from-file=$CONFIG_FILE -o yaml --dry-run=client \
   | envsubst \
