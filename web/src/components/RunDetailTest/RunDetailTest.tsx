@@ -19,30 +19,31 @@ const RunDetailTest = ({run, testId}: IProps) => {
 
   return (
     <S.Container>
-      <Drawer>
-        <SpanDetail span={selectedSpan} />
-      </Drawer>
-
-      <S.Container>
-        <S.SectionLeft>
-          <Visualization runState={run.state} spans={run?.trace?.spans ?? []} />
-        </S.SectionLeft>
-        <S.SectionRight>
-          {isTestSpecFormOpen ? (
-            <TestSpecForm
-              onSubmit={onSubmit}
-              runId={run.id}
-              testId={testId}
-              {...formProps}
-              onCancel={() => {
-                close();
-              }}
-            />
-          ) : (
-            <TestResults />
-          )}
-        </S.SectionRight>
-      </S.Container>
+      <Drawer
+        leftPanel={<SpanDetail span={selectedSpan} />}
+        rightPanel={
+          <S.Container>
+            <S.SectionLeft>
+              <Visualization runState={run.state} spans={run?.trace?.spans ?? []} />
+            </S.SectionLeft>
+            <S.SectionRight>
+              {isTestSpecFormOpen ? (
+                <TestSpecForm
+                  onSubmit={onSubmit}
+                  runId={run.id}
+                  testId={testId}
+                  {...formProps}
+                  onCancel={() => {
+                    close();
+                  }}
+                />
+              ) : (
+                <TestResults />
+              )}
+            </S.SectionRight>
+          </S.Container>
+        }
+      />
     </S.Container>
   );
 };

@@ -1,4 +1,12 @@
-import styled, {css} from 'styled-components';
+import styled, {createGlobalStyle, css} from 'styled-components';
+
+export const GlobalStyle = createGlobalStyle`
+  .reflex-container.vertical > .reflex-splitter {
+    border-left: 1px solid rgba(3, 24, 73, 0.1);
+    border-right: 1px solid rgba(3, 24, 73, 0.1);
+    position: relative;
+  }
+`;
 
 export const ButtonContainer = styled.div`
   position: absolute;
@@ -6,35 +14,24 @@ export const ButtonContainer = styled.div`
   top: 48px;
 `;
 
-export const Container = styled.div<{$isOpen: boolean}>`
+export const Content = styled.div<{$isOpen: boolean}>`
   background-color: ${({theme}) => theme.color.white};
   box-shadow: 0 20px 24px rgba(153, 155, 168, 0.18);
   height: 100%;
-  min-width: 30px;
   overflow: visible;
   position: relative;
-  transition: width ease 0.2s, min-width ease 0.2s;
-  width: 30px;
-  z-index: 2;
 
-  > div:first-child {
+  > div {
     opacity: 0;
+    pointer-events: none;
   }
 
   ${({$isOpen}) =>
     $isOpen &&
     css`
-      min-width: 270px;
-      transition: width ease 0.2s 0.05s, min-width ease 0.2s 0.05s;
-      width: 270px;
-
-      > div:first-child {
+      > div {
         opacity: 1;
+        pointer-events: auto;
       }
     `}
-`;
-
-export const Content = styled.div`
-  height: 100%;
-  overflow: hidden;
 `;
