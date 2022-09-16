@@ -1,5 +1,7 @@
 #/bin/bash
 
+set -x
+
 if [ -z "$NAME" ];then
   echo '$NAME is required'
   exit 1
@@ -28,7 +30,7 @@ helm upgrade --install $NAME kubeshop/tracetest \
   --set image.pullPolicy=Always \
   --set ingress.enabled=false
 
-kubectl --namespace $NAME create configmap $NAME --from-file $CONFIG_FILE --dry-run=client \
+kubectl --namespace $NAME create configmap $NAME --from-file=$CONFIG_FILE -o yaml --dry-run=client \
   | envsubst \
   | sed 's#'$(basename $CONFIG_FILE)'#config.yaml#' \
   | kubectl --namespace $NAME replace -f -
