@@ -117,24 +117,26 @@ func (f testRun) formatFailedTest(test openapi.Test, run openapi.TestRun) string
 		message = f.getColoredText(allPassed, message)
 		buffer.WriteString(message)
 
+		baseLink := f.getRunLink(test, run)
+
 		if metaResult, exists := results["meta"]; exists {
 			// meta assertions should be placed at the top
 			// of the selector section. That's why we treat it as a special case
 			// and remove it from the results map afterwards.
 
-			f.generateSpanResult(&buffer, "meta", metaResult)
+			f.generateSpanResult(&buffer, "meta", metaResult, baseLink)
 			delete(results, "meta")
 		}
 
 		for spanId, spanResult := range results {
-			f.generateSpanResult(&buffer, spanId, spanResult)
+			f.generateSpanResult(&buffer, spanId, spanResult, baseLink)
 		}
 	}
 
 	return buffer.String()
 }
 
-func (f testRun) generateSpanResult(buffer *bytes.Buffer, spanId string, spanResult spanAssertionResult) {
+func (f testRun) generateSpanResult(buffer *bytes.Buffer, spanId string, spanResult spanAssertionResult, baseLink string) {
 	icon := f.getStateIcon(spanResult.allPassed)
 	message := fmt.Sprintf("\t\t%s #%s\n", icon, spanId)
 	message = f.getColoredText(spanResult.allPassed, message)
@@ -143,12 +145,18 @@ func (f testRun) generateSpanResult(buffer *bytes.Buffer, spanId string, spanRes
 	for _, assertionResult := range spanResult.results {
 		icon := f.getStateIcon(assertionResult.passed)
 		var message string
-		link := ""
 		if assertionResult.observedValue != nil {
-			message = fmt.Sprintf("\t\t\t%s %s (%s) (%s)\n", icon, assertionResult.assertion, *assertionResult.observedValue, link)
+			message = fmt.Sprintf("\t\t\t%s %s (%s)", icon, assertionResult.assertion, *assertionResult.observedValue)
 		} else {
-			message = fmt.Sprintf("\t\t\t%s %s (%s)\n", icon, assertionResult.assertion, link)
+			message = fmt.Sprintf("\t\t\t%s %s", icon, assertionResult.assertion)
 		}
+
+		if !assertionResult.passed {
+			link := f.getDeepLink(baseLink, assertionResult.index, assertionResult.spanID)
+			message = fmt.Sprintf("%s (%s)", message, link)
+		}
+		message += "\n"
+
 		message = f.getColoredText(assertionResult.passed, message)
 
 		buffer.WriteString(message)
@@ -179,6 +187,6 @@ func (f testRun) getRunLink(test openapi.Test, run openapi.TestRun) string {
 	return fmt.Sprintf("%s://%s/test/%s/run/%s", f.config.Scheme, f.config.Endpoint, *test.Id, *run.Id)
 }
 
-func (f testRun) getDeepLink(test openapi.Test, run openapi.TestRun) string {
-	return fmt.Sprintf("%s://%s/test/%s/run/%s", f.config.Scheme, f.config.Endpoint, *test.Id, *run.Id)
+func (f testRun) getDeepLink(baseLink string, index int, spanID string) string {
+	return fmt.Sprintf("%s?selectedAssertion=%d&spanId=%s", baseLink, index, spanID)
 }
