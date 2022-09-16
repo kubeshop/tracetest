@@ -14,19 +14,19 @@ const (
 	FAILED_TEST_ICON = "✘"
 )
 
-type TestRunFormatter struct {
+type testRun struct {
 	config        config.Config
 	colorsEnabled bool
 }
 
-func NewTestRunFormatter(config config.Config, colorsEnabled bool) TestRunFormatter {
-	return TestRunFormatter{
+func TestRun(config config.Config, colorsEnabled bool) testRun {
+	return testRun{
 		config:        config,
 		colorsEnabled: colorsEnabled,
 	}
 }
 
-func (f TestRunFormatter) FormatTestRunOutput(test openapi.Test, run openapi.TestRun) string {
+func (f testRun) Format(test openapi.Test, run openapi.TestRun) string {
 	if run.State != nil && *run.State == "FAILED" {
 		return f.getColoredText(false, fmt.Sprintf("Failed to execute test: %s", *run.LastErrorState))
 	}
@@ -38,8 +38,8 @@ func (f TestRunFormatter) FormatTestRunOutput(test openapi.Test, run openapi.Tes
 	return f.formatSuccessfulTest(test, run)
 }
 
-func (f TestRunFormatter) formatSuccessfulTest(test openapi.Test, run openapi.TestRun) string {
-	link := f.getLink(test, run)
+func (f testRun) formatSuccessfulTest(test openapi.Test, run openapi.TestRun) string {
+	link := f.getRunLink(test, run)
 	message := fmt.Sprintf("%s %s (%s)\n", PASSED_TEST_ICON, *test.Name, link)
 	return f.getColoredText(true, message)
 }
@@ -53,12 +53,14 @@ type assertionResult struct {
 	assertion     string
 	observedValue *string
 	passed        bool
+	index         int
+	spanID        string
 }
 
-func (f TestRunFormatter) formatFailedTest(test openapi.Test, run openapi.TestRun) string {
+func (f testRun) formatFailedTest(test openapi.Test, run openapi.TestRun) string {
 	var buffer bytes.Buffer
 
-	link := f.getLink(test, run)
+	link := f.getRunLink(test, run)
 	message := fmt.Sprintf("%s %s (%s)\n", FAILED_TEST_ICON, *test.Name, link)
 	message = f.getColoredText(false, message)
 	buffer.WriteString(message)
@@ -66,7 +68,7 @@ func (f TestRunFormatter) formatFailedTest(test openapi.Test, run openapi.TestRu
 		results := make(map[string]spanAssertionResult, 0)
 		allPassed := true
 
-		for _, result := range specResult.Results {
+		for i, result := range specResult.Results {
 			assertionQuery := fmt.Sprintf(
 				"%s %s %s",
 				*result.Assertion.Attribute,
@@ -97,6 +99,8 @@ func (f TestRunFormatter) formatFailedTest(test openapi.Test, run openapi.TestRu
 					assertion:     assertionQuery,
 					observedValue: spanResult.ObservedValue,
 					passed:        spanAssertionPassed,
+					index:         i,
+					spanID:        spanID,
 				})
 
 				if !spanAssertionPassed {
@@ -113,24 +117,26 @@ func (f TestRunFormatter) formatFailedTest(test openapi.Test, run openapi.TestRu
 		message = f.getColoredText(allPassed, message)
 		buffer.WriteString(message)
 
+		baseLink := f.getRunLink(test, run)
+
 		if metaResult, exists := results["meta"]; exists {
 			// meta assertions should be placed at the top
 			// of the selector section. That's why we treat it as a special case
 			// and remove it from the results map afterwards.
 
-			f.generateSpanResult(&buffer, "meta", metaResult)
+			f.generateSpanResult(&buffer, "meta", metaResult, baseLink)
 			delete(results, "meta")
 		}
 
 		for spanId, spanResult := range results {
-			f.generateSpanResult(&buffer, spanId, spanResult)
+			f.generateSpanResult(&buffer, spanId, spanResult, baseLink)
 		}
 	}
 
 	return buffer.String()
 }
 
-func (f TestRunFormatter) generateSpanResult(buffer *bytes.Buffer, spanId string, spanResult spanAssertionResult) {
+func (f testRun) generateSpanResult(buffer *bytes.Buffer, spanId string, spanResult spanAssertionResult, baseLink string) {
 	icon := f.getStateIcon(spanResult.allPassed)
 	message := fmt.Sprintf("\t\t%s #%s\n", icon, spanId)
 	message = f.getColoredText(spanResult.allPassed, message)
@@ -140,17 +146,24 @@ func (f TestRunFormatter) generateSpanResult(buffer *bytes.Buffer, spanId string
 		icon := f.getStateIcon(assertionResult.passed)
 		var message string
 		if assertionResult.observedValue != nil {
-			message = fmt.Sprintf("\t\t\t%s %s (%s)\n", icon, assertionResult.assertion, *assertionResult.observedValue)
+			message = fmt.Sprintf("\t\t\t%s %s (%s)", icon, assertionResult.assertion, *assertionResult.observedValue)
 		} else {
-			message = fmt.Sprintf("\t\t\t%s %s\n", icon, assertionResult.assertion)
+			message = fmt.Sprintf("\t\t\t%s %s", icon, assertionResult.assertion)
 		}
+
+		if !assertionResult.passed {
+			link := f.getDeepLink(baseLink, assertionResult.index, assertionResult.spanID)
+			message = fmt.Sprintf("%s (%s)", message, link)
+		}
+		message += "\n"
+
 		message = f.getColoredText(assertionResult.passed, message)
 
 		buffer.WriteString(message)
 	}
 }
 
-func (f TestRunFormatter) getStateIcon(passed bool) string {
+func (f testRun) getStateIcon(passed bool) string {
 	if passed {
 		return PASSED_TEST_ICON
 	}
@@ -158,7 +171,7 @@ func (f TestRunFormatter) getStateIcon(passed bool) string {
 	return FAILED_TEST_ICON
 }
 
-func (f TestRunFormatter) getColoredText(passed bool, text string) string {
+func (f testRun) getColoredText(passed bool, text string) string {
 	if !f.colorsEnabled {
 		return text
 	}
@@ -170,6 +183,15 @@ func (f TestRunFormatter) getColoredText(passed bool, text string) string {
 	return pterm.FgRed.Sprintf(text)
 }
 
-func (f TestRunFormatter) getLink(test openapi.Test, run openapi.TestRun) string {
+func (f testRun) getRunLink(test openapi.Test, run openapi.TestRun) string {
 	return fmt.Sprintf("%s://%s/test/%s/run/%s", f.config.Scheme, f.config.Endpoint, *test.Id, *run.Id)
+}
+
+func (f testRun) getDeepLink(baseLink string, index int, spanID string) string {
+	link := fmt.Sprintf("%s?selectedAssertion=%d", baseLink, index)
+	if spanID != "meta" {
+		link = fmt.Sprintf("%s&spanId=%s", link, spanID)
+	}
+
+	return link
 }

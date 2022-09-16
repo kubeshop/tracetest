@@ -31,11 +31,11 @@ func TestSuccessfulTestOutput(t *testing.T) {
 		},
 	}
 
-	formatter := formatters.NewTestRunFormatter(config.Config{
+	formatter := formatters.TestRun(config.Config{
 		Scheme:   "http",
 		Endpoint: "localhost:8080",
 	}, false)
-	output := formatter.FormatTestRunOutput(test, run)
+	output := formatter.Format(test, run)
 
 	assert.Equal(t, "✔ Testcase 1 (http://localhost:8080/test/9876543/run/123456)\n", output)
 }
@@ -117,11 +117,11 @@ func TestFailingTestOutput(t *testing.T) {
 		},
 	}
 
-	formatter := formatters.NewTestRunFormatter(config.Config{
+	formatter := formatters.TestRun(config.Config{
 		Scheme:   "http",
 		Endpoint: "localhost:8080",
 	}, false)
-	output := formatter.FormatTestRunOutput(test, run)
+	output := formatter.Format(test, run)
 	expectedOutput := `✘ Testcase 2 (http://localhost:8080/test/9876543/run/123456)
 	✔ span[name = "my span"]
 		✔ #123456
@@ -129,7 +129,7 @@ func TestFailingTestOutput(t *testing.T) {
 	✘ span[name = "my other span"]
 		✘ #456789
 			✔ tracetest.span.duration <= 200ms (68ms)
-			✘ http.status = 200 (404)
+			✘ http.status = 200 (404) (http://localhost:8080/test/9876543/run/123456?selectedAssertion=1&spanId=456789)
 `
 	assert.Equal(t, expectedOutput, output)
 }
