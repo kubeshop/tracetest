@@ -87,7 +87,7 @@ const selectTotalSpecs = createSelector(selectAssertionResults, assertionResults
 const TestSpecsSelectors = () => ({
   selectSpecs,
   selectSpecsSelectorList,
-  selectIsSelectorExist: createSelector(selectSpecsSelectorList, selectorSelector, (selectorList, selector) =>
+  selectIsSelectorExist: createSelector(selectSpecsSelectorList, selectorSelector, (selectorList, selector = '') =>
     selectorList.includes(selector)
   ),
   selectIsLoading: createSelector(stateSelector, ({isLoading}) => isLoading),

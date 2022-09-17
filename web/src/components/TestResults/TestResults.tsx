@@ -15,22 +15,20 @@ import * as S from './TestResults.styled';
 
 const TestResults = () => {
   const {open} = useTestSpecForm();
-  const {isLoading, assertionResults, remove, revert, setSelectedSpec} = useTestSpecs();
-  const {selectedSpan, onSetFocusedSpan} = useSpan();
+  const {isLoading, assertionResults, remove, revert, setSelectedSpec, selectedTestSpec} = useTestSpecs();
+  const {selectedSpan, onSetFocusedSpan, onSelectSpan} = useSpan();
   const {totalFailedSpecs, totalPassedSpecs} = useAppSelector(TestSpecsSelectors.selectTotalSpecs);
-  const selectedSpec = useAppSelector(TestSpecsSelectors.selectSelectedSpec);
-  const selectedTestSpec = useAppSelector(state =>
-    TestSpecsSelectors.selectAssertionBySelector(state, selectedSpec ?? '')
-  );
 
   const handleOpen = useCallback(
     (selector: string) => {
       AssertionAnalyticsService.onAssertionClick();
       const testSpec = assertionResults?.resultList?.find(specResult => specResult.selector === selector);
+
       onSetFocusedSpan('');
-      setSelectedSpec(testSpec);
+      onSelectSpan(testSpec?.spanIds[0] || '');
+      setSelectedSpec(testSpec?.selector);
     },
-    [assertionResults?.resultList, onSetFocusedSpan, setSelectedSpec]
+    [assertionResults?.resultList, onSelectSpan, onSetFocusedSpan, setSelectedSpec]
   );
 
   const handleClose = useCallback(() => {
@@ -72,9 +70,10 @@ const TestResults = () => {
 
   const handleSelectSpan = useCallback(
     (spanId: string) => {
+      onSelectSpan(spanId);
       onSetFocusedSpan(spanId);
     },
-    [onSetFocusedSpan]
+    [onSelectSpan, onSetFocusedSpan]
   );
 
   return (
@@ -98,7 +97,7 @@ const TestResults = () => {
       )}
 
       <TestSpecDetail
-        isOpen={Boolean(selectedSpec)}
+        isOpen={Boolean(selectedTestSpec)}
         onClose={handleClose}
         onDelete={handleDelete}
         onEdit={handleEdit}

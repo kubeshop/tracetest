@@ -23,13 +23,28 @@ interface IProps {
   runId: string;
   testId: string;
   isDraftMode: boolean;
+  assertionResults?: TAssertionResults;
 }
 
-const useTestSpecsCrud = ({runId, testId, isDraftMode}: IProps) => {
+const useTestSpecsCrud = ({runId, testId, isDraftMode, assertionResults}: IProps) => {
   useBlockNavigation(isDraftMode);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const {onOpen} = useConfirmationModal();
+
+  const setSelectedSpec = useCallback(
+    selector => {
+      const resultList = assertionResults?.resultList || [];
+      const positionIndex = resultList.findIndex(result => result.selector === selector);
+
+      dispatch(
+        RouterActions.updateSearch({
+          [RouterSearchFields.SelectedAssertion]: positionIndex >= 0 ? `${positionIndex}` : undefined,
+        })
+      );
+    },
+    [assertionResults?.resultList, dispatch]
+  );
 
   const revert = useCallback(
     (originalSelector: string) => {
@@ -59,15 +74,18 @@ const useTestSpecsCrud = ({runId, testId, isDraftMode}: IProps) => {
   const add = useCallback(
     async (spec: TTestSpecEntry) => {
       dispatch(addSpec({spec}));
+      setSelectedSpec(spec.selector);
     },
-    [dispatch]
+    [dispatch, setSelectedSpec]
   );
 
   const update = useCallback(
     async (selector: string, spec: TTestSpecEntry) => {
       dispatch(updateSpec({spec, selector}));
+
+      setSelectedSpec(selector);
     },
-    [dispatch]
+    [dispatch, setSelectedSpec]
   );
 
   const onConfirmRemove = useCallback(
@@ -84,8 +102,8 @@ const useTestSpecsCrud = ({runId, testId, isDraftMode}: IProps) => {
   );
 
   const init = useCallback(
-    (assertionResults: TAssertionResults) => {
-      dispatch(initSpecs({assertionResults}));
+    (initialAssertionResults: TAssertionResults) => {
+      dispatch(initSpecs({assertionResults: initialAssertionResults}));
     },
     [dispatch]
   );
@@ -101,7 +119,7 @@ const useTestSpecsCrud = ({runId, testId, isDraftMode}: IProps) => {
     dispatch(resetAction());
   }, [dispatch]);
 
-  return {revert, init, updateIsInitialized, reset, add, remove, update, publish, cancel, dryRun};
+  return {revert, init, updateIsInitialized, reset, add, remove, update, publish, cancel, dryRun, setSelectedSpec};
 };
 
 export default useTestSpecsCrud;

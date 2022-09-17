@@ -31,6 +31,7 @@ export const CardContainer = styled(Card)<{$isSelected: boolean; $type: Semantic
 
 export const DrawerContainer = styled(Drawer)`
   position: absolute;
+  overflow: hidden;
 `;
 
 export const GridContainer = styled.div`

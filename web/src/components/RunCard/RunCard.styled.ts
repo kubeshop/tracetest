@@ -13,6 +13,8 @@ export const Container = styled.div`
 `;
 
 export const HeaderDetail = styled(Typography.Text)`
+  display: flex;
+  align-items: center;
   color: ${({theme}) => theme.color.textSecondary};
   font-size: ${({theme}) => theme.size.md};
   margin-right: 8px;
@@ -59,4 +61,8 @@ export const Title = styled(Typography.Title).attrs({level: 3})`
   && {
     margin: 0;
   }
+`;
+
+export const ResultContainer = styled.div`
+  display: flex;
 `;

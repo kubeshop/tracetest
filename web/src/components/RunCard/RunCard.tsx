@@ -56,7 +56,7 @@ const ResultCard = ({
           </div>
         </S.Info>
 
-        <div>
+        <S.ResultContainer>
           <Tooltip title="Passed assertions">
             <S.HeaderDetail>
               <S.HeaderDot $passed />
@@ -69,7 +69,7 @@ const ResultCard = ({
               {failedAssertionCount}
             </S.HeaderDetail>
           </Tooltip>
-        </div>
+        </S.ResultContainer>
 
         <S.TestStateContainer data-cy={`test-run-result-status-${runId}`}>
           <TestState testState={state} />
