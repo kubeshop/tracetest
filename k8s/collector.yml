@@ -23,14 +23,9 @@ data:
       logging:
         logLevel: debug
       jaeger:
-        endpoint: jaeger-collector.tracetest.svc.cluster.local:14250
+        endpoint: jaeger-collector.tracetest:14250
         tls:
           insecure: true
-      otlphttp:
-        traces_endpoint: https://ingest.lightstep.com:443/traces/otlp/v0.6
-        metrics_endpoint: https://ingest.lightstep.com:443/metrics/otlp/v0.9
-        headers: {"lightstep-access-token": "${LIGHTSTEP_TOKEN}"}
-        compression: gzip
 
     service:
       pipelines:
