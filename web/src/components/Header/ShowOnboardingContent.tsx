@@ -1,4 +1,5 @@
 import {Button, Divider, Typography} from 'antd';
+import {switchTraceMode} from '../GuidedTour/traceStepList';
 import {PrimaryButton} from '../TestResults/TestResults.styled';
 
 export const ShowOnboardingContent = (onGuidedTourClick: () => void, onShow: () => void, onClose: () => void) => (
@@ -15,6 +16,7 @@ export const ShowOnboardingContent = (onGuidedTourClick: () => void, onShow: () 
         onClick={() => {
           onShow();
           onClose();
+          switchTraceMode(0)();
           onGuidedTourClick();
         }}
       >

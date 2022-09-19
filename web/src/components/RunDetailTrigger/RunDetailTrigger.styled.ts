@@ -14,6 +14,8 @@ export const SectionLeft = styled(Section)`
   background-color: ${({theme}) => theme.color.white};
   overflow-y: scroll;
   z-index: 1;
+  flex-basis: 50%;
+  max-width: 50vw;
 `;
 
 export const SectionRight = styled(Section)`
@@ -21,4 +23,6 @@ export const SectionRight = styled(Section)`
   border-left: 1px solid rgba(3, 24, 73, 0.1);
   overflow-y: scroll;
   z-index: 2;
+  flex-basis: 50%;
+  max-width: 50vw;
 `;

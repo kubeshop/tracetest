@@ -1,5 +1,6 @@
 import {Button, Form} from 'antd';
 import EditTestForm from 'components/EditTestForm';
+import {Steps} from 'components/GuidedTour/traceStepList';
 import {TriggerTypeToPlugin} from 'constants/Plugins.constants';
 import useValidateTestDraft from 'hooks/useValidateTestDraft';
 import {useTest} from 'providers/Test/Test.provider';
@@ -7,6 +8,7 @@ import {useCallback} from 'react';
 import {TDraftTest, TTest} from 'types/Test.types';
 import {TestState} from 'constants/TestRun.constants';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
+import GuidedTourService, {GuidedTours} from '../../services/GuidedTour.service';
 import * as S from './EditTest.styled';
 
 interface IProps {
@@ -33,7 +35,7 @@ const EditTest = ({test}: IProps) => {
 
   return (
     <S.Wrapper data-cy="edit-test-form">
-      <S.FormContainer>
+      <S.FormContainer data-tour={GuidedTourService.getStep(GuidedTours.Trace, Steps.MoreData)}>
         <S.Title>Edit Test</S.Title>
         <EditTestForm form={form} test={test} onSubmit={handleOnSubmit} onValidation={onValidate} />
         <S.ButtonsContainer>

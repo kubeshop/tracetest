@@ -1,64 +1,62 @@
-import {StepType} from '@reactour/tour';
-import {Typography} from 'antd';
-import GuidedTourService, {GuidedTours} from '../../services/GuidedTour.service';
-import {StepContent} from './StepContent';
+import {Step} from 'react-joyride';
+import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
 
 export enum Steps {
-  Diagram = 'diagram',
-  SpanDetail = 'spanDetail',
-  TestResults = 'testResults',
-  Timeline = 'timeline',
+  AddTestSpec = 'add-test-spec',
   Graph = 'graph',
-  Details = 'details',
   Switcher = 'switcher',
-  Assertions = 'assertions',
+  MoreData = 'more-data',
+  SpanDetails = 'assertions',
+  RunButton = 'run-button',
+  MetaDetails = 'meta-details',
 }
 
-const StepList: StepType[] = [
+export const switchTraceMode = (index: number) => () => {
+  const elementNodeListOfElement = (document.querySelectorAll('.ant-tabs-tab') as NodeListOf<HTMLElement>)[index];
+  if (elementNodeListOfElement !== null) {
+    elementNodeListOfElement.click();
+  }
+};
+
+const StepList: Step[] = [
   {
-    selector: GuidedTourService.getSelectorStep(GuidedTours.Trace, Steps.Graph),
-    content: ({setIsOpen}) => (
-      <StepContent title="Test View" setIsOpen={setIsOpen}>
-        <Typography.Text>
-          The trace view window shows you the trace generated from the triggering transaction. This is the Graph view
-          showing the calling relationship between services.
-        </Typography.Text>
-      </StepContent>
-    ),
+    title: 'Response',
+    target: GuidedTourService.getSelectorStep(GuidedTours.Trace, Steps.Graph),
+    content: 'View various responses here. When the test is finished, you will get the following results.',
+    // </Typography.Text>
+    // </StepContent>
+    placement: 'left',
+    disableBeacon: true,
   },
   {
-    selector: GuidedTourService.getSelectorStep(GuidedTours.Trace, Steps.Switcher),
-    content: ({setIsOpen}) => (
-      <StepContent title="Switcher" setIsOpen={setIsOpen}>
-        <Typography.Text>
-          You can view the complete trace in a graph view or you can see the trace in a timeline view by clicking the
-          switcher
-        </Typography.Text>
-      </StepContent>
-    ),
+    target: GuidedTourService.getSelectorStep(GuidedTours.Trace, Steps.MoreData),
+    title: 'Mode Switcher',
+    placement: 'right',
+    content:
+      ' You can change the trigger by altering the details and saving. This will rerun the test with the updated trigger.',
+    disableBeacon: true,
   },
   {
-    selector: GuidedTourService.getSelectorStep(GuidedTours.Trace, Steps.Details),
-    content: ({setIsOpen}) => (
-      <StepContent title="Span Details" setIsOpen={setIsOpen}>
-        <Typography.Text>
-          Details about the selected span are shown here. They are grouped into tabs based on the type of span. The
-          {` 'All tab' `} shows all of the attributes
-        </Typography.Text>
-      </StepContent>
-    ),
+    target: '.ant-tabs-nav-wrap',
+    title: 'Run Test',
+    content: 'Click on the Trace tab to open the Trace Details screen or Test tab for adding test specifications.',
+    disableBeacon: true,
   },
   {
-    selector: GuidedTourService.getSelectorStep(GuidedTours.Trace, Steps.Assertions),
-    content: ({setIsOpen}) => (
-      <StepContent title="Adding Assertions" setIsOpen={setIsOpen}>
-        <Typography.Text>
-          You can add an assertion to the attribute on any span by hovering over it and click the plus sign (+) or click
-          Add Assertion button below. Assertions may be added to a trace to set a value for a step in the trace to
-          determine success or failure.
-        </Typography.Text>
-      </StepContent>
-    ),
+    title: 'Span Details',
+    target: GuidedTourService.getSelectorStep(GuidedTours.Trace, Steps.SpanDetails),
+    content:
+      ' Click on the panel to see details about the selected span. These span attributes are grouped into tabs based on the type of span. ',
+    disableBeacon: true,
+    placement: 'right',
+  },
+  {
+    title: 'Test Spec',
+    target: GuidedTourService.getSelectorStep(GuidedTours.Trace, Steps.AddTestSpec),
+    content:
+      ' Test Specifications can be added to set assertions to run against one or more spans in the trace. If test specs have already been added to a test, there will be a list on the Test screen.',
+    placement: 'left',
+    disableBeacon: true,
   },
 ];
 

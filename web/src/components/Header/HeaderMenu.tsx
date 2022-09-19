@@ -1,11 +1,11 @@
-import {useTour} from '@reactour/tour';
 import {Popover, Typography} from 'antd';
-import {useMemo} from 'react';
-import {useLocation, useParams} from 'react-router-dom';
 
 import {DOCUMENTATION_URL, GITHUB_URL} from 'constants/Common.constants';
 import {useGuidedTour} from 'providers/GuidedTour/GuidedTour.provider';
+import {useMemo} from 'react';
+import {useLocation, useParams} from 'react-router-dom';
 import HomeAnalyticsService from 'services/Analytics/HomeAnalytics.service';
+import {switchTraceMode} from '../GuidedTour/traceStepList';
 import * as S from './Header.styled';
 import {ShowOnboardingContent} from './ShowOnboardingContent';
 
@@ -14,17 +14,19 @@ const {onGuidedTourClick} = HomeAnalyticsService;
 const HeaderMenu = () => {
   const {pathname} = useLocation();
   const params = useParams();
-  const {setIsOpen} = useTour();
-  const {isTriggerVisible, onCloseTrigger, setIsTriggerVisible} = useGuidedTour();
+  const {setState, state} = useGuidedTour();
 
   const content = useMemo(
     () =>
       ShowOnboardingContent(
         onGuidedTourClick,
-        () => setIsOpen(true),
-        () => onCloseTrigger()
+        () => {
+          switchTraceMode(0)();
+          setState(st => ({...st, tourActive: true, run: true}));
+        },
+        () => setState(st => ({...st, dialog: false}))
       ),
-    [onCloseTrigger, setIsOpen]
+    [setState]
   );
 
   return (
@@ -32,7 +34,7 @@ const HeaderMenu = () => {
       arrowContent={null}
       content={content}
       title={() => <Typography.Title level={2}>Take a quick tour of Tracetest?</Typography.Title>}
-      visible={isTriggerVisible}
+      visible={state.dialog}
     >
       <S.NavMenu
         selectedKeys={[pathname]}
@@ -61,7 +63,7 @@ const HeaderMenu = () => {
                 key: 'Onboarding',
                 disabled: !params.runId,
                 label: (
-                  <a key="guidedTour" onClick={() => setIsTriggerVisible(!isTriggerVisible)}>
+                  <a key="guidedTour" onClick={() => setState(st => ({...st, dialog: !st.dialog}))}>
                     Show Onboarding
                   </a>
                 ),
