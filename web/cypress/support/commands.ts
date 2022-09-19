@@ -1,6 +1,6 @@
 import 'cypress-file-upload';
 import {camelCase} from 'lodash';
-import {Plugins} from '../../src/constants/Plugins.constants';
+import {PokeshopDemo} from '../../src/constants/Demo.constants';
 import {getTestId} from '../e2e/utils/Common';
 
 export const testRunPageRegex = /\/test\/(.*)\/run\/(.*)/;
@@ -78,7 +78,7 @@ Cypress.Commands.add('createTestWithAuth', (authMethod: string, keys: string[]):
   cy.get('[data-cy=auth-type-select]').click();
   cy.get(`[data-cy=auth-type-select-option-${authMethod}]`).click();
   keys.forEach(key => cy.get(`[data-cy=${authMethod}-${key}]`).type(key));
-  return cy.wrap(Plugins.REST.demoList[0].name);
+  return cy.wrap(PokeshopDemo.REST[0].name);
 });
 
 Cypress.Commands.add('submitAndMakeSureTestIsCreated', (name: string) => {
@@ -170,7 +170,7 @@ Cypress.Commands.add('selectOperator', (index: number, text?: string) => {
 
 Cypress.Commands.add('selectTestFromDemoList', () => {
   cy.get('[data-cy=example-button]').click();
-  cy.get(`[data-cy=demo-example-${camelCase(Plugins.REST.demoList[0].name)}]`).click();
+  cy.get(`[data-cy=demo-example-${camelCase(PokeshopDemo.REST[0].name)}]`).click();
   cy.get('[data-cy=create-test-next-button]').last().click();
 });
 
