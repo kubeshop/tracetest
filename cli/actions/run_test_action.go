@@ -68,7 +68,10 @@ func (a runTestAction) Run(ctx context.Context, args RunTestConfig) error {
 	}
 
 	allPassed := output.Run.Result.AllPassed
-	if allPassed == nil || !*allPassed {
+
+	fmt.Printf("%+v\n%+v\n%+v\n%+v\n", output, output.Run, output.Run.Result, output.Run.Result.AllPassed)
+
+	if args.WaitForResult && (allPassed == nil || !*allPassed) {
 		// It failed, so we have to return an error status
 		os.Exit(1)
 	}
