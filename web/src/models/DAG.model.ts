@@ -14,6 +14,7 @@ function getNodesDatumFromSpans(spans: TSpan[]): INodeDatum<INodeDataSpan>[] {
       name: span.name,
       programmingLanguage: span.attributes?.[Attributes.TELEMETRY_SDK_LANGUAGE]?.value ?? '',
       service: span.service,
+      startTime: span.startTime,
       system: span.system,
       totalAttributes: span.attributeList.length,
       type: span.type,
@@ -25,7 +26,7 @@ function getNodesDatumFromSpans(spans: TSpan[]): INodeDatum<INodeDataSpan>[] {
 }
 
 function DAG(spans: TSpan[]) {
-  const nodesDatum = getNodesDatumFromSpans(spans);
+  const nodesDatum = getNodesDatumFromSpans(spans).sort((a, b) => b.data.startTime - a.data.startTime);
   return DAGService.getEdgesAndNodes(nodesDatum);
 }
 
