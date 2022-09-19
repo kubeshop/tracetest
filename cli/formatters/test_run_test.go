@@ -46,7 +46,7 @@ func TestJSON(t *testing.T) {
 	formatters.SetOutput(formatters.DefaultOutput)
 }
 
-func TestSuccessfulTestOutput(t *testing.T) {
+func TestSuccessfulTestRunOutput(t *testing.T) {
 	in := formatters.TestRunOutput{
 		Test: openapi.Test{
 			Id:   strp("9876543"),

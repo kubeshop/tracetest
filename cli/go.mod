@@ -3,6 +3,7 @@ module github.com/kubeshop/tracetest/cli
 go 1.18
 
 require (
+	github.com/alexeyco/simpletable v1.0.0
 	github.com/compose-spec/compose-go v1.5.0
 	github.com/cucumber/ci-environment/go v0.0.0-20220824023145-61292c03da10
 	github.com/denisbrodbeck/machineid v1.0.1
