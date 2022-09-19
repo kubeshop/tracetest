@@ -8,8 +8,8 @@ poolingConfig:
 demo:
   enabled: [pokeshop]
   endpoints:
-    pokeshopHttp: http://demo-pokemon-api.demo.svc.cluster.local
-    pokeshopGrpc: demo-pokemon-api.demo.svc.cluster.local:8082
+    pokeshopHttp: http://demo-api:8081
+    pokeshopGrpc: demo-rpc:8082
 
 googleAnalytics:
   enabled: false
@@ -22,13 +22,6 @@ telemetry:
         endpoint: jaeger:16685
         tls:
           insecure: true
-
-    opensearch:
-      type: opensearch
-      opensearch:
-        addresses:
-          - http://localhost:9200
-        index: traces
 
   exporters:
     collector:

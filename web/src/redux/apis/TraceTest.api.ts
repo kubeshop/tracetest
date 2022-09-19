@@ -7,8 +7,9 @@ import TestRun from 'models/TestRun.model';
 import WebSocketService, {IListenerFunction} from 'services/WebSocket.service';
 import {TAssertion, TAssertionResults, TRawAssertionResults} from 'types/Assertion.types';
 import {TRawTest, TTest} from 'types/Test.types';
-import {TRawTestSpecs} from 'types/TestSpecs.types';
 import {TRawTestRun, TTestRun} from 'types/TestRun.types';
+import {TRawTestSpecs} from 'types/TestSpecs.types';
+import AssertionService from '../../services/Assertion.service';
 
 const PATH = `${document.baseURI}api/`;
 
@@ -57,7 +58,7 @@ const TraceTestAPI = createApi({
       providesTags: result => [{type: Tags.TEST, id: result?.id}],
       transformResponse: (rawTest: TRawTest) => Test(rawTest),
     }),
-    getTestVersionById: build.query<TTest, {testId: string, version: number}>({
+    getTestVersionById: build.query<TTest, {testId: string; version: number}>({
       query: ({testId, version}) => `/tests/${testId}/version/${version}`,
       providesTags: result => [{type: Tags.TEST, id: result?.id}],
       transformResponse: (rawTest: TRawTest) => Test(rawTest),
@@ -127,11 +128,20 @@ const TraceTestAPI = createApi({
       transformResponse: (rawTestRun: TRawTestRun) => TestRun(rawTestRun),
     }),
     dryRun: build.mutation<TAssertionResults, {testId: string; runId: string; testDefinition: Partial<TRawTestSpecs>}>({
-      query: ({testId, runId, testDefinition}) => ({
-        url: `/tests/${testId}/run/${runId}/dry-run`,
-        method: HTTP_METHOD.PUT,
-        body: testDefinition,
-      }),
+      query: ({testId, runId, testDefinition}) => {
+        return {
+          url: `/tests/${testId}/run/${runId}/dry-run`,
+          method: HTTP_METHOD.PUT,
+          body: {
+            specs: (testDefinition?.specs || []).map(spec => ({
+              ...spec,
+              assertions: (spec?.assertions || []).map(assertion => {
+                return {...assertion, expected: AssertionService.extractExpectedString(assertion.expected)};
+              }),
+            })),
+          },
+        };
+      },
       transformResponse: (rawTestResults: TRawAssertionResults) => AssertionResults(rawTestResults),
     }),
     deleteRunById: build.mutation<TTest, {testId: string; runId: string}>({

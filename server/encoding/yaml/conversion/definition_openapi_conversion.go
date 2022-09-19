@@ -132,7 +132,6 @@ func convertTestSpecIntoOpenAPIObject(testSpec []definition.TestSpec) (openapi.T
 }
 
 func convertStringIntoAssertion(assertion string) (openapi.Assertion, error) {
-	// TODO: convert string into assertion (using a parser?)
 	parsedAssertion, err := parser.ParseAssertion(assertion)
 	if err != nil {
 		return openapi.Assertion{}, err
