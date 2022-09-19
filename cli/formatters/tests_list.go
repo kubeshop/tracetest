@@ -1,6 +1,7 @@
 package formatters
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/alexeyco/simpletable"
@@ -19,6 +20,26 @@ func TestsList(config config.Config) testsList {
 }
 
 func (f testsList) Format(tests []openapi.Test) string {
+	switch CurrentOutput {
+	case Pretty:
+		return f.pretty(tests)
+	case JSON:
+		return f.json(tests)
+	}
+
+	return ""
+}
+
+func (f testsList) json(tests []openapi.Test) string {
+	bytes, err := json.Marshal(tests)
+	if err != nil {
+		panic(fmt.Errorf("could not marshal output json: %w", err))
+	}
+
+	return string(bytes)
+}
+
+func (f testsList) pretty(tests []openapi.Test) string {
 	if len(tests) == 0 {
 		return "No tests"
 	}
