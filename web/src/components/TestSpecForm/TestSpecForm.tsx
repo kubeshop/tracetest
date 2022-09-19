@@ -33,7 +33,7 @@ const TestSpecForm = ({
   defaultValues: {
     assertions = [
       {
-        attribute: '',
+        attribute: undefined,
         comparator: OperatorService.getOperatorSymbol(CompareOperator.EQUALS),
         expected: '',
       },

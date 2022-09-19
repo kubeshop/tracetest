@@ -36,13 +36,13 @@ const selectAssertionResultsBySpan = createSelector(
         .filter(assertion => Boolean(assertion?.result))
         // Hash items by attribute
         .reduce((prev: TResultAssertions, curr) => {
-          const value = prev[curr.attribute] || {failed: [], passed: []};
+          const value = prev[curr.attribute || ''] || {failed: [], passed: []};
 
           if (curr.result?.passed)
             value.passed.push({id: curr.id, label: curr.label, assertionResult: curr.assertionResult});
           else value.failed.push({id: curr.id, label: curr.label, assertionResult: curr.assertionResult});
 
-          return {...prev, [curr.attribute]: value};
+          return {...prev, [curr.attribute || '']: value};
         }, {})
     );
   }

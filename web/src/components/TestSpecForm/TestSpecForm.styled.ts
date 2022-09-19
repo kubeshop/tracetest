@@ -95,3 +95,36 @@ export const FormSectionTitle = styled(Typography.Title).attrs({level: 3})<{$noM
 export const FormSectionText = styled(Typography.Text)`
   color: ${({theme}) => theme.color.textSecondary};
 `;
+
+export const ExpectedInputContainer = styled.div`
+  width: 0;
+  flex-basis: 50%;
+  padding-left: 8px;
+
+  && {
+    .cm-editor {
+      overflow: hidden;
+      display: flex;
+      border-radius: 2px;
+      font-size: ${({theme}) => theme.size.md};
+      outline: 1px solid grey;
+      height: 32px;
+      font-family: SFPro, serif;
+      outline: 1px solid #CDD1DB;
+    }
+
+    .cm-content {
+      display: flex;
+      align-items: center;
+    }
+    .cm-scroller {
+      overflow: hidden;
+    }
+    .cm-line {
+      padding: 0;
+      span {
+        font-family: SFPro, serif;
+      }
+    }
+  }
+`;
