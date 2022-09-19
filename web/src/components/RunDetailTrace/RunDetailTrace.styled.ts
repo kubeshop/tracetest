@@ -13,13 +13,14 @@ export const SearchContainer = styled.div`
 
 export const Section = styled.div`
   flex: 1;
+  height: 100%;
   overflow: hidden;
   width: 100%;
   z-index: 1;
 `;
 
 export const VisualizationContainer = styled.div`
-  height: calc(100% - 80px);
+  height: calc(100% - 52px);
   position: relative;
 `;
 

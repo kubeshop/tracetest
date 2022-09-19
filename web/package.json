@@ -70,7 +70,7 @@
     "types:generate": "openapi-typescript ../api/openapi.yaml --output ./src/types/Generated.types.ts",
     "grammar:generate": "lezer-generator ./src/utils/grammar/syntax.grammar -o ./src/utils/grammar/grammar.js",
     "types": "tsc",
-    "eslint": "eslint --ext=.js,.ts,.tsx ./src/**/* ./cypress/integration/**/*",
+    "eslint": "eslint --ext=.js,.ts,.tsx ./src/**/* ./cypress/e2e/**/*",
     "eject": "react-scripts eject",
     "cy:open": "cypress open",
     "cy:run": "cypress run",

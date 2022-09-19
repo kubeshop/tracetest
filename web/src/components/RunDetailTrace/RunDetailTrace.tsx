@@ -37,30 +37,31 @@ const RunDetailTrace = ({run, testId}: IProps) => {
 
   return (
     <S.Container>
-      <Drawer>
-        <SpanDetail onCreateTestSpec={handleOnCreateSpec} searchText={searchText} span={span} />
-      </Drawer>
+      <Drawer
+        leftPanel={<SpanDetail onCreateTestSpec={handleOnCreateSpec} searchText={searchText} span={span} />}
+        rightPanel={
+          <S.Section>
+            <S.SearchContainer>
+              <Search runId={run.id} testId={testId} />
+            </S.SearchContainer>
 
-      <S.Section>
-        <S.SearchContainer>
-          <Search runId={run.id} testId={testId} />
-        </S.SearchContainer>
-
-        <S.VisualizationContainer>
-          <S.SwitchContainer $hasSpace={visualizationType === VisualizationType.Timeline}>
-            {run.state === TestState.FINISHED && (
-              <Switch
-                onChange={type => {
-                  TraceAnalyticsService.onSwitchDiagramView(type);
-                  setVisualizationType(type);
-                }}
-                type={visualizationType}
-              />
-            )}
-          </S.SwitchContainer>
-          <Visualization runState={run.state} spans={run?.trace?.spans ?? []} type={visualizationType} />
-        </S.VisualizationContainer>
-      </S.Section>
+            <S.VisualizationContainer>
+              <S.SwitchContainer $hasSpace={visualizationType === VisualizationType.Timeline}>
+                {run.state === TestState.FINISHED && (
+                  <Switch
+                    onChange={type => {
+                      TraceAnalyticsService.onSwitchDiagramView(type);
+                      setVisualizationType(type);
+                    }}
+                    type={visualizationType}
+                  />
+                )}
+              </S.SwitchContainer>
+              <Visualization runState={run.state} spans={run?.trace?.spans ?? []} type={visualizationType} />
+            </S.VisualizationContainer>
+          </S.Section>
+        }
+      />
     </S.Container>
   );
 };
