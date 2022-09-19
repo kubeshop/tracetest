@@ -4,8 +4,7 @@ import {TCompareOperatorSymbol} from './Operator.types';
 import {TSpanFlatAttribute} from './Span.types';
 
 export type TRawAssertion = TTestSchemas['Assertion'];
-
-export type TAssertion = Model<TRawAssertion, {}>;
+export type TAssertion = TRawAssertion;
 
 export type TSpanSelector = Model<
   TSpanFlatAttribute,

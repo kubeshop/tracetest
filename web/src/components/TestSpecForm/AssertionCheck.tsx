@@ -8,7 +8,6 @@ import OperatorService from '../../services/Operator.service';
 import {TAssertion} from '../../types/Assertion.types';
 import {TSpanFlatAttribute} from '../../types/Span.types';
 import useEditorTheme from '../AdvancedEditor/hooks/useEditorTheme';
-import {ExpectedInputContainer} from './ExpectedInputContainer';
 import {AttributeField} from './Fields/AttributeField';
 import {OtelReference} from './hooks/useGetOTELSemanticConventionAttributesInfo';
 import {IValues} from './TestSpecForm';
@@ -34,6 +33,7 @@ interface IProps {
 export const AssertionCheck = ({attributeList, field, index, name, assertions, form, remove, reference}: IProps) => {
   const extensionList = useExpectedInputLanguage();
   const editorTheme = useEditorTheme();
+
   return (
     <S.Container>
       <S.FieldsContainer>
@@ -55,7 +55,7 @@ export const AssertionCheck = ({attributeList, field, index, name, assertions, f
           </S.Select>
         </Form.Item>
 
-        <ExpectedInputContainer>
+        <S.ExpectedInputContainer>
           <Form.Item
             {...field}
             style={{margin: 0}}
@@ -84,7 +84,7 @@ export const AssertionCheck = ({attributeList, field, index, name, assertions, f
               );
             }}
           </Form.Item>
-        </ExpectedInputContainer>
+        </S.ExpectedInputContainer>
       </S.FieldsContainer>
       <S.ActionContainer>
         {index !== 0 && (

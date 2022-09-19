@@ -6,11 +6,11 @@ import Highlighted from '../Highlighted';
 import * as S from './AttributeValue.styled';
 
 interface IProps extends TextProps {
-  value: string;
+  value?: string;
   searchText?: string;
 }
 
-const AttributeValue = ({value, searchText = '', ...props}: IProps) => {
+const AttributeValue = ({value = '', searchText = '', ...props}: IProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const isJsonValue = useMemo(() => isJson(value), [value]);
 

@@ -13,7 +13,6 @@ const AssertionService = () => ({
     if (!input) return input;
     const formatted = input.trim();
     if (Object.values(Attributes).includes(formatted)) {
-      // console.log('is attribute');
       return formatted;
     }
     if (
@@ -21,17 +20,12 @@ const AssertionService = () => ({
         return formatted.includes(aa);
       })
     ) {
-      // console.log('is expression');
       return formatted;
     }
     if (isNumeric(formatted) || isNumericTime(formatted)) {
-      // console.log('is numberic');
       return formatted;
     }
 
-    if (['true', 'false'].includes(formatted)) {
-      // console.log('is boolean string');
-    }
     return this.quotedString(formatted);
   },
   quotedString(str: string): string {
