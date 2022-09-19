@@ -1,7 +1,6 @@
 package conversion
 
 import (
-	"encoding/json"
 	"reflect"
 
 	"github.com/kubeshop/tracetest/server/encoding/yaml/definition"
@@ -9,20 +8,20 @@ import (
 )
 
 func GetYamlFileFromDefinition(def definition.Test) ([]byte, error) {
-	defMap := make(map[string]interface{}, 0)
-	jsonBytes, err := json.Marshal(def)
+	yamlBytes, err := yaml.Marshal(def)
 	if err != nil {
 		return []byte{}, nil
 	}
 
-	err = json.Unmarshal(jsonBytes, &defMap)
+	mapSlice := yaml.MapSlice{}
+	err = yaml.Unmarshal(yamlBytes, &mapSlice)
 	if err != nil {
 		return []byte{}, nil
 	}
 
-	defMap = removeEmptyFields(defMap)
+	mapSlice = removeEmptyFields(mapSlice)
 
-	bytes, err := yaml.Marshal(defMap)
+	bytes, err := yaml.Marshal(mapSlice)
 	if err != nil {
 		return []byte{}, nil
 	}
@@ -30,21 +29,57 @@ func GetYamlFileFromDefinition(def definition.Test) ([]byte, error) {
 	return bytes, nil
 }
 
-func removeEmptyFields(m map[string]interface{}) map[string]interface{} {
-	for key, value := range m {
+func removeEmptyFields(slice yaml.MapSlice) yaml.MapSlice {
+	newMap := make(yaml.MapSlice, 0)
+	for _, entry := range slice {
+		key, value := entry.Key, entry.Value
 		tValue := reflect.ValueOf(value)
-		if tValue.Kind() == reflect.Map {
-			m[key] = removeEmptyFields(value.(map[string]interface{}))
-			innerMap := m[key].(map[string]interface{})
-			if len(innerMap) == 0 {
-				delete(m, key)
-			}
-		}
 
-		if tValue.IsZero() {
-			delete(m, key)
+		if tValue.Kind() == reflect.Slice {
+			newValue, length := removeEmptyFieldsFromSlice(value)
+			if length > 0 {
+				newMap = append(newMap, yaml.MapItem{Key: key, Value: newValue})
+			}
+		} else if !tValue.IsZero() {
+			newMap = append(newMap, entry)
 		}
 	}
 
-	return m
+	return newMap
+}
+
+func removeEmptyFieldsFromSlice(slice interface{}) (interface{}, int) {
+	// The slice can be a MapSlice or a slice of objects which
+	// can be either another slice of interface{} or a MapSlice.
+	// So we have to check for both cases before doing anything
+	if mapSlice, ok := slice.(yaml.MapSlice); ok {
+		newSlice := removeEmptyFields(mapSlice)
+		return newSlice, len(newSlice)
+	}
+
+	// If this was not a MapSlice, this is can be a slice of interface{}
+	if genericSlice, ok := slice.([]interface{}); ok {
+		if len(genericSlice) == 0 {
+			return yaml.MapSlice{}, 0
+		}
+
+		firstItem := genericSlice[0]
+		if reflect.ValueOf(firstItem).Kind() != reflect.Slice {
+			return genericSlice, len(genericSlice)
+		}
+
+		newSlice := make([]interface{}, 0)
+		for _, item := range genericSlice {
+			if reflect.ValueOf(item).Kind() == reflect.Slice {
+				newItem, length := removeEmptyFieldsFromSlice(item)
+				if length > 0 {
+					newSlice = append(newSlice, newItem)
+				}
+			}
+		}
+
+		return newSlice, len(newSlice)
+	}
+
+	return yaml.MapSlice{}, 0
 }

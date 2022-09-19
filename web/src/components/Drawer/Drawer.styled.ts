@@ -2,8 +2,8 @@ import styled, {createGlobalStyle, css} from 'styled-components';
 
 export const GlobalStyle = createGlobalStyle`
   .reflex-container.vertical > .reflex-splitter {
-    border-left: 1px solid rgba(3, 24, 73, 0.1);
-    border-right: 1px solid rgba(3, 24, 73, 0.1);
+    border-left: ${({theme}) => `1px solid ${theme.color.borderLight}`};
+    border-right: ${({theme}) => `1px solid ${theme.color.borderLight}`};
     position: relative;
   }
 `;

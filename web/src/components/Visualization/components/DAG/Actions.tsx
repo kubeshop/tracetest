@@ -43,13 +43,17 @@ const Actions = ({
   const handleOnNavigateToSpan = useCallback(
     (spanId: string) => {
       onNavigateToSpan(spanId);
-
-      const {nodeInternals} = getState();
-      const {x, y} = getNodePosition(spanId, nodeInternals);
-      setCenter(x, y, {zoom: 1.0, duration: 1000});
     },
-    [getState, onNavigateToSpan, setCenter]
+    [onNavigateToSpan]
   );
+
+  useEffect(() => {
+    if (selectedSpan) {
+      const {nodeInternals} = getState();
+      const {x, y} = getNodePosition(selectedSpan, nodeInternals);
+      setCenter(x, y, {zoom: 1.0, duration: 1000});
+    }
+  }, [getState, selectedSpan, setCenter]);
 
   return (
     <>

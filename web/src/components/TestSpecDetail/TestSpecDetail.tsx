@@ -32,6 +32,7 @@ const TestSpecDetail = ({
       placement="right"
       visible={isOpen}
       width="100%"
+      height="100%"
     >
       {testSpec && (
         <Content

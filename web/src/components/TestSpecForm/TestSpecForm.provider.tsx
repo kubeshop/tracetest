@@ -78,7 +78,7 @@ const TestSpecFormProvider: React.FC<{testId: string}> = ({children}) => {
         setIsOpen(true);
       }
 
-      dispatch(RouterActions.updateSearch({[RouterSearchFields.SelectedAssertion]: ''}));
+      dispatch(RouterActions.updateSearch({[RouterSearchFields.SelectedAssertion]: undefined}));
     },
     [dispatch, specs, isDraftMode, run.testVersion, test?.version]
   );
