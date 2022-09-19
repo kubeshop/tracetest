@@ -17,6 +17,7 @@ export interface INodeDataSpan {
   name: string;
   programmingLanguage: string;
   service: string;
+  startTime: number;
   system: string;
   totalAttributes: number;
   type: SemanticGroupNames;
