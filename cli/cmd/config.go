@@ -17,16 +17,19 @@ var cliConfig config.Config
 var cliLogger *zap.Logger
 
 func setupCommand(cmd *cobra.Command, args []string) {
+	setupOutputFormat()
+	setupLogger(cmd, args)
+	loadConfig(cmd, args)
+	analytics.Init(cliConfig)
+}
+
+func setupOutputFormat() {
 	o := formatters.Output(output)
 	if !formatters.ValidOutput(o) {
 		fmt.Fprintf(os.Stderr, "Invalid output format %s. Available formats are [%s]\n", output, outputFormatsString)
 		os.Exit(1)
 	}
 	formatters.SetOutput(o)
-
-	setupLogger(cmd, args)
-	loadConfig(cmd, args)
-	analytics.Init(cliConfig)
 }
 
 func loadConfig(cmd *cobra.Command, args []string) {
