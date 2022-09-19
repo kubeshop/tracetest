@@ -2,11 +2,10 @@ package actions
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"os"
 
 	"github.com/kubeshop/tracetest/cli/config"
+	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/kubeshop/tracetest/cli/openapi"
 	"go.uber.org/zap"
 )
@@ -31,12 +30,10 @@ func (a listTestsAction) Run(ctx context.Context, args ListTestConfig) error {
 		return err
 	}
 
-	bytes, err := json.Marshal(tests)
-	if err != nil {
-		return err
-	}
+	formatter := formatters.TestsList(a.config)
+	formattedOutput := formatter.Format(tests)
+	fmt.Println(formattedOutput)
 
-	fmt.Fprintln(os.Stdout, string(bytes))
 	return nil
 }
 

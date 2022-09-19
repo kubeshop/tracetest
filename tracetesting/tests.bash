@@ -12,7 +12,7 @@ tracetest_target_curl "/api/tests/383d3dce-7b60-4a61-bdea-87f47263af5d" -X DELET
 
 test "test_create" ./definitions/test_create.yml || EXIT_STATUS=$?
 
-export TEST_ID=$(tracetest_target test list | jq -rc '.[0].id')
+export TEST_ID=$(tracetest_target test list -o json | jq -rc '.[0].id')
 require_not_empty $TEST_ID "requires TEST_ID, got $TEST_ID " || exit $?
 
 test "test_list" ./definitions/test_list.yml || EXIT_STATUS=$?
