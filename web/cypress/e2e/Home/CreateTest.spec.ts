@@ -1,6 +1,6 @@
-import {Plugins} from '../../../src/constants/Plugins.constants';
+import {PokeshopDemo} from '../../../src/constants/Demo.constants';
 
-const DemoTestExampleList = Plugins.REST.demoList;
+const DemoTestExampleList = PokeshopDemo.REST;
 
 describe('Create test', () => {
   beforeEach(() => {

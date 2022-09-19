@@ -17,6 +17,21 @@ type (
 		PoolingConfig      PoolingConfig   `yaml:",omitempty" mapstructure:"poolingConfig"`
 		GA                 GoogleAnalytics `yaml:"googleAnalytics,omitempty" mapstructure:"googleAnalytics"`
 		Telemetry          Telemetry       `yaml:",omitempty" mapstructure:"telemetry"`
+		Demo               Demo            `yaml:",omitempty" mapstructure:"demo"`
+	}
+
+	Demo struct {
+		Enabled   []string      `yaml:",omitempty" mapstructure:"enabled"`
+		Endpoints DemoEndpoints `yaml:",omitempty" mapstructure:"endpoints"`
+	}
+
+	DemoEndpoints struct {
+		PokeshopHttp       string `yaml:",omitempty" mapstructure:"pokeshopHttp"`
+		PokeshopGrpc       string `yaml:",omitempty" mapstructure:"pokeshopGrpc"`
+		OtelFrontend       string `yaml:",omitempty" mapstructure:"otelFrontend"`
+		OtelProductCatalog string `yaml:",omitempty" mapstructure:"otelProductCatalog"`
+		OtelCart           string `yaml:",omitempty" mapstructure:"otelCart"`
+		OtelCheckout       string `yaml:",omitempty" mapstructure:"otelCheckout"`
 	}
 
 	GoogleAnalytics struct {

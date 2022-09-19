@@ -228,21 +228,13 @@ jobs:
 
     - name: Deploy
       run: |
-        helm repo add kubeshop https://kubeshop.github.io/helm-charts && \
-        helm repo update && \
-        helm upgrade tracetest-demo kubeshop/tracetest \
-          --namespace tracetest-demo \
-          --set image.tag=${{ github.ref_name}}-demo \
-          --set analytics.enabled=true \
-          --set telemetry.dataStores.jaeger.jaeger.endpoint="jaeger-query.tracetest.svc.cluster.local:16685" \
-          --set telemetry.exporters.collector.exporter.collector.endpoint="otel-collector.tracetest.svc.cluster.local:4317" \
-          --set server.telemetry.dataStore="jaeger" \
-          --set service.annotations."cloud\.google\.com/backend-config"='\{\"default\":\"tracetest-beta\"\}' \
-          --set ingress.enabled=true \
-          --set 'ingress.hosts[0].host=demo.tracetest.io,ingress.hosts[0].paths[0].path=/,ingress.hosts[0].paths[0].pathType=Prefix' \
-          --set service.annotations."cloud\.google\.com/backend-config"='\{\"default\":\"tracetest-demo\"\}' \
-          --set ingress.annotations."networking\.gke\.io/managed-certificates"=tracetest-demo \
-          --set ingress.annotations."networking\.gke\.io/v1beta1\.FrontendConfig"="ssl-redirect"
+        TAG=${{ github.ref_name}}-demo \
+        NAME=tracetest-demo \
+        CONFIG_FILE=./k8s/tracetest.demo.yaml \
+        EXPOSE_HOST=demo.tracetest.io \
+        CERT_NAME=tracetest-demo \
+        BACKEND_CONFIG=tracetest-demo \
+        ./k8s/deploy.sh
 
 
   notify_slack_if_helm_chart_bump_fails:

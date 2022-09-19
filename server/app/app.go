@@ -2,11 +2,13 @@ package app
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"path/filepath"
 	"regexp"
+	"strings"
 	"text/template"
 
 	"github.com/gorilla/handlers"
@@ -34,6 +36,8 @@ var (
 	PokeAPI = "dev"
 )
 
+var EmptyDemoEnabled []string
+
 type App struct {
 	config  config.Config
 	db      model.Repository
@@ -50,6 +54,21 @@ func New(config config.Config, db model.Repository, tracedb tracedb.TraceDB, tra
 	}
 
 	return app, nil
+}
+
+func jsonEscape(text any) string {
+	initial, err := json.Marshal(text)
+	if err != nil {
+		panic(err)
+	}
+
+	encoded, err := json.Marshal(string(initial))
+	if err != nil {
+		panic(err)
+	}
+
+	formatted := string(encoded)
+	return strings.Trim(formatted, `"`)
 }
 
 func spaHandler(prefix, staticPath, indexPath string, tplVars map[string]string) http.HandlerFunc {
@@ -152,6 +171,11 @@ func (a *App) Start() error {
 
 	router.Handle("/ws", wsRouter.Handler())
 
+	enabledDemo := jsonEscape(a.config.Demo.Enabled)
+	if len(a.config.Demo.Enabled) == 0 {
+		enabledDemo = jsonEscape([0]string{})
+	}
+
 	router.PathPrefix(a.config.Server.PathPrefix).Handler(
 		spaHandler(
 			a.config.Server.PathPrefix,
@@ -161,10 +185,11 @@ func (a *App) Start() error {
 				"AnalyticsKey":     analytics.FrontendKey,
 				"AnalyticsEnabled": fmt.Sprintf("%t", a.config.GA.Enabled),
 				"ServerPathPrefix": fmt.Sprintf("%s/", a.config.Server.PathPrefix),
-				"PokeAPI":          PokeAPI,
 				"ServerID":         serverID,
 				"AppVersion":       Version,
 				"Env":              Env,
+				"DemoEnabled":      enabledDemo,
+				"DemoEndpoints":    jsonEscape(a.config.Demo.Endpoints),
 			},
 		),
 	)

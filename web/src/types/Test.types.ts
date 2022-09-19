@@ -2,12 +2,11 @@ import {FormInstance} from 'antd';
 import {VariableDefinition, Request} from 'postman-collection';
 import {CaseReducer, PayloadAction} from '@reduxjs/toolkit';
 import {TriggerTypes} from 'constants/Test.constants';
-import {HTTP_METHOD} from 'constants/Common.constants';
+import {HTTP_METHOD, SupportedPlugins} from 'constants/Common.constants';
 import {Model, TGrpcSchemas, THttpSchemas, TTestSchemas, TTriggerSchemas} from './Common.types';
 import {TTestSpecs} from './TestSpecs.types';
 
 import {ICreateTestStep, IPlugin} from './Plugins.types';
-import {SupportedPlugins} from '../constants/Plugins.constants';
 
 export type TRequestAuth = THttpSchemas['HTTPRequest']['auth'];
 export type TMethod = THttpSchemas['HTTPRequest']['method'];

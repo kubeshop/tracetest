@@ -91,20 +91,13 @@ jobs:
 
     - name: Deploy
       run: |
-        helm repo add kubeshop https://kubeshop.github.io/helm-charts && \
-        helm repo update && \
-        helm upgrade tracetest-beta kubeshop/tracetest \
-          --namespace tracetest-beta \
-          --set analytics.enabled=false \
-          --set image.tag=sha-$(git rev-parse --short $GITHUB_SHA) \
-          --set telemetry.dataStores.jaeger.jaeger.endpoint="jaeger-query.tracetest.svc.cluster.local:16685" \
-          --set telemetry.exporters.collector.exporter.collector.endpoint="otel-collector.tracetest.svc.cluster.local:4317" \
-          --set server.telemetry.dataStore="jaeger" \
-          --set service.annotations."cloud\.google\.com/backend-config"='\{\"default\":\"tracetest-beta\"\}' \
-          --set ingress.enabled=true \
-          --set 'ingress.hosts[0].host=beta.tracetest.io,ingress.hosts[0].paths[0].path=/,ingress.hosts[0].paths[0].pathType=Prefix' \
-          --set ingress.annotations."networking\.gke\.io/managed-certificates"=tracetest-beta \
-          --set ingress.annotations."networking\.gke\.io/v1beta1\.FrontendConfig"="ssl-redirect"
+        TAG=sha-$(git rev-parse --short $GITHUB_SHA) \
+        NAME=tracetest-beta \
+        CONFIG_FILE=./k8s/tracetest.beta.yaml \
+        EXPOSE_HOST=beta.tracetest.io \
+        CERT_NAME=tracetest-beta \
+        BACKEND_CONFIG=tracetest-beta \
+        ./k8s/deploy.sh
 
   deploy-integration:
     if: github.event_name == 'push'
@@ -132,15 +125,7 @@ jobs:
 
     - name: Deploy
       run: |
-        helm repo add kubeshop https://kubeshop.github.io/helm-charts && \
-        helm repo update && \
-        helm upgrade tracetest-integration kubeshop/tracetest \
-          --namespace tracetest-integration \
-          --set analytics.enabled=false \
-          --set image.tag=sha-$(git rev-parse --short $GITHUB_SHA) \
-          --set poolingConfig.maxWaitTimeForTrace=30s \
-          --set poolingConfig.retryDelay=500ms \
-          --set telemetry.dataStores.jaeger.jaeger.endpoint="jaeger-query.tracetest.svc.cluster.local:16685" \
-          --set telemetry.exporters.collector.exporter.collector.endpoint="otel-collector.tracetest.svc.cluster.local:4317" \
-          --set server.telemetry.dataStore="jaeger" \
-          --set ingress.enabled=false
+        TAG=sha-$(git rev-parse --short $GITHUB_SHA) \
+        NAME=tracetest-integration \
+        CONFIG_FILE=./k8s/tracetest.integration.yaml \
+        ./k8s/deploy.sh

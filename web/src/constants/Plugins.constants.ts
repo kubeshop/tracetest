@@ -1,20 +1,7 @@
 import {IPlugin} from 'types/Plugins.types';
-import pokeshopPostmanData from '../assets/pokeshop.postman_collection.json';
-import pokeshopProtoData from '../assets/pokeshop.proto.json';
-
-import {HTTP_METHOD} from './Common.constants';
+import {SupportedPlugins} from './Common.constants';
+import {DemoByPluginMap} from './Demo.constants';
 import {TriggerTypes} from './Test.constants';
-
-const pokeshopProtoFile = new File([pokeshopProtoData?.proto], 'pokeshop.proto');
-const pokeshopPostmanFile = new File([JSON.stringify(pokeshopPostmanData)], 'pokeshop.postman_collection.json');
-
-export enum SupportedPlugins {
-  REST = 'REST',
-  Messaging = 'Messaging',
-  GRPC = 'GRPC',
-  Postman = 'Postman',
-  OpenAPI = 'OpenAPI',
-}
 
 const Default: IPlugin = {
   name: SupportedPlugins.REST,
@@ -41,37 +28,13 @@ const Default: IPlugin = {
   ],
 };
 
-export const pokeApi = window?.ENV?.pokeApi || 'http://demo-api:8081';
-
 const Rest: IPlugin = {
   name: SupportedPlugins.REST,
   title: 'HTTP Request',
   description: 'Create a basic HTTP request',
   isActive: true,
   type: TriggerTypes.http,
-  demoList: [
-    {
-      name: 'Pokemon - List',
-      url: `${pokeApi}/pokemon?take=20&skip=0`,
-      method: HTTP_METHOD.GET,
-      body: '',
-      description: 'Get a Pokemon',
-    },
-    {
-      name: 'Pokemon - Add',
-      url: `${pokeApi}/pokemon`,
-      method: HTTP_METHOD.POST,
-      body: '{"name":"meowth","type":"normal","imageUrl":"https://assets.pokemon.com/assets/cms2/img/pokedex/full/052.png","isFeatured":true}',
-      description: 'Add a Pokemon',
-    },
-    {
-      name: 'Pokemon - Import',
-      url: `${pokeApi}/pokemon/import`,
-      method: HTTP_METHOD.POST,
-      body: '{"id":52}',
-      description: 'Import a Pokemon',
-    },
-  ],
+  demoList: DemoByPluginMap.REST,
   stepList: [
     ...Default.stepList,
     {
@@ -89,33 +52,7 @@ const GRPC: IPlugin = {
   description: 'Test and debug your GRPC request',
   isActive: true,
   type: TriggerTypes.grpc,
-  demoList: [
-    {
-      name: 'GRPC - Pokemon - List',
-      url: 'demo-pokemon-api.demo.svc.cluster.local:8082',
-      message: '',
-      method: 'pokeshop.Pokeshop.getPokemonList',
-      description: 'Get a Pokemon',
-      protoFile: pokeshopProtoFile,
-    },
-    {
-      name: 'GRPC - Pokemon - Add',
-      url: 'demo-pokemon-api.demo.svc.cluster.local:8082',
-      message:
-        '{"name":"meowth","type":"normal","imageUrl":"https://assets.pokemon.com/assets/cms2/img/pokedex/full/052.png","isFeatured":true}',
-      method: 'pokeshop.Pokeshop.createPokemon',
-      protoFile: pokeshopProtoFile,
-      description: 'Add a Pokemon',
-    },
-    {
-      name: 'GRPC - Pokemon - Import',
-      url: 'demo-pokemon-api.demo.svc.cluster.local:8082',
-      message: '{"id":52}',
-      method: 'pokeshop.Pokeshop.importPokemon',
-      protoFile: pokeshopProtoFile,
-      description: 'Import a Pokemon',
-    },
-  ],
+  demoList: DemoByPluginMap.GRPC,
   stepList: [
     ...Default.stepList,
     {
@@ -143,35 +80,7 @@ const Postman: IPlugin = {
   description: 'Define your HTTP Request via a Postman Collection',
   type: TriggerTypes.http,
   isActive: true,
-  demoList: [
-    {
-      name: 'Postman - Pokemon - List',
-      url: 'http://demo-pokemon-api.demo.svc.cluster.local/pokemon?take=20&skip=0',
-      method: HTTP_METHOD.GET,
-      body: '',
-      description: 'Get a Pokemon',
-      collectionTest: 'List',
-      collectionFile: pokeshopPostmanFile,
-    },
-    {
-      name: 'Postman - Pokemon - Add',
-      url: 'http://demo-pokemon-api.demo.svc.cluster.local/pokemon',
-      method: HTTP_METHOD.POST,
-      body: '{"name":"meowth","type":"normal","imageUrl":"https://assets.pokemon.com/assets/cms2/img/pokedex/full/052.png","isFeatured":true}',
-      description: 'Add a Pokemon',
-      collectionTest: 'Create',
-      collectionFile: pokeshopPostmanFile,
-    },
-    {
-      name: 'Pokemon - Import',
-      url: 'http://demo-pokemon-api.demo.svc.cluster.local/pokemon/import',
-      method: HTTP_METHOD.POST,
-      body: '{"id":52}',
-      description: 'Import a Pokemon',
-      collectionTest: 'Import',
-      collectionFile: pokeshopPostmanFile,
-    },
-  ],
+  demoList: DemoByPluginMap.Postman,
   stepList: [
     ...Default.stepList,
     {

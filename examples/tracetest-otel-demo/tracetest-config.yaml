@@ -6,10 +6,12 @@ poolingConfig:
   retryDelay: 500ms
 
 demo:
-  enabled: [pokeshop]
+  enabled: [otel]
   endpoints:
-    pokeshopHttp: http://demo-api:8081
-    pokeshopGrpc: demo-rpc:8082
+    otelFrontend: http://otel-frontend:8084
+    otelProductCatalog: otel-productcatalogservice:3550
+    otelCart: otel-cartservice:7070
+    otelCheckout: otel-checkoutservice:5050
 
 googleAnalytics:
   enabled: false
@@ -26,7 +28,7 @@ telemetry:
   exporters:
     collector:
       serviceName: tracetest
-      sampling: 100 # 100%
+      sampling: 100
       exporter:
         type: collector
         collector:

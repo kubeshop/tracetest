@@ -1,5 +1,5 @@
 import {Tabs} from 'antd';
-import {SupportedPlugins} from 'constants/Plugins.constants';
+import {SupportedPlugins} from 'constants/Common.constants';
 import {ICreateTestStep} from 'types/Plugins.types';
 import LoadingSpinner from 'components/LoadingSpinner';
 import CreateTestStepFactory from './CreateTestStepFactory';

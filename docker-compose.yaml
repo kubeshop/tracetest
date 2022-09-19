@@ -10,7 +10,6 @@ services:
       args:
         VERSION: dev
         TRACETEST_ENV: docker-compose
-        POKE_API: http://demo-api:8081
     volumes:
       - type: bind
         source: ./local-config/config.tests.yaml
@@ -50,6 +49,7 @@ services:
       - "55679:55679"
       - "4317:4317"
       - "8888:8888"
+      - "4318:4318"
     command:
       - "--config"
       - "/otel-local-config.yaml"
@@ -70,7 +70,7 @@ services:
       - 6831:6831/udp
       - 6832:6832/udp
     healthcheck:
-      test: [ "CMD", "wget", "--spider", "localhost:16686" ]
+      test: ["CMD", "wget", "--spider", "localhost:16686"]
       interval: 1s
       timeout: 3s
       retries: 60
@@ -81,7 +81,7 @@ services:
     ports:
       - 6379:6379
     healthcheck:
-      test: [ "CMD", "redis-cli","ping" ]
+      test: ["CMD", "redis-cli", "ping"]
       interval: 1s
       timeout: 3s
       retries: 60
@@ -107,13 +107,12 @@ services:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres?schema=public
       RABBITMQ_HOST: queue
       POKE_API_BASE_URL: https://pokeapi.co/api/v2
-      JAEGER_HOST: jaeger
-      JAEGER_PORT: 6832
+      COLLECTOR_ENDPOINT: http://otel-collector:4317
       NPM_RUN_COMMAND: api
     ports:
       - "8081:8081"
     healthcheck:
-      test: [ "CMD", "wget", "--spider", "localhost:8081" ]
+      test: ["CMD", "wget", "--spider", "localhost:8081"]
       interval: 1s
       timeout: 3s
       retries: 60
@@ -136,8 +135,7 @@ services:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres?schema=public
       RABBITMQ_HOST: queue
       POKE_API_BASE_URL: https://pokeapi.co/api/v2
-      JAEGER_HOST: jaeger
-      JAEGER_PORT: 6832
+      COLLECTOR_ENDPOINT: http://otel-collector:4317
       NPM_RUN_COMMAND: worker
     depends_on:
       postgres:
@@ -158,13 +156,12 @@ services:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres?schema=public
       RABBITMQ_HOST: queue
       POKE_API_BASE_URL: https://pokeapi.co/api/v2
-      JAEGER_HOST: jaeger
-      JAEGER_PORT: 6832
+      COLLECTOR_ENDPOINT: http://otel-collector:4317
       NPM_RUN_COMMAND: rpc
     ports:
       - 8082:8082
     healthcheck:
-      test: [ "CMD","lsof", "-i", "8082" ]
+      test: ["CMD", "lsof", "-i", "8082"]
       interval: 1s
       timeout: 3s
       retries: 60
@@ -220,4 +217,3 @@ services:
       OPENSEARCH_PASSWORD: admin
     depends_on:
       - opensearch
-

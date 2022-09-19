@@ -12,6 +12,8 @@ export interface IEnv {
   appVersion: string;
   pokeApi: string;
   env: string;
+  demoEnabled: string;
+  demoEndpoints: string;
 }
 
 export type Modify<T, R> = Omit<T, keyof R> & R;

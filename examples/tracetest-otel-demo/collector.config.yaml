@@ -1,0 +1,40 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+
+
+processors:
+  batch:
+    timeout: 100ms
+
+  # Data sources: traces
+  probabilistic_sampler:
+    hash_seed: 22
+    sampling_percentage: 100
+
+exporters:
+  logging:
+    logLevel: debug
+  jaeger:
+    endpoint: ${JAEGER_ENDPOINT}
+    tls:
+      insecure: true
+  otlphttp:
+    traces_endpoint: https://ingest.lightstep.com:443/traces/otlp/v0.6
+    metrics_endpoint: https://ingest.lightstep.com:443/metrics/otlp/v0.9
+    headers: {"lightstep-access-token": "${LIGHTSTEP_TOKEN}"}
+    compression: gzip
+  otlp/2:
+    endpoint: data-prepper:21890
+    tls:
+      insecure: true
+      insecure_skip_verify: true
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [probabilistic_sampler, batch]
+      exporters: [logging, jaeger, otlp/2]

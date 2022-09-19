@@ -7,6 +7,8 @@ import BasicDetailsDemoHelper from './BasicDetailsDemoHelper';
 import * as S from './BasicDetails.styled';
 
 export const FORM_ID = 'create-test';
+const {demoEnabled = '[]'} = window.ENV || {};
+const isDemoEnabled = JSON.parse(demoEnabled).length > 0;
 
 interface IProps {
   onSelectDemo?(demo: TDraftTest): void;
@@ -18,7 +20,7 @@ interface IProps {
 const BasicDetailsForm = ({onSelectDemo = noop, selectedDemo, isEditing = false, demoList = []}: IProps) => {
   return (
     <S.InputContainer $isEditing={isEditing}>
-      {!isEditing && Boolean(demoList.length) && (
+      {!isEditing && Boolean(demoList.length) && isDemoEnabled && (
         <BasicDetailsDemoHelper selectedDemo={selectedDemo} onSelectDemo={onSelectDemo} demoList={demoList} />
       )}
       <Form.Item

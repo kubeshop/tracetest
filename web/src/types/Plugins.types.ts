@@ -1,4 +1,4 @@
-import {SupportedPlugins} from 'constants/Plugins.constants';
+import {SupportedPlugins} from 'constants/Common.constants';
 import {TriggerTypes} from '../constants/Test.constants';
 import { TDraftTest } from './Test.types';
 

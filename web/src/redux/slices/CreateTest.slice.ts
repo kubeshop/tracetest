@@ -1,6 +1,7 @@
 import {createSlice} from '@reduxjs/toolkit';
 import {ICreateTestState, TCreateTestSliceActions} from 'types/Test.types';
-import {Plugins, SupportedPlugins} from 'constants/Plugins.constants';
+import {Plugins} from 'constants/Plugins.constants';
+import {SupportedPlugins} from 'constants/Common.constants';
 
 export const initialState: ICreateTestState = {
   draftTest: {},

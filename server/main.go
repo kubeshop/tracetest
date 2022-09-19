@@ -24,6 +24,7 @@ import (
 var cfg = flag.String("config", "config.yaml", "path to the config file")
 
 func main() {
+
 	flag.Parse()
 	cfg, err := config.FromFile(*cfg)
 	if err != nil {
