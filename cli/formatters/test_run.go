@@ -2,6 +2,7 @@ package formatters
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 
 	"github.com/kubeshop/tracetest/cli/config"
@@ -26,16 +27,44 @@ func TestRun(config config.Config, colorsEnabled bool) testRun {
 	}
 }
 
-func (f testRun) Format(test openapi.Test, run openapi.TestRun) string {
-	if run.State != nil && *run.State == "FAILED" {
-		return f.getColoredText(false, fmt.Sprintf("Failed to execute test: %s", *run.LastErrorState))
+type TestRunOutput struct {
+	Test      openapi.Test    `json:"test"`
+	Run       openapi.TestRun `json:"testRun"`
+	RunWebURL string          `json:"testRunWebUrl"`
+}
+
+func (f testRun) Format(output TestRunOutput) string {
+	switch CurrentOutput {
+	case Pretty:
+		return f.pretty(output)
+	case JSON:
+		return f.json(output)
 	}
 
-	if run.Result.AllPassed == nil || !*run.Result.AllPassed {
-		return f.formatFailedTest(test, run)
+	return ""
+}
+
+func (f testRun) json(output TestRunOutput) string {
+	output.RunWebURL = f.getRunLink(output.Test, output.Run)
+	bytes, err := json.Marshal(output)
+	if err != nil {
+		panic(fmt.Errorf("could not marshal output json: %w", err))
 	}
 
-	return f.formatSuccessfulTest(test, run)
+	return string(bytes)
+
+}
+
+func (f testRun) pretty(output TestRunOutput) string {
+	if output.Run.State != nil && *output.Run.State == "FAILED" {
+		return f.getColoredText(false, fmt.Sprintf("Failed to execute test: %s", *output.Run.LastErrorState))
+	}
+
+	if output.Run.Result.AllPassed == nil || !*output.Run.Result.AllPassed {
+		return f.formatFailedTest(output.Test, output.Run)
+	}
+
+	return f.formatSuccessfulTest(output.Test, output.Run)
 }
 
 func (f testRun) formatSuccessfulTest(test openapi.Test, run openapi.TestRun) string {

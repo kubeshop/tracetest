@@ -27,13 +27,6 @@ var rootCmd = &cobra.Command{
 }
 
 func Execute() {
-	o := formatters.Output(output)
-	if !formatters.ValidOutput(o) {
-		fmt.Fprintf(os.Stderr, "Invalid output format %s. Available formats are [%s]\n", output, outputFormatsString)
-		os.Exit(1)
-	}
-	formatters.SetOutput(o)
-
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -41,7 +34,7 @@ func Execute() {
 }
 
 func init() {
+	rootCmd.PersistentFlags().StringVarP(&output, "output", "o", string(formatters.DefaultOutput), fmt.Sprintf("output format [%s]", outputFormatsString))
 	rootCmd.PersistentFlags().StringVarP(&configFile, "config", "c", "config.yml", "config file will be used by the CLI")
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "display debug information")
-	rootCmd.PersistentFlags().StringVarP(&output, "output", "o", string(formatters.DefaultOutput), fmt.Sprintf("output format [%s]", outputFormatsString))
 }

@@ -17,17 +17,18 @@ func boolp(in bool) *bool {
 	return &in
 }
 
-func TestSuccessfulTestOutput(t *testing.T) {
-	test := openapi.Test{
-		Id:   strp("9876543"),
-		Name: strp("Testcase 1"),
-	}
-
-	run := openapi.TestRun{
-		Id:    strp("123456"),
-		State: strp("FINISHED"),
-		Result: &openapi.AssertionResults{
-			AllPassed: boolp(true),
+func TestJSON(t *testing.T) {
+	in := formatters.TestRunOutput{
+		Test: openapi.Test{
+			Id:   strp("9876543"),
+			Name: strp("Testcase 1"),
+		},
+		Run: openapi.TestRun{
+			Id:    strp("123456"),
+			State: strp("FINISHED"),
+			Result: &openapi.AssertionResults{
+				AllPassed: boolp(true),
+			},
 		},
 	}
 
@@ -35,79 +36,108 @@ func TestSuccessfulTestOutput(t *testing.T) {
 		Scheme:   "http",
 		Endpoint: "localhost:8080",
 	}, false)
-	output := formatter.Format(test, run)
+
+	formatters.SetOutput(formatters.JSON)
+	actual := formatter.Format(in)
+
+	expected := `{"test":{"id":"9876543","name":"Testcase 1"},"testRun":{"id":"123456","result":{"allPassed":true},"state":"FINISHED"},"testRunWebUrl":"http://localhost:8080/test/9876543/run/123456"}`
+
+	assert.JSONEq(t, expected, actual)
+	formatters.SetOutput(formatters.DefaultOutput)
+}
+
+func TestSuccessfulTestOutput(t *testing.T) {
+	in := formatters.TestRunOutput{
+		Test: openapi.Test{
+			Id:   strp("9876543"),
+			Name: strp("Testcase 1"),
+		},
+		Run: openapi.TestRun{
+			Id:    strp("123456"),
+			State: strp("FINISHED"),
+			Result: &openapi.AssertionResults{
+				AllPassed: boolp(true),
+			},
+		},
+	}
+	formatter := formatters.TestRun(config.Config{
+		Scheme:   "http",
+		Endpoint: "localhost:8080",
+	}, false)
+	output := formatter.Format(in)
 
 	assert.Equal(t, "✔ Testcase 1 (http://localhost:8080/test/9876543/run/123456)\n", output)
 }
 
 func TestFailingTestOutput(t *testing.T) {
-	test := openapi.Test{
-		Id:   strp("9876543"),
-		Name: strp("Testcase 2"),
-	}
-
-	run := openapi.TestRun{
-		Id: strp("123456"),
-		Result: &openapi.AssertionResults{
-			AllPassed: boolp(false),
-			Results: []openapi.AssertionResultsResults{
-				{
-					Selector: &openapi.Selector{
-						Query: strp(`span[name = "my span"]`),
-					},
-					Results: []openapi.AssertionResult{
-						{
-							Assertion: &openapi.Assertion{
-								Attribute:  strp("tracetest.span.duration"),
-								Comparator: strp("<="),
-								Expected:   strp("200ms"),
-							},
-							AllPassed: boolp(true),
-							SpanResults: []openapi.AssertionSpanResult{
-								{
-									SpanId:        strp("123456"),
-									ObservedValue: strp("157ms"),
-									Passed:        boolp(true),
-									Error:         nil,
+	in := formatters.TestRunOutput{
+		Test: openapi.Test{
+			Id:   strp("9876543"),
+			Name: strp("Testcase 2"),
+		},
+		Run: openapi.TestRun{
+			Id: strp("123456"),
+			Result: &openapi.AssertionResults{
+				AllPassed: boolp(false),
+				Results: []openapi.AssertionResultsResults{
+					{
+						Selector: &openapi.Selector{
+							Query: strp(`span[name = "my span"]`),
+						},
+						Results: []openapi.AssertionResult{
+							{
+								Assertion: &openapi.Assertion{
+									Attribute:  strp("tracetest.span.duration"),
+									Comparator: strp("<="),
+									Expected:   strp("200ms"),
+								},
+								AllPassed: boolp(true),
+								SpanResults: []openapi.AssertionSpanResult{
+									{
+										SpanId:        strp("123456"),
+										ObservedValue: strp("157ms"),
+										Passed:        boolp(true),
+										Error:         nil,
+									},
 								},
 							},
 						},
 					},
-				},
-				{
-					Selector: &openapi.Selector{
-						Query: strp(`span[name = "my other span"]`),
-					},
-					Results: []openapi.AssertionResult{
-						{
-							Assertion: &openapi.Assertion{
-								Attribute:  strp("tracetest.span.duration"),
-								Comparator: strp("<="),
-								Expected:   strp("200ms"),
-							},
-							AllPassed: boolp(true),
-							SpanResults: []openapi.AssertionSpanResult{
-								{
-									SpanId:        strp("456789"),
-									ObservedValue: strp("68ms"),
-									Passed:        boolp(true),
-									Error:         nil,
+					{
+						Selector: &openapi.Selector{
+							Query: strp(`span[name = "my other span"]`),
+						},
+						Results: []openapi.AssertionResult{
+							{
+								Assertion: &openapi.Assertion{
+									Attribute:  strp("tracetest.span.duration"),
+									Comparator: strp("<="),
+									Expected:   strp("200ms"),
+								},
+								AllPassed: boolp(true),
+								SpanResults: []openapi.AssertionSpanResult{
+									{
+										SpanId:        strp("456789"),
+										ObservedValue: strp("68ms"),
+										Passed:        boolp(true),
+										Error:         nil,
+									},
 								},
 							},
-						},
-						{
-							Assertion: &openapi.Assertion{
-								Attribute:  strp("http.status"),
-								Comparator: strp("="),
-								Expected:   strp("200"),
-							},
-							AllPassed: boolp(true),
-							SpanResults: []openapi.AssertionSpanResult{
-								{
-									SpanId:        strp("456789"),
-									ObservedValue: strp("404"),
-									Passed:        boolp(false),
-									Error:         nil,
+							{
+								Assertion: &openapi.Assertion{
+									Attribute:  strp("http.status"),
+									Comparator: strp("="),
+									Expected:   strp("200"),
+								},
+								AllPassed: boolp(true),
+								SpanResults: []openapi.AssertionSpanResult{
+									{
+										SpanId:        strp("456789"),
+										ObservedValue: strp("404"),
+										Passed:        boolp(false),
+										Error:         nil,
+									},
 								},
 							},
 						},
@@ -121,7 +151,7 @@ func TestFailingTestOutput(t *testing.T) {
 		Scheme:   "http",
 		Endpoint: "localhost:8080",
 	}, false)
-	output := formatter.Format(test, run)
+	output := formatter.Format(in)
 	expectedOutput := `✘ Testcase 2 (http://localhost:8080/test/9876543/run/123456)
 	✔ span[name = "my span"]
 		✔ #123456

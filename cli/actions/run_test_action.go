@@ -33,12 +33,6 @@ type runTestAction struct {
 
 var _ Action[RunTestConfig] = &runTestAction{}
 
-type runTestOutput struct {
-	Test      openapi.Test    `json:"test"`
-	Run       openapi.TestRun `json:"testRun"`
-	RunWebURL string          `json:"testRunWebUrl"`
-}
-
 type runTestParams struct {
 	DefinitionFile string
 	WaitForResult  bool
@@ -82,15 +76,15 @@ func (a runTestAction) Run(ctx context.Context, args RunTestConfig) error {
 	return nil
 }
 
-func (a runTestAction) runDefinition(ctx context.Context, params runTestParams) (runTestOutput, error) {
+func (a runTestAction) runDefinition(ctx context.Context, params runTestParams) (formatters.TestRunOutput, error) {
 	definition, err := file.LoadDefinition(params.DefinitionFile)
 	if err != nil {
-		return runTestOutput{}, err
+		return formatters.TestRunOutput{}, err
 	}
 
 	err = definition.Validate()
 	if err != nil {
-		return runTestOutput{}, fmt.Errorf("invalid definition file: %w", err)
+		return formatters.TestRunOutput{}, fmt.Errorf("invalid definition file: %w", err)
 	}
 
 	var test openapi.Test
@@ -99,50 +93,51 @@ func (a runTestAction) runDefinition(ctx context.Context, params runTestParams) 
 
 	test, exists, err := a.createTestFromDefinition(ctx, definition)
 	if err != nil {
-		return runTestOutput{}, fmt.Errorf("could not create test from definition: %w", err)
+		return formatters.TestRunOutput{}, fmt.Errorf("could not create test from definition: %w", err)
 	}
 
 	if exists {
 		a.logger.Debug("test exists. Updating it")
 		test, err = a.updateTestFromDefinition(ctx, definition)
 		if err != nil {
-			return runTestOutput{}, fmt.Errorf("could not update test using definition: %w", err)
+			return formatters.TestRunOutput{}, fmt.Errorf("could not update test using definition: %w", err)
 		}
 	}
 
 	definition.Id = *test.Id
 	err = file.SetTestID(params.DefinitionFile, *test.Id)
 	if err != nil {
-		return runTestOutput{}, fmt.Errorf("could not save test definition: %w", err)
+		return formatters.TestRunOutput{}, fmt.Errorf("could not save test definition: %w", err)
 	}
 
 	testRun, err := a.runTest(ctx, definition.Id, params.Metadata)
 	if err != nil {
-		return runTestOutput{}, fmt.Errorf("could not run test: %w", err)
+		return formatters.TestRunOutput{}, fmt.Errorf("could not run test: %w", err)
+	}
+
+	tro := formatters.TestRunOutput{
+		Test: test,
+		Run:  testRun,
 	}
 
 	if params.WaitForResult {
 		updatedTestRun, err := a.waitForResult(ctx, definition.Id, *testRun.Id)
 		if err != nil {
-			return runTestOutput{}, fmt.Errorf("could not wait for result: %w", err)
+			return formatters.TestRunOutput{}, fmt.Errorf("could not wait for result: %w", err)
 		}
 
 		testRun = updatedTestRun
 
 		if err := a.saveJUnitFile(ctx, definition.Id, *testRun.Id, params.JunitFile); err != nil {
-			return runTestOutput{}, fmt.Errorf("could not save junit file: %w", err)
+			return formatters.TestRunOutput{}, fmt.Errorf("could not save junit file: %w", err)
 		}
-
-		formatter := formatters.TestRun(a.config, true)
-		formattedOutput := formatter.Format(test, testRun)
-		fmt.Print(formattedOutput)
 	}
 
-	return runTestOutput{
-		Test:      test,
-		Run:       testRun,
-		RunWebURL: fmt.Sprintf("%s://%s/test/%s/run/%s", a.config.Scheme, a.config.Endpoint, definition.Id, *testRun.Id),
-	}, nil
+	formatter := formatters.TestRun(a.config, true)
+	formattedOutput := formatter.Format(tro)
+	fmt.Print(formattedOutput)
+
+	return tro, nil
 }
 
 func (a runTestAction) saveJUnitFile(ctx context.Context, testId, testRunId, outputFile string) error {

@@ -1,10 +1,12 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/kubeshop/tracetest/cli/config"
+	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
@@ -15,6 +17,13 @@ var cliConfig config.Config
 var cliLogger *zap.Logger
 
 func setupCommand(cmd *cobra.Command, args []string) {
+	o := formatters.Output(output)
+	if !formatters.ValidOutput(o) {
+		fmt.Fprintf(os.Stderr, "Invalid output format %s. Available formats are [%s]\n", output, outputFormatsString)
+		os.Exit(1)
+	}
+	formatters.SetOutput(o)
+
 	setupLogger(cmd, args)
 	loadConfig(cmd, args)
 	analytics.Init(cliConfig)

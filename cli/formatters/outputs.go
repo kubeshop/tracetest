@@ -5,7 +5,7 @@ import "golang.org/x/exp/slices"
 type Output string
 
 var (
-	currentOutput = DefaultOutput
+	CurrentOutput = DefaultOutput
 
 	Outputs = []Output{
 		Pretty,
@@ -19,7 +19,7 @@ var (
 )
 
 func SetOutput(o Output) {
-	currentOutput = o
+	CurrentOutput = o
 }
 
 func OuputsStr() []string {
