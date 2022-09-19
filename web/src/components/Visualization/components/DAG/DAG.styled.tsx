@@ -38,9 +38,9 @@ export const Container = styled.div<{$showMatched: boolean}>`
   }
 
   .react-flow__minimap {
-    bottom: 0;
+    bottom: 25px;
     background-color: ${({theme}) => theme.color.background};
-    right: 0;
+    left: 66px;
   }
 
   ${({$showMatched}) =>

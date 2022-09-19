@@ -1,4 +1,5 @@
 import {ApartmentOutlined, ExpandOutlined, ZoomInOutlined, ZoomOutOutlined} from '@ant-design/icons';
+import {Tooltip} from 'antd';
 import {noop} from 'lodash';
 import {useCallback, useEffect} from 'react';
 import {NodeInternals, useReactFlow, useStoreApi} from 'react-flow-renderer';
@@ -60,15 +61,23 @@ const Actions = ({
       <Navigation matchedSpans={matchedSpans} onNavigateToSpan={handleOnNavigateToSpan} selectedSpan={selectedSpan} />
 
       <S.ActionsContainer>
-        <S.ActionButton icon={<ZoomInOutlined />} onClick={() => zoomIn()} type="text" />
-        <S.ActionButton icon={<ZoomOutOutlined />} onClick={() => zoomOut()} type="text" />
-        <S.ActionButton icon={<ExpandOutlined />} onClick={() => fitView()} type="text" />
-        <S.ActionButton
-          icon={<ApartmentOutlined />}
-          onClick={onMiniMapToggle}
-          type="text"
-          $isActive={isMiniMapActive}
-        />
+        <Tooltip placement="right" title="Zoom In">
+          <S.ActionButton icon={<ZoomInOutlined />} onClick={() => zoomIn()} type="text" />
+        </Tooltip>
+        <Tooltip placement="right" title="Zoom Out">
+          <S.ActionButton icon={<ZoomOutOutlined />} onClick={() => zoomOut()} type="text" />
+        </Tooltip>
+        <Tooltip placement="right" title="Fit View">
+          <S.ActionButton icon={<ExpandOutlined />} onClick={() => fitView()} type="text" />
+        </Tooltip>
+        <Tooltip placement="right" title="Mini Map">
+          <S.ActionButton
+            icon={<ApartmentOutlined />}
+            onClick={onMiniMapToggle}
+            type="text"
+            $isActive={isMiniMapActive}
+          />
+        </Tooltip>
       </S.ActionsContainer>
     </>
   );
