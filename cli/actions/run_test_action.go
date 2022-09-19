@@ -69,8 +69,6 @@ func (a runTestAction) Run(ctx context.Context, args RunTestConfig) error {
 
 	allPassed := output.Run.Result.AllPassed
 
-	fmt.Printf("%+v\n%+v\n%+v\n%+v\n", output, output.Run, output.Run.Result, output.Run.Result.AllPassed)
-
 	if args.WaitForResult && (allPassed == nil || !*allPassed) {
 		// It failed, so we have to return an error status
 		os.Exit(1)
@@ -118,11 +116,6 @@ func (a runTestAction) runDefinition(ctx context.Context, params runTestParams) 
 		return formatters.TestRunOutput{}, fmt.Errorf("could not run test: %w", err)
 	}
 
-	tro := formatters.TestRunOutput{
-		Test: test,
-		Run:  testRun,
-	}
-
 	if params.WaitForResult {
 		updatedTestRun, err := a.waitForResult(ctx, definition.Id, *testRun.Id)
 		if err != nil {
@@ -134,6 +127,11 @@ func (a runTestAction) runDefinition(ctx context.Context, params runTestParams) 
 		if err := a.saveJUnitFile(ctx, definition.Id, *testRun.Id, params.JunitFile); err != nil {
 			return formatters.TestRunOutput{}, fmt.Errorf("could not save junit file: %w", err)
 		}
+	}
+
+	tro := formatters.TestRunOutput{
+		Test: test,
+		Run:  testRun,
 	}
 
 	formatter := formatters.TestRun(a.config, true)
