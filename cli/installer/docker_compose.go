@@ -156,7 +156,7 @@ func getDockerComposeFileContents(ui UI, config configuration) []byte {
 		include = append(include, "otel-collector")
 	}
 
-	if config.Bool("demo.enable") {
+	if config.Bool("demo.enable.pokeshop") {
 		include = append(include, "cache", "queue", "demo-api", "demo-worker", "demo-rpc")
 	}
 
