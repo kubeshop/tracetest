@@ -63,10 +63,10 @@ func detectPkgManager() pkgManager {
 	}
 
 	switch true {
+	case commandExists("apt"):
+		lastDetectedPkgManager = apt
 	case commandExists("brew"):
 		lastDetectedPkgManager = homebrew
-	case commandExists("apt-get"):
-		lastDetectedPkgManager = apt
 	case commandExists("dnf"):
 		lastDetectedPkgManager = dnf
 	case commandExists("yum"):
