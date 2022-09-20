@@ -19,5 +19,9 @@ on:
 jobs:
   pull-request-passed:
     runs-on: ubuntu-latest
+    steps:
+      - run: 'echo "No build required" '
   pull-request-installer-passed:
     runs-on: ubuntu-latest
+    steps:
+      - run: 'echo "No build required" '
