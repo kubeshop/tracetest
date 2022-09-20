@@ -20,17 +20,17 @@ fi
 extraParams=()
 
 if [ -n "$EXPOSE_HOST" ]; then
-  extraParams=("${extraParams[@]}" "--set ingress.enabled=true" )
-  extraParams=("${extraParams[@]}" "--set 'ingress.hosts[0].host=$EXPOSE_HOST,ingress.hosts[0].paths[0].path=/,ingress.hosts[0].paths[0].pathType=Prefix'" )
+  extraParams=("${extraParams[@]}" --set ingress.enabled=true )
+  extraParams=("${extraParams[@]}" --set 'ingress.hosts[0].host=$EXPOSE_HOST,ingress.hosts[0].paths[0].path=/,ingress.hosts[0].paths[0].pathType=Prefix' )
 fi
 
 if [ -n "$CERT_NAME" ]; then
-    extraParams=("${extraParams[@]}" '--set ingress.annotations."networking\.gke\.io/managed-certificates"='$CERT_NAME)
-    extraParams=("${extraParams[@]}" '--set ingress.annotations."networking\.gke\.io/v1beta1\.FrontendConfig"="ssl-redirect"')
+    extraParams=("${extraParams[@]}" --set ingress.annotations."networking\.gke\.io/managed-certificates"=$CERT_NAME)
+    extraParams=("${extraParams[@]}" --set ingress.annotations."networking\.gke\.io/v1beta1\.FrontendConfig"="ssl-redirect")
 fi
 
 if [ -n "$BACKEND_CONFIG" ]; then
-    extraParams=("${extraParams[@]}" "--set service.annotations.\"cloud\\.google\\.com/backend-config\"='\{\\\"default\\\":\\\"$BACKEND_CONFIG\\\"\\}'")
+    extraParams=("${extraParams[@]}" --set service.annotations."cloud\.google\.com/backend-config"='\{\"default\":\"'$BACKEND_CONFIG'\"\}')
 fi
 
 helm repo add kubeshop https://kubeshop.github.io/helm-charts
