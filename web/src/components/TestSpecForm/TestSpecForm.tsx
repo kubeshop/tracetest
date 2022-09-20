@@ -1,4 +1,4 @@
-import {Button, Form, Input, Tag} from 'antd';
+import {Button, Form, Tag} from 'antd';
 import React, {useState} from 'react';
 
 import {ADVANCE_SELECTORS_DOCUMENTATION_URL} from 'constants/Common.constants';
@@ -111,16 +111,6 @@ const TestSpecForm = ({
               />
             )}
           </Form.List>
-        </S.FormSection>
-
-        <S.FormSection>
-          <S.FormSectionTitle>3. Test Spec name (optional)</S.FormSectionTitle>
-          <S.FormSectionRow>
-            <S.FormSectionText>Identify your spec by giving it a name</S.FormSectionText>
-          </S.FormSectionRow>
-          <Form.Item name="name">
-            <Input placeholder="Test Spec name" />
-          </Form.Item>
         </S.FormSection>
 
         <S.AssertionFromActions>
