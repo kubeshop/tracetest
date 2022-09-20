@@ -16,7 +16,7 @@ Getting started with observability and OpenTelemetry can be complex and overwhel
 Our CLI offers an **install wizard** that helps with the process. It helps not only to setup tracetest itself, but all the tools needed 
 to observe your application.
 
-Use it to install locally using Docker Compose or to a local or remote Kubernetes cluster.
+Use the install wizard to install Tracetest locally using Docker Compose or to a local or remote Kubernetes cluster.
 It installs all the tools required to set up the desired environment and creates all the configurations, tailored to your case.
 
 ## CLI Installation
