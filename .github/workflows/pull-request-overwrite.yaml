@@ -1,9 +1,8 @@
 # this pipeline fills the required checks for commits with paths that don't apply
-name: Fill Required Checks
+name: Pull Request
 on:
   push:
     paths-ignore:
-      # from ./pull-request.yaml
       - .github/workflows/pull-request.yaml
       - api/**
       - cli/**
@@ -13,15 +12,9 @@ on:
       - web/**
       - Dockerfile
       - k8s/**
-      # from ./pull-request-installer.yaml
-      - install-cli.sh
 
 jobs:
   pull-request-passed:
     runs-on: ubuntu-latest
     steps:
-      - run: 'echo "No build required" '
-  pull-request-installer-passed:
-    runs-on: ubuntu-latest
-    steps:
-      - run: 'echo "No build required" '
+      - run: 'echo "ok"'

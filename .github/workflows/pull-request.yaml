@@ -311,6 +311,8 @@ jobs:
   pull-request-passed:
     runs-on: ubuntu-latest
     needs: [e2e]
+    steps:
+      - run: 'echo "ok"'
 
   cleanup:
     runs-on: ubuntu-latest

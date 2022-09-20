@@ -45,3 +45,6 @@ jobs:
   pull-request-installer-passed:
     runs-on: ubuntu-latest
     needs: [linux]
+    steps:
+      - run: 'echo "ok"'
+
