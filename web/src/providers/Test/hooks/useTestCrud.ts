@@ -1,5 +1,5 @@
 import {useCallback} from 'react';
-import {useNavigate} from 'react-router-dom';
+import {useMatch, useNavigate} from 'react-router-dom';
 import {useAppDispatch} from 'redux/hooks';
 import {reset} from 'redux/slices/TestSpecs.slice';
 import {TDraftTest, TTest} from 'types/Test.types';
@@ -17,6 +17,7 @@ const useTestCrud = () => {
   const [editTest, {isLoading: isLoadingEditTest}] = useEditTestMutation();
   const [runTestAction, {isLoading: isLoadingRunTest}] = useRunTestMutation();
   const isEditLoading = isLoadingEditTest || isLoadingRunTest;
+  const match = useMatch('/test/:testId/run/:runId/:mode');
 
   const runTest = useCallback(
     async (testId: string) => {
@@ -24,9 +25,11 @@ const useTestCrud = () => {
       const run = await runTestAction({testId}).unwrap();
       dispatch(reset());
 
-      navigate(`/test/${testId}/run/${run.id}`);
+      const mode = match?.params.mode || 'trigger';
+
+      navigate(`/test/${testId}/run/${run.id}/${mode}`);
     },
-    [dispatch, navigate, runTestAction]
+    [dispatch, match?.params.mode, navigate, runTestAction]
   );
 
   const edit = useCallback(
