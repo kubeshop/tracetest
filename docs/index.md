@@ -1,4 +1,4 @@
-# Tracetest
+# Tracetest (ignore this)
 
 Trace-based testing. End-to-end tests powered by your OpenTelemetry Traces.
 
