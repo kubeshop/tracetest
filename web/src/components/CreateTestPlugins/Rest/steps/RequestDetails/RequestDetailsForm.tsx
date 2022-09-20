@@ -1,9 +1,10 @@
-import {Form, Input} from 'antd';
-import {IHttpValues, TDraftTestForm} from 'types/Test.types';
+import {Form} from 'antd';
 import * as S from 'components/CreateTestPlugins/Default/steps/BasicDetails/BasicDetails.styled';
-import RequestDetailsUrlInput from './RequestDetailsUrlInput';
+import {IHttpValues, TDraftTestForm} from 'types/Test.types';
+import {BodyField} from './BodyField/BodyField';
 import RequestDetailsAuthInput from './RequestDetailsAuthInput/RequestDetailsAuthInput';
 import RequestDetailsHeadersInput from './RequestDetailsHeadersInput';
+import RequestDetailsUrlInput from './RequestDetailsUrlInput';
 
 export const FORM_ID = 'create-test';
 
@@ -18,9 +19,7 @@ const RequestDetailsForm = ({form, isEditing = false}: IProps) => {
       <RequestDetailsUrlInput />
       <RequestDetailsAuthInput form={form} />
       <RequestDetailsHeadersInput />
-      <Form.Item className="input-body" data-cy="body" label="Request body" name="body" style={{marginBottom: 0}}>
-        <Input.TextArea placeholder="Enter request body text" />
-      </Form.Item>
+      <BodyField body={Form.useWatch('body', form)} isEditing={isEditing} />
     </S.InputContainer>
   );
 };

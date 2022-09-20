@@ -1,4 +1,5 @@
 import {Col, Form, Input, Row} from 'antd';
+import {BodyField} from 'components/CreateTestPlugins/Rest/steps/RequestDetails/BodyField/BodyField';
 import {IPostmanValues, TDraftTestForm} from 'types/Test.types';
 import RequestDetailsAuthInput from '../../../Rest/steps/RequestDetails/RequestDetailsAuthInput/RequestDetailsAuthInput';
 import RequestDetailsHeadersInput from '../../../Rest/steps/RequestDetails/RequestDetailsHeadersInput';
@@ -32,9 +33,7 @@ const UploadCollectionForm = ({form}: IProps) => {
           <RequestDetailsUrlInput />
         </Col>
         <Col span={12}>
-          <Form.Item className="input-body" data-cy="body" label="Request body" name="body" style={{marginBottom: 0}}>
-            <Input.TextArea placeholder="Enter request body text" />
-          </Form.Item>
+          <BodyField />
         </Col>
       </Row>
       <Row gutter={12}>

@@ -24,6 +24,7 @@ describe('Create test', () => {
     cy.navigateToTestCreationPage();
     cy.fillCreateFormBasicStep(name);
     cy.setCreateFormUrl('POST', 'http://demo-pokemon-api.demo.svc.cluster.local/pokemon');
+    cy.get('[data-cy=bodyMode-json]').click();
     cy.get('[data-cy=body]').type(
       '{"name":"meowth","type":"normal","imageUrl":"https://assets.pokemon.com/assets/cms2/img/pokedex/full/052.png","isFeatured":true}',
       {
