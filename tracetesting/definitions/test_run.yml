@@ -17,7 +17,7 @@ specs:
     - tracetest.response.status = 200
 - selector: span[name = "POST /api/tests/{testId}/run" tracetest.span.type = "http"]
   assertions:
-  - tracetest.selected_spans.count = 1
+  - tracetest.selected_spans.count = 0
 - selector: span[name = "Trigger test"]
   assertions:
   - tracetest.selected_spans.count = 1
