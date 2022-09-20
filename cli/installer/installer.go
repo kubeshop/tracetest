@@ -95,15 +95,6 @@ func (c configuration) set(key string, value interface{}) {
 	c.db[key] = value
 }
 
-func (c configuration) overwrite(key string, value interface{}) {
-	c.db[key] = value
-}
-
-func (c configuration) has(key string) bool {
-	_, exists := c.db[key]
-	return exists
-}
-
 func (c configuration) get(key string) interface{} {
 	v, exists := c.db[key]
 	if !exists {
@@ -138,7 +129,8 @@ func trackInstall(name string, config configuration, extra map[string]string) {
 		"type":                    name,
 		"install_backend":         fmt.Sprintf("%t", config.Bool("tracetest.backend.install")),
 		"install_collector":       fmt.Sprintf("%t", config.Bool("tracetest.collector.install")),
-		"install_demo":            fmt.Sprintf("%t", config.Bool("demo.enable")),
+		"install_demo_pokeshop":   fmt.Sprintf("%t", config.Bool("demo.enable.pokeshop")),
+		"install_demo_otel":       fmt.Sprintf("%t", config.Bool("demo.enable.otel")),
 		"enable_server_analytics": fmt.Sprintf("%t", config.Bool("tracetest.analytics")),
 		"backend_type":            config.String("tracetest.backend.type"),
 	}

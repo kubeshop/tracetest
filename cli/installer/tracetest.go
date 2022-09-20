@@ -12,30 +12,34 @@ import (
 
 func configureDemoApp(conf configuration, ui UI) configuration {
 	conf.set(
-		"demo.enable",
-		ui.Confirm("Do you want to enable the demo app?", true),
+		"demo.enable.pokeshop",
+		ui.Confirm("Do you want to enable the PokeShop demo app? (https://github.com/kubeshop/pokeshop/)", true),
 	)
-	if conf.Bool("demo.enable") {
-		if conf.String("tracetest.backend.type") != "jaeger" {
-			ui.Error("The demo app requires the jaeger backend.")
-			opt := ui.Select("What do you want to do?", []option{
-				{"Continue without the demo", func(ui UI) {
-					conf.overwrite("demo.enable", false)
-					ui.Warning("demo disabled")
-				}},
-				{"Fix manually", exitOption(
-					"You can restart the installer and select a different backend, or disable the demo. " + createIssueMsg,
-				)},
-			}, 0)
-			opt.fn(ui)
-		} else if !conf.has("tracetest.backend.endpoint.agent") {
-			defaultAgent := "jaeger-agent"
-			if conf.String("installer") == "kubernetes" {
-				defaultAgent = "jaeger-agent." + conf.String("k8s.namespace")
-			}
-			conf.set("tracetest.backend.endpoint.agent", ui.TextInput("Jaeger Agent endpoint", defaultAgent))
-		}
+
+	conf.set("demo.enable.otel", false)
+	// TODO: enable this
+	// conf.set(
+	// 	"demo.enable.otel",
+	// 	ui.Confirm("Do you want to enable the OpenTelemetry Community Demo app? (https://github.com/open-telemetry/opentelemetry-demo)", true),
+	// )
+
+	switch conf.String("installer") {
+	case "docker-compose":
+		conf.set("demo.endpoint.pokeshop.http", "http://demo-api:8081")
+		conf.set("demo.endpoint.pokeshop.grpc", "demo-api:8082")
+		conf.set("demo.endpoint.otel.frontend", "http://otel-frontend:8084")
+		conf.set("demo.endpoint.otel.product_catalog", "otel-productcatalogservice:3550")
+		conf.set("demo.endpoint.otel.cart", "otel-cartservice:7070")
+		conf.set("demo.endpoint.otel.checkout", "otel-checkoutservice:5050")
+	case "kubernetes":
+		conf.set("demo.endpoint.pokeshop.http", "http://demo-pokemon-api.demo")
+		conf.set("demo.endpoint.pokeshop.grpc", "demo-pokemon-api.demo:8082")
+		conf.set("demo.endpoint.otel.frontend", "http://otel-frontend.otel-demo:8084")
+		conf.set("demo.endpoint.otel.product_catalog", "otel-productcatalogservice.otel-demo:3550")
+		conf.set("demo.endpoint.otel.cart", "otel-cartservice.otel-demo:7070")
+		conf.set("demo.endpoint.otel.checkout", "otel-checkoutservice.otel-demo:5050")
 	}
+
 	return conf
 }
 
@@ -103,7 +107,6 @@ See https://kubeshop.github.io/tracetest/supported-backends/
 			conf.set("tracetest.backend.endpoint.collector", "jaeger-collector:14250")
 			conf.set("tracetest.backend.tls.insecure", true)
 			conf.set("tracetest.backend.endpoint.agent", "jaeger-agent."+conf.String("k8s.namespace"))
-
 		}
 
 	}
@@ -164,6 +167,26 @@ func getTracetestConfigFileContents(psql string, ui UI, config configuration) []
 			Exporter:            "collector",
 			ApplicationExporter: "collector",
 			DataStore:           config.String("tracetest.backend.type"),
+		},
+	}
+
+	enabledDemos := []string{}
+	if config.Bool("demo.enable.pokeshop") {
+		enabledDemos = append(enabledDemos, "pokeshop")
+	}
+	if config.Bool("demo.enable.otel") {
+		enabledDemos = append(enabledDemos, "otel")
+	}
+
+	sc.Demo = serverConfig.Demo{
+		Enabled: enabledDemos,
+		Endpoints: serverConfig.DemoEndpoints{
+			PokeshopHttp:       config.String("demo.endpoint.pokeshop.http"),
+			PokeshopGrpc:       config.String("demo.endpoint.pokeshop.grpc"),
+			OtelFrontend:       config.String("demo.endpoint.otel.frontend"),
+			OtelProductCatalog: config.String("demo.endpoint.otel.product_catalog"),
+			OtelCart:           config.String("demo.endpoint.otel.cart"),
+			OtelCheckout:       config.String("demo.endpoint.otel.checkout"),
 		},
 	}
 

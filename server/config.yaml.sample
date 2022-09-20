@@ -13,9 +13,9 @@ demo:
     pokeshopHttp: http://demo-api:8081
     pokeshopGrpc: demo-api:8082
     otelFrontend: http://otel-frontend:8084
-    otelProductCatalog: http://otel-productcatalogservice:3550
-    otelCart: http://otel-cartservice:7070
-    otelCheckout: http://otel-checkoutservice:5050
+    otelProductCatalog: otel-productcatalogservice:3550
+    otelCart: otel-cartservice:7070
+    otelCheckout: otel-checkoutservice:5050
 
 telemetry:
   dataStores:

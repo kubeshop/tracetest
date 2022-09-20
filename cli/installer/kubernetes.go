@@ -69,13 +69,13 @@ Happy TraceTesting =)
 }
 
 func installDemo(conf configuration, ui UI) {
-	if !conf.Bool("demo.enable") {
+	if !conf.Bool("demo.enable.pokeshop") {
 		return
 	}
 
 	helm := helmCmd(conf, "")
 	script := strings.ReplaceAll(demoScript, "#helm#", helm)
-	script = fmt.Sprintf(script, conf.String("tracetest.backend.endpoint.agent"))
+	script = fmt.Sprintf(script, conf.String("tracetest.collector.endpoint"))
 
 	execCmd(script, ui)
 }
