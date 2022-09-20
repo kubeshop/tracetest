@@ -22,7 +22,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 
-opts="-f docker-compose.yaml -f local-config/docker-compose.demo.yaml"
+opts="-f docker-compose.yaml -f examples/docker-compose.demo.yaml"
 
 if [ "$RESTART" == "yes" ]; then
   docker compose $opts down

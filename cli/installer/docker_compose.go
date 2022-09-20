@@ -145,7 +145,7 @@ func createEmptyDockerComposeFile(fname string, ui UI) {
 }
 
 func getDockerComposeFileContents(ui UI, config configuration) []byte {
-	project := getCompleteProject(ui)
+	project := getCompleteProject(ui, config)
 	include := []string{"tracetest", "postgres"}
 
 	if config.Bool("tracetest.backend.install") {
@@ -212,7 +212,8 @@ func filterContainers(ui UI, project *types.Project, included []string) {
 type msa = map[string]any
 
 func getCollectorConfigFileContents(ui UI, config configuration) []byte {
-	contents, err := getFileContentsForVersion("local-config/collector.config.yaml", cliConfig.Version)
+	exampleFile := config.String("tracetest.backend.type")
+	contents, err := getFileContentsForVersion("examples/tracetest-"+exampleFile+"/collector.config.yaml", cliConfig.Version)
 	if err != nil {
 		ui.Exit(fmt.Errorf("cannot get collector config file: %w", err).Error())
 	}
@@ -363,10 +364,23 @@ func getFileContentsForVersion(path, version string) ([]byte, error) {
 
 }
 
-func getCompleteProject(ui UI) *types.Project {
-	contents, err := getFileContentsForVersion("docker-compose.yaml", cliConfig.Version)
+func getCompleteProject(ui UI, config configuration) *types.Project {
+	exampleFile := config.String("tracetest.backend.type")
+	tracetestDCContents, err := getFileContentsForVersion("examples/tracetest-"+exampleFile+"/docker-compose.yml", cliConfig.Version)
 	if err != nil {
 		ui.Exit(fmt.Errorf("cannot get docker-compose file: %w", err).Error())
+	}
+
+	configFiles := []types.ConfigFile{
+		{Filename: "docker-compose.yaml", Content: tracetestDCContents},
+	}
+
+	if config.Bool("demo.enable.pokeshop") {
+		demoDCContents, err := getFileContentsForVersion("examples/docker-compose.demo.yaml", cliConfig.Version)
+		if err != nil {
+			ui.Exit(fmt.Errorf("cannot get docker-compose file: %w", err).Error())
+		}
+		configFiles = append(configFiles, types.ConfigFile{Filename: "docker-compose.yaml", Content: demoDCContents})
 	}
 
 	workingDir, err := os.Getwd()
@@ -375,10 +389,8 @@ func getCompleteProject(ui UI) *types.Project {
 	}
 
 	project, err := loader.Load(types.ConfigDetails{
-		WorkingDir: workingDir,
-		ConfigFiles: []types.ConfigFile{
-			{Filename: "docker-compose.yaml", Content: contents},
-		},
+		WorkingDir:  workingDir,
+		ConfigFiles: configFiles,
 	})
 	if err != nil {
 		ui.Exit(fmt.Errorf("cannot parse docker-compose file: %w", err).Error())
