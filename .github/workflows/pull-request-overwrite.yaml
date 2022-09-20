@@ -1,7 +1,12 @@
-# this pipeline fills the required checks for commits with paths that don't apply
 name: Pull Request
 on:
-  push:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+    branches:
+      - main
     paths-ignore:
       - .github/workflows/pull-request.yaml
       - api/**
@@ -12,6 +17,7 @@ on:
       - web/**
       - Dockerfile
       - k8s/**
+
 
 jobs:
   pull-request-passed:
