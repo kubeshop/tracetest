@@ -22,13 +22,15 @@ while [[ $# -gt 0 ]]; do
 done
 
 
+opts="-f docker-compose.yaml -f local-config/docker-compose.demo.yaml"
+
 if [ "$RESTART" == "yes" ]; then
-  docker compose -f docker-compose.yaml -f local-config/docker-compose.testrunner.yaml down
+  docker compose $opts down
 fi
-docker compose -f docker-compose.yaml up -d --build --remove-orphans
-docker compose -f docker-compose.yaml -f local-config/docker-compose.testrunner.yaml build
-docker compose -f docker-compose.yaml -f local-config/docker-compose.testrunner.yaml run testrunner
+docker compose $opts up -d --build --remove-orphans
+docker compose $opts -f local-config/docker-compose.testrunner.yaml build
+docker compose $opts -f local-config/docker-compose.testrunner.yaml run testrunner
 
 if [ "$STOP" == "yes" ]; then
-  docker compose -f docker-compose.yaml stop
+  docker compose $opts stop
 fi

@@ -6,30 +6,32 @@ receivers:
 
 
 processors:
+  tail_sampling:
+    decision_wait: 5s
+    policies:
+      - name: tracetest-spans
+        type: trace_state
+        trace_state: { key: tracetest, values: ["true"] }
+
   batch:
     timeout: 100ms
 
-  # Data sources: traces
-  probabilistic_sampler:
-    hash_seed: 22
-    sampling_percentage: 100
-
 exporters:
   logging:
-    logLevel: debug
-  jaeger:
-    endpoint: ${JAEGER_ENDPOINT}
+    loglevel: debug
+
+  otlp/1:
+    endpoint: tracetest:21321
     tls:
       insecure: true
-  otlp/2:
-    endpoint: data-prepper:21890
-    tls:
-      insecure: true
-      insecure_skip_verify: true
+
+extensions:
+  health_check: {}
 
 service:
+  extensions: [health_check]
   pipelines:
-    traces:
+    traces/1:
       receivers: [otlp]
-      processors: [probabilistic_sampler, batch]
-      exporters: [logging, jaeger, otlp/2]
+      processors: [tail_sampling, batch]
+      exporters: [otlp/1]
