@@ -15,12 +15,8 @@ demo:
 
 telemetry:
   dataStores:
-    jaeger:
-      type: jaeger
-      jaeger:
-        endpoint: jaeger:16685
-        tls:
-          insecure: true
+    otlp:
+      type: otlp
 
   exporters:
     collector:
@@ -33,6 +29,6 @@ telemetry:
 
 server:
   telemetry:
+    dataStore: otlp
     exporter: collector
-    dataStore: jaeger
     applicationExporter: collector
