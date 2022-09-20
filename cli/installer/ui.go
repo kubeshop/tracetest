@@ -97,7 +97,7 @@ func (ui ptermUI) Confirm(msg string, defaultValue bool) bool {
 	confirm, err := (&pterm.InteractiveConfirmPrinter{
 		DefaultValue: defaultValue,
 		DefaultText:  msg,
-		TextStyle:    &pterm.ThemeDefault.PrimaryStyle,
+		TextStyle:    &pterm.ThemeDefault.DefaultText,
 		ConfirmText:  "Yes",
 		ConfirmStyle: &pterm.ThemeDefault.SuccessMessageStyle,
 		RejectText:   "No",
@@ -114,7 +114,7 @@ func (ui ptermUI) Confirm(msg string, defaultValue bool) bool {
 
 func (ui ptermUI) TextInput(msg, defaultValue string) string {
 	text, err := (&pterm.InteractiveTextInputPrinter{
-		TextStyle:   &pterm.ThemeDefault.PrimaryStyle,
+		TextStyle:   &pterm.ThemeDefault.DefaultText,
 		DefaultText: fmt.Sprintf("%s [%s]", msg, defaultValue),
 		MultiLine:   false,
 	}).
@@ -144,7 +144,7 @@ func (ui ptermUI) Select(prompt string, options []option, defaultIndex int) (sel
 	}
 
 	selectedText, err := (&pterm.InteractiveSelectPrinter{
-		TextStyle:     &pterm.ThemeDefault.PrimaryStyle,
+		TextStyle:     &pterm.ThemeDefault.DefaultText,
 		DefaultText:   prompt,
 		Options:       textOpts,
 		OptionStyle:   &pterm.ThemeDefault.DefaultText,
