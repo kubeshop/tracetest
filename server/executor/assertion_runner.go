@@ -27,7 +27,8 @@ type AssertionRunner interface {
 }
 
 type defaultAssertionRunner struct {
-	updater           RunUpdater
+	updater RunUpdater
+
 	assertionExecutor AssertionExecutor
 	inputChannel      chan AssertionRequest
 	exitChannel       chan bool
