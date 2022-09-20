@@ -4,19 +4,19 @@
 
 Install the CLI and use it to setup a server:
 
-```
-$ curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/install-cli.sh | sh
-$ tracetest server install
-
-# Follow the install wizard
+```shell
+curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/install-cli.sh | bash
+tracetest server install
 ```
 
 ## How It Works
 
-Tracetest is a relatively complex system, with a few interconnected dependencies. It relies on a Postgres database, a Data Store to retrieve your application's traces
-on the OpenTelemetry Collector connected to the Data Store, etc. If you are new to the tracing world, it might be overwhelming and a bit tricky to connect everything together.
+Getting started with observability and OpenTelemetry can be complex and overwhelming. It involves different interconected services working together.
 
-Our CLI offers an **install wizard** that helps with the process. Use it to install locally using Docker Compose or to a local or remote Kubernetes cluster.
+Our CLI offers an **install wizard** that helps with the process. It helps not only to setup tracetest itself, but all the tools needed 
+to observe your application.
+
+Use it to install locally using Docker Compose or to a local or remote Kubernetes cluster.
 It installs all the tools required to set up the desired environment and creates all the configurations, tailored to your case.
 
 ## CLI Installation
