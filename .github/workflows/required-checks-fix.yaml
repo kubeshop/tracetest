@@ -1,0 +1,23 @@
+# this pipeline fills the required checks for commits with paths that don't apply
+name: Fill Required Checks
+on:
+  push:
+    paths-ignore:
+      # from ./pull-request.yaml
+      - .github/workflows/pull-request.yaml
+      - api/**
+      - cli/**
+      - examples/
+      - server/**
+      - tracetesting/**
+      - web/**
+      - Dockerfile
+      - k8s/**
+      # from ./pull-request-installer.yaml
+      - install-cli.sh
+
+jobs:
+  pull-request-passed:
+    runs-on: ubuntu-latest
+  pull-request-installer-passed:
+    runs-on: ubuntu-latest
