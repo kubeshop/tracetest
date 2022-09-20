@@ -65,12 +65,12 @@ func detectPkgManager() pkgManager {
 	switch true {
 	case commandExists("apt-get"):
 		lastDetectedPkgManager = apt
-	case commandExists("brew"):
-		lastDetectedPkgManager = homebrew
 	case commandExists("dnf"):
 		lastDetectedPkgManager = dnf
 	case commandExists("yum"):
 		lastDetectedPkgManager = yum
+	case commandExists("brew"):
+		lastDetectedPkgManager = homebrew
 	case runtime.GOOS == "darwin" && detectArchitecture() == "amd64":
 		lastDetectedPkgManager = macIntelChipManual
 	case runtime.GOOS == "darwin" && detectArchitecture() == "arm64":
