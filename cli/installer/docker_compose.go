@@ -166,7 +166,7 @@ func getDockerComposeFileContents(ui UI, config configuration) []byte {
 		ui.Exit(fmt.Sprintf("cannot configure tracetest container: %s", err.Error()))
 	}
 
-	if config.Bool("tracetest.collector.install") {
+	if config.Bool("tracetest.collector.install") && config.Bool("tracetest.backend.install") {
 		if err := fixOtelCollectorContainer(config, project); err != nil {
 			ui.Exit(fmt.Sprintf("cannot configure otel-collector container: %s", err.Error()))
 		}
@@ -265,7 +265,7 @@ func getCollectorConfigFileContents(ui UI, config configuration) []byte {
 	}
 
 	otelConfig["exporters"] = exporters
-	otelConfig["service"].(msa)["pipelines"].(msa)["traces"].(msa)["exporters"] = []string{exporter}
+	otelConfig["service"].(msa)["pipelines"].(msa)["traces/1"].(msa)["exporters"] = []string{exporter}
 
 	updated, err := yaml.Marshal(otelConfig)
 	if err != nil {
