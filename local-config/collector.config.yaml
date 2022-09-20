@@ -7,7 +7,7 @@ receivers:
 
 processors:
   tail_sampling:
-    decision_wait: 5s
+    decision_wait: 1s
     policies:
       - name: tracetest-spans
         type: trace_state
