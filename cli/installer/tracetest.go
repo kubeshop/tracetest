@@ -28,16 +28,16 @@ func configureDemoApp(conf configuration, ui UI) configuration {
 		conf.set("demo.endpoint.pokeshop.http", "http://demo-api:8081")
 		conf.set("demo.endpoint.pokeshop.grpc", "demo-api:8082")
 		conf.set("demo.endpoint.otel.frontend", "http://otel-frontend:8084")
-		conf.set("demo.endpoint.otel.product_catalog", "http://otel-productcatalogservice:3550")
-		conf.set("demo.endpoint.otel.cart", "http://otel-cartservice:7070")
-		conf.set("demo.endpoint.otel.checkout", "http://otel-checkoutservice:5050")
+		conf.set("demo.endpoint.otel.product_catalog", "otel-productcatalogservice:3550")
+		conf.set("demo.endpoint.otel.cart", "otel-cartservice:7070")
+		conf.set("demo.endpoint.otel.checkout", "otel-checkoutservice:5050")
 	case "kubernetes":
 		conf.set("demo.endpoint.pokeshop.http", "http://demo-pokemon-api.demo")
 		conf.set("demo.endpoint.pokeshop.grpc", "demo-pokemon-api.demo:8082")
 		conf.set("demo.endpoint.otel.frontend", "http://otel-frontend.otel-demo:8084")
-		conf.set("demo.endpoint.otel.product_catalog", "http://otel-productcatalogservice.otel-demo:3550")
-		conf.set("demo.endpoint.otel.cart", "http://otel-cartservice.otel-demo:7070")
-		conf.set("demo.endpoint.otel.checkout", "http://otel-checkoutservice.otel-demo:5050")
+		conf.set("demo.endpoint.otel.product_catalog", "otel-productcatalogservice.otel-demo:3550")
+		conf.set("demo.endpoint.otel.cart", "otel-cartservice.otel-demo:7070")
+		conf.set("demo.endpoint.otel.checkout", "otel-checkoutservice.otel-demo:5050")
 	}
 
 	return conf
