@@ -1,6 +1,6 @@
 #/bin/bash
 
-set -x
+set -ex
 
 if [ -z "$NAME" ];then
   echo '$NAME is required'
