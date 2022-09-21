@@ -35,6 +35,7 @@ func (c *customController) Routes() openapi.Routes {
 
 	routes[c.getRouteIndex("GetRunResultJUnit")].HandlerFunc = c.GetRunResultJUnit
 	routes[c.getRouteIndex("GetTestVersionDefinitionFile")].HandlerFunc = c.GetTestVersionDefinitionFile
+	routes[c.getRouteIndex("RunShortUrl")].HandlerFunc = c.RunShortUrl
 
 	for index, route := range routes {
 		routeName := fmt.Sprintf("%s %s", route.Method, route.Pattern)
@@ -49,6 +50,32 @@ func (c *customController) Routes() openapi.Routes {
 	}
 
 	return routes
+}
+
+// RunShortUrl - get test run results in JUnit xml format
+func (c *customController) RunShortUrl(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	runShortIdParam := params["runShortId"]
+
+	result, err := c.service.RunShortUrl(r.Context(), runShortIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+
+	redirect, ok := result.Body.(string)
+	if !ok {
+		panic(fmt.Errorf("expected result.Body to be string, got %v", result.Body))
+	}
+
+	qs := r.URL.Query().Encode()
+	if qs != "" {
+		redirect += "?" + qs
+	}
+
+	w.Header().Set("Location", redirect)
+	w.WriteHeader(http.StatusPermanentRedirect)
 }
 
 // GetRunResultJUnit - get test run results in JUnit xml format

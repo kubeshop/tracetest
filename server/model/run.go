@@ -21,6 +21,7 @@ var (
 func NewRun() Run {
 	return Run{
 		ID:        IDGen.UUID(),
+		ShortID:   IDGen.Short(),
 		TraceID:   IDGen.TraceID(),
 		SpanID:    IDGen.SpanID(),
 		State:     RunStateCreated,
@@ -34,6 +35,7 @@ func (r Run) ResourceID() string {
 
 func (r Run) Copy() Run {
 	r.ID = uuid.UUID{}
+	r.ShortID = ""
 	r.Results = nil
 	r.CreatedAt = Now()
 	r.ServiceTriggeredAt = time.Time{}

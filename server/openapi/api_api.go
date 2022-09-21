@@ -153,6 +153,12 @@ func (c *ApiApiController) Routes() Routes {
 			c.RerunTestRun,
 		},
 		{
+			"RunShortUrl",
+			strings.ToUpper("Get"),
+			"/api/r/{runShortId}",
+			c.RunShortUrl,
+		},
+		{
 			"RunTest",
 			strings.ToUpper("Post"),
 			"/api/tests/{testId}/run",
@@ -524,6 +530,22 @@ func (c *ApiApiController) RerunTestRun(w http.ResponseWriter, r *http.Request) 
 	runIdParam := params["runId"]
 
 	result, err := c.service.RerunTestRun(r.Context(), testIdParam, runIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// RunShortUrl - run short url redirecter
+func (c *ApiApiController) RunShortUrl(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	runShortIdParam := params["runShortId"]
+
+	result, err := c.service.RunShortUrl(r.Context(), runShortIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

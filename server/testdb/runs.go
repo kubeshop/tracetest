@@ -86,6 +86,20 @@ func (td *postgresDB) GetRun(ctx context.Context, id uuid.UUID) (model.Run, erro
 	return run, nil
 }
 
+func (td *postgresDB) GetRunByShortID(ctx context.Context, shortID string) (model.Run, error) {
+	stmt, err := td.db.Prepare("SELECT run, test_id, test_version FROM runs WHERE run ->> 'ShortID' = $1")
+	if err != nil {
+		return model.Run{}, err
+	}
+	defer stmt.Close()
+
+	run, err := readRunRow(stmt.QueryRowContext(ctx, shortID))
+	if err != nil {
+		return model.Run{}, fmt.Errorf("cannot read row: %w", err)
+	}
+	return run, nil
+}
+
 func (td *postgresDB) GetTestRuns(ctx context.Context, test model.Test, take, skip int32) ([]model.Run, error) {
 	stmt, err := td.db.Prepare("SELECT run, test_id, test_version FROM runs WHERE test_id = $1 ORDER BY (run ->> 'CreatedAt')::timestamp DESC LIMIT $2 OFFSET $3")
 	if err != nil {

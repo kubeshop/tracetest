@@ -6,6 +6,7 @@ replace k8s.io/client-go => k8s.io/client-go v0.18.0
 
 require (
 	github.com/alecthomas/participle/v2 v2.0.0-alpha8
+	github.com/brianvoe/gofakeit/v6 v6.17.0
 	github.com/denisbrodbeck/machineid v1.0.1
 	github.com/fullstorydev/grpcurl v1.8.6
 	github.com/gogo/protobuf v1.3.2
@@ -19,11 +20,14 @@ require (
 	github.com/jhump/protoreflect v1.12.0
 	github.com/lib/pq v1.10.5
 	github.com/mitchellh/mapstructure v1.4.3
+	github.com/opensearch-project/opensearch-go v1.1.0
 	github.com/orlangure/gnomock v0.20.0
 	github.com/prometheus/prometheus v1.8.2-0.20211217191541-41f1a8125e66
 	github.com/segmentio/analytics-go/v3 v3.2.1
 	github.com/stretchr/testify v1.7.1
+	github.com/teris-io/shortid v0.0.0-20220617161101-71ec9f2aa569
 	go.opentelemetry.io/collector v0.44.0
+	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.28.0
 	go.opentelemetry.io/contrib/propagators/aws v1.5.0
 	go.opentelemetry.io/contrib/propagators/b3 v1.5.0
 	go.opentelemetry.io/contrib/propagators/jaeger v1.5.0
@@ -41,7 +45,6 @@ require (
 
 require (
 	github.com/Microsoft/go-winio v0.5.2 // indirect
-	github.com/brianvoe/gofakeit/v6 v6.17.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.1.3 // indirect
 	github.com/containerd/containerd v1.6.6 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
@@ -54,7 +57,6 @@ require (
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-redis/redis/v7 v7.4.1 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
-	github.com/grpc-ecosystem/grpc-gateway v1.16.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.7.0 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
@@ -65,7 +67,6 @@ require (
 	github.com/mostynb/go-grpc-compression v1.1.16 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.0.3-0.20211202183452-c5a74bcca799 // indirect
-	github.com/opensearch-project/opensearch-go v1.1.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/segmentio/backo-go v1.0.0 // indirect
@@ -74,7 +75,6 @@ require (
 	github.com/streadway/amqp v1.0.0 // indirect
 	github.com/stretchr/objx v0.2.0 // indirect
 	go.opentelemetry.io/collector/model v0.44.0 // indirect
-	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.28.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/internal/retry v1.10.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.10.0 // indirect
 	go.opentelemetry.io/otel/metric v0.26.0 // indirect

@@ -523,3 +523,14 @@ func (c *controller) UpdateTestFromDefinition(ctx context.Context, testId string
 
 	return openapi.Response(http.StatusOK, openapiObject), nil
 }
+
+func (c *controller) RunShortUrl(ctx context.Context, shortID string) (openapi.ImplResponse, error) {
+	run, err := c.testDB.GetRunByShortID(ctx, shortID)
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	return openapi.ImplResponse{
+		Body: fmt.Sprintf("/test/%s/run/%s", run.TestID.String(), run.ID.String()),
+	}, nil
+}

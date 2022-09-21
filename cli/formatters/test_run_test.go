@@ -24,8 +24,9 @@ func TestJSON(t *testing.T) {
 			Name: strp("Testcase 1"),
 		},
 		Run: openapi.TestRun{
-			Id:    strp("123456"),
-			State: strp("FINISHED"),
+			Id:      strp("123456"),
+			ShortId: strp("ShortID"),
+			State:   strp("FINISHED"),
 			Result: &openapi.AssertionResults{
 				AllPassed: boolp(true),
 			},
@@ -40,7 +41,7 @@ func TestJSON(t *testing.T) {
 	formatters.SetOutput(formatters.JSON)
 	actual := formatter.Format(in)
 
-	expected := `{"test":{"id":"9876543","name":"Testcase 1"},"testRun":{"id":"123456","result":{"allPassed":true},"state":"FINISHED"},"testRunWebUrl":"http://localhost:8080/test/9876543/run/123456"}`
+	expected := `{"test":{"id":"9876543","name":"Testcase 1"},"testRun":{"id":"123456", "shortId": "ShortID","result":{"allPassed":true},"state":"FINISHED"},"testRunWebUrl":"http://localhost:8080/api/r/ShortID"}`
 
 	assert.JSONEq(t, expected, actual)
 	formatters.SetOutput(formatters.DefaultOutput)
@@ -53,8 +54,9 @@ func TestSuccessfulTestRunOutput(t *testing.T) {
 			Name: strp("Testcase 1"),
 		},
 		Run: openapi.TestRun{
-			Id:    strp("123456"),
-			State: strp("FINISHED"),
+			Id:      strp("123456"),
+			ShortId: strp("ShortID"),
+			State:   strp("FINISHED"),
 			Result: &openapi.AssertionResults{
 				AllPassed: boolp(true),
 			},
@@ -66,7 +68,7 @@ func TestSuccessfulTestRunOutput(t *testing.T) {
 	}, false)
 	output := formatter.Format(in)
 
-	assert.Equal(t, "✔ Testcase 1 (http://localhost:8080/test/9876543/run/123456)\n", output)
+	assert.Equal(t, "✔ Testcase 1 (http://localhost:8080/api/r/ShortID)\n", output)
 }
 
 func TestFailingTestOutput(t *testing.T) {
@@ -76,7 +78,8 @@ func TestFailingTestOutput(t *testing.T) {
 			Name: strp("Testcase 2"),
 		},
 		Run: openapi.TestRun{
-			Id: strp("123456"),
+			Id:      strp("123456"),
+			ShortId: strp("shortID"),
 			Result: &openapi.AssertionResults{
 				AllPassed: boolp(false),
 				Results: []openapi.AssertionResultsResults{
@@ -152,14 +155,14 @@ func TestFailingTestOutput(t *testing.T) {
 		Endpoint: "localhost:8080",
 	}, false)
 	output := formatter.Format(in)
-	expectedOutput := `✘ Testcase 2 (http://localhost:8080/test/9876543/run/123456)
+	expectedOutput := `✘ Testcase 2 (http://localhost:8080/api/r/shortID)
 	✔ span[name = "my span"]
 		✔ #123456
 			✔ tracetest.span.duration <= 200ms (157ms)
 	✘ span[name = "my other span"]
 		✘ #456789
 			✔ tracetest.span.duration <= 200ms (68ms)
-			✘ http.status = 200 (404) (http://localhost:8080/test/9876543/run/123456?selectedAssertion=1&spanId=456789)
+			✘ http.status = 200 (404) (http://localhost:8080/api/r/shortID?selectedAssertion=1&spanId=456789)
 `
 	assert.Equal(t, expectedOutput, output)
 }
