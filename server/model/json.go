@@ -116,6 +116,7 @@ func (a *Assertion) UnmarshalJSON(data []byte) error {
 
 type encodedRun struct {
 	ID                        string
+	ShortID                   string
 	TraceID                   string
 	SpanID                    string
 	State                     string
@@ -136,6 +137,7 @@ type encodedRun struct {
 func (r Run) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&encodedRun{
 		ID:                        r.ID.String(),
+		ShortID:                   r.ShortID,
 		TraceID:                   r.TraceID.String(),
 		SpanID:                    r.SpanID.String(),
 		State:                     string(r.State),
@@ -183,6 +185,7 @@ func (r *Run) UnmarshalJSON(data []byte) error {
 	}
 
 	r.ID = id
+	r.ShortID = aux.ShortID
 	r.TraceID = tid
 	r.SpanID = sid
 	r.State = RunState(aux.State)

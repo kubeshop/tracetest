@@ -61,6 +61,7 @@ type (
 
 	Run struct {
 		ID                        uuid.UUID
+		ShortID                   string
 		TestID                    uuid.UUID
 		TestVersion               int
 		TraceID                   trace.TraceID

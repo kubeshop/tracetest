@@ -5,11 +5,13 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/teris-io/shortid"
 	"go.opentelemetry.io/otel/trace"
 )
 
 type Generator interface {
 	UUID() uuid.UUID
+	Short() string
 	TraceID() trace.TraceID
 	SpanID() trace.SpanID
 }
@@ -26,6 +28,10 @@ type randGenerator struct {
 
 func (g randGenerator) UUID() uuid.UUID {
 	return uuid.New()
+}
+
+func (g randGenerator) Short() string {
+	return shortid.MustGenerate()
 }
 
 func (g randGenerator) TraceID() trace.TraceID {

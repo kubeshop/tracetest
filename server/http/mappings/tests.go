@@ -218,8 +218,10 @@ func (m OpenAPI) Run(in *model.Run) openapi.TestRun {
 	if in == nil {
 		return openapi.TestRun{}
 	}
+
 	return openapi.TestRun{
 		Id:                        in.ID.String(),
+		ShortId:                   in.ShortID,
 		TraceId:                   in.TraceID.String(),
 		SpanId:                    in.SpanID.String(),
 		State:                     string(in.State),
@@ -307,6 +309,7 @@ func (m Model) Run(in openapi.TestRun) *model.Run {
 	sid, _ := trace.SpanIDFromHex(in.SpanId)
 	return &model.Run{
 		ID:                        id,
+		ShortID:                   in.ShortId,
 		TraceID:                   tid,
 		SpanID:                    sid,
 		State:                     model.RunState(in.State),
