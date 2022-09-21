@@ -18,6 +18,7 @@ import (
 // TestRun struct for TestRun
 type TestRun struct {
 	Id      *string `json:"id,omitempty"`
+	ShortId *string `json:"shortId,omitempty"`
 	TraceId *string `json:"traceId,omitempty"`
 	SpanId  *string `json:"spanId,omitempty"`
 	// Test version used when running this test run
@@ -87,6 +88,38 @@ func (o *TestRun) HasId() bool {
 // SetId gets a reference to the given string and assigns it to the Id field.
 func (o *TestRun) SetId(v string) {
 	o.Id = &v
+}
+
+// GetShortId returns the ShortId field value if set, zero value otherwise.
+func (o *TestRun) GetShortId() string {
+	if o == nil || o.ShortId == nil {
+		var ret string
+		return ret
+	}
+	return *o.ShortId
+}
+
+// GetShortIdOk returns a tuple with the ShortId field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *TestRun) GetShortIdOk() (*string, bool) {
+	if o == nil || o.ShortId == nil {
+		return nil, false
+	}
+	return o.ShortId, true
+}
+
+// HasShortId returns a boolean if a field has been set.
+func (o *TestRun) HasShortId() bool {
+	if o != nil && o.ShortId != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetShortId gets a reference to the given string and assigns it to the ShortId field.
+func (o *TestRun) SetShortId(v string) {
+	o.ShortId = &v
 }
 
 // GetTraceId returns the TraceId field value if set, zero value otherwise.
@@ -605,6 +638,9 @@ func (o TestRun) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.Id != nil {
 		toSerialize["id"] = o.Id
+	}
+	if o.ShortId != nil {
+		toSerialize["shortId"] = o.ShortId
 	}
 	if o.TraceId != nil {
 		toSerialize["traceId"] = o.TraceId

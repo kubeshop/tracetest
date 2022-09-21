@@ -1882,6 +1882,98 @@ func (a *ApiApiService) RerunTestRunExecute(r ApiRerunTestRunRequest) (*TestRun,
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
+type ApiRunShortUrlRequest struct {
+	ctx        context.Context
+	ApiService *ApiApiService
+	runShortId string
+}
+
+func (r ApiRunShortUrlRequest) Execute() (*http.Response, error) {
+	return r.ApiService.RunShortUrlExecute(r)
+}
+
+/*
+RunShortUrl run short url redirecter
+
+run short url redirecter
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param runShortId shortId for run
+	@return ApiRunShortUrlRequest
+*/
+func (a *ApiApiService) RunShortUrl(ctx context.Context, runShortId string) ApiRunShortUrlRequest {
+	return ApiRunShortUrlRequest{
+		ApiService: a,
+		ctx:        ctx,
+		runShortId: runShortId,
+	}
+}
+
+// Execute executes the request
+func (a *ApiApiService) RunShortUrlExecute(r ApiRunShortUrlRequest) (*http.Response, error) {
+	var (
+		localVarHTTPMethod = http.MethodGet
+		localVarPostBody   interface{}
+		formFiles          []formFile
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.RunShortUrl")
+	if err != nil {
+		return nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/r/{runShortId}"
+	localVarPath = strings.Replace(localVarPath, "{"+"runShortId"+"}", url.PathEscape(parameterToString(r.runShortId, "")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarHTTPResponse, newErr
+	}
+
+	return localVarHTTPResponse, nil
+}
+
 type ApiRunTestRequest struct {
 	ctx                context.Context
 	ApiService         *ApiApiService
