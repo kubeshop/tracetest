@@ -4,6 +4,7 @@ on:
   check_run:
     types:
       - rerequested
+      - requested_action
 jobs:
   wait-for-green:
     runs-on: ubuntu-latest
