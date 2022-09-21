@@ -1,6 +1,9 @@
 name: Merge Gate
 on:
   pull_request: {}
+  check_run:
+    types:
+      - rerequested
 jobs:
   wait-for-green:
     runs-on: ubuntu-latest
