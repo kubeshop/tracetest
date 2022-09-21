@@ -19,7 +19,7 @@ const RequestDetailsForm = ({form, isEditing = false}: IProps) => {
       <RequestDetailsUrlInput />
       <RequestDetailsAuthInput form={form} />
       <RequestDetailsHeadersInput />
-      <BodyField body={Form.useWatch('body', form)} isEditing={isEditing} />
+      <BodyField setBody={body => form.setFieldsValue({body})} body={Form.useWatch('body', form)} />
     </S.InputContainer>
   );
 };
