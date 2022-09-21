@@ -21,7 +21,7 @@ extraParams=()
 
 if [ -n "$EXPOSE_HOST" ]; then
   extraParams=("${extraParams[@]}" --set ingress.enabled=true )
-  extraParams=("${extraParams[@]}" --set 'ingress.hosts[0].host=$EXPOSE_HOST,ingress.hosts[0].paths[0].path=/,ingress.hosts[0].paths[0].pathType=Prefix' )
+  extraParams=("${extraParams[@]}" --set 'ingress.hosts[0].host='$EXPOSE_HOST',ingress.hosts[0].paths[0].path=/,ingress.hosts[0].paths[0].pathType=Prefix' )
 fi
 
 if [ -n "$CERT_NAME" ]; then
