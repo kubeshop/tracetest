@@ -1,10 +1,13 @@
 import {autocompletion} from '@codemirror/autocomplete';
+import {syntaxTree} from '@codemirror/language';
 import {useMemo} from 'react';
-import {Attributes} from '../../constants/SpanAttribute.constants';
-import {tracetest} from '../../utils/grammar';
+
+import {Attributes} from 'constants/SpanAttribute.constants';
+import {tracetest} from 'utils/grammar';
 
 function isNumber(text?: string) {
-  return text?.toString().match(/^\d*(\.\d+)?$/);
+  const matches = text?.toString().match(/^\d*(\.\d+)?$/);
+  return Boolean(matches?.[0]);
 }
 
 export function useExpectedInputLanguage() {
@@ -13,24 +16,29 @@ export function useExpectedInputLanguage() {
       autocompletion({
         override: [
           context => {
-            const message = context.matchBefore(/\w*/);
-            const attributeOptions = Object.values(Attributes).map(s => ({label: s, value: s, apply: `${s} `}));
-            const durationOtions = [
-              {label: `${message?.text.toString()}ms`, value: `${message?.text.toString()}ms`},
-              {label: `${message?.text.toString()}s`, value: `${message?.text.toString()}s`},
+            const {state, pos} = context;
+            const word = context.matchBefore(/\w*/);
+
+            const tree = syntaxTree(state);
+            const nodeBefore = tree.resolveInner(pos, -1);
+            const parentNode = nodeBefore?.parent ?? {from: 0, to: 0};
+            const identifierText = state.doc.sliceString(parentNode.from, parentNode.to);
+            const isN = isNumber(identifierText);
+
+            const attributeOptions = Object.values(Attributes).map(s => ({label: s, apply: `${s} `}));
+            const durationOptions = [{label: `${word?.text.toString()}ms`}, {label: `${word?.text.toString()}s`}];
+            const operatorOptions = [
+              {label: '+', apply: '+ '},
+              {label: '-', apply: '- '},
             ];
-            const isN = isNumber(message?.text);
-            if (message?.from === 0) {
-              return {from: 0, options: isN ? durationOtions : attributeOptions};
+
+            if (word?.from === 0) {
+              return {from: 0, options: isN ? durationOptions : attributeOptions};
             }
+
             return {
-              from: context.pos - 1,
-              options: isN
-                ? durationOtions
-                : [
-                    {label: '+', value: '-', apply: '- '},
-                    {label: '-', value: '+', apply: '+ '},
-                  ],
+              from: word?.from ?? 0,
+              options: isN ? durationOptions : operatorOptions,
             };
           },
         ],
