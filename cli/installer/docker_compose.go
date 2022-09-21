@@ -327,8 +327,6 @@ func fixOtelCollectorContainer(config configuration, project *types.Project) err
 	}
 
 	ocs.Volumes[0].Source = path.Join(config.String("output.dir"), otelCollectorConfigFilename)
-	je := config.String("tracetest.backend.endpoint.collector")
-	ocs.Environment["JAEGER_ENDPOINT"] = &je
 
 	return nil
 }
