@@ -69,6 +69,11 @@ func (c *customController) RunShortUrl(w http.ResponseWriter, r *http.Request) {
 		panic(fmt.Errorf("expected result.Body to be string, got %v", result.Body))
 	}
 
+	qs := r.URL.Query().Encode()
+	if qs != "" {
+		redirect += "?" + qs
+	}
+
 	w.Header().Set("Location", redirect)
 	w.WriteHeader(http.StatusPermanentRedirect)
 }
