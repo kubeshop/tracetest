@@ -154,7 +154,7 @@ func getTracetestConfigFileContents(psql string, ui UI, config configuration) []
 		PostgresConnString: psql,
 		PoolingConfig: serverConfig.PoolingConfig{
 			MaxWaitTimeForTrace: "2m",
-			RetryDelay:          "1s",
+			RetryDelay:          "3s",
 		},
 		GA: serverConfig.GoogleAnalytics{
 			Enabled: config.Bool("tracetest.analytics"),
