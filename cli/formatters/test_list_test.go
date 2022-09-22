@@ -34,8 +34,8 @@ func TestListOutput(t *testing.T) {
 				},
 			},
 			expected: "" + // vs code trims the last whitespace on save. this awful method avoids that\
-				" ID       NAME       URL                               \n" +
-				"-------- ---------- -----------------------------------\n" +
+				" ID       NAME       URL                                \n" +
+				"-------- ---------- ------------------------------------\n" +
 				" 123456   Test One   http://localhost:11633/test/123456 \n" +
 				" 456789   Test Two   http://localhost:11633/test/456789 \n",
 		},
