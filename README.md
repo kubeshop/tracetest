@@ -34,7 +34,7 @@
 
 # Tracetest
 
-Tracetest is a OpenTelemetry based tool that helps you develop and test your distributed applications. It assists you in the development process by giving you an easy tool to trigger your code and see the trace as you add OTel instrumentation. It also empowers you to create trace-based tests based on the data contained in your OpenTelemetry trace. You can verify against both the triggering transactions response AND any of the information contained deep in a span in your trace. This can include:
+Tracetest is a OpenTelemetry based tool that helps you develop and test your distributed applications. It assists you in the development process by enabling you to trigger your code and see the trace as you add OTel instrumentation. It also empowers you to create trace-based tests based on the data contained in your OpenTelemetry trace. You can verify against both the triggering transactions response AND any of the information contained deep in a span in your trace. This can include:
 
 - verify the quality of your OpenTelemetry instrumentation and enforce standards.
 - Testing events that occur on 'the other side' of an async message queue, even though the original async call has returned earlier.
