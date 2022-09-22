@@ -3,8 +3,6 @@ services:
   cache:
     image: redis:6
     restart: unless-stopped
-    ports:
-      - 6379:6379
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 1s
@@ -14,9 +12,6 @@ services:
   queue:
     image: rabbitmq:3.9
     restart: unless-stopped
-    ports:
-      - 5672:5672
-      - 15672:15672
     healthcheck:
       test: rabbitmq-diagnostics -q check_running
       interval: 1s
