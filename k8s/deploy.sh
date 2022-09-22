@@ -39,6 +39,7 @@ helm upgrade --install $NAME kubeshop/tracetest \
   --namespace $NAME --create-namespace \
   --set image.tag=$TAG \
   --set image.pullPolicy=Always \
+  --set service.port 11633 \
   ${extraParams[@]}
 
 kubectl --namespace $NAME create configmap $NAME --from-file=$CONFIG_FILE -o yaml --dry-run=client \
