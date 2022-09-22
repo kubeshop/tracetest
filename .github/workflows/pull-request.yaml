@@ -225,12 +225,7 @@ jobs:
             --namespace tracetest-pr-${{ github.event.pull_request.number }} \
             svc/tracetest-pr-${{ github.event.pull_request.number }} 3000:11633 &
 
-          checkPort() {
-              PORT=$1
-              timeout 30s bash -c 'until nc -z -w 1 localhost '$PORT' > /dev/null 2>&1; do echo "port '$PORT' not available, retry"; sleep 1; done; echo "port '$PORT' ready"'
-          }
-
-          checkPort "3000"
+          ./scripts/wait-for-port.sh 3000
 
       - name: Cache dependencies
         id: cache-nodemodules
@@ -292,13 +287,8 @@ jobs:
             --namespace tracetest-pr-${{ github.event.pull_request.number }} \
             svc/tracetest-pr-${{ github.event.pull_request.number }} 11634:11633 &
 
-          checkPort() {
-              PORT=$1
-              timeout 30s bash -c 'until nc -z -w 1 localhost '$PORT' > /dev/null 2>&1; do echo "port '$PORT' not available, retry"; sleep 1; done; echo "port '$PORT' ready"'
-          }
-
-          checkPort "11633"
-          checkPort "11634"
+          ./scripts/wait-for-port.sh 11633
+          ./scripts/wait-for-port.sh 11634
 
 
       - name: Run integration tests
