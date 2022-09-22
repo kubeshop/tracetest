@@ -6,8 +6,6 @@ services:
     volumes:
       - ./local-config/opensearch/opensearch-analytics.yaml:/usr/share/data-prepper/pipelines.yaml
       - ./local-config/opensearch/opensearch-data-prepper-config.yaml:/usr/share/data-prepper/data-prepper-config.yaml
-    ports:
-      - "21890:21890"
     depends_on:
       - "opensearch"
 
@@ -26,16 +24,9 @@ services:
       nofile:
         soft: 65536 # maximum number of open files for the OpenSearch user, set to at least 65536 on modern systems
         hard: 65536
-    ports:
-      - 9200:9200
-      - 9600:9600 # required for Performance Analyzer
 
   dashboards:
     image: opensearchproject/opensearch-dashboards:latest
-    ports:
-      - 5601:5601
-    expose:
-      - "5601"
     environment:
       OPENSEARCH_HOSTS: '["http://opensearch:9200"]'
       OPENSEARCH_USERNAME: admin

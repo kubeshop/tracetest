@@ -20,8 +20,6 @@ services:
         environment:
             POSTGRES_PASSWORD: postgres
             POSTGRES_USER: postgres
-        ports:
-            - 5432:5432
         healthcheck:
             test: pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
             interval: 1s
@@ -30,10 +28,6 @@ services:
 
     otel-collector:
         image: otel/opentelemetry-collector-contrib:0.59.0
-        ports:
-            - "55679:55679"
-            - "4317:4317"
-            - "8888:8888"
         command:
             - "--config"
             - "/otel-local-config.yaml"
