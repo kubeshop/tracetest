@@ -1,6 +1,7 @@
 import {DoubleLeftOutlined, DoubleRightOutlined} from '@ant-design/icons';
 import {Button} from 'antd';
-import React, {ReactNode, useCallback, useState} from 'react';
+import {noop} from 'lodash';
+import React, {createContext, ReactNode, useCallback, useContext, useMemo, useState} from 'react';
 import {HandlerProps, ReflexContainer, ReflexElement, ReflexSplitter} from 'react-reflex';
 
 import * as S from './Drawer.styled';
@@ -17,6 +18,16 @@ interface IProps {
   leftPanel: ReactNode;
   rightPanel: ReactNode;
 }
+
+interface DrawerContext {
+  openDrawer: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void;
+}
+
+export const Context = createContext<DrawerContext>({
+  openDrawer: noop,
+});
+
+export const useDrawer = () => useContext(Context);
 
 const Drawer = ({leftPanel, rightPanel}: IProps) => {
   const [sizeLeftPanel, setSizeLeftPanel] = useState(LEFT_PANEL_SIZES.CLOSE);
@@ -66,7 +77,21 @@ const Drawer = ({leftPanel, rightPanel}: IProps) => {
           </S.ButtonContainer>
         </ReflexSplitter>
 
-        <ReflexElement minSize={RIGHT_PANEL_MIN_SIZE}>{rightPanel}</ReflexElement>
+        <ReflexElement minSize={RIGHT_PANEL_MIN_SIZE}>
+          <Context.Provider
+            value={useMemo(
+              () => ({
+                openDrawer: event => {
+                  event.stopPropagation();
+                  if (!isOpen) toggleLeftPanel(lastSizeLeftPanel);
+                },
+              }),
+              [isOpen, toggleLeftPanel, lastSizeLeftPanel]
+            )}
+          >
+            {rightPanel}
+          </Context.Provider>
+        </ReflexElement>
       </ReflexContainer>
     </>
   );
