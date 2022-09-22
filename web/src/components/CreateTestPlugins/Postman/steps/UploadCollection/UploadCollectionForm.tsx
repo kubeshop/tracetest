@@ -33,7 +33,7 @@ const UploadCollectionForm = ({form}: IProps) => {
           <RequestDetailsUrlInput />
         </Col>
         <Col span={12}>
-          <BodyField />
+          <BodyField body={Form.useWatch('body', form)} setBody={body => form.setFieldsValue({body})} />
         </Col>
       </Row>
       <Row gutter={12}>

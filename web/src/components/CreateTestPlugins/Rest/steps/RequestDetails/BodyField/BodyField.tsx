@@ -1,24 +1,38 @@
 import CodeMirror from '@uiw/react-codemirror';
 import {Form, Radio} from 'antd';
+import {useState} from 'react';
 import {BodyFieldContainer} from './BodyFieldContainer';
 import {SingleLabel} from './SingleLabel';
 import {useBodyMode} from './useBodyMode';
 import {useLanguageExtensionsMemo} from './useLanguageExtensionsMemo';
 
 interface IProps {
-  isEditing?: boolean;
   body?: string;
+  setBody: (body?: string) => void;
 }
 
-export const BodyField = ({isEditing = false, body}: IProps): React.ReactElement => {
-  const [bodyMode, setBodyMode] = useBodyMode(isEditing, body);
+export const BodyField = ({body, setBody}: IProps): React.ReactElement => {
+  const [bodyMode, setBodyMode] = useBodyMode(body);
+  const [buffer, setBuffer] = useState<undefined | string>(undefined);
   const extensions = useLanguageExtensionsMemo(bodyMode);
   const hasNoBody = bodyMode === 'none';
   return (
     <>
       <span>
-        <SingleLabel label="Request body">{null}</SingleLabel>
-        <Radio.Group value={bodyMode} onChange={e => setBodyMode(e.target.value)}>
+        <SingleLabel label="Request body">{buffer}</SingleLabel>
+        <Radio.Group
+          value={bodyMode}
+          onChange={e => {
+            if (e.target.value === 'none') {
+              setBuffer(body);
+              setBody(undefined);
+            } else if (buffer) {
+              setBody(buffer);
+              setBuffer(undefined);
+            }
+            setBodyMode(e.target.value);
+          }}
+        >
           <Radio value="none" data-cy="bodyMode-none">
             None
           </Radio>
