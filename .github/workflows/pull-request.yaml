@@ -11,7 +11,7 @@ on:
       - .github/workflows/pull-request.yaml
       - api/**
       - cli/**
-      - examples/
+      - examples/**
       - server/**
       - tracetesting/**
       - web/**
