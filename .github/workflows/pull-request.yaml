@@ -223,7 +223,7 @@ jobs:
         run: |
           kubectl port-forward \
             --namespace tracetest-pr-${{ github.event.pull_request.number }} \
-            svc/tracetest-pr-${{ github.event.pull_request.number }} 3000:8080 &
+            svc/tracetest-pr-${{ github.event.pull_request.number }} 3000:11633 &
 
           checkPort() {
               PORT=$1
