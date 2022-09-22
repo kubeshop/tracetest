@@ -6,9 +6,9 @@ services:
       context: .
       dockerfile: testrunner.Dockerfile
     environment:
-      - TARGET_URL=http://tracetest:8080
-      - TRACETEST_MAIN_ENDPOINT=tracetest:8080
-      - TRACETEST_TARGET_ENDPOINT=tracetest:8080
+      - TARGET_URL=http://tracetest:11633
+      - TRACETEST_MAIN_ENDPOINT=tracetest:11633
+      - TRACETEST_TARGET_ENDPOINT=tracetest:11633
       - DEMO_APP_URL=http://demo-api:8081
       - DEMO_APP_GRPC_URL=demo-rpc:8082
     depends_on:
@@ -20,7 +20,7 @@ services:
         condition: service_healthy
   cypress:
     image: cypress/browsers:node16.14.2-slim-chrome100-ff99-edge
-    entrypoint: [ "/bin/sh", "-c" , "npm ci && npx cypress run --config baseUrl=http://tracetest:8080" ]
+    entrypoint: [ "/bin/sh", "-c" , "npm ci && npx cypress run --config baseUrl=http://tracetest:11633" ]
     working_dir: /e2e
     command:
       - npm ci

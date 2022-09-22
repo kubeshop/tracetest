@@ -24,8 +24,8 @@ func (p testingVarProvider) GetVariable(name string) (string, error) {
 func TestInjectorWithStruct(t *testing.T) {
 	provider := testingVarProvider{
 		variables: map[string]string{
-			"TRACETEST_URL":       "http://localhost:8080",
-			"POKEMON_API_URL":     "http://pokemon.api:8080",
+			"TRACETEST_URL":       "http://localhost:11633",
+			"POKEMON_API_URL":     "http://pokemon.api:11633",
 			"EXPECTED_POKEMON_ID": "521",
 		},
 	}
@@ -52,17 +52,17 @@ func TestInjectorWithStruct(t *testing.T) {
 	}
 
 	expectedDefinition := definition.Test{
-		Name: "Test http://localhost:8080",
+		Name: "Test http://localhost:11633",
 		Trigger: definition.TestTrigger{
 			Type: "http",
 			HTTPRequest: definition.HttpRequest{
-				URL:    "http://pokemon.api:8080",
+				URL:    "http://pokemon.api:11633",
 				Method: "GET",
 			},
 		},
 		Specs: []definition.TestSpec{
 			{
-				Selector: "http.url = \"http://pokemon.api:8080\"",
+				Selector: "http.url = \"http://pokemon.api:11633\"",
 				Assertions: []string{
 					"tracetest.span.duration < 100",
 					`tracetest.response.body contains '"id": 521'`,

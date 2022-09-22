@@ -4,7 +4,7 @@ Tracetest allow you to subscribe to updates of resources using websockets. There
 
 ## Endpoint
  
-You can open a websocket connection by sending a request the path `/ws`. Example: `ws://localhost:8080/ws`.
+You can open a websocket connection by sending a request the path `/ws`. Example: `ws://localhost:11633/ws`.
 
 ## Messages
 

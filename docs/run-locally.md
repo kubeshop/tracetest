@@ -54,10 +54,10 @@ helm install tracetest kubeshop/tracetest \
 You can now expose the Tracetest service using a `LoadBalancer`, `NodePort` or even a simple `port-forward`:
 
 ```
-kubectl port-forward svc/tracetest 8080:8080
+kubectl port-forward svc/tracetest 11633:11633
 ```
 
-Now Tracetest is available at [http://localhost:8080]
+Now Tracetest is available at [http://localhost:11633]
 
 ## **Run a Development Build**
 

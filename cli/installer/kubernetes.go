@@ -61,10 +61,10 @@ To access tracetest:
 
 Then, use your browser to navigate to:
 
-  http://localhost:8080
+  http://localhost:11633
 
 Happy TraceTesting =)
-`, kubectlNamespaceCmd(conf, "port-forward svc/tracetest 8080")))
+`, kubectlNamespaceCmd(conf, "port-forward svc/tracetest 11633")))
 
 }
 
