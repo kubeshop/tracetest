@@ -14,7 +14,7 @@
   <a href="https://kubeshop.github.io/tracetest">Documentation</a>&nbsp;|&nbsp;
   <a href="https://twitter.com/tracetest_io">Twitter</a>&nbsp;|&nbsp;
   <a href="https://discord.gg/eBvEQRVyKX">Discord</a>&nbsp;|&nbsp;
-  <a href="https://kubeshop.io/blog-projects/tracetest">Blog</a>
+  <a href="https://tracetest.io/blog">Blog</a>
 </p>
 
 <p align="center">
@@ -49,7 +49,7 @@ Tracetest is a trace-based testing tool that leverages the data captured by your
 - Specifying which spans to check in assertions via the [advanced selector language](https://kubeshop.github.io/tracetest/advanced-selectors/).
 - Defining checks against the attributes in these spans, including properties, return status, or timing.
 - Tests can be created via graphical UI or via [YAML-based test definition file](https://kubeshop.github.io/tracetest/test-definition-file/).
-- Use the test definition file to [enable Gitops flows](https://kubeshop.io/blog/integrating-tracetest-with-github-actions-in-a-ci-pipeline).
+- Use the test definition file to [enable Gitops flows](https://tracetest.io/blog/integrating-tracetest-with-github-actions-in-a-ci-pipeline).
 - [Tracetest CLI](https://kubeshop.github.io/tracetest/command-line-tool/) allows importing & exporting tests, running tests, and more.
 - Tests are [versioned](https://kubeshop.github.io/tracetest/versioning/) as the definition of the test is altered.
 - Supports [numerous backend trace datastores](https://kubeshop.github.io/tracetest/architecture/), including Jeager and Grafana Tempo. Tell us which others you want!
@@ -136,7 +136,7 @@ Is available at [https://kubeshop.github.io/tracetest](https://kubeshop.github.i
 
 # Tests
 
-We strive to produce quality code and improve Tracetest rapidly and safely. Therefore, we have a full suite of both frontend and backend tests. We are using Cypress to test our frontend code and (surprise, surprise) Tracetest for our backend code. You can see the [test runs here](https://github.com/kubeshop/tracetest/actions/workflows/pull-request.yaml), and a blog post describing our [testing pipelines here](https://kubeshop.io/blog/integrating-tracetest-with-github-actions-in-a-ci-pipeline).
+We strive to produce quality code and improve Tracetest rapidly and safely. Therefore, we have a full suite of both frontend and backend tests. We are using Cypress to test our frontend code and (surprise, surprise) Tracetest for our backend code. You can see the [test runs here](https://github.com/kubeshop/tracetest/actions/workflows/pull-request.yaml), and a blog post describing our [testing pipelines here](https://tracetest.io/blog/integrating-tracetest-with-github-actions-in-a-ci-pipeline).
 
 # License
 
