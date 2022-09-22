@@ -4,7 +4,7 @@
 </p>
 
 <p align="center">
-  End-to-end tests powered by OpenTelemetry. For QA, Dev, & Ops.
+  Tracetest - the best way to develop and test your distributed system with OpenTelemetry. For QA, Dev, & Ops.
 </p>
 
 <p align="center">
@@ -34,7 +34,7 @@
 
 # Tracetest
 
-Tracetest is a trace-based testing tool that leverages the data captured by your existing Open Telemetry distributed traces to produce easy to create, yet super powerful integration tests. You can verify activity deep inside your system by asserting on data and flow information contained in the OpenTelemetry traces and span attributes. This can include:
+Tracetest is a OpenTelemetry based tool that helps you develop and test your distributed applications. It assists you in the development process by giving you an easy tool to trigger your code and see the trace as you add OTel instrumentation. It also empowers you to create trace-based tests based on the data contained in your OpenTelemetry trace. You can verify against both the triggering transactions response AND any of the information contained deep in a span in your trace. This can include:
 
 - verify the quality of your OpenTelemetry instrumentation and enforce standards.
 - Testing events that occur on 'the other side' of an async message queue, even though the original async call has returned earlier.
@@ -45,6 +45,7 @@ Tracetest is a trace-based testing tool that leverages the data captured by your
 # Features
 
 - Supporting multiple ways of creating a test, including HTTP, GRPC and Postman Collections.
+- Visualize the changes you are making to your trace as you develop, enabling Observability-Driven Development.
 - [Adding assertions](https://kubeshop.github.io/tracetest/adding-assertions/) based on return data from trigger call and/or data contained in the spans in your distributed trace.
 - Specifying which spans to check in assertions via the [advanced selector language](https://kubeshop.github.io/tracetest/advanced-selectors/).
 - Defining checks against the attributes in these spans, including properties, return status, or timing.
