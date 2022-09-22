@@ -45,7 +45,7 @@ const Visualization = ({runState, spans, type}: IProps) => {
     (event, {id}: Node) => {
       TraceDiagramAnalyticsService.onClickSpan(id);
       dispatch(selectSpan({spanId: id}));
-      openDrawer(event);
+      openDrawer();
     },
     [dispatch, openDrawer]
   );

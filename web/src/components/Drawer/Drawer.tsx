@@ -20,7 +20,7 @@ interface IProps {
 }
 
 interface DrawerContext {
-  openDrawer: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void;
+  openDrawer: () => void;
 }
 
 export const Context = createContext<DrawerContext>({
@@ -81,8 +81,7 @@ const Drawer = ({leftPanel, rightPanel}: IProps) => {
           <Context.Provider
             value={useMemo(
               () => ({
-                openDrawer: event => {
-                  event.stopPropagation();
+                openDrawer: () => {
                   if (!isOpen) toggleLeftPanel(lastSizeLeftPanel);
                 },
               }),
