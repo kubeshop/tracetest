@@ -54,8 +54,9 @@ const Visualization = ({runState, spans, type}: IProps) => {
     (spanId: string) => {
       TraceAnalyticsService.onTimelineSpanClick(spanId);
       dispatch(selectSpan({spanId}));
+      openDrawer();
     },
-    [dispatch]
+    [dispatch, openDrawer]
   );
 
   const onNavigateToSpan = useCallback(
