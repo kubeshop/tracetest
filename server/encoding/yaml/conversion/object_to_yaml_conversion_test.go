@@ -17,7 +17,7 @@ func TestObjectToYamlConversion(t *testing.T) {
 		Trigger: definition.TestTrigger{
 			Type: "http",
 			HTTPRequest: definition.HTTPRequest{
-				URL:    "http://localhost:8080",
+				URL:    "http://localhost:11633",
 				Method: "GET",
 			},
 		},
@@ -44,7 +44,7 @@ name: This is a value
 trigger:
   type: http
   httpRequest:
-    url: http://localhost:8080
+    url: http://localhost:11633
     method: GET
 specs:
 - selector: span[name="My span"]

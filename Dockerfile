@@ -30,5 +30,5 @@ WORKDIR /app
 COPY --from=build-go /go/src/tracetest-server ./
 COPY --from=build-go /go/src/migrations/ ./migrations/
 COPY --from=build-js /app/build /app/html
-EXPOSE 8080/tcp
+EXPOSE 11633/tcp
 ENTRYPOINT ["/app/tracetest-server"]

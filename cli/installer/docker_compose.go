@@ -124,7 +124,7 @@ To start tracetest:
 
 Then, use your browser to navigate to:
 
-  http://localhost:8080
+  http://localhost:11633
 
 Happy TraceTesting =)
 `, dockerCmd))

@@ -27,9 +27,9 @@ poolingConfig:
 
 # Server configuration
 server:
-  # Enables you to add a prefix to the server path. So, instead of running tracetest on http://localhost:8080, it would run on http://localhost:8080/tracetest instead.
+  # Enables you to add a prefix to the server path. So, instead of running tracetest on http://localhost:11633, it would run on http://localhost:11633/tracetest instead.
   pathPrefix: /tracetest
-  httpPort: 8080
+  httpPort: 11633
 
 # Google analytics configuration
 googleAnalytics:

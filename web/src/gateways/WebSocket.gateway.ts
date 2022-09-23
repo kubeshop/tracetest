@@ -164,7 +164,7 @@ function getWebSocketURL() {
   const {serverPathPrefix = '/'} = window.ENV || {};
   const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
   const hostname = window.location.hostname;
-  const port = process.env.NODE_ENV === 'development' ? '8080' : window.location.port;
+  const port = process.env.NODE_ENV === 'development' ? '11633' : window.location.port;
   const pathname = serverPathPrefix === '/' ? '/ws' : `${serverPathPrefix}/ws`;
   return `${protocol}://${hostname}:${port}${pathname}`;
 }

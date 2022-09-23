@@ -154,10 +154,10 @@ jobs:
         run: |
           cd cli
           go build -o ./tracetest main.go
-          echo "http://localhost:8080" | ./tracetest configure -g
+          echo "http://localhost:11633" | ./tracetest configure -g
       - name: Run example test
         run: |
-          timeout 60 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:8080)" != "200" ]]; do sleep 5; done' || false
+          timeout 60 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:11633)" != "200" ]]; do sleep 5; done' || false
           ./cli/tracetest test run -d examples/${{ matrix.example_dir }}/tests/list-tests.yaml --wait-for-result
 
   deploy:
@@ -223,14 +223,9 @@ jobs:
         run: |
           kubectl port-forward \
             --namespace tracetest-pr-${{ github.event.pull_request.number }} \
-            svc/tracetest-pr-${{ github.event.pull_request.number }} 3000:8080 &
+            svc/tracetest-pr-${{ github.event.pull_request.number }} 3000:11633 &
 
-          checkPort() {
-              PORT=$1
-              timeout 30s bash -c 'until nc -z -w 1 localhost '$PORT' > /dev/null 2>&1; do echo "port '$PORT' not available, retry"; sleep 1; done; echo "port '$PORT' ready"'
-          }
-
-          checkPort "3000"
+          ./scripts/wait-for-port.sh 3000
 
       - name: Cache dependencies
         id: cache-nodemodules
@@ -287,25 +282,20 @@ jobs:
         run: |
           kubectl port-forward \
             --namespace tracetest-integration \
-            svc/tracetest-integration 8080 &
+            svc/tracetest-integration 11633:8080 &
           kubectl port-forward \
             --namespace tracetest-pr-${{ github.event.pull_request.number }} \
-            svc/tracetest-pr-${{ github.event.pull_request.number }} 8081:8080 &
+            svc/tracetest-pr-${{ github.event.pull_request.number }} 11634:11633 &
 
-          checkPort() {
-              PORT=$1
-              timeout 30s bash -c 'until nc -z -w 1 localhost '$PORT' > /dev/null 2>&1; do echo "port '$PORT' not available, retry"; sleep 1; done; echo "port '$PORT' ready"'
-          }
-
-          checkPort "8080"
-          checkPort "8081"
+          ./scripts/wait-for-port.sh 11633
+          ./scripts/wait-for-port.sh 11634
 
 
       - name: Run integration tests
         run: |
           cd tracetesting
           TRACETEST_CLI="../cli/tracetest" \
-          TARGET_URL="http://tracetest-pr-${{ github.event.pull_request.number }}.tracetest-pr-${{ github.event.pull_request.number }}:8080" \
+          TARGET_URL="http://tracetest-pr-${{ github.event.pull_request.number }}.tracetest-pr-${{ github.event.pull_request.number }}:11633" \
           ./run.bash
 
   cleanup:
