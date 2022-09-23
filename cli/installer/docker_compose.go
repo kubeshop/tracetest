@@ -21,6 +21,7 @@ import (
 var dockerCompose = installer{
 	name: "docker-compose",
 	preChecks: []preChecker{
+		chocolateyForWindowsChecker,
 		dockerChecker,
 		dockerReadyChecker,
 		dockerComposeChecker,
@@ -404,13 +405,16 @@ func dockerChecker(ui UI) {
 	}
 
 	ui.Warning("I didn't find docker in your system")
-	option := ui.Select("What do you want to do?", []option{
-		{"Install Docker Engine", installDockerEngine},
-		{"Install Docker Desktop", installDockerDesktop},
-		{"Fix manually", exitOption(
-			"Check the docker install docs on https://docs.docker.com/get-docker/",
-		)},
-	}, 0)
+	options := []option{}
+	if !isWindows() {
+		options = append(options, option{"Install Docker Engine", installDockerEngine})
+	}
+
+	options = append(options, option{"Install Docker Desktop", installDockerDesktop})
+	options = append(options, option{"Fix manually", exitOption(
+		"Check the docker install docs on https://docs.docker.com/get-docker/",
+	)})
+	option := ui.Select("What do you want to do?", options, 0)
 
 	option.fn(ui)
 
@@ -617,9 +621,9 @@ func installDockerEngine(ui UI) {
 			sudo systemctl start docker
 			` + post,
 		homebrew:           "brew install docker",
+		windows:            "",
 		macIntelChipManual: "", // empty means not supported
 		macAppleChipManual: "", // empty means not supported
-		windows:            "", // empty means not supported
 		other:              "", // empty means not supported
 	}).exec(ui)
 }
@@ -694,8 +698,12 @@ func installDockerDesktop(ui UI) {
 			sudo hdiutil detach /Volumes/Docker
 			rm -f Docker.dmg
 		`,
-		windows: "", // empty means not supported
-		other:   "", // empty means not supported
+		windows: `
+			choco install docker-desktop -y
+			refreshenv
+			"Docker Desktop.exe"
+		`,
+		other: "", // empty means not supported
 	}).exec(ui)
 }
 
