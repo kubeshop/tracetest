@@ -275,7 +275,6 @@ func (c *controller) UpdateTest(ctx context.Context, testID string, in openapi.T
 	updated := c.mappers.In.Test(in)
 	updated.Version = test.Version
 	updated.ID = test.ID
-	updated.ReferenceRun = nil
 
 	_, err = c.testDB.UpdateTest(ctx, updated)
 	if err != nil {

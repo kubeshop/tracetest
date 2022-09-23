@@ -10,7 +10,6 @@ import (
 type TestRepository interface {
 	CreateTest(context.Context, Test) (Test, error)
 	UpdateTest(context.Context, Test) (Test, error)
-	UpdateTestVersion(context.Context, Test) error
 	DeleteTest(context.Context, Test) error
 	IDExists(context.Context, id.ID) (bool, error)
 	GetLatestTestVersion(context.Context, id.ID) (Test, error)

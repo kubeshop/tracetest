@@ -18,7 +18,6 @@ type (
 		Description      string
 		Version          int
 		ServiceUnderTest Trigger
-		ReferenceRun     *Run
 		Specs            OrderedMap[SpanQuery, []Assertion]
 	}
 
