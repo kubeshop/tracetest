@@ -2,6 +2,7 @@ package executor_test
 
 import (
 	"context"
+	"math/rand"
 	"testing"
 	"time"
 
@@ -52,10 +53,7 @@ func TestPersistentRunner(t *testing.T) {
 		f.run([]model.Test{test1, test2}, 100*time.Millisecond)
 
 		run1 := f.mockDB.runs[test1.ID]
-		require.NotNil(t, run1)
-
 		run2 := f.mockDB.runs[test2.ID]
-		require.NotNil(t, run2)
 
 		assert.Greater(t, run1.ServiceTriggerCompletedAt.UnixNano(), run2.ServiceTriggerCompletedAt.UnixNano(), "test1 did not complete after test2")
 	})
@@ -164,6 +162,7 @@ func (m *mockDB) CreateRun(_ context.Context, test model.Test, run model.Run) (m
 		m.runs = map[id.ID]model.Run{}
 	}
 
+	run.ID = rand.Intn(100)
 	m.runs[test.ID] = run
 
 	return run, args.Error(0)
