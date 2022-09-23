@@ -74,7 +74,7 @@ func (r persistentRunner) Start(workers int) {
 					return
 				case job := <-r.executeQueue:
 					fmt.Printf(
-						"persistentRunner job. ID %s, testID %s, TraceID %s, SpanID %s\n",
+						"persistentRunner job. ID %d, testID %s, TraceID %s, SpanID %s\n",
 						job.run.ID,
 						job.test.ID,
 						job.run.TraceID,

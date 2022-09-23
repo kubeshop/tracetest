@@ -130,7 +130,7 @@ func (tp tracePoller) processJob(job PollingRequest) {
 		return
 	}
 
-	fmt.Printf("completed polling result %s after %d times, number of spans: %d \n", job.run.ID, job.count, len(run.Trace.Flat))
+	fmt.Printf("completed polling result %d after %d times, number of spans: %d \n", job.run.ID, job.count, len(run.Trace.Flat))
 
 	tp.handleDBError(tp.updater.Update(job.ctx, run))
 	err = tp.runAssertions(job.ctx, job.test, run)
@@ -193,7 +193,7 @@ func (tp tracePoller) handleTraceDBError(job PollingRequest, err error) {
 
 func (tp tracePoller) requeue(job PollingRequest) {
 	go func() {
-		fmt.Printf("requeuing result %s for %d time\n", job.run.ID, job.count)
+		fmt.Printf("requeuing result %d for %d time\n", job.run.ID, job.count)
 		time.Sleep(tp.retryDelay)
 		tp.enqueueJob(job)
 	}()

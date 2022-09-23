@@ -28,7 +28,7 @@ func NewRun() Run {
 }
 
 func (r Run) ResourceID() string {
-	return fmt.Sprintf("test/%s/run/%s", r.TestID, r.ID)
+	return fmt.Sprintf("test/%s/run/%d", r.TestID, r.ID)
 }
 
 func (r Run) Copy() Run {
