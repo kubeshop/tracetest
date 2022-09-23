@@ -14,6 +14,7 @@ export interface IEnv {
   env: string;
   demoEnabled: string;
   demoEndpoints: string;
+  featuresEnabled: string;
 }
 
 export type Modify<T, R> = Omit<T, keyof R> & R;

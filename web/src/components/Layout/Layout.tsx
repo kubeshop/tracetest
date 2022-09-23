@@ -11,7 +11,7 @@ const Layout: FC = ({children}) => {
   return (
     <FileViewerModalProvider>
       <ConfirmationModalProvider>
-        <Header />
+        <Header hasLogo />
         <S.Content>{children}</S.Content>
       </ConfirmationModalProvider>
     </FileViewerModalProvider>

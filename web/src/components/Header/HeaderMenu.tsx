@@ -4,7 +4,7 @@ import {DOCUMENTATION_URL, GITHUB_URL} from 'constants/Common.constants';
 import {useLocation} from 'react-router-dom';
 import * as S from './Header.styled';
 
-export const HeaderMenu = () => {
+const HeaderMenu = () => {
   const {pathname} = useLocation();
 
   return (
@@ -53,3 +53,5 @@ export const HeaderMenu = () => {
     </Popover>
   );
 };
+
+export default HeaderMenu;

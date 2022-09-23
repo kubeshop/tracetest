@@ -10,6 +10,9 @@ googleAnalytics:
 demo:
   enabled: []
 
+features:
+  enabled: []
+
 telemetry:
   dataStores:
     jaeger:

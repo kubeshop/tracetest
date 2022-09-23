@@ -176,6 +176,11 @@ func (a *App) Start() error {
 		enabledDemo = jsonEscape([0]string{})
 	}
 
+	enabledFeatures := jsonEscape(a.config.Features.Enabled)
+  	if len(a.config.Features.Enabled) == 0 {
+  		enabledFeatures = jsonEscape([0]string{})
+  	}
+
 	router.PathPrefix(a.config.Server.PathPrefix).Handler(
 		spaHandler(
 			a.config.Server.PathPrefix,
@@ -190,6 +195,7 @@ func (a *App) Start() error {
 				"Env":              Env,
 				"DemoEnabled":      enabledDemo,
 				"DemoEndpoints":    jsonEscape(a.config.Demo.Endpoints),
+				"FeaturesEnabled:"  enabledFeatures,
 			},
 		),
 	)

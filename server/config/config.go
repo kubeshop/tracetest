@@ -18,6 +18,7 @@ type (
 		GA                 GoogleAnalytics `yaml:"googleAnalytics,omitempty" mapstructure:"googleAnalytics"`
 		Telemetry          Telemetry       `yaml:",omitempty" mapstructure:"telemetry"`
 		Demo               Demo            `yaml:",omitempty" mapstructure:"demo"`
+		Features           Features         `yaml:",omitempty" mapstructure:"features"`
 	}
 
 	Demo struct {
@@ -33,6 +34,10 @@ type (
 		OtelCart           string `yaml:",omitempty" mapstructure:"otelCart"`
 		OtelCheckout       string `yaml:",omitempty" mapstructure:"otelCheckout"`
 	}
+
+	Features struct {
+  	Enabled   []string      `yaml:",omitempty" mapstructure:"enabled"`
+  }
 
 	GoogleAnalytics struct {
 		Enabled bool `yaml:",omitempty" mapstructure:"enabled"`
