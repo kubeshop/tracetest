@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/google/uuid"
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/assertions/selectors"
 	"github.com/kubeshop/tracetest/server/encoding/yaml/conversion"
 	"github.com/kubeshop/tracetest/server/encoding/yaml/conversion/parser"
 	"github.com/kubeshop/tracetest/server/encoding/yaml/definition"
+	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/traces"
@@ -29,7 +29,7 @@ func (m OpenAPI) TestDefinitionFile(in model.Test) definition.Test {
 
 func (m OpenAPI) Test(in model.Test) openapi.Test {
 	return openapi.Test{
-		Id:               in.ID.String(),
+		Id:               string(in.ID),
 		Name:             in.Name,
 		Description:      in.Description,
 		ServiceUnderTest: m.Trigger(in.ServiceUnderTest),
@@ -220,8 +220,7 @@ func (m OpenAPI) Run(in *model.Run) openapi.TestRun {
 	}
 
 	return openapi.TestRun{
-		Id:                        in.ID.String(),
-		ShortId:                   in.ShortID,
+		Id:                        int32(in.ID),
 		TraceId:                   in.TraceID.String(),
 		SpanId:                    in.SpanID.String(),
 		State:                     string(in.State),
@@ -257,9 +256,8 @@ type Model struct {
 }
 
 func (m Model) Test(in openapi.Test) model.Test {
-	id, _ := uuid.Parse(in.Id)
 	return model.Test{
-		ID:               id,
+		ID:               id.ID(in.Id),
 		Name:             in.Name,
 		Description:      in.Description,
 		ServiceUnderTest: m.Trigger(in.ServiceUnderTest),
@@ -304,12 +302,10 @@ func (m Model) Definition(in openapi.TestSpecs) model.OrderedMap[model.SpanQuery
 }
 
 func (m Model) Run(in openapi.TestRun) *model.Run {
-	id, _ := uuid.Parse(in.Id)
 	tid, _ := trace.TraceIDFromHex(in.TraceId)
 	sid, _ := trace.SpanIDFromHex(in.SpanId)
 	return &model.Run{
-		ID:                        id,
-		ShortID:                   in.ShortId,
+		ID:                        int(in.Id),
 		TraceID:                   tid,
 		SpanID:                    sid,
 		State:                     model.RunState(in.State),

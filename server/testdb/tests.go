@@ -8,19 +8,19 @@ import (
 	"strings"
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 )
 
 var _ model.TestRepository = &postgresDB{}
 
-func (td *postgresDB) IDExists(ctx context.Context, id uuid.UUID) (bool, error) {
+func (td *postgresDB) IDExists(ctx context.Context, id id.ID) (bool, error) {
 	exists := false
 
 	row := td.db.QueryRowContext(
 		ctx,
 		"SELECT COUNT(*) > 0 as exists FROM tests WHERE id = $1",
-		id.String(),
+		id,
 	)
 
 	err := row.Scan(&exists)
@@ -29,10 +29,6 @@ func (td *postgresDB) IDExists(ctx context.Context, id uuid.UUID) (bool, error) 
 }
 
 func (td *postgresDB) CreateTest(ctx context.Context, test model.Test) (model.Test, error) {
-	if !test.HasID() {
-		test.ID = IDGen.UUID()
-	}
-
 	test.CreatedAt = time.Now()
 	test.ReferenceRun = nil
 	test.Version = 1
@@ -135,7 +131,7 @@ func (td *postgresDB) DeleteTest(ctx context.Context, test model.Test) error {
 
 const getTestSQL = `SELECT t.test FROM tests t`
 
-func (td *postgresDB) GetTestVersion(ctx context.Context, id uuid.UUID, version int) (model.Test, error) {
+func (td *postgresDB) GetTestVersion(ctx context.Context, id id.ID, version int) (model.Test, error) {
 	stmt, err := td.db.Prepare(getTestSQL + " WHERE t.id = $1 AND t.version = $2")
 	if err != nil {
 		return model.Test{}, fmt.Errorf("prepare: %w", err)
@@ -150,7 +146,7 @@ func (td *postgresDB) GetTestVersion(ctx context.Context, id uuid.UUID, version 
 	return test, nil
 }
 
-func (td *postgresDB) GetLatestTestVersion(ctx context.Context, id uuid.UUID) (model.Test, error) {
+func (td *postgresDB) GetLatestTestVersion(ctx context.Context, id id.ID) (model.Test, error) {
 	stmt, err := td.db.Prepare(getTestSQL + " WHERE t.id = $1 ORDER BY t.version DESC LIMIT 1")
 	if err != nil {
 		return model.Test{}, fmt.Errorf("prepare: %w", err)

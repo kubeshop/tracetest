@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
+	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/stretchr/testify/assert"
@@ -16,11 +16,10 @@ import (
 )
 
 func TestTestEncoding(t *testing.T) {
-	id := uuid.MustParse("ccf94a15-e33e-4c75-ae94-d0b401c53da1")
 	t1 := time.Date(2022, 06, 07, 13, 03, 24, 100, time.UTC)
 
 	test := model.Test{
-		ID:          id,
+		ID:          id.ID("test1"),
 		CreatedAt:   t1,
 		Name:        "the name",
 		Description: "the description",
@@ -49,7 +48,6 @@ func TestTestEncoding(t *testing.T) {
 }
 
 func TestRunEncoding(t *testing.T) {
-	id := uuid.MustParse("ccf94a15-e33e-4c75-ae94-d0b401c53da1")
 	tid, _ := trace.TraceIDFromHex("83c7f2fb8b556416e12e1d18c05a30c3")
 	sid, _ := trace.SpanIDFromHex("9ed1382a48be2649")
 
@@ -83,7 +81,7 @@ func TestRunEncoding(t *testing.T) {
 		{
 			name: "Errors",
 			run: model.Run{
-				ID:                 id,
+				ID:                 1,
 				TraceID:            tid,
 				SpanID:             sid,
 				State:              model.RunStateFailed,
@@ -109,7 +107,7 @@ func TestRunEncoding(t *testing.T) {
 		{
 			name: "Success",
 			run: model.Run{
-				ID:                        id,
+				ID:                        1,
 				TraceID:                   tid,
 				SpanID:                    sid,
 				State:                     model.RunStateFinished,

@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/traces"
 	"go.opentelemetry.io/otel/trace"
@@ -115,7 +114,7 @@ func (a *Assertion) UnmarshalJSON(data []byte) error {
 }
 
 type encodedRun struct {
-	ID                        string
+	ID                        int
 	ShortID                   string
 	TraceID                   string
 	SpanID                    string
@@ -136,8 +135,7 @@ type encodedRun struct {
 
 func (r Run) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&encodedRun{
-		ID:                        r.ID.String(),
-		ShortID:                   r.ShortID,
+		ID:                        r.ID,
 		TraceID:                   r.TraceID.String(),
 		SpanID:                    r.SpanID.String(),
 		State:                     string(r.State),
@@ -163,11 +161,6 @@ func (r *Run) UnmarshalJSON(data []byte) error {
 		return fmt.Errorf("unmarshal run: %w", err)
 	}
 
-	id, err := uuid.Parse(aux.ID)
-	if err != nil {
-		return fmt.Errorf("unmarshal run: %w", err)
-	}
-
 	tid, err := trace.TraceIDFromHex(aux.TraceID)
 	if err != nil {
 		return fmt.Errorf("unmarshal run: %w", err)
@@ -184,8 +177,7 @@ func (r *Run) UnmarshalJSON(data []byte) error {
 		GRPC: aux.TriggerResult.GRPC,
 	}
 
-	r.ID = id
-	r.ShortID = aux.ShortID
+	r.ID = aux.ID
 	r.TraceID = tid
 	r.SpanID = sid
 	r.State = RunState(aux.State)

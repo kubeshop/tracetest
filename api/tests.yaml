@@ -6,7 +6,6 @@ components:
       properties:
         id:
           type: string
-          format: uuid
           readOnly: true
         name:
           type: string
@@ -66,11 +65,7 @@ components:
       type: object
       properties:
         id:
-          type: string
-          format: uuid
-          readOnly: true
-        shortId:
-          type: string
+          type: integer
           readOnly: true
         traceId:
           type: string

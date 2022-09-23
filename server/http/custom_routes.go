@@ -83,7 +83,7 @@ func (c *customController) GetRunResultJUnit(w http.ResponseWriter, r *http.Requ
 	params := mux.Vars(r)
 	testIdParam := params["testId"]
 
-	runIdParam := params["runId"]
+	runIdParam, err := parseInt32Parameter(params["runId"], true)
 
 	result, err := c.service.GetRunResultJUnit(r.Context(), testIdParam, runIdParam)
 	// If an error occurred, encode the error with the status code

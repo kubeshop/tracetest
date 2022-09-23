@@ -5,7 +5,6 @@ import (
 	"math"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/traces"
 )
@@ -20,8 +19,7 @@ var (
 
 func NewRun() Run {
 	return Run{
-		ID:        IDGen.UUID(),
-		ShortID:   IDGen.Short(),
+		ID:        0,
 		TraceID:   IDGen.TraceID(),
 		SpanID:    IDGen.SpanID(),
 		State:     RunStateCreated,
@@ -34,8 +32,7 @@ func (r Run) ResourceID() string {
 }
 
 func (r Run) Copy() Run {
-	r.ID = uuid.UUID{}
-	r.ShortID = ""
+	r.ID = 0
 	r.Results = nil
 	r.CreatedAt = Now()
 	r.ServiceTriggeredAt = time.Time{}

@@ -4,15 +4,15 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
+	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/traces"
 	"go.opentelemetry.io/otel/trace"
 )
 
 type (
 	Test struct {
-		ID               uuid.UUID
+		ID               id.ID
 		CreatedAt        time.Time
 		Name             string
 		Description      string
@@ -60,24 +60,30 @@ type (
 	RunMetadata map[string]string
 
 	Run struct {
-		ID                        uuid.UUID
-		ShortID                   string
-		TestID                    uuid.UUID
-		TestVersion               int
-		TraceID                   trace.TraceID
-		SpanID                    trace.SpanID
-		State                     RunState
-		LastError                 error
+		ID          int
+		TestID      id.ID
+		TestVersion int
+
+		// Timestamps
 		CreatedAt                 time.Time
 		ServiceTriggeredAt        time.Time
 		ServiceTriggerCompletedAt time.Time
 		ObtainedTraceAt           time.Time
 		CompletedAt               time.Time
-		Trigger                   Trigger
-		TriggerResult             TriggerResult
-		Trace                     *traces.Trace
-		Results                   *RunResults
-		Metadata                  RunMetadata
+
+		// trigger params
+		State   RunState
+		TraceID trace.TraceID
+		SpanID  trace.SpanID
+		Trigger Trigger
+
+		// result info
+		TriggerResult TriggerResult
+		Results       *RunResults
+		Trace         *traces.Trace
+		LastError     error
+
+		Metadata RunMetadata
 	}
 
 	RunResults struct {
@@ -98,10 +104,8 @@ type (
 	}
 )
 
-const emptyUUID = "00000000-0000-0000-0000-000000000000"
-
 func (t Test) HasID() bool {
-	return t.ID.String() != emptyUUID
+	return t.ID != ""
 }
 
 const (
