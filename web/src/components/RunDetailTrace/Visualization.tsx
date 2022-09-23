@@ -1,10 +1,9 @@
-import {useCallback, useEffect} from 'react';
-import {Node, NodeChange} from 'react-flow-renderer';
-
 import SkeletonDiagram from 'components/SkeletonDiagram';
 import DAG from 'components/Visualization/components/DAG';
 import Timeline from 'components/Visualization/components/Timeline';
 import {TestState} from 'constants/TestRun.constants';
+import {useCallback, useEffect} from 'react';
+import {Node, NodeChange} from 'react-flow-renderer';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import {changeNodes, initNodes, selectSpan} from 'redux/slices/Trace.slice';
 import TraceSelectors from 'selectors/Trace.selectors';
@@ -12,6 +11,7 @@ import TraceAnalyticsService from 'services/Analytics/TraceAnalytics.service';
 import TraceDiagramAnalyticsService from 'services/Analytics/TraceDiagramAnalytics.service';
 import {TSpan} from 'types/Span.types';
 import {TTestRunState} from 'types/TestRun.types';
+import {useDrawer} from '../Drawer/Drawer';
 import {VisualizationType} from './RunDetailTrace';
 
 interface IProps {
@@ -27,6 +27,7 @@ const Visualization = ({runState, spans, type}: IProps) => {
   const nodes = useAppSelector(TraceSelectors.selectNodes);
   const selectedSpan = useAppSelector(TraceSelectors.selectSelectedSpan);
   const isMatchedMode = Boolean(matchedSpans.length);
+  const {openDrawer} = useDrawer();
 
   useEffect(() => {
     dispatch(initNodes({spans}));
@@ -44,16 +45,18 @@ const Visualization = ({runState, spans, type}: IProps) => {
     (event, {id}: Node) => {
       TraceDiagramAnalyticsService.onClickSpan(id);
       dispatch(selectSpan({spanId: id}));
+      openDrawer();
     },
-    [dispatch]
+    [dispatch, openDrawer]
   );
 
   const onNodeClickTimeline = useCallback(
     (spanId: string) => {
       TraceAnalyticsService.onTimelineSpanClick(spanId);
       dispatch(selectSpan({spanId}));
+      openDrawer();
     },
-    [dispatch]
+    [dispatch, openDrawer]
   );
 
   const onNavigateToSpan = useCallback(

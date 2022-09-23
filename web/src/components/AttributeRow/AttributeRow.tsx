@@ -71,7 +71,7 @@ const AttributeRow = ({
         {failedCount > 0 && <AttributeCheck items={assertionsFailed!} type="error" />}
       </S.Header>
 
-      <Dropdown overlay={menu} trigger={['click']}>
+      <Dropdown overlay={menu}>
         <a onClick={e => e.preventDefault()}>
           <MoreOutlined />
         </a>

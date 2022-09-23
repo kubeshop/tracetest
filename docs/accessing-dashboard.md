@@ -7,9 +7,9 @@ Once installed, you can get started by launching the Tracetest Dashboard by foll
 Run:
 
 ```sh
-kubectl port-forward svc/tracetest 8080
+kubectl port-forward svc/tracetest 11633
 ```
 
-Then launch a browser to [http://localhost:8080/](http://localhost:8080/).
+Then launch a browser to [http://localhost:11633/](http://localhost:11633/).
 
 To learn how to create your first test, see [create a test](create-test.md).

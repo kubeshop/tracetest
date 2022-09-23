@@ -4,7 +4,7 @@ description: List all existing tests from tracetest API
 trigger:
   type: http
   httpRequest:
-    url: http://tracetest:8080/api/tests
+    url: http://tracetest:11633/api/tests
     method: GET
     headers:
     - key: Content-Type

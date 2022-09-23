@@ -10,7 +10,7 @@ services:
         source: ./tracetest-config.yaml
         target: /app/config.yaml
     healthcheck:
-      test: ["CMD", "wget", "--spider", "localhost:8080"]
+      test: ["CMD", "wget", "--spider", "localhost:11633"]
       interval: 1s
       timeout: 3s
       retries: 60

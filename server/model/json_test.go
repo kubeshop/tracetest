@@ -28,7 +28,7 @@ func TestTestEncoding(t *testing.T) {
 		ServiceUnderTest: model.Trigger{
 			Type: model.TriggerTypeHTTP,
 			HTTP: &model.HTTPRequest{
-				URL:    "http://localhost:8080/list",
+				URL:    "http://localhost:11633/list",
 				Method: model.HTTPMethodGET,
 			},
 		},
