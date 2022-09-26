@@ -17,8 +17,7 @@ demo:
     otelCart: http://otel-cartservice.otel-demo:7070
     otelCheckout: http://otel-checkoutservice.otel-demo:5050
 
-features:
-  enabled: []
+experimentalFeatures: []
 
 telemetry:
   dataStores:

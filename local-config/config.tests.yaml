@@ -13,8 +13,7 @@ demo:
     pokeshopHttp: http://demo-api:8081
     pokeshopGrpc: demo-rpc:8082
 
-features:
-  enabled: []
+experimentalFeatures: []
 
 telemetry:
   dataStores:

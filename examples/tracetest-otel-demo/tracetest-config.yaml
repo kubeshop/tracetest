@@ -13,8 +13,7 @@ demo:
     otelCart: otel-cartservice:7070
     otelCheckout: otel-checkoutservice:5050
 
-features:
-  enabled: []
+experimentalFeatures: []
 
 googleAnalytics:
   enabled: false

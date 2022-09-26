@@ -10,8 +10,7 @@ googleAnalytics:
 demo:
   enabled: []
 
-features:
-  enabled: []
+experimentalFeatures: []
 
 telemetry:
   dataStores:
