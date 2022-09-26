@@ -2,30 +2,13 @@ package installer
 
 import (
 	"os"
-	"os/exec"
 	"runtime"
-
-	"github.com/kubeshop/tracetest/cli/installer/posix"
-	"github.com/kubeshop/tracetest/cli/installer/win"
 )
 
 func exitOption(msg string) func(ui UI) {
 	return func(ui UI) {
 		ui.Exit(msg)
 	}
-}
-
-func commandExists(cmd string) bool {
-	_, err := exec.LookPath(cmd)
-	return err == nil
-}
-
-func commandSuccess(probeCmd string) bool {
-	if isWindows() {
-		return win.CommandSuccess(probeCmd)
-	}
-
-	return posix.CommandSuccess(probeCmd)
 }
 
 type pkgManager int

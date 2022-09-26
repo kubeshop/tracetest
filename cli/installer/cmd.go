@@ -118,3 +118,16 @@ func getCmdOutputClean(cmd string) string {
 
 	return strings.TrimSpace(out)
 }
+
+func commandExists(cmd string) bool {
+	_, err := exec.LookPath(cmd)
+	return err == nil
+}
+
+func commandSuccess(probeCmd string) bool {
+	if isWindows() {
+		return win.CommandSuccess(probeCmd)
+	}
+
+	return posix.CommandSuccess(probeCmd)
+}
