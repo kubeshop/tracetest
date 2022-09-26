@@ -3,10 +3,10 @@ package testdb_test
 import (
 	"context"
 	"testing"
-	"time"
 
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/model/modeltest"
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/stretchr/testify/assert"
@@ -98,18 +98,19 @@ func TestUpdateRun(t *testing.T) {
 	updatedList, err := db.GetTestRuns(context.TODO(), test, 20, 0)
 	require.NoError(t, err)
 
-	// Ignore time fields in this test
-	actual.Trace.RootSpan.StartTime = time.Time{}
-	actual.Trace.RootSpan.EndTime = time.Time{}
+	assert.Len(t, updatedList, 1)
+	modeltest.AssertRunEqual(t, updatedList[0], actual)
+}
 
-	runFromList := updatedList[0]
-	runFromList.Trace.RootSpan.StartTime = time.Time{}
-	runFromList.Trace.RootSpan.EndTime = time.Time{}
+func TestGetRunByTraceID(t *testing.T) {
+	db, clean := getDB()
+	defer clean()
 
-	assert.Equal(t, run.SpanID.String(), actual.SpanID.String())
-	assert.Equal(t, run.State, actual.State)
-	assert.Equal(t, run.Trace, actual.Trace)
-	assert.Equal(t, run.Results, actual.Results)
+	test := createTest(t, db)
+	expected := createRun(t, db, test)
 
-	assert.Equal(t, actual, runFromList)
+	actual, err := db.GetRunByTraceID(context.TODO(), expected.TraceID)
+	require.NoError(t, err)
+
+	modeltest.AssertRunEqual(t, expected, actual)
 }

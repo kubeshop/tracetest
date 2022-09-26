@@ -82,6 +82,8 @@ func (td *postgresDB) CreateRun(ctx context.Context, test model.Test, run model.
 		return model.Run{}, fmt.Errorf("encoding error: %w", err)
 	}
 
+	var id int
+
 	err = stmt.QueryRowContext(
 		ctx,
 		test.ID,
@@ -91,12 +93,12 @@ func (td *postgresDB) CreateRun(ctx context.Context, test model.Test, run model.
 		run.TraceID.String(),
 		run.SpanID.String(),
 		jsonMetadata,
-	).Scan(&run.ID)
+	).Scan(&id)
 	if err != nil {
 		return model.Run{}, fmt.Errorf("sql exec: %w", err)
 	}
 
-	return run, nil
+	return td.GetRun(ctx, id)
 }
 
 const updateRunQuery = `
@@ -284,7 +286,7 @@ func (td *postgresDB) GetRunByTraceID(ctx context.Context, traceID trace.TraceID
 	}
 	defer stmt.Close()
 
-	run, err := readRunRow(stmt.QueryRowContext(ctx, traceID))
+	run, err := readRunRow(stmt.QueryRowContext(ctx, traceID.String()))
 	if err != nil {
 		return model.Run{}, fmt.Errorf("cannot read row: %w", err)
 	}

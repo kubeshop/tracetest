@@ -9,6 +9,7 @@ import (
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/model/modeltest"
 	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -139,54 +140,7 @@ func TestRunEncoding(t *testing.T) {
 			err = json.Unmarshal(encoded, &actual)
 			require.NoError(t, err)
 
-			// assert.Equal doesn't work on time.Time vars (see https://stackoverflow.com/a/69362528)
-			// We could manually compare each field, but if we add a new field to the struct but not the test,
-			// the test would still pass, even if the json encoding is incorrect.
-			// So instead, we can reset all date fields and compare them separately.
-			// If we add a new date field, the `assert.Equal(t, run, actual)` will catch it
-			expectedCreatedAt := cl.run.CreatedAt
-			expectedServiceTriggeredAt := cl.run.ServiceTriggeredAt
-			expectedServiceTriggerCompletedAt := cl.run.ServiceTriggerCompletedAt
-			expectedObtainedTraceAt := cl.run.ObtainedTraceAt
-			expectedCompletedAt := cl.run.CompletedAt
-
-			run.CreatedAt = t1
-			run.ServiceTriggeredAt = t1
-			run.ServiceTriggerCompletedAt = t1
-			run.ObtainedTraceAt = t1
-			run.CompletedAt = t1
-			if run.Trace != nil {
-				run.Trace.RootSpan.StartTime = t1
-				run.Trace.RootSpan.EndTime = t1
-				run.Trace.Flat[sid].StartTime = t1
-				run.Trace.Flat[sid].EndTime = t1
-			}
-
-			actualCreatedAt := actual.CreatedAt
-			actualServiceTriggeredAt := actual.ServiceTriggeredAt
-			actualServiceTriggerCompletedAt := actual.ServiceTriggerCompletedAt
-			actualObtainedTraceAt := actual.ObtainedTraceAt
-			actualCompletedAt := actual.CompletedAt
-
-			actual.CreatedAt = t1
-			actual.ServiceTriggeredAt = t1
-			actual.ServiceTriggerCompletedAt = t1
-			actual.ObtainedTraceAt = t1
-			actual.CompletedAt = t1
-			if actual.Trace != nil {
-				actual.Trace.RootSpan.StartTime = t1
-				actual.Trace.RootSpan.EndTime = t1
-				actual.Trace.Flat[sid].StartTime = t1
-				actual.Trace.Flat[sid].EndTime = t1
-			}
-
-			assert.Equal(t, run, actual)
-
-			assert.WithinDuration(t, expectedCreatedAt, actualCreatedAt, 0)
-			assert.WithinDuration(t, expectedServiceTriggeredAt, actualServiceTriggeredAt, 0)
-			assert.WithinDuration(t, expectedServiceTriggerCompletedAt, actualServiceTriggerCompletedAt, 0)
-			assert.WithinDuration(t, expectedObtainedTraceAt, actualObtainedTraceAt, 0)
-			assert.WithinDuration(t, expectedCompletedAt, actualCompletedAt, 0)
+			modeltest.AssertRunEqual(t, cl.run, actual)
 		})
 	}
 }
