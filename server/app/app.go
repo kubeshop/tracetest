@@ -195,7 +195,7 @@ func (a *App) Start() error {
 				"Env":              Env,
 				"DemoEnabled":      enabledDemo,
 				"DemoEndpoints":    jsonEscape(a.config.Demo.Endpoints),
-				"FeaturesEnabled:"  enabledFeatures,
+				"FeaturesEnabled":  enabledFeatures,
 			},
 		),
 	)
