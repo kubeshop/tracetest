@@ -44,7 +44,7 @@ func TestJSON(t *testing.T) {
 	formatters.SetOutput(formatters.JSON)
 	actual := formatter.Format(in)
 
-	expected := `{"test":{"id":"9876543","name":"Testcase 1"},"testRun":{"id":"1", "result":{"allPassed":true},"state":"FINISHED"},"testRunWebUrl":"http://localhost:11633/test/9876543/1"}`
+	expected := `{"test":{"id":"9876543","name":"Testcase 1"},"testRun":{"id":1, "result":{"allPassed":true},"state":"FINISHED"},"testRunWebUrl":"http://localhost:11633/test/9876543/run/1"}`
 
 	assert.JSONEq(t, expected, actual)
 	formatters.SetOutput(formatters.DefaultOutput)
@@ -70,7 +70,7 @@ func TestSuccessfulTestRunOutput(t *testing.T) {
 	}, false)
 	output := formatter.Format(in)
 
-	assert.Equal(t, "✔ Testcase 1 (http://localhost:11633/test/9876543/1)\n", output)
+	assert.Equal(t, "✔ Testcase 1 (http://localhost:11633/test/9876543/run/1)\n", output)
 }
 
 func TestFailingTestOutput(t *testing.T) {
@@ -156,14 +156,14 @@ func TestFailingTestOutput(t *testing.T) {
 		Endpoint: "localhost:11633",
 	}, false)
 	output := formatter.Format(in)
-	expectedOutput := `✘ Testcase 2 (http://localhost:11633/api/r/shortID)
+	expectedOutput := `✘ Testcase 2 (http://localhost:11633/test/9876543/run/1)
 	✔ span[name = "my span"]
 		✔ #123456
 			✔ tracetest.span.duration <= 200ms (157ms)
 	✘ span[name = "my other span"]
 		✘ #456789
 			✔ tracetest.span.duration <= 200ms (68ms)
-			✘ http.status = 200 (404) (http://localhost:11633/api/r/shortID?selectedAssertion=1&spanId=456789)
+			✘ http.status = 200 (404) (http://localhost:11633/test/9876543/run/1?selectedAssertion=1&spanId=456789)
 `
 	assert.Equal(t, expectedOutput, output)
 }
