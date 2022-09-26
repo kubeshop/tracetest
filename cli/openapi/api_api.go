@@ -339,7 +339,7 @@ type ApiDeleteTestRunRequest struct {
 	ctx        context.Context
 	ApiService *ApiApiService
 	testId     string
-	runId      string
+	runId      int32
 }
 
 func (r ApiDeleteTestRunRequest) Execute() (*http.Response, error) {
@@ -356,7 +356,7 @@ delete a test run
 	@param runId
 	@return ApiDeleteTestRunRequest
 */
-func (a *ApiApiService) DeleteTestRun(ctx context.Context, testId string, runId string) ApiDeleteTestRunRequest {
+func (a *ApiApiService) DeleteTestRun(ctx context.Context, testId string, runId int32) ApiDeleteTestRunRequest {
 	return ApiDeleteTestRunRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -435,7 +435,7 @@ type ApiDryRunAssertionRequest struct {
 	ctx        context.Context
 	ApiService *ApiApiService
 	testId     string
-	runId      string
+	runId      int32
 	testSpecs  *TestSpecs
 }
 
@@ -458,7 +458,7 @@ use this method to test a definition against an actual trace without creating a 
 	@param runId
 	@return ApiDryRunAssertionRequest
 */
-func (a *ApiApiService) DryRunAssertion(ctx context.Context, testId string, runId string) ApiDryRunAssertionRequest {
+func (a *ApiApiService) DryRunAssertion(ctx context.Context, testId string, runId int32) ApiDryRunAssertionRequest {
 	return ApiDryRunAssertionRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -551,7 +551,7 @@ type ApiExportTestRunRequest struct {
 	ctx        context.Context
 	ApiService *ApiApiService
 	testId     string
-	runId      string
+	runId      int32
 }
 
 func (r ApiExportTestRunRequest) Execute() (*ExportedTestInformation, *http.Response, error) {
@@ -568,7 +568,7 @@ export test and test run information for debugging
 	@param runId
 	@return ApiExportTestRunRequest
 */
-func (a *ApiApiService) ExportTestRun(ctx context.Context, testId string, runId string) ApiExportTestRunRequest {
+func (a *ApiApiService) ExportTestRun(ctx context.Context, testId string, runId int32) ApiExportTestRunRequest {
 	return ApiExportTestRunRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -659,7 +659,7 @@ type ApiGetRunResultJUnitRequest struct {
 	ctx        context.Context
 	ApiService *ApiApiService
 	testId     string
-	runId      string
+	runId      int32
 }
 
 func (r ApiGetRunResultJUnitRequest) Execute() (string, *http.Response, error) {
@@ -676,7 +676,7 @@ get test run results in JUnit xml format
 	@param runId
 	@return ApiGetRunResultJUnitRequest
 */
-func (a *ApiApiService) GetRunResultJUnit(ctx context.Context, testId string, runId string) ApiGetRunResultJUnitRequest {
+func (a *ApiApiService) GetRunResultJUnit(ctx context.Context, testId string, runId int32) ApiGetRunResultJUnitRequest {
 	return ApiGetRunResultJUnitRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -871,7 +871,7 @@ type ApiGetTestResultSelectedSpansRequest struct {
 	ctx        context.Context
 	ApiService *ApiApiService
 	testId     string
-	runId      string
+	runId      int32
 	query      *string
 }
 
@@ -894,7 +894,7 @@ get the spans ids that would be selected by a specific selector query
 	@param runId
 	@return ApiGetTestResultSelectedSpansRequest
 */
-func (a *ApiApiService) GetTestResultSelectedSpans(ctx context.Context, testId string, runId string) ApiGetTestResultSelectedSpansRequest {
+func (a *ApiApiService) GetTestResultSelectedSpans(ctx context.Context, testId string, runId int32) ApiGetTestResultSelectedSpansRequest {
 	return ApiGetTestResultSelectedSpansRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -988,7 +988,7 @@ type ApiGetTestRunRequest struct {
 	ctx        context.Context
 	ApiService *ApiApiService
 	testId     string
-	runId      string
+	runId      int32
 }
 
 func (r ApiGetTestRunRequest) Execute() (*TestRun, *http.Response, error) {
@@ -1005,7 +1005,7 @@ get a particular test Run
 	@param runId
 	@return ApiGetTestRunRequest
 */
-func (a *ApiApiService) GetTestRun(ctx context.Context, testId string, runId string) ApiGetTestRunRequest {
+func (a *ApiApiService) GetTestRun(ctx context.Context, testId string, runId int32) ApiGetTestRunRequest {
 	return ApiGetTestRunRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -1778,7 +1778,7 @@ type ApiRerunTestRunRequest struct {
 	ctx        context.Context
 	ApiService *ApiApiService
 	testId     string
-	runId      string
+	runId      int32
 }
 
 func (r ApiRerunTestRunRequest) Execute() (*TestRun, *http.Response, error) {
@@ -1795,7 +1795,7 @@ rerun a test run
 	@param runId
 	@return ApiRerunTestRunRequest
 */
-func (a *ApiApiService) RerunTestRun(ctx context.Context, testId string, runId string) ApiRerunTestRunRequest {
+func (a *ApiApiService) RerunTestRun(ctx context.Context, testId string, runId int32) ApiRerunTestRunRequest {
 	return ApiRerunTestRunRequest{
 		ApiService: a,
 		ctx:        ctx,

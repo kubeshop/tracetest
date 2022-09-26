@@ -13,6 +13,10 @@ func strp(in string) *string {
 	return &in
 }
 
+func intp(in int32) *int32 {
+	return &in
+}
+
 func boolp(in bool) *bool {
 	return &in
 }
@@ -24,9 +28,8 @@ func TestJSON(t *testing.T) {
 			Name: strp("Testcase 1"),
 		},
 		Run: openapi.TestRun{
-			Id:      strp("123456"),
-			ShortId: strp("ShortID"),
-			State:   strp("FINISHED"),
+			Id:    intp(1),
+			State: strp("FINISHED"),
 			Result: &openapi.AssertionResults{
 				AllPassed: boolp(true),
 			},
@@ -41,7 +44,7 @@ func TestJSON(t *testing.T) {
 	formatters.SetOutput(formatters.JSON)
 	actual := formatter.Format(in)
 
-	expected := `{"test":{"id":"9876543","name":"Testcase 1"},"testRun":{"id":"123456", "shortId": "ShortID","result":{"allPassed":true},"state":"FINISHED"},"testRunWebUrl":"http://localhost:11633/api/r/ShortID"}`
+	expected := `{"test":{"id":"9876543","name":"Testcase 1"},"testRun":{"id":"1", "result":{"allPassed":true},"state":"FINISHED"},"testRunWebUrl":"http://localhost:11633/test/9876543/1"}`
 
 	assert.JSONEq(t, expected, actual)
 	formatters.SetOutput(formatters.DefaultOutput)
@@ -54,9 +57,8 @@ func TestSuccessfulTestRunOutput(t *testing.T) {
 			Name: strp("Testcase 1"),
 		},
 		Run: openapi.TestRun{
-			Id:      strp("123456"),
-			ShortId: strp("ShortID"),
-			State:   strp("FINISHED"),
+			Id:    intp(1),
+			State: strp("FINISHED"),
 			Result: &openapi.AssertionResults{
 				AllPassed: boolp(true),
 			},
@@ -68,7 +70,7 @@ func TestSuccessfulTestRunOutput(t *testing.T) {
 	}, false)
 	output := formatter.Format(in)
 
-	assert.Equal(t, "✔ Testcase 1 (http://localhost:11633/api/r/ShortID)\n", output)
+	assert.Equal(t, "✔ Testcase 1 (http://localhost:11633/test/9876543/1)\n", output)
 }
 
 func TestFailingTestOutput(t *testing.T) {
@@ -78,8 +80,7 @@ func TestFailingTestOutput(t *testing.T) {
 			Name: strp("Testcase 2"),
 		},
 		Run: openapi.TestRun{
-			Id:      strp("123456"),
-			ShortId: strp("shortID"),
+			Id: intp(1),
 			Result: &openapi.AssertionResults{
 				AllPassed: boolp(false),
 				Results: []openapi.AssertionResultsResults{

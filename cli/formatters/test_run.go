@@ -45,7 +45,7 @@ func (f testRun) Format(output TestRunOutput) string {
 }
 
 func (f testRun) json(output TestRunOutput) string {
-	output.RunWebURL = f.getRunLink(output.Run)
+	output.RunWebURL = f.getRunLink(output.Test.GetId(), output.Run.GetId())
 	bytes, err := json.Marshal(output)
 	if err != nil {
 		panic(fmt.Errorf("could not marshal output json: %w", err))
@@ -68,7 +68,7 @@ func (f testRun) pretty(output TestRunOutput) string {
 }
 
 func (f testRun) formatSuccessfulTest(test openapi.Test, run openapi.TestRun) string {
-	link := f.getRunLink(run)
+	link := f.getRunLink(test.GetId(), run.GetId())
 	message := fmt.Sprintf("%s %s (%s)\n", PASSED_TEST_ICON, *test.Name, link)
 	return f.getColoredText(true, message)
 }
@@ -89,7 +89,7 @@ type assertionResult struct {
 func (f testRun) formatFailedTest(test openapi.Test, run openapi.TestRun) string {
 	var buffer bytes.Buffer
 
-	link := f.getRunLink(run)
+	link := f.getRunLink(test.GetId(), run.GetId())
 	message := fmt.Sprintf("%s %s (%s)\n", FAILED_TEST_ICON, *test.Name, link)
 	message = f.getColoredText(false, message)
 	buffer.WriteString(message)
@@ -146,7 +146,7 @@ func (f testRun) formatFailedTest(test openapi.Test, run openapi.TestRun) string
 		message = f.getColoredText(allPassed, message)
 		buffer.WriteString(message)
 
-		baseLink := f.getRunLink(run)
+		baseLink := f.getRunLink(test.GetId(), run.GetId())
 
 		if metaResult, exists := results["meta"]; exists {
 			// meta assertions should be placed at the top
@@ -212,8 +212,8 @@ func (f testRun) getColoredText(passed bool, text string) string {
 	return pterm.FgRed.Sprintf(text)
 }
 
-func (f testRun) getRunLink(run openapi.TestRun) string {
-	return fmt.Sprintf("%s://%s/api/r/%s", f.config.Scheme, f.config.Endpoint, run.GetShortId())
+func (f testRun) getRunLink(testID string, runID int32) string {
+	return fmt.Sprintf("%s://%s/test/%s/run/%d", f.config.Scheme, f.config.Endpoint, testID, runID)
 }
 
 func (f testRun) getDeepLink(baseLink string, index int, spanID string) string {

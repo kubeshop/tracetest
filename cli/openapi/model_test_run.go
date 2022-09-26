@@ -17,8 +17,7 @@ import (
 
 // TestRun struct for TestRun
 type TestRun struct {
-	Id      *string `json:"id,omitempty"`
-	ShortId *string `json:"shortId,omitempty"`
+	Id      *int32  `json:"id,omitempty"`
 	TraceId *string `json:"traceId,omitempty"`
 	SpanId  *string `json:"spanId,omitempty"`
 	// Test version used when running this test run
@@ -34,7 +33,6 @@ type TestRun struct {
 	ServiceTriggerCompletedAt *time.Time         `json:"serviceTriggerCompletedAt,omitempty"`
 	ObtainedTraceAt           *time.Time         `json:"obtainedTraceAt,omitempty"`
 	CompletedAt               *time.Time         `json:"completedAt,omitempty"`
-	Trigger                   *Trigger           `json:"trigger,omitempty"`
 	TriggerResult             *TriggerResult     `json:"triggerResult,omitempty"`
 	Trace                     *Trace             `json:"trace,omitempty"`
 	Result                    *AssertionResults  `json:"result,omitempty"`
@@ -59,9 +57,9 @@ func NewTestRunWithDefaults() *TestRun {
 }
 
 // GetId returns the Id field value if set, zero value otherwise.
-func (o *TestRun) GetId() string {
+func (o *TestRun) GetId() int32 {
 	if o == nil || o.Id == nil {
-		var ret string
+		var ret int32
 		return ret
 	}
 	return *o.Id
@@ -69,7 +67,7 @@ func (o *TestRun) GetId() string {
 
 // GetIdOk returns a tuple with the Id field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *TestRun) GetIdOk() (*string, bool) {
+func (o *TestRun) GetIdOk() (*int32, bool) {
 	if o == nil || o.Id == nil {
 		return nil, false
 	}
@@ -85,41 +83,9 @@ func (o *TestRun) HasId() bool {
 	return false
 }
 
-// SetId gets a reference to the given string and assigns it to the Id field.
-func (o *TestRun) SetId(v string) {
+// SetId gets a reference to the given int32 and assigns it to the Id field.
+func (o *TestRun) SetId(v int32) {
 	o.Id = &v
-}
-
-// GetShortId returns the ShortId field value if set, zero value otherwise.
-func (o *TestRun) GetShortId() string {
-	if o == nil || o.ShortId == nil {
-		var ret string
-		return ret
-	}
-	return *o.ShortId
-}
-
-// GetShortIdOk returns a tuple with the ShortId field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *TestRun) GetShortIdOk() (*string, bool) {
-	if o == nil || o.ShortId == nil {
-		return nil, false
-	}
-	return o.ShortId, true
-}
-
-// HasShortId returns a boolean if a field has been set.
-func (o *TestRun) HasShortId() bool {
-	if o != nil && o.ShortId != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetShortId gets a reference to the given string and assigns it to the ShortId field.
-func (o *TestRun) SetShortId(v string) {
-	o.ShortId = &v
 }
 
 // GetTraceId returns the TraceId field value if set, zero value otherwise.
@@ -474,38 +440,6 @@ func (o *TestRun) SetCompletedAt(v time.Time) {
 	o.CompletedAt = &v
 }
 
-// GetTrigger returns the Trigger field value if set, zero value otherwise.
-func (o *TestRun) GetTrigger() Trigger {
-	if o == nil || o.Trigger == nil {
-		var ret Trigger
-		return ret
-	}
-	return *o.Trigger
-}
-
-// GetTriggerOk returns a tuple with the Trigger field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *TestRun) GetTriggerOk() (*Trigger, bool) {
-	if o == nil || o.Trigger == nil {
-		return nil, false
-	}
-	return o.Trigger, true
-}
-
-// HasTrigger returns a boolean if a field has been set.
-func (o *TestRun) HasTrigger() bool {
-	if o != nil && o.Trigger != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetTrigger gets a reference to the given Trigger and assigns it to the Trigger field.
-func (o *TestRun) SetTrigger(v Trigger) {
-	o.Trigger = &v
-}
-
 // GetTriggerResult returns the TriggerResult field value if set, zero value otherwise.
 func (o *TestRun) GetTriggerResult() TriggerResult {
 	if o == nil || o.TriggerResult == nil {
@@ -639,9 +573,6 @@ func (o TestRun) MarshalJSON() ([]byte, error) {
 	if o.Id != nil {
 		toSerialize["id"] = o.Id
 	}
-	if o.ShortId != nil {
-		toSerialize["shortId"] = o.ShortId
-	}
 	if o.TraceId != nil {
 		toSerialize["traceId"] = o.TraceId
 	}
@@ -674,9 +605,6 @@ func (o TestRun) MarshalJSON() ([]byte, error) {
 	}
 	if o.CompletedAt != nil {
 		toSerialize["completedAt"] = o.CompletedAt
-	}
-	if o.Trigger != nil {
-		toSerialize["trigger"] = o.Trigger
 	}
 	if o.TriggerResult != nil {
 		toSerialize["triggerResult"] = o.TriggerResult
