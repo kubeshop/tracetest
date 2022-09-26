@@ -11,7 +11,7 @@ trigger:
       value: application/json
     body: |
       {
-        "id": "w2ON-RVVg",
+        "id": "${EXAMPLE_TEST_ID}",
         "name": "Pokemon - List - Get a Pokemon",
         "serviceUnderTest": {
           "triggerType": "http",
@@ -35,7 +35,7 @@ specs:
   assertions:
     - tracetest.selected_spans.count = 1
     - tracetest.response.status = 200
-    - tracetest.response.body contains '"id":"w2ON-RVVg"'
+    - tracetest.response.body contains '"id":"${EXAMPLE_TEST_ID}"'
 - selector: span[name="POST /api/tests" tracetest.span.type="http"]
   assertions:
   - tracetest.selected_spans.count = 1

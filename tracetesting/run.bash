@@ -1,5 +1,7 @@
 #/bin/bash
 
+set -e
+
 export TRACETEST_CLI_TARGET=${TRACETEST_CLI_TARGET:-"tracetest"}
 if ! command -v "$TRACETEST_CLI_TARGET" &> /dev/null; then
   echo "\$TRACETEST_CLI_TARGET not set to executable. set to $TRACETEST_CLI_TARGET";

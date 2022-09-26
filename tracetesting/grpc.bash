@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 source ./funcs.bash
 
 EXIT_STATUS=0
