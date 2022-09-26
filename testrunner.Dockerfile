@@ -11,7 +11,7 @@ RUN cd cli && go mod download
 COPY ./cli ./cli
 RUN ls -la && cd ./cli && make build
 
-FROM alpine
+FROM golang:1.18-alpine
 
 RUN apk --update add bash jq curl
 

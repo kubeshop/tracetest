@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 STOP=yes
 RESTART=yes
 

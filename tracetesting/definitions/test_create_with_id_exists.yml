@@ -11,7 +11,7 @@ trigger:
       value: application/json
     body: |
       {
-        "id": "383d3dce-7b60-4a61-bdea-87f47263af5d",
+        "id": "w2ON-RVVg",
         "name": "Pokemon - List - Get a Pokemon",
         "serviceUnderTest": {
           "triggerType": "http",

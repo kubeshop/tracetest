@@ -93,11 +93,11 @@ func (f testRun) formatFailedTest(test openapi.Test, run openapi.TestRun) string
 	message := fmt.Sprintf("%s %s (%s)\n", FAILED_TEST_ICON, *test.Name, link)
 	message = f.getColoredText(false, message)
 	buffer.WriteString(message)
-	for _, specResult := range run.Result.Results {
+	for i, specResult := range run.Result.Results {
 		results := make(map[string]spanAssertionResult, 0)
 		allPassed := true
 
-		for i, result := range specResult.Results {
+		for _, result := range specResult.Results {
 			assertionQuery := fmt.Sprintf(
 				"%s %s %s",
 				*result.Assertion.Attribute,
@@ -213,13 +213,13 @@ func (f testRun) getColoredText(passed bool, text string) string {
 }
 
 func (f testRun) getRunLink(testID string, runID int32) string {
-	return fmt.Sprintf("%s://%s/test/%s/run/%d", f.config.Scheme, f.config.Endpoint, testID, runID)
+	return fmt.Sprintf("%s://%s/test/%s/run/%d/test", f.config.Scheme, f.config.Endpoint, testID, runID)
 }
 
 func (f testRun) getDeepLink(baseLink string, index int, spanID string) string {
 	link := fmt.Sprintf("%s?selectedAssertion=%d", baseLink, index)
 	if spanID != "meta" {
-		link = fmt.Sprintf("%s&spanId=%s", link, spanID)
+		link = fmt.Sprintf("%s&selectedSpan=%s", link, spanID)
 	}
 
 	return link
