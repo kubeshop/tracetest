@@ -125,7 +125,6 @@ type encodedRun struct {
 	ServiceTriggerCompletedAt time.Time
 	ObtainedTraceAt           time.Time
 	CompletedAt               time.Time
-	Trigger                   Trigger
 	TriggerResult             TriggerResult
 	Trace                     *traces.Trace
 	Results                   *RunResults
@@ -146,7 +145,6 @@ func (r Run) MarshalJSON() ([]byte, error) {
 		ObtainedTraceAt:           r.ObtainedTraceAt,
 		CompletedAt:               r.CompletedAt,
 		TestVersion:               r.TestVersion,
-		Trigger:                   r.Trigger,
 		Trace:                     r.Trace,
 		Results:                   r.Results,
 		TriggerResult:             r.TriggerResult,
@@ -188,7 +186,6 @@ func (r *Run) UnmarshalJSON(data []byte) error {
 	r.ObtainedTraceAt = aux.ObtainedTraceAt
 	r.CompletedAt = aux.CompletedAt
 	r.TestVersion = aux.TestVersion
-	r.Trigger = aux.Trigger
 	r.TriggerResult = triggerResult
 
 	r.Trace = aux.Trace

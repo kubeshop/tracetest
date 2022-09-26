@@ -74,7 +74,6 @@ type (
 		State   RunState
 		TraceID trace.TraceID
 		SpanID  trace.SpanID
-		Trigger Trigger
 
 		// result info
 		TriggerResult TriggerResult

@@ -89,19 +89,8 @@ func TestRunEncoding(t *testing.T) {
 				CreatedAt:          t1,
 				ServiceTriggeredAt: t1,
 				CompletedAt:        t1,
-				Trigger: model.Trigger{
-					Type: model.TriggerTypeHTTP,
-					HTTP: &model.HTTPRequest{
-						Method: model.HTTPMethodPOST,
-						URL:    "http://google.com",
-						Headers: []model.HTTPHeader{
-							{"Content-Type", "application/json"},
-						},
-						Body: `{"id":52}`,
-					},
-				},
-				TestVersion: 1,
-				Metadata:    map[string]string{"key": "value"},
+				TestVersion:        1,
+				Metadata:           map[string]string{"key": "value"},
 			},
 		},
 		{
@@ -117,17 +106,6 @@ func TestRunEncoding(t *testing.T) {
 				ServiceTriggerCompletedAt: t2,
 				ObtainedTraceAt:           t3,
 				CompletedAt:               t4,
-				Trigger: model.Trigger{
-					Type: model.TriggerTypeHTTP,
-					HTTP: &model.HTTPRequest{
-						Method: model.HTTPMethodPOST,
-						URL:    "http://google.com",
-						Headers: []model.HTTPHeader{
-							{"Content-Type", "application/json"},
-						},
-						Body: `{"name":"Larry"}`,
-					},
-				},
 				TriggerResult: model.TriggerResult{
 					Type: model.TriggerTypeHTTP,
 					HTTP: &model.HTTPResponse{
