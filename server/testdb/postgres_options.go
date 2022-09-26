@@ -14,8 +14,8 @@ import (
 
 type PostgresOption func(*postgresDB) error
 
-func dbSpanNameFormatter(ctx context.Context, method string, query string) string {
-	splitQuery := strings.Split(query, " ")
+func dbSpanNameFormatter(ctx context.Context, method, query string) string {
+	splitQuery := strings.Fields(query)
 	queryName := ""
 	if len(splitQuery) > 0 {
 		queryName = splitQuery[0]
