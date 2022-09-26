@@ -5,16 +5,68 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"time"
 
-	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 	"go.opentelemetry.io/otel/trace"
 )
 
 var _ model.RunRepository = &postgresDB{}
 
+const createRunQuery = `
+INSERT INTO test_runs (
+	"id",
+	"test_id",
+	"test_version",
+
+	-- timestamps
+	"created_at",
+	"service_triggered_at",
+	"service_trigger_completed_at",
+	"obtained_trace_at",
+	"completed_at",
+
+	-- trigger params
+	"state",
+	"trace_id",
+	"span_id",
+
+	-- result info
+	"trigger_results",
+	"test_results",
+	"trace",
+	"last_error",
+
+	"metadata"
+) VALUES (
+	nextval('test_runs_id_seq'), -- id
+	$1,   -- test_id
+	$2,   -- test_version
+
+	-- timestamps
+	$3,              -- created_at
+	to_timestamp(0), -- service_triggered_at
+	to_timestamp(0), -- service_trigger_completed_at
+	to_timestamp(0), -- obtained_trace_at
+	to_timestamp(0), -- completed_at
+
+	-- trigger params
+	$4, -- state
+	$5, -- trace_id
+	$6, -- span_id
+
+	-- result info
+	'{}', -- trigger_results
+	'{}', -- test_results
+	NULL, -- trace
+	NULL, -- last_error
+
+	$7 -- metadata
+)
+RETURNING "id"`
+
 func (td *postgresDB) CreateRun(ctx context.Context, test model.Test, run model.Run) (model.Run, error) {
-	stmt, err := td.db.Prepare("INSERT INTO runs(id, test_id, test_version, run) VALUES( $1, $2, $3, $4 )")
+	stmt, err := td.db.Prepare(createRunQuery)
 	if err != nil {
 		return model.Run{}, fmt.Errorf("sql prepare: %w", err)
 	}
@@ -23,13 +75,23 @@ func (td *postgresDB) CreateRun(ctx context.Context, test model.Test, run model.
 	run.TestID = test.ID
 	run.State = model.RunStateCreated
 	run.TestVersion = test.Version
+	run.CreatedAt = time.Now()
 
-	encoded, err := encodeRun(run)
+	jsonMetadata, err := json.Marshal(run.Metadata)
 	if err != nil {
 		return model.Run{}, fmt.Errorf("encoding error: %w", err)
 	}
 
-	_, err = stmt.ExecContext(ctx, run.ID, test.ID, run.TestVersion, encoded)
+	err = stmt.QueryRowContext(
+		ctx,
+		test.ID,
+		test.Version,
+		run.CreatedAt,
+		run.State,
+		run.TraceID.String(),
+		run.SpanID.String(),
+		jsonMetadata,
+	).Scan(&run.ID)
 	if err != nil {
 		return model.Run{}, fmt.Errorf("sql exec: %w", err)
 	}
@@ -37,18 +99,80 @@ func (td *postgresDB) CreateRun(ctx context.Context, test model.Test, run model.
 	return run, nil
 }
 
+const updateRunQuery = `
+UPDATE test_runs SET
+
+-- timestamps
+	"service_triggered_at" = $1,
+	"service_trigger_completed_at" = $2,
+	"obtained_trace_at" = $3,
+	"completed_at" = $4,
+
+	-- trigger params
+	"state" = $5,
+	"trace_id" = $6,
+	"span_id" = $7,
+
+	-- result info
+	"trigger_results" = $8,
+	"test_results" = $9,
+	"trace" = $10,
+	"last_error" = $11,
+
+	"metadata" = $12
+
+WHERE id = $13
+`
+
 func (td *postgresDB) UpdateRun(ctx context.Context, r model.Run) error {
-	stmt, err := td.db.Prepare("UPDATE runs SET run = $2 WHERE id = $1")
+	stmt, err := td.db.Prepare(updateRunQuery)
 	if err != nil {
 		return fmt.Errorf("prepare: %w", err)
 	}
 	defer stmt.Close()
 
-	def, err := encodeRun(r)
+	jsonTriggerResults, err := json.Marshal(r.TriggerResult)
 	if err != nil {
-		return err
+		return fmt.Errorf("encoding error: %w", err)
 	}
-	_, err = stmt.ExecContext(ctx, r.ID, def)
+
+	jsonTestResults, err := json.Marshal(r.Results)
+	if err != nil {
+		return fmt.Errorf("encoding error: %w", err)
+	}
+
+	jsonTrace, err := json.Marshal(r.Trace)
+	if err != nil {
+		return fmt.Errorf("encoding error: %w", err)
+	}
+
+	jsonMetadata, err := json.Marshal(r.Metadata)
+	if err != nil {
+		return fmt.Errorf("encoding error: %w", err)
+	}
+
+	var lastError *string
+	if r.LastError != nil {
+		e := r.LastError.Error()
+		lastError = &e
+	}
+
+	_, err = stmt.ExecContext(
+		ctx,
+		r.ServiceTriggeredAt,
+		r.ServiceTriggerCompletedAt,
+		r.ObtainedTraceAt,
+		r.CompletedAt,
+		r.State,
+		r.TraceID.String(),
+		r.SpanID.String(),
+		jsonTriggerResults,
+		jsonTestResults,
+		jsonTrace,
+		lastError,
+		jsonMetadata,
+		r.ID,
+	)
 	if err != nil {
 		return fmt.Errorf("sql exec: %w", err)
 	}
@@ -57,7 +181,7 @@ func (td *postgresDB) UpdateRun(ctx context.Context, r model.Run) error {
 }
 
 func (td *postgresDB) DeleteRun(ctx context.Context, r model.Run) error {
-	stmt, err := td.db.Prepare("DELETE FROM runs WHERE id = $1")
+	stmt, err := td.db.Prepare("DELETE FROM test_runs WHERE id = $1")
 	if err != nil {
 		return fmt.Errorf("prepare: %w", err)
 	}
@@ -71,8 +195,37 @@ func (td *postgresDB) DeleteRun(ctx context.Context, r model.Run) error {
 	return nil
 }
 
+const selectRunQuery = `
+SELECT
+	"id",
+	"test_id",
+	"test_version",
+
+	-- timestamps
+	"created_at",
+	"service_triggered_at",
+	"service_trigger_completed_at",
+	"obtained_trace_at",
+	"completed_at",
+
+	-- trigger params
+	"state",
+	"trace_id",
+	"span_id",
+
+	-- result info
+	"trigger_results",
+	"test_results",
+	"trace",
+	"last_error",
+
+	"metadata"
+FROM test_runs
+`
+
+// TODO require test id as well
 func (td *postgresDB) GetRun(ctx context.Context, id int) (model.Run, error) {
-	stmt, err := td.db.Prepare("SELECT run, test_id, test_version FROM runs WHERE id = $1")
+	stmt, err := td.db.Prepare(selectRunQuery + " WHERE id = $1")
 	if err != nil {
 		return model.Run{}, err
 	}
@@ -86,7 +239,8 @@ func (td *postgresDB) GetRun(ctx context.Context, id int) (model.Run, error) {
 }
 
 func (td *postgresDB) GetRunByShortID(ctx context.Context, shortID string) (model.Run, error) {
-	stmt, err := td.db.Prepare("SELECT run, test_id, test_version FROM runs WHERE run ->> 'ShortID' = $1")
+	panic("not implemented")
+	stmt, err := td.db.Prepare(selectRunQuery + " WHERE id = $1")
 	if err != nil {
 		return model.Run{}, err
 	}
@@ -100,7 +254,7 @@ func (td *postgresDB) GetRunByShortID(ctx context.Context, shortID string) (mode
 }
 
 func (td *postgresDB) GetTestRuns(ctx context.Context, test model.Test, take, skip int32) ([]model.Run, error) {
-	stmt, err := td.db.Prepare("SELECT run, test_id, test_version FROM runs WHERE test_id = $1 ORDER BY (run ->> 'CreatedAt')::timestamp DESC LIMIT $2 OFFSET $3")
+	stmt, err := td.db.Prepare(selectRunQuery + " WHERE test_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3")
 	if err != nil {
 		return nil, err
 	}
@@ -124,52 +278,98 @@ func (td *postgresDB) GetTestRuns(ctx context.Context, test model.Test, take, sk
 }
 
 func (td *postgresDB) GetRunByTraceID(ctx context.Context, traceID trace.TraceID) (model.Run, error) {
-	stmt, err := td.db.Prepare("SELECT run, test_id, test_version FROM runs WHERE run ->> 'TraceID' = $1")
+	stmt, err := td.db.Prepare(selectRunQuery + " WHERE trace_id = $1")
 	if err != nil {
 		return model.Run{}, err
 	}
 	defer stmt.Close()
 
-	run, err := readRunRow(stmt.QueryRowContext(ctx, traceID.String()))
+	run, err := readRunRow(stmt.QueryRowContext(ctx, traceID))
 	if err != nil {
 		return model.Run{}, fmt.Errorf("cannot read row: %w", err)
 	}
 	return run, nil
 }
 
-func encodeRun(r model.Run) (string, error) {
-	b, err := json.Marshal(r)
-	if err != nil {
-		return "", fmt.Errorf("json Marshal: %w", err)
-	}
-
-	return string(b), nil
-}
-
-func decodeRun(b []byte, testID string, testVersion int) (model.Run, error) {
-
-	var run model.Run
-	err := json.Unmarshal(b, &run)
-	if err != nil {
-		return model.Run{}, fmt.Errorf("unmarshal run: %w", err)
-	}
-	run.TestVersion = testVersion
-	run.TestID = id.ID(testID)
-	return run, nil
-}
-
 func readRunRow(row scanner) (model.Run, error) {
+	r := model.Run{}
+
 	var (
-		b           []byte
-		testVersion int
-		testID      string
+		jsonTriggerResults,
+		jsonTestResults,
+		jsonTrace,
+		jsonMetadata []byte
+
+		lastError *string
+		traceID,
+		spanID string
 	)
-	err := row.Scan(&b, &testID, &testVersion)
+
+	err := row.Scan(
+		&r.ID,
+		&r.TestID,
+		&r.TestVersion,
+		&r.CreatedAt,
+		&r.ServiceTriggeredAt,
+		&r.ServiceTriggerCompletedAt,
+		&r.ObtainedTraceAt,
+		&r.CompletedAt,
+		&r.State,
+		&traceID,
+		&spanID,
+		&jsonTriggerResults,
+		&jsonTestResults,
+		&jsonTrace,
+		&lastError,
+		&jsonMetadata,
+	)
+
 	switch err {
 	case sql.ErrNoRows:
 		return model.Run{}, ErrNotFound
 	case nil:
-		return decodeRun(b, testID, testVersion)
+		err = json.Unmarshal(jsonTriggerResults, &r.TriggerResult)
+		if err != nil {
+			return model.Run{}, fmt.Errorf("cannot parse TriggerResult: %s", err)
+		}
+
+		err = json.Unmarshal(jsonTestResults, &r.Results)
+		if err != nil {
+			return model.Run{}, fmt.Errorf("cannot parse Results: %s", err)
+		}
+
+		if jsonTrace != nil {
+			err = json.Unmarshal(jsonTrace, &r.Trace)
+			if err != nil {
+				return model.Run{}, fmt.Errorf("cannot parse Trace: %s", err)
+			}
+		}
+
+		err = json.Unmarshal(jsonMetadata, &r.Metadata)
+		if err != nil {
+			return model.Run{}, fmt.Errorf("cannot parse Metadata: %s", err)
+		}
+
+		if traceID != "" {
+			r.TraceID, err = trace.TraceIDFromHex(traceID)
+			if err != nil {
+				return model.Run{}, fmt.Errorf("cannot parse TraceID: %s", err)
+			}
+		}
+
+		if spanID != "" {
+			r.SpanID, err = trace.SpanIDFromHex(spanID)
+			if err != nil {
+				return model.Run{}, fmt.Errorf("cannot parse SpanID: %s", err)
+			}
+		}
+
+		if lastError != nil && *lastError != "" {
+			r.LastError = fmt.Errorf(*lastError)
+		}
+
+		return r, nil
+
 	default:
 		return model.Run{}, fmt.Errorf("read run row: %w", err)
 	}

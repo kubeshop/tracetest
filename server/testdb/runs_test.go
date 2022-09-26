@@ -21,10 +21,11 @@ func TestCreateRun(t *testing.T) {
 	test := createTest(t, db)
 
 	run := model.Run{
-		TraceID:   testdb.IDGen.TraceID(),
-		SpanID:    testdb.IDGen.SpanID(),
-		CreatedAt: time.Now(),
-		Trigger:   test.ServiceUnderTest,
+		TraceID: testdb.IDGen.TraceID(),
+		SpanID:  testdb.IDGen.SpanID(),
+		Metadata: model.RunMetadata{
+			"key": "Value",
+		},
 	}
 
 	updated, err := db.CreateRun(context.TODO(), test, run)
@@ -32,11 +33,14 @@ func TestCreateRun(t *testing.T) {
 
 	actual, err := db.GetRun(context.TODO(), updated.ID)
 	require.NoError(t, err)
+
+	assert.NotEmpty(t, actual.ID)
+	assert.Equal(t, test.ID, actual.TestID)
+	assert.Equal(t, test.Version, actual.TestVersion)
 	assert.Equal(t, model.RunStateCreated, actual.State)
 	assert.Equal(t, run.TraceID, actual.TraceID)
 	assert.Equal(t, run.SpanID, actual.SpanID)
-	assert.Equal(t, run.CreatedAt.Unix(), actual.CreatedAt.Unix())
-	assert.Equal(t, run.Trigger, actual.Trigger)
+	assert.Equal(t, run.Metadata, actual.Metadata)
 }
 
 func TestUpdateRun(t *testing.T) {
@@ -103,8 +107,6 @@ func TestUpdateRun(t *testing.T) {
 	runFromList.Trace.RootSpan.EndTime = time.Time{}
 
 	assert.Equal(t, run.SpanID.String(), actual.SpanID.String())
-	assert.Equal(t, run.CreatedAt.Unix(), actual.CreatedAt.Unix())
-	assert.Equal(t, run.Trigger, actual.Trigger)
 	assert.Equal(t, run.State, actual.State)
 	assert.Equal(t, run.Trace, actual.Trace)
 	assert.Equal(t, run.Results, actual.Results)

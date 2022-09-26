@@ -159,14 +159,24 @@ func (r *Run) UnmarshalJSON(data []byte) error {
 		return fmt.Errorf("unmarshal run: %w", err)
 	}
 
-	tid, err := trace.TraceIDFromHex(aux.TraceID)
-	if err != nil {
-		return fmt.Errorf("unmarshal run: %w", err)
+	var (
+		tid trace.TraceID
+		sid trace.SpanID
+		err error
+	)
+
+	if aux.TraceID != "" {
+		tid, err = trace.TraceIDFromHex(aux.TraceID)
+		if err != nil {
+			return fmt.Errorf("unmarshal run: %w", err)
+		}
 	}
 
-	sid, err := trace.SpanIDFromHex(aux.SpanID)
-	if err != nil {
-		return fmt.Errorf("unmarshal run: %w", err)
+	if aux.SpanID != "" {
+		sid, err = trace.SpanIDFromHex(aux.SpanID)
+		if err != nil {
+			return fmt.Errorf("unmarshal run: %w", err)
+		}
 	}
 
 	triggerResult := TriggerResult{
@@ -204,9 +214,9 @@ func errToString(err error) string {
 }
 
 func stringToErr(s string) error {
-	if s != "" {
-		return errors.New(s)
+	if s == "" {
+		return nil
 	}
 
-	return nil
+	return errors.New(s)
 }
