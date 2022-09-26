@@ -91,11 +91,6 @@ func (m *MockRepository) GetRun(_ context.Context, id int) (model.Run, error) {
 	return args.Get(0).(model.Run), args.Error(1)
 }
 
-func (m *MockRepository) GetRunByShortID(_ context.Context, shortID string) (model.Run, error) {
-	args := m.Called(shortID)
-	return args.Get(0).(model.Run), args.Error(1)
-}
-
 func (m *MockRepository) GetTestRuns(_ context.Context, test model.Test, take int32, skip int32) ([]model.Run, error) {
 	args := m.Called(test, take, skip)
 	return args.Get(0).([]model.Run), args.Error(1)

@@ -6,30 +6,6 @@ info:
 servers:
   - url: /api
 paths:
-  /r/{runShortId}:
-    get:
-      tags:
-        - api
-      summary: "run short url redirecter"
-      description: "run short url redirecter"
-      operationId: runShortUrl
-      parameters:
-        - in: path
-          name: runShortId
-          description: "shortId for run"
-          schema:
-            type: string
-          required: true
-      responses:
-        301:
-          description: test run found, redirect to Location
-          headers:
-            Location:
-              schema:
-                type: string
-                format: url
-        404:
-          description: "test run not found"
   /tests:
     get:
       tags:

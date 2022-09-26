@@ -240,21 +240,6 @@ func (td *postgresDB) GetRun(ctx context.Context, id int) (model.Run, error) {
 	return run, nil
 }
 
-func (td *postgresDB) GetRunByShortID(ctx context.Context, shortID string) (model.Run, error) {
-	panic("not implemented")
-	stmt, err := td.db.Prepare(selectRunQuery + " WHERE id = $1")
-	if err != nil {
-		return model.Run{}, err
-	}
-	defer stmt.Close()
-
-	run, err := readRunRow(stmt.QueryRowContext(ctx, shortID))
-	if err != nil {
-		return model.Run{}, fmt.Errorf("cannot read row: %w", err)
-	}
-	return run, nil
-}
-
 func (td *postgresDB) GetTestRuns(ctx context.Context, test model.Test, take, skip int32) ([]model.Run, error) {
 	stmt, err := td.db.Prepare(selectRunQuery + " WHERE test_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3")
 	if err != nil {
