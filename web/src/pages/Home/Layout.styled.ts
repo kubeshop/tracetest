@@ -1,9 +1,13 @@
-import {Layout} from 'antd';
+import {Layout as LayoutAntd} from 'antd';
 import styled from 'styled-components';
 
-export const Content = styled(Layout.Content)`
+export const Content = styled(LayoutAntd.Content)`
   height: 100%;
   overflow-y: scroll;
+`;
+
+export const Layout = styled(LayoutAntd)`
+  background: ${({theme}) => theme.color.background};
 `;
 
 export const LogoContainer = styled.div`
@@ -24,7 +28,7 @@ export const MenuContainer = styled.div`
   padding: 24px 20px;
 `;
 
-export const Sider = styled(Layout.Sider)`
+export const Sider = styled(LayoutAntd.Sider)`
   .ant-layout-sider-trigger {
     background: #2c1a54;
   }

@@ -1,5 +1,5 @@
 import {ClusterOutlined, GlobalOutlined} from '@ant-design/icons';
-import {Layout as LayoutAntd, Menu} from 'antd';
+import {Menu} from 'antd';
 import {MenuInfo} from 'rc-menu/es/interface';
 import React from 'react';
 import {Link, useNavigate} from 'react-router-dom';
@@ -36,7 +36,7 @@ const Layout = ({children}: IProps) => {
   };
 
   return (
-    <LayoutAntd hasSider>
+    <S.Layout hasSider>
       <S.Sider width={256}>
         <S.LogoContainer>
           <Link to="/">
@@ -49,11 +49,11 @@ const Layout = ({children}: IProps) => {
         </S.MenuContainer>
       </S.Sider>
 
-      <LayoutAntd>
+      <S.Layout>
         <Header hasEnvironments />
         <S.Content>{children}</S.Content>
-      </LayoutAntd>
-    </LayoutAntd>
+      </S.Layout>
+    </S.Layout>
   );
 };
 
