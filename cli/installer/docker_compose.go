@@ -22,6 +22,7 @@ var dockerCompose = installer{
 	name: "docker-compose",
 	preChecks: []preChecker{
 		chocolateyForWindowsChecker,
+		wslChecker,
 		dockerChecker,
 		dockerReadyChecker,
 		dockerComposeChecker,

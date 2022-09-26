@@ -4,7 +4,9 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
-	"syscall"
+
+	"github.com/kubeshop/tracetest/cli/installer/posix"
+	"github.com/kubeshop/tracetest/cli/installer/win"
 )
 
 func exitOption(msg string) func(ui UI) {
@@ -19,23 +21,11 @@ func commandExists(cmd string) bool {
 }
 
 func commandSuccess(probeCmd string) bool {
-	cmd := exec.Command("/bin/sh", "-c", probeCmd)
-	err := cmd.Run()
-
-	if err != nil {
-		// try to get the exit code
-		if exitError, ok := err.(*exec.ExitError); ok {
-			ws := exitError.Sys().(syscall.WaitStatus)
-			return ws.ExitStatus() == 0
-		}
-	} else {
-		// success, exitCode should be 0 if go is ok
-		ws := cmd.ProcessState.Sys().(syscall.WaitStatus)
-		return ws.ExitStatus() == 0
+	if isWindows() {
+		return win.CommandSuccess(probeCmd)
 	}
 
-	return false
-
+	return posix.CommandSuccess(probeCmd)
 }
 
 type pkgManager int
