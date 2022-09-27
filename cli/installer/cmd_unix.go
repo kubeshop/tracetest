@@ -1,4 +1,7 @@
-package win
+//go:build !windows
+// +build !windows
+
+package installer
 
 import (
 	"os"
@@ -6,13 +9,11 @@ import (
 	"syscall"
 )
 
-func ExecCmd(cmd string, suppressOutput bool) error {
-	execCmd := exec.Command("powershell", "-nologo", "-noprofile", cmd)
+func _execCmd(cmd string) error {
+	execCmd := exec.Command("/bin/sh", "-o", "xtrace", "-c", cmd)
+	execCmd.Stderr = os.Stderr
 	execCmd.Stdin = os.Stdin
-	if !suppressOutput {
-		execCmd.Stderr = os.Stderr
-		execCmd.Stdout = os.Stdout
-	}
+	execCmd.Stdout = os.Stdout
 
 	err := execCmd.Run()
 
@@ -23,8 +24,8 @@ func ExecCmd(cmd string, suppressOutput bool) error {
 	return err
 }
 
-func CommandSuccess(probeCmd string) bool {
-	cmd := exec.Command("powershell", "-nologo", "-noprofile", probeCmd)
+func commandSuccess(probeCmd string) bool {
+	cmd := exec.Command("/bin/sh", "-c", probeCmd)
 	err := cmd.Run()
 
 	if err != nil {
@@ -42,3 +43,5 @@ func CommandSuccess(probeCmd string) bool {
 	return false
 
 }
+
+func refreshEnvVariables() {}

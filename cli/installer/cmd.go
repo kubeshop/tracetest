@@ -5,11 +5,7 @@ import (
 	"html/template"
 	"os"
 	"os/exec"
-	"runtime"
 	"strings"
-
-	"github.com/kubeshop/tracetest/cli/installer/posix"
-	"github.com/kubeshop/tracetest/cli/installer/win"
 )
 
 type cmd struct {
@@ -93,14 +89,6 @@ func execCmdIgnoreError(cmd string, ui UI) {
 	_execCmd(cmd)
 }
 
-func _execCmd(cmd string) error {
-	if runtime.GOOS != "windows" {
-		return posix.ExecCmd(cmd)
-	}
-
-	return win.ExecCmd(cmd, false)
-}
-
 func execCmdIgnoreErrors(cmd string) {
 	_execCmd(cmd)
 }
@@ -120,20 +108,8 @@ func getCmdOutputClean(cmd string) string {
 }
 
 func commandExists(cmd string) bool {
-	// windows requires the env to be reloaded before the command is checked. So if the program just got installed
-	// it will be found.
-	if isWindows() {
-		refreshEnvVariables()
-	}
+	refreshEnvVariables()
 
 	_, err := exec.LookPath(cmd)
 	return err == nil
-}
-
-func commandSuccess(probeCmd string) bool {
-	if isWindows() {
-		return win.CommandSuccess(probeCmd)
-	}
-
-	return posix.CommandSuccess(probeCmd)
 }

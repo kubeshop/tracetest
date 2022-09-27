@@ -1,10 +1,6 @@
 package installer
 
-import (
-	"runtime"
-
-	"github.com/kubeshop/tracetest/cli/installer/win"
-)
+import "runtime"
 
 func isWindows() bool {
 	return runtime.GOOS == "windows"
@@ -20,7 +16,7 @@ func installChocolatey(ui UI) {
 }
 
 func chocolateyForWindowsChecker(ui UI) {
-	if !isWindows() {
+	if isWindows() {
 		return
 	}
 
@@ -49,7 +45,7 @@ func chocolateyForWindowsChecker(ui UI) {
 }
 
 func wslChecker(ui UI) {
-	if !isWindows() {
+	if isWindows() {
 		return
 	}
 
@@ -60,12 +56,4 @@ func wslChecker(ui UI) {
 
 	ui.Warning("I didn't find WSL installed in your system")
 	ui.Exit("WSL is a requirement for running Tracetest on Windows. Install it before proceeding: https://learn.microsoft.com/en-us/windows/wsl/install")
-}
-
-// This function is important for installing things on Windows because programs are not
-// available right after its installation. You have to refresh the environment variables
-// to be able to find the command using the PATH env.
-// Instead of closing and opening the CLI, we can execute this command instead.
-func refreshEnvVariables() {
-	win.ExecCmd("refreshenv", true)
 }
