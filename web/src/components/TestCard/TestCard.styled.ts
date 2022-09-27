@@ -21,6 +21,22 @@ export const Box = styled.div`
   align-items: center;
   background: #2f1e61;
   border-radius: 3px;
+  grid-template-columns: 20px 1fr 60px 2fr 220px 100px 20px;
+  gap: 24px;
+  padding: 16px 24px;
+`;
+
+export const ResultListContainer = styled.div`
+  margin: 0 68px 54px 70px;
+`;
+
+export const TextContainer = styled.div`
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+`;
+
+export const ButtonContainer = styled.div`
   display: flex;
   height: 38px;
   justify-content: center;

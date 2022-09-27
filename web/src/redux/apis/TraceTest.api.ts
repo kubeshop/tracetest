@@ -4,16 +4,19 @@ import {uniq} from 'lodash';
 import AssertionResults from 'models/AssertionResults.model';
 import Test from 'models/Test.model';
 import TestRun from 'models/TestRun.model';
+import {IEnvironment} from 'pages/Environments/IEnvironment';
 import WebSocketService, {IListenerFunction} from 'services/WebSocket.service';
 import {TAssertion, TAssertionResults, TRawAssertionResults} from 'types/Assertion.types';
 import {TRawTest, TTest} from 'types/Test.types';
 import {TRawTestRun, TTestRun} from 'types/TestRun.types';
 import {TRawTestSpecs} from 'types/TestSpecs.types';
+import { IKeyValue } from "../../constants/Test.constants";
 import {SortBy, SortDirection} from 'constants/Test.constants';
 
 const PATH = `${document.baseURI}api/`;
 
 enum Tags {
+  ENVIRONMENT = 'environment',
   TEST = 'test',
   TEST_DEFINITION = 'testDefinition',
   TEST_RUN = 'testRun',
@@ -48,10 +51,53 @@ const TraceTestAPI = createApi({
         {type: Tags.TEST, id: test?.id},
       ],
     }),
+    getEnvList: build.query<IEnvironment[], {take?: number; skip?: number; query?: string}>({
+      query: ({take = 25, skip = 0, query = ''}) => `/tests?take=${take}&skip=${skip}&query=${query}`,
+      providesTags: () => [{type: Tags.ENVIRONMENT, id: 'LIST'}],
+      transformResponse: () => [
+        {
+          id: '9f967918-ce05-4c6c-a2e7-93096be9aa97',
+          name: 'Production',
+          description: 'Production environment',
+          variables: [],
+        },
+        {
+          id: 'ae7162b3-54e0-4603-9d33-423b12cf67c8',
+          name: 'Development',
+          description: 'Developing environment',
+          variables: [],
+        },
+      ],
+    }),
+    getEnvironmentSecretList: build.query<
+      IKeyValue[],
+      {environmentId: string; take?: number; skip?: number}
+    >({
+      query: ({environmentId, take = 25, skip = 0}) => `/tests/${environmentId}/run?take=${take}&skip=${skip}`,
+      providesTags: (result, error, {environmentId}) => [{type: Tags.ENVIRONMENT, id: `${environmentId}-LIST`}],
+      transformResponse: (raw, meta, args) => {
+        return args.environmentId === 'ae7162b3-54e0-4603-9d33-423b12cf67c8'
+          ? [{key: 'token', value: '09edsfuids0fds9f'}]
+          : [
+              {key: 'user', value: 'testAdmin'},
+              {key: 'password', value: '1234'},
+            ];
+      },
+    }),
+
+    createEnvironment: build.mutation<undefined, IEnvironment>({
+      query: newEnvironment => ({
+        url: '/environments',
+        method: HTTP_METHOD.POST,
+        body: newEnvironment,
+      }),
+      transformResponse: () => undefined,
+      invalidatesTags: [{type: Tags.ENVIRONMENT, id: 'LIST'}],
+    }),
     getTestList: build.query<
       TTest[],
       {take?: number; skip?: number; query?: string; sortBy?: SortBy; sortDirection?: SortDirection}
-    >({
+      >({
       query: ({take = 25, skip = 0, query = '', sortBy = '', sortDirection = ''}) =>
         `/tests?take=${take}&skip=${skip}&query=${query}&sortBy=${sortBy}&sortDirection=${sortDirection}`,
       providesTags: () => [{type: Tags.TEST, id: 'LIST'}],
@@ -186,6 +232,10 @@ export const {
   useGetTestDefinitionYamlByRunIdQuery,
   useLazyGetTestDefinitionYamlByRunIdQuery,
   useEditTestMutation,
+  useGetEnvListQuery,
+  useGetEnvironmentSecretListQuery,
+  useLazyGetEnvironmentSecretListQuery,
+  useCreateEnvironmentMutation,
 } = TraceTestAPI;
 export const {endpoints} = TraceTestAPI;
 

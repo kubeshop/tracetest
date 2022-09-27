@@ -1,4 +1,9 @@
-export const DEFAULT_HEADERS = [{key: 'Content-Type', value: 'application/json'}];
+export interface Header {
+  value: string;
+  key: string;
+}
+
+export const DEFAULT_HEADERS: Header[] = [{key: 'Content-Type', value: 'application/json'}];
 
 export enum TriggerTypes {
   http = 'http',
