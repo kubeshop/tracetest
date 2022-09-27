@@ -419,6 +419,11 @@ func dockerChecker(ui UI) {
 
 	option.fn(ui)
 
+	// We can't start docker programmatically on windows
+	if isWindows() {
+		ui.TextInput(`Start Docker Desktop before procceding. Press Enter`, "")
+	}
+
 	if commandExists("docker") {
 		ui.Println(ui.Green("✔ docker was successfully installed"))
 	} else {
@@ -700,9 +705,7 @@ func installDockerDesktop(ui UI) {
 			rm -f Docker.dmg
 		`,
 		windows: `
-			choco install docker-desktop -y
-			refreshenv
-			"Docker Desktop.exe"
+			choco install docker-desktop -y -f
 		`,
 		other: "", // empty means not supported
 	}).exec(ui)

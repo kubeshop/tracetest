@@ -2,6 +2,8 @@ package installer
 
 import (
 	"runtime"
+
+	"github.com/kubeshop/tracetest/cli/installer/win"
 )
 
 func isWindows() bool {
@@ -65,5 +67,5 @@ func wslChecker(ui UI) {
 // to be able to find the command using the PATH env.
 // Instead of closing and opening the CLI, we can execute this command instead.
 func refreshEnvVariables() {
-	_execCmd("refreshenv")
+	win.ExecCmd("refreshenv", true)
 }

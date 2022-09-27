@@ -98,7 +98,7 @@ func _execCmd(cmd string) error {
 		return posix.ExecCmd(cmd)
 	}
 
-	return win.ExecCmd(cmd)
+	return win.ExecCmd(cmd, false)
 }
 
 func execCmdIgnoreErrors(cmd string) {
@@ -120,6 +120,12 @@ func getCmdOutputClean(cmd string) string {
 }
 
 func commandExists(cmd string) bool {
+	// windows requires the env to be reloaded before the command is checked. So if the program just got installed
+	// it will be found.
+	if isWindows() {
+		refreshEnvVariables()
+	}
+
 	_, err := exec.LookPath(cmd)
 	return err == nil
 }

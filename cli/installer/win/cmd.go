@@ -6,11 +6,13 @@ import (
 	"syscall"
 )
 
-func ExecCmd(cmd string) error {
+func ExecCmd(cmd string, suppressOutput bool) error {
 	execCmd := exec.Command("powershell", "-nologo", "-noprofile", cmd)
-	execCmd.Stderr = os.Stderr
 	execCmd.Stdin = os.Stdin
-	execCmd.Stdout = os.Stdout
+	if !suppressOutput {
+		execCmd.Stderr = os.Stderr
+		execCmd.Stdout = os.Stdout
+	}
 
 	err := execCmd.Run()
 
