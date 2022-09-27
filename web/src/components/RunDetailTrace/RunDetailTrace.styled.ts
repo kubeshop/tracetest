@@ -24,11 +24,11 @@ export const VisualizationContainer = styled.div`
   position: relative;
 `;
 
-export const SwitchContainer = styled.div<{$hasSpace: boolean}>`
+export const SwitchContainer = styled.div`
+  bottom: 163px;
+  left: 16px;
   position: absolute;
   z-index: 9;
-  left: 16px;
-  bottom: 163px;
 `;
 
 export const ClearSearchIcon = styled(CloseCircleFilled)`

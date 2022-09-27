@@ -1,14 +1,17 @@
 import {useCallback, useEffect} from 'react';
 import {Node, NodeChange} from 'react-flow-renderer';
 
+import {VisualizationType} from 'components/RunDetailTrace/RunDetailTrace';
 import SkeletonDiagram from 'components/SkeletonDiagram';
 import {useTestSpecForm} from 'components/TestSpecForm/TestSpecForm.provider';
 import DAG from 'components/Visualization/components/DAG';
+import Timeline from 'components/Visualization/components/Timeline';
 import {TestState} from 'constants/TestRun.constants';
 import {useSpan} from 'providers/Span/Span.provider';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import {initNodes, onNodesChange as onNodesChangeAction} from 'redux/slices/DAG.slice';
 import DAGSelectors from 'selectors/DAG.selectors';
+import TraceAnalyticsService from 'services/Analytics/TraceAnalytics.service';
 import TraceDiagramAnalyticsService from 'services/Analytics/TraceDiagramAnalytics.service';
 import {TSpan} from 'types/Span.types';
 import {TTestRunState} from 'types/TestRun.types';
@@ -16,9 +19,10 @@ import {TTestRunState} from 'types/TestRun.types';
 export interface IProps {
   runState: TTestRunState;
   spans: TSpan[];
+  type: VisualizationType;
 }
 
-const Visualization = ({runState, spans}: IProps) => {
+const Visualization = ({runState, spans, type}: IProps) => {
   const dispatch = useAppDispatch();
   const edges = useAppSelector(DAGSelectors.selectEdges);
   const nodes = useAppSelector(DAGSelectors.selectNodes);
@@ -46,6 +50,14 @@ const Visualization = ({runState, spans}: IProps) => {
     [onSelectSpan]
   );
 
+  const onNodeClickTimeline = useCallback(
+    (spanId: string) => {
+      TraceAnalyticsService.onTimelineSpanClick(spanId);
+      onSelectSpan(spanId);
+    },
+    [onSelectSpan]
+  );
+
   const onNavigateToSpan = useCallback(
     (spanId: string) => {
       onSelectSpan(spanId);
@@ -58,7 +70,7 @@ const Visualization = ({runState, spans}: IProps) => {
     return <SkeletonDiagram />;
   }
 
-  return (
+  return type === VisualizationType.Dag ? (
     <DAG
       edges={edges}
       isMatchedMode={matchedSpans.length > 0 || isOpen}
@@ -68,6 +80,15 @@ const Visualization = ({runState, spans}: IProps) => {
       onNodesChange={onNodesChange}
       onNodeClick={onNodeClick}
       selectedSpan={focusedSpan}
+    />
+  ) : (
+    <Timeline
+      isMatchedMode={matchedSpans.length > 0 || isOpen}
+      matchedSpans={matchedSpans}
+      onNavigateToSpan={onNavigateToSpan}
+      onNodeClick={onNodeClickTimeline}
+      selectedSpan={selectedSpan?.id ?? ''}
+      spans={spans}
     />
   );
 };

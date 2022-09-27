@@ -58,7 +58,6 @@ const Label = ({duration, kind, name, service, system, totalFailedChecks, totalP
           <tspan>{`${service} ${SpanKindToText[kind]}`}</tspan>
           {Boolean(system) && <tspan>{` - ${system}`}</tspan>}
           <tspan>{` - ${duration}`}</tspan>
-          <tspan>{` - ${totalPassedChecks} ${totalFailedChecks}`}</tspan>
         </S.TextDescription>
       </Group>
     </Group>

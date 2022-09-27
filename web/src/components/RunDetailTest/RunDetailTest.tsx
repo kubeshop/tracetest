@@ -1,10 +1,15 @@
+import {useState} from 'react';
+
 import Drawer from 'components/Drawer';
+import {VisualizationType} from 'components/RunDetailTrace/RunDetailTrace';
 import SpanDetail from 'components/SpanDetail';
 import TestResults from 'components/TestResults';
 import TestSpecForm from 'components/TestSpecForm';
 import {useTestSpecForm} from 'components/TestSpecForm/TestSpecForm.provider';
+import Switch from 'components/Visualization/components/Switch';
 import {useSpan} from 'providers/Span/Span.provider';
 import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
+import TraceAnalyticsService from 'services/Analytics/TraceAnalytics.service';
 import {TTestRun} from 'types/TestRun.types';
 import * as S from './RunDetailTest.styled';
 import Visualization from './Visualization';
@@ -18,6 +23,7 @@ const RunDetailTest = ({run, testId}: IProps) => {
   const {selectedSpan} = useSpan();
   const {selectedTestSpec} = useTestSpecs();
   const {isOpen: isTestSpecFormOpen, formProps, onSubmit, close} = useTestSpecForm();
+  const [visualizationType, setVisualizationType] = useState(VisualizationType.Dag);
 
   return (
     <S.Container>
@@ -26,8 +32,19 @@ const RunDetailTest = ({run, testId}: IProps) => {
         rightPanel={
           <S.Container>
             <S.SectionLeft>
-              <Visualization runState={run.state} spans={run?.trace?.spans ?? []} />
+              <S.SwitchContainer>
+                <Switch
+                  onChange={type => {
+                    TraceAnalyticsService.onSwitchDiagramView(type);
+                    setVisualizationType(type);
+                  }}
+                  type={visualizationType}
+                />
+              </S.SwitchContainer>
+
+              <Visualization runState={run.state} spans={run?.trace?.spans ?? []} type={visualizationType} />
             </S.SectionLeft>
+
             <S.SectionRight $shouldScroll={!selectedTestSpec}>
               {isTestSpecFormOpen ? (
                 <TestSpecForm

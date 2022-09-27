@@ -46,7 +46,7 @@ const RunDetailTrace = ({run, testId}: IProps) => {
             </S.SearchContainer>
 
             <S.VisualizationContainer>
-              <S.SwitchContainer $hasSpace={visualizationType === VisualizationType.Timeline}>
+              <S.SwitchContainer>
                 {run.state === TestState.FINISHED && (
                   <Switch
                     onChange={type => {
