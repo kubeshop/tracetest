@@ -16,7 +16,7 @@ func installChocolatey(ui UI) {
 }
 
 func chocolateyForWindowsChecker(ui UI) {
-	if isWindows() {
+	if !isWindows() {
 		return
 	}
 
@@ -45,7 +45,7 @@ func chocolateyForWindowsChecker(ui UI) {
 }
 
 func wslChecker(ui UI) {
-	if isWindows() {
+	if !isWindows() {
 		return
 	}
 

@@ -49,5 +49,5 @@ func commandSuccess(probeCmd string) bool {
 // to be able to find the command using the PATH env.
 // Instead of closing and opening the CLI, we can execute this command instead.
 func refreshEnvVariables() {
-	_execCmd("refreshenv")
+	_execCmd("$foo = refreshenv 2>$null")
 }
