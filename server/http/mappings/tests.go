@@ -220,7 +220,7 @@ func (m OpenAPI) Run(in *model.Run) openapi.TestRun {
 	}
 
 	return openapi.TestRun{
-		Id:                        int32(in.ID),
+		Id:                        strconv.Itoa(in.ID),
 		TraceId:                   in.TraceID.String(),
 		SpanId:                    in.SpanID.String(),
 		State:                     string(in.State),
@@ -303,8 +303,9 @@ func (m Model) Definition(in openapi.TestSpecs) model.OrderedMap[model.SpanQuery
 func (m Model) Run(in openapi.TestRun) *model.Run {
 	tid, _ := trace.TraceIDFromHex(in.TraceId)
 	sid, _ := trace.SpanIDFromHex(in.SpanId)
+	id, _ := strconv.Atoi(in.Id)
 	return &model.Run{
-		ID:                        int(in.Id),
+		ID:                        id,
 		TraceID:                   tid,
 		SpanID:                    sid,
 		State:                     model.RunState(in.State),

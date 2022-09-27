@@ -212,8 +212,8 @@ func (f testRun) getColoredText(passed bool, text string) string {
 	return pterm.FgRed.Sprintf(text)
 }
 
-func (f testRun) getRunLink(testID string, runID int32) string {
-	return fmt.Sprintf("%s://%s/test/%s/run/%d/test", f.config.Scheme, f.config.Endpoint, testID, runID)
+func (f testRun) getRunLink(testID, runID string) string {
+	return fmt.Sprintf("%s://%s/test/%s/run/%s/test", f.config.Scheme, f.config.Endpoint, testID, runID)
 }
 
 func (f testRun) getDeepLink(baseLink string, index int, spanID string) string {

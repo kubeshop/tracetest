@@ -241,7 +241,7 @@ paths:
         - in: path
           name: runId
           schema:
-            type: integer
+            type: string
           required: true
         - in: query
           name: query
@@ -272,7 +272,7 @@ paths:
         - in: path
           name: runId
           schema:
-            type: integer
+            type: string
           required: true
       summary: "run given assertions against the traces from the given run without persisting anything"
       description: "use this method to test a definition against an actual trace without creating a new version or persisting anything"
@@ -302,7 +302,7 @@ paths:
         - in: path
           name: runId
           schema:
-            type: integer
+            type: string
           required: true
       summary: "rerun a test run"
       description: "rerun a test run"
@@ -328,7 +328,7 @@ paths:
         - in: path
           name: runId
           schema:
-            type: integer
+            type: string
           required: true
       summary: "get test run results in JUnit xml format"
       description: "get test run results in JUnit xml format"
@@ -354,7 +354,7 @@ paths:
         - in: path
           name: runId
           schema:
-            type: integer
+            type: string
           required: true
       summary: export test and test run information
       description: export test and test run information for debugging
@@ -400,7 +400,7 @@ paths:
         - in: path
           name: runId
           schema:
-            type: integer
+            type: string
           required: true
       summary: "get test Run"
       description: "get a particular test Run"
@@ -424,7 +424,7 @@ paths:
         - in: path
           name: runId
           schema:
-            type: integer
+            type: string
           required: true
       summary: "delete a test run"
       description: "delete a test run"

@@ -13,10 +13,6 @@ func strp(in string) *string {
 	return &in
 }
 
-func intp(in int32) *int32 {
-	return &in
-}
-
 func boolp(in bool) *bool {
 	return &in
 }
@@ -28,7 +24,7 @@ func TestJSON(t *testing.T) {
 			Name: strp("Testcase 1"),
 		},
 		Run: openapi.TestRun{
-			Id:    intp(1),
+			Id:    strp("1"),
 			State: strp("FINISHED"),
 			Result: &openapi.AssertionResults{
 				AllPassed: boolp(true),
@@ -44,7 +40,7 @@ func TestJSON(t *testing.T) {
 	formatters.SetOutput(formatters.JSON)
 	actual := formatter.Format(in)
 
-	expected := `{"test":{"id":"9876543","name":"Testcase 1"},"testRun":{"id":1, "result":{"allPassed":true},"state":"FINISHED"},"testRunWebUrl":"http://localhost:11633/test/9876543/run/1/test"}`
+	expected := `{"test":{"id":"9876543","name":"Testcase 1"},"testRun":{"id":"1", "result":{"allPassed":true},"state":"FINISHED"},"testRunWebUrl":"http://localhost:11633/test/9876543/run/1/test"}`
 
 	assert.JSONEq(t, expected, actual)
 	formatters.SetOutput(formatters.DefaultOutput)
@@ -57,7 +53,7 @@ func TestSuccessfulTestRunOutput(t *testing.T) {
 			Name: strp("Testcase 1"),
 		},
 		Run: openapi.TestRun{
-			Id:    intp(1),
+			Id:    strp("1"),
 			State: strp("FINISHED"),
 			Result: &openapi.AssertionResults{
 				AllPassed: boolp(true),
@@ -80,7 +76,7 @@ func TestFailingTestOutput(t *testing.T) {
 			Name: strp("Testcase 2"),
 		},
 		Run: openapi.TestRun{
-			Id: intp(1),
+			Id: strp("1"),
 			Result: &openapi.AssertionResults{
 				AllPassed: boolp(false),
 				Results: []openapi.AssertionResultsResults{

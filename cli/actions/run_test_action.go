@@ -141,7 +141,7 @@ func (a runTestAction) runDefinition(ctx context.Context, params runTestParams) 
 	return tro, nil
 }
 
-func (a runTestAction) saveJUnitFile(ctx context.Context, testId string, testRunId int32, outputFile string) error {
+func (a runTestAction) saveJUnitFile(ctx context.Context, testId, testRunId, outputFile string) error {
 	if outputFile == "" {
 		return nil
 	}
@@ -230,7 +230,7 @@ func (a runTestAction) runTest(ctx context.Context, testID string, metadata map[
 	return *run, nil
 }
 
-func (a runTestAction) waitForResult(ctx context.Context, testId string, testRunId int32) (openapi.TestRun, error) {
+func (a runTestAction) waitForResult(ctx context.Context, testId, testRunId string) (openapi.TestRun, error) {
 	var testRun openapi.TestRun
 	var lastError error
 	var wg sync.WaitGroup
@@ -264,7 +264,7 @@ func (a runTestAction) waitForResult(ctx context.Context, testId string, testRun
 	return testRun, nil
 }
 
-func (a runTestAction) isTestReady(ctx context.Context, testId string, testRunId int32) (*openapi.TestRun, error) {
+func (a runTestAction) isTestReady(ctx context.Context, testId, testRunId string) (*openapi.TestRun, error) {
 	req := a.client.ApiApi.GetTestRun(ctx, testId, testRunId)
 	run, _, err := a.client.ApiApi.GetTestRunExecute(req)
 	if err != nil {
