@@ -1,13 +1,12 @@
 import Layout from 'components/Layout';
-import HomeContent from './HomeContent';
-import withAnalytics from '../../components/WithAnalytics/WithAnalytics';
+import withAnalytics from 'components/WithAnalytics/WithAnalytics';
+import ExperimentalFeature from 'utils/ExperimentalFeature';
+import Content from './Content';
 
-const Home = (): JSX.Element => {
-  return (
-    <Layout>
-      <HomeContent />
-    </Layout>
-  );
-};
+const Home = () => (
+  <Layout hasMenu={ExperimentalFeature.isEnabled('transactions')}>
+    <Content />
+  </Layout>
+);
 
 export default withAnalytics(Home, 'home');

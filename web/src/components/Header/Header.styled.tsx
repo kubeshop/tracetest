@@ -12,6 +12,9 @@ export const Header = styled(Layout.Header)`
   line-height: 48px;
   padding: 0 24px;
 
+  .ant-dropdown-trigger {
+    display: block;
+  }
   .ant-popover-title {
     padding: 16px;
   }

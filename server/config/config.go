@@ -12,12 +12,13 @@ import (
 
 type (
 	Config struct {
-		Server             ServerConfig    `yaml:",omitempty" mapstructure:"server"`
-		PostgresConnString string          `yaml:",omitempty" mapstructure:"postgresConnString"`
-		PoolingConfig      PoolingConfig   `yaml:",omitempty" mapstructure:"poolingConfig"`
-		GA                 GoogleAnalytics `yaml:"googleAnalytics,omitempty" mapstructure:"googleAnalytics"`
-		Telemetry          Telemetry       `yaml:",omitempty" mapstructure:"telemetry"`
-		Demo               Demo            `yaml:",omitempty" mapstructure:"demo"`
+		Server                ServerConfig    `yaml:",omitempty" mapstructure:"server"`
+		PostgresConnString    string          `yaml:",omitempty" mapstructure:"postgresConnString"`
+		PoolingConfig         PoolingConfig   `yaml:",omitempty" mapstructure:"poolingConfig"`
+		GA                    GoogleAnalytics `yaml:"googleAnalytics,omitempty" mapstructure:"googleAnalytics"`
+		Telemetry             Telemetry       `yaml:",omitempty" mapstructure:"telemetry"`
+		Demo                  Demo            `yaml:",omitempty" mapstructure:"demo"`
+		ExperimentalFeatures  []string        `yaml:",omitempty" mapstructure:"experimentalFeatures"`
 	}
 
 	Demo struct {

@@ -171,25 +171,21 @@ func (a *App) Start() error {
 
 	router.Handle("/ws", wsRouter.Handler())
 
-	enabledDemo := jsonEscape(a.config.Demo.Enabled)
-	if len(a.config.Demo.Enabled) == 0 {
-		enabledDemo = jsonEscape([0]string{})
-	}
-
 	router.PathPrefix(a.config.Server.PathPrefix).Handler(
 		spaHandler(
 			a.config.Server.PathPrefix,
 			"./html",
 			"index.html",
 			map[string]string{
-				"AnalyticsKey":     analytics.FrontendKey,
-				"AnalyticsEnabled": fmt.Sprintf("%t", a.config.GA.Enabled),
-				"ServerPathPrefix": fmt.Sprintf("%s/", a.config.Server.PathPrefix),
-				"ServerID":         serverID,
-				"AppVersion":       Version,
-				"Env":              Env,
-				"DemoEnabled":      enabledDemo,
-				"DemoEndpoints":    jsonEscape(a.config.Demo.Endpoints),
+				"AnalyticsKey":         analytics.FrontendKey,
+				"AnalyticsEnabled":     fmt.Sprintf("%t", a.config.GA.Enabled),
+				"ServerPathPrefix":     fmt.Sprintf("%s/", a.config.Server.PathPrefix),
+				"ServerID":             serverID,
+				"AppVersion":           Version,
+				"Env":                  Env,
+				"DemoEnabled":          jsonEscape(a.config.Demo.Enabled),
+				"DemoEndpoints":        jsonEscape(a.config.Demo.Endpoints),
+				"ExperimentalFeatures": jsonEscape(a.config.ExperimentalFeatures),
 			},
 		),
 	)

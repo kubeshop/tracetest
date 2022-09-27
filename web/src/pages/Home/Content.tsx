@@ -1,11 +1,13 @@
 import {useState} from 'react';
-import SearchInput from '../../components/SearchInput';
+
+import SearchInput from 'components/SearchInput';
 import * as S from './Home.styled';
 import HomeActions from './HomeActions';
 import TestList from './TestList';
 
-const HomeContent: React.FC = () => {
+const Content = () => {
   const [query, setQuery] = useState<string>('');
+
   return (
     <S.Wrapper>
       <S.TitleText>All Tests</S.TitleText>
@@ -18,4 +20,4 @@ const HomeContent: React.FC = () => {
   );
 };
 
-export default HomeContent;
+export default Content;
