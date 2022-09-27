@@ -1,22 +1,22 @@
-import {CheckCircleFilled, CloseCircleFilled} from '@ant-design/icons';
+import {CheckCircleFilled, MinusCircleFilled} from '@ant-design/icons';
 import {Typography} from 'antd';
 import styled from 'styled-components';
 
-export const Container = styled.div`
+export const Container = styled.div<{$isWhite?: boolean}>`
   align-items: center;
   border: ${({theme}) => `1px solid ${theme.color.borderLight}`};
   border-radius: 2px;
-  background: ${({theme}) => theme.color.background};
+  background: ${({$isWhite, theme}) => ($isWhite ? theme.color.white : theme.color.background)};
   display: flex;
   gap: 16px;
-  padding: 12px;
+  padding: 8px 16px;
 `;
 
 export const HeaderDetail = styled(Typography.Text)`
   display: flex;
   align-items: center;
   color: ${({theme}) => theme.color.textSecondary};
-  font-size: ${({theme}) => theme.size.md};
+  font-size: ${({theme}) => theme.size.sm};
   margin-right: 8px;
 `;
 
@@ -31,11 +31,15 @@ export const HeaderDot = styled.span<{$passed: boolean}>`
   width: 10px;
 `;
 
+export const IconContainer = styled.div`
+  width: 14px;
+`;
+
 export const IconSuccess = styled(CheckCircleFilled)`
   color: ${({theme}) => theme.color.success};
 `;
 
-export const IconFail = styled(CloseCircleFilled)`
+export const IconFail = styled(MinusCircleFilled)`
   color: ${({theme}) => theme.color.error};
 `;
 
@@ -43,18 +47,12 @@ export const Info = styled.div`
   flex: 1;
 `;
 
-export const TestStateContainer = styled.div`
-  width: 70px;
-`;
-
 export const Text = styled(Typography.Text).attrs({
-  type: 'secondary',
+  as: 'p',
 })<{$hasLink?: boolean}>`
-  && {
-    color: ${({$hasLink, theme}) => $hasLink && theme.color.primary};
-    font-size: ${({theme}) => theme.size.sm};
-    margin: 0;
-  }
+  color: ${({$hasLink, theme}) => ($hasLink ? theme.color.primary : theme.color.textSecondary)};
+  font-size: ${({theme}) => theme.size.sm};
+  margin: 0;
 `;
 
 export const Title = styled(Typography.Title).attrs({level: 3})`
@@ -63,6 +61,6 @@ export const Title = styled(Typography.Title).attrs({level: 3})`
   }
 `;
 
-export const ResultContainer = styled.div`
+export const Row = styled.div`
   display: flex;
 `;
