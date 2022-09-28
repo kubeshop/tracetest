@@ -1,13 +1,16 @@
-import Layout from 'components/Layout';
 import {useParams} from 'react-router-dom';
+
+import Layout from 'components/Layout';
 import withAnalytics from 'components/WithAnalytics/WithAnalytics';
 import TestProvider from 'providers/Test';
+import ExperimentalFeature from 'utils/ExperimentalFeature';
 import TestContent from './TestContent';
 
-const TestPage: React.FC = () => {
+const Test = () => {
   const {testId = ''} = useParams();
+
   return (
-    <Layout>
+    <Layout hasMenu={ExperimentalFeature.isEnabled('transactions')}>
       <TestProvider testId={testId}>
         <TestContent />
       </TestProvider>
@@ -15,4 +18,4 @@ const TestPage: React.FC = () => {
   );
 };
 
-export default withAnalytics(TestPage, 'test-details');
+export default withAnalytics(Test, 'test-details');

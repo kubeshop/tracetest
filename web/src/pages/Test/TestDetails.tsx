@@ -4,7 +4,6 @@ import {useCallback} from 'react';
 import {Steps} from 'components/GuidedTour/testDetailsStepList';
 import InfiniteScroll from 'components/InfiniteScroll';
 import ResultCardList from 'components/RunCardList';
-import SearchInput from 'components/SearchInput';
 import useInfiniteScroll from 'hooks/useInfiniteScroll';
 import {useGetRunListQuery} from 'redux/apis/TraceTest.api';
 import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
@@ -35,13 +34,7 @@ const TestDetails = ({testId}: IProps) => {
   return (
     <>
       <S.TestDetailsHeader>
-        <SearchInput
-          onSearch={() => {
-            // eslint-disable-next-line no-console
-            console.log('onSearch');
-          }}
-          placeholder="Search test result (Not implemented yet)"
-        />
+        <div />
         <Button
           onClick={handleRunTest}
           loading={isLoadingRunTest}

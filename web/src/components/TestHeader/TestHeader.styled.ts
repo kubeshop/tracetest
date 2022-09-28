@@ -7,13 +7,13 @@ export const BackIcon = styled(LeftOutlined)`
   font-size: ${({theme}) => theme.size.lg};
 `;
 
-export const Container = styled.div`
+export const Container = styled.div<{$isWhite?: boolean}>`
   align-items: center;
-  background-color: ${({theme}) => theme.color.white};
+  background: ${({$isWhite, theme}) => ($isWhite ? theme.color.white : theme.color.background)};
   border-bottom: ${({theme}) => `1px solid ${theme.color.borderLight}`};
   display: flex;
   justify-content: space-between;
-  padding: 6px 24px;
+  padding: 12px 0;
   width: 100%;
 `;
 

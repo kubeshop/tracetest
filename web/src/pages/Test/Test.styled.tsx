@@ -9,12 +9,12 @@ export const TestDetailsHeader = styled.div`
   margin: 32px 0px 24px;
 `;
 
-export const Wrapper = styled.div<{detail?: boolean}>`
+export const Wrapper = styled.div<{$isWhite?: boolean}>`
   padding: 0px 24px;
   display: flex;
   flex-grow: 1;
   flex-direction: column;
-  background: ${({theme}) => theme.color.white};
+  background: ${({$isWhite, theme}) => $isWhite && theme.color.white};
 `;
 
 export const EmptyStateIcon = styled.img.attrs({
