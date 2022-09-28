@@ -1,6 +1,6 @@
-import {useCallback, useMemo} from 'react';
-import {Menu} from 'antd';
 import {CaretDownOutlined} from '@ant-design/icons';
+import {Menu} from 'antd';
+import {useCallback, useMemo} from 'react';
 import HomeAnalyticsService from 'services/Analytics/HomeAnalytics.service';
 import ExperimentalFeature from 'utils/ExperimentalFeature';
 import * as S from './Home.styled';

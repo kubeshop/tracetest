@@ -1,9 +1,6 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
 import {HTTP_METHOD} from 'constants/Common.constants';
-import {IKeyValue, SortBy, SortDirection} from 'constants/Test.constants';
 import {uniq} from 'lodash';
-import Environment from 'models/__mocks__/Environment.mock';
-import KeyValueMock from 'models/__mocks__/KeyValue.mock';
 import AssertionResults from 'models/AssertionResults.model';
 import Test from 'models/Test.model';
 import TestRun from 'models/TestRun.model';
@@ -14,18 +11,22 @@ import {TAssertion, TAssertionResults, TRawAssertionResults} from 'types/Asserti
 import {TRawTest, TTest} from 'types/Test.types';
 import {TRawTestRun, TTestRun} from 'types/TestRun.types';
 import {TRawTestSpecs} from 'types/TestSpecs.types';
-import {PaginationResponse} from '../../hooks/usePagination';
 import {TTransaction} from '../../types/Transaction.types';
+import {IKeyValue, SortBy, SortDirection} from '../../constants/Test.constants';
+import Environment from '../../models/__mocks__/Environment.mock';
+import KeyValueMock from '../../models/__mocks__/KeyValue.mock';
+import TransactionMock from '../../models/__mocks__/Transaction.mock';
+import {ITransaction} from '../../providers/TransactionRunDetail/ITransaction';
 
 const PATH = `${document.baseURI}api/`;
 
 enum Tags {
   ENVIRONMENT = 'environment',
+  TRANSACTION = 'transaction',
   TEST = 'test',
   TEST_DEFINITION = 'testDefinition',
   TEST_RUN = 'testRun',
   SPAN = 'span',
-  TRANSACTION = 'transaction',
 }
 
 function getTotalCountFromHeaders(meta: any) {
@@ -112,6 +113,11 @@ const TraceTestAPI = createApi({
           total: getTotalCountFromHeaders(meta),
         };
       },
+    }),
+    getTransactionById: build.query<ITransaction, {transactionId: string; runId: string}>({
+      query: () => `/tests`,
+      providesTags: result => [{type: Tags.TRANSACTION, id: result?.id}],
+      transformResponse: () => TransactionMock.model(),
     }),
     getTestById: build.query<TTest, {testId: string}>({
       query: ({testId}) => `/tests/${testId}`,
@@ -270,6 +276,7 @@ export const {
   useCreateEnvironmentMutation,
   useGetTransactionByIdQuery,
   useDeleteTransactionByIdMutation,
+  useGetTransactionByIdQuery,
 } = TraceTestAPI;
 export const {endpoints} = TraceTestAPI;
 
