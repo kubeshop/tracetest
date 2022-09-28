@@ -51,7 +51,7 @@ const TestCardV2 = ({onDelete, onRun, onViewAll, test}: IProps) => {
           </div>
         </S.Row>
 
-        <S.Row $gap={36}>
+        <S.Row $gap={36} $noWrap>
           <div>
             <S.Text>Last run time:</S.Text>
             <Tooltip title={Date.format('2022-09-26T17:17:22.064998211Z')}>

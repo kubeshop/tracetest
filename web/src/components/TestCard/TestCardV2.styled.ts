@@ -79,10 +79,11 @@ export const FooterContainer = styled.div`
   width: 100%;
 `;
 
-export const Row = styled.div<{$gap?: number}>`
+export const Row = styled.div<{$gap?: number; $noWrap?: boolean}>`
   align-items: center;
   column-gap: ${({$gap}) => $gap && `${$gap}px`};
   display: flex;
+  white-space: ${({$noWrap}) => $noWrap && 'nowrap'};
 `;
 
 export const RunButton = styled(Button)`
