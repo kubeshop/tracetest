@@ -205,7 +205,7 @@ func TestExpressionType(t *testing.T) {
 		},
 		{
 			Name:         "attribute",
-			Expression:   `tracetest.myattribute`,
+			Expression:   `attr.tracetest.myattribute`,
 			ExpectedType: "attribute",
 		},
 		{
@@ -215,17 +215,17 @@ func TestExpressionType(t *testing.T) {
 		},
 		{
 			Name:         "attribute with duration",
-			Expression:   `my.duration.attr + 17ms`,
+			Expression:   `attr.my.duration.attr + 17ms`,
 			ExpectedType: "duration",
 		},
 		{
 			Name:         "attribute with number",
-			Expression:   `my.number.attr + 28`,
+			Expression:   `attr.my.number.attr + 28`,
 			ExpectedType: "number",
 		},
 		{
 			Name:         "attribute with attribute",
-			Expression:   `my.attr + my.other.attribute`,
+			Expression:   `attr.my.attr + attr.my.other.attribute`,
 			ExpectedType: "attribute",
 		},
 	}
