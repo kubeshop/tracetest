@@ -206,7 +206,7 @@ func (m OpenAPI) AssertionExpression(in *parser.Expression) *model.AssertionExpr
 
 	return &model.AssertionExpression{
 		LiteralValue: model.LiteralValue{
-			Value: in.LiteralValue.String(),
+			Value: in.LiteralValue.String(false),
 			Type:  in.LiteralValue.Type(),
 		},
 		Operation:  in.Operation,
@@ -392,7 +392,7 @@ func (m Model) AssertionExpression(in *parser.Expression) *model.AssertionExpres
 
 	return &model.AssertionExpression{
 		LiteralValue: model.LiteralValue{
-			Value: in.LiteralValue.String(),
+			Value: in.LiteralValue.String(false),
 			Type:  in.LiteralValue.Type(),
 		},
 		Operation:  in.Operation,

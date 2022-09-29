@@ -24,12 +24,12 @@ func (e *Expression) IsSimple() bool {
 	return e.Expression == nil
 }
 
-func (e *Expression) String() string {
+func (e *Expression) String(unformatted bool) string {
 	if e.Expression == nil {
-		return e.LiteralValue.String()
+		return e.LiteralValue.String(unformatted)
 	}
 
-	return fmt.Sprintf("%s %s %s", e.LiteralValue.String(), e.Operation, e.Expression.String())
+	return fmt.Sprintf("%s %s %s", e.LiteralValue.String(unformatted), e.Operation, e.Expression.String(unformatted))
 }
 
 type assertionParserObject struct {
@@ -51,18 +51,22 @@ type ExprLiteral struct {
 	QuotedString *string `| @(QuotedString|SingleQuotedString) )`
 }
 
-func (e ExprLiteral) String() string {
-	exprValue, _ := e.info()
+func (e ExprLiteral) String(unformatted bool) string {
+	exprValue, _ := e.info(unformatted)
 	return exprValue
 }
 
 func (e ExprLiteral) Type() string {
-	_, exprType := e.info()
+	_, exprType := e.info(false)
 	return exprType
 }
 
-func (e ExprLiteral) info() (string, string) {
+func (e ExprLiteral) info(unformatted bool) (string, string) {
 	if e.Attribute != nil {
+		if unformatted {
+			return string(*e.Attribute), "attribute"
+		}
+
 		return strings.Replace(*e.Attribute, "attr:", "", 1), "attribute"
 	}
 
@@ -102,16 +106,16 @@ func strp(in string) *string {
 	return &in
 }
 
-func (e Expr) String() string {
+func (e Expr) String(unformatted bool) string {
 	if e.Operator == "" {
-		return e.Exp1.String()
+		return e.Exp1.String(unformatted)
 	}
 
 	if e.Exp2 == nil {
-		return e.Exp1.String()
+		return e.Exp1.String(unformatted)
 	}
 
-	return fmt.Sprintf("%s %s %s", e.Exp1.String(), e.Operator, e.Exp2.String())
+	return fmt.Sprintf("%s %s %s", e.Exp1.String(unformatted), e.Operator, e.Exp2.String(unformatted))
 }
 
 var languageLexer = lexer.MustStateful(lexer.Rules{

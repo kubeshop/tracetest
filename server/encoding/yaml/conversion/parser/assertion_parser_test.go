@@ -373,7 +373,7 @@ func TestParseAssertion(t *testing.T) {
 func assertExpression(t *testing.T, expected, actual *parser.Expression) {
 	if expected != nil {
 		assert.Equal(t, expected.LiteralValue.Type(), actual.LiteralValue.Type())
-		assert.Equal(t, expected.LiteralValue.String(), actual.LiteralValue.String())
+		assert.Equal(t, expected.LiteralValue.String(false), actual.LiteralValue.String(false))
 		assert.Equal(t, expected.Operation, actual.Operation)
 		assertExpression(t, expected.Expression, actual.Expression)
 	}
