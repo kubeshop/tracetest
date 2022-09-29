@@ -116,11 +116,24 @@ func (td *postgresDB) DeleteTest(ctx context.Context, test model.Test) error {
 		"DELETE FROM tests WHERE id = $1",
 	}
 
+	tx, err := td.db.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("sql BeginTx: %w", err)
+	}
+
 	for _, sql := range queries {
-		_, err := td.db.ExecContext(ctx, sql, test.ID)
+		_, err := tx.ExecContext(ctx, sql, test.ID)
 		if err != nil {
+			tx.Rollback()
 			return fmt.Errorf("sql error: %w", err)
 		}
+	}
+
+	dropSequece(ctx, tx, test.ID)
+
+	err = tx.Commit()
+	if err != nil {
+		return fmt.Errorf("sql Commit: %w", err)
 	}
 
 	return nil

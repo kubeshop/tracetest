@@ -71,8 +71,18 @@ RETURNING "id"`
 
 const (
 	createSequeceQuery = `CREATE SEQUENCE IF NOT EXISTS "` + runSequenceName + `";`
+	dropSequeceQuery   = `DROP SEQUENCE IF EXISTS "` + runSequenceName + `";`
 	runSequenceName    = "%sequence_name%"
 )
+
+func dropSequece(ctx context.Context, tx *sql.Tx, testID id.ID) error {
+	_, err := tx.ExecContext(
+		ctx,
+		replaceRunSequenceName(createSequeceQuery, testID),
+	)
+
+	return err
+}
 
 func md5Hash(text string) string {
 	hash := md5.Sum([]byte(text))

@@ -1,5 +1,7 @@
 BEGIN;
 
+  DELETE FROM test_runs;
+
   ALTER TABLE test_runs
     DROP CONSTRAINT test_runs_pkey,
     ALTER COLUMN id DROP DEFAULT,
