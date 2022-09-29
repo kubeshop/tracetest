@@ -6,6 +6,7 @@ import TestState from 'components/TestState';
 import {TestState as TestStateEnum} from 'constants/TestRun.constants';
 import {TTestRun} from 'types/TestRun.types';
 import Date from 'utils/Date';
+import ExperimentalFeature from 'utils/ExperimentalFeature';
 import * as S from './RunCard.styled';
 
 interface IProps {
@@ -34,46 +35,50 @@ const ResultCard = ({
 
   return (
     <Link to={`/test/${testId}/run/${runId}`}>
-      <S.Container data-cy={`run-card-${runId}`}>
-        <div>{getIcon(state, failedAssertionCount)}</div>
+      <S.Container $isWhite={ExperimentalFeature.isEnabled('transactions')} data-cy={`run-card-${runId}`}>
+        <S.IconContainer>{getIcon(state, failedAssertionCount)}</S.IconContainer>
 
         <S.Info>
           <div>
             <S.Title>v{testVersion}</S.Title>
           </div>
-          <div>
+          <S.Row>
             <Tooltip title={Date.format(createdAt)}>
               <S.Text>{Date.getTimeAgo(createdAt)}</S.Text>
             </Tooltip>
-            <S.Text> - {executionTime}s</S.Text>
+            <S.Text>&nbsp;• {executionTime}s</S.Text>
 
             {metadataName && (
               <a href={metadataUrl} target="_blank" onClick={event => event.stopPropagation()}>
-                <S.Text $hasLink={Boolean(metadataUrl)}> - {`${metadataName} ${metadataBuildNumber}`}</S.Text>
+                <S.Text $hasLink={Boolean(metadataUrl)}>&nbsp;• {`${metadataName} ${metadataBuildNumber}`}</S.Text>
               </a>
             )}
-            {metadataBranch && <S.Text> - Branch: {metadataBranch}</S.Text>}
-          </div>
+            {metadataBranch && <S.Text>&nbsp;• Branch: {metadataBranch}</S.Text>}
+          </S.Row>
         </S.Info>
 
-        <S.ResultContainer>
-          <Tooltip title="Passed assertions">
-            <S.HeaderDetail>
-              <S.HeaderDot $passed />
-              {passedAssertionCount}
-            </S.HeaderDetail>
-          </Tooltip>
-          <Tooltip title="Failed assertions">
-            <S.HeaderDetail>
-              <S.HeaderDot $passed={false} />
-              {failedAssertionCount}
-            </S.HeaderDetail>
-          </Tooltip>
-        </S.ResultContainer>
+        {state !== TestStateEnum.FAILED && state !== TestStateEnum.FINISHED && (
+          <div data-cy={`test-run-result-status-${runId}`}>
+            <TestState testState={state} />
+          </div>
+        )}
 
-        <S.TestStateContainer data-cy={`test-run-result-status-${runId}`}>
-          <TestState testState={state} />
-        </S.TestStateContainer>
+        {(state === TestStateEnum.FAILED || state === TestStateEnum.FINISHED) && (
+          <S.Row>
+            <Tooltip title="Passed assertions">
+              <S.HeaderDetail>
+                <S.HeaderDot $passed />
+                {passedAssertionCount}
+              </S.HeaderDetail>
+            </Tooltip>
+            <Tooltip title="Failed assertions">
+              <S.HeaderDetail>
+                <S.HeaderDot $passed={false} />
+                {failedAssertionCount}
+              </S.HeaderDetail>
+            </Tooltip>
+          </S.Row>
+        )}
 
         <div>
           <RunActionsMenu resultId={runId} testId={testId} testVersion={testVersion} />

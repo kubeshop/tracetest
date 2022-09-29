@@ -10,7 +10,9 @@ const Content = () => {
 
   return (
     <S.Wrapper>
-      <S.TitleText>All Tests</S.TitleText>
+      <S.HeaderContainer>
+        <S.TitleText>All Tests</S.TitleText>
+      </S.HeaderContainer>
       <S.PageHeader>
         <SearchInput onSearch={value => setQuery(value)} placeholder="Search test" />
         <HomeActions />

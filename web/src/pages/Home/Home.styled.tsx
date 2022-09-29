@@ -14,7 +14,7 @@ export const PageHeader = styled.div`
 
 export const TitleText = styled(Typography.Title).attrs({level: 1})`
   && {
-    margin: 14px 0;
+    margin: 0;
   }
 `;
 
@@ -51,4 +51,10 @@ export const TestListContainer = styled.div`
   flex-direction: column;
   gap: 8px;
   margin-bottom: 24px;
+`;
+
+export const HeaderContainer = styled.div`
+  border-bottom: ${({theme}) => `1px solid ${theme.color.borderLight}`};
+  padding: 23px 0;
+  width: 100%;
 `;
