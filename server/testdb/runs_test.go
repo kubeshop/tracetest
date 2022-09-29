@@ -43,6 +43,37 @@ func TestCreateRun(t *testing.T) {
 	assert.Equal(t, run.Metadata, actual.Metadata)
 }
 
+func TestCreateRunIDsIncrementForTest(t *testing.T) {
+	db, clean := getDB()
+	defer clean()
+
+	run := model.Run{
+		TraceID: testdb.IDGen.TraceID(),
+		SpanID:  testdb.IDGen.SpanID(),
+	}
+
+	test1 := createTest(t, db)
+	test2 := createTest(t, db)
+
+	t1r1, err := db.CreateRun(context.TODO(), test1, run)
+	require.NoError(t, err)
+
+	t2r1, err := db.CreateRun(context.TODO(), test2, run)
+	require.NoError(t, err)
+
+	t1r2, err := db.CreateRun(context.TODO(), test1, run)
+	require.NoError(t, err)
+
+	t2r2, err := db.CreateRun(context.TODO(), test2, run)
+	require.NoError(t, err)
+
+	assert.Equal(t, 1, t1r1.ID)
+	assert.Equal(t, 2, t1r2.ID)
+	assert.Equal(t, 1, t2r1.ID)
+	assert.Equal(t, 2, t2r2.ID)
+
+}
+
 func TestUpdateRun(t *testing.T) {
 	db, clean := getDB()
 	defer clean()

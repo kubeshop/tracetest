@@ -2,11 +2,15 @@ package testdb
 
 import (
 	"context"
+	"crypto/md5"
 	"database/sql"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 
+	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -39,7 +43,7 @@ INSERT INTO test_runs (
 
 	"metadata"
 ) VALUES (
-	nextval('test_runs_id_seq'), -- id
+	nextval('` + runSequenceName + `'), -- id
 	$1,   -- test_id
 	$2,   -- test_version
 
@@ -65,13 +69,26 @@ INSERT INTO test_runs (
 )
 RETURNING "id"`
 
-func (td *postgresDB) CreateRun(ctx context.Context, test model.Test, run model.Run) (model.Run, error) {
-	stmt, err := td.db.Prepare(createRunQuery)
-	if err != nil {
-		return model.Run{}, fmt.Errorf("sql prepare: %w", err)
-	}
-	defer stmt.Close()
+const (
+	createSequeceQuery = `CREATE SEQUENCE IF NOT EXISTS "` + runSequenceName + `";`
+	runSequenceName    = "%sequence_name%"
+)
 
+func md5Hash(text string) string {
+	hash := md5.Sum([]byte(text))
+	return hex.EncodeToString(hash[:])
+}
+
+func replaceRunSequenceName(sql string, testID id.ID) string {
+	// postgres doesn't like uppercase chars in sequence names.
+	// testID might contain uppercase chars, and we cannot lowercase them
+	// because they might lose their uniqueness.
+	// md5 creates a unique, lowercase hash.
+	seqName := "runs_test_" + md5Hash(testID.String()) + "_seq"
+	return strings.ReplaceAll(sql, runSequenceName, seqName)
+}
+
+func (td *postgresDB) CreateRun(ctx context.Context, test model.Test, run model.Run) (model.Run, error) {
 	run.TestID = test.ID
 	run.State = model.RunStateCreated
 	run.TestVersion = test.Version
@@ -84,8 +101,20 @@ func (td *postgresDB) CreateRun(ctx context.Context, test model.Test, run model.
 
 	var id int
 
-	err = stmt.QueryRowContext(
+	tx, err := td.db.BeginTx(ctx, nil)
+	if err != nil {
+		return model.Run{}, fmt.Errorf("sql beginTx: %w", err)
+	}
+
+	_, err = tx.ExecContext(ctx, replaceRunSequenceName(createSequeceQuery, test.ID))
+	if err != nil {
+		tx.Rollback()
+		return model.Run{}, fmt.Errorf("sql exec: %w", err)
+	}
+
+	err = tx.QueryRowContext(
 		ctx,
+		replaceRunSequenceName(createRunQuery, test.ID),
 		test.ID,
 		test.Version,
 		run.CreatedAt,
@@ -95,8 +124,11 @@ func (td *postgresDB) CreateRun(ctx context.Context, test model.Test, run model.
 		jsonMetadata,
 	).Scan(&id)
 	if err != nil {
+		tx.Rollback()
 		return model.Run{}, fmt.Errorf("sql exec: %w", err)
 	}
+
+	tx.Commit()
 
 	return td.GetRun(ctx, id)
 }
