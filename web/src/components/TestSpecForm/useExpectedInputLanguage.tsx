@@ -1,8 +1,8 @@
 import {autocompletion} from '@codemirror/autocomplete';
 import {syntaxTree} from '@codemirror/language';
-import {useMemo} from 'react';
 
 import {Attributes} from 'constants/SpanAttribute.constants';
+import {useMemo} from 'react';
 import {tracetest} from 'utils/grammar';
 
 function isNumber(text?: string) {
@@ -25,7 +25,9 @@ export function useExpectedInputLanguage() {
             const identifierText = state.doc.sliceString(parentNode.from, parentNode.to);
             const isN = isNumber(identifierText);
 
-            const attributeOptions = Object.values(Attributes).map(s => ({label: s, apply: `${s} `}));
+            const attributeOptions = Object.values(Attributes)
+              .map(s => `attr:${s}`)
+              .map(s => ({label: s, apply: `${s} `}));
             const durationOptions = [{label: `${word?.text.toString()}ms`}, {label: `${word?.text.toString()}s`}];
             const operatorOptions = [
               {label: '+', apply: '+ '},
