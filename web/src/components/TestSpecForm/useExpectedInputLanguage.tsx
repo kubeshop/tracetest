@@ -25,9 +25,7 @@ export function useExpectedInputLanguage() {
             const identifierText = state.doc.sliceString(parentNode.from, parentNode.to);
             const isN = isNumber(identifierText);
 
-            const attributeOptions = Object.values(Attributes)
-              .map(s => `attr:${s}`)
-              .map(s => ({label: s, apply: `${s} `}));
+            const attributeOptions = Object.values(Attributes).map(s => ({label: `attr:${s}`, apply: `attr:${s} `}));
             const durationOptions = [{label: `${word?.text.toString()}ms`}, {label: `${word?.text.toString()}s`}];
             const operatorOptions = [
               {label: '+', apply: '+ '},
