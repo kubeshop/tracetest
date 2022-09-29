@@ -1,4 +1,4 @@
-id: 368a334a-cd2b-4ed6-bb50-e71aca2d2728
+id: 3G3cJRVVg
 name: Test Rerun
 description: ""
 trigger:
@@ -17,7 +17,7 @@ specs:
 - selector: span[name="POST /api/tests/{testId}/run/{runId}/rerun" tracetest.span.type="http"]
   assertions:
   - tracetest.selected_spans.count = 1
-- selector: span[name = "exec INSERT"]
+- selector: span[name = "query INSERT"]
   assertions:
   - tracetest.selected_spans.count = 1
 - selector: span[name = "exec UPDATE"]

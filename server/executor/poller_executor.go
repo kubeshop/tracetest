@@ -39,7 +39,7 @@ func (pe InstrumentedPollerExecutor) ExecuteRequest(request *PollingRequest) (bo
 		attribute.String("tracetest.run.trace_poller.trace_id", request.run.TraceID.String()),
 		attribute.String("tracetest.run.trace_poller.span_id", request.run.SpanID.String()),
 		attribute.Bool("tracetest.run.trace_poller.succesful", finished),
-		attribute.String("tracetest.run.trace_poller.test_id", request.test.ID.String()),
+		attribute.String("tracetest.run.trace_poller.test_id", string(request.test.ID)),
 		attribute.Int("tracetest.run.trace_poller.amount_retrieved_spans", spanCount),
 	}
 
@@ -98,7 +98,7 @@ func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, m
 
 	run = run.SuccessfullyPolledTraces(augmentData(&trace, run.TriggerResult))
 
-	fmt.Printf("completed polling result %s after %d times, number of spans: %d \n", run.ID, request.count, len(run.Trace.Flat))
+	fmt.Printf("completed polling result %d after %d times, number of spans: %d \n", run.ID, request.count, len(run.Trace.Flat))
 
 	err = pe.updater.Update(request.ctx, run)
 	if err != nil {

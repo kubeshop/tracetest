@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/traces"
 	"go.opentelemetry.io/otel/trace"
@@ -115,7 +114,7 @@ func (a *Assertion) UnmarshalJSON(data []byte) error {
 }
 
 type encodedRun struct {
-	ID                        string
+	ID                        int
 	ShortID                   string
 	TraceID                   string
 	SpanID                    string
@@ -126,7 +125,6 @@ type encodedRun struct {
 	ServiceTriggerCompletedAt time.Time
 	ObtainedTraceAt           time.Time
 	CompletedAt               time.Time
-	Trigger                   Trigger
 	TriggerResult             TriggerResult
 	Trace                     *traces.Trace
 	Results                   *RunResults
@@ -136,8 +134,7 @@ type encodedRun struct {
 
 func (r Run) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&encodedRun{
-		ID:                        r.ID.String(),
-		ShortID:                   r.ShortID,
+		ID:                        r.ID,
 		TraceID:                   r.TraceID.String(),
 		SpanID:                    r.SpanID.String(),
 		State:                     string(r.State),
@@ -148,7 +145,6 @@ func (r Run) MarshalJSON() ([]byte, error) {
 		ObtainedTraceAt:           r.ObtainedTraceAt,
 		CompletedAt:               r.CompletedAt,
 		TestVersion:               r.TestVersion,
-		Trigger:                   r.Trigger,
 		Trace:                     r.Trace,
 		Results:                   r.Results,
 		TriggerResult:             r.TriggerResult,
@@ -163,19 +159,24 @@ func (r *Run) UnmarshalJSON(data []byte) error {
 		return fmt.Errorf("unmarshal run: %w", err)
 	}
 
-	id, err := uuid.Parse(aux.ID)
-	if err != nil {
-		return fmt.Errorf("unmarshal run: %w", err)
+	var (
+		tid trace.TraceID
+		sid trace.SpanID
+		err error
+	)
+
+	if aux.TraceID != "" {
+		tid, err = trace.TraceIDFromHex(aux.TraceID)
+		if err != nil {
+			return fmt.Errorf("unmarshal run: %w", err)
+		}
 	}
 
-	tid, err := trace.TraceIDFromHex(aux.TraceID)
-	if err != nil {
-		return fmt.Errorf("unmarshal run: %w", err)
-	}
-
-	sid, err := trace.SpanIDFromHex(aux.SpanID)
-	if err != nil {
-		return fmt.Errorf("unmarshal run: %w", err)
+	if aux.SpanID != "" {
+		sid, err = trace.SpanIDFromHex(aux.SpanID)
+		if err != nil {
+			return fmt.Errorf("unmarshal run: %w", err)
+		}
 	}
 
 	triggerResult := TriggerResult{
@@ -184,8 +185,7 @@ func (r *Run) UnmarshalJSON(data []byte) error {
 		GRPC: aux.TriggerResult.GRPC,
 	}
 
-	r.ID = id
-	r.ShortID = aux.ShortID
+	r.ID = aux.ID
 	r.TraceID = tid
 	r.SpanID = sid
 	r.State = RunState(aux.State)
@@ -196,7 +196,6 @@ func (r *Run) UnmarshalJSON(data []byte) error {
 	r.ObtainedTraceAt = aux.ObtainedTraceAt
 	r.CompletedAt = aux.CompletedAt
 	r.TestVersion = aux.TestVersion
-	r.Trigger = aux.Trigger
 	r.TriggerResult = triggerResult
 
 	r.Trace = aux.Trace
@@ -215,9 +214,9 @@ func errToString(err error) string {
 }
 
 func stringToErr(s string) error {
-	if s != "" {
-		return errors.New(s)
+	if s == "" {
+		return nil
 	}
 
-	return nil
+	return errors.New(s)
 }

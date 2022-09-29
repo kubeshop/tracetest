@@ -8,19 +8,19 @@ import (
 	"strings"
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 )
 
 var _ model.TestRepository = &postgresDB{}
 
-func (td *postgresDB) IDExists(ctx context.Context, id uuid.UUID) (bool, error) {
+func (td *postgresDB) IDExists(ctx context.Context, id id.ID) (bool, error) {
 	exists := false
 
 	row := td.db.QueryRowContext(
 		ctx,
 		"SELECT COUNT(*) > 0 as exists FROM tests WHERE id = $1",
-		id.String(),
+		id,
 	)
 
 	err := row.Scan(&exists)
@@ -28,27 +28,55 @@ func (td *postgresDB) IDExists(ctx context.Context, id uuid.UUID) (bool, error) 
 	return exists, err
 }
 
+const insertIntoTestsQuery = `
+INSERT INTO tests (
+	"id",
+	"version",
+	"name",
+	"description",
+	"service_under_test",
+	"specs",
+	"created_at"
+) VALUES ($1, $2, $3, $4, $5, $6, $7)`
+
 func (td *postgresDB) CreateTest(ctx context.Context, test model.Test) (model.Test, error) {
 	if !test.HasID() {
-		test.ID = IDGen.UUID()
+		test.ID = IDGen.ID()
 	}
 
-	test.CreatedAt = time.Now()
-	test.ReferenceRun = nil
 	test.Version = 1
+	test.CreatedAt = time.Now()
 
-	stmt, err := td.db.Prepare("INSERT INTO tests(id, test, version) VALUES( $1, $2, $3 )")
+	return td.insertIntoTests(ctx, test)
+}
+
+func (td *postgresDB) insertIntoTests(ctx context.Context, test model.Test) (model.Test, error) {
+	stmt, err := td.db.Prepare(insertIntoTestsQuery)
 	if err != nil {
 		return model.Test{}, fmt.Errorf("sql prepare: %w", err)
 	}
 	defer stmt.Close()
 
-	b, err := encodeTest(test)
+	jsonServiceUnderTest, err := json.Marshal(test.ServiceUnderTest)
 	if err != nil {
 		return model.Test{}, fmt.Errorf("encoding error: %w", err)
 	}
 
-	_, err = stmt.ExecContext(ctx, test.ID, b, test.Version)
+	jsonSpecs, err := json.Marshal(test.Specs)
+	if err != nil {
+		return model.Test{}, fmt.Errorf("encoding error: %w", err)
+	}
+
+	_, err = stmt.ExecContext(
+		ctx,
+		test.ID,
+		test.Version,
+		test.Name,
+		test.Description,
+		jsonServiceUnderTest,
+		jsonSpecs,
+		test.CreatedAt,
+	)
 	if err != nil {
 		return model.Test{}, fmt.Errorf("sql exec: %w", err)
 	}
@@ -79,47 +107,12 @@ func (td *postgresDB) UpdateTest(ctx context.Context, test model.Test) (model.Te
 		return testToUpdate, nil
 	}
 
-	stmt, err := td.db.Prepare("INSERT INTO tests(id, test, version) VALUES( $1, $2, $3 )")
-	if err != nil {
-		return model.Test{}, fmt.Errorf("sql prepare: %w", err)
-	}
-	defer stmt.Close()
-
-	b, err := encodeTest(testToUpdate)
-	if err != nil {
-		return model.Test{}, fmt.Errorf("encoding error: %w", err)
-	}
-	_, err = stmt.ExecContext(ctx, testToUpdate.ID, b, testToUpdate.Version)
-	if err != nil {
-		return model.Test{}, fmt.Errorf("sql exec: %w", err)
-	}
-
-	return testToUpdate, nil
-}
-
-func (td *postgresDB) UpdateTestVersion(ctx context.Context, test model.Test) error {
-	stmt, err := td.db.Prepare("UPDATE tests SET test = $2 WHERE id = $1 AND version = $3")
-	if err != nil {
-		return fmt.Errorf("sql prepare: %w", err)
-	}
-	defer stmt.Close()
-
-	b, err := encodeTest(test)
-	if err != nil {
-		return fmt.Errorf("encoding error: %w", err)
-	}
-
-	_, err = stmt.ExecContext(ctx, test.ID, b, test.Version)
-	if err != nil {
-		return fmt.Errorf("sql exec: %w", err)
-	}
-
-	return nil
+	return td.insertIntoTests(ctx, testToUpdate)
 }
 
 func (td *postgresDB) DeleteTest(ctx context.Context, test model.Test) error {
 	queries := []string{
-		"DELETE FROM runs WHERE test_id = $1",
+		"DELETE FROM test_runs WHERE test_id = $1",
 		"DELETE FROM tests WHERE id = $1",
 	}
 
@@ -133,9 +126,19 @@ func (td *postgresDB) DeleteTest(ctx context.Context, test model.Test) error {
 	return nil
 }
 
-const getTestSQL = `SELECT t.test FROM tests t`
+const getTestSQL = `
+	SELECT
+		t.id,
+		t.version,
+		t.name,
+		t.description,
+		t.service_under_test,
+		t.specs,
+		t.created_at
+	FROM tests t
+`
 
-func (td *postgresDB) GetTestVersion(ctx context.Context, id uuid.UUID, version int) (model.Test, error) {
+func (td *postgresDB) GetTestVersion(ctx context.Context, id id.ID, version int) (model.Test, error) {
 	stmt, err := td.db.Prepare(getTestSQL + " WHERE t.id = $1 AND t.version = $2")
 	if err != nil {
 		return model.Test{}, fmt.Errorf("prepare: %w", err)
@@ -150,7 +153,7 @@ func (td *postgresDB) GetTestVersion(ctx context.Context, id uuid.UUID, version 
 	return test, nil
 }
 
-func (td *postgresDB) GetLatestTestVersion(ctx context.Context, id uuid.UUID) (model.Test, error) {
+func (td *postgresDB) GetLatestTestVersion(ctx context.Context, id id.ID) (model.Test, error) {
 	stmt, err := td.db.Prepare(getTestSQL + " WHERE t.id = $1 ORDER BY t.version DESC LIMIT 1")
 	if err != nil {
 		return model.Test{}, fmt.Errorf("prepare: %w", err)
@@ -177,12 +180,12 @@ func (td *postgresDB) GetTests(ctx context.Context, take, skip int32, query stri
 	if hasSearchQuery {
 		params = append(params, "%"+strings.ReplaceAll(query, " ", "%")+"%")
 		sql += ` AND (
-			(t.test ->> 'Name') ilike $3
-			OR (t.test ->> 'Description') ilike $3
+			t.name ilike $3
+			OR t.description ilike $3
 		)`
 	}
 
-	sql += ` ORDER BY (t.test ->> 'CreatedAt')::timestamp DESC LIMIT $1 OFFSET $2`
+	sql += ` ORDER BY t.created_at DESC LIMIT $1 OFFSET $2`
 
 	stmt, err := td.db.Prepare(sql)
 	if err != nil {
@@ -208,32 +211,30 @@ func (td *postgresDB) GetTests(ctx context.Context, take, skip int32, query stri
 	return tests, nil
 }
 
-func encodeTest(t model.Test) (string, error) {
-	b, err := json.Marshal(t)
-	if err != nil {
-		return "", fmt.Errorf("json Marshal: %w", err)
-	}
-
-	return string(b), nil
-}
-
-func decodeTest(b []byte) (model.Test, error) {
-	var test model.Test
-	err := json.Unmarshal(b, &test)
-	if err != nil {
-		return model.Test{}, err
-	}
-	return test, nil
-}
-
 func (td *postgresDB) readTestRow(ctx context.Context, row scanner) (model.Test, error) {
-	var testB []byte
-	err := row.Scan(&testB)
+	test := model.Test{}
+
+	var jsonServiceUnderTest, jsonSpecs []byte
+	err := row.Scan(
+		&test.ID,
+		&test.Version,
+		&test.Name,
+		&test.Description,
+		&jsonServiceUnderTest,
+		&jsonSpecs,
+		&test.CreatedAt,
+	)
+
 	switch err {
 	case sql.ErrNoRows:
 		return model.Test{}, ErrNotFound
 	case nil:
-		test, err := decodeTest(testB)
+		err = json.Unmarshal(jsonServiceUnderTest, &test.ServiceUnderTest)
+		if err != nil {
+			return model.Test{}, err
+		}
+
+		err = json.Unmarshal(jsonSpecs, &test.Specs)
 		if err != nil {
 			return model.Test{}, err
 		}

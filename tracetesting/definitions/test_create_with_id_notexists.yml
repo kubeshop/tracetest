@@ -1,4 +1,4 @@
-id: 4ab71eaa-7356-454a-b1c0-8064e2a7135d
+id: zwWc1RV4R
 name: Test Create with non-existing ID
 description: ""
 trigger:
@@ -11,7 +11,7 @@ trigger:
       value: application/json
     body: |
       {
-        "id": "383d3dce-7b60-4a61-bdea-87f47263af5d",
+        "id": "${EXAMPLE_TEST_ID}",
         "name": "Pokemon - List - Get a Pokemon",
         "serviceUnderTest": {
           "triggerType": "http",
@@ -35,7 +35,7 @@ specs:
   assertions:
     - tracetest.selected_spans.count = 1
     - tracetest.response.status = 200
-    - tracetest.response.body contains '"id":"383d3dce-7b60-4a61-bdea-87f47263af5d"'
+    - tracetest.response.body contains '"id":"${EXAMPLE_TEST_ID}"'
 - selector: span[name="POST /api/tests" tracetest.span.type="http"]
   assertions:
   - tracetest.selected_spans.count = 1
