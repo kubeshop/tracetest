@@ -17,7 +17,7 @@ import (
 
 var (
 	exampleRun = model.Run{
-		ID:      http.IDGen.UUID(),
+		ID:      1,
 		TraceID: http.IDGen.TraceID(),
 		Trace: &traces.Trace{
 			ID: http.IDGen.TraceID(),
@@ -107,7 +107,7 @@ func TestContains_Issue617(t *testing.T) {
 	f := setupController(t)
 	f.expectGetRun(exampleRun)
 
-	actual, err := f.c.DryRunAssertion(context.TODO(), "", exampleRun.ID.String(), spec)
+	actual, err := f.c.DryRunAssertion(context.TODO(), "", int32(exampleRun.ID), spec)
 	require.NoError(t, err)
 
 	assert.Equal(t, 200, actual.Code)

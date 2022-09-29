@@ -153,12 +153,6 @@ func (c *ApiApiController) Routes() Routes {
 			c.RerunTestRun,
 		},
 		{
-			"RunShortUrl",
-			strings.ToUpper("Get"),
-			"/api/r/{runShortId}",
-			c.RunShortUrl,
-		},
-		{
 			"RunTest",
 			strings.ToUpper("Post"),
 			"/api/tests/{testId}/run",
@@ -254,7 +248,11 @@ func (c *ApiApiController) DeleteTestRun(w http.ResponseWriter, r *http.Request)
 	params := mux.Vars(r)
 	testIdParam := params["testId"]
 
-	runIdParam := params["runId"]
+	runIdParam, err := parseInt32Parameter(params["runId"], true)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
 
 	result, err := c.service.DeleteTestRun(r.Context(), testIdParam, runIdParam)
 	// If an error occurred, encode the error with the status code
@@ -272,7 +270,11 @@ func (c *ApiApiController) DryRunAssertion(w http.ResponseWriter, r *http.Reques
 	params := mux.Vars(r)
 	testIdParam := params["testId"]
 
-	runIdParam := params["runId"]
+	runIdParam, err := parseInt32Parameter(params["runId"], true)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
 
 	testSpecsParam := TestSpecs{}
 	d := json.NewDecoder(r.Body)
@@ -301,7 +303,11 @@ func (c *ApiApiController) ExportTestRun(w http.ResponseWriter, r *http.Request)
 	params := mux.Vars(r)
 	testIdParam := params["testId"]
 
-	runIdParam := params["runId"]
+	runIdParam, err := parseInt32Parameter(params["runId"], true)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
 
 	result, err := c.service.ExportTestRun(r.Context(), testIdParam, runIdParam)
 	// If an error occurred, encode the error with the status code
@@ -319,7 +325,11 @@ func (c *ApiApiController) GetRunResultJUnit(w http.ResponseWriter, r *http.Requ
 	params := mux.Vars(r)
 	testIdParam := params["testId"]
 
-	runIdParam := params["runId"]
+	runIdParam, err := parseInt32Parameter(params["runId"], true)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
 
 	result, err := c.service.GetRunResultJUnit(r.Context(), testIdParam, runIdParam)
 	// If an error occurred, encode the error with the status code
@@ -354,7 +364,11 @@ func (c *ApiApiController) GetTestResultSelectedSpans(w http.ResponseWriter, r *
 	query := r.URL.Query()
 	testIdParam := params["testId"]
 
-	runIdParam := params["runId"]
+	runIdParam, err := parseInt32Parameter(params["runId"], true)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
 
 	queryParam := query.Get("query")
 	result, err := c.service.GetTestResultSelectedSpans(r.Context(), testIdParam, runIdParam, queryParam)
@@ -373,7 +387,11 @@ func (c *ApiApiController) GetTestRun(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	testIdParam := params["testId"]
 
-	runIdParam := params["runId"]
+	runIdParam, err := parseInt32Parameter(params["runId"], true)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
 
 	result, err := c.service.GetTestRun(r.Context(), testIdParam, runIdParam)
 	// If an error occurred, encode the error with the status code
@@ -527,25 +545,13 @@ func (c *ApiApiController) RerunTestRun(w http.ResponseWriter, r *http.Request) 
 	params := mux.Vars(r)
 	testIdParam := params["testId"]
 
-	runIdParam := params["runId"]
-
-	result, err := c.service.RerunTestRun(r.Context(), testIdParam, runIdParam)
-	// If an error occurred, encode the error with the status code
+	runIdParam, err := parseInt32Parameter(params["runId"], true)
 	if err != nil {
-		c.errorHandler(w, r, err, &result)
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
 		return
 	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
 
-}
-
-// RunShortUrl - run short url redirecter
-func (c *ApiApiController) RunShortUrl(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	runShortIdParam := params["runShortId"]
-
-	result, err := c.service.RunShortUrl(r.Context(), runShortIdParam)
+	result, err := c.service.RerunTestRun(r.Context(), testIdParam, runIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

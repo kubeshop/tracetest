@@ -6,7 +6,6 @@ components:
       properties:
         id:
           type: string
-          format: uuid
           readOnly: true
         name:
           type: string
@@ -67,10 +66,6 @@ components:
       properties:
         id:
           type: string
-          format: uuid
-          readOnly: true
-        shortId:
-          type: string
           readOnly: true
         traceId:
           type: string
@@ -106,8 +101,6 @@ components:
         completedAt:
           type: string
           format: date-time
-        trigger:
-          $ref: "./triggers.yaml#/components/schemas/Trigger"
         triggerResult:
           $ref: "./triggers.yaml#/components/schemas/TriggerResult"
         trace:

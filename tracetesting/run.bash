@@ -1,8 +1,16 @@
 #/bin/bash
 
-export TRACETEST_CLI=${TRACETEST_CLI:-"../cli/tracetest"}
-if ! command -v "$TRACETEST_CLI" &> /dev/null; then
-  echo "\$TRACETEST_CLI not set to executable. set to $TRACETEST_CLI";
+set -e
+
+export TRACETEST_CLI_TARGET=${TRACETEST_CLI_TARGET:-"tracetest"}
+if ! command -v "$TRACETEST_CLI_TARGET" &> /dev/null; then
+  echo "\$TRACETEST_CLI_TARGET not set to executable. set to $TRACETEST_CLI_TARGET";
+  exit 2
+fi
+
+export TRACETEST_CLI_MAIN=${TRACETEST_CLI_MAIN:-"${TRACETEST_CLI_TARGET}"}
+if ! command -v "$TRACETEST_CLI_MAIN" &> /dev/null; then
+  echo "\$TRACETEST_CLI_MAIN not set to executable. set to $TRACETEST_CLI_MAIN";
   exit 2
 fi
 
@@ -19,7 +27,8 @@ export DEMO_APP_URL=${DEMO_APP_URL-"http://demo-pokemon-api.demo"}
 export DEMO_APP_GRPC_URL=${DEMO_APP_GRPC_URL-"demo-pokemon-api.demo:8082"}
 
 
-echo "TRACETEST_CLI: $TRACETEST_CLI"
+echo "TRACETEST_CLI_MAIN: $TRACETEST_CLI_MAIN"
+echo "TRACETEST_CLI_TARGET: $TRACETEST_CLI_TARGET"
 echo "TARGET_URL: $TARGET_URL"
 echo "TRACETEST_MAIN_ENDPOINT: $TRACETEST_MAIN_ENDPOINT"
 echo "TRACETEST_TARGET_ENDPOINT: $TRACETEST_TARGET_ENDPOINT"

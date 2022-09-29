@@ -6,30 +6,6 @@ info:
 servers:
   - url: /api
 paths:
-  /r/{runShortId}:
-    get:
-      tags:
-        - api
-      summary: "run short url redirecter"
-      description: "run short url redirecter"
-      operationId: runShortUrl
-      parameters:
-        - in: path
-          name: runShortId
-          description: "shortId for run"
-          schema:
-            type: string
-          required: true
-      responses:
-        301:
-          description: test run found, redirect to Location
-          headers:
-            Location:
-              schema:
-                type: string
-                format: url
-        404:
-          description: "test run not found"
   /tests:
     get:
       tags:
@@ -118,7 +94,6 @@ paths:
           name: testId
           schema:
             type: string
-            format: uuid
           required: true
       summary: "update test from definition file"
       description: "update test action from definition file"
@@ -145,7 +120,6 @@ paths:
           name: testId
           schema:
             type: string
-            format: uuid
           required: true
       summary: "get test"
       description: "get test"
@@ -167,7 +141,6 @@ paths:
           name: testId
           schema:
             type: string
-            format: uuid
           required: true
       summary: "update test"
       description: "update test action"
@@ -190,7 +163,6 @@ paths:
           name: testId
           schema:
             type: string
-            format: uuid
           required: true
       summary: "delete a test"
       description: "delete a test"
@@ -207,7 +179,6 @@ paths:
           name: testId
           schema:
             type: string
-            format: uuid
           required: true
       summary: "run test"
       description: "run a particular test"
@@ -232,7 +203,6 @@ paths:
           name: testId
           schema:
             type: string
-            format: uuid
           required: true
         - in: query
           name: take
@@ -267,13 +237,11 @@ paths:
           name: testId
           schema:
             type: string
-            format: uuid
           required: true
         - in: path
           name: runId
           schema:
             type: string
-            format: uuid
           required: true
         - in: query
           name: query
@@ -300,13 +268,11 @@ paths:
           name: testId
           schema:
             type: string
-            format: uuid
           required: true
         - in: path
           name: runId
           schema:
             type: string
-            format: uuid
           required: true
       summary: "run given assertions against the traces from the given run without persisting anything"
       description: "use this method to test a definition against an actual trace without creating a new version or persisting anything"
@@ -332,13 +298,11 @@ paths:
           name: testId
           schema:
             type: string
-            format: uuid
           required: true
         - in: path
           name: runId
           schema:
             type: string
-            format: uuid
           required: true
       summary: "rerun a test run"
       description: "rerun a test run"
@@ -360,13 +324,11 @@ paths:
           name: testId
           schema:
             type: string
-            format: uuid
           required: true
         - in: path
           name: runId
           schema:
             type: string
-            format: uuid
           required: true
       summary: "get test run results in JUnit xml format"
       description: "get test run results in JUnit xml format"
@@ -388,13 +350,11 @@ paths:
           name: testId
           schema:
             type: string
-            format: uuid
           required: true
         - in: path
           name: runId
           schema:
             type: string
-            format: uuid
           required: true
       summary: export test and test run information
       description: export test and test run information for debugging
@@ -436,13 +396,11 @@ paths:
           name: testId
           schema:
             type: string
-            format: uuid
           required: true
         - in: path
           name: runId
           schema:
             type: string
-            format: uuid
           required: true
       summary: "get test Run"
       description: "get a particular test Run"
@@ -462,13 +420,11 @@ paths:
           name: testId
           schema:
             type: string
-            format: uuid
           required: true
         - in: path
           name: runId
           schema:
             type: string
-            format: uuid
           required: true
       summary: "delete a test run"
       description: "delete a test run"
@@ -485,7 +441,6 @@ paths:
           name: testId
           schema:
             type: string
-            format: uuid
           required: true
       operationId: getTestSpecs
       summary: "Get definition for a test"
@@ -507,7 +462,6 @@ paths:
           name: testId
           schema:
             type: string
-            format: uuid
           required: true
       summary: "Set spec for a test"
       description: "Set spec for a particular test"
@@ -530,7 +484,6 @@ paths:
           name: testId
           schema:
             type: string
-            format: uuid
           required: true
         - in: path
           name: version
@@ -559,7 +512,6 @@ paths:
           name: testId
           schema:
             type: string
-            format: uuid
           required: true
         - in: path
           name: version

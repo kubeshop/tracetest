@@ -69,7 +69,7 @@ func (t *instrumentedTriggerer) Trigger(ctx context.Context, test model.Test, op
 	attrs := []attribute.KeyValue{
 		attribute.String("tracetest.run.trigger.trace_id", tid.String()),
 		attribute.String("tracetest.run.trigger.span_id", sid.String()),
-		attribute.String("tracetest.run.trigger.test_id", test.ID.String()),
+		attribute.String("tracetest.run.trigger.test_id", string(test.ID)),
 		attribute.String("tracetest.run.trigger.type", string(t.triggerer.Type())),
 	}
 

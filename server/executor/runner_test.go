@@ -2,6 +2,7 @@ package executor_test
 
 import (
 	"context"
+	"math/rand"
 	"testing"
 	"time"
 
@@ -22,7 +23,7 @@ func TestPersistentRunner(t *testing.T) {
 		t.Parallel()
 
 		test := model.Test{
-			ID:               id.NewRandGenerator().UUID(),
+			ID:               id.ID("test1"),
 			ServiceUnderTest: sampleTrigger,
 		}
 
@@ -31,7 +32,7 @@ func TestPersistentRunner(t *testing.T) {
 
 		f.run([]model.Test{test}, 10*time.Millisecond)
 
-		result := f.mockDB.runs[test.ID.String()]
+		result := f.mockDB.runs[test.ID]
 		require.NotNil(t, result)
 		assert.Greater(t, result.ServiceTriggerCompletedAt.UnixNano(), result.CreatedAt.UnixNano())
 
@@ -41,8 +42,8 @@ func TestPersistentRunner(t *testing.T) {
 	t.Run("TestsCanBeTriggerdConcurrently", func(t *testing.T) {
 		t.Parallel()
 
-		test1 := model.Test{ID: id.NewRandGenerator().UUID(), ServiceUnderTest: sampleTrigger}
-		test2 := model.Test{ID: id.NewRandGenerator().UUID(), ServiceUnderTest: sampleTrigger}
+		test1 := model.Test{ID: id.ID("test1"), ServiceUnderTest: sampleTrigger}
+		test2 := model.Test{ID: id.ID("test2"), ServiceUnderTest: sampleTrigger}
 
 		f := runnerSetup(t)
 
@@ -51,11 +52,8 @@ func TestPersistentRunner(t *testing.T) {
 
 		f.run([]model.Test{test1, test2}, 100*time.Millisecond)
 
-		run1 := f.mockDB.runs[test1.ID.String()]
-		require.NotNil(t, run1)
-
-		run2 := f.mockDB.runs[test2.ID.String()]
-		require.NotNil(t, run2)
+		run1 := f.mockDB.runs[test1.ID]
+		run2 := f.mockDB.runs[test2.ID]
 
 		assert.Greater(t, run1.ServiceTriggerCompletedAt.UnixNano(), run2.ServiceTriggerCompletedAt.UnixNano(), "test1 did not complete after test2")
 	})
@@ -155,24 +153,25 @@ func runnerSetup(t *testing.T) runnerFixture {
 type mockDB struct {
 	testdb.MockRepository
 
-	runs map[string]model.Run
+	runs map[id.ID]model.Run
 }
 
 func (m *mockDB) CreateRun(_ context.Context, test model.Test, run model.Run) (model.Run, error) {
-	args := m.Called(test.ID.String())
+	args := m.Called(test.ID)
 	if m.runs == nil {
-		m.runs = map[string]model.Run{}
+		m.runs = map[id.ID]model.Run{}
 	}
 
-	m.runs[test.ID.String()] = run
+	run.ID = rand.Intn(100)
+	m.runs[test.ID] = run
 
 	return run, args.Error(0)
 }
 
 func (m *mockDB) UpdateRun(_ context.Context, run model.Run) error {
-	args := m.Called(run.ID.String())
+	args := m.Called(run.ID)
 	for k, v := range m.runs {
-		if v.ID.String() == run.ID.String() {
+		if v.ID == run.ID {
 			m.runs[k] = run
 		}
 	}
@@ -209,7 +208,7 @@ func (m *mockTriggerer) expectTriggerTestLong(test model.Test) *mock.Call {
 
 func expectCreateRun(m *mockDB, test model.Test) *mock.Call {
 	return m.
-		On("CreateRun", test.ID.String()).
+		On("CreateRun", test.ID).
 		Return(noError)
 }
 

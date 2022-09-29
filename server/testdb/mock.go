@@ -3,7 +3,7 @@ package testdb
 import (
 	"context"
 
-	"github.com/google/uuid"
+	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/stretchr/testify/mock"
 	"go.opentelemetry.io/otel/trace"
@@ -21,7 +21,7 @@ func (m *MockRepository) ServerID() (string, bool, error) {
 	return args.String(0), args.Bool(1), args.Error(2)
 }
 
-func (m *MockRepository) IDExists(_ context.Context, id uuid.UUID) (bool, error) {
+func (m *MockRepository) IDExists(_ context.Context, id id.ID) (bool, error) {
 	args := m.Called(id)
 	return args.Bool(0), args.Error(1)
 }
@@ -46,12 +46,12 @@ func (m *MockRepository) DeleteTest(_ context.Context, test model.Test) error {
 	return args.Error(0)
 }
 
-func (m *MockRepository) GetTestVersion(_ context.Context, id uuid.UUID, version int) (model.Test, error) {
+func (m *MockRepository) GetTestVersion(_ context.Context, id id.ID, version int) (model.Test, error) {
 	args := m.Called(id, version)
 	return args.Get(0).(model.Test), args.Error(1)
 }
 
-func (m *MockRepository) GetLatestTestVersion(_ context.Context, id uuid.UUID) (model.Test, error) {
+func (m *MockRepository) GetLatestTestVersion(_ context.Context, id id.ID) (model.Test, error) {
 	args := m.Called(id)
 	return args.Get(0).(model.Test), args.Error(1)
 }
@@ -86,13 +86,8 @@ func (m *MockRepository) DeleteRun(_ context.Context, run model.Run) error {
 	return args.Error(0)
 }
 
-func (m *MockRepository) GetRun(_ context.Context, id uuid.UUID) (model.Run, error) {
+func (m *MockRepository) GetRun(_ context.Context, id int) (model.Run, error) {
 	args := m.Called(id)
-	return args.Get(0).(model.Run), args.Error(1)
-}
-
-func (m *MockRepository) GetRunByShortID(_ context.Context, shortID string) (model.Run, error) {
-	args := m.Called(shortID)
 	return args.Get(0).(model.Run), args.Error(1)
 }
 

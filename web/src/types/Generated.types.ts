@@ -68,6 +68,10 @@ export interface paths {
     /** Set spec for a particular test */
     put: operations["setTestSpecs"];
   };
+  "/tests/{testId}/version/{version}": {
+    /** get a test specific version */
+    get: operations["getTestVersion"];
+  };
   "/tests/{testId}/version/{version}/definition.yaml": {
     /** Get the test definition as an YAML file */
     get: operations["getTestVersionDefinitionFile"];
@@ -254,7 +258,7 @@ export interface operations {
     parameters: {
       path: {
         testId: string;
-        runId: string;
+        runId: number;
       };
       query: {
         query?: string;
@@ -274,7 +278,7 @@ export interface operations {
     parameters: {
       path: {
         testId: string;
-        runId: string;
+        runId: number;
       };
     };
     responses: {
@@ -296,7 +300,7 @@ export interface operations {
     parameters: {
       path: {
         testId: string;
-        runId: string;
+        runId: number;
       };
     };
     responses: {
@@ -313,7 +317,7 @@ export interface operations {
     parameters: {
       path: {
         testId: string;
-        runId: string;
+        runId: number;
       };
     };
     responses: {
@@ -330,7 +334,7 @@ export interface operations {
     parameters: {
       path: {
         testId: string;
-        runId: string;
+        runId: number;
       };
     };
     responses: {
@@ -363,7 +367,7 @@ export interface operations {
     parameters: {
       path: {
         testId: string;
-        runId: string;
+        runId: number;
       };
     };
     responses: {
@@ -380,7 +384,7 @@ export interface operations {
     parameters: {
       path: {
         testId: string;
-        runId: string;
+        runId: number;
       };
     };
     responses: {
@@ -419,6 +423,25 @@ export interface operations {
       content: {
         "application/json": external["tests.yaml"]["components"]["schemas"]["TestSpecs"];
       };
+    };
+  };
+  /** get a test specific version */
+  getTestVersion: {
+    parameters: {
+      path: {
+        testId: string;
+        version: number;
+      };
+    };
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["tests.yaml"]["components"]["schemas"]["Test"];
+        };
+      };
+      /** problem with getting a test */
+      500: unknown;
     };
   };
   /** Get the test definition as an YAML file */
@@ -530,7 +553,6 @@ export interface external {
     components: {
       schemas: {
         Test: {
-          /** Format: uuid */
           id?: string;
           name?: string;
           description?: string;
@@ -553,7 +575,6 @@ export interface external {
           expected?: string;
         };
         TestRun: {
-          /** Format: uuid */
           id?: string;
           traceId?: string;
           spanId?: string;
@@ -584,7 +605,6 @@ export interface external {
           obtainedTraceAt?: string;
           /** Format: date-time */
           completedAt?: string;
-          trigger?: external["triggers.yaml"]["components"]["schemas"]["Trigger"];
           triggerResult?: external["triggers.yaml"]["components"]["schemas"]["TriggerResult"];
           trace?: external["trace.yaml"]["components"]["schemas"]["Trace"];
           result?: external["tests.yaml"]["components"]["schemas"]["AssertionResults"];

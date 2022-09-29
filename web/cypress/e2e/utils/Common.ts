@@ -1,7 +1,7 @@
 Cypress.on('uncaught:exception', err => !err.message.includes('ResizeObserver loop limit exceeded'));
 
-const testIdRegex = /\/test\/([a-z0-9-]+)/;
-const runIdRegex = /\/run\/([a-z0-9-]+)/;
+const testIdRegex = /\/test\/(\w+)/;
+const runIdRegex = /\/run\/(\w+)/;
 
 export const getTestId = (pathname: string) => {
   cy.log(pathname);

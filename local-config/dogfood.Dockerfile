@@ -11,7 +11,7 @@ RUN cd cli && go mod download
 COPY ./cli ./cli
 RUN ls -la && cd ./cli && make build
 
-FROM alpine
+FROM golang:1.18-alpine
 
 RUN apk --update add bash jq curl
 
@@ -20,4 +20,4 @@ COPY --from=build-cli /app/cli/dist/tracetest /app/cli/tracetest
 COPY ./tracetesting ./tracetesting
 
 WORKDIR /app/tracetesting
-CMD ["/bin/bash", "/app/tracetesting/run.bash"]
+CMD ["/bin/sh", "/app/tracetesting/run.bash"]

@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/google/uuid"
 	"github.com/kubeshop/tracetest/server/assertions"
 	"github.com/kubeshop/tracetest/server/assertions/selectors"
 	"github.com/kubeshop/tracetest/server/encoding/yaml/conversion"
@@ -67,7 +66,7 @@ func (c *controller) CreateTest(ctx context.Context, in openapi.Test) (openapi.I
 
 		if exists {
 			r := map[string]string{
-				"error": fmt.Sprintf(`test with ID "%s" already exists. try updating instead`, test.ID.String()),
+				"error": fmt.Sprintf(`test with ID "%s" already exists. try updating instead`, test.ID),
 			}
 			return openapi.Response(http.StatusBadRequest, r), nil
 		}
@@ -82,12 +81,7 @@ func (c *controller) CreateTest(ctx context.Context, in openapi.Test) (openapi.I
 }
 
 func (c *controller) DeleteTest(ctx context.Context, testID string) (openapi.ImplResponse, error) {
-	id, err := uuid.Parse(testID)
-	if err != nil {
-		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
-	}
-
-	test, err := c.testDB.GetLatestTestVersion(ctx, id)
+	test, err := c.testDB.GetLatestTestVersion(ctx, id.ID(testID))
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -101,12 +95,7 @@ func (c *controller) DeleteTest(ctx context.Context, testID string) (openapi.Imp
 }
 
 func (c *controller) GetTest(ctx context.Context, testID string) (openapi.ImplResponse, error) {
-	id, err := uuid.Parse(testID)
-	if err != nil {
-		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
-	}
-
-	test, err := c.testDB.GetLatestTestVersion(ctx, id)
+	test, err := c.testDB.GetLatestTestVersion(ctx, id.ID(testID))
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -115,12 +104,7 @@ func (c *controller) GetTest(ctx context.Context, testID string) (openapi.ImplRe
 }
 
 func (c *controller) GetTestSpecs(ctx context.Context, testID string) (openapi.ImplResponse, error) {
-	id, err := uuid.Parse(testID)
-	if err != nil {
-		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
-	}
-
-	test, err := c.testDB.GetLatestTestVersion(ctx, id)
+	test, err := c.testDB.GetLatestTestVersion(ctx, id.ID(testID))
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -128,18 +112,13 @@ func (c *controller) GetTestSpecs(ctx context.Context, testID string) (openapi.I
 	return openapi.Response(200, c.mappers.Out.Specs(test.Specs)), nil
 }
 
-func (c *controller) GetTestResultSelectedSpans(ctx context.Context, _ string, runID string, selectorQuery string) (openapi.ImplResponse, error) {
-	rid, err := uuid.Parse(runID)
-	if err != nil {
-		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
-	}
-
+func (c *controller) GetTestResultSelectedSpans(ctx context.Context, _ string, runID int32, selectorQuery string) (openapi.ImplResponse, error) {
 	selector, err := selectors.New(selectorQuery)
 	if err != nil {
 		return handleDBError(err), err
 	}
 
-	run, err := c.testDB.GetRun(ctx, rid)
+	run, err := c.testDB.GetRun(ctx, int(runID))
 	if err != nil {
 		return openapi.Response(http.StatusInternalServerError, ""), nil
 	}
@@ -158,13 +137,8 @@ func (c *controller) GetTestResultSelectedSpans(ctx context.Context, _ string, r
 	return openapi.Response(http.StatusOK, selectedSpanIds), nil
 }
 
-func (c *controller) GetTestRun(ctx context.Context, _ string, runID string) (openapi.ImplResponse, error) {
-	rid, err := uuid.Parse(runID)
-	if err != nil {
-		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
-	}
-
-	run, err := c.testDB.GetRun(ctx, rid)
+func (c *controller) GetTestRun(ctx context.Context, _ string, runID int32) (openapi.ImplResponse, error) {
+	run, err := c.testDB.GetRun(ctx, int(runID))
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -172,13 +146,8 @@ func (c *controller) GetTestRun(ctx context.Context, _ string, runID string) (op
 	return openapi.Response(200, c.mappers.Out.Run(&run)), nil
 }
 
-func (c *controller) DeleteTestRun(ctx context.Context, _ string, runID string) (openapi.ImplResponse, error) {
-	rid, err := uuid.Parse(runID)
-	if err != nil {
-		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
-	}
-
-	run, err := c.testDB.GetRun(ctx, rid)
+func (c *controller) DeleteTestRun(ctx context.Context, _ string, runID int32) (openapi.ImplResponse, error) {
+	run, err := c.testDB.GetRun(ctx, int(runID))
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -196,12 +165,7 @@ func (c *controller) GetTestRuns(ctx context.Context, testID string, take, skip 
 		take = 20
 	}
 
-	id, err := uuid.Parse(testID)
-	if err != nil {
-		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
-	}
-
-	test, err := c.testDB.GetLatestTestVersion(ctx, id)
+	test, err := c.testDB.GetLatestTestVersion(ctx, id.ID(testID))
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -227,23 +191,14 @@ func (c *controller) GetTests(ctx context.Context, take, skip int32, query strin
 	return openapi.Response(200, c.mappers.Out.Tests(tests)), nil
 }
 
-func (c *controller) RerunTestRun(ctx context.Context, testID string, runID string) (openapi.ImplResponse, error) {
-	id, err := uuid.Parse(testID)
-	if err != nil {
-		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
-	}
+func (c *controller) RerunTestRun(ctx context.Context, testID string, runID int32) (openapi.ImplResponse, error) {
 
-	test, err := c.testDB.GetLatestTestVersion(ctx, id)
+	test, err := c.testDB.GetLatestTestVersion(ctx, id.ID(testID))
 	if err != nil {
 		return handleDBError(err), err
 	}
 
-	rid, err := uuid.Parse(runID)
-	if err != nil {
-		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
-	}
-
-	run, err := c.testDB.GetRun(ctx, rid)
+	run, err := c.testDB.GetRun(ctx, int(runID))
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -270,12 +225,7 @@ func (c *controller) RerunTestRun(ctx context.Context, testID string, runID stri
 }
 
 func (c *controller) RunTest(ctx context.Context, testID string, runInformation openapi.TestRunInformation) (openapi.ImplResponse, error) {
-	id, err := uuid.Parse(testID)
-	if err != nil {
-		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
-	}
-
-	test, err := c.testDB.GetLatestTestVersion(ctx, id)
+	test, err := c.testDB.GetLatestTestVersion(ctx, id.ID(testID))
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -290,16 +240,11 @@ func (c *controller) RunTest(ctx context.Context, testID string, runInformation 
 }
 
 func (c *controller) SetTestSpecs(ctx context.Context, testID string, def openapi.TestSpecs) (openapi.ImplResponse, error) {
-	id, err := uuid.Parse(testID)
-	if err != nil {
-		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
-	}
-
 	if err := c.mappers.In.ValidateDefinition(def); err != nil {
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
 	}
 
-	test, err := c.testDB.GetLatestTestVersion(ctx, id)
+	test, err := c.testDB.GetLatestTestVersion(ctx, id.ID(testID))
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -322,12 +267,7 @@ func (c *controller) SetTestSpecs(ctx context.Context, testID string, def openap
 }
 
 func (c *controller) UpdateTest(ctx context.Context, testID string, in openapi.Test) (openapi.ImplResponse, error) {
-	id, err := uuid.Parse(testID)
-	if err != nil {
-		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
-	}
-
-	test, err := c.testDB.GetLatestTestVersion(ctx, id)
+	test, err := c.testDB.GetLatestTestVersion(ctx, id.ID(testID))
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -335,7 +275,6 @@ func (c *controller) UpdateTest(ctx context.Context, testID string, in openapi.T
 	updated := c.mappers.In.Test(in)
 	updated.Version = test.Version
 	updated.ID = test.ID
-	updated.ReferenceRun = nil
 
 	_, err = c.testDB.UpdateTest(ctx, updated)
 	if err != nil {
@@ -345,19 +284,14 @@ func (c *controller) UpdateTest(ctx context.Context, testID string, in openapi.T
 	return openapi.Response(204, nil), nil
 }
 
-func (c *controller) DryRunAssertion(ctx context.Context, _, runID string, def openapi.TestSpecs) (openapi.ImplResponse, error) {
-	rid, err := uuid.Parse(runID)
-	if err != nil {
-		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
-	}
-
-	run, err := c.testDB.GetRun(ctx, rid)
+func (c *controller) DryRunAssertion(ctx context.Context, _ string, runID int32, def openapi.TestSpecs) (openapi.ImplResponse, error) {
+	run, err := c.testDB.GetRun(ctx, int(runID))
 	if err != nil {
 		return openapi.Response(http.StatusInternalServerError, ""), nil
 	}
 
 	if run.Trace == nil {
-		return openapi.Response(http.StatusUnprocessableEntity, fmt.Sprintf(`run "%s" has no trace associated`, runID)), nil
+		return openapi.Response(http.StatusUnprocessableEntity, fmt.Sprintf(`run "%d" has no trace associated`, runID)), nil
 	}
 
 	results, allPassed := assertions.Assert(c.mappers.In.Definition(def), *run.Trace)
@@ -369,23 +303,13 @@ func (c *controller) DryRunAssertion(ctx context.Context, _, runID string, def o
 	return openapi.Response(200, res), nil
 }
 
-func (c *controller) GetRunResultJUnit(ctx context.Context, testID string, runID string) (openapi.ImplResponse, error) {
-	rid, err := uuid.Parse(runID)
-	if err != nil {
-		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
-	}
-
-	run, err := c.testDB.GetRun(ctx, rid)
+func (c *controller) GetRunResultJUnit(ctx context.Context, testID string, runID int32) (openapi.ImplResponse, error) {
+	run, err := c.testDB.GetRun(ctx, int(runID))
 	if err != nil {
 		return handleDBError(err), err
 	}
 
-	tid, err := uuid.Parse(testID)
-	if err != nil {
-		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
-	}
-
-	test, err := c.testDB.GetTestVersion(ctx, tid, run.TestVersion)
+	test, err := c.testDB.GetTestVersion(ctx, id.ID(testID), run.TestVersion)
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -399,12 +323,7 @@ func (c *controller) GetRunResultJUnit(ctx context.Context, testID string, runID
 }
 
 func (c controller) GetTestVersion(ctx context.Context, testID string, version int32) (openapi.ImplResponse, error) {
-	tid, err := uuid.Parse(testID)
-	if err != nil {
-		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
-	}
-
-	test, err := c.testDB.GetTestVersion(ctx, tid, int(version))
+	test, err := c.testDB.GetTestVersion(ctx, id.ID(testID), int(version))
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -413,12 +332,7 @@ func (c controller) GetTestVersion(ctx context.Context, testID string, version i
 }
 
 func (c controller) GetTestVersionDefinitionFile(ctx context.Context, testID string, version int32) (openapi.ImplResponse, error) {
-	tid, err := uuid.Parse(testID)
-	if err != nil {
-		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
-	}
-
-	test, err := c.testDB.GetTestVersion(ctx, tid, int(version))
+	test, err := c.testDB.GetTestVersion(ctx, id.ID(testID), int(version))
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -431,23 +345,13 @@ func (c controller) GetTestVersionDefinitionFile(ctx context.Context, testID str
 	return openapi.Response(200, res), nil
 }
 
-func (c controller) ExportTestRun(ctx context.Context, testID string, runID string) (openapi.ImplResponse, error) {
-	rid, err := uuid.Parse(runID)
-	if err != nil {
-		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
-	}
-
-	run, err := c.testDB.GetRun(ctx, rid)
+func (c controller) ExportTestRun(ctx context.Context, testID string, runID int32) (openapi.ImplResponse, error) {
+	run, err := c.testDB.GetRun(ctx, int(runID))
 	if err != nil {
 		return handleDBError(err), err
 	}
 
-	tid, err := uuid.Parse(testID)
-	if err != nil {
-		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
-	}
-
-	test, err := c.testDB.GetTestVersion(ctx, tid, run.TestVersion)
+	test, err := c.testDB.GetTestVersion(ctx, id.ID(testID), run.TestVersion)
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -522,15 +426,4 @@ func (c *controller) UpdateTestFromDefinition(ctx context.Context, testId string
 	}
 
 	return openapi.Response(http.StatusOK, openapiObject), nil
-}
-
-func (c *controller) RunShortUrl(ctx context.Context, shortID string) (openapi.ImplResponse, error) {
-	run, err := c.testDB.GetRunByShortID(ctx, shortID)
-	if err != nil {
-		return handleDBError(err), err
-	}
-
-	return openapi.ImplResponse{
-		Body: fmt.Sprintf("/test/%s/run/%s", run.TestID.String(), run.ID.String()),
-	}, nil
 }
