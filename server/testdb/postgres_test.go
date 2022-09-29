@@ -56,7 +56,6 @@ func createRun(t *testing.T, db model.Repository, test model.Test) model.Run {
 		TraceID:   testdb.IDGen.TraceID(),
 		SpanID:    testdb.IDGen.SpanID(),
 		CreatedAt: time.Now(),
-		Trigger:   test.ServiceUnderTest,
 	}
 	updated, err := db.CreateRun(context.TODO(), test, run)
 	if err != nil {

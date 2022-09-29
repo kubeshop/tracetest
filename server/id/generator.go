@@ -9,9 +9,11 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
+type ID string
+
 type Generator interface {
 	UUID() uuid.UUID
-	Short() string
+	ID() ID
 	TraceID() trace.TraceID
 	SpanID() trace.SpanID
 }
@@ -30,8 +32,8 @@ func (g randGenerator) UUID() uuid.UUID {
 	return uuid.New()
 }
 
-func (g randGenerator) Short() string {
-	return shortid.MustGenerate()
+func (g randGenerator) ID() ID {
+	return ID(shortid.MustGenerate())
 }
 
 func (g randGenerator) TraceID() trace.TraceID {

@@ -6,9 +6,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
+	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/model/modeltest"
 	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -16,11 +17,10 @@ import (
 )
 
 func TestTestEncoding(t *testing.T) {
-	id := uuid.MustParse("ccf94a15-e33e-4c75-ae94-d0b401c53da1")
 	t1 := time.Date(2022, 06, 07, 13, 03, 24, 100, time.UTC)
 
 	test := model.Test{
-		ID:          id,
+		ID:          id.ID("test1"),
 		CreatedAt:   t1,
 		Name:        "the name",
 		Description: "the description",
@@ -49,7 +49,6 @@ func TestTestEncoding(t *testing.T) {
 }
 
 func TestRunEncoding(t *testing.T) {
-	id := uuid.MustParse("ccf94a15-e33e-4c75-ae94-d0b401c53da1")
 	tid, _ := trace.TraceIDFromHex("83c7f2fb8b556416e12e1d18c05a30c3")
 	sid, _ := trace.SpanIDFromHex("9ed1382a48be2649")
 
@@ -83,7 +82,7 @@ func TestRunEncoding(t *testing.T) {
 		{
 			name: "Errors",
 			run: model.Run{
-				ID:                 id,
+				ID:                 1,
 				TraceID:            tid,
 				SpanID:             sid,
 				State:              model.RunStateFailed,
@@ -91,25 +90,14 @@ func TestRunEncoding(t *testing.T) {
 				CreatedAt:          t1,
 				ServiceTriggeredAt: t1,
 				CompletedAt:        t1,
-				Trigger: model.Trigger{
-					Type: model.TriggerTypeHTTP,
-					HTTP: &model.HTTPRequest{
-						Method: model.HTTPMethodPOST,
-						URL:    "http://google.com",
-						Headers: []model.HTTPHeader{
-							{"Content-Type", "application/json"},
-						},
-						Body: `{"id":52}`,
-					},
-				},
-				TestVersion: 1,
-				Metadata:    map[string]string{"key": "value"},
+				TestVersion:        1,
+				Metadata:           map[string]string{"key": "value"},
 			},
 		},
 		{
 			name: "Success",
 			run: model.Run{
-				ID:                        id,
+				ID:                        1,
 				TraceID:                   tid,
 				SpanID:                    sid,
 				State:                     model.RunStateFinished,
@@ -119,17 +107,6 @@ func TestRunEncoding(t *testing.T) {
 				ServiceTriggerCompletedAt: t2,
 				ObtainedTraceAt:           t3,
 				CompletedAt:               t4,
-				Trigger: model.Trigger{
-					Type: model.TriggerTypeHTTP,
-					HTTP: &model.HTTPRequest{
-						Method: model.HTTPMethodPOST,
-						URL:    "http://google.com",
-						Headers: []model.HTTPHeader{
-							{"Content-Type", "application/json"},
-						},
-						Body: `{"name":"Larry"}`,
-					},
-				},
 				TriggerResult: model.TriggerResult{
 					Type: model.TriggerTypeHTTP,
 					HTTP: &model.HTTPResponse{
@@ -163,54 +140,7 @@ func TestRunEncoding(t *testing.T) {
 			err = json.Unmarshal(encoded, &actual)
 			require.NoError(t, err)
 
-			// assert.Equal doesn't work on time.Time vars (see https://stackoverflow.com/a/69362528)
-			// We could manually compare each field, but if we add a new field to the struct but not the test,
-			// the test would still pass, even if the json encoding is incorrect.
-			// So instead, we can reset all date fields and compare them separately.
-			// If we add a new date field, the `assert.Equal(t, run, actual)` will catch it
-			expectedCreatedAt := cl.run.CreatedAt
-			expectedServiceTriggeredAt := cl.run.ServiceTriggeredAt
-			expectedServiceTriggerCompletedAt := cl.run.ServiceTriggerCompletedAt
-			expectedObtainedTraceAt := cl.run.ObtainedTraceAt
-			expectedCompletedAt := cl.run.CompletedAt
-
-			run.CreatedAt = t1
-			run.ServiceTriggeredAt = t1
-			run.ServiceTriggerCompletedAt = t1
-			run.ObtainedTraceAt = t1
-			run.CompletedAt = t1
-			if run.Trace != nil {
-				run.Trace.RootSpan.StartTime = t1
-				run.Trace.RootSpan.EndTime = t1
-				run.Trace.Flat[sid].StartTime = t1
-				run.Trace.Flat[sid].EndTime = t1
-			}
-
-			actualCreatedAt := actual.CreatedAt
-			actualServiceTriggeredAt := actual.ServiceTriggeredAt
-			actualServiceTriggerCompletedAt := actual.ServiceTriggerCompletedAt
-			actualObtainedTraceAt := actual.ObtainedTraceAt
-			actualCompletedAt := actual.CompletedAt
-
-			actual.CreatedAt = t1
-			actual.ServiceTriggeredAt = t1
-			actual.ServiceTriggerCompletedAt = t1
-			actual.ObtainedTraceAt = t1
-			actual.CompletedAt = t1
-			if actual.Trace != nil {
-				actual.Trace.RootSpan.StartTime = t1
-				actual.Trace.RootSpan.EndTime = t1
-				actual.Trace.Flat[sid].StartTime = t1
-				actual.Trace.Flat[sid].EndTime = t1
-			}
-
-			assert.Equal(t, run, actual)
-
-			assert.WithinDuration(t, expectedCreatedAt, actualCreatedAt, 0)
-			assert.WithinDuration(t, expectedServiceTriggeredAt, actualServiceTriggeredAt, 0)
-			assert.WithinDuration(t, expectedServiceTriggerCompletedAt, actualServiceTriggerCompletedAt, 0)
-			assert.WithinDuration(t, expectedObtainedTraceAt, actualObtainedTraceAt, 0)
-			assert.WithinDuration(t, expectedCompletedAt, actualCompletedAt, 0)
+			modeltest.AssertRunEqual(t, cl.run, actual)
 		})
 	}
 }

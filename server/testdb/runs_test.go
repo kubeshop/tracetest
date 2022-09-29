@@ -3,10 +3,10 @@ package testdb_test
 import (
 	"context"
 	"testing"
-	"time"
 
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/model/modeltest"
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/stretchr/testify/assert"
@@ -21,10 +21,11 @@ func TestCreateRun(t *testing.T) {
 	test := createTest(t, db)
 
 	run := model.Run{
-		TraceID:   testdb.IDGen.TraceID(),
-		SpanID:    testdb.IDGen.SpanID(),
-		CreatedAt: time.Now(),
-		Trigger:   test.ServiceUnderTest,
+		TraceID: testdb.IDGen.TraceID(),
+		SpanID:  testdb.IDGen.SpanID(),
+		Metadata: model.RunMetadata{
+			"key": "Value",
+		},
 	}
 
 	updated, err := db.CreateRun(context.TODO(), test, run)
@@ -32,11 +33,14 @@ func TestCreateRun(t *testing.T) {
 
 	actual, err := db.GetRun(context.TODO(), updated.ID)
 	require.NoError(t, err)
+
+	assert.NotEmpty(t, actual.ID)
+	assert.Equal(t, test.ID, actual.TestID)
+	assert.Equal(t, test.Version, actual.TestVersion)
 	assert.Equal(t, model.RunStateCreated, actual.State)
 	assert.Equal(t, run.TraceID, actual.TraceID)
 	assert.Equal(t, run.SpanID, actual.SpanID)
-	assert.Equal(t, run.CreatedAt.Unix(), actual.CreatedAt.Unix())
-	assert.Equal(t, run.Trigger, actual.Trigger)
+	assert.Equal(t, run.Metadata, actual.Metadata)
 }
 
 func TestUpdateRun(t *testing.T) {
@@ -94,20 +98,19 @@ func TestUpdateRun(t *testing.T) {
 	updatedList, err := db.GetTestRuns(context.TODO(), test, 20, 0)
 	require.NoError(t, err)
 
-	// Ignore time fields in this test
-	actual.Trace.RootSpan.StartTime = time.Time{}
-	actual.Trace.RootSpan.EndTime = time.Time{}
+	assert.Len(t, updatedList, 1)
+	modeltest.AssertRunEqual(t, updatedList[0], actual)
+}
 
-	runFromList := updatedList[0]
-	runFromList.Trace.RootSpan.StartTime = time.Time{}
-	runFromList.Trace.RootSpan.EndTime = time.Time{}
+func TestGetRunByTraceID(t *testing.T) {
+	db, clean := getDB()
+	defer clean()
 
-	assert.Equal(t, run.SpanID.String(), actual.SpanID.String())
-	assert.Equal(t, run.CreatedAt.Unix(), actual.CreatedAt.Unix())
-	assert.Equal(t, run.Trigger, actual.Trigger)
-	assert.Equal(t, run.State, actual.State)
-	assert.Equal(t, run.Trace, actual.Trace)
-	assert.Equal(t, run.Results, actual.Results)
+	test := createTest(t, db)
+	expected := createRun(t, db, test)
 
-	assert.Equal(t, actual, runFromList)
+	actual, err := db.GetRunByTraceID(context.TODO(), expected.TraceID)
+	require.NoError(t, err)
+
+	modeltest.AssertRunEqual(t, expected, actual)
 }

@@ -28,21 +28,22 @@ type scanner interface {
 }
 
 func Postgres(options ...PostgresOption) (model.Repository, error) {
-	postgres := &postgresDB{}
-	postgres.migrationsFolder = "file://./migrations"
+	ps := &postgresDB{
+		migrationsFolder: "file://./migrations",
+	}
 	for _, option := range options {
-		err := option(postgres)
+		err := option(ps)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	err := postgres.ensureLatestMigration()
+	err := ps.ensureLatestMigration()
 	if err != nil {
 		return nil, fmt.Errorf("could not execute migrations: %w", err)
 	}
 
-	return postgres, nil
+	return ps, nil
 }
 
 func (p *postgresDB) ensureLatestMigration() error {
@@ -106,7 +107,7 @@ func (td *postgresDB) ServerID() (id string, isNew bool, err error) {
 }
 
 func (td *postgresDB) Drop() error {
-	return dropTables(td, "runs", "definitions", "tests", "schema_migrations")
+	return dropTables(td, "test_runs", "tests", "server", "schema_migrations")
 }
 
 func dropTables(td *postgresDB, tables ...string) error {

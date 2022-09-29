@@ -1,11 +1,11 @@
 #!/bin/bash
 
 tracetest_main() {
-   $TRACETEST_CLI --config ./config.main.yml $@
+   $TRACETEST_CLI_MAIN --config ./config.main.yml $@
 }
 
 tracetest_target() {
-  $TRACETEST_CLI --config ./config.target.yml $@
+  $TRACETEST_CLI_TARGET --config ./config.target.yml $@
 }
 
 tracetest_target_curl() {
