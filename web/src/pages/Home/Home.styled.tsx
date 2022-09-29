@@ -1,15 +1,16 @@
-import {Button, Typography} from 'antd';
+import {Button, Space, Typography} from 'antd';
 import styled from 'styled-components';
-import noResultsIcon from '../../assets/HomeNoResults.svg';
+
+import noResultsIcon from 'assets/HomeNoResults.svg';
 
 export const CreateTestButton = styled(Button)``;
 
-export const PageHeader = styled.div`
+export const ActionsContainer = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  width: 100%;
   margin: 14px 0;
+  width: 100%;
 `;
 
 export const TitleText = styled(Typography.Title).attrs({level: 1})`
@@ -56,5 +57,10 @@ export const TestListContainer = styled.div`
 export const HeaderContainer = styled.div`
   border-bottom: ${({theme}) => `1px solid ${theme.color.borderLight}`};
   padding: 23px 0;
+  width: 100%;
+`;
+
+export const LoadingContainer = styled(Space)`
+  margin-bottom: 24px;
   width: 100%;
 `;

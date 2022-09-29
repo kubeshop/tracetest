@@ -7,61 +7,54 @@ type TUseInfiniteScrollParams<P> = P & {
 };
 
 export interface InfiniteScrollModel<T> {
-  isLoading: boolean;
-  localPage: number;
-  loadMore: () => void;
   hasMore: boolean;
-  isFetching: boolean;
-  refresh: () => void;
+  isLoading: boolean;
   list: T[];
+  loadMore: () => void;
+  search: (query: string) => void;
 }
 
 const useInfiniteScroll = <T, P>(
   useGetDataListQuery: UseQuery<any>,
   {take = 20, ...queryParams}: TUseInfiniteScrollParams<P>
 ): InfiniteScrollModel<T> => {
-  const [localPage, setLocalPage] = useState(0);
   const [list, setList] = useState<T[]>([]);
   const [lastCount, setLastCount] = useState(0);
-
-  const {data, isLoading, isFetching} = useGetDataListQuery({
-    skip: localPage * take,
-    take,
-    ...queryParams,
-  });
-
-  const currentList = data as T[];
+  const [params, setParams] = useState<{page: number; query: string}>({page: 0, query: ''});
 
   const hasMore = useMemo(() => lastCount === take, [lastCount, take]);
 
+  const {data, isFetching} = useGetDataListQuery({
+    skip: params.page * take,
+    take,
+    ...queryParams,
+    ...(params.query ? {query: params.query} : {}),
+  });
+
   useEffect(() => {
-    if (isArray(currentList)) {
-      if (localPage === 0) {
-        setList(currentList);
-      } else if (localPage > 0) {
-        setList(prevList => [...prevList, ...currentList]);
-      }
+    const currentList = data as T[];
+    if (!isArray(currentList)) return;
 
-      setLastCount(currentList.length);
-    }
-  }, [currentList, localPage]);
-
-  const refresh = useCallback(() => {
-    setLocalPage(1);
-  }, []);
+    setList(prevList => [...prevList, ...currentList]);
+    setLastCount(currentList.length);
+  }, [data]);
 
   const loadMore = useCallback(() => {
-    setLocalPage(page => page + 1);
+    setParams(prevParams => ({...prevParams, page: prevParams.page + 1}));
   }, []);
 
+  const search = (query: string) => {
+    setList([]);
+    setLastCount(0);
+    setParams({page: 0, query});
+  };
+
   return {
-    list,
-    localPage,
-    isLoading,
-    isFetching,
     hasMore,
+    isLoading: isFetching,
+    list,
     loadMore,
-    refresh,
+    search,
   };
 };
 
