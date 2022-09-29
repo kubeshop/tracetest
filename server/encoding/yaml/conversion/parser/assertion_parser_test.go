@@ -281,7 +281,7 @@ func TestParseAssertion(t *testing.T) {
 		},
 		{
 			Name:  "should_parse_expression_with_duration",
-			Query: `tracetest.span.endTime <= attr.tracetest.span.startTime + 200ms`,
+			Query: `tracetest.span.endTime <= attr:tracetest.span.startTime + 200ms`,
 			ExpectedOutput: parser.Assertion{
 				Attribute: "tracetest.span.endTime",
 				Operator:  "<=",
@@ -300,7 +300,7 @@ func TestParseAssertion(t *testing.T) {
 		},
 		{
 			Name:  "should_parse_expression_with_number",
-			Query: `myapp.variable > attr.myapp.old_value + 1`,
+			Query: `myapp.variable > attr:myapp.old_value + 1`,
 			ExpectedOutput: parser.Assertion{
 				Attribute: "myapp.variable",
 				Operator:  ">",
@@ -319,7 +319,7 @@ func TestParseAssertion(t *testing.T) {
 		},
 		{
 			Name:  "should_parse_expression_with_number",
-			Query: `myapp.variable > attr.myapp.old_value * 2`,
+			Query: `myapp.variable > attr:myapp.old_value * 2`,
 			ExpectedOutput: parser.Assertion{
 				Attribute: "myapp.variable",
 				Operator:  ">",

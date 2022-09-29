@@ -63,7 +63,7 @@ func (e ExprLiteral) Type() string {
 
 func (e ExprLiteral) info() (string, string) {
 	if e.Attribute != nil {
-		return strings.Replace(*e.Attribute, "attr.", "", 1), "attribute"
+		return strings.Replace(*e.Attribute, "attr:", "", 1), "attribute"
 	}
 
 	if e.Duration != nil {
@@ -119,7 +119,7 @@ var languageLexer = lexer.MustStateful(lexer.Rules{
 		{Name: "whitespace", Pattern: `\s+`, Action: nil},
 		{Name: "Operator", Pattern: `!=|<=|>=|=|<|>|contains|not-contains`},
 		{Name: "ExprOp", Pattern: `[\\+|\-|\\*|\/]`, Action: nil},
-		{Name: "AttributeReference", Pattern: `attr\.[a-zA-Z_][a-zA-Z0-9_\.]*`},
+		{Name: "AttributeReference", Pattern: `attr:[a-zA-Z_][a-zA-Z0-9_\.]*`},
 		{Name: "Attribute", Pattern: `[a-zA-Z_][a-zA-Z0-9_\.]*`},
 		{Name: "Duration", Pattern: `([0-9]+(\.[0-9]+)?)(ns|us|ms|s|m|h)`},
 		{Name: "Number", Pattern: `([0-9]+(\.[0-9]+)?)`},
