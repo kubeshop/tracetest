@@ -137,7 +137,7 @@ func convertStringIntoAssertion(assertion string) (openapi.Assertion, error) {
 		return openapi.Assertion{}, err
 	}
 
-	value := parsedAssertion.Value.String()
+	value := parsedAssertion.Value.String(true)
 	if parsedAssertion.Value.IsSimple() {
 		if parsedAssertion.Value.LiteralValue.Type() == "string" {
 			// This is a simple string comparison, so we need to wrap it

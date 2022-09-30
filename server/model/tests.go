@@ -129,6 +129,10 @@ func (e *AssertionExpression) String() string {
 	}
 
 	if e.Expression == nil {
+		if e.LiteralValue.Type == "attribute" {
+			return fmt.Sprintf("attr:%s", e.LiteralValue.Value)
+		}
+
 		return e.LiteralValue.Value
 	}
 
