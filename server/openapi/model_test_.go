@@ -22,6 +22,8 @@ type Test struct {
 	ServiceUnderTest Trigger `json:"serviceUnderTest,omitempty"`
 
 	Specs TestSpecs `json:"specs,omitempty"`
+
+	Summary TestSummary `json:"summary,omitempty"`
 }
 
 // AssertTestRequired checks if the required fields are not zero-ed
@@ -30,6 +32,9 @@ func AssertTestRequired(obj Test) error {
 		return err
 	}
 	if err := AssertTestSpecsRequired(obj.Specs); err != nil {
+		return err
+	}
+	if err := AssertTestSummaryRequired(obj.Summary); err != nil {
 		return err
 	}
 	return nil

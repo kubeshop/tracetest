@@ -35,6 +35,14 @@ func (m OpenAPI) Test(in model.Test) openapi.Test {
 		ServiceUnderTest: m.Trigger(in.ServiceUnderTest),
 		Specs:            m.Specs(in.Specs),
 		Version:          int32(in.Version),
+		Summary: openapi.TestSummary{
+			Runs: int32(in.Summary.Runs),
+			LastRun: openapi.TestSummaryLastRun{
+				Time:   in.Summary.LastRun.Time,
+				Passes: int32(in.Summary.LastRun.Passes),
+				Fails:  int32(in.Summary.LastRun.Fails),
+			},
+		},
 	}
 }
 
