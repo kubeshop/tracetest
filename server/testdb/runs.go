@@ -109,8 +109,6 @@ func (td *postgresDB) CreateRun(ctx context.Context, test model.Test, run model.
 		return model.Run{}, fmt.Errorf("encoding error: %w", err)
 	}
 
-	var id int
-
 	tx, err := td.db.BeginTx(ctx, nil)
 	if err != nil {
 		return model.Run{}, fmt.Errorf("sql beginTx: %w", err)
@@ -122,6 +120,7 @@ func (td *postgresDB) CreateRun(ctx context.Context, test model.Test, run model.
 		return model.Run{}, fmt.Errorf("sql exec: %w", err)
 	}
 
+	var runID int
 	err = tx.QueryRowContext(
 		ctx,
 		replaceRunSequenceName(createRunQuery, test.ID),
@@ -132,7 +131,7 @@ func (td *postgresDB) CreateRun(ctx context.Context, test model.Test, run model.
 		run.TraceID.String(),
 		run.SpanID.String(),
 		jsonMetadata,
-	).Scan(&id)
+	).Scan(&runID)
 	if err != nil {
 		tx.Rollback()
 		return model.Run{}, fmt.Errorf("sql exec: %w", err)
@@ -140,7 +139,7 @@ func (td *postgresDB) CreateRun(ctx context.Context, test model.Test, run model.
 
 	tx.Commit()
 
-	return td.GetRun(ctx, id)
+	return td.GetRun(ctx, test.ID, runID)
 }
 
 const updateRunQuery = `
@@ -165,7 +164,7 @@ UPDATE test_runs SET
 
 	"metadata" = $12
 
-WHERE id = $13
+WHERE id = $13 AND test_id = $14
 `
 
 func (td *postgresDB) UpdateRun(ctx context.Context, r model.Run) error {
@@ -216,6 +215,7 @@ func (td *postgresDB) UpdateRun(ctx context.Context, r model.Run) error {
 		lastError,
 		jsonMetadata,
 		r.ID,
+		r.TestID,
 	)
 	if err != nil {
 		return fmt.Errorf("sql exec: %w", err)
@@ -267,15 +267,14 @@ SELECT
 FROM test_runs
 `
 
-// TODO require test id as well
-func (td *postgresDB) GetRun(ctx context.Context, id int) (model.Run, error) {
-	stmt, err := td.db.Prepare(selectRunQuery + " WHERE id = $1")
+func (td *postgresDB) GetRun(ctx context.Context, testID id.ID, runID int) (model.Run, error) {
+	stmt, err := td.db.Prepare(selectRunQuery + " WHERE id = $1 AND test_id = $2")
 	if err != nil {
 		return model.Run{}, err
 	}
 	defer stmt.Close()
 
-	run, err := readRunRow(stmt.QueryRowContext(ctx, id))
+	run, err := readRunRow(stmt.QueryRowContext(ctx, runID, testID.String()))
 	if err != nil {
 		return model.Run{}, fmt.Errorf("cannot read row: %w", err)
 	}
