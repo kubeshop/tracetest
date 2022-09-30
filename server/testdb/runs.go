@@ -102,7 +102,9 @@ func (td *postgresDB) CreateRun(ctx context.Context, test model.Test, run model.
 	run.TestID = test.ID
 	run.State = model.RunStateCreated
 	run.TestVersion = test.Version
-	run.CreatedAt = time.Now()
+	if run.CreatedAt.IsZero() {
+		run.CreatedAt = time.Now()
+	}
 
 	jsonMetadata, err := json.Marshal(run.Metadata)
 	if err != nil {

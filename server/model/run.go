@@ -56,6 +56,22 @@ func (r Run) ExecutionTime() int {
 	return int(et)
 }
 
+func (r Run) Count() (pass, fail int) {
+	r.Results.Results.Map(func(_ SpanQuery, ars []AssertionResult) {
+		for _, ar := range ars {
+			for _, rs := range ar.Results {
+				if rs.CompareErr == nil {
+					pass++
+				} else {
+					fail++
+				}
+			}
+		}
+	})
+
+	return
+}
+
 func (r Run) Start() Run {
 	r.State = RunStateExecuting
 	r.ServiceTriggeredAt = Now()

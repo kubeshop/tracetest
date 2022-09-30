@@ -2,8 +2,11 @@ package testdb_test
 
 import (
 	"context"
+	"fmt"
 	"testing"
+	"time"
 
+	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/stretchr/testify/assert"
@@ -136,5 +139,85 @@ func TestGetTestsWithMultipleVersions(t *testing.T) {
 
 	for _, test := range tests {
 		assert.Equal(t, 2, test.Version)
+	}
+}
+
+func TestSummary(t *testing.T) {
+	db, clean := getDB()
+	defer clean()
+
+	createRunWithResult := func(t *testing.T, db model.Repository, test model.Test, d time.Time, pass, fail int) model.Run {
+		t.Helper()
+		run := model.Run{
+			TraceID:   testdb.IDGen.TraceID(),
+			SpanID:    testdb.IDGen.SpanID(),
+			CreatedAt: d,
+		}
+
+		run, err := db.CreateRun(context.TODO(), test, run)
+		if err != nil {
+			panic(err)
+		}
+
+		result := []model.AssertionResult{
+			{
+				Assertion: model.Assertion{Comparator: comparator.Eq},
+				Results:   []model.SpanAssertionResult{},
+			},
+		}
+		for i := 0; i < pass; i++ {
+			// CompareErr: nil means passed
+			result[0].Results = append(result[0].Results, model.SpanAssertionResult{CompareErr: nil})
+		}
+		for i := 0; i < fail; i++ {
+			result[0].Results = append(result[0].Results, model.SpanAssertionResult{CompareErr: fmt.Errorf("err")})
+		}
+		run.Results = &model.RunResults{
+			Results: (model.OrderedMap[model.SpanQuery, []model.AssertionResult]{}).
+				MustAdd("span", result),
+		}
+
+		err = db.UpdateRun(context.TODO(), run)
+		if err != nil {
+			panic(err)
+		}
+
+		return run
+	}
+
+	test := createTest(t, db)
+
+	// 1 run
+	{
+		t1 := time.Date(2022, time.July, 01, 12, 23, 00, 0, time.UTC)
+		createRunWithResult(t, db, test, t1, 2, 0)
+
+		tests, err := db.GetTests(context.TODO(), 20, 0, "")
+		require.NoError(t, err)
+
+		require.Len(t, tests, 1)
+		assert.Equal(t, tests[0].ID, test.ID)
+
+		assert.Equal(t, 1, tests[0].Summary.Runs)
+		assert.WithinDuration(t, t1, tests[0].Summary.LastRun.Time, 0) // hack for comparing times
+		assert.Equal(t, 2, tests[0].Summary.LastRun.Passes)
+		assert.Equal(t, 0, tests[0].Summary.LastRun.Fails)
+	}
+
+	{
+		// 2 runs
+		t2 := time.Date(2022, time.July, 01, 12, 23, 30, 0, time.UTC)
+		createRunWithResult(t, db, test, t2, 1, 1)
+
+		tests, err := db.GetTests(context.TODO(), 20, 0, "")
+		require.NoError(t, err)
+
+		require.Len(t, tests, 1)
+		assert.Equal(t, tests[0].ID, test.ID)
+
+		assert.Equal(t, 2, tests[0].Summary.Runs)
+		assert.WithinDuration(t, t2, tests[0].Summary.LastRun.Time, 0) // hack for comparing times
+		assert.Equal(t, 1, tests[0].Summary.LastRun.Passes)
+		assert.Equal(t, 1, tests[0].Summary.LastRun.Fails)
 	}
 }

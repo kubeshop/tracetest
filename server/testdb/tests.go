@@ -147,7 +147,8 @@ const getTestSQL = `
 		t.description,
 		t.service_under_test,
 		t.specs,
-		t.created_at
+		t.created_at,
+		(SELECT COUNT(*) FROM test_runs tr WHERE tr.test_id = t.id) as total_runs
 	FROM tests t
 `
 
@@ -224,6 +225,26 @@ func (td *postgresDB) GetTests(ctx context.Context, take, skip int32, query stri
 	return tests, nil
 }
 
+func (td *postgresDB) testLastRunSummary(ctx context.Context, test model.Test) (model.Test, error) {
+	runs, err := td.GetTestRuns(ctx, test, 1, 0) //get latest run
+	if err != nil {
+		return model.Test{}, fmt.Errorf("cannot get test last run: %w", err)
+	}
+
+	if len(runs) == 0 {
+		return test, nil
+	}
+
+	lastRun := runs[0]
+
+	test.Summary.LastRun.Time = lastRun.CreatedAt
+
+	test.Summary.LastRun.Passes,
+		test.Summary.LastRun.Fails = lastRun.Count()
+
+	return test, nil
+}
+
 func (td *postgresDB) readTestRow(ctx context.Context, row scanner) (model.Test, error) {
 	test := model.Test{}
 
@@ -236,6 +257,7 @@ func (td *postgresDB) readTestRow(ctx context.Context, row scanner) (model.Test,
 		&jsonServiceUnderTest,
 		&jsonSpecs,
 		&test.CreatedAt,
+		&test.Summary.Runs,
 	)
 
 	switch err {
@@ -252,7 +274,7 @@ func (td *postgresDB) readTestRow(ctx context.Context, row scanner) (model.Test,
 			return model.Test{}, err
 		}
 
-		return test, nil
+		return td.testLastRunSummary(ctx, test)
 	default:
 		return model.Test{}, err
 	}
