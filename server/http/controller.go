@@ -112,13 +112,13 @@ func (c *controller) GetTestSpecs(ctx context.Context, testID string) (openapi.I
 	return openapi.Response(200, c.mappers.Out.Specs(test.Specs)), nil
 }
 
-func (c *controller) GetTestResultSelectedSpans(ctx context.Context, _ string, runID int32, selectorQuery string) (openapi.ImplResponse, error) {
+func (c *controller) GetTestResultSelectedSpans(ctx context.Context, testID string, runID int32, selectorQuery string) (openapi.ImplResponse, error) {
 	selector, err := selectors.New(selectorQuery)
 	if err != nil {
 		return handleDBError(err), err
 	}
 
-	run, err := c.testDB.GetRun(ctx, int(runID))
+	run, err := c.testDB.GetRun(ctx, id.ID(testID), int(runID))
 	if err != nil {
 		return openapi.Response(http.StatusInternalServerError, ""), nil
 	}
@@ -137,8 +137,8 @@ func (c *controller) GetTestResultSelectedSpans(ctx context.Context, _ string, r
 	return openapi.Response(http.StatusOK, selectedSpanIds), nil
 }
 
-func (c *controller) GetTestRun(ctx context.Context, _ string, runID int32) (openapi.ImplResponse, error) {
-	run, err := c.testDB.GetRun(ctx, int(runID))
+func (c *controller) GetTestRun(ctx context.Context, testID string, runID int32) (openapi.ImplResponse, error) {
+	run, err := c.testDB.GetRun(ctx, id.ID(testID), int(runID))
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -146,8 +146,8 @@ func (c *controller) GetTestRun(ctx context.Context, _ string, runID int32) (ope
 	return openapi.Response(200, c.mappers.Out.Run(&run)), nil
 }
 
-func (c *controller) DeleteTestRun(ctx context.Context, _ string, runID int32) (openapi.ImplResponse, error) {
-	run, err := c.testDB.GetRun(ctx, int(runID))
+func (c *controller) DeleteTestRun(ctx context.Context, testID string, runID int32) (openapi.ImplResponse, error) {
+	run, err := c.testDB.GetRun(ctx, id.ID(testID), int(runID))
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -198,7 +198,7 @@ func (c *controller) RerunTestRun(ctx context.Context, testID string, runID int3
 		return handleDBError(err), err
 	}
 
-	run, err := c.testDB.GetRun(ctx, int(runID))
+	run, err := c.testDB.GetRun(ctx, id.ID(testID), int(runID))
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -284,8 +284,8 @@ func (c *controller) UpdateTest(ctx context.Context, testID string, in openapi.T
 	return openapi.Response(204, nil), nil
 }
 
-func (c *controller) DryRunAssertion(ctx context.Context, _ string, runID int32, def openapi.TestSpecs) (openapi.ImplResponse, error) {
-	run, err := c.testDB.GetRun(ctx, int(runID))
+func (c *controller) DryRunAssertion(ctx context.Context, testID string, runID int32, def openapi.TestSpecs) (openapi.ImplResponse, error) {
+	run, err := c.testDB.GetRun(ctx, id.ID(testID), int(runID))
 	if err != nil {
 		return openapi.Response(http.StatusInternalServerError, ""), nil
 	}
@@ -304,7 +304,7 @@ func (c *controller) DryRunAssertion(ctx context.Context, _ string, runID int32,
 }
 
 func (c *controller) GetRunResultJUnit(ctx context.Context, testID string, runID int32) (openapi.ImplResponse, error) {
-	run, err := c.testDB.GetRun(ctx, int(runID))
+	run, err := c.testDB.GetRun(ctx, id.ID(testID), int(runID))
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -346,7 +346,7 @@ func (c controller) GetTestVersionDefinitionFile(ctx context.Context, testID str
 }
 
 func (c controller) ExportTestRun(ctx context.Context, testID string, runID int32) (openapi.ImplResponse, error) {
-	run, err := c.testDB.GetRun(ctx, int(runID))
+	run, err := c.testDB.GetRun(ctx, id.ID(testID), int(runID))
 	if err != nil {
 		return handleDBError(err), err
 	}
