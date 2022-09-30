@@ -150,6 +150,9 @@ const getTestSQL = `
 		t.created_at,
 		(SELECT COUNT(*) FROM test_runs tr WHERE tr.test_id = t.id) as total_runs
 	FROM tests t
+	INNER JOIN (
+		SELECT max(id) as lastRunID FROM test_runs GROUP BY test_id
+	) as latestRuns ON latestRuns.test_id = t.id
 `
 
 func (td *postgresDB) GetTestVersion(ctx context.Context, id id.ID, version int) (model.Test, error) {

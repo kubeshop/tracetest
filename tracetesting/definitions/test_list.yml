@@ -20,4 +20,4 @@ specs:
   - tracetest.selected_spans.count = 1
 - selector: span[name = "query SELECT"]
   assertions:
-  - tracetest.selected_spans.count = 1
+  - tracetest.selected_spans.count = 6
