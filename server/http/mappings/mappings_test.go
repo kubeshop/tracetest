@@ -91,7 +91,9 @@ func TestSpecOrder(t *testing.T) {
 	attempts := 50
 	for i := 0; i < attempts; i++ {
 		maps := mappings.New(traces.ConversionConfig{}, comparator.DefaultRegistry())
-		actual := maps.Out.Specs(maps.In.Definition(input))
+		definition, err := maps.In.Definition(input)
+		require.NoError(t, err)
+		actual := maps.Out.Specs(definition)
 		actualJSON, err := json.Marshal(actual)
 
 		require.NoError(t, err)
@@ -202,7 +204,10 @@ func TestResultsOrder(t *testing.T) {
 	for i := 0; i < attempts; i++ {
 		maps := mappings.New(traces.ConversionConfig{}, comparator.DefaultRegistry())
 
-		actual := maps.Out.Result(maps.In.Result(input))
+		result, err := maps.In.Result(input)
+		require.NoError(t, err)
+
+		actual := maps.Out.Result(result)
 		actualJSON, err := json.Marshal(actual)
 
 		require.NoError(t, err)
