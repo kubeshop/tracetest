@@ -55,8 +55,7 @@ func (c *customController) Routes() openapi.Routes {
 func (c *customController) GetRunResultJUnit(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	testIdParam := params["testId"]
-
-	runIdParam, err := parseInt32Parameter(params["runId"], true)
+	runIdParam := params["runId"]
 
 	result, err := c.service.GetRunResultJUnit(r.Context(), testIdParam, runIdParam)
 	// If an error occurred, encode the error with the status code

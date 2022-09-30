@@ -2,6 +2,7 @@ package http_test
 
 import (
 	"context"
+	"strconv"
 	"testing"
 
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
@@ -109,7 +110,7 @@ func TestContains_Issue617(t *testing.T) {
 	f := setupController(t)
 	f.expectGetRun(exampleRun)
 
-	actual, err := f.c.DryRunAssertion(context.TODO(), exampleRun.TestID.String(), int32(exampleRun.ID), spec)
+	actual, err := f.c.DryRunAssertion(context.TODO(), exampleRun.TestID.String(), strconv.Itoa(exampleRun.ID), spec)
 	require.NoError(t, err)
 
 	assert.Equal(t, 200, actual.Code)
