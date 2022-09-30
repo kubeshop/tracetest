@@ -320,7 +320,7 @@ func (c *controller) DryRunAssertion(ctx context.Context, testID, runID string, 
 	}
 
 	if run.Trace == nil {
-		return openapi.Response(http.StatusUnprocessableEntity, fmt.Sprintf(`run "%d" has no trace associated`, runID)), nil
+		return openapi.Response(http.StatusUnprocessableEntity, fmt.Sprintf(`run "%s" has no trace associated`, runID)), nil
 	}
 
 	definition, err := c.mappers.In.Definition(def)
