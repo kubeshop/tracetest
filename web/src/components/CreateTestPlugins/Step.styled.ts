@@ -2,18 +2,19 @@ import {Typography} from 'antd';
 import styled from 'styled-components';
 
 export const Step = styled.div`
-  padding: 24px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 100%;
+  height: 426px;
+  max-height: 426px;
+  overflow-y: scroll;
+  overflow-x: hidden;
 `;
 
 export const FormContainer = styled.div`
   height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 23px;
   margin-bottom: 24px;
 
   .ant-form-item {
@@ -21,8 +22,17 @@ export const FormContainer = styled.div`
   }
 `;
 
-export const Title = styled(Typography.Title).attrs({level: 2})`
+export const Title = styled(Typography.Title)<{$withSubtitle?: boolean}>`
   && {
-    margin-bottom: 24px;
+    font-size: ${({theme}) => theme.size.md};
+    margin-bottom: ${({$withSubtitle}) => ($withSubtitle ? '0' : '16px')};
+  }
+`;
+
+export const Subtitle = styled(Typography.Text)`
+  && {
+    font-size: ${({theme}) => theme.size.md};
+    color: ${({theme}) => theme.color.textSecondary};
+    margin-bottom: 16px;
   }
 `;

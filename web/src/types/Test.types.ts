@@ -113,6 +113,7 @@ export interface ICreateTestState {
   stepList: ICreateTestStep[];
   stepNumber: number;
   pluginName: SupportedPlugins;
+  isFormValid: boolean;
 }
 
 export type TCreateTestSliceActions = {
@@ -120,4 +121,5 @@ export type TCreateTestSliceActions = {
   setPlugin: CaseReducer<ICreateTestState, PayloadAction<{plugin: IPlugin}>>;
   setStepNumber: CaseReducer<ICreateTestState, PayloadAction<{stepNumber: number; completeStep?: boolean}>>;
   setDraftTest: CaseReducer<ICreateTestState, PayloadAction<{draftTest: TDraftTest}>>;
+  setIsFormValid: CaseReducer<ICreateTestState, PayloadAction<{isValid: boolean}>>;
 };

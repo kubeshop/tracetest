@@ -19,32 +19,34 @@ interface IProps {
 
 const BasicDetailsForm = ({onSelectDemo = noop, selectedDemo, isEditing = false, demoList = []}: IProps) => {
   return (
-    <S.InputContainer $isEditing={isEditing}>
+    <>
       {!isEditing && Boolean(demoList.length) && isDemoEnabled && (
         <BasicDetailsDemoHelper selectedDemo={selectedDemo} onSelectDemo={onSelectDemo} demoList={demoList} />
       )}
-      <Form.Item
-        className="input-name"
-        data-cy="create-test-name-input"
-        data-tour={GuidedTourService.getStep(GuidedTours.Home, Steps.Name)}
-        label="Name"
-        name="name"
-        rules={[{required: true, message: 'Please enter a test name'}]}
-        style={{marginBottom: 0}}
-      >
-        <Input placeholder="Enter test name" />
-      </Form.Item>
-      <Form.Item
-        className="input-description"
-        data-cy="create-test-description-input"
-        label="Description"
-        name="description"
-        style={{marginBottom: 0}}
-        rules={[{required: true, message: 'Please enter a test description'}]}
-      >
-        <Input.TextArea placeholder="Enter a brief description" />
-      </Form.Item>
-    </S.InputContainer>
+      <S.InputContainer $isEditing={isEditing}>
+        <Form.Item
+          className="input-name"
+          data-cy="create-test-name-input"
+          data-tour={GuidedTourService.getStep(GuidedTours.Home, Steps.Name)}
+          label="Name"
+          name="name"
+          rules={[{required: true, message: 'Please enter a test name'}]}
+          style={{marginBottom: 0}}
+        >
+          <Input placeholder="Enter test name" />
+        </Form.Item>
+        <Form.Item
+          className="input-description"
+          data-cy="create-test-description-input"
+          label="Description"
+          name="description"
+          style={{marginBottom: 0}}
+          rules={[{required: true, message: 'Please enter a test description'}]}
+        >
+          <Input.TextArea placeholder="Enter a brief description" />
+        </Form.Item>
+      </S.InputContainer>
+    </>
   );
 };
 

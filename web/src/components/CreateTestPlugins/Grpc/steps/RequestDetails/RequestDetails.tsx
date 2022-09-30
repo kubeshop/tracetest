@@ -1,20 +1,16 @@
 import {Form} from 'antd';
 import {useCallback, useEffect} from 'react';
 import {useCreateTest} from 'providers/CreateTest/CreateTest.provider';
-import CreateStepFooter from 'components/CreateTestSteps/CreateTestStepFooter';
 import * as Step from 'components/CreateTestPlugins/Step.styled';
 import {IRpcValues} from 'types/Test.types';
+import useValidateTestDraft from 'hooks/useValidateTestDraft';
+import {ComponentNames} from 'constants/Plugins.constants';
 import RequestDetailsForm from './RequestDetailsForm';
-import useValidateTestDraft from '../../../../../hooks/useValidateTestDraft';
 
 const RequestDetails = () => {
   const [form] = Form.useForm<IRpcValues>();
-  const {onNext, pluginName, draftTest} = useCreateTest();
-  const {isValid, onValidate, setIsValid} = useValidateTestDraft({pluginName});
-
-  const handleNext = useCallback(() => {
-    form.submit();
-  }, [form]);
+  const {onNext, pluginName, draftTest, onIsFormValid} = useCreateTest();
+  const onValidate = useValidateTestDraft({pluginName, setIsValid: onIsFormValid});
 
   const onRefreshData = useCallback(async () => {
     const {url = '', message = '', method = '', auth, metadata = [{}], protoFile} = draftTest as IRpcValues;
@@ -22,11 +18,11 @@ const RequestDetails = () => {
 
     try {
       await form.validateFields();
-      setIsValid(true);
+      onIsFormValid(true);
     } catch (err) {
-      setIsValid(false);
+      onIsFormValid(false);
     }
-  }, [draftTest, form, setIsValid]);
+  }, [draftTest, form, onIsFormValid]);
 
   useEffect(() => {
     onRefreshData();
@@ -44,6 +40,7 @@ const RequestDetails = () => {
       <Step.FormContainer>
         <Step.Title>Method Selection Information</Step.Title>
         <Form<IRpcValues>
+          id={ComponentNames.RequestDetails}
           autoComplete="off"
           form={form}
           layout="vertical"
@@ -56,7 +53,6 @@ const RequestDetails = () => {
           <RequestDetailsForm form={form} />
         </Form>
       </Step.FormContainer>
-      <CreateStepFooter isValid={isValid} onNext={handleNext} />
     </Step.Step>
   );
 };

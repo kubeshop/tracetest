@@ -11,7 +11,7 @@ describe('Create test', () => {
 
   it('should create a basic GET test from scratch', () => {
     const name = `Test - Pokemon - #${String(Date.now()).slice(-4)}`;
-    cy.navigateToTestCreationPage();
+    cy.openTestCreationModal();
     cy.fillCreateFormBasicStep(name);
     cy.setCreateFormUrl('GET', 'http://demo-pokemon-api.demo.svc.cluster.local/pokemon');
     cy.submitCreateTestForm();
@@ -21,7 +21,7 @@ describe('Create test', () => {
 
   it('should create a basic POST test from scratch', () => {
     const name = `Test - Pokemon - #${String(Date.now()).slice(-4)}`;
-    cy.navigateToTestCreationPage();
+    cy.openTestCreationModal();
     cy.fillCreateFormBasicStep(name);
     cy.setCreateFormUrl('POST', 'http://demo-pokemon-api.demo.svc.cluster.local/pokemon');
     cy.get('[data-cy=bodyMode-json]').click();

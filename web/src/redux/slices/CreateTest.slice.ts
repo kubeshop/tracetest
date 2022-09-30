@@ -8,6 +8,7 @@ export const initialState: ICreateTestState = {
   stepList: Plugins.REST.stepList,
   stepNumber: 0,
   pluginName: SupportedPlugins.REST,
+  isFormValid: true,
 };
 
 const createTestSlice = createSlice<ICreateTestState, TCreateTestSliceActions, 'createTest'>({
@@ -16,6 +17,9 @@ const createTestSlice = createSlice<ICreateTestState, TCreateTestSliceActions, '
   reducers: {
     reset() {
       return initialState;
+    },
+    setIsFormValid(state, {payload: {isValid}}) {
+      state.isFormValid = isValid;
     },
     setPlugin(
       state,
@@ -47,5 +51,5 @@ const createTestSlice = createSlice<ICreateTestState, TCreateTestSliceActions, '
   },
 });
 
-export const {setPlugin, setStepNumber, setDraftTest, reset} = createTestSlice.actions;
+export const {setPlugin, setStepNumber, setDraftTest, reset, setIsFormValid} = createTestSlice.actions;
 export default createTestSlice.reducer;

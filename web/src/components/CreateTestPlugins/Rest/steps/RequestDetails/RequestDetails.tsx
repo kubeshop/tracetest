@@ -1,23 +1,17 @@
 import {Form} from 'antd';
 import * as Step from 'components/CreateTestPlugins/Step.styled';
-import CreateStepFooter from 'components/CreateTestSteps/CreateTestStepFooter';
 import {HTTP_METHOD} from 'constants/Common.constants';
 import useValidateTestDraft from 'hooks/useValidateTestDraft';
 import {useCreateTest} from 'providers/CreateTest/CreateTest.provider';
+import {ComponentNames} from 'constants/Plugins.constants';
 import {useCallback, useEffect} from 'react';
 import {IHttpValues} from 'types/Test.types';
 import RequestDetailsForm from './RequestDetailsForm';
 
 const RequestDetails = () => {
+  const {onNext, draftTest, pluginName, onIsFormValid} = useCreateTest();
   const [form] = Form.useForm<IHttpValues>();
-  const {onNext} = useCreateTest();
-  const {draftTest, pluginName} = useCreateTest();
-  const {isValid, onValidate, setIsValid} = useValidateTestDraft({pluginName});
-  const {url = '', body = '', method = HTTP_METHOD.GET} = draftTest as IHttpValues;
-
-  const handleNext = useCallback(() => {
-    form.submit();
-  }, [form]);
+  const onValidate = useValidateTestDraft({pluginName, setIsValid: onIsFormValid});
 
   const handleSubmit = useCallback(
     (values: IHttpValues) => {
@@ -27,15 +21,16 @@ const RequestDetails = () => {
   );
 
   const onRefreshData = useCallback(async () => {
+    const {url = '', body = '', method = HTTP_METHOD.GET} = draftTest as IHttpValues;
     form.setFieldsValue({url, body, method: method as HTTP_METHOD});
 
     try {
       form.validateFields();
-      setIsValid(true);
+      onIsFormValid(true);
     } catch (err) {
-      setIsValid(false);
+      onIsFormValid(false);
     }
-  }, [body, form, method, setIsValid, url]);
+  }, [draftTest, form, onIsFormValid]);
 
   useEffect(() => {
     onRefreshData();
@@ -46,6 +41,7 @@ const RequestDetails = () => {
       <Step.FormContainer>
         <Step.Title>Provide additional information</Step.Title>
         <Form<IHttpValues>
+          id={ComponentNames.RequestDetails}
           autoComplete="off"
           form={form}
           layout="vertical"
@@ -55,7 +51,6 @@ const RequestDetails = () => {
           <RequestDetailsForm form={form} />
         </Form>
       </Step.FormContainer>
-      <CreateStepFooter isValid={isValid} onNext={handleNext} />
     </Step.Step>
   );
 };

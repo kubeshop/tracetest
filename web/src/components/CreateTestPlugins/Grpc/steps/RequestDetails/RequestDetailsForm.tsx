@@ -33,14 +33,16 @@ const RequestDetailsForm = ({form}: IProps) => {
   return (
     <>
       <Row gutter={12}>
-        <Col span={12}>
+        <Col span={18}>
           <span>
             <Form.Item data-cy="protoFile" name="protoFile" label="Upload Protobuf File">
               <RequestDetailsFileInput />
             </Form.Item>
           </span>
         </Col>
-        <Col span={12}>
+      </Row>
+      <Row gutter={12}>
+        <Col span={18}>
           <Form.Item data-cy="method" label="Select Method" name="method">
             <Select data-cy="method-select">
               {methodList.map(method => (
@@ -53,12 +55,12 @@ const RequestDetailsForm = ({form}: IProps) => {
         </Col>
       </Row>
       <Row gutter={12}>
-        <Col span={24}>
+        <Col span={18}>
           <RequestDetailsUrlInput showMethodSelector={false} shouldValidateUrl={false} />
         </Col>
       </Row>
       <Row gutter={12}>
-        <Col span={24}>
+        <Col span={18}>
           <RequestDetailsAuthInput form={form} />
         </Col>
       </Row>
@@ -68,7 +70,7 @@ const RequestDetailsForm = ({form}: IProps) => {
         </Col>
       </Row>
       <Row gutter={12}>
-        <Col span={24}>
+        <Col span={18}>
           <Form.Item data-cy="message" label="Message" name="message" style={{marginBottom: 0}}>
             <Input.TextArea placeholder="Enter message" />
           </Form.Item>

@@ -6,7 +6,7 @@ describe('Home', () => {
   });
 
   it('should render the list of tests', () => {
-    cy.get('[data-cy=create-test-button]').should('be.visible');
+    cy.get('[data-cy=create-button]').should('be.visible');
     cy.get('[data-cy=test-list]').should('exist');
   });
 
