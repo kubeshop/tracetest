@@ -51,7 +51,15 @@ const TestsSelectionInput = ({value = [], onChange = noop, testList}: IProps) =>
       <Row gutter={12}>
         <Col span={18}>
           <span>
-            <Select placeholder="Add a test" onChange={onSelectedTest} value={null}>
+            <Select
+              placeholder="Add a test"
+              onChange={onSelectedTest}
+              value={null}
+              showSearch
+              filterOption={(input, option) =>
+                (option!.children as unknown as string).toLowerCase().includes(input.toLowerCase())
+              }
+            >
               {testList.map(({id, name}) => (
                 <Select.Option value={id} key={id}>
                   {name}
