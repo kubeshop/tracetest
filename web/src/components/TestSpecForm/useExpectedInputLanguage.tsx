@@ -4,6 +4,7 @@ import {syntaxTree} from '@codemirror/language';
 import {Attributes} from 'constants/SpanAttribute.constants';
 import {useMemo} from 'react';
 import {tracetest} from 'utils/grammar';
+import useEditorTheme from '../AdvancedEditor/hooks/useEditorTheme';
 
 function isNumber(text?: string) {
   const matches = text?.toString().match(/^\d*(\.\d+)?$/);
@@ -11,6 +12,7 @@ function isNumber(text?: string) {
 }
 
 export function useExpectedInputLanguage() {
+  const theme = useEditorTheme();
   return useMemo(
     () => [
       autocompletion({
@@ -25,7 +27,7 @@ export function useExpectedInputLanguage() {
             const identifierText = state.doc.sliceString(parentNode.from, parentNode.to);
             const isN = isNumber(identifierText);
 
-            const attributeOptions = Object.values(Attributes).map(s => ({label: `attr:${s}`, apply: `attr:${s} `}));
+            const attributeOptions = Object.values(Attributes).map(s => ({label: `\${attr:${s}}`, apply: `\${attr:${s}} `}));
             const durationOptions = [{label: `${word?.text.toString()}ms`}, {label: `${word?.text.toString()}s`}];
             const operatorOptions = [
               {label: '+', apply: '+ '},
@@ -43,8 +45,9 @@ export function useExpectedInputLanguage() {
           },
         ],
       }),
+      theme,
       tracetest(),
     ],
-    []
+    [theme]
   );
 }
