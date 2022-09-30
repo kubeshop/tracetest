@@ -225,13 +225,13 @@ func (td *postgresDB) UpdateRun(ctx context.Context, r model.Run) error {
 }
 
 func (td *postgresDB) DeleteRun(ctx context.Context, r model.Run) error {
-	stmt, err := td.db.Prepare("DELETE FROM test_runs WHERE id = $1")
+	stmt, err := td.db.Prepare("DELETE FROM test_runs WHERE id = $1 AND test_id = $2")
 	if err != nil {
 		return fmt.Errorf("prepare: %w", err)
 	}
 	defer stmt.Close()
 
-	_, err = stmt.ExecContext(ctx, r.ID)
+	_, err = stmt.ExecContext(ctx, r.ID, r.TestID)
 	if err != nil {
 		return fmt.Errorf("sql exec: %w", err)
 	}

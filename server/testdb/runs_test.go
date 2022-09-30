@@ -152,6 +152,22 @@ func TestUpdateRunWithNewIDs(t *testing.T) {
 	assert.Equal(t, t2r1.Metadata, t2r1Updated.Metadata)
 }
 
+func TestDeleteRun(t *testing.T) {
+	db, clean := getDB()
+	defer clean()
+
+	t1r1 := createRun(t, db, createTest(t, db))
+	t2r1 := createRun(t, db, createTest(t, db))
+
+	db.DeleteRun(context.TODO(), t2r1)
+
+	_, err := db.GetRun(context.TODO(), t1r1.TestID, t1r1.ID)
+	require.NoError(t, err)
+
+	_, err = db.GetRun(context.TODO(), t2r1.TestID, t2r1.ID)
+	require.ErrorIs(t, err, testdb.ErrNotFound)
+}
+
 func TestGetRunByTraceID(t *testing.T) {
 	db, clean := getDB()
 	defer clean()
