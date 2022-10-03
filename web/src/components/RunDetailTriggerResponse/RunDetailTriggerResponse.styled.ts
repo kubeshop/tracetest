@@ -1,4 +1,4 @@
-import {Typography} from 'antd';
+import {Button, Typography} from 'antd';
 import styled from 'styled-components';
 
 export {default as AttributeTitle} from 'components/AttributeRow/AttributeTitle';
@@ -98,3 +98,12 @@ export const HeadersList = styled.div`
   gap: 4px;
   padding: 16px 0;
 `;
+
+export const Actions = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 16px;
+`;
+
+export const AddOutputButton = styled(Button)``;
