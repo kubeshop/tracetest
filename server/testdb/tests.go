@@ -148,8 +148,17 @@ const getTestSQL = `
 		t.service_under_test,
 		t.specs,
 		t.created_at,
-		(SELECT COUNT(*) FROM test_runs tr WHERE tr.test_id = t.id) as total_runs
+		(SELECT COUNT(*) FROM test_runs tr WHERE tr.test_id = t.id) as total_runs,
+		last_test_run.created_at as last_test_run_time,
+		last_test_run.pass as last_test_run_pass,
+		last_test_run.fail as last_test_run_fail
 	FROM tests t
+	LEFT OUTER JOIN (
+		SELECT MAX(id) as id, test_id FROM test_runs GROUP BY test_id
+	) as ltr ON ltr.test_id = t.id
+	LEFT OUTER JOIN
+		test_runs last_test_run
+	ON last_test_run.test_id = ltr.test_id AND last_test_run.id = ltr.id
 `
 
 func (td *postgresDB) GetTestVersion(ctx context.Context, id id.ID, version int) (model.Test, error) {
@@ -189,8 +198,8 @@ func (td *postgresDB) GetTests(ctx context.Context, take, skip int32, query stri
 	sql := getTestSQL + `
 	INNER JOIN (
 		SELECT id as idx, max(version) as latest_version FROM tests GROUP BY idx
-	) as latestTests ON latestTests.idx = t.id
-	WHERE t.version = latestTests.latest_version `
+	) as latest_tests ON latest_tests.idx = t.id
+	WHERE t.version = latest_tests.latest_version `
 	if hasSearchQuery {
 		params = append(params, "%"+strings.ReplaceAll(query, " ", "%")+"%")
 		sql += ` AND (
@@ -225,30 +234,16 @@ func (td *postgresDB) GetTests(ctx context.Context, take, skip int32, query stri
 	return tests, nil
 }
 
-func (td *postgresDB) testLastRunSummary(ctx context.Context, test model.Test) (model.Test, error) {
-	runs, err := td.GetTestRuns(ctx, test, 1, 0) //get latest run
-	if err != nil {
-		return model.Test{}, fmt.Errorf("cannot get test last run: %w", err)
-	}
-
-	if len(runs) == 0 {
-		return test, nil
-	}
-
-	lastRun := runs[0]
-
-	test.Summary.LastRun.Time = lastRun.CreatedAt
-
-	test.Summary.LastRun.Passes,
-		test.Summary.LastRun.Fails = lastRun.Count()
-
-	return test, nil
-}
-
 func (td *postgresDB) readTestRow(ctx context.Context, row scanner) (model.Test, error) {
 	test := model.Test{}
 
-	var jsonServiceUnderTest, jsonSpecs []byte
+	var (
+		jsonServiceUnderTest, jsonSpecs []byte
+
+		lastRunTime *time.Time
+
+		pass, fail *int
+	)
 	err := row.Scan(
 		&test.ID,
 		&test.Version,
@@ -258,6 +253,9 @@ func (td *postgresDB) readTestRow(ctx context.Context, row scanner) (model.Test,
 		&jsonSpecs,
 		&test.CreatedAt,
 		&test.Summary.Runs,
+		&lastRunTime,
+		&pass,
+		&fail,
 	)
 
 	switch err {
@@ -274,7 +272,17 @@ func (td *postgresDB) readTestRow(ctx context.Context, row scanner) (model.Test,
 			return model.Test{}, err
 		}
 
-		return td.testLastRunSummary(ctx, test)
+		if lastRunTime != nil {
+			test.Summary.LastRun.Time = *lastRunTime
+		}
+		if pass != nil {
+			test.Summary.LastRun.Passes = *pass
+		}
+		if fail != nil {
+			test.Summary.LastRun.Fails = *fail
+		}
+
+		return test, nil
 	default:
 		return model.Test{}, err
 	}

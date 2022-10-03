@@ -92,6 +92,8 @@ type (
 		Results       *RunResults
 		Trace         *traces.Trace
 		LastError     error
+		Pass          int
+		Fail          int
 
 		Metadata RunMetadata
 	}
