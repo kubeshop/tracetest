@@ -11,6 +11,8 @@ var (
 	Force = false
 )
 
+const createIssueMsg = "If you need help, please create an issue: https://github.com/kubeshop/tracetest/issues/new/choose"
+
 func Start() {
 	analytics.Track("Start", "installer", map[string]string{})
 	ui := cliUI.DefaultUI
