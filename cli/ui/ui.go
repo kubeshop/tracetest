@@ -1,4 +1,4 @@
-package installer
+package ui
 
 import (
 	"fmt"
@@ -7,8 +7,6 @@ import (
 	"github.com/pterm/pterm"
 	"github.com/pterm/pterm/putils"
 )
-
-const createIssueMsg = "If you need help, please create an issue: https://github.com/kubeshop/tracetest/issues/new/choose"
 
 var DefaultUI UI = &ptermUI{}
 
@@ -30,13 +28,13 @@ type UI interface {
 	Red(string) string
 
 	Confirm(prompt string, defaultValue bool) bool
-	Select(prompt string, options []option, defaultIndex int) (selected option)
+	Select(prompt string, options []Option, defaultIndex int) (selected Option)
 	TextInput(msg, defaultValue string) string
 }
 
-type option struct {
-	text string
-	fn   func(ui UI)
+type Option struct {
+	Text string
+	Fn   func(ui UI)
 }
 
 type ptermUI struct{}
@@ -131,16 +129,16 @@ func (ui ptermUI) TextInput(msg, defaultValue string) string {
 	return text
 }
 
-func (ui ptermUI) Select(prompt string, options []option, defaultIndex int) (selected option) {
+func (ui ptermUI) Select(prompt string, options []Option, defaultIndex int) (selected Option) {
 	textOpts := make([]string, len(options))
 	lookupMap := make(map[string]int)
 
 	for ix, opt := range options {
-		textOpts[ix] = opt.text
-		if _, ok := lookupMap[opt.text]; ok {
-			panic(fmt.Sprintf("duplicated option %s", opt.text))
+		textOpts[ix] = opt.Text
+		if _, ok := lookupMap[opt.Text]; ok {
+			panic(fmt.Sprintf("duplicated option %s", opt.Text))
 		}
-		lookupMap[opt.text] = ix
+		lookupMap[opt.Text] = ix
 	}
 
 	selectedText, err := (&pterm.InteractiveSelectPrinter{
