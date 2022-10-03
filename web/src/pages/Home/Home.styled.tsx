@@ -51,7 +51,6 @@ export const TestListContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
-  margin-bottom: 24px;
 `;
 
 export const HeaderContainer = styled.div`

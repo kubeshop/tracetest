@@ -1,12 +1,12 @@
 import {useCallback} from 'react';
 import {useNavigate} from 'react-router-dom';
 
-import InfiniteScroll from 'components/InfiniteScroll';
+import Pagination from 'components/Pagination';
 import SearchInput from 'components/SearchInput';
 import TestCard from 'components/TestCard';
 import TestCardV2 from 'components/TestCard/TestCardV2';
 import useDeleteTest from 'hooks/useDeleteTest';
-import useInfiniteScroll from 'hooks/useInfiniteScroll';
+import usePagination from 'hooks/usePagination';
 import useTestCrud from 'providers/Test/hooks/useTestCrud';
 import {useGetTestListQuery} from 'redux/apis/TraceTest.api';
 import HomeAnalyticsService from 'services/Analytics/HomeAnalytics.service';
@@ -20,7 +20,10 @@ import Loading from './Loading';
 const {onTestClick} = HomeAnalyticsService;
 
 const Content = () => {
-  const {hasMore, isLoading, list, loadMore, search} = useInfiniteScroll<TTest, {}>(useGetTestListQuery, {});
+  const {hasNext, hasPrev, isEmpty, isFetching, isLoading, list, loadNext, loadPrev, search} = usePagination<TTest, {}>(
+    useGetTestListQuery,
+    {}
+  );
   const onDelete = useDeleteTest();
   const navigate = useNavigate();
   const {runTest} = useTestCrud();
@@ -51,13 +54,16 @@ const Content = () => {
         <HomeActions />
       </S.ActionsContainer>
 
-      <InfiniteScroll
-        loadMore={loadMore}
-        isLoading={isLoading}
-        hasMore={hasMore}
-        shouldTrigger={Boolean(list.length)}
+      <Pagination
         emptyComponent={<NoResults />}
+        hasNext={hasNext}
+        hasPrev={hasPrev}
+        isEmpty={isEmpty}
+        isFetching={isFetching}
+        isLoading={isLoading}
         loadingComponent={<Loading />}
+        loadNext={loadNext}
+        loadPrev={loadPrev}
       >
         <S.TestListContainer data-cy="test-list">
           {list?.map(test =>
@@ -80,7 +86,7 @@ const Content = () => {
             )
           )}
         </S.TestListContainer>
-      </InfiniteScroll>
+      </Pagination>
     </S.Wrapper>
   );
 };
