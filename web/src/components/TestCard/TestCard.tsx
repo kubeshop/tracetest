@@ -39,7 +39,7 @@ const TestCard = ({onDelete, onRun, onViewAll, test}: IProps) => {
     <S.Container>
       <S.TestContainer onClick={() => handleOnClick()}>
         <S.Row>
-          {isCollapsed ? <DownOutlined /> : <RightOutlined />}
+          {isCollapsed ? <DownOutlined /> : <RightOutlined data-cy={`collapse-test-${test.id}`} />}
           <S.Box>
             <S.BoxTitle level={2}>{test.summary?.runs ?? 0}</S.BoxTitle>
           </S.Box>
