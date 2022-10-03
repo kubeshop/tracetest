@@ -11,6 +11,10 @@ import (
 
 type ID string
 
+func (id ID) String() string {
+	return string(id)
+}
+
 type Generator interface {
 	UUID() uuid.UUID
 	ID() ID

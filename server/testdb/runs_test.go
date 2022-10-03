@@ -31,7 +31,7 @@ func TestCreateRun(t *testing.T) {
 	updated, err := db.CreateRun(context.TODO(), test, run)
 	require.NoError(t, err)
 
-	actual, err := db.GetRun(context.TODO(), updated.ID)
+	actual, err := db.GetRun(context.TODO(), test.ID, updated.ID)
 	require.NoError(t, err)
 
 	assert.NotEmpty(t, actual.ID)
@@ -41,6 +41,36 @@ func TestCreateRun(t *testing.T) {
 	assert.Equal(t, run.TraceID, actual.TraceID)
 	assert.Equal(t, run.SpanID, actual.SpanID)
 	assert.Equal(t, run.Metadata, actual.Metadata)
+}
+
+func TestCreateRunIDsIncrementForTest(t *testing.T) {
+	db, clean := getDB()
+	defer clean()
+
+	run := model.Run{
+		TraceID: testdb.IDGen.TraceID(),
+		SpanID:  testdb.IDGen.SpanID(),
+	}
+
+	test1 := createTest(t, db)
+	test2 := createTest(t, db)
+
+	t1r1, err := db.CreateRun(context.TODO(), test1, run)
+	require.NoError(t, err)
+
+	t2r1, err := db.CreateRun(context.TODO(), test2, run)
+	require.NoError(t, err)
+
+	t1r2, err := db.CreateRun(context.TODO(), test1, run)
+	require.NoError(t, err)
+
+	t2r2, err := db.CreateRun(context.TODO(), test2, run)
+	require.NoError(t, err)
+
+	assert.Equal(t, 1, t1r1.ID)
+	assert.Equal(t, 2, t1r2.ID)
+	assert.Equal(t, 1, t2r1.ID)
+	assert.Equal(t, 2, t2r2.ID)
 }
 
 func TestUpdateRun(t *testing.T) {
@@ -92,7 +122,7 @@ func TestUpdateRun(t *testing.T) {
 	err := db.UpdateRun(context.TODO(), run)
 	require.NoError(t, err)
 
-	actual, err := db.GetRun(context.TODO(), run.ID)
+	actual, err := db.GetRun(context.TODO(), test.ID, run.ID)
 	require.NoError(t, err)
 
 	updatedList, err := db.GetTestRuns(context.TODO(), test, 20, 0)
@@ -100,6 +130,42 @@ func TestUpdateRun(t *testing.T) {
 
 	assert.Len(t, updatedList, 1)
 	modeltest.AssertRunEqual(t, updatedList[0], actual)
+}
+
+func TestUpdateRunWithNewIDs(t *testing.T) {
+	db, clean := getDB()
+	defer clean()
+
+	t1r1 := createRun(t, db, createTest(t, db))
+	t2r1 := createRun(t, db, createTest(t, db))
+
+	t1r1.Metadata = model.RunMetadata{"key": "val"}
+	db.UpdateRun(context.TODO(), t1r1)
+
+	t1r1Updated, err := db.GetRun(context.TODO(), t1r1.TestID, t1r1.ID)
+	require.NoError(t, err)
+
+	t2r1Updated, err := db.GetRun(context.TODO(), t2r1.TestID, t2r1.ID)
+	require.NoError(t, err)
+
+	assert.Equal(t, t1r1.Metadata, t1r1Updated.Metadata)
+	assert.Equal(t, t2r1.Metadata, t2r1Updated.Metadata)
+}
+
+func TestDeleteRun(t *testing.T) {
+	db, clean := getDB()
+	defer clean()
+
+	t1r1 := createRun(t, db, createTest(t, db))
+	t2r1 := createRun(t, db, createTest(t, db))
+
+	db.DeleteRun(context.TODO(), t2r1)
+
+	_, err := db.GetRun(context.TODO(), t1r1.TestID, t1r1.ID)
+	require.NoError(t, err)
+
+	_, err = db.GetRun(context.TODO(), t2r1.TestID, t2r1.ID)
+	require.ErrorIs(t, err, testdb.ErrNotFound)
 }
 
 func TestGetRunByTraceID(t *testing.T) {

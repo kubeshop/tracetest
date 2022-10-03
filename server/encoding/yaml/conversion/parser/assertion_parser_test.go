@@ -281,7 +281,7 @@ func TestParseAssertion(t *testing.T) {
 		},
 		{
 			Name:  "should_parse_expression_with_duration",
-			Query: `tracetest.span.endTime <= tracetest.span.startTime + 200ms`,
+			Query: `tracetest.span.endTime <= attr:tracetest.span.startTime + 200ms`,
 			ExpectedOutput: parser.Assertion{
 				Attribute: "tracetest.span.endTime",
 				Operator:  "<=",
@@ -300,7 +300,7 @@ func TestParseAssertion(t *testing.T) {
 		},
 		{
 			Name:  "should_parse_expression_with_number",
-			Query: `myapp.variable > myapp.old_value + 1`,
+			Query: `myapp.variable > attr:myapp.old_value + 1`,
 			ExpectedOutput: parser.Assertion{
 				Attribute: "myapp.variable",
 				Operator:  ">",
@@ -319,7 +319,7 @@ func TestParseAssertion(t *testing.T) {
 		},
 		{
 			Name:  "should_parse_expression_with_number",
-			Query: `myapp.variable > myapp.old_value * 2`,
+			Query: `myapp.variable > attr:myapp.old_value * 2`,
 			ExpectedOutput: parser.Assertion{
 				Attribute: "myapp.variable",
 				Operator:  ">",
@@ -364,7 +364,6 @@ func TestParseAssertion(t *testing.T) {
 			require.NoError(t, err)
 			assert.Equal(t, testCase.ExpectedOutput.Attribute, output.Attribute)
 			assert.Equal(t, testCase.ExpectedOutput.Operator, output.Operator)
-			assert.Equal(t, testCase.ExpectedOutput.Value, output.Value)
 
 			assertExpression(t, testCase.ExpectedOutput.Value, output.Value)
 		})
@@ -374,7 +373,7 @@ func TestParseAssertion(t *testing.T) {
 func assertExpression(t *testing.T, expected, actual *parser.Expression) {
 	if expected != nil {
 		assert.Equal(t, expected.LiteralValue.Type(), actual.LiteralValue.Type())
-		assert.Equal(t, expected.LiteralValue.String(), actual.LiteralValue.String())
+		assert.Equal(t, expected.LiteralValue.String(false), actual.LiteralValue.String(false))
 		assert.Equal(t, expected.Operation, actual.Operation)
 		assertExpression(t, expected.Expression, actual.Expression)
 	}
