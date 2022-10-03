@@ -10,12 +10,19 @@ import (
 
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/openapi"
+	"github.com/kubeshop/tracetest/cli/ui"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v3"
 )
 
 type ConfigureConfig struct {
-	Global bool
+	Global    bool
+	SetValues ConfigureConfigSetValues
+}
+
+type ConfigureConfigSetValues struct {
+	Endpoint         *string
+	AnalyticsEnabled *bool
 }
 
 type configureAction struct {
@@ -24,7 +31,7 @@ type configureAction struct {
 	client *openapi.APIClient
 }
 
-var _ Action[ExportTestConfig] = &exportTestAction{}
+var _ Action[ConfigureConfig] = &configureAction{}
 
 func NewConfigureAction(config config.Config, logger *zap.Logger, client *openapi.APIClient) configureAction {
 	return configureAction{
@@ -35,22 +42,30 @@ func NewConfigureAction(config config.Config, logger *zap.Logger, client *openap
 }
 
 func (a configureAction) Run(ctx context.Context, args ConfigureConfig) error {
+	ui := ui.DefaultUI
 	existingConfig := a.loadExistingConfig(args)
 	var serverURL string
-	if existingConfig.Scheme != "" && existingConfig.Endpoint != "" {
-		fmt.Printf("Enter your Tracetest server URL (current value: %s://%s): ", existingConfig.Scheme, existingConfig.Endpoint)
-	} else {
-		fmt.Print("Enter your Tracetest server URL: ")
-	}
-	_, err := fmt.Fscanf(os.Stdin, "%s", &serverURL)
-	if err != nil {
-		return fmt.Errorf("could not read text from input: %w", err)
-	}
 
-	a.logger.Debug("user entered new server URL", zap.String("serverURL", serverURL))
+	if args.SetValues.Endpoint != nil {
+		serverURL = *args.SetValues.Endpoint
+	} else {
+		existingURL := ""
+		if existingConfig.Scheme != "" && existingConfig.Endpoint != "" {
+			existingURL = fmt.Sprintf("%s://%s", existingConfig.Scheme, existingConfig.Endpoint)
+		}
+		serverURL = ui.TextInput("Enter your Tracetest server URL", existingURL)
+	}
 
 	if !strings.HasPrefix(serverURL, "http://") && !strings.HasPrefix(serverURL, "https://") {
 		return fmt.Errorf(`the server URL must start with the scheme, either "http://" or "https://"`)
+	}
+
+	var analyticsEnabled bool
+
+	if args.SetValues.AnalyticsEnabled != nil {
+		analyticsEnabled = *args.SetValues.AnalyticsEnabled
+	} else {
+		analyticsEnabled = ui.Confirm("Enable analytics?", true)
 	}
 
 	urlParts := strings.Split(serverURL, "://")
@@ -62,11 +77,12 @@ func (a configureAction) Run(ctx context.Context, args ConfigureConfig) error {
 	endpoint := urlParts[1]
 
 	config := config.Config{
-		Scheme:   scheme,
-		Endpoint: endpoint,
+		Scheme:           scheme,
+		Endpoint:         endpoint,
+		AnalyticsEnabled: analyticsEnabled,
 	}
 
-	err = a.saveConfiguration(ctx, config, args)
+	err := a.saveConfiguration(ctx, config, args)
 	if err != nil {
 		return fmt.Errorf("could not save configuration: %w", err)
 	}
