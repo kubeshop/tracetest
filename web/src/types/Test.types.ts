@@ -51,6 +51,7 @@ export type TTrigger = {
 };
 
 export type TRawTest = TTestSchemas['Test'];
+export type TRawTestSummary = TTestSchemas['TestSummary'];
 export type TTest = Model<
   TRawTest,
   {
@@ -58,6 +59,7 @@ export type TTest = Model<
     serviceUnderTest?: undefined;
     trigger: TTrigger;
     specs?: TTestSpecs;
+    summary?: TRawTestSummary;
   }
 >;
 

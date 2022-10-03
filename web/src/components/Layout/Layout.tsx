@@ -9,6 +9,7 @@ import FileViewerModalProvider from 'components/FileViewerModal/FileViewerModal.
 import Header from 'components/Header';
 import useRouterSync from 'hooks/useRouterSync';
 import ConfirmationModalProvider from 'providers/ConfirmationModal';
+import ExperimentalFeature from 'utils/ExperimentalFeature';
 import * as S from './Layout.styled';
 
 interface IProps {
@@ -23,13 +24,16 @@ const menuItems = [
     label: 'Tests',
     path: '/',
   },
-  {
+];
+
+if (ExperimentalFeature.isEnabled('transactions')) {
+  menuItems.push({
     key: '1',
     icon: <GlobalOutlined />,
     label: 'Environments',
     path: '/environments',
-  },
-];
+  });
+}
 
 const Layout = ({children, hasMenu = false}: IProps) => {
   const navigate = useNavigate();
@@ -65,7 +69,7 @@ const Layout = ({children, hasMenu = false}: IProps) => {
           )}
 
           <S.Layout>
-            <Header hasEnvironments={hasMenu} hasLogo={!hasMenu} />
+            <Header hasEnvironments={ExperimentalFeature.isEnabled('transactions')} hasLogo={!hasMenu} />
             <S.Content $hasMenu={hasMenu}>{children}</S.Content>
           </S.Layout>
         </S.Layout>

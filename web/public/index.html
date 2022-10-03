@@ -45,7 +45,7 @@
           env: getTemplateValue('{{ .Env }}', ''),
           demoEnabled: getTemplateValue('{{ .DemoEnabled }}', '["pokeshop", "otel"]'),
           demoEndpoints: getTemplateValue('{{ .DemoEndpoints }}', '{"PokeshopHttp": "http://demo-pokemon-api.demo.svc.cluster.local", "PokeshopGrpc": "demo-pokemon-api.demo.svc.cluster.local:8082", "OtelFrontend": "http://otel-frontend:8084" }'),
-          experimentalFeatures: getTemplateValue('{{ .ExperimentalFeatures }}', '[]'),
+          experimentalFeatures: getTemplateValue('{{ .ExperimentalFeatures }}', '["transactions1"]'),
         };
 
         var base = document.createElement('base');

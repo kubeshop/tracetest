@@ -1,94 +1,128 @@
 import {DownOutlined, RightOutlined} from '@ant-design/icons';
-import {Button, Typography} from 'antd';
+import {Skeleton, Tooltip} from 'antd';
 import {useCallback, useState} from 'react';
 
-import ResultCardList from 'components/RunCardList';
 import {useLazyGetRunListQuery} from 'redux/apis/TraceTest.api';
+import TestAnalyticsService from 'services/Analytics/TestAnalytics.service';
 import {TTest} from 'types/Test.types';
+import Date from 'utils/Date';
 import * as S from './TestCard.styled';
 import TestCardActions from './TestCardActions';
-import TestAnalyticsService from '../../services/Analytics/TestAnalytics.service';
+import ResultCardList from '../RunCardList/RunCardList';
 
 interface IProps {
-  onClick(testId: string): void;
   onDelete(test: TTest): void;
-  onRunTest(testId: string): void;
+  onRun(id: string): void;
+  onViewAll(id: string): void;
   test: TTest;
 }
 
-const TestCard = ({onClick, onDelete, onRunTest, test: {name, trigger, id: testId}, test}: IProps) => {
+const TestCard = ({onDelete, onRun, onViewAll, test}: IProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [loadResultList, {data: resultList = []}] = useLazyGetRunListQuery();
+  const [getRuns, {data: runs = [], isLoading}] = useLazyGetRunListQuery();
 
-  const onCollapse = useCallback(async () => {
-    TestAnalyticsService.onTestCardCollapse();
-
-    if (resultList.length > 0) {
-      setIsCollapsed(true);
+  const handleOnClick = useCallback(() => {
+    if (isCollapsed) {
+      setIsCollapsed(false);
       return;
     }
-    await loadResultList({testId, take: 5});
+
     setIsCollapsed(true);
-  }, [loadResultList, resultList.length, testId]);
+    TestAnalyticsService.onTestCardCollapse();
+    if (runs.length > 0) {
+      return;
+    }
+    getRuns({testId: test.id, take: 5});
+  }, [getRuns, isCollapsed, runs.length, test.id]);
 
   return (
-    <S.TestCard $isCollapsed={isCollapsed}>
-      <S.InfoContainer
-        onClick={async () => {
-          if (isCollapsed) {
-            setIsCollapsed(false);
-            return;
-          }
-          onCollapse();
-        }}
-      >
-        {isCollapsed ? <DownOutlined /> : <RightOutlined data-cy={`collapse-test-${testId}`} />}
-        <S.TextContainer>
-          <S.NameText>{name}</S.NameText>
-        </S.TextContainer>
-        <S.TextContainer>
-          <S.Text>{trigger.method}</S.Text>
-        </S.TextContainer>
-        <S.TextContainer data-cy={`test-url-${testId}`}>
-          <S.Text>{trigger.entryPoint}</S.Text>
-        </S.TextContainer>
-        <S.TextContainer />
-        <S.ButtonContainer>
-          <Button
-            type="primary"
-            ghost
-            data-cy={`test-run-button-${testId}`}
-            onClick={event => {
-              event.stopPropagation();
-              onRunTest(testId);
-            }}
-          >
-            Run Test
-          </Button>
-        </S.ButtonContainer>
-        <TestCardActions testId={testId} onDelete={() => onDelete(test)} />
-      </S.InfoContainer>
+    <S.Container>
+      <S.TestContainer onClick={() => handleOnClick()}>
+        <S.Row>
+          {isCollapsed ? <DownOutlined /> : <RightOutlined />}
+          <S.Box>
+            <S.BoxTitle level={2}>{test.summary?.runs ?? 0}</S.BoxTitle>
+          </S.Box>
+          <div>
+            <S.Title level={3}>{test.name}</S.Title>
+            <S.Text>
+              {test.trigger.method} • {test.trigger.entryPoint}
+            </S.Text>
+          </div>
+        </S.Row>
 
-      {isCollapsed && Boolean(resultList.length) && (
-        <S.ResultListContainer>
-          <ResultCardList testId={testId} resultList={resultList} />
-          {resultList.length === 5 && (
-            <S.TestDetails>
-              <S.TestDetailsLink data-cy="test-details-link" onClick={() => onClick(testId)}>
-                Explore all test details
-              </S.TestDetailsLink>
-            </S.TestDetails>
+        <S.Row $gap={36} $noWrap>
+          <div>
+            <S.Text>Last run time:</S.Text>
+            <Tooltip title={Date.format(test.summary?.lastRun?.time ?? '')}>
+              <S.Text>{Date.getTimeAgo(test.summary?.lastRun?.time ?? '')}</S.Text>
+            </Tooltip>
+          </div>
+
+          <div>
+            <S.Text>Last run result:</S.Text>
+            <S.Row>
+              <Tooltip title="Passed assertions">
+                <S.HeaderDetail>
+                  <S.HeaderDot $passed />
+                  {test.summary?.lastRun?.passes ?? 0}
+                </S.HeaderDetail>
+              </Tooltip>
+              <Tooltip title="Failed assertions">
+                <S.HeaderDetail>
+                  <S.HeaderDot $passed={false} />
+                  {test.summary?.lastRun?.fails ?? 0}
+                </S.HeaderDetail>
+              </Tooltip>
+            </S.Row>
+          </div>
+
+          <S.Row>
+            <S.RunButton
+              type="primary"
+              ghost
+              data-cy={`test-run-button-${test.id}`}
+              onClick={event => {
+                event.stopPropagation();
+                onRun(test.id);
+              }}
+            >
+              Run
+            </S.RunButton>
+            <TestCardActions testId={test.id} onDelete={() => onDelete(test)} />
+          </S.Row>
+        </S.Row>
+      </S.TestContainer>
+
+      {isCollapsed && (
+        <S.RunsContainer>
+          {isLoading && (
+            <S.LoadingContainer direction="vertical">
+              <Skeleton.Input active block size="small" />
+              <Skeleton.Input active block size="small" />
+              <Skeleton.Input active block size="small" />
+            </S.LoadingContainer>
           )}
-        </S.ResultListContainer>
-      )}
 
-      {isCollapsed && !resultList.length && (
-        <S.EmptyStateContainer>
-          <S.EmptyStateIcon />
-          <Typography.Text disabled>No Runs</Typography.Text>
-        </S.EmptyStateContainer>
+          {Boolean(runs.length) && <ResultCardList testId={test.id} resultList={runs} />}
+
+          {runs.length === 5 && (
+            <S.FooterContainer>
+              <S.Link data-cy="test-details-link" onClick={() => onViewAll(test.id)}>
+                View all runs
+              </S.Link>
+            </S.FooterContainer>
+          )}
+
+          {!runs.length && !isLoading && (
+            <S.EmptyStateContainer>
+              <S.EmptyStateIcon />
+              <S.Text disabled>No Runs</S.Text>
+            </S.EmptyStateContainer>
+          )}
+        </S.RunsContainer>
       )}
-    </S.TestCard>
+    </S.Container>
   );
 };
 

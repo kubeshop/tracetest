@@ -9,6 +9,7 @@ const Test = ({
   specs,
   version = 1,
   serviceUnderTest: rawTrigger,
+  summary = {},
 }: TRawTest): TTest => ({
   id,
   name,
@@ -16,6 +17,7 @@ const Test = ({
   description,
   definition: TestSpecs(specs || {}),
   trigger: Trigger(rawTrigger || {}),
+  summary,
 });
 
 export default Test;
