@@ -50,4 +50,4 @@ kubectl --namespace $NAME create configmap $NAME --from-file=$CONFIG_FILE -o yam
 
 kubectl --namespace $NAME delete pods -l app.kubernetes.io/name=tracetest
 
-kubectl --namespace $NAME wait --for=condition=ready pod -l app.kubernetes.io/name=tracetest --timeout 10m
+kubectl --namespace $NAME wait --for=condition=ready pod -l app.kubernetes.io/name=tracetest --timeout 30m
