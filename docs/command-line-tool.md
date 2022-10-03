@@ -12,16 +12,25 @@ Here is a list of all available commands and how to use them:
 Configure your CLI to connect to your Tracetest server.
 
 
-**How to Use**: 
+**How to Use**:
 
 
 ```sh
 tracetest configure
 ```
 
-or 
+If you want to set values without having to answer questions from a prompt, you can provide the flags `--endpoint` to define the server endpoint and `--analytics` to turn the analytics on and off.
+
+
 ```sh
-echo "your-server-url" | tracetest configure
+# This will prompt a question to ask if you want to enable or not analytics
+tracetest configure --endpoint http://my-tracetest-server:11633
+
+# Analytics enabled
+tracetest configure --endpoint http://my-tracetest-server:11633 --analytics
+
+# Analytics disabled
+tracetest configure --endpoint http://my-tracetest-server:11633 --analytics=false
 ```
 
 ### **Test List**
