@@ -19,7 +19,7 @@ interface IPagination<T> {
 
 const usePagination = <T, P>(
   useGetDataListQuery: UseQuery<any>,
-  {take = 10, ...queryParams}: TParams<P>
+  {take = 20, ...queryParams}: TParams<P>
 ): IPagination<T> => {
   const [params, setParams] = useState<{page: number; query: string}>({page: 0, query: ''});
 
