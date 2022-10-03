@@ -14,6 +14,7 @@ import (
 	"github.com/compose-spec/compose-go/loader"
 	"github.com/compose-spec/compose-go/types"
 	cliConfig "github.com/kubeshop/tracetest/cli/config"
+	cliUI "github.com/kubeshop/tracetest/cli/ui"
 	"golang.org/x/exp/slices"
 	"gopkg.in/yaml.v3"
 )
@@ -36,7 +37,7 @@ var dockerCompose = installer{
 	installFn: dockerComposeInstaller,
 }
 
-func configureDockerCompose(conf configuration, ui UI) configuration {
+func configureDockerCompose(conf configuration, ui cliUI.UI) configuration {
 	dcf := ui.TextInput("Project's docker-compose file", dockerComposeFilename)
 	create := false
 	if !fileExists(dcf) {
@@ -54,7 +55,7 @@ func configureDockerCompose(conf configuration, ui UI) configuration {
 	return conf
 }
 
-func configureDockerComposeOutput(conf configuration, ui UI) configuration {
+func configureDockerComposeOutput(conf configuration, ui cliUI.UI) configuration {
 	conf.set(
 		"output.dir",
 		ui.TextInput("Tracetest output directory", "tracetest/"),
@@ -69,7 +70,7 @@ const (
 	otelCollectorConfigFilename = "otel-collector.yaml"
 )
 
-func dockerComposeInstaller(config configuration, ui UI) {
+func dockerComposeInstaller(config configuration, ui cliUI.UI) {
 	trackInstall("docker-compose", config, nil)
 
 	dir := config.String("output.dir")
@@ -133,7 +134,7 @@ Happy TraceTesting =)
 
 }
 
-func createEmptyDockerComposeFile(fname string, ui UI) {
+func createEmptyDockerComposeFile(fname string, ui cliUI.UI) {
 	project := &types.Project{}
 	output, err := yaml.Marshal(project)
 	if err != nil {
@@ -146,7 +147,7 @@ func createEmptyDockerComposeFile(fname string, ui UI) {
 	}
 }
 
-func getDockerComposeFileContents(ui UI, config configuration) []byte {
+func getDockerComposeFileContents(ui cliUI.UI, config configuration) []byte {
 	project := getCompleteProject(ui, config)
 	include := []string{"tracetest", "postgres"}
 
@@ -184,7 +185,7 @@ func getDockerComposeFileContents(ui UI, config configuration) []byte {
 	return []byte(sout)
 }
 
-func filterContainers(ui UI, project *types.Project, included []string) {
+func filterContainers(ui cliUI.UI, project *types.Project, included []string) {
 	containers := make(types.Services, 0, len(included))
 	if err := project.ForServices(included); err != nil {
 		ui.Exit(err.Error())
@@ -213,7 +214,7 @@ func filterContainers(ui UI, project *types.Project, included []string) {
 
 type msa = map[string]any
 
-func getCollectorConfigFileContents(ui UI, config configuration) []byte {
+func getCollectorConfigFileContents(ui cliUI.UI, config configuration) []byte {
 	exampleFile := config.String("tracetest.backend.type")
 	contents, err := getFileContentsForVersion("examples/tracetest-"+exampleFile+"/collector.config.yaml", cliConfig.Version)
 	if err != nil {
@@ -278,14 +279,14 @@ func getCollectorConfigFileContents(ui UI, config configuration) []byte {
 	return updated
 }
 
-func createDir(ui UI, name string) {
+func createDir(ui cliUI.UI, name string) {
 	err := os.Mkdir(name, 0755)
 	if err != nil {
 		ui.Exit(err.Error())
 	}
 }
 
-func saveFile(ui UI, fname string, contents []byte) {
+func saveFile(ui cliUI.UI, fname string, contents []byte) {
 	if fileExists(fname) {
 		ui.Warning(fmt.Sprintf(`file "%s" already exists.`, fname))
 		if !ui.Confirm("Do you want to overwrite it?", false) {
@@ -364,7 +365,7 @@ func getFileContentsForVersion(path, version string) ([]byte, error) {
 
 }
 
-func getCompleteProject(ui UI, config configuration) *types.Project {
+func getCompleteProject(ui cliUI.UI, config configuration) *types.Project {
 	exampleFile := config.String("tracetest.backend.type")
 	tracetestDCContents, err := getFileContentsForVersion("examples/tracetest-"+exampleFile+"/docker-compose.yml", cliConfig.Version)
 	if err != nil {
@@ -399,25 +400,25 @@ func getCompleteProject(ui UI, config configuration) *types.Project {
 	return project
 }
 
-func dockerChecker(ui UI) {
+func dockerChecker(ui cliUI.UI) {
 	if commandExists("docker") {
 		ui.Println(ui.Green("✔ docker already installed"))
 		return
 	}
 
 	ui.Warning("I didn't find docker in your system")
-	options := []option{}
+	options := []cliUI.Option{}
 	if !isWindows() {
-		options = append(options, option{"Install Docker Engine", installDockerEngine})
+		options = append(options, cliUI.Option{"Install Docker Engine", installDockerEngine})
 	}
 
-	options = append(options, option{"Install Docker Desktop", installDockerDesktop})
-	options = append(options, option{"Fix manually", exitOption(
+	options = append(options, cliUI.Option{"Install Docker Desktop", installDockerDesktop})
+	options = append(options, cliUI.Option{"Fix manually", exitOption(
 		"Check the docker install docs on https://docs.docker.com/get-docker/",
 	)})
 	option := ui.Select("What do you want to do?", options, 0)
 
-	option.fn(ui)
+	option.Fn(ui)
 
 	// We can't start docker programmatically on windows
 	if isWindows() {
@@ -431,7 +432,7 @@ func dockerChecker(ui UI) {
 	}
 }
 
-func dockerReadyChecker(ui UI) {
+func dockerReadyChecker(ui cliUI.UI) {
 	if commandSuccess("docker ps") {
 		ui.Println(ui.Green("✔ docker is ready"))
 		return
@@ -447,21 +448,21 @@ func dockerReadyChecker(ui UI) {
 	)
 }
 
-func dockerComposeChecker(ui UI) {
+func dockerComposeChecker(ui cliUI.UI) {
 	if commandSuccess("docker compose") {
 		ui.Println(ui.Green("✔ docker compose already installed"))
 		return
 	}
 
 	ui.Warning("I didn't find docker compose in your system")
-	option := ui.Select("What do you want to do?", []option{
+	option := ui.Select("What do you want to do?", []cliUI.Option{
 		{"Install Docker Compose", installDockerCompose},
 		{"Fix manually", exitOption(
 			"Check the docker compose install docs on https://docs.docker.com/compose/install/",
 		)},
 	}, 0)
 
-	option.fn(ui)
+	option.Fn(ui)
 
 	if commandSuccess("docker compose") {
 		ui.Println(ui.Green("✔ docker compose was successfully installed"))
@@ -470,7 +471,7 @@ func dockerComposeChecker(ui UI) {
 	}
 }
 
-func installDockerCompose(ui UI) {
+func installDockerCompose(ui cliUI.UI) {
 	(cmd{
 		sudo:          true,
 		notConfirmMsg: "No worries. You can try installing Docker Compose manually. See https://docs.docker.com/compose/install/",
@@ -532,7 +533,7 @@ func installDockerCompose(ui UI) {
 	}).exec(ui)
 }
 
-func installDockerEngine(ui UI) {
+func installDockerEngine(ui cliUI.UI) {
 	post := `
 			# post-install. not neccesary for root
 			if [ "$(id -u)" != "0" ]; then
@@ -634,7 +635,7 @@ func installDockerEngine(ui UI) {
 	}).exec(ui)
 }
 
-func installDockerDesktop(ui UI) {
+func installDockerDesktop(ui cliUI.UI) {
 	(cmd{
 		sudo:          true,
 		notConfirmMsg: "No worries. You can try installing Docker Desktop manually. See https://docs.docker.com/desktop/install/",
@@ -711,7 +712,7 @@ func installDockerDesktop(ui UI) {
 	}).exec(ui)
 }
 
-func dockerVersion(ui UI) string {
+func dockerVersion(ui cliUI.UI) string {
 	resp, err := http.Get("https://docs.docker.com/desktop/release-notes/")
 
 	if err != nil {

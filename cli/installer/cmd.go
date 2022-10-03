@@ -6,6 +6,8 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+
+	"github.com/kubeshop/tracetest/cli/ui"
 )
 
 type cmd struct {
@@ -23,7 +25,7 @@ type cmd struct {
 	other              string
 }
 
-func (c cmd) exec(ui UI, args ...interface{}) interface{} {
+func (c cmd) exec(ui ui.UI, args ...interface{}) interface{} {
 	cmd := ""
 	switch detectPkgManager() {
 	case apt:
@@ -79,13 +81,13 @@ func (c cmd) exec(ui UI, args ...interface{}) interface{} {
 	return nil
 }
 
-func execCmd(cmd string, ui UI) {
+func execCmd(cmd string, ui ui.UI) {
 	if err := _execCmd(cmd); err != nil {
 		ui.Panic(err)
 	}
 }
 
-func execCmdIgnoreError(cmd string, ui UI) {
+func execCmdIgnoreError(cmd string, ui ui.UI) {
 	_execCmd(cmd)
 }
 

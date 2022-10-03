@@ -4,15 +4,18 @@ import (
 	"fmt"
 
 	"github.com/kubeshop/tracetest/cli/analytics"
+	cliUI "github.com/kubeshop/tracetest/cli/ui"
 )
 
 var (
 	Force = false
 )
 
+const createIssueMsg = "If you need help, please create an issue: https://github.com/kubeshop/tracetest/issues/new/choose"
+
 func Start() {
 	analytics.Track("Start", "installer", map[string]string{})
-	ui := DefaultUI
+	ui := cliUI.DefaultUI
 
 	ui.Banner()
 
@@ -27,22 +30,22 @@ or reach us on Discord https://discord.gg/6zupCZFQbe
 
 `)
 
-	option := ui.Select("How do you want to run TraceTest?", []option{
+	option := ui.Select("How do you want to run TraceTest?", []cliUI.Option{
 		{"Using Docker Compose", dockerCompose.Install},
 		{"Using Kubernetes", kubernetes.Install},
 	}, 0)
 
-	option.fn(ui)
+	option.Fn(ui)
 }
 
 type installer struct {
 	name      string
 	preChecks []preChecker
 	configs   []configurator
-	installFn func(config configuration, ui UI)
+	installFn func(config configuration, ui cliUI.UI)
 }
 
-func (i installer) PreCheck(ui UI) {
+func (i installer) PreCheck(ui cliUI.UI) {
 	ui.Title("Let's check if your system has everything we need")
 	for _, pc := range i.preChecks {
 		pc(ui)
@@ -51,7 +54,7 @@ func (i installer) PreCheck(ui UI) {
 	ui.Title("Your system is ready! Now, let's configure TraceTest")
 }
 
-func (i installer) Configure(ui UI) configuration {
+func (i installer) Configure(ui cliUI.UI) configuration {
 	config := newConfiguration(ui)
 	config.set("installer", i.name)
 	for _, confFn := range i.configs {
@@ -61,7 +64,7 @@ func (i installer) Configure(ui UI) configuration {
 	return config
 }
 
-func (i installer) Install(ui UI) {
+func (i installer) Install(ui cliUI.UI) {
 	analytics.Track("PreCheck", "installer", map[string]string{})
 	i.PreCheck(ui)
 
@@ -73,14 +76,14 @@ func (i installer) Install(ui UI) {
 	i.installFn(conf, ui)
 }
 
-type preChecker func(ui UI)
+type preChecker func(ui cliUI.UI)
 
 type configuration struct {
 	db map[string]interface{}
-	ui UI
+	ui cliUI.UI
 }
 
-func newConfiguration(ui UI) configuration {
+func newConfiguration(ui cliUI.UI) configuration {
 	return configuration{
 		db: map[string]interface{}{},
 		ui: ui,
@@ -122,7 +125,7 @@ func (c configuration) String(key string) string {
 	return s
 }
 
-type configurator func(config configuration, ui UI) configuration
+type configurator func(config configuration, ui cliUI.UI) configuration
 
 func trackInstall(name string, config configuration, extra map[string]string) {
 	props := map[string]string{
