@@ -40,6 +40,8 @@ INSERT INTO test_runs (
 	"test_results",
 	"trace",
 	"last_error",
+	"pass",
+	"fail",
 
 	"metadata"
 ) VALUES (
@@ -64,6 +66,8 @@ INSERT INTO test_runs (
 	'{}', -- test_results
 	NULL, -- trace
 	NULL, -- last_error
+	0,    -- pass
+	0,    -- fail
 
 	$7 -- metadata
 )
@@ -102,7 +106,9 @@ func (td *postgresDB) CreateRun(ctx context.Context, test model.Test, run model.
 	run.TestID = test.ID
 	run.State = model.RunStateCreated
 	run.TestVersion = test.Version
-	run.CreatedAt = time.Now()
+	if run.CreatedAt.IsZero() {
+		run.CreatedAt = time.Now()
+	}
 
 	jsonMetadata, err := json.Marshal(run.Metadata)
 	if err != nil {
@@ -161,10 +167,12 @@ UPDATE test_runs SET
 	"test_results" = $9,
 	"trace" = $10,
 	"last_error" = $11,
+	"pass" = $12,
+	"fail" = $13,
 
-	"metadata" = $12
+	"metadata" = $14
 
-WHERE id = $13 AND test_id = $14
+WHERE id = $15 AND test_id = $16
 `
 
 func (td *postgresDB) UpdateRun(ctx context.Context, r model.Run) error {
@@ -200,6 +208,8 @@ func (td *postgresDB) UpdateRun(ctx context.Context, r model.Run) error {
 		lastError = &e
 	}
 
+	pass, fail := count(r)
+
 	_, err = stmt.ExecContext(
 		ctx,
 		r.ServiceTriggeredAt,
@@ -213,6 +223,8 @@ func (td *postgresDB) UpdateRun(ctx context.Context, r model.Run) error {
 		jsonTestResults,
 		jsonTrace,
 		lastError,
+		pass,
+		fail,
 		jsonMetadata,
 		r.ID,
 		r.TestID,
@@ -222,6 +234,22 @@ func (td *postgresDB) UpdateRun(ctx context.Context, r model.Run) error {
 	}
 
 	return nil
+}
+
+func count(r model.Run) (pass, fail int) {
+	r.Results.Results.Map(func(_ model.SpanQuery, ars []model.AssertionResult) {
+		for _, ar := range ars {
+			for _, rs := range ar.Results {
+				if rs.CompareErr == nil {
+					pass++
+				} else {
+					fail++
+				}
+			}
+		}
+	})
+
+	return
 }
 
 func (td *postgresDB) DeleteRun(ctx context.Context, r model.Run) error {
