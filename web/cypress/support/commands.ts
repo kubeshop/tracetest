@@ -188,7 +188,6 @@ Cypress.Commands.add('createTest', () => {
   cy.submitCreateTestForm();
   cy.makeSureUserIsOnTracePage();
   cy.waitForTracePageApiCalls();
-  cy.cancelOnBoarding();
 });
 
 Cypress.Commands.add('createAssertion', (index = 0) => {
