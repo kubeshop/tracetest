@@ -1,5 +1,6 @@
 import {useState, useCallback} from 'react';
-import {arrayMoveImmutable} from 'array-move';
+import {DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors} from '@dnd-kit/core';
+import {arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy} from '@dnd-kit/sortable';
 import {Col, Row, Select} from 'antd';
 import {noop} from 'lodash';
 import {TTest} from 'types/Test.types';
@@ -21,12 +22,23 @@ const TestsSelectionInput = ({value = [], onChange = noop, testList}: IProps) =>
     [onChange, selectedTestList, testList, value]
   );
 
-  const onSortEnd = useCallback(
-    ({oldIndex, newIndex}) => {
-      const updatedList = arrayMoveImmutable(selectedTestList, oldIndex, newIndex);
-      setSelectedTestList(updatedList);
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
-      onChange(updatedList.map(test => test.id));
+  const onSortEnd = useCallback(
+    ({active, over}) => {
+      if (active.id !== over.id) {
+        const oldIndex = selectedTestList.findIndex(({id}) => id === active.id);
+        const newIndex = selectedTestList.findIndex(({id}) => id === over.id);
+        const updatedList = arrayMove(selectedTestList, oldIndex, newIndex);
+
+        setSelectedTestList(updatedList);
+        onChange(updatedList.map(test => test.id));
+      }
     },
     [onChange, selectedTestList]
   );
@@ -41,13 +53,11 @@ const TestsSelectionInput = ({value = [], onChange = noop, testList}: IProps) =>
 
   return (
     <>
-      <TestItemList
-        items={selectedTestList}
-        onSortEnd={onSortEnd}
-        helperClass="draggable-item"
-        onDelete={onDelete}
-        useDragHandle
-      />
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onSortEnd}>
+        <SortableContext items={selectedTestList} strategy={verticalListSortingStrategy}>
+          <TestItemList items={selectedTestList} onDelete={onDelete} />
+        </SortableContext>
+      </DndContext>
       <Row gutter={12}>
         <Col span={18}>
           <span>

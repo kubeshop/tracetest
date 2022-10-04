@@ -50,6 +50,16 @@ export type TTrigger = {
   request: TTriggerRequest;
 };
 
+export type TRawTestSummary = TTestSchemas['TestSummary'];
+export type TSummary = {
+  runs: number;
+  lastRun: {
+    time: string;
+    passes: number;
+    fails: number;
+  };
+};
+
 export type TRawTest = TTestSchemas['Test'];
 export type TTest = Model<
   TRawTest,
@@ -58,6 +68,7 @@ export type TTest = Model<
     serviceUnderTest?: undefined;
     trigger: TTrigger;
     specs?: TTestSpecs;
+    summary: TSummary;
   }
 >;
 
