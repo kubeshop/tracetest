@@ -35,6 +35,7 @@ const HeaderMenu = () => {
       content={content}
       title={() => <Typography.Title level={2}>Take a quick tour of Tracetest?</Typography.Title>}
       visible={state.dialog}
+      trigger={['click']}
     >
       <S.NavMenu
         selectedKeys={[pathname]}

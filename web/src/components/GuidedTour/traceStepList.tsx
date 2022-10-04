@@ -23,22 +23,20 @@ const StepList: Step[] = [
     title: 'Response',
     target: GuidedTourService.getSelectorStep(GuidedTours.Trace, Steps.Graph),
     content: 'View various responses here. When the test is finished, you will get the following results.',
-    // </Typography.Text>
-    // </StepContent>
     placement: 'left',
     disableBeacon: true,
   },
   {
+    title: 'Add more data',
     target: GuidedTourService.getSelectorStep(GuidedTours.Trace, Steps.MoreData),
-    title: 'Mode Switcher',
     placement: 'right',
     content:
       ' You can change the trigger by altering the details and saving. This will rerun the test with the updated trigger.',
     disableBeacon: true,
   },
   {
+    title: 'Mode Switcher',
     target: '.ant-tabs-nav-wrap',
-    title: 'Run Test',
     content: 'Click on the Trace tab to open the Trace Details screen or Test tab for adding test specifications.',
     disableBeacon: true,
   },
