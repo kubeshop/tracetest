@@ -26,7 +26,7 @@ const ImportCommandForm = () => {
         style={{marginBottom: 0}}
       >
         <CodeMirror
-          data-cy="body"
+          data-cy="import-command-input"
           basicSetup={{lineNumbers: true, indentOnInput: true}}
           extensions={[StreamLanguage.define(shell)]}
           spellCheck={false}
