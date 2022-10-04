@@ -9,7 +9,6 @@ import {TAssertion, TAssertionResults, TRawAssertionResults} from 'types/Asserti
 import {TRawTest, TTest} from 'types/Test.types';
 import {TRawTestRun, TTestRun} from 'types/TestRun.types';
 import {TRawTestSpecs} from 'types/TestSpecs.types';
-import AssertionService from '../../services/Assertion.service';
 
 const PATH = `${document.baseURI}api/`;
 
@@ -128,20 +127,11 @@ const TraceTestAPI = createApi({
       transformResponse: (rawTestRun: TRawTestRun) => TestRun(rawTestRun),
     }),
     dryRun: build.mutation<TAssertionResults, {testId: string; runId: string; testDefinition: Partial<TRawTestSpecs>}>({
-      query: ({testId, runId, testDefinition}) => {
-        return {
-          url: `/tests/${testId}/run/${runId}/dry-run`,
-          method: HTTP_METHOD.PUT,
-          body: {
-            specs: (testDefinition?.specs || []).map(spec => ({
-              ...spec,
-              assertions: (spec?.assertions || []).map(assertion => {
-                return {...assertion, expected: AssertionService.extractExpectedString(assertion.expected)};
-              }),
-            })),
-          },
-        };
-      },
+      query: ({testId, runId, testDefinition}) => ({
+        url: `/tests/${testId}/run/${runId}/dry-run`,
+        method: HTTP_METHOD.PUT,
+        body: testDefinition,
+      }),
       transformResponse: (rawTestResults: TRawAssertionResults) => AssertionResults(rawTestResults),
     }),
     deleteRunById: build.mutation<TTest, {testId: string; runId: string}>({
