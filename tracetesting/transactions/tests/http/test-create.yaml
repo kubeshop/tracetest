@@ -62,4 +62,4 @@ spec:
     - sql.query contains "INSERT INTO tests"
 
   outputs:
-    CREATED_TEST_ID: "${attr:tracetest.request.body | json_value '.id' }"
+    CREATED_TEST_ID: "${attr:tracetest.request.body | json_path '.id' }"
