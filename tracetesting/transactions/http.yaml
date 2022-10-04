@@ -3,6 +3,8 @@ spec:
   id: DWKeDBV4g
   name: HTTP
   description: Test all http trigger related functions
+  env:
+    MAX_SPAN_DURATION: 500ms
   steps:
     - ./tests/http/test-create.yaml # this gets replaced by the test ID in that file when running the transaction
     - ZPPgFB44R                     # id defined in ./tests/http/tests-list.yaml

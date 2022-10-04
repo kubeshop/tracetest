@@ -49,6 +49,7 @@ spec:
   specs:
   - selector: span[name = "Tracetest trigger"]
     assertions:
+      - tracetest.span.duration < "${env:MAX_SPAN_DURATION}"
       - tracetest.selected_spans.count = 1
       - tracetest.response.status = 200
   - selector: span[name="POST /api/tests" tracetest.span.type="http"]
@@ -63,3 +64,4 @@ spec:
 
   outputs:
     CREATED_TEST_ID: "${attr:tracetest.request.body | json_path '.id' }"
+    TOTAL_LENGHT: "${attr:tracetest.span.duration - env:MAX_SPAN_DURATION}"
