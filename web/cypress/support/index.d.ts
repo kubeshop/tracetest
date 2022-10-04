@@ -2,7 +2,7 @@ declare namespace Cypress {
   interface Chainable {
     createMultipleTestRuns(id: string, count: number): Chainable<Element>;
     createAssertion(index?: number): Chainable<Element>;
-    navigateToTestCreationPage(): Chainable<Element>;
+    openTestCreationModal(): Chainable<Element>;
     interceptTracePageApiCalls(): Chainable<Element>;
     inteceptHomeApiCall(): Chainable<Element>;
     waitForTracePageApiCalls(): Chainable<Element>;

@@ -1,27 +1,25 @@
-import {useCallback, useState} from 'react';
+import {useCallback} from 'react';
 import TestService from 'services/Test.service';
 import {TDraftTest} from 'types/Test.types';
 import {SupportedPlugins} from 'constants/Common.constants';
 
 interface IProps {
-  isDefaultValid?: boolean;
+  setIsValid(isValid: boolean): void;
   pluginName: SupportedPlugins;
   isBasicDetails?: boolean;
 }
 
-const useValidateTestDraft = ({isDefaultValid = false, pluginName, isBasicDetails = false}: IProps) => {
-  const [isFormValid, setIsFormValid] = useState(isDefaultValid);
-
+const useValidateTestDraft = ({pluginName, isBasicDetails = false, setIsValid}: IProps) => {
   const onValidate = useCallback(
     async (changedValues: any, draft: TDraftTest) => {
       const isValid = await TestService.validateDraft(pluginName, draft, isBasicDetails);
 
-      setIsFormValid(isValid);
+      setIsValid(isValid);
     },
-    [pluginName, isBasicDetails]
+    [pluginName, isBasicDetails, setIsValid]
   );
 
-  return {isValid: isFormValid, setIsValid: setIsFormValid, onValidate};
+  return onValidate;
 };
 
 export default useValidateTestDraft;

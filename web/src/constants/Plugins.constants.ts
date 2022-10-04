@@ -3,6 +3,14 @@ import {SupportedPlugins} from './Common.constants';
 import {DemoByPluginMap} from './Demo.constants';
 import {TriggerTypes} from './Test.constants';
 
+export enum ComponentNames {
+  SelectPlugin = 'SelectPlugin',
+  BasicDetails = 'BasicDetails',
+  RequestDetails = 'RequestDetails',
+  UploadCollection = 'UploadCollection',
+  TestsSelection = 'TestsSelection',
+}
+
 const Default: IPlugin = {
   name: SupportedPlugins.REST,
   title: 'Default',
@@ -15,7 +23,7 @@ const Default: IPlugin = {
       id: 'plugin-selection',
       name: 'Select test type',
       title: 'Choose the way of creating a test',
-      component: 'SelectPlugin',
+      component: ComponentNames.SelectPlugin,
       isDefaultValid: true,
       status: 'selected',
     },
@@ -23,7 +31,7 @@ const Default: IPlugin = {
       id: 'basic-details',
       name: 'Basic Details',
       title: 'Provide needed basic information',
-      component: 'BasicDetails',
+      component: ComponentNames.BasicDetails,
     },
   ],
 };
@@ -41,7 +49,7 @@ const Rest: IPlugin = {
       id: 'request-details',
       name: 'Request Details',
       title: 'Provide additional information',
-      component: 'RequestDetails',
+      component: ComponentNames.RequestDetails,
     },
   ],
 };
@@ -59,7 +67,7 @@ const GRPC: IPlugin = {
       id: 'request-details',
       name: 'Request Details',
       title: 'Provide additional information',
-      component: 'RequestDetails',
+      component: ComponentNames.RequestDetails,
     },
   ],
 };
@@ -87,7 +95,7 @@ const Postman: IPlugin = {
       id: 'import-postman-collection',
       name: 'Import Postman collection',
       title: 'Upload Postman collection',
-      component: 'UploadCollection',
+      component: ComponentNames.UploadCollection,
     },
   ],
 };

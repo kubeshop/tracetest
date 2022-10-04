@@ -3,7 +3,7 @@ import EditTestForm from 'components/EditTestForm';
 import {TriggerTypeToPlugin} from 'constants/Plugins.constants';
 import useValidateTestDraft from 'hooks/useValidateTestDraft';
 import {useTest} from 'providers/Test/Test.provider';
-import {useCallback} from 'react';
+import {useCallback, useState} from 'react';
 import {TDraftTest, TTest} from 'types/Test.types';
 import {TestState} from 'constants/TestRun.constants';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
@@ -16,9 +16,9 @@ interface IProps {
 const EditTest = ({test}: IProps) => {
   const {onEdit, isEditLoading} = useTest();
   const plugin = TriggerTypeToPlugin[test.trigger.type];
+  const [isValid, setIsValid] = useState(true);
 
-  const {isValid, onValidate} = useValidateTestDraft({pluginName: plugin.name, isDefaultValid: true});
-
+  const onValidate = useValidateTestDraft({pluginName: plugin.name, setIsValid});
   const [form] = Form.useForm<TDraftTest>();
 
   const handleOnSubmit = useCallback(

@@ -1,4 +1,4 @@
-import styled, {css} from 'styled-components';
+import styled from 'styled-components';
 
 export const DemoContainer = styled.div`
   margin-bottom: 24px;
@@ -7,11 +7,5 @@ export const DemoContainer = styled.div`
 export const InputContainer = styled.div<{$isEditing?: boolean}>`
   display: grid;
   gap: 26px;
-  grid-template-columns: 55%;
-
-  ${({$isEditing = false}) =>
-    $isEditing &&
-    css`
-      grid-template-columns: 100%;
-    `};
+  grid-template-columns: 75%;
 `;

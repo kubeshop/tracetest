@@ -7,6 +7,7 @@ import Spans from 'redux/slices/Span.slice';
 import CreateTest from 'redux/slices/CreateTest.slice';
 import DAG from 'redux/slices/DAG.slice';
 import Trace from 'redux/slices/Trace.slice';
+import CreateTransaction from 'redux/slices/CreateTransaction.slice';
 import RouterMiddleware from './Router.middleware';
 import OtelRepoApi from './apis/OtelRepo.api';
 
@@ -25,6 +26,7 @@ export const store = configureStore({
     trace: Trace,
     testSpecs: TestSpecs,
     createTest: CreateTest,
+    createTransaction: CreateTransaction,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware()

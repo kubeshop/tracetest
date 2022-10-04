@@ -44,9 +44,10 @@ Cypress.Commands.add('deleteTest', (shoudlIntercept = false) => {
   });
 });
 
-Cypress.Commands.add('navigateToTestCreationPage', () => {
-  cy.get('[data-cy=create-test-button]').click();
-  cy.get('[data-cy=create-test-header]').should('be.visible');
+Cypress.Commands.add('openTestCreationModal', () => {
+  cy.get('[data-cy=create-button]').click();
+  cy.get('.ant-dropdown-menu-item').first().click();
+  cy.get('[data-cy=create-test-steps]').should('be.visible');
 });
 
 Cypress.Commands.add('interceptTracePageApiCalls', () => {
@@ -136,7 +137,7 @@ Cypress.Commands.add('fillCreateFormBasicStep', (name: string, description?: str
 });
 
 Cypress.Commands.add('createTestByName', (name: string) => {
-  cy.navigateToTestCreationPage();
+  cy.openTestCreationModal();
   cy.get('[data-cy=create-test-next-button]').click();
   cy.get('[data-cy=example-button]').click();
   cy.get(`[data-cy=demo-example-${camelCase(name)}]`).click();
@@ -181,7 +182,7 @@ Cypress.Commands.add('clickNextOnCreateTestWizard', () => {
 Cypress.Commands.add('createTest', () => {
   cy.inteceptHomeApiCall();
   cy.visit('/');
-  cy.navigateToTestCreationPage();
+  cy.openTestCreationModal();
   cy.clickNextOnCreateTestWizard();
   cy.selectTestFromDemoList();
   cy.interceptTracePageApiCalls();

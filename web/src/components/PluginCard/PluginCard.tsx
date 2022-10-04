@@ -20,16 +20,14 @@ const PluginCard = ({plugin: {name, title, description, isActive}, plugin, onSel
       <S.Content>
         <div>
           <S.Title $isActive={isActive}>{title} </S.Title>
-          <S.Title $isActive>
-            {!isActive && (
-              <>
-                &nbsp;-{' '}
-                <a href={GITHUB_ISSUES_URL} target="_blank">
-                  Coming soon!
-                </a>
-              </>
-            )}
-          </S.Title>
+          {!isActive && (
+            <S.Title $isActive>
+              &nbsp;-{' '}
+              <a href={GITHUB_ISSUES_URL} target="_blank">
+                Coming soon!
+              </a>
+            </S.Title>
+          )}
         </div>
         <S.Description $isActive={isActive}>{description}</S.Description>
       </S.Content>

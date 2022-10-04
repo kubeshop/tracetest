@@ -4,7 +4,7 @@ describe('Create test from Postman Collection', () => {
   it('should create a basic GET test', () => {
     cy.inteceptHomeApiCall();
     const name = `Test - Pokemon - #${String(Date.now()).slice(-4)}`;
-    cy.navigateToTestCreationPage();
+    cy.openTestCreationModal();
     cy.get('[data-cy=postman-plugin]').click();
     cy.fillCreateFormBasicStep(name, 'Create from Postman Collection');
     cy.get('[data-cy="collectionFile"]').attachFile('collection.json');

@@ -1,2 +1,2 @@
 // eslint-disable-next-line no-restricted-exports
-export {default} from './CreateTestSteps';
+export {default} from './TestsSelection';

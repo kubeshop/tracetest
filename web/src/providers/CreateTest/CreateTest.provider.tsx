@@ -2,13 +2,20 @@ import {createContext, useCallback, useContext, useMemo} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {noop} from 'lodash';
 import {IPlugin} from 'types/Plugins.types';
-import {initialState, setDraftTest, setPlugin, setStepNumber, reset} from 'redux/slices/CreateTest.slice';
+import {
+  initialState,
+  setDraftTest,
+  setPlugin,
+  setStepNumber,
+  reset,
+  setIsFormValid,
+} from 'redux/slices/CreateTest.slice';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import CreateTestSelectors from 'selectors/CreateTest.selectors';
 import {useCreateTestMutation, useRunTestMutation} from 'redux/apis/TraceTest.api';
 import {ICreateTestState, TDraftTest} from 'types/Test.types';
-import TestService from '../../services/Test.service';
-import {Plugins} from '../../constants/Plugins.constants';
+import TestService from 'services/Test.service';
+import {Plugins} from 'constants/Plugins.constants';
 
 interface IContext extends ICreateTestState {
   activeStep: string;
@@ -21,6 +28,7 @@ interface IContext extends ICreateTestState {
   onUpdatePlugin(plugin: IPlugin): void;
   onGoTo(stepId: string): void;
   onReset(): void;
+  onIsFormValid(isValid: boolean): void;
 }
 
 export const Context = createContext<IContext>({
@@ -35,6 +43,7 @@ export const Context = createContext<IContext>({
   onUpdatePlugin: noop,
   onGoTo: noop,
   onReset: noop,
+  onIsFormValid: noop,
 });
 
 interface IProps {
@@ -54,6 +63,7 @@ const CreateTestProvider = ({children}: IProps) => {
   const stepNumber = useAppSelector(CreateTestSelectors.selectStepNumber);
   const plugin = useAppSelector(CreateTestSelectors.selectPlugin);
   const activeStep = useAppSelector(CreateTestSelectors.selectActiveStep);
+  const isFormValid = useAppSelector(CreateTestSelectors.selectIsFormValid);
   const isFinalStep = stepNumber === stepList.length - 1;
 
   const onCreateTest = useCallback(
@@ -115,6 +125,13 @@ const CreateTestProvider = ({children}: IProps) => {
     dispatch(reset());
   }, [dispatch]);
 
+  const onIsFormValid = useCallback(
+    (isValid: boolean) => {
+      dispatch(setIsFormValid({isValid}));
+    },
+    [dispatch]
+  );
+
   const value = useMemo<IContext>(
     () => ({
       stepList,
@@ -124,6 +141,7 @@ const CreateTestProvider = ({children}: IProps) => {
       plugin,
       activeStep,
       isLoading: isLoadingCreateTest || isLoadingRunTest,
+      isFormValid,
       onNext,
       onPrev,
       onGoTo,
@@ -131,6 +149,7 @@ const CreateTestProvider = ({children}: IProps) => {
       onUpdateDraftTest,
       onUpdatePlugin,
       onReset,
+      onIsFormValid,
     }),
     [
       stepList,
@@ -140,6 +159,7 @@ const CreateTestProvider = ({children}: IProps) => {
       activeStep,
       isLoadingCreateTest,
       isLoadingRunTest,
+      isFormValid,
       onNext,
       onPrev,
       onGoTo,
@@ -147,6 +167,7 @@ const CreateTestProvider = ({children}: IProps) => {
       onUpdateDraftTest,
       onUpdatePlugin,
       onReset,
+      onIsFormValid,
     ]
   );
 

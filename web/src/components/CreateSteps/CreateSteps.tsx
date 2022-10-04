@@ -1,22 +1,21 @@
 import {Tabs} from 'antd';
-import {SupportedPlugins} from 'constants/Common.constants';
 import {ICreateTestStep} from 'types/Plugins.types';
 import LoadingSpinner from 'components/LoadingSpinner';
-import CreateTestStepFactory from './CreateTestStepFactory';
-import * as S from './CreateTestSteps.styled';
-import CreateTestStepsTab from './CreateTestStepsTab';
+import * as S from './CreateSteps.styled';
+import CreateTestStepsTab from './CreateStepsTab';
 
 interface IProps {
   isLoading: boolean;
   stepList: ICreateTestStep[];
   selectedKey: string;
-  pluginName: SupportedPlugins;
+  componentFactory({step}: {step: ICreateTestStep}): React.ReactElement;
   onGoTo(stepId: string): void;
 }
 
-const CreateTestSteps = ({isLoading, stepList, selectedKey, pluginName, onGoTo}: IProps) => {
+const CreateTestSteps = ({isLoading, stepList, selectedKey, componentFactory: ComponentFactory, onGoTo}: IProps) => {
   return (
-    <S.CreateTestSteps>
+    <S.CreateTestSteps data-cy="create-test-steps">
+      <S.ProgressLine $stepCount={stepList.length} />
       <Tabs
         type="card"
         activeKey={selectedKey}
@@ -27,13 +26,16 @@ const CreateTestSteps = ({isLoading, stepList, selectedKey, pluginName, onGoTo}:
         }}
       >
         {stepList.map(step => (
-          <Tabs.TabPane tab={<CreateTestStepsTab text={step.name} status={step.status} />} key={step.id}>
+          <Tabs.TabPane
+            tab={<CreateTestStepsTab text={step.name} status={step.status} isActive={step.id === selectedKey} />}
+            key={step.id}
+          >
             {isLoading ? (
               <S.LoadingSpinnerContainer>
                 <LoadingSpinner />
               </S.LoadingSpinnerContainer>
             ) : (
-              <CreateTestStepFactory pluginName={pluginName} step={step} />
+              <ComponentFactory step={step} />
             )}
           </Tabs.TabPane>
         ))}

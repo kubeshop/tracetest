@@ -9,6 +9,7 @@ const CreateTestSelectors = () => ({
   selectPlugin: createSelector(createTestSelectorsStateSelector, ({pluginName}) => Plugins[pluginName]),
   selectStepNumber: createSelector(createTestSelectorsStateSelector, ({stepNumber}) => stepNumber),
   selectDraftTest: createSelector(createTestSelectorsStateSelector, ({draftTest}) => draftTest),
+  selectIsFormValid: createSelector(createTestSelectorsStateSelector, ({isFormValid}) => isFormValid),
   selectActiveStep: createSelector(
     createTestSelectorsStateSelector,
     ({stepList, stepNumber}) => stepList[stepNumber]?.id || ''

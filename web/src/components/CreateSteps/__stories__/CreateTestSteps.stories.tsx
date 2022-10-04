@@ -1,7 +1,6 @@
 import {ComponentStory, ComponentMeta} from '@storybook/react';
-import {SupportedPlugins} from 'constants/Common.constants';
 
-import CreateTestSteps from '../CreateTestSteps';
+import CreateTestSteps from '../CreateSteps';
 
 export default {
   title: 'Create Test Steps',
@@ -13,7 +12,9 @@ const Template: ComponentStory<typeof CreateTestSteps> = args => <CreateTestStep
 export const Default = Template.bind({});
 Default.args = {
   selectedKey: '2',
-  pluginName: SupportedPlugins.REST,
+  componentFactory(step) {
+    return <div>{step}</div>;
+  },
   stepList: [
     {
       id: '1',

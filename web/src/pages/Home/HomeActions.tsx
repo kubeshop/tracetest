@@ -1,26 +1,64 @@
-import {Link} from 'react-router-dom';
+import {useCallback, useMemo} from 'react';
+import {Menu} from 'antd';
+import {CaretDownOutlined} from '@ant-design/icons';
 import HomeAnalyticsService from 'services/Analytics/HomeAnalytics.service';
-import {Steps} from '../../components/GuidedTour/homeStepList';
-import GuidedTourService, {GuidedTours} from '../../services/GuidedTour.service';
+import ExperimentalFeature from 'utils/ExperimentalFeature';
 import * as S from './Home.styled';
 
 const {onCreateTestClick} = HomeAnalyticsService;
+const isTransactionsEnabled = ExperimentalFeature.isEnabled('transactions');
 
-const HomeActions = () => {
+interface IProps {
+  onCreateTest(): void;
+  onCreateTransaction(): void;
+}
+
+const HomeActions = ({onCreateTest, onCreateTransaction}: IProps) => {
+  const onClick = useCallback(
+    (key: string) => {
+      onCreateTestClick();
+      if (key === 'test') return onCreateTest();
+
+      onCreateTransaction();
+    },
+    [onCreateTest, onCreateTransaction]
+  );
+
+  const createMenu = useMemo(
+    () => (
+      <Menu
+        onClick={({key}) => onClick(key)}
+        items={
+          isTransactionsEnabled
+            ? [
+                {
+                  label: 'Create New Test',
+                  key: 'test',
+                },
+                {
+                  label: 'Create New Transaction',
+                  key: 'transaction',
+                },
+              ]
+            : [
+                {
+                  label: 'Create New Test',
+                  key: 'test',
+                },
+              ]
+        }
+      />
+    ),
+    [onClick]
+  );
+
   return (
     <S.ActionContainer>
-      <Link to="/test/create">
-        <S.CreateTestButton
-          data-tour={GuidedTourService.getStep(GuidedTours.Home, Steps.CreateTest)}
-          data-cy="create-test-button"
-          type="primary"
-          onClick={() => {
-            onCreateTestClick();
-          }}
-        >
-          Create Test
+      <S.CreateDropdownButton overlay={createMenu} trigger={['click']} placement="bottomRight">
+        <S.CreateTestButton type="primary" data-cy="create-button">
+          Create <CaretDownOutlined />
         </S.CreateTestButton>
-      </Link>
+      </S.CreateDropdownButton>
     </S.ActionContainer>
   );
 };

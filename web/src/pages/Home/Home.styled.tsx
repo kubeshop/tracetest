@@ -1,9 +1,13 @@
-import {Button, Space, Typography} from 'antd';
+import {Button, Dropdown, Space, Typography} from 'antd';
 import styled from 'styled-components';
 
 import noResultsIcon from 'assets/HomeNoResults.svg';
 
-export const CreateTestButton = styled(Button)``;
+export const CreateTestButton = styled(Button)`
+  font-weight: 600;
+`;
+
+export const CreateDropdownButton = styled(Dropdown)``;
 
 export const ActionsContainer = styled.div`
   display: flex;
