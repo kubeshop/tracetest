@@ -23,6 +23,11 @@ Tracetest allows you to quickly build integration and e2e tests, powered by your
 ## **Blog & Video Posts**
 
 Check out the following blog posts & videos with Tracetest-related content:
+
+- [Enabling Tracetest to Work Directly with OpenSearch](https://tracetest.webflow.io/blog/tracetest-opensearch-integration) - Oct 3, 2022
+
+- [Is it Observable? with Henrik Rexed](https://tracetest.webflow.io/blog/is-it-observable-with-henrik-rexed) - Sep 22, 2022
+
 - [Tracetest v0.7 Release Notes](https://tracetest.io/blog/tracetest-v0-7-release-notes) - Aug 23, 2022
 
 - [Tracetest Roadmap Planning - In Person, In Cartagena!](https://tracetest.io/blog/tracetest-roadmap-planning-in-person-in-cartagena) - Aug 23, 2022

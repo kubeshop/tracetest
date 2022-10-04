@@ -248,11 +248,7 @@ func (c *ApiApiController) DeleteTestRun(w http.ResponseWriter, r *http.Request)
 	params := mux.Vars(r)
 	testIdParam := params["testId"]
 
-	runIdParam, err := parseInt32Parameter(params["runId"], true)
-	if err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
+	runIdParam := params["runId"]
 
 	result, err := c.service.DeleteTestRun(r.Context(), testIdParam, runIdParam)
 	// If an error occurred, encode the error with the status code
@@ -270,11 +266,7 @@ func (c *ApiApiController) DryRunAssertion(w http.ResponseWriter, r *http.Reques
 	params := mux.Vars(r)
 	testIdParam := params["testId"]
 
-	runIdParam, err := parseInt32Parameter(params["runId"], true)
-	if err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
+	runIdParam := params["runId"]
 
 	testSpecsParam := TestSpecs{}
 	d := json.NewDecoder(r.Body)
@@ -303,11 +295,7 @@ func (c *ApiApiController) ExportTestRun(w http.ResponseWriter, r *http.Request)
 	params := mux.Vars(r)
 	testIdParam := params["testId"]
 
-	runIdParam, err := parseInt32Parameter(params["runId"], true)
-	if err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
+	runIdParam := params["runId"]
 
 	result, err := c.service.ExportTestRun(r.Context(), testIdParam, runIdParam)
 	// If an error occurred, encode the error with the status code
@@ -325,11 +313,7 @@ func (c *ApiApiController) GetRunResultJUnit(w http.ResponseWriter, r *http.Requ
 	params := mux.Vars(r)
 	testIdParam := params["testId"]
 
-	runIdParam, err := parseInt32Parameter(params["runId"], true)
-	if err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
+	runIdParam := params["runId"]
 
 	result, err := c.service.GetRunResultJUnit(r.Context(), testIdParam, runIdParam)
 	// If an error occurred, encode the error with the status code
@@ -364,11 +348,7 @@ func (c *ApiApiController) GetTestResultSelectedSpans(w http.ResponseWriter, r *
 	query := r.URL.Query()
 	testIdParam := params["testId"]
 
-	runIdParam, err := parseInt32Parameter(params["runId"], true)
-	if err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
+	runIdParam := params["runId"]
 
 	queryParam := query.Get("query")
 	result, err := c.service.GetTestResultSelectedSpans(r.Context(), testIdParam, runIdParam, queryParam)
@@ -387,11 +367,7 @@ func (c *ApiApiController) GetTestRun(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	testIdParam := params["testId"]
 
-	runIdParam, err := parseInt32Parameter(params["runId"], true)
-	if err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
+	runIdParam := params["runId"]
 
 	result, err := c.service.GetTestRun(r.Context(), testIdParam, runIdParam)
 	// If an error occurred, encode the error with the status code
@@ -545,11 +521,7 @@ func (c *ApiApiController) RerunTestRun(w http.ResponseWriter, r *http.Request) 
 	params := mux.Vars(r)
 	testIdParam := params["testId"]
 
-	runIdParam, err := parseInt32Parameter(params["runId"], true)
-	if err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
+	runIdParam := params["runId"]
 
 	result, err := c.service.RerunTestRun(r.Context(), testIdParam, runIdParam)
 	// If an error occurred, encode the error with the status code

@@ -1,12 +1,16 @@
 package installer
 
-import "runtime"
+import (
+	"runtime"
+
+	cliUI "github.com/kubeshop/tracetest/cli/ui"
+)
 
 func isWindows() bool {
 	return runtime.GOOS == "windows"
 }
 
-func installChocolatey(ui UI) {
+func installChocolatey(ui cliUI.UI) {
 	(cmd{
 		sudo:          true,
 		notConfirmMsg: "No worries. You can try installing Chocolatey manually. See https://chocolatey.org/install#individual",
@@ -15,7 +19,7 @@ func installChocolatey(ui UI) {
 	}).exec(ui)
 }
 
-func chocolateyForWindowsChecker(ui UI) {
+func chocolateyForWindowsChecker(ui cliUI.UI) {
 	if !isWindows() {
 		return
 	}
@@ -26,14 +30,14 @@ func chocolateyForWindowsChecker(ui UI) {
 	}
 
 	ui.Warning("I didn't find chocolatey in your system")
-	option := ui.Select("What do you want to do?", []option{
+	option := ui.Select("What do you want to do?", []cliUI.Option{
 		{"Install Chocolatey", installChocolatey},
 		{"Fix manually", exitOption(
 			"Check the chocolatey install docs on https://chocolatey.org/install#individual",
 		)},
 	}, 0)
 
-	option.fn(ui)
+	option.Fn(ui)
 
 	refreshEnvVariables()
 
@@ -44,7 +48,7 @@ func chocolateyForWindowsChecker(ui UI) {
 	}
 }
 
-func wslChecker(ui UI) {
+func wslChecker(ui cliUI.UI) {
 	if !isWindows() {
 		return
 	}

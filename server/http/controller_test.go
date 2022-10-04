@@ -2,11 +2,13 @@ package http_test
 
 import (
 	"context"
+	"strconv"
 	"testing"
 
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/http"
 	"github.com/kubeshop/tracetest/server/http/mappings"
+	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/testdb"
@@ -18,6 +20,7 @@ import (
 var (
 	exampleRun = model.Run{
 		ID:      1,
+		TestID:  id.ID("abc123"),
 		TraceID: http.IDGen.TraceID(),
 		Trace: &traces.Trace{
 			ID: http.IDGen.TraceID(),
@@ -107,7 +110,7 @@ func TestContains_Issue617(t *testing.T) {
 	f := setupController(t)
 	f.expectGetRun(exampleRun)
 
-	actual, err := f.c.DryRunAssertion(context.TODO(), "", int32(exampleRun.ID), spec)
+	actual, err := f.c.DryRunAssertion(context.TODO(), exampleRun.TestID.String(), strconv.Itoa(exampleRun.ID), spec)
 	require.NoError(t, err)
 
 	assert.Equal(t, 200, actual.Code)
@@ -130,6 +133,6 @@ type controllerFixture struct {
 
 func (f controllerFixture) expectGetRun(r model.Run) {
 	f.db.
-		On("GetRun", r.ID).
+		On("GetRun", r.TestID, r.ID).
 		Return(r, nil)
 }

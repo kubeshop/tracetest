@@ -2,11 +2,15 @@ package testdb
 
 import (
 	"context"
+	"crypto/md5"
 	"database/sql"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 
+	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -36,10 +40,12 @@ INSERT INTO test_runs (
 	"test_results",
 	"trace",
 	"last_error",
+	"pass",
+	"fail",
 
 	"metadata"
 ) VALUES (
-	nextval('test_runs_id_seq'), -- id
+	nextval('` + runSequenceName + `'), -- id
 	$1,   -- test_id
 	$2,   -- test_version
 
@@ -60,32 +66,70 @@ INSERT INTO test_runs (
 	'{}', -- test_results
 	NULL, -- trace
 	NULL, -- last_error
+	0,    -- pass
+	0,    -- fail
 
 	$7 -- metadata
 )
 RETURNING "id"`
 
-func (td *postgresDB) CreateRun(ctx context.Context, test model.Test, run model.Run) (model.Run, error) {
-	stmt, err := td.db.Prepare(createRunQuery)
-	if err != nil {
-		return model.Run{}, fmt.Errorf("sql prepare: %w", err)
-	}
-	defer stmt.Close()
+const (
+	createSequeceQuery = `CREATE SEQUENCE IF NOT EXISTS "` + runSequenceName + `";`
+	dropSequeceQuery   = `DROP SEQUENCE IF EXISTS "` + runSequenceName + `";`
+	runSequenceName    = "%sequence_name%"
+)
 
+func dropSequece(ctx context.Context, tx *sql.Tx, testID id.ID) error {
+	_, err := tx.ExecContext(
+		ctx,
+		replaceRunSequenceName(createSequeceQuery, testID),
+	)
+
+	return err
+}
+
+func md5Hash(text string) string {
+	hash := md5.Sum([]byte(text))
+	return hex.EncodeToString(hash[:])
+}
+
+func replaceRunSequenceName(sql string, testID id.ID) string {
+	// postgres doesn't like uppercase chars in sequence names.
+	// testID might contain uppercase chars, and we cannot lowercase them
+	// because they might lose their uniqueness.
+	// md5 creates a unique, lowercase hash.
+	seqName := "runs_test_" + md5Hash(testID.String()) + "_seq"
+	return strings.ReplaceAll(sql, runSequenceName, seqName)
+}
+
+func (td *postgresDB) CreateRun(ctx context.Context, test model.Test, run model.Run) (model.Run, error) {
 	run.TestID = test.ID
 	run.State = model.RunStateCreated
 	run.TestVersion = test.Version
-	run.CreatedAt = time.Now()
+	if run.CreatedAt.IsZero() {
+		run.CreatedAt = time.Now()
+	}
 
 	jsonMetadata, err := json.Marshal(run.Metadata)
 	if err != nil {
 		return model.Run{}, fmt.Errorf("encoding error: %w", err)
 	}
 
-	var id int
+	tx, err := td.db.BeginTx(ctx, nil)
+	if err != nil {
+		return model.Run{}, fmt.Errorf("sql beginTx: %w", err)
+	}
 
-	err = stmt.QueryRowContext(
+	_, err = tx.ExecContext(ctx, replaceRunSequenceName(createSequeceQuery, test.ID))
+	if err != nil {
+		tx.Rollback()
+		return model.Run{}, fmt.Errorf("sql exec: %w", err)
+	}
+
+	var runID int
+	err = tx.QueryRowContext(
 		ctx,
+		replaceRunSequenceName(createRunQuery, test.ID),
 		test.ID,
 		test.Version,
 		run.CreatedAt,
@@ -93,12 +137,15 @@ func (td *postgresDB) CreateRun(ctx context.Context, test model.Test, run model.
 		run.TraceID.String(),
 		run.SpanID.String(),
 		jsonMetadata,
-	).Scan(&id)
+	).Scan(&runID)
 	if err != nil {
+		tx.Rollback()
 		return model.Run{}, fmt.Errorf("sql exec: %w", err)
 	}
 
-	return td.GetRun(ctx, id)
+	tx.Commit()
+
+	return td.GetRun(ctx, test.ID, runID)
 }
 
 const updateRunQuery = `
@@ -120,10 +167,12 @@ UPDATE test_runs SET
 	"test_results" = $9,
 	"trace" = $10,
 	"last_error" = $11,
+	"pass" = $12,
+	"fail" = $13,
 
-	"metadata" = $12
+	"metadata" = $14
 
-WHERE id = $13
+WHERE id = $15 AND test_id = $16
 `
 
 func (td *postgresDB) UpdateRun(ctx context.Context, r model.Run) error {
@@ -159,6 +208,8 @@ func (td *postgresDB) UpdateRun(ctx context.Context, r model.Run) error {
 		lastError = &e
 	}
 
+	pass, fail := count(r)
+
 	_, err = stmt.ExecContext(
 		ctx,
 		r.ServiceTriggeredAt,
@@ -172,8 +223,11 @@ func (td *postgresDB) UpdateRun(ctx context.Context, r model.Run) error {
 		jsonTestResults,
 		jsonTrace,
 		lastError,
+		pass,
+		fail,
 		jsonMetadata,
 		r.ID,
+		r.TestID,
 	)
 	if err != nil {
 		return fmt.Errorf("sql exec: %w", err)
@@ -182,14 +236,30 @@ func (td *postgresDB) UpdateRun(ctx context.Context, r model.Run) error {
 	return nil
 }
 
+func count(r model.Run) (pass, fail int) {
+	r.Results.Results.Map(func(_ model.SpanQuery, ars []model.AssertionResult) {
+		for _, ar := range ars {
+			for _, rs := range ar.Results {
+				if rs.CompareErr == nil {
+					pass++
+				} else {
+					fail++
+				}
+			}
+		}
+	})
+
+	return
+}
+
 func (td *postgresDB) DeleteRun(ctx context.Context, r model.Run) error {
-	stmt, err := td.db.Prepare("DELETE FROM test_runs WHERE id = $1")
+	stmt, err := td.db.Prepare("DELETE FROM test_runs WHERE id = $1 AND test_id = $2")
 	if err != nil {
 		return fmt.Errorf("prepare: %w", err)
 	}
 	defer stmt.Close()
 
-	_, err = stmt.ExecContext(ctx, r.ID)
+	_, err = stmt.ExecContext(ctx, r.ID, r.TestID)
 	if err != nil {
 		return fmt.Errorf("sql exec: %w", err)
 	}
@@ -225,15 +295,14 @@ SELECT
 FROM test_runs
 `
 
-// TODO require test id as well
-func (td *postgresDB) GetRun(ctx context.Context, id int) (model.Run, error) {
-	stmt, err := td.db.Prepare(selectRunQuery + " WHERE id = $1")
+func (td *postgresDB) GetRun(ctx context.Context, testID id.ID, runID int) (model.Run, error) {
+	stmt, err := td.db.Prepare(selectRunQuery + " WHERE id = $1 AND test_id = $2")
 	if err != nil {
 		return model.Run{}, err
 	}
 	defer stmt.Close()
 
-	run, err := readRunRow(stmt.QueryRowContext(ctx, id))
+	run, err := readRunRow(stmt.QueryRowContext(ctx, runID, testID.String()))
 	if err != nil {
 		return model.Run{}, fmt.Errorf("cannot read row: %w", err)
 	}

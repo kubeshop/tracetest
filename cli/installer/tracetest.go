@@ -4,13 +4,14 @@ import (
 	"fmt"
 	"strings"
 
+	cliUI "github.com/kubeshop/tracetest/cli/ui"
 	serverConfig "github.com/kubeshop/tracetest/server/config"
 	"go.opentelemetry.io/collector/config/configgrpc"
 	"go.opentelemetry.io/collector/config/configtls"
 	"gopkg.in/yaml.v3"
 )
 
-func configureDemoApp(conf configuration, ui UI) configuration {
+func configureDemoApp(conf configuration, ui cliUI.UI) configuration {
 	conf.set(
 		"demo.enable.pokeshop",
 		ui.Confirm("Do you want to enable the PokeShop demo app? (https://github.com/kubeshop/pokeshop/)", true),
@@ -43,7 +44,7 @@ func configureDemoApp(conf configuration, ui UI) configuration {
 	return conf
 }
 
-func configureTracetest(conf configuration, ui UI) configuration {
+func configureTracetest(conf configuration, ui cliUI.UI) configuration {
 	conf = configureBackend(conf, ui)
 	conf = configureCollector(conf, ui)
 
@@ -54,7 +55,7 @@ func configureTracetest(conf configuration, ui UI) configuration {
 
 	return conf
 }
-func configureCollector(conf configuration, ui UI) configuration {
+func configureCollector(conf configuration, ui cliUI.UI) configuration {
 	installCollector := false
 
 	hasCollector := ui.Confirm("Do you have an OpenTelemetry Collector?", false)
@@ -77,7 +78,7 @@ or you can set one up manually. See https://opentelemetry.io/docs/collector/
 	return conf
 }
 
-func configureBackend(conf configuration, ui UI) configuration {
+func configureBackend(conf configuration, ui cliUI.UI) configuration {
 	installBackend := false
 
 	hasBackend := ui.Confirm("Do you have a supported tracing backend you want to use? (Jaeger, Tempo, OpenSearch, SignalFX)", false)
@@ -116,40 +117,40 @@ See https://kubeshop.github.io/tracetest/supported-backends/
 	return conf
 }
 
-func configureBackendOptions(conf configuration, ui UI) configuration {
-	option := ui.Select("Which tracing backend do you want to use?", []option{
-		{"Jaeger", func(ui UI) {
+func configureBackendOptions(conf configuration, ui cliUI.UI) configuration {
+	option := ui.Select("Which tracing backend do you want to use?", []cliUI.Option{
+		{"Jaeger", func(ui cliUI.UI) {
 			conf.set("tracetest.backend.type", "jaeger")
 			conf.set("tracetest.backend.endpoint.query", ui.TextInput("Query Endpoint", "jaeger:16685"))
 			conf.set("tracetest.backend.endpoint.collector", ui.TextInput("Collector Endpoint", "jaeger:14250"))
 			conf.set("tracetest.backend.endpoint.exporter", "")
 			conf.set("tracetest.backend.tls.insecure", ui.Confirm("TLS/Insecure", true))
 		}},
-		{"Tempo", func(ui UI) {
+		{"Tempo", func(ui cliUI.UI) {
 			conf.set("tracetest.backend.type", "tempo")
 			conf.set("tracetest.backend.endpoint", ui.TextInput("Endpoint", "tempo:9095"))
 			conf.set("tracetest.backend.tls.insecure", ui.Confirm("Insecure", true))
 		}},
-		{"OpenSearch", func(ui UI) {
+		{"OpenSearch", func(ui cliUI.UI) {
 			conf.set("tracetest.backend.type", "opensearch")
 			conf.set("tracetest.backend.addresses", ui.TextInput("Addresses (comma separated list)", "http://opensearch:9200"))
 			conf.set("tracetest.backend.index", ui.TextInput("Index", "traces"))
 			conf.set("tracetest.backend.data-prepper.endpoint", ui.TextInput("Data Prepper Endpont", "data-prepper:21890"))
 			conf.set("tracetest.backend.data-prepper.insecure", ui.Confirm("Insecure", true))
 		}},
-		{"SignalFX", func(ui UI) {
+		{"SignalFX", func(ui cliUI.UI) {
 			conf.set("tracetest.backend.type", "signalfx")
 			conf.set("tracetest.backend.token", ui.TextInput("Token", ""))
 			conf.set("tracetest.backend.realm", ui.TextInput("Realm", "us1"))
 		}},
 	}, 0)
 
-	option.fn(ui)
+	option.Fn(ui)
 
 	return conf
 }
 
-func getTracetestConfigFileContents(psql string, ui UI, config configuration) []byte {
+func getTracetestConfigFileContents(psql string, ui cliUI.UI, config configuration) []byte {
 	sc := serverConfig.Config{
 		PostgresConnString: psql,
 		PoolingConfig: serverConfig.PoolingConfig{
@@ -237,14 +238,14 @@ func fixConfigs(conf []byte) ([]byte, error) {
 	return yaml.Marshal(encoded)
 }
 
-func telemetryConfig(ui UI, conf configuration) serverConfig.Telemetry {
+func telemetryConfig(ui cliUI.UI, conf configuration) serverConfig.Telemetry {
 	return serverConfig.Telemetry{
 		DataStores: dataStoreConfig(ui, conf),
 		Exporters:  exportersConfig(ui, conf),
 	}
 }
 
-func exportersConfig(ui UI, conf configuration) map[string]serverConfig.TelemetryExporterOption {
+func exportersConfig(ui cliUI.UI, conf configuration) map[string]serverConfig.TelemetryExporterOption {
 	return map[string]serverConfig.TelemetryExporterOption{
 		"collector": {
 			ServiceName: "tracetest",
@@ -259,7 +260,7 @@ func exportersConfig(ui UI, conf configuration) map[string]serverConfig.Telemetr
 	}
 
 }
-func dataStoreConfig(ui UI, conf configuration) map[string]serverConfig.TracingBackendDataStoreConfig {
+func dataStoreConfig(ui cliUI.UI, conf configuration) map[string]serverConfig.TracingBackendDataStoreConfig {
 	dstype := conf.String("tracetest.backend.type")
 	var c serverConfig.TracingBackendDataStoreConfig
 	switch dstype {

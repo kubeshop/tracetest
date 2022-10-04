@@ -19,6 +19,18 @@ type (
 		Version          int
 		ServiceUnderTest Trigger
 		Specs            OrderedMap[SpanQuery, []Assertion]
+		Summary          Summary
+	}
+
+	Summary struct {
+		Runs    int
+		LastRun TestLastRun
+	}
+
+	TestLastRun struct {
+		Time   time.Time
+		Passes int
+		Fails  int
 	}
 
 	TriggerType string
@@ -80,6 +92,8 @@ type (
 		Results       *RunResults
 		Trace         *traces.Trace
 		LastError     error
+		Pass          int
+		Fail          int
 
 		Metadata RunMetadata
 	}

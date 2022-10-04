@@ -3,10 +3,12 @@ package installer
 import (
 	"os"
 	"runtime"
+
+	cliUI "github.com/kubeshop/tracetest/cli/ui"
 )
 
-func exitOption(msg string) func(ui UI) {
-	return func(ui UI) {
+func exitOption(msg string) func(ui cliUI.UI) {
+	return func(ui cliUI.UI) {
 		ui.Exit(msg)
 	}
 }

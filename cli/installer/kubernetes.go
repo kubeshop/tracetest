@@ -7,6 +7,8 @@ import (
 	"path"
 	"strings"
 	"time"
+
+	cliUI "github.com/kubeshop/tracetest/cli/ui"
 )
 
 var kubernetes = installer{
@@ -26,7 +28,7 @@ var kubernetes = installer{
 	installFn: kubernetesInstaller,
 }
 
-func kubernetesInstaller(config configuration, ui UI) {
+func kubernetesInstaller(config configuration, ui cliUI.UI) {
 	trackInstall("kubernetes", config, nil)
 
 	installCertManager(config, ui)
@@ -41,7 +43,7 @@ func kubernetesInstaller(config configuration, ui UI) {
 
 }
 
-func installTracetest(conf configuration, ui UI) {
+func installTracetest(conf configuration, ui cliUI.UI) {
 	setupHelmRepo(conf, ui)
 
 	installTracetestChart(conf, ui)
@@ -68,7 +70,7 @@ Happy TraceTesting =)
 
 }
 
-func installDemo(conf configuration, ui UI) {
+func installDemo(conf configuration, ui cliUI.UI) {
 	if !conf.Bool("demo.enable.pokeshop") {
 		return
 	}
@@ -80,7 +82,7 @@ func installDemo(conf configuration, ui UI) {
 	execCmd(script, ui)
 }
 
-func installOtelCollector(conf configuration, ui UI) {
+func installOtelCollector(conf configuration, ui cliUI.UI) {
 	if !conf.Bool("tracetest.collector.install") {
 		return
 	}
@@ -99,7 +101,7 @@ func installOtelCollector(conf configuration, ui UI) {
 	execCmd(kubectlNamespaceCmd(conf, "delete pods -l app.kubernetes.io/name=otel-collector"), ui)
 }
 
-func fixTracetestConfiguration(conf configuration, ui UI) {
+func fixTracetestConfiguration(conf configuration, ui cliUI.UI) {
 	psql := "host=tracetest-postgresql user=tracetest password=not-secure-database-password  port=5432 sslmode=disable"
 	c := getTracetestConfigFileContents(psql, ui, conf)
 	ttc := createTmpFile("tracetest-config", string(c), ui)
@@ -114,7 +116,7 @@ func fixTracetestConfiguration(conf configuration, ui UI) {
 	)
 }
 
-func installTracetestChart(conf configuration, ui UI) {
+func installTracetestChart(conf configuration, ui cliUI.UI) {
 	cmd := []string{
 		"upgrade --install tracetest kubeshop/tracetest",
 		"--namespace " + conf.String("k8s.namespace") + " --create-namespace",
@@ -131,7 +133,7 @@ func installTracetestChart(conf configuration, ui UI) {
 	execCmd(helmCmd(conf, cmd...), ui)
 }
 
-func setupHelmRepo(conf configuration, ui UI) {
+func setupHelmRepo(conf configuration, ui cliUI.UI) {
 	execCmd(
 		helmCmd(conf, "repo add --force-update kubeshop https://kubeshop.github.io/helm-charts"),
 		ui,
@@ -187,7 +189,7 @@ cd $tmpdir/helm-chart
 `
 )
 
-func installCollector(config configuration, ui UI) {
+func installCollector(config configuration, ui cliUI.UI) {
 	if !config.Bool("tracetest.collector.install") {
 		return
 	}
@@ -201,7 +203,7 @@ func installCollector(config configuration, ui UI) {
 
 }
 
-func installCertManager(config configuration, ui UI) {
+func installCertManager(config configuration, ui cliUI.UI) {
 	if !config.Bool("k8s.cert-manager.install") {
 		return
 	}
@@ -229,7 +231,7 @@ func installCertManager(config configuration, ui UI) {
 	ui.Println(ui.Green("✔ cert-manager ready"))
 }
 
-func installJaegerOperator(config configuration, ui UI) {
+func installJaegerOperator(config configuration, ui cliUI.UI) {
 	if !config.Bool("k8s.jaeger-operator.install") {
 		return
 	}
@@ -252,7 +254,7 @@ func installJaegerOperator(config configuration, ui UI) {
 
 }
 
-func installJaeger(config configuration, ui UI) {
+func installJaeger(config configuration, ui cliUI.UI) {
 	if !config.Bool("tracetest.backend.install") {
 		return
 	}
@@ -268,7 +270,7 @@ func installJaeger(config configuration, ui UI) {
 
 }
 
-func createTmpFile(name, contents string, ui UI) *os.File {
+func createTmpFile(name, contents string, ui cliUI.UI) *os.File {
 	f, err := os.CreateTemp("", name)
 	if err != nil {
 		ui.Exit(fmt.Sprintf("Cannot create temp %s file: %s", name, err))
@@ -316,7 +318,7 @@ type k8sContext struct {
 	selected bool
 }
 
-func getK8sContexts(conf configuration, ui UI) []k8sContext {
+func getK8sContexts(conf configuration, ui cliUI.UI) []k8sContext {
 	output := getCmdOutput(fmt.Sprintf(
 		`kubectl --kubeconfig %s config get-contexts --no-headers  | tr -s " " | sed -e "s/ /,/g"`,
 		conf.String("k8s.kubeconfig"),
@@ -338,7 +340,7 @@ func getK8sContexts(conf configuration, ui UI) []k8sContext {
 	return results
 }
 
-func configureKubernetes(conf configuration, ui UI) configuration {
+func configureKubernetes(conf configuration, ui cliUI.UI) configuration {
 	conf.set("k8s.kubeconfig", ui.TextInput("Kubeconfig file", "${HOME}/.kube/config"))
 
 	contexts := getK8sContexts(conf, ui)
@@ -349,24 +351,24 @@ func configureKubernetes(conf configuration, ui UI) configuration {
 				createIssueMsg,
 		)
 	}
-	options := []option{}
+	options := []cliUI.Option{}
 	defaultIndex := 0
 	for i, c := range contexts {
 		if c.selected {
 			defaultIndex = i
 		}
-		options = append(options, option{text: c.name, fn: func(ui UI) {}})
+		options = append(options, cliUI.Option{Text: c.name, Fn: func(ui cliUI.UI) {}})
 	}
 
 	selected := ui.Select("Kubectl context", options, defaultIndex)
-	conf.set("k8s.context", selected.text)
+	conf.set("k8s.context", selected.Text)
 
 	conf.set("k8s.namespace", ui.TextInput("Namespace", "tracetest"))
 
 	return conf
 }
 
-func configureIngress(conf configuration, ui UI) configuration {
+func configureIngress(conf configuration, ui cliUI.UI) configuration {
 	expose := ui.Confirm("Do you want to expose tracetest (via ingress)?", false)
 	if expose {
 		conf.set("k8s.ingress-host", ui.TextInput("Host", ""))
@@ -375,7 +377,7 @@ func configureIngress(conf configuration, ui UI) configuration {
 	return conf
 }
 
-func configureKubernetesInstalls(conf configuration, ui UI) configuration {
+func configureKubernetesInstalls(conf configuration, ui cliUI.UI) configuration {
 	installCertManager := false
 	installJaegerOperator := false
 	if conf.Bool("tracetest.backend.install") {
@@ -408,21 +410,21 @@ func configureKubernetesInstalls(conf configuration, ui UI) configuration {
 	return conf
 }
 
-func helmChecker(ui UI) {
+func helmChecker(ui cliUI.UI) {
 	if commandExists("helm") {
 		ui.Println(ui.Green("✔ helm already installed"))
 		return
 	}
 
 	ui.Warning("I didn't find helm in your system")
-	option := ui.Select("What do you want to do?", []option{
+	option := ui.Select("What do you want to do?", []cliUI.Option{
 		{"Install Helm", installHelm},
 		{"Fix it manually", exitOption(
 			"Check the helm install docs on https://helm.sh/docs/intro/install/",
 		)},
 	}, 0)
 
-	option.fn(ui)
+	option.Fn(ui)
 
 	if commandExists("helm") {
 		ui.Println(ui.Green("✔ helm was successfully installed"))
@@ -431,21 +433,21 @@ func helmChecker(ui UI) {
 	}
 }
 
-func kubectlChecker(ui UI) {
+func kubectlChecker(ui cliUI.UI) {
 	if commandExists("kubectl") {
 		ui.Println(ui.Green("✔ kubectl already installed"))
 		return
 	}
 
 	ui.Warning("I didn't find kubectl in your system")
-	option := ui.Select("What do you want to do?", []option{
+	option := ui.Select("What do you want to do?", []cliUI.Option{
 		{"Install Kubectl", installKubectl},
 		{"Fix it manually", exitOption(
 			"Check the kubectl install docs on https://kubernetes.io/docs/tasks/tools/#kubectl",
 		)},
 	}, 0)
 
-	option.fn(ui)
+	option.Fn(ui)
 
 	if commandExists("kubectl") {
 		ui.Println(ui.Green("✔ kubectl was successfully installed"))
@@ -454,31 +456,31 @@ func kubectlChecker(ui UI) {
 	}
 }
 
-func localEnvironmentChecker(ui UI) {
+func localEnvironmentChecker(ui cliUI.UI) {
 
-	option := ui.Select("Are you going to run it locally or in a remote cluster?", []option{
+	option := ui.Select("Are you going to run it locally or in a remote cluster?", []cliUI.Option{
 		{"Locally", confirmLocalK8sRunning},
-		{"Remote cluster", func(ui UI) {}},
+		{"Remote cluster", func(ui cliUI.UI) {}},
 	}, 0)
 
-	option.fn(ui)
+	option.Fn(ui)
 }
 
-func confirmLocalK8sRunning(ui UI) {
+func confirmLocalK8sRunning(ui cliUI.UI) {
 	localK8sRunning := ui.Confirm("Do you have a local kubernentes running?", true)
 	if !localK8sRunning {
-		option := ui.Select("We can fix that:", []option{
+		option := ui.Select("We can fix that:", []cliUI.Option{
 			{"Install minikube", minikubeChecker},
 			{"Fix manually", exitOption(
 				"Check the minikube install docs on https://minikube.sigs.k8s.io/docs/start/",
 			)},
 		}, 0)
 
-		option.fn(ui)
+		option.Fn(ui)
 	}
 }
 
-func minikubeChecker(ui UI) {
+func minikubeChecker(ui cliUI.UI) {
 	if commandExists("minikube") {
 		ui.Println(ui.Green("✔ minikube already installed"))
 		return
@@ -498,7 +500,7 @@ func minikubeChecker(ui UI) {
 	}
 }
 
-func installHelm(ui UI) {
+func installHelm(ui cliUI.UI) {
 	(cmd{
 		sudo:          true,
 		notConfirmMsg: "No worries, you can try installing helm manually. See https://helm.sh/docs/intro/install/",
@@ -532,7 +534,7 @@ func installHelm(ui UI) {
 	}).exec(ui)
 }
 
-func installKubectl(ui UI) {
+func installKubectl(ui cliUI.UI) {
 	(cmd{
 		sudo:          true,
 		notConfirmMsg: "No worries, you can try installing kubectl manually. See https://kubernetes.io/docs/tasks/tools/#kubectl",
@@ -588,7 +590,7 @@ sudo dnf -y install kubectl
 	}).exec(ui)
 }
 
-func installMinikube(ui UI) {
+func installMinikube(ui cliUI.UI) {
 	(cmd{
 		sudo:          true,
 		notConfirmMsg: "No worries, you can try installing minikube manually. See https://minikube.sigs.k8s.io/docs/start/",
