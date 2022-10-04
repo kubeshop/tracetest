@@ -54,7 +54,10 @@ const Content = () => {
 
         <S.ActionsContainer>
           <SearchInput onSearch={value => search(value)} placeholder="Search test" />
-          <HomeActions />
+          <HomeActions
+            onCreateTransaction={() => setIsCreateTransactionOpen(true)}
+            onCreateTest={() => setIsCreateTestOpen(true)}
+          />
         </S.ActionsContainer>
 
         <Pagination
