@@ -37,16 +37,15 @@ export const AssertionCheck = ({attributeList, field, index, name, assertions, f
   return (
     <S.Container>
       <S.FieldsContainer>
-        <Form.Item
+        <AttributeField
           {...field}
           name={[name, 'attribute']}
           rules={[{required: true, message: 'Attribute is required'}]}
           data-cy="assertion-check-attribute"
-          id="assertion-check-attribute"
           style={{flexBasis: '30%', width: 0, margin: 0}}
-        >
-          <AttributeField attributeList={attributeList} reference={reference} />
-        </Form.Item>
+          attributeList={attributeList}
+          reference={reference}
+        />
         <Form.Item
           {...field}
           style={{margin: 0, width: 0, flexBasis: '30%', paddingLeft: 8}}

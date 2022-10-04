@@ -78,15 +78,15 @@ const OutputModalForm = ({form, runId, testId, attributeList, spanIdList}: IProp
           <AdvancedEditor lineNumbers runId={runId} testId={testId} />
         </Form.Item>
       )}
-      <Form.Item
+      <AttributeField
         data-cy="output-form-attribute"
         label="Attribute"
         name="attribute"
         style={{marginBottom: 0}}
         rules={[{required: true, message: 'Please enter an attribute'}]}
-      >
-        <AttributeField attributeList={attributeList} reference={otelReference} />
-      </Form.Item>
+        attributeList={attributeList}
+        reference={otelReference}
+      />
       <Form.Item data-cy="output-form-regex" label="Regex" name="regex" style={{marginBottom: 0}}>
         <Input />
       </Form.Item>
