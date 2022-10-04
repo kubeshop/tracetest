@@ -6,6 +6,7 @@ import {useCreateTest} from 'providers/CreateTest/CreateTest.provider';
 import {ComponentNames} from 'constants/Plugins.constants';
 import {useCallback, useEffect} from 'react';
 import {IHttpValues} from 'types/Test.types';
+import {DEFAULT_HEADERS} from 'constants/Test.constants';
 import RequestDetailsForm from './RequestDetailsForm';
 
 const RequestDetails = () => {
@@ -21,8 +22,8 @@ const RequestDetails = () => {
   );
 
   const onRefreshData = useCallback(async () => {
-    const {url = '', body = '', method = HTTP_METHOD.GET} = draftTest as IHttpValues;
-    form.setFieldsValue({url, body, method: method as HTTP_METHOD});
+    const {url = '', body = '', method = HTTP_METHOD.GET, headers = DEFAULT_HEADERS} = draftTest as IHttpValues;
+    form.setFieldsValue({url, body, method: method as HTTP_METHOD, headers});
 
     try {
       form.validateFields();

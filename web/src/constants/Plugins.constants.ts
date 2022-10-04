@@ -9,6 +9,7 @@ export enum ComponentNames {
   RequestDetails = 'RequestDetails',
   UploadCollection = 'UploadCollection',
   TestsSelection = 'TestsSelection',
+  ImportCommand = 'ImportCommand',
 }
 
 const Default: IPlugin = {
@@ -110,9 +111,34 @@ const OpenAPI: IPlugin = {
   type: TriggerTypes.http,
 };
 
+const Curl: IPlugin = {
+  name: SupportedPlugins.CURL,
+  title: 'CURL Command',
+  description: 'Define your HTTP request via a CURL command',
+  isActive: true,
+  stepList: [
+    ...Default.stepList,
+    {
+      id: 'import-curl',
+      name: 'Import CURL',
+      title: 'Paste the CURL command',
+      component: ComponentNames.ImportCommand,
+    },
+    {
+      id: 'request-details',
+      name: 'Request Details',
+      title: 'Provide additional information',
+      component: ComponentNames.RequestDetails,
+    },
+  ],
+  demoList: DemoByPluginMap.CURL,
+  type: TriggerTypes.http,
+};
+
 export const Plugins: Record<SupportedPlugins, IPlugin> = {
   [SupportedPlugins.REST]: Rest,
   [SupportedPlugins.GRPC]: GRPC,
+  [SupportedPlugins.CURL]: Curl,
   [SupportedPlugins.Postman]: Postman,
   [SupportedPlugins.Messaging]: Messaging,
   [SupportedPlugins.OpenAPI]: OpenAPI,

@@ -44,6 +44,7 @@ export enum RouterSearchFields {
 
 export enum SupportedPlugins {
   REST = 'REST',
+  CURL = 'CURL',
   Messaging = 'Messaging',
   GRPC = 'GRPC',
   Postman = 'Postman',
