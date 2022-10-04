@@ -1,5 +1,4 @@
 import {HolderOutlined, DeleteOutlined} from '@ant-design/icons';
-import {SortableHandle} from 'react-sortable-hoc';
 import styled from 'styled-components';
 
 export const TestItemContainer = styled.li`
@@ -14,10 +13,14 @@ export const TestItemContainer = styled.li`
   height: 32px;
 `;
 
-export const DragHandle = SortableHandle(styled(HolderOutlined)`
+export const DragHandle = styled(HolderOutlined)`
   color: ${({theme}) => theme.color.textSecondary};
   cursor: grab;
-`);
+
+  :active {
+    cursor: grabbing;
+  }
+`;
 
 export const DeleteIcon = styled(DeleteOutlined)`
   color: ${({theme}) => theme.color.textSecondary};

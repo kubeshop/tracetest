@@ -1,5 +1,4 @@
 import {Col, Row} from 'antd';
-import {SortableContainer} from 'react-sortable-hoc';
 import {TTest} from 'types/Test.types';
 import TestItem from './TestItem';
 import * as S from './TestsSelectionInput.styled';
@@ -16,7 +15,7 @@ const TestItemList = ({items, onDelete}: IProps) => {
         <S.ItemListContainer>
           {items.map((test, index) => (
             // eslint-disable-next-line react/no-array-index-key
-            <TestItem key={`${test.id}-${index}`} index={index} value={test} onDelete={onDelete} />
+            <TestItem key={`${test.id}-${index}`} test={test} onDelete={onDelete} />
           ))}
         </S.ItemListContainer>
       </Col>
@@ -24,4 +23,4 @@ const TestItemList = ({items, onDelete}: IProps) => {
   );
 };
 
-export default SortableContainer(TestItemList);
+export default TestItemList;
