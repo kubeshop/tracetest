@@ -258,7 +258,7 @@ export interface operations {
     parameters: {
       path: {
         testId: string;
-        runId: number;
+        runId: string;
       };
       query: {
         query?: string;
@@ -278,7 +278,7 @@ export interface operations {
     parameters: {
       path: {
         testId: string;
-        runId: number;
+        runId: string;
       };
     };
     responses: {
@@ -300,7 +300,7 @@ export interface operations {
     parameters: {
       path: {
         testId: string;
-        runId: number;
+        runId: string;
       };
     };
     responses: {
@@ -317,7 +317,7 @@ export interface operations {
     parameters: {
       path: {
         testId: string;
-        runId: number;
+        runId: string;
       };
     };
     responses: {
@@ -334,7 +334,7 @@ export interface operations {
     parameters: {
       path: {
         testId: string;
-        runId: number;
+        runId: string;
       };
     };
     responses: {
@@ -367,7 +367,7 @@ export interface operations {
     parameters: {
       path: {
         testId: string;
-        runId: number;
+        runId: string;
       };
     };
     responses: {
@@ -384,7 +384,7 @@ export interface operations {
     parameters: {
       path: {
         testId: string;
-        runId: number;
+        runId: string;
       };
     };
     responses: {
@@ -561,6 +561,17 @@ export interface external {
           serviceUnderTest?: external["triggers.yaml"]["components"]["schemas"]["Trigger"];
           /** @description specification of assertions that are going to be made */
           specs?: external["tests.yaml"]["components"]["schemas"]["TestSpecs"];
+          /** @description summary of test data */
+          summary?: external["tests.yaml"]["components"]["schemas"]["TestSummary"];
+        };
+        TestSummary: {
+          runs?: number;
+          lastRun?: {
+            /** Format: date-time */
+            time?: string;
+            passes?: number;
+            fails?: number;
+          };
         };
         /** @example [object Object] */
         TestSpecs: {

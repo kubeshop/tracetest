@@ -9,11 +9,11 @@ test('TestCard', async () => {
   const test = TestMock.model();
 
   const {getByTestId, getByText} = render(
-    <TestCard onDelete={onDelete} onRunTest={onRunTest} test={test} onClick={onClick} />
+    <TestCard onDelete={onDelete} onRun={onRunTest} onViewAll={onClick} test={test} />
   );
   const mouseEvent = new MouseEvent('click', {bubbles: true});
   fireEvent(getByTestId(`test-actions-button-${test.id}`), mouseEvent);
   await waitFor(() => getByTestId('test-card-delete'));
 
-  expect(getByText('Run Test')).toBeTruthy();
+  expect(getByText('Run')).toBeTruthy();
 });

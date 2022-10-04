@@ -1,13 +1,14 @@
 import {Dropdown, Menu} from 'antd';
 import {useCallback} from 'react';
+
 import * as S from './TestCard.styled';
 
 interface IProps {
-  testId: string;
   onDelete(): void;
+  testId: string;
 }
 
-const TestCardActions: React.FC<IProps> = ({testId, onDelete}) => {
+const TestCardActions = ({onDelete, testId}: IProps) => {
   const onClick = useCallback(
     ({domEvent}) => {
       domEvent?.stopPropagation();
