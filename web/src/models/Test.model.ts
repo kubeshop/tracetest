@@ -1,5 +1,6 @@
 import {TRawTest, TTest} from 'types/Test.types';
 import TestSpecs from './TestSpecs.model';
+import TestSummary from './TestSummary.model';
 import Trigger from './Trigger.model';
 
 const Test = ({
@@ -17,7 +18,7 @@ const Test = ({
   description,
   definition: TestSpecs(specs || {}),
   trigger: Trigger(rawTrigger || {}),
-  summary,
+  summary: TestSummary(summary),
 });
 
 export default Test;

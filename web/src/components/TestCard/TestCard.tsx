@@ -41,7 +41,7 @@ const TestCard = ({onDelete, onRun, onViewAll, test}: IProps) => {
         <S.Row>
           {isCollapsed ? <DownOutlined /> : <RightOutlined data-cy={`collapse-test-${test.id}`} />}
           <S.Box>
-            <S.BoxTitle level={2}>{test.summary?.runs ?? 0}</S.BoxTitle>
+            <S.BoxTitle level={2}>{test.summary.runs}</S.BoxTitle>
           </S.Box>
           <div>
             <S.Title level={3}>{test.name}</S.Title>
@@ -54,8 +54,8 @@ const TestCard = ({onDelete, onRun, onViewAll, test}: IProps) => {
         <S.Row $gap={36} $noWrap>
           <div>
             <S.Text>Last run time:</S.Text>
-            <Tooltip title={Date.format(test.summary?.lastRun?.time ?? '')}>
-              <S.Text>{Date.getTimeAgo(test.summary?.lastRun?.time ?? '')}</S.Text>
+            <Tooltip title={Date.format(test.summary.lastRun.time)}>
+              <S.Text>{Date.getTimeAgo(test.summary.lastRun.time)}</S.Text>
             </Tooltip>
           </div>
 
@@ -65,13 +65,13 @@ const TestCard = ({onDelete, onRun, onViewAll, test}: IProps) => {
               <Tooltip title="Passed assertions">
                 <S.HeaderDetail>
                   <S.HeaderDot $passed />
-                  {test.summary?.lastRun?.passes ?? 0}
+                  {test.summary.lastRun.passes}
                 </S.HeaderDetail>
               </Tooltip>
               <Tooltip title="Failed assertions">
                 <S.HeaderDetail>
                   <S.HeaderDot $passed={false} />
-                  {test.summary?.lastRun?.fails ?? 0}
+                  {test.summary.lastRun.fails}
                 </S.HeaderDetail>
               </Tooltip>
             </S.Row>
