@@ -1,0 +1,65 @@
+type: Test
+spec:
+  id: VZvc1g44g
+  name: Test Create
+  trigger:
+    type: http
+    httpRequest:
+      url: "${env:TARGET_URL}/api/tests"
+      method: POST
+      headers:
+      - key: Content-Type
+        value: application/json
+      body: |
+        {
+          "name": "Pokemon - List - Get a Pokemon",
+          "serviceUnderTest": {
+            "triggerType": "http",
+            "triggerSettings": {
+              "http": {
+                "url": "${env:DEMO_APP_URL}/pokemon?take=20&skip=0",
+                "method": "GET",
+                "headers": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ]
+              }
+            }
+          },
+          "specs": {
+            "specs": [
+              {
+                "selector": {
+                  "query": "span[name = \"pg.query:SELECT\"]"
+                },
+                "assertions": [
+                  {
+                    "attribute": "tracetest.selected_spans.count",
+                    "comparator": ">",
+                    "expected": "0"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+
+  specs:
+  - selector: span[name = "Tracetest trigger"]
+    assertions:
+      - tracetest.selected_spans.count = 1
+      - tracetest.response.status = 200
+  - selector: span[name="POST /api/tests" tracetest.span.type="http"]
+    assertions:
+    - tracetest.selected_spans.count = 1
+  - selector: span[name = "exec INSERT"]
+    assertions:
+    - tracetest.selected_spans.count = 1
+  - selector: span[name = "exec INSERT"]:first
+    assertions:
+    - sql.query contains "INSERT INTO tests"
+
+  outputs:
+    CREATED_TEST_ID: "${attr:tracetest.request.body | json_value '.id' }"

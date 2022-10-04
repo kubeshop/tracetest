@@ -1,0 +1,43 @@
+type: Test
+spec:
+  id: zwWc1RV4R
+  name: Create with non-existing ID
+  trigger:
+    type: http
+    httpRequest:
+      url: "${env:TARGET_URL}/api/tests"
+      method: POST
+      headers:
+      - key: Content-Type
+        value: application/json
+      body: |
+        {
+          "id": "${env:EXAMPLE_TEST_ID}",
+          "name": "Pokemon - List - Get a Pokemon",
+          "serviceUnderTest": {
+            "triggerType": "http",
+            "triggerSettings": {
+              "http": {
+                "url": "${env:DEMO_APP_URL}/pokemon?take=20&skip=0",
+                "method": "GET",
+                "body": "",
+                "headers": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ]
+              }
+            }
+          }
+        }
+  specs:
+  - selector: span[name = "Tracetest trigger"]
+    assertions:
+      - tracetest.selected_spans.count = 1
+      - tracetest.response.status = 200
+      - tracetest.response.body json_path_exists '.id' #
+      - ${attr:tracetest.response.body | json 'id'} = "${env:EXAMPLE_TEST_ID}" #
+  - selector: span[name="POST /api/tests" tracetest.span.type="http"]
+    assertions:
+    - tracetest.selected_spans.count = 1
