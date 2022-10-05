@@ -31,7 +31,7 @@ const StepList: Step[] = [
     target: GuidedTourService.getSelectorStep(GuidedTours.Trace, Steps.MoreData),
     placement: 'right',
     content:
-      ' You can change the trigger by altering the details and saving. This will rerun the test with the updated trigger.',
+      'You can change the trigger by altering the details and saving. This will rerun the test with the updated trigger.',
     disableBeacon: true,
   },
   {
@@ -44,7 +44,7 @@ const StepList: Step[] = [
     title: 'Span Details',
     target: GuidedTourService.getSelectorStep(GuidedTours.Trace, Steps.SpanDetails),
     content:
-      ' Click on the panel to see details about the selected span. These span attributes are grouped into tabs based on the type of span. ',
+      'Click on the panel to see details about the selected span. These span attributes are grouped into tabs based on the type of span. ',
     disableBeacon: true,
     placement: 'right',
   },
@@ -52,7 +52,7 @@ const StepList: Step[] = [
     title: 'Test Spec',
     target: GuidedTourService.getSelectorStep(GuidedTours.Trace, Steps.AddTestSpec),
     content:
-      ' Test Specifications can be added to set assertions to run against one or more spans in the trace. If test specs have already been added to a test, there will be a list on the Test screen.',
+      'Test Specifications can be added to set assertions to run against one or more spans in the trace. If test specs have already been added to a test, there will be a list on the Test screen.',
     placement: 'left',
     disableBeacon: true,
   },
