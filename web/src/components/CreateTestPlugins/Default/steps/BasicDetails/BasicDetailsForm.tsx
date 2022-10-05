@@ -7,8 +7,11 @@ import BasicDetailsDemoHelper from './BasicDetailsDemoHelper';
 import * as S from './BasicDetails.styled';
 
 export const FORM_ID = 'create-test';
+
+// TODO: create config abstraction with checks and default values
 const {demoEnabled = '[]'} = window.ENV || {};
-const isDemoEnabled = JSON.parse(demoEnabled).length > 0;
+const parsedDemoEnabled = JSON.parse(demoEnabled);
+const isDemoEnabled = Boolean(parsedDemoEnabled && parsedDemoEnabled.length > 0);
 
 interface IProps {
   onSelectDemo?(demo: TDraftTest): void;
