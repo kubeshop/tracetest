@@ -1,7 +1,7 @@
 import {Button} from 'antd';
 
 import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
-import TraceAnalyticsService from 'services/Analytics/TraceAnalytics.service';
+import TraceAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
 import {singularOrPlural} from 'utils/Common';
 import * as S from './TestActions.styled';
 

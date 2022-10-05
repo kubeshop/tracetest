@@ -1,8 +1,9 @@
 import {DoubleLeftOutlined, DoubleRightOutlined} from '@ant-design/icons';
 import {Button} from 'antd';
 import {noop} from 'lodash';
-import React, {createContext, ReactNode, useCallback, useContext, useMemo, useState} from 'react';
+import {createContext, ReactNode, useCallback, useContext, useMemo, useState} from 'react';
 import {HandlerProps, ReflexContainer, ReflexElement, ReflexSplitter} from 'react-reflex';
+import TestRunAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
 
 import * as S from './Drawer.styled';
 
@@ -68,6 +69,7 @@ const Drawer = ({leftPanel, rightPanel}: IProps) => {
               onClick={event => {
                 event.stopPropagation();
                 toggleLeftPanel(lastSizeLeftPanel);
+                TestRunAnalyticsService.onAttributeDrawerOpen();
               }}
               onMouseDown={event => event.stopPropagation()}
               shape="circle"

@@ -1,6 +1,7 @@
 import {Tabs} from 'antd';
-import {TriggerTypes} from '../../constants/Test.constants';
-import {TTriggerResult} from '../../types/Test.types';
+import {TriggerTypes} from 'constants/Test.constants';
+import TestRunAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
+import {TTriggerResult} from 'types/Test.types';
 import ResponseBody from './ResponseBody';
 import ResponseHeaders from './ResponseHeaders';
 import * as S from './RunDetailTriggerResponse.styled';
@@ -33,7 +34,12 @@ const RunDetailTriggerResponse = ({
         </div>
       </S.TitleContainer>
       <S.TabsContainer>
-        <Tabs defaultActiveKey="1" data-cy="run-detail-trigger-response" size="small">
+        <Tabs
+          defaultActiveKey="1"
+          data-cy="run-detail-trigger-response"
+          size="small"
+          onChange={newTab => TestRunAnalyticsService.onTriggerResponseTabChange(newTab)}
+        >
           <Tabs.TabPane key="1" tab="Body">
             <ResponseBody body={body} bodyMimeType={bodyMimeType} />
           </Tabs.TabPane>

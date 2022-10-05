@@ -1,5 +1,6 @@
 import {Button} from 'antd';
 import {ICreateTestStep} from 'types/Plugins.types';
+import CreateTestAnalyticsService from '../../services/Analytics/CreateTestAnalytics.service';
 import * as S from './CreateSteps.styled';
 
 interface IProps {
@@ -16,7 +17,15 @@ const CreateStepFooter = ({isValid, stepNumber, step, isLastStep, onPrev, isLoad
     <S.Footer>
       <span>
         {stepNumber > 0 && (
-          <Button data-cy="create-test-prev-button" type="primary" ghost onClick={onPrev}>
+          <Button
+            data-cy="create-test-prev-button"
+            type="primary"
+            ghost
+            onClick={() => {
+              CreateTestAnalyticsService.onPrevClick(step.name);
+              onPrev();
+            }}
+          >
             Previous
           </Button>
         )}
@@ -29,6 +38,7 @@ const CreateStepFooter = ({isValid, stepNumber, step, isLastStep, onPrev, isLoad
             data-cy="create-test-next-button"
             disabled={!isValid}
             type="primary"
+            onClick={() => CreateTestAnalyticsService.onNextClick(step.name)}
           >
             Next
           </Button>
@@ -36,6 +46,7 @@ const CreateStepFooter = ({isValid, stepNumber, step, isLastStep, onPrev, isLoad
           <Button
             htmlType="submit"
             form={step.component}
+            onClick={() => CreateTestAnalyticsService.onCreateTestFormSubmit()}
             data-cy="create-test-create-button"
             disabled={!isValid}
             type="primary"

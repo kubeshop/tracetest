@@ -9,29 +9,19 @@ export enum Actions {
   AssertionRevert = 'assertion-revert',
 }
 
-const AssertionAnalyticsService = () => {
-  const onAssertionClick = () => {
+const AssertionAnalyticsService = () => ({
+  onAssertionClick() {
     AnalyticsService.event<Actions>(Categories.TestResults, Actions.AssertionClick, Labels.Button);
-  };
-
-  const onAssertionEdit = () => {
+  },
+  onAssertionEdit() {
     AnalyticsService.event<Actions>(Categories.TestResults, Actions.EditAssertionButtonClick, Labels.Button);
-  };
-
-  const onAssertionDelete = () => {
+  },
+  onAssertionDelete() {
     AnalyticsService.event<Actions>(Categories.TestResults, Actions.AssertionDeleteButtonClick, Labels.Button);
-  };
-
-  const onRevertAssertion = () => {
+  },
+  onRevertAssertion() {
     AnalyticsService.event<Actions>(Categories.TestResults, Actions.AssertionRevert, Labels.Button);
-  };
-
-  return {
-    onAssertionClick,
-    onAssertionEdit,
-    onAssertionDelete,
-    onRevertAssertion,
-  };
-};
+  },
+});
 
 export default AssertionAnalyticsService();

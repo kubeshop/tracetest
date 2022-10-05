@@ -4,6 +4,7 @@ import PluginCard from 'components/PluginCard';
 import {useCreateTest} from 'providers/CreateTest/CreateTest.provider';
 import {ComponentNames, Plugins} from 'constants/Plugins.constants';
 import * as Step from 'components/CreateTestPlugins/Step.styled';
+import CreateTestAnalyticsService from 'services/Analytics/CreateTestAnalytics.service';
 import * as S from './SelectPlugin.styled';
 
 const pluginList = Object.values(Plugins);
@@ -26,7 +27,10 @@ const SelectPlugin = () => {
               <PluginCard
                 plugin={plugin}
                 key={plugin.name}
-                onSelect={onUpdatePlugin}
+                onSelect={selectedPlugin => {
+                  CreateTestAnalyticsService.onPluginSelected(selectedPlugin.name);
+                  onUpdatePlugin(selectedPlugin);
+                }}
                 isSelected={pluginName === plugin.name}
               />
             ))}

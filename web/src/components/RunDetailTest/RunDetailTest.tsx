@@ -9,7 +9,7 @@ import {useTestSpecForm} from 'components/TestSpecForm/TestSpecForm.provider';
 import Switch from 'components/Visualization/components/Switch';
 import {useSpan} from 'providers/Span/Span.provider';
 import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
-import TraceAnalyticsService from 'services/Analytics/TraceAnalytics.service';
+import TraceAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
 import {TTestRun} from 'types/TestRun.types';
 import * as S from './RunDetailTest.styled';
 import Visualization from './Visualization';

@@ -1,6 +1,6 @@
 import {VisualizationType} from 'components/RunDetailTrace/RunDetailTrace';
 import {Categories, Labels} from 'constants/Analytics.constants';
-import TraceAnalyticsService, {Actions} from '../TraceAnalytics.service';
+import TraceAnalyticsService, {Actions} from '../TestRunAnalytics.service';
 import AnalyticsService from '../Analytics.service';
 
 jest.mock('../Analytics.service', () => {

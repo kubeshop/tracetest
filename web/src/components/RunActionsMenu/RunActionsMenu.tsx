@@ -1,5 +1,6 @@
 import {Dropdown, Menu} from 'antd';
-import useDeleteTestRun from '../../hooks/useDeleteTestRun';
+import useDeleteTestRun from 'hooks/useDeleteTestRun';
+import TestRunAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
 import {useFileViewerModal} from '../FileViewerModal/FileViewerModal.provider';
 import * as S from './RunActionsMenu.styled';
 
@@ -20,13 +21,23 @@ const RunActionsMenu = ({resultId, testId, testVersion, isRunView = false}: IPro
       <Dropdown
         overlay={
           <Menu>
-            <Menu.Item data-cy="view-junit-button" key="view-junit" onClick={() => loadJUnit(testId, resultId)}>
+            <Menu.Item
+              data-cy="view-junit-button"
+              key="view-junit"
+              onClick={() => {
+                TestRunAnalyticsService.onLoadJUnitReport();
+                loadJUnit(testId, resultId);
+              }}
+            >
               JUnit Results
             </Menu.Item>
             <Menu.Item
               data-cy="view-test-definition-button"
               key="view-test-definition"
-              onClick={() => loadTestDefinitionYaml(testId, testVersion)}
+              onClick={() => {
+                TestRunAnalyticsService.onLoadTestDefinition();
+                loadTestDefinitionYaml(testId, testVersion);
+              }}
             >
               Test Definition
             </Menu.Item>

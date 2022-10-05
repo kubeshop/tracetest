@@ -6,6 +6,7 @@ import RunDetailTest from 'components/RunDetailTest';
 import RunDetailTrace from 'components/RunDetailTrace';
 import RunDetailTrigger from 'components/RunDetailTrigger';
 import {RunDetailModes} from 'constants/TestRun.constants';
+import TestRunAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import {TTest} from 'types/Test.types';
 import HeaderLeft from './HeaderLeft';
@@ -41,6 +42,7 @@ const RunDetailLayout = ({test: {id, name, trigger, version = 1}, test}: IProps)
         activeKey={mode}
         centered
         onChange={activeKey => {
+          TestRunAnalyticsService.onChangeMode(activeKey as RunDetailModes);
           navigate(`/test/${id}/run/${run.id}/${activeKey}`);
         }}
         renderTabBar={renderTabBar}

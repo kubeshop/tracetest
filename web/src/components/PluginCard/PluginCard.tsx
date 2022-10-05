@@ -1,5 +1,5 @@
 import {IPlugin} from 'types/Plugins.types';
-import {GITHUB_ISSUES_URL} from '../../constants/Common.constants';
+import {GITHUB_ISSUES_URL} from 'constants/Common.constants';
 import * as S from './PluginCard.styled';
 
 interface IProps {

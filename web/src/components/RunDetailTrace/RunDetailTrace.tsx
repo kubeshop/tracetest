@@ -8,7 +8,7 @@ import {TestState} from 'constants/TestRun.constants';
 import {useAppSelector} from 'redux/hooks';
 import SpanSelectors from 'selectors/Span.selectors';
 import TraceSelectors from 'selectors/Trace.selectors';
-import TraceAnalyticsService from 'services/Analytics/TraceAnalytics.service';
+import TraceAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
 import {TTestRun} from 'types/TestRun.types';
 import * as S from './RunDetailTrace.styled';
 import Search from './Search';
