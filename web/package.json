@@ -56,7 +56,6 @@
     "react-reflex": "4.0.9",
     "react-router-dom": "6.2.1",
     "react-scripts": "5.0.1",
-    "react-sortable-hoc": "2.0.0",
     "react-syntax-highlighter": "15.5.0",
     "redux-first-history": "5.0.12",
     "styled-components": "5.3.3",
