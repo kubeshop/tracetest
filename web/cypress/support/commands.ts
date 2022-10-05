@@ -100,7 +100,7 @@ Cypress.Commands.add('goToTestDetailPageAndRunTest', (pathname: string) => {
   cy.visit(`/test/${testId}`);
   cy.get('[data-cy^=run-card]', {timeout: 10000}).first().click();
   cy.makeSureUserIsOnTestDetailPage();
-  cy.makeSureUserIsOnTracePage(false);
+  cy.makeSureUserIsOnTracePage(true);
 });
 
 Cypress.Commands.add('makeSureUserIsOnTestDetailPage', () => {
@@ -120,7 +120,7 @@ Cypress.Commands.add('cancelOnBoarding', () => {
   const parsedValue = value ? JSON.parse(value) : undefined;
 
   if (!parsedValue || parsedValue.trace === false) {
-    // cy.get('[data-cy=no-thanks]').click();
+    cy.get('[data-cy=no-thanks]').click();
   }
 });
 
@@ -189,7 +189,6 @@ Cypress.Commands.add('createTest', () => {
   cy.submitCreateTestForm();
   cy.makeSureUserIsOnTracePage();
   cy.waitForTracePageApiCalls();
-  cy.cancelOnBoarding();
 });
 
 Cypress.Commands.add('createAssertion', (index = 0) => {

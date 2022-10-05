@@ -15,7 +15,7 @@ export function doArrow(
   const height = 12;
   const color = 'white';
   const isVertical = position === 'top' || position === 'bottom';
-  const spaceFromSide = 10;
+  const spaceFromSide = 4;
 
   return {
     '&::after': {

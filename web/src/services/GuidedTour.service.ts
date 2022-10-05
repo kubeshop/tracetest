@@ -1,3 +1,4 @@
+import {useLocation} from 'react-router-dom';
 import LocalStorageGateway from '../gateways/LocalStorage.gateway';
 
 export enum GuidedTours {
@@ -28,13 +29,17 @@ export const defaultValue = Object.values(GuidedTours).reduce<TTour>(
 
 const GuidedTourService = () => {
   return {
-    getByPathName: (pathname: string) => {
+    getByPathName: (pathname: string): GuidedTours => {
       const [, value = GuidedTours.Home] =
         Object.entries(GuidedToursPathnameMap).find(([key]) => pathname.includes(key)) || [];
       return value;
     },
     get(): TTour {
       return get() || defaultValue;
+    },
+    useGetCurrentOnboardingLocation(): GuidedTours {
+      const location = useLocation();
+      return this.getByPathName(location.pathname);
     },
     getIsComplete(tour: GuidedTours): boolean {
       const {[tour]: isComplete} = this.get();
