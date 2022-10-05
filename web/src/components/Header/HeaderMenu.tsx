@@ -21,7 +21,7 @@ const HeaderMenu = () => {
       ShowOnboardingContent(
         onGuidedTourClick,
         () => {
-          switchTraceMode(0)();
+          switchTraceMode(0);
           setState(st => ({...st, tourActive: true, run: true}));
         },
         () => setState(st => ({...st, dialog: false}))

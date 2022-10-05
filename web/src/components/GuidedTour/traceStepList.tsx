@@ -11,7 +11,7 @@ export enum Steps {
   MetaDetails = 'meta-details',
 }
 
-export const switchTraceMode = (index: number) => () => {
+export const switchTraceMode = (index: number) => {
   const elementNodeListOfElement = (document.querySelectorAll('.ant-tabs-tab') as NodeListOf<HTMLElement>)[index];
   if (elementNodeListOfElement !== null) {
     elementNodeListOfElement.click();

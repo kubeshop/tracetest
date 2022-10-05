@@ -27,13 +27,13 @@ const CallbackListMap: Record<
       if (action === 'prev') {
         setState(st => ({...st, stepIndex: st.stepIndex - 1}));
         if (type === 'step:after' && index === 2) {
-          switchTraceMode(0)();
+          switchTraceMode(0);
         }
         return;
       }
-      if (index === 2 /* or step.target === '#home' */) {
+      if (index === 2) {
         setState(st => ({...st, run: false}));
-        switchTraceMode(2)();
+        switchTraceMode(2);
       }
       setState(st => ({...st, stepIndex: st.stepIndex + 1}));
     }

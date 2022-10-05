@@ -16,7 +16,7 @@ export const ShowOnboardingContent = (onGuidedTourClick: () => void, onShow: () 
         onClick={() => {
           onShow();
           onClose();
-          switchTraceMode(0)();
+          switchTraceMode(0);
           onGuidedTourClick();
         }}
       >
