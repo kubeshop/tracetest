@@ -42,6 +42,6 @@ describe('TestAnalyticsService', () => {
   it('should trigger the onDisplayTestInfo event', () => {
     TestAnalyticsService.onDisplayTestInfo();
 
-    expect(AnalyticsService.event).toHaveBeenCalledWith(Categories.Trace, Actions.DisplayTestInfo, Labels.Button);
+    expect(AnalyticsService.event).toHaveBeenCalledWith(Categories.TestRun, Actions.DisplayTestInfo, Labels.Button);
   });
 });

@@ -13,14 +13,14 @@ describe('TraceAnalyticsService', () => {
   it('should trigger the onChangeTab event', () => {
     TraceAnalyticsService.onChangeTab('request');
 
-    expect(AnalyticsService.event).toHaveBeenCalledWith(Categories.Trace, `${Actions.ChangeTab}-request`, Labels.Tab);
+    expect(AnalyticsService.event).toHaveBeenCalledWith(Categories.TestRun, `${Actions.ChangeTab}-request`, Labels.Tab);
   });
 
   it('should trigger the onAddAssertionButtonClick event', () => {
     TraceAnalyticsService.onAddAssertionButtonClick();
 
     expect(AnalyticsService.event).toHaveBeenCalledWith(
-      Categories.Trace,
+      Categories.TestRun,
       Actions.AddAssertionButtonClick,
       Labels.Button
     );
@@ -30,7 +30,7 @@ describe('TraceAnalyticsService', () => {
     const spanId = '1234';
     TraceAnalyticsService.onTimelineSpanClick(spanId);
 
-    expect(AnalyticsService.event).toHaveBeenCalledWith(Categories.Trace, Actions.TimelineSpanClick, spanId);
+    expect(AnalyticsService.event).toHaveBeenCalledWith(Categories.TestRun, Actions.TimelineSpanClick, spanId);
   });
 
   it('should trigger the onAttributeCopy event', () => {
@@ -43,7 +43,7 @@ describe('TraceAnalyticsService', () => {
     TraceAnalyticsService.onSwitchDiagramView(VisualizationType.Dag);
 
     expect(AnalyticsService.event).toHaveBeenCalledWith(
-      Categories.Trace,
+      Categories.TestRun,
       `${Actions.SwitchDiagramView}-${VisualizationType.Dag}`,
       Labels.Button
     );
@@ -62,12 +62,12 @@ describe('TraceAnalyticsService', () => {
   it('should trigger the onRevertAllClick event', () => {
     TraceAnalyticsService.onRevertAllClick();
 
-    expect(AnalyticsService.event).toHaveBeenCalledWith(Categories.Trace, Actions.RevertAllClick, Labels.Button);
+    expect(AnalyticsService.event).toHaveBeenCalledWith(Categories.TestRun, Actions.RevertAllClick, Labels.Button);
   });
 
   it('should trigger the onPublishClick event', () => {
     TraceAnalyticsService.onPublishClick();
 
-    expect(AnalyticsService.event).toHaveBeenCalledWith(Categories.Trace, Actions.PublishClick, Labels.Button);
+    expect(AnalyticsService.event).toHaveBeenCalledWith(Categories.TestRun, Actions.PublishClick, Labels.Button);
   });
 });
