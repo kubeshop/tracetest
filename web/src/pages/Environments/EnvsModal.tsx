@@ -1,9 +1,9 @@
 import {Form, Modal} from 'antd';
 import {Dispatch, SetStateAction} from 'react';
 import styled from 'styled-components';
-import {IEnvironment} from '../../redux/apis/TraceTest.api';
 import {EnvironmentForm} from './EnvironmentForm';
 import {EnvironmentState} from './EnvironmentState';
+import {IEnvironment} from './IEnvironment';
 
 const CustomModal = styled(Modal)`
   && {

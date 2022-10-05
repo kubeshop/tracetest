@@ -1,10 +1,11 @@
 import {DownOutlined, RightOutlined} from '@ant-design/icons';
 import {Dropdown, Menu, Typography} from 'antd';
 import {useCallback, useState} from 'react';
+import {useLazyGetEnvironmentSecretListQuery} from 'redux/apis/TraceTest.api';
 import * as T from '../../components/TestCard/TestCard.styled';
-import {IEnvironment, useLazyGetEnvironmentSecretListQuery} from '../../redux/apis/TraceTest.api';
 import EnvironmentsAnalytics from '../../services/Analytics/EnvironmentsAnalytics.service';
-import * as S from './Envs.styled';
+import * as E from './Envs.styled';
+import {IEnvironment} from './IEnvironment';
 
 interface IProps {
   openDialog: (mode: boolean) => void;
@@ -38,11 +39,11 @@ export const EnvironmentCard = ({
     onCollapse();
   }, [onCollapse, isCollapsed, setIsCollapsed]);
   return (
-    <T.TestCard $isCollapsed={isCollapsed}>
-      <T.InfoContainer onClick={toggleColapsed}>
+    <E.EnvironmentCard $isCollapsed={isCollapsed}>
+      <E.InfoContainer onClick={toggleColapsed}>
         {isCollapsed ? <DownOutlined /> : <RightOutlined data-cy={`collapse-environment-${id}`} />}
         <T.TextContainer>
-          <T.NameText>{name}</T.NameText>
+          <E.NameText>{name}</E.NameText>
         </T.TextContainer>
         <T.TextContainer />
         <T.TextContainer data-cy={`environment-description-${id}`}>
@@ -78,35 +79,38 @@ export const EnvironmentCard = ({
             <T.ActionButton />
           </span>
         </Dropdown>
-      </T.InfoContainer>
+      </E.InfoContainer>
 
       {isCollapsed && Boolean(resultList.length) && (
         <T.ResultListContainer>
-          <S.VariablesMainContainer>
+          <E.VariablesMainContainer>
             <div style={{display: 'flex', justifyContent: 'space-between', paddingBottom: 8}}>
               <Typography style={{flexBasis: '50%', paddingLeft: 8, fontWeight: 'bold'}}>Key</Typography>
               <Typography style={{flexBasis: '50%', fontWeight: 'bold'}}>Value</Typography>
             </div>
-            <S.VariablesContainer>
+            <E.VariablesContainer>
               {resultList.map(secret => (
-                <div style={{display: 'flex', justifyContent: 'space-between', width: '100%'}}>
+                <div
+                  key={secret.key + secret.value}
+                  style={{display: 'flex', justifyContent: 'space-between', width: '100%'}}
+                >
                   <Typography style={{flexBasis: '50%'}}>{secret.key}</Typography>
                   <Typography style={{flexBasis: '50%'}}>{secret.value}</Typography>
                 </div>
               ))}
-            </S.VariablesContainer>
-          </S.VariablesMainContainer>
+            </E.VariablesContainer>
+          </E.VariablesMainContainer>
           {resultList.length === 5 && (
-            <T.TestDetails>
-              <T.TestDetailsLink
-                data-cy="test-details-link"
+            <E.EnvironmentDetails>
+              <E.EnvironmentDetailsLink
+                data-cy="environment-details-link"
                 onClick={() => {
                   // openDialog(environmentId)
                 }}
               >
-                Explore all test details
-              </T.TestDetailsLink>
-            </T.TestDetails>
+                Explore all environments details
+              </E.EnvironmentDetailsLink>
+            </E.EnvironmentDetails>
           )}
         </T.ResultListContainer>
       )}
@@ -117,6 +121,6 @@ export const EnvironmentCard = ({
           <Typography.Text disabled>No Variables</Typography.Text>
         </T.EmptyStateContainer>
       )}
-    </T.TestCard>
+    </E.EnvironmentCard>
   );
 };

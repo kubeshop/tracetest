@@ -1,8 +1,8 @@
 import {MoreOutlined} from '@ant-design/icons';
 import {Button, Space, Typography} from 'antd';
-import styled from 'styled-components';
 
 import emptyStateIcon from 'assets/SpanAssertionsEmptyState.svg';
+import styled from 'styled-components';
 
 export const ActionButton = styled(MoreOutlined)`
   color: ${({theme}) => theme.color.textSecondary};

@@ -2,12 +2,12 @@ import {Form, Modal} from 'antd';
 import {Dispatch, SetStateAction, useCallback, useState} from 'react';
 import styled from 'styled-components';
 import SearchInput from '../../components/SearchInput';
-import {IEnvironment} from '../../redux/apis/TraceTest.api';
 import {EnvironmentForm} from './EnvironmentForm';
 import {EnvironmentState} from './EnvironmentState';
 import EnvList from './EnvList';
 import * as S from './Envs.styled';
 import EnvsActions from './EnvsActions';
+import {IEnvironment} from './IEnvironment';
 
 const CustomModal = styled(Modal)`
   && {

@@ -10,8 +10,15 @@ import {TAssertion, TAssertionResults, TRawAssertionResults} from 'types/Asserti
 import {TRawTest, TTest} from 'types/Test.types';
 import {TRawTestRun, TTestRun} from 'types/TestRun.types';
 import {TRawTestSpecs} from 'types/TestSpecs.types';
+<<<<<<< HEAD
 import { IKeyValue } from "../../constants/Test.constants";
 import {SortBy, SortDirection} from 'constants/Test.constants';
+=======
+import {IKeyValue} from '../../constants/Test.constants';
+import Environment from '../../models/__mocks__/Environment.mock';
+import KeyValueMock from '../../models/__mocks__/KeyValue.mock';
+import {IEnvironment} from '../../pages/Environments/IEnvironment';
+>>>>>>> 1d86eecb19ac (address Oscar comments)
 
 const PATH = `${document.baseURI}api/`;
 
@@ -55,32 +62,31 @@ const TraceTestAPI = createApi({
       query: ({take = 25, skip = 0, query = ''}) => `/tests?take=${take}&skip=${skip}&query=${query}`,
       providesTags: () => [{type: Tags.ENVIRONMENT, id: 'LIST'}],
       transformResponse: () => [
-        {
-          id: '9f967918-ce05-4c6c-a2e7-93096be9aa97',
-          name: 'Production',
-          description: 'Production environment',
-          variables: [],
-        },
-        {
+        Environment.model({name: 'Production', description: 'Production environment'}),
+        Environment.model({
           id: 'ae7162b3-54e0-4603-9d33-423b12cf67c8',
           name: 'Development',
           description: 'Developing environment',
-          variables: [],
-        },
+        }),
       ],
     }),
+<<<<<<< HEAD
     getEnvironmentSecretList: build.query<
       IKeyValue[],
       {environmentId: string; take?: number; skip?: number}
     >({
       query: ({environmentId, take = 25, skip = 0}) => `/tests/${environmentId}/run?take=${take}&skip=${skip}`,
+=======
+    getEnvironmentSecretList: build.query<IKeyValue[], {environmentId: string; take?: number; skip?: number}>({
+      query: ({take = 25, skip = 0}) => `/tests?take=${take}&skip=${skip}`,
+>>>>>>> 1d86eecb19ac (address Oscar comments)
       providesTags: (result, error, {environmentId}) => [{type: Tags.ENVIRONMENT, id: `${environmentId}-LIST`}],
       transformResponse: (raw, meta, args) => {
         return args.environmentId === 'ae7162b3-54e0-4603-9d33-423b12cf67c8'
-          ? [{key: 'token', value: '09edsfuids0fds9f'}]
+          ? [KeyValueMock.model()]
           : [
-              {key: 'user', value: 'testAdmin'},
-              {key: 'password', value: '1234'},
+              KeyValueMock.model({key: 'user', value: 'testAdmin'}),
+              KeyValueMock.model({key: 'password', value: '1234'}),
             ];
       },
     }),

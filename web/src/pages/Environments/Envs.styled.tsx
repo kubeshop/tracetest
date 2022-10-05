@@ -68,3 +68,39 @@ export const VariablesContainer = styled.div`
   gap: 16px;
   padding: 12px;
 `;
+
+export const NameText = styled(Typography.Title).attrs({ellipsis: true, level: 3})`
+  && {
+    margin: 0;
+  }
+`;
+
+export const EnvironmentCard = styled.div<{$isCollapsed: boolean}>`
+  box-shadow: 0 4px 8px rgba(153, 155, 168, 0.1);
+  background: ${({theme}) => theme.color.white};
+  border-left: ${({$isCollapsed, theme}) => $isCollapsed && `2px solid ${theme.color.primary}`};
+  border-radius: 2px;
+`;
+
+export const InfoContainer = styled.div`
+  cursor: pointer;
+  display: grid;
+  align-items: center;
+  grid-template-columns: 20px 1fr 60px 2fr 220px 100px 20px;
+  gap: 24px;
+  padding: 16px 24px;
+`;
+
+export const EnvironmentDetails = styled.div`
+  text-align: right;
+  width: 100%;
+  margin-top: 8px;
+`;
+
+export const EnvironmentDetailsLink = styled(Button).attrs({
+  type: 'link',
+})`
+  color: ${({theme}) => theme.color.primary};
+  font-weight: 600;
+  padding: 0;
+`;

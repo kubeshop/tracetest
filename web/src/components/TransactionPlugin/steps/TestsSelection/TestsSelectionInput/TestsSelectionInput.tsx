@@ -1,15 +1,15 @@
-import {useState, useCallback} from 'react';
-import {DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors} from '@dnd-kit/core';
+import {closestCenter, DndContext, KeyboardSensor, PointerSensor, useSensor, useSensors} from '@dnd-kit/core';
 import {arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy} from '@dnd-kit/sortable';
 import {Col, Row, Select} from 'antd';
 import {noop} from 'lodash';
+import {useCallback, useState} from 'react';
 import {TTest} from 'types/Test.types';
 import TestItemList from './TestItemList';
 
 interface IProps {
-  onChange?(tests: string[]): void;
   value?: string[];
   testList: TTest[];
+  onChange?(tests: string[]): void;
 }
 
 const TestsSelectionInput = ({value = [], onChange = noop, testList}: IProps) => {
@@ -37,7 +37,7 @@ const TestsSelectionInput = ({value = [], onChange = noop, testList}: IProps) =>
         const updatedList = arrayMove(selectedTestList, oldIndex, newIndex);
 
         setSelectedTestList(updatedList);
-        onChange(updatedList.map(test => test.id));
+        onChange(updatedList.map((test: any) => test.id));
       }
     },
     [onChange, selectedTestList]

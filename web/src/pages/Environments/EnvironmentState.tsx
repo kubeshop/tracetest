@@ -1,4 +1,4 @@
-import {IEnvironment} from '../../redux/apis/TraceTest.api';
+import {IEnvironment} from './IEnvironment';
 
 export interface EnvironmentState {
   environment?: IEnvironment;

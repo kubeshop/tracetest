@@ -1,11 +1,11 @@
 import {useCallback, useState} from 'react';
 import SearchInput from '../../components/SearchInput';
-import {IEnvironment} from '../../redux/apis/TraceTest.api';
 import EnvironmentActions from './EnvironmentActions';
 import {EnvironmentState} from './EnvironmentState';
 import EnvironmentList from './EnvList';
 import * as S from './Envs.styled';
 import {EnvsModal} from './EnvsModal';
+import {IEnvironment} from './IEnvironment';
 
 const EnvironmentContent: React.FC = () => {
   const [state, setState] = useState<EnvironmentState>({query: '', dialog: false, environment: undefined});

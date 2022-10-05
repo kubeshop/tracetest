@@ -1,9 +1,9 @@
-export interface Header {
+export interface IKeyValue {
   value: string;
   key: string;
 }
 
-export const DEFAULT_HEADERS: Header[] = [{key: 'Content-Type', value: 'application/json'}];
+export const DEFAULT_HEADERS: IKeyValue[] = [{key: 'Content-Type', value: 'application/json'}];
 
 export enum TriggerTypes {
   http = 'http',

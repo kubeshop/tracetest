@@ -11,7 +11,7 @@ type TEnvironmentsAnalytics = {
   onEnvironmentClick(environmentId: string): void;
 };
 
-const HomeAnalyticsService = (): TEnvironmentsAnalytics => {
+const EnvironmentsAnalyticsService = (): TEnvironmentsAnalytics => {
   return {
     onCreateEnvironmentClick: () => {
       AnalyticsService.event(Categories.Environments, Actions.CreateEnvironmentClick, Labels.Button);
@@ -22,4 +22,4 @@ const HomeAnalyticsService = (): TEnvironmentsAnalytics => {
   };
 };
 
-export default HomeAnalyticsService();
+export default EnvironmentsAnalyticsService();

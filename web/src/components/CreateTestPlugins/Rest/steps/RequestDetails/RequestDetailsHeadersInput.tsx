@@ -1,26 +1,22 @@
 import {PlusOutlined} from '@ant-design/icons';
 import {Button, Form, Input} from 'antd';
-import {DEFAULT_HEADERS, Header} from 'constants/Test.constants';
+import {DEFAULT_HEADERS, IKeyValue} from 'constants/Test.constants';
 import React from 'react';
 import * as S from './RequestDetails.styled';
 
 interface IProps {
-  initialValue?: Header[];
+  initialValue?: IKeyValue[];
   name?: string;
   unit?: string;
-  addLabel?: string;
+  label?: string;
 }
 const RequestDetailsHeadersInput: React.FC<IProps> = ({
   unit = 'Header',
   name = 'headers',
   initialValue = DEFAULT_HEADERS,
-  addLabel = 'Add Header',
+  label = 'Header',
 }) => (
-  <Form.Item
-    className="input-headers"
-    label={`${name?.replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())} list`}
-    shouldUpdate
-  >
+  <Form.Item className="input-headers" label={`${label} list`} shouldUpdate>
     <Form.List name={name} initialValue={initialValue}>
       {(fields, {add, remove}) => (
         <>
@@ -52,7 +48,7 @@ const RequestDetailsHeadersInput: React.FC<IProps> = ({
             style={{fontWeight: 600, height: 'auto', padding: 0}}
             type="link"
           >
-            {addLabel}
+            {`Add ${label}`}
           </Button>
         </>
       )}

@@ -2,12 +2,9 @@ import {Button, Form, FormInstance, Input} from 'antd';
 import {useEffect} from 'react';
 import styled from 'styled-components';
 import RequestDetailsHeadersInput from '../../components/CreateTestPlugins/Rest/steps/RequestDetails/RequestDetailsHeadersInput';
-import {
-  IEnvironment,
-  useCreateEnvironmentMutation,
-  useLazyGetEnvironmentSecretListQuery,
-} from '../../redux/apis/TraceTest.api';
+import {useCreateEnvironmentMutation, useLazyGetEnvironmentSecretListQuery} from '../../redux/apis/TraceTest.api';
 import {EnvironmentState} from './EnvironmentState';
+import {IEnvironment} from './IEnvironment';
 
 export const Footer = styled.div`
   display: flex;
@@ -51,7 +48,7 @@ export const EnvironmentForm: React.FC<IProps> = ({state, form, onCancel}) => {
       >
         <Input />
       </Form.Item>
-      <RequestDetailsHeadersInput name="variables" unit="Key" initialValue={undefined} addLabel="Add Entry" />
+      <RequestDetailsHeadersInput name="variables" unit="Key" initialValue={undefined} label="Entry" />
       <Footer>
         <Button style={{marginRight: 16}} data-cy="create-test-cancel" type="primary" ghost onClick={onCancel}>
           Cancel
