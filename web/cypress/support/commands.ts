@@ -99,7 +99,7 @@ Cypress.Commands.add('goToTestDetailPageAndRunTest', (pathname: string) => {
   cy.visit(`/test/${testId}`);
   cy.get('[data-cy^=run-card]', {timeout: 10000}).first().click();
   cy.makeSureUserIsOnTestDetailPage();
-  cy.makeSureUserIsOnTracePage(false);
+  cy.makeSureUserIsOnTracePage(true);
 });
 
 Cypress.Commands.add('makeSureUserIsOnTestDetailPage', () => {
