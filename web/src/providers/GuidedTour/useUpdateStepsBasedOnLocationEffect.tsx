@@ -9,6 +9,7 @@ import {OnboardingState} from './GuidedTour.provider';
 
 const StepListMap: Record<GuidedTours, Step[]> = {
   [GuidedTours.Home]: HomeStepList,
+  [GuidedTours.Environment]: HomeStepList,
   [GuidedTours.Trace]: TraceStepList,
   [GuidedTours.TestDetails]: TestDetailsStepList,
 };
@@ -17,6 +18,7 @@ const CallbackListMap: Record<
   (setState: Dispatch<SetStateAction<OnboardingState>>) => (data: CallBackProps) => void
 > = {
   [GuidedTours.Home]: () => () => {},
+  [GuidedTours.Environment]: () => () => {},
   [GuidedTours.Trace]: (setState: Dispatch<SetStateAction<OnboardingState>>) => (data: CallBackProps) => {
     const {action, index, type} = data;
     if (type === 'tour:end' || action === 'close') {
