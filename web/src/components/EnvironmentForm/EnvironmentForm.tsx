@@ -1,40 +1,37 @@
 import {Button, Form, FormInstance, Input} from 'antd';
-import {useEffect} from 'react';
-import styled from 'styled-components';
-import RequestDetailsHeadersInput from '../../components/CreateTestPlugins/Rest/steps/RequestDetails/RequestDetailsHeadersInput';
+import RequestDetailsHeadersInput from 'components/CreateTestPlugins/Rest/steps/RequestDetails/RequestDetailsHeadersInput';
+import {useEffect, useMemo} from 'react';
+import {IEnvironment} from '../../pages/Environments/IEnvironment';
 import {useCreateEnvironmentMutation, useLazyGetEnvironmentSecretListQuery} from '../../redux/apis/TraceTest.api';
-import {EnvironmentState} from './EnvironmentState';
-import {IEnvironment} from './IEnvironment';
-
-export const Footer = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-`;
+import {Footer} from './EnvironmentForm.styled';
 
 interface IProps {
   form: FormInstance<IEnvironment>;
-  state: EnvironmentState;
+  environment?: IEnvironment;
   onCancel: () => void;
 }
 
-export const EnvironmentForm: React.FC<IProps> = ({state, form, onCancel}) => {
+const EnvironmentForm: React.FC<IProps> = ({environment, form, onCancel}) => {
   const [createEnvironment] = useCreateEnvironmentMutation();
   const [loadResultList, {data}] = useLazyGetEnvironmentSecretListQuery();
+  const isDisabled = useMemo(
+    () => !form.isFieldsTouched(true) || form.getFieldsError().filter(({errors}: any) => errors.length).length > 0,
+    [form]
+  );
   useEffect(() => {
-    if (state.environment) loadResultList({environmentId: state.environment?.id || ''});
-  }, [loadResultList, state.environment]);
+    if (environment) loadResultList({environmentId: environment?.id || ''});
+  }, [loadResultList, environment]);
   useEffect(() => form.setFieldsValue({variables: data || []}), [form, data]);
   useEffect(() => {
-    form.setFieldsValue({name: state.environment?.name, description: state.environment?.description});
-  }, [form, state.environment?.name, state.environment?.description]);
+    form.setFieldsValue({name: environment?.name, description: environment?.description});
+  }, [form, environment?.name, environment?.description]);
   return (
     <Form<IEnvironment>
       name="basic"
       layout="vertical"
       form={form}
       onFinish={s => {
-        createEnvironment({...s});
+        createEnvironment(s);
         onCancel();
       }}
     >
@@ -54,19 +51,13 @@ export const EnvironmentForm: React.FC<IProps> = ({state, form, onCancel}) => {
           Cancel
         </Button>
         <Form.Item shouldUpdate className="submit">
-          {() => (
-            <Button
-              type="primary"
-              htmlType="submit"
-              disabled={
-                !form.isFieldsTouched(true) || form.getFieldsError().filter(({errors}: any) => errors.length).length > 0
-              }
-            >
-              Log in
-            </Button>
-          )}
+          <Button type="primary" htmlType="submit" disabled={isDisabled}>
+            Create
+          </Button>
         </Form.Item>
       </Footer>
     </Form>
   );
 };
+
+export default EnvironmentForm;

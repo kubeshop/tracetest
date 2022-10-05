@@ -1,20 +1,21 @@
+import {Dispatch, SetStateAction} from 'react';
 import EnvironmentsAnalytics from 'services/Analytics/EnvironmentsAnalytics.service';
-import * as S from './Envs.styled';
+import * as S from './Environment.styled';
 
 const {onCreateEnvironmentClick} = EnvironmentsAnalytics;
 
 interface IProps {
-  openDialog: () => void;
+  setIsFormOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-const EnvironmentActions = ({openDialog}: IProps): React.ReactElement => {
+const EnvironmentActions = ({setIsFormOpen}: IProps): React.ReactElement => {
   return (
     <S.ActionContainer>
       <S.CreateEnvironmentButton
         data-cy="create-test-button"
         type="primary"
         onClick={() => {
-          openDialog();
+          setIsFormOpen(true);
           onCreateEnvironmentClick();
         }}
       >

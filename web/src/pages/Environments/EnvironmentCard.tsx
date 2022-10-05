@@ -1,21 +1,21 @@
 import {DownOutlined, RightOutlined} from '@ant-design/icons';
 import {Dropdown, Menu, Typography} from 'antd';
-import {useCallback, useState} from 'react';
+import {Dispatch, SetStateAction, useCallback, useState} from 'react';
 import {useLazyGetEnvironmentSecretListQuery} from 'redux/apis/TraceTest.api';
 import * as T from '../../components/TestCard/TestCard.styled';
 import EnvironmentsAnalytics from '../../services/Analytics/EnvironmentsAnalytics.service';
-import * as E from './Envs.styled';
+import * as E from './Environment.styled';
 import {IEnvironment} from './IEnvironment';
 
 interface IProps {
-  openDialog: (mode: boolean) => void;
+  setIsFormOpen: Dispatch<SetStateAction<boolean>>;
   environment: IEnvironment;
-  setEnvironment: (mode: IEnvironment) => void;
+  setEnvironment: Dispatch<SetStateAction<IEnvironment | undefined>>;
 }
 
 export const EnvironmentCard = ({
+  setIsFormOpen,
   setEnvironment,
-  openDialog,
   environment: {name, id, description},
 }: IProps): React.ReactElement => {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -62,7 +62,7 @@ export const EnvironmentCard = ({
                   onClick: e => {
                     e.domEvent.stopPropagation();
                     setEnvironment({id, name, description, variables: []});
-                    openDialog(true);
+                    setIsFormOpen(true);
                   },
                 },
               ]}

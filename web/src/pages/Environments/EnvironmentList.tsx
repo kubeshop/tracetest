@@ -1,19 +1,20 @@
+import {Dispatch, SetStateAction} from 'react';
 import Pagination from '../../components/Pagination';
 import usePagination from '../../hooks/usePagination';
 import {useGetEnvListQuery} from '../../redux/apis/TraceTest.api';
 import Loading from '../Home/Loading';
 import NoResults from '../Home/NoResults';
+import * as S from './Environment.styled';
 import {EnvironmentCard} from './EnvironmentCard';
-import * as S from './Envs.styled';
 import {IEnvironment} from './IEnvironment';
 
 interface IProps {
   query: string;
-  openDialog: (mode: boolean) => void;
-  setEnvironment: (mode: IEnvironment) => void;
+  setIsFormOpen: Dispatch<SetStateAction<boolean>>;
+  setEnvironment: Dispatch<SetStateAction<IEnvironment | undefined>>;
 }
 
-const EnvList = ({query, openDialog, setEnvironment}: IProps) => {
+const EnvironmentList = ({query, setEnvironment, setIsFormOpen}: IProps) => {
   const {hasNext, hasPrev, isEmpty, isFetching, isLoading, list, loadNext, loadPrev} = usePagination<
     IEnvironment,
     {query: string}
@@ -35,7 +36,7 @@ const EnvList = ({query, openDialog, setEnvironment}: IProps) => {
           <EnvironmentCard
             key={environment.name}
             environment={environment}
-            openDialog={openDialog}
+            setIsFormOpen={setIsFormOpen}
             setEnvironment={setEnvironment}
           />
         ))}
@@ -44,4 +45,4 @@ const EnvList = ({query, openDialog, setEnvironment}: IProps) => {
   );
 };
 
-export default EnvList;
+export default EnvironmentList;

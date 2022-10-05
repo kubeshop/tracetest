@@ -1,6 +1,5 @@
 import {Button, Typography} from 'antd';
 import styled from 'styled-components';
-import noResultsIcon from '../../assets/HomeNoResults.svg';
 
 export const CreateEnvironmentButton = styled(Button)``;
 
@@ -28,22 +27,6 @@ export const ActionContainer = styled.div`
   align-items: center;
   justify-content: center;
   gap: 8px;
-`;
-
-export const NoResultsContainer = styled.div`
-  height: 600px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-`;
-
-export const NoResultsIcon = styled.img.attrs({
-  src: noResultsIcon,
-})``;
-
-export const NoResultsTitle = styled(Typography.Title)`
-  margin-top: 32px;
 `;
 
 export const TestListContainer = styled.div`

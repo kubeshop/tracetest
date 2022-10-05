@@ -1,8 +1,8 @@
 import Layout from 'components/Layout';
-import EnvironmentContent from './EnvironmentContent';
 import withAnalytics from '../../components/WithAnalytics/WithAnalytics';
+import EnvironmentContent from './EnvironmentContent';
 
-const Envs = (): JSX.Element => {
+const Environment = (): JSX.Element => {
   return (
     <Layout hasMenu>
       <EnvironmentContent />
@@ -10,4 +10,4 @@ const Envs = (): JSX.Element => {
   );
 };
 
-export default withAnalytics(Envs, 'environments');
+export default withAnalytics(Environment, 'environments');
