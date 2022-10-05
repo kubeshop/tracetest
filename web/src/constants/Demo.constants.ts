@@ -106,25 +106,17 @@ export const PokeshopDemo = {
     {
       name: 'Pokeshop - List',
       description: 'Get a Pokemon',
-      command: `curl -XGET '${PokeshopHttp}/pokemon?take=20&skip=0'
- -H "Content-type: application/json"
-`,
+      command: `curl -XGET -H "Content-type: application/json" '${PokeshopHttp}/pokemon?take=20&skip=0'`,
     },
     {
       name: 'Pokeshop - Add',
       description: 'Add a Pokemon',
-      command: `curl -XPOST '${PokeshopHttp}/pokemon'
- -H "Content-type: application/json"
- --data '{"name":"meowth","type":"normal","imageUrl":"https://assets.pokemon.com/assets/cms2/img/pokedex/full/052.png","isFeatured":true}'
-`,
+      command: `curl -XPOST -H "Content-type: application/json" --data '{"name":"meowth","type":"normal","imageUrl":"https://assets.pokemon.com/assets/cms2/img/pokedex/full/052.png","isFeatured":true}' '${PokeshopHttp}/pokemon'`,
     },
     {
       name: 'Pokeshop - Import',
       description: 'Import a Pokemon',
-      command: `curl -XPOST '${PokeshopHttp}/pokemon/import'
- -H "Content-type: application/json"
- --data '{"id":52}'
-`,
+      command: `curl -XPOST -H "Content-type: application/json" --data '{"id":52}' '${PokeshopHttp}/pokemon/import'`,
     },
   ],
 };
