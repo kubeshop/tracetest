@@ -95,7 +95,9 @@ func TestSpec(t *testing.T) {
 
 		spec := generateSpec()
 
-		expected := []model.Assertion{{"1", comparator.Eq, createExpressionFromNumber("1")}}
+		expected := model.NamedAssertions{
+			Assertions: []model.Assertion{{"1", comparator.Eq, createExpressionFromNumber("1")}},
+		}
 		actual := spec.Get(model.SpanQuery("1"))
 
 		assert.Equal(t, expected, actual)
@@ -111,7 +113,7 @@ func TestSpec(t *testing.T) {
 		encoded, err := json.Marshal(spec)
 		require.NoError(t, err)
 
-		decoded := model.OrderedMap[model.SpanQuery, []model.Assertion]{}
+		decoded := model.OrderedMap[model.SpanQuery, model.NamedAssertions]{}
 		err = json.Unmarshal(encoded, &decoded)
 		require.NoError(t, err)
 
