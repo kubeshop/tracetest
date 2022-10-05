@@ -50,6 +50,7 @@ func (t TestTrigger) Validate() error {
 }
 
 type TestSpec struct {
+	Name       string   `yaml:"name" json:"name"`
 	Selector   string   `yaml:"selector" json:"selector"`
 	Assertions []string `yaml:"assertions" json:"assertions"`
 }

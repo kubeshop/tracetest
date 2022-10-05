@@ -119,6 +119,7 @@ func convertTestSpecIntoOpenAPIObject(testSpec []definition.TestSpec) (openapi.T
 		}
 
 		definitions = append(definitions, openapi.TestSpecsSpecs{
+			Name: &testSpec.Name,
 			Selector: openapi.Selector{
 				Query: testSpec.Selector,
 			},
