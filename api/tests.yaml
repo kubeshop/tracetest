@@ -52,6 +52,9 @@ components:
           items:
             type: object
             properties:
+              name:
+                type: string
+                nullable: true
               selector:
                 $ref: "#/components/schemas/Selector"
               assertions:

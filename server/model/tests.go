@@ -18,8 +18,13 @@ type (
 		Description      string
 		Version          int
 		ServiceUnderTest Trigger
-		Specs            OrderedMap[SpanQuery, []Assertion]
+		Specs            OrderedMap[SpanQuery, NamedAssertions]
 		Summary          Summary
+	}
+
+	NamedAssertions struct {
+		Name       string
+		Assertions []Assertion
 	}
 
 	Summary struct {

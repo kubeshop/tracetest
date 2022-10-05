@@ -10,13 +10,13 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-func Assert(defs model.OrderedMap[model.SpanQuery, []model.Assertion], trace traces.Trace) (model.OrderedMap[model.SpanQuery, []model.AssertionResult], bool) {
+func Assert(defs model.OrderedMap[model.SpanQuery, model.NamedAssertions], trace traces.Trace) (model.OrderedMap[model.SpanQuery, []model.AssertionResult], bool) {
 	testResult := model.OrderedMap[model.SpanQuery, []model.AssertionResult]{}
 	allPassed := true
-	defs.Map(func(spanQuery model.SpanQuery, asserts []model.Assertion) {
+	defs.Map(func(spanQuery model.SpanQuery, asserts model.NamedAssertions) {
 		spans := selector(spanQuery).Filter(trace)
 		assertionResults := make([]model.AssertionResult, 0)
-		for _, assertion := range asserts {
+		for _, assertion := range asserts.Assertions {
 			res := assert(assertion, spans)
 			if !res.AllPassed {
 				allPassed = false

@@ -17,7 +17,7 @@ func BumpTestVersionIfNeeded(in, updated Test) (Test, error) {
 	return updated, nil
 }
 
-func BumpVersionIfDefinitionChanged(test Test, newDef OrderedMap[SpanQuery, []Assertion]) (Test, error) {
+func BumpVersionIfDefinitionChanged(test Test, newDef OrderedMap[SpanQuery, NamedAssertions]) (Test, error) {
 	definitionHasChanged, err := testFieldHasChanged(test.Specs, newDef)
 	if err != nil {
 		return test, err

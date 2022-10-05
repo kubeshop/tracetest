@@ -11,12 +11,12 @@ import (
 )
 
 type AssertionExecutor interface {
-	Assert(context.Context, model.OrderedMap[model.SpanQuery, []model.Assertion], traces.Trace) (model.OrderedMap[model.SpanQuery, []model.AssertionResult], bool)
+	Assert(context.Context, model.OrderedMap[model.SpanQuery, model.NamedAssertions], traces.Trace) (model.OrderedMap[model.SpanQuery, []model.AssertionResult], bool)
 }
 
 type defaultAssertionExecutor struct{}
 
-func (e defaultAssertionExecutor) Assert(ctx context.Context, defs model.OrderedMap[model.SpanQuery, []model.Assertion], trace traces.Trace) (model.OrderedMap[model.SpanQuery, []model.AssertionResult], bool) {
+func (e defaultAssertionExecutor) Assert(ctx context.Context, defs model.OrderedMap[model.SpanQuery, model.NamedAssertions], trace traces.Trace) (model.OrderedMap[model.SpanQuery, []model.AssertionResult], bool) {
 	return assertions.Assert(defs, trace)
 }
 
@@ -25,7 +25,7 @@ type instrumentedAssertionExecutor struct {
 	tracer            trace.Tracer
 }
 
-func (e instrumentedAssertionExecutor) Assert(ctx context.Context, defs model.OrderedMap[model.SpanQuery, []model.Assertion], trace traces.Trace) (model.OrderedMap[model.SpanQuery, []model.AssertionResult], bool) {
+func (e instrumentedAssertionExecutor) Assert(ctx context.Context, defs model.OrderedMap[model.SpanQuery, model.NamedAssertions], trace traces.Trace) (model.OrderedMap[model.SpanQuery, []model.AssertionResult], bool) {
 	ctx, span := e.tracer.Start(ctx, "Execute assertions")
 	defer span.End()
 
