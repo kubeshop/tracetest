@@ -23,7 +23,7 @@ const BasicDetailsForm = ({onSelectDemo = noop, selectedDemo, isEditing = false,
       {!isEditing && Boolean(demoList.length) && isDemoEnabled && (
         <BasicDetailsDemoHelper selectedDemo={selectedDemo} onSelectDemo={onSelectDemo} demoList={demoList} />
       )}
-      <S.InputContainer $isEditing={isEditing}>
+      <S.InputContainer>
         <Form.Item
           className="input-name"
           data-cy="create-test-name-input"

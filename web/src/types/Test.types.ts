@@ -86,7 +86,6 @@ export interface IHttpValues {
   auth: TRequestAuth;
   headers: THTTPRequest['headers'];
   method: HTTP_METHOD;
-  name: string;
   url: string;
 }
 
@@ -103,13 +102,17 @@ export interface IPostmanValues extends IHttpValues {
   variables: VariableDefinition[];
 }
 
+export interface ICurlValues extends IHttpValues {
+  command: string;
+}
+
 export interface IBasicValues {
   name: string;
   description: string;
   testSuite: string;
 }
 
-export type TTestRequestDetailsValues = IRpcValues | IHttpValues | IPostmanValues;
+export type TTestRequestDetailsValues = IRpcValues | IHttpValues | IPostmanValues | ICurlValues;
 export type TDraftTest<T = TTestRequestDetailsValues> = Partial<IBasicValues & T>;
 export type TDraftTestForm<T = TTestRequestDetailsValues> = FormInstance<TDraftTest<T>>;
 

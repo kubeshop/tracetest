@@ -10,12 +10,11 @@ export const FORM_ID = 'create-test';
 
 interface IProps {
   form: TDraftTestForm<IHttpValues>;
-  isEditing?: boolean;
 }
 
-const RequestDetailsForm = ({form, isEditing = false}: IProps) => {
+const RequestDetailsForm = ({form}: IProps) => {
   return (
-    <S.InputContainer $isEditing={isEditing}>
+    <S.InputContainer>
       <RequestDetailsUrlInput />
       <RequestDetailsAuthInput form={form} />
       <RequestDetailsHeadersInput />

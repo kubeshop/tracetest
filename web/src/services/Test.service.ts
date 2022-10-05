@@ -6,6 +6,7 @@ import Validator from '../utils/Validator';
 import GrpcService from './Triggers/Grpc.service';
 import HttpService from './Triggers/Http.service';
 import PostmanService from './Triggers/Postman.service';
+import CurlService from './Triggers/Curl.service';
 import {TriggerTypes} from '../constants/Test.constants';
 
 const authValidation = ({auth}: TDraftTest): boolean => {
@@ -31,6 +32,7 @@ const TriggerServiceMap = {
   [SupportedPlugins.Messaging]: HttpService,
   [SupportedPlugins.OpenAPI]: HttpService,
   [SupportedPlugins.Postman]: PostmanService,
+  [SupportedPlugins.CURL]: CurlService,
 } as const;
 
 const TriggerServiceByTypeMap = {
