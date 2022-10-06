@@ -1,11 +1,13 @@
 import {Button} from 'antd';
+import {Steps} from 'components/GuidedTour/traceStepList';
 import RunActionsMenu from 'components/RunActionsMenu';
 import TestActions from 'components/TestActions';
 import TestState from 'components/TestState';
 import {TestState as TestStateEnum} from 'constants/TestRun.constants';
-import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
-import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import {useTest} from 'providers/Test/Test.provider';
+import {useTestRun} from 'providers/TestRun/TestRun.provider';
+import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
+import GuidedTourService, {GuidedTours} from '../../services/GuidedTour.service';
 import * as S from './RunDetailLayout.styled';
 
 interface IProps {
@@ -29,7 +31,13 @@ const HeaderRight = ({testId, testVersion}: IProps) => {
         </S.StateContainer>
       )}
       {!isDraftMode && state && state === TestStateEnum.FINISHED && (
-        <Button data-cy="run-test-button" ghost onClick={onRun} type="primary">
+        <Button
+          data-tour={GuidedTourService.getStep(GuidedTours.Trace, Steps.RunButton)}
+          data-cy="run-test-button"
+          ghost
+          onClick={onRun}
+          type="primary"
+        >
           Run Test
         </Button>
       )}

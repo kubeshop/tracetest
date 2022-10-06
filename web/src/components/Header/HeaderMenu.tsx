@@ -1,18 +1,41 @@
 import {Popover, Typography} from 'antd';
 
 import {DOCUMENTATION_URL, GITHUB_URL} from 'constants/Common.constants';
-import {useLocation} from 'react-router-dom';
+import {useGuidedTour} from 'providers/GuidedTour/GuidedTour.provider';
+import {useMemo} from 'react';
+import {useLocation, useParams} from 'react-router-dom';
+import HomeAnalyticsService from 'services/Analytics/HomeAnalytics.service';
+import {switchTraceMode} from '../GuidedTour/traceStepList';
 import * as S from './Header.styled';
+import {ShowOnboardingContent} from './ShowOnboardingContent';
+
+const {onGuidedTourClick} = HomeAnalyticsService;
 
 const HeaderMenu = () => {
   const {pathname} = useLocation();
+  const params = useParams();
+  const {setState, state} = useGuidedTour();
+
+  const content = useMemo(
+    () =>
+      ShowOnboardingContent(
+        onGuidedTourClick,
+        () => {
+          switchTraceMode(0);
+          setState(st => ({...st, tourActive: true, run: true}));
+        },
+        () => setState(st => ({...st, dialog: false}))
+      ),
+    [setState]
+  );
 
   return (
     <Popover
       arrowContent={null}
-      content={() => null}
+      content={content}
       title={() => <Typography.Title level={2}>Take a quick tour of Tracetest?</Typography.Title>}
-      visible={false}
+      visible={state.dialog}
+      trigger={['click']}
     >
       <S.NavMenu
         selectedKeys={[pathname]}
@@ -39,9 +62,9 @@ const HeaderMenu = () => {
               },
               {
                 key: 'Onboarding',
-                disabled: true,
+                disabled: !params.runId,
                 label: (
-                  <a key="guidedTour" aria-disabled>
+                  <a key="guidedTour" onClick={() => setState(st => ({...st, dialog: !st.dialog}))}>
                     Show Onboarding
                   </a>
                 ),

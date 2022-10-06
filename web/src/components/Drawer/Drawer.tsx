@@ -4,6 +4,8 @@ import {noop} from 'lodash';
 import {createContext, ReactNode, useCallback, useContext, useMemo, useState} from 'react';
 import {HandlerProps, ReflexContainer, ReflexElement, ReflexSplitter} from 'react-reflex';
 import TestRunAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
+import {Steps} from 'components/GuidedTour/traceStepList';
+import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
 
 import * as S from './Drawer.styled';
 
@@ -65,6 +67,7 @@ const Drawer = ({leftPanel, rightPanel}: IProps) => {
         <ReflexSplitter>
           <S.ButtonContainer>
             <Button
+              data-tour={GuidedTourService.getStep(GuidedTours.Trace, Steps.SpanDetails)}
               icon={isOpen ? <DoubleLeftOutlined /> : <DoubleRightOutlined />}
               onClick={event => {
                 event.stopPropagation();
