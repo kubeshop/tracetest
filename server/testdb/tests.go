@@ -191,7 +191,7 @@ func (td *postgresDB) GetLatestTestVersion(ctx context.Context, id id.ID) (model
 	return test, nil
 }
 
-func (td *postgresDB) GetTests(ctx context.Context, take, skip int32, query string) ([]model.Test, error) {
+func (td *postgresDB) GetTests(ctx context.Context, take, skip int32, query string, sortBy string, sortDirection string) ([]model.Test, error) {
 	hasSearchQuery := query != ""
 	params := []any{take, skip}
 
@@ -200,6 +200,7 @@ func (td *postgresDB) GetTests(ctx context.Context, take, skip int32, query stri
 		SELECT id as idx, max(version) as latest_version FROM tests GROUP BY idx
 	) as latest_tests ON latest_tests.idx = t.id
 	WHERE t.version = latest_tests.latest_version `
+
 	if hasSearchQuery {
 		params = append(params, "%"+strings.ReplaceAll(query, " ", "%")+"%")
 		sql += ` AND (
@@ -208,7 +209,28 @@ func (td *postgresDB) GetTests(ctx context.Context, take, skip int32, query stri
 		)`
 	}
 
-	sql += ` ORDER BY t.created_at DESC LIMIT $1 OFFSET $2`
+	sortSQL := " ORDER BY "
+	switch sortBy {
+	default:
+		sortSQL += "t.created_at"
+	case "created":
+		sortSQL += "t.created_at"
+	case "name":
+		sortSQL += "t.name"
+	case "last_run":
+		sortSQL += "last_test_run_time"
+	}
+
+	switch sortDirection {
+	default:
+		sortSQL += " DESC"
+	case "desc":
+		sortSQL += " DESC"
+	case "asc":
+		sortSQL += " ASC"
+	}
+
+	sql += sortSQL + ` LIMIT $1 OFFSET $2`
 
 	stmt, err := td.db.Prepare(sql)
 	if err != nil {

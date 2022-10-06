@@ -9,6 +9,7 @@ import {TAssertion, TAssertionResults, TRawAssertionResults} from 'types/Asserti
 import {TRawTest, TTest} from 'types/Test.types';
 import {TRawTestRun, TTestRun} from 'types/TestRun.types';
 import {TRawTestSpecs} from 'types/TestSpecs.types';
+import {SortBy, SortDirection} from 'constants/Test.constants';
 
 const PATH = `${document.baseURI}api/`;
 
@@ -47,8 +48,12 @@ const TraceTestAPI = createApi({
         {type: Tags.TEST, id: test?.id},
       ],
     }),
-    getTestList: build.query<TTest[], {take?: number; skip?: number; query?: string}>({
-      query: ({take = 25, skip = 0, query = ''}) => `/tests?take=${take}&skip=${skip}&query=${query}`,
+    getTestList: build.query<
+      TTest[],
+      {take?: number; skip?: number; query?: string; sortBy?: SortBy; sortDirection?: SortDirection}
+    >({
+      query: ({take = 25, skip = 0, query = '', sortBy = '', sortDirection = ''}) =>
+        `/tests?take=${take}&skip=${skip}&query=${query}&sortBy=${sortBy}&sortDirection=${sortDirection}`,
       providesTags: () => [{type: Tags.TEST, id: 'LIST'}],
       transformResponse: (rawTestList: TTest[]) => rawTestList.map(rawTest => Test(rawTest)),
     }),

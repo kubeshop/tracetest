@@ -14,7 +14,7 @@ type TestRepository interface {
 	IDExists(context.Context, id.ID) (bool, error)
 	GetLatestTestVersion(context.Context, id.ID) (Test, error)
 	GetTestVersion(_ context.Context, _ id.ID, verson int) (Test, error)
-	GetTests(_ context.Context, take, skip int32, query string) ([]Test, error)
+	GetTests(_ context.Context, take, skip int32, query string, sortBy string, sortDirection string) ([]Test, error)
 }
 
 type RunRepository interface {
