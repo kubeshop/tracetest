@@ -9,6 +9,8 @@ services:
               target: /app/config.yaml
         ports:
             - 11633:11633
+        extra_hosts:
+          - "host.docker.internal:host-gateway"
         depends_on:
             postgres:
                 condition: service_healthy
