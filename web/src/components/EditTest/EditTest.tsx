@@ -8,7 +8,8 @@ import {useCallback, useState} from 'react';
 import {TDraftTest, TTest} from 'types/Test.types';
 import {TestState} from 'constants/TestRun.constants';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
-import GuidedTourService, {GuidedTours} from '../../services/GuidedTour.service';
+import TestRunAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
+import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
 import * as S from './EditTest.styled';
 
 interface IProps {
@@ -25,6 +26,7 @@ const EditTest = ({test}: IProps) => {
 
   const handleOnSubmit = useCallback(
     async (values: TDraftTest) => {
+      TestRunAnalyticsService.onTriggerEditSubmit();
       onEdit(values);
     },
     [onEdit]

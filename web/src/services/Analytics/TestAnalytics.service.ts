@@ -10,39 +10,25 @@ export enum Actions {
   DisplayTestInfo = 'display-test-info-button-hover',
 }
 
-const TestAnalyticsService = () => {
-  const onRunTest = () => {
+const TestAnalyticsService = () => ({
+  onRunTest() {
     AnalyticsService.event(Categories.Test, Actions.RunTest, Labels.Button);
-  };
-
-  const onTestRunClick = () => {
+  },
+  onTestRunClick() {
     AnalyticsService.event(Categories.Test, Actions.TestRunClick, Labels.Button);
-  };
-
-  const onTestCardCollapse = () => {
+  },
+  onTestCardCollapse() {
     AnalyticsService.event(Categories.Home, Actions.TestCardCollapse, Labels.Button);
-  };
-
-  const onDeleteTest = () => {
+  },
+  onDeleteTest() {
     AnalyticsService.event(Categories.Home, Actions.DeleteTest, Labels.Button);
-  };
-
-  const onDeleteTestRun = () => {
+  },
+  onDeleteTestRun() {
     AnalyticsService.event(Categories.Test, Actions.DeleteTestRun, Labels.Button);
-  };
-
-  const onDisplayTestInfo = () => {
-    AnalyticsService.event(Categories.Trace, Actions.DisplayTestInfo, Labels.Button);
-  };
-
-  return {
-    onRunTest,
-    onTestRunClick,
-    onTestCardCollapse,
-    onDeleteTest,
-    onDeleteTestRun,
-    onDisplayTestInfo,
-  };
-};
+  },
+  onDisplayTestInfo() {
+    AnalyticsService.event(Categories.TestRun, Actions.DisplayTestInfo, Labels.Button);
+  },
+});
 
 export default TestAnalyticsService();

@@ -1,7 +1,7 @@
 import {Dropdown, Menu} from 'antd';
 
 import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
-import TraceAnalyticsService from 'services/Analytics/TraceAnalytics.service';
+import TraceAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
 import {IResult} from 'types/Assertion.types';
 import * as S from './AttributeRow.styled';
 

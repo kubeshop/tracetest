@@ -4,21 +4,27 @@ import AnalyticsService from './Analytics.service';
 export enum Actions {
   CreateTestFormSubmit = 'create-test-form-submit',
   DemoTestClick = 'demo-test-click',
+  CreateTestPluginSelected = 'create-test-plugin-selected',
+  CreateTestNextClick = 'create-test-next-click',
+  CreateTestPrevClick = 'create-test-prev-click',
 }
 
-const CreateTestAnalyticsService = () => {
-  const onCreateTestFormSubmit = () => {
+const CreateTestAnalyticsService = () => ({
+  onCreateTestFormSubmit() {
     AnalyticsService.event(Categories.Home, Actions.CreateTestFormSubmit, Labels.Form);
-  };
-
-  const onDemoTestClick = () => {
+  },
+  onDemoTestClick() {
     AnalyticsService.event(Categories.Home, Actions.DemoTestClick, Labels.Button);
-  };
-
-  return {
-    onCreateTestFormSubmit,
-    onDemoTestClick,
-  };
-};
+  },
+  onPluginSelected(pluginName: string) {
+    AnalyticsService.event(Categories.Home, Actions.CreateTestPluginSelected, pluginName);
+  },
+  onNextClick(stepName: string) {
+    AnalyticsService.event(Categories.Home, Actions.CreateTestNextClick, stepName);
+  },
+  onPrevClick(stepName: string) {
+    AnalyticsService.event(Categories.Home, Actions.CreateTestPrevClick, stepName);
+  },
+});
 
 export default CreateTestAnalyticsService();
