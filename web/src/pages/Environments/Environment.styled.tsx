@@ -36,6 +36,24 @@ export const TestListContainer = styled.div`
   margin-bottom: 24px;
 `;
 
+export const HeaderContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 8px;
+`;
+export const VariablesText = styled(Typography)`
+  flex-basis: 50%;
+`;
+export const HeaderText = styled(Typography)`
+  flex-basis: 50%;
+  font-weight: bold;
+  padding-left: 8px;
+`;
+export const HeaderTextRight = styled(Typography)`
+  flex-basis: 50%;
+  font-weight: bold;
+`;
+
 export const VariablesMainContainer = styled.div`
   display: flex;
   flex-direction: column;

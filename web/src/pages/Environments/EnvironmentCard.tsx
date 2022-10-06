@@ -84,30 +84,25 @@ export const EnvironmentCard = ({
       {isCollapsed && Boolean(resultList.length) && (
         <T.ResultListContainer>
           <E.VariablesMainContainer>
-            <div style={{display: 'flex', justifyContent: 'space-between', paddingBottom: 8}}>
-              <Typography style={{flexBasis: '50%', paddingLeft: 8, fontWeight: 'bold'}}>Key</Typography>
-              <Typography style={{flexBasis: '50%', fontWeight: 'bold'}}>Value</Typography>
-            </div>
+            <E.HeaderContainer>
+              <E.HeaderText>Key</E.HeaderText>
+              <E.HeaderTextRight>Value</E.HeaderTextRight>
+            </E.HeaderContainer>
             <E.VariablesContainer>
               {resultList.map(secret => (
                 <div
                   key={secret.key + secret.value}
                   style={{display: 'flex', justifyContent: 'space-between', width: '100%'}}
                 >
-                  <Typography style={{flexBasis: '50%'}}>{secret.key}</Typography>
-                  <Typography style={{flexBasis: '50%'}}>{secret.value}</Typography>
+                  <E.VariablesText>{secret.key}</E.VariablesText>
+                  <E.VariablesText>{secret.value}</E.VariablesText>
                 </div>
               ))}
             </E.VariablesContainer>
           </E.VariablesMainContainer>
           {resultList.length === 5 && (
             <E.EnvironmentDetails>
-              <E.EnvironmentDetailsLink
-                data-cy="environment-details-link"
-                onClick={() => {
-                  // openDialog(environmentId)
-                }}
-              >
+              <E.EnvironmentDetailsLink data-cy="environment-details-link">
                 Explore all environments details
               </E.EnvironmentDetailsLink>
             </E.EnvironmentDetails>
