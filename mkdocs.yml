@@ -42,7 +42,7 @@ nav:
 extra:
   analytics:
     provider: google
-    property: G-175WMKCFBZ
+    property: UA-204665550-9
 
   consent:
     title: Cookie consent
