@@ -81,7 +81,7 @@ func TestGetTests(t *testing.T) {
 	createTestWithName(t, db, "three")
 
 	t.Run("Order", func(t *testing.T) {
-		actual, err := db.GetTests(context.TODO(), 20, 0, "")
+		actual, err := db.GetTests(context.TODO(), 20, 0, "", "", "")
 		require.NoError(t, err)
 		assert.Len(t, actual, 3)
 
@@ -92,14 +92,58 @@ func TestGetTests(t *testing.T) {
 	})
 
 	t.Run("Pagination", func(t *testing.T) {
-		actual, err := db.GetTests(context.TODO(), 20, 10, "")
+		actual, err := db.GetTests(context.TODO(), 20, 10, "", "", "")
 		require.NoError(t, err)
 		assert.Len(t, actual, 0)
 	})
 
+	t.Run("SortByCreated", func(t *testing.T) {
+		actual, err := db.GetTests(context.TODO(), 20, 0, "", "created", "")
+		require.NoError(t, err)
+		assert.Len(t, actual, 3)
+
+		// test order
+		assert.Equal(t, "three", actual[0].Name)
+		assert.Equal(t, "two", actual[1].Name)
+		assert.Equal(t, "one", actual[2].Name)
+	})
+
+	t.Run("SortByLastRun", func(t *testing.T) {
+		actual, err := db.GetTests(context.TODO(), 20, 0, "", "last_run", "")
+		require.NoError(t, err)
+		assert.Len(t, actual, 3)
+
+		// test order
+		assert.Equal(t, "three", actual[0].Name)
+		assert.Equal(t, "two", actual[1].Name)
+		assert.Equal(t, "one", actual[2].Name)
+	})
+
+	t.Run("SortByNameAsc", func(t *testing.T) {
+		actual, err := db.GetTests(context.TODO(), 20, 0, "", "name", "asc")
+		require.NoError(t, err)
+		assert.Len(t, actual, 3)
+
+		// test order
+		assert.Equal(t, "three", actual[0].Name)
+		assert.Equal(t, "two", actual[1].Name)
+		assert.Equal(t, "one", actual[2].Name)
+	})
+
+	t.Run("SortByNameDesc", func(t *testing.T) {
+		actual, err := db.GetTests(context.TODO(), 20, 0, "", "name", "desc")
+		require.NoError(t, err)
+		assert.Len(t, actual, 3)
+
+		// test order
+		assert.Equal(t, "one", actual[0].Name)
+		assert.Equal(t, "two", actual[1].Name)
+		assert.Equal(t, "three", actual[2].Name)
+	})
+
 	t.Run("SearchByName", func(t *testing.T) {
 		_, _ = db.CreateTest(context.TODO(), model.Test{Name: "VerySpecificName"})
-		actual, err := db.GetTests(context.TODO(), 10, 0, "specif")
+		actual, err := db.GetTests(context.TODO(), 10, 0, "specif", "", "")
 		require.NoError(t, err)
 		assert.Len(t, actual, 1)
 
@@ -109,7 +153,7 @@ func TestGetTests(t *testing.T) {
 	t.Run("SearchByDescription", func(t *testing.T) {
 		_, _ = db.CreateTest(context.TODO(), model.Test{Description: "VeryUniqueText"})
 
-		actual, err := db.GetTests(context.TODO(), 10, 0, "nique")
+		actual, err := db.GetTests(context.TODO(), 10, 0, "nique", "", "")
 		require.NoError(t, err)
 		assert.Len(t, actual, 1)
 
@@ -133,7 +177,7 @@ func TestGetTestsWithMultipleVersions(t *testing.T) {
 	_, err = db.UpdateTest(context.TODO(), test2)
 	require.NoError(t, err)
 
-	tests, err := db.GetTests(context.TODO(), 20, 0, "")
+	tests, err := db.GetTests(context.TODO(), 20, 0, "", "", "")
 	assert.NoError(t, err)
 	assert.Len(t, tests, 2)
 
@@ -192,7 +236,7 @@ func TestSummary(t *testing.T) {
 		t1 := time.Date(2022, time.July, 01, 12, 23, 00, 0, time.UTC)
 		createRunWithResult(t, db, test, t1, 2, 0)
 
-		tests, err := db.GetTests(context.TODO(), 20, 0, "")
+		tests, err := db.GetTests(context.TODO(), 20, 0, "", "", "")
 		require.NoError(t, err)
 
 		require.Len(t, tests, 1)
@@ -209,7 +253,7 @@ func TestSummary(t *testing.T) {
 		t2 := time.Date(2022, time.July, 01, 12, 23, 30, 0, time.UTC)
 		createRunWithResult(t, db, test, t2, 1, 1)
 
-		tests, err := db.GetTests(context.TODO(), 20, 0, "")
+		tests, err := db.GetTests(context.TODO(), 20, 0, "", "", "")
 		require.NoError(t, err)
 
 		require.Len(t, tests, 1)
