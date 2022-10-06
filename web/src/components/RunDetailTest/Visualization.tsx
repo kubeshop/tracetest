@@ -11,7 +11,7 @@ import {useSpan} from 'providers/Span/Span.provider';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import {initNodes, onNodesChange as onNodesChangeAction} from 'redux/slices/DAG.slice';
 import DAGSelectors from 'selectors/DAG.selectors';
-import TraceAnalyticsService from 'services/Analytics/TraceAnalytics.service';
+import TraceAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
 import TraceDiagramAnalyticsService from 'services/Analytics/TraceDiagramAnalytics.service';
 import {TSpan} from 'types/Span.types';
 import {TTestRunState} from 'types/TestRun.types';

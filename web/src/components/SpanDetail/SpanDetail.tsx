@@ -6,7 +6,7 @@ import {SemanticGroupNames} from 'constants/SemanticGroupNames.constants';
 import {useTestSpecForm} from 'components/TestSpecForm/TestSpecForm.provider';
 import {useAppSelector} from 'redux/hooks';
 import TestSpecsSelectors from 'selectors/TestSpecs.selectors';
-import TraceAnalyticsService from 'services/Analytics/TraceAnalytics.service';
+import TraceAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
 import OperatorService from 'services/Operator.service';
 import SpanService from 'services/Span.service';
 import {TSpan, TSpanFlatAttribute} from 'types/Span.types';

@@ -13,24 +13,16 @@ type THomeAnalytics = {
   onTestClick(testId: string): void;
 };
 
-const HomeAnalyticsService = (): THomeAnalytics => {
-  const onCreateTestClick = () => {
+const HomeAnalyticsService = (): THomeAnalytics => ({
+  onCreateTestClick() {
     AnalyticsService.event(Categories.Home, Actions.CreateTestClick, Labels.Button);
-  };
-
-  const onGuidedTourClick = () => {
+  },
+  onGuidedTourClick() {
     AnalyticsService.event(Categories.Home, Actions.GuidedTourClick, Labels.Button);
-  };
-
-  const onTestClick = (testId: string) => {
+  },
+  onTestClick(testId: string) {
     AnalyticsService.event(Categories.Home, Actions.TestClick, testId);
-  };
-
-  return {
-    onCreateTestClick,
-    onGuidedTourClick,
-    onTestClick,
-  };
-};
+  },
+});
 
 export default HomeAnalyticsService();

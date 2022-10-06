@@ -4,6 +4,7 @@ import RunDetailTest from 'components/RunDetailTest';
 import RunDetailTrace from 'components/RunDetailTrace';
 import RunDetailTrigger from 'components/RunDetailTrigger';
 import {RunDetailModes} from 'constants/TestRun.constants';
+import TestRunAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import {useMemo} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
@@ -45,7 +46,10 @@ const RunDetailLayout = ({test: {id, name, trigger, version = 1}, test}: IProps)
       <Tabs
         activeKey={mode}
         centered
-        onChange={activeKey => navigate(`/test/${id}/run/${run.id}/${activeKey}`)}
+        onChange={activeKey => {
+          TestRunAnalyticsService.onChangeMode(activeKey as RunDetailModes);
+          navigate(`/test/${id}/run/${run.id}/${activeKey}`);
+        }}
         renderTabBar={renderTabBar}
         tabBarExtraContent={tabBarExtraContent}
         destroyInactiveTabPane

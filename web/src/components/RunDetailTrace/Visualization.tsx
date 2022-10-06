@@ -7,7 +7,7 @@ import {Node, NodeChange} from 'react-flow-renderer';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import {changeNodes, initNodes, selectSpan} from 'redux/slices/Trace.slice';
 import TraceSelectors from 'selectors/Trace.selectors';
-import TraceAnalyticsService from 'services/Analytics/TraceAnalytics.service';
+import TraceAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
 import TraceDiagramAnalyticsService from 'services/Analytics/TraceDiagramAnalytics.service';
 import {TSpan} from 'types/Span.types';
 import {TTestRunState} from 'types/TestRun.types';

@@ -2,7 +2,8 @@ import {Tabs} from 'antd';
 import {TriggerTypes} from 'constants/Test.constants';
 import {TTriggerResult} from 'types/Test.types';
 import ExperimentalFeature from 'utils/ExperimentalFeature';
-import GuidedTourService, {GuidedTours} from '../../services/GuidedTour.service';
+import TestRunAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
+import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
 import {Steps} from '../GuidedTour/traceStepList';
 import ResponseBody from './ResponseBody';
 import ResponseHeaders from './ResponseHeaders';
@@ -39,7 +40,12 @@ const RunDetailTriggerResponse = ({
         </div>
       </S.TitleContainer>
       <S.TabsContainer>
-        <Tabs defaultActiveKey="1" data-cy="run-detail-trigger-response" size="small">
+        <Tabs
+          defaultActiveKey="1"
+          data-cy="run-detail-trigger-response"
+          size="small"
+          onChange={newTab => TestRunAnalyticsService.onTriggerResponseTabChange(newTab)}
+        >
           <Tabs.TabPane key="1" tab="Body">
             <ResponseBody body={body} bodyMimeType={bodyMimeType} />
           </Tabs.TabPane>

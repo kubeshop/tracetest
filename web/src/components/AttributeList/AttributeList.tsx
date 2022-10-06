@@ -1,7 +1,7 @@
 import AttributeRow from 'components/AttributeRow';
 import {TResultAssertions} from 'types/Assertion.types';
 import {TSpanFlatAttribute} from 'types/Span.types';
-import TraceAnalyticsService from 'services/Analytics/TraceAnalytics.service';
+import TraceAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
 import * as S from './AttributeList.styled';
 import EmptyAttributeList from './EmptyAttributeList';
 

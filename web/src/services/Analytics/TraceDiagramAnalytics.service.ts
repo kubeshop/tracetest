@@ -9,14 +9,10 @@ type TTraceDiagramAnalytics = {
   onClickSpan(spanId: string): void;
 };
 
-const TraceDiagramAnalyticsService = (): TTraceDiagramAnalytics => {
-  const onClickSpan = (spanId: string) => {
-    AnalyticsService.event(Categories.Trace, Actions.ClickSpan, spanId);
-  };
-
-  return {
-    onClickSpan,
-  };
-};
+const TraceDiagramAnalyticsService = (): TTraceDiagramAnalytics => ({
+  onClickSpan(spanId) {
+    AnalyticsService.event(Categories.TestRun, Actions.ClickSpan, spanId);
+  },
+});
 
 export default TraceDiagramAnalyticsService();

@@ -4,7 +4,7 @@ import {useEffect, useMemo, useRef, useState} from 'react';
 
 import AttributeList from 'components/AttributeList';
 import {SemanticGroupNames} from 'constants/SemanticGroupNames.constants';
-import TraceAnalyticsService from 'services/Analytics/TraceAnalytics.service';
+import TraceAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
 import SpanAttributeService from 'services/SpanAttribute.service';
 import {TResultAssertions} from 'types/Assertion.types';
 import {TSpanFlatAttribute} from 'types/Span.types';

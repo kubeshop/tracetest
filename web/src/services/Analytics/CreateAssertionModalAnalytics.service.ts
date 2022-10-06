@@ -12,49 +12,31 @@ export enum Actions {
   ConfirmationModalOpen = 'open-create-assertion-modal-confirmation-modal',
 }
 
-const CreateAssertionModalAnalyticsService = () => {
-  const onCreateAssertionFormSubmit = () => {
+const CreateAssertionModalAnalyticsService = () => ({
+  onCreateAssertionFormSubmit() {
     AnalyticsService.event(Categories.Assertion, Actions.CreateAssertionFormSubmit, Labels.Form);
-  };
-
-  const onEditAssertionFormSubmit = () => {
+  },
+  onEditAssertionFormSubmit() {
     AnalyticsService.event(Categories.Assertion, Actions.EditAssertionFormSubmit, Labels.Form);
-  };
-
-  const onSelectorChange = () => {
+  },
+  onSelectorChange() {
     AnalyticsService.event(Categories.Assertion, Actions.SelectorChange, Labels.Input);
-  };
-
-  const onChecksChange = () => {
+  },
+  onChecksChange() {
     AnalyticsService.event(Categories.Assertion, Actions.ChecksChange, Labels.Input);
-  };
-
-  const onAddCheck = () => {
+  },
+  onAddCheck() {
     AnalyticsService.event(Categories.Assertion, Actions.AddCheck, Labels.Button);
-  };
-
-  const onRemoveCheck = () => {
+  },
+  onRemoveCheck() {
     AnalyticsService.event(Categories.Assertion, Actions.RemoveCheck, Labels.Button);
-  };
-
-  const onAssertionFormOpen = () => {
+  },
+  onAssertionFormOpen() {
     AnalyticsService.event(Categories.Assertion, Actions.OpenForm, Labels.Button);
-  };
-
-  const onConfirmationModalOpen = () => {
+  },
+  onConfirmationModalOpen() {
     AnalyticsService.event(Categories.Assertion, Actions.ConfirmationModalOpen, Labels.Button);
-  };
-
-  return {
-    onCreateAssertionFormSubmit,
-    onEditAssertionFormSubmit,
-    onSelectorChange,
-    onChecksChange,
-    onAddCheck,
-    onRemoveCheck,
-    onAssertionFormOpen,
-    onConfirmationModalOpen,
-  };
-};
+  },
+});
 
 export default CreateAssertionModalAnalyticsService();
