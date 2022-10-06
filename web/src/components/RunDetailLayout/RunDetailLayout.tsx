@@ -1,13 +1,15 @@
 import {Tabs, TabsProps} from 'antd';
-import {useMemo} from 'react';
-import {useNavigate, useParams} from 'react-router-dom';
 
 import RunDetailTest from 'components/RunDetailTest';
 import RunDetailTrace from 'components/RunDetailTrace';
 import RunDetailTrigger from 'components/RunDetailTrigger';
 import {RunDetailModes} from 'constants/TestRun.constants';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
+import {useMemo} from 'react';
+import {useNavigate, useParams} from 'react-router-dom';
+import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
 import {TTest} from 'types/Test.types';
+import {Steps} from '../GuidedTour/traceStepList';
 import HeaderLeft from './HeaderLeft';
 import HeaderRight from './HeaderRight';
 import * as S from './RunDetailLayout.styled';
@@ -17,7 +19,10 @@ interface IProps {
 }
 
 const renderTabBar: TabsProps['renderTabBar'] = (props, DefaultTabBar) => (
-  <S.ContainerHeader data-cy="run-detail-header">
+  <S.ContainerHeader
+    data-tour={GuidedTourService.getStep(GuidedTours.Trace, Steps.Switcher)}
+    data-cy="run-detail-header"
+  >
     <DefaultTabBar {...props} className="site-custom-tab-bar" />
   </S.ContainerHeader>
 );
@@ -40,11 +45,10 @@ const RunDetailLayout = ({test: {id, name, trigger, version = 1}, test}: IProps)
       <Tabs
         activeKey={mode}
         centered
-        onChange={activeKey => {
-          navigate(`/test/${id}/run/${run.id}/${activeKey}`);
-        }}
+        onChange={activeKey => navigate(`/test/${id}/run/${run.id}/${activeKey}`)}
         renderTabBar={renderTabBar}
         tabBarExtraContent={tabBarExtraContent}
+        destroyInactiveTabPane
       >
         <Tabs.TabPane tab="Trigger" key={RunDetailModes.TRIGGER}>
           <RunDetailTrigger test={test} run={run} isError={isError} />

@@ -14,9 +14,9 @@ interface IProps {
 
 const UploadCollectionForm = ({form}: IProps) => {
   return (
-    <div style={{display: 'grid'}}>
+    <>
       <Row gutter={12}>
-        <Col span={12}>
+        <Col span={18}>
           <Form.Item name="requests" hidden>
             <Input type="hidden" />
           </Form.Item>
@@ -29,22 +29,26 @@ const UploadCollectionForm = ({form}: IProps) => {
         </Col>
       </Row>
       <Row gutter={12} style={{marginTop: 16}}>
-        <Col span={12}>
+        <Col span={18}>
           <RequestDetailsUrlInput />
         </Col>
-        <Col span={12}>
+      </Row>
+      <Row gutter={12}>
+        <Col span={18}>
           <BodyField body={Form.useWatch('body', form)} setBody={body => form.setFieldsValue({body})} />
         </Col>
       </Row>
       <Row gutter={12}>
-        <Col span={12}>
+        <Col span={18}>
           <RequestDetailsHeadersInput />
         </Col>
-        <Col span={12}>
+      </Row>
+      <Row gutter={12}>
+        <Col span={18}>
           <RequestDetailsAuthInput form={form} />
         </Col>
       </Row>
-    </div>
+    </>
   );
 };
 

@@ -44,9 +44,10 @@ Cypress.Commands.add('deleteTest', (shoudlIntercept = false) => {
   });
 });
 
-Cypress.Commands.add('navigateToTestCreationPage', () => {
-  cy.get('[data-cy=create-test-button]').click();
-  cy.get('[data-cy=create-test-header]').should('be.visible');
+Cypress.Commands.add('openTestCreationModal', () => {
+  cy.get('[data-cy=create-button]').click();
+  cy.get('.ant-dropdown-menu-item').first().click();
+  cy.get('[data-cy=create-test-steps]').should('be.visible');
 });
 
 Cypress.Commands.add('interceptTracePageApiCalls', () => {
@@ -99,7 +100,7 @@ Cypress.Commands.add('goToTestDetailPageAndRunTest', (pathname: string) => {
   cy.visit(`/test/${testId}`);
   cy.get('[data-cy^=run-card]', {timeout: 10000}).first().click();
   cy.makeSureUserIsOnTestDetailPage();
-  cy.makeSureUserIsOnTracePage(false);
+  cy.makeSureUserIsOnTracePage(true);
 });
 
 Cypress.Commands.add('makeSureUserIsOnTestDetailPage', () => {
@@ -119,7 +120,7 @@ Cypress.Commands.add('cancelOnBoarding', () => {
   const parsedValue = value ? JSON.parse(value) : undefined;
 
   if (!parsedValue || parsedValue.trace === false) {
-    // cy.get('[data-cy=no-thanks]').click();
+    cy.get('[data-cy=no-thanks]').click();
   }
 });
 
@@ -136,7 +137,7 @@ Cypress.Commands.add('fillCreateFormBasicStep', (name: string, description?: str
 });
 
 Cypress.Commands.add('createTestByName', (name: string) => {
-  cy.navigateToTestCreationPage();
+  cy.openTestCreationModal();
   cy.get('[data-cy=create-test-next-button]').click();
   cy.get('[data-cy=example-button]').click();
   cy.get(`[data-cy=demo-example-${camelCase(name)}]`).click();
@@ -181,14 +182,13 @@ Cypress.Commands.add('clickNextOnCreateTestWizard', () => {
 Cypress.Commands.add('createTest', () => {
   cy.inteceptHomeApiCall();
   cy.visit('/');
-  cy.navigateToTestCreationPage();
+  cy.openTestCreationModal();
   cy.clickNextOnCreateTestWizard();
   cy.selectTestFromDemoList();
   cy.interceptTracePageApiCalls();
   cy.submitCreateTestForm();
   cy.makeSureUserIsOnTracePage();
   cy.waitForTracePageApiCalls();
-  cy.cancelOnBoarding();
 });
 
 Cypress.Commands.add('createAssertion', (index = 0) => {

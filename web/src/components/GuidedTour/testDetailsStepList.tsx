@@ -1,7 +1,5 @@
-import {StepType} from '@reactour/tour';
-import {Typography} from 'antd';
+import {Step} from 'react-joyride';
 import GuidedTourService, {GuidedTours} from '../../services/GuidedTour.service';
-import {StepContent} from './StepContent';
 
 export enum Steps {
   ExecutionTime = 'executionTime',
@@ -12,43 +10,22 @@ export enum Steps {
   Failed = 'failed',
 }
 
-const StepList: StepType[] = [
+const StepList: Step[] = [
   {
-    selector: GuidedTourService.getSelectorStep(GuidedTours.TestDetails, Steps.ExecutionTime),
-    content: ({setIsOpen}) => (
-      <StepContent title="Test View" setIsOpen={setIsOpen}>
-        <Typography.Text>execution time</Typography.Text>
-      </StepContent>
-    ),
+    target: GuidedTourService.getSelectorStep(GuidedTours.TestDetails, Steps.ExecutionTime),
+    content: 'execution time',
   },
   {
-    selector: GuidedTourService.getSelectorStep(GuidedTours.TestDetails, Steps.Status),
-    content: ({setIsOpen}) => (
-      <StepContent title="Test View" setIsOpen={setIsOpen}>
-        <Typography.Text>status</Typography.Text>
-      </StepContent>
-    ),
+    target: GuidedTourService.getSelectorStep(GuidedTours.TestDetails, Steps.Status),
+    content: 'status',
   },
   {
-    selector: GuidedTourService.getSelectorStep(GuidedTours.TestDetails, Steps.Assertions),
-    content: ({setIsOpen}) => (
-      <StepContent title="Test View" setIsOpen={setIsOpen}>
-        <Typography.Text>assertions</Typography.Text>
-      </StepContent>
-    ),
-    highlightedSelectors: [
-      GuidedTourService.getSelectorStep(GuidedTours.TestDetails, Steps.Assertions),
-      GuidedTourService.getSelectorStep(GuidedTours.TestDetails, Steps.Passed),
-      GuidedTourService.getSelectorStep(GuidedTours.TestDetails, Steps.Failed),
-    ],
+    target: GuidedTourService.getSelectorStep(GuidedTours.TestDetails, Steps.Assertions),
+    content: 'assertions',
   },
   {
-    selector: GuidedTourService.getSelectorStep(GuidedTours.TestDetails, Steps.RunTest),
-    content: ({setIsOpen}) => (
-      <StepContent title="Test View" setIsOpen={setIsOpen}>
-        <Typography.Text>assertions</Typography.Text>
-      </StepContent>
-    ),
+    target: GuidedTourService.getSelectorStep(GuidedTours.TestDetails, Steps.RunTest),
+    content: 'assertions',
   },
 ];
 

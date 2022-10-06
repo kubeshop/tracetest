@@ -2,7 +2,9 @@ import {DoubleLeftOutlined, DoubleRightOutlined} from '@ant-design/icons';
 import {Button} from 'antd';
 import {noop} from 'lodash';
 import React, {createContext, ReactNode, useCallback, useContext, useMemo, useState} from 'react';
+import {Steps} from 'components/GuidedTour/traceStepList';
 import {HandlerProps, ReflexContainer, ReflexElement, ReflexSplitter} from 'react-reflex';
+import GuidedTourService, {GuidedTours} from '../../services/GuidedTour.service';
 
 import * as S from './Drawer.styled';
 
@@ -64,6 +66,7 @@ const Drawer = ({leftPanel, rightPanel}: IProps) => {
         <ReflexSplitter>
           <S.ButtonContainer>
             <Button
+              data-tour={GuidedTourService.getStep(GuidedTours.Trace, Steps.SpanDetails)}
               icon={isOpen ? <DoubleLeftOutlined /> : <DoubleRightOutlined />}
               onClick={event => {
                 event.stopPropagation();

@@ -2,6 +2,8 @@ import {useNavigate} from 'react-router-dom';
 
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import Date from 'utils/Date';
+import GuidedTourService, {GuidedTours} from '../../services/GuidedTour.service';
+import {Steps} from '../GuidedTour/traceStepList';
 import Info from './Info';
 import * as S from './RunDetailLayout.styled';
 
@@ -19,7 +21,7 @@ const HeaderLeft = ({name, testId, triggerType}: IProps) => {
   return (
     <S.Section $justifyContent="flex-start">
       <S.BackIcon data-cy="test-header-back-button" onClick={() => navigate(`/test/${testId}`)} />
-      <S.InfoContainer>
+      <S.InfoContainer data-tour={GuidedTourService.getStep(GuidedTours.Trace, Steps.MetaDetails)}>
         <S.Row>
           <S.Title data-cy="test-details-name">
             {name} (v{run.testVersion})

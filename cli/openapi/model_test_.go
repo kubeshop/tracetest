@@ -20,9 +20,10 @@ type Test struct {
 	Name        *string `json:"name,omitempty"`
 	Description *string `json:"description,omitempty"`
 	// version number of the test
-	Version          *int32     `json:"version,omitempty"`
-	ServiceUnderTest *Trigger   `json:"serviceUnderTest,omitempty"`
-	Specs            *TestSpecs `json:"specs,omitempty"`
+	Version          *int32       `json:"version,omitempty"`
+	ServiceUnderTest *Trigger     `json:"serviceUnderTest,omitempty"`
+	Specs            *TestSpecs   `json:"specs,omitempty"`
+	Summary          *TestSummary `json:"summary,omitempty"`
 }
 
 // NewTest instantiates a new Test object
@@ -234,6 +235,38 @@ func (o *Test) SetSpecs(v TestSpecs) {
 	o.Specs = &v
 }
 
+// GetSummary returns the Summary field value if set, zero value otherwise.
+func (o *Test) GetSummary() TestSummary {
+	if o == nil || o.Summary == nil {
+		var ret TestSummary
+		return ret
+	}
+	return *o.Summary
+}
+
+// GetSummaryOk returns a tuple with the Summary field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Test) GetSummaryOk() (*TestSummary, bool) {
+	if o == nil || o.Summary == nil {
+		return nil, false
+	}
+	return o.Summary, true
+}
+
+// HasSummary returns a boolean if a field has been set.
+func (o *Test) HasSummary() bool {
+	if o != nil && o.Summary != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetSummary gets a reference to the given TestSummary and assigns it to the Summary field.
+func (o *Test) SetSummary(v TestSummary) {
+	o.Summary = &v
+}
+
 func (o Test) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.Id != nil {
@@ -253,6 +286,9 @@ func (o Test) MarshalJSON() ([]byte, error) {
 	}
 	if o.Specs != nil {
 		toSerialize["specs"] = o.Specs
+	}
+	if o.Summary != nil {
+		toSerialize["summary"] = o.Summary
 	}
 	return json.Marshal(toSerialize)
 }

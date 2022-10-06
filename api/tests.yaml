@@ -19,6 +19,30 @@ components:
         specs:
           $ref: "#/components/schemas/TestSpecs"
           description: specification of assertions that are going to be made
+        summary:
+          $ref: "#/components/schemas/TestSummary"
+          description: summary of test data
+          readOnly: true
+
+    TestSummary:
+      type: object
+      properties:
+        runs:
+          type: integer
+          readOnly: true
+        lastRun:
+          type: object
+          readOnly: true
+          properties:
+            time:
+              type: string
+              format: date-time
+            passes:
+              type: integer
+              readOnly: true
+            fails:
+              type: integer
+              readOnly: true
 
     TestSpecs:
       type: object

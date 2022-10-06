@@ -1,8 +1,8 @@
 import {Form} from 'antd';
 import {useCallback, useState} from 'react';
 import {useCreateTest} from 'providers/CreateTest/CreateTest.provider';
-import CreateStepFooter from 'components/CreateTestSteps/CreateTestStepFooter';
 import * as Step from 'components/CreateTestPlugins/Step.styled';
+import {ComponentNames} from 'constants/Plugins.constants';
 import useValidateTestDraft from 'hooks/useValidateTestDraft';
 import {IBasicValues, TDraftTest} from 'types/Test.types';
 import BasicDetailsForm from './BasicDetailsForm';
@@ -10,34 +10,27 @@ import BasicDetailsForm from './BasicDetailsForm';
 const BasicDetails = () => {
   const [selectedDemo, setSelectedDemo] = useState<TDraftTest>();
   const [form] = Form.useForm<IBasicValues>();
-  const {onNext} = useCreateTest();
 
   const {
     plugin: {name: pluginName, demoList},
+    onNext,
+    onIsFormValid,
   } = useCreateTest();
-  const {setIsValid, isValid, onValidate} = useValidateTestDraft({pluginName, isBasicDetails: true});
+  const onValidate = useValidateTestDraft({pluginName, isBasicDetails: true, setIsValid: onIsFormValid});
 
   const handleSelectDemo = useCallback(
     (demo: TDraftTest) => {
-      const {name, description} = demo;
+      form.setFieldsValue(demo);
 
-      form.setFieldsValue({
-        name,
-        description,
-      });
-
-      setIsValid(true);
+      onIsFormValid(true);
       setSelectedDemo(demo);
     },
-    [form, setIsValid]
+    [form, onIsFormValid]
   );
 
-  const handleNext = useCallback(() => {
-    form.submit();
-  }, [form]);
-
   const handleSubmit = useCallback(
-    ({name, description}: IBasicValues) => {
+    (values: IBasicValues) => {
+      const {name, description} = values;
       onNext({...(selectedDemo || {}), name, description});
     },
     [onNext, selectedDemo]
@@ -48,6 +41,7 @@ const BasicDetails = () => {
       <Step.FormContainer>
         <Step.Title>Provide needed basic information</Step.Title>
         <Form<IBasicValues>
+          id={ComponentNames.BasicDetails}
           autoComplete="off"
           data-cy="create-test-modal"
           form={form}
@@ -55,14 +49,9 @@ const BasicDetails = () => {
           onFinish={handleSubmit}
           onValuesChange={onValidate}
         >
-          <BasicDetailsForm
-            onSelectDemo={handleSelectDemo}
-            selectedDemo={selectedDemo}
-            demoList={demoList}
-          />
+          <BasicDetailsForm onSelectDemo={handleSelectDemo} selectedDemo={selectedDemo} demoList={demoList} />
         </Form>
       </Step.FormContainer>
-      <CreateStepFooter isValid={isValid} onNext={handleNext} />
     </Step.Step>
   );
 };

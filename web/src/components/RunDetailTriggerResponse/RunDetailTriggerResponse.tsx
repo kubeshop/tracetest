@@ -2,6 +2,8 @@ import {Tabs} from 'antd';
 import {TriggerTypes} from 'constants/Test.constants';
 import {TTriggerResult} from 'types/Test.types';
 import ExperimentalFeature from 'utils/ExperimentalFeature';
+import GuidedTourService, {GuidedTours} from '../../services/GuidedTour.service';
+import {Steps} from '../GuidedTour/traceStepList';
 import ResponseBody from './ResponseBody';
 import ResponseHeaders from './ResponseHeaders';
 import ResponseOutputs from './ResponseOutputs';
@@ -24,7 +26,7 @@ const RunDetailTriggerResponse = ({
   },
 }: IProps) => {
   return (
-    <S.Container>
+    <S.Container data-tour={GuidedTourService.getStep(GuidedTours.Trace, Steps.Graph)}>
       <S.TitleContainer>
         <S.Title>Response Data</S.Title>
         <div>

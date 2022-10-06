@@ -1,5 +1,3 @@
-import {useState} from 'react';
-
 import Drawer from 'components/Drawer';
 import {VisualizationType} from 'components/RunDetailTrace/RunDetailTrace';
 import SpanDetail from 'components/SpanDetail';
@@ -9,8 +7,11 @@ import {useTestSpecForm} from 'components/TestSpecForm/TestSpecForm.provider';
 import Switch from 'components/Visualization/components/Switch';
 import {useSpan} from 'providers/Span/Span.provider';
 import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
+import {useState} from 'react';
+import {useMount} from 'react-use';
 import TraceAnalyticsService from 'services/Analytics/TraceAnalytics.service';
 import {TTestRun} from 'types/TestRun.types';
+import {useGuidedTour} from '../../providers/GuidedTour/GuidedTour.provider';
 import * as S from './RunDetailTest.styled';
 import Visualization from './Visualization';
 
@@ -24,7 +25,13 @@ const RunDetailTest = ({run, testId}: IProps) => {
   const {selectedTestSpec} = useTestSpecs();
   const {isOpen: isTestSpecFormOpen, formProps, onSubmit, close} = useTestSpecForm();
   const [visualizationType, setVisualizationType] = useState(VisualizationType.Dag);
-
+  const {
+    state: {tourActive},
+    setState,
+  } = useGuidedTour();
+  useMount(() => {
+    if (tourActive) setState(st => ({...st, run: true, stepIndex: 3}));
+  });
   return (
     <S.Container>
       <Drawer

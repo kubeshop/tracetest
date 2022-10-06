@@ -50,6 +50,16 @@ export type TTrigger = {
   request: TTriggerRequest;
 };
 
+export type TRawTestSummary = TTestSchemas['TestSummary'];
+export type TSummary = {
+  runs: number;
+  lastRun: {
+    time: string;
+    passes: number;
+    fails: number;
+  };
+};
+
 export type TRawTest = TTestSchemas['Test'];
 export type TTest = Model<
   TRawTest,
@@ -58,6 +68,7 @@ export type TTest = Model<
     serviceUnderTest?: undefined;
     trigger: TTrigger;
     specs?: TTestSpecs;
+    summary: TSummary;
   }
 >;
 
@@ -75,7 +86,6 @@ export interface IHttpValues {
   auth: TRequestAuth;
   headers: THTTPRequest['headers'];
   method: HTTP_METHOD;
-  name: string;
   url: string;
 }
 
@@ -92,13 +102,17 @@ export interface IPostmanValues extends IHttpValues {
   variables: VariableDefinition[];
 }
 
+export interface ICurlValues extends IHttpValues {
+  command: string;
+}
+
 export interface IBasicValues {
   name: string;
   description: string;
   testSuite: string;
 }
 
-export type TTestRequestDetailsValues = IRpcValues | IHttpValues | IPostmanValues;
+export type TTestRequestDetailsValues = IRpcValues | IHttpValues | IPostmanValues | ICurlValues;
 export type TDraftTest<T = TTestRequestDetailsValues> = Partial<IBasicValues & T>;
 export type TDraftTestForm<T = TTestRequestDetailsValues> = FormInstance<TDraftTest<T>>;
 
@@ -113,6 +127,7 @@ export interface ICreateTestState {
   stepList: ICreateTestStep[];
   stepNumber: number;
   pluginName: SupportedPlugins;
+  isFormValid: boolean;
 }
 
 export type TCreateTestSliceActions = {
@@ -120,4 +135,5 @@ export type TCreateTestSliceActions = {
   setPlugin: CaseReducer<ICreateTestState, PayloadAction<{plugin: IPlugin}>>;
   setStepNumber: CaseReducer<ICreateTestState, PayloadAction<{stepNumber: number; completeStep?: boolean}>>;
   setDraftTest: CaseReducer<ICreateTestState, PayloadAction<{draftTest: TDraftTest}>>;
+  setIsFormValid: CaseReducer<ICreateTestState, PayloadAction<{isValid: boolean}>>;
 };

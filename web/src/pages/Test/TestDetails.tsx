@@ -2,9 +2,9 @@ import {Button, Typography} from 'antd';
 import {useCallback} from 'react';
 
 import {Steps} from 'components/GuidedTour/testDetailsStepList';
-import InfiniteScroll from 'components/InfiniteScroll';
+import Pagination from 'components/Pagination';
 import ResultCardList from 'components/RunCardList';
-import useInfiniteScroll from 'hooks/useInfiniteScroll';
+import usePagination from 'hooks/usePagination';
 import {useGetRunListQuery} from 'redux/apis/TraceTest.api';
 import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
 import {TTestRun} from 'types/TestRun.types';
@@ -16,12 +16,10 @@ interface IProps {
 }
 
 const TestDetails = ({testId}: IProps) => {
-  const {
-    list: resultList,
-    hasMore,
-    loadMore,
-    isLoading,
-  } = useInfiniteScroll<TTestRun, {testId: string}>(useGetRunListQuery, {
+  const {hasNext, hasPrev, isEmpty, isFetching, isLoading, list, loadNext, loadPrev} = usePagination<
+    TTestRun,
+    {testId: string}
+  >(useGetRunListQuery, {
     testId,
   });
 
@@ -47,20 +45,23 @@ const TestDetails = ({testId}: IProps) => {
         </Button>
       </S.TestDetailsHeader>
 
-      <InfiniteScroll
-        loadMore={loadMore}
-        isLoading={isLoading}
-        hasMore={hasMore}
-        shouldTrigger={Boolean(resultList.length)}
+      <Pagination
         emptyComponent={
           <S.EmptyStateContainer>
             <S.EmptyStateIcon />
             <Typography.Text disabled>No Runs</Typography.Text>
           </S.EmptyStateContainer>
         }
+        hasNext={hasNext}
+        hasPrev={hasPrev}
+        isEmpty={isEmpty}
+        isFetching={isFetching}
+        isLoading={isLoading}
+        loadNext={loadNext}
+        loadPrev={loadPrev}
       >
-        <ResultCardList testId={testId} resultList={resultList} />
-      </InfiniteScroll>
+        <ResultCardList testId={testId} resultList={list} />
+      </Pagination>
     </>
   );
 };

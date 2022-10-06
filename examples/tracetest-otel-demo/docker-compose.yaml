@@ -209,6 +209,7 @@ services:
   # FeatureFlagService
   otel-featureflagservice:
     image: otel/demo:v0.3.4-alpha-featureflagservice
+    ports:
       - "${FEATURE_FLAG_GRPC_SERVICE_PORT}" # Feature Flag Service gRPC API
     environment:
       - FEATURE_FLAG_SERVICE_PORT

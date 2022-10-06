@@ -1,11 +1,16 @@
 import Layout from 'components/Layout';
 import withAnalytics from 'components/WithAnalytics/WithAnalytics';
-import ExperimentalFeature from 'utils/ExperimentalFeature';
+import CreateTransactionProvider from 'providers/CreateTransaction';
+import CreateTestProvider from 'providers/CreateTest';
 import Content from './Content';
 
 const Home = () => (
-  <Layout hasMenu={ExperimentalFeature.isEnabled('transactions')}>
-    <Content />
+  <Layout hasMenu>
+    <CreateTransactionProvider>
+      <CreateTestProvider>
+        <Content />
+      </CreateTestProvider>
+    </CreateTransactionProvider>
   </Layout>
 );
 

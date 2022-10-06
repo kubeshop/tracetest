@@ -3,6 +3,15 @@ import {SupportedPlugins} from './Common.constants';
 import {DemoByPluginMap} from './Demo.constants';
 import {TriggerTypes} from './Test.constants';
 
+export enum ComponentNames {
+  SelectPlugin = 'SelectPlugin',
+  BasicDetails = 'BasicDetails',
+  RequestDetails = 'RequestDetails',
+  UploadCollection = 'UploadCollection',
+  TestsSelection = 'TestsSelection',
+  ImportCommand = 'ImportCommand',
+}
+
 const Default: IPlugin = {
   name: SupportedPlugins.REST,
   title: 'Default',
@@ -15,7 +24,7 @@ const Default: IPlugin = {
       id: 'plugin-selection',
       name: 'Select test type',
       title: 'Choose the way of creating a test',
-      component: 'SelectPlugin',
+      component: ComponentNames.SelectPlugin,
       isDefaultValid: true,
       status: 'selected',
     },
@@ -23,7 +32,7 @@ const Default: IPlugin = {
       id: 'basic-details',
       name: 'Basic Details',
       title: 'Provide needed basic information',
-      component: 'BasicDetails',
+      component: ComponentNames.BasicDetails,
     },
   ],
 };
@@ -41,7 +50,7 @@ const Rest: IPlugin = {
       id: 'request-details',
       name: 'Request Details',
       title: 'Provide additional information',
-      component: 'RequestDetails',
+      component: ComponentNames.RequestDetails,
     },
   ],
 };
@@ -59,7 +68,7 @@ const GRPC: IPlugin = {
       id: 'request-details',
       name: 'Request Details',
       title: 'Provide additional information',
-      component: 'RequestDetails',
+      component: ComponentNames.RequestDetails,
     },
   ],
 };
@@ -87,7 +96,7 @@ const Postman: IPlugin = {
       id: 'import-postman-collection',
       name: 'Import Postman collection',
       title: 'Upload Postman collection',
-      component: 'UploadCollection',
+      component: ComponentNames.UploadCollection,
     },
   ],
 };
@@ -102,9 +111,34 @@ const OpenAPI: IPlugin = {
   type: TriggerTypes.http,
 };
 
+const Curl: IPlugin = {
+  name: SupportedPlugins.CURL,
+  title: 'CURL Command',
+  description: 'Define your HTTP request via a CURL command',
+  isActive: true,
+  stepList: [
+    ...Default.stepList,
+    {
+      id: 'import-curl',
+      name: 'Import CURL',
+      title: 'Paste the CURL command',
+      component: ComponentNames.ImportCommand,
+    },
+    {
+      id: 'request-details',
+      name: 'Request Details',
+      title: 'Provide additional information',
+      component: ComponentNames.RequestDetails,
+    },
+  ],
+  demoList: DemoByPluginMap.CURL,
+  type: TriggerTypes.http,
+};
+
 export const Plugins: Record<SupportedPlugins, IPlugin> = {
   [SupportedPlugins.REST]: Rest,
   [SupportedPlugins.GRPC]: GRPC,
+  [SupportedPlugins.CURL]: Curl,
   [SupportedPlugins.Postman]: Postman,
   [SupportedPlugins.Messaging]: Messaging,
   [SupportedPlugins.OpenAPI]: OpenAPI,

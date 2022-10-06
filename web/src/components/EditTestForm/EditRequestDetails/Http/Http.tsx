@@ -2,8 +2,6 @@ import BasicDetailsForm from 'components/CreateTestPlugins/Rest/steps/RequestDet
 import {IHttpValues, TDraftTestForm} from 'types/Test.types';
 import {IFormProps} from '../EditRequestDetails';
 
-const EditRequestDetailsHttp = ({form}: IFormProps) => (
-  <BasicDetailsForm isEditing form={form as TDraftTestForm<IHttpValues>} />
-);
+const EditRequestDetailsHttp = ({form}: IFormProps) => <BasicDetailsForm form={form as TDraftTestForm<IHttpValues>} />;
 
 export default EditRequestDetailsHttp;
