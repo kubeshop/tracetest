@@ -521,6 +521,10 @@ func localEnvironmentChecker(ui cliUI.UI) {
 func confirmLocalK8sRunning(ui cliUI.UI) {
 	localK8sRunning := ui.Confirm("Do you have a local kubernentes running?", true)
 	if !localK8sRunning {
+		if isWindows() {
+			ui.Exit("You should have a kubernetes instance running before installing Tracetest. Try minikube (https://minikube.sigs.k8s.io/docs/start/)")
+		}
+
 		option := ui.Select("We can fix that:", []cliUI.Option{
 			{"Install minikube", minikubeChecker},
 			{"Fix manually", exitOption(
@@ -682,7 +686,7 @@ func installMinikube(ui cliUI.UI) {
 			curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-darwin-arm64
 			sudo install minikube-darwin-arm64 /usr/local/bin/minikube
 		`,
-		windows: "choco install minikube",
+		windows: "",
 		other:   "",
 	}).exec(ui)
 }
