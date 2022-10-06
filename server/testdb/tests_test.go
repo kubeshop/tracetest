@@ -109,14 +109,14 @@ func TestGetTests(t *testing.T) {
 	})
 
 	t.Run("SortByLastRun", func(t *testing.T) {
-		actual, err := db.GetTests(context.TODO(), 20, 0, "", "last_run", "")
+		actual, err := db.GetTests(context.TODO(), 20, 0, "", "last_run", "desc")
 		require.NoError(t, err)
 		assert.Len(t, actual, 3)
 
 		// test order
-		assert.Equal(t, "three", actual[0].Name)
-		assert.Equal(t, "two", actual[1].Name)
-		assert.Equal(t, "one", actual[2].Name)
+		assert.Equal(t, "one", actual[0].Name)
+		assert.Equal(t, "three", actual[1].Name)
+		assert.Equal(t, "two", actual[2].Name)
 	})
 
 	t.Run("SortByNameAsc", func(t *testing.T) {
@@ -125,9 +125,9 @@ func TestGetTests(t *testing.T) {
 		assert.Len(t, actual, 3)
 
 		// test order
-		assert.Equal(t, "three", actual[0].Name)
-		assert.Equal(t, "two", actual[1].Name)
-		assert.Equal(t, "one", actual[2].Name)
+		assert.Equal(t, "one", actual[0].Name)
+		assert.Equal(t, "three", actual[1].Name)
+		assert.Equal(t, "two", actual[2].Name)
 	})
 
 	t.Run("SortByNameDesc", func(t *testing.T) {
@@ -136,9 +136,9 @@ func TestGetTests(t *testing.T) {
 		assert.Len(t, actual, 3)
 
 		// test order
-		assert.Equal(t, "one", actual[0].Name)
-		assert.Equal(t, "two", actual[1].Name)
-		assert.Equal(t, "three", actual[2].Name)
+		assert.Equal(t, "two", actual[0].Name)
+		assert.Equal(t, "three", actual[1].Name)
+		assert.Equal(t, "one", actual[2].Name)
 	})
 
 	t.Run("SearchByName", func(t *testing.T) {
