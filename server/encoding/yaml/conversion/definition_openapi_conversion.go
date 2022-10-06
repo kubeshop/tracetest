@@ -118,7 +118,12 @@ func convertTestSpecIntoOpenAPIObject(testSpec []definition.TestSpec) (openapi.T
 			assertions = append(assertions, assertionObject)
 		}
 
+		var name *string
+		if testSpec.Name != "" {
+			name = &testSpec.Name
+		}
 		definitions = append(definitions, openapi.TestSpecsSpecs{
+			Name: name,
 			Selector: openapi.Selector{
 				Query: testSpec.Selector,
 			},

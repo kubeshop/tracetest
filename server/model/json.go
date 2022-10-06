@@ -71,6 +71,29 @@ func (a Assertion) MarshalJSON() ([]byte, error) {
 	})
 }
 
+func (na *NamedAssertions) UnmarshalJSON(data []byte) error {
+	type encodedNamedAssertions struct {
+		Name       string
+		Assertions []Assertion
+	}
+
+	var namedAssertion encodedNamedAssertions
+	if err := json.Unmarshal(data, &namedAssertion); err != nil {
+		// this might be an []Assertion from the older format
+		// try to parse []Assertions instead
+
+		err = json.Unmarshal(data, &namedAssertion.Assertions)
+		if err != nil {
+			return err
+		}
+	}
+
+	na.Name = namedAssertion.Name
+	na.Assertions = namedAssertion.Assertions
+
+	return nil
+}
+
 func (a *Assertion) UnmarshalJSON(data []byte) error {
 	aux := struct {
 		Attribute  string

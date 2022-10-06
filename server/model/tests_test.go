@@ -40,24 +40,35 @@ func TestSpec(t *testing.T) {
 	t.Run("Add", func(t *testing.T) {
 		spec := (model.Test{}).Specs
 
-		spec, err := spec.Add(model.SpanQuery("1"), []model.Assertion{{"1", comparator.Eq, createExpressionFromNumber("1")}})
+		spec, err := spec.Add(model.SpanQuery("1"), model.NamedAssertions{
+			Assertions: []model.Assertion{{"1", comparator.Eq, createExpressionFromNumber("1")}},
+		})
 		require.NoError(t, err)
 
-		spec, err = spec.Add(model.SpanQuery("2"), []model.Assertion{{"2", comparator.Eq, createExpressionFromNumber("2")}})
+		spec, err = spec.Add(model.SpanQuery("2"), model.NamedAssertions{
+			Assertions: []model.Assertion{{"2", comparator.Eq, createExpressionFromNumber("2")}},
+		})
 		require.NoError(t, err)
 		assert.Equal(t, 2, spec.Len())
 
-		spec, err = spec.Add(model.SpanQuery("2"), []model.Assertion{{"2", comparator.Eq, createExpressionFromNumber("2")}})
+		spec, err = spec.Add(model.SpanQuery("2"), model.NamedAssertions{
+			Assertions: []model.Assertion{{"2", comparator.Eq, createExpressionFromNumber("2")}},
+		})
 		assert.ErrorContains(t, err, "selector already exists")
 		assert.Equal(t, 0, spec.Len())
 
 	})
 
-	generateSpec := func() model.OrderedMap[model.SpanQuery, []model.Assertion] {
+	generateSpec := func() model.OrderedMap[model.SpanQuery, model.NamedAssertions] {
 		spec := (model.Test{}).Specs
 
-		spec, _ = spec.Add(model.SpanQuery("1"), []model.Assertion{{"1", comparator.Eq, createExpressionFromNumber("1")}})
-		spec, _ = spec.Add(model.SpanQuery("2"), []model.Assertion{{"2", comparator.Eq, createExpressionFromNumber("2")}})
+		spec, _ = spec.Add(model.SpanQuery("1"), model.NamedAssertions{
+			Assertions: []model.Assertion{{"1", comparator.Eq, createExpressionFromNumber("1")}},
+		})
+
+		spec, _ = spec.Add(model.SpanQuery("2"), model.NamedAssertions{
+			Assertions: []model.Assertion{{"2", comparator.Eq, createExpressionFromNumber("2")}},
+		})
 
 		return spec
 	}
@@ -66,13 +77,13 @@ func TestSpec(t *testing.T) {
 
 		spec := generateSpec()
 
-		expected := map[string][]model.Assertion{
-			"1": {{"1", comparator.Eq, createExpressionFromNumber("1")}},
-			"2": {{"2", comparator.Eq, createExpressionFromNumber("2")}},
+		expected := map[string]model.NamedAssertions{
+			"1": {Assertions: []model.Assertion{{"1", comparator.Eq, createExpressionFromNumber("1")}}},
+			"2": {Assertions: []model.Assertion{{"2", comparator.Eq, createExpressionFromNumber("2")}}},
 		}
 
-		actual := map[string][]model.Assertion{}
-		spec.Map(func(spanQuery model.SpanQuery, asserts []model.Assertion) {
+		actual := make(map[string]model.NamedAssertions)
+		spec.Map(func(spanQuery model.SpanQuery, asserts model.NamedAssertions) {
 			actual[string(spanQuery)] = asserts
 		})
 
@@ -84,7 +95,9 @@ func TestSpec(t *testing.T) {
 
 		spec := generateSpec()
 
-		expected := []model.Assertion{{"1", comparator.Eq, createExpressionFromNumber("1")}}
+		expected := model.NamedAssertions{
+			Assertions: []model.Assertion{{"1", comparator.Eq, createExpressionFromNumber("1")}},
+		}
 		actual := spec.Get(model.SpanQuery("1"))
 
 		assert.Equal(t, expected, actual)
@@ -100,7 +113,7 @@ func TestSpec(t *testing.T) {
 		encoded, err := json.Marshal(spec)
 		require.NoError(t, err)
 
-		decoded := model.OrderedMap[model.SpanQuery, []model.Assertion]{}
+		decoded := model.OrderedMap[model.SpanQuery, model.NamedAssertions]{}
 		err = json.Unmarshal(encoded, &decoded)
 		require.NoError(t, err)
 

@@ -10,6 +10,8 @@
 package openapi
 
 type TestSpecsSpecs struct {
+	Name *string `json:"name,omitempty"`
+
 	Selector Selector `json:"selector,omitempty"`
 
 	Assertions []Assertion `json:"assertions,omitempty"`

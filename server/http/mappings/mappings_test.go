@@ -11,10 +11,15 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func strp(in string) *string {
+	return &in
+}
+
 func TestSpecOrder(t *testing.T) {
 	input := openapi.TestSpecs{
 		Specs: []openapi.TestSpecsSpecs{
 			{
+				Name: strp("name 1"),
 				Selector: openapi.Selector{
 					Query: "selector 1",
 				},
@@ -32,6 +37,7 @@ func TestSpecOrder(t *testing.T) {
 				},
 			},
 			{
+				Name: strp("name 2"),
 				Selector: openapi.Selector{
 					Query: "selector 2",
 				},
@@ -53,6 +59,7 @@ func TestSpecOrder(t *testing.T) {
 
 	expectedJSON := `{
 		"specs": [{
+			    "name": "name 1",
 				"selector": {
 					"query": "selector 1"
 				},
@@ -69,6 +76,7 @@ func TestSpecOrder(t *testing.T) {
 				]
 			},
 			{
+				"name": "name 2",
 				"selector": {
 					"query": "selector 2"
 				},

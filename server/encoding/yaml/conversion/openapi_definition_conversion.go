@@ -109,7 +109,12 @@ func convertOpenAPITestSpecIntoSpecArray(testSpec openapi.TestSpecs) []definitio
 			assertions = append(assertions, assertionString)
 		}
 
+		name := ""
+		if def.Name != nil {
+			name = *def.Name
+		}
 		newDefinition := definition.TestSpec{
+			Name:       name,
 			Selector:   def.Selector.Query,
 			Assertions: assertions,
 		}

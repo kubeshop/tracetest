@@ -76,18 +76,19 @@ func (m OpenAPI) Tests(in []model.Test) []openapi.Test {
 	return tests
 }
 
-func (m OpenAPI) Specs(in model.OrderedMap[model.SpanQuery, []model.Assertion]) openapi.TestSpecs {
+func (m OpenAPI) Specs(in model.OrderedMap[model.SpanQuery, model.NamedAssertions]) openapi.TestSpecs {
 
 	specs := make([]openapi.TestSpecsSpecs, in.Len())
 
 	i := 0
-	in.Map(func(spanQuery model.SpanQuery, asserts []model.Assertion) {
-		assertions := make([]openapi.Assertion, len(asserts))
-		for j, a := range asserts {
+	in.Map(func(spanQuery model.SpanQuery, namedAssertions model.NamedAssertions) {
+		assertions := make([]openapi.Assertion, len(namedAssertions.Assertions))
+		for j, a := range namedAssertions.Assertions {
 			assertions[j] = m.Assertion(a)
 		}
 
 		specs[i] = openapi.TestSpecsSpecs{
+			Name:       &namedAssertions.Name,
 			Selector:   m.Selector(spanQuery),
 			Assertions: assertions,
 		}
@@ -303,18 +304,27 @@ func (m Model) ValidateDefinition(in openapi.TestSpecs) error {
 	return nil
 }
 
-func (m Model) Definition(in openapi.TestSpecs) (model.OrderedMap[model.SpanQuery, []model.Assertion], error) {
-	specs := model.OrderedMap[model.SpanQuery, []model.Assertion]{}
+func (m Model) Definition(in openapi.TestSpecs) (model.OrderedMap[model.SpanQuery, model.NamedAssertions], error) {
+	specs := model.OrderedMap[model.SpanQuery, model.NamedAssertions]{}
 	for _, spec := range in.Specs {
 		asserts := make([]model.Assertion, len(spec.Assertions))
 		for i, a := range spec.Assertions {
 			assertion, err := m.Assertion(a)
 			if err != nil {
-				return model.OrderedMap[model.SpanQuery, []model.Assertion]{}, fmt.Errorf("could not convert assertion: %w", err)
+				return model.OrderedMap[model.SpanQuery, model.NamedAssertions]{}, fmt.Errorf("could not convert assertion: %w", err)
 			}
 			asserts[i] = assertion
 		}
-		specs, _ = specs.Add(model.SpanQuery(spec.Selector.Query), asserts)
+		name := ""
+		if spec.Name != nil {
+			name = *spec.Name
+		}
+
+		namedAssertions := model.NamedAssertions{
+			Name:       name,
+			Assertions: asserts,
+		}
+		specs, _ = specs.Add(model.SpanQuery(spec.Selector.Query), namedAssertions)
 	}
 
 	return specs, nil

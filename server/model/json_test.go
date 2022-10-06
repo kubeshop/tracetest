@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
@@ -32,9 +33,12 @@ func TestTestEncoding(t *testing.T) {
 				Method: model.HTTPMethodGET,
 			},
 		},
-		Specs: (model.OrderedMap[model.SpanQuery, []model.Assertion]{}).
-			MustAdd(model.SpanQuery(`span[name="test"]`), []model.Assertion{
-				{"name", comparator.Eq, createExpressionFromString("test")},
+		Specs: (model.OrderedMap[model.SpanQuery, model.NamedAssertions]{}).
+			MustAdd(model.SpanQuery(`span[name="test"]`), model.NamedAssertions{
+				Name: "test",
+				Assertions: []model.Assertion{
+					{"name", comparator.Eq, createExpressionFromString("test")},
+				},
 			}),
 	}
 
@@ -166,4 +170,105 @@ func TestOldAssertionSerialization(t *testing.T) {
 	assert.Equal(t, oldAssertion.Attribute, newAssertion.Attribute.String())
 	assert.Equal(t, oldAssertion.Comparator, newAssertion.Comparator.String())
 	assert.Equal(t, oldAssertion.Value, newAssertion.Value.String())
+}
+
+func TestOldAssertionSpecsFormatWithoutNames(t *testing.T) {
+	type OldTest struct {
+		ID               id.ID
+		CreatedAt        time.Time
+		Name             string
+		Description      string
+		Version          int
+		ServiceUnderTest model.Trigger
+		Specs            model.OrderedMap[model.SpanQuery, []model.Assertion]
+		Summary          model.Summary
+	}
+
+	expectedSpecs := model.OrderedMap[model.SpanQuery, model.NamedAssertions]{}
+	expectedSpecs = expectedSpecs.MustAdd(model.SpanQuery(`span[tracetest.span.type = "http"]`), model.NamedAssertions{
+		Name: "",
+		Assertions: []model.Assertion{
+			{
+				Attribute:  "http.status",
+				Comparator: comparator.Eq,
+				Value: &model.AssertionExpression{
+					LiteralValue: model.LiteralValue{
+						Value: "200",
+						Type:  "number",
+					},
+				},
+			},
+		},
+	})
+
+	specs := model.OrderedMap[model.SpanQuery, []model.Assertion]{}
+	specs = specs.MustAdd(model.SpanQuery(`span[tracetest.span.type = "http"]`), []model.Assertion{
+		{
+			Attribute:  "http.status",
+			Comparator: comparator.Eq,
+			Value: &model.AssertionExpression{
+				LiteralValue: model.LiteralValue{
+					Value: "200",
+					Type:  "number",
+				},
+			},
+		},
+	})
+	oldTest := OldTest{
+		ID:               id.NewRandGenerator().ID(),
+		CreatedAt:        time.Now(),
+		Name:             "my test name",
+		Description:      "this is an old test using the old test format from version <= 0.7.2",
+		Version:          1,
+		ServiceUnderTest: model.Trigger{},
+		Specs:            specs,
+		Summary:          model.Summary{},
+	}
+
+	oldTestJson, err := json.Marshal(oldTest)
+	require.NoError(t, err)
+
+	var test model.Test
+	err = json.Unmarshal(oldTestJson, &test)
+	require.NoError(t, err)
+
+	assert.Equal(t, expectedSpecs, test.Specs)
+}
+
+func TestNewAssertionSpecFormat(t *testing.T) {
+	test := model.Test{
+		ID:               id.NewRandGenerator().ID(),
+		CreatedAt:        time.Now(),
+		Name:             gofakeit.Name(),
+		Description:      gofakeit.AdjectiveDescriptive(),
+		Version:          1,
+		ServiceUnderTest: model.Trigger{},
+		Specs: model.OrderedMap[model.SpanQuery, model.NamedAssertions]{}.MustAdd(
+			model.SpanQuery(`span[tracetest.span.type = "http"`), model.NamedAssertions{
+				Name: "my test",
+				Assertions: []model.Assertion{
+					{
+						Attribute:  "http.status",
+						Comparator: comparator.Eq,
+						Value: &model.AssertionExpression{
+							LiteralValue: model.LiteralValue{
+								Value: "200",
+								Type:  "number",
+							},
+						},
+					},
+				},
+			},
+		),
+		Summary: model.Summary{},
+	}
+
+	bytes, err := json.Marshal(test)
+	require.NoError(t, err)
+
+	var newTest model.Test
+	err = json.Unmarshal(bytes, &newTest)
+
+	require.NoError(t, err)
+	assert.Equal(t, test.Specs, newTest.Specs)
 }
