@@ -30,7 +30,7 @@ var kubernetes = installer{
 	installFn: kubernetesInstaller,
 }
 
-func windowsGnuToolsChecker(ui UI) {
+func windowsGnuToolsChecker(ui cliUI.UI) {
 	if !isWindows() {
 		return
 	}
@@ -41,14 +41,14 @@ func windowsGnuToolsChecker(ui UI) {
 	}
 
 	ui.Warning("I didn't find sed in your system")
-	option := ui.Select("What do you want to do?", []option{
+	option := ui.Select("What do you want to do?", []cliUI.Option{
 		{"Install sed", installSed},
 		{"Fix it manually", exitOption(
 			"Check the helm install docs on https://community.chocolatey.org/packages/sed",
 		)},
 	}, 0)
 
-	option.fn(ui)
+	option.Fn(ui)
 
 	if commandExists("sed") {
 		ui.Println(ui.Green("✔ sed was successfully installed"))
@@ -57,7 +57,7 @@ func windowsGnuToolsChecker(ui UI) {
 	}
 }
 
-func installSed(ui UI) {
+func installSed(ui cliUI.UI) {
 	(cmd{
 		sudo:          true,
 		notConfirmMsg: "No worries, you can try installing sed manually. See https://community.chocolatey.org/packages/sed",
