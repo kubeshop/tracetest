@@ -67,3 +67,9 @@ export const LoadingContainer = styled(Space)`
   margin-bottom: 24px;
   width: 100%;
 `;
+
+export const FiltersContainer = styled.div`
+  display: flex;
+  gap: 8px;
+  align-items:center;
+`;

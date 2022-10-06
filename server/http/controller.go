@@ -194,12 +194,12 @@ func (c *controller) GetTestRuns(ctx context.Context, testID string, take, skip 
 	return openapi.Response(200, c.mappers.Out.Runs(runs)), nil
 }
 
-func (c *controller) GetTests(ctx context.Context, take, skip int32, query string) (openapi.ImplResponse, error) {
+func (c *controller) GetTests(ctx context.Context, take, skip int32, query string, sortBy string, sortDirection string) (openapi.ImplResponse, error) {
 	if take == 0 {
 		take = 20
 	}
 
-	tests, err := c.testDB.GetTests(ctx, take, skip, query)
+	tests, err := c.testDB.GetTests(ctx, take, skip, query, sortBy, sortDirection)
 	if err != nil {
 		return handleDBError(err), err
 	}

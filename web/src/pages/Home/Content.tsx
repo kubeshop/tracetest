@@ -1,7 +1,6 @@
 import {useCallback, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import Pagination from 'components/Pagination';
-import SearchInput from 'components/SearchInput';
 import CreateTestModal from 'components/CreateTestModal/CreateTestModal';
 import CreateTransactionModal from 'components/CreateTransactionModal/CreateTransactionModal';
 import TestCard from 'components/TestCard';
@@ -10,22 +9,27 @@ import usePagination from 'hooks/usePagination';
 import useTestCrud from 'providers/Test/hooks/useTestCrud';
 import {useGetTestListQuery} from 'redux/apis/TraceTest.api';
 import HomeAnalyticsService from 'services/Analytics/HomeAnalytics.service';
+import {SortBy, SortDirection, sortOptions} from 'constants/Test.constants';
 import {TTest} from 'types/Test.types';
 import * as S from './Home.styled';
 import HomeActions from './HomeActions';
 import NoResults from './NoResults';
 import Loading from './Loading';
+import HomeFilters from './HomeFilters';
 
 const {onTestClick} = HomeAnalyticsService;
+type TParameters = {sortBy: SortBy; sortDirection: SortDirection};
+const [{params: defaultSort}] = sortOptions;
 
 const Content = () => {
   const [isCreateTransactionOpen, setIsCreateTransactionOpen] = useState(false);
   const [isCreateTestOpen, setIsCreateTestOpen] = useState(false);
+  const [parameters, setParameters] = useState<TParameters>(defaultSort);
 
-  const {hasNext, hasPrev, isEmpty, isFetching, isLoading, list, loadNext, loadPrev, search} = usePagination<TTest, {}>(
-    useGetTestListQuery,
-    {}
-  );
+  const {hasNext, hasPrev, isEmpty, isFetching, isLoading, list, loadNext, loadPrev, search} = usePagination<
+    TTest,
+    TParameters
+  >(useGetTestListQuery, parameters);
   const onDelete = useDeleteTest();
   const navigate = useNavigate();
   const {runTest} = useTestCrud();
@@ -53,7 +57,7 @@ const Content = () => {
         </S.HeaderContainer>
 
         <S.ActionsContainer>
-          <SearchInput onSearch={value => search(value)} placeholder="Search test" />
+          <HomeFilters onSearch={search} onSortBy={(sortBy, sortDirection) => setParameters({sortBy, sortDirection})} />
           <HomeActions
             onCreateTransaction={() => setIsCreateTransactionOpen(true)}
             onCreateTest={() => setIsCreateTestOpen(true)}

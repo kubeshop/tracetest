@@ -31,6 +31,18 @@ paths:
           description: "query to search tests, based on test name and description"
           schema:
             type: string
+        - in: query
+          name: sortBy
+          description: "indicates the sort field for the tests"
+          schema:
+            type: string
+            enum: [created, name, last_run]
+        - in: query
+          name: sortDirection
+          description: "indicates the sort direction for the tests"
+          schema:
+            type: string
+            enum: [asc, desc]
       responses:
         200:
           description: successful operation

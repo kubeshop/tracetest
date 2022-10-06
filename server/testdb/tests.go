@@ -161,6 +161,27 @@ const getTestSQL = `
 	ON last_test_run.test_id = ltr.test_id AND last_test_run.id = ltr.id
 `
 
+var sortingFields = map[string]string{
+	"created":  "t.created_at",
+	"name":     "t.name",
+	"last_run": "last_test_run_time",
+}
+
+func sortQuery(sql, sortBy, sortDirection string) string {
+	sortField, ok := sortingFields[sortBy]
+
+	if !ok {
+		sortField = sortingFields["created"]
+	}
+
+	dir := "DESC"
+	if strings.ToLower(sortDirection) == "asc" {
+		dir = "ASC"
+	}
+
+	return fmt.Sprintf("%s ORDER BY %s %s", sql, sortField, dir)
+}
+
 func (td *postgresDB) GetTestVersion(ctx context.Context, id id.ID, version int) (model.Test, error) {
 	stmt, err := td.db.Prepare(getTestSQL + " WHERE t.id = $1 AND t.version = $2")
 	if err != nil {
@@ -191,7 +212,7 @@ func (td *postgresDB) GetLatestTestVersion(ctx context.Context, id id.ID) (model
 	return test, nil
 }
 
-func (td *postgresDB) GetTests(ctx context.Context, take, skip int32, query string) ([]model.Test, error) {
+func (td *postgresDB) GetTests(ctx context.Context, take, skip int32, query, sortBy, sortDirection string) ([]model.Test, error) {
 	hasSearchQuery := query != ""
 	params := []any{take, skip}
 
@@ -200,6 +221,7 @@ func (td *postgresDB) GetTests(ctx context.Context, take, skip int32, query stri
 		SELECT id as idx, max(version) as latest_version FROM tests GROUP BY idx
 	) as latest_tests ON latest_tests.idx = t.id
 	WHERE t.version = latest_tests.latest_version `
+
 	if hasSearchQuery {
 		params = append(params, "%"+strings.ReplaceAll(query, " ", "%")+"%")
 		sql += ` AND (
@@ -208,7 +230,8 @@ func (td *postgresDB) GetTests(ctx context.Context, take, skip int32, query stri
 		)`
 	}
 
-	sql += ` ORDER BY t.created_at DESC LIMIT $1 OFFSET $2`
+	sql = sortQuery(sql, sortBy, sortDirection)
+	sql += ` LIMIT $1 OFFSET $2`
 
 	stmt, err := td.db.Prepare(sql)
 	if err != nil {

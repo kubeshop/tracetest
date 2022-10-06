@@ -60,7 +60,7 @@ type ApiApiServicer interface {
 	GetTestSpecs(context.Context, string) (ImplResponse, error)
 	GetTestVersion(context.Context, string, int32) (ImplResponse, error)
 	GetTestVersionDefinitionFile(context.Context, string, int32) (ImplResponse, error)
-	GetTests(context.Context, int32, int32, string) (ImplResponse, error)
+	GetTests(context.Context, int32, int32, string, string, string) (ImplResponse, error)
 	ImportTestRun(context.Context, ExportedTestInformation) (ImplResponse, error)
 	RerunTestRun(context.Context, string, string) (ImplResponse, error)
 	RunTest(context.Context, string, TestRunInformation) (ImplResponse, error)
