@@ -23,6 +23,7 @@ Tracetest allows you to quickly build integration and e2e tests, powered by your
 ## **Blog & Video Posts**
 
 Check out the following blog posts & videos with Tracetest-related content:
+
 - [Frontend Overhaul of the OpenTelemetry Demo (Go to Next.js)](https://tracetest.io/blog/frontend-overhaul-opentelemetry-demo) - Oct 5, 2022
 
 - [Enabling Tracetest to Work Directly with OpenSearch](https://tracetest.webflow.io/blog/tracetest-opensearch-integration) - Oct 3, 2022
