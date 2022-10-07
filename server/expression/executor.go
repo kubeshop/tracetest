@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
+	"strconv"
 
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/traces"
@@ -30,14 +31,20 @@ func (e Executor) ExecuteStatement(statement string) (string, string, error) {
 		return "", "", fmt.Errorf("could not parse statement: %w", err)
 	}
 
-	leftValue, err := e.executeExpression(parsedStatement.Left)
+	leftValue, leftType, err := e.executeExpression(parsedStatement.Left)
 	if err != nil {
 		return "", "", fmt.Errorf("could not parse left side expression: %w", err)
 	}
 
-	rightValue, err := e.executeExpression(parsedStatement.Right)
+	rightValue, rightType, err := e.executeExpression(parsedStatement.Right)
 	if err != nil {
 		return "", "", fmt.Errorf("could not parse left side expression: %w", err)
+	}
+
+	// https://github.com/kubeshop/tracetest/issues/1203
+	if leftType == TYPE_DURATION || rightType == TYPE_DURATION {
+		leftValue = getRoundedDurationValue(leftValue)
+		rightValue = getRoundedDurationValue(rightValue)
 	}
 
 	comparatorFunction, err := comparator.DefaultRegistry().Get(parsedStatement.Comparator)
@@ -58,10 +65,10 @@ type executionValue struct {
 	Type  Type
 }
 
-func (e Executor) executeExpression(expr Expr) (string, error) {
+func (e Executor) executeExpression(expr Expr) (string, Type, error) {
 	currentValue, currentType, err := e.resolveTerm(expr.Left)
 	if err != nil {
-		return "", fmt.Errorf("could not resolve term: %w", err)
+		return "", TYPE_NIL, fmt.Errorf("could not resolve term: %w", err)
 	}
 
 	value := executionValue{currentValue, currentType}
@@ -69,7 +76,7 @@ func (e Executor) executeExpression(expr Expr) (string, error) {
 		for _, opTerm := range expr.Right {
 			currentValue, currentType, err = e.executeOperation(value, opTerm)
 			if err != nil {
-				return "", fmt.Errorf("could not execute operation: %w", err)
+				return "", TYPE_NIL, fmt.Errorf("could not execute operation: %w", err)
 			}
 
 			value = executionValue{currentValue, currentType}
@@ -80,14 +87,15 @@ func (e Executor) executeExpression(expr Expr) (string, error) {
 		for _, filter := range expr.Filters {
 			newValue, err := e.executeFilter(value, filter)
 			if err != nil {
-				return "", fmt.Errorf("could not execute filter: %w", err)
+				return "", TYPE_NIL, fmt.Errorf("could not execute filter: %w", err)
 			}
 
 			value = newValue
+			currentType = getType(value.Value)
 		}
 	}
 
-	return value.Value, nil
+	return value.Value, currentType, nil
 }
 
 func (e Executor) resolveTerm(term *Term) (string, Type, error) {
@@ -123,7 +131,7 @@ func (e Executor) resolveTerm(term *Term) (string, Type, error) {
 	if term.Str != nil {
 		stringArgs := make([]any, 0, len(term.Str.Args))
 		for _, arg := range term.Str.Args {
-			stringArg, err := e.executeExpression(arg)
+			stringArg, _, err := e.executeExpression(arg)
 			if err != nil {
 				return "", TYPE_NIL, fmt.Errorf("could not execute expression: %w", err)
 			}
@@ -166,8 +174,8 @@ func (e Executor) executeOperation(left executionValue, right *OpTerm) (string, 
 }
 
 func getType(value string) Type {
-	numberRegex := regexp.MustCompile(`([0-9]+(\.[0-9]+)?)`)
-	durationRegex := regexp.MustCompile(`([0-9]+(\.[0-9]+)?)(ns|us|ms|s|m|h)`)
+	numberRegex := regexp.MustCompile(`^([0-9]+(\.[0-9]+)?)$`)
+	durationRegex := regexp.MustCompile(`^([0-9]+(\.[0-9]+)?)(ns|us|ms|s|m|h)$`)
 
 	if numberRegex.Match([]byte(value)) {
 		return TYPE_NUMBER
@@ -200,4 +208,12 @@ func (e Executor) executeFilter(value executionValue, filter *Filter) (execution
 		Value: newValue,
 		Type:  getType(newValue),
 	}, nil
+}
+
+func getRoundedDurationValue(value string) string {
+	numberValue, _ := strconv.Atoi(value)
+	valueAsDuration := traces.ConvertNanoSecondsIntoProperTimeUnit(numberValue)
+	roundedValue := traces.ConvertTimeFieldIntoNanoSeconds(valueAsDuration)
+
+	return fmt.Sprintf("%d", roundedValue)
 }

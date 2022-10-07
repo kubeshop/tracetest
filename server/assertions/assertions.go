@@ -1,13 +1,10 @@
 package assertions
 
 import (
-	"fmt"
-	"strconv"
-
 	"github.com/kubeshop/tracetest/server/assertions/selectors"
+	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/traces"
-	"go.opentelemetry.io/otel/trace"
 )
 
 func Assert(defs model.OrderedMap[model.SpanQuery, model.NamedAssertions], trace traces.Trace) (model.OrderedMap[model.SpanQuery, []model.AssertionResult], bool) {
@@ -29,88 +26,53 @@ func Assert(defs model.OrderedMap[model.SpanQuery, model.NamedAssertions], trace
 	return testResult, allPassed
 }
 
-func assert(a model.Assertion, spans []traces.Span) model.AssertionResult {
-	if a.Attribute.IsMeta() {
-		return assertMeta(a, spans)
-	}
+func assert(assertion model.Assertion, spans []traces.Span) model.AssertionResult {
+	metaAttributeDataStore := expression.MetaAttributesDataStore{SelectedSpans: spans}
+	if len(spans) == 0 {
+		// we still have to run the assertion because it migth use a meta attribute
+		emptyAttributeDataStore := expression.AttributeDataStore{}
+		executor := expression.NewExecutor(emptyAttributeDataStore, metaAttributeDataStore)
+		result := runAssertion(executor, string(assertion))
 
-	return assertIndividualSpans(a, spans)
-}
-
-func assertMeta(a model.Assertion, spans []traces.Span) model.AssertionResult {
-	res := func(res model.SpanAssertionResult, err error) model.AssertionResult {
 		return model.AssertionResult{
-			Assertion: a,
-			AllPassed: err == nil,
-			Results:   []model.SpanAssertionResult{res},
+			Assertion: assertion,
+			AllPassed: result.CompareErr == nil,
+			Results:   []model.SpanAssertionResult{result},
 		}
 	}
 
-	ma, err := metaAttr(a.Attribute.String())
-	if err != nil {
-		return res(model.SpanAssertionResult{}, err)
-	}
-
-	expectedValue, err := ExecuteExpression(*a.Value, traces.Span{})
-	actualValue := ma.Value(spans)
-
-	sar := apply(a, expectedValue, actualValue, nil)
-	if err != nil {
-		sar.CompareErr = err
-	}
-
-	return res(sar, sar.CompareErr)
-}
-
-func assertIndividualSpans(a model.Assertion, spans []traces.Span) model.AssertionResult {
-	res := make([]model.SpanAssertionResult, len(spans))
 	allPassed := true
-	for i, span := range spans {
+	spanResults := make([]model.SpanAssertionResult, 0, len(spans))
+	for _, span := range spans {
 		spanID := span.ID
-		var err error = nil
-		expectedValue, err := ExecuteExpression(*a.Value, span)
-		actualValue := span.Attributes.Get(a.Attribute.String())
+		attributeDataStore := expression.AttributeDataStore{Span: span}
+		expressionExecutor := expression.NewExecutor(attributeDataStore, metaAttributeDataStore)
 
-		// See https://github.com/kubeshop/tracetest/issues/1203
-		if a.Value.Type() == "duration" {
-			actualValue = getRoundedDurationValue(actualValue)
-		}
-
-		res[i] = apply(
-			a,
-			expectedValue,
-			actualValue,
-			&spanID,
-		)
+		actualValue, _, err := expressionExecutor.ExecuteStatement(string(assertion))
 		if err != nil {
-			res[i].CompareErr = err
-		}
-
-		if res[i].CompareErr != nil {
 			allPassed = false
 		}
+
+		spanResults = append(spanResults, model.SpanAssertionResult{
+			SpanID:        &spanID,
+			ObservedValue: actualValue,
+			CompareErr:    err,
+		})
 	}
 
 	return model.AssertionResult{
-		Assertion: a,
+		Assertion: assertion,
 		AllPassed: allPassed,
-		Results:   res,
+		Results:   spanResults,
 	}
 }
 
-func getRoundedDurationValue(value string) string {
-	numberValue, _ := strconv.Atoi(value)
-	valueAsDuration := traces.ConvertNanoSecondsIntoProperTimeUnit(numberValue)
-	roundedValue := traces.ConvertTimeFieldIntoNanoSeconds(valueAsDuration)
-
-	return fmt.Sprintf("%d", roundedValue)
-}
-
-func apply(a model.Assertion, expected, actual string, spanID *trace.SpanID) model.SpanAssertionResult {
+func runAssertion(executor expression.Executor, assertion string) model.SpanAssertionResult {
+	actualValue, _, err := executor.ExecuteStatement(string(assertion))
 	return model.SpanAssertionResult{
-		SpanID:        spanID,
-		ObservedValue: actual,
-		CompareErr:    a.Comparator.Compare(expected, actual),
+		SpanID:        nil,
+		ObservedValue: actualValue,
+		CompareErr:    err,
 	}
 }
 
