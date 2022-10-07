@@ -3,6 +3,8 @@ services:
   tracetest:
     restart: unless-stopped
     image: kubeshop/tracetest:${TAG:-latest}
+    ports:
+      - 11633:11633
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
