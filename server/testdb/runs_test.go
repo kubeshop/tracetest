@@ -4,7 +4,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/model/modeltest"
 	"github.com/kubeshop/tracetest/server/testdb"
@@ -98,16 +97,7 @@ func TestUpdateRun(t *testing.T) {
 		AllPassed: true,
 		Results: (model.OrderedMap[model.SpanQuery, []model.AssertionResult]{}).MustAdd(`span[service.name="Pokeshop"]`, []model.AssertionResult{
 			{
-				Assertion: model.Assertion{
-					Attribute:  "tracetest.span.duration",
-					Comparator: comparator.Eq,
-					Value: &model.AssertionExpression{
-						LiteralValue: model.LiteralValue{
-							Value: "2000",
-							Type:  "number",
-						},
-					},
-				},
+				Assertion: model.Assertion(`attr:tracetest.span.duration = 2000`),
 				Results: []model.SpanAssertionResult{
 					{
 						SpanID:        &run.Trace.RootSpan.ID,

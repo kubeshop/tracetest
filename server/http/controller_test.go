@@ -46,12 +46,8 @@ func TestContains_Issue617(t *testing.T) {
 				Selector: openapi.Selector{
 					Query: `span[tracetest.span.type = "http" service.name = "pokeshop"  name = "POST /pokemon/import"]`,
 				},
-				Assertions: []openapi.Assertion{
-					{
-						Attribute:  "http.response.body",
-						Comparator: "contains",
-						Expected:   "52",
-					},
+				Assertions: []string{
+					`attr:http.response.body contains 52`,
 				},
 			},
 		},
@@ -88,11 +84,7 @@ func TestContains_Issue617(t *testing.T) {
 				Results: []openapi.AssertionResult{
 					{
 						AllPassed: true,
-						Assertion: openapi.Assertion{
-							Attribute:  "http.response.body",
-							Comparator: "contains",
-							Expected:   "52",
-						},
+						Assertion: `attr:http.response.body contains 52`,
 						SpanResults: []openapi.AssertionSpanResult{
 							{
 								SpanId:        exampleRun.Trace.RootSpan.ID.String(),
