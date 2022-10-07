@@ -99,7 +99,7 @@ func (e Executor) resolveTerm(term *Term) (string, Type, error) {
 	}
 
 	if term.Str != nil {
-		stringArgs := make([]string, 0, len(term.Str.Args))
+		stringArgs := make([]any, 0, len(term.Str.Args))
 		for _, arg := range term.Str.Args {
 			stringArg, err := e.executeExpression(arg)
 			if err != nil {
@@ -108,7 +108,13 @@ func (e Executor) resolveTerm(term *Term) (string, Type, error) {
 
 			stringArgs = append(stringArgs, stringArg)
 		}
-		return fmt.Sprintf(term.Str.Text, stringArgs), TYPE_STRING, nil
+
+		value := term.Str.Text
+		if len(stringArgs) > 0 {
+			value = fmt.Sprintf(term.Str.Text, stringArgs...)
+		}
+
+		return value, TYPE_STRING, nil
 	}
 
 	return "", TYPE_NIL, fmt.Errorf("empty term")

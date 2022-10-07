@@ -100,6 +100,25 @@ func TestAttributes(t *testing.T) {
 	executeTestCases(t, testCases)
 }
 
+func TestStringInterpolations(t *testing.T) {
+	testCases := []executorTestCase{
+		{
+			Name:       "should_interpolate_simple_values",
+			Query:      `attr:text = 'this run took ${"25ms"}'`,
+			ShouldPass: true,
+			AttributeDataStore: expression.AttributeDataStore{
+				Span: traces.Span{
+					Attributes: traces.Attributes{
+						"text": "this run took 25ms",
+					},
+				},
+			},
+		},
+	}
+
+	executeTestCases(t, testCases)
+}
+
 func executeTestCases(t *testing.T, testCases []executorTestCase) {
 	for _, testCase := range testCases {
 		t.Run(testCase.Name, func(t *testing.T) {
