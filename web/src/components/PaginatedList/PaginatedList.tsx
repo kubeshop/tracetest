@@ -12,6 +12,7 @@ type TParams<P> = P & {
 };
 
 interface IProps<T, P> {
+  dataCy?: string;
   itemComponent({item}: {item: T}): ReactElement;
   params: TParams<P>;
   query: UseQuery<any>;
@@ -21,7 +22,7 @@ interface IId {
   id: string;
 }
 
-const PaginatedList = <T extends IId, P>({itemComponent: ItemComponent, params, query}: IProps<T, P>) => {
+const PaginatedList = <T extends IId, P>({dataCy, itemComponent: ItemComponent, params, query}: IProps<T, P>) => {
   const {hasNext, hasPrev, isEmpty, isFetching, isLoading, list, loadNext, loadPrev} = usePagination<T, typeof params>(
     query,
     params
@@ -39,7 +40,7 @@ const PaginatedList = <T extends IId, P>({itemComponent: ItemComponent, params, 
       loadNext={loadNext}
       loadPrev={loadPrev}
     >
-      <S.ListContainer>
+      <S.ListContainer data-cy={dataCy}>
         {list.map(item => (
           <ItemComponent item={item} key={item.id} />
         ))}

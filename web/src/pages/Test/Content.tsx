@@ -53,6 +53,7 @@ const Content = () => {
       </S.ActionsContainer>
 
       <PaginatedList<TTestRun, {testId: string}>
+        dataCy="run-card-list"
         itemComponent={({item}) => <RunCard linkTo={`/test/${test.id}/run/${item.id}`} run={item} testId={test.id} />}
         params={params}
         query={useGetRunListQuery}
