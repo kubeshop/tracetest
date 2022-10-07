@@ -3,6 +3,7 @@ import LocalStorageGateway from '../gateways/LocalStorage.gateway';
 
 export enum GuidedTours {
   Home = 'home',
+  Environment = 'environment',
   Trace = 'trace',
   TestDetails = 'testDetails',
 }

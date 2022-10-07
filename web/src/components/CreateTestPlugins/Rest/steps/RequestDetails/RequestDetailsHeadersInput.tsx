@@ -1,18 +1,29 @@
 import {PlusOutlined} from '@ant-design/icons';
 import {Button, Form, Input} from 'antd';
+import {DEFAULT_HEADERS, IKeyValue} from 'constants/Test.constants';
 import React from 'react';
-import {DEFAULT_HEADERS} from 'constants/Test.constants';
 import * as S from './RequestDetails.styled';
 
-const RequestDetailsHeadersInput: React.FC = () => (
-  <Form.Item className="input-headers" label="Headers list">
-    <Form.List name="headers" initialValue={DEFAULT_HEADERS}>
+interface IProps {
+  initialValue?: IKeyValue[];
+  name?: string;
+  unit?: string;
+  label?: string;
+}
+const RequestDetailsHeadersInput: React.FC<IProps> = ({
+  unit = 'Header',
+  name = 'headers',
+  initialValue = DEFAULT_HEADERS,
+  label = 'Header',
+}) => (
+  <Form.Item className="input-headers" label={`${label} list`} shouldUpdate>
+    <Form.List name={name} initialValue={initialValue}>
       {(fields, {add, remove}) => (
         <>
           {fields.map((field, index) => (
             <S.HeaderContainer key={field.name}>
               <Form.Item name={[field.name, 'key']} noStyle>
-                <Input placeholder={`Header ${index + 1}`} />
+                <Input placeholder={`${unit} ${index + 1}`} />
               </Form.Item>
 
               <Form.Item name={[field.name, 'value']} noStyle>
@@ -37,7 +48,7 @@ const RequestDetailsHeadersInput: React.FC = () => (
             style={{fontWeight: 600, height: 'auto', padding: 0}}
             type="link"
           >
-            Add Header
+            {`Add ${label}`}
           </Button>
         </>
       )}

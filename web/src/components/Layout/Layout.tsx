@@ -1,14 +1,14 @@
 import {ClusterOutlined, GlobalOutlined} from '@ant-design/icons';
 import {Menu} from 'antd';
-import {MenuInfo} from 'rc-menu/es/interface';
-import React from 'react';
-import {Link, useNavigate} from 'react-router-dom';
 
 import logoAsset from 'assets/logo-white.svg';
 import FileViewerModalProvider from 'components/FileViewerModal/FileViewerModal.provider';
 import Header from 'components/Header';
 import useRouterSync from 'hooks/useRouterSync';
 import ConfirmationModalProvider from 'providers/ConfirmationModal';
+import {MenuInfo} from 'rc-menu/es/interface';
+import React from 'react';
+import {Link, useLocation, useNavigate} from 'react-router-dom';
 import ExperimentalFeature from 'utils/ExperimentalFeature';
 import * as S from './Layout.styled';
 
@@ -43,7 +43,7 @@ const Layout = ({children, hasMenu = false}: IProps) => {
     const item = menuItems.find(menuItem => menuItem.key === menuInfo.key);
     navigate(item?.path ?? '/');
   };
-
+  const pathname = useLocation().pathname;
   return (
     <FileViewerModalProvider>
       <ConfirmationModalProvider>
@@ -58,7 +58,7 @@ const Layout = ({children, hasMenu = false}: IProps) => {
 
               <S.MenuContainer>
                 <Menu
-                  defaultSelectedKeys={['0']}
+                  defaultSelectedKeys={[menuItems.findIndex(value => value.path === pathname).toString() || '0']}
                   items={menuItems}
                   mode="inline"
                   onClick={handleOnClickMenu}

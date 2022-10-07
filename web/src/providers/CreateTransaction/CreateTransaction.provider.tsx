@@ -1,7 +1,6 @@
-import {createContext, useCallback, useContext, useMemo} from 'react';
 import {noop} from 'lodash';
+import {createContext, useCallback, useContext, useMemo} from 'react';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
-import {ICreateTransactionState, TDraftTransaction} from 'types/Transaction.types';
 import {
   initialState,
   reset,
@@ -11,6 +10,7 @@ import {
 } from 'redux/slices/CreateTransaction.slice';
 import CreateTransactionSelectors from 'selectors/CreateTransaction.selectors';
 import {ICreateTestStep} from 'types/Plugins.types';
+import {ICreateTransactionState, TDraftTransaction} from 'types/Transaction.types';
 
 interface IContext extends ICreateTransactionState {
   isLoading: boolean;
@@ -54,6 +54,7 @@ const CreateTransactionProvider = ({children}: IProps) => {
   const activeStep = stepList[stepNumber]?.id;
 
   const onCreateTransaction = useCallback(async (draft: TDraftTransaction) => {
+    // eslint-disable-next-line no-console
     console.log('@@ creating a new transaction!!', draft);
   }, []);
 
