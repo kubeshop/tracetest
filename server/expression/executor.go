@@ -75,7 +75,18 @@ func (e Executor) executeExpression(expr Expr) (string, error) {
 		}
 	}
 
-	return currentValue, nil
+	if expr.Filters != nil {
+		for _, filter := range expr.Filters {
+			newValue, err := e.executeFilter(value, filter)
+			if err != nil {
+				return "", fmt.Errorf("could not execute filter: %w", err)
+			}
+
+			value = newValue
+		}
+	}
+
+	return value.Value, nil
 }
 
 func (e Executor) resolveTerm(term *Term) (string, Type, error) {
@@ -156,4 +167,26 @@ func getType(value string) Type {
 	}
 
 	return TYPE_STRING
+}
+
+func (e Executor) executeFilter(value executionValue, filter *Filter) (executionValue, error) {
+	args := make([]string, 0, len(filter.Args))
+	for _, arg := range filter.Args {
+		resolvedArg, _, err := e.resolveTerm(arg)
+		if err != nil {
+			return executionValue{}, err
+		}
+
+		args = append(args, resolvedArg)
+	}
+
+	newValue, err := executeFilter(value.Value, filter.FunctionName, args)
+	if err != nil {
+		return executionValue{}, err
+	}
+
+	return executionValue{
+		Value: newValue,
+		Type:  getType(newValue),
+	}, nil
 }

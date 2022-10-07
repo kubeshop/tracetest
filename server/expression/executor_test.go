@@ -16,7 +16,7 @@ type executorTestCase struct {
 	AttributeDataStore expression.AttributeDataStore
 }
 
-func TestBasicExpressions(t *testing.T) {
+func TestBasicExpressionExecution(t *testing.T) {
 	testCases := []executorTestCase{
 		{
 			Name:       "should_compare_equal_integers",
@@ -48,7 +48,7 @@ func TestBasicExpressions(t *testing.T) {
 	executeTestCases(t, testCases)
 }
 
-func TestBasicOperations(t *testing.T) {
+func TestBasicOperationExecution(t *testing.T) {
 	testCases := []executorTestCase{
 		{
 			Name:       "should_allow_addition",
@@ -80,7 +80,7 @@ func TestBasicOperations(t *testing.T) {
 	executeTestCases(t, testCases)
 }
 
-func TestAttributes(t *testing.T) {
+func TestAttributeExecution(t *testing.T) {
 	testCases := []executorTestCase{
 		{
 			Name:       "should_get_values_from_attributes",
@@ -100,7 +100,7 @@ func TestAttributes(t *testing.T) {
 	executeTestCases(t, testCases)
 }
 
-func TestStringInterpolations(t *testing.T) {
+func TestStringInterpolationExecution(t *testing.T) {
 	testCases := []executorTestCase{
 		{
 			Name:       "should_interpolate_simple_values",
@@ -118,6 +118,25 @@ func TestStringInterpolations(t *testing.T) {
 			Name:       "should_interpolate_multiple_values",
 			Query:      `'${1} is a number, ${"dog"} is a string, and ${1ms + 1ns} is a duration' = '1 is a number, dog is a string, and 1000001 is a duration'`,
 			ShouldPass: true,
+		},
+	}
+
+	executeTestCases(t, testCases)
+}
+
+func TestFilterExecution(t *testing.T) {
+	testCases := []executorTestCase{
+		{
+			Name:       "should_extract_id_from_json",
+			Query:      `attr:tracetest.response.body | json_path '.id' = 8`,
+			ShouldPass: true,
+			AttributeDataStore: expression.AttributeDataStore{
+				Span: traces.Span{
+					Attributes: traces.Attributes{
+						"tracetest.response.body": `{"id": 8, "name": "john doe"}`,
+					},
+				},
+			},
 		},
 	}
 
