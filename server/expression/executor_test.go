@@ -70,6 +70,11 @@ func TestBasicOperations(t *testing.T) {
 			Query:      "8 / 2 = 4",
 			ShouldPass: true,
 		},
+		{
+			Name:       "should_add_durations",
+			Query:      "100ms + 200ms = 300ms",
+			ShouldPass: true,
+		},
 	}
 
 	executeTestCases(t, testCases)

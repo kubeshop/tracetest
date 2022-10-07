@@ -6,6 +6,7 @@ import (
 	"regexp"
 
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
+	"github.com/kubeshop/tracetest/server/traces"
 )
 
 var ErrNoMatch error = errors.New("no match")
@@ -89,7 +90,8 @@ func (e Executor) resolveTerm(term *Term) (string, Type, error) {
 	}
 
 	if term.Duration != nil {
-		return *term.Duration, TYPE_DURATION, nil
+		nanoSeconds := traces.ConvertTimeFieldIntoNanoSeconds(*term.Duration)
+		return fmt.Sprintf("%d", nanoSeconds), TYPE_DURATION, nil
 	}
 
 	if term.Number != nil {
