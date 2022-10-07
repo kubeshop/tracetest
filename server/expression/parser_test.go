@@ -291,6 +291,47 @@ func TestFilters(t *testing.T) {
 			},
 		},
 		{
+			Name:  "should_allow_filters_with_multiple_arguments",
+			Query: `attr:my_json_attribute | my_function 'arg1' 'arg2' 42 = "abc"`,
+			ExpectedOutput: expression.Statement{
+				Left: expression.Expr{
+					Left: &expression.Term{
+						Attribute: attrp("my_json_attribute"),
+					},
+					Filters: []*expression.Filter{
+						{
+							FunctionName: "my_function", Args: []*expression.Term{
+								{
+									Str: &expression.Str{
+										Text: "arg1",
+										Args: []expression.Expr{},
+									},
+								},
+								{
+									Str: &expression.Str{
+										Text: "arg2",
+										Args: []expression.Expr{},
+									},
+								},
+								{
+									Number: strp("42"),
+								},
+							},
+						},
+					},
+				},
+				Comparator: "=",
+				Right: expression.Expr{
+					Left: &expression.Term{
+						Str: &expression.Str{
+							Text: "abc",
+							Args: []expression.Expr{},
+						},
+					},
+				},
+			},
+		},
+		{
 			Name:  "should_allow_chaining_filters",
 			Query: `attr:my_json_attribute | json_path '.name' | lowercase = "john"`,
 			ExpectedOutput: expression.Statement{
@@ -320,6 +361,44 @@ func TestFilters(t *testing.T) {
 						Str: &expression.Str{
 							Text: "john",
 							Args: []expression.Expr{},
+						},
+					},
+				},
+			},
+		},
+		{
+			Name:  "should_allow_filters_inside_string_interpolation",
+			Query: `attr:message = "welcome to tracetest, ${attr:tracetest.response.body | json_path '.name'}"`,
+			ExpectedOutput: expression.Statement{
+				Left: expression.Expr{
+					Left: &expression.Term{
+						Attribute: attrp("message"),
+					},
+				},
+				Comparator: "=",
+				Right: expression.Expr{
+					Left: &expression.Term{
+						Str: &expression.Str{
+							Text: "welcome to tracetest, %s",
+							Args: []expression.Expr{
+								{
+									Left: &expression.Term{
+										Attribute: attrp("tracetest.response.body"),
+									},
+									Filters: []*expression.Filter{
+										{
+											FunctionName: "json_path", Args: []*expression.Term{
+												{
+													Str: &expression.Str{
+														Text: ".name",
+														Args: []expression.Expr{},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
 						},
 					},
 				},
