@@ -9,14 +9,14 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-type testCase struct {
+type parserTestCase struct {
 	Name           string
 	Query          string
 	ExpectedOutput expression.Statement
 }
 
 func TestSimpleParsingRules(t *testing.T) {
-	testCases := []testCase{
+	testCases := []parserTestCase{
 		{
 			Name:  "should_parse_1=1",
 			Query: `1 = 1`,
@@ -77,7 +77,7 @@ func TestSimpleParsingRules(t *testing.T) {
 }
 
 func TestExpressions(t *testing.T) {
-	testCases := []testCase{
+	testCases := []parserTestCase{
 		{
 			Name:  "should_parse_expressions_with_addition_operator",
 			Query: "2 + 1 = 1 + 2",
@@ -144,7 +144,7 @@ func TestExpressions(t *testing.T) {
 }
 
 func TestStringInterpolation(t *testing.T) {
-	testCases := []testCase{
+	testCases := []parserTestCase{
 		{
 			Name:  "should_interpolate_simple_values",
 			Query: `attr:text = "your age is ${18}"`,
@@ -231,7 +231,7 @@ func TestStringInterpolation(t *testing.T) {
 }
 
 func TestFilters(t *testing.T) {
-	testCases := []testCase{
+	testCases := []parserTestCase{
 		{
 			Name:  "should_allow_filter_on_left_hand_side",
 			Query: `attr:my_json_attribute | json_path '.id' = 32`,
@@ -409,7 +409,7 @@ func TestFilters(t *testing.T) {
 	runTestCases(t, testCases)
 }
 
-func runTestCases(t *testing.T, testCases []testCase) {
+func runTestCases(t *testing.T, testCases []parserTestCase) {
 	for _, testCase := range testCases {
 		t.Run(testCase.Name, func(t *testing.T) {
 			output, err := expression.Parse(testCase.Query)
