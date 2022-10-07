@@ -230,6 +230,106 @@ func TestStringInterpolation(t *testing.T) {
 	runTestCases(t, testCases)
 }
 
+func TestFilters(t *testing.T) {
+	testCases := []testCase{
+		{
+			Name:  "should_allow_filter_on_left_hand_side",
+			Query: `attr:my_json_attribute | json_path '.id' = 32`,
+			ExpectedOutput: expression.Statement{
+				Left: expression.Expr{
+					Left: &expression.Term{
+						Attribute: attrp("my_json_attribute"),
+					},
+					Filters: []*expression.Filter{
+						{
+							FunctionName: "json_path", Args: []*expression.Term{
+								{
+									Str: &expression.Str{
+										Text: ".id",
+										Args: []expression.Expr{},
+									},
+								},
+							},
+						},
+					},
+				},
+				Comparator: "=",
+				Right: expression.Expr{
+					Left: &expression.Term{
+						Number: strp("32"),
+					},
+				},
+			},
+		},
+		{
+			Name:  "should_allow_filter_on_right_hand_side",
+			Query: `attr:user_id = attr:tracetest.response.body | json_path '.id'`,
+			ExpectedOutput: expression.Statement{
+				Left: expression.Expr{
+					Left: &expression.Term{
+						Attribute: attrp("user_id"),
+					},
+				},
+				Comparator: "=",
+				Right: expression.Expr{
+					Left: &expression.Term{
+						Attribute: attrp("tracetest.response.body"),
+					},
+					Filters: []*expression.Filter{
+						{
+							FunctionName: "json_path", Args: []*expression.Term{
+								{
+									Str: &expression.Str{
+										Text: ".id",
+										Args: []expression.Expr{},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			Name:  "should_allow_chaining_filters",
+			Query: `attr:my_json_attribute | json_path '.name' | lowercase = "john"`,
+			ExpectedOutput: expression.Statement{
+				Left: expression.Expr{
+					Left: &expression.Term{
+						Attribute: attrp("my_json_attribute"),
+					},
+					Filters: []*expression.Filter{
+						{
+							FunctionName: "json_path", Args: []*expression.Term{
+								{
+									Str: &expression.Str{
+										Text: ".name",
+										Args: []expression.Expr{},
+									},
+								},
+							},
+						},
+						{
+							FunctionName: "lowercase",
+						},
+					},
+				},
+				Comparator: "=",
+				Right: expression.Expr{
+					Left: &expression.Term{
+						Str: &expression.Str{
+							Text: "john",
+							Args: []expression.Expr{},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	runTestCases(t, testCases)
+}
+
 func runTestCases(t *testing.T, testCases []testCase) {
 	for _, testCase := range testCases {
 		t.Run(testCase.Name, func(t *testing.T) {

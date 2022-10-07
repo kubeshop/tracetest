@@ -9,8 +9,9 @@ type Statement struct {
 }
 
 type Expr struct {
-	Left  *Term     `@@`
-	Right []*OpTerm `@@*`
+	Left    *Term     `@@`
+	Right   []*OpTerm `@@*`
+	Filters []*Filter `@@*`
 }
 
 type OpTerm struct {
@@ -25,10 +26,15 @@ type Term struct {
 	Str       *Str       `| @(QuotedString|SingleQuotedString) )`
 }
 
+type Filter struct {
+	FunctionName string  `"|" @Ident`
+	Args         []*Term `@@*`
+}
+
 var languageLexer = lexer.MustStateful(lexer.Rules{
 	"Root": {
 		{Name: "whitespace", Pattern: `\s+`, Action: nil},
-		{Name: "punc", Pattern: "\\{\\\"'}", Action: nil},
+		{Name: "Punc", Pattern: `\|`, Action: nil},
 
 		{Name: "Comparator", Pattern: `!=|<=|>=|=|<|>|contains|not-contains`},
 		{Name: "Operator", Pattern: `(\+|\-|\*|\/)`, Action: nil},
@@ -38,5 +44,7 @@ var languageLexer = lexer.MustStateful(lexer.Rules{
 		{Name: "Attribute", Pattern: `attr:[a-zA-Z_0-9][a-zA-Z_0-9.]*`, Action: nil},
 		{Name: "QuotedString", Pattern: `"(\\"|[^"])*"`, Action: nil},
 		{Name: "SingleQuotedString", Pattern: `'(\\'|[^'])*'`, Action: nil},
+
+		{Name: "Ident", Pattern: `[a-zA-Z][a-zA-Z0-9_]*`, Action: nil},
 	},
 })
