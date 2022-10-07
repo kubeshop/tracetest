@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/kubeshop/tracetest/server/expression"
+	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -11,6 +12,8 @@ type executorTestCase struct {
 	Name       string
 	Query      string
 	ShouldPass bool
+
+	AttributeDataStore expression.AttributeDataStore
 }
 
 func TestBasicExpressions(t *testing.T) {
@@ -45,10 +48,58 @@ func TestBasicExpressions(t *testing.T) {
 	executeTestCases(t, testCases)
 }
 
+func TestBasicOperations(t *testing.T) {
+	testCases := []executorTestCase{
+		{
+			Name:       "should_allow_addition",
+			Query:      "1 + 1 = 2",
+			ShouldPass: true,
+		},
+		{
+			Name:       "should_allow_subtraction",
+			Query:      "8 - 3 > 0",
+			ShouldPass: true,
+		},
+		{
+			Name:       "should_allow_multiplication",
+			Query:      "15 * 10 = 150",
+			ShouldPass: true,
+		},
+		{
+			Name:       "should_allow_multiplication",
+			Query:      "8 / 2 = 4",
+			ShouldPass: true,
+		},
+	}
+
+	executeTestCases(t, testCases)
+}
+
+func TestAttributes(t *testing.T) {
+	testCases := []executorTestCase{
+		{
+			Name:       "should_get_values_from_attributes",
+			Query:      "attr:my_attribute = 42",
+			ShouldPass: true,
+
+			AttributeDataStore: expression.AttributeDataStore{
+				Span: traces.Span{
+					Attributes: traces.Attributes{
+						"my_attribute": "42",
+					},
+				},
+			},
+		},
+	}
+
+	executeTestCases(t, testCases)
+}
+
 func executeTestCases(t *testing.T, testCases []executorTestCase) {
 	for _, testCase := range testCases {
 		t.Run(testCase.Name, func(t *testing.T) {
-			err := expression.ExecuteStatement(testCase.Query)
+			executor := expression.NewExecutor(testCase.AttributeDataStore)
+			_, _, err := executor.ExecuteStatement(testCase.Query)
 			if testCase.ShouldPass {
 				assert.NoError(t, err)
 			} else {
