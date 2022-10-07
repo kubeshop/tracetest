@@ -2,7 +2,6 @@ package expression
 
 import (
 	"fmt"
-	"regexp"
 	"strconv"
 	"strings"
 
@@ -77,46 +76,4 @@ func validateFieldType(field executionValue) error {
 	}
 
 	return nil
-}
-
-func resolveLiteralValue(literalValue executionValue, span traces.Span) executionValue {
-	if literalValue.Type == TYPE_ATTRIBUTE {
-		value := span.Attributes.Get(literalValue.Value)
-
-		return executionValue{
-			Value: value,
-			Type:  TYPE_STRING,
-		}
-	}
-
-	if literalValue.Type == TYPE_DURATION {
-		value := traces.ConvertTimeFieldIntoNanoSeconds(literalValue.Value)
-
-		return executionValue{
-			Value: fmt.Sprintf("%d", value),
-			Type:  TYPE_NUMBER,
-		}
-	}
-
-	return literalValue
-}
-
-func getValueType(value string) string {
-	numberRegex := regexp.MustCompile(`([0-9]+(\.[0-9]+)?)`)
-	durationRegex := regexp.MustCompile(`([0-9]+(\.[0-9]+)?)(ns|us|ms|s|m|h)`)
-
-	if numberRegex.Match([]byte(value)) {
-		return "number"
-	}
-
-	if durationRegex.Match([]byte(value)) {
-		return "duration"
-	}
-
-	return "string"
-}
-
-func getLiteralValue(literalValue executionValue, span traces.Span) string {
-	resolvedValue := resolveLiteralValue(literalValue, span)
-	return resolvedValue.Value
 }
