@@ -114,6 +114,11 @@ func TestStringInterpolations(t *testing.T) {
 				},
 			},
 		},
+		{
+			Name:       "should_interpolate_multiple_values",
+			Query:      `'${1} is a number, ${"dog"} is a string, and ${1ms + 1ns} is a duration' = '1 is a number, dog is a string, and 1000001 is a duration'`,
+			ShouldPass: true,
+		},
 	}
 
 	executeTestCases(t, testCases)
