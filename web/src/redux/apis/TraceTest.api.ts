@@ -10,15 +10,9 @@ import {TAssertion, TAssertionResults, TRawAssertionResults} from 'types/Asserti
 import {TRawTest, TTest} from 'types/Test.types';
 import {TRawTestRun, TTestRun} from 'types/TestRun.types';
 import {TRawTestSpecs} from 'types/TestSpecs.types';
-<<<<<<< HEAD
-import { IKeyValue } from "../../constants/Test.constants";
-import {SortBy, SortDirection} from 'constants/Test.constants';
-=======
-import {IKeyValue} from '../../constants/Test.constants';
+import {IKeyValue, SortBy, SortDirection} from '../../constants/Test.constants';
 import Environment from '../../models/__mocks__/Environment.mock';
 import KeyValueMock from '../../models/__mocks__/KeyValue.mock';
-import {IEnvironment} from '../../pages/Environments/IEnvironment';
->>>>>>> 1d86eecb19ac (address Oscar comments)
 
 const PATH = `${document.baseURI}api/`;
 
@@ -70,16 +64,8 @@ const TraceTestAPI = createApi({
         }),
       ],
     }),
-<<<<<<< HEAD
-    getEnvironmentSecretList: build.query<
-      IKeyValue[],
-      {environmentId: string; take?: number; skip?: number}
-    >({
-      query: ({environmentId, take = 25, skip = 0}) => `/tests/${environmentId}/run?take=${take}&skip=${skip}`,
-=======
     getEnvironmentSecretList: build.query<IKeyValue[], {environmentId: string; take?: number; skip?: number}>({
       query: ({take = 25, skip = 0}) => `/tests?take=${take}&skip=${skip}`,
->>>>>>> 1d86eecb19ac (address Oscar comments)
       providesTags: (result, error, {environmentId}) => [{type: Tags.ENVIRONMENT, id: `${environmentId}-LIST`}],
       transformResponse: (raw, meta, args) => {
         return args.environmentId === 'ae7162b3-54e0-4603-9d33-423b12cf67c8'
@@ -90,7 +76,6 @@ const TraceTestAPI = createApi({
             ];
       },
     }),
-
     createEnvironment: build.mutation<undefined, IEnvironment>({
       query: newEnvironment => ({
         url: '/environments',
@@ -103,7 +88,7 @@ const TraceTestAPI = createApi({
     getTestList: build.query<
       TTest[],
       {take?: number; skip?: number; query?: string; sortBy?: SortBy; sortDirection?: SortDirection}
-      >({
+    >({
       query: ({take = 25, skip = 0, query = '', sortBy = '', sortDirection = ''}) =>
         `/tests?take=${take}&skip=${skip}&query=${query}&sortBy=${sortBy}&sortDirection=${sortDirection}`,
       providesTags: () => [{type: Tags.TEST, id: 'LIST'}],
