@@ -15,10 +15,11 @@ type Executor struct {
 	Stores map[string]DataStore
 }
 
-func NewExecutor(attributeDataStore DataStore) Executor {
+func NewExecutor(attributeDataStore DataStore, metaAttributesDataStore DataStore) Executor {
 	return Executor{
 		Stores: map[string]DataStore{
-			"attr": attributeDataStore,
+			"attr":                     attributeDataStore,
+			"tracetest.selected_spans": metaAttributesDataStore,
 		},
 	}
 }
@@ -91,8 +92,18 @@ func (e Executor) executeExpression(expr Expr) (string, error) {
 
 func (e Executor) resolveTerm(term *Term) (string, Type, error) {
 	if term.Attribute != nil {
+		if term.Attribute.IsMeta() {
+			selectedSpansDataStore := e.Stores["tracetest.selected_spans"]
+			value, err := selectedSpansDataStore.Get(term.Attribute.Name())
+			if err != nil {
+				return "", TYPE_NIL, fmt.Errorf("could not resolve meta attribute: %w", err)
+			}
+
+			return value, getType(value), nil
+		}
+
 		attributeDataStore := e.Stores["attr"]
-		value, err := attributeDataStore.Get(string(*term.Attribute))
+		value, err := attributeDataStore.Get(term.Attribute.Name())
 		if err != nil {
 			return "", TYPE_NIL, fmt.Errorf("could not resolve attribute %s: %w", *term.Attribute, err)
 		}

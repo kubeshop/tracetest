@@ -448,7 +448,7 @@ func attrExpr(attrName string) expression.Expr {
 }
 
 func attrp(attrName string) *expression.Attribute {
-	attr := expression.Attribute(attrName)
+	attr := expression.NewAttribute(attrName)
 	return &attr
 }
 

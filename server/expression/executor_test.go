@@ -13,7 +13,8 @@ type executorTestCase struct {
 	Query      string
 	ShouldPass bool
 
-	AttributeDataStore expression.AttributeDataStore
+	AttributeDataStore      expression.DataStore
+	MetaAttributesDataStore expression.DataStore
 }
 
 func TestBasicExpressionExecution(t *testing.T) {
@@ -143,10 +144,43 @@ func TestFilterExecution(t *testing.T) {
 	executeTestCases(t, testCases)
 }
 
+func TestMetaAttributesExecution(t *testing.T) {
+	testCases := []executorTestCase{
+		{
+			Name:               "should_support_count_meta_attribute",
+			Query:              `attr:tracetest.selected_spans.count = 3`,
+			ShouldPass:         true,
+			AttributeDataStore: expression.AttributeDataStore{},
+			MetaAttributesDataStore: expression.MetaAttributesDataStore{
+				SelectedSpans: []traces.Span{
+					// We don't have to fill the spans details to make the meta attribute work
+					{},
+					{},
+					{},
+				},
+			},
+		},
+		{
+			Name:               "should_support_count_meta_attribute",
+			Query:              `"Selected matched ${attr:tracetest.selected_spans.count} spans" = "Selected matched 2 spans"`,
+			ShouldPass:         true,
+			AttributeDataStore: expression.AttributeDataStore{},
+			MetaAttributesDataStore: expression.MetaAttributesDataStore{
+				SelectedSpans: []traces.Span{
+					{},
+					{},
+				},
+			},
+		},
+	}
+
+	executeTestCases(t, testCases)
+}
+
 func executeTestCases(t *testing.T, testCases []executorTestCase) {
 	for _, testCase := range testCases {
 		t.Run(testCase.Name, func(t *testing.T) {
-			executor := expression.NewExecutor(testCase.AttributeDataStore)
+			executor := expression.NewExecutor(testCase.AttributeDataStore, testCase.MetaAttributesDataStore)
 			_, _, err := executor.ExecuteStatement(testCase.Query)
 			if testCase.ShouldPass {
 				assert.NoError(t, err)
