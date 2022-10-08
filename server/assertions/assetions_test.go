@@ -44,7 +44,7 @@ func TestAssertion(t *testing.T) {
 					Results: []model.SpanAssertionResult{
 						{
 							SpanID:        &spanID,
-							ObservedValue: "2000",
+							ObservedValue: "2us",
 							CompareErr:    nil,
 						},
 					},
@@ -130,7 +130,7 @@ func TestAssertion(t *testing.T) {
 					Results: []model.SpanAssertionResult{
 						{
 							SpanID:        &spanID,
-							ObservedValue: "21000000",
+							ObservedValue: "21ms",
 							CompareErr:    nil,
 						},
 					},
@@ -161,7 +161,7 @@ func TestAssertion(t *testing.T) {
 					Results: []model.SpanAssertionResult{
 						{
 							SpanID:        &spanID,
-							ObservedValue: "25000000",
+							ObservedValue: "25ms",
 							CompareErr:    nil,
 						},
 					},

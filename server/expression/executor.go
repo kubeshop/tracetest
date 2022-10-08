@@ -57,6 +57,13 @@ func (e Executor) ExecuteStatement(statement string) (string, string, error) {
 		err = ErrNoMatch
 	}
 
+	if leftType == TYPE_DURATION || rightType == TYPE_DURATION {
+		// If any of the sides is a duration, there's a high change of the other side
+		// to be a duration as well. So try to format both before returning it
+		leftValue = maybeFormatDuration(leftValue, leftType)
+		rightValue = maybeFormatDuration(rightValue, rightType)
+	}
+
 	return leftValue, rightValue, err
 }
 
@@ -216,4 +223,16 @@ func getRoundedDurationValue(value string) string {
 	roundedValue := traces.ConvertTimeFieldIntoNanoSeconds(valueAsDuration)
 
 	return fmt.Sprintf("%d", roundedValue)
+}
+
+func maybeFormatDuration(value string, vType Type) string {
+	// Any type other than duration and number is certain to not be a duration field
+	// We still try to convert TYPE_NUMBER because we store durations as long numbers,
+	// so it's worth trying converting it.
+	if vType != TYPE_DURATION && vType != TYPE_NUMBER {
+		return value
+	}
+
+	intValue, _ := strconv.Atoi(value)
+	return traces.ConvertNanoSecondsIntoProperTimeUnit(intValue)
 }

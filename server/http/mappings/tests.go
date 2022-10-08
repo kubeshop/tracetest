@@ -173,15 +173,6 @@ func (m OpenAPI) Result(in *model.RunResults) openapi.AssertionResults {
 				}
 			}
 
-			// TODO: fix conversion of time fields
-			// if m.traceConversionConfig.IsTimeField(r.Assertion.Attribute.String()) {
-			// 	for i, result := range sres {
-			// 		intValue, _ := strconv.Atoi(result.ObservedValue)
-			// 		result.ObservedValue = traces.ConvertNanoSecondsIntoProperTimeUnit(intValue)
-			// 		sres[i] = result
-			// 	}
-			// }
-
 			res[j] = openapi.AssertionResult{
 				AllPassed:   r.AllPassed,
 				Assertion:   string(r.Assertion),
