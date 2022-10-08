@@ -30,13 +30,7 @@ trigger:
               "selector": {
                 "query": "span[name = \"queue.synchronizePokemon send\"]"
               },
-              "assertions": [
-                {
-                  "attribute": "tracetest.selected_spans.count",
-                  "comparator": ">",
-                  "expected": "0"
-                }
-              ]
+              "assertions": ["attr:tracetest.selected_spans.count > 0"]
             }
           ]
         }
