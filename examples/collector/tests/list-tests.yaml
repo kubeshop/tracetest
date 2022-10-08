@@ -12,4 +12,4 @@ trigger:
 specs:
 - selector: span[name = "Tracetest trigger"]
   assertions:
-  - tracetest.selected_spans.count = 1
+  - attr:tracetest.selected_spans.count = 1
