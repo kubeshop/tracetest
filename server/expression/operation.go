@@ -5,53 +5,54 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/kubeshop/tracetest/server/expression/types"
 	"github.com/kubeshop/tracetest/server/traces"
 )
 
-type ExpressionOperation func(executionValue, executionValue) (executionValue, error)
+type ExpressionOperation func(types.TypedValue, types.TypedValue) (types.TypedValue, error)
 
-func sum(value1 executionValue, value2 executionValue) (executionValue, error) {
+func sum(value1 types.TypedValue, value2 types.TypedValue) (types.TypedValue, error) {
 	return runMathOperationOnNumbers(value1, value2, func(f1, f2 float64) float64 {
 		return f1 + f2
 	})
 }
 
-func subtract(value1 executionValue, value2 executionValue) (executionValue, error) {
+func subtract(value1 types.TypedValue, value2 types.TypedValue) (types.TypedValue, error) {
 	return runMathOperationOnNumbers(value1, value2, func(f1, f2 float64) float64 {
 		return f1 - f2
 	})
 }
 
-func multiply(value1 executionValue, value2 executionValue) (executionValue, error) {
+func multiply(value1 types.TypedValue, value2 types.TypedValue) (types.TypedValue, error) {
 	return runMathOperationOnNumbers(value1, value2, func(f1, f2 float64) float64 {
 		return f1 * f2
 	})
 }
 
-func divide(value1 executionValue, value2 executionValue) (executionValue, error) {
+func divide(value1 types.TypedValue, value2 types.TypedValue) (types.TypedValue, error) {
 	return runMathOperationOnNumbers(value1, value2, func(f1, f2 float64) float64 {
 		return f1 / f2
 	})
 }
 
-func runMathOperationOnNumbers(value1 executionValue, value2 executionValue, operation func(float64, float64) float64) (executionValue, error) {
+func runMathOperationOnNumbers(value1 types.TypedValue, value2 types.TypedValue, operation func(float64, float64) float64) (types.TypedValue, error) {
 	if err := validateFieldType(value1); err != nil {
-		return executionValue{}, err
+		return types.TypedValue{}, err
 	}
 
 	if err := validateFieldType(value2); err != nil {
-		return executionValue{}, err
+		return types.TypedValue{}, err
 	}
 
-	operationType := TYPE_NUMBER
-	if value1.Type == TYPE_DURATION {
+	operationType := types.TYPE_NUMBER
+	if value1.Type == types.TYPE_DURATION {
 		value1.Value = fmt.Sprintf("%d", traces.ConvertTimeFieldIntoNanoSeconds(value1.Value))
-		operationType = TYPE_DURATION
+		operationType = types.TYPE_DURATION
 	}
 
-	if value2.Type == TYPE_DURATION {
+	if value2.Type == types.TYPE_DURATION {
 		value2.Value = fmt.Sprintf("%d", traces.ConvertTimeFieldIntoNanoSeconds(value2.Value))
-		operationType = TYPE_DURATION
+		operationType = types.TYPE_DURATION
 	}
 
 	number1, _ := strconv.ParseFloat(value1.Value, 64)
@@ -64,14 +65,14 @@ func runMathOperationOnNumbers(value1 executionValue, value2 executionValue, ope
 		resultStr = fmt.Sprintf("%.2f", result)
 	}
 
-	return executionValue{
+	return types.TypedValue{
 		Value: resultStr,
 		Type:  operationType,
 	}, nil
 }
 
-func validateFieldType(field executionValue) error {
-	if field.Type != TYPE_NUMBER && field.Type != TYPE_DURATION {
+func validateFieldType(field types.TypedValue) error {
+	if field.Type != types.TYPE_NUMBER && field.Type != types.TYPE_DURATION {
 		return fmt.Errorf("operation is only allowed on numbers and duration fields")
 	}
 

@@ -144,6 +144,11 @@ func TestFilterExecution(t *testing.T) {
 			Query:      `'{ "name": "john", "age": 37 }' | regex_group '"age": (\d+)' = 37`,
 			ShouldPass: true,
 		},
+		{
+			Name:       "should_support_multiple_filters",
+			Query:      `'{ "array": [{ "name": "john", "age": 37 }, { "name": "jonas", "age": 38 }]}' | regex_group '"age": (\d+)' | get_index 1 = 38`,
+			ShouldPass: true,
+		},
 	}
 
 	executeTestCases(t, testCases)

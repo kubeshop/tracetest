@@ -3,26 +3,33 @@ package filters
 import (
 	"fmt"
 	"regexp"
+
+	"github.com/kubeshop/tracetest/server/expression/types"
 )
 
-func Regex(input string, args ...string) (string, error) {
+func Regex(input Value, args ...string) (Value, error) {
 	if len(args) != 1 {
-		return "", fmt.Errorf("wrong number of args. Expected 1, got %d", len(args))
+		return Value{}, fmt.Errorf("wrong number of args. Expected 1, got %d", len(args))
+	}
+
+	if len(input) != 1 {
+		return Value{}, fmt.Errorf("cannot process array of json objects")
 	}
 
 	regex, err := regexp.Compile(args[0])
 	if err != nil {
-		return "", fmt.Errorf("invalid regex: %w", err)
+		return Value{}, fmt.Errorf("invalid regex: %w", err)
 	}
 
-	results := regex.FindAllString(input, -1)
+	results := regex.FindAllString(input.Value().Value, -1)
 	if results == nil {
-		return "[]", nil
+		return NewArrayValue([]types.TypedValue{}), nil
 	}
 
 	if len(results) == 1 {
-		return results[0], nil
+		typedValue := types.GetTypedValue(results[0])
+		return NewValue(typedValue), nil
 	}
 
-	return formatArray(results), nil
+	return NewArrayValueFromStrings(results), nil
 }
