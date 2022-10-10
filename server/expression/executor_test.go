@@ -139,6 +139,11 @@ func TestFilterExecution(t *testing.T) {
 				},
 			},
 		},
+		{
+			Name:       "should_support_filters_with_arguments_containing_spaces",
+			Query:      `'{ "name": "john", "age": 37 }' | regex_group '"age": (\d+)' = 37`,
+			ShouldPass: true,
+		},
 	}
 
 	executeTestCases(t, testCases)
