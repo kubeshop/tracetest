@@ -23,6 +23,14 @@ func _execCmd(cmd string) error {
 	return err
 }
 
+func getCmdOutput(cmd string) string {
+	execCmd := exec.Command("powershell", "-nologo", "-noprofile", cmd)
+
+	out, _ := execCmd.CombinedOutput()
+
+	return string(out)
+}
+
 func commandSuccess(probeCmd string) bool {
 	cmd := exec.Command("powershell", "-nologo", "-noprofile", probeCmd)
 	err := cmd.Run()

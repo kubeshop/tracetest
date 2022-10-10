@@ -95,14 +95,6 @@ func execCmdIgnoreErrors(cmd string) {
 	_execCmd(cmd)
 }
 
-func getCmdOutput(cmd string) string {
-	execCmd := exec.Command("/bin/sh", "-c", cmd)
-
-	out, _ := execCmd.CombinedOutput()
-
-	return string(out)
-}
-
 func getCmdOutputClean(cmd string) string {
 	out := getCmdOutput(cmd)
 

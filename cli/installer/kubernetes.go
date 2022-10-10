@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"regexp"
 	"strings"
 	"time"
 
@@ -14,6 +15,7 @@ import (
 var kubernetes = installer{
 	name: "kubernetes",
 	preChecks: []preChecker{
+		windowsGnuToolsChecker,
 		kubectlChecker,
 		helmChecker,
 		localEnvironmentChecker,
@@ -26,6 +28,42 @@ var kubernetes = installer{
 		configureDemoApp,
 	},
 	installFn: kubernetesInstaller,
+}
+
+func windowsGnuToolsChecker(ui cliUI.UI) {
+	if !isWindows() {
+		return
+	}
+
+	if commandExists("sed") {
+		ui.Println(ui.Green("✔ sed already installed"))
+		return
+	}
+
+	ui.Warning("I didn't find sed in your system")
+	option := ui.Select("What do you want to do?", []cliUI.Option{
+		{"Install sed", installSed},
+		{"Fix it manually", exitOption(
+			"Check the helm install docs on https://community.chocolatey.org/packages/sed",
+		)},
+	}, 0)
+
+	option.Fn(ui)
+
+	if commandExists("sed") {
+		ui.Println(ui.Green("✔ sed was successfully installed"))
+	} else {
+		ui.Exit(ui.Red("✘ sed could not be installed. Check output for errors. " + createIssueMsg))
+	}
+}
+
+func installSed(ui cliUI.UI) {
+	(cmd{
+		sudo:          true,
+		notConfirmMsg: "No worries, you can try installing sed manually. See https://community.chocolatey.org/packages/sed",
+		installDocs:   "https://community.chocolatey.org/packages/sed",
+		windows:       "choco install sed",
+	}).exec(ui)
 }
 
 func kubernetesInstaller(config configuration, ui cliUI.UI) {
@@ -319,12 +357,7 @@ type k8sContext struct {
 }
 
 func getK8sContexts(conf configuration, ui cliUI.UI) []k8sContext {
-	output := getCmdOutput(fmt.Sprintf(
-		`kubectl --kubeconfig %s config get-contexts --no-headers  | tr -s " " | sed -e "s/ /,/g"`,
-		conf.String("k8s.kubeconfig"),
-	))
-
-	records, err := csv.NewReader(strings.NewReader(output)).ReadAll()
+	records, err := getKubernetesContextArray(conf.String("k8s.kubeconfig"))
 	if err != nil {
 		ui.Exit(fmt.Sprintf("cannot get kubectl contexts: %s", err.Error()))
 	}
@@ -338,6 +371,25 @@ func getK8sContexts(conf configuration, ui cliUI.UI) []k8sContext {
 	}
 
 	return results
+}
+
+func getKubernetesContextArray(kubeconfig string) ([][]string, error) {
+	output := getCmdOutput(fmt.Sprintf(
+		`kubectl --kubeconfig %s config get-contexts --no-headers`,
+		kubeconfig,
+	))
+
+	// replace spaces with comma
+	spaceRegex := regexp.MustCompile(`[ ]+`)
+	newStringBytes := spaceRegex.ReplaceAll([]byte(output), []byte(","))
+	output = string(newStringBytes)
+
+	records, err := csv.NewReader(strings.NewReader(output)).ReadAll()
+	if err != nil {
+		return [][]string{}, err
+	}
+
+	return records, nil
 }
 
 func configureKubernetes(conf configuration, ui cliUI.UI) configuration {
@@ -469,6 +521,10 @@ func localEnvironmentChecker(ui cliUI.UI) {
 func confirmLocalK8sRunning(ui cliUI.UI) {
 	localK8sRunning := ui.Confirm("Do you have a local kubernentes running?", true)
 	if !localK8sRunning {
+		if isWindows() {
+			ui.Exit("You should have a kubernetes instance running before installing Tracetest. Try minikube (https://minikube.sigs.k8s.io/docs/start/)")
+		}
+
 		option := ui.Select("We can fix that:", []cliUI.Option{
 			{"Install minikube", minikubeChecker},
 			{"Fix manually", exitOption(
@@ -481,6 +537,11 @@ func confirmLocalK8sRunning(ui cliUI.UI) {
 }
 
 func minikubeChecker(ui cliUI.UI) {
+	// before procceding, we must start minikube
+	// starting in insecure mode to prevent certificate problems
+	// TODO: configure the certificate instead to prevent the x509 error
+	defer execCmd(`minikube start --insecure-registry="registry-1.docker.io"`, ui)
+
 	if commandExists("minikube") {
 		ui.Println(ui.Green("✔ minikube already installed"))
 		return
@@ -529,7 +590,7 @@ func installHelm(ui cliUI.UI) {
 			chmod 700 get_helm.sh
 			./get_helm.sh
 		`,
-		windows: "",
+		windows: "choco install kubernetes-helm",
 		other:   "",
 	}).exec(ui)
 }
@@ -585,7 +646,7 @@ sudo dnf -y install kubectl
 			sudo mv ./kubectl /usr/local/bin/kubectl
 			sudo chown root: /usr/local/bin/kubectl
 		`,
-		windows: "",
+		windows: "choco install kubernetes-cli",
 		other:   "",
 	}).exec(ui)
 }
