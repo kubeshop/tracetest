@@ -14,6 +14,10 @@ logs() {
   docker compose $opts logs -f
 }
 
+logstt() {
+  docker compose $opts logs -f tracetest
+}
+
 ps() {
   docker compose $opts ps
 }
@@ -57,6 +61,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     test)
       CMD+=("test")
+      shift
+      ;;
+    logstt)
+      CMD+=("logstt")
       shift
       ;;
     logs)
