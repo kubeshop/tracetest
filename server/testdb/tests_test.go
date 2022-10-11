@@ -28,12 +28,7 @@ func TestCreateTest(t *testing.T) {
 		Outputs: (model.OrderedMap[string, model.Output]{}).
 			MustAdd("output1", model.Output{
 				Selector: model.SpanQuery(`span[name="root"]`),
-				Value: model.AssertionExpression{
-					LiteralValue: model.LiteralValue{
-						Value: "attr:name",
-						Type:  "string",
-					},
-				},
+				Value:    "${attr:myapp.some_attribute}",
 			}),
 	}
 

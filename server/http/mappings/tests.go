@@ -53,7 +53,7 @@ func (m OpenAPI) Outputs(in model.OrderedMap[string, model.Output]) []openapi.Te
 		res = append(res, openapi.TestOutput{
 			Name:     key,
 			Selector: m.Selector(val.Selector),
-			Value:    val.Value.String(),
+			Value:    val.Value,
 		})
 	})
 
@@ -301,19 +301,9 @@ func (m Model) Outputs(in []openapi.TestOutput) (model.OrderedMap[string, model.
 	res := model.OrderedMap[string, model.Output]{}
 
 	for _, output := range in {
-		expression, err := parser.ParseAssertionExpression(output.Value)
-		if err != nil {
-			return model.OrderedMap[string, model.Output]{}, err
-		}
-		assertionExpression := m.AssertionExpression(expression)
-		if assertionExpression == nil {
-			err := fmt.Errorf("cannot parse output value expression %s", output.Value)
-			return model.OrderedMap[string, model.Output]{}, err
-		}
-
 		res.Add(output.Name, model.Output{
 			Selector: model.SpanQuery(output.Selector.Query),
-			Value:    *assertionExpression,
+			Value:    output.Value,
 		})
 	}
 

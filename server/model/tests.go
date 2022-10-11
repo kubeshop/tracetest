@@ -24,7 +24,7 @@ type (
 
 	Output struct {
 		Selector SpanQuery
-		Value    AssertionExpression
+		Value    string
 	}
 
 	NamedAssertions struct {
