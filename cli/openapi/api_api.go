@@ -47,8 +47,8 @@ CreateTest Create new test
 
 Create new test action
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiCreateTestRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiCreateTestRequest
 */
 func (a *ApiApiService) CreateTest(ctx context.Context) ApiCreateTestRequest {
 	return ApiCreateTestRequest{
@@ -58,8 +58,7 @@ func (a *ApiApiService) CreateTest(ctx context.Context) ApiCreateTestRequest {
 }
 
 // Execute executes the request
-//
-//	@return Test
+//  @return Test
 func (a *ApiApiService) CreateTestExecute(r ApiCreateTestRequest) (*Test, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -155,8 +154,8 @@ CreateTestFromDefinition Create new test using the yaml definition
 
 Create new test using the yaml definition
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiCreateTestFromDefinitionRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiCreateTestFromDefinitionRequest
 */
 func (a *ApiApiService) CreateTestFromDefinition(ctx context.Context) ApiCreateTestFromDefinitionRequest {
 	return ApiCreateTestFromDefinitionRequest{
@@ -166,8 +165,7 @@ func (a *ApiApiService) CreateTestFromDefinition(ctx context.Context) ApiCreateT
 }
 
 // Execute executes the request
-//
-//	@return Test
+//  @return Test
 func (a *ApiApiService) CreateTestFromDefinitionExecute(r ApiCreateTestFromDefinitionRequest) (*Test, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -258,9 +256,9 @@ DeleteTest delete a test
 
 delete a test
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param testId
-	@return ApiDeleteTestRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param testId
+ @return ApiDeleteTestRequest
 */
 func (a *ApiApiService) DeleteTest(ctx context.Context, testId string) ApiDeleteTestRequest {
 	return ApiDeleteTestRequest{
@@ -351,10 +349,10 @@ DeleteTestRun delete a test run
 
 delete a test run
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param testId
-	@param runId
-	@return ApiDeleteTestRunRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param testId
+ @param runId
+ @return ApiDeleteTestRunRequest
 */
 func (a *ApiApiService) DeleteTestRun(ctx context.Context, testId string, runId string) ApiDeleteTestRunRequest {
 	return ApiDeleteTestRunRequest{
@@ -453,10 +451,10 @@ DryRunAssertion run given assertions against the traces from the given run witho
 
 use this method to test a definition against an actual trace without creating a new version or persisting anything
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param testId
-	@param runId
-	@return ApiDryRunAssertionRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param testId
+ @param runId
+ @return ApiDryRunAssertionRequest
 */
 func (a *ApiApiService) DryRunAssertion(ctx context.Context, testId string, runId string) ApiDryRunAssertionRequest {
 	return ApiDryRunAssertionRequest{
@@ -468,8 +466,7 @@ func (a *ApiApiService) DryRunAssertion(ctx context.Context, testId string, runI
 }
 
 // Execute executes the request
-//
-//	@return AssertionResults
+//  @return AssertionResults
 func (a *ApiApiService) DryRunAssertionExecute(r ApiDryRunAssertionRequest) (*AssertionResults, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPut
@@ -563,10 +560,10 @@ ExportTestRun export test and test run information
 
 export test and test run information for debugging
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param testId
-	@param runId
-	@return ApiExportTestRunRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param testId
+ @param runId
+ @return ApiExportTestRunRequest
 */
 func (a *ApiApiService) ExportTestRun(ctx context.Context, testId string, runId string) ApiExportTestRunRequest {
 	return ApiExportTestRunRequest{
@@ -578,8 +575,7 @@ func (a *ApiApiService) ExportTestRun(ctx context.Context, testId string, runId 
 }
 
 // Execute executes the request
-//
-//	@return ExportedTestInformation
+//  @return ExportedTestInformation
 func (a *ApiApiService) ExportTestRunExecute(r ApiExportTestRunRequest) (*ExportedTestInformation, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -671,10 +667,10 @@ GetRunResultJUnit get test run results in JUnit xml format
 
 get test run results in JUnit xml format
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param testId
-	@param runId
-	@return ApiGetRunResultJUnitRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param testId
+ @param runId
+ @return ApiGetRunResultJUnitRequest
 */
 func (a *ApiApiService) GetRunResultJUnit(ctx context.Context, testId string, runId string) ApiGetRunResultJUnitRequest {
 	return ApiGetRunResultJUnitRequest{
@@ -686,8 +682,7 @@ func (a *ApiApiService) GetRunResultJUnit(ctx context.Context, testId string, ru
 }
 
 // Execute executes the request
-//
-//	@return string
+//  @return string
 func (a *ApiApiService) GetRunResultJUnitExecute(r ApiGetRunResultJUnitRequest) (string, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -778,9 +773,9 @@ GetTest get test
 
 get test
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param testId
-	@return ApiGetTestRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param testId
+ @return ApiGetTestRequest
 */
 func (a *ApiApiService) GetTest(ctx context.Context, testId string) ApiGetTestRequest {
 	return ApiGetTestRequest{
@@ -791,8 +786,7 @@ func (a *ApiApiService) GetTest(ctx context.Context, testId string) ApiGetTestRe
 }
 
 // Execute executes the request
-//
-//	@return Test
+//  @return Test
 func (a *ApiApiService) GetTestExecute(r ApiGetTestRequest) (*Test, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -889,10 +883,10 @@ GetTestResultSelectedSpans retrieve spans that will be selected by selector
 
 get the spans ids that would be selected by a specific selector query
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param testId
-	@param runId
-	@return ApiGetTestResultSelectedSpansRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param testId
+ @param runId
+ @return ApiGetTestResultSelectedSpansRequest
 */
 func (a *ApiApiService) GetTestResultSelectedSpans(ctx context.Context, testId string, runId string) ApiGetTestResultSelectedSpansRequest {
 	return ApiGetTestResultSelectedSpansRequest{
@@ -904,8 +898,7 @@ func (a *ApiApiService) GetTestResultSelectedSpans(ctx context.Context, testId s
 }
 
 // Execute executes the request
-//
-//	@return []string
+//  @return []string
 func (a *ApiApiService) GetTestResultSelectedSpansExecute(r ApiGetTestResultSelectedSpansRequest) ([]string, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -1000,10 +993,10 @@ GetTestRun get test Run
 
 get a particular test Run
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param testId
-	@param runId
-	@return ApiGetTestRunRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param testId
+ @param runId
+ @return ApiGetTestRunRequest
 */
 func (a *ApiApiService) GetTestRun(ctx context.Context, testId string, runId string) ApiGetTestRunRequest {
 	return ApiGetTestRunRequest{
@@ -1015,8 +1008,7 @@ func (a *ApiApiService) GetTestRun(ctx context.Context, testId string, runId str
 }
 
 // Execute executes the request
-//
-//	@return TestRun
+//  @return TestRun
 func (a *ApiApiService) GetTestRunExecute(r ApiGetTestRunRequest) (*TestRun, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -1121,9 +1113,9 @@ GetTestRuns get the runs for a test
 
 get the runs from a particular test
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param testId
-	@return ApiGetTestRunsRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param testId
+ @return ApiGetTestRunsRequest
 */
 func (a *ApiApiService) GetTestRuns(ctx context.Context, testId string) ApiGetTestRunsRequest {
 	return ApiGetTestRunsRequest{
@@ -1134,8 +1126,7 @@ func (a *ApiApiService) GetTestRuns(ctx context.Context, testId string) ApiGetTe
 }
 
 // Execute executes the request
-//
-//	@return []TestRun
+//  @return []TestRun
 func (a *ApiApiService) GetTestRunsExecute(r ApiGetTestRunsRequest) ([]TestRun, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -1231,9 +1222,9 @@ GetTestSpecs Get definition for a test
 
 Gets definition for a test
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param testId
-	@return ApiGetTestSpecsRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param testId
+ @return ApiGetTestSpecsRequest
 */
 func (a *ApiApiService) GetTestSpecs(ctx context.Context, testId string) ApiGetTestSpecsRequest {
 	return ApiGetTestSpecsRequest{
@@ -1244,8 +1235,7 @@ func (a *ApiApiService) GetTestSpecs(ctx context.Context, testId string) ApiGetT
 }
 
 // Execute executes the request
-//
-//	@return []TestSpecs
+//  @return []TestSpecs
 func (a *ApiApiService) GetTestSpecsExecute(r ApiGetTestSpecsRequest) ([]TestSpecs, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -1336,10 +1326,10 @@ GetTestVersion get a test specific version
 
 get a test specific version
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param testId
-	@param version
-	@return ApiGetTestVersionRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param testId
+ @param version
+ @return ApiGetTestVersionRequest
 */
 func (a *ApiApiService) GetTestVersion(ctx context.Context, testId string, version int32) ApiGetTestVersionRequest {
 	return ApiGetTestVersionRequest{
@@ -1351,8 +1341,7 @@ func (a *ApiApiService) GetTestVersion(ctx context.Context, testId string, versi
 }
 
 // Execute executes the request
-//
-//	@return Test
+//  @return Test
 func (a *ApiApiService) GetTestVersionExecute(r ApiGetTestVersionRequest) (*Test, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -1444,10 +1433,10 @@ GetTestVersionDefinitionFile Get the test definition as an YAML file
 
 Get the test definition as an YAML file
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param testId
-	@param version
-	@return ApiGetTestVersionDefinitionFileRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param testId
+ @param version
+ @return ApiGetTestVersionDefinitionFileRequest
 */
 func (a *ApiApiService) GetTestVersionDefinitionFile(ctx context.Context, testId string, version int32) ApiGetTestVersionDefinitionFileRequest {
 	return ApiGetTestVersionDefinitionFileRequest{
@@ -1459,8 +1448,7 @@ func (a *ApiApiService) GetTestVersionDefinitionFile(ctx context.Context, testId
 }
 
 // Execute executes the request
-//
-//	@return string
+//  @return string
 func (a *ApiApiService) GetTestVersionDefinitionFileExecute(r ApiGetTestVersionDefinitionFileRequest) (string, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -1585,8 +1573,8 @@ GetTests Get tests
 
 get tests
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiGetTestsRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiGetTestsRequest
 */
 func (a *ApiApiService) GetTests(ctx context.Context) ApiGetTestsRequest {
 	return ApiGetTestsRequest{
@@ -1596,8 +1584,7 @@ func (a *ApiApiService) GetTests(ctx context.Context) ApiGetTestsRequest {
 }
 
 // Execute executes the request
-//
-//	@return []Test
+//  @return []Test
 func (a *ApiApiService) GetTestsExecute(r ApiGetTestsRequest) ([]Test, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -1706,8 +1693,8 @@ ImportTestRun import test and test run information
 
 import test and test run information for debugging
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiImportTestRunRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiImportTestRunRequest
 */
 func (a *ApiApiService) ImportTestRun(ctx context.Context) ApiImportTestRunRequest {
 	return ApiImportTestRunRequest{
@@ -1717,8 +1704,7 @@ func (a *ApiApiService) ImportTestRun(ctx context.Context) ApiImportTestRunReque
 }
 
 // Execute executes the request
-//
-//	@return ExportedTestInformation
+//  @return ExportedTestInformation
 func (a *ApiApiService) ImportTestRunExecute(r ApiImportTestRunRequest) (*ExportedTestInformation, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -1810,10 +1796,10 @@ RerunTestRun rerun a test run
 
 rerun a test run
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param testId
-	@param runId
-	@return ApiRerunTestRunRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param testId
+ @param runId
+ @return ApiRerunTestRunRequest
 */
 func (a *ApiApiService) RerunTestRun(ctx context.Context, testId string, runId string) ApiRerunTestRunRequest {
 	return ApiRerunTestRunRequest{
@@ -1825,8 +1811,7 @@ func (a *ApiApiService) RerunTestRun(ctx context.Context, testId string, runId s
 }
 
 // Execute executes the request
-//
-//	@return TestRun
+//  @return TestRun
 func (a *ApiApiService) RerunTestRunExecute(r ApiRerunTestRunRequest) (*TestRun, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -1923,9 +1908,9 @@ RunTest run test
 
 run a particular test
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param testId
-	@return ApiRunTestRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param testId
+ @return ApiRunTestRequest
 */
 func (a *ApiApiService) RunTest(ctx context.Context, testId string) ApiRunTestRequest {
 	return ApiRunTestRequest{
@@ -1936,8 +1921,7 @@ func (a *ApiApiService) RunTest(ctx context.Context, testId string) ApiRunTestRe
 }
 
 // Execute executes the request
-//
-//	@return TestRun
+//  @return TestRun
 func (a *ApiApiService) RunTestExecute(r ApiRunTestRequest) (*TestRun, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -2035,9 +2019,9 @@ SetTestSpecs Set spec for a test
 
 Set spec for a particular test
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param testId
-	@return ApiSetTestSpecsRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param testId
+ @return ApiSetTestSpecsRequest
 */
 func (a *ApiApiService) SetTestSpecs(ctx context.Context, testId string) ApiSetTestSpecsRequest {
 	return ApiSetTestSpecsRequest{
@@ -2135,9 +2119,9 @@ UpdateTest update test
 
 update test action
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param testId
-	@return ApiUpdateTestRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param testId
+ @return ApiUpdateTestRequest
 */
 func (a *ApiApiService) UpdateTest(ctx context.Context, testId string) ApiUpdateTestRequest {
 	return ApiUpdateTestRequest{
@@ -2235,9 +2219,9 @@ UpdateTestFromDefinition update test from definition file
 
 update test action from definition file
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param testId
-	@return ApiUpdateTestFromDefinitionRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param testId
+ @return ApiUpdateTestFromDefinitionRequest
 */
 func (a *ApiApiService) UpdateTestFromDefinition(ctx context.Context, testId string) ApiUpdateTestFromDefinitionRequest {
 	return ApiUpdateTestFromDefinitionRequest{
@@ -2248,8 +2232,7 @@ func (a *ApiApiService) UpdateTestFromDefinition(ctx context.Context, testId str
 }
 
 // Execute executes the request
-//
-//	@return Test
+//  @return Test
 func (a *ApiApiService) UpdateTestFromDefinitionExecute(r ApiUpdateTestFromDefinitionRequest) (*Test, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPut

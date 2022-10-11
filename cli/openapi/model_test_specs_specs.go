@@ -114,9 +114,9 @@ func (o *TestSpecsSpecs) SetSelector(v Selector) {
 }
 
 // GetAssertions returns the Assertions field value if set, zero value otherwise.
-func (o *TestSpecsSpecs) GetAssertions() []Assertion {
+func (o *TestSpecsSpecs) GetAssertions() []string {
 	if o == nil || o.Assertions == nil {
-		var ret []Assertion
+		var ret []string
 		return ret
 	}
 	return o.Assertions
@@ -124,7 +124,7 @@ func (o *TestSpecsSpecs) GetAssertions() []Assertion {
 
 // GetAssertionsOk returns a tuple with the Assertions field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *TestSpecsSpecs) GetAssertionsOk() ([]Assertion, bool) {
+func (o *TestSpecsSpecs) GetAssertionsOk() ([]string, bool) {
 	if o == nil || o.Assertions == nil {
 		return nil, false
 	}
@@ -140,8 +140,8 @@ func (o *TestSpecsSpecs) HasAssertions() bool {
 	return false
 }
 
-// SetAssertions gets a reference to the given []Assertion and assigns it to the Assertions field.
-func (o *TestSpecsSpecs) SetAssertions(v []Assertion) {
+// SetAssertions gets a reference to the given []string and assigns it to the Assertions field.
+func (o *TestSpecsSpecs) SetAssertions(v []string) {
 	o.Assertions = v
 }
 

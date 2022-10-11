@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
-	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/model/modeltest"
@@ -37,7 +36,7 @@ func TestTestEncoding(t *testing.T) {
 			MustAdd(model.SpanQuery(`span[name="test"]`), model.NamedAssertions{
 				Name: "test",
 				Assertions: []model.Assertion{
-					{"name", comparator.Eq, createExpressionFromString("test")},
+					model.Assertion(`attr:name = "test"`),
 				},
 			}),
 	}
@@ -149,29 +148,6 @@ func TestRunEncoding(t *testing.T) {
 	}
 }
 
-func TestOldAssertionSerialization(t *testing.T) {
-	var newAssertion model.Assertion
-	oldAssertion := struct {
-		Attribute  string
-		Comparator string
-		Value      string
-	}{
-		Attribute:  "tracetest.span.type",
-		Comparator: "=",
-		Value:      "http",
-	}
-
-	oldAssertionJson, err := json.Marshal(oldAssertion)
-	require.NoError(t, err)
-
-	err = json.Unmarshal(oldAssertionJson, &newAssertion)
-	require.NoError(t, err)
-
-	assert.Equal(t, oldAssertion.Attribute, newAssertion.Attribute.String())
-	assert.Equal(t, oldAssertion.Comparator, newAssertion.Comparator.String())
-	assert.Equal(t, oldAssertion.Value, newAssertion.Value.String())
-}
-
 func TestOldAssertionSpecsFormatWithoutNames(t *testing.T) {
 	type OldTest struct {
 		ID               id.ID
@@ -188,31 +164,13 @@ func TestOldAssertionSpecsFormatWithoutNames(t *testing.T) {
 	expectedSpecs = expectedSpecs.MustAdd(model.SpanQuery(`span[tracetest.span.type = "http"]`), model.NamedAssertions{
 		Name: "",
 		Assertions: []model.Assertion{
-			{
-				Attribute:  "http.status",
-				Comparator: comparator.Eq,
-				Value: &model.AssertionExpression{
-					LiteralValue: model.LiteralValue{
-						Value: "200",
-						Type:  "number",
-					},
-				},
-			},
+			model.Assertion(`attr:http.status = 200`),
 		},
 	})
 
 	specs := model.OrderedMap[model.SpanQuery, []model.Assertion]{}
 	specs = specs.MustAdd(model.SpanQuery(`span[tracetest.span.type = "http"]`), []model.Assertion{
-		{
-			Attribute:  "http.status",
-			Comparator: comparator.Eq,
-			Value: &model.AssertionExpression{
-				LiteralValue: model.LiteralValue{
-					Value: "200",
-					Type:  "number",
-				},
-			},
-		},
+		model.Assertion(`attr:http.status = 200`),
 	})
 	oldTest := OldTest{
 		ID:               id.NewRandGenerator().ID(),
@@ -247,16 +205,7 @@ func TestNewAssertionSpecFormat(t *testing.T) {
 			model.SpanQuery(`span[tracetest.span.type = "http"`), model.NamedAssertions{
 				Name: "my test",
 				Assertions: []model.Assertion{
-					{
-						Attribute:  "http.status",
-						Comparator: comparator.Eq,
-						Value: &model.AssertionExpression{
-							LiteralValue: model.LiteralValue{
-								Value: "200",
-								Type:  "number",
-							},
-						},
-					},
+					model.Assertion(`attr:http.status = 200`),
 				},
 			},
 		),

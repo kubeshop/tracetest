@@ -60,7 +60,7 @@ components:
               assertions:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Assertion"
+                  type: string
       example:
         specs:
           - selector:
@@ -77,16 +77,6 @@ components:
             - attribute: http.status_code
               comparator: "="
               expected: "200"
-
-    Assertion:
-      type: object
-      properties:
-        attribute:
-          type: string
-        comparator:
-          type: string
-        expected:
-          type: string
 
     TestRun:
       type: object
@@ -198,7 +188,7 @@ components:
       type: object
       properties:
         assertion:
-          $ref: "#/components/schemas/Assertion"
+          type: string
         allPassed:
           type: boolean
         spanResults:

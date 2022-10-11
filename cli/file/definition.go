@@ -35,7 +35,7 @@ func SaveDefinition(file string, definition string) error {
 }
 
 func SetTestID(file string, id string) error {
-	idStatementRegex := regexp.MustCompile("^id: [0-9a-zA-Z\\-]+\n")
+	idStatementRegex := regexp.MustCompile("^id: [0-9a-zA-Z\\-_]+\n")
 	fileBytes, err := os.ReadFile(file)
 	if err != nil {
 		return fmt.Errorf("could not read test definition file %s: %w", file, err)

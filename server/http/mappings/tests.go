@@ -82,9 +82,9 @@ func (m OpenAPI) Specs(in model.OrderedMap[model.SpanQuery, model.NamedAssertion
 
 	i := 0
 	in.Map(func(spanQuery model.SpanQuery, namedAssertions model.NamedAssertions) {
-		assertions := make([]openapi.Assertion, len(namedAssertions.Assertions))
+		assertions := make([]string, len(namedAssertions.Assertions))
 		for j, a := range namedAssertions.Assertions {
-			assertions[j] = m.Assertion(a)
+			assertions[j] = string(a)
 		}
 
 		specs[i] = openapi.TestSpecsSpecs{
@@ -173,17 +173,9 @@ func (m OpenAPI) Result(in *model.RunResults) openapi.AssertionResults {
 				}
 			}
 
-			if m.traceConversionConfig.IsTimeField(r.Assertion.Attribute.String()) {
-				for i, result := range sres {
-					intValue, _ := strconv.Atoi(result.ObservedValue)
-					result.ObservedValue = traces.ConvertNanoSecondsIntoProperTimeUnit(intValue)
-					sres[i] = result
-				}
-			}
-
 			res[j] = openapi.AssertionResult{
 				AllPassed:   r.AllPassed,
-				Assertion:   m.Assertion(r.Assertion),
+				Assertion:   string(r.Assertion),
 				SpanResults: sres,
 			}
 		}
@@ -197,14 +189,6 @@ func (m OpenAPI) Result(in *model.RunResults) openapi.AssertionResults {
 	return openapi.AssertionResults{
 		AllPassed: in.AllPassed,
 		Results:   results,
-	}
-}
-
-func (m OpenAPI) Assertion(in model.Assertion) openapi.Assertion {
-	return openapi.Assertion{
-		Attribute:  in.Attribute.String(),
-		Comparator: in.Comparator.String(),
-		Expected:   in.Value.String(),
 	}
 }
 
@@ -309,10 +293,7 @@ func (m Model) Definition(in openapi.TestSpecs) (model.OrderedMap[model.SpanQuer
 	for _, spec := range in.Specs {
 		asserts := make([]model.Assertion, len(spec.Assertions))
 		for i, a := range spec.Assertions {
-			assertion, err := m.Assertion(a)
-			if err != nil {
-				return model.OrderedMap[model.SpanQuery, model.NamedAssertions]{}, fmt.Errorf("could not convert assertion: %w", err)
-			}
+			assertion := model.Assertion(a)
 			asserts[i] = assertion
 		}
 		name := ""
@@ -396,10 +377,7 @@ func (m Model) Result(in openapi.AssertionResults) (*model.RunResults, error) {
 				}
 			}
 
-			assertion, err := m.Assertion(r.Assertion)
-			if err != nil {
-				return &model.RunResults{}, fmt.Errorf("could not convert assertion: %w", err)
-			}
+			assertion := model.Assertion(r.Assertion)
 
 			ars[i] = model.AssertionResult{
 				Assertion: assertion,
@@ -414,35 +392,6 @@ func (m Model) Result(in openapi.AssertionResults) (*model.RunResults, error) {
 		AllPassed: in.AllPassed,
 		Results:   results,
 	}, nil
-}
-
-func (m Model) Assertion(in openapi.Assertion) (model.Assertion, error) {
-	expression, err := parser.ParseAssertionExpression(in.Expected)
-	if err != nil {
-		return model.Assertion{}, err
-	}
-
-	comp, _ := m.comparators.Get(in.Comparator)
-	return model.Assertion{
-		Attribute:  model.Attribute(in.Attribute),
-		Comparator: comp,
-		Value:      m.AssertionExpression(expression),
-	}, nil
-}
-
-func (m Model) AssertionExpression(in *parser.Expression) *model.AssertionExpression {
-	if in == nil {
-		return nil
-	}
-
-	return &model.AssertionExpression{
-		LiteralValue: model.LiteralValue{
-			Value: in.LiteralValue.String(false),
-			Type:  in.LiteralValue.Type(),
-		},
-		Operation:  in.Operation,
-		Expression: m.AssertionExpression(in.Expression),
-	}
 }
 
 func (m Model) Runs(in []openapi.TestRun) ([]model.Run, error) {

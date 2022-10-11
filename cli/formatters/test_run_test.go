@@ -107,11 +107,7 @@ func TestFailingTestOutput(t *testing.T) {
 						},
 						Results: []openapi.AssertionResult{
 							{
-								Assertion: &openapi.Assertion{
-									Attribute:  strp("tracetest.span.duration"),
-									Comparator: strp("<="),
-									Expected:   strp("200ms"),
-								},
+								Assertion: strp(`attr:tracetest.span.duration <= 200ms`),
 								AllPassed: boolp(true),
 								SpanResults: []openapi.AssertionSpanResult{
 									{
@@ -130,11 +126,7 @@ func TestFailingTestOutput(t *testing.T) {
 						},
 						Results: []openapi.AssertionResult{
 							{
-								Assertion: &openapi.Assertion{
-									Attribute:  strp("http.status"),
-									Comparator: strp("="),
-									Expected:   strp("200"),
-								},
+								Assertion: strp(`attr:http.status = 200`),
 								AllPassed: boolp(true),
 								SpanResults: []openapi.AssertionSpanResult{
 									{
@@ -146,11 +138,7 @@ func TestFailingTestOutput(t *testing.T) {
 								},
 							},
 							{
-								Assertion: &openapi.Assertion{
-									Attribute:  strp("tracetest.span.duration"),
-									Comparator: strp("<="),
-									Expected:   strp("200ms"),
-								},
+								Assertion: strp(`attr:tracetest.span.duration <= 200ms`),
 								AllPassed: boolp(true),
 								SpanResults: []openapi.AssertionSpanResult{
 									{
@@ -176,11 +164,11 @@ func TestFailingTestOutput(t *testing.T) {
 	expectedOutput := `✘ Testcase 2 (http://localhost:11633/test/9876543/run/1/test)
 	✔ span[name = "my span"]
 		✔ #123456
-			✔ tracetest.span.duration <= 200ms (157ms)
+			✔ attr:tracetest.span.duration <= 200ms (157ms)
 	✘ span[name = "my other span"]
 		✘ #456789
-			✘ http.status = 200 (404) (http://localhost:11633/test/9876543/run/1/test?selectedAssertion=1&selectedSpan=456789)
-			✔ tracetest.span.duration <= 200ms (68ms)
+			✘ attr:http.status = 200 (404) (http://localhost:11633/test/9876543/run/1/test?selectedAssertion=1&selectedSpan=456789)
+			✔ attr:tracetest.span.duration <= 200ms (68ms)
 `
 	assert.Equal(t, expectedOutput, output)
 }
