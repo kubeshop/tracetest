@@ -105,3 +105,13 @@ export const EnvironmentDetailsLink = styled(Button).attrs({
   font-weight: 600;
   padding: 0;
 `;
+
+export const ResultListContainer = styled.div`
+  margin: 0 68px 54px 70px;
+`;
+
+export const TextContainer = styled.div`
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+`;

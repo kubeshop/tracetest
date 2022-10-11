@@ -1,8 +1,8 @@
 import {MoreOutlined} from '@ant-design/icons';
 import {Button, Space, Typography} from 'antd';
+import styled from 'styled-components';
 
 import emptyStateIcon from 'assets/SpanAssertionsEmptyState.svg';
-import styled from 'styled-components';
 
 export const ActionButton = styled(MoreOutlined)`
   color: ${({theme}) => theme.color.textSecondary};
@@ -27,25 +27,6 @@ export const Box = styled.div`
   width: 38px;
   min-width: 38px;
   min-height: 38px;
-`;
-
-export const ResultListContainer = styled.div`
-  margin: 0 68px 54px 70px;
-`;
-
-export const TextContainer = styled.div`
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-`;
-
-export const ButtonContainer = styled.div`
-  display: flex;
-  height: 38px;
-  justify-content: center;
-  margin-left: 26px;
-  margin-right: 18px;
-  width: 38px;
 `;
 
 export const BoxTitle = styled(Typography.Title)`

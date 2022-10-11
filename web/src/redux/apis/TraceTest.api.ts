@@ -1,18 +1,20 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
 import {HTTP_METHOD} from 'constants/Common.constants';
+import {IKeyValue, SortBy, SortDirection} from 'constants/Test.constants';
 import {uniq} from 'lodash';
 import AssertionResults from 'models/AssertionResults.model';
+import Environment from 'models/__mocks__/Environment.mock';
+import KeyValueMock from 'models/__mocks__/KeyValue.mock';
 import Test from 'models/Test.model';
 import TestRun from 'models/TestRun.model';
+import Transaction from 'models/Transaction.model';
 import {IEnvironment} from 'pages/Environments/IEnvironment';
 import WebSocketService, {IListenerFunction} from 'services/WebSocket.service';
 import {TAssertion, TAssertionResults, TRawAssertionResults} from 'types/Assertion.types';
 import {TRawTest, TTest} from 'types/Test.types';
 import {TRawTestRun, TTestRun} from 'types/TestRun.types';
 import {TRawTestSpecs} from 'types/TestSpecs.types';
-import {IKeyValue, SortBy, SortDirection} from '../../constants/Test.constants';
-import Environment from '../../models/__mocks__/Environment.mock';
-import KeyValueMock from '../../models/__mocks__/KeyValue.mock';
+import {TRawTransaction, TTransaction} from 'types/Transaction.types';
 
 const PATH = `${document.baseURI}api/`;
 
@@ -22,6 +24,7 @@ enum Tags {
   TEST_DEFINITION = 'testDefinition',
   TEST_RUN = 'testRun',
   SPAN = 'span',
+  TRANSACTION = 'transaction',
 }
 
 const TraceTestAPI = createApi({
@@ -199,6 +202,26 @@ const TraceTestAPI = createApi({
       providesTags: (result, error, {query}) => (result ? [{type: Tags.SPAN, id: `${query}-LIST`}] : []),
       transformResponse: (rawSpanList: string[]) => uniq(rawSpanList),
     }),
+
+    // Transactions
+    getTransactionById: build.query<TTransaction, {transactionId: string}>({
+      // query: ({transactionId}) => `/transactions/${transactionId}`,
+      query: ({transactionId}) => `/tests`,
+      providesTags: result => [{type: Tags.TRANSACTION, id: result?.id}],
+      transformResponse: (rawTest: TRawTransaction) => {
+        return Transaction({
+          id: '-vgKcy44R',
+          description: 'Description for transaction',
+          name: 'Transaction',
+          version: 1,
+        });
+        // return Transaction(rawTest);
+      },
+    }),
+    deleteTransactionById: build.mutation<TTransaction, {transactionId: string}>({
+      query: ({transactionId}) => ({url: `/transactions/${transactionId}`, method: 'DELETE'}),
+      invalidatesTags: [{type: Tags.TRANSACTION, id: 'LIST'}],
+    }),
   }),
 });
 
@@ -227,6 +250,8 @@ export const {
   useGetEnvironmentSecretListQuery,
   useLazyGetEnvironmentSecretListQuery,
   useCreateEnvironmentMutation,
+  useGetTransactionByIdQuery,
+  useDeleteTransactionByIdMutation,
 } = TraceTestAPI;
 export const {endpoints} = TraceTestAPI;
 

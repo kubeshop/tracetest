@@ -3,7 +3,7 @@ import {useParams} from 'react-router-dom';
 import Layout from 'components/Layout';
 import withAnalytics from 'components/WithAnalytics/WithAnalytics';
 import TestProvider from 'providers/Test';
-import TestContent from './TestContent';
+import Content from './Content';
 
 const Test = () => {
   const {testId = ''} = useParams();
@@ -11,7 +11,7 @@ const Test = () => {
   return (
     <Layout hasMenu>
       <TestProvider testId={testId}>
-        <TestContent />
+        <Content />
       </TestProvider>
     </Layout>
   );

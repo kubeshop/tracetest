@@ -1,6 +1,15 @@
 import {CaseReducer, PayloadAction} from '@reduxjs/toolkit';
-import { FormInstance } from 'antd';
-import { ICreateTestStep } from './Plugins.types';
+import {FormInstance} from 'antd';
+import {ICreateTestStep} from './Plugins.types';
+import {Model} from './Common.types';
+
+export type TRawTransaction = {
+  id?: string;
+  name?: string;
+  description?: string;
+  version?: number;
+};
+export type TTransaction = Model<TRawTransaction, {}>;
 
 export type TDraftTransaction = {
   tests?: string[];
