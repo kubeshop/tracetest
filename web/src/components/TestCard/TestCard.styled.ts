@@ -21,9 +21,12 @@ export const Box = styled.div`
   align-items: center;
   background: #2f1e61;
   border-radius: 3px;
-  grid-template-columns: 20px 1fr 60px 2fr 220px 100px 20px;
-  gap: 24px;
-  padding: 16px 24px;
+  display: flex;
+  justify-content: center;
+  height: 38px;
+  width: 38px;
+  min-width: 38px;
+  min-height: 38px;
 `;
 
 export const ResultListContainer = styled.div`
@@ -119,8 +122,10 @@ export const RunsContainer = styled.div`
 
 export const TestContainer = styled.div`
   cursor: pointer;
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: auto auto 1fr 100px auto auto;
+  align-items: center;
+  gap: 18px;
   padding: 15px 24px;
 `;
 
@@ -128,6 +133,15 @@ export const Text = styled(Typography.Text).attrs({as: 'p'})`
   color: ${({theme}) => theme.color.textSecondary};
   font-size: ${({theme}) => theme.size.sm};
   margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+export const TitleContainer = styled.div`
+  max-width: 500px;
+  min-width: 500px;
+  width: 500px;
 `;
 
 export const Title = styled(Typography.Title)`
