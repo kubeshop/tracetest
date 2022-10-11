@@ -6,7 +6,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/stretchr/testify/assert"
@@ -194,8 +193,7 @@ func TestSummary(t *testing.T) {
 
 		result := []model.AssertionResult{
 			{
-				Assertion: model.Assertion{Comparator: comparator.Eq},
-				Results:   []model.SpanAssertionResult{},
+				Results: []model.SpanAssertionResult{},
 			},
 		}
 		for i := 0; i < pass; i++ {

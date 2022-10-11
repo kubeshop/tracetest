@@ -1,9 +1,6 @@
 package conversion
 
 import (
-	"fmt"
-	"strconv"
-
 	"github.com/kubeshop/tracetest/cli/definition"
 	"github.com/kubeshop/tracetest/cli/openapi"
 )
@@ -132,34 +129,12 @@ func convertOpenAPITestSpecIntoSpecArray(testSpec *openapi.TestSpecs) []definiti
 
 	definitionArray := make([]definition.TestSpec, 0, len(testSpec.Specs))
 	for _, def := range testSpec.Specs {
-		assertions := make([]string, 0, len(def.Assertions))
-		for _, assertion := range def.Assertions {
-			assertionFormat := `%s %s "%s"`
-			if isNumber(*assertion.Expected) {
-				assertionFormat = "%s %s %s"
-			}
-			assertionString := fmt.Sprintf(assertionFormat, *assertion.Attribute, *assertion.Comparator, *assertion.Expected)
-			assertions = append(assertions, assertionString)
-		}
-
 		newDefinition := definition.TestSpec{
 			Selector:   *def.Selector.Query,
-			Assertions: assertions,
+			Assertions: def.Assertions,
 		}
 		definitionArray = append(definitionArray, newDefinition)
 	}
 
 	return definitionArray
-}
-
-func isNumber(in string) bool {
-	if _, err := strconv.Atoi(in); err == nil {
-		return true
-	}
-
-	if _, err := strconv.ParseFloat(in, 64); err == nil {
-		return true
-	}
-
-	return false
 }

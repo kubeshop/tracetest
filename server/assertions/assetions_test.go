@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/kubeshop/tracetest/server/assertions"
-	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/traces"
@@ -26,16 +25,7 @@ func TestAssertion(t *testing.T) {
 			name: "CanAssert",
 			testDef: (model.OrderedMap[model.SpanQuery, model.NamedAssertions]{}).MustAdd(`span[service.name="Pokeshop"]`, model.NamedAssertions{
 				Assertions: []model.Assertion{
-					{
-						Attribute:  "tracetest.span.duration",
-						Comparator: comparator.Eq,
-						Value: &model.AssertionExpression{
-							LiteralValue: model.LiteralValue{
-								Value: "2000ns",
-								Type:  "duration",
-							},
-						},
-					},
+					`attr:tracetest.span.duration = 2000ns`,
 				},
 			}),
 			trace: traces.Trace{
@@ -50,20 +40,11 @@ func TestAssertion(t *testing.T) {
 			expectedAllPassed: true,
 			expectedResult: (model.OrderedMap[model.SpanQuery, []model.AssertionResult]{}).MustAdd(`span[service.name="Pokeshop"]`, []model.AssertionResult{
 				{
-					Assertion: model.Assertion{
-						Attribute:  "tracetest.span.duration",
-						Comparator: comparator.Eq,
-						Value: &model.AssertionExpression{
-							LiteralValue: model.LiteralValue{
-								Value: "2000ns",
-								Type:  "duration",
-							},
-						},
-					},
+					Assertion: `attr:tracetest.span.duration = 2000ns`,
 					Results: []model.SpanAssertionResult{
 						{
 							SpanID:        &spanID,
-							ObservedValue: "2000",
+							ObservedValue: "2us",
 							CompareErr:    nil,
 						},
 					},
@@ -74,29 +55,11 @@ func TestAssertion(t *testing.T) {
 			name: "CanAssertOnSpanMatchCount",
 			testDef: (model.OrderedMap[model.SpanQuery, model.NamedAssertions]{}).MustAdd(`span[service.name="Pokeshop"]`, model.NamedAssertions{
 				Assertions: []model.Assertion{
-					{
-						Attribute:  "tracetest.selected_spans.count",
-						Comparator: comparator.Eq,
-						Value: &model.AssertionExpression{
-							LiteralValue: model.LiteralValue{
-								Value: "1",
-								Type:  "number",
-							},
-						},
-					},
+					`attr:tracetest.selected_spans.count = 1`,
 				},
 			}).MustAdd(`span[service.name="NotExists"]`, model.NamedAssertions{
 				Assertions: []model.Assertion{
-					{
-						Attribute:  "tracetest.selected_spans.count",
-						Comparator: comparator.Eq,
-						Value: &model.AssertionExpression{
-							LiteralValue: model.LiteralValue{
-								Value: "0",
-								Type:  "number",
-							},
-						},
-					},
+					`attr:tracetest.selected_spans.count = 0`,
 				}}),
 			trace: traces.Trace{
 				RootSpan: traces.Span{
@@ -110,16 +73,7 @@ func TestAssertion(t *testing.T) {
 			expectedAllPassed: true,
 			expectedResult: (model.OrderedMap[model.SpanQuery, []model.AssertionResult]{}).MustAdd(`span[service.name="Pokeshop"]`, []model.AssertionResult{
 				{
-					Assertion: model.Assertion{
-						Attribute:  "tracetest.selected_spans.count",
-						Comparator: comparator.Eq,
-						Value: &model.AssertionExpression{
-							LiteralValue: model.LiteralValue{
-								Value: "1",
-								Type:  "number",
-							},
-						},
-					},
+					Assertion: `attr:tracetest.selected_spans.count = 1`,
 					Results: []model.SpanAssertionResult{
 						{
 							SpanID:        &spanID,
@@ -130,16 +84,7 @@ func TestAssertion(t *testing.T) {
 				},
 			}).MustAdd(`span[service.name="NotExists"]`, []model.AssertionResult{
 				{
-					Assertion: model.Assertion{
-						Attribute:  "tracetest.selected_spans.count",
-						Comparator: comparator.Eq,
-						Value: &model.AssertionExpression{
-							LiteralValue: model.LiteralValue{
-								Value: "0",
-								Type:  "number",
-							},
-						},
-					},
+					Assertion: `attr:tracetest.selected_spans.count = 0`,
 					Results: []model.SpanAssertionResult{
 						{
 							SpanID:        nil,
@@ -155,26 +100,8 @@ func TestAssertion(t *testing.T) {
 			name: "ContainsWithJSON",
 			testDef: (model.OrderedMap[model.SpanQuery, model.NamedAssertions]{}).MustAdd(`span[service.name="Pokeshop"]`, model.NamedAssertions{
 				Assertions: []model.Assertion{
-					{
-						Attribute:  "http.response.body",
-						Comparator: comparator.Contains,
-						Value: &model.AssertionExpression{
-							LiteralValue: model.LiteralValue{
-								Value: "52",
-								Type:  "number",
-							},
-						},
-					},
-					{
-						Attribute:  "tracetest.span.duration",
-						Comparator: comparator.Lt,
-						Value: &model.AssertionExpression{
-							LiteralValue: model.LiteralValue{
-								Value: "2001",
-								Type:  "number",
-							},
-						},
-					},
+					`attr:http.response.body contains 52`,
+					`attr:tracetest.span.duration <= 21ms`,
 				}}),
 			trace: traces.Trace{
 				RootSpan: traces.Span{
@@ -182,23 +109,14 @@ func TestAssertion(t *testing.T) {
 					Attributes: traces.Attributes{
 						"service.name":            "Pokeshop",
 						"http.response.body":      `{"id":52}`,
-						"tracetest.span.duration": "2000",
+						"tracetest.span.duration": "21000000",
 					},
 				},
 			},
 			expectedAllPassed: true,
 			expectedResult: (model.OrderedMap[model.SpanQuery, []model.AssertionResult]{}).MustAdd(`span[service.name="Pokeshop"]`, []model.AssertionResult{
 				{
-					Assertion: model.Assertion{
-						Attribute:  "http.response.body",
-						Comparator: comparator.Contains,
-						Value: &model.AssertionExpression{
-							LiteralValue: model.LiteralValue{
-								Value: "52",
-								Type:  "number",
-							},
-						},
-					},
+					Assertion: `attr:http.response.body contains 52`,
 					Results: []model.SpanAssertionResult{
 						{
 							SpanID:        &spanID,
@@ -208,20 +126,11 @@ func TestAssertion(t *testing.T) {
 					},
 				},
 				{
-					Assertion: model.Assertion{
-						Attribute:  "tracetest.span.duration",
-						Comparator: comparator.Lt,
-						Value: &model.AssertionExpression{
-							LiteralValue: model.LiteralValue{
-								Value: "2001",
-								Type:  "number",
-							},
-						},
-					},
+					Assertion: `attr:tracetest.span.duration <= 21ms`,
 					Results: []model.SpanAssertionResult{
 						{
 							SpanID:        &spanID,
-							ObservedValue: "2000",
+							ObservedValue: "21ms",
 							CompareErr:    nil,
 						},
 					},
@@ -233,16 +142,7 @@ func TestAssertion(t *testing.T) {
 			name: "DurationComparison",
 			testDef: (model.OrderedMap[model.SpanQuery, model.NamedAssertions]{}).MustAdd(`span[service.name="Pokeshop"]`, model.NamedAssertions{
 				Assertions: []model.Assertion{
-					{
-						Attribute:  "tracetest.span.duration",
-						Comparator: comparator.Lte,
-						Value: &model.AssertionExpression{
-							LiteralValue: model.LiteralValue{
-								Value: "25ms",
-								Type:  "duration",
-							},
-						},
-					},
+					`attr:tracetest.span.duration <= 25ms`,
 				}}),
 			trace: traces.Trace{
 				RootSpan: traces.Span{
@@ -257,20 +157,11 @@ func TestAssertion(t *testing.T) {
 			expectedAllPassed: true,
 			expectedResult: (model.OrderedMap[model.SpanQuery, []model.AssertionResult]{}).MustAdd(`span[service.name="Pokeshop"]`, []model.AssertionResult{
 				{
-					Assertion: model.Assertion{
-						Attribute:  "tracetest.span.duration",
-						Comparator: comparator.Lte,
-						Value: &model.AssertionExpression{
-							LiteralValue: model.LiteralValue{
-								Value: "25ms",
-								Type:  "duration",
-							},
-						},
-					},
+					Assertion: `attr:tracetest.span.duration <= 25ms`,
 					Results: []model.SpanAssertionResult{
 						{
 							SpanID:        &spanID,
-							ObservedValue: "25000000",
+							ObservedValue: "25ms",
 							CompareErr:    nil,
 						},
 					},

@@ -271,8 +271,8 @@ func TestDefinitionToOpenAPIConversion(t *testing.T) {
 					{
 						Selector: `span[tracetest.span.type="http"]`,
 						Assertions: []string{
-							"tracetest.span.duration <= 200ms",
-							"http.status_code = 200",
+							"attr:tracetest.span.duration <= 200ms",
+							"attr:http.status_code = 200",
 						},
 					},
 				},
@@ -301,17 +301,9 @@ func TestDefinitionToOpenAPIConversion(t *testing.T) {
 							Selector: openapi.Selector{
 								Query: `span[tracetest.span.type="http"]`,
 							},
-							Assertions: []openapi.Assertion{
-								{
-									Attribute:  "tracetest.span.duration",
-									Comparator: "<=",
-									Expected:   "200ms",
-								},
-								{
-									Attribute:  "http.status_code",
-									Comparator: "=",
-									Expected:   "200",
-								},
+							Assertions: []string{
+								`attr:tracetest.span.duration <= 200ms`,
+								`attr:http.status_code = 200`,
 							},
 						},
 					},
