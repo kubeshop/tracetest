@@ -8,7 +8,7 @@ type TypedValue struct {
 }
 
 func (tv TypedValue) FormattedString() string {
-	if tv.Type == TYPE_STRING {
+	if tv.Type == TypeString {
 		return fmt.Sprintf(`"%s"`, tv.Value)
 	}
 

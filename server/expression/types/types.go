@@ -5,11 +5,11 @@ import "regexp"
 type Type uint
 
 const (
-	TYPE_NIL       Type = 0
-	TYPE_STRING    Type = 1
-	TYPE_NUMBER    Type = 2
-	TYPE_ATTRIBUTE Type = 3
-	TYPE_DURATION  Type = 4
+	TypeNil Type = iota
+	TypeString
+	TypeNumber
+	TypeAttribute
+	TypeDuration
 )
 
 func GetType(value string) Type {
@@ -17,14 +17,14 @@ func GetType(value string) Type {
 	durationRegex := regexp.MustCompile(`^([0-9]+(\.[0-9]+)?)(ns|us|ms|s|m|h)$`)
 
 	if numberRegex.Match([]byte(value)) {
-		return TYPE_NUMBER
+		return TypeNumber
 	}
 
 	if durationRegex.Match([]byte(value)) {
-		return TYPE_DURATION
+		return TypeDuration
 	}
 
-	return TYPE_STRING
+	return TypeString
 }
 
 func GetTypedValue(value string) TypedValue {

@@ -44,15 +44,15 @@ func runMathOperationOnNumbers(value1 types.TypedValue, value2 types.TypedValue,
 		return types.TypedValue{}, err
 	}
 
-	operationType := types.TYPE_NUMBER
-	if value1.Type == types.TYPE_DURATION {
+	operationType := types.TypeNumber
+	if value1.Type == types.TypeDuration {
 		value1.Value = fmt.Sprintf("%d", traces.ConvertTimeFieldIntoNanoSeconds(value1.Value))
-		operationType = types.TYPE_DURATION
+		operationType = types.TypeDuration
 	}
 
-	if value2.Type == types.TYPE_DURATION {
+	if value2.Type == types.TypeDuration {
 		value2.Value = fmt.Sprintf("%d", traces.ConvertTimeFieldIntoNanoSeconds(value2.Value))
-		operationType = types.TYPE_DURATION
+		operationType = types.TypeDuration
 	}
 
 	number1, _ := strconv.ParseFloat(value1.Value, 64)
@@ -72,7 +72,7 @@ func runMathOperationOnNumbers(value1 types.TypedValue, value2 types.TypedValue,
 }
 
 func validateFieldType(field types.TypedValue) error {
-	if field.Type != types.TYPE_NUMBER && field.Type != types.TYPE_DURATION {
+	if field.Type != types.TypeNumber && field.Type != types.TypeDuration {
 		return fmt.Errorf("operation is only allowed on numbers and duration fields")
 	}
 

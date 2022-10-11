@@ -43,7 +43,7 @@ func (e Executor) ExecuteStatement(statement string) (string, string, error) {
 	}
 
 	// https://github.com/kubeshop/tracetest/issues/1203
-	if leftType == types.TYPE_DURATION || rightType == types.TYPE_DURATION {
+	if leftType == types.TypeDuration || rightType == types.TypeDuration {
 		leftValue = getRoundedDurationValue(leftValue)
 		rightValue = getRoundedDurationValue(rightValue)
 	}
@@ -58,7 +58,7 @@ func (e Executor) ExecuteStatement(statement string) (string, string, error) {
 		err = ErrNoMatch
 	}
 
-	if leftType == types.TYPE_DURATION || rightType == types.TYPE_DURATION {
+	if leftType == types.TypeDuration || rightType == types.TypeDuration {
 		// If any of the sides is a duration, there's a high change of the other side
 		// to be a duration as well. So try to format both before returning it
 		leftValue = maybeFormatDuration(leftValue, leftType)
@@ -71,7 +71,7 @@ func (e Executor) ExecuteStatement(statement string) (string, string, error) {
 func (e Executor) executeExpression(expr Expr) (string, types.Type, error) {
 	currentValue, currentType, err := e.resolveTerm(expr.Left)
 	if err != nil {
-		return "", types.TYPE_NIL, fmt.Errorf("could not resolve term: %w", err)
+		return "", types.TypeNil, fmt.Errorf("could not resolve term: %w", err)
 	}
 
 	value := types.TypedValue{Value: currentValue, Type: currentType}
@@ -79,7 +79,7 @@ func (e Executor) executeExpression(expr Expr) (string, types.Type, error) {
 		for _, opTerm := range expr.Right {
 			currentValue, currentType, err = e.executeOperation(value, opTerm)
 			if err != nil {
-				return "", types.TYPE_NIL, fmt.Errorf("could not execute operation: %w", err)
+				return "", types.TypeNil, fmt.Errorf("could not execute operation: %w", err)
 			}
 
 			value = types.TypedValue{Value: currentValue, Type: currentType}
@@ -89,7 +89,7 @@ func (e Executor) executeExpression(expr Expr) (string, types.Type, error) {
 	if expr.Filters != nil {
 		newValue, err := e.executeFilters(value, expr.Filters)
 		if err != nil {
-			return "", types.TYPE_NIL, err
+			return "", types.TypeNil, err
 		}
 
 		value = newValue
@@ -105,7 +105,7 @@ func (e Executor) resolveTerm(term *Term) (string, types.Type, error) {
 			selectedSpansDataStore := e.Stores["tracetest.selected_spans"]
 			value, err := selectedSpansDataStore.Get(term.Attribute.Name())
 			if err != nil {
-				return "", types.TYPE_NIL, fmt.Errorf("could not resolve meta attribute: %w", err)
+				return "", types.TypeNil, fmt.Errorf("could not resolve meta attribute: %w", err)
 			}
 
 			return value, types.GetType(value), nil
@@ -114,7 +114,7 @@ func (e Executor) resolveTerm(term *Term) (string, types.Type, error) {
 		attributeDataStore := e.Stores["attr"]
 		value, err := attributeDataStore.Get(term.Attribute.Name())
 		if err != nil {
-			return "", types.TYPE_NIL, fmt.Errorf("could not resolve attribute %s: %w", *term.Attribute, err)
+			return "", types.TypeNil, fmt.Errorf("could not resolve attribute %s: %w", *term.Attribute, err)
 		}
 
 		return value, types.GetType(value), nil
@@ -122,11 +122,11 @@ func (e Executor) resolveTerm(term *Term) (string, types.Type, error) {
 
 	if term.Duration != nil {
 		nanoSeconds := traces.ConvertTimeFieldIntoNanoSeconds(*term.Duration)
-		return fmt.Sprintf("%d", nanoSeconds), types.TYPE_DURATION, nil
+		return fmt.Sprintf("%d", nanoSeconds), types.TypeDuration, nil
 	}
 
 	if term.Number != nil {
-		return *term.Number, types.TYPE_NUMBER, nil
+		return *term.Number, types.TypeNumber, nil
 	}
 
 	if term.Str != nil {
@@ -134,7 +134,7 @@ func (e Executor) resolveTerm(term *Term) (string, types.Type, error) {
 		for _, arg := range term.Str.Args {
 			stringArg, _, err := e.executeExpression(arg)
 			if err != nil {
-				return "", types.TYPE_NIL, fmt.Errorf("could not execute expression: %w", err)
+				return "", types.TypeNil, fmt.Errorf("could not execute expression: %w", err)
 			}
 
 			stringArgs = append(stringArgs, stringArg)
@@ -145,30 +145,30 @@ func (e Executor) resolveTerm(term *Term) (string, types.Type, error) {
 			value = fmt.Sprintf(term.Str.Text, stringArgs...)
 		}
 
-		return value, types.TYPE_STRING, nil
+		return value, types.TypeString, nil
 	}
 
-	return "", types.TYPE_NIL, fmt.Errorf("empty term")
+	return "", types.TypeNil, fmt.Errorf("empty term")
 }
 
 func (e Executor) executeOperation(left types.TypedValue, right *OpTerm) (string, types.Type, error) {
 	rightValue, rightType, err := e.resolveTerm(right.Term)
 	if err != nil {
-		return "", types.TYPE_NIL, err
+		return "", types.TypeNil, err
 	}
 
 	if left.Type != rightType {
-		return "", types.TYPE_NIL, fmt.Errorf("types mismatch")
+		return "", types.TypeNil, fmt.Errorf("types mismatch")
 	}
 
 	operatorFunction, err := getOperationRegistry().Get(right.Operator)
 	if err != nil {
-		return "", types.TYPE_NIL, err
+		return "", types.TypeNil, err
 	}
 
 	newValue, err := operatorFunction(left, types.TypedValue{Value: rightValue, Type: rightType})
 	if err != nil {
-		return "", types.TYPE_NIL, err
+		return "", types.TypeNil, err
 	}
 
 	return newValue.Value, newValue.Type, nil
@@ -226,7 +226,7 @@ func maybeFormatDuration(value string, vType types.Type) string {
 	// Any type other than duration and number is certain to not be a duration field
 	// We still try to convert types.TYPE_NUMBER because we store durations as long numbers,
 	// so it's worth trying converting it.
-	if vType != types.TYPE_DURATION && vType != types.TYPE_NUMBER {
+	if vType != types.TypeDuration && vType != types.TypeNumber {
 		return value
 	}
 
