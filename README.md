@@ -47,7 +47,7 @@ Tracetest is a OpenTelemetry based tool that helps you develop and test your dis
 - Works out of the box with your existing OTel instrumentation, supporting [numerous backend trace datastores](https://docs.tracetest.io/supported-backends/), including Jeager and Grafana Tempo. In addition, supports adding Tracetest as an [additional pipeline](https://docs.tracetest.io/supported-backends/#using-tracetest-without-a-backend) via your OpenTelemetry Collector config. Tell us others backend datastores you want supported!
 - Supporting multiple ways of creating a test, including HTTP, GRPC and Postman Collections.
 - Visualize the changes you are making to your trace as you develop, enabling Observability-Driven Development.
-- [Adding assertions](https://docs.tracetest.io/adding-assertions/) based on return data from trigger call and/or data contained in the spans in your distributed trace.
+- [Add assertions](https://docs.tracetest.io/adding-assertions/) based on return data from trigger call and/or data contained in the spans in your distributed trace.
 - Specifying which spans to check in assertions via the [advanced selector language](https://docs.tracetest.io/advanced-selectors/).
 - Defining checks against the attributes in these spans, including properties, return status, or timing.
 - Tests can be created via graphical UI or via [YAML-based test definition file](https://docs.tracetest.io/test-definition-file/).
