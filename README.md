@@ -53,7 +53,7 @@ Tracetest is a OpenTelemetry based tool that helps you develop and test your dis
 - Tests can be created via graphical UI or via [YAML-based test definition file](https://docs.tracetest.io/test-definition-file/).
 - Use the test definition file to [enable Gitops flows](https://tracetest.io/blog/integrating-tracetest-with-github-actions-in-a-ci-pipeline).
 - [Tracetest CLI](https://docs.tracetest.io/command-line-tool/) allows importing & exporting tests, running tests, and more.
-- Tests are [versioned](https://docs.tracetest.io/versioning/) as the definition of the test is altered.
+- [Version tests](https://docs.tracetest.io/versioning/) as the definition of the test is altered.
 - Install can include [an example microservice](https://kubeshop.github.io/tracetest/pokeshop/) that is instrumented with OpenTelemetry to use as an example application under test.
 
 # Getting Started
