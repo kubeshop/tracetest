@@ -5,8 +5,6 @@ on:
       - opened
       - reopened
       - synchronize
-    branches:
-      - main
     paths:
       - .github/workflows/pull-request.yaml
       - api/**
