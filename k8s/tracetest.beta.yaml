@@ -8,7 +8,7 @@ googleAnalytics:
   enabled: false
 
 demo:
-  enabled: [pokeshop, otel]
+  enabled: [pokeshop]
   endpoints:
     pokeshopHttp: http://demo-pokemon-api.demo
     pokeshopGrpc: demo-pokemon-api.demo:8082

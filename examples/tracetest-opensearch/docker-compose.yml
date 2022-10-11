@@ -49,7 +49,7 @@ services:
 
     data-prepper:
         restart: unless-stopped
-        image: opensearchproject/data-prepper:latest
+        image: opensearchproject/data-prepper:1.5.1
         volumes:
             - ./opensearch/opensearch-analytics.yaml:/usr/share/data-prepper/pipelines.yaml
             - ./opensearch/opensearch-data-prepper-config.yaml:/usr/share/data-prepper/data-prepper-config.yaml
@@ -58,7 +58,7 @@ services:
                 condition: service_healthy
 
     opensearch:
-        image: opensearchproject/opensearch:latest
+        image: opensearchproject/opensearch:2.3.0
         environment:
             - discovery.type=single-node
             - bootstrap.memory_lock=true # along with the memlock settings below, disables swapping
