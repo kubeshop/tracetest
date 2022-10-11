@@ -1,7 +1,7 @@
-import pokeshopProtoData from 'assets/pokeshop.proto.json';
-import otelProtoData from 'assets/otel-demo.proto.json';
-import pokeshopPostmanData from 'assets/pokeshop.postman_collection.json';
 import Env from 'utils/Env';
+import pokeshopProtoData from '../assets/pokeshop.proto.json';
+import otelProtoData from '../assets/otel-demo.proto.json';
+import pokeshopPostmanData from '../assets/pokeshop.postman_collection.json';
 import {HTTP_METHOD, SupportedPlugins} from './Common.constants';
 
 const pokeshopProtoFile = new File([pokeshopProtoData?.proto], 'pokeshop.proto');

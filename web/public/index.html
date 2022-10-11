@@ -23,7 +23,7 @@
     -->
     <title>Tracetest</title>
     <script>
-      const getParser = {
+      const parser = {
         toArray(value) {
           try {
             return JSON.parse(value) || [];
@@ -60,15 +60,15 @@
 
       function injectVariables() {
         window.ENV = {
-          measurementId: getTemplateValue('{{ .AnalyticsKey }}', '', getParser.toString),
-          analyticsEnabled: getTemplateValue('{{ .AnalyticsEnabled }}', 'false', getParser.toBoolean),
-          serverPathPrefix: getTemplateValue('{{ .ServerPathPrefix }}', '/', getParser.toString),
-          serverID: getTemplateValue('{{ .ServerID }}', '', getParser.toString),
-          appVersion: getTemplateValue('{{ .AppVersion }}', '', getParser.toString),
-          env: getTemplateValue('{{ .Env }}', '', getParser.toString),
-          demoEnabled: getTemplateValue('{{ .DemoEnabled }}', '["pokeshop", "otel"]', getParser.toArray),
-          demoEndpoints: getTemplateValue('{{ .DemoEndpoints }}', '{"PokeshopHttp": "http://demo-pokemon-api.demo.svc.cluster.local", "PokeshopGrpc": "demo-pokemon-api.demo.svc.cluster.local:8082", "OtelFrontend": "http://otel-frontend:8084" }', getParser.toObject),
-          experimentalFeatures: getTemplateValue('{{ .ExperimentalFeatures }}', '["transactions"]', getParser.toArray),
+          measurementId: getTemplateValue('{{ .AnalyticsKey }}', '', parser.toString),
+          analyticsEnabled: getTemplateValue('{{ .AnalyticsEnabled }}', 'false', parser.toBoolean),
+          serverPathPrefix: getTemplateValue('{{ .ServerPathPrefix }}', '/', parser.toString),
+          serverID: getTemplateValue('{{ .ServerID }}', '', parser.toString),
+          appVersion: getTemplateValue('{{ .AppVersion }}', '', parser.toString),
+          env: getTemplateValue('{{ .Env }}', '', parser.toString),
+          demoEnabled: getTemplateValue('{{ .DemoEnabled }}', '["pokeshop", "otel"]', parser.toArray),
+          demoEndpoints: getTemplateValue('{{ .DemoEndpoints }}', '{"PokeshopHttp": "http://demo-pokemon-api.demo.svc.cluster.local", "PokeshopGrpc": "demo-pokemon-api.demo.svc.cluster.local:8082", "OtelFrontend": "http://otel-frontend:8084" }', parser.toObject),
+          experimentalFeatures: getTemplateValue('{{ .ExperimentalFeatures }}', '["transactions"]', parser.toArray),
         };
 
         var base = document.createElement('base');
