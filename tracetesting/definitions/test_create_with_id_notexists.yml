@@ -33,9 +33,9 @@ trigger:
 specs:
 - selector: span[name = "Tracetest trigger"]
   assertions:
-    - tracetest.selected_spans.count = 1
-    - tracetest.response.status = 200
-    - tracetest.response.body contains '"id":"${EXAMPLE_TEST_ID}"'
+    - attr:tracetest.selected_spans.count = 1
+    - attr:tracetest.response.status = 200
+    - attr:tracetest.response.body | json_path '.id' = "${EXAMPLE_TEST_ID}"
 - selector: span[name="POST /api/tests" tracetest.span.type="http"]
   assertions:
-  - tracetest.selected_spans.count = 1
+  - attr:tracetest.selected_spans.count = 1
