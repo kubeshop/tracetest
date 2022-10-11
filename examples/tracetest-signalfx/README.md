@@ -4,7 +4,7 @@ This repository objective is to show how you can configure your tracetest instan
 
 ## Steps
 
-1. [Install the tracetest CLI](https://github.com/kubeshop/tracetest/blob/main/docs/installing.md#cli-installation)
+1. [Install the tracetest CLI](https://docs.tracetest.io/installing/)
 2. Run `tracetest configure --endpoint http://localhost:11633` on a terminal to configure the CLI to send all commands to that address
 3. Update the `collector.config.yaml` and `tracetest-config.yaml` with the `token` and `realm` of your SignalFX account.
 4. Run the project by using docker-compose: `docker-compose up` (Linux) or `docker compose up` (Mac)

@@ -5,7 +5,7 @@ Tracetest depends on a postgres database and a trace store backend (Jaeger or Te
 ## **Run on Local Kubernetes**
 
 Tracetest and its dependencies can be installed in a local Kubernetes cluster (microk8s, minikube, Kubernetes for Docker Desktop, etc).
-Following the [install steps](/docs/installing.md) will get a running instance of Tracetest and postgres. Installing Jaeger is the easiest way to get a trace store backend.
+Following the [install steps](/installing/) will install a running instance of Tracetest and Postgres. Installing Jaeger is the easiest way to get a trace store backend.
 
 The Tracetest install can be exposed with a `LoadBalancer`, `NodePort` or any similar mechanism. It can also be kept internally, only expose the Jaeger and postgres port,
 and use them to run local development builds. This is useful to quickly test changes on both the front and back end.
@@ -39,7 +39,7 @@ EOF
 
 ### **Install Tracetest**
 
-Follow the [install steps](/docs/installing.md):
+Follow the [install steps](/installing/):
 
 ```sh
 helm repo add kubeshop https://kubeshop.github.io/helm-charts
