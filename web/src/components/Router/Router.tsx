@@ -6,10 +6,12 @@ import Envs from 'pages/Environments';
 import Home from 'pages/Home';
 import RunDetail from 'pages/RunDetail';
 import Test from 'pages/Test';
+
 import Transaction from 'pages/Transaction';
+import Env from 'utils/Env';
 import ExperimentalFeature from 'utils/ExperimentalFeature';
 
-const {serverPathPrefix = '/'} = window.ENV || {};
+const serverPathPrefix = Env.get('serverPathPrefix');
 const isTransactionsFeatureEnabled = ExperimentalFeature.isEnabled('transactions');
 
 const Router = () => (

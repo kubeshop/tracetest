@@ -1,3 +1,5 @@
+import Env from 'utils/Env';
+
 interface IData<T> {
   event: T;
   resource: string;
@@ -161,7 +163,7 @@ const WebSocketGateway = ({url}: IParams): IWebSocketGateway => {
 };
 
 function getWebSocketURL() {
-  const {serverPathPrefix = '/'} = window.ENV || {};
+  const serverPathPrefix = Env.get('serverPathPrefix');
   const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
   const hostname = window.location.hostname;
   const port = process.env.NODE_ENV === 'development' ? '11633' : window.location.port;
