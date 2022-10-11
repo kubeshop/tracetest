@@ -2,7 +2,7 @@ version: "3.2"
 services:
   data-prepper:
     restart: unless-stopped
-    image: opensearchproject/data-prepper:latest
+    image: opensearchproject/data-prepper:2.3.0
     volumes:
       - ./local-config/opensearch/opensearch-analytics.yaml:/usr/share/data-prepper/pipelines.yaml
       - ./local-config/opensearch/opensearch-data-prepper-config.yaml:/usr/share/data-prepper/data-prepper-config.yaml
@@ -10,7 +10,7 @@ services:
       - "opensearch"
 
   opensearch:
-    image: opensearchproject/opensearch:latest
+    image: opensearchproject/opensearch:2.3.0
     environment:
       - discovery.type=single-node
       - bootstrap.memory_lock=true # along with the memlock settings below, disables swapping
@@ -26,7 +26,7 @@ services:
         hard: 65536
 
   dashboards:
-    image: opensearchproject/opensearch-dashboards:latest
+    image: opensearchproject/opensearch-dashboards:2.3.0
     environment:
       OPENSEARCH_HOSTS: '["http://opensearch:9200"]'
       OPENSEARCH_USERNAME: admin
