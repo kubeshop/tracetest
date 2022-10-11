@@ -50,7 +50,7 @@ Tracetest is a OpenTelemetry based tool that helps you develop and test your dis
 - [Add assertions](https://docs.tracetest.io/adding-assertions/) based on return data from trigger call and/or data contained in the spans in your distributed trace.
 - Specifying which spans to check in assertions via the [advanced selector language](https://docs.tracetest.io/advanced-selectors/).
 - Define checks against the attributes in these spans, including properties, return status, or timing.
-- Tests can be created via graphical UI or via [YAML-based test definition file](https://docs.tracetest.io/test-definition-file/).
+- Create tests via graphical UI or via [YAML-based test definition file](https://docs.tracetest.io/test-definition-file/).
 - Use the test definition file to [enable Gitops flows](https://tracetest.io/blog/integrating-tracetest-with-github-actions-in-a-ci-pipeline).
 - [Tracetest CLI](https://docs.tracetest.io/command-line-tool/) allows importing & exporting tests, running tests, and more.
 - [Version tests](https://docs.tracetest.io/versioning/) as the definition of the test is altered.
