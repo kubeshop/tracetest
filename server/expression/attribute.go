@@ -4,7 +4,7 @@ import "strings"
 
 const (
 	metaPrefix    = "tracetest.selected_spans."
-	metaPrefixLen = len("tracetest.selected_spans.")
+	metaPrefixLen = len(metaPrefix)
 )
 
 type Attribute struct {
