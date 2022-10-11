@@ -27,7 +27,9 @@ const HomeFilters = ({onSearch, onSortBy}: IProps) => {
       <Typography.Text>Sort by:</Typography.Text>
       <Select defaultValue={sortOptions[0].value} onChange={handleSort} style={{width: 160}}>
         {sortOptions.map(({value, label}) => (
-          <Select.Option value={value}>{label}</Select.Option>
+          <Select.Option key={value} value={value}>
+            {label}
+          </Select.Option>
         ))}
       </Select>
     </S.FiltersContainer>

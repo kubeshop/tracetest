@@ -12,6 +12,7 @@ import * as S from './RunCard.styled';
 interface IProps {
   run: TTestRun;
   testId: string;
+  linkTo: string;
 }
 
 function getIcon(state: TTestRun['state'], failedAssertions: number) {
@@ -24,9 +25,10 @@ function getIcon(state: TTestRun['state'], failedAssertions: number) {
   return <S.IconSuccess />;
 }
 
-const ResultCard = ({
+const RunCard = ({
   run: {id: runId, executionTime, passedAssertionCount, failedAssertionCount, state, createdAt, testVersion, metadata},
   testId,
+  linkTo,
 }: IProps) => {
   const metadataName = metadata?.name;
   const metadataBuildNumber = metadata?.buildNumber;
@@ -34,7 +36,7 @@ const ResultCard = ({
   const metadataUrl = metadata?.url;
 
   return (
-    <Link to={`/test/${testId}/run/${runId}`}>
+    <Link to={linkTo}>
       <S.Container $isWhite={ExperimentalFeature.isEnabled('transactions')} data-cy={`run-card-${runId}`}>
         <S.IconContainer>{getIcon(state, failedAssertionCount)}</S.IconContainer>
 
@@ -88,4 +90,4 @@ const ResultCard = ({
   );
 };
 
-export default ResultCard;
+export default RunCard;

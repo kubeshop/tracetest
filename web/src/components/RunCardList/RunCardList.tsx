@@ -11,7 +11,7 @@ interface IProps {
 const RunCardList = ({resultList, testId}: IProps) => (
   <S.Container data-cy="run-card-list">
     {resultList.map(run => (
-      <ResultCard key={run.id} run={run} testId={testId} />
+      <ResultCard key={run.id} linkTo={`/test/${testId}/run/${run.id}`} run={run} testId={testId} />
     ))}
   </S.Container>
 );

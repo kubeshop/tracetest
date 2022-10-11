@@ -42,15 +42,15 @@ export const EnvironmentCard = ({
     <E.EnvironmentCard $isCollapsed={isCollapsed}>
       <E.InfoContainer onClick={toggleColapsed}>
         {isCollapsed ? <DownOutlined /> : <RightOutlined data-cy={`collapse-environment-${id}`} />}
-        <T.TextContainer>
+        <E.TextContainer>
           <E.NameText>{name}</E.NameText>
-        </T.TextContainer>
-        <T.TextContainer />
-        <T.TextContainer data-cy={`environment-description-${id}`}>
+        </E.TextContainer>
+        <E.TextContainer />
+        <E.TextContainer data-cy={`environment-description-${id}`}>
           <T.Text>{description}</T.Text>
-        </T.TextContainer>
-        <T.TextContainer />
-        <T.TextContainer />
+        </E.TextContainer>
+        <E.TextContainer />
+        <E.TextContainer />
 
         <Dropdown
           overlay={
@@ -82,7 +82,7 @@ export const EnvironmentCard = ({
       </E.InfoContainer>
 
       {isCollapsed && Boolean(resultList.length) && (
-        <T.ResultListContainer>
+        <E.ResultListContainer>
           <E.VariablesMainContainer>
             <E.HeaderContainer>
               <E.HeaderText>Key</E.HeaderText>
@@ -107,7 +107,7 @@ export const EnvironmentCard = ({
               </E.EnvironmentDetailsLink>
             </E.EnvironmentDetails>
           )}
-        </T.ResultListContainer>
+        </E.ResultListContainer>
       )}
 
       {isCollapsed && !resultList.length && (
