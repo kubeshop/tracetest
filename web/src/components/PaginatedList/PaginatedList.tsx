@@ -1,7 +1,8 @@
 import {UseQuery} from '@reduxjs/toolkit/dist/query/react/buildHooks';
 import {ReactElement} from 'react';
-import usePagination from '../../hooks/usePagination';
-import Pagination from '../Pagination';
+
+import usePagination from 'hooks/usePagination';
+import Pagination from 'components/Pagination';
 import Empty from './Empty';
 import Loading from './Loading';
 import * as S from './PaginatedList.styled';
@@ -12,9 +13,9 @@ type TParams<P> = P & {
 
 interface IProps<T, P> {
   dataCy?: string;
+  itemComponent({item}: {item: T}): ReactElement;
   params: TParams<P>;
   query: UseQuery<any>;
-  itemComponent({item}: {item: T}): ReactElement;
 }
 
 interface IId {
