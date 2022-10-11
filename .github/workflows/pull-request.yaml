@@ -153,12 +153,12 @@ jobs:
       - name: Build CLI
         run: |
           cd cli
-          go build -o ./tracetest main.go
-          ./tracetest configure -g --endpoint http://localhost:11633 --analytics=false
+          make build
+          ./dist/tracetest configure -g --endpoint http://localhost:11633 --analytics=false
       - name: Run example test
         run: |
           ./scripts/wait-for-port.sh 11633
-          ./cli/tracetest test run -d examples/${{ matrix.example_dir }}/tests/list-tests.yaml --wait-for-result
+          ./cli/dist/tracetest test run -d examples/${{ matrix.example_dir }}/tests/list-tests.yaml --wait-for-result
 
   deploy:
     needs:  [unit-test-frontend, unit-test-backend, unit-test-cli, build-docker]
