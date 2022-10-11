@@ -35,6 +35,7 @@ func (m OpenAPI) Test(in model.Test) openapi.Test {
 		ServiceUnderTest: m.Trigger(in.ServiceUnderTest),
 		Specs:            m.Specs(in.Specs),
 		Version:          int32(in.Version),
+		Outputs:          m.Outputs(in.Outputs),
 		Summary: openapi.TestSummary{
 			Runs: int32(in.Summary.Runs),
 			LastRun: openapi.TestSummaryLastRun{
@@ -44,6 +45,19 @@ func (m OpenAPI) Test(in model.Test) openapi.Test {
 			},
 		},
 	}
+}
+
+func (m OpenAPI) Outputs(in model.OrderedMap[string, model.Output]) []openapi.TestOutput {
+	res := make([]openapi.TestOutput, 0, in.Len())
+	in.Map(func(key string, val model.Output) {
+		res = append(res, openapi.TestOutput{
+			Name:     key,
+			Selector: m.Selector(val.Selector),
+			Value:    val.Value.String(),
+		})
+	})
+
+	return res
 }
 
 func (m OpenAPI) Trigger(in model.Trigger) openapi.Trigger {
@@ -252,14 +266,44 @@ func (m Model) Test(in openapi.Test) (model.Test, error) {
 	if err != nil {
 		return model.Test{}, fmt.Errorf("could not convert definition: %w", err)
 	}
+
+	outputs, err := m.Outputs(in.Outputs)
+	if err != nil {
+		return model.Test{}, fmt.Errorf("could not convert outputs: %w", err)
+	}
+
 	return model.Test{
 		ID:               id.ID(in.Id),
 		Name:             in.Name,
 		Description:      in.Description,
 		ServiceUnderTest: m.Trigger(in.ServiceUnderTest),
 		Specs:            definition,
+		Outputs:          outputs,
 		Version:          int(in.Version),
 	}, nil
+}
+
+func (m Model) Outputs(in []openapi.TestOutput) (model.OrderedMap[string, model.Output], error) {
+	res := model.OrderedMap[string, model.Output]{}
+
+	for _, output := range in {
+		expression, err := parser.ParseAssertionExpression(output.Value)
+		if err != nil {
+			return model.OrderedMap[string, model.Output]{}, err
+		}
+		assertionExpression := m.AssertionExpression(expression)
+		if assertionExpression == nil {
+			err := fmt.Errorf("cannot parse output value expression %s", output.Value)
+			return model.OrderedMap[string, model.Output]{}, err
+		}
+
+		res.Add(output.Name, model.Output{
+			Selector: model.SpanQuery(output.Selector.Query),
+			Value:    *assertionExpression,
+		})
+	}
+
+	return res, nil
 }
 
 func (m Model) Tests(in []openapi.Test) ([]model.Test, error) {

@@ -1,0 +1,5 @@
+BEGIN;
+
+  ALTER TABLE tests ADD COLUMN outputs JSONB;
+
+COMMIT;

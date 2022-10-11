@@ -1,0 +1,5 @@
+BEGIN;
+
+  ALTER TABLE tests DROP COLUMN outputs JSONB;
+
+COMMIT;
