@@ -1,4 +1,4 @@
-import {format, formatDistanceToNow, isValid, parseISO} from 'date-fns';
+import {format, formatDistanceToNowStrict, isValid, parseISO} from 'date-fns';
 
 const Date = {
   format(date: string, dateFormat = "EEEE, yyyy/MM/dd 'at' HH:mm:ss") {
@@ -13,7 +13,7 @@ const Date = {
     if (!isValid(isoDate)) {
       return '';
     }
-    return formatDistanceToNow(isoDate, {addSuffix: true});
+    return formatDistanceToNowStrict(isoDate, {addSuffix: true});
   },
 };
 

@@ -153,12 +153,12 @@ jobs:
       - name: Build CLI
         run: |
           cd cli
-          go build -o ./tracetest main.go
-          ./tracetest configure -g --endpoint http://localhost:11633 --analytics=false
+          make build
+          ./dist/tracetest configure -g --endpoint http://localhost:11633 --analytics=false
       - name: Run example test
         run: |
-          timeout 60 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:11633)" != "200" ]]; do sleep 5; done' || false
-          ./cli/tracetest test run -d examples/${{ matrix.example_dir }}/tests/list-tests.yaml --wait-for-result
+          ./scripts/wait-for-port.sh 11633
+          ./cli/dist/tracetest test run -d examples/${{ matrix.example_dir }}/tests/list-tests.yaml --wait-for-result
 
   deploy:
     needs:  [unit-test-frontend, unit-test-backend, unit-test-cli, build-docker]

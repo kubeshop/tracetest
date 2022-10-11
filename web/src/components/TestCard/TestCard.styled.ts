@@ -22,11 +22,11 @@ export const Box = styled.div`
   background: #2f1e61;
   border-radius: 3px;
   display: flex;
-  height: 38px;
   justify-content: center;
-  margin-left: 26px;
-  margin-right: 18px;
+  height: 38px;
   width: 38px;
+  min-width: 38px;
+  min-height: 38px;
 `;
 
 export const BoxTitle = styled(Typography.Title)`
@@ -103,8 +103,10 @@ export const RunsContainer = styled.div`
 
 export const TestContainer = styled.div`
   cursor: pointer;
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: auto auto 1fr 100px auto auto;
+  align-items: center;
+  gap: 18px;
   padding: 15px 24px;
 `;
 
@@ -112,6 +114,15 @@ export const Text = styled(Typography.Text).attrs({as: 'p'})`
   color: ${({theme}) => theme.color.textSecondary};
   font-size: ${({theme}) => theme.size.sm};
   margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+export const TitleContainer = styled.div`
+  max-width: 500px;
+  min-width: 500px;
+  width: 500px;
 `;
 
 export const Title = styled(Typography.Title)`
