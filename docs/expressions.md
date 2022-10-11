@@ -1,6 +1,6 @@
 # Expressions
 
-Tracetest allows you to add expressions when writing your tests. They are a nice and clean way of adding values that are only known during execution time. For example, referencing a variable, a span attribute or even arithmetic operations.
+Tracetest allows you to add expressions when writing your tests. They are a nice and clean way of adding values that are only known during execution time. For example, when referencing a variable, a span attribute or even arithmetic operations.
 
 ## Features
 
