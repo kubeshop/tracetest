@@ -97,6 +97,7 @@ type (
 		TriggerResult TriggerResult
 		Results       *RunResults
 		Trace         *traces.Trace
+		Outputs       OrderedMap[string, string]
 		LastError     error
 		Pass          int
 		Fail          int

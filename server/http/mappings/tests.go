@@ -242,8 +242,22 @@ func (m OpenAPI) Run(in *model.Run) openapi.TestRun {
 		TestVersion:               int32(in.TestVersion),
 		Trace:                     m.Trace(in.Trace),
 		Result:                    m.Result(in.Results),
+		Outputs:                   m.RunOutputs(in.Outputs),
 		Metadata:                  in.Metadata,
 	}
+}
+
+func (m OpenAPI) RunOutputs(in model.OrderedMap[string, string]) []openapi.TestRunOutputs {
+	res := make([]openapi.TestRunOutputs, 0, in.Len())
+
+	in.Map(func(key, val string) {
+		res = append(res, openapi.TestRunOutputs{
+			Name:  key,
+			Value: val,
+		})
+	})
+
+	return res
 }
 
 func (m OpenAPI) Runs(in []model.Run) []openapi.TestRun {
@@ -380,8 +394,19 @@ func (m Model) Run(in openapi.TestRun) (*model.Run, error) {
 		TriggerResult:             m.TriggerResult(in.TriggerResult),
 		Trace:                     m.Trace(in.Trace),
 		Results:                   result,
+		Outputs:                   m.RunOutputs(in.Outputs),
 		Metadata:                  in.Metadata,
 	}, nil
+}
+
+func (m Model) RunOutputs(in []openapi.TestRunOutputs) model.OrderedMap[string, string] {
+	res := model.OrderedMap[string, string]{}
+
+	for _, output := range in {
+		res.Add(output.Name, output.Value)
+	}
+
+	return res
 }
 
 func (m Model) Trigger(in openapi.Trigger) model.Trigger {

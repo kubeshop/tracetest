@@ -99,8 +99,14 @@ func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, req Asse
 		return model.Run{}, fmt.Errorf("trace not available")
 	}
 
+	outputs := model.OrderedMap[string, string]{}
+
+	assertionResult, allPassed := e.assertionExecutor.Assert(ctx, req.Test.Specs, *run.Trace)
+
 	run = run.SuccessfullyAsserted(
-		e.assertionExecutor.Assert(ctx, req.Test.Specs, *run.Trace),
+		outputs,
+		assertionResult,
+		allPassed,
 	)
 
 	return run, nil

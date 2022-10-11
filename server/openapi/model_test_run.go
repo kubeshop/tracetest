@@ -48,6 +48,8 @@ type TestRun struct {
 
 	Result AssertionResults `json:"result,omitempty"`
 
+	Outputs []TestRunOutputs `json:"outputs,omitempty"`
+
 	Metadata map[string]string `json:"metadata,omitempty"`
 }
 
@@ -61,6 +63,11 @@ func AssertTestRunRequired(obj TestRun) error {
 	}
 	if err := AssertAssertionResultsRequired(obj.Result); err != nil {
 		return err
+	}
+	for _, el := range obj.Outputs {
+		if err := AssertTestRunOutputsRequired(el); err != nil {
+			return err
+		}
 	}
 	return nil
 }

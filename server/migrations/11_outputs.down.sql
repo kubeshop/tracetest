@@ -1,5 +1,6 @@
 BEGIN;
 
   ALTER TABLE tests DROP COLUMN outputs JSONB;
+  ALTER TABLE test_runs DROP COLUMN outputs JSONB;
 
 COMMIT;

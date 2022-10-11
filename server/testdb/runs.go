@@ -39,6 +39,7 @@ INSERT INTO test_runs (
 	"trigger_results",
 	"test_results",
 	"trace",
+	"outputs",
 	"last_error",
 	"pass",
 	"fail",
@@ -65,6 +66,7 @@ INSERT INTO test_runs (
 	'{}', -- trigger_results
 	'{}', -- test_results
 	NULL, -- trace
+	'[]', -- outputs
 	NULL, -- last_error
 	0,    -- pass
 	0,    -- fail
@@ -166,13 +168,14 @@ UPDATE test_runs SET
 	"trigger_results" = $8,
 	"test_results" = $9,
 	"trace" = $10,
-	"last_error" = $11,
-	"pass" = $12,
-	"fail" = $13,
+	"outputs" = $11,
+	"last_error" = $12,
+	"pass" = $13,
+	"fail" = $14,
 
-	"metadata" = $14
+	"metadata" = $15
 
-WHERE id = $15 AND test_id = $16
+WHERE id = $16 AND test_id = $17
 `
 
 func (td *postgresDB) UpdateRun(ctx context.Context, r model.Run) error {
@@ -184,17 +187,22 @@ func (td *postgresDB) UpdateRun(ctx context.Context, r model.Run) error {
 
 	jsonTriggerResults, err := json.Marshal(r.TriggerResult)
 	if err != nil {
-		return fmt.Errorf("encoding error: %w", err)
+		return fmt.Errorf("trigger results encoding error: %w", err)
 	}
 
 	jsonTestResults, err := json.Marshal(r.Results)
 	if err != nil {
-		return fmt.Errorf("encoding error: %w", err)
+		return fmt.Errorf("test results encoding error: %w", err)
 	}
 
 	jsonTrace, err := json.Marshal(r.Trace)
 	if err != nil {
-		return fmt.Errorf("encoding error: %w", err)
+		return fmt.Errorf("trace encoding error: %w", err)
+	}
+
+	jsonOutputs, err := json.Marshal(r.Outputs)
+	if err != nil {
+		return fmt.Errorf("outputs encoding error: %w", err)
 	}
 
 	jsonMetadata, err := json.Marshal(r.Metadata)
@@ -222,6 +230,7 @@ func (td *postgresDB) UpdateRun(ctx context.Context, r model.Run) error {
 		jsonTriggerResults,
 		jsonTestResults,
 		jsonTrace,
+		jsonOutputs,
 		lastError,
 		pass,
 		fail,
@@ -289,6 +298,7 @@ SELECT
 	"trigger_results",
 	"test_results",
 	"trace",
+	"outputs",
 	"last_error",
 
 	"metadata"
@@ -366,6 +376,7 @@ func readRunRow(row scanner) (model.Run, error) {
 		jsonTriggerResults,
 		jsonTestResults,
 		jsonTrace,
+		jsonOutputs,
 		jsonMetadata []byte
 
 		lastError *string
@@ -388,6 +399,7 @@ func readRunRow(row scanner) (model.Run, error) {
 		&jsonTriggerResults,
 		&jsonTestResults,
 		&jsonTrace,
+		&jsonOutputs,
 		&lastError,
 		&jsonMetadata,
 	)
@@ -398,37 +410,42 @@ func readRunRow(row scanner) (model.Run, error) {
 	case nil:
 		err = json.Unmarshal(jsonTriggerResults, &r.TriggerResult)
 		if err != nil {
-			return model.Run{}, fmt.Errorf("cannot parse TriggerResult: %s", err)
+			return model.Run{}, fmt.Errorf("cannot parse TriggerResult: %w", err)
 		}
 
 		err = json.Unmarshal(jsonTestResults, &r.Results)
 		if err != nil {
-			return model.Run{}, fmt.Errorf("cannot parse Results: %s", err)
+			return model.Run{}, fmt.Errorf("cannot parse Results: %w", err)
 		}
 
 		if jsonTrace != nil {
 			err = json.Unmarshal(jsonTrace, &r.Trace)
 			if err != nil {
-				return model.Run{}, fmt.Errorf("cannot parse Trace: %s", err)
+				return model.Run{}, fmt.Errorf("cannot parse Trace: %w", err)
 			}
+		}
+
+		err = json.Unmarshal(jsonOutputs, &r.Outputs)
+		if err != nil {
+			return model.Run{}, fmt.Errorf("cannot parse Outputs: %w", err)
 		}
 
 		err = json.Unmarshal(jsonMetadata, &r.Metadata)
 		if err != nil {
-			return model.Run{}, fmt.Errorf("cannot parse Metadata: %s", err)
+			return model.Run{}, fmt.Errorf("cannot parse Metadata: %w", err)
 		}
 
 		if traceID != "" {
 			r.TraceID, err = trace.TraceIDFromHex(traceID)
 			if err != nil {
-				return model.Run{}, fmt.Errorf("cannot parse TraceID: %s", err)
+				return model.Run{}, fmt.Errorf("cannot parse TraceID: %w", err)
 			}
 		}
 
 		if spanID != "" {
 			r.SpanID, err = trace.SpanIDFromHex(spanID)
 			if err != nil {
-				return model.Run{}, fmt.Errorf("cannot parse SpanID: %s", err)
+				return model.Run{}, fmt.Errorf("cannot parse SpanID: %w", err)
 			}
 		}
 
