@@ -36,7 +36,16 @@ trigger:
               "assertions": ["attr:tracetest.selected_spans.count > 0"]
             }
           ]
-        }
+        },
+        "outputs": [
+          {
+            "name": "TRIGGER_COUNT",
+            "selector": {
+              "query": "span[name = \"Trigger test\"]"
+            },
+            "value": "attr:tracetest.selected_spans.count"
+          }
+        ]
       }
 specs:
 - selector: span[name = "Tracetest trigger"]
