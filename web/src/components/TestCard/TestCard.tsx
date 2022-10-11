@@ -38,59 +38,54 @@ const TestCard = ({onDelete, onRun, onViewAll, test}: IProps) => {
   return (
     <S.Container>
       <S.TestContainer onClick={() => handleOnClick()}>
-        <S.Row>
-          {isCollapsed ? <DownOutlined /> : <RightOutlined data-cy={`collapse-test-${test.id}`} />}
-          <S.Box>
-            <S.BoxTitle level={2}>{test.summary.runs}</S.BoxTitle>
-          </S.Box>
-          <div>
-            <S.Title level={3}>{test.name}</S.Title>
-            <S.Text>
-              {test.trigger.method} • {test.trigger.entryPoint}
-            </S.Text>
-          </div>
-        </S.Row>
+        {isCollapsed ? <DownOutlined /> : <RightOutlined data-cy={`collapse-test-${test.id}`} />}
+        <S.Box>
+          <S.BoxTitle level={2}>{test.summary.runs}</S.BoxTitle>
+        </S.Box>
+        <S.TitleContainer>
+          <S.Title level={3}>{test.name}</S.Title>
+          <S.Text>
+            {test.trigger.method} • {test.trigger.entryPoint}
+          </S.Text>
+        </S.TitleContainer>
+        <div>
+          <S.Text>Last run time:</S.Text>
+          <Tooltip title={Date.format(test.summary.lastRun.time)}>
+            <S.Text>{Date.getTimeAgo(test.summary.lastRun.time)}</S.Text>
+          </Tooltip>
+        </div>
 
-        <S.Row $gap={36} $noWrap>
-          <div>
-            <S.Text>Last run time:</S.Text>
-            <Tooltip title={Date.format(test.summary.lastRun.time)}>
-              <S.Text>{Date.getTimeAgo(test.summary.lastRun.time)}</S.Text>
-            </Tooltip>
-          </div>
-
-          <div>
-            <S.Text>Last run result:</S.Text>
-            <S.Row>
-              <Tooltip title="Passed assertions">
-                <S.HeaderDetail>
-                  <S.HeaderDot $passed />
-                  {test.summary.lastRun.passes}
-                </S.HeaderDetail>
-              </Tooltip>
-              <Tooltip title="Failed assertions">
-                <S.HeaderDetail>
-                  <S.HeaderDot $passed={false} />
-                  {test.summary.lastRun.fails}
-                </S.HeaderDetail>
-              </Tooltip>
-            </S.Row>
-          </div>
-
+        <div>
+          <S.Text>Last run result:</S.Text>
           <S.Row>
-            <S.RunButton
-              type="primary"
-              ghost
-              data-cy={`test-run-button-${test.id}`}
-              onClick={event => {
-                event.stopPropagation();
-                onRun(test.id);
-              }}
-            >
-              Run
-            </S.RunButton>
-            <TestCardActions testId={test.id} onDelete={() => onDelete(test)} />
+            <Tooltip title="Passed assertions">
+              <S.HeaderDetail>
+                <S.HeaderDot $passed />
+                {test.summary.lastRun.passes}
+              </S.HeaderDetail>
+            </Tooltip>
+            <Tooltip title="Failed assertions">
+              <S.HeaderDetail>
+                <S.HeaderDot $passed={false} />
+                {test.summary.lastRun.fails}
+              </S.HeaderDetail>
+            </Tooltip>
           </S.Row>
+        </div>
+
+        <S.Row>
+          <S.RunButton
+            type="primary"
+            ghost
+            data-cy={`test-run-button-${test.id}`}
+            onClick={event => {
+              event.stopPropagation();
+              onRun(test.id);
+            }}
+          >
+            Run
+          </S.RunButton>
+          <TestCardActions testId={test.id} onDelete={() => onDelete(test)} />
         </S.Row>
       </S.TestContainer>
 
