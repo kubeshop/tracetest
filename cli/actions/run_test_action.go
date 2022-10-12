@@ -130,8 +130,9 @@ func (a runTestAction) runDefinition(ctx context.Context, params runTestParams) 
 	}
 
 	tro := formatters.TestRunOutput{
-		Test: test,
-		Run:  testRun,
+		HasResults: params.WaitForResult,
+		Test:       test,
+		Run:        testRun,
 	}
 
 	formatter := formatters.TestRun(a.config, true)
