@@ -28,7 +28,7 @@ const Editor = ({type, onChange = noop, value = '', placeholder, basicSetup = {}
   const Component = EditorMap[type];
 
   return (
-    <Suspense fallback={<div />}>
+    <Suspense fallback={<div data-cy="editor-fallback" />}>
       <Component
         onChange={onChange}
         value={value}
