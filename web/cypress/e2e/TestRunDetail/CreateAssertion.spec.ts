@@ -6,7 +6,7 @@ describe('Create Assertion', () => {
 
   it('should create a basic assertion', () => cy.createAssertion());
 
-  it.only('should create an assertion with multiple checks', () => {
+  it('should create an assertion with multiple checks', () => {
     cy.selectRunDetailMode(3);
 
     cy.get(`[data-cy=trace-node-http]`, {timeout: 20000}).first().click();
@@ -52,7 +52,7 @@ describe('Create Assertion', () => {
     cy.get('[data-cy=add-test-spec-button]').click();
     cy.get('[data-cy=assertion-form]', {timeout: 10000}).should('be.visible');
 
-    cy.get('[data-cy=advanced-selector] [contenteditable]')
+    cy.get('[data-cy=selector-editor] [contenteditable]')
       .clear()
       .type('span[tracetest.span.type = "http"] span[tracetest.span.type = "database"]:first');
 
@@ -99,7 +99,7 @@ describe('Create Assertion', () => {
     cy.get('[data-cy=edit-test-spec-button]').last().click();
     cy.get('[data-cy=assertion-form]').should('be.visible');
 
-    cy.get('[data-cy=advanced-selector] [contenteditable]').clear().type('span[tracetest.span.type = "database"]:last');
+    cy.get('[data-cy=selector-editor] [contenteditable]').clear().type('span[tracetest.span.type = "database"]:last');
 
     cy.selectOperator(0);
 

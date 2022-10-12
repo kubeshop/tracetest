@@ -10,7 +10,7 @@ describe('Create test from CURL Command', () => {
     cy.get(`[data-cy=${SupportedPlugins.CURL.toLowerCase()}-plugin]`).click();
     cy.fillCreateFormBasicStep(name, 'Create from Curl Command');
 
-    cy.get('[data-cy=import-command-input] [contenteditable]')
+    cy.get('[data-cy=curl-command-editor] [contenteditable]')
       .first()
       .type(
         `curl -XPOST 'http://demo-pokemon-api.demo.svc.cluster.local/pokemon'

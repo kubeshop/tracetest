@@ -1,0 +1,31 @@
+@precedence { list @left }
+
+@top Program { expression* }
+
+@skip { space }
+
+expression {!list SpanMatch+ | !list SpanOrMatch+}
+
+SpanOrMatch {expression Comma !list expression}
+
+SpanMatch {Span BaseExpression+ ClosingBracket PseudoSelector}
+
+BaseExpression {Identifier Operator ComparatorValue}
+
+ComparatorValue {Number | String}
+
+PseudoSelector {":first" | ":last" | ":nth_child(" Number+ ")" | ""}
+
+@tokens {
+  Identifier { $[a-zA-Z_.\-0-9]+ }
+  Number { @digit+ }
+  String { '"' (!["\\] | "\\" _)* '"' }
+  Operator {"=" | "contains"}
+  Span { "span[" }
+  ClosingBracket { "]" }
+  Comma { "," }
+
+  space { @whitespace+ }
+}
+
+@detectDelim

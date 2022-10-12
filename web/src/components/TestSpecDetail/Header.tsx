@@ -1,12 +1,10 @@
 import {ArrowLeftOutlined} from '@ant-design/icons';
-import {EditorView} from '@codemirror/view';
 import {Button, Divider} from 'antd';
-
-import useEditorTheme from 'components/AdvancedEditor/hooks/useEditorTheme';
 import TestSpecActions from 'components/TestSpec/Actions';
 import * as STestSpec from 'components/TestSpec/TestSpec.styled';
 import {singularOrPlural} from 'utils/Common';
-import {tracetest} from 'utils/grammar';
+import {SupportedEditors} from 'constants/Editor.constants';
+import Editor from 'components/Editor';
 import * as S from './TestSpecDetail.styled';
 
 interface IProps {
@@ -34,8 +32,6 @@ const Header = ({
   onRevert,
   title,
 }: IProps) => {
-  const editorTheme = useEditorTheme({isEditable: false});
-
   return (
     <>
       <S.HeaderContainer>
@@ -73,13 +69,11 @@ const Header = ({
 
       <Divider />
 
-      <STestSpec.HeaderTitle
-        data-cy="advanced-selector"
+      <Editor
+        type={SupportedEditors.Selector}
         editable={false}
-        extensions={[tracetest(), editorTheme, EditorView.lineWrapping]}
-        maxHeight="120px"
+        basicSetup={{lineNumbers: false}}
         placeholder="Selecting All Spans"
-        spellCheck={false}
         value={title || 'All Spans'}
       />
 

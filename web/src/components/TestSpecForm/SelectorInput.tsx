@@ -1,7 +1,8 @@
 import {Form, FormInstance} from 'antd';
+import Editor from 'components/Editor';
 import {IValues} from './TestSpecForm';
-import AdvancedEditor from '../AdvancedEditor';
 import useQuerySelector from './hooks/useQuerySelector';
+import {SupportedEditors} from '../../constants/Editor.constants';
 
 interface IProps {
   form: FormInstance<IValues>;
@@ -20,7 +21,11 @@ const SelectorInput = ({form, testId, runId, onValidSelector}: IProps) => {
 
   return (
     <Form.Item name="selector" validateTrigger={[]}>
-      <AdvancedEditor lineNumbers runId={runId} testId={testId} />
+      <Editor
+        type={SupportedEditors.Selector}
+        basicSetup={{lineNumbers: true}}
+        placeholder="Leaving it empty will select All Spans"
+      />
     </Form.Item>
   );
 };

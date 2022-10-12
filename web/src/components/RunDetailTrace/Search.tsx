@@ -1,15 +1,15 @@
 import {Col, Row} from 'antd';
-
-import AdvancedEditor from 'components/AdvancedEditor';
 import {debounce} from 'lodash';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import {useCallback, useMemo, useState} from 'react';
 import {useLazyGetSelectedSpansQuery} from 'redux/apis/TraceTest.api';
 import {useAppDispatch} from 'redux/hooks';
 import {matchSpans, selectSpan, setSearchText} from 'redux/slices/Trace.slice';
-import SelectorService from 'services/Selector.service';
 import SpanService from 'services/Span.service';
+import Editor from 'components/Editor';
 import * as S from './RunDetailTrace.styled';
+import {SupportedEditors} from '../../constants/Editor.constants';
+import useEditorValidate from '../Editor/hooks/useEditorValidate';
 
 interface IProps {
   runId: string;
@@ -23,10 +23,11 @@ const Search = ({runId, testId}: IProps) => {
     run: {trace: {spans = []} = {}},
   } = useTestRun();
   const [getSelectedSpans] = useLazyGetSelectedSpansQuery();
+  const getIsValidSelector = useEditorValidate();
 
   const handleSearch = useCallback(
     async (query: string) => {
-      const isValidSelector = SelectorService.getIsValidSelector(query);
+      const isValidSelector = getIsValidSelector(SupportedEditors.Selector, query);
       if (!query) {
         dispatch(matchSpans({spanIds: []}));
         dispatch(selectSpan({spanId: ''}));
@@ -44,7 +45,7 @@ const Search = ({runId, testId}: IProps) => {
       dispatch(matchSpans({spanIds}));
       dispatch(selectSpan({spanId: spanIds[0]}));
     },
-    [dispatch, getSelectedSpans, runId, spans, testId]
+    [dispatch, getIsValidSelector, getSelectedSpans, runId, spans, testId]
   );
 
   const onSearch = useMemo(() => debounce(handleSearch, 500), [handleSearch]);
@@ -56,10 +57,9 @@ const Search = ({runId, testId}: IProps) => {
   return (
     <Row>
       <Col flex="auto">
-        <AdvancedEditor
+        <Editor
+          type={SupportedEditors.Selector}
           placeholder="Search in trace"
-          runId={runId}
-          testId={testId}
           onChange={query => {
             onSearch(query);
             setSearch(query);

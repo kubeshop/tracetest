@@ -1,5 +1,4 @@
 import {Form, FormInstance} from 'antd';
-import React from 'react';
 import {TRequestAuth} from 'types/Test.types';
 import {apiKeyFields} from './apiKeyFields';
 import {basicFields} from './basicFields';

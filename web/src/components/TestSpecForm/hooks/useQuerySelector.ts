@@ -1,9 +1,10 @@
 import {FormInstance} from 'antd';
 import {debounce} from 'lodash';
 import {useEffect, useMemo, useState} from 'react';
-import {useSpan} from '../../../providers/Span/Span.provider';
-import {useLazyGetSelectedSpansQuery} from '../../../redux/apis/TraceTest.api';
-import SelectorService from '../../../services/Selector.service';
+import {SupportedEditors} from 'constants/Editor.constants';
+import {useSpan} from 'providers/Span/Span.provider';
+import {useLazyGetSelectedSpansQuery} from 'redux/apis/TraceTest.api';
+import useEditorValidate from 'components/Editor/hooks/useEditorValidate';
 import {IValues} from '../TestSpecForm';
 import useAssertionFormValues from './useAssertionFormValues';
 
@@ -25,11 +26,12 @@ const useQuerySelector = ({form, runId, testId, onValidSelector}: IProps) => {
   const {currentSelector} = useAssertionFormValues(form);
   const [onTriggerSelectedSpans, {data: spanIdList = [], isError}] = useLazyGetSelectedSpansQuery();
   const [isValid, setIsValid] = useState(!isError);
+  const getIsValidSelector = useEditorValidate();
 
   const handleSelector = useMemo(
     () =>
       debounce(async ({q, tId, rId}: IDebouceProps) => {
-        const isValidSelector = SelectorService.getIsValidSelector(q);
+        const isValidSelector = getIsValidSelector(SupportedEditors.Selector, q);
 
         setIsValid(isValidSelector);
         if (isValidSelector) {
@@ -42,7 +44,7 @@ const useQuerySelector = ({form, runId, testId, onValidSelector}: IProps) => {
           onSetMatchedSpans(idList);
         }
       }, 500),
-    [onSetMatchedSpans, onTriggerSelectedSpans]
+    [getIsValidSelector, onSetMatchedSpans, onTriggerSelectedSpans]
   );
 
   useEffect(() => {

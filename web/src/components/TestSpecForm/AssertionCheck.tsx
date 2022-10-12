@@ -7,7 +7,7 @@ import CreateAssertionModalAnalyticsService from '../../services/Analytics/Creat
 import OperatorService from '../../services/Operator.service';
 import {TAssertion} from '../../types/Assertion.types';
 import {TSpanFlatAttribute} from '../../types/Span.types';
-import useEditorTheme from '../AdvancedEditor/hooks/useEditorTheme';
+import useEditorTheme from '../Editor/hooks/useEditorTheme';
 import {AttributeField} from './Fields/AttributeField';
 import {OtelReference} from './hooks/useGetOTELSemanticConventionAttributesInfo';
 import {IValues} from './TestSpecForm';

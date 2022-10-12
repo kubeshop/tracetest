@@ -1,9 +1,8 @@
-import CodeMirror from '@uiw/react-codemirror';
-import {StreamLanguage} from '@codemirror/language';
-import {shell} from '@codemirror/legacy-modes/mode/shell';
 import {Form} from 'antd';
 import * as S from 'components/CreateTestPlugins/Default/steps/BasicDetails/BasicDetails.styled';
 import CurlService from 'services/Triggers/Curl.service';
+import Editor from 'components/Editor';
+import {SupportedEditors} from 'constants/Editor.constants';
 
 export const FORM_ID = 'create-test';
 
@@ -25,13 +24,7 @@ const ImportCommandForm = () => {
         ]}
         style={{marginBottom: 0}}
       >
-        <CodeMirror
-          data-cy="import-command-input"
-          basicSetup={{lineNumbers: true, indentOnInput: true}}
-          extensions={[StreamLanguage.define(shell)]}
-          spellCheck={false}
-          placeholder="Enter a curl command"
-        />
+        <Editor type={SupportedEditors.CurlCommand} />
       </Form.Item>
     </S.InputContainer>
   );

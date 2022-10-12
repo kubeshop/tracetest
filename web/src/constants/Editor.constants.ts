@@ -11,6 +11,9 @@ export enum Tokens {
   String = 'String',
   ClosingBracket = 'ClosingBracket',
   Program = 'Program',
+  Source = 'Source',
+  OutsideInput = 'OutsideInput',
+  Pipe = 'Pipe',
 }
 
 export const completeIdentifierAfter: string[] = [
@@ -22,8 +25,8 @@ export const completeIdentifierAfter: string[] = [
 ];
 export const completeOperatorAfter: string[] = [Tokens.Identifier];
 export const completeValueAfter: string[] = [Tokens.ComparatorValue];
-
 export const completePseudoSelectorAfter: string[] = [Tokens.ClosingBracket];
+export const completeSourceAfter: string[] = [Tokens.Source];
 
 export const operatorList = [
   {
@@ -50,3 +53,18 @@ export const pseudoSelectorList = [
     type: 'operatorKeyword',
   },
 ];
+
+export const parserList = [
+  {
+    label: 'json_path',
+    type: 'operatorKeyword',
+    apply: " json_path '",
+  },
+];
+
+export enum SupportedEditors {
+  Selector = 'Selector',
+  Interpolation = 'Interpolation',
+  Expression = 'Expression',
+  CurlCommand = 'CurlCommand',
+}

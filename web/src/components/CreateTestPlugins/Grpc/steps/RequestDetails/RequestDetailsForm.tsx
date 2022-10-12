@@ -56,7 +56,7 @@ const RequestDetailsForm = ({form}: IProps) => {
       </Row>
       <Row gutter={12}>
         <Col span={18}>
-          <RequestDetailsUrlInput showMethodSelector={false} shouldValidateUrl={false} />
+          <RequestDetailsUrlInput showMethodSelector={false} />
         </Col>
       </Row>
       <Row gutter={12}>

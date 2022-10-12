@@ -1,6 +1,7 @@
-import CodeMirror from '@uiw/react-codemirror';
 import {Form, Radio} from 'antd';
 import {useState} from 'react';
+import Editor from 'components/Editor';
+import {SupportedEditors} from 'constants/Editor.constants';
 import {BodyFieldContainer} from './BodyFieldContainer';
 import {SingleLabel} from './SingleLabel';
 import {useBodyMode} from './useBodyMode';
@@ -54,12 +55,11 @@ export const BodyField = ({body, setBody}: IProps): React.ReactElement => {
       )}
       <BodyFieldContainer $isDisplaying={hasNoBody}>
         <Form.Item name="body">
-          <CodeMirror
-            data-cy="body"
+          <Editor
+            type={SupportedEditors.Interpolation}
             basicSetup={{lineNumbers: true, indentOnInput: true}}
             extensions={extensions}
-            spellCheck={false}
-            placeholder={`Enter request body text `}
+            placeholder="Enter request body text"
           />
         </Form.Item>
       </BodyFieldContainer>
