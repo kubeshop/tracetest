@@ -253,3 +253,44 @@ jobs:
         SLACK_LINK_NAMES: true
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
         SLACK_FOOTER: "Kubeshop --> Tracetest"
+
+  chocolatey-release:
+    name: Release on Chocolatey
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Download newest version
+        id: cliDownload
+        run: |
+          $tag = $env:TAG
+          $version = $tag.trimStart("v")
+          echo "$version"
+          Invoke-Webrequest -URI "https://github.com/kubeshop/tracetest/releases/download/v${version}/tracetest_${version}_windows_amd64.tar.gz" -OutFile tracetest.tar.gz
+          $hash = Get-FileHash tracetest.tar.gz | Select -ExpandProperty Hash
+
+          echo '::echo::on'
+          echo "::set-output name=hash::$hash"
+          echo "::set-output name=version::$version"
+        env:
+          TAG: ${{ github.ref_name }}
+      - name: Generate release files
+        run: |
+          (Get-Content scripts/choco/tools/chocolateyinstall.ps1) -Replace '%checksum%', $env:PACKAGE_CHECKSUM | Set-Content scripts/choco/tools/chocolateyinstall.ps1
+          (Get-Content scripts/choco/tracetest.nuspec) -Replace '%version%', $env:PACKAGE_VERSION | Set-Content scripts/choco/tracetest.nuspec
+        env:
+          PACKAGE_CHECKSUM: ${{ steps.cliDownload.outputs.hash }}
+          PACKAGE_VERSION: ${{ steps.cliDownload.outputs.version }}
+      - name: Pack and release
+        run: |
+          # install choco
+          Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+
+          cd scripts/choco
+          choco pack
+
+          choco apikey --key $env:CHOCOLATEY_API_KEY --source https://push.chocolatey.org/
+          choco push tracetest.${env:PACKAGE_VERSION}.nupkg --source https://push.chocolatey.org/
+        env:
+          CHOCOLATEY_API_KEY: ${{ secrets.CHOCOLATEY_API_KEY }}
+          PACKAGE_VERSION: ${{ steps.cliDownload.outputs.version }}
