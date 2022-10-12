@@ -1,13 +1,15 @@
+import {HTTP_METHOD, SupportedPlugins} from './Common.constants';
 import pokeshopProtoData from '../assets/pokeshop.proto.json';
 import otelProtoData from '../assets/otel-demo.proto.json';
 import pokeshopPostmanData from '../assets/pokeshop.postman_collection.json';
-import {HTTP_METHOD, SupportedPlugins} from './Common.constants';
+import Env from '../utils/Env';
 
 const pokeshopProtoFile = new File([pokeshopProtoData?.proto], 'pokeshop.proto');
 const otelProtoFile = new File([otelProtoData?.proto], 'otel-demo.proto');
 const pokeshopPostmanFile = new File([JSON.stringify(pokeshopPostmanData)], 'pokeshop.postman_collection.json');
 
-const {demoEndpoints = '{}', demoEnabled = '[]'} = window.ENV || {};
+const demoEnabled = Env.get('demoEnabled');
+const demoEndpoints = Env.get('demoEndpoints');
 
 const isPokeshopEnabled = demoEnabled.includes('pokeshop');
 const isOtelEnabled = demoEnabled.includes('otel');
@@ -19,7 +21,7 @@ const {
   OtelProductCatalog = '',
   OtelCart = '',
   OtelCheckout = '',
-}: Record<string, string> = JSON.parse(demoEndpoints);
+} = demoEndpoints;
 const userId = '2491f868-88f1-4345-8836-d5d8511a9f83';
 
 export const PokeshopDemo = {

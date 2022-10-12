@@ -1,9 +1,10 @@
-const {experimentalFeatures = '[]'} = window.ENV || {};
-const parsedExperimentalFeatures = JSON.parse(experimentalFeatures);
+import Env from './Env';
+
+const experimentalFeatures = Env.get('experimentalFeatures');
 
 const ExperimentalFeature = {
   isEnabled(feature: string) {
-    return parsedExperimentalFeatures?.includes(feature);
+    return experimentalFeatures.includes(feature);
   },
 };
 

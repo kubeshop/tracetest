@@ -1,9 +1,12 @@
-import {Categories} from '../../constants/Analytics.constants';
+import {Categories} from 'constants/Analytics.constants';
+import Env from 'utils/Env';
 
-const {analyticsEnabled = 'false', serverID = '', appVersion = '', env = ''} = window.ENV || {};
+const analyticsEnabled = Env.get('analyticsEnabled');
+const appVersion = Env.get('appVersion');
+const env = Env.get('env');
+const serverID = Env.get('serverID');
+
 const {analytics} = window;
-
-export const isEnabled = analyticsEnabled === 'true';
 
 type TAnalyticsService = {
   event<A>(category: Categories, action: A, label: string): void;
@@ -13,7 +16,7 @@ type TAnalyticsService = {
 
 const AnalyticsService = (): TAnalyticsService => ({
   event<A>(category: Categories, action: A, label: string) {
-    if (!isEnabled) return;
+    if (!analyticsEnabled) return;
     analytics.track(String(action), {
       serverID,
       appVersion,
@@ -23,7 +26,7 @@ const AnalyticsService = (): TAnalyticsService => ({
     });
   },
   page(name: string) {
-    if (!isEnabled) return;
+    if (!analyticsEnabled) return;
     analytics.page(name, {
       serverID,
       appVersion,
@@ -31,7 +34,7 @@ const AnalyticsService = (): TAnalyticsService => ({
     });
   },
   identify() {
-    if (!isEnabled) return;
+    if (!analyticsEnabled) return;
     analytics.identify({
       serverID,
       appVersion,

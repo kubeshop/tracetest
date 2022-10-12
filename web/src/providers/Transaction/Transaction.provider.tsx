@@ -50,7 +50,7 @@ const TransactionProvider = ({children, transactionId}: IProps) => {
 
       onOpen(`Are you sure you want to delete “${name}”?`, onConfirmation);
     },
-    [navigate, onOpen]
+    [deleteTransaction, navigate, onOpen]
   );
 
   const value = useMemo<IContext>(
