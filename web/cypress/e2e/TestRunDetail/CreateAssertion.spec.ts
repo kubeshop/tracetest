@@ -52,6 +52,7 @@ describe('Create Assertion', () => {
     cy.get('[data-cy=add-test-spec-button]').click();
     cy.get('[data-cy=assertion-form]', {timeout: 10000}).should('be.visible');
 
+    cy.get('[data-cy=selector-editor] [contenteditable]').should('be.visible');
     cy.get('[data-cy=selector-editor] [contenteditable]')
       .clear()
       .type('span[tracetest.span.type = "http"] span[tracetest.span.type = "database"]:first');
