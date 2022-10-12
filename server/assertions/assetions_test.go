@@ -179,7 +179,7 @@ func TestAssertion(t *testing.T) {
 
 			assert.Equal(t, cl.expectedAllPassed, allPassed)
 
-			cl.expectedResult.Map(func(expectedSel model.SpanQuery, expectedAssertionResults []model.AssertionResult) {
+			cl.expectedResult.Map(func(expectedSel model.SpanQuery, expectedAssertionResults []model.AssertionResult) bool {
 				actualAssertionResults := actual.Get(expectedSel)
 				assert.NotEmpty(t, actualAssertionResults, `expected selector "%s" not found`, expectedSel)
 				for i := 0; i < len(expectedAssertionResults); i++ {
@@ -195,6 +195,8 @@ func TestAssertion(t *testing.T) {
 						assert.Equal(t, expectedSpanRes.CompareErr, actualSpanRes.CompareErr)
 					}
 				}
+
+				return true
 			})
 
 		})

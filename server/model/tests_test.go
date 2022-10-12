@@ -64,8 +64,9 @@ func TestSpec(t *testing.T) {
 		}
 
 		actual := make(map[string]model.NamedAssertions)
-		spec.Map(func(spanQuery model.SpanQuery, asserts model.NamedAssertions) {
+		spec.Map(func(spanQuery model.SpanQuery, asserts model.NamedAssertions) bool {
 			actual[string(spanQuery)] = asserts
+			return true
 		})
 
 		assert.Equal(t, expected, actual)
@@ -139,8 +140,9 @@ func TestResults(t *testing.T) {
 		}
 
 		actual := map[string][]model.AssertionResult{}
-		def.Map(func(spanQuery model.SpanQuery, asserts []model.AssertionResult) {
+		def.Map(func(spanQuery model.SpanQuery, asserts []model.AssertionResult) bool {
 			actual[string(spanQuery)] = asserts
+			return true
 		})
 
 		assert.Equal(t, expected, actual)

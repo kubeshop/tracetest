@@ -246,7 +246,7 @@ func (td *postgresDB) UpdateRun(ctx context.Context, r model.Run) error {
 }
 
 func count(r model.Run) (pass, fail int) {
-	r.Results.Results.Map(func(_ model.SpanQuery, ars []model.AssertionResult) {
+	r.Results.Results.Map(func(_ model.SpanQuery, ars []model.AssertionResult) bool {
 		for _, ar := range ars {
 			for _, rs := range ar.Results {
 				if rs.CompareErr == nil {
@@ -256,6 +256,7 @@ func count(r model.Run) (pass, fail int) {
 				}
 			}
 		}
+		return true
 	})
 
 	return

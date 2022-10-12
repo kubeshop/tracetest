@@ -49,12 +49,13 @@ func (m OpenAPI) Test(in model.Test) openapi.Test {
 
 func (m OpenAPI) Outputs(in model.OrderedMap[string, model.Output]) []openapi.TestOutput {
 	res := make([]openapi.TestOutput, 0, in.Len())
-	in.Map(func(key string, val model.Output) {
+	in.Map(func(key string, val model.Output) bool {
 		res = append(res, openapi.TestOutput{
 			Name:     key,
 			Selector: m.Selector(val.Selector),
 			Value:    val.Value,
 		})
+		return true
 	})
 
 	return res
@@ -95,7 +96,7 @@ func (m OpenAPI) Specs(in model.OrderedMap[model.SpanQuery, model.NamedAssertion
 	specs := make([]openapi.TestSpecsSpecs, in.Len())
 
 	i := 0
-	in.Map(func(spanQuery model.SpanQuery, namedAssertions model.NamedAssertions) {
+	in.Map(func(spanQuery model.SpanQuery, namedAssertions model.NamedAssertions) bool {
 		assertions := make([]string, len(namedAssertions.Assertions))
 		for j, a := range namedAssertions.Assertions {
 			assertions[j] = string(a)
@@ -107,6 +108,7 @@ func (m OpenAPI) Specs(in model.OrderedMap[model.SpanQuery, model.NamedAssertion
 			Assertions: assertions,
 		}
 		i++
+		return true
 	})
 
 	return openapi.TestSpecs{
@@ -170,7 +172,7 @@ func (m OpenAPI) Result(in *model.RunResults) openapi.AssertionResults {
 	results := make([]openapi.AssertionResultsResults, in.Results.Len())
 
 	i := 0
-	in.Results.Map(func(query model.SpanQuery, inRes []model.AssertionResult) {
+	in.Results.Map(func(query model.SpanQuery, inRes []model.AssertionResult) bool {
 		res := make([]openapi.AssertionResult, len(inRes))
 		for j, r := range inRes {
 			sres := make([]openapi.AssertionSpanResult, len(r.Results))
@@ -198,6 +200,7 @@ func (m OpenAPI) Result(in *model.RunResults) openapi.AssertionResults {
 			Results:  res,
 		}
 		i++
+		return true
 	})
 
 	return openapi.AssertionResults{
@@ -250,11 +253,12 @@ func (m OpenAPI) Run(in *model.Run) openapi.TestRun {
 func (m OpenAPI) RunOutputs(in model.OrderedMap[string, string]) []openapi.TestRunOutputs {
 	res := make([]openapi.TestRunOutputs, 0, in.Len())
 
-	in.Map(func(key, val string) {
+	in.Map(func(key, val string) bool {
 		res = append(res, openapi.TestRunOutputs{
 			Name:  key,
 			Value: val,
 		})
+		return true
 	})
 
 	return res
