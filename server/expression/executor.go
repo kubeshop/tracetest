@@ -31,18 +31,18 @@ func NewExecutor(dataStores ...DataStore) Executor {
 	}
 }
 
-func (e Executor) ExecuteStatement(statement string) (string, string, error) {
+func (e Executor) Statement(statement string) (string, string, error) {
 	parsedStatement, err := ParseStatement(statement)
 	if err != nil {
 		return "", "", fmt.Errorf("could not parse statement: %w", err)
 	}
 
-	leftValue, leftType, err := e.executeExpression(parsedStatement.Left)
+	leftValue, leftType, err := e.Expression(parsedStatement.Left)
 	if err != nil {
 		return "", "", fmt.Errorf("could not parse left side expression: %w", err)
 	}
 
-	rightValue, rightType, err := e.executeExpression(parsedStatement.Right)
+	rightValue, rightType, err := e.Expression(parsedStatement.Right)
 	if err != nil {
 		return "", "", fmt.Errorf("could not parse left side expression: %w", err)
 	}
@@ -73,7 +73,7 @@ func (e Executor) ExecuteStatement(statement string) (string, string, error) {
 	return leftValue, rightValue, err
 }
 
-func (e Executor) executeExpression(expr Expr) (string, types.Type, error) {
+func (e Executor) Expression(expr Expr) (string, types.Type, error) {
 	currentValue, currentType, err := e.resolveTerm(expr.Left)
 	if err != nil {
 		return "", types.TypeNil, fmt.Errorf("could not resolve term: %w", err)
@@ -147,7 +147,7 @@ func (e Executor) resolveTerm(term *Term) (string, types.Type, error) {
 	if term.Str != nil {
 		stringArgs := make([]any, 0, len(term.Str.Args))
 		for _, arg := range term.Str.Args {
-			stringArg, _, err := e.executeExpression(arg)
+			stringArg, _, err := e.Expression(arg)
 			if err != nil {
 				return "", types.TypeNil, fmt.Errorf("could not execute expression: %w", err)
 			}

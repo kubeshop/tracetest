@@ -41,7 +41,7 @@ trigger:
           {
             "name": "TRIGGER_COUNT",
             "selector": {
-              "query": "span[name = \"Trigger test\"]"
+              "query": "span[name = \"Tracetest trigger\"]"
             },
             "value": "attr:tracetest.selected_spans.count"
           }

@@ -180,6 +180,24 @@ func (a Attributes) Get(key string) string {
 	return ""
 }
 
+type Spans []Span
+
+func (s Spans) MapIfZeroItems(
+	ifZeroFn func(),
+	itemFn func(ix int, _ Span) bool,
+) {
+	if len(s) == 0 {
+		ifZeroFn()
+	}
+
+	for i, span := range s {
+		doNext := itemFn(i, span)
+		if !doNext {
+			return
+		}
+	}
+}
+
 type Span struct {
 	ID         trace.SpanID
 	Name       string

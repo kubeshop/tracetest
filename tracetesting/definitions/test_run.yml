@@ -35,3 +35,6 @@ specs:
   assertions:
   - attr:tracetest.selected_spans.count = 1
   - attr:tracetest.run.assertion_runner.all_assertions_passed = "true"
+- selector: span[name = "Process outputs"]
+  assertions:
+  - attr:tracetest.run.output_processor.outputs | json_path ".TRIGGER_COUNT" = 1

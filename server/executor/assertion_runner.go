@@ -29,6 +29,7 @@ type AssertionRunner interface {
 type defaultAssertionRunner struct {
 	updater           RunUpdater
 	assertionExecutor AssertionExecutor
+	outputsProcessor  OutputsProcessorFn
 	inputChannel      chan AssertionRequest
 	exitChannel       chan bool
 }
@@ -36,8 +37,9 @@ type defaultAssertionRunner struct {
 var _ WorkerPool = &defaultAssertionRunner{}
 var _ AssertionRunner = &defaultAssertionRunner{}
 
-func NewAssertionRunner(updater RunUpdater, assertionExecutor AssertionExecutor) AssertionRunner {
+func NewAssertionRunner(updater RunUpdater, assertionExecutor AssertionExecutor, op OutputsProcessorFn) AssertionRunner {
 	return &defaultAssertionRunner{
+		outputsProcessor:  op,
 		updater:           updater,
 		assertionExecutor: assertionExecutor,
 		inputChannel:      make(chan AssertionRequest, 1),
@@ -99,7 +101,10 @@ func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, req Asse
 		return model.Run{}, fmt.Errorf("trace not available")
 	}
 
-	outputs := model.OrderedMap[string, string]{}
+	outputs, err := e.outputsProcessor(ctx, req.Test.Outputs, *run.Trace)
+	if err != nil {
+		return model.Run{}, fmt.Errorf("cannot process outputs: %w", err)
+	}
 
 	assertionResult, allPassed := e.assertionExecutor.Assert(ctx, req.Test.Specs, *run.Trace)
 

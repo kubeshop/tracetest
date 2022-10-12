@@ -27,43 +27,30 @@ func Assert(defs model.OrderedMap[model.SpanQuery, model.NamedAssertions], trace
 	return testResult, allPassed
 }
 
-func assert(assertion model.Assertion, spans []traces.Span) model.AssertionResult {
-	metaAttributeDataStore := expression.MetaAttributesDataStore{SelectedSpans: spans}
-	if len(spans) == 0 {
-		// we still have to run the assertion because it migth use a meta attribute
-		emptyAttributeDataStore := expression.AttributeDataStore{}
-		emptyVariablesDataStore := expression.VariableDataStore{}
-		executor := expression.NewExecutor(emptyAttributeDataStore, metaAttributeDataStore, emptyVariablesDataStore)
-		result := runAssertion(executor, string(assertion))
-
-		return model.AssertionResult{
-			Assertion: assertion,
-			AllPassed: result.CompareErr == nil,
-			Results:   []model.SpanAssertionResult{result},
-		}
+func assert(assertion model.Assertion, spans traces.Spans) model.AssertionResult {
+	ds := []expression.DataStore{
+		expression.MetaAttributesDataStore{SelectedSpans: spans},
+		expression.VariableDataStore{},
 	}
-
 	allPassed := true
 	spanResults := make([]model.SpanAssertionResult, 0, len(spans))
-	for _, span := range spans {
-		spanID := span.ID
-		attributeDataStore := expression.AttributeDataStore{Span: span}
+	spans.MapIfZeroItems(
+		func() {
+			res := assertSpan(traces.Span{}, ds, string(assertion))
+			spanResults = append(spanResults, res)
+			allPassed = res.CompareErr == nil
+		},
+		func(_ int, span traces.Span) bool {
+			res := assertSpan(span, ds, string(assertion))
+			spanResults = append(spanResults, res)
 
-		// TODO: populate it with variables when they are available
-		variablesDataStore := expression.VariableDataStore{}
-		expressionExecutor := expression.NewExecutor(attributeDataStore, metaAttributeDataStore, variablesDataStore)
+			if res.CompareErr != nil {
+				allPassed = false
+			}
 
-		actualValue, _, err := expressionExecutor.ExecuteStatement(string(assertion))
-		if err != nil {
-			allPassed = false
-		}
-
-		spanResults = append(spanResults, model.SpanAssertionResult{
-			SpanID:        &spanID,
-			ObservedValue: actualValue,
-			CompareErr:    err,
-		})
-	}
+			return true
+		},
+	)
 
 	return model.AssertionResult{
 		Assertion: assertion,
@@ -72,13 +59,22 @@ func assert(assertion model.Assertion, spans []traces.Span) model.AssertionResul
 	}
 }
 
-func runAssertion(executor expression.Executor, assertion string) model.SpanAssertionResult {
-	actualValue, _, err := executor.ExecuteStatement(string(assertion))
-	return model.SpanAssertionResult{
-		SpanID:        nil,
+func assertSpan(span traces.Span, ds []expression.DataStore, assertion string) model.SpanAssertionResult {
+	ds = append([]expression.DataStore{expression.AttributeDataStore{Span: span}}, ds...)
+	expressionExecutor := expression.NewExecutor(ds...)
+
+	actualValue, _, err := expressionExecutor.Statement(assertion)
+
+	sar := model.SpanAssertionResult{
 		ObservedValue: actualValue,
 		CompareErr:    err,
 	}
+
+	if span.ID.IsValid() {
+		sar.SpanID = &span.ID
+	}
+
+	return sar
 }
 
 func selector(sq model.SpanQuery) selectors.Selector {
