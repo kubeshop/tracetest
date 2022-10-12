@@ -32,7 +32,7 @@ func NewExecutor(dataStores ...DataStore) Executor {
 }
 
 func (e Executor) ExecuteStatement(statement string) (string, string, error) {
-	parsedStatement, err := Parse(statement)
+	parsedStatement, err := ParseStatement(statement)
 	if err != nil {
 		return "", "", fmt.Errorf("could not parse statement: %w", err)
 	}

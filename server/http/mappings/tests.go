@@ -300,11 +300,16 @@ func (m Model) Test(in openapi.Test) (model.Test, error) {
 func (m Model) Outputs(in []openapi.TestOutput) (model.OrderedMap[string, model.Output], error) {
 	res := model.OrderedMap[string, model.Output]{}
 
+	var err error
 	for _, output := range in {
-		res.Add(output.Name, model.Output{
+		res, err = res.Add(output.Name, model.Output{
 			Selector: model.SpanQuery(output.Selector.Query),
 			Value:    output.Value,
 		})
+
+		if err != nil {
+			return res, fmt.Errorf("cannot parse outputs: %w", err)
+		}
 	}
 
 	return res, nil

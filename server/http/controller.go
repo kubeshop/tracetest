@@ -76,8 +76,6 @@ func (c *controller) CreateTest(ctx context.Context, in openapi.Test) (openapi.I
 		}
 	}
 
-	fmt.Printf("*********** %+v\n", test.Outputs)
-
 	test, err = c.testDB.CreateTest(ctx, test)
 	if err != nil {
 		return openapi.Response(http.StatusInternalServerError, err.Error()), err
