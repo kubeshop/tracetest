@@ -6,21 +6,21 @@ import {useLazyGetRunListQuery} from 'redux/apis/TraceTest.api';
 import TestAnalyticsService from 'services/Analytics/TestAnalytics.service';
 import {TTest} from 'types/Test.types';
 import Date from 'utils/Date';
+import ResultCardList from '../RunCardList/RunCardList';
 import * as S from './TestCard.styled';
 import TestCardActions from './TestCardActions';
-import ResultCardList from '../RunCardList/RunCardList';
 
 interface IProps {
+  test: TTest;
   onDelete(test: TTest): void;
   onRun(id: string): void;
   onViewAll(id: string): void;
-  test: TTest;
 }
 
 const TestCard = ({onDelete, onRun, onViewAll, test}: IProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [getRuns, {data: runs = [], isLoading}] = useLazyGetRunListQuery();
-
+  const [getRuns, {data, isLoading}] = useLazyGetRunListQuery();
+  let runs = data?.items || [];
   const handleOnClick = useCallback(() => {
     if (isCollapsed) {
       setIsCollapsed(false);

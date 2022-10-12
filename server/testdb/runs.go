@@ -309,28 +309,40 @@ func (td *postgresDB) GetRun(ctx context.Context, testID id.ID, runID int) (mode
 	return run, nil
 }
 
-func (td *postgresDB) GetTestRuns(ctx context.Context, test model.Test, take, skip int32) ([]model.Run, error) {
-	stmt, err := td.db.Prepare(selectRunQuery + " WHERE test_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3")
+func (td *postgresDB) GetTestRuns(ctx context.Context, test model.Test, take, skip int32) (model.List[model.Run], error) {
+	const condition = " WHERE test_id = $1"
+	stmt, err := td.db.Prepare(selectRunQuery + condition + " ORDER BY created_at DESC LIMIT $2 OFFSET $3")
 	if err != nil {
-		return nil, err
+		return model.List[model.Run]{}, err
 	}
 	defer stmt.Close()
 
 	rows, err := stmt.QueryContext(ctx, test.ID, take, skip)
 	if err != nil {
-		return nil, err
+		return model.List[model.Run]{}, err
 	}
 	var runs []model.Run
 
 	for rows.Next() {
 		run, err := readRunRow(rows)
 		if err != nil {
-			return nil, fmt.Errorf("cannot read row: %w", err)
+			return model.List[model.Run]{}, fmt.Errorf("cannot read row: %w", err)
 		}
 		runs = append(runs, run)
 	}
 
-	return runs, nil
+	var count int
+	err = td.db.
+		QueryRowContext(ctx, "SELECT COUNT(*) FROM test_runs"+condition, test.ID).
+		Scan(&count)
+	if err != nil {
+		return model.List[model.Run]{}, err
+	}
+
+	return model.List[model.Run]{
+		Items:      runs,
+		TotalCount: count,
+	}, nil
 }
 
 func (td *postgresDB) GetRunByTraceID(ctx context.Context, traceID trace.TraceID) (model.Run, error) {

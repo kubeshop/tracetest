@@ -15,24 +15,11 @@ interface IProps {
 }
 
 const EnvironmentList = ({query, setEnvironment, setIsFormOpen}: IProps) => {
-  const {hasNext, hasPrev, isEmpty, isFetching, isLoading, list, loadNext, loadPrev} = usePagination<
-    IEnvironment,
-    {query: string}
-  >(useGetEnvListQuery, {query});
+  const pagination = usePagination<IEnvironment, {query: string}>(useGetEnvListQuery, {query});
   return (
-    <Pagination
-      emptyComponent={<NoResults />}
-      hasNext={hasNext}
-      hasPrev={hasPrev}
-      isEmpty={isEmpty}
-      isFetching={isFetching}
-      isLoading={isLoading}
-      loadingComponent={<Loading />}
-      loadNext={loadNext}
-      loadPrev={loadPrev}
-    >
+    <Pagination emptyComponent={<NoResults />} loadingComponent={<Loading />} {...pagination}>
       <S.TestListContainer data-cy="test-list">
-        {list?.map(environment => (
+        {pagination.list?.map(environment => (
           <EnvironmentCard
             key={environment.name}
             environment={environment}
