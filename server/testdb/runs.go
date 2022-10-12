@@ -7,6 +7,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"log"
 	"strings"
 	"time"
 
@@ -307,6 +308,28 @@ func (td *postgresDB) GetRun(ctx context.Context, testID id.ID, runID int) (mode
 		return model.Run{}, fmt.Errorf("cannot read row: %w", err)
 	}
 	return run, nil
+}
+
+func (td *postgresDB) GetTestRunsTotal(ctx context.Context, s string) (int, error) {
+	stmt, err := td.db.Prepare("SELECT COUNT(*) from test_runs WHERE test_id = $1 ")
+	if err != nil {
+		return 0, err
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.QueryContext(ctx, s)
+	if err != nil {
+		return 0, err
+	}
+	var total int
+
+	for rows.Next() {
+		if err := rows.Scan(&total); err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	return total, nil
 }
 
 func (td *postgresDB) GetTestRuns(ctx context.Context, test model.Test, take, skip int32) ([]model.Run, error) {

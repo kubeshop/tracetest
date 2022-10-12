@@ -12,6 +12,7 @@ package openapi
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/gorilla/mux"
@@ -337,6 +338,7 @@ func (c *ApiApiController) GetTest(w http.ResponseWriter, r *http.Request) {
 		c.errorHandler(w, r, err, &result)
 		return
 	}
+
 	// If no error, encode the body and the result code
 	EncodeJSONResponse(result.Body, &result.Code, w)
 
@@ -402,6 +404,13 @@ func (c *ApiApiController) GetTestRuns(w http.ResponseWriter, r *http.Request) {
 		c.errorHandler(w, r, err, &result)
 		return
 	}
+
+	total, err := c.service.GetTestRunsTotal(r.Context(), testIdParam)
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	w.Header().Set("X-Total-Count", strconv.Itoa(total))
 	// If no error, encode the body and the result code
 	EncodeJSONResponse(result.Body, &result.Code, w)
 
@@ -489,6 +498,13 @@ func (c *ApiApiController) GetTests(w http.ResponseWriter, r *http.Request) {
 		c.errorHandler(w, r, err, &result)
 		return
 	}
+
+	total, err := c.service.GetTestsTotal(r.Context(), queryParam)
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	w.Header().Set("X-Total-Count", strconv.Itoa(total))
 	// If no error, encode the body and the result code
 	EncodeJSONResponse(result.Body, &result.Code, w)
 

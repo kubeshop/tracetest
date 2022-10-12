@@ -15,6 +15,7 @@ type TestRepository interface {
 	GetLatestTestVersion(context.Context, id.ID) (Test, error)
 	GetTestVersion(_ context.Context, _ id.ID, verson int) (Test, error)
 	GetTests(_ context.Context, take, skip int32, query, sortBy, sortDirection string) ([]Test, error)
+	GetTestsTotal(_ context.Context, query string) (int, error)
 }
 
 type RunRepository interface {
@@ -23,6 +24,7 @@ type RunRepository interface {
 	DeleteRun(context.Context, Run) error
 	GetRun(_ context.Context, testID id.ID, runID int) (Run, error)
 	GetTestRuns(_ context.Context, _ Test, take, skip int32) ([]Run, error)
+	GetTestRunsTotal(context.Context, string) (int, error)
 	GetRunByTraceID(context.Context, trace.TraceID) (Run, error)
 }
 

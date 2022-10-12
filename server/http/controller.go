@@ -194,6 +194,23 @@ func (c *controller) GetTestRuns(ctx context.Context, testID string, take, skip 
 	return openapi.Response(200, c.mappers.Out.Runs(runs)), nil
 }
 
+func (c *controller) GetTestRunsTotal(ctx context.Context, s string) (int, error) {
+	total, err := c.testDB.GetTestRunsTotal(ctx, s)
+	if err != nil {
+		return total, err
+	}
+
+	return total, nil
+}
+
+func (c *controller) GetTestsTotal(ctx context.Context, query string) (int, error) {
+	total, err := c.testDB.GetTestsTotal(ctx, query)
+	if err != nil {
+		return total, err
+	}
+
+	return total, nil
+}
 func (c *controller) GetTests(ctx context.Context, take, skip int32, query string, sortBy string, sortDirection string) (openapi.ImplResponse, error) {
 	if take == 0 {
 		take = 20

@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"log"
 	"strings"
 	"time"
 
@@ -212,6 +213,39 @@ func (td *postgresDB) GetLatestTestVersion(ctx context.Context, id id.ID) (model
 	return test, nil
 }
 
+func (td *postgresDB) GetTestsTotal(ctx context.Context, query string) (int, error) {
+	hasSearchQuery := query != ""
+	total := 0
+	params := []any{}
+	sql := `SELECT COUNT(*) FROM tests t` + ` INNER JOIN (
+		SELECT id as idx, max(version) as latest_version FROM tests GROUP BY idx
+	) as latest_tests ON latest_tests.idx = t.id
+	WHERE t.version = latest_tests.latest_version 
+	`
+	if hasSearchQuery {
+		params = append(params, "%"+strings.ReplaceAll(query, " ", "%")+"%")
+		sql += ` WHERE( t.name ilike $1 OR t.description ilike $1 )`
+	}
+	stmt, err := td.db.Prepare(sql)
+	if err != nil {
+		return total, err
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.QueryContext(ctx, params...)
+	if err != nil {
+		return total, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		if err := rows.Scan(&total); err != nil {
+			log.Fatal(err)
+		}
+	}
+	return total, nil
+}
+
 func (td *postgresDB) GetTests(ctx context.Context, take, skip int32, query, sortBy, sortDirection string) ([]model.Test, error) {
 	hasSearchQuery := query != ""
 	params := []any{take, skip}
@@ -224,14 +258,21 @@ func (td *postgresDB) GetTests(ctx context.Context, take, skip int32, query, sor
 
 	if hasSearchQuery {
 		params = append(params, "%"+strings.ReplaceAll(query, " ", "%")+"%")
-		sql += ` AND (
-			t.name ilike $3
-			OR t.description ilike $3
-		)`
+		sql += `
+	AND(
+		t.name
+	ilike $3
+	OR
+	t.description
+	ilike $3
+	)`
 	}
 
 	sql = sortQuery(sql, sortBy, sortDirection)
-	sql += ` LIMIT $1 OFFSET $2`
+	sql += `
+	LIMIT $1
+	OFFSET $2
+	`
 
 	stmt, err := td.db.Prepare(sql)
 	if err != nil {

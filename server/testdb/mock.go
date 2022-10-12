@@ -16,6 +16,16 @@ type MockRepository struct {
 	T mock.TestingT
 }
 
+func (m *MockRepository) GetTestRunsTotal(ctx context.Context, s string) (int, error) {
+	args := m.Called()
+	return args.Int(0), nil
+}
+
+func (m *MockRepository) GetTestsTotal(_ context.Context, query string) (int, error) {
+	args := m.Called()
+	return args.Int(0), nil
+}
+
 func (m *MockRepository) ServerID() (string, bool, error) {
 	args := m.Called()
 	return args.String(0), args.Bool(1), args.Error(2)
