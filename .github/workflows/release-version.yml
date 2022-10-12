@@ -255,6 +255,7 @@ jobs:
         SLACK_FOOTER: "Kubeshop --> Tracetest"
 
   chocolatey-release:
+    needs: release-cli
     name: Release on Chocolatey
     runs-on: windows-latest
     steps:
