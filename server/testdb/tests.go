@@ -258,21 +258,11 @@ func (td *postgresDB) GetTests(ctx context.Context, take, skip int32, query, sor
 
 	if hasSearchQuery {
 		params = append(params, "%"+strings.ReplaceAll(query, " ", "%")+"%")
-		sql += `
-	AND(
-		t.name
-	ilike $3
-	OR
-	t.description
-	ilike $3
-	)`
+		sql += ` AND( t.name ilike $3 OR t.description ilike $3 )`
 	}
 
 	sql = sortQuery(sql, sortBy, sortDirection)
-	sql += `
-	LIMIT $1
-	OFFSET $2
-	`
+	sql += ` LIMIT $1 OFFSET $2 `
 
 	stmt, err := td.db.Prepare(sql)
 	if err != nil {
