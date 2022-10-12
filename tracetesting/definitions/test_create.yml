@@ -62,3 +62,8 @@ specs:
 - selector: span[name = "exec INSERT"]:first
   assertions:
   - attr:sql.query contains "INSERT INTO tests"
+
+outputs:
+- name: TEST_ID
+  selector: span[name = "Tracetest trigger"]
+  value: attr:tracetest.response.body | json_path '$.id'
