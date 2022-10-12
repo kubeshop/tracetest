@@ -73,7 +73,7 @@
     "test:unit:watch": "craco test  --coverage",
     "lint": "npm run eslint && npm run types",
     "types:generate": "openapi-typescript ../api/openapi.yaml --output ./src/types/Generated.types.ts",
-    "grammar:generate": "npm run grammar:selectorQL && npm run grammar:expressionQL",
+    "grammar:generate": "npm run grammar:selectorQL && npm run grammar:expressionQL && npm run grammar:interpolationQL",
     "grammar:selectorQL": "lezer-generator ./src/components/Editor/Selector/grammar/syntax.grammar -o ./src/components/Editor/Selector/grammar/grammar.js",
     "grammar:expressionQL": "lezer-generator ./src/components/Editor/Expression/grammar/syntax.grammar -o ./src/components/Editor/Expression/grammar/grammar.js",
     "grammar:interpolationQL": "lezer-generator ./src/components/Editor/Interpolation/grammar/syntax.grammar -o ./src/components/Editor/Interpolation/grammar/grammar.js",
