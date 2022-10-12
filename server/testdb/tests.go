@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"log"
 	"strings"
 	"time"
 
@@ -140,7 +139,8 @@ func (td *postgresDB) DeleteTest(ctx context.Context, test model.Test) error {
 	return nil
 }
 
-const getTestSQL = `
+const (
+	getTestSQL = `
 	SELECT
 		t.id,
 		t.version,
@@ -161,6 +161,14 @@ const getTestSQL = `
 		test_runs last_test_run
 	ON last_test_run.test_id = ltr.test_id AND last_test_run.id = ltr.id
 `
+
+	testMaxVersionQuery = `
+	INNER JOIN (
+		SELECT id as idx, max(version) as latest_version FROM tests GROUP BY idx
+		) as latest_tests ON latest_tests.idx = t.id
+
+		WHERE t.version = latest_tests.latest_version `
+)
 
 var sortingFields = map[string]string{
 	"created":  "t.created_at",
@@ -213,52 +221,17 @@ func (td *postgresDB) GetLatestTestVersion(ctx context.Context, id id.ID) (model
 	return test, nil
 }
 
-func (td *postgresDB) GetTestsTotal(ctx context.Context, query string) (int, error) {
+func (td *postgresDB) GetTests(ctx context.Context, take, skip int32, query, sortBy, sortDirection string) (model.List[model.Test], error) {
 	hasSearchQuery := query != ""
-	total := 0
-	params := []any{}
-	sql := `SELECT COUNT(*) FROM tests t` + ` INNER JOIN (
-		SELECT id as idx, max(version) as latest_version FROM tests GROUP BY idx
-	) as latest_tests ON latest_tests.idx = t.id
-	WHERE t.version = latest_tests.latest_version 
-	`
-	if hasSearchQuery {
-		params = append(params, "%"+strings.ReplaceAll(query, " ", "%")+"%")
-		sql += ` WHERE( t.name ilike $1 OR t.description ilike $1 )`
-	}
-	stmt, err := td.db.Prepare(sql)
-	if err != nil {
-		return total, err
-	}
-	defer stmt.Close()
-
-	rows, err := stmt.QueryContext(ctx, params...)
-	if err != nil {
-		return total, err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		if err := rows.Scan(&total); err != nil {
-			log.Fatal(err)
-		}
-	}
-	return total, nil
-}
-
-func (td *postgresDB) GetTests(ctx context.Context, take, skip int32, query, sortBy, sortDirection string) ([]model.Test, error) {
-	hasSearchQuery := query != ""
+	cleanSearchQuery := "%" + strings.ReplaceAll(query, " ", "%") + "%"
 	params := []any{take, skip}
 
-	sql := getTestSQL + `
-	INNER JOIN (
-		SELECT id as idx, max(version) as latest_version FROM tests GROUP BY idx
-	) as latest_tests ON latest_tests.idx = t.id
-	WHERE t.version = latest_tests.latest_version `
+	sql := getTestSQL + testMaxVersionQuery
 
+	const condition = " AND (t.name ilike $3 OR t.description ilike $3)"
 	if hasSearchQuery {
-		params = append(params, "%"+strings.ReplaceAll(query, " ", "%")+"%")
-		sql += ` AND( t.name ilike $3 OR t.description ilike $3 )`
+		params = append(params, cleanSearchQuery)
+		sql += condition
 	}
 
 	sql = sortQuery(sql, sortBy, sortDirection)
@@ -266,13 +239,13 @@ func (td *postgresDB) GetTests(ctx context.Context, take, skip int32, query, sor
 
 	stmt, err := td.db.Prepare(sql)
 	if err != nil {
-		return nil, err
+		return model.List[model.Test]{}, err
 	}
 	defer stmt.Close()
 
 	rows, err := stmt.QueryContext(ctx, params...)
 	if err != nil {
-		return nil, err
+		return model.List[model.Test]{}, err
 	}
 
 	tests := []model.Test{}
@@ -280,12 +253,42 @@ func (td *postgresDB) GetTests(ctx context.Context, take, skip int32, query, sor
 	for rows.Next() {
 		test, err := td.readTestRow(ctx, rows)
 		if err != nil {
-			return nil, err
+			return model.List[model.Test]{}, err
 		}
 
 		tests = append(tests, test)
 	}
-	return tests, nil
+
+	count, err := td.count(ctx, condition, cleanSearchQuery)
+	if err != nil {
+		return model.List[model.Test]{}, err
+	}
+
+	return model.List[model.Test]{
+		Items:      tests,
+		TotalCount: count,
+	}, nil
+}
+
+func (td *postgresDB) count(ctx context.Context, condition, cleanSearchQuery string) (int, error) {
+	var (
+		count  int
+		params []any
+	)
+	countQuery := "SELECT COUNT(*) FROM tests t" + testMaxVersionQuery
+	if cleanSearchQuery != "" {
+		params = []any{cleanSearchQuery}
+		countQuery += strings.ReplaceAll(condition, "$3", "$1")
+	}
+
+	err := td.db.
+		QueryRowContext(ctx, countQuery, params...).
+		Scan(&count)
+
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
 }
 
 func (td *postgresDB) readTestRow(ctx context.Context, row scanner) (model.Test, error) {

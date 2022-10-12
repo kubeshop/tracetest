@@ -16,16 +16,6 @@ type MockRepository struct {
 	T mock.TestingT
 }
 
-func (m *MockRepository) GetTestRunsTotal(ctx context.Context, s string) (int, error) {
-	args := m.Called()
-	return args.Int(0), nil
-}
-
-func (m *MockRepository) GetTestsTotal(_ context.Context, query string) (int, error) {
-	args := m.Called()
-	return args.Int(0), nil
-}
-
 func (m *MockRepository) ServerID() (string, bool, error) {
 	args := m.Called()
 	return args.String(0), args.Bool(1), args.Error(2)
@@ -66,9 +56,14 @@ func (m *MockRepository) GetLatestTestVersion(_ context.Context, id id.ID) (mode
 	return args.Get(0).(model.Test), args.Error(1)
 }
 
-func (m *MockRepository) GetTests(_ context.Context, take, skip int32, query, sortBy, sortDirection string) ([]model.Test, error) {
+func (m *MockRepository) GetTests(_ context.Context, take, skip int32, query, sortBy, sortDirection string) (model.List[model.Test], error) {
 	args := m.Called(take, skip, query, sortBy, sortDirection)
-	return args.Get(0).([]model.Test), args.Error(1)
+	tests := args.Get(0).([]model.Test)
+	list := model.List[model.Test]{
+		Items:      tests,
+		TotalCount: len(tests),
+	}
+	return list, args.Error(1)
 }
 
 func (m *MockRepository) GetSpec(_ context.Context, test model.Test) (model.OrderedMap[model.SpanQuery, []model.Assertion], error) {
@@ -101,9 +96,14 @@ func (m *MockRepository) GetRun(_ context.Context, testID id.ID, id int) (model.
 	return args.Get(0).(model.Run), args.Error(1)
 }
 
-func (m *MockRepository) GetTestRuns(_ context.Context, test model.Test, take int32, skip int32) ([]model.Run, error) {
+func (m *MockRepository) GetTestRuns(_ context.Context, test model.Test, take int32, skip int32) (model.List[model.Run], error) {
 	args := m.Called(test, take, skip)
-	return args.Get(0).([]model.Run), args.Error(1)
+	runs := args.Get(0).([]model.Run)
+	list := model.List[model.Run]{
+		Items:      runs,
+		TotalCount: len(runs),
+	}
+	return list, args.Error(1)
 }
 
 func (m *MockRepository) GetRunByTraceID(_ context.Context, tid trace.TraceID) (model.Run, error) {
