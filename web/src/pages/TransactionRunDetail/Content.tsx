@@ -1,8 +1,8 @@
 import {Tag, Typography} from 'antd';
-import {useNavigate} from 'react-router-dom';
+import {useNavigate, useParams} from 'react-router-dom';
 import TransactionHeader from '../../components/TransactionHeader';
-import {useTransaction} from '../../providers/TransactionRunDetail/Transaction.provider';
-import * as S from './Transaction.styled';
+import {useTransaction} from '../../providers/TransactionRunDetail/TransactionRunDetailProvider';
+import * as S from './Content.styled';
 
 function iconBasedOnResult(result: 'success' | 'fail' | 'running', index: number) {
   switch (result) {
@@ -15,12 +15,13 @@ function iconBasedOnResult(result: 'success' | 'fail' | 'running', index: number
   }
 }
 
-const TransactionContent = () => {
+const Content = () => {
   const navigate = useNavigate();
   const {transaction} = useTransaction();
+  const {transactionId = ''} = useParams();
   return (
     <>
-      <TransactionHeader onBack={() => navigate('/')} />
+      <TransactionHeader onBack={() => navigate(`/transaction/${transactionId}`)} />
       <S.Wrapper>
         <S.Container>
           <S.SectionLeft>
@@ -72,4 +73,4 @@ const TransactionContent = () => {
   );
 };
 
-export default TransactionContent;
+export default Content;

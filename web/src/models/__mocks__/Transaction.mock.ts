@@ -1,10 +1,10 @@
 import faker from '@faker-js/faker';
 import Transaction from 'models/Transaction.model';
 import {IMockFactory} from 'types/Common.types';
-import {ITransaction} from '../../providers/TransactionRunDetail/ITransaction';
+import {TTransaction} from 'types/Transaction.types';
 import TestMock from './Test.mock';
 
-const TransactionMock: IMockFactory<ITransaction, ITransaction> = () => ({
+const TransactionMock: IMockFactory<TTransaction, TTransaction> = () => ({
   raw(data = {}) {
     const test = TestMock.model();
     const test2 = TestMock.model();

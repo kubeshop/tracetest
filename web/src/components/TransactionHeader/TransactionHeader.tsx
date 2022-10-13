@@ -1,6 +1,6 @@
 import TestCardActions from 'components/TestCard/TestCardActions';
 import {noop} from 'lodash';
-import {useTransaction} from '../../providers/TransactionRunDetail/Transaction.provider';
+import {useTransaction} from '../../providers/TransactionRunDetail/TransactionRunDetailProvider';
 import * as S from './TransactionHeader.styled';
 
 interface IProps {
