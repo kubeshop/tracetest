@@ -69,7 +69,7 @@ func (te *httpTriggerer) Trigger(ctx context.Context, test model.Test, opts *Tri
 		return response, err
 	}
 	for _, h := range tReq.Headers {
-		req.Header.Set(h.Key, h.Value)
+		req.Header.Add(h.Key, h.Value)
 	}
 
 	tReq.Authenticate(req)
