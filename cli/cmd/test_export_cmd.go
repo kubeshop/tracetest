@@ -12,6 +12,7 @@ import (
 var (
 	exportTestId         string
 	exportTestOutputFile string
+	version              int32
 )
 
 var testExportCmd = &cobra.Command{
@@ -30,6 +31,7 @@ var testExportCmd = &cobra.Command{
 		actionArgs := actions.ExportTestConfig{
 			TestId:     exportTestId,
 			OutputFile: exportTestOutputFile,
+			Version:    version,
 		}
 
 		err := exportTestAction.Run(ctx, actionArgs)
@@ -42,8 +44,9 @@ var testExportCmd = &cobra.Command{
 }
 
 func init() {
-	testExportCmd.PersistentFlags().StringVarP(&exportTestId, "id", "", "", "tracetest test export --id <id>")
-	testExportCmd.PersistentFlags().StringVarP(&exportTestOutputFile, "output", "o", "", "tracetest test export --output file")
+	testExportCmd.PersistentFlags().StringVarP(&exportTestId, "id", "", "", "id of the test")
+	testExportCmd.PersistentFlags().StringVarP(&exportTestOutputFile, "output", "o", "", "file to be created with definition")
+	testExportCmd.PersistentFlags().Int32VarP(&version, "version", "", -1, "version of the test. Default is latest")
 
 	testCmd.AddCommand(testExportCmd)
 }
