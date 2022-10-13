@@ -27,7 +27,7 @@ components:
           example:
             - name: USER_ID
               selector: span[name="user_signup" result="success"]
-              value: "${attr:myapp.signup.user_id}"
+              value: "attr:myapp.signup.user_id"
             - name: PROFILE_URL
               selector: span[tracetest.span.type="general" name="Tracetest trigger"]
               value: "${attr:tracetest.response.body | json_path '.user.profileUrl' }"
