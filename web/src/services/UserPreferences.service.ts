@@ -1,30 +1,28 @@
 import LocalStorageGateway from 'gateways/LocalStorage.gateway';
+import {IUserPreferences} from 'types/User.types';
 
 const storageKey = 'user_preferences';
-
-interface IUserPreferences {
-  lang: string;
-}
 
 const localStorageGateway = LocalStorageGateway<IUserPreferences>(storageKey);
 
 const initialUserPreferences: IUserPreferences = {
   lang: 'en',
+  environmentId: '',
 };
 
 const UserPreferencesService = () => ({
-  getUserPreferences(): IUserPreferences {
+  get(): IUserPreferences {
     const userPreferences = localStorageGateway.get() || initialUserPreferences;
 
     return userPreferences;
   },
-  getUserPreference<K extends keyof IUserPreferences>(key: K): IUserPreferences[K] {
-    const preferences = this.getUserPreferences();
+  getEntry<K extends keyof IUserPreferences>(key: K): IUserPreferences[K] {
+    const preferences = this.get();
 
     return preferences[key];
   },
-  setPreference<K extends keyof IUserPreferences>(key: K, value: IUserPreferences[K]) {
-    const preferences = this.getUserPreferences();
+  set<K extends keyof IUserPreferences>(key: K, value: IUserPreferences[K]) {
+    const preferences = this.get();
 
     const updatedUserPreferences = {
       ...preferences,

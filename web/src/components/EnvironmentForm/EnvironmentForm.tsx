@@ -1,13 +1,13 @@
 import {Button, Form, FormInstance, Input} from 'antd';
 import RequestDetailsHeadersInput from 'components/CreateTestPlugins/Rest/steps/RequestDetails/RequestDetailsHeadersInput';
 import {useEffect, useMemo} from 'react';
-import {IEnvironment} from '../../pages/Environments/IEnvironment';
+import {TEnvironment} from '../../types/Environment.types';
 import {useCreateEnvironmentMutation, useLazyGetEnvironmentSecretListQuery} from '../../redux/apis/TraceTest.api';
 import {Footer} from './EnvironmentForm.styled';
 
 interface IProps {
-  form: FormInstance<IEnvironment>;
-  environment?: IEnvironment;
+  form: FormInstance<TEnvironment>;
+  environment?: TEnvironment;
   onCancel: () => void;
 }
 
@@ -26,7 +26,7 @@ const EnvironmentForm: React.FC<IProps> = ({environment, form, onCancel}) => {
     form.setFieldsValue({name: environment?.name, description: environment?.description});
   }, [form, environment?.name, environment?.description]);
   return (
-    <Form<IEnvironment>
+    <Form<TEnvironment>
       name="basic"
       layout="vertical"
       form={form}
