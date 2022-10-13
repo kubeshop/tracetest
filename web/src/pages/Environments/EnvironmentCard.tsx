@@ -5,12 +5,12 @@ import {useLazyGetEnvironmentSecretListQuery} from 'redux/apis/TraceTest.api';
 import * as T from '../../components/TestCard/TestCard.styled';
 import EnvironmentsAnalytics from '../../services/Analytics/EnvironmentsAnalytics.service';
 import * as E from './Environment.styled';
-import {IEnvironment} from './IEnvironment';
+import {TEnvironment} from '../../types/Environment.types';
 
 interface IProps {
   setIsFormOpen: Dispatch<SetStateAction<boolean>>;
-  environment: IEnvironment;
-  setEnvironment: Dispatch<SetStateAction<IEnvironment | undefined>>;
+  environment: TEnvironment;
+  setEnvironment: Dispatch<SetStateAction<TEnvironment | undefined>>;
 }
 
 export const EnvironmentCard = ({

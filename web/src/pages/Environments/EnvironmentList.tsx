@@ -6,16 +6,16 @@ import Loading from '../Home/Loading';
 import NoResults from '../Home/NoResults';
 import * as S from './Environment.styled';
 import {EnvironmentCard} from './EnvironmentCard';
-import {IEnvironment} from './IEnvironment';
+import {TEnvironment} from '../../types/Environment.types';
 
 interface IProps {
   query: string;
   setIsFormOpen: Dispatch<SetStateAction<boolean>>;
-  setEnvironment: Dispatch<SetStateAction<IEnvironment | undefined>>;
+  setEnvironment: Dispatch<SetStateAction<TEnvironment | undefined>>;
 }
 
 const EnvironmentList = ({query, setEnvironment, setIsFormOpen}: IProps) => {
-  const pagination = usePagination<IEnvironment, {query: string}>(useGetEnvListQuery, {query});
+  const pagination = usePagination<TEnvironment, {query: string}>(useGetEnvListQuery, {query});
   return (
     <Pagination emptyComponent={<NoResults />} loadingComponent={<Loading />} {...pagination}>
       <S.TestListContainer data-cy="test-list">

@@ -4,12 +4,12 @@ import * as S from './Environment.styled';
 import EnvironmentActions from './EnvironmentActions';
 import EnvironmentList from './EnvironmentList';
 import {EnvironmentModal} from './EnvironmentModal';
-import {IEnvironment} from './IEnvironment';
+import {TEnvironment} from '../../types/Environment.types';
 
 const EnvironmentContent: React.FC = () => {
   const [query, setQuery] = useState<string>('');
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
-  const [environment, setEnvironment] = useState<IEnvironment | undefined>(undefined);
+  const [environment, setEnvironment] = useState<TEnvironment | undefined>(undefined);
   const onSearch = useCallback((value: string) => setQuery(value), [setQuery]);
   return (
     <S.Wrapper>

@@ -43,3 +43,12 @@ export const sortOptions = [
     params: {sortDirection: SortDirection.Desc, sortBy: SortBy.Name},
   },
 ] as const;
+
+export enum TracetestApiTags {
+  ENVIRONMENT = 'environment',
+  TRANSACTION = 'transaction',
+  TEST = 'test',
+  TEST_DEFINITION = 'testDefinition',
+  TEST_RUN = 'testRun',
+  SPAN = 'span',
+}
