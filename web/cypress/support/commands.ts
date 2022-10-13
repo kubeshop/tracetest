@@ -117,7 +117,6 @@ Cypress.Commands.add('makeSureUserIsOnTracePage', () => {
 Cypress.Commands.add('cancelOnBoarding', () => {
   const value = localStorage.getItem('guided_tour');
   const parsedValue = value ? JSON.parse(value) : undefined;
-  cy.log(JSON.stringify(parsedValue));
 
   if (!parsedValue || parsedValue.trace === false) {
     cy.get('[data-cy=no-thanks]').click();
