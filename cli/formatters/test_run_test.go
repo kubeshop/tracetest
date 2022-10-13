@@ -69,8 +69,29 @@ func TestSuccessfulTestRunOutput(t *testing.T) {
 	assert.Equal(t, "✔ Testcase 1 (http://localhost:11633/test/9876543/run/1/test)\n", output)
 }
 
+func TestSuccessfulTestRunOutputNoResult(t *testing.T) {
+	in := formatters.TestRunOutput{
+		HasResults: false,
+		Test: openapi.Test{
+			Id:   strp("9876543"),
+			Name: strp("Testcase 1"),
+		},
+		Run: openapi.TestRun{
+			Id: strp("1"),
+		},
+	}
+	formatter := formatters.TestRun(config.Config{
+		Scheme:   "http",
+		Endpoint: "localhost:11633",
+	}, false)
+	output := formatter.Format(in)
+
+	assert.Equal(t, "✔ Testcase 1 (http://localhost:11633/test/9876543/run/1/test)\n", output)
+}
+
 func TestFailingTestOutput(t *testing.T) {
 	in := formatters.TestRunOutput{
+		HasResults: true,
 		Test: openapi.Test{
 			Id:   strp("9876543"),
 			Name: strp("Testcase 2"),

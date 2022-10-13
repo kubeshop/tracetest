@@ -118,8 +118,9 @@ func TestUpdateRun(t *testing.T) {
 	updatedList, err := db.GetTestRuns(context.TODO(), test, 20, 0)
 	require.NoError(t, err)
 
-	assert.Len(t, updatedList, 1)
-	modeltest.AssertRunEqual(t, updatedList[0], actual)
+	assert.Len(t, updatedList.Items, 1)
+	assert.Equal(t, 1, updatedList.TotalCount)
+	modeltest.AssertRunEqual(t, updatedList.Items[0], actual)
 }
 
 func TestUpdateRunWithNewIDs(t *testing.T) {

@@ -1,30 +1,35 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
 import {HTTP_METHOD} from 'constants/Common.constants';
-import {IKeyValue, SortBy, SortDirection} from 'constants/Test.constants';
+import {PaginationResponse} from 'hooks/usePagination';
 import {uniq} from 'lodash';
-import AssertionResults from 'models/AssertionResults.model';
 import Environment from 'models/__mocks__/Environment.mock';
 import KeyValueMock from 'models/__mocks__/KeyValue.mock';
+import TransactionMock from 'models/__mocks__/Transaction.mock';
+import AssertionResults from 'models/AssertionResults.model';
 import Test from 'models/Test.model';
 import TestRun from 'models/TestRun.model';
-import Transaction from 'models/Transaction.model';
 import {IEnvironment} from 'pages/Environments/IEnvironment';
 import WebSocketService, {IListenerFunction} from 'services/WebSocket.service';
 import {TAssertion, TAssertionResults, TRawAssertionResults} from 'types/Assertion.types';
 import {TRawTest, TTest} from 'types/Test.types';
 import {TRawTestRun, TTestRun} from 'types/TestRun.types';
 import {TRawTestSpecs} from 'types/TestSpecs.types';
-import {TRawTransaction, TTransaction} from 'types/Transaction.types';
+import {TTransaction} from 'types/Transaction.types';
+import {IKeyValue, SortBy, SortDirection} from '../../constants/Test.constants';
 
 const PATH = `${document.baseURI}api/`;
 
 enum Tags {
   ENVIRONMENT = 'environment',
+  TRANSACTION = 'transaction',
   TEST = 'test',
   TEST_DEFINITION = 'testDefinition',
   TEST_RUN = 'testRun',
   SPAN = 'span',
-  TRANSACTION = 'transaction',
+}
+
+function getTotalCountFromHeaders(meta: any) {
+  return Number(meta?.response?.headers.get('x-total-count') || 0);
 }
 
 const TraceTestAPI = createApi({
@@ -55,17 +60,23 @@ const TraceTestAPI = createApi({
         {type: Tags.TEST, id: test?.id},
       ],
     }),
-    getEnvList: build.query<IEnvironment[], {take?: number; skip?: number; query?: string}>({
+    getEnvList: build.query<PaginationResponse<IEnvironment>, {take?: number; skip?: number; query?: string}>({
       query: ({take = 25, skip = 0, query = ''}) => `/tests?take=${take}&skip=${skip}&query=${query}`,
       providesTags: () => [{type: Tags.ENVIRONMENT, id: 'LIST'}],
-      transformResponse: () => [
-        Environment.model({name: 'Production', description: 'Production environment'}),
-        Environment.model({
-          id: 'ae7162b3-54e0-4603-9d33-423b12cf67c8',
-          name: 'Development',
-          description: 'Developing environment',
-        }),
-      ],
+      transformResponse: () => {
+        const items = [
+          Environment.model({name: 'Production', description: 'Production environment'}),
+          Environment.model({
+            id: 'ae7162b3-54e0-4603-9d33-423b12cf67c8',
+            name: 'Development',
+            description: 'Developing environment',
+          }),
+        ];
+        return {
+          total: items.length,
+          items,
+        };
+      },
     }),
     getEnvironmentSecretList: build.query<IKeyValue[], {environmentId: string; take?: number; skip?: number}>({
       query: ({take = 25, skip = 0}) => `/tests?take=${take}&skip=${skip}`,
@@ -89,13 +100,28 @@ const TraceTestAPI = createApi({
       invalidatesTags: [{type: Tags.ENVIRONMENT, id: 'LIST'}],
     }),
     getTestList: build.query<
-      TTest[],
+      PaginationResponse<TTest>,
       {take?: number; skip?: number; query?: string; sortBy?: SortBy; sortDirection?: SortDirection}
     >({
       query: ({take = 25, skip = 0, query = '', sortBy = '', sortDirection = ''}) =>
         `/tests?take=${take}&skip=${skip}&query=${query}&sortBy=${sortBy}&sortDirection=${sortDirection}`,
       providesTags: () => [{type: Tags.TEST, id: 'LIST'}],
-      transformResponse: (rawTestList: TTest[]) => rawTestList.map(rawTest => Test(rawTest)),
+      transformResponse: (rawTestList: TTest[], meta) => {
+        return {
+          items: rawTestList.map(rawTest => Test(rawTest)),
+          total: getTotalCountFromHeaders(meta),
+        };
+      },
+    }),
+    getTransactionRunById: build.query<TTransaction, {transactionId: string; runId?: string}>({
+      query: () => `/tests`,
+      providesTags: result => [{type: Tags.TRANSACTION, id: result?.id}],
+      transformResponse: () => TransactionMock.model(),
+    }),
+    getTransactionById: build.query<TTransaction, {transactionId: string}>({
+      query: () => `/tests`,
+      providesTags: result => [{type: Tags.TRANSACTION, id: result?.id}],
+      transformResponse: () => TransactionMock.model(),
     }),
     getTestById: build.query<TTest, {testId: string}>({
       query: ({testId}) => `/tests/${testId}`,
@@ -138,11 +164,13 @@ const TraceTestAPI = createApi({
       ],
       transformResponse: (rawTestRun: TRawTestRun) => TestRun(rawTestRun),
     }),
-    getRunList: build.query<TTestRun[], {testId: string; take?: number; skip?: number}>({
+    getRunList: build.query<PaginationResponse<TTestRun>, {testId: string; take?: number; skip?: number}>({
       query: ({testId, take = 25, skip = 0}) => `/tests/${testId}/run?take=${take}&skip=${skip}`,
       providesTags: (result, error, {testId}) => [{type: Tags.TEST_RUN, id: `${testId}-LIST`}],
-      transformResponse: (rawTestResultList: TRawTestRun[]) =>
-        rawTestResultList.map(rawTestResult => TestRun(rawTestResult)),
+      transformResponse: (rawTestResultList: TRawTestRun[], meta) => ({
+        total: getTotalCountFromHeaders(meta),
+        items: rawTestResultList.map(rawTestResult => TestRun(rawTestResult)),
+      }),
     }),
     getRunById: build.query<TTestRun, {runId: string; testId: string}>({
       query: ({testId, runId}) => `/tests/${testId}/run/${runId}`,
@@ -204,20 +232,6 @@ const TraceTestAPI = createApi({
     }),
 
     // Transactions
-    getTransactionById: build.query<TTransaction, {transactionId: string}>({
-      // query: ({transactionId}) => `/transactions/${transactionId}`,
-      query: ({transactionId}) => `/tests`,
-      providesTags: result => [{type: Tags.TRANSACTION, id: result?.id}],
-      transformResponse: (rawTest: TRawTransaction) => {
-        return Transaction({
-          id: '-vgKcy44R',
-          description: 'Description for transaction',
-          name: 'Transaction',
-          version: 1,
-        });
-        // return Transaction(rawTest);
-      },
-    }),
     deleteTransactionById: build.mutation<TTransaction, {transactionId: string}>({
       query: ({transactionId}) => ({url: `/transactions/${transactionId}`, method: 'DELETE'}),
       invalidatesTags: [{type: Tags.TRANSACTION, id: 'LIST'}],
@@ -251,6 +265,7 @@ export const {
   useLazyGetEnvironmentSecretListQuery,
   useCreateEnvironmentMutation,
   useGetTransactionByIdQuery,
+  useGetTransactionRunByIdQuery,
   useDeleteTransactionByIdMutation,
 } = TraceTestAPI;
 export const {endpoints} = TraceTestAPI;

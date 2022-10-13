@@ -176,6 +176,11 @@ func (c *controller) DeleteTestRun(ctx context.Context, testID, runID string) (o
 	return openapi.Response(204, nil), nil
 }
 
+type paginated[T any] struct {
+	items []T
+	count int
+}
+
 func (c *controller) GetTestRuns(ctx context.Context, testID string, take, skip int32) (openapi.ImplResponse, error) {
 	if take == 0 {
 		take = 20
@@ -191,7 +196,10 @@ func (c *controller) GetTestRuns(ctx context.Context, testID string, take, skip 
 		return handleDBError(err), err
 	}
 
-	return openapi.Response(200, c.mappers.Out.Runs(runs)), nil
+	return openapi.Response(200, paginated[openapi.TestRun]{
+		items: c.mappers.Out.Runs(runs.Items),
+		count: runs.TotalCount,
+	}), nil
 }
 
 func (c *controller) GetTests(ctx context.Context, take, skip int32, query string, sortBy string, sortDirection string) (openapi.ImplResponse, error) {
@@ -204,7 +212,10 @@ func (c *controller) GetTests(ctx context.Context, take, skip int32, query strin
 		return handleDBError(err), err
 	}
 
-	return openapi.Response(200, c.mappers.Out.Tests(tests)), nil
+	return openapi.Response(200, paginated[openapi.Test]{
+		items: c.mappers.Out.Tests(tests.Items),
+		count: tests.TotalCount,
+	}), nil
 }
 
 func (c *controller) RerunTestRun(ctx context.Context, testID, runID string) (openapi.ImplResponse, error) {

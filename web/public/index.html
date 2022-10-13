@@ -23,29 +23,52 @@
     -->
     <title>Tracetest</title>
     <script>
-      function getTemplateValue(value, defaultValue) {
+      const parser = {
+        toArray(value) {
+          try {
+            return JSON.parse(value) || [];
+          } catch (error) {
+            return [];
+          }
+        },
+        toBoolean(value) {
+          return value === 'true';
+        },
+        toObject(value) {
+          try {
+            return JSON.parse(value) || {};
+          } catch (error) {
+            return {};
+          }
+        },
+        toString(value) {
+          return value;
+        },
+      };
+
+      function getTemplateValue(value, defaultValue, parser) {
         // hack: we cannot add double curly brackets on our code otherwise the go template
         // module will try to parse it and it will fail.
         var curlyBracket = String.fromCharCode(123);
         var startingTemplateToken = `${curlyBracket}${curlyBracket}`;
         if (!value || value.startsWith(startingTemplateToken)) {
-          return defaultValue;
+          return parser(defaultValue);
         }
 
-        return value;
+        return parser(value);
       }
 
       function injectVariables() {
         window.ENV = {
-          measurementId: getTemplateValue('{{ .AnalyticsKey }}', ''),
-          analyticsEnabled: getTemplateValue('{{ .AnalyticsEnabled }}', 'false'),
-          serverPathPrefix: getTemplateValue('{{ .ServerPathPrefix }}', '/'),
-          serverID: getTemplateValue('{{ .ServerID }}', ''),
-          appVersion: getTemplateValue('{{ .AppVersion }}', ''),
-          env: getTemplateValue('{{ .Env }}', ''),
-          demoEnabled: getTemplateValue('{{ .DemoEnabled }}', '["pokeshop", "otel"]'),
-          demoEndpoints: getTemplateValue('{{ .DemoEndpoints }}', '{"PokeshopHttp": "http://demo-pokemon-api.demo.svc.cluster.local", "PokeshopGrpc": "demo-pokemon-api.demo.svc.cluster.local:8082", "OtelFrontend": "http://otel-frontend:8084" }'),
-          experimentalFeatures: getTemplateValue('{{ .ExperimentalFeatures }}', '["transactions"]'),
+          measurementId: getTemplateValue('{{ .AnalyticsKey }}', '', parser.toString),
+          analyticsEnabled: getTemplateValue('{{ .AnalyticsEnabled }}', 'false', parser.toBoolean),
+          serverPathPrefix: getTemplateValue('{{ .ServerPathPrefix }}', '/', parser.toString),
+          serverID: getTemplateValue('{{ .ServerID }}', '', parser.toString),
+          appVersion: getTemplateValue('{{ .AppVersion }}', '', parser.toString),
+          env: getTemplateValue('{{ .Env }}', '', parser.toString),
+          demoEnabled: getTemplateValue('{{ .DemoEnabled }}', '["pokeshop", "otel"]', parser.toArray),
+          demoEndpoints: getTemplateValue('{{ .DemoEndpoints }}', '{"PokeshopHttp": "http://demo-pokemon-api.demo.svc.cluster.local", "PokeshopGrpc": "demo-pokemon-api.demo.svc.cluster.local:8082", "OtelFrontend": "http://otel-frontend:8084" }', parser.toObject),
+          experimentalFeatures: getTemplateValue('{{ .ExperimentalFeatures }}', '["transactions"]', parser.toArray),
         };
 
         var base = document.createElement('base');
@@ -55,7 +78,7 @@
 
       injectVariables();
 
-      if (window.ENV.analyticsEnabled === 'true') {
+      if (window.ENV.analyticsEnabled) {
         !function(){var analytics=window.analytics=window.analytics||[];if(!analytics.initialize)if(analytics.invoked)window.console&&console.error&&console.error("Segment snippet included twice.");else{analytics.invoked=!0;analytics.methods=["trackSubmit","trackClick","trackLink","trackForm","pageview","identify","reset","group","track","ready","alias","debug","page","once","off","on","addSourceMiddleware","addIntegrationMiddleware","setAnonymousId","addDestinationMiddleware"];analytics.factory=function(e){return function(){var t=Array.prototype.slice.call(arguments);t.unshift(e);analytics.push(t);return analytics}};for(var e=0;e<analytics.methods.length;e++){var key=analytics.methods[e];analytics[key]=analytics.factory(key)}analytics.load=function(key,e){var t=document.createElement("script");t.type="text/javascript";t.async=!0;t.src="https://cdn.segment.com/analytics.js/v1/" + key + "/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(t,n);analytics._loadOptions=e};analytics._writeKey="X2vwYODI1vb8g6QpzL9OBxuv5vK7dGan";analytics.SNIPPET_VERSION="4.15.3";
         analytics.load(window.ENV.measurementId);
         }}();

@@ -1,8 +1,7 @@
 import {UseQuery} from '@reduxjs/toolkit/dist/query/react/buildHooks';
 import {ReactElement} from 'react';
-
-import usePagination from 'hooks/usePagination';
-import Pagination from 'components/Pagination';
+import usePagination from '../../hooks/usePagination';
+import Pagination from '../Pagination';
 import Empty from './Empty';
 import Loading from './Loading';
 import * as S from './PaginatedList.styled';
@@ -13,9 +12,9 @@ type TParams<P> = P & {
 
 interface IProps<T, P> {
   dataCy?: string;
-  itemComponent({item}: {item: T}): ReactElement;
   params: TParams<P>;
   query: UseQuery<any>;
+  itemComponent({item}: {item: T}): ReactElement;
 }
 
 interface IId {
@@ -23,25 +22,12 @@ interface IId {
 }
 
 const PaginatedList = <T extends IId, P>({dataCy, itemComponent: ItemComponent, params, query}: IProps<T, P>) => {
-  const {hasNext, hasPrev, isEmpty, isFetching, isLoading, list, loadNext, loadPrev} = usePagination<T, typeof params>(
-    query,
-    params
-  );
+  const pagination = usePagination<T, typeof params>(query, params);
 
   return (
-    <Pagination
-      emptyComponent={<Empty />}
-      hasNext={hasNext}
-      hasPrev={hasPrev}
-      isEmpty={isEmpty}
-      isFetching={isFetching}
-      isLoading={isLoading}
-      loadingComponent={<Loading />}
-      loadNext={loadNext}
-      loadPrev={loadPrev}
-    >
+    <Pagination emptyComponent={<Empty />} loadingComponent={<Loading />} {...pagination}>
       <S.ListContainer data-cy={dataCy}>
-        {list.map(item => (
+        {pagination.list.map(item => (
           <ItemComponent item={item} key={item.id} />
         ))}
       </S.ListContainer>

@@ -5,16 +5,15 @@ export type TRecursivePartial<T> = {
 };
 
 export interface IEnv {
-  measurementId: string;
-  analyticsEnabled: string;
-  serverPathPrefix: string;
-  serverID: string;
+  analyticsEnabled: boolean;
   appVersion: string;
-  pokeApi: string;
+  demoEnabled: string[];
+  demoEndpoints: {[key: string]: string};
   env: string;
-  demoEnabled: string;
-  demoEndpoints: string;
-  experimentalFeatures: string;
+  experimentalFeatures: string[];
+  measurementId: string;
+  serverID: string;
+  serverPathPrefix: string;
 }
 
 export type Modify<T, R> = Omit<T, keyof R> & R;

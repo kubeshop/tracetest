@@ -3,15 +3,13 @@ import {noop} from 'lodash';
 import {Steps} from 'components/GuidedTour/homeStepList';
 import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
 import {TDraftTest} from 'types/Test.types';
+import Env from 'utils/Env';
 import BasicDetailsDemoHelper from './BasicDetailsDemoHelper';
 import * as S from './BasicDetails.styled';
 
 export const FORM_ID = 'create-test';
-
-// TODO: create config abstraction with checks and default values
-const {demoEnabled = '[]'} = window.ENV || {};
-const parsedDemoEnabled = JSON.parse(demoEnabled);
-const isDemoEnabled = Boolean(parsedDemoEnabled && parsedDemoEnabled.length > 0);
+const demoEnabled = Env.get('demoEnabled');
+const isDemoEnabled = demoEnabled.length > 0;
 
 interface IProps {
   onSelectDemo?(demo: TDraftTest): void;

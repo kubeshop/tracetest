@@ -6,7 +6,7 @@ describe('Create Assertion', () => {
 
   it('should create a basic assertion', () => cy.createAssertion());
 
-  it.only('should create an assertion with multiple checks', () => {
+  it('should create an assertion with multiple checks', () => {
     cy.selectRunDetailMode(3);
 
     cy.get(`[data-cy=trace-node-http]`, {timeout: 20000}).first().click();

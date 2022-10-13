@@ -48,12 +48,12 @@ tracetest test list
 
 ### **Run a Test**
 
-Allows you to run a test by referencing a [test definition file](/docs/test-definition-file.md).
+Allows you to run a test by referencing a [test definition file](/test-definition-file/).
 
 > Note: If the definition file contains the field `id`, this command will not create a new test. Instead, it will update the test with that ID. If that test doesn't exist, a new one will be created with that ID on the server.
 
 
-Every time the test is run, changes are detected and, if any change is introduced, we use Tractest's [versioning](/docs/versioning.md) mechanism to ensure that it will not cause problems with previous test runs.
+Every time the test is run, changes are detected and, if any change is introduced, we use Tractest's [versioning](/versioning/) mechanism to ensure that it will not cause problems with previous test runs.
 
 **How to Use**:
 
