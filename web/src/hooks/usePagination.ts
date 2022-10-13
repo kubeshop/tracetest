@@ -1,7 +1,8 @@
 import {UseQuery} from '@reduxjs/toolkit/dist/query/react/buildHooks';
+import {QueryDefinition} from '@reduxjs/toolkit/query';
 import {useCallback, useState} from 'react';
 
-type TParams<P> = P & {
+export type TParams<P> = P & {
   take?: number;
 };
 
@@ -11,14 +12,10 @@ export interface PaginationResponse<T> {
 }
 
 export interface IPagination<T> {
-  hasNext: boolean;
-  hasPrev: boolean;
   isEmpty: boolean;
   isFetching: boolean;
   isLoading: boolean;
   list: T[];
-  loadNext: () => void;
-  loadPrev: () => void;
   loadPage: (pg: number) => void;
   search: (query: string) => void;
   page: number;
@@ -26,57 +23,31 @@ export interface IPagination<T> {
   take: number;
 }
 
-function totalLoaded(list: Array<any>, params: {page: number; query: string}, take: number) {
-  const length = list?.length || 0;
-  return params.page === 0 ? length : params.page * take + length;
-}
-
 const usePagination = <T, P>(
-  useGetDataListQuery: UseQuery<any>,
-  {take = 20, ...queryParams}: TParams<P>
+  useGetDataListQuery: UseQuery<QueryDefinition<P, any, any, PaginationResponse<T>>>,
+  {...queryParams}: TParams<P>
 ): IPagination<T> => {
+  const take = queryParams?.take || 5;
   const [params, setParams] = useState<{page: number; query: string}>({page: 0, query: ''});
-
   const {data, isFetching, isLoading} = useGetDataListQuery({
     skip: params.page * take,
     take,
     ...queryParams,
     ...(params.query ? {query: params.query} : {}),
   });
-
-  const list = (data as any)?.items as T[];
-  const total = (data as any)?.total as number;
-
-  const loadNext = useCallback(() => {
-    setParams(prevParams => ({...prevParams, page: prevParams.page + 1}));
-  }, []);
-
-  const loadPrev = useCallback(() => {
-    setParams(prevParams => ({...prevParams, page: prevParams.page - 1}));
-  }, []);
-
-  const loadPage = useCallback((pg: number) => {
-    setParams(prevParams => ({...prevParams, page: pg}));
-  }, []);
-
-  const search = (query: string) => {
-    setParams({page: 0, query});
-  };
-
+  const list = data?.items || [];
   return {
-    loadPage,
-    hasNext: totalLoaded(list, params, take) < total,
-    hasPrev: params.page > 0,
-    isEmpty: params.page === 0 && !list?.length && !isLoading && !isFetching,
     isFetching,
     isLoading,
     list: list ?? [],
-    loadNext,
-    loadPrev,
-    search,
     page: params.page + 1,
-    total,
+    total: data?.total || 0,
     take,
+    isEmpty: params.page === 0 && !list?.length && !isLoading && !isFetching,
+    search: useCallback(query => setParams({page: 0, query}), [setParams]),
+    loadPage: useCallback(pg => {
+      setParams(prevParams => ({...prevParams, page: pg}));
+    }, []),
   };
 };
 

@@ -1,6 +1,4 @@
 import {Button} from 'antd';
-import {useCallback, useMemo} from 'react';
-import {useNavigate} from 'react-router-dom';
 
 import {Steps} from 'components/GuidedTour/testDetailsStepList';
 import PaginatedList from 'components/PaginatedList';
@@ -9,6 +7,8 @@ import TestHeader from 'components/TestHeader';
 import useDeleteTest from 'hooks/useDeleteTest';
 import useTestCrud from 'providers/Test/hooks/useTestCrud';
 import {useTest} from 'providers/Test/Test.provider';
+import {useCallback, useMemo} from 'react';
+import {useNavigate} from 'react-router-dom';
 import {useGetRunListQuery} from 'redux/apis/TraceTest.api';
 import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
 import {TTestRun} from 'types/TestRun.types';
@@ -51,7 +51,6 @@ const Content = () => {
           Run Test
         </Button>
       </S.ActionsContainer>
-
       <PaginatedList<TTestRun, {testId: string}>
         dataCy="run-card-list"
         itemComponent={({item}) => <RunCard linkTo={`/test/${test.id}/run/${item.id}`} run={item} testId={test.id} />}
