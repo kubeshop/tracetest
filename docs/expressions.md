@@ -76,3 +76,15 @@ Some filters might result in an array. If you want to assert just part of this a
 ```
 '[1, 2, 3] | get_index 1 = 2'
 ```
+
+### **Count**
+
+Return the size of the input array. If it's a single value, it will return 1. Otherwise it will return `length(input_array)`.
+
+```
+'{ "array": [1, 2, 3] }' | json_path '$.array[*]' | count = 3
+```
+
+```
+"my string" | count = 1
+```
