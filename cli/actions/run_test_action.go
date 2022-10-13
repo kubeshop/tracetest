@@ -8,7 +8,7 @@ import (
 	"sync"
 	"time"
 
-	cTEnvironment "github.com/cucumber/ci-environment/go"
+	cienvironment "github.com/cucumber/ci-environment/go"
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/definition"
 	"github.com/kubeshop/tracetest/cli/file"
@@ -280,7 +280,7 @@ func (a runTestAction) isTestReady(ctx context.Context, testId, testRunId string
 }
 
 func (a runTestAction) getMetadata() map[string]string {
-	ci := cTEnvironment.DetectCTEnvironment()
+	ci := cienvironment.DetectCIEnvironment()
 	if ci == nil {
 		return map[string]string{}
 	}
