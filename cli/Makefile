@@ -35,19 +35,5 @@ endif
 	goreleaser build --single-target --rm-dist --snapshot -f ../.goreleaser.yaml
 	cp `cat ./dist/artifacts.json | jq -rc '.[0].path'` ./dist/tracetest
 
-test: mockserver
+test:
 	@go test -coverprofile=coverage.out ./...
-	@make --no-print-directory kill-mock
-
-mockserver:
-ifeq (, $(shell which prism))
-	npm install -g @stoplight/prism-cli@4.8.0
-endif
-	@make --no-print-directory kill-mock
-	@echo "Starting prism mock server"
-	@prism mock ../api/openapi.yaml &
-	@sleep 2
-
-kill-mock:
-	@echo "Stopping prism mock server"
-	@ps -ef | grep /bin/prism | grep -v grep | awk '{print $$2}' | xargs -r kill -9
