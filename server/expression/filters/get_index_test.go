@@ -44,6 +44,17 @@ func TestGetIndex(t *testing.T) {
 			ShouldFail:     false,
 			ExpectedOutput: "def",
 		},
+		{
+			Name: "should_get_last_item",
+			Input: filters.NewArrayValue([]types.TypedValue{
+				types.GetTypedValue("abc"),
+				types.GetTypedValue("def"),
+				types.GetTypedValue("ghi"),
+			}),
+			Index:          `last`,
+			ShouldFail:     false,
+			ExpectedOutput: "ghi",
+		},
 	}
 
 	for _, testCase := range testCases {
