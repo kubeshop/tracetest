@@ -18,7 +18,7 @@ import (
 type TestSpecsSpecs struct {
 	Name       NullableString `json:"name,omitempty"`
 	Selector   *Selector      `json:"selector,omitempty"`
-	Assertions []Assertion    `json:"assertions,omitempty"`
+	Assertions []string       `json:"assertions,omitempty"`
 }
 
 // NewTestSpecsSpecs instantiates a new TestSpecsSpecs object
