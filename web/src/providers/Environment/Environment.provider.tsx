@@ -9,13 +9,15 @@ import EnvironmentSelectors from 'selectors/Environment.selectors';
 interface IContext {
   environmentList: TEnvironment[];
   selectedEnvironment?: TEnvironment;
-  setSelectedEnvironment(environment: TEnvironment): void;
+  setSelectedEnvironment(environment?: TEnvironment): void;
+  isLoading: boolean;
 }
 
 export const Context = createContext<IContext>({
   environmentList: [],
   selectedEnvironment: undefined,
   setSelectedEnvironment: noop,
+  isLoading: true,
 });
 
 interface IProps {
@@ -25,16 +27,16 @@ interface IProps {
 export const useEnvironment = () => useContext(Context);
 
 const EnvironmentProvider = ({children}: IProps) => {
-  const {data: {items: environmentList = []} = {}} = useGetEnvListQuery({});
+  const {data: {items: environmentList = []} = {}, isLoading} = useGetEnvListQuery({});
   const dispatch = useAppDispatch();
   const selectedEnvironment: TEnvironment | undefined = useAppSelector(EnvironmentSelectors.selectSelectedEnvironment);
 
   const setSelectedEnvironment = useCallback(
-    (environment: TEnvironment) => {
+    (environment?: TEnvironment) => {
       dispatch(
         setUserPreference({
           key: 'environmentId',
-          value: environment.id,
+          value: environment?.id || '',
         })
       );
     },
@@ -46,8 +48,9 @@ const EnvironmentProvider = ({children}: IProps) => {
       environmentList,
       selectedEnvironment,
       setSelectedEnvironment,
+      isLoading,
     }),
-    [environmentList, selectedEnvironment, setSelectedEnvironment]
+    [environmentList, isLoading, selectedEnvironment, setSelectedEnvironment]
   );
 
   return <Context.Provider value={value}>{children}</Context.Provider>;
