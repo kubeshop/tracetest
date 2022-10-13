@@ -22,9 +22,9 @@ type jsonOrderedMapEntry[K comparable, V any] struct {
 
 func (om OrderedMap[K, V]) MarshalJSON() ([]byte, error) {
 	j := []jsonOrderedMapEntry[K, V]{}
-	om.Map(func(key K, asserts V) bool {
+	om.ForEach(func(key K, asserts V) error {
 		j = append(j, jsonOrderedMapEntry[K, V]{key, asserts})
-		return true
+		return nil
 	})
 
 	return json.Marshal(j)
@@ -92,20 +92,23 @@ func (om OrderedMap[K, V]) Get(key K) V {
 	return om.list[ix]
 }
 
-func (om *OrderedMap[K, V]) Map(fn func(key K, val V) bool) {
+func (om *OrderedMap[K, V]) ForEach(fn func(key K, val V) error) error {
 	for ix, asserts := range om.list {
 		K := om.positionKey[ix]
-		if !fn(K, asserts) {
-			return
+		err := fn(K, asserts)
+		if err != nil {
+			return err
 		}
 	}
+
+	return nil
 }
 
 func (om OrderedMap[K, V]) Unordered() map[K]V {
 	m := map[K]V{}
-	om.Map(func(key K, val V) bool {
+	om.ForEach(func(key K, val V) error {
 		m[key] = val
-		return true
+		return nil
 	})
 
 	return m

@@ -18,7 +18,7 @@ func FromRunResult(test model.Test, run model.Run) ([]byte, error) {
 	if run.Results == nil {
 		return nil, fmt.Errorf("run has no results")
 	}
-	run.Results.Results.Map(func(selector model.SpanQuery, results []model.AssertionResult) bool {
+	run.Results.Results.ForEach(func(selector model.SpanQuery, results []model.AssertionResult) error {
 		checks := []check{}
 		var total, fails, errs int
 		for _, res := range results {
@@ -58,7 +58,8 @@ func FromRunResult(test model.Test, run model.Run) ([]byte, error) {
 			// Skipped: 0, // we don't have skips yet
 			Checks: checks,
 		})
-		return true
+
+		return nil
 	})
 
 	r := report{

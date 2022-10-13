@@ -10,7 +10,7 @@ import (
 func Assert(defs model.OrderedMap[model.SpanQuery, model.NamedAssertions], trace traces.Trace) (model.OrderedMap[model.SpanQuery, []model.AssertionResult], bool) {
 	testResult := model.OrderedMap[model.SpanQuery, []model.AssertionResult]{}
 	allPassed := true
-	defs.Map(func(spanQuery model.SpanQuery, asserts model.NamedAssertions) bool {
+	defs.ForEach(func(spanQuery model.SpanQuery, asserts model.NamedAssertions) error {
 		spans := selector(spanQuery).Filter(trace)
 		assertionResults := make([]model.AssertionResult, 0)
 		for _, assertion := range asserts.Assertions {
@@ -21,7 +21,7 @@ func Assert(defs model.OrderedMap[model.SpanQuery, model.NamedAssertions], trace
 			assertionResults = append(assertionResults, res)
 		}
 		testResult, _ = testResult.Add(spanQuery, assertionResults)
-		return true
+		return nil
 	})
 
 	return testResult, allPassed

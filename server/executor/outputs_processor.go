@@ -58,35 +58,30 @@ func outputProcessor(ctx context.Context, outputs model.OrderedMap[string, model
 		return model.OrderedMap[string, string]{}, err
 	}
 
-	var execErr error
-	parsed.Map(func(key string, out parsedOutput) bool {
+	err = parsed.ForEach(func(key string, out parsedOutput) error {
 		spans := out.selector.Filter(tr)
 
 		mads := expression.MetaAttributesDataStore{SelectedSpans: spans}
 		value := ""
-		spans.MapIfZeroItems(
-			func() {
+		spans.
+			ForEach(func(_ int, span traces.Span) bool {
 				value = extractAttr(traces.Span{}, mads, out.expr)
-			},
-			func(_ int, span traces.Span) bool {
-
+				// take only the first value
+				return false
+			}).
+			OrEmpty(func() {
 				value = extractAttr(traces.Span{}, mads, out.expr)
+			})
 
-				return true
-			},
-		)
-
-		var err error
 		res, err = res.Add(key, value)
 		if err != nil {
-			execErr = fmt.Errorf(`cannot process output "%s": %w`, key, err)
-			return false
+			return fmt.Errorf(`cannot process output "%s": %w`, key, err)
 		}
 
-		return true
+		return nil
 	})
 
-	if execErr != nil {
+	if err != nil {
 		return model.OrderedMap[string, string]{}, err
 	}
 
@@ -109,29 +104,24 @@ type parsedOutput struct {
 }
 
 func parseOutputs(outputs model.OrderedMap[string, model.Output]) (model.OrderedMap[string, parsedOutput], error) {
-	var (
-		parseErr error
-		parsed   = model.OrderedMap[string, parsedOutput]{}
-	)
+	var parsed model.OrderedMap[string, parsedOutput]
 
-	outputs.Map(func(key string, out model.Output) bool {
+	parseErr := outputs.ForEach(func(key string, out model.Output) error {
 		expr, err := expression.Parse(out.Value)
 		if err != nil {
-			parseErr = fmt.Errorf(`cannot parse output "%s" value "%s": %w`, key, out.Value, err)
-			return false
+			return fmt.Errorf(`cannot parse output "%s" value "%s": %w`, key, out.Value, err)
 		}
 
 		selector, err := selectors.New(string(out.Selector))
 		if err != nil {
-			parseErr = fmt.Errorf(`cannot parse output "%s" selector "%s": %w`, key, string(out.Selector), err)
-			return false
+			return fmt.Errorf(`cannot parse output "%s" selector "%s": %w`, key, string(out.Selector), err)
 		}
 
 		parsed, _ = parsed.Add(key, parsedOutput{
 			selector: selector,
 			expr:     expr,
 		})
-		return true
+		return nil
 	})
 
 	if parseErr != nil {
