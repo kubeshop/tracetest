@@ -13,7 +13,7 @@ declare namespace Cypress {
     editTestByTestId(testId: string): Chainable<Element>;
     submitCreateTestForm(): Chainable<Element>;
     deleteTest(shouldIntercept?: boolean): Chainable<Element>;
-    makeSureUserIsOnTracePage(shouldCancelOnboarding?: boolean): Chainable<Element>;
+    makeSureUserIsOnTracePage(): Chainable<Element>;
     cancelOnBoarding(): Chainable<Element>;
     makeSureUserIsOnTestDetailPage(): Chainable<Element>;
     goToTestDetailPageAndRunTest(pathname: string): Chainable<Element>;

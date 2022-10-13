@@ -11,9 +11,9 @@ interface IProps {
   assertionsFailed?: IResult[];
   assertionsPassed?: IResult[];
   attribute: TSpanFlatAttribute;
+  searchText?: string;
   onCopy(value: string): void;
   onCreateTestSpec(attribute: TSpanFlatAttribute): void;
-  searchText?: string;
 }
 
 enum Action {
@@ -43,7 +43,7 @@ const AttributeRow = ({
       return onCreateTestSpec(attribute);
     }
   };
-
+  const cypressKey = key.toLowerCase().replace('.', '-');
   const menu = (
     <Menu
       items={[
@@ -59,9 +59,8 @@ const AttributeRow = ({
       onClick={handleOnClick}
     />
   );
-
   return (
-    <S.Container>
+    <S.Container data-cy={`attribute-row-${cypressKey}`}>
       <S.Header>
         <S.AttributeTitle title={key} searchText={searchText} />
         <S.AttributeValueRow>
