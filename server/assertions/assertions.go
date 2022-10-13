@@ -34,13 +34,8 @@ func assert(assertion model.Assertion, spans traces.Spans) model.AssertionResult
 	}
 	allPassed := true
 	spanResults := make([]model.SpanAssertionResult, 0, len(spans))
-	spans.MapIfZeroItems(
-		func() {
-			res := assertSpan(traces.Span{}, ds, string(assertion))
-			spanResults = append(spanResults, res)
-			allPassed = res.CompareErr == nil
-		},
-		func(_ int, span traces.Span) bool {
+	spans.
+		ForEach(func(_ int, span traces.Span) bool {
 			res := assertSpan(span, ds, string(assertion))
 			spanResults = append(spanResults, res)
 
@@ -49,8 +44,12 @@ func assert(assertion model.Assertion, spans traces.Spans) model.AssertionResult
 			}
 
 			return true
-		},
-	)
+		}).
+		OrEmpty(func() {
+			res := assertSpan(traces.Span{}, ds, string(assertion))
+			spanResults = append(spanResults, res)
+			allPassed = res.CompareErr == nil
+		})
 
 	return model.AssertionResult{
 		Assertion: assertion,

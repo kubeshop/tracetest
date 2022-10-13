@@ -182,20 +182,21 @@ func (a Attributes) Get(key string) string {
 
 type Spans []Span
 
-func (s Spans) MapIfZeroItems(
-	ifZeroFn func(),
-	itemFn func(ix int, _ Span) bool,
-) {
-	if len(s) == 0 {
-		ifZeroFn()
-	}
-
+func (s Spans) ForEach(fn func(ix int, _ Span) bool) Spans {
 	for i, span := range s {
-		doNext := itemFn(i, span)
+		doNext := fn(i, span)
 		if !doNext {
-			return
+			break
 		}
 	}
+	return s
+}
+
+func (s Spans) OrEmpty(fn func()) Spans {
+	if len(s) == 0 {
+		fn()
+	}
+	return s
 }
 
 type Span struct {
