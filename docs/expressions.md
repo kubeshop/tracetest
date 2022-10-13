@@ -74,7 +74,13 @@ Wrap the groups you want to extract with parentheses.
 Some filters might result in an array. If you want to assert just part of this array, this filter allows you to pick one element from the array based on its index.
 
 ```
-'[1, 2, 3] | get_index 1 = 2'
+'{ "array": [1, 2, 3] }' | json_path '$.array[*]' | get_index 1 = 2
+```
+
+You can select the last item from a list by specifying `'last'` as the argument for the filter:
+
+```
+'{ "array": [1, 2, 3] }' | json_path '$.array[*]' | get_index 'last' = 3
 ```
 
 ### **Count**

@@ -155,6 +155,11 @@ func TestFilterExecution(t *testing.T) {
 			Query:      `'{ "array": [1, 2, 3] }' | json_path '$.array[*]' | count = 3`,
 			ShouldPass: true,
 		},
+		{
+			Name:       "should_get_last_item_from_list",
+			Query:      `'{ "array": [1, 2, 5] }' | json_path '$.array[*]' | get_index 'last' = 5`,
+			ShouldPass: true,
+		},
 	}
 
 	executeTestCases(t, testCases)
