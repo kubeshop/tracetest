@@ -8,6 +8,7 @@ type Test struct {
 	Description string      `yaml:"description"`
 	Trigger     TestTrigger `yaml:"trigger"`
 	Specs       []TestSpec  `yaml:"specs,omitempty"`
+	Outputs     []Output    `yaml:"specs,omitempty"`
 }
 
 func (t Test) Validate() error {
@@ -45,6 +46,12 @@ func (t TestTrigger) Validate() error {
 	}
 
 	return nil
+}
+
+type Output struct {
+	Name     string `yaml:"name"`
+	Selector string `yaml:"selector"`
+	Value    string `yaml:"value"`
 }
 
 type TestSpec struct {
