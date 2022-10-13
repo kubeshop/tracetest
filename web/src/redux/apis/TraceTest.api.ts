@@ -1,31 +1,31 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
 import {HTTP_METHOD} from 'constants/Common.constants';
-import {IKeyValue, SortBy, SortDirection} from 'constants/Test.constants';
+import {PaginationResponse} from 'hooks/usePagination';
 import {uniq} from 'lodash';
 import Environment from 'models/__mocks__/Environment.mock';
 import KeyValueMock from 'models/__mocks__/KeyValue.mock';
+import TransactionMock from 'models/__mocks__/Transaction.mock';
 import AssertionResults from 'models/AssertionResults.model';
 import Test from 'models/Test.model';
 import TestRun from 'models/TestRun.model';
-import Transaction from 'models/Transaction.model';
 import {IEnvironment} from 'pages/Environments/IEnvironment';
 import WebSocketService, {IListenerFunction} from 'services/WebSocket.service';
 import {TAssertion, TAssertionResults, TRawAssertionResults} from 'types/Assertion.types';
 import {TRawTest, TTest} from 'types/Test.types';
 import {TRawTestRun, TTestRun} from 'types/TestRun.types';
 import {TRawTestSpecs} from 'types/TestSpecs.types';
-import {PaginationResponse} from '../../hooks/usePagination';
-import {TTransaction} from '../../types/Transaction.types';
+import {TTransaction} from 'types/Transaction.types';
+import {IKeyValue, SortBy, SortDirection} from '../../constants/Test.constants';
 
 const PATH = `${document.baseURI}api/`;
 
 enum Tags {
   ENVIRONMENT = 'environment',
+  TRANSACTION = 'transaction',
   TEST = 'test',
   TEST_DEFINITION = 'testDefinition',
   TEST_RUN = 'testRun',
   SPAN = 'span',
-  TRANSACTION = 'transaction',
 }
 
 function getTotalCountFromHeaders(meta: any) {
@@ -112,6 +112,16 @@ const TraceTestAPI = createApi({
           total: getTotalCountFromHeaders(meta),
         };
       },
+    }),
+    getTransactionRunById: build.query<TTransaction, {transactionId: string; runId?: string}>({
+      query: () => `/tests`,
+      providesTags: result => [{type: Tags.TRANSACTION, id: result?.id}],
+      transformResponse: () => TransactionMock.model(),
+    }),
+    getTransactionById: build.query<TTransaction, {transactionId: string}>({
+      query: () => `/tests`,
+      providesTags: result => [{type: Tags.TRANSACTION, id: result?.id}],
+      transformResponse: () => TransactionMock.model(),
     }),
     getTestById: build.query<TTest, {testId: string}>({
       query: ({testId}) => `/tests/${testId}`,
@@ -220,22 +230,6 @@ const TraceTestAPI = createApi({
       providesTags: (result, error, {query}) => (result ? [{type: Tags.SPAN, id: `${query}-LIST`}] : []),
       transformResponse: (rawSpanList: string[]) => uniq(rawSpanList),
     }),
-
-    // Transactions
-    getTransactionById: build.query<TTransaction, {transactionId: string}>({
-      // query: ({transactionId}) => `/transactions/${transactionId}`,
-      query: () => `/tests`,
-      providesTags: result => [{type: Tags.TRANSACTION, id: result?.id}],
-      transformResponse: () => {
-        return Transaction({
-          id: '-vgKcy44R',
-          description: 'Description for transaction',
-          name: 'Transaction',
-          version: 1,
-        });
-        // return Transaction(rawTest);
-      },
-    }),
     deleteTransactionById: build.mutation<TTransaction, {transactionId: string}>({
       query: ({transactionId}) => ({url: `/transactions/${transactionId}`, method: 'DELETE'}),
       invalidatesTags: [{type: Tags.TRANSACTION, id: 'LIST'}],
@@ -269,6 +263,7 @@ export const {
   useLazyGetEnvironmentSecretListQuery,
   useCreateEnvironmentMutation,
   useGetTransactionByIdQuery,
+  useGetTransactionRunByIdQuery,
   useDeleteTransactionByIdMutation,
 } = TraceTestAPI;
 export const {endpoints} = TraceTestAPI;
