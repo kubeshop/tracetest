@@ -1,6 +1,7 @@
 package expression_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/kubeshop/tracetest/server/expression"
@@ -149,6 +150,11 @@ func TestFilterExecution(t *testing.T) {
 			Query:      `'{ "array": [{ "name": "john", "age": 37 }, { "name": "jonas", "age": 38 }]}' | regex_group '"age": (\d+)' | get_index 1 = 38`,
 			ShouldPass: true,
 		},
+		{
+			Name:       "should_count_array_input",
+			Query:      `'{ "array": [1, 2, 3] }' | json_path '$.array[*]' | count = 3`,
+			ShouldPass: true,
+		},
 	}
 
 	executeTestCases(t, testCases)
@@ -191,11 +197,12 @@ func executeTestCases(t *testing.T, testCases []executorTestCase) {
 	for _, testCase := range testCases {
 		t.Run(testCase.Name, func(t *testing.T) {
 			executor := expression.NewExecutor(testCase.AttributeDataStore, testCase.MetaAttributesDataStore)
-			_, _, err := executor.ExecuteStatement(testCase.Query)
+			left, right, err := executor.ExecuteStatement(testCase.Query)
+			debugMessage := fmt.Sprintf("left value: %s; right value: %s", left, right)
 			if testCase.ShouldPass {
-				assert.NoError(t, err)
+				assert.NoError(t, err, debugMessage)
 			} else {
-				assert.Error(t, err)
+				assert.Error(t, err, debugMessage)
 			}
 		})
 	}
