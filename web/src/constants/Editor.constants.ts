@@ -5,7 +5,9 @@ export enum Tokens {
   SpanMatch = 'SpanMatch',
   BaseComparator = 'BaseComparator',
   ComparatorValue = 'ComparatorValue',
+  ComposedValue = 'ComposedValue',
   Identifier = 'Identifier',
+  Comparator = 'Comparator',
   Operator = 'Operator',
   Number = 'Number',
   String = 'String',
@@ -14,6 +16,7 @@ export enum Tokens {
   Source = 'Source',
   OutsideInput = 'OutsideInput',
   Pipe = 'Pipe',
+  OpenInterpolation = 'OpenInterpolation',
 }
 
 export const completeIdentifierAfter: string[] = [
@@ -28,7 +31,7 @@ export const completeValueAfter: string[] = [Tokens.ComparatorValue];
 export const completePseudoSelectorAfter: string[] = [Tokens.ClosingBracket];
 export const completeSourceAfter: string[] = [Tokens.Source];
 
-export const operatorList = [
+export const comparatorList = [
   {
     label: CompareOperatorSymbolMap.EQUALS,
     type: 'operatorKeyword',
@@ -68,3 +71,31 @@ export enum SupportedEditors {
   Expression = 'Expression',
   CurlCommand = 'CurlCommand',
 }
+
+export const operatorList = [
+  {type: 'operatorKeyword', label: '+', apply: '+'},
+  {type: 'operatorKeyword', label: '-', apply: '-'},
+  {type: 'operatorKeyword', label: '*', apply: '*'},
+  {type: 'operatorKeyword', label: '/', apply: '/'},
+  {type: 'operatorKeyword', label: '%', apply: '%'},
+  {type: 'operatorKeyword', label: '^', apply: '^'},
+];
+
+export const SourceByEditorType = {
+  [SupportedEditors.Expression]: [
+    {
+      label: 'env:',
+      type: 'variableName',
+    },
+    {
+      label: 'attr:',
+      type: 'variableName',
+    },
+  ],
+  [SupportedEditors.Interpolation]: [
+    {
+      label: 'env:',
+      type: 'variableName',
+    },
+  ],
+} as const;

@@ -1,13 +1,13 @@
 import CodeMirror from '@uiw/react-codemirror';
-// import {autocompletion} from '@codemirror/autocomplete';
-// import {hoverTooltip} from '@codemirror/view';
-// import {useMemo} from 'react';
-// import {interpolationQL} from './grammar';
+import {autocompletion} from '@codemirror/autocomplete';
+import {hoverTooltip} from '@codemirror/view';
+import {useMemo} from 'react';
+import {interpolationQL} from './grammar';
 import useEditorTheme from '../hooks/useEditorTheme';
 import {IEditorProps} from '../Editor';
-// import useAutoComplete from './hooks/useAutoComplete';
+import useAutoComplete from './hooks/useAutoComplete';
 import * as S from '../Editor.styled';
-// import useTooltip from '../hooks/useTooltip';
+import useTooltip from '../hooks/useTooltip';
 
 const Interpolation = ({
   basicSetup: {lineNumbers, ...basicSetup} = {},
@@ -17,13 +17,13 @@ const Interpolation = ({
   extensions = [],
 }: IEditorProps) => {
   const editorTheme = useEditorTheme();
-  // const completionFn = useAutoComplete();
-  // const tooltipFn = useTooltip();
+  const completionFn = useAutoComplete();
+  const tooltipFn = useTooltip();
 
-  // const extensionList = useMemo(
-  //   () => [autocompletion({override: [completionFn]}), interpolationQL(), hoverTooltip(tooltipFn), ...extensions],
-  //   [completionFn, extensions, tooltipFn]
-  // );
+  const extensionList = useMemo(
+    () => [autocompletion({override: [completionFn]}), interpolationQL(), hoverTooltip(tooltipFn), ...extensions],
+    [completionFn, extensions, tooltipFn]
+  );
 
   return (
     <S.InterpolationEditorContainer $showLineNumbers={lineNumbers}>
@@ -33,7 +33,7 @@ const Interpolation = ({
         data-cy="interpolation-editor"
         value={value}
         maxHeight="120px"
-        extensions={extensions}
+        extensions={extensionList}
         onChange={onChange}
         spellCheck={false}
         theme={editorTheme}

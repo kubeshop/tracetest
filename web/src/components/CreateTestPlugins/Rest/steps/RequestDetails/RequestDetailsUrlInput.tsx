@@ -1,6 +1,8 @@
-import {Form, Input, Select} from 'antd';
+import {Form, Select} from 'antd';
 import {HTTP_METHOD} from 'constants/Common.constants';
 import Validator from 'utils/Validator';
+import {SupportedEditors} from 'constants/Editor.constants';
+import Editor from 'components/Editor';
 import * as S from './RequestDetails.styled';
 
 interface IProps {
@@ -57,7 +59,7 @@ const RequestDetailsUrlInput = ({showMethodSelector = true, shouldValidateUrl = 
           ]}
           style={{flex: 1}}
         >
-          <Input placeholder="Enter request url" />
+          <Editor type={SupportedEditors.Interpolation} placeholder="Enter request url" />
         </Form.Item>
       </S.URLInputContainer>
     </div>
