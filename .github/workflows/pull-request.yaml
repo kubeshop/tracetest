@@ -5,8 +5,6 @@ on:
       - opened
       - reopened
       - synchronize
-    branches:
-      - main
     paths:
       - .github/workflows/pull-request.yaml
       - api/**
@@ -272,11 +270,6 @@ jobs:
           cluster_name: ${{ secrets.GKE_CLUSTER }}
           location: ${{ secrets.GKE_ZONE }}
           credentials: ${{ secrets.GKE_SA_KEY }}
-
-      - name: Build Current CLI
-        run: |
-          cd cli
-          go build -o ./tracetest main.go
 
       - name: Build Current CLI
         run: |
