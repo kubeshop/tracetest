@@ -38,7 +38,7 @@ Tracetest is a OpenTelemetry based tool that helps you develop and test your dis
 
 - verify the quality of your OpenTelemetry instrumentation and enforce standards.
 - Testing events that occur on 'the other side' of an async message queue, even though the original async call has returned earlier.
-- Assertions based on the timing of different steps in your process.
+- Assertions based on the timing of different steps in your process, such as specifying maximum return time for a SQL query or an external HTTP call.
 - Wildcard assertions across common types of activities, ie all gRPC return codes should be 0, all database calls should happen in less than 100ms.
 - Testing long running processes instrumented with OpenTelemetry tracing to assert proper operation deep in the process.
 
@@ -88,7 +88,7 @@ The Tracetest [test definition files](https://docs.tracetest.io/test-definition-
 
 - executes POST against the pokemon/import endpoint.
 - verifies that the HTTP blocks return a 200 status code.
-- verifies all database calls execute in less than 200ms.
+- verifies all database calls execute in less than 50ms.
 
 ```yaml
 id: 5dd03dda-fad2-49f0-b9d9-5143b746c1d0
