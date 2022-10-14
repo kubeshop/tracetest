@@ -45,6 +45,15 @@ func TestSimpleParsingRules(t *testing.T) {
 			},
 		},
 		{
+			Name:  "should_parse_variables",
+			Query: `var:var1 = var:var2`,
+			ExpectedOutput: expression.Statement{
+				Left:       varExpr("var1"),
+				Comparator: "=",
+				Right:      varExpr("var2"),
+			},
+		},
+		{
 			Name:  "should_parse_abc=abc",
 			Query: `"abc" = "abc"`,
 			ExpectedOutput: expression.Statement{
@@ -443,6 +452,15 @@ func attrExpr(attrName string) expression.Expr {
 	return expression.Expr{
 		Left: &expression.Term{
 			Attribute: attrp(attrName),
+		},
+	}
+}
+
+func varExpr(varName string) expression.Expr {
+	variableObject := expression.NewVariable(varName)
+	return expression.Expr{
+		Left: &expression.Term{
+			Variable: &variableObject,
 		},
 	}
 }
