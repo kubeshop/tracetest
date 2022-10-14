@@ -38,14 +38,14 @@ trigger:
 specs:
 - selector: span[name = "Tracetest trigger"]
   assertions:
-    - attr:tracetest.selected_spans.count = 1
-    - attr:tracetest.response.status = 200
+    - tracetest.selected_spans.count = 1
+    - tracetest.response.status = 200
 - selector: span[name="POST /api/tests" tracetest.span.type="http"]
   assertions:
-  - attr:tracetest.selected_spans.count = 1
+  - tracetest.selected_spans.count = 1
 - selector: span[name = "exec INSERT"]
   assertions:
-  - attr:tracetest.selected_spans.count = 1
+  - tracetest.selected_spans.count = 1
 - selector: span[name = "exec INSERT"]:first
   assertions:
-  - attr:sql.query contains "INSERT INTO tests"
+  - sql.query contains "INSERT INTO tests"

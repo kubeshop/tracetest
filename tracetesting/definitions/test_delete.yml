@@ -12,12 +12,12 @@ trigger:
 specs:
 - selector: span[name = "Tracetest trigger"]
   assertions:
-    - attr:tracetest.selected_spans.count = 1
-    - attr:tracetest.response.status = 204
+    - tracetest.selected_spans.count = 1
+    - tracetest.response.status = 204
 - selector: span[name="DELETE /api/tests/{testId}" tracetest.span.type="http"]
   assertions:
-  - attr:tracetest.selected_spans.count = 1
+  - tracetest.selected_spans.count = 1
 - selector: span[name = "exec DELETE"]
   assertions:
   # must delete test and runs. That's why we need 2 deletes
-  - attr:tracetest.selected_spans.count = 2
+  - tracetest.selected_spans.count = 2

@@ -12,11 +12,11 @@ trigger:
 specs:
 - selector: span[name = "Tracetest trigger"]
   assertions:
-    - attr:tracetest.selected_spans.count = 1
-    - attr:tracetest.response.status = 204
+    - tracetest.selected_spans.count = 1
+    - tracetest.response.status = 204
 - selector: span[name="DELETE /api/tests/{testId}/run/{runId}" tracetest.span.type="http"]
   assertions:
-  - attr:tracetest.selected_spans.count = 1
+  - tracetest.selected_spans.count = 1
 - selector: span[name = "exec DELETE"]
   assertions:
-  - attr:tracetest.selected_spans.count = 1
+  - tracetest.selected_spans.count = 1
