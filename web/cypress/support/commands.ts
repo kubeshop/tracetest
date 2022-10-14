@@ -198,6 +198,8 @@ Cypress.Commands.add('createAssertion', (index = 0) => {
   cy.get(`[data-cy=trace-node-database]`, {timeout: 25000}).first().click({force: true});
   cy.get('[data-cy=add-test-spec-button]').click({force: true});
   cy.get('[data-cy=assertion-form]', {timeout: 10000}).should('be.visible');
+
+  cy.get('[data-cy=editor-fallback]').should('not.exist');
   cy.get('[data-cy=assertion-check-attribute]').type('db');
   const attributeListId = getAttributeListId(index);
   cy.get(`${attributeListId} + div .ant-select-item:nth-child(2)`).first().click({force: true});
