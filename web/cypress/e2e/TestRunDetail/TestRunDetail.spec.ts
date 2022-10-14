@@ -23,7 +23,7 @@ describe('Test Run Detail Views', () => {
     cy.get('[data-cy=add-test-spec-button]').click({force: true});
 
     cy.get('[data-cy=assertion-form]', {timeout: 10000}).should('be.visible');
-    cy.get('[data-cy=advanced-selector] [contenteditable]').clear();
+    cy.get('[data-cy=selector-editor] [contenteditable]').clear();
     cy.get('[data-cy=assertion-check-attribute]').type('db.name');
     const attributeListId = getAttributeListId(0);
     cy.get(`${attributeListId} + div .ant-select-item:nth-child(2)`).first().click({force: true});
