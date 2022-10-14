@@ -18,7 +18,7 @@ When building assertions, you might need to assert if a certain span contains an
 attr:service.name = "cart-api"
 ```
 
-### **Reference Span Attributes**
+### **Reference Variables**
 
 Tracetest allows you to create variables based on the trace obtained by the test to enable assertions that require values from other spans. Variables use the prefix `var:` and its name. For example, a variable called `user_id` would be referenced as `var:user_id` in an expression.
 
