@@ -3,12 +3,7 @@
 Trace-based testing. End-to-end tests powered by your OpenTelemetry Traces.
 
 <p align="center">
-  <a target="_new" href="https://www.youtube.com/watch?v=WMRicNlaehc">
-    <img src="https://img.youtube.com/vi/WMRicNlaehc/0.jpg" style="width:66%;height:auto">
-    <p align="center">
-      Click on the image or this link to watch the "Tracetest Intro Video" video (7 mins)
-    </p>
-  </a>
+ <script src="https://fast.wistia.com/embed/medias/dw06408oqz.jsonp" async></script><script src="https://fast.wistia.com/assets/external/E-v1.js" async></script><div class="wistia_responsive_padding" style="padding:56.25% 0 0 0;position:relative;"><div class="wistia_responsive_wrapper" style="height:100%;left:0;position:absolute;top:0;width:100%;"><div class="wistia_embed wistia_async_dw06408oqz videoFoam=true" style="height:100%;position:relative;width:100%"><div class="wistia_swatch" style="height:100%;left:0;opacity:0;overflow:hidden;position:absolute;top:0;transition:opacity 200ms;width:100%;"><img src="https://fast.wistia.com/embed/medias/dw06408oqz/swatch" style="filter:blur(5px);height:100%;object-fit:contain;width:100%;" alt="" aria-hidden="true" onload="this.parentNode.style.opacity=1;" /></div></div></div></div>
 </p>
 
 Tracetest allows you to quickly build integration and e2e tests, powered by your OpenTelementry traces.
