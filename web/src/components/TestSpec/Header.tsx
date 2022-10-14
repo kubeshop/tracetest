@@ -1,8 +1,6 @@
-import {EditorView} from '@codemirror/view';
-
-import useEditorTheme from 'components/AdvancedEditor/hooks/useEditorTheme';
 import {singularOrPlural} from 'utils/Common';
-import {tracetest} from 'utils/grammar';
+import {SupportedEditors} from 'constants/Editor.constants';
+import Editor from 'components/Editor';
 import * as S from './TestSpec.styled';
 
 interface IProps {
@@ -13,17 +11,13 @@ interface IProps {
 }
 
 const Header = ({affectedSpans, assertionsFailed, assertionsPassed, title}: IProps) => {
-  const editorTheme = useEditorTheme({isEditable: false});
-
   return (
     <S.Column>
-      <S.HeaderTitle
-        data-cy="advanced-selector"
+      <Editor
+        type={SupportedEditors.Selector}
         editable={false}
-        extensions={[tracetest(), editorTheme, EditorView.lineWrapping]}
-        maxHeight="120px"
+        basicSetup={{lineNumbers: false}}
         placeholder="Selecting All Spans"
-        spellCheck={false}
         value={title || 'All Spans'}
       />
 

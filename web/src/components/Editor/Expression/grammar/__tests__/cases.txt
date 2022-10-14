@@ -1,0 +1,48 @@
+# Right side interpolation
+
+attr:tracetest.span.type = "${env:TRACETEST_SPAN_TYPE}"
+
+==>
+
+Program(Expression(ComposedValue(OutsideInput(Source,Identifier))),Comparator,Expression(ComposedValue(ComposedString(Quotes,Interpolation(OpenInterpolation,OutsideInput(Source,Identifier),CloseInterpolation),Quotes))))
+
+
+# Expression for both sides
+
+attr:tracetest.span.duration + 2 = 5 + env:TRACETEST_SPAN_DURATION
+
+==>
+
+Program(Expression(ComposedValue(OutsideInput(Source,Identifier)),Operator,ComposedValue(Number)),Comparator,Expression(ComposedValue(Number),Operator,ComposedValue(OutsideInput(Source,Identifier))))
+
+# Raw Arithmetic Operation
+
+5 + 5 = 10
+
+==>
+
+Program(Expression(ComposedValue(Number),Operator,ComposedValue(Number)),Comparator,Expression(ComposedValue(Number)))
+
+# Raw Logic Operation
+
+10 != 20
+
+==>
+
+Program(Expression(ComposedValue(Number)),Comparator,Expression(ComposedValue(Number)))
+
+# String Concatenation Expression
+
+"Jorge" = "Ecuador" + attr:http.message
+
+==>
+
+Program(Expression(ComposedValue(ComposedString(Quotes,String,Quotes))),Comparator,Expression(ComposedValue(ComposedString(Quotes,String,Quotes)),Operator,ComposedValue(OutsideInput(Source,Identifier))))
+
+# String Interpolation
+
+attr:http.message = "error at line ${attr:tracetest.span.duration}"
+
+==>
+
+ Program(Expression(ComposedValue(OutsideInput(Source,Identifier))),Comparator,Expression(ComposedValue(ComposedString(Quotes,String,Interpolation(OpenInterpolation,OutsideInput(Source,Identifier),CloseInterpolation),Quotes))))

@@ -1,0 +1,41 @@
+@top Program { expression }
+
+@skip { space }
+
+// attr:tracetest.span.type = "${env:TRACETEST_SPAN_TYPE}"
+// att:tracetest.span.duration + 2 = 5 + env:TRACETEST_SPAN_DURATION
+// 5 + 5 = 10
+// 10 != 20
+// "Jorge" == "Ecuador" + ${attr:http.message}
+// att:http.message = "error at line ${attr:tracetest.span.duration}"
+
+expression {Expression Comparator Expression}
+
+Expression {ComposedValue (Operator ComposedValue)*}
+ComposedValue {OutsideInput (Pipe SupportedParsers)* | Number | ComposedString}
+OutsideInput {Source Identifier}
+Interpolation {OpenInterpolation OutsideInput CloseInterpolation}
+ComposedString {Quotes (Interpolation | String)+ Quotes}
+SupportedParsers {JsonPath}
+JsonPath {"json_path '" Identifier "'"}
+
+@tokens {
+  Identifier { $[a-zA-Z_.\-0-9]+ }
+  Pipe {"|"}
+  Number { @digit+ }
+  Comparator {"=" | "contains" | "!=" | "<" | ">" | "<=" | ">=" | "not-contains" }
+  Operator {"+" | "-" | "*" | "/" | "%" | "^" }
+  String {(![${}"])+}
+  Quotes {'"'}
+  OpenInterpolation { "${" }
+  CloseInterpolation { "}" }
+  Colon { ":" }
+  Source { ("env" | "attr") Colon }
+
+  @precedence { OpenInterpolation, String }
+  @precedence { String, space }
+
+  space { @whitespace+ }
+}
+
+@detectDelim

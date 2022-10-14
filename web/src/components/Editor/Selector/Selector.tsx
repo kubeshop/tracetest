@@ -2,47 +2,45 @@ import {autocompletion} from '@codemirror/autocomplete';
 import {linter} from '@codemirror/lint';
 import {EditorView} from '@codemirror/view';
 import CodeMirror from '@uiw/react-codemirror';
-import {noop} from 'lodash';
 import {useMemo} from 'react';
+import {useTest} from 'providers/Test/Test.provider';
+import {useTestRun} from 'providers/TestRun/TestRun.provider';
 
-import {tracetest} from 'utils/grammar';
-import * as S from './AdvancedEditor.styled';
+import {selectorQL} from './grammar';
 import useAutoComplete from './hooks/useAutoComplete';
-import useEditorTheme from './hooks/useEditorTheme';
+import useEditorTheme from '../hooks/useEditorTheme';
 import useLint from './hooks/useLint';
+import {IEditorProps} from '../Editor';
+import * as S from '../Editor.styled';
 
-interface IProps {
-  lineNumbers?: boolean;
-  onChange?(value: string): void;
-  placeholder?: string;
-  runId: string;
-  testId: string;
-  value?: string;
-}
-
-const AdvancedEditor = ({
-  lineNumbers = false,
-  onChange = noop,
+const Selector = ({
+  basicSetup,
+  onChange,
   placeholder = 'Leaving it empty will select All Spans',
-  runId,
-  testId,
-  value = '',
-}: IProps) => {
+  value,
+  editable = true,
+}: IEditorProps) => {
+  const {
+    test: {id: testId},
+  } = useTest();
+  const {
+    run: {id: runId},
+  } = useTestRun();
   const completionFn = useAutoComplete({testId, runId});
   const lintFn = useLint({testId, runId});
   const editorTheme = useEditorTheme();
 
   const extensionList = useMemo(
-    () => [autocompletion({override: [completionFn]}), linter(lintFn), tracetest(), EditorView.lineWrapping],
+    () => [autocompletion({override: [completionFn]}), linter(lintFn), selectorQL(), EditorView.lineWrapping],
     [completionFn, lintFn]
   );
 
   return (
-    <S.AdvancedEditor>
+    <S.SelectorEditorContainer $isEditable={editable}>
       <CodeMirror
-        id="advanced-editor"
-        basicSetup={{lineNumbers}}
-        data-cy="advanced-selector"
+        id="selector-editor"
+        basicSetup={basicSetup}
+        data-cy="selector-editor"
         value={value}
         maxHeight="120px"
         extensions={extensionList}
@@ -51,9 +49,10 @@ const AdvancedEditor = ({
         autoFocus
         theme={editorTheme}
         placeholder={placeholder}
+        editable={editable}
       />
-    </S.AdvancedEditor>
+    </S.SelectorEditorContainer>
   );
 };
 
-export default AdvancedEditor;
+export default Selector;

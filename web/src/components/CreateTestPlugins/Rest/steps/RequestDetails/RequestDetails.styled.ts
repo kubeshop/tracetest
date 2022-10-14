@@ -11,8 +11,9 @@ export const Label = styled(Typography.Text).attrs({as: 'div'})`
 `;
 
 export const URLInputContainer = styled.div`
-  display: flex;
+  display: grid;
   align-items: flex-start;
+  grid-template-columns: 20% 80%;
 
   .ant-form-item {
     margin: 0;
@@ -21,7 +22,9 @@ export const URLInputContainer = styled.div`
 
 export const HeaderContainer = styled.div`
   align-items: center;
-  display: flex;
+  display: grid;
+  justify-content: center;
+  grid-template-columns: 40% 40% 19%;
   margin-bottom: 8px;
 `;
 

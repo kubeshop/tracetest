@@ -1,4 +1,5 @@
 import {json, jsonLanguage, jsonParseLinter} from '@codemirror/lang-json';
+import {Extension} from '@codemirror/state';
 import {xml, xmlLanguage} from '@codemirror/lang-xml';
 import {LanguageSupport} from '@codemirror/language';
 import {Diagnostic, linter, lintGutter} from '@codemirror/lint';
@@ -7,7 +8,7 @@ import {XMLValidator} from 'fast-xml-parser';
 import {useMemo} from 'react';
 import {BodyMode} from './useBodyMode';
 
-export function useLanguageExtensionsMemo(bodyMode: BodyMode): any[] {
+export function useLanguageExtensionsMemo(bodyMode: BodyMode): Extension[] {
   return useMemo(() => {
     switch (bodyMode) {
       case 'xml':

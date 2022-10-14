@@ -28,5 +28,9 @@ declare module 'styled-components' {
       lg: string;
       xl: string;
     };
+    /** Font defaults */
+    font: {
+      family: string;
+    };
   }
 }

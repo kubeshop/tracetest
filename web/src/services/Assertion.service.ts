@@ -2,8 +2,8 @@ import countBy from 'lodash/countBy';
 import uniq from 'lodash/uniq';
 
 import {ICheckResult, TAssertionResult, TRawAssertionResult} from 'types/Assertion.types';
-import {durationRegExp} from '../constants/Common.constants';
-import {Attributes} from '../constants/SpanAttribute.constants';
+import {durationRegExp} from 'constants/Common.constants';
+import {Attributes} from 'constants/SpanAttribute.constants';
 
 const isNumeric = (num: string): boolean => /^-?\d+(?:\.\d+)?$/.test(num);
 const isNumericTime = (num: string): boolean => durationRegExp.test(num);

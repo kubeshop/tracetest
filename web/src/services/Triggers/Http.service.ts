@@ -11,7 +11,7 @@ const HttpTriggerService = (): ITriggerService => ({
 
   async validateDraft(draft): Promise<boolean> {
     const {url, method} = draft as IHttpValues;
-    return Validator.required(url) && Validator.required(method) && Validator.url(url);
+    return Validator.required(url) && Validator.required(method);
   },
 
   getInitialValues(request) {

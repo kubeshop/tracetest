@@ -1,6 +1,7 @@
 import {useCallback, useState} from 'react';
 import {TOutput} from 'types/Output.types';
-import SelectorService from 'services/Selector.service';
+import {SupportedEditors} from 'constants/Editor.constants';
+import useEditorValidate from 'components/Editor/hooks/useEditorValidate';
 
 interface IProps {
   spanIdList: string[];
@@ -8,6 +9,8 @@ interface IProps {
 
 const useValidateOutput = ({spanIdList}: IProps) => {
   const [isFormValid, setIsFormValid] = useState(false);
+
+  const getIsValidSelector = useEditorValidate();
 
   const onValidate = useCallback(
     async (changedValues: any, {source, selector, attribute}: TOutput) => {
@@ -18,13 +21,13 @@ const useValidateOutput = ({spanIdList}: IProps) => {
           isBaseValid &&
             spanIdList.length === 1 &&
             Boolean(selector) &&
-            SelectorService.getIsValidSelector(selector || '')
+            getIsValidSelector(SupportedEditors.Selector, selector || '')
         );
       } else {
         setIsFormValid(isBaseValid);
       }
     },
-    [spanIdList.length]
+    [getIsValidSelector, spanIdList.length]
   );
 
   return {isValid: isFormValid, onValidate};

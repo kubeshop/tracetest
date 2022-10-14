@@ -21,7 +21,6 @@ const RequestDetailsUrlInput = ({showMethodSelector = true, shouldValidateUrl = 
                 className="select-method"
                 data-cy="method-select"
                 dropdownClassName="select-dropdown-method"
-                style={{minWidth: 120}}
                 filterOption={(input, option) => option?.key?.toLowerCase().includes(input.toLowerCase())}
               >
                 {Object.keys(HTTP_METHOD).map(method => {
@@ -38,6 +37,7 @@ const RequestDetailsUrlInput = ({showMethodSelector = true, shouldValidateUrl = 
 
         <Form.Item
           name="url"
+          data-cy="url"
           rules={[
             {
               validator: async (_, value: string) => {
@@ -57,7 +57,7 @@ const RequestDetailsUrlInput = ({showMethodSelector = true, shouldValidateUrl = 
           ]}
           style={{flex: 1}}
         >
-          <Input data-cy="url" placeholder="Enter request url" />
+          <Input placeholder="Enter request url" />
         </Form.Item>
       </S.URLInputContainer>
     </div>

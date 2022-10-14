@@ -23,4 +23,7 @@ export const theme: DefaultTheme = {
     lg: '16px',
     xl: '18px',
   },
+  font: {
+    family: 'SFPro',
+  },
 };
