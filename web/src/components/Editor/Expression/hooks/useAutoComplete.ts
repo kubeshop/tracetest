@@ -6,9 +6,9 @@ import {completeSourceAfter, parserList, Tokens} from 'constants/Editor.constant
 import {useAppStore} from 'redux/hooks';
 import AssertionSelectors from 'selectors/Assertion.selectors';
 import SpanSelectors from 'selectors/Span.selectors';
+import Env from 'utils/Env';
 
-const {demoEndpoints = '{}'} = window.ENV || {};
-const {PokeshopHttp = ''}: Record<string, string> = JSON.parse(demoEndpoints);
+const {PokeshopHttp = ''} = Env.get('demoEndpoints');
 
 const environmentList = [
   {

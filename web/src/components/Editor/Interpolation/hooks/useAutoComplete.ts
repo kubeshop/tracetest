@@ -2,9 +2,9 @@ import {useCallback} from 'react';
 import {CompletionContext} from '@codemirror/autocomplete';
 import {syntaxTree} from '@codemirror/language';
 import {completeSourceAfter, parserList, Tokens} from 'constants/Editor.constants';
+import Env from 'utils/Env';
 
-const {demoEndpoints = '{}'} = window.ENV || {};
-const {PokeshopHttp = ''}: Record<string, string> = JSON.parse(demoEndpoints);
+const {PokeshopHttp = ''} = Env.get('demoEndpoints');
 
 const environmentList = [
   {

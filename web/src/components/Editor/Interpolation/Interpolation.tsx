@@ -26,7 +26,7 @@ const Interpolation = ({
   // );
 
   return (
-    <S.InterpolationContainer $showLineNumbers={lineNumbers}>
+    <S.InterpolationEditorContainer $showLineNumbers={lineNumbers}>
       <CodeMirror
         id="interpolation-editor"
         basicSetup={{...basicSetup, lineNumbers}}
@@ -40,7 +40,7 @@ const Interpolation = ({
         placeholder={placeholder}
         indentWithTab={false}
       />
-    </S.InterpolationContainer>
+    </S.InterpolationEditorContainer>
   );
 };
 

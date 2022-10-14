@@ -15,7 +15,7 @@ import useAutoComplete from './hooks/useAutoComplete';
 const Expression = ({
   basicSetup,
   onChange,
-  placeholder = 'Leaving it empty will select All Spans',
+  placeholder,
   value = '',
   editable = true,
   extensions = [],

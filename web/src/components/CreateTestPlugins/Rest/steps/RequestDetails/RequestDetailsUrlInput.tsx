@@ -1,6 +1,6 @@
 import {Form, Input, Select} from 'antd';
 import {HTTP_METHOD} from 'constants/Common.constants';
-import Validator from '../../../../../utils/Validator';
+import Validator from 'utils/Validator';
 import * as S from './RequestDetails.styled';
 
 interface IProps {

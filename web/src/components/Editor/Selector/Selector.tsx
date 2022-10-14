@@ -13,7 +13,13 @@ import useLint from './hooks/useLint';
 import {IEditorProps} from '../Editor';
 import * as S from '../Editor.styled';
 
-const Selector = ({basicSetup, onChange, placeholder, value, editable = true}: IEditorProps) => {
+const Selector = ({
+  basicSetup,
+  onChange,
+  placeholder = 'Leaving it empty will select All Spans',
+  value,
+  editable = true,
+}: IEditorProps) => {
   const {
     test: {id: testId},
   } = useTest();

@@ -70,7 +70,7 @@ export const ExpressionEditorContainer = styled(EditorContainer)<{$isEditable: b
   }
 `;
 
-export const InterpolationContainer = styled(EditorContainer)<{$showLineNumbers?: boolean}>`
+export const InterpolationEditorContainer = styled(EditorContainer)<{$showLineNumbers?: boolean}>`
   && {
     ${({$showLineNumbers = false}) =>
       !$showLineNumbers &&
