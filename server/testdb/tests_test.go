@@ -83,60 +83,63 @@ func TestGetTests(t *testing.T) {
 	t.Run("Order", func(t *testing.T) {
 		actual, err := db.GetTests(context.TODO(), 20, 0, "", "", "")
 		require.NoError(t, err)
-		assert.Len(t, actual, 3)
+
+		assert.Len(t, actual.Items, 3)
+		assert.Equal(t, actual.TotalCount, 3)
 
 		// test order
-		assert.Equal(t, "three", actual[0].Name)
-		assert.Equal(t, "two", actual[1].Name)
-		assert.Equal(t, "one", actual[2].Name)
+		assert.Equal(t, actual.TotalCount, 3)
+		assert.Equal(t, "three", actual.Items[0].Name)
+		assert.Equal(t, "two", actual.Items[1].Name)
+		assert.Equal(t, "one", actual.Items[2].Name)
 	})
 
 	t.Run("Pagination", func(t *testing.T) {
 		actual, err := db.GetTests(context.TODO(), 20, 10, "", "", "")
 		require.NoError(t, err)
-		assert.Len(t, actual, 0)
+
+		assert.Equal(t, actual.TotalCount, 3)
+		assert.Len(t, actual.Items, 0)
 	})
 
 	t.Run("SortByCreated", func(t *testing.T) {
 		actual, err := db.GetTests(context.TODO(), 20, 0, "", "created", "")
 		require.NoError(t, err)
-		assert.Len(t, actual, 3)
 
 		// test order
-		assert.Equal(t, "three", actual[0].Name)
-		assert.Equal(t, "two", actual[1].Name)
-		assert.Equal(t, "one", actual[2].Name)
+		assert.Equal(t, "three", actual.Items[0].Name)
+		assert.Equal(t, "two", actual.Items[1].Name)
+		assert.Equal(t, "one", actual.Items[2].Name)
 	})
 
 	t.Run("SortByNameAsc", func(t *testing.T) {
 		actual, err := db.GetTests(context.TODO(), 20, 0, "", "name", "asc")
 		require.NoError(t, err)
-		assert.Len(t, actual, 3)
 
 		// test order
-		assert.Equal(t, "one", actual[0].Name)
-		assert.Equal(t, "three", actual[1].Name)
-		assert.Equal(t, "two", actual[2].Name)
+		assert.Equal(t, "one", actual.Items[0].Name)
+		assert.Equal(t, "three", actual.Items[1].Name)
+		assert.Equal(t, "two", actual.Items[2].Name)
 	})
 
 	t.Run("SortByNameDesc", func(t *testing.T) {
 		actual, err := db.GetTests(context.TODO(), 20, 0, "", "name", "desc")
 		require.NoError(t, err)
-		assert.Len(t, actual, 3)
 
 		// test order
-		assert.Equal(t, "two", actual[0].Name)
-		assert.Equal(t, "three", actual[1].Name)
-		assert.Equal(t, "one", actual[2].Name)
+		assert.Equal(t, "two", actual.Items[0].Name)
+		assert.Equal(t, "three", actual.Items[1].Name)
+		assert.Equal(t, "one", actual.Items[2].Name)
 	})
 
 	t.Run("SearchByName", func(t *testing.T) {
 		_, _ = db.CreateTest(context.TODO(), model.Test{Name: "VerySpecificName"})
 		actual, err := db.GetTests(context.TODO(), 10, 0, "specif", "", "")
 		require.NoError(t, err)
-		assert.Len(t, actual, 1)
+		assert.Len(t, actual.Items, 1)
+		assert.Equal(t, actual.TotalCount, 1)
 
-		assert.Equal(t, "VerySpecificName", actual[0].Name)
+		assert.Equal(t, "VerySpecificName", actual.Items[0].Name)
 	})
 
 	t.Run("SearchByDescription", func(t *testing.T) {
@@ -144,9 +147,10 @@ func TestGetTests(t *testing.T) {
 
 		actual, err := db.GetTests(context.TODO(), 10, 0, "nique", "", "")
 		require.NoError(t, err)
-		assert.Len(t, actual, 1)
+		assert.Len(t, actual.Items, 1)
+		assert.Equal(t, actual.TotalCount, 1)
 
-		assert.Equal(t, "VeryUniqueText", actual[0].Description)
+		assert.Equal(t, "VeryUniqueText", actual.Items[0].Description)
 	})
 }
 
@@ -168,9 +172,10 @@ func TestGetTestsWithMultipleVersions(t *testing.T) {
 
 	tests, err := db.GetTests(context.TODO(), 20, 0, "", "", "")
 	assert.NoError(t, err)
-	assert.Len(t, tests, 2)
+	assert.Len(t, tests.Items, 2)
+	assert.Equal(t, 2, tests.TotalCount)
 
-	for _, test := range tests {
+	for _, test := range tests.Items {
 		assert.Equal(t, 2, test.Version)
 	}
 }
@@ -228,13 +233,13 @@ func TestSummary(t *testing.T) {
 		tests, err := db.GetTests(context.TODO(), 20, 0, "", "", "")
 		require.NoError(t, err)
 
-		require.Len(t, tests, 1)
-		assert.Equal(t, tests[0].ID, test.ID)
+		require.Len(t, tests.Items, 1)
+		assert.Equal(t, tests.Items[0].ID, test.ID)
 
-		assert.Equal(t, 1, tests[0].Summary.Runs)
-		assert.WithinDuration(t, t1, tests[0].Summary.LastRun.Time, 0) // hack for comparing times
-		assert.Equal(t, 2, tests[0].Summary.LastRun.Passes)
-		assert.Equal(t, 0, tests[0].Summary.LastRun.Fails)
+		assert.Equal(t, 1, tests.Items[0].Summary.Runs)
+		assert.WithinDuration(t, t1, tests.Items[0].Summary.LastRun.Time, 0) // hack for comparing times
+		assert.Equal(t, 2, tests.Items[0].Summary.LastRun.Passes)
+		assert.Equal(t, 0, tests.Items[0].Summary.LastRun.Fails)
 	}
 
 	{
@@ -245,12 +250,12 @@ func TestSummary(t *testing.T) {
 		tests, err := db.GetTests(context.TODO(), 20, 0, "", "", "")
 		require.NoError(t, err)
 
-		require.Len(t, tests, 1)
-		assert.Equal(t, tests[0].ID, test.ID)
+		require.Len(t, tests.Items, 1)
+		assert.Equal(t, tests.Items[0].ID, test.ID)
 
-		assert.Equal(t, 2, tests[0].Summary.Runs)
-		assert.WithinDuration(t, t2, tests[0].Summary.LastRun.Time, 0) // hack for comparing times
-		assert.Equal(t, 1, tests[0].Summary.LastRun.Passes)
-		assert.Equal(t, 1, tests[0].Summary.LastRun.Fails)
+		assert.Equal(t, 2, tests.Items[0].Summary.Runs)
+		assert.WithinDuration(t, t2, tests.Items[0].Summary.LastRun.Time, 0) // hack for comparing times
+		assert.Equal(t, 1, tests.Items[0].Summary.LastRun.Passes)
+		assert.Equal(t, 1, tests.Items[0].Summary.LastRun.Fails)
 	}
 }

@@ -6,33 +6,20 @@ import Loading from '../Home/Loading';
 import NoResults from '../Home/NoResults';
 import * as S from './Environment.styled';
 import {EnvironmentCard} from './EnvironmentCard';
-import {IEnvironment} from './IEnvironment';
+import {TEnvironment} from '../../types/Environment.types';
 
 interface IProps {
   query: string;
   setIsFormOpen: Dispatch<SetStateAction<boolean>>;
-  setEnvironment: Dispatch<SetStateAction<IEnvironment | undefined>>;
+  setEnvironment: Dispatch<SetStateAction<TEnvironment | undefined>>;
 }
 
 const EnvironmentList = ({query, setEnvironment, setIsFormOpen}: IProps) => {
-  const {hasNext, hasPrev, isEmpty, isFetching, isLoading, list, loadNext, loadPrev} = usePagination<
-    IEnvironment,
-    {query: string}
-  >(useGetEnvListQuery, {query});
+  const pagination = usePagination<TEnvironment, {query: string}>(useGetEnvListQuery, {query});
   return (
-    <Pagination
-      emptyComponent={<NoResults />}
-      hasNext={hasNext}
-      hasPrev={hasPrev}
-      isEmpty={isEmpty}
-      isFetching={isFetching}
-      isLoading={isLoading}
-      loadingComponent={<Loading />}
-      loadNext={loadNext}
-      loadPrev={loadPrev}
-    >
+    <Pagination emptyComponent={<NoResults />} loadingComponent={<Loading />} {...pagination}>
       <S.TestListContainer data-cy="test-list">
-        {list?.map(environment => (
+        {pagination.list?.map(environment => (
           <EnvironmentCard
             key={environment.name}
             environment={environment}

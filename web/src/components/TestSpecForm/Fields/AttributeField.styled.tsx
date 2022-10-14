@@ -11,6 +11,7 @@ export const Container = styled.div`
 
 export const Select = styled(AntSelect)`
   min-width: 88px;
+
   > .ant-select-selector {
     min-height: 100%;
   }

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>tracetest</id>
+    <!-- %placeholder% will be replaced by the correct value in the CI pipeline -->
+    <version>%version%</version>
+    <title>tracetest</title>
+    <authors>Kubeshop</authors>
+    <projectUrl>https://tracetest.io</projectUrl>
+    <tags>tracetest opentelemetry trace-based-testing testing</tags>
+    <summary>Tracetest - the best way to develop and test your distributed system with OpenTelemetry</summary>
+    <description>Tracetest - the best way to develop and test your distributed system with OpenTelemetry</description>
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+  </files>
+</package>

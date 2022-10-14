@@ -41,6 +41,7 @@ Cypress.Commands.add('deleteTest', (shoudlIntercept = false) => {
     cy.wait('@testDelete');
     cy.get(`[data-cy=test-actions-button-${localTestId}]`).should('not.exist');
     cy.wait('@testList');
+    cy.clearLocalStorage();
   });
 });
 
@@ -100,7 +101,7 @@ Cypress.Commands.add('goToTestDetailPageAndRunTest', (pathname: string) => {
   cy.visit(`/test/${testId}`);
   cy.get('[data-cy^=run-card]', {timeout: 10000}).first().click();
   cy.makeSureUserIsOnTestDetailPage();
-  cy.makeSureUserIsOnTracePage(true);
+  cy.makeSureUserIsOnTracePage();
 });
 
 Cypress.Commands.add('makeSureUserIsOnTestDetailPage', () => {
@@ -108,11 +109,9 @@ Cypress.Commands.add('makeSureUserIsOnTestDetailPage', () => {
   cy.wait('@testObject');
 });
 
-Cypress.Commands.add('makeSureUserIsOnTracePage', (shouldCancelOnboarding = true) => {
+Cypress.Commands.add('makeSureUserIsOnTracePage', () => {
   cy.matchTestRunPageUrl();
-  if (shouldCancelOnboarding) {
-    cy.cancelOnBoarding();
-  }
+  cy.cancelOnBoarding();
 });
 
 Cypress.Commands.add('cancelOnBoarding', () => {
@@ -181,7 +180,9 @@ Cypress.Commands.add('clickNextOnCreateTestWizard', () => {
 
 Cypress.Commands.add('createTest', () => {
   cy.inteceptHomeApiCall();
+  cy.clearLocalStorage();
   cy.visit('/');
+  cy.clearLocalStorage();
   cy.openTestCreationModal();
   cy.clickNextOnCreateTestWizard();
   cy.selectTestFromDemoList();

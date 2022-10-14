@@ -28,9 +28,10 @@ func TestRun(config config.Config, colorsEnabled bool) testRun {
 }
 
 type TestRunOutput struct {
-	Test      openapi.Test    `json:"test"`
-	Run       openapi.TestRun `json:"testRun"`
-	RunWebURL string          `json:"testRunWebUrl"`
+	HasResults bool            `json:"-"`
+	Test       openapi.Test    `json:"test"`
+	Run        openapi.TestRun `json:"testRun"`
+	RunWebURL  string          `json:"testRunWebUrl"`
 }
 
 func (f testRun) Format(output TestRunOutput) string {
@@ -46,18 +47,21 @@ func (f testRun) Format(output TestRunOutput) string {
 
 func (f testRun) json(output TestRunOutput) string {
 	output.RunWebURL = f.getRunLink(output.Test.GetId(), output.Run.GetId())
-	bytes, err := json.Marshal(output)
+	bytes, err := json.MarshalIndent(output, "", "  ")
 	if err != nil {
 		panic(fmt.Errorf("could not marshal output json: %w", err))
 	}
 
-	return string(bytes)
-
+	return string(bytes) + "\n"
 }
 
 func (f testRun) pretty(output TestRunOutput) string {
 	if output.Run.State != nil && *output.Run.State == "FAILED" {
 		return f.getColoredText(false, fmt.Sprintf("Failed to execute test: %s", *output.Run.LastErrorState))
+	}
+
+	if !output.HasResults {
+		return f.formatSuccessfulTest(output.Test, output.Run)
 	}
 
 	if output.Run.Result.AllPassed == nil || !*output.Run.Result.AllPassed {

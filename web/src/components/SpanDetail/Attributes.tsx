@@ -1,9 +1,9 @@
 import {Tabs} from 'antd';
-import {capitalize} from 'lodash';
-import {useEffect, useMemo, useRef, useState} from 'react';
 
 import AttributeList from 'components/AttributeList';
 import {SemanticGroupNames} from 'constants/SemanticGroupNames.constants';
+import {capitalize} from 'lodash';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import TraceAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
 import SpanAttributeService from 'services/SpanAttribute.service';
 import {TResultAssertions} from 'types/Assertion.types';
@@ -14,9 +14,9 @@ import * as S from './SpanDetail.styled';
 interface IProps {
   assertions?: TResultAssertions;
   attributeList: TSpanFlatAttribute[];
-  onCreateTestSpec(attribute: TSpanFlatAttribute): void;
   searchText?: string;
   type: SemanticGroupNames;
+  onCreateTestSpec(attribute: TSpanFlatAttribute): void;
 }
 
 const Attributes = ({assertions, attributeList, onCreateTestSpec, searchText, type}: IProps) => {
@@ -41,7 +41,7 @@ const Attributes = ({assertions, attributeList, onCreateTestSpec, searchText, ty
         {sectionList.map(({section, attributeList: attrList}) => (
           <Tabs.TabPane
             tab={
-              <span>
+              <span data-cy={`attribute-tabs-${section.toLowerCase()}`}>
                 {capitalize(section)} {getObjectIncludesText(attrList, searchText) && <S.Dot />}
               </span>
             }

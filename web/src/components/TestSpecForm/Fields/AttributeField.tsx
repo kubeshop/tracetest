@@ -1,5 +1,4 @@
-import {Select} from 'antd';
-import {FormListFieldData} from 'antd/lib/form/FormList';
+import {FormItemProps, Select, Form} from 'antd';
 import {uniqBy} from 'lodash';
 import {ReactElement, useMemo, useState} from 'react';
 import SpanAttributeService from 'services/SpanAttribute.service';
@@ -8,14 +7,12 @@ import {OtelReference} from '../hooks/useGetOTELSemanticConventionAttributesInfo
 import * as S from './AttributeField.styled';
 import {useDropDownRenderComponent} from './useDropDownRenderComponent';
 
-interface IProps {
+interface IProps extends FormItemProps {
   attributeList: TSpanFlatAttribute[];
   reference: OtelReference;
-  field: Pick<FormListFieldData, never>;
-  name: number;
 }
 
-export const AttributeField = ({field, name, reference, attributeList}: IProps): ReactElement => {
+export const AttributeField = ({reference, attributeList, ...props}: IProps): ReactElement => {
   const [hoveredKey, setHoveredKey] = useState<string | undefined>(undefined);
   const [newAttribute, setNewAttribute] = useState<string | undefined>(undefined);
 
@@ -26,14 +23,7 @@ export const AttributeField = ({field, name, reference, attributeList}: IProps):
   }, [attributeList, newAttribute]);
 
   return (
-    <S.FormItem
-      {...field}
-      name={[name, 'attribute']}
-      rules={[{required: true, message: 'Attribute is required'}]}
-      data-cy="assertion-check-attribute"
-      id="assertion-check-attribute"
-      style={{flexBasis: '30%', width: 0}}
-    >
+    <Form.Item {...props}>
       <S.Select
         placeholder="Select Attribute"
         showSearch
@@ -44,7 +34,7 @@ export const AttributeField = ({field, name, reference, attributeList}: IProps):
 
           return itMatches;
         }}
-        onSearch={value => setNewAttribute(value)}
+        onSearch={sarchValue => setNewAttribute(sarchValue)}
       >
         {filteredAttributedList.map(({key}) => (
           <Select.Option key={key} value={key}>
@@ -54,6 +44,6 @@ export const AttributeField = ({field, name, reference, attributeList}: IProps):
           </Select.Option>
         ))}
       </S.Select>
-    </S.FormItem>
+    </Form.Item>
   );
 };

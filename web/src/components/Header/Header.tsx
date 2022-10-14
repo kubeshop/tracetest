@@ -1,39 +1,14 @@
-import {DownOutlined} from '@ant-design/icons';
-import {Dropdown, Menu, Space} from 'antd';
-
+import {Space} from 'antd';
 import {Link} from 'react-router-dom';
-
 import Logo from 'assets/Logo.svg';
 import * as S from './Header.styled';
 import HeaderMenu from './HeaderMenu';
+import EnvironmentSelector from '../EnvironmentSelector';
 
 interface IProps {
   hasEnvironments?: boolean;
   hasLogo?: boolean;
 }
-
-const menu = (
-  <Menu
-    items={[
-      {
-        key: '1',
-        label: (
-          <a target="_blank" rel="noopener noreferrer" href="#">
-            Env 1
-          </a>
-        ),
-      },
-      {
-        key: '2',
-        label: (
-          <a target="_blank" rel="noopener noreferrer" href="#">
-            Env 2
-          </a>
-        ),
-      },
-    ]}
-  />
-);
 
 const Header = ({hasEnvironments = false, hasLogo = false}: IProps) => (
   <S.Header>
@@ -46,16 +21,7 @@ const Header = ({hasEnvironments = false, hasLogo = false}: IProps) => (
     </div>
 
     <Space>
-      {hasEnvironments && (
-        <Dropdown overlay={menu}>
-          <a onClick={e => e.preventDefault()}>
-            <Space>
-              All environments
-              <DownOutlined />
-            </Space>
-          </a>
-        </Dropdown>
-      )}
+      {hasEnvironments && <EnvironmentSelector />}
 
       <HeaderMenu />
     </Space>

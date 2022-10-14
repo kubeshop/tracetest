@@ -1,9 +1,9 @@
 import faker from '@faker-js/faker';
-import {IEnvironment} from '../../pages/Environments/IEnvironment';
+import {TEnvironment} from '../../types/Environment.types';
 import {IMockFactory} from '../../types/Common.types';
 import Environment from '../Environment.model';
 
-const EnvironmentMock: IMockFactory<IEnvironment, IEnvironment> = () => ({
+const EnvironmentMock: IMockFactory<TEnvironment, TEnvironment> = () => ({
   raw(data = {}) {
     return {
       id: faker.datatype.uuid(),

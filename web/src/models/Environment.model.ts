@@ -1,7 +1,10 @@
-import {IEnvironment} from '../pages/Environments/IEnvironment';
+import {TEnvironment, TRawEnvironment} from 'types/Environment.types';
 
-const Environment = (props: IEnvironment): IEnvironment => ({
-  ...props,
+const Environment = ({id = '', name = '', description = '', variables = []}: TRawEnvironment): TEnvironment => ({
+  id,
+  name,
+  description,
+  variables,
 });
 
 export default Environment;

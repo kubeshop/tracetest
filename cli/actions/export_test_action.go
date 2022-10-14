@@ -5,8 +5,6 @@ import (
 	"fmt"
 
 	"github.com/kubeshop/tracetest/cli/config"
-	"github.com/kubeshop/tracetest/cli/conversion"
-	"github.com/kubeshop/tracetest/cli/definition"
 	"github.com/kubeshop/tracetest/cli/file"
 	"github.com/kubeshop/tracetest/cli/openapi"
 	"go.uber.org/zap"
@@ -15,6 +13,7 @@ import (
 type ExportTestConfig struct {
 	TestId     string
 	OutputFile string
+	Version    int32
 }
 
 type exportTestAction struct {
@@ -43,7 +42,7 @@ func (a exportTestAction) Run(ctx context.Context, args ExportTestConfig) error 
 	}
 
 	a.logger.Debug("exporting test", zap.String("testID", args.TestId), zap.String("outputFile", args.OutputFile))
-	definition, err := a.getDefinitionFromServer(ctx, args.TestId)
+	definition, err := a.getDefinitionFromServer(ctx, args)
 	if err != nil {
 		return fmt.Errorf("could not get definition from server: %w", err)
 	}
@@ -56,18 +55,24 @@ func (a exportTestAction) Run(ctx context.Context, args ExportTestConfig) error 
 	return nil
 }
 
-func (a exportTestAction) getDefinitionFromServer(ctx context.Context, testID string) (definition.Test, error) {
-	openapiTest, err := a.getTestFromServer(ctx, testID)
-	if err != nil {
-		return definition.Test{}, fmt.Errorf("could not get test from server: %w", err)
+func (a exportTestAction) getDefinitionFromServer(ctx context.Context, args ExportTestConfig) (string, error) {
+	expectedVersion := args.Version
+	if expectedVersion < 0 {
+		test, err := a.getTestFromServer(ctx, args.TestId)
+		if err != nil {
+			return "", fmt.Errorf("could not get test: %w", err)
+		}
+
+		expectedVersion = *test.Version
 	}
 
-	spec, err := conversion.ConvertOpenAPITestIntoSpecObject(openapiTest)
+	request := a.client.ApiApi.GetTestVersionDefinitionFile(ctx, args.TestId, expectedVersion)
+	definitionString, _, err := a.client.ApiApi.GetTestVersionDefinitionFileExecute(request)
 	if err != nil {
-		return definition.Test{}, fmt.Errorf("could not convert openapi object into a defintion object: %w", err)
+		return "", fmt.Errorf("could not get test definition: %w", err)
 	}
 
-	return spec, nil
+	return definitionString, nil
 }
 
 func (a exportTestAction) getTestFromServer(ctx context.Context, testID string) (openapi.Test, error) {

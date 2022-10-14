@@ -1,12 +1,16 @@
 import {Tabs} from 'antd';
 import {TriggerTypes} from 'constants/Test.constants';
-import TestRunAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
 import {TTriggerResult} from 'types/Test.types';
+import ExperimentalFeature from 'utils/ExperimentalFeature';
+import TestRunAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
 import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
 import {Steps} from '../GuidedTour/traceStepList';
 import ResponseBody from './ResponseBody';
 import ResponseHeaders from './ResponseHeaders';
+import ResponseOutputs from './ResponseOutputs';
 import * as S from './RunDetailTriggerResponse.styled';
+
+const isTransactionsEnabled = ExperimentalFeature.isEnabled('transactions');
 
 interface IProps {
   triggerResult?: TTriggerResult;
@@ -48,6 +52,11 @@ const RunDetailTriggerResponse = ({
           <Tabs.TabPane key="2" tab="Headers">
             <ResponseHeaders headers={headers} />
           </Tabs.TabPane>
+          {isTransactionsEnabled && (
+            <Tabs.TabPane key="3" tab="Outputs">
+              <ResponseOutputs />
+            </Tabs.TabPane>
+          )}
         </Tabs>
       </S.TabsContainer>
     </S.Container>

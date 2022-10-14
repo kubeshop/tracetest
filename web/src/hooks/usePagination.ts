@@ -5,7 +5,12 @@ type TParams<P> = P & {
   take?: number;
 };
 
-interface IPagination<T> {
+export interface PaginationResponse<T> {
+  total: number;
+  items: T[];
+}
+
+export interface IPagination<T> {
   hasNext: boolean;
   hasPrev: boolean;
   isEmpty: boolean;
@@ -14,7 +19,16 @@ interface IPagination<T> {
   list: T[];
   loadNext: () => void;
   loadPrev: () => void;
+  loadPage: (pg: number) => void;
   search: (query: string) => void;
+  page: number;
+  total: number;
+  take: number;
+}
+
+function totalLoaded(list: Array<any>, params: {page: number; query: string}, take: number) {
+  const length = list?.length || 0;
+  return params.page === 0 ? length : params.page * take + length;
 }
 
 const usePagination = <T, P>(
@@ -30,7 +44,8 @@ const usePagination = <T, P>(
     ...(params.query ? {query: params.query} : {}),
   });
 
-  const list = data as T[];
+  const list = (data as any)?.items as T[];
+  const total = (data as any)?.total as number;
 
   const loadNext = useCallback(() => {
     setParams(prevParams => ({...prevParams, page: prevParams.page + 1}));
@@ -40,12 +55,17 @@ const usePagination = <T, P>(
     setParams(prevParams => ({...prevParams, page: prevParams.page - 1}));
   }, []);
 
+  const loadPage = useCallback((pg: number) => {
+    setParams(prevParams => ({...prevParams, page: pg}));
+  }, []);
+
   const search = (query: string) => {
     setParams({page: 0, query});
   };
 
   return {
-    hasNext: list?.length === take,
+    loadPage,
+    hasNext: totalLoaded(list, params, take) < total,
     hasPrev: params.page > 0,
     isEmpty: params.page === 0 && !list?.length && !isLoading && !isFetching,
     isFetching,
@@ -54,6 +74,9 @@ const usePagination = <T, P>(
     loadNext,
     loadPrev,
     search,
+    page: params.page + 1,
+    total,
+    take,
   };
 };
 

@@ -16,8 +16,9 @@ import (
 
 // TestSpecsSpecs struct for TestSpecsSpecs
 type TestSpecsSpecs struct {
-	Selector   *Selector   `json:"selector,omitempty"`
-	Assertions []Assertion `json:"assertions,omitempty"`
+	Name       NullableString `json:"name,omitempty"`
+	Selector   *Selector      `json:"selector,omitempty"`
+	Assertions []Assertion    `json:"assertions,omitempty"`
 }
 
 // NewTestSpecsSpecs instantiates a new TestSpecsSpecs object
@@ -35,6 +36,49 @@ func NewTestSpecsSpecs() *TestSpecsSpecs {
 func NewTestSpecsSpecsWithDefaults() *TestSpecsSpecs {
 	this := TestSpecsSpecs{}
 	return &this
+}
+
+// GetName returns the Name field value if set, zero value otherwise (both if not set or set to explicit null).
+func (o *TestSpecsSpecs) GetName() string {
+	if o == nil || o.Name.Get() == nil {
+		var ret string
+		return ret
+	}
+	return *o.Name.Get()
+}
+
+// GetNameOk returns a tuple with the Name field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
+func (o *TestSpecsSpecs) GetNameOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return o.Name.Get(), o.Name.IsSet()
+}
+
+// HasName returns a boolean if a field has been set.
+func (o *TestSpecsSpecs) HasName() bool {
+	if o != nil && o.Name.IsSet() {
+		return true
+	}
+
+	return false
+}
+
+// SetName gets a reference to the given NullableString and assigns it to the Name field.
+func (o *TestSpecsSpecs) SetName(v string) {
+	o.Name.Set(&v)
+}
+
+// SetNameNil sets the value for Name to be an explicit nil
+func (o *TestSpecsSpecs) SetNameNil() {
+	o.Name.Set(nil)
+}
+
+// UnsetName ensures that no value is present for Name, not even an explicit nil
+func (o *TestSpecsSpecs) UnsetName() {
+	o.Name.Unset()
 }
 
 // GetSelector returns the Selector field value if set, zero value otherwise.
@@ -103,6 +147,9 @@ func (o *TestSpecsSpecs) SetAssertions(v []Assertion) {
 
 func (o TestSpecsSpecs) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
+	if o.Name.IsSet() {
+		toSerialize["name"] = o.Name.Get()
+	}
 	if o.Selector != nil {
 		toSerialize["selector"] = o.Selector
 	}

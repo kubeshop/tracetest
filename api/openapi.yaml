@@ -46,6 +46,11 @@ paths:
       responses:
         200:
           description: successful operation
+          headers:
+            X-Total-Count:
+              schema:
+                type: integer
+              description: Total records count
           content:
             application/json:
               schema:
@@ -234,6 +239,11 @@ paths:
       responses:
         200:
           description: successful operation
+          headers:
+            X-Total-Count:
+              schema:
+                type: integer
+              description: Total records count
           content:
             application/json:
               schema:

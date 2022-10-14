@@ -1537,11 +1537,13 @@ func (a *ApiApiService) GetTestVersionDefinitionFileExecute(r ApiGetTestVersionD
 }
 
 type ApiGetTestsRequest struct {
-	ctx        context.Context
-	ApiService *ApiApiService
-	take       *int32
-	skip       *int32
-	query      *string
+	ctx           context.Context
+	ApiService    *ApiApiService
+	take          *int32
+	skip          *int32
+	query         *string
+	sortBy        *string
+	sortDirection *string
 }
 
 // indicates how many tests can be returned by each page
@@ -1559,6 +1561,18 @@ func (r ApiGetTestsRequest) Skip(skip int32) ApiGetTestsRequest {
 // query to search tests, based on test name and description
 func (r ApiGetTestsRequest) Query(query string) ApiGetTestsRequest {
 	r.query = &query
+	return r
+}
+
+// indicates the sort field for the tests
+func (r ApiGetTestsRequest) SortBy(sortBy string) ApiGetTestsRequest {
+	r.sortBy = &sortBy
+	return r
+}
+
+// indicates the sort direction for the tests
+func (r ApiGetTestsRequest) SortDirection(sortDirection string) ApiGetTestsRequest {
+	r.sortDirection = &sortDirection
 	return r
 }
 
@@ -1611,6 +1625,12 @@ func (a *ApiApiService) GetTestsExecute(r ApiGetTestsRequest) ([]Test, *http.Res
 	}
 	if r.query != nil {
 		localVarQueryParams.Add("query", parameterToString(*r.query, ""))
+	}
+	if r.sortBy != nil {
+		localVarQueryParams.Add("sortBy", parameterToString(*r.sortBy, ""))
+	}
+	if r.sortDirection != nil {
+		localVarQueryParams.Add("sortDirection", parameterToString(*r.sortDirection, ""))
 	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}

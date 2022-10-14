@@ -1,7 +1,9 @@
 import {FormInstance} from 'antd';
 import {VariableDefinition, Request} from 'postman-collection';
 import {CaseReducer, PayloadAction} from '@reduxjs/toolkit';
-import {TriggerTypes} from 'constants/Test.constants';
+import {BaseQueryFn, FetchArgs, FetchBaseQueryError, FetchBaseQueryMeta} from '@reduxjs/toolkit/dist/query';
+import {EndpointBuilder} from '@reduxjs/toolkit/dist/query/endpointDefinitions';
+import {TracetestApiTags, TriggerTypes} from 'constants/Test.constants';
 import {HTTP_METHOD, SupportedPlugins} from 'constants/Common.constants';
 import {Model, TGrpcSchemas, THttpSchemas, TTestSchemas, TTriggerSchemas} from './Common.types';
 import {TTestSpecs} from './TestSpecs.types';
@@ -137,3 +139,9 @@ export type TCreateTestSliceActions = {
   setDraftTest: CaseReducer<ICreateTestState, PayloadAction<{draftTest: TDraftTest}>>;
   setIsFormValid: CaseReducer<ICreateTestState, PayloadAction<{isValid: boolean}>>;
 };
+
+export type TTestApiEndpointBuilder = EndpointBuilder<
+  BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError, {}, FetchBaseQueryMeta>,
+  TracetestApiTags,
+  'tests'
+>;
