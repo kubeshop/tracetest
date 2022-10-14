@@ -23,6 +23,7 @@ type Term struct {
 	Duration  *string    `( @Duration `
 	Number    *string    `| @Number `
 	Attribute *Attribute `| @Attribute `
+	Variable  *Variable  `| @Variable`
 	Str       *Str       `| @(QuotedString|SingleQuotedString) )`
 }
 
@@ -42,6 +43,7 @@ var languageLexer = lexer.MustStateful(lexer.Rules{
 		{Name: "Duration", Pattern: `([0-9]+(\.[0-9]+)?)(ns|us|ms|s|m|h)`},
 		{Name: "Number", Pattern: `([0-9]+(\.[0-9]+)?)`},
 		{Name: "Attribute", Pattern: `attr:[a-zA-Z_0-9][a-zA-Z_0-9.]*`, Action: nil},
+		{Name: "Variable", Pattern: `var:[a-zA-Z_0-9][a-zA-Z_0-9.]*`, Action: nil},
 		{Name: "QuotedString", Pattern: `"(\\"|[^"])*"`, Action: nil},
 		{Name: "SingleQuotedString", Pattern: `'(\\'|[^'])*'`, Action: nil},
 

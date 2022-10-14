@@ -17,12 +17,17 @@ type Executor struct {
 	Stores map[string]DataStore
 }
 
-func NewExecutor(attributeDataStore DataStore, metaAttributesDataStore DataStore) Executor {
+func NewExecutor(dataStores ...DataStore) Executor {
+	storesMap := make(map[string]DataStore, len(dataStores))
+	for _, dataStore := range dataStores {
+		// we can have nil dataStores from test cases
+		if dataStore != nil {
+			storesMap[dataStore.Source()] = dataStore
+		}
+	}
+
 	return Executor{
-		Stores: map[string]DataStore{
-			"attr":                     attributeDataStore,
-			"tracetest.selected_spans": metaAttributesDataStore,
-		},
+		Stores: storesMap,
 	}
 }
 
@@ -102,7 +107,7 @@ func (e Executor) executeExpression(expr Expr) (string, types.Type, error) {
 func (e Executor) resolveTerm(term *Term) (string, types.Type, error) {
 	if term.Attribute != nil {
 		if term.Attribute.IsMeta() {
-			selectedSpansDataStore := e.Stores["tracetest.selected_spans"]
+			selectedSpansDataStore := e.Stores[metaPrefix]
 			value, err := selectedSpansDataStore.Get(term.Attribute.Name())
 			if err != nil {
 				return "", types.TypeNil, fmt.Errorf("could not resolve meta attribute: %w", err)
@@ -114,7 +119,17 @@ func (e Executor) resolveTerm(term *Term) (string, types.Type, error) {
 		attributeDataStore := e.Stores["attr"]
 		value, err := attributeDataStore.Get(term.Attribute.Name())
 		if err != nil {
-			return "", types.TypeNil, fmt.Errorf("could not resolve attribute %s: %w", *term.Attribute, err)
+			return "", types.TypeNil, fmt.Errorf("could not resolve attribute %s: %w", term.Attribute.Name(), err)
+		}
+
+		return value, types.GetType(value), nil
+	}
+
+	if term.Variable != nil {
+		variableDataStore := e.Stores["var"]
+		value, err := variableDataStore.Get(term.Variable.Name())
+		if err != nil {
+			return "", types.TypeNil, fmt.Errorf("could not resolve variable %s: %w", term.Variable.Name(), err)
 		}
 
 		return value, types.GetType(value), nil
