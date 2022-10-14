@@ -31,7 +31,8 @@ func assert(assertion model.Assertion, spans []traces.Span) model.AssertionResul
 	if len(spans) == 0 {
 		// we still have to run the assertion because it migth use a meta attribute
 		emptyAttributeDataStore := expression.AttributeDataStore{}
-		executor := expression.NewExecutor(emptyAttributeDataStore, metaAttributeDataStore)
+		emptyVariablesDataStore := expression.VariableDataStore{}
+		executor := expression.NewExecutor(emptyAttributeDataStore, metaAttributeDataStore, emptyVariablesDataStore)
 		result := runAssertion(executor, string(assertion))
 
 		return model.AssertionResult{
@@ -46,7 +47,10 @@ func assert(assertion model.Assertion, spans []traces.Span) model.AssertionResul
 	for _, span := range spans {
 		spanID := span.ID
 		attributeDataStore := expression.AttributeDataStore{Span: span}
-		expressionExecutor := expression.NewExecutor(attributeDataStore, metaAttributeDataStore)
+
+		// TODO: populate it with variables when they are available
+		variablesDataStore := expression.VariableDataStore{}
+		expressionExecutor := expression.NewExecutor(attributeDataStore, metaAttributeDataStore, variablesDataStore)
 
 		actualValue, _, err := expressionExecutor.ExecuteStatement(string(assertion))
 		if err != nil {

@@ -10,6 +10,7 @@ const (
 	TypeNumber
 	TypeAttribute
 	TypeDuration
+	TypeVariable
 )
 
 func GetType(value string) Type {

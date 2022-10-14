@@ -1,7 +1,6 @@
 package expression
 
 import (
-	"bytes"
 	"fmt"
 
 	"github.com/alecthomas/participle/v2"
@@ -31,9 +30,6 @@ func Parse(statement string) (Statement, error) {
 	if err != nil {
 		return Statement{}, fmt.Errorf("could not create parser: %w", err)
 	}
-
-	tokens, _ := parser.Lex("", bytes.NewBuffer([]byte(statement)))
-	fmt.Println(tokens)
 
 	err = parser.ParseString("", statement, &parsedStatement)
 	if err != nil {

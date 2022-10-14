@@ -16,6 +16,7 @@ type executorTestCase struct {
 
 	AttributeDataStore      expression.DataStore
 	MetaAttributesDataStore expression.DataStore
+	VariableDataStore       expression.DataStore
 }
 
 func TestBasicExpressionExecution(t *testing.T) {
@@ -96,6 +97,23 @@ func TestAttributeExecution(t *testing.T) {
 					},
 				},
 			},
+		},
+	}
+
+	executeTestCases(t, testCases)
+}
+
+func TestVariableExecution(t *testing.T) {
+	testCases := []executorTestCase{
+		{
+			Name:       "should_get_values_from_variables",
+			Query:      "var:my_variable = var:other_variable + 1",
+			ShouldPass: true,
+
+			VariableDataStore: expression.VariableDataStore(map[string]string{
+				"my_variable":    "42",
+				"other_variable": "41",
+			}),
 		},
 	}
 
@@ -201,7 +219,11 @@ func TestMetaAttributesExecution(t *testing.T) {
 func executeTestCases(t *testing.T, testCases []executorTestCase) {
 	for _, testCase := range testCases {
 		t.Run(testCase.Name, func(t *testing.T) {
-			executor := expression.NewExecutor(testCase.AttributeDataStore, testCase.MetaAttributesDataStore)
+			executor := expression.NewExecutor(
+				testCase.AttributeDataStore,
+				testCase.MetaAttributesDataStore,
+				testCase.VariableDataStore,
+			)
 			left, right, err := executor.ExecuteStatement(testCase.Query)
 			debugMessage := fmt.Sprintf("left value: %s; right value: %s", left, right)
 			if testCase.ShouldPass {
