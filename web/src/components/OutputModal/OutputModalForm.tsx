@@ -2,10 +2,11 @@ import {Form, FormInstance, Input, Select} from 'antd';
 import {noop} from 'lodash';
 import {useMemo} from 'react';
 import {TOutput} from 'types/Output.types';
-import OutputService from '../../services/Output.service';
-import {TSpanFlatAttribute} from '../../types/Span.types';
-import {singularOrPlural} from '../../utils/Common';
-import AdvancedEditor from '../AdvancedEditor';
+import {SupportedEditors} from 'constants/Editor.constants';
+import OutputService from 'services/Output.service';
+import {TSpanFlatAttribute} from 'types/Span.types';
+import {singularOrPlural} from 'utils/Common';
+import Editor from '../Editor';
 import {AttributeField} from '../TestSpecForm/Fields/AttributeField';
 import {useGetOTELSemanticConventionAttributesInfo} from '../TestSpecForm/hooks/useGetOTELSemanticConventionAttributesInfo';
 import useQuerySelector from '../TestSpecForm/hooks/useQuerySelector';
@@ -75,7 +76,7 @@ const OutputModalForm = ({form, runId, testId, attributeList, spanIdList}: IProp
             },
           ]}
         >
-          <AdvancedEditor lineNumbers runId={runId} testId={testId} />
+          <Editor basicSetup={{lineNumbers: true}} type={SupportedEditors.Selector} />
         </Form.Item>
       )}
       <AttributeField

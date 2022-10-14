@@ -1,0 +1,73 @@
+# InterpolatedString - multiple 
+
+http://${env:HOST}:${env:PORT}/graphql
+
+==>
+
+Program(Value(TemplateString),Value(Interpolation(OpenInterpolation,Expression(ComposedValue(OutsideInput(Source,Identifier))),CloseInterpolation)),Value(TemplateString),Value(Interpolation(OpenInterpolation,Expression(ComposedValue(OutsideInput(Source,Identifier))),CloseInterpolation)),Value(TemplateString))
+
+# InterpolatedString - with multi pipe
+
+http://${env:REQUEST | json_path '.endpoint' | json_path '.host' }:${env:REQUEST | json_path '.endpoint' | json_path '.port'}/graphql
+
+==>
+
+Program(Value(TemplateString),Value(Interpolation(OpenInterpolation,Expression(ComposedValue(OutsideInput(Source,Identifier),Pipe,SupportedParsers(JsonPath(Identifier)),Pipe,SupportedParsers(JsonPath(Identifier)))),CloseInterpolation)),Value(TemplateString),Value(Interpolation(OpenInterpolation,Expression(ComposedValue(OutsideInput(Source,Identifier),Pipe,SupportedParsers(JsonPath(Identifier)),Pipe,SupportedParsers(JsonPath(Identifier)))),CloseInterpolation)),Value(TemplateString))
+
+# InterpolatedString - with internal string
+
+http://${env:REQUEST + 'a'}:${env:REQUEST | json_path '.endpoint' + 123}/graphql
+
+==>
+
+Program(Value(TemplateString),Value(Interpolation(OpenInterpolation,Expression(ComposedValue(OutsideInput(Source,Identifier)),Operator,ComposedValue(String),Operator,ComposedValue(Number)),CloseInterpolation)),Value(TemplateString))
+
+# InterpolatedString - only interpolated
+
+${env:CONTENT_TYPE}
+
+==>
+
+Program(Value(Interpolation(OpenInterpolation,Expression(ComposedValue(OutsideInput(Source,Identifier))),CloseInterpolation)))
+
+# InterpolatedString - one interpolation
+
+Bearer ${env:AUTHORIZATION}
+
+==>
+
+ Program(Value(TemplateString),Value(Interpolation(OpenInterpolation,Expression(ComposedValue(OutsideInput(Source,Identifier))),CloseInterpolation)))
+
+# InterpolatedString - JSON
+
+{"name":"${env:POKEMON_NAME}","type":"normal","imageUrl":"https://assets.pokemon.com/assets/cms2/img/pokedex/full/052.png","isFeatured":true}
+
+==>
+
+Program(Value(TemplateString),Value(Interpolation(OpenInterpolation,Expression(ComposedValue(OutsideInput(Source,Identifier))),CloseInterpolation)),Value(TemplateString))
+
+# InterpolatedString - JSON With expression
+
+{"name":"${env:POKEMON_NAME + 1}","type":"normal","imageUrl":"https://assets.pokemon.com/assets/cms2/img/pokedex/full/052.png","isFeatured":true}
+
+==>
+
+Program(Value(TemplateString),Value(Interpolation(OpenInterpolation,Expression(ComposedValue(OutsideInput(Source,Identifier)),Operator,ComposedValue(Number)),CloseInterpolation)),Value(TemplateString))
+
+# String
+
+http://localhost:3000
+Bearer 12345
+
+==>
+
+Program(Value(TemplateString))
+
+# JSON
+
+{"name":"meowth","type":"normal","imageUrl":"https://assets.pokemon.com/assets/cms2/img/pokedex/full/052.png","isFeatured":true}
+
+==>
+
+Program(Value(TemplateString))
+

@@ -13,6 +13,7 @@ describe('Create Assertion', () => {
 
     cy.get('[data-cy=add-test-spec-button]').click();
     cy.get('[data-cy=assertion-form]').should('be.visible');
+    cy.get('[data-cy=editor-fallback]').should('not.exist');
 
     cy.get('[data-cy=assertion-check-attribute]').type('http.status_code');
     cy.get(`${getAttributeListId(0)} + div .ant-select-item`)
@@ -51,8 +52,10 @@ describe('Create Assertion', () => {
     cy.get(`[data-cy=trace-node-database]`, {timeout: 20000}).last().click();
     cy.get('[data-cy=add-test-spec-button]').click();
     cy.get('[data-cy=assertion-form]', {timeout: 10000}).should('be.visible');
+    cy.get('[data-cy=editor-fallback]').should('not.exist');
 
-    cy.get('[data-cy=advanced-selector] [contenteditable]')
+    cy.get('[data-cy=editor-fallback]').should('not.exist');
+    cy.get('[data-cy=selector-editor] [contenteditable]')
       .clear()
       .type('span[tracetest.span.type = "http"] span[tracetest.span.type = "database"]:first');
 
@@ -75,6 +78,7 @@ describe('Create Assertion', () => {
 
     cy.get('[data-cy=edit-test-spec-button]').first().click();
     cy.get('[data-cy=assertion-form]').should('be.visible');
+    cy.get('[data-cy=editor-fallback]').should('not.exist');
 
     cy.selectOperator(0);
 
@@ -98,8 +102,9 @@ describe('Create Assertion', () => {
 
     cy.get('[data-cy=edit-test-spec-button]').last().click();
     cy.get('[data-cy=assertion-form]').should('be.visible');
+    cy.get('[data-cy=editor-fallback]').should('not.exist');
 
-    cy.get('[data-cy=advanced-selector] [contenteditable]').clear().type('span[tracetest.span.type = "database"]:last');
+    cy.get('[data-cy=selector-editor] [contenteditable]').clear().type('span[tracetest.span.type = "database"]:last');
 
     cy.selectOperator(0);
 
@@ -129,6 +134,7 @@ describe('Create Assertion', () => {
     cy.get(`[data-cy=trace-node-database]`, {timeout: 20000}).last().click();
     cy.get('[data-cy=add-test-spec-button]').click();
     cy.get('[data-cy=assertion-form]', {timeout: 10000}).should('be.visible');
+    cy.get('[data-cy=editor-fallback]').should('not.exist');
 
     cy.get('[data-cy=assertion-check-attribute]').type('db.name');
     cy.get(`${getAttributeListId(0)} + div .ant-select-item`)

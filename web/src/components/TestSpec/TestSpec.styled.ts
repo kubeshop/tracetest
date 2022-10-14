@@ -1,5 +1,4 @@
 import {ApartmentOutlined} from '@ant-design/icons';
-import ReactCodeMirror from '@uiw/react-codemirror';
 import {Typography} from 'antd';
 import styled from 'styled-components';
 
@@ -48,25 +47,6 @@ export const HeaderDot = styled.span<{$passed: boolean}>`
 
 export const HeaderSpansIcon = styled(ApartmentOutlined)`
   margin-right: 4px;
-`;
-
-export const HeaderTitle = styled(ReactCodeMirror)`
-  .cm-gutterElement {
-    display: none;
-  }
-
-  .cm-scroller {
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    overflow: inherit;
-  }
-
-  .cm-scroller::-webkit-scrollbar {
-    display: none;
-    -webkit-appearance: none;
-    width: 0;
-    height: 0;
-  }
 `;
 
 export const Selector = styled.div`

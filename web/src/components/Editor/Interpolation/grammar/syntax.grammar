@@ -1,0 +1,38 @@
+@top Program { expression }
+
+@skip { space }
+
+// http://${env:HOST}:${env:PORT}/graphql
+// ${env:CONTENT_TYPE}
+// Bearer ${env:AUTHORIZATION}
+// ${env:CONTENT_LENGTH} + 10 
+// hola ${env:CONTENT_LENGTH + "10" + env:HOST | json_path '.id'}
+
+expression { Value* }
+
+Expression {ComposedValue (Operator ComposedValue)*}
+ComposedValue {OutsideInput (Pipe SupportedParsers)*  | Number |  String |  Boolean}
+OutsideInput {Source Identifier}
+Interpolation {OpenInterpolation Expression CloseInterpolation}
+Value { Interpolation | TemplateString }
+SupportedParsers {JsonPath}
+JsonPath {"json_path '" Identifier "'"}
+
+@tokens {
+  Identifier { $[a-zA-Z_.\-0-9]+ }
+  Pipe {"|"}
+  Number { @digit+ }
+  Boolean {"true" | "false"}
+  Operator {"+" | "-" | "*" | "/" | "%" | "^" }
+  TemplateString {![$]+}
+  String { "'" (!["\\] | "\\" _)* "'" }
+  OpenInterpolation { "${" }
+  CloseInterpolation { "}" }
+  Source { "env" Colon }
+  Colon { ":" }
+  space { @whitespace+ }
+
+  @precedence { OpenInterpolation, space, TemplateString}
+}
+
+@detectDelim

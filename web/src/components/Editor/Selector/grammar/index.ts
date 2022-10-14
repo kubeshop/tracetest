@@ -2,7 +2,7 @@ import {LRLanguage, LanguageSupport} from '@codemirror/language';
 import {styleTags, tags as t} from '@lezer/highlight';
 import {parser} from './grammar';
 
-export const tracetestLang = LRLanguage.define({
+export const selectorQLang = LRLanguage.define({
   parser: parser.configure({
     props: [
       styleTags({
@@ -19,6 +19,6 @@ export const tracetestLang = LRLanguage.define({
   }),
 });
 
-export const tracetest = () => {
-  return new LanguageSupport(tracetestLang);
+export const selectorQL = () => {
+  return new LanguageSupport(selectorQLang);
 };

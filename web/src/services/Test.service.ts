@@ -1,13 +1,13 @@
 import {TRawTest, TTest, TDraftTest} from 'types/Test.types';
 import {SupportedPlugins} from 'constants/Common.constants';
 import {IPlugin} from 'types/Plugins.types';
+import Validator from 'utils/Validator';
+import {TriggerTypes} from 'constants/Test.constants';
 import TestDefinitionService from './TestDefinition.service';
-import Validator from '../utils/Validator';
 import GrpcService from './Triggers/Grpc.service';
 import HttpService from './Triggers/Http.service';
 import PostmanService from './Triggers/Postman.service';
 import CurlService from './Triggers/Curl.service';
-import {TriggerTypes} from '../constants/Test.constants';
 
 const authValidation = ({auth}: TDraftTest): boolean => {
   switch (auth?.type) {

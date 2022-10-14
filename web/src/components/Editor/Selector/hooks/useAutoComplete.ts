@@ -9,7 +9,7 @@ import {
   operatorList,
   pseudoSelectorList,
   Tokens,
-} from 'constants/AdvancedEditor.constants';
+} from 'constants/Editor.constants';
 import {useAppStore} from 'redux/hooks';
 import AssertionSelectors from 'selectors/Assertion.selectors';
 import {escapeString} from 'utils/Common';
