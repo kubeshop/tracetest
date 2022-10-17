@@ -190,7 +190,7 @@ func (e Executor) resolveFunctionCall(functionCall *FunctionCall) (string, types
 		args = append(args, types.TypedValue{Type: argType, Value: argValue})
 	}
 
-	function, err := functions.GetFunctionRegistry().Get(functionCall.Name)
+	function, err := functions.DefaultRegistry().Get(functionCall.Name)
 	if err != nil {
 		return "", types.TypeNil, fmt.Errorf("function %s doesn't exist", functionCall.Name)
 	}

@@ -15,8 +15,8 @@ func GetIndex(input Value, args ...string) (Value, error) {
 		return Value{}, err
 	}
 
-	if index < 0 || index >= len(input) {
-		return Value{}, fmt.Errorf("index out of boundaries: %d out of %d", index, len(input))
+	if index < 0 || index >= input.Len() {
+		return Value{}, fmt.Errorf("index out of boundaries: %d out of %d", index, input.Len())
 	}
 
 	value := input.ValueAt(index)
@@ -25,7 +25,7 @@ func GetIndex(input Value, args ...string) (Value, error) {
 
 func getIndex(input Value, args ...string) (int, error) {
 	if args[0] == "last" {
-		return len(input) - 1, nil
+		return input.Len() - 1, nil
 	}
 
 	index, err := strconv.Atoi(args[0])

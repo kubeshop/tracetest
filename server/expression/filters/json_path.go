@@ -12,7 +12,7 @@ func JSON_path(input Value, args ...string) (Value, error) {
 		return Value{}, fmt.Errorf("wrong number of args. Expected 1, got %d", len(args))
 	}
 
-	if len(input) != 1 {
+	if input.IsArray() {
 		return Value{}, fmt.Errorf("cannot process array of json objects")
 	}
 

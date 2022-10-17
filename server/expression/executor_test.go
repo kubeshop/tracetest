@@ -170,7 +170,7 @@ func TestFilterExecution(t *testing.T) {
 		},
 		{
 			Name:       "should_count_array_input",
-			Query:      `'{ "array": [1, 2, 3] }' | json_path '$.array[*]' | count = 3`,
+			Query:      `'{ "array": [1, 2, 3] }' | json_path '$.array[*]' | length = 3`,
 			ShouldPass: true,
 		},
 		{
@@ -235,7 +235,7 @@ func TestFunctionExecution(t *testing.T) {
 		},
 		{
 			Name:       "should_generate_a_random_int_and_fail_comparison",
-			Query:      `randomInt(10,20) <= 10`,
+			Query:      `randomInt(10,20) < 10`,
 			ShouldPass: false,
 		},
 	}

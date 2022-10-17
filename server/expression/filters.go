@@ -13,7 +13,6 @@ var filterFunctions = map[string]filterFn{
 	"regex":       filters.Regex,
 	"regex_group": filters.RegexGroup,
 	"get_index":   filters.GetIndex,
-	"count":       filters.Count,
 	"length":      filters.Length,
 }
 

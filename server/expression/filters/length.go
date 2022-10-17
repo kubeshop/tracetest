@@ -11,16 +11,31 @@ func Length(input Value, args ...string) (Value, error) {
 		return Value{}, fmt.Errorf("wrong number of args. Expected 0, got %d", len(args))
 	}
 
-	if len(input) != 1 {
-		return Value{}, fmt.Errorf("wrong input: Expected string, not an array")
-	}
-
-	if input[0].Type != types.TypeString {
-		return Value{}, fmt.Errorf("wrong input type: Expected string, not %s", input[0].Type.String())
+	length, err := getLength(input)
+	if err != nil {
+		return Value{}, err
 	}
 
 	return NewValue(types.TypedValue{
 		Type:  types.TypeNumber,
-		Value: fmt.Sprintf("%d", len(input[0].Value)),
+		Value: fmt.Sprintf("%d", length),
 	}), nil
+}
+
+func getLength(input Value) (int, error) {
+	if input.IsArray() {
+		return input.Len(), nil
+	}
+
+	if input.Len() == 0 {
+		return 0, nil
+	}
+
+	singleItem := input.Items[0]
+	if singleItem.Type != types.TypeString {
+		// we don't support length on types that are not string or array
+		return -1, fmt.Errorf("unsupported type: expected array or string, got %s", singleItem.Type.String())
+	}
+
+	return len(singleItem.Value), nil
 }

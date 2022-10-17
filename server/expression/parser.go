@@ -1,7 +1,6 @@
 package expression
 
 import (
-	"bytes"
 	"fmt"
 
 	"github.com/alecthomas/participle/v2"

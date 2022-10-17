@@ -59,7 +59,7 @@ func TestGetIndex(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.Name, func(t *testing.T) {
-			input := filters.NewArrayValue(testCase.Input)
+			input := filters.NewArrayValue(testCase.Input.Items)
 			output, err := filters.GetIndex(input, testCase.Index)
 			if testCase.ShouldFail {
 				require.Error(t, err)

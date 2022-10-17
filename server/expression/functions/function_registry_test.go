@@ -11,7 +11,7 @@ import (
 )
 
 func TestFunctionWithoutArgs(t *testing.T) {
-	registry := functions.GetFunctionRegistry()
+	registry := functions.DefaultRegistry()
 
 	function, err := registry.Get("uuid")
 	require.NoError(t, err)
@@ -22,7 +22,7 @@ func TestFunctionWithoutArgs(t *testing.T) {
 }
 
 func TestFunctionWithArgs(t *testing.T) {
-	registry := functions.GetFunctionRegistry()
+	registry := functions.DefaultRegistry()
 
 	function, err := registry.Get("randomInt")
 	require.NoError(t, err)
@@ -48,7 +48,7 @@ func TestFunctionWithArgs(t *testing.T) {
 }
 
 func TestFunctionWithWrongArgNumber(t *testing.T) {
-	registry := functions.GetFunctionRegistry()
+	registry := functions.DefaultRegistry()
 
 	function, err := registry.Get("randomInt")
 	require.NoError(t, err)
@@ -59,7 +59,7 @@ func TestFunctionWithWrongArgNumber(t *testing.T) {
 }
 
 func TestFunctionWithWrongArgType(t *testing.T) {
-	registry := functions.GetFunctionRegistry()
+	registry := functions.DefaultRegistry()
 
 	function, err := registry.Get("randomInt")
 	require.NoError(t, err)
@@ -81,7 +81,7 @@ func TestFunctionWithWrongArgType(t *testing.T) {
 }
 
 func TestInexistentFunction(t *testing.T) {
-	registry := functions.GetFunctionRegistry()
+	registry := functions.DefaultRegistry()
 
 	_, err := registry.Get("this should not exist!")
 	assert.Error(t, err)
