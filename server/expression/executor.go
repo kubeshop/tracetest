@@ -221,7 +221,7 @@ func (e Executor) executeFilter(input filters.Value, filter *Filter) (filters.Va
 		args = append(args, resolvedArg)
 	}
 
-	newValue, err := executeFilter(input, filter.FunctionName, args)
+	newValue, err := executeFilter(input, filter.Name, args)
 	if err != nil {
 		return filters.Value{}, err
 	}
