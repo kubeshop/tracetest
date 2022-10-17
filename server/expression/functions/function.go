@@ -22,7 +22,7 @@ func (f Function) Invoke(args ...types.TypedValue) (types.TypedValue, error) {
 	for i, arg := range args {
 		expectedArgType := f.argTypes[i]
 		if arg.Type != expectedArgType {
-			return types.TypedValue{}, fmt.Errorf("invalid argument on index %d: expected %s, got %s", i, arg.Type.String(), expectedArgType.String())
+			return types.TypedValue{}, fmt.Errorf("invalid argument type on index %d: expected %s, got %s", i, arg.Type.String(), expectedArgType.String())
 		}
 	}
 

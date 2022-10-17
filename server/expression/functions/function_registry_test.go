@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/kubeshop/tracetest/server/expression/functions"
+	"github.com/kubeshop/tracetest/server/expression/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -26,21 +27,21 @@ func TestFunctionWithArgs(t *testing.T) {
 	function, err := registry.Get("randomInt")
 	require.NoError(t, err)
 
-	args := []functions.Arg{
+	args := []types.TypedValue{
 		{
 			Value: "1",
-			Type:  "number",
+			Type:  types.TypeNumber,
 		},
 		{
 			Value: "100",
-			Type:  "number",
+			Type:  types.TypeNumber,
 		},
 	}
 	result, err := function.Invoke(args...)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, result)
 
-	generatedNumber, err := strconv.Atoi(result)
+	generatedNumber, err := strconv.Atoi(result.Value)
 	assert.NoError(t, err)
 	assert.GreaterOrEqual(t, generatedNumber, 1)
 	assert.LessOrEqual(t, generatedNumber, 100)
@@ -54,7 +55,7 @@ func TestFunctionWithWrongArgNumber(t *testing.T) {
 
 	_, err = function.Invoke()
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "wrong number of arguments")
+	assert.Contains(t, err.Error(), "invalid number of arguments")
 }
 
 func TestFunctionWithWrongArgType(t *testing.T) {
@@ -63,20 +64,20 @@ func TestFunctionWithWrongArgType(t *testing.T) {
 	function, err := registry.Get("randomInt")
 	require.NoError(t, err)
 
-	args := []functions.Arg{
+	args := []types.TypedValue{
 		{
 			Value: "1",
-			Type:  "number",
+			Type:  types.TypeNumber,
 		},
 		{
 			Value: "string",
-			Type:  "string",
+			Type:  types.TypeString,
 		},
 	}
 
 	_, err = function.Invoke(args...)
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "wrong argument type")
+	assert.Contains(t, err.Error(), "invalid argument type")
 }
 
 func TestInexistentFunction(t *testing.T) {
