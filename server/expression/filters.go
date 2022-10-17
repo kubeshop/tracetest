@@ -14,6 +14,7 @@ var filterFunctions = map[string]filterFn{
 	"regex_group": filters.RegexGroup,
 	"get_index":   filters.GetIndex,
 	"count":       filters.Count,
+	"length":      filters.Length,
 }
 
 func executeFilter(input filters.Value, filterName string, args []string) (filters.Value, error) {

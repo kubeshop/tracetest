@@ -216,6 +216,33 @@ func TestMetaAttributesExecution(t *testing.T) {
 	executeTestCases(t, testCases)
 }
 
+func TestFunctionExecution(t *testing.T) {
+	testCases := []executorTestCase{
+		{
+			Name:       "should_generate_a_non_empty_first_name",
+			Query:      `firstName() | length > 0`,
+			ShouldPass: true,
+		},
+		{
+			Name:       "should_generate_a_random_first_name",
+			Query:      `firstName() != firstName()`,
+			ShouldPass: true,
+		},
+		{
+			Name:       "should_generate_a_random_int",
+			Query:      `randomInt(0,10) <= 10`,
+			ShouldPass: true,
+		},
+		{
+			Name:       "should_generate_a_random_int_and_fail_comparison",
+			Query:      `randomInt(10,20) <= 10`,
+			ShouldPass: false,
+		},
+	}
+
+	executeTestCases(t, testCases)
+}
+
 func executeTestCases(t *testing.T, testCases []executorTestCase) {
 	for _, testCase := range testCases {
 		t.Run(testCase.Name, func(t *testing.T) {
