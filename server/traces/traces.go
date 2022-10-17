@@ -180,6 +180,25 @@ func (a Attributes) Get(key string) string {
 	return ""
 }
 
+type Spans []Span
+
+func (s Spans) ForEach(fn func(ix int, _ Span) bool) Spans {
+	for i, span := range s {
+		doNext := fn(i, span)
+		if !doNext {
+			break
+		}
+	}
+	return s
+}
+
+func (s Spans) OrEmpty(fn func()) Spans {
+	if len(s) == 0 {
+		fn()
+	}
+	return s
+}
+
 type Span struct {
 	ID         trace.SpanID
 	Name       string

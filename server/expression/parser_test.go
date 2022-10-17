@@ -421,7 +421,7 @@ func TestFilters(t *testing.T) {
 func runTestCases(t *testing.T, testCases []parserTestCase) {
 	for _, testCase := range testCases {
 		t.Run(testCase.Name, func(t *testing.T) {
-			output, err := expression.Parse(testCase.Query)
+			output, err := expression.ParseStatement(testCase.Query)
 			require.NoError(t, err)
 			assert.Equal(t, testCase.ExpectedOutput, output)
 		})

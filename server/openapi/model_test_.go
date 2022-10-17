@@ -23,6 +23,9 @@ type Test struct {
 
 	Specs TestSpecs `json:"specs,omitempty"`
 
+	// define test outputs, in a key/value format. The value is processed as an expression
+	Outputs []TestOutput `json:"outputs,omitempty"`
+
 	Summary TestSummary `json:"summary,omitempty"`
 }
 
@@ -33,6 +36,11 @@ func AssertTestRequired(obj Test) error {
 	}
 	if err := AssertTestSpecsRequired(obj.Specs); err != nil {
 		return err
+	}
+	for _, el := range obj.Outputs {
+		if err := AssertTestOutputRequired(el); err != nil {
+			return err
+		}
 	}
 	if err := AssertTestSummaryRequired(obj.Summary); err != nil {
 		return err

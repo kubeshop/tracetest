@@ -109,11 +109,16 @@ func TestUpdateRun(t *testing.T) {
 		}),
 	}
 
+	run.Outputs = (model.OrderedMap[string, string]{}).
+		MustAdd("key", "value")
+
 	err := db.UpdateRun(context.TODO(), run)
 	require.NoError(t, err)
 
 	actual, err := db.GetRun(context.TODO(), test.ID, run.ID)
 	require.NoError(t, err)
+
+	modeltest.AssertRunEqual(t, run, actual)
 
 	updatedList, err := db.GetTestRuns(context.TODO(), test, 20, 0)
 	require.NoError(t, err)

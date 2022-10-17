@@ -67,9 +67,9 @@ func (a runTestAction) Run(ctx context.Context, args RunTestConfig) error {
 		return fmt.Errorf("could not run definition: %w", err)
 	}
 
-	allPassed := output.Run.Result.AllPassed
+	allPassed := output.Run.Result.GetAllPassed()
 
-	if args.WaitForResult && (allPassed == nil || !*allPassed) {
+	if args.WaitForResult && !allPassed {
 		// It failed, so we have to return an error status
 		os.Exit(1)
 	}

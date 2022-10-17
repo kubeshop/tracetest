@@ -46,7 +46,7 @@ func extractInterpolationArguments(input string) (string, []Expr, error) {
 
 	for _, interpolationToken := range interpolationTokens {
 		innerExpression := interpolationToken[2 : len(interpolationToken)-1] // removes ${ and }
-		expr, err := parseExpr(innerExpression)
+		expr, err := Parse(innerExpression)
 		if err != nil {
 			return "", []Expr{}, err
 		}

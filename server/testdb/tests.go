@@ -36,8 +36,9 @@ INSERT INTO tests (
 	"description",
 	"service_under_test",
 	"specs",
+	"outputs",
 	"created_at"
-) VALUES ($1, $2, $3, $4, $5, $6, $7)`
+) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
 
 func (td *postgresDB) CreateTest(ctx context.Context, test model.Test) (model.Test, error) {
 	if !test.HasID() {
@@ -67,6 +68,11 @@ func (td *postgresDB) insertIntoTests(ctx context.Context, test model.Test) (mod
 		return model.Test{}, fmt.Errorf("encoding error: %w", err)
 	}
 
+	jsonOutputs, err := json.Marshal(test.Outputs)
+	if err != nil {
+		return model.Test{}, fmt.Errorf("encoding error: %w", err)
+	}
+
 	_, err = stmt.ExecContext(
 		ctx,
 		test.ID,
@@ -75,6 +81,7 @@ func (td *postgresDB) insertIntoTests(ctx context.Context, test model.Test) (mod
 		test.Description,
 		jsonServiceUnderTest,
 		jsonSpecs,
+		jsonOutputs,
 		test.CreatedAt,
 	)
 	if err != nil {
@@ -148,6 +155,7 @@ const (
 		t.description,
 		t.service_under_test,
 		t.specs,
+		t.outputs,
 		t.created_at,
 		(SELECT COUNT(*) FROM test_runs tr WHERE tr.test_id = t.id) as total_runs,
 		last_test_run.created_at as last_test_run_time,
@@ -295,7 +303,9 @@ func (td *postgresDB) readTestRow(ctx context.Context, row scanner) (model.Test,
 	test := model.Test{}
 
 	var (
-		jsonServiceUnderTest, jsonSpecs []byte
+		jsonServiceUnderTest,
+		jsonSpecs,
+		jsonOutputs []byte
 
 		lastRunTime *time.Time
 
@@ -308,6 +318,7 @@ func (td *postgresDB) readTestRow(ctx context.Context, row scanner) (model.Test,
 		&test.Description,
 		&jsonServiceUnderTest,
 		&jsonSpecs,
+		&jsonOutputs,
 		&test.CreatedAt,
 		&test.Summary.Runs,
 		&lastRunTime,
@@ -321,12 +332,17 @@ func (td *postgresDB) readTestRow(ctx context.Context, row scanner) (model.Test,
 	case nil:
 		err = json.Unmarshal(jsonServiceUnderTest, &test.ServiceUnderTest)
 		if err != nil {
-			return model.Test{}, err
+			return model.Test{}, fmt.Errorf("cannot parse trigger: %w", err)
 		}
 
 		err = json.Unmarshal(jsonSpecs, &test.Specs)
 		if err != nil {
-			return model.Test{}, err
+			return model.Test{}, fmt.Errorf("cannot parse specs: %w", err)
+		}
+
+		err = json.Unmarshal(jsonOutputs, &test.Outputs)
+		if err != nil {
+			return model.Test{}, fmt.Errorf("cannot parse outputs: %w", err)
 		}
 
 		if lastRunTime != nil {
