@@ -141,7 +141,7 @@ trigger:
 
 Sometimes we want to randomize our test data. Maybe we want to try new values or maybe we know our API will fail if the same id is provided more than once. For this use case, you can define generator functions in the test trigger.
 
-Generator functions can be invoked as part of expressions. Therefore, you only need to invoke it as `uuid()`. However, you might want to generate values and concatenate them with static texts as well. For this, you can use the string interpolation feature: `"your user id is ${uuid()}`
+Generator functions can be invoked as part of expressions. Therefore, you only need to invoke it as `uuid()`. However, you might want to generate values and concatenate them with static texts as well. For this, you can use the string interpolation feature: `"your user id is ${uuid()}`.
 
 Available functions:
 
@@ -289,7 +289,7 @@ Using the same hypotethical user creation endpoint, a user creation might result
 - `UPDATE accounts SET remaining_users ...`
 
 In this case, the service is instrumented so that each query generates a span of type `database`.
-You can get a list of sql operations
+You can get a list of sql operations:
 
 ```yaml
 outpus:
