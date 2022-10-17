@@ -25,6 +25,11 @@ func TestCreateTest(t *testing.T) {
 				URL: "http://localhost:3030/hello-instrumented",
 			},
 		},
+		Outputs: (model.OrderedMap[string, model.Output]{}).
+			MustAdd("output1", model.Output{
+				Selector: model.SpanQuery(`span[name="root"]`),
+				Value:    "${attr:myapp.some_attribute}",
+			}),
 	}
 
 	updated, err := db.CreateTest(context.TODO(), test)
@@ -36,6 +41,7 @@ func TestCreateTest(t *testing.T) {
 	assert.Equal(t, test.Description, actual.Description)
 	assert.Equal(t, test.ServiceUnderTest, actual.ServiceUnderTest)
 	assert.Equal(t, test.Specs, actual.Specs)
+	assert.Equal(t, test.Outputs, actual.Outputs)
 	assert.False(t, actual.CreatedAt.IsZero())
 }
 

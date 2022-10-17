@@ -20,10 +20,12 @@ type Test struct {
 	Name        *string `json:"name,omitempty"`
 	Description *string `json:"description,omitempty"`
 	// version number of the test
-	Version          *int32       `json:"version,omitempty"`
-	ServiceUnderTest *Trigger     `json:"serviceUnderTest,omitempty"`
-	Specs            *TestSpecs   `json:"specs,omitempty"`
-	Summary          *TestSummary `json:"summary,omitempty"`
+	Version          *int32     `json:"version,omitempty"`
+	ServiceUnderTest *Trigger   `json:"serviceUnderTest,omitempty"`
+	Specs            *TestSpecs `json:"specs,omitempty"`
+	// define test outputs, in a key/value format. The value is processed as an expression
+	Outputs []TestOutput `json:"outputs,omitempty"`
+	Summary *TestSummary `json:"summary,omitempty"`
 }
 
 // NewTest instantiates a new Test object
@@ -235,6 +237,38 @@ func (o *Test) SetSpecs(v TestSpecs) {
 	o.Specs = &v
 }
 
+// GetOutputs returns the Outputs field value if set, zero value otherwise.
+func (o *Test) GetOutputs() []TestOutput {
+	if o == nil || o.Outputs == nil {
+		var ret []TestOutput
+		return ret
+	}
+	return o.Outputs
+}
+
+// GetOutputsOk returns a tuple with the Outputs field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Test) GetOutputsOk() ([]TestOutput, bool) {
+	if o == nil || o.Outputs == nil {
+		return nil, false
+	}
+	return o.Outputs, true
+}
+
+// HasOutputs returns a boolean if a field has been set.
+func (o *Test) HasOutputs() bool {
+	if o != nil && o.Outputs != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetOutputs gets a reference to the given []TestOutput and assigns it to the Outputs field.
+func (o *Test) SetOutputs(v []TestOutput) {
+	o.Outputs = v
+}
+
 // GetSummary returns the Summary field value if set, zero value otherwise.
 func (o *Test) GetSummary() TestSummary {
 	if o == nil || o.Summary == nil {
@@ -286,6 +320,9 @@ func (o Test) MarshalJSON() ([]byte, error) {
 	}
 	if o.Specs != nil {
 		toSerialize["specs"] = o.Specs
+	}
+	if o.Outputs != nil {
+		toSerialize["outputs"] = o.Outputs
 	}
 	if o.Summary != nil {
 		toSerialize["summary"] = o.Summary

@@ -36,6 +36,7 @@ type TestRun struct {
 	TriggerResult             *TriggerResult     `json:"triggerResult,omitempty"`
 	Trace                     *Trace             `json:"trace,omitempty"`
 	Result                    *AssertionResults  `json:"result,omitempty"`
+	Outputs                   []TestRunOutputs   `json:"outputs,omitempty"`
 	Metadata                  *map[string]string `json:"metadata,omitempty"`
 }
 
@@ -536,6 +537,38 @@ func (o *TestRun) SetResult(v AssertionResults) {
 	o.Result = &v
 }
 
+// GetOutputs returns the Outputs field value if set, zero value otherwise.
+func (o *TestRun) GetOutputs() []TestRunOutputs {
+	if o == nil || o.Outputs == nil {
+		var ret []TestRunOutputs
+		return ret
+	}
+	return o.Outputs
+}
+
+// GetOutputsOk returns a tuple with the Outputs field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *TestRun) GetOutputsOk() ([]TestRunOutputs, bool) {
+	if o == nil || o.Outputs == nil {
+		return nil, false
+	}
+	return o.Outputs, true
+}
+
+// HasOutputs returns a boolean if a field has been set.
+func (o *TestRun) HasOutputs() bool {
+	if o != nil && o.Outputs != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetOutputs gets a reference to the given []TestRunOutputs and assigns it to the Outputs field.
+func (o *TestRun) SetOutputs(v []TestRunOutputs) {
+	o.Outputs = v
+}
+
 // GetMetadata returns the Metadata field value if set, zero value otherwise.
 func (o *TestRun) GetMetadata() map[string]string {
 	if o == nil || o.Metadata == nil {
@@ -614,6 +647,9 @@ func (o TestRun) MarshalJSON() ([]byte, error) {
 	}
 	if o.Result != nil {
 		toSerialize["result"] = o.Result
+	}
+	if o.Outputs != nil {
+		toSerialize["outputs"] = o.Outputs
 	}
 	if o.Metadata != nil {
 		toSerialize["metadata"] = o.Metadata

@@ -18,7 +18,13 @@ type (
 		Version          int
 		ServiceUnderTest Trigger
 		Specs            OrderedMap[SpanQuery, NamedAssertions]
+		Outputs          OrderedMap[string, Output]
 		Summary          Summary
+	}
+
+	Output struct {
+		Selector SpanQuery
+		Value    string
 	}
 
 	NamedAssertions struct {
@@ -91,6 +97,7 @@ type (
 		TriggerResult TriggerResult
 		Results       *RunResults
 		Trace         *traces.Trace
+		Outputs       OrderedMap[string, string]
 		LastError     error
 		Pass          int
 		Fail          int

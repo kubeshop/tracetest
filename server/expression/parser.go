@@ -24,7 +24,7 @@ func createParser() (*participle.Parser, error) {
 	return defaultParser, nil
 }
 
-func Parse(statement string) (Statement, error) {
+func ParseStatement(statement string) (Statement, error) {
 	var parsedStatement Statement
 	parser, err := createParser()
 	if err != nil {
@@ -54,7 +54,7 @@ func createExpressionParser() (*participle.Parser, error) {
 	return defaultExpressionParser, nil
 }
 
-func parseExpr(expression string) (Expr, error) {
+func Parse(expression string) (Expr, error) {
 	var parsedExpression Expr
 	parser, err := createExpressionParser()
 	if err != nil {

@@ -13,12 +13,14 @@ func ConvertTestDefinitionIntoOpenAPIObject(definition definition.Test) (openapi
 	if err != nil {
 		return openapi.Test{}, fmt.Errorf("could not convert test definition: %w", err)
 	}
+
 	return openapi.Test{
 		Id:               definition.Id,
 		Name:             definition.Name,
 		Description:      definition.Description,
 		ServiceUnderTest: convertTriggerIntoServiceUnderTest(definition.Trigger),
 		Specs:            spec,
+		Outputs:          convertTestOutputsIntoOpenAPIOutputs(definition.Outputs),
 	}, nil
 }
 
@@ -101,6 +103,25 @@ func getAuthOpenAPI(auth definition.HTTPAuthentication) openapi.HttpAuth {
 	}
 }
 
+func convertTestOutputsIntoOpenAPIOutputs(outputs []definition.Output) []openapi.TestOutput {
+	if len(outputs) == 0 {
+		return nil
+	}
+
+	res := make([]openapi.TestOutput, 0, len(outputs))
+
+	for _, out := range outputs {
+		res = append(res, openapi.TestOutput{
+			Name: out.Name,
+			Selector: openapi.Selector{
+				Query: out.Selector,
+			},
+			Value: out.Value,
+		})
+	}
+
+	return res
+}
 func convertTestSpecIntoOpenAPIObject(testSpec []definition.TestSpec) (openapi.TestSpecs, error) {
 	if len(testSpec) == 0 {
 		return openapi.TestSpecs{}, nil

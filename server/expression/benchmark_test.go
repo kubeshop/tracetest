@@ -13,7 +13,7 @@ func BenchmarkSimpleExpressions(b *testing.B) {
 	executor := expression.NewExecutor()
 
 	for i := 0; i < b.N; i++ {
-		executor.ExecuteStatement(statement)
+		executor.Statement(statement)
 	}
 }
 
@@ -30,7 +30,7 @@ func BenchmarkJSONPathExpressions(b *testing.B) {
 	executor := expression.NewExecutor(attributeDataStore)
 
 	for i := 0; i < b.N; i++ {
-		executor.ExecuteStatement(statement)
+		executor.Statement(statement)
 	}
 }
 

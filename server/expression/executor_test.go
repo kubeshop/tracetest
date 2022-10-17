@@ -224,7 +224,7 @@ func executeTestCases(t *testing.T, testCases []executorTestCase) {
 				testCase.MetaAttributesDataStore,
 				testCase.VariableDataStore,
 			)
-			left, right, err := executor.ExecuteStatement(testCase.Query)
+			left, right, err := executor.Statement(testCase.Query)
 			debugMessage := fmt.Sprintf("left value: %s; right value: %s", left, right)
 			if testCase.ShouldPass {
 				assert.NoError(t, err, debugMessage)
