@@ -15,6 +15,7 @@ const Interpolation = ({
   placeholder,
   value,
   extensions = [],
+  indentWithTab = false,
 }: IEditorProps) => {
   const editorTheme = useEditorTheme();
   const completionFn = useAutoComplete();
@@ -38,7 +39,7 @@ const Interpolation = ({
         spellCheck={false}
         theme={editorTheme}
         placeholder={placeholder}
-        indentWithTab={false}
+        indentWithTab={indentWithTab}
       />
     </S.InterpolationEditorContainer>
   );

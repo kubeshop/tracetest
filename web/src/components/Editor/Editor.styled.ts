@@ -66,6 +66,14 @@ export const ExpressionEditorContainer = styled(EditorContainer)<{$isEditable: b
         .cm-gutterElement {
           display: none;
         }
+
+        .cm-gutters {
+          border: none;
+        }
+
+        .cm-line {
+          padding: 0;
+        }
       `}
   }
 `;

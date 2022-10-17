@@ -1,4 +1,3 @@
-import {noop} from 'lodash';
 import {lazy, Suspense} from 'react';
 import {BasicSetupOptions} from '@uiw/react-codemirror';
 import {Extension} from '@codemirror/state';
@@ -18,25 +17,19 @@ export interface IEditorProps {
   basicSetup?: BasicSetupOptions;
   editable?: boolean;
   extensions?: Extension[];
+  indentWithTab?: boolean;
 }
 
 interface IProps extends IEditorProps {
   type: SupportedEditors;
 }
 
-const Editor = ({type, onChange = noop, value = '', placeholder, basicSetup = {}, editable = true, extensions = []}: IProps) => {
+const Editor = ({type, ...props}: IProps) => {
   const Component = EditorMap[type];
 
   return (
     <Suspense fallback={<div data-cy="editor-fallback" />}>
-      <Component
-        onChange={onChange}
-        value={value}
-        placeholder={placeholder}
-        basicSetup={basicSetup}
-        editable={editable}
-        extensions={extensions}
-      />
+      <Component {...props} />
     </Suspense>
   );
 };

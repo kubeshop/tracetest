@@ -66,10 +66,10 @@ export const parserList = [
 ];
 
 export enum SupportedEditors {
-  Selector = 'Selector',
-  Interpolation = 'Interpolation',
-  Expression = 'Expression',
-  CurlCommand = 'CurlCommand',
+  Selector = 'selector-editor',
+  Interpolation = 'interpolation-editor',
+  Expression = 'expression-editor',
+  CurlCommand = 'curlCommand-editor',
 }
 
 export const operatorList = [

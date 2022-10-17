@@ -1,7 +1,8 @@
 import {SyntaxNode} from '@lezer/common/dist';
 import {EditorState} from '@codemirror/state';
 import {syntaxTree} from '@codemirror/language';
-import {CompletionContext} from '@codemirror/autocomplete';
+import {EditorView, Tooltip} from '@codemirror/view';
+import {CompletionContext, CompletionResult} from '@codemirror/autocomplete';
 import {
   completeSourceAfter,
   operatorList,
@@ -11,17 +12,31 @@ import {
   Tokens,
 } from 'constants/Editor.constants';
 import {TSpanFlatAttribute} from 'types/Span.types';
+import {expressionQLang} from 'components/Editor/Expression/grammar';
+import {interpolationQLang} from 'components/Editor/Interpolation/grammar';
+import {selectorQLang} from 'components/Editor/Selector/grammar';
+import {IKeyValue} from 'constants/Test.constants';
 
-const environmentList = [
-  {
-    label: 'HOST',
-    type: 'variableName',
-  },
-  {
-    label: 'PORT',
-    type: 'variableName',
-  },
-];
+const langMap = {
+  [SupportedEditors.Expression]: expressionQLang,
+  [SupportedEditors.Interpolation]: interpolationQLang,
+  [SupportedEditors.Selector]: selectorQLang,
+} as const;
+
+interface IAutoCompleteProps {
+  type: SupportedEditors.Interpolation | SupportedEditors.Expression;
+  context: CompletionContext;
+  attributeList?: TSpanFlatAttribute[];
+  envEntryList?: IKeyValue[];
+}
+
+interface ITooltipProps {
+  view: EditorView;
+  pos: number;
+  side: -1 | 1;
+  attributeList?: TSpanFlatAttribute[];
+  envEntryList?: IKeyValue[];
+}
 
 const EditorService = () => ({
   getOperatorAutocomplete(node: SyntaxNode) {
@@ -59,8 +74,9 @@ const EditorService = () => ({
     type: SupportedEditors.Interpolation | SupportedEditors.Expression,
     node: SyntaxNode,
     state: EditorState,
+    environmentList: IKeyValue[] = [],
     attributeList: TSpanFlatAttribute[] = []
-  ) {
+  ): CompletionResult | null {
     if (node.name === Tokens.OpenInterpolation) {
       const sourceOptionList = SourceByEditorType[type];
 
@@ -78,7 +94,10 @@ const EditorService = () => ({
         from: node.to,
         options:
           sourceText === 'env'
-            ? environmentList
+            ? environmentList.map(({key}) => ({
+                label: key,
+                type: 'variableName',
+              }))
             : attributeList.map(({key}) => ({
                 label: key,
                 type: 'variableName',
@@ -95,7 +114,10 @@ const EditorService = () => ({
         from: node.from,
         options:
           sourceText === 'env'
-            ? environmentList
+            ? environmentList.map(({key}) => ({
+                label: key,
+                type: 'variableName',
+              }))
             : attributeList.map(({key}) => ({
                 label: key,
                 type: 'variableName',
@@ -106,11 +128,7 @@ const EditorService = () => ({
     return null;
   },
 
-  getAutocomplete(
-    type: SupportedEditors.Interpolation | SupportedEditors.Expression,
-    context: CompletionContext,
-    attributeList: TSpanFlatAttribute[] = []
-  ) {
+  getAutocomplete({type, context, attributeList = [], envEntryList = []}: IAutoCompleteProps): CompletionResult | null {
     const {state, pos} = context;
     const tree = syntaxTree(state);
     const node = tree.resolveInner(pos, -1);
@@ -121,7 +139,49 @@ const EditorService = () => ({
     const operatorAutocomplete = this.getOperatorAutocomplete(node);
     if (operatorAutocomplete) return operatorAutocomplete;
 
-    return this.getSourceAutocomplete(type, node, state, attributeList);
+    return this.getSourceAutocomplete(type, node, state, envEntryList, attributeList);
+  },
+
+  getTooltip({view: {state}, pos, side, envEntryList = [], attributeList = []}: ITooltipProps): Tooltip | null {
+    const tree = syntaxTree(state);
+    const node = tree.resolveInner(pos, -1);
+
+    if ((node.from === pos && side < 0) || (node.from === pos && side > 0)) return null;
+
+    const parentNode = node.parent;
+
+    if (parentNode && parentNode.name === Tokens.OutsideInput) {
+      const identifier = parentNode.lastChild || {from: 0, to: 0};
+      const identifierText = state.doc.sliceString(identifier.from, identifier.to);
+      const textContent = envEntryList.concat(attributeList).find(({key}) => key === identifierText)?.value || 'No value';
+
+      return {
+        pos: parentNode.from,
+        end: parentNode.to,
+        above: true,
+        create() {
+          const dom = document.createElement('div');
+          dom.textContent = textContent;
+          return {dom};
+        },
+      };
+    }
+
+    return null;
+  },
+
+  getIsQueryValid(
+    type: SupportedEditors.Expression | SupportedEditors.Interpolation | SupportedEditors.Selector,
+    query: string
+  ) {
+    const lang = langMap[type];
+
+    try {
+      lang.parser.configure({strict: true}).parse(query);
+      return true;
+    } catch (e) {
+      return false;
+    }
   },
 });
 

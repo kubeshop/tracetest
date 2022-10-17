@@ -1,15 +1,15 @@
 import {noop} from 'lodash';
 import {useCallback} from 'react';
-
-import {CompareOperator} from 'constants/Operator.constants';
 import {SemanticGroupNames} from 'constants/SemanticGroupNames.constants';
 import {useTestSpecForm} from 'components/TestSpecForm/TestSpecForm.provider';
 import {useAppSelector} from 'redux/hooks';
 import TestSpecsSelectors from 'selectors/TestSpecs.selectors';
 import TraceAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
-import OperatorService from 'services/Operator.service';
 import SpanService from 'services/Span.service';
 import {TSpan, TSpanFlatAttribute} from 'types/Span.types';
+import {CompareOperator} from 'constants/Operator.constants';
+import OperatorService from 'services/Operator.service';
+import AssertionService from 'services/Assertion.service';
 import Attributes from './Attributes';
 import Header from './Header';
 import * as S from './SpanDetail.styled';
@@ -35,11 +35,9 @@ const SpanDetail = ({onCreateTestSpec = noop, searchText, span}: IProps) => {
         selector,
         defaultValues: {
           assertions: [
-            {
-              comparator: OperatorService.getOperatorSymbol(CompareOperator.EQUALS),
-              expected: value,
-              attribute: key,
-            },
+            `attr:${key} ${OperatorService.getOperatorSymbol(
+              CompareOperator.EQUALS
+            )} ${AssertionService.extractExpectedString(value)}`,
           ],
           selector,
         },

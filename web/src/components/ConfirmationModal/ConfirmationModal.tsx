@@ -5,16 +5,17 @@ interface IProps {
   onClose(): void;
   onConfirm(): void;
   title: string;
+  heading?: string;
 }
 
-const ConfirmationModal = ({isOpen, title, onClose, onConfirm}: IProps) => {
+const ConfirmationModal = ({isOpen, title, heading = 'Delete Confirmation', onClose, onConfirm}: IProps) => {
   return (
     <Modal
       cancelText="Cancel"
       okText="Delete"
       onCancel={onClose}
       onOk={onConfirm}
-      title="Delete Confirmation"
+      title={heading}
       visible={isOpen}
       data-cy="delete-confirmation-modal"
     >

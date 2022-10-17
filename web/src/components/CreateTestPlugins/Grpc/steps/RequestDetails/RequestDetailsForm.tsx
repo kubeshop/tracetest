@@ -1,7 +1,9 @@
-import {Col, Form, Input, Row, Select} from 'antd';
+import {Col, Form, Row, Select} from 'antd';
 import {useCallback, useEffect, useState} from 'react';
 import GrpcService from 'services/Triggers/Grpc.service';
 import {IRpcValues, TDraftTestForm} from 'types/Test.types';
+import {SupportedEditors} from 'constants/Editor.constants';
+import Editor from 'components/Editor';
 import RequestDetailsAuthInput from '../../../Rest/steps/RequestDetails/RequestDetailsAuthInput/RequestDetailsAuthInput';
 import RequestDetailsUrlInput from '../../../Rest/steps/RequestDetails/RequestDetailsUrlInput';
 import RequestDetailsFileInput from './RequestDetailsFileInput';
@@ -56,7 +58,7 @@ const RequestDetailsForm = ({form}: IProps) => {
       </Row>
       <Row gutter={12}>
         <Col span={18}>
-          <RequestDetailsUrlInput shouldValidateUrl={false} showMethodSelector={false} />
+          <RequestDetailsUrlInput showMethodSelector={false} />
         </Col>
       </Row>
       <Row gutter={12}>
@@ -72,7 +74,12 @@ const RequestDetailsForm = ({form}: IProps) => {
       <Row gutter={12}>
         <Col span={18}>
           <Form.Item data-cy="message" label="Message" name="message" style={{marginBottom: 0}}>
-            <Input.TextArea placeholder="Enter message" />
+            <Editor
+              type={SupportedEditors.Interpolation}
+              placeholder="Enter message"
+              basicSetup={{lineNumbers: true}}
+              indentWithTab
+            />
           </Form.Item>
         </Col>
       </Row>

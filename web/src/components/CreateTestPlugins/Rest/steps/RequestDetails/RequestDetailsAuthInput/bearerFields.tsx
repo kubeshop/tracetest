@@ -1,10 +1,9 @@
-import {Form, Input} from 'antd';
-import * as S from '../RequestDetails.styled';
+import {Form} from 'antd';
+import Editor from 'components/Editor';
+import {SupportedEditors} from 'constants/Editor.constants';
 
 export const bearerFields: React.ReactElement = (
-  <S.Row style={{width: '100%'}}>
-    <Form.Item data-cy="bearer-token" name={['auth', 'bearer', 'token']} label="Token" rules={[{required: true}]}>
-      <Input />
-    </Form.Item>
-  </S.Row>
+  <Form.Item data-cy="bearer-token" name={['auth', 'bearer', 'token']} label="Token" rules={[{required: true}]}>
+    <Editor type={SupportedEditors.Interpolation} />
+  </Form.Item>
 );

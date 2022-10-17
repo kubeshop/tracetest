@@ -17,8 +17,9 @@ const environmentList = [
 
 const keyValueListOne = [KeyValueMock.model()];
 const keyValueListTwo = [
-  KeyValueMock.model({key: 'user', value: 'testAdmin'}),
-  KeyValueMock.model({key: 'password', value: '1234'}),
+  KeyValueMock.model({key: 'HOST', value: 'http://localhost'}),
+  KeyValueMock.model({key: 'METHOD', value: 'GET'}),
+  KeyValueMock.model({key: 'USER_ID', value: '123'}),
 ];
 
 const EnvironmentEndpoint = (builder: TTestApiEndpointBuilder) => ({

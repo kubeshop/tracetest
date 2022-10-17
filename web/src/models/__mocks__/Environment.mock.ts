@@ -9,7 +9,20 @@ const EnvironmentMock: IMockFactory<TEnvironment, TEnvironment> = () => ({
       id: faker.datatype.uuid(),
       name: faker.name.jobType(),
       description: faker.name.jobDescriptor(),
-      variables: [],
+      variables: [
+        {
+          key: 'HOST',
+          value: 'http://localhost',
+        },
+        {
+          key: 'PORT',
+          value: '3000',
+        },
+        {
+          key: 'AUTH_TOKEN',
+          value: '12313215akashdlasjkldql;dqkwl;wm',
+        },
+      ],
       ...data,
     };
   },

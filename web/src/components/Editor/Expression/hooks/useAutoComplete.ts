@@ -3,6 +3,7 @@ import {uniqBy} from 'lodash';
 import {CompletionContext} from '@codemirror/autocomplete';
 import {useAppStore} from 'redux/hooks';
 import AssertionSelectors from 'selectors/Assertion.selectors';
+import EnvironmentSelectors from 'selectors/Environment.selectors';
 import SpanSelectors from 'selectors/Span.selectors';
 import EditorService from 'services/Editor.service';
 import {SupportedEditors} from 'constants/Editor.constants';
@@ -23,13 +24,25 @@ const useAutoComplete = ({testId, runId}: IProps) => {
     return uniqBy(attributeList, 'key');
   }, [getState, runId, testId]);
 
+  const getSelectedEnvironmentEntryList = useCallback(() => {
+    const state = getState();
+
+    return EnvironmentSelectors.selectSelectedEnvironmentEntryList(state);
+  }, [getState]);
+
   return useCallback(
     async (context: CompletionContext) => {
       const attributeList = getAttributeList();
+      const envEntryList = getSelectedEnvironmentEntryList();
 
-      return EditorService.getAutocomplete(SupportedEditors.Expression, context, attributeList);
+      return EditorService.getAutocomplete({
+        type: SupportedEditors.Expression,
+        context,
+        attributeList,
+        envEntryList,
+      });
     },
-    [getAttributeList]
+    [getAttributeList, getSelectedEnvironmentEntryList]
   );
 };
 

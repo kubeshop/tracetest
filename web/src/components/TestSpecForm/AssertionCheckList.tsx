@@ -1,9 +1,8 @@
 import {PlusOutlined} from '@ant-design/icons';
 import {FormInstance} from 'antd';
 import {FormListFieldData} from 'antd/lib/form/FormList';
-import CreateAssertionModalAnalyticsService from '../../services/Analytics/CreateAssertionModalAnalytics.service';
-import {TAssertion} from '../../types/Assertion.types';
-import {TSpanFlatAttribute} from '../../types/Span.types';
+import CreateAssertionModalAnalyticsService from 'services/Analytics/CreateAssertionModalAnalytics.service';
+import {TSpanFlatAttribute} from 'types/Span.types';
 import {AssertionCheck} from './AssertionCheck';
 import {useGetOTELSemanticConventionAttributesInfo} from './hooks/useGetOTELSemanticConventionAttributesInfo';
 import {IValues} from './TestSpecForm';
@@ -11,7 +10,7 @@ import * as S from './TestSpecForm.styled';
 
 interface IProps {
   add(): void;
-  assertions: TAssertion[];
+  assertions: string[];
   attributeList: TSpanFlatAttribute[];
   fields: FormListFieldData[];
   form: FormInstance<IValues>;

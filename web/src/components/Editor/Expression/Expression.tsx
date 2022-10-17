@@ -28,7 +28,7 @@ const Expression = ({
   } = useTestRun();
   const editorTheme = useEditorTheme();
   const completionFn = useAutoComplete({testId, runId});
-  const tooltipFn = useTooltip();
+  const tooltipFn = useTooltip({testId, runId});
 
   const extensionList = useMemo(
     () => [
