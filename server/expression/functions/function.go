@@ -30,7 +30,7 @@ func (f Function) Invoke(args ...types.TypedValue) (types.TypedValue, error) {
 	return types.GetTypedValue(returnedValue), nil
 }
 
-func GetFunctionRegistry() Registry {
+func DefaultRegistry() Registry {
 	emptyArgsConfig := []types.Type{}
 	registry := newRegistry()
 

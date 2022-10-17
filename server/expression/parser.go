@@ -32,9 +32,6 @@ func ParseStatement(statement string) (Statement, error) {
 		return Statement{}, fmt.Errorf("could not create parser: %w", err)
 	}
 
-	tokens, _ := parser.Lex("", bytes.NewBuffer([]byte(statement)))
-	fmt.Println(tokens)
-
 	err = parser.ParseString("", statement, &parsedStatement)
 	if err != nil {
 		return Statement{}, fmt.Errorf(`could not parse statement "%s": %w`, statement, err)
