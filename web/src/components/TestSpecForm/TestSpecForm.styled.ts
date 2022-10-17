@@ -1,4 +1,4 @@
-import {DeleteOutlined} from '@ant-design/icons';
+import {DeleteOutlined, ReadOutlined} from '@ant-design/icons';
 import {Button, Select as AntSelect, Typography} from 'antd';
 import styled from 'styled-components';
 
@@ -86,6 +86,12 @@ export const FormSectionRow1 = styled.div`
   gap: 12px;
 `;
 
+export const FormSectionHeaderSelector = styled.div`
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+`;
+
 export const FormSectionTitle = styled(Typography.Title).attrs({level: 3})<{$noMargin?: boolean}>`
   && {
     margin-bottom: ${({$noMargin}) => ($noMargin ? '0' : '4px')};
@@ -94,6 +100,10 @@ export const FormSectionTitle = styled(Typography.Title).attrs({level: 3})<{$noM
 
 export const FormSectionText = styled(Typography.Text)`
   color: ${({theme}) => theme.color.textSecondary};
+`;
+
+export const ReadIcon = styled(ReadOutlined)`
+  margin-top: 4px;
 `;
 
 export const ExpectedInputContainer = styled.div`
@@ -110,7 +120,7 @@ export const ExpectedInputContainer = styled.div`
       outline: 1px solid grey;
       height: 32px;
       font-family: SFPro, serif;
-      outline: 1px solid #CDD1DB;
+      outline: 1px solid #cdd1db;
     }
 
     .cm-content {

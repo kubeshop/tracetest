@@ -1,7 +1,7 @@
 import {Button, Form, Tag} from 'antd';
 import React, {useState} from 'react';
 
-import {ADVANCE_SELECTORS_DOCUMENTATION_URL} from 'constants/Common.constants';
+import {SELECTOR_LANGUAGE_CHEAT_SHEET_URL} from 'constants/Common.constants';
 import {CompareOperator} from 'constants/Operator.constants';
 import {useAppSelector} from 'redux/hooks';
 import AssertionSelectors from 'selectors/Assertion.selectors';
@@ -81,15 +81,17 @@ const TestSpecForm = ({
         onFieldsChange={onFieldsChange}
       >
         <S.FormSection>
-          <S.FormSectionRow1>
-            <S.FormSectionTitle $noMargin>1. Select Spans</S.FormSectionTitle>
-            <Tag color="blue">{`${spanIdList.length} ${singularOrPlural('span', spanIdList.length)} selected`}</Tag>
-          </S.FormSectionRow1>
-          <S.FormSectionRow>
-            <S.FormSectionText>Specify which spans to assert using the </S.FormSectionText>
-            <a href={ADVANCE_SELECTORS_DOCUMENTATION_URL} target="_blank">
-              Selector Language
+          <S.FormSectionHeaderSelector>
+            <S.FormSectionRow1>
+              <S.FormSectionTitle $noMargin>1. Select Spans</S.FormSectionTitle>
+              <Tag color="blue">{`${spanIdList.length} ${singularOrPlural('span', spanIdList.length)} selected`}</Tag>
+            </S.FormSectionRow1>
+            <a href={SELECTOR_LANGUAGE_CHEAT_SHEET_URL} target="_blank">
+              <S.ReadIcon /> SL cheat sheet
             </a>
+          </S.FormSectionHeaderSelector>
+          <S.FormSectionRow>
+            <S.FormSectionText>Select the spans to which a set of assertions will be applied</S.FormSectionText>
           </S.FormSectionRow>
           <SelectorInput form={form} testId={testId} runId={runId} onValidSelector={setIsValid} />
         </S.FormSection>
