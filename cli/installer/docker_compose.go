@@ -180,9 +180,17 @@ func getDockerComposeFileContents(ui cliUI.UI, config configuration) []byte {
 		ui.Exit(fmt.Sprintf("cannot encode docker-compose file: %s", err.Error()))
 	}
 
-	sout := strings.ReplaceAll(string(output), "$", "$$")
+	sout := fixPortConfig(string(output))
+	sout = strings.ReplaceAll(sout, "$", "$$")
 
 	return []byte(sout)
+}
+
+func fixPortConfig(output string) string {
+	publishedPortRegex := regexp.MustCompile(`published: "\d+"`)
+	return publishedPortRegex.ReplaceAllStringFunc(output, func(s string) string {
+		return strings.ReplaceAll(s, `"`, ``)
+	})
 }
 
 func filterContainers(ui cliUI.UI, project *types.Project, included []string) {
