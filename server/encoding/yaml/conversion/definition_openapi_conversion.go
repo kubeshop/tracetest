@@ -15,7 +15,7 @@ func ConvertTestDefinitionIntoOpenAPIObject(definition definition.Test) (openapi
 	}
 
 	return openapi.Test{
-		Id:               definition.Id,
+		Id:               definition.ID,
 		Name:             definition.Name,
 		Description:      definition.Description,
 		ServiceUnderTest: convertTriggerIntoServiceUnderTest(definition.Trigger),

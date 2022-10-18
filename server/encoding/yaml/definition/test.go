@@ -5,12 +5,12 @@ import (
 )
 
 type Test struct {
-	Id          string      `yaml:"id" json:"id"`
-	Name        string      `yaml:"name" json:"name"`
-	Description string      `yaml:"description" json:"description"`
-	Trigger     TestTrigger `yaml:"trigger" json:"trigger"`
-	Specs       []TestSpec  `yaml:"specs,omitempty" json:"specs,omitempty"`
-	Outputs     []Output    `yaml:"outputs,omitempty" json:"outputs,omitempty"`
+	ID          string      `mapstructure:"id"`
+	Name        string      `mapstructure:"name"`
+	Description string      `mapstructure:"description"`
+	Trigger     TestTrigger `mapstructure:"trigger"`
+	Specs       []TestSpec  `mapstructure:"specs,omitempty"`
+	Outputs     []Output    `mapstructure:"outputs,omitempty"`
 }
 
 func (t Test) Validate() error {
@@ -26,9 +26,9 @@ func (t Test) Validate() error {
 }
 
 type TestTrigger struct {
-	Type        string      `yaml:"type" json:"type"`
-	HTTPRequest HTTPRequest `yaml:"httpRequest" json:"httpRequest"`
-	GRPC        GRPC        `yaml:"grpc" json:"grpc"`
+	Type        string      `mapstructure:"type"`
+	HTTPRequest HTTPRequest `mapstructure:"httpRequest"`
+	GRPC        GRPC        `mapstructure:"grpc"`
 }
 
 func (t TestTrigger) Validate() error {
@@ -51,13 +51,13 @@ func (t TestTrigger) Validate() error {
 }
 
 type Output struct {
-	Name     string `yaml:"name"`
-	Selector string `yaml:"selector"`
-	Value    string `yaml:"value"`
+	Name     string `mapstructure:"name"`
+	Selector string `mapstructure:"selector"`
+	Value    string `mapstructure:"value"`
 }
 
 type TestSpec struct {
-	Name       string   `yaml:"name" json:"name"`
-	Selector   string   `yaml:"selector" json:"selector"`
-	Assertions []string `yaml:"assertions" json:"assertions"`
+	Name       string   `mapstructure:"name"`
+	Selector   string   `mapstructure:"selector"`
+	Assertions []string `mapstructure:"assertions"`
 }

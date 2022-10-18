@@ -11,7 +11,7 @@ import (
 
 func TestObjectToYamlConversion(t *testing.T) {
 	def := definition.Test{
-		Id:          "abcdeef",
+		ID:          "abcdeef",
 		Name:        "This is a value",
 		Description: "", // should be ommited
 		Trigger: definition.TestTrigger{

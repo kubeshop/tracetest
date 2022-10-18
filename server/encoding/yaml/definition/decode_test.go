@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/kubeshop/tracetest/cli/definition"
+	"github.com/kubeshop/tracetest/server/encoding/yaml/definition"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -35,7 +35,7 @@ func TestDecode(t *testing.T) {
 					Name: "Get example",
 					Trigger: definition.TestTrigger{
 						Type: "http",
-						HTTPRequest: definition.HttpRequest{
+						HTTPRequest: definition.HTTPRequest{
 							URL:    "http://test.com/list",
 							Method: "GET",
 						},

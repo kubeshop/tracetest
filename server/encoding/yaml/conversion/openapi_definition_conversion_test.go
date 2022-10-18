@@ -27,7 +27,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 				Specs:            openapi.TestSpecs{},
 			},
 			ExpectedOutput: definition.Test{
-				Id:          "624a8dea-f152-48d4-a742-30b210094959",
+				ID:          "624a8dea-f152-48d4-a742-30b210094959",
 				Name:        "my test",
 				Description: "my test description",
 				Trigger: definition.TestTrigger{
@@ -64,7 +64,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 				},
 			},
 			ExpectedOutput: definition.Test{
-				Id:          "624a8dea-f152-48d4-a742-30b210094959",
+				ID:          "624a8dea-f152-48d4-a742-30b210094959",
 				Name:        "my test",
 				Description: "my test description",
 				Trigger: definition.TestTrigger{
@@ -108,7 +108,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 				},
 			},
 			ExpectedOutput: definition.Test{
-				Id:          "624a8dea-f152-48d4-a742-30b210094959",
+				ID:          "624a8dea-f152-48d4-a742-30b210094959",
 				Name:        "my test",
 				Description: "my test description",
 				Trigger: definition.TestTrigger{
@@ -157,7 +157,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 				},
 			},
 			ExpectedOutput: definition.Test{
-				Id:          "624a8dea-f152-48d4-a742-30b210094959",
+				ID:          "624a8dea-f152-48d4-a742-30b210094959",
 				Name:        "my test",
 				Description: "my test description",
 				Trigger: definition.TestTrigger{
@@ -214,7 +214,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 				},
 			},
 			ExpectedOutput: definition.Test{
-				Id:          "624a8dea-f152-48d4-a742-30b210094959",
+				ID:          "624a8dea-f152-48d4-a742-30b210094959",
 				Name:        "my test",
 				Description: "my test description",
 				Trigger: definition.TestTrigger{
@@ -270,7 +270,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 				},
 			},
 			ExpectedOutput: definition.Test{
-				Id:          "624a8dea-f152-48d4-a742-30b210094959",
+				ID:          "624a8dea-f152-48d4-a742-30b210094959",
 				Name:        "my test",
 				Description: "my test description",
 				Trigger: definition.TestTrigger{
@@ -319,7 +319,7 @@ func TestOpenAPIToDefinitionConversion(t *testing.T) {
 				},
 			},
 			ExpectedOutput: definition.Test{
-				Id:          "624a8dea-f152-48d4-a742-30b210094959",
+				ID:          "624a8dea-f152-48d4-a742-30b210094959",
 				Name:        "my test",
 				Description: "my test description",
 				Trigger: definition.TestTrigger{

@@ -9,7 +9,7 @@ import (
 
 func ConvertOpenAPITestIntoDefinitionObject(test openapi.Test) (definition.Test, error) {
 	return definition.Test{
-		Id:          test.Id,
+		ID:          test.Id,
 		Name:        test.Name,
 		Description: test.Description,
 		Trigger:     convertServiceUnderTestIntoTrigger(test.ServiceUnderTest),

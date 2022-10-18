@@ -5,11 +5,11 @@ import (
 )
 
 type HTTPRequest struct {
-	URL            string             `json:"url" yaml:"url"`
-	Method         string             `json:"method" yaml:"method"`
-	Headers        []HTTPHeader       `json:"headers,omitempty" yaml:"headers,omitempty"`
-	Authentication HTTPAuthentication `json:"authentication,omitempty" yaml:"authentication,omitempty"`
-	Body           string             `json:"body,omitempty" yaml:"body,omitempty"`
+	URL            string             `yaml:"url"`
+	Method         string             `yaml:"method"`
+	Headers        []HTTPHeader       `yaml:"headers,omitempty"`
+	Authentication HTTPAuthentication `yaml:"authentication,omitempty"`
+	Body           string             `yaml:"body,omitempty"`
 }
 
 func (r HTTPRequest) Validate() error {
@@ -35,8 +35,8 @@ func (r HTTPRequest) Validate() error {
 }
 
 type HTTPHeader struct {
-	Key   string `json:"key" yaml:"key"`
-	Value string `json:"value" yaml:"value"`
+	Key   string `yaml:"key"`
+	Value string `yaml:"value"`
 }
 
 func (h HTTPHeader) Validate() error {
@@ -48,10 +48,10 @@ func (h HTTPHeader) Validate() error {
 }
 
 type HTTPAuthentication struct {
-	Type   string         `json:"type,omitempty" yaml:"type,omitempty"`
-	Basic  HTTPBasicAuth  `json:"basic,omitempty" yaml:"basic,omitempty"`
-	ApiKey HTTPAPIKeyAuth `json:"apiKey,omitempty" yaml:"apiKey,omitempty"`
-	Bearer HTTPBearerAuth `json:"bearer,omitempty" yaml:"bearer,omitempty"`
+	Type   string         `yaml:"type,omitempty"`
+	Basic  HTTPBasicAuth  `yaml:"basic,omitempty"`
+	ApiKey HTTPAPIKeyAuth `yaml:"apiKey,omitempty"`
+	Bearer HTTPBearerAuth `yaml:"bearer,omitempty"`
 }
 
 func (a HTTPAuthentication) Validate() error {
@@ -81,8 +81,8 @@ func (a HTTPAuthentication) Validate() error {
 }
 
 type HTTPBasicAuth struct {
-	User     string `json:"user" yaml:"user"`
-	Password string `json:"password" yaml:"password"`
+	User     string `yaml:"user"`
+	Password string `yaml:"password"`
 }
 
 func (ba HTTPBasicAuth) Validate() error {
@@ -98,7 +98,7 @@ func (ba HTTPBasicAuth) Validate() error {
 }
 
 type HTTPBearerAuth struct {
-	Token string `json:"token" yaml:"token"`
+	Token string `yaml:"token"`
 }
 
 func (ba HTTPBearerAuth) Validate() error {
@@ -110,9 +110,9 @@ func (ba HTTPBearerAuth) Validate() error {
 }
 
 type HTTPAPIKeyAuth struct {
-	Key   string `json:"key" yaml:"key"`
-	Value string `json:"value" yaml:"value"`
-	In    string `json:"in" yaml:"in"`
+	Key   string `yaml:"key"`
+	Value string `yaml:"value"`
+	In    string `yaml:"in"`
 }
 
 func (aka HTTPAPIKeyAuth) Validate() error {
