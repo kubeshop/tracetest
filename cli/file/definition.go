@@ -7,25 +7,23 @@ import (
 	"strings"
 
 	"github.com/kubeshop/tracetest/cli/definition"
-	"gopkg.in/yaml.v2"
 )
 
-func LoadDefinition(file string) (definition.Test, error) {
-	fileBytes, err := os.ReadFile(file)
+func LoadDefinition(file string) (definition.File, error) {
+	b, err := os.ReadFile(file)
 	if err != nil {
-		return definition.Test{}, fmt.Errorf("could not read test definition file %s: %w", file, err)
+		return definition.File{}, fmt.Errorf("could not read definition file %s: %w", file, err)
 	}
 
-	test := definition.Test{}
-	err = yaml.Unmarshal(fileBytes, &test)
+	f, err := definition.Decode(string(b))
 	if err != nil {
-		return definition.Test{}, fmt.Errorf("could not parse test definition file: %w", err)
+		return definition.File{}, fmt.Errorf("could not parse definition file: %w", err)
 	}
 
-	return test, nil
+	return f, nil
 }
 
-func SaveDefinition(file string, definition string) error {
+func SaveDefinition(file, definition string) error {
 	err := os.WriteFile(file, []byte(definition), 0644)
 	if err != nil {
 		return fmt.Errorf("could not write file: %w", err)
@@ -34,7 +32,7 @@ func SaveDefinition(file string, definition string) error {
 	return nil
 }
 
-func SetTestID(file string, id string) error {
+func SetTestID(file, id string) error {
 	idStatementRegex := regexp.MustCompile("^id: [0-9a-zA-Z\\-_]+\n")
 	fileBytes, err := os.ReadFile(file)
 	if err != nil {
@@ -49,10 +47,5 @@ func SetTestID(file string, id string) error {
 		fileContent = fmt.Sprintf("id: %s\n%s", id, fileContent)
 	}
 
-	err = os.WriteFile(file, []byte(fileContent), 0644)
-	if err != nil {
-		return fmt.Errorf("could not write file: %w", err)
-	}
-
-	return nil
+	return SaveDefinition(file, fileContent)
 }

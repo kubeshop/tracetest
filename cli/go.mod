@@ -8,6 +8,7 @@ require (
 	github.com/cucumber/ci-environment/go v0.0.0-20220915001957-711b1c82415f
 	github.com/denisbrodbeck/machineid v1.0.1
 	github.com/kubeshop/tracetest/server v0.0.0-20220920142527-2369576b6725
+	github.com/mitchellh/mapstructure v1.5.0
 	github.com/pterm/pterm v0.12.46
 	github.com/segmentio/analytics-go/v3 v3.2.1
 	github.com/spf13/cobra v1.5.0
@@ -17,7 +18,6 @@ require (
 	go.uber.org/zap v1.23.0
 	golang.org/x/exp v0.0.0-20220916125017-b168a2c6b86b
 	golang.org/x/oauth2 v0.0.0-20220909003341-f21342109be1
-	gopkg.in/yaml.v2 v2.4.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -49,7 +49,6 @@ require (
 	github.com/mattn/go-runewidth v0.0.14 // indirect
 	github.com/mattn/go-shellwords v1.0.12 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
-	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
@@ -88,4 +87,5 @@ require (
 	google.golang.org/grpc v1.49.0 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
+	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
