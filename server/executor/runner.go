@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/kubeshop/tracetest/server/executor/replacer"
 	"github.com/kubeshop/tracetest/server/executor/trigger"
 	"github.com/kubeshop/tracetest/server/model"
 	"go.opentelemetry.io/otel"
@@ -125,14 +124,6 @@ func (r persistentRunner) processExecQueue(job execReq) {
 		// TODO: actually handle the error
 		panic(err)
 	}
-
-	newTest, err := replacer.ReplaceTestPlaceholders(job.test)
-	if err != nil {
-		// TODO: handle this
-		panic(err)
-	}
-
-	job.test = newTest
 
 	traceID := model.IDGen.TraceID()
 	run.TraceID = traceID

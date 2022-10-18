@@ -40,8 +40,8 @@ func TestCount(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.Name, func(t *testing.T) {
-			input := filters.NewArrayValue(testCase.Input)
-			output, err := filters.Count(input)
+			input := filters.NewArrayValue(testCase.Input.Items)
+			output, err := filters.Length(input)
 			require.NoError(t, err)
 			assert.Equal(t, testCase.ExpectedOutput, output.String())
 		})

@@ -141,7 +141,7 @@ trigger:
 
 Sometimes we want to randomize our test data. Maybe we want to try new values or maybe we know our API will fail if the same id is provided more than once. For this use case, you can define generator functions in the test trigger.
 
-To use a generator function, wrap it in double curly brackets: `{{ uuid() }}`.
+Generator functions can be invoked as part of expressions. Therefore, you only need to invoke it as `uuid()`. However, you might want to generate values and concatenate them with static texts as well. For this, you can use the string interpolation feature: `"your user id is ${uuid()}`.
 
 Available functions:
 
@@ -162,9 +162,9 @@ Available functions:
 ## **Assertions**
 Assertions are as important as how you trigger your test. Without them, your test is just a fancy way of executing a request using a CLI command. In this section, we will discuss how you can declare your assertions in your definition file.
 
-Before we start, there are two concepts that you must understand to write your tests: [selectors](advanced-selectors.md) and assertions. 
+Before we start, there are two concepts that you must understand to write your tests: [selectors](advanced-selectors.md) and assertions.
 
-**Selectors** are queries that are executed against your trace tree and select a set of spans based on some attributes. They are responsible for defining which spans will be tested against your assertions. 
+**Selectors** are queries that are executed against your trace tree and select a set of spans based on some attributes. They are responsible for defining which spans will be tested against your assertions.
 
 **Assertions** are tests against a specific span based on its attributes. A practical example might be useful:
 
@@ -237,7 +237,7 @@ For more information about selectors or assertions, take a look at the documenta
 Outputs are really useful when running [Transactions](transactions.md). They allow to export values from a test so they become available in the [Environment Variables](environment-variables.md) of the current transaction.
 
 An ouptut exports the result of an [Expression](expressions.md) and assigns it to a name, so it can be injected into the environment variables of a running transaction.
-A `selector` is needed only if the provided expression refers to a/some span/s attribute or meta attributes. 
+A `selector` is needed only if the provided expression refers to a/some span/s attribute or meta attributes.
 
 It can be defined using the following YAML definition:
 
@@ -262,7 +262,7 @@ outpus:
 - name: ARITHMETIC_RESULT
   value: 1 + 1
   # results in ARITHMETIC_RESULT = 2
-  
+
 - name: INTERPOLATE_STRING
   # assume PRE_EXISTING_VALUE=someValue from env vars
   value: "the value ${env:PRE_EXISTING_VALUE} comes from the env var PRE_EXISTING_VALUE"
@@ -289,7 +289,7 @@ Using the same hypotethical user creation endpoint, a user creation might result
 - `UPDATE accounts SET remaining_users ...`
 
 In this case, the service is instrumented so that each query generates a span of type `database`.
-You can get a list of sql operations 
+You can get a list of sql operations:
 
 ```yaml
 outpus:

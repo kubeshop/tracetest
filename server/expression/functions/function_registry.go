@@ -3,10 +3,12 @@ package functions
 import (
 	"fmt"
 	"sync"
+
+	"github.com/kubeshop/tracetest/server/expression/types"
 )
 
 type Registry interface {
-	Add(string, Invoker, ArgTypes)
+	Add(string, Invoker, []types.Type)
 	Get(string) (Function, error)
 }
 
@@ -21,7 +23,7 @@ type registry struct {
 	mutex     sync.Mutex
 }
 
-func (r *registry) Add(name string, function Invoker, argsConfig ArgTypes) {
+func (r *registry) Add(name string, function Invoker, argsConfig []types.Type) {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 

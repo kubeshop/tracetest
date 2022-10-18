@@ -7,6 +7,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/expression/filters"
+	"github.com/kubeshop/tracetest/server/expression/functions"
 	"github.com/kubeshop/tracetest/server/expression/types"
 	"github.com/kubeshop/tracetest/server/traces"
 )
@@ -106,33 +107,15 @@ func (e Executor) Expression(expr Expr) (string, types.Type, error) {
 
 func (e Executor) resolveTerm(term *Term) (string, types.Type, error) {
 	if term.Attribute != nil {
-		if term.Attribute.IsMeta() {
-			selectedSpansDataStore := e.Stores[metaPrefix]
-			value, err := selectedSpansDataStore.Get(term.Attribute.Name())
-			if err != nil {
-				return "", types.TypeNil, fmt.Errorf("could not resolve meta attribute: %w", err)
-			}
-
-			return value, types.GetType(value), nil
-		}
-
-		attributeDataStore := e.Stores["attr"]
-		value, err := attributeDataStore.Get(term.Attribute.Name())
-		if err != nil {
-			return "", types.TypeNil, fmt.Errorf("could not resolve attribute %s: %w", term.Attribute.Name(), err)
-		}
-
-		return value, types.GetType(value), nil
+		return e.resolveAttribute(term.Attribute)
 	}
 
 	if term.Variable != nil {
-		variableDataStore := e.Stores["var"]
-		value, err := variableDataStore.Get(term.Variable.Name())
-		if err != nil {
-			return "", types.TypeNil, fmt.Errorf("could not resolve variable %s: %w", term.Variable.Name(), err)
-		}
+		return e.resolveVariable(term.Variable)
+	}
 
-		return value, types.GetType(value), nil
+	if term.FunctionCall != nil {
+		return e.resolveFunctionCall(term.FunctionCall)
 	}
 
 	if term.Duration != nil {
@@ -164,6 +147,56 @@ func (e Executor) resolveTerm(term *Term) (string, types.Type, error) {
 	}
 
 	return "", types.TypeNil, fmt.Errorf("empty term")
+}
+
+func (e Executor) resolveAttribute(attribute *Attribute) (string, types.Type, error) {
+	if attribute.IsMeta() {
+		selectedSpansDataStore := e.Stores[metaPrefix]
+		value, err := selectedSpansDataStore.Get(attribute.Name())
+		if err != nil {
+			return "", types.TypeNil, fmt.Errorf("could not resolve meta attribute: %w", err)
+		}
+
+		return value, types.GetType(value), nil
+	}
+
+	attributeDataStore := e.Stores["attr"]
+	value, err := attributeDataStore.Get(attribute.Name())
+	if err != nil {
+		return "", types.TypeNil, fmt.Errorf("could not resolve attribute %s: %w", attribute.Name(), err)
+	}
+
+	return value, types.GetType(value), nil
+}
+
+func (e Executor) resolveVariable(variable *Variable) (string, types.Type, error) {
+	variableDataStore := e.Stores["var"]
+	value, err := variableDataStore.Get(variable.Name())
+	if err != nil {
+		return "", types.TypeNil, fmt.Errorf("could not resolve variable %s: %w", variable.Name(), err)
+	}
+
+	return value, types.GetType(value), nil
+}
+
+func (e Executor) resolveFunctionCall(functionCall *FunctionCall) (string, types.Type, error) {
+	args := make([]types.TypedValue, 0, len(functionCall.Args))
+	for i, arg := range functionCall.Args {
+		argValue, argType, err := e.resolveTerm(arg)
+		if err != nil {
+			return "", types.TypeNil, fmt.Errorf("could not execute function %s: invalid argument on index %d: %w", functionCall.Name, i, err)
+		}
+
+		args = append(args, types.TypedValue{Type: argType, Value: argValue})
+	}
+
+	function, err := functions.DefaultRegistry().Get(functionCall.Name)
+	if err != nil {
+		return "", types.TypeNil, fmt.Errorf("function %s doesn't exist", functionCall.Name)
+	}
+
+	typedValue, err := function.Invoke(args...)
+	return typedValue.Value, typedValue.Type, err
 }
 
 func (e Executor) executeOperation(left types.TypedValue, right *OpTerm) (string, types.Type, error) {
@@ -221,7 +254,7 @@ func (e Executor) executeFilter(input filters.Value, filter *Filter) (filters.Va
 		args = append(args, resolvedArg)
 	}
 
-	newValue, err := executeFilter(input, filter.FunctionName, args)
+	newValue, err := executeFilter(input, filter.Name, args)
 	if err != nil {
 		return filters.Value{}, err
 	}
