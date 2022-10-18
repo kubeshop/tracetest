@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/kubeshop/tracetest/cli/definition"
+	"github.com/kubeshop/tracetest/server/encoding/yaml/definition"
 	"gopkg.in/yaml.v2"
 )
 

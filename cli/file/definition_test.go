@@ -3,8 +3,8 @@ package file_test
 import (
 	"testing"
 
-	"github.com/kubeshop/tracetest/cli/definition"
 	"github.com/kubeshop/tracetest/cli/file"
+	"github.com/kubeshop/tracetest/server/encoding/yaml/definition"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -25,7 +25,7 @@ func TestLoadDefinition(t *testing.T) {
 				Description: "Import a pokemon using its ID",
 				Trigger: definition.TestTrigger{
 					Type: "http",
-					HTTPRequest: definition.HttpRequest{
+					HTTPRequest: definition.HTTPRequest{
 						URL:    "http://pokemon-demo.tracetest.io/pokemon/import",
 						Method: "POST",
 						Headers: []definition.HTTPHeader{
@@ -81,7 +81,7 @@ func TestLoadDefinition(t *testing.T) {
 				Description: "Import a pokemon using its ID",
 				Trigger: definition.TestTrigger{
 					Type: "http",
-					HTTPRequest: definition.HttpRequest{
+					HTTPRequest: definition.HTTPRequest{
 						URL:    "http://pokemon-demo.tracetest.io/pokemon/import",
 						Method: "POST",
 						Headers: []definition.HTTPHeader{

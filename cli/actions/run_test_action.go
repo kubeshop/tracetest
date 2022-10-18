@@ -10,11 +10,11 @@ import (
 
 	cienvironment "github.com/cucumber/ci-environment/go"
 	"github.com/kubeshop/tracetest/cli/config"
-	"github.com/kubeshop/tracetest/cli/definition"
 	"github.com/kubeshop/tracetest/cli/file"
 	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/kubeshop/tracetest/cli/variable"
+	"github.com/kubeshop/tracetest/server/encoding/yaml/definition"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v3"
 )

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/kubeshop/tracetest/cli/definition"
 	"github.com/kubeshop/tracetest/cli/variable"
+	"github.com/kubeshop/tracetest/server/encoding/yaml/definition"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -35,7 +35,7 @@ func TestInjectorWithStruct(t *testing.T) {
 		Name: "Test ${TRACETEST_URL}",
 		Trigger: definition.TestTrigger{
 			Type: "http",
-			HTTPRequest: definition.HttpRequest{
+			HTTPRequest: definition.HTTPRequest{
 				URL:    "${POKEMON_API_URL}",
 				Method: "GET",
 			},
@@ -55,7 +55,7 @@ func TestInjectorWithStruct(t *testing.T) {
 		Name: "Test http://localhost:11633",
 		Trigger: definition.TestTrigger{
 			Type: "http",
-			HTTPRequest: definition.HttpRequest{
+			HTTPRequest: definition.HTTPRequest{
 				URL:    "http://pokemon.api:11633",
 				Method: "GET",
 			},
