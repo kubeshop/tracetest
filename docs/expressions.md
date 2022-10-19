@@ -88,14 +88,43 @@ You can select the last item from a list by specifying `'last'` as the argument 
 '{ "array": [1, 2, 3] }' | json_path '$.array[*]' | get_index 'last' = 3
 ```
 
-### **Count**
+### **Length**
 
 Return the size of the input array. If it's a single value, it will return 1. Otherwise it will return `length(input_array)`.
 
 ```
-'{ "array": [1, 2, 3] }' | json_path '$.array[*]' | count = 3
+'{ "array": [1, 2, 3] }' | json_path '$.array[*]' | length = 3
 ```
 
 ```
-"my string" | count = 1
+"my string" | length = 1
+```
+
+### **Type**
+
+Return the type of the input as a string.
+
+```
+2 | type = "number"
+```
+
+```
+2s | type = "duration"
+```
+
+```
+"something" | type = "string"
+```
+
+```
+[1, 2s, "this is a string"] | type = "array"
+```
+
+```
+attr:myapp.operations | get_index 2 | type = "string"
+```
+
+```
+# check if attribute is either a number of a string
+["number", "string"] contains attr:my_attribute | type
 ```

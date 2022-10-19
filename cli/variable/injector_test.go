@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/kubeshop/tracetest/cli/definition"
 	"github.com/kubeshop/tracetest/cli/variable"
+	"github.com/kubeshop/tracetest/server/model/yaml"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -31,16 +31,16 @@ func TestInjectorWithStruct(t *testing.T) {
 	}
 	injector := variable.NewInjector(variable.WithVariableProvider(provider))
 
-	input := definition.Test{
+	input := yaml.Test{
 		Name: "Test ${TRACETEST_URL}",
-		Trigger: definition.TestTrigger{
+		Trigger: yaml.TestTrigger{
 			Type: "http",
-			HTTPRequest: definition.HttpRequest{
+			HTTPRequest: yaml.HTTPRequest{
 				URL:    "${POKEMON_API_URL}",
 				Method: "GET",
 			},
 		},
-		Specs: []definition.TestSpec{
+		Specs: []yaml.TestSpec{
 			{
 				Selector: "http.url = \"${POKEMON_API_URL}\"",
 				Assertions: []string{
@@ -51,16 +51,16 @@ func TestInjectorWithStruct(t *testing.T) {
 		},
 	}
 
-	expectedDefinition := definition.Test{
+	expectedDefinition := yaml.Test{
 		Name: "Test http://localhost:11633",
-		Trigger: definition.TestTrigger{
+		Trigger: yaml.TestTrigger{
 			Type: "http",
-			HTTPRequest: definition.HttpRequest{
+			HTTPRequest: yaml.HTTPRequest{
 				URL:    "http://pokemon.api:11633",
 				Method: "GET",
 			},
 		},
-		Specs: []definition.TestSpec{
+		Specs: []yaml.TestSpec{
 			{
 				Selector: "http.url = \"http://pokemon.api:11633\"",
 				Assertions: []string{

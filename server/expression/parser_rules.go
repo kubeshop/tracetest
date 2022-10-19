@@ -20,22 +20,33 @@ type OpTerm struct {
 }
 
 type Term struct {
-	Duration  *string    `( @Duration `
-	Number    *string    `| @Number `
-	Attribute *Attribute `| @Attribute `
-	Variable  *Variable  `| @Variable`
-	Str       *Str       `| @(QuotedString|SingleQuotedString) )`
+	FunctionCall *FunctionCall `( @@`
+	Array        *Array        `| @@`
+	Duration     *string       `| @Duration `
+	Number       *string       `| @Number `
+	Attribute    *Attribute    `| @Attribute `
+	Variable     *Variable     `| @Variable`
+	Str          *Str          `| @(QuotedString|SingleQuotedString) )`
 }
 
 type Filter struct {
-	FunctionName string  `"|" @Ident`
-	Args         []*Term `@@*`
+	Name string  `"|" @Ident`
+	Args []*Term `@@*`
+}
+
+type FunctionCall struct {
+	Name string  `@Ident`
+	Args []*Term `"(" ( @@ ("," @@ )* )? ")"`
+}
+
+type Array struct {
+	Items []*Term `"[" ( @@ ("," @@ )* )? "]"`
 }
 
 var languageLexer = lexer.MustStateful(lexer.Rules{
 	"Root": {
 		{Name: "whitespace", Pattern: `\s+`, Action: nil},
-		{Name: "Punc", Pattern: `\|`, Action: nil},
+		{Name: "Punc", Pattern: `[(),|\[\]]`, Action: nil},
 
 		{Name: "Comparator", Pattern: `!=|<=|>=|=|<|>|contains|not-contains`},
 		{Name: "Operator", Pattern: `(\+|\-|\*|\/)`, Action: nil},

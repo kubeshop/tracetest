@@ -1,17 +1,19 @@
-name: POST import pokemon
-description: Import a pokemon using its ID
-trigger:
-  type: http
-  httpRequest:
-    url: http://pokemon-demo.tracetest.io/pokemon/import
-    method: POST
-    headers:
-    - key: Content-Type
-      value: application/json
-    authentication:
-      type: apiKey
-      apiKey:
-        key: X-Key
-        value: ${POKEMON_APP_API_KEY}
-        in: header
-    body: '{ "id": 52 }'
+type: Test
+spec:
+  name: POST import pokemon
+  description: Import a pokemon using its ID
+  trigger:
+    type: http
+    httpRequest:
+      url: http://pokemon-demo.tracetest.io/pokemon/import
+      method: POST
+      headers:
+      - key: Content-Type
+        value: application/json
+      authentication:
+        type: apiKey
+        apiKey:
+          key: X-Key
+          value: ${POKEMON_APP_API_KEY}
+          in: header
+      body: '{ "id": 52 }'

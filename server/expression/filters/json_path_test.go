@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/kubeshop/tracetest/server/expression/filters"
+	"github.com/kubeshop/tracetest/server/expression/value"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -43,7 +44,7 @@ func TestJSONPath(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.Name, func(t *testing.T) {
-			input := filters.NewValueFromString(testCase.JSON)
+			input := value.NewFromString(testCase.JSON)
 			output, err := filters.JSON_path(input, testCase.Query)
 			require.NoError(t, err)
 

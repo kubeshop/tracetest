@@ -251,7 +251,7 @@ func TestFilters(t *testing.T) {
 					},
 					Filters: []*expression.Filter{
 						{
-							FunctionName: "json_path", Args: []*expression.Term{
+							Name: "json_path", Args: []*expression.Term{
 								{
 									Str: &expression.Str{
 										Text: ".id",
@@ -286,7 +286,7 @@ func TestFilters(t *testing.T) {
 					},
 					Filters: []*expression.Filter{
 						{
-							FunctionName: "json_path", Args: []*expression.Term{
+							Name: "json_path", Args: []*expression.Term{
 								{
 									Str: &expression.Str{
 										Text: ".id",
@@ -309,7 +309,7 @@ func TestFilters(t *testing.T) {
 					},
 					Filters: []*expression.Filter{
 						{
-							FunctionName: "my_function", Args: []*expression.Term{
+							Name: "my_function", Args: []*expression.Term{
 								{
 									Str: &expression.Str{
 										Text: "arg1",
@@ -350,7 +350,7 @@ func TestFilters(t *testing.T) {
 					},
 					Filters: []*expression.Filter{
 						{
-							FunctionName: "json_path", Args: []*expression.Term{
+							Name: "json_path", Args: []*expression.Term{
 								{
 									Str: &expression.Str{
 										Text: ".name",
@@ -360,7 +360,7 @@ func TestFilters(t *testing.T) {
 							},
 						},
 						{
-							FunctionName: "lowercase",
+							Name: "lowercase",
 						},
 					},
 				},
@@ -396,7 +396,7 @@ func TestFilters(t *testing.T) {
 									},
 									Filters: []*expression.Filter{
 										{
-											FunctionName: "json_path", Args: []*expression.Term{
+											Name: "json_path", Args: []*expression.Term{
 												{
 													Str: &expression.Str{
 														Text: ".name",
@@ -407,6 +407,150 @@ func TestFilters(t *testing.T) {
 										},
 									},
 								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	runTestCases(t, testCases)
+}
+
+func TestFunctions(t *testing.T) {
+	testCases := []parserTestCase{
+		{
+			Name:  "should_parse_no_arg_function",
+			Query: `myFunction() = 3`,
+			ExpectedOutput: expression.Statement{
+				Left: expression.Expr{
+					Left: &expression.Term{
+						FunctionCall: &expression.FunctionCall{
+							Name: "myFunction",
+							Args: nil,
+						},
+					},
+				},
+				Comparator: "=",
+				Right:      numberExpr(3),
+			},
+		},
+		{
+			Name:  "should_parse_one_arg_function",
+			Query: `getRandomString(5) = "abcde"`,
+			ExpectedOutput: expression.Statement{
+				Left: expression.Expr{
+					Left: &expression.Term{
+						FunctionCall: &expression.FunctionCall{
+							Name: "getRandomString",
+							Args: []*expression.Term{
+								{
+									Number: strp("5"),
+								},
+							},
+						},
+					},
+				},
+				Comparator: "=",
+				Right:      strExpr("abcde"),
+			},
+		},
+		{
+			Name:  "should_parse_one_arg_function",
+			Query: `randomInt(5, 10) = 7`,
+			ExpectedOutput: expression.Statement{
+				Left: expression.Expr{
+					Left: &expression.Term{
+						FunctionCall: &expression.FunctionCall{
+							Name: "randomInt",
+							Args: []*expression.Term{
+								{
+									Number: strp("5"),
+								},
+								{
+									Number: strp("10"),
+								},
+							},
+						},
+					},
+				},
+				Comparator: "=",
+				Right:      numberExpr(7),
+			},
+		},
+	}
+
+	runTestCases(t, testCases)
+}
+
+func TestArrays(t *testing.T) {
+	testCases := []parserTestCase{
+		{
+			Name:  "should_parse_empty_array",
+			Query: `[] = []`,
+			ExpectedOutput: expression.Statement{
+				Left: expression.Expr{
+					Left: &expression.Term{
+						Array: &expression.Array{},
+					},
+				},
+				Comparator: "=",
+				Right: expression.Expr{
+					Left: &expression.Term{
+						Array: &expression.Array{},
+					},
+				},
+			},
+		},
+		{
+			Name:  "should_parse_single_item_arrays",
+			Query: `[2] = [3]`,
+			ExpectedOutput: expression.Statement{
+				Left: expression.Expr{
+					Left: &expression.Term{
+						Array: &expression.Array{
+							Items: []*expression.Term{
+								{Number: strp("2")},
+							},
+						},
+					},
+				},
+				Comparator: "=",
+				Right: expression.Expr{
+					Left: &expression.Term{
+						Array: &expression.Array{
+							Items: []*expression.Term{
+								{Number: strp("3")},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			Name:  "should_parse_multiple_items_arrays",
+			Query: `[1, 2s, "3"] = ["3", 2s, 1]`,
+			ExpectedOutput: expression.Statement{
+				Left: expression.Expr{
+					Left: &expression.Term{
+						Array: &expression.Array{
+							Items: []*expression.Term{
+								{Number: strp("1")},
+								{Duration: strp("2s")},
+								{Str: &expression.Str{Text: "3", Args: []expression.Expr{}}},
+							},
+						},
+					},
+				},
+				Comparator: "=",
+				Right: expression.Expr{
+					Left: &expression.Term{
+						Array: &expression.Array{
+							Items: []*expression.Term{
+								{Str: &expression.Str{Text: "3", Args: []expression.Expr{}}},
+								{Duration: strp("2s")},
+								{Number: strp("1")},
 							},
 						},
 					},

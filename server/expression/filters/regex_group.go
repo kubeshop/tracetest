@@ -5,25 +5,26 @@ import (
 	"regexp"
 
 	"github.com/kubeshop/tracetest/server/expression/types"
+	"github.com/kubeshop/tracetest/server/expression/value"
 )
 
-func RegexGroup(input Value, args ...string) (Value, error) {
+func RegexGroup(input value.Value, args ...string) (value.Value, error) {
 	if len(args) != 1 {
-		return Value{}, fmt.Errorf("wrong number of args. Expected 1, got %d", len(args))
+		return value.Value{}, fmt.Errorf("wrong number of args. Expected 1, got %d", len(args))
 	}
 
-	if len(input) != 1 {
-		return Value{}, fmt.Errorf("cannot process array of json objects")
+	if input.IsArray() {
+		return value.Value{}, fmt.Errorf("cannot process array of json objects")
 	}
 
 	regex, err := regexp.Compile(args[0])
 	if err != nil {
-		return Value{}, fmt.Errorf("invalid regex: %w", err)
+		return value.Value{}, fmt.Errorf("invalid regex: %w", err)
 	}
 
 	groups := regex.FindAllStringSubmatch(input.Value().Value, -1)
 	if groups == nil {
-		return NewArrayValue([]types.TypedValue{}), nil
+		return value.NewArray([]types.TypedValue{}), nil
 	}
 
 	output := make([]string, 0)
@@ -33,8 +34,8 @@ func RegexGroup(input Value, args ...string) (Value, error) {
 
 	if len(output) == 1 {
 		typedValue := types.GetTypedValue(output[0])
-		return NewValue(typedValue), nil
+		return value.New(typedValue), nil
 	}
 
-	return NewArrayValueFromStrings(output), nil
+	return value.NewArrayFromStrings(output), nil
 }
