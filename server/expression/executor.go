@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/expression/functions"
 	"github.com/kubeshop/tracetest/server/expression/types"
 	"github.com/kubeshop/tracetest/server/expression/value"
@@ -60,14 +59,9 @@ func (e Executor) Statement(statement string) (string, string, error) {
 		})
 	}
 
-	comparatorFunction, err := comparator.DefaultRegistry().Get(parsedStatement.Comparator)
+	err = compare(parsedStatement.Comparator, leftValue, rightValue)
 	if err != nil {
-		return "", "", fmt.Errorf("comparator not supported: %w", err)
-	}
-
-	err = comparatorFunction.Compare(rightValue.String(), leftValue.String())
-	if err == comparator.ErrNoMatch {
-		err = ErrNoMatch
+		return leftValue.String(), rightValue.String(), err
 	}
 
 	if leftValue.Type() == types.TypeDuration || rightValue.Type() == types.TypeDuration {

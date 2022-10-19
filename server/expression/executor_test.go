@@ -285,6 +285,16 @@ func TestArrayExecution(t *testing.T) {
 			Query:      `'{ "array": [{ "name": "john", "age": 37 }, { "name": "jonas", "age": 38 }]}' | json_path '$.array[*].age' = [37, 38]`,
 			ShouldPass: true,
 		},
+		{
+			Name:       "should_check_if_array_contains_value",
+			Query:      `[31,35,39] contains 35`,
+			ShouldPass: true,
+		},
+		{
+			Name:       "should_check_if_array_contains_value_and_fail_if_not",
+			Query:      `[31,35,39] contains 42`,
+			ShouldPass: false,
+		},
 	}
 
 	executeTestCases(t, testCases)
