@@ -10,16 +10,16 @@ import (
 type valueType int
 
 const (
-	TypeSingle valueType = iota
+	TypeNil valueType = iota
+	TypeSingle
 	TypeArray
-	TypeNil
 )
 
-var Nil = Value{Type: TypeNil}
+var Nil = Value{vType: TypeNil}
 
 type Value struct {
 	Items []types.TypedValue
-	Type  valueType
+	vType valueType
 }
 
 func NewFromString(input string) Value {
@@ -27,7 +27,7 @@ func NewFromString(input string) Value {
 }
 
 func New(value types.TypedValue) Value {
-	return Value{Items: []types.TypedValue{value}, Type: TypeSingle}
+	return Value{Items: []types.TypedValue{value}, vType: TypeSingle}
 }
 
 func NewArrayFromStrings(inputs []string) Value {
@@ -40,7 +40,7 @@ func NewArrayFromStrings(inputs []string) Value {
 }
 
 func NewArray(values []types.TypedValue) Value {
-	return Value{Items: values, Type: TypeArray}
+	return Value{Items: values, vType: TypeArray}
 }
 
 func (v Value) Len() int {
@@ -48,7 +48,7 @@ func (v Value) Len() int {
 }
 
 func (v Value) IsArray() bool {
-	return v.Type == TypeArray
+	return v.vType == TypeArray
 }
 
 func (v Value) Value() types.TypedValue {
@@ -57,6 +57,14 @@ func (v Value) Value() types.TypedValue {
 	}
 
 	return types.TypedValue{}
+}
+
+func (v Value) Type() types.Type {
+	if v.IsArray() {
+		return types.TypeArray
+	}
+
+	return v.Value().Type
 }
 
 func (v Value) ValueAt(index int) types.TypedValue {

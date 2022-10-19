@@ -49,7 +49,7 @@ func (e Executor) Statement(statement string) (string, string, error) {
 	}
 
 	// https://github.com/kubeshop/tracetest/issues/1203
-	if leftValue.Value().Type == types.TypeDuration || rightValue.Value().Type == types.TypeDuration {
+	if leftValue.Type() == types.TypeDuration || rightValue.Type() == types.TypeDuration {
 		leftValue = value.New(types.TypedValue{
 			Value: getRoundedDurationValue(leftValue.String()),
 			Type:  types.TypeDuration,
@@ -70,7 +70,7 @@ func (e Executor) Statement(statement string) (string, string, error) {
 		err = ErrNoMatch
 	}
 
-	if leftValue.Value().Type == types.TypeDuration || rightValue.Value().Type == types.TypeDuration {
+	if leftValue.Type() == types.TypeDuration || rightValue.Type() == types.TypeDuration {
 		// If any of the sides is a duration, there's a high change of the other side
 		// to be a duration as well. So try to format both before returning it
 		leftValue = value.NewFromString(maybeFormatDuration(leftValue))
@@ -235,7 +235,7 @@ func (e Executor) executeOperation(left types.TypedValue, right *OpTerm) (value.
 		return value.Nil, err
 	}
 
-	if left.Type != rightValue.Value().Type {
+	if left.Type != rightValue.Type() {
 		return value.Nil, fmt.Errorf("types mismatch")
 	}
 
@@ -297,7 +297,7 @@ func maybeFormatDuration(input value.Value) string {
 	// Any type other than duration and number is certain to not be a duration field
 	// We still try to convert types.TYPE_NUMBER because we store durations as long numbers,
 	// so it's worth trying converting it.
-	if input.Value().Type != types.TypeDuration && input.Value().Type != types.TypeNumber {
+	if input.Type() != types.TypeDuration && input.Type() != types.TypeNumber {
 		return input.String()
 	}
 
