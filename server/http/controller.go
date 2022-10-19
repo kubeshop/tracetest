@@ -10,16 +10,14 @@ import (
 
 	"github.com/kubeshop/tracetest/server/assertions"
 	"github.com/kubeshop/tracetest/server/assertions/selectors"
-	"github.com/kubeshop/tracetest/server/encoding/yaml/conversion"
-	"github.com/kubeshop/tracetest/server/encoding/yaml/definition"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/http/mappings"
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/junit"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/model/yaml"
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/testdb"
-	"gopkg.in/yaml.v3"
 )
 
 var IDGen = id.NewRandGenerator()
@@ -385,12 +383,15 @@ func (c controller) GetTestVersionDefinitionFile(ctx context.Context, testID str
 		return handleDBError(err), err
 	}
 
-	res, err := conversion.GetYamlFileFromDefinition(c.mappers.Out.TestDefinitionFile(test))
+	enc, err := yaml.Encode(yaml.File{
+		Type: yaml.FileTypeTest,
+		Spec: test,
+	})
 	if err != nil {
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
 	}
 
-	return openapi.Response(200, res), nil
+	return openapi.Response(200, enc), nil
 }
 
 func (c controller) ExportTestRun(ctx context.Context, testID, runID string) (openapi.ImplResponse, error) {
