@@ -6,6 +6,7 @@ import {CompareOperator} from 'constants/Operator.constants';
 import {useAppSelector} from 'redux/hooks';
 import AssertionSelectors from 'selectors/Assertion.selectors';
 import SpanSelectors from 'selectors/Span.selectors';
+import TestSpecsSelectors from 'selectors/TestSpecs.selectors';
 import OperatorService from 'services/Operator.service';
 import {TAssertion} from 'types/Assertion.types';
 import {singularOrPlural} from 'utils/Common';
@@ -13,6 +14,7 @@ import AssertionCheckList from './AssertionCheckList';
 import useAssertionFormValues from './hooks/useAssertionFormValues';
 import useOnFieldsChange from './hooks/useOnFieldsChange';
 import SelectorInput from './SelectorInput';
+import SelectorSuggestions from './SelectorSuggestions';
 import * as S from './TestSpecForm.styled';
 
 export interface IValues {
@@ -60,6 +62,8 @@ const TestSpecForm = ({
     attributeList,
   });
 
+  const selectorSuggestions = useAppSelector(TestSpecsSelectors.selectSelectorSuggestions);
+
   return (
     <S.AssertionForm>
       <S.AssertionFormHeader>
@@ -92,6 +96,19 @@ const TestSpecForm = ({
             </a>
           </S.FormSectionRow>
           <SelectorInput form={form} testId={testId} runId={runId} onValidSelector={setIsValid} />
+
+          <S.SuggestionsContainer>
+            {!isEditing && (
+              <SelectorSuggestions
+                onClick={query => {
+                  form.setFieldsValue({
+                    selector: query,
+                  });
+                }}
+                selectorSuggestions={selectorSuggestions}
+              />
+            )}
+          </S.SuggestionsContainer>
         </S.FormSection>
 
         <S.FormSection>

@@ -96,6 +96,14 @@ export const FormSectionText = styled(Typography.Text)`
   color: ${({theme}) => theme.color.textSecondary};
 `;
 
+export const SuggestionsContainer = styled.div`
+  margin-bottom: 24px;
+`;
+
+export const SuggestionsButton = styled(Button)`
+  padding: 4px 8px;
+`;
+
 export const ExpectedInputContainer = styled.div`
   width: 0;
   flex-basis: 50%;
@@ -110,7 +118,7 @@ export const ExpectedInputContainer = styled.div`
       outline: 1px solid grey;
       height: 32px;
       font-family: SFPro, serif;
-      outline: 1px solid #CDD1DB;
+      outline: 1px solid #cdd1db;
     }
 
     .cm-content {

@@ -224,6 +224,16 @@ components:
         content:
           type: string
 
+    SelectedSpansResult:
+      type: object
+      properties:
+        selector:
+          $ref: "#/components/schemas/Selector"
+        spanIds:
+          type: array
+          items:
+            type: string
+
     Selector:
       type: object
       properties:

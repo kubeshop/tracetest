@@ -11,6 +11,7 @@ export const initialState: ITestSpecsState = {
   isInitialized: false,
   selectedSpec: undefined,
   isDraftMode: false,
+  selectorSuggestions: [],
 };
 
 export const assertionResultsToSpecs = (assertionResults: TAssertionResults): TTestSpecEntry[] => {
@@ -85,6 +86,9 @@ const testSpecsSlice = createSlice<ITestSpecsState, TTestSpecsSliceActions, 'tes
       if (assertionResult) state.selectedSpec = assertionResult.selector;
       else state.selectedSpec = undefined;
     },
+    setSelectorSuggestions(state, {payload: selectorSuggestions}) {
+      state.selectorSuggestions = selectorSuggestions;
+    },
   },
   extraReducers: builder => {
     builder
@@ -126,5 +130,6 @@ export const {
   reset,
   setSelectedSpec,
   setIsInitialized,
+  setSelectorSuggestions,
 } = testSpecsSlice.actions;
 export default testSpecsSlice.reducer;

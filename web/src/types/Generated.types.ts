@@ -91,11 +91,19 @@ export interface operations {
         skip?: number;
         /** query to search tests, based on test name and description */
         query?: string;
+        /** indicates the sort field for the tests */
+        sortBy?: "created" | "name" | "last_run";
+        /** indicates the sort direction for the tests */
+        sortDirection?: "asc" | "desc";
       };
     };
     responses: {
       /** successful operation */
       200: {
+        headers: {
+          /** Total records count */
+          "X-Total-Count"?: number;
+        };
         content: {
           "application/json": external["tests.yaml"]["components"]["schemas"]["Test"][];
         };
@@ -226,6 +234,10 @@ export interface operations {
     responses: {
       /** successful operation */
       200: {
+        headers: {
+          /** Total records count */
+          "X-Total-Count"?: number;
+        };
         content: {
           "application/json": external["tests.yaml"]["components"]["schemas"]["TestRun"][];
         };
@@ -268,7 +280,7 @@ export interface operations {
       /** successful operation */
       200: {
         content: {
-          "application/json": string[];
+          "application/json": external["tests.yaml"]["components"]["schemas"]["SelectedSpansResult"];
         };
       };
     };
@@ -576,6 +588,7 @@ export interface external {
         /** @example [object Object] */
         TestSpecs: {
           specs?: {
+            name?: string | null;
             selector?: external["tests.yaml"]["components"]["schemas"]["Selector"];
             assertions?: external["tests.yaml"]["components"]["schemas"]["Assertion"][];
           }[];
@@ -645,6 +658,10 @@ export interface external {
         };
         DefinitionFile: {
           content?: string;
+        };
+        SelectedSpansResult: {
+          selector?: external["tests.yaml"]["components"]["schemas"]["Selector"];
+          spanIds?: string[];
         };
         Selector: {
           query?: string;

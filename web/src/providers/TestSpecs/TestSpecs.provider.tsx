@@ -1,12 +1,12 @@
 import {noop} from 'lodash';
-
-import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import {createContext, useContext, useEffect, useMemo} from 'react';
 import {useAppSelector} from 'redux/hooks';
+
+import TestProvider from 'providers/Test';
+import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import TestSpecsSelectors from 'selectors/TestSpecs.selectors';
 import {TAssertionResultEntry, TAssertionResults} from 'types/Assertion.types';
-import {TTestSpecEntry} from 'types/TestSpecs.types';
-import TestProvider from 'providers/Test';
+import {ISuggestion, TTestSpecEntry} from 'types/TestSpecs.types';
 import useTestSpecsCrud from './hooks/useTestSpecsCrud';
 
 interface IContext {
@@ -25,6 +25,7 @@ interface IContext {
   isError: boolean;
   isDraftMode: boolean;
   setSelectedSpec(selector?: string): void;
+  setSelectorSuggestions(selectorSuggestions: ISuggestion[]): void;
 }
 
 export const Context = createContext<IContext>({
@@ -41,6 +42,7 @@ export const Context = createContext<IContext>({
   specs: [],
   setSelectedSpec: noop,
   updateIsInitialized: noop,
+  setSelectorSuggestions: noop,
 });
 
 interface IProps {
@@ -63,13 +65,25 @@ const TestSpecsProvider = ({children, testId, runId}: IProps) => {
   const selectedSpec = useAppSelector(TestSpecsSelectors.selectSelectedSpec);
   const selectedTestSpec = useAppSelector(state => TestSpecsSelectors.selectAssertionBySelector(state, selectedSpec!));
 
-  const {add, cancel, publish, remove, dryRun, update, init, reset, revert, updateIsInitialized, setSelectedSpec} =
-    useTestSpecsCrud({
-      assertionResults,
-      testId,
-      runId,
-      isDraftMode,
-    });
+  const {
+    add,
+    cancel,
+    publish,
+    remove,
+    dryRun,
+    update,
+    init,
+    reset,
+    revert,
+    updateIsInitialized,
+    setSelectedSpec,
+    setSelectorSuggestions,
+  } = useTestSpecsCrud({
+    assertionResults,
+    testId,
+    runId,
+    isDraftMode,
+  });
 
   useEffect(() => {
     if (run.state === 'FINISHED') init(run.result);
@@ -102,6 +116,7 @@ const TestSpecsProvider = ({children, testId, runId}: IProps) => {
       setSelectedSpec,
       revert,
       updateIsInitialized,
+      setSelectorSuggestions,
     }),
     [
       add,
@@ -118,6 +133,7 @@ const TestSpecsProvider = ({children, testId, runId}: IProps) => {
       setSelectedSpec,
       revert,
       updateIsInitialized,
+      setSelectorSuggestions,
     ]
   );
 

@@ -118,6 +118,7 @@ func (c *controller) GetTestSpecs(ctx context.Context, testID string) (openapi.I
 
 func (c *controller) GetTestResultSelectedSpans(ctx context.Context, testID, runID, selectorQuery string) (openapi.ImplResponse, error) {
 	selector, err := selectors.New(selectorQuery)
+
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -142,7 +143,12 @@ func (c *controller) GetTestResultSelectedSpans(ctx context.Context, testID, run
 		selectedSpanIds[i] = hex.EncodeToString(span.ID[:])
 	}
 
-	return openapi.Response(http.StatusOK, selectedSpanIds), nil
+	res := openapi.SelectedSpansResult{
+		Selector: c.mappers.Out.Selector(model.SpanQuery(selectorQuery)),
+		SpanIds:  selectedSpanIds,
+	}
+
+	return openapi.Response(http.StatusOK, res), nil
 }
 
 func (c *controller) GetTestRun(ctx context.Context, testID, runID string) (openapi.ImplResponse, error) {

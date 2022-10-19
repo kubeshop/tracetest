@@ -36,7 +36,8 @@ const Search = ({runId, testId}: IProps) => {
 
       let spanIds = [];
       if (isValidSelector) {
-        spanIds = await getSelectedSpans({query, runId, testId}).unwrap();
+        const selectedSpansData = await getSelectedSpans({query, runId, testId}).unwrap();
+        spanIds = selectedSpansData.spanIds;
       } else {
         dispatch(setSearchText({searchText: query}));
         spanIds = SpanService.searchSpanList(spans, query);
