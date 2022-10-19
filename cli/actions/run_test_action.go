@@ -60,8 +60,8 @@ func (a runTestAction) Run(ctx context.Context, args RunTestConfig) error {
 		JunitFile:      args.JUnit,
 		Metadata:       metadata,
 	}
-	err := a.runDefinition(ctx, params)
 
+	err := a.runDefinition(ctx, params)
 	if err != nil {
 		return fmt.Errorf("could not run definition: %w", err)
 	}
@@ -80,15 +80,15 @@ func (a runTestAction) runDefinition(ctx context.Context, params runDefParams) e
 		return fmt.Errorf("invalid definition file: %w", err)
 	}
 
-	if test, err := defFile.Test(); err != nil {
+	if test, err := defFile.Test(); err == nil {
 		return a.runTestFile(ctx, test, params)
 	}
 
-	// if transaction, err := defFile.Transaction(); err != nil {
+	// if transaction, err := defFile.Transaction(); err == nil {
 	// 	return a.runTransactionFile(transaction)
 	// }
 
-	return fmt.Errorf("invalid test type")
+	return fmt.Errorf("invalid file type")
 }
 
 func (a runTestAction) runTestFile(ctx context.Context, defTest yaml.Test, params runDefParams) error {
