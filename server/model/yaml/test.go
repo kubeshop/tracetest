@@ -115,7 +115,7 @@ type TestSpec struct {
 	Assertions []string `mapstructure:"assertions"`
 }
 
-func (t Test) Model() (model.Test, error) {
+func (t Test) Model() model.Test {
 	mt := model.Test{
 		ID:               id.ID(t.ID),
 		Name:             t.Name,
@@ -125,5 +125,5 @@ func (t Test) Model() (model.Test, error) {
 		Outputs:          t.Outputs.Model(),
 	}
 
-	return mt, nil
+	return mt
 }

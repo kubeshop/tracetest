@@ -58,6 +58,10 @@ func (c *controller) CreateTest(ctx context.Context, in openapi.Test) (openapi.I
 		return openapi.Response(http.StatusBadRequest, err.Error()), nil
 	}
 
+	return c.doCreateTest(ctx, test)
+}
+
+func (c *controller) doCreateTest(ctx context.Context, test model.Test) (openapi.ImplResponse, error) {
 	// if they try to create a test with preset ID, we need to make sure that ID doesn't exists already
 	if test.HasID() {
 		exists, err := c.testDB.IDExists(ctx, test.ID)
@@ -74,7 +78,7 @@ func (c *controller) CreateTest(ctx context.Context, in openapi.Test) (openapi.I
 		}
 	}
 
-	test, err = c.testDB.CreateTest(ctx, test)
+	test, err := c.testDB.CreateTest(ctx, test)
 	if err != nil {
 		return openapi.Response(http.StatusInternalServerError, err.Error()), err
 	}
@@ -298,15 +302,20 @@ func (c *controller) SetTestSpecs(ctx context.Context, testID string, def openap
 }
 
 func (c *controller) UpdateTest(ctx context.Context, testID string, in openapi.Test) (openapi.ImplResponse, error) {
-	test, err := c.testDB.GetLatestTestVersion(ctx, id.ID(testID))
-	if err != nil {
-		return handleDBError(err), err
-	}
-
 	updated, err := c.mappers.In.Test(in)
 	if err != nil {
 		return openapi.Response(http.StatusBadRequest, err.Error()), nil
 	}
+
+	return c.doUpdateTest(ctx, id.ID(testID), updated)
+}
+
+func (c *controller) doUpdateTest(ctx context.Context, testID id.ID, updated model.Test) (openapi.ImplResponse, error) {
+	test, err := c.testDB.GetLatestTestVersion(ctx, testID)
+	if err != nil {
+		return handleDBError(err), err
+	}
+
 	updated.Version = test.Version
 	updated.ID = test.ID
 
@@ -454,36 +463,29 @@ func (c controller) ImportTestRun(ctx context.Context, exportedTest openapi.Expo
 }
 
 func (c *controller) CreateTestFromDefinition(ctx context.Context, testDefinition openapi.TextDefinition) (openapi.ImplResponse, error) {
-	var definitionObject definition.Test
-	err := yaml.Unmarshal([]byte(testDefinition.Content), &definitionObject)
+	def, err := yaml.Decode([]byte(testDefinition.Content))
 	if err != nil {
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
 	}
 
-	openapiObject, err := conversion.ConvertTestDefinitionIntoOpenAPIObject(definitionObject)
+	test, err := def.Test()
 	if err != nil {
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
 	}
 
-	return c.CreateTest(ctx, openapiObject)
+	return c.doCreateTest(ctx, test.Model())
 }
 
-func (c *controller) UpdateTestFromDefinition(ctx context.Context, testId string, testDefinition openapi.TextDefinition) (openapi.ImplResponse, error) {
-	var definitionObject definition.Test
-	err := yaml.Unmarshal([]byte(testDefinition.Content), &definitionObject)
+func (c *controller) UpdateTestFromDefinition(ctx context.Context, testID string, testDefinition openapi.TextDefinition) (openapi.ImplResponse, error) {
+	def, err := yaml.Decode([]byte(testDefinition.Content))
 	if err != nil {
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
 	}
 
-	openapiObject, err := conversion.ConvertTestDefinitionIntoOpenAPIObject(definitionObject)
+	updated, err := def.Test()
 	if err != nil {
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
 	}
 
-	response, err := c.UpdateTest(ctx, testId, openapiObject)
-	if err != nil {
-		return response, err
-	}
-
-	return openapi.Response(http.StatusOK, openapiObject), nil
+	return c.doUpdateTest(ctx, id.ID(testID), updated.Model())
 }

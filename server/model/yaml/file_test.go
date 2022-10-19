@@ -321,8 +321,7 @@ func TestTestModel(t *testing.T) {
 			test, err := file.Test()
 			require.NoError(t, err)
 
-			actual, err := test.Model()
-			require.NoError(t, err)
+			actual := test.Model()
 
 			assert.Equal(t, cl.expected, actual)
 		})
