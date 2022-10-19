@@ -53,16 +53,28 @@ export const SelectorEditorContainer = styled(EditorContainer)<{$isEditable: boo
 export const ExpressionEditorContainer = styled(EditorContainer)<{$isEditable: boolean}>`
   && {
     .cm-editor {
-      outline: ${({$isEditable, theme}) => $isEditable && `1px solid ${theme.color.primary}`};
+      border: 1px solid ${({theme}) => theme.color.border};
+      transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+
+      &.cm-focused {
+        border-color: ${({theme}) => theme.color.primary};
+        box-shadow: 0 0 0 2px rgb(97 23 94 / 20%);
+        border-right-width: 1px;
+        outline: 0;
+      }
     }
 
-    .cm-scroller {
-      overflow: inherit;
+    .cm-content {
+      font-family: ${({theme}) => theme.font.family};
     }
 
     ${({$isEditable}) =>
       !$isEditable &&
       css`
+        .cm-editor {
+          border: none;
+        }
+
         .cm-gutterElement {
           display: none;
         }

@@ -7,8 +7,7 @@ import TestSpecsSelectors from 'selectors/TestSpecs.selectors';
 import TraceAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
 import SpanService from 'services/Span.service';
 import {TSpan, TSpanFlatAttribute} from 'types/Span.types';
-import {CompareOperator} from 'constants/Operator.constants';
-import OperatorService from 'services/Operator.service';
+import {CompareOperatorSymbolMap} from 'constants/Operator.constants';
 import AssertionService from 'services/Assertion.service';
 import Attributes from './Attributes';
 import Header from './Header';
@@ -35,9 +34,11 @@ const SpanDetail = ({onCreateTestSpec = noop, searchText, span}: IProps) => {
         selector,
         defaultValues: {
           assertions: [
-            `attr:${key} ${OperatorService.getOperatorSymbol(
-              CompareOperator.EQUALS
-            )} ${AssertionService.extractExpectedString(value)}`,
+            {
+              left: `attr:${key}`,
+              comparator: CompareOperatorSymbolMap.EQUALS,
+              right: AssertionService.extractExpectedString(value) || '',
+            },
           ],
           selector,
         },

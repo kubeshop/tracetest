@@ -4,15 +4,18 @@ import {ADVANCE_SELECTORS_DOCUMENTATION_URL} from 'constants/Common.constants';
 import {useAppSelector} from 'redux/hooks';
 import AssertionSelectors from 'selectors/Assertion.selectors';
 import SpanSelectors from 'selectors/Span.selectors';
+import {TStructuredAssertion} from 'types/Assertion.types';
 import {singularOrPlural} from 'utils/Common';
 import AssertionCheckList from './AssertionCheckList';
 import useAssertionFormValues from './hooks/useAssertionFormValues';
 import useOnFieldsChange from './hooks/useOnFieldsChange';
 import SelectorInput from './SelectorInput';
 import * as S from './TestSpecForm.styled';
+import {CompareOperator} from '../../constants/Operator.constants';
+import OperatorService from '../../services/Operator.service';
 
 export interface IValues {
-  assertions?: string[];
+  assertions?: TStructuredAssertion[];
   selector?: string;
 }
 
@@ -26,7 +29,16 @@ interface IProps {
 }
 
 const TestSpecForm = ({
-  defaultValues: {assertions = [''], selector = ''} = {},
+  defaultValues: {
+    assertions = [
+      {
+        left: '',
+        comparator: OperatorService.getOperatorSymbol(CompareOperator.EQUALS),
+        right: '',
+      },
+    ],
+    selector = '',
+  } = {},
   isEditing = false,
   onCancel,
   onSubmit,

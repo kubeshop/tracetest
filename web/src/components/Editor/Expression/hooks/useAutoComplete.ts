@@ -1,6 +1,6 @@
 import {useCallback} from 'react';
-import {uniqBy} from 'lodash';
-import {CompletionContext} from '@codemirror/autocomplete';
+import {noop, uniqBy} from 'lodash';
+import {Completion, CompletionContext} from '@codemirror/autocomplete';
 import {useAppStore} from 'redux/hooks';
 import AssertionSelectors from 'selectors/Assertion.selectors';
 import EnvironmentSelectors from 'selectors/Environment.selectors';
@@ -11,9 +11,10 @@ import {SupportedEditors} from 'constants/Editor.constants';
 interface IProps {
   testId: string;
   runId: string;
+  onSelect?(option: Completion): void;
 }
 
-const useAutoComplete = ({testId, runId}: IProps) => {
+const useAutoComplete = ({testId, runId, onSelect = noop}: IProps) => {
   const {getState} = useAppStore();
 
   const getAttributeList = useCallback(() => {
@@ -40,9 +41,10 @@ const useAutoComplete = ({testId, runId}: IProps) => {
         context,
         attributeList,
         envEntryList,
+        onSelect,
       });
     },
-    [getAttributeList, getSelectedEnvironmentEntryList]
+    [getAttributeList, getSelectedEnvironmentEntryList, onSelect]
   );
 };
 

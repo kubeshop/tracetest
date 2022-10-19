@@ -3,6 +3,7 @@ import {FormInstance} from 'antd';
 import {FormListFieldData} from 'antd/lib/form/FormList';
 import CreateAssertionModalAnalyticsService from 'services/Analytics/CreateAssertionModalAnalytics.service';
 import {TSpanFlatAttribute} from 'types/Span.types';
+import {TStructuredAssertion} from 'types/Assertion.types';
 import {AssertionCheck} from './AssertionCheck';
 import {useGetOTELSemanticConventionAttributesInfo} from './hooks/useGetOTELSemanticConventionAttributesInfo';
 import {IValues} from './TestSpecForm';
@@ -10,7 +11,7 @@ import * as S from './TestSpecForm.styled';
 
 interface IProps {
   add(): void;
-  assertions: string[];
+  assertions: TStructuredAssertion[];
   attributeList: TSpanFlatAttribute[];
   fields: FormListFieldData[];
   form: FormInstance<IValues>;

@@ -50,3 +50,5 @@ export enum PseudoSelector {
   NTH = ':nth_child',
   ALL = '',
 }
+
+export const OperatorRegexp = /= | != | < | > | >= | <= | contains | not-contains/gi;
