@@ -84,10 +84,6 @@ func (a runTestAction) runDefinition(ctx context.Context, params runDefParams) e
 		return a.runTestFile(ctx, test, params)
 	}
 
-	// if transaction, err := defFile.Transaction(); err == nil {
-	// 	return a.runTransactionFile(transaction)
-	// }
-
 	return fmt.Errorf("invalid file type")
 }
 
