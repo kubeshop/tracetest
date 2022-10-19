@@ -14,9 +14,8 @@ import (
 	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/kubeshop/tracetest/cli/variable"
-	"github.com/kubeshop/tracetest/server/encoding/yaml/definition"
+	"github.com/kubeshop/tracetest/server/model/yaml"
 	"go.uber.org/zap"
-	"gopkg.in/yaml.v3"
 )
 
 type RunTestConfig struct {
@@ -174,11 +173,15 @@ func (a runTestAction) saveJUnitFile(ctx context.Context, testId, testRunId, out
 
 }
 
-func (a runTestAction) createTestFromDefinition(ctx context.Context, definition definition.Test) (_ openapi.Test, exists bool, _ error) {
+func (a runTestAction) createTestFromDefinition(ctx context.Context, definition yaml.Test) (_ openapi.Test, exists bool, _ error) {
 	variableInjector := variable.NewInjector()
 	variableInjector.Inject(&definition)
 
-	yamlContentBytes, err := yaml.Marshal(definition)
+	yamlContentBytes, err := yaml.Encode(yaml.File{
+		Type: yaml.FileTypeTest,
+		Spec: definition,
+	})
+
 	if err != nil {
 		return openapi.Test{}, false, fmt.Errorf("could not marshal yaml: %w", err)
 	}
@@ -208,7 +211,10 @@ func (a runTestAction) updateTestFromDefinition(ctx context.Context, definition 
 	variableInjector := variable.NewInjector()
 	variableInjector.Inject(&definition)
 
-	yamlContentBytes, err := yaml.Marshal(definition)
+	yamlContentBytes, err := yaml.Encode(yaml.File{
+		Type: yaml.FileTypeTest,
+		Spec: definition,
+	})
 	if err != nil {
 		return openapi.Test{}, fmt.Errorf("could not marshal yaml: %w", err)
 	}
