@@ -9,7 +9,7 @@
 // "Jorge" == "Ecuador" + ${attr:http.message}
 // att:http.message = "error at line ${attr:tracetest.span.duration}"
 
-expression {Expression}
+expression {Expression (Comparator Expression)*}
 
 Expression {ComposedValue (Operator ComposedValue)*}
 ComposedValue {OutsideInput (Pipe SupportedParsers)* | Number | ComposedString}
@@ -23,6 +23,7 @@ JsonPath {"json_path '" Identifier "'"}
   Identifier { $[a-zA-Z_.\-0-9]+ }
   Pipe {"|"}
   Number { @digit+ }
+  Comparator {"=" | "contains" | "!=" | "<" | ">" | "<=" | ">=" | "not-contains" }
   Operator {"+" | "-" | "*" | "/" | "%" | "^" }
   String {(![${}"])+}
   Quotes {'"'}

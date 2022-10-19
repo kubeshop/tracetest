@@ -16,4 +16,5 @@ export const
   OpenInterpolation = 14,
   Interpolation = 15,
   String = 16,
-  Operator = 17
+  Operator = 17,
+  Comparator = 18
