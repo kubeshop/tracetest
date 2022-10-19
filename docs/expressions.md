@@ -121,6 +121,10 @@ Return the type of the input as a string.
 ```
 
 ```
+attr:myapp.operations | get_index 2 | type = "string"
+```
+
+```
 # check if attribute is either a number of a string
 ["number", "string"] contains attr:my_attribute | type
 ```
