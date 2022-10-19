@@ -91,7 +91,7 @@ func (a runTestAction) runDefinition(ctx context.Context, params runDefParams) e
 	return fmt.Errorf("invalid test type")
 }
 
-func (a runTestAction) runTestFile(ctx context.Context, defTest definition.Test, params runDefParams) error {
+func (a runTestAction) runTestFile(ctx context.Context, defTest yaml.Test, params runDefParams) error {
 	a.logger.Debug("try to create test")
 
 	test, exists, err := a.createTestFromDefinition(ctx, defTest)
@@ -207,13 +207,13 @@ func (a runTestAction) createTestFromDefinition(ctx context.Context, definition 
 	return *createdTest, false, nil
 }
 
-func (a runTestAction) updateTestFromDefinition(ctx context.Context, definition definition.Test) (openapi.Test, error) {
+func (a runTestAction) updateTestFromDefinition(ctx context.Context, defTest yaml.Test) (openapi.Test, error) {
 	variableInjector := variable.NewInjector()
-	variableInjector.Inject(&definition)
+	variableInjector.Inject(&defTest)
 
 	yamlContentBytes, err := yaml.Encode(yaml.File{
 		Type: yaml.FileTypeTest,
-		Spec: definition,
+		Spec: defTest,
 	})
 	if err != nil {
 		return openapi.Test{}, fmt.Errorf("could not marshal yaml: %w", err)
@@ -222,7 +222,7 @@ func (a runTestAction) updateTestFromDefinition(ctx context.Context, definition 
 	yamlContent := string(yamlContentBytes)
 	textDefinition := openapi.TextDefinition{Content: &yamlContent}
 
-	req := a.client.ApiApi.UpdateTestFromDefinition(ctx, definition.ID)
+	req := a.client.ApiApi.UpdateTestFromDefinition(ctx, defTest.ID)
 	req = req.TextDefinition(textDefinition)
 
 	a.logger.Debug("Sending request to update test", zap.ByteString("test", yamlContentBytes))

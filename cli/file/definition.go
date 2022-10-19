@@ -6,18 +6,18 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/kubeshop/tracetest/server/encoding/yaml/definition"
+	"github.com/kubeshop/tracetest/server/model/yaml"
 )
 
-func LoadDefinition(file string) (definition.File, error) {
+func LoadDefinition(file string) (yaml.File, error) {
 	b, err := os.ReadFile(file)
 	if err != nil {
-		return definition.File{}, fmt.Errorf("could not read definition file %s: %w", file, err)
+		return yaml.File{}, fmt.Errorf("could not read definition file %s: %w", file, err)
 	}
 
-	f, err := definition.Decode(string(b))
+	f, err := yaml.Decode(b)
 	if err != nil {
-		return definition.File{}, fmt.Errorf("could not parse definition file: %w", err)
+		return yaml.File{}, fmt.Errorf("could not parse definition file: %w", err)
 	}
 
 	return f, nil

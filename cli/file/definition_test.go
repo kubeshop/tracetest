@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/kubeshop/tracetest/cli/file"
-	"github.com/kubeshop/tracetest/server/encoding/yaml/definition"
+	"github.com/kubeshop/tracetest/server/model/yaml"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -13,30 +13,30 @@ func TestLoadDefinition(t *testing.T) {
 	testCases := []struct {
 		name          string
 		file          string
-		expected      definition.File
+		expected      yaml.File
 		expectSuccess bool
 	}{
 		{
 			name:          "Should_parse_valid_definition_file",
 			file:          "../testdata/definitions/valid_http_test_definition.yml",
 			expectSuccess: true,
-			expected: definition.File{
-				Type: definition.FileTypeTest,
-				Spec: definition.Test{
+			expected: yaml.File{
+				Type: yaml.FileTypeTest,
+				Spec: yaml.Test{
 					Name:        "POST import pokemon",
 					Description: "Import a pokemon using its ID",
-					Trigger: definition.TestTrigger{
+					Trigger: yaml.TestTrigger{
 						Type: "http",
-						HTTPRequest: definition.HTTPRequest{
+						HTTPRequest: yaml.HTTPRequest{
 							URL:    "http://pokemon-demo.tracetest.io/pokemon/import",
 							Method: "POST",
-							Headers: []definition.HTTPHeader{
+							Headers: []yaml.HTTPHeader{
 								{Key: "Content-Type", Value: "application/json"},
 							},
 							Body: `{ "id": 52 }`,
 						},
 					},
-					Specs: []definition.TestSpec{
+					Specs: []yaml.TestSpec{
 						{
 							Selector: "span[name = \"POST /pokemon/import\"]",
 							Assertions: []string{
@@ -78,24 +78,24 @@ func TestLoadDefinition(t *testing.T) {
 			name:          "Should_parse_valid_definition_file_with_id",
 			file:          "../testdata/definitions/valid_http_test_definition_with_id.yml",
 			expectSuccess: true,
-			expected: definition.File{
-				Type: definition.FileTypeTest,
-				Spec: definition.Test{
+			expected: yaml.File{
+				Type: yaml.FileTypeTest,
+				Spec: yaml.Test{
 					ID:          "3fd66887-4ee7-44d5-bad8-9934ab9c1a9a",
 					Name:        "POST import pokemon",
 					Description: "Import a pokemon using its ID",
-					Trigger: definition.TestTrigger{
+					Trigger: yaml.TestTrigger{
 						Type: "http",
-						HTTPRequest: definition.HTTPRequest{
+						HTTPRequest: yaml.HTTPRequest{
 							URL:    "http://pokemon-demo.tracetest.io/pokemon/import",
 							Method: "POST",
-							Headers: []definition.HTTPHeader{
+							Headers: []yaml.HTTPHeader{
 								{Key: "Content-Type", Value: "application/json"},
 							},
 							Body: `{ "id": 52 }`,
 						},
 					},
-					Specs: []definition.TestSpec{
+					Specs: []yaml.TestSpec{
 						{
 							Selector: "span[name = \"POST /pokemon/import\"]",
 							Assertions: []string{

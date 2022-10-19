@@ -2,13 +2,14 @@ module github.com/kubeshop/tracetest/cli
 
 go 1.18
 
+replace github.com/kubeshop/tracetest/server => ../server
+
 require (
 	github.com/alexeyco/simpletable v1.0.0
 	github.com/compose-spec/compose-go v1.5.1
 	github.com/cucumber/ci-environment/go v0.0.0-20220915001957-711b1c82415f
 	github.com/denisbrodbeck/machineid v1.0.1
 	github.com/kubeshop/tracetest/server v0.0.0-20220920142527-2369576b6725
-	github.com/mitchellh/mapstructure v1.5.0
 	github.com/pterm/pterm v0.12.46
 	github.com/segmentio/analytics-go/v3 v3.2.1
 	github.com/spf13/cobra v1.5.0
@@ -49,6 +50,7 @@ require (
 	github.com/mattn/go-runewidth v0.0.14 // indirect
 	github.com/mattn/go-shellwords v1.0.12 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
+	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
@@ -66,6 +68,7 @@ require (
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/subosito/gotenv v1.4.1 // indirect
+	github.com/teris-io/shortid v0.0.0-20220617161101-71ec9f2aa569 // indirect
 	github.com/xeipuuv/gojsonpointer v0.0.0-20190905194746-02993c407bfb // indirect
 	github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 // indirect
 	github.com/xeipuuv/gojsonschema v1.2.0 // indirect
@@ -75,6 +78,7 @@ require (
 	go.opentelemetry.io/otel v1.10.0 // indirect
 	go.opentelemetry.io/otel/metric v0.32.0 // indirect
 	go.opentelemetry.io/otel/trace v1.10.0 // indirect
+	go.opentelemetry.io/proto/otlp v0.19.0 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	golang.org/x/net v0.0.0-20220919232410-f2f64ebce3c1 // indirect
