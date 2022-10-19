@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/kubeshop/tracetest/server/expression/filters"
+	"github.com/kubeshop/tracetest/server/expression/value"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -37,7 +38,7 @@ func TestRegexGroup(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.Name, func(t *testing.T) {
-			input := filters.NewValueFromString(testCase.Input)
+			input := value.NewFromString(testCase.Input)
 			output, err := filters.RegexGroup(input, testCase.Regex)
 			require.NoError(t, err)
 

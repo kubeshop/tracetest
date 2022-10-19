@@ -1,4 +1,4 @@
-package filters
+package value
 
 import (
 	"fmt"
@@ -19,25 +19,25 @@ type Value struct {
 	Type  valueType
 }
 
-func NewValueFromString(input string) Value {
+func NewFromString(input string) Value {
 	typedValue := types.TypedValue{Value: input, Type: types.GetType(input)}
-	return NewValue(typedValue)
+	return New(typedValue)
 }
 
-func NewValue(value types.TypedValue) Value {
+func New(value types.TypedValue) Value {
 	return Value{Items: []types.TypedValue{value}, Type: SingleItem}
 }
 
-func NewArrayValueFromStrings(inputs []string) Value {
+func NewArrayFromStrings(inputs []string) Value {
 	typedValues := make([]types.TypedValue, 0, len(inputs))
 	for _, str := range inputs {
 		typedValues = append(typedValues, types.TypedValue{Value: str, Type: types.GetType(str)})
 	}
 
-	return NewArrayValue(typedValues)
+	return NewArray(typedValues)
 }
 
-func NewArrayValue(values []types.TypedValue) Value {
+func NewArray(values []types.TypedValue) Value {
 	return Value{Items: values, Type: Array}
 }
 

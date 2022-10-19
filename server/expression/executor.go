@@ -7,9 +7,9 @@ import (
 	"strconv"
 
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
-	"github.com/kubeshop/tracetest/server/expression/filters"
 	"github.com/kubeshop/tracetest/server/expression/functions"
 	"github.com/kubeshop/tracetest/server/expression/types"
+	"github.com/kubeshop/tracetest/server/expression/value"
 	"github.com/kubeshop/tracetest/server/traces"
 )
 
@@ -236,16 +236,16 @@ func (e Executor) executeOperation(left types.TypedValue, right *OpTerm) (string
 	return newValue.Value, newValue.Type, nil
 }
 
-func (e Executor) executeFilters(value types.TypedValue, f []*Filter) (types.TypedValue, error) {
-	var filterInput filters.Value
-	if value.Type == types.TypeArray {
-		inputValue, err := e.convertArrayIntoFilterValue(value)
+func (e Executor) executeFilters(input types.TypedValue, f []*Filter) (types.TypedValue, error) {
+	var filterInput value.Value
+	if input.Type == types.TypeArray {
+		inputValue, err := e.convertArrayIntoFilterValue(input)
 		if err != nil {
 			return types.TypedValue{}, err
 		}
 		filterInput = inputValue
 	} else {
-		filterInput = filters.NewValue(value)
+		filterInput = value.New(input)
 	}
 
 	for _, filter := range f {
@@ -266,12 +266,12 @@ func (e Executor) executeFilters(value types.TypedValue, f []*Filter) (types.Typ
 	return filterInput.Value(), nil
 }
 
-func (e Executor) executeFilter(input filters.Value, filter *Filter) (filters.Value, error) {
+func (e Executor) executeFilter(input value.Value, filter *Filter) (value.Value, error) {
 	args := make([]string, 0, len(filter.Args))
 	for _, arg := range filter.Args {
 		resolvedArg, _, err := e.resolveTerm(arg)
 		if err != nil {
-			return filters.Value{}, err
+			return value.Value{}, err
 		}
 
 		args = append(args, resolvedArg)
@@ -279,30 +279,30 @@ func (e Executor) executeFilter(input filters.Value, filter *Filter) (filters.Va
 
 	newValue, err := executeFilter(input, filter.Name, args)
 	if err != nil {
-		return filters.Value{}, err
+		return value.Value{}, err
 	}
 
 	return newValue, nil
 }
 
-func (e Executor) convertArrayIntoFilterValue(input types.TypedValue) (filters.Value, error) {
+func (e Executor) convertArrayIntoFilterValue(input types.TypedValue) (value.Value, error) {
 	var array Array
 	err := json.Unmarshal([]byte(input.Value), &array)
 	if err != nil {
-		return filters.Value{}, fmt.Errorf("could not transform array into value: %w", err)
+		return value.Value{}, fmt.Errorf("could not transform array into value: %w", err)
 	}
 
 	typedValues := make([]types.TypedValue, 0, len(array.Items))
 	for index, item := range array.Items {
 		itemValue, itemType, err := e.resolveTerm(item)
 		if err != nil {
-			return filters.Value{}, fmt.Errorf("could not resolve item at index %d: %w", index, err)
+			return value.Value{}, fmt.Errorf("could not resolve item at index %d: %w", index, err)
 		}
 
 		typedValues = append(typedValues, types.TypedValue{Value: itemValue, Type: itemType})
 	}
 
-	return filters.NewArrayValue(typedValues), nil
+	return value.NewArray(typedValues), nil
 }
 
 func getRoundedDurationValue(value string) string {

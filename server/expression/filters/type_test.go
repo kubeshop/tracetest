@@ -5,6 +5,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/expression/filters"
 	"github.com/kubeshop/tracetest/server/expression/types"
+	"github.com/kubeshop/tracetest/server/expression/value"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -12,17 +13,17 @@ import (
 func TestType(t *testing.T) {
 	testCases := []struct {
 		Name           string
-		Input          filters.Value
+		Input          value.Value
 		ExpectedOutput string
 	}{
 		{
 			Name:           "should_return_array_for_empty_array",
-			Input:          filters.NewArrayValue([]types.TypedValue{}),
+			Input:          value.NewArray([]types.TypedValue{}),
 			ExpectedOutput: "array",
 		},
 		{
 			Name: "should_return_array_for_an_array",
-			Input: filters.NewArrayValue([]types.TypedValue{
+			Input: value.NewArray([]types.TypedValue{
 				types.GetTypedValue("1"),
 				types.GetTypedValue("2"),
 			}),
@@ -30,12 +31,12 @@ func TestType(t *testing.T) {
 		},
 		{
 			Name:           "should_return_number_for_number",
-			Input:          filters.NewValue(types.GetTypedValue("1")),
+			Input:          value.New(types.GetTypedValue("1")),
 			ExpectedOutput: "number",
 		},
 		{
 			Name:           "should_return_duration_for_duration",
-			Input:          filters.NewValue(types.GetTypedValue("25ms")),
+			Input:          value.New(types.GetTypedValue("25ms")),
 			ExpectedOutput: "duration",
 		},
 	}

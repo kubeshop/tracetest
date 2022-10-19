@@ -4,25 +4,26 @@ import (
 	"fmt"
 
 	"github.com/kubeshop/tracetest/server/expression/types"
+	"github.com/kubeshop/tracetest/server/expression/value"
 )
 
-func Length(input Value, args ...string) (Value, error) {
+func Length(input value.Value, args ...string) (value.Value, error) {
 	if len(args) != 0 {
-		return Value{}, fmt.Errorf("wrong number of args. Expected 0, got %d", len(args))
+		return value.Value{}, fmt.Errorf("wrong number of args. Expected 0, got %d", len(args))
 	}
 
 	length, err := getLength(input)
 	if err != nil {
-		return Value{}, err
+		return value.Value{}, err
 	}
 
-	return NewValue(types.TypedValue{
+	return value.New(types.TypedValue{
 		Type:  types.TypeNumber,
 		Value: fmt.Sprintf("%d", length),
 	}), nil
 }
 
-func getLength(input Value) (int, error) {
+func getLength(input value.Value) (int, error) {
 	if input.IsArray() {
 		return input.Len(), nil
 	}

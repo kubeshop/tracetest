@@ -4,9 +4,10 @@ import (
 	"fmt"
 
 	"github.com/kubeshop/tracetest/server/expression/filters"
+	"github.com/kubeshop/tracetest/server/expression/value"
 )
 
-type filterFn func(input filters.Value, args ...string) (filters.Value, error)
+type filterFn func(input value.Value, args ...string) (value.Value, error)
 
 var filterFunctions = map[string]filterFn{
 	"json_path":   filters.JSON_path,
@@ -17,15 +18,15 @@ var filterFunctions = map[string]filterFn{
 	"type":        filters.Type,
 }
 
-func executeFilter(input filters.Value, filterName string, args []string) (filters.Value, error) {
+func executeFilter(input value.Value, filterName string, args []string) (value.Value, error) {
 	fn, found := filterFunctions[filterName]
 	if !found {
-		return filters.Value{}, fmt.Errorf("filter %s was not found", filterName)
+		return value.Value{}, fmt.Errorf("filter %s was not found", filterName)
 	}
 
 	output, err := fn(input, args...)
 	if err != nil {
-		return filters.Value{}, fmt.Errorf("%s: %w", filterName, err)
+		return value.Value{}, fmt.Errorf("%s: %w", filterName, err)
 	}
 
 	return output, nil
