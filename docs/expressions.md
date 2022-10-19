@@ -119,3 +119,8 @@ Return the type of the input as a string.
 ```
 [1, 2s, "this is a string"] | type = "array"
 ```
+
+```
+# check if attribute is either a number of a string
+["number", "string"] contains attr:my_attribute | type
+```
