@@ -484,6 +484,84 @@ func TestFunctions(t *testing.T) {
 	runTestCases(t, testCases)
 }
 
+func TestArrays(t *testing.T) {
+	testCases := []parserTestCase{
+		{
+			Name:  "should_parse_empty_array",
+			Query: `[] = []`,
+			ExpectedOutput: expression.Statement{
+				Left: expression.Expr{
+					Left: &expression.Term{
+						Array: &expression.Array{},
+					},
+				},
+				Comparator: "=",
+				Right: expression.Expr{
+					Left: &expression.Term{
+						Array: &expression.Array{},
+					},
+				},
+			},
+		},
+		{
+			Name:  "should_parse_single_item_arrays",
+			Query: `[2] = [3]`,
+			ExpectedOutput: expression.Statement{
+				Left: expression.Expr{
+					Left: &expression.Term{
+						Array: &expression.Array{
+							Items: []*expression.Term{
+								{Number: strp("2")},
+							},
+						},
+					},
+				},
+				Comparator: "=",
+				Right: expression.Expr{
+					Left: &expression.Term{
+						Array: &expression.Array{
+							Items: []*expression.Term{
+								{Number: strp("3")},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			Name:  "should_parse_multiple_items_arrays",
+			Query: `[1, 2s, "3"] = ["3", 2s, 1]`,
+			ExpectedOutput: expression.Statement{
+				Left: expression.Expr{
+					Left: &expression.Term{
+						Array: &expression.Array{
+							Items: []*expression.Term{
+								{Number: strp("1")},
+								{Duration: strp("2s")},
+								{Str: &expression.Str{Text: "3", Args: []expression.Expr{}}},
+							},
+						},
+					},
+				},
+				Comparator: "=",
+				Right: expression.Expr{
+					Left: &expression.Term{
+						Array: &expression.Array{
+							Items: []*expression.Term{
+								{Str: &expression.Str{Text: "3", Args: []expression.Expr{}}},
+								{Duration: strp("2s")},
+								{Number: strp("1")},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	runTestCases(t, testCases)
+}
+
 func runTestCases(t *testing.T, testCases []parserTestCase) {
 	for _, testCase := range testCases {
 		t.Run(testCase.Name, func(t *testing.T) {

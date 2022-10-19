@@ -1,6 +1,7 @@
 package expression
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strconv"
@@ -118,6 +119,10 @@ func (e Executor) resolveTerm(term *Term) (string, types.Type, error) {
 		return e.resolveFunctionCall(term.FunctionCall)
 	}
 
+	if term.Array != nil {
+		return e.resolveArray(term.Array)
+	}
+
 	if term.Duration != nil {
 		nanoSeconds := traces.ConvertTimeFieldIntoNanoSeconds(*term.Duration)
 		return fmt.Sprintf("%d", nanoSeconds), types.TypeDuration, nil
@@ -199,6 +204,15 @@ func (e Executor) resolveFunctionCall(functionCall *FunctionCall) (string, types
 	return typedValue.Value, typedValue.Type, err
 }
 
+func (e Executor) resolveArray(array *Array) (string, types.Type, error) {
+	arrayJson, err := json.Marshal(array)
+	if err != nil {
+		return "", types.TypeNil, fmt.Errorf("could not marshal array: %w", err)
+	}
+
+	return string(arrayJson), types.TypeArray, nil
+}
+
 func (e Executor) executeOperation(left types.TypedValue, right *OpTerm) (string, types.Type, error) {
 	rightValue, rightType, err := e.resolveTerm(right.Term)
 	if err != nil {
@@ -223,7 +237,16 @@ func (e Executor) executeOperation(left types.TypedValue, right *OpTerm) (string
 }
 
 func (e Executor) executeFilters(value types.TypedValue, f []*Filter) (types.TypedValue, error) {
-	filterInput := filters.NewValue(value)
+	var filterInput filters.Value
+	if value.Type == types.TypeArray {
+		inputValue, err := e.convertArrayIntoFilterValue(value)
+		if err != nil {
+			return types.TypedValue{}, err
+		}
+		filterInput = inputValue
+	} else {
+		filterInput = filters.NewValue(value)
+	}
 
 	for _, filter := range f {
 		output, err := e.executeFilter(filterInput, filter)
@@ -260,6 +283,26 @@ func (e Executor) executeFilter(input filters.Value, filter *Filter) (filters.Va
 	}
 
 	return newValue, nil
+}
+
+func (e Executor) convertArrayIntoFilterValue(input types.TypedValue) (filters.Value, error) {
+	var array Array
+	err := json.Unmarshal([]byte(input.Value), &array)
+	if err != nil {
+		return filters.Value{}, fmt.Errorf("could not transform array into value: %w", err)
+	}
+
+	typedValues := make([]types.TypedValue, 0, len(array.Items))
+	for index, item := range array.Items {
+		itemValue, itemType, err := e.resolveTerm(item)
+		if err != nil {
+			return filters.Value{}, fmt.Errorf("could not resolve item at index %d: %w", index, err)
+		}
+
+		typedValues = append(typedValues, types.TypedValue{Value: itemValue, Type: itemType})
+	}
+
+	return filters.NewArrayValue(typedValues), nil
 }
 
 func getRoundedDurationValue(value string) string {

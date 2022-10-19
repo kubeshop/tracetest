@@ -21,6 +21,7 @@ type OpTerm struct {
 
 type Term struct {
 	FunctionCall *FunctionCall `( @@`
+	Array        *Array        `| @@`
 	Duration     *string       `| @Duration `
 	Number       *string       `| @Number `
 	Attribute    *Attribute    `| @Attribute `
@@ -38,10 +39,14 @@ type FunctionCall struct {
 	Args []*Term `"(" ( @@ ("," @@ )* )? ")"`
 }
 
+type Array struct {
+	Items []*Term `"[" ( @@ ("," @@ )* )? "]"`
+}
+
 var languageLexer = lexer.MustStateful(lexer.Rules{
 	"Root": {
 		{Name: "whitespace", Pattern: `\s+`, Action: nil},
-		{Name: "Punc", Pattern: `[(),|]`, Action: nil},
+		{Name: "Punc", Pattern: `[(),|\[\]]`, Action: nil},
 
 		{Name: "Comparator", Pattern: `!=|<=|>=|=|<|>|contains|not-contains`},
 		{Name: "Operator", Pattern: `(\+|\-|\*|\/)`, Action: nil},
