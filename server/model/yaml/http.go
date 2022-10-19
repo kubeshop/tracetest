@@ -1,18 +1,37 @@
-package definition
+package yaml
 
 import (
 	"fmt"
+
+	"github.com/kubeshop/tracetest/server/model"
 )
 
-type HttpRequest struct {
+type HTTPHeaders []HTTPHeader
+
+func (hs HTTPHeaders) Model() []model.HTTPHeader {
+	if len(hs) == 0 {
+		return nil
+	}
+	mh := make([]model.HTTPHeader, 0, len(hs))
+	for _, h := range hs {
+		mh = append(mh, model.HTTPHeader{
+			Key:   h.Key,
+			Value: h.Value,
+		})
+	}
+
+	return mh
+}
+
+type HTTPRequest struct {
 	URL            string             `yaml:"url"`
 	Method         string             `yaml:"method"`
-	Headers        []HTTPHeader       `yaml:"headers,omitempty"`
+	Headers        HTTPHeaders        `yaml:"headers,omitempty"`
 	Authentication HTTPAuthentication `yaml:"authentication,omitempty"`
 	Body           string             `yaml:"body,omitempty"`
 }
 
-func (r HttpRequest) Validate() error {
+func (r HTTPRequest) Validate() error {
 	if r.URL == "" {
 		return fmt.Errorf("URL cannot be empty")
 	}
@@ -52,6 +71,35 @@ type HTTPAuthentication struct {
 	Basic  HTTPBasicAuth  `yaml:"basic,omitempty"`
 	ApiKey HTTPAPIKeyAuth `yaml:"apiKey,omitempty"`
 	Bearer HTTPBearerAuth `yaml:"bearer,omitempty"`
+}
+
+func (a HTTPAuthentication) Model() *model.HTTPAuthenticator {
+	var props map[string]string
+	switch a.Type {
+	case "":
+		// auth not set
+		return nil
+	case "apiKey":
+		props = map[string]string{
+			"key":   a.ApiKey.Key,
+			"value": a.ApiKey.Value,
+			"in":    a.ApiKey.In,
+		}
+	case "basic":
+		props = map[string]string{
+			"username": a.Basic.User,
+			"password": a.Basic.Password,
+		}
+	case "bearer":
+		props = map[string]string{
+			"token": a.Bearer.Token,
+		}
+	}
+
+	return &model.HTTPAuthenticator{
+		Type:  a.Type,
+		Props: props,
+	}
 }
 
 func (a HTTPAuthentication) Validate() error {

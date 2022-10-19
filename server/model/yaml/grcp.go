@@ -1,10 +1,10 @@
-package definition
+package yaml
 
 import (
 	"fmt"
 )
 
-type GrpcRequest struct {
+type GRPC struct {
 	ProtobufFile string             `yaml:"protobufFile"`
 	Address      string             `yaml:"address"`
 	Method       string             `yaml:"method"`
@@ -13,7 +13,7 @@ type GrpcRequest struct {
 	Request      string             `yaml:"request,omitempty"`
 }
 
-func (r GrpcRequest) Validate() error {
+func (r GRPC) Validate() error {
 	if r.ProtobufFile == "" {
 		return fmt.Errorf("protobufFile cannot be empty")
 	}

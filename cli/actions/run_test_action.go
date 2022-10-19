@@ -10,13 +10,12 @@ import (
 
 	cienvironment "github.com/cucumber/ci-environment/go"
 	"github.com/kubeshop/tracetest/cli/config"
-	"github.com/kubeshop/tracetest/cli/definition"
 	"github.com/kubeshop/tracetest/cli/file"
 	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/kubeshop/tracetest/cli/variable"
+	"github.com/kubeshop/tracetest/server/model/yaml"
 	"go.uber.org/zap"
-	"gopkg.in/yaml.v3"
 )
 
 type RunTestConfig struct {
@@ -33,7 +32,7 @@ type runTestAction struct {
 
 var _ Action[RunTestConfig] = &runTestAction{}
 
-type runTestParams struct {
+type runDefParams struct {
 	DefinitionFile string
 	WaitForResult  bool
 	JunitFile      string
@@ -55,77 +54,76 @@ func (a runTestAction) Run(ctx context.Context, args RunTestConfig) error {
 
 	metadata := a.getMetadata()
 	a.logger.Debug("Running test from definition", zap.String("definitionFile", args.DefinitionFile))
-	params := runTestParams{
+	params := runDefParams{
 		DefinitionFile: args.DefinitionFile,
 		WaitForResult:  args.WaitForResult,
 		JunitFile:      args.JUnit,
 		Metadata:       metadata,
 	}
-	output, err := a.runDefinition(ctx, params)
 
+	err := a.runDefinition(ctx, params)
 	if err != nil {
 		return fmt.Errorf("could not run definition: %w", err)
-	}
-
-	allPassed := output.Run.Result.GetAllPassed()
-
-	if args.WaitForResult && !allPassed {
-		// It failed, so we have to return an error status
-		os.Exit(1)
 	}
 
 	return nil
 }
 
-func (a runTestAction) runDefinition(ctx context.Context, params runTestParams) (formatters.TestRunOutput, error) {
-	definition, err := file.LoadDefinition(params.DefinitionFile)
+func (a runTestAction) runDefinition(ctx context.Context, params runDefParams) error {
+	defFile, err := file.LoadDefinition(params.DefinitionFile)
 	if err != nil {
-		return formatters.TestRunOutput{}, err
+		return err
 	}
 
-	err = definition.Validate()
+	err = defFile.Validate()
 	if err != nil {
-		return formatters.TestRunOutput{}, fmt.Errorf("invalid definition file: %w", err)
+		return fmt.Errorf("invalid definition file: %w", err)
 	}
 
-	var test openapi.Test
+	if test, err := defFile.Test(); err == nil {
+		return a.runTestFile(ctx, test, params)
+	}
 
+	return fmt.Errorf("invalid file type")
+}
+
+func (a runTestAction) runTestFile(ctx context.Context, defTest yaml.Test, params runDefParams) error {
 	a.logger.Debug("try to create test")
 
-	test, exists, err := a.createTestFromDefinition(ctx, definition)
+	test, exists, err := a.createTestFromDefinition(ctx, defTest)
 	if err != nil {
-		return formatters.TestRunOutput{}, fmt.Errorf("could not create test from definition: %w", err)
+		return fmt.Errorf("could not create test from definition: %w", err)
 	}
 
 	if exists {
 		a.logger.Debug("test exists. Updating it")
-		test, err = a.updateTestFromDefinition(ctx, definition)
+		test, err = a.updateTestFromDefinition(ctx, defTest)
 		if err != nil {
-			return formatters.TestRunOutput{}, fmt.Errorf("could not update test using definition: %w", err)
+			return fmt.Errorf("could not update test using definition: %w", err)
 		}
 	}
 
-	definition.Id = *test.Id
+	defTest.ID = *test.Id
 	err = file.SetTestID(params.DefinitionFile, *test.Id)
 	if err != nil {
-		return formatters.TestRunOutput{}, fmt.Errorf("could not save test definition: %w", err)
+		return fmt.Errorf("could not save test definition: %w", err)
 	}
 
-	testRun, err := a.runTest(ctx, definition.Id, params.Metadata)
+	testRun, err := a.runTest(ctx, defTest.ID, params.Metadata)
 	if err != nil {
-		return formatters.TestRunOutput{}, fmt.Errorf("could not run test: %w", err)
+		return fmt.Errorf("could not run test: %w", err)
 	}
 
 	if params.WaitForResult {
-		updatedTestRun, err := a.waitForResult(ctx, definition.Id, testRun.GetId())
+		updatedTestRun, err := a.waitForResult(ctx, defTest.ID, testRun.GetId())
 		if err != nil {
-			return formatters.TestRunOutput{}, fmt.Errorf("could not wait for result: %w", err)
+			return fmt.Errorf("could not wait for result: %w", err)
 		}
 
 		testRun = updatedTestRun
 
-		if err := a.saveJUnitFile(ctx, definition.Id, testRun.GetId(), params.JunitFile); err != nil {
-			return formatters.TestRunOutput{}, fmt.Errorf("could not save junit file: %w", err)
+		if err := a.saveJUnitFile(ctx, defTest.ID, testRun.GetId(), params.JunitFile); err != nil {
+			return fmt.Errorf("could not save junit file: %w", err)
 		}
 	}
 
@@ -139,7 +137,14 @@ func (a runTestAction) runDefinition(ctx context.Context, params runTestParams) 
 	formattedOutput := formatter.Format(tro)
 	fmt.Print(formattedOutput)
 
-	return tro, nil
+	allPassed := tro.Run.Result.GetAllPassed()
+
+	if params.WaitForResult && !allPassed {
+		// It failed, so we have to return an error status
+		os.Exit(1)
+	}
+
+	return nil
 }
 
 func (a runTestAction) saveJUnitFile(ctx context.Context, testId, testRunId, outputFile string) error {
@@ -164,11 +169,15 @@ func (a runTestAction) saveJUnitFile(ctx context.Context, testId, testRunId, out
 
 }
 
-func (a runTestAction) createTestFromDefinition(ctx context.Context, definition definition.Test) (_ openapi.Test, exists bool, _ error) {
+func (a runTestAction) createTestFromDefinition(ctx context.Context, definition yaml.Test) (_ openapi.Test, exists bool, _ error) {
 	variableInjector := variable.NewInjector()
 	variableInjector.Inject(&definition)
 
-	yamlContentBytes, err := yaml.Marshal(definition)
+	yamlContentBytes, err := yaml.Encode(yaml.File{
+		Type: yaml.FileTypeTest,
+		Spec: definition,
+	})
+
 	if err != nil {
 		return openapi.Test{}, false, fmt.Errorf("could not marshal yaml: %w", err)
 	}
@@ -194,11 +203,14 @@ func (a runTestAction) createTestFromDefinition(ctx context.Context, definition 
 	return *createdTest, false, nil
 }
 
-func (a runTestAction) updateTestFromDefinition(ctx context.Context, definition definition.Test) (openapi.Test, error) {
+func (a runTestAction) updateTestFromDefinition(ctx context.Context, defTest yaml.Test) (openapi.Test, error) {
 	variableInjector := variable.NewInjector()
-	variableInjector.Inject(&definition)
+	variableInjector.Inject(&defTest)
 
-	yamlContentBytes, err := yaml.Marshal(definition)
+	yamlContentBytes, err := yaml.Encode(yaml.File{
+		Type: yaml.FileTypeTest,
+		Spec: defTest,
+	})
 	if err != nil {
 		return openapi.Test{}, fmt.Errorf("could not marshal yaml: %w", err)
 	}
@@ -206,7 +218,7 @@ func (a runTestAction) updateTestFromDefinition(ctx context.Context, definition 
 	yamlContent := string(yamlContentBytes)
 	textDefinition := openapi.TextDefinition{Content: &yamlContent}
 
-	req := a.client.ApiApi.UpdateTestFromDefinition(ctx, definition.Id)
+	req := a.client.ApiApi.UpdateTestFromDefinition(ctx, defTest.ID)
 	req = req.TextDefinition(textDefinition)
 
 	a.logger.Debug("Sending request to update test", zap.ByteString("test", yamlContentBytes))
