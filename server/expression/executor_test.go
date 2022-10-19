@@ -280,6 +280,11 @@ func TestArrayExecution(t *testing.T) {
 			Query:      `[1,2,3] = [1, 2]`,
 			ShouldPass: false,
 		},
+		{
+			Name:       "arrays_can_be_compared_with_other_arrays_generated_by_filters",
+			Query:      `'{ "array": [{ "name": "john", "age": 37 }, { "name": "jonas", "age": 38 }]}' | json_path '$.array[*].age' = [37, 38]`,
+			ShouldPass: true,
+		},
 	}
 
 	executeTestCases(t, testCases)
