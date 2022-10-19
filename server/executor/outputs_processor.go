@@ -93,9 +93,9 @@ func extractAttr(span traces.Span, mads expression.MetaAttributesDataStore, expr
 	attributeDataStore := expression.AttributeDataStore{Span: span}
 	expressionExecutor := expression.NewExecutor(attributeDataStore, mads)
 
-	actualValue, _, _ := expressionExecutor.Expression(expr)
+	actualValue, _ := expressionExecutor.Expression(expr)
 
-	return actualValue
+	return actualValue.String()
 }
 
 type parsedOutput struct {

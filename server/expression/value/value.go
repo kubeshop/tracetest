@@ -1,4 +1,4 @@
-package filters
+package value
 
 import (
 	"fmt"
@@ -10,35 +10,37 @@ import (
 type valueType int
 
 const (
-	SingleItem valueType = iota
-	Array
+	TypeNil valueType = iota
+	TypeSingle
+	TypeArray
 )
+
+var Nil = Value{vType: TypeNil}
 
 type Value struct {
 	Items []types.TypedValue
-	Type  valueType
+	vType valueType
 }
 
-func NewValueFromString(input string) Value {
-	typedValue := types.TypedValue{Value: input, Type: types.GetType(input)}
-	return NewValue(typedValue)
+func NewFromString(input string) Value {
+	return New(types.GetTypedValue(input))
 }
 
-func NewValue(value types.TypedValue) Value {
-	return Value{Items: []types.TypedValue{value}, Type: SingleItem}
+func New(value types.TypedValue) Value {
+	return Value{Items: []types.TypedValue{value}, vType: TypeSingle}
 }
 
-func NewArrayValueFromStrings(inputs []string) Value {
+func NewArrayFromStrings(inputs []string) Value {
 	typedValues := make([]types.TypedValue, 0, len(inputs))
 	for _, str := range inputs {
 		typedValues = append(typedValues, types.TypedValue{Value: str, Type: types.GetType(str)})
 	}
 
-	return NewArrayValue(typedValues)
+	return NewArray(typedValues)
 }
 
-func NewArrayValue(values []types.TypedValue) Value {
-	return Value{Items: values, Type: Array}
+func NewArray(values []types.TypedValue) Value {
+	return Value{Items: values, vType: TypeArray}
 }
 
 func (v Value) Len() int {
@@ -46,7 +48,7 @@ func (v Value) Len() int {
 }
 
 func (v Value) IsArray() bool {
-	return v.Type == Array
+	return v.vType == TypeArray
 }
 
 func (v Value) Value() types.TypedValue {
@@ -55,6 +57,14 @@ func (v Value) Value() types.TypedValue {
 	}
 
 	return types.TypedValue{}
+}
+
+func (v Value) Type() types.Type {
+	if v.IsArray() {
+		return types.TypeArray
+	}
+
+	return v.Value().Type
 }
 
 func (v Value) ValueAt(index int) types.TypedValue {

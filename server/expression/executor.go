@@ -5,10 +5,9 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/kubeshop/tracetest/server/assertions/comparator"
-	"github.com/kubeshop/tracetest/server/expression/filters"
 	"github.com/kubeshop/tracetest/server/expression/functions"
 	"github.com/kubeshop/tracetest/server/expression/types"
+	"github.com/kubeshop/tracetest/server/expression/value"
 	"github.com/kubeshop/tracetest/server/traces"
 )
 
@@ -38,74 +37,73 @@ func (e Executor) Statement(statement string) (string, string, error) {
 		return "", "", fmt.Errorf("could not parse statement: %w", err)
 	}
 
-	leftValue, leftType, err := e.Expression(parsedStatement.Left)
+	leftValue, err := e.Expression(parsedStatement.Left)
 	if err != nil {
 		return "", "", fmt.Errorf("could not parse left side expression: %w", err)
 	}
 
-	rightValue, rightType, err := e.Expression(parsedStatement.Right)
+	rightValue, err := e.Expression(parsedStatement.Right)
 	if err != nil {
 		return "", "", fmt.Errorf("could not parse left side expression: %w", err)
 	}
 
 	// https://github.com/kubeshop/tracetest/issues/1203
-	if leftType == types.TypeDuration || rightType == types.TypeDuration {
-		leftValue = getRoundedDurationValue(leftValue)
-		rightValue = getRoundedDurationValue(rightValue)
+	if leftValue.Type() == types.TypeDuration || rightValue.Type() == types.TypeDuration {
+		leftValue = value.New(types.TypedValue{
+			Value: getRoundedDurationValue(leftValue.String()),
+			Type:  types.TypeDuration,
+		})
+		rightValue = value.New(types.TypedValue{
+			Value: getRoundedDurationValue(rightValue.String()),
+			Type:  types.TypeDuration,
+		})
 	}
 
-	comparatorFunction, err := comparator.DefaultRegistry().Get(parsedStatement.Comparator)
+	err = compare(parsedStatement.Comparator, leftValue, rightValue)
 	if err != nil {
-		return "", "", fmt.Errorf("comparator not supported: %w", err)
+		return leftValue.String(), rightValue.String(), err
 	}
 
-	err = comparatorFunction.Compare(rightValue, leftValue)
-	if err == comparator.ErrNoMatch {
-		err = ErrNoMatch
-	}
-
-	if leftType == types.TypeDuration || rightType == types.TypeDuration {
+	if leftValue.Type() == types.TypeDuration || rightValue.Type() == types.TypeDuration {
 		// If any of the sides is a duration, there's a high change of the other side
 		// to be a duration as well. So try to format both before returning it
-		leftValue = maybeFormatDuration(leftValue, leftType)
-		rightValue = maybeFormatDuration(rightValue, rightType)
+		leftValue = value.NewFromString(maybeFormatDuration(leftValue))
+		rightValue = value.NewFromString(maybeFormatDuration(rightValue))
 	}
 
-	return leftValue, rightValue, err
+	return leftValue.String(), rightValue.String(), err
 }
 
-func (e Executor) Expression(expr Expr) (string, types.Type, error) {
-	currentValue, currentType, err := e.resolveTerm(expr.Left)
+func (e Executor) Expression(expr Expr) (value.Value, error) {
+	currentValue, err := e.resolveTerm(expr.Left)
 	if err != nil {
-		return "", types.TypeNil, fmt.Errorf("could not resolve term: %w", err)
+		return value.Nil, fmt.Errorf("could not resolve term: %w", err)
 	}
 
-	value := types.TypedValue{Value: currentValue, Type: currentType}
 	if expr.Right != nil {
 		for _, opTerm := range expr.Right {
-			currentValue, currentType, err = e.executeOperation(value, opTerm)
+			newValue, err := e.executeOperation(currentValue.Value(), opTerm)
 			if err != nil {
-				return "", types.TypeNil, fmt.Errorf("could not execute operation: %w", err)
+				return value.Nil, fmt.Errorf("could not execute operation: %w", err)
 			}
 
-			value = types.TypedValue{Value: currentValue, Type: currentType}
+			currentValue = newValue
 		}
 	}
 
 	if expr.Filters != nil {
-		newValue, err := e.executeFilters(value, expr.Filters)
+		newValue, err := e.executeFilters(currentValue, expr.Filters)
 		if err != nil {
-			return "", types.TypeNil, err
+			return value.Nil, err
 		}
 
-		value = newValue
-		currentType = types.GetType(value.Value)
+		currentValue = newValue
 	}
 
-	return value.Value, currentType, nil
+	return currentValue, nil
 }
 
-func (e Executor) resolveTerm(term *Term) (string, types.Type, error) {
+func (e Executor) resolveTerm(term *Term) (value.Value, error) {
 	if term.Attribute != nil {
 		return e.resolveAttribute(term.Attribute)
 	}
@@ -118,145 +116,164 @@ func (e Executor) resolveTerm(term *Term) (string, types.Type, error) {
 		return e.resolveFunctionCall(term.FunctionCall)
 	}
 
+	if term.Array != nil {
+		return e.resolveArray(term.Array)
+	}
+
 	if term.Duration != nil {
 		nanoSeconds := traces.ConvertTimeFieldIntoNanoSeconds(*term.Duration)
-		return fmt.Sprintf("%d", nanoSeconds), types.TypeDuration, nil
+		typedValue := types.TypedValue{
+			Value: fmt.Sprintf("%d", nanoSeconds),
+			Type:  types.TypeDuration,
+		}
+		return value.New(typedValue), nil
 	}
 
 	if term.Number != nil {
-		return *term.Number, types.TypeNumber, nil
+		typedValue := types.TypedValue{
+			Value: *term.Number,
+			Type:  types.TypeNumber,
+		}
+		return value.New(typedValue), nil
 	}
 
 	if term.Str != nil {
 		stringArgs := make([]any, 0, len(term.Str.Args))
 		for _, arg := range term.Str.Args {
-			stringArg, _, err := e.Expression(arg)
+			newValue, err := e.Expression(arg)
 			if err != nil {
-				return "", types.TypeNil, fmt.Errorf("could not execute expression: %w", err)
+				return value.Nil, fmt.Errorf("could not execute expression: %w", err)
 			}
 
-			stringArgs = append(stringArgs, stringArg)
+			stringArgs = append(stringArgs, newValue.String())
 		}
 
-		value := term.Str.Text
+		strValue := term.Str.Text
 		if len(stringArgs) > 0 {
-			value = fmt.Sprintf(term.Str.Text, stringArgs...)
+			strValue = fmt.Sprintf(term.Str.Text, stringArgs...)
 		}
 
-		return value, types.TypeString, nil
+		return value.NewFromString(strValue), nil
 	}
 
-	return "", types.TypeNil, fmt.Errorf("empty term")
+	return value.Nil, fmt.Errorf("empty term")
 }
 
-func (e Executor) resolveAttribute(attribute *Attribute) (string, types.Type, error) {
+func (e Executor) resolveAttribute(attribute *Attribute) (value.Value, error) {
 	if attribute.IsMeta() {
 		selectedSpansDataStore := e.Stores[metaPrefix]
-		value, err := selectedSpansDataStore.Get(attribute.Name())
+		attributeValue, err := selectedSpansDataStore.Get(attribute.Name())
 		if err != nil {
-			return "", types.TypeNil, fmt.Errorf("could not resolve meta attribute: %w", err)
+			return value.Nil, fmt.Errorf("could not resolve meta attribute: %w", err)
 		}
 
-		return value, types.GetType(value), nil
+		return value.NewFromString(attributeValue), nil
 	}
 
 	attributeDataStore := e.Stores["attr"]
-	value, err := attributeDataStore.Get(attribute.Name())
+	attributeValue, err := attributeDataStore.Get(attribute.Name())
 	if err != nil {
-		return "", types.TypeNil, fmt.Errorf("could not resolve attribute %s: %w", attribute.Name(), err)
+		return value.Nil, fmt.Errorf("could not resolve attribute %s: %w", attribute.Name(), err)
 	}
 
-	return value, types.GetType(value), nil
+	return value.NewFromString(attributeValue), nil
 }
 
-func (e Executor) resolveVariable(variable *Variable) (string, types.Type, error) {
+func (e Executor) resolveVariable(variable *Variable) (value.Value, error) {
 	variableDataStore := e.Stores["var"]
-	value, err := variableDataStore.Get(variable.Name())
+	variableValue, err := variableDataStore.Get(variable.Name())
 	if err != nil {
-		return "", types.TypeNil, fmt.Errorf("could not resolve variable %s: %w", variable.Name(), err)
+		return value.Nil, fmt.Errorf("could not resolve variable %s: %w", variable.Name(), err)
 	}
 
-	return value, types.GetType(value), nil
+	return value.NewFromString(variableValue), nil
 }
 
-func (e Executor) resolveFunctionCall(functionCall *FunctionCall) (string, types.Type, error) {
+func (e Executor) resolveFunctionCall(functionCall *FunctionCall) (value.Value, error) {
 	args := make([]types.TypedValue, 0, len(functionCall.Args))
 	for i, arg := range functionCall.Args {
-		argValue, argType, err := e.resolveTerm(arg)
+		functionValue, err := e.resolveTerm(arg)
 		if err != nil {
-			return "", types.TypeNil, fmt.Errorf("could not execute function %s: invalid argument on index %d: %w", functionCall.Name, i, err)
+			return value.Nil, fmt.Errorf("could not execute function %s: invalid argument on index %d: %w", functionCall.Name, i, err)
 		}
 
-		args = append(args, types.TypedValue{Type: argType, Value: argValue})
+		args = append(args, functionValue.Value())
 	}
 
 	function, err := functions.DefaultRegistry().Get(functionCall.Name)
 	if err != nil {
-		return "", types.TypeNil, fmt.Errorf("function %s doesn't exist", functionCall.Name)
+		return value.Nil, fmt.Errorf("function %s doesn't exist", functionCall.Name)
 	}
 
 	typedValue, err := function.Invoke(args...)
-	return typedValue.Value, typedValue.Type, err
+	return value.New(typedValue), err
 }
 
-func (e Executor) executeOperation(left types.TypedValue, right *OpTerm) (string, types.Type, error) {
-	rightValue, rightType, err := e.resolveTerm(right.Term)
-	if err != nil {
-		return "", types.TypeNil, err
+func (e Executor) resolveArray(array *Array) (value.Value, error) {
+	typedValues := make([]types.TypedValue, 0, len(array.Items))
+	for index, item := range array.Items {
+		termValue, err := e.resolveTerm(item)
+		if err != nil {
+			return value.Value{}, fmt.Errorf("could not resolve item at index %d: %w", index, err)
+		}
+
+		typedValues = append(typedValues, termValue.Value())
 	}
 
-	if left.Type != rightType {
-		return "", types.TypeNil, fmt.Errorf("types mismatch")
+	return value.NewArray(typedValues), nil
+}
+
+func (e Executor) executeOperation(left types.TypedValue, right *OpTerm) (value.Value, error) {
+	rightValue, err := e.resolveTerm(right.Term)
+	if err != nil {
+		return value.Nil, err
+	}
+
+	if left.Type != rightValue.Type() {
+		return value.Nil, fmt.Errorf("types mismatch")
 	}
 
 	operatorFunction, err := getOperationRegistry().Get(right.Operator)
 	if err != nil {
-		return "", types.TypeNil, err
+		return value.Nil, err
 	}
 
-	newValue, err := operatorFunction(left, types.TypedValue{Value: rightValue, Type: rightType})
+	newValue, err := operatorFunction(left, rightValue.Value())
 	if err != nil {
-		return "", types.TypeNil, err
+		return value.Nil, err
 	}
 
-	return newValue.Value, newValue.Type, nil
+	return value.New(newValue), nil
 }
 
-func (e Executor) executeFilters(value types.TypedValue, f []*Filter) (types.TypedValue, error) {
-	filterInput := filters.NewValue(value)
-
+func (e Executor) executeFilters(input value.Value, f []*Filter) (value.Value, error) {
+	filterInput := input
 	for _, filter := range f {
 		output, err := e.executeFilter(filterInput, filter)
 		if err != nil {
-			return types.TypedValue{}, err
+			return value.Nil, err
 		}
 
 		filterInput = output
 	}
 
-	if filterInput.IsArray() {
-		// we don't have to deal with arrays when doing comparisons
-		// transform it into a string instead for the simplicity's sake
-		return types.GetTypedValue(filterInput.String()), nil
-	}
-
-	return filterInput.Value(), nil
+	return filterInput, nil
 }
 
-func (e Executor) executeFilter(input filters.Value, filter *Filter) (filters.Value, error) {
+func (e Executor) executeFilter(input value.Value, filter *Filter) (value.Value, error) {
 	args := make([]string, 0, len(filter.Args))
 	for _, arg := range filter.Args {
-		resolvedArg, _, err := e.resolveTerm(arg)
+		resolvedArg, err := e.resolveTerm(arg)
 		if err != nil {
-			return filters.Value{}, err
+			return value.Value{}, err
 		}
 
-		args = append(args, resolvedArg)
+		args = append(args, resolvedArg.Value().Value)
 	}
 
 	newValue, err := executeFilter(input, filter.Name, args)
 	if err != nil {
-		return filters.Value{}, err
+		return value.Value{}, err
 	}
 
 	return newValue, nil
@@ -270,14 +287,14 @@ func getRoundedDurationValue(value string) string {
 	return fmt.Sprintf("%d", roundedValue)
 }
 
-func maybeFormatDuration(value string, vType types.Type) string {
+func maybeFormatDuration(input value.Value) string {
 	// Any type other than duration and number is certain to not be a duration field
 	// We still try to convert types.TYPE_NUMBER because we store durations as long numbers,
 	// so it's worth trying converting it.
-	if vType != types.TypeDuration && vType != types.TypeNumber {
-		return value
+	if input.Type() != types.TypeDuration && input.Type() != types.TypeNumber {
+		return input.String()
 	}
 
-	intValue, _ := strconv.Atoi(value)
+	intValue, _ := strconv.Atoi(input.String())
 	return traces.ConvertNanoSecondsIntoProperTimeUnit(intValue)
 }

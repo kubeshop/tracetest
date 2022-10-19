@@ -3,27 +3,29 @@ package filters
 import (
 	"fmt"
 	"strconv"
+
+	"github.com/kubeshop/tracetest/server/expression/value"
 )
 
-func GetIndex(input Value, args ...string) (Value, error) {
+func GetIndex(input value.Value, args ...string) (value.Value, error) {
 	if len(args) != 1 {
-		return Value{}, fmt.Errorf("wrong number of args. Expected 1, got %d", len(args))
+		return value.Value{}, fmt.Errorf("wrong number of args. Expected 1, got %d", len(args))
 	}
 
 	index, err := getIndex(input, args...)
 	if err != nil {
-		return Value{}, err
+		return value.Value{}, err
 	}
 
 	if index < 0 || index >= input.Len() {
-		return Value{}, fmt.Errorf("index out of boundaries: %d out of %d", index, input.Len())
+		return value.Value{}, fmt.Errorf("index out of boundaries: %d out of %d", index, input.Len())
 	}
 
-	value := input.ValueAt(index)
-	return NewValue(value), nil
+	v := input.ValueAt(index)
+	return value.New(v), nil
 }
 
-func getIndex(input Value, args ...string) (int, error) {
+func getIndex(input value.Value, args ...string) (int, error) {
 	if args[0] == "last" {
 		return input.Len() - 1, nil
 	}

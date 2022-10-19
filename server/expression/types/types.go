@@ -11,6 +11,7 @@ const (
 	TypeAttribute
 	TypeDuration
 	TypeVariable
+	TypeArray
 )
 
 var typeNames = map[Type]string{
@@ -20,11 +21,13 @@ var typeNames = map[Type]string{
 	TypeAttribute: "attribute",
 	TypeDuration:  "duration",
 	TypeVariable:  "variable",
+	TypeArray:     "array",
 }
 
 func GetType(value string) Type {
 	numberRegex := regexp.MustCompile(`^([0-9]+(\.[0-9]+)?)$`)
 	durationRegex := regexp.MustCompile(`^([0-9]+(\.[0-9]+)?)(ns|us|ms|s|m|h)$`)
+	arrayRegex := regexp.MustCompile(`\[[^\,]*(,[^\],]+)*\]`)
 
 	if numberRegex.Match([]byte(value)) {
 		return TypeNumber
@@ -32,6 +35,10 @@ func GetType(value string) Type {
 
 	if durationRegex.Match([]byte(value)) {
 		return TypeDuration
+	}
+
+	if arrayRegex.Match([]byte(value)) {
+		return TypeArray
 	}
 
 	return TypeString

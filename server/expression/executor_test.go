@@ -243,6 +243,63 @@ func TestFunctionExecution(t *testing.T) {
 	executeTestCases(t, testCases)
 }
 
+func TestArrayExecution(t *testing.T) {
+	testCases := []executorTestCase{
+		{
+			Name:       "should_compare_two_empty_arrays",
+			Query:      `[] = []`,
+			ShouldPass: true,
+		},
+		{
+			Name:       "should_compare_two_filled_arrays",
+			Query:      `[1, 2, 3] = [1, 2, 3]`,
+			ShouldPass: true,
+		},
+		{
+			Name:       "should_fail_to_compare_different_arrays",
+			Query:      `[1, 2, 3] = [3, 2, 1]`,
+			ShouldPass: false,
+		},
+		{
+			Name:       "should_be_able_to_run_filters_on_arrays",
+			Query:      `[1, 2, 3] | length = 3`,
+			ShouldPass: true,
+		},
+		{
+			Name:       "should_be_able_to_chain_filters_on_arrays",
+			Query:      `["this", "is", "sparta"] | get_index 2 | length = 6`,
+			ShouldPass: true,
+		},
+		{
+			Name:       "arrays_should_be_of_type_array",
+			Query:      `["this", "is", "sparta"] | type = "array"`,
+			ShouldPass: true,
+		},
+		{
+			Name:       "incomplete_arrays_should_not_be_equal",
+			Query:      `[1,2,3] = [1, 2]`,
+			ShouldPass: false,
+		},
+		{
+			Name:       "arrays_can_be_compared_with_other_arrays_generated_by_filters",
+			Query:      `'{ "array": [{ "name": "john", "age": 37 }, { "name": "jonas", "age": 38 }]}' | json_path '$.array[*].age' = [37, 38]`,
+			ShouldPass: true,
+		},
+		{
+			Name:       "should_check_if_array_contains_value",
+			Query:      `[31,35,39] contains 35`,
+			ShouldPass: true,
+		},
+		{
+			Name:       "should_check_if_array_contains_value_and_fail_if_not",
+			Query:      `[31,35,39] contains 42`,
+			ShouldPass: false,
+		},
+	}
+
+	executeTestCases(t, testCases)
+}
+
 func executeTestCases(t *testing.T, testCases []executorTestCase) {
 	for _, testCase := range testCases {
 		t.Run(testCase.Name, func(t *testing.T) {
