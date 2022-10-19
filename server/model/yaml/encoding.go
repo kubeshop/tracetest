@@ -1,13 +1,28 @@
 package yaml
 
 import (
+	"bytes"
 	"fmt"
 
 	"github.com/mitchellh/mapstructure"
 	"gopkg.in/yaml.v3"
 )
 
-func Decode(contents string) (File, error) {
+func Encode(in File) ([]byte, error) {
+	b := new(bytes.Buffer)
+	enc := yaml.NewEncoder(b)
+	defer enc.Close()
+	enc.SetIndent(2)
+	err := enc.Encode(in)
+	if err != nil {
+		return nil, fmt.Errorf("cannot encode File: %w", err)
+	}
+
+	return b.Bytes(), nil
+
+}
+
+func Decode(contents []byte) (File, error) {
 	var f File
 
 	err := yaml.Unmarshal([]byte(contents), &f)

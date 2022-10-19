@@ -5,7 +5,7 @@ spec:
   trigger:
     type: http
     httpRequest:
-      url: "http://test.com/list"
+      url: http://test.com/list
       method: GET
   specs:
     - selector: span[name = "Tracetest trigger"]

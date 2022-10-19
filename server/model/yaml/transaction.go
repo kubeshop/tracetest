@@ -5,8 +5,8 @@ import "fmt"
 type Transaction struct {
 	ID          string            `mapstructure:"id"`
 	Name        string            `mapstructure:"name"`
-	Description string            `mapstructure:"description"`
-	Env         map[string]string `mapstructure:"env"`
+	Description string            `mapstructure:"description" yaml:",omitempty"`
+	Env         map[string]string `mapstructure:"env" yaml:",omitempty"`
 	Steps       []string          `mapstructure:"steps"`
 }
 

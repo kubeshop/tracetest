@@ -9,26 +9,26 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func readFile(path string) string {
+func readFile(path string) []byte {
 	f, err := os.ReadFile(path)
 	if err != nil {
 		panic(err)
 	}
 
-	return string(f)
+	return f
 }
 
 func TestDecode(t *testing.T) {
 	cases := []struct {
-		name     string
-		yaml     string
-		expected yaml.File
-		fn       func(t *testing.T, expected, actual yaml.File)
+		name       string
+		yaml       []byte
+		file       yaml.File
+		testSpecFn func(t *testing.T, expected, actual yaml.File)
 	}{
 		{
 			name: "TestHTTPTrigger",
 			yaml: readFile("./testdata/test_http.yaml"),
-			expected: yaml.File{
+			file: yaml.File{
 				Type: yaml.FileTypeTest,
 				Spec: yaml.Test{
 					ID:   "ZsoMdf44R",
@@ -50,7 +50,7 @@ func TestDecode(t *testing.T) {
 					},
 				},
 			},
-			fn: func(t *testing.T, expected, actual yaml.File) {
+			testSpecFn: func(t *testing.T, expected, actual yaml.File) {
 				test, err := actual.Test()
 				require.NoError(t, err)
 				assert.Equal(t, expected.Spec.(yaml.Test), test)
@@ -60,7 +60,7 @@ func TestDecode(t *testing.T) {
 		{
 			name: "Transaction",
 			yaml: readFile("./testdata/transaction.yaml"),
-			expected: yaml.File{
+			file: yaml.File{
 				Type: yaml.FileTypeTransaction,
 				Spec: yaml.Transaction{
 					ID:   "ZsoMdf44R",
@@ -71,7 +71,7 @@ func TestDecode(t *testing.T) {
 					},
 				},
 			},
-			fn: func(t *testing.T, expected, actual yaml.File) {
+			testSpecFn: func(t *testing.T, expected, actual yaml.File) {
 				test, err := actual.Transaction()
 				require.NoError(t, err)
 				assert.Equal(t, expected.Spec.(yaml.Transaction), test)
@@ -84,13 +84,22 @@ func TestDecode(t *testing.T) {
 			cl := c
 			t.Parallel()
 
-			actual, err := yaml.Decode(cl.yaml)
-			require.NoError(t, err)
+			t.Run("Decode", func(t *testing.T) {
+				actual, err := yaml.Decode(cl.yaml)
+				require.NoError(t, err)
 
-			assert.Equal(t, cl.expected.Type, actual.Type)
-			assert.Equal(t, cl.expected.Spec, actual.Spec)
+				assert.Equal(t, cl.file.Type, actual.Type)
+				assert.Equal(t, cl.file.Spec, actual.Spec)
 
-			cl.fn(t, cl.expected, actual)
+				cl.testSpecFn(t, cl.file, actual)
+			})
+
+			t.Run("Encode", func(t *testing.T) {
+				actual, err := yaml.Encode(cl.file)
+				require.NoError(t, err)
+
+				assert.Equal(t, string(cl.yaml), string(actual))
+			})
 		})
 	}
 }

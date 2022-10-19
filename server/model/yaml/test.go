@@ -41,10 +41,10 @@ func (outs Outputs) Model() model.OrderedMap[string, model.Output] {
 type Test struct {
 	ID          string      `mapstructure:"id"`
 	Name        string      `mapstructure:"name"`
-	Description string      `mapstructure:"description"`
+	Description string      `mapstructure:"description" yaml:",omitempty"`
 	Trigger     TestTrigger `mapstructure:"trigger"`
-	Specs       TestSpecs   `mapstructure:"specs,omitempty"`
-	Outputs     Outputs     `mapstructure:"outputs,omitempty"`
+	Specs       TestSpecs   `mapstructure:"specs" yaml:",omitempty"`
+	Outputs     Outputs     `mapstructure:"outputs,omitempty" yaml:",omitempty"`
 }
 
 func (t Test) Validate() error {
@@ -61,8 +61,8 @@ func (t Test) Validate() error {
 
 type TestTrigger struct {
 	Type        string      `mapstructure:"type"`
-	HTTPRequest HTTPRequest `mapstructure:"httpRequest"`
-	GRPC        GRPC        `mapstructure:"grpc"`
+	HTTPRequest HTTPRequest `mapstructure:"httpRequest" yaml:"httpRequest,omitempty"`
+	GRPC        GRPC        `mapstructure:"grpc" yaml:"grpc,omitempty"`
 }
 
 func (t TestTrigger) Model() model.Trigger {
@@ -110,7 +110,7 @@ type Output struct {
 }
 
 type TestSpec struct {
-	Name       string   `mapstructure:"name"`
+	Name       string   `mapstructure:"name" yaml:",omitempty"`
 	Selector   string   `mapstructure:"selector"`
 	Assertions []string `mapstructure:"assertions"`
 }
