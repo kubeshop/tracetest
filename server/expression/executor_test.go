@@ -275,6 +275,11 @@ func TestArrayExecution(t *testing.T) {
 			Query:      `["this", "is", "sparta"] | type = "array"`,
 			ShouldPass: true,
 		},
+		{
+			Name:       "incomplete_arrays_should_not_be_equal",
+			Query:      `[1,2,3] = [1, 2]`,
+			ShouldPass: false,
+		},
 	}
 
 	executeTestCases(t, testCases)
