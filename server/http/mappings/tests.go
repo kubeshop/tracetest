@@ -6,9 +6,6 @@ import (
 
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/assertions/selectors"
-	"github.com/kubeshop/tracetest/server/encoding/yaml/conversion"
-	"github.com/kubeshop/tracetest/server/encoding/yaml/conversion/parser"
-	"github.com/kubeshop/tracetest/server/encoding/yaml/definition"
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
@@ -20,11 +17,6 @@ import (
 
 type OpenAPI struct {
 	traceConversionConfig traces.ConversionConfig
-}
-
-func (m OpenAPI) TestDefinitionFile(in model.Test) definition.Test {
-	testDefinition, _ := conversion.ConvertOpenAPITestIntoDefinitionObject(m.Test(in))
-	return testDefinition
 }
 
 func (m OpenAPI) Test(in model.Test) openapi.Test {
@@ -206,21 +198,6 @@ func (m OpenAPI) Result(in *model.RunResults) openapi.AssertionResults {
 	return openapi.AssertionResults{
 		AllPassed: in.AllPassed,
 		Results:   results,
-	}
-}
-
-func (m OpenAPI) AssertionExpression(in *parser.Expression) *model.AssertionExpression {
-	if in == nil {
-		return nil
-	}
-
-	return &model.AssertionExpression{
-		LiteralValue: model.LiteralValue{
-			Value: in.LiteralValue.String(false),
-			Type:  in.LiteralValue.Type(),
-		},
-		Operation:  in.Operation,
-		Expression: m.AssertionExpression(in.Expression),
 	}
 }
 
