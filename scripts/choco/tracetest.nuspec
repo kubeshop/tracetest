@@ -2,7 +2,6 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
   <metadata>
     <id>tracetest</id>
-    <!-- %placeholder% will be replaced by the correct value in the CI pipeline -->
     <version>%version%</version>
     <title>tracetest</title>
     <authors>Kubeshop</authors>
