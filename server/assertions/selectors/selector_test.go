@@ -109,6 +109,11 @@ func TestSelector(t *testing.T) {
 			ExpectedSpanIds: []trace.SpanID{updatePokemonDatabaseSpanID},
 		},
 		{
+			Name:            "Selector_to_select_all_children_spans",
+			Expression:      `span[service.name="Pokeshop" tracetest.span.type="http"] span[]`,
+			ExpectedSpanIds: []trace.SpanID{insertPokemonDatabaseSpanID, getPokemonFromExternalAPISpanID, updatePokemonDatabaseSpanID},
+		},
+		{
 			Name:            "Selector_with_first_pseudo_class",
 			Expression:      `span[tracetest.span.type="db"]:first`,
 			ExpectedSpanIds: []trace.SpanID{insertPokemonDatabaseSpanID},
