@@ -125,7 +125,7 @@ func TestSelector(t *testing.T) {
 		},
 		{
 			Name:            "SelectorWithNthChildPseudoClass",
-			Expression:      `span[tracetest.span.type="db"]:nthChild(2)`,
+			Expression:      `span[tracetest.span.type="db"]:nth_child(2)`,
 			ExpectedSpanIds: []trace.SpanID{updatePokemonDatabaseSpanID},
 		},
 		{
