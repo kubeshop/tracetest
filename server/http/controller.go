@@ -61,6 +61,8 @@ func (c *controller) CreateTest(ctx context.Context, in openapi.Test) (openapi.I
 	return c.doCreateTest(ctx, test)
 }
 
+var errTestExists = errors.New("test already exists")
+
 func (c *controller) doCreateTest(ctx context.Context, test model.Test) (openapi.ImplResponse, error) {
 	// if they try to create a test with preset ID, we need to make sure that ID doesn't exists already
 	if test.HasID() {
@@ -71,10 +73,11 @@ func (c *controller) doCreateTest(ctx context.Context, test model.Test) (openapi
 		}
 
 		if exists {
+			err := fmt.Errorf(`cannot create test with ID "%s: %w`, test.ID, errTestExists)
 			r := map[string]string{
-				"error": fmt.Sprintf(`test with ID "%s" already exists. try updating instead`, test.ID),
+				"error": err.Error(),
 			}
-			return openapi.Response(http.StatusBadRequest, r), nil
+			return openapi.Response(http.StatusBadRequest, r), err
 		}
 	}
 
@@ -462,30 +465,24 @@ func (c controller) ImportTestRun(ctx context.Context, exportedTest openapi.Expo
 	return openapi.Response(http.StatusOK, response), nil
 }
 
-func (c *controller) CreateTestFromDefinition(ctx context.Context, testDefinition openapi.TextDefinition) (openapi.ImplResponse, error) {
+func (c *controller) ExecuteDefinition(ctx context.Context, testDefinition openapi.TextDefinition) (openapi.ImplResponse, error) {
 	def, err := yaml.Decode([]byte(testDefinition.Content))
 	if err != nil {
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
 	}
 
-	test, err := def.Test()
-	if err != nil {
-		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
+	if test, err := def.Test(); err == nil {
+		c.executeTest(ctx, test.Model())
 	}
 
-	return c.doCreateTest(ctx, test.Model())
+	return openapi.Response(http.StatusUnprocessableEntity, nil), nil
 }
 
-func (c *controller) UpdateTestFromDefinition(ctx context.Context, testID string, testDefinition openapi.TextDefinition) (openapi.ImplResponse, error) {
-	def, err := yaml.Decode([]byte(testDefinition.Content))
-	if err != nil {
-		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
+func (c *controller) executeTest(ctx context.Context, test model.Test) (openapi.ImplResponse, error) {
+	resp, err := c.doCreateTest(ctx, test)
+	if err != nil && errors.Is(err, errTestExists) {
+		return c.doUpdateTest(ctx, test.ID, test)
 	}
 
-	updated, err := def.Test()
-	if err != nil {
-		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
-	}
-
-	return c.doUpdateTest(ctx, id.ID(testID), updated.Model())
+	return resp, err
 }

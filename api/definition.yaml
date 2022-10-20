@@ -1,0 +1,22 @@
+openapi: 3.0.0
+components:
+  schemas:
+
+    ExecuteDefinitionResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: resource ID
+        type:
+          type: string
+          description: resource type
+        url:
+          type: string
+          description: resource web UI url
+
+    TextDefinition:
+      type: object
+      properties:
+        content:
+          type: string
