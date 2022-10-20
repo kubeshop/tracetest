@@ -16,7 +16,8 @@ import (
 
 // TextDefinition struct for TextDefinition
 type TextDefinition struct {
-	Content *string `json:"content,omitempty"`
+	RunInformation *TestRunInformation `json:"runInformation,omitempty"`
+	Content        *string             `json:"content,omitempty"`
 }
 
 // NewTextDefinition instantiates a new TextDefinition object
@@ -34,6 +35,38 @@ func NewTextDefinition() *TextDefinition {
 func NewTextDefinitionWithDefaults() *TextDefinition {
 	this := TextDefinition{}
 	return &this
+}
+
+// GetRunInformation returns the RunInformation field value if set, zero value otherwise.
+func (o *TextDefinition) GetRunInformation() TestRunInformation {
+	if o == nil || o.RunInformation == nil {
+		var ret TestRunInformation
+		return ret
+	}
+	return *o.RunInformation
+}
+
+// GetRunInformationOk returns a tuple with the RunInformation field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *TextDefinition) GetRunInformationOk() (*TestRunInformation, bool) {
+	if o == nil || o.RunInformation == nil {
+		return nil, false
+	}
+	return o.RunInformation, true
+}
+
+// HasRunInformation returns a boolean if a field has been set.
+func (o *TextDefinition) HasRunInformation() bool {
+	if o != nil && o.RunInformation != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetRunInformation gets a reference to the given TestRunInformation and assigns it to the RunInformation field.
+func (o *TextDefinition) SetRunInformation(v TestRunInformation) {
+	o.RunInformation = &v
 }
 
 // GetContent returns the Content field value if set, zero value otherwise.
@@ -70,6 +103,9 @@ func (o *TextDefinition) SetContent(v string) {
 
 func (o TextDefinition) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
+	if o.RunInformation != nil {
+		toSerialize["runInformation"] = o.RunInformation
+	}
 	if o.Content != nil {
 		toSerialize["content"] = o.Content
 	}

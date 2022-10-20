@@ -25,12 +25,12 @@ func TestListOutput(t *testing.T) {
 			name: "HaveTests",
 			tests: []openapi.Test{
 				{
-					Id:   strp("123456"),
-					Name: strp("Test One"),
+					Id:   openapi.PtrString("123456"),
+					Name: openapi.PtrString("Test One"),
 				},
 				{
-					Id:   strp("456789"),
-					Name: strp("Test Two"),
+					Id:   openapi.PtrString("456789"),
+					Name: openapi.PtrString("Test Two"),
 				},
 			},
 			expected: "" + // vs code trims the last whitespace on save. this awful method avoids that\

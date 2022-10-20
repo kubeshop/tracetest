@@ -57,12 +57,6 @@ func (c *ApiApiController) Routes() Routes {
 			c.CreateTest,
 		},
 		{
-			"CreateTestFromDefinition",
-			strings.ToUpper("Post"),
-			"/api/tests/definition.yaml",
-			c.CreateTestFromDefinition,
-		},
-		{
 			"DeleteTest",
 			strings.ToUpper("Delete"),
 			"/api/tests/{testId}",
@@ -79,6 +73,12 @@ func (c *ApiApiController) Routes() Routes {
 			strings.ToUpper("Put"),
 			"/api/tests/{testId}/run/{runId}/dry-run",
 			c.DryRunAssertion,
+		},
+		{
+			"ExecuteDefinition",
+			strings.ToUpper("Post"),
+			"/api/definition.yaml",
+			c.ExecuteDefinition,
 		},
 		{
 			"ExportTestRun",
@@ -170,12 +170,6 @@ func (c *ApiApiController) Routes() Routes {
 			"/api/tests/{testId}",
 			c.UpdateTest,
 		},
-		{
-			"UpdateTestFromDefinition",
-			strings.ToUpper("Put"),
-			"/api/tests/{testId}/definition.yaml",
-			c.UpdateTestFromDefinition,
-		},
 	}
 }
 
@@ -193,30 +187,6 @@ func (c *ApiApiController) CreateTest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	result, err := c.service.CreateTest(r.Context(), testParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
-// CreateTestFromDefinition - Create new test using the yaml definition
-func (c *ApiApiController) CreateTestFromDefinition(w http.ResponseWriter, r *http.Request) {
-	textDefinitionParam := TextDefinition{}
-	d := json.NewDecoder(r.Body)
-	d.DisallowUnknownFields()
-	if err := d.Decode(&textDefinitionParam); err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-	if err := AssertTextDefinitionRequired(textDefinitionParam); err != nil {
-		c.errorHandler(w, r, err, nil)
-		return
-	}
-	result, err := c.service.CreateTestFromDefinition(r.Context(), textDefinitionParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -280,6 +250,30 @@ func (c *ApiApiController) DryRunAssertion(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	result, err := c.service.DryRunAssertion(r.Context(), testIdParam, runIdParam, testSpecsParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// ExecuteDefinition - Execute a definition
+func (c *ApiApiController) ExecuteDefinition(w http.ResponseWriter, r *http.Request) {
+	textDefinitionParam := TextDefinition{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&textDefinitionParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertTextDefinitionRequired(textDefinitionParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.ExecuteDefinition(r.Context(), textDefinitionParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -607,33 +601,6 @@ func (c *ApiApiController) UpdateTest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	result, err := c.service.UpdateTest(r.Context(), testIdParam, testParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
-// UpdateTestFromDefinition - update test from definition file
-func (c *ApiApiController) UpdateTestFromDefinition(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	testIdParam := params["testId"]
-
-	textDefinitionParam := TextDefinition{}
-	d := json.NewDecoder(r.Body)
-	d.DisallowUnknownFields()
-	if err := d.Decode(&textDefinitionParam); err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-	if err := AssertTextDefinitionRequired(textDefinitionParam); err != nil {
-		c.errorHandler(w, r, err, nil)
-		return
-	}
-	result, err := c.service.UpdateTestFromDefinition(r.Context(), testIdParam, textDefinitionParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

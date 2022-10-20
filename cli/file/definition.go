@@ -1,6 +1,7 @@
 package file
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"regexp"
@@ -9,43 +10,85 @@ import (
 	"github.com/kubeshop/tracetest/server/model/yaml"
 )
 
-func LoadDefinition(file string) (yaml.File, error) {
-	b, err := os.ReadFile(file)
-	if err != nil {
-		return yaml.File{}, fmt.Errorf("could not read definition file %s: %w", file, err)
-	}
-
-	f, err := yaml.Decode(b)
-	if err != nil {
-		return yaml.File{}, fmt.Errorf("could not parse definition file: %w", err)
-	}
-
-	return f, nil
+type File struct {
+	path     string
+	contents []byte
+	file     yaml.File
 }
 
-func SaveDefinition(file, definition string) error {
-	err := os.WriteFile(file, []byte(definition), 0644)
+func Read(path string) (File, error) {
+	b, err := os.ReadFile(path)
 	if err != nil {
-		return fmt.Errorf("could not write file: %w", err)
+		return File{}, fmt.Errorf("could not read definition file %s: %w", path, err)
 	}
 
-	return nil
+	return New(path, b)
+
 }
 
-func SetTestID(file, id string) error {
-	idStatementRegex := regexp.MustCompile("^id: [0-9a-zA-Z\\-_]+\n")
-	fileBytes, err := os.ReadFile(file)
+func New(path string, b []byte) (File, error) {
+	yf, err := yaml.Decode(b)
 	if err != nil {
-		return fmt.Errorf("could not read test definition file %s: %w", file, err)
+		return File{}, fmt.Errorf("could not parse definition file: %w", err)
 	}
 
-	fileContent := string(fileBytes)
-	idStatement := idStatementRegex.FindString(fileContent)
-	if idStatement != "" {
-		fileContent = strings.Replace(fileContent, idStatement, fmt.Sprintf("id: %s\n", id), 1)
-	} else {
-		fileContent = fmt.Sprintf("id: %s\n%s", id, fileContent)
+	return File{
+		contents: b,
+		file:     yf,
+	}, nil
+}
+
+func (f File) Definition() yaml.File {
+	return f.file
+}
+
+func (f File) Contents() string {
+	return string(f.contents)
+}
+
+var (
+	hasIDRegex      = regexp.MustCompile(`(?m:^\s+id:\s*[0-9a-zA-Z\-_]+$)`)
+	indentSizeRegex = regexp.MustCompile(`(?m:^(\s+)\w+)`)
+)
+
+var ErrFileHasID = errors.New("file already has ID")
+
+func (f File) HasID() bool {
+	fileID := hasIDRegex.Find(f.contents)
+	return fileID != nil
+}
+
+func (f File) SetID(id string) (File, error) {
+	if f.HasID() {
+		return f, ErrFileHasID
 	}
 
-	return SaveDefinition(file, fileContent)
+	indent := indentSizeRegex.FindSubmatchIndex(f.contents)
+	if len(indent) < 4 {
+		return f, fmt.Errorf("cannot detect indentation size")
+	}
+
+	indentSize := indent[3] - indent[2]
+	// indent[2] is the index of the first indentation.
+	// we can assume that's the first line within the `specs` block
+	// so we can use it as the place to inejct the ID
+
+	var newContents []byte
+	newContents = append(newContents, f.contents[0:indent[2]]...)
+
+	newContents = append(newContents, []byte(strings.Repeat(" ", indentSize))...)
+	newContents = append(newContents, []byte("id: "+id+"\n")...)
+
+	newContents = append(newContents, f.contents[indent[2]:]...)
+
+	return New(f.path, newContents)
+}
+
+func (f File) Write() (File, error) {
+	err := os.WriteFile(f.path, f.contents, 0644)
+	if err != nil {
+		return f, fmt.Errorf("could not write file: %w", err)
+	}
+
+	return Read(f.path)
 }

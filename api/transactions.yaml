@@ -1,0 +1,21 @@
+openapi: 3.0.0
+components:
+  schemas:
+
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        name:
+          type: string
+        description:
+          type: string
+        version:
+          type: integer
+          description: version number of the test
+        steps:
+          type: array
+          items:
+            type: string

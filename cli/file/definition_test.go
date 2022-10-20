@@ -136,16 +136,40 @@ func TestLoadDefinition(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
-			actual, err := file.LoadDefinition(testCase.file)
+			actual, err := file.Read(testCase.file)
 			if testCase.expectSuccess {
-				require.NoError(t, err, "LoadDefinition should not fail")
-				err = actual.Validate()
-
+				require.NoError(t, err)
+				err = actual.Definition().Validate()
 				assert.NoError(t, err)
-				assert.Equal(t, testCase.expected, actual)
+				assert.Equal(t, testCase.expected, actual.Definition())
 			} else {
 				require.Error(t, err, "LoadDefinition should fail")
 			}
 		})
 	}
+}
+
+func TestSetID(t *testing.T) {
+	t.Run("NoID", func(t *testing.T) {
+		f, err := file.Read("../testdata/definitions/valid_http_test_definition.yml")
+		require.NoError(t, err)
+
+		test, _ := f.Definition().Test()
+		assert.Equal(t, "", test.ID)
+
+		f, err = f.SetID("new-id")
+		require.NoError(t, err)
+
+		test, _ = f.Definition().Test()
+		assert.Equal(t, "new-id", test.ID)
+	})
+
+	t.Run("WithID", func(t *testing.T) {
+		f, err := file.Read("../testdata/definitions/valid_http_test_definition_with_id.yml")
+		require.NoError(t, err)
+
+		_, err = f.SetID("new-id")
+		require.ErrorIs(t, err, file.ErrFileHasID)
+	})
+
 }
