@@ -69,57 +69,62 @@ func TestSelector(t *testing.T) {
 		ExpectedSpanIds []trace.SpanID
 	}{
 		{
-			Name:            "Empty selector should select all spans",
+			Name:            "Empty_selector_should_select_all_spans",
 			Expression:      ``,
 			ExpectedSpanIds: []trace.SpanID{postImportSpanID, insertPokemonDatabaseSpanID, getPokemonFromExternalAPISpanID, updatePokemonDatabaseSpanID},
 		},
 		{
-			Name:            "Selector with span name",
+			Name:            "Selector_without_parameters_should_select_all_spans",
+			Expression:      `span[]`,
+			ExpectedSpanIds: []trace.SpanID{postImportSpanID, insertPokemonDatabaseSpanID, getPokemonFromExternalAPISpanID, updatePokemonDatabaseSpanID},
+		},
+		{
+			Name:            "Selector_with_span_name",
 			Expression:      `span[name="Get pokemon from external API"]`,
 			ExpectedSpanIds: []trace.SpanID{getPokemonFromExternalAPISpanID},
 		},
 		{
-			Name:            "Selector with simple single attribute querying",
+			Name:            "Selector_with_simple_single_attribute_querying",
 			Expression:      `span[service.name="Pokeshop"]`,
 			ExpectedSpanIds: []trace.SpanID{postImportSpanID, insertPokemonDatabaseSpanID},
 		},
 		{
-			Name:            "Multiple span selectors",
+			Name:            "Multiple_span_selectors",
 			Expression:      `span[service.name="Pokeshop"], span[service.name="Pokeshop-worker"]`,
 			ExpectedSpanIds: []trace.SpanID{postImportSpanID, insertPokemonDatabaseSpanID, getPokemonFromExternalAPISpanID, updatePokemonDatabaseSpanID},
 		},
 		{
-			Name:            "Multiple spans using contains",
+			Name:            "Multiple_spans_using_contains",
 			Expression:      `span[service.name contains "Pokeshop"]`,
 			ExpectedSpanIds: []trace.SpanID{postImportSpanID, insertPokemonDatabaseSpanID, getPokemonFromExternalAPISpanID, updatePokemonDatabaseSpanID},
 		},
 		{
-			Name:            "Selector with multiple attributes",
+			Name:            "Selector_with_multiple_attributes",
 			Expression:      `span[service.name="Pokeshop" tracetest.span.type="db"]`,
 			ExpectedSpanIds: []trace.SpanID{insertPokemonDatabaseSpanID},
 		},
 		{
-			Name:            "Selector with child selector",
+			Name:            "Selector_with_child_selector",
 			Expression:      `span[service.name="Pokeshop-worker"] span[tracetest.span.type="db"]`,
 			ExpectedSpanIds: []trace.SpanID{updatePokemonDatabaseSpanID},
 		},
 		{
-			Name:            "Selector with first pseudo class",
+			Name:            "Selector_with_first_pseudo_class",
 			Expression:      `span[tracetest.span.type="db"]:first`,
 			ExpectedSpanIds: []trace.SpanID{insertPokemonDatabaseSpanID},
 		},
 		{
-			Name:            "Selector with first pseudo class",
+			Name:            "Selector_with_first_pseudo_class",
 			Expression:      `span[tracetest.span.type="db"]:last`,
 			ExpectedSpanIds: []trace.SpanID{updatePokemonDatabaseSpanID},
 		},
 		{
-			Name:            "Selector with nth_child pseudo class",
+			Name:            "Selector_with_nth_child_pseudo_class",
 			Expression:      `span[tracetest.span.type="db"]:nth_child(2)`,
 			ExpectedSpanIds: []trace.SpanID{updatePokemonDatabaseSpanID},
 		},
 		{
-			Name:            "Selector should not match parent when children are specified",
+			Name:            "Selector_should_not_match_parent_when_children_are_specified",
 			Expression:      `span[service.name = "Pokeshop-worker"] span[service.name = "Pokeshop-worker"]`,
 			ExpectedSpanIds: []trace.SpanID{updatePokemonDatabaseSpanID},
 		},
@@ -137,7 +142,7 @@ func TestSelector(t *testing.T) {
 }
 
 func ensureExpectedSpansWereReturned(t *testing.T, spanIDs []trace.SpanID, spans []traces.Span) {
-	assert.Len(t, spans, len(spanIDs), "Should return the same number of spans as we expected")
+	assert.Len(t, spans, len(spanIDs), "Should_return_the_same_number_of_spans_as_we_expected")
 	for _, span := range spans {
 		assert.Contains(t, spanIDs, span.ID, "span ID was returned but wasn't expected")
 	}

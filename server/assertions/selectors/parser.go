@@ -11,7 +11,7 @@ type ParserSelector struct {
 }
 
 type parserSpanSelector struct {
-	Filters       []parserFilter      `"span""["( @@* ( "," @@)*)"]"`
+	Filters       []parserFilter      `"span""["( @@* ( "," @@)*)*"]"`
 	PseudoClass   parserPseudoClass   `@@*`
 	ChildSelector *parserSpanSelector ` @@*`
 }
