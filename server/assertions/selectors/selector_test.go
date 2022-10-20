@@ -69,67 +69,67 @@ func TestSelector(t *testing.T) {
 		ExpectedSpanIds []trace.SpanID
 	}{
 		{
-			Name:            "Empty_selector_should_select_all_spans",
+			Name:            "EmptySelectorShouldSelectAllSpans",
 			Expression:      ``,
 			ExpectedSpanIds: []trace.SpanID{postImportSpanID, insertPokemonDatabaseSpanID, getPokemonFromExternalAPISpanID, updatePokemonDatabaseSpanID},
 		},
 		{
-			Name:            "Selector_without_parameters_should_select_all_spans",
+			Name:            "SelectorWithoutParametersShouldSelectAllSpans",
 			Expression:      `span[]`,
 			ExpectedSpanIds: []trace.SpanID{postImportSpanID, insertPokemonDatabaseSpanID, getPokemonFromExternalAPISpanID, updatePokemonDatabaseSpanID},
 		},
 		{
-			Name:            "Selector_with_span_name",
+			Name:            "SelectorWithSpanName",
 			Expression:      `span[name="Get pokemon from external API"]`,
 			ExpectedSpanIds: []trace.SpanID{getPokemonFromExternalAPISpanID},
 		},
 		{
-			Name:            "Selector_with_simple_single_attribute_querying",
+			Name:            "SelectorWithSimpleSingleAttributeQuerying",
 			Expression:      `span[service.name="Pokeshop"]`,
 			ExpectedSpanIds: []trace.SpanID{postImportSpanID, insertPokemonDatabaseSpanID},
 		},
 		{
-			Name:            "Multiple_span_selectors",
+			Name:            "MultipleSpanSelectors",
 			Expression:      `span[service.name="Pokeshop"], span[service.name="Pokeshop-worker"]`,
 			ExpectedSpanIds: []trace.SpanID{postImportSpanID, insertPokemonDatabaseSpanID, getPokemonFromExternalAPISpanID, updatePokemonDatabaseSpanID},
 		},
 		{
-			Name:            "Multiple_spans_using_contains",
+			Name:            "MultipleSpansUsingContains",
 			Expression:      `span[service.name contains "Pokeshop"]`,
 			ExpectedSpanIds: []trace.SpanID{postImportSpanID, insertPokemonDatabaseSpanID, getPokemonFromExternalAPISpanID, updatePokemonDatabaseSpanID},
 		},
 		{
-			Name:            "Selector_with_multiple_attributes",
+			Name:            "SelectorWithMultipleAttributes",
 			Expression:      `span[service.name="Pokeshop" tracetest.span.type="db"]`,
 			ExpectedSpanIds: []trace.SpanID{insertPokemonDatabaseSpanID},
 		},
 		{
-			Name:            "Selector_with_child_selector",
+			Name:            "SelectorWithChildSelector",
 			Expression:      `span[service.name="Pokeshop-worker"] span[tracetest.span.type="db"]`,
 			ExpectedSpanIds: []trace.SpanID{updatePokemonDatabaseSpanID},
 		},
 		{
-			Name:            "Selector_to_select_all_children_spans",
+			Name:            "SelectorToSelectAllChildrenSpans",
 			Expression:      `span[service.name="Pokeshop" tracetest.span.type="http"] span[]`,
 			ExpectedSpanIds: []trace.SpanID{insertPokemonDatabaseSpanID, getPokemonFromExternalAPISpanID, updatePokemonDatabaseSpanID},
 		},
 		{
-			Name:            "Selector_with_first_pseudo_class",
+			Name:            "SelectorWithFirstPseudoClass",
 			Expression:      `span[tracetest.span.type="db"]:first`,
 			ExpectedSpanIds: []trace.SpanID{insertPokemonDatabaseSpanID},
 		},
 		{
-			Name:            "Selector_with_first_pseudo_class",
+			Name:            "SelectorWithFirstPseudoClass",
 			Expression:      `span[tracetest.span.type="db"]:last`,
 			ExpectedSpanIds: []trace.SpanID{updatePokemonDatabaseSpanID},
 		},
 		{
-			Name:            "Selector_with_nth_child_pseudo_class",
-			Expression:      `span[tracetest.span.type="db"]:nth_child(2)`,
+			Name:            "SelectorWithNthChildPseudoClass",
+			Expression:      `span[tracetest.span.type="db"]:nthChild(2)`,
 			ExpectedSpanIds: []trace.SpanID{updatePokemonDatabaseSpanID},
 		},
 		{
-			Name:            "Selector_should_not_match_parent_when_children_are_specified",
+			Name:            "SelectorShouldNotMatchParentWhenChildrenAreSpecified",
 			Expression:      `span[service.name = "Pokeshop-worker"] span[service.name = "Pokeshop-worker"]`,
 			ExpectedSpanIds: []trace.SpanID{updatePokemonDatabaseSpanID},
 		},
