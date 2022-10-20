@@ -47,7 +47,12 @@ func (a exportTestAction) Run(ctx context.Context, args ExportTestConfig) error 
 		return fmt.Errorf("could not get definition from server: %w", err)
 	}
 
-	err = file.SaveDefinition(args.OutputFile, definition)
+	f, err := file.New(args.OutputFile, []byte(definition))
+	if err != nil {
+		return fmt.Errorf("could not process definition from server: %w", err)
+	}
+
+	_, err = f.Write()
 	if err != nil {
 		return fmt.Errorf("could not save exported definition into file: %w", err)
 	}

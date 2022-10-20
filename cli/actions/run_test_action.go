@@ -13,8 +13,6 @@ import (
 	"github.com/kubeshop/tracetest/cli/file"
 	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/kubeshop/tracetest/cli/openapi"
-	"github.com/kubeshop/tracetest/cli/variable"
-	"github.com/kubeshop/tracetest/server/model/yaml"
 	"go.uber.org/zap"
 )
 
@@ -53,7 +51,12 @@ func (a runTestAction) Run(ctx context.Context, args RunTestConfig) error {
 	}
 
 	metadata := a.getMetadata()
-	a.logger.Debug("Running test from definition", zap.String("definitionFile", args.DefinitionFile))
+	a.logger.Debug(
+		"Running test from definition",
+		zap.String("definitionFile", args.DefinitionFile),
+		zap.Bool("waitForResults", args.WaitForResult),
+		zap.String("junit", args.JUnit),
+	)
 	params := runDefParams{
 		DefinitionFile: args.DefinitionFile,
 		WaitForResult:  args.WaitForResult,
@@ -70,59 +73,95 @@ func (a runTestAction) Run(ctx context.Context, args RunTestConfig) error {
 }
 
 func (a runTestAction) runDefinition(ctx context.Context, params runDefParams) error {
-	defFile, err := file.LoadDefinition(params.DefinitionFile)
+	f, err := file.Read(params.DefinitionFile)
 	if err != nil {
 		return err
 	}
 
-	err = defFile.Validate()
-	if err != nil {
+	defFile := f.Definition()
+	if err = defFile.Validate(); err != nil {
 		return fmt.Errorf("invalid definition file: %w", err)
 	}
 
-	if test, err := defFile.Test(); err == nil {
-		return a.runTestFile(ctx, test, params)
-	}
-
-	return fmt.Errorf("invalid file type")
+	return a.runDefinitionFile(ctx, f, params)
 }
 
-func (a runTestAction) runTestFile(ctx context.Context, defTest yaml.Test, params runDefParams) error {
-	a.logger.Debug("try to create test")
+func (a runTestAction) runDefinitionFile(ctx context.Context, f file.File, params runDefParams) error {
+	body, resp, err := a.client.ApiApi.
+		ExecuteDefinition(ctx).
+		TextDefinition(openapi.TextDefinition{
+			Content: openapi.PtrString(f.Contents()),
+			RunInformation: &openapi.TestRunInformation{
+				Metadata: params.Metadata,
+			},
+		}).
+		Execute()
 
-	test, exists, err := a.createTestFromDefinition(ctx, defTest)
 	if err != nil {
-		return fmt.Errorf("could not create test from definition: %w", err)
+		return fmt.Errorf("could not execute definition: %w", err)
 	}
 
-	if exists {
-		a.logger.Debug("test exists. Updating it")
-		test, err = a.updateTestFromDefinition(ctx, defTest)
+	if resp.StatusCode == http.StatusCreated && !f.HasID() {
+		f, err = f.SetID(body.GetId())
 		if err != nil {
-			return fmt.Errorf("could not update test using definition: %w", err)
+			return fmt.Errorf("could not update definition file: %w", err)
+		}
+
+		_, err = f.Write()
+		if err != nil {
+			return fmt.Errorf("could not update definition file: %w", err)
 		}
 	}
 
-	defTest.ID = *test.Id
-	err = file.SetTestID(params.DefinitionFile, *test.Id)
-	if err != nil {
-		return fmt.Errorf("could not save test definition: %w", err)
+	runID := body.GetRunId()
+	a.logger.Debug(
+		"executed",
+		zap.String("runID", runID),
+		zap.String("runType", body.GetType()),
+	)
+
+	switch body.GetType() {
+	case "Test":
+		test, err := a.getTest(ctx, body.GetId())
+		if err != nil {
+			return fmt.Errorf("could not get test info: %w", err)
+		}
+		return a.testRun(ctx, test, runID, params)
+	case "Transaction":
+		panic("not implemented")
 	}
 
-	testRun, err := a.runTest(ctx, defTest.ID, params.Metadata)
+	return fmt.Errorf(`unsuported run type "%s"`, body.GetType())
+}
+
+func (a runTestAction) getTest(ctx context.Context, id string) (openapi.Test, error) {
+	test, _, err := a.client.ApiApi.
+		GetTest(ctx, id).
+		Execute()
+	if err != nil {
+		return openapi.Test{}, fmt.Errorf("could not execute request: %w", err)
+	}
+
+	return *test, nil
+}
+
+func (a runTestAction) testRun(ctx context.Context, test openapi.Test, runID string, params runDefParams) error {
+	a.logger.Debug("run test", zap.Bool("wait-for-results", params.WaitForResult))
+	testID := test.GetId()
+	testRun, err := a.getTestRun(ctx, testID, runID)
 	if err != nil {
 		return fmt.Errorf("could not run test: %w", err)
 	}
 
 	if params.WaitForResult {
-		updatedTestRun, err := a.waitForResult(ctx, defTest.ID, testRun.GetId())
+		updatedTestRun, err := a.waitForResult(ctx, testID, testRun.GetId())
 		if err != nil {
 			return fmt.Errorf("could not wait for result: %w", err)
 		}
 
 		testRun = updatedTestRun
 
-		if err := a.saveJUnitFile(ctx, defTest.ID, testRun.GetId(), params.JunitFile); err != nil {
+		if err := a.saveJUnitFile(ctx, testID, testRun.GetId(), params.JunitFile); err != nil {
 			return fmt.Errorf("could not save junit file: %w", err)
 		}
 	}
@@ -138,7 +177,6 @@ func (a runTestAction) runTestFile(ctx context.Context, defTest yaml.Test, param
 	fmt.Print(formattedOutput)
 
 	allPassed := tro.Run.Result.GetAllPassed()
-
 	if params.WaitForResult && !allPassed {
 		// It failed, so we have to return an error status
 		os.Exit(1)
@@ -169,73 +207,10 @@ func (a runTestAction) saveJUnitFile(ctx context.Context, testId, testRunId, out
 
 }
 
-func (a runTestAction) createTestFromDefinition(ctx context.Context, definition yaml.Test) (_ openapi.Test, exists bool, _ error) {
-	variableInjector := variable.NewInjector()
-	variableInjector.Inject(&definition)
-
-	yamlContentBytes, err := yaml.Encode(yaml.File{
-		Type: yaml.FileTypeTest,
-		Spec: definition,
-	})
-
-	if err != nil {
-		return openapi.Test{}, false, fmt.Errorf("could not marshal yaml: %w", err)
-	}
-
-	yamlContent := string(yamlContentBytes)
-
-	textDefinition := openapi.TextDefinition{Content: &yamlContent}
-	req := a.client.ApiApi.CreateTestFromDefinition(ctx)
-	req = req.TextDefinition(textDefinition)
-
-	a.logger.Debug("Sending request to create test", zap.ByteString("test", yamlContentBytes))
-	createdTest, resp, err := a.client.ApiApi.CreateTestFromDefinitionExecute(req)
-
-	if resp != nil && resp.StatusCode == http.StatusBadRequest {
-		// trying to create a test with already exsiting ID
-		return openapi.Test{}, true, nil
-	}
-
-	if err != nil {
-		return openapi.Test{}, false, fmt.Errorf("could not execute request: %w", err)
-	}
-
-	return *createdTest, false, nil
-}
-
-func (a runTestAction) updateTestFromDefinition(ctx context.Context, defTest yaml.Test) (openapi.Test, error) {
-	variableInjector := variable.NewInjector()
-	variableInjector.Inject(&defTest)
-
-	yamlContentBytes, err := yaml.Encode(yaml.File{
-		Type: yaml.FileTypeTest,
-		Spec: defTest,
-	})
-	if err != nil {
-		return openapi.Test{}, fmt.Errorf("could not marshal yaml: %w", err)
-	}
-
-	yamlContent := string(yamlContentBytes)
-	textDefinition := openapi.TextDefinition{Content: &yamlContent}
-
-	req := a.client.ApiApi.UpdateTestFromDefinition(ctx, defTest.ID)
-	req = req.TextDefinition(textDefinition)
-
-	a.logger.Debug("Sending request to update test", zap.ByteString("test", yamlContentBytes))
-	openapiTest, _, err := a.client.ApiApi.UpdateTestFromDefinitionExecute(req)
-	if err != nil {
-		return openapi.Test{}, fmt.Errorf("could not execute request: %w", err)
-	}
-
-	return *openapiTest, nil
-}
-
-func (a runTestAction) runTest(ctx context.Context, testID string, metadata map[string]string) (openapi.TestRun, error) {
-	req := a.client.ApiApi.RunTest(ctx, testID)
-	req = req.TestRunInformation(openapi.TestRunInformation{
-		Metadata: metadata,
-	})
-	run, _, err := a.client.ApiApi.RunTestExecute(req)
+func (a runTestAction) getTestRun(ctx context.Context, testID, runID string) (openapi.TestRun, error) {
+	run, _, err := a.client.ApiApi.
+		GetTestRun(ctx, testID, runID).
+		Execute()
 	if err != nil {
 		return openapi.TestRun{}, fmt.Errorf("could not execute request: %w", err)
 	}
@@ -243,17 +218,19 @@ func (a runTestAction) runTest(ctx context.Context, testID string, metadata map[
 	return *run, nil
 }
 
-func (a runTestAction) waitForResult(ctx context.Context, testId, testRunId string) (openapi.TestRun, error) {
-	var testRun openapi.TestRun
-	var lastError error
-	var wg sync.WaitGroup
+func (a runTestAction) waitForResult(ctx context.Context, testID, testRunID string) (openapi.TestRun, error) {
+	var (
+		testRun   openapi.TestRun
+		lastError error
+		wg        sync.WaitGroup
+	)
 	wg.Add(1)
 	ticker := time.NewTicker(1 * time.Second) // TODO: make this configurable
 	go func() {
 		for {
 			select {
 			case <-ticker.C:
-				readyTestRun, err := a.isTestReady(ctx, testId, testRunId)
+				readyTestRun, err := a.isTestReady(ctx, testID, testRunID)
 				if err != nil {
 					lastError = err
 					wg.Done()
@@ -277,8 +254,8 @@ func (a runTestAction) waitForResult(ctx context.Context, testId, testRunId stri
 	return testRun, nil
 }
 
-func (a runTestAction) isTestReady(ctx context.Context, testId, testRunId string) (*openapi.TestRun, error) {
-	req := a.client.ApiApi.GetTestRun(ctx, testId, testRunId)
+func (a runTestAction) isTestReady(ctx context.Context, testID, testRunId string) (*openapi.TestRun, error) {
+	req := a.client.ApiApi.GetTestRun(ctx, testID, testRunId)
 	run, _, err := a.client.ApiApi.GetTestRunExecute(req)
 	if err != nil {
 		return &openapi.TestRun{}, fmt.Errorf("could not execute GetTestRun request: %w", err)

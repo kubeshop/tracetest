@@ -8,6 +8,9 @@ components:
         id:
           type: string
           description: resource ID
+        runId:
+          type: string
+          description: run ID
         type:
           type: string
           description: resource type
@@ -18,5 +21,7 @@ components:
     TextDefinition:
       type: object
       properties:
+        runInformation:
+          $ref: "./tests.yaml#/components/schemas/TestRunInformation"
         content:
           type: string

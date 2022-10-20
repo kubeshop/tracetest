@@ -9,25 +9,17 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func strp(in string) *string {
-	return &in
-}
-
-func boolp(in bool) *bool {
-	return &in
-}
-
 func TestJSON(t *testing.T) {
 	in := formatters.TestRunOutput{
 		Test: openapi.Test{
-			Id:   strp("9876543"),
-			Name: strp("Testcase 1"),
+			Id:   openapi.PtrString("9876543"),
+			Name: openapi.PtrString("Testcase 1"),
 		},
 		Run: openapi.TestRun{
-			Id:    strp("1"),
-			State: strp("FINISHED"),
+			Id:    openapi.PtrString("1"),
+			State: openapi.PtrString("FINISHED"),
 			Result: &openapi.AssertionResults{
-				AllPassed: boolp(true),
+				AllPassed: openapi.PtrBool(true),
 			},
 		},
 	}
@@ -49,14 +41,14 @@ func TestJSON(t *testing.T) {
 func TestSuccessfulTestRunOutput(t *testing.T) {
 	in := formatters.TestRunOutput{
 		Test: openapi.Test{
-			Id:   strp("9876543"),
-			Name: strp("Testcase 1"),
+			Id:   openapi.PtrString("9876543"),
+			Name: openapi.PtrString("Testcase 1"),
 		},
 		Run: openapi.TestRun{
-			Id:    strp("1"),
-			State: strp("FINISHED"),
+			Id:    openapi.PtrString("1"),
+			State: openapi.PtrString("FINISHED"),
 			Result: &openapi.AssertionResults{
-				AllPassed: boolp(true),
+				AllPassed: openapi.PtrBool(true),
 			},
 		},
 	}
@@ -73,11 +65,11 @@ func TestSuccessfulTestRunOutputNoResult(t *testing.T) {
 	in := formatters.TestRunOutput{
 		HasResults: false,
 		Test: openapi.Test{
-			Id:   strp("9876543"),
-			Name: strp("Testcase 1"),
+			Id:   openapi.PtrString("9876543"),
+			Name: openapi.PtrString("Testcase 1"),
 		},
 		Run: openapi.TestRun{
-			Id: strp("1"),
+			Id: openapi.PtrString("1"),
 		},
 	}
 	formatter := formatters.TestRun(config.Config{
@@ -93,27 +85,27 @@ func TestFailingTestOutput(t *testing.T) {
 	in := formatters.TestRunOutput{
 		HasResults: true,
 		Test: openapi.Test{
-			Id:   strp("9876543"),
-			Name: strp("Testcase 2"),
+			Id:   openapi.PtrString("9876543"),
+			Name: openapi.PtrString("Testcase 2"),
 		},
 		Run: openapi.TestRun{
-			Id: strp("1"),
+			Id: openapi.PtrString("1"),
 			Result: &openapi.AssertionResults{
-				AllPassed: boolp(false),
+				AllPassed: openapi.PtrBool(false),
 				Results: []openapi.AssertionResultsResults{
 					{
 						Selector: &openapi.Selector{
-							Query: strp(`span[name = "my span"]`),
+							Query: openapi.PtrString(`span[name = "my span"]`),
 						},
 						Results: []openapi.AssertionResult{
 							{
-								Assertion: strp(`attr:tracetest.span.duration <= 200ms`),
-								AllPassed: boolp(true),
+								Assertion: openapi.PtrString(`attr:tracetest.span.duration <= 200ms`),
+								AllPassed: openapi.PtrBool(true),
 								SpanResults: []openapi.AssertionSpanResult{
 									{
-										SpanId:        strp("123456"),
-										ObservedValue: strp("157ms"),
-										Passed:        boolp(true),
+										SpanId:        openapi.PtrString("123456"),
+										ObservedValue: openapi.PtrString("157ms"),
+										Passed:        openapi.PtrBool(true),
 										Error:         nil,
 									},
 								},
@@ -122,29 +114,29 @@ func TestFailingTestOutput(t *testing.T) {
 					},
 					{
 						Selector: &openapi.Selector{
-							Query: strp(`span[name = "my other span"]`),
+							Query: openapi.PtrString(`span[name = "my other span"]`),
 						},
 						Results: []openapi.AssertionResult{
 							{
-								Assertion: strp(`attr:http.status = 200`),
-								AllPassed: boolp(true),
+								Assertion: openapi.PtrString(`attr:http.status = 200`),
+								AllPassed: openapi.PtrBool(true),
 								SpanResults: []openapi.AssertionSpanResult{
 									{
-										SpanId:        strp("456789"),
-										ObservedValue: strp("404"),
-										Passed:        boolp(false),
+										SpanId:        openapi.PtrString("456789"),
+										ObservedValue: openapi.PtrString("404"),
+										Passed:        openapi.PtrBool(false),
 										Error:         nil,
 									},
 								},
 							},
 							{
-								Assertion: strp(`attr:tracetest.span.duration <= 200ms`),
-								AllPassed: boolp(true),
+								Assertion: openapi.PtrString(`attr:tracetest.span.duration <= 200ms`),
+								AllPassed: openapi.PtrBool(true),
 								SpanResults: []openapi.AssertionSpanResult{
 									{
-										SpanId:        strp("456789"),
-										ObservedValue: strp("68ms"),
-										Passed:        boolp(true),
+										SpanId:        openapi.PtrString("456789"),
+										ObservedValue: openapi.PtrString("68ms"),
+										Passed:        openapi.PtrBool(true),
 										Error:         nil,
 									},
 								},
