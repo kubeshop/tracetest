@@ -57,8 +57,8 @@ export const AssertionCheck = ({field, index, name, remove, form, assertions, at
           {...field}
           name={[name, 'left']}
           rules={[{required: true, message: 'An attribute is required'}]}
+          style={{margin: 0}}
           data-cy="assertion-check-attribute"
-          noStyle
         >
           <Editor
             type={SupportedEditors.Expression}
@@ -71,11 +71,10 @@ export const AssertionCheck = ({field, index, name, remove, form, assertions, at
           {...field}
           name={[name, 'comparator']}
           rules={[{required: true, message: 'Operator is required'}]}
-          noStyle
-          data-cy="assertion-check-operator"
+          style={{margin: 0}}
           initialValue={operatorList[0].value}
         >
-          <S.Select style={{margin: 0}} placeholder="Assertion Type">
+          <S.Select data-cy="assertion-check-operator" style={{margin: 0}} placeholder="Assertion Type">
             {operatorList.map(({value, label}) => (
               <Select.Option key={value} value={value}>
                 {label}
@@ -87,8 +86,8 @@ export const AssertionCheck = ({field, index, name, remove, form, assertions, at
           {...field}
           name={[name, 'right']}
           rules={[{required: true, message: 'Expected value is required'}]}
-          data-cy="assertion-input"
-          noStyle
+          data-cy="assertion-check-value"
+          style={{margin: 0}}
         >
           <Editor type={SupportedEditors.Expression} placeholder="Expected Value" />
         </Form.Item>

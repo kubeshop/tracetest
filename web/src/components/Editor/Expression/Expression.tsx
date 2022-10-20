@@ -55,7 +55,7 @@ const Expression = ({
         onFocus={() => onFocus(ref.current?.view!)}
         id="expression-editor"
         basicSetup={{...basicSetup, lineNumbers}}
-        data-cy="expression-selector"
+        data-cy="expression-editor"
         value={value}
         maxHeight="120px"
         extensions={extensionList}
