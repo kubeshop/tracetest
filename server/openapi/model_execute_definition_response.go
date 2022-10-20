@@ -14,6 +14,9 @@ type ExecuteDefinitionResponse struct {
 	// resource ID
 	Id string `json:"id,omitempty"`
 
+	// run ID
+	RunId string `json:"runId,omitempty"`
+
 	// resource type
 	Type string `json:"type,omitempty"`
 
