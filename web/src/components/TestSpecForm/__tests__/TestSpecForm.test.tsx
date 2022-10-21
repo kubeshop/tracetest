@@ -5,6 +5,8 @@ import TestSpecForm from '../TestSpecForm';
 const defaultProps = {
   onSubmit: jest.fn(),
   onCancel: jest.fn(),
+  onClearSelectorSuggestions: jest.fn(),
+  onClickPrevSelector: jest.fn(),
   testId: 'testId',
   runId: 'runId',
 };

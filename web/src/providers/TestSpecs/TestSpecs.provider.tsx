@@ -26,6 +26,7 @@ interface IContext {
   isDraftMode: boolean;
   setSelectedSpec(selector?: string): void;
   setSelectorSuggestions(selectorSuggestions: ISuggestion[]): void;
+  setPrevSelector(selector: string): void;
 }
 
 export const Context = createContext<IContext>({
@@ -43,6 +44,7 @@ export const Context = createContext<IContext>({
   setSelectedSpec: noop,
   updateIsInitialized: noop,
   setSelectorSuggestions: noop,
+  setPrevSelector: noop,
 });
 
 interface IProps {
@@ -78,6 +80,7 @@ const TestSpecsProvider = ({children, testId, runId}: IProps) => {
     updateIsInitialized,
     setSelectedSpec,
     setSelectorSuggestions,
+    setPrevSelector,
   } = useTestSpecsCrud({
     assertionResults,
     testId,
@@ -117,6 +120,7 @@ const TestSpecsProvider = ({children, testId, runId}: IProps) => {
       revert,
       updateIsInitialized,
       setSelectorSuggestions,
+      setPrevSelector,
     }),
     [
       add,
@@ -134,6 +138,7 @@ const TestSpecsProvider = ({children, testId, runId}: IProps) => {
       revert,
       updateIsInitialized,
       setSelectorSuggestions,
+      setPrevSelector,
     ]
   );
 

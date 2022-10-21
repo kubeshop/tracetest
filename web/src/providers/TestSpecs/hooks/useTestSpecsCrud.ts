@@ -12,6 +12,7 @@ import {
   reset as resetAction,
   setIsInitialized,
   setSelectorSuggestions as setSelectorSuggestionsAction,
+  setPrevSelector as setPrevSelectorAction,
 } from 'redux/slices/TestSpecs.slice';
 import {TAssertionResults} from 'types/Assertion.types';
 import {ISuggestion, TTestSpecEntry} from 'types/TestSpecs.types';
@@ -127,6 +128,13 @@ const useTestSpecsCrud = ({runId, testId, isDraftMode, assertionResults}: IProps
     [dispatch]
   );
 
+  const setPrevSelector = useCallback(
+    (prevSelector: string) => {
+      dispatch(setPrevSelectorAction({prevSelector}));
+    },
+    [dispatch]
+  );
+
   return {
     revert,
     init,
@@ -140,6 +148,7 @@ const useTestSpecsCrud = ({runId, testId, isDraftMode, assertionResults}: IProps
     dryRun,
     setSelectedSpec,
     setSelectorSuggestions,
+    setPrevSelector,
   };
 };
 

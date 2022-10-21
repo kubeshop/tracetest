@@ -36,6 +36,7 @@ export interface ITestSpecsState {
   selectedSpec: string | undefined;
   isDraftMode: boolean;
   selectorSuggestions: ISuggestion[];
+  prevSelector: string;
 }
 
 export type TTestSpecsSliceActions = {
@@ -50,4 +51,5 @@ export type TTestSpecsSliceActions = {
   setSelectedSpec: CaseReducer<ITestSpecsState, PayloadAction<TAssertionResultEntry | undefined>>;
   setIsInitialized: CaseReducer<ITestSpecsState, PayloadAction<{isInitialized: boolean}>>;
   setSelectorSuggestions: CaseReducer<ITestSpecsState, PayloadAction<ISuggestion[]>>;
+  setPrevSelector: CaseReducer<ITestSpecsState, PayloadAction<{prevSelector: string}>>;
 };

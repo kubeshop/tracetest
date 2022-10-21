@@ -5,9 +5,9 @@ import {ADVANCE_SELECTORS_DOCUMENTATION_URL} from 'constants/Common.constants';
 import {CompareOperator} from 'constants/Operator.constants';
 import {useAppSelector} from 'redux/hooks';
 import AssertionSelectors from 'selectors/Assertion.selectors';
+import OperatorService from 'services/Operator.service';
 import SpanSelectors from 'selectors/Span.selectors';
 import TestSpecsSelectors from 'selectors/TestSpecs.selectors';
-import OperatorService from 'services/Operator.service';
 import {TAssertion} from 'types/Assertion.types';
 import {singularOrPlural} from 'utils/Common';
 import AssertionCheckList from './AssertionCheckList';
@@ -26,6 +26,8 @@ interface IProps {
   defaultValues?: IValues;
   isEditing?: boolean;
   onCancel(): void;
+  onClearSelectorSuggestions(): void;
+  onClickPrevSelector(prevSelector: string): void;
   onSubmit(values: IValues): void;
   runId: string;
   testId: string;
@@ -44,6 +46,8 @@ const TestSpecForm = ({
   } = {},
   isEditing = false,
   onCancel,
+  onClearSelectorSuggestions,
+  onClickPrevSelector,
   onSubmit,
   runId,
   testId,
@@ -63,6 +67,7 @@ const TestSpecForm = ({
   });
 
   const selectorSuggestions = useAppSelector(TestSpecsSelectors.selectSelectorSuggestions);
+  const prevSelector = useAppSelector(TestSpecsSelectors.selectPrevSelector);
 
   return (
     <S.AssertionForm>
@@ -101,10 +106,20 @@ const TestSpecForm = ({
             {!isEditing && (
               <SelectorSuggestions
                 onClick={query => {
+                  onClickPrevSelector(form.getFieldValue('selector'));
+                  onClearSelectorSuggestions();
                   form.setFieldsValue({
                     selector: query,
                   });
                 }}
+                onClickPrevSelector={query => {
+                  onClickPrevSelector('');
+                  onClearSelectorSuggestions();
+                  form.setFieldsValue({
+                    selector: query,
+                  });
+                }}
+                prevSelector={prevSelector}
                 selectorSuggestions={selectorSuggestions}
               />
             )}

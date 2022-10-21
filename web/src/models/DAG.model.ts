@@ -26,7 +26,12 @@ function getNodesDatumFromSpans(spans: TSpan[]): INodeDatum<INodeDataSpan>[] {
 }
 
 function DAG(spans: TSpan[]) {
-  const nodesDatum = getNodesDatumFromSpans(spans).sort((a, b) => b.data.startTime - a.data.startTime);
+  const nodesDatum = getNodesDatumFromSpans(spans).sort((a, b) => {
+    if (b.data.startTime !== a.data.startTime) return b.data.startTime - a.data.startTime;
+    if (b.id < a.id) return -1;
+    if (b.id > a.id) return 1;
+    return 0;
+  });
   return DAGService.getEdgesAndNodes(nodesDatum);
 }
 
