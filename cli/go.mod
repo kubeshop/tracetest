@@ -2,8 +2,6 @@ module github.com/kubeshop/tracetest/cli
 
 go 1.18
 
-replace github.com/kubeshop/tracetest/server => ../server
-
 require (
 	github.com/alexeyco/simpletable v1.0.0
 	github.com/compose-spec/compose-go v1.5.1
