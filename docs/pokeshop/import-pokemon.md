@@ -50,7 +50,7 @@ Response:
 
 Here are some key points that are relevant to this query.
 
-**Validate the Message Is Sent to the Cue**
+**Validate the Message Is Sent to the Queue**
 
 To validate what’s being sent from the API to the worker, we can click the custom queue producer span and validate the `messaging.payload` attribute exists under the custom tab. To add an assertion targeting this attribute, we can select the **add assertion** icon that shows up while hovering over it.
 

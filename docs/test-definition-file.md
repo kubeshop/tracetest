@@ -15,7 +15,7 @@ To solve that, the best approach would be to enable developers to define their t
 
 ## **Definition**
 
-The definition can be broken into three parts: `test information`, `triggering transaction`, and `assertions`. Here is a real test we have on Tracetest to test our Pokemon demo api:
+The definition can be broken into three parts: `test information`, `triggering transaction`, `assertions`, and `outputs`. Here is a real test we have on Tracetest to test our Pokemon demo api:
 
 ```yaml
 name: POST import pokemon
@@ -31,23 +31,27 @@ trigger:
 specs:
 - selector: span[name = "POST /pokemon/import"]
   assertions:
-  - tracetest.span.duration <= 500ms
-  - http.status_code = 200
+  - attr:tracetest.span.duration <= 500ms
+  - attr:http.status_code = 200
 - selector: span[name = "send message to queue"]
   assertions:
-  - messaging.message.payload contains 52
+  - attr:messaging.message.payload contains 52
 - selector: span[name = "consume message from queue"]:last
   assertions:
-  - messaging.message.payload contains 52
+  - attr:messaging.message.payload contains 52
 - selector: span[name = "consume message from queue"]:last span[name = "import pokemon
     from pokeapi"]
   assertions:
-  - http.status_code = 200
+  - attr:http.status_code = 200
 - selector: span[name = "consume message from queue"]:last span[name = "save pokemon
     on database"]
   assertions:
-  - db.repository.operation = "create"
-  - tracetest.span.duration <= 500ms
+  - attr:db.repository.operation = "create"
+  - attr:tracetest.span.duration <= 500ms
+outputs:
+- name: POKEMON_ID
+  selector: span[name = "POST /pokemon/import"]
+  value: attr:http.response.body | json_path '.id'
 ```
 
 ## **Test Information**
@@ -137,7 +141,7 @@ trigger:
 
 Sometimes we want to randomize our test data. Maybe we want to try new values or maybe we know our API will fail if the same id is provided more than once. For this use case, you can define generator functions in the test trigger.
 
-To use a generator function, wrap it in double curly brackets: `{{ uuid() }}`.
+Generator functions can be invoked as part of expressions. Therefore, you only need to invoke it as `uuid()`. However, you might want to generate values and concatenate them with static texts as well. For this, you can use the string interpolation feature: `"your user id is ${uuid()}`.
 
 Available functions:
 
@@ -158,9 +162,9 @@ Available functions:
 ## **Assertions**
 Assertions are as important as how you trigger your test. Without them, your test is just a fancy way of executing a request using a CLI command. In this section, we will discuss how you can declare your assertions in your definition file.
 
-Before we start, there are two concepts that you must understand to write your tests: [selectors](https://kubeshop.github.io/tracetest/advanced-selectors/) and assertions. 
+Before we start, there are two concepts that you must understand to write your tests: [selectors](advanced-selectors.md) and assertions.
 
-**Selectors** are queries that are executed against your trace tree and select a set of spans based on some attributes. They are responsible for defining which spans will be tested against your assertions. 
+**Selectors** are queries that are executed against your trace tree and select a set of spans based on some attributes. They are responsible for defining which spans will be tested against your assertions.
 
 **Assertions** are tests against a specific span based on its attributes. A practical example might be useful:
 
@@ -169,44 +173,44 @@ Imagine you have to ensure that all your `database select statements` take `less
 1. Select all spans in your trace related to `select statements`.
 2. Check if all those spans lasted `less than 500ms`.
 
-For the first task, we use a selector: `span[db.statement contains "SELECT"]`. While the second one is achieved by using an assertion: `tracetest.span.duration < 500ms`.
+For the first task, we use a selector: `span[db.statement contains "SELECT"]`. While the second one is achieved by using an assertion: `attr:tracetest.span.duration < 500ms`.
 
-> **Note:** When asserting time fields, you can use the following time units: `ns` (nanoseconds), `us` (microseconds), `ms` (milliseconds), `s` (seconds), `m` (minutes), and `h` (hours). Instead of defining `tracetest.span.duration <= 3600s`, you can set it as `tracetest.span.duration <= 1h`.
+> **Note:** When asserting time fields, you can use the following time units: `ns` (nanoseconds), `us` (microseconds), `ms` (milliseconds), `s` (seconds), `m` (minutes), and `h` (hours). Instead of defining `attr:tracetest.span.duration <= 3600s`, you can set it as `attr:tracetest.span.duration <= 1h`.
 
 To write that in your test definition, you can define the following YAML definition:
 
 ```yaml
 specs:
-    - selector: span[db.statement contains "SELECT"]
-      assertions:
-        - tracetest.span.duration < 500ms
+- selector: span[db.statement contains "SELECT"]
+  assertions:
+    - attr:tracetest.span.duration < 500ms
 ```
 
 As you probably noticed in the test definition structure, you can have multiple assertions for the same selector. This is useful to group related validations. For example, ensuring that all your HTTP calls are successful and take less than 1000ms:
 
 ```yaml
 specs:
-    - selector: span[tracetest.span.type="http"]
-      assertions:
-        - http.status_code >= 200
-        - http.status_code < 300
-        - tracetest.span.duration < 1000ms
+- selector: span[tracetest.span.type="http"]
+  assertions:
+    - attr:http.status_code >= 200
+    - attr:http.status_code < 300
+    - attr:tracetest.span.duration < 1000ms
 ```
 
 #### **Referencing Other Fields from the Same Span**
 You also can reference fields from the same span in your assertions. For example, you can define an assertion to ensure the output number is greater than the input number.
 
 ```yaml
-testDefinition:
-    - selector: span[name = "my operation"]
-      assertions:
-        - myapp.output > myapp.input
+specs:
+- selector: span[name = "my operation"]
+  assertions:
+    - attr:myapp.output > attr:myapp.input
 ```
 
 You also can use basic arithmetic expressions in your assertions:
 ```yaml
 assertions:
-  - myapp.output = myapp.input + 1
+  - attr:myapp.output = myapp.input + 1
 ```
 > **Note:** This does not take into account the order of operators yet. So an expression `1 + 2 * 3` will be resolved as `9` instead of `7`. This will be fixed in future releases.
 
@@ -226,3 +230,81 @@ For more information about selectors or assertions, take a look at the documenta
 | `>=`           | Check if value from left side is larger or equal to the one on the right side of the operation.                           |
 | `contains`     | Check if value on the right side of the operation is contained inside of the value of the left side of the operation.     |
 | `not-contains` | Check if value on the right side of the operation is not contained inside of the value of the left side of the operation. |
+
+
+## **Outputs**
+
+Outputs are really useful when running [Transactions](transactions.md). They allow to export values from a test so they become available in the [Environment Variables](environment-variables.md) of the current transaction.
+
+An ouptut exports the result of an [Expression](expressions.md) and assigns it to a name, so it can be injected into the environment variables of a running transaction.
+A `selector` is needed only if the provided expression refers to a/some span/s attribute or meta attributes.
+
+It can be defined using the following YAML definition:
+
+```yaml
+outpus:
+  - name: USER_ID
+    selector: span[name = "user creation"]
+    value: attr:myapp.users.created_id
+```
+
+The `value` attribute is an `expression`, and is a very powerful tool.
+
+## Examples
+
+### Basic expression
+
+You can output basic expressions
+
+```yaml
+outpus:
+
+- name: ARITHMETIC_RESULT
+  value: 1 + 1
+  # results in ARITHMETIC_RESULT = 2
+
+- name: INTERPOLATE_STRING
+  # assume PRE_EXISTING_VALUE=someValue from env vars
+  value: "the value ${env:PRE_EXISTING_VALUE} comes from the env var PRE_EXISTING_VALUE"
+  # results in INTERPOLATE_STRING = "the value someValue comes from the env var PRE_EXISTING_VALUE
+```
+
+### Extract a value from a JSON
+
+Imagine an hypotetical `/users/create` endpoint that returns the full `user` object, including the new ID, when the operation is successful.
+
+```yaml
+outpus:
+- name: USER_ID
+  selector: span[name = "POST /user/create"]
+  value: attr:http.response.body | json_path '.id'
+```
+
+### Multiple values
+
+Using the same hypotethical user creation endpoint, a user creation might result on multiple sql queries, for example:
+- `INSERT INTO users ...`
+- `INSERT INTO permissions...`
+- `SELECT remaining_users FROM accounts`
+- `UPDATE accounts SET remaining_users ...`
+
+In this case, the service is instrumented so that each query generates a span of type `database`.
+You can get a list of sql operations:
+
+```yaml
+outpus:
+- name: SQL_OPS
+  selector: span[tracetest.span.type = "database"]
+  value: attr:sql.operation
+  # result: SQL_OPS = ["INSERT", "INSERT", "SELECT", "UPDATE"]
+```
+
+Since the value is an array, you can also apply filters to it:
+
+```yaml
+outpus:
+- name: LAST_SQL_OP
+  selector: span[tracetest.span.type = "database"]
+  value: attr:sql.operation | get_index 'last'
+  # result: LAST_SQL_OP = "INSERT"
+```

@@ -1,60 +1,27 @@
 import {useCallback} from 'react';
 import {CompletionContext} from '@codemirror/autocomplete';
-import {syntaxTree} from '@codemirror/language';
-import {completeSourceAfter, parserList, Tokens} from 'constants/Editor.constants';
-import Env from 'utils/Env';
-
-const {PokeshopHttp = ''} = Env.get('demoEndpoints');
-
-const environmentList = [
-  {
-    key: 'HOST',
-    value: PokeshopHttp,
-  },
-  {
-    key: 'PORT',
-    value: '8080',
-  },
-];
+import EditorService from 'services/Editor.service';
+import {SupportedEditors} from 'constants/Editor.constants';
+import {useAppStore} from 'redux/hooks';
+import EnvironmentSelectors from 'selectors/Environment.selectors';
 
 const useAutoComplete = () => {
-  return useCallback(async (context: CompletionContext) => {
-    const {state, pos} = context;
-    const tree = syntaxTree(state);
-    const nodeBefore = tree.resolveInner(pos, -1);
+  const {getState} = useAppStore();
 
-    if (nodeBefore.name === Tokens.Pipe) {
-      return {
-        from: nodeBefore.to,
-        options: parserList,
-      };
-    }
+  const getSelectedEnvironmentEntryList = useCallback(() => {
+    const state = getState();
 
-    if (completeSourceAfter.includes(nodeBefore.name)) {
-      return {
-        from: nodeBefore.to,
-        options: environmentList.map(({key}) => ({
-          label: key,
-          type: 'variableName',
-          apply: key,
-        })),
-      };
-    }
+    return EnvironmentSelectors.selectSelectedEnvironmentEntryList(state);
+  }, [getState]);
 
-    if (nodeBefore.prevSibling?.name === Tokens.Source) {
-      return {
-        from: nodeBefore.from,
-        to: nodeBefore.to,
-        options: environmentList.map(({key}) => ({
-          label: key,
-          type: 'variableName',
-          apply: key,
-        })),
-      };
-    }
+  return useCallback(
+    async (context: CompletionContext) => {
+      const envEntryList = getSelectedEnvironmentEntryList();
 
-    return null;
-  }, []);
+      return EditorService.getAutocomplete({type: SupportedEditors.Interpolation, context, envEntryList});
+    },
+    [getSelectedEnvironmentEntryList]
+  );
 };
 
 export default useAutoComplete;

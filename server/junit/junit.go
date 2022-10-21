@@ -18,20 +18,20 @@ func FromRunResult(test model.Test, run model.Run) ([]byte, error) {
 	if run.Results == nil {
 		return nil, fmt.Errorf("run has no results")
 	}
-	run.Results.Results.Map(func(selector model.SpanQuery, results []model.AssertionResult) {
+	run.Results.Results.ForEach(func(selector model.SpanQuery, results []model.AssertionResult) error {
 		checks := []check{}
 		var total, fails, errs int
 		for _, res := range results {
 			for _, sar := range res.Results {
 				total++
 				c := check{
-					Check: res.Assertion.String(),
+					Check: string(res.Assertion),
 				}
 				if sar.CompareErr != nil {
 					if errors.Is(sar.CompareErr, comparator.ErrNoMatch) {
 						fails++
 						c.Failure = &failure{
-							Attribute:   res.Assertion.Attribute.String(),
+							Assertion:   string(res.Assertion),
 							ActualValue: sar.ObservedValue,
 						}
 					} else {
@@ -58,6 +58,8 @@ func FromRunResult(test model.Test, run model.Run) ([]byte, error) {
 			// Skipped: 0, // we don't have skips yet
 			Checks: checks,
 		})
+
+		return nil
 	})
 
 	r := report{
@@ -108,6 +110,6 @@ type jError struct {
 
 type failure struct {
 	XMLName     xml.Name `xml:"failure"`
-	Attribute   string   `xml:"type,attr"`
+	Assertion   string   `xml:"type,attr"`
 	ActualValue string   `xml:"message,attr"`
 }

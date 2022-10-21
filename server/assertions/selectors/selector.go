@@ -17,7 +17,7 @@ type Selector struct {
 	SpanSelectors []SpanSelector
 }
 
-func (s Selector) Filter(trace traces.Trace) []traces.Span {
+func (s Selector) Filter(trace traces.Trace) traces.Spans {
 	if len(s.SpanSelectors) == 0 {
 		// empty selector should select everything
 		return getAllSpans(trace)
@@ -32,8 +32,8 @@ func (s Selector) Filter(trace traces.Trace) []traces.Span {
 	return allFilteredSpans
 }
 
-func getAllSpans(trace traces.Trace) []traces.Span {
-	var allSpans = make([]traces.Span, 0)
+func getAllSpans(trace traces.Trace) traces.Spans {
+	var allSpans = make(traces.Spans, 0)
 	traverseTree(trace.RootSpan, func(span traces.Span) {
 		allSpans = append(allSpans, span)
 	})

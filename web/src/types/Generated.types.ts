@@ -590,13 +590,8 @@ export interface external {
           specs?: {
             name?: string | null;
             selector?: external["tests.yaml"]["components"]["schemas"]["Selector"];
-            assertions?: external["tests.yaml"]["components"]["schemas"]["Assertion"][];
+            assertions?: string[];
           }[];
-        };
-        Assertion: {
-          attribute?: string;
-          comparator?: string;
-          expected?: string;
         };
         TestRun: {
           id?: string;
@@ -646,7 +641,7 @@ export interface external {
           }[];
         };
         AssertionResult: {
-          assertion?: external["tests.yaml"]["components"]["schemas"]["Assertion"];
+          assertion?: string;
           allPassed?: boolean;
           spanResults?: external["tests.yaml"]["components"]["schemas"]["AssertionSpanResult"][];
         };

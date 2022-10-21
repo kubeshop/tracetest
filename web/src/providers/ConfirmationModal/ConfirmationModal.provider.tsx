@@ -5,7 +5,7 @@ import ConfirmationModal from 'components/ConfirmationModal';
 type TOnConfirm = typeof noop;
 
 interface IContext {
-  onOpen(title: string, onConfirm: TOnConfirm): void;
+  onOpen(title: string, onConfirm: TOnConfirm, heading?: string): void;
 }
 
 export const Context = createContext<IContext>({
@@ -20,13 +20,15 @@ export const useConfirmationModal = () => useContext(Context);
 
 const ConfirmationModalProvider = ({children}: IProps) => {
   const [title, setTitle] = useState<string>('');
+  const [heading, setHeading] = useState<string>('');
   const [onConfirm, setOnConfirm] = useState<TOnConfirm>(() => noop);
   const [isOpen, setIsOpen] = useState(false);
 
-  const onOpen = useCallback((newTitle: string, onConfirmFn: TOnConfirm) => {
+  const onOpen = useCallback((newTitle: string, onConfirmFn: TOnConfirm, newHeading = 'Delete Confirmation') => {
     setTitle(newTitle);
     setOnConfirm(() => onConfirmFn);
     setIsOpen(true);
+    setHeading(newHeading);
   }, []);
 
   const triggerConfirm = useCallback(() => {
@@ -39,7 +41,13 @@ const ConfirmationModalProvider = ({children}: IProps) => {
   return (
     <Context.Provider value={value}>
       {children}
-      <ConfirmationModal onClose={() => setIsOpen(false)} onConfirm={triggerConfirm} isOpen={isOpen} title={title} />
+      <ConfirmationModal
+        onClose={() => setIsOpen(false)}
+        onConfirm={triggerConfirm}
+        isOpen={isOpen}
+        title={title}
+        heading={heading}
+      />
     </Context.Provider>
   );
 };

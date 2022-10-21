@@ -1,19 +1,16 @@
 package assertions
 
 import (
-	"fmt"
-	"strconv"
-
 	"github.com/kubeshop/tracetest/server/assertions/selectors"
+	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/traces"
-	"go.opentelemetry.io/otel/trace"
 )
 
 func Assert(defs model.OrderedMap[model.SpanQuery, model.NamedAssertions], trace traces.Trace) (model.OrderedMap[model.SpanQuery, []model.AssertionResult], bool) {
 	testResult := model.OrderedMap[model.SpanQuery, []model.AssertionResult]{}
 	allPassed := true
-	defs.Map(func(spanQuery model.SpanQuery, asserts model.NamedAssertions) {
+	defs.ForEach(func(spanQuery model.SpanQuery, asserts model.NamedAssertions) error {
 		spans := selector(spanQuery).Filter(trace)
 		assertionResults := make([]model.AssertionResult, 0)
 		for _, assertion := range asserts.Assertions {
@@ -24,94 +21,59 @@ func Assert(defs model.OrderedMap[model.SpanQuery, model.NamedAssertions], trace
 			assertionResults = append(assertionResults, res)
 		}
 		testResult, _ = testResult.Add(spanQuery, assertionResults)
+		return nil
 	})
 
 	return testResult, allPassed
 }
 
-func assert(a model.Assertion, spans []traces.Span) model.AssertionResult {
-	if a.Attribute.IsMeta() {
-		return assertMeta(a, spans)
+func assert(assertion model.Assertion, spans traces.Spans) model.AssertionResult {
+	ds := []expression.DataStore{
+		expression.MetaAttributesDataStore{SelectedSpans: spans},
+		expression.VariableDataStore{},
 	}
-
-	return assertIndividualSpans(a, spans)
-}
-
-func assertMeta(a model.Assertion, spans []traces.Span) model.AssertionResult {
-	res := func(res model.SpanAssertionResult, err error) model.AssertionResult {
-		return model.AssertionResult{
-			Assertion: a,
-			AllPassed: err == nil,
-			Results:   []model.SpanAssertionResult{res},
-		}
-	}
-
-	ma, err := metaAttr(a.Attribute.String())
-	if err != nil {
-		return res(model.SpanAssertionResult{}, err)
-	}
-
-	expectedValue, err := ExecuteExpression(*a.Value, traces.Span{})
-	actualValue := ma.Value(spans)
-
-	sar := apply(a, expectedValue, actualValue, nil)
-	if err != nil {
-		sar.CompareErr = err
-	}
-
-	return res(sar, sar.CompareErr)
-}
-
-func assertIndividualSpans(a model.Assertion, spans []traces.Span) model.AssertionResult {
-	res := make([]model.SpanAssertionResult, len(spans))
 	allPassed := true
-	for i, span := range spans {
-		spanID := span.ID
-		var err error = nil
-		expectedValue, err := ExecuteExpression(*a.Value, span)
-		actualValue := span.Attributes.Get(a.Attribute.String())
+	spanResults := make([]model.SpanAssertionResult, 0, len(spans))
+	spans.
+		ForEach(func(_ int, span traces.Span) bool {
+			res := assertSpan(span, ds, string(assertion))
+			spanResults = append(spanResults, res)
 
-		// See https://github.com/kubeshop/tracetest/issues/1203
-		if a.Value.Type() == "duration" {
-			actualValue = getRoundedDurationValue(actualValue)
-		}
+			if res.CompareErr != nil {
+				allPassed = false
+			}
 
-		res[i] = apply(
-			a,
-			expectedValue,
-			actualValue,
-			&spanID,
-		)
-		if err != nil {
-			res[i].CompareErr = err
-		}
-
-		if res[i].CompareErr != nil {
-			allPassed = false
-		}
-	}
+			return true
+		}).
+		OrEmpty(func() {
+			res := assertSpan(traces.Span{}, ds, string(assertion))
+			spanResults = append(spanResults, res)
+			allPassed = res.CompareErr == nil
+		})
 
 	return model.AssertionResult{
-		Assertion: a,
+		Assertion: assertion,
 		AllPassed: allPassed,
-		Results:   res,
+		Results:   spanResults,
 	}
 }
 
-func getRoundedDurationValue(value string) string {
-	numberValue, _ := strconv.Atoi(value)
-	valueAsDuration := traces.ConvertNanoSecondsIntoProperTimeUnit(numberValue)
-	roundedValue := traces.ConvertTimeFieldIntoNanoSeconds(valueAsDuration)
+func assertSpan(span traces.Span, ds []expression.DataStore, assertion string) model.SpanAssertionResult {
+	ds = append([]expression.DataStore{expression.AttributeDataStore{Span: span}}, ds...)
+	expressionExecutor := expression.NewExecutor(ds...)
 
-	return fmt.Sprintf("%d", roundedValue)
-}
+	actualValue, _, err := expressionExecutor.Statement(assertion)
 
-func apply(a model.Assertion, expected, actual string, spanID *trace.SpanID) model.SpanAssertionResult {
-	return model.SpanAssertionResult{
-		SpanID:        spanID,
-		ObservedValue: actual,
-		CompareErr:    a.Comparator.Compare(expected, actual),
+	sar := model.SpanAssertionResult{
+		ObservedValue: actualValue,
+		CompareErr:    err,
 	}
+
+	if span.ID.IsValid() {
+		sar.SpanID = &span.ID
+	}
+
+	return sar
 }
 
 func selector(sq model.SpanQuery) selectors.Selector {

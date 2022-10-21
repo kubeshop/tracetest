@@ -23,17 +23,9 @@ func TestSpecOrder(t *testing.T) {
 				Selector: openapi.Selector{
 					Query: "selector 1",
 				},
-				Assertions: []openapi.Assertion{
-					{
-						Attribute:  "attr 1",
-						Comparator: "=",
-						Expected:   "1",
-					},
-					{
-						Attribute:  "attr 2",
-						Comparator: "=",
-						Expected:   "2",
-					},
+				Assertions: []string{
+					`attr:attr1 = 1`,
+					`attr:attr2 = 2`,
 				},
 			},
 			{
@@ -41,17 +33,9 @@ func TestSpecOrder(t *testing.T) {
 				Selector: openapi.Selector{
 					Query: "selector 2",
 				},
-				Assertions: []openapi.Assertion{
-					{
-						Attribute:  "attr 3",
-						Comparator: "=",
-						Expected:   "3",
-					},
-					{
-						Attribute:  "attr 4",
-						Comparator: "=",
-						Expected:   "4",
-					},
+				Assertions: []string{
+					`attr:attr3 = 3`,
+					`attr:attr4 = 4`,
 				},
 			},
 		},
@@ -63,34 +47,14 @@ func TestSpecOrder(t *testing.T) {
 				"selector": {
 					"query": "selector 1"
 				},
-				"assertions": [{
-						"attribute": "attr 1",
-						"comparator": "=",
-						"expected": "1"
-					},
-					{
-						"attribute": "attr 2",
-						"comparator": "=",
-						"expected": "2"
-					}
-				]
+				"assertions": ["attr:attr1 = 1", "attr:attr2 = 2"]
 			},
 			{
 				"name": "name 2",
 				"selector": {
 					"query": "selector 2"
 				},
-				"assertions": [{
-						"attribute": "attr 3",
-						"comparator": "=",
-						"expected": "3"
-					},
-					{
-						"attribute": "attr 4",
-						"comparator": "=",
-						"expected": "4"
-					}
-				]
+				"assertions": ["attr:attr3 = 3", "attr:attr4 = 4"]
 			}
 		]
 	}`
@@ -121,18 +85,10 @@ func TestResultsOrder(t *testing.T) {
 				},
 				Results: []openapi.AssertionResult{
 					{
-						Assertion: openapi.Assertion{
-							Attribute:  "attr 1",
-							Comparator: "=",
-							Expected:   "1",
-						},
+						Assertion: `attr:attr1 = 1`,
 					},
 					{
-						Assertion: openapi.Assertion{
-							Attribute:  "attr 2",
-							Comparator: "=",
-							Expected:   "2",
-						},
+						Assertion: `attr:attr2 = 2`,
 					},
 				},
 			},
@@ -142,18 +98,10 @@ func TestResultsOrder(t *testing.T) {
 				},
 				Results: []openapi.AssertionResult{
 					{
-						Assertion: openapi.Assertion{
-							Attribute:  "attr 3",
-							Comparator: "=",
-							Expected:   "3",
-						},
+						Assertion: `attr:attr3 = 3`,
 					},
 					{
-						Assertion: openapi.Assertion{
-							Attribute:  "attr 4",
-							Comparator: "=",
-							Expected:   "4",
-						},
+						Assertion: `attr:attr4 = 4`,
 					},
 				},
 			},
@@ -168,18 +116,10 @@ func TestResultsOrder(t *testing.T) {
 				},
 				"results": [
 					{
-						"assertion": {
-							"attribute":  "attr 1",
-							"comparator": "=",
-							"expected":   "1"
-						}
+						"assertion": "attr:attr1 = 1"
 					},
 					{
-						"assertion": {
-							"attribute":  "attr 2",
-							"comparator": "=",
-							"expected":   "2"
-						}
+						"assertion": "attr:attr2 = 2"
 					}
 				]
 			},
@@ -189,18 +129,10 @@ func TestResultsOrder(t *testing.T) {
 				},
 				"results": [
 					{
-						"assertion": {
-							"attribute":  "attr 3",
-							"comparator": "=",
-							"expected":   "3"
-						}
+						"assertion": "attr:attr3 = 3"
 					},
 					{
-						"assertion": {
-							"attribute":  "attr 4",
-							"comparator": "=",
-							"expected":   "4"
-						}
+						"assertion": "attr:attr4 = 4"
 					}
 				]
 			}

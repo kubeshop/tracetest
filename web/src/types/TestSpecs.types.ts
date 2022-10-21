@@ -1,13 +1,13 @@
 import {CaseReducer, PayloadAction} from '@reduxjs/toolkit';
 
 import {TChange} from 'redux/actions/TestSpecs.actions';
-import {TAssertion, TAssertionResultEntry, TAssertionResults} from './Assertion.types';
+import {TAssertionResultEntry, TAssertionResults} from './Assertion.types';
 import {Model, TTestSchemas} from './Common.types';
 
 export type TRawTestSpecs = TTestSchemas['TestSpecs'];
 
 export type TTestSpecEntry = {
-  assertions: TAssertion[];
+  assertions: string[];
   isDeleted?: boolean;
   isDraft: boolean;
   originalSelector?: string;
@@ -16,7 +16,7 @@ export type TTestSpecEntry = {
 
 export type TRawTestSpecEntry = {
   selector: {query: string};
-  assertions: TAssertion[];
+  assertions: string[];
 };
 
 export type TTestSpecs = Model<TRawTestSpecs, {specs: TTestSpecEntry[]}>;

@@ -6,7 +6,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/stretchr/testify/assert"
@@ -26,6 +25,11 @@ func TestCreateTest(t *testing.T) {
 				URL: "http://localhost:3030/hello-instrumented",
 			},
 		},
+		Outputs: (model.OrderedMap[string, model.Output]{}).
+			MustAdd("output1", model.Output{
+				Selector: model.SpanQuery(`span[name="root"]`),
+				Value:    "${attr:myapp.some_attribute}",
+			}),
 	}
 
 	updated, err := db.CreateTest(context.TODO(), test)
@@ -37,6 +41,7 @@ func TestCreateTest(t *testing.T) {
 	assert.Equal(t, test.Description, actual.Description)
 	assert.Equal(t, test.ServiceUnderTest, actual.ServiceUnderTest)
 	assert.Equal(t, test.Specs, actual.Specs)
+	assert.Equal(t, test.Outputs, actual.Outputs)
 	assert.False(t, actual.CreatedAt.IsZero())
 }
 
@@ -199,8 +204,7 @@ func TestSummary(t *testing.T) {
 
 		result := []model.AssertionResult{
 			{
-				Assertion: model.Assertion{Comparator: comparator.Eq},
-				Results:   []model.SpanAssertionResult{},
+				Results: []model.SpanAssertionResult{},
 			},
 		}
 		for i := 0; i < pass; i++ {

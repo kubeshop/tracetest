@@ -1,13 +1,15 @@
+import {useParams} from 'react-router-dom';
+
 import Layout from 'components/Layout';
 import withAnalytics from 'components/WithAnalytics/WithAnalytics';
-import {useParams} from 'react-router-dom';
-import TransactionProvider from '../../providers/Transaction';
+import TransactionProvider from 'providers/Transaction';
 import Content from './Content';
 
-const Transaction: React.FC = () => {
+const Transaction = () => {
   const {transactionId = ''} = useParams();
+
   return (
-    <Layout>
+    <Layout hasMenu>
       <TransactionProvider transactionId={transactionId}>
         <Content />
       </TransactionProvider>

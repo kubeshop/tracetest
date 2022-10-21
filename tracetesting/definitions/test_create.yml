@@ -33,22 +33,26 @@ trigger:
               "selector": {
                 "query": "span[name = \"pg.query:SELECT\"]"
               },
-              "assertions": [
-                {
-                  "attribute": "tracetest.selected_spans.count",
-                  "comparator": ">",
-                  "expected": "0"
-                }
-              ]
+              "assertions": ["attr:tracetest.selected_spans.count > 0"]
             }
           ]
-        }
+        },
+        "outputs": [
+          {
+            "name": "TRIGGER_COUNT",
+            "selector": {
+              "query": "span[name = \"Tracetest trigger\"]"
+            },
+            "value": "attr:tracetest.selected_spans.count"
+          }
+        ]
       }
 specs:
 - selector: span[name = "Tracetest trigger"]
   assertions:
     - tracetest.selected_spans.count = 1
     - tracetest.response.status = 200
+    # - tracetest.response.body | json_path '$.outputs[0].name' = "TRIGGER_COUNT"
 - selector: span[name="POST /api/tests" tracetest.span.type="http"]
   assertions:
   - tracetest.selected_spans.count = 1
@@ -58,3 +62,8 @@ specs:
 - selector: span[name = "exec INSERT"]:first
   assertions:
   - sql.query contains "INSERT INTO tests"
+
+# outputs:
+# - name: TEST_ID
+#   selector: span[name = "Tracetest trigger"]
+#   value: attr:tracetest.response.body | json_path '$.id'

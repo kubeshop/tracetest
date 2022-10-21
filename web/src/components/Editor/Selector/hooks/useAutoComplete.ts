@@ -6,7 +6,7 @@ import {
   completeIdentifierAfter,
   completePseudoSelectorAfter,
   completeValueAfter,
-  operatorList,
+  comparatorList,
   pseudoSelectorList,
   Tokens,
 } from 'constants/Editor.constants';
@@ -47,7 +47,7 @@ const useAutoComplete = ({testId, runId}: IProps) => {
       ) {
         return {
           from: word.from,
-          options: operatorList,
+          options: comparatorList,
         };
       }
 
