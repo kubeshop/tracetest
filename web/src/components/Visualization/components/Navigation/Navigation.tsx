@@ -1,7 +1,10 @@
 import {LeftOutlined, RightOutlined} from '@ant-design/icons';
 import {useCallback, useEffect} from 'react';
+import {SupportedEditors} from 'constants/Editor.constants';
 
 import * as S from './Navigation.styled';
+
+const editorList = Object.values(SupportedEditors) as string[];
 
 interface IProps {
   matchedSpans: string[];
@@ -30,7 +33,9 @@ const Navigation = ({matchedSpans, onNavigateToSpan, selectedSpan}: IProps) => {
     function onKeydown({key}: KeyboardEvent) {
       const activeElement = document.activeElement;
       const activeElementTagName = activeElement?.tagName.toLowerCase() || '';
-      const isAdvancedEditor = activeElement?.parentElement?.parentElement?.parentElement?.id === 'advanced-editor';
+      const isAdvancedEditor = editorList.includes(
+        activeElement?.parentElement?.parentElement?.parentElement?.id || ''
+      );
 
       if (isAdvancedEditor || ['input', 'textarea'].includes(activeElementTagName)) return;
 

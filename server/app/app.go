@@ -132,8 +132,8 @@ func (a *App) Start() error {
 		Add(executor.NewSubscriptionUpdater(subscriptionManager))
 
 	assertionExecutor := executor.NewAssertionExecutor(a.tracer)
-
-	assertionRunner := executor.NewAssertionRunner(execTestUpdater, assertionExecutor)
+	outputProcesser := executor.InstrumentedOutputProcessor(a.tracer)
+	assertionRunner := executor.NewAssertionRunner(execTestUpdater, assertionExecutor, outputProcesser)
 	assertionRunner.Start(5)
 	defer assertionRunner.Stop()
 

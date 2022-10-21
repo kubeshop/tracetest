@@ -1,22 +1,21 @@
 import {Button, Form, Tag} from 'antd';
-import React, {useState} from 'react';
-
+import {useState} from 'react';
 import {ADVANCE_SELECTORS_DOCUMENTATION_URL} from 'constants/Common.constants';
-import {CompareOperator} from 'constants/Operator.constants';
 import {useAppSelector} from 'redux/hooks';
 import AssertionSelectors from 'selectors/Assertion.selectors';
 import SpanSelectors from 'selectors/Span.selectors';
-import OperatorService from 'services/Operator.service';
-import {TAssertion} from 'types/Assertion.types';
+import {TStructuredAssertion} from 'types/Assertion.types';
 import {singularOrPlural} from 'utils/Common';
 import AssertionCheckList from './AssertionCheckList';
 import useAssertionFormValues from './hooks/useAssertionFormValues';
 import useOnFieldsChange from './hooks/useOnFieldsChange';
 import SelectorInput from './SelectorInput';
 import * as S from './TestSpecForm.styled';
+import {CompareOperator} from '../../constants/Operator.constants';
+import OperatorService from '../../services/Operator.service';
 
 export interface IValues {
-  assertions?: TAssertion[];
+  assertions?: TStructuredAssertion[];
   selector?: string;
 }
 
@@ -33,9 +32,9 @@ const TestSpecForm = ({
   defaultValues: {
     assertions = [
       {
-        attribute: undefined,
+        left: '',
         comparator: OperatorService.getOperatorSymbol(CompareOperator.EQUALS),
-        expected: '',
+        right: '',
       },
     ],
     selector = '',
@@ -55,10 +54,7 @@ const TestSpecForm = ({
   );
   const {currentAssertions} = useAssertionFormValues(form);
 
-  const onFieldsChange = useOnFieldsChange({
-    form,
-    attributeList,
-  });
+  const onFieldsChange = useOnFieldsChange();
 
   return (
     <S.AssertionForm>

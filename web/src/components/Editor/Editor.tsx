@@ -1,8 +1,9 @@
-import {noop} from 'lodash';
 import {lazy, Suspense} from 'react';
+import {EditorView} from '@codemirror/view';
 import {BasicSetupOptions} from '@uiw/react-codemirror';
 import {Extension} from '@codemirror/state';
 import {SupportedEditors} from 'constants/Editor.constants';
+import { Completion } from '@codemirror/autocomplete';
 
 const EditorMap = {
   [SupportedEditors.Expression]: lazy(() => import('./Expression')),
@@ -13,30 +14,27 @@ const EditorMap = {
 
 export interface IEditorProps {
   onChange?(value: string): void;
+  onFocus?(view: EditorView): void;
   value?: string;
   placeholder?: string;
   basicSetup?: BasicSetupOptions;
   editable?: boolean;
   extensions?: Extension[];
+  indentWithTab?: boolean;
+  autoFocus?: boolean;
+  onSelectAutocompleteOption?(option: Completion): void;
 }
 
 interface IProps extends IEditorProps {
   type: SupportedEditors;
 }
 
-const Editor = ({type, onChange = noop, value = '', placeholder, basicSetup = {}, editable = true, extensions = []}: IProps) => {
+const Editor = ({type, ...props}: IProps) => {
   const Component = EditorMap[type];
 
   return (
     <Suspense fallback={<div data-cy="editor-fallback" />}>
-      <Component
-        onChange={onChange}
-        value={value}
-        placeholder={placeholder}
-        basicSetup={basicSetup}
-        editable={editable}
-        extensions={extensions}
-      />
+      <Component {...props} />
     </Suspense>
   );
 };

@@ -19,10 +19,10 @@ import (
 // pass the data to a ApiApiServicer to perform the required actions, then write the service results to the http response.
 type ApiApiRouter interface {
 	CreateTest(http.ResponseWriter, *http.Request)
-	CreateTestFromDefinition(http.ResponseWriter, *http.Request)
 	DeleteTest(http.ResponseWriter, *http.Request)
 	DeleteTestRun(http.ResponseWriter, *http.Request)
 	DryRunAssertion(http.ResponseWriter, *http.Request)
+	ExecuteDefinition(http.ResponseWriter, *http.Request)
 	ExportTestRun(http.ResponseWriter, *http.Request)
 	GetRunResultJUnit(http.ResponseWriter, *http.Request)
 	GetTest(http.ResponseWriter, *http.Request)
@@ -38,7 +38,6 @@ type ApiApiRouter interface {
 	RunTest(http.ResponseWriter, *http.Request)
 	SetTestSpecs(http.ResponseWriter, *http.Request)
 	UpdateTest(http.ResponseWriter, *http.Request)
-	UpdateTestFromDefinition(http.ResponseWriter, *http.Request)
 }
 
 // ApiApiServicer defines the api actions for the ApiApi service
@@ -47,10 +46,10 @@ type ApiApiRouter interface {
 // and updated with the logic required for the API.
 type ApiApiServicer interface {
 	CreateTest(context.Context, Test) (ImplResponse, error)
-	CreateTestFromDefinition(context.Context, TextDefinition) (ImplResponse, error)
 	DeleteTest(context.Context, string) (ImplResponse, error)
 	DeleteTestRun(context.Context, string, string) (ImplResponse, error)
 	DryRunAssertion(context.Context, string, string, TestSpecs) (ImplResponse, error)
+	ExecuteDefinition(context.Context, TextDefinition) (ImplResponse, error)
 	ExportTestRun(context.Context, string, string) (ImplResponse, error)
 	GetRunResultJUnit(context.Context, string, string) (ImplResponse, error)
 	GetTest(context.Context, string) (ImplResponse, error)
@@ -66,5 +65,4 @@ type ApiApiServicer interface {
 	RunTest(context.Context, string, TestRunInformation) (ImplResponse, error)
 	SetTestSpecs(context.Context, string, TestSpecs) (ImplResponse, error)
 	UpdateTest(context.Context, string, Test) (ImplResponse, error)
-	UpdateTestFromDefinition(context.Context, string, TextDefinition) (ImplResponse, error)
 }

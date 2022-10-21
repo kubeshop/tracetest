@@ -18,6 +18,12 @@ const EnvironmentSelectors = () => ({
 
     return environmentList.find(({id}) => id === environmentId);
   }),
+  selectSelectedEnvironmentEntryList: createSelector(selectEnvironmentList, stateSelector, (environmentList, state) => {
+    const environmentId = UserSelectors.selectUserPreference(state, 'environmentId');
+    const {data: entries = []} = endpoints.getEnvironmentSecretList.select({environmentId})(state);
+
+    return entries;
+  }),
 });
 
 export default EnvironmentSelectors();

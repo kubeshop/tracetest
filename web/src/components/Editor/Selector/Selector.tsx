@@ -46,7 +46,6 @@ const Selector = ({
         extensions={extensionList}
         onChange={onChange}
         spellCheck={false}
-        autoFocus
         theme={editorTheme}
         placeholder={placeholder}
         editable={editable}

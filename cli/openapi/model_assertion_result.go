@@ -16,7 +16,7 @@ import (
 
 // AssertionResult struct for AssertionResult
 type AssertionResult struct {
-	Assertion   *Assertion            `json:"assertion,omitempty"`
+	Assertion   *string               `json:"assertion,omitempty"`
 	AllPassed   *bool                 `json:"allPassed,omitempty"`
 	SpanResults []AssertionSpanResult `json:"spanResults,omitempty"`
 }
@@ -39,9 +39,9 @@ func NewAssertionResultWithDefaults() *AssertionResult {
 }
 
 // GetAssertion returns the Assertion field value if set, zero value otherwise.
-func (o *AssertionResult) GetAssertion() Assertion {
+func (o *AssertionResult) GetAssertion() string {
 	if o == nil || o.Assertion == nil {
-		var ret Assertion
+		var ret string
 		return ret
 	}
 	return *o.Assertion
@@ -49,7 +49,7 @@ func (o *AssertionResult) GetAssertion() Assertion {
 
 // GetAssertionOk returns a tuple with the Assertion field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *AssertionResult) GetAssertionOk() (*Assertion, bool) {
+func (o *AssertionResult) GetAssertionOk() (*string, bool) {
 	if o == nil || o.Assertion == nil {
 		return nil, false
 	}
@@ -65,8 +65,8 @@ func (o *AssertionResult) HasAssertion() bool {
 	return false
 }
 
-// SetAssertion gets a reference to the given Assertion and assigns it to the Assertion field.
-func (o *AssertionResult) SetAssertion(v Assertion) {
+// SetAssertion gets a reference to the given string and assigns it to the Assertion field.
+func (o *AssertionResult) SetAssertion(v string) {
 	o.Assertion = &v
 }
 

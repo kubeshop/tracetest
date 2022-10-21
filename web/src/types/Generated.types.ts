@@ -91,11 +91,19 @@ export interface operations {
         skip?: number;
         /** query to search tests, based on test name and description */
         query?: string;
+        /** indicates the sort field for the tests */
+        sortBy?: "created" | "name" | "last_run";
+        /** indicates the sort direction for the tests */
+        sortDirection?: "asc" | "desc";
       };
     };
     responses: {
       /** successful operation */
       200: {
+        headers: {
+          /** Total records count */
+          "X-Total-Count"?: number;
+        };
         content: {
           "application/json": external["tests.yaml"]["components"]["schemas"]["Test"][];
         };
@@ -226,6 +234,10 @@ export interface operations {
     responses: {
       /** successful operation */
       200: {
+        headers: {
+          /** Total records count */
+          "X-Total-Count"?: number;
+        };
         content: {
           "application/json": external["tests.yaml"]["components"]["schemas"]["TestRun"][];
         };
@@ -576,14 +588,10 @@ export interface external {
         /** @example [object Object] */
         TestSpecs: {
           specs?: {
+            name?: string | null;
             selector?: external["tests.yaml"]["components"]["schemas"]["Selector"];
-            assertions?: external["tests.yaml"]["components"]["schemas"]["Assertion"][];
+            assertions?: string[];
           }[];
-        };
-        Assertion: {
-          attribute?: string;
-          comparator?: string;
-          expected?: string;
         };
         TestRun: {
           id?: string;
@@ -633,7 +641,7 @@ export interface external {
           }[];
         };
         AssertionResult: {
-          assertion?: external["tests.yaml"]["components"]["schemas"]["Assertion"];
+          assertion?: string;
           allPassed?: boolean;
           spanResults?: external["tests.yaml"]["components"]["schemas"]["AssertionSpanResult"][];
         };

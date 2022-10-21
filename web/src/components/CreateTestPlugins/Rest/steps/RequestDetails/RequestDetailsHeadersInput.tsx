@@ -1,7 +1,9 @@
 import {PlusOutlined} from '@ant-design/icons';
-import {Button, Form, Input} from 'antd';
+import {Button, Form} from 'antd';
 import {DEFAULT_HEADERS, IKeyValue} from 'constants/Test.constants';
 import React from 'react';
+import Editor from 'components/Editor';
+import {SupportedEditors} from 'constants/Editor.constants';
 import * as S from './RequestDetails.styled';
 
 interface IProps {
@@ -23,11 +25,11 @@ const RequestDetailsHeadersInput: React.FC<IProps> = ({
           {fields.map((field, index) => (
             <S.HeaderContainer key={field.name}>
               <Form.Item name={[field.name, 'key']} noStyle>
-                <Input placeholder={`${unit} ${index + 1}`} />
+                <Editor type={SupportedEditors.Interpolation} placeholder={`${unit} ${index + 1}`} />
               </Form.Item>
 
               <Form.Item name={[field.name, 'value']} noStyle>
-                <Input placeholder={`Value ${index + 1}`} />
+                <Editor type={SupportedEditors.Interpolation} placeholder={`Value ${index + 1}`} />
               </Form.Item>
 
               <Form.Item noStyle>

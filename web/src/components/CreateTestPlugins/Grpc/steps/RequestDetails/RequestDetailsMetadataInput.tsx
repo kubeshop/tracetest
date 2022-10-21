@@ -1,6 +1,8 @@
 import {PlusOutlined} from '@ant-design/icons';
-import {Button, Form, Input} from 'antd';
+import {Button, Form} from 'antd';
 import React from 'react';
+import {SupportedEditors} from 'constants/Editor.constants';
+import Editor from 'components/Editor';
 import * as S from './RequestDetails.styled';
 
 const RequestDetailsMetadataInput: React.FC = () => (
@@ -11,11 +13,11 @@ const RequestDetailsMetadataInput: React.FC = () => (
           {fields.map(field => (
             <S.HeaderContainer key={field.name}>
               <Form.Item name={[field.name, 'key']} noStyle>
-                <Input placeholder="Key" />
+                <Editor type={SupportedEditors.Interpolation} placeholder="Key" />
               </Form.Item>
 
               <Form.Item name={[field.name, 'value']} noStyle>
-                <Input placeholder="Value" />
+                <Editor type={SupportedEditors.Interpolation} placeholder="Value" />
               </Form.Item>
 
               <Form.Item noStyle>

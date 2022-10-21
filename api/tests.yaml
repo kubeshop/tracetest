@@ -19,10 +19,32 @@ components:
         specs:
           $ref: "#/components/schemas/TestSpecs"
           description: specification of assertions that are going to be made
+        outputs:
+          description: define test outputs, in a key/value format. The value is processed as an expression
+          type: array
+          items:
+            $ref: "#/components/schemas/TestOutput"
+          example:
+            - name: USER_ID
+              selector: span[name="user_signup" result="success"]
+              value: "attr:myapp.signup.user_id"
+            - name: PROFILE_URL
+              selector: span[tracetest.span.type="general" name="Tracetest trigger"]
+              value: "${attr:tracetest.response.body | json_path '.user.profileUrl' }"
         summary:
           $ref: "#/components/schemas/TestSummary"
           description: summary of test data
           readOnly: true
+
+    TestOutput:
+      type: object
+      properties:
+        name:
+          type: string
+        selector:
+          $ref: "#/components/schemas/Selector"
+        value:
+          type: string
 
     TestSummary:
       type: object
@@ -60,7 +82,7 @@ components:
               assertions:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Assertion"
+                  type: string
       example:
         specs:
           - selector:
@@ -77,16 +99,6 @@ components:
             - attribute: http.status_code
               comparator: "="
               expected: "200"
-
-    Assertion:
-      type: object
-      properties:
-        attribute:
-          type: string
-        comparator:
-          type: string
-        expected:
-          type: string
 
     TestRun:
       type: object
@@ -134,6 +146,16 @@ components:
           $ref: "./trace.yaml#/components/schemas/Trace"
         result:
           $ref: "#/components/schemas/AssertionResults"
+        outputs:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              value:
+                type: string
+
         metadata:
           type: object
           additionalProperties:
@@ -198,7 +220,7 @@ components:
       type: object
       properties:
         assertion:
-          $ref: "#/components/schemas/Assertion"
+          type: string
         allPassed:
           type: boolean
         spanResults:
@@ -284,9 +306,3 @@ components:
           $ref: "#/components/schemas/Test"
         run:
           $ref: "#/components/schemas/TestRun"
-
-    TextDefinition:
-      type: object
-      properties:
-        content:
-          type: string

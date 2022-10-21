@@ -27,10 +27,13 @@ describe('Test Run Detail Views', () => {
     cy.get('[data-cy=assertion-form]', {timeout: 10000}).should('be.visible');
     cy.get('[data-cy=editor-fallback]').should('not.exist');
 
-    cy.get('[data-cy=selector-editor] [contenteditable]').clear();
-    cy.get('[data-cy=assertion-check-attribute]').type('db.name');
-    const attributeListId = getAttributeListId(0);
-    cy.get(`${attributeListId} + div .ant-select-item:nth-child(2)`).first().click({force: true});
+    cy.get('[data-cy=selector-editor] [contenteditable]').first().clear();
+    cy.get('[data-cy=selector-editor] .cm-placeholder').should('be.visible');
+
+    cy.get('[data-cy=expression-editor] [contenteditable]').first().type('db.na', {delay: 100});
+
+    cy.get(getAttributeListId(0)).first().click({force: true});
+
     cy.get('[data-cy=assertion-form-submit-button]').click();
     cy.wait('@testRuns', {timeout: 30000});
 
@@ -47,10 +50,8 @@ describe('Test Run Detail Views', () => {
     cy.get('[data-cy=assertion-form]', {timeout: 10000}).should('be.visible');
     cy.get('[data-cy=editor-fallback]').should('not.exist');
 
-    cy.get('[data-cy=assertion-check-attribute]').type('tdd').click();
-    const attributeListId = getAttributeListId(0);
-    cy.get(`${attributeListId} + div .ant-select-item:nth-child(1)`).first().click({force: true});
-    cy.get('[data-cy=assertion-check-value]').type('value');
+    cy.get('[data-cy=expression-editor] [contenteditable]').first().type('tdd', {delay: 100});
+    cy.get('[data-cy=expression-editor] [contenteditable="true"]').last().type('value', {delay: 100});
 
     cy.get('[data-cy=assertion-form-submit-button]').click();
     cy.wait('@testRuns', {timeout: 30000});
@@ -63,16 +64,14 @@ describe('Test Run Detail Views', () => {
 
   it('Test view -> navigate away with pending changes', () => {
     cy.selectRunDetailMode(3);
+
     cy.get('[data-cy=add-test-spec-button]').click({force: true});
     cy.get('[data-cy=assertion-form]', {timeout: 10000}).should('be.visible');
     cy.get('[data-cy=editor-fallback]').should('not.exist');
 
-    cy.get('[data-cy=assertion-check-attribute]').type('db').click();
+    cy.get('[data-cy=expression-editor] [contenteditable]').first().type('name', {delay: 100});
+    cy.get(getAttributeListId(0)).first().click({force: true});
 
-    const attributeListId = getAttributeListId(0);
-    cy.get(`${attributeListId} + div .ant-select-item:nth-child(1)`).first().click({force: true});
-
-    cy.get('[data-cy=assertion-check-value]').type('value');
     cy.get('[data-cy=assertion-form-submit-button]').click();
     cy.wait('@testRuns', {timeout: 30000});
   });

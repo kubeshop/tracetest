@@ -1,5 +1,4 @@
 import faker from '@faker-js/faker';
-import AssertionMock from '../../../models/__mocks__/Assertion.mock';
 import AssertionResultsMock from '../../../models/__mocks__/AssertionResults.mock';
 import TestDefinitionMock from '../../../models/__mocks__/TestSpecs.mock';
 import TestRunMock from '../../../models/__mocks__/TestRun.mock';
@@ -25,7 +24,9 @@ const specSelector = `span[http.status_code] = "304"]`;
 const spec: TTestSpecEntry = {
   selector: specSelector,
   isDraft: true,
-  assertions: new Array(faker.datatype.number({min: 2, max: 10})).fill(null).map(() => AssertionMock.model()),
+  assertions: new Array(faker.datatype.number({min: 2, max: 10}))
+    .fill(null)
+    .map(() => `${faker.datatype.string(10)} = "${faker.datatype.string(10)}"`),
   originalSelector: specSelector,
 };
 

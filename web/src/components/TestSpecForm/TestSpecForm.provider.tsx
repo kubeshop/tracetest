@@ -13,6 +13,7 @@ import TestSpecsSelectors from 'selectors/TestSpecs.selectors';
 import CreateAssertionModalAnalyticsService from 'services/Analytics/CreateAssertionModalAnalytics.service';
 import {TTestSpecEntry} from 'types/TestSpecs.types';
 import {IValues} from './TestSpecForm';
+import AssertionService from '../../services/Assertion.service';
 
 interface IFormProps {
   defaultValues?: IValues;
@@ -65,7 +66,12 @@ const TestSpecFormProvider: React.FC<{testId: string}> = ({children}) => {
           selector: defaultSelector,
           defaultValues: {
             selector: defaultSelector,
-            assertions: isEditing ? assertions : [...spec.assertions, ...assertions],
+            assertions: isEditing
+              ? assertions
+              : [
+                  ...spec.assertions.map(assertion => AssertionService.getStructuredAssertion(assertion)),
+                  ...assertions,
+                ],
           },
         });
       else setFormProps(props);
@@ -102,7 +108,7 @@ const TestSpecFormProvider: React.FC<{testId: string}> = ({children}) => {
 
       const definition: TTestSpecEntry = {
         selector: newSelectorString,
-        assertions,
+        assertions: assertions.map(assertion => AssertionService.getStringAssertion(assertion)),
         originalSelector: newSelectorString,
         isDraft: true,
       };

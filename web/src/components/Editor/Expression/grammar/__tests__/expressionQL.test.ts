@@ -8,7 +8,7 @@ describe('expressionQLanguage', () => {
   describe('cases.txt', () => {
     const testList = fileTests(fs.readFileSync(path.join(__dirname, './cases.txt'), 'utf8'), 'cases.txt');
 
-    testList.forEach(({name, run}: {name: string, run: Function}) => {
+    testList.forEach(({name, run}: {name: string; run: Function}) => {
       it(name, () => run(expressionQLang.parser));
     });
   });

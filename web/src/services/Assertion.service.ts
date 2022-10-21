@@ -1,9 +1,11 @@
 import countBy from 'lodash/countBy';
 import uniq from 'lodash/uniq';
 
-import {ICheckResult, TAssertionResult, TRawAssertionResult} from 'types/Assertion.types';
+import {ICheckResult, TAssertionResult, TRawAssertionResult, TStructuredAssertion} from 'types/Assertion.types';
 import {durationRegExp} from 'constants/Common.constants';
 import {Attributes} from 'constants/SpanAttribute.constants';
+import {CompareOperatorSymbolMap, OperatorRegexp} from 'constants/Operator.constants';
+import { TCompareOperatorSymbol } from '../types/Operator.types';
 
 const isNumeric = (num: string): boolean => /^-?\d+(?:\.\d+)?$/.test(num);
 const isNumericTime = (num: string): boolean => durationRegExp.test(num);
@@ -55,6 +57,21 @@ const AssertionService = () => ({
           [curr.result.spanId]: items,
         };
       }, {});
+  },
+
+  getStructuredAssertion(assertion: string): TStructuredAssertion {
+    const [left, right] = assertion.split(OperatorRegexp);
+    const [comparator = CompareOperatorSymbolMap.EQUALS] = assertion.match(OperatorRegexp) ?? [];
+
+    return {
+      left,
+      comparator: comparator as TCompareOperatorSymbol,
+      right,
+    };
+  },
+
+  getStringAssertion({left, comparator, right}: TStructuredAssertion): string {
+    return `${left} ${comparator} ${right}`;
   },
 });
 

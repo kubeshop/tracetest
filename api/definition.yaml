@@ -1,0 +1,27 @@
+openapi: 3.0.0
+components:
+  schemas:
+
+    ExecuteDefinitionResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: resource ID
+        runId:
+          type: string
+          description: run ID
+        type:
+          type: string
+          description: resource type
+        url:
+          type: string
+          description: resource web UI url
+
+    TextDefinition:
+      type: object
+      properties:
+        runInformation:
+          $ref: "./tests.yaml#/components/schemas/TestRunInformation"
+        content:
+          type: string

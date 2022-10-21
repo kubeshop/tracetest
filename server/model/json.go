@@ -59,18 +59,6 @@ func (sar *SpanAssertionResult) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (a Assertion) MarshalJSON() ([]byte, error) {
-	return json.Marshal(&struct {
-		Attribute  string
-		Comparator string
-		Value      *AssertionExpression
-	}{
-		Attribute:  a.Attribute.String(),
-		Comparator: a.Comparator.String(),
-		Value:      a.Value,
-	})
-}
-
 func (na *NamedAssertions) UnmarshalJSON(data []byte) error {
 	type encodedNamedAssertions struct {
 		Name       string
@@ -90,48 +78,6 @@ func (na *NamedAssertions) UnmarshalJSON(data []byte) error {
 
 	na.Name = namedAssertion.Name
 	na.Assertions = namedAssertion.Assertions
-
-	return nil
-}
-
-func (a *Assertion) UnmarshalJSON(data []byte) error {
-	aux := struct {
-		Attribute  string
-		Comparator string
-		Value      *AssertionExpression
-	}{}
-	if err := json.Unmarshal(data, &aux); err != nil {
-		// This might be an older assertion that has its value as a string
-		// we have to try convert it before returning the error
-		oldAssertion := struct {
-			Attribute  string
-			Comparator string
-			Value      string
-		}{}
-
-		if err := json.Unmarshal(data, &oldAssertion); err != nil {
-			// It isn't the old format either, so it's an error
-			return err
-		}
-
-		aux.Attribute = oldAssertion.Attribute
-		aux.Comparator = oldAssertion.Comparator
-		aux.Value = &AssertionExpression{
-			LiteralValue: LiteralValue{
-				Type:  "string",
-				Value: oldAssertion.Value,
-			},
-		}
-	}
-
-	c, err := comparator.DefaultRegistry().Get(aux.Comparator)
-	if err != nil {
-		return err
-	}
-
-	a.Attribute = Attribute(aux.Attribute)
-	a.Value = aux.Value
-	a.Comparator = c
 
 	return nil
 }

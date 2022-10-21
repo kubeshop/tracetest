@@ -12,6 +12,7 @@ import AssertionAnalyticsService from 'services/Analytics/AssertionAnalytics.ser
 import {TAssertionResultEntry} from 'types/Assertion.types';
 import Header from './Header';
 import * as S from './TestResults.styled';
+import AssertionService from '../../services/Assertion.service';
 
 const TestResults = () => {
   const {open} = useTestSpecForm();
@@ -44,7 +45,7 @@ const TestResults = () => {
         isEditing: true,
         selector,
         defaultValues: {
-          assertions: list.map(({assertion}) => assertion),
+          assertions: list.map(({assertion}) => AssertionService.getStructuredAssertion(assertion)),
           selector,
         },
       });

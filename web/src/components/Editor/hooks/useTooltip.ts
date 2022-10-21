@@ -1,41 +1,43 @@
 import {useCallback} from 'react';
 import {EditorView} from '@codemirror/view';
-import {syntaxTree} from '@codemirror/language';
-import {Tokens} from '../../../constants/Editor.constants';
+import EditorService from 'services/Editor.service';
+import EnvironmentSelectors from 'selectors/Environment.selectors';
+import {useAppStore} from 'redux/hooks';
+import SpanSelectors from 'selectors/Span.selectors';
+import AssertionSelectors from 'selectors/Assertion.selectors';
+import {uniqBy} from 'lodash';
 
-const useTooltip = () => {
-  return useCallback(({state}: EditorView, pos: number, side: -1 | 1) => {
-    const tree = syntaxTree(state);
-    const node = tree.resolveInner(pos, -1);
+interface IProps {
+  testId?: string;
+  runId?: string;
+}
 
-    if ((node.from === pos && side < 0) || (node.from === pos && side > 0)) return null;
+const useTooltip = ({testId = '', runId = ''}: IProps = {}) => {
+  const {getState} = useAppStore();
 
-    const parentNode = node.parent;
+  const getAttributeList = useCallback(() => {
+    const state = getState();
+    const spanIdList = SpanSelectors.selectMatchedSpans(state);
+    const attributeList = AssertionSelectors.selectAttributeList(state, testId, runId, spanIdList);
 
-    if (parentNode && parentNode.name === Tokens.OutsideInput) {
-      const source = parentNode.firstChild || {from: 0, to: 0};
-      const identifier = parentNode.lastChild || {from: 0, to: 0};
-      const [sourceText] = state.doc.sliceString(source.from, source.to).split(':');
-      const identifierText = state.doc.sliceString(identifier.from, identifier.to);
+    return uniqBy(attributeList, 'key');
+  }, [getState, runId, testId]);
 
-      // TODO: display the value from the selected source and value
-      // eslint-disable-next-line no-console
-      console.log('@@', sourceText);
+  const getSelectedEnvironmentEntryList = useCallback(() => {
+    const state = getState();
 
-      return {
-        pos: parentNode.from,
-        end: parentNode.to,
-        above: true,
-        create() {
-          const dom = document.createElement('div');
-          dom.textContent = identifierText;
-          return {dom};
-        },
-      };
-    }
+    return EnvironmentSelectors.selectSelectedEnvironmentEntryList(state);
+  }, [getState]);
 
-    return null;
-  }, []);
+  return useCallback(
+    async (view: EditorView, pos: number, side: -1 | 1) => {
+      const attributeList = testId && runId ? getAttributeList() : [];
+      const envEntryList = getSelectedEnvironmentEntryList();
+
+      return EditorService.getTooltip({view, pos, side, attributeList, envEntryList});
+    },
+    [getAttributeList, getSelectedEnvironmentEntryList, runId, testId]
+  );
 };
 
 export default useTooltip;

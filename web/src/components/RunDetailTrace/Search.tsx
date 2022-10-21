@@ -7,9 +7,9 @@ import {useAppDispatch} from 'redux/hooks';
 import {matchSpans, selectSpan, setSearchText} from 'redux/slices/Trace.slice';
 import SpanService from 'services/Span.service';
 import Editor from 'components/Editor';
+import {SupportedEditors} from 'constants/Editor.constants';
+import EditorService from 'services/Editor.service';
 import * as S from './RunDetailTrace.styled';
-import {SupportedEditors} from '../../constants/Editor.constants';
-import useEditorValidate from '../Editor/hooks/useEditorValidate';
 
 interface IProps {
   runId: string;
@@ -23,11 +23,10 @@ const Search = ({runId, testId}: IProps) => {
     run: {trace: {spans = []} = {}},
   } = useTestRun();
   const [getSelectedSpans] = useLazyGetSelectedSpansQuery();
-  const getIsValidSelector = useEditorValidate();
 
   const handleSearch = useCallback(
     async (query: string) => {
-      const isValidSelector = getIsValidSelector(SupportedEditors.Selector, query);
+      const isValidSelector = EditorService.getIsQueryValid(SupportedEditors.Selector, query || '');
       if (!query) {
         dispatch(matchSpans({spanIds: []}));
         dispatch(selectSpan({spanId: ''}));
@@ -45,7 +44,7 @@ const Search = ({runId, testId}: IProps) => {
       dispatch(matchSpans({spanIds}));
       dispatch(selectSpan({spanId: spanIds[0]}));
     },
-    [dispatch, getIsValidSelector, getSelectedSpans, runId, spans, testId]
+    [dispatch, getSelectedSpans, runId, spans, testId]
   );
 
   const onSearch = useMemo(() => debounce(handleSearch, 500), [handleSearch]);

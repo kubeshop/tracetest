@@ -4,7 +4,7 @@ import {PokeshopDemo} from '../../src/constants/Demo.constants';
 import {getTestId} from '../e2e/utils/Common';
 
 export const testRunPageRegex = /\/test\/(.*)\/run\/(.*)/;
-export const getAttributeListId = (number: number) => `#assertion-form_assertions_${number}_attribute_list`;
+export const getAttributeListId = (number: number) => `.cm-tooltip-autocomplete [id*=${number}]`;
 export const getComparatorListId = (number: number) => `#assertion-form_assertions_${number}_comparator_list`;
 
 Cypress.Commands.add('createMultipleTestRuns', (id: string, count: number) => {
@@ -198,12 +198,15 @@ Cypress.Commands.add('createAssertion', (index = 0) => {
   cy.get(`[data-cy=trace-node-database]`, {timeout: 25000}).first().click({force: true});
   cy.get('[data-cy=add-test-spec-button]').click({force: true});
   cy.get('[data-cy=assertion-form]', {timeout: 10000}).should('be.visible');
-
   cy.get('[data-cy=editor-fallback]').should('not.exist');
-  cy.get('[data-cy=assertion-check-attribute]').type('db');
+
+  cy.get('[data-cy=expression-editor] [contenteditable]').first().type('db', {delay: 100});
+
   const attributeListId = getAttributeListId(index);
-  cy.get(`${attributeListId} + div .ant-select-item:nth-child(2)`).first().click({force: true});
+  cy.get(attributeListId).click();
+
   cy.get('[data-cy=assertion-check-operator]').click({force: true});
+
   cy.get('[data-cy=assertion-form-submit-button]').click();
   cy.get('[data-cy=test-specs-container]').should('be.visible');
   cy.get('[data-cy=test-spec-container]').should('have.lengthOf', 1);

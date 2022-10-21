@@ -1,0 +1,25 @@
+type: Test
+spec:
+  id: ZPPgFB44R
+  name: Test List
+  trigger:
+    type: http
+    httpRequest:
+      url: "${env:TARGET_URL}/api/tests"
+      method: GET
+      headers:
+      - key: Content-Type
+        value: application/json
+
+  specs:
+  - selector: span[name = "Tracetest trigger"]
+    assertions:
+      - tracetest.selected_spans.count = 1
+      - tracetest.response.status = 200
+      - tracetest.response.body contains "${env:CREATED_TEST_ID}"
+  - selector: span[name="GET /api/tests" tracetest.span.type="http"]
+    assertions:
+    - tracetest.selected_spans.count = 1
+  - selector: span[name = "query SELECT"]
+    assertions:
+    - tracetest.selected_spans.count = 1

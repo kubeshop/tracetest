@@ -1,12 +1,13 @@
+import {Navigate, Route, Routes} from 'react-router-dom';
+import {HistoryRouter} from 'redux-first-history/rr6';
+import {history} from 'redux/store';
+
 import Envs from 'pages/Environments';
 import Home from 'pages/Home';
 import RunDetail from 'pages/RunDetail';
 import Test from 'pages/Test';
 import Transaction from 'pages/Transaction';
 import TransactionRunDetail from 'pages/TransactionRunDetail';
-import {Navigate, Route, Routes} from 'react-router-dom';
-import {HistoryRouter} from 'redux-first-history/rr6';
-import {history} from 'redux/store';
 import Env from 'utils/Env';
 import ExperimentalFeature from 'utils/ExperimentalFeature';
 

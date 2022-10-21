@@ -1,4 +1,6 @@
-import {Form, Input, Select} from 'antd';
+import {Form, Select} from 'antd';
+import Editor from 'components/Editor';
+import {SupportedEditors} from 'constants/Editor.constants';
 import * as S from '../RequestDetails.styled';
 import * as R from './RequestDetailsAuthInput.styled';
 
@@ -13,7 +15,7 @@ export const apiKeyFields: React.ReactElement = (
           label="Key"
           rules={[{required: true}]}
         >
-          <Input placeholder="Enter key" />
+          <Editor type={SupportedEditors.Interpolation} placeholder="Enter key" />
         </Form.Item>
         <Form.Item
           data-cy="apiKey-value"
@@ -22,7 +24,7 @@ export const apiKeyFields: React.ReactElement = (
           label="Value"
           rules={[{required: true}]}
         >
-          <Input placeholder="Enter value" />
+          <Editor type={SupportedEditors.Interpolation} placeholder="Enter value" />
         </Form.Item>
       </R.FlexContainer>
     </S.Row>

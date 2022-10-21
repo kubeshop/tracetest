@@ -20,6 +20,7 @@ require (
 	github.com/jhump/protoreflect v1.12.0
 	github.com/lib/pq v1.10.5
 	github.com/mitchellh/mapstructure v1.4.3
+	github.com/ohler55/ojg v1.14.4
 	github.com/opensearch-project/opensearch-go v1.1.0
 	github.com/orlangure/gnomock v0.20.0
 	github.com/prometheus/prometheus v1.8.2-0.20211217191541-41f1a8125e66
