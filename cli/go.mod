@@ -2,14 +2,12 @@ module github.com/kubeshop/tracetest/cli
 
 go 1.18
 
-replace github.com/kubeshop/tracetest/server => ../server
-
 require (
 	github.com/alexeyco/simpletable v1.0.0
 	github.com/compose-spec/compose-go v1.5.1
 	github.com/cucumber/ci-environment/go v0.0.0-20220915001957-711b1c82415f
 	github.com/denisbrodbeck/machineid v1.0.1
-	github.com/kubeshop/tracetest/server v0.0.0-20220920142527-2369576b6725
+	github.com/kubeshop/tracetest/server v0.0.0-20221021165818-2cf036c38e59
 	github.com/pterm/pterm v0.12.46
 	github.com/segmentio/analytics-go/v3 v3.2.1
 	github.com/spf13/cobra v1.5.0
