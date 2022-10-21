@@ -9,12 +9,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestAttributeIsMeta(t *testing.T) {
-	assert.True(t, model.Attribute("tracetest.selected_spans.something").IsMeta())
-	assert.False(t, model.Attribute("tracetest.selected_spans.").IsMeta())
-	assert.False(t, model.Attribute("db.system").IsMeta())
-}
-
 func TestSpec(t *testing.T) {
 	t.Run("Add", func(t *testing.T) {
 		spec := (model.Test{}).Specs
