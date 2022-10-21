@@ -327,8 +327,6 @@ func (td *postgresDB) readTestRow(ctx context.Context, row scanner) (model.Test,
 	)
 
 	switch err {
-	case sql.ErrNoRows:
-		return model.Test{}, ErrNotFound
 	case nil:
 		err = json.Unmarshal(jsonServiceUnderTest, &test.ServiceUnderTest)
 		if err != nil {
@@ -356,6 +354,8 @@ func (td *postgresDB) readTestRow(ctx context.Context, row scanner) (model.Test,
 		}
 
 		return test, nil
+	case sql.ErrNoRows:
+		return model.Test{}, ErrNotFound
 	default:
 		return model.Test{}, err
 	}

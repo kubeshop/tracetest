@@ -34,10 +34,10 @@ type (
 
 	Summary struct {
 		Runs    int
-		LastRun TestLastRun
+		LastRun LastRun
 	}
 
-	TestLastRun struct {
+	LastRun struct {
 		Time   time.Time
 		Passes int
 		Fails  int

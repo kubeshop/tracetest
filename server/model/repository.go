@@ -18,7 +18,7 @@ type TestRepository interface {
 	DeleteTest(context.Context, Test) error
 	IDExists(context.Context, id.ID) (bool, error)
 	GetLatestTestVersion(context.Context, id.ID) (Test, error)
-	GetTestVersion(_ context.Context, _ id.ID, verson int) (Test, error)
+	GetTestVersion(_ context.Context, _ id.ID, version int) (Test, error)
 	GetTests(_ context.Context, take, skip int32, query, sortBy, sortDirection string) (List[Test], error)
 }
 
@@ -31,9 +31,20 @@ type RunRepository interface {
 	GetRunByTraceID(context.Context, trace.TraceID) (Run, error)
 }
 
+type TransactionRepository interface {
+	CreateTransaction(context.Context, Transaction) (Transaction, error)
+	UpdateTransaction(context.Context, Transaction) (Transaction, error)
+	DeleteTransaction(context.Context, Transaction) error
+	GetLatestTransactionVersion(context.Context, id.ID) (Transaction, error)
+	GetTransactionVersion(_ context.Context, _ id.ID, version int) (Transaction, error)
+	GetTransactions(_ context.Context, take, skip int32, query, sortBy, sortDirection string) (List[Transaction], error)
+}
+
 type Repository interface {
 	TestRepository
 	RunRepository
+
+	TransactionRepository
 
 	ServerID() (id string, isNew bool, _ error)
 	Drop() error

@@ -115,3 +115,33 @@ func (m *MockRepository) Drop() error {
 	args := m.Called()
 	return args.Error(0)
 }
+
+func (m *MockRepository) CreateTransaction(_ context.Context, transaction model.Transaction) (model.Transaction, error) {
+	args := m.Called(transaction)
+	return args.Get(0).(model.Transaction), args.Error(1)
+}
+func (m *MockRepository) UpdateTransaction(_ context.Context, transaction model.Transaction) (model.Transaction, error) {
+	args := m.Called(transaction)
+	return args.Get(0).(model.Transaction), args.Error(1)
+}
+func (m *MockRepository) DeleteTransaction(_ context.Context, transaction model.Transaction) error {
+	args := m.Called(transaction)
+	return args.Error(1)
+}
+func (m *MockRepository) GetLatestTransactionVersion(_ context.Context, id id.ID) (model.Transaction, error) {
+	args := m.Called(id)
+	return args.Get(0).(model.Transaction), args.Error(1)
+}
+func (m *MockRepository) GetTransactionVersion(_ context.Context, id id.ID, version int) (model.Transaction, error) {
+	args := m.Called(id, version)
+	return args.Get(0).(model.Transaction), args.Error(1)
+}
+func (m *MockRepository) GetTransactions(_ context.Context, take, skip int32, query, sortBy, sortDirection string) (model.List[model.Transaction], error) {
+	args := m.Called(take, skip, query, sortBy, sortDirection)
+	transactions := args.Get(0).([]model.Transaction)
+	list := model.List[model.Transaction]{
+		Items:      transactions,
+		TotalCount: len(transactions),
+	}
+	return list, args.Error(1)
+}
