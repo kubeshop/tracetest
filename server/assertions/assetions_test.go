@@ -169,7 +169,7 @@ func TestAssertion(t *testing.T) {
 				},
 			}),
 		},
-		// https://github.com/kubeshop/tracetest/issues/1203
+		// https://github.com/kubeshop/tracetest/issues/1421
 		{
 			name: "FailedAssertionsConvertDurationFieldsIntoDurationFormat",
 			testDef: (model.OrderedMap[model.SpanQuery, model.NamedAssertions]{}).MustAdd(`span[service.name="Pokeshop"]`, model.NamedAssertions{
