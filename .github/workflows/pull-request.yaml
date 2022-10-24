@@ -298,7 +298,8 @@ jobs:
       - name: Run integration tests
         run: |
           cd tracetesting
-          TRACETEST_CLI_MAIN="$(go env GOPATH)/bin/tracetest" \
+          # TRACETEST_CLI_MAIN="$(go env GOPATH)/bin/tracetest" \
+          TRACETEST_CLI_MAIN="../cli/tracetest" \
           TRACETEST_CLI_TARGET="../cli/tracetest" \
           TARGET_URL="http://tracetest-pr-${{ github.event.pull_request.number }}.tracetest-pr-${{ github.event.pull_request.number }}:11633" \
           ./run.bash

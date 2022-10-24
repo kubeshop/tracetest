@@ -13,6 +13,7 @@ import (
 	"github.com/kubeshop/tracetest/cli/file"
 	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/kubeshop/tracetest/cli/openapi"
+	"github.com/kubeshop/tracetest/cli/variable"
 	"go.uber.org/zap"
 )
 
@@ -87,6 +88,11 @@ func (a runTestAction) runDefinition(ctx context.Context, params runDefParams) e
 }
 
 func (a runTestAction) runDefinitionFile(ctx context.Context, f file.File, params runDefParams) error {
+	err := a.replaceEnvVariables(f)
+	if err != nil {
+		return err
+	}
+
 	body, resp, err := a.client.ApiApi.
 		ExecuteDefinition(ctx).
 		TextDefinition(openapi.TextDefinition{
@@ -132,6 +138,19 @@ func (a runTestAction) runDefinitionFile(ctx context.Context, f file.File, param
 	}
 
 	return fmt.Errorf(`unsuported run type "%s"`, body.GetType())
+}
+
+func (a runTestAction) replaceEnvVariables(f file.File) error {
+	variableInjector := variable.NewInjector(variable.WithVariableProvider(
+		variable.EnvironmentVariableProvider{},
+	))
+
+	err := variableInjector.Inject(&f)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (a runTestAction) getTest(ctx context.Context, id string) (openapi.Test, error) {
