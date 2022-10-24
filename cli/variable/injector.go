@@ -37,9 +37,20 @@ func (i Injector) Inject(target interface{}) error {
 }
 
 func (i Injector) inject(target reflect.Value) error {
+	if target.CanInterface() {
+		output := fmt.Sprintf("%s", target.Interface())
+		fmt.Println(output)
+	}
 	switch target.Kind() {
 	case reflect.Struct:
 		return i.injectValuesIntoStruct(target)
+	case reflect.Interface:
+		newValue, err := i.replaceValueInInterface(target)
+		if err != nil {
+			return err
+		}
+
+		target.Set(newValue)
 	case reflect.String:
 		return i.injectValueIntoField(target)
 	case reflect.Slice:
@@ -67,14 +78,35 @@ func (i Injector) injectValuesIntoStruct(target reflect.Value) error {
 	return nil
 }
 
+func (i Injector) replaceValueInInterface(target reflect.Value) (reflect.Value, error) {
+	target = target.Elem()
+	newValue := reflect.New(target.Type()).Elem()
+	for index := 0; index < target.NumField(); index++ {
+		newValueField := newValue.Field(index)
+		field := target.Field(index)
+		newValueField.Set(field)
+
+		err := i.inject(newValueField)
+		if err != nil {
+			return newValue, err
+		}
+	}
+
+	return newValue, nil
+}
+
 func (i Injector) injectValueIntoField(field reflect.Value) error {
-	// We only support variables replacements in strings right now
-	strValue := field.String()
 	if !field.CanInterface() {
 		// cannot replace unexported fields, so skip them.
 		return nil
 	}
 
+	if !field.CanAddr() {
+		return nil
+	}
+
+	// We only support variables replacements in strings right now
+	strValue := field.String()
 	newValue, err := i.replaceVariable(strValue)
 	if err != nil {
 		return err
