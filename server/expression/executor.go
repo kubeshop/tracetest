@@ -67,10 +67,6 @@ func (e Executor) Statement(statement string) (string, string, error) {
 		rightValue = value.NewFromString(maybeFormatDuration(rightValue))
 	}
 
-	if err != nil {
-		return leftValue.String(), rightValue.String(), err
-	}
-
 	return leftValue.String(), rightValue.String(), err
 }
 
