@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/kubeshop/tracetest/server/assertions"
+	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/traces"
@@ -163,6 +164,37 @@ func TestAssertion(t *testing.T) {
 							SpanID:        &spanID,
 							ObservedValue: "25ms",
 							CompareErr:    nil,
+						},
+					},
+				},
+			}),
+		},
+		// https://github.com/kubeshop/tracetest/issues/1203
+		{
+			name: "FailedAssertionsConvertDurationFieldsIntoDurationFormat",
+			testDef: (model.OrderedMap[model.SpanQuery, model.NamedAssertions]{}).MustAdd(`span[service.name="Pokeshop"]`, model.NamedAssertions{
+				Assertions: []model.Assertion{
+					`attr:tracetest.span.duration <= 25ms`,
+				}}),
+			trace: traces.Trace{
+				RootSpan: traces.Span{
+					ID: spanID,
+					Attributes: traces.Attributes{
+						"service.name":            "Pokeshop",
+						"http.response.body":      `{"id":52}`,
+						"tracetest.span.duration": "35000000", // 35ms
+					},
+				},
+			},
+			expectedAllPassed: false,
+			expectedResult: (model.OrderedMap[model.SpanQuery, []model.AssertionResult]{}).MustAdd(`span[service.name="Pokeshop"]`, []model.AssertionResult{
+				{
+					Assertion: `attr:tracetest.span.duration <= 25ms`,
+					Results: []model.SpanAssertionResult{
+						{
+							SpanID:        &spanID,
+							ObservedValue: "35ms",
+							CompareErr:    comparator.ErrNoMatch,
 						},
 					},
 				},
