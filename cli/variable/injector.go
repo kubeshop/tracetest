@@ -70,6 +70,11 @@ func (i Injector) injectValuesIntoStruct(target reflect.Value) error {
 func (i Injector) injectValueIntoField(field reflect.Value) error {
 	// We only support variables replacements in strings right now
 	strValue := field.String()
+	if !field.CanInterface() {
+		// cannot replace unexported fields, so skip them.
+		return nil
+	}
+
 	newValue, err := i.replaceVariable(strValue)
 	if err != nil {
 		return err
