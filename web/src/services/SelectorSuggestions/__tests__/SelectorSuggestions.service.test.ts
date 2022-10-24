@@ -72,4 +72,79 @@ describe('SelectorSuggestionsService', () => {
 
     expect(suggestions).toContainEqual({query: 'span[service.name="cart-api"]', title: 'All cart-api spans'});
   });
+
+  it('should get structural pseudo class suggestion', () => {
+    const selector: TSelector = {
+      query: 'span[tracetest.span.type="general" attribute="value"]',
+      structure: [
+        {
+          filters: [
+            {operator: '=', property: 'tracetest.span.type', value: 'general'},
+            {operator: '=', property: 'attribute', value: 'value'},
+          ],
+        },
+      ],
+    };
+    const suggestions = SelectorSuggestionsService.getSuggestions(
+      selector,
+      ['123', '456'],
+      '123',
+      selectedSpanSelector,
+      selectedParentSpanSelector
+    );
+
+    expect(suggestions).toContainEqual({query: `${selector.query}:first`, title: '1st span in group'});
+  });
+
+  it('should get descendant suggestion', () => {
+    const selector: TSelector = {
+      query: 'span[tracetest.span.type="general" attribute="value"]',
+      structure: [
+        {
+          filters: [
+            {operator: '=', property: 'tracetest.span.type', value: 'general'},
+            {operator: '=', property: 'attribute', value: 'value'},
+          ],
+        },
+      ],
+    };
+    const suggestions = SelectorSuggestionsService.getSuggestions(
+      selector,
+      matchedSpansId,
+      selectedSpanId,
+      selectedSpanSelector,
+      'span[parent="parent"]'
+    );
+
+    expect(suggestions).toContainEqual({
+      query: `span[parent="parent"] span[tracetest.span.type="general"]`,
+      title: 'general descendants',
+    });
+  });
+
+  it('should get selected span suggestion', () => {
+    const selector: TSelector = {
+      query: 'span[tracetest.span.type="general" attribute="value"]',
+      structure: [
+        {
+          filters: [
+            {operator: '=', property: 'tracetest.span.type', value: 'general'},
+            {operator: '=', property: 'attribute', value: 'value'},
+          ],
+        },
+      ],
+    };
+    const suggestions = SelectorSuggestionsService.getSuggestions(
+      selector,
+      matchedSpansId,
+      selectedSpanId,
+      'span[name="selected-span"]',
+      selectedParentSpanSelector
+    );
+
+    expect(suggestions).toContainEqual({
+      query: 'span[name="selected-span"]',
+      title: 'Current span',
+    });
+  });
 });
