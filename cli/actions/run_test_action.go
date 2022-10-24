@@ -88,7 +88,7 @@ func (a runTestAction) runDefinition(ctx context.Context, params runDefParams) e
 }
 
 func (a runTestAction) runDefinitionFile(ctx context.Context, f file.File, params runDefParams) error {
-	err := a.replaceEnvVariables(f)
+	err := a.replaceEnvVariables(&f)
 	if err != nil {
 		return err
 	}
@@ -140,12 +140,12 @@ func (a runTestAction) runDefinitionFile(ctx context.Context, f file.File, param
 	return fmt.Errorf(`unsuported run type "%s"`, body.GetType())
 }
 
-func (a runTestAction) replaceEnvVariables(f file.File) error {
+func (a runTestAction) replaceEnvVariables(f *file.File) error {
 	variableInjector := variable.NewInjector(variable.WithVariableProvider(
 		variable.EnvironmentVariableProvider{},
 	))
 
-	err := variableInjector.Inject(&f)
+	err := variableInjector.Inject(f)
 	if err != nil {
 		return err
 	}
