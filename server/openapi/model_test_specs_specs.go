@@ -14,18 +14,13 @@ type TestSpecsSpecs struct {
 
 	Selector Selector `json:"selector,omitempty"`
 
-	Assertions []Assertion `json:"assertions,omitempty"`
+	Assertions []string `json:"assertions,omitempty"`
 }
 
 // AssertTestSpecsSpecsRequired checks if the required fields are not zero-ed
 func AssertTestSpecsSpecsRequired(obj TestSpecsSpecs) error {
 	if err := AssertSelectorRequired(obj.Selector); err != nil {
 		return err
-	}
-	for _, el := range obj.Assertions {
-		if err := AssertAssertionRequired(el); err != nil {
-			return err
-		}
 	}
 	return nil
 }

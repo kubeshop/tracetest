@@ -29,6 +29,25 @@ export const Box = styled.div`
   min-height: 38px;
 `;
 
+export const ResultListContainer = styled.div`
+  margin: 0 68px 54px 70px;
+`;
+
+export const TextContainer = styled.div`
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+`;
+
+export const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  height: 38px;
+  width: 38px;
+  min-width: 38px;
+  min-height: 38px;
+`;
+
 export const BoxTitle = styled(Typography.Title)`
   && {
     color: ${({theme}) => theme.color.white};

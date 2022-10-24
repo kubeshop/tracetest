@@ -18,6 +18,7 @@ nav:
     - Introduction to Trace-Based Testing: introduction.md
     - Architecture: architecture.md
     - Specifying Selectors: advanced-selectors.md
+    - Expressions: expressions.md
   - Getting Started:
     - Supported Backends: supported-backends.md
     - Installation: installing.md

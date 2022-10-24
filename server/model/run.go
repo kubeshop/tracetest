@@ -75,7 +75,8 @@ func (r Run) SuccessfullyPolledTraces(t *traces.Trace) Run {
 	return r
 }
 
-func (r Run) SuccessfullyAsserted(res OrderedMap[SpanQuery, []AssertionResult], allPassed bool) Run {
+func (r Run) SuccessfullyAsserted(outputs OrderedMap[string, string], res OrderedMap[SpanQuery, []AssertionResult], allPassed bool) Run {
+	r.Outputs = outputs
 	r.Results = &RunResults{
 		AllPassed: allPassed,
 		Results:   res,

@@ -25,16 +25,7 @@ func TestConversion(t *testing.T) {
 		Results: (model.OrderedMap[model.SpanQuery, []model.AssertionResult]{}).MustAdd(
 			model.SpanQuery(`span[tracetest.span.type = "database"]`), []model.AssertionResult{
 				{
-					Assertion: model.Assertion{
-						Attribute:  "db.statement",
-						Comparator: comparator.Contains,
-						Value: &model.AssertionExpression{
-							LiteralValue: model.LiteralValue{
-								Value: "INSERT",
-								Type:  "string",
-							},
-						},
-					},
+					Assertion: `attr:db.statement contains "INSERT"`,
 					Results: []model.SpanAssertionResult{
 						{
 							ObservedValue: "INSERT into whatever",
@@ -43,16 +34,7 @@ func TestConversion(t *testing.T) {
 					},
 				},
 				{
-					Assertion: model.Assertion{
-						Attribute:  "tracetest.span.duration",
-						Comparator: comparator.Lt,
-						Value: &model.AssertionExpression{
-							LiteralValue: model.LiteralValue{
-								Value: "500",
-								Type:  "number",
-							},
-						},
-					},
+					Assertion: `attr:tracetest.span.duration < 500`,
 					Results: []model.SpanAssertionResult{
 						{
 							ObservedValue: "notANumber",
@@ -61,16 +43,7 @@ func TestConversion(t *testing.T) {
 					},
 				},
 				{
-					Assertion: model.Assertion{
-						Attribute:  "tracetest.span.type",
-						Comparator: comparator.Eq,
-						Value: &model.AssertionExpression{
-							LiteralValue: model.LiteralValue{
-								Value: "http",
-								Type:  "string",
-							},
-						},
-					},
+					Assertion: `attr:tracetest.span.type = "http"`,
 					Results: []model.SpanAssertionResult{
 						{
 							ObservedValue: "database",

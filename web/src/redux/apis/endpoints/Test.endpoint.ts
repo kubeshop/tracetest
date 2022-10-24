@@ -3,7 +3,6 @@ import {HTTP_METHOD} from 'constants/Common.constants';
 import {SortBy, SortDirection, TracetestApiTags} from 'constants/Test.constants';
 import Test from 'models/Test.model';
 import {PaginationResponse} from 'hooks/usePagination';
-import {TAssertion} from 'types/Assertion.types';
 import {TRawTestSpecs} from 'types/TestSpecs.types';
 
 function getTotalCountFromHeaders(meta: any) {
@@ -60,7 +59,7 @@ const TestEndpoint = (builder: TTestApiEndpointBuilder) => ({
     invalidatesTags: [{type: TracetestApiTags.TEST, id: 'LIST'}],
   }),
 
-  setTestDefinition: builder.mutation<TAssertion, {testId: string; testDefinition: Partial<TRawTestSpecs>}>({
+  setTestDefinition: builder.mutation<string[], {testId: string; testDefinition: Partial<TRawTestSpecs>}>({
     query: ({testId, testDefinition}) => ({
       url: `/tests/${testId}/definition`,
       method: HTTP_METHOD.PUT,

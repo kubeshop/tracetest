@@ -102,12 +102,6 @@ func (f testRun) formatFailedTest(test openapi.Test, run openapi.TestRun) string
 		allPassed := true
 
 		for _, result := range specResult.Results {
-			assertionQuery := fmt.Sprintf(
-				"%s %s %s",
-				*result.Assertion.Attribute,
-				*result.Assertion.Comparator,
-				*result.Assertion.Expected,
-			)
 
 			for _, spanResult := range result.SpanResults {
 				// meta assertions such as tracetest.selected_spasn.count don't have a spanID
@@ -129,7 +123,7 @@ func (f testRun) formatFailedTest(test openapi.Test, run openapi.TestRun) string
 				spanAssertionPassed := spanResult.Passed != nil && *spanResult.Passed
 
 				spanResults.results = append(spanResults.results, assertionResult{
-					assertion:     assertionQuery,
+					assertion:     *result.Assertion,
 					observedValue: spanResult.ObservedValue,
 					passed:        spanAssertionPassed,
 					index:         i,

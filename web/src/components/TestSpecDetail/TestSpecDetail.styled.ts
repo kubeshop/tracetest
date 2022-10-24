@@ -37,8 +37,16 @@ export const DrawerContainer = styled(Drawer)`
 export const GridContainer = styled.div`
   display: grid;
   column-gap: 24px;
-  grid-template-columns: 30% 1fr;
+  grid-template-columns: 5% 1fr;
+  align-items: center;
+`;
+
+export const CheckItemContainer = styled.div`
   padding: 10px 0 10px 30px;
+
+  &:hover {
+    background: ${({theme}) => theme.color.background};
+  }
 `;
 
 export const HeaderContainer = styled.div`

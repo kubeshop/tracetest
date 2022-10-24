@@ -27,9 +27,11 @@ export const Container = styled.div`
 `;
 
 export const FieldsContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  flex-basis: 95%;
+  display: grid;
+  width: 95%;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 8px;
+  align-items: center;
 `;
 
 export const ActionContainer = styled.div`

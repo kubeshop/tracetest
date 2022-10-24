@@ -77,7 +77,7 @@ const Content = ({
             $type={span?.type ?? SemanticGroupNames.General}
           >
             {checkResults.map(checkResult => (
-              <Assertion check={checkResult} key={`${checkResult.result.spanId}-${checkResult.assertion.attribute}`} />
+              <Assertion check={checkResult} key={`${checkResult.result.spanId}-${checkResult.assertion}`} />
             ))}
           </S.CardContainer>
         );

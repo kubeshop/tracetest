@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/traces"
 	"go.opentelemetry.io/otel/trace"
@@ -19,7 +18,13 @@ type (
 		Version          int
 		ServiceUnderTest Trigger
 		Specs            OrderedMap[SpanQuery, NamedAssertions]
+		Outputs          OrderedMap[string, Output]
 		Summary          Summary
+	}
+
+	Output struct {
+		Selector SpanQuery
+		Value    string
 	}
 
 	NamedAssertions struct {
@@ -54,11 +59,7 @@ type (
 
 	SpanQuery string
 
-	Assertion struct {
-		Attribute  Attribute
-		Comparator comparator.Comparator
-		Value      *AssertionExpression
-	}
+	Assertion string
 
 	AssertionExpression struct {
 		LiteralValue LiteralValue
@@ -96,6 +97,7 @@ type (
 		TriggerResult TriggerResult
 		Results       *RunResults
 		Trace         *traces.Trace
+		Outputs       OrderedMap[string, string]
 		LastError     error
 		Pass          int
 		Fail          int
@@ -136,10 +138,6 @@ func (a Attribute) IsMeta() bool {
 
 func (a Attribute) String() string {
 	return string(a)
-}
-
-func (a Assertion) String() string {
-	return fmt.Sprintf(`"%s" %s "%s"`, a.Attribute, a.Comparator, a.Value)
 }
 
 func (e *AssertionExpression) String() string {

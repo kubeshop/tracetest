@@ -1,48 +1,48 @@
 # Right side interpolation
 
-attr:tracetest.span.type = "${env:TRACETEST_SPAN_TYPE}"
+attr:tracetest.span.type
 
 ==>
 
-Program(Expression(ComposedValue(OutsideInput(Source,Identifier))),Comparator,Expression(ComposedValue(ComposedString(Quotes,Interpolation(OpenInterpolation,OutsideInput(Source,Identifier),CloseInterpolation),Quotes))))
+Program(Expression(ComposedValue(OutsideInput(Source,Identifier))))
 
 
 # Expression for both sides
 
-attr:tracetest.span.duration + 2 = 5 + env:TRACETEST_SPAN_DURATION
+attr:tracetest.span.duration + 2
 
 ==>
 
-Program(Expression(ComposedValue(OutsideInput(Source,Identifier)),Operator,ComposedValue(Number)),Comparator,Expression(ComposedValue(Number),Operator,ComposedValue(OutsideInput(Source,Identifier))))
+Program(Expression(ComposedValue(OutsideInput(Source,Identifier)),Operator,ComposedValue(Number)))
 
 # Raw Arithmetic Operation
 
-5 + 5 = 10
+5 + 5
 
 ==>
 
-Program(Expression(ComposedValue(Number),Operator,ComposedValue(Number)),Comparator,Expression(ComposedValue(Number)))
+Program(Expression(ComposedValue(Number),Operator,ComposedValue(Number)))
 
 # Raw Logic Operation
 
-10 != 20
+10
 
 ==>
 
-Program(Expression(ComposedValue(Number)),Comparator,Expression(ComposedValue(Number)))
+Program(Expression(ComposedValue(Number)))
 
 # String Concatenation Expression
 
-"Jorge" = "Ecuador" + attr:http.message
+"Ecuador" + attr:http.message
 
 ==>
 
-Program(Expression(ComposedValue(ComposedString(Quotes,String,Quotes))),Comparator,Expression(ComposedValue(ComposedString(Quotes,String,Quotes)),Operator,ComposedValue(OutsideInput(Source,Identifier))))
+Program(Expression(ComposedValue(ComposedString(Quotes,String,Quotes)),Operator,ComposedValue(OutsideInput(Source,Identifier))))
 
 # String Interpolation
 
-attr:http.message = "error at line ${attr:tracetest.span.duration}"
+attr:http.message
 
 ==>
 
- Program(Expression(ComposedValue(OutsideInput(Source,Identifier))),Comparator,Expression(ComposedValue(ComposedString(Quotes,String,Interpolation(OpenInterpolation,OutsideInput(Source,Identifier),CloseInterpolation),Quotes))))
+Program(Expression(ComposedValue(OutsideInput(Source,Identifier))))

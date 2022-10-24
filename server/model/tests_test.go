@@ -4,9 +4,6 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/kubeshop/tracetest/server/assertions/comparator"
-	"github.com/kubeshop/tracetest/server/encoding/yaml/conversion/parser"
-	"github.com/kubeshop/tracetest/server/http/mappings"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -18,41 +15,23 @@ func TestAttributeIsMeta(t *testing.T) {
 	assert.False(t, model.Attribute("db.system").IsMeta())
 }
 
-func createExpressionFromNumber(number string) *model.AssertionExpression {
-	return &model.AssertionExpression{
-		LiteralValue: model.LiteralValue{
-			Value: number,
-			Type:  "number",
-		},
-	}
-}
-
-func createExpressionFromString(str string) *model.AssertionExpression {
-	return &model.AssertionExpression{
-		LiteralValue: model.LiteralValue{
-			Value: str,
-			Type:  "string",
-		},
-	}
-}
-
 func TestSpec(t *testing.T) {
 	t.Run("Add", func(t *testing.T) {
 		spec := (model.Test{}).Specs
 
 		spec, err := spec.Add(model.SpanQuery("1"), model.NamedAssertions{
-			Assertions: []model.Assertion{{"1", comparator.Eq, createExpressionFromNumber("1")}},
+			Assertions: []model.Assertion{model.Assertion(`1 = 1`)},
 		})
 		require.NoError(t, err)
 
 		spec, err = spec.Add(model.SpanQuery("2"), model.NamedAssertions{
-			Assertions: []model.Assertion{{"2", comparator.Eq, createExpressionFromNumber("2")}},
+			Assertions: []model.Assertion{model.Assertion(`2 = 2`)},
 		})
 		require.NoError(t, err)
 		assert.Equal(t, 2, spec.Len())
 
 		spec, err = spec.Add(model.SpanQuery("2"), model.NamedAssertions{
-			Assertions: []model.Assertion{{"2", comparator.Eq, createExpressionFromNumber("2")}},
+			Assertions: []model.Assertion{model.Assertion(`2 = 2`)},
 		})
 		assert.ErrorContains(t, err, "selector already exists")
 		assert.Equal(t, 0, spec.Len())
@@ -63,11 +42,11 @@ func TestSpec(t *testing.T) {
 		spec := (model.Test{}).Specs
 
 		spec, _ = spec.Add(model.SpanQuery("1"), model.NamedAssertions{
-			Assertions: []model.Assertion{{"1", comparator.Eq, createExpressionFromNumber("1")}},
+			Assertions: []model.Assertion{model.Assertion(`1 = 1`)},
 		})
 
 		spec, _ = spec.Add(model.SpanQuery("2"), model.NamedAssertions{
-			Assertions: []model.Assertion{{"2", comparator.Eq, createExpressionFromNumber("2")}},
+			Assertions: []model.Assertion{model.Assertion(`2 = 2`)},
 		})
 
 		return spec
@@ -78,13 +57,14 @@ func TestSpec(t *testing.T) {
 		spec := generateSpec()
 
 		expected := map[string]model.NamedAssertions{
-			"1": {Assertions: []model.Assertion{{"1", comparator.Eq, createExpressionFromNumber("1")}}},
-			"2": {Assertions: []model.Assertion{{"2", comparator.Eq, createExpressionFromNumber("2")}}},
+			"1": {Assertions: []model.Assertion{model.Assertion(`1 = 1`)}},
+			"2": {Assertions: []model.Assertion{model.Assertion(`2 = 2`)}},
 		}
 
 		actual := make(map[string]model.NamedAssertions)
-		spec.Map(func(spanQuery model.SpanQuery, asserts model.NamedAssertions) {
+		spec.ForEach(func(spanQuery model.SpanQuery, asserts model.NamedAssertions) error {
 			actual[string(spanQuery)] = asserts
+			return nil
 		})
 
 		assert.Equal(t, expected, actual)
@@ -96,7 +76,7 @@ func TestSpec(t *testing.T) {
 		spec := generateSpec()
 
 		expected := model.NamedAssertions{
-			Assertions: []model.Assertion{{"1", comparator.Eq, createExpressionFromNumber("1")}},
+			Assertions: []model.Assertion{model.Assertion(`1 = 1`)},
 		}
 		actual := spec.Get(model.SpanQuery("1"))
 
@@ -126,14 +106,14 @@ func TestResults(t *testing.T) {
 	t.Run("Add", func(t *testing.T) {
 		def := (model.RunResults{}).Results
 
-		def, err := def.Add(model.SpanQuery("1"), []model.AssertionResult{{Assertion: model.Assertion{"1", comparator.Eq, createExpressionFromNumber("1")}}})
+		def, err := def.Add(model.SpanQuery("1"), []model.AssertionResult{{Assertion: model.Assertion(`1 = 1`)}})
 		require.NoError(t, err)
 
-		def, err = def.Add(model.SpanQuery("2"), []model.AssertionResult{{Assertion: model.Assertion{"2", comparator.Eq, createExpressionFromNumber("2")}}})
+		def, err = def.Add(model.SpanQuery("2"), []model.AssertionResult{{Assertion: model.Assertion(`2 = 2`)}})
 		require.NoError(t, err)
 		assert.Equal(t, 2, def.Len())
 
-		def, err = def.Add(model.SpanQuery("2"), []model.AssertionResult{{Assertion: model.Assertion{"2", comparator.Eq, createExpressionFromNumber("2")}}})
+		def, err = def.Add(model.SpanQuery("2"), []model.AssertionResult{{Assertion: model.Assertion(`2 = 2`)}})
 		assert.ErrorContains(t, err, "selector already exists")
 		assert.Equal(t, 0, def.Len())
 
@@ -142,8 +122,8 @@ func TestResults(t *testing.T) {
 	generateDef := func() model.OrderedMap[model.SpanQuery, []model.AssertionResult] {
 		def := (model.RunResults{}).Results
 
-		def, _ = def.Add(model.SpanQuery("1"), []model.AssertionResult{{Assertion: model.Assertion{"1", comparator.Eq, createExpressionFromNumber("1")}}})
-		def, _ = def.Add(model.SpanQuery("2"), []model.AssertionResult{{Assertion: model.Assertion{"2", comparator.Eq, createExpressionFromNumber("2")}}})
+		def, _ = def.Add(model.SpanQuery("1"), []model.AssertionResult{{Assertion: model.Assertion(`1 = 1`)}})
+		def, _ = def.Add(model.SpanQuery("2"), []model.AssertionResult{{Assertion: model.Assertion(`2 = 2`)}})
 
 		return def
 	}
@@ -153,13 +133,14 @@ func TestResults(t *testing.T) {
 		def := generateDef()
 
 		expected := map[string][]model.AssertionResult{
-			"1": {{Assertion: model.Assertion{"1", comparator.Eq, createExpressionFromNumber("1")}}},
-			"2": {{Assertion: model.Assertion{"2", comparator.Eq, createExpressionFromNumber("2")}}},
+			"1": {{Assertion: model.Assertion(`1 = 1`)}},
+			"2": {{Assertion: model.Assertion(`2 = 2`)}},
 		}
 
 		actual := map[string][]model.AssertionResult{}
-		def.Map(func(spanQuery model.SpanQuery, asserts []model.AssertionResult) {
+		def.ForEach(func(spanQuery model.SpanQuery, asserts []model.AssertionResult) error {
 			actual[string(spanQuery)] = asserts
+			return nil
 		})
 
 		assert.Equal(t, expected, actual)
@@ -170,7 +151,7 @@ func TestResults(t *testing.T) {
 
 		def := generateDef()
 
-		expected := []model.AssertionResult{{Assertion: model.Assertion{"1", comparator.Eq, createExpressionFromNumber("1")}}}
+		expected := []model.AssertionResult{{Assertion: model.Assertion(`1 = 1`)}}
 		actual := def.Get(model.SpanQuery("1"))
 
 		assert.Equal(t, expected, actual)
@@ -193,65 +174,4 @@ func TestResults(t *testing.T) {
 		assert.Equal(t, def, decoded)
 	})
 
-}
-
-func TestExpressionType(t *testing.T) {
-	testCases := []struct {
-		Name         string
-		Expression   string
-		ExpectedType string
-	}{
-		{
-			Name:         "simple string",
-			Expression:   `"my string"`,
-			ExpectedType: "string",
-		},
-		{
-			Name:         "integer",
-			Expression:   `12`,
-			ExpectedType: "number",
-		},
-		{
-			Name:         "float",
-			Expression:   `12.75`,
-			ExpectedType: "number",
-		},
-		{
-			Name:         "attribute",
-			Expression:   `attr:tracetest.myattribute`,
-			ExpectedType: "attribute",
-		},
-		{
-			Name:         "duration",
-			Expression:   `17ms`,
-			ExpectedType: "duration",
-		},
-		{
-			Name:         "attribute with duration",
-			Expression:   `attr:my.duration.attr + 17ms`,
-			ExpectedType: "duration",
-		},
-		{
-			Name:         "attribute with number",
-			Expression:   `attr:my.number.attr + 28`,
-			ExpectedType: "number",
-		},
-		{
-			Name:         "attribute with attribute",
-			Expression:   `attr:my.attr + attr:my.other.attribute`,
-			ExpectedType: "attribute",
-		},
-	}
-
-	for _, testCase := range testCases {
-		t.Run(testCase.Name, func(t *testing.T) {
-			mapping := mappings.OpenAPI{}
-			parserExpression, err := parser.ParseAssertionExpression(testCase.Expression)
-			require.NoError(t, err)
-
-			expression := mapping.AssertionExpression(parserExpression)
-
-			assert.Equal(t, testCase.ExpectedType, expression.Type())
-		})
-	}
 }
