@@ -1,69 +1,71 @@
-id: VZvc1g44g
-name: Test Create
-description: ""
-trigger:
-  type: http
-  httpRequest:
-    url: ${TARGET_URL}/api/tests
-    method: POST
-    headers:
-    - key: Content-Type
-      value: application/json
-    body: |
-      {
-        "name": "Pokemon - List - Get a Pokemon",
-        "serviceUnderTest": {
-          "triggerType": "http",
-          "triggerSettings": {
-            "http": {
-              "url": "${DEMO_APP_URL}/pokemon?take=20&skip=0",
-              "method": "GET",
-              "headers": [
-                {
-                  "key": "Content-Type",
-                  "value": "application/json"
-                }
-              ]
+type: Test
+spec:
+  id: VZvc1g44g
+  name: Test Create
+  description: ""
+  trigger:
+    type: http
+    httpRequest:
+      url: ${TARGET_URL}/api/tests
+      method: POST
+      headers:
+      - key: Content-Type
+        value: application/json
+      body: |
+        {
+          "name": "Pokemon - List - Get a Pokemon",
+          "serviceUnderTest": {
+            "triggerType": "http",
+            "triggerSettings": {
+              "http": {
+                "url": "${DEMO_APP_URL}/pokemon?take=20&skip=0",
+                "method": "GET",
+                "headers": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ]
+              }
             }
-          }
-        },
-        "specs": {
-          "specs": [
+          },
+          "specs": {
+            "specs": [
+              {
+                "selector": {
+                  "query": "span[name = \"pg.query:SELECT\"]"
+                },
+                "assertions": ["attr:tracetest.selected_spans.count > 0"]
+              }
+            ]
+          },
+          "outputs": [
             {
+              "name": "TRIGGER_COUNT",
               "selector": {
-                "query": "span[name = \"pg.query:SELECT\"]"
+                "query": "span[name = \"Tracetest trigger\"]"
               },
-              "assertions": ["attr:tracetest.selected_spans.count > 0"]
+              "value": "attr:tracetest.selected_spans.count"
             }
           ]
-        },
-        "outputs": [
-          {
-            "name": "TRIGGER_COUNT",
-            "selector": {
-              "query": "span[name = \"Tracetest trigger\"]"
-            },
-            "value": "attr:tracetest.selected_spans.count"
-          }
-        ]
-      }
-specs:
-- selector: span[name = "Tracetest trigger"]
-  assertions:
+        }
+  specs:
+  - selector: span[name = "Tracetest trigger"]
+    assertions:
+      - tracetest.selected_spans.count = 1
+      - tracetest.response.status = 200
+      # - tracetest.response.body | json_path '$.outputs[0].name' = "TRIGGER_COUNT"
+  - selector: span[name="POST /api/tests" tracetest.span.type="http"]
+    assertions:
     - tracetest.selected_spans.count = 1
-    - tracetest.response.status = 200
-    # - tracetest.response.body | json_path '$.outputs[0].name' = "TRIGGER_COUNT"
-- selector: span[name="POST /api/tests" tracetest.span.type="http"]
-  assertions:
-  - tracetest.selected_spans.count = 1
-- selector: span[name = "exec INSERT"]
-  assertions:
-  - tracetest.selected_spans.count = 1
-- selector: span[name = "exec INSERT"]:first
-  assertions:
-  - sql.query contains "INSERT INTO tests"
+  - selector: span[name = "exec INSERT"]
+    assertions:
+    - tracetest.selected_spans.count = 1
+  - selector: span[name = "exec INSERT"]:first
+    assertions:
+    - sql.query contains "INSERT INTO tests"
 
-# outputs:
-# - name: TEST_ID
-#   selector: span[name = "Tracetest trigger"]
-#   value: attr:tracetest.response.body | json_path '$.id'
+  # outputs:
+  # - name: TEST_ID
+  #   selector: span[name = "Tracetest trigger"]
+  #   value: attr:tracetest.response.body | json_path '$.id'

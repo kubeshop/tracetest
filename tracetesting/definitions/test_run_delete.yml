@@ -1,22 +1,24 @@
-id: 9empJgVVR
-name: Test Run Delete
-description: ""
-trigger:
-  type: http
-  httpRequest:
-    url: ${TARGET_URL}/api/tests/${TEST_ID}/run/${RUN_ID}
-    method: DELETE
-    headers:
-    - key: Content-Type
-      value: application/json
-specs:
-- selector: span[name = "Tracetest trigger"]
-  assertions:
+type: Test
+spec:
+  id: 9empJgVVR
+  name: Test Run Delete
+  description: ""
+  trigger:
+    type: http
+    httpRequest:
+      url: ${TARGET_URL}/api/tests/${TEST_ID}/run/${RUN_ID}
+      method: DELETE
+      headers:
+      - key: Content-Type
+        value: application/json
+  specs:
+  - selector: span[name = "Tracetest trigger"]
+    assertions:
+      - tracetest.selected_spans.count = 1
+      - tracetest.response.status = 204
+  - selector: span[name="DELETE /api/tests/{testId}/run/{runId}" tracetest.span.type="http"]
+    assertions:
     - tracetest.selected_spans.count = 1
-    - tracetest.response.status = 204
-- selector: span[name="DELETE /api/tests/{testId}/run/{runId}" tracetest.span.type="http"]
-  assertions:
-  - tracetest.selected_spans.count = 1
-- selector: span[name = "exec DELETE"]
-  assertions:
-  - tracetest.selected_spans.count = 1
+  - selector: span[name = "exec DELETE"]
+    assertions:
+    - tracetest.selected_spans.count = 1
