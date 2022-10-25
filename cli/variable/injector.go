@@ -83,9 +83,12 @@ func (i Injector) replaceValueInInterface(target reflect.Value) (reflect.Value, 
 	newValue := reflect.New(target.Type()).Elem()
 	for index := 0; index < target.NumField(); index++ {
 		newValueField := newValue.Field(index)
+		if !newValueField.CanInterface() {
+			continue
+		}
+
 		field := target.Field(index)
 		newValueField.Set(field)
-
 		err := i.inject(newValueField)
 		if err != nil {
 			return newValue, err
