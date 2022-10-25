@@ -188,7 +188,9 @@ func TestLoadDefinition(t *testing.T) {
 				require.NoError(t, err)
 				err = actual.Definition().Validate()
 				assert.NoError(t, err)
-				assert.Equal(t, testCase.expected, actual.Definition())
+				resolvedFile, err := actual.ResolveVariables()
+				assert.NoError(t, err)
+				assert.Equal(t, testCase.expected, resolvedFile.Definition())
 			} else {
 				require.Error(t, err, "LoadDefinition should fail")
 			}

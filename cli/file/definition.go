@@ -24,7 +24,6 @@ func Read(path string) (File, error) {
 	}
 
 	return New(path, b)
-
 }
 
 func New(path string, b []byte) (File, error) {
@@ -38,32 +37,27 @@ func New(path string, b []byte) (File, error) {
 		file:     yf,
 	}
 
-	err = file.replaceEnvVariables()
-	if err != nil {
-		return File{}, err
-	}
-
 	return file, nil
 }
 
-func (f *File) replaceEnvVariables() error {
+func (f File) ResolveVariables() (File, error) {
 	variableInjector := variable.NewInjector(variable.WithVariableProvider(
 		variable.EnvironmentVariableProvider{},
 	))
 
 	err := variableInjector.Inject(&f.file)
 	if err != nil {
-		return err
+		return File{}, err
 	}
 
 	bytes, err := yaml.Encode(f.file)
 	if err != nil {
-		return err
+		return File{}, err
 	}
 
 	f.contents = bytes
 
-	return nil
+	return f, nil
 }
 
 func (f File) Definition() yaml.File {
