@@ -21,6 +21,12 @@ func (p testingVarProvider) GetVariable(name string) (string, error) {
 	return p.variables[name], nil
 }
 
+type structWithUnexportedFields struct {
+	name    string
+	content []byte
+	File    yaml.File
+}
+
 func TestInjectorWithStruct(t *testing.T) {
 	provider := testingVarProvider{
 		variables: map[string]string{
@@ -76,8 +82,21 @@ func TestInjectorWithStruct(t *testing.T) {
 			},
 		},
 	}
-	err := injector.Inject(&input)
+
+	file := structWithUnexportedFields{
+		name:    "haha",
+		content: []byte{},
+		File:    input,
+	}
+
+	expectedFile := structWithUnexportedFields{
+		name:    "haha",
+		content: []byte{},
+		File:    expectedDefinition,
+	}
+
+	err := injector.Inject(&file)
 	assert.NoError(t, err)
 
-	assert.Equal(t, expectedDefinition, input)
+	assert.Equal(t, expectedFile, file)
 }

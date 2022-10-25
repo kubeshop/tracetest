@@ -37,10 +37,6 @@ func (i Injector) Inject(target interface{}) error {
 }
 
 func (i Injector) inject(target reflect.Value) error {
-	if target.CanInterface() {
-		output := fmt.Sprintf("%s", target.Interface())
-		fmt.Println(output)
-	}
 	switch target.Kind() {
 	case reflect.Struct:
 		return i.injectValuesIntoStruct(target)
@@ -50,7 +46,9 @@ func (i Injector) inject(target reflect.Value) error {
 			return err
 		}
 
-		target.Set(newValue)
+		if target.CanSet() {
+			target.Set(newValue)
+		}
 	case reflect.String:
 		return i.injectValueIntoField(target)
 	case reflect.Slice:
@@ -83,11 +81,11 @@ func (i Injector) replaceValueInInterface(target reflect.Value) (reflect.Value, 
 	newValue := reflect.New(target.Type()).Elem()
 	for index := 0; index < target.NumField(); index++ {
 		newValueField := newValue.Field(index)
-		if !newValueField.CanInterface() {
+		field := target.Field(index)
+		if !field.CanInterface() {
 			continue
 		}
 
-		field := target.Field(index)
 		newValueField.Set(field)
 		err := i.inject(newValueField)
 		if err != nil {

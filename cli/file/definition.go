@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/kubeshop/tracetest/cli/variable"
 	"github.com/kubeshop/tracetest/server/model/yaml"
 )
 
@@ -32,10 +33,37 @@ func New(path string, b []byte) (File, error) {
 		return File{}, fmt.Errorf("could not parse definition file: %w", err)
 	}
 
-	return File{
+	file := File{
 		contents: b,
 		file:     yf,
-	}, nil
+	}
+
+	err = file.replaceEnvVariables()
+	if err != nil {
+		return File{}, err
+	}
+
+	return file, nil
+}
+
+func (f *File) replaceEnvVariables() error {
+	variableInjector := variable.NewInjector(variable.WithVariableProvider(
+		variable.EnvironmentVariableProvider{},
+	))
+
+	err := variableInjector.Inject(&f.file)
+	if err != nil {
+		return err
+	}
+
+	bytes, err := yaml.Encode(f.file)
+	if err != nil {
+		return err
+	}
+
+	f.contents = bytes
+
+	return nil
 }
 
 func (f File) Definition() yaml.File {
