@@ -12,7 +12,7 @@ trigger:
 specs:
 - selector: span[name = "POST /pokemon/import"]
   assertions:
-  - tracetest.span.duration <= 500
+  - attr:tracetest.span.duration <= 500
   - http.status_code = 200
 - selector: span[name = "send message to queue"]
   assertions:
@@ -28,4 +28,4 @@ specs:
     on database"]
   assertions:
   - db.repository.operation = "create"
-  - tracetest.span.duration <= 500
+  - attr:tracetest.span.duration <= 500

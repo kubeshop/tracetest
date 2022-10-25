@@ -14,13 +14,13 @@ spec:
   specs:
   - selector: span[name = "Tracetest trigger"]
     assertions:
-      - tracetest.selected_spans.count = 1
-      - tracetest.response.status = 200
-      # - tracetest.response.body | json_path '$[0].id' = "${TEST_ID}"
-      - tracetest.response.body contains "${TEST_ID}"
+    - attr:tracetest.selected_spans.count = 1
+    - attr:tracetest.response.status = 200
+    # - attr:tracetest.response.body | json_path '$[0].id' = "${TEST_ID}"
+    - attr:tracetest.response.body contains "${TEST_ID}"
   - selector: span[name="GET /api/tests" tracetest.span.type="http"]
     assertions:
-    - tracetest.selected_spans.count = 1
+    - attr:tracetest.selected_spans.count = 1
   - selector: span[name = "query SELECT"]
     assertions:
-    - tracetest.selected_spans.count = 2
+    - attr:tracetest.selected_spans.count = 2

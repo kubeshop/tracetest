@@ -15,28 +15,28 @@ spec:
   specs:
   - selector: span[name = "Tracetest trigger"]
     assertions:
-      - tracetest.selected_spans.count = 1
-      - tracetest.response.status = 200
+    - attr:tracetest.selected_spans.count = 1
+    - attr:tracetest.response.status = 200
   - selector: span[name = "POST /api/tests/{testId}/run" tracetest.span.type = "http"]
     assertions:
-    - tracetest.selected_spans.count = 1
+    - attr:tracetest.selected_spans.count = 1
   - selector: span[name = "Trigger test"]
     assertions:
-    - tracetest.selected_spans.count = 1
-    - tracetest.run.trigger.test_id = "${TEST_ID}"
-    - tracetest.run.trigger.type = "http"
-    - tracetest.run.trigger.http.response_code = 200
+    - attr:tracetest.selected_spans.count = 1
+    - attr:tracetest.run.trigger.test_id = "${TEST_ID}"
+    - attr:tracetest.run.trigger.type = "http"
+    - attr:tracetest.run.trigger.http.response_code = 200
   - selector: span[name = "Fetch trace"]
     assertions:
-    - tracetest.selected_spans.count > 0
-    - tracetest.run.trace_poller.test_id = "${TEST_ID}"
+    - attr:tracetest.selected_spans.count > 0
+    - attr:tracetest.run.trace_poller.test_id = "${TEST_ID}"
   - selector: span[name = "Fetch trace"]:last
     assertions:
-    - tracetest.run.trace_poller.succesful = "true"
+    - attr:tracetest.run.trace_poller.succesful = "true"
   - selector: span[name = "Execute assertions"]
     assertions:
-    - tracetest.selected_spans.count = 1
-    - tracetest.run.assertion_runner.all_assertions_passed = "true"
+    - attr:tracetest.selected_spans.count = 1
+    - attr:tracetest.run.assertion_runner.all_assertions_passed = "true"
   # - selector: span[name = "Process outputs"]
   #   assertions:
-  #   - tracetest.run.output_processor.outputs | json_path ".TRIGGER_COUNT" = 1
+  #   - attr:tracetest.run.output_processor.outputs | json_path ".TRIGGER_COUNT" = 1
