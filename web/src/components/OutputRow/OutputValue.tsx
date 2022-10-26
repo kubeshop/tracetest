@@ -1,12 +1,13 @@
 import {useMemo} from 'react';
+
 import {isJson} from 'utils/Common';
-import * as S from './OutputModal.styled';
+import * as S from './OutputRow.styled';
 
 interface IProps {
   value: string;
 }
 
-const OutputModalValue = ({value}: IProps) => {
+const OutputValue = ({value}: IProps) => {
   const isJsonValue = useMemo(() => isJson(value), [value]);
 
   if (isJsonValue) {
@@ -20,4 +21,4 @@ const OutputModalValue = ({value}: IProps) => {
   return <S.ValueText>{value}</S.ValueText>;
 };
 
-export default OutputModalValue;
+export default OutputValue;

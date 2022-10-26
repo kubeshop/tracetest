@@ -1,6 +1,7 @@
 import {TRawAssertionResults} from 'types/Assertion.types';
 import {TRawTestRun, TTestRun} from 'types/TestRun.types';
 import AssertionResults from './AssertionResults.model';
+import {TestRunOutput} from './TestOutput.model';
 import Trace from './Trace.model';
 import TriggerResult from './TriggerResult.model';
 
@@ -45,6 +46,7 @@ const TestRun = ({
   serviceTriggerCompletedAt = '',
   serviceTriggeredAt = '',
   metadata = {},
+  outputs = [],
 }: TRawTestRun): TTestRun => {
   return {
     obtainedTraceAt,
@@ -66,6 +68,7 @@ const TestRun = ({
     failedAssertionCount: getTestResultCount(result, 'failed'),
     passedAssertionCount: getTestResultCount(result, 'passed'),
     metadata,
+    outputs: outputs?.map(rawOuput => TestRunOutput(rawOuput)),
   };
 };
 

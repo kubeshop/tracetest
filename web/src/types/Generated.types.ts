@@ -4,19 +4,15 @@
  */
 
 export interface paths {
+  "/definition.yaml": {
+    /** Execute a definition */
+    post: operations["executeDefinition"];
+  };
   "/tests": {
     /** get tests */
     get: operations["getTests"];
     /** Create new test action */
     post: operations["createTest"];
-  };
-  "/tests/definition.yaml": {
-    /** Create new test using the yaml definition */
-    post: operations["createTestFromDefinition"];
-  };
-  "/tests/{testId}/definition.yaml": {
-    /** update test action from definition file */
-    put: operations["updateTestFromDefinition"];
   };
   "/tests/{testId}": {
     /** get test */
@@ -81,6 +77,30 @@ export interface paths {
 export interface components {}
 
 export interface operations {
+  /** Execute a definition */
+  executeDefinition: {
+    responses: {
+      /** Definition updated */
+      200: {
+        content: {
+          "application/json": external["definition.yaml"]["components"]["schemas"]["ExecuteDefinitionResponse"];
+        };
+      };
+      /** Definition created */
+      201: {
+        content: {
+          "application/json": external["definition.yaml"]["components"]["schemas"]["ExecuteDefinitionResponse"];
+        };
+      };
+      /** trying to create a test with an already existing ID */
+      422: unknown;
+    };
+    requestBody: {
+      content: {
+        "text/json": external["definition.yaml"]["components"]["schemas"]["TextDefinition"];
+      };
+    };
+  };
   /** get tests */
   getTests: {
     parameters: {
@@ -127,45 +147,6 @@ export interface operations {
     requestBody: {
       content: {
         "application/json": external["tests.yaml"]["components"]["schemas"]["Test"];
-      };
-    };
-  };
-  /** Create new test using the yaml definition */
-  createTestFromDefinition: {
-    responses: {
-      /** successful operation */
-      200: {
-        content: {
-          "application/json": external["tests.yaml"]["components"]["schemas"]["Test"];
-        };
-      };
-      /** trying to create a test with an already existing ID */
-      400: unknown;
-    };
-    requestBody: {
-      content: {
-        "text/json": external["tests.yaml"]["components"]["schemas"]["TextDefinition"];
-      };
-    };
-  };
-  /** update test action from definition file */
-  updateTestFromDefinition: {
-    parameters: {
-      path: {
-        testId: string;
-      };
-    };
-    responses: {
-      /** successful operation */
-      200: {
-        content: {
-          "application/json": external["tests.yaml"]["components"]["schemas"]["Test"];
-        };
-      };
-    };
-    requestBody: {
-      content: {
-        "text/json": external["tests.yaml"]["components"]["schemas"]["TextDefinition"];
       };
     };
   };
@@ -476,6 +457,28 @@ export interface operations {
 }
 
 export interface external {
+  "definition.yaml": {
+    paths: {};
+    components: {
+      schemas: {
+        ExecuteDefinitionResponse: {
+          /** @description resource ID */
+          id?: string;
+          /** @description run ID */
+          runId?: string;
+          /** @description resource type */
+          type?: string;
+          /** @description resource web UI url */
+          url?: string;
+        };
+        TextDefinition: {
+          runInformation?: external["tests.yaml"]["components"]["schemas"]["TestRunInformation"];
+          content?: string;
+        };
+      };
+    };
+    operations: {};
+  };
   "grpc.yaml": {
     paths: {};
     components: {
@@ -573,8 +576,18 @@ export interface external {
           serviceUnderTest?: external["triggers.yaml"]["components"]["schemas"]["Trigger"];
           /** @description specification of assertions that are going to be made */
           specs?: external["tests.yaml"]["components"]["schemas"]["TestSpecs"];
+          /**
+           * @description define test outputs, in a key/value format. The value is processed as an expression
+           * @example [object Object],[object Object]
+           */
+          outputs?: external["tests.yaml"]["components"]["schemas"]["TestOutput"][];
           /** @description summary of test data */
           summary?: external["tests.yaml"]["components"]["schemas"]["TestSummary"];
+        };
+        TestOutput: {
+          name?: string;
+          selector?: external["tests.yaml"]["components"]["schemas"]["Selector"];
+          value?: string;
         };
         TestSummary: {
           runs?: number;
@@ -627,6 +640,10 @@ export interface external {
           triggerResult?: external["triggers.yaml"]["components"]["schemas"]["TriggerResult"];
           trace?: external["trace.yaml"]["components"]["schemas"]["Trace"];
           result?: external["tests.yaml"]["components"]["schemas"]["AssertionResults"];
+          outputs?: {
+            name?: string;
+            value?: string;
+          }[];
           metadata?: { [key: string]: string };
         };
         TestRunInformation: {
@@ -675,9 +692,6 @@ export interface external {
         ExportedTestInformation: {
           test: external["tests.yaml"]["components"]["schemas"]["Test"];
           run: external["tests.yaml"]["components"]["schemas"]["TestRun"];
-        };
-        TextDefinition: {
-          content?: string;
         };
       };
     };
