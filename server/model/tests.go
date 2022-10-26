@@ -103,6 +103,9 @@ type (
 		Fail          int
 
 		Metadata RunMetadata
+
+		// environment
+		EnvSnapshot []EnvironmentValue
 	}
 
 	RunResults struct {

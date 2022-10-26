@@ -266,7 +266,9 @@ func (c *controller) RunTest(ctx context.Context, testID string, runInformation 
 	}
 
 	metadata := metadata(runInformation.Metadata)
-	run := c.runner.Run(ctx, test, metadata)
+	environment := environment(ctx, c.testDB, runInformation.EnvironmentId)
+
+	run := c.runner.Run(ctx, test, metadata, environment)
 
 	return openapi.Response(200, c.mappers.Out.Run(&run)), nil
 }
@@ -481,6 +483,20 @@ func metadata(in *map[string]string) model.RunMetadata {
 	}
 
 	return model.RunMetadata(*in)
+}
+
+func environment(ctx context.Context, testDB model.Repository, environmentId string) model.Environment {
+	if environmentId != "" {
+		environment, err := testDB.GetEnvironment(ctx, id.ID(environmentId))
+
+		if err != nil {
+			return model.Environment{}
+		}
+
+		return environment
+	}
+
+	return model.Environment{}
 }
 
 func (c *controller) executeTest(ctx context.Context, test model.Test, runInfo openapi.TestRunInformation) (openapi.ImplResponse, error) {
