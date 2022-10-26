@@ -34,8 +34,8 @@ spec:
   specs:
   - selector: span[name = "Tracetest trigger"]
     assertions:
-      - tracetest.selected_spans.count = 1
-      - tracetest.response.status = 400
+      - attr:tracetest.selected_spans.count = 1
+      - attr:tracetest.response.status = 400
   - selector: span[name="POST /api/tests" tracetest.span.type="http"]
     assertions:
-    - tracetest.selected_spans.count = 1
+    - attr:tracetest.selected_spans.count = 1

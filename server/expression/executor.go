@@ -60,10 +60,6 @@ func (e Executor) Statement(statement string) (string, string, error) {
 	}
 
 	err = compare(parsedStatement.Comparator, leftValue, rightValue)
-	if err != nil {
-		return leftValue.String(), rightValue.String(), err
-	}
-
 	if leftValue.Type() == types.TypeDuration || rightValue.Type() == types.TypeDuration {
 		// If any of the sides is a duration, there's a high change of the other side
 		// to be a duration as well. So try to format both before returning it
