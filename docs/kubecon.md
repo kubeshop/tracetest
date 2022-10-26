@@ -21,7 +21,7 @@ Play our game, learn to run trace-based tests using TraceTest, get familiar with
 
 5. Don’t forget to "Publish" your changes once you created all your specs.
 
-6. Go to GDOCS_FORM and fill it. You will need to copy/paste your test URL. Make sure it is correct by copy/pasting it into a new browser window. If it’s correct, you should see your test with all the specs you added.
+6. Complete [our survey](https://forms.gle/pAyCFjKUeBAKhTFP7). You will need to copy/paste your test URL. Make sure it is correct by copy/pasting it into a new browser window. If it’s correct, you should see your test with all the specs you added.
 
 7. Come by the stand and reclaim your plushie!
 
@@ -31,5 +31,5 @@ Play our game, learn to run trace-based tests using TraceTest, get familiar with
   - Creating tests: https://docs.tracetest.io/create-test/
   - Adding test spec: https://docs.tracetest.io/adding-assertions/
   - Advanced selectors: https://docs.tracetest.io/advanced-selectors/
-- Selectors can be hard, so we have a cheatsheet: https://docs.tracetest.io/cheatsheet.pdf
+- Selectors can be hard, so we have a cheatsheet: https://docs.tracetest.io/img/cheatsheet.pdf
 - You can ask for help in our Discord channel: https://discord.com/invite/6zupCZFQbe
