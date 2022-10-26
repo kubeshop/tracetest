@@ -1,42 +1,44 @@
-id: zwWc1RV4R
-name: Test Create with non-existing ID
-description: ""
-trigger:
-  type: http
-  httpRequest:
-    url: ${TARGET_URL}/api/tests
-    method: POST
-    headers:
-    - key: Content-Type
-      value: application/json
-    body: |
-      {
-        "id": "${EXAMPLE_TEST_ID}",
-        "name": "Pokemon - List - Get a Pokemon",
-        "serviceUnderTest": {
-          "triggerType": "http",
-          "triggerSettings": {
-            "http": {
-              "url": "${DEMO_APP_URL}/pokemon?take=20&skip=0",
-              "method": "GET",
-              "body": "",
-              "headers": [
-                {
-                  "key": "Content-Type",
-                  "value": "application/json"
-                }
-              ]
+type: Test
+spec:
+  id: zwWc1RV4R
+  name: Test Create with non-existing ID
+  description: ""
+  trigger:
+    type: http
+    httpRequest:
+      url: ${TARGET_URL}/api/tests
+      method: POST
+      headers:
+      - key: Content-Type
+        value: application/json
+      body: |
+        {
+          "id": "${EXAMPLE_TEST_ID}",
+          "name": "Pokemon - List - Get a Pokemon",
+          "serviceUnderTest": {
+            "triggerType": "http",
+            "triggerSettings": {
+              "http": {
+                "url": "${DEMO_APP_URL}/pokemon?take=20&skip=0",
+                "method": "GET",
+                "body": "",
+                "headers": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ]
+              }
             }
           }
         }
-      }
-specs:
-- selector: span[name = "Tracetest trigger"]
-  assertions:
-    - tracetest.selected_spans.count = 1
-    - tracetest.response.status = 200
-    # - tracetest.response.body | json_path '.id' = "${EXAMPLE_TEST_ID}"
-    - tracetest.response.body contains '"id":"${EXAMPLE_TEST_ID}"'
-- selector: span[name="POST /api/tests" tracetest.span.type="http"]
-  assertions:
-  - tracetest.selected_spans.count = 1
+  specs:
+  - selector: span[name = "Tracetest trigger"]
+    assertions:
+    - attr:tracetest.selected_spans.count = 1
+    - attr:tracetest.response.status = 200
+    # - attr:tracetest.response.body | json_path '.id' = "${EXAMPLE_TEST_ID}"
+    - attr:tracetest.response.body contains '"id":"${EXAMPLE_TEST_ID}"'
+  - selector: span[name="POST /api/tests" tracetest.span.type="http"]
+    assertions:
+    - attr:tracetest.selected_spans.count = 1
