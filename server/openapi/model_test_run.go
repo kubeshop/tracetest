@@ -42,6 +42,8 @@ type TestRun struct {
 
 	CompletedAt time.Time `json:"completedAt,omitempty"`
 
+	EnvSnapshot []EnvironmentValue `json:"envSnapshot,omitempty"`
+
 	TriggerResult TriggerResult `json:"triggerResult,omitempty"`
 
 	Trace Trace `json:"trace,omitempty"`
@@ -55,6 +57,11 @@ type TestRun struct {
 
 // AssertTestRunRequired checks if the required fields are not zero-ed
 func AssertTestRunRequired(obj TestRun) error {
+	for _, el := range obj.EnvSnapshot {
+		if err := AssertEnvironmentValueRequired(el); err != nil {
+			return err
+		}
+	}
 	if err := AssertTriggerResultRequired(obj.TriggerResult); err != nil {
 		return err
 	}

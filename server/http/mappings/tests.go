@@ -39,6 +39,24 @@ func (m OpenAPI) Test(in model.Test) openapi.Test {
 	}
 }
 
+func (m OpenAPI) Environment(in model.Environment) openapi.Environment {
+	return openapi.Environment{
+		Id:          string(in.ID),
+		Name:        in.Name,
+		Description: in.Description,
+		Values:      m.EnvironmentValues(in.Values),
+	}
+}
+
+func (m OpenAPI) EnvironmentValues(in []model.EnvironmentValue) []openapi.EnvironmentValue {
+	values := make([]openapi.EnvironmentValue, len(in))
+	for i, v := range in {
+		values[i] = openapi.EnvironmentValue{Key: v.Key, Value: v.Value}
+	}
+
+	return values
+}
+
 func (m OpenAPI) Outputs(in model.OrderedMap[string, model.Output]) []openapi.TestOutput {
 	res := make([]openapi.TestOutput, 0, in.Len())
 	in.ForEach(func(key string, val model.Output) error {
@@ -81,6 +99,15 @@ func (m OpenAPI) Tests(in []model.Test) []openapi.Test {
 	}
 
 	return tests
+}
+
+func (m OpenAPI) Environments(in []model.Environment) []openapi.Environment {
+	environments := make([]openapi.Environment, len(in))
+	for i, t := range in {
+		environments[i] = m.Environment(t)
+	}
+
+	return environments
 }
 
 func (m OpenAPI) Specs(in model.OrderedMap[model.SpanQuery, model.NamedAssertions]) openapi.TestSpecs {
@@ -450,4 +477,22 @@ func (m Model) Runs(in []openapi.TestRun) ([]model.Run, error) {
 	}
 
 	return runs, nil
+}
+
+func (m Model) EnvironmentValue(in []openapi.EnvironmentValue) []model.EnvironmentValue {
+	values := make([]model.EnvironmentValue, len(in))
+	for i, h := range in {
+		values[i] = model.EnvironmentValue{Key: h.Key, Value: h.Value}
+	}
+
+	return values
+}
+
+func (m Model) Environment(in openapi.Environment) model.Environment {
+	return model.Environment{
+		ID:          id.ID(in.Id),
+		Name:        in.Name,
+		Description: in.Description,
+		Values:      m.EnvironmentValue(in.Values),
+	}
 }

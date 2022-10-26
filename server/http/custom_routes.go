@@ -37,6 +37,7 @@ func (c *customController) Routes() openapi.Routes {
 	routes[c.getRouteIndex("GetTestVersionDefinitionFile")].HandlerFunc = c.GetTestVersionDefinitionFile
 	routes[c.getRouteIndex("GetTests")].HandlerFunc = c.GetTests
 	routes[c.getRouteIndex("GetTestRuns")].HandlerFunc = c.GetTestRuns
+	routes[c.getRouteIndex("GetEnvironments")].HandlerFunc = c.GetEnvironments
 
 	for index, route := range routes {
 		routeName := fmt.Sprintf("%s %s", route.Method, route.Pattern)
@@ -107,7 +108,34 @@ func (c *customController) GetTestRuns(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("X-Total-Count", strconv.Itoa(res.count))
 	openapi.EncodeJSONResponse(res.items, &result.Code, w)
+}
 
+// GetEnvironments - Get environments
+func (c *customController) GetEnvironments(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+	takeParam, err := parseInt32Parameter(query.Get("take"), false)
+	if err != nil {
+		c.errorHandler(w, r, &openapi.ParsingError{Err: err}, nil)
+		return
+	}
+	skipParam, err := parseInt32Parameter(query.Get("skip"), false)
+	if err != nil {
+		c.errorHandler(w, r, &openapi.ParsingError{Err: err}, nil)
+		return
+	}
+	queryParam := query.Get("query")
+	sortByParam := query.Get("sortBy")
+	sortDirectionParam := query.Get("sortDirection")
+	result, err := c.service.GetEnvironments(r.Context(), takeParam, skipParam, queryParam, sortByParam, sortDirectionParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	res := result.Body.(paginated[openapi.Environment])
+
+	w.Header().Set("X-Total-Count", strconv.Itoa(res.count))
+	openapi.EncodeJSONResponse(res.items, &result.Code, w)
 }
 
 // GetRunResultJUnit - get test run results in JUnit xml format

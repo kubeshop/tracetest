@@ -115,3 +115,41 @@ func (m *MockRepository) Drop() error {
 	args := m.Called()
 	return args.Error(0)
 }
+
+// environments
+
+func (m *MockRepository) CreateEnvironment(_ context.Context, environment model.Environment) (model.Environment, error) {
+	args := m.Called(environment)
+	return args.Get(0).(model.Environment), args.Error(1)
+}
+
+func (m *MockRepository) UpdateEnvironment(_ context.Context, environment model.Environment) (model.Environment, error) {
+	args := m.Called(environment)
+	return args.Get(0).(model.Environment), args.Error(1)
+}
+
+func (m *MockRepository) DeleteEnvironment(_ context.Context, environment model.Environment) error {
+	args := m.Called(environment)
+	return args.Error(0)
+}
+
+func (m *MockRepository) EnvironmentIDExists(_ context.Context, id id.ID) (bool, error) {
+	args := m.Called(id)
+	return args.Bool(0), args.Error(1)
+}
+
+func (m *MockRepository) GetEnvironment(_ context.Context, id id.ID) (model.Environment, error) {
+	args := m.Called(id)
+	return args.Get(0).(model.Environment), args.Error(1)
+}
+
+func (m *MockRepository) GetEnvironments(_ context.Context, take, skip int32, query, sortBy, sortDirection string) (model.List[model.Environment], error) {
+	args := m.Called(take, skip, query, sortBy, sortDirection)
+	environments := args.Get(0).([]model.Environment)
+
+	list := model.List[model.Environment]{
+		Items:      environments,
+		TotalCount: len(environments),
+	}
+	return list, args.Error(1)
+}

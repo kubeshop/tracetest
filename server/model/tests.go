@@ -121,6 +121,19 @@ type (
 		ObservedValue string
 		CompareErr    error
 	}
+
+	Environment struct {
+		ID          id.ID
+		Name        string
+		Description string
+		CreatedAt   time.Time
+		Values      []EnvironmentValue
+	}
+
+	EnvironmentValue struct {
+		Key   string
+		Value string
+	}
 )
 
 func (t Test) HasID() bool {
