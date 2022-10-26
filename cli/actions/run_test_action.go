@@ -87,10 +87,15 @@ func (a runTestAction) runDefinition(ctx context.Context, params runDefParams) e
 }
 
 func (a runTestAction) runDefinitionFile(ctx context.Context, f file.File, params runDefParams) error {
+	resolvedFile, err := f.ResolveVariables()
+	if err != nil {
+		return err
+	}
+
 	body, resp, err := a.client.ApiApi.
 		ExecuteDefinition(ctx).
 		TextDefinition(openapi.TextDefinition{
-			Content: openapi.PtrString(f.Contents()),
+			Content: openapi.PtrString(resolvedFile.Contents()),
 			RunInformation: &openapi.TestRunInformation{
 				Metadata: params.Metadata,
 			},
