@@ -1,6 +1,6 @@
 import TestCardActions from 'components/TestCard/TestCardActions';
 import {noop} from 'lodash';
-import {useTransaction} from '../../providers/TransactionRunDetail/TransactionRunDetailProvider';
+import {useTransaction} from 'providers/TransactionRunDetail/TransactionRunDetailProvider';
 import * as S from './TransactionHeader.styled';
 
 interface IProps {
@@ -9,6 +9,7 @@ interface IProps {
 
 const TransactionHeader = ({onBack}: IProps) => {
   const {transaction} = useTransaction();
+
   return (
     <S.Container>
       <S.Section>
