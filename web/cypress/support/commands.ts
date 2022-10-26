@@ -200,10 +200,10 @@ Cypress.Commands.add('createAssertion', (index = 0) => {
   cy.get('[data-cy=assertion-form]', {timeout: 10000}).should('be.visible');
   cy.get('[data-cy=editor-fallback]').should('not.exist');
 
-  cy.get('[data-cy=expression-editor] [contenteditable]').first().type('db', {delay: 100});
+  cy.get('[data-cy=expression-editor] [contenteditable]').first().type('db.name', {delay: 100});
 
   const attributeListId = getAttributeListId(index);
-  cy.get(attributeListId).click();
+  cy.get(attributeListId, {timeout: 10000}).first().click();
 
   cy.get('[data-cy=assertion-check-operator]').click({force: true});
 
