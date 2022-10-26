@@ -57,6 +57,7 @@ const Pagination = <T extends any>({
             pageSize={take}
             current={page}
             total={total}
+            showSizeChanger={false}
           />
         </S.Footer>
       )}
