@@ -2,6 +2,7 @@ package model
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/kubeshop/tracetest/server/id"
@@ -103,6 +104,9 @@ type (
 		Fail          int
 
 		Metadata RunMetadata
+
+		// environment
+		Environment Environment
 	}
 
 	RunResults struct {
@@ -120,6 +124,19 @@ type (
 		SpanID        *trace.SpanID
 		ObservedValue string
 		CompareErr    error
+	}
+
+	Environment struct {
+		ID          string
+		Name        string
+		Description string
+		CreatedAt   time.Time
+		Values      []EnvironmentValue
+	}
+
+	EnvironmentValue struct {
+		Key   string
+		Value string
 	}
 )
 
@@ -171,6 +188,10 @@ func (e *AssertionExpression) Type() string {
 	}
 
 	return e.LiteralValue.Type
+}
+
+func (e Environment) GetSlug() string {
+	return strings.ToLower(strings.ReplaceAll(strings.TrimSpace(e.Name), " ", "-"))
 }
 
 type RunState string

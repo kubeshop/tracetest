@@ -18,12 +18,16 @@ import (
 // The ApiApiRouter implementation should parse necessary information from the http request,
 // pass the data to a ApiApiServicer to perform the required actions, then write the service results to the http response.
 type ApiApiRouter interface {
+	CreateEnvironment(http.ResponseWriter, *http.Request)
 	CreateTest(http.ResponseWriter, *http.Request)
+	DeleteEnvironment(http.ResponseWriter, *http.Request)
 	DeleteTest(http.ResponseWriter, *http.Request)
 	DeleteTestRun(http.ResponseWriter, *http.Request)
 	DryRunAssertion(http.ResponseWriter, *http.Request)
 	ExecuteDefinition(http.ResponseWriter, *http.Request)
 	ExportTestRun(http.ResponseWriter, *http.Request)
+	GetEnvironment(http.ResponseWriter, *http.Request)
+	GetEnvironments(http.ResponseWriter, *http.Request)
 	GetRunResultJUnit(http.ResponseWriter, *http.Request)
 	GetTest(http.ResponseWriter, *http.Request)
 	GetTestResultSelectedSpans(http.ResponseWriter, *http.Request)
@@ -38,6 +42,7 @@ type ApiApiRouter interface {
 	RunTest(http.ResponseWriter, *http.Request)
 	SetTestOutputs(http.ResponseWriter, *http.Request)
 	SetTestSpecs(http.ResponseWriter, *http.Request)
+	UpdateEnvironment(http.ResponseWriter, *http.Request)
 	UpdateTest(http.ResponseWriter, *http.Request)
 }
 
@@ -46,12 +51,16 @@ type ApiApiRouter interface {
 // while the service implementation can ignored with the .openapi-generator-ignore file
 // and updated with the logic required for the API.
 type ApiApiServicer interface {
+	CreateEnvironment(context.Context, Environment) (ImplResponse, error)
 	CreateTest(context.Context, Test) (ImplResponse, error)
+	DeleteEnvironment(context.Context, string) (ImplResponse, error)
 	DeleteTest(context.Context, string) (ImplResponse, error)
 	DeleteTestRun(context.Context, string, string) (ImplResponse, error)
 	DryRunAssertion(context.Context, string, string, TestSpecs) (ImplResponse, error)
 	ExecuteDefinition(context.Context, TextDefinition) (ImplResponse, error)
 	ExportTestRun(context.Context, string, string) (ImplResponse, error)
+	GetEnvironment(context.Context, string) (ImplResponse, error)
+	GetEnvironments(context.Context, int32, int32, string, string, string) (ImplResponse, error)
 	GetRunResultJUnit(context.Context, string, string) (ImplResponse, error)
 	GetTest(context.Context, string) (ImplResponse, error)
 	GetTestResultSelectedSpans(context.Context, string, string, string) (ImplResponse, error)
@@ -66,5 +75,6 @@ type ApiApiServicer interface {
 	RunTest(context.Context, string, TestRunInformation) (ImplResponse, error)
 	SetTestOutputs(context.Context, string, []TestOutput) (ImplResponse, error)
 	SetTestSpecs(context.Context, string, TestSpecs) (ImplResponse, error)
+	UpdateEnvironment(context.Context, string, Environment) (ImplResponse, error)
 	UpdateTest(context.Context, string, Test) (ImplResponse, error)
 }

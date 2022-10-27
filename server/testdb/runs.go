@@ -44,7 +44,10 @@ INSERT INTO test_runs (
 	"pass",
 	"fail",
 
-	"metadata"
+	"metadata",
+
+	-- environment
+	"environment"
 ) VALUES (
 	nextval('` + runSequenceName + `'), -- id
 	$1,   -- test_id
@@ -71,7 +74,8 @@ INSERT INTO test_runs (
 	0,    -- pass
 	0,    -- fail
 
-	$7 -- metadata
+	$7, -- metadata
+	$8 -- environment
 )
 RETURNING "id"`
 
@@ -117,6 +121,11 @@ func (td *postgresDB) CreateRun(ctx context.Context, test model.Test, run model.
 		return model.Run{}, fmt.Errorf("encoding error: %w", err)
 	}
 
+	jsonEnvironment, err := json.Marshal(run.Environment)
+	if err != nil {
+		return model.Run{}, fmt.Errorf("encoding error: %w", err)
+	}
+
 	tx, err := td.db.BeginTx(ctx, nil)
 	if err != nil {
 		return model.Run{}, fmt.Errorf("sql beginTx: %w", err)
@@ -139,6 +148,7 @@ func (td *postgresDB) CreateRun(ctx context.Context, test model.Test, run model.
 		run.TraceID.String(),
 		run.SpanID.String(),
 		jsonMetadata,
+		jsonEnvironment,
 	).Scan(&runID)
 	if err != nil {
 		tx.Rollback()
@@ -173,7 +183,8 @@ UPDATE test_runs SET
 	"pass" = $13,
 	"fail" = $14,
 
-	"metadata" = $15
+	"metadata" = $15,
+	"environment" = $18
 
 WHERE id = $16 AND test_id = $17
 `
@@ -210,6 +221,11 @@ func (td *postgresDB) UpdateRun(ctx context.Context, r model.Run) error {
 		return fmt.Errorf("encoding error: %w", err)
 	}
 
+	jsonEnvironment, err := json.Marshal(r.Environment)
+	if err != nil {
+		return fmt.Errorf("encoding error: %w", err)
+	}
+
 	var lastError *string
 	if r.LastError != nil {
 		e := r.LastError.Error()
@@ -237,6 +253,7 @@ func (td *postgresDB) UpdateRun(ctx context.Context, r model.Run) error {
 		jsonMetadata,
 		r.ID,
 		r.TestID,
+		jsonEnvironment,
 	)
 	if err != nil {
 		return fmt.Errorf("sql exec: %w", err)
@@ -302,7 +319,8 @@ SELECT
 	"outputs",
 	"last_error",
 
-	"metadata"
+	"metadata",
+	"environment"
 FROM test_runs
 `
 
@@ -378,6 +396,7 @@ func readRunRow(row scanner) (model.Run, error) {
 		jsonTestResults,
 		jsonTrace,
 		jsonOutputs,
+		jsonEnvironment,
 		jsonMetadata []byte
 
 		lastError *string
@@ -403,6 +422,7 @@ func readRunRow(row scanner) (model.Run, error) {
 		&jsonOutputs,
 		&lastError,
 		&jsonMetadata,
+		&jsonEnvironment,
 	)
 
 	switch err {
@@ -434,6 +454,11 @@ func readRunRow(row scanner) (model.Run, error) {
 		err = json.Unmarshal(jsonMetadata, &r.Metadata)
 		if err != nil {
 			return model.Run{}, fmt.Errorf("cannot parse Metadata: %w", err)
+		}
+
+		err = json.Unmarshal(jsonEnvironment, &r.Environment)
+		if err != nil {
+			return model.Run{}, fmt.Errorf("cannot parse Environment: %w", err)
 		}
 
 		if traceID != "" {
