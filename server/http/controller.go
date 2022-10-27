@@ -11,6 +11,7 @@ import (
 	"github.com/kubeshop/tracetest/server/assertions"
 	"github.com/kubeshop/tracetest/server/assertions/selectors"
 	"github.com/kubeshop/tracetest/server/executor"
+	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/http/mappings"
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/junit"
@@ -351,7 +352,12 @@ func (c *controller) DryRunAssertion(ctx context.Context, testID, runID string, 
 	if err != nil {
 		return openapi.Response(http.StatusBadRequest, err.Error()), nil
 	}
-	results, allPassed := assertions.Assert(definition, *run.Trace)
+
+	ds := []expression.DataStore{expression.EnvironmentDataStore{
+		Values: run.Environment.Values,
+	}}
+
+	results, allPassed := assertions.Assert(definition, *run.Trace, ds)
 	res := c.mappers.Out.Result(&model.RunResults{
 		AllPassed: allPassed,
 		Results:   results,

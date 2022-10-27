@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/model"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/propagation"
@@ -101,12 +102,16 @@ func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, req Asse
 		return model.Run{}, fmt.Errorf("trace not available")
 	}
 
-	outputs, err := e.outputsProcessor(ctx, req.Test.Outputs, *run.Trace)
+	ds := []expression.DataStore{expression.EnvironmentDataStore{
+		Values: req.Run.Environment.Values,
+	}}
+
+	outputs, err := e.outputsProcessor(ctx, req.Test.Outputs, *run.Trace, ds)
 	if err != nil {
 		return model.Run{}, fmt.Errorf("cannot process outputs: %w", err)
 	}
 
-	assertionResult, allPassed := e.assertionExecutor.Assert(ctx, req.Test.Specs, *run.Trace)
+	assertionResult, allPassed := e.assertionExecutor.Assert(ctx, req.Test.Specs, *run.Trace, ds)
 
 	run = run.SuccessfullyAsserted(
 		outputs,

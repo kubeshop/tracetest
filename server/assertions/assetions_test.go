@@ -5,6 +5,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/assertions"
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
+	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/traces"
@@ -207,7 +208,7 @@ func TestAssertion(t *testing.T) {
 			cl := c
 			// t.Parallel()
 
-			actual, allPassed := assertions.Assert(cl.testDef, cl.trace)
+			actual, allPassed := assertions.Assert(cl.testDef, cl.trace, []expression.DataStore{})
 
 			assert.Equal(t, cl.expectedAllPassed, allPassed)
 
