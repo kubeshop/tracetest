@@ -54,6 +54,7 @@ const TestEndpoint = (builder: TTestApiEndpointBuilder) => ({
     query: ({testId, version}) => `/tests/${testId}/version/${version}`,
     providesTags: result => [{type: TracetestApiTags.TEST, id: result?.id}],
     transformResponse: (rawTest: TRawTest) => Test(rawTest),
+    keepUnusedDataFor: 10,
   }),
   deleteTestById: builder.mutation<TTest, {testId: string}>({
     query: ({testId}) => ({url: `/tests/${testId}`, method: 'DELETE'}),

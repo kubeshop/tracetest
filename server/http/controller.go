@@ -271,6 +271,32 @@ func (c *controller) RunTest(ctx context.Context, testID string, runInformation 
 	return openapi.Response(200, c.mappers.Out.Run(&run)), nil
 }
 
+func (c *controller) SetTestOutputs(ctx context.Context, testID string, testOutputs []openapi.TestOutput) (openapi.ImplResponse, error) {
+	test, err := c.testDB.GetLatestTestVersion(ctx, id.ID(testID))
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	newOutputs, err := c.mappers.In.Outputs(testOutputs)
+	if err != nil {
+		return openapi.Response(http.StatusBadRequest, err.Error()), nil
+	}
+
+	newTest, err := model.BumpVersionIfOutputsChanged(test, newOutputs)
+	if err != nil {
+		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
+	}
+
+	newTest.Outputs = newOutputs
+
+	newTest, err = c.testDB.UpdateTest(ctx, newTest)
+	if err != nil {
+		return openapi.Response(http.StatusInternalServerError, err.Error()), err
+	}
+
+	return openapi.Response(204, nil), nil
+}
+
 func (c *controller) SetTestSpecs(ctx context.Context, testID string, def openapi.TestSpecs) (openapi.ImplResponse, error) {
 	if err := c.mappers.In.ValidateDefinition(def); err != nil {
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err

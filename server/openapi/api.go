@@ -36,6 +36,7 @@ type ApiApiRouter interface {
 	ImportTestRun(http.ResponseWriter, *http.Request)
 	RerunTestRun(http.ResponseWriter, *http.Request)
 	RunTest(http.ResponseWriter, *http.Request)
+	SetTestOutputs(http.ResponseWriter, *http.Request)
 	SetTestSpecs(http.ResponseWriter, *http.Request)
 	UpdateTest(http.ResponseWriter, *http.Request)
 }
@@ -63,6 +64,7 @@ type ApiApiServicer interface {
 	ImportTestRun(context.Context, ExportedTestInformation) (ImplResponse, error)
 	RerunTestRun(context.Context, string, string) (ImplResponse, error)
 	RunTest(context.Context, string, TestRunInformation) (ImplResponse, error)
+	SetTestOutputs(context.Context, string, []TestOutput) (ImplResponse, error)
 	SetTestSpecs(context.Context, string, TestSpecs) (ImplResponse, error)
 	UpdateTest(context.Context, string, Test) (ImplResponse, error)
 }

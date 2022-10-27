@@ -1,5 +1,6 @@
+import {PlusOutlined} from '@ant-design/icons';
 import {Button} from 'antd';
-import {useCallback, useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 
 import OutputModal from 'components/OutputModal/OutputModal';
@@ -67,42 +68,43 @@ const ResponseOutputs = () => {
   const handleOnSave = useCallback(async () => {
     await setTestOutputs({testId, testOutputs: toRawTestOutputs(outputs)}).unwrap();
     const run = await reRunTest({testId, runId}).unwrap();
-    navigate(`/test/${testId}/run/${run.id}/test`);
+    navigate(`/test/${testId}/run/${run.id}/trigger`);
   }, [navigate, outputs, reRunTest, runId, setTestOutputs, testId]);
 
   return !outputs ? (
     <SkeletonResponse />
   ) : (
     <>
-      {isPending && (
-        <S.Actions>
-          <Button ghost loading={isLoading} onClick={handleOnCancel} type="primary">
-            Cancel
-          </Button>
-          <Button loading={isLoading} onClick={handleOnSave} type="primary">
-            Save
-          </Button>
-        </S.Actions>
-      )}
-
       <S.HeadersList>
         {outputs.map((output, index) => (
           <OutputRow index={index} key={output.name} output={output} onDelete={handleOnDelete} onEdit={handleOnEdit} />
         ))}
       </S.HeadersList>
 
-      <S.Actions>
+      <div>
         <Button
-          ghost
+          icon={<PlusOutlined />}
           onClick={() => {
             setIsModalOpen(true);
             setSelectedIndex(-1);
           }}
-          type="primary"
+          style={{fontWeight: 600, height: 'auto', padding: 0}}
+          type="link"
         >
           Add Output
         </Button>
-      </S.Actions>
+      </div>
+
+      {isPending && (
+        <S.Actions>
+          <Button ghost loading={isLoading} onClick={handleOnCancel} type="primary">
+            Reset
+          </Button>
+          <Button loading={isLoading} onClick={handleOnSave} type="primary">
+            Save & Run
+          </Button>
+        </S.Actions>
+      )}
 
       <OutputModal
         index={selectedIndex}
