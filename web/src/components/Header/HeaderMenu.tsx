@@ -2,7 +2,7 @@ import {Popover, Typography} from 'antd';
 
 import {DOCUMENTATION_URL, GITHUB_URL} from 'constants/Common.constants';
 import {useGuidedTour} from 'providers/GuidedTour/GuidedTour.provider';
-import {useMemo} from 'react';
+import {useCallback, useMemo} from 'react';
 import {useLocation, useParams} from 'react-router-dom';
 import HomeAnalyticsService from 'services/Analytics/HomeAnalytics.service';
 import {switchTraceMode} from '../GuidedTour/traceStepList';
@@ -16,17 +16,19 @@ const HeaderMenu = () => {
   const params = useParams();
   const {setState, state} = useGuidedTour();
 
+  const onStartOnboarding = useCallback(() => {
+    switchTraceMode(0);
+    setState(st => ({...st, tourActive: true, run: true}));
+  }, [setState]);
+
   const content = useMemo(
     () =>
       ShowOnboardingContent(
         onGuidedTourClick,
-        () => {
-          switchTraceMode(0);
-          setState(st => ({...st, tourActive: true, run: true}));
-        },
+        () => onStartOnboarding(),
         () => setState(st => ({...st, dialog: false}))
       ),
-    [setState]
+    [onStartOnboarding, setState]
   );
 
   return (
@@ -64,7 +66,7 @@ const HeaderMenu = () => {
                 key: 'Onboarding',
                 disabled: !params.runId,
                 label: (
-                  <a key="guidedTour" onClick={() => setState(st => ({...st, dialog: !st.dialog}))}>
+                  <a key="guidedTour" onClick={onStartOnboarding}>
                     Show Onboarding
                   </a>
                 ),
