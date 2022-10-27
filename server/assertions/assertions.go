@@ -7,14 +7,14 @@ import (
 	"github.com/kubeshop/tracetest/server/traces"
 )
 
-func Assert(defs model.OrderedMap[model.SpanQuery, model.NamedAssertions], trace traces.Trace) (model.OrderedMap[model.SpanQuery, []model.AssertionResult], bool) {
+func Assert(defs model.OrderedMap[model.SpanQuery, model.NamedAssertions], trace traces.Trace, ds []expression.DataStore) (model.OrderedMap[model.SpanQuery, []model.AssertionResult], bool) {
 	testResult := model.OrderedMap[model.SpanQuery, []model.AssertionResult]{}
 	allPassed := true
 	defs.ForEach(func(spanQuery model.SpanQuery, asserts model.NamedAssertions) error {
 		spans := selector(spanQuery).Filter(trace)
 		assertionResults := make([]model.AssertionResult, 0)
 		for _, assertion := range asserts.Assertions {
-			res := assert(assertion, spans)
+			res := assert(assertion, spans, ds)
 			if !res.AllPassed {
 				allPassed = false
 			}
@@ -27,11 +27,12 @@ func Assert(defs model.OrderedMap[model.SpanQuery, model.NamedAssertions], trace
 	return testResult, allPassed
 }
 
-func assert(assertion model.Assertion, spans traces.Spans) model.AssertionResult {
-	ds := []expression.DataStore{
+func assert(assertion model.Assertion, spans traces.Spans, ds []expression.DataStore) model.AssertionResult {
+	ds = append([]expression.DataStore{
 		expression.MetaAttributesDataStore{SelectedSpans: spans},
 		expression.VariableDataStore{},
-	}
+	}, ds...)
+
 	allPassed := true
 	spanResults := make([]model.SpanAssertionResult, 0, len(spans))
 	spans.
