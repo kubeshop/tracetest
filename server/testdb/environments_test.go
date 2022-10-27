@@ -40,12 +40,12 @@ func TestDeleteEnvironment(t *testing.T) {
 	err := db.DeleteEnvironment(context.TODO(), environment)
 	require.NoError(t, err)
 
-	actual, err := db.GetLatestTestVersion(context.TODO(), environment.ID)
+	actual, err := db.GetEnvironment(context.TODO(), environment.ID)
 	assert.ErrorIs(t, err, testdb.ErrNotFound)
 	assert.Empty(t, actual)
 }
 
-func TestGetEnvironment(t *testing.T) {
+func TestUpdateEnvironment(t *testing.T) {
 	db, clean := getDB()
 	defer clean()
 
@@ -56,7 +56,7 @@ func TestGetEnvironment(t *testing.T) {
 	_, err := db.UpdateEnvironment(context.TODO(), environment)
 	require.NoError(t, err)
 
-	latestTest, err := db.GetEnvironment(context.TODO(), environment.ID)
+	latestTest, err := db.GetEnvironment(context.TODO(), environment.GetSlug())
 	assert.NoError(t, err)
 	assert.Equal(t, "1 v2", latestTest.Name)
 	assert.Equal(t, "1 v2 description", latestTest.Description)

@@ -41,7 +41,7 @@ func (m OpenAPI) Test(in model.Test) openapi.Test {
 
 func (m OpenAPI) Environment(in model.Environment) openapi.Environment {
 	return openapi.Environment{
-		Id:          string(in.ID),
+		Id:          in.ID,
 		Name:        in.Name,
 		Description: in.Description,
 		Values:      m.EnvironmentValues(in.Values),
@@ -491,7 +491,7 @@ func (m Model) EnvironmentValue(in []openapi.EnvironmentValue) []model.Environme
 
 func (m Model) Environment(in openapi.Environment) model.Environment {
 	return model.Environment{
-		ID:          id.ID(in.Id),
+		ID:          in.Id,
 		Name:        in.Name,
 		Description: in.Description,
 		Values:      m.EnvironmentValue(in.Values),

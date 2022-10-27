@@ -8,7 +8,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 )
 
@@ -26,10 +25,11 @@ INSERT INTO environments (
 
 	updateQuery = `
 		UPDATE environments SET
-			"name" = $2,
-			"description" = $3,
-			"created_at" = $4,
-			"values" = $5
+			"id" = $2,
+			"name" = $3,
+			"description" = $4,
+			"created_at" = $5,
+			"values" = $6
 		WHERE id = $1
 	`
 
@@ -60,10 +60,10 @@ var environmentSortingFields = map[string]string{
 }
 
 func (td *postgresDB) CreateEnvironment(ctx context.Context, environment model.Environment) (model.Environment, error) {
-	environment.ID = IDGen.ID()
+	environment.ID = environment.GetSlug()
 	environment.CreatedAt = time.Now()
 
-	return td.insertIntoEnvironments(ctx, environment, insertQuery)
+	return td.insertIntoEnvironments(ctx, environment)
 }
 
 func (td *postgresDB) UpdateEnvironment(ctx context.Context, environment model.Environment) (model.Environment, error) {
@@ -74,8 +74,9 @@ func (td *postgresDB) UpdateEnvironment(ctx context.Context, environment model.E
 
 	// keep the same creation date to keep sort order
 	environment.CreatedAt = oldEnvironment.CreatedAt
+	environment.ID = environment.GetSlug()
 
-	return td.insertIntoEnvironments(ctx, environment, updateQuery)
+	return td.updateIntoEnvironments(ctx, environment, oldEnvironment.ID)
 }
 
 func (td *postgresDB) DeleteEnvironment(ctx context.Context, environment model.Environment) error {
@@ -148,7 +149,7 @@ func (td *postgresDB) GetEnvironments(ctx context.Context, take, skip int32, que
 	}, nil
 }
 
-func (td *postgresDB) GetEnvironment(ctx context.Context, id id.ID) (model.Environment, error) {
+func (td *postgresDB) GetEnvironment(ctx context.Context, id string) (model.Environment, error) {
 	stmt, err := td.db.Prepare(getQuery + " WHERE e.id = $1")
 
 	if err != nil {
@@ -164,7 +165,7 @@ func (td *postgresDB) GetEnvironment(ctx context.Context, id id.ID) (model.Envir
 	return environment, nil
 }
 
-func (td *postgresDB) EnvironmentIDExists(ctx context.Context, id id.ID) (bool, error) {
+func (td *postgresDB) EnvironmentIDExists(ctx context.Context, id string) (bool, error) {
 	exists := false
 
 	row := td.db.QueryRowContext(ctx, idExistsQuery, id)
@@ -225,8 +226,8 @@ func (td *postgresDB) countEnvironments(ctx context.Context, condition, cleanSea
 	return count, nil
 }
 
-func (td *postgresDB) insertIntoEnvironments(ctx context.Context, environment model.Environment, query string) (model.Environment, error) {
-	stmt, err := td.db.Prepare(query)
+func (td *postgresDB) insertIntoEnvironments(ctx context.Context, environment model.Environment) (model.Environment, error) {
+	stmt, err := td.db.Prepare(insertQuery)
 	if err != nil {
 		return model.Environment{}, fmt.Errorf("sql prepare: %w", err)
 	}
@@ -240,6 +241,35 @@ func (td *postgresDB) insertIntoEnvironments(ctx context.Context, environment mo
 	_, err = stmt.ExecContext(
 		ctx,
 		environment.ID,
+		environment.Name,
+		environment.Description,
+		environment.CreatedAt,
+		jsonValues,
+	)
+
+	if err != nil {
+		return model.Environment{}, fmt.Errorf("sql exec: %w", err)
+	}
+
+	return environment, nil
+}
+
+func (td *postgresDB) updateIntoEnvironments(ctx context.Context, environment model.Environment, oldId string) (model.Environment, error) {
+	stmt, err := td.db.Prepare(updateQuery)
+	if err != nil {
+		return model.Environment{}, fmt.Errorf("sql prepare: %w", err)
+	}
+	defer stmt.Close()
+
+	jsonValues, err := json.Marshal(environment.Values)
+	if err != nil {
+		return model.Environment{}, fmt.Errorf("encoding error: %w", err)
+	}
+
+	_, err = stmt.ExecContext(
+		ctx,
+		oldId,
+		environment.GetSlug(),
 		environment.Name,
 		environment.Description,
 		environment.CreatedAt,

@@ -35,8 +35,8 @@ type EnvironmentRepository interface {
 	CreateEnvironment(context.Context, Environment) (Environment, error)
 	UpdateEnvironment(context.Context, Environment) (Environment, error)
 	DeleteEnvironment(context.Context, Environment) error
-	GetEnvironment(_ context.Context, environmentId id.ID) (Environment, error)
-	EnvironmentIDExists(context.Context, id.ID) (bool, error)
+	GetEnvironment(_ context.Context, id string) (Environment, error)
+	EnvironmentIDExists(context.Context, string) (bool, error)
 	GetEnvironments(_ context.Context, take, skip int32, query, sortBy, sortDirection string) (List[Environment], error)
 }
 

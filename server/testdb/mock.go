@@ -133,12 +133,12 @@ func (m *MockRepository) DeleteEnvironment(_ context.Context, environment model.
 	return args.Error(0)
 }
 
-func (m *MockRepository) EnvironmentIDExists(_ context.Context, id id.ID) (bool, error) {
+func (m *MockRepository) EnvironmentIDExists(_ context.Context, id string) (bool, error) {
 	args := m.Called(id)
 	return args.Bool(0), args.Error(1)
 }
 
-func (m *MockRepository) GetEnvironment(_ context.Context, id id.ID) (model.Environment, error) {
+func (m *MockRepository) GetEnvironment(_ context.Context, id string) (model.Environment, error) {
 	args := m.Called(id)
 	return args.Get(0).(model.Environment), args.Error(1)
 }

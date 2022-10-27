@@ -487,7 +487,7 @@ func metadata(in *map[string]string) model.RunMetadata {
 
 func environment(ctx context.Context, testDB model.Repository, environmentId string) model.Environment {
 	if environmentId != "" {
-		environment, err := testDB.GetEnvironment(ctx, id.ID(environmentId))
+		environment, err := testDB.GetEnvironment(ctx, environmentId)
 
 		if err != nil {
 			return model.Environment{}
@@ -561,7 +561,7 @@ func (c *controller) CreateEnvironment(ctx context.Context, in openapi.Environme
 }
 
 func (c *controller) DeleteEnvironment(ctx context.Context, environmentId string) (openapi.ImplResponse, error) {
-	environment, err := c.testDB.GetEnvironment(ctx, id.ID(environmentId))
+	environment, err := c.testDB.GetEnvironment(ctx, environmentId)
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -575,7 +575,7 @@ func (c *controller) DeleteEnvironment(ctx context.Context, environmentId string
 }
 
 func (c *controller) GetEnvironment(ctx context.Context, environmentId string) (openapi.ImplResponse, error) {
-	environment, err := c.testDB.GetEnvironment(ctx, id.ID(environmentId))
+	environment, err := c.testDB.GetEnvironment(ctx, environmentId)
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -602,7 +602,7 @@ func (c *controller) GetEnvironments(ctx context.Context, take, skip int32, quer
 func (c *controller) UpdateEnvironment(ctx context.Context, environmentId string, in openapi.Environment) (openapi.ImplResponse, error) {
 	updated := c.mappers.In.Environment(in)
 
-	environment, err := c.testDB.GetEnvironment(ctx, id.ID(environmentId))
+	environment, err := c.testDB.GetEnvironment(ctx, environmentId)
 	if err != nil {
 		return handleDBError(err), err
 	}

@@ -2,6 +2,7 @@ package model
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/kubeshop/tracetest/server/id"
@@ -126,7 +127,7 @@ type (
 	}
 
 	Environment struct {
-		ID          id.ID
+		ID          string
 		Name        string
 		Description string
 		CreatedAt   time.Time
@@ -187,6 +188,10 @@ func (e *AssertionExpression) Type() string {
 	}
 
 	return e.LiteralValue.Type
+}
+
+func (e Environment) GetSlug() string {
+	return strings.ToLower(strings.ReplaceAll(strings.TrimSpace(e.Name), " ", "-"))
 }
 
 type RunState string
