@@ -764,3 +764,23 @@ func (c *controller) buildDataStores(ctx context.Context, info openapi.ResolveRe
 
 	return ds, nil
 }
+
+func (c *controller) CreateTransaction(ctx context.Context, transaction openapi.Transaction) (openapi.ImplResponse, error) {
+	panic("unimplemented")
+}
+
+func (c *controller) DeleteTransaction(ctx context.Context, id string) (openapi.ImplResponse, error) {
+	panic("unimplemented")
+}
+
+func (c *controller) GetTransaction(ctx context.Context, id string) (openapi.ImplResponse, error) {
+	panic("unimplemented")
+}
+
+func (c *controller) GetTransactions(ctx context.Context, take, skip int32, query, sortBy, sortDirection string) (openapi.ImplResponse, error) {
+	panic("unimplemented")
+}
+
+func (c *controller) UpdateTransaction(ctx context.Context, id string, transaction openapi.Transaction) (openapi.ImplResponse, error) {
+	panic("unimplemented")
+}

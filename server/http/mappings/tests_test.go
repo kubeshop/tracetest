@@ -29,7 +29,7 @@ func Test_OpenApiToModel_Outputs(t *testing.T) {
 		Value:    "attr:tracetest.selected_spans.count",
 	})
 
-	m := mappings.New(traces.NewConversionConfig(), nil)
+	m := mappings.New(traces.NewConversionConfig(), nil, nil)
 
 	actual, err := m.In.Test(in)
 	require.NoError(t, err)

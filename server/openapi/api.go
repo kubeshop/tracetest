@@ -20,9 +20,11 @@ import (
 type ApiApiRouter interface {
 	CreateEnvironment(http.ResponseWriter, *http.Request)
 	CreateTest(http.ResponseWriter, *http.Request)
+	CreateTransaction(http.ResponseWriter, *http.Request)
 	DeleteEnvironment(http.ResponseWriter, *http.Request)
 	DeleteTest(http.ResponseWriter, *http.Request)
 	DeleteTestRun(http.ResponseWriter, *http.Request)
+	DeleteTransaction(http.ResponseWriter, *http.Request)
 	DryRunAssertion(http.ResponseWriter, *http.Request)
 	ExecuteDefinition(http.ResponseWriter, *http.Request)
 	ExportTestRun(http.ResponseWriter, *http.Request)
@@ -38,6 +40,8 @@ type ApiApiRouter interface {
 	GetTestVersion(http.ResponseWriter, *http.Request)
 	GetTestVersionDefinitionFile(http.ResponseWriter, *http.Request)
 	GetTests(http.ResponseWriter, *http.Request)
+	GetTransaction(http.ResponseWriter, *http.Request)
+	GetTransactions(http.ResponseWriter, *http.Request)
 	ImportTestRun(http.ResponseWriter, *http.Request)
 	RerunTestRun(http.ResponseWriter, *http.Request)
 	RunTest(http.ResponseWriter, *http.Request)
@@ -45,6 +49,7 @@ type ApiApiRouter interface {
 	SetTestSpecs(http.ResponseWriter, *http.Request)
 	UpdateEnvironment(http.ResponseWriter, *http.Request)
 	UpdateTest(http.ResponseWriter, *http.Request)
+	UpdateTransaction(http.ResponseWriter, *http.Request)
 }
 
 // ApiApiServicer defines the api actions for the ApiApi service
@@ -54,9 +59,11 @@ type ApiApiRouter interface {
 type ApiApiServicer interface {
 	CreateEnvironment(context.Context, Environment) (ImplResponse, error)
 	CreateTest(context.Context, Test) (ImplResponse, error)
+	CreateTransaction(context.Context, Transaction) (ImplResponse, error)
 	DeleteEnvironment(context.Context, string) (ImplResponse, error)
 	DeleteTest(context.Context, string) (ImplResponse, error)
 	DeleteTestRun(context.Context, string, string) (ImplResponse, error)
+	DeleteTransaction(context.Context, string) (ImplResponse, error)
 	DryRunAssertion(context.Context, string, string, TestSpecs) (ImplResponse, error)
 	ExecuteDefinition(context.Context, TextDefinition) (ImplResponse, error)
 	ExportTestRun(context.Context, string, string) (ImplResponse, error)
@@ -72,6 +79,8 @@ type ApiApiServicer interface {
 	GetTestVersion(context.Context, string, int32) (ImplResponse, error)
 	GetTestVersionDefinitionFile(context.Context, string, int32) (ImplResponse, error)
 	GetTests(context.Context, int32, int32, string, string, string) (ImplResponse, error)
+	GetTransaction(context.Context, string) (ImplResponse, error)
+	GetTransactions(context.Context, int32, int32, string, string, string) (ImplResponse, error)
 	ImportTestRun(context.Context, ExportedTestInformation) (ImplResponse, error)
 	RerunTestRun(context.Context, string, string) (ImplResponse, error)
 	RunTest(context.Context, string, TestRunInformation) (ImplResponse, error)
@@ -79,4 +88,5 @@ type ApiApiServicer interface {
 	SetTestSpecs(context.Context, string, TestSpecs) (ImplResponse, error)
 	UpdateEnvironment(context.Context, string, Environment) (ImplResponse, error)
 	UpdateTest(context.Context, string, Test) (ImplResponse, error)
+	UpdateTransaction(context.Context, string, Transaction) (ImplResponse, error)
 }
