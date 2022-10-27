@@ -1,6 +1,6 @@
 import {PlusOutlined} from '@ant-design/icons';
 import {Button} from 'antd';
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 
 import OutputModal from 'components/OutputModal/OutputModal';
@@ -10,7 +10,7 @@ import {useConfirmationModal} from 'providers/ConfirmationModal/ConfirmationModa
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import {useSetTestOutputsMutation, useReRunMutation} from 'redux/apis/TraceTest.api';
 import {selectTestOutputs, selectIsPending} from 'redux/testOutputs/selectors';
-import {outputAdded, outputUpdated, outputDeleted, outputsReverted} from 'redux/testOutputs/slice';
+import {outputsInitiated, outputAdded, outputUpdated, outputDeleted, outputsReverted} from 'redux/testOutputs/slice';
 import {useTest} from 'providers/Test/Test.provider';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import {TTestOutput} from 'types/TestOutput.types';
@@ -22,18 +22,22 @@ const ResponseOutputs = () => {
     run: {id: runId},
   } = useTestRun();
   const {
-    test: {id: testId},
+    test: {id: testId, outputs: testOutputs},
   } = useTest();
 
   const dispatch = useAppDispatch();
   const outputs = useAppSelector(state => selectTestOutputs(state, testId, runId));
   const isPending = useAppSelector(selectIsPending);
   const [setTestOutputs, {isLoading}] = useSetTestOutputsMutation();
-  const [reRunTest] = useReRunMutation();
+  const [reRunTest, {isLoading: isLoadingReRub}] = useReRunMutation();
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const {onOpen} = useConfirmationModal();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    dispatch(outputsInitiated(testOutputs || []));
+  }, [dispatch, testOutputs]);
 
   const handleOnDelete = useCallback(
     (index: number) => {
@@ -97,10 +101,10 @@ const ResponseOutputs = () => {
 
       {isPending && (
         <S.Actions>
-          <Button ghost loading={isLoading} onClick={handleOnCancel} type="primary">
+          <Button ghost loading={isLoading || isLoadingReRub} onClick={handleOnCancel} type="primary">
             Reset
           </Button>
-          <Button loading={isLoading} onClick={handleOnSave} type="primary">
+          <Button loading={isLoading || isLoadingReRub} onClick={handleOnSave} type="primary">
             Save & Run
           </Button>
         </S.Actions>
