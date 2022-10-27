@@ -53,5 +53,6 @@ mkdir -p results/responses
 EXIT_STATUS=0
 bash ./tests.bash || EXIT_STATUS=$?
 bash ./grpc.bash || EXIT_STATUS=$?
+bash ./environments.bash || EXIT_STATUS=$?
 
 exit $EXIT_STATUS

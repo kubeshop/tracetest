@@ -25,6 +25,10 @@ func TestCreateRun(t *testing.T) {
 		Metadata: model.RunMetadata{
 			"key": "Value",
 		},
+		EnvSnapshot: []model.EnvironmentValue{{
+			Key:   "key",
+			Value: "value",
+		}},
 	}
 
 	updated, err := db.CreateRun(context.TODO(), test, run)
@@ -40,6 +44,7 @@ func TestCreateRun(t *testing.T) {
 	assert.Equal(t, run.TraceID, actual.TraceID)
 	assert.Equal(t, run.SpanID, actual.SpanID)
 	assert.Equal(t, run.Metadata, actual.Metadata)
+	assert.Equal(t, run.EnvSnapshot, actual.EnvSnapshot)
 }
 
 func TestCreateRunIDsIncrementForTest(t *testing.T) {
