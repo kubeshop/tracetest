@@ -11,6 +11,8 @@ package openapi
 
 type TestRunInformation struct {
 	Metadata *map[string]string `json:"metadata,omitempty"`
+
+	EnvironmentId string `json:"environmentId,omitempty"`
 }
 
 // AssertTestRunInformationRequired checks if the required fields are not zero-ed

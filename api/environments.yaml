@@ -1,0 +1,25 @@
+openapi: 3.0.0
+
+components:
+  schemas:
+    Environment:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        name:
+          type: string
+        description:
+          type: string
+        values:
+          type: array
+          items:
+            $ref: "#/components/schemas/EnvironmentValue"
+    EnvironmentValue:
+      type: object
+      properties:
+        key:
+          type: string
+        value:
+          type: string

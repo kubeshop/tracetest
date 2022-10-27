@@ -51,10 +51,22 @@ func NewApiApiController(s ApiApiServicer, opts ...ApiApiOption) Router {
 func (c *ApiApiController) Routes() Routes {
 	return Routes{
 		{
+			"CreateEnvironment",
+			strings.ToUpper("Post"),
+			"/api/environments",
+			c.CreateEnvironment,
+		},
+		{
 			"CreateTest",
 			strings.ToUpper("Post"),
 			"/api/tests",
 			c.CreateTest,
+		},
+		{
+			"DeleteEnvironment",
+			strings.ToUpper("Delete"),
+			"/api/environments/{environmentId}",
+			c.DeleteEnvironment,
 		},
 		{
 			"DeleteTest",
@@ -85,6 +97,18 @@ func (c *ApiApiController) Routes() Routes {
 			strings.ToUpper("Get"),
 			"/api/tests/{testId}/run/{runId}/export",
 			c.ExportTestRun,
+		},
+		{
+			"GetEnvironment",
+			strings.ToUpper("Get"),
+			"/api/environments/{environmentId}",
+			c.GetEnvironment,
+		},
+		{
+			"GetEnvironments",
+			strings.ToUpper("Get"),
+			"/api/environments",
+			c.GetEnvironments,
 		},
 		{
 			"GetRunResultJUnit",
@@ -165,12 +189,42 @@ func (c *ApiApiController) Routes() Routes {
 			c.SetTestSpecs,
 		},
 		{
+			"UpdateEnvironment",
+			strings.ToUpper("Put"),
+			"/api/environments/{environmentId}",
+			c.UpdateEnvironment,
+		},
+		{
 			"UpdateTest",
 			strings.ToUpper("Put"),
 			"/api/tests/{testId}",
 			c.UpdateTest,
 		},
 	}
+}
+
+// CreateEnvironment - Create new environment
+func (c *ApiApiController) CreateEnvironment(w http.ResponseWriter, r *http.Request) {
+	environmentParam := Environment{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&environmentParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertEnvironmentRequired(environmentParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.CreateEnvironment(r.Context(), environmentParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
 }
 
 // CreateTest - Create new test
@@ -187,6 +241,22 @@ func (c *ApiApiController) CreateTest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	result, err := c.service.CreateTest(r.Context(), testParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// DeleteEnvironment - delete a environment
+func (c *ApiApiController) DeleteEnvironment(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	environmentIdParam := params["environmentId"]
+
+	result, err := c.service.DeleteEnvironment(r.Context(), environmentIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -292,6 +362,49 @@ func (c *ApiApiController) ExportTestRun(w http.ResponseWriter, r *http.Request)
 	runIdParam := params["runId"]
 
 	result, err := c.service.ExportTestRun(r.Context(), testIdParam, runIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// GetEnvironment - get environment
+func (c *ApiApiController) GetEnvironment(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	environmentIdParam := params["environmentId"]
+
+	result, err := c.service.GetEnvironment(r.Context(), environmentIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// GetEnvironments - Get Environments
+func (c *ApiApiController) GetEnvironments(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+	takeParam, err := parseInt32Parameter(query.Get("take"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	skipParam, err := parseInt32Parameter(query.Get("skip"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	queryParam := query.Get("query")
+	sortByParam := query.Get("sortBy")
+	sortDirectionParam := query.Get("sortDirection")
+	result, err := c.service.GetEnvironments(r.Context(), takeParam, skipParam, queryParam, sortByParam, sortDirectionParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -574,6 +687,33 @@ func (c *ApiApiController) SetTestSpecs(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 	result, err := c.service.SetTestSpecs(r.Context(), testIdParam, testSpecsParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// UpdateEnvironment - update environment
+func (c *ApiApiController) UpdateEnvironment(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	environmentIdParam := params["environmentId"]
+
+	environmentParam := Environment{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&environmentParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertEnvironmentRequired(environmentParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.UpdateEnvironment(r.Context(), environmentIdParam, environmentParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

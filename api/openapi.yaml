@@ -184,7 +184,7 @@ paths:
         content:
           application/json:
             schema:
-                $ref: "./tests.yaml#/components/schemas/TestRunInformation"
+              $ref: "./tests.yaml#/components/schemas/TestRunInformation"
       responses:
         200:
           description: successful operation
@@ -530,3 +530,138 @@ paths:
             application/yaml:
               schema:
                 type: string
+
+  # Environments
+  /environments:
+    get:
+      tags:
+        - api
+      summary: "Get Environments"
+      description: "Get Environments"
+      operationId: getEnvironments
+      parameters:
+        - in: query
+          name: take
+          description: "indicates how many environments can be returned by each page"
+          schema:
+            type: integer
+            default: 20
+        - in: query
+          name: skip
+          description: "indicates how many environments will be skipped when paginating"
+          schema:
+            type: integer
+            default: 0
+        - in: query
+          name: query
+          description: "query to search environments, based on environments name and description"
+          schema:
+            type: string
+        - in: query
+          name: sortBy
+          description: "indicates the sort field for the environments"
+          schema:
+            type: string
+            enum: [created, name]
+        - in: query
+          name: sortDirection
+          description: "indicates the sort direction for the environments"
+          schema:
+            type: string
+            enum: [asc, desc]
+      responses:
+        200:
+          description: successful operation
+          headers:
+            X-Total-Count:
+              schema:
+                type: integer
+              description: Total records count
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "./environments.yaml#/components/schemas/Environment"
+        500:
+          description: "problem with getting environments"
+    post:
+      tags:
+        - api
+      summary: "Create new environment"
+      description: "Create new environment action"
+      operationId: createEnvironment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "./environments.yaml#/components/schemas/Environment"
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "./environments.yaml#/components/schemas/Environment"
+        400:
+          description: "trying to create a environment with an already existing ID"
+
+  /environments/{environmentId}:
+    get:
+      tags:
+        - api
+      parameters:
+        - in: path
+          name: environmentId
+          schema:
+            type: string
+          required: true
+      summary: "get environment"
+      description: "get environment"
+      operationId: getEnvironment
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "./environments.yaml#/components/schemas/Environment"
+        500:
+          description: "problem with getting a environment"
+    put:
+      tags:
+        - api
+      parameters:
+        - in: path
+          name: environmentId
+          schema:
+            type: string
+          required: true
+      summary: "update environment"
+      description: "update environment action"
+      operationId: updateEnvironment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "./environments.yaml#/components/schemas/Environment"
+      responses:
+        204:
+          description: successful operation
+        500:
+          description: "problem with updating environment"
+    delete:
+      tags:
+        - api
+      parameters:
+        - in: path
+          name: environmentId
+          schema:
+            type: string
+          required: true
+      summary: "delete a environment"
+      description: "delete a environment"
+      operationId: deleteEnvironment
+      responses:
+        "204":
+          description: OK
