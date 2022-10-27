@@ -107,6 +107,7 @@ type (
 
 		// environment
 		EnvSnapshot []EnvironmentValue
+		EnvID       string
 	}
 
 	RunResults struct {

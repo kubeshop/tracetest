@@ -148,6 +148,8 @@ components:
         completedAt:
           type: string
           format: date-time
+        envId:
+          type: string
         envSnapshot:
           type: array
           items:

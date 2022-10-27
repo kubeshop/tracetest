@@ -47,7 +47,8 @@ INSERT INTO test_runs (
 	"metadata",
 
 	-- environments
-	"env_snapshot"
+	"env_snapshot",
+	"env_id"
 ) VALUES (
 	nextval('` + runSequenceName + `'), -- id
 	$1,   -- test_id
@@ -76,7 +77,8 @@ INSERT INTO test_runs (
 
 	$7, -- metadata
 
-	$8 -- envSnapshot
+	$8, -- envSnapshot
+	$9 -- envId
 )
 RETURNING "id"`
 
@@ -150,6 +152,7 @@ func (td *postgresDB) CreateRun(ctx context.Context, test model.Test, run model.
 		run.SpanID.String(),
 		jsonMetadata,
 		jsonEnvSnapshot,
+		run.EnvID,
 	).Scan(&runID)
 	if err != nil {
 		tx.Rollback()
@@ -185,7 +188,8 @@ UPDATE test_runs SET
 	"fail" = $14,
 
 	"metadata" = $15,
-	"env_snapshot" = $18
+	"env_snapshot" = $18,
+	"env_id" = $19
 
 WHERE id = $16 AND test_id = $17
 `
@@ -255,6 +259,7 @@ func (td *postgresDB) UpdateRun(ctx context.Context, r model.Run) error {
 		r.ID,
 		r.TestID,
 		jsonEnvSnapshot,
+		r.EnvID,
 	)
 	if err != nil {
 		return fmt.Errorf("sql exec: %w", err)
@@ -321,7 +326,8 @@ SELECT
 	"last_error",
 
 	"metadata",
-	"env_snapshot"
+	"env_snapshot",
+	"env_id"
 FROM test_runs
 `
 
@@ -424,6 +430,7 @@ func readRunRow(row scanner) (model.Run, error) {
 		&lastError,
 		&jsonMetadata,
 		&jsonEnvSnapshot,
+		&r.EnvID,
 	)
 
 	switch err {

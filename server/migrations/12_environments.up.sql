@@ -13,4 +13,9 @@ ALTER TABLE
 ADD
   COLUMN env_snapshot jsonb;
 
+ALTER TABLE
+  "test_runs"
+ADD
+  COLUMN env_id varchar;
+
 COMMIT;

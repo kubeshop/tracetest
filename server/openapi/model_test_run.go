@@ -42,6 +42,8 @@ type TestRun struct {
 
 	CompletedAt time.Time `json:"completedAt,omitempty"`
 
+	EnvId string `json:"envId,omitempty"`
+
 	EnvSnapshot []EnvironmentValue `json:"envSnapshot,omitempty"`
 
 	TriggerResult TriggerResult `json:"triggerResult,omitempty"`
