@@ -103,7 +103,7 @@ func (r persistentRunner) Run(ctx context.Context, test model.Test, metadata mod
 
 	run := model.NewRun()
 	run.Metadata = metadata
-	run.EnvSnapshot = environment.Values
+	run.Environment = environment
 	run, err := r.runs.CreateRun(ctx, test, run)
 	r.handleDBError(err)
 

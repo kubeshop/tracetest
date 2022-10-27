@@ -148,12 +148,8 @@ components:
         completedAt:
           type: string
           format: date-time
-        envId:
-          type: string
-        envSnapshot:
-          type: array
-          items:
-            $ref: "./environments.yaml#/components/schemas/EnvironmentValue"
+        environment:
+          $ref: "./environments.yaml#/components/schemas/Environment"
         triggerResult:
           $ref: "./triggers.yaml#/components/schemas/TriggerResult"
         trace:

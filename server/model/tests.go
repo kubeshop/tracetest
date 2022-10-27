@@ -106,8 +106,7 @@ type (
 		Metadata RunMetadata
 
 		// environment
-		EnvSnapshot []EnvironmentValue
-		EnvID       string
+		Environment Environment
 	}
 
 	RunResults struct {

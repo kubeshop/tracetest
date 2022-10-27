@@ -251,8 +251,7 @@ func (m OpenAPI) Run(in *model.Run) openapi.TestRun {
 		Result:                    m.Result(in.Results),
 		Outputs:                   m.RunOutputs(in.Outputs),
 		Metadata:                  in.Metadata,
-		EnvSnapshot:               m.EnvironmentValues(in.EnvSnapshot),
-		EnvId:                     in.EnvID,
+		Environment:               m.Environment(in.Environment),
 	}
 }
 
@@ -401,8 +400,7 @@ func (m Model) Run(in openapi.TestRun) (*model.Run, error) {
 		Results:                   result,
 		Outputs:                   m.RunOutputs(in.Outputs),
 		Metadata:                  in.Metadata,
-		EnvSnapshot:               m.EnvironmentValue(in.EnvSnapshot),
-		EnvID:                     in.EnvId,
+		Environment:               m.Environment(in.Environment),
 	}, nil
 }
 

@@ -266,7 +266,11 @@ func (c *controller) RunTest(ctx context.Context, testID string, runInformation 
 	}
 
 	metadata := metadata(runInformation.Metadata)
-	environment := environment(ctx, c.testDB, runInformation.EnvironmentId)
+	environment, err := environment(ctx, c.testDB, runInformation.EnvironmentId)
+
+	if err != nil {
+		return handleDBError(err), err
+	}
 
 	run := c.runner.Run(ctx, test, metadata, environment)
 
@@ -485,18 +489,18 @@ func metadata(in *map[string]string) model.RunMetadata {
 	return model.RunMetadata(*in)
 }
 
-func environment(ctx context.Context, testDB model.Repository, environmentId string) model.Environment {
+func environment(ctx context.Context, testDB model.Repository, environmentId string) (model.Environment, error) {
 	if environmentId != "" {
 		environment, err := testDB.GetEnvironment(ctx, environmentId)
 
 		if err != nil {
-			return model.Environment{}
+			return model.Environment{}, err
 		}
 
-		return environment
+		return environment, nil
 	}
 
-	return model.Environment{}
+	return model.Environment{}, nil
 }
 
 func (c *controller) executeTest(ctx context.Context, test model.Test, runInfo openapi.TestRunInformation) (openapi.ImplResponse, error) {
@@ -568,7 +572,7 @@ func (c *controller) DeleteEnvironment(ctx context.Context, environmentId string
 
 	err = c.testDB.DeleteEnvironment(ctx, environment)
 	if err != nil {
-		return openapi.Response(http.StatusInternalServerError, err.Error()), err
+		return handleDBError(err), err
 	}
 
 	return openapi.Response(204, nil), nil
