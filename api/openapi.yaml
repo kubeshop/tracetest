@@ -664,3 +664,24 @@ paths:
       responses:
         "204":
           description: OK
+
+  # expressions
+  /expressions/parse:
+    post:
+      tags:
+        - api
+      summary: parses an expression and returns the result string
+      description: parses an expression and returns the result string
+      operationId: ExpressionParse
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "./expressions.yaml#/components/schemas/ParseRequestInfo"
+      responses:
+        200:
+          description: successfully parsed the expression
+          content:
+            application/json:
+              schema:
+                $ref: "./expressions.yaml#/components/schemas/ParseResponseInfo"

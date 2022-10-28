@@ -99,6 +99,12 @@ func (c *ApiApiController) Routes() Routes {
 			c.ExportTestRun,
 		},
 		{
+			"ExpressionParse",
+			strings.ToUpper("Post"),
+			"/api/expressions/parse",
+			c.ExpressionParse,
+		},
+		{
 			"GetEnvironment",
 			strings.ToUpper("Get"),
 			"/api/environments/{environmentId}",
@@ -362,6 +368,30 @@ func (c *ApiApiController) ExportTestRun(w http.ResponseWriter, r *http.Request)
 	runIdParam := params["runId"]
 
 	result, err := c.service.ExportTestRun(r.Context(), testIdParam, runIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// ExpressionParse - parses an expression and returns the result string
+func (c *ApiApiController) ExpressionParse(w http.ResponseWriter, r *http.Request) {
+	parseRequestInfoParam := ParseRequestInfo{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&parseRequestInfoParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertParseRequestInfoRequired(parseRequestInfoParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.ExpressionParse(r.Context(), parseRequestInfoParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

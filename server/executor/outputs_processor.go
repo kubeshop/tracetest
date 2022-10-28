@@ -95,7 +95,7 @@ func extractAttr(span traces.Span, ds []expression.DataStore, expr expression.Ex
 
 	expressionExecutor := expression.NewExecutor(ds...)
 
-	actualValue, _ := expressionExecutor.Expression(expr)
+	actualValue, _ := expressionExecutor.Expression(&expr)
 
 	return actualValue.String()
 }

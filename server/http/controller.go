@@ -19,6 +19,7 @@ import (
 	"github.com/kubeshop/tracetest/server/model/yaml"
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/testdb"
+	"go.opentelemetry.io/otel/trace"
 )
 
 var IDGen = id.NewRandGenerator()
@@ -631,4 +632,79 @@ func (c *controller) UpdateEnvironment(ctx context.Context, environmentId string
 	}
 
 	return openapi.Response(204, nil), nil
+}
+
+// expressions
+func (c *controller) ExpressionParse(ctx context.Context, in openapi.ParseRequestInfo) (openapi.ImplResponse, error) {
+	ds, err := c.buildDataStores(ctx, in)
+
+	if err != nil {
+		return openapi.Response(http.StatusBadRequest, err.Error()), err
+	}
+
+	parsed, err := expression.NewExecutor(ds...).ParseStatement(in.Expression)
+
+	if err != nil {
+		return openapi.Response(http.StatusBadRequest, err.Error()), err
+	}
+
+	return openapi.Response(200, openapi.ParseResponseInfo{Expression: parsed}), nil
+}
+
+func (c *controller) buildDataStores(ctx context.Context, info openapi.ParseRequestInfo) ([]expression.DataStore, error) {
+	context := info.Context
+
+	ds := []expression.DataStore{}
+
+	if context.Attr.RunId != "" {
+		attr := context.Attr
+		runId, err := strconv.Atoi(attr.RunId)
+
+		if err != nil {
+			return []expression.DataStore{}, err
+		}
+
+		run, err := c.testDB.GetRun(ctx, id.ID(attr.TestId), runId)
+		if err != nil {
+			return []expression.DataStore{}, err
+		}
+
+		spanId, err := trace.SpanIDFromHex(attr.SpanId)
+
+		if err != nil {
+			return []expression.DataStore{}, err
+		}
+
+		span := run.Trace.Flat[spanId]
+
+		ds = append([]expression.DataStore{expression.AttributeDataStore{
+			Span: *span,
+		}}, ds...)
+
+		if attr.Selector != "" {
+			selector, err := selectors.New(attr.Selector)
+			if err != nil {
+				return []expression.DataStore{}, err
+			}
+
+			spans := selector.Filter(*run.Trace)
+			ds = append([]expression.DataStore{expression.MetaAttributesDataStore{
+				SelectedSpans: spans,
+			}}, ds...)
+		}
+	}
+
+	if context.Env.EnvironmentId != "" {
+		environment, err := c.testDB.GetEnvironment(ctx, context.Env.EnvironmentId)
+
+		if err != nil {
+			return []expression.DataStore{}, err
+		}
+
+		ds = append([]expression.DataStore{expression.EnvironmentDataStore{
+			Values: environment.Values,
+		}}, ds...)
+	}
+
+	return ds, nil
 }

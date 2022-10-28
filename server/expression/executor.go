@@ -70,7 +70,34 @@ func (e Executor) Statement(statement string) (string, string, error) {
 	return leftValue.String(), rightValue.String(), err
 }
 
-func (e Executor) Expression(expr Expr) (value.Value, error) {
+func (e Executor) ParseStatement(statement string) (string, error) {
+	parsedStatement, err := ParseStatement(statement)
+	if err != nil {
+		return "", fmt.Errorf("could not parse statement: %w", err)
+	}
+
+	parsed := ""
+
+	leftValue, err := e.Expression(parsedStatement.Left)
+	if err != nil {
+		return "", fmt.Errorf("could not parse left side expression: %w", err)
+	}
+
+	parsed = parsed + leftValue.String()
+
+	if parsedStatement.Right != nil {
+		rightValue, err := e.Expression(parsedStatement.Right)
+		if err != nil {
+			return "", fmt.Errorf("could not parse left side expression: %w", err)
+		}
+
+		parsed = parsed + parsedStatement.Comparator + rightValue.String()
+	}
+
+	return parsed, nil
+}
+
+func (e Executor) Expression(expr *Expr) (value.Value, error) {
 	currentValue, err := e.resolveTerm(expr.Left)
 	if err != nil {
 		return value.Nil, fmt.Errorf("could not resolve term: %w", err)
@@ -102,6 +129,10 @@ func (e Executor) Expression(expr Expr) (value.Value, error) {
 func (e Executor) resolveTerm(term *Term) (value.Value, error) {
 	if term.Attribute != nil {
 		return e.resolveAttribute(term.Attribute)
+	}
+
+	if term.Environment != nil {
+		return e.resolveEnvironment(term.Environment)
 	}
 
 	if term.Variable != nil {
@@ -136,7 +167,7 @@ func (e Executor) resolveTerm(term *Term) (value.Value, error) {
 	if term.Str != nil {
 		stringArgs := make([]any, 0, len(term.Str.Args))
 		for _, arg := range term.Str.Args {
-			newValue, err := e.Expression(arg)
+			newValue, err := e.Expression(&arg)
 			if err != nil {
 				return value.Nil, fmt.Errorf("could not execute expression: %w", err)
 			}
@@ -183,6 +214,16 @@ func (e Executor) resolveVariable(variable *Variable) (value.Value, error) {
 	}
 
 	return value.NewFromString(variableValue), nil
+}
+
+func (e Executor) resolveEnvironment(environment *Environment) (value.Value, error) {
+	envDataStore := e.Stores["env"]
+	envValue, err := envDataStore.Get(environment.Name())
+	if err != nil {
+		return value.Nil, fmt.Errorf("could not resolve variable %s: %w", environment.Name(), err)
+	}
+
+	return value.NewFromString(envValue), nil
 }
 
 func (e Executor) resolveFunctionCall(functionCall *FunctionCall) (value.Value, error) {

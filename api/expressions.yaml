@@ -1,0 +1,37 @@
+openapi: 3.0.0
+
+components:
+  schemas:
+    ParseRequestInfo:
+      type: object
+      properties:
+        expression:
+          type: string
+        context:
+          type: object
+          properties:
+            env:
+              $ref: "#/components/schemas/EnvDataStore"
+            attr:
+              $ref: "#/components/schemas/AttrDataStore"
+    EnvDataStore:
+      type: object
+      properties:
+        environmentId:
+          type: string
+    AttrDataStore:
+      type: object
+      properties:
+        testId:
+          type: string
+        runId:
+          type: string
+        spanId:
+          type: string
+        selector:
+          type: string
+    ParseResponseInfo:
+      type: object
+      properties:
+        expression:
+          type: string
