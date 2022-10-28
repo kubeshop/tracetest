@@ -22,7 +22,7 @@ interface IProps {
 
 const RunDetailTest = ({run, testId}: IProps) => {
   const {selectedSpan} = useSpan();
-  const {selectedTestSpec} = useTestSpecs();
+  const {selectedTestSpec, setSelectorSuggestions, setPrevSelector} = useTestSpecs();
   const {isOpen: isTestSpecFormOpen, formProps, onSubmit, close} = useTestSpecForm();
   const [visualizationType, setVisualizationType] = useState(VisualizationType.Dag);
   const {
@@ -55,12 +55,24 @@ const RunDetailTest = ({run, testId}: IProps) => {
             <S.SectionRight $shouldScroll={!selectedTestSpec}>
               {isTestSpecFormOpen ? (
                 <TestSpecForm
-                  onSubmit={onSubmit}
+                  onSubmit={values => {
+                    setSelectorSuggestions([]);
+                    setPrevSelector('');
+                    onSubmit(values);
+                  }}
                   runId={run.id}
                   testId={testId}
                   {...formProps}
                   onCancel={() => {
+                    setSelectorSuggestions([]);
+                    setPrevSelector('');
                     close();
+                  }}
+                  onClearSelectorSuggestions={() => {
+                    setSelectorSuggestions([]);
+                  }}
+                  onClickPrevSelector={prevSelector => {
+                    setPrevSelector(prevSelector);
                   }}
                 />
               ) : (

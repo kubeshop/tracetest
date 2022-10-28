@@ -280,7 +280,7 @@ export interface operations {
       /** successful operation */
       200: {
         content: {
-          "application/json": string[];
+          "application/json": external["tests.yaml"]["components"]["schemas"]["SelectedSpansResult"];
         };
       };
     };
@@ -653,6 +653,10 @@ export interface external {
         };
         DefinitionFile: {
           content?: string;
+        };
+        SelectedSpansResult: {
+          selector?: external["tests.yaml"]["components"]["schemas"]["Selector"];
+          spanIds?: string[];
         };
         Selector: {
           query?: string;

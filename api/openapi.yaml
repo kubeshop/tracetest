@@ -258,9 +258,8 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: string
+                $ref: "./tests.yaml#/components/schemas/SelectedSpansResult"
+
   /tests/{testId}/run/{runId}/dry-run:
     put:
       tags:

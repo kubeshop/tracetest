@@ -1,8 +1,9 @@
 import {Form, FormInstance} from 'antd';
+
 import Editor from 'components/Editor';
-import {IValues} from './TestSpecForm';
+import {SupportedEditors} from 'constants/Editor.constants';
 import useQuerySelector from './hooks/useQuerySelector';
-import {SupportedEditors} from '../../constants/Editor.constants';
+import {IValues} from './TestSpecForm';
 
 interface IProps {
   form: FormInstance<IValues>;
@@ -20,7 +21,7 @@ const SelectorInput = ({form, testId, runId, onValidSelector}: IProps) => {
   });
 
   return (
-    <Form.Item name="selector" validateTrigger={[]}>
+    <Form.Item name="selector" validateTrigger={[]} style={{marginBottom: '8px'}}>
       <Editor
         type={SupportedEditors.Selector}
         basicSetup={{lineNumbers: true}}

@@ -11,9 +11,11 @@ import {
   updateSpec,
   reset as resetAction,
   setIsInitialized,
+  setSelectorSuggestions as setSelectorSuggestionsAction,
+  setPrevSelector as setPrevSelectorAction,
 } from 'redux/slices/TestSpecs.slice';
 import {TAssertionResults} from 'types/Assertion.types';
-import {TTestSpecEntry} from 'types/TestSpecs.types';
+import {ISuggestion, TTestSpecEntry} from 'types/TestSpecs.types';
 import useBlockNavigation from 'hooks/useBlockNavigation';
 import RouterActions from 'redux/actions/Router.actions';
 import {RouterSearchFields} from 'constants/Common.constants';
@@ -119,7 +121,35 @@ const useTestSpecsCrud = ({runId, testId, isDraftMode, assertionResults}: IProps
     dispatch(resetAction());
   }, [dispatch]);
 
-  return {revert, init, updateIsInitialized, reset, add, remove, update, publish, cancel, dryRun, setSelectedSpec};
+  const setSelectorSuggestions = useCallback(
+    (selectorSuggestions: ISuggestion[]) => {
+      dispatch(setSelectorSuggestionsAction(selectorSuggestions));
+    },
+    [dispatch]
+  );
+
+  const setPrevSelector = useCallback(
+    (prevSelector: string) => {
+      dispatch(setPrevSelectorAction({prevSelector}));
+    },
+    [dispatch]
+  );
+
+  return {
+    revert,
+    init,
+    updateIsInitialized,
+    reset,
+    add,
+    remove,
+    update,
+    publish,
+    cancel,
+    dryRun,
+    setSelectedSpec,
+    setSelectorSuggestions,
+    setPrevSelector,
+  };
 };
 
 export default useTestSpecsCrud;

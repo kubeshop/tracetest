@@ -6,6 +6,7 @@ import {CompareOperator} from 'constants/Operator.constants';
 import {useAppSelector} from 'redux/hooks';
 import AssertionSelectors from 'selectors/Assertion.selectors';
 import SpanSelectors from 'selectors/Span.selectors';
+import TestSpecsSelectors from 'selectors/TestSpecs.selectors';
 import OperatorService from 'services/Operator.service';
 import {TStructuredAssertion} from 'types/Assertion.types';
 import {singularOrPlural} from 'utils/Common';
@@ -13,6 +14,7 @@ import AssertionCheckList from './AssertionCheckList';
 import useAssertionFormValues from './hooks/useAssertionFormValues';
 import useOnFieldsChange from './hooks/useOnFieldsChange';
 import SelectorInput from './SelectorInput';
+import SelectorSuggestions from './SelectorSuggestions';
 import * as S from './TestSpecForm.styled';
 
 export interface IValues {
@@ -24,6 +26,8 @@ interface IProps {
   defaultValues?: IValues;
   isEditing?: boolean;
   onCancel(): void;
+  onClearSelectorSuggestions(): void;
+  onClickPrevSelector(prevSelector: string): void;
   onSubmit(values: IValues): void;
   runId: string;
   testId: string;
@@ -42,6 +46,8 @@ const TestSpecForm = ({
   } = {},
   isEditing = false,
   onCancel,
+  onClearSelectorSuggestions,
+  onClickPrevSelector,
   onSubmit,
   runId,
   testId,
@@ -56,6 +62,9 @@ const TestSpecForm = ({
   const {currentAssertions} = useAssertionFormValues(form);
 
   const onFieldsChange = useOnFieldsChange();
+
+  const selectorSuggestions = useAppSelector(TestSpecsSelectors.selectSelectorSuggestions);
+  const prevSelector = useAppSelector(TestSpecsSelectors.selectPrevSelector);
 
   return (
     <S.AssertionForm>
@@ -91,6 +100,29 @@ const TestSpecForm = ({
             <S.FormSectionText>Select the spans to which a set of assertions will be applied</S.FormSectionText>
           </S.FormSectionRow>
           <SelectorInput form={form} testId={testId} runId={runId} onValidSelector={setIsValid} />
+
+          <S.SuggestionsContainer>
+            {!isEditing && (
+              <SelectorSuggestions
+                onClick={query => {
+                  onClickPrevSelector(form.getFieldValue('selector'));
+                  onClearSelectorSuggestions();
+                  form.setFieldsValue({
+                    selector: query,
+                  });
+                }}
+                onClickPrevSelector={query => {
+                  onClickPrevSelector('');
+                  onClearSelectorSuggestions();
+                  form.setFieldsValue({
+                    selector: query,
+                  });
+                }}
+                prevSelector={prevSelector}
+                selectorSuggestions={selectorSuggestions}
+              />
+            )}
+          </S.SuggestionsContainer>
         </S.FormSection>
 
         <S.FormSection>

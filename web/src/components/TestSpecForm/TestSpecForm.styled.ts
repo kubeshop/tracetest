@@ -104,39 +104,14 @@ export const FormSectionText = styled(Typography.Text)`
   color: ${({theme}) => theme.color.textSecondary};
 `;
 
-export const ReadIcon = styled(ReadOutlined)`
-  margin-top: 4px;
+export const SuggestionsContainer = styled.div`
+  margin-bottom: 24px;
 `;
 
-export const ExpectedInputContainer = styled.div`
-  width: 0;
-  flex-basis: 50%;
-  padding-left: 8px;
+export const SuggestionsButton = styled(Button)`
+  padding: 4px 8px;
+`;
 
-  && {
-    .cm-editor {
-      overflow: hidden;
-      display: flex;
-      border-radius: 2px;
-      font-size: ${({theme}) => theme.size.md};
-      outline: 1px solid grey;
-      height: 32px;
-      font-family: SFPro, serif;
-      outline: 1px solid #cdd1db;
-    }
-
-    .cm-content {
-      display: flex;
-      align-items: center;
-    }
-    .cm-scroller {
-      overflow: hidden;
-    }
-    .cm-line {
-      padding: 0;
-      span {
-        font-family: SFPro, serif;
-      }
-    }
-  }
+export const ReadIcon = styled(ReadOutlined)`
+  margin-top: 4px;
 `;

@@ -109,6 +109,8 @@ const TestSpecsSelectors = () => ({
   selectIsDraftMode: createSelector(stateSelector, ({isDraftMode}) => isDraftMode),
   selectSpansResult,
   selectTotalSpecs,
+  selectSelectorSuggestions: createSelector(stateSelector, ({selectorSuggestions}) => selectorSuggestions),
+  selectPrevSelector: createSelector(stateSelector, ({prevSelector}) => prevSelector),
 });
 
 export default TestSpecsSelectors();

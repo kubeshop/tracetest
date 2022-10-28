@@ -1,9 +1,5 @@
 import {external} from './Generated.types';
 
-export type TRecursivePartial<T> = {
-  [P in keyof T]?: TRecursivePartial<T[P]>;
-};
-
 export interface IEnv {
   analyticsEnabled: boolean;
   appVersion: string;
@@ -31,8 +27,7 @@ export type TTestSchemas = external['tests.yaml']['components']['schemas'];
 export type TTriggerSchemas = external['triggers.yaml']['components']['schemas'];
 export type TGrpcSchemas = external['grpc.yaml']['components']['schemas'];
 
-export type TStructure = TTestSchemas['SpanSelector'];
-export type TFilter = TTestSchemas['SelectorFilter'];
+export type TSelector = TTestSchemas['Selector'];
 
 export type Model<T, R> = Modify<Required<T>, R>;
 
@@ -41,13 +36,3 @@ export interface IAnalytics {
   track(event: string, traits: Record<string, any>): void;
   page(pageName: string, traits: Record<string, any>): void;
 }
-
-export declare type RecursivePartial<T> = T extends object
-  ? {
-      [P in keyof T]?: T[P] extends (infer U)[]
-        ? RecursivePartial<U>[]
-        : T[P] extends object
-        ? RecursivePartial<T[P]>
-        : T[P];
-    }
-  : any;
