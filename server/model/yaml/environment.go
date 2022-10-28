@@ -34,7 +34,13 @@ func (evs EnvironmentValues) Model() []model.EnvironmentValue {
 
 func (e Environment) Validate() error {
 	if e.Name == "" {
-		return fmt.Errorf("transaction name cannot be empty")
+		return fmt.Errorf("environment name cannot be empty")
+	}
+
+	for _, v := range e.Values {
+		if v.Key == "" {
+			return fmt.Errorf("environment value name cannot be empty")
+		}
 	}
 
 	return nil
