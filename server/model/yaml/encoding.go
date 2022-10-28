@@ -45,6 +45,13 @@ func Decode(contents []byte) (File, error) {
 			return File{}, fmt.Errorf("cannot decode transaction: %w", err)
 		}
 		f.Spec = transaction
+	case FileTypeEnvironment:
+		var environment Environment
+		err := mapstructure.Decode(f.Spec, &environment)
+		if err != nil {
+			return File{}, fmt.Errorf("cannot decode environment: %w", err)
+		}
+		f.Spec = environment
 	default:
 		return File{}, fmt.Errorf("invalid file type %s", f.Type)
 	}
