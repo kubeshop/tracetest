@@ -20,16 +20,17 @@ const RouterActions = () => ({
     'router/addAssertionResult',
     async ({search}, {getState, dispatch}) => {
       const {[RouterSearchFields.SelectedAssertion]: positionIndex} = search;
+      const selectedSpec = TestSpecsSelectors.selectSelectedSpec(getState() as RootState);
 
-      if (typeof positionIndex === 'undefined') {
+      if (typeof positionIndex === 'undefined' && selectedSpec) {
         dispatch(setSelectedSpec());
         return;
       }
+
       const assertionResult = TestSpecsSelectors.selectAssertionByPositionIndex(
         getState() as RootState,
         Number(positionIndex)
       );
-      const selectedSpec = TestSpecsSelectors.selectSelectedSpec(getState() as RootState);
       const isDagReady = DAGSelectors.selectNodes(getState() as RootState).length > 0;
 
       if (selectedSpec === assertionResult?.selector) return;

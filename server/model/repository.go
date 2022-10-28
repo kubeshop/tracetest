@@ -31,9 +31,19 @@ type RunRepository interface {
 	GetRunByTraceID(context.Context, trace.TraceID) (Run, error)
 }
 
+type EnvironmentRepository interface {
+	CreateEnvironment(context.Context, Environment) (Environment, error)
+	UpdateEnvironment(context.Context, Environment) (Environment, error)
+	DeleteEnvironment(context.Context, Environment) error
+	GetEnvironment(_ context.Context, id string) (Environment, error)
+	EnvironmentIDExists(context.Context, string) (bool, error)
+	GetEnvironments(_ context.Context, take, skip int32, query, sortBy, sortDirection string) (List[Environment], error)
+}
+
 type Repository interface {
 	TestRepository
 	RunRepository
+	EnvironmentRepository
 
 	ServerID() (id string, isNew bool, _ error)
 	Drop() error

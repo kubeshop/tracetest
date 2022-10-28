@@ -14,7 +14,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-type OutputsProcessorFn func(context.Context, model.OrderedMap[string, model.Output], traces.Trace) (model.OrderedMap[string, string], error)
+type OutputsProcessorFn func(context.Context, model.OrderedMap[string, model.Output], traces.Trace, []expression.DataStore) (model.OrderedMap[string, string], error)
 
 func InstrumentedOutputProcessor(tracer trace.Tracer) OutputsProcessorFn {
 	op := instrumentedOutputProcessor{tracer}
@@ -25,11 +25,11 @@ type instrumentedOutputProcessor struct {
 	tracer trace.Tracer
 }
 
-func (op instrumentedOutputProcessor) process(ctx context.Context, outputs model.OrderedMap[string, model.Output], t traces.Trace) (model.OrderedMap[string, string], error) {
+func (op instrumentedOutputProcessor) process(ctx context.Context, outputs model.OrderedMap[string, model.Output], t traces.Trace, ds []expression.DataStore) (model.OrderedMap[string, string], error) {
 	ctx, span := op.tracer.Start(ctx, "Process outputs")
 	defer span.End()
 
-	result, err := outputProcessor(ctx, outputs, t)
+	result, err := outputProcessor(ctx, outputs, t, ds)
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
@@ -50,7 +50,7 @@ func (op instrumentedOutputProcessor) process(ctx context.Context, outputs model
 	return result, err
 }
 
-func outputProcessor(ctx context.Context, outputs model.OrderedMap[string, model.Output], tr traces.Trace) (model.OrderedMap[string, string], error) {
+func outputProcessor(ctx context.Context, outputs model.OrderedMap[string, model.Output], tr traces.Trace, ds []expression.DataStore) (model.OrderedMap[string, string], error) {
 	res := model.OrderedMap[string, string]{}
 
 	parsed, err := parseOutputs(outputs)
@@ -61,16 +61,17 @@ func outputProcessor(ctx context.Context, outputs model.OrderedMap[string, model
 	err = parsed.ForEach(func(key string, out parsedOutput) error {
 		spans := out.selector.Filter(tr)
 
-		mads := expression.MetaAttributesDataStore{SelectedSpans: spans}
+		stores := append([]expression.DataStore{expression.MetaAttributesDataStore{SelectedSpans: spans}}, ds...)
+
 		value := ""
 		spans.
 			ForEach(func(_ int, span traces.Span) bool {
-				value = extractAttr(traces.Span{}, mads, out.expr)
+				value = extractAttr(traces.Span{}, stores, out.expr)
 				// take only the first value
 				return false
 			}).
 			OrEmpty(func() {
-				value = extractAttr(traces.Span{}, mads, out.expr)
+				value = extractAttr(traces.Span{}, stores, out.expr)
 			})
 
 		res, err = res.Add(key, value)
@@ -89,9 +90,10 @@ func outputProcessor(ctx context.Context, outputs model.OrderedMap[string, model
 
 }
 
-func extractAttr(span traces.Span, mads expression.MetaAttributesDataStore, expr expression.Expr) string {
-	attributeDataStore := expression.AttributeDataStore{Span: span}
-	expressionExecutor := expression.NewExecutor(attributeDataStore, mads)
+func extractAttr(span traces.Span, ds []expression.DataStore, expr expression.Expr) string {
+	ds = append([]expression.DataStore{expression.AttributeDataStore{Span: span}}, ds...)
+
+	expressionExecutor := expression.NewExecutor(ds...)
 
 	actualValue, _ := expressionExecutor.Expression(expr)
 

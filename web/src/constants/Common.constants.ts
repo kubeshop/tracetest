@@ -1,4 +1,3 @@
-export const BASE_URL = 'http://localhost:11633';
 export const SENTRY_DNS = 'https://8411cbb3b7d84c879f711f0e642a28e3@o1229268.ingest.sentry.io/6375361';
 
 export const SENTRY_ALLOWED_URLS = [/.*?localhost:3000/, /.*?tracetest.io/];
@@ -15,7 +14,9 @@ export const RESOURCE_SEMANTIC_CONVENTIONS_URL =
 export const TRACE_DOCUMENTATION_URL =
   'https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/api.md';
 
-export const ADVANCE_SELECTORS_DOCUMENTATION_URL = 'https://kubeshop.github.io/tracetest/advanced-selectors/';
+export const ADD_TEST_SPECS_DOCUMENTATION_URL = 'https://docs.tracetest.io/adding-assertions/';
+
+export const SELECTOR_LANGUAGE_CHEAT_SHEET_URL = `${process.env.PUBLIC_URL}/SL_cheat_sheet.pdf`;
 
 export enum HTTP_METHOD {
   GET = 'GET',

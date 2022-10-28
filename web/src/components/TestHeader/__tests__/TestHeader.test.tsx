@@ -3,6 +3,9 @@ import TestMock from '../../../models/__mocks__/Test.mock';
 import TestHeader from '../TestHeader';
 
 test('SpanAttributesTable', () => {
-  const {getByTestId} = render(<TestHeader onBack={jest.fn()} test={TestMock.model()} />);
+  const test = TestMock.model();
+  const {getByTestId} = render(
+    <TestHeader description={test.description} id={test.id} onBack={jest.fn()} onDelete={jest.fn} title={test.name} />
+  );
   expect(getByTestId('test-details-name')).toBeInTheDocument();
 });

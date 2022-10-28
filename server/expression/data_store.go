@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/traces"
 )
 
@@ -57,4 +58,22 @@ func (ds VariableDataStore) Get(name string) (string, error) {
 	}
 
 	return value, nil
+}
+
+type EnvironmentDataStore struct {
+	Values []model.EnvironmentValue
+}
+
+func (ds EnvironmentDataStore) Source() string {
+	return "env"
+}
+
+func (ds EnvironmentDataStore) Get(name string) (string, error) {
+	for _, v := range ds.Values {
+		if v.Key == name {
+			return v.Value, nil
+		}
+	}
+
+	return "", nil
 }

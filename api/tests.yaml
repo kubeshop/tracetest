@@ -89,16 +89,16 @@ components:
               query: span[tracetest.span.type="http"]
               structure:
                 - filters:
-                  - property: tracetest.span.type
-                    operator: '='
-                    value: http
+                    - property: tracetest.span.type
+                      operator: "="
+                      value: http
             assertions:
-            - attribute: tracetest.span.duration
-              comparator: "<"
-              expected: "2000"
-            - attribute: http.status_code
-              comparator: "="
-              expected: "200"
+              - attribute: tracetest.span.duration
+                comparator: "<"
+                expected: "2000"
+              - attribute: http.status_code
+                comparator: "="
+                expected: "200"
 
     TestRun:
       type: object
@@ -117,7 +117,15 @@ components:
           description: Test version used when running this test run
         state:
           type: string
-          enum: [CREATED, EXECUTING, AWAITING_TRACE, AWAITING_TEST_RESULTS, FINISHED, FAILED]
+          enum:
+            [
+              CREATED,
+              EXECUTING,
+              AWAITING_TRACE,
+              AWAITING_TEST_RESULTS,
+              FINISHED,
+              FAILED,
+            ]
           description: Current execution state
         lastErrorState:
           type: string
@@ -140,6 +148,8 @@ components:
         completedAt:
           type: string
           format: date-time
+        environment:
+          $ref: "./environments.yaml#/components/schemas/Environment"
         triggerResult:
           $ref: "./triggers.yaml#/components/schemas/TriggerResult"
         trace:
@@ -169,6 +179,8 @@ components:
           nullable: true
           additionalProperties:
             type: string
+        environmentId:
+          type: string
 
     AssertionResults:
       type: object
@@ -193,28 +205,28 @@ components:
               query: span[tracetest.span.type="http"]
               structure:
                 - filters:
-                  - property: tracetest.span.type
-                    operator: '='
-                    value: http
+                    - property: tracetest.span.type
+                      operator: "="
+                      value: http
             results:
-            - assertion:
-                attribute: http.status_code
-                comparator: "="
-                expected: "200"
-              allPassed: true
-              spanResults:
-                - spanId: "123"
-                  observedValue: "test"
-                  passed: true
-            - assertion:
-                attribute: http.status_code
-                comparator: "="
-                expected: "200"
-              allPassed: true
-              spanResults:
-                - spanId: "123"
-                  observedValue: "test"
-                  passed: true
+              - assertion:
+                  attribute: http.status_code
+                  comparator: "="
+                  expected: "200"
+                allPassed: true
+                spanResults:
+                  - spanId: "123"
+                    observedValue: "test"
+                    passed: true
+              - assertion:
+                  attribute: http.status_code
+                  comparator: "="
+                  expected: "200"
+                allPassed: true
+                spanResults:
+                  - spanId: "123"
+                    observedValue: "test"
+                    passed: true
 
     AssertionResult:
       type: object

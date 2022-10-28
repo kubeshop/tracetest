@@ -95,7 +95,7 @@ func (f runnerFixture) run(tests []model.Test, ttl time.Duration) {
 	f.runner.Start(2)
 	time.Sleep(10 * time.Millisecond)
 	for _, test := range tests {
-		f.runner.Run(context.TODO(), test, model.RunMetadata{})
+		f.runner.Run(context.TODO(), test, model.RunMetadata{}, model.Environment{})
 	}
 	time.Sleep(ttl)
 	f.runner.Stop()

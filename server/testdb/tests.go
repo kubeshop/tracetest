@@ -184,7 +184,7 @@ var sortingFields = map[string]string{
 	"last_run": "last_test_run_time",
 }
 
-func sortQuery(sql, sortBy, sortDirection string) string {
+func sortQuery(sql, sortBy, sortDirection string, sortingFields map[string]string) string {
 	sortField, ok := sortingFields[sortBy]
 
 	if !ok {
@@ -242,7 +242,7 @@ func (td *postgresDB) GetTests(ctx context.Context, take, skip int32, query, sor
 		sql += condition
 	}
 
-	sql = sortQuery(sql, sortBy, sortDirection)
+	sql = sortQuery(sql, sortBy, sortDirection, sortingFields)
 	sql += ` LIMIT $1 OFFSET $2 `
 
 	stmt, err := td.db.Prepare(sql)

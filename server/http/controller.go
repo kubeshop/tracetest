@@ -11,6 +11,7 @@ import (
 	"github.com/kubeshop/tracetest/server/assertions"
 	"github.com/kubeshop/tracetest/server/assertions/selectors"
 	"github.com/kubeshop/tracetest/server/executor"
+	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/http/mappings"
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/junit"
@@ -272,7 +273,13 @@ func (c *controller) RunTest(ctx context.Context, testID string, runInformation 
 	}
 
 	metadata := metadata(runInformation.Metadata)
-	run := c.runner.Run(ctx, test, metadata)
+	environment, err := environment(ctx, c.testDB, runInformation.EnvironmentId)
+
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	run := c.runner.Run(ctx, test, metadata, environment)
 
 	return openapi.Response(200, c.mappers.Out.Run(&run)), nil
 }
@@ -351,7 +358,12 @@ func (c *controller) DryRunAssertion(ctx context.Context, testID, runID string, 
 	if err != nil {
 		return openapi.Response(http.StatusBadRequest, err.Error()), nil
 	}
-	results, allPassed := assertions.Assert(definition, *run.Trace)
+
+	ds := []expression.DataStore{expression.EnvironmentDataStore{
+		Values: run.Environment.Values,
+	}}
+
+	results, allPassed := assertions.Assert(definition, *run.Trace, ds)
 	res := c.mappers.Out.Result(&model.RunResults{
 		AllPassed: allPassed,
 		Results:   results,
@@ -489,6 +501,20 @@ func metadata(in *map[string]string) model.RunMetadata {
 	return model.RunMetadata(*in)
 }
 
+func environment(ctx context.Context, testDB model.Repository, environmentId string) (model.Environment, error) {
+	if environmentId != "" {
+		environment, err := testDB.GetEnvironment(ctx, environmentId)
+
+		if err != nil {
+			return model.Environment{}, err
+		}
+
+		return environment, nil
+	}
+
+	return model.Environment{}, nil
+}
+
 func (c *controller) executeTest(ctx context.Context, test model.Test, runInfo openapi.TestRunInformation) (openapi.ImplResponse, error) {
 	// create or update test
 	testID := test.ID
@@ -519,4 +545,90 @@ func (c *controller) executeTest(ctx context.Context, test model.Test, runInfo o
 		Type:  string(yaml.FileTypeTest),
 	}
 	return openapi.Response(200, res), nil
+}
+
+// Environments
+
+func (c *controller) CreateEnvironment(ctx context.Context, in openapi.Environment) (openapi.ImplResponse, error) {
+	environment := c.mappers.In.Environment(in)
+
+	if environment.ID != "" {
+		exists, err := c.testDB.EnvironmentIDExists(ctx, environment.ID)
+
+		if err != nil {
+			return handleDBError(err), err
+		}
+
+		if exists {
+			err := fmt.Errorf(`cannot create environment with ID "%s: %w`, environment.ID, errTestExists)
+			r := map[string]string{
+				"error": err.Error(),
+			}
+			return openapi.Response(http.StatusBadRequest, r), err
+		}
+	}
+
+	environment, err := c.testDB.CreateEnvironment(ctx, environment)
+	if err != nil {
+		return openapi.Response(http.StatusInternalServerError, err.Error()), err
+	}
+
+	return openapi.Response(200, c.mappers.Out.Environment(environment)), nil
+}
+
+func (c *controller) DeleteEnvironment(ctx context.Context, environmentId string) (openapi.ImplResponse, error) {
+	environment, err := c.testDB.GetEnvironment(ctx, environmentId)
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	err = c.testDB.DeleteEnvironment(ctx, environment)
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	return openapi.Response(204, nil), nil
+}
+
+func (c *controller) GetEnvironment(ctx context.Context, environmentId string) (openapi.ImplResponse, error) {
+	environment, err := c.testDB.GetEnvironment(ctx, environmentId)
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	return openapi.Response(200, c.mappers.Out.Environment(environment)), nil
+}
+
+func (c *controller) GetEnvironments(ctx context.Context, take, skip int32, query string, sortBy string, sortDirection string) (openapi.ImplResponse, error) {
+	if take == 0 {
+		take = 20
+	}
+
+	environments, err := c.testDB.GetEnvironments(ctx, take, skip, query, sortBy, sortDirection)
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	return openapi.Response(200, paginated[openapi.Environment]{
+		items: c.mappers.Out.Environments(environments.Items),
+		count: environments.TotalCount,
+	}), nil
+}
+
+func (c *controller) UpdateEnvironment(ctx context.Context, environmentId string, in openapi.Environment) (openapi.ImplResponse, error) {
+	updated := c.mappers.In.Environment(in)
+
+	environment, err := c.testDB.GetEnvironment(ctx, environmentId)
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	updated.ID = environment.ID
+
+	_, err = c.testDB.UpdateEnvironment(ctx, updated)
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	return openapi.Response(204, nil), nil
 }

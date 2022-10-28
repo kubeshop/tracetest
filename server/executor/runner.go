@@ -12,7 +12,7 @@ import (
 )
 
 type Runner interface {
-	Run(context.Context, model.Test, model.RunMetadata) model.Run
+	Run(context.Context, model.Test, model.RunMetadata, model.Environment) model.Run
 }
 
 type PersistentRunner interface {
@@ -98,11 +98,12 @@ func getNewCtx(ctx context.Context) context.Context {
 	return otel.GetTextMapPropagator().Extract(context.Background(), carrier)
 }
 
-func (r persistentRunner) Run(ctx context.Context, test model.Test, metadata model.RunMetadata) model.Run {
+func (r persistentRunner) Run(ctx context.Context, test model.Test, metadata model.RunMetadata, environment model.Environment) model.Run {
 	ctx = getNewCtx(ctx)
 
 	run := model.NewRun()
 	run.Metadata = metadata
+	run.Environment = environment
 	run, err := r.runs.CreateRun(ctx, test, run)
 	r.handleDBError(err)
 

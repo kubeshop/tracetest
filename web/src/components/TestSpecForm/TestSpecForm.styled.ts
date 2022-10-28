@@ -1,4 +1,4 @@
-import {DeleteOutlined} from '@ant-design/icons';
+import {DeleteOutlined, ReadOutlined} from '@ant-design/icons';
 import {Button, Select as AntSelect, Typography} from 'antd';
 import styled from 'styled-components';
 
@@ -88,6 +88,12 @@ export const FormSectionRow1 = styled.div`
   gap: 12px;
 `;
 
+export const FormSectionHeaderSelector = styled.div`
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+`;
+
 export const FormSectionTitle = styled(Typography.Title).attrs({level: 3})<{$noMargin?: boolean}>`
   && {
     margin-bottom: ${({$noMargin}) => ($noMargin ? '0' : '4px')};
@@ -106,35 +112,6 @@ export const SuggestionsButton = styled(Button)`
   padding: 4px 8px;
 `;
 
-export const ExpectedInputContainer = styled.div`
-  width: 0;
-  flex-basis: 50%;
-  padding-left: 8px;
-
-  && {
-    .cm-editor {
-      overflow: hidden;
-      display: flex;
-      border-radius: 2px;
-      font-size: ${({theme}) => theme.size.md};
-      outline: 1px solid grey;
-      height: 32px;
-      font-family: SFPro, serif;
-      outline: 1px solid #cdd1db;
-    }
-
-    .cm-content {
-      display: flex;
-      align-items: center;
-    }
-    .cm-scroller {
-      overflow: hidden;
-    }
-    .cm-line {
-      padding: 0;
-      span {
-        font-family: SFPro, serif;
-      }
-    }
-  }
+export const ReadIcon = styled(ReadOutlined)`
+  margin-top: 4px;
 `;
