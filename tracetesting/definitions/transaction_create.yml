@@ -1,0 +1,32 @@
+---
+type: Test
+spec:
+  name: Create Transaction
+  trigger:
+    type: http
+    httpRequest:
+      url: ${TARGET_URL}/api/transactions
+      method: POST
+      headers:
+        - key: Content-Type
+          value: application/json
+      body: |
+        {
+            "name": "test-transaction",
+            "description": "a transaction",
+            "steps": [ "${TEST_ID}", "${TEST_ID}" ]
+        }
+  specs:
+    - selector: span[name = "Tracetest trigger"]
+      assertions:
+        - attr:tracetest.selected_spans.count = 1
+        - attr:tracetest.response.status = 200
+    - selector: span[name="POST /api/transactions" tracetest.span.type="http"]
+      assertions:
+        - attr:tracetest.selected_spans.count = 1
+    - selector: span[name = "exec INSERT"]
+      assertions:
+        - attr:tracetest.selected_spans.count = 1
+    - selector: span[name = "exec INSERT"]:first
+      assertions:
+        - attr:sql.query contains "INSERT INTO transactions"
