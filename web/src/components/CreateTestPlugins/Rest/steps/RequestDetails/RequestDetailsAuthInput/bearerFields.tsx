@@ -3,7 +3,13 @@ import Editor from 'components/Editor';
 import {SupportedEditors} from 'constants/Editor.constants';
 
 export const bearerFields: React.ReactElement = (
-  <Form.Item data-cy="bearer-token" name={['auth', 'bearer', 'token']} label="Token" rules={[{required: true}]}>
+  <Form.Item
+    data-cy="bearer-token"
+    name={['auth', 'bearer', 'token']}
+    label="Token"
+    rules={[{required: true}]}
+    style={{marginTop: '26px'}}
+  >
     <Editor type={SupportedEditors.Interpolation} />
   </Form.Item>
 );
