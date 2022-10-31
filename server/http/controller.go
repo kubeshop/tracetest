@@ -656,7 +656,7 @@ func (c *controller) buildDataStores(ctx context.Context, info openapi.ParseRequ
 
 	ds := []expression.DataStore{}
 
-	if context.Attr.RunId != "" {
+	if context.Attr.RunId != "" && context.Attr.TestId != "" {
 		attr := context.Attr
 		runId, err := strconv.Atoi(attr.RunId)
 
@@ -669,17 +669,19 @@ func (c *controller) buildDataStores(ctx context.Context, info openapi.ParseRequ
 			return []expression.DataStore{}, err
 		}
 
-		spanId, err := trace.SpanIDFromHex(attr.SpanId)
+		if context.Attr.SpanId != "" {
+			spanId, err := trace.SpanIDFromHex(attr.SpanId)
 
-		if err != nil {
-			return []expression.DataStore{}, err
+			if err != nil {
+				return []expression.DataStore{}, err
+			}
+
+			span := run.Trace.Flat[spanId]
+
+			ds = append([]expression.DataStore{expression.AttributeDataStore{
+				Span: *span,
+			}}, ds...)
 		}
-
-		span := run.Trace.Flat[spanId]
-
-		ds = append([]expression.DataStore{expression.AttributeDataStore{
-			Span: *span,
-		}}, ds...)
 
 		if attr.Selector != "" {
 			selector, err := selectors.New(attr.Selector)

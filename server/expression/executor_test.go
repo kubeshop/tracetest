@@ -318,3 +318,139 @@ func executeTestCases(t *testing.T, testCases []executorTestCase) {
 		})
 	}
 }
+
+func TestBasicStatementExecution(t *testing.T) {
+	testCases := []executorTestCase{
+		{
+			Name:       "should_parse_a_single_integer",
+			Query:      `1`,
+			ShouldPass: true,
+		},
+		{
+			Name:       "should_parse_double_quoted_strings",
+			Query:      `"matheus"`,
+			ShouldPass: true,
+		},
+	}
+
+	executeParseStatementTestCases(t, testCases)
+}
+
+func TestParseStatementAttributeExecution(t *testing.T) {
+	testCases := []executorTestCase{
+		{
+			Name:       "should_get_values_from_attributes",
+			Query:      "attr:my_attribute",
+			ShouldPass: true,
+
+			AttributeDataStore: expression.AttributeDataStore{
+				Span: traces.Span{
+					Attributes: traces.Attributes{
+						"my_attribute": "42",
+					},
+				},
+			},
+		},
+	}
+
+	executeParseStatementTestCases(t, testCases)
+}
+
+func TestParseStatementVariableExecution(t *testing.T) {
+	testCases := []executorTestCase{
+		{
+			Name:       "should_get_values_from_variables",
+			Query:      "var:my_variable",
+			ShouldPass: true,
+
+			VariableDataStore: expression.VariableDataStore(map[string]string{
+				"my_variable":    "42",
+				"other_variable": "41",
+			}),
+		},
+	}
+
+	executeParseStatementTestCases(t, testCases)
+}
+
+func TestParseStatementStringInterpolationExecution(t *testing.T) {
+	testCases := []executorTestCase{
+		{
+			Name:       "should_interpolate_simple_values",
+			Query:      `'this run took ${"25ms"}'`,
+			ShouldPass: true,
+			AttributeDataStore: expression.AttributeDataStore{
+				Span: traces.Span{
+					Attributes: traces.Attributes{
+						"text": "this run took 25ms",
+					},
+				},
+			},
+		},
+		{
+			Name:       "should_interpolate_multiple_values",
+			Query:      `'${1} is a number, ${"dog"} is a string, and ${1ms + 1ns} is a duration'`,
+			ShouldPass: true,
+		},
+	}
+
+	executeParseStatementTestCases(t, testCases)
+}
+
+func TestParseStatementFilterExecution(t *testing.T) {
+	testCases := []executorTestCase{
+		{
+			Name:       "should_extract_id_from_json",
+			Query:      `attr:tracetest.response.body`,
+			ShouldPass: true,
+			AttributeDataStore: expression.AttributeDataStore{
+				Span: traces.Span{
+					Attributes: traces.Attributes{
+						"tracetest.response.body": `{"id": 8, "name": "john doe"}`,
+					},
+				},
+			},
+		},
+		{
+			Name:       "should_support_filters_with_arguments_containing_spaces",
+			Query:      `'{ "name": "john", "age": 37 }' | regex_group '"age": (\d+)'`,
+			ShouldPass: true,
+		},
+		{
+			Name:       "should_support_multiple_filters",
+			Query:      `'{ "array": [{ "name": "john", "age": 37 }, { "name": "jonas", "age": 38 }]}' | regex_group '"age": (\d+)' | get_index 1`,
+			ShouldPass: true,
+		},
+		{
+			Name:       "should_count_array_input",
+			Query:      `'{ "array": [1, 2, 3] }' | json_path '$.array[*]' | length`,
+			ShouldPass: true,
+		},
+		{
+			Name:       "should_get_last_item_from_list",
+			Query:      `'{ "array": [1, 2, 5] }' | json_path '$.array[*]' | get_index 'last'`,
+			ShouldPass: true,
+		},
+	}
+
+	executeParseStatementTestCases(t, testCases)
+}
+
+func executeParseStatementTestCases(t *testing.T, testCases []executorTestCase) {
+	for _, testCase := range testCases {
+		t.Run(testCase.Name, func(t *testing.T) {
+			executor := expression.NewExecutor(
+				testCase.AttributeDataStore,
+				testCase.MetaAttributesDataStore,
+				testCase.VariableDataStore,
+			)
+			left, err := executor.ParseStatement(testCase.Query)
+			debugMessage := fmt.Sprintf("left value: %s", left)
+			if testCase.ShouldPass {
+				assert.NoError(t, err, debugMessage)
+			} else {
+				assert.Error(t, err, debugMessage)
+			}
+		})
+	}
+}
