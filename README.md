@@ -4,7 +4,7 @@
 </p>
 
 <p align="center">
-  Tracetest - the best way to develop and test your distributed system with OpenTelemetry. For QA, Dev, & Ops.
+  Tracetest - Generate end-to-end tests automatically from your traces. For QA, Dev, & Ops.
 </p>
 
 <p align="center">
