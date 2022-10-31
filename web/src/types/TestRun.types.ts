@@ -1,5 +1,6 @@
 import {TAssertionResults} from './Assertion.types';
 import {Model, TTestSchemas, TTriggerSchemas} from './Common.types';
+import {TEnvironment} from './Environment.types';
 import {TTriggerResult} from './Test.types';
 import {TTestRunOutput} from './TestOutput.types';
 import {TTrace} from './Trace.types';
@@ -19,6 +20,7 @@ export type TTestRun = Model<
     trigger?: TTriggerSchemas['Trigger'];
     triggerResult?: TTriggerResult;
     outputs?: TTestRunOutput[];
+    environment?: TEnvironment;
   }
 >;
 

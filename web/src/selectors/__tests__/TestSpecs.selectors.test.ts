@@ -11,6 +11,8 @@ describe('TestSpecsSelectors', () => {
     isInitialized: false,
     selectedSpec: undefined,
     isDraftMode: false,
+    selectorSuggestions: [],
+    prevSelector: '',
   };
 
   describe('selectSpecs', () => {

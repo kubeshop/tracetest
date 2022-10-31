@@ -1,10 +1,11 @@
-import {createContext, useContext, useMemo, useCallback, useEffect} from 'react';
 import {noop} from 'lodash';
-import {TEnvironment} from 'types/Environment.types';
-import {useGetEnvListQuery, useLazyGetEnvironmentSecretListQuery} from 'redux/apis/TraceTest.api';
+import {createContext, useContext, useMemo, useCallback} from 'react';
+
+import {useGetEnvironmentsQuery} from 'redux/apis/TraceTest.api';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import {setUserPreference} from 'redux/slices/User.slice';
 import EnvironmentSelectors from 'selectors/Environment.selectors';
+import {TEnvironment} from 'types/Environment.types';
 
 interface IContext {
   environmentList: TEnvironment[];
@@ -27,14 +28,9 @@ interface IProps {
 export const useEnvironment = () => useContext(Context);
 
 const EnvironmentProvider = ({children}: IProps) => {
-  const {data: {items: environmentList = []} = {}, isLoading} = useGetEnvListQuery({});
-  const [getEnvEntryList] = useLazyGetEnvironmentSecretListQuery({});
   const dispatch = useAppDispatch();
+  const {data: {items: environmentList = []} = {}, isLoading} = useGetEnvironmentsQuery({});
   const selectedEnvironment: TEnvironment | undefined = useAppSelector(EnvironmentSelectors.selectSelectedEnvironment);
-
-  const getEnvironmentEntryList = useCallback(() => {
-    if (selectedEnvironment) getEnvEntryList({environmentId: selectedEnvironment.id});
-  }, [getEnvEntryList, selectedEnvironment]);
 
   const setSelectedEnvironment = useCallback(
     (environment?: TEnvironment) => {
@@ -47,10 +43,6 @@ const EnvironmentProvider = ({children}: IProps) => {
     },
     [dispatch]
   );
-
-  useEffect(() => {
-    getEnvironmentEntryList();
-  }, [getEnvironmentEntryList]);
 
   const value = useMemo<IContext>(
     () => ({

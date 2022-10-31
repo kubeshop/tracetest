@@ -34,11 +34,26 @@ export const downloadFile = (data: string, fileName: string): Element => {
   return element;
 };
 
-export function enumKeys<O extends object, K extends keyof O = keyof O>(obj: O): K[] {
-  return Object.keys(obj).filter(k => Number.isNaN(Number(k))) as K[];
-}
-
 export function singularOrPlural(noun: string, quantity: number) {
   if (quantity === 1) return noun;
   return `${noun}s`;
+}
+
+export function ordinalSuffixOf(i: number) {
+  const j = i % 10;
+  const k = i % 100;
+  if (j === 1 && k !== 11) {
+    return `${i}st`;
+  }
+  if (j === 2 && k !== 12) {
+    return `${i}nd`;
+  }
+  if (j === 3 && k !== 13) {
+    return `${i}rd`;
+  }
+  return `${i}th`;
+}
+
+export function getTotalCountFromHeaders(meta: any) {
+  return Number(meta?.response?.headers.get('x-total-count') || 0);
 }

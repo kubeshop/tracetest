@@ -11,6 +11,7 @@ import (
 	"github.com/kubeshop/tracetest/server/assertions"
 	"github.com/kubeshop/tracetest/server/assertions/selectors"
 	"github.com/kubeshop/tracetest/server/executor"
+	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/http/mappings"
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/junit"
@@ -123,6 +124,7 @@ func (c *controller) GetTestSpecs(ctx context.Context, testID string) (openapi.I
 
 func (c *controller) GetTestResultSelectedSpans(ctx context.Context, testID, runID, selectorQuery string) (openapi.ImplResponse, error) {
 	selector, err := selectors.New(selectorQuery)
+
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -147,7 +149,12 @@ func (c *controller) GetTestResultSelectedSpans(ctx context.Context, testID, run
 		selectedSpanIds[i] = hex.EncodeToString(span.ID[:])
 	}
 
-	return openapi.Response(http.StatusOK, selectedSpanIds), nil
+	res := openapi.SelectedSpansResult{
+		Selector: c.mappers.Out.Selector(model.SpanQuery(selectorQuery)),
+		SpanIds:  selectedSpanIds,
+	}
+
+	return openapi.Response(http.StatusOK, res), nil
 }
 
 func (c *controller) GetTestRun(ctx context.Context, testID, runID string) (openapi.ImplResponse, error) {
@@ -377,7 +384,12 @@ func (c *controller) DryRunAssertion(ctx context.Context, testID, runID string, 
 	if err != nil {
 		return openapi.Response(http.StatusBadRequest, err.Error()), nil
 	}
-	results, allPassed := assertions.Assert(definition, *run.Trace)
+
+	ds := []expression.DataStore{expression.EnvironmentDataStore{
+		Values: run.Environment.Values,
+	}}
+
+	results, allPassed := assertions.Assert(definition, *run.Trace, ds)
 	res := c.mappers.Out.Result(&model.RunResults{
 		AllPassed: allPassed,
 		Results:   results,

@@ -28,7 +28,7 @@ const useAutoComplete = ({testId, runId, onSelect = noop}: IProps) => {
   const getSelectedEnvironmentEntryList = useCallback(() => {
     const state = getState();
 
-    return EnvironmentSelectors.selectSelectedEnvironmentEntryList(state);
+    return EnvironmentSelectors.selectSelectedEnvironmentValues(state);
   }, [getState]);
 
   return useCallback(

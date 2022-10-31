@@ -29,7 +29,7 @@ export const ActionContainer = styled.div`
   gap: 8px;
 `;
 
-export const TestListContainer = styled.div`
+export const ListContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -90,20 +90,6 @@ export const InfoContainer = styled.div`
   grid-template-columns: 20px 1fr 60px 2fr 220px 100px 20px;
   gap: 24px;
   padding: 16px 24px;
-`;
-
-export const EnvironmentDetails = styled.div`
-  text-align: right;
-  width: 100%;
-  margin-top: 8px;
-`;
-
-export const EnvironmentDetailsLink = styled(Button).attrs({
-  type: 'link',
-})`
-  color: ${({theme}) => theme.color.primary};
-  font-weight: 600;
-  padding: 0;
 `;
 
 export const ResultListContainer = styled.div`

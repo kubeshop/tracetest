@@ -21,6 +21,11 @@ export type TRawTestSpecEntry = {
 
 export type TTestSpecs = Model<TRawTestSpecs, {specs: TTestSpecEntry[]}>;
 
+export interface ISuggestion {
+  query: string;
+  title: string;
+}
+
 export interface ITestSpecsState {
   initialSpecs: TTestSpecEntry[];
   specs: TTestSpecEntry[];
@@ -30,6 +35,8 @@ export interface ITestSpecsState {
   isInitialized: boolean;
   selectedSpec: string | undefined;
   isDraftMode: boolean;
+  selectorSuggestions: ISuggestion[];
+  prevSelector: string;
 }
 
 export type TTestSpecsSliceActions = {
@@ -43,4 +50,6 @@ export type TTestSpecsSliceActions = {
   setAssertionResults: CaseReducer<ITestSpecsState, PayloadAction<TAssertionResults>>;
   setSelectedSpec: CaseReducer<ITestSpecsState, PayloadAction<TAssertionResultEntry | undefined>>;
   setIsInitialized: CaseReducer<ITestSpecsState, PayloadAction<{isInitialized: boolean}>>;
+  setSelectorSuggestions: CaseReducer<ITestSpecsState, PayloadAction<ISuggestion[]>>;
+  setPrevSelector: CaseReducer<ITestSpecsState, PayloadAction<{prevSelector: string}>>;
 };

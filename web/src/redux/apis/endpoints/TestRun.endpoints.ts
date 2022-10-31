@@ -1,15 +1,15 @@
-import {uniq} from 'lodash';
 import {HTTP_METHOD} from 'constants/Common.constants';
+import {TracetestApiTags} from 'constants/Test.constants';
 import {PaginationResponse} from 'hooks/usePagination';
 import AssertionResults from 'models/AssertionResults.model';
+import SelectedSpans from 'models/SelectedSpans.model';
 import TestRun from 'models/TestRun.model';
-
 import WebSocketService, {IListenerFunction} from 'services/WebSocket.service';
 import {TAssertionResults, TRawAssertionResults} from 'types/Assertion.types';
+import {TRawSelectedSpans, TSelectedSpans} from 'types/SelectedSpans.types';
 import {TTest, TTestApiEndpointBuilder} from 'types/Test.types';
 import {TRawTestRun, TTestRun} from 'types/TestRun.types';
 import {TRawTestSpecs} from 'types/TestSpecs.types';
-import {TracetestApiTags} from 'constants/Test.constants';
 
 function getTotalCountFromHeaders(meta: any) {
   return Number(meta?.response?.headers.get('x-total-count') || 0);
@@ -93,11 +93,10 @@ const TestRunEndpoint = (builder: TTestApiEndpointBuilder) => ({
       {type: TracetestApiTags.TEST_RUN, id: `${testId}-${version}-definition`},
     ],
   }),
-
-  getSelectedSpans: builder.query<string[], {testId: string; runId: string; query: string}>({
+  getSelectedSpans: builder.query<TSelectedSpans, {testId: string; runId: string; query: string}>({
     query: ({testId, runId, query}) => `/tests/${testId}/run/${runId}/select?query=${encodeURIComponent(query)}`,
     providesTags: (result, error, {query}) => (result ? [{type: TracetestApiTags.SPAN, id: `${query}-LIST`}] : []),
-    transformResponse: (rawSpanList: string[]) => uniq(rawSpanList),
+    transformResponse: (rawSpanList: TRawSelectedSpans) => SelectedSpans(rawSpanList),
   }),
 });
 

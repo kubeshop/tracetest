@@ -64,6 +64,10 @@ export interface paths {
     /** Set spec for a particular test */
     put: operations["setTestSpecs"];
   };
+  "/tests/{testId}/outputs": {
+    /** Set outputs for a particular test */
+    put: operations["setTestOutputs"];
+  };
   "/tests/{testId}/version/{version}": {
     /** get a test specific version */
     get: operations["getTestVersion"];
@@ -71,6 +75,20 @@ export interface paths {
   "/tests/{testId}/version/{version}/definition.yaml": {
     /** Get the test definition as an YAML file */
     get: operations["getTestVersionDefinitionFile"];
+  };
+  "/environments": {
+    /** Get Environments */
+    get: operations["getEnvironments"];
+    /** Create new environment action */
+    post: operations["createEnvironment"];
+  };
+  "/environments/{environmentId}": {
+    /** get environment */
+    get: operations["getEnvironment"];
+    /** update environment action */
+    put: operations["updateEnvironment"];
+    /** delete a environment */
+    delete: operations["deleteEnvironment"];
   };
 }
 
@@ -261,7 +279,7 @@ export interface operations {
       /** successful operation */
       200: {
         content: {
-          "application/json": string[];
+          "application/json": external["tests.yaml"]["components"]["schemas"]["SelectedSpansResult"];
         };
       };
     };
@@ -418,6 +436,23 @@ export interface operations {
       };
     };
   };
+  /** Set outputs for a particular test */
+  setTestOutputs: {
+    parameters: {
+      path: {
+        testId: string;
+      };
+    };
+    responses: {
+      /** OK */
+      204: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": external["tests.yaml"]["components"]["schemas"]["TestOutput"][];
+      };
+    };
+  };
   /** get a test specific version */
   getTestVersion: {
     parameters: {
@@ -454,6 +489,104 @@ export interface operations {
       };
     };
   };
+  /** Get Environments */
+  getEnvironments: {
+    parameters: {
+      query: {
+        /** indicates how many environments can be returned by each page */
+        take?: number;
+        /** indicates how many environments will be skipped when paginating */
+        skip?: number;
+        /** query to search environments, based on environments name and description */
+        query?: string;
+        /** indicates the sort field for the environments */
+        sortBy?: "created" | "name";
+        /** indicates the sort direction for the environments */
+        sortDirection?: "asc" | "desc";
+      };
+    };
+    responses: {
+      /** successful operation */
+      200: {
+        headers: {
+          /** Total records count */
+          "X-Total-Count"?: number;
+        };
+        content: {
+          "application/json": external["environments.yaml"]["components"]["schemas"]["Environment"][];
+        };
+      };
+      /** problem with getting environments */
+      500: unknown;
+    };
+  };
+  /** Create new environment action */
+  createEnvironment: {
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["environments.yaml"]["components"]["schemas"]["Environment"];
+        };
+      };
+      /** trying to create a environment with an already existing ID */
+      400: unknown;
+    };
+    requestBody: {
+      content: {
+        "application/json": external["environments.yaml"]["components"]["schemas"]["Environment"];
+      };
+    };
+  };
+  /** get environment */
+  getEnvironment: {
+    parameters: {
+      path: {
+        environmentId: string;
+      };
+    };
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["environments.yaml"]["components"]["schemas"]["Environment"];
+        };
+      };
+      /** problem with getting a environment */
+      500: unknown;
+    };
+  };
+  /** update environment action */
+  updateEnvironment: {
+    parameters: {
+      path: {
+        environmentId: string;
+      };
+    };
+    responses: {
+      /** successful operation */
+      204: never;
+      /** problem with updating environment */
+      500: unknown;
+    };
+    requestBody: {
+      content: {
+        "application/json": external["environments.yaml"]["components"]["schemas"]["Environment"];
+      };
+    };
+  };
+  /** delete a environment */
+  deleteEnvironment: {
+    parameters: {
+      path: {
+        environmentId: string;
+      };
+    };
+    responses: {
+      /** OK */
+      204: never;
+    };
+  };
 }
 
 export interface external {
@@ -474,6 +607,24 @@ export interface external {
         TextDefinition: {
           runInformation?: external["tests.yaml"]["components"]["schemas"]["TestRunInformation"];
           content?: string;
+        };
+      };
+    };
+    operations: {};
+  };
+  "environments.yaml": {
+    paths: {};
+    components: {
+      schemas: {
+        Environment: {
+          id?: string;
+          name?: string;
+          description?: string;
+          values?: external["environments.yaml"]["components"]["schemas"]["EnvironmentValue"][];
+        };
+        EnvironmentValue: {
+          key?: string;
+          value?: string;
         };
       };
     };
@@ -637,6 +788,7 @@ export interface external {
           obtainedTraceAt?: string;
           /** Format: date-time */
           completedAt?: string;
+          environment?: external["environments.yaml"]["components"]["schemas"]["Environment"];
           triggerResult?: external["triggers.yaml"]["components"]["schemas"]["TriggerResult"];
           trace?: external["trace.yaml"]["components"]["schemas"]["Trace"];
           result?: external["tests.yaml"]["components"]["schemas"]["AssertionResults"];
@@ -648,6 +800,7 @@ export interface external {
         };
         TestRunInformation: {
           metadata?: { [key: string]: string } | null;
+          environmentId?: string;
         };
         /** @example [object Object] */
         AssertionResults: {
@@ -670,6 +823,10 @@ export interface external {
         };
         DefinitionFile: {
           content?: string;
+        };
+        SelectedSpansResult: {
+          selector?: external["tests.yaml"]["components"]["schemas"]["Selector"];
+          spanIds?: string[];
         };
         Selector: {
           query?: string;
