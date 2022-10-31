@@ -1,0 +1,20 @@
+---
+type: Test
+spec:
+  name: Create Transaction
+  trigger:
+    type: http
+    httpRequest:
+      url: ${TARGET_URL}/api/transactions
+      method: GET
+      headers:
+        - key: Content-Type
+          value: application/json
+  specs:
+    - selector: span[name = "Tracetest trigger"]
+      assertions:
+        - attr:tracetest.selected_spans.count = 1
+        - attr:tracetest.response.status = 200
+    - selector: span[name="GET /api/transactions" tracetest.span.type="http"]
+      assertions:
+        - attr:tracetest.selected_spans.count = 1
