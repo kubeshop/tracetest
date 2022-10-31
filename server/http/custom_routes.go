@@ -38,6 +38,7 @@ func (c *customController) Routes() openapi.Routes {
 	routes[c.getRouteIndex("GetTests")].HandlerFunc = c.GetTests
 	routes[c.getRouteIndex("GetTestRuns")].HandlerFunc = c.GetTestRuns
 	routes[c.getRouteIndex("GetEnvironments")].HandlerFunc = c.GetEnvironments
+	routes[c.getRouteIndex("GetTransactions")].HandlerFunc = c.GetTransactions
 
 	for index, route := range routes {
 		routeName := fmt.Sprintf("%s %s", route.Method, route.Pattern)
@@ -174,6 +175,33 @@ func (c *customController) GetTestVersionDefinitionFile(w http.ResponseWriter, r
 	}
 	w.Header().Set("Content-Type", "application/yaml; charset=UTF-8")
 	w.Write(result.Body.([]byte))
+}
+
+func (c *customController) GetTransactions(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+	takeParam, err := parseInt32Parameter(query.Get("take"), false)
+	if err != nil {
+		c.errorHandler(w, r, &openapi.ParsingError{Err: err}, nil)
+		return
+	}
+	skipParam, err := parseInt32Parameter(query.Get("skip"), false)
+	if err != nil {
+		c.errorHandler(w, r, &openapi.ParsingError{Err: err}, nil)
+		return
+	}
+	queryParam := query.Get("query")
+	sortByParam := query.Get("sortBy")
+	sortDirectionParam := query.Get("sortDirection")
+	result, err := c.service.GetTransactions(r.Context(), takeParam, skipParam, queryParam, sortByParam, sortDirectionParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	res := result.Body.(paginated[openapi.Transaction])
+
+	w.Header().Set("X-Total-Count", strconv.Itoa(res.count))
+	openapi.EncodeJSONResponse(res.items, &result.Code, w)
 }
 
 const errMsgRequiredMissing = "required parameter is missing"

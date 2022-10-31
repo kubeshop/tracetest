@@ -306,7 +306,7 @@ func (m Model) Transaction(ctx context.Context, in openapi.Transaction) (model.T
 	for i, testID := range in.Steps {
 		test, err := m.testRepository.GetLatestTestVersion(ctx, id.ID(testID))
 		if err != nil {
-			return model.Transaction{}, fmt.Errorf("could not get step %s: %w", testID, err)
+			return model.Transaction{}, err
 		}
 
 		tests[i] = test

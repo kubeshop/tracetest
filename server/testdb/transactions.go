@@ -107,9 +107,24 @@ func (td *postgresDB) UpdateTransaction(ctx context.Context, transaction model.T
 }
 
 func (td *postgresDB) DeleteTransaction(ctx context.Context, transaction model.Transaction) error {
-	_, err := td.db.
-		ExecContext(ctx, "DELETE FROM transactions WHERE id = $1", transaction.ID)
-	return err
+	tx, err := td.db.Begin()
+	if err != nil {
+		return err
+	}
+
+	_, err = tx.ExecContext(ctx, "DELETE FROM transaction_steps WHERE transaction_id = $1", transaction.ID)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	_, err = tx.ExecContext(ctx, "DELETE FROM transactions WHERE id = $1", transaction.ID)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return tx.Commit()
 }
 
 const getTransactionSQL = `
