@@ -192,7 +192,7 @@ func (td *postgresDB) GetTransactions(ctx context.Context, take, skip int32, que
 		sql += condition
 	}
 
-	sql = sortQuery(sql, sortBy, sortDirection)
+	sql = sortQuery(sql, sortBy, sortDirection, sortingFields)
 	sql += ` LIMIT $1 OFFSET $2 `
 
 	stmt, err := td.db.Prepare(sql)
