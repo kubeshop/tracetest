@@ -18,3 +18,5 @@ require_not_empty $TRANSACTION_ID "requires TRANSACTION_ID, got $TRANSACTION_ID 
 
 test "transaction_list" ./definitions/transaction_list.yml || EXIT_STATUS=$?
 test "transaction_delete" ./definitions/environment_delete.yml || EXIT_STATUS=$?
+
+exit $EXIT_STATUS
