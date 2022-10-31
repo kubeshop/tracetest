@@ -11,7 +11,7 @@ function TestOutput({name = '', selector = {}, value = ''}: TRawTestOutput): TTe
   };
 }
 
-export function TestRunOutput({name = '', value = 'test'}: TRawTestRunOutput): TTestRunOutput {
+export function TestRunOutput({name = '', value = ''}: TRawTestRunOutput): TTestRunOutput {
   return {
     name,
     value,
