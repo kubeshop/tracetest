@@ -1,11 +1,6 @@
 import {IKeyValue} from 'constants/Test.constants';
-import {Model} from 'types/Common.types';
+import {Model, TEnvironmentSchemas} from 'types/Common.types';
 
-export type TRawEnvironment = {
-  id?: string;
-  name?: string;
-  description?: string;
-  variables?: IKeyValue[];
-}
+export type TRawEnvironment = TEnvironmentSchemas['Environment'];
 
-export type TEnvironment = Model<TRawEnvironment, {}>;
+export type TEnvironment = Model<TRawEnvironment, {values: IKeyValue[]}>;

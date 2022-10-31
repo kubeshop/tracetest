@@ -1,54 +1,41 @@
 import {HTTP_METHOD} from 'constants/Common.constants';
+import {TracetestApiTags} from 'constants/Test.constants';
 import {PaginationResponse} from 'hooks/usePagination';
-import Environment from 'models/__mocks__/Environment.mock';
-import KeyValueMock from 'models/__mocks__/KeyValue.mock';
-import {TEnvironment} from 'types/Environment.types';
-import {IKeyValue, TracetestApiTags} from 'constants/Test.constants';
+import Environment from 'models/Environment.model';
+import {TEnvironment, TRawEnvironment} from 'types/Environment.types';
 import {TTestApiEndpointBuilder} from 'types/Test.types';
-
-const environmentList = [
-  Environment.model({id: 'ae7162b3-54e0-4603-9d33-12345', name: 'Production', description: 'Production environment'}),
-  Environment.model({
-    id: 'ae7162b3-54e0-4603-9d33-423b12cf67c8',
-    name: 'Development',
-    description: 'Developing environment',
-  }),
-];
-
-const keyValueListOne = [KeyValueMock.model()];
-const keyValueListTwo = [
-  KeyValueMock.model({key: 'HOST', value: 'http://localhost'}),
-  KeyValueMock.model({key: 'METHOD', value: 'GET'}),
-  KeyValueMock.model({key: 'USER_ID', value: '123'}),
-];
+import {getTotalCountFromHeaders} from 'utils/Common';
 
 const EnvironmentEndpoint = (builder: TTestApiEndpointBuilder) => ({
-  getEnvList: builder.query<PaginationResponse<TEnvironment>, {take?: number; skip?: number; query?: string}>({
-    query: ({take = 25, skip = 0, query = ''}) => `/tests?take=${take}&skip=${skip}&query=${query}`,
+  getEnvironments: builder.query<PaginationResponse<TEnvironment>, {take?: number; skip?: number; query?: string}>({
+    query: ({take = 25, skip = 0, query = ''}) => `/environments?take=${take}&skip=${skip}&query=${query}`,
     providesTags: () => [{type: TracetestApiTags.ENVIRONMENT, id: 'LIST'}],
-    transformResponse: () => {
-      return {
-        total: environmentList.length,
-        items: environmentList,
-      };
-    },
-  }),
-  getEnvironmentSecretList: builder.query<IKeyValue[], {environmentId: string; take?: number; skip?: number}>({
-    query: ({take = 25, skip = 0}) => `/tests?take=${take}&skip=${skip}`,
-    providesTags: (result, error, {environmentId}) => [
-      {type: TracetestApiTags.ENVIRONMENT, id: `${environmentId}-LIST`},
-    ],
-    transformResponse: (raw, meta, args) => {
-      return args.environmentId === 'ae7162b3-54e0-4603-9d33-423b12cf67c8' ? keyValueListOne : keyValueListTwo;
-    },
+    transformResponse: (rawEnvironments: TRawEnvironment[], meta) => ({
+      items: rawEnvironments.map(rawEnv => Environment(rawEnv)),
+      total: getTotalCountFromHeaders(meta),
+    }),
   }),
   createEnvironment: builder.mutation<undefined, TEnvironment>({
-    query: newEnvironment => ({
+    query: environment => ({
       url: '/environments',
       method: HTTP_METHOD.POST,
-      body: newEnvironment,
+      body: environment,
     }),
-    transformResponse: () => undefined,
+    invalidatesTags: [{type: TracetestApiTags.ENVIRONMENT, id: 'LIST'}],
+  }),
+  updateEnvironment: builder.mutation<undefined, {environment: TRawEnvironment; environmentId: string}>({
+    query: ({environment, environmentId}) => ({
+      url: `/environments/${environmentId}`,
+      method: HTTP_METHOD.PUT,
+      body: environment,
+    }),
+    invalidatesTags: [{type: TracetestApiTags.ENVIRONMENT, id: 'LIST'}],
+  }),
+  deleteEnvironment: builder.mutation<undefined, {environmentId: string}>({
+    query: ({environmentId}) => ({
+      url: `/environments/${environmentId}`,
+      method: HTTP_METHOD.DELETE,
+    }),
     invalidatesTags: [{type: TracetestApiTags.ENVIRONMENT, id: 'LIST'}],
   }),
 });

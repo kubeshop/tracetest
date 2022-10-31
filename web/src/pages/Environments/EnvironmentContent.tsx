@@ -1,30 +1,56 @@
 import React, {useCallback, useState} from 'react';
-import SearchInput from '../../components/SearchInput';
+
+import SearchInput from 'components/SearchInput';
+import {useConfirmationModal} from 'providers/ConfirmationModal/ConfirmationModal.provider';
+import {useDeleteEnvironmentMutation} from 'redux/apis/TraceTest.api';
+import EnvironmentsAnalytics from 'services/Analytics/EnvironmentsAnalytics.service';
+import {TEnvironment} from 'types/Environment.types';
 import * as S from './Environment.styled';
-import EnvironmentActions from './EnvironmentActions';
 import EnvironmentList from './EnvironmentList';
 import {EnvironmentModal} from './EnvironmentModal';
-import {TEnvironment} from '../../types/Environment.types';
 
-const EnvironmentContent: React.FC = () => {
+const {onCreateEnvironmentClick} = EnvironmentsAnalytics;
+
+const EnvironmentContent = () => {
+  const [deleteEnvironment] = useDeleteEnvironmentMutation();
   const [query, setQuery] = useState<string>('');
-  const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
   const [environment, setEnvironment] = useState<TEnvironment | undefined>(undefined);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const onSearch = useCallback((value: string) => setQuery(value), [setQuery]);
+  const {onOpen} = useConfirmationModal();
+
+  const handleOnClickCreate = () => {
+    onCreateEnvironmentClick();
+    setIsModalOpen(true);
+  };
+
+  const handleOnModalClose = () => {
+    setEnvironment(undefined);
+    setIsModalOpen(false);
+  };
+
+  const handleOnEdit = (values: TEnvironment) => {
+    setEnvironment(values);
+    setIsModalOpen(true);
+  };
+
+  const handleOnDelete = (id: string) => {
+    onOpen(`Are you sure you want to delete the environment?`, () => deleteEnvironment({environmentId: id}));
+  };
+
   return (
     <S.Wrapper>
-      <S.TitleText>All Envs</S.TitleText>
+      <S.TitleText>All Environments</S.TitleText>
       <S.PageHeader>
-        <SearchInput onSearch={onSearch} placeholder="Search test" />
-        <EnvironmentActions setIsFormOpen={setIsFormOpen} />
+        <SearchInput onSearch={onSearch} placeholder="Search environment" />
+        <S.ActionContainer>
+          <S.CreateEnvironmentButton onClick={handleOnClickCreate} type="primary">
+            Create Environment
+          </S.CreateEnvironmentButton>
+        </S.ActionContainer>
       </S.PageHeader>
-      <EnvironmentList query={query} setIsFormOpen={setIsFormOpen} setEnvironment={setEnvironment} />
-      <EnvironmentModal
-        isFormOpen={isFormOpen}
-        environment={environment}
-        setEnvironment={setEnvironment}
-        setIsFormOpen={setIsFormOpen}
-      />
+      <EnvironmentList onDelete={handleOnDelete} onEdit={handleOnEdit} query={query} />
+      <EnvironmentModal isOpen={isModalOpen} onClose={handleOnModalClose} environment={environment} />
     </S.Wrapper>
   );
 };
