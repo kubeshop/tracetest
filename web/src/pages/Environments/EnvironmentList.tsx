@@ -1,33 +1,28 @@
-import {Dispatch, SetStateAction} from 'react';
-import Pagination from '../../components/Pagination';
-import usePagination from '../../hooks/usePagination';
-import {useGetEnvListQuery} from '../../redux/apis/TraceTest.api';
-import Loading from '../Home/Loading';
-import NoResults from '../Home/NoResults';
+import Pagination from 'components/Pagination';
+import usePagination from 'hooks/usePagination';
+import Loading from 'pages/Home/Loading';
+import NoResults from 'pages/Home/NoResults';
+import {useGetEnvironmentsQuery} from 'redux/apis/TraceTest.api';
+import {TEnvironment} from 'types/Environment.types';
 import * as S from './Environment.styled';
 import {EnvironmentCard} from './EnvironmentCard';
-import {TEnvironment} from '../../types/Environment.types';
 
 interface IProps {
+  onDelete(id: string): void;
+  onEdit(values: TEnvironment): void;
   query: string;
-  setIsFormOpen: Dispatch<SetStateAction<boolean>>;
-  setEnvironment: Dispatch<SetStateAction<TEnvironment | undefined>>;
 }
 
-const EnvironmentList = ({query, setEnvironment, setIsFormOpen}: IProps) => {
-  const pagination = usePagination<TEnvironment, {query: string}>(useGetEnvListQuery, {query});
+const EnvironmentList = ({onDelete, onEdit, query}: IProps) => {
+  const pagination = usePagination<TEnvironment, {query: string}>(useGetEnvironmentsQuery, {query});
+
   return (
     <Pagination emptyComponent={<NoResults />} loadingComponent={<Loading />} {...pagination}>
-      <S.TestListContainer data-cy="test-list">
+      <S.ListContainer>
         {pagination.list?.map(environment => (
-          <EnvironmentCard
-            key={environment.name}
-            environment={environment}
-            setIsFormOpen={setIsFormOpen}
-            setEnvironment={setEnvironment}
-          />
+          <EnvironmentCard environment={environment} key={environment.name} onDelete={onDelete} onEdit={onEdit} />
         ))}
-      </S.TestListContainer>
+      </S.ListContainer>
     </Pagination>
   );
 };
