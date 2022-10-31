@@ -4,10 +4,7 @@ import {SortBy, SortDirection, TracetestApiTags} from 'constants/Test.constants'
 import Test from 'models/Test.model';
 import {PaginationResponse} from 'hooks/usePagination';
 import {TRawTestSpecs} from 'types/TestSpecs.types';
-
-function getTotalCountFromHeaders(meta: any) {
-  return Number(meta?.response?.headers.get('x-total-count') || 0);
-}
+import {getTotalCountFromHeaders} from 'utils/Common';
 
 const TestEndpoint = (builder: TTestApiEndpointBuilder) => ({
   createTest: builder.mutation<TTest, TRawTest>({

@@ -4,19 +4,15 @@
  */
 
 export interface paths {
+  "/definition.yaml": {
+    /** Execute a definition */
+    post: operations["executeDefinition"];
+  };
   "/tests": {
     /** get tests */
     get: operations["getTests"];
     /** Create new test action */
     post: operations["createTest"];
-  };
-  "/tests/definition.yaml": {
-    /** Create new test using the yaml definition */
-    post: operations["createTestFromDefinition"];
-  };
-  "/tests/{testId}/definition.yaml": {
-    /** update test action from definition file */
-    put: operations["updateTestFromDefinition"];
   };
   "/tests/{testId}": {
     /** get test */
@@ -76,11 +72,49 @@ export interface paths {
     /** Get the test definition as an YAML file */
     get: operations["getTestVersionDefinitionFile"];
   };
+  "/environments": {
+    /** Get Environments */
+    get: operations["getEnvironments"];
+    /** Create new environment action */
+    post: operations["createEnvironment"];
+  };
+  "/environments/{environmentId}": {
+    /** get environment */
+    get: operations["getEnvironment"];
+    /** update environment action */
+    put: operations["updateEnvironment"];
+    /** delete a environment */
+    delete: operations["deleteEnvironment"];
+  };
 }
 
 export interface components {}
 
 export interface operations {
+  /** Execute a definition */
+  executeDefinition: {
+    responses: {
+      /** Definition updated */
+      200: {
+        content: {
+          "application/json": external["definition.yaml"]["components"]["schemas"]["ExecuteDefinitionResponse"];
+        };
+      };
+      /** Definition created */
+      201: {
+        content: {
+          "application/json": external["definition.yaml"]["components"]["schemas"]["ExecuteDefinitionResponse"];
+        };
+      };
+      /** trying to create a test with an already existing ID */
+      422: unknown;
+    };
+    requestBody: {
+      content: {
+        "text/json": external["definition.yaml"]["components"]["schemas"]["TextDefinition"];
+      };
+    };
+  };
   /** get tests */
   getTests: {
     parameters: {
@@ -127,45 +161,6 @@ export interface operations {
     requestBody: {
       content: {
         "application/json": external["tests.yaml"]["components"]["schemas"]["Test"];
-      };
-    };
-  };
-  /** Create new test using the yaml definition */
-  createTestFromDefinition: {
-    responses: {
-      /** successful operation */
-      200: {
-        content: {
-          "application/json": external["tests.yaml"]["components"]["schemas"]["Test"];
-        };
-      };
-      /** trying to create a test with an already existing ID */
-      400: unknown;
-    };
-    requestBody: {
-      content: {
-        "text/json": external["tests.yaml"]["components"]["schemas"]["TextDefinition"];
-      };
-    };
-  };
-  /** update test action from definition file */
-  updateTestFromDefinition: {
-    parameters: {
-      path: {
-        testId: string;
-      };
-    };
-    responses: {
-      /** successful operation */
-      200: {
-        content: {
-          "application/json": external["tests.yaml"]["components"]["schemas"]["Test"];
-        };
-      };
-    };
-    requestBody: {
-      content: {
-        "text/json": external["tests.yaml"]["components"]["schemas"]["TextDefinition"];
       };
     };
   };
@@ -473,9 +468,147 @@ export interface operations {
       };
     };
   };
+  /** Get Environments */
+  getEnvironments: {
+    parameters: {
+      query: {
+        /** indicates how many environments can be returned by each page */
+        take?: number;
+        /** indicates how many environments will be skipped when paginating */
+        skip?: number;
+        /** query to search environments, based on environments name and description */
+        query?: string;
+        /** indicates the sort field for the environments */
+        sortBy?: "created" | "name";
+        /** indicates the sort direction for the environments */
+        sortDirection?: "asc" | "desc";
+      };
+    };
+    responses: {
+      /** successful operation */
+      200: {
+        headers: {
+          /** Total records count */
+          "X-Total-Count"?: number;
+        };
+        content: {
+          "application/json": external["environments.yaml"]["components"]["schemas"]["Environment"][];
+        };
+      };
+      /** problem with getting environments */
+      500: unknown;
+    };
+  };
+  /** Create new environment action */
+  createEnvironment: {
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["environments.yaml"]["components"]["schemas"]["Environment"];
+        };
+      };
+      /** trying to create a environment with an already existing ID */
+      400: unknown;
+    };
+    requestBody: {
+      content: {
+        "application/json": external["environments.yaml"]["components"]["schemas"]["Environment"];
+      };
+    };
+  };
+  /** get environment */
+  getEnvironment: {
+    parameters: {
+      path: {
+        environmentId: string;
+      };
+    };
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["environments.yaml"]["components"]["schemas"]["Environment"];
+        };
+      };
+      /** problem with getting a environment */
+      500: unknown;
+    };
+  };
+  /** update environment action */
+  updateEnvironment: {
+    parameters: {
+      path: {
+        environmentId: string;
+      };
+    };
+    responses: {
+      /** successful operation */
+      204: never;
+      /** problem with updating environment */
+      500: unknown;
+    };
+    requestBody: {
+      content: {
+        "application/json": external["environments.yaml"]["components"]["schemas"]["Environment"];
+      };
+    };
+  };
+  /** delete a environment */
+  deleteEnvironment: {
+    parameters: {
+      path: {
+        environmentId: string;
+      };
+    };
+    responses: {
+      /** OK */
+      204: never;
+    };
+  };
 }
 
 export interface external {
+  "definition.yaml": {
+    paths: {};
+    components: {
+      schemas: {
+        ExecuteDefinitionResponse: {
+          /** @description resource ID */
+          id?: string;
+          /** @description run ID */
+          runId?: string;
+          /** @description resource type */
+          type?: string;
+          /** @description resource web UI url */
+          url?: string;
+        };
+        TextDefinition: {
+          runInformation?: external["tests.yaml"]["components"]["schemas"]["TestRunInformation"];
+          content?: string;
+        };
+      };
+    };
+    operations: {};
+  };
+  "environments.yaml": {
+    paths: {};
+    components: {
+      schemas: {
+        Environment: {
+          id?: string;
+          name?: string;
+          description?: string;
+          values?: external["environments.yaml"]["components"]["schemas"]["EnvironmentValue"][];
+        };
+        EnvironmentValue: {
+          key?: string;
+          value?: string;
+        };
+      };
+    };
+    operations: {};
+  };
   "grpc.yaml": {
     paths: {};
     components: {
@@ -624,6 +757,7 @@ export interface external {
           obtainedTraceAt?: string;
           /** Format: date-time */
           completedAt?: string;
+          environment?: external["environments.yaml"]["components"]["schemas"]["Environment"];
           triggerResult?: external["triggers.yaml"]["components"]["schemas"]["TriggerResult"];
           trace?: external["trace.yaml"]["components"]["schemas"]["Trace"];
           result?: external["tests.yaml"]["components"]["schemas"]["AssertionResults"];
@@ -631,6 +765,7 @@ export interface external {
         };
         TestRunInformation: {
           metadata?: { [key: string]: string } | null;
+          environmentId?: string;
         };
         /** @example [object Object] */
         AssertionResults: {
@@ -679,9 +814,6 @@ export interface external {
         ExportedTestInformation: {
           test: external["tests.yaml"]["components"]["schemas"]["Test"];
           run: external["tests.yaml"]["components"]["schemas"]["TestRun"];
-        };
-        TextDefinition: {
-          content?: string;
         };
       };
     };
