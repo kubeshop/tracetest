@@ -14,6 +14,7 @@ CREATE TABLE transaction_steps (
     transaction_id varchar NOT NULL,
     transaction_version integer NOT NULL,
     test_id varchar NOT NULL,
+    step_number int NOT NULL,
 
     CONSTRAINT transaction_steps_transactions_fk
       FOREIGN KEY (transaction_id, transaction_version) REFERENCES transactions(id, "version")

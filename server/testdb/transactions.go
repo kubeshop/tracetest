@@ -67,10 +67,11 @@ func (td *postgresDB) setTransactionSteps(tx *sql.Tx, transaction model.Transact
 	}
 
 	values := []string{}
-	for _, test := range transaction.Steps {
+	for i, test := range transaction.Steps {
+		stepNumber := i + 1
 		values = append(
 			values,
-			fmt.Sprintf("('%s', %d, '%s')", transaction.ID, transaction.Version, test.ID),
+			fmt.Sprintf("('%s', %d, '%s', %d)", transaction.ID, transaction.Version, test.ID, stepNumber),
 		)
 	}
 
@@ -282,7 +283,7 @@ func (td *postgresDB) readTransactionRow(ctx context.Context, row scanner) (mode
 
 func (td *postgresDB) getTransactionSteps(ctx context.Context, transaction model.Transaction) ([]model.Test, error) {
 	stmt, err := td.db.Prepare(getTestSQL + `INNER JOIN transaction_steps ts ON t.id = ts.test_id
-	 WHERE ts.transaction_id = $1 AND ts.transaction_version = $2`)
+	 WHERE ts.transaction_id = $1 AND ts.transaction_version = $2 ORDER BY ts.step_number ASC`)
 	if err != nil {
 		return []model.Test{}, fmt.Errorf("prepare: %w", err)
 	}

@@ -39,6 +39,40 @@ func TestCreateTransaction(t *testing.T) {
 	}
 }
 
+func TestUpdateTransactionStepsOrder(t *testing.T) {
+	db, clean := getDB()
+	defer clean()
+
+	transaction := createTransaction(t, db)
+
+	transaction.Steps = []model.Test{
+		createTestWithName(t, db, "first step"),
+		createTestWithName(t, db, "second step"),
+	}
+
+	newTransaction, err := db.UpdateTransaction(context.TODO(), transaction)
+	require.NoError(t, err)
+
+	for i, step := range transaction.Steps {
+		newStep := newTransaction.Steps[i]
+		assert.Equal(t, step.ID, newStep.ID)
+	}
+
+	transaction.Steps = []model.Test{
+		transaction.Steps[0],
+		createTestWithName(t, db, "new second step"),
+		transaction.Steps[1],
+	}
+
+	newTransaction, err = db.UpdateTransaction(context.TODO(), transaction)
+	require.NoError(t, err)
+
+	for i, step := range transaction.Steps {
+		newStep := newTransaction.Steps[i]
+		assert.Equal(t, step.ID, newStep.ID)
+	}
+}
+
 func TestDeleteTransaction(t *testing.T) {
 	db, clean := getDB()
 	defer clean()
