@@ -20,21 +20,6 @@ export const InputContainer = styled.div`
   grid-template-columns: 100%;
 `;
 
-export const ValueJson = styled(Typography.Text)`
-  cursor: pointer;
-
-  pre {
-    margin: 0;
-    background: ${({theme}) => theme.color.white};
-    border: ${({theme}) => `1px solid ${theme.color.borderLight}`};
-    font-size: ${({theme}) => theme.size.sm};
-  }
-`;
-
-export const ValueText = styled(Typography.Text)`
-  margin: 0;
-`;
-
 export const Footer = styled.div`
   display: flex;
   justify-content: space-between;
@@ -42,16 +27,11 @@ export const Footer = styled.div`
 `;
 
 export const SelectorTitleContainer = styled.div`
+  align-items: center;
   display: flex;
-  flex-direction: column;
+  gap: 12px;
 `;
 
 export const SelectorLabel = styled(Typography.Text)`
-  margin: 0;
-`;
-
-export const SelectedCount = styled(Typography.Text)`
-  font-size: ${({theme}) => theme.size.xs};
-  color: ${({theme}) => theme.color.textSecondary};
   margin: 0;
 `;

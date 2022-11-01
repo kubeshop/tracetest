@@ -64,6 +64,10 @@ export interface paths {
     /** Set spec for a particular test */
     put: operations["setTestSpecs"];
   };
+  "/tests/{testId}/outputs": {
+    /** Set outputs for a particular test */
+    put: operations["setTestOutputs"];
+  };
   "/tests/{testId}/version/{version}": {
     /** get a test specific version */
     get: operations["getTestVersion"];
@@ -432,6 +436,23 @@ export interface operations {
       };
     };
   };
+  /** Set outputs for a particular test */
+  setTestOutputs: {
+    parameters: {
+      path: {
+        testId: string;
+      };
+    };
+    responses: {
+      /** OK */
+      204: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": external["tests.yaml"]["components"]["schemas"]["TestOutput"][];
+      };
+    };
+  };
   /** get a test specific version */
   getTestVersion: {
     parameters: {
@@ -706,8 +727,18 @@ export interface external {
           serviceUnderTest?: external["triggers.yaml"]["components"]["schemas"]["Trigger"];
           /** @description specification of assertions that are going to be made */
           specs?: external["tests.yaml"]["components"]["schemas"]["TestSpecs"];
+          /**
+           * @description define test outputs, in a key/value format. The value is processed as an expression
+           * @example [object Object],[object Object]
+           */
+          outputs?: external["tests.yaml"]["components"]["schemas"]["TestOutput"][];
           /** @description summary of test data */
           summary?: external["tests.yaml"]["components"]["schemas"]["TestSummary"];
+        };
+        TestOutput: {
+          name?: string;
+          selector?: external["tests.yaml"]["components"]["schemas"]["Selector"];
+          value?: string;
         };
         TestSummary: {
           runs?: number;
@@ -761,6 +792,10 @@ export interface external {
           triggerResult?: external["triggers.yaml"]["components"]["schemas"]["TriggerResult"];
           trace?: external["trace.yaml"]["components"]["schemas"]["Trace"];
           result?: external["tests.yaml"]["components"]["schemas"]["AssertionResults"];
+          outputs?: {
+            name?: string;
+            value?: string;
+          }[];
           metadata?: { [key: string]: string };
         };
         TestRunInformation: {
