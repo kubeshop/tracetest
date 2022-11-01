@@ -188,6 +188,10 @@ func (e Executor) resolveTerm(term *Term) (value.Value, error) {
 
 func (e Executor) resolveAttribute(attribute *Attribute) (value.Value, error) {
 	if attribute.IsMeta() {
+		if e.Stores[metaPrefix] == nil {
+			return value.NewFromString(""), nil
+		}
+
 		selectedSpansDataStore := e.Stores[metaPrefix]
 		attributeValue, err := selectedSpansDataStore.Get(attribute.Name())
 		if err != nil {
@@ -195,6 +199,10 @@ func (e Executor) resolveAttribute(attribute *Attribute) (value.Value, error) {
 		}
 
 		return value.NewFromString(attributeValue), nil
+	}
+
+	if e.Stores["attr"] == nil {
+		return value.NewFromString(""), nil
 	}
 
 	attributeDataStore := e.Stores["attr"]
@@ -217,6 +225,10 @@ func (e Executor) resolveVariable(variable *Variable) (value.Value, error) {
 }
 
 func (e Executor) resolveEnvironment(environment *Environment) (value.Value, error) {
+	if e.Stores["env"] == nil {
+		return value.NewFromString(""), nil
+	}
+
 	envDataStore := e.Stores["env"]
 	envValue, err := envDataStore.Get(environment.Name())
 	if err != nil {
