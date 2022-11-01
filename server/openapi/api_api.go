@@ -293,21 +293,6 @@ func (c *ApiApiController) CreateTest(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// DeleteEnvironment - delete a environment
-func (c *ApiApiController) DeleteEnvironment(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	environmentIdParam := params["environmentId"]
-
-	result, err := c.service.DeleteEnvironment(r.Context(), environmentIdParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-}
-
 // CreateTransaction - Create new transaction
 func (c *ApiApiController) CreateTransaction(w http.ResponseWriter, r *http.Request) {
 	transactionParam := Transaction{}
@@ -322,6 +307,22 @@ func (c *ApiApiController) CreateTransaction(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	result, err := c.service.CreateTransaction(r.Context(), transactionParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// DeleteEnvironment - delete a environment
+func (c *ApiApiController) DeleteEnvironment(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	environmentIdParam := params["environmentId"]
+
+	result, err := c.service.DeleteEnvironment(r.Context(), environmentIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
