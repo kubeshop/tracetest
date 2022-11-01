@@ -4,8 +4,8 @@ import "github.com/alecthomas/participle/v2/lexer"
 
 type Statement struct {
 	Left       *Expr  `@@`
-	Comparator string `@Comparator*`
-	Right      *Expr  `@@*`
+	Comparator string `@Comparator`
+	Right      *Expr  `@@`
 }
 
 type Expr struct {
