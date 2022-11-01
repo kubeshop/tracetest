@@ -19,6 +19,7 @@ const Test = ({
   definition: TestSpecs(specs || {}),
   trigger: Trigger(rawTrigger || {}),
   summary: TestSummary(summary),
+  outputs: [],
 });
 
 export default Test;

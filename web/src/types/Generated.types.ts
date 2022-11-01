@@ -86,6 +86,10 @@ export interface paths {
     /** delete a environment */
     delete: operations["deleteEnvironment"];
   };
+  "/expressions/parse": {
+    /** parses an expression and returns the result string */
+    post: operations["ExpressionParse"];
+  };
 }
 
 export interface components {}
@@ -566,6 +570,22 @@ export interface operations {
       204: never;
     };
   };
+  /** parses an expression and returns the result string */
+  ExpressionParse: {
+    responses: {
+      /** successfully parsed the expression */
+      200: {
+        content: {
+          "application/json": external["expressions.yaml"]["components"]["schemas"]["ParseResponseInfo"];
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": external["expressions.yaml"]["components"]["schemas"]["ParseRequestInfo"];
+      };
+    };
+  };
 }
 
 export interface external {
@@ -604,6 +624,28 @@ export interface external {
         EnvironmentValue: {
           key?: string;
           value?: string;
+        };
+      };
+    };
+    operations: {};
+  };
+  "expressions.yaml": {
+    paths: {};
+    components: {
+      schemas: {
+        ParseRequestInfo: {
+          expression?: string;
+          context?: external["expressions.yaml"]["components"]["schemas"]["ParseContext"];
+        };
+        ParseContext: {
+          testId?: string;
+          runId?: string;
+          spanId?: string;
+          selector?: string;
+          environmentId?: string;
+        };
+        ParseResponseInfo: {
+          expression?: string;
         };
       };
     };
@@ -706,8 +748,18 @@ export interface external {
           serviceUnderTest?: external["triggers.yaml"]["components"]["schemas"]["Trigger"];
           /** @description specification of assertions that are going to be made */
           specs?: external["tests.yaml"]["components"]["schemas"]["TestSpecs"];
+          /**
+           * @description define test outputs, in a key/value format. The value is processed as an expression
+           * @example [object Object],[object Object]
+           */
+          outputs?: external["tests.yaml"]["components"]["schemas"]["TestOutput"][];
           /** @description summary of test data */
           summary?: external["tests.yaml"]["components"]["schemas"]["TestSummary"];
+        };
+        TestOutput: {
+          name?: string;
+          selector?: external["tests.yaml"]["components"]["schemas"]["Selector"];
+          value?: string;
         };
         TestSummary: {
           runs?: number;
@@ -761,6 +813,10 @@ export interface external {
           triggerResult?: external["triggers.yaml"]["components"]["schemas"]["TriggerResult"];
           trace?: external["trace.yaml"]["components"]["schemas"]["Trace"];
           result?: external["tests.yaml"]["components"]["schemas"]["AssertionResults"];
+          outputs?: {
+            name?: string;
+            value?: string;
+          }[];
           metadata?: { [key: string]: string };
         };
         TestRunInformation: {

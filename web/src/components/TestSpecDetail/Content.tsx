@@ -10,6 +10,7 @@ import Assertion from './Assertion';
 import Header from './Header';
 import SpanHeader from './SpanHeader';
 import * as S from './TestSpecDetail.styled';
+import {useTest} from '../../providers/Test/Test.provider';
 
 interface IProps {
   onClose(): void;
@@ -32,8 +33,11 @@ const Content = ({
   testSpec: {resultList, selector, spanIds},
 }: IProps) => {
   const {
-    run: {trace},
+    run: {trace, id: runId},
   } = useTestRun();
+  const {
+    test: {id: testId},
+  } = useTest();
   const {
     isDeleted = false,
     isDraft = false,
@@ -77,7 +81,13 @@ const Content = ({
             $type={span?.type ?? SemanticGroupNames.General}
           >
             {checkResults.map(checkResult => (
-              <Assertion check={checkResult} key={`${checkResult.result.spanId}-${checkResult.assertion}`} />
+              <Assertion
+                testId={testId}
+                runId={runId}
+                selector={selector}
+                check={checkResult}
+                key={`${checkResult.result.spanId}-${checkResult.assertion}`}
+              />
             ))}
           </S.CardContainer>
         );

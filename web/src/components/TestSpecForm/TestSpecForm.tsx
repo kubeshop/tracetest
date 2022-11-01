@@ -139,6 +139,9 @@ const TestSpecForm = ({
                 add={add}
                 remove={remove}
                 attributeList={attributeList}
+                runId={runId}
+                testId={testId}
+                spanIdList={spanIdList}
               />
             )}
           </Form.List>

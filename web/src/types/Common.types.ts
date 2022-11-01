@@ -27,6 +27,7 @@ export type TTestSchemas = external['tests.yaml']['components']['schemas'];
 export type TTriggerSchemas = external['triggers.yaml']['components']['schemas'];
 export type TGrpcSchemas = external['grpc.yaml']['components']['schemas'];
 export type TEnvironmentSchemas = external['environments.yaml']['components']['schemas'];
+export type TExpressionsSchemas = external['expressions.yaml']['components']['schemas'];
 
 export type TSelector = TTestSchemas['Selector'];
 

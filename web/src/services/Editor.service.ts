@@ -36,8 +36,7 @@ interface ITooltipProps {
   view: EditorView;
   pos: number;
   side: -1 | 1;
-  attributeList?: TSpanFlatAttribute[];
-  envEntryList?: IKeyValue[];
+  expression: string;
 }
 
 const EditorService = () => ({
@@ -164,33 +163,21 @@ const EditorService = () => ({
     return this.getSourceAutocomplete(type, node, state, envEntryList, attributeList, onSelect);
   },
 
-  getTooltip({view: {state}, pos, side, envEntryList = [], attributeList = []}: ITooltipProps): Tooltip | null {
+  async getTooltip({view: {state}, pos, side, expression}: ITooltipProps): Promise<Tooltip | null> {
     const tree = syntaxTree(state);
     const node = tree.resolveInner(pos, -1);
 
     if ((node.from === pos && side < 0) || (node.from === pos && side > 0)) return null;
 
-    const parentNode = node.parent;
-
-    if (parentNode && parentNode.name === Tokens.OutsideInput) {
-      const identifier = parentNode.lastChild || {from: 0, to: 0};
-      const identifierText = state.doc.sliceString(identifier.from, identifier.to);
-      const textContent =
-        envEntryList.concat(attributeList).find(({key}) => key === identifierText)?.value || 'No value';
-
-      return {
-        pos: parentNode.from,
-        end: parentNode.to,
-        above: true,
-        create() {
-          const dom = document.createElement('div');
-          dom.textContent = textContent;
-          return {dom};
-        },
-      };
-    }
-
-    return null;
+    return {
+      pos: 0,
+      above: true,
+      create: () => {
+        const dom = document.createElement('div');
+        dom.textContent = expression;
+        return {dom};
+      },
+    };
   },
 
   getIsQueryValid(

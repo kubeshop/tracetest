@@ -66,6 +66,8 @@ const TestRun = ({
     failedAssertionCount: getTestResultCount(result, 'failed'),
     passedAssertionCount: getTestResultCount(result, 'passed'),
     metadata,
+
+    outputs: [],
   };
 };
 

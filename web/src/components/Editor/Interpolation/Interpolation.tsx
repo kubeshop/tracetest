@@ -1,7 +1,10 @@
 import CodeMirror from '@uiw/react-codemirror';
+import {Tooltip} from 'antd';
 import {autocompletion} from '@codemirror/autocomplete';
-import {hoverTooltip} from '@codemirror/view';
-import {useMemo} from 'react';
+import {useCallback, useMemo} from 'react';
+import {useEnvironment} from 'providers/Environment/Environment.provider';
+import EditorService from 'services/Editor.service';
+import {SupportedEditors} from 'constants/Editor.constants';
 import {interpolationQL} from './grammar';
 import useEditorTheme from '../hooks/useEditorTheme';
 import {IEditorProps} from '../Editor';
@@ -13,34 +16,44 @@ const Interpolation = ({
   basicSetup: {lineNumbers, ...basicSetup} = {},
   onChange,
   placeholder,
-  value,
+  value = '',
   extensions = [],
   indentWithTab = false,
 }: IEditorProps) => {
+  const {selectedEnvironment} = useEnvironment();
   const editorTheme = useEditorTheme();
   const completionFn = useAutoComplete();
-  const tooltipFn = useTooltip();
+  const {onHover, expression} = useTooltip({
+    environmentId: selectedEnvironment?.id,
+  });
 
   const extensionList = useMemo(
-    () => [autocompletion({override: [completionFn]}), interpolationQL(), hoverTooltip(tooltipFn), ...extensions],
-    [completionFn, extensions, tooltipFn]
+    () => [autocompletion({override: [completionFn]}), interpolationQL(), ...extensions],
+    [completionFn, extensions]
   );
+
+  const handleHover = useCallback(() => {
+    if (EditorService.getIsQueryValid(SupportedEditors.Interpolation, value)) onHover(value);
+  }, [onHover, value]);
 
   return (
     <S.InterpolationEditorContainer $showLineNumbers={lineNumbers}>
-      <CodeMirror
-        id="interpolation-editor"
-        basicSetup={{...basicSetup, lineNumbers}}
-        data-cy="interpolation-editor"
-        value={value}
-        maxHeight="120px"
-        extensions={extensionList}
-        onChange={onChange}
-        spellCheck={false}
-        theme={editorTheme}
-        placeholder={placeholder}
-        indentWithTab={indentWithTab}
-      />
+      <Tooltip placement="topLeft" title={expression}>
+        <CodeMirror
+          id="interpolation-editor"
+          basicSetup={{...basicSetup, lineNumbers}}
+          data-cy="interpolation-editor"
+          value={value}
+          maxHeight="120px"
+          extensions={extensionList}
+          onChange={onChange}
+          spellCheck={false}
+          theme={editorTheme}
+          placeholder={placeholder}
+          indentWithTab={indentWithTab}
+          onMouseOver={handleHover}
+        />
+      </Tooltip>
     </S.InterpolationEditorContainer>
   );
 };
