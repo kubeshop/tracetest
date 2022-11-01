@@ -643,7 +643,7 @@ func (c *controller) DeleteEnvironment(ctx context.Context, environmentId string
 		return handleDBError(err), err
 	}
 
-	return openapi.Response(204, nil), nil
+	return openapi.Response(http.StatusNoContent, nil), nil
 }
 
 func (c *controller) GetEnvironment(ctx context.Context, environmentId string) (openapi.ImplResponse, error) {
