@@ -53,3 +53,7 @@ export function ordinalSuffixOf(i: number) {
   }
   return `${i}th`;
 }
+
+export function getTotalCountFromHeaders(meta: any) {
+  return Number(meta?.response?.headers.get('x-total-count') || 0);
+}

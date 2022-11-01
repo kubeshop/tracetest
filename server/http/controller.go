@@ -491,7 +491,36 @@ func (c *controller) ExecuteDefinition(ctx context.Context, testDefinition opena
 		return c.executeTest(ctx, test.Model(), testDefinition.RunInformation)
 	}
 
+	if environment, err := def.Environment(); err == nil {
+		return c.createEnvFromDefinition(ctx, environment)
+	}
+
 	return openapi.Response(http.StatusUnprocessableEntity, nil), nil
+}
+
+func (c *controller) createEnvFromDefinition(ctx context.Context, def yaml.Environment) (openapi.ImplResponse, error) {
+	environment := def.Model()
+
+	if environment.ID != "" {
+		_, err := c.testDB.UpdateEnvironment(ctx, environment)
+
+		if err != nil {
+			return handleDBError(err), err
+		}
+	} else {
+		env, err := c.testDB.CreateEnvironment(ctx, environment)
+		environment.ID = env.ID
+
+		if err != nil {
+			return handleDBError(err), err
+		}
+	}
+
+	res := openapi.ExecuteDefinitionResponse{
+		Id: environment.ID,
+	}
+
+	return openapi.Response(200, res), nil
 }
 
 func metadata(in *map[string]string) model.RunMetadata {
