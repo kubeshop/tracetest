@@ -37,12 +37,12 @@ func (e Executor) Statement(statement string) (string, string, error) {
 		return "", "", fmt.Errorf("could not parse statement: %w", err)
 	}
 
-	leftValue, err := e.Expression(parsedStatement.Left)
+	leftValue, err := e.ResolveExpression(parsedStatement.Left)
 	if err != nil {
 		return "", "", fmt.Errorf("could not parse left side expression: %w", err)
 	}
 
-	rightValue, err := e.Expression(parsedStatement.Right)
+	rightValue, err := e.ResolveExpression(parsedStatement.Right)
 	if err != nil {
 		return "", "", fmt.Errorf("could not parse left side expression: %w", err)
 	}
@@ -70,15 +70,22 @@ func (e Executor) Statement(statement string) (string, string, error) {
 	return leftValue.String(), rightValue.String(), err
 }
 
-func (e Executor) ParseStatement(statement string) (string, error) {
+func (e Executor) ResolveStatement(statement string) (string, error) {
 	parsedStatement, err := ParseStatement(statement)
 	if err != nil {
-		return "", fmt.Errorf("could not parse statement: %w", err)
+		// This might be an expression instead
+		expression, err := Parse(statement)
+		if err != nil {
+			// it's really invalid
+			return "", fmt.Errorf("could not parse statement: %w", err)
+		}
+
+		parsedStatement.Left = &expression
 	}
 
 	parsed := ""
 
-	leftValue, err := e.Expression(parsedStatement.Left)
+	leftValue, err := e.ResolveExpression(parsedStatement.Left)
 	if err != nil {
 		return "", fmt.Errorf("could not parse left side expression: %w", err)
 	}
@@ -86,7 +93,7 @@ func (e Executor) ParseStatement(statement string) (string, error) {
 	parsed = parsed + leftValue.String()
 
 	if parsedStatement.Right != nil {
-		rightValue, err := e.Expression(parsedStatement.Right)
+		rightValue, err := e.ResolveExpression(parsedStatement.Right)
 		if err != nil {
 			return "", fmt.Errorf("could not parse left side expression: %w", err)
 		}
@@ -97,7 +104,22 @@ func (e Executor) ParseStatement(statement string) (string, error) {
 	return parsed, nil
 }
 
-func (e Executor) Expression(expr *Expr) (value.Value, error) {
+func (e Executor) Expression(expression string) (value.Value, error) {
+	parser, err := createExpressionParser()
+	if err != nil {
+		return value.Nil, fmt.Errorf("could not create expression parser: %w", err)
+	}
+
+	var expr Expr
+	err = parser.ParseString("", expression, &expr)
+	if err != nil {
+		return value.Nil, fmt.Errorf(`could not parse expression "%s": %w`, expression, err)
+	}
+
+	return e.ResolveExpression(&expr)
+}
+
+func (e Executor) ResolveExpression(expr *Expr) (value.Value, error) {
 	currentValue, err := e.resolveTerm(expr.Left)
 	if err != nil {
 		return value.Nil, fmt.Errorf("could not resolve term: %w", err)
@@ -167,7 +189,7 @@ func (e Executor) resolveTerm(term *Term) (value.Value, error) {
 	if term.Str != nil {
 		stringArgs := make([]any, 0, len(term.Str.Args))
 		for _, arg := range term.Str.Args {
-			newValue, err := e.Expression(&arg)
+			newValue, err := e.ResolveExpression(&arg)
 			if err != nil {
 				return value.Nil, fmt.Errorf("could not execute expression: %w", err)
 			}

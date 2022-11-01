@@ -333,10 +333,10 @@ func TestBasicStatementExecution(t *testing.T) {
 		},
 	}
 
-	executeParseStatementTestCases(t, testCases)
+	executeResolveStatementTestCases(t, testCases)
 }
 
-func TestParseStatementAttributeExecution(t *testing.T) {
+func TestResolveStatementAttributeExecution(t *testing.T) {
 	testCases := []executorTestCase{
 		{
 			Name:       "should_get_values_from_attributes",
@@ -353,10 +353,10 @@ func TestParseStatementAttributeExecution(t *testing.T) {
 		},
 	}
 
-	executeParseStatementTestCases(t, testCases)
+	executeResolveStatementTestCases(t, testCases)
 }
 
-func TestParseStatementVariableExecution(t *testing.T) {
+func TestResolveStatementVariableExecution(t *testing.T) {
 	testCases := []executorTestCase{
 		{
 			Name:       "should_get_values_from_variables",
@@ -370,10 +370,10 @@ func TestParseStatementVariableExecution(t *testing.T) {
 		},
 	}
 
-	executeParseStatementTestCases(t, testCases)
+	executeResolveStatementTestCases(t, testCases)
 }
 
-func TestParseStatementStringInterpolationExecution(t *testing.T) {
+func TestResolveStatementStringInterpolationExecution(t *testing.T) {
 	testCases := []executorTestCase{
 		{
 			Name:       "should_interpolate_simple_values",
@@ -394,10 +394,10 @@ func TestParseStatementStringInterpolationExecution(t *testing.T) {
 		},
 	}
 
-	executeParseStatementTestCases(t, testCases)
+	executeResolveStatementTestCases(t, testCases)
 }
 
-func TestParseStatementFilterExecution(t *testing.T) {
+func TestResolveStatementFilterExecution(t *testing.T) {
 	testCases := []executorTestCase{
 		{
 			Name:       "should_extract_id_from_json",
@@ -433,10 +433,10 @@ func TestParseStatementFilterExecution(t *testing.T) {
 		},
 	}
 
-	executeParseStatementTestCases(t, testCases)
+	executeResolveStatementTestCases(t, testCases)
 }
 
-func executeParseStatementTestCases(t *testing.T, testCases []executorTestCase) {
+func executeResolveStatementTestCases(t *testing.T, testCases []executorTestCase) {
 	for _, testCase := range testCases {
 		t.Run(testCase.Name, func(t *testing.T) {
 			executor := expression.NewExecutor(
@@ -444,7 +444,7 @@ func executeParseStatementTestCases(t *testing.T, testCases []executorTestCase) 
 				testCase.MetaAttributesDataStore,
 				testCase.VariableDataStore,
 			)
-			left, err := executor.ParseStatement(testCase.Query)
+			left, err := executor.ResolveStatement(testCase.Query)
 			debugMessage := fmt.Sprintf("left value: %s", left)
 			if testCase.ShouldPass {
 				assert.NoError(t, err, debugMessage)
