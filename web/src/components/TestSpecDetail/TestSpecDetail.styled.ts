@@ -52,6 +52,8 @@ export const GridContainer = styled.div`
 
 export const CheckItemContainer = styled.div`
   padding: 10px 12px 10px 42px;
+
+  border-bottom: 1px solid ${({theme}) => theme.color.borderLight};
 `;
 
 export const HeaderContainer = styled.div`

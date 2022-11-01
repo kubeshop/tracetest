@@ -98,7 +98,7 @@ func (e Executor) ResolveStatement(statement string) (string, error) {
 			return "", fmt.Errorf("could not parse left side expression: %w", err)
 		}
 
-		parsed = parsed + parsedStatement.Comparator + rightValue.String()
+		parsed = fmt.Sprintf("%s %s %s", parsed, parsedStatement.Comparator, rightValue.String())
 	}
 
 	return parsed, nil
