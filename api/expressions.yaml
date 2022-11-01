@@ -1,0 +1,29 @@
+openapi: 3.0.0
+
+components:
+  schemas:
+    ResolveRequestInfo:
+      type: object
+      properties:
+        expression:
+          type: string
+        context:
+          $ref: "#/components/schemas/ResolveContext"
+    ResolveContext:
+      type: object
+      properties:
+        testId:
+          type: string
+        runId:
+          type: string
+        spanId:
+          type: string
+        selector:
+          type: string
+        environmentId:
+          type: string
+    ResolveResponseInfo:
+      type: object
+      properties:
+        resolvedValue:
+          type: string

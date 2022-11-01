@@ -91,12 +91,12 @@ func TestExpressions(t *testing.T) {
 			Name:  "should_parse_expressions_with_addition_operator",
 			Query: "2 + 1 = 1 + 2",
 			ExpectedOutput: expression.Statement{
-				Left: expression.Expr{
+				Left: &expression.Expr{
 					Left:  &expression.Term{Number: strp("2")},
 					Right: []*expression.OpTerm{{Operator: "+", Term: &expression.Term{Number: strp("1")}}},
 				},
 				Comparator: "=",
-				Right: expression.Expr{
+				Right: &expression.Expr{
 					Left:  &expression.Term{Number: strp("1")},
 					Right: []*expression.OpTerm{{Operator: "+", Term: &expression.Term{Number: strp("2")}}},
 				},
@@ -106,12 +106,12 @@ func TestExpressions(t *testing.T) {
 			Name:  "should_parse_expressions_with_subtraction_operator",
 			Query: "2 - 1 != 1 - 2",
 			ExpectedOutput: expression.Statement{
-				Left: expression.Expr{
+				Left: &expression.Expr{
 					Left:  &expression.Term{Number: strp("2")},
 					Right: []*expression.OpTerm{{Operator: "-", Term: &expression.Term{Number: strp("1")}}},
 				},
 				Comparator: "!=",
-				Right: expression.Expr{
+				Right: &expression.Expr{
 					Left:  &expression.Term{Number: strp("1")},
 					Right: []*expression.OpTerm{{Operator: "-", Term: &expression.Term{Number: strp("2")}}},
 				},
@@ -121,12 +121,12 @@ func TestExpressions(t *testing.T) {
 			Name:  "should_parse_expressions_with_multiplication_operator",
 			Query: "2 * 1 = 1 * 2",
 			ExpectedOutput: expression.Statement{
-				Left: expression.Expr{
+				Left: &expression.Expr{
 					Left:  &expression.Term{Number: strp("2")},
 					Right: []*expression.OpTerm{{Operator: "*", Term: &expression.Term{Number: strp("1")}}},
 				},
 				Comparator: "=",
-				Right: expression.Expr{
+				Right: &expression.Expr{
 					Left:  &expression.Term{Number: strp("1")},
 					Right: []*expression.OpTerm{{Operator: "*", Term: &expression.Term{Number: strp("2")}}},
 				},
@@ -136,12 +136,12 @@ func TestExpressions(t *testing.T) {
 			Name:  "should_parse_expressions_with_division_operator",
 			Query: "2 / 1 != 1 / 2",
 			ExpectedOutput: expression.Statement{
-				Left: expression.Expr{
+				Left: &expression.Expr{
 					Left:  &expression.Term{Number: strp("2")},
 					Right: []*expression.OpTerm{{Operator: "/", Term: &expression.Term{Number: strp("1")}}},
 				},
 				Comparator: "!=",
-				Right: expression.Expr{
+				Right: &expression.Expr{
 					Left:  &expression.Term{Number: strp("1")},
 					Right: []*expression.OpTerm{{Operator: "/", Term: &expression.Term{Number: strp("2")}}},
 				},
@@ -160,7 +160,7 @@ func TestStringInterpolation(t *testing.T) {
 			ExpectedOutput: expression.Statement{
 				Left:       attrExpr("text"),
 				Comparator: "=",
-				Right: expression.Expr{
+				Right: &expression.Expr{
 					Left: &expression.Term{
 						Str: &expression.Str{
 							Text: "your age is %s",
@@ -178,7 +178,7 @@ func TestStringInterpolation(t *testing.T) {
 			ExpectedOutput: expression.Statement{
 				Left:       attrExpr("text"),
 				Comparator: "=",
-				Right: expression.Expr{
+				Right: &expression.Expr{
 					Left: &expression.Term{
 						Str: &expression.Str{
 							Text: "your age is %s but you must be %s to start drinking",
@@ -197,7 +197,7 @@ func TestStringInterpolation(t *testing.T) {
 			ExpectedOutput: expression.Statement{
 				Left:       attrExpr("text"),
 				Comparator: "=",
-				Right: expression.Expr{
+				Right: &expression.Expr{
 					Left: &expression.Term{
 						Str: &expression.Str{
 							Text: "your age will be %s in two years",
@@ -220,7 +220,7 @@ func TestStringInterpolation(t *testing.T) {
 			ExpectedOutput: expression.Statement{
 				Left:       attrExpr("tracetest.response.body"),
 				Comparator: "=",
-				Right: expression.Expr{
+				Right: &expression.Expr{
 					Left: &expression.Term{
 						Str: &expression.Str{
 							Text: `{"userID":"%s"}`,
@@ -245,7 +245,7 @@ func TestFilters(t *testing.T) {
 			Name:  "should_allow_filter_on_left_hand_side",
 			Query: `attr:my_json_attribute | json_path '.id' = 32`,
 			ExpectedOutput: expression.Statement{
-				Left: expression.Expr{
+				Left: &expression.Expr{
 					Left: &expression.Term{
 						Attribute: attrp("my_json_attribute"),
 					},
@@ -263,7 +263,7 @@ func TestFilters(t *testing.T) {
 					},
 				},
 				Comparator: "=",
-				Right: expression.Expr{
+				Right: &expression.Expr{
 					Left: &expression.Term{
 						Number: strp("32"),
 					},
@@ -274,13 +274,13 @@ func TestFilters(t *testing.T) {
 			Name:  "should_allow_filter_on_right_hand_side",
 			Query: `attr:user_id = attr:tracetest.response.body | json_path '.id'`,
 			ExpectedOutput: expression.Statement{
-				Left: expression.Expr{
+				Left: &expression.Expr{
 					Left: &expression.Term{
 						Attribute: attrp("user_id"),
 					},
 				},
 				Comparator: "=",
-				Right: expression.Expr{
+				Right: &expression.Expr{
 					Left: &expression.Term{
 						Attribute: attrp("tracetest.response.body"),
 					},
@@ -303,7 +303,7 @@ func TestFilters(t *testing.T) {
 			Name:  "should_allow_filters_with_multiple_arguments",
 			Query: `attr:my_json_attribute | my_function 'arg1' 'arg2' 42 = "abc"`,
 			ExpectedOutput: expression.Statement{
-				Left: expression.Expr{
+				Left: &expression.Expr{
 					Left: &expression.Term{
 						Attribute: attrp("my_json_attribute"),
 					},
@@ -330,7 +330,7 @@ func TestFilters(t *testing.T) {
 					},
 				},
 				Comparator: "=",
-				Right: expression.Expr{
+				Right: &expression.Expr{
 					Left: &expression.Term{
 						Str: &expression.Str{
 							Text: "abc",
@@ -344,7 +344,7 @@ func TestFilters(t *testing.T) {
 			Name:  "should_allow_chaining_filters",
 			Query: `attr:my_json_attribute | json_path '.name' | lowercase = "john"`,
 			ExpectedOutput: expression.Statement{
-				Left: expression.Expr{
+				Left: &expression.Expr{
 					Left: &expression.Term{
 						Attribute: attrp("my_json_attribute"),
 					},
@@ -365,7 +365,7 @@ func TestFilters(t *testing.T) {
 					},
 				},
 				Comparator: "=",
-				Right: expression.Expr{
+				Right: &expression.Expr{
 					Left: &expression.Term{
 						Str: &expression.Str{
 							Text: "john",
@@ -379,13 +379,13 @@ func TestFilters(t *testing.T) {
 			Name:  "should_allow_filters_inside_string_interpolation",
 			Query: `attr:message = "welcome to tracetest, ${attr:tracetest.response.body | json_path '.name'}"`,
 			ExpectedOutput: expression.Statement{
-				Left: expression.Expr{
+				Left: &expression.Expr{
 					Left: &expression.Term{
 						Attribute: attrp("message"),
 					},
 				},
 				Comparator: "=",
-				Right: expression.Expr{
+				Right: &expression.Expr{
 					Left: &expression.Term{
 						Str: &expression.Str{
 							Text: "welcome to tracetest, %s",
@@ -424,7 +424,7 @@ func TestFunctions(t *testing.T) {
 			Name:  "should_parse_no_arg_function",
 			Query: `myFunction() = 3`,
 			ExpectedOutput: expression.Statement{
-				Left: expression.Expr{
+				Left: &expression.Expr{
 					Left: &expression.Term{
 						FunctionCall: &expression.FunctionCall{
 							Name: "myFunction",
@@ -440,7 +440,7 @@ func TestFunctions(t *testing.T) {
 			Name:  "should_parse_one_arg_function",
 			Query: `getRandomString(5) = "abcde"`,
 			ExpectedOutput: expression.Statement{
-				Left: expression.Expr{
+				Left: &expression.Expr{
 					Left: &expression.Term{
 						FunctionCall: &expression.FunctionCall{
 							Name: "getRandomString",
@@ -460,7 +460,7 @@ func TestFunctions(t *testing.T) {
 			Name:  "should_parse_one_arg_function",
 			Query: `randomInt(5, 10) = 7`,
 			ExpectedOutput: expression.Statement{
-				Left: expression.Expr{
+				Left: &expression.Expr{
 					Left: &expression.Term{
 						FunctionCall: &expression.FunctionCall{
 							Name: "randomInt",
@@ -490,13 +490,13 @@ func TestArrays(t *testing.T) {
 			Name:  "should_parse_empty_array",
 			Query: `[] = []`,
 			ExpectedOutput: expression.Statement{
-				Left: expression.Expr{
+				Left: &expression.Expr{
 					Left: &expression.Term{
 						Array: &expression.Array{},
 					},
 				},
 				Comparator: "=",
-				Right: expression.Expr{
+				Right: &expression.Expr{
 					Left: &expression.Term{
 						Array: &expression.Array{},
 					},
@@ -507,7 +507,7 @@ func TestArrays(t *testing.T) {
 			Name:  "should_parse_single_item_arrays",
 			Query: `[2] = [3]`,
 			ExpectedOutput: expression.Statement{
-				Left: expression.Expr{
+				Left: &expression.Expr{
 					Left: &expression.Term{
 						Array: &expression.Array{
 							Items: []*expression.Term{
@@ -517,7 +517,7 @@ func TestArrays(t *testing.T) {
 					},
 				},
 				Comparator: "=",
-				Right: expression.Expr{
+				Right: &expression.Expr{
 					Left: &expression.Term{
 						Array: &expression.Array{
 							Items: []*expression.Term{
@@ -532,7 +532,7 @@ func TestArrays(t *testing.T) {
 			Name:  "should_parse_multiple_items_arrays",
 			Query: `[1, 2s, "3"] = ["3", 2s, 1]`,
 			ExpectedOutput: expression.Statement{
-				Left: expression.Expr{
+				Left: &expression.Expr{
 					Left: &expression.Term{
 						Array: &expression.Array{
 							Items: []*expression.Term{
@@ -544,7 +544,7 @@ func TestArrays(t *testing.T) {
 					},
 				},
 				Comparator: "=",
-				Right: expression.Expr{
+				Right: &expression.Expr{
 					Left: &expression.Term{
 						Array: &expression.Array{
 							Items: []*expression.Term{
@@ -576,33 +576,33 @@ func strp(in string) *string {
 	return &in
 }
 
-func numberExpr(number int) expression.Expr {
-	return expression.Expr{
+func numberExpr(number int) *expression.Expr {
+	return &expression.Expr{
 		Left: &expression.Term{
 			Number: strp(fmt.Sprintf("%d", number)),
 		},
 	}
 }
 
-func durationExpr(duration string) expression.Expr {
-	return expression.Expr{
+func durationExpr(duration string) *expression.Expr {
+	return &expression.Expr{
 		Left: &expression.Term{
 			Duration: &duration,
 		},
 	}
 }
 
-func attrExpr(attrName string) expression.Expr {
-	return expression.Expr{
+func attrExpr(attrName string) *expression.Expr {
+	return &expression.Expr{
 		Left: &expression.Term{
 			Attribute: attrp(attrName),
 		},
 	}
 }
 
-func varExpr(varName string) expression.Expr {
+func varExpr(varName string) *expression.Expr {
 	variableObject := expression.NewVariable(varName)
-	return expression.Expr{
+	return &expression.Expr{
 		Left: &expression.Term{
 			Variable: &variableObject,
 		},
@@ -614,12 +614,12 @@ func attrp(attrName string) *expression.Attribute {
 	return &attr
 }
 
-func strExpr(str string) expression.Expr {
+func strExpr(str string) *expression.Expr {
 	s := expression.Str{
 		Text: str,
 		Args: []expression.Expr{},
 	}
-	return expression.Expr{
+	return &expression.Expr{
 		Left: &expression.Term{
 			Str: &s,
 		},

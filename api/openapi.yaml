@@ -664,3 +664,24 @@ paths:
       responses:
         "204":
           description: OK
+
+  # expressions
+  /expressions/resolve:
+    post:
+      tags:
+        - api
+      summary: resolves an expression and returns the result string
+      description: resolves an expression and returns the result string
+      operationId: ExpressionResolve
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "./expressions.yaml#/components/schemas/ResolveRequestInfo"
+      responses:
+        200:
+          description: successfully resolved the expression
+          content:
+            application/json:
+              schema:
+                $ref: "./expressions.yaml#/components/schemas/ResolveResponseInfo"
