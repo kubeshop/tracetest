@@ -1,7 +1,7 @@
 import {SyntaxNode} from '@lezer/common/dist';
 import {EditorState} from '@codemirror/state';
 import {syntaxTree} from '@codemirror/language';
-import {EditorView, Tooltip} from '@codemirror/view';
+import {EditorView} from '@codemirror/view';
 import {Completion, CompletionContext, CompletionResult} from '@codemirror/autocomplete';
 import {
   completeSourceAfter,
@@ -30,13 +30,6 @@ interface IAutoCompleteProps {
   attributeList?: TSpanFlatAttribute[];
   envEntryList?: IKeyValue[];
   onSelect?(option: Completion): void;
-}
-
-interface ITooltipProps {
-  view: EditorView;
-  pos: number;
-  side: -1 | 1;
-  expression: string;
 }
 
 const EditorService = () => ({
@@ -161,23 +154,6 @@ const EditorService = () => ({
     if (operatorAutocomplete) return operatorAutocomplete;
 
     return this.getSourceAutocomplete(type, node, state, envEntryList, attributeList, onSelect);
-  },
-
-  async getTooltip({view: {state}, pos, side, expression}: ITooltipProps): Promise<Tooltip | null> {
-    const tree = syntaxTree(state);
-    const node = tree.resolveInner(pos, -1);
-
-    if ((node.from === pos && side < 0) || (node.from === pos && side > 0)) return null;
-
-    return {
-      pos: 0,
-      above: true,
-      create: () => {
-        const dom = document.createElement('div');
-        dom.textContent = expression;
-        return {dom};
-      },
-    };
   },
 
   getIsQueryValid(

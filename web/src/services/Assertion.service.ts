@@ -5,7 +5,7 @@ import {ICheckResult, TAssertionResult, TRawAssertionResult, TStructuredAssertio
 import {durationRegExp} from 'constants/Common.constants';
 import {Attributes} from 'constants/SpanAttribute.constants';
 import {CompareOperatorSymbolMap, OperatorRegexp} from 'constants/Operator.constants';
-import { TCompareOperatorSymbol } from '../types/Operator.types';
+import {TCompareOperatorSymbol} from '../types/Operator.types';
 
 const isNumeric = (num: string): boolean => /^-?\d+(?:\.\d+)?$/.test(num);
 const isNumericTime = (num: string): boolean => durationRegExp.test(num);
@@ -28,7 +28,9 @@ const AssertionService = () => ({
       return formatted;
     }
 
-    return this.quotedString(formatted);
+    const isQuoted = formatted.startsWith('"') && formatted.endsWith('"');
+
+    return isQuoted ? formatted : this.quotedString(formatted);
   },
   quotedString(str: string): string {
     return `\"${str}\"`;

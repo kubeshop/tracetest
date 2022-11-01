@@ -6,11 +6,11 @@ import {useAppSelector} from 'redux/hooks';
 import TestSpecsSelectors from 'selectors/TestSpecs.selectors';
 import AssertionService from 'services/Assertion.service';
 import {TAssertionResultEntry} from 'types/Assertion.types';
+import {useTest} from 'providers/Test/Test.provider';
 import Assertion from './Assertion';
 import Header from './Header';
 import SpanHeader from './SpanHeader';
 import * as S from './TestSpecDetail.styled';
-import {useTest} from '../../providers/Test/Test.provider';
 
 interface IProps {
   onClose(): void;

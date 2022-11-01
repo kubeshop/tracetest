@@ -1,10 +1,9 @@
 import {useCallback, useState} from 'react';
-import {useAppDispatch} from 'redux/hooks';
-import ExpressionGateway from 'gateways/Expression.gateway';
 import {TParseExpressionContext, TParseRequestInfo} from 'types/Expression.types';
+import {useParseExpressionMutation} from 'redux/apis/TraceTest.api';
 
 const useTooltip = (context: TParseExpressionContext = {}) => {
-  const dispatch = useAppDispatch();
+  const [parseExpressionMutation] = useParseExpressionMutation();
   const [prevExpression, setPrevExpression] = useState<string>('');
   const [prevRawExpression, setPrevRawExpression] = useState<string>('');
 
@@ -14,12 +13,12 @@ const useTooltip = (context: TParseExpressionContext = {}) => {
 
       if (isSameAsPrev) return prevExpression;
 
-      const parsedExpression = await dispatch(ExpressionGateway.parseExpression(props)).unwrap();
+      const parsedExpression = await parseExpressionMutation(props).unwrap();
 
       setPrevExpression(parsedExpression);
       setPrevRawExpression(props.expression || '');
     },
-    [dispatch, prevExpression, prevRawExpression]
+    [parseExpressionMutation, prevExpression, prevRawExpression]
   );
 
   const onHover = useCallback(
