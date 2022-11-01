@@ -62,6 +62,10 @@ export const ExpressionEditorContainer = styled(EditorContainer)<{$isEditable: b
         border-right-width: 1px;
         outline: 0;
       }
+
+      .cm-content {
+        padding: 5px 0;
+      }
     }
 
     .cm-content {
