@@ -6,6 +6,8 @@ receivers:
 
 
 processors:
+  logging:
+    logLevel: debug
   batch:
     timeout: 100ms
 
@@ -25,5 +27,5 @@ service:
   pipelines:
     traces:
       receivers: [otlp]
-      processors: [probabilistic_sampler, batch]
+      processors: [probabilistic_sampler, batch, logging]
       exporters: [otlp/2]
