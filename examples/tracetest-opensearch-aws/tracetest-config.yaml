@@ -2,7 +2,7 @@ postgresConnString: "host=postgres user=postgres password=postgres port=5432 ssl
 
 poolingConfig:
   maxWaitTimeForTrace: 10m
-  retryDelay: 5s
+  retryDelay: 10s
 
 googleAnalytics:
   enabled: false
@@ -20,6 +20,8 @@ telemetry:
         addresses:
           - http://opensearch:9200
         index: traces
+        username: example
+        password: Example1#
 
   exporters:
     collector:

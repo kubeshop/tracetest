@@ -53,3 +53,5 @@ services:
         volumes:
             - ./opensearch/opensearch-analytics.yaml:/usr/share/data-prepper/pipelines.yaml
             - ./opensearch/opensearch-data-prepper-config.yaml:/usr/share/data-prepper/data-prepper-config.yaml
+        ports:
+            - "21890:21890"

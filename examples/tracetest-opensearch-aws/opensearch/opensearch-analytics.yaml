@@ -17,8 +17,8 @@ raw-pipeline:
     - opensearch:
         hosts:
           - "http://opensearch:9200"
-        insecure: true
+        insecure: false
         trace-analytics-raw: true
         username: example
-        password: Example1*
+        password: Example1#
         index: traces

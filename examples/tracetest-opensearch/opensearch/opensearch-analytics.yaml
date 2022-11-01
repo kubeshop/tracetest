@@ -16,7 +16,7 @@ raw-pipeline:
   sink:
     - opensearch:
         hosts:
-          - "https://opensearch:9200"
+          - "http://opensearch:9200"
         insecure: true
         trace-analytics-raw: true
         index: traces
