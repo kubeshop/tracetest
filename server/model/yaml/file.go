@@ -11,6 +11,7 @@ type FileType string
 const (
 	FileTypeTest        FileType = "Test"
 	FileTypeTransaction FileType = "Transaction"
+	FileTypeEnvironment FileType = "Environment"
 )
 
 type File struct {
@@ -65,4 +66,17 @@ func (f File) Transaction() (Transaction, error) {
 	}
 
 	return transaction, nil
+}
+
+func (f File) Environment() (Environment, error) {
+	if f.Type != FileTypeEnvironment {
+		return Environment{}, fmt.Errorf("file is not an environment")
+	}
+
+	environment, ok := f.Spec.(Environment)
+	if !ok {
+		return Environment{}, fmt.Errorf("file spec cannot be casted to an environment")
+	}
+
+	return environment, nil
 }
