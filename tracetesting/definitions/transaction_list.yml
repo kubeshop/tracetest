@@ -1,7 +1,7 @@
 ---
 type: Test
 spec:
-  name: Create Transaction
+  name: List Transactions
   trigger:
     type: http
     httpRequest:
