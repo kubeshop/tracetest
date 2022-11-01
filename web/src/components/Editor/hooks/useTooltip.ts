@@ -1,14 +1,14 @@
 import {useCallback, useState} from 'react';
-import {TParseExpressionContext, TParseRequestInfo} from 'types/Expression.types';
+import {TResolveExpressionContext, TResolveRequestInfo} from 'types/Expression.types';
 import {useParseExpressionMutation} from 'redux/apis/TraceTest.api';
 
-const useTooltip = (context: TParseExpressionContext = {}) => {
+const useTooltip = (context: TResolveExpressionContext = {}) => {
   const [parseExpressionMutation] = useParseExpressionMutation();
   const [prevExpression, setPrevExpression] = useState<string>('');
   const [prevRawExpression, setPrevRawExpression] = useState<string>('');
 
   const parseExpression = useCallback(
-    async (props: TParseRequestInfo) => {
+    async (props: TResolveRequestInfo) => {
       const isSameAsPrev = prevRawExpression === props.expression;
 
       if (isSameAsPrev) return prevExpression;

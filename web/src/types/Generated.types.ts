@@ -86,9 +86,9 @@ export interface paths {
     /** delete a environment */
     delete: operations["deleteEnvironment"];
   };
-  "/expressions/parse": {
-    /** parses an expression and returns the result string */
-    post: operations["ExpressionParse"];
+  "/expressions/resolve": {
+    /** resolves an expression and returns the result string */
+    post: operations["ExpressionResolve"];
   };
 }
 
@@ -570,19 +570,19 @@ export interface operations {
       204: never;
     };
   };
-  /** parses an expression and returns the result string */
-  ExpressionParse: {
+  /** resolves an expression and returns the result string */
+  ExpressionResolve: {
     responses: {
-      /** successfully parsed the expression */
+      /** successfully resolved the expression */
       200: {
         content: {
-          "application/json": external["expressions.yaml"]["components"]["schemas"]["ParseResponseInfo"];
+          "application/json": external["expressions.yaml"]["components"]["schemas"]["ResolveResponseInfo"];
         };
       };
     };
     requestBody: {
       content: {
-        "application/json": external["expressions.yaml"]["components"]["schemas"]["ParseRequestInfo"];
+        "application/json": external["expressions.yaml"]["components"]["schemas"]["ResolveRequestInfo"];
       };
     };
   };
@@ -633,19 +633,19 @@ export interface external {
     paths: {};
     components: {
       schemas: {
-        ParseRequestInfo: {
+        ResolveRequestInfo: {
           expression?: string;
-          context?: external["expressions.yaml"]["components"]["schemas"]["ParseContext"];
+          context?: external["expressions.yaml"]["components"]["schemas"]["ResolveContext"];
         };
-        ParseContext: {
+        ResolveContext: {
           testId?: string;
           runId?: string;
           spanId?: string;
           selector?: string;
           environmentId?: string;
         };
-        ParseResponseInfo: {
-          expression?: string;
+        ResolveResponseInfo: {
+          resolvedValue?: string;
         };
       };
     };
