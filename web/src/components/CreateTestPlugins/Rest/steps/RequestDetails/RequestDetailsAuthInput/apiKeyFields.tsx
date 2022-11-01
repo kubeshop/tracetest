@@ -10,7 +10,7 @@ export const apiKeyFields: React.ReactElement = (
       <R.FlexContainer>
         <Form.Item
           data-cy="apiKey-key"
-          style={{flexBasis: '50%'}}
+          style={{flexBasis: '50%', marginTop: '26px'}}
           name={['auth', 'apiKey', 'key']}
           label="Key"
           rules={[{required: true}]}
@@ -19,7 +19,7 @@ export const apiKeyFields: React.ReactElement = (
         </Form.Item>
         <Form.Item
           data-cy="apiKey-value"
-          style={{flexBasis: '50%'}}
+          style={{flexBasis: '50%', marginTop: '26px'}}
           name={['auth', 'apiKey', 'value']}
           label="Value"
           rules={[{required: true}]}

@@ -9,7 +9,7 @@ export const basicFields: React.ReactElement = (
   <S.Row>
     <R.FlexContainer>
       <Form.Item
-        style={{flexBasis: '50%'}}
+        style={{flexBasis: '50%', marginTop: '26px'}}
         name={['auth', 'basic', 'username']}
         data-cy="basic-username"
         label="Username"
@@ -18,7 +18,7 @@ export const basicFields: React.ReactElement = (
         <Editor type={SupportedEditors.Interpolation} />
       </Form.Item>
       <Form.Item
-        style={{flexBasis: '50%'}}
+        style={{flexBasis: '50%', marginTop: '26px'}}
         name={['auth', 'basic', 'password']}
         label="Password"
         data-cy="basic-password"

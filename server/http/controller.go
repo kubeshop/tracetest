@@ -491,7 +491,36 @@ func (c *controller) ExecuteDefinition(ctx context.Context, testDefinition opena
 		return c.executeTest(ctx, test.Model(), testDefinition.RunInformation)
 	}
 
+	if environment, err := def.Environment(); err == nil {
+		return c.createEnvFromDefinition(ctx, environment)
+	}
+
 	return openapi.Response(http.StatusUnprocessableEntity, nil), nil
+}
+
+func (c *controller) createEnvFromDefinition(ctx context.Context, def yaml.Environment) (openapi.ImplResponse, error) {
+	environment := def.Model()
+
+	if environment.ID != "" {
+		_, err := c.testDB.UpdateEnvironment(ctx, environment)
+
+		if err != nil {
+			return handleDBError(err), err
+		}
+	} else {
+		env, err := c.testDB.CreateEnvironment(ctx, environment)
+		environment.ID = env.ID
+
+		if err != nil {
+			return handleDBError(err), err
+		}
+	}
+
+	res := openapi.ExecuteDefinitionResponse{
+		Id: environment.ID,
+	}
+
+	return openapi.Response(200, res), nil
 }
 
 func metadata(in *map[string]string) model.RunMetadata {
@@ -656,21 +685,20 @@ func (c *controller) buildDataStores(ctx context.Context, info openapi.ParseRequ
 
 	ds := []expression.DataStore{}
 
-	if context.Attr.RunId != "" && context.Attr.TestId != "" {
-		attr := context.Attr
-		runId, err := strconv.Atoi(attr.RunId)
+	if context.RunId != "" && context.TestId != "" {
+		runId, err := strconv.Atoi(context.RunId)
 
 		if err != nil {
 			return []expression.DataStore{}, err
 		}
 
-		run, err := c.testDB.GetRun(ctx, id.ID(attr.TestId), runId)
+		run, err := c.testDB.GetRun(ctx, id.ID(context.TestId), runId)
 		if err != nil {
 			return []expression.DataStore{}, err
 		}
 
-		if context.Attr.SpanId != "" {
-			spanId, err := trace.SpanIDFromHex(attr.SpanId)
+		if context.SpanId != "" {
+			spanId, err := trace.SpanIDFromHex(context.SpanId)
 
 			if err != nil {
 				return []expression.DataStore{}, err
@@ -683,8 +711,8 @@ func (c *controller) buildDataStores(ctx context.Context, info openapi.ParseRequ
 			}}, ds...)
 		}
 
-		if attr.Selector != "" {
-			selector, err := selectors.New(attr.Selector)
+		if context.Selector != "" {
+			selector, err := selectors.New(context.Selector)
 			if err != nil {
 				return []expression.DataStore{}, err
 			}
@@ -696,8 +724,8 @@ func (c *controller) buildDataStores(ctx context.Context, info openapi.ParseRequ
 		}
 	}
 
-	if context.Env.EnvironmentId != "" {
-		environment, err := c.testDB.GetEnvironment(ctx, context.Env.EnvironmentId)
+	if context.EnvironmentId != "" {
+		environment, err := c.testDB.GetEnvironment(ctx, context.EnvironmentId)
 
 		if err != nil {
 			return []expression.DataStore{}, err

@@ -12,12 +12,12 @@ package openapi
 type ParseRequestInfo struct {
 	Expression string `json:"expression,omitempty"`
 
-	Context ParseRequestInfoContext `json:"context,omitempty"`
+	Context ParseContext `json:"context,omitempty"`
 }
 
 // AssertParseRequestInfoRequired checks if the required fields are not zero-ed
 func AssertParseRequestInfoRequired(obj ParseRequestInfo) error {
-	if err := AssertParseRequestInfoContextRequired(obj.Context); err != nil {
+	if err := AssertParseContextRequired(obj.Context); err != nil {
 		return err
 	}
 	return nil

@@ -8,18 +8,8 @@ components:
         expression:
           type: string
         context:
-          type: object
-          properties:
-            env:
-              $ref: "#/components/schemas/EnvDataStore"
-            attr:
-              $ref: "#/components/schemas/AttrDataStore"
-    EnvDataStore:
-      type: object
-      properties:
-        environmentId:
-          type: string
-    AttrDataStore:
+          $ref: "#/components/schemas/ParseContext"
+    ParseContext:
       type: object
       properties:
         testId:
@@ -29,6 +19,8 @@ components:
         spanId:
           type: string
         selector:
+          type: string
+        environmentId:
           type: string
     ParseResponseInfo:
       type: object
