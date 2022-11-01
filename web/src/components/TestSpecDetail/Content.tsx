@@ -80,15 +80,17 @@ const Content = ({
             $isSelected={spanId === selectedSpan}
             $type={span?.type ?? SemanticGroupNames.General}
           >
-            {checkResults.map(checkResult => (
-              <Assertion
-                testId={testId}
-                runId={runId}
-                selector={selector}
-                check={checkResult}
-                key={`${checkResult.result.spanId}-${checkResult.assertion}`}
-              />
-            ))}
+            <S.AssertionsContainer onClick={() => onSelectSpan(span?.id ?? '')}>
+              {checkResults.map(checkResult => (
+                <Assertion
+                  testId={testId}
+                  runId={runId}
+                  selector={selector}
+                  check={checkResult}
+                  key={`${checkResult.result.spanId}-${checkResult.assertion}`}
+                />
+              ))}
+            </S.AssertionsContainer>
           </S.CardContainer>
         );
       })}

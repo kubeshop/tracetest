@@ -4,6 +4,10 @@ import styled from 'styled-components';
 
 import {SemanticGroupNames, SemanticGroupNamesToColor} from 'constants/SemanticGroupNames.constants';
 
+export const AssertionsContainer = styled.div`
+  cursor: pointer;
+`;
+
 export const AssertionContainer = styled.div`
   span {
     overflow-wrap: anywhere;
@@ -22,10 +26,15 @@ export const CardContainer = styled(Card)<{$isSelected: boolean; $type: Semantic
     border-bottom: ${({theme}) => `1px solid ${theme.color.borderLight}`};
     border-top: ${({$type}) => `4px solid ${SemanticGroupNamesToColor[$type]}`};
     background-color: ${({theme}) => theme.color.white};
+    padding: 0;
   }
 
   > .ant-card-body {
-    padding: 0px 12px;
+    padding: 0;
+  }
+
+  .ant-card-head > .ant-card-head-wrapper > .ant-card-head-title {
+    padding: 0;
   }
 `;
 
@@ -42,11 +51,7 @@ export const GridContainer = styled.div`
 `;
 
 export const CheckItemContainer = styled.div`
-  padding: 10px 0 10px 30px;
-
-  &:hover {
-    background: ${({theme}) => theme.color.background};
-  }
+  padding: 10px 12px 10px 42px;
 `;
 
 export const HeaderContainer = styled.div`
@@ -98,4 +103,5 @@ export const SpanHeaderContainer = styled.div`
   cursor: pointer;
   display: flex;
   gap: 8px;
+  padding: 8px 12px;
 `;

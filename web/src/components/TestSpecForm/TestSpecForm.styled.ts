@@ -31,13 +31,12 @@ export const FieldsContainer = styled.div`
   width: 95%;
   grid-template-columns: 1fr auto 1fr;
   gap: 8px;
-  align-items: center;
 `;
 
 export const ActionContainer = styled.div`
   display: flex;
   justify-content: center;
-  align-self: center;
+  align-self: flex-start;
   flex-basis: 5%;
 `;
 
