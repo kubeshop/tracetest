@@ -671,7 +671,7 @@ func (c *controller) ExpressionResolve(ctx context.Context, in openapi.ResolveRe
 		return openapi.Response(http.StatusBadRequest, err.Error()), err
 	}
 
-	parsed, err := expression.NewExecutor(ds...).ParseStatement(in.Expression)
+	parsed, err := expression.NewExecutor(ds...).ResolveStatement(in.Expression)
 
 	if err != nil {
 		return openapi.Response(http.StatusBadRequest, err.Error()), err
