@@ -1,7 +1,8 @@
 import {useCallback, useState} from 'react';
-import {TOutput} from 'types/Output.types';
+
 import {SupportedEditors} from 'constants/Editor.constants';
 import EditorService from 'services/Editor.service';
+import {TTestOutput} from 'types/TestOutput.types';
 
 interface IProps {
   spanIdList: string[];
@@ -11,19 +12,14 @@ const useValidateOutput = ({spanIdList}: IProps) => {
   const [isFormValid, setIsFormValid] = useState(false);
 
   const onValidate = useCallback(
-    async (changedValues: any, {source, selector, attribute}: TOutput) => {
-      const isBaseValid = Boolean(source && attribute);
-
-      if (source === 'trace') {
-        setIsFormValid(
-          isBaseValid &&
-            spanIdList.length === 1 &&
-            Boolean(selector) &&
-            EditorService.getIsQueryValid(SupportedEditors.Selector, selector || '')
-        );
-      } else {
-        setIsFormValid(isBaseValid);
-      }
+    (changedValues: any, {name, selector, value}: TTestOutput) => {
+      setIsFormValid(
+        Boolean(name) &&
+          Boolean(selector) &&
+          Boolean(value) &&
+          spanIdList.length === 1 &&
+          EditorService.getIsQueryValid(SupportedEditors.Selector, selector || '')
+      );
     },
     [spanIdList.length]
   );

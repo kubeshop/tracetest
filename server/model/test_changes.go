@@ -30,6 +30,19 @@ func BumpVersionIfDefinitionChanged(test Test, newDef OrderedMap[SpanQuery, Name
 	return test, nil
 }
 
+func BumpVersionIfOutputsChanged(test Test, newOutputs OrderedMap[string, Output]) (Test, error) {
+	outputsHaveChanged, err := testFieldHasChanged(test.Outputs, newOutputs)
+	if err != nil {
+		return test, err
+	}
+
+	if outputsHaveChanged {
+		test.Version = test.Version + 1
+	}
+
+	return test, nil
+}
+
 func testHasChanged(oldTest Test, newTest Test) (bool, error) {
 	definitionHasChanged, err := testFieldHasChanged(oldTest.Specs, newTest.Specs)
 	if err != nil {

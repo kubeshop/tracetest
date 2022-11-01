@@ -55,6 +55,7 @@ export const {
   useGetTransactionRunByIdQuery,
   useDeleteTransactionByIdMutation,
   useParseExpressionMutation,
+  useSetTestOutputsMutation,
 } = TraceTestAPI;
 export const {endpoints} = TraceTestAPI;
 

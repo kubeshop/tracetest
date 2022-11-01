@@ -476,6 +476,30 @@ paths:
         204:
           description: OK
 
+  /tests/{testId}/outputs:
+    put:
+      tags:
+        - api
+      parameters:
+        - in: path
+          name: testId
+          schema:
+            type: string
+          required: true
+      summary: "Set outputs for a test"
+      description: "Set outputs for a particular test"
+      operationId: setTestOutputs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "./tests.yaml#/components/schemas/TestOutput"
+      responses:
+        204:
+          description: OK
+
   /tests/{testId}/version/{version}:
     get:
       tags:

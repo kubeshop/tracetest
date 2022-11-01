@@ -1,42 +1,50 @@
-import {capitalize} from 'lodash';
-import {TOutput} from 'types/Output.types';
+import {Tag} from 'antd';
+
+import {TTestOutput} from 'types/TestOutput.types';
 import * as S from './OutputRow.styled';
 import OutputRowActions from './OutputRowActions';
+import OutputValue from './OutputValue';
 
 interface IProps {
-  output: TOutput;
-  onDelete(id: string): void;
-  onEdit(id: TOutput): void;
+  index: number;
+  output: TTestOutput;
+  onDelete(index: number): void;
+  onEdit(index: number): void;
 }
 
-const OutputRow = ({output: {id, source, attribute, regex, selector}, output, onEdit, onDelete}: IProps) => {
-  return (
-    <S.Container>
+const OutputRow = ({index, output, onEdit, onDelete}: IProps) => (
+  <S.Container $isDeleted={output.isDeleted}>
+    {output.isDraft && (
+      <S.Row $justifyContent="flex-end">
+        <Tag>pending {output.isDeleted && '/ deleted'}</Tag>
+      </S.Row>
+    )}
+    <S.Row>
       <S.OutputDetails>
         <S.Entry>
-          <S.Key>Source</S.Key>
-          <S.Value>{capitalize(source)}</S.Value>
+          <S.Key>Name</S.Key>
+          <S.Value>{output.name}</S.Value>
         </S.Entry>
         <S.Entry>
-          <S.Key>Attribute</S.Key>
-          <S.Value>{attribute}</S.Value>
+          <S.Key>Selector</S.Key>
+          <S.Value>{output.selector}</S.Value>
         </S.Entry>
-        {selector && (
-          <S.Entry>
-            <S.Key>Selector</S.Key>
-            <S.Value>{selector}</S.Value>
-          </S.Entry>
-        )}
-        {regex && (
-          <S.Entry>
-            <S.Key>Regex</S.Key>
-            <S.Value>{regex}</S.Value>
-          </S.Entry>
-        )}
+        <S.Entry>
+          <S.Key>Value</S.Key>
+          <S.Value>{output.value}</S.Value>
+        </S.Entry>
+        <S.Entry>
+          {!output.isDraft && Boolean(output.valueRun) && (
+            <>
+              <S.Key>Run value</S.Key>
+              <OutputValue value={output.valueRun} />
+            </>
+          )}
+        </S.Entry>
       </S.OutputDetails>
-      <OutputRowActions outputId={id} onDelete={() => onDelete(id)} onEdit={() => onEdit(output)} />
-    </S.Container>
-  );
-};
+      <OutputRowActions name={output.name} onDelete={() => onDelete(index)} onEdit={() => onEdit(index)} />
+    </S.Row>
+  </S.Container>
+);
 
 export default OutputRow;

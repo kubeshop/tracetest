@@ -1,7 +1,5 @@
-import {Button, Typography} from 'antd';
+import {Typography} from 'antd';
 import styled from 'styled-components';
-
-export {default as AttributeTitle} from 'components/AttributeRow/AttributeTitle';
 
 export const Container = styled.div`
   display: flex;
@@ -104,6 +102,5 @@ export const Actions = styled.div`
   justify-content: flex-end;
   align-items: center;
   margin-top: 16px;
+  gap: 10px;
 `;
-
-export const AddOutputButton = styled(Button)``;

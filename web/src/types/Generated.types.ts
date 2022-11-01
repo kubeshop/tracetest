@@ -64,6 +64,10 @@ export interface paths {
     /** Set spec for a particular test */
     put: operations["setTestSpecs"];
   };
+  "/tests/{testId}/outputs": {
+    /** Set outputs for a particular test */
+    put: operations["setTestOutputs"];
+  };
   "/tests/{testId}/version/{version}": {
     /** get a test specific version */
     get: operations["getTestVersion"];
@@ -433,6 +437,23 @@ export interface operations {
     requestBody: {
       content: {
         "application/json": external["tests.yaml"]["components"]["schemas"]["TestSpecs"];
+      };
+    };
+  };
+  /** Set outputs for a particular test */
+  setTestOutputs: {
+    parameters: {
+      path: {
+        testId: string;
+      };
+    };
+    responses: {
+      /** OK */
+      204: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": external["tests.yaml"]["components"]["schemas"]["TestOutput"][];
       };
     };
   };

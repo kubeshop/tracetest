@@ -1,14 +1,15 @@
-import {FormInstance} from 'antd';
-import {VariableDefinition, Request} from 'postman-collection';
 import {CaseReducer, PayloadAction} from '@reduxjs/toolkit';
 import {BaseQueryFn, FetchArgs, FetchBaseQueryError, FetchBaseQueryMeta} from '@reduxjs/toolkit/dist/query';
 import {EndpointBuilder} from '@reduxjs/toolkit/dist/query/endpointDefinitions';
-import {TracetestApiTags, TriggerTypes} from 'constants/Test.constants';
-import {HTTP_METHOD, SupportedPlugins} from 'constants/Common.constants';
-import {Model, TGrpcSchemas, THttpSchemas, TTestSchemas, TTriggerSchemas} from './Common.types';
-import {TTestSpecs} from './TestSpecs.types';
+import {FormInstance} from 'antd';
+import {VariableDefinition, Request} from 'postman-collection';
 
+import {HTTP_METHOD, SupportedPlugins} from 'constants/Common.constants';
+import {TracetestApiTags, TriggerTypes} from 'constants/Test.constants';
+import {Model, TGrpcSchemas, THttpSchemas, TTestSchemas, TTriggerSchemas} from './Common.types';
 import {ICreateTestStep, IPlugin} from './Plugins.types';
+import {TTestOutput} from './TestOutput.types';
+import {TTestSpecs} from './TestSpecs.types';
 
 export type TRequestAuth = THttpSchemas['HTTPRequest']['auth'];
 export type TMethod = THttpSchemas['HTTPRequest']['method'];
@@ -71,6 +72,7 @@ export type TTest = Model<
     trigger: TTrigger;
     specs?: TTestSpecs;
     summary: TSummary;
+    outputs?: TTestOutput[];
   }
 >;
 
