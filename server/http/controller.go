@@ -664,7 +664,7 @@ func (c *controller) UpdateEnvironment(ctx context.Context, environmentId string
 }
 
 // expressions
-func (c *controller) ExpressionParse(ctx context.Context, in openapi.ParseRequestInfo) (openapi.ImplResponse, error) {
+func (c *controller) ExpressionResolve(ctx context.Context, in openapi.ResolveRequestInfo) (openapi.ImplResponse, error) {
 	ds, err := c.buildDataStores(ctx, in)
 
 	if err != nil {
@@ -677,10 +677,10 @@ func (c *controller) ExpressionParse(ctx context.Context, in openapi.ParseReques
 		return openapi.Response(http.StatusBadRequest, err.Error()), err
 	}
 
-	return openapi.Response(200, openapi.ParseResponseInfo{Expression: parsed}), nil
+	return openapi.Response(200, openapi.ResolveResponseInfo{ResolvedValue: parsed}), nil
 }
 
-func (c *controller) buildDataStores(ctx context.Context, info openapi.ParseRequestInfo) ([]expression.DataStore, error) {
+func (c *controller) buildDataStores(ctx context.Context, info openapi.ResolveRequestInfo) ([]expression.DataStore, error) {
 	context := info.Context
 
 	ds := []expression.DataStore{}
