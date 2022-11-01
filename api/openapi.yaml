@@ -666,22 +666,22 @@ paths:
           description: OK
 
   # expressions
-  /expressions/parse:
+  /expressions/resolve:
     post:
       tags:
         - api
-      summary: parses an expression and returns the result string
-      description: parses an expression and returns the result string
-      operationId: ExpressionParse
+      summary: resolves an expression and returns the result string
+      description: resolves an expression and returns the result string
+      operationId: ExpressionResolve
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "./expressions.yaml#/components/schemas/ParseRequestInfo"
+              $ref: "./expressions.yaml#/components/schemas/ResolveRequestInfo"
       responses:
         200:
-          description: successfully parsed the expression
+          description: successfully resolved the expression
           content:
             application/json:
               schema:
-                $ref: "./expressions.yaml#/components/schemas/ParseResponseInfo"
+                $ref: "./expressions.yaml#/components/schemas/ResolveResponseInfo"

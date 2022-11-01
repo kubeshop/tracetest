@@ -2,14 +2,14 @@ openapi: 3.0.0
 
 components:
   schemas:
-    ParseRequestInfo:
+    ResolveRequestInfo:
       type: object
       properties:
         expression:
           type: string
         context:
-          $ref: "#/components/schemas/ParseContext"
-    ParseContext:
+          $ref: "#/components/schemas/ResolveContext"
+    ResolveContext:
       type: object
       properties:
         testId:
@@ -22,8 +22,8 @@ components:
           type: string
         environmentId:
           type: string
-    ParseResponseInfo:
+    ResolveResponseInfo:
       type: object
       properties:
-        expression:
+        resolvedValue:
           type: string
