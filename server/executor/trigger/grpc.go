@@ -129,7 +129,7 @@ func (t *grpcTriggerer) Resolve(ctx context.Context, test model.Test, opts *Trig
 		}
 	}
 
-	grpc.Request, err = opts.Executor.ResolveStatement(fmt.Sprintf("\"%s\"", grpc.Request))
+	grpc.Request, err = opts.Executor.ResolveStatement(fmt.Sprintf("'%s'", grpc.Request))
 	if err != nil {
 		return test, err
 	}
