@@ -7,7 +7,7 @@ spec:
   trigger:
     type: http
     httpRequest:
-      url: ${TARGET_URL}/api/environment/${ENV_ID}
+      url: ${TARGET_URL}/api/environments/${ENV_ID}
       method: DELETE
       headers:
         - key: Content-Type
@@ -17,7 +17,7 @@ spec:
       assertions:
         - attr:tracetest.selected_spans.count = 1
         - attr:tracetest.response.status = 204
-    - selector: span[name="DELETE /api/environment/{environmentId}" tracetest.span.type="http"]
+    - selector: span[name="DELETE /api/environments/{environmentId}" tracetest.span.type="http"]
       assertions:
         - attr:tracetest.selected_spans.count = 1
     - selector: span[name = "exec DELETE"]
