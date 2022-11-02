@@ -16,9 +16,22 @@ interface IProps {
   fields: FormListFieldData[];
   form: FormInstance<IValues>;
   remove(name: number): void;
+  runId: string;
+  testId: string;
+  spanIdList: string[];
 }
 
-const AssertionCheckList = ({form, fields, add, remove, attributeList, assertions}: IProps) => {
+const AssertionCheckList = ({
+  form,
+  fields,
+  add,
+  remove,
+  attributeList,
+  assertions,
+  runId,
+  testId,
+  spanIdList,
+}: IProps) => {
   const reference = useGetOTELSemanticConventionAttributesInfo();
 
   return (
@@ -35,6 +48,9 @@ const AssertionCheckList = ({form, fields, add, remove, attributeList, assertion
             index={index}
             assertions={assertions}
             reference={reference}
+            runId={runId}
+            testId={testId}
+            spanIdList={spanIdList}
           />
         );
       })}

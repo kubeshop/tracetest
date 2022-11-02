@@ -1,43 +1,37 @@
-import {useCallback} from 'react';
-import {EditorView} from '@codemirror/view';
-import EditorService from 'services/Editor.service';
-import EnvironmentSelectors from 'selectors/Environment.selectors';
-import {useAppStore} from 'redux/hooks';
-import SpanSelectors from 'selectors/Span.selectors';
-import AssertionSelectors from 'selectors/Assertion.selectors';
-import {uniqBy} from 'lodash';
+import {useCallback, useState} from 'react';
+import {TResolveExpressionContext, TResolveRequestInfo} from 'types/Expression.types';
+import {useParseExpressionMutation} from 'redux/apis/TraceTest.api';
 
-interface IProps {
-  testId?: string;
-  runId?: string;
-}
+const useTooltip = (context: TResolveExpressionContext = {}) => {
+  const [parseExpressionMutation] = useParseExpressionMutation();
+  const [prevExpression, setPrevExpression] = useState<string>('');
+  const [prevRawExpression, setPrevRawExpression] = useState<string>('');
 
-const useTooltip = ({testId = '', runId = ''}: IProps = {}) => {
-  const {getState} = useAppStore();
+  const parseExpression = useCallback(
+    async (props: TResolveRequestInfo) => {
+      const isSameAsPrev = prevRawExpression === props.expression;
 
-  const getAttributeList = useCallback(() => {
-    const state = getState();
-    const spanIdList = SpanSelectors.selectMatchedSpans(state);
-    const attributeList = AssertionSelectors.selectAttributeList(state, testId, runId, spanIdList);
+      if (isSameAsPrev) return prevExpression;
 
-    return uniqBy(attributeList, 'key');
-  }, [getState, runId, testId]);
+      const parsedExpression = await parseExpressionMutation(props).unwrap();
 
-  const getSelectedEnvironmentEntryList = useCallback(() => {
-    const state = getState();
-
-    return EnvironmentSelectors.selectSelectedEnvironmentValues(state);
-  }, [getState]);
-
-  return useCallback(
-    async (view: EditorView, pos: number, side: -1 | 1) => {
-      const attributeList = testId && runId ? getAttributeList() : [];
-      const envEntryList = getSelectedEnvironmentEntryList();
-
-      return EditorService.getTooltip({view, pos, side, attributeList, envEntryList});
+      setPrevExpression(parsedExpression);
+      setPrevRawExpression(props.expression || '');
     },
-    [getAttributeList, getSelectedEnvironmentEntryList, runId, testId]
+    [parseExpressionMutation, prevExpression, prevRawExpression]
   );
+
+  const onHover = useCallback(
+    (rawExpression: string) => {
+      parseExpression({
+        expression: rawExpression,
+        context,
+      });
+    },
+    [context, parseExpression]
+  );
+
+  return {onHover, expression: prevExpression};
 };
 
 export default useTooltip;

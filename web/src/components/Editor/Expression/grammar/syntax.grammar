@@ -12,7 +12,7 @@
 expression {Expression (Comparator Expression)*}
 
 Expression {ComposedValue (Operator ComposedValue)*}
-ComposedValue {OutsideInput (Pipe SupportedParsers)* | Number | ComposedString}
+ComposedValue {OutsideInput (Pipe SupportedParsers)* | Duration | Number | ComposedString}
 OutsideInput {Source Identifier}
 Interpolation {OpenInterpolation OutsideInput CloseInterpolation}
 ComposedString {Quotes (Interpolation | String)+ Quotes}
@@ -24,6 +24,7 @@ JsonPath {"json_path '" Identifier "'"}
   Pipe {"|"}
   Number { @digit+ }
   Comparator {"=" | "contains" | "!=" | "<" | ">" | "<=" | ">=" | "not-contains" }
+  Duration { Number ("." Number)? ("ns" | "us" | "ms"| "s"| "m" | "h") }
   Operator {"+" | "-" | "*" | "/" | "%" | "^" }
   String {(![${}"])+}
   Quotes {'"'}
@@ -34,6 +35,7 @@ JsonPath {"json_path '" Identifier "'"}
 
   @precedence { OpenInterpolation, String }
   @precedence { String, space }
+  @precedence { Duration, Number }
 
   space { @whitespace+ }
 }

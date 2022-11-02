@@ -46,3 +46,11 @@ attr:http.message
 ==>
 
 Program(Expression(ComposedValue(OutsideInput(Source,Identifier))))
+
+# Duration
+
+120ms
+
+==>
+
+Program(Expression(ComposedValue(Duration)))

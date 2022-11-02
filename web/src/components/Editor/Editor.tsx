@@ -3,7 +3,8 @@ import {EditorView} from '@codemirror/view';
 import {BasicSetupOptions} from '@uiw/react-codemirror';
 import {Extension} from '@codemirror/state';
 import {SupportedEditors} from 'constants/Editor.constants';
-import { Completion } from '@codemirror/autocomplete';
+import {Completion} from '@codemirror/autocomplete';
+import {TResolveExpressionContext} from 'types/Expression.types';
 
 const EditorMap = {
   [SupportedEditors.Expression]: lazy(() => import('./Expression')),
@@ -23,6 +24,7 @@ export interface IEditorProps {
   indentWithTab?: boolean;
   autoFocus?: boolean;
   onSelectAutocompleteOption?(option: Completion): void;
+  context?: TResolveExpressionContext;
 }
 
 interface IProps extends IEditorProps {

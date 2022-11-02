@@ -6,6 +6,7 @@ import {useAppSelector} from 'redux/hooks';
 import TestSpecsSelectors from 'selectors/TestSpecs.selectors';
 import AssertionService from 'services/Assertion.service';
 import {TAssertionResultEntry} from 'types/Assertion.types';
+import {useTest} from 'providers/Test/Test.provider';
 import Assertion from './Assertion';
 import Header from './Header';
 import SpanHeader from './SpanHeader';
@@ -32,8 +33,11 @@ const Content = ({
   testSpec: {resultList, selector, spanIds},
 }: IProps) => {
   const {
-    run: {trace},
+    run: {trace, id: runId},
   } = useTestRun();
+  const {
+    test: {id: testId},
+  } = useTest();
   const {
     isDeleted = false,
     isDraft = false,
@@ -78,7 +82,13 @@ const Content = ({
           >
             <S.AssertionsContainer onClick={() => onSelectSpan(span?.id ?? '')}>
               {checkResults.map(checkResult => (
-                <Assertion check={checkResult} key={`${checkResult.result.spanId}-${checkResult.assertion}`} />
+                <Assertion
+                  testId={testId}
+                  runId={runId}
+                  selector={selector}
+                  check={checkResult}
+                  key={`${checkResult.result.spanId}-${checkResult.assertion}`}
+                />
               ))}
             </S.AssertionsContainer>
           </S.CardContainer>

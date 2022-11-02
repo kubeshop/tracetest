@@ -2,6 +2,7 @@ import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
 import {TracetestApiTags} from 'constants/Test.constants';
 import {TTestApiEndpointBuilder} from '../../types/Test.types';
 import EnvironmentEndpoint from './endpoints/Environment.endpoint';
+import ExpressionEndpoint from './endpoints/Expression.endpoint';
 import TestEndpoint from './endpoints/Test.endpoint';
 import TestRunEndpoint from './endpoints/TestRun.endpoints';
 import TransactionEndpoint from './endpoints/Transaction.endpoint';
@@ -20,6 +21,7 @@ const TraceTestAPI = createApi({
       ...TestRunEndpoint(builder),
       ...TestEndpoint(builder),
       ...EnvironmentEndpoint(builder),
+      ...ExpressionEndpoint(builder),
     };
   },
 });
@@ -52,6 +54,7 @@ export const {
   useGetTransactionByIdQuery,
   useGetTransactionRunByIdQuery,
   useDeleteTransactionByIdMutation,
+  useParseExpressionMutation,
   useSetTestOutputsMutation,
 } = TraceTestAPI;
 export const {endpoints} = TraceTestAPI;

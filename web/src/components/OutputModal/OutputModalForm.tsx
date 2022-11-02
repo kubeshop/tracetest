@@ -23,6 +23,8 @@ const OutputModalForm = ({form, runId, spanIdList, testId}: IProps) => {
     onValidSelector: noop,
   });
 
+  const selector = Form.useWatch('selector', form) || '';
+
   return (
     <S.InputContainer>
       <Form.Item
@@ -64,7 +66,16 @@ const OutputModalForm = ({form, runId, spanIdList, testId}: IProps) => {
         rules={[{required: true, message: 'Please enter an attribute'}]}
         style={{margin: 0}}
       >
-        <Editor type={SupportedEditors.Expression} placeholder="Attribute" />
+        <Editor
+          type={SupportedEditors.Expression}
+          placeholder="Attribute"
+          context={{
+            runId,
+            testId,
+            spanId: spanIdList[0],
+            selector,
+          }}
+        />
       </Form.Item>
     </S.InputContainer>
   );

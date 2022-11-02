@@ -90,6 +90,10 @@ export interface paths {
     /** delete a environment */
     delete: operations["deleteEnvironment"];
   };
+  "/expressions/resolve": {
+    /** resolves an expression and returns the result string */
+    post: operations["ExpressionResolve"];
+  };
 }
 
 export interface components {}
@@ -587,6 +591,22 @@ export interface operations {
       204: never;
     };
   };
+  /** resolves an expression and returns the result string */
+  ExpressionResolve: {
+    responses: {
+      /** successfully resolved the expression */
+      200: {
+        content: {
+          "application/json": external["expressions.yaml"]["components"]["schemas"]["ResolveResponseInfo"];
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": external["expressions.yaml"]["components"]["schemas"]["ResolveRequestInfo"];
+      };
+    };
+  };
 }
 
 export interface external {
@@ -625,6 +645,28 @@ export interface external {
         EnvironmentValue: {
           key?: string;
           value?: string;
+        };
+      };
+    };
+    operations: {};
+  };
+  "expressions.yaml": {
+    paths: {};
+    components: {
+      schemas: {
+        ResolveRequestInfo: {
+          expression?: string;
+          context?: external["expressions.yaml"]["components"]["schemas"]["ResolveContext"];
+        };
+        ResolveContext: {
+          testId?: string;
+          runId?: string;
+          spanId?: string;
+          selector?: string;
+          environmentId?: string;
+        };
+        ResolveResponseInfo: {
+          resolvedValue?: string;
         };
       };
     };

@@ -1,6 +1,6 @@
 import {Form, FormInstance, Select} from 'antd';
 import {EditorView} from '@codemirror/view';
-import {useCallback} from 'react';
+import {useCallback, useMemo} from 'react';
 import {delay} from 'lodash';
 import {Completion, startCompletion} from '@codemirror/autocomplete';
 import {FormListFieldData} from 'antd/lib/form/FormList';
@@ -25,6 +25,9 @@ interface IProps {
   attributeList: TSpanFlatAttribute[];
   index: number;
   assertions: TStructuredAssertion[];
+  runId: string;
+  testId: string;
+  spanIdList: string[];
 }
 
 const operatorList = Object.values(CompareOperator).map(value => ({
@@ -32,7 +35,18 @@ const operatorList = Object.values(CompareOperator).map(value => ({
   label: OperatorService.getOperatorSymbol(value),
 }));
 
-export const AssertionCheck = ({field, index, name, remove, form, assertions, attributeList}: IProps) => {
+export const AssertionCheck = ({
+  field,
+  index,
+  name,
+  remove,
+  form,
+  assertions,
+  attributeList,
+  runId,
+  testId,
+  spanIdList,
+}: IProps) => {
   const onAttributeFocus = useCallback((view: EditorView) => {
     if (!view?.state.doc.length) delay(() => startCompletion(view!), 0);
   }, []);
@@ -50,6 +64,18 @@ export const AssertionCheck = ({field, index, name, remove, form, assertions, at
     [assertions, attributeList, form, name]
   );
 
+  const selector = Form.useWatch('selector') || '';
+  const editorContext = useMemo(() => {
+    const [spanId = ''] = spanIdList;
+
+    return {
+      runId,
+      testId,
+      selector,
+      spanId,
+    };
+  }, [runId, selector, spanIdList, testId]);
+
   return (
     <S.Container>
       <S.FieldsContainer>
@@ -65,6 +91,7 @@ export const AssertionCheck = ({field, index, name, remove, form, assertions, at
             placeholder="Attribute"
             onFocus={onAttributeFocus}
             onSelectAutocompleteOption={onSelectAttribute}
+            context={editorContext}
           />
         </Form.Item>
         <Form.Item
@@ -89,7 +116,7 @@ export const AssertionCheck = ({field, index, name, remove, form, assertions, at
           data-cy="assertion-check-value"
           style={{margin: 0}}
         >
-          <Editor type={SupportedEditors.Expression} placeholder="Expected Value" />
+          <Editor type={SupportedEditors.Expression} placeholder="Expected Value" context={editorContext} />
         </Form.Item>
       </S.FieldsContainer>
       <S.ActionContainer>

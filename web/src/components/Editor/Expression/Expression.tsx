@@ -1,12 +1,14 @@
 import {noop} from 'lodash';
-import {EditorView, hoverTooltip} from '@codemirror/view';
+import {Tooltip} from 'antd';
+import {EditorView} from '@codemirror/view';
 import {Extension} from '@codemirror/state';
 import {autocompletion} from '@codemirror/autocomplete';
 import CodeMirror, {ReactCodeMirrorRef} from '@uiw/react-codemirror';
-import {useMemo, useRef} from 'react';
+import {useCallback, useMemo, useRef} from 'react';
+import {useEnvironment} from 'providers/Environment/Environment.provider';
+import EditorService from 'services/Editor.service';
+import {SupportedEditors} from 'constants/Editor.constants';
 
-import {useTest} from 'providers/Test/Test.provider';
-import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import {expressionQL} from './grammar';
 import useEditorTheme from '../hooks/useEditorTheme';
 import {IEditorProps} from '../Editor';
@@ -25,48 +27,47 @@ const Expression = ({
   onFocus = noop,
   indentWithTab = false,
   onSelectAutocompleteOption = noop,
+  context = {},
 }: IEditorProps) => {
-  const {
-    test: {id: testId},
-  } = useTest();
-  const {
-    run: {id: runId},
-  } = useTestRun();
+  const {testId = '', runId = ''} = context;
+  const {selectedEnvironment} = useEnvironment();
   const editorTheme = useEditorTheme();
   const completionFn = useAutoComplete({testId, runId, onSelect: onSelectAutocompleteOption});
-  const tooltipFn = useTooltip({testId, runId});
+  const {onHover, expression} = useTooltip({environmentId: selectedEnvironment?.id, ...context});
+
   const ref = useRef<ReactCodeMirrorRef>(null);
 
   const extensionList: Extension[] = useMemo(
-    () => [
-      autocompletion({override: [completionFn]}),
-      expressionQL(),
-      hoverTooltip(tooltipFn),
-      EditorView.lineWrapping,
-      ...extensions,
-    ],
-    [completionFn, extensions, tooltipFn]
+    () => [autocompletion({override: [completionFn]}), expressionQL(), EditorView.lineWrapping, ...extensions],
+    [completionFn, extensions]
   );
+
+  const handleHover = useCallback(() => {
+    if (EditorService.getIsQueryValid(SupportedEditors.Expression, value)) onHover(value);
+  }, [onHover, value]);
 
   return (
     <S.ExpressionEditorContainer $isEditable={editable}>
-      <CodeMirror
-        ref={ref}
-        onFocus={() => onFocus(ref.current?.view!)}
-        id="expression-editor"
-        basicSetup={{...basicSetup, lineNumbers}}
-        data-cy="expression-editor"
-        value={value}
-        maxHeight="120px"
-        extensions={extensionList}
-        onChange={onChange}
-        spellCheck={false}
-        theme={editorTheme}
-        editable={editable}
-        autoFocus={autoFocus}
-        placeholder={placeholder}
-        indentWithTab={indentWithTab}
-      />
+      <Tooltip placement="topLeft" title={expression}>
+        <CodeMirror
+          ref={ref}
+          onFocus={() => onFocus(ref.current?.view!)}
+          id="expression-editor"
+          basicSetup={{...basicSetup, lineNumbers}}
+          data-cy="expression-editor"
+          value={value}
+          maxHeight="120px"
+          extensions={extensionList}
+          onChange={onChange}
+          spellCheck={false}
+          theme={editorTheme}
+          editable={editable}
+          autoFocus={autoFocus}
+          placeholder={placeholder}
+          indentWithTab={indentWithTab}
+          onMouseOver={handleHover}
+        />
+      </Tooltip>
     </S.ExpressionEditorContainer>
   );
 };
