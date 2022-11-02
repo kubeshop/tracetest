@@ -34,7 +34,7 @@ INSERT INTO transactions (
 ) VALUES ($1, $2, $3, $4, $5)`
 
 func (td *postgresDB) insertIntoTransactions(ctx context.Context, transaction model.Transaction) (model.Transaction, error) {
-	tx, err := td.db.Begin()
+	tx, err := td.db.BeginTx(ctx, &sql.TxOptions{})
 	if err != nil {
 		return model.Transaction{}, fmt.Errorf("sql begin: %w", err)
 	}
@@ -108,7 +108,7 @@ func (td *postgresDB) UpdateTransaction(ctx context.Context, transaction model.T
 }
 
 func (td *postgresDB) DeleteTransaction(ctx context.Context, transaction model.Transaction) error {
-	tx, err := td.db.Begin()
+	tx, err := td.db.BeginTx(ctx, &sql.TxOptions{})
 	if err != nil {
 		return err
 	}
