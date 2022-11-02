@@ -14,7 +14,7 @@ spec:
         {
             "name": "test-transaction",
             "description": "a transaction",
-            "steps": []
+            "steps": [ "$TEST_ID" ]
         }
   specs:
     - selector: span[name = "Tracetest trigger"]
