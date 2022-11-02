@@ -15,6 +15,6 @@ spec:
       assertions:
         - attr:tracetest.selected_spans.count = 1
         - attr:tracetest.response.status = 204
-    - selector: span[name="GET /api/transactions" tracetest.span.type="http"]
+    - selector: span[name="DELETE /api/transactions/{transactionId}" tracetest.span.type="http"]
       assertions:
         - attr:tracetest.selected_spans.count = 1
