@@ -7,7 +7,7 @@ spec:
   trigger:
     type: http
     httpRequest:
-      url: ${TARGET_URL}/api/tests
+      url: ${TARGET_URL}/api/environments
       method: GET
       headers:
         - key: Content-Type
