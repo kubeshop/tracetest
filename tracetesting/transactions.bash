@@ -6,6 +6,9 @@ source ./funcs.bash
 
 EXIT_STATUS=0
 
+# create a test to register it as a step
+test "transaction_step_create" ./definitions/test_create.yml || EXIT_STATUS=$?
+
 export TEST_ID=$(tracetest_target test list -o json | jq -rc '.[0].id')
 require_not_empty $TEST_ID "requires TEST_ID, got $TEST_ID " || exit $?
 
