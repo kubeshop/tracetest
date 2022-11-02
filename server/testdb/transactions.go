@@ -59,10 +59,10 @@ func (td *postgresDB) insertIntoTransactions(ctx context.Context, transaction mo
 		return model.Transaction{}, fmt.Errorf("sql exec: %w", err)
 	}
 
-	return td.setTransactionSteps(tx, transaction)
+	return td.setTransactionSteps(ctx, tx, transaction)
 }
 
-func (td *postgresDB) setTransactionSteps(tx *sql.Tx, transaction model.Transaction) (model.Transaction, error) {
+func (td *postgresDB) setTransactionSteps(ctx context.Context, tx *sql.Tx, transaction model.Transaction) (model.Transaction, error) {
 	if len(transaction.Steps) == 0 {
 		return transaction, tx.Commit()
 	}
@@ -77,7 +77,7 @@ func (td *postgresDB) setTransactionSteps(tx *sql.Tx, transaction model.Transact
 	}
 
 	sql := "INSERT INTO transaction_steps VALUES " + strings.Join(values, ", ")
-	_, err := tx.Exec(sql)
+	_, err := tx.ExecContext(ctx, sql)
 	if err != nil {
 		tx.Rollback()
 		return model.Transaction{}, fmt.Errorf("cannot save transaction steps: %w", err)
