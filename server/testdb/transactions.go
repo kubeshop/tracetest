@@ -46,7 +46,8 @@ func (td *postgresDB) insertIntoTransactions(ctx context.Context, transaction mo
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(
+	_, err = stmt.ExecContext(
+		ctx,
 		transaction.ID,
 		transaction.Version,
 		transaction.Name,
