@@ -32,6 +32,10 @@ func (t *instrumentedTriggerer) Type() model.TriggerType {
 	return model.TriggerType("instrumented")
 }
 
+func (t *instrumentedTriggerer) Resolve(ctx context.Context, test model.Test, opts *TriggerOptions) (model.Test, error) {
+	return t.triggerer.Resolve(ctx, test, opts)
+}
+
 func (t *instrumentedTriggerer) Trigger(ctx context.Context, test model.Test, opts *TriggerOptions) (Response, error) {
 	_, span := t.tracer.Start(ctx, "Trigger test")
 	defer span.End()

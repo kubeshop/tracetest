@@ -5,10 +5,12 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
 
+	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/model"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/trace"
@@ -91,6 +93,79 @@ func (te *httpTriggerer) Trigger(ctx context.Context, test model.Test, opts *Tri
 
 func (t *httpTriggerer) Type() model.TriggerType {
 	return model.TriggerTypeHTTP
+}
+
+func (t *httpTriggerer) Resolve(ctx context.Context, test model.Test, opts *TriggerOptions) (model.Test, error) {
+	http := test.ServiceUnderTest.HTTP
+
+	// add quotes before resolving the statements
+	// require users to add explicit interpolation to fields
+
+	if http == nil {
+		return test, fmt.Errorf("no settings provided for HTTP triggerer")
+	}
+
+	url, err := opts.Executor.ResolveStatement(fmt.Sprintf("\"%s\"", http.URL))
+
+	log.Println("resolved url", url, http.URL)
+
+	if err != nil {
+		return test, err
+	}
+
+	http.URL = url
+
+	headers := []model.HTTPHeader{}
+	for _, h := range http.Headers {
+		h.Key, err = opts.Executor.ResolveStatement(fmt.Sprintf("\"%s\"", h.Key))
+		log.Println("resolved header key", h.Key)
+		if err != nil {
+			return test, err
+		}
+
+		h.Value, err = opts.Executor.ResolveStatement(fmt.Sprintf("\"%s\"", h.Value))
+		log.Println("resolved header value", h.Value)
+		if err != nil {
+			return test, err
+		}
+
+		headers = append(headers, h)
+	}
+	http.Headers = headers
+
+	http.Body, err = opts.Executor.ResolveStatement(fmt.Sprintf("'%s'", http.Body))
+	log.Println("resolved body", http.Body)
+	if err != nil {
+		return test, err
+	}
+
+	http.Auth, err = resolveAuth(http.Auth, opts.Executor)
+	if err != nil {
+		return test, err
+	}
+
+	test.ServiceUnderTest.HTTP = http
+
+	log.Println("resolved HTTP triggerer", http)
+
+	return test, nil
+}
+
+func resolveAuth(auth *model.HTTPAuthenticator, executor expression.Executor) (*model.HTTPAuthenticator, error) {
+	if auth == nil {
+		return nil, nil
+	}
+
+	for k, v := range auth.Props {
+		resolved, err := executor.ResolveStatement(fmt.Sprintf("\"%s\"", v))
+		if err != nil {
+			return auth, err
+		}
+
+		auth.Props[k] = resolved
+	}
+
+	return auth, nil
 }
 
 func mapResp(resp *http.Response) model.HTTPResponse {

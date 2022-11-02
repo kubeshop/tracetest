@@ -6,17 +6,20 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/model"
 	"go.opentelemetry.io/otel/trace"
 )
 
 type TriggerOptions struct {
-	TraceID trace.TraceID
+	TraceID  trace.TraceID
+	Executor expression.Executor
 }
 
 type Triggerer interface {
 	Trigger(context.Context, model.Test, *TriggerOptions) (Response, error)
 	Type() model.TriggerType
+	Resolve(context.Context, model.Test, *TriggerOptions) (model.Test, error)
 }
 
 type Response struct {

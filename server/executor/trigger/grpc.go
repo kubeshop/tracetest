@@ -104,6 +104,44 @@ func (t *grpcTriggerer) Type() model.TriggerType {
 	return model.TriggerTypeGRPC
 }
 
+func (t *grpcTriggerer) Resolve(ctx context.Context, test model.Test, opts *TriggerOptions) (model.Test, error) {
+	grpc := test.ServiceUnderTest.GRPC
+
+	if grpc == nil {
+		return test, fmt.Errorf("no settings provided for GRPC triggerer")
+	}
+
+	address, err := opts.Executor.ResolveStatement(fmt.Sprintf("\"%s\"", grpc.Address))
+	if err != nil {
+		return test, err
+	}
+	grpc.Address = address
+
+	for _, h := range grpc.Metadata {
+		h.Key, err = opts.Executor.ResolveStatement(fmt.Sprintf("\"%s\"", h.Key))
+		if err != nil {
+			return test, err
+		}
+
+		h.Value, err = opts.Executor.ResolveStatement(fmt.Sprintf("\"%s\"", h.Value))
+		if err != nil {
+			return test, err
+		}
+	}
+
+	grpc.Request, err = opts.Executor.ResolveStatement(fmt.Sprintf("\"%s\"", grpc.Request))
+	if err != nil {
+		return test, err
+	}
+
+	grpc.Method, err = opts.Executor.ResolveStatement(fmt.Sprintf("\"%s\"", grpc.Method))
+	if err != nil {
+		return test, err
+	}
+
+	return test, nil
+}
+
 func mdToHeaders(md *metadata.MD) []string {
 	h := []string{}
 

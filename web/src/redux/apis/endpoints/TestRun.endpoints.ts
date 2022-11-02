@@ -16,11 +16,13 @@ function getTotalCountFromHeaders(meta: any) {
 }
 
 const TestRunEndpoint = (builder: TTestApiEndpointBuilder) => ({
-  runTest: builder.mutation<TTestRun, {testId: string}>({
-    query: ({testId}) => ({
+  runTest: builder.mutation<TTestRun, {testId: string; environmentId?: string}>({
+    query: ({testId, environmentId}) => ({
       url: `/tests/${testId}/run`,
       method: HTTP_METHOD.POST,
-      body: {},
+      body: {
+        environmentId,
+      },
     }),
     invalidatesTags: (response, error, {testId}) => [
       {type: TracetestApiTags.TEST_RUN, id: `${testId}-LIST`},
