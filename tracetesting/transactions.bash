@@ -12,6 +12,8 @@ test "transaction_step_create" ./definitions/test_create.yml || EXIT_STATUS=$?
 export TEST_ID=$(tracetest_target test list -o json | jq -rc '.[0].id')
 require_not_empty $TEST_ID "requires TEST_ID, got $TEST_ID " || exit $?
 
+echo "TEST_ID = $TEST_ID"
+
 test "transaction_create" ./definitions/transaction_create.yml || EXIT_STATUS=$?
 
 export TRANSACTION_ID=$(tracetest_target_curl "/api/transactions" -X GET | jq -rc '.[0].id')
