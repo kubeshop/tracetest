@@ -1,14 +1,17 @@
 import {noop} from 'lodash';
-import {useCallback} from 'react';
-import {SemanticGroupNames} from 'constants/SemanticGroupNames.constants';
+import {useCallback, useMemo, useState} from 'react';
+
+import SearchInput from 'components/SearchInput';
+import {useGetOTELSemanticConventionAttributesInfo} from 'components/TestSpecForm/hooks/useGetOTELSemanticConventionAttributesInfo';
 import {useTestSpecForm} from 'components/TestSpecForm/TestSpecForm.provider';
+import {CompareOperatorSymbolMap} from 'constants/Operator.constants';
 import {useAppSelector} from 'redux/hooks';
 import TestSpecsSelectors from 'selectors/TestSpecs.selectors';
 import TraceAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
-import SpanService from 'services/Span.service';
-import {TSpan, TSpanFlatAttribute} from 'types/Span.types';
-import {CompareOperatorSymbolMap} from 'constants/Operator.constants';
 import AssertionService from 'services/Assertion.service';
+import SpanService from 'services/Span.service';
+import SpanAttributeService from 'services/SpanAttribute.service';
+import {TSpan, TSpanFlatAttribute} from 'types/Span.types';
 import Attributes from './Attributes';
 import Header from './Header';
 import * as S from './SpanDetail.styled';
@@ -23,6 +26,8 @@ const SpanDetail = ({onCreateTestSpec = noop, searchText, span}: IProps) => {
   const {open} = useTestSpecForm();
   const spansResult = useAppSelector(TestSpecsSelectors.selectSpansResult);
   const assertions = useAppSelector(state => TestSpecsSelectors.selectAssertionResultsBySpan(state, span?.id || ''));
+  const [search, setSearch] = useState('');
+  const semanticConventions = useGetOTELSemanticConventionAttributesInfo();
 
   const handleCreateTestSpec = useCallback(
     ({value, key}: TSpanFlatAttribute) => {
@@ -49,6 +54,15 @@ const SpanDetail = ({onCreateTestSpec = noop, searchText, span}: IProps) => {
     [onCreateTestSpec, open, span]
   );
 
+  const handleOnSearch = useCallback((value: string) => {
+    setSearch(value);
+  }, []);
+
+  const filteredAttributes = useMemo(
+    () => SpanAttributeService.filterAttributes(span?.attributeList ?? [], search, semanticConventions),
+    [span?.attributeList, search, semanticConventions]
+  );
+
   return (
     <>
       <Header
@@ -57,12 +71,16 @@ const SpanDetail = ({onCreateTestSpec = noop, searchText, span}: IProps) => {
         totalPassedChecks={span?.id ? spansResult[span?.id]?.passed : 0}
       />
       <S.HeaderDivider />
+
+      <S.SearchContainer>
+        <SearchInput placeholder="Search attributes" onSearch={handleOnSearch} width="100%" />
+      </S.SearchContainer>
+
       <Attributes
         assertions={assertions}
-        attributeList={span?.attributeList ?? []}
+        attributeList={filteredAttributes}
         onCreateTestSpec={handleCreateTestSpec}
         searchText={searchText}
-        type={span?.type ?? SemanticGroupNames.General}
       />
     </>
   );

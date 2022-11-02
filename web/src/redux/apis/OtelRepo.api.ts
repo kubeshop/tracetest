@@ -41,7 +41,7 @@ const OtelRepoAPI = createApi({
         const message: OTELYaml = jsyaml.load(rawSpanList);
         return (
           (message?.groups || [])
-            .flatMap<CompleteAttribute>(s => (s.attributes || []).map(d => ({...d, group: s.id})))
+            .flatMap<CompleteAttribute>(s => (s.attributes || []).map(d => ({...d, group: s.prefix})))
             .reduce((acc: OtelReference, d: CompleteAttribute) => {
               let id = `${d.group}.${d?.ref || d?.id || ''}`;
               acc[id] = {description: d?.brief || '', tags: normalizeThis(d?.examples)};
