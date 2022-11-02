@@ -81,6 +81,7 @@ const SpanDetail = ({onCreateTestSpec = noop, searchText, span}: IProps) => {
         attributeList={filteredAttributes}
         onCreateTestSpec={handleCreateTestSpec}
         searchText={searchText}
+        semanticConventions={semanticConventions}
       />
     </>
   );

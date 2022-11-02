@@ -1,4 +1,4 @@
-import {Badge, Typography} from 'antd';
+import {Badge, Tag as AntdTag, Typography} from 'antd';
 import styled from 'styled-components';
 
 export {default as AttributeTitle} from './AttributeTitle';
@@ -17,6 +17,7 @@ export const Container = styled.div`
 `;
 
 export const Header = styled.div`
+  cursor: pointer;
   flex: 1;
 `;
 
@@ -49,4 +50,22 @@ export const CustomBadge = styled(Badge)`
     font-size: ${({theme}) => theme.size.sm};
     margin-left: 3px;
   }
+`;
+
+export const Title = styled(Typography.Title)`
+  && {
+    margin-bottom: 0;
+  }
+`;
+
+export const DetailContainer = styled.div`
+  width: 270px;
+`;
+
+export const TagsContainer = styled.div`
+  margin-top: 8px;
+`;
+
+export const Tag = styled(AntdTag)`
+  background: #e7e8eb;
 `;

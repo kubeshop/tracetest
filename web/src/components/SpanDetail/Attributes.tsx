@@ -1,6 +1,7 @@
 import {useEffect, useRef, useState} from 'react';
 
 import AttributeList from 'components/AttributeList';
+import {OtelReference} from 'components/TestSpecForm/hooks/useGetOTELSemanticConventionAttributesInfo';
 import {TResultAssertions} from 'types/Assertion.types';
 import {TSpanFlatAttribute} from 'types/Span.types';
 import * as S from './SpanDetail.styled';
@@ -10,9 +11,10 @@ interface IProps {
   attributeList: TSpanFlatAttribute[];
   searchText?: string;
   onCreateTestSpec(attribute: TSpanFlatAttribute): void;
+  semanticConventions: OtelReference;
 }
 
-const Attributes = ({assertions, attributeList, onCreateTestSpec, searchText}: IProps) => {
+const Attributes = ({assertions, attributeList, onCreateTestSpec, searchText, semanticConventions}: IProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [topPosition, setTopPosition] = useState(0);
 
@@ -27,6 +29,7 @@ const Attributes = ({assertions, attributeList, onCreateTestSpec, searchText}: I
         attributeList={attributeList}
         onCreateTestSpec={onCreateTestSpec}
         searchText={searchText}
+        semanticConventions={semanticConventions}
       />
     </S.AttributesContainer>
   );

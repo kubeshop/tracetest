@@ -13,7 +13,13 @@ const onCopy = jest.fn();
 describe('AttributeRow', () => {
   it('should render correctly', () => {
     const {getByText} = render(
-      <AttributeRow searchText="" attribute={attribute} onCreateTestSpec={onCreateTestSpec} onCopy={onCopy} />
+      <AttributeRow
+        searchText=""
+        attribute={attribute}
+        onCreateTestSpec={onCreateTestSpec}
+        onCopy={onCopy}
+        semanticConventions={{}}
+      />
     );
 
     expect(getByText(attribute.key)).toBeInTheDocument();
