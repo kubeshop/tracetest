@@ -643,7 +643,7 @@ func (c *controller) DeleteEnvironment(ctx context.Context, environmentId string
 		return handleDBError(err), err
 	}
 
-	return openapi.Response(204, nil), nil
+	return openapi.Response(http.StatusNoContent, nil), nil
 }
 
 func (c *controller) GetEnvironment(ctx context.Context, environmentId string) (openapi.ImplResponse, error) {
@@ -763,4 +763,78 @@ func (c *controller) buildDataStores(ctx context.Context, info openapi.ResolveRe
 	}
 
 	return ds, nil
+}
+
+func (c *controller) CreateTransaction(ctx context.Context, transaction openapi.Transaction) (openapi.ImplResponse, error) {
+	transactionModel, err := c.mappers.In.Transaction(ctx, transaction)
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	createdTransaction, err := c.testDB.CreateTransaction(ctx, transactionModel)
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	return openapi.Response(http.StatusOK, c.mappers.Out.Transaction(createdTransaction)), nil
+}
+
+func (c *controller) DeleteTransaction(ctx context.Context, tID string) (openapi.ImplResponse, error) {
+	transaction, err := c.testDB.GetLatestTransactionVersion(ctx, id.ID(tID))
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	err = c.testDB.DeleteTransaction(ctx, transaction)
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	return openapi.Response(http.StatusNoContent, nil), nil
+}
+
+func (c *controller) GetTransaction(ctx context.Context, tID string) (openapi.ImplResponse, error) {
+	transaction, err := c.testDB.GetLatestTransactionVersion(ctx, id.ID(tID))
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	return openapi.Response(http.StatusOK, c.mappers.Out.Transaction(transaction)), nil
+}
+
+func (c *controller) GetTransactions(ctx context.Context, take, skip int32, query, sortBy, sortDirection string) (openapi.ImplResponse, error) {
+	if take == 0 {
+		take = 20
+	}
+
+	transactions, err := c.testDB.GetTransactions(ctx, take, skip, query, sortBy, sortDirection)
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	apiTransactions := make([]openapi.Transaction, len(transactions.Items))
+	for i, transaction := range transactions.Items {
+		apiTransactions[i] = c.mappers.Out.Transaction(transaction)
+	}
+
+	return openapi.Response(http.StatusOK, paginated[openapi.Transaction]{
+		items: apiTransactions,
+		count: transactions.TotalCount,
+	}), nil
+}
+
+func (c *controller) UpdateTransaction(ctx context.Context, tID string, transaction openapi.Transaction) (openapi.ImplResponse, error) {
+	modelTransaction, err := c.mappers.In.Transaction(ctx, transaction)
+	if err != nil {
+		return openapi.Response(http.StatusBadRequest, err.Error()), err
+	}
+
+	modelTransaction.ID = id.ID(tID)
+
+	_, err = c.testDB.UpdateTransaction(ctx, modelTransaction)
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	return openapi.Response(http.StatusNoContent, nil), nil
 }

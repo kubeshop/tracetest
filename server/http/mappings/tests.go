@@ -1,6 +1,7 @@
 package mappings
 
 import (
+	"context"
 	"fmt"
 	"strconv"
 
@@ -17,6 +18,21 @@ import (
 
 type OpenAPI struct {
 	traceConversionConfig traces.ConversionConfig
+}
+
+func (m OpenAPI) Transaction(in model.Transaction) openapi.Transaction {
+	testIds := make([]string, len(in.Steps))
+	for i, step := range in.Steps {
+		testIds[i] = step.ID.String()
+	}
+
+	return openapi.Transaction{
+		Id:          in.ID.String(),
+		Name:        in.Name,
+		Description: in.Description,
+		Version:     int32(in.Version),
+		Steps:       testIds,
+	}
 }
 
 func (m OpenAPI) Test(in model.Test) openapi.Test {
@@ -282,6 +298,27 @@ func (m OpenAPI) Runs(in []model.Run) []openapi.TestRun {
 type Model struct {
 	comparators           comparator.Registry
 	traceConversionConfig traces.ConversionConfig
+	testRepository        model.TestRepository
+}
+
+func (m Model) Transaction(ctx context.Context, in openapi.Transaction) (model.Transaction, error) {
+	tests := make([]model.Test, len(in.Steps))
+	for i, testID := range in.Steps {
+		test, err := m.testRepository.GetLatestTestVersion(ctx, id.ID(testID))
+		if err != nil {
+			return model.Transaction{}, err
+		}
+
+		tests[i] = test
+	}
+
+	return model.Transaction{
+		ID:          id.ID(in.Id),
+		Name:        in.Name,
+		Description: in.Description,
+		Version:     int(in.Version),
+		Steps:       tests,
+	}, nil
 }
 
 func (m Model) Test(in openapi.Test) (model.Test, error) {

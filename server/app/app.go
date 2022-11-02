@@ -153,7 +153,7 @@ func (a *App) Start() error {
 	runner.Start(5) // worker count. should be configurable
 	defer runner.Stop()
 
-	mappers := mappings.New(traceConversionConfig, comparator.DefaultRegistry())
+	mappers := mappings.New(traceConversionConfig, comparator.DefaultRegistry(), a.db)
 
 	controller := httpServer.NewController(a.db, runner, assertionRunner, mappers)
 	apiApiController := openapi.NewApiApiController(controller)

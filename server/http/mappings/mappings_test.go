@@ -62,7 +62,7 @@ func TestSpecOrder(t *testing.T) {
 	// try multiple times to hit the map iteration randomization
 	attempts := 50
 	for i := 0; i < attempts; i++ {
-		maps := mappings.New(traces.ConversionConfig{}, comparator.DefaultRegistry())
+		maps := mappings.New(traces.ConversionConfig{}, comparator.DefaultRegistry(), nil)
 		definition, err := maps.In.Definition(input)
 		require.NoError(t, err)
 		actual := maps.Out.Specs(definition)
@@ -142,7 +142,7 @@ func TestResultsOrder(t *testing.T) {
 	// try multiple times to hit the map iteration randomization
 	attempts := 50
 	for i := 0; i < attempts; i++ {
-		maps := mappings.New(traces.ConversionConfig{}, comparator.DefaultRegistry())
+		maps := mappings.New(traces.ConversionConfig{}, comparator.DefaultRegistry(), nil)
 
 		result, err := maps.In.Result(input)
 		require.NoError(t, err)

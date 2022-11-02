@@ -35,10 +35,10 @@ type (
 
 	Summary struct {
 		Runs    int
-		LastRun TestLastRun
+		LastRun LastRun
 	}
 
-	TestLastRun struct {
+	LastRun struct {
 		Time   time.Time
 		Passes int
 		Fails  int
@@ -72,8 +72,6 @@ type (
 		Value string
 		Type  string
 	}
-
-	Attribute string
 
 	RunMetadata map[string]string
 
@@ -142,19 +140,6 @@ type (
 
 func (t Test) HasID() bool {
 	return t.ID != ""
-}
-
-const (
-	metaPrefix    = "tracetest.selected_spans."
-	metaPrefixLen = len("tracetest.selected_spans.")
-)
-
-func (a Attribute) IsMeta() bool {
-	return len(a) > metaPrefixLen && a[0:metaPrefixLen] == metaPrefix
-}
-
-func (a Attribute) String() string {
-	return string(a)
 }
 
 func (e *AssertionExpression) String() string {

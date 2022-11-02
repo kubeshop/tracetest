@@ -256,15 +256,9 @@ func (td *postgresDB) GetTests(ctx context.Context, take, skip int32, query, sor
 		return model.List[model.Test]{}, err
 	}
 
-	tests := []model.Test{}
-
-	for rows.Next() {
-		test, err := td.readTestRow(ctx, rows)
-		if err != nil {
-			return model.List[model.Test]{}, err
-		}
-
-		tests = append(tests, test)
+	tests, err := td.readTestRows(ctx, rows)
+	if err != nil {
+		return model.List[model.Test]{}, err
 	}
 
 	count, err := td.count(ctx, condition, cleanSearchQuery)
@@ -299,6 +293,21 @@ func (td *postgresDB) count(ctx context.Context, condition, cleanSearchQuery str
 	return count, nil
 }
 
+func (td *postgresDB) readTestRows(ctx context.Context, rows *sql.Rows) ([]model.Test, error) {
+	tests := []model.Test{}
+
+	for rows.Next() {
+		test, err := td.readTestRow(ctx, rows)
+		if err != nil {
+			return []model.Test{}, err
+		}
+
+		tests = append(tests, test)
+	}
+
+	return tests, nil
+}
+
 func (td *postgresDB) readTestRow(ctx context.Context, row scanner) (model.Test, error) {
 	test := model.Test{}
 
@@ -327,8 +336,6 @@ func (td *postgresDB) readTestRow(ctx context.Context, row scanner) (model.Test,
 	)
 
 	switch err {
-	case sql.ErrNoRows:
-		return model.Test{}, ErrNotFound
 	case nil:
 		err = json.Unmarshal(jsonServiceUnderTest, &test.ServiceUnderTest)
 		if err != nil {
@@ -356,6 +363,8 @@ func (td *postgresDB) readTestRow(ctx context.Context, row scanner) (model.Test,
 		}
 
 		return test, nil
+	case sql.ErrNoRows:
+		return model.Test{}, ErrNotFound
 	default:
 		return model.Test{}, err
 	}

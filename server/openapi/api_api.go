@@ -63,6 +63,12 @@ func (c *ApiApiController) Routes() Routes {
 			c.CreateTest,
 		},
 		{
+			"CreateTransaction",
+			strings.ToUpper("Post"),
+			"/api/transactions",
+			c.CreateTransaction,
+		},
+		{
 			"DeleteEnvironment",
 			strings.ToUpper("Delete"),
 			"/api/environments/{environmentId}",
@@ -79,6 +85,12 @@ func (c *ApiApiController) Routes() Routes {
 			strings.ToUpper("Delete"),
 			"/api/tests/{testId}/run/{runId}",
 			c.DeleteTestRun,
+		},
+		{
+			"DeleteTransaction",
+			strings.ToUpper("Delete"),
+			"/api/transactions/{transactionId}",
+			c.DeleteTransaction,
 		},
 		{
 			"DryRunAssertion",
@@ -171,6 +183,18 @@ func (c *ApiApiController) Routes() Routes {
 			c.GetTests,
 		},
 		{
+			"GetTransaction",
+			strings.ToUpper("Get"),
+			"/api/transactions/{transactionId}",
+			c.GetTransaction,
+		},
+		{
+			"GetTransactions",
+			strings.ToUpper("Get"),
+			"/api/transactions",
+			c.GetTransactions,
+		},
+		{
 			"ImportTestRun",
 			strings.ToUpper("Post"),
 			"/api/tests/import",
@@ -211,6 +235,12 @@ func (c *ApiApiController) Routes() Routes {
 			strings.ToUpper("Put"),
 			"/api/tests/{testId}",
 			c.UpdateTest,
+		},
+		{
+			"UpdateTransaction",
+			strings.ToUpper("Put"),
+			"/api/transactions/{transactionId}",
+			c.UpdateTransaction,
 		},
 	}
 }
@@ -263,6 +293,30 @@ func (c *ApiApiController) CreateTest(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// CreateTransaction - Create new transaction
+func (c *ApiApiController) CreateTransaction(w http.ResponseWriter, r *http.Request) {
+	transactionParam := Transaction{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&transactionParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertTransactionRequired(transactionParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.CreateTransaction(r.Context(), transactionParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
 // DeleteEnvironment - delete a environment
 func (c *ApiApiController) DeleteEnvironment(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
@@ -303,6 +357,22 @@ func (c *ApiApiController) DeleteTestRun(w http.ResponseWriter, r *http.Request)
 	runIdParam := params["runId"]
 
 	result, err := c.service.DeleteTestRun(r.Context(), testIdParam, runIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// DeleteTransaction - delete a transaction
+func (c *ApiApiController) DeleteTransaction(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	transactionIdParam := params["transactionId"]
+
+	result, err := c.service.DeleteTransaction(r.Context(), transactionIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -637,6 +707,49 @@ func (c *ApiApiController) GetTests(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// GetTransaction - get transaction
+func (c *ApiApiController) GetTransaction(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	transactionIdParam := params["transactionId"]
+
+	result, err := c.service.GetTransaction(r.Context(), transactionIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// GetTransactions - Get transactions
+func (c *ApiApiController) GetTransactions(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+	takeParam, err := parseInt32Parameter(query.Get("take"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	skipParam, err := parseInt32Parameter(query.Get("skip"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	queryParam := query.Get("query")
+	sortByParam := query.Get("sortBy")
+	sortDirectionParam := query.Get("sortDirection")
+	result, err := c.service.GetTransactions(r.Context(), takeParam, skipParam, queryParam, sortByParam, sortDirectionParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
 // ImportTestRun - import test and test run information
 func (c *ApiApiController) ImportTestRun(w http.ResponseWriter, r *http.Request) {
 	exportedTestInformationParam := ExportedTestInformation{}
@@ -806,6 +919,33 @@ func (c *ApiApiController) UpdateTest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	result, err := c.service.UpdateTest(r.Context(), testIdParam, testParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// UpdateTransaction - update transaction
+func (c *ApiApiController) UpdateTransaction(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	transactionIdParam := params["transactionId"]
+
+	transactionParam := Transaction{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&transactionParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertTransactionRequired(transactionParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.UpdateTransaction(r.Context(), transactionIdParam, transactionParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
