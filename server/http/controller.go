@@ -596,7 +596,7 @@ func (c *controller) executeTest(ctx context.Context, test model.Test, runInfo o
 	}
 
 	res := openapi.ExecuteDefinitionResponse{
-		Id:    test.ID.String(),
+		Id:    testID.String(),
 		RunId: resp.Body.(openapi.TestRun).Id,
 		Type:  string(yaml.FileTypeTest),
 	}
