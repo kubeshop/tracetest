@@ -129,6 +129,12 @@ func (c *ApiApiController) Routes() Routes {
 			c.GetEnvironments,
 		},
 		{
+			"GetResources",
+			strings.ToUpper("Get"),
+			"/api/resources",
+			c.GetResources,
+		},
+		{
 			"GetRunResultJUnit",
 			strings.ToUpper("Get"),
 			"/api/tests/{testId}/run/{runId}/junit.xml",
@@ -511,6 +517,33 @@ func (c *ApiApiController) GetEnvironments(w http.ResponseWriter, r *http.Reques
 	sortByParam := query.Get("sortBy")
 	sortDirectionParam := query.Get("sortDirection")
 	result, err := c.service.GetEnvironments(r.Context(), takeParam, skipParam, queryParam, sortByParam, sortDirectionParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// GetResources - Get resources
+func (c *ApiApiController) GetResources(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+	takeParam, err := parseInt32Parameter(query.Get("take"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	skipParam, err := parseInt32Parameter(query.Get("skip"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	queryParam := query.Get("query")
+	sortByParam := query.Get("sortBy")
+	sortDirectionParam := query.Get("sortDirection")
+	result, err := c.service.GetResources(r.Context(), takeParam, skipParam, queryParam, sortByParam, sortDirectionParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

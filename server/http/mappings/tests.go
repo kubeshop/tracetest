@@ -32,6 +32,7 @@ func (m OpenAPI) Transaction(in model.Transaction) openapi.Transaction {
 		Description: in.Description,
 		Version:     int32(in.Version),
 		Steps:       testIds,
+		CreatedAt:   in.CreatedAt,
 	}
 }
 
@@ -43,6 +44,7 @@ func (m OpenAPI) Test(in model.Test) openapi.Test {
 		ServiceUnderTest: m.Trigger(in.ServiceUnderTest),
 		Specs:            m.Specs(in.Specs),
 		Version:          int32(in.Version),
+		CreatedAt:        in.CreatedAt,
 		Outputs:          m.Outputs(in.Outputs),
 		Summary: openapi.TestSummary{
 			Runs: int32(in.Summary.Runs),
