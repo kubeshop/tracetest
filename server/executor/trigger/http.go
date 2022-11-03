@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -98,16 +97,11 @@ func (t *httpTriggerer) Type() model.TriggerType {
 func (t *httpTriggerer) Resolve(ctx context.Context, test model.Test, opts *TriggerOptions) (model.Test, error) {
 	http := test.ServiceUnderTest.HTTP
 
-	// add quotes before resolving the statements
-	// require users to add explicit interpolation to fields
-
 	if http == nil {
 		return test, fmt.Errorf("no settings provided for HTTP triggerer")
 	}
 
-	url, err := opts.Executor.ResolveStatement(fmt.Sprintf("\"%s\"", http.URL))
-
-	log.Println("resolved url", url, http.URL)
+	url, err := opts.Executor.ResolveStatement(WrapInQuotes(http.URL, "\""))
 
 	if err != nil {
 		return test, err
@@ -117,14 +111,12 @@ func (t *httpTriggerer) Resolve(ctx context.Context, test model.Test, opts *Trig
 
 	headers := []model.HTTPHeader{}
 	for _, h := range http.Headers {
-		h.Key, err = opts.Executor.ResolveStatement(fmt.Sprintf("\"%s\"", h.Key))
-		log.Println("resolved header key", h.Key)
+		h.Key, err = opts.Executor.ResolveStatement(WrapInQuotes(h.Key, "\""))
 		if err != nil {
 			return test, err
 		}
 
-		h.Value, err = opts.Executor.ResolveStatement(fmt.Sprintf("\"%s\"", h.Value))
-		log.Println("resolved header value", h.Value)
+		h.Value, err = opts.Executor.ResolveStatement(WrapInQuotes(h.Value, "\""))
 		if err != nil {
 			return test, err
 		}
@@ -133,8 +125,7 @@ func (t *httpTriggerer) Resolve(ctx context.Context, test model.Test, opts *Trig
 	}
 	http.Headers = headers
 
-	http.Body, err = opts.Executor.ResolveStatement(fmt.Sprintf("'%s'", http.Body))
-	log.Println("resolved body", http.Body)
+	http.Body, err = opts.Executor.ResolveStatement(WrapInQuotes(http.Body, "'"))
 	if err != nil {
 		return test, err
 	}
@@ -146,8 +137,6 @@ func (t *httpTriggerer) Resolve(ctx context.Context, test model.Test, opts *Trig
 
 	test.ServiceUnderTest.HTTP = http
 
-	log.Println("resolved HTTP triggerer", http)
-
 	return test, nil
 }
 
@@ -157,7 +146,7 @@ func resolveAuth(auth *model.HTTPAuthenticator, executor expression.Executor) (*
 	}
 
 	for k, v := range auth.Props {
-		resolved, err := executor.ResolveStatement(fmt.Sprintf("\"%s\"", v))
+		resolved, err := executor.ResolveStatement(WrapInQuotes(v, "\""))
 		if err != nil {
 			return auth, err
 		}

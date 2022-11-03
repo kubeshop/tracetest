@@ -111,30 +111,30 @@ func (t *grpcTriggerer) Resolve(ctx context.Context, test model.Test, opts *Trig
 		return test, fmt.Errorf("no settings provided for GRPC triggerer")
 	}
 
-	address, err := opts.Executor.ResolveStatement(fmt.Sprintf("\"%s\"", grpc.Address))
+	address, err := opts.Executor.ResolveStatement(WrapInQuotes(grpc.Address, "\""))
 	if err != nil {
 		return test, err
 	}
 	grpc.Address = address
 
 	for _, h := range grpc.Metadata {
-		h.Key, err = opts.Executor.ResolveStatement(fmt.Sprintf("\"%s\"", h.Key))
+		h.Key, err = opts.Executor.ResolveStatement(WrapInQuotes(h.Key, "\""))
 		if err != nil {
 			return test, err
 		}
 
-		h.Value, err = opts.Executor.ResolveStatement(fmt.Sprintf("\"%s\"", h.Value))
+		h.Value, err = opts.Executor.ResolveStatement(WrapInQuotes(h.Value, "\""))
 		if err != nil {
 			return test, err
 		}
 	}
 
-	grpc.Request, err = opts.Executor.ResolveStatement(fmt.Sprintf("'%s'", grpc.Request))
+	grpc.Request, err = opts.Executor.ResolveStatement(WrapInQuotes(grpc.Request, "'"))
 	if err != nil {
 		return test, err
 	}
 
-	grpc.Method, err = opts.Executor.ResolveStatement(fmt.Sprintf("\"%s\"", grpc.Method))
+	grpc.Method, err = opts.Executor.ResolveStatement(WrapInQuotes(grpc.Method, "\""))
 	if err != nil {
 		return test, err
 	}

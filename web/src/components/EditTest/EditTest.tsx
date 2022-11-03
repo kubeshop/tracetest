@@ -26,6 +26,7 @@ const EditTest = ({test}: IProps) => {
 
   const handleOnSubmit = useCallback(
     async (values: TDraftTest) => {
+      console.log('@@edit values', values);
       TestRunAnalyticsService.onTriggerEditSubmit();
       onEdit(values);
     },
