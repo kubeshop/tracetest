@@ -1,6 +1,7 @@
 package http
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -35,10 +36,12 @@ func (c *customController) Routes() openapi.Routes {
 
 	routes[c.getRouteIndex("GetRunResultJUnit")].HandlerFunc = c.GetRunResultJUnit
 	routes[c.getRouteIndex("GetTestVersionDefinitionFile")].HandlerFunc = c.GetTestVersionDefinitionFile
-	routes[c.getRouteIndex("GetTests")].HandlerFunc = c.GetTests
 	routes[c.getRouteIndex("GetTestRuns")].HandlerFunc = c.GetTestRuns
-	routes[c.getRouteIndex("GetEnvironments")].HandlerFunc = c.GetEnvironments
-	routes[c.getRouteIndex("GetTransactions")].HandlerFunc = c.GetTransactions
+
+	routes[c.getRouteIndex("GetTests")].HandlerFunc = paginatedEndpoint[openapi.Test](c.service.GetTests, c.errorHandler)
+	routes[c.getRouteIndex("GetEnvironments")].HandlerFunc = paginatedEndpoint[openapi.Environment](c.service.GetEnvironments, c.errorHandler)
+	routes[c.getRouteIndex("GetTransactions")].HandlerFunc = paginatedEndpoint[openapi.Transaction](c.service.GetTransactions, c.errorHandler)
+	routes[c.getRouteIndex("GetResources")].HandlerFunc = paginatedEndpoint[openapi.Resource](c.service.GetResources, c.errorHandler)
 
 	for index, route := range routes {
 		routeName := fmt.Sprintf("%s %s", route.Method, route.Pattern)
@@ -53,34 +56,6 @@ func (c *customController) Routes() openapi.Routes {
 	}
 
 	return routes
-}
-
-// GetTests - Get tests
-func (c *customController) GetTests(w http.ResponseWriter, r *http.Request) {
-	query := r.URL.Query()
-	takeParam, err := parseInt32Parameter(query.Get("take"), false)
-	if err != nil {
-		c.errorHandler(w, r, &openapi.ParsingError{Err: err}, nil)
-		return
-	}
-	skipParam, err := parseInt32Parameter(query.Get("skip"), false)
-	if err != nil {
-		c.errorHandler(w, r, &openapi.ParsingError{Err: err}, nil)
-		return
-	}
-	queryParam := query.Get("query")
-	sortByParam := query.Get("sortBy")
-	sortDirectionParam := query.Get("sortDirection")
-	result, err := c.service.GetTests(r.Context(), takeParam, skipParam, queryParam, sortByParam, sortDirectionParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	res := result.Body.(paginated[openapi.Test])
-
-	w.Header().Set("X-Total-Count", strconv.Itoa(res.count))
-	openapi.EncodeJSONResponse(res.items, &result.Code, w)
 }
 
 // GetTestRuns - get the runs for a test
@@ -106,34 +81,6 @@ func (c *customController) GetTestRuns(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	res := result.Body.(paginated[openapi.TestRun])
-
-	w.Header().Set("X-Total-Count", strconv.Itoa(res.count))
-	openapi.EncodeJSONResponse(res.items, &result.Code, w)
-}
-
-// GetEnvironments - Get environments
-func (c *customController) GetEnvironments(w http.ResponseWriter, r *http.Request) {
-	query := r.URL.Query()
-	takeParam, err := parseInt32Parameter(query.Get("take"), false)
-	if err != nil {
-		c.errorHandler(w, r, &openapi.ParsingError{Err: err}, nil)
-		return
-	}
-	skipParam, err := parseInt32Parameter(query.Get("skip"), false)
-	if err != nil {
-		c.errorHandler(w, r, &openapi.ParsingError{Err: err}, nil)
-		return
-	}
-	queryParam := query.Get("query")
-	sortByParam := query.Get("sortBy")
-	sortDirectionParam := query.Get("sortDirection")
-	result, err := c.service.GetEnvironments(r.Context(), takeParam, skipParam, queryParam, sortByParam, sortDirectionParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	res := result.Body.(paginated[openapi.Environment])
 
 	w.Header().Set("X-Total-Count", strconv.Itoa(res.count))
 	openapi.EncodeJSONResponse(res.items, &result.Code, w)
@@ -177,31 +124,36 @@ func (c *customController) GetTestVersionDefinitionFile(w http.ResponseWriter, r
 	w.Write(result.Body.([]byte))
 }
 
-func (c *customController) GetTransactions(w http.ResponseWriter, r *http.Request) {
-	query := r.URL.Query()
-	takeParam, err := parseInt32Parameter(query.Get("take"), false)
-	if err != nil {
-		c.errorHandler(w, r, &openapi.ParsingError{Err: err}, nil)
-		return
-	}
-	skipParam, err := parseInt32Parameter(query.Get("skip"), false)
-	if err != nil {
-		c.errorHandler(w, r, &openapi.ParsingError{Err: err}, nil)
-		return
-	}
-	queryParam := query.Get("query")
-	sortByParam := query.Get("sortBy")
-	sortDirectionParam := query.Get("sortDirection")
-	result, err := c.service.GetTransactions(r.Context(), takeParam, skipParam, queryParam, sortByParam, sortDirectionParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	res := result.Body.(paginated[openapi.Transaction])
+func paginatedEndpoint[T any](
+	f func(c context.Context, take, skip int32, query string, sortBy string, sortDirection string) (openapi.ImplResponse, error),
+	errorHandler openapi.ErrorHandler,
+) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		query := r.URL.Query()
+		takeParam, err := parseInt32Parameter(query.Get("take"), false)
+		if err != nil {
+			errorHandler(w, r, &openapi.ParsingError{Err: err}, nil)
+			return
+		}
+		skipParam, err := parseInt32Parameter(query.Get("skip"), false)
+		if err != nil {
+			errorHandler(w, r, &openapi.ParsingError{Err: err}, nil)
+			return
+		}
+		queryParam := query.Get("query")
+		sortByParam := query.Get("sortBy")
+		sortDirectionParam := query.Get("sortDirection")
+		result, err := f(r.Context(), takeParam, skipParam, queryParam, sortByParam, sortDirectionParam)
+		// If an error occurred, encode the error with the status code
+		if err != nil {
+			errorHandler(w, r, err, &result)
+			return
+		}
+		res := result.Body.(paginated[T])
 
-	w.Header().Set("X-Total-Count", strconv.Itoa(res.count))
-	openapi.EncodeJSONResponse(res.items, &result.Code, w)
+		w.Header().Set("X-Total-Count", strconv.Itoa(res.count))
+		openapi.EncodeJSONResponse(res.items, &result.Code, w)
+	}
 }
 
 const errMsgRequiredMissing = "required parameter is missing"

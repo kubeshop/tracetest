@@ -9,6 +9,10 @@
 
 package openapi
 
+import (
+	"time"
+)
+
 type Test struct {
 	Id string `json:"id,omitempty"`
 
@@ -18,6 +22,8 @@ type Test struct {
 
 	// version number of the test
 	Version int32 `json:"version,omitempty"`
+
+	CreatedAt time.Time `json:"createdAt,omitempty"`
 
 	ServiceUnderTest Trigger `json:"serviceUnderTest,omitempty"`
 
