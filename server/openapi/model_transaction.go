@@ -9,6 +9,10 @@
 
 package openapi
 
+import (
+	"time"
+)
+
 type Transaction struct {
 	Id string `json:"id,omitempty"`
 
@@ -20,6 +24,8 @@ type Transaction struct {
 	Version int32 `json:"version,omitempty"`
 
 	Steps []string `json:"steps,omitempty"`
+
+	CreatedAt time.Time `json:"createdAt,omitempty"`
 }
 
 // AssertTransactionRequired checks if the required fields are not zero-ed

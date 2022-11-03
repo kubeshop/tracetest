@@ -18,6 +18,7 @@ export TRANSACTION_ID=$(tracetest_target_curl "/api/transactions" -X GET | jq -r
 require_not_empty $TRANSACTION_ID "requires TRANSACTION_ID, got $TRANSACTION_ID " || exit $?
 
 test "transaction_list" ./definitions/transaction_list.yml || EXIT_STATUS=$?
+test "resource_list" ./definitions/resource_list.yml || EXIT_STATUS=$?
 test "transaction_delete" ./definitions/transaction_delete.yml || EXIT_STATUS=$?
 
 exit $EXIT_STATUS

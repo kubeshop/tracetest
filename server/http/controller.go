@@ -838,3 +838,92 @@ func (c *controller) UpdateTransaction(ctx context.Context, tID string, transact
 
 	return openapi.Response(http.StatusNoContent, nil), nil
 }
+
+// GetResources implements openapi.ApiApiServicer
+func (c *controller) GetResources(ctx context.Context, take, skip int32, query, sortBy, sortDirection string) (openapi.ImplResponse, error) {
+	// TODO: this is endpoint is a hack to unblock the team quickly.
+	// This is not production ready because it might take too long to respond if there are numerous
+	// transactions and tests.
+
+	if take == 0 {
+		take = 20
+	}
+
+	newTake := take + skip
+
+	getTransactionsReponse, err := c.GetTransactions(ctx, newTake, 0, query, sortBy, sortDirection)
+	if err != nil {
+		return getTransactionsReponse, err
+	}
+
+	getTestsResponse, err := c.GetTests(ctx, newTake, 0, query, sortBy, sortDirection)
+	if err != nil {
+		return getTestsResponse, err
+	}
+
+	transactionPaginatedResponse := getTransactionsReponse.Body.(paginated[openapi.Transaction])
+	transactions := transactionPaginatedResponse.items
+	testPaginatedResponse := getTestsResponse.Body.(paginated[openapi.Test])
+	tests := testPaginatedResponse.items
+
+	totalResources := transactionPaginatedResponse.count + testPaginatedResponse.count
+
+	items := takeResources(transactions, tests, take, skip)
+
+	paginatedResponse := paginated[openapi.Resource]{
+		items: items,
+		count: totalResources,
+	}
+
+	return openapi.Response(http.StatusOK, paginatedResponse), nil
+}
+
+func takeResources(transactions []openapi.Transaction, tests []openapi.Test, take, skip int32) []openapi.Resource {
+	numItems := len(transactions) + len(tests)
+	items := make([]openapi.Resource, numItems)
+	maxNumItems := len(transactions) + len(tests)
+	currentNumberItens := 0
+
+	var i, j int
+	for currentNumberItens < int(numItems) && currentNumberItens < maxNumItems {
+		if i >= len(transactions) {
+			test := tests[j]
+			testInterface := any(test)
+			items[currentNumberItens] = openapi.Resource{Type: "test", Item: &testInterface}
+			j++
+			currentNumberItens++
+			continue
+		}
+
+		if j >= len(tests) {
+			transaction := transactions[i]
+			transactionInterface := any(transaction)
+			items[currentNumberItens] = openapi.Resource{Type: "transaction", Item: &transactionInterface}
+			i++
+			currentNumberItens++
+			continue
+		}
+
+		transaction := transactions[i]
+		test := tests[j]
+		transactionInterface := any(transaction)
+		testInterface := any(test)
+
+		if transaction.CreatedAt.After(test.CreatedAt) {
+			items[currentNumberItens] = openapi.Resource{Type: "transaction", Item: &transactionInterface}
+			i++
+		} else {
+			items[currentNumberItens] = openapi.Resource{Type: "test", Item: &testInterface}
+			i++
+		}
+
+		currentNumberItens++
+	}
+
+	upperLimit := int(skip + take)
+	if upperLimit > currentNumberItens {
+		upperLimit = currentNumberItens
+	}
+
+	return items[skip:upperLimit]
+}
