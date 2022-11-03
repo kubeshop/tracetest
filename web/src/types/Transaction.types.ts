@@ -14,6 +14,7 @@ export type TTransaction = Model<
     name: string;
     description: string;
     version: number;
+    createdAt?: string;
     steps: string[];
     // steps: TransactionStep[]; // TODO define if this should be part of Transaction Run
     env?: Record<string, string>; // TODO define if this should be part of Transaction Run

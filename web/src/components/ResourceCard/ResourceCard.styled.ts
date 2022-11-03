@@ -3,6 +3,7 @@ import {Button, Space, Typography} from 'antd';
 import styled from 'styled-components';
 
 import emptyStateIcon from 'assets/SpanAssertionsEmptyState.svg';
+import {ResourceType} from 'types/Resource.type';
 
 export const ActionButton = styled(MoreOutlined)`
   color: ${({theme}) => theme.color.textSecondary};
@@ -17,9 +18,9 @@ export const Container = styled.div`
   box-shadow: -1px 1px 5px #e4e9f5;
 `;
 
-export const Box = styled.div`
+export const Box = styled.div<{$type: ResourceType}>`
   align-items: center;
-  background: #2f1e61;
+  background: ${({$type}) => ($type === ResourceType.test ? '#2f1e61' : '#BC334A')};
   border-radius: 3px;
   display: flex;
   justify-content: center;

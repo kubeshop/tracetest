@@ -1,4 +1,4 @@
-import TestCardActions from 'components/TestCard/TestCardActions';
+import ResourceCardActions from 'components/ResourceCard/ResourceCardActions';
 import {noop} from 'lodash';
 import {useTransaction} from 'providers/TransactionRunDetail/TransactionRunDetailProvider';
 import * as S from './TransactionHeader.styled';
@@ -22,7 +22,7 @@ const TransactionHeader = ({onBack}: IProps) => {
         </div>
       </S.Section>
       <S.Section>
-        <TestCardActions testId={transaction?.id || ''} onDelete={noop} />
+        <ResourceCardActions id={transaction?.id || ''} onDelete={noop} />
       </S.Section>
     </S.Container>
   );

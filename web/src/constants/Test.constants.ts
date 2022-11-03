@@ -52,4 +52,5 @@ export enum TracetestApiTags {
   TEST_RUN = 'testRun',
   SPAN = 'span',
   EXPRESSION = 'expression',
+  RESOURCE = 'resource',
 }

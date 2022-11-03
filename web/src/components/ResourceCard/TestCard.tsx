@@ -1,26 +1,28 @@
 import {DownOutlined, RightOutlined} from '@ant-design/icons';
-import {Skeleton, Tooltip} from 'antd';
+import {Skeleton} from 'antd';
 import {useCallback, useState} from 'react';
 
 import {useLazyGetRunListQuery} from 'redux/apis/TraceTest.api';
 import TestAnalyticsService from 'services/Analytics/TestAnalytics.service';
+import {ResourceType} from 'types/Resource.type';
 import {TTest} from 'types/Test.types';
-import Date from 'utils/Date';
 import ResultCardList from '../RunCardList/RunCardList';
-import * as S from './TestCard.styled';
-import TestCardActions from './TestCardActions';
+import * as S from './ResourceCard.styled';
+import ResourceCardActions from './ResourceCardActions';
+import ResourceCardSummary from './ResourceCardSummary';
 
 interface IProps {
+  onDelete(id: string, name: string, type: ResourceType): void;
+  onRun(id: string, type: ResourceType): void;
+  onViewAll(id: string, type: ResourceType): void;
   test: TTest;
-  onDelete(test: TTest): void;
-  onRun(id: string): void;
-  onViewAll(id: string): void;
 }
 
 const TestCard = ({onDelete, onRun, onViewAll, test}: IProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [getRuns, {data, isLoading}] = useLazyGetRunListQuery();
-  let runs = data?.items || [];
+  const runs = data?.items || [];
+
   const handleOnClick = useCallback(() => {
     if (isCollapsed) {
       setIsCollapsed(false);
@@ -39,7 +41,7 @@ const TestCard = ({onDelete, onRun, onViewAll, test}: IProps) => {
     <S.Container>
       <S.TestContainer onClick={() => handleOnClick()}>
         {isCollapsed ? <DownOutlined /> : <RightOutlined data-cy={`collapse-test-${test.id}`} />}
-        <S.Box>
+        <S.Box $type={ResourceType.test}>
           <S.BoxTitle level={2}>{test.summary.runs}</S.BoxTitle>
         </S.Box>
         <S.TitleContainer>
@@ -48,30 +50,8 @@ const TestCard = ({onDelete, onRun, onViewAll, test}: IProps) => {
             {test.trigger.method} • {test.trigger.entryPoint}
           </S.Text>
         </S.TitleContainer>
-        <div>
-          <S.Text>Last run time:</S.Text>
-          <Tooltip title={Date.format(test.summary.lastRun.time)}>
-            <S.Text>{Date.getTimeAgo(test.summary.lastRun.time)}</S.Text>
-          </Tooltip>
-        </div>
 
-        <div>
-          <S.Text>Last run result:</S.Text>
-          <S.Row>
-            <Tooltip title="Passed assertions">
-              <S.HeaderDetail>
-                <S.HeaderDot $passed />
-                {test.summary.lastRun.passes}
-              </S.HeaderDetail>
-            </Tooltip>
-            <Tooltip title="Failed assertions">
-              <S.HeaderDetail>
-                <S.HeaderDot $passed={false} />
-                {test.summary.lastRun.fails}
-              </S.HeaderDetail>
-            </Tooltip>
-          </S.Row>
-        </div>
+        <ResourceCardSummary summary={test.summary} />
 
         <S.Row>
           <S.RunButton
@@ -80,12 +60,12 @@ const TestCard = ({onDelete, onRun, onViewAll, test}: IProps) => {
             data-cy={`test-run-button-${test.id}`}
             onClick={event => {
               event.stopPropagation();
-              onRun(test.id);
+              onRun(test.id, ResourceType.test);
             }}
           >
             Run
           </S.RunButton>
-          <TestCardActions testId={test.id} onDelete={() => onDelete(test)} />
+          <ResourceCardActions id={test.id} onDelete={() => onDelete(test.id, test.name, ResourceType.test)} />
         </S.Row>
       </S.TestContainer>
 
@@ -103,7 +83,7 @@ const TestCard = ({onDelete, onRun, onViewAll, test}: IProps) => {
 
           {runs.length === 5 && (
             <S.FooterContainer>
-              <S.Link data-cy="test-details-link" onClick={() => onViewAll(test.id)}>
+              <S.Link data-cy="test-details-link" onClick={() => onViewAll(test.id, ResourceType.test)}>
                 View all runs
               </S.Link>
             </S.FooterContainer>

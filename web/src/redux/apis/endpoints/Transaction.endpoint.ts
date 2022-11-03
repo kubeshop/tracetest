@@ -13,11 +13,17 @@ const TransactionEndpoint = (builder: TTestApiEndpointBuilder) => ({
       body: transaction,
     }),
     transformResponse: (rawTransaction: TRawTransaction) => Transaction(rawTransaction),
-    invalidatesTags: [{type: TracetestApiTags.TRANSACTION, id: 'LIST'}],
+    invalidatesTags: [
+      {type: TracetestApiTags.TRANSACTION, id: 'LIST'},
+      {type: TracetestApiTags.RESOURCE, id: 'LIST'},
+    ],
   }),
   deleteTransactionById: builder.mutation<TTransaction, {transactionId: string}>({
     query: ({transactionId}) => ({url: `/transactions/${transactionId}`, method: 'DELETE'}),
-    invalidatesTags: [{type: TracetestApiTags.TRANSACTION, id: 'LIST'}],
+    invalidatesTags: [
+      {type: TracetestApiTags.TRANSACTION, id: 'LIST'},
+      {type: TracetestApiTags.RESOURCE, id: 'LIST'},
+    ],
   }),
   getTransactionRunById: builder.query<TTransaction, {transactionId: string; runId?: string}>({
     query: () => `/tests`,
