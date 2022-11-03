@@ -868,7 +868,7 @@ func (c *controller) GetResources(ctx context.Context, take, skip int32, query, 
 
 	totalResources := transactionPaginatedResponse.count + testPaginatedResponse.count
 
-	items := takeResources(transactions, tests, newTake)
+	items := takeResources(transactions, tests, take, skip)
 
 	paginatedResponse := paginated[openapi.Resource]{
 		items: items,
@@ -878,13 +878,14 @@ func (c *controller) GetResources(ctx context.Context, take, skip int32, query, 
 	return openapi.Response(http.StatusOK, paginatedResponse), nil
 }
 
-func takeResources(transactions []openapi.Transaction, tests []openapi.Test, take int32) []openapi.Resource {
-	items := make([]openapi.Resource, take)
+func takeResources(transactions []openapi.Transaction, tests []openapi.Test, take, skip int32) []openapi.Resource {
+	numItems := len(transactions) + len(tests)
+	items := make([]openapi.Resource, numItems)
 	maxNumItems := len(transactions) + len(tests)
 	currentNumberItens := 0
 
 	var i, j int
-	for currentNumberItens < int(take) && currentNumberItens < maxNumItems {
+	for currentNumberItens < int(numItems) && currentNumberItens < maxNumItems {
 		if i >= len(transactions) {
 			test := tests[j]
 			testInterface := any(test)
@@ -919,14 +920,10 @@ func takeResources(transactions []openapi.Transaction, tests []openapi.Test, tak
 		currentNumberItens++
 	}
 
-	filteredItems := make([]openapi.Resource, 0, take)
-	for i, item := range items {
-		if i >= int(take) {
-			break
-		}
-
-		filteredItems = append(filteredItems, item)
+	upperLimit := int(skip + take)
+	if upperLimit > currentNumberItens {
+		upperLimit = currentNumberItens
 	}
 
-	return filteredItems
+	return items[skip:upperLimit]
 }
