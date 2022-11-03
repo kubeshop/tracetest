@@ -1,11 +1,13 @@
-import {TTransaction} from 'types/Transaction.types';
+import {TRawTransaction, TTransaction} from 'types/Transaction.types';
 
-const Transaction = ({id = '', name = '', description = '', version = 1, ...data}: TTransaction): TTransaction => ({
-  id,
-  name,
-  description,
-  version,
-  ...data,
-});
+function Transaction({id = '', name = '', description = '', version = 1, steps = []}: TRawTransaction): TTransaction {
+  return {
+    id,
+    name,
+    description,
+    version,
+    steps,
+  };
+}
 
 export default Transaction;

@@ -1,5 +1,7 @@
 import {noop} from 'lodash';
 import {createContext, useCallback, useContext, useMemo} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {useCreateTransactionMutation} from 'redux/apis/TraceTest.api';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import {
   initialState,
@@ -45,6 +47,8 @@ export const useCreateTransaction = () => useContext(Context);
 
 const CreateTransactionProvider = ({children}: IProps) => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const [createTransaction, {isLoading: isLoadingCreateTransaction}] = useCreateTransactionMutation();
 
   const draftTransaction = useAppSelector(CreateTransactionSelectors.selectDraftTransaction);
   const stepNumber = useAppSelector(CreateTransactionSelectors.selectStepNumber);
@@ -53,10 +57,15 @@ const CreateTransactionProvider = ({children}: IProps) => {
   const isFinalStep = stepNumber === stepList.length - 1;
   const activeStep = stepList[stepNumber]?.id;
 
-  const onCreateTransaction = useCallback(async (draft: TDraftTransaction) => {
-    // eslint-disable-next-line no-console
-    console.log('@@ creating a new transaction!!', draft);
-  }, []);
+  const onCreateTransaction = useCallback(
+    async (draft: TDraftTransaction) => {
+      const transaction = await createTransaction(draft).unwrap();
+      // const run = await runTransaction({transactionId: transaction.id}).unwrap(); TODO: run transaction
+      const run = {id: 1};
+      navigate(`/transaction/${transaction.id}/run/${run.id}`);
+    },
+    [createTransaction, navigate]
+  );
 
   const onUpdateDraft = useCallback(
     (update: TDraftTransaction) => {
@@ -98,7 +107,7 @@ const CreateTransactionProvider = ({children}: IProps) => {
     () => ({
       draftTransaction,
       stepNumber,
-      isLoading: false,
+      isLoading: isLoadingCreateTransaction,
       isFormValid,
       onNext,
       onPrev,
@@ -112,6 +121,7 @@ const CreateTransactionProvider = ({children}: IProps) => {
     [
       draftTransaction,
       stepNumber,
+      isLoadingCreateTransaction,
       isFormValid,
       onNext,
       onPrev,
