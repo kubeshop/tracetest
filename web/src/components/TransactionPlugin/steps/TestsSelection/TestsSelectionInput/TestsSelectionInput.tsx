@@ -2,7 +2,7 @@ import {closestCenter, DndContext, KeyboardSensor, PointerSensor, useSensor, use
 import {arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy} from '@dnd-kit/sortable';
 import {Col, Row, Select} from 'antd';
 import {noop} from 'lodash';
-import {useCallback, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {TTest} from 'types/Test.types';
 import TestItemList from './TestItemList';
 
@@ -17,10 +17,13 @@ const TestsSelectionInput = ({value = [], onChange = noop, testList}: IProps) =>
   const onSelectedTest = useCallback(
     (testId: string) => {
       onChange([...value, testId]);
-      setSelectedTestList([...selectedTestList, testList.find(test => test.id === testId)!]);
     },
-    [onChange, selectedTestList, testList, value]
+    [onChange, value]
   );
+
+  useEffect(() => {
+    setSelectedTestList(testList.filter(test => value.includes(test.id)));
+  }, [testList, value]);
 
   const sensors = useSensors(
     useSensor(PointerSensor),

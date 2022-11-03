@@ -1,6 +1,5 @@
 import TestCardActions from 'components/TestCard/TestCardActions';
-import {noop} from 'lodash';
-import {useTransaction} from 'providers/TransactionRunDetail/TransactionRunDetailProvider';
+import {useTransaction} from 'providers/Transaction/Transaction.provider';
 import * as S from './TransactionHeader.styled';
 
 interface IProps {
@@ -8,7 +7,7 @@ interface IProps {
 }
 
 const TransactionHeader = ({onBack}: IProps) => {
-  const {transaction} = useTransaction();
+  const {transaction, onDelete} = useTransaction();
 
   return (
     <S.Container>
@@ -16,13 +15,13 @@ const TransactionHeader = ({onBack}: IProps) => {
         <S.BackIcon data-cy="transaction-header-back-button" onClick={onBack} />
         <div>
           <S.Title data-cy="transaction-details-name">
-            {transaction?.name} (v{transaction?.version})
+            {transaction?.name} ({transaction.version})
           </S.Title>
           <S.Text>{transaction?.description}</S.Text>
         </div>
       </S.Section>
       <S.Section>
-        <TestCardActions testId={transaction?.id || ''} onDelete={noop} />
+        <TestCardActions testId={transaction?.id || ''} onDelete={() => onDelete(transaction.id, transaction.name)} />
       </S.Section>
     </S.Container>
   );
