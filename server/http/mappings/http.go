@@ -1,8 +1,6 @@
 package mappings
 
 import (
-	"log"
-
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
 )
@@ -115,7 +113,6 @@ func (m Model) HTTPResponse(in openapi.HttpResponse) *model.HTTPResponse {
 
 func (m Model) Auth(in openapi.HttpAuth) *model.HTTPAuthenticator {
 	var props map[string]string
-	log.Println("@@@@ auth type", in.Type, in)
 
 	switch in.Type {
 	case "apiKey":
