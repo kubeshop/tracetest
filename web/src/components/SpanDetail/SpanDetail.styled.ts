@@ -59,25 +59,11 @@ export const Row = styled.div`
   margin-bottom: 4px;
 `;
 
-export const Dot = styled.div`
-  background-color: ${({theme}) => theme.color.textHighlight};
-  border-radius: 50%;
-  display: inline-block;
-  height: 10px;
-  margin-left: 5px;
-  width: 10px;
+export const AttributesContainer = styled.div<{$top: number}>`
+  height: calc(100% - ${({$top}) => `${$top}px`});
+  overflow-y: scroll;
 `;
 
-export const TabContainer = styled.div<{$top: number}>`
-  height: calc(100% - ${({$top}) => `${$top}px`});
-
-  .ant-tabs-nav {
-    padding: 0 12px;
-    margin-bottom: 0;
-  }
-
-  .ant-tabs-content-holder {
-    height: calc(100% - 38px);
-    overflow-y: scroll;
-  }
+export const SearchContainer = styled.div`
+  padding: 0 12px;
 `;

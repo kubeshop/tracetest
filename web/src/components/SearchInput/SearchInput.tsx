@@ -2,7 +2,7 @@ import {debounce} from 'lodash';
 import {useMemo} from 'react';
 import * as S from './SearchInput.styled';
 
-interface ISearchInputProps {
+interface IProps {
   height?: string;
   width?: string;
   placeholder: string;
@@ -10,13 +10,7 @@ interface ISearchInputProps {
   delay?: number;
 }
 
-const SearchInput: React.FC<ISearchInputProps> = ({
-  height = '32px',
-  width = '270px',
-  placeholder,
-  onSearch,
-  delay = 500,
-}) => {
+const SearchInput = ({height = '32px', width = '270px', placeholder, onSearch, delay = 500}: IProps) => {
   const handleSearch = useMemo(
     () =>
       debounce(event => {

@@ -1,6 +1,6 @@
 import {FormItemProps, Select, Form} from 'antd';
 import {uniqBy} from 'lodash';
-import {ReactElement, useMemo, useState} from 'react';
+import {useMemo, useState} from 'react';
 import SpanAttributeService from 'services/SpanAttribute.service';
 import {TSpanFlatAttribute} from 'types/Span.types';
 import {OtelReference} from '../hooks/useGetOTELSemanticConventionAttributesInfo';
@@ -12,7 +12,7 @@ interface IProps extends FormItemProps {
   reference: OtelReference;
 }
 
-export const AttributeField = ({reference, attributeList, ...props}: IProps): ReactElement => {
+const AttributeField = ({reference, attributeList, ...props}: IProps) => {
   const [hoveredKey, setHoveredKey] = useState<string | undefined>(undefined);
   const [newAttribute, setNewAttribute] = useState<string | undefined>(undefined);
 
@@ -29,12 +29,10 @@ export const AttributeField = ({reference, attributeList, ...props}: IProps): Re
         showSearch
         dropdownRender={useDropDownRenderComponent(reference, hoveredKey)}
         dropdownStyle={hoveredKey ? {minWidth: 550, maxWidth: 550} : undefined}
-        filterOption={(search, option) => {
-          const itMatches = SpanAttributeService.getItMatchesAttributeByKey(reference, option?.key || '', search);
-
-          return itMatches;
-        }}
-        onSearch={sarchValue => setNewAttribute(sarchValue)}
+        filterOption={(search, option) =>
+          SpanAttributeService.getItMatchesAttributeByKey(reference, option?.key || '', search)
+        }
+        onSearch={searchValue => setNewAttribute(searchValue)}
       >
         {filteredAttributedList.map(({key}) => (
           <Select.Option key={key} value={key}>
@@ -47,3 +45,5 @@ export const AttributeField = ({reference, attributeList, ...props}: IProps): Re
     </Form.Item>
   );
 };
+
+export default AttributeField;

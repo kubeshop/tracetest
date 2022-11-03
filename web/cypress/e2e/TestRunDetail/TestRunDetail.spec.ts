@@ -12,12 +12,11 @@ describe('Test Run Detail Views', () => {
     cy.get('[data-cy=attribute-row-http-method]').should('be.visible');
   });
 
-  it('Trace view -> attribute list -> switch between tabs', () => {
+  it('Trace view -> attribute list', () => {
     cy.selectRunDetailMode(2);
     cy.get('[data-cy=trace-node-http]').click();
 
     cy.get('[data-cy=attribute-list]').should('be.visible');
-    cy.get('[data-cy=attribute-tabs-response]').should('be.visible').click();
   });
 
   it('Test view -> create assertion with empty selector', () => {
