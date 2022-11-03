@@ -129,9 +129,11 @@ func (t *grpcTriggerer) Resolve(ctx context.Context, test model.Test, opts *Trig
 		}
 	}
 
-	grpc.Request, err = opts.Executor.ResolveStatement(WrapInQuotes(grpc.Request, "'"))
-	if err != nil {
-		return test, err
+	if grpc.Request != "" {
+		grpc.Request, err = opts.Executor.ResolveStatement(WrapInQuotes(grpc.Request, "'"))
+		if err != nil {
+			return test, err
+		}
 	}
 
 	grpc.Method, err = opts.Executor.ResolveStatement(WrapInQuotes(grpc.Method, "\""))

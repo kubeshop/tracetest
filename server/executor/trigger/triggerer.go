@@ -66,5 +66,5 @@ func (r *Registry) Get(triggererType model.TriggerType) (Triggerer, error) {
 }
 
 func WrapInQuotes(input string, quoteChar string) string {
-	return fmt.Sprintf("%s%s%s", quoteChar, input, "\"")
+	return fmt.Sprintf("%s%s%s", quoteChar, input, quoteChar)
 }

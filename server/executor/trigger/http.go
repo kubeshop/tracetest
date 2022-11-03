@@ -125,9 +125,11 @@ func (t *httpTriggerer) Resolve(ctx context.Context, test model.Test, opts *Trig
 	}
 	http.Headers = headers
 
-	http.Body, err = opts.Executor.ResolveStatement(WrapInQuotes(http.Body, "'"))
-	if err != nil {
-		return test, err
+	if http.Body != "" {
+		http.Body, err = opts.Executor.ResolveStatement(WrapInQuotes(http.Body, "'"))
+		if err != nil {
+			return test, err
+		}
 	}
 
 	http.Auth, err = resolveAuth(http.Auth, opts.Executor)

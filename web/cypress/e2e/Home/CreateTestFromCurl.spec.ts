@@ -14,7 +14,7 @@ describe('Create test from CURL Command', () => {
       .first()
       .type(
         `curl -XPOST 'http://demo-pokemon-api.demo.svc.cluster.local/pokemon'
-    -H "Content-type: application/json"
+    -H Content-type: application/json
     --data '{"name":"meowth","type":"normal","imageUrl":"https://assets.pokemon.com/assets/cms2/img/pokedex/full/052.png","isFeatured":true}'
    `,
         {parseSpecialCharSequences: false}
