@@ -1,0 +1,15 @@
+openapi: 3.0.0
+components:
+  schemas:
+
+    Resource:
+      type: object
+      required:
+        - type
+        - item
+      nullable: false
+      properties:
+        type:
+          type: string
+          readOnly: true
+        item: {}
