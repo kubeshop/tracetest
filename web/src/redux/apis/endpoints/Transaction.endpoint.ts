@@ -25,9 +25,9 @@ const TransactionEndpoint = (builder: TTestApiEndpointBuilder) => ({
     transformResponse: () => TransactionMock.model(),
   }),
   getTransactionById: builder.query<TTransaction, {transactionId: string}>({
-    query: () => `/tests`,
+    query: ({transactionId}) => `/transactions/${transactionId}`,
     providesTags: result => [{type: TracetestApiTags.TRANSACTION, id: result?.id}],
-    transformResponse: () => TransactionMock.model(),
+    transformResponse: (rawTransaction: TRawTransaction) => Transaction(rawTransaction),
   }),
 });
 

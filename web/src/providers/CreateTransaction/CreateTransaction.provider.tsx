@@ -1,5 +1,6 @@
 import {noop} from 'lodash';
 import {createContext, useCallback, useContext, useMemo} from 'react';
+import {useNavigate} from 'react-router-dom';
 import {useCreateTransactionMutation} from 'redux/apis/TraceTest.api';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import {
@@ -46,6 +47,7 @@ export const useCreateTransaction = () => useContext(Context);
 
 const CreateTransactionProvider = ({children}: IProps) => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const [createTransaction, {isLoading: isLoadingCreateTransaction}] = useCreateTransactionMutation();
 
   const draftTransaction = useAppSelector(CreateTransactionSelectors.selectDraftTransaction);
@@ -59,9 +61,10 @@ const CreateTransactionProvider = ({children}: IProps) => {
     async (draft: TDraftTransaction) => {
       const transaction = await createTransaction(draft).unwrap();
       // const run = await runTransaction({transactionId: transaction.id}).unwrap(); TODO: run transaction
-      // navigate(`/transaction/${transaction.id}/run/${run.id}`); TODO: navigate to transaction run detail page
+      const run = {id: 1};
+      navigate(`/transaction/${transaction.id}/run/${run.id}`);
     },
-    [createTransaction]
+    [createTransaction, navigate]
   );
 
   const onUpdateDraft = useCallback(
