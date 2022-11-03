@@ -8,6 +8,20 @@ export interface paths {
     /** Execute a definition */
     post: operations["executeDefinition"];
   };
+  "/transactions": {
+    /** get transactions */
+    get: operations["getTransactions"];
+    /** Create new transaction */
+    post: operations["createTransaction"];
+  };
+  "/transactions/{transactionId}": {
+    /** get transaction */
+    get: operations["getTransaction"];
+    /** update transaction action */
+    put: operations["updateTransaction"];
+    /** delete a transaction */
+    delete: operations["deleteTransaction"];
+  };
   "/tests": {
     /** get tests */
     get: operations["getTests"];
@@ -121,6 +135,104 @@ export interface operations {
       content: {
         "text/json": external["definition.yaml"]["components"]["schemas"]["TextDefinition"];
       };
+    };
+  };
+  /** get transactions */
+  getTransactions: {
+    parameters: {
+      query: {
+        /** indicates how many transactions can be returned by each page */
+        take?: number;
+        /** indicates how many transactions will be skipped when paginating */
+        skip?: number;
+        /** query to search transactions, based on transaction name and description */
+        query?: string;
+        /** indicates the sort field for the transactions */
+        sortBy?: "created" | "name" | "last_run";
+        /** indicates the sort direction for the transactions */
+        sortDirection?: "asc" | "desc";
+      };
+    };
+    responses: {
+      /** successful operation */
+      200: {
+        headers: {
+          /** Total records count */
+          "X-Total-Count"?: number;
+        };
+        content: {
+          "application/json": external["transactions.yaml"]["components"]["schemas"]["Transaction"][];
+        };
+      };
+      /** problem with getting transactions */
+      500: unknown;
+    };
+  };
+  /** Create new transaction */
+  createTransaction: {
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["transactions.yaml"]["components"]["schemas"]["Transaction"];
+        };
+      };
+      /** trying to create a transaction with an already existing ID */
+      400: unknown;
+    };
+    requestBody: {
+      content: {
+        "application/json": external["transactions.yaml"]["components"]["schemas"]["Transaction"];
+      };
+    };
+  };
+  /** get transaction */
+  getTransaction: {
+    parameters: {
+      path: {
+        transactionId: string;
+      };
+    };
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["transactions.yaml"]["components"]["schemas"]["Transaction"];
+        };
+      };
+      /** problem with getting a transaction */
+      500: unknown;
+    };
+  };
+  /** update transaction action */
+  updateTransaction: {
+    parameters: {
+      path: {
+        transactionId: string;
+      };
+    };
+    responses: {
+      /** successful operation */
+      204: never;
+      /** problem with updating transaction */
+      500: unknown;
+    };
+    requestBody: {
+      content: {
+        "application/json": external["transactions.yaml"]["components"]["schemas"]["Transaction"];
+      };
+    };
+  };
+  /** delete a transaction */
+  deleteTransaction: {
+    parameters: {
+      path: {
+        transactionId: string;
+      };
+    };
+    responses: {
+      /** OK */
+      204: never;
     };
   };
   /** get tests */
@@ -932,6 +1044,22 @@ export interface external {
            */
           attributes?: { [key: string]: string };
           children?: external["trace.yaml"]["components"]["schemas"]["Span"][];
+        };
+      };
+    };
+    operations: {};
+  };
+  "transactions.yaml": {
+    paths: {};
+    components: {
+      schemas: {
+        Transaction: {
+          id?: string;
+          name?: string;
+          description?: string;
+          /** @description version number of the test */
+          version?: number;
+          steps?: string[];
         };
       };
     };

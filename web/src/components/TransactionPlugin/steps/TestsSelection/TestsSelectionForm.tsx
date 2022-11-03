@@ -8,7 +8,7 @@ const TestsSelectionForm = () => {
   return (
     <Row gutter={12}>
       <Col span={18}>
-        <Form.Item name="tests">
+        <Form.Item name="steps">
           <TestsSelectionInput testList={data?.items || []} />
         </Form.Item>
       </Col>

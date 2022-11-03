@@ -14,11 +14,12 @@ const TransactionMock: IMockFactory<TTransaction, TTransaction> = () => ({
       name: faker.name.firstName(),
       version: faker.datatype.number(),
       description: faker.company.catchPhraseDescriptor(),
-      steps: [
+      /* steps: [
         {...test, result: 'success'},
         {...test2, result: 'fail'},
         {...test3, result: 'running'},
-      ],
+      ], */
+      steps: [test.id, test2.id, test3.id],
       env: {
         usename: 'john doe',
       },

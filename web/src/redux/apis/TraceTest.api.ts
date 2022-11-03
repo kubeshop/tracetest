@@ -51,6 +51,7 @@ export const {
   useCreateEnvironmentMutation,
   useUpdateEnvironmentMutation,
   useDeleteEnvironmentMutation,
+  useCreateTransactionMutation,
   useGetTransactionByIdQuery,
   useGetTransactionRunByIdQuery,
   useDeleteTransactionByIdMutation,

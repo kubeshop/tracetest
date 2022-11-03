@@ -1,33 +1,31 @@
 import {CaseReducer, PayloadAction} from '@reduxjs/toolkit';
 import {FormInstance} from 'antd';
+
+import {Model, TTransactionsSchemas} from './Common.types';
 import {ICreateTestStep} from './Plugins.types';
-import {Model} from './Common.types';
 import {TTest} from './Test.types';
 
-export type TRawTransaction = {
-  id?: string;
-  name?: string;
-  description?: string;
-  version?: number;
-};
+export type TRawTransaction = TTransactionsSchemas['Transaction'];
 
-export interface TTransaction extends Model<TRawTransaction, ITransaction> {}
+export type TTransaction = Model<
+  TRawTransaction,
+  {
+    id: string;
+    name: string;
+    description: string;
+    version: number;
+    steps: string[];
+    // steps: TransactionStep[]; // TODO define if this should be part of Transaction Run
+    env?: Record<string, string>; // TODO define if this should be part of Transaction Run
+  }
+>;
 
 interface TransactionStep extends TTest {
   result: 'success' | 'fail' | 'running';
 }
 
-export interface ITransaction {
-  id: string;
-  name: string;
-  description: string;
-  version: number;
-  steps: TransactionStep[];
-  env: Record<string, string>;
-}
-
 export type TDraftTransaction = {
-  tests?: string[];
+  steps?: string[];
   name?: string;
   description?: string;
 };

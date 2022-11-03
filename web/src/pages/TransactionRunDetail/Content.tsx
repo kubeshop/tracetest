@@ -1,4 +1,4 @@
-import {Tag, Typography} from 'antd';
+import {/* Tag, */ Typography} from 'antd';
 import {useNavigate, useParams} from 'react-router-dom';
 import TransactionHeader from '../../components/TransactionHeader';
 import {useTransaction} from '../../providers/TransactionRunDetail/TransactionRunDetailProvider';
@@ -27,7 +27,7 @@ const Content = () => {
           <S.SectionLeft>
             <Typography style={{fontSize: 16, marginBottom: 24}}>Execution steps</Typography>
 
-            {transaction?.steps.map(({name, version, ...test}, index) => {
+            {/* {transaction?.steps.map(({name, version, ...test}, index) => {
               return (
                 <S.Containerr data-cy={`run-card-${name}`} key={test.id}>
                   <div>{iconBasedOnResult(test.result, index)}</div>
@@ -41,12 +41,12 @@ const Content = () => {
                   </S.Info>
                 </S.Containerr>
               );
-            })}
+            })} */}
           </S.SectionLeft>
           <S.SectionRight>
             <Typography style={{fontSize: 16, marginBottom: 24}}>Variables</Typography>
             {Object.keys(transaction?.env || {}).map(key => {
-              const result = transaction?.env[key];
+              const result = transaction?.env?.[key];
               return (
                 <S.Containerr data-cy={`variable-card-${key}`} key={key}>
                   <S.Infoo>

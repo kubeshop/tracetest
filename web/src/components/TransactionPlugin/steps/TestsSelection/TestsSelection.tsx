@@ -11,8 +11,8 @@ const TestsSelection = () => {
   const {onNext} = useCreateTransaction();
 
   const handleSubmit = useCallback(
-    ({tests = []}: TDraftTransaction) => {
-      onNext({tests});
+    ({steps = []}: TDraftTransaction) => {
+      onNext({steps});
     },
     [onNext]
   );
