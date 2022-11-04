@@ -38,7 +38,7 @@ const TransactionCard = ({onDelete, onRun, onViewAll, transaction}: IProps) => {
   }, [getRuns, isCollapsed, runs.length, transaction.id]);
 
   return (
-    <S.Container>
+    <S.Container $type={ResourceType.transaction}>
       <S.TestContainer onClick={() => handleOnClick()}>
         {isCollapsed ? <DownOutlined /> : <RightOutlined data-cy={`collapse-transaction-${transaction.id}`} />}
         <S.Box $type={ResourceType.transaction}>

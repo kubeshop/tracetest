@@ -38,7 +38,7 @@ const TestCard = ({onDelete, onRun, onViewAll, test}: IProps) => {
   }, [getRuns, isCollapsed, runs.length, test.id]);
 
   return (
-    <S.Container>
+    <S.Container $type={ResourceType.test}>
       <S.TestContainer onClick={() => handleOnClick()}>
         {isCollapsed ? <DownOutlined /> : <RightOutlined data-cy={`collapse-test-${test.id}`} />}
         <S.Box $type={ResourceType.test}>

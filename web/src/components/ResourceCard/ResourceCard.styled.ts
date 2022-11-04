@@ -11,9 +11,9 @@ export const ActionButton = styled(MoreOutlined)`
   font-size: ${({theme}) => theme.size.lg};
 `;
 
-export const Container = styled.div`
+export const Container = styled.div<{$type: ResourceType}>`
   background: ${({theme}) => theme.color.white};
-  border-left: 4px solid #2f1e61;
+  border-left: ${({$type}) => ($type === ResourceType.test ? '4px solid #2f1e61' : '4px solid #BC334A')};
   border-radius: 2px;
   box-shadow: -1px 1px 5px #e4e9f5;
 `;
