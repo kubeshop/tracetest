@@ -23,7 +23,7 @@ const Interpolation = ({
   const {selectedEnvironment} = useEnvironment();
   const editorTheme = useEditorTheme();
   const completionFn = useAutoComplete();
-  const {onHover, expression} = useTooltip({
+  const {onHover, resolvedValues} = useTooltip({
     environmentId: selectedEnvironment?.id,
   });
 
@@ -38,7 +38,7 @@ const Interpolation = ({
 
   return (
     <S.InterpolationEditorContainer $showLineNumbers={lineNumbers}>
-      <Tooltip placement="topLeft" title={expression}>
+      <Tooltip placement="topLeft" title={resolvedValues.join(',')}>
         <CodeMirror
           id="interpolation-editor"
           basicSetup={{...basicSetup, lineNumbers}}

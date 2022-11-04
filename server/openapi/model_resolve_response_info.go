@@ -10,7 +10,7 @@
 package openapi
 
 type ResolveResponseInfo struct {
-	ResolvedValue string `json:"resolvedValue,omitempty"`
+	ResolvedValues []string `json:"resolvedValues,omitempty"`
 }
 
 // AssertResolveResponseInfoRequired checks if the required fields are not zero-ed

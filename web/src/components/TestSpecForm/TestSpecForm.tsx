@@ -11,7 +11,7 @@ import OperatorService from 'services/Operator.service';
 import {TStructuredAssertion} from 'types/Assertion.types';
 import {singularOrPlural} from 'utils/Common';
 import AssertionCheckList from './AssertionCheckList';
-import useAssertionFormValues from './hooks/useAssertionFormValues';
+// import useAssertionFormValues from './hooks/useAssertionFormValues';
 import useOnFieldsChange from './hooks/useOnFieldsChange';
 import SelectorInput from './SelectorInput';
 import SelectorSuggestions from './SelectorSuggestions';
@@ -59,7 +59,6 @@ const TestSpecForm = ({
   const attributeList = useAppSelector(state =>
     AssertionSelectors.selectAttributeList(state, testId, runId, spanIdList)
   );
-  const {currentAssertions} = useAssertionFormValues(form);
 
   const onFieldsChange = useOnFieldsChange();
 
@@ -133,7 +132,6 @@ const TestSpecForm = ({
           <Form.List name="assertions">
             {(fields, {add, remove}) => (
               <AssertionCheckList
-                assertions={currentAssertions}
                 form={form}
                 fields={fields}
                 add={add}

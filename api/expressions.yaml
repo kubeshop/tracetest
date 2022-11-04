@@ -25,5 +25,7 @@ components:
     ResolveResponseInfo:
       type: object
       properties:
-        resolvedValue:
-          type: string
+        resolvedValues:
+          type: array
+          items:
+            type: string

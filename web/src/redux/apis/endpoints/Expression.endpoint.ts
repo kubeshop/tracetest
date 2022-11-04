@@ -4,7 +4,7 @@ import {HTTP_METHOD} from 'constants/Common.constants';
 import AssertionService from 'services/Assertion.service';
 
 const ExpressionEndpoint = (builder: TTestApiEndpointBuilder) => ({
-  parseExpression: builder.mutation<string, TResolveRequestInfo>({
+  parseExpression: builder.mutation<string[], TResolveRequestInfo>({
     query: ({expression, context: {spanId = '', runId = '', environmentId = '', testId = '', selector = ''} = {}}) => ({
       url: '/expressions/resolve',
       method: HTTP_METHOD.POST,
@@ -13,7 +13,7 @@ const ExpressionEndpoint = (builder: TTestApiEndpointBuilder) => ({
         context: {spanId, runId, testId, selector, environmentId},
       },
     }),
-    transformResponse: (res: TResolveResponseInfo) => res.resolvedValue || '',
+    transformResponse: ({resolvedValues = []}: TResolveResponseInfo) => resolvedValues,
   }),
 });
 
