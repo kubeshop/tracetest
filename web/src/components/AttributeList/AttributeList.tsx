@@ -1,4 +1,5 @@
 import AttributeRow from 'components/AttributeRow';
+import {OtelReference} from 'components/TestSpecForm/hooks/useGetOTELSemanticConventionAttributesInfo';
 import {TResultAssertions} from 'types/Assertion.types';
 import {TSpanFlatAttribute} from 'types/Span.types';
 import TraceAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
@@ -10,9 +11,10 @@ interface IProps {
   attributeList: TSpanFlatAttribute[];
   onCreateTestSpec(attribute: TSpanFlatAttribute): void;
   searchText?: string;
+  semanticConventions: OtelReference;
 }
 
-const AttributeList = ({assertions, attributeList, onCreateTestSpec, searchText}: IProps) => {
+const AttributeList = ({assertions, attributeList, onCreateTestSpec, searchText, semanticConventions}: IProps) => {
   const onCopy = (value: string) => {
     TraceAnalyticsService.onAttributeCopy();
     navigator.clipboard.writeText(value);
@@ -29,6 +31,7 @@ const AttributeList = ({assertions, attributeList, onCreateTestSpec, searchText}
           key={attribute.key}
           onCopy={onCopy}
           onCreateTestSpec={onCreateTestSpec}
+          semanticConventions={semanticConventions}
         />
       ))}
     </S.AttributeList>

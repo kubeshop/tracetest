@@ -263,6 +263,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Download newest version
         id: cliDownload
+        shell: pwsh
         run: |
           $tag = $env:TAG
           $version = $tag.trimStart("v")
@@ -276,6 +277,7 @@ jobs:
         env:
           TAG: ${{ github.ref_name }}
       - name: Generate release files
+        shell: pwsh
         run: |
           (Get-Content scripts/choco/tools/chocolateyinstall.ps1) -Replace '%checksum%', $env:PACKAGE_CHECKSUM | Set-Content scripts/choco/tools/chocolateyinstall.ps1
           (Get-Content scripts/choco/tracetest.nuspec) -Replace '%version%', $env:PACKAGE_VERSION | Set-Content scripts/choco/tracetest.nuspec
@@ -283,6 +285,7 @@ jobs:
           PACKAGE_CHECKSUM: ${{ steps.cliDownload.outputs.hash }}
           PACKAGE_VERSION: ${{ steps.cliDownload.outputs.version }}
       - name: Pack and release
+        shell: pwsh
         run: |
           # install choco
           Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
@@ -293,6 +296,6 @@ jobs:
           choco apikey --key $CHOCOLATEY_API_KEY --source $CHOCOLATEY_REPO
           choco push tracetest.$PACKAGE_VERSION.nupkg --source $CHOCOLATEY_REPO
         env:
-          CHOCOLATEY_API_KEY: ${{ secrets.CHOCOLATEY_API_KEY }}
+          CHOCOLATEY_API_KEY: ${{ secrets.COMMOM_CHOCO_API_KEY }}
           CHOCOLATEY_REPO: ${{ secrets.CHOCOLATEY_REPO }}
           PACKAGE_VERSION: ${{ steps.cliDownload.outputs.version }}
