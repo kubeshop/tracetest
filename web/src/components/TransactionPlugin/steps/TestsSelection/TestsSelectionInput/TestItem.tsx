@@ -5,11 +5,12 @@ import * as S from './TestsSelectionInput.styled';
 
 interface IProps {
   test: TTest;
+  sortableId: string;
   onDelete(testId: string): void;
 }
 
-const TestItem = ({test, onDelete}: IProps) => {
-  const {attributes, listeners, setNodeRef, transform, transition} = useSortable({id: test.id});
+const TestItem = ({test, onDelete, sortableId}: IProps) => {
+  const {attributes, listeners, setNodeRef, transform, transition} = useSortable({id: sortableId});
 
   const style = {
     transform: CSS.Transform.toString(transform),
