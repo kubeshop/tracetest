@@ -1,9 +1,0 @@
-{
-  "tracetest.span.duration": {
-    "description": "",
-    "tags": [
-      "ms",
-      "time"
-    ]
-  }
-}
