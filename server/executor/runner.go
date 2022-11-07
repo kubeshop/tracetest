@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/kubeshop/tracetest/server/executor/trigger"
+	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/model"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/propagation"
@@ -50,10 +51,11 @@ type persistentRunner struct {
 }
 
 type execReq struct {
-	ctx     context.Context
-	test    model.Test
-	run     model.Run
-	Headers propagation.MapCarrier
+	ctx      context.Context
+	test     model.Test
+	run      model.Run
+	Headers  propagation.MapCarrier
+	executor expression.Executor
 }
 
 func (r persistentRunner) handleDBError(err error) {
@@ -107,10 +109,17 @@ func (r persistentRunner) Run(ctx context.Context, test model.Test, metadata mod
 	run, err := r.runs.CreateRun(ctx, test, run)
 	r.handleDBError(err)
 
+	ds := []expression.DataStore{expression.EnvironmentDataStore{
+		Values: environment.Values,
+	}}
+
+	executor := expression.NewExecutor(ds...)
+
 	r.executeQueue <- execReq{
-		ctx:  ctx,
-		test: test,
-		run:  run,
+		ctx:      ctx,
+		test:     test,
+		run:      run,
+		executor: executor,
 	}
 
 	return run
@@ -130,9 +139,17 @@ func (r persistentRunner) processExecQueue(job execReq) {
 	run.TraceID = traceID
 	r.handleDBError(r.updater.Update(job.ctx, run))
 
-	response, err := triggerer.Trigger(job.ctx, job.test, &trigger.TriggerOptions{
-		TraceID: traceID,
-	})
+	triggerOptions := &trigger.TriggerOptions{
+		TraceID:  traceID,
+		Executor: job.executor,
+	}
+
+	resolvedTest, err := triggerer.Resolve(job.ctx, job.test, triggerOptions)
+	if err != nil {
+		panic(err)
+	}
+
+	response, err := triggerer.Trigger(job.ctx, resolvedTest, triggerOptions)
 	run = r.handleExecutionResult(run, response, err)
 
 	run.SpanID = response.SpanID
