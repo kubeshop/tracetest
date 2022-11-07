@@ -219,6 +219,12 @@ func (c *ApiApiController) Routes() Routes {
 			c.RunTest,
 		},
 		{
+			"RunTransaction",
+			strings.ToUpper("Post"),
+			"/api/transactions/{transactionId}/run",
+			c.RunTransaction,
+		},
+		{
 			"SetTestOutputs",
 			strings.ToUpper("Put"),
 			"/api/tests/{testId}/outputs",
@@ -830,18 +836,45 @@ func (c *ApiApiController) RunTest(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	testIdParam := params["testId"]
 
-	testRunInformationParam := TestRunInformation{}
+	runInformationParam := RunInformation{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
-	if err := d.Decode(&testRunInformationParam); err != nil {
+	if err := d.Decode(&runInformationParam); err != nil {
 		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
 		return
 	}
-	if err := AssertTestRunInformationRequired(testRunInformationParam); err != nil {
+	if err := AssertRunInformationRequired(runInformationParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	result, err := c.service.RunTest(r.Context(), testIdParam, testRunInformationParam)
+	result, err := c.service.RunTest(r.Context(), testIdParam, runInformationParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// RunTransaction - run transaction
+func (c *ApiApiController) RunTransaction(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	transactionIdParam := params["transactionId"]
+
+	runInformationParam := RunInformation{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&runInformationParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertRunInformationRequired(runInformationParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.RunTransaction(r.Context(), transactionIdParam, runInformationParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

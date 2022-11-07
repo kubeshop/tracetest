@@ -22,3 +22,24 @@ components:
         createdAt:
           type: string
           format: date-time
+
+    TransactionRun:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        createdAt:
+          type: string
+          format: date-time
+        state:
+          type: string
+          enum:
+            [
+              CREATED,
+              EXECUTING,
+              FINISHED,
+              FAILED,
+            ]
+        environment:
+          $ref: "./environments.yaml#/components/schemas/Environment"

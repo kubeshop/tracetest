@@ -16,8 +16,8 @@ import (
 
 // TextDefinition struct for TextDefinition
 type TextDefinition struct {
-	RunInformation *TestRunInformation `json:"runInformation,omitempty"`
-	Content        *string             `json:"content,omitempty"`
+	RunInformation *RunInformation `json:"runInformation,omitempty"`
+	Content        *string         `json:"content,omitempty"`
 }
 
 // NewTextDefinition instantiates a new TextDefinition object
@@ -38,9 +38,9 @@ func NewTextDefinitionWithDefaults() *TextDefinition {
 }
 
 // GetRunInformation returns the RunInformation field value if set, zero value otherwise.
-func (o *TextDefinition) GetRunInformation() TestRunInformation {
+func (o *TextDefinition) GetRunInformation() RunInformation {
 	if o == nil || o.RunInformation == nil {
-		var ret TestRunInformation
+		var ret RunInformation
 		return ret
 	}
 	return *o.RunInformation
@@ -48,7 +48,7 @@ func (o *TextDefinition) GetRunInformation() TestRunInformation {
 
 // GetRunInformationOk returns a tuple with the RunInformation field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *TextDefinition) GetRunInformationOk() (*TestRunInformation, bool) {
+func (o *TextDefinition) GetRunInformationOk() (*RunInformation, bool) {
 	if o == nil || o.RunInformation == nil {
 		return nil, false
 	}
@@ -64,8 +64,8 @@ func (o *TextDefinition) HasRunInformation() bool {
 	return false
 }
 
-// SetRunInformation gets a reference to the given TestRunInformation and assigns it to the RunInformation field.
-func (o *TextDefinition) SetRunInformation(v TestRunInformation) {
+// SetRunInformation gets a reference to the given RunInformation and assigns it to the RunInformation field.
+func (o *TextDefinition) SetRunInformation(v RunInformation) {
 	o.RunInformation = &v
 }
 

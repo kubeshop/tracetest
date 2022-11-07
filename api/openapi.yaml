@@ -167,6 +167,33 @@ paths:
       responses:
         "204":
           description: OK
+
+  /transactions/{transactionId}/run:
+    post:
+      tags:
+        - api
+      parameters:
+        - in: path
+          name: transactionId
+          schema:
+            type: string
+          required: true
+      summary: "run transaction"
+      description: "run a particular transaction"
+      operationId: runTransaction
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "./tests.yaml#/components/schemas/RunInformation"
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "./transactions.yaml#/components/schemas/TransactionRun"
+
   /tests:
     get:
       tags:
@@ -317,7 +344,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "./tests.yaml#/components/schemas/TestRunInformation"
+              $ref: "./tests.yaml#/components/schemas/RunInformation"
       responses:
         200:
           description: successful operation

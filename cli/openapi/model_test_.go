@@ -12,6 +12,7 @@ package openapi
 
 import (
 	"encoding/json"
+	"time"
 )
 
 // Test struct for Test
@@ -21,6 +22,7 @@ type Test struct {
 	Description *string `json:"description,omitempty"`
 	// version number of the test
 	Version          *int32     `json:"version,omitempty"`
+	CreatedAt        *time.Time `json:"createdAt,omitempty"`
 	ServiceUnderTest *Trigger   `json:"serviceUnderTest,omitempty"`
 	Specs            *TestSpecs `json:"specs,omitempty"`
 	// define test outputs, in a key/value format. The value is processed as an expression
@@ -173,6 +175,38 @@ func (o *Test) SetVersion(v int32) {
 	o.Version = &v
 }
 
+// GetCreatedAt returns the CreatedAt field value if set, zero value otherwise.
+func (o *Test) GetCreatedAt() time.Time {
+	if o == nil || o.CreatedAt == nil {
+		var ret time.Time
+		return ret
+	}
+	return *o.CreatedAt
+}
+
+// GetCreatedAtOk returns a tuple with the CreatedAt field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Test) GetCreatedAtOk() (*time.Time, bool) {
+	if o == nil || o.CreatedAt == nil {
+		return nil, false
+	}
+	return o.CreatedAt, true
+}
+
+// HasCreatedAt returns a boolean if a field has been set.
+func (o *Test) HasCreatedAt() bool {
+	if o != nil && o.CreatedAt != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetCreatedAt gets a reference to the given time.Time and assigns it to the CreatedAt field.
+func (o *Test) SetCreatedAt(v time.Time) {
+	o.CreatedAt = &v
+}
+
 // GetServiceUnderTest returns the ServiceUnderTest field value if set, zero value otherwise.
 func (o *Test) GetServiceUnderTest() Trigger {
 	if o == nil || o.ServiceUnderTest == nil {
@@ -314,6 +348,9 @@ func (o Test) MarshalJSON() ([]byte, error) {
 	}
 	if o.Version != nil {
 		toSerialize["version"] = o.Version
+	}
+	if o.CreatedAt != nil {
+		toSerialize["createdAt"] = o.CreatedAt
 	}
 	if o.ServiceUnderTest != nil {
 		toSerialize["serviceUnderTest"] = o.ServiceUnderTest

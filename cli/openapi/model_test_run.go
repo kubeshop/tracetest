@@ -33,6 +33,7 @@ type TestRun struct {
 	ServiceTriggerCompletedAt *time.Time         `json:"serviceTriggerCompletedAt,omitempty"`
 	ObtainedTraceAt           *time.Time         `json:"obtainedTraceAt,omitempty"`
 	CompletedAt               *time.Time         `json:"completedAt,omitempty"`
+	Environment               *Environment       `json:"environment,omitempty"`
 	TriggerResult             *TriggerResult     `json:"triggerResult,omitempty"`
 	Trace                     *Trace             `json:"trace,omitempty"`
 	Result                    *AssertionResults  `json:"result,omitempty"`
@@ -441,6 +442,38 @@ func (o *TestRun) SetCompletedAt(v time.Time) {
 	o.CompletedAt = &v
 }
 
+// GetEnvironment returns the Environment field value if set, zero value otherwise.
+func (o *TestRun) GetEnvironment() Environment {
+	if o == nil || o.Environment == nil {
+		var ret Environment
+		return ret
+	}
+	return *o.Environment
+}
+
+// GetEnvironmentOk returns a tuple with the Environment field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *TestRun) GetEnvironmentOk() (*Environment, bool) {
+	if o == nil || o.Environment == nil {
+		return nil, false
+	}
+	return o.Environment, true
+}
+
+// HasEnvironment returns a boolean if a field has been set.
+func (o *TestRun) HasEnvironment() bool {
+	if o != nil && o.Environment != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetEnvironment gets a reference to the given Environment and assigns it to the Environment field.
+func (o *TestRun) SetEnvironment(v Environment) {
+	o.Environment = &v
+}
+
 // GetTriggerResult returns the TriggerResult field value if set, zero value otherwise.
 func (o *TestRun) GetTriggerResult() TriggerResult {
 	if o == nil || o.TriggerResult == nil {
@@ -638,6 +671,9 @@ func (o TestRun) MarshalJSON() ([]byte, error) {
 	}
 	if o.CompletedAt != nil {
 		toSerialize["completedAt"] = o.CompletedAt
+	}
+	if o.Environment != nil {
+		toSerialize["environment"] = o.Environment
 	}
 	if o.TriggerResult != nil {
 		toSerialize["triggerResult"] = o.TriggerResult

@@ -10,14 +10,14 @@
 package openapi
 
 type TextDefinition struct {
-	RunInformation TestRunInformation `json:"runInformation,omitempty"`
+	RunInformation RunInformation `json:"runInformation,omitempty"`
 
 	Content string `json:"content,omitempty"`
 }
 
 // AssertTextDefinitionRequired checks if the required fields are not zero-ed
 func AssertTextDefinitionRequired(obj TextDefinition) error {
-	if err := AssertTestRunInformationRequired(obj.RunInformation); err != nil {
+	if err := AssertRunInformationRequired(obj.RunInformation); err != nil {
 		return err
 	}
 	return nil
