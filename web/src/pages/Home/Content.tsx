@@ -36,7 +36,7 @@ const Content = () => {
 
   const handleOnRun = useCallback(
     (id: string, type: ResourceType) => {
-      if (type === ResourceType.test) runTest(id);
+      if (type === ResourceType.Test) runTest(id);
     },
     [runTest]
   );
@@ -70,7 +70,7 @@ const Content = () => {
         <Pagination<TResource> emptyComponent={<NoResults />} loadingComponent={<Loading />} {...pagination}>
           <S.TestListContainer data-cy="test-list">
             {pagination.list?.map(resource =>
-              resource.type === ResourceType.test ? (
+              resource.type === ResourceType.Test ? (
                 <TestCard
                   key={resource.item.id}
                   onDelete={onDeleteResource}

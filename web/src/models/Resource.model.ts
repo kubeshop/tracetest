@@ -5,9 +5,16 @@ import Test from './Test.model';
 import Transaction from './Transaction.model';
 
 function Resource({item, type}: TRawResource): TResource {
+  if (type === ResourceType.Test) {
+    return {
+      type: ResourceType.Test,
+      item: Test(item as TRawTest),
+    };
+  }
+
   return {
-    type: type === ResourceType.test ? ResourceType.test : ResourceType.transaction,
-    item: type === ResourceType.test ? Test(item as TRawTest) : Transaction(item as TRawTransaction),
+    type: ResourceType.Transaction,
+    item: Transaction(item as TRawTransaction),
   };
 }
 

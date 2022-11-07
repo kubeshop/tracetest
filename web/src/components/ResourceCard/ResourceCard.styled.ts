@@ -13,14 +13,14 @@ export const ActionButton = styled(MoreOutlined)`
 
 export const Container = styled.div<{$type: ResourceType}>`
   background: ${({theme}) => theme.color.white};
-  border-left: ${({$type}) => ($type === ResourceType.test ? '4px solid #2f1e61' : '4px solid #BC334A')};
+  border-left: ${({$type}) => ($type === ResourceType.Test ? '4px solid #2f1e61' : '4px solid #BC334A')};
   border-radius: 2px;
   box-shadow: -1px 1px 5px #e4e9f5;
 `;
 
 export const Box = styled.div<{$type: ResourceType}>`
   align-items: center;
-  background: ${({$type}) => ($type === ResourceType.test ? '#2f1e61' : '#BC334A')};
+  background: ${({$type}) => ($type === ResourceType.Test ? '#2f1e61' : '#BC334A')};
   border-radius: 3px;
   display: flex;
   justify-content: center;

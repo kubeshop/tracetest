@@ -1,15 +1,16 @@
 import {DownOutlined, RightOutlined} from '@ant-design/icons';
-import {Skeleton} from 'antd';
-import {useCallback, useState} from 'react';
+import {useMemo} from 'react';
 
 import {useLazyGetRunListQuery} from 'redux/apis/TraceTest.api';
-import TestAnalyticsService from 'services/Analytics/TestAnalytics.service';
-import {TTransaction} from 'types/Transaction.types';
 import {ResourceType} from 'types/Resource.type';
+import {TTestRun} from 'types/TestRun.types';
+import {TTransaction} from 'types/Transaction.types';
 import ResultCardList from '../RunCardList/RunCardList';
 import * as S from './ResourceCard.styled';
 import ResourceCardActions from './ResourceCardActions';
+import ResourceCardRuns from './ResourceCardRuns';
 import ResourceCardSummary from './ResourceCardSummary';
+import useRuns from './useRuns';
 
 interface IProps {
   onDelete(id: string, name: string, type: ResourceType): void;
@@ -19,29 +20,17 @@ interface IProps {
 }
 
 const TransactionCard = ({onDelete, onRun, onViewAll, transaction}: IProps) => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const [getRuns, {data, isLoading}] = useLazyGetRunListQuery();
-  const runs = data?.items || [];
-
-  const handleOnClick = useCallback(() => {
-    if (isCollapsed) {
-      setIsCollapsed(false);
-      return;
-    }
-
-    setIsCollapsed(true);
-    TestAnalyticsService.onTestCardCollapse();
-    if (runs.length > 0) {
-      return;
-    }
-    getRuns({testId: transaction.id, take: 5});
-  }, [getRuns, isCollapsed, runs.length, transaction.id]);
+  const queryParams = useMemo(() => ({take: 5, testId: transaction.id}), [transaction.id]);
+  const {isCollapsed, isLoading, list, onClick} = useRuns<TTestRun, {testId: string}>(
+    useLazyGetRunListQuery,
+    queryParams
+  );
 
   return (
-    <S.Container $type={ResourceType.transaction}>
-      <S.TestContainer onClick={() => handleOnClick()}>
-        {isCollapsed ? <DownOutlined /> : <RightOutlined data-cy={`collapse-transaction-${transaction.id}`} />}
-        <S.Box $type={ResourceType.transaction}>
+    <S.Container $type={ResourceType.Transaction}>
+      <S.TestContainer onClick={onClick}>
+        {isCollapsed ? <RightOutlined data-cy={`collapse-transaction-${transaction.id}`} /> : <DownOutlined />}
+        <S.Box $type={ResourceType.Transaction}>
           <S.BoxTitle level={2}>1</S.BoxTitle>
         </S.Box>
         <S.TitleContainer>
@@ -58,46 +47,27 @@ const TransactionCard = ({onDelete, onRun, onViewAll, transaction}: IProps) => {
             data-cy={`transaction-run-button-${transaction.id}`}
             onClick={event => {
               event.stopPropagation();
-              onRun(transaction.id, ResourceType.transaction);
+              onRun(transaction.id, ResourceType.Transaction);
             }}
           >
             Run
           </S.RunButton>
           <ResourceCardActions
             id={transaction.id}
-            onDelete={() => onDelete(transaction.id, transaction.name, ResourceType.transaction)}
+            onDelete={() => onDelete(transaction.id, transaction.name, ResourceType.Transaction)}
           />
         </S.Row>
       </S.TestContainer>
 
-      {isCollapsed && (
-        <S.RunsContainer>
-          {isLoading && (
-            <S.LoadingContainer direction="vertical">
-              <Skeleton.Input active block size="small" />
-              <Skeleton.Input active block size="small" />
-              <Skeleton.Input active block size="small" />
-            </S.LoadingContainer>
-          )}
-
-          {Boolean(runs.length) && <ResultCardList testId={transaction.id} resultList={runs} />}
-
-          {runs.length === 5 && (
-            <S.FooterContainer>
-              <S.Link data-cy="test-details-link" onClick={() => onViewAll(transaction.id, ResourceType.transaction)}>
-                View all runs
-              </S.Link>
-            </S.FooterContainer>
-          )}
-
-          {!runs.length && !isLoading && (
-            <S.EmptyStateContainer>
-              <S.EmptyStateIcon />
-              <S.Text disabled>No Runs</S.Text>
-            </S.EmptyStateContainer>
-          )}
-        </S.RunsContainer>
-      )}
+      <ResourceCardRuns
+        hasMoreRuns={list.length === 5}
+        hasRuns={Boolean(list.length)}
+        isCollapsed={isCollapsed}
+        isLoading={isLoading}
+        onViewAll={() => onViewAll(transaction.id, ResourceType.Test)}
+      >
+        <ResultCardList testId={transaction.id} resultList={list} />
+      </ResourceCardRuns>
     </S.Container>
   );
 };

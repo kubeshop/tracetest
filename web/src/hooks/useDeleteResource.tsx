@@ -14,10 +14,10 @@ const useDeleteResource = () => {
 
   const onConfirmDelete = useCallback(
     (id: string, type: ResourceType) => {
-      if (type === ResourceType.test) {
+      if (type === ResourceType.Test) {
         TestAnalyticsService.onDeleteTest();
         deleteTestMutation({testId: id});
-      } else if (type === ResourceType.transaction) {
+      } else if (type === ResourceType.Transaction) {
         deleteTransactionMutation({transactionId: id});
       }
       navigate('/');

@@ -3,8 +3,8 @@ import {TTest} from './Test.types';
 import {TTransaction} from './Transaction.types';
 
 export enum ResourceType {
-  test = 'test',
-  transaction = 'transaction',
+  Test = 'test',
+  Transaction = 'transaction',
 }
 
 export type TRawResource = TResourceSchemas['Resource'];

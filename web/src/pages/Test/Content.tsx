@@ -35,7 +35,7 @@ const Content = () => {
         }`}
         id={test.id}
         onBack={() => navigate('/')}
-        onDelete={() => onDeleteResource(test.id, test.name, ResourceType.test)}
+        onDelete={() => onDeleteResource(test.id, test.name, ResourceType.Test)}
         title={`${test.name} (v${test.version})`}
       />
 
