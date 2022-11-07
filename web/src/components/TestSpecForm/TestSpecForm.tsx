@@ -11,7 +11,6 @@ import OperatorService from 'services/Operator.service';
 import {TStructuredAssertion} from 'types/Assertion.types';
 import {singularOrPlural} from 'utils/Common';
 import AssertionCheckList from './AssertionCheckList';
-// import useAssertionFormValues from './hooks/useAssertionFormValues';
 import useOnFieldsChange from './hooks/useOnFieldsChange';
 import SelectorInput from './SelectorInput';
 import SelectorSuggestions from './SelectorSuggestions';
