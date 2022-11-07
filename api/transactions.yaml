@@ -32,6 +32,9 @@ components:
         createdAt:
           type: string
           format: date-time
+        completedAt:
+          type: string
+          format: date-time
         state:
           type: string
           enum:
@@ -41,5 +44,17 @@ components:
               FINISHED,
               FAILED,
             ]
+        steps:
+          type: array
+          items:
+            $ref: "./tests.yaml#/components/schemas/Test"
+        stepRuns:
+          type: array
+          items:
+            $ref: "./tests.yaml#/components/schemas/TestRun"
         environment:
           $ref: "./environments.yaml#/components/schemas/Environment"
+        metadata:
+          type: object
+          additionalProperties:
+            type: string

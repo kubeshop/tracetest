@@ -36,6 +36,30 @@ func (m OpenAPI) Transaction(in model.Transaction) openapi.Transaction {
 	}
 }
 
+func (m OpenAPI) TransactionRun(in model.TransactionRun) openapi.TransactionRun {
+	steps := make([]openapi.Test, 0, len(in.Steps))
+	runs := make([]openapi.TestRun, 0, len(in.StepRuns))
+
+	for _, step := range in.Steps {
+		steps = append(steps, m.Test(step))
+	}
+
+	for _, run := range in.StepRuns {
+		runs = append(runs, m.Run(&run))
+	}
+
+	return openapi.TransactionRun{
+		Id:          fmt.Sprintf("%d", in.ID),
+		CreatedAt:   in.CreatedAt,
+		CompletedAt: in.CompletedAt,
+		State:       string(in.State),
+		Steps:       steps,
+		StepRuns:    runs,
+		Metadata:    in.Metadata,
+		Environment: m.Environment(in.Environment),
+	}
+}
+
 func (m OpenAPI) Test(in model.Test) openapi.Test {
 	return openapi.Test{
 		Id:               string(in.ID),

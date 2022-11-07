@@ -18,13 +18,31 @@ type TransactionRun struct {
 
 	CreatedAt time.Time `json:"createdAt,omitempty"`
 
+	CompletedAt time.Time `json:"completedAt,omitempty"`
+
 	State string `json:"state,omitempty"`
 
+	Steps []Test `json:"steps,omitempty"`
+
+	StepRuns []TestRun `json:"stepRuns,omitempty"`
+
 	Environment Environment `json:"environment,omitempty"`
+
+	Metadata map[string]string `json:"metadata,omitempty"`
 }
 
 // AssertTransactionRunRequired checks if the required fields are not zero-ed
 func AssertTransactionRunRequired(obj TransactionRun) error {
+	for _, el := range obj.Steps {
+		if err := AssertTestRequired(el); err != nil {
+			return err
+		}
+	}
+	for _, el := range obj.StepRuns {
+		if err := AssertTestRunRequired(el); err != nil {
+			return err
+		}
+	}
 	if err := AssertEnvironmentRequired(obj.Environment); err != nil {
 		return err
 	}

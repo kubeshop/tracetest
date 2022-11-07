@@ -25,15 +25,17 @@ import (
 var IDGen = id.NewRandGenerator()
 
 type controller struct {
-	testDB          model.Repository
-	runner          executor.Runner
-	assertionRunner executor.AssertionRunner
-	mappers         mappings.Mappings
+	testDB            model.Repository
+	runner            executor.Runner
+	transactionRunner executor.TransactionRunner
+	assertionRunner   executor.AssertionRunner
+	mappers           mappings.Mappings
 }
 
 func NewController(
 	testDB model.Repository,
 	runner executor.Runner,
+	transactionRunner executor.TransactionRunner,
 	assertionRunner executor.AssertionRunner,
 	mappers mappings.Mappings,
 ) openapi.ApiApiServicer {
@@ -267,7 +269,7 @@ func (c *controller) RerunTestRun(ctx context.Context, testID, runID string) (op
 	return openapi.Response(http.StatusOK, c.mappers.Out.Run(&newTestRun)), nil
 }
 
-func (c *controller) RunTest(ctx context.Context, testID string, runInformation openapi.TestRunInformation) (openapi.ImplResponse, error) {
+func (c *controller) RunTest(ctx context.Context, testID string, runInformation openapi.RunInformation) (openapi.ImplResponse, error) {
 	test, err := c.testDB.GetLatestTestVersion(ctx, id.ID(testID))
 	if err != nil {
 		return handleDBError(err), err
@@ -571,7 +573,7 @@ func environment(ctx context.Context, testDB model.Repository, environmentId str
 	return model.Environment{}, nil
 }
 
-func (c *controller) executeTest(ctx context.Context, test model.Test, runInfo openapi.TestRunInformation) (openapi.ImplResponse, error) {
+func (c *controller) executeTest(ctx context.Context, test model.Test, runInfo openapi.RunInformation) (openapi.ImplResponse, error) {
 	// create or update test
 	testID := test.ID
 	resp, err := c.doCreateTest(ctx, test)
@@ -837,6 +839,25 @@ func (c *controller) UpdateTransaction(ctx context.Context, tID string, transact
 	}
 
 	return openapi.Response(http.StatusNoContent, nil), nil
+}
+
+// RunTransaction implements openapi.ApiApiServicer
+func (c *controller) RunTransaction(ctx context.Context, transactionId string, runInformation openapi.RunInformation) (openapi.ImplResponse, error) {
+	transaction, err := c.testDB.GetLatestTransactionVersion(ctx, id.ID(transactionId))
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	metadata := metadata(runInformation.Metadata)
+	environment, err := environment(ctx, c.testDB, runInformation.EnvironmentId)
+
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	run := c.transactionRunner.Run(ctx, transaction, metadata, environment)
+
+	return openapi.Response(http.StatusOK, c.mappers.Out.TransactionRun(run)), nil
 }
 
 // GetResources implements openapi.ApiApiServicer

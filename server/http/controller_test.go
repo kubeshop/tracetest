@@ -114,7 +114,7 @@ func setupController(t *testing.T) controllerFixture {
 	mdb.Test(t)
 	return controllerFixture{
 		db: mdb,
-		c:  http.NewController(mdb, nil, nil, mappings.New(traces.NewConversionConfig(), comparator.DefaultRegistry(), mdb)),
+		c:  http.NewController(mdb, nil, nil, nil, mappings.New(traces.NewConversionConfig(), comparator.DefaultRegistry(), mdb)),
 	}
 }
 
