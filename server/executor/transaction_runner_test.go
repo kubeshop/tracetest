@@ -8,6 +8,7 @@ import (
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/testmock"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -81,13 +82,24 @@ func TestTransactionRunner(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	runner := executor.NewTransactionRunner(testRunner)
+	runner := executor.NewTransactionRunner(testRunner, db)
 	runner.Start(1)
 
-	ctxWithTimeout, cancel := context.WithTimeout(ctx, 15*time.Second)
+	ctxWithTimeout, cancel := context.WithTimeout(ctx, 30*time.Second)
 	defer cancel()
 
-	runner.Run(ctxWithTimeout, transaction, metadata, env)
+	transactionRun := runner.Run(ctxWithTimeout, transaction, metadata, env)
+
+	for !transactionRun.State.IsFinal() {
+		transactionRun, err = db.GetTransactionRun(ctxWithTimeout, transactionRun.TransactionID.String(), transactionRun.ID)
+		require.NoError(t, err)
+		time.Sleep(1 * time.Second)
+	}
+
+	assert.Equal(t, model.TransactionRunStateFinished, transactionRun.State)
+	assert.Len(t, transactionRun.StepRuns, 2)
+	assert.Equal(t, transactionRun.StepRuns[0].State, model.RunStateFinished)
+	assert.Equal(t, transactionRun.StepRuns[1].State, model.RunStateFinished)
 }
 
 func getDB() (model.Repository, func()) {

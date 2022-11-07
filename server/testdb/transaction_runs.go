@@ -182,8 +182,8 @@ func (td *postgresDB) UpdateTransactionRun(ctx context.Context, transactionRun m
 		transactionRun.LastError,
 		jsonMetadata,
 		jsonEnvironment,
-		transactionRun.TransactionID,
 		transactionRun.ID,
+		transactionRun.TransactionID,
 	)
 
 	if err != nil {

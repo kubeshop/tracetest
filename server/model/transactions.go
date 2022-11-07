@@ -51,6 +51,10 @@ const (
 	TransactionRunStateFinished  TransactionRunState = "FINISHED"
 )
 
+func (rs TransactionRunState) IsFinal() bool {
+	return rs == TransactionRunStateFailed || rs == TransactionRunStateFinished
+}
+
 func (t Transaction) HasID() bool {
 	return t.ID != ""
 }
@@ -61,6 +65,8 @@ func NewTransactionRun(transaction Transaction) TransactionRun {
 		TransactionVersion: transaction.Version,
 		CreatedAt:          time.Now(),
 		State:              TransactionRunStateCreated,
+		Steps:              transaction.Steps,
+		StepRuns:           make([]Run, 0, len(transaction.Steps)),
 		CurrentTest:        0,
 	}
 }

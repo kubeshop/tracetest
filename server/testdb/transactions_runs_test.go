@@ -50,18 +50,18 @@ func TestUpdateTransactionRun(t *testing.T) {
 	require.NoError(t, err)
 
 	run := model.NewTransactionRun(transaction)
-	newRun, err := db.CreateTransactionRun(context.TODO(), run)
+	run, err = db.CreateTransactionRun(context.TODO(), run)
 	require.NoError(t, err)
 
 	run.State = model.TransactionRunStateExecuting
 	err = db.UpdateTransactionRun(context.TODO(), run)
 	require.NoError(t, err)
 
-	updatedRun, err := db.GetTransactionRun(context.TODO(), transaction.ID.String(), newRun.ID)
+	updatedRun, err := db.GetTransactionRun(context.TODO(), transaction.ID.String(), run.ID)
 	require.NoError(t, err)
 
-	assert.Equal(t, newRun.TransactionID, transaction.ID)
-	assert.Equal(t, updatedRun.State, model.TransactionRunStateCreated)
+	assert.Equal(t, run.TransactionID, transaction.ID)
+	assert.Equal(t, model.TransactionRunStateExecuting, updatedRun.State)
 }
 
 func TestDeleteTransactionRun(t *testing.T) {
