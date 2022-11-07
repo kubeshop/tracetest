@@ -67,7 +67,7 @@
           appVersion: getTemplateValue('{{ .AppVersion }}', '', parser.toString),
           env: getTemplateValue('{{ .Env }}', '', parser.toString),
           demoEnabled: getTemplateValue('{{ .DemoEnabled }}', '["pokeshop", "otel"]', parser.toArray),
-          demoEndpoints: getTemplateValue('{{ .DemoEndpoints }}', '{"PokeshopHttp": "http://demo-pokemon-api.demo.svc.cluster.local", "PokeshopGrpc": "demo-pokemon-api.demo.svc.cluster.local:8082", "OtelFrontend": "http://otel-frontend:8084" }', parser.toObject),
+          demoEndpoints: getTemplateValue('{{ .DemoEndpoints }}', '{"PokeshopHttp": "http://demo-api:8081", "PokeshopGrpc": "demo-api:8082", "OtelFrontend": "http://otel-frontend:8084" }', parser.toObject),
           experimentalFeatures: getTemplateValue('{{ .ExperimentalFeatures }}', '["transactions"]', parser.toArray),
         };
 

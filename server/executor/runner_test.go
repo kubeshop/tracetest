@@ -193,8 +193,15 @@ func (m *mockTriggerer) Trigger(_ context.Context, test model.Test, opts *trigge
 	return args.Get(0).(trigger.Response), args.Error(1)
 }
 
+func (m *mockTriggerer) Resolve(_ context.Context, test model.Test, opts *trigger.TriggerOptions) (model.Test, error) {
+	args := m.Called(test.ID)
+	return args.Get(0).(model.Test), args.Error(1)
+}
+
 func (m *mockTriggerer) expectTriggerTest(test model.Test) *mock.Call {
 	return m.
+		On("Resolve", test.ID).
+		Return(test, noError).
 		On("Trigger", test.ID).
 		Return(sampleResponse, noError)
 }
@@ -203,7 +210,9 @@ func (m *mockTriggerer) expectTriggerTestLong(test model.Test) *mock.Call {
 	return m.
 		On("Trigger", test.ID).
 		After(50*time.Millisecond).
-		Return(sampleResponse, noError)
+		Return(sampleResponse, noError).
+		On("Resolve", test.ID).
+		Return(test, noError)
 }
 
 func expectCreateRun(m *mockDB, test model.Test) *mock.Call {

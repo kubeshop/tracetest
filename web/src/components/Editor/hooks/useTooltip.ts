@@ -26,12 +26,16 @@ const useTooltip = (context: TResolveExpressionContext = {}) => {
 
   const onHover = useCallback(
     (rawExpression: string) => {
+      const isSameAsPrev = prevRawExpression === rawExpression;
+
+      if (isSameAsPrev) return;
+
       parseExpression({
         expression: rawExpression,
         context,
       });
     },
-    [context, parseExpression]
+    [context, parseExpression, prevRawExpression]
   );
 
   return {onHover, resolvedValues: prevExpression};

@@ -54,7 +54,7 @@ export const BodyField = ({body, setBody}: IProps): React.ReactElement => {
         </div>
       )}
       <BodyFieldContainer $isDisplaying={hasNoBody}>
-        <Form.Item name="body">
+        <Form.Item name="body" data-cy="body">
           <Editor
             type={SupportedEditors.Interpolation}
             basicSetup={{lineNumbers: true, indentOnInput: true}}

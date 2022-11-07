@@ -4,7 +4,7 @@ import {useParams} from 'react-router-dom';
 import TransactionRunDetailProvider from '../../providers/TransactionRunDetail';
 import TransactionContent from './Content';
 
-const Transaction: React.FC = () => {
+const TransactionRunDetail: React.FC = () => {
   const {transactionId = '', runId = ''} = useParams();
   return (
     <Layout>
@@ -15,4 +15,4 @@ const Transaction: React.FC = () => {
   );
 };
 
-export default withAnalytics(Transaction, 'transaction-details');
+export default withAnalytics(TransactionRunDetail, 'transaction-details');
