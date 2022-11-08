@@ -40,10 +40,11 @@ func NewController(
 	mappers mappings.Mappings,
 ) openapi.ApiApiServicer {
 	return &controller{
-		testDB:          testDB,
-		runner:          runner,
-		assertionRunner: assertionRunner,
-		mappers:         mappers,
+		testDB:            testDB,
+		runner:            runner,
+		assertionRunner:   assertionRunner,
+		transactionRunner: transactionRunner,
+		mappers:           mappers,
 	}
 }
 
@@ -860,7 +861,29 @@ func (c *controller) RunTransaction(ctx context.Context, transactionId string, r
 	return openapi.Response(http.StatusOK, c.mappers.Out.TransactionRun(run)), nil
 }
 
-// GetResources implements openapi.ApiApiServicer
+func (c *controller) GetTransactionRun(ctx context.Context, transactionId string, runId int32) (openapi.ImplResponse, error) {
+	run, err := c.testDB.GetTransactionRun(ctx, transactionId, int(runId))
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	return openapi.Response(http.StatusOK, c.mappers.Out.TransactionRun(run)), nil
+}
+
+func (c *controller) GetTransactionRuns(ctx context.Context, transactionId string) (openapi.ImplResponse, error) {
+	runs, err := c.testDB.GetTransactionsRuns(ctx, transactionId)
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	openapiRuns := make([]openapi.TransactionRun, 0, len(runs))
+	for _, run := range runs {
+		openapiRuns = append(openapiRuns, c.mappers.Out.TransactionRun(run))
+	}
+
+	return openapi.Response(http.StatusOK, openapiRuns), nil
+}
+
 func (c *controller) GetResources(ctx context.Context, take, skip int32, query, sortBy, sortDirection string) (openapi.ImplResponse, error) {
 	// TODO: this is endpoint is a hack to unblock the team quickly.
 	// This is not production ready because it might take too long to respond if there are numerous

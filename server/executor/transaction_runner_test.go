@@ -83,7 +83,7 @@ func TestTransactionRunner(t *testing.T) {
 	require.NoError(t, err)
 
 	runner := executor.NewTransactionRunner(testRunner, db)
-	runner.Start(1)
+	runner.Start(5)
 
 	ctxWithTimeout, cancel := context.WithTimeout(ctx, 30*time.Second)
 	defer cancel()

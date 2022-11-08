@@ -154,8 +154,8 @@ func (a *App) Start() error {
 	defer runner.Stop()
 
 	transactionRunner := executor.NewTransactionRunner(runner, a.db)
-	runner.Start(5)
-	defer runner.Stop()
+	transactionRunner.Start(5)
+	defer transactionRunner.Stop()
 
 	mappers := mappings.New(traceConversionConfig, comparator.DefaultRegistry(), a.db)
 

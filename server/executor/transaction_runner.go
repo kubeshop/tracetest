@@ -48,6 +48,10 @@ func (r PersistentTransactionRunner) Run(ctx context.Context, transaction model.
 	return run
 }
 
+func (r PersistentTransactionRunner) Stop() {
+	r.exit <- true
+}
+
 func (r PersistentTransactionRunner) Start(workers int) {
 	for i := 0; i < workers; i++ {
 		go func() {

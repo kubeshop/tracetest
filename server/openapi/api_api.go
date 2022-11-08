@@ -195,6 +195,18 @@ func (c *ApiApiController) Routes() Routes {
 			c.GetTransaction,
 		},
 		{
+			"GetTransactionRun",
+			strings.ToUpper("Get"),
+			"/api/transactions/{transactionId}/runs/{runId}",
+			c.GetTransactionRun,
+		},
+		{
+			"GetTransactionRuns",
+			strings.ToUpper("Get"),
+			"/api/transactions/{transactionId}/runs",
+			c.GetTransactionRuns,
+		},
+		{
 			"GetTransactions",
 			strings.ToUpper("Get"),
 			"/api/transactions",
@@ -752,6 +764,44 @@ func (c *ApiApiController) GetTransaction(w http.ResponseWriter, r *http.Request
 	transactionIdParam := params["transactionId"]
 
 	result, err := c.service.GetTransaction(r.Context(), transactionIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// GetTransactionRun - Get a specific run from a particular transaction
+func (c *ApiApiController) GetTransactionRun(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	transactionIdParam := params["transactionId"]
+
+	runIdParam, err := parseInt32Parameter(params["runId"], true)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+
+	result, err := c.service.GetTransactionRun(r.Context(), transactionIdParam, runIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// GetTransactionRuns - Get all runs from a particular transaction
+func (c *ApiApiController) GetTransactionRuns(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	transactionIdParam := params["transactionId"]
+
+	result, err := c.service.GetTransactionRuns(r.Context(), transactionIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
