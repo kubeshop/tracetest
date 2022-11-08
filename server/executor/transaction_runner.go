@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/model"
 )
 
@@ -12,12 +13,13 @@ type TransactionRunner interface {
 	Run(context.Context, model.Transaction, model.RunMetadata, model.Environment) model.TransactionRun
 }
 
-func NewTransactionRunner(runner Runner, db model.Repository) PersistentTransactionRunner {
+func NewTransactionRunner(runner Runner, db model.Repository, config config.Config) PersistentTransactionRunner {
 	return PersistentTransactionRunner{
-		testRunner:       runner,
-		db:               db,
-		executionChannel: make(chan transactionRunJob, 1),
-		exit:             make(chan bool),
+		testRunner:          runner,
+		db:                  db,
+		executionChannel:    make(chan transactionRunJob, 1),
+		exit:                make(chan bool),
+		checkTestStateDelay: config.PoolingRetryDelay() / 2,
 	}
 }
 
@@ -27,10 +29,11 @@ type transactionRunJob struct {
 }
 
 type PersistentTransactionRunner struct {
-	testRunner       Runner
-	db               model.Repository
-	executionChannel chan transactionRunJob
-	exit             chan bool
+	testRunner          Runner
+	db                  model.Repository
+	checkTestStateDelay time.Duration
+	executionChannel    chan transactionRunJob
+	exit                chan bool
 }
 
 func (r PersistentTransactionRunner) Run(ctx context.Context, transaction model.Transaction, metadata model.RunMetadata, environment model.Environment) model.TransactionRun {
@@ -122,9 +125,10 @@ func (r PersistentTransactionRunner) runTransactionStep(ctx context.Context, tra
 }
 
 func (r PersistentTransactionRunner) waitTestRunIsFinished(ctx context.Context, testRun model.Run) (model.Run, error) {
+	ticker := time.NewTicker(r.checkTestStateDelay)
 	var err error
 	for !testRun.State.IsFinal() {
-		time.Sleep(2 * time.Second)
+		<-ticker.C
 
 		testRun, err = r.db.GetRun(ctx, testRun.TestID, testRun.ID)
 		if err != nil {

@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/testmock"
@@ -82,7 +83,13 @@ func TestTransactionRunner(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	runner := executor.NewTransactionRunner(testRunner, db)
+	config := config.Config{
+		PoolingConfig: config.PoolingConfig{
+			RetryDelay: "2s",
+		},
+	}
+
+	runner := executor.NewTransactionRunner(testRunner, db, config)
 	runner.Start(5)
 
 	ctxWithTimeout, cancel := context.WithTimeout(ctx, 30*time.Second)
