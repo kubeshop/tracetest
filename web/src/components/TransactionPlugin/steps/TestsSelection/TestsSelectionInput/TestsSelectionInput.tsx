@@ -2,7 +2,7 @@ import {closestCenter, DndContext, KeyboardSensor, PointerSensor, useSensor, use
 import {arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy} from '@dnd-kit/sortable';
 import {Col, Row, Select} from 'antd';
 import {noop} from 'lodash';
-import {useCallback, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {TTest} from 'types/Test.types';
 import TestItemList from './TestItemList';
 
@@ -12,15 +12,34 @@ interface IProps {
   onChange?(tests: string[]): void;
 }
 
+export interface ISortableTest {
+  id: string;
+  test: TTest;
+}
+
 const TestsSelectionInput = ({value = [], onChange = noop, testList}: IProps) => {
-  const [selectedTestList, setSelectedTestList] = useState<TTest[]>([]);
+  const [selectedTestList, setSelectedTestList] = useState<ISortableTest[]>([]);
   const onSelectedTest = useCallback(
     (testId: string) => {
       onChange([...value, testId]);
-      setSelectedTestList([...selectedTestList, testList.find(test => test.id === testId)!]);
     },
-    [onChange, selectedTestList, testList, value]
+    [onChange, value]
   );
+
+  useEffect(() => {
+    if (testList.length) {
+      setSelectedTestList(
+        value.map((testId, index) => {
+          const test = testList.find(({id}) => id === testId)!;
+
+          return {
+            test,
+            id: `${test.id}-${index}`,
+          };
+        })
+      );
+    }
+  }, [testList, value]);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -37,7 +56,7 @@ const TestsSelectionInput = ({value = [], onChange = noop, testList}: IProps) =>
         const updatedList = arrayMove(selectedTestList, oldIndex, newIndex);
 
         setSelectedTestList(updatedList);
-        onChange(updatedList.map((test: any) => test.id));
+        onChange(updatedList.map(({test}) => test.id));
       }
     },
     [onChange, selectedTestList]

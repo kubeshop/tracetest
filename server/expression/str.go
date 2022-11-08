@@ -18,10 +18,6 @@ func (s *Str) Capture(in []string) error {
 		input = input[1 : len(input)-1]
 	}
 
-	// remove escape characters
-	input = strings.ReplaceAll(input, `\"`, `"`)
-	input = strings.ReplaceAll(input, `\'`, `'`)
-
 	newInput, expressions, err := extractInterpolationArguments(input)
 	if err != nil {
 		return fmt.Errorf("could not parse interpolated expression: %w", err)
