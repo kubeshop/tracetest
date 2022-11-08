@@ -6,6 +6,7 @@ import {getTestId} from '../e2e/utils/Common';
 export const testRunPageRegex = /\/test\/(.*)\/run\/(.*)/;
 export const getAttributeListId = (number: number) => `.cm-tooltip-autocomplete [id*=${number}]`;
 export const getComparatorListId = (number: number) => `#assertion-form_assertions_${number}_comparator_list`;
+export const getValueFromList = (number: number) => `[data-cy=assertion-check-value-menu] li:nth-child(${number})`;
 
 Cypress.Commands.add('createMultipleTestRuns', (id: string, count: number) => {
   cy.visit('/');
@@ -201,6 +202,7 @@ Cypress.Commands.add('createAssertion', (index = 0) => {
   cy.get('[data-cy=editor-fallback]').should('not.exist');
 
   cy.get('[data-cy=expression-editor] [contenteditable]').first().type('db.name', {delay: 100});
+  cy.get(getValueFromList(0)).first().click();
 
   const attributeListId = getAttributeListId(index);
   cy.get(attributeListId, {timeout: 10000}).first().click();

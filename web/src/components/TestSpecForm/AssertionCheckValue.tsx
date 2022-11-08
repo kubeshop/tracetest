@@ -40,7 +40,7 @@ const AssertionCheckValue = ({form, name, valueList, isDropdownOpen, onClose, fi
 
   const menu = useMemo(
     () => (
-      <Menu>
+      <Menu data-cy="assertion-check-value-menu">
         {valueList.map(value => (
           <Menu.Item key={value} onClick={() => onSelectedValue(value)}>
             {value}
