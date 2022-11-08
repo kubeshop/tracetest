@@ -26,7 +26,7 @@ describe('Create Assertion', () => {
 
     cy.get('[data-cy=assertion-check-attribute] [contenteditable="true"]').last().type('type', {delay: 100});
     cy.get(getAttributeListId(1)).click();
-    cy.get(getValueFromList(0)).first().click();
+    cy.get(getValueFromList(1)).first().click();
 
     cy.selectOperator(1);
 
@@ -34,7 +34,7 @@ describe('Create Assertion', () => {
 
     cy.get('[data-cy=assertion-check-attribute] [contenteditable="true"]').last().type('duration', {delay: 100});
     cy.get(getAttributeListId(0)).click();
-    cy.get(getValueFromList(0)).first().click();
+    cy.get(getValueFromList(1)).first().click();
 
     cy.selectOperator(2);
 
@@ -59,7 +59,7 @@ describe('Create Assertion', () => {
 
     cy.get('[data-cy=assertion-check-attribute] [contenteditable="true"]').type('db.name', {delay: 100});
     cy.get(getAttributeListId(0)).click();
-    cy.get(getValueFromList(0)).first().click();
+    cy.get(getValueFromList(1)).first().click();
 
     cy.selectOperator(0);
 
@@ -83,7 +83,7 @@ describe('Create Assertion', () => {
 
     cy.get('[data-cy=assertion-check-attribute] [contenteditable="true"]').last().type('duration', {delay: 100});
     cy.get(getAttributeListId(0)).click();
-    cy.get(getValueFromList(0)).first().click();
+    cy.get(getValueFromList(1)).first().click();
 
     cy.selectOperator(1);
 
@@ -108,7 +108,7 @@ describe('Create Assertion', () => {
 
     cy.get('[data-cy=assertion-check-attribute] [contenteditable="true"]').last().type('duration', {delay: 100});
     cy.get(getAttributeListId(0)).click();
-    cy.get(getValueFromList(0)).first().click();
+    cy.get(getValueFromList(1)).first().click();
 
     cy.selectOperator(1);
 
@@ -133,7 +133,7 @@ describe('Create Assertion', () => {
 
     cy.get('[data-cy=assertion-check-attribute] [contenteditable="true"]').type('db.name', {delay: 100});
     cy.get(getAttributeListId(0)).click();
-    cy.get(getValueFromList(0)).first().click();
+    cy.get(getValueFromList(1)).first().click();
 
     cy.selectOperator(0);
 

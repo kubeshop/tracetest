@@ -205,7 +205,7 @@ Cypress.Commands.add('createAssertion', (index = 0) => {
 
   const attributeListId = getAttributeListId(index);
   cy.get(attributeListId, {timeout: 10000}).first().click();
-  cy.get(getValueFromList(0)).first().click();
+  cy.get(getValueFromList(1)).first().click();
 
   cy.get('[data-cy=assertion-check-operator]').click({force: true});
 
