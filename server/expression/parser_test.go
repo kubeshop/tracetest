@@ -66,9 +66,9 @@ func TestSimpleParsingRules(t *testing.T) {
 			Name:  "should_parse_escaped_strings",
 			Query: `"my name is \"john\"" = 'my name is \'john\''`,
 			ExpectedOutput: expression.Statement{
-				Left:       strExpr(`my name is "john"`),
+				Left:       strExpr(`my name is \"john\"`),
 				Comparator: "=",
-				Right:      strExpr(`my name is 'john'`),
+				Right:      strExpr(`my name is \'john\'`),
 			},
 		},
 		{
