@@ -15,6 +15,7 @@ func newSegmentTracker(hostname, serverID, appVersion, env string) Tracker {
 	})
 
 	client.Enqueue(segment.Identify{
+		UserId: serverID,
 		Traits: segment.NewTraits().
 			Set("source", "server").
 			Set("serverID", serverID).
