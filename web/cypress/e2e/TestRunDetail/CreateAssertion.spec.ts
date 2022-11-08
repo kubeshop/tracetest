@@ -19,6 +19,7 @@ describe('Create Assertion', () => {
 
     const attributeListId = getAttributeListId(0);
     cy.get(attributeListId).click();
+    cy.get(getValueFromList(1)).first().click();
 
     cy.selectOperator(0);
 
