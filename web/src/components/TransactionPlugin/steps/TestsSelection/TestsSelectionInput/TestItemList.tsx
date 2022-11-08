@@ -1,10 +1,10 @@
 import {Col, Row} from 'antd';
-import {TTest} from 'types/Test.types';
 import TestItem from './TestItem';
+import {ISortableTest} from './TestsSelectionInput';
 import * as S from './TestsSelectionInput.styled';
 
 interface IProps {
-  items: TTest[];
+  items: ISortableTest[];
   onDelete(testId: string): void;
 }
 
@@ -13,9 +13,8 @@ const TestItemList = ({items, onDelete}: IProps) => {
     <Row gutter={12}>
       <Col span={18}>
         <S.ItemListContainer>
-          {items.map((test, index) => (
-            // eslint-disable-next-line react/no-array-index-key
-            <TestItem key={`${test.id}-${index}`} test={test} onDelete={onDelete} />
+          {items.map(({id, test}) => (
+            <TestItem key={id} test={test} sortableId={id} onDelete={onDelete} />
           ))}
         </S.ItemListContainer>
       </Col>

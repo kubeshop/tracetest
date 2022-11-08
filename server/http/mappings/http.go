@@ -113,6 +113,7 @@ func (m Model) HTTPResponse(in openapi.HttpResponse) *model.HTTPResponse {
 
 func (m Model) Auth(in openapi.HttpAuth) *model.HTTPAuthenticator {
 	var props map[string]string
+
 	switch in.Type {
 	case "apiKey":
 		props = map[string]string{

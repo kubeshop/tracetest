@@ -16,6 +16,7 @@ import {useCreateTestMutation, useRunTestMutation} from 'redux/apis/TraceTest.ap
 import {ICreateTestState, TDraftTest} from 'types/Test.types';
 import TestService from 'services/Test.service';
 import {Plugins} from 'constants/Plugins.constants';
+import {useEnvironment} from '../Environment/Environment.provider';
 
 interface IContext extends ICreateTestState {
   activeStep: string;
@@ -55,6 +56,7 @@ export const useCreateTest = () => useContext(Context);
 const CreateTestProvider = ({children}: IProps) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const {selectedEnvironment} = useEnvironment();
   const [createTest, {isLoading: isLoadingCreateTest}] = useCreateTestMutation();
   const [runTest, {isLoading: isLoadingRunTest}] = useRunTestMutation();
 
@@ -70,11 +72,11 @@ const CreateTestProvider = ({children}: IProps) => {
     async (draft: TDraftTest) => {
       const rawTest = await TestService.getRequest(plugin, draft);
       const test = await createTest(rawTest).unwrap();
-      const run = await runTest({testId: test.id}).unwrap();
+      const run = await runTest({testId: test.id, environmentId: selectedEnvironment?.id}).unwrap();
 
       navigate(`/test/${test.id}/run/${run.id}`);
     },
-    [createTest, navigate, plugin, runTest]
+    [createTest, navigate, plugin, runTest, selectedEnvironment?.id]
   );
 
   const onUpdateDraftTest = useCallback(

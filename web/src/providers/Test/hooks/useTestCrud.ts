@@ -9,6 +9,7 @@ import {TriggerTypeToPlugin} from 'constants/Plugins.constants';
 import {TriggerTypes} from 'constants/Test.constants';
 import TestService from 'services/Test.service';
 import {useEditTestMutation, useRunTestMutation} from 'redux/apis/TraceTest.api';
+import {useEnvironment} from '../../Environment/Environment.provider';
 
 const useTestCrud = () => {
   const dispatch = useAppDispatch();
@@ -18,18 +19,19 @@ const useTestCrud = () => {
   const [runTestAction, {isLoading: isLoadingRunTest}] = useRunTestMutation();
   const isEditLoading = isLoadingEditTest || isLoadingRunTest;
   const match = useMatch('/test/:testId/run/:runId/:mode');
+  const {selectedEnvironment} = useEnvironment();
 
   const runTest = useCallback(
-    async (testId: string) => {
+    async (testId: string, environmentId = selectedEnvironment?.id) => {
       TestAnalyticsService.onRunTest();
-      const run = await runTestAction({testId}).unwrap();
+      const run = await runTestAction({testId, environmentId}).unwrap();
       dispatch(reset());
 
       const mode = match?.params.mode || 'trigger';
 
       navigate(`/test/${testId}/run/${run.id}/${mode}`);
     },
-    [dispatch, match?.params.mode, navigate, runTestAction]
+    [dispatch, match?.params.mode, navigate, runTestAction, selectedEnvironment?.id]
   );
 
   const edit = useCallback(

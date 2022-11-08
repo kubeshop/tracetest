@@ -57,6 +57,7 @@ export const {
   useGetTransactionByIdQuery,
   useGetTransactionRunByIdQuery,
   useDeleteTransactionByIdMutation,
+  useEditTransactionMutation,
   useParseExpressionMutation,
   useSetTestOutputsMutation,
   useGetResourcesQuery,

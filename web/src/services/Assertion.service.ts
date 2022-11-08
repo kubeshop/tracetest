@@ -6,6 +6,7 @@ import {durationRegExp} from 'constants/Common.constants';
 import {Attributes} from 'constants/SpanAttribute.constants';
 import {CompareOperatorSymbolMap, OperatorRegexp} from 'constants/Operator.constants';
 import {TCompareOperatorSymbol} from '../types/Operator.types';
+import {isJson} from '../utils/Common';
 
 const isNumeric = (num: string): boolean => /^-?\d+(?:\.\d+)?$/.test(num);
 const isNumericTime = (num: string): boolean => durationRegExp.test(num);
@@ -14,19 +15,12 @@ const AssertionService = () => ({
   extractExpectedString(input?: string): string | undefined {
     if (!input) return input;
     const formatted = input.trim();
-    if (Object.values(Attributes).includes(formatted)) {
-      return formatted;
-    }
-    if (
-      Object.values(Attributes).some(aa => {
-        return formatted.includes(aa);
-      })
-    ) {
-      return formatted;
-    }
-    if (isNumeric(formatted) || isNumericTime(formatted)) {
-      return formatted;
-    }
+
+    if (isJson(input)) return `'${input}'`;
+
+    if (Object.values(Attributes).includes(formatted)) return formatted;
+    if (Object.values(Attributes).some(aa => formatted.includes(aa))) return formatted;
+    if (isNumeric(formatted) || isNumericTime(formatted)) return formatted;
 
     const isQuoted = formatted.startsWith('"') && formatted.endsWith('"');
 
