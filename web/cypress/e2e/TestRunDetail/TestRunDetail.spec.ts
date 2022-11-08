@@ -30,9 +30,8 @@ describe('Test Run Detail Views', () => {
     cy.get('[data-cy=selector-editor] .cm-placeholder').should('be.visible');
 
     cy.get('[data-cy=expression-editor] [contenteditable]').first().type('db.na', {delay: 100});
-    cy.get(getValueFromList(0)).first().click();
-
     cy.get(getAttributeListId(0)).first().click({force: true});
+    cy.get(getValueFromList(0)).first().click();
 
     cy.get('[data-cy=assertion-form-submit-button]').click();
     cy.wait('@testRuns', {timeout: 30000});
