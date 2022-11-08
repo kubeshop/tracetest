@@ -884,6 +884,20 @@ func (c *controller) GetTransactionRuns(ctx context.Context, transactionId strin
 	return openapi.Response(http.StatusOK, openapiRuns), nil
 }
 
+func (c *controller) DeleteTransactionRun(ctx context.Context, transactionId string, runId int32) (openapi.ImplResponse, error) {
+	run, err := c.testDB.GetTransactionRun(ctx, transactionId, int(runId))
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	err = c.testDB.DeleteTransactionRun(ctx, run)
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	return openapi.Response(http.StatusNoContent, nil), nil
+}
+
 func (c *controller) GetResources(ctx context.Context, take, skip int32, query, sortBy, sortDirection string) (openapi.ImplResponse, error) {
 	// TODO: this is endpoint is a hack to unblock the team quickly.
 	// This is not production ready because it might take too long to respond if there are numerous

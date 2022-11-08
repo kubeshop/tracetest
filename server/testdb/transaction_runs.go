@@ -238,7 +238,7 @@ func (td *postgresDB) GetTransactionRun(ctx context.Context, transactionId strin
 
 	run, err := readTransactionRow(stmt.QueryRowContext(ctx, runId, transactionId))
 	if err != nil {
-		return model.TransactionRun{}, fmt.Errorf("cannot read row: %w", err)
+		return model.TransactionRun{}, err
 	}
 	return run, nil
 }
@@ -258,7 +258,7 @@ func (td *postgresDB) GetTransactionsRuns(ctx context.Context, transactionId str
 	for rows.Next() {
 		run, err := readTransactionRow(rows)
 		if err != nil {
-			return []model.TransactionRun{}, fmt.Errorf("cannot read row: %w", err)
+			return []model.TransactionRun{}, err
 		}
 		runs = append(runs, run)
 	}

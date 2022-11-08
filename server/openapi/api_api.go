@@ -93,6 +93,12 @@ func (c *ApiApiController) Routes() Routes {
 			c.DeleteTransaction,
 		},
 		{
+			"DeleteTransactionRun",
+			strings.ToUpper("Delete"),
+			"/api/transactions/{transactionId}/runs/{runId}",
+			c.DeleteTransactionRun,
+		},
+		{
 			"DryRunAssertion",
 			strings.ToUpper("Put"),
 			"/api/tests/{testId}/run/{runId}/dry-run",
@@ -397,6 +403,28 @@ func (c *ApiApiController) DeleteTransaction(w http.ResponseWriter, r *http.Requ
 	transactionIdParam := params["transactionId"]
 
 	result, err := c.service.DeleteTransaction(r.Context(), transactionIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// DeleteTransactionRun - Delete a specific run from a particular transaction
+func (c *ApiApiController) DeleteTransactionRun(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	transactionIdParam := params["transactionId"]
+
+	runIdParam, err := parseInt32Parameter(params["runId"], true)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+
+	result, err := c.service.DeleteTransactionRun(r.Context(), transactionIdParam, runIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
