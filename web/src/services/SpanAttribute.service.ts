@@ -52,7 +52,7 @@ const SpanAttributeService = () => ({
   },
 
   getReferencePicker(reference: OtelReference, attrName: string): OtelReferenceModel {
-    return reference[attrName] || {description: '', tags: []};
+    return reference[attrName] || {description: '', note: '', tags: []};
   },
 
   getItMatchesAttributeByKey(reference: OtelReference, attrName: string, search: string): boolean {
