@@ -193,8 +193,6 @@ paths:
             application/json:
               schema:
                 $ref: "./transactions.yaml#/components/schemas/TransactionRun"
-
-  /transactions/{transactionId}/runs:
     get:
       tags:
         - api
@@ -217,7 +215,7 @@ paths:
                 items:
                   $ref: "./transactions.yaml#/components/schemas/TransactionRun"
 
-  /transactions/{transactionId}/runs/{runId}:
+  /transactions/{transactionId}/run/{runId}:
     get:
       tags:
         - api

@@ -95,7 +95,7 @@ func (c *ApiApiController) Routes() Routes {
 		{
 			"DeleteTransactionRun",
 			strings.ToUpper("Delete"),
-			"/api/transactions/{transactionId}/runs/{runId}",
+			"/api/transactions/{transactionId}/run/{runId}",
 			c.DeleteTransactionRun,
 		},
 		{
@@ -203,13 +203,13 @@ func (c *ApiApiController) Routes() Routes {
 		{
 			"GetTransactionRun",
 			strings.ToUpper("Get"),
-			"/api/transactions/{transactionId}/runs/{runId}",
+			"/api/transactions/{transactionId}/run/{runId}",
 			c.GetTransactionRun,
 		},
 		{
 			"GetTransactionRuns",
 			strings.ToUpper("Get"),
-			"/api/transactions/{transactionId}/runs",
+			"/api/transactions/{transactionId}/run",
 			c.GetTransactionRuns,
 		},
 		{
