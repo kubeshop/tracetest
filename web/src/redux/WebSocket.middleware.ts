@@ -19,13 +19,15 @@ function createWebSocketMiddleware(): Middleware<{}, RootState> {
     };
 
     return next => action => {
+      // Listen to the getRunByID fulfilled query
+      // and subscribe using the websocket connection
       if (action.type === 'tests/executeQuery/fulfilled' && action?.meta?.arg?.endpointName === 'getRunById') {
         const args = action?.meta?.arg?.originalArgs ?? {};
         webSocketGateway.subscribe(`test/${args.testId}/run/${args.runId}`, listener);
       }
 
+      // Listen to action to send a custom websocket message
       if (webSocketSendMessage.match(action)) {
-        console.log('send socket middleware');
         const message: IMessage = {type: 'subscribe', resource: action.payload};
         webSocketGateway.send(message);
         return;
