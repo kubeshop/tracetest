@@ -140,21 +140,23 @@ func (r persistentTransactionRunner) waitTestRunIsFinished(ctx context.Context, 
 }
 
 func (r persistentTransactionRunner) patchEnvironment(baseEnvironment model.Environment, run model.TransactionRun) model.Environment {
-	newEnvVariables := make([]model.EnvironmentValue, 0)
-
-	for i := 0; i < run.CurrentTest; i++ {
-		testRun := run.StepRuns[i]
-		testRun.Outputs.ForEach(func(key, val string) error {
-			newEnvVariables = append(newEnvVariables, model.EnvironmentValue{
-				Key:   key,
-				Value: val,
-			})
-
-			return nil
-		})
+	if run.CurrentTest == 0 {
+		return baseEnvironment
 	}
+
+	lastExecutedTest := run.StepRuns[run.CurrentTest-1]
+	lastEnvironment := lastExecutedTest.Environment
+	newEnvVariables := make([]model.EnvironmentValue, 0)
+	lastExecutedTest.Outputs.ForEach(func(key, val string) error {
+		newEnvVariables = append(newEnvVariables, model.EnvironmentValue{
+			Key:   key,
+			Value: val,
+		})
+
+		return nil
+	})
 
 	newEnvironment := model.Environment{Values: newEnvVariables}
 
-	return baseEnvironment.Merge(newEnvironment)
+	return lastEnvironment.Merge(newEnvironment)
 }
