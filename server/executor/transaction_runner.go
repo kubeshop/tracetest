@@ -103,14 +103,20 @@ func (r persistentTransactionRunner) runTransaction(ctx context.Context, run mod
 
 func (r persistentTransactionRunner) runTransactionStep(ctx context.Context, transactionRun model.TransactionRun, stepIndex int, environment model.Environment) (model.TransactionRun, error) {
 	step := transactionRun.Steps[stepIndex]
-	testRun := r.testRunner.Run(ctx, step, transactionRun.Metadata, environment)
+	test, err := r.db.GetLatestTestVersion(ctx, step.ID)
+	if err != nil {
+		return model.TransactionRun{}, fmt.Errorf("could not load transaction step: %w", err)
+	}
 
-	testRun, err := r.waitTestRunIsFinished(ctx, testRun)
+	testRun := r.testRunner.Run(ctx, test, transactionRun.Metadata, environment)
+	testRun, err = r.waitTestRunIsFinished(ctx, testRun)
 	if err != nil {
 		return model.TransactionRun{}, fmt.Errorf("could not wait for step execution: %w", err)
 	}
 
-	transactionRun.StepRuns = append(transactionRun.StepRuns, testRun)
+	stepRun := model.TransactionStepRun{ID: testRun.ID, TestID: testRun.TestID, State: testRun.State}
+
+	transactionRun.StepRuns = append(transactionRun.StepRuns, stepRun)
 
 	if testRun.State == model.RunStateFailed {
 		transactionRun.State = model.TransactionRunStateFailed
