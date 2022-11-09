@@ -7,6 +7,8 @@ import {TestState as TestStateEnum} from 'constants/TestRun.constants';
 import {useTest} from 'providers/Test/Test.provider';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
+import {useAppDispatch} from 'redux/hooks';
+import {webSocketSendMessage} from 'redux/WebSocket.middleware';
 import GuidedTourService, {GuidedTours} from '../../services/GuidedTour.service';
 import * as S from './RunDetailLayout.styled';
 
@@ -16,6 +18,7 @@ interface IProps {
 }
 
 const HeaderRight = ({testId, testVersion}: IProps) => {
+  const dispatch = useAppDispatch();
   const {isDraftMode} = useTestSpecs();
   const {run} = useTestRun();
   const {onRun} = useTest();
@@ -41,6 +44,9 @@ const HeaderRight = ({testId, testVersion}: IProps) => {
           Run Test
         </Button>
       )}
+      <Button ghost onClick={() => dispatch(webSocketSendMessage('message'))} type="primary">
+        Send websocket message
+      </Button>
       <RunActionsMenu isRunView resultId={run.id} testId={testId} testVersion={testVersion} />
     </S.Section>
   );

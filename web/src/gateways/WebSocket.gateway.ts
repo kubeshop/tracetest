@@ -10,7 +10,7 @@ export interface IListenerFunction<T = any> {
   (data: IData<T>): void;
 }
 
-interface IMessage {
+export interface IMessage {
   type: 'subscribe' | 'unsubscribe';
   resource: string;
   subscriptionId?: string;
@@ -172,6 +172,5 @@ function getWebSocketURL() {
 }
 
 const webSocketGateway = WebSocketGateway({url: getWebSocketURL()});
-webSocketGateway.connect();
 
 export default webSocketGateway;
