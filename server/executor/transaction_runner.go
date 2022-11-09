@@ -13,8 +13,8 @@ type TransactionRunner interface {
 	Run(context.Context, model.Transaction, model.RunMetadata, model.Environment) model.TransactionRun
 }
 
-func NewTransactionRunner(runner Runner, db model.Repository, config config.Config) PersistentTransactionRunner {
-	return PersistentTransactionRunner{
+func NewTransactionRunner(runner Runner, db model.Repository, config config.Config) persistentTransactionRunner {
+	return persistentTransactionRunner{
 		testRunner:          runner,
 		db:                  db,
 		executionChannel:    make(chan transactionRunJob, 1),
@@ -28,7 +28,7 @@ type transactionRunJob struct {
 	run model.TransactionRun
 }
 
-type PersistentTransactionRunner struct {
+type persistentTransactionRunner struct {
 	testRunner          Runner
 	db                  model.Repository
 	checkTestStateDelay time.Duration
@@ -36,7 +36,7 @@ type PersistentTransactionRunner struct {
 	exit                chan bool
 }
 
-func (r PersistentTransactionRunner) Run(ctx context.Context, transaction model.Transaction, metadata model.RunMetadata, environment model.Environment) model.TransactionRun {
+func (r persistentTransactionRunner) Run(ctx context.Context, transaction model.Transaction, metadata model.RunMetadata, environment model.Environment) model.TransactionRun {
 	run := model.NewTransactionRun(transaction)
 	run.Metadata = metadata
 	run.Environment = environment
@@ -51,11 +51,11 @@ func (r PersistentTransactionRunner) Run(ctx context.Context, transaction model.
 	return run
 }
 
-func (r PersistentTransactionRunner) Stop() {
+func (r persistentTransactionRunner) Stop() {
 	r.exit <- true
 }
 
-func (r PersistentTransactionRunner) Start(workers int) {
+func (r persistentTransactionRunner) Start(workers int) {
 	for i := 0; i < workers; i++ {
 		go func() {
 			fmt.Println("PersistentTransactionRunner start goroutine")
@@ -75,7 +75,7 @@ func (r PersistentTransactionRunner) Start(workers int) {
 	}
 }
 
-func (r PersistentTransactionRunner) runTransaction(ctx context.Context, run model.TransactionRun) error {
+func (r persistentTransactionRunner) runTransaction(ctx context.Context, run model.TransactionRun) error {
 	run.State = model.TransactionRunStateExecuting
 	environment := run.Environment
 
@@ -87,19 +87,19 @@ func (r PersistentTransactionRunner) runTransaction(ctx context.Context, run mod
 			return fmt.Errorf("could not execute step %d of transaction %s: %w", i, run.TransactionID, err)
 		}
 
-		if run.State == model.TransactionRunStateExecuting {
+		if !run.State.IsFinal() {
 			environment = r.patchEnvironment(environment, run)
 		}
 	}
 
-	if !run.State.IsFinal() {
+	if run.State != model.TransactionRunStateFailed {
 		run.State = model.TransactionRunStateFinished
 	}
 
 	return r.db.UpdateTransactionRun(ctx, run)
 }
 
-func (r PersistentTransactionRunner) runTransactionStep(ctx context.Context, transactionRun model.TransactionRun, stepIndex int, environment model.Environment) (model.TransactionRun, error) {
+func (r persistentTransactionRunner) runTransactionStep(ctx context.Context, transactionRun model.TransactionRun, stepIndex int, environment model.Environment) (model.TransactionRun, error) {
 	step := transactionRun.Steps[stepIndex]
 	testRun := r.testRunner.Run(ctx, step, transactionRun.Metadata, environment)
 
@@ -124,7 +124,7 @@ func (r PersistentTransactionRunner) runTransactionStep(ctx context.Context, tra
 	return transactionRun, nil
 }
 
-func (r PersistentTransactionRunner) waitTestRunIsFinished(ctx context.Context, testRun model.Run) (model.Run, error) {
+func (r persistentTransactionRunner) waitTestRunIsFinished(ctx context.Context, testRun model.Run) (model.Run, error) {
 	ticker := time.NewTicker(r.checkTestStateDelay)
 	var err error
 	for !testRun.State.IsFinal() {
@@ -139,7 +139,7 @@ func (r PersistentTransactionRunner) waitTestRunIsFinished(ctx context.Context, 
 	return testRun, nil
 }
 
-func (r PersistentTransactionRunner) patchEnvironment(baseEnvironment model.Environment, run model.TransactionRun) model.Environment {
+func (r persistentTransactionRunner) patchEnvironment(baseEnvironment model.Environment, run model.TransactionRun) model.Environment {
 	newEnvVariables := make([]model.EnvironmentValue, 0)
 
 	for i := 0; i < run.CurrentTest; i++ {
