@@ -87,9 +87,11 @@ func (r persistentTransactionRunner) runTransaction(ctx context.Context, run mod
 			return fmt.Errorf("could not execute step %d of transaction %s: %w", i, run.TransactionID, err)
 		}
 
-		if !run.State.IsFinal() {
-			environment = r.patchEnvironment(environment, run)
+		if run.State == model.TransactionRunStateFailed {
+			break
 		}
+
+		environment = r.patchEnvironment(environment, run)
 	}
 
 	if run.State != model.TransactionRunStateFailed {
