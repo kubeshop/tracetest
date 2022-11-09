@@ -25,6 +25,7 @@ func TestEnvironmentMerge(t *testing.T) {
 		Values: []model.EnvironmentValue{
 			{Key: "apiKey", Value: "abcdef"},
 			{Key: "apiKeyLocation", Value: "header"},
+			{Key: "URL", Value: "http://my-api.com"},
 		},
 	}
 
@@ -36,7 +37,7 @@ func TestEnvironmentMerge(t *testing.T) {
 	assert.Equal(t, env1.CreatedAt, newEnv.CreatedAt)
 
 	require.Len(t, newEnv.Values, 4)
-	assert.Contains(t, newEnv.Values, model.EnvironmentValue{Key: "URL", Value: "http://localhost"})
+	assert.Contains(t, newEnv.Values, model.EnvironmentValue{Key: "URL", Value: "http://my-api.com"})
 	assert.Contains(t, newEnv.Values, model.EnvironmentValue{Key: "PORT", Value: "8085"})
 	assert.Contains(t, newEnv.Values, model.EnvironmentValue{Key: "apiKey", Value: "abcdef"})
 	assert.Contains(t, newEnv.Values, model.EnvironmentValue{Key: "apiKeyLocation", Value: "header"})
