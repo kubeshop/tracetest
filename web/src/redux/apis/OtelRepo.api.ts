@@ -9,19 +9,6 @@ enum Tags {
   TAGS = 'tags',
 }
 
-function normalizeThis(examples?: Array<string | number> | number | string): string[] {
-  switch (typeof examples) {
-    case 'object':
-      return examples.map(d => d.toString());
-    case 'number':
-      return [examples.toString()];
-    case 'string':
-      return [examples];
-    default:
-      return [];
-  }
-}
-
 const OtelRepoAPI = createApi({
   reducerPath: 'otel',
   baseQuery: fetchBaseQuery({
@@ -44,7 +31,7 @@ const OtelRepoAPI = createApi({
             .flatMap<CompleteAttribute>(s => (s.attributes || []).map(d => ({...d, group: s.prefix})))
             .reduce((acc: OtelReference, d: CompleteAttribute) => {
               let id = `${d.group}.${d?.ref || d?.id || ''}`;
-              acc[id] = {description: d?.brief || '', tags: normalizeThis(d?.examples)};
+              acc[id] = {description: d?.brief || '', note: d?.note ?? '', tags: []};
               return acc;
             }, {}) || {}
         );

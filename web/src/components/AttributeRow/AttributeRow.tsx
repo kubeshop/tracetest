@@ -41,6 +41,7 @@ const AttributeRow = ({
   const failedCount = assertionsFailed?.length ?? 0;
   const semanticConvention = SpanAttributeService.getReferencePicker(semanticConventions, key);
   const description = useMemo(() => parse(MarkdownIt().render(semanticConvention.description)), [semanticConvention]);
+  const note = useMemo(() => parse(MarkdownIt().render(semanticConvention.note)), [semanticConvention]);
 
   const handleOnClick = ({key: option}: {key: string}) => {
     if (option === Action.Copy) {
@@ -74,6 +75,7 @@ const AttributeRow = ({
   const content = (
     <S.DetailContainer>
       {semanticConvention.description !== '' ? description : 'We have not found a description for this attribute'}
+      {note}
       <S.TagsContainer>
         {semanticConvention.tags.map(tag => (
           <S.Tag key={tag}>{tag}</S.Tag>
