@@ -44,7 +44,7 @@ func loadConfig(cmd *cobra.Command, args []string) {
 
 func validateConfig(cmd *cobra.Command, args []string) {
 	if cliConfig.IsEmpty() {
-		cliLogger.Warn("You haven't configured your CLI, commands might fail!")
+		cliLogger.Warn("You haven't configured your CLI, some commands might fail!")
 		cliLogger.Warn("Run 'tracetest configure' to configure your CLI")
 	}
 }
