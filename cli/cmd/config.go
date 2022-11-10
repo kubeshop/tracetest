@@ -20,6 +20,7 @@ func setupCommand(cmd *cobra.Command, args []string) {
 	setupOutputFormat()
 	setupLogger(cmd, args)
 	loadConfig(cmd, args)
+	validateConfig(cmd, args)
 	analytics.Init(cliConfig)
 }
 
@@ -39,6 +40,13 @@ func loadConfig(cmd *cobra.Command, args []string) {
 	}
 
 	cliConfig = config
+}
+
+func validateConfig(cmd *cobra.Command, args []string) {
+	if cliConfig.IsEmpty() {
+		cliLogger.Warn("You haven't configured your CLI, commands might fail!")
+		cliLogger.Warn("Run 'tracetest configure' to configure your CLI")
+	}
 }
 
 func setupLogger(cmd *cobra.Command, args []string) {
