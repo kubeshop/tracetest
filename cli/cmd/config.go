@@ -45,12 +45,27 @@ func setupLogger(cmd *cobra.Command, args []string) {
 	atom := zap.NewAtomicLevel()
 	if verbose {
 		atom.SetLevel(zap.DebugLevel)
+	} else {
+		atom.SetLevel(zap.WarnLevel)
 	}
 
-	encoderCfg := zap.NewProductionEncoderConfig()
+	encoderCfg := zapcore.EncoderConfig{
+		TimeKey:        zapcore.OmitKey,
+		LevelKey:       "level",
+		NameKey:        zapcore.OmitKey,
+		CallerKey:      zapcore.OmitKey,
+		FunctionKey:    zapcore.OmitKey,
+		MessageKey:     "message",
+		StacktraceKey:  zapcore.OmitKey,
+		LineEnding:     zapcore.DefaultLineEnding,
+		EncodeLevel:    zapcore.CapitalColorLevelEncoder,
+		EncodeTime:     zapcore.EpochTimeEncoder,
+		EncodeDuration: zapcore.SecondsDurationEncoder,
+		EncodeCaller:   zapcore.ShortCallerEncoder,
+	}
 
 	logger := zap.New(zapcore.NewCore(
-		zapcore.NewJSONEncoder(encoderCfg),
+		zapcore.NewConsoleEncoder(encoderCfg),
 		zapcore.Lock(os.Stdout),
 		atom,
 	))
