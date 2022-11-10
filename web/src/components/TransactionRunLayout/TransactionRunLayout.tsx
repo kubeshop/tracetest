@@ -1,6 +1,7 @@
 import {useNavigate} from 'react-router-dom';
 import TransactionHeader from 'components/TransactionHeader';
-import {TTransaction, TTransactionRun} from 'types/Transaction.types';
+import {TTransaction} from 'types/Transaction.types';
+import {TTransactionRun} from 'types/TransactionRun.types';
 import * as S from './TransactionRunLayout.styled';
 import EditTransaction from '../EditTransaction';
 import TransactionRunResult from '../TransactionRunResult/TransactionRunResult';
@@ -24,7 +25,7 @@ const TransactionRunDetailLayout = ({transaction, transaction: {id: transactionI
           <S.SectionRight>
             <TransactionRunResult transactionRun={transactionRun} />
           </S.SectionRight>
-      </S.Container>
+        </S.Container>
       </S.Wrapper>
     </>
   );

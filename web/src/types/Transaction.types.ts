@@ -2,7 +2,6 @@ import {CaseReducer, PayloadAction} from '@reduxjs/toolkit';
 import {FormInstance} from 'antd';
 
 import {Model, TTransactionsSchemas} from './Common.types';
-import {TEnvironment, TRawEnvironment} from './Environment.types';
 import {ICreateTestStep} from './Plugins.types';
 import {TTrigger} from './Test.types';
 
@@ -30,19 +29,6 @@ export type TRawTransactionTestResult = {
 };
 
 export type TTransactionTestResult = Model<TRawTransactionTestResult, {}>;
-
-export type TRawTransactionRun = {
-  id?: string;
-  environment?: TRawEnvironment;
-  results?: TTransactionTestResult[];
-};
-
-export type TTransactionRun = Model<
-  TRawTransactionRun,
-  {
-    environment: TEnvironment;
-  }
->;
 
 export type TDraftTransaction = {
   steps?: string[];

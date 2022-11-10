@@ -1,12 +1,14 @@
 import {Tag} from 'antd';
-import {TTransactionTestResult} from 'types/Transaction.types';
+import {TestState} from 'constants/TestRun.constants';
+import {TTest} from 'types/Test.types';
+import {TTestRun, TTestRunState} from 'types/TestRun.types';
 import * as S from './TransactionRunResult.styled';
 
-const iconBasedOnResult = (result: 'success' | 'fail' | 'running', index: number) => {
+const iconBasedOnResult = (result: TTestRunState, index: number) => {
   switch (result) {
-    case 'success':
+    case TestState.FINISHED:
       return <S.IconSuccess />;
-    case 'fail':
+    case TestState.FAILED:
       return <S.IconSuccess />;
     default:
       return index + 1;
@@ -14,16 +16,17 @@ const iconBasedOnResult = (result: 'success' | 'fail' | 'running', index: number
 };
 
 interface IProps {
-  executionStepResult: TTransactionTestResult;
   index: number;
+  test: TTest;
+  testRun: TTestRun;
 }
 
-const ExecutionStep = ({executionStepResult: {name, id, result, version, trigger}, index}: IProps) => {
+const ExecutionStep = ({index, test: {name, trigger}, testRun: {id, state, testVersion}}: IProps) => {
   return (
     <S.Container data-cy={`run-card-${name}`} key={id}>
-      <div>{iconBasedOnResult(result, index)}</div>
+      <div>{iconBasedOnResult(state, index)}</div>
       <S.Info>
-        <S.Title>{`${name} v${version}`}</S.Title>
+        <S.Title>{`${name} v${testVersion}`}</S.Title>
         <S.TagContainer>
           {[trigger.method, trigger.type].map(d => (
             <Tag key={d}>{d}</Tag>

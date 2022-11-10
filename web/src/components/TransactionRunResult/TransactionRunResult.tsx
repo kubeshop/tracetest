@@ -1,4 +1,4 @@
-import {TTransactionRun} from 'types/Transaction.types';
+import {TTransactionRun} from 'types/TransactionRun.types';
 import ExecutionStep from './ExecutionStep';
 import * as S from './TransactionRunResult.styled';
 import Variable from './Variable';
@@ -7,20 +7,15 @@ interface IProps {
   transactionRun: TTransactionRun;
 }
 
-const TransactionRunResult = ({
-  transactionRun: {
-    environment: {values},
-    results,
-  },
-}: IProps) => {
+const TransactionRunResult = ({transactionRun: {steps, stepRuns, environment}}: IProps) => {
   return (
     <>
       <S.Title>Execution Steps</S.Title>
-      {results.map((executionStepResult, index) => {
-        return <ExecutionStep executionStepResult={executionStepResult} index={index} key={executionStepResult.id} />;
+      {stepRuns.map((stepRun, index) => {
+        return <ExecutionStep index={index} key={stepRun.id} test={steps[index]} testRun={stepRun} />;
       })}
       <S.Title>Variables</S.Title>
-      {values.map(value => (
+      {environment?.values?.map(value => (
         <Variable key={value.key} value={value} />
       ))}
     </>

@@ -1,9 +1,8 @@
 import {HTTP_METHOD} from 'constants/Common.constants';
 import {TracetestApiTags} from 'constants/Test.constants';
 import Transaction from 'models/Transaction.model';
-import Environment from 'models/Environment.model';
 import {TTestApiEndpointBuilder} from 'types/Test.types';
-import {TDraftTransaction, TRawTransaction, TTransaction, TTransactionRun} from 'types/Transaction.types';
+import {TDraftTransaction, TRawTransaction, TTransaction} from 'types/Transaction.types';
 
 const TransactionEndpoint = (builder: TTestApiEndpointBuilder) => ({
   createTransaction: builder.mutation<TTransaction, TDraftTransaction>({
@@ -32,30 +31,6 @@ const TransactionEndpoint = (builder: TTestApiEndpointBuilder) => ({
       {type: TracetestApiTags.TRANSACTION, id: 'LIST'},
       {type: TracetestApiTags.RESOURCE, id: 'LIST'},
     ],
-  }),
-  getTransactionRunById: builder.query<TTransactionRun, {transactionId: string; runId?: string}>({
-    query: () => `/tests`,
-    providesTags: result => [{type: TracetestApiTags.TRANSACTION, id: result?.id}],
-    transformResponse: () => ({
-      id: '1',
-      transactionVersion: 1,
-      results: [],
-      environment: Environment({
-        name: 'mock',
-        id: '1',
-        description: 'mock',
-        values: [
-          {
-            key: 'HOST',
-            value: 'http://localhost',
-          },
-          {
-            key: 'PORT',
-            value: '3000',
-          },
-        ],
-      }),
-    }),
   }),
   getTransactionById: builder.query<TTransaction, {transactionId: string}>({
     query: ({transactionId}) => `/transactions/${transactionId}`,

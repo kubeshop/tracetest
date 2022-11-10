@@ -3,13 +3,8 @@ import {TracetestApiTags} from 'constants/Test.constants';
 import {PaginationResponse} from 'hooks/usePagination';
 import TransactionRun from 'models/TransactionRun.model';
 import {/* TRawTest, */ TTestApiEndpointBuilder} from 'types/Test.types';
-import {TRawTransactionRun, TTransactionRun} from 'types/TransactionRun.types';
-// import {TRawTestRun} from '../../../types/TestRun.types';
-// import {TRawEnvironment} from '../../../types/Environment.types';
-
-function getTotalCountFromHeaders(meta: any) {
-  return Number(meta?.response?.headers.get('x-total-count') || 0);
-}
+import {/* TRawTransactionRun, */ TTransactionRun} from 'types/TransactionRun.types';
+// import {getTotalCountFromHeaders} from 'utils/Common';
 
 const TransactionRunEndpoint = (builder: TTestApiEndpointBuilder) => ({
   getTransactionRuns: builder.query<
@@ -17,7 +12,7 @@ const TransactionRunEndpoint = (builder: TTestApiEndpointBuilder) => ({
     {transactionId: string; take?: number; skip?: number}
   >({
     // query: ({transactionId, take = 25, skip = 0}) => `/transactions/${transactionId}/run?take=${take}&skip=${skip}`,
-    query: ({transactionId, take = 25, skip = 0}) => `/tests`,
+    query: () => `/tests`,
     providesTags: (result, error, {transactionId}) => [
       {type: TracetestApiTags.TRANSACTION_RUN, id: `${transactionId}-LIST`},
     ],
@@ -25,7 +20,7 @@ const TransactionRunEndpoint = (builder: TTestApiEndpointBuilder) => ({
       total: getTotalCountFromHeaders(meta),
       items: rawTransactionRuns.map(rawTransactionRun => TransactionRun(rawTransactionRun)),
     }), */
-    transformResponse: (rawTransactionRuns: TRawTransactionRun[], meta) => {
+    transformResponse: () => {
       const rawItem = {
         id: '1',
         createdAt: '2022-11-09T17:38:46.165444Z',
@@ -33,13 +28,45 @@ const TransactionRunEndpoint = (builder: TTestApiEndpointBuilder) => ({
         state: 'CREATED' as const,
         steps: [],
         stepRuns: [],
-        // environment?: TRawEnvironment;
-        // metadata?: {[key: string]: string};
       };
       return {
         total: 1,
         items: [TransactionRun(rawItem)],
       };
+    },
+  }),
+
+  getTransactionRunById: builder.query<TTransactionRun, {transactionId: string; runId: string}>({
+    // query: ({transactionId, runId}) => `/transactions/${transactionId}/run/${runId}`,
+    query: () => `/tests`,
+    providesTags: result => [{type: TracetestApiTags.TRANSACTION_RUN, id: result?.id}],
+    /* transformResponse: (rawTransactionRun: TRawTransactionRun) => TransactionRun(rawTransactionRun), */
+    transformResponse: () => {
+      const rawItem = {
+        id: '1',
+        createdAt: '2022-11-09T17:38:46.165444Z',
+        completedAt: '2022-11-09T17:38:46.165444Z',
+        state: 'CREATED' as const,
+        steps: [],
+        stepRuns: [],
+        environment: {
+          name: 'mock',
+          id: '1',
+          description: 'mock',
+          values: [
+            {
+              key: 'HOST',
+              value: 'http://localhost',
+            },
+            {
+              key: 'PORT',
+              value: '3000',
+            },
+          ],
+        },
+      };
+
+      return TransactionRun(rawItem);
     },
   }),
 
