@@ -15,7 +15,7 @@ import (
 )
 
 type TracePoller interface {
-	Poll(context.Context, model.Test, model.Run)
+	Poll(context.Context, model.Test, model.Run, chan RunResult)
 }
 
 type PersistentTracePoller interface {
@@ -65,10 +65,11 @@ type tracePoller struct {
 }
 
 type PollingRequest struct {
-	ctx   context.Context
-	test  model.Test
-	run   model.Run
-	count int
+	ctx     context.Context
+	test    model.Test
+	run     model.Run
+	channel chan RunResult
+	count   int
 }
 
 func (tp tracePoller) handleDBError(err error) {
@@ -105,11 +106,12 @@ func (tp tracePoller) Stop() {
 	tp.exit <- true
 }
 
-func (tp tracePoller) Poll(ctx context.Context, test model.Test, run model.Run) {
+func (tp tracePoller) Poll(ctx context.Context, test model.Test, run model.Run, resultChannel chan RunResult) {
 	tp.enqueueJob(PollingRequest{
-		ctx:  ctx,
-		test: test,
-		run:  run,
+		ctx:     ctx,
+		test:    test,
+		run:     run,
+		channel: resultChannel,
 	})
 }
 
@@ -136,6 +138,11 @@ func (tp tracePoller) processJob(job PollingRequest) {
 	err = tp.runAssertions(job.ctx, job.test, run)
 	if err != nil {
 		fmt.Printf("could not run assertions: %s\n", err.Error())
+	}
+
+	job.channel <- RunResult{
+		Run: run,
+		Err: err,
 	}
 }
 

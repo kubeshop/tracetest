@@ -283,7 +283,7 @@ func (c *controller) RunTest(ctx context.Context, testID string, runInformation 
 		return handleDBError(err), err
 	}
 
-	run := c.runner.Run(ctx, test, metadata, environment)
+	run, _ := c.runner.Run(ctx, test, metadata, environment)
 
 	return openapi.Response(200, c.mappers.Out.Run(&run)), nil
 }

@@ -17,7 +17,7 @@ type simpleTestRunner struct {
 	db model.Repository
 }
 
-func (r simpleTestRunner) Run(ctx context.Context, test model.Test, metadata model.RunMetadata, env model.Environment) model.Run {
+func (r simpleTestRunner) Run(ctx context.Context, test model.Test, metadata model.RunMetadata, env model.Environment) (model.Run, chan executor.RunResult) {
 	run := model.NewRun()
 	run.State = model.RunStateCreated
 	newRun, err := r.db.CreateRun(ctx, test, run)
@@ -25,17 +25,20 @@ func (r simpleTestRunner) Run(ctx context.Context, test model.Test, metadata mod
 		panic(err)
 	}
 
+	channel := make(chan executor.RunResult, 1)
+
 	go func() {
 		time.Sleep(2 * time.Second) // simulate some real work
 
 		newRun.State = model.RunStateFinished
 		err = r.db.UpdateRun(ctx, newRun)
-		if err != nil {
-			panic(err)
+		channel <- executor.RunResult{
+			Run: newRun,
+			Err: err,
 		}
 	}()
 
-	return newRun
+	return newRun, channel
 }
 
 func TestTransactionRunner(t *testing.T) {

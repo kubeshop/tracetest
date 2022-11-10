@@ -108,10 +108,11 @@ func (r persistentTransactionRunner) runTransactionStep(ctx context.Context, tra
 		return model.TransactionRun{}, fmt.Errorf("could not load transaction step: %w", err)
 	}
 
-	testRun := r.testRunner.Run(ctx, test, transactionRun.Metadata, environment)
-	testRun, err = r.waitTestRunIsFinished(ctx, testRun)
+	_, completedTestChannel := r.testRunner.Run(ctx, test, transactionRun.Metadata, environment)
+	runResult := <-completedTestChannel
+	testRun, err := runResult.Run, runResult.Err
 	if err != nil {
-		return model.TransactionRun{}, fmt.Errorf("could not wait for step execution: %w", err)
+		return model.TransactionRun{}, fmt.Errorf("could not run step: %w", err)
 	}
 
 	stepRun := model.TransactionStepRun{ID: testRun.ID, TestID: testRun.TestID, State: testRun.State}
@@ -130,21 +131,6 @@ func (r persistentTransactionRunner) runTransactionStep(ctx context.Context, tra
 	}
 
 	return transactionRun, nil
-}
-
-func (r persistentTransactionRunner) waitTestRunIsFinished(ctx context.Context, testRun model.Run) (model.Run, error) {
-	ticker := time.NewTicker(r.checkTestStateDelay)
-	var err error
-	for !testRun.State.IsFinal() {
-		<-ticker.C
-
-		testRun, err = r.db.GetRun(ctx, testRun.TestID, testRun.ID)
-		if err != nil {
-			return model.Run{}, err
-		}
-	}
-
-	return testRun, nil
 }
 
 func (r persistentTransactionRunner) patchEnvironment(baseEnvironment model.Environment, run model.TransactionRun) model.Environment {
