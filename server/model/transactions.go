@@ -19,7 +19,7 @@ type (
 
 	TransactionRunState string
 
-	transactionStep struct {
+	TransactionStep struct {
 		ID   id.ID
 		Name string
 	}
@@ -43,7 +43,7 @@ type (
 
 		// trigger params
 		State       TransactionRunState
-		Steps       []transactionStep
+		Steps       []TransactionStep
 		StepRuns    []TransactionStepRun
 		CurrentTest int
 
@@ -73,10 +73,10 @@ func (t Transaction) HasID() bool {
 }
 
 func NewTransactionRun(transaction Transaction) TransactionRun {
-	testIds := make([]transactionStep, 0, len(transaction.Steps))
+	testIds := make([]TransactionStep, 0, len(transaction.Steps))
 
 	for _, test := range transaction.Steps {
-		testIds = append(testIds, transactionStep{ID: test.ID, Name: test.Name})
+		testIds = append(testIds, TransactionStep{ID: test.ID, Name: test.Name})
 	}
 
 	return TransactionRun{
