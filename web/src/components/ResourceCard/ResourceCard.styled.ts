@@ -121,6 +121,12 @@ export const RunsContainer = styled.div`
   padding: 0 24px 15px 64px;
 `;
 
+export const RunsListContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`;
+
 export const TestContainer = styled.div`
   cursor: pointer;
   display: grid;

@@ -7,6 +7,7 @@ import ResourceEndpoint from './endpoints/Resource.endpoint';
 import TestEndpoint from './endpoints/Test.endpoint';
 import TestRunEndpoint from './endpoints/TestRun.endpoints';
 import TransactionEndpoint from './endpoints/Transaction.endpoint';
+import TransactionRunEndpoint from './endpoints/TransactionRun.endpoint';
 
 const PATH = `${document.baseURI}api/`;
 
@@ -19,6 +20,7 @@ const TraceTestAPI = createApi({
   endpoints(builder: TTestApiEndpointBuilder) {
     return {
       ...TransactionEndpoint(builder),
+      ...TransactionRunEndpoint(builder),
       ...TestRunEndpoint(builder),
       ...TestEndpoint(builder),
       ...EnvironmentEndpoint(builder),
@@ -58,6 +60,9 @@ export const {
   useGetTransactionRunByIdQuery,
   useDeleteTransactionByIdMutation,
   useEditTransactionMutation,
+  useGetTransactionRunsQuery,
+  useLazyGetTransactionRunsQuery,
+  useDeleteTransactionRunByIdMutation,
   useParseExpressionMutation,
   useSetTestOutputsMutation,
   useGetResourcesQuery,

@@ -1,11 +1,11 @@
 import {DownOutlined, RightOutlined} from '@ant-design/icons';
 import {useMemo} from 'react';
 
-import {useLazyGetRunListQuery} from 'redux/apis/TraceTest.api';
+import TransactionRunCard from 'components/RunCard/TransactionRunCard';
+import {useLazyGetTransactionRunsQuery} from 'redux/apis/TraceTest.api';
 import {ResourceType} from 'types/Resource.type';
-import {TTestRun} from 'types/TestRun.types';
+import {TTransactionRun} from 'types/TransactionRun.types';
 import {TTransaction} from 'types/Transaction.types';
-import ResultCardList from '../RunCardList/RunCardList';
 import * as S from './ResourceCard.styled';
 import ResourceCardActions from './ResourceCardActions';
 import ResourceCardRuns from './ResourceCardRuns';
@@ -20,9 +20,9 @@ interface IProps {
 }
 
 const TransactionCard = ({onDelete, onRun, onViewAll, transaction}: IProps) => {
-  const queryParams = useMemo(() => ({take: 5, testId: transaction.id}), [transaction.id]);
-  const {isCollapsed, isLoading, list, onClick} = useRuns<TTestRun, {testId: string}>(
-    useLazyGetRunListQuery,
+  const queryParams = useMemo(() => ({take: 5, transactionId: transaction.id}), [transaction.id]);
+  const {isCollapsed, isLoading, list, onClick} = useRuns<TTransactionRun, {transactionId: string}>(
+    useLazyGetTransactionRunsQuery,
     queryParams
   );
 
@@ -66,7 +66,16 @@ const TransactionCard = ({onDelete, onRun, onViewAll, transaction}: IProps) => {
         isLoading={isLoading}
         onViewAll={() => onViewAll(transaction.id, ResourceType.Test)}
       >
-        <ResultCardList testId={transaction.id} resultList={list} />
+        <S.RunsListContainer>
+          {list.map(run => (
+            <TransactionRunCard
+              key={run.id}
+              linkTo={`/transaction/${transaction.id}/run/${run.id}`}
+              run={run}
+              transactionId={transaction.id}
+            />
+          ))}
+        </S.RunsListContainer>
       </ResourceCardRuns>
     </S.Container>
   );

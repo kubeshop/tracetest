@@ -25,14 +25,12 @@ const useDeleteResource = () => {
     [deleteTestMutation, deleteTransactionMutation, navigate]
   );
 
-  const onDelete = useCallback(
+  return useCallback(
     (id: string, name: string, type: ResourceType) => {
       onOpen(`Are you sure you want to delete “${name}”?`, () => onConfirmDelete(id, type));
     },
     [onConfirmDelete, onOpen]
   );
-
-  return onDelete;
 };
 
 export default useDeleteResource;

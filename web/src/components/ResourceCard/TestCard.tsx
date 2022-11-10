@@ -1,11 +1,11 @@
 import {DownOutlined, RightOutlined} from '@ant-design/icons';
 import {useMemo} from 'react';
 
+import TestRunCard from 'components/RunCard/TestRunCard';
 import {useLazyGetRunListQuery} from 'redux/apis/TraceTest.api';
 import {ResourceType} from 'types/Resource.type';
 import {TTest} from 'types/Test.types';
 import {TTestRun} from 'types/TestRun.types';
-import ResultCardList from '../RunCardList/RunCardList';
 import * as S from './ResourceCard.styled';
 import ResourceCardActions from './ResourceCardActions';
 import ResourceCardRuns from './ResourceCardRuns';
@@ -65,7 +65,11 @@ const TestCard = ({onDelete, onRun, onViewAll, test}: IProps) => {
         isLoading={isLoading}
         onViewAll={() => onViewAll(test.id, ResourceType.Test)}
       >
-        <ResultCardList testId={test.id} resultList={list} />
+        <S.RunsListContainer data-cy="run-card-list">
+          {list.map(run => (
+            <TestRunCard key={run.id} linkTo={`/test/${test.id}/run/${run.id}`} run={run} testId={test.id} />
+          ))}
+        </S.RunsListContainer>
       </ResourceCardRuns>
     </S.Container>
   );

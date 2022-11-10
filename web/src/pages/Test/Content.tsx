@@ -4,7 +4,7 @@ import {useNavigate} from 'react-router-dom';
 
 import {Steps} from 'components/GuidedTour/testDetailsStepList';
 import PaginatedList from 'components/PaginatedList';
-import RunCard from 'components/RunCard';
+import TestRunCard from 'components/RunCard/TestRunCard';
 import TestHeader from 'components/TestHeader';
 import useDeleteResource from 'hooks/useDeleteResource';
 import useTestCrud from 'providers/Test/hooks/useTestCrud';
@@ -55,7 +55,9 @@ const Content = () => {
 
       <PaginatedList<TTestRun, {testId: string}>
         dataCy="run-card-list"
-        itemComponent={({item}) => <RunCard linkTo={`/test/${test.id}/run/${item.id}`} run={item} testId={test.id} />}
+        itemComponent={({item}) => (
+          <TestRunCard linkTo={`/test/${test.id}/run/${item.id}`} run={item} testId={test.id} />
+        )}
         params={params}
         query={useGetRunListQuery}
       />
