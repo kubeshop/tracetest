@@ -22,10 +22,6 @@ export interface paths {
     /** delete a transaction */
     delete: operations["deleteTransaction"];
   };
-  "/transactions/{transactionId}/run": {
-    /** run a particular transaction */
-    post: operations["runTransaction"];
-  };
   "/tests": {
     /** get tests */
     get: operations["getTests"];
@@ -111,10 +107,6 @@ export interface paths {
   "/expressions/resolve": {
     /** resolves an expression and returns the result string */
     post: operations["ExpressionResolve"];
-  };
-  "/resources": {
-    /** get resources */
-    get: operations["getResources"];
   };
 }
 
@@ -241,27 +233,6 @@ export interface operations {
     responses: {
       /** OK */
       204: never;
-    };
-  };
-  /** run a particular transaction */
-  runTransaction: {
-    parameters: {
-      path: {
-        transactionId: string;
-      };
-    };
-    responses: {
-      /** successful operation */
-      200: {
-        content: {
-          "application/json": external["tests.yaml"]["components"]["schemas"]["TestRun"];
-        };
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": external["tests.yaml"]["components"]["schemas"]["RunInformation"];
-      };
     };
   };
   /** get tests */
@@ -405,7 +376,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": external["tests.yaml"]["components"]["schemas"]["RunInformation"];
+        "application/json": external["tests.yaml"]["components"]["schemas"]["TestRunInformation"];
       };
     };
   };
@@ -748,35 +719,6 @@ export interface operations {
       };
     };
   };
-  /** get resources */
-  getResources: {
-    parameters: {
-      query: {
-        /** indicates how many transactions can be returned by each page */
-        take?: number;
-        /** indicates how many transactions will be skipped when paginating */
-        skip?: number;
-        /** query to search transactions, based on transaction name and description */
-        query?: string;
-        /** indicates the sort field for the transactions */
-        sortBy?: "created" | "name" | "last_run";
-        /** indicates the sort direction for the transactions */
-        sortDirection?: "asc" | "desc";
-      };
-    };
-    responses: {
-      /** successful operation */
-      200: {
-        headers: {
-          /** Total records count */
-          "X-Total-Count"?: number;
-        };
-        content: {
-          "application/json": external["resources.yaml"]["components"]["schemas"]["Resource"][];
-        };
-      };
-    };
-  };
 }
 
 export interface external {
@@ -795,7 +737,7 @@ export interface external {
           url?: string;
         };
         TextDefinition: {
-          runInformation?: external["tests.yaml"]["components"]["schemas"]["RunInformation"];
+          runInformation?: external["tests.yaml"]["components"]["schemas"]["TestRunInformation"];
           content?: string;
         };
       };
@@ -926,18 +868,6 @@ export interface external {
     };
     operations: {};
   };
-  "resources.yaml": {
-    paths: {};
-    components: {
-      schemas: {
-        Resource: {
-          type: string;
-          item: unknown;
-        };
-      };
-    };
-    operations: {};
-  };
   "tests.yaml": {
     paths: {};
     components: {
@@ -948,8 +878,6 @@ export interface external {
           description?: string;
           /** @description version number of the test */
           version?: number;
-          /** Format: date-time */
-          createdAt?: string;
           serviceUnderTest?: external["triggers.yaml"]["components"]["schemas"]["Trigger"];
           /** @description specification of assertions that are going to be made */
           specs?: external["tests.yaml"]["components"]["schemas"]["TestSpecs"];
@@ -1024,7 +952,7 @@ export interface external {
           }[];
           metadata?: { [key: string]: string };
         };
-        RunInformation: {
+        TestRunInformation: {
           metadata?: { [key: string]: string } | null;
           environmentId?: string;
         };
@@ -1132,8 +1060,6 @@ export interface external {
           /** @description version number of the test */
           version?: number;
           steps?: string[];
-          /** Format: date-time */
-          createdAt?: string;
         };
       };
     };
