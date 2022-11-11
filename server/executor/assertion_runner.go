@@ -15,6 +15,7 @@ type AssertionRequest struct {
 	carrier propagation.MapCarrier
 	Test    model.Test
 	Run     model.Run
+	channel chan RunResult
 }
 
 func (r AssertionRequest) Context() context.Context {
@@ -74,7 +75,12 @@ func (e *defaultAssertionRunner) startWorker() {
 			return
 		case assertionRequest := <-e.inputChannel:
 			ctx := assertionRequest.Context()
-			err := e.runAssertionsAndUpdateResult(ctx, assertionRequest)
+			run, err := e.runAssertionsAndUpdateResult(ctx, assertionRequest)
+
+			assertionRequest.channel <- RunResult{
+				Run: run,
+				Err: err,
+			}
 			if err != nil {
 				fmt.Println(err.Error())
 			}
@@ -82,18 +88,18 @@ func (e *defaultAssertionRunner) startWorker() {
 	}
 }
 
-func (e *defaultAssertionRunner) runAssertionsAndUpdateResult(ctx context.Context, request AssertionRequest) error {
+func (e *defaultAssertionRunner) runAssertionsAndUpdateResult(ctx context.Context, request AssertionRequest) (model.Run, error) {
 	run, err := e.executeAssertions(ctx, request)
 	if err != nil {
-		return e.updater.Update(ctx, run.Failed(err))
+		return model.Run{}, e.updater.Update(ctx, run.Failed(err))
 	}
 
 	err = e.updater.Update(ctx, run)
 	if err != nil {
-		return fmt.Errorf("could not save result on database: %w", err)
+		return model.Run{}, fmt.Errorf("could not save result on database: %w", err)
 	}
 
-	return nil
+	return run, nil
 }
 
 func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, req AssertionRequest) (model.Run, error) {

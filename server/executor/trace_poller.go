@@ -135,7 +135,7 @@ func (tp tracePoller) processJob(job PollingRequest) {
 	fmt.Printf("completed polling result %d after %d times, number of spans: %d \n", job.run.ID, job.count, len(run.Trace.Flat))
 
 	tp.handleDBError(tp.updater.Update(job.ctx, run))
-	err = tp.runAssertions(job.ctx, job.test, run)
+	err = tp.runAssertions(job)
 	if err != nil {
 		fmt.Printf("could not run assertions: %s\n", err.Error())
 	}
@@ -146,13 +146,14 @@ func (tp tracePoller) processJob(job PollingRequest) {
 	}
 }
 
-func (tp tracePoller) runAssertions(ctx context.Context, test model.Test, run model.Run) error {
+func (tp tracePoller) runAssertions(job PollingRequest) error {
 	assertionRequest := AssertionRequest{
-		Test: test,
-		Run:  run,
+		Test:    job.test,
+		Run:     job.run,
+		channel: job.channel,
 	}
 
-	tp.assertionRunner.RunAssertions(ctx, assertionRequest)
+	tp.assertionRunner.RunAssertions(job.ctx, assertionRequest)
 
 	return nil
 }
