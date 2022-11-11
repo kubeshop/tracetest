@@ -22,6 +22,14 @@ type Config struct {
 	AnalyticsEnabled bool    `yaml:"analyticsEnabled"`
 }
 
+func (c Config) URL() string {
+	if c.Scheme == "" || c.Endpoint == "" {
+		return ""
+	}
+
+	return fmt.Sprintf("%s://%s", c.Scheme, strings.TrimSuffix(c.Endpoint, "/"))
+}
+
 func (c Config) IsEmpty() bool {
 	thisConfigJson, _ := json.Marshal(c)
 	emptyConfigJson, _ := json.Marshal(Config{})

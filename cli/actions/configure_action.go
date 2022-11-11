@@ -49,11 +49,7 @@ func (a configureAction) Run(ctx context.Context, args ConfigureConfig) error {
 	if args.SetValues.Endpoint != nil {
 		serverURL = *args.SetValues.Endpoint
 	} else {
-		existingURL := ""
-		if existingConfig.Scheme != "" && existingConfig.Endpoint != "" {
-			existingURL = fmt.Sprintf("%s://%s", existingConfig.Scheme, existingConfig.Endpoint)
-		}
-		serverURL = ui.TextInput("Enter your Tracetest server URL", existingURL)
+		serverURL = ui.TextInput("Enter your Tracetest server URL", existingConfig.URL())
 	}
 
 	if !strings.HasPrefix(serverURL, "http://") && !strings.HasPrefix(serverURL, "https://") {
@@ -74,7 +70,7 @@ func (a configureAction) Run(ctx context.Context, args ConfigureConfig) error {
 	}
 
 	scheme := urlParts[0]
-	endpoint := urlParts[1]
+	endpoint := strings.TrimSuffix(urlParts[1], "/")
 
 	config := config.Config{
 		Scheme:           scheme,

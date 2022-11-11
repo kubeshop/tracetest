@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/kubeshop/tracetest/cli/config"
@@ -67,7 +68,7 @@ func getAPIClient() *openapi.APIClient {
 	config := openapi.NewConfiguration()
 	config.AddDefaultHeader("x-client-id", analytics.ClientID())
 	config.Scheme = cliConfig.Scheme
-	config.Host = cliConfig.Endpoint
+	config.Host = strings.TrimSuffix(cliConfig.Endpoint, "/")
 	if cliConfig.ServerPath != nil {
 		config.Servers = []openapi.ServerConfiguration{
 			{
