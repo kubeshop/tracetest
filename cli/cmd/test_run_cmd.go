@@ -18,7 +18,7 @@ var testRunCmd = &cobra.Command{
 	Use:    "run",
 	Short:  "run a test",
 	Long:   "run a test using a definition or an id",
-	PreRun: setupCommand,
+	PreRun: setupCommand(),
 	Run: func(cmd *cobra.Command, args []string) {
 		analytics.Track("Test Run", "cmd", map[string]string{})
 

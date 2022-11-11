@@ -17,11 +17,37 @@ import (
 var cliConfig config.Config
 var cliLogger *zap.Logger
 
-func setupCommand(cmd *cobra.Command, args []string) {
-	setupOutputFormat()
-	setupLogger(cmd, args)
-	loadConfig(cmd, args)
-	analytics.Init(cliConfig)
+type setupConfig struct {
+	shouldValidateConfig bool
+}
+
+type setupOption func(*setupConfig)
+
+func SkipConfigValidation() setupOption {
+	return func(sc *setupConfig) {
+		sc.shouldValidateConfig = false
+	}
+}
+
+func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string) {
+	config := setupConfig{
+		shouldValidateConfig: true,
+	}
+	for _, option := range options {
+		option(&config)
+	}
+
+	return func(cmd *cobra.Command, args []string) {
+		setupOutputFormat()
+		setupLogger(cmd, args)
+		loadConfig(cmd, args)
+
+		if config.shouldValidateConfig {
+			validateConfig(cmd, args)
+		}
+
+		analytics.Init(cliConfig)
+	}
 }
 
 func setupOutputFormat() {
@@ -42,16 +68,38 @@ func loadConfig(cmd *cobra.Command, args []string) {
 	cliConfig = config
 }
 
+func validateConfig(cmd *cobra.Command, args []string) {
+	if cliConfig.IsEmpty() {
+		cliLogger.Warn("You haven't configured your CLI, some commands might fail!")
+		cliLogger.Warn("Run 'tracetest configure' to configure your CLI")
+	}
+}
+
 func setupLogger(cmd *cobra.Command, args []string) {
 	atom := zap.NewAtomicLevel()
 	if verbose {
 		atom.SetLevel(zap.DebugLevel)
+	} else {
+		atom.SetLevel(zap.WarnLevel)
 	}
 
-	encoderCfg := zap.NewProductionEncoderConfig()
+	encoderCfg := zapcore.EncoderConfig{
+		TimeKey:        zapcore.OmitKey,
+		LevelKey:       "level",
+		NameKey:        zapcore.OmitKey,
+		CallerKey:      zapcore.OmitKey,
+		FunctionKey:    zapcore.OmitKey,
+		MessageKey:     "message",
+		StacktraceKey:  zapcore.OmitKey,
+		LineEnding:     zapcore.DefaultLineEnding,
+		EncodeLevel:    zapcore.CapitalColorLevelEncoder,
+		EncodeTime:     zapcore.EpochTimeEncoder,
+		EncodeDuration: zapcore.SecondsDurationEncoder,
+		EncodeCaller:   zapcore.ShortCallerEncoder,
+	}
 
 	logger := zap.New(zapcore.NewCore(
-		zapcore.NewJSONEncoder(encoderCfg),
+		zapcore.NewConsoleEncoder(encoderCfg),
 		zapcore.Lock(os.Stdout),
 		atom,
 	))
