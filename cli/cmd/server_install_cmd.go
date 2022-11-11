@@ -14,7 +14,7 @@ var serverInstallCmd = &cobra.Command{
 	Use:    "install",
 	Short:  "install a new server",
 	Long:   "install a new server",
-	PreRun: setupCommand,
+	PreRun: setupCommand(SkipConfigValidation()),
 	Run: func(cmd *cobra.Command, args []string) {
 		installer.Force = force
 		analytics.Track("Server Install", "cmd", map[string]string{})

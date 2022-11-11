@@ -16,12 +16,37 @@ import (
 var cliConfig config.Config
 var cliLogger *zap.Logger
 
-func setupCommand(cmd *cobra.Command, args []string) {
-	setupOutputFormat()
-	setupLogger(cmd, args)
-	loadConfig(cmd, args)
-	validateConfig(cmd, args)
-	analytics.Init(cliConfig)
+type setupConfig struct {
+	shouldValidateConfig bool
+}
+
+type setupOption func(*setupConfig)
+
+func SkipConfigValidation() setupOption {
+	return func(sc *setupConfig) {
+		sc.shouldValidateConfig = false
+	}
+}
+
+func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string) {
+	config := setupConfig{
+		shouldValidateConfig: true,
+	}
+	for _, option := range options {
+		option(&config)
+	}
+
+	return func(cmd *cobra.Command, args []string) {
+		setupOutputFormat()
+		setupLogger(cmd, args)
+		loadConfig(cmd, args)
+
+		if config.shouldValidateConfig {
+			validateConfig(cmd, args)
+		}
+
+		analytics.Init(cliConfig)
+	}
 }
 
 func setupOutputFormat() {
