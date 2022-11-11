@@ -14,7 +14,6 @@ const TransactionMock: IMockFactory<TTransaction, TTransaction> = () => ({
       name: faker.name.firstName(),
       version: faker.datatype.number(),
       description: faker.company.catchPhraseDescriptor(),
-      createdAt: faker.date.recent().toString(),
       /* steps: [
         {...test, result: 'success'},
         {...test2, result: 'fail'},

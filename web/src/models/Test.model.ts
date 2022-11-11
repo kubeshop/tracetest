@@ -22,7 +22,6 @@ const Test = ({
   trigger: Trigger(rawTrigger || {}),
   summary: TestSummary(summary),
   outputs: outputs?.map(rawOutput => TestOutput(rawOutput)),
-  createdAt: Date.now().toString(),
 });
 
 export default Test;
