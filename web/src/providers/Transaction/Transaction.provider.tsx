@@ -2,13 +2,10 @@ import {noop} from 'lodash';
 import {createContext, ReactNode, useCallback, useContext, useMemo} from 'react';
 import {useNavigate} from 'react-router-dom';
 
-import {
-  useGetTransactionByIdQuery,
-  useDeleteTransactionByIdMutation,
-  useEditTransactionMutation,
-} from 'redux/apis/TraceTest.api';
+import {useGetTransactionByIdQuery} from 'redux/apis/TraceTest.api';
 import {TDraftTransaction, TTransaction} from 'types/Transaction.types';
 import {useConfirmationModal} from '../ConfirmationModal/ConfirmationModal.provider';
+import useTransactionCrud from './hooks/useTransactionCrud';
 
 interface IContext {
   isError: boolean;
@@ -41,19 +38,18 @@ export const useTransaction = () => useContext(Context);
 
 const TransactionProvider = ({children, transactionId}: IProps) => {
   const {data: transaction, isLoading, isError} = useGetTransactionByIdQuery({transactionId});
-  const [deleteTransaction] = useDeleteTransactionByIdMutation();
-  const [editTransaction, {isLoading: isEditLoading}] = useEditTransactionMutation();
+  const {deleteTransaction, runTransaction, isEditLoading, edit} = useTransactionCrud();
   const {onOpen} = useConfirmationModal();
   const navigate = useNavigate();
 
   const onRun = useCallback(() => {
-    console.log('onRun');
-  }, []);
+    runTransaction(transactionId);
+  }, [runTransaction, transactionId]);
 
   const onDelete = useCallback(
     (id: string, name: string) => {
       function onConfirmation() {
-        deleteTransaction({transactionId: id});
+        deleteTransaction(id);
         navigate('/');
       }
 
@@ -64,9 +60,9 @@ const TransactionProvider = ({children, transactionId}: IProps) => {
 
   const onEdit = useCallback(
     (draft: TDraftTransaction) => {
-      editTransaction({transactionId, transaction: draft});
+      edit(transaction!, draft);
     },
-    [editTransaction, transactionId]
+    [edit, transaction]
   );
 
   const value = useMemo<IContext>(

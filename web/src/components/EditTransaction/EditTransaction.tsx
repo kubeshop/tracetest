@@ -3,18 +3,22 @@ import {useCallback, useState} from 'react';
 import {TDraftTransaction, TTransaction} from 'types/Transaction.types';
 import {useTransaction} from 'providers/Transaction/Transaction.provider';
 import useValidateTransactionDraft from 'hooks/useValidateTransactionDraft';
+import {TTransactionRun} from 'types/TransactionRun.types';
+import {TestState} from 'constants/TestRun.constants';
 
 import * as S from './EditTransaction.styled';
 import EditTransactionForm from '../EditTransactionForm';
 
 interface IProps {
   transaction: TTransaction;
+  transactionRun: TTransactionRun;
 }
 
-const EditTransaction = ({transaction}: IProps) => {
+const EditTransaction = ({transaction, transactionRun}: IProps) => {
   const [form] = Form.useForm<TDraftTransaction>();
   const {onEdit, isEditLoading} = useTransaction();
   const [isFormValid, setIsFormValid] = useState(true);
+  const stateIsFinished = ([TestState.FINISHED, TestState.FAILED] as string[]).includes(transactionRun.state);
 
   const onChange = useValidateTransactionDraft({setIsValid: setIsFormValid});
 
@@ -37,7 +41,7 @@ const EditTransaction = ({transaction}: IProps) => {
           <Button
             data-cy="edit-transaction-submit"
             loading={isEditLoading}
-            disabled={!isFormValid}
+            disabled={!isFormValid || !stateIsFinished}
             type="primary"
             onClick={() => form.submit()}
           >
