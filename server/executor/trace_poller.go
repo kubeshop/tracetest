@@ -139,11 +139,6 @@ func (tp tracePoller) processJob(job PollingRequest) {
 	if err != nil {
 		fmt.Printf("could not run assertions: %s\n", err.Error())
 	}
-
-	job.channel <- RunResult{
-		Run: run,
-		Err: err,
-	}
 }
 
 func (tp tracePoller) runAssertions(job PollingRequest) error {

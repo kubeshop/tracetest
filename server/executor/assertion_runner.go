@@ -77,10 +77,22 @@ func (e *defaultAssertionRunner) startWorker() {
 			ctx := assertionRequest.Context()
 			run, err := e.runAssertionsAndUpdateResult(ctx, assertionRequest)
 
-			assertionRequest.channel <- RunResult{
-				Run: run,
-				Err: err,
+			// We cannot send the message using channel <- value
+			// directly because this makes the runner block until the message
+			// is read. As it is only important for transactions, and we
+			// know a transaction will always be listening for the update,
+			// messages should only be dropped when tests are being executed. And that's
+			// ok as test runs ignore the channel.
+			runResult := RunResult{Run: run, Err: err}
+			select {
+			case assertionRequest.channel <- runResult:
+				// message sent
+				fmt.Println("Results reported correctly")
+			default:
+				// message dropped
+				fmt.Println("Message dropped")
 			}
+
 			if err != nil {
 				fmt.Println(err.Error())
 			}
