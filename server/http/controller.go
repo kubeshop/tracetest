@@ -972,7 +972,7 @@ func takeResources(transactions []openapi.Transaction, tests []openapi.Test, tak
 			i++
 		} else {
 			items[currentNumberItens] = openapi.Resource{Type: "test", Item: &testInterface}
-			i++
+			j++
 		}
 
 		currentNumberItens++
