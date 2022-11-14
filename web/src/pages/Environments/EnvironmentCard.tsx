@@ -2,7 +2,7 @@ import {DownOutlined, RightOutlined} from '@ant-design/icons';
 import {Dropdown, Menu, Typography} from 'antd';
 import {useState} from 'react';
 
-import * as T from 'components/TestCard/TestCard.styled';
+import * as T from 'components/ResourceCard/ResourceCard.styled';
 import {TEnvironment} from 'types/Environment.types';
 import * as E from './Environment.styled';
 

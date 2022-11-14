@@ -62,7 +62,7 @@ Cypress.Commands.add('interceptEditTestCall', () => {
 });
 
 Cypress.Commands.add('inteceptHomeApiCall', () => {
-  cy.intercept({method: 'GET', url: '/api/tests?take=20&skip=0*'}).as('testList');
+  cy.intercept({method: 'GET', url: '/api/resources?take=20&skip=0*'}).as('testList');
   cy.intercept({method: 'DELETE', url: '/api/tests/**'}).as('testDelete');
   cy.intercept({method: 'POST', url: '/api/tests'}).as('testCreation');
 });

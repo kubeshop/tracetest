@@ -1,4 +1,4 @@
-import TestCardActions from 'components/TestCard/TestCardActions';
+import ResourceCardActions from 'components/ResourceCard/ResourceCardActions';
 import ExperimentalFeature from 'utils/ExperimentalFeature';
 import * as S from './TestHeader.styled';
 
@@ -20,7 +20,7 @@ const TestHeader = ({description, id, onBack, onDelete, title}: IProps) => (
       </div>
     </S.Section>
     <S.Section>
-      <TestCardActions testId={id} onDelete={onDelete} />
+      <ResourceCardActions id={id} onDelete={onDelete} />
     </S.Section>
   </S.Container>
 );

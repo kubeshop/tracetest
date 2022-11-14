@@ -3,18 +3,18 @@ import {useMemo} from 'react';
 import {useNavigate} from 'react-router-dom';
 
 import PaginatedList from 'components/PaginatedList';
-import RunCard from 'components/RunCard';
+import TransactionRunCard from 'components/RunCard/TransactionRunCard';
 import TestHeader from 'components/TestHeader';
 import {useTransaction} from 'providers/Transaction/Transaction.provider';
-import {useGetRunListQuery} from 'redux/apis/TraceTest.api';
-import {TTestRun} from 'types/TestRun.types';
+import {useGetTransactionRunsQuery} from 'redux/apis/TraceTest.api';
+import {TTransactionRun} from 'types/TransactionRun.types';
 import ExperimentalFeature from 'utils/ExperimentalFeature';
 import * as S from './Transaction.styled';
 
 const Content = () => {
   const navigate = useNavigate();
   const {isLoadingRun, onDelete, onRun, transaction} = useTransaction();
-  const params = useMemo(() => ({testId: transaction.id}), [transaction.id]);
+  const params = useMemo(() => ({transactionId: transaction.id}), [transaction.id]);
 
   return (
     <S.Container $isWhite={!ExperimentalFeature.isEnabled('transactions')}>
@@ -33,12 +33,16 @@ const Content = () => {
         </Button>
       </S.ActionsContainer>
 
-      <PaginatedList<TTestRun, {testId: string}>
+      <PaginatedList<TTransactionRun, {transactionId: string}>
         itemComponent={({item}) => (
-          <RunCard linkTo={`/test/${transaction.id}/run/${item.id}`} run={item} testId="123" />
+          <TransactionRunCard
+            linkTo={`/transaction/${transaction.id}/run/${item.id}`}
+            run={item}
+            transactionId={transaction.id}
+          />
         )}
         params={params}
-        query={useGetRunListQuery}
+        query={useGetTransactionRunsQuery}
       />
     </S.Container>
   );

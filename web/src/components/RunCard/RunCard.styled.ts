@@ -1,6 +1,12 @@
-import {CheckCircleFilled, MinusCircleFilled} from '@ant-design/icons';
+import {CheckCircleFilled, MinusCircleFilled, MoreOutlined} from '@ant-design/icons';
 import {Typography} from 'antd';
 import styled from 'styled-components';
+
+export const ActionButton = styled(MoreOutlined)`
+  color: ${({theme}) => theme.color.textSecondary};
+  cursor: pointer;
+  font-size: ${({theme}) => theme.size.lg};
+`;
 
 export const Container = styled.div<{$isWhite?: boolean}>`
   align-items: center;

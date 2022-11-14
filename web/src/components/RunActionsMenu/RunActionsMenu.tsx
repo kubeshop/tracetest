@@ -1,7 +1,8 @@
 import {Dropdown, Menu} from 'antd';
-import useDeleteTestRun from 'hooks/useDeleteTestRun';
+import {useFileViewerModal} from 'components/FileViewerModal/FileViewerModal.provider';
+import useDeleteResourceRun from 'hooks/useDeleteResourceRun';
 import TestRunAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
-import {useFileViewerModal} from '../FileViewerModal/FileViewerModal.provider';
+import {ResourceType} from 'types/Resource.type';
 import * as S from './RunActionsMenu.styled';
 
 interface IProps {
@@ -14,7 +15,7 @@ interface IProps {
 const RunActionsMenu = ({resultId, testId, testVersion, isRunView = false}: IProps) => {
   const {loadJUnit, loadTestDefinitionYaml} = useFileViewerModal();
 
-  const onDelete = useDeleteTestRun({isRunView, testId});
+  const onDelete = useDeleteResourceRun({id: testId, isRunView, type: ResourceType.Test});
 
   return (
     <span className="ant-dropdown-link" onClick={e => e.stopPropagation()} style={{textAlign: 'right'}}>

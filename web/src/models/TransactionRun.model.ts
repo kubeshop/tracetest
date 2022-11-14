@@ -1,12 +1,27 @@
-import {TRawTransactionRun, TTransactionRun} from 'types/Transaction.types';
-import TransactionRunResult from './TransactionRunResult';
+import {TRawTransactionRun, TTransactionRun} from 'types/TransactionRun.types';
 import Environment from './Environment.model';
+import Test from './Test.model';
+import TestRun from './TestRun.model';
 
-const TransactionRunModel = ({id = '', environment = {}, results = []}: TRawTransactionRun): TTransactionRun => {
+const TransactionRunModel = ({
+  id = '',
+  createdAt = '',
+  completedAt = '',
+  state = 'CREATED',
+  steps = [],
+  stepRuns = [],
+  environment = {},
+  metadata = {},
+}: TRawTransactionRun): TTransactionRun => {
   return {
     id,
+    createdAt,
+    completedAt,
+    state,
+    steps: steps.map(step => Test(step)),
+    stepRuns: stepRuns.map(stepRun => TestRun(stepRun)),
     environment: Environment(environment),
-    results: results.map(result => TransactionRunResult(result)),
+    metadata,
   };
 };
 
