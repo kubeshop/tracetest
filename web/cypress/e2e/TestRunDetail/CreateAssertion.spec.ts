@@ -25,7 +25,7 @@ describe('Create Assertion', () => {
 
     cy.get('[data-cy=add-assertion-form-add-check]').click();
 
-    cy.get('[data-cy=assertion-check-attribute] [contenteditable="true"]').last().type('type', {delay: 100});
+    cy.get('[data-cy=assertion-check-attribute] [contenteditable="true"]').last().type('tracetest.span', {delay: 100});
     cy.get(getAttributeListId(1)).click();
     cy.get(getValueFromList(1)).first().click();
 
