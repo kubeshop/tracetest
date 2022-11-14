@@ -93,6 +93,12 @@ func (c *ApiApiController) Routes() Routes {
 			c.DeleteTransaction,
 		},
 		{
+			"DeleteTransactionRun",
+			strings.ToUpper("Delete"),
+			"/api/transactions/{transactionId}/run/{runId}",
+			c.DeleteTransactionRun,
+		},
+		{
 			"DryRunAssertion",
 			strings.ToUpper("Put"),
 			"/api/tests/{testId}/run/{runId}/dry-run",
@@ -195,6 +201,18 @@ func (c *ApiApiController) Routes() Routes {
 			c.GetTransaction,
 		},
 		{
+			"GetTransactionRun",
+			strings.ToUpper("Get"),
+			"/api/transactions/{transactionId}/run/{runId}",
+			c.GetTransactionRun,
+		},
+		{
+			"GetTransactionRuns",
+			strings.ToUpper("Get"),
+			"/api/transactions/{transactionId}/run",
+			c.GetTransactionRuns,
+		},
+		{
 			"GetTransactions",
 			strings.ToUpper("Get"),
 			"/api/transactions",
@@ -217,6 +235,12 @@ func (c *ApiApiController) Routes() Routes {
 			strings.ToUpper("Post"),
 			"/api/tests/{testId}/run",
 			c.RunTest,
+		},
+		{
+			"RunTransaction",
+			strings.ToUpper("Post"),
+			"/api/transactions/{transactionId}/run",
+			c.RunTransaction,
 		},
 		{
 			"SetTestOutputs",
@@ -379,6 +403,28 @@ func (c *ApiApiController) DeleteTransaction(w http.ResponseWriter, r *http.Requ
 	transactionIdParam := params["transactionId"]
 
 	result, err := c.service.DeleteTransaction(r.Context(), transactionIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// DeleteTransactionRun - Delete a specific run from a particular transaction
+func (c *ApiApiController) DeleteTransactionRun(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	transactionIdParam := params["transactionId"]
+
+	runIdParam, err := parseInt32Parameter(params["runId"], true)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+
+	result, err := c.service.DeleteTransactionRun(r.Context(), transactionIdParam, runIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -756,6 +802,44 @@ func (c *ApiApiController) GetTransaction(w http.ResponseWriter, r *http.Request
 
 }
 
+// GetTransactionRun - Get a specific run from a particular transaction
+func (c *ApiApiController) GetTransactionRun(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	transactionIdParam := params["transactionId"]
+
+	runIdParam, err := parseInt32Parameter(params["runId"], true)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+
+	result, err := c.service.GetTransactionRun(r.Context(), transactionIdParam, runIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// GetTransactionRuns - Get all runs from a particular transaction
+func (c *ApiApiController) GetTransactionRuns(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	transactionIdParam := params["transactionId"]
+
+	result, err := c.service.GetTransactionRuns(r.Context(), transactionIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
 // GetTransactions - Get transactions
 func (c *ApiApiController) GetTransactions(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
@@ -830,18 +914,45 @@ func (c *ApiApiController) RunTest(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	testIdParam := params["testId"]
 
-	testRunInformationParam := TestRunInformation{}
+	runInformationParam := RunInformation{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
-	if err := d.Decode(&testRunInformationParam); err != nil {
+	if err := d.Decode(&runInformationParam); err != nil {
 		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
 		return
 	}
-	if err := AssertTestRunInformationRequired(testRunInformationParam); err != nil {
+	if err := AssertRunInformationRequired(runInformationParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	result, err := c.service.RunTest(r.Context(), testIdParam, testRunInformationParam)
+	result, err := c.service.RunTest(r.Context(), testIdParam, runInformationParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// RunTransaction - run transaction
+func (c *ApiApiController) RunTransaction(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	transactionIdParam := params["transactionId"]
+
+	runInformationParam := RunInformation{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&runInformationParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertRunInformationRequired(runInformationParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.RunTransaction(r.Context(), transactionIdParam, runInformationParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

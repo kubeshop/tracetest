@@ -174,7 +174,7 @@ components:
           additionalProperties:
             type: string
 
-    TestRunInformation:
+    RunInformation:
       type: object
       properties:
         metadata:

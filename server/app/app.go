@@ -153,9 +153,13 @@ func (a *App) Start() error {
 	runner.Start(5) // worker count. should be configurable
 	defer runner.Stop()
 
+	transactionRunner := executor.NewTransactionRunner(runner, a.db, a.config)
+	transactionRunner.Start(5)
+	defer transactionRunner.Stop()
+
 	mappers := mappings.New(traceConversionConfig, comparator.DefaultRegistry(), a.db)
 
-	controller := httpServer.NewController(a.db, runner, assertionRunner, mappers)
+	controller := httpServer.NewController(a.db, runner, transactionRunner, assertionRunner, mappers)
 	apiApiController := openapi.NewApiApiController(controller)
 	customController := httpServer.NewCustomController(controller, apiApiController, openapi.DefaultErrorHandler, a.tracer)
 	httpRouter := customController

@@ -22,3 +22,39 @@ components:
         createdAt:
           type: string
           format: date-time
+
+    TransactionRun:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        createdAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+        state:
+          type: string
+          enum:
+            [
+              CREATED,
+              EXECUTING,
+              FINISHED,
+              FAILED,
+            ]
+        steps:
+          type: array
+          items:
+            $ref: "./tests.yaml#/components/schemas/Test"
+        stepRuns:
+          type: array
+          items:
+            $ref: "./tests.yaml#/components/schemas/TestRun"
+        environment:
+          $ref: "./environments.yaml#/components/schemas/Environment"
+        metadata:
+          type: object
+          additionalProperties:
+            type: string

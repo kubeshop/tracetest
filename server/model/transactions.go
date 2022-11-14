@@ -16,8 +16,76 @@ type (
 		Steps       []Test
 		Summary     Summary
 	}
+
+	TransactionRunState string
+
+	TransactionStep struct {
+		ID   id.ID
+		Name string
+	}
+
+	TransactionStepRun struct {
+		ID          int
+		TestID      id.ID
+		State       RunState
+		Environment Environment
+		Outputs     OrderedMap[string, string]
+	}
+
+	TransactionRun struct {
+		ID                 int
+		TransactionID      id.ID
+		TransactionVersion int
+
+		// Timestamps
+		CreatedAt   time.Time
+		CompletedAt time.Time
+
+		// trigger params
+		State       TransactionRunState
+		Steps       []TransactionStep
+		StepRuns    []TransactionStepRun
+		CurrentTest int
+
+		// result info
+		LastError error
+
+		Metadata RunMetadata
+
+		// environment
+		Environment Environment
+	}
 )
+
+const (
+	TransactionRunStateCreated   TransactionRunState = "CREATED"
+	TransactionRunStateExecuting TransactionRunState = "EXECUTING"
+	TransactionRunStateFailed    TransactionRunState = "FAILED"
+	TransactionRunStateFinished  TransactionRunState = "FINISHED"
+)
+
+func (rs TransactionRunState) IsFinal() bool {
+	return rs == TransactionRunStateFailed || rs == TransactionRunStateFinished
+}
 
 func (t Transaction) HasID() bool {
 	return t.ID != ""
+}
+
+func NewTransactionRun(transaction Transaction) TransactionRun {
+	testIds := make([]TransactionStep, 0, len(transaction.Steps))
+
+	for _, test := range transaction.Steps {
+		testIds = append(testIds, TransactionStep{ID: test.ID, Name: test.Name})
+	}
+
+	return TransactionRun{
+		TransactionID:      transaction.ID,
+		TransactionVersion: transaction.Version,
+		CreatedAt:          time.Now(),
+		State:              TransactionRunStateCreated,
+		Steps:              testIds,
+		StepRuns:           make([]TransactionStepRun, 0, len(transaction.Steps)),
+		CurrentTest:        0,
+	}
 }
