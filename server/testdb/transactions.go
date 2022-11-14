@@ -63,6 +63,19 @@ func (td *postgresDB) insertIntoTransactions(ctx context.Context, transaction mo
 }
 
 func (td *postgresDB) setTransactionSteps(ctx context.Context, tx *sql.Tx, transaction model.Transaction) (model.Transaction, error) {
+	// delete existing steps
+	stmt, err := tx.Prepare("DELETE FROM transaction_runs WHERE transaction_id = $1")
+	if err != nil {
+		tx.Rollback()
+		return model.Transaction{}, err
+	}
+
+	_, err = stmt.ExecContext(ctx, transaction.ID)
+	if err != nil {
+		tx.Rollback()
+		return model.Transaction{}, err
+	}
+
 	if len(transaction.Steps) == 0 {
 		return transaction, tx.Commit()
 	}
@@ -77,7 +90,7 @@ func (td *postgresDB) setTransactionSteps(ctx context.Context, tx *sql.Tx, trans
 	}
 
 	sql := "INSERT INTO transaction_steps VALUES " + strings.Join(values, ", ")
-	_, err := tx.ExecContext(ctx, sql)
+	_, err = tx.ExecContext(ctx, sql)
 	if err != nil {
 		tx.Rollback()
 		return model.Transaction{}, fmt.Errorf("cannot save transaction steps: %w", err)
