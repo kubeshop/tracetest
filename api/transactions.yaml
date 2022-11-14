@@ -22,6 +22,11 @@ components:
         createdAt:
           type: string
           format: date-time
+        summary:
+          $ref: "./tests.yaml#/components/schemas/TestSummary"
+          description: summary of transaction
+          readOnly: true
+
 
     TransactionRun:
       type: object
