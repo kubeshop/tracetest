@@ -128,6 +128,7 @@ func (r persistentRunner) Run(ctx context.Context, test model.Test, metadata mod
 		test:     test,
 		run:      run,
 		executor: executor,
+		channel:  channel,
 	}
 
 	return run, channel

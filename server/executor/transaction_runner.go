@@ -41,6 +41,8 @@ func (r persistentTransactionRunner) Run(ctx context.Context, transaction model.
 	run.Metadata = metadata
 	run.Environment = environment
 
+	ctx = getNewCtx(ctx)
+
 	run, _ = r.db.CreateTransactionRun(ctx, run)
 
 	r.executionChannel <- transactionRunJob{

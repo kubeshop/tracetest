@@ -882,7 +882,26 @@ func (c *controller) GetTransactionRun(ctx context.Context, transactionId string
 		return handleDBError(err), err
 	}
 
-	return openapi.Response(http.StatusOK, c.mappers.Out.TransactionRun(run)), nil
+	openapiRun := c.mappers.Out.TransactionRun(run)
+	for i, step := range run.Steps {
+		test, err := c.testDB.GetLatestTestVersion(ctx, id.ID(step.ID))
+		if err != nil {
+			return handleDBError(err), err
+		}
+
+		openapiRun.Steps[i] = c.mappers.Out.Test(test)
+	}
+
+	for i, stepRun := range run.StepRuns {
+		testRun, err := c.testDB.GetRun(ctx, stepRun.TestID, stepRun.ID)
+		if err != nil {
+			return handleDBError(err), err
+		}
+
+		openapiRun.StepRuns[i] = c.mappers.Out.Run(&testRun)
+	}
+
+	return openapi.Response(http.StatusOK, openapiRun), nil
 }
 
 func (c *controller) GetTransactionRuns(ctx context.Context, transactionId string) (openapi.ImplResponse, error) {
