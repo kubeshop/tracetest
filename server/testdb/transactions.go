@@ -148,8 +148,16 @@ const getTransactionSQL = `
 		t.version,
 		t.name,
 		t.description,
-		t.created_at
+		t.created_at,
+		(SELECT COUNT(*) FROM transaction_runs tr WHERE tr.transaction_id = t.id) as total_runs,
+		last_transaction_run.created_at as last_transaction_run_time
 	FROM transactions t
+	LEFT OUTER JOIN (
+		SELECT MAX(id) as id, transaction_id FROM transaction_runs GROUP BY transaction_id
+	) as ltr ON ltr.transaction_id = t.id
+	LEFT OUTER JOIN
+		transaction_runs last_transaction_run
+	ON last_transaction_run.transaction_id = ltr.transaction_id AND last_transaction_run.id = ltr.id
 `
 
 const transactionMaxVersionQuery = `
@@ -277,16 +285,23 @@ func (td *postgresDB) readTransactionRows(ctx context.Context, rows *sql.Rows) (
 func (td *postgresDB) readTransactionRow(ctx context.Context, row scanner) (model.Transaction, error) {
 	transaction := model.Transaction{}
 
+	var lastRunTime *time.Time
+
 	err := row.Scan(
 		&transaction.ID,
 		&transaction.Version,
 		&transaction.Name,
 		&transaction.Description,
 		&transaction.CreatedAt,
+		&transaction.Summary.Runs,
+		&lastRunTime,
 	)
 
 	switch err {
 	case nil:
+		if lastRunTime != nil {
+			transaction.Summary.LastRun.Time = *lastRunTime
+		}
 		return transaction, nil
 	case sql.ErrNoRows:
 		return model.Transaction{}, ErrNotFound
