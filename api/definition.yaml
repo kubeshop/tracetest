@@ -22,6 +22,6 @@ components:
       type: object
       properties:
         runInformation:
-          $ref: "./tests.yaml#/components/schemas/TestRunInformation"
+          $ref: "./tests.yaml#/components/schemas/RunInformation"
         content:
           type: string

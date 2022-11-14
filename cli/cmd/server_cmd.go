@@ -11,7 +11,7 @@ var serverCmd = &cobra.Command{
 	Use:    "server",
 	Short:  "Manage your tracetest server",
 	Long:   "Manage your tracetest server",
-	PreRun: setupCommand,
+	PreRun: setupCommand(),
 	Run: func(cmd *cobra.Command, args []string) {
 		analytics.Track("Server", "cmd", map[string]string{})
 		fmt.Println("Manage your server")

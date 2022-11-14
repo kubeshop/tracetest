@@ -25,7 +25,7 @@ function getIcon(state: TTestRun['state'], failedAssertions: number) {
   return <S.IconSuccess />;
 }
 
-const RunCard = ({
+const TestRunCard = ({
   run: {id: runId, executionTime, passedAssertionCount, failedAssertionCount, state, createdAt, testVersion, metadata},
   testId,
   linkTo,
@@ -90,4 +90,4 @@ const RunCard = ({
   );
 };
 
-export default RunCard;
+export default TestRunCard;

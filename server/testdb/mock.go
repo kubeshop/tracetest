@@ -16,6 +16,11 @@ type MockRepository struct {
 	T mock.TestingT
 }
 
+// CreateTransactionRun implements model.Repository
+func (*MockRepository) CreateTransactionRun(context.Context, model.TransactionRun) (model.TransactionRun, error) {
+	panic("unimplemented")
+}
+
 func (m *MockRepository) ServerID() (string, bool, error) {
 	args := m.Called()
 	return args.String(0), args.Bool(1), args.Error(2)
@@ -187,4 +192,28 @@ func (m *MockRepository) GetTransactions(_ context.Context, take, skip int32, qu
 		TotalCount: len(transactions),
 	}
 	return list, args.Error(1)
+}
+
+// DeleteTransactionRun implements model.Repository
+func (m *MockRepository) DeleteTransactionRun(ctx context.Context, run model.TransactionRun) error {
+	args := m.Called(ctx, run)
+	return args.Error(0)
+}
+
+// GetTransactionRun implements model.Repository
+func (m *MockRepository) GetTransactionRun(ctx context.Context, transactionID string, runID int) (model.TransactionRun, error) {
+	args := m.Called(ctx, transactionID, runID)
+	return args.Get(0).(model.TransactionRun), args.Error(1)
+}
+
+// GetTransactionsRuns implements model.Repository
+func (m *MockRepository) GetTransactionsRuns(ctx context.Context, transactionID string) ([]model.TransactionRun, error) {
+	args := m.Called(ctx, transactionID)
+	return args.Get(0).([]model.TransactionRun), args.Error(1)
+}
+
+// UpdateTransactionRun implements model.Repository
+func (m *MockRepository) UpdateTransactionRun(ctx context.Context, run model.TransactionRun) error {
+	args := m.Called(ctx, run)
+	return args.Error(0)
 }

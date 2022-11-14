@@ -22,7 +22,7 @@ var rootCmd = &cobra.Command{
 	Use:     "tracetest",
 	Short:   "tracetest CLI is a tool to interact with a tracetest server",
 	Long:    `tracetest CLI is a tool to interact with a tracetest server`,
-	PreRun:  setupCommand,
+	PreRun:  setupCommand(),
 	PostRun: teardownCommand,
 }
 

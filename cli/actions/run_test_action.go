@@ -96,7 +96,7 @@ func (a runTestAction) runDefinitionFile(ctx context.Context, f file.File, param
 		ExecuteDefinition(ctx).
 		TextDefinition(openapi.TextDefinition{
 			Content: openapi.PtrString(resolvedFile.Contents()),
-			RunInformation: &openapi.TestRunInformation{
+			RunInformation: &openapi.RunInformation{
 				Metadata: params.Metadata,
 			},
 		}).

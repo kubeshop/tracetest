@@ -4,13 +4,14 @@ import {useNavigate} from 'react-router-dom';
 
 import {Steps} from 'components/GuidedTour/testDetailsStepList';
 import PaginatedList from 'components/PaginatedList';
-import RunCard from 'components/RunCard';
+import TestRunCard from 'components/RunCard/TestRunCard';
 import TestHeader from 'components/TestHeader';
-import useDeleteTest from 'hooks/useDeleteTest';
+import useDeleteResource from 'hooks/useDeleteResource';
 import useTestCrud from 'providers/Test/hooks/useTestCrud';
 import {useTest} from 'providers/Test/Test.provider';
 import {useGetRunListQuery} from 'redux/apis/TraceTest.api';
 import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
+import {ResourceType} from 'types/Resource.type';
 import {TTestRun} from 'types/TestRun.types';
 import ExperimentalFeature from 'utils/ExperimentalFeature';
 import * as S from './Test.styled';
@@ -18,7 +19,7 @@ import * as S from './Test.styled';
 const Content = () => {
   const navigate = useNavigate();
   const {test} = useTest();
-  const onDelete = useDeleteTest();
+  const onDeleteResource = useDeleteResource();
   const {runTest, isLoadingRunTest} = useTestCrud();
   const params = useMemo(() => ({testId: test.id}), [test.id]);
 
@@ -34,7 +35,7 @@ const Content = () => {
         }`}
         id={test.id}
         onBack={() => navigate('/')}
-        onDelete={() => onDelete(test)}
+        onDelete={() => onDeleteResource(test.id, test.name, ResourceType.Test)}
         title={`${test.name} (v${test.version})`}
       />
 
@@ -54,7 +55,9 @@ const Content = () => {
 
       <PaginatedList<TTestRun, {testId: string}>
         dataCy="run-card-list"
-        itemComponent={({item}) => <RunCard linkTo={`/test/${test.id}/run/${item.id}`} run={item} testId={test.id} />}
+        itemComponent={({item}) => (
+          <TestRunCard linkTo={`/test/${test.id}/run/${item.id}`} run={item} testId={test.id} />
+        )}
         params={params}
         query={useGetRunListQuery}
       />

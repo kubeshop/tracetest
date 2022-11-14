@@ -25,23 +25,26 @@ import (
 var IDGen = id.NewRandGenerator()
 
 type controller struct {
-	testDB          model.Repository
-	runner          executor.Runner
-	assertionRunner executor.AssertionRunner
-	mappers         mappings.Mappings
+	testDB            model.Repository
+	runner            executor.Runner
+	transactionRunner executor.TransactionRunner
+	assertionRunner   executor.AssertionRunner
+	mappers           mappings.Mappings
 }
 
 func NewController(
 	testDB model.Repository,
 	runner executor.Runner,
+	transactionRunner executor.TransactionRunner,
 	assertionRunner executor.AssertionRunner,
 	mappers mappings.Mappings,
 ) openapi.ApiApiServicer {
 	return &controller{
-		testDB:          testDB,
-		runner:          runner,
-		assertionRunner: assertionRunner,
-		mappers:         mappers,
+		testDB:            testDB,
+		runner:            runner,
+		assertionRunner:   assertionRunner,
+		transactionRunner: transactionRunner,
+		mappers:           mappers,
 	}
 }
 
@@ -267,7 +270,7 @@ func (c *controller) RerunTestRun(ctx context.Context, testID, runID string) (op
 	return openapi.Response(http.StatusOK, c.mappers.Out.Run(&newTestRun)), nil
 }
 
-func (c *controller) RunTest(ctx context.Context, testID string, runInformation openapi.TestRunInformation) (openapi.ImplResponse, error) {
+func (c *controller) RunTest(ctx context.Context, testID string, runInformation openapi.RunInformation) (openapi.ImplResponse, error) {
 	test, err := c.testDB.GetLatestTestVersion(ctx, id.ID(testID))
 	if err != nil {
 		return handleDBError(err), err
@@ -280,7 +283,7 @@ func (c *controller) RunTest(ctx context.Context, testID string, runInformation 
 		return handleDBError(err), err
 	}
 
-	run := c.runner.Run(ctx, test, metadata, environment)
+	run, _ := c.runner.Run(ctx, test, metadata, environment)
 
 	return openapi.Response(200, c.mappers.Out.Run(&run)), nil
 }
@@ -571,7 +574,7 @@ func environment(ctx context.Context, testDB model.Repository, environmentId str
 	return model.Environment{}, nil
 }
 
-func (c *controller) executeTest(ctx context.Context, test model.Test, runInfo openapi.TestRunInformation) (openapi.ImplResponse, error) {
+func (c *controller) executeTest(ctx context.Context, test model.Test, runInfo openapi.RunInformation) (openapi.ImplResponse, error) {
 	// create or update test
 	testID := test.ID
 	resp, err := c.doCreateTest(ctx, test)
@@ -839,7 +842,62 @@ func (c *controller) UpdateTransaction(ctx context.Context, tID string, transact
 	return openapi.Response(http.StatusNoContent, nil), nil
 }
 
-// GetResources implements openapi.ApiApiServicer
+// RunTransaction implements openapi.ApiApiServicer
+func (c *controller) RunTransaction(ctx context.Context, transactionId string, runInformation openapi.RunInformation) (openapi.ImplResponse, error) {
+	transaction, err := c.testDB.GetLatestTransactionVersion(ctx, id.ID(transactionId))
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	metadata := metadata(runInformation.Metadata)
+	environment, err := environment(ctx, c.testDB, runInformation.EnvironmentId)
+
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	run := c.transactionRunner.Run(ctx, transaction, metadata, environment)
+
+	return openapi.Response(http.StatusOK, c.mappers.Out.TransactionRun(run)), nil
+}
+
+func (c *controller) GetTransactionRun(ctx context.Context, transactionId string, runId int32) (openapi.ImplResponse, error) {
+	run, err := c.testDB.GetTransactionRun(ctx, transactionId, int(runId))
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	return openapi.Response(http.StatusOK, c.mappers.Out.TransactionRun(run)), nil
+}
+
+func (c *controller) GetTransactionRuns(ctx context.Context, transactionId string) (openapi.ImplResponse, error) {
+	runs, err := c.testDB.GetTransactionsRuns(ctx, transactionId)
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	openapiRuns := make([]openapi.TransactionRun, 0, len(runs))
+	for _, run := range runs {
+		openapiRuns = append(openapiRuns, c.mappers.Out.TransactionRun(run))
+	}
+
+	return openapi.Response(http.StatusOK, openapiRuns), nil
+}
+
+func (c *controller) DeleteTransactionRun(ctx context.Context, transactionId string, runId int32) (openapi.ImplResponse, error) {
+	run, err := c.testDB.GetTransactionRun(ctx, transactionId, int(runId))
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	err = c.testDB.DeleteTransactionRun(ctx, run)
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	return openapi.Response(http.StatusNoContent, nil), nil
+}
+
 func (c *controller) GetResources(ctx context.Context, take, skip int32, query, sortBy, sortDirection string) (openapi.ImplResponse, error) {
 	// TODO: this is endpoint is a hack to unblock the team quickly.
 	// This is not production ready because it might take too long to respond if there are numerous

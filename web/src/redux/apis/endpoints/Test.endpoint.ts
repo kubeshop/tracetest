@@ -15,7 +15,10 @@ const TestEndpoint = (builder: TTestApiEndpointBuilder) => ({
       body: newTest,
     }),
     transformResponse: (rawTest: TRawTest) => Test(rawTest),
-    invalidatesTags: [{type: TracetestApiTags.TEST, id: 'LIST'}],
+    invalidatesTags: [
+      {type: TracetestApiTags.TEST, id: 'LIST'},
+      {type: TracetestApiTags.RESOURCE, id: 'LIST'},
+    ],
   }),
   editTest: builder.mutation<TTest, {test: TRawTest; testId: string}>({
     query: ({test, testId}) => ({
@@ -26,6 +29,7 @@ const TestEndpoint = (builder: TTestApiEndpointBuilder) => ({
     invalidatesTags: test => [
       {type: TracetestApiTags.TEST, id: 'LIST'},
       {type: TracetestApiTags.TEST, id: test?.id},
+      {type: TracetestApiTags.RESOURCE, id: 'LIST'},
     ],
   }),
   getTestList: builder.query<
@@ -55,7 +59,10 @@ const TestEndpoint = (builder: TTestApiEndpointBuilder) => ({
   }),
   deleteTestById: builder.mutation<TTest, {testId: string}>({
     query: ({testId}) => ({url: `/tests/${testId}`, method: 'DELETE'}),
-    invalidatesTags: [{type: TracetestApiTags.TEST, id: 'LIST'}],
+    invalidatesTags: [
+      {type: TracetestApiTags.TEST, id: 'LIST'},
+      {type: TracetestApiTags.RESOURCE, id: 'LIST'},
+    ],
   }),
   setTestDefinition: builder.mutation<string[], {testId: string; testDefinition: Partial<TRawTestSpecs>}>({
     query: ({testId, testDefinition}) => ({

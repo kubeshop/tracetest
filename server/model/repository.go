@@ -49,12 +49,21 @@ type TransactionRepository interface {
 	GetTransactions(_ context.Context, take, skip int32, query, sortBy, sortDirection string) (List[Transaction], error)
 }
 
+type TransactionRunRepository interface {
+	CreateTransactionRun(context.Context, TransactionRun) (TransactionRun, error)
+	UpdateTransactionRun(context.Context, TransactionRun) error
+	DeleteTransactionRun(context.Context, TransactionRun) error
+	GetTransactionRun(context.Context, string, int) (TransactionRun, error)
+	GetTransactionsRuns(context.Context, string) ([]TransactionRun, error)
+}
+
 type Repository interface {
 	TestRepository
 	RunRepository
 	EnvironmentRepository
 
 	TransactionRepository
+	TransactionRunRepository
 
 	ServerID() (id string, isNew bool, _ error)
 	Drop() error

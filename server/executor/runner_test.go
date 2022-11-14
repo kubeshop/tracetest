@@ -226,7 +226,7 @@ type mockTracePoller struct {
 	t *testing.T
 }
 
-func (m *mockTracePoller) Poll(_ context.Context, test model.Test, run model.Run) {
+func (m *mockTracePoller) Poll(_ context.Context, test model.Test, run model.Run, ch chan executor.RunResult) {
 	m.Called(test.ID)
 }
 

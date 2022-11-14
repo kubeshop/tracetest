@@ -73,6 +73,7 @@ export type TTest = Model<
     specs?: TTestSpecs;
     summary: TSummary;
     outputs?: TTestOutput[];
+    createdAt?: string;
   }
 >;
 

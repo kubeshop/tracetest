@@ -12,8 +12,13 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
+type RunResult struct {
+	Run model.Run
+	Err error
+}
+
 type Runner interface {
-	Run(context.Context, model.Test, model.RunMetadata, model.Environment) model.Run
+	Run(context.Context, model.Test, model.RunMetadata, model.Environment) (model.Run, chan RunResult)
 }
 
 type PersistentRunner interface {
@@ -54,6 +59,7 @@ type execReq struct {
 	ctx      context.Context
 	test     model.Test
 	run      model.Run
+	channel  chan RunResult
 	Headers  propagation.MapCarrier
 	executor expression.Executor
 }
@@ -100,7 +106,7 @@ func getNewCtx(ctx context.Context) context.Context {
 	return otel.GetTextMapPropagator().Extract(context.Background(), carrier)
 }
 
-func (r persistentRunner) Run(ctx context.Context, test model.Test, metadata model.RunMetadata, environment model.Environment) model.Run {
+func (r persistentRunner) Run(ctx context.Context, test model.Test, metadata model.RunMetadata, environment model.Environment) (model.Run, chan RunResult) {
 	ctx = getNewCtx(ctx)
 
 	run := model.NewRun()
@@ -115,6 +121,8 @@ func (r persistentRunner) Run(ctx context.Context, test model.Test, metadata mod
 
 	executor := expression.NewExecutor(ds...)
 
+	channel := make(chan RunResult, 1)
+
 	r.executeQueue <- execReq{
 		ctx:      ctx,
 		test:     test,
@@ -122,7 +130,7 @@ func (r persistentRunner) Run(ctx context.Context, test model.Test, metadata mod
 		executor: executor,
 	}
 
-	return run
+	return run, channel
 }
 
 func (r persistentRunner) processExecQueue(job execReq) {
@@ -158,7 +166,7 @@ func (r persistentRunner) processExecQueue(job execReq) {
 	if run.State == model.RunStateAwaitingTrace {
 		ctx, pollingSpan := r.tracer.Start(job.ctx, "Start Polling trace")
 		defer pollingSpan.End()
-		r.tp.Poll(ctx, job.test, run)
+		r.tp.Poll(ctx, job.test, run, job.channel)
 	}
 }
 

@@ -1,11 +1,13 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
 import {TracetestApiTags} from 'constants/Test.constants';
-import {TTestApiEndpointBuilder} from '../../types/Test.types';
+import {TTestApiEndpointBuilder} from 'types/Test.types';
 import EnvironmentEndpoint from './endpoints/Environment.endpoint';
 import ExpressionEndpoint from './endpoints/Expression.endpoint';
+import ResourceEndpoint from './endpoints/Resource.endpoint';
 import TestEndpoint from './endpoints/Test.endpoint';
 import TestRunEndpoint from './endpoints/TestRun.endpoints';
 import TransactionEndpoint from './endpoints/Transaction.endpoint';
+import TransactionRunEndpoint from './endpoints/TransactionRun.endpoint';
 
 const PATH = `${document.baseURI}api/`;
 
@@ -18,10 +20,12 @@ const TraceTestAPI = createApi({
   endpoints(builder: TTestApiEndpointBuilder) {
     return {
       ...TransactionEndpoint(builder),
+      ...TransactionRunEndpoint(builder),
       ...TestRunEndpoint(builder),
       ...TestEndpoint(builder),
       ...EnvironmentEndpoint(builder),
       ...ExpressionEndpoint(builder),
+      ...ResourceEndpoint(builder),
     };
   },
 });
@@ -53,11 +57,15 @@ export const {
   useDeleteEnvironmentMutation,
   useCreateTransactionMutation,
   useGetTransactionByIdQuery,
-  useGetTransactionRunByIdQuery,
   useDeleteTransactionByIdMutation,
+  useEditTransactionMutation,
+  useGetTransactionRunsQuery,
+  useLazyGetTransactionRunsQuery,
+  useGetTransactionRunByIdQuery,
+  useDeleteTransactionRunByIdMutation,
   useParseExpressionMutation,
   useSetTestOutputsMutation,
-  useEditTransactionMutation,
+  useGetResourcesQuery,
 } = TraceTestAPI;
 export const {endpoints} = TraceTestAPI;
 

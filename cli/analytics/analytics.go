@@ -32,6 +32,7 @@ func Init(conf config.Config) {
 	} // ignore errors and continue with an empty ID if neccesary
 
 	client.Enqueue(segment.Identify{
+		UserId: mid,
 		Traits: segment.NewTraits().
 			Set("source", "cli").
 			Set("clientID", mid).

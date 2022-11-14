@@ -2,7 +2,6 @@ package model
 
 import (
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/kubeshop/tracetest/server/id"
@@ -123,19 +122,6 @@ type (
 		ObservedValue string
 		CompareErr    error
 	}
-
-	Environment struct {
-		ID          string
-		Name        string
-		Description string
-		CreatedAt   time.Time
-		Values      []EnvironmentValue
-	}
-
-	EnvironmentValue struct {
-		Key   string
-		Value string
-	}
 )
 
 func (t Test) HasID() bool {
@@ -175,10 +161,6 @@ func (e *AssertionExpression) Type() string {
 	return e.LiteralValue.Type
 }
 
-func (e Environment) GetSlug() string {
-	return strings.ToLower(strings.ReplaceAll(strings.TrimSpace(e.Name), " ", "-"))
-}
-
 type RunState string
 
 const (
@@ -189,3 +171,7 @@ const (
 	RunStateFinished            RunState = "FINISHED"
 	RunStateAwaitingTestResults RunState = "AWAITING_TEST_RESULTS"
 )
+
+func (rs RunState) IsFinal() bool {
+	return rs == RunStateFailed || rs == RunStateFinished
+}

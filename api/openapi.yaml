@@ -167,6 +167,105 @@ paths:
       responses:
         "204":
           description: OK
+
+  /transactions/{transactionId}/run:
+    post:
+      tags:
+        - api
+      parameters:
+        - in: path
+          name: transactionId
+          schema:
+            type: string
+          required: true
+      summary: "run transaction"
+      description: "run a particular transaction"
+      operationId: runTransaction
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "./tests.yaml#/components/schemas/RunInformation"
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "./transactions.yaml#/components/schemas/TransactionRun"
+    get:
+      tags:
+        - api
+      parameters:
+        - in: path
+          name: transactionId
+          schema:
+            type: string
+          required: true
+      summary: "Get all runs from a particular transaction"
+      description: "Get all runs from a particular transaction"
+      operationId: getTransactionRuns
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "./transactions.yaml#/components/schemas/TransactionRun"
+
+  /transactions/{transactionId}/run/{runId}:
+    get:
+      tags:
+        - api
+      parameters:
+        - in: path
+          name: transactionId
+          schema:
+            type: string
+          required: true
+        - in: path
+          name: runId
+          schema:
+            type: integer
+          required: true
+      summary: "Get a specific run from a particular transaction"
+      description: "Get a specific run from a particular transaction"
+      operationId: getTransactionRun
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "./transactions.yaml#/components/schemas/TransactionRun"
+        404:
+          description: transaction run not found
+
+    delete:
+      tags:
+        - api
+      parameters:
+        - in: path
+          name: transactionId
+          schema:
+            type: string
+          required: true
+        - in: path
+          name: runId
+          schema:
+            type: integer
+          required: true
+      summary: "Delete a specific run from a particular transaction"
+      description: "Delete a specific run from a particular transaction"
+      operationId: deleteTransactionRun
+      responses:
+        204:
+          description: OK
+        404:
+          description: transaction run not found
+
   /tests:
     get:
       tags:
@@ -317,7 +416,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "./tests.yaml#/components/schemas/TestRunInformation"
+              $ref: "./tests.yaml#/components/schemas/RunInformation"
       responses:
         200:
           description: successful operation

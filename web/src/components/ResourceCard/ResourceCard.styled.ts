@@ -3,6 +3,7 @@ import {Button, Space, Typography} from 'antd';
 import styled from 'styled-components';
 
 import emptyStateIcon from 'assets/SpanAssertionsEmptyState.svg';
+import {ResourceType} from 'types/Resource.type';
 
 export const ActionButton = styled(MoreOutlined)`
   color: ${({theme}) => theme.color.textSecondary};
@@ -10,16 +11,16 @@ export const ActionButton = styled(MoreOutlined)`
   font-size: ${({theme}) => theme.size.lg};
 `;
 
-export const Container = styled.div`
+export const Container = styled.div<{$type: ResourceType}>`
   background: ${({theme}) => theme.color.white};
-  border-left: 4px solid #2f1e61;
+  border-left: ${({$type}) => ($type === ResourceType.Test ? '4px solid #2f1e61' : '4px solid #BC334A')};
   border-radius: 2px;
   box-shadow: -1px 1px 5px #e4e9f5;
 `;
 
-export const Box = styled.div`
+export const Box = styled.div<{$type: ResourceType}>`
   align-items: center;
-  background: #2f1e61;
+  background: ${({$type}) => ($type === ResourceType.Test ? '#2f1e61' : '#BC334A')};
   border-radius: 3px;
   display: flex;
   justify-content: center;
@@ -118,6 +119,12 @@ export const RunButton = styled(Button)`
 
 export const RunsContainer = styled.div`
   padding: 0 24px 15px 64px;
+`;
+
+export const RunsListContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 `;
 
 export const TestContainer = styled.div`
