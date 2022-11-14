@@ -58,6 +58,7 @@ func (m OpenAPI) TransactionRun(in model.TransactionRun) openapi.TransactionRun 
 
 	return openapi.TransactionRun{
 		Id:          fmt.Sprintf("%d", in.ID),
+		Version:     int32(in.TransactionVersion),
 		CreatedAt:   in.CreatedAt,
 		CompletedAt: in.CompletedAt,
 		State:       string(in.State),

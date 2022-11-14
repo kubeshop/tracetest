@@ -16,6 +16,8 @@ import (
 type TransactionRun struct {
 	Id string `json:"id,omitempty"`
 
+	Version int32 `json:"version,omitempty"`
+
 	CreatedAt time.Time `json:"createdAt,omitempty"`
 
 	CompletedAt time.Time `json:"completedAt,omitempty"`

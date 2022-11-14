@@ -34,6 +34,9 @@ components:
         id:
           type: string
           readOnly: true
+        version:
+          type: integer
+          readOnly: true
         createdAt:
           type: string
           format: date-time
