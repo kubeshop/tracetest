@@ -3,7 +3,6 @@ import {FormInstance} from 'antd';
 import {FormListFieldData} from 'antd/lib/form/FormList';
 import CreateAssertionModalAnalyticsService from 'services/Analytics/CreateAssertionModalAnalytics.service';
 import {TSpanFlatAttribute} from 'types/Span.types';
-import {TStructuredAssertion} from 'types/Assertion.types';
 import {AssertionCheck} from './AssertionCheck';
 import {useGetOTELSemanticConventionAttributesInfo} from './hooks/useGetOTELSemanticConventionAttributesInfo';
 import {IValues} from './TestSpecForm';
@@ -11,7 +10,6 @@ import * as S from './TestSpecForm.styled';
 
 interface IProps {
   add(): void;
-  assertions: TStructuredAssertion[];
   attributeList: TSpanFlatAttribute[];
   fields: FormListFieldData[];
   form: FormInstance<IValues>;
@@ -21,17 +19,7 @@ interface IProps {
   spanIdList: string[];
 }
 
-const AssertionCheckList = ({
-  form,
-  fields,
-  add,
-  remove,
-  attributeList,
-  assertions,
-  runId,
-  testId,
-  spanIdList,
-}: IProps) => {
+const AssertionCheckList = ({form, fields, add, remove, attributeList, runId, testId, spanIdList}: IProps) => {
   const reference = useGetOTELSemanticConventionAttributesInfo();
 
   return (
@@ -46,7 +34,6 @@ const AssertionCheckList = ({
             attributeList={attributeList}
             name={name}
             index={index}
-            assertions={assertions}
             reference={reference}
             runId={runId}
             testId={testId}

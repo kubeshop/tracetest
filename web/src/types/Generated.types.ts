@@ -811,7 +811,7 @@ export interface external {
           environmentId?: string;
         };
         ResolveResponseInfo: {
-          resolvedValue?: string;
+          resolvedValues?: string[];
         };
       };
     };

@@ -33,7 +33,7 @@ const Expression = ({
   const {selectedEnvironment} = useEnvironment();
   const editorTheme = useEditorTheme();
   const completionFn = useAutoComplete({testId, runId, onSelect: onSelectAutocompleteOption});
-  const {onHover, expression} = useTooltip({environmentId: selectedEnvironment?.id, ...context});
+  const {onHover, resolvedValues} = useTooltip({environmentId: selectedEnvironment?.id, ...context});
 
   const ref = useRef<ReactCodeMirrorRef>(null);
 
@@ -46,9 +46,18 @@ const Expression = ({
     if (EditorService.getIsQueryValid(SupportedEditors.Expression, value)) onHover(value);
   }, [onHover, value]);
 
+  const title = (
+    <>
+      {resolvedValues.map((resolvedValue, index) => (
+        // eslint-disable-next-line react/no-array-index-key
+        <p key={`${resolvedValue}-${index}`}>{resolvedValue}</p>
+      ))}
+    </>
+  );
+
   return (
     <S.ExpressionEditorContainer $isEditable={editable}>
-      <Tooltip placement="topLeft" title={expression}>
+      <Tooltip placement="topLeft" title={title}>
         <CodeMirror
           ref={ref}
           onFocus={() => onFocus(ref.current?.view!)}

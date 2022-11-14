@@ -1,20 +1,21 @@
 import {Form, FormInstance, Select} from 'antd';
 import {EditorView} from '@codemirror/view';
-import {useCallback, useMemo} from 'react';
+import {useCallback, useMemo, useState} from 'react';
 import {delay} from 'lodash';
 import {Completion, startCompletion} from '@codemirror/autocomplete';
 import {FormListFieldData} from 'antd/lib/form/FormList';
 import {SupportedEditors} from 'constants/Editor.constants';
 import CreateAssertionModalAnalyticsService from 'services/Analytics/CreateAssertionModalAnalytics.service';
 import {TSpanFlatAttribute} from 'types/Span.types';
-import {TStructuredAssertion} from 'types/Assertion.types';
 import OperatorService from 'services/Operator.service';
 import {CompareOperator} from 'constants/Operator.constants';
+import AssertionSelectors from 'selectors/Assertion.selectors';
+import {useAppSelector} from 'redux/hooks';
 import Editor from '../Editor';
 import {OtelReference} from './hooks/useGetOTELSemanticConventionAttributesInfo';
 import {IValues} from './TestSpecForm';
 import * as S from './TestSpecForm.styled';
-import AssertionService from '../../services/Assertion.service';
+import AssertionCheckValue from './AssertionCheckValue';
 
 interface IProps {
   remove(name: number): void;
@@ -24,7 +25,6 @@ interface IProps {
   name: number;
   attributeList: TSpanFlatAttribute[];
   index: number;
-  assertions: TStructuredAssertion[];
   runId: string;
   testId: string;
   spanIdList: string[];
@@ -40,41 +40,40 @@ export const AssertionCheck = ({
   index,
   name,
   remove,
-  form,
-  assertions,
   attributeList,
   runId,
   testId,
   spanIdList,
+  form,
 }: IProps) => {
+  const [isValueDropdownOpen, setIsValueDropdownOpen] = useState(false);
+  const [selectedAttributeKey, setSelectedAttributeKey] = useState('');
   const onAttributeFocus = useCallback((view: EditorView) => {
     if (!view?.state.doc.length) delay(() => startCompletion(view!), 0);
   }, []);
 
+  const valueList = useAppSelector(state =>
+    AssertionSelectors.selectAttributeValueList(state, testId, runId, spanIdList, selectedAttributeKey)
+  );
+
   const onSelectAttribute = useCallback(
     ({label}: Completion) => {
-      const value = attributeList.find(({key}) => key === label.replace('attr:', ''))?.value || '';
+      const attributeKey = attributeList.find(({key}) => key === label.replace('attr:', ''))?.key || '';
 
-      form.setFieldsValue({
-        assertions: assertions.map((assertion, i) =>
-          i === name ? {...assertion, right: AssertionService.extractExpectedString(value) || ''} : assertion
-        ),
-      });
+      setSelectedAttributeKey(attributeKey);
+      setIsValueDropdownOpen(true);
     },
-    [assertions, attributeList, form, name]
+    [attributeList]
   );
 
   const selector = Form.useWatch('selector') || '';
   const editorContext = useMemo(() => {
-    const [spanId = ''] = spanIdList;
-
     return {
       runId,
       testId,
       selector,
-      spanId,
     };
-  }, [runId, selector, spanIdList, testId]);
+  }, [runId, selector, testId]);
 
   return (
     <S.Container>
@@ -109,15 +108,15 @@ export const AssertionCheck = ({
             ))}
           </S.Select>
         </Form.Item>
-        <Form.Item
-          {...field}
-          name={[name, 'right']}
-          rules={[{required: true, message: 'Expected value is required'}]}
-          data-cy="assertion-check-value"
-          style={{margin: 0}}
-        >
-          <Editor type={SupportedEditors.Expression} placeholder="Expected Value" context={editorContext} />
-        </Form.Item>
+        <AssertionCheckValue
+          form={form}
+          valueList={valueList}
+          isDropdownOpen={isValueDropdownOpen}
+          onClose={() => setIsValueDropdownOpen(false)}
+          editorContext={editorContext}
+          name={name}
+          field={field}
+        />
       </S.FieldsContainer>
       <S.ActionContainer>
         {index !== 0 && (

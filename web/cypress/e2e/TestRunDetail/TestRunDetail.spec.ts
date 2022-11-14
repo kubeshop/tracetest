@@ -1,4 +1,4 @@
-import {getAttributeListId} from '../../support/commands';
+import {getAttributeListId, getValueFromList} from '../../support/commands';
 
 describe('Test Run Detail Views', () => {
   beforeEach(() => cy.createTest());
@@ -29,9 +29,12 @@ describe('Test Run Detail Views', () => {
     cy.get('[data-cy=selector-editor] [contenteditable]').first().clear();
     cy.get('[data-cy=selector-editor] .cm-placeholder').should('be.visible');
 
-    cy.get('[data-cy=expression-editor] [contenteditable]').first().type('db.na', {delay: 100});
-
+    cy.get('[data-cy=expression-editor] [contenteditable]').first().type('db.name', {delay: 100});
     cy.get(getAttributeListId(0)).first().click({force: true});
+    
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(100);
+    cy.get(getValueFromList(1)).first().click();
 
     cy.get('[data-cy=assertion-form-submit-button]').click();
     cy.wait('@testRuns', {timeout: 30000});
@@ -70,6 +73,10 @@ describe('Test Run Detail Views', () => {
 
     cy.get('[data-cy=expression-editor] [contenteditable]').first().type('name', {delay: 100});
     cy.get(getAttributeListId(0)).first().click({force: true});
+
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(100);
+    cy.get(getValueFromList(1)).first().click();
 
     cy.get('[data-cy=assertion-form-submit-button]').click();
     cy.wait('@testRuns', {timeout: 30000});

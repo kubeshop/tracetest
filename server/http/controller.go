@@ -694,43 +694,60 @@ func (c *controller) UpdateEnvironment(ctx context.Context, environmentId string
 
 // expressions
 func (c *controller) ExpressionResolve(ctx context.Context, in openapi.ResolveRequestInfo) (openapi.ImplResponse, error) {
-	ds, err := c.buildDataStores(ctx, in)
+	dsList, err := c.buildDataStores(ctx, in)
 
 	if err != nil {
 		return openapi.Response(http.StatusBadRequest, err.Error()), err
 	}
 
-	parsed, err := expression.NewExecutor(ds...).ResolveStatement(in.Expression)
+	resolvedValues := make([]string, len(dsList))
+	for i, ds := range dsList {
+		parsed, err := expression.NewExecutor(ds...).ResolveStatement(in.Expression)
 
-	if err != nil {
-		return openapi.Response(http.StatusBadRequest, err.Error()), err
+		if err != nil {
+			return openapi.Response(http.StatusBadRequest, err.Error()), err
+		}
+
+		resolvedValues[i] = parsed
 	}
 
-	return openapi.Response(200, openapi.ResolveResponseInfo{ResolvedValue: parsed}), nil
+	return openapi.Response(200, openapi.ResolveResponseInfo{ResolvedValues: resolvedValues}), nil
 }
 
-func (c *controller) buildDataStores(ctx context.Context, info openapi.ResolveRequestInfo) ([]expression.DataStore, error) {
+func (c *controller) buildDataStores(ctx context.Context, info openapi.ResolveRequestInfo) ([][]expression.DataStore, error) {
 	context := info.Context
 
 	ds := []expression.DataStore{}
+
+	if context.EnvironmentId != "" {
+		environment, err := c.testDB.GetEnvironment(ctx, context.EnvironmentId)
+
+		if err != nil {
+			return [][]expression.DataStore{}, err
+		}
+
+		ds = append([]expression.DataStore{expression.EnvironmentDataStore{
+			Values: environment.Values,
+		}}, ds...)
+	}
 
 	if context.RunId != "" && context.TestId != "" {
 		runId, err := strconv.Atoi(context.RunId)
 
 		if err != nil {
-			return []expression.DataStore{}, err
+			return [][]expression.DataStore{}, err
 		}
 
 		run, err := c.testDB.GetRun(ctx, id.ID(context.TestId), runId)
 		if err != nil {
-			return []expression.DataStore{}, err
+			return [][]expression.DataStore{}, err
 		}
 
 		if context.SpanId != "" {
 			spanId, err := trace.SpanIDFromHex(context.SpanId)
 
 			if err != nil {
-				return []expression.DataStore{}, err
+				return [][]expression.DataStore{}, err
 			}
 
 			span := run.Trace.Flat[spanId]
@@ -740,32 +757,30 @@ func (c *controller) buildDataStores(ctx context.Context, info openapi.ResolveRe
 			}}, ds...)
 		}
 
-		if context.Selector != "" {
-			selector, err := selectors.New(context.Selector)
-			if err != nil {
-				return []expression.DataStore{}, err
+		selector, err := selectors.New(context.Selector)
+		if err != nil {
+			return [][]expression.DataStore{}, err
+		}
+
+		spans := selector.Filter(*run.Trace)
+		ds = append([]expression.DataStore{expression.MetaAttributesDataStore{
+			SelectedSpans: spans,
+		}}, ds...)
+
+		if context.SpanId == "" {
+			dsList := make([][]expression.DataStore, len(spans))
+			for i, span := range spans {
+
+				dsList[i] = append([]expression.DataStore{expression.AttributeDataStore{
+					Span: span,
+				}}, ds...)
 			}
 
-			spans := selector.Filter(*run.Trace)
-			ds = append([]expression.DataStore{expression.MetaAttributesDataStore{
-				SelectedSpans: spans,
-			}}, ds...)
+			return dsList, nil
 		}
 	}
 
-	if context.EnvironmentId != "" {
-		environment, err := c.testDB.GetEnvironment(ctx, context.EnvironmentId)
-
-		if err != nil {
-			return []expression.DataStore{}, err
-		}
-
-		ds = append([]expression.DataStore{expression.EnvironmentDataStore{
-			Values: environment.Values,
-		}}, ds...)
-	}
-
-	return ds, nil
+	return [][]expression.DataStore{ds}, nil
 }
 
 func (c *controller) CreateTransaction(ctx context.Context, transaction openapi.Transaction) (openapi.ImplResponse, error) {

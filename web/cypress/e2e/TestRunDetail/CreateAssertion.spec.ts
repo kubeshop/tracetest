@@ -1,4 +1,4 @@
-import {getAttributeListId} from '../../support/commands';
+import {getAttributeListId, getValueFromList} from '../../support/commands';
 
 describe('Create Assertion', () => {
   beforeEach(() => cy.createTest());
@@ -19,13 +19,15 @@ describe('Create Assertion', () => {
 
     const attributeListId = getAttributeListId(0);
     cy.get(attributeListId).click();
+    cy.get(getValueFromList(1)).last().click();
 
     cy.selectOperator(0);
 
     cy.get('[data-cy=add-assertion-form-add-check]').click();
 
-    cy.get('[data-cy=assertion-check-attribute] [contenteditable="true"]').last().type('type', {delay: 100});
-    cy.get(getAttributeListId(1)).click();
+    cy.get('[data-cy=assertion-check-attribute] [contenteditable="true"]').last().type('tracetest.span.ty', {delay: 100});
+    cy.get(getAttributeListId(0)).click();
+    cy.get(getValueFromList(1)).last().click();
 
     cy.selectOperator(1);
 
@@ -33,6 +35,7 @@ describe('Create Assertion', () => {
 
     cy.get('[data-cy=assertion-check-attribute] [contenteditable="true"]').last().type('duration', {delay: 100});
     cy.get(getAttributeListId(0)).click();
+    cy.get(getValueFromList(1)).last().click();
 
     cy.selectOperator(2);
 
@@ -57,6 +60,7 @@ describe('Create Assertion', () => {
 
     cy.get('[data-cy=assertion-check-attribute] [contenteditable="true"]').type('db.name', {delay: 100});
     cy.get(getAttributeListId(0)).click();
+    cy.get(getValueFromList(1)).first().click();
 
     cy.selectOperator(0);
 
@@ -80,6 +84,7 @@ describe('Create Assertion', () => {
 
     cy.get('[data-cy=assertion-check-attribute] [contenteditable="true"]').last().type('duration', {delay: 100});
     cy.get(getAttributeListId(0)).click();
+    cy.get(getValueFromList(1)).first().click();
 
     cy.selectOperator(1);
 
@@ -104,6 +109,7 @@ describe('Create Assertion', () => {
 
     cy.get('[data-cy=assertion-check-attribute] [contenteditable="true"]').last().type('duration', {delay: 100});
     cy.get(getAttributeListId(0)).click();
+    cy.get(getValueFromList(1)).first().click();
 
     cy.selectOperator(1);
 
@@ -128,6 +134,7 @@ describe('Create Assertion', () => {
 
     cy.get('[data-cy=assertion-check-attribute] [contenteditable="true"]').type('db.name', {delay: 100});
     cy.get(getAttributeListId(0)).click();
+    cy.get(getValueFromList(1)).first().click();
 
     cy.selectOperator(0);
 

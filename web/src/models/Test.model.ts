@@ -13,11 +13,13 @@ const Test = ({
   serviceUnderTest: rawTrigger,
   summary = {},
   outputs = [],
+  createdAt = '',
 }: TRawTest): TTest => ({
   id,
   name,
   version,
   description,
+  createdAt,
   definition: TestSpecs(specs || {}),
   trigger: Trigger(rawTrigger || {}),
   summary: TestSummary(summary),

@@ -22,6 +22,8 @@ const currentSelectorListSelector = (
   currentSelectorList: TSpanSelector[] = []
 ) => currentSelectorList.map(({key}) => key);
 
+const attributeKeySelector = (state: RootState, testId: string, runId: string, spanIdList: string[], key: string) => key;
+
 const selectMatchedSpanList = createSelector(stateSelector, paramsSelector, (state, {spanIdList, testId, runId}) => {
   const {data: {trace} = {}} = endpoints.getRunById.select({testId, runId})(state);
   if (!spanIdList.length) return trace?.spans || [];
@@ -59,6 +61,16 @@ const AssertionSelectors = () => {
           'key'
         )
     ),
+    selectAttributeValueList: createSelector(selectMatchedSpanList, attributeKeySelector, (spanList, attrKey) => {
+      const list = spanList.reduce<string[]>((acc, span) => {
+        const attr = span.attributeList.find(({key}) => key === attrKey);
+
+        if (attr) return acc.concat(attr.value);
+        return acc;
+      }, []);
+
+      return list;
+    }),
   };
 };
 

@@ -1,24 +1,27 @@
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useState} from 'react';
 import {TResolveExpressionContext, TResolveRequestInfo} from 'types/Expression.types';
 import {useParseExpressionMutation} from 'redux/apis/TraceTest.api';
 
 const useTooltip = (context: TResolveExpressionContext = {}) => {
   const [parseExpressionMutation] = useParseExpressionMutation();
-  const [prevExpression, setPrevExpression] = useState<string>('');
+  const [prevExpression, setPrevExpression] = useState<string[]>([]);
   const [prevRawExpression, setPrevRawExpression] = useState<string>('');
-
-  useEffect(() => {
-    if (prevExpression) parseExpression({expression: prevExpression, context});
-  }, [context.environmentId, prevExpression]);
+  const [prevContext, setPrevContext] = useState<TResolveExpressionContext>({});
 
   const parseExpression = useCallback(
     async (props: TResolveRequestInfo) => {
+      const isSameAsPrev =
+        prevRawExpression === props.expression && JSON.stringify(prevContext) === JSON.stringify(context);
+
+      if (isSameAsPrev) return prevExpression;
+
       const parsedExpression = await parseExpressionMutation(props).unwrap();
 
       setPrevExpression(parsedExpression);
+      setPrevContext(props.context || {});
       setPrevRawExpression(props.expression || '');
     },
-    [parseExpressionMutation]
+    [context, parseExpressionMutation, prevContext, prevExpression, prevRawExpression]
   );
 
   const onHover = useCallback(
@@ -35,7 +38,7 @@ const useTooltip = (context: TResolveExpressionContext = {}) => {
     [context, parseExpression, prevRawExpression]
   );
 
-  return {onHover, expression: prevExpression};
+  return {onHover, resolvedValues: prevExpression};
 };
 
 export default useTooltip;
