@@ -979,6 +979,8 @@ export interface external {
           lastErrorState?: string;
           /** @description time it took for the test to complete, either success or fail. If the test is still running, it will show the time up to the time of the request */
           executionTime?: number;
+          /** @description time it took for the triggering transaction to complete, either success or fail. If the test is still running, it will show the time up to the time of the request */
+          triggerTime?: number;
           /** Format: date-time */
           createdAt?: string;
           /** Format: date-time */

@@ -14,11 +14,11 @@ const isTransactionsEnabled = ExperimentalFeature.isEnabled('transactions');
 
 interface IProps {
   triggerResult?: TTriggerResult;
-  executionTime?: number;
+  triggerTime?: number;
 }
 
 const RunDetailTriggerResponse = ({
-  executionTime = 0,
+  triggerTime = 0,
   triggerResult: {headers, body = '', statusCode = 200, bodyMimeType} = {
     body: '',
     type: TriggerTypes.http,
@@ -35,7 +35,7 @@ const RunDetailTriggerResponse = ({
             Status: <S.StatusSpan $isError={statusCode >= 400}>{statusCode}</S.StatusSpan>
           </S.StatusText>
           <S.StatusText>
-            Time: <S.StatusSpan $isError={executionTime > 1000}>{executionTime}ms</S.StatusSpan>
+            Time: <S.StatusSpan $isError={triggerTime > 1000}>{triggerTime}ms</S.StatusSpan>
           </S.StatusText>
         </div>
       </S.TitleContainer>
