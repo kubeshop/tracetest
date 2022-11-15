@@ -1,5 +1,5 @@
 import {Button} from 'antd';
-import {useMemo} from 'react';
+import {useCallback, useMemo} from 'react';
 import {useNavigate} from 'react-router-dom';
 
 import PaginatedList from 'components/PaginatedList';
@@ -9,12 +9,18 @@ import {useTransaction} from 'providers/Transaction/Transaction.provider';
 import {useGetTransactionRunsQuery} from 'redux/apis/TraceTest.api';
 import {TTransactionRun} from 'types/TransactionRun.types';
 import ExperimentalFeature from 'utils/ExperimentalFeature';
+import useTransactionCrud from 'providers/Transaction/hooks/useTransactionCrud';
 import * as S from './Transaction.styled';
 
 const Content = () => {
   const navigate = useNavigate();
-  const {isLoadingRun, onDelete, onRun, transaction} = useTransaction();
+  const {onDelete, transaction} = useTransaction();
+  const {runTransaction, isEditLoading} = useTransactionCrud();
   const params = useMemo(() => ({transactionId: transaction.id}), [transaction.id]);
+
+  const handleRunTest = useCallback(async () => {
+    if (transaction.id) runTransaction(transaction.id);
+  }, [runTransaction, transaction.id]);
 
   return (
     <S.Container $isWhite={!ExperimentalFeature.isEnabled('transactions')}>
@@ -28,7 +34,7 @@ const Content = () => {
 
       <S.ActionsContainer>
         <div />
-        <Button onClick={onRun} loading={isLoadingRun} type="primary" ghost>
+        <Button onClick={handleRunTest} loading={isEditLoading} type="primary" ghost>
           Run Transaction
         </Button>
       </S.ActionsContainer>
