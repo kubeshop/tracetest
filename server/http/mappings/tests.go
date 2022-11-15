@@ -33,6 +33,14 @@ func (m OpenAPI) Transaction(in model.Transaction) openapi.Transaction {
 		Version:     int32(in.Version),
 		Steps:       testIds,
 		CreatedAt:   in.CreatedAt,
+		Summary: openapi.TestSummary{
+			Runs: int32(in.Summary.Runs),
+			LastRun: openapi.TestSummaryLastRun{
+				Time:   in.Summary.LastRun.Time,
+				Passes: 0,
+				Fails:  0,
+			},
+		},
 	}
 }
 
@@ -50,6 +58,7 @@ func (m OpenAPI) TransactionRun(in model.TransactionRun) openapi.TransactionRun 
 
 	return openapi.TransactionRun{
 		Id:          fmt.Sprintf("%d", in.ID),
+		Version:     int32(in.TransactionVersion),
 		CreatedAt:   in.CreatedAt,
 		CompletedAt: in.CompletedAt,
 		State:       string(in.State),

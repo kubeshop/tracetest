@@ -26,10 +26,15 @@ type Transaction struct {
 	Steps []string `json:"steps,omitempty"`
 
 	CreatedAt time.Time `json:"createdAt,omitempty"`
+
+	Summary TestSummary `json:"summary,omitempty"`
 }
 
 // AssertTransactionRequired checks if the required fields are not zero-ed
 func AssertTransactionRequired(obj Transaction) error {
+	if err := AssertTestSummaryRequired(obj.Summary); err != nil {
+		return err
+	}
 	return nil
 }
 
