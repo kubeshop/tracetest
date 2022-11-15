@@ -1192,9 +1192,12 @@ export interface external {
           steps?: string[];
           /** Format: date-time */
           createdAt?: string;
+          /** @description summary of transaction */
+          summary?: external["tests.yaml"]["components"]["schemas"]["TestSummary"];
         };
         TransactionRun: {
           id?: string;
+          version?: number;
           /** Format: date-time */
           createdAt?: string;
           /** Format: date-time */

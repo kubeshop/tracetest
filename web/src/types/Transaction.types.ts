@@ -3,10 +3,13 @@ import {FormInstance} from 'antd';
 
 import {Model, TTransactionsSchemas} from './Common.types';
 import {ICreateTestStep} from './Plugins.types';
+import { TSummary } from './Test.types';
 
 export type TRawTransaction = TTransactionsSchemas['Transaction'];
 
-export type TTransaction = Model<TRawTransaction, {}>;
+export type TTransaction = Model<TRawTransaction, {
+  summary: TSummary;
+}>;
 
 export type TDraftTransaction = {
   steps?: string[];

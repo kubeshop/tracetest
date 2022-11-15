@@ -19,6 +19,14 @@ const TransactionMock: IMockFactory<TTransaction, TTransaction> = () => ({
       env: {
         usename: 'john doe',
       },
+      summary: {
+        runs: 0,
+        lastRun: {
+          time: '',
+          passes: 0,
+          fails: 0,
+        },
+      },
       ...data,
     };
   },
