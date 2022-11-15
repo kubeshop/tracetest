@@ -42,3 +42,24 @@ func TestEnvironmentMerge(t *testing.T) {
 	assert.Contains(t, newEnv.Values, model.EnvironmentValue{Key: "apiKey", Value: "abcdef"})
 	assert.Contains(t, newEnv.Values, model.EnvironmentValue{Key: "apiKeyLocation", Value: "header"})
 }
+
+func TestEnvironmentMergeWithEmptyEnvironment(t *testing.T) {
+	env1 := model.Environment{
+		ID:          "my-env",
+		Name:        "my environment",
+		Description: "my description",
+		CreatedAt:   time.Now(),
+		Values: []model.EnvironmentValue{
+			{Key: "URL", Value: "http://localhost"},
+			{Key: "PORT", Value: "8085"},
+		},
+	}
+
+	env2 := model.Environment{
+		Values: []model.EnvironmentValue{},
+	}
+
+	newEnv := env1.Merge(env2)
+	require.Len(t, newEnv.Values, 2)
+
+}
