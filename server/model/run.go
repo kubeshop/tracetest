@@ -11,7 +11,7 @@ import (
 
 var (
 	Now = func() time.Time {
-		return time.Now()
+		return time.Now().UTC()
 	}
 
 	IDGen = id.NewRandGenerator()
