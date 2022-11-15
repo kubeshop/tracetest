@@ -136,6 +136,9 @@ components:
         executionTime:
           type: integer
           description: time it took for the test to complete, either success or fail. If the test is still running, it will show the time up to the time of the request
+        triggerTime:
+          type: integer
+          description: time it took for the triggering transaction to complete, either success or fail. If the test is still running, it will show the time up to the time of the request
         createdAt:
           type: string
           format: date-time

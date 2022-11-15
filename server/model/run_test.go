@@ -9,41 +9,68 @@ import (
 )
 
 func TestRunExecutionTime(t *testing.T) {
+	timeTest(t, func(start, end time.Time) int {
+		run := model.Run{
+			CreatedAt:   start,
+			CompletedAt: end,
+		}
+
+		return run.ExecutionTime()
+	})
+}
+
+func TestRunTriggerTime(t *testing.T) {
+	timeTest(t, func(start, end time.Time) int {
+		run := model.Run{
+			ServiceTriggeredAt:        start,
+			ServiceTriggerCompletedAt: end,
+		}
+
+		return run.TriggerTime()
+	})
+}
+
+func timeTest(t *testing.T, fn func(start, end time.Time) int) {
+	t.Helper()
+
+	type timeCase struct {
+		start, end time.Time
+	}
 	cases := []struct {
 		name     string
-		run      model.Run
+		run      timeCase
 		now      time.Time
 		expected int
 	}{
 		{
 			name: "CompletedOk",
-			run: model.Run{
-				CreatedAt:   time.Date(2022, 01, 25, 12, 45, 33, 100, time.UTC),
-				CompletedAt: time.Date(2022, 01, 25, 12, 45, 36, 400, time.UTC),
+			run: timeCase{
+				start: time.Date(2022, 01, 25, 12, 45, 33, 100, time.UTC),
+				end:   time.Date(2022, 01, 25, 12, 45, 36, 400, time.UTC),
 			},
 			expected: 4,
 		},
 		{
 			name: "LessThan1Sec",
-			run: model.Run{
-				CreatedAt:   time.Date(2022, 01, 25, 12, 45, 33, 100, time.UTC),
-				CompletedAt: time.Date(2022, 01, 25, 12, 45, 33, 400, time.UTC),
+			run: timeCase{
+				start: time.Date(2022, 01, 25, 12, 45, 33, 100, time.UTC),
+				end:   time.Date(2022, 01, 25, 12, 45, 33, 400, time.UTC),
 			},
 			expected: 1,
 		},
 		{
 			name: "StillRunning",
-			run: model.Run{
-				CreatedAt: time.Date(2022, 01, 25, 12, 45, 33, 100, time.UTC),
+			run: timeCase{
+				start: time.Date(2022, 01, 25, 12, 45, 33, 100, time.UTC),
 			},
 			now:      time.Date(2022, 01, 25, 12, 45, 34, 300, time.UTC),
 			expected: 2,
 		},
 		{
 			name: "ZeroedDate",
-			run: model.Run{
-				CreatedAt:   time.Date(2022, 01, 25, 12, 45, 33, 100, time.UTC),
-				CompletedAt: time.Unix(0, 0),
+			run: timeCase{
+				start: time.Date(2022, 01, 25, 12, 45, 33, 100, time.UTC),
+				end:   time.Unix(0, 0),
 			},
 			now:      time.Date(2022, 01, 25, 12, 45, 34, 300, time.UTC),
 			expected: 2,
@@ -59,7 +86,7 @@ func TestRunExecutionTime(t *testing.T) {
 				}
 			}
 
-			assert.Equal(t, c.expected, c.run.ExecutionTime())
+			assert.Equal(t, c.expected, fn(c.run.start, c.run.end))
 			model.Now = now
 		})
 	}
