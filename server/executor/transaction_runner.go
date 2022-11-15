@@ -115,22 +115,24 @@ func (r persistentTransactionRunner) runTransactionStep(ctx context.Context, tra
 		return model.TransactionRun{}, fmt.Errorf("could not load transaction step: %w", err)
 	}
 
-	_, completedTestChannel := r.testRunner.Run(ctx, test, transactionRun.Metadata, transactionRun.Environment)
+	testRun, completedTestChannel := r.testRunner.Run(ctx, test, transactionRun.Metadata, transactionRun.Environment)
+	stepRun := createStepRun(testRun)
+	transactionRun.StepRuns = append(transactionRun.StepRuns, stepRun)
+
+	err = r.updater.Update(ctx, transactionRun)
+	if err != nil {
+		return model.TransactionRun{}, fmt.Errorf("could not update transaction run: %w", err)
+	}
+
 	runResult := <-completedTestChannel
-	testRun, err := runResult.Run, runResult.Err
+	testRun, err = runResult.Run, runResult.Err
 	if err != nil {
 		return model.TransactionRun{}, fmt.Errorf("could not run step: %w", err)
 	}
 
-	stepRun := model.TransactionStepRun{
-		ID:          testRun.ID,
-		TestID:      testRun.TestID,
-		State:       testRun.State,
-		Environment: testRun.Environment,
-		Outputs:     testRun.Outputs,
-	}
+	stepRun = createStepRun(testRun)
 
-	transactionRun.StepRuns = append(transactionRun.StepRuns, stepRun)
+	transactionRun.StepRuns[stepIndex] = stepRun
 
 	if testRun.State == model.RunStateFailed {
 		transactionRun.State = model.TransactionRunStateFailed
@@ -144,6 +146,16 @@ func (r persistentTransactionRunner) runTransactionStep(ctx context.Context, tra
 	}
 
 	return transactionRun, nil
+}
+
+func createStepRun(testRun model.Run) model.TransactionStepRun {
+	return model.TransactionStepRun{
+		ID:          testRun.ID,
+		TestID:      testRun.TestID,
+		State:       testRun.State,
+		Environment: testRun.Environment,
+		Outputs:     testRun.Outputs,
+	}
 }
 
 func (r persistentTransactionRunner) patchEnvironment(baseEnvironment model.Environment, run model.TransactionRun) model.Environment {
