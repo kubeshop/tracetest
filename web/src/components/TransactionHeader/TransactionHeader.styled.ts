@@ -37,3 +37,17 @@ export const Title = styled(Typography.Title).attrs({level: 2})`
     margin: 0;
   }
 `;
+
+export const StateContainer = styled.div`
+  align-items: center;
+  display: flex;
+  justify-self: flex-end;
+  cursor: pointer;
+`;
+
+export const StateText = styled(Typography.Text)`
+  && {
+    margin-right: 8px;
+    color: ${({theme}) => theme.color.textSecondary};
+  }
+`;

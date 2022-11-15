@@ -1,7 +1,9 @@
-import {Tag} from 'antd';
+import {capitalize} from 'lodash';
+import {LinkOutlined} from '@ant-design/icons';
 import {TestState} from 'constants/TestRun.constants';
 import {TTest} from 'types/Test.types';
 import {TTestRun, TTestRunState} from 'types/TestRun.types';
+import TestRun from 'models/TestRun.model';
 import * as S from './TransactionRunResult.styled';
 
 const iconBasedOnResult = (result: TTestRunState, index: number) => {
@@ -18,21 +20,30 @@ const iconBasedOnResult = (result: TTestRunState, index: number) => {
 interface IProps {
   index: number;
   test: TTest;
-  testRun: TTestRun;
+  testRun?: TTestRun;
 }
 
-const ExecutionStep = ({index, test: {name, trigger}, testRun: {id, state, testVersion}}: IProps) => {
+const ExecutionStep = ({
+  index,
+  test: {name, trigger, id: testId},
+  testRun: {id: runId, state, testVersion} = TestRun({}),
+}: IProps) => {
   return (
-    <S.Container data-cy={`run-card-${name}`} key={id}>
-      <div>{iconBasedOnResult(state, index)}</div>
+    <S.Container data-cy={`run-card-${name}`} key={`${testId}-${runId}`}>
+      <S.ExecutionStepStatus>{iconBasedOnResult(state, index)}</S.ExecutionStepStatus>
       <S.Info>
-        <S.Title>{`${name} v${testVersion}`}</S.Title>
+        <S.ExecutionStepName>{`${name} v${testVersion}`}</S.ExecutionStepName>
         <S.TagContainer>
-          {[trigger.method, trigger.type].map(d => (
-            <Tag key={d}>{d}</Tag>
-          ))}
+          <S.TextTag>{trigger.method}</S.TextTag>
+          <S.TextTag $isLight>{trigger.entryPoint}</S.TextTag>
+          <S.TextTag>{capitalize(state)}</S.TextTag>
         </S.TagContainer>
       </S.Info>
+      <S.ExecutionStepStatus>
+        <S.ExecutionStepRunLink to={`/test/${testId}/run/${runId}`} target="_blank">
+          <LinkOutlined />
+        </S.ExecutionStepRunLink>
+      </S.ExecutionStepStatus>
     </S.Container>
   );
 };

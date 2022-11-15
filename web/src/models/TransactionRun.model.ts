@@ -12,6 +12,7 @@ const TransactionRunModel = ({
   stepRuns = [],
   environment = {},
   metadata = {},
+  version = 1,
 }: TRawTransactionRun): TTransactionRun => {
   return {
     id,
@@ -22,6 +23,7 @@ const TransactionRunModel = ({
     stepRuns: stepRuns.map(stepRun => TestRun(stepRun)),
     environment: Environment(environment),
     metadata,
+    version,
   };
 };
 

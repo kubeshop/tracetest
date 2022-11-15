@@ -16,11 +16,15 @@ const TransactionRunDetailLayout = ({transaction, transaction: {id: transactionI
 
   return (
     <>
-      <TransactionHeader onBack={() => navigate(`/transaction/${transactionId}`)} />
+      <TransactionHeader
+        onBack={() => navigate(`/transaction/${transactionId}`)}
+        transactionRun={transactionRun}
+        transaction={transaction}
+      />
       <S.Wrapper>
         <S.Container>
           <S.SectionLeft>
-            <EditTransaction transaction={transaction} />
+            <EditTransaction transaction={transaction} transactionRun={transactionRun} />
           </S.SectionLeft>
           <S.SectionRight>
             <TransactionRunResult transactionRun={transactionRun} />
