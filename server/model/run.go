@@ -45,7 +45,7 @@ func (r Run) Copy() Run {
 
 func (r Run) ExecutionTime() int {
 	var endDate time.Time
-	if !r.CompletedAt.IsZero() {
+	if !dateIsZero(r.CompletedAt) {
 		endDate = r.CompletedAt
 	} else {
 		endDate = Now()
@@ -54,6 +54,10 @@ func (r Run) ExecutionTime() int {
 	et := math.Ceil(endDate.Sub(r.CreatedAt).Seconds())
 
 	return int(et)
+}
+
+func dateIsZero(in time.Time) bool {
+	return in.IsZero() || in.Unix() == 0
 }
 
 func (r Run) Start() Run {

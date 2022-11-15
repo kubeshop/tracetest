@@ -39,6 +39,15 @@ func TestRunExecutionTime(t *testing.T) {
 			now:      time.Date(2022, 01, 25, 12, 45, 34, 300, time.UTC),
 			expected: 2,
 		},
+		{
+			name: "ZeroedDate",
+			run: model.Run{
+				CreatedAt:   time.Date(2022, 01, 25, 12, 45, 33, 100, time.UTC),
+				CompletedAt: time.Unix(0, 0),
+			},
+			now:      time.Date(2022, 01, 25, 12, 45, 34, 300, time.UTC),
+			expected: 2,
+		},
 	}
 
 	for _, c := range cases {
