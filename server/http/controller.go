@@ -820,6 +820,16 @@ func (c *controller) GetTransaction(ctx context.Context, tID string) (openapi.Im
 	return openapi.Response(http.StatusOK, c.mappers.Out.Transaction(transaction)), nil
 }
 
+func (c *controller) GetTransactionVersion(ctx context.Context, tID string, version int32) (openapi.ImplResponse, error) {
+	transaction, err := c.testDB.GetTransactionVersion(ctx, id.ID(tID), int(version))
+
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	return openapi.Response(http.StatusOK, c.mappers.Out.Transaction(transaction)), nil
+}
+
 func (c *controller) GetTransactions(ctx context.Context, take, skip int32, query, sortBy, sortDirection string) (openapi.ImplResponse, error) {
 	if take == 0 {
 		take = 20
