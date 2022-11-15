@@ -74,9 +74,14 @@ func (r Run) Start() Run {
 	return r
 }
 
-func (r Run) SuccessfullyExecuted() Run {
-	r.State = RunStateAwaitingTrace
+func (r Run) TriggerCompleted(tr TriggerResult) Run {
 	r.ServiceTriggerCompletedAt = Now()
+	r.TriggerResult = tr
+	return r
+}
+
+func (r Run) SuccessfullyTriggered() Run {
+	r.State = RunStateAwaitingTrace
 	return r
 }
 
