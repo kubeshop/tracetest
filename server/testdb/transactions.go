@@ -205,6 +205,11 @@ func (td *postgresDB) GetTransactionVersion(ctx context.Context, id id.ID, versi
 		return model.Transaction{}, err
 	}
 
+	transaction.Steps, err = td.getTransactionSteps(ctx, transaction)
+	if err != nil {
+		return model.Transaction{}, err
+	}
+
 	return transaction, nil
 }
 

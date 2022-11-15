@@ -22,6 +22,10 @@ export interface paths {
     /** delete a transaction */
     delete: operations["deleteTransaction"];
   };
+  "/transactions/{transactionId}/version/{version}": {
+    /** get a transaction specific version */
+    get: operations["getTransactionVersion"];
+  };
   "/transactions/{transactionId}/run": {
     /** Get all runs from a particular transaction */
     get: operations["getTransactionRuns"];
@@ -249,6 +253,25 @@ export interface operations {
     responses: {
       /** OK */
       204: never;
+    };
+  };
+  /** get a transaction specific version */
+  getTransactionVersion: {
+    parameters: {
+      path: {
+        transactionId: string;
+        version: number;
+      };
+    };
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["transactions.yaml"]["components"]["schemas"]["Transaction"];
+        };
+      };
+      /** problem with getting a test */
+      500: unknown;
     };
   };
   /** Get all runs from a particular transaction */
