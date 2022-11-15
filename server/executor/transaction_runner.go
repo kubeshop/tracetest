@@ -13,10 +13,11 @@ type TransactionRunner interface {
 	Run(context.Context, model.Transaction, model.RunMetadata, model.Environment) model.TransactionRun
 }
 
-func NewTransactionRunner(runner Runner, db model.Repository, config config.Config) persistentTransactionRunner {
+func NewTransactionRunner(runner Runner, db model.Repository, updater TransactionRunUpdater, config config.Config) persistentTransactionRunner {
 	return persistentTransactionRunner{
 		testRunner:          runner,
 		db:                  db,
+		updater:             updater,
 		executionChannel:    make(chan transactionRunJob, 1),
 		exit:                make(chan bool),
 		checkTestStateDelay: config.PoolingRetryDelay() / 2,
@@ -31,6 +32,7 @@ type transactionRunJob struct {
 type persistentTransactionRunner struct {
 	testRunner          Runner
 	db                  model.Repository
+	updater             TransactionRunUpdater
 	checkTestStateDelay time.Duration
 	executionChannel    chan transactionRunJob
 	exit                chan bool
@@ -103,7 +105,7 @@ func (r persistentTransactionRunner) runTransaction(ctx context.Context, run mod
 		run.State = model.TransactionRunStateFinished
 	}
 
-	return r.db.UpdateTransactionRun(ctx, run)
+	return r.updater.Update(ctx, run)
 }
 
 func (r persistentTransactionRunner) runTransactionStep(ctx context.Context, transactionRun model.TransactionRun, stepIndex int) (model.TransactionRun, error) {
@@ -136,7 +138,7 @@ func (r persistentTransactionRunner) runTransactionStep(ctx context.Context, tra
 		transactionRun.CurrentTest += 1
 	}
 
-	err = r.db.UpdateTransactionRun(ctx, transactionRun)
+	err = r.updater.Update(ctx, transactionRun)
 	if err != nil {
 		return model.TransactionRun{}, fmt.Errorf("could not update transaction run: %w", err)
 	}
