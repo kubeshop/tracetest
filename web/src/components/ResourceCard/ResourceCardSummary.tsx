@@ -16,14 +16,7 @@ const ResourceCardSummary = ({
   shouldShowResult = true,
 }: IProps) => (
   <>
-    <div>
-      <S.Text>Last run time:</S.Text>
-      <Tooltip title={Date.format(time ?? '')}>
-        <S.Text>{Date.getTimeAgo(time ?? '')}</S.Text>
-      </Tooltip>
-    </div>
-
-    {shouldShowResult && (
+    {shouldShowResult ? (
       <div>
         <S.Text>Last run result:</S.Text>
         <S.Row>
@@ -41,7 +34,15 @@ const ResourceCardSummary = ({
           </Tooltip>
         </S.Row>
       </div>
+    ) : (
+      <div />
     )}
+    <div>
+      <S.Text>Last run time:</S.Text>
+      <Tooltip title={Date.format(time ?? '')}>
+        <S.Text>{Date.getTimeAgo(time ?? '')}</S.Text>
+      </Tooltip>
+    </div>
   </>
 );
 
