@@ -26,6 +26,7 @@ const useDeleteResourceRun = ({id, isRunView = false, type}: IProps) => {
         if (isRunView) navigate(`/test/${id}`);
       } else if (type === ResourceType.Transaction) {
         deleteTransactionRunById({transactionId: id, runId});
+        if (isRunView) navigate(`/transaction/${id}`);
       }
     },
     [deleteTestRunById, deleteTransactionRunById, id, isRunView, navigate, type]

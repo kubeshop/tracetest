@@ -66,7 +66,7 @@ func outputProcessor(ctx context.Context, outputs model.OrderedMap[string, model
 		value := ""
 		spans.
 			ForEach(func(_ int, span traces.Span) bool {
-				value = extractAttr(traces.Span{}, stores, out.expr)
+				value = extractAttr(span, stores, out.expr)
 				// take only the first value
 				return false
 			}).

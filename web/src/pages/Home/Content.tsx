@@ -14,6 +14,7 @@ import HomeAnalyticsService from 'services/Analytics/HomeAnalytics.service';
 import {ResourceType, TResource} from 'types/Resource.type';
 import {TTest} from 'types/Test.types';
 import {TTransaction} from 'types/Transaction.types';
+import useTransactionCrud from 'providers/Transaction/hooks/useTransactionCrud';
 import * as S from './Home.styled';
 import HomeActions from './HomeActions';
 import HomeFilters from './HomeFilters';
@@ -33,12 +34,14 @@ const Content = () => {
   const pagination = usePagination<TResource, TParameters>(useGetResourcesQuery, parameters);
   const onDeleteResource = useDeleteResource();
   const {runTest} = useTestCrud();
+  const {runTransaction} = useTransactionCrud();
 
   const handleOnRun = useCallback(
     (id: string, type: ResourceType) => {
       if (type === ResourceType.Test) runTest(id);
+      else if (type === ResourceType.Transaction) runTransaction(id);
     },
-    [runTest]
+    [runTest, runTransaction]
   );
 
   const handleOnViewAll = useCallback(

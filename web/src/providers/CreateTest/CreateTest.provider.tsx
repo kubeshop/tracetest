@@ -1,5 +1,4 @@
 import {createContext, useCallback, useContext, useMemo} from 'react';
-import {useNavigate} from 'react-router-dom';
 import {noop} from 'lodash';
 import {IPlugin} from 'types/Plugins.types';
 import {
@@ -12,11 +11,11 @@ import {
 } from 'redux/slices/CreateTest.slice';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import CreateTestSelectors from 'selectors/CreateTest.selectors';
-import {useCreateTestMutation, useRunTestMutation} from 'redux/apis/TraceTest.api';
+import {useCreateTestMutation} from 'redux/apis/TraceTest.api';
 import {ICreateTestState, TDraftTest} from 'types/Test.types';
 import TestService from 'services/Test.service';
 import {Plugins} from 'constants/Plugins.constants';
-import {useEnvironment} from '../Environment/Environment.provider';
+import useTestCrud from '../Test/hooks/useTestCrud';
 
 interface IContext extends ICreateTestState {
   activeStep: string;
@@ -55,10 +54,8 @@ export const useCreateTest = () => useContext(Context);
 
 const CreateTestProvider = ({children}: IProps) => {
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
-  const {selectedEnvironment} = useEnvironment();
   const [createTest, {isLoading: isLoadingCreateTest}] = useCreateTestMutation();
-  const [runTest, {isLoading: isLoadingRunTest}] = useRunTestMutation();
+  const {runTest, isEditLoading} = useTestCrud();
 
   const stepList = useAppSelector(CreateTestSelectors.selectStepList);
   const draftTest = useAppSelector(CreateTestSelectors.selectDraftTest);
@@ -72,11 +69,9 @@ const CreateTestProvider = ({children}: IProps) => {
     async (draft: TDraftTest) => {
       const rawTest = await TestService.getRequest(plugin, draft);
       const test = await createTest(rawTest).unwrap();
-      const run = await runTest({testId: test.id, environmentId: selectedEnvironment?.id}).unwrap();
-
-      navigate(`/test/${test.id}/run/${run.id}`);
+      runTest(test.id);
     },
-    [createTest, navigate, plugin, runTest, selectedEnvironment?.id]
+    [createTest, plugin, runTest]
   );
 
   const onUpdateDraftTest = useCallback(
@@ -142,7 +137,7 @@ const CreateTestProvider = ({children}: IProps) => {
       pluginName: plugin.name,
       plugin,
       activeStep,
-      isLoading: isLoadingCreateTest || isLoadingRunTest,
+      isLoading: isLoadingCreateTest || isEditLoading,
       isFormValid,
       onNext,
       onPrev,
@@ -160,7 +155,7 @@ const CreateTestProvider = ({children}: IProps) => {
       plugin,
       activeStep,
       isLoadingCreateTest,
-      isLoadingRunTest,
+      isEditLoading,
       isFormValid,
       onNext,
       onPrev,

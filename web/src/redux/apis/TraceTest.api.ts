@@ -66,6 +66,7 @@ export const {
   useParseExpressionMutation,
   useSetTestOutputsMutation,
   useGetResourcesQuery,
+  useRunTransactionMutation,
 } = TraceTestAPI;
 export const {endpoints} = TraceTestAPI;
 

@@ -27,7 +27,7 @@ function getIcon(state: TTestRun['state']) {
   return <S.IconSuccess />;
 }
 
-const TransactionRunCard = ({run: {id: runId, createdAt, state, metadata}, transactionId, linkTo}: IProps) => {
+const TransactionRunCard = ({run: {id: runId, createdAt, state, metadata, version}, transactionId, linkTo}: IProps) => {
   const onDelete = useDeleteResourceRun({id: transactionId, type: ResourceType.Transaction});
   const metadataName = metadata?.name;
   const metadataBuildNumber = metadata?.buildNumber;
@@ -41,13 +41,14 @@ const TransactionRunCard = ({run: {id: runId, createdAt, state, metadata}, trans
 
         <S.Info>
           <div>
-            <S.Title>v1 (version missing from API)</S.Title>
+            <S.Title>v{version}</S.Title>
           </div>
           <S.Row>
             <Tooltip title={Date.format(createdAt)}>
               <S.Text>{Date.getTimeAgo(createdAt)}</S.Text>
             </Tooltip>
-            <S.Text>&nbsp;• 0s (executionTime missing from API)</S.Text>
+            {/* Adding this latter when is available */}
+            {/* <S.Text>&nbsp;• 0s (executionTime missing from API)</S.Text> */}
 
             {metadataName && (
               <a href={metadataUrl} target="_blank" onClick={event => event.stopPropagation()}>
