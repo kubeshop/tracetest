@@ -133,6 +133,12 @@ func (td *postgresDB) DeleteTransaction(ctx context.Context, transaction model.T
 		return err
 	}
 
+	_, err = tx.ExecContext(ctx, "DELETE FROM transaction_runs WHERE transaction_id = $1", transaction.ID)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
 	_, err = tx.ExecContext(ctx, "DELETE FROM transactions WHERE id = $1", transaction.ID)
 	if err != nil {
 		tx.Rollback()
