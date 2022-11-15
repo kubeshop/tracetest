@@ -24,7 +24,7 @@ const RunDetailTrigger = ({test, run: {state, triggerResult, triggerTime}, run, 
         {shouldDisplayError ? (
           <FailedTrace isDisplayingError={shouldDisplayError} run={run} />
         ) : (
-          <RunDetailTriggerResponse triggerResult={triggerResult} triggerTime={triggerTime} />
+          <RunDetailTriggerResponse state={state} triggerResult={triggerResult} triggerTime={triggerTime} />
         )}
       </S.SectionRight>
     </S.Container>
