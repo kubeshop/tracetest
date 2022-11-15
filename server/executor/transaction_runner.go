@@ -92,7 +92,11 @@ func (r persistentTransactionRunner) runTransaction(ctx context.Context, run mod
 			break
 		}
 
-		run.Environment = r.patchEnvironment(run.Environment, run)
+		run.Environment = run.InjectOutputsIntoEnvironment(run.Environment)
+		err = r.db.UpdateTransactionRun(ctx, run)
+		if err != nil {
+			return fmt.Errorf("coult not update transaction step: %w", err)
+		}
 	}
 
 	if run.State != model.TransactionRunStateFailed {
@@ -116,7 +120,13 @@ func (r persistentTransactionRunner) runTransactionStep(ctx context.Context, tra
 		return model.TransactionRun{}, fmt.Errorf("could not run step: %w", err)
 	}
 
-	stepRun := model.TransactionStepRun{ID: testRun.ID, TestID: testRun.TestID, State: testRun.State}
+	stepRun := model.TransactionStepRun{
+		ID:          testRun.ID,
+		TestID:      testRun.TestID,
+		State:       testRun.State,
+		Environment: testRun.Environment,
+		Outputs:     testRun.Outputs,
+	}
 
 	transactionRun.StepRuns = append(transactionRun.StepRuns, stepRun)
 
