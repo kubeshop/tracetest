@@ -4,6 +4,8 @@ import {PaginationResponse} from 'hooks/usePagination';
 import TransactionRun from 'models/TransactionRun.model';
 import {TTestApiEndpointBuilder} from 'types/Test.types';
 import {TRawTransactionRun, TTransactionRun} from 'types/TransactionRun.types';
+import {IListenerFunction} from '../../../gateways/WebSocket.gateway';
+import WebSocketService from '../../../services/WebSocket.service';
 import {getTotalCountFromHeaders} from '../../../utils/Common';
 
 const TransactionRunEndpoint = (builder: TTestApiEndpointBuilder) => ({
@@ -37,6 +39,18 @@ const TransactionRunEndpoint = (builder: TTestApiEndpointBuilder) => ({
     query: ({transactionId, runId}) => `/transactions/${transactionId}/run/${runId}`,
     providesTags: result => [{type: TracetestApiTags.TRANSACTION_RUN, id: result?.id}],
     transformResponse: (rawTransactionRun: TRawTransactionRun) => TransactionRun(rawTransactionRun),
+    async onCacheEntryAdded(arg, {cacheDataLoaded, cacheEntryRemoved, updateCachedData}) {
+      const listener: IListenerFunction<TRawTransactionRun> = data => {
+        updateCachedData(() => TransactionRun(data.event));
+      };
+
+      await WebSocketService.initWebSocketSubscription({
+        listener,
+        resource: `transaction/${arg.transactionId}/run/${arg.runId}`,
+        waitToCleanSubscription: cacheEntryRemoved,
+        waitToInitSubscription: cacheDataLoaded,
+      });
+    },
   }),
 
   deleteTransactionRunById: builder.mutation<TTransactionRun, {transactionId: string; runId: string}>({
