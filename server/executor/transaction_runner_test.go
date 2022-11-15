@@ -8,6 +8,7 @@ import (
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/testmock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -92,7 +93,13 @@ func TestTransactionRunner(t *testing.T) {
 		},
 	}
 
-	runner := executor.NewTransactionRunner(testRunner, db, config)
+	subscriptionManager := subscription.NewManager()
+
+	transactionUpdater := (executor.CompositeTransactionUpdater{}).
+		Add(executor.NewDBTranasctionUpdater(db)).
+		Add(executor.NewSubscriptionTransactionUpdater(subscriptionManager))
+
+	runner := executor.NewTransactionRunner(testRunner, db, transactionUpdater, config)
 	runner.Start(5)
 
 	ctxWithTimeout, cancel := context.WithTimeout(ctx, 30*time.Second)

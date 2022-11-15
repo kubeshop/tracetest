@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/kubeshop/tracetest/server/id"
@@ -110,4 +111,8 @@ func (run TransactionRun) InjectOutputsIntoEnvironment(env Environment) Environm
 	newEnvironment := Environment{Values: newEnvVariables}
 
 	return lastEnvironment.Merge(newEnvironment)
+}
+
+func (r TransactionRun) ResourceID() string {
+	return fmt.Sprintf("transaction/%s/run/%d", r.TransactionID, r.ID)
 }
