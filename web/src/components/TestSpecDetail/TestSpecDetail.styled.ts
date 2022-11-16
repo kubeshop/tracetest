@@ -45,8 +45,7 @@ export const DrawerContainer = styled(Drawer)`
 
 export const GridContainer = styled.div`
   display: grid;
-  column-gap: 24px;
-  grid-template-columns: 5% 1fr;
+  grid-template-columns: 4.5% 1fr;
   align-items: center;
 `;
 
@@ -82,16 +81,16 @@ export const HeaderTitle = styled(Typography.Title)`
 
 export const IconError = styled(MinusCircleFilled)`
   color: ${({theme}) => theme.color.error};
-  margin-right: 8px;
-`;
-export const IconSuccess = styled(CheckCircleFilled)`
-  color: ${({theme}) => theme.color.success};
-  margin-right: 8px;
 `;
 
-export const Row = styled.div<{$align?: string; $hasGap?: boolean}>`
+export const IconSuccess = styled(CheckCircleFilled)`
+  color: ${({theme}) => theme.color.success};
+`;
+
+export const Row = styled.div<{$align?: string; $hasGap?: boolean, $justify?: string}>`
   align-items: ${({$align}) => $align || 'center'};
   display: flex;
+  justify-content: ${({$justify}) => $justify || 'flex-start'};
   gap: ${({$hasGap}) => $hasGap && '8px'};
 `;
 
