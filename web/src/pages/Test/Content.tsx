@@ -15,6 +15,7 @@ import {ResourceType} from 'types/Resource.type';
 import {TTestRun} from 'types/TestRun.types';
 import ExperimentalFeature from 'utils/ExperimentalFeature';
 import * as S from './Test.styled';
+import useDocumentTitle from '../../hooks/useDocumentTitle';
 
 const Content = () => {
   const navigate = useNavigate();
@@ -22,6 +23,7 @@ const Content = () => {
   const onDeleteResource = useDeleteResource();
   const {runTest, isLoadingRunTest} = useTestCrud();
   const params = useMemo(() => ({testId: test.id}), [test.id]);
+  useDocumentTitle(`${test.name}`);
 
   const handleRunTest = useCallback(async () => {
     if (test.id) runTest(test.id);
