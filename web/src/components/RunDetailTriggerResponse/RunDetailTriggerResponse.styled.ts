@@ -104,3 +104,7 @@ export const Actions = styled.div`
   margin-top: 16px;
   gap: 10px;
 `;
+
+export const ResponseEnvironmentContainer = styled.div`
+  padding: 16px 0;
+`;
