@@ -8,8 +8,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const ms = 100000000
-
 func TestRunExecutionTime(t *testing.T) {
 	cases := []struct {
 		name     string
@@ -20,34 +18,34 @@ func TestRunExecutionTime(t *testing.T) {
 		{
 			name: "CompletedOk",
 			run: model.Run{
-				CreatedAt:   time.Date(2022, 01, 25, 12, 45, 33, 1*ms, time.UTC),
-				CompletedAt: time.Date(2022, 01, 25, 12, 45, 36, 4*ms, time.UTC),
+				CreatedAt:   time.Date(2022, 01, 25, 12, 45, 33, int(100*time.Millisecond), time.UTC),
+				CompletedAt: time.Date(2022, 01, 25, 12, 45, 36, int(400*time.Millisecond), time.UTC),
 			},
 			expected: 4,
 		},
 		{
 			name: "LessThan1Sec",
 			run: model.Run{
-				CreatedAt:   time.Date(2022, 01, 25, 12, 45, 33, 1*ms, time.UTC),
-				CompletedAt: time.Date(2022, 01, 25, 12, 45, 33, 4*ms, time.UTC),
+				CreatedAt:   time.Date(2022, 01, 25, 12, 45, 33, int(100*time.Millisecond), time.UTC),
+				CompletedAt: time.Date(2022, 01, 25, 12, 45, 33, int(400*time.Millisecond), time.UTC),
 			},
 			expected: 1,
 		},
 		{
 			name: "StillRunning",
 			run: model.Run{
-				CreatedAt: time.Date(2022, 01, 25, 12, 45, 33, 1*ms, time.UTC),
+				CreatedAt: time.Date(2022, 01, 25, 12, 45, 33, int(100*time.Millisecond), time.UTC),
 			},
-			now:      time.Date(2022, 01, 25, 12, 45, 34, 3*ms, time.UTC),
+			now:      time.Date(2022, 01, 25, 12, 45, 34, int(300*time.Millisecond), time.UTC),
 			expected: 2,
 		},
 		{
 			name: "ZeroedDate",
 			run: model.Run{
-				CreatedAt:   time.Date(2022, 01, 25, 12, 45, 33, 1*ms, time.UTC),
+				CreatedAt:   time.Date(2022, 01, 25, 12, 45, 33, int(100*time.Millisecond), time.UTC),
 				CompletedAt: time.Unix(0, 0),
 			},
-			now:      time.Date(2022, 01, 25, 12, 45, 34, 3*ms, time.UTC),
+			now:      time.Date(2022, 01, 25, 12, 45, 34, int(300*time.Millisecond), time.UTC),
 			expected: 2,
 		},
 	}
@@ -77,34 +75,34 @@ func TestRunTriggerTime(t *testing.T) {
 		{
 			name: "CompletedOk",
 			run: model.Run{
-				ServiceTriggeredAt:        time.Date(2022, 01, 25, 12, 45, 33, 1*ms, time.UTC),
-				ServiceTriggerCompletedAt: time.Date(2022, 01, 25, 12, 45, 36, 4*ms, time.UTC),
+				ServiceTriggeredAt:        time.Date(2022, 01, 25, 12, 45, 33, int(100*time.Millisecond), time.UTC),
+				ServiceTriggerCompletedAt: time.Date(2022, 01, 25, 12, 45, 36, int(400*time.Millisecond), time.UTC),
 			},
 			expected: 3300,
 		},
 		{
 			name: "LessThan1Sec",
 			run: model.Run{
-				ServiceTriggeredAt:        time.Date(2022, 01, 25, 12, 45, 33, 1*ms, time.UTC),
-				ServiceTriggerCompletedAt: time.Date(2022, 01, 25, 12, 45, 33, 4*ms, time.UTC),
+				ServiceTriggeredAt:        time.Date(2022, 01, 25, 12, 45, 33, int(100*time.Millisecond), time.UTC),
+				ServiceTriggerCompletedAt: time.Date(2022, 01, 25, 12, 45, 33, int(400*time.Millisecond), time.UTC),
 			},
 			expected: 300,
 		},
 		{
 			name: "StillRunning",
 			run: model.Run{
-				ServiceTriggeredAt: time.Date(2022, 01, 25, 12, 45, 33, 1*ms, time.UTC),
+				ServiceTriggeredAt: time.Date(2022, 01, 25, 12, 45, 33, int(100*time.Millisecond), time.UTC),
 			},
-			now:      time.Date(2022, 01, 25, 12, 45, 34, 3*ms, time.UTC),
+			now:      time.Date(2022, 01, 25, 12, 45, 34, int(300*time.Millisecond), time.UTC),
 			expected: 1200,
 		},
 		{
 			name: "ZeroedDate",
 			run: model.Run{
-				ServiceTriggeredAt:        time.Date(2022, 01, 25, 12, 45, 33, 1*ms, time.UTC),
+				ServiceTriggeredAt:        time.Date(2022, 01, 25, 12, 45, 33, int(100*time.Millisecond), time.UTC),
 				ServiceTriggerCompletedAt: time.Unix(0, 0),
 			},
-			now:      time.Date(2022, 01, 25, 12, 45, 34, 3*ms, time.UTC),
+			now:      time.Date(2022, 01, 25, 12, 45, 34, int(300*time.Millisecond), time.UTC),
 			expected: 1200,
 		},
 	}
