@@ -2,17 +2,20 @@ import {Button, Popover, Typography} from 'antd';
 import {InfoCircleOutlined} from '@ant-design/icons';
 import {useTheme} from 'styled-components';
 
+import {TestState} from 'constants/TestRun.constants';
+import TestAnalyticsService from 'services/Analytics/TestAnalytics.service';
+import {TTestRunState} from 'types/TestRun.types';
 import Date from 'utils/Date';
-import TestAnalyticsService from '../../services/Analytics/TestAnalytics.service';
 
 interface IProps {
   date: string;
   executionTime: number;
+  state: TTestRunState;
   totalSpans: number;
   traceId: string;
 }
 
-const Info = ({date, executionTime, totalSpans, traceId}: IProps) => {
+const Info = ({date, executionTime, state, totalSpans, traceId}: IProps) => {
   const theme = useTheme();
 
   const content = (
@@ -27,7 +30,9 @@ const Info = ({date, executionTime, totalSpans, traceId}: IProps) => {
       </div>
       <div>
         <Typography.Text strong>Execution time: </Typography.Text>
-        <Typography.Text>{executionTime} s</Typography.Text>
+        <Typography.Text>
+          {state === TestState.FAILED || state === TestState.FINISHED ? `${executionTime}s` : '-'}
+        </Typography.Text>
       </div>
       <div>
         <Typography.Text strong>Total spans: </Typography.Text>

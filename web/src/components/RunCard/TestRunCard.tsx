@@ -48,7 +48,10 @@ const TestRunCard = ({
             <Tooltip title={Date.format(createdAt)}>
               <S.Text>{Date.getTimeAgo(createdAt)}</S.Text>
             </Tooltip>
-            <S.Text>&nbsp;• {executionTime}s</S.Text>
+
+            {(state === TestStateEnum.FAILED || state === TestStateEnum.FINISHED) && (
+              <S.Text>&nbsp;• {executionTime}s</S.Text>
+            )}
 
             {metadataName && (
               <a href={metadataUrl} target="_blank" onClick={event => event.stopPropagation()}>
