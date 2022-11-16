@@ -44,24 +44,34 @@ func (r Run) Copy() Run {
 }
 
 func (r Run) ExecutionTime() int {
-	return timeDiff(r.CreatedAt, r.CompletedAt)
+	return durationInSeconds(
+		timeDiff(r.CreatedAt, r.CompletedAt),
+	)
 }
 
 func (r Run) TriggerTime() int {
-	return timeDiff(r.ServiceTriggeredAt, r.ServiceTriggerCompletedAt)
+	return durationInMillieconds(
+		timeDiff(r.ServiceTriggeredAt, r.ServiceTriggerCompletedAt),
+	)
 }
 
-func timeDiff(start, end time.Time) int {
+func timeDiff(start, end time.Time) time.Duration {
 	var endDate time.Time
 	if !dateIsZero(end) {
 		endDate = end
 	} else {
 		endDate = Now()
 	}
+	return endDate.Sub(start)
+}
 
-	et := math.Ceil(endDate.Sub(start).Seconds())
+func durationInMillieconds(d time.Duration) int {
+	fmt.Println(d)
+	return int(d.Milliseconds())
+}
 
-	return int(et)
+func durationInSeconds(d time.Duration) int {
+	return int(math.Ceil(d.Seconds()))
 }
 
 func dateIsZero(in time.Time) bool {
