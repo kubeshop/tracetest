@@ -1,6 +1,7 @@
 import {TRawAssertionResults} from 'types/Assertion.types';
 import {TRawTestRun, TTestRun} from 'types/TestRun.types';
 import AssertionResults from './AssertionResults.model';
+import Environment from './Environment.model';
 import {TestRunOutput} from './TestOutput.model';
 import Trace from './Trace.model';
 import TriggerResult from './TriggerResult.model';
@@ -48,6 +49,7 @@ const TestRun = ({
   serviceTriggeredAt = '',
   metadata = {},
   outputs = [],
+  environment = {},
 }: TRawTestRun): TTestRun => {
   return {
     obtainedTraceAt,
@@ -70,7 +72,8 @@ const TestRun = ({
     failedAssertionCount: getTestResultCount(result, 'failed'),
     passedAssertionCount: getTestResultCount(result, 'passed'),
     metadata,
-    outputs: outputs?.map(rawOuput => TestRunOutput(rawOuput)),
+    outputs: outputs?.map(rawOutput => TestRunOutput(rawOutput)),
+    environment: Environment(environment),
   };
 };
 

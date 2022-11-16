@@ -23,21 +23,6 @@ export const Info = styled.div`
   height: 100%;
 `;
 
-export const Stack = styled.div`
-  display: flex;
-  justify-content: space-between;
-  flex-direction: column;
-`;
-
-export const Text = styled(Typography.Text)<{opacity?: number; fontWeight?: string}>`
-  && {
-    font-size: ${({theme}) => theme.size.sm};
-    color: ${({opacity}) => `rgba(3, 24, 73, ${opacity || 1})`};
-    margin: 0 !important;
-    font-weight: ${({fontWeight}) => fontWeight || 'normal'};
-  }
-`;
-
 export const ExecutionStepName = styled(Typography.Text)`
   && {
     font-size: ${({theme}) => theme.size.sm};
@@ -90,10 +75,6 @@ export const ExecutionStepRunLink = styled(Link)`
   && {
     color: ${({theme}) => theme.color.textLight};
   }
-`;
-
-export const VariableContainer = styled(Container)`
-  grid-template-columns: 1fr 1fr;
 `;
 
 export const ResultContainer = styled.div`

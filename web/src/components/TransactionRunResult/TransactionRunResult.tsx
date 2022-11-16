@@ -1,7 +1,7 @@
+import KeyValueRow from 'components/KeyValueRow';
 import {TTransactionRun} from 'types/TransactionRun.types';
 import ExecutionStep from './ExecutionStep';
 import * as S from './TransactionRunResult.styled';
-import Variable from './Variable';
 
 interface IProps {
   transactionRun: TTransactionRun;
@@ -19,7 +19,7 @@ const TransactionRunResult = ({transactionRun: {steps, stepRuns, environment}}: 
       <div>
         <S.Title>Variables</S.Title>
         {environment?.values?.map(value => (
-          <Variable key={value.key} value={value} />
+          <KeyValueRow key={value.key} keyName={value.key} value={value.value} />
         ))}
       </div>
     </S.ResultContainer>

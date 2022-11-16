@@ -8,6 +8,7 @@ import {TTestRunState} from 'types/TestRun.types';
 import ExperimentalFeature from 'utils/ExperimentalFeature';
 import {Steps} from '../GuidedTour/traceStepList';
 import ResponseBody from './ResponseBody';
+import ResponseEnvironment from './ResponseEnvironment';
 import ResponseHeaders from './ResponseHeaders';
 import ResponseOutputs from './ResponseOutputs';
 import * as S from './RunDetailTriggerResponse.styled';
@@ -62,6 +63,11 @@ const RunDetailTriggerResponse = ({
           {isTransactionsEnabled && (
             <Tabs.TabPane key="3" tab="Outputs">
               <ResponseOutputs />
+            </Tabs.TabPane>
+          )}
+          {isTransactionsEnabled && (
+            <Tabs.TabPane key="4" tab="Environment">
+              <ResponseEnvironment />
             </Tabs.TabPane>
           )}
         </Tabs>
