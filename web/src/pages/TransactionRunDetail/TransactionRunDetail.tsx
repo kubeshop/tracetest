@@ -1,7 +1,7 @@
+import {useParams} from 'react-router-dom';
 import Layout from 'components/Layout';
 import withAnalytics from 'components/WithAnalytics/WithAnalytics';
-import TransactionRunProvider from 'providers/TransactionRun';
-import {useParams} from 'react-router-dom';
+import TransactionRunProvider from 'providers/TransactionRun/TransactionRun.provider';
 import TransactionContent from './Content';
 
 const TransactionRunDetail = () => {

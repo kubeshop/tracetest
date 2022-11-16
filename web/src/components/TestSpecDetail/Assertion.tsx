@@ -16,14 +16,12 @@ interface IProps {
 const Assertion = ({check, testId, runId, selector}: IProps) => (
   <S.CheckItemContainer>
     <S.GridContainer>
-      <S.Row>{check.result.passed ? <S.IconSuccess /> : <S.IconError />}</S.Row>
+      <S.Row $justify="center">{check.result.passed ? <S.IconSuccess /> : <S.IconError />}</S.Row>
       <AttributeValue
         strong
         type={check.result.passed ? 'success' : 'danger'}
         value={check.result.observedValue || '<Empty Value>'}
       />
-    </S.GridContainer>
-    <S.GridContainer>
       <div />
       <S.Row>
         <S.AssertionContainer>
