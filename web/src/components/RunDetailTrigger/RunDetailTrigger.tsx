@@ -12,7 +12,7 @@ interface IProps {
   isError: boolean;
 }
 
-const RunDetailTrigger = ({test, run: {triggerResult, state, executionTime}, run, isError}: IProps) => {
+const RunDetailTrigger = ({test, run: {state, triggerResult, triggerTime}, run, isError}: IProps) => {
   const shouldDisplayError = isError || state === TestState.FAILED;
 
   return (
@@ -24,7 +24,7 @@ const RunDetailTrigger = ({test, run: {triggerResult, state, executionTime}, run
         {shouldDisplayError ? (
           <FailedTrace isDisplayingError={shouldDisplayError} run={run} />
         ) : (
-          <RunDetailTriggerResponse triggerResult={triggerResult} executionTime={executionTime} />
+          <RunDetailTriggerResponse state={state} triggerResult={triggerResult} triggerTime={triggerTime} />
         )}
       </S.SectionRight>
     </S.Container>

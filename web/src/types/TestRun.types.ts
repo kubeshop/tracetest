@@ -16,6 +16,7 @@ export type TTestRun = Model<
     failedAssertionCount: number;
     passedAssertionCount: number;
     executionTime: number;
+    triggerTime: number;
     lastErrorState?: string;
     trigger?: TTriggerSchemas['Trigger'];
     triggerResult?: TTriggerResult;

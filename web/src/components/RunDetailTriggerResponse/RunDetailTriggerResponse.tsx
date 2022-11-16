@@ -1,9 +1,11 @@
 import {Tabs} from 'antd';
 import {TriggerTypes} from 'constants/Test.constants';
-import {TTriggerResult} from 'types/Test.types';
-import ExperimentalFeature from 'utils/ExperimentalFeature';
+import {TestState} from 'constants/TestRun.constants';
 import TestRunAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
 import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
+import {TTriggerResult} from 'types/Test.types';
+import {TTestRunState} from 'types/TestRun.types';
+import ExperimentalFeature from 'utils/ExperimentalFeature';
 import {Steps} from '../GuidedTour/traceStepList';
 import ResponseBody from './ResponseBody';
 import ResponseHeaders from './ResponseHeaders';
@@ -13,12 +15,14 @@ import * as S from './RunDetailTriggerResponse.styled';
 const isTransactionsEnabled = ExperimentalFeature.isEnabled('transactions');
 
 interface IProps {
+  state: TTestRunState;
   triggerResult?: TTriggerResult;
-  executionTime?: number;
+  triggerTime?: number;
 }
 
 const RunDetailTriggerResponse = ({
-  executionTime = 0,
+  state,
+  triggerTime = 0,
   triggerResult: {headers, body = '', statusCode = 200, bodyMimeType} = {
     body: '',
     type: TriggerTypes.http,
@@ -35,7 +39,10 @@ const RunDetailTriggerResponse = ({
             Status: <S.StatusSpan $isError={statusCode >= 400}>{statusCode}</S.StatusSpan>
           </S.StatusText>
           <S.StatusText>
-            Time: <S.StatusSpan $isError={executionTime > 1000}>{executionTime}ms</S.StatusSpan>
+            Time:{' '}
+            <S.StatusSpan $isError={triggerTime > 1000}>
+              {state === TestState.CREATED || state === TestState.EXECUTING ? '-' : `${triggerTime}ms`}
+            </S.StatusSpan>
           </S.StatusText>
         </div>
       </S.TitleContainer>

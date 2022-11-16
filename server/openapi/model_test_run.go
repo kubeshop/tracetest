@@ -29,8 +29,11 @@ type TestRun struct {
 	// Details of the cause for the last `FAILED` state
 	LastErrorState string `json:"lastErrorState,omitempty"`
 
-	// time it took for the test to complete, either success or fail. If the test is still running, it will show the time up to the time of the request
+	// time in seconds it took for the test to complete, either success or fail. If the test is still running, it will show the time up to the time of the request
 	ExecutionTime int32 `json:"executionTime,omitempty"`
+
+	// time in milliseconds it took for the triggering transaction to complete, either success or fail. If the test is still running, it will show the time up to the time of the request
+	TriggerTime int32 `json:"triggerTime,omitempty"`
 
 	CreatedAt time.Time `json:"createdAt,omitempty"`
 

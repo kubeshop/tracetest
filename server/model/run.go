@@ -11,7 +11,7 @@ import (
 
 var (
 	Now = func() time.Time {
-		return time.Now()
+		return time.Now().UTC()
 	}
 
 	IDGen = id.NewRandGenerator()
@@ -44,16 +44,37 @@ func (r Run) Copy() Run {
 }
 
 func (r Run) ExecutionTime() int {
+	return durationInSeconds(
+		timeDiff(r.CreatedAt, r.CompletedAt),
+	)
+}
+
+func (r Run) TriggerTime() int {
+	return durationInMillieconds(
+		timeDiff(r.ServiceTriggeredAt, r.ServiceTriggerCompletedAt),
+	)
+}
+
+func timeDiff(start, end time.Time) time.Duration {
 	var endDate time.Time
-	if !r.CompletedAt.IsZero() {
-		endDate = r.CompletedAt
+	if !dateIsZero(end) {
+		endDate = end
 	} else {
 		endDate = Now()
 	}
+	return endDate.Sub(start)
+}
 
-	et := math.Ceil(endDate.Sub(r.CreatedAt).Seconds())
+func durationInMillieconds(d time.Duration) int {
+	return int(d.Milliseconds())
+}
 
-	return int(et)
+func durationInSeconds(d time.Duration) int {
+	return int(math.Ceil(d.Seconds()))
+}
+
+func dateIsZero(in time.Time) bool {
+	return in.IsZero() || in.Unix() == 0
 }
 
 func (r Run) Start() Run {
@@ -62,9 +83,14 @@ func (r Run) Start() Run {
 	return r
 }
 
-func (r Run) SuccessfullyExecuted() Run {
-	r.State = RunStateAwaitingTrace
+func (r Run) TriggerCompleted(tr TriggerResult) Run {
 	r.ServiceTriggerCompletedAt = Now()
+	r.TriggerResult = tr
+	return r
+}
+
+func (r Run) SuccessfullyTriggered() Run {
+	r.State = RunStateAwaitingTrace
 	return r
 }
 
