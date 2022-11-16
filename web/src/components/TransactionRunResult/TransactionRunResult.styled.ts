@@ -9,7 +9,7 @@ export const Container = styled.div`
   border-radius: 2px;
   background: ${({theme}) => theme.color.background};
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto 1fr auto auto;
   gap: 16px;
   padding: 7px 16px;
   margin-bottom: 8px;
@@ -100,4 +100,28 @@ export const ResultContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 24px;
+`;
+
+export const HeaderDetail = styled(Typography.Text)`
+  display: flex;
+  align-items: center;
+  color: ${({theme}) => theme.color.textSecondary};
+  font-size: ${({theme}) => theme.size.sm};
+  margin-right: 8px;
+`;
+
+export const HeaderDot = styled.span<{$passed: boolean}>`
+  background-color: ${({$passed, theme}) => ($passed ? theme.color.success : theme.color.error)};
+  border-radius: 50%;
+  display: inline-block;
+  height: 10px;
+  line-height: 0;
+  margin-right: 4px;
+  vertical-align: -0.1em;
+  width: 10px;
+`;
+
+export const AssertionResultContainer = styled.div`
+  display: flex;
+  align-items: center;
 `;

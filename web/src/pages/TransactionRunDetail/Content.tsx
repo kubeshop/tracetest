@@ -1,6 +1,6 @@
 import TransactionRunLayout from 'components/TransactionRunLayout';
 import {useTransaction} from 'providers/Transaction/Transaction.provider';
-import {useTransactionRun} from 'providers/TransactionRun/TransactionRunProvider';
+import {useTransactionRun} from 'providers/TransactionRun/TransactionRun.provider';
 
 const Content = () => {
   const {transaction} = useTransaction();

@@ -21,7 +21,6 @@ export const useTransactionRun = () => useContext(Context);
 
 const TransactionRunProvider = ({children, transactionId, runId}: IProps) => {
   const {data: transactionRun} = useGetTransactionRunByIdQuery({transactionId, runId});
-
   const value = useMemo<IContext>(() => ({transactionRun}), [transactionRun]);
 
   return transactionRun ? (

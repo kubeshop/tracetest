@@ -1,5 +1,4 @@
 import {Tooltip} from 'antd';
-
 import {TSummary} from 'types/Test.types';
 import Date from 'utils/Date';
 import * as S from './ResourceCard.styled';

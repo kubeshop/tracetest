@@ -1,4 +1,5 @@
 import {capitalize} from 'lodash';
+import {Tooltip} from 'antd';
 import {LinkOutlined} from '@ant-design/icons';
 import {TestState} from 'constants/TestRun.constants';
 import {TTest} from 'types/Test.types';
@@ -26,7 +27,7 @@ interface IProps {
 const ExecutionStep = ({
   index,
   test: {name, trigger, id: testId},
-  testRun: {id: runId, state, testVersion} = TestRun({}),
+  testRun: {id: runId, state, testVersion, passedAssertionCount, failedAssertionCount} = TestRun({}),
 }: IProps) => {
   return (
     <S.Container data-cy={`run-card-${name}`} key={`${testId}-${runId}`}>
@@ -39,10 +40,32 @@ const ExecutionStep = ({
           <S.TextTag>{capitalize(state)}</S.TextTag>
         </S.TagContainer>
       </S.Info>
+      <S.AssertionResultContainer>
+        {runId && (
+          <>
+            <Tooltip title="Passed assertions">
+              <S.HeaderDetail>
+                <S.HeaderDot $passed />
+                {passedAssertionCount}
+              </S.HeaderDetail>
+            </Tooltip>
+            <Tooltip title="Failed assertions">
+              <S.HeaderDetail>
+                <S.HeaderDot $passed={false} />
+                {failedAssertionCount}
+              </S.HeaderDetail>
+            </Tooltip>
+          </>
+        )}
+      </S.AssertionResultContainer>
       <S.ExecutionStepStatus>
-        <S.ExecutionStepRunLink to={`/test/${testId}/run/${runId}`} target="_blank">
-          <LinkOutlined />
-        </S.ExecutionStepRunLink>
+        {runId && (
+          <Tooltip title="Go to Run">
+            <S.ExecutionStepRunLink to={`/test/${testId}/run/${runId}`} target="_blank">
+              <LinkOutlined />
+            </S.ExecutionStepRunLink>
+          </Tooltip>
+        )}
       </S.ExecutionStepStatus>
     </S.Container>
   );
