@@ -12,6 +12,8 @@ import AssertionService from 'services/Assertion.service';
 import SpanService from 'services/Span.service';
 import SpanAttributeService from 'services/SpanAttribute.service';
 import {TSpan, TSpanFlatAttribute} from 'types/Span.types';
+import {useTestOutput} from 'providers/TestOutput/TestOutput.provider';
+import TestOutput from 'models/TestOutput.model';
 import Attributes from './Attributes';
 import Header from './Header';
 import * as S from './SpanDetail.styled';
@@ -24,6 +26,7 @@ interface IProps {
 
 const SpanDetail = ({onCreateTestSpec = noop, searchText, span}: IProps) => {
   const {open} = useTestSpecForm();
+  const {onNavigateAndOpenModal} = useTestOutput();
   const spansResult = useAppSelector(TestSpecsSelectors.selectSpansResult);
   const assertions = useAppSelector(state => TestSpecsSelectors.selectAssertionResultsBySpan(state, span?.id || ''));
   const [search, setSearch] = useState('');
@@ -54,6 +57,22 @@ const SpanDetail = ({onCreateTestSpec = noop, searchText, span}: IProps) => {
     [onCreateTestSpec, open, span]
   );
 
+  const handleCreateOutput = useCallback(
+    ({key}: TSpanFlatAttribute) => {
+      TraceAnalyticsService.onAddAssertionButtonClick();
+      const selector = SpanService.getSelectorInformation(span!);
+
+      const output = TestOutput({
+        selector: {query: selector},
+        name: key,
+        value: `attr:${key}`,
+      });
+
+      onNavigateAndOpenModal(output);
+    },
+    [onNavigateAndOpenModal, span]
+  );
+
   const handleOnSearch = useCallback((value: string) => {
     setSearch(value);
   }, []);
@@ -80,6 +99,7 @@ const SpanDetail = ({onCreateTestSpec = noop, searchText, span}: IProps) => {
         assertions={assertions}
         attributeList={filteredAttributes}
         onCreateTestSpec={handleCreateTestSpec}
+        onCreateOutput={handleCreateOutput}
         searchText={searchText}
         semanticConventions={semanticConventions}
       />

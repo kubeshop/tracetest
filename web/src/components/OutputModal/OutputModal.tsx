@@ -2,7 +2,6 @@ import {Form} from 'antd';
 import {useEffect} from 'react';
 
 import {useAppSelector} from 'redux/hooks';
-import {selectTestOutputByIndex} from 'redux/testOutputs/selectors';
 import SpanSelectors from 'selectors/Span.selectors';
 import {TTestOutput} from 'types/TestOutput.types';
 import useValidateOutput from './hooks/useValidateOutput';
@@ -11,20 +10,19 @@ import OutputModalFooter from './OutputModalFooter';
 import OutputModalForm from './OutputModalForm';
 
 interface IProps {
-  index: number;
   isOpen: boolean;
   onClose(): void;
   onSubmit(values: TTestOutput, isEditing: boolean): void;
   runId: string;
   testId: string;
+  output?: TTestOutput;
+  isEditing?: boolean;
 }
 
-const OutputModal = ({index, isOpen, onClose, onSubmit, runId, testId}: IProps) => {
+const OutputModal = ({isOpen, onClose, onSubmit, runId, testId, output, isEditing = false}: IProps) => {
   const [form] = Form.useForm<TTestOutput>();
-  const output = useAppSelector(state => selectTestOutputByIndex(state, index));
   const spanIdList = useAppSelector(SpanSelectors.selectMatchedSpans);
   const {isValid, onValidate} = useValidateOutput({spanIdList});
-  const isEditing = index !== -1;
 
   useEffect(() => {
     if (output && isOpen) form.setFieldsValue(output);

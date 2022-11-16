@@ -12,9 +12,10 @@ interface IProps {
   onCreateTestSpec(attribute: TSpanFlatAttribute): void;
   searchText?: string;
   semanticConventions: OtelReference;
+  onCreateOutput(attribute: TSpanFlatAttribute): void;
 }
 
-const AttributeList = ({assertions, attributeList, onCreateTestSpec, searchText, semanticConventions}: IProps) => {
+const AttributeList = ({assertions, attributeList, onCreateTestSpec, onCreateOutput, searchText, semanticConventions}: IProps) => {
   const onCopy = (value: string) => {
     TraceAnalyticsService.onAttributeCopy();
     navigator.clipboard.writeText(value);
@@ -31,6 +32,7 @@ const AttributeList = ({assertions, attributeList, onCreateTestSpec, searchText,
           key={attribute.key}
           onCopy={onCopy}
           onCreateTestSpec={onCreateTestSpec}
+          onCreateOutput={onCreateOutput}
           semanticConventions={semanticConventions}
         />
       ))}

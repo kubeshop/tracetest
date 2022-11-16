@@ -9,6 +9,7 @@ export type TTestOutput = {
   selector: string;
   value: string;
   valueRun: string;
+  id: number;
 };
 
 export type TRawTestRunOutput = {

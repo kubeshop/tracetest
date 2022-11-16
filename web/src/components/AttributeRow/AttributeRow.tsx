@@ -19,12 +19,14 @@ interface IProps {
   searchText?: string;
   onCopy(value: string): void;
   onCreateTestSpec(attribute: TSpanFlatAttribute): void;
+  onCreateOutput(attribute: TSpanFlatAttribute): void;
   semanticConventions: OtelReference;
 }
 
 enum Action {
   Copy = '0',
   Create_Spec = '1',
+  Create_Output = '2',
 }
 
 const AttributeRow = ({
@@ -36,6 +38,7 @@ const AttributeRow = ({
   onCreateTestSpec,
   searchText,
   semanticConventions,
+  onCreateOutput,
 }: IProps) => {
   const passedCount = assertionsPassed?.length ?? 0;
   const failedCount = assertionsFailed?.length ?? 0;
@@ -52,6 +55,10 @@ const AttributeRow = ({
     if (option === Action.Create_Spec) {
       return onCreateTestSpec(attribute);
     }
+
+    if (option === Action.Create_Output) {
+      return onCreateOutput(attribute);
+    }
   };
 
   const cypressKey = key.toLowerCase().replace('.', '-');
@@ -62,6 +69,10 @@ const AttributeRow = ({
         {
           label: 'Copy value',
           key: Action.Copy,
+        },
+        {
+          label: 'Create Output',
+          key: Action.Create_Output,
         },
         {
           label: 'Create test spec',
