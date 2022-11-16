@@ -139,3 +139,51 @@ func TestListTransactionRun(t *testing.T) {
 	assert.Contains(t, runs, newRun2)
 	assert.NotContains(t, runs, newRun3)
 }
+
+func TestBug(t *testing.T) {
+	db, clean := getDB()
+	defer clean()
+
+	ctx := context.TODO()
+
+	transaction := model.Transaction{
+		Name:        "first test",
+		Description: "description",
+		Steps: []model.Test{
+			createTestWithName(t, db, "first step"),
+			createTestWithName(t, db, "second step"),
+		},
+	}
+
+	transaction, err := db.CreateTransaction(ctx, transaction)
+	require.NoError(t, err)
+
+	run1 := model.NewTransactionRun(transaction)
+	run1, err = db.CreateTransactionRun(ctx, run1)
+	require.NoError(t, err)
+
+	run2 := model.NewTransactionRun(transaction)
+	run2, err = db.CreateTransactionRun(ctx, run2)
+	require.NoError(t, err)
+
+	runs, err := db.GetTransactionsRuns(ctx, transaction.ID.String())
+	require.NoError(t, err)
+	assert.Contains(t, runs, run1)
+	assert.Contains(t, runs, run2)
+
+	transaction.Name = "another thing"
+	newTransaction, err := db.UpdateTransaction(ctx, transaction)
+	require.NoError(t, err)
+
+	run3 := model.NewTransactionRun(newTransaction)
+	run3, err = db.CreateTransactionRun(ctx, run3)
+	require.NoError(t, err)
+
+	runs, err = db.GetTransactionsRuns(ctx, newTransaction.ID.String())
+	require.NoError(t, err)
+	assert.Len(t, runs, 3)
+	assert.Contains(t, runs, run1)
+	assert.Contains(t, runs, run2)
+	assert.Contains(t, runs, run3)
+
+}
