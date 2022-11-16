@@ -71,6 +71,12 @@ func TestUpdateTransactionStepsOrder(t *testing.T) {
 		newStep := newTransaction.Steps[i]
 		assert.Equal(t, step.ID, newStep.ID)
 	}
+
+	// old version must exist
+	oldTransaction, err := db.GetTransactionVersion(context.TODO(), newTransaction.ID, 2)
+	assert.NoError(t, err)
+	assert.Equal(t, 2, oldTransaction.Version)
+	assert.Len(t, oldTransaction.Steps, 2)
 }
 
 func TestDeleteTransaction(t *testing.T) {
