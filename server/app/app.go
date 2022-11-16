@@ -131,10 +131,6 @@ func (a *App) Start() error {
 		Add(executor.NewDBUpdater(a.db)).
 		Add(executor.NewSubscriptionUpdater(subscriptionManager))
 
-	execTransactionUpdater := (executor.CompositeTransactionUpdater{}).
-		Add(executor.NewDBTranasctionUpdater(a.db)).
-		Add(executor.NewSubscriptionTransactionUpdater(subscriptionManager))
-
 	assertionExecutor := executor.NewAssertionExecutor(a.tracer)
 	outputProcesser := executor.InstrumentedOutputProcessor(a.tracer)
 	assertionRunner := executor.NewAssertionRunner(execTestUpdater, assertionExecutor, outputProcesser)
@@ -157,7 +153,7 @@ func (a *App) Start() error {
 	runner.Start(5) // worker count. should be configurable
 	defer runner.Stop()
 
-	transactionRunner := executor.NewTransactionRunner(runner, a.db, execTransactionUpdater, a.config)
+	transactionRunner := executor.NewTransactionRunner(runner, a.db, subscriptionManager, a.config)
 	transactionRunner.Start(5)
 	defer transactionRunner.Stop()
 

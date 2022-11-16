@@ -96,11 +96,7 @@ func TestTransactionRunner(t *testing.T) {
 
 	subscriptionManager := subscription.NewManager()
 
-	transactionUpdater := (executor.CompositeTransactionUpdater{}).
-		Add(executor.NewDBTranasctionUpdater(db)).
-		Add(executor.NewSubscriptionTransactionUpdater(subscriptionManager))
-
-	runner := executor.NewTransactionRunner(testRunner, db, transactionUpdater, config)
+	runner := executor.NewTransactionRunner(testRunner, db, subscriptionManager, config)
 	runner.Start(5)
 
 	ctxWithTimeout, cancel := context.WithTimeout(ctx, 30*time.Second)
@@ -217,11 +213,7 @@ func TestTransactionRunnerWhenTestFails(t *testing.T) {
 
 	subscriptionManager := subscription.NewManager()
 
-	transactionUpdater := (executor.CompositeTransactionUpdater{}).
-		Add(executor.NewDBTranasctionUpdater(db)).
-		Add(executor.NewSubscriptionTransactionUpdater(subscriptionManager))
-
-	runner := executor.NewTransactionRunner(testRunner, db, transactionUpdater, config)
+	runner := executor.NewTransactionRunner(testRunner, db, subscriptionManager, config)
 	runner.Start(5)
 
 	ctxWithTimeout, cancel := context.WithTimeout(ctx, 30*time.Second)
