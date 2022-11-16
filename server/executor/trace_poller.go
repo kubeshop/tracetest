@@ -190,6 +190,8 @@ func (tp tracePoller) handleTraceDBError(job PollingRequest, err error) {
 		fmt.Println("other", err)
 	}
 
+	job.channel <- RunResult{Run: run, Err: err}
+
 	tp.handleDBError(tp.updater.Update(job.ctx, run.Failed(err)))
 
 }

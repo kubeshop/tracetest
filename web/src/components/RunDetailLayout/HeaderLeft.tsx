@@ -29,6 +29,7 @@ const HeaderLeft = ({name, testId, triggerType}: IProps) => {
           <Info
             date={run?.createdAt ?? ''}
             executionTime={run?.executionTime ?? 0}
+            state={run.state}
             totalSpans={run?.trace?.spans?.length ?? 0}
             traceId={run?.traceId ?? ''}
           />

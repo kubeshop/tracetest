@@ -291,6 +291,7 @@ func (m OpenAPI) Run(in *model.Run) openapi.TestRun {
 		State:                     string(in.State),
 		LastErrorState:            errToString(in.LastError),
 		ExecutionTime:             int32(in.ExecutionTime()),
+		TriggerTime:               int32(in.TriggerTime()),
 		CreatedAt:                 in.CreatedAt,
 		ServiceTriggeredAt:        in.ServiceTriggeredAt,
 		ServiceTriggerCompletedAt: in.ServiceTriggerCompletedAt,

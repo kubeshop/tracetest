@@ -64,13 +64,13 @@ func (td *postgresDB) insertIntoTransactions(ctx context.Context, transaction mo
 
 func (td *postgresDB) setTransactionSteps(ctx context.Context, tx *sql.Tx, transaction model.Transaction) (model.Transaction, error) {
 	// delete existing steps
-	stmt, err := tx.Prepare("DELETE FROM transaction_runs WHERE transaction_id = $1")
+	stmt, err := tx.Prepare("DELETE FROM transaction_runs WHERE transaction_id = $1 AND transaction_version = $2")
 	if err != nil {
 		tx.Rollback()
 		return model.Transaction{}, err
 	}
 
-	_, err = stmt.ExecContext(ctx, transaction.ID)
+	_, err = stmt.ExecContext(ctx, transaction.ID, transaction.Version)
 	if err != nil {
 		tx.Rollback()
 		return model.Transaction{}, err

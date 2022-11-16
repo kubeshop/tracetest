@@ -71,7 +71,7 @@ func (r persistentTransactionRunner) Start(workers int) {
 				case job := <-r.executionChannel:
 					err := r.runTransaction(job.ctx, job.run)
 					if err != nil {
-						panic(err)
+						fmt.Println(err.Error())
 					}
 				}
 			}
@@ -127,6 +127,10 @@ func (r persistentTransactionRunner) runTransactionStep(ctx context.Context, tra
 	runResult := <-completedTestChannel
 	testRun, err = runResult.Run, runResult.Err
 	if err != nil {
+		transactionRun.State = model.TransactionRunStateFailed
+		transactionRun.StepRuns[stepIndex] = createStepRun(testRun)
+		r.updater.Update(ctx, transactionRun)
+
 		return model.TransactionRun{}, fmt.Errorf("could not run step: %w", err)
 	}
 
