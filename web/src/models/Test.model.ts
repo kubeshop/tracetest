@@ -23,7 +23,7 @@ const Test = ({
   definition: TestSpecs(specs || {}),
   trigger: Trigger(rawTrigger || {}),
   summary: TestSummary(summary),
-  outputs: outputs?.map(rawOutput => TestOutput(rawOutput)),
+  outputs: outputs?.map((rawOutput, index) => TestOutput(rawOutput, index)),
 });
 
 export default Test;

@@ -6,6 +6,7 @@ import TransactionContent from './Content';
 
 const TransactionRunDetail = () => {
   const {transactionId = '', runId = ''} = useParams();
+
   return (
     <Layout>
       <TransactionRunProvider transactionId={transactionId} runId={runId}>

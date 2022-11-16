@@ -1,4 +1,5 @@
 import {Tabs} from 'antd';
+import {useSearchParams} from 'react-router-dom';
 import {TriggerTypes} from 'constants/Test.constants';
 import {TestState} from 'constants/TestRun.constants';
 import TestRunAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
@@ -21,6 +22,12 @@ interface IProps {
   triggerTime?: number;
 }
 
+const TabsKeys = {
+  Body: 'body',
+  Headers: 'headers',
+  Outputs: 'outputs',
+};
+
 const RunDetailTriggerResponse = ({
   state,
   triggerTime = 0,
@@ -31,6 +38,8 @@ const RunDetailTriggerResponse = ({
     bodyMimeType: '',
   },
 }: IProps) => {
+  const [query, updateQuery] = useSearchParams();
+
   return (
     <S.Container data-tour={GuidedTourService.getStep(GuidedTours.Trace, Steps.Graph)}>
       <S.TitleContainer>
@@ -49,19 +58,22 @@ const RunDetailTriggerResponse = ({
       </S.TitleContainer>
       <S.TabsContainer>
         <Tabs
-          defaultActiveKey="1"
+          defaultActiveKey={query.get('tab') || TabsKeys.Body}
           data-cy="run-detail-trigger-response"
           size="small"
-          onChange={newTab => TestRunAnalyticsService.onTriggerResponseTabChange(newTab)}
+          onChange={newTab => {
+            TestRunAnalyticsService.onTriggerResponseTabChange(newTab);
+            updateQuery([['tab', newTab]]);
+          }}
         >
-          <Tabs.TabPane key="1" tab="Body">
+          <Tabs.TabPane key={TabsKeys.Body} tab="Body">
             <ResponseBody body={body} bodyMimeType={bodyMimeType} />
           </Tabs.TabPane>
-          <Tabs.TabPane key="2" tab="Headers">
+          <Tabs.TabPane key={TabsKeys.Headers} tab="Headers">
             <ResponseHeaders headers={headers} />
           </Tabs.TabPane>
           {isTransactionsEnabled && (
-            <Tabs.TabPane key="3" tab="Outputs">
+            <Tabs.TabPane key={TabsKeys.Outputs} tab="Outputs">
               <ResponseOutputs />
             </Tabs.TabPane>
           )}

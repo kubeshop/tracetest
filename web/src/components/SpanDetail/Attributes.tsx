@@ -11,10 +11,11 @@ interface IProps {
   attributeList: TSpanFlatAttribute[];
   searchText?: string;
   onCreateTestSpec(attribute: TSpanFlatAttribute): void;
+  onCreateOutput(attribute: TSpanFlatAttribute): void;
   semanticConventions: OtelReference;
 }
 
-const Attributes = ({assertions, attributeList, onCreateTestSpec, searchText, semanticConventions}: IProps) => {
+const Attributes = ({assertions, attributeList, onCreateTestSpec, onCreateOutput, searchText, semanticConventions}: IProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [topPosition, setTopPosition] = useState(0);
 
@@ -28,6 +29,7 @@ const Attributes = ({assertions, attributeList, onCreateTestSpec, searchText, se
         assertions={assertions}
         attributeList={attributeList}
         onCreateTestSpec={onCreateTestSpec}
+        onCreateOutput={onCreateOutput}
         searchText={searchText}
         semanticConventions={semanticConventions}
       />

@@ -1,7 +1,8 @@
 import {TRawTestOutput, TRawTestRunOutput, TTestOutput, TTestRunOutput} from 'types/TestOutput.types';
 
-function TestOutput({name = '', selector = {}, value = ''}: TRawTestOutput): TTestOutput {
+function TestOutput({name = '', selector = {}, value = ''}: TRawTestOutput, id = -1): TTestOutput {
   return {
+    id,
     isDeleted: false,
     isDraft: false,
     name,

@@ -1,7 +1,6 @@
 import {Tabs, TabsProps} from 'antd';
 import {useMemo} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
-
 import RunDetailTest from 'components/RunDetailTest';
 import RunDetailTrace from 'components/RunDetailTrace';
 import RunDetailTrigger from 'components/RunDetailTrigger';
