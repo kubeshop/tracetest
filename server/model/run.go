@@ -66,7 +66,6 @@ func timeDiff(start, end time.Time) time.Duration {
 }
 
 func durationInMillieconds(d time.Duration) int {
-	fmt.Println(d)
 	return int(d.Milliseconds())
 }
 
