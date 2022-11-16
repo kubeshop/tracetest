@@ -173,9 +173,8 @@ const (
 	testMaxVersionQuery = `
 	INNER JOIN (
 		SELECT id as idx, max(version) as latest_version FROM tests GROUP BY idx
-		) as latest_tests ON latest_tests.idx = t.id
-
-		WHERE t.version = latest_tests.latest_version `
+		) as latest_tests ON latest_tests.idx = t.id AND t.version = latest_tests.latest_version
+	`
 )
 
 var sortingFields = map[string]string{

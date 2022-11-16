@@ -10,6 +10,7 @@ import {useGetTransactionRunsQuery} from 'redux/apis/TraceTest.api';
 import {TTransactionRun} from 'types/TransactionRun.types';
 import ExperimentalFeature from 'utils/ExperimentalFeature';
 import useTransactionCrud from 'providers/Transaction/hooks/useTransactionCrud';
+import useDocumentTitle from 'hooks/useDocumentTitle';
 import * as S from './Transaction.styled';
 
 const Content = () => {
@@ -17,6 +18,8 @@ const Content = () => {
   const {onDelete, transaction} = useTransaction();
   const {runTransaction, isEditLoading} = useTransactionCrud();
   const params = useMemo(() => ({transactionId: transaction.id}), [transaction.id]);
+
+  useDocumentTitle(`${transaction.name}`);
 
   const handleRunTest = useCallback(async () => {
     if (transaction.id) runTransaction(transaction.id);

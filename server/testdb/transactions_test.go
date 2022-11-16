@@ -71,6 +71,12 @@ func TestUpdateTransactionStepsOrder(t *testing.T) {
 		newStep := newTransaction.Steps[i]
 		assert.Equal(t, step.ID, newStep.ID)
 	}
+
+	// old version must exist
+	oldTransaction, err := db.GetTransactionVersion(context.TODO(), newTransaction.ID, 2)
+	assert.NoError(t, err)
+	assert.Equal(t, 2, oldTransaction.Version)
+	assert.Len(t, oldTransaction.Steps, 2)
 }
 
 func TestDeleteTransaction(t *testing.T) {
@@ -232,4 +238,44 @@ func TestGetTransactionsWithMultipleVersions(t *testing.T) {
 	for _, test := range tests.Items {
 		assert.Equal(t, 2, test.Version)
 	}
+}
+
+func TestGetTransactionsStepsWithMultipleVersions(t *testing.T) {
+	db, clean := getDB()
+	defer clean()
+
+	ctx := context.TODO()
+
+	transaction := createTransaction(t, db)
+
+	test1 := createTestWithName(t, db, "first step")
+	test2 := createTestWithName(t, db, "second step")
+
+	transaction.Steps = []model.Test{
+		test1,
+		test2,
+	}
+
+	_, err := db.UpdateTransaction(context.TODO(), transaction)
+	require.NoError(t, err)
+
+	updatedTransaction, err := db.GetLatestTransactionVersion(ctx, transaction.ID)
+	require.NoError(t, err)
+
+	assert.Len(t, updatedTransaction.Steps, 2)
+
+	test1.Name = "new test name"
+	updatedTest, err := db.UpdateTest(ctx, test1)
+	require.NoError(t, err)
+
+	updatedTransaction, err = db.GetLatestTransactionVersion(ctx, transaction.ID)
+	require.NoError(t, err)
+
+	assert.Len(t, updatedTransaction.Steps, 2)
+
+	assert.Equal(t, updatedTransaction.Steps[0].ID, updatedTest.ID)
+	assert.Equal(t, updatedTransaction.Steps[0].Version, updatedTest.Version)
+
+	assert.Equal(t, updatedTransaction.Steps[1].ID, test2.ID)
+	assert.Equal(t, updatedTransaction.Steps[1].Version, test2.Version)
 }

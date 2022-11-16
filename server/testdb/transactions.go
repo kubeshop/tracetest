@@ -64,13 +64,13 @@ func (td *postgresDB) insertIntoTransactions(ctx context.Context, transaction mo
 
 func (td *postgresDB) setTransactionSteps(ctx context.Context, tx *sql.Tx, transaction model.Transaction) (model.Transaction, error) {
 	// delete existing steps
-	stmt, err := tx.Prepare("DELETE FROM transaction_runs WHERE transaction_id = $1")
+	stmt, err := tx.Prepare("DELETE FROM transaction_runs WHERE transaction_id = $1 AND transaction_version = $2")
 	if err != nil {
 		tx.Rollback()
 		return model.Transaction{}, err
 	}
 
-	_, err = stmt.ExecContext(ctx, transaction.ID)
+	_, err = stmt.ExecContext(ctx, transaction.ID, transaction.Version)
 	if err != nil {
 		tx.Rollback()
 		return model.Transaction{}, err
@@ -322,7 +322,7 @@ func (td *postgresDB) readTransactionRow(ctx context.Context, row scanner) (mode
 }
 
 func (td *postgresDB) getTransactionSteps(ctx context.Context, transaction model.Transaction) ([]model.Test, error) {
-	stmt, err := td.db.Prepare(getTestSQL + `INNER JOIN transaction_steps ts ON t.id = ts.test_id
+	stmt, err := td.db.Prepare(getTestSQL + testMaxVersionQuery + ` INNER JOIN transaction_steps ts ON t.id = ts.test_id
 	 WHERE ts.transaction_id = $1 AND ts.transaction_version = $2 ORDER BY ts.step_number ASC`)
 	if err != nil {
 		return []model.Test{}, fmt.Errorf("prepare: %w", err)

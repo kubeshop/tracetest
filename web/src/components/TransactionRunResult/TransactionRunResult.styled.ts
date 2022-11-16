@@ -9,7 +9,7 @@ export const Container = styled.div`
   border-radius: 2px;
   background: ${({theme}) => theme.color.background};
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto 1fr auto auto;
   gap: 16px;
   padding: 7px 16px;
   margin-bottom: 8px;
@@ -21,21 +21,6 @@ export const Info = styled.div`
   flex-direction: column;
   width: 100%;
   height: 100%;
-`;
-
-export const Stack = styled.div`
-  display: flex;
-  justify-content: space-between;
-  flex-direction: column;
-`;
-
-export const Text = styled(Typography.Text)<{opacity?: number; fontWeight?: string}>`
-  && {
-    font-size: ${({theme}) => theme.size.sm};
-    color: ${({opacity}) => `rgba(3, 24, 73, ${opacity || 1})`};
-    margin: 0 !important;
-    font-weight: ${({fontWeight}) => fontWeight || 'normal'};
-  }
 `;
 
 export const ExecutionStepName = styled(Typography.Text)`
@@ -92,12 +77,32 @@ export const ExecutionStepRunLink = styled(Link)`
   }
 `;
 
-export const VariableContainer = styled(Container)`
-  grid-template-columns: 1fr 1fr;
-`;
-
 export const ResultContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 24px;
+`;
+
+export const HeaderDetail = styled(Typography.Text)`
+  display: flex;
+  align-items: center;
+  color: ${({theme}) => theme.color.textSecondary};
+  font-size: ${({theme}) => theme.size.sm};
+  margin-right: 8px;
+`;
+
+export const HeaderDot = styled.span<{$passed: boolean}>`
+  background-color: ${({$passed, theme}) => ($passed ? theme.color.success : theme.color.error)};
+  border-radius: 50%;
+  display: inline-block;
+  height: 10px;
+  line-height: 0;
+  margin-right: 4px;
+  vertical-align: -0.1em;
+  width: 10px;
+`;
+
+export const AssertionResultContainer = styled.div`
+  display: flex;
+  align-items: center;
 `;

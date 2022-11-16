@@ -7,17 +7,28 @@ import (
 
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/subscription"
 )
 
 type TransactionRunner interface {
 	Run(context.Context, model.Transaction, model.RunMetadata, model.Environment) model.TransactionRun
 }
 
-func NewTransactionRunner(runner Runner, db model.Repository, updater TransactionRunUpdater, config config.Config) persistentTransactionRunner {
+func NewTransactionRunner(
+	runner Runner,
+	db model.Repository,
+	subscriptionManager *subscription.Manager,
+	config config.Config,
+) persistentTransactionRunner {
+	updater := (CompositeTransactionUpdater{}).
+		Add(NewDBTranasctionUpdater(db)).
+		Add(NewSubscriptionTransactionUpdater(subscriptionManager))
+
 	return persistentTransactionRunner{
 		testRunner:          runner,
 		db:                  db,
 		updater:             updater,
+		subscriptionManager: subscriptionManager,
 		executionChannel:    make(chan transactionRunJob, 1),
 		exit:                make(chan bool),
 		checkTestStateDelay: config.PoolingRetryDelay() / 2,
@@ -33,6 +44,7 @@ type persistentTransactionRunner struct {
 	testRunner          Runner
 	db                  model.Repository
 	updater             TransactionRunUpdater
+	subscriptionManager *subscription.Manager
 	checkTestStateDelay time.Duration
 	executionChannel    chan transactionRunJob
 	exit                chan bool
@@ -71,7 +83,7 @@ func (r persistentTransactionRunner) Start(workers int) {
 				case job := <-r.executionChannel:
 					err := r.runTransaction(job.ctx, job.run)
 					if err != nil {
-						panic(err)
+						fmt.Println(err.Error())
 					}
 				}
 			}
@@ -119,6 +131,28 @@ func (r persistentTransactionRunner) runTransactionStep(ctx context.Context, tra
 	stepRun := createStepRun(testRun)
 	transactionRun.StepRuns = append(transactionRun.StepRuns, stepRun)
 
+	// listen for updates and propagate them as if they were transaction updates
+	r.subscriptionManager.Subscribe(testRun.ResourceID(), subscription.NewSubscriberFunction(
+		func(m subscription.Message) error {
+			updatedRun := m.Content.(model.Run)
+
+			for i, run := range transactionRun.StepRuns {
+				if run.ID == updatedRun.ID && run.TestID == updatedRun.TestID {
+					transactionRun.StepRuns[i] = createStepRun(updatedRun)
+					break
+				}
+			}
+
+			r.subscriptionManager.PublishUpdate(subscription.Message{
+				ResourceID: transactionRun.ResourceID(),
+				Type:       "result_update",
+				Content:    transactionRun,
+			})
+
+			return nil
+		}),
+	)
+
 	err = r.updater.Update(ctx, transactionRun)
 	if err != nil {
 		return model.TransactionRun{}, fmt.Errorf("could not update transaction run: %w", err)
@@ -127,6 +161,10 @@ func (r persistentTransactionRunner) runTransactionStep(ctx context.Context, tra
 	runResult := <-completedTestChannel
 	testRun, err = runResult.Run, runResult.Err
 	if err != nil {
+		transactionRun.State = model.TransactionRunStateFailed
+		transactionRun.StepRuns[stepIndex] = createStepRun(testRun)
+		r.updater.Update(ctx, transactionRun)
+
 		return model.TransactionRun{}, fmt.Errorf("could not run step: %w", err)
 	}
 
@@ -156,26 +194,4 @@ func createStepRun(testRun model.Run) model.TransactionStepRun {
 		Environment: testRun.Environment,
 		Outputs:     testRun.Outputs,
 	}
-}
-
-func (r persistentTransactionRunner) patchEnvironment(baseEnvironment model.Environment, run model.TransactionRun) model.Environment {
-	if run.CurrentTest == 0 {
-		return baseEnvironment
-	}
-
-	lastExecutedTest := run.StepRuns[run.CurrentTest-1]
-	lastEnvironment := lastExecutedTest.Environment
-	newEnvVariables := make([]model.EnvironmentValue, 0)
-	lastExecutedTest.Outputs.ForEach(func(key, val string) error {
-		newEnvVariables = append(newEnvVariables, model.EnvironmentValue{
-			Key:   key,
-			Value: val,
-		})
-
-		return nil
-	})
-
-	newEnvironment := model.Environment{Values: newEnvVariables}
-
-	return lastEnvironment.Merge(newEnvironment)
 }

@@ -3,7 +3,8 @@ import {useParams} from 'react-router-dom';
 import Layout from 'components/Layout';
 import TestSpecFormProvider from 'components/TestSpecForm/TestSpecForm.provider';
 import withAnalytics from 'components/WithAnalytics/WithAnalytics';
-import GuidedTourProvider from 'providers/GuidedTour/GuidedTour.provider';
+import GuidedTourProvider from 'providers/GuidedTour';
+import TestOutputProvider from 'providers/TestOutput';
 import SpanProvider from 'providers/Span';
 import TestSpecsProvider from 'providers/TestSpecs';
 import TestRunProvider from 'providers/TestRun';
@@ -18,9 +19,11 @@ const RunDetail = () => {
         <TestRunProvider testId={testId} runId={runId}>
           <TestSpecsProvider testId={testId} runId={runId}>
             <TestSpecFormProvider testId={testId}>
-              <SpanProvider>
-                <Content />
-              </SpanProvider>
+              <TestOutputProvider testId={testId} runId={runId}>
+                <SpanProvider>
+                  <Content />
+                </SpanProvider>
+              </TestOutputProvider>
             </TestSpecFormProvider>
           </TestSpecsProvider>
         </TestRunProvider>
