@@ -22,6 +22,22 @@ export interface paths {
     /** delete a transaction */
     delete: operations["deleteTransaction"];
   };
+  "/transactions/{transactionId}/version/{version}": {
+    /** get a transaction specific version */
+    get: operations["getTransactionVersion"];
+  };
+  "/transactions/{transactionId}/run": {
+    /** Get all runs from a particular transaction */
+    get: operations["getTransactionRuns"];
+    /** run a particular transaction */
+    post: operations["runTransaction"];
+  };
+  "/transactions/{transactionId}/run/{runId}": {
+    /** Get a specific run from a particular transaction */
+    get: operations["getTransactionRun"];
+    /** Delete a specific run from a particular transaction */
+    delete: operations["deleteTransactionRun"];
+  };
   "/tests": {
     /** get tests */
     get: operations["getTests"];
@@ -239,6 +255,96 @@ export interface operations {
       204: never;
     };
   };
+  /** get a transaction specific version */
+  getTransactionVersion: {
+    parameters: {
+      path: {
+        transactionId: string;
+        version: number;
+      };
+    };
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["transactions.yaml"]["components"]["schemas"]["Transaction"];
+        };
+      };
+      /** problem with getting a test */
+      500: unknown;
+    };
+  };
+  /** Get all runs from a particular transaction */
+  getTransactionRuns: {
+    parameters: {
+      path: {
+        transactionId: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": external["transactions.yaml"]["components"]["schemas"]["TransactionRun"][];
+        };
+      };
+    };
+  };
+  /** run a particular transaction */
+  runTransaction: {
+    parameters: {
+      path: {
+        transactionId: string;
+      };
+    };
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["transactions.yaml"]["components"]["schemas"]["TransactionRun"];
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": external["tests.yaml"]["components"]["schemas"]["RunInformation"];
+      };
+    };
+  };
+  /** Get a specific run from a particular transaction */
+  getTransactionRun: {
+    parameters: {
+      path: {
+        transactionId: string;
+        runId: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": external["transactions.yaml"]["components"]["schemas"]["TransactionRun"];
+        };
+      };
+      /** transaction run not found */
+      404: unknown;
+    };
+  };
+  /** Delete a specific run from a particular transaction */
+  deleteTransactionRun: {
+    parameters: {
+      path: {
+        transactionId: string;
+        runId: number;
+      };
+    };
+    responses: {
+      /** OK */
+      204: never;
+      /** transaction run not found */
+      404: unknown;
+    };
+  };
   /** get tests */
   getTests: {
     parameters: {
@@ -380,7 +486,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": external["tests.yaml"]["components"]["schemas"]["TestRunInformation"];
+        "application/json": external["tests.yaml"]["components"]["schemas"]["RunInformation"];
       };
     };
   };
@@ -770,7 +876,7 @@ export interface external {
           url?: string;
         };
         TextDefinition: {
-          runInformation?: external["tests.yaml"]["components"]["schemas"]["TestRunInformation"];
+          runInformation?: external["tests.yaml"]["components"]["schemas"]["RunInformation"];
           content?: string;
         };
       };
@@ -1001,7 +1107,7 @@ export interface external {
           }[];
           metadata?: { [key: string]: string };
         };
-        TestRunInformation: {
+        RunInformation: {
           metadata?: { [key: string]: string } | null;
           environmentId?: string;
         };
@@ -1111,6 +1217,22 @@ export interface external {
           steps?: string[];
           /** Format: date-time */
           createdAt?: string;
+          /** @description summary of transaction */
+          summary?: external["tests.yaml"]["components"]["schemas"]["TestSummary"];
+        };
+        TransactionRun: {
+          id?: string;
+          version?: number;
+          /** Format: date-time */
+          createdAt?: string;
+          /** Format: date-time */
+          completedAt?: string;
+          /** @enum {string} */
+          state?: "CREATED" | "EXECUTING" | "FINISHED" | "FAILED";
+          steps?: external["tests.yaml"]["components"]["schemas"]["Test"][];
+          stepRuns?: external["tests.yaml"]["components"]["schemas"]["TestRun"][];
+          environment?: external["environments.yaml"]["components"]["schemas"]["Environment"];
+          metadata?: { [key: string]: string };
         };
       };
     };

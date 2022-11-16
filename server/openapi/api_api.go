@@ -213,6 +213,12 @@ func (c *ApiApiController) Routes() Routes {
 			c.GetTransactionRuns,
 		},
 		{
+			"GetTransactionVersion",
+			strings.ToUpper("Get"),
+			"/api/transactions/{transactionId}/version/{version}",
+			c.GetTransactionVersion,
+		},
+		{
 			"GetTransactions",
 			strings.ToUpper("Get"),
 			"/api/transactions",
@@ -830,6 +836,28 @@ func (c *ApiApiController) GetTransactionRuns(w http.ResponseWriter, r *http.Req
 	transactionIdParam := params["transactionId"]
 
 	result, err := c.service.GetTransactionRuns(r.Context(), transactionIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// GetTransactionVersion - get a transaction specific version
+func (c *ApiApiController) GetTransactionVersion(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	transactionIdParam := params["transactionId"]
+
+	versionParam, err := parseInt32Parameter(params["version"], true)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+
+	result, err := c.service.GetTransactionVersion(r.Context(), transactionIdParam, versionParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

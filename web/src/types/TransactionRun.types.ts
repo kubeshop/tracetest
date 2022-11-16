@@ -1,18 +1,9 @@
-import {Model} from './Common.types';
-import {TEnvironment, TRawEnvironment} from './Environment.types';
-import {TRawTest, TTest} from './Test.types';
-import {TRawTestRun, TTestRun} from './TestRun.types';
+import {Model, TTransactionsSchemas} from './Common.types';
+import {TEnvironment} from './Environment.types';
+import {TTest} from './Test.types';
+import {TTestRun} from './TestRun.types';
 
-export type TRawTransactionRun = {
-  id: string;
-  createdAt: string;
-  completedAt: string;
-  state: 'CREATED' | 'EXECUTING' | 'FINISHED' | 'FAILED';
-  steps: TRawTest[];
-  stepRuns: TRawTestRun[];
-  environment?: TRawEnvironment;
-  metadata?: {[key: string]: string};
-};
+export type TRawTransactionRun = TTransactionsSchemas['TransactionRun'];
 
 export type TTransactionRun = Model<
   TRawTransactionRun,

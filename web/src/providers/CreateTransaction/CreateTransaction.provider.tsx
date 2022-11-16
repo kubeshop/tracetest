@@ -1,6 +1,5 @@
 import {noop} from 'lodash';
 import {createContext, useCallback, useContext, useMemo} from 'react';
-import {useNavigate} from 'react-router-dom';
 import {useCreateTransactionMutation} from 'redux/apis/TraceTest.api';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import {
@@ -13,6 +12,7 @@ import {
 import CreateTransactionSelectors from 'selectors/CreateTransaction.selectors';
 import {ICreateTestStep} from 'types/Plugins.types';
 import {ICreateTransactionState, TDraftTransaction} from 'types/Transaction.types';
+import useTransactionCrud from '../Transaction/hooks/useTransactionCrud';
 
 interface IContext extends ICreateTransactionState {
   isLoading: boolean;
@@ -47,8 +47,8 @@ export const useCreateTransaction = () => useContext(Context);
 
 const CreateTransactionProvider = ({children}: IProps) => {
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
   const [createTransaction, {isLoading: isLoadingCreateTransaction}] = useCreateTransactionMutation();
+  const {runTransaction, isEditLoading} = useTransactionCrud();
 
   const draftTransaction = useAppSelector(CreateTransactionSelectors.selectDraftTransaction);
   const stepNumber = useAppSelector(CreateTransactionSelectors.selectStepNumber);
@@ -60,11 +60,9 @@ const CreateTransactionProvider = ({children}: IProps) => {
   const onCreateTransaction = useCallback(
     async (draft: TDraftTransaction) => {
       const transaction = await createTransaction(draft).unwrap();
-      // const run = await runTransaction({transactionId: transaction.id}).unwrap(); TODO: run transaction
-      const run = {id: 1};
-      navigate(`/transaction/${transaction.id}/run/${run.id}`);
+      runTransaction(transaction.id);
     },
-    [createTransaction, navigate]
+    [createTransaction, runTransaction]
   );
 
   const onUpdateDraft = useCallback(
@@ -107,7 +105,7 @@ const CreateTransactionProvider = ({children}: IProps) => {
     () => ({
       draftTransaction,
       stepNumber,
-      isLoading: isLoadingCreateTransaction,
+      isLoading: isLoadingCreateTransaction || isEditLoading,
       isFormValid,
       onNext,
       onPrev,
@@ -122,6 +120,7 @@ const CreateTransactionProvider = ({children}: IProps) => {
       draftTransaction,
       stepNumber,
       isLoadingCreateTransaction,
+      isEditLoading,
       isFormValid,
       onNext,
       onPrev,

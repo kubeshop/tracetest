@@ -62,6 +62,11 @@ func (e subscribeCommandExecutor) ResourceUpdatedEvent(resource interface{}) Eve
 		mapped = e.mappers.Out.Run(&v)
 	case *model.Run:
 		mapped = e.mappers.Out.Run(v)
+	case model.TransactionRun:
+		mapped = e.mappers.Out.TransactionRun(v)
+	case *model.TransactionRun:
+		var value model.TransactionRun = *v
+		mapped = e.mappers.Out.TransactionRun(value)
 	default:
 		fmt.Printf("type %T mapping not supported\n", v)
 		mapped = v

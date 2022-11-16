@@ -9,16 +9,20 @@ interface IProps {
 
 const TransactionRunResult = ({transactionRun: {steps, stepRuns, environment}}: IProps) => {
   return (
-    <>
-      <S.Title>Execution Steps</S.Title>
-      {stepRuns.map((stepRun, index) => {
-        return <ExecutionStep index={index} key={stepRun.id} test={steps[index]} testRun={stepRun} />;
-      })}
-      <S.Title>Variables</S.Title>
-      {environment?.values?.map(value => (
-        <Variable key={value.key} value={value} />
-      ))}
-    </>
+    <S.ResultContainer>
+      <div>
+        <S.Title>Execution Steps</S.Title>
+        {steps.map((step, index) => {
+          return <ExecutionStep index={index} key={step.id} test={step} testRun={stepRuns[index]} />;
+        })}
+      </div>
+      <div>
+        <S.Title>Variables</S.Title>
+        {environment?.values?.map(value => (
+          <Variable key={value.key} value={value} />
+        ))}
+      </div>
+    </S.ResultContainer>
   );
 };
 

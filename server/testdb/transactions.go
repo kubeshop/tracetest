@@ -133,6 +133,12 @@ func (td *postgresDB) DeleteTransaction(ctx context.Context, transaction model.T
 		return err
 	}
 
+	_, err = tx.ExecContext(ctx, "DELETE FROM transaction_runs WHERE transaction_id = $1", transaction.ID)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
 	_, err = tx.ExecContext(ctx, "DELETE FROM transactions WHERE id = $1", transaction.ID)
 	if err != nil {
 		tx.Rollback()
@@ -195,6 +201,11 @@ func (td *postgresDB) GetTransactionVersion(ctx context.Context, id id.ID, versi
 	defer stmt.Close()
 
 	transaction, err := td.readTransactionRow(ctx, stmt.QueryRowContext(ctx, id, version))
+	if err != nil {
+		return model.Transaction{}, err
+	}
+
+	transaction.Steps, err = td.getTransactionSteps(ctx, transaction)
 	if err != nil {
 		return model.Transaction{}, err
 	}

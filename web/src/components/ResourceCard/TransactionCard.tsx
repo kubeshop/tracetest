@@ -19,8 +19,13 @@ interface IProps {
   transaction: TTransaction;
 }
 
-const TransactionCard = ({onDelete, onRun, onViewAll, transaction}: IProps) => {
-  const queryParams = useMemo(() => ({take: 5, transactionId: transaction.id}), [transaction.id]);
+const TransactionCard = ({
+  onDelete,
+  onRun,
+  onViewAll,
+  transaction: {id: transactionId, summary, name, description},
+}: IProps) => {
+  const queryParams = useMemo(() => ({take: 5, transactionId}), [transactionId]);
   const {isCollapsed, isLoading, list, onClick} = useRuns<TTransactionRun, {transactionId: string}>(
     useLazyGetTransactionRunsQuery,
     queryParams
@@ -29,32 +34,32 @@ const TransactionCard = ({onDelete, onRun, onViewAll, transaction}: IProps) => {
   return (
     <S.Container $type={ResourceType.Transaction}>
       <S.TestContainer onClick={onClick}>
-        {isCollapsed ? <RightOutlined data-cy={`collapse-transaction-${transaction.id}`} /> : <DownOutlined />}
+        {isCollapsed ? <RightOutlined data-cy={`collapse-transaction-${transactionId}`} /> : <DownOutlined />}
         <S.Box $type={ResourceType.Transaction}>
-          <S.BoxTitle level={2}>1</S.BoxTitle>
+          <S.BoxTitle level={2}>{summary.runs}</S.BoxTitle>
         </S.Box>
         <S.TitleContainer>
-          <S.Title level={3}>{transaction.name}</S.Title>
-          <S.Text>{transaction.description}</S.Text>
+          <S.Title level={3}>{name}</S.Title>
+          <S.Text>{description}</S.Text>
         </S.TitleContainer>
 
-        <ResourceCardSummary />
+        <ResourceCardSummary summary={summary} shouldShowResult={false} />
 
         <S.Row>
           <S.RunButton
             type="primary"
             ghost
-            data-cy={`transaction-run-button-${transaction.id}`}
+            data-cy={`transaction-run-button-${transactionId}`}
             onClick={event => {
               event.stopPropagation();
-              onRun(transaction.id, ResourceType.Transaction);
+              onRun(transactionId, ResourceType.Transaction);
             }}
           >
             Run
           </S.RunButton>
           <ResourceCardActions
-            id={transaction.id}
-            onDelete={() => onDelete(transaction.id, transaction.name, ResourceType.Transaction)}
+            id={transactionId}
+            onDelete={() => onDelete(transactionId, name, ResourceType.Transaction)}
           />
         </S.Row>
       </S.TestContainer>
@@ -64,15 +69,15 @@ const TransactionCard = ({onDelete, onRun, onViewAll, transaction}: IProps) => {
         hasRuns={Boolean(list.length)}
         isCollapsed={isCollapsed}
         isLoading={isLoading}
-        onViewAll={() => onViewAll(transaction.id, ResourceType.Test)}
+        onViewAll={() => onViewAll(transactionId, ResourceType.Test)}
       >
         <S.RunsListContainer>
           {list.map(run => (
             <TransactionRunCard
               key={run.id}
-              linkTo={`/transaction/${transaction.id}/run/${run.id}`}
+              linkTo={`/transaction/${transactionId}/run/${run.id}`}
               run={run}
-              transactionId={transaction.id}
+              transactionId={transactionId}
             />
           ))}
         </S.RunsListContainer>

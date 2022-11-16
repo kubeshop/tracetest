@@ -168,6 +168,34 @@ paths:
         "204":
           description: OK
 
+  /transactions/{transactionId}/version/{version}:
+    get:
+      tags:
+        - api
+      parameters:
+        - in: path
+          name: transactionId
+          schema:
+            type: string
+          required: true
+        - in: path
+          name: version
+          schema:
+            type: integer
+          required: true
+      summary: "get a transaction specific version"
+      description: "get a transaction specific version"
+      operationId: getTransactionVersion
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "./transactions.yaml#/components/schemas/Transaction"
+        500:
+          description: "problem with getting a test"
+
   /transactions/{transactionId}/run:
     post:
       tags:

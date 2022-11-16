@@ -37,6 +37,12 @@ const TransactionEndpoint = (builder: TTestApiEndpointBuilder) => ({
     providesTags: result => [{type: TracetestApiTags.TRANSACTION, id: result?.id}],
     transformResponse: (rawTransaction: TRawTransaction) => Transaction(rawTransaction),
   }),
+  getTransactionVersionById: builder.query<TTransaction, {transactionId: string; version: number}>({
+    query: ({transactionId, version}) => `/transactions/${transactionId}/version/${version}`,
+    providesTags: result => [{type: TracetestApiTags.TRANSACTION, id: `${result?.id}-${result?.version}`}],
+    transformResponse: (rawTest: TRawTransaction) => Transaction(rawTest),
+    keepUnusedDataFor: 10,
+  }),
 });
 
 export default TransactionEndpoint;

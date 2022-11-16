@@ -3,32 +3,13 @@ import {FormInstance} from 'antd';
 
 import {Model, TTransactionsSchemas} from './Common.types';
 import {ICreateTestStep} from './Plugins.types';
-import {TTrigger} from './Test.types';
+import { TSummary } from './Test.types';
 
 export type TRawTransaction = TTransactionsSchemas['Transaction'];
 
-export type TTransaction = Model<
-  TRawTransaction,
-  {
-    id: string;
-    name: string;
-    description: string;
-    version: number;
-    createdAt?: string;
-    steps: string[];
-  }
->;
-
-export type TRawTransactionTestResult = {
-  id?: string;
-  testId?: string;
-  result?: 'success' | 'fail' | 'running';
-  trigger?: TTrigger;
-  name?: string;
-  version?: number;
-};
-
-export type TTransactionTestResult = Model<TRawTransactionTestResult, {}>;
+export type TTransaction = Model<TRawTransaction, {
+  summary: TSummary;
+}>;
 
 export type TDraftTransaction = {
   steps?: string[];

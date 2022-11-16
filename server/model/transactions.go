@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/kubeshop/tracetest/server/id"
@@ -88,4 +89,30 @@ func NewTransactionRun(transaction Transaction) TransactionRun {
 		StepRuns:           make([]TransactionStepRun, 0, len(transaction.Steps)),
 		CurrentTest:        0,
 	}
+}
+
+func (run TransactionRun) InjectOutputsIntoEnvironment(env Environment) Environment {
+	if run.CurrentTest == 0 {
+		return env
+	}
+
+	lastExecutedTest := run.StepRuns[run.CurrentTest-1]
+	lastEnvironment := lastExecutedTest.Environment
+	newEnvVariables := make([]EnvironmentValue, 0)
+	lastExecutedTest.Outputs.ForEach(func(key, val string) error {
+		newEnvVariables = append(newEnvVariables, EnvironmentValue{
+			Key:   key,
+			Value: val,
+		})
+
+		return nil
+	})
+
+	newEnvironment := Environment{Values: newEnvVariables}
+
+	return lastEnvironment.Merge(newEnvironment)
+}
+
+func (r TransactionRun) ResourceID() string {
+	return fmt.Sprintf("transaction/%s/run/%d", r.TransactionID, r.ID)
 }

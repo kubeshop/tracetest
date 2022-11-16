@@ -59,7 +59,7 @@ const TestRun = ({
     triggerResult: rawTriggerResult ? TriggerResult(rawTriggerResult) : undefined,
     createdAt,
     completedAt,
-    result: AssertionResults(result!),
+    result: AssertionResults(result || {}),
     id,
     traceId,
     spanId,
