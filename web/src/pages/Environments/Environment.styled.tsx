@@ -13,7 +13,7 @@ export const PageHeader = styled.div`
 
 export const TitleText = styled(Typography.Title).attrs({level: 1})`
   && {
-    margin: 14px 0;
+    margin: 0;
   }
 `;
 
@@ -41,14 +41,17 @@ export const HeaderContainer = styled.div`
   justify-content: space-between;
   padding-bottom: 8px;
 `;
+
 export const VariablesText = styled(Typography)`
   flex-basis: 50%;
 `;
+
 export const HeaderText = styled(Typography)`
   flex-basis: 50%;
   font-weight: bold;
   padding-left: 8px;
 `;
+
 export const HeaderTextRight = styled(Typography)`
   flex-basis: 50%;
   font-weight: bold;
@@ -100,4 +103,10 @@ export const TextContainer = styled.div`
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
+`;
+
+export const MainHeaderContainer = styled.div`
+  border-bottom: ${({theme}) => `1px solid ${theme.color.borderLight}`};
+  padding: 23px 0;
+  width: 100%;
 `;

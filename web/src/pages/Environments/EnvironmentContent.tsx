@@ -40,7 +40,10 @@ const EnvironmentContent = () => {
 
   return (
     <S.Wrapper>
-      <S.TitleText>All Environments</S.TitleText>
+      <S.MainHeaderContainer>
+        <S.TitleText>All Environments</S.TitleText>
+      </S.MainHeaderContainer>
+
       <S.PageHeader>
         <SearchInput onSearch={onSearch} placeholder="Search environment" />
         <S.ActionContainer>
@@ -49,6 +52,7 @@ const EnvironmentContent = () => {
           </S.CreateEnvironmentButton>
         </S.ActionContainer>
       </S.PageHeader>
+
       <EnvironmentList onDelete={handleOnDelete} onEdit={handleOnEdit} query={query} />
       <EnvironmentModal isOpen={isModalOpen} onClose={handleOnModalClose} environment={environment} />
     </S.Wrapper>
