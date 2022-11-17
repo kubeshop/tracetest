@@ -85,7 +85,7 @@ const AttributeRow = ({
 
   const content = (
     <S.DetailContainer>
-      {semanticConvention.description !== '' ? description : 'We have not found a description for this attribute'}
+      {description}
       {note}
       <S.TagsContainer>
         {semanticConvention.tags.map(tag => (
@@ -97,17 +97,23 @@ const AttributeRow = ({
 
   return (
     <S.Container data-cy={`attribute-row-${cypressKey}`}>
-      <Popover content={content} placement="right" title={<S.Title level={3}>{key}</S.Title>} trigger="click">
-        <S.Header>
+      <S.Header>
+        <S.SectionTitle>
           <S.AttributeTitle title={key} searchText={searchText} />
 
-          <S.AttributeValueRow>
-            <AttributeValue value={value} searchText={searchText} />
-          </S.AttributeValueRow>
-          {passedCount > 0 && <AttributeCheck items={assertionsPassed!} type="success" />}
-          {failedCount > 0 && <AttributeCheck items={assertionsFailed!} type="error" />}
-        </S.Header>
-      </Popover>
+          {semanticConvention.description !== '' && (
+            <Popover content={content} placement="right" title={<S.Title level={3}>{key}</S.Title>}>
+              <S.InfoIcon />
+            </Popover>
+          )}
+        </S.SectionTitle>
+
+        <S.AttributeValueRow>
+          <AttributeValue value={value} searchText={searchText} />
+        </S.AttributeValueRow>
+        {passedCount > 0 && <AttributeCheck items={assertionsPassed!} type="success" />}
+        {failedCount > 0 && <AttributeCheck items={assertionsFailed!} type="error" />}
+      </S.Header>
 
       <Dropdown overlay={menu}>
         <a onClick={e => e.preventDefault()}>
