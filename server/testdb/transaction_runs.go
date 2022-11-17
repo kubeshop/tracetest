@@ -243,13 +243,13 @@ func (td *postgresDB) GetTransactionRun(ctx context.Context, transactionId strin
 	return run, nil
 }
 
-func (td *postgresDB) GetTransactionsRuns(ctx context.Context, transactionId string) ([]model.TransactionRun, error) {
-	stmt, err := td.db.Prepare(selectTransactionRunQuery + " WHERE transaction_id = $1")
+func (td *postgresDB) GetTransactionsRuns(ctx context.Context, transactionId string, take, skip int32) ([]model.TransactionRun, error) {
+	stmt, err := td.db.Prepare(selectTransactionRunQuery + " WHERE transaction_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3")
 	if err != nil {
 		return []model.TransactionRun{}, fmt.Errorf("prepare: %w", err)
 	}
 
-	rows, err := stmt.QueryContext(ctx, transactionId)
+	rows, err := stmt.QueryContext(ctx, transactionId, take, skip)
 	if err != nil {
 		return []model.TransactionRun{}, fmt.Errorf("query: %w", err)
 	}

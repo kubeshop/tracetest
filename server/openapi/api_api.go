@@ -833,9 +833,20 @@ func (c *ApiApiController) GetTransactionRun(w http.ResponseWriter, r *http.Requ
 // GetTransactionRuns - Get all runs from a particular transaction
 func (c *ApiApiController) GetTransactionRuns(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
+	query := r.URL.Query()
 	transactionIdParam := params["transactionId"]
 
-	result, err := c.service.GetTransactionRuns(r.Context(), transactionIdParam)
+	takeParam, err := parseInt32Parameter(query.Get("take"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	skipParam, err := parseInt32Parameter(query.Get("skip"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	result, err := c.service.GetTransactionRuns(r.Context(), transactionIdParam, takeParam, skipParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

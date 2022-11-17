@@ -914,8 +914,8 @@ func (c *controller) GetTransactionRun(ctx context.Context, transactionId string
 	return openapi.Response(http.StatusOK, openapiRun), nil
 }
 
-func (c *controller) GetTransactionRuns(ctx context.Context, transactionId string) (openapi.ImplResponse, error) {
-	runs, err := c.testDB.GetTransactionsRuns(ctx, transactionId)
+func (c *controller) GetTransactionRuns(ctx context.Context, transactionId string, take, skip int32) (openapi.ImplResponse, error) {
+	runs, err := c.testDB.GetTransactionsRuns(ctx, transactionId, take, skip)
 	if err != nil {
 		return handleDBError(err), err
 	}
