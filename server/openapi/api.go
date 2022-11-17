@@ -56,6 +56,7 @@ type ApiApiRouter interface {
 	UpdateEnvironment(http.ResponseWriter, *http.Request)
 	UpdateTest(http.ResponseWriter, *http.Request)
 	UpdateTransaction(http.ResponseWriter, *http.Request)
+	UpsertDefinition(http.ResponseWriter, *http.Request)
 }
 
 // ApiApiServicer defines the api actions for the ApiApi service
@@ -101,4 +102,5 @@ type ApiApiServicer interface {
 	UpdateEnvironment(context.Context, string, Environment) (ImplResponse, error)
 	UpdateTest(context.Context, string, Test) (ImplResponse, error)
 	UpdateTransaction(context.Context, string, Transaction) (ImplResponse, error)
+	UpsertDefinition(context.Context, TextDefinition) (ImplResponse, error)
 }

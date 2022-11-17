@@ -5,11 +5,15 @@ RUN apk add --update jq make
 
 COPY ./.goreleaser.yaml ./
 
+COPY ./server/go.mod ./server/go.sum ./server/
+RUN cd server && go mod download
+COPY ./server ./server
+
 COPY ./cli/go.mod ./cli/go.sum ./cli/
 RUN cd cli && go mod download
 
 COPY ./cli ./cli
-RUN ls -la && cd ./cli && make build
+RUN cd ./cli && make build
 
 FROM golang:1.18-alpine
 

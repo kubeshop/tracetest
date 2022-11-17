@@ -14,7 +14,7 @@ import (
 
 var _ model.TestRepository = &postgresDB{}
 
-func (td *postgresDB) IDExists(ctx context.Context, id id.ID) (bool, error) {
+func (td *postgresDB) TestIDExists(ctx context.Context, id id.ID) (bool, error) {
 	exists := false
 
 	row := td.db.QueryRowContext(

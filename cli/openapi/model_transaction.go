@@ -21,9 +21,10 @@ type Transaction struct {
 	Name        *string `json:"name,omitempty"`
 	Description *string `json:"description,omitempty"`
 	// version number of the test
-	Version   *int32     `json:"version,omitempty"`
-	Steps     []string   `json:"steps,omitempty"`
-	CreatedAt *time.Time `json:"createdAt,omitempty"`
+	Version   *int32       `json:"version,omitempty"`
+	Steps     []string     `json:"steps,omitempty"`
+	CreatedAt *time.Time   `json:"createdAt,omitempty"`
+	Summary   *TestSummary `json:"summary,omitempty"`
 }
 
 // NewTransaction instantiates a new Transaction object
@@ -235,6 +236,38 @@ func (o *Transaction) SetCreatedAt(v time.Time) {
 	o.CreatedAt = &v
 }
 
+// GetSummary returns the Summary field value if set, zero value otherwise.
+func (o *Transaction) GetSummary() TestSummary {
+	if o == nil || o.Summary == nil {
+		var ret TestSummary
+		return ret
+	}
+	return *o.Summary
+}
+
+// GetSummaryOk returns a tuple with the Summary field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Transaction) GetSummaryOk() (*TestSummary, bool) {
+	if o == nil || o.Summary == nil {
+		return nil, false
+	}
+	return o.Summary, true
+}
+
+// HasSummary returns a boolean if a field has been set.
+func (o *Transaction) HasSummary() bool {
+	if o != nil && o.Summary != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetSummary gets a reference to the given TestSummary and assigns it to the Summary field.
+func (o *Transaction) SetSummary(v TestSummary) {
+	o.Summary = &v
+}
+
 func (o Transaction) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.Id != nil {
@@ -254,6 +287,9 @@ func (o Transaction) MarshalJSON() ([]byte, error) {
 	}
 	if o.CreatedAt != nil {
 		toSerialize["createdAt"] = o.CreatedAt
+	}
+	if o.Summary != nil {
+		toSerialize["summary"] = o.Summary
 	}
 	return json.Marshal(toSerialize)
 }

@@ -16,7 +16,7 @@ type TestRepository interface {
 	CreateTest(context.Context, Test) (Test, error)
 	UpdateTest(context.Context, Test) (Test, error)
 	DeleteTest(context.Context, Test) error
-	IDExists(context.Context, id.ID) (bool, error)
+	TestIDExists(context.Context, id.ID) (bool, error)
 	GetLatestTestVersion(context.Context, id.ID) (Test, error)
 	GetTestVersion(_ context.Context, _ id.ID, version int) (Test, error)
 	GetTests(_ context.Context, take, skip int32, query, sortBy, sortDirection string) (List[Test], error)
@@ -44,6 +44,7 @@ type TransactionRepository interface {
 	CreateTransaction(context.Context, Transaction) (Transaction, error)
 	UpdateTransaction(context.Context, Transaction) (Transaction, error)
 	DeleteTransaction(context.Context, Transaction) error
+	TransactionIDExists(context.Context, id.ID) (bool, error)
 	GetLatestTransactionVersion(context.Context, id.ID) (Transaction, error)
 	GetTransactionVersion(_ context.Context, _ id.ID, version int) (Transaction, error)
 	GetTransactions(_ context.Context, take, skip int32, query, sortBy, sortDirection string) (List[Transaction], error)

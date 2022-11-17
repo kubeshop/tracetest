@@ -16,7 +16,7 @@ import (
 
 // ResolveResponseInfo struct for ResolveResponseInfo
 type ResolveResponseInfo struct {
-	ResolvedValue *string `json:"resolvedValue,omitempty"`
+	ResolvedValues []string `json:"resolvedValues,omitempty"`
 }
 
 // NewResolveResponseInfo instantiates a new ResolveResponseInfo object
@@ -36,42 +36,42 @@ func NewResolveResponseInfoWithDefaults() *ResolveResponseInfo {
 	return &this
 }
 
-// GetResolvedValue returns the ResolvedValue field value if set, zero value otherwise.
-func (o *ResolveResponseInfo) GetResolvedValue() string {
-	if o == nil || o.ResolvedValue == nil {
-		var ret string
+// GetResolvedValues returns the ResolvedValues field value if set, zero value otherwise.
+func (o *ResolveResponseInfo) GetResolvedValues() []string {
+	if o == nil || o.ResolvedValues == nil {
+		var ret []string
 		return ret
 	}
-	return *o.ResolvedValue
+	return o.ResolvedValues
 }
 
-// GetResolvedValueOk returns a tuple with the ResolvedValue field value if set, nil otherwise
+// GetResolvedValuesOk returns a tuple with the ResolvedValues field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *ResolveResponseInfo) GetResolvedValueOk() (*string, bool) {
-	if o == nil || o.ResolvedValue == nil {
+func (o *ResolveResponseInfo) GetResolvedValuesOk() ([]string, bool) {
+	if o == nil || o.ResolvedValues == nil {
 		return nil, false
 	}
-	return o.ResolvedValue, true
+	return o.ResolvedValues, true
 }
 
-// HasResolvedValue returns a boolean if a field has been set.
-func (o *ResolveResponseInfo) HasResolvedValue() bool {
-	if o != nil && o.ResolvedValue != nil {
+// HasResolvedValues returns a boolean if a field has been set.
+func (o *ResolveResponseInfo) HasResolvedValues() bool {
+	if o != nil && o.ResolvedValues != nil {
 		return true
 	}
 
 	return false
 }
 
-// SetResolvedValue gets a reference to the given string and assigns it to the ResolvedValue field.
-func (o *ResolveResponseInfo) SetResolvedValue(v string) {
-	o.ResolvedValue = &v
+// SetResolvedValues gets a reference to the given []string and assigns it to the ResolvedValues field.
+func (o *ResolveResponseInfo) SetResolvedValues(v []string) {
+	o.ResolvedValues = v
 }
 
 func (o ResolveResponseInfo) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if o.ResolvedValue != nil {
-		toSerialize["resolvedValue"] = o.ResolvedValue
+	if o.ResolvedValues != nil {
+		toSerialize["resolvedValues"] = o.ResolvedValues
 	}
 	return json.Marshal(toSerialize)
 }

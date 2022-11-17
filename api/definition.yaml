@@ -1,6 +1,15 @@
 openapi: 3.0.0
 components:
   schemas:
+    UpsertDefinitionResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: resource ID
+        type:
+          type: string
+          description: resource type
 
     ExecuteDefinitionResponse:
       type: object

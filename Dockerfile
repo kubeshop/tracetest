@@ -32,10 +32,15 @@ ARG TRACETEST_ENV
 
 RUN apk add --update make git jq
 
-COPY ./cli/go.mod ./cli/
-COPY ./cli/go.sum ./cli/
+COPY ./server/go.mod ./server/go.sum ./server/
+RUN cd server && go mod download
+COPY ./server ./server
+
+COPY ./cli/go.mod ./cli/go.sum ./cli/
 RUN cd cli && go mod download
+
 COPY ./cli ./cli
+
 COPY .goreleaser.yaml .
 RUN cd cli && make build
 
