@@ -8,6 +8,10 @@ import (
 
 type FileType string
 
+func (ft FileType) String() string {
+	return string(ft)
+}
+
 const (
 	FileTypeTest        FileType = "Test"
 	FileTypeTransaction FileType = "Transaction"
@@ -19,9 +23,8 @@ type File struct {
 	Spec any      `yaml:"spec"`
 }
 
-func (f File) Text() string {
-	b, _ := yaml.Marshal(f)
-	return string(b)
+func (f File) Encode() ([]byte, error) {
+	return yaml.Marshal(f)
 }
 
 func (f File) Validate() error {

@@ -25,15 +25,38 @@ paths:
             application/json:
               schema:
                 $ref: "./definition.yaml#/components/schemas/ExecuteDefinitionResponse"
-
         200:
           description: Definition updated
           content:
             application/json:
               schema:
                 $ref: "./definition.yaml#/components/schemas/ExecuteDefinitionResponse"
-        422:
-          description: "trying to create a test with an already existing ID"
+
+    put:
+      tags:
+        - api
+      summary: "Upsert a definition"
+      description: "Upsert a definition"
+      operationId: upsertDefinition
+      requestBody:
+        content:
+          text/json:
+            schema:
+              $ref: "./definition.yaml#/components/schemas/TextDefinition"
+      responses:
+        201:
+          description: Definition created
+          content:
+            application/json:
+              schema:
+                $ref: "./definition.yaml#/components/schemas/UpsertDefinitionResponse"
+        200:
+          description: Definition updated
+          content:
+            application/json:
+              schema:
+                $ref: "./definition.yaml#/components/schemas/UpsertDefinitionResponse"
+
   /transactions:
     get:
       tags:

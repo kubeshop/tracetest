@@ -13,6 +13,20 @@ import (
 
 var _ model.TestRepository = &postgresDB{}
 
+func (td *postgresDB) TransactionIDExists(ctx context.Context, id id.ID) (bool, error) {
+	exists := false
+
+	row := td.db.QueryRowContext(
+		ctx,
+		"SELECT COUNT(*) > 0 as exists FROM transactions WHERE id = $1",
+		id,
+	)
+
+	err := row.Scan(&exists)
+
+	return exists, err
+}
+
 func (td *postgresDB) CreateTransaction(ctx context.Context, transaction model.Transaction) (model.Transaction, error) {
 	if !transaction.HasID() {
 		transaction.ID = IDGen.ID()

@@ -278,6 +278,12 @@ func (c *ApiApiController) Routes() Routes {
 			"/api/transactions/{transactionId}",
 			c.UpdateTransaction,
 		},
+		{
+			"UpsertDefinition",
+			strings.ToUpper("Put"),
+			"/api/definition.yaml",
+			c.UpsertDefinition,
+		},
 	}
 }
 
@@ -1118,6 +1124,30 @@ func (c *ApiApiController) UpdateTransaction(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	result, err := c.service.UpdateTransaction(r.Context(), transactionIdParam, transactionParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// UpsertDefinition - Upsert a definition
+func (c *ApiApiController) UpsertDefinition(w http.ResponseWriter, r *http.Request) {
+	textDefinitionParam := TextDefinition{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&textDefinitionParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertTextDefinitionRequired(textDefinitionParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.UpsertDefinition(r.Context(), textDefinitionParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

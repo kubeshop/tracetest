@@ -20,6 +20,10 @@ type (
 	}
 )
 
+func (e Environment) HasID() bool {
+	return e.ID != ""
+}
+
 func (e Environment) GetSlug() string {
 	return strings.ToLower(strings.ReplaceAll(strings.TrimSpace(e.Name), " ", "-"))
 }
