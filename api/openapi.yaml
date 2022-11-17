@@ -230,6 +230,18 @@ paths:
           schema:
             type: string
           required: true
+        - in: query
+          name: take
+          description: "indicates how many results can be returned by each page"
+          schema:
+            type: integer
+            default: 20
+        - in: query
+          name: skip
+          description: "indicates how many results will be skipped when paginating"
+          schema:
+            type: integer
+            default: 0
       summary: "Get all runs from a particular transaction"
       description: "Get all runs from a particular transaction"
       operationId: getTransactionRuns
