@@ -35,7 +35,7 @@ export const EnvironmentCard = ({environment: {description, id, name, values}, o
               items={[
                 {
                   key: 'edit',
-                  label: <span>Edit</span>,
+                  label: <span data-cy="environment-actions-edit">Edit</span>,
                   onClick: e => {
                     e.domEvent.stopPropagation();
                     onEdit({id, name, description, values});
@@ -43,7 +43,7 @@ export const EnvironmentCard = ({environment: {description, id, name, values}, o
                 },
                 {
                   key: 'delete',
-                  label: <span>Delete</span>,
+                  label: <span data-cy="environment-actions-delete">Delete</span>,
                   onClick: e => {
                     e.domEvent.stopPropagation();
                     onDelete(id);
@@ -55,7 +55,7 @@ export const EnvironmentCard = ({environment: {description, id, name, values}, o
           placement="bottomLeft"
           trigger={['click']}
         >
-          <span onClick={e => e.stopPropagation()}>
+          <span data-cy="environment-actions" onClick={e => e.stopPropagation()}>
             <T.ActionButton />
           </span>
         </Dropdown>
