@@ -2,11 +2,9 @@ import {CaretDownOutlined} from '@ant-design/icons';
 import {Menu} from 'antd';
 import {useCallback, useMemo} from 'react';
 import HomeAnalyticsService from 'services/Analytics/HomeAnalytics.service';
-import ExperimentalFeature from 'utils/ExperimentalFeature';
 import * as S from './Home.styled';
 
 const {onCreateTestClick} = HomeAnalyticsService;
-const isTransactionsEnabled = ExperimentalFeature.isEnabled('transactions');
 
 interface IProps {
   onCreateTest(): void;
@@ -28,25 +26,16 @@ const HomeActions = ({onCreateTest, onCreateTransaction}: IProps) => {
     () => (
       <Menu
         onClick={({key}) => onClick(key)}
-        items={
-          isTransactionsEnabled
-            ? [
-                {
-                  label: 'Create New Test',
-                  key: 'test',
-                },
-                {
-                  label: 'Create New Transaction',
-                  key: 'transaction',
-                },
-              ]
-            : [
-                {
-                  label: 'Create New Test',
-                  key: 'test',
-                },
-              ]
-        }
+        items={[
+          {
+            label: 'Create New Test',
+            key: 'test',
+          },
+          {
+            label: 'Create New Transaction',
+            key: 'transaction',
+          },
+        ]}
       />
     ),
     [onClick]

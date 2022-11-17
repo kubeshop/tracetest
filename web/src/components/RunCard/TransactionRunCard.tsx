@@ -8,7 +8,6 @@ import {ResourceType} from 'types/Resource.type';
 import {TTestRun} from 'types/TestRun.types';
 import {TTransactionRun} from 'types/TransactionRun.types';
 import Date from 'utils/Date';
-import ExperimentalFeature from 'utils/ExperimentalFeature';
 import * as S from './RunCard.styled';
 
 interface IProps {
@@ -36,7 +35,7 @@ const TransactionRunCard = ({run: {id: runId, createdAt, state, metadata, versio
 
   return (
     <Link to={linkTo}>
-      <S.Container $isWhite={ExperimentalFeature.isEnabled('transactions')}>
+      <S.Container $isWhite>
         <S.IconContainer>{getIcon(state)}</S.IconContainer>
 
         <S.Info>
