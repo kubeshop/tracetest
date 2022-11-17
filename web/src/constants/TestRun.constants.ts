@@ -5,6 +5,8 @@ export enum TestState {
   AWAITING_TEST_RESULTS = 'AWAITING_TEST_RESULTS',
   FAILED = 'FAILED',
   FINISHED = 'FINISHED',
+  WAITING = 'WAITING',
+  SKIPPED = 'SKIPPED',
 }
 
 export const TestStateMap: Record<
@@ -37,6 +39,14 @@ export const TestStateMap: Record<
   [TestState.FINISHED]: {
     status: 'success',
     label: 'Finished',
+  },
+  [TestState.WAITING]: {
+    status: 'default',
+    label: 'Waiting',
+  },
+  [TestState.SKIPPED]: {
+    status: 'warning',
+    label: 'Skipped',
   },
 };
 

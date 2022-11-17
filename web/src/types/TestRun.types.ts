@@ -1,11 +1,18 @@
 import {TAssertionResults} from './Assertion.types';
-import {Model, TTestSchemas, TTriggerSchemas} from './Common.types';
+import {Model, Modify, TTestSchemas, TTriggerSchemas} from './Common.types';
 import {TEnvironment} from './Environment.types';
 import {TTriggerResult} from './Test.types';
 import {TTestRunOutput} from './TestOutput.types';
 import {TTrace} from './Trace.types';
 
-export type TRawTestRun = TTestSchemas['TestRun'];
+export type TTestRunState = NonNullable<TTestSchemas['TestRun']['state'] | 'WAITING' | 'SKIPPED'>;
+
+export type TRawTestRun = Modify<
+  TTestSchemas['TestRun'],
+  {
+    state?: TTestRunState;
+  }
+>;
 
 export type TTestRun = Model<
   TRawTestRun,
@@ -22,7 +29,6 @@ export type TTestRun = Model<
     triggerResult?: TTriggerResult;
     outputs?: TTestRunOutput[];
     environment?: TEnvironment;
+    state: TTestRunState;
   }
 >;
-
-export type TTestRunState = TRawTestRun['state'];
