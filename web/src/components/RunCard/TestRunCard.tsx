@@ -6,7 +6,6 @@ import TestState from 'components/TestState';
 import {TestState as TestStateEnum} from 'constants/TestRun.constants';
 import {TTestRun} from 'types/TestRun.types';
 import Date from 'utils/Date';
-import ExperimentalFeature from 'utils/ExperimentalFeature';
 import * as S from './RunCard.styled';
 
 interface IProps {
@@ -37,7 +36,7 @@ const TestRunCard = ({
 
   return (
     <Link to={linkTo}>
-      <S.Container $isWhite={ExperimentalFeature.isEnabled('transactions')} data-cy={`run-card-${runId}`}>
+      <S.Container $isWhite data-cy={`run-card-${runId}`}>
         <S.IconContainer>{getIcon(state, failedAssertionCount)}</S.IconContainer>
 
         <S.Info>

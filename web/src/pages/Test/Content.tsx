@@ -13,7 +13,6 @@ import {useGetRunListQuery} from 'redux/apis/TraceTest.api';
 import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
 import {ResourceType} from 'types/Resource.type';
 import {TTestRun} from 'types/TestRun.types';
-import ExperimentalFeature from 'utils/ExperimentalFeature';
 import * as S from './Test.styled';
 import useDocumentTitle from '../../hooks/useDocumentTitle';
 
@@ -30,7 +29,7 @@ const Content = () => {
   }, [runTest, test.id]);
 
   return (
-    <S.Container $isWhite={!ExperimentalFeature.isEnabled('transactions')}>
+    <S.Container $isWhite>
       <TestHeader
         description={`${test.trigger.type.toUpperCase()} • ${test.trigger.method.toUpperCase()} • ${
           test.trigger.entryPoint

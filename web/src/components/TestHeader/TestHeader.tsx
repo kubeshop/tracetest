@@ -1,5 +1,4 @@
 import ResourceCardActions from 'components/ResourceCard/ResourceCardActions';
-import ExperimentalFeature from 'utils/ExperimentalFeature';
 import * as S from './TestHeader.styled';
 
 interface IProps {
@@ -11,7 +10,7 @@ interface IProps {
 }
 
 const TestHeader = ({description, id, onBack, onDelete, title}: IProps) => (
-  <S.Container $isWhite={!ExperimentalFeature.isEnabled('transactions')}>
+  <S.Container $isWhite>
     <S.Section>
       <S.BackIcon data-cy="test-header-back-button" onClick={onBack} />
       <div>

@@ -10,7 +10,6 @@ import EnvironmentProvider from 'providers/Environment';
 import {MenuInfo} from 'rc-menu/es/interface';
 import React from 'react';
 import {Link, useLocation, useNavigate} from 'react-router-dom';
-import ExperimentalFeature from 'utils/ExperimentalFeature';
 import * as S from './Layout.styled';
 
 interface IProps {
@@ -25,16 +24,13 @@ const menuItems = [
     label: 'Tests',
     path: '/',
   },
-];
-
-if (ExperimentalFeature.isEnabled('transactions')) {
-  menuItems.push({
+  {
     key: '1',
     icon: <GlobalOutlined />,
     label: 'Environments',
     path: '/environments',
-  });
-}
+  },
+];
 
 const Layout = ({children, hasMenu = false}: IProps) => {
   const navigate = useNavigate();
@@ -71,7 +67,7 @@ const Layout = ({children, hasMenu = false}: IProps) => {
             )}
 
             <S.Layout>
-              <Header hasEnvironments={ExperimentalFeature.isEnabled('transactions')} hasLogo={!hasMenu} />
+              <Header hasEnvironments hasLogo={!hasMenu} />
               <S.Content $hasMenu={hasMenu}>{children}</S.Content>
             </S.Layout>
           </S.Layout>
