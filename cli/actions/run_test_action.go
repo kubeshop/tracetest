@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -189,10 +190,25 @@ func (a runTestAction) runDefinitionFile(ctx context.Context, f file.File, param
 		}
 		return a.testRun(ctx, test, runID, params)
 	case "Transaction":
-		panic("not implemented")
+		test, err := a.getTransaction(ctx, body.GetId())
+		if err != nil {
+			return fmt.Errorf("could not get test info: %w", err)
+		}
+		return a.transactionRun(ctx, test, runID, params)
 	}
 
 	return fmt.Errorf(`unsuported run type "%s"`, body.GetType())
+}
+
+func (a runTestAction) getTransaction(ctx context.Context, id string) (openapi.Transaction, error) {
+	test, _, err := a.client.ApiApi.
+		GetTransaction(ctx, id).
+		Execute()
+	if err != nil {
+		return openapi.Transaction{}, fmt.Errorf("could not execute request: %w", err)
+	}
+
+	return *test, nil
 }
 
 func (a runTestAction) getTest(ctx context.Context, id string) (openapi.Test, error) {
@@ -246,6 +262,37 @@ func (a runTestAction) testRun(ctx context.Context, test openapi.Test, runID str
 	return nil
 }
 
+func (a runTestAction) transactionRun(ctx context.Context, transaction openapi.Transaction, runID string, params runDefParams) error {
+	rid, _ := strconv.Atoi(runID)
+	a.logger.Debug("run transaction", zap.Bool("wait-for-results", params.WaitForResult))
+	transactionID := transaction.GetId()
+	transactionRun, err := a.getTransactionRun(ctx, transactionID, int32(rid))
+	if err != nil {
+		return fmt.Errorf("could not run transaction: %w", err)
+	}
+
+	// if params.WaitForResult {
+	// 	// TODO implement this
+	// }
+
+	tro := formatters.TransactionRunOutput{
+		HasResults:  params.WaitForResult,
+		Transaction: transaction,
+		Run:         transactionRun,
+	}
+
+	formatter := formatters.TransactionRun(a.config, true)
+	formattedOutput := formatter.Format(tro)
+	fmt.Print(formattedOutput)
+
+	if params.WaitForResult && tro.Run.GetState() == "FAILED" {
+		// It failed, so we have to return an error status
+		os.Exit(1)
+	}
+
+	return nil
+}
+
 func (a runTestAction) saveJUnitFile(ctx context.Context, testId, testRunId, outputFile string) error {
 	if outputFile == "" {
 		return nil
@@ -279,6 +326,17 @@ func (a runTestAction) getTestRun(ctx context.Context, testID, runID string) (op
 	return *run, nil
 }
 
+func (a runTestAction) getTransactionRun(ctx context.Context, transactionID string, runID int32) (openapi.TransactionRun, error) {
+	run, _, err := a.client.ApiApi.
+		GetTransactionRun(ctx, transactionID, runID).
+		Execute()
+	if err != nil {
+		return openapi.TransactionRun{}, fmt.Errorf("could not execute request: %w", err)
+	}
+
+	return *run, nil
+}
+
 func (a runTestAction) waitForResult(ctx context.Context, testID, testRunID string) (openapi.TestRun, error) {
 	var (
 		testRun   openapi.TestRun
@@ -286,7 +344,7 @@ func (a runTestAction) waitForResult(ctx context.Context, testID, testRunID stri
 		wg        sync.WaitGroup
 	)
 	wg.Add(1)
-	ticker := time.NewTicker(1 * time.Second) // TODO: make this configurable
+	ticker := time.NewTicker(1 * time.Second) // TODO: change to websockets
 	go func() {
 		for {
 			select {
