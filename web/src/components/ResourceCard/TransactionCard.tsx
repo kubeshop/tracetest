@@ -69,7 +69,7 @@ const TransactionCard = ({
         hasRuns={Boolean(list.length)}
         isCollapsed={isCollapsed}
         isLoading={isLoading}
-        onViewAll={() => onViewAll(transactionId, ResourceType.Test)}
+        onViewAll={() => onViewAll(transactionId, ResourceType.Transaction)}
       >
         <S.RunsListContainer>
           {list.map(run => (

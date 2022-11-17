@@ -89,7 +89,7 @@ type ApiApiServicer interface {
 	GetTests(context.Context, int32, int32, string, string, string) (ImplResponse, error)
 	GetTransaction(context.Context, string) (ImplResponse, error)
 	GetTransactionRun(context.Context, string, int32) (ImplResponse, error)
-	GetTransactionRuns(context.Context, string) (ImplResponse, error)
+	GetTransactionRuns(context.Context, string, int32, int32) (ImplResponse, error)
 	GetTransactionVersion(context.Context, string, int32) (ImplResponse, error)
 	GetTransactions(context.Context, int32, int32, string, string, string) (ImplResponse, error)
 	ImportTestRun(context.Context, ExportedTestInformation) (ImplResponse, error)

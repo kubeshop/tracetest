@@ -207,8 +207,8 @@ func (m *MockRepository) GetTransactionRun(ctx context.Context, transactionID st
 }
 
 // GetTransactionsRuns implements model.Repository
-func (m *MockRepository) GetTransactionsRuns(ctx context.Context, transactionID string) ([]model.TransactionRun, error) {
-	args := m.Called(ctx, transactionID)
+func (m *MockRepository) GetTransactionsRuns(ctx context.Context, transactionID string, take, skip int32) ([]model.TransactionRun, error) {
+	args := m.Called(ctx, transactionID, take, skip)
 	return args.Get(0).([]model.TransactionRun), args.Error(1)
 }
 
