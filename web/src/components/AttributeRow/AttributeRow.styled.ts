@@ -1,3 +1,4 @@
+import {InfoCircleOutlined} from '@ant-design/icons';
 import {Badge, Tag as AntdTag, Typography} from 'antd';
 import styled from 'styled-components';
 
@@ -17,7 +18,6 @@ export const Container = styled.div`
 `;
 
 export const Header = styled.div`
-  cursor: pointer;
   flex: 1;
 `;
 
@@ -59,6 +59,7 @@ export const Title = styled(Typography.Title)`
 `;
 
 export const DetailContainer = styled.div`
+  overflow-wrap: break-word;
   width: 270px;
 `;
 
@@ -68,4 +69,16 @@ export const TagsContainer = styled.div`
 
 export const Tag = styled(AntdTag)`
   background: #e7e8eb;
+  margin-bottom: 8px;
+`;
+
+export const SectionTitle = styled.div`
+  align-items: center;
+  display: flex;
+`;
+
+export const InfoIcon = styled(InfoCircleOutlined)`
+  color: ${({theme}) => theme.color.textSecondary};
+  cursor: pointer;
+  margin: 4px;
 `;
