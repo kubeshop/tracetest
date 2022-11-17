@@ -834,7 +834,7 @@ func (c *controller) CreateTransaction(ctx context.Context, in openapi.Transacti
 var errTransactionExists = errors.New("transaction already exists")
 
 func (c *controller) doCreateTransaction(ctx context.Context, transaction model.Transaction) (openapi.ImplResponse, error) {
-	// if they try to create a test with preset ID, we need to make sure that ID doesn't exists already
+	// if they try to create a transaction with preset ID, we need to make sure that ID doesn't exists already
 	if transaction.HasID() {
 		exists, err := c.testDB.TransactionIDExists(ctx, transaction.ID)
 
