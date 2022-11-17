@@ -160,6 +160,9 @@ func (r persistentRunner) processExecQueue(job execReq) {
 
 	response, err := triggerer.Trigger(job.ctx, resolvedTest, triggerOptions)
 	run = r.handleExecutionResult(run, response, err)
+	if err != nil {
+		job.channel <- RunResult{Run: run, Err: err}
+	}
 
 	run.SpanID = response.SpanID
 
