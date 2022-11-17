@@ -12,7 +12,7 @@ const iconBasedOnResult = (result: TTestRunState, index: number) => {
     case TestState.FINISHED:
       return <S.IconSuccess />;
     case TestState.FAILED:
-      return <S.IconSuccess />;
+      return <S.IconFail />;
     default:
       return index + 1;
   }
@@ -22,13 +22,19 @@ interface IProps {
   index: number;
   test: TTest;
   testRun?: TTestRun;
+  hasRunFailed: boolean;
 }
 
 const ExecutionStep = ({
   index,
   test: {name, trigger, id: testId},
-  testRun: {id: runId, state, testVersion, passedAssertionCount, failedAssertionCount} = TestRun({}),
+  hasRunFailed,
+  testRun: {id: runId, state, testVersion, passedAssertionCount, failedAssertionCount} = TestRun({
+    state: hasRunFailed ? TestState.SKIPPED : TestState.WAITING,
+  }),
 }: IProps) => {
+  const stateIsFinished = ([TestState.FINISHED, TestState.FAILED] as string[]).includes(state);
+
   return (
     <S.Container data-cy={`run-card-${name}`} key={`${testId}-${runId}`}>
       <S.ExecutionStepStatus>{iconBasedOnResult(state, index)}</S.ExecutionStepStatus>
@@ -37,7 +43,7 @@ const ExecutionStep = ({
         <S.TagContainer>
           <S.TextTag>{trigger.method}</S.TextTag>
           <S.TextTag $isLight>{trigger.entryPoint}</S.TextTag>
-          <S.TextTag>{capitalize(state)}</S.TextTag>
+          {!stateIsFinished && <S.TextTag>{capitalize(state)}</S.TextTag>}
         </S.TagContainer>
       </S.Info>
       <S.AssertionResultContainer>
