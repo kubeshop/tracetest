@@ -131,7 +131,7 @@ func TestListTransactionRun(t *testing.T) {
 	newRun3, err := db.CreateTransactionRun(context.TODO(), run3)
 	require.NoError(t, err)
 
-	runs, err := db.GetTransactionsRuns(context.TODO(), transaction.ID.String())
+	runs, err := db.GetTransactionsRuns(context.TODO(), transaction.ID.String(), 20, 0)
 	require.NoError(t, err)
 
 	assert.Len(t, runs, 2)
@@ -166,7 +166,7 @@ func TestBug(t *testing.T) {
 	run2, err = db.CreateTransactionRun(ctx, run2)
 	require.NoError(t, err)
 
-	runs, err := db.GetTransactionsRuns(ctx, transaction.ID.String())
+	runs, err := db.GetTransactionsRuns(ctx, transaction.ID.String(), 20, 0)
 	require.NoError(t, err)
 	assert.Contains(t, runs, run1)
 	assert.Contains(t, runs, run2)
@@ -179,7 +179,7 @@ func TestBug(t *testing.T) {
 	run3, err = db.CreateTransactionRun(ctx, run3)
 	require.NoError(t, err)
 
-	runs, err = db.GetTransactionsRuns(ctx, newTransaction.ID.String())
+	runs, err = db.GetTransactionsRuns(ctx, newTransaction.ID.String(), 20, 0)
 	require.NoError(t, err)
 	assert.Len(t, runs, 3)
 	assert.Contains(t, runs, run1)
