@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
@@ -13,6 +15,7 @@ import (
 	"github.com/kubeshop/tracetest/cli/file"
 	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/kubeshop/tracetest/cli/openapi"
+	"github.com/kubeshop/tracetest/server/model/yaml"
 	"go.uber.org/zap"
 )
 
@@ -72,6 +75,27 @@ func (a runTestAction) Run(ctx context.Context, args RunTestConfig) error {
 	return nil
 }
 
+func (a runTestAction) testFileToID(ctx context.Context, originalPath, filePath string) (string, error) {
+	path := filepath.Join(originalPath, filePath)
+	f, err := file.Read(path)
+	if err != nil {
+		return "", err
+	}
+
+	body, _, err := a.client.ApiApi.
+		UpsertDefinition(ctx).
+		TextDefinition(openapi.TextDefinition{
+			Content: openapi.PtrString(f.Contents()),
+		}).
+		Execute()
+
+	if err != nil {
+		return "", fmt.Errorf("could not upsert definition: %w", err)
+	}
+
+	return body.GetId(), nil
+}
+
 func (a runTestAction) runDefinition(ctx context.Context, params runDefParams) error {
 	f, err := file.Read(params.DefinitionFile)
 	if err != nil {
@@ -87,15 +111,47 @@ func (a runTestAction) runDefinition(ctx context.Context, params runDefParams) e
 }
 
 func (a runTestAction) runDefinitionFile(ctx context.Context, f file.File, params runDefParams) error {
-	resolvedFile, err := f.ResolveVariables()
+	f, err := f.ResolveVariables()
 	if err != nil {
 		return err
+	}
+
+	if t, err := f.Definition().Transaction(); err == nil {
+		for i, step := range t.Steps {
+			if !strings.HasPrefix(step, "./") {
+				// not referencing a file, keep the value
+				continue
+			}
+
+			// references a file, resolve to its ID
+			id, err := a.testFileToID(ctx, f.AbsDir(), step)
+			if err != nil {
+				return fmt.Errorf(`cannot transalte path "%s" to an ID: %w`, step, err)
+			}
+
+			t.Steps[i] = id
+		}
+
+		def := yaml.File{
+			Type: yaml.FileTypeTransaction,
+			Spec: t,
+		}
+
+		updated, err := def.Encode()
+		if err != nil {
+			return fmt.Errorf(`cannot encode updated transaction: %w`, err)
+		}
+
+		f, err = file.New(f.Path(), updated)
+		if err != nil {
+			return fmt.Errorf(`cannot recreate updated file: %w`, err)
+		}
 	}
 
 	body, resp, err := a.client.ApiApi.
 		ExecuteDefinition(ctx).
 		TextDefinition(openapi.TextDefinition{
-			Content: openapi.PtrString(resolvedFile.Contents()),
+			Content: openapi.PtrString(f.Contents()),
 			RunInformation: &openapi.RunInformation{
 				Metadata: params.Metadata,
 			},

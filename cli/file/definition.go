@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -35,9 +36,23 @@ func New(path string, b []byte) (File, error) {
 	file := File{
 		contents: b,
 		file:     yf,
+		path:     path,
 	}
 
 	return file, nil
+}
+
+func (f File) Path() string {
+	return f.path
+}
+
+func (f File) AbsDir() string {
+	abs, err := filepath.Abs(f.path)
+	if err != nil {
+		panic(fmt.Errorf(`cannot get absolute path from "%s": %w`, f.path, err))
+	}
+
+	return filepath.Dir(abs)
 }
 
 func (f File) ResolveVariables() (File, error) {

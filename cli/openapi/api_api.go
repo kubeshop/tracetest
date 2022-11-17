@@ -47,8 +47,8 @@ CreateEnvironment Create new environment
 
 Create new environment action
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiCreateEnvironmentRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiCreateEnvironmentRequest
 */
 func (a *ApiApiService) CreateEnvironment(ctx context.Context) ApiCreateEnvironmentRequest {
 	return ApiCreateEnvironmentRequest{
@@ -58,7 +58,8 @@ func (a *ApiApiService) CreateEnvironment(ctx context.Context) ApiCreateEnvironm
 }
 
 // Execute executes the request
-//  @return Environment
+//
+//	@return Environment
 func (a *ApiApiService) CreateEnvironmentExecute(r ApiCreateEnvironmentRequest) (*Environment, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -154,8 +155,8 @@ CreateTest Create new test
 
 Create new test action
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiCreateTestRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiCreateTestRequest
 */
 func (a *ApiApiService) CreateTest(ctx context.Context) ApiCreateTestRequest {
 	return ApiCreateTestRequest{
@@ -165,7 +166,8 @@ func (a *ApiApiService) CreateTest(ctx context.Context) ApiCreateTestRequest {
 }
 
 // Execute executes the request
-//  @return Test
+//
+//	@return Test
 func (a *ApiApiService) CreateTestExecute(r ApiCreateTestRequest) (*Test, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -261,8 +263,8 @@ CreateTransaction Create new transaction
 
 Create new transaction
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiCreateTransactionRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiCreateTransactionRequest
 */
 func (a *ApiApiService) CreateTransaction(ctx context.Context) ApiCreateTransactionRequest {
 	return ApiCreateTransactionRequest{
@@ -272,7 +274,8 @@ func (a *ApiApiService) CreateTransaction(ctx context.Context) ApiCreateTransact
 }
 
 // Execute executes the request
-//  @return Transaction
+//
+//	@return Transaction
 func (a *ApiApiService) CreateTransactionExecute(r ApiCreateTransactionRequest) (*Transaction, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -363,9 +366,9 @@ DeleteEnvironment delete a environment
 
 delete a environment
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param environmentId
- @return ApiDeleteEnvironmentRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param environmentId
+	@return ApiDeleteEnvironmentRequest
 */
 func (a *ApiApiService) DeleteEnvironment(ctx context.Context, environmentId string) ApiDeleteEnvironmentRequest {
 	return ApiDeleteEnvironmentRequest{
@@ -455,9 +458,9 @@ DeleteTest delete a test
 
 delete a test
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param testId
- @return ApiDeleteTestRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param testId
+	@return ApiDeleteTestRequest
 */
 func (a *ApiApiService) DeleteTest(ctx context.Context, testId string) ApiDeleteTestRequest {
 	return ApiDeleteTestRequest{
@@ -548,10 +551,10 @@ DeleteTestRun delete a test run
 
 delete a test run
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param testId
- @param runId
- @return ApiDeleteTestRunRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param testId
+	@param runId
+	@return ApiDeleteTestRunRequest
 */
 func (a *ApiApiService) DeleteTestRun(ctx context.Context, testId string, runId string) ApiDeleteTestRunRequest {
 	return ApiDeleteTestRunRequest{
@@ -643,9 +646,9 @@ DeleteTransaction delete a transaction
 
 delete a transaction
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param transactionId
- @return ApiDeleteTransactionRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param transactionId
+	@return ApiDeleteTransactionRequest
 */
 func (a *ApiApiService) DeleteTransaction(ctx context.Context, transactionId string) ApiDeleteTransactionRequest {
 	return ApiDeleteTransactionRequest{
@@ -720,6 +723,102 @@ func (a *ApiApiService) DeleteTransactionExecute(r ApiDeleteTransactionRequest) 
 	return localVarHTTPResponse, nil
 }
 
+type ApiDeleteTransactionRunRequest struct {
+	ctx           context.Context
+	ApiService    *ApiApiService
+	transactionId string
+	runId         int32
+}
+
+func (r ApiDeleteTransactionRunRequest) Execute() (*http.Response, error) {
+	return r.ApiService.DeleteTransactionRunExecute(r)
+}
+
+/*
+DeleteTransactionRun Delete a specific run from a particular transaction
+
+Delete a specific run from a particular transaction
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param transactionId
+	@param runId
+	@return ApiDeleteTransactionRunRequest
+*/
+func (a *ApiApiService) DeleteTransactionRun(ctx context.Context, transactionId string, runId int32) ApiDeleteTransactionRunRequest {
+	return ApiDeleteTransactionRunRequest{
+		ApiService:    a,
+		ctx:           ctx,
+		transactionId: transactionId,
+		runId:         runId,
+	}
+}
+
+// Execute executes the request
+func (a *ApiApiService) DeleteTransactionRunExecute(r ApiDeleteTransactionRunRequest) (*http.Response, error) {
+	var (
+		localVarHTTPMethod = http.MethodDelete
+		localVarPostBody   interface{}
+		formFiles          []formFile
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.DeleteTransactionRun")
+	if err != nil {
+		return nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/transactions/{transactionId}/run/{runId}"
+	localVarPath = strings.Replace(localVarPath, "{"+"transactionId"+"}", url.PathEscape(parameterToString(r.transactionId, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"runId"+"}", url.PathEscape(parameterToString(r.runId, "")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarHTTPResponse, newErr
+	}
+
+	return localVarHTTPResponse, nil
+}
+
 type ApiDryRunAssertionRequest struct {
 	ctx        context.Context
 	ApiService *ApiApiService
@@ -742,10 +841,10 @@ DryRunAssertion run given assertions against the traces from the given run witho
 
 use this method to test a definition against an actual trace without creating a new version or persisting anything
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param testId
- @param runId
- @return ApiDryRunAssertionRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param testId
+	@param runId
+	@return ApiDryRunAssertionRequest
 */
 func (a *ApiApiService) DryRunAssertion(ctx context.Context, testId string, runId string) ApiDryRunAssertionRequest {
 	return ApiDryRunAssertionRequest{
@@ -757,7 +856,8 @@ func (a *ApiApiService) DryRunAssertion(ctx context.Context, testId string, runI
 }
 
 // Execute executes the request
-//  @return AssertionResults
+//
+//	@return AssertionResults
 func (a *ApiApiService) DryRunAssertionExecute(r ApiDryRunAssertionRequest) (*AssertionResults, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPut
@@ -855,8 +955,8 @@ ExecuteDefinition Execute a definition
 
 Execute a definition
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiExecuteDefinitionRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiExecuteDefinitionRequest
 */
 func (a *ApiApiService) ExecuteDefinition(ctx context.Context) ApiExecuteDefinitionRequest {
 	return ApiExecuteDefinitionRequest{
@@ -866,7 +966,8 @@ func (a *ApiApiService) ExecuteDefinition(ctx context.Context) ApiExecuteDefinit
 }
 
 // Execute executes the request
-//  @return ExecuteDefinitionResponse
+//
+//	@return ExecuteDefinitionResponse
 func (a *ApiApiService) ExecuteDefinitionExecute(r ApiExecuteDefinitionRequest) (*ExecuteDefinitionResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -958,10 +1059,10 @@ ExportTestRun export test and test run information
 
 export test and test run information for debugging
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param testId
- @param runId
- @return ApiExportTestRunRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param testId
+	@param runId
+	@return ApiExportTestRunRequest
 */
 func (a *ApiApiService) ExportTestRun(ctx context.Context, testId string, runId string) ApiExportTestRunRequest {
 	return ApiExportTestRunRequest{
@@ -973,7 +1074,8 @@ func (a *ApiApiService) ExportTestRun(ctx context.Context, testId string, runId 
 }
 
 // Execute executes the request
-//  @return ExportedTestInformation
+//
+//	@return ExportedTestInformation
 func (a *ApiApiService) ExportTestRunExecute(r ApiExportTestRunRequest) (*ExportedTestInformation, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -1069,8 +1171,8 @@ ExpressionResolve resolves an expression and returns the result string
 
 resolves an expression and returns the result string
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiExpressionResolveRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiExpressionResolveRequest
 */
 func (a *ApiApiService) ExpressionResolve(ctx context.Context) ApiExpressionResolveRequest {
 	return ApiExpressionResolveRequest{
@@ -1080,7 +1182,8 @@ func (a *ApiApiService) ExpressionResolve(ctx context.Context) ApiExpressionReso
 }
 
 // Execute executes the request
-//  @return ResolveResponseInfo
+//
+//	@return ResolveResponseInfo
 func (a *ApiApiService) ExpressionResolveExecute(r ApiExpressionResolveRequest) (*ResolveResponseInfo, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -1171,9 +1274,9 @@ GetEnvironment get environment
 
 get environment
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param environmentId
- @return ApiGetEnvironmentRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param environmentId
+	@return ApiGetEnvironmentRequest
 */
 func (a *ApiApiService) GetEnvironment(ctx context.Context, environmentId string) ApiGetEnvironmentRequest {
 	return ApiGetEnvironmentRequest{
@@ -1184,7 +1287,8 @@ func (a *ApiApiService) GetEnvironment(ctx context.Context, environmentId string
 }
 
 // Execute executes the request
-//  @return Environment
+//
+//	@return Environment
 func (a *ApiApiService) GetEnvironmentExecute(r ApiGetEnvironmentRequest) (*Environment, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -1308,8 +1412,8 @@ GetEnvironments Get Environments
 
 Get Environments
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiGetEnvironmentsRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiGetEnvironmentsRequest
 */
 func (a *ApiApiService) GetEnvironments(ctx context.Context) ApiGetEnvironmentsRequest {
 	return ApiGetEnvironmentsRequest{
@@ -1319,7 +1423,8 @@ func (a *ApiApiService) GetEnvironments(ctx context.Context) ApiGetEnvironmentsR
 }
 
 // Execute executes the request
-//  @return []Environment
+//
+//	@return []Environment
 func (a *ApiApiService) GetEnvironmentsExecute(r ApiGetEnvironmentsRequest) ([]Environment, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -1457,8 +1562,8 @@ GetResources Get resources
 
 get resources
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiGetResourcesRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiGetResourcesRequest
 */
 func (a *ApiApiService) GetResources(ctx context.Context) ApiGetResourcesRequest {
 	return ApiGetResourcesRequest{
@@ -1468,7 +1573,8 @@ func (a *ApiApiService) GetResources(ctx context.Context) ApiGetResourcesRequest
 }
 
 // Execute executes the request
-//  @return []Resource
+//
+//	@return []Resource
 func (a *ApiApiService) GetResourcesExecute(r ApiGetResourcesRequest) ([]Resource, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -1573,10 +1679,10 @@ GetRunResultJUnit get test run results in JUnit xml format
 
 get test run results in JUnit xml format
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param testId
- @param runId
- @return ApiGetRunResultJUnitRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param testId
+	@param runId
+	@return ApiGetRunResultJUnitRequest
 */
 func (a *ApiApiService) GetRunResultJUnit(ctx context.Context, testId string, runId string) ApiGetRunResultJUnitRequest {
 	return ApiGetRunResultJUnitRequest{
@@ -1588,7 +1694,8 @@ func (a *ApiApiService) GetRunResultJUnit(ctx context.Context, testId string, ru
 }
 
 // Execute executes the request
-//  @return string
+//
+//	@return string
 func (a *ApiApiService) GetRunResultJUnitExecute(r ApiGetRunResultJUnitRequest) (string, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -1679,9 +1786,9 @@ GetTest get test
 
 get test
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param testId
- @return ApiGetTestRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param testId
+	@return ApiGetTestRequest
 */
 func (a *ApiApiService) GetTest(ctx context.Context, testId string) ApiGetTestRequest {
 	return ApiGetTestRequest{
@@ -1692,7 +1799,8 @@ func (a *ApiApiService) GetTest(ctx context.Context, testId string) ApiGetTestRe
 }
 
 // Execute executes the request
-//  @return Test
+//
+//	@return Test
 func (a *ApiApiService) GetTestExecute(r ApiGetTestRequest) (*Test, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -1789,10 +1897,10 @@ GetTestResultSelectedSpans retrieve spans that will be selected by selector
 
 get the spans ids that would be selected by a specific selector query
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param testId
- @param runId
- @return ApiGetTestResultSelectedSpansRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param testId
+	@param runId
+	@return ApiGetTestResultSelectedSpansRequest
 */
 func (a *ApiApiService) GetTestResultSelectedSpans(ctx context.Context, testId string, runId string) ApiGetTestResultSelectedSpansRequest {
 	return ApiGetTestResultSelectedSpansRequest{
@@ -1804,7 +1912,8 @@ func (a *ApiApiService) GetTestResultSelectedSpans(ctx context.Context, testId s
 }
 
 // Execute executes the request
-//  @return SelectedSpansResult
+//
+//	@return SelectedSpansResult
 func (a *ApiApiService) GetTestResultSelectedSpansExecute(r ApiGetTestResultSelectedSpansRequest) (*SelectedSpansResult, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -1899,10 +2008,10 @@ GetTestRun get test Run
 
 get a particular test Run
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param testId
- @param runId
- @return ApiGetTestRunRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param testId
+	@param runId
+	@return ApiGetTestRunRequest
 */
 func (a *ApiApiService) GetTestRun(ctx context.Context, testId string, runId string) ApiGetTestRunRequest {
 	return ApiGetTestRunRequest{
@@ -1914,7 +2023,8 @@ func (a *ApiApiService) GetTestRun(ctx context.Context, testId string, runId str
 }
 
 // Execute executes the request
-//  @return TestRun
+//
+//	@return TestRun
 func (a *ApiApiService) GetTestRunExecute(r ApiGetTestRunRequest) (*TestRun, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -2019,9 +2129,9 @@ GetTestRuns get the runs for a test
 
 get the runs from a particular test
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param testId
- @return ApiGetTestRunsRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param testId
+	@return ApiGetTestRunsRequest
 */
 func (a *ApiApiService) GetTestRuns(ctx context.Context, testId string) ApiGetTestRunsRequest {
 	return ApiGetTestRunsRequest{
@@ -2032,7 +2142,8 @@ func (a *ApiApiService) GetTestRuns(ctx context.Context, testId string) ApiGetTe
 }
 
 // Execute executes the request
-//  @return []TestRun
+//
+//	@return []TestRun
 func (a *ApiApiService) GetTestRunsExecute(r ApiGetTestRunsRequest) ([]TestRun, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -2128,9 +2239,9 @@ GetTestSpecs Get definition for a test
 
 Gets definition for a test
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param testId
- @return ApiGetTestSpecsRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param testId
+	@return ApiGetTestSpecsRequest
 */
 func (a *ApiApiService) GetTestSpecs(ctx context.Context, testId string) ApiGetTestSpecsRequest {
 	return ApiGetTestSpecsRequest{
@@ -2141,7 +2252,8 @@ func (a *ApiApiService) GetTestSpecs(ctx context.Context, testId string) ApiGetT
 }
 
 // Execute executes the request
-//  @return []TestSpecs
+//
+//	@return []TestSpecs
 func (a *ApiApiService) GetTestSpecsExecute(r ApiGetTestSpecsRequest) ([]TestSpecs, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -2232,10 +2344,10 @@ GetTestVersion get a test specific version
 
 get a test specific version
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param testId
- @param version
- @return ApiGetTestVersionRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param testId
+	@param version
+	@return ApiGetTestVersionRequest
 */
 func (a *ApiApiService) GetTestVersion(ctx context.Context, testId string, version int32) ApiGetTestVersionRequest {
 	return ApiGetTestVersionRequest{
@@ -2247,7 +2359,8 @@ func (a *ApiApiService) GetTestVersion(ctx context.Context, testId string, versi
 }
 
 // Execute executes the request
-//  @return Test
+//
+//	@return Test
 func (a *ApiApiService) GetTestVersionExecute(r ApiGetTestVersionRequest) (*Test, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -2339,10 +2452,10 @@ GetTestVersionDefinitionFile Get the test definition as an YAML file
 
 Get the test definition as an YAML file
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param testId
- @param version
- @return ApiGetTestVersionDefinitionFileRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param testId
+	@param version
+	@return ApiGetTestVersionDefinitionFileRequest
 */
 func (a *ApiApiService) GetTestVersionDefinitionFile(ctx context.Context, testId string, version int32) ApiGetTestVersionDefinitionFileRequest {
 	return ApiGetTestVersionDefinitionFileRequest{
@@ -2354,7 +2467,8 @@ func (a *ApiApiService) GetTestVersionDefinitionFile(ctx context.Context, testId
 }
 
 // Execute executes the request
-//  @return string
+//
+//	@return string
 func (a *ApiApiService) GetTestVersionDefinitionFileExecute(r ApiGetTestVersionDefinitionFileRequest) (string, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -2479,8 +2593,8 @@ GetTests Get tests
 
 get tests
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiGetTestsRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiGetTestsRequest
 */
 func (a *ApiApiService) GetTests(ctx context.Context) ApiGetTestsRequest {
 	return ApiGetTestsRequest{
@@ -2490,7 +2604,8 @@ func (a *ApiApiService) GetTests(ctx context.Context) ApiGetTestsRequest {
 }
 
 // Execute executes the request
-//  @return []Test
+//
+//	@return []Test
 func (a *ApiApiService) GetTestsExecute(r ApiGetTestsRequest) ([]Test, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -2594,9 +2709,9 @@ GetTransaction get transaction
 
 get transaction
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param transactionId
- @return ApiGetTransactionRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param transactionId
+	@return ApiGetTransactionRequest
 */
 func (a *ApiApiService) GetTransaction(ctx context.Context, transactionId string) ApiGetTransactionRequest {
 	return ApiGetTransactionRequest{
@@ -2607,7 +2722,8 @@ func (a *ApiApiService) GetTransaction(ctx context.Context, transactionId string
 }
 
 // Execute executes the request
-//  @return Transaction
+//
+//	@return Transaction
 func (a *ApiApiService) GetTransactionExecute(r ApiGetTransactionRequest) (*Transaction, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -2623,6 +2739,326 @@ func (a *ApiApiService) GetTransactionExecute(r ApiGetTransactionRequest) (*Tran
 
 	localVarPath := localBasePath + "/transactions/{transactionId}"
 	localVarPath = strings.Replace(localVarPath, "{"+"transactionId"+"}", url.PathEscape(parameterToString(r.transactionId, "")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiGetTransactionRunRequest struct {
+	ctx           context.Context
+	ApiService    *ApiApiService
+	transactionId string
+	runId         int32
+}
+
+func (r ApiGetTransactionRunRequest) Execute() (*TransactionRun, *http.Response, error) {
+	return r.ApiService.GetTransactionRunExecute(r)
+}
+
+/*
+GetTransactionRun Get a specific run from a particular transaction
+
+Get a specific run from a particular transaction
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param transactionId
+	@param runId
+	@return ApiGetTransactionRunRequest
+*/
+func (a *ApiApiService) GetTransactionRun(ctx context.Context, transactionId string, runId int32) ApiGetTransactionRunRequest {
+	return ApiGetTransactionRunRequest{
+		ApiService:    a,
+		ctx:           ctx,
+		transactionId: transactionId,
+		runId:         runId,
+	}
+}
+
+// Execute executes the request
+//
+//	@return TransactionRun
+func (a *ApiApiService) GetTransactionRunExecute(r ApiGetTransactionRunRequest) (*TransactionRun, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *TransactionRun
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.GetTransactionRun")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/transactions/{transactionId}/run/{runId}"
+	localVarPath = strings.Replace(localVarPath, "{"+"transactionId"+"}", url.PathEscape(parameterToString(r.transactionId, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"runId"+"}", url.PathEscape(parameterToString(r.runId, "")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiGetTransactionRunsRequest struct {
+	ctx           context.Context
+	ApiService    *ApiApiService
+	transactionId string
+}
+
+func (r ApiGetTransactionRunsRequest) Execute() ([]TransactionRun, *http.Response, error) {
+	return r.ApiService.GetTransactionRunsExecute(r)
+}
+
+/*
+GetTransactionRuns Get all runs from a particular transaction
+
+Get all runs from a particular transaction
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param transactionId
+	@return ApiGetTransactionRunsRequest
+*/
+func (a *ApiApiService) GetTransactionRuns(ctx context.Context, transactionId string) ApiGetTransactionRunsRequest {
+	return ApiGetTransactionRunsRequest{
+		ApiService:    a,
+		ctx:           ctx,
+		transactionId: transactionId,
+	}
+}
+
+// Execute executes the request
+//
+//	@return []TransactionRun
+func (a *ApiApiService) GetTransactionRunsExecute(r ApiGetTransactionRunsRequest) ([]TransactionRun, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue []TransactionRun
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.GetTransactionRuns")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/transactions/{transactionId}/run"
+	localVarPath = strings.Replace(localVarPath, "{"+"transactionId"+"}", url.PathEscape(parameterToString(r.transactionId, "")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiGetTransactionVersionRequest struct {
+	ctx           context.Context
+	ApiService    *ApiApiService
+	transactionId string
+	version       int32
+}
+
+func (r ApiGetTransactionVersionRequest) Execute() (*Transaction, *http.Response, error) {
+	return r.ApiService.GetTransactionVersionExecute(r)
+}
+
+/*
+GetTransactionVersion get a transaction specific version
+
+get a transaction specific version
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param transactionId
+	@param version
+	@return ApiGetTransactionVersionRequest
+*/
+func (a *ApiApiService) GetTransactionVersion(ctx context.Context, transactionId string, version int32) ApiGetTransactionVersionRequest {
+	return ApiGetTransactionVersionRequest{
+		ApiService:    a,
+		ctx:           ctx,
+		transactionId: transactionId,
+		version:       version,
+	}
+}
+
+// Execute executes the request
+//
+//	@return Transaction
+func (a *ApiApiService) GetTransactionVersionExecute(r ApiGetTransactionVersionRequest) (*Transaction, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *Transaction
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.GetTransactionVersion")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/transactions/{transactionId}/version/{version}"
+	localVarPath = strings.Replace(localVarPath, "{"+"transactionId"+"}", url.PathEscape(parameterToString(r.transactionId, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"version"+"}", url.PathEscape(parameterToString(r.version, "")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -2731,8 +3167,8 @@ GetTransactions Get transactions
 
 get transactions
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiGetTransactionsRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiGetTransactionsRequest
 */
 func (a *ApiApiService) GetTransactions(ctx context.Context) ApiGetTransactionsRequest {
 	return ApiGetTransactionsRequest{
@@ -2742,7 +3178,8 @@ func (a *ApiApiService) GetTransactions(ctx context.Context) ApiGetTransactionsR
 }
 
 // Execute executes the request
-//  @return []Transaction
+//
+//	@return []Transaction
 func (a *ApiApiService) GetTransactionsExecute(r ApiGetTransactionsRequest) ([]Transaction, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -2851,8 +3288,8 @@ ImportTestRun import test and test run information
 
 import test and test run information for debugging
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiImportTestRunRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiImportTestRunRequest
 */
 func (a *ApiApiService) ImportTestRun(ctx context.Context) ApiImportTestRunRequest {
 	return ApiImportTestRunRequest{
@@ -2862,7 +3299,8 @@ func (a *ApiApiService) ImportTestRun(ctx context.Context) ApiImportTestRunReque
 }
 
 // Execute executes the request
-//  @return ExportedTestInformation
+//
+//	@return ExportedTestInformation
 func (a *ApiApiService) ImportTestRunExecute(r ApiImportTestRunRequest) (*ExportedTestInformation, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -2954,10 +3392,10 @@ RerunTestRun rerun a test run
 
 rerun a test run
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param testId
- @param runId
- @return ApiRerunTestRunRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param testId
+	@param runId
+	@return ApiRerunTestRunRequest
 */
 func (a *ApiApiService) RerunTestRun(ctx context.Context, testId string, runId string) ApiRerunTestRunRequest {
 	return ApiRerunTestRunRequest{
@@ -2969,7 +3407,8 @@ func (a *ApiApiService) RerunTestRun(ctx context.Context, testId string, runId s
 }
 
 // Execute executes the request
-//  @return TestRun
+//
+//	@return TestRun
 func (a *ApiApiService) RerunTestRunExecute(r ApiRerunTestRunRequest) (*TestRun, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -3066,9 +3505,9 @@ RunTest run test
 
 run a particular test
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param testId
- @return ApiRunTestRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param testId
+	@return ApiRunTestRequest
 */
 func (a *ApiApiService) RunTest(ctx context.Context, testId string) ApiRunTestRequest {
 	return ApiRunTestRequest{
@@ -3079,7 +3518,8 @@ func (a *ApiApiService) RunTest(ctx context.Context, testId string) ApiRunTestRe
 }
 
 // Execute executes the request
-//  @return TestRun
+//
+//	@return TestRun
 func (a *ApiApiService) RunTestExecute(r ApiRunTestRequest) (*TestRun, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -3168,7 +3608,7 @@ func (r ApiRunTransactionRequest) RunInformation(runInformation RunInformation) 
 	return r
 }
 
-func (r ApiRunTransactionRequest) Execute() (*TestRun, *http.Response, error) {
+func (r ApiRunTransactionRequest) Execute() (*TransactionRun, *http.Response, error) {
 	return r.ApiService.RunTransactionExecute(r)
 }
 
@@ -3177,9 +3617,9 @@ RunTransaction run transaction
 
 run a particular transaction
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param transactionId
- @return ApiRunTransactionRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param transactionId
+	@return ApiRunTransactionRequest
 */
 func (a *ApiApiService) RunTransaction(ctx context.Context, transactionId string) ApiRunTransactionRequest {
 	return ApiRunTransactionRequest{
@@ -3190,13 +3630,14 @@ func (a *ApiApiService) RunTransaction(ctx context.Context, transactionId string
 }
 
 // Execute executes the request
-//  @return TestRun
-func (a *ApiApiService) RunTransactionExecute(r ApiRunTransactionRequest) (*TestRun, *http.Response, error) {
+//
+//	@return TransactionRun
+func (a *ApiApiService) RunTransactionExecute(r ApiRunTransactionRequest) (*TransactionRun, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
 		localVarPostBody    interface{}
 		formFiles           []formFile
-		localVarReturnValue *TestRun
+		localVarReturnValue *TransactionRun
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.RunTransaction")
@@ -3288,9 +3729,9 @@ SetTestOutputs Set outputs for a test
 
 Set outputs for a particular test
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param testId
- @return ApiSetTestOutputsRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param testId
+	@return ApiSetTestOutputsRequest
 */
 func (a *ApiApiService) SetTestOutputs(ctx context.Context, testId string) ApiSetTestOutputsRequest {
 	return ApiSetTestOutputsRequest{
@@ -3388,9 +3829,9 @@ SetTestSpecs Set spec for a test
 
 Set spec for a particular test
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param testId
- @return ApiSetTestSpecsRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param testId
+	@return ApiSetTestSpecsRequest
 */
 func (a *ApiApiService) SetTestSpecs(ctx context.Context, testId string) ApiSetTestSpecsRequest {
 	return ApiSetTestSpecsRequest{
@@ -3488,9 +3929,9 @@ UpdateEnvironment update environment
 
 update environment action
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param environmentId
- @return ApiUpdateEnvironmentRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param environmentId
+	@return ApiUpdateEnvironmentRequest
 */
 func (a *ApiApiService) UpdateEnvironment(ctx context.Context, environmentId string) ApiUpdateEnvironmentRequest {
 	return ApiUpdateEnvironmentRequest{
@@ -3588,9 +4029,9 @@ UpdateTest update test
 
 update test action
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param testId
- @return ApiUpdateTestRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param testId
+	@return ApiUpdateTestRequest
 */
 func (a *ApiApiService) UpdateTest(ctx context.Context, testId string) ApiUpdateTestRequest {
 	return ApiUpdateTestRequest{
@@ -3688,9 +4129,9 @@ UpdateTransaction update transaction
 
 update transaction action
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param transactionId
- @return ApiUpdateTransactionRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param transactionId
+	@return ApiUpdateTransactionRequest
 */
 func (a *ApiApiService) UpdateTransaction(ctx context.Context, transactionId string) ApiUpdateTransactionRequest {
 	return ApiUpdateTransactionRequest{
@@ -3765,4 +4206,112 @@ func (a *ApiApiService) UpdateTransactionExecute(r ApiUpdateTransactionRequest) 
 	}
 
 	return localVarHTTPResponse, nil
+}
+
+type ApiUpsertDefinitionRequest struct {
+	ctx            context.Context
+	ApiService     *ApiApiService
+	textDefinition *TextDefinition
+}
+
+func (r ApiUpsertDefinitionRequest) TextDefinition(textDefinition TextDefinition) ApiUpsertDefinitionRequest {
+	r.textDefinition = &textDefinition
+	return r
+}
+
+func (r ApiUpsertDefinitionRequest) Execute() (*UpsertDefinitionResponse, *http.Response, error) {
+	return r.ApiService.UpsertDefinitionExecute(r)
+}
+
+/*
+UpsertDefinition Upsert a definition
+
+Upsert a definition
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiUpsertDefinitionRequest
+*/
+func (a *ApiApiService) UpsertDefinition(ctx context.Context) ApiUpsertDefinitionRequest {
+	return ApiUpsertDefinitionRequest{
+		ApiService: a,
+		ctx:        ctx,
+	}
+}
+
+// Execute executes the request
+//
+//	@return UpsertDefinitionResponse
+func (a *ApiApiService) UpsertDefinitionExecute(r ApiUpsertDefinitionRequest) (*UpsertDefinitionResponse, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodPut
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *UpsertDefinitionResponse
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.UpsertDefinition")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/definition.yaml"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"text/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.textDefinition
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
 }

@@ -26,8 +26,10 @@ type TestRun struct {
 	State *string `json:"state,omitempty"`
 	// Details of the cause for the last `FAILED` state
 	LastErrorState *string `json:"lastErrorState,omitempty"`
-	// time it took for the test to complete, either success or fail. If the test is still running, it will show the time up to the time of the request
-	ExecutionTime             *int32             `json:"executionTime,omitempty"`
+	// time in seconds it took for the test to complete, either success or fail. If the test is still running, it will show the time up to the time of the request
+	ExecutionTime *int32 `json:"executionTime,omitempty"`
+	// time in milliseconds it took for the triggering transaction to complete, either success or fail. If the test is still running, it will show the time up to the time of the request
+	TriggerTime               *int32             `json:"triggerTime,omitempty"`
 	CreatedAt                 *time.Time         `json:"createdAt,omitempty"`
 	ServiceTriggeredAt        *time.Time         `json:"serviceTriggeredAt,omitempty"`
 	ServiceTriggerCompletedAt *time.Time         `json:"serviceTriggerCompletedAt,omitempty"`
@@ -280,6 +282,38 @@ func (o *TestRun) HasExecutionTime() bool {
 // SetExecutionTime gets a reference to the given int32 and assigns it to the ExecutionTime field.
 func (o *TestRun) SetExecutionTime(v int32) {
 	o.ExecutionTime = &v
+}
+
+// GetTriggerTime returns the TriggerTime field value if set, zero value otherwise.
+func (o *TestRun) GetTriggerTime() int32 {
+	if o == nil || o.TriggerTime == nil {
+		var ret int32
+		return ret
+	}
+	return *o.TriggerTime
+}
+
+// GetTriggerTimeOk returns a tuple with the TriggerTime field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *TestRun) GetTriggerTimeOk() (*int32, bool) {
+	if o == nil || o.TriggerTime == nil {
+		return nil, false
+	}
+	return o.TriggerTime, true
+}
+
+// HasTriggerTime returns a boolean if a field has been set.
+func (o *TestRun) HasTriggerTime() bool {
+	if o != nil && o.TriggerTime != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetTriggerTime gets a reference to the given int32 and assigns it to the TriggerTime field.
+func (o *TestRun) SetTriggerTime(v int32) {
+	o.TriggerTime = &v
 }
 
 // GetCreatedAt returns the CreatedAt field value if set, zero value otherwise.
@@ -656,6 +690,9 @@ func (o TestRun) MarshalJSON() ([]byte, error) {
 	}
 	if o.ExecutionTime != nil {
 		toSerialize["executionTime"] = o.ExecutionTime
+	}
+	if o.TriggerTime != nil {
+		toSerialize["triggerTime"] = o.TriggerTime
 	}
 	if o.CreatedAt != nil {
 		toSerialize["createdAt"] = o.CreatedAt
