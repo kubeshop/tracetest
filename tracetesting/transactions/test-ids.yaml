@@ -5,11 +5,12 @@ spec:
   env:
     EXAMPLE_TEST_ID: "w2ON-RVVg"
   steps:
-    # ensure test doesn not exists
-    - ./tests/delete-example-test.yaml
+  # ensure test doesn not exists
+  - ./tests/delete-example-test.yaml
 
-    - ./tests/create-nonexisting-id.yaml
-    - ./tests/create-existing-id.yaml
+  # tests
+  - ./tests/create-nonexisting-id.yaml
+  - ./tests/create-existing-id.yaml
 
-    # cleanup
-    - ./tests/delete-example-test.yaml
+  # cleanup
+  - ./tests/delete-example-test.yaml
