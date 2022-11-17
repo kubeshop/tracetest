@@ -21,14 +21,16 @@ type (
 	TransactionRunState string
 
 	TransactionStep struct {
-		ID   id.ID
-		Name string
+		ID      id.ID
+		Name    string
+		Trigger Trigger
 	}
 
 	TransactionStepRun struct {
 		ID          int
 		TestID      id.ID
 		State       RunState
+		Result      RunResults
 		Environment Environment
 		Outputs     OrderedMap[string, string]
 	}
@@ -74,10 +76,10 @@ func (t Transaction) HasID() bool {
 }
 
 func NewTransactionRun(transaction Transaction) TransactionRun {
-	testIds := make([]TransactionStep, 0, len(transaction.Steps))
+	tests := make([]TransactionStep, 0, len(transaction.Steps))
 
 	for _, test := range transaction.Steps {
-		testIds = append(testIds, TransactionStep{ID: test.ID, Name: test.Name})
+		tests = append(tests, TransactionStep{ID: test.ID, Name: test.Name, Trigger: test.ServiceUnderTest})
 	}
 
 	return TransactionRun{
@@ -85,7 +87,7 @@ func NewTransactionRun(transaction Transaction) TransactionRun {
 		TransactionVersion: transaction.Version,
 		CreatedAt:          time.Now(),
 		State:              TransactionRunStateCreated,
-		Steps:              testIds,
+		Steps:              tests,
 		StepRuns:           make([]TransactionStepRun, 0, len(transaction.Steps)),
 		CurrentTest:        0,
 	}

@@ -49,11 +49,11 @@ func (m OpenAPI) TransactionRun(in model.TransactionRun) openapi.TransactionRun 
 	runs := make([]openapi.TestRun, 0, len(in.StepRuns))
 
 	for _, step := range in.Steps {
-		steps = append(steps, m.Test(model.Test{ID: step.ID, Name: step.Name}))
+		steps = append(steps, m.Test(model.Test{ID: step.ID, Name: step.Name, ServiceUnderTest: step.Trigger}))
 	}
 
 	for _, run := range in.StepRuns {
-		runs = append(runs, m.Run(&model.Run{ID: run.ID, TestID: run.TestID, State: run.State}))
+		runs = append(runs, m.Run(&model.Run{ID: run.ID, TestID: run.TestID, State: run.State, Results: &run.Result}))
 	}
 
 	return openapi.TransactionRun{

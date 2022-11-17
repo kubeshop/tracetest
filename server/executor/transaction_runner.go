@@ -190,6 +190,7 @@ func createStepRun(testRun model.Run) model.TransactionStepRun {
 	return model.TransactionStepRun{
 		ID:          testRun.ID,
 		TestID:      testRun.TestID,
+		Result:      *testRun.Results,
 		State:       testRun.State,
 		Environment: testRun.Environment,
 		Outputs:     testRun.Outputs,
