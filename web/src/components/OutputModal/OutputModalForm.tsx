@@ -57,7 +57,7 @@ const OutputModalForm = ({form, runId, spanIdList, testId}: IProps) => {
         ]}
         style={{marginBottom: 0}}
       >
-        <Editor basicSetup={{lineNumbers: true}} type={SupportedEditors.Selector} />
+        <Editor basicSetup={{lineNumbers: true}} type={SupportedEditors.Selector} placeholder="" />
       </Form.Item>
 
       <Form.Item
