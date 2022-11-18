@@ -19,11 +19,11 @@ const RunDetail = () => {
         <TestRunProvider testId={testId} runId={runId}>
           <TestSpecsProvider testId={testId} runId={runId}>
             <TestSpecFormProvider testId={testId}>
-              <TestOutputProvider testId={testId} runId={runId}>
-                <SpanProvider>
+              <SpanProvider>
+                <TestOutputProvider testId={testId} runId={runId}>
                   <Content />
-                </SpanProvider>
-              </TestOutputProvider>
+                </TestOutputProvider>
+              </SpanProvider>
             </TestSpecFormProvider>
           </TestSpecsProvider>
         </TestRunProvider>
