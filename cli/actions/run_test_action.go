@@ -111,22 +111,21 @@ func (a runTestAction) processEnv(ctx context.Context, envID string) (string, er
 	name := filepath.Base(envID)
 
 	req := openapi.Environment{
+		Id:     &name,
 		Name:   &name,
 		Values: values,
 	}
-
-	fmt.Println("vars", req.GetName(), req.GetValues())
 
 	body, resp, err := a.client.ApiApi.
 		CreateEnvironment(ctx).
 		Environment(req).
 		Execute()
 	if err != nil {
-		return "", fmt.Errorf("could not create environment: %w", err)
-	}
+		if resp.StatusCode == http.StatusBadRequest {
+			return a.updateEnv(ctx, req)
+		}
 
-	if resp.StatusCode == http.StatusBadRequest {
-		return a.updateEnv(ctx, req)
+		return "", fmt.Errorf("could not create environment: %w", err)
 	}
 
 	return body.GetId(), nil

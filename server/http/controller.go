@@ -652,7 +652,6 @@ func (c *controller) CreateEnvironment(ctx context.Context, in openapi.Environme
 
 	if environment.ID != "" {
 		exists, err := c.testDB.EnvironmentIDExists(ctx, environment.ID)
-
 		if err != nil {
 			return handleDBError(err), err
 		}
