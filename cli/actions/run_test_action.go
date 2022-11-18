@@ -22,6 +22,7 @@ import (
 
 type RunTestConfig struct {
 	DefinitionFile string
+	EnvID          string
 	WaitForResult  bool
 	JUnit          string
 }
@@ -36,6 +37,7 @@ var _ Action[RunTestConfig] = &runTestAction{}
 
 type runDefParams struct {
 	DefinitionFile string
+	EnvID          string
 	WaitForResult  bool
 	JunitFile      string
 	Metadata       map[string]string
@@ -54,18 +56,19 @@ func (a runTestAction) Run(ctx context.Context, args RunTestConfig) error {
 		return fmt.Errorf("--junit option requires --wait-for-result")
 	}
 
-	metadata := a.getMetadata()
 	a.logger.Debug(
 		"Running test from definition",
 		zap.String("definitionFile", args.DefinitionFile),
+		zap.String("environment", args.EnvID),
 		zap.Bool("waitForResults", args.WaitForResult),
 		zap.String("junit", args.JUnit),
 	)
 	params := runDefParams{
 		DefinitionFile: args.DefinitionFile,
+		EnvID:          args.EnvID,
 		WaitForResult:  args.WaitForResult,
 		JunitFile:      args.JUnit,
-		Metadata:       metadata,
+		Metadata:       a.getMetadata(),
 	}
 
 	err := a.runDefinition(ctx, params)
@@ -154,7 +157,8 @@ func (a runTestAction) runDefinitionFile(ctx context.Context, f file.File, param
 		TextDefinition(openapi.TextDefinition{
 			Content: openapi.PtrString(f.Contents()),
 			RunInformation: &openapi.RunInformation{
-				Metadata: params.Metadata,
+				Metadata:      params.Metadata,
+				EnvironmentId: &params.EnvID,
 			},
 		}).
 		Execute()
