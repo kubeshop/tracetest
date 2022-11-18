@@ -1,6 +1,6 @@
 type: Test
 spec:
-  id: zwWc1RV4R
+  id: v4QKJR4Vg
   name: Create with non-existing ID
   trigger:
     type: http
@@ -36,8 +36,7 @@ spec:
     assertions:
       - attr:tracetest.selected_spans.count = 1
       - attr:tracetest.response.status = 200
-      - ${attr:tracetest.response.body | json_path '.id' } != ""
-      - ${attr:tracetest.response.body | json_path '.id' } = "${env:EXAMPLE_TEST_ID}" #
+      - attr:tracetest.response.body | json_path '.id' = env:EXAMPLE_TEST_ID
   - selector: span[name="POST /api/tests" tracetest.span.type="http"]
     assertions:
     - attr:tracetest.selected_spans.count = 1
