@@ -1,4 +1,4 @@
-import {BarsOutlined, ClusterOutlined} from '@ant-design/icons';
+import {BarsOutlined, ClusterOutlined, PicCenterOutlined} from '@ant-design/icons';
 import styled from 'styled-components';
 
 export const Container = styled.div`
@@ -18,6 +18,12 @@ export const DAGIcon = styled(ClusterOutlined)<{$isSelected?: boolean}>`
 `;
 
 export const TimelineIcon = styled(BarsOutlined)<{$isSelected?: boolean}>`
+  color: ${({$isSelected = false, theme}) => ($isSelected ? theme.color.primary : theme.color.textSecondary)};
+  cursor: pointer;
+  font-size: ${({theme}) => theme.size.xl};
+`;
+
+export const FlameIcon = styled(PicCenterOutlined)<{$isSelected?: boolean}>`
   color: ${({$isSelected = false, theme}) => ($isSelected ? theme.color.primary : theme.color.textSecondary)};
   cursor: pointer;
   font-size: ${({theme}) => theme.size.xl};
