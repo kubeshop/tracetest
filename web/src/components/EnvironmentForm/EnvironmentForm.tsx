@@ -17,7 +17,7 @@ const EnvironmentForm = ({form, initialValues, onSubmit, onValidate}: IProps) =>
       initialValues={{...initialValues}}
       form={form}
       layout="vertical"
-      name="basic"
+      name="environment"
       onFinish={onSubmit}
       onValuesChange={onValidate}
     >
