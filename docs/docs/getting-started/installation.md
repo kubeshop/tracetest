@@ -81,7 +81,7 @@ Download one of the files from the latest tag, extract to your machine, and then
 You can run Tracetest locally using Docker Compose. This setup is great for a development environment. In this form, Tracetest runs in parallel to your Dockerized application,
 allowing you to interact with your app and its traces, create and run tests over them, etc.
 
-![Installer using docker compose](img/installer/1_docker-compose_0.7.0.png)
+![Installer using docker compose](../img/installer/1_docker-compose_0.7.0.png)
 
 **Tools required (installed if missing)**:
 - Docker
@@ -106,7 +106,7 @@ allowing you to interact with your app and its traces, create and run tests over
 You can run Tracetest in a Kubernetes cluster. This setup is ideal for a CI/CD environment, QA teams working on shared environments, etc.
 You can use a remote or local (minikube, etc) cluster. We'll even help you setup a local cluster, if you need one.
 
-![Installer using Kubernetes](img/installer/1_kubernetes_0.7.0.png)
+![Installer using Kubernetes](../img/installer/1_kubernetes_0.7.0.png)
 
 **Tools required (installed if missing)**:
 - kubectl

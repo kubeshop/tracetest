@@ -10,4 +10,4 @@ The PMA is only accessible from within the Kubernetes cluster network as the Tra
 
 ## **System architecture**
 
-![System Architecture](img/516718595/517537795.png)
+![System Architecture](../img/516718595/517537795.png)

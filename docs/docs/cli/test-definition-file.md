@@ -162,7 +162,7 @@ Available functions:
 ## **Assertions**
 Assertions are as important as how you trigger your test. Without them, your test is just a fancy way of executing a request using a CLI command. In this section, we will discuss how you can declare your assertions in your definition file.
 
-Before we start, there are two concepts that you must understand to write your tests: [selectors](advanced-selectors.md) and assertions.
+Before we start, there are two concepts that you must understand to write your tests: [selectors](../concepts/advanced-selectors) and assertions.
 
 **Selectors** are queries that are executed against your trace tree and select a set of spans based on some attributes. They are responsible for defining which spans will be tested against your assertions.
 
@@ -236,7 +236,7 @@ For more information about selectors or assertions, take a look at the documenta
 
 Outputs are really useful when running [Transactions](transactions.md). They allow to export values from a test so they become available in the [Environment Variables](environment-variables.md) of the current transaction.
 
-An ouptut exports the result of an [Expression](expressions.md) and assigns it to a name, so it can be injected into the environment variables of a running transaction.
+An ouptut exports the result of an [Expression](../concepts/expressions) and assigns it to a name, so it can be injected into the environment variables of a running transaction.
 A `selector` is needed only if the provided expression refers to a/some span/s attribute or meta attributes.
 
 It can be defined using the following YAML definition:
