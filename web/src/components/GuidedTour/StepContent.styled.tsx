@@ -1,4 +1,4 @@
-import {Typography, Divider as AntdDivider} from 'antd';
+import {Divider as AntdDivider, Typography} from 'antd';
 import styled from 'styled-components';
 
 export const Container = styled.div`
@@ -18,7 +18,7 @@ export const Header = styled.div`
   justify-content: space-between;
   padding: 16px;
   height: 48px;
-  background: linear-gradient(180deg, #2f1e61 -11.46%, #bc334a 134.37%);
+  background: linear-gradient(180deg, #2f1e61 -11.46%, #8b2c53 134.37%);
   > div {
     width: 100%;
   }
