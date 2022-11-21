@@ -248,3 +248,4 @@ docker-compose -f docker-compose.yaml -f tracetest/docker-compose.yaml up # add 
 
 This will start your Tracetest instance on `http://localhost:11633/`. Go ahead and open it up.
 
+Start creating test! Make sure to use the `http://app:8080/` url in your test creation, because your Node.js app and Tracetest are in the same network.
