@@ -17,9 +17,9 @@ import (
 
 // TestSummaryLastRun struct for TestSummaryLastRun
 type TestSummaryLastRun struct {
-	Time   *time.Time `json:"time,omitempty"`
-	Passes *int32     `json:"passes,omitempty"`
-	Fails  *int32     `json:"fails,omitempty"`
+	Time   NullableTime `json:"time,omitempty"`
+	Passes *int32       `json:"passes,omitempty"`
+	Fails  *int32       `json:"fails,omitempty"`
 }
 
 // NewTestSummaryLastRun instantiates a new TestSummaryLastRun object
@@ -39,36 +39,47 @@ func NewTestSummaryLastRunWithDefaults() *TestSummaryLastRun {
 	return &this
 }
 
-// GetTime returns the Time field value if set, zero value otherwise.
+// GetTime returns the Time field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *TestSummaryLastRun) GetTime() time.Time {
-	if o == nil || o.Time == nil {
+	if o == nil || o.Time.Get() == nil {
 		var ret time.Time
 		return ret
 	}
-	return *o.Time
+	return *o.Time.Get()
 }
 
 // GetTimeOk returns a tuple with the Time field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *TestSummaryLastRun) GetTimeOk() (*time.Time, bool) {
-	if o == nil || o.Time == nil {
+	if o == nil {
 		return nil, false
 	}
-	return o.Time, true
+	return o.Time.Get(), o.Time.IsSet()
 }
 
 // HasTime returns a boolean if a field has been set.
 func (o *TestSummaryLastRun) HasTime() bool {
-	if o != nil && o.Time != nil {
+	if o != nil && o.Time.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetTime gets a reference to the given time.Time and assigns it to the Time field.
+// SetTime gets a reference to the given NullableTime and assigns it to the Time field.
 func (o *TestSummaryLastRun) SetTime(v time.Time) {
-	o.Time = &v
+	o.Time.Set(&v)
+}
+
+// SetTimeNil sets the value for Time to be an explicit nil
+func (o *TestSummaryLastRun) SetTimeNil() {
+	o.Time.Set(nil)
+}
+
+// UnsetTime ensures that no value is present for Time, not even an explicit nil
+func (o *TestSummaryLastRun) UnsetTime() {
+	o.Time.Unset()
 }
 
 // GetPasses returns the Passes field value if set, zero value otherwise.
@@ -137,8 +148,8 @@ func (o *TestSummaryLastRun) SetFails(v int32) {
 
 func (o TestSummaryLastRun) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if o.Time != nil {
-		toSerialize["time"] = o.Time
+	if o.Time.IsSet() {
+		toSerialize["time"] = o.Time.Get()
 	}
 	if o.Passes != nil {
 		toSerialize["passes"] = o.Passes
