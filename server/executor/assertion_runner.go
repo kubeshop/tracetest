@@ -116,15 +116,36 @@ func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, req Asse
 		return model.Run{}, fmt.Errorf("cannot process outputs: %w", err)
 	}
 
+	newEnvironment := createEnvironment(req.Run.Environment, outputs)
+
+	ds = []expression.DataStore{expression.EnvironmentDataStore{Values: newEnvironment.Values}}
+
 	assertionResult, allPassed := e.assertionExecutor.Assert(ctx, req.Test.Specs, *run.Trace, ds)
 
 	run = run.SuccessfullyAsserted(
 		outputs,
+		newEnvironment,
 		assertionResult,
 		allPassed,
 	)
 
 	return run, nil
+}
+
+func createEnvironment(environment model.Environment, outputs model.OrderedMap[string, string]) model.Environment {
+	outputVariables := make([]model.EnvironmentValue, 0)
+	outputs.ForEach(func(key, val string) error {
+		outputVariables = append(outputVariables, model.EnvironmentValue{
+			Key:   key,
+			Value: val,
+		})
+
+		return nil
+	})
+
+	outputEnv := model.Environment{Values: outputVariables}
+
+	return environment.Merge(outputEnv)
 }
 
 func (e *defaultAssertionRunner) RunAssertions(ctx context.Context, request AssertionRequest) {
