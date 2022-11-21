@@ -4,7 +4,7 @@ declare namespace Cypress {
     createAssertion(index?: number): Chainable<Element>;
     openTestCreationModal(): Chainable<Element>;
     interceptTracePageApiCalls(): Chainable<Element>;
-    inteceptHomeApiCall(): Chainable<Element>;
+    interceptHomeApiCall(): Chainable<Element>;
     waitForTracePageApiCalls(): Chainable<Element>;
     createTest(): Chainable<Element>;
     clickNextOnCreateTestWizard(): Chainable<Element>;

@@ -25,12 +25,12 @@ Cypress.Commands.add('setCreateFormUrl', (method: string, url: string) => {
   cy.get('[data-cy=url]').type(url);
 });
 
-Cypress.Commands.add('deleteTest', (shoudlIntercept = false) => {
+Cypress.Commands.add('deleteTest', (shouldIntercept = false) => {
   cy.location('pathname').then(pathname => {
     const localTestId = getTestId(pathname);
     // called when test not created with createTest method
-    if (shoudlIntercept) {
-      cy.inteceptHomeApiCall();
+    if (shouldIntercept) {
+      cy.interceptHomeApiCall();
     }
     cy.visit(`/`);
     cy.wait('@testList');
@@ -48,7 +48,7 @@ Cypress.Commands.add('deleteTest', (shoudlIntercept = false) => {
 
 Cypress.Commands.add('openTestCreationModal', () => {
   cy.get('[data-cy=create-button]').click();
-  cy.get('.ant-dropdown-menu-item').first().click();
+  cy.get('.test-create-selector-items ul li').first().click();
   cy.get('[data-cy=create-test-steps]').should('be.visible');
 });
 
@@ -62,7 +62,7 @@ Cypress.Commands.add('interceptEditTestCall', () => {
   cy.intercept({method: 'PUT', url: '/api/tests/*'}).as('testEdit');
 });
 
-Cypress.Commands.add('inteceptHomeApiCall', () => {
+Cypress.Commands.add('interceptHomeApiCall', () => {
   cy.intercept({method: 'GET', url: '/api/resources?take=20&skip=0*'}).as('testList');
   cy.intercept({method: 'DELETE', url: '/api/tests/**'}).as('testDelete');
   cy.intercept({method: 'POST', url: '/api/tests'}).as('testCreation');
@@ -180,7 +180,7 @@ Cypress.Commands.add('clickNextOnCreateTestWizard', () => {
 });
 
 Cypress.Commands.add('createTest', () => {
-  cy.inteceptHomeApiCall();
+  cy.interceptHomeApiCall();
   cy.clearLocalStorage();
   cy.visit('/');
   cy.clearLocalStorage();

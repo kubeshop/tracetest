@@ -4,7 +4,7 @@ const DemoTestExampleList = PokeshopDemo.REST;
 
 describe('Create test', () => {
   beforeEach(() => {
-    cy.inteceptHomeApiCall();
+    cy.interceptHomeApiCall();
     cy.visit('/');
   });
   afterEach(() => cy.deleteTest(true));

@@ -24,8 +24,8 @@ const EnvironmentSelector = () => {
   );
 
   return !isLoading ? (
-    <Dropdown overlay={menu}>
-      <a onClick={e => e.preventDefault()}>
+    <Dropdown overlay={menu} overlayClassName="environment-selector-items">
+      <a data-cy="environment-selector" onClick={e => e.preventDefault()}>
         <Space>
           {selectedEnvironment?.name || 'No environment'}
           <DownOutlined />

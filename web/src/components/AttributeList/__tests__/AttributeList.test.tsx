@@ -1,6 +1,7 @@
 import {render} from '../../../test-utils';
 import AttributeList from '../AttributeList';
 
+const onCreateOutput = jest.fn();
 const onCreateTestSpec = jest.fn();
 
 describe('AttributeList', () => {
@@ -13,7 +14,12 @@ describe('AttributeList', () => {
     ];
 
     const {getByTestId} = render(
-      <AttributeList attributeList={attributeList} onCreateTestSpec={onCreateTestSpec} semanticConventions={{}} />
+      <AttributeList
+        attributeList={attributeList}
+        onCreateOutput={onCreateOutput}
+        onCreateTestSpec={onCreateTestSpec}
+        semanticConventions={{}}
+      />
     );
 
     expect(getByTestId('attribute-list')).toBeInTheDocument();
@@ -21,7 +27,12 @@ describe('AttributeList', () => {
 
   it('should render the empty list', () => {
     const {getByTestId} = render(
-      <AttributeList attributeList={[]} onCreateTestSpec={onCreateTestSpec} semanticConventions={{}} />
+      <AttributeList
+        attributeList={[]}
+        onCreateOutput={onCreateOutput}
+        onCreateTestSpec={onCreateTestSpec}
+        semanticConventions={{}}
+      />
     );
 
     expect(getByTestId('empty-attribute-list')).toBeInTheDocument();

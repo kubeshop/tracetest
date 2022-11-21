@@ -1,6 +1,6 @@
 describe('Create test with authentication', () => {
   beforeEach(() => {
-    cy.inteceptHomeApiCall();
+    cy.interceptHomeApiCall();
     cy.visit('/');
   });
 
