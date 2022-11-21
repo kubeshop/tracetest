@@ -5,6 +5,8 @@
 
 export interface paths {
   "/definition.yaml": {
+    /** Upsert a definition */
+    put: operations["upsertDefinition"];
     /** Execute a definition */
     post: operations["executeDefinition"];
   };
@@ -133,6 +135,28 @@ export interface paths {
 export interface components {}
 
 export interface operations {
+  /** Upsert a definition */
+  upsertDefinition: {
+    responses: {
+      /** Definition updated */
+      200: {
+        content: {
+          "application/json": external["definition.yaml"]["components"]["schemas"]["UpsertDefinitionResponse"];
+        };
+      };
+      /** Definition created */
+      201: {
+        content: {
+          "application/json": external["definition.yaml"]["components"]["schemas"]["UpsertDefinitionResponse"];
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "text/json": external["definition.yaml"]["components"]["schemas"]["TextDefinition"];
+      };
+    };
+  };
   /** Execute a definition */
   executeDefinition: {
     responses: {
@@ -148,8 +172,6 @@ export interface operations {
           "application/json": external["definition.yaml"]["components"]["schemas"]["ExecuteDefinitionResponse"];
         };
       };
-      /** trying to create a test with an already existing ID */
-      422: unknown;
     };
     requestBody: {
       content: {
@@ -279,6 +301,12 @@ export interface operations {
     parameters: {
       path: {
         transactionId: string;
+      };
+      query: {
+        /** indicates how many results can be returned by each page */
+        take?: number;
+        /** indicates how many results will be skipped when paginating */
+        skip?: number;
       };
     };
     responses: {
@@ -865,6 +893,12 @@ export interface external {
     paths: {};
     components: {
       schemas: {
+        UpsertDefinitionResponse: {
+          /** @description resource ID */
+          id?: string;
+          /** @description resource type */
+          type?: string;
+        };
         ExecuteDefinitionResponse: {
           /** @description resource ID */
           id?: string;
@@ -1083,9 +1117,9 @@ export interface external {
             | "FAILED";
           /** @description Details of the cause for the last `FAILED` state */
           lastErrorState?: string;
-          /** @description time it took for the test to complete, either success or fail. If the test is still running, it will show the time up to the time of the request */
+          /** @description time in seconds it took for the test to complete, either success or fail. If the test is still running, it will show the time up to the time of the request */
           executionTime?: number;
-          /** @description time it took for the triggering transaction to complete, either success or fail. If the test is still running, it will show the time up to the time of the request */
+          /** @description time in milliseconds it took for the triggering transaction to complete, either success or fail. If the test is still running, it will show the time up to the time of the request */
           triggerTime?: number;
           /** Format: date-time */
           createdAt?: string;

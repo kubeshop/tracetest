@@ -1,41 +1,44 @@
-PROJECT_ROOT=${shell dirname $${PWD}}
+PROJECT_ROOT=${PWD}
 
 OPENAPI_GENERATOR_VER=v5.4.0
 OPENAPI_GENERATOR_IMAGE=openapitools/openapi-generator-cli:$(OPENAPI_GENERATOR_VER)
-OPENAPI_TARGET_DIR=./openapi/
+OPENAPI_GENERATOR_CLI=docker run --rm -u ${shell id -u}  -v "$(PROJECT_ROOT):/local" -w "/local" ${OPENAPI_GENERATOR_IMAGE}
+OPENAPI_TARGET_DIR=openapi/
 
+generate: generate-server generate-cli generate-web
 
-generate: generate-cli generate-server
+generate-web:
+	cd web; npm ci --prefer-offline && npm run types:generate
 
 generate-cli:
-	rm -rf $(OPENAPI_TARGET_DIR)
-	mkdir -p ./tmp
-	mkdir -p $(OPENAPI_TARGET_DIR)
+	$(eval BASE := ./cli)
+	mkdir -p $(BASE)/tmp
+	rm -rf $(BASE)/$(OPENAPI_TARGET_DIR)
+	mkdir -p $(BASE)/$(OPENAPI_TARGET_DIR)
 
-	docker run --rm -u ${shell id -u}  -v "$(PROJECT_ROOT)/cli:/local" -w "/local" ${OPENAPI_GENERATOR_IMAGE} \
-		generate \
+	$(OPENAPI_GENERATOR_CLI) generate \
 		-i api/openapi.yaml \
 		-g go \
-		-o ./cli/tmp \
+		-o $(BASE)/tmp \
 		--generate-alias-as-model
-	cp ./tmp/*.go $(OPENAPI_TARGET_DIR)
-	rm -rf ./tmp
+	cp $(BASE)/tmp/*.go $(BASE)/$(OPENAPI_TARGET_DIR)
+	rm -rf $(BASE)/tmp
 
-	go fmt ./...; cd ..
-
+	cd $(BASE); go fmt ./...
 
 generate-server:
-	rm -rf $(OPENAPI_SERVER_TARGET_DIR)
-	mkdir -p ./tmp
+	$(eval BASE := ./server)
+	mkdir -p $(BASE)/tmp
+	rm -rf $(BASE)/$(OPENAPI_TARGET_DIR)
+	mkdir -p $(BASE)/$(OPENAPI_TARGET_DIR)
 
-	docker run --rm -u ${shell id -u}  -v "$(PROJECT_ROOT)/server:/local" -w "/local" ${OPENAPI_GENERATOR_IMAGE} \
-		generate \
+	$(OPENAPI_GENERATOR_CLI) generate \
 		-i api/openapi.yaml \
 		-g go-server \
-		-o ./tmp \
+		-o $(BASE)/tmp \
 		--generate-alias-as-model
-	mv ./tmp/go $(OPENAPI_SERVER_TARGET_DIR)
-	rm -f $(OPENAPI_SERVER_TARGET_DIR)/api_api_service.go
-	rm -rf ./tmp
+	cp $(BASE)/tmp/go/*.go $(BASE)/$(OPENAPI_TARGET_DIR)
+	rm -f $(BASE)/$(OPENAPI_TARGET_DIR)/api_api_service.go
+	rm -rf $(BASE)/tmp
 
-	go fmt ./...
+	cd $(BASE); go fmt ./...
