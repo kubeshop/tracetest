@@ -2910,6 +2910,20 @@ type ApiGetTransactionRunsRequest struct {
 	ctx           context.Context
 	ApiService    *ApiApiService
 	transactionId string
+	take          *int32
+	skip          *int32
+}
+
+// indicates how many results can be returned by each page
+func (r ApiGetTransactionRunsRequest) Take(take int32) ApiGetTransactionRunsRequest {
+	r.take = &take
+	return r
+}
+
+// indicates how many results will be skipped when paginating
+func (r ApiGetTransactionRunsRequest) Skip(skip int32) ApiGetTransactionRunsRequest {
+	r.skip = &skip
+	return r
 }
 
 func (r ApiGetTransactionRunsRequest) Execute() ([]TransactionRun, *http.Response, error) {
@@ -2956,6 +2970,12 @@ func (a *ApiApiService) GetTransactionRunsExecute(r ApiGetTransactionRunsRequest
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
 
+	if r.take != nil {
+		localVarQueryParams.Add("take", parameterToString(*r.take, ""))
+	}
+	if r.skip != nil {
+		localVarQueryParams.Add("skip", parameterToString(*r.skip, ""))
+	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
 

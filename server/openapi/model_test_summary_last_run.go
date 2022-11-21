@@ -14,7 +14,7 @@ import (
 )
 
 type TestSummaryLastRun struct {
-	Time time.Time `json:"time,omitempty"`
+	Time *time.Time `json:"time,omitempty"`
 
 	Passes int32 `json:"passes,omitempty"`
 

@@ -62,6 +62,7 @@ components:
             time:
               type: string
               format: date-time
+              nullable: true
             passes:
               type: integer
               readOnly: true

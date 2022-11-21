@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/assertions/selectors"
@@ -18,6 +19,14 @@ import (
 
 type OpenAPI struct {
 	traceConversionConfig traces.ConversionConfig
+}
+
+func optionalTime(in time.Time) *time.Time {
+	if in.IsZero() {
+		return nil
+	}
+
+	return &in
 }
 
 func (m OpenAPI) Transaction(in model.Transaction) openapi.Transaction {
@@ -36,7 +45,7 @@ func (m OpenAPI) Transaction(in model.Transaction) openapi.Transaction {
 		Summary: openapi.TestSummary{
 			Runs: int32(in.Summary.Runs),
 			LastRun: openapi.TestSummaryLastRun{
-				Time:   in.Summary.LastRun.Time,
+				Time:   optionalTime(in.Summary.LastRun.Time),
 				Passes: 0,
 				Fails:  0,
 			},
@@ -82,7 +91,7 @@ func (m OpenAPI) Test(in model.Test) openapi.Test {
 		Summary: openapi.TestSummary{
 			Runs: int32(in.Summary.Runs),
 			LastRun: openapi.TestSummaryLastRun{
-				Time:   in.Summary.LastRun.Time,
+				Time:   optionalTime(in.Summary.LastRun.Time),
 				Passes: int32(in.Summary.LastRun.Passes),
 				Fails:  int32(in.Summary.LastRun.Fails),
 			},
