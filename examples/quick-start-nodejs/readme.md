@@ -111,9 +111,9 @@ Let's fix this by configuring Tracetest and OpenTelemetry Collector.
 
 The `docker-compose.yaml` in the `tracetest` directory is configured with three services.
 
-- Postgres - Postgres is a prerequisite for Tracetest to work. It stores trace data when running the trace-based tests. We're currently working on alternative databases. Stay tuned for more about that!
-- [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/) - A vendor-agnostic implementation of how to receive, process and export telemetry data.
-- [Tracetest](https://tracetest.io/) - Trace-based testing that generates end-to-end tests automatically from traces.
+- **Postgres** - Postgres is a prerequisite for Tracetest to work. It stores trace data when running the trace-based tests. We're currently working on alternative databases. Stay tuned for more about that!
+- [**OpenTelemetry Collector**](https://opentelemetry.io/docs/collector/) - A vendor-agnostic implementation of how to receive, process and export telemetry data.
+- [**Tracetest**](https://tracetest.io/) - Trace-based testing that generates end-to-end tests automatically from traces.
 
 ```yaml
 version: '3'
@@ -248,4 +248,6 @@ docker-compose -f docker-compose.yaml -f tracetest/docker-compose.yaml up # add 
 
 This will start your Tracetest instance on `http://localhost:11633/`. Go ahead and open it up.
 
-Start creating test! Make sure to use the `http://app:8080/` url in your test creation, because your Node.js app and Tracetest are in the same network.
+Start creating tests! Make sure to use the `http://app:8080/` url in your test creation, because your Node.js app and Tracetest are in the same network.
+
+Feel free to check out our [docs](https://docs.tracetest.io/), and join our [Discord Community](https://discord.gg/8MtcMrQNbX) for more info!
