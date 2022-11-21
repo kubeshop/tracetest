@@ -1,5 +1,6 @@
 import {CloseCircleFilled} from '@ant-design/icons';
 import styled from 'styled-components';
+import {VisualizationType} from './RunDetailTrace';
 
 export const Container = styled.div`
   display: flex;
@@ -19,8 +20,8 @@ export const Section = styled.div`
   z-index: 1;
 `;
 
-export const VisualizationContainer = styled.div`
-  height: calc(100% - 52px);
+export const VisualizationContainer = styled.div<{$visualizationType?: VisualizationType}>`
+  height: calc(100% - ${({$visualizationType}) => ($visualizationType === VisualizationType.Flame ? 0 : 52)}px);
   position: relative;
 `;
 

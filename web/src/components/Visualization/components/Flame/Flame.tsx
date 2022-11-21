@@ -8,6 +8,7 @@ import * as S from './Flame.styled';
 
 interface IProps {
   isMatchedMode: boolean;
+  isTrace?: boolean;
   matchedSpans: string[];
   selectedSpan: string;
   spans: TSpan[];
@@ -16,14 +17,14 @@ interface IProps {
   onNodeClick(spanId: string): void;
 }
 
-export const Flame: React.FC<IProps> = ({spans}) => {
+export const Flame: React.FC<IProps> = ({spans, isTrace = false}) => {
   const {run} = useTestRun();
   const profile = useMemo(
     () => convertJaegerTraceToProfile(FlameGraphService.convertTracetestSpanToJaeger(run.trace?.traceId || '', spans)),
     [spans, run.trace?.traceId]
   );
   return (
-    <S.Container>
+    <S.Container $isTrace={isTrace}>
       <FlamegraphRenderer profile={profile} colorMode="light" showToolbar />
     </S.Container>
   );

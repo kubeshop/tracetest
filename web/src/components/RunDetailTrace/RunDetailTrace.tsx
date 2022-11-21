@@ -47,7 +47,7 @@ const RunDetailTrace = ({run, testId}: IProps) => {
               </S.SearchContainer>
             )}
 
-            <S.VisualizationContainer>
+            <S.VisualizationContainer $visualizationType={visualizationType}>
               <S.SwitchContainer>
                 {run.state === TestState.FINISHED && (
                   <Switch

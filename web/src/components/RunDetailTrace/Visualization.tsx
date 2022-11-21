@@ -97,6 +97,7 @@ const Visualization = ({runState, spans, type}: IProps) => {
       )}
       {type === VisualizationType.Flame && (
         <Flame
+          isTrace
           isMatchedMode={isMatchedMode}
           matchedSpans={matchedSpans}
           onNavigateToSpan={onNavigateToSpan}
