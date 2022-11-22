@@ -7,9 +7,10 @@ interface IProps {
   onBack(): void;
   onDelete(): void;
   title: string;
+  runButton: React.ReactElement;
 }
 
-const TestHeader = ({description, id, onBack, onDelete, title}: IProps) => (
+const TestHeader = ({description, id, onBack, onDelete, title, runButton}: IProps) => (
   <S.Container $isWhite>
     <S.Section>
       <S.BackIcon data-cy="test-header-back-button" onClick={onBack} />
@@ -19,6 +20,7 @@ const TestHeader = ({description, id, onBack, onDelete, title}: IProps) => (
       </div>
     </S.Section>
     <S.Section>
+      {runButton}
       <ResourceCardActions id={id} onDelete={onDelete} />
     </S.Section>
   </S.Container>

@@ -3,7 +3,7 @@ import {TResolveExpressionContext, TResolveRequestInfo} from 'types/Expression.t
 import {useParseExpressionMutation} from 'redux/apis/TraceTest.api';
 
 const useTooltip = (context: TResolveExpressionContext = {}) => {
-  const [parseExpressionMutation] = useParseExpressionMutation();
+  const [parseExpressionMutation, {isLoading}] = useParseExpressionMutation();
   const [prevExpression, setPrevExpression] = useState<string[]>([]);
   const [prevRawExpression, setPrevRawExpression] = useState<string>('');
   const [prevContext, setPrevContext] = useState<TResolveExpressionContext>({});
@@ -38,7 +38,7 @@ const useTooltip = (context: TResolveExpressionContext = {}) => {
     [context, parseExpression, prevRawExpression]
   );
 
-  return {onHover, resolvedValues: prevExpression};
+  return {onHover, resolvedValues: prevExpression, isLoading};
 };
 
 export default useTooltip;

@@ -4,7 +4,7 @@ import {PokeshopDemo} from '../../src/constants/Demo.constants';
 import {getTestId} from '../e2e/utils/Common';
 
 export const testRunPageRegex = /\/test\/(.*)\/run\/(.*)/;
-export const getAttributeListId = (number: number) => `.cm-tooltip-autocomplete [id*=${number}]`;
+export const getAttributeListId = (number: number) => `.cm-tooltip-autocomplete [id$=-${number}]`;
 export const getComparatorListId = (number: number) => `#assertion-form_assertions_${number}_comparator_list`;
 export const getValueFromList = (number: number) => `[data-cy=assertion-check-value-menu] li:nth-child(${number})`;
 
@@ -193,7 +193,7 @@ Cypress.Commands.add('createTest', () => {
   cy.waitForTracePageApiCalls();
 });
 
-Cypress.Commands.add('createAssertion', (index = 0) => {
+Cypress.Commands.add('createAssertion', () => {
   cy.selectRunDetailMode(3);
 
   cy.get(`[data-cy=trace-node-database]`, {timeout: 25000}).first().click({force: true});
@@ -203,8 +203,9 @@ Cypress.Commands.add('createAssertion', (index = 0) => {
 
   cy.get('[data-cy=expression-editor] [contenteditable]').first().type('db.name', {delay: 100});
 
-  const attributeListId = getAttributeListId(index);
+  const attributeListId = getAttributeListId(0);
   cy.get(attributeListId, {timeout: 10000}).first().click();
+  cy.get('[data-cy=assertion-check-value] .cm-content').first().click();
   cy.get(getValueFromList(1)).first().click();
 
   cy.get('[data-cy=assertion-check-operator]').click({force: true});
