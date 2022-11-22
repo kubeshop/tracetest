@@ -10,9 +10,12 @@ import (
 	"go.uber.org/zap"
 )
 
-var runTestFileDefinition string
-var runTestWaitForResult bool
-var runTestJUnit string
+var (
+	runTestFileDefinition,
+	runTestEnvID,
+	runTestJUnit string
+	runTestWaitForResult bool
+)
 
 var testRunCmd = &cobra.Command{
 	Use:    "run",
@@ -28,6 +31,7 @@ var testRunCmd = &cobra.Command{
 		runTestAction := actions.NewRunTestAction(cliConfig, cliLogger, client)
 		actionArgs := actions.RunTestConfig{
 			DefinitionFile: runTestFileDefinition,
+			EnvID:          runTestEnvID,
 			WaitForResult:  runTestWaitForResult,
 			JUnit:          runTestJUnit,
 		}
@@ -43,6 +47,7 @@ var testRunCmd = &cobra.Command{
 }
 
 func init() {
+	testRunCmd.PersistentFlags().StringVarP(&runTestEnvID, "environment", "e", "", "--environment <id>")
 	testRunCmd.PersistentFlags().StringVarP(&runTestFileDefinition, "definition", "d", "", "--definition <definition-file.yml>")
 	testRunCmd.PersistentFlags().BoolVarP(&runTestWaitForResult, "wait-for-result", "w", false, "")
 	testRunCmd.PersistentFlags().StringVarP(&runTestJUnit, "junit", "j", "", "--junit <junit-output.xml>")

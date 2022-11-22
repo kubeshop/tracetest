@@ -1,7 +1,7 @@
 type: Test
 spec:
   id: zwWc1RV4R
-  name: Create with non-existing ID
+  name: Create with existing ID
   trigger:
     type: http
     httpRequest:
