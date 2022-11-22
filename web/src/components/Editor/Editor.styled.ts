@@ -27,6 +27,23 @@ export const EditorContainer = styled.div`
       display: none;
       -webkit-appearance: none;
     }
+
+    .cm-content .cm-activeLine.cm-line::selection,
+    .cm-content .cm-activeLine {
+      color: inherit;
+      background: inherit;
+    }
+
+    .cm-content span::selection {
+      color: inherit;
+      background: inherit;
+    }
+
+    .cm-content span::-moz-selection {
+      /* Code for Firefox */
+      color: inherit;
+      background: inherit;
+    }
   }
 `;
 

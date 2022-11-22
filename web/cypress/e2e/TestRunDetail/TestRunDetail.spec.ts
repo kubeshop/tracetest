@@ -34,6 +34,7 @@ describe('Test Run Detail Views', () => {
     
     // eslint-disable-next-line cypress/no-unnecessary-waiting
     cy.wait(100);
+    cy.get('[data-cy=assertion-check-value] .cm-content').last().click();
     cy.get(getValueFromList(1)).first().click();
 
     cy.get('[data-cy=assertion-form-submit-button]').click();
@@ -76,6 +77,7 @@ describe('Test Run Detail Views', () => {
 
     // eslint-disable-next-line cypress/no-unnecessary-waiting
     cy.wait(100);
+    cy.get('[data-cy=assertion-check-value] .cm-content').last().click();
     cy.get(getValueFromList(1)).first().click();
 
     cy.get('[data-cy=assertion-form-submit-button]').click();
