@@ -17,7 +17,9 @@ nav:
   - Concepts:
     - Introduction to Trace-Based Testing: introduction.md
     - Architecture: architecture.md
-    - Specifying Selectors: advanced-selectors.md
+    - Selectors: concepts/selectors.md
+    - Transactions: concepts/transactions.md
+    - Environments: concepts/environments.md
     - Expressions: expressions.md
   - Getting Started:
     - Supported Backends: supported-backends.md
