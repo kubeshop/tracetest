@@ -16,7 +16,7 @@ interface IProps {
 }
 
 const OutputModalForm = ({form, runId, spanIdList, testId}: IProps) => {
-  useQuerySelector({
+  const {isLoading} = useQuerySelector({
     form,
     runId,
     testId,
@@ -51,8 +51,9 @@ const OutputModalForm = ({form, runId, spanIdList, testId}: IProps) => {
           {
             message: 'Please select a single span',
             validator: async () => {
-              if (spanIdList.length !== 1) throw new Error('Please select a single span');
+              if (spanIdList.length !== 1 && !isLoading) throw new Error('Please select a single span');
             },
+            validateTrigger: 'onSubmit',
           },
         ]}
         style={{marginBottom: 0}}

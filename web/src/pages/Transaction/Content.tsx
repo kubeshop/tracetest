@@ -32,14 +32,12 @@ const Content = () => {
         onBack={() => navigate('/')}
         onDelete={() => onDelete(transaction.id, transaction.name)}
         title={`${transaction.name} (v${transaction.version})`}
+        runButton={
+          <Button onClick={handleRunTest} loading={isEditLoading} type="primary" ghost>
+            Run Transaction
+          </Button>
+        }
       />
-
-      <S.ActionsContainer>
-        <div />
-        <Button onClick={handleRunTest} loading={isEditLoading} type="primary" ghost>
-          Run Transaction
-        </Button>
-      </S.ActionsContainer>
 
       <PaginatedList<TTransactionRun, {transactionId: string}>
         itemComponent={({item}) => (
