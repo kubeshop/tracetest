@@ -78,7 +78,7 @@ Cypress.Commands.add('waitForTracePageApiCalls', () => {
 });
 
 Cypress.Commands.add('createTestWithAuth', (authMethod: string, keys: string[]): any => {
-  cy.get('[data-cy=CreateTestFactory-create-create-button]').last().click();
+  cy.get('[data-cy=CreateTestFactory-create-next-button]').last().click();
   cy.selectTestFromDemoList();
   cy.get('[data-cy=auth-type-select]').click();
   cy.get(`[data-cy=auth-type-select-option-${authMethod}]`).click();
