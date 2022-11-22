@@ -47,6 +47,7 @@ const CreateModal = ({
           isLoading={isLoading}
           stepNumber={stepNumber}
           step={step}
+          mode={componentFactory.name}
         />
       }
     >

@@ -14,7 +14,7 @@ interface IProps {
 
 const CreateTestSteps = ({isLoading, stepList, selectedKey, componentFactory: ComponentFactory, onGoTo}: IProps) => {
   return (
-    <S.CreateTestSteps data-cy="create-test-steps">
+    <S.CreateTestSteps data-cy={`create-test-steps-${ComponentFactory.name}`}>
       <S.ProgressLine $stepCount={stepList.length} />
       <Tabs
         type="card"
