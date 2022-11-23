@@ -16,7 +16,7 @@ import (
 )
 
 type TracePoller interface {
-	Poll(context.Context, model.Test, model.Run, chan RunResult)
+	Poll(context.Context, model.Test, model.Run)
 }
 
 type PersistentTracePoller interface {
@@ -66,11 +66,10 @@ type tracePoller struct {
 }
 
 type PollingRequest struct {
-	ctx     context.Context
-	test    model.Test
-	run     model.Run
-	channel chan RunResult
-	count   int
+	ctx   context.Context
+	test  model.Test
+	run   model.Run
+	count int
 }
 
 func (tp tracePoller) handleDBError(err error) {
@@ -102,13 +101,12 @@ func (tp tracePoller) Stop() {
 	tp.exit <- true
 }
 
-func (tp tracePoller) Poll(ctx context.Context, test model.Test, run model.Run, resultChannel chan RunResult) {
+func (tp tracePoller) Poll(ctx context.Context, test model.Test, run model.Run) {
 	log.Printf("[TracePoller] Test %s Run %d: Poll\n", test.ID, run.ID)
 	tp.enqueueJob(PollingRequest{
-		ctx:     ctx,
-		test:    test,
-		run:     run,
-		channel: resultChannel,
+		ctx:  ctx,
+		test: test,
+		run:  run,
 	})
 }
 
@@ -138,9 +136,8 @@ func (tp tracePoller) processJob(job PollingRequest) {
 
 func (tp tracePoller) runAssertions(job PollingRequest) {
 	assertionRequest := AssertionRequest{
-		Test:    job.test,
-		Run:     job.run,
-		channel: job.channel,
+		Test: job.test,
+		Run:  job.run,
 	}
 
 	tp.assertionRunner.RunAssertions(job.ctx, assertionRequest)
@@ -182,8 +179,6 @@ func (tp tracePoller) handleTraceDBError(job PollingRequest, err error) {
 		err = fmt.Errorf("cannot fetch trace: %w", err)
 		fmt.Println("other", err)
 	}
-
-	job.channel <- RunResult{Run: run, Err: err}
 
 	tp.handleDBError(tp.updater.Update(job.ctx, run.Failed(err)))
 

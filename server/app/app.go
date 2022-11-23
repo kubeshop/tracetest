@@ -133,7 +133,7 @@ func (a *App) Start() error {
 
 	assertionExecutor := executor.NewAssertionExecutor(a.tracer)
 	outputProcesser := executor.InstrumentedOutputProcessor(a.tracer)
-	assertionRunner := executor.NewAssertionRunner(execTestUpdater, assertionExecutor, outputProcesser)
+	assertionRunner := executor.NewAssertionRunner(execTestUpdater, assertionExecutor, outputProcesser, subscriptionManager)
 	assertionRunner.Start(5)
 	defer assertionRunner.Stop()
 
@@ -149,7 +149,7 @@ func (a *App) Start() error {
 	tracePoller.Start(5) // worker count. should be configurable
 	defer tracePoller.Stop()
 
-	runner := executor.NewPersistentRunner(triggerReg, a.db, execTestUpdater, tracePoller, a.tracer)
+	runner := executor.NewPersistentRunner(triggerReg, a.db, execTestUpdater, tracePoller, a.tracer, subscriptionManager)
 	runner.Start(5) // worker count. should be configurable
 	defer runner.Stop()
 

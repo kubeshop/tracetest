@@ -7,6 +7,7 @@ import (
 	"github.com/kubeshop/tracetest/server/executor/trigger"
 	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/subscription"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/trace"
@@ -18,7 +19,7 @@ type RunResult struct {
 }
 
 type Runner interface {
-	Run(context.Context, model.Test, model.RunMetadata, model.Environment) (model.Run, chan RunResult)
+	Run(context.Context, model.Test, model.RunMetadata, model.Environment) model.Run
 }
 
 type PersistentRunner interface {
@@ -32,36 +33,39 @@ func NewPersistentRunner(
 	updater RunUpdater,
 	tp TracePoller,
 	tracer trace.Tracer,
+	subscriptionManager *subscription.Manager,
 ) PersistentRunner {
 	return persistentRunner{
-		triggers:     triggers,
-		runs:         runs,
-		updater:      updater,
-		tp:           tp,
-		tracer:       tracer,
-		executeQueue: make(chan execReq, 5),
-		exit:         make(chan bool, 1),
+		triggers:            triggers,
+		runs:                runs,
+		updater:             updater,
+		tp:                  tp,
+		tracer:              tracer,
+		subscriptionManager: subscriptionManager,
+		executeQueue:        make(chan execReq, 5),
+		exit:                make(chan bool, 1),
 	}
 }
 
 type persistentRunner struct {
-	triggers *trigger.Registry
-	tp       TracePoller
-	runs     model.RunRepository
-	updater  RunUpdater
-	tracer   trace.Tracer
+	triggers            *trigger.Registry
+	tp                  TracePoller
+	runs                model.RunRepository
+	updater             RunUpdater
+	tracer              trace.Tracer
+	subscriptionManager *subscription.Manager
 
 	executeQueue chan execReq
 	exit         chan bool
 }
 
 type execReq struct {
-	ctx      context.Context
-	test     model.Test
-	run      model.Run
-	channel  chan RunResult
-	Headers  propagation.MapCarrier
-	executor expression.Executor
+	ctx                 context.Context
+	test                model.Test
+	run                 model.Run
+	subscriptionManager *subscription.Manager
+	Headers             propagation.MapCarrier
+	executor            expression.Executor
 }
 
 func (r persistentRunner) handleDBError(run model.Run, err error) {
@@ -106,7 +110,7 @@ func getNewCtx(ctx context.Context) context.Context {
 	return otel.GetTextMapPropagator().Extract(context.Background(), carrier)
 }
 
-func (r persistentRunner) Run(ctx context.Context, test model.Test, metadata model.RunMetadata, environment model.Environment) (model.Run, chan RunResult) {
+func (r persistentRunner) Run(ctx context.Context, test model.Test, metadata model.RunMetadata, environment model.Environment) model.Run {
 	ctx = getNewCtx(ctx)
 
 	run := model.NewRun()
@@ -121,17 +125,14 @@ func (r persistentRunner) Run(ctx context.Context, test model.Test, metadata mod
 
 	executor := expression.NewExecutor(ds...)
 
-	channel := make(chan RunResult, 1)
-
 	r.executeQueue <- execReq{
 		ctx:      ctx,
 		test:     test,
 		run:      run,
 		executor: executor,
-		channel:  channel,
 	}
 
-	return run, channel
+	return run
 }
 
 func (r persistentRunner) processExecQueue(job execReq) {
@@ -162,7 +163,11 @@ func (r persistentRunner) processExecQueue(job execReq) {
 	run = r.handleExecutionResult(run, response, err)
 	if err != nil {
 		fmt.Printf("test %s run #%d trigger error: %s\n", run.TestID, run.ID, err.Error())
-		job.channel <- RunResult{Run: run, Err: err}
+		r.subscriptionManager.PublishUpdate(subscription.Message{
+			ResourceID: run.TransactionStepResourceID(),
+			Type:       "run_update",
+			Content:    RunResult{Run: run, Err: err},
+		})
 	}
 
 	run.SpanID = response.SpanID
@@ -171,7 +176,7 @@ func (r persistentRunner) processExecQueue(job execReq) {
 	if run.State == model.RunStateAwaitingTrace {
 		ctx, pollingSpan := r.tracer.Start(job.ctx, "Start Polling trace")
 		defer pollingSpan.End()
-		r.tp.Poll(ctx, job.test, run, job.channel)
+		r.tp.Poll(ctx, job.test, run)
 	}
 }
 

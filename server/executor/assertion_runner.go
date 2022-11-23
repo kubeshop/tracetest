@@ -8,6 +8,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/subscription"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/propagation"
 )
@@ -16,7 +17,6 @@ type AssertionRequest struct {
 	carrier propagation.MapCarrier
 	Test    model.Test
 	Run     model.Run
-	channel chan RunResult
 }
 
 func (r AssertionRequest) Context() context.Context {
@@ -30,22 +30,29 @@ type AssertionRunner interface {
 }
 
 type defaultAssertionRunner struct {
-	updater           RunUpdater
-	assertionExecutor AssertionExecutor
-	outputsProcessor  OutputsProcessorFn
-	inputChannel      chan AssertionRequest
-	exitChannel       chan bool
+	updater             RunUpdater
+	assertionExecutor   AssertionExecutor
+	outputsProcessor    OutputsProcessorFn
+	inputChannel        chan AssertionRequest
+	exitChannel         chan bool
+	subscriptionManager *subscription.Manager
 }
 
 var _ WorkerPool = &defaultAssertionRunner{}
 var _ AssertionRunner = &defaultAssertionRunner{}
 
-func NewAssertionRunner(updater RunUpdater, assertionExecutor AssertionExecutor, op OutputsProcessorFn) AssertionRunner {
+func NewAssertionRunner(
+	updater RunUpdater,
+	assertionExecutor AssertionExecutor,
+	op OutputsProcessorFn,
+	subscriptionManager *subscription.Manager,
+) AssertionRunner {
 	return &defaultAssertionRunner{
-		outputsProcessor:  op,
-		updater:           updater,
-		assertionExecutor: assertionExecutor,
-		inputChannel:      make(chan AssertionRequest, 1),
+		outputsProcessor:    op,
+		updater:             updater,
+		assertionExecutor:   assertionExecutor,
+		inputChannel:        make(chan AssertionRequest, 1),
+		subscriptionManager: subscriptionManager,
 	}
 }
 
@@ -79,7 +86,11 @@ func (e *defaultAssertionRunner) startWorker() {
 			run, err := e.runAssertionsAndUpdateResult(ctx, request)
 
 			log.Printf("[AssertionRunner] Test %s Run %d: update channel start\n", request.Test.ID, request.Run.ID)
-			request.channel <- RunResult{Run: run, Err: err}
+			e.subscriptionManager.PublishUpdate(subscription.Message{
+				ResourceID: run.ResourceID(),
+				Type:       "run_update",
+				Content:    RunResult{Run: run, Err: err},
+			})
 			log.Printf("[AssertionRunner] Test %s Run %d: update channel complete\n", request.Test.ID, request.Run.ID)
 
 			if err != nil {
