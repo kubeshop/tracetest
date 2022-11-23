@@ -5,9 +5,11 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/model"
@@ -20,6 +22,19 @@ func HTTP() Triggerer {
 }
 
 type httpTriggerer struct{}
+
+func httpClient() http.Client {
+	transport := &http.Transport{
+		DialContext: (&net.Dialer{
+			Timeout: time.Second,
+		}).DialContext,
+	}
+
+	return http.Client{
+		Transport: transport,
+		Timeout:   5 * time.Second,
+	}
+}
 
 func newSpanContext(ctx context.Context) trace.SpanContext {
 	spanCtx := trace.SpanContextFromContext(ctx)
@@ -55,17 +70,18 @@ func (te *httpTriggerer) Trigger(ctx context.Context, test model.Test, opts *Tri
 		return response, fmt.Errorf(`trigger type "%s" not supported by HTTP triggerer`, trigger.Type)
 	}
 
-	client := http.DefaultClient
+	client := httpClient()
 
 	ctx = trace.ContextWithSpanContext(ctx, newSpanContext(ctx))
+	ctx, cncl := context.WithTimeout(ctx, 5*time.Second)
+	defer cncl()
 
-	var req *http.Request
 	tReq := trigger.HTTP
 	var body io.Reader
 	if tReq.Body != "" {
 		body = bytes.NewBufferString(tReq.Body)
 	}
-	req, err := http.NewRequest(strings.ToUpper(string(tReq.Method)), tReq.URL, body)
+	req, err := http.NewRequestWithContext(ctx, strings.ToUpper(string(tReq.Method)), tReq.URL, body)
 	if err != nil {
 		return response, err
 	}
