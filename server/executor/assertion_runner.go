@@ -89,11 +89,13 @@ func (e *defaultAssertionRunner) startWorker() {
 }
 
 func (e *defaultAssertionRunner) runAssertionsAndUpdateResult(ctx context.Context, request AssertionRequest) (model.Run, error) {
+	log.Printf("[AssertionRunner] Test %s Run %d: Starting\n", request.Test.ID, request.Run.ID)
 	run, err := e.executeAssertions(ctx, request)
 	if err != nil {
 		log.Printf("[AssertionRunner] Test %s Run %d: error executing assertions: %s\n", request.Test.ID, request.Run.ID, err.Error())
 		return model.Run{}, e.updater.Update(ctx, run.Failed(err))
 	}
+	log.Printf("[AssertionRunner] Test %s Run %d: Success. pass: %d, fail: %d\n", request.Test.ID, request.Run.ID, run.Pass, run.Fail)
 
 	err = e.updater.Update(ctx, run)
 	if err != nil {
