@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"math"
 	"time"
 
@@ -88,12 +89,7 @@ func (tp tracePoller) Start(workers int) {
 					fmt.Println("tracePoller exit goroutine")
 					return
 				case job := <-tp.executeQueue:
-					fmt.Printf(
-						"tracePoller job. TestID %s, TraceID %s, SpanID %s\n",
-						job.test.ID,
-						job.run.TraceID,
-						job.run.SpanID,
-					)
+					log.Printf("[TracePoller] Test %s Run %d: recieved job\n", job.test.ID, job.run.ID)
 					tp.processJob(job)
 				}
 			}
@@ -107,6 +103,7 @@ func (tp tracePoller) Stop() {
 }
 
 func (tp tracePoller) Poll(ctx context.Context, test model.Test, run model.Run, resultChannel chan RunResult) {
+	log.Printf("[TracePoller] Test %s Run %d: Poll\n", test.ID, run.ID)
 	tp.enqueueJob(PollingRequest{
 		ctx:     ctx,
 		test:    test,
@@ -122,6 +119,7 @@ func (tp tracePoller) enqueueJob(job PollingRequest) {
 func (tp tracePoller) processJob(job PollingRequest) {
 	finished, run, err := tp.pollerExecutor.ExecuteRequest(&job)
 	if err != nil {
+		log.Printf("[TracePoller] Test %s Run %d: ExecuteRequest Error: %s\n", job.test.ID, job.run.ID, err.Error())
 		tp.handleTraceDBError(job, err)
 		return
 	}
@@ -132,16 +130,13 @@ func (tp tracePoller) processJob(job PollingRequest) {
 		return
 	}
 
-	fmt.Printf("completed polling result %d after %d times, number of spans: %d \n", job.run.ID, job.count, len(run.Trace.Flat))
+	log.Printf("[TracePoller] Test %s Run %d: Done polling. completed polling after %d times, number of spans %d\n", job.test.ID, job.run.ID, job.count, len(run.Trace.Flat))
 
 	tp.handleDBError(tp.updater.Update(job.ctx, run))
-	err = tp.runAssertions(job)
-	if err != nil {
-		fmt.Printf("could not run assertions: %s\n", err.Error())
-	}
+	tp.runAssertions(job)
 }
 
-func (tp tracePoller) runAssertions(job PollingRequest) error {
+func (tp tracePoller) runAssertions(job PollingRequest) {
 	assertionRequest := AssertionRequest{
 		Test:    job.test,
 		Run:     job.run,
@@ -149,8 +144,6 @@ func (tp tracePoller) runAssertions(job PollingRequest) error {
 	}
 
 	tp.assertionRunner.RunAssertions(job.ctx, assertionRequest)
-
-	return nil
 }
 
 func augmentData(trace *traces.Trace, result model.TriggerResult) *traces.Trace {

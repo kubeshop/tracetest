@@ -3,6 +3,7 @@ package executor
 import (
 	"context"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/kubeshop/tracetest/server/expression"
@@ -73,15 +74,15 @@ func (e *defaultAssertionRunner) startWorker() {
 		case <-e.exitChannel:
 			fmt.Println("Exiting assertion executor worker")
 			return
-		case assertionRequest := <-e.inputChannel:
-			ctx := assertionRequest.Context()
-			run, err := e.runAssertionsAndUpdateResult(ctx, assertionRequest)
+		case request := <-e.inputChannel:
+			ctx := request.Context()
+			run, err := e.runAssertionsAndUpdateResult(ctx, request)
 
 			runResult := RunResult{Run: run, Err: err}
-			assertionRequest.channel <- runResult
+			request.channel <- runResult
 
 			if err != nil {
-				fmt.Println(err.Error())
+				log.Printf("[AssertionRunner] Test %s Run %d: error with runAssertionsAndUpdateResult: %s\n", request.Test.ID, request.Run.ID, err.Error())
 			}
 		}
 	}
@@ -90,11 +91,13 @@ func (e *defaultAssertionRunner) startWorker() {
 func (e *defaultAssertionRunner) runAssertionsAndUpdateResult(ctx context.Context, request AssertionRequest) (model.Run, error) {
 	run, err := e.executeAssertions(ctx, request)
 	if err != nil {
+		log.Printf("[AssertionRunner] Test %s Run %d: error executing assertions: %s\n", request.Test.ID, request.Run.ID, err.Error())
 		return model.Run{}, e.updater.Update(ctx, run.Failed(err))
 	}
 
 	err = e.updater.Update(ctx, run)
 	if err != nil {
+		log.Printf("[AssertionRunner] Test %s Run %d: error updating run: %s\n", request.Test.ID, request.Run.ID, err.Error())
 		return model.Run{}, fmt.Errorf("could not save result on database: %w", err)
 	}
 
