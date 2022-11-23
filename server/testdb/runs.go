@@ -55,27 +55,27 @@ INSERT INTO test_runs (
 
 	-- timestamps
 	$3,              -- created_at
-	to_timestamp(0), -- service_triggered_at
-	to_timestamp(0), -- service_trigger_completed_at
-	to_timestamp(0), -- obtained_trace_at
+	$4,              -- service_triggered_at
+	$5,              -- service_trigger_completed_at
+	$6,              -- obtained_trace_at
 	to_timestamp(0), -- completed_at
 
 	-- trigger params
-	$4, -- state
-	$5, -- trace_id
-	$6, -- span_id
+	$7, -- state
+	$8, -- trace_id
+	$9, -- span_id
 
 	-- result info
-	'{}', -- trigger_results
+	$10,  -- trigger_results
 	'{}', -- test_results
-	NULL, -- trace
+	$11,  -- trace
 	'[]', -- outputs
 	NULL, -- last_error
 	0,    -- pass
 	0,    -- fail
 
-	$7, -- metadata
-	$8 -- environment
+	$12, -- metadata
+	$13 -- environment
 )
 RETURNING "id"`
 
@@ -116,14 +116,24 @@ func (td *postgresDB) CreateRun(ctx context.Context, test model.Test, run model.
 		run.CreatedAt = time.Now()
 	}
 
+	jsonTriggerResults, err := json.Marshal(run.TriggerResult)
+	if err != nil {
+		return model.Run{}, fmt.Errorf("trigger results encoding error: %w", err)
+	}
+
+	jsonTrace, err := json.Marshal(run.Trace)
+	if err != nil {
+		return model.Run{}, fmt.Errorf("trace encoding error: %w", err)
+	}
+
 	jsonMetadata, err := json.Marshal(run.Metadata)
 	if err != nil {
-		return model.Run{}, fmt.Errorf("encoding error: %w", err)
+		return model.Run{}, fmt.Errorf("metadata encoding error: %w", err)
 	}
 
 	jsonEnvironment, err := json.Marshal(run.Environment)
 	if err != nil {
-		return model.Run{}, fmt.Errorf("encoding error: %w", err)
+		return model.Run{}, fmt.Errorf("environment encoding error: %w", err)
 	}
 
 	tx, err := td.db.BeginTx(ctx, nil)
@@ -144,9 +154,14 @@ func (td *postgresDB) CreateRun(ctx context.Context, test model.Test, run model.
 		test.ID,
 		test.Version,
 		run.CreatedAt,
+		run.ServiceTriggeredAt,
+		run.ServiceTriggerCompletedAt,
+		run.ObtainedTraceAt,
 		run.State,
 		run.TraceID.String(),
 		run.SpanID.String(),
+		jsonTriggerResults,
+		jsonTrace,
 		jsonMetadata,
 		jsonEnvironment,
 	).Scan(&runID)
@@ -163,7 +178,7 @@ func (td *postgresDB) CreateRun(ctx context.Context, test model.Test, run model.
 const updateRunQuery = `
 UPDATE test_runs SET
 
--- timestamps
+	-- timestamps
 	"service_triggered_at" = $1,
 	"service_trigger_completed_at" = $2,
 	"obtained_trace_at" = $3,

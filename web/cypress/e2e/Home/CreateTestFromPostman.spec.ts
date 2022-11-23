@@ -10,7 +10,7 @@ describe('Create test from Postman Collection', () => {
     cy.get('[data-cy="collectionFile"]').attachFile('collection.json');
     cy.get('[data-cy=collectionTest-select]').click();
     cy.get('[data-cy=collectionTest-1]').click({force: true});
-    cy.submitCreateTestForm();
+    cy.submitCreateForm();
     cy.matchTestRunPageUrl();
     cy.cancelOnBoarding();
     cy.get('[data-cy=test-details-name]').should('have.text', `${name} (v1)`);

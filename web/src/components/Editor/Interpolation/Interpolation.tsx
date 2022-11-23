@@ -1,4 +1,5 @@
 import CodeMirror from '@uiw/react-codemirror';
+import {uniq} from 'lodash';
 import {Tooltip} from 'antd';
 import {autocompletion} from '@codemirror/autocomplete';
 import {useCallback, useMemo} from 'react';
@@ -38,7 +39,7 @@ const Interpolation = ({
 
   return (
     <S.InterpolationEditorContainer $showLineNumbers={lineNumbers}>
-      <Tooltip placement="topLeft" title={resolvedValues.join(',')}>
+      <Tooltip placement="topLeft" title={uniq(resolvedValues).join(',')}>
         <CodeMirror
           id="interpolation-editor"
           basicSetup={{...basicSetup, lineNumbers}}

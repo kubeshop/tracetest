@@ -1085,7 +1085,7 @@ export interface external {
           runs?: number;
           lastRun?: {
             /** Format: date-time */
-            time?: string;
+            time?: string | null;
             passes?: number;
             fails?: number;
           };

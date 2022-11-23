@@ -8,6 +8,6 @@ spec:
       url: http://test.com/list
       method: GET
   specs:
-    - selector: span[name = "Tracetest trigger"]
-      assertions:
-        - tracetest.response.status = 200
+  - selector: span[name = "Tracetest trigger"]
+    assertions:
+    - tracetest.response.status = 200

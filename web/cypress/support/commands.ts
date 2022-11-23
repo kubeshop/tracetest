@@ -1,10 +1,10 @@
 import 'cypress-file-upload';
 import {camelCase} from 'lodash';
 import {PokeshopDemo} from '../../src/constants/Demo.constants';
-import {getTestId} from '../e2e/utils/Common';
+import {getTestId, getTransactionId} from '../e2e/utils/Common';
 
 export const testRunPageRegex = /\/test\/(.*)\/run\/(.*)/;
-export const getAttributeListId = (number: number) => `.cm-tooltip-autocomplete [id*=${number}]`;
+export const getAttributeListId = (number: number) => `.cm-tooltip-autocomplete [id$=-${number}]`;
 export const getComparatorListId = (number: number) => `#assertion-form_assertions_${number}_comparator_list`;
 export const getValueFromList = (number: number) => `[data-cy=assertion-check-value-menu] li:nth-child(${number})`;
 
@@ -49,7 +49,7 @@ Cypress.Commands.add('deleteTest', (shouldIntercept = false) => {
 Cypress.Commands.add('openTestCreationModal', () => {
   cy.get('[data-cy=create-button]').click();
   cy.get('.test-create-selector-items ul li').first().click();
-  cy.get('[data-cy=create-test-steps]').should('be.visible');
+  cy.get('[data-cy=create-test-steps-CreateTestFactory]').should('be.visible');
 });
 
 Cypress.Commands.add('interceptTracePageApiCalls', () => {
@@ -66,6 +66,8 @@ Cypress.Commands.add('interceptHomeApiCall', () => {
   cy.intercept({method: 'GET', url: '/api/resources?take=20&skip=0*'}).as('testList');
   cy.intercept({method: 'DELETE', url: '/api/tests/**'}).as('testDelete');
   cy.intercept({method: 'POST', url: '/api/tests'}).as('testCreation');
+  cy.intercept({method: 'DELETE', url: '/api/transactions/**'}).as('transactionDelete');
+  cy.intercept({method: 'POST', url: '/api/transactions'}).as('transactionCreation');
 });
 
 Cypress.Commands.add('waitForTracePageApiCalls', () => {
@@ -76,7 +78,7 @@ Cypress.Commands.add('waitForTracePageApiCalls', () => {
 });
 
 Cypress.Commands.add('createTestWithAuth', (authMethod: string, keys: string[]): any => {
-  cy.get('[data-cy=create-test-next-button]').last().click();
+  cy.get('[data-cy=CreateTestFactory-create-next-button]').last().click();
   cy.selectTestFromDemoList();
   cy.get('[data-cy=auth-type-select]').click();
   cy.get(`[data-cy=auth-type-select-option-${authMethod}]`).click();
@@ -85,7 +87,7 @@ Cypress.Commands.add('createTestWithAuth', (authMethod: string, keys: string[]):
 });
 
 Cypress.Commands.add('submitAndMakeSureTestIsCreated', (name: string) => {
-  cy.submitCreateTestForm();
+  cy.submitCreateForm();
   cy.interceptTracePageApiCalls();
   cy.makeSureUserIsOnTracePage();
   cy.waitForTracePageApiCalls();
@@ -124,25 +126,26 @@ Cypress.Commands.add('cancelOnBoarding', () => {
   }
 });
 
-Cypress.Commands.add('submitCreateTestForm', () => {
-  cy.get('[data-cy=create-test-create-button]').last().click();
-  cy.wait('@testCreation');
+Cypress.Commands.add('submitCreateForm', (mode = 'CreateTestFactory') => {
+  cy.get(`[data-cy=${mode}-create-create-button]`).last().click();
+  if (mode === 'CreateTestFactory') cy.wait('@testCreation');
+  if (mode === 'CreateTransactionFactory') cy.wait('@transactionCreation');
 });
 
-Cypress.Commands.add('fillCreateFormBasicStep', (name: string, description?: string) => {
-  cy.get('[data-cy=create-test-next-button]').click();
+Cypress.Commands.add('fillCreateFormBasicStep', (name: string, description?: string, mode = 'CreateTestFactory') => {
+  if (mode === 'CreateTestFactory') cy.get(`[data-cy=${mode}-create-next-button]`).click();
   cy.get('[data-cy=create-test-name-input').type(name);
   cy.get('[data-cy=create-test-description-input').type(description || name);
-  cy.get('[data-cy=create-test-next-button]').last().click();
+  cy.get(`[data-cy=${mode}-create-next-button]`).last().click();
 });
 
 Cypress.Commands.add('createTestByName', (name: string) => {
   cy.openTestCreationModal();
-  cy.get('[data-cy=create-test-next-button]').click();
+  cy.get('[data-cy=CreateTestFactory-create-next-button]').click();
   cy.get('[data-cy=example-button]').click();
   cy.get(`[data-cy=demo-example-${camelCase(name)}]`).click();
-  cy.get('[data-cy=create-test-next-button]').last().click();
-  cy.submitCreateTestForm();
+  cy.get('[data-cy=CreateTestFactory-create-next-button]').last().click();
+  cy.submitCreateForm();
   cy.makeSureUserIsOnTracePage();
   cy.get('[data-cy=test-details-name]').should('have.text', `${name} (v1)`);
 });
@@ -172,11 +175,11 @@ Cypress.Commands.add('selectOperator', (index: number, text?: string) => {
 Cypress.Commands.add('selectTestFromDemoList', () => {
   cy.get('[data-cy=example-button]').click();
   cy.get(`[data-cy=demo-example-${camelCase(PokeshopDemo.REST[0].name)}]`).click();
-  cy.get('[data-cy=create-test-next-button]').last().click();
+  cy.get('[data-cy=CreateTestFactory-create-next-button]').last().click();
 });
 
 Cypress.Commands.add('clickNextOnCreateTestWizard', () => {
-  cy.get('[data-cy=create-test-next-button]').click();
+  cy.get('[data-cy=CreateTestFactory-create-next-button]').click();
 });
 
 Cypress.Commands.add('createTest', () => {
@@ -188,12 +191,12 @@ Cypress.Commands.add('createTest', () => {
   cy.clickNextOnCreateTestWizard();
   cy.selectTestFromDemoList();
   cy.interceptTracePageApiCalls();
-  cy.submitCreateTestForm();
+  cy.submitCreateForm();
   cy.makeSureUserIsOnTracePage();
   cy.waitForTracePageApiCalls();
 });
 
-Cypress.Commands.add('createAssertion', (index = 0) => {
+Cypress.Commands.add('createAssertion', () => {
   cy.selectRunDetailMode(3);
 
   cy.get(`[data-cy=trace-node-database]`, {timeout: 25000}).first().click({force: true});
@@ -203,8 +206,9 @@ Cypress.Commands.add('createAssertion', (index = 0) => {
 
   cy.get('[data-cy=expression-editor] [contenteditable]').first().type('db.name', {delay: 100});
 
-  const attributeListId = getAttributeListId(index);
+  const attributeListId = getAttributeListId(0);
   cy.get(attributeListId, {timeout: 10000}).first().click();
+  cy.get('[data-cy=assertion-check-value] .cm-content').first().click();
   cy.get(getValueFromList(1)).first().click();
 
   cy.get('[data-cy=assertion-check-operator]').click({force: true});
@@ -220,4 +224,28 @@ Cypress.Commands.add('createAssertion', (index = 0) => {
  */
 Cypress.Commands.add('selectRunDetailMode', (index: number) => {
   cy.get(`[data-cy=run-detail-header] .ant-tabs-nav-list div:nth-child(${index})`).click();
+});
+
+Cypress.Commands.add('openTransactionCreationModal', () => {
+  cy.get('[data-cy=create-button]').click();
+  cy.get('.ant-dropdown-menu-item').last().click();
+  cy.get('[data-cy=create-test-steps-CreateTransactionFactory]').should('be.visible');
+});
+
+Cypress.Commands.add('deleteTransaction', () => {
+  cy.location('pathname').then(pathname => {
+    const localTestId = getTransactionId(pathname);
+
+    cy.visit(`/`);
+    cy.wait('@testList');
+    cy.get('[data-cy=test-list]').should('exist', {timeout: 10000});
+    cy.get(`[data-cy=test-actions-button-${localTestId}]`, {timeout: 10000}).should('be.visible');
+    cy.get(`[data-cy=test-actions-button-${localTestId}]`).click({force: true});
+    cy.get('[data-cy=test-card-delete]').click();
+    cy.get('[data-cy=delete-confirmation-modal] .ant-btn-primary').click();
+    cy.wait('@transactionDelete');
+    cy.get(`[data-cy=test-actions-button-${localTestId}]`).should('not.exist');
+    cy.wait('@testList');
+    cy.clearLocalStorage();
+  });
 });

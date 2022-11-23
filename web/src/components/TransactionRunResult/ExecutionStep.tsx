@@ -36,7 +36,7 @@ const ExecutionStep = ({
   const stateIsFinished = ([TestState.FINISHED, TestState.FAILED] as string[]).includes(state);
 
   return (
-    <S.Container data-cy={`run-card-${name}`} key={`${testId}-${runId}`}>
+    <S.Container data-cy={`transaction-execution-step-${name}`}>
       <S.ExecutionStepStatus>{iconBasedOnResult(state, index)}</S.ExecutionStepStatus>
       <S.Info>
         <S.ExecutionStepName>{`${name} v${testVersion}`}</S.ExecutionStepName>
@@ -67,7 +67,7 @@ const ExecutionStep = ({
       <S.ExecutionStepStatus>
         {runId && (
           <Tooltip title="Go to Run">
-            <S.ExecutionStepRunLink to={`/test/${testId}/run/${runId}`} target="_blank">
+            <S.ExecutionStepRunLink to={`/test/${testId}/run/${runId}`} target="_blank" data-cy="execution-step-run-link">
               <LinkOutlined />
             </S.ExecutionStepRunLink>
           </Tooltip>

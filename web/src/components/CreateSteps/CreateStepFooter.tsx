@@ -10,9 +10,10 @@ interface IProps {
   step: ICreateTestStep;
   onPrev(): void;
   isLoading: boolean;
+  mode: string;
 }
 
-const CreateStepFooter = ({isValid, stepNumber, step, isLastStep, onPrev, isLoading}: IProps) => {
+const CreateStepFooter = ({isValid, stepNumber, step, isLastStep, onPrev, isLoading, mode}: IProps) => {
   return (
     <S.Footer>
       <span>
@@ -35,7 +36,7 @@ const CreateStepFooter = ({isValid, stepNumber, step, isLastStep, onPrev, isLoad
           <Button
             htmlType="submit"
             form={step.component}
-            data-cy="create-test-next-button"
+            data-cy={`${mode}-create-next-button`}
             disabled={!isValid}
             type="primary"
             onClick={() => CreateTestAnalyticsService.onNextClick(step.name)}
@@ -47,7 +48,7 @@ const CreateStepFooter = ({isValid, stepNumber, step, isLastStep, onPrev, isLoad
             htmlType="submit"
             form={step.component}
             onClick={() => CreateTestAnalyticsService.onCreateTestFormSubmit()}
-            data-cy="create-test-create-button"
+            data-cy={`${mode}-create-create-button`}
             disabled={!isValid}
             type="primary"
             loading={isLoading}

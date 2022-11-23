@@ -54,6 +54,8 @@ func augmentSpanData(span *Span) {
 	span.Attributes["name"] = span.Name
 	span.Attributes["tracetest.span.type"] = spanType(span.Attributes)
 	span.Attributes["tracetest.span.duration"] = spanDuration(*span)
+	span.Attributes["tracetest.span.startTime"] = fmt.Sprintf("%d", span.StartTime.UnixNano())
+	span.Attributes["tracetest.span.endTime"] = fmt.Sprintf("%d", span.EndTime.UnixNano())
 }
 
 func spanType(attrs Attributes) string {

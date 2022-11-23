@@ -14,7 +14,7 @@ describe('Create test', () => {
     cy.openTestCreationModal();
     cy.fillCreateFormBasicStep(name);
     cy.setCreateFormUrl('GET', 'http://demo-pokemon-api.demo.svc.cluster.local/pokemon');
-    cy.submitCreateTestForm();
+    cy.submitCreateForm();
     cy.makeSureUserIsOnTracePage();
     cy.get('[data-cy=test-details-name]').should('have.text', `${name} (v1)`);
   });
@@ -33,7 +33,7 @@ describe('Create test', () => {
           parseSpecialCharSequences: false,
         }
       );
-    cy.submitCreateTestForm();
+    cy.submitCreateForm();
     cy.makeSureUserIsOnTracePage();
     cy.get('[data-cy=test-details-name]').should('have.text', `${name} (v1)`);
   });

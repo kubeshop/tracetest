@@ -46,7 +46,6 @@ export const AssertionCheck = ({
   spanIdList,
   form,
 }: IProps) => {
-  const [isValueDropdownOpen, setIsValueDropdownOpen] = useState(false);
   const [selectedAttributeKey, setSelectedAttributeKey] = useState('');
   const onAttributeFocus = useCallback((view: EditorView) => {
     if (!view?.state.doc.length) delay(() => startCompletion(view!), 0);
@@ -61,7 +60,6 @@ export const AssertionCheck = ({
       const attributeKey = attributeList.find(({key}) => key === label.replace('attr:', ''))?.key || '';
 
       setSelectedAttributeKey(attributeKey);
-      setIsValueDropdownOpen(true);
     },
     [attributeList]
   );
@@ -111,8 +109,6 @@ export const AssertionCheck = ({
         <AssertionCheckValue
           form={form}
           valueList={valueList}
-          isDropdownOpen={isValueDropdownOpen}
-          onClose={() => setIsValueDropdownOpen(false)}
           editorContext={editorContext}
           name={name}
           field={field}

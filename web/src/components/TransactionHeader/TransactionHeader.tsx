@@ -26,20 +26,20 @@ const TransactionHeader = ({
         <S.BackIcon data-cy="transaction-header-back-button" onClick={onBack} />
         <div>
           <S.Title data-cy="transaction-details-name">
-            {name} ({version})
+            {name} (v{version})
           </S.Title>
           <S.Text>{description}</S.Text>
         </div>
       </S.Section>
       <S.Section>
         {state && state !== TestStateEnum.FINISHED && (
-          <S.StateContainer data-cy="test-run-result-status">
+          <S.StateContainer data-cy="transaction-run-result-status">
             <S.StateText>Status:</S.StateText>
             <TestState testState={state} />
           </S.StateContainer>
         )}
         {state && state === TestStateEnum.FINISHED && (
-          <Button ghost onClick={onRun} type="primary">
+          <Button ghost onClick={onRun} type="primary" data-cy="transaction-run-button">
             Run Transaction
           </Button>
         )}

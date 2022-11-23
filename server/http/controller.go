@@ -283,7 +283,7 @@ func (c *controller) RunTest(ctx context.Context, testID string, runInformation 
 		return handleDBError(err), err
 	}
 
-	run, _ := c.runner.Run(ctx, test, metadata, environment)
+	run := c.runner.Run(ctx, test, metadata, environment)
 
 	return openapi.Response(200, c.mappers.Out.Run(&run)), nil
 }
@@ -440,9 +440,15 @@ func (c controller) GetTestVersionDefinitionFile(ctx context.Context, testID str
 		return handleDBError(err), err
 	}
 
+	openapiTest := c.mappers.Out.Test(test)
+	yamlTest, err := yaml.GetTestFromOpenapiObject(openapiTest)
+	if err != nil {
+		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
+	}
+
 	enc, err := yaml.Encode(yaml.File{
 		Type: yaml.FileTypeTest,
-		Spec: test,
+		Spec: yamlTest,
 	})
 	if err != nil {
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
@@ -652,7 +658,6 @@ func (c *controller) CreateEnvironment(ctx context.Context, in openapi.Environme
 
 	if environment.ID != "" {
 		exists, err := c.testDB.EnvironmentIDExists(ctx, environment.ID)
-
 		if err != nil {
 			return handleDBError(err), err
 		}
