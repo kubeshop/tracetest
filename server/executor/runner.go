@@ -64,9 +64,9 @@ type execReq struct {
 	executor expression.Executor
 }
 
-func (r persistentRunner) handleDBError(err error) {
+func (r persistentRunner) handleDBError(run model.Run, err error) {
 	if err != nil {
-		fmt.Printf("DB error when running test: %s\n", err.Error())
+		fmt.Printf("test %s run #%d trigger DB error: %s\n", run.TestID, run.ID, err.Error())
 	}
 }
 
@@ -113,7 +113,7 @@ func (r persistentRunner) Run(ctx context.Context, test model.Test, metadata mod
 	run.Metadata = metadata
 	run.Environment = environment
 	run, err := r.runs.CreateRun(ctx, test, run)
-	r.handleDBError(err)
+	r.handleDBError(run, err)
 
 	ds := []expression.DataStore{expression.EnvironmentDataStore{
 		Values: environment.Values,
@@ -136,7 +136,7 @@ func (r persistentRunner) Run(ctx context.Context, test model.Test, metadata mod
 
 func (r persistentRunner) processExecQueue(job execReq) {
 	run := job.run.Start()
-	r.handleDBError(r.updater.Update(job.ctx, run))
+	r.handleDBError(run, r.updater.Update(job.ctx, run))
 
 	triggerer, err := r.triggers.Get(job.test.ServiceUnderTest.Type)
 	if err != nil {
@@ -146,7 +146,7 @@ func (r persistentRunner) processExecQueue(job execReq) {
 
 	traceID := model.IDGen.TraceID()
 	run.TraceID = traceID
-	r.handleDBError(r.updater.Update(job.ctx, run))
+	r.handleDBError(run, r.updater.Update(job.ctx, run))
 
 	triggerOptions := &trigger.TriggerOptions{
 		TraceID:  traceID,
@@ -161,12 +161,13 @@ func (r persistentRunner) processExecQueue(job execReq) {
 	response, err := triggerer.Trigger(job.ctx, resolvedTest, triggerOptions)
 	run = r.handleExecutionResult(run, response, err)
 	if err != nil {
+		fmt.Printf("test %s run #%d trigger error: %s\n", run.TestID, run.ID, err.Error())
 		job.channel <- RunResult{Run: run, Err: err}
 	}
 
 	run.SpanID = response.SpanID
 
-	r.handleDBError(r.updater.Update(job.ctx, run))
+	r.handleDBError(run, r.updater.Update(job.ctx, run))
 	if run.State == model.RunStateAwaitingTrace {
 		ctx, pollingSpan := r.tracer.Start(job.ctx, "Start Polling trace")
 		defer pollingSpan.End()
