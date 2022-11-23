@@ -25,6 +25,7 @@ export interface IEditorProps {
   autoFocus?: boolean;
   onSelectAutocompleteOption?(option: Completion): void;
   context?: TResolveExpressionContext;
+  autocompleteCustomValues?: string[];
 }
 
 interface IProps extends IEditorProps {

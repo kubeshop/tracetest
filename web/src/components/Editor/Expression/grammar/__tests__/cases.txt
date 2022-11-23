@@ -54,3 +54,19 @@ Program(Expression(ComposedValue(OutsideInput(Source,Identifier))))
 ==>
 
 Program(Expression(ComposedValue(Duration)))
+
+# Complete Expression
+
+attr:http.response.body | json_path '$.name' = env:IMPORTED_POKEMON_NAME
+
+==>
+
+Program(Expression(ComposedValue(OutsideInput(Source,Identifier),Pipe,SupportedParsers(JsonPath(Word)))),Comparator,Expression(ComposedValue(OutsideInput(Source,Identifier))))
+
+# Complete Expression With Index
+
+attr:http.response.body | json_path '$[0].name' = env:IMPORTED_POKEMON_NAME
+
+==>
+
+Program(Expression(ComposedValue(OutsideInput(Source,Identifier),Pipe,SupportedParsers(JsonPath(Word)))),Comparator,Expression(ComposedValue(OutsideInput(Source,Identifier))))

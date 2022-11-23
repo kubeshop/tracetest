@@ -23,6 +23,7 @@ const Expression = ({
   value = '',
   editable = true,
   extensions = [],
+  autocompleteCustomValues = [],
   autoFocus = false,
   onFocus = noop,
   indentWithTab = false,
@@ -33,10 +34,10 @@ const Expression = ({
   const [isHovering, setIsHovering] = useState(false);
   const {selectedEnvironment} = useEnvironment();
   const editorTheme = useEditorTheme();
-  const completionFn = useAutoComplete({testId, runId, onSelect: onSelectAutocompleteOption});
+  const completionFn = useAutoComplete({testId, runId, onSelect: onSelectAutocompleteOption, autocompleteCustomValues});
   const {onHover, resolvedValues, isLoading} = useTooltip({environmentId: selectedEnvironment?.id, ...context});
-
   const ref = useRef<ReactCodeMirrorRef>(null);
+  const isValidQuery = useMemo(() => EditorService.getIsQueryValid(SupportedEditors.Expression, value), [value]);
 
   const extensionList: Extension[] = useMemo(
     () => [autocompletion({override: [completionFn]}), expressionQL(), EditorView.lineWrapping, ...extensions],
@@ -44,8 +45,8 @@ const Expression = ({
   );
 
   const handleHover = useCallback(() => {
-    if (EditorService.getIsQueryValid(SupportedEditors.Expression, value)) onHover(value);
-  }, [onHover, value]);
+    if (isValidQuery) onHover(value);
+  }, [isValidQuery, onHover, value]);
 
   const title = (
     <>
@@ -59,7 +60,7 @@ const Expression = ({
   return (
     <S.ExpressionEditorContainer
       $isEditable={editable}
-      onMouseEnter={() => Boolean(value) && !isLoading && setIsHovering(true)}
+      onMouseEnter={() => Boolean(value) && !isLoading && isValidQuery && setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >
       <Tooltip placement="topLeft" title={title} visible={isHovering}>
