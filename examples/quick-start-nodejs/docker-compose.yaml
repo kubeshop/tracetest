@@ -1,0 +1,7 @@
+version: '3'
+services:
+  app:
+    image: quick-start-nodejs
+    build: .
+    ports:
+      - "8080:8080"
