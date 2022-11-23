@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/traces"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
@@ -38,6 +39,7 @@ func NewTracePoller(
 	assertionRunner AssertionRunner,
 	retryDelay time.Duration,
 	maxWaitTimeForTrace time.Duration,
+	subscriptionManager *subscription.Manager,
 ) PersistentTracePoller {
 	maxTracePollRetry := int(math.Ceil(float64(maxWaitTimeForTrace) / float64(retryDelay)))
 	return tracePoller{
@@ -49,6 +51,7 @@ func NewTracePoller(
 		executeQueue:        make(chan PollingRequest, 5),
 		exit:                make(chan bool, 1),
 		assertionRunner:     assertionRunner,
+		subscriptionManager: subscriptionManager,
 	}
 }
 
@@ -60,6 +63,8 @@ type tracePoller struct {
 
 	retryDelay        time.Duration
 	maxTracePollRetry int
+
+	subscriptionManager *subscription.Manager
 
 	executeQueue chan PollingRequest
 	exit         chan bool
@@ -181,6 +186,12 @@ func (tp tracePoller) handleTraceDBError(job PollingRequest, err error) {
 	}
 
 	tp.handleDBError(tp.updater.Update(job.ctx, run.Failed(err)))
+
+	tp.subscriptionManager.PublishUpdate(subscription.Message{
+		ResourceID: run.TransactionStepResourceID(),
+		Type:       "update_run",
+		Content:    RunResult{Run: run, Err: err},
+	})
 
 }
 
