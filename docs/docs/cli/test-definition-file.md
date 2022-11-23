@@ -162,7 +162,7 @@ Available functions:
 ## **Assertions**
 Assertions are as important as how you trigger your test. Without them, your test is just a fancy way of executing a request using a CLI command. In this section, we will discuss how you can declare your assertions in your definition file.
 
-Before we start, there are two concepts that you must understand to write your tests: [selectors](../concepts/advanced-selectors) and assertions.
+Before we start, there are two concepts that you must understand to write your tests: [selectors](../concepts/selectors.md) and assertions.
 
 **Selectors** are queries that are executed against your trace tree and select a set of spans based on some attributes. They are responsible for defining which spans will be tested against your assertions.
 

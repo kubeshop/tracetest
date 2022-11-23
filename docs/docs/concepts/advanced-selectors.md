@@ -1,4 +1,4 @@
-# Advanced Selectors
+# Selectors
 
 If you find yourself in a position where you cannot select complex spans, you can use our advanced selectors to help with that task. Advanced selectors enable selecting spans that are impossible to select using just basic selectors.
 
@@ -30,7 +30,7 @@ flowchart LR
     start -->|1. Close order| cart-api
     cart-api-->|5. send buy action| purchase-api
     purchase-api --> |7. Send notification to user|notification-api
-    purchase-api -->|6. can product be bought by user?| auth-api 
+    purchase-api -->|6. can product be bought by user?| auth-api
     auth-api --> auth-storage
     cart-api -->|2. is product available?| product-api
     product-api -->|4. can user view product?| auth-api
@@ -47,7 +47,7 @@ And it generates the following trace:
 flowchart TD
     A[" id: 1
         close order
-        
+
         attributes:
         service.name: cart-api
         tracetest.span.type: http
@@ -87,7 +87,7 @@ flowchart TD
     "]
     F[" id: 6
         purchase products
-        
+
         attributes:
         service.name: cart-api
         tracetest.span.type: http
@@ -163,7 +163,7 @@ This would select the following spans:
 flowchart TD
     A[" id: 1
         close order
-        
+
         attributes:
         service.name: cart-api
         tracetest.span.type: http
@@ -203,7 +203,7 @@ flowchart TD
     "]
     F[" id: 6
         purchase products
-        
+
         attributes:
         service.name: cart-api
         tracetest.span.type: http
@@ -284,7 +284,7 @@ This would select the following spans:
 flowchart TD
     A[" id: 1
         close order
-        
+
         attributes:
         service.name: cart-api
         tracetest.span.type: http
@@ -324,7 +324,7 @@ flowchart TD
     "]
     F[" id: 6
         purchase products
-        
+
         attributes:
         service.name: cart-api
         tracetest.span.type: http
@@ -401,7 +401,7 @@ This would select the following spans:
 flowchart TD
     A[" id: 1
         close order
-        
+
         attributes:
         service.name: cart-api
         tracetest.span.type: http
@@ -441,7 +441,7 @@ flowchart TD
     "]
     F[" id: 6
         purchase products
-        
+
         attributes:
         service.name: cart-api
         tracetest.span.type: http
@@ -528,7 +528,7 @@ This would select the same spans as the previous example:
 flowchart TD
     A[" id: 1
         close order
-        
+
         attributes:
         service.name: cart-api
         tracetest.span.type: http
@@ -568,7 +568,7 @@ flowchart TD
     "]
     F[" id: 6
         purchase products
-        
+
         attributes:
         service.name: cart-api
         tracetest.span.type: http
@@ -659,7 +659,7 @@ This will select the following spans:
 flowchart TD
     A[" id: 1
         close order
-        
+
         attributes:
         service.name: cart-api
         tracetest.span.type: http
@@ -699,7 +699,7 @@ flowchart TD
     "]
     F[" id: 6
         purchase products
-        
+
         attributes:
         service.name: cart-api
         tracetest.span.type: http
@@ -778,7 +778,7 @@ span[tracetest.span.type="http"]:first
 flowchart TD
     A[" id: 1
         close order
-        
+
         attributes:
         service.name: cart-api
         tracetest.span.type: http
@@ -818,7 +818,7 @@ flowchart TD
     "]
     F[" id: 6
         purchase products
-        
+
         attributes:
         service.name: cart-api
         tracetest.span.type: http
@@ -897,7 +897,7 @@ span[tracetest.span.type="http"]:last
 flowchart TD
     A[" id: 1
         close order
-        
+
         attributes:
         service.name: cart-api
         tracetest.span.type: http
@@ -937,7 +937,7 @@ flowchart TD
     "]
     F[" id: 6
         purchase products
-        
+
         attributes:
         service.name: cart-api
         tracetest.span.type: http
@@ -1016,7 +1016,7 @@ span[tracetest.span.type="http"]:nth_child(3)
 flowchart TD
     A[" id: 1
         close order
-        
+
         attributes:
         service.name: cart-api
         tracetest.span.type: http
@@ -1056,7 +1056,7 @@ flowchart TD
     "]
     F[" id: 6
         purchase products
-        
+
         attributes:
         service.name: cart-api
         tracetest.span.type: http
@@ -1145,7 +1145,7 @@ Will return:
 flowchart TD
     A[" id: 1
         close order
-        
+
         attributes:
         service.name: cart-api
         tracetest.span.type: http
@@ -1185,7 +1185,7 @@ flowchart TD
     "]
     F[" id: 6
         purchase products
-        
+
         attributes:
         service.name: cart-api
         tracetest.span.type: http
@@ -1263,7 +1263,7 @@ This would find the parent span and only select the spans that are descedents of
 flowchart TD
     A[" id: 1
         close order
-        
+
         attributes:
         service.name: cart-api
         tracetest.span.type: http
@@ -1303,7 +1303,7 @@ flowchart TD
     "]
     F[" id: 6
         purchase products
-        
+
         attributes:
         service.name: cart-api
         tracetest.span.type: http
