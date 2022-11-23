@@ -35,10 +35,6 @@ func (r Run) Copy() Run {
 	r.ID = 0
 	r.Results = nil
 	r.CreatedAt = Now()
-	r.ServiceTriggeredAt = time.Time{}
-	r.ServiceTriggerCompletedAt = time.Time{}
-	r.ObtainedTraceAt = time.Time{}
-	r.CompletedAt = time.Time{}
 
 	return r
 }
