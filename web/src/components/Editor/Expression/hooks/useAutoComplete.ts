@@ -12,9 +12,10 @@ interface IProps {
   testId: string;
   runId: string;
   onSelect?(option: Completion): void;
+  autocompleteCustomValues: string[];
 }
 
-const useAutoComplete = ({testId, runId, onSelect = noop}: IProps) => {
+const useAutoComplete = ({testId, runId, onSelect = noop, autocompleteCustomValues}: IProps) => {
   const {getState} = useAppStore();
 
   const getAttributeList = useCallback(() => {
@@ -41,10 +42,11 @@ const useAutoComplete = ({testId, runId, onSelect = noop}: IProps) => {
         context,
         attributeList,
         envEntryList,
+        customValueList: autocompleteCustomValues,
         onSelect,
       });
     },
-    [getAttributeList, getSelectedEnvironmentEntryList, onSelect]
+    [autocompleteCustomValues, getAttributeList, getSelectedEnvironmentEntryList, onSelect]
   );
 };
 
