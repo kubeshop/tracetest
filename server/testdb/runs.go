@@ -55,27 +55,27 @@ INSERT INTO test_runs (
 
 	-- timestamps
 	$3,              -- created_at
-	to_timestamp(0), -- service_triggered_at
-	to_timestamp(0), -- service_trigger_completed_at
-	to_timestamp(0), -- obtained_trace_at
+	$4,              -- service_triggered_at
+	$5,              -- service_trigger_completed_at
+	$6,              -- obtained_trace_at
 	to_timestamp(0), -- completed_at
 
 	-- trigger params
-	$4, -- state
-	$5, -- trace_id
-	$6, -- span_id
+	$7, -- state
+	$8, -- trace_id
+	$9, -- span_id
 
 	-- result info
-	$7, -- trigger_results
+	$10,  -- trigger_results
 	'{}', -- test_results
-	$8, -- trace
+	$11,  -- trace
 	'[]', -- outputs
 	NULL, -- last_error
 	0,    -- pass
 	0,    -- fail
 
-	$9, -- metadata
-	$10 -- environment
+	$12, -- metadata
+	$13 -- environment
 )
 RETURNING "id"`
 
@@ -154,6 +154,9 @@ func (td *postgresDB) CreateRun(ctx context.Context, test model.Test, run model.
 		test.ID,
 		test.Version,
 		run.CreatedAt,
+		run.ServiceTriggeredAt,
+		run.ServiceTriggerCompletedAt,
+		run.ObtainedTraceAt,
 		run.State,
 		run.TraceID.String(),
 		run.SpanID.String(),
