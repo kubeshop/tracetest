@@ -87,7 +87,7 @@ func (e *defaultAssertionRunner) startWorker() {
 
 			log.Printf("[AssertionRunner] Test %s Run %d: update channel start\n", request.Test.ID, request.Run.ID)
 			e.subscriptionManager.PublishUpdate(subscription.Message{
-				ResourceID: run.ResourceID(),
+				ResourceID: run.TransactionStepResourceID(),
 				Type:       "run_update",
 				Content:    RunResult{Run: run, Err: err},
 			})
