@@ -10,13 +10,14 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/traces"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 )
 
 type TracePoller interface {
-	Poll(context.Context, model.Test, model.Run, chan RunResult)
+	Poll(context.Context, model.Test, model.Run)
 }
 
 type PersistentTracePoller interface {
@@ -38,6 +39,7 @@ func NewTracePoller(
 	assertionRunner AssertionRunner,
 	retryDelay time.Duration,
 	maxWaitTimeForTrace time.Duration,
+	subscriptionManager *subscription.Manager,
 ) PersistentTracePoller {
 	maxTracePollRetry := int(math.Ceil(float64(maxWaitTimeForTrace) / float64(retryDelay)))
 	return tracePoller{
@@ -49,6 +51,7 @@ func NewTracePoller(
 		executeQueue:        make(chan PollingRequest, 5),
 		exit:                make(chan bool, 1),
 		assertionRunner:     assertionRunner,
+		subscriptionManager: subscriptionManager,
 	}
 }
 
@@ -61,16 +64,17 @@ type tracePoller struct {
 	retryDelay        time.Duration
 	maxTracePollRetry int
 
+	subscriptionManager *subscription.Manager
+
 	executeQueue chan PollingRequest
 	exit         chan bool
 }
 
 type PollingRequest struct {
-	ctx     context.Context
-	test    model.Test
-	run     model.Run
-	channel chan RunResult
-	count   int
+	ctx   context.Context
+	test  model.Test
+	run   model.Run
+	count int
 }
 
 func (tp tracePoller) handleDBError(err error) {
@@ -102,13 +106,12 @@ func (tp tracePoller) Stop() {
 	tp.exit <- true
 }
 
-func (tp tracePoller) Poll(ctx context.Context, test model.Test, run model.Run, resultChannel chan RunResult) {
+func (tp tracePoller) Poll(ctx context.Context, test model.Test, run model.Run) {
 	log.Printf("[TracePoller] Test %s Run %d: Poll\n", test.ID, run.ID)
 	tp.enqueueJob(PollingRequest{
-		ctx:     ctx,
-		test:    test,
-		run:     run,
-		channel: resultChannel,
+		ctx:  ctx,
+		test: test,
+		run:  run,
 	})
 }
 
@@ -138,9 +141,8 @@ func (tp tracePoller) processJob(job PollingRequest) {
 
 func (tp tracePoller) runAssertions(job PollingRequest) {
 	assertionRequest := AssertionRequest{
-		Test:    job.test,
-		Run:     job.run,
-		channel: job.channel,
+		Test: job.test,
+		Run:  job.run,
 	}
 
 	tp.assertionRunner.RunAssertions(job.ctx, assertionRequest)
@@ -183,9 +185,13 @@ func (tp tracePoller) handleTraceDBError(job PollingRequest, err error) {
 		fmt.Println("other", err)
 	}
 
-	job.channel <- RunResult{Run: run, Err: err}
-
 	tp.handleDBError(tp.updater.Update(job.ctx, run.Failed(err)))
+
+	tp.subscriptionManager.PublishUpdate(subscription.Message{
+		ResourceID: run.TransactionStepResourceID(),
+		Type:       "update_run",
+		Content:    RunResult{Run: run, Err: err},
+	})
 
 }
 

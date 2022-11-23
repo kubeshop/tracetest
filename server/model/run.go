@@ -31,6 +31,10 @@ func (r Run) ResourceID() string {
 	return fmt.Sprintf("test/%s/run/%d", r.TestID, r.ID)
 }
 
+func (r Run) TransactionStepResourceID() string {
+	return fmt.Sprintf("transaction_step/%s/run/%d", r.TestID, r.ID)
+}
+
 func (r Run) Copy() Run {
 	r.ID = 0
 	r.Results = nil

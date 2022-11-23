@@ -16,10 +16,11 @@ import (
 )
 
 type simpleTestRunner struct {
-	db model.Repository
+	db                  model.Repository
+	subscriptionManager *subscription.Manager
 }
 
-func (r simpleTestRunner) Run(ctx context.Context, test model.Test, metadata model.RunMetadata, env model.Environment) (model.Run, chan executor.RunResult) {
+func (r simpleTestRunner) Run(ctx context.Context, test model.Test, metadata model.RunMetadata, env model.Environment) model.Run {
 	run := model.NewRun()
 	run.State = model.RunStateCreated
 	newRun, err := r.db.CreateRun(ctx, test, run)
@@ -27,20 +28,22 @@ func (r simpleTestRunner) Run(ctx context.Context, test model.Test, metadata mod
 		panic(err)
 	}
 
-	channel := make(chan executor.RunResult, 1)
-
 	go func() {
 		time.Sleep(2 * time.Second) // simulate some real work
 
 		newRun.State = model.RunStateFinished
 		err = r.db.UpdateRun(ctx, newRun)
-		channel <- executor.RunResult{
-			Run: newRun,
-			Err: err,
-		}
+		r.subscriptionManager.PublishUpdate(subscription.Message{
+			ResourceID: newRun.TransactionStepResourceID(),
+			Type:       "run_update",
+			Content: executor.RunResult{
+				Run: newRun,
+				Err: err,
+			},
+		})
 	}()
 
-	return newRun, channel
+	return newRun
 }
 
 func TestTransactionRunner(t *testing.T) {
@@ -48,8 +51,11 @@ func TestTransactionRunner(t *testing.T) {
 	db, clear := getDB()
 	defer clear()
 
+	subscriptionManager := subscription.NewManager()
+
 	testRunner := simpleTestRunner{
 		db,
+		subscriptionManager,
 	}
 
 	test1, err := db.CreateTest(ctx, model.Test{
@@ -93,8 +99,6 @@ func TestTransactionRunner(t *testing.T) {
 			RetryDelay: "2s",
 		},
 	}
-
-	subscriptionManager := subscription.NewManager()
 
 	runner := executor.NewTransactionRunner(testRunner, db, subscriptionManager, config)
 	runner.Start(5)
@@ -133,10 +137,11 @@ func getDB() (model.Repository, func()) {
 }
 
 type testRunnerAlwaysFails struct {
-	db model.Repository
+	db                  model.Repository
+	subscriptionManager *subscription.Manager
 }
 
-func (r testRunnerAlwaysFails) Run(ctx context.Context, test model.Test, metadata model.RunMetadata, env model.Environment) (model.Run, chan executor.RunResult) {
+func (r testRunnerAlwaysFails) Run(ctx context.Context, test model.Test, metadata model.RunMetadata, env model.Environment) model.Run {
 	run := model.NewRun()
 	run.State = model.RunStateCreated
 	newRun, err := r.db.CreateRun(ctx, test, run)
@@ -144,20 +149,22 @@ func (r testRunnerAlwaysFails) Run(ctx context.Context, test model.Test, metadat
 		panic(err)
 	}
 
-	channel := make(chan executor.RunResult, 1)
-
 	go func() {
 		time.Sleep(2 * time.Second) // simulate some real work
 
 		newRun.State = model.RunStateFailed
 		err = r.db.UpdateRun(ctx, newRun)
-		channel <- executor.RunResult{
-			Run: newRun,
-			Err: fmt.Errorf("failed to do something"),
-		}
+		r.subscriptionManager.PublishUpdate(subscription.Message{
+			ResourceID: newRun.TransactionStepResourceID(),
+			Type:       "run_update",
+			Content: executor.RunResult{
+				Run: newRun,
+				Err: fmt.Errorf("failed to do something"),
+			},
+		})
 	}()
 
-	return newRun, channel
+	return newRun
 }
 
 func TestTransactionRunnerWhenTestFails(t *testing.T) {
@@ -165,8 +172,11 @@ func TestTransactionRunnerWhenTestFails(t *testing.T) {
 	db, clear := getDB()
 	defer clear()
 
+	subscriptionManager := subscription.NewManager()
+
 	testRunner := testRunnerAlwaysFails{
 		db,
+		subscriptionManager,
 	}
 
 	test1, err := db.CreateTest(ctx, model.Test{
@@ -210,8 +220,6 @@ func TestTransactionRunnerWhenTestFails(t *testing.T) {
 			RetryDelay: "2s",
 		},
 	}
-
-	subscriptionManager := subscription.NewManager()
 
 	runner := executor.NewTransactionRunner(testRunner, db, subscriptionManager, config)
 	runner.Start(5)

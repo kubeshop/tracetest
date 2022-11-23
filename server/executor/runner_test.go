@@ -11,6 +11,7 @@ import (
 	"github.com/kubeshop/tracetest/server/executor/trigger"
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/kubeshop/tracetest/server/tracing"
 	"github.com/stretchr/testify/assert"
@@ -143,7 +144,7 @@ func runnerSetup(t *testing.T) runnerFixture {
 
 	mtp.Test(t)
 	return runnerFixture{
-		runner:          executor.NewPersistentRunner(reg, db, executor.NewDBUpdater(db), mtp, tracer),
+		runner:          executor.NewPersistentRunner(reg, db, executor.NewDBUpdater(db), mtp, tracer, subscription.NewManager()),
 		mockExecutor:    me,
 		mockDB:          db,
 		mockTracePoller: mtp,
@@ -226,7 +227,7 @@ type mockTracePoller struct {
 	t *testing.T
 }
 
-func (m *mockTracePoller) Poll(_ context.Context, test model.Test, run model.Run, ch chan executor.RunResult) {
+func (m *mockTracePoller) Poll(_ context.Context, test model.Test, run model.Run) {
 	m.Called(test.ID)
 }
 
