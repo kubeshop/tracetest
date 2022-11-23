@@ -2,6 +2,7 @@ package executor
 
 import (
 	"fmt"
+	"log"
 	"math"
 
 	"github.com/kubeshop/tracetest/server/config"
@@ -76,23 +77,28 @@ func NewPollerExecutor(
 }
 
 func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, model.Run, error) {
+	log.Printf("[PollerExecutor] Test %s Run %d: ExecuteRequest\n", request.test.ID, request.run.ID)
 	run := request.run
 	traceID := run.TraceID.String()
 
 	trace, err := pe.traceDB.GetTraceByID(request.ctx, traceID)
 	if err != nil {
+		log.Printf("[PollerExecutor] Test %s Run %d: GetTraceByID (traceID %s) error: %s\n", request.test.ID, request.run.ID, traceID, err.Error())
 		return false, model.Run{}, err
 	}
 
 	trace.ID = run.TraceID
 
 	if !pe.donePollingTraces(request, trace) {
+		log.Printf("[PollerExecutor] Test %s Run %d: Not done polling\n", request.test.ID, request.run.ID)
 		run.Trace = &trace
 		request.run = run
 		return false, run, nil
 	}
 
+	log.Printf("[PollerExecutor] Test %s Run %d: Start Sorting\n", request.test.ID, request.run.ID)
 	trace = trace.Sort()
+	log.Printf("[PollerExecutor] Test %s Run %d: Sorting complete\n", request.test.ID, request.run.ID)
 	run.Trace = &trace
 	request.run = run
 
@@ -100,8 +106,10 @@ func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, m
 
 	fmt.Printf("completed polling result %d after %d times, number of spans: %d \n", run.ID, request.count, len(run.Trace.Flat))
 
+	log.Printf("[PollerExecutor] Test %s Run %d: Start updating\n", request.test.ID, request.run.ID)
 	err = pe.updater.Update(request.ctx, run)
 	if err != nil {
+		log.Printf("[PollerExecutor] Test %s Run %d: Update error: %s\n", request.test.ID, request.run.ID, err.Error())
 		return false, model.Run{}, err
 	}
 
@@ -111,6 +119,7 @@ func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, m
 func (pe DefaultPollerExecutor) donePollingTraces(job *PollingRequest, trace traces.Trace) bool {
 	// we're done if we have the same amount of spans after polling or `maxTracePollRetry` times
 	if job.count == pe.maxTracePollRetry {
+		log.Printf("[PollerExecutor] Test %s Run %d: Done polling. Hit MaxRetry of %d\n", job.test.ID, job.run.ID, pe.maxTracePollRetry)
 		return true
 	}
 
@@ -127,6 +136,7 @@ func (pe DefaultPollerExecutor) donePollingTraces(job *PollingRequest, trace tra
 	}
 
 	if len(trace.Flat) > minimalNumberOfSpans && len(trace.Flat) == len(job.run.Trace.Flat) {
+		log.Printf("[PollerExecutor] Test %s Run %d: Done polling. Condition met\n", job.test.ID, job.run.ID)
 		return true
 	}
 
