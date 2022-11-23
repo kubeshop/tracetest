@@ -121,7 +121,7 @@ func (r persistentRunner) Run(ctx context.Context, test model.Test, metadata mod
 
 	executor := expression.NewExecutor(ds...)
 
-	channel := make(chan RunResult, 1)
+	channel := make(chan RunResult, 2)
 
 	r.executeQueue <- execReq{
 		ctx:      ctx,
