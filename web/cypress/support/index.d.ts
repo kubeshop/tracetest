@@ -11,7 +11,7 @@ declare namespace Cypress {
     selectTestFromDemoList(): Chainable<Element>;
     selectOperator(index: number, text?: string): Chainable<Element>;
     editTestByTestId(testId: string): Chainable<Element>;
-    submitCreateTestForm(): Chainable<Element>;
+    submitCreateForm(mode?: string): Chainable<Element>;
     deleteTest(shouldIntercept?: boolean): Chainable<Element>;
     makeSureUserIsOnTracePage(): Chainable<Element>;
     cancelOnBoarding(): Chainable<Element>;
@@ -21,9 +21,12 @@ declare namespace Cypress {
     createTestByName(name: string): Chainable<Element>;
     submitAndMakeSureTestIsCreated(name: string): Chainable<Element>;
     createTestWithAuth(authMethod: string, keys: string[]): Chainable<string>;
-    fillCreateFormBasicStep(name: string, description?: string): Chainable<Element>;
+    fillCreateFormBasicStep(name: string, description?: string, mode?: string): Chainable<Element>;
     setCreateFormUrl(method: string, url: string): Chainable<Element>;
     selectRunDetailMode(index: number): Chainable<Element>;
     interceptEditTestCall(): Chainable<Element>;
+    deleteTransactionTests(): Chainable<Element>;
+    openTransactionCreationModal(): Chainable<Element>;
+    deleteTransaction(): Chainable<Element>;
   }
 }

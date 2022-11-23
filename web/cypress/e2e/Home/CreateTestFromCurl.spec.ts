@@ -19,9 +19,9 @@ describe('Create test from CURL Command', () => {
    `,
         {parseSpecialCharSequences: false}
       );
-    cy.get('[data-cy=create-test-next-button]').last().click();
+    cy.get('[data-cy=CreateTestFactory-create-next-button]').last().click();
 
-    cy.submitCreateTestForm();
+    cy.submitCreateForm();
     cy.matchTestRunPageUrl();
     cy.cancelOnBoarding();
     cy.get('[data-cy=test-details-name]').should('have.text', `${name} (v1)`);
