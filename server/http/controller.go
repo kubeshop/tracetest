@@ -440,9 +440,15 @@ func (c controller) GetTestVersionDefinitionFile(ctx context.Context, testID str
 		return handleDBError(err), err
 	}
 
+	openapiTest := c.mappers.Out.Test(test)
+	yamlTest, err := yaml.GetTestFromOpenapiObject(openapiTest)
+	if err != nil {
+		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
+	}
+
 	enc, err := yaml.Encode(yaml.File{
 		Type: yaml.FileTypeTest,
-		Spec: test,
+		Spec: yamlTest,
 	})
 	if err != nil {
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
