@@ -17,7 +17,7 @@ describe('Transactions', () => {
   it('should create a transaction with multiple tests', () => {
     const name = `Transaction - #${String(Date.now()).slice(-4)}`;
     cy.openTransactionCreationModal();
-    cy.inteceptHomeApiCall();
+    cy.interceptHomeApiCall();
     cy.fillCreateFormBasicStep(name, name, 'CreateTransactionFactory');
 
     transactionUtils.testList.forEach(test => {
@@ -32,7 +32,7 @@ describe('Transactions', () => {
   it('should create a transaction with no tests', () => {
     const name = `Transaction - #${String(Date.now()).slice(-4)}`;
     cy.openTransactionCreationModal();
-    cy.inteceptHomeApiCall();
+    cy.interceptHomeApiCall();
     cy.fillCreateFormBasicStep(name, name, 'CreateTransactionFactory');
 
     cy.submitCreateForm('CreateTransactionFactory');
