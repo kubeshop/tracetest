@@ -114,7 +114,7 @@ describe('Environments', () => {
     cy.fillCreateFormBasicStep(name);
     // eslint-disable-next-line no-template-curly-in-string
     cy.setCreateFormUrl('GET', '${{}env:host}/pokemon');
-    cy.submitCreateTestForm();
+    cy.submitCreateForm();
     cy.makeSureUserIsOnTracePage();
 
     cy.get('[data-cy=run-detail-trigger-response]').within(() => {
