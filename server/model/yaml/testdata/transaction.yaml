@@ -3,5 +3,5 @@ spec:
   id: ZsoMdf44R
   name: Get example
   steps:
-    - step 1
-    - step 2
+  - step 1
+  - step 2
