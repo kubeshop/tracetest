@@ -78,8 +78,9 @@ func (e *defaultAssertionRunner) startWorker() {
 			ctx := request.Context()
 			run, err := e.runAssertionsAndUpdateResult(ctx, request)
 
-			runResult := RunResult{Run: run, Err: err}
-			request.channel <- runResult
+			log.Printf("[AssertionRunner] Test %s Run %d: update channel start\n", request.Test.ID, request.Run.ID)
+			request.channel <- RunResult{Run: run, Err: err}
+			log.Printf("[AssertionRunner] Test %s Run %d: update channel complete\n", request.Test.ID, request.Run.ID)
 
 			if err != nil {
 				log.Printf("[AssertionRunner] Test %s Run %d: error with runAssertionsAndUpdateResult: %s\n", request.Test.ID, request.Run.ID, err.Error())
