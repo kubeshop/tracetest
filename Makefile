@@ -8,7 +8,7 @@ OPENAPI_TARGET_DIR=openapi/
 generate: generate-server generate-cli generate-web
 
 generate-web:
-	cd web; npm ci --prefer-offline && npm run types:generate
+	cd web; npm run types:generate
 
 generate-cli:
 	$(eval BASE := ./cli)
