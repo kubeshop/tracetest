@@ -45,13 +45,23 @@ const sidebars = {
         },
         {
           type: "doc",
-          id: "concepts/advanced-selectors",
-          label: "Advanced Selectors",
+          id: "concepts/selectors",
+          label: "Selectors",
         },
         {
           type: "doc",
           id: "concepts/expressions",
           label: "Expressions",
+        },
+        {
+          type: "doc",
+          id: "concepts/environments",
+          label: "Environments",
+        },
+        {
+          type: "doc",
+          id: "concepts/transactions",
+          label: "Transactions",
         },
       ],
     },
