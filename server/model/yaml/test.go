@@ -3,6 +3,7 @@ package yaml
 import (
 	"fmt"
 
+	dc "github.com/fluidtruck/deepcopy"
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 )
@@ -61,27 +62,16 @@ func (t Test) Validate() error {
 
 type TestTrigger struct {
 	Type        string      `mapstructure:"type"`
-	HTTPRequest HTTPRequest `mapstructure:"httpRequest" yaml:"httpRequest,omitempty"`
+	HTTPRequest HTTPRequest `mapstructure:"httpRequest" yaml:"httpRequest,omitempty" dc:"http"`
 	GRPC        GRPC        `mapstructure:"grpc" yaml:"grpc,omitempty"`
 }
 
 func (t TestTrigger) Model() model.Trigger {
-	mt := model.Trigger{
-		Type: model.TriggerType(t.Type),
-	}
+	out := model.Trigger{}
+	dc.DeepCopy(t, &out)
 
-	switch t.Type {
-	case "http":
-		hr := t.HTTPRequest
-		mt.HTTP = &model.HTTPRequest{
-			Method:  model.HTTPMethod(hr.Method),
-			URL:     hr.URL,
-			Headers: hr.Headers.Model(),
-			Body:    hr.Body,
-			Auth:    hr.Authentication.Model(),
-		}
-	}
-	return mt
+	return out
+
 }
 
 func (t TestTrigger) Validate() error {

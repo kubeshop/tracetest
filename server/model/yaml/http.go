@@ -2,34 +2,14 @@ package yaml
 
 import (
 	"fmt"
-
-	dc "github.com/fluidtruck/deepcopy"
-	"github.com/kubeshop/tracetest/server/model"
 )
 
-type HTTPHeaders []HTTPHeader
-
-func (hs HTTPHeaders) Model() []model.HTTPHeader {
-	if len(hs) == 0 {
-		return nil
-	}
-	mh := make([]model.HTTPHeader, 0, len(hs))
-	for _, h := range hs {
-		mh = append(mh, model.HTTPHeader{
-			Key:   h.Key,
-			Value: h.Value,
-		})
-	}
-
-	return mh
-}
-
 type HTTPRequest struct {
-	URL            string             `yaml:"url"`
-	Method         string             `yaml:"method"`
-	Headers        HTTPHeaders        `yaml:"headers,omitempty"`
-	Authentication HTTPAuthentication `yaml:"authentication,omitempty"`
-	Body           string             `yaml:"body,omitempty"`
+	URL            string              `yaml:"url"`
+	Method         string              `yaml:"method"`
+	Headers        []HTTPHeader        `yaml:"headers,omitempty" dc:"headers"`
+	Authentication *HTTPAuthentication `yaml:"authentication,omitempty" dc:"auth"`
+	Body           string              `yaml:"body,omitempty"`
 }
 
 func (r HTTPRequest) Validate() error {
@@ -68,17 +48,10 @@ func (h HTTPHeader) Validate() error {
 }
 
 type HTTPAuthentication struct {
-	Type   string         `yaml:"type,omitempty"`
-	Basic  HTTPBasicAuth  `yaml:"basic,omitempty"`
-	ApiKey HTTPAPIKeyAuth `yaml:"apiKey,omitempty"`
-	Bearer HTTPBearerAuth `yaml:"bearer,omitempty"`
-}
-
-func (a HTTPAuthentication) Model() *model.HTTPAuthenticator {
-	out := model.HTTPAuthenticator{}
-	dc.DeepCopy(a, &out)
-
-	return &out
+	Type   string          `yaml:"type,omitempty"`
+	Basic  *HTTPBasicAuth  `yaml:"basic,omitempty"`
+	APIKey *HTTPAPIKeyAuth `yaml:"apiKey,omitempty"`
+	Bearer *HTTPBearerAuth `yaml:"bearer,omitempty"`
 }
 
 func (a HTTPAuthentication) Validate() error {
@@ -94,7 +67,7 @@ func (a HTTPAuthentication) Validate() error {
 		}
 		return nil
 	case "apiKey":
-		if err := a.ApiKey.Validate(); err != nil {
+		if err := a.APIKey.Validate(); err != nil {
 			return fmt.Errorf("apiKey authentication must be valid: %w", err)
 		}
 		return nil
@@ -125,7 +98,7 @@ func (ba HTTPBasicAuth) Validate() error {
 }
 
 type HTTPBearerAuth struct {
-	Token string `yaml:"token"`
+	Token string `yaml:"token" dc:"bearer"`
 }
 
 func (ba HTTPBearerAuth) Validate() error {

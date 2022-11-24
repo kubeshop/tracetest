@@ -28,8 +28,7 @@ func TestTestModel(t *testing.T) {
 						Headers: []yaml.HTTPHeader{
 							{Key: "Content-Type", Value: "application/json"},
 						},
-						Authentication: yaml.HTTPAuthentication{},
-						Body:           "",
+						Body: "",
 					},
 				},
 			},
@@ -63,9 +62,9 @@ func TestTestModel(t *testing.T) {
 							{Key: "Content-Type", Value: "application/json"},
 						},
 						Body: "",
-						Authentication: yaml.HTTPAuthentication{
+						Authentication: &yaml.HTTPAuthentication{
 							Type: "basic",
-							Basic: yaml.HTTPBasicAuth{
+							Basic: &yaml.HTTPBasicAuth{
 								Username: "matheus",
 								Password: "pikachu",
 							},
@@ -110,9 +109,9 @@ func TestTestModel(t *testing.T) {
 							{Key: "Content-Type", Value: "application/json"},
 						},
 						Body: "",
-						Authentication: yaml.HTTPAuthentication{
+						Authentication: &yaml.HTTPAuthentication{
 							Type: "apiKey",
-							ApiKey: yaml.HTTPAPIKeyAuth{
+							APIKey: &yaml.HTTPAPIKeyAuth{
 								Key:   "X-Key",
 								Value: "my-api-key",
 								In:    "header",
@@ -159,9 +158,9 @@ func TestTestModel(t *testing.T) {
 							{Key: "Content-Type", Value: "application/json"},
 						},
 						Body: "",
-						Authentication: yaml.HTTPAuthentication{
+						Authentication: &yaml.HTTPAuthentication{
 							Type: "bearer",
-							Bearer: yaml.HTTPBearerAuth{
+							Bearer: &yaml.HTTPBearerAuth{
 								Token: "my-token",
 							},
 						},
@@ -203,8 +202,7 @@ func TestTestModel(t *testing.T) {
 						Headers: []yaml.HTTPHeader{
 							{Key: "Content-Type", Value: "application/json"},
 						},
-						Authentication: yaml.HTTPAuthentication{},
-						Body:           `{ "message": "hello" }`,
+						Body: `{ "message": "hello" }`,
 					},
 				},
 			},
@@ -232,11 +230,9 @@ func TestTestModel(t *testing.T) {
 				Trigger: yaml.TestTrigger{
 					Type: "http",
 					HTTPRequest: yaml.HTTPRequest{
-						URL:            "http://localhost:1234",
-						Method:         "POST",
-						Headers:        []yaml.HTTPHeader{},
-						Authentication: yaml.HTTPAuthentication{},
-						Body:           "",
+						URL:    "http://localhost:1234",
+						Method: "POST",
+						Body:   "",
 					},
 				},
 				Specs: []yaml.TestSpec{
