@@ -54,8 +54,10 @@ type HTTPResponse struct {
 }
 
 type HTTPAuthenticator struct {
-	Type  string
-	Props map[string]string
+	Type   string
+	APIKey APIKeyAuthenticator
+	Basic  BasicAuthenticator
+	Bearer BearerAuthenticator
 }
 
 func (a HTTPAuthenticator) AuthenticateGRPC() {}
@@ -63,20 +65,11 @@ func (a HTTPAuthenticator) AuthenticateHTTP(req *http.Request) {
 	var auth authenticator
 	switch a.Type {
 	case "apiKey":
-		auth = APIKeyAuthenticator{
-			Key:   a.Props["key"],
-			Value: a.Props["value"],
-			In:    APIKeyPosition(a.Props["in"]),
-		}
+		auth = a.APIKey
 	case "basic":
-		auth = BasicAuthenticator{
-			Username: a.Props["username"],
-			Password: a.Props["password"],
-		}
+		auth = a.Basic
 	case "bearer":
-		auth = BearerAuthenticator{
-			Bearer: a.Props["token"],
-		}
+		auth = a.Bearer
 	default:
 		return
 	}

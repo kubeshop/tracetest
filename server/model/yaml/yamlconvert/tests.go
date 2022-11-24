@@ -17,7 +17,9 @@ func Test(in model.Test) yaml.File {
 
 	if in.ServiceUnderTest.HTTP != nil {
 		dc.DeepCopy(in.ServiceUnderTest.HTTP, &out.Trigger.HTTPRequest)
+		dc.DeepCopy(in.ServiceUnderTest.HTTP.Auth, &out.Trigger.HTTPRequest.Authentication)
 	}
+
 	in.Specs.ForEach(func(key model.SpanQuery, val model.NamedAssertions) error {
 		spec := yaml.TestSpec{
 			Selector: string(key),

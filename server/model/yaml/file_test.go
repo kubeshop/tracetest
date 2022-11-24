@@ -66,7 +66,7 @@ func TestTestModel(t *testing.T) {
 						Authentication: yaml.HTTPAuthentication{
 							Type: "basic",
 							Basic: yaml.HTTPBasicAuth{
-								User:     "matheus",
+								Username: "matheus",
 								Password: "pikachu",
 							},
 						},
@@ -87,9 +87,9 @@ func TestTestModel(t *testing.T) {
 						Body: "",
 						Auth: &model.HTTPAuthenticator{
 							Type: "basic",
-							Props: map[string]string{
-								"username": "matheus",
-								"password": "pikachu",
+							Basic: model.BasicAuthenticator{
+								Username: "matheus",
+								Password: "pikachu",
 							},
 						},
 					},
@@ -135,10 +135,10 @@ func TestTestModel(t *testing.T) {
 						Body: "",
 						Auth: &model.HTTPAuthenticator{
 							Type: "apiKey",
-							Props: map[string]string{
-								"key":   "X-Key",
-								"value": "my-api-key",
-								"in":    "header",
+							APIKey: model.APIKeyAuthenticator{
+								Key:   "X-Key",
+								Value: "my-api-key",
+								In:    "header",
 							},
 						},
 					},
@@ -182,8 +182,8 @@ func TestTestModel(t *testing.T) {
 						Body: "",
 						Auth: &model.HTTPAuthenticator{
 							Type: "bearer",
-							Props: map[string]string{
-								"token": "my-token",
+							Bearer: model.BearerAuthenticator{
+								Bearer: "my-token",
 							},
 						},
 					},

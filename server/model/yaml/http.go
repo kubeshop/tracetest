@@ -3,6 +3,7 @@ package yaml
 import (
 	"fmt"
 
+	dc "github.com/fluidtruck/deepcopy"
 	"github.com/kubeshop/tracetest/server/model"
 )
 
@@ -74,32 +75,10 @@ type HTTPAuthentication struct {
 }
 
 func (a HTTPAuthentication) Model() *model.HTTPAuthenticator {
-	var props map[string]string
-	switch a.Type {
-	case "":
-		// auth not set
-		return nil
-	case "apiKey":
-		props = map[string]string{
-			"key":   a.ApiKey.Key,
-			"value": a.ApiKey.Value,
-			"in":    a.ApiKey.In,
-		}
-	case "basic":
-		props = map[string]string{
-			"username": a.Basic.User,
-			"password": a.Basic.Password,
-		}
-	case "bearer":
-		props = map[string]string{
-			"token": a.Bearer.Token,
-		}
-	}
+	out := model.HTTPAuthenticator{}
+	dc.DeepCopy(a, &out)
 
-	return &model.HTTPAuthenticator{
-		Type:  a.Type,
-		Props: props,
-	}
+	return &out
 }
 
 func (a HTTPAuthentication) Validate() error {
@@ -129,12 +108,12 @@ func (a HTTPAuthentication) Validate() error {
 }
 
 type HTTPBasicAuth struct {
-	User     string `yaml:"user"`
+	Username string `yaml:"username"`
 	Password string `yaml:"password"`
 }
 
 func (ba HTTPBasicAuth) Validate() error {
-	if ba.User == "" {
+	if ba.Username == "" {
 		return fmt.Errorf("user cannot be empty")
 	}
 

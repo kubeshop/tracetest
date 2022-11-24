@@ -1,7 +1,6 @@
 package yamlconvert_test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/kubeshop/tracetest/server/model"
@@ -27,9 +26,9 @@ func TestConverter(t *testing.T) {
 				Body: `{"id":123}`,
 				Auth: &model.HTTPAuthenticator{
 					Type: "basic",
-					Props: map[string]string{
-						"username": "user",
-						"password": "passwd",
+					Basic: model.BasicAuthenticator{
+						Username: "user",
+						Password: "passwd",
 					},
 				},
 			},
@@ -61,6 +60,11 @@ spec:
       headers:
       - key: Content-Type
         value: application/json
+      authentication:
+        type: basic
+        basic:
+          username: user
+          password: passwd
       body: '{"id":123}'
   specs:
   - name: count test spans
@@ -77,7 +81,5 @@ spec:
 	actual, err := yaml.Encode(mapped)
 	require.NoError(t, err)
 
-	fmt.Println(string(actual))
-	fmt.Println(expected)
 	assert.Equal(t, expected, string(actual))
 }
