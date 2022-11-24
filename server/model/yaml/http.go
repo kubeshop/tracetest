@@ -124,7 +124,6 @@ type HTTPAPIKeyAuth struct {
 }
 
 func (aka HTTPAPIKeyAuth) Validate() error {
-	fmt.Println("ACA!!!!", aka.Value)
 	if aka.Key == "" {
 		return fmt.Errorf("key cannot be empty")
 	}

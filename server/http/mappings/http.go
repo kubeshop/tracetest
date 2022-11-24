@@ -112,28 +112,19 @@ func (m Model) HTTPResponse(in openapi.HttpResponse) *model.HTTPResponse {
 }
 
 func (m Model) Auth(in openapi.HttpAuth) *model.HTTPAuthenticator {
-	// var props map[string]string
-
-	// switch in.Type {
-	// case "apiKey":
-	// 	props = map[string]string{
-	// 		"key":   in.ApiKey.Key,
-	// 		"value": in.ApiKey.Value,
-	// 		"in":    in.ApiKey.In,
-	// 	}
-	// case "basic":
-	// 	props = map[string]string{
-	// 		"username": in.Basic.Username,
-	// 		"password": in.Basic.Password,
-	// 	}
-	// case "bearer":
-	// 	props = map[string]string{
-	// 		"token": in.Bearer.Token,
-	// 	}
-	// }
-
 	return &model.HTTPAuthenticator{
 		Type: in.Type,
-		// Props: props,
+		APIKey: model.APIKeyAuthenticator{
+			Key:   in.ApiKey.Key,
+			Value: in.ApiKey.Value,
+			In:    model.APIKeyPosition(in.ApiKey.In),
+		},
+		Basic: model.BasicAuthenticator{
+			Username: in.Basic.Username,
+			Password: in.Basic.Password,
+		},
+		Bearer: model.BearerAuthenticator{
+			Bearer: in.Bearer.Token,
+		},
 	}
 }
