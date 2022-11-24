@@ -60,6 +60,42 @@ type HTTPAuthenticator struct {
 	Bearer BearerAuthenticator
 }
 
+func (a HTTPAuthenticator) Map(mapFn func(current string) (string, error)) (HTTPAuthenticator, error) {
+	var err error
+	switch a.Type {
+	case "apiKey":
+		in := string(a.APIKey.In)
+		in, err = mapFn(in)
+		if err != nil {
+			return a, err
+		}
+		a.APIKey.In = APIKeyPosition(in)
+		a.APIKey.Key, err = mapFn(a.APIKey.Key)
+		if err != nil {
+			return a, err
+		}
+		a.APIKey.Value, err = mapFn(a.APIKey.Value)
+		if err != nil {
+			return a, err
+		}
+	case "basic":
+		a.Basic.Username, err = mapFn(a.Basic.Username)
+		if err != nil {
+			return a, err
+		}
+		a.Basic.Password, err = mapFn(a.Basic.Password)
+		if err != nil {
+			return a, err
+		}
+	case "bearer":
+		a.Bearer.Bearer, err = mapFn(a.Bearer.Bearer)
+		if err != nil {
+			return a, err
+		}
+	}
+	return a, nil
+}
+
 func (a HTTPAuthenticator) AuthenticateGRPC() {}
 func (a HTTPAuthenticator) AuthenticateHTTP(req *http.Request) {
 	var auth authenticator

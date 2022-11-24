@@ -156,10 +156,10 @@ func TestTriggerPostWithApiKeyAuth(t *testing.T) {
 				},
 				Auth: &model.HTTPAuthenticator{
 					Type: "apiKey",
-					Props: map[string]string{
-						"key":   "key",
-						"value": "value",
-						"in":    string(model.APIKeyPositionHeader),
+					APIKey: model.APIKeyAuthenticator{
+						Key:   "key",
+						Value: "value",
+						In:    model.APIKeyPositionHeader,
 					},
 				},
 				Body: "body",
@@ -217,9 +217,9 @@ func TestTriggerPostWithBasicAuth(t *testing.T) {
 				},
 				Auth: &model.HTTPAuthenticator{
 					Type: "basic",
-					Props: map[string]string{
-						"username": "username",
-						"password": "password",
+					Basic: model.BasicAuthenticator{
+						Username: "username",
+						Password: "password",
 					},
 				},
 				Body: "body",
@@ -277,8 +277,8 @@ func TestTriggerPostWithBearerAuth(t *testing.T) {
 				},
 				Auth: &model.HTTPAuthenticator{
 					Type: "bearer",
-					Props: map[string]string{
-						"token": "token",
+					Bearer: model.BearerAuthenticator{
+						Bearer: "token",
 					},
 				},
 				Body: "body",

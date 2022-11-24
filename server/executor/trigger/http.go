@@ -163,16 +163,15 @@ func resolveAuth(auth *model.HTTPAuthenticator, executor expression.Executor) (*
 		return nil, nil
 	}
 
-	for k, v := range auth.Props {
+	updated, err := auth.Map(func(v string) (string, error) {
 		resolved, err := executor.ResolveStatement(WrapInQuotes(v, "\""))
 		if err != nil {
-			return auth, err
+			return "", err
 		}
+		return resolved, nil
+	})
 
-		auth.Props[k] = resolved
-	}
-
-	return auth, nil
+	return &updated, err
 }
 
 func mapResp(resp *http.Response) model.HTTPResponse {
