@@ -1,15 +1,18 @@
 # Dockerfile to build and serve the documentation files locally
 # for testing purposes.
-FROM python:3-alpine
+FROM node:alpine
 
 WORKDIR /app
 
-# install mkdocs and dependencies
-RUN pip install mkdocs mkdocs-material mkdocs-render-swagger-plugin
+COPY ./docs/package.json .
+COPY ./docs/package-lock.json .
 
-COPY ./mkdocs.yml .
-COPY docs/ ./docs/
+RUN npm install
 
-EXPOSE 8000
+COPY ./docs/ ./
 
-CMD [ "python3", "-m", "mkdocs", "serve" ]
+EXPOSE 3000
+
+RUN npm run build
+
+CMD [ "npm", "run", "serve" ]
