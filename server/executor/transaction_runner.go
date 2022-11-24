@@ -3,10 +3,7 @@ package executor
 import (
 	"context"
 	"fmt"
-	"sync"
-	"time"
 
-	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/subscription"
 )
@@ -19,7 +16,6 @@ func NewTransactionRunner(
 	runner Runner,
 	db model.Repository,
 	subscriptionManager *subscription.Manager,
-	config config.Config,
 ) persistentTransactionRunner {
 	updater := (CompositeTransactionUpdater{}).
 		Add(NewDBTranasctionUpdater(db)).
@@ -32,13 +28,13 @@ func NewTransactionRunner(
 		subscriptionManager: subscriptionManager,
 		executionChannel:    make(chan transactionRunJob, 1),
 		exit:                make(chan bool),
-		checkTestStateDelay: config.PoolingRetryDelay() / 2,
 	}
 }
 
 type transactionRunJob struct {
-	ctx context.Context
-	run model.TransactionRun
+	ctx         context.Context
+	transaction model.Transaction
+	run         model.TransactionRun
 }
 
 type persistentTransactionRunner struct {
@@ -46,13 +42,12 @@ type persistentTransactionRunner struct {
 	db                  model.Repository
 	updater             TransactionRunUpdater
 	subscriptionManager *subscription.Manager
-	checkTestStateDelay time.Duration
 	executionChannel    chan transactionRunJob
 	exit                chan bool
 }
 
 func (r persistentTransactionRunner) Run(ctx context.Context, transaction model.Transaction, metadata model.RunMetadata, environment model.Environment) model.TransactionRun {
-	run := model.NewTransactionRun(transaction)
+	run := transaction.NewRun()
 	run.Metadata = metadata
 	run.Environment = environment
 
@@ -61,8 +56,9 @@ func (r persistentTransactionRunner) Run(ctx context.Context, transaction model.
 	run, _ = r.db.CreateTransactionRun(ctx, run)
 
 	r.executionChannel <- transactionRunJob{
-		ctx: ctx,
-		run: run,
+		ctx:         ctx,
+		transaction: transaction,
+		run:         run,
 	}
 
 	return run
@@ -82,7 +78,7 @@ func (r persistentTransactionRunner) Start(workers int) {
 					fmt.Println("PersistentTransactionRunner exit goroutine")
 					return
 				case job := <-r.executionChannel:
-					err := r.runTransaction(job.ctx, job.run)
+					err := r.runTransaction(job.ctx, job.transaction, job.run)
 					if err != nil {
 						fmt.Println(err.Error())
 					}
@@ -92,22 +88,22 @@ func (r persistentTransactionRunner) Start(workers int) {
 	}
 }
 
-func (r persistentTransactionRunner) runTransaction(ctx context.Context, run model.TransactionRun) error {
+func (r persistentTransactionRunner) runTransaction(ctx context.Context, transaction model.Transaction, run model.TransactionRun) error {
 	run.State = model.TransactionRunStateExecuting
 
 	var err error
 
-	for i := range run.Steps {
-		run, err = r.runTransactionStep(ctx, run, i)
+	for step, test := range transaction.Steps {
+		run, err = r.runTransactionStep(ctx, run, step, test)
 		if err != nil {
-			return fmt.Errorf("could not execute step %d of transaction %s: %w", i, run.TransactionID, err)
+			return fmt.Errorf("could not execute step %d of transaction %s: %w", step, run.TransactionID, err)
 		}
 
 		if run.State == model.TransactionRunStateFailed {
 			break
 		}
 
-		run.Environment = run.InjectOutputsIntoEnvironment(run.Environment)
+		// run.Environment = run.InjectOutputsIntoEnvironment(run.Environment)
 		err = r.db.UpdateTransactionRun(ctx, run)
 		if err != nil {
 			return fmt.Errorf("coult not update transaction step: %w", err)
@@ -121,93 +117,81 @@ func (r persistentTransactionRunner) runTransaction(ctx context.Context, run mod
 	return r.updater.Update(ctx, run)
 }
 
-func (r persistentTransactionRunner) runTransactionStep(ctx context.Context, transactionRun model.TransactionRun, stepIndex int) (model.TransactionRun, error) {
-	step := transactionRun.Steps[stepIndex]
-	test, err := r.db.GetLatestTestVersion(ctx, step.ID)
-	if err != nil {
-		return model.TransactionRun{}, fmt.Errorf("could not load transaction step: %w", err)
-	}
-
-	testRun := r.testRunner.Run(ctx, test, transactionRun.Metadata, transactionRun.Environment)
-	stepRun := createStepRun(testRun)
-	transactionRun.StepRuns = append(transactionRun.StepRuns, stepRun)
-
-	// listen for updates and propagate them as if they were transaction updates
-	r.subscriptionManager.Subscribe(testRun.ResourceID(), subscription.NewSubscriberFunction(
-		func(m subscription.Message) error {
-			updatedRun := m.Content.(model.Run)
-
-			for i, run := range transactionRun.StepRuns {
-				if run.ID == updatedRun.ID && run.TestID == updatedRun.TestID {
-					transactionRun.StepRuns[i] = createStepRun(updatedRun)
-					break
-				}
-			}
-
-			r.subscriptionManager.PublishUpdate(subscription.Message{
-				ResourceID: transactionRun.ResourceID(),
-				Type:       "result_update",
-				Content:    transactionRun,
-			})
-
-			return nil
-		}),
-	)
-
-	err = r.updater.Update(ctx, transactionRun)
+func (r persistentTransactionRunner) runTransactionStep(ctx context.Context, tr model.TransactionRun, step int, test model.Test) (model.TransactionRun, error) {
+	testRun := r.testRunner.Run(ctx, test, tr.Metadata, tr.Environment)
+	tr, err := r.updateStepRun(ctx, tr, step, testRun)
 	if err != nil {
 		return model.TransactionRun{}, fmt.Errorf("could not update transaction run: %w", err)
 	}
 
-	var wg sync.WaitGroup
-	wgPtr := &wg
-	wg.Add(1)
-
-	r.subscriptionManager.Subscribe(testRun.TransactionStepResourceID(), subscription.NewSubscriberFunction(
+	done := make(chan bool)
+	// listen for updates and propagate them as if they were transaction updates
+	r.subscriptionManager.Subscribe(testRun.ResourceID(), subscription.NewSubscriberFunction(
 		func(m subscription.Message) error {
-			defer wgPtr.Done()
-			runResult := m.Content.(RunResult)
+			testRun := m.Content.(model.Run)
+			if testRun.LastError != nil {
+				tr.State = model.TransactionRunStateFailed
+				tr.LastError = testRun.LastError
+			}
 
-			return r.updateTransactionRun(ctx, stepIndex, &transactionRun, runResult)
+			tr, err = r.updateStepRun(ctx, tr, step, testRun)
+			if err != nil {
+				done <- true
+				return err
+			}
+
+			r.subscriptionManager.PublishUpdate(subscription.Message{
+				ResourceID: tr.ResourceID(),
+				Type:       "result_update",
+				Content:    tr,
+			})
+
+			fmt.Println("ACA", testRun.State, testRun.State.IsFinal())
+			if testRun.State.IsFinal() {
+				done <- true
+			}
+
+			return nil
 		}),
 	)
+	// TODO: this will block indefinitely. we need to set a timeout or something
+	<-done
 
-	wg.Wait()
-
-	return transactionRun, nil
+	return tr, err
 }
 
-func createStepRun(testRun model.Run) model.TransactionStepRun {
-	return model.TransactionStepRun{
-		ID:          testRun.ID,
-		TestID:      testRun.TestID,
-		Result:      *testRun.Results,
-		State:       testRun.State,
-		Environment: testRun.Environment,
-		Outputs:     testRun.Outputs,
+func (r persistentTransactionRunner) updateStepRun(ctx context.Context, tr model.TransactionRun, step int, run model.Run) (model.TransactionRun, error) {
+	if len(tr.Steps) <= step {
+		tr.Steps = append(tr.Steps, model.Run{})
 	}
-}
 
-func (r persistentTransactionRunner) updateTransactionRun(ctx context.Context, stepIndex int, transactionRun *model.TransactionRun, runResult RunResult) error {
-	testRun, err := runResult.Run, runResult.Err
+	tr.Steps[step] = run
+	err := r.updater.Update(ctx, tr)
 	if err != nil {
-		transactionRun.State = model.TransactionRunStateFailed
-		transactionRun.StepRuns[stepIndex] = createStepRun(testRun)
-		r.updater.Update(ctx, *transactionRun)
-
-		return err
+		return model.TransactionRun{}, fmt.Errorf("could not update transaction run: %w", err)
 	}
 
-	stepRun := createStepRun(testRun)
-
-	transactionRun.StepRuns[stepIndex] = stepRun
-
-	if testRun.State == model.RunStateFailed {
-		transactionRun.State = model.TransactionRunStateFailed
-	} else {
-		transactionRun.CurrentTest += 1
-	}
-
-	err = r.updater.Update(ctx, *transactionRun)
-	return err
+	return tr, nil
 }
+
+// func (run TransactionRun) InjectOutputsIntoEnvironment(env Environment) Environment {
+// 	if run.CurrentTest == 0 {
+// 		return env
+// 	}
+
+// 	lastExecutedTest := run.StepRuns[run.CurrentTest-1]
+// 	lastEnvironment := lastExecutedTest.Environment
+// 	newEnvVariables := make([]EnvironmentValue, 0)
+// 	lastExecutedTest.Outputs.ForEach(func(key, val string) error {
+// 		newEnvVariables = append(newEnvVariables, EnvironmentValue{
+// 			Key:   key,
+// 			Value: val,
+// 		})
+
+// 		return nil
+// 	})
+
+// 	newEnvironment := Environment{Values: newEnvVariables}
+
+// 	return lastEnvironment.Merge(newEnvironment)
+// }

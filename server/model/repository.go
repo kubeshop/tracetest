@@ -54,8 +54,8 @@ type TransactionRunRepository interface {
 	CreateTransactionRun(context.Context, TransactionRun) (TransactionRun, error)
 	UpdateTransactionRun(context.Context, TransactionRun) error
 	DeleteTransactionRun(context.Context, TransactionRun) error
-	GetTransactionRun(context.Context, string, int) (TransactionRun, error)
-	GetTransactionsRuns(context.Context, string, int32, int32) ([]TransactionRun, error)
+	GetTransactionRun(context.Context, id.ID, int) (TransactionRun, error)
+	GetTransactionsRuns(context.Context, id.ID, int32, int32) ([]TransactionRun, error)
 }
 
 type Repository interface {

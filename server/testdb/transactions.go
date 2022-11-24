@@ -109,8 +109,7 @@ func (td *postgresDB) setTransactionSteps(ctx context.Context, tx *sql.Tx, trans
 		tx.Rollback()
 		return model.Transaction{}, fmt.Errorf("cannot save transaction steps: %w", err)
 	}
-	err = tx.Commit()
-	return transaction, err
+	return transaction, tx.Commit()
 }
 
 func (td *postgresDB) UpdateTransaction(ctx context.Context, transaction model.Transaction) (model.Transaction, error) {

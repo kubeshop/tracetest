@@ -365,14 +365,10 @@ func (td *postgresDB) GetTestRuns(ctx context.Context, test model.Test, take, sk
 	if err != nil {
 		return model.List[model.Run]{}, err
 	}
-	var runs []model.Run
 
-	for rows.Next() {
-		run, err := readRunRow(rows)
-		if err != nil {
-			return model.List[model.Run]{}, fmt.Errorf("cannot read row: %w", err)
-		}
-		runs = append(runs, run)
+	runs, err := td.readRunRows(ctx, rows)
+	if err != nil {
+		return model.List[model.Run]{}, err
 	}
 
 	var count int
@@ -401,6 +397,20 @@ func (td *postgresDB) GetRunByTraceID(ctx context.Context, traceID trace.TraceID
 		return model.Run{}, fmt.Errorf("cannot read row: %w", err)
 	}
 	return run, nil
+}
+
+func (td *postgresDB) readRunRows(ctx context.Context, rows *sql.Rows) ([]model.Run, error) {
+	var runs []model.Run
+
+	for rows.Next() {
+		run, err := readRunRow(rows)
+		if err != nil {
+			return []model.Run{}, fmt.Errorf("cannot read row: %w", err)
+		}
+		runs = append(runs, run)
+	}
+
+	return runs, nil
 }
 
 func readRunRow(row scanner) (model.Run, error) {

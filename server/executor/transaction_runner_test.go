@@ -6,7 +6,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/subscription"
@@ -15,12 +14,13 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-type simpleTestRunner struct {
+type fakeTestRunner struct {
 	db                  model.Repository
 	subscriptionManager *subscription.Manager
+	returnErr           bool
 }
 
-func (r simpleTestRunner) Run(ctx context.Context, test model.Test, metadata model.RunMetadata, env model.Environment) model.Run {
+func (r fakeTestRunner) Run(ctx context.Context, test model.Test, metadata model.RunMetadata, env model.Environment) model.Run {
 	run := model.NewRun()
 	run.State = model.RunStateCreated
 	newRun, err := r.db.CreateRun(ctx, test, run)
@@ -29,17 +29,20 @@ func (r simpleTestRunner) Run(ctx context.Context, test model.Test, metadata mod
 	}
 
 	go func() {
-		time.Sleep(2 * time.Second) // simulate some real work
+		time.Sleep(100 * time.Millisecond) // simulate some real work
 
-		newRun.State = model.RunStateFinished
+		if r.returnErr {
+			newRun.State = model.RunStateFailed
+			newRun.LastError = fmt.Errorf("failed to do something")
+		} else {
+			newRun.State = model.RunStateFinished
+		}
+
 		err = r.db.UpdateRun(ctx, newRun)
 		r.subscriptionManager.PublishUpdate(subscription.Message{
-			ResourceID: newRun.TransactionStepResourceID(),
-			Type:       "run_update",
-			Content: executor.RunResult{
-				Run: newRun,
-				Err: err,
-			},
+			ResourceID: newRun.ResourceID(),
+			Type:       "result_update",
+			Content:    newRun,
 		})
 	}()
 
@@ -47,77 +50,24 @@ func (r simpleTestRunner) Run(ctx context.Context, test model.Test, metadata mod
 }
 
 func TestTransactionRunner(t *testing.T) {
-	ctx := context.Background()
-	db, clear := getDB()
-	defer clear()
 
-	subscriptionManager := subscription.NewManager()
-
-	testRunner := simpleTestRunner{
-		db,
-		subscriptionManager,
-	}
-
-	test1, err := db.CreateTest(ctx, model.Test{
-		Name: "Test 1",
+	t.Run("NoErrors", func(t *testing.T) {
+		runTransactionRunnerTest(t, false, func(t *testing.T, actual model.TransactionRun) {
+			assert.Equal(t, model.TransactionRunStateFinished, actual.State)
+			assert.Len(t, actual.Steps, 2)
+			assert.Equal(t, actual.Steps[0].State, model.RunStateFinished)
+			assert.Equal(t, actual.Steps[1].State, model.RunStateFinished)
+		})
 	})
-	require.NoError(t, err)
 
-	test2, err := db.CreateTest(ctx, model.Test{
-		Name: "Test 1",
+	t.Run("WithErrors", func(t *testing.T) {
+		runTransactionRunnerTest(t, true, func(t *testing.T, actual model.TransactionRun) {
+			assert.Equal(t, model.TransactionRunStateFailed, actual.State)
+			require.Len(t, actual.Steps, 1)
+			assert.Equal(t, model.RunStateFailed, actual.Steps[0].State)
+		})
 	})
-	require.NoError(t, err)
 
-	transaction, err := db.CreateTransaction(ctx, model.Transaction{
-		Name:    "transaction",
-		Version: 1,
-		Steps: []model.Test{
-			test1,
-			test2,
-		},
-	})
-	require.NoError(t, err)
-
-	metadata := model.RunMetadata{
-		"environment": "production",
-		"service":     "tracetest",
-	}
-
-	env, err := db.CreateEnvironment(ctx, model.Environment{
-		Name: "production",
-		Values: []model.EnvironmentValue{
-			{
-				Key:   "url",
-				Value: "http://my-service.com",
-			},
-		},
-	})
-	require.NoError(t, err)
-
-	config := config.Config{
-		PoolingConfig: config.PoolingConfig{
-			RetryDelay: "2s",
-		},
-	}
-
-	runner := executor.NewTransactionRunner(testRunner, db, subscriptionManager, config)
-	runner.Start(5)
-
-	ctxWithTimeout, cancel := context.WithTimeout(ctx, 30*time.Second)
-	defer cancel()
-
-	transactionRun := runner.Run(ctxWithTimeout, transaction, metadata, env)
-
-	for !transactionRun.State.IsFinal() {
-		transactionRun, err = db.GetTransactionRun(ctxWithTimeout, transactionRun.TransactionID.String(), transactionRun.ID)
-		require.NoError(t, err)
-		time.Sleep(1 * time.Second)
-	}
-
-	assert.Equal(t, model.TransactionRunStateFinished, transactionRun.State)
-	assert.Len(t, transactionRun.StepRuns, 2)
-	assert.Equal(t, transactionRun.StepRuns[0].State, model.RunStateFinished)
-	assert.Equal(t, transactionRun.StepRuns[1].State, model.RunStateFinished)
 }
 
 func getDB() (model.Repository, func()) {
@@ -136,66 +86,28 @@ func getDB() (model.Repository, func()) {
 	return db, clean
 }
 
-type testRunnerAlwaysFails struct {
-	db                  model.Repository
-	subscriptionManager *subscription.Manager
-}
-
-func (r testRunnerAlwaysFails) Run(ctx context.Context, test model.Test, metadata model.RunMetadata, env model.Environment) model.Run {
-	run := model.NewRun()
-	run.State = model.RunStateCreated
-	newRun, err := r.db.CreateRun(ctx, test, run)
-	if err != nil {
-		panic(err)
-	}
-
-	go func() {
-		time.Sleep(2 * time.Second) // simulate some real work
-
-		newRun.State = model.RunStateFailed
-		err = r.db.UpdateRun(ctx, newRun)
-		r.subscriptionManager.PublishUpdate(subscription.Message{
-			ResourceID: newRun.TransactionStepResourceID(),
-			Type:       "run_update",
-			Content: executor.RunResult{
-				Run: newRun,
-				Err: fmt.Errorf("failed to do something"),
-			},
-		})
-	}()
-
-	return newRun
-}
-
-func TestTransactionRunnerWhenTestFails(t *testing.T) {
+func runTransactionRunnerTest(t *testing.T, withErrors bool, assert func(t *testing.T, actual model.TransactionRun)) {
 	ctx := context.Background()
 	db, clear := getDB()
 	defer clear()
 
 	subscriptionManager := subscription.NewManager()
 
-	testRunner := testRunnerAlwaysFails{
+	testRunner := fakeTestRunner{
 		db,
 		subscriptionManager,
+		withErrors,
 	}
 
-	test1, err := db.CreateTest(ctx, model.Test{
-		Name: "Test 1",
-	})
+	test1, err := db.CreateTest(ctx, model.Test{Name: "Test 1"})
 	require.NoError(t, err)
 
-	test2, err := db.CreateTest(ctx, model.Test{
-		Name: "Test 1",
-	})
+	test2, err := db.CreateTest(ctx, model.Test{Name: "Test 2"})
 	require.NoError(t, err)
 
 	transaction, err := db.CreateTransaction(ctx, model.Transaction{
-		Name:    "transaction",
-		Version: 1,
-		Steps: []model.Test{
-			test1,
-			test2,
-		},
+		Name:  "transaction",
+		Steps: []model.Test{test1, test2},
 	})
 	require.NoError(t, err)
 
@@ -215,28 +127,58 @@ func TestTransactionRunnerWhenTestFails(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	config := config.Config{
-		PoolingConfig: config.PoolingConfig{
-			RetryDelay: "2s",
-		},
-	}
+	runner := executor.NewTransactionRunner(testRunner, db, subscriptionManager)
+	runner.Start(1)
 
-	runner := executor.NewTransactionRunner(testRunner, db, subscriptionManager, config)
-	runner.Start(5)
-
-	ctxWithTimeout, cancel := context.WithTimeout(ctx, 30*time.Second)
+	ctxWithTimeout, cancel := context.WithTimeout(ctx, 1*time.Second)
 	defer cancel()
 
 	transactionRun := runner.Run(ctxWithTimeout, transaction, metadata, env)
 
-	for !transactionRun.State.IsFinal() {
-		transactionRun, err = db.GetTransactionRun(ctxWithTimeout, transactionRun.TransactionID.String(), transactionRun.ID)
-		require.NoError(t, err)
-		time.Sleep(1 * time.Second)
-	}
+	done := make(chan bool, 1)
+	subscriptionManager.Subscribe(transactionRun.ResourceID(), subscription.NewSubscriberFunction(
+		func(m subscription.Message) error {
+			tr := m.Content.(model.TransactionRun)
+			if tr.State.IsFinal() {
+				transactionRun = tr
+				done <- true
+			}
 
-	assert.Equal(t, model.TransactionRunStateFailed, transactionRun.State)
-	require.Len(t, transactionRun.StepRuns, 1)
+			return nil
+		}),
+	)
+	// TODO: this will block indefinitely. we need to set a timeout or something
+	<-done
 
-	assert.Equal(t, model.RunStateFailed, transactionRun.StepRuns[0].State)
+	assert(t, transactionRun)
 }
+
+// func TestEnvironmentOutputInjection(t *testing.T) {
+// 	environment := model.Environment{
+// 		ID:   "env-id",
+// 		Name: "my environment",
+// 		Values: []model.EnvironmentValue{
+// 			{Key: "HOST", Value: "http://my-api.com"},
+// 			{Key: "PORT", Value: "8081"},
+// 		},
+// 	}
+
+// 	run := model.TransactionRun{
+// 		CurrentTest: 1,
+// 		Steps: []model.Run{
+// 			{
+// 				Environment: environment,
+// 				Outputs: (model.OrderedMap[string, string]{}).
+// 					MustAdd("TEST_ID", "123456").
+// 					MustAdd("RUN_ID", "2"),
+// 			},
+// 		},
+// 	}
+
+// 	newEnvironment := run.InjectOutputsIntoEnvironment(environment)
+
+// 	assert.Contains(t, newEnvironment.Values, model.EnvironmentValue{Key: "HOST", Value: "http://my-api.com"})
+// 	assert.Contains(t, newEnvironment.Values, model.EnvironmentValue{Key: "PORT", Value: "8081"})
+// 	assert.Contains(t, newEnvironment.Values, model.EnvironmentValue{Key: "TEST_ID", Value: "123456"})
+// 	assert.Contains(t, newEnvironment.Values, model.EnvironmentValue{Key: "RUN_ID", Value: "2"})
+// }

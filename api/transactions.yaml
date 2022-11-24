@@ -55,10 +55,6 @@ components:
         steps:
           type: array
           items:
-            $ref: "./tests.yaml#/components/schemas/Test"
-        stepRuns:
-          type: array
-          items:
             $ref: "./tests.yaml#/components/schemas/TestRun"
         environment:
           $ref: "./environments.yaml#/components/schemas/Environment"

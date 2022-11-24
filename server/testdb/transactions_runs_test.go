@@ -25,7 +25,7 @@ func TestCreateTransactionRun(t *testing.T) {
 	transaction, err := db.CreateTransaction(context.TODO(), transaction)
 	require.NoError(t, err)
 
-	run := model.NewTransactionRun(transaction)
+	run := transaction.NewRun()
 	newRun, err := db.CreateTransactionRun(context.TODO(), run)
 	require.NoError(t, err)
 
@@ -49,7 +49,7 @@ func TestUpdateTransactionRun(t *testing.T) {
 	transaction, err := db.CreateTransaction(context.TODO(), transaction)
 	require.NoError(t, err)
 
-	run := model.NewTransactionRun(transaction)
+	run := transaction.NewRun()
 	run, err = db.CreateTransactionRun(context.TODO(), run)
 	require.NoError(t, err)
 
@@ -57,7 +57,7 @@ func TestUpdateTransactionRun(t *testing.T) {
 	err = db.UpdateTransactionRun(context.TODO(), run)
 	require.NoError(t, err)
 
-	updatedRun, err := db.GetTransactionRun(context.TODO(), transaction.ID.String(), run.ID)
+	updatedRun, err := db.GetTransactionRun(context.TODO(), transaction.ID, run.ID)
 	require.NoError(t, err)
 
 	assert.Equal(t, run.TransactionID, transaction.ID)
@@ -80,14 +80,14 @@ func TestDeleteTransactionRun(t *testing.T) {
 	transaction, err := db.CreateTransaction(context.TODO(), transaction)
 	require.NoError(t, err)
 
-	run := model.NewTransactionRun(transaction)
+	run := transaction.NewRun()
 	newRun, err := db.CreateTransactionRun(context.TODO(), run)
 	require.NoError(t, err)
 
 	err = db.DeleteTransactionRun(context.TODO(), newRun)
 	require.NoError(t, err)
 
-	_, err = db.GetTransactionRun(context.TODO(), transaction.ID.String(), newRun.ID)
+	_, err = db.GetTransactionRun(context.TODO(), transaction.ID, newRun.ID)
 	require.ErrorContains(t, err, "record not found")
 }
 
@@ -95,49 +95,41 @@ func TestListTransactionRun(t *testing.T) {
 	db, clean := getDB()
 	defer clean()
 
-	transaction := model.Transaction{
+	transaction, err := db.CreateTransaction(context.TODO(), model.Transaction{
 		Name:        "first test",
 		Description: "description",
 		Steps: []model.Test{
 			createTestWithName(t, db, "first step"),
 			createTestWithName(t, db, "second step"),
 		},
-	}
+	})
+	require.NoError(t, err)
 
-	transaction2 := model.Transaction{
+	transaction2, err := db.CreateTransaction(context.TODO(), model.Transaction{
 		Name:        "second transaction",
 		Description: "description",
 		Steps: []model.Test{
 			createTestWithName(t, db, "first step"),
 			createTestWithName(t, db, "second step"),
 		},
-	}
-
-	transaction, err := db.CreateTransaction(context.TODO(), transaction)
+	})
 	require.NoError(t, err)
 
-	transaction2, err = db.CreateTransaction(context.TODO(), transaction2)
+	run1, err := db.CreateTransactionRun(context.TODO(), transaction.NewRun())
 	require.NoError(t, err)
 
-	run1 := model.NewTransactionRun(transaction)
-	newRun1, err := db.CreateTransactionRun(context.TODO(), run1)
+	run2, err := db.CreateTransactionRun(context.TODO(), transaction.NewRun())
 	require.NoError(t, err)
 
-	run2 := model.NewTransactionRun(transaction)
-	newRun2, err := db.CreateTransactionRun(context.TODO(), run2)
+	_, err = db.CreateTransactionRun(context.TODO(), transaction2.NewRun())
 	require.NoError(t, err)
 
-	run3 := model.NewTransactionRun(transaction2)
-	newRun3, err := db.CreateTransactionRun(context.TODO(), run3)
-	require.NoError(t, err)
-
-	runs, err := db.GetTransactionsRuns(context.TODO(), transaction.ID.String(), 20, 0)
+	runs, err := db.GetTransactionsRuns(context.TODO(), transaction.ID, 20, 0)
 	require.NoError(t, err)
 
 	assert.Len(t, runs, 2)
-	assert.Contains(t, runs, newRun1)
-	assert.Contains(t, runs, newRun2)
-	assert.NotContains(t, runs, newRun3)
+	assert.Equal(t, runs[0].ID, run2.ID)
+	assert.Equal(t, runs[1].ID, run1.ID)
 }
 
 func TestBug(t *testing.T) {
@@ -158,32 +150,30 @@ func TestBug(t *testing.T) {
 	transaction, err := db.CreateTransaction(ctx, transaction)
 	require.NoError(t, err)
 
-	run1 := model.NewTransactionRun(transaction)
-	run1, err = db.CreateTransactionRun(ctx, run1)
+	run1, err := db.CreateTransactionRun(ctx, transaction.NewRun())
 	require.NoError(t, err)
 
-	run2 := model.NewTransactionRun(transaction)
-	run2, err = db.CreateTransactionRun(ctx, run2)
+	run2, err := db.CreateTransactionRun(ctx, transaction.NewRun())
 	require.NoError(t, err)
 
-	runs, err := db.GetTransactionsRuns(ctx, transaction.ID.String(), 20, 0)
+	runs, err := db.GetTransactionsRuns(ctx, transaction.ID, 20, 0)
 	require.NoError(t, err)
-	assert.Contains(t, runs, run1)
-	assert.Contains(t, runs, run2)
+	assert.Equal(t, runs[0].ID, run2.ID)
+	assert.Equal(t, runs[1].ID, run1.ID)
 
 	transaction.Name = "another thing"
 	newTransaction, err := db.UpdateTransaction(ctx, transaction)
 	require.NoError(t, err)
 
-	run3 := model.NewTransactionRun(newTransaction)
-	run3, err = db.CreateTransactionRun(ctx, run3)
+	run3, err := db.CreateTransactionRun(ctx, newTransaction.NewRun())
 	require.NoError(t, err)
 
-	runs, err = db.GetTransactionsRuns(ctx, newTransaction.ID.String(), 20, 0)
+	runs, err = db.GetTransactionsRuns(ctx, newTransaction.ID, 20, 0)
 	require.NoError(t, err)
+
 	assert.Len(t, runs, 3)
-	assert.Contains(t, runs, run1)
-	assert.Contains(t, runs, run2)
-	assert.Contains(t, runs, run3)
+	assert.Equal(t, runs[0].ID, run3.ID)
+	assert.Equal(t, runs[1].ID, run2.ID)
+	assert.Equal(t, runs[2].ID, run1.ID)
 
 }
