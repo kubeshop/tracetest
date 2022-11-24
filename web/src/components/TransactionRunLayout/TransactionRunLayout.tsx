@@ -29,7 +29,7 @@ const TransactionRunDetailLayout = ({transaction, transaction: {id: transactionI
             <EditTransaction transaction={transaction} transactionRun={transactionRun} />
           </S.SectionLeft>
           <S.SectionRight>
-            <TransactionRunResult transactionRun={transactionRun} />
+            <TransactionRunResult transaction={transaction} transactionRun={transactionRun} />
           </S.SectionRight>
         </S.Container>
       </S.Wrapper>

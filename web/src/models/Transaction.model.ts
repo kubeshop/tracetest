@@ -1,5 +1,6 @@
 import {TRawTransaction, TTransaction} from 'types/Transaction.types';
 import TestSummary from './TestSummary.model';
+import Test from './Test.model';
 
 function Transaction({
   id = '',
@@ -15,7 +16,7 @@ function Transaction({
     name,
     description,
     version,
-    steps,
+    steps: steps.map(step => Test(step)),
     createdAt,
     summary: TestSummary(summary),
   };

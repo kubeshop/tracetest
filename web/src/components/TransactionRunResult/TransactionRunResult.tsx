@@ -1,14 +1,16 @@
 import KeyValueRow from 'components/KeyValueRow';
+import {TTransaction} from 'types/Transaction.types';
 import {TTransactionRun} from 'types/TransactionRun.types';
 import {TestState} from 'constants/TestRun.constants';
 import ExecutionStep from './ExecutionStep';
 import * as S from './TransactionRunResult.styled';
 
 interface IProps {
+  transaction: TTransaction;
   transactionRun: TTransactionRun;
 }
 
-const TransactionRunResult = ({transactionRun: {steps, stepRuns, environment, state}}: IProps) => {
+const TransactionRunResult = ({transactionRun: {steps, environment, state}, transaction}: IProps) => {
   const hasRunFailed = state === TestState.FAILED;
 
   return (
@@ -19,8 +21,8 @@ const TransactionRunResult = ({transactionRun: {steps, stepRuns, environment, st
           <ExecutionStep
             index={index}
             key={step.id}
-            test={step}
-            testRun={stepRuns[index]}
+            test={transaction.steps[index]}
+            testRun={step}
             hasRunFailed={hasRunFailed}
           />
         ))}
