@@ -31,53 +31,17 @@ const sidebars = {
     // },
     {
       type: "category",
-      label: "Concepts",
-      items: [
-        {
-          type: "doc",
-          id: "concepts/introduction-to-trace-based-testing",
-          label: "Introduction to trace-based testing",
-        },
-        {
-          type: "doc",
-          id: "concepts/architecture",
-          label: "Architecture",
-        },
-        {
-          type: "doc",
-          id: "concepts/selectors",
-          label: "Selectors",
-        },
-        {
-          type: "doc",
-          id: "concepts/expressions",
-          label: "Expressions",
-        },
-        {
-          type: "doc",
-          id: "concepts/environments",
-          label: "Environments",
-        },
-        {
-          type: "doc",
-          id: "concepts/transactions",
-          label: "Transactions",
-        },
-      ],
-    },
-    {
-      type: "category",
       label: "Getting Started",
       items: [
         {
           type: "doc",
-          id: "getting-started/supported-backends",
-          label: "Supported back ends",
+          id: "getting-started/installation",
+          label: "Installation",
         },
         {
           type: "doc",
-          id: "getting-started/installation",
-          label: "Installation",
+          id: "getting-started/supported-backends",
+          label: "Supported back ends",
         },
         {
           type: "doc",
@@ -140,35 +104,87 @@ const sidebars = {
       ],
     },
     {
-      type: "link",
-      label: "Tracetest Open API definition",
-      href: "/openapi",
-    },
-    {
       type: "category",
-      label: "Installable Example - Pokeshop Service", // should be renamed to "Sample Microservice App - Pokeshop"
+      label: "Examples & Tutorials",
       items: [
         {
           type: "doc",
-          id: "pokeshop/index",
-          label: "Overview",
+          id: "examples-tutorials/overview",
+          label: "Examples Overview",
         },
+        // {
+        //   type: "doc",
+        //   id: "examples-tutorials/recipes",
+        //   label: "Recipes",
+        // },
         {
-          type: "doc",
-          id: "pokeshop/add-pokemon",
-          label: "Add Pokemon",
-        },
-        {
-          type: "doc",
-          id: "pokeshop/import-pokemon",
-          label: "Import Pokemon",
-        },
-        {
-          type: "doc",
-          id: "pokeshop/list-pokemon",
-          label: "List Pokemon",
+          type: "category",
+          label: "Installable Example - Pokeshop Service", // should be renamed to "Sample Microservice App - Pokeshop"
+          items: [
+            {
+              type: "doc",
+              id: "pokeshop/index",
+              label: "Overview",
+            },
+            {
+              type: "doc",
+              id: "pokeshop/add-pokemon",
+              label: "Add Pokemon",
+            },
+            {
+              type: "doc",
+              id: "pokeshop/import-pokemon",
+              label: "Import Pokemon",
+            },
+            {
+              type: "doc",
+              id: "pokeshop/list-pokemon",
+              label: "List Pokemon",
+            },
+          ],
         },
       ],
+    },
+    {
+      type: "category",
+      label: "Concepts",
+      items: [
+        {
+          type: "doc",
+          id: "concepts/introduction-to-trace-based-testing",
+          label: "Introduction to trace-based testing",
+        },
+        {
+          type: "doc",
+          id: "concepts/architecture",
+          label: "Architecture",
+        },
+        {
+          type: "doc",
+          id: "concepts/selectors",
+          label: "Selectors",
+        },
+        {
+          type: "doc",
+          id: "concepts/expressions",
+          label: "Expressions",
+        },
+        {
+          type: "doc",
+          id: "concepts/environments",
+          label: "Environments",
+        },
+        {
+          type: "doc",
+          id: "concepts/transactions",
+          label: "Transactions",
+        },
+      ],
+    },
+    {
+      type: "link",
+      label: "Tracetest Open API definition",
+      href: "/openapi",
     },
   ],
 };
