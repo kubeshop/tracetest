@@ -27,7 +27,7 @@ const TestsSelectionInput = ({value = [], onChange = noop, testList}: IProps) =>
   );
 
   useEffect(() => {
-    if (testList.length) {
+    if (testList.length && value.length) {
       setSelectedTestList(
         value.map((testId, index) => {
           const test = testList.find(({id}) => id === testId)!;
