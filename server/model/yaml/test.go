@@ -137,6 +137,7 @@ func GetTestFromOpenapiObject(test openapi.Test) (Test, error) {
 		Description: test.Description,
 		Trigger:     convertServiceUnderTestIntoTrigger(test.ServiceUnderTest),
 		Specs:       convertOpenAPITestSpecIntoSpecArray(test.Specs),
+		Outputs:     convertOpenAPITestOutputsIntoOutputsArray(test.Outputs),
 	}, nil
 }
 
@@ -233,4 +234,20 @@ func convertOpenAPITestSpecIntoSpecArray(testSpec openapi.TestSpecs) []TestSpec 
 	}
 
 	return definitionArray
+}
+
+func convertOpenAPITestOutputsIntoOutputsArray(outputs []openapi.TestOutput) Outputs {
+	outputArray := make(Outputs, 0, len(outputs))
+
+	for _, output := range outputs {
+		newOutput := Output{
+			Name:     output.Name,
+			Selector: output.Selector.Query,
+			Value:    output.Value,
+		}
+
+		outputArray = append(outputArray, newOutput)
+	}
+
+	return outputArray
 }
