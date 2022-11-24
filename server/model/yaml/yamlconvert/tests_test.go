@@ -1,10 +1,14 @@
-package yaml_test
+package yamlconvert_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/model/yaml"
+	"github.com/kubeshop/tracetest/server/model/yaml/yamlconvert"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestConverter(t *testing.T) {
@@ -44,30 +48,36 @@ func TestConverter(t *testing.T) {
 			}),
 	}
 
-	expected := `
-type: Test
+	expected := `type: Test
 spec:
-	id: 123
-	name: The Name
-	description: Description
-	trigger:
-		type: http
-		httpRequest:
-			url: "http://google.com"
-			method: POST
-			headers:
-			- key: Content-Type
-				value: application/json
-			body: '{"id":123}'
-	specs:
-	- selector: span[name = "Test Span"]
-		assertions:
-			- attr:tracetest.selected_spans.count = 2
-	outputs:
-	- selector: span[name = "Create User"]
-		value: attr:myapp.user_id
+  id: "123"
+  name: The Name
+  description: Description
+  trigger:
+    type: http
+    httpRequest:
+      url: http://google.com
+      method: POST
+      headers:
+      - key: Content-Type
+        value: application/json
+      body: '{"id":123}'
+  specs:
+  - name: count test spans
+    selector: span[name="Test Span"]
+    assertions:
+    - attr:tracetest.selected_spans.count = 2
+  outputs:
+  - name: user_id
+    selector: span[name="Create User"]
+    value: attr:myapp.user_id
 `
 
-	mapped := yaml.Test(in)
-	actual, err := yaml
+	mapped := yamlconvert.Test(in)
+	actual, err := yaml.Encode(mapped)
+	require.NoError(t, err)
+
+	fmt.Println(string(actual))
+	fmt.Println(expected)
+	assert.Equal(t, expected, string(actual))
 }
