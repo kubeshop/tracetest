@@ -7,6 +7,7 @@ const attribute: TSpanFlatAttribute = {
   value: 'value',
 };
 
+const onCreateOutput = jest.fn();
 const onCreateTestSpec = jest.fn();
 const onCopy = jest.fn();
 
@@ -16,6 +17,7 @@ describe('AttributeRow', () => {
       <AttributeRow
         searchText=""
         attribute={attribute}
+        onCreateOutput={onCreateOutput}
         onCreateTestSpec={onCreateTestSpec}
         onCopy={onCopy}
         semanticConventions={{}}

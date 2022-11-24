@@ -4,7 +4,7 @@ describe('Create test from CURL Command', () => {
   beforeEach(() => cy.visit('/'));
 
   it('should create a basic GET test', () => {
-    cy.inteceptHomeApiCall();
+    cy.interceptHomeApiCall();
     const name = `Test - Pokemon - #${String(Date.now()).slice(-4)}`;
     cy.openTestCreationModal();
     cy.get(`[data-cy=${SupportedPlugins.CURL.toLowerCase()}-plugin]`).click();

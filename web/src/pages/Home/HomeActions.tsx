@@ -43,7 +43,12 @@ const HomeActions = ({onCreateTest, onCreateTransaction}: IProps) => {
 
   return (
     <S.ActionContainer>
-      <S.CreateDropdownButton overlay={createMenu} trigger={['click']} placement="bottomRight">
+      <S.CreateDropdownButton
+        overlay={createMenu}
+        overlayClassName="test-create-selector-items"
+        trigger={['click']}
+        placement="bottomRight"
+      >
         <S.CreateTestButton type="primary" data-cy="create-button">
           Create <CaretDownOutlined />
         </S.CreateTestButton>

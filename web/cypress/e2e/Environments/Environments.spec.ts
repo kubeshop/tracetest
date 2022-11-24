@@ -24,6 +24,7 @@ function createEnvironment(environment: IEnvironment) {
 }
 
 function deleteEnvironment() {
+  cy.visit('/environments');
   cy.get('[data-cy=environment-actions]').first().click();
   cy.get('[data-cy=environment-actions-delete]').click();
 
@@ -39,7 +40,7 @@ describe('Environments', () => {
   const environment1: IEnvironment = {
     name: 'Environment One',
     description: 'Description Environment One',
-    values: [{key: 'item1', value: 'value1'}],
+    values: [{key: 'host', value: 'http://demo-pokemon-api.demo.svc.cluster.local'}],
   };
   const environment2: IEnvironment = {
     name: 'Environment Two',
@@ -96,5 +97,33 @@ describe('Environments', () => {
     deleteEnvironment();
 
     cy.contains(environment1.name).should('not.exist');
+  });
+
+  it('should create a test using variables from environment', () => {
+    createEnvironment(environment1);
+
+    cy.visit('/');
+    cy.interceptHomeApiCall();
+
+    // Select created environment
+    cy.get('[data-cy=environment-selector]').click();
+    cy.get('.environment-selector-items ul li').eq(1).click();
+
+    const name = `Test - Pokemon - #${String(Date.now()).slice(-4)}`;
+    cy.openTestCreationModal();
+    cy.fillCreateFormBasicStep(name);
+    // eslint-disable-next-line no-template-curly-in-string
+    cy.setCreateFormUrl('GET', '${{}env:host}/pokemon');
+    cy.submitCreateForm();
+    cy.makeSureUserIsOnTracePage();
+
+    cy.get('[data-cy=run-detail-trigger-response]').within(() => {
+      cy.contains('Environment').click();
+      cy.contains(environment1.values[0].key);
+      cy.contains(environment1.values[0].value);
+    });
+
+    cy.deleteTest(true);
+    deleteEnvironment();
   });
 });

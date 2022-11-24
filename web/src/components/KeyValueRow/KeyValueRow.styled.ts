@@ -9,8 +9,8 @@ export const Container = styled.div`
   display: grid;
   gap: 16px;
   grid-template-columns: 1fr 1fr;
-  height: 58px;
   margin-bottom: 8px;
+  min-height: 58px;
   padding: 7px 16px;
 `;
 

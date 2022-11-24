@@ -17,7 +17,7 @@ describe('Transactions', () => {
   it('should create and run a transaction with multiple tests', () => {
     const name = `Transaction - #${String(Date.now()).slice(-4)}`;
     cy.openTransactionCreationModal();
-    cy.inteceptHomeApiCall();
+    cy.interceptHomeApiCall();
     cy.fillCreateFormBasicStep(name, name, 'CreateTransactionFactory');
 
     transactionUtils.testList.forEach(test => {
@@ -33,7 +33,7 @@ describe('Transactions', () => {
   it('should rerun a transaction after creation', () => {
     const name = `Transaction - #${String(Date.now()).slice(-4)}`;
     cy.openTransactionCreationModal();
-    cy.inteceptHomeApiCall();
+    cy.interceptHomeApiCall();
     cy.fillCreateFormBasicStep(name, name, 'CreateTransactionFactory');
 
     transactionUtils.testList.forEach(test => {
@@ -52,7 +52,7 @@ describe('Transactions', () => {
   it('should update a transaction and rerun', () => {
     const name = `Transaction - #${String(Date.now()).slice(-4)}`;
     cy.openTransactionCreationModal();
-    cy.inteceptHomeApiCall();
+    cy.interceptHomeApiCall();
     cy.fillCreateFormBasicStep(name, name, 'CreateTransactionFactory');
 
     transactionUtils.testList.forEach(test => {
