@@ -40,5 +40,5 @@ export const Sider = styled(LayoutAntd.Sider)`
     background: #2c1a54;
   }
 
-  background: linear-gradient(180deg, #2f1e61 0%, #bc334a 111.31%, rgba(49, 38, 132, 0) 180.18%, #df4f80 180.18%);
+  background: linear-gradient(180deg, #2f1e61 0%, #8b2c53 111.31%, rgba(49, 38, 132, 0) 180.18%, #df4f80 180.18%);
 `;

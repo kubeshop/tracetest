@@ -30,6 +30,7 @@ interface IProps {
 const useQuerySelector = ({form, runId, testId, onValidSelector}: IProps) => {
   const {onSetMatchedSpans, onClearMatchedSpans, selectedSpan} = useSpan();
   const {setSelectorSuggestions} = useTestSpecs();
+  const [isLoading, setIsLoading] = useState(true);
   const {currentSelector} = useAssertionFormValues(form);
   const [onTriggerSelectedSpans, {data: selectedSpansData, isError}] = useLazyGetSelectedSpansQuery();
   const [isValid, setIsValid] = useState(!isError);
@@ -52,11 +53,14 @@ const useQuerySelector = ({form, runId, testId, onValidSelector}: IProps) => {
           }).unwrap();
           onSetMatchedSpans(data.spanIds);
         }
+
+        setIsLoading(false);
       }, 500),
     [onSetMatchedSpans, onTriggerSelectedSpans]
   );
 
   useEffect(() => {
+    setIsLoading(true);
     handleSelector({q: currentSelector, tId: testId, rId: runId});
   }, [handleSelector, currentSelector, runId, testId]);
 
@@ -100,6 +104,7 @@ const useQuerySelector = ({form, runId, testId, onValidSelector}: IProps) => {
   return {
     spanIdList: selectedSpansData?.spanIds ?? [],
     isValid,
+    isLoading,
   };
 };
 

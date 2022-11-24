@@ -3,10 +3,12 @@ package executor
 import (
 	"context"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/subscription"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/propagation"
 )
@@ -15,7 +17,6 @@ type AssertionRequest struct {
 	carrier propagation.MapCarrier
 	Test    model.Test
 	Run     model.Run
-	channel chan RunResult
 }
 
 func (r AssertionRequest) Context() context.Context {
@@ -29,22 +30,29 @@ type AssertionRunner interface {
 }
 
 type defaultAssertionRunner struct {
-	updater           RunUpdater
-	assertionExecutor AssertionExecutor
-	outputsProcessor  OutputsProcessorFn
-	inputChannel      chan AssertionRequest
-	exitChannel       chan bool
+	updater             RunUpdater
+	assertionExecutor   AssertionExecutor
+	outputsProcessor    OutputsProcessorFn
+	inputChannel        chan AssertionRequest
+	exitChannel         chan bool
+	subscriptionManager *subscription.Manager
 }
 
 var _ WorkerPool = &defaultAssertionRunner{}
 var _ AssertionRunner = &defaultAssertionRunner{}
 
-func NewAssertionRunner(updater RunUpdater, assertionExecutor AssertionExecutor, op OutputsProcessorFn) AssertionRunner {
+func NewAssertionRunner(
+	updater RunUpdater,
+	assertionExecutor AssertionExecutor,
+	op OutputsProcessorFn,
+	subscriptionManager *subscription.Manager,
+) AssertionRunner {
 	return &defaultAssertionRunner{
-		outputsProcessor:  op,
-		updater:           updater,
-		assertionExecutor: assertionExecutor,
-		inputChannel:      make(chan AssertionRequest, 1),
+		outputsProcessor:    op,
+		updater:             updater,
+		assertionExecutor:   assertionExecutor,
+		inputChannel:        make(chan AssertionRequest, 1),
+		subscriptionManager: subscriptionManager,
 	}
 }
 
@@ -73,28 +81,37 @@ func (e *defaultAssertionRunner) startWorker() {
 		case <-e.exitChannel:
 			fmt.Println("Exiting assertion executor worker")
 			return
-		case assertionRequest := <-e.inputChannel:
-			ctx := assertionRequest.Context()
-			run, err := e.runAssertionsAndUpdateResult(ctx, assertionRequest)
+		case request := <-e.inputChannel:
+			ctx := request.Context()
+			run, err := e.runAssertionsAndUpdateResult(ctx, request)
 
-			runResult := RunResult{Run: run, Err: err}
-			assertionRequest.channel <- runResult
+			log.Printf("[AssertionRunner] Test %s Run %d: update channel start\n", request.Test.ID, request.Run.ID)
+			e.subscriptionManager.PublishUpdate(subscription.Message{
+				ResourceID: run.TransactionStepResourceID(),
+				Type:       "run_update",
+				Content:    RunResult{Run: run, Err: err},
+			})
+			log.Printf("[AssertionRunner] Test %s Run %d: update channel complete\n", request.Test.ID, request.Run.ID)
 
 			if err != nil {
-				fmt.Println(err.Error())
+				log.Printf("[AssertionRunner] Test %s Run %d: error with runAssertionsAndUpdateResult: %s\n", request.Test.ID, request.Run.ID, err.Error())
 			}
 		}
 	}
 }
 
 func (e *defaultAssertionRunner) runAssertionsAndUpdateResult(ctx context.Context, request AssertionRequest) (model.Run, error) {
+	log.Printf("[AssertionRunner] Test %s Run %d: Starting\n", request.Test.ID, request.Run.ID)
 	run, err := e.executeAssertions(ctx, request)
 	if err != nil {
+		log.Printf("[AssertionRunner] Test %s Run %d: error executing assertions: %s\n", request.Test.ID, request.Run.ID, err.Error())
 		return model.Run{}, e.updater.Update(ctx, run.Failed(err))
 	}
+	log.Printf("[AssertionRunner] Test %s Run %d: Success. pass: %d, fail: %d\n", request.Test.ID, request.Run.ID, run.Pass, run.Fail)
 
 	err = e.updater.Update(ctx, run)
 	if err != nil {
+		log.Printf("[AssertionRunner] Test %s Run %d: error updating run: %s\n", request.Test.ID, request.Run.ID, err.Error())
 		return model.Run{}, fmt.Errorf("could not save result on database: %w", err)
 	}
 
@@ -116,15 +133,36 @@ func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, req Asse
 		return model.Run{}, fmt.Errorf("cannot process outputs: %w", err)
 	}
 
+	newEnvironment := createEnvironment(req.Run.Environment, outputs)
+
+	ds = []expression.DataStore{expression.EnvironmentDataStore{Values: newEnvironment.Values}}
+
 	assertionResult, allPassed := e.assertionExecutor.Assert(ctx, req.Test.Specs, *run.Trace, ds)
 
 	run = run.SuccessfullyAsserted(
 		outputs,
+		newEnvironment,
 		assertionResult,
 		allPassed,
 	)
 
 	return run, nil
+}
+
+func createEnvironment(environment model.Environment, outputs model.OrderedMap[string, string]) model.Environment {
+	outputVariables := make([]model.EnvironmentValue, 0)
+	outputs.ForEach(func(key, val string) error {
+		outputVariables = append(outputVariables, model.EnvironmentValue{
+			Key:   key,
+			Value: val,
+		})
+
+		return nil
+	})
+
+	outputEnv := model.Environment{Values: outputVariables}
+
+	return environment.Merge(outputEnv)
 }
 
 func (e *defaultAssertionRunner) RunAssertions(ctx context.Context, request AssertionRequest) {

@@ -17,10 +17,11 @@ OutsideInput {Source Identifier}
 Interpolation {OpenInterpolation OutsideInput CloseInterpolation}
 ComposedString {Quotes (Interpolation | String)+ Quotes}
 SupportedParsers {JsonPath}
-JsonPath {"json_path '" Identifier "'"}
+JsonPath {"json_path '$" Word "'"}
 
 @tokens {
   Identifier { $[a-zA-Z_.\-0-9]+ }
+  Word { $[a-zA-Z_.\-0-9\{\}\[\]]+ }
   Pipe {"|"}
   Number { @digit+ }
   Comparator {"=" | "contains" | "!=" | "<" | ">" | "<=" | ">=" | "not-contains" }

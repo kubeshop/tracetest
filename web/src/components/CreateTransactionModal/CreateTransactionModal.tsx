@@ -33,6 +33,7 @@ const CreateTransactionModal = ({isOpen, onClose}: IProps) => {
       isLoading={false}
       stepNumber={stepNumber}
       componentFactory={CreateTransactionFactory}
+      mode="CreateTransactionFactory"
     />
   ) : null;
 };

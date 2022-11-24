@@ -65,7 +65,12 @@ spec:
     assertions:
     - attr:sql.query contains "INSERT INTO tests"
 
-  # outputs:
-  # - name: TEST_ID
-  #   selector: span[name = "Tracetest trigger"]
-  #   value: attr:tracetest.response.body | json_path '$.id'
+  # ensure we can reference outputs declared in the same test
+  - selector: span[name = "Tracetest trigger"]
+    assertions:
+    - attr:tracetest.response.body | json_path '$.id' = env:TEST_ID
+
+  outputs:
+  - name: TEST_ID
+    selector: span[name = "Tracetest trigger"]
+    value: attr:tracetest.response.body | json_path '$.id'

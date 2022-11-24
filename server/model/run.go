@@ -31,14 +31,14 @@ func (r Run) ResourceID() string {
 	return fmt.Sprintf("test/%s/run/%d", r.TestID, r.ID)
 }
 
+func (r Run) TransactionStepResourceID() string {
+	return fmt.Sprintf("transaction_step/%s/run/%d", r.TestID, r.ID)
+}
+
 func (r Run) Copy() Run {
 	r.ID = 0
 	r.Results = nil
 	r.CreatedAt = Now()
-	r.ServiceTriggeredAt = time.Time{}
-	r.ServiceTriggerCompletedAt = time.Time{}
-	r.ObtainedTraceAt = time.Time{}
-	r.CompletedAt = time.Time{}
 
 	return r
 }
@@ -101,8 +101,14 @@ func (r Run) SuccessfullyPolledTraces(t *traces.Trace) Run {
 	return r
 }
 
-func (r Run) SuccessfullyAsserted(outputs OrderedMap[string, string], res OrderedMap[SpanQuery, []AssertionResult], allPassed bool) Run {
+func (r Run) SuccessfullyAsserted(
+	outputs OrderedMap[string, string],
+	environment Environment,
+	res OrderedMap[SpanQuery, []AssertionResult],
+	allPassed bool,
+) Run {
 	r.Outputs = outputs
+	r.Environment = environment
 	r.Results = &RunResults{
 		AllPassed: allPassed,
 		Results:   res,

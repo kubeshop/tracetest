@@ -12,6 +12,7 @@ import (
 	"time"
 
 	cienvironment "github.com/cucumber/ci-environment/go"
+	"github.com/joho/godotenv"
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/file"
 	"github.com/kubeshop/tracetest/cli/formatters"
@@ -22,6 +23,7 @@ import (
 
 type RunTestConfig struct {
 	DefinitionFile string
+	EnvID          string
 	WaitForResult  bool
 	JUnit          string
 }
@@ -36,6 +38,7 @@ var _ Action[RunTestConfig] = &runTestAction{}
 
 type runDefParams struct {
 	DefinitionFile string
+	EnvID          string
 	WaitForResult  bool
 	JunitFile      string
 	Metadata       map[string]string
@@ -54,26 +57,94 @@ func (a runTestAction) Run(ctx context.Context, args RunTestConfig) error {
 		return fmt.Errorf("--junit option requires --wait-for-result")
 	}
 
-	metadata := a.getMetadata()
 	a.logger.Debug(
 		"Running test from definition",
 		zap.String("definitionFile", args.DefinitionFile),
+		zap.String("environment", args.EnvID),
 		zap.Bool("waitForResults", args.WaitForResult),
 		zap.String("junit", args.JUnit),
 	)
-	params := runDefParams{
-		DefinitionFile: args.DefinitionFile,
-		WaitForResult:  args.WaitForResult,
-		JunitFile:      args.JUnit,
-		Metadata:       metadata,
+
+	envID, err := a.processEnv(ctx, args.EnvID)
+	if err != nil {
+		return fmt.Errorf("could not run definition: %w", err)
 	}
 
-	err := a.runDefinition(ctx, params)
+	params := runDefParams{
+		DefinitionFile: args.DefinitionFile,
+		EnvID:          envID,
+		WaitForResult:  args.WaitForResult,
+		JunitFile:      args.JUnit,
+		Metadata:       a.getMetadata(),
+	}
+
+	err = a.runDefinition(ctx, params)
 	if err != nil {
 		return fmt.Errorf("could not run definition: %w", err)
 	}
 
 	return nil
+}
+
+func stringReferencesFile(path string) bool {
+	return strings.HasPrefix(path, "./")
+}
+
+func (a runTestAction) processEnv(ctx context.Context, envID string) (string, error) {
+	if !stringReferencesFile(envID) { //not a file, do nothing
+		return envID, nil
+	}
+
+	envVars, err := godotenv.Read(envID)
+	if err != nil {
+		return "", fmt.Errorf(`cannot read env file "%s": %w`, envID, err)
+	}
+
+	values := make([]openapi.EnvironmentValue, 0, len(envVars))
+	for k, v := range envVars {
+		values = append(values, openapi.EnvironmentValue{
+			Key:   openapi.PtrString(k),
+			Value: openapi.PtrString(v),
+		})
+	}
+
+	name := filepath.Base(envID)
+
+	req := openapi.Environment{
+		Id:     &name,
+		Name:   &name,
+		Values: values,
+	}
+
+	body, resp, err := a.client.ApiApi.
+		CreateEnvironment(ctx).
+		Environment(req).
+		Execute()
+	if err != nil {
+		if resp.StatusCode == http.StatusBadRequest {
+			return a.updateEnv(ctx, req)
+		}
+
+		return "", fmt.Errorf("could not create environment: %w", err)
+	}
+
+	return body.GetId(), nil
+}
+
+func (a runTestAction) updateEnv(ctx context.Context, req openapi.Environment) (string, error) {
+	resp, err := a.client.ApiApi.
+		UpdateEnvironment(ctx, req.GetId()).
+		Environment(req).
+		Execute()
+	if err != nil {
+		return "", fmt.Errorf("could not update environment: %w", err)
+	}
+
+	if resp.StatusCode != http.StatusNoContent {
+		return "", fmt.Errorf("error updating environment")
+	}
+
+	return req.GetId(), nil
 }
 
 func (a runTestAction) testFileToID(ctx context.Context, originalPath, filePath string) (string, error) {
@@ -119,7 +190,7 @@ func (a runTestAction) runDefinitionFile(ctx context.Context, f file.File, param
 
 	if t, err := f.Definition().Transaction(); err == nil {
 		for i, step := range t.Steps {
-			if !strings.HasPrefix(step, "./") {
+			if !stringReferencesFile(step) {
 				// not referencing a file, keep the value
 				continue
 			}
@@ -154,7 +225,8 @@ func (a runTestAction) runDefinitionFile(ctx context.Context, f file.File, param
 		TextDefinition(openapi.TextDefinition{
 			Content: openapi.PtrString(f.Contents()),
 			RunInformation: &openapi.RunInformation{
-				Metadata: params.Metadata,
+				Metadata:      params.Metadata,
+				EnvironmentId: &params.EnvID,
 			},
 		}).
 		Execute()

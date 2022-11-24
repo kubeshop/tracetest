@@ -17,6 +17,7 @@ import {interpolationQLang} from 'components/Editor/Interpolation/grammar';
 import {selectorQLang} from 'components/Editor/Selector/grammar';
 import {IKeyValue} from 'constants/Test.constants';
 import {noop} from 'lodash';
+import AssertionService from './Assertion.service';
 
 const langMap = {
   [SupportedEditors.Expression]: expressionQLang,
@@ -29,6 +30,7 @@ interface IAutoCompleteProps {
   context: CompletionContext;
   attributeList?: TSpanFlatAttribute[];
   envEntryList?: IKeyValue[];
+  customValueList?: string[];
   onSelect?(option: Completion): void;
 }
 
@@ -70,6 +72,7 @@ const EditorService = () => ({
     state: EditorState,
     environmentList: IKeyValue[] = [],
     attributeList: TSpanFlatAttribute[] = [],
+    customValueList: string[] = [],
     onSelect: (option: Completion) => void = noop
   ): CompletionResult | null {
     if (node.name === Tokens.OpenInterpolation) {
@@ -122,17 +125,23 @@ const EditorService = () => ({
 
     return {
       from: 0,
-      options: attributeList.map(({key}) => ({
-        label: `attr:${key}`,
-        type: 'variableName',
-        apply(view: EditorView, completion: Completion, from: number, to: number) {
-          onSelect(completion);
+      options: customValueList.length
+        ? customValueList.map(value => ({
+            label: value,
+            type: 'variableName',
+            apply: AssertionService.extractExpectedString(value),
+          }))
+        : attributeList.map(({key}) => ({
+            label: `attr:${key}`,
+            type: 'variableName',
+            apply(view: EditorView, completion: Completion, from: number, to: number) {
+              onSelect(completion);
 
-          return view.dispatch({
-            changes: {from, to, insert: completion.label},
-          });
-        },
-      })),
+              return view.dispatch({
+                changes: {from, to, insert: completion.label},
+              });
+            },
+          })),
     };
   },
 
@@ -141,6 +150,7 @@ const EditorService = () => ({
     context,
     attributeList = [],
     envEntryList = [],
+    customValueList = [],
     onSelect = noop,
   }: IAutoCompleteProps): CompletionResult | null {
     const {state, pos} = context;
@@ -153,7 +163,7 @@ const EditorService = () => ({
     const operatorAutocomplete = this.getOperatorAutocomplete(node);
     if (operatorAutocomplete) return operatorAutocomplete;
 
-    return this.getSourceAutocomplete(type, node, state, envEntryList, attributeList, onSelect);
+    return this.getSourceAutocomplete(type, node, state, envEntryList, attributeList, customValueList, onSelect);
   },
 
   getIsQueryValid(

@@ -83,6 +83,7 @@ const TestsSelectionInput = ({value = [], onChange = noop, testList}: IProps) =>
             <Select
               placeholder="Add a test"
               onChange={onSelectedTest}
+              data-cy="transaction-test-selection"
               value={null}
               showSearch
               filterOption={(input, option) =>
@@ -90,7 +91,7 @@ const TestsSelectionInput = ({value = [], onChange = noop, testList}: IProps) =>
               }
             >
               {testList.map(({id, name}) => (
-                <Select.Option value={id} key={id}>
+                <Select.Option value={id} key={id} data-cy={name}>
                   {name}
                 </Select.Option>
               ))}

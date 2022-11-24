@@ -1,10 +1,10 @@
-import {noop} from 'lodash';
+import {noop, uniq} from 'lodash';
 import {Tooltip} from 'antd';
 import {EditorView} from '@codemirror/view';
 import {Extension} from '@codemirror/state';
 import {autocompletion} from '@codemirror/autocomplete';
 import CodeMirror, {ReactCodeMirrorRef} from '@uiw/react-codemirror';
-import {useCallback, useMemo, useRef} from 'react';
+import {useCallback, useMemo, useRef, useState} from 'react';
 import {useEnvironment} from 'providers/Environment/Environment.provider';
 import EditorService from 'services/Editor.service';
 import {SupportedEditors} from 'constants/Editor.constants';
@@ -23,6 +23,7 @@ const Expression = ({
   value = '',
   editable = true,
   extensions = [],
+  autocompleteCustomValues = [],
   autoFocus = false,
   onFocus = noop,
   indentWithTab = false,
@@ -30,12 +31,13 @@ const Expression = ({
   context = {},
 }: IEditorProps) => {
   const {testId = '', runId = ''} = context;
+  const [isHovering, setIsHovering] = useState(false);
   const {selectedEnvironment} = useEnvironment();
   const editorTheme = useEditorTheme();
-  const completionFn = useAutoComplete({testId, runId, onSelect: onSelectAutocompleteOption});
-  const {onHover, resolvedValues} = useTooltip({environmentId: selectedEnvironment?.id, ...context});
-
+  const completionFn = useAutoComplete({testId, runId, onSelect: onSelectAutocompleteOption, autocompleteCustomValues});
+  const {onHover, resolvedValues, isLoading} = useTooltip({environmentId: selectedEnvironment?.id, ...context});
   const ref = useRef<ReactCodeMirrorRef>(null);
+  const isValidQuery = useMemo(() => EditorService.getIsQueryValid(SupportedEditors.Expression, value), [value]);
 
   const extensionList: Extension[] = useMemo(
     () => [autocompletion({override: [completionFn]}), expressionQL(), EditorView.lineWrapping, ...extensions],
@@ -43,12 +45,12 @@ const Expression = ({
   );
 
   const handleHover = useCallback(() => {
-    if (EditorService.getIsQueryValid(SupportedEditors.Expression, value)) onHover(value);
-  }, [onHover, value]);
+    if (isValidQuery) onHover(value);
+  }, [isValidQuery, onHover, value]);
 
   const title = (
     <>
-      {resolvedValues.map((resolvedValue, index) => (
+      {uniq(resolvedValues).map((resolvedValue, index) => (
         // eslint-disable-next-line react/no-array-index-key
         <p key={`${resolvedValue}-${index}`}>{resolvedValue}</p>
       ))}
@@ -56,8 +58,12 @@ const Expression = ({
   );
 
   return (
-    <S.ExpressionEditorContainer $isEditable={editable}>
-      <Tooltip placement="topLeft" title={title}>
+    <S.ExpressionEditorContainer
+      $isEditable={editable}
+      onMouseEnter={() => Boolean(value) && !isLoading && isValidQuery && setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
+    >
+      <Tooltip placement="topLeft" title={title} visible={isHovering}>
         <CodeMirror
           ref={ref}
           onFocus={() => onFocus(ref.current?.view!)}

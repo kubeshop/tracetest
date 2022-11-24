@@ -15,6 +15,7 @@ export const Container = styled.div<{$isWhite?: boolean}>`
   justify-content: space-between;
   padding: 12px 0;
   width: 100%;
+  margin-bottom: 16px;
 `;
 
 export const Section = styled.div`

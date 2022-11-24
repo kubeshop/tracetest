@@ -3,6 +3,7 @@ package executor
 import (
 	"context"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/kubeshop/tracetest/server/config"
@@ -127,7 +128,7 @@ func (r persistentTransactionRunner) runTransactionStep(ctx context.Context, tra
 		return model.TransactionRun{}, fmt.Errorf("could not load transaction step: %w", err)
 	}
 
-	testRun, completedTestChannel := r.testRunner.Run(ctx, test, transactionRun.Metadata, transactionRun.Environment)
+	testRun := r.testRunner.Run(ctx, test, transactionRun.Metadata, transactionRun.Environment)
 	stepRun := createStepRun(testRun)
 	transactionRun.StepRuns = append(transactionRun.StepRuns, stepRun)
 
@@ -158,30 +159,20 @@ func (r persistentTransactionRunner) runTransactionStep(ctx context.Context, tra
 		return model.TransactionRun{}, fmt.Errorf("could not update transaction run: %w", err)
 	}
 
-	runResult := <-completedTestChannel
-	testRun, err = runResult.Run, runResult.Err
-	if err != nil {
-		transactionRun.State = model.TransactionRunStateFailed
-		transactionRun.StepRuns[stepIndex] = createStepRun(testRun)
-		r.updater.Update(ctx, transactionRun)
+	var wg sync.WaitGroup
+	wgPtr := &wg
+	wg.Add(1)
 
-		return model.TransactionRun{}, fmt.Errorf("could not run step: %w", err)
-	}
+	r.subscriptionManager.Subscribe(testRun.TransactionStepResourceID(), subscription.NewSubscriberFunction(
+		func(m subscription.Message) error {
+			defer wgPtr.Done()
+			runResult := m.Content.(RunResult)
 
-	stepRun = createStepRun(testRun)
+			return r.updateTransactionRun(ctx, stepIndex, &transactionRun, runResult)
+		}),
+	)
 
-	transactionRun.StepRuns[stepIndex] = stepRun
-
-	if testRun.State == model.RunStateFailed {
-		transactionRun.State = model.TransactionRunStateFailed
-	} else {
-		transactionRun.CurrentTest += 1
-	}
-
-	err = r.updater.Update(ctx, transactionRun)
-	if err != nil {
-		return model.TransactionRun{}, fmt.Errorf("could not update transaction run: %w", err)
-	}
+	wg.Wait()
 
 	return transactionRun, nil
 }
@@ -195,4 +186,28 @@ func createStepRun(testRun model.Run) model.TransactionStepRun {
 		Environment: testRun.Environment,
 		Outputs:     testRun.Outputs,
 	}
+}
+
+func (r persistentTransactionRunner) updateTransactionRun(ctx context.Context, stepIndex int, transactionRun *model.TransactionRun, runResult RunResult) error {
+	testRun, err := runResult.Run, runResult.Err
+	if err != nil {
+		transactionRun.State = model.TransactionRunStateFailed
+		transactionRun.StepRuns[stepIndex] = createStepRun(testRun)
+		r.updater.Update(ctx, *transactionRun)
+
+		return err
+	}
+
+	stepRun := createStepRun(testRun)
+
+	transactionRun.StepRuns[stepIndex] = stepRun
+
+	if testRun.State == model.RunStateFailed {
+		transactionRun.State = model.TransactionRunStateFailed
+	} else {
+		transactionRun.CurrentTest += 1
+	}
+
+	err = r.updater.Update(ctx, *transactionRun)
+	return err
 }

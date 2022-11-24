@@ -33,6 +33,7 @@ const CreateTestModal = ({isOpen, onClose}: IProps) => {
       isLoading={isLoading}
       stepNumber={stepNumber}
       componentFactory={CreateTestFactory}
+      mode="CreateTestFactory"
     />
   ) : null;
 };

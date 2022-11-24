@@ -27,25 +27,6 @@ run:
 build:
 	go build -o tracetest-server -ldflags="$(GO_LDFLAGS)" .
 
-OPENAPI_GENERATOR_VER=v5.4.0
-OPENAPI_GENERATOR_IMAGE=openapitools/openapi-generator-cli:$(OPENAPI_GENERATOR_VER)
-OPENAPI_GENERATOR_CLI=docker run --rm -u ${shell id -u}  -v "${PWD}:/app" -v "${PWD}/../api:/app/api" -w "/app" ${OPENAPI_GENERATOR_IMAGE}
-OPENAPI_SERVER_TARGET_DIR=./openapi
-generate:
-	rm -rf $(OPENAPI_SERVER_TARGET_DIR)
-	mkdir -p ./tmp
-
-	$(OPENAPI_GENERATOR_CLI)  generate \
-		-i api/openapi.yaml \
-		-g go-server \
-		-o ./tmp \
-		--generate-alias-as-model
-	mv ./tmp/go $(OPENAPI_SERVER_TARGET_DIR)
-	rm -f $(OPENAPI_SERVER_TARGET_DIR)/api_api_service.go
-	rm -rf ./tmp
-
-	go fmt ./...
-
 PROTOC_VER=0.3.1
 UNAME_P := $(shell uname -p)
 ifeq ($(UNAME_P),x86_64)

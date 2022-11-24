@@ -15,6 +15,7 @@ interface IProps {
   stepNumber: number;
   isLoading: boolean;
   isValid: boolean;
+  mode: string;
 }
 
 const CreateModal = ({
@@ -29,6 +30,7 @@ const CreateModal = ({
   stepNumber,
   isLoading,
   isValid,
+  mode,
 }: IProps) => {
   const isLastStep = stepNumber === stepList.length - 1;
   const step = stepList[stepNumber];
@@ -47,6 +49,7 @@ const CreateModal = ({
           isLoading={isLoading}
           stepNumber={stepNumber}
           step={step}
+          mode={mode}
         />
       }
     >
@@ -56,6 +59,7 @@ const CreateModal = ({
         stepList={stepList}
         selectedKey={activeStep}
         componentFactory={componentFactory}
+        mode={mode}
       />
     </S.Modal>
   );

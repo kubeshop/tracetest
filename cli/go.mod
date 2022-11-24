@@ -9,6 +9,7 @@ require (
 	github.com/compose-spec/compose-go v1.5.1
 	github.com/cucumber/ci-environment/go v0.0.0-20220915001957-711b1c82415f
 	github.com/denisbrodbeck/machineid v1.0.1
+	github.com/joho/godotenv v1.3.0
 	github.com/kubeshop/tracetest/server v0.0.0
 	github.com/pterm/pterm v0.12.46
 	github.com/segmentio/analytics-go/v3 v3.2.1
@@ -39,6 +40,7 @@ require (
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/gookit/color v1.5.2 // indirect
+	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/imdario/mergo v0.3.13 // indirect
 	github.com/inconshreveable/mousetrap v1.0.1 // indirect
