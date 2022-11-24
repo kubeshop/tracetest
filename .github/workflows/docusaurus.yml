@@ -6,7 +6,6 @@ on:
       - main
     paths:
       - "docs/**"
-      - "mkdocs.yml"
       - "api/*"
 
   # Allows you to run this workflow manually from the Actions tab
