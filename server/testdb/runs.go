@@ -295,15 +295,27 @@ func count(r model.Run) (pass, fail int) {
 }
 
 func (td *postgresDB) DeleteRun(ctx context.Context, r model.Run) error {
-	stmt, err := td.db.Prepare("DELETE FROM test_runs WHERE id = $1 AND test_id = $2")
-	if err != nil {
-		return fmt.Errorf("prepare: %w", err)
+	queries := []string{
+		"DELETE FROM transaction_run_steps WHERE test_run_id = $1 AND test_run_test_id = $2",
+		"DELETE FROM test_runs WHERE id = $1 AND test_id = $2",
 	}
-	defer stmt.Close()
 
-	_, err = stmt.ExecContext(ctx, r.ID, r.TestID)
+	tx, err := td.db.BeginTx(ctx, nil)
 	if err != nil {
-		return fmt.Errorf("sql exec: %w", err)
+		return fmt.Errorf("sql BeginTx: %w", err)
+	}
+
+	for _, sql := range queries {
+		_, err := tx.ExecContext(ctx, sql, r.ID, r.TestID)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("sql error: %w", err)
+		}
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return fmt.Errorf("sql Commit: %w", err)
 	}
 
 	return nil
