@@ -1,6 +1,6 @@
 import {Button, Form} from 'antd';
 import {useCallback, useState} from 'react';
-import {TDraftTransaction, TTransaction} from 'types/Transaction.types';
+import {TDraftTransaction} from 'types/Transaction.types';
 import {useTransaction} from 'providers/Transaction/Transaction.provider';
 import useValidateTransactionDraft from 'hooks/useValidateTransactionDraft';
 import {TTransactionRun} from 'types/TransactionRun.types';
@@ -10,7 +10,7 @@ import * as S from './EditTransaction.styled';
 import EditTransactionForm from '../EditTransactionForm';
 
 interface IProps {
-  transaction: TTransaction;
+  transaction: TDraftTransaction;
   transactionRun: TTransactionRun;
 }
 
