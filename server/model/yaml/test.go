@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	dc "github.com/fluidtruck/deepcopy"
-	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 )
 
@@ -43,7 +42,7 @@ type Test struct {
 	ID          string      `mapstructure:"id"`
 	Name        string      `mapstructure:"name"`
 	Description string      `mapstructure:"description" yaml:",omitempty"`
-	Trigger     TestTrigger `mapstructure:"trigger"`
+	Trigger     TestTrigger `mapstructure:"trigger" dc:"serviceUnderTest"`
 	Specs       TestSpecs   `mapstructure:"specs" yaml:",omitempty"`
 	Outputs     Outputs     `mapstructure:"outputs,omitempty" yaml:",omitempty"`
 }
@@ -64,14 +63,6 @@ type TestTrigger struct {
 	Type        string      `mapstructure:"type"`
 	HTTPRequest HTTPRequest `mapstructure:"httpRequest" yaml:"httpRequest,omitempty" dc:"http"`
 	GRPC        GRPC        `mapstructure:"grpc" yaml:"grpc,omitempty"`
-}
-
-func (t TestTrigger) Model() model.Trigger {
-	out := model.Trigger{}
-	dc.DeepCopy(t, &out)
-
-	return out
-
 }
 
 func (t TestTrigger) Validate() error {
@@ -106,14 +97,10 @@ type TestSpec struct {
 }
 
 func (t Test) Model() model.Test {
-	mt := model.Test{
-		ID:               id.ID(t.ID),
-		Name:             t.Name,
-		Description:      t.Description,
-		ServiceUnderTest: t.Trigger.Model(),
-		Specs:            t.Specs.Model(),
-		Outputs:          t.Outputs.Model(),
-	}
+	mt := model.Test{}
+	dc.DeepCopy(t, &mt)
+	mt.Specs = t.Specs.Model()
+	mt.Outputs = t.Outputs.Model()
 
 	return mt
 }

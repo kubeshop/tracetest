@@ -11,15 +11,6 @@ func Test(in model.Test) yaml.File {
 	dc.DeepCopy(in, &out)
 	dc.DeepCopy(in.ServiceUnderTest, &out.Trigger)
 
-	if in.ServiceUnderTest.GRPC != nil {
-		dc.DeepCopy(in.ServiceUnderTest.GRPC, &out.Trigger.GRPC)
-	}
-
-	if in.ServiceUnderTest.HTTP != nil {
-		dc.DeepCopy(in.ServiceUnderTest.HTTP, &out.Trigger.HTTPRequest)
-		dc.DeepCopy(in.ServiceUnderTest.HTTP.Auth, &out.Trigger.HTTPRequest.Authentication)
-	}
-
 	in.Specs.ForEach(func(key model.SpanQuery, val model.NamedAssertions) error {
 		spec := yaml.TestSpec{
 			Selector: string(key),
@@ -30,6 +21,7 @@ func Test(in model.Test) yaml.File {
 
 		return nil
 	})
+
 	in.Outputs.ForEach(func(key string, val model.Output) error {
 		out.Outputs = append(out.Outputs, yaml.Output{
 			Name:     key,

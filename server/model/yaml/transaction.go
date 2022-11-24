@@ -3,6 +3,7 @@ package yaml
 import (
 	"fmt"
 
+	dc "github.com/fluidtruck/deepcopy"
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 )
@@ -16,19 +17,15 @@ type Transaction struct {
 }
 
 func (t Transaction) Model() model.Transaction {
+	mt := model.Transaction{}
+	dc.DeepCopy(t, &mt)
 	steps := make([]model.Test, 0, len(t.Steps))
 	for _, stepID := range t.Steps {
 		steps = append(steps, model.Test{
 			ID: id.ID(stepID),
 		})
 	}
-
-	mt := model.Transaction{
-		ID:          id.ID(t.ID),
-		Name:        t.Name,
-		Description: t.Description,
-		Steps:       steps,
-	}
+	mt.Steps = steps
 
 	return mt
 }
