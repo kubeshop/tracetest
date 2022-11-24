@@ -27,11 +27,19 @@ func (r HTTPRequest) Validate() error {
 		}
 	}
 
-	if err := r.Authentication.Validate(); err != nil {
+	if err := r.validateAuth(); err != nil {
 		return fmt.Errorf("http authentication must be valid: %w", err)
 	}
 
 	return nil
+}
+
+func (r HTTPRequest) validateAuth() error {
+	if r.Authentication == nil {
+		return nil
+	}
+
+	return r.Authentication.Validate()
 }
 
 type HTTPHeader struct {
@@ -116,6 +124,7 @@ type HTTPAPIKeyAuth struct {
 }
 
 func (aka HTTPAPIKeyAuth) Validate() error {
+	fmt.Println("ACA!!!!", aka.Value)
 	if aka.Key == "" {
 		return fmt.Errorf("key cannot be empty")
 	}
