@@ -2,33 +2,14 @@ package yaml
 
 import (
 	"fmt"
-
-	"github.com/kubeshop/tracetest/server/model"
 )
 
-type HTTPHeaders []HTTPHeader
-
-func (hs HTTPHeaders) Model() []model.HTTPHeader {
-	if len(hs) == 0 {
-		return nil
-	}
-	mh := make([]model.HTTPHeader, 0, len(hs))
-	for _, h := range hs {
-		mh = append(mh, model.HTTPHeader{
-			Key:   h.Key,
-			Value: h.Value,
-		})
-	}
-
-	return mh
-}
-
 type HTTPRequest struct {
-	URL            string             `yaml:"url"`
-	Method         string             `yaml:"method"`
-	Headers        HTTPHeaders        `yaml:"headers,omitempty"`
-	Authentication HTTPAuthentication `yaml:"authentication,omitempty"`
-	Body           string             `yaml:"body,omitempty"`
+	URL            string              `yaml:"url"`
+	Method         string              `yaml:"method"`
+	Headers        []HTTPHeader        `yaml:"headers,omitempty" dc:"headers"`
+	Authentication *HTTPAuthentication `yaml:"authentication,omitempty" dc:"auth"`
+	Body           string              `yaml:"body,omitempty"`
 }
 
 func (r HTTPRequest) Validate() error {
@@ -46,11 +27,19 @@ func (r HTTPRequest) Validate() error {
 		}
 	}
 
-	if err := r.Authentication.Validate(); err != nil {
+	if err := r.validateAuth(); err != nil {
 		return fmt.Errorf("http authentication must be valid: %w", err)
 	}
 
 	return nil
+}
+
+func (r HTTPRequest) validateAuth() error {
+	if r.Authentication == nil {
+		return nil
+	}
+
+	return r.Authentication.Validate()
 }
 
 type HTTPHeader struct {
@@ -67,39 +56,10 @@ func (h HTTPHeader) Validate() error {
 }
 
 type HTTPAuthentication struct {
-	Type   string         `yaml:"type,omitempty"`
-	Basic  HTTPBasicAuth  `yaml:"basic,omitempty"`
-	ApiKey HTTPAPIKeyAuth `yaml:"apiKey,omitempty"`
-	Bearer HTTPBearerAuth `yaml:"bearer,omitempty"`
-}
-
-func (a HTTPAuthentication) Model() *model.HTTPAuthenticator {
-	var props map[string]string
-	switch a.Type {
-	case "":
-		// auth not set
-		return nil
-	case "apiKey":
-		props = map[string]string{
-			"key":   a.ApiKey.Key,
-			"value": a.ApiKey.Value,
-			"in":    a.ApiKey.In,
-		}
-	case "basic":
-		props = map[string]string{
-			"username": a.Basic.User,
-			"password": a.Basic.Password,
-		}
-	case "bearer":
-		props = map[string]string{
-			"token": a.Bearer.Token,
-		}
-	}
-
-	return &model.HTTPAuthenticator{
-		Type:  a.Type,
-		Props: props,
-	}
+	Type   string          `yaml:"type,omitempty"`
+	Basic  *HTTPBasicAuth  `yaml:"basic,omitempty"`
+	APIKey *HTTPAPIKeyAuth `yaml:"apiKey,omitempty"`
+	Bearer *HTTPBearerAuth `yaml:"bearer,omitempty"`
 }
 
 func (a HTTPAuthentication) Validate() error {
@@ -115,7 +75,7 @@ func (a HTTPAuthentication) Validate() error {
 		}
 		return nil
 	case "apiKey":
-		if err := a.ApiKey.Validate(); err != nil {
+		if err := a.APIKey.Validate(); err != nil {
 			return fmt.Errorf("apiKey authentication must be valid: %w", err)
 		}
 		return nil
@@ -129,12 +89,12 @@ func (a HTTPAuthentication) Validate() error {
 }
 
 type HTTPBasicAuth struct {
-	User     string `yaml:"user"`
+	Username string `yaml:"username"`
 	Password string `yaml:"password"`
 }
 
 func (ba HTTPBasicAuth) Validate() error {
-	if ba.User == "" {
+	if ba.Username == "" {
 		return fmt.Errorf("user cannot be empty")
 	}
 
@@ -146,7 +106,7 @@ func (ba HTTPBasicAuth) Validate() error {
 }
 
 type HTTPBearerAuth struct {
-	Token string `yaml:"token"`
+	Token string `yaml:"token" dc:"bearer"`
 }
 
 func (ba HTTPBearerAuth) Validate() error {

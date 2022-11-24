@@ -2,11 +2,9 @@ package yaml
 
 import (
 	"fmt"
-	"strings"
 
-	"github.com/kubeshop/tracetest/server/id"
+	dc "github.com/fluidtruck/deepcopy"
 	"github.com/kubeshop/tracetest/server/model"
-	"github.com/kubeshop/tracetest/server/openapi"
 )
 
 type TestSpecs []TestSpec
@@ -44,7 +42,7 @@ type Test struct {
 	ID          string      `mapstructure:"id"`
 	Name        string      `mapstructure:"name"`
 	Description string      `mapstructure:"description" yaml:",omitempty"`
-	Trigger     TestTrigger `mapstructure:"trigger"`
+	Trigger     TestTrigger `mapstructure:"trigger" dc:"serviceUnderTest"`
 	Specs       TestSpecs   `mapstructure:"specs" yaml:",omitempty"`
 	Outputs     Outputs     `mapstructure:"outputs,omitempty" yaml:",omitempty"`
 }
@@ -63,27 +61,8 @@ func (t Test) Validate() error {
 
 type TestTrigger struct {
 	Type        string      `mapstructure:"type"`
-	HTTPRequest HTTPRequest `mapstructure:"httpRequest" yaml:"httpRequest,omitempty"`
+	HTTPRequest HTTPRequest `mapstructure:"httpRequest" yaml:"httpRequest,omitempty" dc:"http"`
 	GRPC        GRPC        `mapstructure:"grpc" yaml:"grpc,omitempty"`
-}
-
-func (t TestTrigger) Model() model.Trigger {
-	mt := model.Trigger{
-		Type: model.TriggerType(t.Type),
-	}
-
-	switch t.Type {
-	case "http":
-		hr := t.HTTPRequest
-		mt.HTTP = &model.HTTPRequest{
-			Method:  model.HTTPMethod(hr.Method),
-			URL:     hr.URL,
-			Headers: hr.Headers.Model(),
-			Body:    hr.Body,
-			Auth:    hr.Authentication.Model(),
-		}
-	}
-	return mt
 }
 
 func (t TestTrigger) Validate() error {
@@ -118,119 +97,10 @@ type TestSpec struct {
 }
 
 func (t Test) Model() model.Test {
-	mt := model.Test{
-		ID:               id.ID(t.ID),
-		Name:             t.Name,
-		Description:      t.Description,
-		ServiceUnderTest: t.Trigger.Model(),
-		Specs:            t.Specs.Model(),
-		Outputs:          t.Outputs.Model(),
-	}
+	mt := model.Test{}
+	dc.DeepCopy(t, &mt)
+	mt.Specs = t.Specs.Model()
+	mt.Outputs = t.Outputs.Model()
 
 	return mt
-}
-
-func GetTestFromOpenapiObject(test openapi.Test) (Test, error) {
-	return Test{
-		ID:          test.Id,
-		Name:        test.Name,
-		Description: test.Description,
-		Trigger:     convertServiceUnderTestIntoTrigger(test.ServiceUnderTest),
-		Specs:       convertOpenAPITestSpecIntoSpecArray(test.Specs),
-	}, nil
-}
-
-func convertServiceUnderTestIntoTrigger(trigger openapi.Trigger) TestTrigger {
-
-	return TestTrigger{
-		Type:        trigger.TriggerType,
-		HTTPRequest: convertHTTPRequestOpenAPIIntoDefinition(trigger.TriggerSettings.Http),
-		GRPC:        convertGRPCOpenAPIIntoDefinition(trigger.TriggerSettings.Grpc),
-	}
-}
-
-func convertGRPCOpenAPIIntoDefinition(request openapi.GrpcRequest) GRPC {
-	metadata := make([]GRPCHeader, 0, len(request.Metadata))
-	for _, meta := range request.Metadata {
-		metadata = append(metadata, GRPCHeader{
-			Key:   meta.Key,
-			Value: meta.Value,
-		})
-	}
-
-	return GRPC{
-		ProtobufFile: (request.ProtobufFile),
-		Address:      (request.Address),
-		Method:       (request.Method),
-		Metadata:     metadata,
-		Auth:         getAuthDefinition(request.Auth),
-		Request:      (request.Request),
-	}
-}
-
-func convertHTTPRequestOpenAPIIntoDefinition(request openapi.HttpRequest) HTTPRequest {
-	headers := make([]HTTPHeader, 0, len(request.Headers))
-	for _, header := range request.Headers {
-		headers = append(headers, HTTPHeader{
-			Key:   (header.Key),
-			Value: (header.Value),
-		})
-	}
-
-	return HTTPRequest{
-		URL:            (request.Url),
-		Method:         (request.Method),
-		Headers:        headers,
-		Body:           (request.Body),
-		Authentication: getAuthDefinition(request.Auth),
-	}
-}
-
-func getAuthDefinition(auth openapi.HttpAuth) HTTPAuthentication {
-	switch strings.ToLower(auth.Type) {
-	case "basic":
-		return HTTPAuthentication{
-			Type: "basic",
-			Basic: HTTPBasicAuth{
-				User:     auth.Basic.Username,
-				Password: auth.Basic.Password,
-			},
-		}
-	case "apikey":
-		return HTTPAuthentication{
-			Type: "apikey",
-			ApiKey: HTTPAPIKeyAuth{
-				Key:   auth.ApiKey.Key,
-				Value: auth.ApiKey.Value,
-				In:    auth.ApiKey.In,
-			},
-		}
-	case "bearer":
-		return HTTPAuthentication{
-			Type: "bearer",
-			Bearer: HTTPBearerAuth{
-				Token: auth.Bearer.Token,
-			},
-		}
-	default:
-		return HTTPAuthentication{}
-	}
-}
-
-func convertOpenAPITestSpecIntoSpecArray(testSpec openapi.TestSpecs) []TestSpec {
-	definitionArray := make([]TestSpec, 0, len(testSpec.Specs))
-	for _, def := range testSpec.Specs {
-		name := ""
-		if def.Name != nil {
-			name = *def.Name
-		}
-		newDefinition := TestSpec{
-			Name:       name,
-			Selector:   def.Selector.Query,
-			Assertions: def.Assertions,
-		}
-		definitionArray = append(definitionArray, newDefinition)
-	}
-
-	return definitionArray
 }

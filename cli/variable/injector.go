@@ -38,6 +38,8 @@ func (i Injector) Inject(target interface{}) error {
 
 func (i Injector) inject(target reflect.Value) error {
 	switch target.Kind() {
+	case reflect.Pointer:
+		i.inject(target.Elem())
 	case reflect.Struct:
 		return i.injectValuesIntoStruct(target)
 	case reflect.Interface:

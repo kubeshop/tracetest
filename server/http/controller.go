@@ -17,6 +17,7 @@ import (
 	"github.com/kubeshop/tracetest/server/junit"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/model/yaml"
+	"github.com/kubeshop/tracetest/server/model/yaml/yamlconvert"
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/testdb"
 	"go.opentelemetry.io/otel/trace"
@@ -440,16 +441,7 @@ func (c controller) GetTestVersionDefinitionFile(ctx context.Context, testID str
 		return handleDBError(err), err
 	}
 
-	openapiTest := c.mappers.Out.Test(test)
-	yamlTest, err := yaml.GetTestFromOpenapiObject(openapiTest)
-	if err != nil {
-		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
-	}
-
-	enc, err := yaml.Encode(yaml.File{
-		Type: yaml.FileTypeTest,
-		Spec: yamlTest,
-	})
+	enc, err := yaml.Encode(yamlconvert.Test(test))
 	if err != nil {
 		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
 	}

@@ -3,33 +3,20 @@ package yaml
 import (
 	"fmt"
 
+	dc "github.com/fluidtruck/deepcopy"
 	"github.com/kubeshop/tracetest/server/model"
 )
 
 type Environment struct {
-	ID          string            `mapstructure:"id"`
-	Name        string            `mapstructure:"name"`
-	Description string            `mapstructure:"description" yaml:",omitempty"`
-	Values      EnvironmentValues `mapstructure:"values"`
+	ID          string             `mapstructure:"id"`
+	Name        string             `mapstructure:"name"`
+	Description string             `mapstructure:"description" yaml:",omitempty"`
+	Values      []EnvironmentValue `mapstructure:"values"`
 }
 
 type EnvironmentValue struct {
 	Key   string `mapstructure:"key"`
 	Value string `mapstructure:"value"`
-}
-
-type EnvironmentValues []EnvironmentValue
-
-func (evs EnvironmentValues) Model() []model.EnvironmentValue {
-	mevs := make([]model.EnvironmentValue, 0, len(evs))
-	for _, ev := range evs {
-		mevs = append(mevs, model.EnvironmentValue{
-			Key:   ev.Key,
-			Value: ev.Value,
-		})
-	}
-
-	return mevs
 }
 
 func (e Environment) Validate() error {
@@ -47,12 +34,8 @@ func (e Environment) Validate() error {
 }
 
 func (e Environment) Model() model.Environment {
-	me := model.Environment{
-		ID:          e.ID,
-		Name:        e.Name,
-		Description: e.Description,
-		Values:      e.Values.Model(),
-	}
+	me := model.Environment{}
+	dc.DeepCopy(e, &me)
 
 	return me
 }

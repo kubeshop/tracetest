@@ -19,7 +19,7 @@ func TestLoadDefinition(t *testing.T) {
 		envVariables  map[string]string
 	}{
 		{
-			name:          "Should_parse_valid_definition_file",
+			name:          "Basic",
 			file:          "../testdata/definitions/valid_http_test_definition.yml",
 			expectSuccess: true,
 			expected: yaml.File{
@@ -77,7 +77,7 @@ func TestLoadDefinition(t *testing.T) {
 			},
 		},
 		{
-			name:          "Should_parse_valid_definition_file_with_id",
+			name:          "HandleID",
 			file:          "../testdata/definitions/valid_http_test_definition_with_id.yml",
 			expectSuccess: true,
 			expected: yaml.File{
@@ -135,7 +135,7 @@ func TestLoadDefinition(t *testing.T) {
 			},
 		},
 		{
-			name:          "Should_parse_valid_definition_file_with_id",
+			name:          "EnvVars",
 			file:          "../testdata/definitions/valid_http_test_definition_with_env_variables.yml",
 			expectSuccess: true,
 			envVariables: map[string]string{
@@ -155,9 +155,9 @@ func TestLoadDefinition(t *testing.T) {
 								{Key: "Content-Type", Value: "application/json"},
 							},
 							Body: `{ "id": 52 }`,
-							Authentication: yaml.HTTPAuthentication{
+							Authentication: &yaml.HTTPAuthentication{
 								Type: "apiKey",
-								ApiKey: yaml.HTTPAPIKeyAuth{
+								APIKey: &yaml.HTTPAPIKeyAuth{
 									Key:   "X-Key",
 									Value: "1234",
 									In:    "header",
@@ -178,7 +178,7 @@ func TestLoadDefinition(t *testing.T) {
 			}
 
 			defer func() {
-				for envName, _ := range testCase.envVariables {
+				for envName := range testCase.envVariables {
 					os.Unsetenv(envName)
 				}
 			}()
@@ -186,10 +186,13 @@ func TestLoadDefinition(t *testing.T) {
 			actual, err := file.Read(testCase.file)
 			if testCase.expectSuccess {
 				require.NoError(t, err)
+
 				err = actual.Definition().Validate()
 				assert.NoError(t, err)
+
 				resolvedFile, err := actual.ResolveVariables()
 				assert.NoError(t, err)
+
 				assert.Equal(t, testCase.expected, resolvedFile.Definition())
 			} else {
 				require.Error(t, err, "LoadDefinition should fail")

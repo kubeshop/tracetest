@@ -3,6 +3,7 @@ package yaml_test
 import (
 	"testing"
 
+	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/model/yaml"
 	"github.com/stretchr/testify/assert"
@@ -28,8 +29,7 @@ func TestTestModel(t *testing.T) {
 						Headers: []yaml.HTTPHeader{
 							{Key: "Content-Type", Value: "application/json"},
 						},
-						Authentication: yaml.HTTPAuthentication{},
-						Body:           "",
+						Body: "",
 					},
 				},
 			},
@@ -63,10 +63,10 @@ func TestTestModel(t *testing.T) {
 							{Key: "Content-Type", Value: "application/json"},
 						},
 						Body: "",
-						Authentication: yaml.HTTPAuthentication{
+						Authentication: &yaml.HTTPAuthentication{
 							Type: "basic",
-							Basic: yaml.HTTPBasicAuth{
-								User:     "matheus",
+							Basic: &yaml.HTTPBasicAuth{
+								Username: "matheus",
 								Password: "pikachu",
 							},
 						},
@@ -87,9 +87,9 @@ func TestTestModel(t *testing.T) {
 						Body: "",
 						Auth: &model.HTTPAuthenticator{
 							Type: "basic",
-							Props: map[string]string{
-								"username": "matheus",
-								"password": "pikachu",
+							Basic: model.BasicAuthenticator{
+								Username: "matheus",
+								Password: "pikachu",
 							},
 						},
 					},
@@ -110,9 +110,9 @@ func TestTestModel(t *testing.T) {
 							{Key: "Content-Type", Value: "application/json"},
 						},
 						Body: "",
-						Authentication: yaml.HTTPAuthentication{
+						Authentication: &yaml.HTTPAuthentication{
 							Type: "apiKey",
-							ApiKey: yaml.HTTPAPIKeyAuth{
+							APIKey: &yaml.HTTPAPIKeyAuth{
 								Key:   "X-Key",
 								Value: "my-api-key",
 								In:    "header",
@@ -135,10 +135,10 @@ func TestTestModel(t *testing.T) {
 						Body: "",
 						Auth: &model.HTTPAuthenticator{
 							Type: "apiKey",
-							Props: map[string]string{
-								"key":   "X-Key",
-								"value": "my-api-key",
-								"in":    "header",
+							APIKey: model.APIKeyAuthenticator{
+								Key:   "X-Key",
+								Value: "my-api-key",
+								In:    "header",
 							},
 						},
 					},
@@ -159,9 +159,9 @@ func TestTestModel(t *testing.T) {
 							{Key: "Content-Type", Value: "application/json"},
 						},
 						Body: "",
-						Authentication: yaml.HTTPAuthentication{
+						Authentication: &yaml.HTTPAuthentication{
 							Type: "bearer",
-							Bearer: yaml.HTTPBearerAuth{
+							Bearer: &yaml.HTTPBearerAuth{
 								Token: "my-token",
 							},
 						},
@@ -182,8 +182,8 @@ func TestTestModel(t *testing.T) {
 						Body: "",
 						Auth: &model.HTTPAuthenticator{
 							Type: "bearer",
-							Props: map[string]string{
-								"token": "my-token",
+							Bearer: model.BearerAuthenticator{
+								Bearer: "my-token",
 							},
 						},
 					},
@@ -203,8 +203,7 @@ func TestTestModel(t *testing.T) {
 						Headers: []yaml.HTTPHeader{
 							{Key: "Content-Type", Value: "application/json"},
 						},
-						Authentication: yaml.HTTPAuthentication{},
-						Body:           `{ "message": "hello" }`,
+						Body: `{ "message": "hello" }`,
 					},
 				},
 			},
@@ -232,11 +231,9 @@ func TestTestModel(t *testing.T) {
 				Trigger: yaml.TestTrigger{
 					Type: "http",
 					HTTPRequest: yaml.HTTPRequest{
-						URL:            "http://localhost:1234",
-						Method:         "POST",
-						Headers:        []yaml.HTTPHeader{},
-						Authentication: yaml.HTTPAuthentication{},
-						Body:           "",
+						URL:    "http://localhost:1234",
+						Method: "POST",
+						Body:   "",
 					},
 				},
 				Specs: []yaml.TestSpec{
@@ -322,6 +319,98 @@ func TestTestModel(t *testing.T) {
 			require.NoError(t, err)
 
 			actual := test.Model()
+
+			assert.Equal(t, cl.expected, actual)
+		})
+	}
+}
+
+func TestEnvironmentModel(t *testing.T) {
+	cases := []struct {
+		name     string
+		in       yaml.Environment
+		expected model.Environment
+	}{
+		{
+			name: "Basic",
+			in: yaml.Environment{
+				ID:          "prod",
+				Name:        "prod",
+				Description: "Production",
+				Values: []yaml.EnvironmentValue{
+					{Key: "USER_ID", Value: "1"},
+				},
+			},
+			expected: model.Environment{
+				ID:          "prod",
+				Name:        "prod",
+				Description: "Production",
+				Values: []model.EnvironmentValue{
+					{Key: "USER_ID", Value: "1"},
+				},
+			},
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			cl := c
+			t.Parallel()
+
+			file := yaml.File{
+				Type: yaml.FileTypeEnvironment,
+				Spec: cl.in,
+			}
+
+			env, err := file.Environment()
+			require.NoError(t, err)
+
+			actual := env.Model()
+
+			assert.Equal(t, cl.expected, actual)
+		})
+	}
+}
+
+func TestTransactionModel(t *testing.T) {
+	cases := []struct {
+		name     string
+		in       yaml.Transaction
+		expected model.Transaction
+	}{
+		{
+			name: "Basic",
+			in: yaml.Transaction{
+				ID:          "123",
+				Name:        "Transaction",
+				Description: "Some transaction",
+				Steps:       []string{"345"},
+			},
+			expected: model.Transaction{
+				ID:          id.ID("123"),
+				Name:        "Transaction",
+				Description: "Some transaction",
+				Steps: []model.Test{
+					{ID: id.ID("345")},
+				},
+			},
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			cl := c
+			t.Parallel()
+
+			file := yaml.File{
+				Type: yaml.FileTypeTransaction,
+				Spec: cl.in,
+			}
+
+			transaction, err := file.Transaction()
+			require.NoError(t, err)
+
+			actual := transaction.Model()
 
 			assert.Equal(t, cl.expected, actual)
 		})
