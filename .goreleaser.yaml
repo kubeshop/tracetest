@@ -9,40 +9,53 @@ release:
   # discussion_category_name: General
   draft: false
   prerelease: auto
+  ids:
+  - cli
+  - server
 before:
   hooks:
-    - go mod tidy
+  - dir: server
+    cmd: go mod tidy
+
+  - dir: cli
+    cmd: go mod tidy
 builds:
-  - ldflags:
-    - -X github.com/kubeshop/tracetest/cli/config.Version={{ .Env.VERSION }}
-    - -X github.com/kubeshop/tracetest/cli/config.Env={{ .Env.TRACETEST_ENV }}
-    - -X github.com/kubeshop/tracetest/cli/analytics.SecretKey={{ .Env.ANALYTICS_BE_KEY }}
+  - id: cli
+    dir: ./cli
+    binary: tracetest
+    ldflags:
+    - -X github.com/kubeshop/tracetest/cli/config.Version={{ if index .Env "VERSION"  }}{{ .Env.VERSION }}{{ else }}dev{{ end }}
+    - -X github.com/kubeshop/tracetest/cli/config.Env={{ if index .Env "TRACETEST_ENV"  }}{{ .Env.TRACETEST_ENV }}{{ else }}dev{{ end }}
+    - -X github.com/kubeshop/tracetest/cli/analytics.SecretKey={{ if index .Env "ANALYTICS_BE_KEY"  }}{{ .Env.ANALYTICS_BE_KEY }}{{ else }}{{ end }}
     env:
       - CGO_ENABLED=0
-    goos:
-      - linux
-      - windows
-      - darwin
-    goarch:
-    - "386"
-    - amd64
-    - arm
-    - arm64
-    goarm:
-    - "7"
+
+  - id: server
+    dir: ./server
+    binary: tracetest-server
+    ldflags:
+    - -X github.com/kubeshop/tracetest/server/app.Version={{ if index .Env "VERSION"  }}{{ .Env.VERSION }}{{ else }}dev{{ end }}
+    - -X github.com/kubeshop/tracetest/server/app.Env={{ if index .Env "TRACETEST_ENV"  }}{{ .Env.TRACETEST_ENV }}{{ else }}dev{{ end }}
+    - -X github.com/kubeshop/tracetest/server/analytics.SecretKey={{ if index .Env "ANALYTICS_BE_KEY"  }}{{ .Env.ANALYTICS_BE_KEY }}{{ else }}{{ end }}
+    - -X github.com/kubeshop/tracetest/server/analytics.FrontendKey={{ if index .Env "ANALYTICS_FE_KEY"  }}{{ .Env.ANALYTICS_FE_KEY }}{{ else }}{{ end }}
+    env:
+      - CGO_ENABLED=0
+
 archives:
 - replacements:
     386: i386
+
 checksum:
   name_template: 'checksums.txt'
+
 snapshot:
   name_template: "{{ incpatch .Version }}-next"
+
 universal_binaries:
-- id: tracetest
-  replace: true
+- replace: true
+
 nfpms:
-- id: tracetest
-  vendor: Kubeshop
+- vendor: Kubeshop
   homepage: https://tracetest.kubeshop.io/
   maintainer: Sebastian Choren <sebastian@kubeshop.io>
   license: MIT
