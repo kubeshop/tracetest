@@ -56,7 +56,7 @@ func TestUpdateEnvironment(t *testing.T) {
 	_, err := db.UpdateEnvironment(context.TODO(), environment)
 	require.NoError(t, err)
 
-	latestTest, err := db.GetEnvironment(context.TODO(), environment.GetSlug())
+	latestTest, err := db.GetEnvironment(context.TODO(), environment.Slug())
 	assert.NoError(t, err)
 	assert.Equal(t, "1 v2", latestTest.Name)
 	assert.Equal(t, "1 v2 description", latestTest.Description)

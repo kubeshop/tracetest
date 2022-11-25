@@ -24,8 +24,17 @@ func (e Environment) HasID() bool {
 	return e.ID != ""
 }
 
-func (e Environment) GetSlug() string {
+func (e Environment) Slug() string {
 	return strings.ToLower(strings.ReplaceAll(strings.TrimSpace(e.Name), " ", "-"))
+}
+
+func (e Environment) Get(key string) string {
+	for _, v := range e.Values {
+		if v.Key == key {
+			return v.Value
+		}
+	}
+	return ""
 }
 
 func (e Environment) Merge(env Environment) Environment {

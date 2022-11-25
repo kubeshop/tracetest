@@ -3,6 +3,7 @@ package executor_test
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"testing"
 	"time"
 
@@ -18,10 +19,12 @@ type fakeTestRunner struct {
 	db                  model.Repository
 	subscriptionManager *subscription.Manager
 	returnErr           bool
+	uid                 int
 }
 
-func (r fakeTestRunner) Run(ctx context.Context, test model.Test, metadata model.RunMetadata, env model.Environment) model.Run {
+func (r *fakeTestRunner) Run(ctx context.Context, test model.Test, metadata model.RunMetadata, env model.Environment) model.Run {
 	run := model.NewRun()
+	run.Environment = env
 	run.State = model.RunStateCreated
 	newRun, err := r.db.CreateRun(ctx, test, run)
 	if err != nil {
@@ -37,6 +40,10 @@ func (r fakeTestRunner) Run(ctx context.Context, test model.Test, metadata model
 		} else {
 			newRun.State = model.RunStateFinished
 		}
+
+		r.uid++
+
+		newRun.Outputs = (model.OrderedMap[string, string]{}).MustAdd("USER_ID", strconv.Itoa(r.uid))
 
 		err = r.db.UpdateRun(ctx, newRun)
 		r.subscriptionManager.PublishUpdate(subscription.Message{
@@ -57,6 +64,20 @@ func TestTransactionRunner(t *testing.T) {
 			assert.Len(t, actual.Steps, 2)
 			assert.Equal(t, actual.Steps[0].State, model.RunStateFinished)
 			assert.Equal(t, actual.Steps[1].State, model.RunStateFinished)
+			assert.Equal(t, "http://my-service.com", actual.Environment.Get("url"))
+
+			assert.Equal(t, "1", actual.Steps[0].Outputs.Get("USER_ID"))
+
+			// this assertom is supposed to test that the output from the previous step
+			// is injected in the env for the next. In practice, this depends
+			// on the `fakeTestRunner` used here to actually save the environment
+			// to the test run, like the real test runner would.
+			// see line 27
+			assert.Equal(t, "1", actual.Steps[1].Environment.Get("USER_ID"))
+			assert.Equal(t, "2", actual.Steps[1].Outputs.Get("USER_ID"))
+
+			assert.Equal(t, "2", actual.Environment.Get("USER_ID"))
+
 		})
 	})
 
@@ -93,10 +114,11 @@ func runTransactionRunnerTest(t *testing.T, withErrors bool, assert func(t *test
 
 	subscriptionManager := subscription.NewManager()
 
-	testRunner := fakeTestRunner{
+	testRunner := &fakeTestRunner{
 		db,
 		subscriptionManager,
 		withErrors,
+		0,
 	}
 
 	test1, err := db.CreateTest(ctx, model.Test{Name: "Test 1"})
@@ -152,33 +174,3 @@ func runTransactionRunnerTest(t *testing.T, withErrors bool, assert func(t *test
 
 	assert(t, transactionRun)
 }
-
-// func TestEnvironmentOutputInjection(t *testing.T) {
-// 	environment := model.Environment{
-// 		ID:   "env-id",
-// 		Name: "my environment",
-// 		Values: []model.EnvironmentValue{
-// 			{Key: "HOST", Value: "http://my-api.com"},
-// 			{Key: "PORT", Value: "8081"},
-// 		},
-// 	}
-
-// 	run := model.TransactionRun{
-// 		CurrentTest: 1,
-// 		Steps: []model.Run{
-// 			{
-// 				Environment: environment,
-// 				Outputs: (model.OrderedMap[string, string]{}).
-// 					MustAdd("TEST_ID", "123456").
-// 					MustAdd("RUN_ID", "2"),
-// 			},
-// 		},
-// 	}
-
-// 	newEnvironment := run.InjectOutputsIntoEnvironment(environment)
-
-// 	assert.Contains(t, newEnvironment.Values, model.EnvironmentValue{Key: "HOST", Value: "http://my-api.com"})
-// 	assert.Contains(t, newEnvironment.Values, model.EnvironmentValue{Key: "PORT", Value: "8081"})
-// 	assert.Contains(t, newEnvironment.Values, model.EnvironmentValue{Key: "TEST_ID", Value: "123456"})
-// 	assert.Contains(t, newEnvironment.Values, model.EnvironmentValue{Key: "RUN_ID", Value: "2"})
-// }

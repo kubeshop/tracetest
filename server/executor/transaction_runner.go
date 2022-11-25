@@ -103,7 +103,7 @@ func (r persistentTransactionRunner) runTransaction(ctx context.Context, transac
 			break
 		}
 
-		// run.Environment = run.InjectOutputsIntoEnvironment(run.Environment)
+		run.Environment = mergeOutputsIntoEnv(run.Environment, run.Steps[step].Outputs)
 		err = r.db.UpdateTransactionRun(ctx, run)
 		if err != nil {
 			return fmt.Errorf("coult not update transaction step: %w", err)
@@ -146,7 +146,6 @@ func (r persistentTransactionRunner) runTransactionStep(ctx context.Context, tr 
 				Content:    tr,
 			})
 
-			fmt.Println("ACA", testRun.State, testRun.State.IsFinal())
 			if testRun.State.IsFinal() {
 				done <- true
 			}
@@ -174,24 +173,18 @@ func (r persistentTransactionRunner) updateStepRun(ctx context.Context, tr model
 	return tr, nil
 }
 
-// func (run TransactionRun) InjectOutputsIntoEnvironment(env Environment) Environment {
-// 	if run.CurrentTest == 0 {
-// 		return env
-// 	}
+func mergeOutputsIntoEnv(env model.Environment, outputs model.OrderedMap[string, string]) model.Environment {
+	newEnv := make([]model.EnvironmentValue, 0, outputs.Len())
+	outputs.ForEach(func(key, val string) error {
+		newEnv = append(newEnv, model.EnvironmentValue{
+			Key:   key,
+			Value: val,
+		})
 
-// 	lastExecutedTest := run.StepRuns[run.CurrentTest-1]
-// 	lastEnvironment := lastExecutedTest.Environment
-// 	newEnvVariables := make([]EnvironmentValue, 0)
-// 	lastExecutedTest.Outputs.ForEach(func(key, val string) error {
-// 		newEnvVariables = append(newEnvVariables, EnvironmentValue{
-// 			Key:   key,
-// 			Value: val,
-// 		})
+		return nil
+	})
 
-// 		return nil
-// 	})
-
-// 	newEnvironment := Environment{Values: newEnvVariables}
-
-// 	return lastEnvironment.Merge(newEnvironment)
-// }
+	return env.Merge(model.Environment{
+		Values: newEnv,
+	})
+}
