@@ -41,12 +41,59 @@ const sidebars = {
         {
           type: "doc",
           id: "getting-started/supported-backends",
-          label: "Supported back ends",
+          label: "Supported backends",
         },
         {
           type: "doc",
           id: "getting-started/accessing-dashboard",
           label: "Accessing the Tracetest dashboard",
+        },
+      ],
+    },
+    {
+      type: "category",
+      label: "Configuration",
+      items: [
+        {
+          type: "category",
+          label: "Data Stores",
+          items: [
+            {
+              type: "doc",
+              id: "configuration/data-stores/jaeger",
+              label: "Jaeger",
+            },
+            {
+              type: "doc",
+              id: "configuration/data-stores/opensearch",
+              label: "OpenSearch",
+            },
+            {
+              type: "doc",
+              id: "configuration/data-stores/signalfx",
+              label: "SignalFX",
+            },
+            {
+              type: "doc",
+              id: "configuration/data-stores/tempo",
+              label: "Tempo",
+            },
+          ],
+        },
+        {
+          type: "doc",
+          id: "configuration/database",
+          label: "Database",
+        },
+        {
+          type: "doc",
+          id: "configuration/trace-data-stores",
+          label: "Trace Data Stores",
+        },
+        {
+          type: "doc",
+          id: "configuration/analytics",
+          label: "Analytics",
         },
       ],
     },
