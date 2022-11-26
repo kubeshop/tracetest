@@ -10,8 +10,8 @@
 <p align="center">
   <!--<a href="https://tracetest.io">Website</a>&nbsp;|&nbsp; -->
   <!--<a href="https://github.com/kubeshop/tracetest#try-the-demo--give-us-feedback">Live Demo</a>&nbsp;|&nbsp;-->
-  <a href="https://kubeshop.github.io/tracetest/installing/">Install</a>&nbsp;|&nbsp;
-  <a href="https://kubeshop.github.io/tracetest">Documentation</a>&nbsp;|&nbsp;
+  <a href="https://docs.tracetest.io/getting-started/installation">Install</a>&nbsp;|&nbsp;
+  <a href="https://docs.tracetest.io/">Documentation</a>&nbsp;|&nbsp;
   <a href="https://twitter.com/tracetest_io">Twitter</a>&nbsp;|&nbsp;
   <a href="https://discord.gg/eBvEQRVyKX">Discord</a>&nbsp;|&nbsp;
   <a href="https://tracetest.io/blog">Blog</a>
@@ -44,16 +44,16 @@ Tracetest is a OpenTelemetry based tool that helps you develop and test your dis
 
 # Features
 
-- Works out of the box with your existing OTel instrumentation, supporting [numerous backend trace datastores](https://docs.tracetest.io/supported-backends/), including Jeager and Grafana Tempo. In addition, supports adding Tracetest as an [additional pipeline](https://docs.tracetest.io/supported-backends/#using-tracetest-without-a-backend) via your OpenTelemetry Collector config. Tell us others backend datastores you want supported!
+- Works out of the box with your existing OTel instrumentation, supporting [numerous backend trace datastores](https://docs.tracetest.io/getting-started/supported-backends), including Jeager and Grafana Tempo. In addition, supports adding Tracetest as an [additional pipeline](https://docs.tracetest.io/getting-started/supported-backends#using-tracetest-without-a-backend) via your OpenTelemetry Collector config. Tell us others backend datastores you want supported!
 - Supporting multiple ways of creating a test, including HTTP, GRPC and Postman Collections.
 - Visualize the changes you are making to your trace as you develop, enabling Observability-Driven Development.
-- [Add assertions](https://docs.tracetest.io/adding-assertions/) based on return data from trigger call and/or data contained in the spans in your distributed trace.
-- Specify which spans to check in assertions via the [advanced selector language](https://docs.tracetest.io/advanced-selectors/).
+- [Add assertions](https://docs.tracetest.io/using-tracetest/adding-assertions) based on return data from trigger call and/or data contained in the spans in your distributed trace.
+- Specify which spans to check in assertions via the [selector language](https://docs.tracetest.io/concepts/selectors).
 - Define checks against the attributes in these spans, including properties, return status, or timing.
-- Create tests via graphical UI or via [YAML-based test definition file](https://docs.tracetest.io/test-definition-file/).
+- Create tests via graphical UI or via [YAML-based test definition file](https://docs.tracetest.io/cli/test-definition-file).
 - Use the test definition file to [enable Gitops flows](https://tracetest.io/blog/integrating-tracetest-with-github-actions-in-a-ci-pipeline).
-- [Tracetest CLI](https://docs.tracetest.io/command-line-tool/) allows importing & exporting tests, running tests, and more.
-- [Version tests](https://docs.tracetest.io/versioning/) as the definition of the test is altered.
+- [Tracetest CLI](https://docs.tracetest.io/cli/command-line-tool) allows importing & exporting tests, running tests, and more.
+- [Version tests](https://docs.tracetest.io/using-tracetest/versioning) as the definition of the test is altered.
 - Install can include [an example microservice](https://kubeshop.github.io/tracetest/pokeshop/) that is instrumented with OpenTelemetry to use as an example application under test.
 
 # Getting Started
@@ -65,10 +65,10 @@ curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/install-cli.sh
 tracetest server install
 ```
 
-> :gear: To customize your Tracetest installation. Go to our [installation guide](https://docs.tracetest.io/installing/) for more information.
+> :gear: To customize your Tracetest installation. Go to our [installation guide](https://docs.tracetest.io/getting-started/installation) for more information.
 
 Installation only takes a few minutes and is done with via a Helm command. After installing, take a look at the
-[Accessing the Dashboard](https://docs.tracetest.io/accessing-dashboard/) guide to access the Tracetest Dashboard and
+[Accessing the Dashboard](https://docs.tracetest.io/getting-started/accessing-dashboard) guide to access the Tracetest Dashboard and
 create and run your first test.
 
 # How does Tracetest work?
@@ -84,7 +84,7 @@ Once the test is built, it can be run automatically as part of a build process. 
 
 # What does the test definition file look like?
 
-The Tracetest [test definition files](https://docs.tracetest.io/test-definition-file/) are written in a simple YAML format. You can write them directly or build them graphically via the UI. Here is an example of a test which:
+The Tracetest [test definition files](https://docs.tracetest.io/cli/test-definition-file) are written in a simple YAML format. You can write them directly or build them graphically via the UI. Here is an example of a test which:
 
 - executes POST against the pokemon/import endpoint.
 - verifies that the HTTP blocks return a 200 status code.
