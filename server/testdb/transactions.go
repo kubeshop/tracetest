@@ -239,6 +239,12 @@ func (td *postgresDB) GetTransactions(ctx context.Context, take, skip int32, que
 		sql += condition
 	}
 
+	sortingFields := map[string]string{
+		"created":  "t.created_at",
+		"name":     "t.name",
+		"last_run": "t.created_at",
+	}
+
 	sql = sortQuery(sql, sortBy, sortDirection, sortingFields)
 	sql += ` LIMIT $1 OFFSET $2 `
 

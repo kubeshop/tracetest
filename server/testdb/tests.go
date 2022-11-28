@@ -184,12 +184,6 @@ const (
 	`
 )
 
-var sortingFields = map[string]string{
-	"created":  "t.created_at",
-	"name":     "t.name",
-	"last_run": "last_test_run_time",
-}
-
 func sortQuery(sql, sortBy, sortDirection string, sortingFields map[string]string) string {
 	sortField, ok := sortingFields[sortBy]
 
@@ -246,6 +240,12 @@ func (td *postgresDB) GetTests(ctx context.Context, take, skip int32, query, sor
 	if hasSearchQuery {
 		params = append(params, cleanSearchQuery)
 		sql += condition
+	}
+
+	sortingFields := map[string]string{
+		"created":  "t.created_at",
+		"name":     "t.name",
+		"last_run": "last_test_run_time",
 	}
 
 	sql = sortQuery(sql, sortBy, sortDirection, sortingFields)
