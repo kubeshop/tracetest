@@ -234,7 +234,7 @@ For more information about selectors or assertions, take a look at the documenta
 
 ## **Outputs**
 
-Outputs are really useful when running [Transactions](transactions.md). They allow to export values from a test so they become available in the [Environment Variables](environment-variables.md) of the current transaction.
+Outputs are really useful when running [Transactions](transactions.md). They allow to export values from a test so they become available in the [Environment Variables](../concepts/environments) of the current transaction.
 
 An ouptut exports the result of an [Expression](../concepts/expressions) and assigns it to a name, so it can be injected into the environment variables of a running transaction.
 A `selector` is needed only if the provided expression refers to a/some span/s attribute or meta attributes.

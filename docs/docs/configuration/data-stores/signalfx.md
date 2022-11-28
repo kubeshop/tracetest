@@ -1,1 +1,15 @@
 # SignalFX
+
+```yaml
+telemetry:
+  dataStores:
+    signalfx:
+      type: signalfx
+      signalfx:
+        token: <YOUR_TOKEN> # UPDATE THIS
+        realm: us1 # UPDATE THIS IF NEEDED
+
+server:
+    telemetry:
+        dataStore: signalfx
+```
