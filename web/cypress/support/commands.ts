@@ -53,8 +53,8 @@ Cypress.Commands.add('openTestCreationModal', () => {
 });
 
 Cypress.Commands.add('interceptTracePageApiCalls', () => {
-  cy.intercept({method: 'GET', url: '/api/tests/**/run/**'}).as('testRun');
-  cy.intercept({method: 'GET', url: '/api/tests/**'}).as('testObject');
+  cy.intercept({method: 'GET', url: /\/api\/tests\/([\w-]+)\/run\/(\w+)$/}).as('testRun');
+  cy.intercept({method: 'GET', url: /\/api\/tests\/([\w-]+)$/}).as('testObject');
   cy.intercept({method: 'PUT', url: '/api/tests/**/run/**/dry-run'}).as('testRuns');
 });
 
