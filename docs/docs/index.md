@@ -1,7 +1,5 @@
 # Tracetest Documentation
 
-Generate end-to-end tests automatically from your traces. For QA, Dev, & Ops.
-
 <!-- 
 TODO: migrate video to youtube and use YT embed.
 
@@ -11,13 +9,41 @@ TODO: migrate video to youtube and use YT embed.
 
 -->
 
-Tracetest allows you to quickly build integration and end-to-end tests, powered by your OpenTelementry traces.
+Tracetest is a next generation end-to-end trace-based testing tool built for distributed systems and microservices. We address the key pain points developers and QA engineers face when testing microservices.
 
-- Point Tracetest to your preffered trace back-end, like Jaeger or Tempo, or to the OpenTelemetry Collector directly.
-- Define a triggering transaction, such as a GET against an API endpoint.
-- The system runs this transaction, returning both the response data and a full trace.
-- Define tests & assertions against this data, ensuring both your response and the underlying processes worked correctly, quickly, and without errors.
-- Save your test.
-- Run the tests either manually or via your CI build jobs.
+## In a nutshell
 
-New to trace-based testing? Read more about the concepts, [here](./concepts/introduction-to-trace-based-testing).
+Tracetest uses your existing [OpenTelemetry](https://opentelemetry.io/docs/getting-started/) traces to power trace-based testing with assertions against your trace data at every point of the request transaction. You only need to point Tracetest to your existing trace data source, or send traces to Tracetest directly!
+
+We make it possible to:
+
+- Define tests and assertions againts every single microservice a request goes through
+- Use your preffered trace back-end, like Jaeger or Tempo, or OpenTelemetry Collector
+- Define multiple transaction triggers, such as a GET against an API endpoint, a GRPC request, etc.
+- Return both the response data and a full trace
+- Define assertions against trace data, ensuring both your response and the underlying processes worked correctly, quickly, and without errors
+- Save tests
+- Run the tests manually or via CI build jobs with the Tracetest CLI.
+
+New to trace-based testing? Read more about the concepts, [here](./concepts/what-is-trace-based-testing).
+
+## Who uses Tracetest?
+
+Our users are typically developers or QA engineers building distributed systems with microservices using back-end languages like Go, Rust, Node.js, and Python.
+
+Tracetest enables you to write detailed trace-based tests, primarily:
+
+- End-to-end tests
+- Integration tests
+
+## What makes Tracetest special?
+
+Tracetest can be compared with Cypress or Selenium; however Tracetest is fundamentally different. Cypress and Selenium are constrained by using the browser for testing. Tracetest bypasses this entirely by instead using your existing OpenTelemetry instrumentation and trace data to run tests and assertions against traces in every step of a reqest transaction.
+
+Move on to the installation step and get started!
+
+## Prerequisites
+
+You need to add [OpenTelemetry instrumentation](https://opentelemetry.io/docs/instrumentation/) to your code and configure sending traces to a trace data store, or Tracetest directly, to benefit for Tracetest's trace-based testing.
+
+
