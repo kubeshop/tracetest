@@ -1014,35 +1014,17 @@ func (c *controller) executeTransaction(ctx context.Context, transaction model.T
 }
 
 func (c *controller) GetTransactionRun(ctx context.Context, transactionId string, runId int32) (openapi.ImplResponse, error) {
-	run, err := c.testDB.GetTransactionRun(ctx, transactionId, int(runId))
+	run, err := c.testDB.GetTransactionRun(ctx, id.ID(transactionId), int(runId))
 	if err != nil {
 		return handleDBError(err), err
 	}
 
 	openapiRun := c.mappers.Out.TransactionRun(run)
-	for i, step := range run.Steps {
-		test, err := c.testDB.GetLatestTestVersion(ctx, id.ID(step.ID))
-		if err != nil {
-			return handleDBError(err), err
-		}
-
-		openapiRun.Steps[i] = c.mappers.Out.Test(test)
-	}
-
-	for i, stepRun := range run.StepRuns {
-		testRun, err := c.testDB.GetRun(ctx, stepRun.TestID, stepRun.ID)
-		if err != nil {
-			return handleDBError(err), err
-		}
-
-		openapiRun.StepRuns[i] = c.mappers.Out.Run(&testRun)
-	}
-
 	return openapi.Response(http.StatusOK, openapiRun), nil
 }
 
 func (c *controller) GetTransactionRuns(ctx context.Context, transactionId string, take, skip int32) (openapi.ImplResponse, error) {
-	runs, err := c.testDB.GetTransactionsRuns(ctx, transactionId, take, skip)
+	runs, err := c.testDB.GetTransactionsRuns(ctx, id.ID(transactionId), take, skip)
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -1056,7 +1038,7 @@ func (c *controller) GetTransactionRuns(ctx context.Context, transactionId strin
 }
 
 func (c *controller) DeleteTransactionRun(ctx context.Context, transactionId string, runId int32) (openapi.ImplResponse, error) {
-	run, err := c.testDB.GetTransactionRun(ctx, transactionId, int(runId))
+	run, err := c.testDB.GetTransactionRun(ctx, id.ID(transactionId), int(runId))
 	if err != nil {
 		return handleDBError(err), err
 	}

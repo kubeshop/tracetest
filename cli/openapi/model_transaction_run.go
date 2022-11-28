@@ -22,8 +22,7 @@ type TransactionRun struct {
 	CreatedAt   *time.Time         `json:"createdAt,omitempty"`
 	CompletedAt *time.Time         `json:"completedAt,omitempty"`
 	State       *string            `json:"state,omitempty"`
-	Steps       []Test             `json:"steps,omitempty"`
-	StepRuns    []TestRun          `json:"stepRuns,omitempty"`
+	Steps       []TestRun          `json:"steps,omitempty"`
 	Environment *Environment       `json:"environment,omitempty"`
 	Metadata    *map[string]string `json:"metadata,omitempty"`
 }
@@ -206,9 +205,9 @@ func (o *TransactionRun) SetState(v string) {
 }
 
 // GetSteps returns the Steps field value if set, zero value otherwise.
-func (o *TransactionRun) GetSteps() []Test {
+func (o *TransactionRun) GetSteps() []TestRun {
 	if o == nil || o.Steps == nil {
-		var ret []Test
+		var ret []TestRun
 		return ret
 	}
 	return o.Steps
@@ -216,7 +215,7 @@ func (o *TransactionRun) GetSteps() []Test {
 
 // GetStepsOk returns a tuple with the Steps field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *TransactionRun) GetStepsOk() ([]Test, bool) {
+func (o *TransactionRun) GetStepsOk() ([]TestRun, bool) {
 	if o == nil || o.Steps == nil {
 		return nil, false
 	}
@@ -232,41 +231,9 @@ func (o *TransactionRun) HasSteps() bool {
 	return false
 }
 
-// SetSteps gets a reference to the given []Test and assigns it to the Steps field.
-func (o *TransactionRun) SetSteps(v []Test) {
+// SetSteps gets a reference to the given []TestRun and assigns it to the Steps field.
+func (o *TransactionRun) SetSteps(v []TestRun) {
 	o.Steps = v
-}
-
-// GetStepRuns returns the StepRuns field value if set, zero value otherwise.
-func (o *TransactionRun) GetStepRuns() []TestRun {
-	if o == nil || o.StepRuns == nil {
-		var ret []TestRun
-		return ret
-	}
-	return o.StepRuns
-}
-
-// GetStepRunsOk returns a tuple with the StepRuns field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *TransactionRun) GetStepRunsOk() ([]TestRun, bool) {
-	if o == nil || o.StepRuns == nil {
-		return nil, false
-	}
-	return o.StepRuns, true
-}
-
-// HasStepRuns returns a boolean if a field has been set.
-func (o *TransactionRun) HasStepRuns() bool {
-	if o != nil && o.StepRuns != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetStepRuns gets a reference to the given []TestRun and assigns it to the StepRuns field.
-func (o *TransactionRun) SetStepRuns(v []TestRun) {
-	o.StepRuns = v
 }
 
 // GetEnvironment returns the Environment field value if set, zero value otherwise.
@@ -352,9 +319,6 @@ func (o TransactionRun) MarshalJSON() ([]byte, error) {
 	}
 	if o.Steps != nil {
 		toSerialize["steps"] = o.Steps
-	}
-	if o.StepRuns != nil {
-		toSerialize["stepRuns"] = o.StepRuns
 	}
 	if o.Environment != nil {
 		toSerialize["environment"] = o.Environment

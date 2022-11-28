@@ -22,4 +22,4 @@ spec:
   - selector: span[name = "exec DELETE"]
     assertions:
     # must delete test and runs. That's why we need 2 deletes
-    - attr:tracetest.selected_spans.count = 2
+    - attr:tracetest.selected_spans.count = 4

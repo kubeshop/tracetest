@@ -124,6 +124,8 @@ func (td *postgresDB) UpdateTest(ctx context.Context, test model.Test) (model.Te
 
 func (td *postgresDB) DeleteTest(ctx context.Context, test model.Test) error {
 	queries := []string{
+		"DELETE FROM transaction_run_steps WHERE test_run_test_id = $1",
+		"DELETE FROM transaction_steps WHERE test_id = $1",
 		"DELETE FROM test_runs WHERE test_id = $1",
 		"DELETE FROM tests WHERE id = $1",
 	}

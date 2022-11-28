@@ -24,9 +24,7 @@ type TransactionRun struct {
 
 	State string `json:"state,omitempty"`
 
-	Steps []Test `json:"steps,omitempty"`
-
-	StepRuns []TestRun `json:"stepRuns,omitempty"`
+	Steps []TestRun `json:"steps,omitempty"`
 
 	Environment Environment `json:"environment,omitempty"`
 
@@ -36,11 +34,6 @@ type TransactionRun struct {
 // AssertTransactionRunRequired checks if the required fields are not zero-ed
 func AssertTransactionRunRequired(obj TransactionRun) error {
 	for _, el := range obj.Steps {
-		if err := AssertTestRequired(el); err != nil {
-			return err
-		}
-	}
-	for _, el := range obj.StepRuns {
 		if err := AssertTestRunRequired(el); err != nil {
 			return err
 		}

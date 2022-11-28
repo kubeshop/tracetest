@@ -1248,7 +1248,7 @@ export interface external {
           description?: string;
           /** @description version number of the test */
           version?: number;
-          steps?: string[];
+          steps?: external["tests.yaml"]["components"]["schemas"]["Test"][];
           /** Format: date-time */
           createdAt?: string;
           /** @description summary of transaction */
@@ -1263,8 +1263,7 @@ export interface external {
           completedAt?: string;
           /** @enum {string} */
           state?: "CREATED" | "EXECUTING" | "FINISHED" | "FAILED";
-          steps?: external["tests.yaml"]["components"]["schemas"]["Test"][];
-          stepRuns?: external["tests.yaml"]["components"]["schemas"]["TestRun"][];
+          steps?: external["tests.yaml"]["components"]["schemas"]["TestRun"][];
           environment?: external["environments.yaml"]["components"]["schemas"]["Environment"];
           metadata?: { [key: string]: string };
         };

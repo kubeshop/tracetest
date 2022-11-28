@@ -50,7 +50,7 @@ INSERT INTO environments (
 	`
 
 	countQuery = `
-		SELECT COUNT(*) FROM environments e 
+		SELECT COUNT(*) FROM environments e
 	`
 )
 
@@ -60,7 +60,7 @@ var environmentSortingFields = map[string]string{
 }
 
 func (td *postgresDB) CreateEnvironment(ctx context.Context, environment model.Environment) (model.Environment, error) {
-	environment.ID = environment.GetSlug()
+	environment.ID = environment.Slug()
 	environment.CreatedAt = time.Now()
 
 	return td.insertIntoEnvironments(ctx, environment)
@@ -74,7 +74,7 @@ func (td *postgresDB) UpdateEnvironment(ctx context.Context, environment model.E
 
 	// keep the same creation date to keep sort order
 	environment.CreatedAt = oldEnvironment.CreatedAt
-	environment.ID = environment.GetSlug()
+	environment.ID = environment.Slug()
 
 	return td.updateIntoEnvironments(ctx, environment, oldEnvironment.ID)
 }
@@ -269,7 +269,7 @@ func (td *postgresDB) updateIntoEnvironments(ctx context.Context, environment mo
 	_, err = stmt.ExecContext(
 		ctx,
 		oldId,
-		environment.GetSlug(),
+		environment.Slug(),
 		environment.Name,
 		environment.Description,
 		environment.CreatedAt,
