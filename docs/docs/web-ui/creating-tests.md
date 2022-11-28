@@ -1,7 +1,5 @@
 # Create a Test
 
-Access the [Tracetest application](../getting-started/accessing-dashboard.md).
-
 ![Main Screen](../img/main-screen-0.6.png)
 
 Click the **Create Test** button and the **Create New Test** dialog appears:

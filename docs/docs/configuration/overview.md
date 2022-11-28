@@ -6,24 +6,24 @@ When using Docker, ensure that the configuration file is mounted to `/app/config
 
 To view all the configuration options see the [config file reference page](./config-file-reference).
 
-## Supported data sources
+## Supported trace data stores
 
 Tracetest is designed to work with different trace data stores. To enable Tracetest to run end-to-end tests against trace data, you need to configure Tracetest to access trace data.
 
 Currently, Tracetest supports the following data stores. Click on the respective data store to view configuration examples:
 
-- [Jaeger](./connecting-to-data-sources/jaeger)
-- [Grafana Tempo](./connecting-to-data-sources/tempo)
-- [OpenSearch](./connecting-to-data-sources/opensearch)
-- [SignalFX](./connecting-to-data-sources/signalfx)
+- [Jaeger](./connecting-to-data-stores/jaeger)
+- [Grafana Tempo](./connecting-to-data-stores/tempo)
+- [OpenSearch](./connecting-to-data-stores/opensearch)
+- [SignalFX](./connecting-to-data-stores/signalfx)
 
-## Using Tracetest without a data source
+## Using Tracetest without a trace data store
 
 Another option is to send traces directly to Tracetest using the OpenTelemetry Collector. And, you don't have to change your existing pipelines to do so.
 
-View the [configuration for OpenTelemetry Collector](./connecting-to-data-sources/opentelemetry-collector) for more details.
+View the [configuration for OpenTelemetry Collector](./connecting-to-data-stores/opentelemetry-collector) for more details.
 
-## Data source configuration examples
+## Trace data store configuration examples
 
 Examples of configuring Tracetest to access different data stores can be found in the [`examples` folder of the Tracetest GitHub repo](https://github.com/kubeshop/tracetest/tree/main/examples). 
 

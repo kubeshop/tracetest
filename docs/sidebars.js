@@ -30,6 +30,11 @@ const sidebars = {
       items: [
         {
           type: "doc",
+          id: "getting-started/installation",
+          label: "Quick Start",
+        },
+        {
+          type: "doc",
           id: "getting-started/docker",
           label: "Docker",
         },
@@ -56,31 +61,31 @@ const sidebars = {
         },
         {
           type: "category",
-          label: "Connecting to Data Sources",
+          label: "Connecting to Data Stores",
           items: [
             {
               type: "doc",
-              id: "configuration/connecting-to-data-sources/opentelemetry-collector",
+              id: "configuration/connecting-to-data-stores/opentelemetry-collector",
               label: "OpenTelemetry Collector",
             },
             {
               type: "doc",
-              id: "configuration/connecting-to-data-sources/jaeger",
+              id: "configuration/connecting-to-data-stores/jaeger",
               label: "Jaeger",
             },
             {
               type: "doc",
-              id: "configuration/connecting-to-data-sources/opensearch",
+              id: "configuration/connecting-to-data-stores/opensearch",
               label: "OpenSearch",
             },
             {
               type: "doc",
-              id: "configuration/connecting-to-data-sources/signalfx",
+              id: "configuration/connecting-to-data-stores/signalfx",
               label: "SignalFX",
             },
             {
               type: "doc",
-              id: "configuration/connecting-to-data-sources/tempo",
+              id: "configuration/connecting-to-data-stores/tempo",
               label: "Tempo",
             },
           ],

@@ -27,6 +27,10 @@ We make it possible to:
 
 New to trace-based testing? Read more about the concepts, [here](./concepts/what-is-trace-based-testing).
 
+## Prerequisites
+
+You need to add [OpenTelemetry instrumentation](https://opentelemetry.io/docs/instrumentation/) to your code and configure sending traces to a trace data store, or Tracetest directly, to benefit for Tracetest's trace-based testing.
+
 ## Who uses Tracetest?
 
 Our users are typically developers or QA engineers building distributed systems with microservices using back-end languages like Go, Rust, Node.js, and Python.
@@ -38,12 +42,8 @@ Tracetest enables you to write detailed trace-based tests, primarily:
 
 ## What makes Tracetest special?
 
-Tracetest can be compared with Cypress or Selenium; however Tracetest is fundamentally different. Cypress and Selenium are constrained by using the browser for testing. Tracetest bypasses this entirely by instead using your existing OpenTelemetry instrumentation and trace data to run tests and assertions against traces in every step of a reqest transaction.
+Tracetest can be compared with Cypress or Selenium; however Tracetest is fundamentally different.
 
-Move on to the installation step and get started!
+Cypress and Selenium are constrained by using the browser for testing. Tracetest bypasses this entirely by using your existing OpenTelemetry instrumentation and trace data to run tests and assertions against traces in every step of a reqest transaction.
 
-## Prerequisites
-
-You need to add [OpenTelemetry instrumentation](https://opentelemetry.io/docs/instrumentation/) to your code and configure sending traces to a trace data store, or Tracetest directly, to benefit for Tracetest's trace-based testing.
-
-
+Move on to the [Quick Start](./getting-started/installation.md) to hit the ground running!

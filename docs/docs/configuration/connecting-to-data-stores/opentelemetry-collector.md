@@ -4,7 +4,9 @@ If you don't want to use a trace data store, you can send all traces directly to
 
 ## Configuring Your Collector to Send Traces to Tracetest
 
-> :warning: It is important to notice that this relies on the [tailsampling](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/tailsamplingprocessor) processor, which, at the moment, is only available in the [contrib](https://github.com/open-telemetry/opentelemetry-collector-contrib/) version of the collector.
+:::warning
+It is important to notice that this relies on the [tailsampling](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/tailsamplingprocessor) processor, which, at the moment, is only available in the [contrib](https://github.com/open-telemetry/opentelemetry-collector-contrib/) version of the collector.
+:::
 
 ### Creating a New Pipeline for Your Traces
 

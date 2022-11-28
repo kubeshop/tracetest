@@ -83,23 +83,23 @@ const config = {
     [
       '@docusaurus/plugin-client-redirects',
       {
-        fromExtensions: ['html', 'htm'], // /myPage.html -> /myPage
-        toExtensions: ['exe', 'zip'], // /myAsset -> /myAsset.zip (if latter exists)
+        // fromExtensions: ['html', 'htm'], // /myPage.html -> /myPage
+        // toExtensions: ['exe', 'zip'], // /myAsset -> /myAsset.zip (if latter exists)
         redirects: [
           // /docs/oldDoc -> /docs/newDoc
-          {
-            to: '/using-tracetest/adding-assertions',
-            from: '/adding-assertions',
-          },
+          // {
+          //   to: '/using-tracetest/adding-assertions',
+          //   from: '/adding-assertions',
+          // },
           // Redirect from multiple old paths to the new path
           {
             to: '/concepts/selectors',
             from: ['/advanced-selectors' /*, '/docs/legacyDocFrom2016'*/],
           },
-          {
-            to: '/cli/test-definition-file', // replace with '/cli/creating-tests' after new docs structure release
-            from: ['/test-definition-file' /*, '/docs/legacyDocFrom2016'*/],
-          },
+          // {
+          //   to: '/cli/test-definition-file', // replace with '/cli/creating-tests' after new docs structure release
+          //   from: ['/test-definition-file' /*, '/docs/legacyDocFrom2016'*/],
+          // },
         ],
         // createRedirects(existingPath) {
         //   if (existingPath.includes('/community')) {
