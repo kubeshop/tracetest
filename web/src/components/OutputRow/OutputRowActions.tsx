@@ -11,15 +11,15 @@ interface IProps {
 const OutputRowActions = ({name, onEdit, onDelete}: IProps) => {
   const items = useMemo(
     () => [
-      {key: 'edit', label: <span data-cy="output-row-actions-edit">Edit</span>, onClick: onEdit},
-      {key: 'delete', label: <span data-cy="output-row-actions-delete">Delete</span>, onClick: onDelete},
+      {key: 'edit', label: <span data-cy="output-item-actions-edit">Edit</span>, onClick: onEdit},
+      {key: 'delete', label: <span data-cy="output-item-actions-delete">Delete</span>, onClick: onDelete},
     ],
     [onDelete, onEdit]
   );
 
   return (
     <Dropdown overlay={<Menu items={items} />} placement="bottomLeft" trigger={['click']}>
-      <span data-cy={`test-actions-button-${name}`} className="ant-dropdown-link" onClick={e => e.stopPropagation()}>
+      <span data-cy={`output-actions-button-${name}`} className="ant-dropdown-link" onClick={e => e.stopPropagation()}>
         <S.ActionButton />
       </span>
     </Dropdown>
