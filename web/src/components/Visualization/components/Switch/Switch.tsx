@@ -1,12 +1,11 @@
 import {Tooltip} from 'antd';
 
 import {VisualizationType} from 'components/RunDetailTrace/RunDetailTrace';
-import ExperimentalFeature from '../../../../utils/ExperimentalFeature';
 import * as S from './Switch.styled';
 
 interface IProps {
-  type: VisualizationType;
   onChange(type: VisualizationType): void;
+  type: VisualizationType;
 }
 
 const Switch = ({onChange, type}: IProps) => (
@@ -20,11 +19,6 @@ const Switch = ({onChange, type}: IProps) => (
         onClick={() => onChange(VisualizationType.Timeline)}
       />
     </Tooltip>
-    {ExperimentalFeature.isEnabled('flamegraph') && (
-      <Tooltip title="Flame view" placement="right">
-        <S.FlameIcon $isSelected={type === VisualizationType.Flame} onClick={() => onChange(VisualizationType.Flame)} />
-      </Tooltip>
-    )}
   </S.Container>
 );
 
