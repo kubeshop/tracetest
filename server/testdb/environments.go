@@ -108,12 +108,12 @@ func (td *postgresDB) GetEnvironments(ctx context.Context, take, skip int32, que
 		sql += condition
 	}
 
-	sortFields := map[string]string{
+	sortingFields := map[string]string{
 		"created": "e.created_at",
 		"name":    "e.name",
 	}
 
-	sql = sortQuery(sql, sortBy, sortDirection, sortFields)
+	sql = sortQuery(sql, sortBy, sortDirection, sortingFields)
 	sql += ` LIMIT $1 OFFSET $2 `
 
 	stmt, err := td.db.Prepare(sql)
