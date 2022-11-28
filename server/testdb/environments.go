@@ -54,11 +54,6 @@ INSERT INTO environments (
 	`
 )
 
-var environmentSortingFields = map[string]string{
-	"created": "e.created_at",
-	"name":    "e.name",
-}
-
 func (td *postgresDB) CreateEnvironment(ctx context.Context, environment model.Environment) (model.Environment, error) {
 	environment.ID = environment.Slug()
 	environment.CreatedAt = time.Now()
@@ -113,7 +108,12 @@ func (td *postgresDB) GetEnvironments(ctx context.Context, take, skip int32, que
 		sql += condition
 	}
 
-	sql = sortQuery(sql, sortBy, sortDirection, environmentSortingFields)
+	sortFields := map[string]string{
+		"created": "e.created_at",
+		"name":    "e.name",
+	}
+
+	sql = sortQuery(sql, sortBy, sortDirection, sortFields)
 	sql += ` LIMIT $1 OFFSET $2 `
 
 	stmt, err := td.db.Prepare(sql)
