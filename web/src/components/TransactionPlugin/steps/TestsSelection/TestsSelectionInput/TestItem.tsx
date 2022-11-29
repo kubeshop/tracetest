@@ -6,7 +6,7 @@ import * as S from './TestsSelectionInput.styled';
 interface IProps {
   test: TTest;
   sortableId: string;
-  onDelete(testId: string): void;
+  onDelete(sortableId: string): void;
 }
 
 const TestItem = ({test, onDelete, sortableId}: IProps) => {
@@ -21,7 +21,7 @@ const TestItem = ({test, onDelete, sortableId}: IProps) => {
     <S.TestItemContainer ref={setNodeRef} style={style} {...attributes}>
       <S.DragHandle {...listeners} />
       <span>{test.name}</span>
-      <S.DeleteIcon onClick={() => onDelete(test.id)} />
+      <S.DeleteIcon onClick={() => onDelete(sortableId)} />
     </S.TestItemContainer>
   );
 };
