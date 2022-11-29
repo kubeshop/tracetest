@@ -29,7 +29,7 @@ const useTestCrud = () => {
 
       const mode = match?.params.mode || 'trigger';
 
-      navigate(`/test/${testId}/run/${run.id}/${mode}`);
+      navigate(`/test/${testId}/run/${run.id}/${mode}`, {});
     },
     [dispatch, match?.params.mode, navigate, runTestAction, selectedEnvironment?.id]
   );

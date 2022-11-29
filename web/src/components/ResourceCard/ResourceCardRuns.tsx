@@ -8,9 +8,10 @@ interface IProps {
   isCollapsed: boolean;
   isLoading: boolean;
   onViewAll(): void;
+  resourceId: string;
 }
 
-const ResourceCardRuns = ({children, hasMoreRuns, hasRuns, isCollapsed, isLoading, onViewAll}: IProps) => {
+const ResourceCardRuns = ({children, hasMoreRuns, hasRuns, isCollapsed, isLoading, onViewAll, resourceId}: IProps) => {
   if (isCollapsed) return null;
 
   return (
@@ -27,7 +28,7 @@ const ResourceCardRuns = ({children, hasMoreRuns, hasRuns, isCollapsed, isLoadin
 
       {hasMoreRuns && (
         <S.FooterContainer>
-          <S.Link data-cy="test-details-link" onClick={onViewAll}>
+          <S.Link data-cy="test-details-link" onClick={onViewAll} href={`/test/${resourceId}`}>
             View all runs
           </S.Link>
         </S.FooterContainer>
