@@ -63,9 +63,9 @@ const TestsSelectionInput = ({value = [], onChange = noop, testList}: IProps) =>
   );
 
   const onDelete = useCallback(
-    (testId: string) => {
-      onChange(value.filter(id => id !== testId));
-      setSelectedTestList(selectedTestList.filter(test => test.id !== testId));
+    (sortableId: string) => {
+      onChange(value.filter((id, index) => `${id}-${index}` !== sortableId));
+      setSelectedTestList(selectedTestList.filter(test => test.id !== sortableId));
     },
     [onChange, selectedTestList, value]
   );
