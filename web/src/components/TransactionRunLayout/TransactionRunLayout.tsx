@@ -1,5 +1,4 @@
 import {useMemo} from 'react';
-import {useNavigate} from 'react-router-dom';
 import TransactionHeader from 'components/TransactionHeader';
 import {TTransaction} from 'types/Transaction.types';
 import {TTransactionRun} from 'types/TransactionRun.types';
@@ -14,15 +13,13 @@ interface IProps {
   transactionRun: TTransactionRun;
 }
 
-const TransactionRunDetailLayout = ({transaction, transaction: {id: transactionId}, transactionRun}: IProps) => {
-  const navigate = useNavigate();
+const TransactionRunDetailLayout = ({transaction, transactionRun}: IProps) => {
   useDocumentTitle(`${transaction.name} - ${transactionRun.state}`);
   const draftTransaction = useMemo(() => TransactionService.getInitialValues(transaction), [transaction]);
 
   return (
     <>
       <TransactionHeader
-        onBack={() => navigate(`/transaction/${transactionId}`)}
         transactionRun={transactionRun}
         transaction={transaction}
       />

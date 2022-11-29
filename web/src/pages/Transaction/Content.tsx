@@ -1,6 +1,5 @@
 import {Button} from 'antd';
 import {useCallback, useMemo} from 'react';
-import {useNavigate} from 'react-router-dom';
 
 import PaginatedList from 'components/PaginatedList';
 import TransactionRunCard from 'components/RunCard/TransactionRunCard';
@@ -13,7 +12,6 @@ import useDocumentTitle from 'hooks/useDocumentTitle';
 import * as S from './Transaction.styled';
 
 const Content = () => {
-  const navigate = useNavigate();
   const {onDelete, transaction} = useTransaction();
   const {runTransaction, isEditLoading} = useTransactionCrud();
   const params = useMemo(() => ({transactionId: transaction.id}), [transaction.id]);
@@ -29,7 +27,6 @@ const Content = () => {
       <TestHeader
         description={transaction.description}
         id={transaction.id}
-        onBack={() => navigate('/')}
         onDelete={() => onDelete(transaction.id, transaction.name)}
         title={`${transaction.name} (v${transaction.version})`}
         runButton={

@@ -8,7 +8,6 @@ import useDeleteResource from 'hooks/useDeleteResource';
 import usePagination from 'hooks/usePagination';
 import useTestCrud from 'providers/Test/hooks/useTestCrud';
 import {useCallback, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
 import {useGetResourcesQuery} from 'redux/apis/TraceTest.api';
 import HomeAnalyticsService from 'services/Analytics/HomeAnalytics.service';
 import {ResourceType, TResource} from 'types/Resource.type';
@@ -30,7 +29,6 @@ const Content = () => {
   const [isCreateTestOpen, setIsCreateTestOpen] = useState(false);
   const [parameters, setParameters] = useState<TParameters>(defaultSort);
 
-  const navigate = useNavigate();
   const pagination = usePagination<TResource, TParameters>(useGetResourcesQuery, parameters);
   const onDeleteResource = useDeleteResource();
   const {runTest} = useTestCrud();
@@ -44,13 +42,9 @@ const Content = () => {
     [runTest, runTransaction]
   );
 
-  const handleOnViewAll = useCallback(
-    (id: string, type: ResourceType) => {
-      onTestClick(id);
-      navigate(`/${type}/${id}`);
-    },
-    [navigate]
-  );
+  const handleOnViewAll = useCallback((id: string) => {
+    onTestClick(id);
+  }, []);
 
   return (
     <>

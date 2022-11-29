@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import {Typography} from 'antd';
 import {LeftOutlined} from '@ant-design/icons';
+import {Link} from 'react-router-dom';
 
 export const BackIcon = styled(LeftOutlined)`
   cursor: pointer;
@@ -109,5 +110,17 @@ export const Title = styled(Typography.Title).attrs({ellipsis: true, level: 2})`
   && {
     margin: 0;
     max-width: calc((100vw / 2) - 150px - 54px);
+  }
+`;
+
+export const TabLink = styled(Link)<{$isActive: boolean}>`
+  && {
+    color: ${({theme, $isActive}) => $isActive && theme.color.white};
+
+    &:hover,
+    &:visited,
+    &:focused {
+      color: ${({theme, $isActive}) => $isActive && theme.color.white};
+    }
   }
 `;
