@@ -28,7 +28,6 @@ const OutputModalForm = ({form, runId, spanIdList, testId}: IProps) => {
   return (
     <S.InputContainer>
       <Form.Item
-        data-cy="output-form-name"
         label="Name"
         name="name"
         rules={[{required: true, message: 'Please enter a name'}]}
@@ -38,7 +37,6 @@ const OutputModalForm = ({form, runId, spanIdList, testId}: IProps) => {
       </Form.Item>
 
       <Form.Item
-        data-cy="output-form-selector"
         label={
           <S.SelectorTitleContainer>
             <S.SelectorLabel>Selector</S.SelectorLabel>
@@ -61,12 +59,7 @@ const OutputModalForm = ({form, runId, spanIdList, testId}: IProps) => {
         <Editor basicSetup={{lineNumbers: true}} type={SupportedEditors.Selector} placeholder="" />
       </Form.Item>
 
-      <Form.Item
-        data-cy="output-form-value"
-        name="value"
-        rules={[{required: true, message: 'Please enter an attribute'}]}
-        style={{margin: 0}}
-      >
+      <Form.Item name="value" rules={[{required: true, message: 'Please enter an attribute'}]} style={{margin: 0}}>
         <Editor
           type={SupportedEditors.Expression}
           placeholder="Attribute"

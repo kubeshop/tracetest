@@ -39,6 +39,7 @@ const ResponseOutputs = () => {
 
       <div>
         <Button
+          data-cy="output-add-button"
           icon={<PlusOutlined />}
           onClick={() => onModalOpen()}
           style={{fontWeight: 600, height: 'auto', padding: 0}}
@@ -50,10 +51,10 @@ const ResponseOutputs = () => {
 
       {isPending && (
         <S.Actions>
-          <Button ghost loading={isLoading} onClick={onCancel} type="primary">
+          <Button data-cy="output-reset-button" ghost loading={isLoading} onClick={onCancel} type="primary">
             Reset
           </Button>
-          <Button loading={isLoading} onClick={() => onSave(outputs)} type="primary">
+          <Button data-cy="output-publish-button" loading={isLoading} onClick={() => onSave(outputs)} type="primary">
             Save & Run
           </Button>
         </S.Actions>

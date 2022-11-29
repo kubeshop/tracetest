@@ -91,7 +91,7 @@ const SpanDetail = ({onCreateTestSpec = noop, searchText, span}: IProps) => {
       />
       <S.HeaderDivider />
 
-      <S.SearchContainer>
+      <S.SearchContainer data-cy="attributes-search-container">
         <SearchInput placeholder="Search attributes" onSearch={handleOnSearch} width="100%" />
       </S.SearchContainer>
 
