@@ -1,6 +1,7 @@
 import {capitalize} from 'lodash';
 import {Tooltip} from 'antd';
 import {LinkOutlined} from '@ant-design/icons';
+import {Link} from 'react-router-dom';
 import {TestState} from 'constants/TestRun.constants';
 import {TTest} from 'types/Test.types';
 import {TTestRun, TTestRunState} from 'types/TestRun.types';
@@ -34,18 +35,21 @@ const ExecutionStep = ({
   }),
 }: IProps) => {
   const stateIsFinished = ([TestState.FINISHED, TestState.FAILED] as string[]).includes(state);
+  const toLink = runId ? `/test/${testId}/run/${runId}` : `/test/${testId}`;
 
   return (
     <S.Container data-cy={`transaction-execution-step-${name}`}>
       <S.ExecutionStepStatus>{iconBasedOnResult(state, index)}</S.ExecutionStepStatus>
-      <S.Info>
-        <S.ExecutionStepName>{`${name} v${testVersion}`}</S.ExecutionStepName>
-        <S.TagContainer>
-          <S.TextTag>{trigger.method}</S.TextTag>
-          <S.TextTag $isLight>{trigger.entryPoint}</S.TextTag>
-          {!stateIsFinished && <S.TextTag>{capitalize(state)}</S.TextTag>}
-        </S.TagContainer>
-      </S.Info>
+      <Link to={toLink} target="_blank">
+        <S.Info>
+          <S.ExecutionStepName>{`${name} v${testVersion}`}</S.ExecutionStepName>
+          <S.TagContainer>
+            <S.TextTag>{trigger.method}</S.TextTag>
+            <S.TextTag $isLight>{trigger.entryPoint}</S.TextTag>
+            {!stateIsFinished && <S.TextTag>{capitalize(state)}</S.TextTag>}
+          </S.TagContainer>
+        </S.Info>
+      </Link>
       <S.AssertionResultContainer>
         {runId && (
           <>
@@ -65,13 +69,11 @@ const ExecutionStep = ({
         )}
       </S.AssertionResultContainer>
       <S.ExecutionStepStatus>
-        {runId && (
-          <Tooltip title="Go to Run">
-            <S.ExecutionStepRunLink to={`/test/${testId}/run/${runId}`} target="_blank" data-cy="execution-step-run-link">
-              <LinkOutlined />
-            </S.ExecutionStepRunLink>
-          </Tooltip>
-        )}
+        <Tooltip title="Go to Run">
+          <S.ExecutionStepRunLink to={toLink} target="_blank" data-cy="execution-step-run-link">
+            <LinkOutlined />
+          </S.ExecutionStepRunLink>
+        </Tooltip>
       </S.ExecutionStepStatus>
     </S.Container>
   );

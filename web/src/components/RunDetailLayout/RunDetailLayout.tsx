@@ -1,6 +1,6 @@
 import {Tabs, TabsProps} from 'antd';
 import {useMemo} from 'react';
-import {useNavigate, useParams} from 'react-router-dom';
+import {useParams} from 'react-router-dom';
 import RunDetailTest from 'components/RunDetailTest';
 import RunDetailTrace from 'components/RunDetailTrace';
 import RunDetailTrigger from 'components/RunDetailTrigger';
@@ -28,8 +28,13 @@ const renderTabBar: TabsProps['renderTabBar'] = (props, DefaultTabBar) => (
   </S.ContainerHeader>
 );
 
+const renderTab = (title: string, testId: string, runId: string, mode: string) => (
+  <S.TabLink $isActive={mode === title.toLowerCase()} to={`/test/${testId}/run/${runId}/${title.toLowerCase()}`}>
+    {title}
+  </S.TabLink>
+);
+
 const RunDetailLayout = ({test: {id, name, trigger, version = 1}, test}: IProps) => {
-  const navigate = useNavigate();
   const {mode = RunDetailModes.TRIGGER} = useParams();
   const {isError, run} = useTestRun();
   useDocumentTitle(`${name} - ${run.state}`);
@@ -49,19 +54,18 @@ const RunDetailLayout = ({test: {id, name, trigger, version = 1}, test}: IProps)
         centered
         onChange={activeKey => {
           TestRunAnalyticsService.onChangeMode(activeKey as RunDetailModes);
-          navigate(`/test/${id}/run/${run.id}/${activeKey}`);
         }}
         renderTabBar={renderTabBar}
         tabBarExtraContent={tabBarExtraContent}
         destroyInactiveTabPane
       >
-        <Tabs.TabPane tab="Trigger" key={RunDetailModes.TRIGGER}>
+        <Tabs.TabPane tab={renderTab('Trigger', id, run.id, mode)} key={RunDetailModes.TRIGGER}>
           <RunDetailTrigger test={test} run={run} isError={isError} />
         </Tabs.TabPane>
-        <Tabs.TabPane tab="Trace" key={RunDetailModes.TRACE}>
+        <Tabs.TabPane tab={renderTab('Trace', id, run.id, mode)} key={RunDetailModes.TRACE}>
           <RunDetailTrace run={run} testId={id} />
         </Tabs.TabPane>
-        <Tabs.TabPane tab="Test" key={RunDetailModes.TEST}>
+        <Tabs.TabPane tab={renderTab('Test', id, run.id, mode)} key={RunDetailModes.TEST}>
           <RunDetailTest run={run} testId={id} />
         </Tabs.TabPane>
       </Tabs>

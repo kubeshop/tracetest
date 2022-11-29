@@ -64,6 +64,7 @@ const TestCard = ({onDelete, onRun, onViewAll, test}: IProps) => {
         isCollapsed={isCollapsed}
         isLoading={isLoading}
         onViewAll={() => onViewAll(test.id, ResourceType.Test)}
+        resourcePath={`/test/${test.id}`}
       >
         <S.RunsListContainer data-cy="run-card-list">
           {list.map(run => (

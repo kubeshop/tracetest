@@ -1,6 +1,5 @@
 import {useMemo} from 'react';
 import {Button} from 'antd';
-import {useNavigate} from 'react-router-dom';
 import PaginatedList from 'components/PaginatedList';
 import TestRunCard from 'components/RunCard/TestRunCard';
 import TestHeader from 'components/TestHeader';
@@ -16,7 +15,6 @@ import {Steps} from 'components/GuidedTour/testDetailsStepList';
 import * as S from './Test.styled';
 
 const Content = () => {
-  const navigate = useNavigate();
   const {test} = useTest();
   const onDeleteResource = useDeleteResource();
   const {runTest, isLoadingRunTest} = useTestCrud();
@@ -30,7 +28,6 @@ const Content = () => {
           test.trigger.entryPoint
         }`}
         id={test.id}
-        onBack={() => navigate('/')}
         onDelete={() => onDeleteResource(test.id, test.name, ResourceType.Test)}
         title={`${test.name} (v${test.version})`}
         runButton={
