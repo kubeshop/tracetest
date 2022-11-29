@@ -50,6 +50,7 @@ const OutputModal = ({isOpen, onClose, onSubmit, runId, testId, output, isEditin
         autoComplete="off"
         form={form}
         layout="vertical"
+        name="testOutput"
         onFinish={values => onSubmit(values, isEditing)}
         onValuesChange={onValidate}
       >

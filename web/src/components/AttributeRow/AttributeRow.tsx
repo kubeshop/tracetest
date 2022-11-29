@@ -71,7 +71,7 @@ const AttributeRow = ({
           key: Action.Copy,
         },
         {
-          label: 'Create Output',
+          label: 'Create output',
           key: Action.Create_Output,
         },
         {
