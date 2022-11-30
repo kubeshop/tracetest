@@ -14,9 +14,10 @@ release:
   - server
 before:
   hooks:
+  - dir: web
+    cmd: npm ci --silent && npm run build
   - dir: server
     cmd: go mod tidy
-
   - dir: cli
     cmd: go mod tidy
 builds:
