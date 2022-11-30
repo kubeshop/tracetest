@@ -6,10 +6,13 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"path/filepath"
 
 	"github.com/denisbrodbeck/machineid"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/model/yaml"
+	"golang.org/x/exp/slices"
 )
 
 type fsDB struct {
@@ -123,6 +126,50 @@ func (td *fsDB) persistDB(config map[string]string) error {
 	}
 
 	return os.WriteFile(path.Join(td.root, ".config.json"), db, 0644)
+}
+
+type file struct {
+	path string
+	info os.FileInfo
+}
+
+func (f file) read() (yaml.File, error) {
+	b, err := os.ReadFile(f.path)
+	if err != nil {
+		return yaml.File{}, fmt.Errorf("cannot read file %s: %w", f.path, err)
+	}
+
+	yf, err := yaml.Decode(b)
+	if err != nil {
+		return yaml.File{}, fmt.Errorf("cannot decode file %s: %w", f.path, err)
+	}
+
+	return yf, nil
+}
+
+func (f file) isYaml() bool {
+	return slices.Contains([]string{".yaml", ".yml"}, filepath.Ext(f.path))
+}
+
+func (td *fsDB) getFiles() ([]file, error) {
+	return td.readDir(td.root)
+}
+
+func (td *fsDB) readDir(path string) ([]file, error) {
+	var files []file
+	err := filepath.Walk(path,
+		func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			files = append(files, file{path, info})
+			return nil
+		})
+	if err != nil {
+		return nil, err
+	}
+
+	return files, nil
 }
 
 func (td *fsDB) Drop() error {

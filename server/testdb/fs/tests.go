@@ -34,5 +34,30 @@ func (td *fsDB) GetLatestTestVersion(ctx context.Context, id id.ID) (model.Test,
 }
 
 func (td *fsDB) GetTests(ctx context.Context, take, skip int32, query, sortBy, sortDirection string) (model.List[model.Test], error) {
-	panic("not implemented")
+	files, err := td.getFiles()
+	if err != nil {
+		return model.List[model.Test]{}, err
+	}
+
+	res := model.List[model.Test]{}
+	for _, f := range files {
+		if !f.isYaml() {
+			continue
+		}
+
+		yf, err := f.read()
+		if err != nil {
+			return model.List[model.Test]{}, err
+		}
+
+		test, err := yf.Test()
+		if err != nil {
+			// not a test, ignore
+			continue
+		}
+
+		res.Items = append(res.Items, test.Model())
+	}
+
+	return res, nil
 }

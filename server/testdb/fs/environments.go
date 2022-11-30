@@ -21,7 +21,7 @@ func (td *fsDB) DeleteEnvironment(ctx context.Context, environment model.Environ
 }
 
 func (td *fsDB) GetEnvironments(ctx context.Context, take, skip int32, query, sortBy, sortDirection string) (model.List[model.Environment], error) {
-	panic("not implemented")
+	return model.List[model.Environment]{}, nil
 }
 
 func (td *fsDB) GetEnvironment(ctx context.Context, id string) (model.Environment, error) {

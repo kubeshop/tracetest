@@ -63,5 +63,9 @@ spec:
     - attr:sql.query contains "INSERT INTO tests"
 
   outputs:
-    CREATED_TEST_ID: "${attr:tracetest.request.body | json_path '.id' }"
-    OVER_DURATION: "${attr:tracetest.span.duration - env:MAX_SPAN_DURATION}"
+  - name: CREATED_TEST_ID
+    selector: span[name = "Tracetest trigger"]
+    value: attr:tracetest.request.body | json_path '.id'
+  - name: OVER_DURATION
+    selector: span[name = "Tracetest trigger"]
+    value: attr:tracetest.span.duration - env:MAX_SPAN_DURATION

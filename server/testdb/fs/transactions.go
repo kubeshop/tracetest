@@ -34,5 +34,5 @@ func (td *fsDB) GetTransactionVersion(ctx context.Context, id id.ID, version int
 }
 
 func (td *fsDB) GetTransactions(ctx context.Context, take, skip int32, query, sortBy, sortDirection string) (model.List[model.Transaction], error) {
-	panic("not implemented")
+	return model.List[model.Transaction]{}, nil
 }
