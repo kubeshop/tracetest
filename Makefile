@@ -5,6 +5,10 @@ OPENAPI_GENERATOR_IMAGE=openapitools/openapi-generator-cli:$(OPENAPI_GENERATOR_V
 OPENAPI_GENERATOR_CLI=docker run --rm -u ${shell id -u}  -v "$(PROJECT_ROOT):/local" -w "/local" ${OPENAPI_GENERATOR_IMAGE}
 OPENAPI_TARGET_DIR=openapi/
 
+build:
+	cd web; npm ci --silent && npm run build
+	cd server; go build -o tracetest-server .
+
 generate: generate-server generate-cli generate-web
 
 generate-web:

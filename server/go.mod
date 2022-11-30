@@ -2,7 +2,7 @@ module github.com/kubeshop/tracetest/server
 
 go 1.18
 
-replace k8s.io/client-go => k8s.io/client-go v0.18.0
+replace github.com/kubeshop/tracetest/web => ../web
 
 require (
 	github.com/alecthomas/participle/v2 v2.0.0-alpha8
@@ -19,6 +19,7 @@ require (
 	github.com/gorilla/websocket v1.5.0
 	github.com/j2gg0s/otsql v0.14.0
 	github.com/jhump/protoreflect v1.12.0
+	github.com/kubeshop/tracetest/web v0.0.0
 	github.com/lib/pq v1.10.5
 	github.com/mitchellh/mapstructure v1.4.3
 	github.com/ohler55/ojg v1.14.4

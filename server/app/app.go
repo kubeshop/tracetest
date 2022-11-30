@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io/fs"
 	"log"
 	"net/http"
 	"path/filepath"
@@ -27,6 +28,7 @@ import (
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/kubeshop/tracetest/server/tracing"
+	"github.com/kubeshop/tracetest/web"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -75,7 +77,8 @@ func spaHandler(prefix, staticPath, indexPath string, tplVars map[string]string)
 	var fileMatcher = regexp.MustCompile(`\.[a-zA-Z]*$`)
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		if !fileMatcher.MatchString(r.URL.Path) {
-			tpl, err := template.ParseFiles(filepath.Join(staticPath, indexPath))
+			tpl, err := template.ParseFS(web.SPA, filepath.Join(staticPath, indexPath))
+			// tpl, err := template.ParseFiles(filepath.Join(staticPath, indexPath))
 			if err != nil {
 				http.Error(w, err.Error(), 500)
 				return
@@ -87,7 +90,8 @@ func spaHandler(prefix, staticPath, indexPath string, tplVars map[string]string)
 			}
 
 		} else {
-			http.FileServer(http.Dir(staticPath)).ServeHTTP(w, r)
+			sub, _ := fs.Sub(web.SPA, "build")
+			http.FileServer(http.FS(sub)).ServeHTTP(w, r)
 		}
 	}
 
@@ -179,7 +183,7 @@ func (a *App) Start() error {
 	router.PathPrefix(a.config.Server.PathPrefix).Handler(
 		spaHandler(
 			a.config.Server.PathPrefix,
-			"./html",
+			"build",
 			"index.html",
 			map[string]string{
 				"AnalyticsKey":         analytics.FrontendKey,
