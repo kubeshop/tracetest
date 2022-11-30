@@ -99,6 +99,7 @@ func (a *App) Start() error {
 	ctx := context.Background()
 
 	serverID, isNewInstall, err := a.db.ServerID()
+	fmt.Println("ServerID", serverID, isNewInstall)
 
 	if err != nil {
 		return err

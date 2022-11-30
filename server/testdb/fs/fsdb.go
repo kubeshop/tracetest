@@ -30,7 +30,15 @@ func New(path string) (model.Repository, error) {
 }
 
 func (td *fsDB) ready() error {
-	return os.Mkdir(td.root, 0755)
+	err := os.Mkdir(td.root, 0755)
+	if err != nil {
+		if errors.Is(err, os.ErrExist) {
+			return nil
+		}
+		return err
+	}
+
+	return nil
 }
 
 func (td *fsDB) ServerID() (id string, isNew bool, err error) {
