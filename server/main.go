@@ -36,7 +36,7 @@ func main() {
 	ctx := context.Background()
 
 	// testDB, err := tdbpg.New(tdbpg.WithDSN(cfg.PostgresConnString))
-	testDB, err := tdbfs.New("./.tracetest")
+	testDB, err := tdbfs.New("./.tracetest") // TODO: config and factory
 	if err != nil {
 		log.Fatal(err)
 	}

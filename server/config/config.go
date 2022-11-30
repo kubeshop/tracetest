@@ -1,6 +1,7 @@
 package config
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"time"
@@ -152,6 +153,10 @@ func (c Config) getExporter(name string) (*TelemetryExporterOption, error) {
 func FromFile(file string) (Config, error) {
 	yamlFile, err := os.ReadFile(file)
 	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			// TODO: have solid default config
+			return Config{}, nil
+		}
 		return Config{}, fmt.Errorf("read file: %w", err)
 	}
 

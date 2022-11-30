@@ -78,7 +78,6 @@ func spaHandler(prefix, staticPath, indexPath string, tplVars map[string]string)
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		if !fileMatcher.MatchString(r.URL.Path) {
 			tpl, err := template.ParseFS(web.SPA, filepath.Join(staticPath, indexPath))
-			// tpl, err := template.ParseFiles(filepath.Join(staticPath, indexPath))
 			if err != nil {
 				http.Error(w, err.Error(), 500)
 				return

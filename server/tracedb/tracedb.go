@@ -25,12 +25,19 @@ type TraceDB interface {
 	Close() error
 }
 
+type noopTraceDB struct{}
+
+func (db *noopTraceDB) GetTraceByID(ctx context.Context, traceID string) (t traces.Trace, err error) {
+	return
+}
+func (db *noopTraceDB) Close() error { return nil }
+
 var ErrInvalidTraceDBProvider = fmt.Errorf("invalid traceDB provider: available options are (jaeger, tempo)")
 
 func New(c config.Config, repository model.RunRepository) (db TraceDB, err error) {
 	selectedDataStore, err := c.DataStore()
 	if err != nil {
-		return nil, ErrInvalidTraceDBProvider
+		return &noopTraceDB{}, nil
 	}
 
 	err = ErrInvalidTraceDBProvider
