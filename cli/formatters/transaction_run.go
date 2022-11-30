@@ -51,10 +51,11 @@ func (f transactionRun) json(output TransactionRunOutput) string {
 
 func (f transactionRun) pretty(output TransactionRunOutput) string {
 	if output.Run.GetState() == "FAILED" {
+		fmt.Println(output.Run)
 		return f.getColoredText(false, "Failed to execute transaction")
 	}
 
-	if !output.HasResults {
+	if output.HasResults {
 		link := output.RunWebURL
 		message := fmt.Sprintf("%s %s (%s)\n", PASSED_TEST_ICON, output.Transaction.GetName(), link)
 		return f.getColoredText(true, message)

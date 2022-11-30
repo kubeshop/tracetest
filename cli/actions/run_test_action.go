@@ -303,7 +303,7 @@ func (a runTestAction) testRun(ctx context.Context, test openapi.Test, runID str
 	}
 
 	if params.WaitForResult {
-		updatedTestRun, err := a.waitForResult(ctx, testID, testRun.GetId())
+		updatedTestRun, err := a.waitForTestResult(ctx, testID, testRun.GetId())
 		if err != nil {
 			return fmt.Errorf("could not wait for result: %w", err)
 		}
@@ -343,9 +343,14 @@ func (a runTestAction) transactionRun(ctx context.Context, transaction openapi.T
 		return fmt.Errorf("could not run transaction: %w", err)
 	}
 
-	// if params.WaitForResult {
-	// 	// TODO implement this
-	// }
+	if params.WaitForResult {
+		updatedTestRun, err := a.waitForTransactionResult(ctx, transactionID, transactionRun.GetId())
+		if err != nil {
+			return fmt.Errorf("could not wait for result: %w", err)
+		}
+
+		transactionRun = updatedTestRun
+	}
 
 	tro := formatters.TransactionRunOutput{
 		HasResults:  params.WaitForResult,
@@ -409,7 +414,7 @@ func (a runTestAction) getTransactionRun(ctx context.Context, transactionID stri
 	return *run, nil
 }
 
-func (a runTestAction) waitForResult(ctx context.Context, testID, testRunID string) (openapi.TestRun, error) {
+func (a runTestAction) waitForTestResult(ctx context.Context, testID, testRunID string) (openapi.TestRun, error) {
 	var (
 		testRun   openapi.TestRun
 		lastError error
@@ -445,11 +450,66 @@ func (a runTestAction) waitForResult(ctx context.Context, testID, testRunID stri
 	return testRun, nil
 }
 
+func (a runTestAction) waitForTransactionResult(ctx context.Context, transactionID, transactionRunID string) (openapi.TransactionRun, error) {
+	var (
+		transactionRun openapi.TransactionRun
+		lastError      error
+		wg             sync.WaitGroup
+	)
+	wg.Add(1)
+	ticker := time.NewTicker(1 * time.Second) // TODO: change to websockets
+	go func() {
+		for {
+			select {
+			case <-ticker.C:
+				readyTransactionRun, err := a.isTransactionReady(ctx, transactionID, transactionRunID)
+				if err != nil {
+					lastError = err
+					wg.Done()
+					return
+				}
+
+				if readyTransactionRun != nil {
+					transactionRun = *readyTransactionRun
+					wg.Done()
+					return
+				}
+			}
+		}
+	}()
+	wg.Wait()
+
+	if lastError != nil {
+		return openapi.TransactionRun{}, lastError
+	}
+
+	return transactionRun, nil
+}
+
 func (a runTestAction) isTestReady(ctx context.Context, testID, testRunId string) (*openapi.TestRun, error) {
 	req := a.client.ApiApi.GetTestRun(ctx, testID, testRunId)
 	run, _, err := a.client.ApiApi.GetTestRunExecute(req)
 	if err != nil {
 		return &openapi.TestRun{}, fmt.Errorf("could not execute GetTestRun request: %w", err)
+	}
+
+	if *run.State == "FAILED" || *run.State == "FINISHED" {
+		return run, nil
+	}
+
+	return nil, nil
+}
+
+func (a runTestAction) isTransactionReady(ctx context.Context, transactionID, transactionRunId string) (*openapi.TransactionRun, error) {
+	runId, err := strconv.Atoi(transactionRunId)
+	if err != nil {
+		return nil, fmt.Errorf("invalid transaction run id format: %w", err)
+	}
+
+	req := a.client.ApiApi.GetTransactionRun(ctx, transactionID, int32(runId))
+	run, _, err := a.client.ApiApi.GetTransactionRunExecute(req)
+	if err != nil {
+		return nil, fmt.Errorf("could not execute GetTestRun request: %w", err)
 	}
 
 	if *run.State == "FAILED" || *run.State == "FINISHED" {
