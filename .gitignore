@@ -20,3 +20,4 @@ swagger/
 .vscode/
 .idea/
 server/vendor
+.tracetest

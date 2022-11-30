@@ -14,9 +14,11 @@ import (
 	"flag"
 	"log"
 
+	// tdbpg "github.com/kubeshop/tracetest/server/testdb/postgres"
+	tdbfs "github.com/kubeshop/tracetest/server/testdb/fs"
+
 	"github.com/kubeshop/tracetest/server/app"
 	"github.com/kubeshop/tracetest/server/config"
-	tdbpg "github.com/kubeshop/tracetest/server/testdb/postgres"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/tracing"
 )
@@ -33,7 +35,8 @@ func main() {
 
 	ctx := context.Background()
 
-	testDB, err := tdbpg.New(tdbpg.WithDSN(cfg.PostgresConnString))
+	// testDB, err := tdbpg.New(tdbpg.WithDSN(cfg.PostgresConnString))
+	testDB, err := tdbfs.New("./.tracetest")
 	if err != nil {
 		log.Fatal(err)
 	}
