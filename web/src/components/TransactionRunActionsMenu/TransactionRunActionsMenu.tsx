@@ -1,15 +1,18 @@
 import {Dropdown, Menu} from 'antd';
 import useDeleteResourceRun from 'hooks/useDeleteResourceRun';
 import {ResourceType} from 'types/Resource.type';
+import {useFileViewerModal} from '../FileViewerModal/FileViewerModal.provider';
 import * as S from './TransactionRunActionsMenu.styled';
 
 interface IProps {
   runId: string;
   transactionId: string;
   isRunView?: boolean;
+  transactionVersion: number;
 }
 
-const TransactionRunActionsMenu = ({runId, transactionId, isRunView = false}: IProps) => {
+const TransactionRunActionsMenu = ({runId, transactionId, isRunView = false, transactionVersion}: IProps) => {
+  const {loadDefinition} = useFileViewerModal();
   const onDelete = useDeleteResourceRun({id: transactionId, isRunView, type: ResourceType.Transaction});
 
   return (
@@ -17,6 +20,13 @@ const TransactionRunActionsMenu = ({runId, transactionId, isRunView = false}: IP
       <Dropdown
         overlay={
           <Menu>
+            <Menu.Item
+              data-cy="view-transaction-definition-button"
+              key="view-transaction-definition"
+              onClick={() => loadDefinition(ResourceType.Transaction, transactionId, transactionVersion)}
+            >
+              Transaction Definition
+            </Menu.Item>
             <Menu.Item
               data-cy="test-delete-button"
               onClick={({domEvent}) => {

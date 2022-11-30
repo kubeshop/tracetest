@@ -3,8 +3,10 @@ import {Dropdown, Menu, Typography} from 'antd';
 import {useState} from 'react';
 
 import * as T from 'components/ResourceCard/ResourceCard.styled';
+import {useFileViewerModal} from 'components/FileViewerModal/FileViewerModal.provider';
 import {TEnvironment} from 'types/Environment.types';
 import * as E from './Environment.styled';
+import {ResourceType} from '../../types/Resource.type';
 
 interface IProps {
   environment: TEnvironment;
@@ -14,6 +16,7 @@ interface IProps {
 
 export const EnvironmentCard = ({environment: {description, id, name, values}, onDelete, onEdit}: IProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const {loadDefinition} = useFileViewerModal();
 
   return (
     <E.EnvironmentCard $isCollapsed={isCollapsed}>
@@ -39,6 +42,14 @@ export const EnvironmentCard = ({environment: {description, id, name, values}, o
                   onClick: e => {
                     e.domEvent.stopPropagation();
                     onEdit({id, name, description, values});
+                  },
+                },
+                {
+                  key: 'definition',
+                  label: <span data-cy="environment-actions-definition">Environment Definition</span>,
+                  onClick: e => {
+                    e.domEvent.stopPropagation();
+                    loadDefinition(ResourceType.Environment, id);
                   },
                 },
                 {
