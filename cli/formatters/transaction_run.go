@@ -51,7 +51,6 @@ func (f transactionRun) json(output TransactionRunOutput) string {
 
 func (f transactionRun) pretty(output TransactionRunOutput) string {
 	if output.Run.GetState() == "FAILED" {
-		fmt.Println(output.Run)
 		return f.getColoredText(false, "Failed to execute transaction")
 	}
 
