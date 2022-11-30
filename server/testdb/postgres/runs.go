@@ -1,4 +1,4 @@
-package testdb
+package postgres
 
 import (
 	"context"
@@ -12,6 +12,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/testdb"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -464,7 +465,7 @@ func readRunRow(row scanner) (model.Run, error) {
 
 	switch err {
 	case sql.ErrNoRows:
-		return model.Run{}, ErrNotFound
+		return model.Run{}, testdb.ErrNotFound
 	case nil:
 		err = json.Unmarshal(jsonTriggerResults, &r.TriggerResult)
 		if err != nil {

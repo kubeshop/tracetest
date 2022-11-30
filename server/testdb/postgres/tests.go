@@ -1,4 +1,4 @@
-package testdb
+package postgres
 
 import (
 	"context"
@@ -10,6 +10,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/testdb"
 )
 
 var _ model.TestRepository = &postgresDB{}
@@ -42,7 +43,7 @@ INSERT INTO tests (
 
 func (td *postgresDB) CreateTest(ctx context.Context, test model.Test) (model.Test, error) {
 	if !test.HasID() {
-		test.ID = IDGen.ID()
+		test.ID = testdb.IDGen.ID()
 	}
 
 	test.Version = 1
@@ -370,7 +371,7 @@ func (td *postgresDB) readTestRow(ctx context.Context, row scanner) (model.Test,
 
 		return test, nil
 	case sql.ErrNoRows:
-		return model.Test{}, ErrNotFound
+		return model.Test{}, testdb.ErrNotFound
 	default:
 		return model.Test{}, err
 	}

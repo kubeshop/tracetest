@@ -1,15 +1,13 @@
-package testdb
+package postgres
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
 
 	"github.com/denisbrodbeck/machineid"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
-	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 )
 
@@ -18,16 +16,11 @@ type postgresDB struct {
 	migrationsFolder string
 }
 
-var (
-	IDGen       = id.NewRandGenerator()
-	ErrNotFound = errors.New("record not found")
-)
-
 type scanner interface {
 	Scan(dest ...interface{}) error
 }
 
-func Postgres(options ...PostgresOption) (model.Repository, error) {
+func New(options ...PostgresOption) (model.Repository, error) {
 	ps := &postgresDB{
 		migrationsFolder: "file://./migrations",
 	}

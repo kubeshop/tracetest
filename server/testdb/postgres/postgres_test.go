@@ -1,4 +1,4 @@
-package testdb_test
+package postgres_test
 
 import (
 	"context"
@@ -11,7 +11,7 @@ import (
 )
 
 func getDB() (model.Repository, func()) {
-	db, err := testmock.GetTestingDatabase("file://../migrations")
+	db, err := testmock.GetTestingDatabase("file://../../migrations")
 	if err != nil {
 		panic(err)
 	}

@@ -1,4 +1,4 @@
-package testdb
+package postgres
 
 import (
 	"context"
@@ -9,6 +9,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/testdb"
 )
 
 const createTransactionRunQuery = `
@@ -330,7 +331,7 @@ func readTransactionRow(row scanner) (model.TransactionRun, error) {
 
 	switch err {
 	case sql.ErrNoRows:
-		return model.TransactionRun{}, ErrNotFound
+		return model.TransactionRun{}, testdb.ErrNotFound
 	case nil:
 		err = json.Unmarshal(jsonMetadata, &r.Metadata)
 		if err != nil {

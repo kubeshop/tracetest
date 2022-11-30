@@ -1,4 +1,4 @@
-package testdb
+package postgres
 
 import (
 	"context"
@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/testdb"
 )
 
 var _ model.EnvironmentRepository = &postgresDB{}
@@ -191,7 +192,7 @@ func (td *postgresDB) readEnvironmentRow(ctx context.Context, row scanner) (mode
 
 	switch err {
 	case sql.ErrNoRows:
-		return model.Environment{}, ErrNotFound
+		return model.Environment{}, testdb.ErrNotFound
 	case nil:
 		err = json.Unmarshal(jsonValues, &environment.Values)
 		if err != nil {

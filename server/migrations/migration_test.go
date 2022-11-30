@@ -7,7 +7,7 @@ import (
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
-	"github.com/kubeshop/tracetest/server/testdb"
+	tdbpg "github.com/kubeshop/tracetest/server/testdb/postgres"
 	"github.com/kubeshop/tracetest/server/testmock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -18,7 +18,7 @@ func TestMigrations(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Run("applying migrations", func(t *testing.T) {
-		_, err = testdb.Postgres(testdb.WithMigrations("file://../migrations"), testdb.WithDB(db))
+		_, err = tdbpg.New(tdbpg.WithMigrations("file://../migrations"), tdbpg.WithDB(db))
 		require.NoError(t, err, "postgres migrations up should not fail")
 	})
 

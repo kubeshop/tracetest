@@ -16,7 +16,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/app"
 	"github.com/kubeshop/tracetest/server/config"
-	"github.com/kubeshop/tracetest/server/testdb"
+	tdbpg "github.com/kubeshop/tracetest/server/testdb/postgres"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/tracing"
 )
@@ -33,7 +33,7 @@ func main() {
 
 	ctx := context.Background()
 
-	testDB, err := testdb.Postgres(testdb.WithDSN(cfg.PostgresConnString))
+	testDB, err := tdbpg.New(tdbpg.WithDSN(cfg.PostgresConnString))
 	if err != nil {
 		log.Fatal(err)
 	}

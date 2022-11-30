@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/server/model"
-	"github.com/kubeshop/tracetest/server/testdb"
+	tdbpg "github.com/kubeshop/tracetest/server/testdb/postgres"
 	"github.com/orlangure/gnomock"
 	"github.com/orlangure/gnomock/preset/postgres"
 )
@@ -19,9 +19,9 @@ func GetTestingDatabase(migrationFolder string) (model.Repository, error) {
 		return nil, err
 	}
 
-	return testdb.Postgres(
-		testdb.WithDB(db),
-		testdb.WithMigrations(migrationFolder),
+	return tdbpg.New(
+		tdbpg.WithDB(db),
+		tdbpg.WithMigrations(migrationFolder),
 	)
 }
 

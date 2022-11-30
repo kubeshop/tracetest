@@ -1,4 +1,4 @@
-package testdb
+package postgres
 
 import (
 	"context"
@@ -9,6 +9,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/testdb"
 )
 
 var _ model.TestRepository = &postgresDB{}
@@ -29,7 +30,7 @@ func (td *postgresDB) TransactionIDExists(ctx context.Context, id id.ID) (bool, 
 
 func (td *postgresDB) CreateTransaction(ctx context.Context, transaction model.Transaction) (model.Transaction, error) {
 	if !transaction.HasID() {
-		transaction.ID = IDGen.ID()
+		transaction.ID = testdb.IDGen.ID()
 	}
 
 	transaction.Version = 1
@@ -334,7 +335,7 @@ func (td *postgresDB) readTransactionRow(ctx context.Context, row scanner) (mode
 		}
 		return transaction, nil
 	case sql.ErrNoRows:
-		return model.Transaction{}, ErrNotFound
+		return model.Transaction{}, testdb.ErrNotFound
 	default:
 		return model.Transaction{}, err
 	}
