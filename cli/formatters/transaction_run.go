@@ -3,6 +3,7 @@ package formatters
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/openapi"
@@ -10,14 +11,16 @@ import (
 )
 
 type transactionRun struct {
-	config        config.Config
-	colorsEnabled bool
+	config           config.Config
+	colorsEnabled    bool
+	testRunFormatter testRun
 }
 
 func TransactionRun(config config.Config, colorsEnabled bool) transactionRun {
 	return transactionRun{
-		config:        config,
-		colorsEnabled: colorsEnabled,
+		config:           config,
+		colorsEnabled:    colorsEnabled,
+		testRunFormatter: TestRun(config, colorsEnabled, WithPadding(1)),
 	}
 }
 
@@ -55,13 +58,43 @@ func (f transactionRun) pretty(output TransactionRunOutput) string {
 	}
 
 	if !output.HasResults {
-		link := output.RunWebURL
-		message := fmt.Sprintf("%s %s (%s)\n", PASSED_TEST_ICON, output.Transaction.GetName(), link)
-		return f.getColoredText(true, message)
+		return ""
 	}
 
-	return ""
+	link := output.RunWebURL
+	allStepsPassed := f.allTransactionStepsPassed(output)
+	message := fmt.Sprintf("%s %s (%s)\n", PASSED_TEST_ICON, output.Transaction.GetName(), link)
 
+	if !allStepsPassed {
+		message = fmt.Sprintf("%s %s (%s)\n", FAILED_TEST_ICON, output.Transaction.GetName(), link)
+	}
+
+	// the transaction name + all steps
+	formattedMessages := make([]string, 0, len(output.Run.Steps)+1)
+	formattedMessages = append(formattedMessages, f.getColoredText(allStepsPassed, message))
+
+	for i, testRun := range output.Run.Steps {
+		test := output.Transaction.Steps[i]
+		message := f.testRunFormatter.pretty(TestRunOutput{
+			HasResults: true,
+			Test:       test,
+			Run:        testRun,
+			RunWebURL:  f.testRunFormatter.GetRunLink(*test.Id, *testRun.Id),
+		})
+
+		formattedMessages = append(formattedMessages, message)
+	}
+
+	return strings.Join(formattedMessages, "")
+}
+
+func (f transactionRun) allTransactionStepsPassed(output TransactionRunOutput) bool {
+	for _, step := range output.Run.Steps {
+		if !step.Result.GetAllPassed() {
+			return false
+		}
+	}
+	return true
 }
 
 func (f transactionRun) getColoredText(passed bool, text string) string {
