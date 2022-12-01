@@ -36,6 +36,9 @@ func (c *customController) Routes() openapi.Routes {
 
 	routes[c.getRouteIndex("GetRunResultJUnit")].HandlerFunc = c.GetRunResultJUnit
 	routes[c.getRouteIndex("GetTestVersionDefinitionFile")].HandlerFunc = c.GetTestVersionDefinitionFile
+	routes[c.getRouteIndex("GetTransactionVersionDefinitionFile")].HandlerFunc = c.GetTransactionVersionDefinitionFile
+	routes[c.getRouteIndex("GetEnvironmentDefinitionFile")].HandlerFunc = c.GetEnvironmentDefinitionFile
+
 	routes[c.getRouteIndex("GetTestRuns")].HandlerFunc = c.GetTestRuns
 
 	routes[c.getRouteIndex("GetTests")].HandlerFunc = paginatedEndpoint[openapi.Test](c.service.GetTests, c.errorHandler)
@@ -115,6 +118,42 @@ func (c *customController) GetTestVersionDefinitionFile(w http.ResponseWriter, r
 	}
 
 	result, err := c.service.GetTestVersionDefinitionFile(r.Context(), testIdParam, versionParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	w.Header().Set("Content-Type", "application/yaml; charset=UTF-8")
+	w.Write(result.Body.([]byte))
+}
+
+// GetTransactionVersionDefinitionFile - Get the test definition as an YAML file
+func (c *customController) GetTransactionVersionDefinitionFile(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	transactionIdParam := params["transactionId"]
+
+	versionParam, err := parseInt32Parameter(params["version"], true)
+	if err != nil {
+		c.errorHandler(w, r, &openapi.ParsingError{Err: err}, nil)
+		return
+	}
+
+	result, err := c.service.GetTransactionVersionDefinitionFile(r.Context(), transactionIdParam, versionParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	w.Header().Set("Content-Type", "application/yaml; charset=UTF-8")
+	w.Write(result.Body.([]byte))
+}
+
+// GetTransactionVersionDefinitionFile - Get the test definition as an YAML file
+func (c *customController) GetEnvironmentDefinitionFile(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	environmentIdParam := params["environmentId"]
+
+	result, err := c.service.GetEnvironmentDefinitionFile(r.Context(), environmentIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

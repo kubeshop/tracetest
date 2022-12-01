@@ -48,8 +48,6 @@ export const {
   useDeleteRunByIdMutation,
   useGetJUnitByRunIdQuery,
   useLazyGetJUnitByRunIdQuery,
-  useGetTestDefinitionYamlByRunIdQuery,
-  useLazyGetTestDefinitionYamlByRunIdQuery,
   useEditTestMutation,
   useGetEnvironmentsQuery,
   useCreateEnvironmentMutation,
@@ -68,6 +66,8 @@ export const {
   useGetResourcesQuery,
   useRunTransactionMutation,
   useGetTransactionVersionByIdQuery,
+  useGetResourceDefinitionQuery,
+  useLazyGetResourceDefinitionQuery,
 } = TraceTestAPI;
 export const {endpoints} = TraceTestAPI;
 

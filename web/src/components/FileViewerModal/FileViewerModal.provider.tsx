@@ -1,16 +1,17 @@
-import {noop} from 'lodash';
+import {capitalize, noop} from 'lodash';
 import {createContext, useCallback, useContext, useMemo, useState} from 'react';
 import FileViewerModal from 'components/FileViewerModal';
-import {useLazyGetJUnitByRunIdQuery, useLazyGetTestDefinitionYamlByRunIdQuery} from 'redux/apis/TraceTest.api';
+import {useLazyGetJUnitByRunIdQuery, useLazyGetResourceDefinitionQuery} from 'redux/apis/TraceTest.api';
+import {ResourceType} from 'types/Resource.type';
 
 interface IContext {
   loadJUnit(testId: string, runId: string): void;
-  loadTestDefinitionYaml(testId: string, version: number): void;
+  loadDefinition(resourceType: ResourceType, resourceId: string, version?: number): void;
 }
 
 export const Context = createContext<IContext>({
   loadJUnit: noop,
-  loadTestDefinitionYaml: noop,
+  loadDefinition: noop,
 });
 
 interface IProps {
@@ -41,28 +42,40 @@ const FileViewerModalProvider = ({children}: IProps) => {
     type: 'definition',
   });
   const [getJUnit] = useLazyGetJUnitByRunIdQuery();
-  const [getTestDefinitionYaml] = useLazyGetTestDefinitionYamlByRunIdQuery();
+  const [getResourceDefinition] = useLazyGetResourceDefinitionQuery();
+  const [fileProps, setProps] = useState({
+    title: '',
+    language: '',
+    subtitle: '',
+    fileName: '',
+  });
 
   const loadJUnit = useCallback(
     async (testId: string, runId: string) => {
       const data = await getJUnit({runId, testId}).unwrap();
       setIsFileViewerOpen(true);
       setFileViewerData({data, type: 'junit'});
+      setProps(propsMap.junit);
     },
     [getJUnit]
   );
 
-  const loadTestDefinitionYaml = useCallback(
-    async (testId: string, version: number) => {
-      const data = await getTestDefinitionYaml({testId, version}).unwrap();
+  const loadDefinition = useCallback(
+    async (resourceType: ResourceType, resourceId: string, version?: number) => {
+      const data = await getResourceDefinition({resourceId, version, resourceType}).unwrap();
       setIsFileViewerOpen(true);
       setFileViewerData({data, type: 'definition'});
+      setProps({
+        title: `${capitalize(resourceType)} Definition`,
+        language: 'yaml',
+        subtitle: 'Preview your YAML file',
+        fileName: `${resourceType}-${resourceId}-${version || 0}-definition.yaml`,
+      });
     },
-    [getTestDefinitionYaml]
+    [getResourceDefinition]
   );
 
-  const value: IContext = useMemo(() => ({loadJUnit, loadTestDefinitionYaml}), [loadJUnit, loadTestDefinitionYaml]);
-  const fileProps = propsMap[fileViewerData.type];
+  const value: IContext = useMemo(() => ({loadJUnit, loadDefinition}), [loadJUnit, loadDefinition]);
 
   return (
     <>

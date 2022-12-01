@@ -13,7 +13,7 @@ interface IProps {
 }
 
 const RunActionsMenu = ({resultId, testId, testVersion, isRunView = false}: IProps) => {
-  const {loadJUnit, loadTestDefinitionYaml} = useFileViewerModal();
+  const {loadJUnit, loadDefinition} = useFileViewerModal();
 
   const onDelete = useDeleteResourceRun({id: testId, isRunView, type: ResourceType.Test});
 
@@ -37,7 +37,7 @@ const RunActionsMenu = ({resultId, testId, testVersion, isRunView = false}: IPro
               key="view-test-definition"
               onClick={() => {
                 TestRunAnalyticsService.onLoadTestDefinition();
-                loadTestDefinitionYaml(testId, testVersion);
+                loadDefinition(ResourceType.Test, testId, testVersion);
               }}
             >
               Test Definition

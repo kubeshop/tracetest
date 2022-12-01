@@ -5,6 +5,7 @@ import {TTransaction} from './Transaction.types';
 export enum ResourceType {
   Test = 'test',
   Transaction = 'transaction',
+  Environment = 'environment',
 }
 
 export type TRawResource = TResourceSchemas['Resource'];
