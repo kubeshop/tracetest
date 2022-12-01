@@ -1,14 +1,18 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 import {PatchCollection} from '@reduxjs/toolkit/dist/query/core/buildThunks';
 
+import TestGateway from 'gateways/Test.gateway';
 import TestRunGateway from 'gateways/TestRun.gateway';
-import TestSpecsGateway from 'gateways/TestSpecs.gateway';
 import TestSpecsSelectors from 'selectors/TestSpecs.selectors';
 import TestDefinitionService from 'services/TestDefinition.service';
 import {TAssertionResults} from 'types/Assertion.types';
+import {TTest} from 'types/Test.types';
 import {TTestRun} from 'types/TestRun.types';
-import {TRawTestSpecEntry, TTestSpecEntry} from 'types/TestSpecs.types';
+import {TTestSpecEntry} from 'types/TestSpecs.types';
 import {RootState} from '../store';
+import {TriggerTypeToPlugin} from '../../constants/Plugins.constants';
+import {TriggerTypes} from '../../constants/Test.constants';
+import TestService from '../../services/Test.service';
 
 export type TChange = {
   selector: string;
@@ -16,31 +20,25 @@ export type TChange = {
   patch: PatchCollection;
 };
 
-export type TCrudResponse = {
-  definitionList: TTestSpecEntry[];
-  change: TChange;
-};
-
 const TestSpecsActions = () => ({
-  publish: createAsyncThunk<TTestRun, {testId: string; runId: string}>(
+  publish: createAsyncThunk<TTestRun, {test: TTest; testId: string; runId: string}>(
     'testDefinition/publish',
-    async ({testId, runId}, {dispatch, getState}) => {
-      const rawDefinitionList = TestSpecsSelectors.selectSpecs(getState() as RootState).reduce<TRawTestSpecEntry[]>(
-        (list, def) => (!def.isDeleted ? list.concat([TestDefinitionService.toRaw(def)]) : list),
-        []
-      );
-      const specs = TestDefinitionService.formatExpectedField(rawDefinitionList);
+    async ({test, testId, runId}, {dispatch, getState}) => {
+      const specs = TestSpecsSelectors.selectSpecs(getState() as RootState).filter(def => !def.isDeleted);
 
-      await dispatch(TestSpecsGateway.set(testId, {specs}));
+      const plugin = TriggerTypeToPlugin[test?.trigger?.type ?? TriggerTypes.http];
+      const testTriggerData = TestService.getInitialValues(test);
+      const updatedTest = {...test, definition: {specs}};
+      const rawTest = await TestService.getRequest(plugin, testTriggerData, updatedTest);
 
+      await dispatch(TestGateway.edit(rawTest, testId));
       return dispatch(TestRunGateway.reRun(testId, runId)).unwrap();
     }
   ),
   dryRun: createAsyncThunk<TAssertionResults, {definitionList: TTestSpecEntry[]; testId: string; runId: string}>(
     'testDefinition/dryRun',
     ({definitionList, testId, runId}, {dispatch}) => {
-      const rawDefinitionList = definitionList.map(def => TestDefinitionService.toRaw(def));
-      const specs = TestDefinitionService.formatExpectedField(rawDefinitionList);
+      const specs = definitionList.map(def => TestDefinitionService.toRaw(def));
 
       return dispatch(TestRunGateway.dryRun(testId, runId, {specs})).unwrap();
     }

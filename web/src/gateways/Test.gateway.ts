@@ -1,7 +1,7 @@
 import {endpoints} from 'redux/apis/TraceTest.api';
 import {TRawTest} from '../types/Test.types';
 
-const {createTest, getTestById, getTestList, runTest} = endpoints;
+const {createTest, editTest, getTestById, getTestList, runTest} = endpoints;
 
 const TestGateway = () => ({
   getList() {
@@ -15,6 +15,9 @@ const TestGateway = () => ({
   },
   run(testId: string) {
     return runTest.initiate({testId});
+  },
+  edit(test: TRawTest, testId: string) {
+    return editTest.initiate({test, testId});
   },
 });
 

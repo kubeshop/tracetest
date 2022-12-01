@@ -3,6 +3,7 @@ import {store} from '../../store';
 import {HTTP_METHOD} from '../../../constants/Common.constants';
 import TestSpecsSelectors from '../../../selectors/TestSpecs.selectors';
 import TestRunMock from '../../../models/__mocks__/TestRun.mock';
+import TestMock from '../../../models/__mocks__/Test.mock';
 
 jest.mock('../../../selectors/TestSpecs.selectors', () => ({
   selectSpecs: jest.fn(),
@@ -24,6 +25,7 @@ describe('TestDefinitionActions', () => {
 
       await store.dispatch(
         TestSpecsActions.publish({
+          test: TestMock.model(),
           testId: 'testId',
           runId: 'runId',
         })
@@ -32,7 +34,7 @@ describe('TestDefinitionActions', () => {
       const setRequest = fetchMock.mock.calls[0][0] as Request;
       const reRunRequest = fetchMock.mock.calls[1][0] as Request;
 
-      expect(setRequest.url).toEqual('http://localhost/api/tests/testId/definition');
+      expect(setRequest.url).toEqual('http://localhost/api/tests/testId');
       expect(setRequest.method).toEqual(HTTP_METHOD.PUT);
 
       expect(reRunRequest.url).toEqual('http://localhost/api/tests/testId/run/runId/rerun');

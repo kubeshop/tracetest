@@ -1,15 +1,18 @@
 import {noop} from 'lodash';
-import {useNavigate} from 'react-router-dom';
-import {outputAdded, outputDeleted, outputsInitiated, outputsReverted, outputUpdated} from 'redux/testOutputs/slice';
-import {useAppDispatch, useAppStore} from 'redux/hooks';
-import {useReRunMutation, useSetTestOutputsMutation} from 'redux/apis/TraceTest.api';
-import {toRawTestOutputs} from 'models/TestOutput.model';
 import {createContext, useCallback, useContext, useEffect, useMemo, useState} from 'react';
-import {TTestOutput} from 'types/TestOutput.types';
+import {useNavigate} from 'react-router-dom';
+
 import OutputModal from 'components/OutputModal/OutputModal';
+import {TriggerTypeToPlugin} from 'constants/Plugins.constants';
+import {TriggerTypes} from 'constants/Test.constants';
+import {useEditTestMutation, useReRunMutation} from 'redux/apis/TraceTest.api';
+import {useAppDispatch, useAppStore} from 'redux/hooks';
 import {selectTestOutputByIndex} from 'redux/testOutputs/selectors';
-import {useTest} from '../Test/Test.provider';
+import {outputAdded, outputDeleted, outputsInitiated, outputsReverted, outputUpdated} from 'redux/testOutputs/slice';
+import TestService from 'services/Test.service';
+import {TTestOutput} from 'types/TestOutput.types';
 import {useConfirmationModal} from '../ConfirmationModal/ConfirmationModal.provider';
+import {useTest} from '../Test/Test.provider';
 
 interface IContext {
   onModalOpen(draft?: TTestOutput): void;
@@ -46,9 +49,10 @@ const TestOutputProvider = ({children, testId, runId}: IProps) => {
   const dispatch = useAppDispatch();
   const {getState} = useAppStore();
   const {
+    test,
     test: {outputs: testOutputs = []},
   } = useTest();
-  const [setTestOutputs, {isLoading}] = useSetTestOutputsMutation();
+  const [editTest, {isLoading}] = useEditTestMutation();
   const [reRunTest, {isLoading: isLoadingReRun}] = useReRunMutation();
   const {onOpen} = useConfirmationModal();
   const navigate = useNavigate();
@@ -101,12 +105,16 @@ const TestOutputProvider = ({children, testId, runId}: IProps) => {
 
   const onSave = useCallback(
     async (outputs: TTestOutput[]) => {
-      await setTestOutputs({testId, testOutputs: toRawTestOutputs(outputs)}).unwrap();
-      const run = await reRunTest({testId, runId}).unwrap();
+      const plugin = TriggerTypeToPlugin[test?.trigger?.type || TriggerTypes.http];
+      const testTriggerData = TestService.getInitialValues(test);
+      const updatedTest = {...test, outputs};
+      const rawTest = await TestService.getRequest(plugin, testTriggerData, updatedTest);
 
+      await editTest({test: rawTest, testId}).unwrap();
+      const run = await reRunTest({runId, testId}).unwrap();
       navigate(`/test/${testId}/run/${run.id}/trigger`);
     },
-    [navigate, reRunTest, runId, setTestOutputs, testId]
+    [editTest, navigate, reRunTest, runId, test, testId]
   );
 
   const onNavigateAndOpenModal = useCallback(

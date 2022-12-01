@@ -104,18 +104,13 @@ func (td *postgresDB) UpdateTest(ctx context.Context, test model.Test) (model.Te
 	// keep the same creation date to keep sort order
 	test.CreatedAt = oldTest.CreatedAt
 
-	// keep outputs if new test doesn't have any
-	if test.Outputs.Len() == 0 {
-		test.Outputs = oldTest.Outputs
-	}
-
 	testToUpdate, err := model.BumpTestVersionIfNeeded(oldTest, test)
 	if err != nil {
 		return model.Test{}, fmt.Errorf("could not bump test version: %w", err)
 	}
 
 	if oldTest.Version == testToUpdate.Version {
-		// No change in the version, so nothing changes and it doesn't need to persist it
+		// No change in the version. Nothing changed so no need to persist it
 		return testToUpdate, nil
 	}
 

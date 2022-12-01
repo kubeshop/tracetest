@@ -1,6 +1,7 @@
-import {TRawTest, TTest, TDraftTest} from 'types/Test.types';
 import {SupportedPlugins} from 'constants/Common.constants';
+import {toRawTestOutputs} from 'models/TestOutput.model';
 import {IPlugin} from 'types/Plugins.types';
+import {TRawTest, TTest, TDraftTest} from 'types/Test.types';
 import Validator from 'utils/Validator';
 import {TriggerTypes} from 'constants/Test.constants';
 import TestDefinitionService from './TestDefinition.service';
@@ -57,6 +58,7 @@ const TestService = () => ({
       },
       ...(original
         ? {
+            outputs: toRawTestOutputs(original.outputs ?? []),
             specs: {
               specs: original.definition.specs.map(def => TestDefinitionService.toRaw(def)),
             },

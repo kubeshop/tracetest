@@ -5,6 +5,7 @@ import {TDraftTest, TTest} from 'types/Test.types';
 import VersionMismatchModal from 'components/VersionMismatchModal';
 import useTestCrud from './hooks/useTestCrud';
 import TestService from '../../services/Test.service';
+import {useTestRun} from '../TestRun/TestRun.provider';
 
 interface IContext {
   onEdit(values: TDraftTest): void;
@@ -30,13 +31,15 @@ export const Context = createContext<IContext>({
 
 interface IProps {
   testId: string;
-  version?: number;
   children: React.ReactNode;
 }
 
 export const useTest = () => useContext(Context);
 
-const TestProvider = ({children, testId, version = 0}: IProps) => {
+const TestProvider = ({children, testId}: IProps) => {
+  const {run} = useTestRun();
+  const version = run.testVersion || 0;
+
   const [isVersionModalOpen, setIsVersionModalOpen] = useState(false);
   const [draft, setDraft] = useState<TDraftTest>({});
   const [action, setAction] = useState<'edit' | 'run'>();
