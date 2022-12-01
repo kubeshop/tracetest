@@ -90,7 +90,7 @@ func (f transactionRun) pretty(output TransactionRunOutput) string {
 
 func (f transactionRun) allTransactionStepsPassed(output TransactionRunOutput) bool {
 	for _, step := range output.Run.Steps {
-		if step.Result.AllPassed == nil || !*step.Result.AllPassed {
+		if !step.Result.GetAllPassed() {
 			return false
 		}
 	}

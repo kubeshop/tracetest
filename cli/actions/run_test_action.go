@@ -362,9 +362,18 @@ func (a runTestAction) transactionRun(ctx context.Context, transaction openapi.T
 	formattedOutput := formatter.Format(tro)
 	fmt.Print(formattedOutput)
 
-	if params.WaitForResult && tro.Run.GetState() == "FAILED" {
-		// It failed, so we have to return an error status
-		os.Exit(1)
+	if params.WaitForResult {
+		if tro.Run.GetState() == "FAILED" {
+			// It failed, so we have to return an error status
+			os.Exit(1)
+		}
+
+		for _, step := range tro.Run.Steps {
+			if !step.Result.GetAllPassed() {
+				// if any test doesn't pass, fail the transaction execution
+				os.Exit(1)
+			}
+		}
 	}
 
 	return nil
