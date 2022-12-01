@@ -13,7 +13,7 @@ func Transaction(in model.Transaction) yaml.File {
 	out.Steps = make([]string, 0, len(in.Steps))
 
 	for _, step := range in.Steps {
-		out.Steps = append(out.Steps, step.ID.String()
+		out.Steps = append(out.Steps, step.ID.String())
 	}
 
 	return yaml.File{
