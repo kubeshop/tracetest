@@ -10,16 +10,7 @@ func Environment(in model.Environment) yaml.File {
 	out := yaml.Environment{}
 	dc.DeepCopy(in, &out)
 
-	valueList := make([]yaml.EnvironmentValue, len(in.Values))
-
-	for index, value := range in.Values {
-		valueList[index] = yaml.EnvironmentValue{
-			Key:   value.Key,
-			Value: value.Value,
-		}
-	}
-
-	out.Values = valueList
+	dc.DeepCopy(in.Values, &out.Values)
 
 	return yaml.File{
 		Type: yaml.FileTypeEnvironment,
