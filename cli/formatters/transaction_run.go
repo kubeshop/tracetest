@@ -62,15 +62,16 @@ func (f transactionRun) pretty(output TransactionRunOutput) string {
 	}
 
 	link := output.RunWebURL
-	if f.allTransactionStepsPassed(output) {
-		message := fmt.Sprintf("%s %s (%s)\n", PASSED_TEST_ICON, output.Transaction.GetName(), link)
-		return f.getColoredText(true, message)
+	allStepsPassed := f.allTransactionStepsPassed(output)
+	message := fmt.Sprintf("%s %s (%s)\n", PASSED_TEST_ICON, output.Transaction.GetName(), link)
+
+	if !allStepsPassed {
+		message = fmt.Sprintf("%s %s (%s)\n", FAILED_TEST_ICON, output.Transaction.GetName(), link)
 	}
 
-	message := fmt.Sprintf("%s %s (%s)\n", FAILED_TEST_ICON, output.Transaction.GetName(), link)
 	// the transaction name + all steps
 	formattedMessages := make([]string, 0, len(output.Run.Steps)+1)
-	formattedMessages = append(formattedMessages, f.getColoredText(false, message))
+	formattedMessages = append(formattedMessages, f.getColoredText(allStepsPassed, message))
 
 	for i, testRun := range output.Run.Steps {
 		test := output.Transaction.Steps[i]
