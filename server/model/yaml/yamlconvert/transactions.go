@@ -10,13 +10,11 @@ func Transaction(in model.Transaction) yaml.File {
 	out := yaml.Transaction{}
 	dc.DeepCopy(in, &out)
 
-	stepList := make([]string, len(in.Steps))
+	out.Steps = make([]string, 0, len(in.Steps))
 
-	for index, step := range in.Steps {
-		stepList[index] = string(step.ID)
+	for _, step := range in.Steps {
+		out.Steps = append(out.Steps, step.ID.String()
 	}
-
-	out.Steps = stepList
 
 	return yaml.File{
 		Type: yaml.FileTypeTransaction,
