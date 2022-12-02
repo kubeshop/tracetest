@@ -169,7 +169,7 @@ const config = {
         // Public API key: it is safe to commit it
         apiKey: "4bbc30616d55bf1aad84ed654121d5c7",
 
-        indexName: "docs_tracetest",
+        indexName: "tracetest",
       },
     }),
 };
