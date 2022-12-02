@@ -1,0 +1,6 @@
+type: Transaction
+spec:
+  name: my transaction
+  description: haha
+  steps:
+    - ./create-pokemon.yaml
