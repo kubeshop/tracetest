@@ -57,13 +57,12 @@ export interface IResult {
   assertionResult: TAssertionResultEntry;
 }
 
-export type TResultAssertions = Record<
-  string,
-  {
-    failed: IResult[];
-    passed: IResult[];
-  }
->;
+export type TResultAssertionsSummary = {
+  failed: IResult[];
+  passed: IResult[];
+};
+
+export type TResultAssertions = Record<string, TResultAssertionsSummary>;
 
 export interface ICheckResult {
   result: TAssertionSpanResult;

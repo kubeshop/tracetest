@@ -7,6 +7,7 @@ import {Attributes, TraceTestAttributes} from 'constants/SpanAttribute.constants
 import {isEmpty, remove} from 'lodash';
 import {TSpanFlatAttribute} from 'types/Span.types';
 import {getObjectIncludesText, isJson} from 'utils/Common';
+import {TResultAssertions, TResultAssertionsSummary} from 'types/Assertion.types';
 
 const flatAttributes = Object.values(Attributes);
 const flatTraceTestAttributes = Object.values(TraceTestAttributes);
@@ -81,6 +82,27 @@ const SpanAttributeService = () => ({
         getObjectIncludesText(tags, searchTextLowerCase)
       );
     });
+  },
+
+  getAttributeAssertionResults(attrName: string, assertions: TResultAssertions): TResultAssertionsSummary {
+    const resultList = Object.entries(assertions).reduce<TResultAssertionsSummary>(
+      ({failed: prevFailed, passed: prevPassed}, [assertionString, {failed, passed}]) => {
+        const itMatches = assertionString.toLowerCase().includes(attrName.toLowerCase());
+
+        return itMatches
+          ? {
+              failed: prevFailed.concat(failed),
+              passed: prevPassed.concat(passed),
+            }
+          : {failed: prevFailed, passed: prevPassed};
+      },
+      {
+        failed: [],
+        passed: [],
+      }
+    );
+
+    return resultList;
   },
 });
 
