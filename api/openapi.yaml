@@ -219,6 +219,32 @@ paths:
         500:
           description: "problem with getting a test"
 
+  /transactions/{transactionId}/version/{version}/definition.yaml:
+    get:
+      tags:
+        - api
+      parameters:
+        - in: path
+          name: transactionId
+          schema:
+            type: string
+          required: true
+        - in: path
+          name: version
+          schema:
+            type: integer
+          required: true
+      summary: Get the transaction definition as an YAML file
+      description: Get the transaction as an YAML file
+      operationId: getTransactionVersionDefinitionFile
+      responses:
+        200:
+          description: OK
+          content:
+            application/yaml:
+              schema:
+                type: string
+
   /transactions/{transactionId}/run:
     post:
       tags:
@@ -939,6 +965,27 @@ paths:
       responses:
         "204":
           description: OK
+
+  /environments/{environmentId}/definition.yaml:
+    get:
+      tags:
+        - api
+      parameters:
+        - in: path
+          name: environmentId
+          schema:
+            type: string
+          required: true
+      summary: Get the environment definition as an YAML file
+      description: Get the environment as an YAML file
+      operationId: getEnvironmentDefinitionFile
+      responses:
+        200:
+          description: OK
+          content:
+            application/yaml:
+              schema:
+                type: string
 
   # expressions
   /expressions/resolve:

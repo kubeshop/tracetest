@@ -28,6 +28,10 @@ export interface paths {
     /** get a transaction specific version */
     get: operations["getTransactionVersion"];
   };
+  "/transactions/{transactionId}/version/{version}/definition.yaml": {
+    /** Get the transaction as an YAML file */
+    get: operations["getTransactionVersionDefinitionFile"];
+  };
   "/transactions/{transactionId}/run": {
     /** Get all runs from a particular transaction */
     get: operations["getTransactionRuns"];
@@ -115,6 +119,10 @@ export interface paths {
     put: operations["updateEnvironment"];
     /** delete a environment */
     delete: operations["deleteEnvironment"];
+  };
+  "/environments/{environmentId}/definition.yaml": {
+    /** Get the environment as an YAML file */
+    get: operations["getEnvironmentDefinitionFile"];
   };
   "/expressions/resolve": {
     /** resolves an expression and returns the result string */
@@ -288,6 +296,23 @@ export interface operations {
       };
       /** problem with getting a test */
       500: unknown;
+    };
+  };
+  /** Get the transaction as an YAML file */
+  getTransactionVersionDefinitionFile: {
+    parameters: {
+      path: {
+        transactionId: string;
+        version: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/yaml": string;
+        };
+      };
     };
   };
   /** Get all runs from a particular transaction */
@@ -799,6 +824,22 @@ export interface operations {
     responses: {
       /** OK */
       204: never;
+    };
+  };
+  /** Get the environment as an YAML file */
+  getEnvironmentDefinitionFile: {
+    parameters: {
+      path: {
+        environmentId: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/yaml": string;
+        };
+      };
     };
   };
   /** resolves an expression and returns the result string */

@@ -44,7 +44,7 @@ const TransactionHeader = ({
             Run Transaction
           </Button>
         )}
-        <TransactionRunActionsMenu transactionId={transactionId} runId={runId} isRunView />
+        <TransactionRunActionsMenu transactionId={transactionId} runId={runId} isRunView transactionVersion={version} />
       </S.Section>
     </S.Container>
   );

@@ -654,6 +654,20 @@ func (c *controller) GetEnvironments(ctx context.Context, take, skip int32, quer
 	}), nil
 }
 
+func (c *controller) GetEnvironmentDefinitionFile(ctx context.Context, environmentId string) (openapi.ImplResponse, error) {
+	environment, err := c.testDB.GetEnvironment(ctx, environmentId)
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	enc, err := yaml.Encode(yamlconvert.Environment(environment))
+	if err != nil {
+		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
+	}
+
+	return openapi.Response(200, enc), nil
+}
+
 func (c *controller) UpdateEnvironment(ctx context.Context, environmentId string, in openapi.Environment) (openapi.ImplResponse, error) {
 	updated := c.mappers.In.Environment(in)
 
@@ -861,6 +875,20 @@ func (c *controller) UpdateTransaction(ctx context.Context, transactionID string
 	}
 
 	return c.doUpdateTransaction(ctx, id.ID(transactionID), transaction)
+}
+
+func (c *controller) GetTransactionVersionDefinitionFile(ctx context.Context, transactionId string, version int32) (openapi.ImplResponse, error) {
+	transaction, err := c.testDB.GetLatestTransactionVersion(ctx, id.ID(transactionId))
+	if err != nil {
+		return openapi.Response(http.StatusBadRequest, err.Error()), err
+	}
+
+	enc, err := yaml.Encode(yamlconvert.Transaction(transaction))
+	if err != nil {
+		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
+	}
+
+	return openapi.Response(200, enc), nil
 }
 
 func (c *controller) doUpdateTransaction(ctx context.Context, transactionID id.ID, updated model.Transaction) (openapi.ImplResponse, error) {
