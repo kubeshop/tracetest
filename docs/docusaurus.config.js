@@ -88,7 +88,7 @@ const config = {
         defaultMode: 'dark',
         disableSwitch: false,
         respectPrefersColorScheme: false,
-      },  
+      },
       navbar: {
         title: 'Tracetest',
         logo: {
@@ -167,7 +167,7 @@ const config = {
         appId: "L2ILN3GLIL",
 
         // Public API key: it is safe to commit it
-        apiKey: "faec1c157e78117102554f5e9036758d",
+        apiKey: "663c91299e298ff34c5a7a18f4451d1a",
 
         indexName: "tracetest",
       },
