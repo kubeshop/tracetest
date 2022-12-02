@@ -167,7 +167,7 @@ const config = {
         appId: "L2ILN3GLIL",
 
         // Public API key: it is safe to commit it
-        apiKey: "b032a80658edd801d9780862e13a83df",
+        apiKey: "faec1c157e78117102554f5e9036758d",
 
         indexName: "tracetest",
       },
