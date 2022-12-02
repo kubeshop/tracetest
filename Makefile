@@ -6,8 +6,7 @@ OPENAPI_GENERATOR_CLI=docker run --rm -u ${shell id -u}  -v "$(PROJECT_ROOT):/lo
 OPENAPI_TARGET_DIR=openapi/
 
 build:
-	cd web; npm ci --silent && npm run build
-	cd server; go build -o tracetest-server .
+	goreleaser release --skip-announce  --skip-publish --snapshot --rm-dist
 
 generate: generate-server generate-cli generate-web
 

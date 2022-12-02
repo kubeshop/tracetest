@@ -15,7 +15,8 @@ import (
 var _ model.TestRepository = &fsDB{}
 
 func (td *fsDB) TestIDExists(ctx context.Context, id id.ID) (bool, error) {
-	panic("TestIDExists not implemented")
+	_, err := td.GetLatestTestVersion(ctx, id)
+	return err == nil, err
 }
 
 func (td *fsDB) CreateTest(ctx context.Context, test model.Test) (model.Test, error) {
@@ -102,7 +103,7 @@ func (td *fsDB) getTestFile(id id.ID) (file, error) {
 	}
 
 	for _, f := range files {
-		yf, _ := f.read()
+		yf, _ := f.readYaml()
 		test, _ := yf.Test()
 		if test.Model().ID == id {
 			return f, nil
@@ -110,7 +111,6 @@ func (td *fsDB) getTestFile(id id.ID) (file, error) {
 	}
 
 	return file{}, testdb.ErrNotFound
-
 }
 
 func (td *fsDB) getAllTests() ([]model.Test, error) {
@@ -121,7 +121,7 @@ func (td *fsDB) getAllTests() ([]model.Test, error) {
 
 	res := []model.Test{}
 	for _, f := range files {
-		yf, _ := f.read()
+		yf, _ := f.readYaml()
 		test, _ := yf.Test()
 		res = append(res, test.Model())
 	}
@@ -141,7 +141,7 @@ func (td *fsDB) getAllTestFiles() ([]file, error) {
 			continue
 		}
 
-		yf, err := f.read()
+		yf, err := f.readYaml()
 		if err != nil {
 			return nil, err
 		}

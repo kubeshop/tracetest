@@ -10,6 +10,7 @@ import (
 
 	"github.com/denisbrodbeck/machineid"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/joho/godotenv"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/model/yaml"
 	"github.com/kubeshop/tracetest/server/testdb"
@@ -186,7 +187,7 @@ func (f file) write(in yaml.File) error {
 	return nil
 }
 
-func (f file) read() (yaml.File, error) {
+func (f file) readYaml() (yaml.File, error) {
 	b, err := os.ReadFile(f.path)
 	if err != nil {
 		return yaml.File{}, fmt.Errorf("cannot read file %s: %w", f.path, err)
@@ -200,8 +201,21 @@ func (f file) read() (yaml.File, error) {
 	return yf, nil
 }
 
+func (f file) readEnv() (map[string]string, error) {
+	b, err := os.ReadFile(f.path)
+	if err != nil {
+		return nil, fmt.Errorf("cannot read file %s: %w", f.path, err)
+	}
+	return godotenv.Unmarshal(string(b))
+
+}
+
 func (f file) isYaml() bool {
 	return slices.Contains([]string{".yaml", ".yml"}, filepath.Ext(f.path))
+}
+
+func (f file) isEnv() bool {
+	return slices.Contains([]string{".env"}, filepath.Ext(f.path))
 }
 
 func (td *fsDB) getFiles() ([]file, error) {
@@ -227,4 +241,10 @@ func (td *fsDB) readDir(path string) ([]file, error) {
 
 func (td *fsDB) Drop() error {
 	panic("not implemented")
+}
+
+func (td *fsDB) envs() fileDB[string, model.Environment] {
+	return fileDB[string, model.Environment]{
+		path: td.dbPath("envs.json"),
+	}
 }

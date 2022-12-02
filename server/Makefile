@@ -22,7 +22,7 @@ vet:
 	go vet -structtag=false ./...
 
 run:
-	go run -ldflags="$(GO_LDFLAGS)" main.go
+	go run -ldflags="$(GO_LDFLAGS)" main.go -- ../tracetesting/transactions
 
 build:
 	go build -o tracetest-server -ldflags="$(GO_LDFLAGS)" .

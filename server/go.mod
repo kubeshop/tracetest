@@ -19,6 +19,7 @@ require (
 	github.com/gorilla/websocket v1.5.0
 	github.com/j2gg0s/otsql v0.14.0
 	github.com/jhump/protoreflect v1.12.0
+	github.com/joho/godotenv v1.3.0
 	github.com/kubeshop/tracetest/web v0.0.0
 	github.com/lib/pq v1.10.5
 	github.com/mitchellh/mapstructure v1.4.3

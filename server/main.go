@@ -28,6 +28,7 @@ var cfg = flag.String("config", "config.yaml", "path to the config file")
 func main() {
 
 	flag.Parse()
+	root := flag.Arg(0)
 	cfg, err := config.FromFile(*cfg)
 	if err != nil {
 		log.Fatal(err)
@@ -36,7 +37,7 @@ func main() {
 	ctx := context.Background()
 
 	// testDB, err := tdbpg.New(tdbpg.WithDSN(cfg.PostgresConnString))
-	testDB, err := tdbfs.New("../tracetesting/transactions") // TODO: config and factory
+	testDB, err := tdbfs.New(root) // TODO: config and factory
 	if err != nil {
 		log.Fatal(err)
 	}
