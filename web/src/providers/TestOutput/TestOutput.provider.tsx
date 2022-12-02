@@ -95,7 +95,7 @@ const TestOutputProvider = ({children, testId, runId}: IProps) => {
       setIsOpen(false);
       if (isEditing) {
         setIsEditing(false);
-        dispatch(outputUpdated({output: {...values, id: draft?.id || -1}}));
+        dispatch(outputUpdated({output: {...values, id: draft?.id ?? -1}}));
         return;
       }
       dispatch(outputAdded(values));
