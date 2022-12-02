@@ -164,12 +164,12 @@ const config = {
       },
       algolia: {
         // The application ID provided by Algolia
-        appId: "NA2OEQH0PY",
+        appId: "L2ILN3GLIL",
 
         // Public API key: it is safe to commit it
-        apiKey: "4bbc30616d55bf1aad84ed654121d5c7",
+        apiKey: "b032a80658edd801d9780862e13a83df",
 
-        indexName: "docs_tracetest",
+        indexName: "tracetest",
       },
     }),
 };
