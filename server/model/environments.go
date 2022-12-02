@@ -20,12 +20,19 @@ type (
 	}
 )
 
+func Slug(in string) string {
+	out := strings.TrimSpace(in)
+	out = strings.ReplaceAll(out, " ", "-")
+	out = strings.ToLower(out)
+	return out
+}
+
 func (e Environment) HasID() bool {
 	return e.ID != ""
 }
 
 func (e Environment) Slug() string {
-	return strings.ToLower(strings.ReplaceAll(strings.TrimSpace(e.Name), " ", "-"))
+	return Slug(e.Name)
 }
 
 func (e Environment) Get(key string) string {

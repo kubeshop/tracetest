@@ -10,27 +10,27 @@ import (
 var _ model.TestRepository = &fsDB{}
 
 func (td *fsDB) TransactionIDExists(ctx context.Context, id id.ID) (bool, error) {
-	panic("not implemented")
+	panic("TransactionIDExists not implemented")
 }
 
 func (td *fsDB) CreateTransaction(ctx context.Context, transaction model.Transaction) (model.Transaction, error) {
-	panic("not implemented")
+	panic("CreateTransaction not implemented")
 }
 
 func (td *fsDB) UpdateTransaction(ctx context.Context, transaction model.Transaction) (model.Transaction, error) {
-	panic("not implemented")
+	panic("UpdateTransaction not implemented")
 }
 
 func (td *fsDB) DeleteTransaction(ctx context.Context, transaction model.Transaction) error {
-	panic("not implemented")
+	panic("DeleteTransaction not implemented")
 }
 
 func (td *fsDB) GetLatestTransactionVersion(ctx context.Context, id id.ID) (model.Transaction, error) {
-	panic("not implemented")
+	panic("GetLatestTransactionVersion not implemented")
 }
 
 func (td *fsDB) GetTransactionVersion(ctx context.Context, id id.ID, version int) (model.Transaction, error) {
-	panic("not implemented")
+	panic("GetTransactionVersion not implemented")
 }
 
 func (td *fsDB) GetTransactions(ctx context.Context, take, skip int32, query, sortBy, sortDirection string) (model.List[model.Transaction], error) {

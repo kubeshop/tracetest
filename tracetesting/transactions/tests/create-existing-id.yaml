@@ -1,41 +1,43 @@
 type: Test
 spec:
-  id: zwWc1RV4R
-  name: Create with existing ID
-  trigger:
-    type: http
-    httpRequest:
-      url: "${env:TARGET_URL}/api/tests"
-      method: POST
-      headers:
-      - key: Content-Type
-        value: application/json
-      body: |
-        {
-          "id": "${env:EXAMPLE_TEST_ID}",
-          "name": "Pokemon - List - Get a Pokemon",
-          "serviceUnderTest": {
-            "triggerType": "http",
-            "triggerSettings": {
-              "http": {
-                "url": "${env:DEMO_APP_URL}/pokemon?take=20&skip=0",
-                "method": "GET",
-                "body": "",
-                "headers": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
+    id: zwWc1RV4R
+    name: Create with existing ID
+    description: asd
+    trigger:
+        type: http
+        httpRequest:
+            url: http://localhost:11633/api/tests
+            method: GET
+            headers:
+                - key: Content-Type
+                  value: application/json
+            authentication: {}
+            body: |
+                {
+                  "id": "${env:EXAMPLE_TEST_ID}",
+                  "name": "Pokemon - List - Get a Pokemon",
+                  "serviceUnderTest": {
+                    "triggerType": "http",
+                    "triggerSettings": {
+                      "http": {
+                        "url": "${env:DEMO_APP_URL}/pokemon?take=20&skip=0",
+                        "method": "GET",
+                        "body": "",
+                        "headers": [
+                          {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                          }
+                        ]
+                      }
+                    }
                   }
-                ]
-              }
-            }
-          }
-        }
-  specs:
-  - selector: span[name = "Tracetest trigger"]
-    assertions:
-      - attr:tracetest.selected_spans.count = 1
-      - attr:tracetest.response.status = 400
-  - selector: span[name="POST /api/tests" tracetest.span.type="http"]
-    assertions:
-    - attr:tracetest.selected_spans.count = 1
+                }
+    specs:
+        - selector: span[name = "Tracetest trigger"]
+          assertions:
+            - attr:tracetest.selected_spans.count = 1
+            - attr:tracetest.response.status = 400
+        - selector: span[name="POST /api/tests" tracetest.span.type="http"]
+          assertions:
+            - attr:tracetest.selected_spans.count = 1

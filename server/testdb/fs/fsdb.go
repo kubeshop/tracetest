@@ -12,6 +12,7 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/model/yaml"
+	"github.com/kubeshop/tracetest/server/testdb"
 	"golang.org/x/exp/slices"
 )
 
@@ -44,8 +45,24 @@ func (td *fsDB) ready() error {
 	return nil
 }
 
+func (td *fsDB) dbPath(name string) string {
+	return path.Join(td.root, name)
+}
+
+func (td *fsDB) runs(testID string) fileDB[int, model.Run] {
+	return fileDB[int, model.Run]{
+		path: td.dbPath(".run_" + testID + ".json"),
+	}
+}
+
+func (td *fsDB) config() fileDB[string, string] {
+	return fileDB[string, string]{
+		path: td.dbPath(".config.json"),
+	}
+}
+
 func (td *fsDB) ServerID() (id string, isNew bool, err error) {
-	id, err = td.getConfigValue("serverID")
+	id, err = td.config().get("serverID")
 	if err != nil {
 		err = fmt.Errorf("could not get machineID: %w", err)
 		return
@@ -65,12 +82,11 @@ func (td *fsDB) ServerID() (id string, isNew bool, err error) {
 	}
 	id = id[:10] // limit lenght to avoid issues with GA
 
-	// id, err =
 	if err != nil {
 		err = fmt.Errorf("could not get machineID: %w", err)
 		return
 	}
-	err = td.writeConfigValue("serverID", id)
+	err = td.config().write("serverID", id)
 	if err != nil {
 		err = fmt.Errorf("could not save serverID into DB: %w", err)
 		return
@@ -79,58 +95,81 @@ func (td *fsDB) ServerID() (id string, isNew bool, err error) {
 	return
 }
 
-func (td *fsDB) getConfigValue(key string) (string, error) {
-	config, err := td.getDB()
-	if err != nil {
-		return "", err
-	}
-
-	return config[key], nil
+type fileDB[K comparable, V any] struct {
+	path string
 }
 
-func (td *fsDB) writeConfigValue(key, value string) error {
-	config, err := td.getDB()
-	if err != nil {
-		return err
-	}
-
-	config[key] = value
-
-	return td.persistDB(config)
-}
-
-func (td *fsDB) getDB() (map[string]string, error) {
-	db, err := os.ReadFile(path.Join(td.root, ".config.json"))
+func (fdb fileDB[K, V]) read() (map[K]V, error) {
+	b, err := os.ReadFile(fdb.path)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
 			// allow working with not existing dbs
-			return map[string]string{}, nil
+			return nil, nil
 		}
 
 		return nil, err
 	}
 
-	var config map[string]string
-	err = json.Unmarshal(db, &config)
+	var contents map[K]V
+	err = json.Unmarshal(b, &contents)
 	if err != nil {
 		return nil, err
 	}
 
-	return config, nil
+	return contents, nil
 }
 
-func (td *fsDB) persistDB(config map[string]string) error {
-	db, err := json.Marshal(config)
+func (fdb fileDB[K, V]) get(key K) (v V, err error) {
+	rows, err := fdb.read()
+	if err != nil {
+		return
+	}
+
+	row, exists := rows[key]
+	if !exists {
+		err = testdb.ErrNotFound
+		return
+	}
+
+	return row, nil
+}
+
+func (fdb fileDB[K, V]) write(key K, val V) error {
+	db, err := fdb.read()
+	if err != nil {
+		return err
+	}
+	if db == nil {
+		db = make(map[K]V)
+	}
+
+	db[key] = val
+
+	encoded, err := json.Marshal(db)
 	if err != nil {
 		return err
 	}
 
-	return os.WriteFile(path.Join(td.root, ".config.json"), db, 0644)
+	return os.WriteFile(fdb.path, encoded, 0644)
 }
 
 type file struct {
 	path string
 	info os.FileInfo
+}
+
+func (f file) write(in yaml.File) error {
+	b, err := in.Encode()
+	if err != nil {
+		return fmt.Errorf("cannot encode input for file %s: %w", f.path, err)
+	}
+
+	os.WriteFile(f.path, b, 0644)
+	if err != nil {
+		return fmt.Errorf("cannot write file %s: %w", f.path, err)
+	}
+
+	return nil
 }
 
 func (f file) read() (yaml.File, error) {

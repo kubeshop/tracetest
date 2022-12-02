@@ -9,15 +9,15 @@ import (
 var _ model.EnvironmentRepository = &fsDB{}
 
 func (td *fsDB) CreateEnvironment(ctx context.Context, environment model.Environment) (model.Environment, error) {
-	panic("not implemented")
+	panic("CreateEnvironment not implemented")
 }
 
 func (td *fsDB) UpdateEnvironment(ctx context.Context, environment model.Environment) (model.Environment, error) {
-	panic("not implemented")
+	panic("UpdateEnvironment not implemented")
 }
 
 func (td *fsDB) DeleteEnvironment(ctx context.Context, environment model.Environment) error {
-	panic("not implemented")
+	panic("DeleteEnvironment not implemented")
 }
 
 func (td *fsDB) GetEnvironments(ctx context.Context, take, skip int32, query, sortBy, sortDirection string) (model.List[model.Environment], error) {
@@ -25,9 +25,9 @@ func (td *fsDB) GetEnvironments(ctx context.Context, take, skip int32, query, so
 }
 
 func (td *fsDB) GetEnvironment(ctx context.Context, id string) (model.Environment, error) {
-	panic("not implemented")
+	panic("GetEnvironment not implemented")
 }
 
 func (td *fsDB) EnvironmentIDExists(ctx context.Context, id string) (bool, error) {
-	panic("not implemented")
+	panic("EnvironmentIDExists not implemented")
 }
