@@ -1,6 +1,7 @@
 import {HTTP_METHOD} from 'constants/Common.constants';
 import {TracetestApiTags} from 'constants/Test.constants';
 import Transaction from 'models/Transaction.model';
+import TransactionService from 'services/Transaction.service';
 import {TTestApiEndpointBuilder} from 'types/Test.types';
 import {TDraftTransaction, TRawTransaction, TTransaction} from 'types/Transaction.types';
 
@@ -9,7 +10,7 @@ const TransactionEndpoint = (builder: TTestApiEndpointBuilder) => ({
     query: transaction => ({
       url: '/transactions',
       method: HTTP_METHOD.POST,
-      body: transaction,
+      body: TransactionService.getRawFromDraft(transaction),
     }),
     transformResponse: (rawTransaction: TRawTransaction) => Transaction(rawTransaction),
     invalidatesTags: [
@@ -21,7 +22,7 @@ const TransactionEndpoint = (builder: TTestApiEndpointBuilder) => ({
     query: ({transactionId, transaction}) => ({
       url: `/transactions/${transactionId}`,
       method: HTTP_METHOD.PUT,
-      body: transaction,
+      body: TransactionService.getRawFromDraft(transaction),
     }),
     invalidatesTags: [{type: TracetestApiTags.TRANSACTION, id: 'LIST'}],
   }),

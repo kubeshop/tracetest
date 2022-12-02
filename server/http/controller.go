@@ -710,6 +710,20 @@ func (c *controller) GetEnvironments(ctx context.Context, take, skip int32, quer
 	}), nil
 }
 
+func (c *controller) GetEnvironmentDefinitionFile(ctx context.Context, environmentId string) (openapi.ImplResponse, error) {
+	environment, err := c.testDB.GetEnvironment(ctx, environmentId)
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	enc, err := yaml.Encode(yamlconvert.Environment(environment))
+	if err != nil {
+		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
+	}
+
+	return openapi.Response(200, enc), nil
+}
+
 func (c *controller) UpdateEnvironment(ctx context.Context, environmentId string, in openapi.Environment) (openapi.ImplResponse, error) {
 	updated := c.mappers.In.Environment(in)
 
@@ -919,6 +933,20 @@ func (c *controller) UpdateTransaction(ctx context.Context, transactionID string
 	return c.doUpdateTransaction(ctx, id.ID(transactionID), transaction)
 }
 
+func (c *controller) GetTransactionVersionDefinitionFile(ctx context.Context, transactionId string, version int32) (openapi.ImplResponse, error) {
+	transaction, err := c.testDB.GetLatestTransactionVersion(ctx, id.ID(transactionId))
+	if err != nil {
+		return openapi.Response(http.StatusBadRequest, err.Error()), err
+	}
+
+	enc, err := yaml.Encode(yamlconvert.Transaction(transaction))
+	if err != nil {
+		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
+	}
+
+	return openapi.Response(200, enc), nil
+}
+
 func (c *controller) doUpdateTransaction(ctx context.Context, transactionID id.ID, updated model.Transaction) (openapi.ImplResponse, error) {
 	transaction, err := c.testDB.GetLatestTransactionVersion(ctx, transactionID)
 	if err != nil {
@@ -1014,35 +1042,17 @@ func (c *controller) executeTransaction(ctx context.Context, transaction model.T
 }
 
 func (c *controller) GetTransactionRun(ctx context.Context, transactionId string, runId int32) (openapi.ImplResponse, error) {
-	run, err := c.testDB.GetTransactionRun(ctx, transactionId, int(runId))
+	run, err := c.testDB.GetTransactionRun(ctx, id.ID(transactionId), int(runId))
 	if err != nil {
 		return handleDBError(err), err
 	}
 
 	openapiRun := c.mappers.Out.TransactionRun(run)
-	for i, step := range run.Steps {
-		test, err := c.testDB.GetLatestTestVersion(ctx, id.ID(step.ID))
-		if err != nil {
-			return handleDBError(err), err
-		}
-
-		openapiRun.Steps[i] = c.mappers.Out.Test(test)
-	}
-
-	for i, stepRun := range run.StepRuns {
-		testRun, err := c.testDB.GetRun(ctx, stepRun.TestID, stepRun.ID)
-		if err != nil {
-			return handleDBError(err), err
-		}
-
-		openapiRun.StepRuns[i] = c.mappers.Out.Run(&testRun)
-	}
-
 	return openapi.Response(http.StatusOK, openapiRun), nil
 }
 
 func (c *controller) GetTransactionRuns(ctx context.Context, transactionId string, take, skip int32) (openapi.ImplResponse, error) {
-	runs, err := c.testDB.GetTransactionsRuns(ctx, transactionId, take, skip)
+	runs, err := c.testDB.GetTransactionsRuns(ctx, id.ID(transactionId), take, skip)
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -1056,7 +1066,7 @@ func (c *controller) GetTransactionRuns(ctx context.Context, transactionId strin
 }
 
 func (c *controller) DeleteTransactionRun(ctx context.Context, transactionId string, runId int32) (openapi.ImplResponse, error) {
-	run, err := c.testDB.GetTransactionRun(ctx, transactionId, int(runId))
+	run, err := c.testDB.GetTransactionRun(ctx, id.ID(transactionId), int(runId))
 	if err != nil {
 		return handleDBError(err), err
 	}

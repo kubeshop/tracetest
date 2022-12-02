@@ -5,7 +5,7 @@ import * as S from './TestsSelectionInput.styled';
 
 interface IProps {
   items: ISortableTest[];
-  onDelete(testId: string): void;
+  onDelete(sortableId: string): void;
 }
 
 const TestItemList = ({items, onDelete}: IProps) => {

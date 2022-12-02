@@ -1,7 +1,7 @@
 import {SortBy, SortDirection, TracetestApiTags} from 'constants/Test.constants';
 import Resource from 'models/Resource.model';
 import {PaginationResponse} from 'hooks/usePagination';
-import {TRawResource, TResource} from 'types/Resource.type';
+import {TRawResource, TResource, ResourceType} from 'types/Resource.type';
 import {TTestApiEndpointBuilder} from 'types/Test.types';
 import {getTotalCountFromHeaders} from 'utils/Common';
 
@@ -19,6 +19,15 @@ const ResourceEndpoint = (builder: TTestApiEndpointBuilder) => ({
         total: getTotalCountFromHeaders(meta),
       };
     },
+  }),
+  getResourceDefinition: builder.query<string, {resourceId: string; version?: number; resourceType: ResourceType}>({
+    query: ({resourceId, resourceType, version}) => ({
+      url: `/${resourceType}s/${resourceId}${version ? `/version/${version}` : ''}/definition.yaml`,
+      responseHandler: 'text',
+    }),
+    providesTags: (result, error, {resourceId, version}) => [
+      {type: TracetestApiTags.RESOURCE, id: `${resourceId}-${version}-definition`},
+    ],
   }),
 });
 

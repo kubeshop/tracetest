@@ -7,9 +7,8 @@ import Header from 'components/Header';
 import useRouterSync from 'hooks/useRouterSync';
 import ConfirmationModalProvider from 'providers/ConfirmationModal';
 import EnvironmentProvider from 'providers/Environment';
-import {MenuInfo} from 'rc-menu/es/interface';
 import React from 'react';
-import {Link, useLocation, useNavigate} from 'react-router-dom';
+import {Link, useLocation} from 'react-router-dom';
 import * as S from './Layout.styled';
 
 interface IProps {
@@ -21,25 +20,20 @@ const menuItems = [
   {
     key: '0',
     icon: <ClusterOutlined />,
-    label: 'Tests',
+    label: <Link to="/">Tests</Link>,
     path: '/',
   },
   {
     key: '1',
     icon: <GlobalOutlined />,
-    label: 'Environments',
+    label: <Link to="/environments">Environments</Link>,
     path: '/environments',
   },
 ];
 
 const Layout = ({children, hasMenu = false}: IProps) => {
-  const navigate = useNavigate();
   useRouterSync();
 
-  const handleOnClickMenu = (menuInfo: MenuInfo) => {
-    const item = menuItems.find(menuItem => menuItem.key === menuInfo.key);
-    navigate(item?.path ?? '/');
-  };
   const pathname = useLocation().pathname;
   return (
     <FileViewerModalProvider>
@@ -59,7 +53,6 @@ const Layout = ({children, hasMenu = false}: IProps) => {
                     defaultSelectedKeys={[menuItems.findIndex(value => value.path === pathname).toString() || '0']}
                     items={menuItems}
                     mode="inline"
-                    onClick={handleOnClickMenu}
                     theme="dark"
                   />
                 </S.MenuContainer>

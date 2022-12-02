@@ -1,3 +1,6 @@
+import {useCallback, useEffect} from 'react';
+import {Node, NodeChange} from 'react-flow-renderer';
+
 import {VisualizationType} from 'components/RunDetailTrace/RunDetailTrace';
 import SkeletonDiagram from 'components/SkeletonDiagram';
 import {useTestSpecForm} from 'components/TestSpecForm/TestSpecForm.provider';
@@ -5,8 +8,6 @@ import DAG from 'components/Visualization/components/DAG';
 import Timeline from 'components/Visualization/components/Timeline';
 import {TestState} from 'constants/TestRun.constants';
 import {useSpan} from 'providers/Span/Span.provider';
-import {useCallback, useEffect} from 'react';
-import {Node, NodeChange} from 'react-flow-renderer';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import {initNodes, onNodesChange as onNodesChangeAction} from 'redux/slices/DAG.slice';
 import DAGSelectors from 'selectors/DAG.selectors';
@@ -14,7 +15,6 @@ import TraceAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
 import TraceDiagramAnalyticsService from 'services/Analytics/TraceDiagramAnalytics.service';
 import {TSpan} from 'types/Span.types';
 import {TTestRunState} from 'types/TestRun.types';
-import {Flame} from '../Visualization/components/Flame/Flame';
 
 export interface IProps {
   runState: TTestRunState;
@@ -69,43 +69,27 @@ const Visualization = ({runState, spans, type}: IProps) => {
   if (runState !== TestState.FINISHED) {
     return <SkeletonDiagram />;
   }
-  return (
-    <>
-      {type === VisualizationType.Dag && (
-        <DAG
-          edges={edges}
-          isMatchedMode={matchedSpans.length > 0 || isOpen}
-          matchedSpans={matchedSpans}
-          nodes={nodes}
-          onNavigateToSpan={onNavigateToSpan}
-          onNodesChange={onNodesChange}
-          onNodeClick={onNodeClick}
-          selectedSpan={focusedSpan}
-        />
-      )}
 
-      {type === VisualizationType.Timeline && (
-        <Timeline
-          isMatchedMode={matchedSpans.length > 0 || isOpen}
-          matchedSpans={matchedSpans}
-          onNavigateToSpan={onNavigateToSpan}
-          onNodeClick={onNodeClickTimeline}
-          selectedSpan={selectedSpan?.id ?? ''}
-          spans={spans}
-        />
-      )}
-
-      {type === VisualizationType.Flame && (
-        <Flame
-          isMatchedMode={matchedSpans.length > 0 || isOpen}
-          matchedSpans={matchedSpans}
-          onNavigateToSpan={onNavigateToSpan}
-          onNodeClick={onNodeClickTimeline}
-          selectedSpan={selectedSpan?.id ?? ''}
-          spans={spans}
-        />
-      )}
-    </>
+  return type === VisualizationType.Dag ? (
+    <DAG
+      edges={edges}
+      isMatchedMode={matchedSpans.length > 0 || isOpen}
+      matchedSpans={matchedSpans}
+      nodes={nodes}
+      onNavigateToSpan={onNavigateToSpan}
+      onNodesChange={onNodesChange}
+      onNodeClick={onNodeClick}
+      selectedSpan={focusedSpan}
+    />
+  ) : (
+    <Timeline
+      isMatchedMode={matchedSpans.length > 0 || isOpen}
+      matchedSpans={matchedSpans}
+      onNavigateToSpan={onNavigateToSpan}
+      onNodeClick={onNodeClickTimeline}
+      selectedSpan={selectedSpan?.id ?? ''}
+      spans={spans}
+    />
   );
 };
 

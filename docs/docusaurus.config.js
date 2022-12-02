@@ -41,7 +41,7 @@ const config = {
           sidebarPath: require.resolve("./sidebars.js"),
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
-          editUrl: "https://github.com/kubeshop/tracetest",
+          editUrl: "https://github.com/kubeshop/tracetest/blob/main/docs/",
           routeBasePath: "/",
         },
         theme: {
@@ -77,7 +77,7 @@ const config = {
     [
       require.resolve('docusaurus-gtm-plugin'),
       {
-        id: 'GTM-5S7QKN7', // GTM Container ID
+        id: 'GTM-MZ7RNS7', // GTM Container ID
       },
     ],
     [

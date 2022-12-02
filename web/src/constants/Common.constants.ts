@@ -3,7 +3,7 @@ export const SENTRY_ALLOWED_URLS = [/.*?localhost:3000/, /.*?tracetest.io/];
 
 export const DOCUMENT_TITLE = 'Tracetest';
 
-export const DOCUMENTATION_URL = 'https://kubeshop.github.io/tracetest/';
+export const DOCUMENTATION_URL = 'https://docs.tracetest.io';
 export const GITHUB_URL = 'https://github.com/kubeshop/tracetest';
 export const GITHUB_ISSUES_URL = 'https://github.com/kubeshop/tracetest/issues/new/choose';
 export const DISCORD_URL = 'https://discord.gg/6zupCZFQbe';
@@ -15,7 +15,7 @@ export const RESOURCE_SEMANTIC_CONVENTIONS_URL =
 export const TRACE_DOCUMENTATION_URL =
   'https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/api.md';
 
-export const ADD_TEST_SPECS_DOCUMENTATION_URL = 'https://docs.tracetest.io/adding-assertions/';
+export const ADD_TEST_SPECS_DOCUMENTATION_URL = 'https://docs.tracetest.io/using-tracetest/adding-assertions/';
 
 export const SELECTOR_LANGUAGE_CHEAT_SHEET_URL = `${process.env.PUBLIC_URL}/SL_cheat_sheet.pdf`;
 

@@ -22,7 +22,7 @@ type Transaction struct {
 	Description *string `json:"description,omitempty"`
 	// version number of the test
 	Version   *int32       `json:"version,omitempty"`
-	Steps     []string     `json:"steps,omitempty"`
+	Steps     []Test       `json:"steps,omitempty"`
 	CreatedAt *time.Time   `json:"createdAt,omitempty"`
 	Summary   *TestSummary `json:"summary,omitempty"`
 }
@@ -173,9 +173,9 @@ func (o *Transaction) SetVersion(v int32) {
 }
 
 // GetSteps returns the Steps field value if set, zero value otherwise.
-func (o *Transaction) GetSteps() []string {
+func (o *Transaction) GetSteps() []Test {
 	if o == nil || o.Steps == nil {
-		var ret []string
+		var ret []Test
 		return ret
 	}
 	return o.Steps
@@ -183,7 +183,7 @@ func (o *Transaction) GetSteps() []string {
 
 // GetStepsOk returns a tuple with the Steps field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Transaction) GetStepsOk() ([]string, bool) {
+func (o *Transaction) GetStepsOk() ([]Test, bool) {
 	if o == nil || o.Steps == nil {
 		return nil, false
 	}
@@ -199,8 +199,8 @@ func (o *Transaction) HasSteps() bool {
 	return false
 }
 
-// SetSteps gets a reference to the given []string and assigns it to the Steps field.
-func (o *Transaction) SetSteps(v []string) {
+// SetSteps gets a reference to the given []Test and assigns it to the Steps field.
+func (o *Transaction) SetSteps(v []Test) {
 	o.Steps = v
 }
 

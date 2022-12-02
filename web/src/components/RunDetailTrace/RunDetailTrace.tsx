@@ -1,10 +1,11 @@
+import {useCallback, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {useAppSelector} from 'redux/hooks';
+
 import Drawer from 'components/Drawer';
 import SpanDetail from 'components/SpanDetail';
 import Switch from 'components/Visualization/components/Switch';
 import {TestState} from 'constants/TestRun.constants';
-import {useCallback, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
-import {useAppSelector} from 'redux/hooks';
 import SpanSelectors from 'selectors/Span.selectors';
 import TraceSelectors from 'selectors/Trace.selectors';
 import TraceAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
@@ -21,7 +22,6 @@ interface IProps {
 export enum VisualizationType {
   Dag,
   Timeline,
-  Flame,
 }
 
 const RunDetailTrace = ({run, testId}: IProps) => {
@@ -41,11 +41,9 @@ const RunDetailTrace = ({run, testId}: IProps) => {
         leftPanel={<SpanDetail onCreateTestSpec={handleOnCreateSpec} searchText={searchText} span={span} />}
         rightPanel={
           <S.Section>
-            {visualizationType !== VisualizationType.Flame && (
-              <S.SearchContainer>
-                <Search runId={run.id} testId={testId} />
-              </S.SearchContainer>
-            )}
+            <S.SearchContainer>
+              <Search runId={run.id} testId={testId} />
+            </S.SearchContainer>
 
             <S.VisualizationContainer>
               <S.SwitchContainer>

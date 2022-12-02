@@ -18,13 +18,28 @@ const (
 type testRun struct {
 	config        config.Config
 	colorsEnabled bool
+	padding       int
 }
 
-func TestRun(config config.Config, colorsEnabled bool) testRun {
-	return testRun{
+type testRunFormatterOption func(*testRun)
+
+func WithPadding(padding int) testRunFormatterOption {
+	return func(tr *testRun) {
+		tr.padding = padding
+	}
+}
+
+func TestRun(config config.Config, colorsEnabled bool, options ...testRunFormatterOption) testRun {
+	testRun := testRun{
 		config:        config,
 		colorsEnabled: colorsEnabled,
 	}
+
+	for _, option := range options {
+		option(&testRun)
+	}
+
+	return testRun
 }
 
 type TestRunOutput struct {
@@ -46,7 +61,7 @@ func (f testRun) Format(output TestRunOutput) string {
 }
 
 func (f testRun) json(output TestRunOutput) string {
-	output.RunWebURL = f.getRunLink(output.Test.GetId(), output.Run.GetId())
+	output.RunWebURL = f.GetRunLink(output.Test.GetId(), output.Run.GetId())
 	bytes, err := json.MarshalIndent(output, "", "  ")
 	if err != nil {
 		panic(fmt.Errorf("could not marshal output json: %w", err))
@@ -57,7 +72,7 @@ func (f testRun) json(output TestRunOutput) string {
 
 func (f testRun) pretty(output TestRunOutput) string {
 	if output.Run.State != nil && *output.Run.State == "FAILED" {
-		return f.getColoredText(false, fmt.Sprintf("Failed to execute test: %s", *output.Run.LastErrorState))
+		return f.getColoredText(false, f.formatMessage("Failed to execute test: %s", *output.Run.LastErrorState))
 	}
 
 	if !output.HasResults {
@@ -72,8 +87,8 @@ func (f testRun) pretty(output TestRunOutput) string {
 }
 
 func (f testRun) formatSuccessfulTest(test openapi.Test, run openapi.TestRun) string {
-	link := f.getRunLink(test.GetId(), run.GetId())
-	message := fmt.Sprintf("%s %s (%s)\n", PASSED_TEST_ICON, *test.Name, link)
+	link := f.GetRunLink(test.GetId(), run.GetId())
+	message := f.formatMessage("%s %s (%s)\n", PASSED_TEST_ICON, *test.Name, link)
 	return f.getColoredText(true, message)
 }
 
@@ -93,8 +108,8 @@ type assertionResult struct {
 func (f testRun) formatFailedTest(test openapi.Test, run openapi.TestRun) string {
 	var buffer bytes.Buffer
 
-	link := f.getRunLink(test.GetId(), run.GetId())
-	message := fmt.Sprintf("%s %s (%s)\n", FAILED_TEST_ICON, *test.Name, link)
+	link := f.GetRunLink(test.GetId(), run.GetId())
+	message := f.formatMessage("%s %s (%s)\n", FAILED_TEST_ICON, *test.Name, link)
 	message = f.getColoredText(false, message)
 	buffer.WriteString(message)
 	for i, specResult := range run.Result.Results {
@@ -140,11 +155,11 @@ func (f testRun) formatFailedTest(test openapi.Test, run openapi.TestRun) string
 		}
 
 		icon := f.getStateIcon(allPassed)
-		message := fmt.Sprintf("\t%s %s\n", icon, *specResult.Selector.Query)
+		message := f.formatMessage("\t%s %s\n", icon, *specResult.Selector.Query)
 		message = f.getColoredText(allPassed, message)
 		buffer.WriteString(message)
 
-		baseLink := f.getRunLink(test.GetId(), run.GetId())
+		baseLink := f.GetRunLink(test.GetId(), run.GetId())
 
 		if metaResult, exists := results["meta"]; exists {
 			// meta assertions should be placed at the top
@@ -165,7 +180,7 @@ func (f testRun) formatFailedTest(test openapi.Test, run openapi.TestRun) string
 
 func (f testRun) generateSpanResult(buffer *bytes.Buffer, spanId string, spanResult spanAssertionResult, baseLink string) {
 	icon := f.getStateIcon(spanResult.allPassed)
-	message := fmt.Sprintf("\t\t%s #%s\n", icon, spanId)
+	message := f.formatMessage("\t\t%s #%s\n", icon, spanId)
 	message = f.getColoredText(spanResult.allPassed, message)
 	buffer.WriteString(message)
 
@@ -173,9 +188,9 @@ func (f testRun) generateSpanResult(buffer *bytes.Buffer, spanId string, spanRes
 		icon := f.getStateIcon(assertionResult.passed)
 		var message string
 		if assertionResult.observedValue != nil {
-			message = fmt.Sprintf("\t\t\t%s %s (%s)", icon, assertionResult.assertion, *assertionResult.observedValue)
+			message = f.formatMessage("\t\t\t%s %s (%s)", icon, assertionResult.assertion, *assertionResult.observedValue)
 		} else {
-			message = fmt.Sprintf("\t\t\t%s %s", icon, assertionResult.assertion)
+			message = f.formatMessage("\t\t\t%s %s", icon, assertionResult.assertion)
 		}
 
 		if !assertionResult.passed {
@@ -188,6 +203,20 @@ func (f testRun) generateSpanResult(buffer *bytes.Buffer, spanId string, spanRes
 
 		buffer.WriteString(message)
 	}
+}
+
+func (f testRun) formatMessage(format string, args ...interface{}) string {
+	message := fmt.Sprintf(format, args...)
+	return fmt.Sprintf("%s%s", f.getPadding(), message)
+}
+
+func (f testRun) getPadding() string {
+	padding := ""
+	for i := 0; i < f.padding; i++ {
+		padding = padding + "\t"
+	}
+
+	return padding
 }
 
 func (f testRun) getStateIcon(passed bool) string {
@@ -210,7 +239,7 @@ func (f testRun) getColoredText(passed bool, text string) string {
 	return pterm.FgRed.Sprintf(text)
 }
 
-func (f testRun) getRunLink(testID, runID string) string {
+func (f testRun) GetRunLink(testID, runID string) string {
 	return fmt.Sprintf("%s://%s/test/%s/run/%s/test", f.config.Scheme, f.config.Endpoint, testID, runID)
 }
 

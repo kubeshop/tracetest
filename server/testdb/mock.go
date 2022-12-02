@@ -206,13 +206,13 @@ func (m *MockRepository) DeleteTransactionRun(ctx context.Context, run model.Tra
 }
 
 // GetTransactionRun implements model.Repository
-func (m *MockRepository) GetTransactionRun(ctx context.Context, transactionID string, runID int) (model.TransactionRun, error) {
+func (m *MockRepository) GetTransactionRun(ctx context.Context, transactionID id.ID, runID int) (model.TransactionRun, error) {
 	args := m.Called(ctx, transactionID, runID)
 	return args.Get(0).(model.TransactionRun), args.Error(1)
 }
 
 // GetTransactionsRuns implements model.Repository
-func (m *MockRepository) GetTransactionsRuns(ctx context.Context, transactionID string, take, skip int32) ([]model.TransactionRun, error) {
+func (m *MockRepository) GetTransactionsRuns(ctx context.Context, transactionID id.ID, take, skip int32) ([]model.TransactionRun, error) {
 	args := m.Called(ctx, transactionID, take, skip)
 	return args.Get(0).([]model.TransactionRun), args.Error(1)
 }

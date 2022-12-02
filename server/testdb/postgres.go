@@ -109,6 +109,7 @@ func (td *postgresDB) ServerID() (id string, isNew bool, err error) {
 func (td *postgresDB) Drop() error {
 	return dropTables(
 		td,
+		"transaction_run_steps",
 		"transaction_runs",
 		"transaction_steps",
 		"transactions",

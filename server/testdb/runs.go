@@ -295,15 +295,27 @@ func count(r model.Run) (pass, fail int) {
 }
 
 func (td *postgresDB) DeleteRun(ctx context.Context, r model.Run) error {
-	stmt, err := td.db.Prepare("DELETE FROM test_runs WHERE id = $1 AND test_id = $2")
-	if err != nil {
-		return fmt.Errorf("prepare: %w", err)
+	queries := []string{
+		"DELETE FROM transaction_run_steps WHERE test_run_id = $1 AND test_run_test_id = $2",
+		"DELETE FROM test_runs WHERE id = $1 AND test_id = $2",
 	}
-	defer stmt.Close()
 
-	_, err = stmt.ExecContext(ctx, r.ID, r.TestID)
+	tx, err := td.db.BeginTx(ctx, nil)
 	if err != nil {
-		return fmt.Errorf("sql exec: %w", err)
+		return fmt.Errorf("sql BeginTx: %w", err)
+	}
+
+	for _, sql := range queries {
+		_, err := tx.ExecContext(ctx, sql, r.ID, r.TestID)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("sql error: %w", err)
+		}
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return fmt.Errorf("sql Commit: %w", err)
 	}
 
 	return nil
@@ -365,14 +377,10 @@ func (td *postgresDB) GetTestRuns(ctx context.Context, test model.Test, take, sk
 	if err != nil {
 		return model.List[model.Run]{}, err
 	}
-	var runs []model.Run
 
-	for rows.Next() {
-		run, err := readRunRow(rows)
-		if err != nil {
-			return model.List[model.Run]{}, fmt.Errorf("cannot read row: %w", err)
-		}
-		runs = append(runs, run)
+	runs, err := td.readRunRows(ctx, rows)
+	if err != nil {
+		return model.List[model.Run]{}, err
 	}
 
 	var count int
@@ -401,6 +409,20 @@ func (td *postgresDB) GetRunByTraceID(ctx context.Context, traceID trace.TraceID
 		return model.Run{}, fmt.Errorf("cannot read row: %w", err)
 	}
 	return run, nil
+}
+
+func (td *postgresDB) readRunRows(ctx context.Context, rows *sql.Rows) ([]model.Run, error) {
+	var runs []model.Run
+
+	for rows.Next() {
+		run, err := readRunRow(rows)
+		if err != nil {
+			return []model.Run{}, fmt.Errorf("cannot read row: %w", err)
+		}
+		runs = append(runs, run)
+	}
+
+	return runs, nil
 }
 
 func readRunRow(row scanner) (model.Run, error) {

@@ -1,4 +1,5 @@
 import {HolderOutlined, DeleteOutlined} from '@ant-design/icons';
+import {Link} from 'react-router-dom';
 import styled from 'styled-components';
 
 export const TestItemContainer = styled.li`
@@ -34,4 +35,16 @@ export const ItemListContainer = styled.ul`
   padding: 0;
   margin: 0;
   margin-bottom: 12px;
+`;
+
+export const TestLink = styled(Link)`
+  && {
+    color: ${({theme}) => theme.color.text};
+
+    &:hover,
+    &:visited,
+    &:focused {
+      color: ${({theme}) => theme.color.text};
+    }
+  }
 `;

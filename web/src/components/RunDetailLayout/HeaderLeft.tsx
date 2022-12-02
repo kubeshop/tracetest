@@ -1,4 +1,4 @@
-import {useNavigate} from 'react-router-dom';
+import {Link} from 'react-router-dom';
 
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import Date from 'utils/Date';
@@ -14,13 +14,14 @@ interface IProps {
 }
 
 const HeaderLeft = ({name, testId, triggerType}: IProps) => {
-  const navigate = useNavigate();
   const {run} = useTestRun();
   const createdTimeAgo = Date.getTimeAgo(run?.createdAt ?? '');
 
   return (
     <S.Section $justifyContent="flex-start">
-      <S.BackIcon data-cy="test-header-back-button" onClick={() => navigate(`/test/${testId}`)} />
+      <Link data-cy="test-header-back-button" to={`/test/${testId}`}>
+        <S.BackIcon />
+      </Link>
       <S.InfoContainer data-tour={GuidedTourService.getStep(GuidedTours.Trace, Steps.MetaDetails)}>
         <S.Row>
           <S.Title data-cy="test-details-name">

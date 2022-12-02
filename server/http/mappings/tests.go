@@ -30,9 +30,9 @@ func optionalTime(in time.Time) *time.Time {
 }
 
 func (m OpenAPI) Transaction(in model.Transaction) openapi.Transaction {
-	testIds := make([]string, len(in.Steps))
+	steps := make([]openapi.Test, len(in.Steps))
 	for i, step := range in.Steps {
-		testIds[i] = step.ID.String()
+		steps[i] = m.Test(step)
 	}
 
 	return openapi.Transaction{
@@ -40,7 +40,7 @@ func (m OpenAPI) Transaction(in model.Transaction) openapi.Transaction {
 		Name:        in.Name,
 		Description: in.Description,
 		Version:     int32(in.Version),
-		Steps:       testIds,
+		Steps:       steps,
 		CreatedAt:   in.CreatedAt,
 		Summary: openapi.TestSummary{
 			Runs: int32(in.Summary.Runs),
@@ -54,15 +54,10 @@ func (m OpenAPI) Transaction(in model.Transaction) openapi.Transaction {
 }
 
 func (m OpenAPI) TransactionRun(in model.TransactionRun) openapi.TransactionRun {
-	steps := make([]openapi.Test, 0, len(in.Steps))
-	runs := make([]openapi.TestRun, 0, len(in.StepRuns))
+	steps := make([]openapi.TestRun, 0, len(in.Steps))
 
 	for _, step := range in.Steps {
-		steps = append(steps, m.Test(model.Test{ID: step.ID, Name: step.Name, ServiceUnderTest: step.Trigger}))
-	}
-
-	for _, run := range in.StepRuns {
-		runs = append(runs, m.Run(&model.Run{ID: run.ID, TestID: run.TestID, State: run.State, Results: &run.Result}))
+		steps = append(steps, m.Run(&step))
 	}
 
 	return openapi.TransactionRun{
@@ -72,7 +67,6 @@ func (m OpenAPI) TransactionRun(in model.TransactionRun) openapi.TransactionRun 
 		CompletedAt: in.CompletedAt,
 		State:       string(in.State),
 		Steps:       steps,
-		StepRuns:    runs,
 		Metadata:    in.Metadata,
 		Environment: m.Environment(in.Environment),
 	}
@@ -348,8 +342,8 @@ type Model struct {
 
 func (m Model) Transaction(ctx context.Context, in openapi.Transaction) (model.Transaction, error) {
 	tests := make([]model.Test, len(in.Steps))
-	for i, testID := range in.Steps {
-		test, err := m.testRepository.GetLatestTestVersion(ctx, id.ID(testID))
+	for i, test := range in.Steps {
+		test, err := m.testRepository.GetLatestTestVersion(ctx, id.ID(test.Id))
 		if err != nil {
 			return model.Transaction{}, err
 		}

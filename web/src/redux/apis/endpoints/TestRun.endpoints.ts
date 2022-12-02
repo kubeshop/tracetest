@@ -86,15 +86,6 @@ const TestRunEndpoint = (builder: TTestApiEndpointBuilder) => ({
       {type: TracetestApiTags.TEST_RUN, id: `${testId}-${runId}-junit`},
     ],
   }),
-  getTestDefinitionYamlByRunId: builder.query<string, {testId: string; version: number}>({
-    query: ({testId, version}) => ({
-      url: `/tests/${testId}/version/${version}/definition.yaml`,
-      responseHandler: 'text',
-    }),
-    providesTags: (result, error, {testId, version}) => [
-      {type: TracetestApiTags.TEST_RUN, id: `${testId}-${version}-definition`},
-    ],
-  }),
   getSelectedSpans: builder.query<TSelectedSpans, {testId: string; runId: string; query: string}>({
     query: ({testId, runId, query}) => `/tests/${testId}/run/${runId}/select?query=${encodeURIComponent(query)}`,
     providesTags: (result, error, {query}) => (result ? [{type: TracetestApiTags.SPAN, id: `${query}-LIST`}] : []),

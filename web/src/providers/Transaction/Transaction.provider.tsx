@@ -5,6 +5,7 @@ import {useNavigate} from 'react-router-dom';
 import {useGetTransactionByIdQuery, useGetTransactionVersionByIdQuery} from 'redux/apis/TraceTest.api';
 import {TDraftTransaction, TTransaction} from 'types/Transaction.types';
 import VersionMismatchModal from 'components/VersionMismatchModal';
+import TransactionService from 'services/Transaction.service';
 import {useConfirmationModal} from '../ConfirmationModal/ConfirmationModal.provider';
 import useTransactionCrud from './hooks/useTransactionCrud';
 
@@ -101,7 +102,10 @@ const TransactionProvider = ({children, transactionId, version = 0}: IProps) => 
 
   const onConfirm = useCallback(() => {
     if (action === 'edit') edit(transaction!, draft);
-    else edit(transaction!, transaction!);
+    else {
+      const initialValues = TransactionService.getInitialValues(transaction!);
+      edit(transaction!, initialValues);
+    }
 
     setIsVersionModalOpen(false);
   }, [action, draft, edit, transaction]);
@@ -128,12 +132,12 @@ const TransactionProvider = ({children, transactionId, version = 0}: IProps) => 
         description={
           action === 'edit'
             ? 'Editing it will result in a new version that will become the latest.'
-            : 'Running the test will use the latest version of the transaction.'
+            : 'Running the transaction will use the latest version of the transaction.'
         }
         currentVersion={currentTransaction.version}
         isOpen={isVersionModalOpen}
         latestVersion={latestTransaction.version}
-        okText="Run Test"
+        okText="Run Transaction"
         onCancel={() => setIsVersionModalOpen(false)}
         onConfirm={onConfirm}
       />

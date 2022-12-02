@@ -13,10 +13,10 @@ interface IProps {
 }
 
 const OutputRow = ({index, output, onEdit, onDelete}: IProps) => (
-  <S.Container $isDeleted={output.isDeleted}>
+  <S.Container $isDeleted={output.isDeleted} data-cy="output-item-container">
     {output.isDraft && (
       <S.Row $justifyContent="flex-end">
-        <Tag>pending {output.isDeleted && '/ deleted'}</Tag>
+        <Tag data-cy="output-pending-tag">pending {output.isDeleted && '/ deleted'}</Tag>
       </S.Row>
     )}
     <S.Row>

@@ -17,7 +17,7 @@ const OutputModalFooter = ({isEditing, isValid, onCancel, onSave}: IProps) => (
       </Button>
     </span>
     <span>
-      <Button htmlType="submit" data-cy="output-modal-save-button" disabled={!isValid} type="primary" onClick={onSave}>
+      <Button htmlType="submit" data-cy="output-save-button" disabled={!isValid} type="primary" onClick={onSave}>
         {isEditing ? 'Update' : 'Add'}
       </Button>
     </span>

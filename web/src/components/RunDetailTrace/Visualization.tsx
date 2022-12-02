@@ -11,7 +11,6 @@ import {TSpan} from 'types/Span.types';
 import {TTestRunState} from 'types/TestRun.types';
 import {useDrawer} from '../Drawer/Drawer';
 import DAG from '../Visualization/components/DAG';
-import {Flame} from '../Visualization/components/Flame/Flame';
 import Timeline from '../Visualization/components/Timeline';
 import {VisualizationType} from './RunDetailTrace';
 
@@ -71,41 +70,26 @@ const Visualization = ({runState, spans, type}: IProps) => {
     return <SkeletonDiagram />;
   }
 
-  return (
-    <>
-      {type === VisualizationType.Dag && (
-        <DAG
-          edges={edges}
-          isMatchedMode={isMatchedMode}
-          matchedSpans={matchedSpans}
-          nodes={nodes}
-          onNavigateToSpan={onNavigateToSpan}
-          onNodesChange={onNodesChange}
-          onNodeClick={onNodeClick}
-          selectedSpan={selectedSpan}
-        />
-      )}
-      {type === VisualizationType.Timeline && (
-        <Timeline
-          isMatchedMode={isMatchedMode}
-          matchedSpans={matchedSpans}
-          onNavigateToSpan={onNavigateToSpan}
-          onNodeClick={onNodeClickTimeline}
-          selectedSpan={selectedSpan}
-          spans={spans}
-        />
-      )}
-      {type === VisualizationType.Flame && (
-        <Flame
-          isMatchedMode={isMatchedMode}
-          matchedSpans={matchedSpans}
-          onNavigateToSpan={onNavigateToSpan}
-          onNodeClick={onNodeClickTimeline}
-          selectedSpan={selectedSpan}
-          spans={spans}
-        />
-      )}
-    </>
+  return type === VisualizationType.Dag ? (
+    <DAG
+      edges={edges}
+      isMatchedMode={isMatchedMode}
+      matchedSpans={matchedSpans}
+      nodes={nodes}
+      onNavigateToSpan={onNavigateToSpan}
+      onNodesChange={onNodesChange}
+      onNodeClick={onNodeClick}
+      selectedSpan={selectedSpan}
+    />
+  ) : (
+    <Timeline
+      isMatchedMode={isMatchedMode}
+      matchedSpans={matchedSpans}
+      onNavigateToSpan={onNavigateToSpan}
+      onNodeClick={onNodeClickTimeline}
+      selectedSpan={selectedSpan}
+      spans={spans}
+    />
   );
 };
 

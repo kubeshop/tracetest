@@ -50,17 +50,12 @@ INSERT INTO environments (
 	`
 
 	countQuery = `
-		SELECT COUNT(*) FROM environments e 
+		SELECT COUNT(*) FROM environments e
 	`
 )
 
-var environmentSortingFields = map[string]string{
-	"created": "e.created_at",
-	"name":    "e.name",
-}
-
 func (td *postgresDB) CreateEnvironment(ctx context.Context, environment model.Environment) (model.Environment, error) {
-	environment.ID = environment.GetSlug()
+	environment.ID = environment.Slug()
 	environment.CreatedAt = time.Now()
 
 	return td.insertIntoEnvironments(ctx, environment)
@@ -74,7 +69,7 @@ func (td *postgresDB) UpdateEnvironment(ctx context.Context, environment model.E
 
 	// keep the same creation date to keep sort order
 	environment.CreatedAt = oldEnvironment.CreatedAt
-	environment.ID = environment.GetSlug()
+	environment.ID = environment.Slug()
 
 	return td.updateIntoEnvironments(ctx, environment, oldEnvironment.ID)
 }
@@ -113,7 +108,12 @@ func (td *postgresDB) GetEnvironments(ctx context.Context, take, skip int32, que
 		sql += condition
 	}
 
-	sql = sortQuery(sql, sortBy, sortDirection, environmentSortingFields)
+	sortingFields := map[string]string{
+		"created": "e.created_at",
+		"name":    "e.name",
+	}
+
+	sql = sortQuery(sql, sortBy, sortDirection, sortingFields)
 	sql += ` LIMIT $1 OFFSET $2 `
 
 	stmt, err := td.db.Prepare(sql)
@@ -269,7 +269,7 @@ func (td *postgresDB) updateIntoEnvironments(ctx context.Context, environment mo
 	_, err = stmt.ExecContext(
 		ctx,
 		oldId,
-		environment.GetSlug(),
+		environment.Slug(),
 		environment.Name,
 		environment.Description,
 		environment.CreatedAt,

@@ -1,5 +1,5 @@
 import {Form} from 'antd';
-import {TDraftTransaction, TDraftTransactionForm, TTransaction} from 'types/Transaction.types';
+import {TDraftTransaction, TDraftTransactionForm} from 'types/Transaction.types';
 import BasicDetailsForm from '../CreateTestPlugins/Default/steps/BasicDetails/BasicDetailsForm';
 import TestsSelectionForm from '../TransactionPlugin/steps/TestsSelection/TestsSelectionForm';
 import * as S from './EditTransactionForm.styled';
@@ -8,7 +8,7 @@ export const FORM_ID = 'edit-test';
 
 interface IProps {
   form: TDraftTransactionForm;
-  transaction: TTransaction;
+  transaction: TDraftTransaction;
   onSubmit(values: TDraftTransaction): Promise<void>;
   onValidation(allValues: any, values: TDraftTransaction): void;
 }

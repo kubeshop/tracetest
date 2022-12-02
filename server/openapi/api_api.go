@@ -129,6 +129,12 @@ func (c *ApiApiController) Routes() Routes {
 			c.GetEnvironment,
 		},
 		{
+			"GetEnvironmentDefinitionFile",
+			strings.ToUpper("Get"),
+			"/api/environments/{environmentId}/definition.yaml",
+			c.GetEnvironmentDefinitionFile,
+		},
+		{
 			"GetEnvironments",
 			strings.ToUpper("Get"),
 			"/api/environments",
@@ -217,6 +223,12 @@ func (c *ApiApiController) Routes() Routes {
 			strings.ToUpper("Get"),
 			"/api/transactions/{transactionId}/version/{version}",
 			c.GetTransactionVersion,
+		},
+		{
+			"GetTransactionVersionDefinitionFile",
+			strings.ToUpper("Get"),
+			"/api/transactions/{transactionId}/version/{version}/definition.yaml",
+			c.GetTransactionVersionDefinitionFile,
 		},
 		{
 			"GetTransactions",
@@ -558,6 +570,22 @@ func (c *ApiApiController) GetEnvironment(w http.ResponseWriter, r *http.Request
 
 }
 
+// GetEnvironmentDefinitionFile - Get the environment definition as an YAML file
+func (c *ApiApiController) GetEnvironmentDefinitionFile(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	environmentIdParam := params["environmentId"]
+
+	result, err := c.service.GetEnvironmentDefinitionFile(r.Context(), environmentIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
 // GetEnvironments - Get Environments
 func (c *ApiApiController) GetEnvironments(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
@@ -875,6 +903,28 @@ func (c *ApiApiController) GetTransactionVersion(w http.ResponseWriter, r *http.
 	}
 
 	result, err := c.service.GetTransactionVersion(r.Context(), transactionIdParam, versionParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// GetTransactionVersionDefinitionFile - Get the transaction definition as an YAML file
+func (c *ApiApiController) GetTransactionVersionDefinitionFile(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	transactionIdParam := params["transactionId"]
+
+	versionParam, err := parseInt32Parameter(params["version"], true)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+
+	result, err := c.service.GetTransactionVersionDefinitionFile(r.Context(), transactionIdParam, versionParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

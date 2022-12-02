@@ -153,7 +153,7 @@ func (a *App) Start() error {
 	runner.Start(5) // worker count. should be configurable
 	defer runner.Stop()
 
-	transactionRunner := executor.NewTransactionRunner(runner, a.db, subscriptionManager, a.config)
+	transactionRunner := executor.NewTransactionRunner(runner, a.db, subscriptionManager)
 	transactionRunner.Start(5)
 	defer transactionRunner.Stop()
 
