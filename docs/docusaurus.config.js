@@ -8,7 +8,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 const config = {
   title: 'Tracetest Docs',
   tagline: 'Trace-based testing',
-  url: 'https://tracetest.io',
+  url: 'https://docs.tracetest.io',
   baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
