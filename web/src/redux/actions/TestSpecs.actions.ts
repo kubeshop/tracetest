@@ -10,8 +10,6 @@ import {TTest} from 'types/Test.types';
 import {TTestRun} from 'types/TestRun.types';
 import {TTestSpecEntry} from 'types/TestSpecs.types';
 import {RootState} from '../store';
-import {TriggerTypeToPlugin} from '../../constants/Plugins.constants';
-import {TriggerTypes} from '../../constants/Test.constants';
 import TestService from '../../services/Test.service';
 
 export type TChange = {
@@ -25,12 +23,7 @@ const TestSpecsActions = () => ({
     'testDefinition/publish',
     async ({test, testId, runId}, {dispatch, getState}) => {
       const specs = TestSpecsSelectors.selectSpecs(getState() as RootState).filter(def => !def.isDeleted);
-
-      const plugin = TriggerTypeToPlugin[test?.trigger?.type ?? TriggerTypes.http];
-      const testTriggerData = TestService.getInitialValues(test);
-      const updatedTest = {...test, definition: {specs}};
-      const rawTest = await TestService.getRequest(plugin, testTriggerData, updatedTest);
-
+      const rawTest = await TestService.getUpdatedRawTest(test, {definition: {specs}});
       await dispatch(TestGateway.edit(rawTest, testId));
       return dispatch(TestRunGateway.reRun(testId, runId)).unwrap();
     }

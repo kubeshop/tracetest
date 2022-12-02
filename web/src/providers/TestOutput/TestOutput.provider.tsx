@@ -3,8 +3,6 @@ import {createContext, useCallback, useContext, useEffect, useMemo, useState} fr
 import {useNavigate} from 'react-router-dom';
 
 import OutputModal from 'components/OutputModal/OutputModal';
-import {TriggerTypeToPlugin} from 'constants/Plugins.constants';
-import {TriggerTypes} from 'constants/Test.constants';
 import {useEditTestMutation, useReRunMutation} from 'redux/apis/TraceTest.api';
 import {useAppDispatch, useAppStore} from 'redux/hooks';
 import {selectTestOutputByIndex} from 'redux/testOutputs/selectors';
@@ -105,11 +103,7 @@ const TestOutputProvider = ({children, testId, runId}: IProps) => {
 
   const onSave = useCallback(
     async (outputs: TTestOutput[]) => {
-      const plugin = TriggerTypeToPlugin[test?.trigger?.type || TriggerTypes.http];
-      const testTriggerData = TestService.getInitialValues(test);
-      const updatedTest = {...test, outputs};
-      const rawTest = await TestService.getRequest(plugin, testTriggerData, updatedTest);
-
+      const rawTest = await TestService.getUpdatedRawTest(test, {outputs});
       await editTest({test: rawTest, testId}).unwrap();
       const run = await reRunTest({runId, testId}).unwrap();
       navigate(`/test/${testId}/run/${run.id}/trigger`);
