@@ -23,4 +23,3 @@ server/vendor
 .tracetest
 
 dist/
-**/.config.json

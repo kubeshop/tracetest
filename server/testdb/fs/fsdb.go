@@ -17,12 +17,14 @@ import (
 )
 
 type fsDB struct {
-	root string
+	root    string
+	dbsPath string
 }
 
-func New(path string) (model.Repository, error) {
+func New(root string) (model.Repository, error) {
 	ps := &fsDB{
-		root: path,
+		root:    root,
+		dbsPath: path.Join(root, ".tracetest/"),
 	}
 
 	err := ps.ready()
@@ -34,36 +36,47 @@ func New(path string) (model.Repository, error) {
 }
 
 func (td *fsDB) ready() error {
-	err := os.Mkdir(td.root, 0755)
-	if err != nil {
-		if errors.Is(err, os.ErrExist) {
-			return nil
-		}
+	if err := mkdir(td.root); err != nil {
+		return err
+	}
+
+	if err := mkdir(td.dbsPath); err != nil {
 		return err
 	}
 
 	return nil
 }
 
+func mkdir(pathName string) error {
+	err := os.Mkdir(pathName, 0755)
+	if err != nil {
+		if errors.Is(err, os.ErrExist) {
+			return nil
+		}
+		return err
+	}
+	return nil
+}
+
 func (td *fsDB) dbPath(name string) string {
-	return path.Join(td.root, name)
+	return path.Join(td.dbsPath, name)
 }
 
 func (td *fsDB) runs(testID string) fileDB[int, model.Run] {
 	return fileDB[int, model.Run]{
-		path: td.dbPath(".run_" + testID + ".json"),
+		path: td.dbPath("run_" + testID + ".json"),
 	}
 }
 
 func (td *fsDB) config() fileDB[string, string] {
 	return fileDB[string, string]{
-		path: td.dbPath(".config.json"),
+		path: td.dbPath("config.json"),
 	}
 }
 
 func (td *fsDB) ServerID() (id string, isNew bool, err error) {
 	id, err = td.config().get("serverID")
-	if err != nil {
+	if err != nil && !errors.Is(err, testdb.ErrNotFound) {
 		err = fmt.Errorf("could not get machineID: %w", err)
 		return
 	}
@@ -122,6 +135,7 @@ func (fdb fileDB[K, V]) read() (map[K]V, error) {
 func (fdb fileDB[K, V]) get(key K) (v V, err error) {
 	rows, err := fdb.read()
 	if err != nil {
+		err = fmt.Errorf("cannot read db %s: %w", fdb.path, err)
 		return
 	}
 
