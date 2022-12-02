@@ -170,6 +170,8 @@ const config = {
         apiKey: "663c91299e298ff34c5a7a18f4451d1a",
 
         indexName: "tracetest",
+
+        contextualSearch: false,
       },
     }),
 };
