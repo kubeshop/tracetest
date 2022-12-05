@@ -1059,3 +1059,54 @@ paths:
                 type: array
                 items:
                   $ref: "./resources.yaml#/components/schemas/Resource"
+  /config:
+    get:
+      tags:
+        - api
+      summary: "Get the Server Side Config"
+      description: "Get the Server Side Config"
+      operationId: getConfig
+      responses:
+        200:
+          description: Server Side Config
+          content:
+            application/json:
+              schema:
+                $ref: "./config.yaml#/components/schemas/Config"
+    put:
+      tags:
+        - api
+      summary: "Updates the Server Side config"
+      description: "Updates the Server Side config"
+      operationId: updateConfig
+      requestBody:
+        content:
+          text/json:
+            schema:
+              $ref: "./config.yaml#/components/schemas/Config"
+      responses:
+        201:
+          description: Config Updated
+          content:
+            application/json:
+              schema:
+                $ref: "./config.yaml#/components/schemas/Config"
+  /config/connection:
+    put:
+      tags:
+        - api
+      summary: "Tests the config data store/exporter connection"
+      description: "Tests the config data store/exporter connection"
+      operationId: testConnection
+      requestBody:
+        content:
+          text/json:
+            schema:
+              $ref: "./config.yaml#/components/schemas/TestConnectionRequest"
+      responses:
+        201:
+          description: Test connection Result
+          content:
+            application/json:
+              schema:
+                $ref: "./config.yaml#/components/schemas/TestConnectionResponse"
