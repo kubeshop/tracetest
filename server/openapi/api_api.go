@@ -261,18 +261,6 @@ func (c *ApiApiController) Routes() Routes {
 			c.RunTransaction,
 		},
 		{
-			"SetTestOutputs",
-			strings.ToUpper("Put"),
-			"/api/tests/{testId}/outputs",
-			c.SetTestOutputs,
-		},
-		{
-			"SetTestSpecs",
-			strings.ToUpper("Put"),
-			"/api/tests/{testId}/definition",
-			c.SetTestSpecs,
-		},
-		{
 			"UpdateEnvironment",
 			strings.ToUpper("Put"),
 			"/api/environments/{environmentId}",
@@ -1048,62 +1036,6 @@ func (c *ApiApiController) RunTransaction(w http.ResponseWriter, r *http.Request
 		return
 	}
 	result, err := c.service.RunTransaction(r.Context(), transactionIdParam, runInformationParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
-// SetTestOutputs - Set outputs for a test
-func (c *ApiApiController) SetTestOutputs(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	testIdParam := params["testId"]
-
-	testOutputParam := []TestOutput{}
-	d := json.NewDecoder(r.Body)
-	d.DisallowUnknownFields()
-	if err := d.Decode(&testOutputParam); err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-	for _, el := range testOutputParam {
-		if err := AssertTestOutputRequired(el); err != nil {
-			c.errorHandler(w, r, err, nil)
-			return
-		}
-	}
-	result, err := c.service.SetTestOutputs(r.Context(), testIdParam, testOutputParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
-// SetTestSpecs - Set spec for a test
-func (c *ApiApiController) SetTestSpecs(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	testIdParam := params["testId"]
-
-	testSpecsParam := TestSpecs{}
-	d := json.NewDecoder(r.Body)
-	d.DisallowUnknownFields()
-	if err := d.Decode(&testSpecsParam); err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-	if err := AssertTestSpecsRequired(testSpecsParam); err != nil {
-		c.errorHandler(w, r, err, nil)
-		return
-	}
-	result, err := c.service.SetTestSpecs(r.Context(), testIdParam, testSpecsParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

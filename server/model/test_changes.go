@@ -17,33 +17,12 @@ func BumpTestVersionIfNeeded(in, updated Test) (Test, error) {
 	return updated, nil
 }
 
-func BumpVersionIfDefinitionChanged(test Test, newDef OrderedMap[SpanQuery, NamedAssertions]) (Test, error) {
-	definitionHasChanged, err := testFieldHasChanged(test.Specs, newDef)
-	if err != nil {
-		return test, err
-	}
-
-	if definitionHasChanged {
-		test.Version = test.Version + 1
-	}
-
-	return test, nil
-}
-
-func BumpVersionIfOutputsChanged(test Test, newOutputs OrderedMap[string, Output]) (Test, error) {
-	outputsHaveChanged, err := testFieldHasChanged(test.Outputs, newOutputs)
-	if err != nil {
-		return test, err
-	}
-
-	if outputsHaveChanged {
-		test.Version = test.Version + 1
-	}
-
-	return test, nil
-}
-
 func testHasChanged(oldTest Test, newTest Test) (bool, error) {
+	outputsHaveChanged, err := testFieldHasChanged(oldTest.Outputs, newTest.Outputs)
+	if err != nil {
+		return false, err
+	}
+
 	definitionHasChanged, err := testFieldHasChanged(oldTest.Specs, newTest.Specs)
 	if err != nil {
 		return false, err
@@ -57,7 +36,7 @@ func testHasChanged(oldTest Test, newTest Test) (bool, error) {
 	nameHasChanged := oldTest.Name != newTest.Name
 	descriptionHasChanged := oldTest.Description != newTest.Description
 
-	return definitionHasChanged || serviceUnderTestHasChanged || nameHasChanged || descriptionHasChanged, nil
+	return outputsHaveChanged || definitionHasChanged || serviceUnderTestHasChanged || nameHasChanged || descriptionHasChanged, nil
 }
 
 func testFieldHasChanged(oldField interface{}, newField interface{}) (bool, error) {

@@ -1,8 +1,10 @@
-import {TRawTest, TTest, TDraftTest} from 'types/Test.types';
 import {SupportedPlugins} from 'constants/Common.constants';
-import {IPlugin} from 'types/Plugins.types';
-import Validator from 'utils/Validator';
+import {TriggerTypeToPlugin} from 'constants/Plugins.constants';
 import {TriggerTypes} from 'constants/Test.constants';
+import {toRawTestOutputs} from 'models/TestOutput.model';
+import {IPlugin} from 'types/Plugins.types';
+import {TRawTest, TTest, TDraftTest} from 'types/Test.types';
+import Validator from 'utils/Validator';
 import TestDefinitionService from './TestDefinition.service';
 import GrpcService from './Triggers/Grpc.service';
 import HttpService from './Triggers/Http.service';
@@ -57,6 +59,7 @@ const TestService = () => ({
       },
       ...(original
         ? {
+            outputs: toRawTestOutputs(original.outputs ?? []),
             specs: {
               specs: original.definition.specs.map(def => TestDefinitionService.toRaw(def)),
             },
@@ -81,6 +84,13 @@ const TestService = () => ({
       type,
       ...triggerService.getInitialValues!(request),
     };
+  },
+
+  getUpdatedRawTest(test: TTest, partialTest: Partial<TTest>) {
+    const plugin = TriggerTypeToPlugin[test?.trigger?.type || TriggerTypes.http];
+    const testTriggerData = this.getInitialValues(test);
+    const updatedTest = {...test, ...partialTest};
+    return this.getRequest(plugin, testTriggerData, updatedTest);
   },
 });
 

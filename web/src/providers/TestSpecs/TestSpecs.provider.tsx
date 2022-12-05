@@ -2,12 +2,12 @@ import {noop} from 'lodash';
 import {createContext, useContext, useEffect, useMemo} from 'react';
 import {useAppSelector} from 'redux/hooks';
 
-import TestProvider from 'providers/Test';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import TestSpecsSelectors from 'selectors/TestSpecs.selectors';
 import {TAssertionResultEntry, TAssertionResults} from 'types/Assertion.types';
 import {ISuggestion, TTestSpecEntry} from 'types/TestSpecs.types';
 import useTestSpecsCrud from './hooks/useTestSpecsCrud';
+import {useTest} from '../Test/Test.provider';
 
 interface IContext {
   revert: (originalSelector: string) => void;
@@ -56,6 +56,7 @@ interface IProps {
 export const useTestSpecs = () => useContext(Context);
 
 const TestSpecsProvider = ({children, testId, runId}: IProps) => {
+  const {test} = useTest();
   const {run} = useTestRun();
 
   const assertionResults = useAppSelector(state => TestSpecsSelectors.selectAssertionResults(state));
@@ -83,6 +84,7 @@ const TestSpecsProvider = ({children, testId, runId}: IProps) => {
     setPrevSelector,
   } = useTestSpecsCrud({
     assertionResults,
+    test,
     testId,
     runId,
     isDraftMode,
@@ -142,13 +144,7 @@ const TestSpecsProvider = ({children, testId, runId}: IProps) => {
     ]
   );
 
-  return (
-    <Context.Provider value={value}>
-      <TestProvider testId={testId} version={run.testVersion}>
-        {children}
-      </TestProvider>
-    </Context.Provider>
-  );
+  return <Context.Provider value={value}>{children}</Context.Provider>;
 };
 
 export default TestSpecsProvider;

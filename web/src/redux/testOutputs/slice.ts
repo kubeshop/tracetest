@@ -21,7 +21,7 @@ const testOutputsSlice = createSlice({
       state.outputs = action.payload;
     },
     outputAdded(state, action: PayloadAction<TTestOutput>) {
-      state.outputs.push({...action.payload, isDeleted: false, isDraft: true, id: state.outputs.length + 1});
+      state.outputs.push({...action.payload, isDeleted: false, isDraft: true, id: state.outputs.length});
     },
     outputUpdated(state, action: PayloadAction<{output: TTestOutput}>) {
       state.outputs.splice(action.payload.output.id, 1, {...action.payload.output, isDeleted: false, isDraft: true});
