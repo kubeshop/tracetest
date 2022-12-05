@@ -1,16 +1,18 @@
 import {Dropdown, Menu} from 'antd';
+import {uniqBy} from 'lodash';
 
 import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
 import TraceAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
 import {IResult} from 'types/Assertion.types';
-import * as S from './AttributeRow.styled';
+import * as S from './AssertionResultChecks.styled';
 
 interface IProps {
   items: IResult[];
   type: 'error' | 'success';
+  styleType?: 'node' | 'summary' | 'default';
 }
 
-const AttributeCheck = ({items, type}: IProps) => {
+const ResultCheck = ({items, type, styleType = 'default'}: IProps) => {
   const {setSelectedSpec} = useTestSpecs();
 
   const handleOnClick = (id: string) => {
@@ -21,7 +23,7 @@ const AttributeCheck = ({items, type}: IProps) => {
 
   const menuLayout = (
     <Menu
-      items={items.map(item => ({
+      items={uniqBy(items, 'id').map(item => ({
         key: item.id,
         label: item.label,
       }))}
@@ -32,7 +34,7 @@ const AttributeCheck = ({items, type}: IProps) => {
   if (items.length === 1) {
     return (
       <div onClick={() => handleOnClick(items[0].id)}>
-        <S.CustomBadge status={type} text={items.length} />
+        <S.CustomBadge status={type} text={items.length} $styleType={styleType} />
       </div>
     );
   }
@@ -40,12 +42,10 @@ const AttributeCheck = ({items, type}: IProps) => {
   return (
     <div>
       <Dropdown overlay={menuLayout} placement="bottomLeft" trigger={['click']}>
-        <div>
-          <S.CustomBadge status={type} text={items.length} />
-        </div>
+        <S.CustomBadge status={type} text={items.length} $styleType={styleType} />
       </Dropdown>
     </div>
   );
 };
 
-export default AttributeCheck;
+export default ResultCheck;

@@ -25,10 +25,10 @@ const selectAssertionResultsBySpan = createSelector(
       assertionResults.resultList
         .flatMap(assertionResult =>
           assertionResult.resultList.map(assertion => ({
-            id: assertionResult.selector,
+            id: assertionResult.selector  || 'All Spans',
             attribute: assertion.assertion,
             assertionResult,
-            label: assertionResult.selector,
+            label: assertionResult.selector || 'All Spans',
             result: assertion.spanResults.find(spanResult => spanResult.spanId === spanId),
           }))
         )

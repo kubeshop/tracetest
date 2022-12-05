@@ -26,8 +26,7 @@ const AttributeList = ({assertions, attributeList, onCreateTestSpec, onCreateOut
       {attributeList.map(attribute => (
         <AttributeRow
           searchText={searchText}
-          assertionsFailed={assertions?.[attribute.key]?.failed}
-          assertionsPassed={assertions?.[attribute.key]?.passed}
+          assertions={assertions}
           attribute={attribute}
           key={attribute.key}
           onCopy={onCopy}

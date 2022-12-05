@@ -1,19 +1,22 @@
 import {SettingOutlined, ToolOutlined} from '@ant-design/icons';
+import {useMemo} from 'react';
 import * as SSpanNode from 'components/Visualization/components/DAG/SpanNode.styled';
 import {SemanticGroupNamesToText} from 'constants/SemanticGroupNames.constants';
 import {SpanKindToText} from 'constants/Span.constants';
 import SpanService from 'services/Span.service';
 import {TSpan} from 'types/Span.types';
+import {TResultAssertions} from 'types/Assertion.types';
 import * as S from './SpanDetail.styled';
+import AssertionResultChecks from '../AssertionResultChecks/AssertionResultChecks';
 
 interface IProps {
   span?: TSpan;
-  totalFailedChecks?: number;
-  totalPassedChecks?: number;
+  assertions?: TResultAssertions;
 }
 
-const Header = ({span, totalFailedChecks, totalPassedChecks}: IProps) => {
+const Header = ({span, assertions = {}}: IProps) => {
   const {kind, name, service, system, type} = SpanService.getSpanInfo(span);
+  const {failed, passed} = useMemo(() => SpanService.getAssertionResultSummary(assertions), [assertions]);
 
   return (
     <S.Header>
@@ -34,18 +37,7 @@ const Header = ({span, totalFailedChecks, totalPassedChecks}: IProps) => {
         )}
       </S.Column>
       <S.Row>
-        {Boolean(totalPassedChecks) && (
-          <S.HeaderCheck>
-            <S.HeaderDot $passed />
-            {totalPassedChecks}
-          </S.HeaderCheck>
-        )}
-        {Boolean(totalFailedChecks) && (
-          <S.HeaderCheck>
-            <S.HeaderDot $passed={false} />
-            {totalFailedChecks}
-          </S.HeaderCheck>
-        )}
+        <AssertionResultChecks failed={failed} passed={passed} styleType="summary" />
       </S.Row>
     </S.Header>
   );
