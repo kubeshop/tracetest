@@ -1,4 +1,5 @@
 import {Dropdown, Menu} from 'antd';
+import {uniqBy} from 'lodash';
 
 import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
 import TraceAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
@@ -22,7 +23,7 @@ const ResultCheck = ({items, type, styleType = 'default'}: IProps) => {
 
   const menuLayout = (
     <Menu
-      items={items.map(item => ({
+      items={uniqBy(items, 'id').map(item => ({
         key: item.id,
         label: item.label,
       }))}
