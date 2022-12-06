@@ -87,7 +87,7 @@ components:
         headers:
           type: array
           items:
-            $ref: "#/http.yaml/components/schemas/HTTPHeader"
+            $ref: "./http.yaml#/components/schemas/HTTPHeader"
         balancerName:
           type: string
         compression:
@@ -103,7 +103,7 @@ components:
         tls:
           $ref: "#/components/schemas/TLS"
         auth:
-          $ref: "#/http.yaml#/components/schemas/HTTPAuth"
+          $ref: "./http.yaml#/components/schemas/HTTPAuth"
     TLS:
       type: object
       properties:

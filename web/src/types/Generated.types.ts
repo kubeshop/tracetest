@@ -989,7 +989,7 @@ export interface external {
           readBufferSize?: number;
           writeBufferSize?: number;
           waitForReady?: boolean;
-          headers?: external["config.yaml"]["http.yaml"]["components"]["schemas"]["HTTPHeader"][];
+          headers?: external["http.yaml"]["components"]["schemas"]["HTTPHeader"][];
           balancerName?: string;
           /** @enum {string} */
           compression?:
@@ -1001,7 +1001,7 @@ export interface external {
             | "none"
             | "";
           tls?: external["config.yaml"]["components"]["schemas"]["TLS"];
-          auth?: external["config.yaml"]["http.yaml"];
+          auth?: external["http.yaml"]["components"]["schemas"]["HTTPAuth"];
         };
         TLS: {
           insecure?: boolean;
