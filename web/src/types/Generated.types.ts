@@ -972,7 +972,7 @@ export interface external {
           jaeger?: external["config.yaml"]["components"]["schemas"]["GRPCClientSettings"];
           tempo?: external["config.yaml"]["components"]["schemas"]["GRPCClientSettings"];
           openSearch?: external["config.yaml"]["components"]["schemas"]["OpenSearch"];
-          signalFx?: external["config.yaml"]["components"]["schemas"]["SignalFx"];
+          signalFx?: external["config.yaml"]["components"]["schemas"]["SignalFX"];
         };
         OpenSearch: {
           addresses?: string[];
@@ -1023,7 +1023,7 @@ export interface external {
             jaeger?: external["config.yaml"]["components"]["schemas"]["GRPCClientSettings"];
             tempo?: external["config.yaml"]["components"]["schemas"]["GRPCClientSettings"];
             openSearch?: external["config.yaml"]["components"]["schemas"]["OpenSearch"];
-            signalFx?: external["config.yaml"]["components"]["schemas"]["SignalFx"];
+            signalFx?: external["config.yaml"]["components"]["schemas"]["SignalFX"];
             collector?: external["config.yaml"]["components"]["schemas"]["CollectorConfig"];
           };
         };
