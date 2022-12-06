@@ -1092,7 +1092,7 @@ paths:
               schema:
                 $ref: "./config.yaml#/components/schemas/Config"
   /config/connection:
-    put:
+    post:
       tags:
         - api
       summary: "Tests the config data store/exporter connection"

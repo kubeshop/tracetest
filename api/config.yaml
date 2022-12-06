@@ -5,20 +5,20 @@ components:
       type: object
       properties:
         telemetry:
-          $ref: "./components/schemas/TelemetryConfig"
+          $ref: "#/components/schemas/TelemetryConfig"
         server:
-          $ref: "./components/schemas/Server"
+          $ref: "#/components/schemas/Server"
     TelemetryConfig:
       type: object
       properties:
         dataStores:
           type: array
           items:
-            $ref: DataStore
+            $ref: "#/components/schemas/DataStore"
         exporters:
           type: array
           items:
-            $ref: "./components/schemas/ExporterOption"
+            $ref: "#/components/schemas/ExporterOption"
     ExporterOption:
       type: object
       properties:
@@ -27,14 +27,14 @@ components:
         sampling:
           type: number
         exporter:
-          $ref: "./components/schemas/Exporter"
+          $ref: "#/components/schemas/Exporter"
     Exporter:
       type: object
       properties:
         type:
           type: string
         collector:
-          $ref: "./components/schemas/CollectorConfig"
+          $ref: "#/components/schemas/CollectorConfig"
     CollectorConfig:
       type: object
       properties:
@@ -46,13 +46,13 @@ components:
         type:
           type: string
         jaeger:
-          $ref: "./components/schemas/GRPCClientSettings"
+          $ref: "#/components/schemas/GRPCClientSettings"
         tempo:
-          $ref: "./components/schemas/GRPCClientSettings"
+          $ref: "#/components/schemas/GRPCClientSettings"
         openSearch:
-          $ref: "./components/schemas/OpenSearch"
+          $ref: "#/components/schemas/OpenSearch"
         signalFx:
-          $ref: "./components/schemas/SignalFx"
+          $ref: "#/components/schemas/SignalFx"
     OpenSearch:
       type: object
       properties:
@@ -87,7 +87,7 @@ components:
         headers:
           type: array
           items:
-            $ref: "./http.yaml/components/schemas/HTTPHeader"
+            $ref: "#/http.yaml/components/schemas/HTTPHeader"
         balancerName:
           type: string
         compression:
@@ -101,9 +101,9 @@ components:
             - "none"
             - ""
         tls:
-          $ref: "./components/schemas/TLS"
+          $ref: "#/components/schemas/TLS"
         auth:
-          $ref: "./http.yaml#/components/schemas/HTTPAuth"
+          $ref: "#/http.yaml#/components/schemas/HTTPAuth"
     TLS:
       type: object
       properties:
@@ -114,7 +114,7 @@ components:
         serverName:
           type: string
         settings:
-          $ref: "./components/schemas/TLSSetting"
+          $ref: "#/components/schemas/TLSSetting"
     TLSSetting:
       type: object
       properties:
@@ -140,15 +140,15 @@ components:
           type: object
           properties:
             jaeger:
-              $ref: "./components/schemas/GRPCClientSettings"
+              $ref: "#/components/schemas/GRPCClientSettings"
             tempo:
-              $ref: "./components/schemas/GRPCClientSettings"
+              $ref: "#/components/schemas/GRPCClientSettings"
             openSearch:
-              $ref: "./components/schemas/OpenSearch"
+              $ref: "#/components/schemas/OpenSearch"
             signalFx:
-              $ref: "./components/schemas/SignalFx"
+              $ref: "#/components/schemas/SignalFx"
             collector:
-              $ref: "./components/schemas/CollectorConfig"
+              $ref: "#/components/schemas/CollectorConfig"
     TestConnectionResponse:
       type: object
       properties:
