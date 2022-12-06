@@ -1,5 +1,5 @@
 import {InfoCircleOutlined} from '@ant-design/icons';
-import {Badge, Tag as AntdTag, Typography} from 'antd';
+import {Tag as AntdTag, Typography} from 'antd';
 import styled from 'styled-components';
 
 export {default as AttributeTitle} from './AttributeTitle';
@@ -34,22 +34,6 @@ export const TextContainer = styled.div`
 
 export const Text = styled(Typography.Text)`
   font-size: ${({theme}) => theme.size.sm};
-`;
-
-export const CustomBadge = styled(Badge)`
-  border: ${({theme}) => `1px solid ${theme.color.textSecondary}`};
-  border-radius: 9999px;
-  cursor: pointer;
-  line-height: 19px;
-  margin-left: 8px;
-  padding: 0 8px;
-  white-space: nowrap;
-
-  .ant-badge-status-text {
-    color: ${({theme}) => theme.color.textSecondary};
-    font-size: ${({theme}) => theme.size.sm};
-    margin-left: 3px;
-  }
 `;
 
 export const Title = styled(Typography.Title)`

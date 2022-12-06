@@ -1,20 +1,14 @@
 import {render} from 'test-utils';
-import TestDefinitionProvider from '../TestSpecs.provider';
-
-jest.mock('../../Test/Test.provider', () => {
-  const Provider = ({children}: {children: React.ReactElement}) => children;
-
-  return Provider;
-});
+import TestSpecs from '../TestSpecs.provider';
 
 describe('TestDefinitionProvider', () => {
   it('should render with the proper values', () => {
     const {getByText} = render(
-      <TestDefinitionProvider testId="testId" runId="runId">
+      <TestSpecs testId="testId" runId="runId">
         <div>
           <p>Hello</p>
         </div>
-      </TestDefinitionProvider>
+      </TestSpecs>
     );
 
     expect(getByText('Hello')).toBeInTheDocument();

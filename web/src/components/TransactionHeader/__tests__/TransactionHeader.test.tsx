@@ -5,11 +5,7 @@ import TransactionHeader from '../TransactionHeader';
 
 test('TransactionHeader', () => {
   const {getByTestId} = render(
-    <TransactionHeader
-      onBack={jest.fn()}
-      transaction={TransactionMock.model()}
-      transactionRun={TransactionRunModel({})}
-    />
+    <TransactionHeader transaction={TransactionMock.model()} transactionRun={TransactionRunModel({})} />
   );
   expect(getByTestId('transaction-details-name')).toBeInTheDocument();
 });

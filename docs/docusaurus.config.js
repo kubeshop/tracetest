@@ -8,7 +8,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 const config = {
   title: 'Tracetest Docs',
   tagline: 'Trace-based testing',
-  url: 'https://tracetest.io',
+  url: 'https://docs.tracetest.io',
   baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
@@ -121,7 +121,7 @@ const config = {
         defaultMode: 'dark',
         disableSwitch: false,
         respectPrefersColorScheme: false,
-      },  
+      },
       navbar: {
         title: 'Tracetest',
         logo: {
@@ -197,12 +197,14 @@ const config = {
       },
       algolia: {
         // The application ID provided by Algolia
-        appId: "NA2OEQH0PY",
+        appId: "L2ILN3GLIL",
 
         // Public API key: it is safe to commit it
-        apiKey: "4bbc30616d55bf1aad84ed654121d5c7",
+        apiKey: "663c91299e298ff34c5a7a18f4451d1a",
 
-        indexName: "docs_tracetest",
+        indexName: "tracetest",
+
+        contextualSearch: false,
       },
     }),
 };

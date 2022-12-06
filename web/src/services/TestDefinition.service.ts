@@ -7,12 +7,6 @@ const TestDefinitionService = () => ({
       assertions,
     };
   },
-  formatExpectedField(rawTestSpecs: TRawTestSpecEntry[]) {
-    return rawTestSpecs.map(spec => ({
-      ...spec,
-      assertions: spec.assertions,
-    }));
-  },
 });
 
 export default TestDefinitionService();

@@ -1,19 +1,22 @@
 import {ClockCircleOutlined, SettingOutlined, ToolOutlined} from '@ant-design/icons';
+import {useMemo} from 'react';
 import {Handle, NodeProps, Position} from 'react-flow-renderer';
 
 import {SemanticGroupNamesToText} from 'constants/SemanticGroupNames.constants';
 import {SpanKindToText} from 'constants/Span.constants';
 import {useAppSelector} from 'redux/hooks';
+import SpanService from 'services/Span.service';
 import TestSpecsSelectors from 'selectors/TestSpecs.selectors';
 import {INodeDataSpan} from 'types/DAG.types';
 import * as S from './SpanNode.styled';
+import AssertionResultChecks from '../../../AssertionResultChecks/AssertionResultChecks';
 
 interface IProps extends NodeProps<INodeDataSpan> {}
 
 const SpanNode = ({data, id, selected}: IProps) => {
-  const spansResult = useAppSelector(TestSpecsSelectors.selectSpansResult);
-  const passedChecks = spansResult[data.id]?.passed;
-  const failedChecks = spansResult[data.id]?.failed;
+  const assertions = useAppSelector(state => TestSpecsSelectors.selectAssertionResultsBySpan(state, data?.id || ''));
+  const {failed, passed} = useMemo(() => SpanService.getAssertionResultSummary(assertions), [assertions]);
+
   const className = data.isMatched ? 'matched' : '';
 
   return (
@@ -54,8 +57,7 @@ const SpanNode = ({data, id, selected}: IProps) => {
       </S.Body>
 
       <S.Footer>
-        {Boolean(passedChecks) && <S.BadgeCheck status="success" text={passedChecks} />}
-        {Boolean(failedChecks) && <S.BadgeCheck status="error" text={failedChecks} />}
+        <AssertionResultChecks failed={failed} passed={passed} styleType="node" />
       </S.Footer>
 
       <Handle id={id} position={Position.Bottom} style={{bottom: 0, visibility: 'hidden'}} type="source" />

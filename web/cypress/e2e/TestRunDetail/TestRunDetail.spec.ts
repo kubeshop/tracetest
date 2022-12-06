@@ -31,7 +31,7 @@ describe('Test Run Detail Views', () => {
 
     cy.get('[data-cy=expression-editor] [contenteditable]').first().type('db.name', {delay: 100});
     cy.get(getAttributeListId(0)).first().click({force: true});
-    
+
     // eslint-disable-next-line cypress/no-unnecessary-waiting
     cy.wait(100);
     cy.get('[data-cy=assertion-check-value] .cm-content').last().click();
@@ -40,7 +40,7 @@ describe('Test Run Detail Views', () => {
     cy.get('[data-cy=assertion-form-submit-button]').click();
     cy.wait('@testRuns', {timeout: 30000});
 
-    cy.intercept({method: 'PUT', url: '/api/tests/**/definition'}).as('testPublish');
+    cy.intercept({method: 'PUT', url: '/api/tests/**'}).as('testPublish');
     cy.get('[data-cy=trace-actions-publish').click({force: true});
     cy.wait('@testPublish');
     cy.get('[data-cy=test-spec-container]', {timeout: 10000}).should('have.lengthOf', 1);
@@ -59,7 +59,7 @@ describe('Test Run Detail Views', () => {
     cy.get('[data-cy=assertion-form-submit-button]').click();
     cy.wait('@testRuns', {timeout: 30000});
 
-    cy.intercept({method: 'PUT', url: '/api/tests/**/definition'}).as('testPublish');
+    cy.intercept({method: 'PUT', url: '/api/tests/**'}).as('testPublish');
     cy.get('[data-cy=trace-actions-publish').click({force: true});
     cy.wait('@testPublish');
     cy.get('[data-cy=test-spec-container]', {timeout: 10000}).should('have.lengthOf', 1);

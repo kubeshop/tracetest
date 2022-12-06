@@ -3,8 +3,6 @@ import {SortBy, SortDirection, TracetestApiTags} from 'constants/Test.constants'
 import Test from 'models/Test.model';
 import {PaginationResponse} from 'hooks/usePagination';
 import {TRawTest, TTest, TTestApiEndpointBuilder} from 'types/Test.types';
-import {TRawTestOutput} from 'types/TestOutput.types';
-import {TRawTestSpecs} from 'types/TestSpecs.types';
 import {getTotalCountFromHeaders} from 'utils/Common';
 
 const TestEndpoint = (builder: TTestApiEndpointBuilder) => ({
@@ -63,25 +61,6 @@ const TestEndpoint = (builder: TTestApiEndpointBuilder) => ({
       {type: TracetestApiTags.TEST, id: 'LIST'},
       {type: TracetestApiTags.RESOURCE, id: 'LIST'},
     ],
-  }),
-  setTestDefinition: builder.mutation<string[], {testId: string; testDefinition: Partial<TRawTestSpecs>}>({
-    query: ({testId, testDefinition}) => ({
-      url: `/tests/${testId}/definition`,
-      method: HTTP_METHOD.PUT,
-      body: testDefinition,
-    }),
-    invalidatesTags: (result, error, {testId}) => [
-      {type: TracetestApiTags.TEST, id: testId},
-      {type: TracetestApiTags.TEST_DEFINITION, id: testId},
-    ],
-  }),
-  setTestOutputs: builder.mutation<undefined, {testId: string; testOutputs: TRawTestOutput[]}>({
-    query: ({testId, testOutputs}) => ({
-      url: `/tests/${testId}/outputs`,
-      method: HTTP_METHOD.PUT,
-      body: testOutputs,
-    }),
-    invalidatesTags: (result, error, {testId}) => [{type: TracetestApiTags.TEST, id: testId}],
   }),
 });
 

@@ -27,7 +27,6 @@ interface IProps {
 const SpanDetail = ({onCreateTestSpec = noop, searchText, span}: IProps) => {
   const {open} = useTestSpecForm();
   const {onNavigateAndOpenModal} = useTestOutput();
-  const spansResult = useAppSelector(TestSpecsSelectors.selectSpansResult);
   const assertions = useAppSelector(state => TestSpecsSelectors.selectAssertionResultsBySpan(state, span?.id || ''));
   const [search, setSearch] = useState('');
   const semanticConventions = useGetOTELSemanticConventionAttributesInfo();
@@ -84,11 +83,7 @@ const SpanDetail = ({onCreateTestSpec = noop, searchText, span}: IProps) => {
 
   return (
     <>
-      <Header
-        span={span}
-        totalFailedChecks={span?.id ? spansResult[span.id]?.failed : 0}
-        totalPassedChecks={span?.id ? spansResult[span?.id]?.passed : 0}
-      />
+      <Header span={span} assertions={assertions} />
       <S.HeaderDivider />
 
       <S.SearchContainer data-cy="attributes-search-container">

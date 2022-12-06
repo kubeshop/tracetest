@@ -15,6 +15,7 @@ import {
   setPrevSelector as setPrevSelectorAction,
 } from 'redux/slices/TestSpecs.slice';
 import {TAssertionResults} from 'types/Assertion.types';
+import {TTest} from 'types/Test.types';
 import {ISuggestion, TTestSpecEntry} from 'types/TestSpecs.types';
 import useBlockNavigation from 'hooks/useBlockNavigation';
 import RouterActions from 'redux/actions/Router.actions';
@@ -24,11 +25,12 @@ import {useConfirmationModal} from 'providers/ConfirmationModal/ConfirmationModa
 interface IProps {
   runId: string;
   testId: string;
+  test: TTest;
   isDraftMode: boolean;
   assertionResults?: TAssertionResults;
 }
 
-const useTestSpecsCrud = ({runId, testId, isDraftMode, assertionResults}: IProps) => {
+const useTestSpecsCrud = ({runId, testId, test, isDraftMode, assertionResults}: IProps) => {
   useBlockNavigation(isDraftMode);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -63,11 +65,11 @@ const useTestSpecsCrud = ({runId, testId, isDraftMode, assertionResults}: IProps
   );
 
   const publish = useCallback(async () => {
-    const {id} = await dispatch(TestSpecsActions.publish({testId, runId})).unwrap();
+    const {id} = await dispatch(TestSpecsActions.publish({test, testId, runId})).unwrap();
     dispatch(RouterActions.updateSearch({[RouterSearchFields.SelectedAssertion]: ''}));
 
     navigate(`/test/${testId}/run/${id}/test`);
-  }, [dispatch, navigate, runId, testId]);
+  }, [dispatch, navigate, runId, test, testId]);
 
   const cancel = useCallback(() => {
     dispatch(resetSpecs());
