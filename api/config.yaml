@@ -52,7 +52,7 @@ components:
         openSearch:
           $ref: "#/components/schemas/OpenSearch"
         signalFx:
-          $ref: "#/components/schemas/SignalFx"
+          $ref: "#/components/schemas/SignalFX"
     OpenSearch:
       type: object
       properties:
@@ -146,7 +146,7 @@ components:
             openSearch:
               $ref: "#/components/schemas/OpenSearch"
             signalFx:
-              $ref: "#/components/schemas/SignalFx"
+              $ref: "#/components/schemas/SignalFX"
             collector:
               $ref: "#/components/schemas/CollectorConfig"
     TestConnectionResponse:
