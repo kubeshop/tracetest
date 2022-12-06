@@ -2,19 +2,18 @@ import {MoreOutlined} from '@ant-design/icons';
 import {Dropdown, Menu, message, Popover} from 'antd';
 import parse from 'html-react-parser';
 import MarkdownIt from 'markdown-it';
-import React, {useMemo} from 'react';
+import {useMemo} from 'react';
 
 import AttributeValue from 'components/AttributeValue';
 import {OtelReference} from 'components/TestSpecForm/hooks/useGetOTELSemanticConventionAttributesInfo';
 import SpanAttributeService from 'services/SpanAttribute.service';
-import {IResult} from 'types/Assertion.types';
+import {TResultAssertions} from 'types/Assertion.types';
 import {TSpanFlatAttribute} from 'types/Span.types';
-import AttributeCheck from './AttributeCheck';
 import * as S from './AttributeRow.styled';
+import AssertionResultChecks from '../AssertionResultChecks/AssertionResultChecks';
 
 interface IProps {
-  assertionsFailed?: IResult[];
-  assertionsPassed?: IResult[];
+  assertions?: TResultAssertions;
   attribute: TSpanFlatAttribute;
   searchText?: string;
   onCopy(value: string): void;
@@ -30,8 +29,7 @@ enum Action {
 }
 
 const AttributeRow = ({
-  assertionsFailed,
-  assertionsPassed,
+  assertions = {},
   attribute: {key, value},
   attribute,
   onCopy,
@@ -40,11 +38,16 @@ const AttributeRow = ({
   semanticConventions,
   onCreateOutput,
 }: IProps) => {
-  const passedCount = assertionsPassed?.length ?? 0;
-  const failedCount = assertionsFailed?.length ?? 0;
   const semanticConvention = SpanAttributeService.getReferencePicker(semanticConventions, key);
   const description = useMemo(() => parse(MarkdownIt().render(semanticConvention.description)), [semanticConvention]);
   const note = useMemo(() => parse(MarkdownIt().render(semanticConvention.note)), [semanticConvention]);
+  const {failed, passed} = useMemo(
+    () => SpanAttributeService.getAttributeAssertionResults(key, assertions),
+    [assertions, key]
+  );
+
+  const passedCount = passed.length;
+  const failedCount = failed.length;
 
   const handleOnClick = ({key: option}: {key: string}) => {
     if (option === Action.Copy) {
@@ -111,8 +114,7 @@ const AttributeRow = ({
         <S.AttributeValueRow>
           <AttributeValue value={value} searchText={searchText} />
         </S.AttributeValueRow>
-        {passedCount > 0 && <AttributeCheck items={assertionsPassed!} type="success" />}
-        {failedCount > 0 && <AttributeCheck items={assertionsFailed!} type="error" />}
+        <AssertionResultChecks failed={failed} passed={passed} />
       </S.Header>
 
       <Dropdown overlay={menu}>

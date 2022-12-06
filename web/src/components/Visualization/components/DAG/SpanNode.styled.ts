@@ -82,6 +82,7 @@ export const Footer = styled.div`
   bottom: 12px;
   position: absolute;
   right: 10px;
+  display: flex;
 `;
 
 export const Header = styled.div`
