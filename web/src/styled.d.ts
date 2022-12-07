@@ -19,6 +19,7 @@ declare module 'styled-components' {
       textLight: string;
       textSecondary: string;
       white: string;
+      warningYellow: string;
     };
     /** Font size */
     size: {

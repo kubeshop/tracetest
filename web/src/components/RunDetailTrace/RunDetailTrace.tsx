@@ -13,6 +13,7 @@ import {TTestRun} from 'types/TestRun.types';
 import * as S from './RunDetailTrace.styled';
 import Search from './Search';
 import Visualization from './Visualization';
+import SetupAlert from '../SetupAlert/SetupAlert';
 
 interface IProps {
   run: TTestRun;
@@ -37,6 +38,7 @@ const RunDetailTrace = ({run, testId}: IProps) => {
 
   return (
     <S.Container>
+      <SetupAlert />
       <Drawer
         leftPanel={<SpanDetail onCreateTestSpec={handleOnCreateSpec} searchText={searchText} span={span} />}
         rightPanel={

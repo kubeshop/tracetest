@@ -14,7 +14,7 @@ const {onGuidedTourClick} = HomeAnalyticsService;
 const HeaderMenu = () => {
   const {pathname} = useLocation();
   const params = useParams();
-  const {setState, state} = useGuidedTour();
+  const {setState, state, onSkip} = useGuidedTour();
 
   const onStartOnboarding = useCallback(() => {
     switchTraceMode(0);
@@ -26,9 +26,9 @@ const HeaderMenu = () => {
       ShowOnboardingContent(
         onGuidedTourClick,
         () => onStartOnboarding(),
-        () => setState(st => ({...st, dialog: false}))
+        () => onSkip()
       ),
-    [onStartOnboarding, setState]
+    [onSkip, onStartOnboarding]
   );
 
   return (

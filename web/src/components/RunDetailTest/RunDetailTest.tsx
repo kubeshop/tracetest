@@ -14,6 +14,7 @@ import {TTestRun} from 'types/TestRun.types';
 import {useGuidedTour} from 'providers/GuidedTour/GuidedTour.provider';
 import * as S from './RunDetailTest.styled';
 import Visualization from './Visualization';
+import SetupAlert from '../SetupAlert/SetupAlert';
 
 interface IProps {
   run: TTestRun;
@@ -34,6 +35,7 @@ const RunDetailTest = ({run, testId}: IProps) => {
   });
   return (
     <S.Container>
+      <SetupAlert />
       <Drawer
         leftPanel={<SpanDetail span={selectedSpan} />}
         rightPanel={

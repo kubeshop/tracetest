@@ -1,6 +1,8 @@
 import {noop} from 'lodash';
-import React, {createContext, Dispatch, SetStateAction, useContext, useMemo, useState} from 'react';
+import React, {createContext, Dispatch, SetStateAction, useCallback, useContext, useMemo, useState} from 'react';
 import Joyride, {CallBackProps} from 'react-joyride';
+import {useAppDispatch} from '../../redux/hooks';
+import {setUserPreference} from '../../redux/slices/User.slice';
 import GuidedTourService from '../../services/GuidedTour.service';
 import {useGetTooltipComponent} from './useGetTooltipComponent';
 import {useShowOnboardingWhenNotCompletedEffect} from './useShowOnboardingWhenNotCompletedEffect';
@@ -9,11 +11,13 @@ import {useUpdateStepsBasedOnLocationEffect} from './useUpdateStepsBasedOnLocati
 interface IContext {
   state: OnboardingState;
   setState: Dispatch<SetStateAction<OnboardingState>>;
+  onSkip(): void;
 }
 
 export const Context = createContext<IContext>({
   state: {} as OnboardingState,
   setState: noop,
+  onSkip: noop,
 });
 
 export interface OnboardingState {
@@ -36,10 +40,24 @@ const GuidedTourProvider: React.FC = ({children}) => {
     tourActive: false,
     callback: noop,
   });
+  const dispatch = useAppDispatch();
   const tour = GuidedTourService.useGetCurrentOnboardingLocation();
   useUpdateStepsBasedOnLocationEffect(state, setState);
   useShowOnboardingWhenNotCompletedEffect(tour, setState);
-  const value = useMemo(() => ({state, setState}), [setState, state]);
+
+  const onSkip = useCallback(() => {
+    dispatch(
+      setUserPreference({
+        key: 'isOnboardingComplete',
+        value: true,
+      })
+    );
+
+    setState(st => ({...st, dialog: false}));
+  }, [dispatch]);
+
+  const value = useMemo(() => ({state, setState, onSkip}), [setState, state, onSkip]);
+
   return (
     <Context.Provider value={value}>
       <Joyride

@@ -3,16 +3,25 @@ import {createContext, useCallback, useContext, useMemo} from 'react';
 
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import {setUserPreference} from 'redux/slices/User.slice';
-import {selectShouldDisplayConfigSetup} from 'redux/config/selectors';
+import {useGetConfigQuery} from 'redux/apis/TraceTest.api';
+import {ConfigMode, TConfig} from 'types/Config.types';
+import Config from 'models/Config.model';
+import UserSelectors from '../../selectors/User.selectors';
 
 interface IContext {
-  shouldDisplayConfigSetup: boolean;
+  config: TConfig;
+  isLoading: boolean;
+  isError: boolean;
   skipConfigSetup(): void;
+  shouldDisplayConfigSetup: boolean;
 }
 
 const Context = createContext<IContext>({
-  shouldDisplayConfigSetup: true,
+  config: Config({}),
   skipConfigSetup: noop,
+  isLoading: false,
+  isError: false,
+  shouldDisplayConfigSetup: false,
 });
 
 interface IProps {
@@ -23,7 +32,10 @@ export const useConfig = () => useContext(Context);
 
 const ConfigProvider = ({children}: IProps) => {
   const dispatch = useAppDispatch();
-  const shouldDisplayConfigSetup = useAppSelector(selectShouldDisplayConfigSetup);
+  const {data: config = Config({}), isLoading, isError} = useGetConfigQuery({});
+  const initConfigSetup = useAppSelector(state => UserSelectors.selectUserPreference(state, 'initConfigSetup'));
+
+  const shouldDisplayConfigSetup = Boolean(initConfigSetup) && config.mode === ConfigMode.NO_TRACING_MODE;
 
   const skipConfigSetup = useCallback(() => {
     dispatch(
@@ -36,10 +48,13 @@ const ConfigProvider = ({children}: IProps) => {
 
   const value = useMemo<IContext>(
     () => ({
-      shouldDisplayConfigSetup,
+      config,
+      isLoading,
+      isError,
       skipConfigSetup,
+      shouldDisplayConfigSetup,
     }),
-    [shouldDisplayConfigSetup, skipConfigSetup]
+    [config, isError, isLoading, shouldDisplayConfigSetup, skipConfigSetup]
   );
 
   return <Context.Provider value={value}>{children}</Context.Provider>;
