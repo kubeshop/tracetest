@@ -4,6 +4,7 @@ import SetupConfigService from 'services/SetupConfig.service';
 import {TConfig, TDraftConfig, TDraftConfigForm} from 'types/Config.types';
 import DataStoreComponentFactory from '../DataStorePlugin/DataStoreComponentFactory';
 import * as S from './DataStoreForm.styled';
+import DataStoreSelectionInput from './DataStoreSelectionInput';
 
 export const FORM_ID = 'edit-test';
 
@@ -29,6 +30,9 @@ const DataStoreForm = ({form, onSubmit, config, onValidation}: IProps) => {
       initialValues={initialValues}
     >
       <S.FormContainer>
+        <Form.Item name="dataStoreType">
+          <DataStoreSelectionInput />
+        </Form.Item>
         <DataStoreComponentFactory dataStoreType={dataStoreType} />
       </S.FormContainer>
     </Form>

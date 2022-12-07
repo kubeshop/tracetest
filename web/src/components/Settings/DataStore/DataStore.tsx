@@ -24,6 +24,8 @@ const DataStore = ({config}: IProps) => {
   return (
     <S.Wrapper data-cy="config-datastore-form">
       <S.FormContainer>
+        <S.Description>Optional page description goes here</S.Description>
+        <S.Title>Choose type of OTEL data store</S.Title>
         <DataStoreForm form={form} config={config} onSubmit={handleOnSubmit} onValidation={onIsFormValid} />
         <S.ButtonsContainer>
           <Button

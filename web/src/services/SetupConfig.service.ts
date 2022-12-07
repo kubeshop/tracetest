@@ -34,11 +34,12 @@ const SetupConfigService = (): ISetupConfigService => ({
     return config;
   },
 
-  getInitialValues({telemetry: {dataStores = []}}) {
+  getInitialValues({telemetry: {dataStores = []}, server: {telemetry: {dataStore: dataStoreType} = {}}}) {
     const [dataStore] = dataStores;
 
     return {
       dataStore,
+      dataStoreType: (dataStoreType || SupportedDataStores.JAEGER) as SupportedDataStores,
     };
   },
 });
