@@ -10,7 +10,11 @@ const ConfigEndpoint = (builder: TTestApiEndpointBuilder) => ({
     // query: () => '/config',
     query: () => '/tests',
     providesTags: () => [{type: TracetestApiTags.CONFIG, id: 'config'}],
-    transformResponse: () => ConfigMock.model(),
+    transformResponse: () =>
+      ConfigMock.model({
+        telemetry: {dataStores: [{type: 'jaeger'}]},
+        server: {telemetry: {dataStore: 'jaeger'}},
+      }),
   }),
   updateConfig: builder.mutation<undefined, TRawConfig>({
     query: config => ({
