@@ -14,7 +14,7 @@ import {TTestRun} from 'types/TestRun.types';
 import {useGuidedTour} from 'providers/GuidedTour/GuidedTour.provider';
 import * as S from './RunDetailTest.styled';
 import Visualization from './Visualization';
-import SetupAlert from '../SetupAlert/SetupAlert';
+import SetupAlert from '../SetupAlert';
 
 interface IProps {
   run: TTestRun;

@@ -13,7 +13,7 @@ import {TTestRun} from 'types/TestRun.types';
 import * as S from './RunDetailTrace.styled';
 import Search from './Search';
 import Visualization from './Visualization';
-import SetupAlert from '../SetupAlert/SetupAlert';
+import SetupAlert from '../SetupAlert';
 
 interface IProps {
   run: TTestRun;
