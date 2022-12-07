@@ -5,7 +5,7 @@ interface IConfigState {
 }
 
 const initialState: IConfigState = {
-  isDataStoreConfigured: false,
+  isDataStoreConfigured: true,
 };
 
 const configSlice = createSlice({
