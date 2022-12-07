@@ -92,14 +92,42 @@ const config = {
           //   from: '/adding-assertions',
           // },
           // Redirect from multiple old paths to the new path
-          {
-            to: '/concepts/selectors',
-            from: ['/advanced-selectors' /*, '/docs/legacyDocFrom2016'*/],
-          },
           // {
           //   to: '/cli/test-definition-file', // replace with '/cli/creating-tests' after new docs structure release
           //   from: ['/test-definition-file' /*, '/docs/legacyDocFrom2016'*/],
           // },
+          {
+            to: '/concepts/selectors',
+            from: ['/advanced-selectors' /*, '/docs/legacyDocFrom2016'*/],
+          },
+          {
+            to: '/configuration/overview',
+            from: ['/getting-started/supported-backends' /*, '/docs/legacyDocFrom2016'*/],
+          },
+          {
+            to: '/web-ui/creating-tests',
+            from: ['/using-tracetest/create-test' /*, '/docs/legacyDocFrom2016'*/],
+          },
+          {
+            to: '/web-ui/test-results',
+            from: ['/using-tracetest/test-results' /*, '/docs/legacyDocFrom2016'*/],
+          },
+          {
+            to: '/web-ui/creating-test-specifications',
+            from: ['/using-tracetest/adding-assertions' /*, '/docs/legacyDocFrom2016'*/],
+          },
+          {
+            to: '/concepts/versioning',
+            from: ['/using-tracetest/versioning' /*, '/docs/legacyDocFrom2016'*/],
+          },
+          {
+            to: '/cli/creating-tests',
+            from: ['/cli/test-definition-file' /*, '/docs/legacyDocFrom2016'*/],
+          },
+          {
+            to: '/ci-cd-automation/github-actions-pipeline',
+            from: ['/ci-cd-automation/ci-cd-best-practices' /*, '/docs/legacyDocFrom2016'*/],
+          },
         ],
         // createRedirects(existingPath) {
         //   if (existingPath.includes('/community')) {

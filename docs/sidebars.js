@@ -54,11 +54,11 @@ const sidebars = {
           id: "configuration/overview",
           label: "Overview",
         },
-        {
-          type: "doc",
-          id: "configuration/config-file-reference",
-          label: "Config File Reference",
-        },
+        // {
+        //   type: "doc",
+        //   id: "configuration/config-file-reference",
+        //   label: "Config File Reference",
+        // },
         {
           type: "category",
           label: "Connecting to Data Stores",
@@ -192,6 +192,11 @@ const sidebars = {
           type: "doc",
           id: "web-ui/creating-tests",
           label: "Creating tests",
+        },
+        {
+          type: "doc",
+          id: "web-ui/creating-test-specifications",
+          label: "Creating test specifications",
         },
         {
           type: "doc",

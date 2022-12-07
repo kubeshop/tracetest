@@ -1,4 +1,4 @@
-# Assertions
+# Creating Test Specifications
 
 Test Specifications may be added to a trace to set a value for a step in the trace to determine success or failure. If test specs have already been added to a test, they will be on the Test screen:
 

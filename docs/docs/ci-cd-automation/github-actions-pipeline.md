@@ -1,4 +1,4 @@
-# CI/CD Best Practices
+# GitHub Actions Pipeline
 
 Read our blog post:
 

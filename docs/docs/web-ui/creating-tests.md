@@ -1,4 +1,4 @@
-# Create a Test
+# Creating Tests
 
 ![Main Screen](../img/main-screen-0.6.png)
 
