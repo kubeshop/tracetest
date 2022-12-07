@@ -12,7 +12,6 @@ import User from 'redux/slices/User.slice';
 import RouterMiddleware from './Router.middleware';
 import OtelRepoApi from './apis/OtelRepo.api';
 import TestOutputs from './testOutputs/slice';
-import Config from './config/slice';
 
 const {createReduxHistory, routerMiddleware, routerReducer} = createReduxHistoryContext({
   history: createBrowserHistory(),
@@ -32,7 +31,6 @@ export const store = configureStore({
     createTransaction: CreateTransaction,
     user: User,
     testOutputs: TestOutputs,
-    config: Config,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware()
