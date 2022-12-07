@@ -11,7 +11,7 @@ TODO: migrate video to youtube and use YT embed.
 
 -->
 
-Tracetest allows you to quickly build integration and end-to-end tests, powered by your OpenTelementry traces.
+Tracetest allows you to quickly build integration and end-to-end tests, powered by your OpenTelemetry traces.
 
 - Point Tracetest to your preffered trace back-end, like Jaeger or Tempo, or to the OpenTelemetry Collector directly.
 - Define a triggering transaction, such as a GET against an API endpoint.
