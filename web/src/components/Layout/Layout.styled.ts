@@ -36,9 +36,21 @@ export const MenuContainer = styled.div`
 `;
 
 export const Sider = styled(LayoutAntd.Sider)`
+  .ant-layout-sider-children {
+    display: flex;
+    flex-direction: column;
+  }
+
   .ant-layout-sider-trigger {
     background: #2c1a54;
   }
 
   background: linear-gradient(180deg, #2f1e61 0%, #8b2c53 111.31%, rgba(49, 38, 132, 0) 180.18%, #df4f80 180.18%);
+`;
+
+export const SiderContent = styled.div`
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
 `;
