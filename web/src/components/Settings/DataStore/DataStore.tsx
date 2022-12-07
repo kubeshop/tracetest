@@ -2,7 +2,7 @@ import {Button, Form} from 'antd';
 import {useSetupConfig} from 'providers/SetupConfig/SetupConfig.provider';
 import {useCallback} from 'react';
 import {TConfig, TDraftConfig} from 'types/Config.types';
-import DataStoreForm from '../../DataStoreForm';
+import DataStoreForm from '../DataStoreForm';
 import * as S from './DataStore.styled';
 
 interface IProps {

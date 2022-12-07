@@ -5,7 +5,7 @@ import {TConfig, TDraftConfig, TDraftConfigForm} from 'types/Config.types';
 import DataStoreComponentFactory from '../DataStorePlugin/DataStoreComponentFactory';
 import * as S from './DataStoreForm.styled';
 
-export const FORM_ID = 'edit-test';
+export const FORM_ID = 'data-store-form';
 
 interface IProps {
   form: TDraftConfigForm;
