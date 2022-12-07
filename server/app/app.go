@@ -39,10 +39,11 @@ var (
 var EmptyDemoEnabled []string
 
 type App struct {
-	config  config.Config
-	db      model.Repository
-	traceDB tracedb.TraceDB
-	tracer  trace.Tracer
+	config           config.Config
+	db               model.Repository
+	traceDB          tracedb.TraceDB
+	tracer           trace.Tracer
+	executionContext *executionContext
 }
 
 func New(config config.Config, db model.Repository, tracedb tracedb.TraceDB, tracer trace.Tracer) (*App, error) {
@@ -94,7 +95,16 @@ func spaHandler(prefix, staticPath, indexPath string, tplVars map[string]string)
 	return http.StripPrefix(prefix, http.HandlerFunc(handler)).ServeHTTP
 }
 
+func (a *App) GetConfig() config.Config {
+	return a.config
+}
+
+func (a *App) SetConfig(config config.Config) {
+	a.config = config
+}
+
 func (a *App) Start() error {
+	a.executionContext = &executionContext{}
 	fmt.Printf("Starting tracetest (version %s, env %s)\n", Version, Env)
 	ctx := context.Background()
 
@@ -200,7 +210,8 @@ func (a *App) Start() error {
 	}
 
 	// Start otlp endpoint
-	go func() { otlp.StartServer(21321, a.db) }()
+	otlpServer := otlp.StartServer(21321, a.db)
+	a.executionContext.otlpServer = otlpServer
 
 	port := 11633
 	if a.config.Server.HttpPort != 0 {
@@ -208,7 +219,26 @@ func (a *App) Start() error {
 	}
 
 	log.Printf("HTTP Server started")
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), handlers.CompressHandler(router)))
+	httpServer := http.Server{Addr: fmt.Sprintf(":%d", port), Handler: handlers.CompressHandler(router)}
+	a.executionContext.httpServer = &httpServer
+
+	if err = httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		log.Fatal(err)
+	}
+
+	return nil
+}
+
+func (a *App) Stop() error {
+	ctx := context.Background()
+	err := a.executionContext.httpServer.Shutdown(ctx)
+	if err != nil {
+		return fmt.Errorf("could not stop http server: %w", err)
+	}
+
+	a.executionContext.otlpServer.Stop()
+
+	a.executionContext = nil
 
 	return nil
 }

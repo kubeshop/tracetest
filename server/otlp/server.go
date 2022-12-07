@@ -19,7 +19,7 @@ type Server struct {
 	db model.Repository
 }
 
-func StartServer(port int, db model.Repository) error {
+func StartServer(port int, db model.Repository) *grpc.Server {
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
 		panic(err)
@@ -31,11 +31,13 @@ func StartServer(port int, db model.Repository) error {
 
 	s := grpc.NewServer()
 	pb.RegisterTraceServiceServer(s, &server)
-	if err := s.Serve(listener); err != nil {
-		return fmt.Errorf("could not serve: %w", err)
-	}
+	go func() {
+		if err := s.Serve(listener); err != nil {
+			panic(fmt.Errorf("could not serve: %w", err))
+		}
+	}()
 
-	return nil
+	return s
 }
 
 func (s Server) Export(ctx context.Context, request *pb.ExportTraceServiceRequest) (*pb.ExportTraceServiceResponse, error) {
