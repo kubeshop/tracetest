@@ -14,7 +14,7 @@ const AddressesList = ({fields, add, remove}: IProps) => {
     <>
       <S.ItemListContainer>
         {fields.map(({key, name, ...field}, index) => (
-          <S.ListItem>
+          <S.ListItem key={key}>
             <Form.Item key={key} name={[name]} {...{field}} style={{width: '100%'}}>
               <Input placeholder={`Address #${index + 1}`} />
             </Form.Item>

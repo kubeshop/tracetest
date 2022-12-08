@@ -1,4 +1,5 @@
 import {SupportedDataStores, TDataStoreService} from 'types/Config.types';
+import Validator from '../../utils/Validator';
 
 const OpenSearchService = (): TDataStoreService => ({
   getRequest({dataStore: {openSearch: {index = '', username = '', password = '', addresses = []} = {}} = {}}) {
@@ -13,11 +14,12 @@ const OpenSearchService = (): TDataStoreService => ({
     });
   },
   validateDraft({dataStore: {openSearch: {index = '', username = '', password = '', addresses = []} = {}} = {}}) {
-    if (!index || !username || !password || !addresses.length) return Promise.resolve(false);
+    const [address] = addresses;
+    if (!index || !username || !password || !Validator.url(address)) return Promise.resolve(false);
 
     return Promise.resolve(true);
   },
-  getInitialValues({ telemetry: { dataStores: [{openSearch = {}} = {}] = [] } = {} }) {
+  getInitialValues({telemetry: {dataStores: [{openSearch = {}} = {}] = []} = {}}) {
     const {index = '', username = '', password = '', addresses = ['']} = openSearch;
 
     return {
@@ -27,7 +29,7 @@ const OpenSearchService = (): TDataStoreService => ({
           username,
           password,
           addresses,
-        }
+        },
       },
       dataStoreType: SupportedDataStores.OpenSearch,
     };
