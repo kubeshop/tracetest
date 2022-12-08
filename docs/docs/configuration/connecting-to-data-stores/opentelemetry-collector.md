@@ -6,6 +6,10 @@ If you don't want to use a trace data store, you can send all traces directly to
 It is important to notice that this relies on the [tailsampling](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/tailsamplingprocessor) processor, which, at the moment, is only available in the [contrib](https://github.com/open-telemetry/opentelemetry-collector-contrib/) version of the collector.
 :::
 
+:::tip
+Examples of configuring Tracetest can be found in the [`examples` folder of the Tracetest GitHub repo](https://github.com/kubeshop/tracetest/tree/main/examples). 
+:::
+
 ## Configuring OpenTelemetry Collector to Send Traces to Tracetest
 
 In your OpenTelemetry Collector config file, make sure to set the `exporter` to `otlp/1`, with the `endpoint` pointing to your Tracetest instance on port `21321`. If you are running Tracetest with Docker, the endpoint might look like this `http://tracetest:21321`.
@@ -58,12 +62,29 @@ You also have to configure your Tracetest instance to make it aware that there's
 
 ```yaml
 # tracetest.config.yaml
-# ...
+
+postgresConnString: "host=postgres user=postgres password=postgres port=5432 sslmode=disable"
+
+poolingConfig:
+  maxWaitTimeForTrace: 10s
+  retryDelay: 1s
+
+googleAnalytics:
+  enabled: true
+
 telemetry:
   dataStores:
     otlp:
       type: otlp
-# ...
+  exporters:
+    collector:
+      serviceName: tracetest
+      sampling: 100 # 100%
+      exporter:
+        type: collector
+        collector:
+          endpoint: otel-collector:4317
+
 server:
   telemetry:
     dataStore: otlp

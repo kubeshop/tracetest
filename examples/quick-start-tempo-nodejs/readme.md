@@ -1,6 +1,6 @@
-# Quick Start - Node.js app with OpenSearch, OpenTelemetry and Tracetest
+# Quick Start - Node.js app with Tempo, OpenTelemetry and Tracetest
 
-This is a simple quick start on how to configure a Node.js app to use OpenTelemetry instrumentation with traces, and Tracetest for enhancing your e2e and integration tests with trace-based testing. The infrastructure will use OpenSearch as the trace data store, and OpenTelemetry Collector to receive traces from the Node.js app and send them to OpenSearch.
+This is a simple quick start on how to configure a Node.js app to use OpenTelemetry instrumentation with traces, and Tracetest for enhancing your e2e and integration tests with trace-based testing. The infrastructure will use Tempo as the trace data store, and OpenTelemetry Collector to receive traces from the Node.js app and send them to Tempo.
 
 ## Prerequisites
 
@@ -14,12 +14,12 @@ The project is built with Docker Compose. It contains two distinct `docker-compo
 The `docker-compose.yaml` file and `Dockerfile` in the root directory are for the Node.js app.
 
 ### 2. Tracetest
-The `docker-compose.yaml` file, `collector.config.yaml`, and `tracetest.config.yaml` in the `tracetest` directory are for the setting up Tracetest, OpenSearch, and the OpenTelemetry Collector.
+The `docker-compose.yaml` file, `collector.config.yaml`, and `tracetest.config.yaml` in the `tracetest` directory are for the setting up Tracetest, Tempo, and the OpenTelemetry Collector.
 
 The `tracetest` directory is self-contained and will run all the prerequisites for enabling OpenTelemetry traces and trace-based testing with Tracetest.
 
 ### Docker Compose Network
-All `services` in the `docker-compose.yaml` are on the same network and will be reachable by hostname from within other services. E.g. `data-prepper:21890` in the `collector.config.yaml` will map to the `data-prepper` service, where the port `21890` is the port where the Data Prepper accepts traces. And, `http://opensearch:9200` in the `tracetest.config.yaml` will map to the `opensearch` service and port `9200` where Tracetest will fetch trace data from OpenSearch.
+All `services` in the `docker-compose.yaml` are on the same network and will be reachable by hostname from within other services. E.g. `tempo:4317` in the `collector.config.yaml` will map to the `tempo` service, where the port `4317` is the port where Tempo accepts traces. And, `tempo:9095` in the `tracetest.config.yaml` will map to the `tempo` service and port `9095` where Tracetest will fetch trace data from Tempo.
 
 ## Node.js app
 
@@ -113,23 +113,15 @@ The `docker-compose.yaml` in the `tracetest` directory is configured with four s
 
 - **Postgres** - Postgres is a prerequisite for Tracetest to work. It stores trace data when running the trace-based tests. We're currently working on alternative databases. Stay tuned for more about that!
 - [**OpenTelemetry Collector**](https://opentelemetry.io/docs/collector/) - A vendor-agnostic implementation of how to receive, process and export telemetry data.
-- [**OpenSearch**](https://opensearch.org/) - Data store and search engine.
+- [**Tempo**](https://grafana.com/oss/tempo/) - Grafana Tempo is an open source, easy-to-use, and high-scale distributed tracing backend.
 - [**Tracetest**](https://tracetest.io/) - Trace-based testing that generates end-to-end tests automatically from traces.
-
-They will start in this order:
-
-1. Postgres
-2. OpenSearch
-3. Data Prepper
-4. OpenTelemetry Collector
-5. Tracetest
 
 ```yaml
 version: '3'
 services:
 
   tracetest:
-    image: kubeshop/tracetest:v0.8.0
+    image: kubeshop/tracetest
     volumes:
       - ./tracetest/tracetest.config.yaml:/app/config.yaml
     ports:
@@ -137,6 +129,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      tempo:
+        condition: service_started
       otel-collector:
         condition: service_started
     healthcheck:
@@ -164,47 +158,17 @@ services:
     volumes:
       - ./tracetest/collector.config.yaml:/otel-local-config.yaml
     depends_on:
-      data-prepper:
-        condition: service_started
-
-  data-prepper:
-    restart: unless-stopped
-    image: opensearchproject/data-prepper:1.5.1
+      - tempo
+    
+  tempo:
+    image: grafana/tempo:1.5.0
+    command: ["-config.file=/etc/tempo.yaml"]
     volumes:
-      - ./tracetest/opensearch/opensearch-analytics.yaml:/usr/share/data-prepper/pipelines.yaml
-      - ./tracetest/opensearch/opensearch-data-prepper-config.yaml:/usr/share/data-prepper/data-prepper-config.yaml
-    depends_on:
-      opensearch:
-        condition: service_healthy
-
-  opensearch:
-    image: opensearchproject/opensearch:2.3.0
-    environment:
-      - discovery.type=single-node
-      - bootstrap.memory_lock=true # along with the memlock settings below, disables swapping
-      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m" # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
-    volumes:
-      - ./tracetest/opensearch/opensearch.yaml:/usr/share/opensearch/config/opensearch.yml
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-      nofile:
-        soft: 65536 # maximum number of open files for the OpenSearch user, set to at least 65536 on modern systems
-        hard: 65536
-    healthcheck:
-      test: curl -s http://localhost:9200 >/dev/null || exit 1
-      interval: 5s
-      timeout: 10s
-      retries: 5
+    - ./tracetest/tempo.config.yaml:/etc/tempo.yaml
 
 ```
 
-Tracetest depends on Postgres and the OpenTelemetry Collector. The OpenTelemetry Collector depends on the Data Prepper that then depends on OpenSearch.
-
-Both Tracetest and the OpenTelemetry Collector require config files to be loaded via a volume. The volumes are mapped from the root directory into the `tracetest` directory and the respective config files.
-
-OpenSearch and Data Prepper require config files to be loaded via a volume as well. The volumes are mapped from the root directory into the `tracetest/opensearch` directory and the respective config files. Data Prepper will receive trace data from OpenTelemetry Collector and send them along to OpenSearch.
+Tracetest depends on Postgres, Tempo and the OpenTelemetry Collector. All three services require config files to be loaded via a volume. The volumes are mapped from the root directory into the `tracetest` directory and the respective config files.
 
 **Why?** To start both the Node.js app and Tracetest we will run this command:
 
@@ -212,24 +176,81 @@ OpenSearch and Data Prepper require config files to be loaded via a volume as we
 docker-compose -f docker-compose.yaml -f tracetest/docker-compose.yaml up # add --build if the images are not built already
 ```
 
-The `tracetest.config.yaml` file contains the basic setup of connecting Tracetest to the Postgres instance, and defining the trace data store and exporter. The data store is set to OpenSearch meaning the traces will be stored in OpenSearch and Tracetest will fetch them from OpenSearch when running tests. The exporter is set to the OpenTelemetry Collector.
+The `tempo.config.yaml` file contains the initial config for running Tempo.
+
+The key takeaway is the server block.
+
+```yaml
+#...
+server:
+  http_listen_port: 3100
+  grpc_listen_port: 9095
+#...
+```
+
+We'll use this below.
+
+Check out the full Tempo config for reference.
+
+```yaml
+auth_enabled: false
+
+server:
+  http_listen_port: 3100
+  grpc_listen_port: 9095
+
+distributor:
+  receivers:                           # this configuration will listen on all ports and protocols that tempo is capable of.
+    jaeger:                            # the receives all come from the OpenTelemetry collector.  more configuration information can
+      protocols:                       # be found there: https://github.com/open-telemetry/opentelemetry-collector/tree/master/receiver
+        thrift_http:                   #
+        grpc:                          # for a production deployment you should only enable the receivers you need!
+        thrift_binary:
+        thrift_compact:
+    zipkin:
+    otlp:
+      protocols:
+        http:
+        grpc:
+    opencensus:
+
+ingester:
+  trace_idle_period: 10s               # the length of time after a trace has not received spans to consider it complete and flush it
+  max_block_bytes: 1_000_000           # cut the head block when it hits this size or ...
+  #traces_per_block: 1_000_000
+  max_block_duration: 5m               #   this much time passes
+
+compactor:
+  compaction:
+    compaction_window: 1h              # blocks in this time window will be compacted together
+    max_compaction_objects: 1000000    # maximum size of compacted blocks
+    block_retention: 1h
+    compacted_block_retention: 10m
+
+storage:
+  trace:
+    backend: local                     # backend configuration to use
+    wal:
+      path: /tmp/tempo/wal            # where to store the the wal locally
+      #bloom_filter_false_positive: .05 # bloom filter false positive rate.  lower values create larger filters but fewer false positives
+      #index_downsample: 10             # number of traces per index record
+    local:
+      path: /tmp/tempo/blocks
+    pool:
+      max_workers: 100                 # the worker pool mainly drives querying, but is also used for polling the blocklist
+      queue_depth: 10000
+
+```
+
+The `tracetest.config.yaml` file contains the basic setup of connecting Tracetest to the Postgres instance, and defining the trace data store and exporter. The data store is set to Tempo meaning the traces will be stored in Tempo and Tracetest will fetch them from Tempo when running tests. The exporter is set to the OpenTelemetry Collector.
 
 But how does Tracetest fetch traces?
 
-Tracetest connects to OpenSearch to fetch trace data:
+Tracetest uses `tempo.endpoint:tempo:9095` to connect to Tempo and fetch trace data.
 
 ```yaml
-opensearch:
-  type: opensearch
-  opensearch:
-    addresses:
-      - http://opensearch:9200
-    index: traces
-```
+# tracetest.config.yaml
 
-Here's the full `tracetest.config.yaml`:
-
-```yaml
 postgresConnString: "host=postgres user=postgres password=postgres port=5432 sslmode=disable"
 
 poolingConfig:
@@ -246,10 +267,10 @@ experimentalFeatures: []
 
 telemetry:
   dataStores:
-    jaeger:
-      type: jaeger
-      jaeger:
-        endpoint: jaeger:16685
+    tempo:
+      type: tempo
+      tempo:
+        endpoint: tempo:9095
         tls:
           insecure: true
 
@@ -264,17 +285,18 @@ telemetry:
 
 server:
   telemetry:
-    dataStore: jaeger
+    dataStore: tempo
     exporter: collector
     applicationExporter: collector
 
 ```
 
-How do traces reach Jaeger?
+How do traces reach Tempo?
 
-The `collector.config.yaml` explains that. It receives traces via either `grpc` or `http`. Then, exports them to the Data Prepper that will parse the trace data and send it to OpenSearch. Data Prepper uses the endpoint `data-prepper:21890`.
+The `collector.config.yaml` explains that. It receives traces via either `grpc` or `http`. Then, exports them to Tempo's OTLP gRPC endpoint `tempo:4317`.
 
 ```yaml
+# collector.config.yaml
 receivers:
   otlp:
     protocols:
@@ -292,10 +314,9 @@ exporters:
   logging:
     loglevel: debug
   otlp/2:
-    endpoint: data-prepper:21890
+    endpoint: tempo:4317
     tls:
       insecure: true
-      insecure_skip_verify: true
 
 service:
   pipelines:

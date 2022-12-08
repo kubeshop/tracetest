@@ -8,6 +8,10 @@ You'll configure the OpenTelemetry Collector to receive traces from your system 
 It is important to notice that this relies on the [probabilistic_sampler](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/probabilisticsamplerprocessor) processor, which, at the moment, is only available in the [contrib](https://github.com/open-telemetry/opentelemetry-collector-contrib/) version of the collector.
 :::
 
+:::tip
+Examples of configuring Tracetest can be found in the [`examples` folder of the Tracetest GitHub repo](https://github.com/kubeshop/tracetest/tree/main/examples). 
+:::
+
 ## Configure OpenTelemetry Collector to send traces to OpenSearch
 
 In your OpenTelemetry Collector config file, make sure to set the `exporter` to `otlp`, with the `endpoint` pointing to the Data Prepper on port `21890`. If you are running Tracetest with Docker, the endpoint might look like this `data-prepper:21890`.
@@ -59,7 +63,21 @@ Edit your configuration file to include this configuration:
 
 ```yaml
 # tracetest.config.yaml
-# ...
+
+postgresConnString: "host=postgres user=postgres password=postgres port=5432 sslmode=disable"
+
+poolingConfig:
+  maxWaitTimeForTrace: 10m
+  retryDelay: 5s
+
+googleAnalytics:
+  enabled: true
+
+demo:
+  enabled: []
+
+experimentalFeatures: []
+
 telemetry:
   dataStores:
     opensearch:
@@ -68,7 +86,16 @@ telemetry:
         addresses:
           - http://opensearch:9200
         index: traces
-# ...
+
+  exporters:
+    collector:
+      serviceName: tracetest
+      sampling: 100 # 100%
+      exporter:
+        type: collector
+        collector:
+          endpoint: otel-collector:4317
+
 server:
   telemetry:
     dataStore: opensearch
