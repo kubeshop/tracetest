@@ -3,9 +3,15 @@ import {Typography} from 'antd';
 
 export const Title = styled(Typography.Title)`
   && {
-    font-size: ${({theme}) => theme.size.lg};
-    margin-bottom: 25px;
+    font-size: ${({theme}) => theme.size.md};
+    margin-bottom: 16px;
     font-weight: 700;
+  }
+`;
+
+export const Description = styled(Typography.Text)`
+  && {
+    color: ${({theme}) => theme.color.textSecondary};
   }
 `;
 
@@ -13,10 +19,12 @@ export const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   height: 100%;
+  margin-top: 24px;
+  background: ${({theme}) => theme.color.white};
 `;
 
 export const FormContainer = styled.div`
-  padding: 24px;
+  padding: 16px;
 `;
 
 export const ButtonsContainer = styled.div`
