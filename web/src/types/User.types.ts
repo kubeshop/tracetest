@@ -1,6 +1,8 @@
 export interface IUserPreferences {
   lang: string;
   environmentId: string;
+  initConfigSetup: boolean;
+  isOnboardingComplete: boolean;
 }
 
 export type TUserPreferenceKey = keyof IUserPreferences;

@@ -5,6 +5,7 @@ import {history} from 'redux/store';
 import Envs from 'pages/Environments';
 import Home from 'pages/Home';
 import RunDetail from 'pages/RunDetail';
+import Settings from 'pages/Settings';
 import Test from 'pages/Test';
 import Transaction from 'pages/Transaction';
 import TransactionRunDetail from 'pages/TransactionRunDetail';
@@ -18,6 +19,8 @@ const Router = () => (
       <Route path="/" element={<Home />} />
 
       <Route path="/environments" element={<Envs />} />
+
+      <Route path="/settings" element={<Settings />} />
 
       <Route path="/test/:testId" element={<Test />} />
 

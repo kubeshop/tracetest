@@ -8,13 +8,18 @@ const localStorageGateway = LocalStorageGateway<IUserPreferences>(storageKey);
 const initialUserPreferences: IUserPreferences = {
   lang: 'en',
   environmentId: '',
+  initConfigSetup: true,
+  isOnboardingComplete: false,
 };
 
 const UserPreferencesService = () => ({
   get(): IUserPreferences {
     const userPreferences = localStorageGateway.get() || initialUserPreferences;
 
-    return userPreferences;
+    return {
+      ...initialUserPreferences,
+      ...userPreferences,
+    };
   },
   getEntry<K extends keyof IUserPreferences>(key: K): IUserPreferences[K] {
     const preferences = this.get();

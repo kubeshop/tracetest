@@ -1,4 +1,4 @@
-import {ClusterOutlined, GlobalOutlined} from '@ant-design/icons';
+import {ClusterOutlined, GlobalOutlined, SettingOutlined} from '@ant-design/icons';
 import {Menu} from 'antd';
 
 import logoAsset from 'assets/logo-white.svg';
@@ -31,6 +31,15 @@ const menuItems = [
   },
 ];
 
+const footerMenuItems = [
+  {
+    key: '0',
+    icon: <SettingOutlined />,
+    label: <Link to="/settings">Settings</Link>,
+    path: '/settings',
+  },
+];
+
 const Layout = ({children, hasMenu = false}: IProps) => {
   useRouterSync();
 
@@ -48,14 +57,27 @@ const Layout = ({children, hasMenu = false}: IProps) => {
                   </Link>
                 </S.LogoContainer>
 
-                <S.MenuContainer>
-                  <Menu
-                    defaultSelectedKeys={[menuItems.findIndex(value => value.path === pathname).toString() || '0']}
-                    items={menuItems}
-                    mode="inline"
-                    theme="dark"
-                  />
-                </S.MenuContainer>
+                <S.SiderContent>
+                  <S.MenuContainer>
+                    <Menu
+                      defaultSelectedKeys={[menuItems.findIndex(value => value.path === pathname).toString() || '0']}
+                      items={menuItems}
+                      mode="inline"
+                      theme="dark"
+                    />
+                  </S.MenuContainer>
+
+                  <S.MenuContainer>
+                    <Menu
+                      defaultSelectedKeys={[
+                        footerMenuItems.findIndex(value => value.path === pathname).toString() || '0',
+                      ]}
+                      items={footerMenuItems}
+                      mode="inline"
+                      theme="dark"
+                    />
+                  </S.MenuContainer>
+                </S.SiderContent>
               </S.Sider>
             )}
 

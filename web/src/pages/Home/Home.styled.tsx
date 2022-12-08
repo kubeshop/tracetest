@@ -1,4 +1,4 @@
-import {Button, Dropdown, Space, Typography} from 'antd';
+import {Button, Dropdown, Row, Space, Typography} from 'antd';
 import styled from 'styled-components';
 
 import noResultsIcon from 'assets/HomeNoResults.svg';
@@ -71,5 +71,21 @@ export const LoadingContainer = styled(Space)`
 export const FiltersContainer = styled.div`
   display: flex;
   gap: 8px;
-  align-items:center;
+  align-items: center;
+`;
+
+export const ConfigContainer = styled(Row)`
+  height: 100%;
+`;
+
+export const ConfigContent = styled.div`
+  text-align: center;
+`;
+
+export const ConfigIcon = styled.img`
+  margin-bottom: 25px;
+`;
+
+export const ConfigFooter = styled.div`
+  margin: 20px 0;
 `;

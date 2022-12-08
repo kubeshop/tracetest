@@ -15,6 +15,7 @@ export const theme: DefaultTheme = {
     textLight: 'rgba(3, 24, 73, 0.4)',
     textSecondary: '#687492',
     white: '#FFFFFF',
+    warningYellow: '#FAAD14',
   },
   size: {
     xs: '10px',

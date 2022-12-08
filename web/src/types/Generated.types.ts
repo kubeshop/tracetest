@@ -132,6 +132,16 @@ export interface paths {
     /** get resources */
     get: operations["getResources"];
   };
+  "/config": {
+    /** Get the Server Side Config */
+    get: operations["getConfig"];
+    /** Updates the Server Side config */
+    put: operations["updateConfig"];
+  };
+  "/config/connection": {
+    /** Tests the config data store/exporter connection */
+    post: operations["testConnection"];
+  };
 }
 
 export interface components {}
@@ -887,9 +897,151 @@ export interface operations {
       };
     };
   };
+  /** Get the Server Side Config */
+  getConfig: {
+    responses: {
+      /** Server Side Config */
+      200: {
+        content: {
+          "application/json": external["config.yaml"]["components"]["schemas"]["Config"];
+        };
+      };
+    };
+  };
+  /** Updates the Server Side config */
+  updateConfig: {
+    responses: {
+      /** Config Updated */
+      201: {
+        content: {
+          "application/json": external["config.yaml"]["components"]["schemas"]["Config"];
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "text/json": external["config.yaml"]["components"]["schemas"]["Config"];
+      };
+    };
+  };
+  /** Tests the config data store/exporter connection */
+  testConnection: {
+    responses: {
+      /** Test connection Result */
+      201: {
+        content: {
+          "application/json": external["config.yaml"]["components"]["schemas"]["TestConnectionResponse"];
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "text/json": external["config.yaml"]["components"]["schemas"]["TestConnectionRequest"];
+      };
+    };
+  };
 }
 
 export interface external {
+  "config.yaml": {
+    paths: {};
+    components: {
+      schemas: {
+        Config: {
+          telemetry?: external["config.yaml"]["components"]["schemas"]["TelemetryConfig"];
+          server?: external["config.yaml"]["components"]["schemas"]["Server"];
+        };
+        TelemetryConfig: {
+          dataStores?: external["config.yaml"]["components"]["schemas"]["DataStore"][];
+          exporters?: external["config.yaml"]["components"]["schemas"]["ExporterOption"][];
+        };
+        ExporterOption: {
+          serviceName?: string;
+          sampling?: number;
+          exporter?: external["config.yaml"]["components"]["schemas"]["Exporter"];
+        };
+        Exporter: {
+          type?: string;
+          collector?: external["config.yaml"]["components"]["schemas"]["CollectorConfig"];
+        };
+        CollectorConfig: {
+          endpoint?: string;
+        };
+        DataStore: {
+          type?: string;
+          jaeger?: external["config.yaml"]["components"]["schemas"]["GRPCClientSettings"];
+          tempo?: external["config.yaml"]["components"]["schemas"]["GRPCClientSettings"];
+          openSearch?: external["config.yaml"]["components"]["schemas"]["OpenSearch"];
+          signalFx?: external["config.yaml"]["components"]["schemas"]["SignalFX"];
+        };
+        OpenSearch: {
+          addresses?: string[];
+          username?: string;
+          password?: string;
+          index?: string;
+        };
+        SignalFX: {
+          realm?: string;
+          token?: string;
+        };
+        GRPCClientSettings: {
+          endpoint?: string;
+          readBufferSize?: number;
+          writeBufferSize?: number;
+          waitForReady?: boolean;
+          headers?: external["http.yaml"]["components"]["schemas"]["HTTPHeader"][];
+          balancerName?: string;
+          /** @enum {string} */
+          compression?:
+            | "gzip"
+            | "zlib"
+            | "deflate"
+            | "snappy"
+            | "zstd"
+            | "none"
+            | "";
+          tls?: external["config.yaml"]["components"]["schemas"]["TLS"];
+          auth?: external["http.yaml"]["components"]["schemas"]["HTTPAuth"];
+        };
+        TLS: {
+          insecure?: boolean;
+          insecureSkipVerify?: boolean;
+          serverName?: string;
+          settings?: external["config.yaml"]["components"]["schemas"]["TLSSetting"];
+        };
+        TLSSetting: {
+          cAFile?: string;
+          certFile?: string;
+          keyFile?: string;
+          minVersion?: string;
+          maxVersion?: string;
+        };
+        TestConnectionRequest: {
+          /** @enum {string} */
+          type?: "datastore" | "exporter";
+          info?: {
+            jaeger?: external["config.yaml"]["components"]["schemas"]["GRPCClientSettings"];
+            tempo?: external["config.yaml"]["components"]["schemas"]["GRPCClientSettings"];
+            openSearch?: external["config.yaml"]["components"]["schemas"]["OpenSearch"];
+            signalFx?: external["config.yaml"]["components"]["schemas"]["SignalFX"];
+            collector?: external["config.yaml"]["components"]["schemas"]["CollectorConfig"];
+          };
+        };
+        TestConnectionResponse: {
+          successful?: boolean;
+          errorMessage?: string;
+        };
+        Server: {
+          telemetry?: {
+            exporter?: string;
+            applicationExporter?: string;
+            dataStore?: string;
+          };
+        };
+      };
+    };
+    operations: {};
+  };
   "definition.yaml": {
     paths: {};
     components: {

@@ -9,7 +9,7 @@ TODO: migrate video to youtube and use YT embed.
 
 -->
 
-Tracetest is a next generation end-to-end trace-based testing tool built for distributed systems and microservices. We address the key pain points developers and QA engineers face when testing microservices.
+Tracetest allows you to quickly build integration and end-to-end tests, powered by your OpenTelemetry traces.
 
 ## In a nutshell
 
