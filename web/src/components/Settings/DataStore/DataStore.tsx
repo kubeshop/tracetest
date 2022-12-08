@@ -28,7 +28,7 @@ const DataStore = ({config}: IProps) => {
           Tracetest needs configuration information to be able to retrieve your trace from your distributed tracing
           solution. Select your tracing data store and enter the configuration info.
         </S.Description>
-        <S.Title>Choose type of OTEL data store</S.Title>
+        <S.Title>Choose OpenTelemetry data store</S.Title>
         <DataStoreForm form={form} config={config} onSubmit={handleOnSubmit} onValidation={onIsFormValid} />
         <S.ButtonsContainer>
           <Button
