@@ -1,7 +1,7 @@
 import {Form} from 'antd';
 import {useCallback, useMemo} from 'react';
 import SetupConfigService from 'services/DataStore.service';
-import {TConfig, TDraftDataStore, TDataStoreForm} from 'types/Config.types';
+import {TDraftDataStore, TDataStoreForm, TDataStoreConfig} from 'types/Config.types';
 import DataStoreComponentFactory from '../DataStorePlugin/DataStoreComponentFactory';
 import * as S from './DataStoreForm.styled';
 import DataStoreSelectionInput from './DataStoreSelectionInput';
@@ -10,13 +10,13 @@ export const FORM_ID = 'data-store';
 
 interface IProps {
   form: TDataStoreForm;
-  config: TConfig;
+  dataStoreConfig: TDataStoreConfig;
   onSubmit(values: TDraftDataStore): Promise<void>;
   onIsFormValid(isValid: boolean): void;
 }
 
-const DataStoreForm = ({form, onSubmit, config, onIsFormValid}: IProps) => {
-  const initialValues = useMemo(() => SetupConfigService.getInitialValues(config), [config]);
+const DataStoreForm = ({form, onSubmit, dataStoreConfig, onIsFormValid}: IProps) => {
+  const initialValues = useMemo(() => SetupConfigService.getInitialValues(dataStoreConfig), [dataStoreConfig]);
   const dataStoreType = Form.useWatch('dataStoreType', form);
 
   const onValidation = useCallback(

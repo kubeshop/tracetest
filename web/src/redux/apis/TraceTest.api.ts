@@ -68,7 +68,7 @@ export const {
   useGetTransactionVersionByIdQuery,
   useGetResourceDefinitionQuery,
   useLazyGetResourceDefinitionQuery,
-  useGetConfigQuery,
+  useGetDataStoreConfigQuery,
   useUpdateDatastoreConfigMutation,
   useTestConnectionMutation,
 } = TraceTestAPI;

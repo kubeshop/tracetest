@@ -1,13 +1,13 @@
 import Layout from 'components/Layout';
 import withAnalytics from 'components/WithAnalytics/WithAnalytics';
-import {useConfig} from 'providers/Config/Config.provider';
+import {useDataStoreConfig} from 'providers/DataStoreConfig/DataStoreConfig.provider';
 import CreateTransactionProvider from 'providers/CreateTransaction';
 import CreateTestProvider from 'providers/CreateTest';
 import ConfigCTA from './ConfigCTA';
 import Content from './Content';
 
 const Home = () => {
-  const {shouldDisplayConfigSetup, skipConfigSetup} = useConfig();
+  const {shouldDisplayConfigSetup, skipConfigSetup} = useDataStoreConfig();
 
   return (
     <Layout hasMenu>

@@ -19,7 +19,7 @@ const OpenSearchService = (): TDataStoreService => ({
 
     return Promise.resolve(true);
   },
-  getInitialValues({telemetry: {dataStores: [{openSearch = {}} = {}] = []} = {}}) {
+  getInitialValues({dataStores: [{openSearch = {}} = {}] = []}) {
     const {index = '', username = '', password = '', addresses = ['']} = openSearch;
 
     return {

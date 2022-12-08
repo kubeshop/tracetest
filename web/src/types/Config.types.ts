@@ -13,23 +13,14 @@ export enum SupportedDataStores {
   SignalFX = 'signalFx',
 }
 
-export type TRawConfig = TConfigSchemas['Config'];
-export type TConfig = Model<
-  TRawConfig,
-  {
-    mode: ConfigMode;
-  }
->;
-
 export type TSupportedDataStores = TConfigSchemas['SupportedDataStores'];
-export type TRawTelemetryConfig = TConfigSchemas['TelemetryConfig'];
-export type TTelemetryConfig = Model<TRawTelemetryConfig, {}>;
-export type TUpdateDataStoreConfigRequest = TConfigSchemas['UpdateDataStoreConfigRequest'];
+export type TRawDataStoreConfig = TConfigSchemas['DataStoreConfig'];
+export type TDataStoreConfig = Model<TRawDataStoreConfig, {
+  mode: ConfigMode;
+}>;
 
 export type TRawDataStore = TConfigSchemas['DataStore'];
-
-export type TRawServerConfig = TConfigSchemas['Server'];
-export type TServerConfig = Model<TRawServerConfig, {}>;
+export type TDataStore = Model<TRawDataStore, {}>;
 
 export type TTestConnectionRequest = TConfigSchemas['TestConnectionRequest'];
 export type TTestConnectionResponse = TConfigSchemas['TestConnectionResponse'];
@@ -44,7 +35,7 @@ export type TDataStoreForm = FormInstance<TDraftDataStore>;
 export type TDataStoreService = {
   getRequest(values: TDraftDataStore, dataStoreType?: SupportedDataStores): Promise<TRawDataStore>;
   validateDraft(draft: TDraftDataStore): Promise<boolean>;
-  getInitialValues(draft: TConfig): TDraftDataStore;
+  getInitialValues(draft: TDataStoreConfig): TDraftDataStore;
 };
 
 export interface IDataStorePluginProps {}
