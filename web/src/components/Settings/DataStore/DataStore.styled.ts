@@ -18,13 +18,16 @@ export const Description = styled(Typography.Text)`
 export const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-  height: 100%;
   margin-top: 24px;
   background: ${({theme}) => theme.color.white};
 `;
 
 export const FormContainer = styled.div`
   padding: 16px;
+  min-height: 663px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 `;
 
 export const ButtonsContainer = styled.div`
@@ -32,4 +35,6 @@ export const ButtonsContainer = styled.div`
   justify-content: flex-end;
   gap: 8px;
   margin-top: 23px;
+  padding-top: 16px;
+  border-top: 1px solid ${({theme}) => theme.color.borderLight};
 `;

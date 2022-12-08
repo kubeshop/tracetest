@@ -6,6 +6,7 @@ import SignalFxService from './DataStores/SignalFx.service';
 interface ISetupConfigService {
   getRequest(draft: TDraftConfig): Promise<TRawConfig>;
   getInitialValues(config: TConfig): TDraftConfig;
+  validateDraft(config: TDraftConfig): Promise<boolean>;
 }
 
 const dataStoreServiceMap = {
@@ -34,13 +35,20 @@ const SetupConfigService = (): ISetupConfigService => ({
     return config;
   },
 
-  getInitialValues({telemetry: {dataStores = []}, server: {telemetry: {dataStore: dataStoreType} = {}}}) {
-    const [dataStore] = dataStores;
+  getInitialValues(config) {
+    const {
+      server: {telemetry: {dataStore: dataStoreType} = {}},
+    } = config;
+    const type = (dataStoreType || SupportedDataStores.JAEGER) as SupportedDataStores;
 
-    return {
-      dataStore,
-      dataStoreType: (dataStoreType || SupportedDataStores.JAEGER) as SupportedDataStores,
-    };
+    return dataStoreServiceMap[type].getInitialValues(config);
+  },
+
+  validateDraft(draft) {
+    const dataStoreType = draft.dataStoreType || SupportedDataStores.JAEGER;
+    const dataStore = dataStoreServiceMap[dataStoreType];
+
+    return dataStore.validateDraft(draft);
   },
 });
 
