@@ -1,5 +1,5 @@
 import {SupportedDataStores, TDataStoreService} from 'types/Config.types';
-import Validator from '../../utils/Validator';
+import Validator from 'utils/Validator';
 
 const OpenSearchService = (): TDataStoreService => ({
   getRequest({dataStore: {openSearch: {index = '', username = '', password = '', addresses = []} = {}} = {}}) {

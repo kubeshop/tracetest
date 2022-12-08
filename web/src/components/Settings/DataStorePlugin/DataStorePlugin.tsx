@@ -1,7 +1,7 @@
 import {IDataStorePluginMap, SupportedDataStores} from 'types/Config.types';
 import GrpcClient from './forms/GrpcClient';
 import OpenSearch from './forms/OpenSearch';
-import SignalFx from './forms/SignalFx';
+import SignalFx from './forms/SignalFx/SignalFx';
 
 export const DataStoreComponentMap: IDataStorePluginMap = {
   [SupportedDataStores.JAEGER]: GrpcClient,

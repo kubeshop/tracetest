@@ -969,6 +969,7 @@ export interface external {
         };
         DataStore: {
           type?: external["config.yaml"]["components"]["schemas"]["SupportedDataStores"];
+          name?: string;
           jaeger?: external["config.yaml"]["components"]["schemas"]["GRPCClientSettings"];
           tempo?: external["config.yaml"]["components"]["schemas"]["GRPCClientSettings"];
           openSearch?: external["config.yaml"]["components"]["schemas"]["OpenSearch"];
@@ -976,7 +977,7 @@ export interface external {
         };
         UpdateDataStoreConfigRequest: {
           dataStores?: external["config.yaml"]["components"]["schemas"]["DataStore"][];
-          defaultDataStore?: external["config.yaml"]["components"]["schemas"]["SupportedDataStores"];
+          defaultDataStore?: string;
         };
         OpenSearch: {
           addresses?: string[];
@@ -1039,7 +1040,7 @@ export interface external {
           telemetry?: {
             exporter?: string;
             applicationExporter?: string;
-            dataStore?: external["config.yaml"]["components"]["schemas"]["SupportedDataStores"];
+            dataStore?: string;
           };
         };
         /** @enum {string} */

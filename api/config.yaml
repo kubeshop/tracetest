@@ -45,6 +45,8 @@ components:
       properties:
         type:
           $ref: "#/components/schemas/SupportedDataStores"
+        name:
+          type: string
         jaeger:
           $ref: "#/components/schemas/GRPCClientSettings"
         tempo:
@@ -61,7 +63,7 @@ components:
           items:
             $ref: "#/components/schemas/DataStore"
         defaultDataStore:
-          $ref: "#/components/schemas/SupportedDataStores"
+          type: string
     OpenSearch:
       type: object
       properties:
@@ -176,7 +178,7 @@ components:
             applicationExporter:
               type: string
             dataStore:
-              $ref: "#/components/schemas/SupportedDataStores"
+              type: string
     SupportedDataStores:
       type: string
       enum: [jaeger, openSearch, tempo, signalFx]

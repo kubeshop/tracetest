@@ -1,10 +1,10 @@
-import {SupportedDataStores, TRawServerConfig, TServerConfig} from 'types/Config.types';
+import {TRawServerConfig, TServerConfig} from 'types/Config.types';
 
 const ServerConfig = ({
-  telemetry: {exporter = '', applicationExporter = '', dataStore = SupportedDataStores.JAEGER} = {
+  telemetry: {exporter = '', applicationExporter = '', dataStore = ''} = {
     exporter: '',
     applicationExporter: '',
-    dataStore: SupportedDataStores.JAEGER,
+    dataStore: '',
   },
 }: TRawServerConfig): TServerConfig => {
   return {
