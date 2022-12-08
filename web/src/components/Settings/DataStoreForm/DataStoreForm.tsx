@@ -1,7 +1,7 @@
 import {Form} from 'antd';
 import {useCallback, useMemo} from 'react';
-import SetupConfigService from 'services/SetupConfig.service';
-import {TConfig, TDraftConfig, TDraftConfigForm} from 'types/Config.types';
+import SetupConfigService from 'services/DataStore.service';
+import {TConfig, TDraftDataStore, TDataStoreForm} from 'types/Config.types';
 import DataStoreComponentFactory from '../DataStorePlugin/DataStoreComponentFactory';
 import * as S from './DataStoreForm.styled';
 import DataStoreSelectionInput from './DataStoreSelectionInput';
@@ -9,9 +9,9 @@ import DataStoreSelectionInput from './DataStoreSelectionInput';
 export const FORM_ID = 'data-store';
 
 interface IProps {
-  form: TDraftConfigForm;
+  form: TDataStoreForm;
   config: TConfig;
-  onSubmit(values: TDraftConfig): Promise<void>;
+  onSubmit(values: TDraftDataStore): Promise<void>;
   onIsFormValid(isValid: boolean): void;
 }
 
@@ -20,7 +20,7 @@ const DataStoreForm = ({form, onSubmit, config, onIsFormValid}: IProps) => {
   const dataStoreType = Form.useWatch('dataStoreType', form);
 
   const onValidation = useCallback(
-    async (_: any, draft: TDraftConfig) => {
+    async (_: any, draft: TDraftDataStore) => {
       try {
         const isValid = await SetupConfigService.validateDraft(draft);
         form.validateFields();
@@ -33,7 +33,7 @@ const DataStoreForm = ({form, onSubmit, config, onIsFormValid}: IProps) => {
   );
 
   return (
-    <Form<TDraftConfig>
+    <Form<TDraftDataStore>
       autoComplete="off"
       form={form}
       layout="vertical"

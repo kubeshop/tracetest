@@ -1,7 +1,7 @@
 import {Button, Form} from 'antd';
-import {useSetupConfig} from 'providers/SetupConfig/SetupConfig.provider';
+import {useSetupConfig} from 'providers/DataStore/DataStore.provider';
 import {useCallback} from 'react';
-import {TConfig, TDraftConfig} from 'types/Config.types';
+import {TConfig, TDraftDataStore} from 'types/Config.types';
 import DataStoreForm from '../DataStoreForm';
 import * as S from './DataStore.styled';
 
@@ -12,10 +12,10 @@ interface IProps {
 const DataStore = ({config}: IProps) => {
   const {isLoading, isFormValid, onIsFormValid, onSaveConfig} = useSetupConfig();
 
-  const [form] = Form.useForm<TDraftConfig>();
+  const [form] = Form.useForm<TDraftDataStore>();
 
   const handleOnSubmit = useCallback(
-    async (values: TDraftConfig) => {
+    async (values: TDraftDataStore) => {
       onSaveConfig(values);
     },
     [onSaveConfig]

@@ -44,7 +44,7 @@ components:
       type: object
       properties:
         type:
-          type: string
+          $ref: "#/components/schemas/SupportedDataStores"
         jaeger:
           $ref: "#/components/schemas/GRPCClientSettings"
         tempo:
@@ -53,6 +53,15 @@ components:
           $ref: "#/components/schemas/OpenSearch"
         signalFx:
           $ref: "#/components/schemas/SignalFX"
+    UpdateDataStoreConfigRequest:
+      type: object
+      properties:
+        dataStores:
+          type: array
+          items:
+            $ref: "#/components/schemas/DataStore"
+        defaultDataStore:
+          $ref: "#/components/schemas/SupportedDataStores"
     OpenSearch:
       type: object
       properties:
@@ -167,4 +176,7 @@ components:
             applicationExporter:
               type: string
             dataStore:
-              type: string
+              $ref: "#/components/schemas/SupportedDataStores"
+    SupportedDataStores:
+      type: string
+      enum: [jaeger, openSearch, tempo, signalFx]

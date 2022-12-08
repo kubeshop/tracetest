@@ -69,7 +69,7 @@ export const {
   useGetResourceDefinitionQuery,
   useLazyGetResourceDefinitionQuery,
   useGetConfigQuery,
-  useUpdateConfigMutation,
+  useUpdateDatastoreConfigMutation,
   useTestConnectionMutation,
 } = TraceTestAPI;
 export const {endpoints} = TraceTestAPI;

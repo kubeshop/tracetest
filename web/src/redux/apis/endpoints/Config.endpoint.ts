@@ -1,7 +1,12 @@
 import {HTTP_METHOD} from 'constants/Common.constants';
 import {TracetestApiTags} from 'constants/Test.constants';
 import {TTestApiEndpointBuilder} from 'types/Test.types';
-import {TConfig, TRawConfig, TTestConnectionRequest, TTestConnectionResponse} from 'types/Config.types';
+import {
+  TConfig,
+  TTestConnectionRequest,
+  TTestConnectionResponse,
+  TUpdateDataStoreConfigRequest,
+} from 'types/Config.types';
 // import Config from 'models/Config.model';
 import ConfigMock from 'models/__mocks__/Config.mock';
 
@@ -16,9 +21,9 @@ const ConfigEndpoint = (builder: TTestApiEndpointBuilder) => ({
         server: {telemetry: {dataStore: 'jaeger'}},
       }),
   }),
-  updateConfig: builder.mutation<undefined, TRawConfig>({
+  updateDatastoreConfig: builder.mutation<undefined, TUpdateDataStoreConfigRequest>({
     query: config => ({
-      url: '/config',
+      url: '/config/datastore',
       method: HTTP_METHOD.PUT,
       body: config,
     }),

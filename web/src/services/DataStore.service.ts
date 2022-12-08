@@ -1,12 +1,12 @@
-import {SupportedDataStores, TConfig, TDraftConfig, TRawConfig} from 'types/Config.types';
+import {SupportedDataStores, TConfig, TDraftDataStore, TUpdateDataStoreConfigRequest} from 'types/Config.types';
 import GrpcClientService from './DataStores/GrpcClient.service';
 import OpenSearchService from './DataStores/OpenSearch.service';
 import SignalFxService from './DataStores/SignalFx.service';
 
-interface ISetupConfigService {
-  getRequest(draft: TDraftConfig): Promise<TRawConfig>;
-  getInitialValues(config: TConfig): TDraftConfig;
-  validateDraft(config: TDraftConfig): Promise<boolean>;
+interface IDataStoreService {
+  getRequest(draft: TDraftDataStore): Promise<TUpdateDataStoreConfigRequest>;
+  getInitialValues(config: TConfig): TDraftDataStore;
+  validateDraft(config: TDraftDataStore): Promise<boolean>;
 }
 
 const dataStoreServiceMap = {
@@ -16,20 +16,14 @@ const dataStoreServiceMap = {
   [SupportedDataStores.SignalFX]: SignalFxService,
 } as const;
 
-const SetupConfigService = (): ISetupConfigService => ({
+const DataStoreService = (): IDataStoreService => ({
   async getRequest(draft) {
     const dataStoreType = draft.dataStoreType || SupportedDataStores.JAEGER;
     const dataStore = await dataStoreServiceMap[dataStoreType].getRequest(draft);
 
-    const config: TRawConfig = {
-      telemetry: {
-        dataStores: [dataStore],
-      },
-      server: {
-        telemetry: {
-          dataStore: dataStoreType,
-        },
-      },
+    const config: TUpdateDataStoreConfigRequest = {
+      dataStores: [dataStore],
+      defaultDataStore: dataStoreType,
     };
 
     return config;
@@ -52,4 +46,4 @@ const SetupConfigService = (): ISetupConfigService => ({
   },
 });
 
-export default SetupConfigService();
+export default DataStoreService();

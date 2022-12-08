@@ -135,8 +135,10 @@ export interface paths {
   "/config": {
     /** Get the Server Side Config */
     get: operations["getConfig"];
-    /** Updates the Server Side config */
-    put: operations["updateConfig"];
+  };
+  "/config/datastore": {
+    /** Updates the Server Side Data Store config */
+    put: operations["updateDataStoreConfig"];
   };
   "/config/connection": {
     /** Tests the config data store/exporter connection */
@@ -908,19 +910,17 @@ export interface operations {
       };
     };
   };
-  /** Updates the Server Side config */
-  updateConfig: {
+  /** Updates the Server Side Data Store config */
+  updateDataStoreConfig: {
     responses: {
-      /** Config Updated */
-      201: {
-        content: {
-          "application/json": external["config.yaml"]["components"]["schemas"]["Config"];
-        };
-      };
+      /** successful operation */
+      204: never;
+      /** problem with updating environment */
+      500: unknown;
     };
     requestBody: {
       content: {
-        "text/json": external["config.yaml"]["components"]["schemas"]["Config"];
+        "text/json": external["config.yaml"]["components"]["schemas"]["UpdateDataStoreConfigRequest"];
       };
     };
   };
@@ -968,11 +968,15 @@ export interface external {
           endpoint?: string;
         };
         DataStore: {
-          type?: string;
+          type?: external["config.yaml"]["components"]["schemas"]["SupportedDataStores"];
           jaeger?: external["config.yaml"]["components"]["schemas"]["GRPCClientSettings"];
           tempo?: external["config.yaml"]["components"]["schemas"]["GRPCClientSettings"];
           openSearch?: external["config.yaml"]["components"]["schemas"]["OpenSearch"];
           signalFx?: external["config.yaml"]["components"]["schemas"]["SignalFX"];
+        };
+        UpdateDataStoreConfigRequest: {
+          dataStores?: external["config.yaml"]["components"]["schemas"]["DataStore"][];
+          defaultDataStore?: external["config.yaml"]["components"]["schemas"]["SupportedDataStores"];
         };
         OpenSearch: {
           addresses?: string[];
@@ -1035,9 +1039,11 @@ export interface external {
           telemetry?: {
             exporter?: string;
             applicationExporter?: string;
-            dataStore?: string;
+            dataStore?: external["config.yaml"]["components"]["schemas"]["SupportedDataStores"];
           };
         };
+        /** @enum {string} */
+        SupportedDataStores: "jaeger" | "openSearch" | "tempo" | "signalFx";
       };
     };
     operations: {};
