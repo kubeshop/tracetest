@@ -54,8 +54,9 @@ export type TSetupConfigSliceActions = {
 export type TDataStoreService = {
   getRequest(values: TDraftConfig, dataStoreType?: SupportedDataStores): Promise<TRawDataStore>;
   validateDraft(draft: TDraftConfig): Promise<boolean>;
-  getInitialValues?(draft: TDraftConfig): TRawDataStore;
+  getInitialValues(draft: TConfig): TDraftConfig;
 };
 
 export interface IDataStorePluginProps {}
-export interface IDataStorePluginMap extends Record<SupportedDataStores, (props: IDataStorePluginProps) => React.ReactElement> {}
+export interface IDataStorePluginMap
+  extends Record<SupportedDataStores, (props: IDataStorePluginProps) => React.ReactElement> {}

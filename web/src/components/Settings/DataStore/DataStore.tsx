@@ -2,7 +2,7 @@ import {Button, Form} from 'antd';
 import {useSetupConfig} from 'providers/SetupConfig/SetupConfig.provider';
 import {useCallback} from 'react';
 import {TConfig, TDraftConfig} from 'types/Config.types';
-import DataStoreForm from '../../DataStoreForm';
+import DataStoreForm from '../DataStoreForm';
 import * as S from './DataStore.styled';
 
 interface IProps {
@@ -24,12 +24,14 @@ const DataStore = ({config}: IProps) => {
   return (
     <S.Wrapper data-cy="config-datastore-form">
       <S.FormContainer>
-        <S.Description>
-          Tracetest needs configuration information to be able to retrieve your trace from your distributed tracing
-          solution. Select your tracing data store and enter the configuration info.
-        </S.Description>
-        <S.Title>Choose OpenTelemetry data store</S.Title>
-        <DataStoreForm form={form} config={config} onSubmit={handleOnSubmit} onValidation={onIsFormValid} />
+        <div>
+          <S.Description>
+            Tracetest needs configuration information to be able to retrieve your trace from your distributed tracing
+            solution. Select your tracing data store and enter the configuration info.
+          </S.Description>
+          <S.Title>Choose OpenTelemetry data store</S.Title>
+          <DataStoreForm form={form} config={config} onSubmit={handleOnSubmit} onIsFormValid={onIsFormValid} />
+        </div>
         <S.ButtonsContainer>
           <Button
             data-cy="config-datastore-submit"

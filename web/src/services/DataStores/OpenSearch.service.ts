@@ -1,18 +1,38 @@
 import {SupportedDataStores, TDataStoreService} from 'types/Config.types';
+import Validator from '../../utils/Validator';
 
 const OpenSearchService = (): TDataStoreService => ({
-  getRequest({dataStore = {}}) {
-    // todo add datastore mapping
+  getRequest({dataStore: {openSearch: {index = '', username = '', password = '', addresses = []} = {}} = {}}) {
     return Promise.resolve({
       type: SupportedDataStores.OpenSearch,
-      ...dataStore,
+      openSearch: {
+        index,
+        username,
+        password,
+        addresses,
+      },
     });
   },
-  validateDraft() {
-    return Promise.resolve(false);
+  validateDraft({dataStore: {openSearch: {index = '', username = '', password = '', addresses = []} = {}} = {}}) {
+    const [address] = addresses;
+    if (!index || !username || !password || !Validator.url(address)) return Promise.resolve(false);
+
+    return Promise.resolve(true);
   },
-  getInitialValues() {
-    return {};
+  getInitialValues({telemetry: {dataStores: [{openSearch = {}} = {}] = []} = {}}) {
+    const {index = '', username = '', password = '', addresses = ['']} = openSearch;
+
+    return {
+      dataStore: {
+        openSearch: {
+          index,
+          username,
+          password,
+          addresses,
+        },
+      },
+      dataStoreType: SupportedDataStores.OpenSearch,
+    };
   },
 });
 

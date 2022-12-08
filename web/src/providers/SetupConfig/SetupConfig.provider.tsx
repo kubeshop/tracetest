@@ -5,7 +5,7 @@ import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import {initialState, reset, setDraftConfig, setIsFormValid} from 'redux/setupConfig/slice';
 import SetupConfigSelectors from 'redux/setupConfig/selectors';
 import {ISetupConfigState, TDraftConfig} from 'types/Config.types';
-import SetupConfigService from 'services/SetupConfig.service';
+// import SetupConfigService from 'services/SetupConfig.service';
 
 interface IContext extends ISetupConfigState {
   isLoading: boolean;
@@ -39,10 +39,10 @@ const SetupConfigProvider = ({children}: IProps) => {
 
   const onSaveConfig = useCallback(
     async (draft: TDraftConfig) => {
-      const configRequest = await SetupConfigService.getRequest(draft);
-      const config = await updateConfig(configRequest).unwrap();
+      console.log('@@saving', draft);
 
-      console.log('@@config', config);
+      // const configRequest = await SetupConfigService.getRequest(draft);
+      // const config = await updateConfig(configRequest).unwrap();
     },
     [updateConfig]
   );
