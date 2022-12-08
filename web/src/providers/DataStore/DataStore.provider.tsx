@@ -2,7 +2,7 @@ import {noop} from 'lodash';
 import {createContext, useCallback, useContext, useMemo, useState} from 'react';
 import {useUpdateDatastoreConfigMutation} from 'redux/apis/TraceTest.api';
 import {TDraftDataStore} from 'types/Config.types';
-import SetupConfigService from 'services/DataStore.service';
+import DataStoreService from 'services/DataStore.service';
 
 interface IContext {
   isFormValid: boolean;
@@ -28,15 +28,11 @@ const SetupConfigProvider = ({children}: IProps) => {
   const [updateConfig, {isLoading}] = useUpdateDatastoreConfigMutation();
   const [isFormValid, setIsFormValid] = useState(false);
 
-  const onSaveConfig = useCallback(
-    async (draft: TDraftDataStore) => {
-      const configRequest = await SetupConfigService.getRequest(draft);
-      const config = await updateConfig(configRequest).unwrap();
-
-      console.log('@@config', config);
-    },
-    [updateConfig]
-  );
+  const onSaveConfig = useCallback(async (draft: TDraftDataStore) => {
+    const configRequest = await DataStoreService.getRequest(draft);
+    console.log('@@saving draft', draft, configRequest);
+    // const config = await updateConfig(configRequest).unwrap();
+  }, []);
 
   const onIsFormValid = useCallback((isValid: boolean) => {
     setIsFormValid(isValid);

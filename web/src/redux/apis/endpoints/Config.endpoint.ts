@@ -24,7 +24,7 @@ const ConfigEndpoint = (builder: TTestApiEndpointBuilder) => ({
   }),
   updateDatastoreConfig: builder.mutation<undefined, TRawDataStoreConfig>({
     query: config => ({
-      url: '/config/datastore',
+      url: '/config/datastores',
       method: HTTP_METHOD.PUT,
       body: config,
     }),
