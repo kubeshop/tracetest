@@ -101,11 +101,11 @@ const sidebars = {
           id: "deployment/overview",
           label: "Deployment Overview",
         },
-        {
-          type: "doc",
-          id: "deployment/production-checklist",
-          label: "Production checklist",
-        },
+        // {
+        //   type: "doc",
+        //   id: "deployment/production-checklist",
+        //   label: "Production checklist",
+        // },
         {
           type: "doc",
           id: "deployment/docker",
@@ -127,11 +127,11 @@ const sidebars = {
           id: "concepts/what-is-trace-based-testing",
           label: "What is trace-based testing",
         },
-        {
-          type: "doc",
-          id: "concepts/what-is-tracing",
-          label: "What is tracing",
-        },
+        // {
+        //   type: "doc",
+        //   id: "concepts/what-is-tracing",
+        //   label: "What is tracing",
+        // },
         {
           type: "doc",
           id: "concepts/architecture",
@@ -142,11 +142,11 @@ const sidebars = {
           id: "concepts/assertions",
           label: "Assertions",
         },
-        {
-          type: "doc",
-          id: "concepts/data-stores",
-          label: "Data Stores",
-        },
+        // {
+        //   type: "doc",
+        //   id: "concepts/data-stores",
+        //   label: "Data Stores",
+        // },
         {
           type: "doc",
           id: "concepts/environments",
@@ -157,11 +157,11 @@ const sidebars = {
           id: "concepts/selectors",
           label: "Selectors",
         },
-        {
-          type: "doc",
-          id: "concepts/tests",
-          label: "Tests",
-        },
+        // {
+        //   type: "doc",
+        //   id: "concepts/tests",
+        //   label: "Tests",
+        // },
         {
           type: "doc",
           id: "concepts/expressions",
@@ -183,11 +183,11 @@ const sidebars = {
       type: "category",
       label: "Web UI",
       items: [
-        {
-          type: "doc",
-          id: "web-ui/creating-environments",
-          label: "Creating environments",
-        },
+        // {
+        //   type: "doc",
+        //   id: "web-ui/creating-environments",
+        //   label: "Creating environments",
+        // },
         {
           type: "doc",
           id: "web-ui/creating-tests",
@@ -203,11 +203,11 @@ const sidebars = {
           id: "web-ui/test-results",
           label: "Test results",
         },
-        {
-          type: "doc",
-          id: "web-ui/creating-transactions",
-          label: "Creating transactions",
-        },
+        // {
+        //   type: "doc",
+        //   id: "web-ui/creating-transactions",
+        //   label: "Creating transactions",
+        // },
         {
           type: "doc",
           id: "web-ui/exporting-tests",
@@ -224,26 +224,26 @@ const sidebars = {
           id: "cli/configuring-your-cli",
           label: "Configuring your CLI",
         },
-        {
-          type: "doc",
-          id: "cli/creating-environments",
-          label: "Creating environments",
-        },
+        // {
+        //   type: "doc",
+        //   id: "cli/creating-environments",
+        //   label: "Creating environments",
+        // },
         {
           type: "doc",
           id: "cli/creating-tests",
           label: "Creating tests",
         },
-        {
-          type: "doc",
-          id: "cli/creating-transactions",
-          label: "Creating transactions",
-        },
-        {
-          type: "doc",
-          id: "cli/exporting-tests",
-          label: "Exporting tests",
-        },
+        // {
+        //   type: "doc",
+        //   id: "cli/creating-transactions",
+        //   label: "Creating transactions",
+        // },
+        // {
+        //   type: "doc",
+        //   id: "cli/exporting-tests",
+        //   label: "Exporting tests",
+        // },
       ],
     },
     {
@@ -266,11 +266,11 @@ const sidebars = {
           id: "examples-tutorials/overview",
           label: "Overview",
         },
-        {
-          type: "doc",
-          id: "examples-tutorials/recipes",
-          label: "Recipes",
-        },
+        // {
+        //   type: "doc",
+        //   id: "examples-tutorials/recipes",
+        //   label: "Recipes",
+        // },
       ],
     },
     {
@@ -303,17 +303,17 @@ const sidebars = {
             },
           ],
         },
-        {
-          type: "category",
-          label: "OpenTelemetry Store Demo",
-          items: [
-            {
-              type: "doc",
-              id: "opentelemetry-store/overview",
-              label: "Overview",
-            },
-          ],
-        },
+        // {
+        //   type: "category",
+        //   label: "OpenTelemetry Store Demo",
+        //   items: [
+        //     {
+        //       type: "doc",
+        //       id: "opentelemetry-store/overview",
+        //       label: "Overview",
+        //     },
+        //   ],
+        // },
       ],
     },
     {

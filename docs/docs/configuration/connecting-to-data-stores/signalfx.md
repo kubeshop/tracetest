@@ -101,5 +101,3 @@ server:
     applicationExporter: collector
 
 ```
-
-Examples of configuring Tracetest can be found in the [`examples` folder of the Tracetest GitHub repo](https://github.com/kubeshop/tracetest/tree/main/examples). 
