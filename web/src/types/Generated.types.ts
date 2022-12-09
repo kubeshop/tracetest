@@ -1002,17 +1002,7 @@ export interface external {
           minVersion?: string;
           maxVersion?: string;
         };
-        TestConnectionRequest: {
-          /** @enum {string} */
-          type?: "datastore" | "exporter";
-          info?: {
-            jaeger?: external["config.yaml"]["components"]["schemas"]["GRPCClientSettings"];
-            tempo?: external["config.yaml"]["components"]["schemas"]["GRPCClientSettings"];
-            openSearch?: external["config.yaml"]["components"]["schemas"]["OpenSearch"];
-            signalFx?: external["config.yaml"]["components"]["schemas"]["SignalFX"];
-            collector?: external["config.yaml"]["components"]["schemas"]["CollectorConfig"];
-          };
-        };
+        TestConnectionRequest: external["config.yaml"]["components"]["schemas"]["DataStore"];
         TestConnectionResponse: {
           successful?: boolean;
           errorMessage?: string;

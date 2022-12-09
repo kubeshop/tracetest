@@ -1,6 +1,8 @@
 import {noop} from 'lodash';
 import {createContext, useCallback, useContext, useMemo, useState} from 'react';
-import {useUpdateDatastoreConfigMutation} from 'redux/apis/TraceTest.api';
+import {notification} from 'antd';
+import {useTheme} from 'styled-components';
+import {useTestConnectionMutation, useUpdateDatastoreConfigMutation} from 'redux/apis/TraceTest.api';
 import {TDraftDataStore} from 'types/Config.types';
 import DataStoreService from 'services/DataStore.service';
 import {useConfirmationModal} from '../ConfirmationModal/ConfirmationModal.provider';
@@ -8,15 +10,19 @@ import {useConfirmationModal} from '../ConfirmationModal/ConfirmationModal.provi
 interface IContext {
   isFormValid: boolean;
   isLoading: boolean;
+  isTestConnectionLoading: boolean;
   onSaveConfig(draft: TDraftDataStore): void;
+  onTestConnection(draft: TDraftDataStore): void;
   onIsFormValid(isValid: boolean): void;
 }
 
 export const Context = createContext<IContext>({
   isFormValid: false,
   isLoading: false,
+  isTestConnectionLoading: false,
   onSaveConfig: noop,
   onIsFormValid: noop,
+  onTestConnection: noop,
 });
 
 interface IProps {
@@ -25,10 +31,15 @@ interface IProps {
 
 export const useSetupConfig = () => useContext(Context);
 
-const SetupConfigProvider = ({children}: IProps) => {
+const DataStoreProvider = ({children}: IProps) => {
   const [updateConfig, {isLoading}] = useUpdateDatastoreConfigMutation();
+  const [testConnection, {isLoading: isTestConnectionLoading}] = useTestConnectionMutation();
   const [isFormValid, setIsFormValid] = useState(false);
   const {onOpen} = useConfirmationModal();
+  const [api, contextHolder] = notification.useNotification();
+  const {
+    notification: {success, error},
+  } = useTheme();
 
   const onSaveConfig = useCallback(
     async (draft: TDraftDataStore) => {
@@ -50,17 +61,45 @@ const SetupConfigProvider = ({children}: IProps) => {
     setIsFormValid(isValid);
   }, []);
 
+  const onTestConnection = useCallback(
+    async (draft: TDraftDataStore) => {
+      const {dataStores: [dataStore] = []} = await DataStoreService.getRequest(draft);
+      const {successful, errorMessage = ''} = await testConnection(dataStore!).unwrap();
+
+      if (successful)
+        return api.success({
+          message: 'Connection is setup',
+          description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor',
+          ...success,
+        });
+
+      api.error({
+        message: 'Connection is not setup',
+        description: errorMessage,
+        ...error,
+      });
+    },
+    [api, error, success, testConnection]
+  );
+
   const value = useMemo<IContext>(
     () => ({
       isLoading,
       isFormValid,
+      isTestConnectionLoading,
       onSaveConfig,
       onIsFormValid,
+      onTestConnection,
     }),
-    [isLoading, isFormValid, onSaveConfig, onIsFormValid]
+    [isLoading, isFormValid, isTestConnectionLoading, onSaveConfig, onIsFormValid, onTestConnection]
   );
 
-  return <Context.Provider value={value}>{children}</Context.Provider>;
+  return (
+    <>
+      {contextHolder}
+      <Context.Provider value={value}>{children}</Context.Provider>
+    </>
+  );
 };
 
-export default SetupConfigProvider;
+export default DataStoreProvider;
