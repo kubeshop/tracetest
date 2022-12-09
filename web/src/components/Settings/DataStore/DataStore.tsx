@@ -30,7 +30,12 @@ const DataStore = ({dataStoreConfig}: IProps) => {
             solution. Select your tracing data store and enter the configuration info.
           </S.Description>
           <S.Title>Choose OpenTelemetry data store</S.Title>
-          <DataStoreForm form={form} dataStoreConfig={dataStoreConfig} onSubmit={handleOnSubmit} onIsFormValid={onIsFormValid} />
+          <DataStoreForm
+            form={form}
+            dataStoreConfig={dataStoreConfig}
+            onSubmit={handleOnSubmit}
+            onIsFormValid={onIsFormValid}
+          />
         </div>
         <S.ButtonsContainer>
           <Button

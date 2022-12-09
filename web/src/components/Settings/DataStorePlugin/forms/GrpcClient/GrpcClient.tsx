@@ -3,7 +3,7 @@ import {useState} from 'react';
 
 import RequestDetailsAuthInput from 'components/CreateTestPlugins/Rest/steps/RequestDetails/RequestDetailsAuthInput/RequestDetailsAuthInput';
 import RequestDetailsHeadersInput from 'components/CreateTestPlugins/Rest/steps/RequestDetails/RequestDetailsHeadersInput';
-import {TDraftConfig} from 'types/Config.types';
+import {TDraftDataStore} from 'types/Config.types';
 import * as S from './GrcpClient.styled';
 import GrpcClientSecure from './GrpcClientSecure';
 
@@ -19,7 +19,7 @@ const COMPRESSION_LIST = [
 const HEADER_DEFAULT_VALUES = [{key: '', value: ''}];
 
 const GrpcClient = () => {
-  const form = Form.useFormInstance<TDraftConfig>();
+  const form = Form.useFormInstance<TDraftDataStore>();
   const [isSecure, setIsSecure] = useState(false);
   const dataStoreType = form.getFieldValue('dataStoreType');
   const baseName = ['dataStore', dataStoreType];
@@ -72,10 +72,6 @@ const GrpcClient = () => {
           <S.ChecksContainer>
             <Form.Item name={[...baseName, 'waitForReady']} valuePropName="checked">
               <Checkbox>Wait For Ready State</Checkbox>
-            </Form.Item>
-
-            <Form.Item name={[...baseName, 'keepAlive']} valuePropName="checked">
-              <Checkbox>Keep Alive</Checkbox>
             </Form.Item>
           </S.ChecksContainer>
         </Col>

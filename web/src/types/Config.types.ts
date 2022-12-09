@@ -15,12 +15,16 @@ export enum SupportedDataStores {
 
 export type TSupportedDataStores = TConfigSchemas['SupportedDataStores'];
 export type TRawDataStoreConfig = TConfigSchemas['DataStoreConfig'];
-export type TDataStoreConfig = Model<TRawDataStoreConfig, {
-  mode: ConfigMode;
-}>;
+export type TDataStoreConfig = Model<
+  TRawDataStoreConfig,
+  {
+    mode: ConfigMode;
+  }
+>;
 
 export type TRawDataStore = TConfigSchemas['DataStore'];
 export type TDataStore = Model<TRawDataStore, {}>;
+export type TRawGRPCClientSettings = TConfigSchemas['GRPCClientSettings'];
 
 export type TTestConnectionRequest = TConfigSchemas['TestConnectionRequest'];
 export type TTestConnectionResponse = TConfigSchemas['TestConnectionResponse'];
@@ -35,7 +39,7 @@ export type TDataStoreForm = FormInstance<TDraftDataStore>;
 export type TDataStoreService = {
   getRequest(values: TDraftDataStore, dataStoreType?: SupportedDataStores): Promise<TRawDataStore>;
   validateDraft(draft: TDraftDataStore): Promise<boolean>;
-  getInitialValues(draft: TDataStoreConfig): TDraftDataStore;
+  getInitialValues(draft: TDataStoreConfig, dataStoreType?: SupportedDataStores): TDraftDataStore;
 };
 
 export interface IDataStorePluginProps {}

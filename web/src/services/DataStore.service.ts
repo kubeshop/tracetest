@@ -19,7 +19,7 @@ const dataStoreServiceMap = {
 const DataStoreService = (): IDataStoreService => ({
   async getRequest(draft) {
     const dataStoreType = draft.dataStoreType || SupportedDataStores.JAEGER;
-    const dataStore = await dataStoreServiceMap[dataStoreType].getRequest(draft);
+    const dataStore = await dataStoreServiceMap[dataStoreType].getRequest(draft, dataStoreType);
 
     const config: TRawDataStoreConfig = {
       dataStores: [{...dataStore, name: dataStoreType, type: dataStoreType}],
@@ -30,14 +30,11 @@ const DataStoreService = (): IDataStoreService => ({
   },
 
   getInitialValues(config) {
-    const {
-      defaultDataStore = '',
-      dataStores = []
-    } = config;
+    const {defaultDataStore = '', dataStores = []} = config;
     const dataStoreType = dataStores.find(({name}) => name === defaultDataStore)?.type;
     const type = (dataStoreType || SupportedDataStores.JAEGER) as SupportedDataStores;
 
-    return dataStoreServiceMap[type].getInitialValues(config);
+    return dataStoreServiceMap[type].getInitialValues(config, type);
   },
 
   validateDraft(draft) {
