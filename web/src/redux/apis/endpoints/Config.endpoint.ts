@@ -1,28 +1,34 @@
 import {HTTP_METHOD} from 'constants/Common.constants';
 import {TracetestApiTags} from 'constants/Test.constants';
 import {TTestApiEndpointBuilder} from 'types/Test.types';
-import {TConfig, TRawConfig, TTestConnectionRequest, TTestConnectionResponse} from 'types/Config.types';
+import {
+  SupportedDataStores,
+  TDataStoreConfig,
+  TRawDataStoreConfig,
+  TTestConnectionRequest,
+  TTestConnectionResponse,
+} from 'types/Config.types';
 // import Config from 'models/Config.model';
-import ConfigMock from 'models/__mocks__/Config.mock';
+import DataStoreConfigMock from 'models/__mocks__/DataStoreConfig.mock';
 
 const ConfigEndpoint = (builder: TTestApiEndpointBuilder) => ({
-  getConfig: builder.query<TConfig, unknown>({
+  getDataStoreConfig: builder.query<TDataStoreConfig, unknown>({
     // query: () => '/config',
     query: () => '/tests',
-    providesTags: () => [{type: TracetestApiTags.CONFIG, id: 'config'}],
+    providesTags: () => [{type: TracetestApiTags.CONFIG, id: 'datastore'}],
     transformResponse: () =>
-      ConfigMock.model({
-        telemetry: {dataStores: [{type: 'jaeger'}]},
-        server: {telemetry: {dataStore: 'jaeger'}},
+      DataStoreConfigMock.model({
+        dataStores: [{name: 'jaeger', type: SupportedDataStores.JAEGER}],
+        defaultDataStore: 'jaeger',
       }),
   }),
-  updateConfig: builder.mutation<undefined, TRawConfig>({
+  updateDatastoreConfig: builder.mutation<undefined, TRawDataStoreConfig>({
     query: config => ({
-      url: '/config',
+      url: '/config/datastore',
       method: HTTP_METHOD.PUT,
       body: config,
     }),
-    invalidatesTags: [{type: TracetestApiTags.CONFIG, id: 'config'}],
+    invalidatesTags: [{type: TracetestApiTags.CONFIG, id: 'datastore'}],
   }),
   testConnection: builder.mutation<TTestConnectionResponse, TTestConnectionRequest>({
     query: connectionTest => ({

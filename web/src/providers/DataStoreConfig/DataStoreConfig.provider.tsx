@@ -3,13 +3,13 @@ import {createContext, useCallback, useContext, useMemo} from 'react';
 
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import {setUserPreference} from 'redux/slices/User.slice';
-import {useGetConfigQuery} from 'redux/apis/TraceTest.api';
-import {ConfigMode, TConfig} from 'types/Config.types';
-import Config from 'models/Config.model';
-import UserSelectors from '../../selectors/User.selectors';
+import {useGetDataStoreConfigQuery} from 'redux/apis/TraceTest.api';
+import {ConfigMode, TDataStoreConfig} from 'types/Config.types';
+import UserSelectors from 'selectors/User.selectors';
+import DataStoreConfig from 'models/DataStoreConfig.model';
 
 interface IContext {
-  config: TConfig;
+  dataStoreConfig: TDataStoreConfig;
   isLoading: boolean;
   isError: boolean;
   skipConfigSetup(): void;
@@ -17,7 +17,7 @@ interface IContext {
 }
 
 const Context = createContext<IContext>({
-  config: Config({}),
+  dataStoreConfig: DataStoreConfig({}),
   skipConfigSetup: noop,
   isLoading: false,
   isError: false,
@@ -28,14 +28,14 @@ interface IProps {
   children: React.ReactNode;
 }
 
-export const useConfig = () => useContext(Context);
+export const useDataStoreConfig = () => useContext(Context);
 
-const ConfigProvider = ({children}: IProps) => {
+const DataStoreConfigProvider = ({children}: IProps) => {
   const dispatch = useAppDispatch();
-  const {data: config = Config({}), isLoading, isError} = useGetConfigQuery({});
+  const {data: dataStoreConfig = DataStoreConfig({}), isLoading, isError} = useGetDataStoreConfigQuery({});
   const initConfigSetup = useAppSelector(state => UserSelectors.selectUserPreference(state, 'initConfigSetup'));
 
-  const shouldDisplayConfigSetup = Boolean(initConfigSetup) && config.mode === ConfigMode.NO_TRACING_MODE;
+  const shouldDisplayConfigSetup = Boolean(initConfigSetup) && dataStoreConfig.mode === ConfigMode.NO_TRACING_MODE;
 
   const skipConfigSetup = useCallback(() => {
     dispatch(
@@ -48,16 +48,16 @@ const ConfigProvider = ({children}: IProps) => {
 
   const value = useMemo<IContext>(
     () => ({
-      config,
+      dataStoreConfig,
       isLoading,
       isError,
       skipConfigSetup,
       shouldDisplayConfigSetup,
     }),
-    [config, isError, isLoading, shouldDisplayConfigSetup, skipConfigSetup]
+    [dataStoreConfig, isError, isLoading, shouldDisplayConfigSetup, skipConfigSetup]
   );
 
   return <Context.Provider value={value}>{children}</Context.Provider>;
 };
 
-export default ConfigProvider;
+export default DataStoreConfigProvider;

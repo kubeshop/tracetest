@@ -1,12 +1,12 @@
-import {SupportedDataStores, TConfig, TDraftConfig, TRawConfig} from 'types/Config.types';
+import {SupportedDataStores, TDataStoreConfig, TDraftDataStore, TRawDataStoreConfig} from 'types/Config.types';
 import GrpcClientService from './DataStores/GrpcClient.service';
 import OpenSearchService from './DataStores/OpenSearch.service';
 import SignalFxService from './DataStores/SignalFx.service';
 
-interface ISetupConfigService {
-  getRequest(draft: TDraftConfig): Promise<TRawConfig>;
-  getInitialValues(config: TConfig): TDraftConfig;
-  validateDraft(config: TDraftConfig): Promise<boolean>;
+interface IDataStoreService {
+  getRequest(draft: TDraftDataStore): Promise<TRawDataStoreConfig>;
+  getInitialValues(config: TDataStoreConfig): TDraftDataStore;
+  validateDraft(config: TDraftDataStore): Promise<boolean>;
 }
 
 const dataStoreServiceMap = {
@@ -16,20 +16,14 @@ const dataStoreServiceMap = {
   [SupportedDataStores.SignalFX]: SignalFxService,
 } as const;
 
-const SetupConfigService = (): ISetupConfigService => ({
+const DataStoreService = (): IDataStoreService => ({
   async getRequest(draft) {
     const dataStoreType = draft.dataStoreType || SupportedDataStores.JAEGER;
     const dataStore = await dataStoreServiceMap[dataStoreType].getRequest(draft);
 
-    const config: TRawConfig = {
-      telemetry: {
-        dataStores: [dataStore],
-      },
-      server: {
-        telemetry: {
-          dataStore: dataStoreType,
-        },
-      },
+    const config: TRawDataStoreConfig = {
+      dataStores: [{...dataStore, name: dataStoreType}],
+      defaultDataStore: dataStoreType,
     };
 
     return config;
@@ -37,8 +31,10 @@ const SetupConfigService = (): ISetupConfigService => ({
 
   getInitialValues(config) {
     const {
-      server: {telemetry: {dataStore: dataStoreType} = {}},
+      defaultDataStore = '',
+      dataStores = []
     } = config;
+    const dataStoreType = dataStores.find(({name}) => name === defaultDataStore)?.type;
     const type = (dataStoreType || SupportedDataStores.JAEGER) as SupportedDataStores;
 
     return dataStoreServiceMap[type].getInitialValues(config);
@@ -52,4 +48,4 @@ const SetupConfigService = (): ISetupConfigService => ({
   },
 });
 
-export default SetupConfigService();
+export default DataStoreService();

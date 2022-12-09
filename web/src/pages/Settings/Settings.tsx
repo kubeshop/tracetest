@@ -1,13 +1,13 @@
 import Layout from 'components/Layout';
 import withAnalytics from 'components/WithAnalytics/WithAnalytics';
-import SetupConfigProvider from 'providers/SetupConfig';
+import DataStoreProvider from 'providers/DataStore';
 import Content from './Content';
 
 const Settings = () => (
   <Layout hasMenu>
-    <SetupConfigProvider>
+    <DataStoreProvider>
       <Content />
-    </SetupConfigProvider>
+    </DataStoreProvider>
   </Layout>
 );
 
