@@ -34,7 +34,10 @@ const useDeleteResourceRun = ({id, isRunView = false, type}: IProps) => {
 
   return useCallback(
     (runId: string) => {
-      onOpen(`Are you sure you want to delete the Run?`, () => onConfirmDelete(runId));
+      onOpen({
+        title: `Are you sure you want to delete the Run?`,
+        onConfirm: () => onConfirmDelete(runId),
+      });
     },
     [onConfirmDelete, onOpen]
   );

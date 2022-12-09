@@ -100,7 +100,10 @@ const useTestSpecsCrud = ({runId, testId, test, isDraftMode, assertionResults}: 
   );
   const remove = useCallback(
     (selector: string) => {
-      onOpen('Are you sure you want to remove this test spec?', () => onConfirmRemove(selector));
+      onOpen({
+        title: 'Are you sure you want to remove this test spec?',
+        onConfirm: () => onConfirmRemove(selector),
+      });
     },
     [onConfirmRemove, onOpen]
   );

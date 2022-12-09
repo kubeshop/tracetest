@@ -81,8 +81,11 @@ const TestOutputProvider = ({children, testId, runId}: IProps) => {
 
   const onDelete = useCallback(
     (index: number) => {
-      onOpen(`Are you sure you want to delete the output?`, () => {
-        dispatch(outputDeleted(index));
+      onOpen({
+        title: `Are you sure you want to delete the output?`,
+        onConfirm: () => {
+          dispatch(outputDeleted(index));
+        },
       });
     },
     [dispatch, onOpen]

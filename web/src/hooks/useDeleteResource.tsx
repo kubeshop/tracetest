@@ -27,7 +27,12 @@ const useDeleteResource = () => {
 
   return useCallback(
     (id: string, name: string, type: ResourceType) => {
-      onOpen(`Are you sure you want to delete “${name}”?`, () => onConfirmDelete(id, type));
+      onOpen({
+        title: `Are you sure you want to delete “${name}”?`,
+        onConfirm() {
+          onConfirmDelete(id, type);
+        },
+      });
     },
     [onConfirmDelete, onOpen]
   );

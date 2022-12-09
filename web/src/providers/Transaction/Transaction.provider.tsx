@@ -83,7 +83,10 @@ const TransactionProvider = ({children, transactionId, version = 0}: IProps) => 
         navigate('/');
       }
 
-      onOpen(`Are you sure you want to delete “${name}”?`, onConfirmation);
+      onOpen({
+        title: `Are you sure you want to delete “${name}”?`,
+        onConfirm: onConfirmation,
+      });
     },
     [deleteTransaction, navigate, onOpen]
   );

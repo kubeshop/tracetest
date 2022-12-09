@@ -66,7 +66,7 @@ describe('Outputs', () => {
     // Delete output
     cy.get('[data-cy="output-actions-button-db.name"]').click();
     cy.get('[data-cy=output-item-actions-delete]').click();
-    cy.get('[data-cy=delete-confirmation-modal] .ant-btn-primary').click();
+    cy.get('[data-cy=confirmation-modal] .ant-btn-primary').click();
 
     // Publish and run
     cy.get('[data-cy=output-publish-button]').click();
