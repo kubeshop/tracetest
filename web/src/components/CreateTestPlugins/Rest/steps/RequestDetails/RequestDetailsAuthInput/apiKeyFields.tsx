@@ -1,34 +1,14 @@
 import {Form, Select} from 'antd';
-import Editor from 'components/Editor';
-import {SupportedEditors} from 'constants/Editor.constants';
-import * as S from '../RequestDetails.styled';
-import * as R from './RequestDetailsAuthInput.styled';
+import {ApiKeyFieldsBase} from './apiKeyFieldsBase';
 
-export const apiKeyFields: React.ReactElement = (
+interface IProps {
+  baseName: string[];
+}
+
+export const ApiKeyFields = ({baseName}: IProps) => (
   <>
-    <S.Row>
-      <R.FlexContainer>
-        <Form.Item
-          data-cy="apiKey-key"
-          style={{flexBasis: '50%', marginTop: '26px'}}
-          name={['auth', 'apiKey', 'key']}
-          label="Key"
-          rules={[{required: true}]}
-        >
-          <Editor type={SupportedEditors.Interpolation} placeholder="Enter key" />
-        </Form.Item>
-        <Form.Item
-          data-cy="apiKey-value"
-          style={{flexBasis: '50%', marginTop: '26px'}}
-          name={['auth', 'apiKey', 'value']}
-          label="Value"
-          rules={[{required: true}]}
-        >
-          <Editor type={SupportedEditors.Interpolation} placeholder="Enter value" />
-        </Form.Item>
-      </R.FlexContainer>
-    </S.Row>
-    <Form.Item style={{minWidth: '100%'}} initialValue="query" label="Add To" name={['auth', 'apiKey', 'in']}>
+    <ApiKeyFieldsBase baseName={baseName} />
+    <Form.Item style={{minWidth: '100%'}} initialValue="query" label="Add To" name={[...baseName, 'apiKey', 'in']}>
       <Select
         className="select-auth-method"
         data-cy="auth-apiKey-select"

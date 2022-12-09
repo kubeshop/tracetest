@@ -16,7 +16,7 @@ const RequestDetailsForm = ({form}: IProps) => {
   return (
     <S.InputContainer>
       <RequestDetailsUrlInput />
-      <RequestDetailsAuthInput form={form} />
+      <RequestDetailsAuthInput />
       <RequestDetailsHeadersInput />
       <BodyField setBody={body => form.setFieldsValue({body})} body={Form.useWatch('body', form)} />
     </S.InputContainer>

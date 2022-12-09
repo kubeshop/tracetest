@@ -8,18 +8,18 @@ import * as S from './RequestDetails.styled';
 
 interface IProps {
   initialValue?: IKeyValue[];
-  name?: string;
+  name?: string[];
   unit?: string;
   label?: string;
 }
 const RequestDetailsHeadersInput: React.FC<IProps> = ({
   unit = 'Header',
-  name = 'headers',
+  name = ['headers'],
   initialValue = DEFAULT_HEADERS,
   label = 'Header',
 }) => (
   <Form.Item className="input-headers" label={`${label} list`} shouldUpdate>
-    <Form.List name={name} initialValue={initialValue}>
+    <Form.List name={name.length === 1 ? name[0] : name} initialValue={initialValue}>
       {(fields, {add, remove}) => (
         <>
           {fields.map((field, index) => (

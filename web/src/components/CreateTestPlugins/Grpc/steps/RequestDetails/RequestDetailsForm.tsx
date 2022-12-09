@@ -63,7 +63,7 @@ const RequestDetailsForm = ({form}: IProps) => {
       </Row>
       <Row gutter={12}>
         <Col span={18}>
-          <RequestDetailsAuthInput form={form} />
+          <RequestDetailsAuthInput />
         </Col>
       </Row>
       <Row gutter={12}>
