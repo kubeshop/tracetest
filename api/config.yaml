@@ -106,26 +106,7 @@ components:
         maxVersion:
           type: string
     TestConnectionRequest:
-      type: object
-      properties:
-        type:
-          type: string
-          enum:
-            - datastore
-            - exporter
-        info:
-          type: object
-          properties:
-            jaeger:
-              $ref: "#/components/schemas/GRPCClientSettings"
-            tempo:
-              $ref: "#/components/schemas/GRPCClientSettings"
-            openSearch:
-              $ref: "#/components/schemas/OpenSearch"
-            signalFx:
-              $ref: "#/components/schemas/SignalFX"
-            collector:
-              $ref: "#/components/schemas/CollectorConfig"
+      $ref: "#/components/schemas/DataStore"
     TestConnectionResponse:
       type: object
       properties:

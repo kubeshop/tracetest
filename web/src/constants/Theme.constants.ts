@@ -27,4 +27,18 @@ export const theme: DefaultTheme = {
   font: {
     family: 'SFPro',
   },
+  notification: {
+    success: {
+      style: {
+        border: '1px solid #52C41A',
+        background: '#F6FFED',
+      },
+    },
+    error: {
+      style: {
+        border: '1px solid #F5222D',
+        background: '#FFF1F0',
+      },
+    },
+  },
 };
