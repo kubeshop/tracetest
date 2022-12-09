@@ -4,10 +4,6 @@ If you want to use Tempo as the trace data store, you can configure Tracetest to
 
 You'll configure the OpenTelemetry Collector to receive traces from your system and then send them to Tempo. And, you don't have to change your existing pipelines to do so.
 
-:::note
-It is important to notice that this relies on the [probabilistic_sampler](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/probabilisticsamplerprocessor) processor, which, at the moment, is only available in the [contrib](https://github.com/open-telemetry/opentelemetry-collector-contrib/) version of the collector.
-:::
-
 :::tip
 Examples of configuring Tracetest can be found in the [`examples` folder of the Tracetest GitHub repo](https://github.com/kubeshop/tracetest/tree/main/examples). 
 :::
@@ -30,9 +26,6 @@ receivers:
 processors:
   batch:
     timeout: 100ms
-  probabilistic_sampler:
-    hash_seed: 22
-    sampling_percentage: 100
 
 exporters:
   otlp/2:
@@ -47,7 +40,7 @@ service:
     # pipelines with the same name
     traces/1:
       receivers: [otlp] # your receiver
-      processors: [tail_sampling, batch] # make sure to have the probabilistic_sampler before your batch processor
+      processors: [batch] # make sure to have the probabilistic_sampler before your batch processor
       exporters: [otlp/2] # your exporter pointing to your Tempo instance
 
 ```
@@ -133,15 +126,6 @@ telemetry:
         endpoint: tempo:9095
         tls:
           insecure: true
-
-  exporters:
-    collector:
-      serviceName: tracetest
-      sampling: 100 # 100%
-      exporter:
-        type: collector
-        collector:
-          endpoint: otel-collector:4317
 
 server:
   telemetry:

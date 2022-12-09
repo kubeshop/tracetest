@@ -20,10 +20,9 @@ flowchart TD
     C --> |OTel Collector sends traces to the trace data store| D
     D --> |Tracetest fetches traces to enrich e2e and integration tests| A
 
-    classDef selectedSpan stroke:#439846, fill:#439846, color:#fffff
-    classDef blah fill:#61175e,stroke:#61175e,stroke-width:4px,color:#ffffff;
+    classDef tracetest fill:#61175e,stroke:#61175e,stroke-width:4px,color:#ffffff;
 
-    class A blah
+    class A tracetest
 ```
 
 Postgres stores all Tracetest-related data.

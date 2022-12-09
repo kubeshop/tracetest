@@ -48,7 +48,7 @@ Select `Using Docker Compose` and follow the instructions.
 In the folder where you ran `tracetest server install` run this command to start the Tracetest cluster.
 
 ```bash
-docker compose -f docker-compose.yaml -f tracetest/docker-compose.yaml up (--build)
+docker compose -f docker-compose.yaml -f tracetest/docker-compose.yaml up
 ```
 
 ```bash title="Condensed expected output from the Tracetest container:"
