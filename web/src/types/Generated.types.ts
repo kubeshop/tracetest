@@ -132,11 +132,11 @@ export interface paths {
     /** get resources */
     get: operations["getResources"];
   };
-  "/config": {
-    /** Get the Server Side Config */
-    get: operations["getConfig"];
-    /** Updates the Server Side config */
-    put: operations["updateConfig"];
+  "/config/datastores": {
+    /** Get the Server Side Data Stores Config */
+    get: operations["getDataStoresConfig"];
+    /** Updates the Server Side Data Store config */
+    put: operations["updateDataStoresConfig"];
   };
   "/config/connection": {
     /** Tests the config data store/exporter connection */
@@ -897,30 +897,28 @@ export interface operations {
       };
     };
   };
-  /** Get the Server Side Config */
-  getConfig: {
+  /** Get the Server Side Data Stores Config */
+  getDataStoresConfig: {
     responses: {
       /** Server Side Config */
       200: {
         content: {
-          "application/json": external["config.yaml"]["components"]["schemas"]["Config"];
+          "application/json": external["config.yaml"]["components"]["schemas"]["DataStoreConfig"];
         };
       };
     };
   };
-  /** Updates the Server Side config */
-  updateConfig: {
+  /** Updates the Server Side Data Store config */
+  updateDataStoresConfig: {
     responses: {
-      /** Config Updated */
-      201: {
-        content: {
-          "application/json": external["config.yaml"]["components"]["schemas"]["Config"];
-        };
-      };
+      /** successful operation */
+      204: never;
+      /** problem with updating environment */
+      500: unknown;
     };
     requestBody: {
       content: {
-        "text/json": external["config.yaml"]["components"]["schemas"]["Config"];
+        "text/json": external["config.yaml"]["components"]["schemas"]["DataStoreConfig"];
       };
     };
   };
@@ -947,32 +945,20 @@ export interface external {
     paths: {};
     components: {
       schemas: {
-        Config: {
-          telemetry?: external["config.yaml"]["components"]["schemas"]["TelemetryConfig"];
-          server?: external["config.yaml"]["components"]["schemas"]["Server"];
-        };
-        TelemetryConfig: {
-          dataStores?: external["config.yaml"]["components"]["schemas"]["DataStore"][];
-          exporters?: external["config.yaml"]["components"]["schemas"]["ExporterOption"][];
-        };
-        ExporterOption: {
-          serviceName?: string;
-          sampling?: number;
-          exporter?: external["config.yaml"]["components"]["schemas"]["Exporter"];
-        };
-        Exporter: {
-          type?: string;
-          collector?: external["config.yaml"]["components"]["schemas"]["CollectorConfig"];
-        };
-        CollectorConfig: {
-          endpoint?: string;
-        };
         DataStore: {
-          type?: string;
+          type?: external["config.yaml"]["components"]["schemas"]["SupportedDataStores"];
+          name?: string;
           jaeger?: external["config.yaml"]["components"]["schemas"]["GRPCClientSettings"];
           tempo?: external["config.yaml"]["components"]["schemas"]["GRPCClientSettings"];
           openSearch?: external["config.yaml"]["components"]["schemas"]["OpenSearch"];
           signalFx?: external["config.yaml"]["components"]["schemas"]["SignalFX"];
+        };
+        DataStoreConfig: {
+          dataStores?: external["config.yaml"]["components"]["schemas"]["DataStore"][];
+          defaultDataStore?: string;
+        };
+        CollectorConfig: {
+          endpoint?: string;
         };
         OpenSearch: {
           addresses?: string[];
@@ -1031,13 +1017,8 @@ export interface external {
           successful?: boolean;
           errorMessage?: string;
         };
-        Server: {
-          telemetry?: {
-            exporter?: string;
-            applicationExporter?: string;
-            dataStore?: string;
-          };
-        };
+        /** @enum {string} */
+        SupportedDataStores: "jaeger" | "openSearch" | "tempo" | "signalFx";
       };
     };
     operations: {};
