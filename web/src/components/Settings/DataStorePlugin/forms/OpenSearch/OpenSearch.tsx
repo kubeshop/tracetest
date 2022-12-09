@@ -1,9 +1,10 @@
 import {Form, Input} from 'antd';
+import {SupportedDataStores} from 'types/Config.types';
 import * as S from '../../DataStorePluginForm.styled';
 import AddressesList from './AddressesList';
 
 const OpenSearch = () => {
-  const baseName = ['dataStore', 'openSearch'];
+  const baseName = ['dataStore', SupportedDataStores.OpenSearch];
 
   return (
     <S.FormContainer>
