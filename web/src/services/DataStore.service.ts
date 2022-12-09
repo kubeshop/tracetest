@@ -30,14 +30,11 @@ const DataStoreService = (): IDataStoreService => ({
   },
 
   getInitialValues(config) {
-    const {
-      defaultDataStore = '',
-      dataStores = []
-    } = config;
+    const {defaultDataStore = '', dataStores = []} = config;
     const dataStoreType = dataStores.find(({name}) => name === defaultDataStore)?.type;
     const type = (dataStoreType || SupportedDataStores.JAEGER) as SupportedDataStores;
 
-    return dataStoreServiceMap[type].getInitialValues(config);
+    return {...dataStoreServiceMap[type].getInitialValues(config), dataStoreType: type};
   },
 
   validateDraft(draft) {
