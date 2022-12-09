@@ -1,4 +1,3 @@
-import {CaseReducer, PayloadAction} from '@reduxjs/toolkit';
 import {FormInstance} from 'antd';
 import {Model, TConfigSchemas} from 'types/Common.types';
 
@@ -10,51 +9,33 @@ export enum ConfigMode {
 export enum SupportedDataStores {
   JAEGER = 'jaeger',
   TEMPO = 'tempo',
-  OpenSearch = 'opensearch',
-  SignalFX = 'signalfx',
+  OpenSearch = 'openSearch',
+  SignalFX = 'signalFx',
 }
 
-export type TRawConfig = TConfigSchemas['Config'];
-export type TConfig = Model<
-  TRawConfig,
-  {
-    mode: ConfigMode;
-  }
->;
-
-export type TRawTelemetryConfig = TConfigSchemas['TelemetryConfig'];
-export type TTelemetryConfig = Model<TRawTelemetryConfig, {}>;
+export type TSupportedDataStores = TConfigSchemas['SupportedDataStores'];
+export type TRawDataStoreConfig = TConfigSchemas['DataStoreConfig'];
+export type TDataStoreConfig = Model<TRawDataStoreConfig, {
+  mode: ConfigMode;
+}>;
 
 export type TRawDataStore = TConfigSchemas['DataStore'];
-
-export type TRawServerConfig = TConfigSchemas['Server'];
-export type TServerConfig = Model<TRawServerConfig, {}>;
+export type TDataStore = Model<TRawDataStore, {}>;
 
 export type TTestConnectionRequest = TConfigSchemas['TestConnectionRequest'];
 export type TTestConnectionResponse = TConfigSchemas['TestConnectionResponse'];
 
-export type TDraftConfig = {
+export type TDraftDataStore = {
   dataStore?: TRawDataStore;
   dataStoreType?: SupportedDataStores;
 };
 
-export interface ISetupConfigState {
-  draftConfig: TDraftConfig;
-  isFormValid: boolean;
-}
-
-export type TDraftConfigForm = FormInstance<TDraftConfig>;
-
-export type TSetupConfigSliceActions = {
-  reset: CaseReducer<ISetupConfigState>;
-  setDraftConfig: CaseReducer<ISetupConfigState, PayloadAction<{draftConfig: TDraftConfig}>>;
-  setIsFormValid: CaseReducer<ISetupConfigState, PayloadAction<{isValid: boolean}>>;
-};
+export type TDataStoreForm = FormInstance<TDraftDataStore>;
 
 export type TDataStoreService = {
-  getRequest(values: TDraftConfig, dataStoreType?: SupportedDataStores): Promise<TRawDataStore>;
-  validateDraft(draft: TDraftConfig): Promise<boolean>;
-  getInitialValues(draft: TConfig): TDraftConfig;
+  getRequest(values: TDraftDataStore, dataStoreType?: SupportedDataStores): Promise<TRawDataStore>;
+  validateDraft(draft: TDraftDataStore): Promise<boolean>;
+  getInitialValues(draft: TDataStoreConfig): TDraftDataStore;
 };
 
 export interface IDataStorePluginProps {}

@@ -1,21 +1,21 @@
 import {Button, Form} from 'antd';
-import {useSetupConfig} from 'providers/SetupConfig/SetupConfig.provider';
+import {useSetupConfig} from 'providers/DataStore/DataStore.provider';
 import {useCallback} from 'react';
-import {TConfig, TDraftConfig} from 'types/Config.types';
+import {TDraftDataStore, TDataStoreConfig} from 'types/Config.types';
 import DataStoreForm from '../DataStoreForm';
 import * as S from './DataStore.styled';
 
 interface IProps {
-  config: TConfig;
+  dataStoreConfig: TDataStoreConfig;
 }
 
-const DataStore = ({config}: IProps) => {
+const DataStore = ({dataStoreConfig}: IProps) => {
   const {isLoading, isFormValid, onIsFormValid, onSaveConfig} = useSetupConfig();
 
-  const [form] = Form.useForm<TDraftConfig>();
+  const [form] = Form.useForm<TDraftDataStore>();
 
   const handleOnSubmit = useCallback(
-    async (values: TDraftConfig) => {
+    async (values: TDraftDataStore) => {
       onSaveConfig(values);
     },
     [onSaveConfig]
@@ -30,7 +30,7 @@ const DataStore = ({config}: IProps) => {
             solution. Select your tracing data store and enter the configuration info.
           </S.Description>
           <S.Title>Choose OpenTelemetry data store</S.Title>
-          <DataStoreForm form={form} config={config} onSubmit={handleOnSubmit} onIsFormValid={onIsFormValid} />
+          <DataStoreForm form={form} dataStoreConfig={dataStoreConfig} onSubmit={handleOnSubmit} onIsFormValid={onIsFormValid} />
         </div>
         <S.ButtonsContainer>
           <Button

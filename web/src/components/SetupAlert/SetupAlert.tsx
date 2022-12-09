@@ -1,10 +1,10 @@
-import {useConfig} from 'providers/Config/Config.provider';
+import {useDataStoreConfig} from 'providers/DataStoreConfig/DataStoreConfig.provider';
 import {ConfigMode} from 'types/Config.types';
 import * as S from './SetupAlert.styled';
 
 const SetupAlert = () => {
-  const {config} = useConfig();
-  const shouldDisplay = config.mode === ConfigMode.NO_TRACING_MODE;
+  const {dataStoreConfig} = useDataStoreConfig();
+  const shouldDisplay = dataStoreConfig.mode === ConfigMode.NO_TRACING_MODE;
 
   return shouldDisplay ? (
     <S.Container

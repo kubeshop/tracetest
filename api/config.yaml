@@ -1,49 +1,12 @@
 openapi: 3.0.0
 components:
   schemas:
-    Config:
-      type: object
-      properties:
-        telemetry:
-          $ref: "#/components/schemas/TelemetryConfig"
-        server:
-          $ref: "#/components/schemas/Server"
-    TelemetryConfig:
-      type: object
-      properties:
-        dataStores:
-          type: array
-          items:
-            $ref: "#/components/schemas/DataStore"
-        exporters:
-          type: array
-          items:
-            $ref: "#/components/schemas/ExporterOption"
-    ExporterOption:
-      type: object
-      properties:
-        serviceName:
-          type: string
-        sampling:
-          type: number
-        exporter:
-          $ref: "#/components/schemas/Exporter"
-    Exporter:
-      type: object
-      properties:
-        type:
-          type: string
-        collector:
-          $ref: "#/components/schemas/CollectorConfig"
-    CollectorConfig:
-      type: object
-      properties:
-        endpoint:
-          type: string
     DataStore:
       type: object
       properties:
         type:
+          $ref: "#/components/schemas/SupportedDataStores"
+        name:
           type: string
         jaeger:
           $ref: "#/components/schemas/GRPCClientSettings"
@@ -53,6 +16,20 @@ components:
           $ref: "#/components/schemas/OpenSearch"
         signalFx:
           $ref: "#/components/schemas/SignalFX"
+    DataStoreConfig:
+      type: object
+      properties:
+        dataStores:
+          type: array
+          items:
+            $ref: "#/components/schemas/DataStore"
+        defaultDataStore:
+          type: string
+    CollectorConfig:
+      type: object
+      properties:
+        endpoint:
+          type: string
     OpenSearch:
       type: object
       properties:
@@ -156,15 +133,6 @@ components:
           type: boolean
         errorMessage:
           type: string
-    Server:
-      type: object
-      properties:
-        telemetry:
-          type: object
-          properties:
-            exporter:
-              type: string
-            applicationExporter:
-              type: string
-            dataStore:
-              type: string
+    SupportedDataStores:
+      type: string
+      enum: [jaeger, openSearch, tempo, signalFx]
