@@ -8,7 +8,7 @@ You'll configure the OpenTelemetry Collector to receive traces from your system 
 Examples of configuring Tracetest can be found in the [`examples` folder of the Tracetest GitHub repo](https://github.com/kubeshop/tracetest/tree/main/examples). 
 :::
 
-## Configure OpenTelemetry Collector to send traces to Jaeger
+## Configure OpenTelemetry Collector to Send Traces to Jaeger
 
 In your OpenTelemetry Collector config file, make sure to set the `exporter` to `jaeger`, with the `endpoint` pointing to your Jaeger's instance on port `14250`. If you are running Tracetest with Docker, the endpoint might look like this `http://jaeger:14250`.
 
