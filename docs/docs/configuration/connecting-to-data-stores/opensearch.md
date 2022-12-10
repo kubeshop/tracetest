@@ -40,7 +40,7 @@ service:
   pipelines:
     # You probably already have a traces pipeline, you don't have to change it.
     # Just add this one to your configuration. Just make sure to not have two
-    # pipelines with the same name
+    # pipelines with the same name.
     traces/1:
       receivers: [otlp] # your receiver
       processors: [batch] # make sure to add the batch processor
