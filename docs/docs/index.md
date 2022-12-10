@@ -11,7 +11,7 @@ TODO: migrate video to youtube and use YT embed.
 
 Tracetest allows you to quickly build integration and end-to-end tests, powered by your OpenTelemetry traces.
 
-## In a nutshell
+## In a Nutshell
 
 Tracetest uses your existing [OpenTelemetry](https://opentelemetry.io/docs/getting-started/) traces to power trace-based testing with assertions against your trace data at every point of the request transaction. You only need to point Tracetest to your existing trace data source, or send traces to Tracetest directly!
 
