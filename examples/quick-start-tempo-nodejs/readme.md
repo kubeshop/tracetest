@@ -170,7 +170,7 @@ services:
 
 Tracetest depends on Postgres, Tempo and the OpenTelemetry Collector. All three services require config files to be loaded via a volume. The volumes are mapped from the root directory into the `tracetest` directory and the respective config files.
 
-**Why?** To start both the Node.js app and Tracetest we will run this command:
+**Why?** To start both the Node.js app and Tracetest, we will run this command:
 
 ```bash
 docker-compose -f docker-compose.yaml -f tracetest/docker-compose.yaml up # add --build if the images are not built already
