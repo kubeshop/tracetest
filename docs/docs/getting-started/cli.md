@@ -238,7 +238,7 @@ Starting tracetest ...
 
 ### 8. Open the Tracetest Web UI
 
-Open your browser on [`http://localhost:11633`](http://localhost:11633).
+Open [`http://localhost:11633`](http://localhost:11633) in your browser.
 
 Create a [test](../web-ui/creating-tests.md).
 
