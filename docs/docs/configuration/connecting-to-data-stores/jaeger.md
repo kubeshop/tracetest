@@ -35,7 +35,7 @@ exporters:
 
 service:
   pipelines:
-    # your probably already have a traces pipeline, you don't have to change it.
+    # You probably already have a traces pipeline, you don't have to change it.
     # just add this one to your configuration. Just make sure to not have two
     # pipelines with the same name
     traces/1:
