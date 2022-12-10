@@ -96,7 +96,7 @@ server:
 
 The `postgresConnString` will configure Tracetest to connect to the Postgres service. The `telemetry.dataStores` defines that the trace data store will be through `otlp` because it's expecting to receive traces from the OpenTelemetry Collector.
 
-## 3. Create an OpenTelemetry Collector config file
+## 3. Create an OpenTelemetry Collector Config File
 
 Create a `collector.config.yaml` file:
 
