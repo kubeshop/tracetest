@@ -45,7 +45,7 @@ service:
 
 ```
 
-## Configure Tracetest to use Jaeger as a trace data store
+## Configure Tracetest to Use Jaeger as a Trace Data Store
 
 You also have to configure your Tracetest instance to make it aware that it has to fetch trace data from Jaeger. 
 
