@@ -60,7 +60,7 @@ services:
       - ./collector.config.yaml:/otel-local-config.yaml
 ```
 
-## 2. Create a Tracetest config file
+## 2. Create a Tracetest Config File
 
 Create a `tracetest.config.yaml` file:
 
