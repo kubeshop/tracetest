@@ -55,7 +55,7 @@ Enabling the tracer is done by preloading the trace file.
 node -r ./tracing.otel.grpc.js app.js
 ```
 
-In the `package.json` you will see two npm script for running the respective tracers alongside the `app.js`.
+In the `package.json` you will see two npm scripts for running the respective tracers alongside the `app.js`.
 
 ```json
 "scripts": {
