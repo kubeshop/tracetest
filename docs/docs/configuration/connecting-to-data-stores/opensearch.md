@@ -16,7 +16,7 @@ In your OpenTelemetry Collector config file, make sure to set the `exporter` to 
 # collector.config.yaml
 
 # If you already have receivers declared, you can just ignore
-# this one and still use yours instead.
+# this one and use yours instead.
 receivers:
   otlp:
     protocols:
