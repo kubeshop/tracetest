@@ -1,4 +1,4 @@
-# Getting started with Tracetest using Docker Compose
+# Getting Started with Tracetest Using Docker Compose
 
 This guide will help you get Tracetest running using Docker Compose.
 
