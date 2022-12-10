@@ -17,7 +17,7 @@ Tracetest uses your existing [OpenTelemetry](https://opentelemetry.io/docs/getti
 
 We make it possible to:
 
-- Define tests and assertions againts every single microservice a request goes through
+- Define tests and assertions against every single microservice that a request goes through.
 - Use your preffered trace back-end, like Jaeger or Tempo, or OpenTelemetry Collector
 - Define multiple transaction triggers, such as a GET against an API endpoint, a GRPC request, etc.
 - Return both the response data and a full trace
