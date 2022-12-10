@@ -64,7 +64,7 @@ In the `package.json` you will see two npm script for running the respective tra
 },
 ```
 
-To start the server you run this command.
+To start the server, run this command:
 
 ```bash
 npm run with-grpc-tracer
