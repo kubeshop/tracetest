@@ -242,7 +242,7 @@ storage:
 
 ```
 
-The `tracetest.config.yaml` file contains the basic setup of connecting Tracetest to the Postgres instance, and defining the trace data store and exporter. The data store is set to Tempo meaning the traces will be stored in Tempo and Tracetest will fetch them from Tempo when running tests. The exporter is set to the OpenTelemetry Collector.
+The `tracetest.config.yaml` file contains the basic setup of connecting Tracetest to the Postgres instance, and defining the trace data store and exporter. The data store is set to Tempo, meaning the traces will be stored in Tempo and Tracetest will fetch them from Tempo when running tests. The exporter is set to the OpenTelemetry Collector.
 
 But how does Tracetest fetch traces?
 
