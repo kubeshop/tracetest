@@ -1,4 +1,4 @@
-# Getting started with Tracetest using the CLI
+# Getting Started with Tracetest Using the CLI
 
 The CLI offers an **install wizard** that helps with the process. It helps configure Tracetest itself and all the tools needed to observe your application.
 
@@ -20,9 +20,9 @@ Tracetest CLI can be installed automatically using the following script:
 curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/install-cli.sh | bash
 ```
 
-It works for systems with Hombrew, `apt-get`, `dpkg`, `yum`, `rpm` installed, and if no package manager is available, it will try to download the build and install it manually.
+It works for systems with Homebrew, `apt-get`, `dpkg`, `yum`, `rpm` installed, and if no package manager is available, it will try to download the build and install it manually.
 
-You can also manually install with one of the following methods
+You can also manually install with one of the following methods.
 
 #### Homebrew
 
@@ -30,7 +30,7 @@ You can also manually install with one of the following methods
 brew install kubeshop/tracetest/tracetest
 ```
 
-#### apt
+#### APT
 
 ```sh
 # requirements for our deb repo to work
@@ -44,7 +44,7 @@ sudo apt-get update
 sudo apt-get install tracetest
 ```
 
-#### yum
+#### YUM
 
 ```sh
 # add repository
@@ -63,7 +63,7 @@ sudo yum install tracetest --refresh
 ### Windows
 Download one of the files from the latest tag, extract to your machine, and then [add the tracetest binary to your PATH variable](https://stackoverflow.com/a/41895179)
 
-## Install a Tracetest server for development with the CLI
+## Install a Tracetest Server for Development with the CLI
 
 This guide will help you get Tracetest running using the Tracetest CLI.
 
@@ -81,7 +81,7 @@ Postgres is a prerequisite for Tracetest to work. It stores Tracetest's trace da
 In this quick start, OpenTelemetry Collector is used to send traces directly to Tracetest. If you have an existing trace data source, [read here](../configuration/overview.md).
 :::
 
-### 1. Run the `server install` command
+### 1. Run the `server install` Command
 Once you've installed the CLI you can install a Tracetest server by running:
 
 ```bash
@@ -132,9 +132,9 @@ Select Docker Compose.
 Project's docker-compose file [docker-compose.yaml]:
 ```
 
-### 3. Generate a Docker Compose file
+### 3. Generate a Docker Compose File
 
-Add the name of the Docker Compose file if you have one, or just hit enter to proceed and add one.
+Add the name of the Docker Compose file, if you have one, or just hit enter to proceed and add one.
 
 ```text title="Expected output:"
 ERROR   File "docker-compose.yaml" does not exist. You need an existing docker-compose file.
@@ -143,7 +143,7 @@ Do you want me to create an empty docker-compose file? [Y/n]:
 
 Now, hit enter again and this will generate a default `docker-compose.yaml` file.
 
-### 4. Configure Jaeger as the trace data source
+### 4. Configure Jaeger as the Trace Data Source
 
 Next up you'll be prompted to connect a trace data store, if you have one.
 
@@ -183,7 +183,7 @@ This will generate an OpenTelemetry Collector config for you.
 Want to read in more detail how to use OpenTelemetry Collector? [Check this out](../configuration/connecting-to-data-stores/opentelemetry-collector).
 :::
 
-### (Optional) Enable a demo app
+### (Optional) Enable a Demo App
 
 In the next step, the CLI will ask if you want a demo app to try out your Tracetest config.
 
@@ -193,7 +193,7 @@ Do you want to enable the PokeShop demo app? (https://github.com/kubeshop/pokesh
 
 Proceed with `Y` again.
 
-### 6. Select output directory for Tracetest server installation
+### 6. Select Output Directory for Tracetest Server Installation
 
 Lastly, select the output directory where to store all files related to Tracetest. 
 

@@ -9,7 +9,7 @@ This is an example of a production-ready deployment, but real-world deployments 
 In this form, Tracetest runs in parallel to your Dockerized application,
 allowing you to interact with your app and its traces, create and run tests over them, etc.
 
-After installing the CLI, go ahead and run:
+After installing the CLI, run:
 
 ```bash
 tracetest server install
@@ -45,7 +45,7 @@ Select `Using Docker Compose` and follow the instructions.
 
 **How to start**:
 
-In the folder where you ran `tracetest server install` run this command to start the Tracetest cluster.
+In the folder where you ran `tracetest server install`, run this command to start the Tracetest cluster:
 
 ```bash
 docker compose -f docker-compose.yaml -f tracetest/docker-compose.yaml up

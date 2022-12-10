@@ -18,11 +18,11 @@ Tracetest uses your existing [OpenTelemetry](https://opentelemetry.io/docs/getti
 We make it possible to:
 
 - Define tests and assertions against every single microservice that a request goes through.
-- Use your preffered trace back-end, like Jaeger or Tempo, or OpenTelemetry Collector
+- Use your preferred trace back-end, like Jaeger or Tempo, or OpenTelemetry Collector.
 - Define multiple transaction triggers, such as a GET against an API endpoint, a GRPC request, etc.
-- Return both the response data and a full trace
-- Define assertions against trace data, ensuring both your response and the underlying processes worked correctly, quickly, and without errors
-- Save tests
+- Return both the response data and a full trace.
+- Define assertions against trace data, ensuring both your response and the underlying processes worked correctly, quickly, and without errors.
+- Save tests.
 - Run the tests manually or via CI build jobs with the Tracetest CLI.
 
 New to trace-based testing? Read more about the concepts, [here](./concepts/what-is-trace-based-testing).
@@ -31,7 +31,7 @@ New to trace-based testing? Read more about the concepts, [here](./concepts/what
 
 You need to add [OpenTelemetry instrumentation](https://opentelemetry.io/docs/instrumentation/) to your code and configure sending traces to a trace data store, or Tracetest directly, to benefit for Tracetest's trace-based testing.
 
-## Who uses Tracetest?
+## Who Uses Tracetest?
 
 Our users are typically developers or QA engineers building distributed systems with microservices using back-end languages like Go, Rust, Node.js, and Python.
 
@@ -40,10 +40,10 @@ Tracetest enables you to write detailed trace-based tests, primarily:
 - End-to-end tests
 - Integration tests
 
-## What makes Tracetest special?
+## What Makes Tracetest Special?
 
 Tracetest can be compared with Cypress or Selenium; however Tracetest is fundamentally different.
 
-Cypress and Selenium are constrained by using the browser for testing. Tracetest bypasses this entirely by using your existing OpenTelemetry instrumentation and trace data to run tests and assertions against traces in every step of a reqest transaction.
+Cypress and Selenium are constrained by using the browser for testing. Tracetest bypasses this entirely by using your existing OpenTelemetry instrumentation and trace data to run tests and assertions against traces in every step of a request transaction.
 
 Move on to the [Quick Start](./getting-started/installation.md) to hit the ground running!

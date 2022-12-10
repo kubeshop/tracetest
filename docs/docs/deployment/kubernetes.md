@@ -11,7 +11,7 @@ You can use a remote or local (minikube, kind, etc) cluster.
 
 We'll even help you setup a local cluster, if you need one.
 
-After installing the CLI, go ahead and run:
+After installing the CLI, run:
 
 ```bash
 tracetest server install
@@ -29,7 +29,7 @@ Select `Using Kubernetes` and follow the instructions.
 
 **Tools required (installed if missing)**:
 - kubectl
-- helm
+- Helm
 
 If you selected to run locally and want the installer to set up [minikube](https://minikube.sigs.k8s.io/docs/) for you:
 - Docker
@@ -42,7 +42,7 @@ If you selected to run locally and want the installer to set up [minikube](https
 - [PokeShop demo app](https://github.com/kubeshop/pokeshop/). A sample microservice app to test your Tracetest installation.
 
 **Result**:
-- `tracetest` helm chart deployed in the `tracetest` (configurable) namespace.
+- `tracetest` Helm chart deployed in the `tracetest` (configurable) namespace.
 - [Jaeger](https://www.jaegertracing.io/) instance deployed in the `tracetest` namespace, if selected.
 - [Cert Manager](https://cert-manager.io/), if selected.
 - [Jaeger Operator](https://www.jaegertracing.io/docs/latest/operator/), if selected.

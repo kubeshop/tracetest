@@ -1,6 +1,6 @@
 # Exporting Tests
 
-Tracetest allows you to export the different set of information displayed for assertions and checks in a way you can use it as input for other tools, create text based tests to use on your CI/CD pipelines using the CLI and more options.
+Tracetest allows you to export the different set of information displayed for assertions and checks for a way you can use it as input for other tools and create text based tests to use on your CI/CD pipelines using the CLI and more options.
 
 The current supported exports are:
 1. JUnit results XML.
@@ -19,6 +19,6 @@ The JUnit report contains the results from each of the assertions added to the t
 ## Test Definition YAML
 The Tracetest CLI allows you to execute text based tests. This means you can store all of your tests in a repo, keep track of the different versions and use them for your CI/CD process.
 An easy way to start is to export the test definition directly from the UI by selecting the option from the dropdown.
-The file viewer modal will popup where you can copy paste or download the file.
+The file viewer modal will pop up and you can copy paste or download the file.
 
 ![Export Trace Test Definition](../img/exports-test-definition.png)

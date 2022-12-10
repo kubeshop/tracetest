@@ -1,12 +1,12 @@
 # Quick Start - Node.js app with Tempo, OpenTelemetry and Tracetest
 
-This is a simple quick start on how to configure a Node.js app to use OpenTelemetry instrumentation with traces, and Tracetest for enhancing your e2e and integration tests with trace-based testing. The infrastructure will use Tempo as the trace data store, and OpenTelemetry Collector to receive traces from the Node.js app and send them to Tempo.
+This is a simple quick start on how to configure a Node.js app to use OpenTelemetry instrumentation with traces and Tracetest for enhancing your e2e and integration tests with trace-based testing. The infrastructure will use Tempo as the trace data store, and OpenTelemetry Collector to receive traces from the Node.js app and send them to Tempo.
 
 ## Prerequisites
 
 You will need [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed on your machine to run this quick start app!
 
-## Project structure
+## Project Structure
 
 The project is built with Docker Compose. It contains two distinct `docker-compose.yaml` files.
 
