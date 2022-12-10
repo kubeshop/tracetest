@@ -16,7 +16,7 @@ Postgres is a prerequisite for Tracetest to work. It stores Tracetest's trace da
 In this quick start, OpenTelemetry Collector is used to send traces directly to Tracetest. If you have an existing trace data source, [read here](../configuration/overview.md).
 :::
 
-## 1. Create a Docker Compose config
+## 1. Create a Docker Compose Config
 
 Create a `docker-compose.yaml` file:
 
