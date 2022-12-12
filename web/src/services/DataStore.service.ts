@@ -34,7 +34,7 @@ const DataStoreService = (): IDataStoreService => ({
     const dataStoreType = dataStores.find(({name}) => name === defaultDataStore)?.type;
     const type = (dataStoreType || SupportedDataStores.JAEGER) as SupportedDataStores;
 
-    return dataStoreServiceMap[type].getInitialValues(config, type);
+    return {...dataStoreServiceMap[type].getInitialValues(config, type), dataStoreType: type};
   },
 
   validateDraft(draft) {

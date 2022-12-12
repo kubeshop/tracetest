@@ -10,7 +10,8 @@ interface IProps {
 }
 
 const DataStore = ({dataStoreConfig}: IProps) => {
-  const {isLoading, isFormValid, onIsFormValid, onSaveConfig} = useSetupConfig();
+  const {isLoading, isFormValid, onIsFormValid, onSaveConfig, isTestConnectionLoading, onTestConnection} =
+    useSetupConfig();
 
   const [form] = Form.useForm<TDraftDataStore>();
 
@@ -20,6 +21,11 @@ const DataStore = ({dataStoreConfig}: IProps) => {
     },
     [onSaveConfig]
   );
+
+  const handleTestConnection = useCallback(async () => {
+    const draft = form.getFieldsValue();
+    onTestConnection(draft);
+  }, [form, onTestConnection]);
 
   return (
     <S.Wrapper data-cy="config-datastore-form">
@@ -49,10 +55,10 @@ const DataStore = ({dataStoreConfig}: IProps) => {
           </Button>
           <Button
             data-cy="config-datastore-submit"
-            loading={isLoading}
+            loading={isTestConnectionLoading}
             disabled={!isFormValid}
             type="primary"
-            onClick={() => console.log('@@test connection')}
+            onClick={handleTestConnection}
           >
             Test Connection
           </Button>

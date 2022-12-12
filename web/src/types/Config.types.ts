@@ -45,3 +45,5 @@ export type TDataStoreService = {
 export interface IDataStorePluginProps {}
 export interface IDataStorePluginMap
   extends Record<SupportedDataStores, (props: IDataStorePluginProps) => React.ReactElement> {}
+
+

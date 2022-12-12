@@ -31,10 +31,16 @@ const ConfigEndpoint = (builder: TTestApiEndpointBuilder) => ({
     invalidatesTags: [{type: TracetestApiTags.CONFIG, id: 'datastore'}],
   }),
   testConnection: builder.mutation<TTestConnectionResponse, TTestConnectionRequest>({
+    // remove comments once the real service is ready
     query: connectionTest => ({
-      url: `/config/connection`,
-      method: HTTP_METHOD.PUT,
-      body: connectionTest,
+      url: `/tests`,
+      // url: `/config/connection`,
+      method: HTTP_METHOD.GET,
+      // body: connectionTest,
+    }),
+    transformResponse: () => ({
+      successful: true,
+      // errorMessage: 'Error connecting to Data Store',
     }),
   }),
 });
