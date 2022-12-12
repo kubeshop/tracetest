@@ -5,6 +5,7 @@ import SignalFxService from './DataStores/SignalFx.service';
 
 interface IDataStoreService {
   getRequest(draft: TDraftDataStore): Promise<TRawDataStoreConfig>;
+  getDeleteRequest(): TRawDataStoreConfig;
   getInitialValues(config: TDataStoreConfig): TDraftDataStore;
   validateDraft(config: TDraftDataStore): Promise<boolean>;
 }
@@ -42,6 +43,15 @@ const DataStoreService = (): IDataStoreService => ({
     const dataStore = dataStoreServiceMap[dataStoreType];
 
     return dataStore.validateDraft(draft);
+  },
+
+  getDeleteRequest() {
+    const config: TRawDataStoreConfig = {
+      dataStores: [],
+      defaultDataStore: '',
+    };
+
+    return config;
   },
 });
 

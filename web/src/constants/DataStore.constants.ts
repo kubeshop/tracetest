@@ -8,8 +8,8 @@ export const SupportedDataStoresToName = {
 } as const;
 
 export const SupportedDataStoresToDocsLink = {
-  [SupportedDataStores.JAEGER]: 'https://docs.tracetest.io/run-locally/#installing-jaeger',
-  [SupportedDataStores.OpenSearch]: 'https://docs.tracetest.io/run-locally/#installing-jaeger',
-  [SupportedDataStores.SignalFX]: 'https://docs.tracetest.io/run-locally/#installing-jaeger',
-  [SupportedDataStores.TEMPO]: 'https://docs.tracetest.io/run-locally/#installing-jaeger',
+  [SupportedDataStores.JAEGER]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/jaeger',
+  [SupportedDataStores.OpenSearch]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/opensearch',
+  [SupportedDataStores.SignalFX]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/signalfx',
+  [SupportedDataStores.TEMPO]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/tempo',
 } as const;

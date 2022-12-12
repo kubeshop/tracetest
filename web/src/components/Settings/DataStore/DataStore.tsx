@@ -1,7 +1,7 @@
 import {Button, Form} from 'antd';
 import {useSetupConfig} from 'providers/DataStore/DataStore.provider';
 import {useCallback} from 'react';
-import {TDraftDataStore, TDataStoreConfig} from 'types/Config.types';
+import {TDraftDataStore, TDataStoreConfig, ConfigMode} from 'types/Config.types';
 import DataStoreForm from '../DataStoreForm';
 import * as S from './DataStore.styled';
 
@@ -10,9 +10,16 @@ interface IProps {
 }
 
 const DataStore = ({dataStoreConfig}: IProps) => {
-  const {isLoading, isFormValid, onIsFormValid, onSaveConfig, isTestConnectionLoading, onTestConnection} =
-    useSetupConfig();
-
+  const {
+    isLoading,
+    isFormValid,
+    onIsFormValid,
+    onSaveConfig,
+    isTestConnectionLoading,
+    onTestConnection,
+    onDeleteConfig,
+  } = useSetupConfig();
+  const isConfigReady = dataStoreConfig.mode === ConfigMode.READY;
   const [form] = Form.useForm<TDraftDataStore>();
 
   const handleOnSubmit = useCallback(
@@ -44,24 +51,41 @@ const DataStore = ({dataStoreConfig}: IProps) => {
           />
         </div>
         <S.ButtonsContainer>
-          <Button
-            data-cy="config-datastore-submit"
-            loading={isLoading}
-            type="primary"
-            ghost
-            onClick={() => form.submit()}
-          >
-            Save
-          </Button>
-          <Button
-            data-cy="config-datastore-submit"
-            loading={isTestConnectionLoading}
-            disabled={!isFormValid}
-            type="primary"
-            onClick={handleTestConnection}
-          >
-            Test Connection
-          </Button>
+          {isConfigReady ? (
+            <Button
+              data-cy="config-datastore-delete"
+              disabled={isLoading}
+              type="primary"
+              ghost
+              onClick={onDeleteConfig}
+              danger
+            >
+              Delete
+            </Button>
+          ) : (
+            <div />
+          )}
+          <S.SaveContainer>
+            <Button
+              data-cy="config-datastore-submit"
+              loading={isTestConnectionLoading}
+              disabled={!isFormValid}
+              type="primary"
+              ghost
+              onClick={handleTestConnection}
+            >
+              Test Connection
+            </Button>
+            <Button
+              data-cy="config-datastore-submit"
+              disabled={!isFormValid}
+              loading={isLoading}
+              type="primary"
+              onClick={() => form.submit()}
+            >
+              Save
+            </Button>
+          </S.SaveContainer>
         </S.ButtonsContainer>
       </S.FormContainer>
     </S.Wrapper>
