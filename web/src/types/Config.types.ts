@@ -29,8 +29,19 @@ export type TRawGRPCClientSettings = TConfigSchemas['GRPCClientSettings'];
 export type TTestConnectionRequest = TConfigSchemas['TestConnectionRequest'];
 export type TTestConnectionResponse = TConfigSchemas['TestConnectionResponse'];
 
+export interface IGRPCClientSettings extends TRawGRPCClientSettings {
+  fileCA: File;
+  fileCert: File;
+  fileKey: File;
+}
+
+interface IDataStore extends TRawDataStore {
+  jaeger?: IGRPCClientSettings;
+  tempo?: IGRPCClientSettings;
+}
+
 export type TDraftDataStore = {
-  dataStore?: TRawDataStore;
+  dataStore?: IDataStore;
   dataStoreType?: SupportedDataStores;
 };
 
@@ -45,5 +56,3 @@ export type TDataStoreService = {
 export interface IDataStorePluginProps {}
 export interface IDataStorePluginMap
   extends Record<SupportedDataStores, (props: IDataStorePluginProps) => React.ReactElement> {}
-
-
