@@ -1,8 +1,8 @@
-import {SupportedDataStores, TDataStoreService, TRawGRPCClientSettings} from 'types/Config.types';
+import {IGRPCClientSettings, SupportedDataStores, TDataStoreService, TRawGRPCClientSettings} from 'types/Config.types';
 
 const GrpcClientService = (): TDataStoreService => ({
-  getRequest({dataStore = {}}, dataStoreType = SupportedDataStores.JAEGER) {
-    const values = dataStore[dataStoreType || SupportedDataStores.JAEGER] as TRawGRPCClientSettings;
+  async getRequest({dataStore = {}}, dataStoreType = SupportedDataStores.JAEGER) {
+    const values = dataStore[dataStoreType || SupportedDataStores.JAEGER] as IGRPCClientSettings;
     const {
       endpoint = '',
       readBufferSize,
@@ -15,10 +15,16 @@ const GrpcClientService = (): TDataStoreService => ({
         insecure = true,
         insecureSkipVerify = false,
         serverName = '',
-        settings: {cAFile = '', certFile = '', keyFile = '', minVersion = '', maxVersion = ''} = {},
+        settings: {minVersion = '', maxVersion = ''} = {},
       } = {},
       auth = {},
+      fileCA,
+      fileCert,
+      fileKey,
     } = values;
+
+    const filesToText = [fileCA, fileCert, fileKey].map(file => (file ? file.text() : Promise.resolve(undefined)));
+    const [cAFile, certFile, keyFile] = await Promise.all(filesToText);
 
     return Promise.resolve({
       type: dataStoreType,
@@ -47,7 +53,7 @@ const GrpcClientService = (): TDataStoreService => ({
     });
   },
   validateDraft({dataStore = {}, dataStoreType}) {
-    const values = dataStore[dataStoreType || SupportedDataStores.JAEGER] as TRawGRPCClientSettings;
+    const values = dataStore[dataStoreType || SupportedDataStores.JAEGER] as IGRPCClientSettings;
     const {endpoint = ''} = values;
     if (!endpoint) return Promise.resolve(false);
 
@@ -96,6 +102,9 @@ const GrpcClientService = (): TDataStoreService => ({
             },
           },
           auth,
+          fileCA: cAFile ? new File([cAFile], 'fileCA') : undefined,
+          fileCert: certFile ? new File([certFile], 'fileCert') : undefined,
+          fileKey: keyFile ? new File([keyFile], 'fileKey') : undefined,
         },
       },
       dataStoreType,
