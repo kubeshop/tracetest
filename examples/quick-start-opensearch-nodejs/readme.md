@@ -111,7 +111,7 @@ Let's fix this by configuring Tracetest and OpenTelemetry Collector.
 
 The `docker-compose.yaml` in the `tracetest` directory is configured with four services.
 
-- **Postgres** - Postgres is a prerequisite for Tracetest to work. It stores trace data when running the trace-based tests. We're currently working on alternative databases. Stay tuned for more about that!
+- **Postgres** - Postgres is a prerequisite for Tracetest to work. It stores trace data when running the trace-based tests.
 - [**OpenTelemetry Collector**](https://opentelemetry.io/docs/collector/) - A vendor-agnostic implementation of how to receive, process and export telemetry data.
 - [**OpenSearch**](https://opensearch.org/) - Data store and search engine.
 - [**Tracetest**](https://tracetest.io/) - Trace-based testing that generates end-to-end tests automatically from traces.
