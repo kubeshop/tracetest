@@ -10,8 +10,15 @@ interface IProps {
 }
 
 const DataStore = ({dataStoreConfig}: IProps) => {
-  const {isLoading, isFormValid, onIsFormValid, onSaveConfig, isTestConnectionLoading, onTestConnection} =
-    useSetupConfig();
+  const {
+    isLoading,
+    isFormValid,
+    onIsFormValid,
+    onSaveConfig,
+    isTestConnectionLoading,
+    onTestConnection,
+    onDeleteConfig,
+  } = useSetupConfig();
 
   const [form] = Form.useForm<TDraftDataStore>();
 
@@ -46,22 +53,29 @@ const DataStore = ({dataStoreConfig}: IProps) => {
         <S.ButtonsContainer>
           <Button
             data-cy="config-datastore-submit"
-            loading={isLoading}
+            disabled={isLoading}
             type="primary"
             ghost
-            onClick={() => form.submit()}
+            onClick={onDeleteConfig}
+            danger
           >
-            Save
+            Delete
           </Button>
-          <Button
-            data-cy="config-datastore-submit"
-            loading={isTestConnectionLoading}
-            disabled={!isFormValid}
-            type="primary"
-            onClick={handleTestConnection}
-          >
-            Test Connection
-          </Button>
+          <S.SaveContainer>
+            <Button
+              data-cy="config-datastore-submit"
+              loading={isTestConnectionLoading}
+              disabled={!isFormValid}
+              type="primary"
+              ghost
+              onClick={handleTestConnection}
+            >
+              Test Connection
+            </Button>
+            <Button data-cy="config-datastore-submit" loading={isLoading} type="primary" onClick={() => form.submit()}>
+              Save
+            </Button>
+          </S.SaveContainer>
         </S.ButtonsContainer>
       </S.FormContainer>
     </S.Wrapper>
