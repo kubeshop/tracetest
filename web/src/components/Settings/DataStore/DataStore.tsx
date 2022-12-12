@@ -1,7 +1,7 @@
 import {Button, Form} from 'antd';
 import {useSetupConfig} from 'providers/DataStore/DataStore.provider';
 import {useCallback} from 'react';
-import {TDraftDataStore, TDataStoreConfig} from 'types/Config.types';
+import {TDraftDataStore, TDataStoreConfig, ConfigMode} from 'types/Config.types';
 import DataStoreForm from '../DataStoreForm';
 import * as S from './DataStore.styled';
 
@@ -19,7 +19,7 @@ const DataStore = ({dataStoreConfig}: IProps) => {
     onTestConnection,
     onDeleteConfig,
   } = useSetupConfig();
-
+  const isConfigReady = dataStoreConfig.mode === ConfigMode.READY;
   const [form] = Form.useForm<TDraftDataStore>();
 
   const handleOnSubmit = useCallback(
@@ -51,16 +51,20 @@ const DataStore = ({dataStoreConfig}: IProps) => {
           />
         </div>
         <S.ButtonsContainer>
-          <Button
-            data-cy="config-datastore-submit"
-            disabled={isLoading}
-            type="primary"
-            ghost
-            onClick={onDeleteConfig}
-            danger
-          >
-            Delete
-          </Button>
+          {isConfigReady ? (
+            <Button
+              data-cy="config-datastore-delete"
+              disabled={isLoading}
+              type="primary"
+              ghost
+              onClick={onDeleteConfig}
+              danger
+            >
+              Delete
+            </Button>
+          ) : (
+            <div />
+          )}
           <S.SaveContainer>
             <Button
               data-cy="config-datastore-submit"
@@ -72,7 +76,13 @@ const DataStore = ({dataStoreConfig}: IProps) => {
             >
               Test Connection
             </Button>
-            <Button data-cy="config-datastore-submit" loading={isLoading} type="primary" onClick={() => form.submit()}>
+            <Button
+              data-cy="config-datastore-submit"
+              disabled={!isFormValid}
+              loading={isLoading}
+              type="primary"
+              onClick={() => form.submit()}
+            >
               Save
             </Button>
           </S.SaveContainer>
