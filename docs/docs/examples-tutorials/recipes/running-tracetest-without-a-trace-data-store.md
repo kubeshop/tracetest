@@ -1,12 +1,14 @@
-# Quick Start - Node.js app with OpenSearch, OpenTelemetry and Tracetest
+# Running Tracetest without a Trace Data Store
 
-This is a simple quick start on how to configure a Node.js app to use OpenTelemetry instrumentation with traces, and Tracetest for enhancing your E2E and integration tests with trace-based testing. The infrastructure will use OpenSearch as the trace data store and OpenTelemetry Collector to receive traces from the Node.js app and send them to OpenSearch.
+## Sample Node.js app with OpenTelemetry and Tracetest
+
+This is a simple quick start on how to configure a Node.js app to use OpenTelemetry instrumentation with traces, and Tracetest for enhancing your e2e and integration tests with trace-based testing.
 
 ## Prerequisites
 
 You will need [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed on your machine to run this quick start app!
 
-## Project Structure
+## Project structure
 
 The project is built with Docker Compose. It contains two distinct `docker-compose.yaml` files.
 
@@ -14,12 +16,12 @@ The project is built with Docker Compose. It contains two distinct `docker-compo
 The `docker-compose.yaml` file and `Dockerfile` in the root directory are for the Node.js app.
 
 ### 2. Tracetest
-The `docker-compose.yaml` file, `collector.config.yaml`, and `tracetest.config.yaml` in the `tracetest` directory are for the setting up Tracetest, OpenSearch, and the OpenTelemetry Collector.
+The `docker-compose.yaml` file, `collector.config.yaml`, and `tracetest.config.yaml` in the `tracetest` directory are for the setting up Tracetest and the OpenTelemetry Collector.
 
 The `tracetest` directory is self-contained and will run all the prerequisites for enabling OpenTelemetry traces and trace-based testing with Tracetest.
 
 ### Docker Compose Network
-All `services` in the `docker-compose.yaml` are on the same network and will be reachable by hostname from within other services. E.g. `data-prepper:21890` in the `collector.config.yaml` will map to the `data-prepper` service, where the port `21890` is the port where the Data Prepper accepts traces. And, `http://opensearch:9200` in the `tracetest.config.yaml` will map to the `opensearch` service and port `9200` where Tracetest will fetch trace data from OpenSearch.
+All `services` in the `docker-compose.yaml` are on the same network and will be reachable by hostname from within other services. E.g. `tracetest:21321` in the `collector.config.yaml` will map to the `tracetest` service, where the port `21321` is the port where Tracetest accepts traces.
 
 ## Node.js app
 
@@ -64,7 +66,7 @@ In the `package.json` you will see two npm script for running the respective tra
 },
 ```
 
-To start the server, run this command.
+To start the server you run this command.
 
 ```bash
 npm run with-grpc-tracer
@@ -109,27 +111,18 @@ Let's fix this by configuring Tracetest and OpenTelemetry Collector.
 
 ## Tracetest
 
-The `docker-compose.yaml` in the `tracetest` directory is configured with four services.
+The `docker-compose.yaml` in the `tracetest` directory is configured with three services.
 
 - **Postgres** - Postgres is a prerequisite for Tracetest to work. It stores trace data when running the trace-based tests. We're currently working on alternative databases. Stay tuned for more about that!
 - [**OpenTelemetry Collector**](https://opentelemetry.io/docs/collector/) - A vendor-agnostic implementation of how to receive, process and export telemetry data.
-- [**OpenSearch**](https://opensearch.org/) - Data store and search engine.
 - [**Tracetest**](https://tracetest.io/) - Trace-based testing that generates end-to-end tests automatically from traces.
-
-They will start in this order:
-
-1. Postgres
-2. OpenSearch
-3. Data Prepper
-4. OpenTelemetry Collector
-5. Tracetest
 
 ```yaml
 version: '3'
 services:
 
   tracetest:
-    image: kubeshop/tracetest:v0.8.0
+    image: kubeshop/tracetest
     volumes:
       - ./tracetest/tracetest.config.yaml:/app/config.yaml
     ports:
@@ -163,48 +156,10 @@ services:
       - "/otel-local-config.yaml"
     volumes:
       - ./tracetest/collector.config.yaml:/otel-local-config.yaml
-    depends_on:
-      data-prepper:
-        condition: service_started
-
-  data-prepper:
-    restart: unless-stopped
-    image: opensearchproject/data-prepper:1.5.1
-    volumes:
-      - ./tracetest/opensearch/opensearch-analytics.yaml:/usr/share/data-prepper/pipelines.yaml
-      - ./tracetest/opensearch/opensearch-data-prepper-config.yaml:/usr/share/data-prepper/data-prepper-config.yaml
-    depends_on:
-      opensearch:
-        condition: service_healthy
-
-  opensearch:
-    image: opensearchproject/opensearch:2.3.0
-    environment:
-      - discovery.type=single-node
-      - bootstrap.memory_lock=true # along with the memlock settings below, disables swapping
-      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m" # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
-    volumes:
-      - ./tracetest/opensearch/opensearch.yaml:/usr/share/opensearch/config/opensearch.yml
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-      nofile:
-        soft: 65536 # maximum number of open files for the OpenSearch user, set to at least 65536 on modern systems
-        hard: 65536
-    healthcheck:
-      test: curl -s http://localhost:9200 >/dev/null || exit 1
-      interval: 5s
-      timeout: 10s
-      retries: 5
 
 ```
 
-Tracetest depends on Postgres and the OpenTelemetry Collector. The OpenTelemetry Collector depends on the Data Prepper that then depends on OpenSearch.
-
-Both Tracetest and the OpenTelemetry Collector require config files to be loaded via a volume. The volumes are mapped from the root directory into the `tracetest` directory and the respective config files.
-
-OpenSearch and Data Prepper require config files to be loaded via a volume as well. The volumes are mapped from the root directory into the `tracetest/opensearch` directory and the respective config files. Data Prepper will receive trace data from OpenTelemetry Collector and send them along to OpenSearch.
+Tracetest depends on both Postgres and the OpenTelemetry Collector. Both Tracetest and the OpenTelemetry Collector require config files to be loaded via a volume. The volumes are mapped from the root directory into the `tracetest` directory and the respective config files.
 
 **Why?** To start both the Node.js app and Tracetest we will run this command:
 
@@ -212,58 +167,42 @@ OpenSearch and Data Prepper require config files to be loaded via a volume as we
 docker-compose -f docker-compose.yaml -f tracetest/docker-compose.yaml up # add --build if the images are not built already
 ```
 
-The `tracetest.config.yaml` file contains the basic setup of connecting Tracetest to the Postgres instance and defines the trace data store and exporter. The data store is set to OpenSearch, meaning the traces will be stored in OpenSearch and Tracetest will fetch them from OpenSearch when running tests. The exporter is set to the OpenTelemetry Collector.
-
-But how does Tracetest fetch traces?
-
-Tracetest connects to OpenSearch to fetch trace data:
-
-```yaml
-opensearch:
-  type: opensearch
-  opensearch:
-    addresses:
-      - http://opensearch:9200
-    index: traces
-```
-
-Here's the full `tracetest.config.yaml`:
+The `tracetest.config.yaml` file contains the basic setup of connecting Tracetest to the Postgres instance, and defining the trace data store and exporter. The data store is set to OTLP meaning the traces will be stored in Tracetest itself. The exporter is set to the OpenTelemetry Collector.
 
 ```yaml
 postgresConnString: "host=postgres user=postgres password=postgres port=5432 sslmode=disable"
 
 poolingConfig:
-  maxWaitTimeForTrace: 10m
-  retryDelay: 5s
+  maxWaitTimeForTrace: 10s
+  retryDelay: 1s
 
 googleAnalytics:
   enabled: true
 
-demo:
-  enabled: []
-
-experimentalFeatures: []
-
 telemetry:
   dataStores:
-    jaeger:
-      type: jaeger
-      jaeger:
-        endpoint: jaeger:16685
-        tls:
-          insecure: true
+    otlp:
+      type: otlp
+  exporters:
+    collector:
+      serviceName: tracetest
+      sampling: 100 # 100%
+      exporter:
+        type: collector
+        collector:
+          endpoint: otel-collector:4317
 
 server:
   telemetry:
-    dataStore: jaeger
+    dataStore: otlp
     exporter: collector
     applicationExporter: collector
 
 ```
 
-How do traces reach Jaeger?
+But how are traces sent to Tracetest?
 
-The `collector.config.yaml` explains that. It receives traces via either `grpc` or `http`. Then it exports them to the Data Prepper that will parse the trace data and send it to OpenSearch. Data Prepper uses the endpoint `data-prepper:21890`.
+The `collector.config.yaml` explains that. It receives traces via either `grpc` or `http`. Then, exports them to Tracetest's otlp endpoint `tracetest:21321`.
 
 ```yaml
 receivers:
@@ -273,30 +212,37 @@ receivers:
       http:
 
 processors:
+  tail_sampling:
+    decision_wait: 5s
+    policies:
+      - name: tracetest-spans
+        type: trace_state
+        trace_state: { key: tracetest, values: ["true"] }
   batch:
     timeout: 100ms
 
 exporters:
   logging:
     loglevel: debug
-  otlp/2:
-    endpoint: data-prepper:21890
+  otlp/1:
+    endpoint: tracetest:21321 # Send traces to Tracetest. Read more in docs here. (TODO ADD LINK)
     tls:
       insecure: true
-      insecure_skip_verify: true
 
 service:
   pipelines:
-    traces:
+    traces/1:
       receivers: [otlp]
-      processors: [batch]
-      exporters: [otlp/2]
+      processors: [tail_sampling, batch]
+      exporters: [otlp/1]
 
 ```
 
-## Run Both the Node.js app and Tracetest
+**Important!** Take a closer look at the sampling configs in both the `collector.config.yaml` and `tracetest.config.yaml`. They both set sampling to 100%. This is crucial when running trace-based e2e and integration tests.
 
-To start both the Node.js app and Tracetest, run this command:
+## Run both the Node.js app and Tracetest
+
+To start both the Node.js app and Tracetest we will run this command:
 
 ```bash
 docker-compose -f docker-compose.yaml -f tracetest/docker-compose.yaml up # add --build if the images are not built already
@@ -306,4 +252,4 @@ This will start your Tracetest instance on `http://localhost:11633/`. Go ahead a
 
 Start creating tests! Make sure to use the `http://app:8080/` url in your test creation, because your Node.js app and Tracetest are in the same network.
 
-Feel free to check out our [docs](https://docs.tracetest.io/), and join our [Discord Community](https://discord.gg/8MtcMrQNbX) for more info!
+Feel free to check out our [examples in GitHub](https://github.com/kubeshop/tracetest/tree/main/examples), and join our [Discord Community](https://discord.gg/8MtcMrQNbX) for more info!

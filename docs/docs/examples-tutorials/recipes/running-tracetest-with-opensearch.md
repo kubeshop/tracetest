@@ -1,4 +1,6 @@
-# Quick Start - Node.js app with OpenSearch, OpenTelemetry and Tracetest
+# Running Tracetest with OpenSearch
+
+## Sample Node.js app with OpenSearch, OpenTelemetry and Tracetest
 
 This is a simple quick start on how to configure a Node.js app to use OpenTelemetry instrumentation with traces, and Tracetest for enhancing your E2E and integration tests with trace-based testing. The infrastructure will use OpenSearch as the trace data store and OpenTelemetry Collector to receive traces from the Node.js app and send them to OpenSearch.
 
@@ -306,4 +308,4 @@ This will start your Tracetest instance on `http://localhost:11633/`. Go ahead a
 
 Start creating tests! Make sure to use the `http://app:8080/` url in your test creation, because your Node.js app and Tracetest are in the same network.
 
-Feel free to check out our [docs](https://docs.tracetest.io/), and join our [Discord Community](https://discord.gg/8MtcMrQNbX) for more info!
+Feel free to check out our [examples in GitHub](https://github.com/kubeshop/tracetest/tree/main/examples), and join our [Discord Community](https://discord.gg/8MtcMrQNbX) for more info!

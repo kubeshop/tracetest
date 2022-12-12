@@ -274,15 +274,6 @@ telemetry:
         tls:
           insecure: true
 
-  exporters:
-    collector:
-      serviceName: tracetest
-      sampling: 100 # 100%
-      exporter:
-        type: collector
-        collector:
-          endpoint: otel-collector:4317
-
 server:
   telemetry:
     dataStore: tempo
@@ -306,9 +297,6 @@ receivers:
 processors:
   batch:
     timeout: 100ms
-  probabilistic_sampler:
-    hash_seed: 22
-    sampling_percentage: 100
 
 exporters:
   logging:
@@ -322,12 +310,10 @@ service:
   pipelines:
     traces:
       receivers: [otlp]
-      processors: [probabilistic_sampler, batch]
+      processors: [batch]
       exporters: [otlp/2]
 
 ```
-
-**Important!** Take a closer look at the sampling configs in both the `collector.config.yaml` and `tracetest.config.yaml`. They both set sampling to 100%. This is crucial when running trace-based e2e and integration tests.
 
 ## Run both the Node.js app and Tracetest
 

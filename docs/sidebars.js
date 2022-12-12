@@ -266,11 +266,37 @@ const sidebars = {
           id: "examples-tutorials/overview",
           label: "Overview",
         },
-        // {
-        //   type: "doc",
-        //   id: "examples-tutorials/recipes",
-        //   label: "Recipes",
-        // },
+        {
+          type: "category",
+          label: "Recipes",
+          items: [
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes",
+              label: "Overview",
+            },
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/running-tracetest-without-a-trace-data-store",
+              label: "Running Tracetest Without a Trace Data Store",
+            },
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/running-tracetest-with-jaeger",
+              label: "Running Tracetest With Jaeger",
+            },
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/running-tracetest-with-opensearch",
+              label: "Running Tracetest With OpenSearch",
+            },
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/running-tracetest-with-tempo",
+              label: "Running Tracetest With Tempo",
+            },
+          ],
+        },
       ],
     },
     {
