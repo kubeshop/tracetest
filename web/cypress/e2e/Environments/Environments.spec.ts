@@ -31,7 +31,7 @@ function deleteEnvironment() {
   cy.intercept({method: 'DELETE', url: '/api/environments/*'}).as('deleteEnvironment');
   cy.intercept({method: 'GET', url: '/api/environments?take=20&skip=0*'}).as('getEnvironments');
 
-  cy.get('[data-cy=delete-confirmation-modal] .ant-btn-primary').click();
+  cy.get('[data-cy=confirmation-modal] .ant-btn-primary').click();
   cy.wait('@deleteEnvironment');
   cy.wait('@getEnvironments');
 }

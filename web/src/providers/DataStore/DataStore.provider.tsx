@@ -1,10 +1,11 @@
 import {noop} from 'lodash';
 import {createContext, useCallback, useContext, useMemo, useState} from 'react';
+import {notification} from 'antd';
+import {useTheme} from 'styled-components';
 import {useTestConnectionMutation, useUpdateDatastoreConfigMutation} from 'redux/apis/TraceTest.api';
 import {TDraftDataStore} from 'types/Config.types';
 import DataStoreService from 'services/DataStore.service';
-import {notification} from 'antd';
-import {useTheme} from 'styled-components';
+import {useConfirmationModal} from '../ConfirmationModal/ConfirmationModal.provider';
 
 interface IContext {
   isFormValid: boolean;
@@ -34,16 +35,27 @@ const DataStoreProvider = ({children}: IProps) => {
   const [updateConfig, {isLoading}] = useUpdateDatastoreConfigMutation();
   const [testConnection, {isLoading: isTestConnectionLoading}] = useTestConnectionMutation();
   const [isFormValid, setIsFormValid] = useState(false);
+  const {onOpen} = useConfirmationModal();
   const [api, contextHolder] = notification.useNotification();
   const {
     notification: {success, error},
   } = useTheme();
 
-  const onSaveConfig = useCallback(async (draft: TDraftDataStore) => {
-    const configRequest = await DataStoreService.getRequest(draft);
-    console.log('@@saving draft', draft, configRequest);
-    // const config = await updateConfig(configRequest).unwrap();
-  }, []);
+  const onSaveConfig = useCallback(
+    async (draft: TDraftDataStore) => {
+      onOpen({
+        title: 'Tracetest is about to be restarted and there will be some downtime. Please confirm to continue.',
+        heading: 'Save Confirmation',
+        okText: 'Confirm',
+        onConfirm: async () => {
+          const configRequest = await DataStoreService.getRequest(draft);
+          console.log('@@saving draft', draft, configRequest);
+          // const config = await updateConfig(configRequest).unwrap();
+        },
+      });
+    },
+    [onOpen]
+  );
 
   const onIsFormValid = useCallback((isValid: boolean) => {
     setIsFormValid(isValid);
