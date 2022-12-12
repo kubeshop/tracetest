@@ -1,5 +1,4 @@
 import {Form} from 'antd';
-import React from 'react';
 import Editor from 'components/Editor';
 import {SupportedEditors} from 'constants/Editor.constants';
 import * as S from '../RequestDetails.styled';
@@ -9,26 +8,26 @@ interface IProps {
   baseName: string[];
 }
 
-export const BasicFields = ({baseName}: IProps) => (
+export const ApiKeyFieldsBase = ({baseName}: IProps) => (
   <S.Row>
     <R.FlexContainer>
       <Form.Item
+        data-cy="apiKey-key"
         style={{flexBasis: '50%', marginTop: '26px'}}
-        name={[...baseName, 'basic', 'username']}
-        data-cy="basic-username"
-        label="Username"
+        name={[...baseName, 'apiKey', 'key']}
+        label="Key"
         rules={[{required: true}]}
       >
-        <Editor type={SupportedEditors.Interpolation} />
+        <Editor type={SupportedEditors.Interpolation} placeholder="Enter key" />
       </Form.Item>
       <Form.Item
+        data-cy="apiKey-value"
         style={{flexBasis: '50%', marginTop: '26px'}}
-        name={[...baseName, 'basic', 'password']}
-        label="Password"
-        data-cy="basic-password"
+        name={[...baseName, 'apiKey', 'value']}
+        label="Value"
         rules={[{required: true}]}
       >
-        <Editor type={SupportedEditors.Interpolation} />
+        <Editor type={SupportedEditors.Interpolation} placeholder="Enter value" />
       </Form.Item>
     </R.FlexContainer>
   </S.Row>
