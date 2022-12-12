@@ -35,7 +35,10 @@ const EnvironmentContent = () => {
   };
 
   const handleOnDelete = (id: string) => {
-    onOpen(`Are you sure you want to delete the environment?`, () => deleteEnvironment({environmentId: id}));
+    onOpen({
+      title: `Are you sure you want to delete the environment?`,
+      onConfirm: () => deleteEnvironment({environmentId: id}),
+    });
   };
 
   return (

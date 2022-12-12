@@ -38,7 +38,7 @@ Cypress.Commands.add('deleteTest', (shouldIntercept = false) => {
     cy.get(`[data-cy=test-actions-button-${localTestId}]`, {timeout: 10000}).should('be.visible');
     cy.get(`[data-cy=test-actions-button-${localTestId}]`).click({force: true});
     cy.get('[data-cy=test-card-delete]').click();
-    cy.get('[data-cy=delete-confirmation-modal] .ant-btn-primary').click();
+    cy.get('[data-cy=confirmation-modal] .ant-btn-primary').click();
     cy.wait('@testDelete');
     cy.get(`[data-cy=test-actions-button-${localTestId}]`).should('not.exist');
     cy.wait('@testList');
@@ -244,7 +244,7 @@ Cypress.Commands.add('deleteTransaction', () => {
     cy.get(`[data-cy=test-actions-button-${localTestId}]`, {timeout: 10000}).should('be.visible');
     cy.get(`[data-cy=test-actions-button-${localTestId}]`).click({force: true});
     cy.get('[data-cy=test-card-delete]').click();
-    cy.get('[data-cy=delete-confirmation-modal] .ant-btn-primary').click();
+    cy.get('[data-cy=confirmation-modal] .ant-btn-primary').click();
     cy.wait('@transactionDelete');
     cy.get(`[data-cy=test-actions-button-${localTestId}]`).should('not.exist');
     cy.wait('@testList');

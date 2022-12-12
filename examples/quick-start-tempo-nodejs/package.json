@@ -1,0 +1,20 @@
+{
+  "name": "quick-start-nodejs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "with-grpc-tracer":"node -r ./tracing.otel.grpc.js app.js",
+    "with-http-tracer":"node -r ./tracing.otel.http.js app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@opentelemetry/auto-instrumentations-node": "^0.33.1",
+    "@opentelemetry/exporter-trace-otlp-grpc": "^0.34.0",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.33.0",
+    "@opentelemetry/sdk-node": "^0.33.0",
+    "express": "^4.18.2"
+  }
+}

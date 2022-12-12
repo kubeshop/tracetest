@@ -33,5 +33,20 @@ declare module 'styled-components' {
     font: {
       family: string;
     };
+
+    notification: {
+      success: {
+        style: {
+          border: string;
+          background: string;
+        };
+      };
+      error: {
+        style: {
+          border: string;
+          background: string;
+        };
+      };
+    };
   }
 }

@@ -3,9 +3,16 @@ import {createContext, useCallback, useContext, useMemo, useState} from 'react';
 import ConfirmationModal from 'components/ConfirmationModal';
 
 type TOnConfirm = typeof noop;
+type TOnOPenProps = {
+  title: string;
+  heading?: string;
+  okText?: string;
+  cancelText?: string;
+  onConfirm: TOnConfirm;
+};
 
 interface IContext {
-  onOpen(title: string, onConfirm: TOnConfirm, heading?: string): void;
+  onOpen(props: TOnOPenProps): void;
 }
 
 export const Context = createContext<IContext>({
@@ -19,16 +26,18 @@ interface IProps {
 export const useConfirmationModal = () => useContext(Context);
 
 const ConfirmationModalProvider = ({children}: IProps) => {
-  const [title, setTitle] = useState<string>('');
-  const [heading, setHeading] = useState<string>('');
-  const [onConfirm, setOnConfirm] = useState<TOnConfirm>(() => noop);
+  const [{title, heading, okText, cancelText, onConfirm}, setProps] = useState<TOnOPenProps>({
+    title: '',
+    heading: '',
+    okText: '',
+    cancelText: '',
+    onConfirm: noop,
+  });
   const [isOpen, setIsOpen] = useState(false);
 
-  const onOpen = useCallback((newTitle: string, onConfirmFn: TOnConfirm, newHeading = 'Delete Confirmation') => {
-    setTitle(newTitle);
-    setOnConfirm(() => onConfirmFn);
+  const onOpen = useCallback((newProps: TOnOPenProps) => {
+    setProps(newProps);
     setIsOpen(true);
-    setHeading(newHeading);
   }, []);
 
   const triggerConfirm = useCallback(() => {
@@ -47,6 +56,8 @@ const ConfirmationModalProvider = ({children}: IProps) => {
         isOpen={isOpen}
         title={title}
         heading={heading}
+        okText={okText}
+        cancelText={cancelText}
       />
     </Context.Provider>
   );

@@ -5,12 +5,16 @@ import {SupportedEditors} from 'constants/Editor.constants';
 import * as S from '../RequestDetails.styled';
 import * as R from './RequestDetailsAuthInput.styled';
 
-export const basicFields: React.ReactElement = (
+interface IProps {
+  baseName: string[];
+}
+
+export const BasicFields = ({baseName}: IProps) => (
   <S.Row>
     <R.FlexContainer>
       <Form.Item
         style={{flexBasis: '50%', marginTop: '26px'}}
-        name={['auth', 'basic', 'username']}
+        name={[...baseName, 'basic', 'username']}
         data-cy="basic-username"
         label="Username"
         rules={[{required: true}]}
@@ -19,7 +23,7 @@ export const basicFields: React.ReactElement = (
       </Form.Item>
       <Form.Item
         style={{flexBasis: '50%', marginTop: '26px'}}
-        name={['auth', 'basic', 'password']}
+        name={[...baseName, 'basic', 'password']}
         label="Password"
         data-cy="basic-password"
         rules={[{required: true}]}

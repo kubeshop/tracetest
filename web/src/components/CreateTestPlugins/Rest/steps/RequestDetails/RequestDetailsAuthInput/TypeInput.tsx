@@ -1,5 +1,4 @@
-import {Form, FormInstance, Select} from 'antd';
-import {TRequestAuth} from 'types/Test.types';
+import {Form, Select} from 'antd';
 import * as S from '../RequestDetails.styled';
 
 const authMethodList = [
@@ -22,19 +21,17 @@ const authMethodList = [
 ] as const;
 
 interface IProps {
-  form: FormInstance<Partial<{auth: TRequestAuth}>>;
+  baseName: string[];
 }
 
-const TypeInput = ({form}: IProps) => (
+const TypeInput = ({baseName}: IProps) => (
   <S.Row>
-    <Form.Item shouldUpdate style={{minWidth: '100%'}} label="Authorization Type" name={['auth', 'type']}>
+    <Form.Item shouldUpdate style={{minWidth: '100%'}} label="Authorization Type" name={[...baseName, 'type']}>
       <Select
         className="select-auth-method"
         data-cy="auth-type-select"
         dropdownClassName="select-dropdown-auth-type"
         placeholder="No Auth"
-        allowClear
-        onClear={() => form.resetFields(['auth'])}
       >
         {authMethodList.map(({name, value}) => (
           <Select.Option data-cy={`auth-type-select-option-${value}`} key={value} value={value}>

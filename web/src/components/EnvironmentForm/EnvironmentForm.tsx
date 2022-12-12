@@ -36,7 +36,7 @@ const EnvironmentForm = ({form, initialValues, onSubmit, onValidate}: IProps) =>
       <RequestDetailsHeadersInput
         initialValue={form.getFieldValue('values') || DEFAULT_VALUES}
         label="Values"
-        name="values"
+        name={['values']}
         unit="Key"
       />
     </Form>

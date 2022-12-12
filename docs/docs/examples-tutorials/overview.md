@@ -1,4 +1,4 @@
-# Examples Overview
+# Overview
 
 Below you can find tutorials to help you get started with Tracetest.
 
@@ -53,3 +53,7 @@ Check out the following videos with Tracetest-related content:
 
 - Recorded livestream: [Introduction to Tracetest - E2E Tests Powered by OpenTelemetry](https://youtu.be/mqwJRxqBNCg) - June 23, 2022
 
+- Observability-driven development 3-part video tutorial - November 24, 2022:
+    - [Part 1](https://www.youtube.com/watch?v=LXVBnPqxspY)
+    - [Part 2](https://www.youtube.com/watch?v=gLl_QmIU7UA)
+    - [Part 3](https://www.youtube.com/watch?v=lHMDDyAtxWE)
