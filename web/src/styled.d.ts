@@ -20,6 +20,7 @@ declare module 'styled-components' {
       textSecondary: string;
       white: string;
       warningYellow: string;
+      alertYellow: string;
     };
     /** Font size */
     size: {

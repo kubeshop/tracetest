@@ -16,6 +16,7 @@ export const theme: DefaultTheme = {
     textSecondary: '#687492',
     white: '#FFFFFF',
     warningYellow: '#FAAD14',
+    alertYellow: '#fffbe6',
   },
   size: {
     xs: '10px',

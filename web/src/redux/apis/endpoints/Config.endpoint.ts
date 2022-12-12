@@ -19,7 +19,7 @@ const ConfigEndpoint = (builder: TTestApiEndpointBuilder) => ({
     transformResponse: () =>
       DataStoreConfigMock.model({
         dataStores: [{name: 'jaeger', type: SupportedDataStores.JAEGER}],
-        defaultDataStore: 'jaeger',
+        defaultDataStore: 'jaeger1',
       }),
   }),
   updateDatastoreConfig: builder.mutation<undefined, TRawDataStoreConfig>({
