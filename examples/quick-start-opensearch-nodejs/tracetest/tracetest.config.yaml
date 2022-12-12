@@ -1,0 +1,28 @@
+postgresConnString: "host=postgres user=postgres password=postgres port=5432 sslmode=disable"
+
+poolingConfig:
+  maxWaitTimeForTrace: 10m
+  retryDelay: 5s
+
+googleAnalytics:
+  enabled: true
+
+demo:
+  enabled: []
+
+experimentalFeatures: []
+
+telemetry:
+  dataStores:
+    opensearch:
+      type: opensearch
+      opensearch:
+        addresses:
+          - http://opensearch:9200
+        index: traces
+
+server:
+  telemetry:
+    dataStore: opensearch
+    exporter: collector
+    applicationExporter: collector

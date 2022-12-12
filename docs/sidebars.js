@@ -24,11 +24,6 @@ const sidebars = {
       id: "index",
       label: "Introduction",
     },
-    // {
-    //   type: "doc",
-    //   id: "quick-start",
-    //   label: "Quick Start",
-    // },
     {
       type: "category",
       label: "Getting Started",
@@ -36,70 +31,229 @@ const sidebars = {
         {
           type: "doc",
           id: "getting-started/installation",
-          label: "Installation",
+          label: "Quick Start",
         },
         {
           type: "doc",
-          id: "getting-started/supported-backends",
-          label: "Supported back ends",
+          id: "getting-started/docker",
+          label: "Docker",
         },
         {
           type: "doc",
-          id: "getting-started/accessing-dashboard",
-          label: "Accessing the Tracetest dashboard",
+          id: "getting-started/cli",
+          label: "CLI",
         },
       ],
     },
     {
       type: "category",
-      label: "Using Tracetest", // should be renamed to "Guides"
+      label: "Configuration",
       items: [
         {
           type: "doc",
-          id: "using-tracetest/create-test",
-          label: "Create a test",
+          id: "configuration/overview",
+          label: "Overview",
+        },
+        // {
+        //   type: "doc",
+        //   id: "configuration/config-file-reference",
+        //   label: "Config File Reference",
+        // },
+        {
+          type: "category",
+          label: "Connecting to Data Stores",
+          items: [
+            {
+              type: "doc",
+              id: "configuration/connecting-to-data-stores/opentelemetry-collector",
+              label: "OpenTelemetry Collector",
+            },
+            {
+              type: "doc",
+              id: "configuration/connecting-to-data-stores/jaeger",
+              label: "Jaeger",
+            },
+            {
+              type: "doc",
+              id: "configuration/connecting-to-data-stores/opensearch",
+              label: "OpenSearch",
+            },
+            {
+              type: "doc",
+              id: "configuration/connecting-to-data-stores/signalfx",
+              label: "SignalFX",
+            },
+            {
+              type: "doc",
+              id: "configuration/connecting-to-data-stores/tempo",
+              label: "Tempo",
+            },
+          ],
+        },
+      ],
+    },
+    {
+      type: "category",
+      label: "Deployment",
+      items: [
+        {
+          type: "doc",
+          id: "deployment/overview",
+          label: "Deployment Overview",
+        },
+        // {
+        //   type: "doc",
+        //   id: "deployment/production-checklist",
+        //   label: "Production checklist",
+        // },
+        {
+          type: "doc",
+          id: "deployment/docker",
+          label: "Docker",
         },
         {
           type: "doc",
-          id: "using-tracetest/test-results",
-          label: "Test results",
+          id: "deployment/kubernetes",
+          label: "Kubernetes",
+        },
+      ],
+    },
+    {
+      type: "category",
+      label: "Concepts",
+      items: [
+        {
+          type: "doc",
+          id: "concepts/what-is-trace-based-testing",
+          label: "What is trace-based testing",
+        },
+        // {
+        //   type: "doc",
+        //   id: "concepts/what-is-tracing",
+        //   label: "What is tracing",
+        // },
+        {
+          type: "doc",
+          id: "concepts/architecture",
+          label: "Architecture",
         },
         {
           type: "doc",
-          id: "using-tracetest/adding-assertions",
-          label: "Adding assertions",
+          id: "concepts/assertions",
+          label: "Assertions",
+        },
+        // {
+        //   type: "doc",
+        //   id: "concepts/data-stores",
+        //   label: "Data Stores",
+        // },
+        {
+          type: "doc",
+          id: "concepts/environments",
+          label: "Environments",
         },
         {
           type: "doc",
-          id: "using-tracetest/versioning",
+          id: "concepts/selectors",
+          label: "Selectors",
+        },
+        // {
+        //   type: "doc",
+        //   id: "concepts/tests",
+        //   label: "Tests",
+        // },
+        {
+          type: "doc",
+          id: "concepts/expressions",
+          label: "Expressions",
+        },
+        {
+          type: "doc",
+          id: "concepts/transactions",
+          label: "Transactions",
+        },
+        {
+          type: "doc",
+          id: "concepts/versioning",
           label: "Versioning",
         },
       ],
     },
     {
       type: "category",
-      label: "Command Line Interface", // should be renamed to "CLI"
+      label: "Web UI",
       items: [
+        // {
+        //   type: "doc",
+        //   id: "web-ui/creating-environments",
+        //   label: "Creating environments",
+        // },
         {
           type: "doc",
-          id: "cli/command-line-tool",
-          label: "Command line tool",
+          id: "web-ui/creating-tests",
+          label: "Creating tests",
         },
         {
           type: "doc",
-          id: "cli/test-definition-file",
-          label: "Test definition file",
+          id: "web-ui/creating-test-specifications",
+          label: "Creating test specifications",
+        },
+        {
+          type: "doc",
+          id: "web-ui/test-results",
+          label: "Test results",
+        },
+        // {
+        //   type: "doc",
+        //   id: "web-ui/creating-transactions",
+        //   label: "Creating transactions",
+        // },
+        {
+          type: "doc",
+          id: "web-ui/exporting-tests",
+          label: "Exporting tests",
         },
       ],
     },
     {
       type: "category",
-      label: "Automating tests for CI/CD", // should be renamed to "CI/CD Automation"
+      label: "CLI",
       items: [
         {
           type: "doc",
-          id: "ci-cd-automation/ci-cd-best-practices", // should be renamed "ci-cd-automation/best-practices"
-          label: "CI/CD best practices",
+          id: "cli/configuring-your-cli",
+          label: "Configuring your CLI",
+        },
+        // {
+        //   type: "doc",
+        //   id: "cli/creating-environments",
+        //   label: "Creating environments",
+        // },
+        {
+          type: "doc",
+          id: "cli/creating-tests",
+          label: "Creating tests",
+        },
+        // {
+        //   type: "doc",
+        //   id: "cli/creating-transactions",
+        //   label: "Creating transactions",
+        // },
+        // {
+        //   type: "doc",
+        //   id: "cli/exporting-tests",
+        //   label: "Exporting tests",
+        // },
+      ],
+    },
+    {
+      type: "category",
+      label: "CI/CD automation",
+      items: [
+        {
+          type: "doc",
+          id: "ci-cd-automation/github-actions-pipeline",
+          label: "GitHub actions pipeline",
         },
       ],
     },
@@ -110,16 +264,48 @@ const sidebars = {
         {
           type: "doc",
           id: "examples-tutorials/overview",
-          label: "Examples Overview",
+          label: "Overview",
         },
-        // {
-        //   type: "doc",
-        //   id: "examples-tutorials/recipes",
-        //   label: "Recipes",
-        // },
         {
           type: "category",
-          label: "Installable Example - Pokeshop Service", // should be renamed to "Sample Microservice App - Pokeshop"
+          label: "Recipes",
+          items: [
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes",
+              label: "Overview",
+            },
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/running-tracetest-without-a-trace-data-store",
+              label: "Running Tracetest Without a Trace Data Store",
+            },
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/running-tracetest-with-jaeger",
+              label: "Running Tracetest With Jaeger",
+            },
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/running-tracetest-with-opensearch",
+              label: "Running Tracetest With OpenSearch",
+            },
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/running-tracetest-with-tempo",
+              label: "Running Tracetest With Tempo",
+            },
+          ],
+        },
+      ],
+    },
+    {
+      type: "category",
+      label: "Live examples",
+      items: [
+        {
+          type: "category",
+          label: "Pokemon API Demo",
           items: [
             {
               type: "doc",
@@ -143,42 +329,17 @@ const sidebars = {
             },
           ],
         },
-      ],
-    },
-    {
-      type: "category",
-      label: "Concepts",
-      items: [
-        {
-          type: "doc",
-          id: "concepts/introduction-to-trace-based-testing",
-          label: "Introduction to trace-based testing",
-        },
-        {
-          type: "doc",
-          id: "concepts/architecture",
-          label: "Architecture",
-        },
-        {
-          type: "doc",
-          id: "concepts/selectors",
-          label: "Selectors",
-        },
-        {
-          type: "doc",
-          id: "concepts/expressions",
-          label: "Expressions",
-        },
-        {
-          type: "doc",
-          id: "concepts/environments",
-          label: "Environments",
-        },
-        {
-          type: "doc",
-          id: "concepts/transactions",
-          label: "Transactions",
-        },
+        // {
+        //   type: "category",
+        //   label: "OpenTelemetry Store Demo",
+        //   items: [
+        //     {
+        //       type: "doc",
+        //       id: "opentelemetry-store/overview",
+        //       label: "Overview",
+        //     },
+        //   ],
+        // },
       ],
     },
     {

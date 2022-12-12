@@ -1,6 +1,4 @@
-# Create a Test
-
-Access the [Tracetest application](../getting-started/accessing-dashboard.md).
+# Creating Tests
 
 ![Main Screen](../img/main-screen-0.6.png)
 

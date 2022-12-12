@@ -5,7 +5,7 @@ poolingConfig:
   retryDelay: 5s
 
 googleAnalytics:
-  enabled: false
+  enabled: true
 
 demo:
   enabled: []
