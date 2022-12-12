@@ -123,6 +123,12 @@ func (c *ApiApiController) Routes() Routes {
 			c.ExpressionResolve,
 		},
 		{
+			"GetDataStoresConfig",
+			strings.ToUpper("Get"),
+			"/api/config/datastores",
+			c.GetDataStoresConfig,
+		},
+		{
 			"GetEnvironment",
 			strings.ToUpper("Get"),
 			"/api/environments/{environmentId}",
@@ -259,6 +265,18 @@ func (c *ApiApiController) Routes() Routes {
 			strings.ToUpper("Post"),
 			"/api/transactions/{transactionId}/run",
 			c.RunTransaction,
+		},
+		{
+			"TestConnection",
+			strings.ToUpper("Post"),
+			"/api/config/connection",
+			c.TestConnection,
+		},
+		{
+			"UpdateDataStoresConfig",
+			strings.ToUpper("Put"),
+			"/api/config/datastores",
+			c.UpdateDataStoresConfig,
 		},
 		{
 			"UpdateEnvironment",
@@ -532,6 +550,19 @@ func (c *ApiApiController) ExpressionResolve(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	result, err := c.service.ExpressionResolve(r.Context(), resolveRequestInfoParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// GetDataStoresConfig - Get the Server Side Data Stores Config
+func (c *ApiApiController) GetDataStoresConfig(w http.ResponseWriter, r *http.Request) {
+	result, err := c.service.GetDataStoresConfig(r.Context())
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -1036,6 +1067,50 @@ func (c *ApiApiController) RunTransaction(w http.ResponseWriter, r *http.Request
 		return
 	}
 	result, err := c.service.RunTransaction(r.Context(), transactionIdParam, runInformationParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// TestConnection - Tests the config data store/exporter connection
+func (c *ApiApiController) TestConnection(w http.ResponseWriter, r *http.Request) {
+	bodyParam := DataStore1{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&bodyParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	result, err := c.service.TestConnection(r.Context(), bodyParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// UpdateDataStoresConfig - Updates the Server Side Data Store config
+func (c *ApiApiController) UpdateDataStoresConfig(w http.ResponseWriter, r *http.Request) {
+	dataStoreConfigParam := DataStoreConfig{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&dataStoreConfigParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertDataStoreConfigRequired(dataStoreConfigParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.UpdateDataStoresConfig(r.Context(), dataStoreConfigParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
