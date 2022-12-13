@@ -1,22 +1,9 @@
-import {DisconnectOutlined,} from '@ant-design/icons';
+import {SettingOutlined} from '@ant-design/icons';
 import {Button, Typography} from 'antd';
-import styled, {createGlobalStyle} from 'styled-components';
+import styled from 'styled-components';
 
-export const CustomPopoverGlobalStyles = createGlobalStyle`
-  .no-tracing-popover {
-    .ant-popover-inner-content {
-      background: ${({theme}) => theme.color.alertYellow};
-    }
-
-    .ant-popover-arrow-content::before {
-      background: ${({theme}) => theme.color.alertYellow};
-    }
-  }
-`;
-
-export const Icon = styled(DisconnectOutlined)`
+export const Icon = styled(SettingOutlined)`
   && {
-    color: ${({theme}) => theme.color.warningYellow};
     cursor: pointer;
     font-size: ${({theme}) => theme.size.lg};
 `;
@@ -57,6 +44,7 @@ export const MessageContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
+  max-width: 340px;
 `;
 
 export const ButtonContainer = styled.div`
@@ -71,4 +59,8 @@ export const Trigger = styled.div`
   align-items: center;
   cursor: pointer;
   margin-right: 24px;
+  border-radius: 12px;
+  padding: 4px 7px;
+  background: ${({theme}) => theme.color.backgroundDark};
+  height: 24px;
 `;

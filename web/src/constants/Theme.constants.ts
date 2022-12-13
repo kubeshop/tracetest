@@ -4,6 +4,7 @@ export const theme: DefaultTheme = {
   color: {
     background: '#FBFBFF',
     backgroundInteractive: 'rgba(56, 101, 246, 0.05)',
+    backgroundDark: '#E2E4ED',
     border: '#CDD1DB',
     borderLight: 'rgba(3, 24, 73, 0.1)',
     error: '#FF4D4F',

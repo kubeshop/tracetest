@@ -8,6 +8,7 @@ declare module 'styled-components' {
     color: {
       background: string;
       backgroundInteractive: string;
+      backgroundDark: string;
       border: string;
       borderLight: string;
       error: string;

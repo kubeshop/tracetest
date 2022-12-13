@@ -1,4 +1,4 @@
-import {Popover} from 'antd';
+import {Button, Popover} from 'antd';
 import {useMemo} from 'react';
 import {Link} from 'react-router-dom';
 import * as S from './NoTracingPopover.styled';
@@ -7,13 +7,16 @@ const NoTracingPopover = () => {
   const content = useMemo(
     () => (
       <S.MessageContainer>
-        <S.Title>
-          <S.Icon /> No-Tracing Mode
-        </S.Title>
-        <S.Text>Tracetest is not configured to work with traces. Go to the settings page to set it up.</S.Text>
+        <div>
+          <S.Title>Tracing is not configured.</S.Title>
+          <S.Text>
+            Tracetest needs configuration information about your backend trace data store so it can collect the trace
+            after a test run. Please configure your data store now.
+          </S.Text>
+        </div>
         <S.ButtonContainer>
           <Link to="/settings">
-            <S.WarningButton>Setup</S.WarningButton>
+            <Button type="primary">Configure</Button>
           </Link>
         </S.ButtonContainer>
       </S.MessageContainer>
@@ -22,14 +25,11 @@ const NoTracingPopover = () => {
   );
 
   return (
-    <>
-      <S.CustomPopoverGlobalStyles />
-      <Popover content={content} overlayClassName="no-tracing-popover" placement="bottomLeft">
-        <S.Trigger>
-          <S.Icon /> No-Tracing Mode
-        </S.Trigger>
-      </Popover>
-    </>
+    <Popover content={content} overlayClassName="no-tracing-popover" placement="bottom">
+      <S.Trigger>
+        <S.Icon /> No-Tracing Mode
+      </S.Trigger>
+    </Popover>
   );
 };
 
