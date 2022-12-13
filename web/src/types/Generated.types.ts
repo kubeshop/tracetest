@@ -1008,7 +1008,12 @@ export interface external {
           errorMessage?: string;
         };
         /** @enum {string} */
-        SupportedDataStores: "jaeger" | "openSearch" | "tempo" | "signalFx";
+        SupportedDataStores:
+          | "jaeger"
+          | "openSearch"
+          | "tempo"
+          | "signalFx"
+          | "otlp";
       };
     };
     operations: {};

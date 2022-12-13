@@ -2,6 +2,7 @@ import {Form} from 'antd';
 import {useCallback, useMemo} from 'react';
 import SetupConfigService from 'services/DataStore.service';
 import {TDraftDataStore, TDataStoreForm, TDataStoreConfig} from 'types/Config.types';
+import {SupportedDataStoresToExplanation} from 'constants/DataStore.constants';
 import DataStoreDocsBanner from '../DataStoreDocsBanner/DataStoreDocsBanner';
 import DataStoreComponentFactory from '../DataStorePlugin/DataStoreComponentFactory';
 import * as S from './DataStoreForm.styled';
@@ -27,6 +28,7 @@ const DataStoreForm = ({form, onSubmit, dataStoreConfig, onIsFormValid}: IProps)
     },
     [onIsFormValid]
   );
+  const explanation = SupportedDataStoresToExplanation[dataStoreType!];
 
   return (
     <Form<TDraftDataStore>
@@ -43,7 +45,7 @@ const DataStoreForm = ({form, onSubmit, dataStoreConfig, onIsFormValid}: IProps)
           <DataStoreSelectionInput />
         </Form.Item>
         <DataStoreDocsBanner dataStoreType={dataStoreType!} />
-        <S.Title>Provide connection info</S.Title>
+        {explanation ? <S.Explanation>{explanation}</S.Explanation> : <S.Title>Provide connection info</S.Title>}
         <DataStoreComponentFactory dataStoreType={dataStoreType} />
       </S.FormContainer>
     </Form>
