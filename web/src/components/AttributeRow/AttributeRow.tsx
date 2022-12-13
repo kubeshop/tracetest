@@ -46,9 +46,6 @@ const AttributeRow = ({
     [assertions, key]
   );
 
-  const passedCount = passed.length;
-  const failedCount = failed.length;
-
   const handleOnClick = ({key: option}: {key: string}) => {
     if (option === Action.Copy) {
       message.success('Value copied to the clipboard');

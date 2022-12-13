@@ -89,5 +89,5 @@ module.exports = {
       },
     ],
   },
-  ignorePatterns: ['package.json', './node_modules', './dist', '**/dist/*.js'],
+  ignorePatterns: ['package.json', './node_modules', './dist', '**/dist/*.js', 'grammar.terms.js'],
 };
