@@ -79,9 +79,10 @@ const DataStoreProvider = ({children}: IProps) => {
   const onTestConnection = useCallback(
     async (draft: TDraftDataStore) => {
       const {dataStores: [dataStore] = []} = await DataStoreService.getRequest(draft);
-      const {successful, errorMessage = ''} = await testConnection(dataStore!).unwrap();
+      const errorMessage = '';
+      const {allPassed} = await testConnection(dataStore!).unwrap();
 
-      if (successful)
+      if (allPassed)
         return api.success({
           message: 'Connection is setup',
           description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor',

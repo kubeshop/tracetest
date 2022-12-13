@@ -26,8 +26,8 @@ export type TRawDataStore = TConfigSchemas['DataStore'];
 export type TDataStore = Model<TRawDataStore, {}>;
 export type TRawGRPCClientSettings = TConfigSchemas['GRPCClientSettings'];
 
-export type TTestConnectionRequest = TConfigSchemas['TestConnectionRequest'];
-export type TTestConnectionResponse = TConfigSchemas['TestConnectionResponse'];
+export type TTestConnectionRequest = TConfigSchemas['DataStoreTestConnectionRequest'];
+export type TTestConnectionResponse = TConfigSchemas['DataStoreTestConnectionResponse'];
 
 export interface IGRPCClientSettings extends TRawGRPCClientSettings {
   fileCA: File;

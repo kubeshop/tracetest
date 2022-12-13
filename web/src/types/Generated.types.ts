@@ -928,13 +928,13 @@ export interface operations {
       /** Test connection Result */
       201: {
         content: {
-          "application/json": external["config.yaml"]["components"]["schemas"]["TestConnectionResponse"];
+          "application/json": external["config.yaml"]["components"]["schemas"]["DataStoreTestConnectionResponse"];
         };
       };
     };
     requestBody: {
       content: {
-        "text/json": external["config.yaml"]["components"]["schemas"]["TestConnectionRequest"];
+        "text/json": external["config.yaml"]["components"]["schemas"]["DataStoreTestConnectionRequest"];
       };
     };
   };
@@ -1002,10 +1002,15 @@ export interface external {
           minVersion?: string;
           maxVersion?: string;
         };
-        TestConnectionRequest: external["config.yaml"]["components"]["schemas"]["DataStore"];
-        TestConnectionResponse: {
-          successful?: boolean;
-          errorMessage?: string;
+        DataStoreTestConnectionRequest: external["config.yaml"]["components"]["schemas"]["DataStore"];
+        DataStoreTestConnectionResponse: {
+          allPassed?: boolean;
+          checks?: external["config.yaml"]["components"]["schemas"]["DataStoreTestConnectionCheck"][];
+        };
+        DataStoreTestConnectionCheck: {
+          passed?: boolean;
+          check?: string;
+          result?: string;
         };
         /** @enum {string} */
         SupportedDataStores: "jaeger" | "openSearch" | "tempo" | "signalFx";

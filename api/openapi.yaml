@@ -1100,11 +1100,11 @@ paths:
         content:
           text/json:
             schema:
-              $ref: "./config.yaml#/components/schemas/TestConnectionRequest"
+              $ref: "./config.yaml#/components/schemas/DataStoreTestConnectionRequest"
       responses:
         201:
           description: Test connection Result
           content:
             application/json:
               schema:
-                $ref: "./config.yaml#/components/schemas/TestConnectionResponse"
+                $ref: "./config.yaml#/components/schemas/DataStoreTestConnectionResponse"
