@@ -1,5 +1,6 @@
 import CreateTestModal from 'components/CreateTestModal/CreateTestModal';
 import CreateTransactionModal from 'components/CreateTransactionModal/CreateTransactionModal';
+import Empty from 'components/Empty';
 import Pagination from 'components/Pagination';
 import TestCard from 'components/ResourceCard/TestCard';
 import TransactionCard from 'components/ResourceCard/TransactionCard';
@@ -18,7 +19,6 @@ import * as S from './Home.styled';
 import HomeActions from './HomeActions';
 import HomeFilters from './HomeFilters';
 import Loading from './Loading';
-import NoResults from './NoResults';
 
 const {onTestClick} = HomeAnalyticsService;
 type TParameters = {sortBy: SortBy; sortDirection: SortDirection};
@@ -64,7 +64,13 @@ const Content = () => {
           />
         </S.ActionsContainer>
 
-        <Pagination<TResource> emptyComponent={<NoResults />} loadingComponent={<Loading />} {...pagination}>
+        <Pagination<TResource>
+          emptyComponent={
+            <Empty message="You have not created any tests yet. Use the Create button to create your first test" />
+          }
+          loadingComponent={<Loading />}
+          {...pagination}
+        >
           <S.TestListContainer data-cy="test-list">
             {pagination.list?.map(resource =>
               resource.type === ResourceType.Test ? (

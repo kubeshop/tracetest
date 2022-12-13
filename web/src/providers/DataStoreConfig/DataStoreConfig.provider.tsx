@@ -57,7 +57,7 @@ const DataStoreConfigProvider = ({children}: IProps) => {
     [dataStoreConfig, isError, isLoading, shouldDisplayConfigSetup, skipConfigSetup]
   );
 
-  return <Context.Provider value={value}>{children}</Context.Provider>;
+  return isLoading ? null : <Context.Provider value={value}>{children}</Context.Provider>;
 };
 
 export default DataStoreConfigProvider;
