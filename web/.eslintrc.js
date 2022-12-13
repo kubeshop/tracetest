@@ -76,7 +76,7 @@ module.exports = {
     'no-implicit-coercion': [
       'error',
       {
-        boolean: true,
+        boolean: false,
         number: true,
         string: true,
       },
