@@ -35,13 +35,13 @@ const sidebars = {
         },
         {
           type: "doc",
-          id: "getting-started/docker",
-          label: "Docker",
+          id: "getting-started/cli",
+          label: "CLI",
         },
         {
           type: "doc",
-          id: "getting-started/cli",
-          label: "CLI",
+          id: "getting-started/docker",
+          label: "Docker",
         },
       ],
     },
