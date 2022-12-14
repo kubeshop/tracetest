@@ -44,7 +44,7 @@ const footerMenuItems = [
 
 const Layout = ({children, hasMenu = false}: IProps) => {
   useRouterSync();
-  const {dataStoreConfig} = useDataStoreConfig();
+  const {dataStoreConfig, isLoading} = useDataStoreConfig();
   const pathname = useLocation().pathname;
   const isNoTracingMode = dataStoreConfig.mode === ConfigMode.NO_TRACING_MODE;
 
@@ -86,7 +86,7 @@ const Layout = ({children, hasMenu = false}: IProps) => {
             )}
 
             <S.Layout>
-              <Header hasEnvironments hasLogo={!hasMenu} isNoTracingMode={isNoTracingMode} />
+              <Header hasEnvironments hasLogo={!hasMenu} isNoTracingMode={isNoTracingMode && !isLoading} />
               <S.Content $hasMenu={hasMenu}>{children}</S.Content>
             </S.Layout>
           </S.Layout>
