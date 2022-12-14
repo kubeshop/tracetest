@@ -1,12 +1,12 @@
-# Getting Started with Tracetest Using the CLI
+# Detailed Instructions on Installing Tracetest Using the CLI
 
-The CLI offers an **install wizard** that helps with the process. It helps configure Tracetest itself and all the tools needed to observe your application.
+Tracetest has a command line interface (CLI) with includes an  **install wizard** that helps with installing the Tracetest server into Docker or Kubernetes. The CLI can also be used run tests, download or upload tests, and many manage much of the capability of Tracetest.
 
-## Installing the Tracetest CLI
+## Installing the Tracetest Server via the CLI
 
-Use the install wizard to install Tracetest locally using Docker Compose or to a local or remote Kubernetes cluster.
+Use the CLI's install wizard to install a Tracetest server locally using Docker Compose or to a local or remote Kubernetes cluster.
 
-It installs all the tools required to set up the desired environment and creates all the configurations, tailored to your case.
+The wizard installs all the tools required to set up the desired environment and creates all the configurations, tailored to your case.
 
 Every time we release a new version of Tracetest, we generate binaries for Linux, MacOS, and Windows. Supporting both amd64, and ARM64 architectures, in `tar.gz`, `deb`, `rpm` and `exe` formats.
 
