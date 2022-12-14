@@ -116,6 +116,7 @@ func (td *postgresDB) Drop() error {
 		"test_runs",
 		"tests",
 		"environments",
+		"data_stores",
 		"server",
 		"schema_migrations",
 	)
