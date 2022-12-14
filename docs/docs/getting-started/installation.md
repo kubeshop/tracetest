@@ -10,8 +10,6 @@ import CodeBlock from '@theme/CodeBlock';
 
 This page showcases getting started with Tracetest by using the Tracetest CLI, Docker, or Kubernetes.
 
-More detailed guides can be found [here for Docker](./docker), and [here for the Tracetest CLI](./cli).
-
 :::note
 You need to add [OpenTelemetry instrumentation](https://opentelemetry.io/docs/instrumentation/) to your code and configure sending traces to a trace data store, or Tracetest directly, to benefit for Tracetest's trace-based testing.
 :::
