@@ -70,7 +70,7 @@ This guide will help you get Tracetest running using the Tracetest CLI.
 ### Prerequisites
 
 :::info
-Make sure you have [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed.
+Make sure you have [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/), or [Kubernetes](https://kubernetes.io/) installed.
 :::
 
 :::info
