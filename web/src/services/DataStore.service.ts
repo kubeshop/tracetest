@@ -1,6 +1,7 @@
 import {SupportedDataStores, TDataStoreConfig, TDraftDataStore, TRawDataStoreConfig} from 'types/Config.types';
 import GrpcClientService from './DataStores/GrpcClient.service';
 import OpenSearchService from './DataStores/OpenSearch.service';
+import OtelCollectorService from './DataStores/OtelCollector.service';
 import SignalFxService from './DataStores/SignalFx.service';
 
 interface IDataStoreService {
@@ -15,6 +16,7 @@ const dataStoreServiceMap = {
   [SupportedDataStores.TEMPO]: GrpcClientService,
   [SupportedDataStores.OpenSearch]: OpenSearchService,
   [SupportedDataStores.SignalFX]: SignalFxService,
+  [SupportedDataStores.OtelCollector]: OtelCollectorService,
 } as const;
 
 const DataStoreService = (): IDataStoreService => ({
