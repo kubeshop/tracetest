@@ -1,0 +1,20 @@
+openapi: 3.0.0
+components:
+  schemas:
+    DataStore:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        name:
+          type: string
+        type:
+          $ref: "./config.yaml#/components/schemas/SupportedDataStores"
+        is_default:
+          type: boolean
+        values:
+          oneOf:
+            - $ref: "./config.yaml#/components/schemas/GRPCClientSettings"
+            - $ref: "./config.yaml#/components/schemas/OpenSearch"
+            - $ref: "./config.yaml#/components/schemas/SignalFX"
