@@ -11,7 +11,16 @@ export enum SupportedDataStores {
   TEMPO = 'tempo',
   OpenSearch = 'openSearch',
   SignalFX = 'signalFx',
+  OtelCollector = 'otlp',
 }
+
+export type TRawDataStore = TConfigSchemas['DataStore'];
+export type TDataStore = Model<
+  TRawDataStore,
+  {
+    otlp?: {};
+  }
+>;
 
 export type TSupportedDataStores = TConfigSchemas['SupportedDataStores'];
 export type TRawDataStoreConfig = TConfigSchemas['DataStoreConfig'];
@@ -19,11 +28,10 @@ export type TDataStoreConfig = Model<
   TRawDataStoreConfig,
   {
     mode: ConfigMode;
+    dataStores: TDataStore[];
   }
 >;
 
-export type TRawDataStore = TConfigSchemas['DataStore'];
-export type TDataStore = Model<TRawDataStore, {}>;
 export type TRawGRPCClientSettings = TConfigSchemas['GRPCClientSettings'];
 
 export type TTestConnectionRequest = TConfigSchemas['TestConnectionRequest'];
@@ -38,6 +46,7 @@ export interface IGRPCClientSettings extends TRawGRPCClientSettings {
 interface IDataStore extends TRawDataStore {
   jaeger?: IGRPCClientSettings;
   tempo?: IGRPCClientSettings;
+  otlp?: {};
 }
 
 export type TDraftDataStore = {

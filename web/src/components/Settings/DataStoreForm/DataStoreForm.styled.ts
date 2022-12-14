@@ -4,6 +4,7 @@ import Jaeger from 'assets/jaeger.svg';
 import OpenSearch from 'assets/openSearch.svg';
 import SignalFx from 'assets/signalFx.svg';
 import Tempo from 'assets/tempo.svg';
+import OtelCollector from 'assets/otlp.svg';
 import {Typography} from 'antd';
 
 export const FormContainer = styled.div`
@@ -59,6 +60,7 @@ const dataStoreIconMap = {
   [SupportedDataStores.OpenSearch]: OpenSearch,
   [SupportedDataStores.SignalFX]: SignalFx,
   [SupportedDataStores.TEMPO]: Tempo,
+  [SupportedDataStores.OtelCollector]: OtelCollector,
 };
 
 export const DataStoreIcon = styled.img.attrs<{$dataStore: SupportedDataStores}>(({$dataStore}) => ({
@@ -77,5 +79,12 @@ export const Title = styled(Typography.Title)`
     font-size: ${({theme}) => theme.size.md};
     font-weight: 700;
     margin: 0;
+  }
+`;
+
+export const Explanation = styled(Typography.Text)`
+  && {
+    color: ${({theme}) => theme.color.textSecondary};
+    font-size: ${({theme}) => theme.size.md};
   }
 `;

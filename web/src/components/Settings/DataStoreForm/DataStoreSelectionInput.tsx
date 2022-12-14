@@ -1,5 +1,6 @@
-import {capitalize, noop} from 'lodash';
+import {noop} from 'lodash';
 import {SupportedDataStores} from 'types/Config.types';
+import {SupportedDataStoresToName} from '../../../constants/DataStore.constants';
 import * as S from './DataStoreForm.styled';
 
 interface IProps {
@@ -18,7 +19,7 @@ const DataStoreSelectionInput = ({onChange = noop, value = SupportedDataStores.J
           <S.DataStoreItemContainer $isSelected={isSelected} key={dataStore} onClick={() => onChange(dataStore)}>
             <S.Circle>{isSelected && <S.Check />}</S.Circle>
             <S.DataStoreIcon $dataStore={dataStore} />
-            <S.DataStoreName>{capitalize(dataStore)}</S.DataStoreName>
+            <S.DataStoreName>{SupportedDataStoresToName[dataStore]}</S.DataStoreName>
           </S.DataStoreItemContainer>
         );
       })}
