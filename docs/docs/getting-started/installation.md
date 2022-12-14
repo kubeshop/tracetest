@@ -1,82 +1,118 @@
 # Quick Start
 
-This page showcases getting started with Tracetest by using Docker or the Tracetest CLI.
+<!-- Docusaurus imports start -->
 
-More detailed guides can be found [here for Docker](./docker), and [here for the Tracetest CLI](./cli).
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import CodeBlock from '@theme/CodeBlock';
 
-## Prerequisites
+<!-- Docusaurus imports end -->
 
-:::info
+This page showcases getting started with Tracetest by using the Tracetest CLI, Docker, or Kubernetes.
+
+:::note
 You need to add [OpenTelemetry instrumentation](https://opentelemetry.io/docs/instrumentation/) to your code and configure sending traces to a trace data store, or Tracetest directly, to benefit for Tracetest's trace-based testing.
 :::
 
-:::caution
-Postgres is a prerequisite for Tracetest to work. It stores Tracetest's trace data. Make sure to have a Postgres service.
-:::
+## Install the Tracetest CLI
 
-## Docker
+<Tabs groupId="operating-systems">
+  <TabItem value="mac" label="MAC" default>
+    <CodeBlock
+        language="bash"
+        title="Terminal"
+    >
+    {`brew install kubeshop/tracetest/tracetest`}
+    </CodeBlock>
+  </TabItem>
+  <TabItem value="linux" label="LINUX">
+    <CodeBlock
+        language="bash"
+        title="Terminal"
+    >
+    {`curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/install-cli.sh | bash`}
+    </CodeBlock>
+  </TabItem>
+  <TabItem value="win" label="WINDOWS">  
+    <CodeBlock
+        language="bash"
+        title="Terminal"
+    >
+    {`choco source add --name=kubeshop_repo --source=https://chocolatey.kubeshop.io/chocolatey & choco install tracetest`}
+    </CodeBlock>
+  </TabItem>
+</Tabs>
 
-Download [this sample setup](https://github.com/kubeshop/tracetest/tree/main/examples/collector) from our GitHub examples.
+## Install the Tracetest server
 
-Start Docker Compose.
-
-```bash
-docker compose up
-```
-
-```bash title="Condensed expected output from the Tracetest container:"
-Starting tracetest ...
-...
-2022/11/28 18:24:09 HTTP Server started
-...
-```
-
-Open your browser on [`http://localhost:11633`](http://localhost:11633).
-
-Create a [test](../web-ui/creating-tests.md).
-
-Read the detailed setup on the [Docker installation page](./docker).
-
-:::info
-Running a test against `localhost` will resolve as the 127.0.0.1 inside the Tracetest container. To run tests against apps running on your local machine, add them to the same network and use service name mapping instead. Example: Instead of running an app on `localhost:8080`, add it to your Docker Compose file, connect it to the same network as your Tracetest service, and use `service-name:8080` in the URL field when creating an app.
-
-You can reach services running on your local machine using:
-
-- Linux (docker version < 20.10.0): `172.17.0.1:8080`
-- MacOS (docker version >= 18.03) and Linux (docker version >= 20.10.0): `host.docker.internal:8080`
-:::
-
-## CLI
-
-Install the Tracetest CLI:
-
-```bash
-curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/install-cli.sh | bash
-```
-
-Install the Tracetest server:
-
-```bash
+```bash title="Terminal"
 tracetest server install
 ```
+
+<Tabs groupId="container-orchestrators">
+  <TabItem value="docker-compose" label="Docker Compose" default>
+    <CodeBlock
+        language="text"
+        title="Terminal"
+    >
+    {`How do you want to run TraceTest? [type to search]:
+> Using Docker Compose
+  Using Kubernetes`}
+    </CodeBlock>
 
 :::note
 Follow the prompts and continue with all the default settings.
 This will generate an empty `docker-compose.yaml` file and a `./tracetest/` directory that contains another `docker-compose.yaml` and two more config files. One for Tracetest and one for OpenTelemetry collector.
+
+To see the output of this command, view [this sample setup](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-jaeger) from our GitHub examples.
 :::
 
 Start Docker Compose from the directory where you ran `tracetest server install`.
 
-```bash
-docker compose -f docker-compose.yaml -f tracetest/docker-compose.yaml up -d
-```
-
-```bash title="Condensed expected output from the Tracetest container:"
-Starting tracetest ...
+<CodeBlock
+  language="bash"
+  title="Terminal"
+>
+{`docker compose -f docker-compose.yaml -f tracetest/docker-compose.yaml up -d`}
+</CodeBlock>
+<CodeBlock
+  language="bash"
+  title="Condensed expected output from the Tracetest container:"
+>
+{`Starting tracetest ...
 ...
 2022/11/28 18:24:09 HTTP Server started
-...
-```
+...`}
+</CodeBlock>
+  </TabItem>
+  <TabItem value="kubernetes" label="Kubernetes">
+    <CodeBlock
+        language="text"
+        title="Terminal"
+    >
+    {`How do you want to run TraceTest? [type to search]:
+  Using Docker Compose
+> Using Kubernetes`}
+    </CodeBlock>
+
+:::note
+Follow the prompts and continue with all the default settings.
+This will deploy all resources to Kubernetes.
+To see exactly what is deployed, view [the deployment instructions](../deployment/kubernetes) in the Deployment section of the docs.
+:::
+
+<CodeBlock
+  language="bash"
+  title="Condensed expected output from the Tracetest CLI:"
+>
+{`export POD_NAME=$(kubectl get pods --namespace demo -l "app.kubernetes.io/name=pokemon-api,app.kubernetes.io/instance=demo" -o jsonpath="{.items[0].metadata.name}")
+export CONTAINER_PORT=$(kubectl get pod --namespace demo $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
+echo "Visit http://127.0.0.1:8080 to use your application"
+kubectl --namespace demo port-forward $POD_NAME 8080:$CONTAINER_PORT
+kubectl --kubeconfig <path-to-your-home>/.kube/config --context <your-cluster-context> --namespace tracetest port-forward svc/tracetest 11633`}
+</CodeBlock>
+  </TabItem>
+</Tabs>
 
 Open your browser on [`http://localhost:11633`](http://localhost:11633).
 
@@ -84,8 +120,12 @@ Create a [test](../web-ui/creating-tests.md).
 
 Read the detailed setup on the [CLI installation page](./cli).
 
+:::note
+View deployment instructions for Docker and Kubernetes in the [Deployment section](../deployment/overview).
+:::
+
 :::info
-Running a test against `localhost` will resolve as the 127.0.0.1 inside the Tracetest container. To run tests against apps running on your local machine, add them to the same network and use service name mapping instead. Example: Instead of running an app on `localhost:8080`, add it to your Docker Compose file, connect it to the same network as your Tracetest service, and use `service-name:8080` in the URL field when creating an app.
+Running a test against `localhost` will resolve as `127.0.0.1` inside the Tracetest container. To run tests against apps running on your local machine, add them to the same network and use service name mapping instead. Example: Instead of running an app on `localhost:8080`, add it to your Docker Compose file, connect it to the same network as your Tracetest service, and use `service-name:8080` in the URL field when creating an app.
 
 You can reach services running on your local machine using:
 
