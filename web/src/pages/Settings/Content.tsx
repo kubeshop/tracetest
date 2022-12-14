@@ -1,11 +1,11 @@
-import {Tabs} from 'antd';
+// import {Tabs} from 'antd';
 import DataStore from 'components/Settings/DataStore';
 import {useDataStoreConfig} from 'providers/DataStoreConfig/DataStoreConfig.provider';
 import * as S from './Settings.styled';
 
-const TabsKeys = {
+/* const TabsKeys = {
   DataStore: 'dataStore',
-};
+}; */
 
 const Content = () => {
   const {dataStoreConfig} = useDataStoreConfig();
@@ -13,16 +13,16 @@ const Content = () => {
   return (
     <S.Container>
       <S.Header>
-        <S.Title>Settings</S.Title>
+        <S.Title>Configure Data Store</S.Title>
       </S.Header>
 
-      <S.TabsContainer>
+      {/* <S.TabsContainer>
         <Tabs size="small">
-          <Tabs.TabPane key={TabsKeys.DataStore} tab="Configure Data Store">
-            <DataStore dataStoreConfig={dataStoreConfig} />
-          </Tabs.TabPane>
+          <Tabs.TabPane key={TabsKeys.DataStore} tab="Configure Data Store"> */}
+      <DataStore dataStoreConfig={dataStoreConfig} />
+      {/* </Tabs.TabPane>
         </Tabs>
-      </S.TabsContainer>
+      </S.TabsContainer> */}
     </S.Container>
   );
 };

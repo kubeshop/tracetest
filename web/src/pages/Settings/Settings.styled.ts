@@ -19,6 +19,10 @@ export const TabsContainer = styled.div`
   .ant-tabs-nav {
     padding: 0;
   }
+
+  .ant-tabs-content {
+    margin-top: 24px;
+  }
 `;
 
 export const Title = styled(Typography.Title)`
