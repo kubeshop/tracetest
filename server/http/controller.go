@@ -5,7 +5,6 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -1169,11 +1168,9 @@ func (c *controller) GetDataStores(ctx context.Context, take, skip int32, query 
 	}
 
 	dataStores, err := c.testDB.GetDataStores(ctx, take, skip, query, sortBy, sortDirection)
-	log.Printf("data stores total %d", dataStores.TotalCount)
 	if err != nil {
 		return handleDBError(err), err
 	}
-	log.Printf("After if %d", len(dataStores.Items))
 
 	return openapi.Response(200, paginated[openapi.DataStore]{
 		items: c.mappers.Out.DataStores(dataStores.Items),
