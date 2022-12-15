@@ -4012,11 +4012,11 @@ func (a *ApiApiService) RunTransactionExecute(r ApiRunTransactionRequest) (*Tran
 type ApiTestConnectionRequest struct {
 	ctx        context.Context
 	ApiService *ApiApiService
-	body       *DataStore1
+	dataStore  *DataStore
 }
 
-func (r ApiTestConnectionRequest) Body(body DataStore1) ApiTestConnectionRequest {
-	r.body = &body
+func (r ApiTestConnectionRequest) DataStore(dataStore DataStore) ApiTestConnectionRequest {
+	r.dataStore = &dataStore
 	return r
 }
 
@@ -4078,7 +4078,7 @@ func (a *ApiApiService) TestConnectionExecute(r ApiTestConnectionRequest) (*Test
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	// body params
-	localVarPostBody = r.body
+	localVarPostBody = r.dataStore
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return localVarReturnValue, nil, err

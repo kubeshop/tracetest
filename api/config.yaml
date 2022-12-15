@@ -105,14 +105,32 @@ components:
           type: string
         maxVersion:
           type: string
-    TestConnectionRequest:
-      $ref: "#/components/schemas/DataStore"
     TestConnectionResponse:
       type: object
       properties:
         successful:
           type: boolean
-        errorMessage:
+        steps:
+          type: array
+          items:
+            $ref: "#/components/schemas/ConnectionResult"
+    ConnectionResult:
+      type: object
+      properties:
+        connectivity:
+          $ref: "#/components/schemas/ConnectionTestStep"
+        authentication:
+          $ref: "#/components/schemas/ConnectionTestStep"
+        fetchTraces:
+          $ref: "#/components/schemas/ConnectionTestStep"
+    ConnectionTestStep:
+      type: object
+      properties:
+        passed:
+          type: boolean
+        message:
+          type: string
+        error:
           type: string
     SupportedDataStores:
       type: string

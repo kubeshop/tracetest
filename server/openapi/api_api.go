@@ -1079,14 +1079,18 @@ func (c *ApiApiController) RunTransaction(w http.ResponseWriter, r *http.Request
 
 // TestConnection - Tests the config data store/exporter connection
 func (c *ApiApiController) TestConnection(w http.ResponseWriter, r *http.Request) {
-	bodyParam := DataStore1{}
+	dataStoreParam := DataStore{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
-	if err := d.Decode(&bodyParam); err != nil {
+	if err := d.Decode(&dataStoreParam); err != nil {
 		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
 		return
 	}
-	result, err := c.service.TestConnection(r.Context(), bodyParam)
+	if err := AssertDataStoreRequired(dataStoreParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.TestConnection(r.Context(), dataStoreParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

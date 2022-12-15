@@ -20,9 +20,17 @@ type opensearchDb struct {
 	client *opensearch.Client
 }
 
+func (db opensearchDb) Connect(ctx context.Context) error {
+	return nil
+}
+
 func (db opensearchDb) Close() error {
 	// No need to close this db
 	return nil
+}
+
+func (jtd opensearchDb) TestConnection(ctx context.Context) ConnectionTestResult {
+	return ConnectionTestResult{}
 }
 
 func (db opensearchDb) GetTraceByID(ctx context.Context, traceID string) (traces.Trace, error) {

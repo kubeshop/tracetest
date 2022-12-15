@@ -10,6 +10,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/assertions"
 	"github.com/kubeshop/tracetest/server/assertions/selectors"
+	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/http/mappings"
@@ -20,12 +21,14 @@ import (
 	"github.com/kubeshop/tracetest/server/model/yaml/yamlconvert"
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/testdb"
+	"github.com/kubeshop/tracetest/server/tracedb"
 	"go.opentelemetry.io/otel/trace"
 )
 
 var IDGen = id.NewRandGenerator()
 
 type controller struct {
+	config            config.Config
 	testDB            model.Repository
 	runner            executor.Runner
 	transactionRunner executor.TransactionRunner
@@ -34,6 +37,7 @@ type controller struct {
 }
 
 func NewController(
+	config config.Config,
 	testDB model.Repository,
 	runner executor.Runner,
 	transactionRunner executor.TransactionRunner,
@@ -41,6 +45,7 @@ func NewController(
 	mappers mappings.Mappings,
 ) openapi.ApiApiServicer {
 	return &controller{
+		config:            config,
 		testDB:            testDB,
 		runner:            runner,
 		assertionRunner:   assertionRunner,
@@ -1109,4 +1114,44 @@ func takeResources(transactions []openapi.Transaction, tests []openapi.Test, tak
 	}
 
 	return items[skip:upperLimit]
+}
+
+// GetDataStoresConfig implements openapi.ApiApiServicer
+func (c *controller) GetDataStoresConfig(ctx context.Context) (openapi.ImplResponse, error) {
+	// TODO: get that from the database when it's ready
+	dataStores := c.config.Telemetry.DataStores
+	selectedDataStore := c.config.Server.Telemetry.DataStore
+
+	availableDataStores := make([]openapi.DataStore, 0, len(dataStores))
+
+	for name, dataStore := range dataStores {
+		availableDataStores = append(availableDataStores, c.mappers.Out.DataStore(name, dataStore))
+	}
+
+	return openapi.Response(http.StatusOK, openapi.DataStoreConfig{
+		DefaultDataStore: selectedDataStore,
+		DataStores:       availableDataStores,
+	}), nil
+}
+
+// UpdateDataStoresConfig implements openapi.ApiApiServicer
+func (c *controller) UpdateDataStoresConfig(ctx context.Context, dataStoreConfig openapi.DataStoreConfig) (openapi.ImplResponse, error) {
+	return openapi.Response(http.StatusNotImplemented, nil), nil
+}
+
+// TestConnection implements openapi.ApiApiServicer
+func (c *controller) TestConnection(ctx context.Context, dataStore openapi.DataStore) (openapi.ImplResponse, error) {
+	dataStoreConfig := c.mappers.In.DataStore(dataStore)
+	selectedTraceDB, err := tracedb.NewFromDataStoreConfig(&dataStoreConfig, c.testDB)
+	if err != nil {
+		return openapi.Response(http.StatusBadRequest, err.Error()), err
+	}
+
+	testResult := selectedTraceDB.TestConnection(ctx)
+	statusCode := http.StatusOK
+	if !testResult.HasSucceed() {
+		statusCode = http.StatusUnprocessableEntity
+	}
+
+	return openapi.Response(statusCode, c.mappers.Out.ConnectionTestResult(testResult)), nil
 }

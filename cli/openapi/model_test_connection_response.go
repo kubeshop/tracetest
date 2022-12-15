@@ -16,8 +16,8 @@ import (
 
 // TestConnectionResponse struct for TestConnectionResponse
 type TestConnectionResponse struct {
-	Successful   *bool   `json:"successful,omitempty"`
-	ErrorMessage *string `json:"errorMessage,omitempty"`
+	Successful *bool              `json:"successful,omitempty"`
+	Steps      []ConnectionResult `json:"steps,omitempty"`
 }
 
 // NewTestConnectionResponse instantiates a new TestConnectionResponse object
@@ -69,36 +69,36 @@ func (o *TestConnectionResponse) SetSuccessful(v bool) {
 	o.Successful = &v
 }
 
-// GetErrorMessage returns the ErrorMessage field value if set, zero value otherwise.
-func (o *TestConnectionResponse) GetErrorMessage() string {
-	if o == nil || o.ErrorMessage == nil {
-		var ret string
+// GetSteps returns the Steps field value if set, zero value otherwise.
+func (o *TestConnectionResponse) GetSteps() []ConnectionResult {
+	if o == nil || o.Steps == nil {
+		var ret []ConnectionResult
 		return ret
 	}
-	return *o.ErrorMessage
+	return o.Steps
 }
 
-// GetErrorMessageOk returns a tuple with the ErrorMessage field value if set, nil otherwise
+// GetStepsOk returns a tuple with the Steps field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *TestConnectionResponse) GetErrorMessageOk() (*string, bool) {
-	if o == nil || o.ErrorMessage == nil {
+func (o *TestConnectionResponse) GetStepsOk() ([]ConnectionResult, bool) {
+	if o == nil || o.Steps == nil {
 		return nil, false
 	}
-	return o.ErrorMessage, true
+	return o.Steps, true
 }
 
-// HasErrorMessage returns a boolean if a field has been set.
-func (o *TestConnectionResponse) HasErrorMessage() bool {
-	if o != nil && o.ErrorMessage != nil {
+// HasSteps returns a boolean if a field has been set.
+func (o *TestConnectionResponse) HasSteps() bool {
+	if o != nil && o.Steps != nil {
 		return true
 	}
 
 	return false
 }
 
-// SetErrorMessage gets a reference to the given string and assigns it to the ErrorMessage field.
-func (o *TestConnectionResponse) SetErrorMessage(v string) {
-	o.ErrorMessage = &v
+// SetSteps gets a reference to the given []ConnectionResult and assigns it to the Steps field.
+func (o *TestConnectionResponse) SetSteps(v []ConnectionResult) {
+	o.Steps = v
 }
 
 func (o TestConnectionResponse) MarshalJSON() ([]byte, error) {
@@ -106,8 +106,8 @@ func (o TestConnectionResponse) MarshalJSON() ([]byte, error) {
 	if o.Successful != nil {
 		toSerialize["successful"] = o.Successful
 	}
-	if o.ErrorMessage != nil {
-		toSerialize["errorMessage"] = o.ErrorMessage
+	if o.Steps != nil {
+		toSerialize["steps"] = o.Steps
 	}
 	return json.Marshal(toSerialize)
 }

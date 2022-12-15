@@ -103,7 +103,7 @@ type ApiApiServicer interface {
 	RerunTestRun(context.Context, string, string) (ImplResponse, error)
 	RunTest(context.Context, string, RunInformation) (ImplResponse, error)
 	RunTransaction(context.Context, string, RunInformation) (ImplResponse, error)
-	TestConnection(context.Context, DataStore1) (ImplResponse, error)
+	TestConnection(context.Context, DataStore) (ImplResponse, error)
 	UpdateDataStoresConfig(context.Context, DataStoreConfig) (ImplResponse, error)
 	UpdateEnvironment(context.Context, string, Environment) (ImplResponse, error)
 	UpdateTest(context.Context, string, Test) (ImplResponse, error)

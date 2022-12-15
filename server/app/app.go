@@ -159,7 +159,7 @@ func (a *App) Start() error {
 
 	mappers := mappings.New(traceConversionConfig, comparator.DefaultRegistry(), a.db)
 
-	controller := httpServer.NewController(a.db, runner, transactionRunner, assertionRunner, mappers)
+	controller := httpServer.NewController(a.config, a.db, runner, transactionRunner, assertionRunner, mappers)
 	apiApiController := openapi.NewApiApiController(controller)
 	customController := httpServer.NewCustomController(controller, apiApiController, openapi.DefaultErrorHandler, a.tracer)
 	httpRouter := customController

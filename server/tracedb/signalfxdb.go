@@ -29,9 +29,17 @@ func (db signalfxDB) getURL() string {
 	return fmt.Sprintf("https://api.%s.signalfx.com", db.Realm)
 }
 
+func (tdb signalfxDB) Connect(ctx context.Context) error {
+	return nil
+}
+
 func (db signalfxDB) Close() error {
 	// Doesn't need to be closed
 	return nil
+}
+
+func (jtd signalfxDB) TestConnection(ctx context.Context) ConnectionTestResult {
+	return ConnectionTestResult{}
 }
 
 func (db signalfxDB) GetTraceByID(ctx context.Context, traceID string) (traces.Trace, error) {

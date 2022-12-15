@@ -934,7 +934,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "text/json": external["config.yaml"]["components"]["schemas"]["TestConnectionRequest"];
+        "text/json": external["config.yaml"]["components"]["schemas"]["DataStore"];
       };
     };
   };
@@ -1002,10 +1002,19 @@ export interface external {
           minVersion?: string;
           maxVersion?: string;
         };
-        TestConnectionRequest: external["config.yaml"]["components"]["schemas"]["DataStore"];
         TestConnectionResponse: {
           successful?: boolean;
-          errorMessage?: string;
+          steps?: external["config.yaml"]["components"]["schemas"]["ConnectionResult"][];
+        };
+        ConnectionResult: {
+          connectivity?: external["config.yaml"]["components"]["schemas"]["ConnectionTestStep"];
+          authentication?: external["config.yaml"]["components"]["schemas"]["ConnectionTestStep"];
+          fetchTraces?: external["config.yaml"]["components"]["schemas"]["ConnectionTestStep"];
+        };
+        ConnectionTestStep: {
+          passed?: boolean;
+          message?: string;
+          error?: string;
         };
         /** @enum {string} */
         SupportedDataStores: "jaeger" | "openSearch" | "tempo" | "signalFx";

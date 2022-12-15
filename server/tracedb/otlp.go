@@ -18,9 +18,17 @@ func newCollectorDB(repository model.RunRepository) (TraceDB, error) {
 	}, nil
 }
 
+func (tdb *OTLPTraceDB) Connect(ctx context.Context) error {
+	return nil
+}
+
 func (tdb *OTLPTraceDB) Close() error {
 	// No need to implement this
 	return nil
+}
+
+func (jtd *OTLPTraceDB) TestConnection(ctx context.Context) ConnectionTestResult {
+	return ConnectionTestResult{}
 }
 
 // GetTraceByID implements TraceDB

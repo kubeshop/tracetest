@@ -6,6 +6,7 @@ import (
 
 	tempopb "github.com/kubeshop/tracetest/server/internal/proto-gen-go/tempo-idl"
 	"github.com/kubeshop/tracetest/server/traces"
+	"github.com/pkg/errors"
 	"go.opentelemetry.io/collector/component/componenttest"
 	"go.opentelemetry.io/collector/config/configgrpc"
 	"go.opentelemetry.io/otel/trace"
@@ -15,25 +16,36 @@ import (
 )
 
 type tempoTraceDB struct {
-	conn  *grpc.ClientConn
-	query tempopb.QuerierClient
+	config *configgrpc.GRPCClientSettings
+	conn   *grpc.ClientConn
+	query  tempopb.QuerierClient
 }
 
 func newTempoDB(config *configgrpc.GRPCClientSettings) (TraceDB, error) {
-	opts, err := config.ToDialOptions(nil, componenttest.NewNopTelemetrySettings())
-	if err != nil {
-		return nil, fmt.Errorf("tempodb grpc config: %w", err)
-	}
-
-	conn, err := grpc.Dial(config.Endpoint, opts...)
-	if err != nil {
-		return nil, fmt.Errorf("tempodb grpc dial: %w", err)
-	}
-
 	return &tempoTraceDB{
-		conn:  conn,
-		query: tempopb.NewQuerierClient(conn),
+		config: config,
 	}, nil
+}
+
+func (tdb *tempoTraceDB) Connect(ctx context.Context) error {
+	opts, err := tdb.config.ToDialOptions(nil, componenttest.NewNopTelemetrySettings())
+	if err != nil {
+		return errors.Wrap(ErrInvalidConfiguration, err.Error())
+	}
+
+	conn, err := grpc.DialContext(ctx, tdb.config.Endpoint, opts...)
+	if err != nil {
+		return errors.Wrap(ErrConnectionFailed, err.Error())
+	}
+
+	tdb.conn = conn
+	tdb.query = tempopb.NewQuerierClient(conn)
+
+	return nil
+}
+
+func (jtd *tempoTraceDB) TestConnection(ctx context.Context) ConnectionTestResult {
+	return ConnectionTestResult{}
 }
 
 func (ttd *tempoTraceDB) GetTraceByID(ctx context.Context, traceID string) (traces.Trace, error) {
