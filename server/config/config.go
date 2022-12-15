@@ -135,11 +135,7 @@ func (c Config) IsDataStoreConfigured() bool {
 	selectedStore := c.Server.Telemetry.DataStore
 	_, found := c.Telemetry.DataStores[selectedStore]
 
-	if selectedStore != "" && !found {
-		return false
-	}
-
-	return true
+	return found
 }
 
 func (c Config) Exporter() (*TelemetryExporterOption, error) {

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"strconv"
 	"time"
 
 	"github.com/kubeshop/tracetest/server/model"
@@ -116,6 +117,8 @@ func (tp tracePoller) Poll(ctx context.Context, test model.Test, run model.Run) 
 		test: test,
 		run:  run,
 	}
+
+	log.Printf("[PollerExecutor] Test %s Run %d: Is Data Store Configured? %s \n", job.test.ID, run.ID, strconv.FormatBool(tp.isDataStoreConfigured))
 
 	if tp.isDataStoreConfigured {
 		tp.enqueueJob(job)
