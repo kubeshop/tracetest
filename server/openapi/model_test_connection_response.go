@@ -12,11 +12,16 @@ package openapi
 type TestConnectionResponse struct {
 	Successful bool `json:"successful,omitempty"`
 
-	ErrorMessage string `json:"errorMessage,omitempty"`
+	Steps []ConnectionResult `json:"steps,omitempty"`
 }
 
 // AssertTestConnectionResponseRequired checks if the required fields are not zero-ed
 func AssertTestConnectionResponseRequired(obj TestConnectionResponse) error {
+	for _, el := range obj.Steps {
+		if err := AssertConnectionResultRequired(el); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 

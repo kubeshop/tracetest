@@ -32,6 +32,8 @@ services:
             interval: 1s
             timeout: 5s
             retries: 60
+        ports:
+            - 5432:5432
 
     otel-collector:
         image: otel/opentelemetry-collector:0.54.0
@@ -42,6 +44,8 @@ services:
             - ./collector.config.yaml:/otel-local-config.yaml
         depends_on:
             - jaeger
+        ports:
+            - 4317:4317
 
     jaeger:
         image: jaegertracing/all-in-one:latest
@@ -51,3 +55,5 @@ services:
             interval: 1s
             timeout: 3s
             retries: 60
+        ports:
+            - 16685:16685

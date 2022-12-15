@@ -337,18 +337,18 @@ func (c *ApiApiController) Routes() Routes {
 
 // CreateDataStore - Create a new Data Store
 func (c *ApiApiController) CreateDataStore(w http.ResponseWriter, r *http.Request) {
-	dataStore1Param := DataStore1{}
+	dataStoreParam := DataStore{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
-	if err := d.Decode(&dataStore1Param); err != nil {
+	if err := d.Decode(&dataStoreParam); err != nil {
 		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
 		return
 	}
-	if err := AssertDataStore1Required(dataStore1Param); err != nil {
+	if err := AssertDataStoreRequired(dataStoreParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	result, err := c.service.CreateDataStore(r.Context(), dataStore1Param)
+	result, err := c.service.CreateDataStore(r.Context(), dataStoreParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -1192,14 +1192,18 @@ func (c *ApiApiController) RunTransaction(w http.ResponseWriter, r *http.Request
 
 // TestConnection - Tests the config data store/exporter connection
 func (c *ApiApiController) TestConnection(w http.ResponseWriter, r *http.Request) {
-	bodyParam := DataStore{}
+	dataStoreParam := DataStore{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
-	if err := d.Decode(&bodyParam); err != nil {
+	if err := d.Decode(&dataStoreParam); err != nil {
 		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
 		return
 	}
-	result, err := c.service.TestConnection(r.Context(), bodyParam)
+	if err := AssertDataStoreRequired(dataStoreParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.TestConnection(r.Context(), dataStoreParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -1215,18 +1219,18 @@ func (c *ApiApiController) UpdateDataStore(w http.ResponseWriter, r *http.Reques
 	params := mux.Vars(r)
 	dataStoreIdParam := params["dataStoreId"]
 
-	dataStore1Param := DataStore1{}
+	dataStoreParam := DataStore{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
-	if err := d.Decode(&dataStore1Param); err != nil {
+	if err := d.Decode(&dataStoreParam); err != nil {
 		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
 		return
 	}
-	if err := AssertDataStore1Required(dataStore1Param); err != nil {
+	if err := AssertDataStoreRequired(dataStoreParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	result, err := c.service.UpdateDataStore(r.Context(), dataStoreIdParam, dataStore1Param)
+	result, err := c.service.UpdateDataStore(r.Context(), dataStoreIdParam, dataStoreParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
