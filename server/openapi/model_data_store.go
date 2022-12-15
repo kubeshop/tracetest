@@ -20,7 +20,7 @@ type DataStore struct {
 
 	Type SupportedDataStores `json:"type,omitempty"`
 
-	IsDefault bool `json:"is_default,omitempty"`
+	IsDefault bool `json:"isDefault,omitempty"`
 
 	Jaeger GrpcClientSettings `json:"jaeger,omitempty"`
 

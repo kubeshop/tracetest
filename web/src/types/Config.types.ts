@@ -1,5 +1,5 @@
 import {FormInstance} from 'antd';
-import {Model, TConfigSchemas} from 'types/Common.types';
+import {Model, TDataStoreSchemas, TConfigSchemas} from 'types/Common.types';
 
 export enum ConfigMode {
   NO_TRACING_MODE = 'NO_TRACING',
@@ -14,7 +14,7 @@ export enum SupportedDataStores {
   OtelCollector = 'otlp',
 }
 
-export type TRawDataStore = TConfigSchemas['DataStore'];
+export type TRawDataStore = TDataStoreSchemas['DataStore'];
 export type TDataStore = Model<
   TRawDataStore,
   {
@@ -22,7 +22,7 @@ export type TDataStore = Model<
   }
 >;
 
-export type TSupportedDataStores = TConfigSchemas['SupportedDataStores'];
+export type TSupportedDataStores = TDataStoreSchemas['SupportedDataStores'];
 export type TRawDataStoreConfig = TConfigSchemas['DataStoreConfig'];
 export type TDataStoreConfig = Model<
   TRawDataStoreConfig,
@@ -32,7 +32,7 @@ export type TDataStoreConfig = Model<
   }
 >;
 
-export type TRawGRPCClientSettings = TConfigSchemas['GRPCClientSettings'];
+export type TRawGRPCClientSettings = TDataStoreSchemas['GRPCClientSettings'];
 
 export type TTestConnectionRequest = TConfigSchemas['TestConnectionRequest'];
 export type TTestConnectionResponse = TConfigSchemas['TestConnectionResponse'];

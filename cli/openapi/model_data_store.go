@@ -20,7 +20,7 @@ type DataStore struct {
 	Id         *string              `json:"id,omitempty"`
 	Name       *string              `json:"name,omitempty"`
 	Type       *SupportedDataStores `json:"type,omitempty"`
-	IsDefault  *bool                `json:"is_default,omitempty"`
+	IsDefault  *bool                `json:"isDefault,omitempty"`
 	Jaeger     *GRPCClientSettings  `json:"jaeger,omitempty"`
 	Tempo      *GRPCClientSettings  `json:"tempo,omitempty"`
 	OpenSearch *OpenSearch          `json:"openSearch,omitempty"`
@@ -345,7 +345,7 @@ func (o DataStore) MarshalJSON() ([]byte, error) {
 		toSerialize["type"] = o.Type
 	}
 	if o.IsDefault != nil {
-		toSerialize["is_default"] = o.IsDefault
+		toSerialize["isDefault"] = o.IsDefault
 	}
 	if o.Jaeger != nil {
 		toSerialize["jaeger"] = o.Jaeger
