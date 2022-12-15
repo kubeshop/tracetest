@@ -1059,6 +1059,55 @@ paths:
                 type: array
                 items:
                   $ref: "./resources.yaml#/components/schemas/Resource"
+  /config/datastores:
+    get:
+      tags:
+        - api
+      summary: "Get the Server Side Data Stores Config"
+      description: "Get the Server Side Data Stores Config"
+      operationId: getDataStoresConfig
+      responses:
+        200:
+          description: Server Side Config
+          content:
+            application/json:
+              schema:
+                $ref: "./config.yaml#/components/schemas/DataStoreConfig"
+    put:
+      tags:
+        - api
+      summary: "Updates the Server Side Data Store config"
+      description: "Updates the Server Side Data Store config"
+      operationId: updateDataStoresConfig
+      requestBody:
+        content:
+          text/json:
+            schema:
+              $ref: "./config.yaml#/components/schemas/DataStoreConfig"
+      responses:
+        204:
+          description: successful operation
+        500:
+          description: "problem with updating environment"
+  /config/connection:
+    post:
+      tags:
+        - api
+      summary: "Tests the config data store/exporter connection"
+      description: "Tests the config data store/exporter connection"
+      operationId: testConnection
+      requestBody:
+        content:
+          text/json:
+            schema:
+              $ref: "./config.yaml#/components/schemas/TestConnectionRequest"
+      responses:
+        201:
+          description: Test connection Result
+          content:
+            application/json:
+              schema:
+                $ref: "./config.yaml#/components/schemas/TestConnectionResponse"
 
   # Data Stores
   /datastores:
@@ -1194,53 +1243,3 @@ paths:
       responses:
         "204":
           description: OK
-
-  /config/datastores:
-    get:
-      tags:
-        - api
-      summary: "Get the Server Side Data Stores Config"
-      description: "Get the Server Side Data Stores Config"
-      operationId: getDataStoresConfig
-      responses:
-        200:
-          description: Server Side Config
-          content:
-            application/json:
-              schema:
-                $ref: "./config.yaml#/components/schemas/DataStoreConfig"
-    put:
-      tags:
-        - api
-      summary: "Updates the Server Side Data Store config"
-      description: "Updates the Server Side Data Store config"
-      operationId: updateDataStoresConfig
-      requestBody:
-        content:
-          text/json:
-            schema:
-              $ref: "./config.yaml#/components/schemas/DataStoreConfig"
-      responses:
-        204:
-          description: successful operation
-        500:
-          description: "problem with updating environment"
-  /config/connection:
-    post:
-      tags:
-        - api
-      summary: "Tests the config data store/exporter connection"
-      description: "Tests the config data store/exporter connection"
-      operationId: testConnection
-      requestBody:
-        content:
-          text/json:
-            schema:
-              $ref: "./config.yaml#/components/schemas/TestConnectionRequest"
-      responses:
-        201:
-          description: Test connection Result
-          content:
-            application/json:
-              schema:
-                $ref: "./config.yaml#/components/schemas/TestConnectionResponse"

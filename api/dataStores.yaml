@@ -10,11 +10,95 @@ components:
         name:
           type: string
         type:
-          $ref: "./config.yaml#/components/schemas/SupportedDataStores"
+          $ref: "#/components/schemas/SupportedDataStores"
         is_default:
           type: boolean
-        values:
-          oneOf:
-            - $ref: "./config.yaml#/components/schemas/GRPCClientSettings"
-            - $ref: "./config.yaml#/components/schemas/OpenSearch"
-            - $ref: "./config.yaml#/components/schemas/SignalFX"
+        jaeger:
+          $ref: "#/components/schemas/GRPCClientSettings"
+        tempo:
+          $ref: "#/components/schemas/GRPCClientSettings"
+        openSearch:
+          $ref: "#/components/schemas/OpenSearch"
+        signalFx:
+          $ref: "#/components/schemas/SignalFX"
+        createdAt:
+          type: string
+          format: date-time
+    OpenSearch:
+      type: object
+      properties:
+        addresses:
+          type: array
+          items:
+            type: string
+        username:
+          type: string
+        password:
+          type: string
+        index:
+          type: string
+    SignalFX:
+      type: object
+      properties:
+        realm:
+          type: string
+        token:
+          type: string
+    GRPCClientSettings:
+      type: object
+      properties:
+        endpoint:
+          type: string
+        readBufferSize:
+          type: number
+        writeBufferSize:
+          type: number
+        waitForReady:
+          type: boolean
+        headers:
+          type: array
+          items:
+            $ref: "./http.yaml#/components/schemas/HTTPHeader"
+        balancerName:
+          type: string
+        compression:
+          type: string
+          enum:
+            - "gzip"
+            - "zlib"
+            - "deflate"
+            - "snappy"
+            - "zstd"
+            - "none"
+            - ""
+        tls:
+          $ref: "#/components/schemas/TLS"
+        auth:
+          $ref: "./http.yaml#/components/schemas/HTTPAuth"
+    TLS:
+      type: object
+      properties:
+        insecure:
+          type: boolean
+        insecureSkipVerify:
+          type: boolean
+        serverName:
+          type: string
+        settings:
+          $ref: "#/components/schemas/TLSSetting"
+    TLSSetting:
+      type: object
+      properties:
+        cAFile:
+          type: string
+        certFile:
+          type: string
+        keyFile:
+          type: string
+        minVersion:
+          type: string
+        maxVersion:
+          type: string
+    SupportedDataStores:
+      type: string
+      enum: [ jaeger, openSearch, tempo, signalFx, otlp ]

@@ -18,9 +18,11 @@ import (
 // The ApiApiRouter implementation should parse necessary information from the http request,
 // pass the data to a ApiApiServicer to perform the required actions, then write the service results to the http response.
 type ApiApiRouter interface {
+	CreateDataStore(http.ResponseWriter, *http.Request)
 	CreateEnvironment(http.ResponseWriter, *http.Request)
 	CreateTest(http.ResponseWriter, *http.Request)
 	CreateTransaction(http.ResponseWriter, *http.Request)
+	DeleteDataStore(http.ResponseWriter, *http.Request)
 	DeleteEnvironment(http.ResponseWriter, *http.Request)
 	DeleteTest(http.ResponseWriter, *http.Request)
 	DeleteTestRun(http.ResponseWriter, *http.Request)
@@ -30,6 +32,8 @@ type ApiApiRouter interface {
 	ExecuteDefinition(http.ResponseWriter, *http.Request)
 	ExportTestRun(http.ResponseWriter, *http.Request)
 	ExpressionResolve(http.ResponseWriter, *http.Request)
+	GetDataStore(http.ResponseWriter, *http.Request)
+	GetDataStores(http.ResponseWriter, *http.Request)
 	GetEnvironment(http.ResponseWriter, *http.Request)
 	GetEnvironmentDefinitionFile(http.ResponseWriter, *http.Request)
 	GetEnvironments(http.ResponseWriter, *http.Request)
@@ -53,6 +57,7 @@ type ApiApiRouter interface {
 	RerunTestRun(http.ResponseWriter, *http.Request)
 	RunTest(http.ResponseWriter, *http.Request)
 	RunTransaction(http.ResponseWriter, *http.Request)
+	UpdateDataStore(http.ResponseWriter, *http.Request)
 	UpdateEnvironment(http.ResponseWriter, *http.Request)
 	UpdateTest(http.ResponseWriter, *http.Request)
 	UpdateTransaction(http.ResponseWriter, *http.Request)
@@ -64,9 +69,11 @@ type ApiApiRouter interface {
 // while the service implementation can ignored with the .openapi-generator-ignore file
 // and updated with the logic required for the API.
 type ApiApiServicer interface {
+	CreateDataStore(context.Context, DataStore) (ImplResponse, error)
 	CreateEnvironment(context.Context, Environment) (ImplResponse, error)
 	CreateTest(context.Context, Test) (ImplResponse, error)
 	CreateTransaction(context.Context, Transaction) (ImplResponse, error)
+	DeleteDataStore(context.Context, string) (ImplResponse, error)
 	DeleteEnvironment(context.Context, string) (ImplResponse, error)
 	DeleteTest(context.Context, string) (ImplResponse, error)
 	DeleteTestRun(context.Context, string, string) (ImplResponse, error)
@@ -76,6 +83,8 @@ type ApiApiServicer interface {
 	ExecuteDefinition(context.Context, TextDefinition) (ImplResponse, error)
 	ExportTestRun(context.Context, string, string) (ImplResponse, error)
 	ExpressionResolve(context.Context, ResolveRequestInfo) (ImplResponse, error)
+	GetDataStore(context.Context, string) (ImplResponse, error)
+	GetDataStores(context.Context, int32, int32, string, string, string) (ImplResponse, error)
 	GetEnvironment(context.Context, string) (ImplResponse, error)
 	GetEnvironmentDefinitionFile(context.Context, string) (ImplResponse, error)
 	GetEnvironments(context.Context, int32, int32, string, string, string) (ImplResponse, error)
@@ -99,6 +108,7 @@ type ApiApiServicer interface {
 	RerunTestRun(context.Context, string, string) (ImplResponse, error)
 	RunTest(context.Context, string, RunInformation) (ImplResponse, error)
 	RunTransaction(context.Context, string, RunInformation) (ImplResponse, error)
+	UpdateDataStore(context.Context, string, DataStore) (ImplResponse, error)
 	UpdateEnvironment(context.Context, string, Environment) (ImplResponse, error)
 	UpdateTest(context.Context, string, Test) (ImplResponse, error)
 	UpdateTransaction(context.Context, string, Transaction) (ImplResponse, error)
