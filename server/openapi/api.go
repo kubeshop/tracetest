@@ -72,7 +72,7 @@ type ApiApiRouter interface {
 // while the service implementation can ignored with the .openapi-generator-ignore file
 // and updated with the logic required for the API.
 type ApiApiServicer interface {
-	CreateDataStore(context.Context, DataStore1) (ImplResponse, error)
+	CreateDataStore(context.Context, DataStore) (ImplResponse, error)
 	CreateEnvironment(context.Context, Environment) (ImplResponse, error)
 	CreateTest(context.Context, Test) (ImplResponse, error)
 	CreateTransaction(context.Context, Transaction) (ImplResponse, error)
@@ -113,7 +113,7 @@ type ApiApiServicer interface {
 	RunTest(context.Context, string, RunInformation) (ImplResponse, error)
 	RunTransaction(context.Context, string, RunInformation) (ImplResponse, error)
 	TestConnection(context.Context, DataStore) (ImplResponse, error)
-	UpdateDataStore(context.Context, string, DataStore1) (ImplResponse, error)
+	UpdateDataStore(context.Context, string, DataStore) (ImplResponse, error)
 	UpdateDataStoresConfig(context.Context, DataStoreConfig) (ImplResponse, error)
 	UpdateEnvironment(context.Context, string, Environment) (ImplResponse, error)
 	UpdateTest(context.Context, string, Test) (ImplResponse, error)

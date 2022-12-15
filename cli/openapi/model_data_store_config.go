@@ -16,8 +16,8 @@ import (
 
 // DataStoreConfig struct for DataStoreConfig
 type DataStoreConfig struct {
-	DataStores       []DataStore1 `json:"dataStores,omitempty"`
-	DefaultDataStore *string      `json:"defaultDataStore,omitempty"`
+	DataStores       []DataStore `json:"dataStores,omitempty"`
+	DefaultDataStore *string     `json:"defaultDataStore,omitempty"`
 }
 
 // NewDataStoreConfig instantiates a new DataStoreConfig object
@@ -38,9 +38,9 @@ func NewDataStoreConfigWithDefaults() *DataStoreConfig {
 }
 
 // GetDataStores returns the DataStores field value if set, zero value otherwise.
-func (o *DataStoreConfig) GetDataStores() []DataStore1 {
+func (o *DataStoreConfig) GetDataStores() []DataStore {
 	if o == nil || o.DataStores == nil {
-		var ret []DataStore1
+		var ret []DataStore
 		return ret
 	}
 	return o.DataStores
@@ -48,7 +48,7 @@ func (o *DataStoreConfig) GetDataStores() []DataStore1 {
 
 // GetDataStoresOk returns a tuple with the DataStores field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *DataStoreConfig) GetDataStoresOk() ([]DataStore1, bool) {
+func (o *DataStoreConfig) GetDataStoresOk() ([]DataStore, bool) {
 	if o == nil || o.DataStores == nil {
 		return nil, false
 	}
@@ -64,8 +64,8 @@ func (o *DataStoreConfig) HasDataStores() bool {
 	return false
 }
 
-// SetDataStores gets a reference to the given []DataStore1 and assigns it to the DataStores field.
-func (o *DataStoreConfig) SetDataStores(v []DataStore1) {
+// SetDataStores gets a reference to the given []DataStore and assigns it to the DataStores field.
+func (o *DataStoreConfig) SetDataStores(v []DataStore) {
 	o.DataStores = v
 }
 
