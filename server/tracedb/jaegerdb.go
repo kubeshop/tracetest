@@ -47,6 +47,10 @@ func (jtd *jaegerTraceDB) Connect(ctx context.Context) error {
 }
 
 func (jtd *jaegerTraceDB) TestConnection(ctx context.Context) ConnectionTestResult {
+	// TODO: when the test fails, we should still keep all messages.
+	// Current implementation makes only errors to show, so if everything worked but the last
+	// step, there's no feedback that tracetest was able to ping the service and authenticate to it.
+
 	reachable, err := isReachable(jtd.config.Endpoint)
 	if !reachable {
 		return ConnectionTestResult{
