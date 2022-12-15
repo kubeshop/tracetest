@@ -122,12 +122,17 @@ func (a *App) Start() error {
 	if err != nil {
 		log.Fatal(err)
 	}
+	a.registerStopFn(func() {
+		fmt.Println("stopping traceDB")
+		traceDB.Close()
+	})
 
 	tracer, err := tracing.NewTracer(ctx, a.config.Config)
 	if err != nil {
 		log.Fatal(err)
 	}
 	a.registerStopFn(func() {
+		fmt.Println("stopping tracer")
 		tracing.ShutdownTracer(ctx)
 	})
 
@@ -244,8 +249,12 @@ func (a *App) Start() error {
 		return err
 	}
 
-	// Start otlp endpoint
-	go func() { otlp.StartServer(21321, testDB) }()
+	otlpServer := otlp.NewServer(":21321", testDB)
+	go otlpServer.Start()
+	a.registerStopFn(func() {
+		fmt.Println("stopping otlp server")
+		otlpServer.Stop()
+	})
 
 	port := 11633
 	if a.config.Server.HttpPort != 0 {
