@@ -10,15 +10,15 @@
 package main
 
 import (
-	"context"
 	"flag"
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/kubeshop/tracetest/server/app"
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/testdb"
-	"github.com/kubeshop/tracetest/server/tracedb"
-	"github.com/kubeshop/tracetest/server/tracing"
 )
 
 var cfg = flag.String("config", "config.yaml", "path to the config file")
@@ -31,29 +31,27 @@ func main() {
 		log.Fatal(err)
 	}
 
-	ctx := context.Background()
-
-	testDB, err := testdb.Postgres(testdb.WithDSN(cfg.PostgresConnString))
+	db, err := testdb.Connect(cfg.PostgresConnString)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	traceDB, err := tracedb.New(cfg, testDB)
+	appCfg := app.Config{
+		Config: cfg,
+	}
+
+	app, err := app.New(appCfg, db)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	tracer, err := tracing.NewTracer(ctx, cfg)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	defer tracing.ShutdownTracer(ctx)
-
-	app, err := app.New(cfg, testDB, traceDB, tracer)
-	if err != nil {
-		log.Fatal(err)
-	}
+	c := make(chan os.Signal)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-c
+		app.Stop()
+		os.Exit(1)
+	}()
 
 	err = app.Start()
 	if err != nil {

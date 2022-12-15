@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -20,14 +21,13 @@ import (
 	httpServer "github.com/kubeshop/tracetest/server/http"
 	"github.com/kubeshop/tracetest/server/http/mappings"
 	"github.com/kubeshop/tracetest/server/http/websocket"
-	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/otlp"
 	"github.com/kubeshop/tracetest/server/subscription"
+	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/kubeshop/tracetest/server/tracing"
-	"go.opentelemetry.io/otel/trace"
 )
 
 var (
@@ -39,18 +39,20 @@ var (
 var EmptyDemoEnabled []string
 
 type App struct {
-	config  config.Config
-	db      model.Repository
-	traceDB tracedb.TraceDB
-	tracer  trace.Tracer
+	config  Config
+	db      *sql.DB
+	stopFns []func()
 }
 
-func New(config config.Config, db model.Repository, tracedb tracedb.TraceDB, tracer trace.Tracer) (*App, error) {
+type Config struct {
+	config.Config
+	Migrations string
+}
+
+func New(config Config, db *sql.DB) (*App, error) {
 	app := &App{
-		config:  config,
-		db:      db,
-		traceDB: tracedb,
-		tracer:  tracer,
+		config: config,
+		db:     db,
 	}
 
 	return app, nil
@@ -94,11 +96,42 @@ func spaHandler(prefix, staticPath, indexPath string, tplVars map[string]string)
 	return http.StripPrefix(prefix, http.HandlerFunc(handler)).ServeHTTP
 }
 
+func (a *App) Stop() {
+	for _, fn := range a.stopFns {
+		fn()
+	}
+}
+
+func (a *App) registerStopFn(fn func()) {
+	a.stopFns = append(a.stopFns, fn)
+}
+
 func (a *App) Start() error {
 	fmt.Printf("Starting tracetest (version %s, env %s)\n", Version, Env)
 	ctx := context.Background()
 
-	serverID, isNewInstall, err := a.db.ServerID()
+	testDB, err := testdb.Postgres(
+		testdb.WithDB(a.db),
+		testdb.WithMigrations(a.config.Migrations),
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	traceDB, err := tracedb.New(a.config.Config, testDB)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	tracer, err := tracing.NewTracer(ctx, a.config.Config)
+	if err != nil {
+		log.Fatal(err)
+	}
+	a.registerStopFn(func() {
+		tracing.ShutdownTracer(ctx)
+	})
+
+	serverID, isNewInstall, err := testDB.ServerID()
 
 	if err != nil {
 		return err
@@ -116,26 +149,29 @@ func (a *App) Start() error {
 		}
 	}
 
-	applicationTracer, err := tracing.GetApplicationTracer(ctx, a.config)
+	applicationTracer, err := tracing.GetApplicationTracer(ctx, a.config.Config)
 	if err != nil {
 		return fmt.Errorf("could not create trigger span tracer: %w", err)
 	}
 
-	triggerReg := trigger.NewRegsitry(a.tracer, applicationTracer)
+	triggerReg := trigger.NewRegsitry(tracer, applicationTracer)
 	triggerReg.Add(trigger.HTTP())
 	triggerReg.Add(trigger.GRPC())
 
 	subscriptionManager := subscription.NewManager()
 
 	execTestUpdater := (executor.CompositeUpdater{}).
-		Add(executor.NewDBUpdater(a.db)).
+		Add(executor.NewDBUpdater(testDB)).
 		Add(executor.NewSubscriptionUpdater(subscriptionManager))
 
-	assertionExecutor := executor.NewAssertionExecutor(a.tracer)
-	outputProcesser := executor.InstrumentedOutputProcessor(a.tracer)
+	assertionExecutor := executor.NewAssertionExecutor(tracer)
+	outputProcesser := executor.InstrumentedOutputProcessor(tracer)
 	assertionRunner := executor.NewAssertionRunner(execTestUpdater, assertionExecutor, outputProcesser, subscriptionManager)
 	assertionRunner.Start(5)
-	defer assertionRunner.Stop()
+	a.registerStopFn(func() {
+		fmt.Println("stopping assertionRunner")
+		assertionRunner.Stop()
+	})
 
 	traceConversionConfig := traces.NewConversionConfig()
 	// hardcoded for now. In the future we will get those values from the database
@@ -143,25 +179,34 @@ func (a *App) Start() error {
 		"tracetest.span.duration",
 	)
 
-	pollerExecutor := executor.NewPollerExecutor(a.config, a.tracer, execTestUpdater, a.traceDB)
+	pollerExecutor := executor.NewPollerExecutor(a.config.Config, tracer, execTestUpdater, traceDB)
 
 	tracePoller := executor.NewTracePoller(pollerExecutor, execTestUpdater, assertionRunner, a.config.PoolingRetryDelay(), a.config.MaxWaitTimeForTraceDuration(), subscriptionManager)
 	tracePoller.Start(5) // worker count. should be configurable
-	defer tracePoller.Stop()
+	a.registerStopFn(func() {
+		fmt.Println("stopping tracePoller")
+		tracePoller.Stop()
+	})
 
-	runner := executor.NewPersistentRunner(triggerReg, a.db, execTestUpdater, tracePoller, a.tracer, subscriptionManager)
+	runner := executor.NewPersistentRunner(triggerReg, testDB, execTestUpdater, tracePoller, tracer, subscriptionManager)
 	runner.Start(5) // worker count. should be configurable
-	defer runner.Stop()
+	a.registerStopFn(func() {
+		fmt.Println("stopping runner")
+		runner.Stop()
+	})
 
-	transactionRunner := executor.NewTransactionRunner(runner, a.db, subscriptionManager)
+	transactionRunner := executor.NewTransactionRunner(runner, testDB, subscriptionManager)
 	transactionRunner.Start(5)
-	defer transactionRunner.Stop()
+	a.registerStopFn(func() {
+		fmt.Println("stopping transactionRunner")
+		transactionRunner.Stop()
+	})
 
-	mappers := mappings.New(traceConversionConfig, comparator.DefaultRegistry(), a.db)
+	mappers := mappings.New(traceConversionConfig, comparator.DefaultRegistry(), testDB)
 
-	controller := httpServer.NewController(a.db, runner, transactionRunner, assertionRunner, mappers)
+	controller := httpServer.NewController(testDB, runner, transactionRunner, assertionRunner, mappers)
 	apiApiController := openapi.NewApiApiController(controller)
-	customController := httpServer.NewCustomController(controller, apiApiController, openapi.DefaultErrorHandler, a.tracer)
+	customController := httpServer.NewCustomController(controller, apiApiController, openapi.DefaultErrorHandler, tracer)
 	httpRouter := customController
 	if a.config.Server.PathPrefix != "" {
 		httpRouter = httpServer.NewPrefixedRouter(httpRouter, a.config.Server.PathPrefix)
@@ -200,15 +245,24 @@ func (a *App) Start() error {
 	}
 
 	// Start otlp endpoint
-	go func() { otlp.StartServer(21321, a.db) }()
+	go func() { otlp.StartServer(21321, testDB) }()
 
 	port := 11633
 	if a.config.Server.HttpPort != 0 {
 		port = a.config.Server.HttpPort
 	}
 
+	httpServer := &http.Server{
+		Addr:    fmt.Sprintf(":%d", port),
+		Handler: handlers.CompressHandler(router),
+	}
+	a.registerStopFn(func() {
+		fmt.Println("stopping http server")
+		httpServer.Shutdown(ctx)
+	})
+
 	log.Printf("HTTP Server started")
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), handlers.CompressHandler(router)))
+	httpServer.ListenAndServe()
 
 	return nil
 }
