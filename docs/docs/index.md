@@ -21,7 +21,7 @@ We make it possible to:
 - Use your preferred trace back-end, like Jaeger or Tempo, or OpenTelemetry Collector.
 - Define multiple transaction triggers, such as a GET against an API endpoint, a GRPC request, etc.
 - Return both the response data and a full trace.
-- Define assertions against trace data, ensuring both your response and the underlying processes worked correctly, quickly, and without errors.
+- Define assertions against both the response and trace data, ensuring both your response and the underlying processes worked correctly, quickly, and without errors.
 - Save tests.
 - Run the tests manually or via CI build jobs with the Tracetest CLI.
 
@@ -29,7 +29,7 @@ New to trace-based testing? Read more about the concepts, [here](./concepts/what
 
 ## Prerequisites
 
-You need to add [OpenTelemetry instrumentation](https://opentelemetry.io/docs/instrumentation/) to your code and configure sending traces to a trace data store, or Tracetest directly, to benefit for Tracetest's trace-based testing.
+You need to add [OpenTelemetry instrumentation](https://opentelemetry.io/docs/instrumentation/) to your code and configure sending traces to a trace data store, or Tracetest directly, to benefit from Tracetest's trace-based testing.
 
 ## Who Uses Tracetest?
 
