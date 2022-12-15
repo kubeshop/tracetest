@@ -17,6 +17,7 @@ import (
 	"sync"
 	"syscall"
 
+	"github.com/fsnotify/fsnotify"
 	"github.com/kubeshop/tracetest/server/app"
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/testdb"
@@ -27,11 +28,7 @@ var cfg = flag.String("config", "config.yaml", "path to the config file")
 func main() {
 
 	flag.Parse()
-	cfg, err := config.FromFile(*cfg)
-	if err != nil {
-		log.Fatal(err)
-	}
-
+	cfg := loadConfig()
 	db, err := testdb.Connect(cfg.PostgresConnString)
 	if err != nil {
 		log.Fatal(err)
@@ -41,7 +38,7 @@ func main() {
 		Config: cfg,
 	}
 
-	app, err := app.New(appCfg, db)
+	appInstance, err := app.New(appCfg, db)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -52,15 +49,69 @@ func main() {
 	go func() {
 		<-c
 		wg.Done()
-		app.Stop()
+		appInstance.Stop()
 		os.Exit(1)
 	}()
 
 	wg.Add(1)
-	err = app.Start()
+	err = appInstance.Start()
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	go watchChanges(func() {
+		appCfg = app.Config{
+			Config: loadConfig(),
+		}
+		appInstance.HotReload(appCfg)
+	})
+
 	wg.Wait()
+}
+
+func loadConfig() config.Config {
+	cfg, err := config.FromFile(*cfg)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return cfg
+
+}
+
+func watchChanges(updateFn func()) {
+	watcher, err := fsnotify.NewWatcher()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer watcher.Close()
+
+	go func() {
+		for {
+			select {
+			case event, ok := <-watcher.Events:
+				if !ok {
+					return
+				}
+				if event.Has(fsnotify.Write) {
+					log.Println("config updated:", event.Name)
+					updateFn()
+				}
+			case err, ok := <-watcher.Errors:
+				if !ok {
+					return
+				}
+				log.Println("error:", err)
+			}
+		}
+	}()
+
+	// Add a path.
+	err = watcher.Add(*cfg)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	<-make(chan struct{})
+
 }
