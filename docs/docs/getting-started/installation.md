@@ -118,7 +118,7 @@ Open your browser on [`http://localhost:11633`](http://localhost:11633).
 
 Create a [test](../web-ui/creating-tests.md).
 
-Need more detailed information about how to install Tracetest? Read the detailed setup on the [CLI installation page](./cli).
+Need more detailed information about how to install Tracetest? Read the detailed setup on the [CLI installation page](./detailed-installation).
 
 :::note
 View deployment instructions for Docker and Kubernetes in the [Deployment section](../deployment/overview).
