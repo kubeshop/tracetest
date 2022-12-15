@@ -106,6 +106,12 @@ func (a *App) registerStopFn(fn func()) {
 	a.stopFns = append(a.stopFns, fn)
 }
 
+func (a *App) HotReload(c Config) {
+	a.config = c
+	a.Stop()
+	a.Start()
+}
+
 func (a *App) Start() error {
 	fmt.Printf("Starting tracetest (version %s, env %s)\n", Version, Env)
 	ctx := context.Background()
@@ -271,7 +277,7 @@ func (a *App) Start() error {
 	})
 
 	log.Printf("HTTP Server started")
-	httpServer.ListenAndServe()
+	go httpServer.ListenAndServe()
 
 	return nil
 }

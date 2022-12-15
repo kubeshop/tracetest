@@ -14,6 +14,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 
 	"github.com/kubeshop/tracetest/server/app"
@@ -45,16 +46,21 @@ func main() {
 		log.Fatal(err)
 	}
 
+	var wg sync.WaitGroup
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
+		wg.Done()
 		app.Stop()
 		os.Exit(1)
 	}()
 
+	wg.Add(1)
 	err = app.Start()
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	wg.Wait()
 }
