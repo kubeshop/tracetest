@@ -7,7 +7,6 @@ import (
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/model/modeltest"
 	"github.com/kubeshop/tracetest/server/testdb"
-	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/otel/trace"
@@ -88,17 +87,17 @@ func TestUpdateRun(t *testing.T) {
 	run := createRun(t, db, test)
 
 	run.State = model.RunStateFinished
-	run.Trace = &traces.Trace{
+	run.Trace = &model.Trace{
 		ID: testdb.IDGen.TraceID(),
-		RootSpan: traces.Span{
+		RootSpan: model.Span{
 			ID: testdb.IDGen.SpanID(),
-			Attributes: traces.Attributes{
+			Attributes: model.Attributes{
 				"service.name":            "Pokeshop",
 				"tracetest.span.duration": "2000",
 			},
 		},
 	}
-	run.Trace.Flat = map[trace.SpanID]*traces.Span{
+	run.Trace.Flat = map[trace.SpanID]*model.Span{
 		run.Trace.RootSpan.ID: &run.Trace.RootSpan,
 	}
 	run.Results = &model.RunResults{

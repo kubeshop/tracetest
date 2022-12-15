@@ -4,6 +4,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/traces"
 	"go.opentelemetry.io/otel/trace"
@@ -11,7 +12,7 @@ import (
 
 // out
 
-func (m OpenAPI) Trace(in *traces.Trace) openapi.Trace {
+func (m OpenAPI) Trace(in *model.Trace) openapi.Trace {
 	if in == nil {
 		return openapi.Trace{}
 	}
@@ -28,7 +29,7 @@ func (m OpenAPI) Trace(in *traces.Trace) openapi.Trace {
 	}
 }
 
-func (m OpenAPI) Span(in traces.Span) openapi.Span {
+func (m OpenAPI) Span(in model.Span) openapi.Span {
 	parentID := ""
 	if in.Parent != nil {
 		parentID = in.Parent.ID.String()
@@ -53,7 +54,7 @@ func (m OpenAPI) Span(in traces.Span) openapi.Span {
 	}
 }
 
-func (m OpenAPI) Spans(in []*traces.Span) []openapi.Span {
+func (m OpenAPI) Spans(in []*model.Span) []openapi.Span {
 	spans := make([]openapi.Span, len(in))
 	for i, s := range in {
 		spans[i] = m.Span(*s)
@@ -64,17 +65,17 @@ func (m OpenAPI) Spans(in []*traces.Span) []openapi.Span {
 
 // in
 
-func (m Model) Trace(in openapi.Trace) *traces.Trace {
+func (m Model) Trace(in openapi.Trace) *model.Trace {
 	tid, _ := trace.TraceIDFromHex(in.TraceId)
-	return &traces.Trace{
+	return &model.Trace{
 		ID:       tid,
 		RootSpan: m.Span(in.Tree, nil),
 	}
 }
 
-func (m Model) Span(in openapi.Span, parent *traces.Span) traces.Span {
+func (m Model) Span(in openapi.Span, parent *model.Span) model.Span {
 	sid, _ := trace.SpanIDFromHex(in.Id)
-	span := traces.Span{
+	span := model.Span{
 		ID:         sid,
 		Attributes: in.Attributes,
 		Name:       in.Name,
@@ -87,8 +88,8 @@ func (m Model) Span(in openapi.Span, parent *traces.Span) traces.Span {
 	return span
 }
 
-func (m Model) Spans(in []openapi.Span, parent *traces.Span) []*traces.Span {
-	spans := make([]*traces.Span, len(in))
+func (m Model) Spans(in []openapi.Span, parent *model.Span) []*model.Span {
+	spans := make([]*model.Span, len(in))
 	for i, s := range in {
 		span := m.Span(s, parent)
 		spans[i] = &span

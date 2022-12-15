@@ -5,7 +5,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/assertions/selectors"
 	"github.com/kubeshop/tracetest/server/id"
-	"github.com/kubeshop/tracetest/server/traces"
+	"github.com/kubeshop/tracetest/server/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/otel/trace"
@@ -18,20 +18,20 @@ var (
 	getPokemonFromExternalAPISpanID = gen.SpanID()
 	updatePokemonDatabaseSpanID     = gen.SpanID()
 )
-var pokeshopTrace = traces.Trace{
+var pokeshopTrace = model.Trace{
 	ID: gen.TraceID(),
-	RootSpan: traces.Span{
+	RootSpan: model.Span{
 		ID: postImportSpanID,
-		Attributes: traces.Attributes{
+		Attributes: model.Attributes{
 			"service.name":        "Pokeshop",
 			"tracetest.span.type": "http",
 			"http.status_code":    "201",
 		},
 		Name: "POST /import",
-		Children: []*traces.Span{
+		Children: []*model.Span{
 			{
 				ID: insertPokemonDatabaseSpanID,
-				Attributes: traces.Attributes{
+				Attributes: model.Attributes{
 					"service.name":        "Pokeshop",
 					"tracetest.span.type": "db",
 					"db.statement":        "INSERT INTO pokemon (id) values (?)",
@@ -40,16 +40,16 @@ var pokeshopTrace = traces.Trace{
 			},
 			{
 				ID: getPokemonFromExternalAPISpanID,
-				Attributes: traces.Attributes{
+				Attributes: model.Attributes{
 					"service.name":        "Pokeshop-worker",
 					"tracetest.span.type": "http",
 					"http.status_code":    "200",
 				},
 				Name: "Get pokemon from external API",
-				Children: []*traces.Span{
+				Children: []*model.Span{
 					{
 						ID: updatePokemonDatabaseSpanID,
-						Attributes: traces.Attributes{
+						Attributes: model.Attributes{
 							"service.name":        "Pokeshop-worker",
 							"tracetest.span.type": "db",
 							"db.statement":        "UPDATE pokemon (name = ?) WHERE id = ?",
@@ -146,7 +146,7 @@ func TestSelector(t *testing.T) {
 	}
 }
 
-func ensureExpectedSpansWereReturned(t *testing.T, spanIDs []trace.SpanID, spans []traces.Span) {
+func ensureExpectedSpansWereReturned(t *testing.T, spanIDs []trace.SpanID, spans []model.Span) {
 	assert.Len(t, spans, len(spanIDs), "Should_return_the_same_number_of_spans_as_we_expected")
 	for _, span := range spans {
 		assert.Contains(t, spanIDs, span.ID, "span ID was returned but wasn't expected")

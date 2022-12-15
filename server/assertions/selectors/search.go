@@ -1,13 +1,13 @@
 package selectors
 
 import (
-	"github.com/kubeshop/tracetest/server/traces"
+	"github.com/kubeshop/tracetest/server/model"
 	"go.opentelemetry.io/otel/trace"
 )
 
-func filterSpans(rootSpan traces.Span, spanSelector SpanSelector) []traces.Span {
-	filteredSpans := make([]traces.Span, 0)
-	traverseTree(rootSpan, func(span traces.Span) {
+func filterSpans(rootSpan model.Span, spanSelector SpanSelector) []model.Span {
+	filteredSpans := make([]model.Span, 0)
+	traverseTree(rootSpan, func(span model.Span) {
 		if spanSelector.MatchesFilters(span) {
 			if spanSelector.ChildSelector != nil {
 				childFilteredSpans := filterSpans(span, *spanSelector.ChildSelector)
@@ -29,7 +29,7 @@ func filterSpans(rootSpan traces.Span, spanSelector SpanSelector) []traces.Span 
 	return uniqueSpans
 }
 
-func traverseTree(rootNode traces.Span, fn func(traces.Span)) {
+func traverseTree(rootNode model.Span, fn func(model.Span)) {
 	// FIX: don't use recursion to prevent stackoverflow errors on huge traces
 	fn(rootNode)
 	for i := range rootNode.Children {
@@ -38,9 +38,9 @@ func traverseTree(rootNode traces.Span, fn func(traces.Span)) {
 	}
 }
 
-func filterDuplicated(spans []traces.Span) []traces.Span {
+func filterDuplicated(spans []model.Span) []model.Span {
 	existingSpans := make(map[trace.SpanID]bool, 0)
-	uniqueSpans := make([]traces.Span, 0)
+	uniqueSpans := make([]model.Span, 0)
 	for _, span := range spans {
 		if _, exists := existingSpans[span.ID]; !exists {
 			uniqueSpans = append(uniqueSpans, span)
@@ -51,9 +51,9 @@ func filterDuplicated(spans []traces.Span) []traces.Span {
 	return uniqueSpans
 }
 
-func removeSpanFromList(spans []traces.Span, id trace.SpanID) []traces.Span {
+func removeSpanFromList(spans []model.Span, id trace.SpanID) []model.Span {
 	idString := id.String()
-	list := make([]traces.Span, 0, len(spans))
+	list := make([]model.Span, 0, len(spans))
 	for _, span := range spans {
 		if span.ID.String() != idString {
 			list = append(list, span)

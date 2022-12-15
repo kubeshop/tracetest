@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/server/id"
-	"github.com/kubeshop/tracetest/server/traces"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -94,7 +93,7 @@ type (
 		// result info
 		TriggerResult TriggerResult
 		Results       *RunResults
-		Trace         *traces.Trace
+		Trace         *Trace
 		Outputs       OrderedMap[string, string]
 		LastError     error
 		Pass          int

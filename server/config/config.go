@@ -118,12 +118,28 @@ func (c Config) MaxWaitTimeForTraceDuration() time.Duration {
 func (c Config) DataStore() (*TracingBackendDataStoreConfig, error) {
 	selectedStore := c.Server.Telemetry.DataStore
 	dataStoreConfig, found := c.Telemetry.DataStores[selectedStore]
-	if !found {
+
+	if selectedStore != "" && !found {
 		availableOptions := mapKeys(c.Telemetry.DataStores)
 		return nil, fmt.Errorf(`invalid data store option: "%s". Available options: %v`, selectedStore, availableOptions)
 	}
 
+	if !found {
+		return nil, nil
+	}
+
 	return &dataStoreConfig, nil
+}
+
+func (c Config) IsDataStoreConfigured() bool {
+	selectedStore := c.Server.Telemetry.DataStore
+	_, found := c.Telemetry.DataStores[selectedStore]
+
+	if selectedStore != "" && !found {
+		return false
+	}
+
+	return true
 }
 
 func (c Config) Exporter() (*TelemetryExporterOption, error) {

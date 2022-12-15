@@ -77,6 +77,16 @@ func TestInexistentDataStore(t *testing.T) {
 	assert.Nil(t, dataStore)
 }
 
+func TestEmptyDataStore(t *testing.T) {
+	config, err := config.FromFile("./testdata/empty_datastore.yaml")
+	assert.NoError(t, err)
+
+	dataStore, err := config.DataStore()
+
+	assert.NoError(t, err)
+	assert.Nil(t, dataStore)
+}
+
 func TestExporterConfig(t *testing.T) {
 	expectedExporter := config.TelemetryExporterOption{
 		ServiceName: "tracetest",

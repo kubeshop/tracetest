@@ -7,7 +7,6 @@ import (
 
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/model"
-	"github.com/kubeshop/tracetest/server/traces"
 )
 
 var ErrTraceNotFound = errors.New("trace not found")
@@ -21,7 +20,7 @@ const (
 )
 
 type TraceDB interface {
-	GetTraceByID(ctx context.Context, traceID string) (traces.Trace, error)
+	GetTraceByID(ctx context.Context, traceID string) (model.Trace, error)
 	Close() error
 }
 
@@ -29,11 +28,14 @@ var ErrInvalidTraceDBProvider = fmt.Errorf("invalid traceDB provider: available 
 
 func New(c config.Config, repository model.RunRepository) (db TraceDB, err error) {
 	selectedDataStore, err := c.DataStore()
+
+	if selectedDataStore == nil && err == nil {
+		return nil, nil
+	}
+
 	if err != nil {
 		return nil, ErrInvalidTraceDBProvider
 	}
-
-	err = ErrInvalidTraceDBProvider
 
 	switch {
 	case selectedDataStore.Type == JAEGER_BACKEND:

@@ -4,12 +4,6 @@ receivers:
       grpc:
       http:
 processors:
-  tail_sampling:
-    decision_wait: 1s
-    policies:
-      - name: tracetest-spans
-        type: trace_state
-        trace_state: { key: tracetest, values: ["true"] }
   batch:
     timeout: 100ms
 
@@ -17,7 +11,7 @@ exporters:
   logging:
     loglevel: debug
   otlp/1:
-    endpoint: tracetest:21321
+    endpoint: host.docker.internal:21321
     tls:
       insecure: true
 extensions:
@@ -28,5 +22,5 @@ service:
   pipelines:
     traces/1:
       receivers: [otlp]
-      processors: [tail_sampling, batch]
+      processors: [batch]
       exporters: [otlp/1]
