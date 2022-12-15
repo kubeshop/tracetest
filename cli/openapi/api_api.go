@@ -30,15 +30,15 @@ type ApiApiService service
 type ApiCreateDataStoreRequest struct {
 	ctx        context.Context
 	ApiService *ApiApiService
-	dataStore1 *DataStore1
+	dataStore  *DataStore
 }
 
-func (r ApiCreateDataStoreRequest) DataStore1(dataStore1 DataStore1) ApiCreateDataStoreRequest {
-	r.dataStore1 = &dataStore1
+func (r ApiCreateDataStoreRequest) DataStore(dataStore DataStore) ApiCreateDataStoreRequest {
+	r.dataStore = &dataStore
 	return r
 }
 
-func (r ApiCreateDataStoreRequest) Execute() (*DataStore1, *http.Response, error) {
+func (r ApiCreateDataStoreRequest) Execute() (*DataStore, *http.Response, error) {
 	return r.ApiService.CreateDataStoreExecute(r)
 }
 
@@ -58,13 +58,13 @@ func (a *ApiApiService) CreateDataStore(ctx context.Context) ApiCreateDataStoreR
 }
 
 // Execute executes the request
-//  @return DataStore1
-func (a *ApiApiService) CreateDataStoreExecute(r ApiCreateDataStoreRequest) (*DataStore1, *http.Response, error) {
+//  @return DataStore
+func (a *ApiApiService) CreateDataStoreExecute(r ApiCreateDataStoreRequest) (*DataStore, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
 		localVarPostBody    interface{}
 		formFiles           []formFile
-		localVarReturnValue *DataStore1
+		localVarReturnValue *DataStore
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.CreateDataStore")
@@ -96,7 +96,7 @@ func (a *ApiApiService) CreateDataStoreExecute(r ApiCreateDataStoreRequest) (*Da
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	// body params
-	localVarPostBody = r.dataStore1
+	localVarPostBody = r.dataStore
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -1457,7 +1457,7 @@ type ApiGetDataStoreRequest struct {
 	dataStoreId string
 }
 
-func (r ApiGetDataStoreRequest) Execute() (*DataStore1, *http.Response, error) {
+func (r ApiGetDataStoreRequest) Execute() (*DataStore, *http.Response, error) {
 	return r.ApiService.GetDataStoreExecute(r)
 }
 
@@ -1479,13 +1479,13 @@ func (a *ApiApiService) GetDataStore(ctx context.Context, dataStoreId string) Ap
 }
 
 // Execute executes the request
-//  @return DataStore1
-func (a *ApiApiService) GetDataStoreExecute(r ApiGetDataStoreRequest) (*DataStore1, *http.Response, error) {
+//  @return DataStore
+func (a *ApiApiService) GetDataStoreExecute(r ApiGetDataStoreRequest) (*DataStore, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
 		formFiles           []formFile
-		localVarReturnValue *DataStore1
+		localVarReturnValue *DataStore
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.GetDataStore")
@@ -1594,7 +1594,7 @@ func (r ApiGetDataStoresRequest) SortDirection(sortDirection string) ApiGetDataS
 	return r
 }
 
-func (r ApiGetDataStoresRequest) Execute() ([]DataStore1, *http.Response, error) {
+func (r ApiGetDataStoresRequest) Execute() ([]DataStore, *http.Response, error) {
 	return r.ApiService.GetDataStoresExecute(r)
 }
 
@@ -1614,13 +1614,13 @@ func (a *ApiApiService) GetDataStores(ctx context.Context) ApiGetDataStoresReque
 }
 
 // Execute executes the request
-//  @return []DataStore1
-func (a *ApiApiService) GetDataStoresExecute(r ApiGetDataStoresRequest) ([]DataStore1, *http.Response, error) {
+//  @return []DataStore
+func (a *ApiApiService) GetDataStoresExecute(r ApiGetDataStoresRequest) ([]DataStore, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
 		formFiles           []formFile
-		localVarReturnValue []DataStore1
+		localVarReturnValue []DataStore
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.GetDataStores")
@@ -4463,11 +4463,11 @@ func (a *ApiApiService) RunTransactionExecute(r ApiRunTransactionRequest) (*Tran
 type ApiTestConnectionRequest struct {
 	ctx        context.Context
 	ApiService *ApiApiService
-	body       *DataStore
+	dataStore  *DataStore
 }
 
-func (r ApiTestConnectionRequest) Body(body DataStore) ApiTestConnectionRequest {
-	r.body = &body
+func (r ApiTestConnectionRequest) DataStore(dataStore DataStore) ApiTestConnectionRequest {
+	r.dataStore = &dataStore
 	return r
 }
 
@@ -4529,7 +4529,7 @@ func (a *ApiApiService) TestConnectionExecute(r ApiTestConnectionRequest) (*Test
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	// body params
-	localVarPostBody = r.body
+	localVarPostBody = r.dataStore
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -4571,11 +4571,11 @@ type ApiUpdateDataStoreRequest struct {
 	ctx         context.Context
 	ApiService  *ApiApiService
 	dataStoreId string
-	dataStore1  *DataStore1
+	dataStore   *DataStore
 }
 
-func (r ApiUpdateDataStoreRequest) DataStore1(dataStore1 DataStore1) ApiUpdateDataStoreRequest {
-	r.dataStore1 = &dataStore1
+func (r ApiUpdateDataStoreRequest) DataStore(dataStore DataStore) ApiUpdateDataStoreRequest {
+	r.dataStore = &dataStore
 	return r
 }
 
@@ -4638,7 +4638,7 @@ func (a *ApiApiService) UpdateDataStoreExecute(r ApiUpdateDataStoreRequest) (*ht
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	// body params
-	localVarPostBody = r.dataStore1
+	localVarPostBody = r.dataStore
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return nil, err

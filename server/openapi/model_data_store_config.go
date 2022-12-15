@@ -10,7 +10,7 @@
 package openapi
 
 type DataStoreConfig struct {
-	DataStores []DataStore1 `json:"dataStores,omitempty"`
+	DataStores []DataStore `json:"dataStores,omitempty"`
 
 	DefaultDataStore string `json:"defaultDataStore,omitempty"`
 }
@@ -18,7 +18,7 @@ type DataStoreConfig struct {
 // AssertDataStoreConfigRequired checks if the required fields are not zero-ed
 func AssertDataStoreConfigRequired(obj DataStoreConfig) error {
 	for _, el := range obj.DataStores {
-		if err := AssertDataStore1Required(el); err != nil {
+		if err := AssertDataStoreRequired(el); err != nil {
 			return err
 		}
 	}
