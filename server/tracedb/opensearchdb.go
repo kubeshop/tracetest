@@ -50,7 +50,7 @@ func (db opensearchDb) TestConnection(ctx context.Context) ConnectionTestResult 
 	if strings.Contains(strings.ToLower(err.Error()), "unauthorized") {
 		return ConnectionTestResult{
 			AuthenticationTestResult: ConnectionTestStepResult{
-				OperationDescription: `Tracetest tried to execue an OpenSearch API request but it failed due to authentication issues`,
+				OperationDescription: `Tracetest tried to execute an OpenSearch API request but it failed due to authentication issues`,
 				Error:                err,
 			},
 		}
