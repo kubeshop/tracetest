@@ -26,8 +26,8 @@ export type TRawDataStore = TConfigSchemas['DataStore'];
 export type TDataStore = Model<TRawDataStore, {}>;
 export type TRawGRPCClientSettings = TConfigSchemas['GRPCClientSettings'];
 
-export type TTestConnectionRequest = TConfigSchemas['TestConnectionRequest'];
-export type TTestConnectionResponse = TConfigSchemas['TestConnectionResponse'];
+export type TTestConnectionRequest = TRawDataStore;
+export type TTestConnectionResponse = TConfigSchemas['ConnectionResult'];
 
 export type TDraftDataStore = {
   dataStore?: TRawDataStore;
@@ -45,5 +45,3 @@ export type TDataStoreService = {
 export interface IDataStorePluginProps {}
 export interface IDataStorePluginMap
   extends Record<SupportedDataStores, (props: IDataStorePluginProps) => React.ReactElement> {}
-
-

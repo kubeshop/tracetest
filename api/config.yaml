@@ -105,15 +105,6 @@ components:
           type: string
         maxVersion:
           type: string
-    TestConnectionResponse:
-      type: object
-      properties:
-        successful:
-          type: boolean
-        steps:
-          type: array
-          items:
-            $ref: "#/components/schemas/ConnectionResult"
     ConnectionResult:
       type: object
       properties:
@@ -123,15 +114,6 @@ components:
           $ref: "#/components/schemas/ConnectionTestStep"
         fetchTraces:
           $ref: "#/components/schemas/ConnectionTestStep"
-    ConnectionTestStep:
-      type: object
-      properties:
-        passed:
-          type: boolean
-        message:
-          type: string
-        error:
-          type: string
     SupportedDataStores:
       type: string
       enum: [jaeger, openSearch, tempo, signalFx]
