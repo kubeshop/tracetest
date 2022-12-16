@@ -34,6 +34,10 @@ const (
 		WHERE id = $1
 	`
 
+	updateAllDefaultDataStoresQuery = `
+		UPDATE data_stores SET "is_default" = false
+	`
+
 	getFromDataStoresQuery = `
 	SELECT
 		d.id,
@@ -230,59 +234,83 @@ func (td *postgresDB) countDataStores(ctx context.Context, condition, cleanSearc
 }
 
 func (td *postgresDB) insertIntoDataStores(ctx context.Context, dataStore model.DataStore) (model.DataStore, error) {
-	stmt, err := td.db.Prepare(insertIntoDataStoresQuery)
+	tx, err := td.db.BeginTx(ctx, nil)
 	if err != nil {
-		return model.DataStore{}, fmt.Errorf("sql prepare: %w", err)
+		return model.DataStore{}, fmt.Errorf("sql BeginTx: %w", err)
 	}
-	defer stmt.Close()
+
+	if dataStore.IsDefault {
+		_, err = tx.ExecContext(ctx, updateAllDefaultDataStoresQuery)
+
+		if err != nil {
+			tx.Rollback()
+			return model.DataStore{}, fmt.Errorf("sql exec: %w", err)
+		}
+	}
 
 	jsonValues, err := json.Marshal(dataStore.Values)
 	if err != nil {
 		return model.DataStore{}, fmt.Errorf("encoding error: %w", err)
 	}
 
-	_, err = stmt.ExecContext(
-		ctx,
+	_, err = tx.ExecContext(ctx, insertIntoDataStoresQuery,
 		dataStore.ID,
 		dataStore.Name,
 		dataStore.Type,
 		dataStore.IsDefault,
 		jsonValues,
-		dataStore.CreatedAt,
-	)
+		dataStore.CreatedAt)
 
 	if err != nil {
+		tx.Rollback()
 		return model.DataStore{}, fmt.Errorf("sql exec: %w", err)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return model.DataStore{}, fmt.Errorf("commit: %w", err)
 	}
 
 	return dataStore, nil
 }
 
 func (td *postgresDB) updateIntoDataStores(ctx context.Context, dataStore model.DataStore, oldId string) (model.DataStore, error) {
-	stmt, err := td.db.Prepare(updateIntoDataStoresQuery)
+	tx, err := td.db.BeginTx(ctx, nil)
 	if err != nil {
-		return model.DataStore{}, fmt.Errorf("sql prepare: %w", err)
+		return model.DataStore{}, fmt.Errorf("sql BeginTx: %w", err)
 	}
-	defer stmt.Close()
+
+	if dataStore.IsDefault {
+		_, err = tx.ExecContext(ctx, updateAllDefaultDataStoresQuery)
+
+		if err != nil {
+			tx.Rollback()
+			return model.DataStore{}, fmt.Errorf("sql exec: %w", err)
+		}
+	}
 
 	jsonValues, err := json.Marshal(dataStore.Values)
 	if err != nil {
 		return model.DataStore{}, fmt.Errorf("encoding error: %w", err)
 	}
 
-	_, err = stmt.ExecContext(
-		ctx,
+	_, err = tx.ExecContext(ctx, updateIntoDataStoresQuery,
 		oldId,
 		dataStore.Slug(),
 		dataStore.Name,
 		dataStore.Type,
 		dataStore.IsDefault,
 		jsonValues,
-		dataStore.CreatedAt,
-	)
+		dataStore.CreatedAt)
 
 	if err != nil {
+		tx.Rollback()
 		return model.DataStore{}, fmt.Errorf("sql exec: %w", err)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return model.DataStore{}, fmt.Errorf("commit: %w", err)
 	}
 
 	return dataStore, nil
