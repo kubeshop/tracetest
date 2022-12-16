@@ -928,7 +928,7 @@ export interface operations {
       /** Test connection Result */
       201: {
         content: {
-          "application/json": external["config.yaml"]["components"]["schemas"]["TestConnectionResponse"];
+          "application/json": external["config.yaml"]["components"]["schemas"]["ConnectionResult"];
         };
       };
     };
@@ -1001,10 +1001,6 @@ export interface external {
           keyFile?: string;
           minVersion?: string;
           maxVersion?: string;
-        };
-        TestConnectionResponse: {
-          successful?: boolean;
-          steps?: external["config.yaml"]["components"]["schemas"]["ConnectionResult"][];
         };
         ConnectionResult: {
           connectivity?: external["config.yaml"]["components"]["schemas"]["ConnectionTestStep"];

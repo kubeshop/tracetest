@@ -105,15 +105,6 @@ components:
           type: string
         maxVersion:
           type: string
-    TestConnectionResponse:
-      type: object
-      properties:
-        successful:
-          type: boolean
-        steps:
-          type: array
-          items:
-            $ref: "#/components/schemas/ConnectionResult"
     ConnectionResult:
       type: object
       properties:
