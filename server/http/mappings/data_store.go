@@ -20,7 +20,9 @@ func (m OpenAPI) DataStore(in model.DataStore) openapi.DataStore {
 	}
 
 	deepcopy.DeepCopy(in.Values.Jaeger, &dataStore.Jaeger)
+	deepcopy.DeepCopy(in.Values.Jaeger.TLSSetting, &dataStore.Jaeger.Tls)
 	deepcopy.DeepCopy(in.Values.Tempo, &dataStore.Tempo)
+	deepcopy.DeepCopy(in.Values.Tempo.TLSSetting, &dataStore.Tempo.Tls)
 	deepcopy.DeepCopy(in.Values.OpenSearch, &dataStore.OpenSearch)
 	deepcopy.DeepCopy(in.Values.SignalFx, &dataStore.SignalFx)
 
