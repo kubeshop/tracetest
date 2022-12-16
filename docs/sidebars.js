@@ -35,13 +35,8 @@ const sidebars = {
         },
         {
           type: "doc",
-          id: "getting-started/docker",
-          label: "Docker",
-        },
-        {
-          type: "doc",
-          id: "getting-started/cli",
-          label: "CLI",
+          id: "getting-started/detailed-installation",
+          label: "Detailed Installation",
         },
       ],
     },

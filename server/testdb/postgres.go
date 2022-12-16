@@ -10,7 +10,6 @@ import (
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/kubeshop/tracetest/server/id"
-	"github.com/kubeshop/tracetest/server/model"
 )
 
 type postgresDB struct {
@@ -27,7 +26,7 @@ type scanner interface {
 	Scan(dest ...interface{}) error
 }
 
-func Postgres(options ...PostgresOption) (model.Repository, error) {
+func Postgres(options ...PostgresOption) (*postgresDB, error) {
 	ps := &postgresDB{
 		migrationsFolder: "file://./migrations",
 	}

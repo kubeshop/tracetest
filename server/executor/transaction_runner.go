@@ -12,6 +12,11 @@ type TransactionRunner interface {
 	Run(context.Context, model.Transaction, model.RunMetadata, model.Environment) model.TransactionRun
 }
 
+type PersistentTransactionRunner interface {
+	TransactionRunner
+	WorkerPool
+}
+
 func NewTransactionRunner(
 	runner Runner,
 	db model.Repository,

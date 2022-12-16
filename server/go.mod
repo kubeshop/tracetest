@@ -8,6 +8,8 @@ require (
 	github.com/alecthomas/participle/v2 v2.0.0-alpha8
 	github.com/brianvoe/gofakeit/v6 v6.17.0
 	github.com/denisbrodbeck/machineid v1.0.1
+	github.com/fluidtruck/deepcopy v1.0.0
+	github.com/fsnotify/fsnotify v1.6.0
 	github.com/fullstorydev/grpcurl v1.8.6
 	github.com/gogo/protobuf v1.3.2
 	github.com/golang-migrate/migrate/v4 v4.15.2
@@ -54,7 +56,6 @@ require (
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.4.0 // indirect
 	github.com/felixge/httpsnoop v1.0.2 // indirect
-	github.com/fluidtruck/deepcopy v1.0.0 // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-redis/redis/v7 v7.4.1 // indirect
@@ -85,7 +86,7 @@ require (
 	go.uber.org/zap v1.21.0 // indirect
 	golang.org/x/net v0.0.0-20220615171555-694bf12d69de // indirect
 	golang.org/x/sync v0.0.0-20220601150217-0de741cfad7f // indirect
-	golang.org/x/sys v0.0.0-20220614162138-6c1b26c55098 // indirect
+	golang.org/x/sys v0.0.0-20220908164124-27713097b956 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/genproto v0.0.0-20220615141314-f1464d18c36b // indirect
 	google.golang.org/protobuf v1.28.1 // indirect

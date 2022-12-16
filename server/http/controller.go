@@ -26,26 +26,26 @@ import (
 var IDGen = id.NewRandGenerator()
 
 type controller struct {
-	testDB            model.Repository
-	runner            executor.Runner
-	transactionRunner executor.TransactionRunner
-	assertionRunner   executor.AssertionRunner
-	mappers           mappings.Mappings
+	testDB  model.Repository
+	runner  runner
+	mappers mappings.Mappings
+}
+
+type runner interface {
+	RunTest(ctx context.Context, test model.Test, rm model.RunMetadata, env model.Environment) model.Run
+	RunTransaction(ctx context.Context, tr model.Transaction, rm model.RunMetadata, env model.Environment) model.TransactionRun
+	RunAssertions(ctx context.Context, request executor.AssertionRequest)
 }
 
 func NewController(
 	testDB model.Repository,
-	runner executor.Runner,
-	transactionRunner executor.TransactionRunner,
-	assertionRunner executor.AssertionRunner,
+	runner runner,
 	mappers mappings.Mappings,
 ) openapi.ApiApiServicer {
 	return &controller{
-		testDB:            testDB,
-		runner:            runner,
-		assertionRunner:   assertionRunner,
-		transactionRunner: transactionRunner,
-		mappers:           mappers,
+		testDB:  testDB,
+		runner:  runner,
+		mappers: mappers,
 	}
 }
 
@@ -266,7 +266,7 @@ func (c *controller) RerunTestRun(ctx context.Context, testID, runID string) (op
 		Run:  newTestRun,
 	}
 
-	c.assertionRunner.RunAssertions(ctx, assertionRequest)
+	c.runner.RunAssertions(ctx, assertionRequest)
 
 	return openapi.Response(http.StatusOK, c.mappers.Out.Run(&newTestRun)), nil
 }
@@ -284,7 +284,7 @@ func (c *controller) RunTest(ctx context.Context, testID string, runInformation 
 		return handleDBError(err), err
 	}
 
-	run := c.runner.Run(ctx, test, metadata, environment)
+	run := c.runner.RunTest(ctx, test, metadata, environment)
 
 	return openapi.Response(200, c.mappers.Out.Run(&run)), nil
 }
@@ -922,7 +922,7 @@ func (c *controller) RunTransaction(ctx context.Context, transactionID string, r
 		return handleDBError(err), err
 	}
 
-	run := c.transactionRunner.Run(ctx, transaction, metadata, environment)
+	run := c.runner.RunTransaction(ctx, transaction, metadata, environment)
 
 	return openapi.Response(http.StatusOK, c.mappers.Out.TransactionRun(run)), nil
 }

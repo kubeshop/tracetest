@@ -101,6 +101,10 @@ const config = {
             from: ['/advanced-selectors' /*, '/docs/legacyDocFrom2016'*/],
           },
           {
+            to: '/getting-started/detailed-installation',
+            from: ['/getting-started/cli' /*, '/docs/legacyDocFrom2016'*/],
+          },
+          {
             to: '/configuration/overview',
             from: ['/getting-started/supported-backends' /*, '/docs/legacyDocFrom2016'*/],
           },
