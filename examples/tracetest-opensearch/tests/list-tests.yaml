@@ -1,3 +1,4 @@
+---
 type: Test
 spec:
   id: e9c6cff9-974d-4263-8a23-22f1e9f975aa
@@ -9,9 +10,9 @@ spec:
       url: http://tracetest:11633/api/tests
       method: GET
       headers:
-      - key: Content-Type
-        value: application/json
+        - key: Content-Type
+          value: application/json
   specs:
-  - selector: span[name = "Tracetest trigger"]
-    assertions:
-    - attr:tracetest.selected_spans.count = 1
+    - selector: span[name = "Tracetest trigger"]
+      assertions:
+        - attr:tracetest.selected_spans.count = 1
