@@ -4,6 +4,7 @@ export const theme: DefaultTheme = {
   color: {
     background: '#FBFBFF',
     backgroundInteractive: 'rgba(56, 101, 246, 0.05)',
+    backgroundDark: '#E2E4ED',
     border: '#CDD1DB',
     borderLight: 'rgba(3, 24, 73, 0.1)',
     error: '#FF4D4F',
@@ -16,6 +17,7 @@ export const theme: DefaultTheme = {
     textSecondary: '#687492',
     white: '#FFFFFF',
     warningYellow: '#FAAD14',
+    alertYellow: '#fffbe6',
   },
   size: {
     xs: '10px',

@@ -5,7 +5,6 @@ import (
 	"strconv"
 
 	"github.com/kubeshop/tracetest/server/model"
-	"github.com/kubeshop/tracetest/server/traces"
 )
 
 type DataStore interface {
@@ -14,7 +13,7 @@ type DataStore interface {
 }
 
 type AttributeDataStore struct {
-	Span traces.Span
+	Span model.Span
 }
 
 func (ds AttributeDataStore) Source() string {
@@ -26,7 +25,7 @@ func (ds AttributeDataStore) Get(name string) (string, error) {
 }
 
 type MetaAttributesDataStore struct {
-	SelectedSpans []traces.Span
+	SelectedSpans []model.Span
 }
 
 func (ds MetaAttributesDataStore) Source() string {

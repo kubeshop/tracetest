@@ -17,6 +17,7 @@ const (
 	OPEN_SEARCH SupportedDataStores = "openSearch"
 	TEMPO       SupportedDataStores = "tempo"
 	SIGNAL_FX   SupportedDataStores = "signalFx"
+	OTLP        SupportedDataStores = "otlp"
 )
 
 // AssertSupportedDataStoresRequired checks if the required fields are not zero-ed

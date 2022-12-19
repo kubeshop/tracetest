@@ -26,28 +26,26 @@ func dbSpanNameFormatter(ctx context.Context, method, query string) string {
 	return fmt.Sprintf("%s %s", method, queryName)
 }
 
-func WithDSN(dsn string) PostgresOption {
-	return func(pd *postgresDB) error {
-		connector, err := pq.NewConnector(dsn)
-		if err != nil {
-			return fmt.Errorf("sql open: %w", err)
-		}
-		db := sql.OpenDB(
-			otsql.WrapConnector(connector,
-				otsql.WithHooks(
-					trace.New(
-						trace.WithQuery(true),
-						trace.WithQueryParams(true),
-						trace.WithRowsAffected(true),
-						trace.WithSpanNameFormatter(dbSpanNameFormatter),
-						trace.WithDefaultAttributes(attribute.String("service.name", "tracetest")),
-					),
+func Connect(dsn string) (*sql.DB, error) {
+	connector, err := pq.NewConnector(dsn)
+	if err != nil {
+		return nil, fmt.Errorf("sql open: %w", err)
+	}
+	db := sql.OpenDB(
+		otsql.WrapConnector(connector,
+			otsql.WithHooks(
+				trace.New(
+					trace.WithQuery(true),
+					trace.WithQueryParams(true),
+					trace.WithRowsAffected(true),
+					trace.WithSpanNameFormatter(dbSpanNameFormatter),
+					trace.WithDefaultAttributes(attribute.String("service.name", "tracetest")),
 				),
 			),
-		)
-		pd.db = db
-		return nil
-	}
+		),
+	)
+
+	return db, nil
 }
 
 func WithDB(db *sql.DB) PostgresOption {
@@ -59,6 +57,9 @@ func WithDB(db *sql.DB) PostgresOption {
 
 func WithMigrations(migrationFolder string) PostgresOption {
 	return func(pd *postgresDB) error {
+		if migrationFolder == "" {
+			return nil
+		}
 		pd.migrationsFolder = migrationFolder
 
 		return nil

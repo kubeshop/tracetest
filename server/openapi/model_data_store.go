@@ -9,10 +9,18 @@
 
 package openapi
 
+import (
+	"time"
+)
+
 type DataStore struct {
-	Type SupportedDataStores `json:"type,omitempty"`
+	Id string `json:"id,omitempty"`
 
 	Name string `json:"name,omitempty"`
+
+	Type SupportedDataStores `json:"type,omitempty"`
+
+	IsDefault bool `json:"isDefault,omitempty"`
 
 	Jaeger GrpcClientSettings `json:"jaeger,omitempty"`
 
@@ -21,6 +29,8 @@ type DataStore struct {
 	OpenSearch OpenSearch `json:"openSearch,omitempty"`
 
 	SignalFx SignalFx `json:"signalFx,omitempty"`
+
+	CreatedAt time.Time `json:"createdAt,omitempty"`
 }
 
 // AssertDataStoreRequired checks if the required fields are not zero-ed

@@ -8,6 +8,7 @@ declare module 'styled-components' {
     color: {
       background: string;
       backgroundInteractive: string;
+      backgroundDark: string;
       border: string;
       borderLight: string;
       error: string;
@@ -20,6 +21,7 @@ declare module 'styled-components' {
       textSecondary: string;
       white: string;
       warningYellow: string;
+      alertYellow: string;
     };
     /** Font size */
     size: {

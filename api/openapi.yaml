@@ -1059,36 +1059,6 @@ paths:
                 type: array
                 items:
                   $ref: "./resources.yaml#/components/schemas/Resource"
-  /config/datastores:
-    get:
-      tags:
-        - api
-      summary: "Get the Server Side Data Stores Config"
-      description: "Get the Server Side Data Stores Config"
-      operationId: getDataStoresConfig
-      responses:
-        200:
-          description: Server Side Config
-          content:
-            application/json:
-              schema:
-                $ref: "./config.yaml#/components/schemas/DataStoreConfig"
-    put:
-      tags:
-        - api
-      summary: "Updates the Server Side Data Store config"
-      description: "Updates the Server Side Data Store config"
-      operationId: updateDataStoresConfig
-      requestBody:
-        content:
-          text/json:
-            schema:
-              $ref: "./config.yaml#/components/schemas/DataStoreConfig"
-      responses:
-        204:
-          description: successful operation
-        500:
-          description: "problem with updating environment"
   /config/connection:
     post:
       tags:
@@ -1100,11 +1070,146 @@ paths:
         content:
           text/json:
             schema:
-              $ref: "./config.yaml#/components/schemas/DataStore"
+              $ref: "./dataStores.yaml#/components/schemas/DataStore"
       responses:
         201:
           description: Test connection Result
           content:
             application/json:
               schema:
-                $ref: "./config.yaml#/components/schemas/ConnectionResult"
+                $ref: "./config.yaml#/components/schemas/TestConnectionResponse"
+
+  # Data Stores
+  /datastores:
+    get:
+      tags:
+        - api
+      summary: "Get all Data Stores"
+      description: "Get all Data Stores"
+      operationId: getDataStores
+      parameters:
+        - in: query
+          name: take
+          description: "indicates how many data stores can be returned by each page"
+          schema:
+            type: integer
+            default: 20
+        - in: query
+          name: skip
+          description: "indicates how many data stores will be skipped when paginating"
+          schema:
+            type: integer
+            default: 0
+        - in: query
+          name: query
+          description: "query to search data stores, based on data store name"
+          schema:
+            type: string
+        - in: query
+          name: sortBy
+          description: "indicates the sort field for the data stores"
+          schema:
+            type: string
+            enum: [ created, name ]
+        - in: query
+          name: sortDirection
+          description: "indicates the sort direction for the data stores"
+          schema:
+            type: string
+            enum: [ asc, desc ]
+      responses:
+        200:
+          description: successful operation
+          headers:
+            X-Total-Count:
+              schema:
+                type: integer
+              description: Total records count
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "./dataStores.yaml#/components/schemas/DataStore"
+        500:
+          description: "problem with getting data stores"
+    post:
+      tags:
+        - api
+      summary: "Create a new Data Store"
+      description: "Create a new Data Store"
+      operationId: createDataStore
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "./dataStores.yaml#/components/schemas/DataStore"
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "./dataStores.yaml#/components/schemas/DataStore"
+        400:
+          description: "trying to create a data store with an already existing ID"
+
+  /datastores/{dataStoreId}:
+    get:
+      tags:
+        - api
+      parameters:
+        - in: path
+          name: dataStoreId
+          schema:
+            type: string
+          required: true
+      summary: "Get a Data Store"
+      description: "Get a Data Store"
+      operationId: getDataStore
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "./dataStores.yaml#/components/schemas/DataStore"
+        500:
+          description: "problem with getting a data store"
+    put:
+      tags:
+        - api
+      parameters:
+        - in: path
+          name: dataStoreId
+          schema:
+            type: string
+          required: true
+      summary: "Update a Data Store"
+      description: "Update a Data Store"
+      operationId: updateDataStore
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "./dataStores.yaml#/components/schemas/DataStore"
+      responses:
+        204:
+          description: successful operation
+        500:
+          description: "problem with updating data store"
+    delete:
+      tags:
+        - api
+      parameters:
+        - in: path
+          name: dataStoreId
+          schema:
+            type: string
+          required: true
+      summary: "Delete a Data Store"
+      description: "Delete a Data Store"
+      operationId: deleteDataStore
+      responses:
+        "204":
+          description: OK

@@ -16,26 +16,32 @@ import (
 
 type Server struct {
 	pb.UnimplementedTraceServiceServer
-	db model.Repository
+
+	addr string
+	db   model.RunRepository
+
+	gServer *grpc.Server
 }
 
-func StartServer(port int, db model.Repository) error {
-	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
+func NewServer(addr string, db model.RunRepository) *Server {
+	return &Server{
+		addr: addr,
+		db:   db,
+	}
+}
+
+func (s *Server) Start() error {
+	s.gServer = grpc.NewServer()
+	listener, err := net.Listen("tcp", s.addr)
 	if err != nil {
-		panic(err)
+		return fmt.Errorf("cannot listen on address %s: %w", s.addr, err)
 	}
+	pb.RegisterTraceServiceServer(s.gServer, s)
+	return s.gServer.Serve(listener)
+}
 
-	server := Server{
-		db: db,
-	}
-
-	s := grpc.NewServer()
-	pb.RegisterTraceServiceServer(s, &server)
-	if err := s.Serve(listener); err != nil {
-		return fmt.Errorf("could not serve: %w", err)
-	}
-
-	return nil
+func (s *Server) Stop() {
+	s.gServer.Stop()
 }
 
 func (s Server) Export(ctx context.Context, request *pb.ExportTraceServiceRequest) (*pb.ExportTraceServiceResponse, error) {
@@ -56,7 +62,7 @@ func (s Server) Export(ctx context.Context, request *pb.ExportTraceServiceReques
 	}, nil
 }
 
-func (s Server) getSpansByTrace(request *pb.ExportTraceServiceRequest) map[trace.TraceID][]traces.Span {
+func (s Server) getSpansByTrace(request *pb.ExportTraceServiceRequest) map[trace.TraceID][]model.Span {
 	otelSpans := make([]*v1.Span, 0)
 	for _, resourceSpan := range request.ResourceSpans {
 		for _, spans := range resourceSpan.ScopeSpans {
@@ -64,15 +70,15 @@ func (s Server) getSpansByTrace(request *pb.ExportTraceServiceRequest) map[trace
 		}
 	}
 
-	spansByTrace := make(map[trace.TraceID][]traces.Span)
+	spansByTrace := make(map[trace.TraceID][]model.Span)
 
 	for _, span := range otelSpans {
 		traceID := traces.CreateTraceID(span.TraceId)
-		var existingArray []traces.Span
+		var existingArray []model.Span
 		if spansArray, ok := spansByTrace[traceID]; ok {
 			existingArray = spansArray
 		} else {
-			existingArray = make([]traces.Span, 0)
+			existingArray = make([]model.Span, 0)
 		}
 
 		existingArray = append(existingArray, *traces.ConvertOtelSpanIntoSpan(span))
@@ -82,7 +88,7 @@ func (s Server) getSpansByTrace(request *pb.ExportTraceServiceRequest) map[trace
 	return spansByTrace
 }
 
-func (s Server) saveSpansIntoTest(ctx context.Context, traceID trace.TraceID, spans []traces.Span) error {
+func (s Server) saveSpansIntoTest(ctx context.Context, traceID trace.TraceID, spans []model.Span) error {
 	run, err := s.db.GetRunByTraceID(ctx, traceID)
 	if err != nil && strings.Contains(err.Error(), "record not found") {
 		// span is not part of any known test run. So it will be ignored
@@ -95,7 +101,7 @@ func (s Server) saveSpansIntoTest(ctx context.Context, traceID trace.TraceID, sp
 
 	existingSpans := run.Trace.Spans()
 	newSpans := append(existingSpans, spans...)
-	newTrace := traces.New(traceID.String(), newSpans)
+	newTrace := model.NewTrace(traceID.String(), newSpans)
 
 	run.Trace = &newTrace
 

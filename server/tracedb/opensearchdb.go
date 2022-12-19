@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/server/config"
-	"github.com/kubeshop/tracetest/server/traces"
+	"github.com/kubeshop/tracetest/server/model"
 	"github.com/opensearch-project/opensearch-go"
 	"github.com/opensearch-project/opensearch-go/opensearchapi"
 	"go.opentelemetry.io/otel/trace"
@@ -78,7 +78,7 @@ func (db opensearchDb) TestConnection(ctx context.Context) ConnectionTestResult 
 	}
 }
 
-func (db opensearchDb) GetTraceByID(ctx context.Context, traceID string) (traces.Trace, error) {
+func (db opensearchDb) GetTraceByID(ctx context.Context, traceID string) (model.Trace, error) {
 	content := strings.NewReader(fmt.Sprintf(`{
 		"query": { "match": { "traceId": "%s" } }
 	}`, traceID))
@@ -90,22 +90,22 @@ func (db opensearchDb) GetTraceByID(ctx context.Context, traceID string) (traces
 
 	response, err := searchRequest.Do(ctx, db.client)
 	if err != nil {
-		return traces.Trace{}, fmt.Errorf("could not execute search request: %w", err)
+		return model.Trace{}, fmt.Errorf("could not execute search request: %w", err)
 	}
 
 	responseBody, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		return traces.Trace{}, fmt.Errorf("could not read response body")
+		return model.Trace{}, fmt.Errorf("could not read response body")
 	}
 
 	var searchResponse searchResponse
 	err = json.Unmarshal(responseBody, &searchResponse)
 	if err != nil {
-		return traces.Trace{}, fmt.Errorf("could not unmarshal search response into struct: %w", err)
+		return model.Trace{}, fmt.Errorf("could not unmarshal search response into struct: %w", err)
 	}
 
 	if len(searchResponse.Hits.Results) == 0 {
-		return traces.Trace{}, ErrTraceNotFound
+		return model.Trace{}, ErrTraceNotFound
 	}
 
 	return convertOpensearchFormatIntoTrace(traceID, searchResponse), nil
@@ -128,23 +128,23 @@ func newOpenSearchDB(cfg config.OpensearchDataStoreConfig) (TraceDB, error) {
 	}, nil
 }
 
-func convertOpensearchFormatIntoTrace(traceID string, searchResponse searchResponse) traces.Trace {
-	spans := make([]traces.Span, 0)
+func convertOpensearchFormatIntoTrace(traceID string, searchResponse searchResponse) model.Trace {
+	spans := make([]model.Span, 0)
 	for _, result := range searchResponse.Hits.Results {
 		span := convertOpensearchSpanIntoSpan(result.Source)
 		spans = append(spans, span)
 	}
 
-	return traces.New(traceID, spans)
+	return model.NewTrace(traceID, spans)
 }
 
-func convertOpensearchSpanIntoSpan(input map[string]interface{}) traces.Span {
+func convertOpensearchSpanIntoSpan(input map[string]interface{}) model.Span {
 	spanId, _ := trace.SpanIDFromHex(input["spanId"].(string))
 
 	startTime, _ := time.Parse(time.RFC3339, input["startTime"].(string))
 	endTime, _ := time.Parse(time.RFC3339, input["endTime"].(string))
 
-	attributes := make(traces.Attributes, 0)
+	attributes := make(model.Attributes, 0)
 
 	for attrName, attrValue := range input {
 		if !strings.HasPrefix(attrName, "span.attributes.") && !strings.HasPrefix(attrName, "resource.attributes.") {
@@ -164,14 +164,14 @@ func convertOpensearchSpanIntoSpan(input map[string]interface{}) traces.Span {
 	attributes["kind"] = input["kind"].(string)
 	attributes["parent_id"] = input["parentSpanId"].(string)
 
-	return traces.Span{
+	return model.Span{
 		ID:         spanId,
 		Name:       input["name"].(string),
 		StartTime:  startTime,
 		EndTime:    endTime,
 		Attributes: attributes,
 		Parent:     nil,
-		Children:   []*traces.Span{},
+		Children:   []*model.Span{},
 	}
 }
 

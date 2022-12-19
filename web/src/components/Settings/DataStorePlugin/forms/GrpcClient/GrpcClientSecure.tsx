@@ -1,4 +1,5 @@
 import {Checkbox, Col, Form, Input, Row} from 'antd';
+import RequestDetailsFileInput from 'components/CreateTestPlugins/Grpc/steps/RequestDetails/RequestDetailsFileInput';
 
 interface IProps {
   baseName: string[];
@@ -21,21 +22,21 @@ const GrpcClientSecure = ({baseName}: IProps) => (
         </Form.Item>
       </Col>
       <Col span={12}>
-        <Form.Item label="CA file" name={[...baseName, 'tls', 'settings', 'cAFile']}>
-          <Input placeholder="Enter a CA file" />
+        <Form.Item label="Upload CA file" name={[...baseName, 'fileCA']}>
+          <RequestDetailsFileInput accept="" />
         </Form.Item>
       </Col>
     </Row>
 
     <Row gutter={[16, 16]}>
       <Col span={12}>
-        <Form.Item label="Cert file" name={[...baseName, 'tls', 'settings', 'certFile']}>
-          <Input placeholder="Enter a Cert file" />
+        <Form.Item label="Upload Cert file" name={[...baseName, 'fileCert']}>
+          <RequestDetailsFileInput accept="" />
         </Form.Item>
       </Col>
       <Col span={12}>
-        <Form.Item label="Key file" name={[...baseName, 'tls', 'settings', 'keyFile']}>
-          <Input placeholder="Enter a Key file" />
+        <Form.Item label="Upload Key file" name={[...baseName, 'fileKey']}>
+          <RequestDetailsFileInput accept="" />
         </Form.Item>
       </Col>
     </Row>

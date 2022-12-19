@@ -30,6 +30,7 @@ export type TEnvironmentSchemas = external['environments.yaml']['components']['s
 export type TExpressionsSchemas = external['expressions.yaml']['components']['schemas'];
 export type TTransactionsSchemas = external['transactions.yaml']['components']['schemas'];
 export type TResourceSchemas = external['resources.yaml']['components']['schemas'];
+export type TDataStoreSchemas = external['dataStores.yaml']['components']['schemas'];
 export type TConfigSchemas = external['config.yaml']['components']['schemas'];
 
 export type TSelector = TTestSchemas['Selector'];

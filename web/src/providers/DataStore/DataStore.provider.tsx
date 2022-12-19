@@ -9,6 +9,7 @@ interface IContext {
   isFormValid: boolean;
   isLoading: boolean;
   isTestConnectionLoading: boolean;
+  onDeleteConfig(): void;
   onSaveConfig(draft: TDraftDataStore): void;
   onTestConnection(draft: TDraftDataStore): void;
   onIsFormValid(isValid: boolean): void;
@@ -21,6 +22,7 @@ export const Context = createContext<IContext>({
   onSaveConfig: noop,
   onIsFormValid: noop,
   onTestConnection: noop,
+  onDeleteConfig: noop,
 });
 
 interface IProps {
@@ -35,11 +37,34 @@ const DataStoreProvider = ({children}: IProps) => {
   const [isFormValid, setIsFormValid] = useState(false);
   const {showNotification, contextHolder} = useTestConnectionNotification();
 
-  const onSaveConfig = useCallback(async (draft: TDraftDataStore) => {
-    const configRequest = await DataStoreService.getRequest(draft);
-    console.log('@@saving draft', draft, configRequest);
-    // const config = await updateConfig(configRequest).unwrap();
-  }, []);
+  const onSaveConfig = useCallback(
+    async (draft: TDraftDataStore) => {
+      onOpen({
+        title: 'Tracetest needs to do a quick restart to use this new configuration.',
+        heading: 'Save Confirmation',
+        okText: 'Save & Restart',
+        onConfirm: async () => {
+          const update = await DataStoreService.getRequest(draft);
+          console.log('@@saving draft', draft, update);
+          // const config = await updateConfig(update).unwrap();
+        },
+      });
+    },
+    [onOpen]
+  );
+
+  const onDeleteConfig = useCallback(async () => {
+    onOpen({
+      title: 'Tracetest needs to do a quick restart to use this new configuration.',
+      heading: 'Save Confirmation',
+      okText: 'Save & Restart',
+      onConfirm: async () => {
+        const deleteRequest = await DataStoreService.getDeleteRequest();
+        console.log('@@deleting', deleteRequest);
+        // const config = await updateConfig(configRequest).unwrap();
+      },
+    });
+  }, [onOpen]);
 
   const onIsFormValid = useCallback((isValid: boolean) => {
     setIsFormValid(isValid);
@@ -67,8 +92,9 @@ const DataStoreProvider = ({children}: IProps) => {
       onSaveConfig,
       onIsFormValid,
       onTestConnection,
+      onDeleteConfig,
     }),
-    [isLoading, isFormValid, isTestConnectionLoading, onSaveConfig, onIsFormValid, onTestConnection]
+    [isLoading, isFormValid, isTestConnectionLoading, onSaveConfig, onIsFormValid, onTestConnection, onDeleteConfig]
   );
 
   return (

@@ -32,14 +32,14 @@ func (jtd *OTLPTraceDB) TestConnection(ctx context.Context) ConnectionTestResult
 }
 
 // GetTraceByID implements TraceDB
-func (tdb *OTLPTraceDB) GetTraceByID(ctx context.Context, id string) (traces.Trace, error) {
+func (tdb *OTLPTraceDB) GetTraceByID(ctx context.Context, id string) (model.Trace, error) {
 	run, err := tdb.db.GetRunByTraceID(ctx, traces.DecodeTraceID(id))
 	if err != nil && strings.Contains(err.Error(), "record not found") {
-		return traces.Trace{}, ErrTraceNotFound
+		return model.Trace{}, ErrTraceNotFound
 	}
 
 	if run.Trace == nil {
-		return traces.Trace{}, ErrTraceNotFound
+		return model.Trace{}, ErrTraceNotFound
 	}
 
 	return *run.Trace, nil

@@ -1,12 +1,12 @@
-# Getting Started with Tracetest Using the CLI
+# Detailed Instructions on Installing Tracetest Using the CLI
 
-The CLI offers an **install wizard** that helps with the process. It helps configure Tracetest itself and all the tools needed to observe your application.
+Tracetest has a command line interface (CLI) which includes an **install wizard** that helps to install the Tracetest server into Docker or Kubernetes. The CLI can also be used to run tests, download or upload tests, and manage much of the capability of Tracetest.
 
-## Installing the Tracetest CLI
+## Installing the Tracetest Server via the CLI
 
-Use the install wizard to install Tracetest locally using Docker Compose or to a local or remote Kubernetes cluster.
+Use the CLI's install wizard to install a Tracetest server locally using Docker Compose or to a local or remote Kubernetes cluster.
 
-It installs all the tools required to set up the desired environment and creates all the configurations, tailored to your case.
+The wizard installs all the tools required to set up the desired environment and creates all the configurations, tailored to your case.
 
 Every time we release a new version of Tracetest, we generate binaries for Linux, MacOS, and Windows. Supporting both amd64, and ARM64 architectures, in `tar.gz`, `deb`, `rpm` and `exe` formats.
 
@@ -70,11 +70,7 @@ This guide will help you get Tracetest running using the Tracetest CLI.
 ### Prerequisites
 
 :::info
-Make sure you have [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed.
-:::
-
-:::caution
-Postgres is a prerequisite for Tracetest to work. It stores Tracetest's trace data. Make sure to have a Postgres service.
+Make sure you have [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/), or [Kubernetes](https://kubernetes.io/) installed.
 :::
 
 :::info
@@ -243,7 +239,7 @@ Open [`http://localhost:11633`](http://localhost:11633) in your browser.
 Create a [test](../web-ui/creating-tests.md).
 
 :::info
-Running a test against `localhost` will resolve as the 127.0.0.1 inside the Tracetest container. To run tests against apps running on your local machine, add them to the same network and use service name mapping instead. Example: Instead of running an app on `localhost:8080`, add it to your Docker Compose file, connect it to the same network as your Tracetest service, and use `service-name:8080` in the URL field when creating an app.
+Running a test against `localhost` will resolve as `127.0.0.1` inside the Tracetest container. To run tests against apps running on your local machine, add them to the same network and use service name mapping instead. Example: Instead of running an app on `localhost:8080`, add it to your Docker Compose file, connect it to the same network as your Tracetest service, and use `service-name:8080` in the URL field when creating an app.
 
 You can reach services running on your local machine using:
 

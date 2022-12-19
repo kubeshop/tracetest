@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/server/config"
-	"github.com/kubeshop/tracetest/server/traces"
+	"github.com/kubeshop/tracetest/server/model"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -87,22 +87,22 @@ func (db signalfxDB) TestConnection(ctx context.Context) ConnectionTestResult {
 	}
 }
 
-func (db signalfxDB) GetTraceByID(ctx context.Context, traceID string) (traces.Trace, error) {
+func (db signalfxDB) GetTraceByID(ctx context.Context, traceID string) (model.Trace, error) {
 	timestamps, err := db.getSegmentsTimestamps(ctx, traceID)
 	if err != nil {
-		return traces.Trace{}, fmt.Errorf("coult not get trace segment timestamps: %w", err)
+		return model.Trace{}, fmt.Errorf("coult not get trace segment timestamps: %w", err)
 	}
 
 	if len(timestamps) == 0 {
-		return traces.Trace{}, ErrTraceNotFound
+		return model.Trace{}, ErrTraceNotFound
 	}
 
-	traceSpans := make([]traces.Span, 0)
+	traceSpans := make([]model.Span, 0)
 
 	for _, timestamp := range timestamps {
 		segmentSpans, err := db.getSegmentSpans(ctx, traceID, timestamp)
 		if err != nil {
-			return traces.Trace{}, fmt.Errorf("could not get segment spans: %w", err)
+			return model.Trace{}, fmt.Errorf("could not get segment spans: %w", err)
 		}
 
 		for _, signalFxSpan := range segmentSpans {
@@ -112,10 +112,10 @@ func (db signalfxDB) GetTraceByID(ctx context.Context, traceID string) (traces.T
 	}
 
 	if len(traceSpans) == 0 {
-		return traces.Trace{}, ErrTraceNotFound
+		return model.Trace{}, ErrTraceNotFound
 	}
 
-	return traces.New(traceID, traceSpans), nil
+	return model.NewTrace(traceID, traceSpans), nil
 }
 
 func (db signalfxDB) getSegmentsTimestamps(ctx context.Context, traceID string) ([]int64, error) {
@@ -186,8 +186,8 @@ func (db signalfxDB) getSegmentSpans(ctx context.Context, traceID string, timest
 	return spans, nil
 }
 
-func convertSignalFXSpan(in signalFXSpan) traces.Span {
-	attributes := make(traces.Attributes, 0)
+func convertSignalFXSpan(in signalFXSpan) model.Span {
+	attributes := make(model.Attributes, 0)
 	for name, value := range in.Tags {
 		attributes[name] = value
 	}
@@ -204,7 +204,7 @@ func convertSignalFXSpan(in signalFXSpan) traces.Span {
 	startTime, _ := time.Parse(time.RFC3339, in.StartTime)
 	endTime := startTime.Add(time.Duration(in.Duration) * time.Microsecond)
 
-	return traces.Span{
+	return model.Span{
 		ID:         spanID,
 		Name:       in.Name,
 		StartTime:  startTime,

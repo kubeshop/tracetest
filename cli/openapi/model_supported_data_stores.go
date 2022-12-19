@@ -24,6 +24,7 @@ const (
 	OPEN_SEARCH SupportedDataStores = "openSearch"
 	TEMPO       SupportedDataStores = "tempo"
 	SIGNAL_FX   SupportedDataStores = "signalFx"
+	OTLP        SupportedDataStores = "otlp"
 )
 
 // All allowed values of SupportedDataStores enum
@@ -32,6 +33,7 @@ var AllowedSupportedDataStoresEnumValues = []SupportedDataStores{
 	"openSearch",
 	"tempo",
 	"signalFx",
+	"otlp",
 }
 
 func (v *SupportedDataStores) UnmarshalJSON(src []byte) error {

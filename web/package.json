@@ -79,7 +79,7 @@
     "grammar:expressionQL": "lezer-generator ./src/components/Editor/Expression/grammar/syntax.grammar -o ./src/components/Editor/Expression/grammar/grammar.js",
     "grammar:interpolationQL": "lezer-generator ./src/components/Editor/Interpolation/grammar/syntax.grammar -o ./src/components/Editor/Interpolation/grammar/grammar.js",
     "types": "tsc",
-    "eslint": "eslint --ext=.js,.ts,.tsx ./src/**/* ./cypress/e2e/**/*",
+    "eslint": "eslint --ext .js,.ts,.tsx src/ cypress/",
     "eject": "react-scripts eject",
     "cy:open": "cypress open",
     "cy:run": "cypress run",
@@ -87,19 +87,6 @@
     "prettier": "prettier --write ./src",
     "storybook": "start-storybook -p 6006 -s public",
     "build-storybook": "build-storybook -s public"
-  },
-  "eslintConfig": {
-    "extends": "react-app",
-    "overrides": [
-      {
-        "files": [
-          "**/*.stories.*"
-        ],
-        "rules": {
-          "import/no-anonymous-default-export": "off"
-        }
-      }
-    ]
   },
   "browserslist": {
     "production": [

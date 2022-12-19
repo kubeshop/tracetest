@@ -10,15 +10,17 @@
 package main
 
 import (
-	"context"
 	"flag"
 	"log"
+	"os"
+	"os/signal"
+	"sync"
+	"syscall"
 
+	"github.com/fsnotify/fsnotify"
 	"github.com/kubeshop/tracetest/server/app"
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/testdb"
-	"github.com/kubeshop/tracetest/server/tracedb"
-	"github.com/kubeshop/tracetest/server/tracing"
 )
 
 var cfg = flag.String("config", "config.yaml", "path to the config file")
@@ -26,37 +28,90 @@ var cfg = flag.String("config", "config.yaml", "path to the config file")
 func main() {
 
 	flag.Parse()
+	cfg := loadConfig()
+	db, err := testdb.Connect(cfg.PostgresConnString)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	appCfg := app.Config{
+		Config: cfg,
+	}
+
+	appInstance, err := app.New(appCfg, db)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var wg sync.WaitGroup
+	c := make(chan os.Signal)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-c
+		wg.Done()
+		appInstance.Stop()
+		os.Exit(1)
+	}()
+
+	wg.Add(1)
+	err = appInstance.Start()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	go watchChanges(func() {
+		appCfg = app.Config{
+			Config: loadConfig(),
+		}
+		appInstance.HotReload(appCfg)
+	})
+
+	wg.Wait()
+}
+
+func loadConfig() config.Config {
 	cfg, err := config.FromFile(*cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	ctx := context.Background()
+	return cfg
 
-	testDB, err := testdb.Postgres(testdb.WithDSN(cfg.PostgresConnString))
+}
+
+func watchChanges(updateFn func()) {
+	watcher, err := fsnotify.NewWatcher()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer watcher.Close()
+
+	go func() {
+		for {
+			select {
+			case event, ok := <-watcher.Events:
+				if !ok {
+					return
+				}
+				if event.Has(fsnotify.Write) {
+					log.Println("config updated:", event.Name)
+					updateFn()
+				}
+			case err, ok := <-watcher.Errors:
+				if !ok {
+					return
+				}
+				log.Println("error:", err)
+			}
+		}
+	}()
+
+	// Add a path.
+	err = watcher.Add(*cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	traceDB, err := tracedb.New(cfg, testDB)
-	if err != nil {
-		log.Fatal(err)
-	}
+	<-make(chan struct{})
 
-	tracer, err := tracing.NewTracer(ctx, cfg)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	defer tracing.ShutdownTracer(ctx)
-
-	app, err := app.New(cfg, testDB, traceDB, tracer)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = app.Start()
-	if err != nil {
-		log.Fatal(err)
-	}
 }

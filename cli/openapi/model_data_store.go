@@ -12,16 +12,20 @@ package openapi
 
 import (
 	"encoding/json"
+	"time"
 )
 
 // DataStore struct for DataStore
 type DataStore struct {
-	Type       *SupportedDataStores `json:"type,omitempty"`
+	Id         *string              `json:"id,omitempty"`
 	Name       *string              `json:"name,omitempty"`
+	Type       *SupportedDataStores `json:"type,omitempty"`
+	IsDefault  *bool                `json:"isDefault,omitempty"`
 	Jaeger     *GRPCClientSettings  `json:"jaeger,omitempty"`
 	Tempo      *GRPCClientSettings  `json:"tempo,omitempty"`
 	OpenSearch *OpenSearch          `json:"openSearch,omitempty"`
 	SignalFx   *SignalFX            `json:"signalFx,omitempty"`
+	CreatedAt  *time.Time           `json:"createdAt,omitempty"`
 }
 
 // NewDataStore instantiates a new DataStore object
@@ -39,6 +43,70 @@ func NewDataStore() *DataStore {
 func NewDataStoreWithDefaults() *DataStore {
 	this := DataStore{}
 	return &this
+}
+
+// GetId returns the Id field value if set, zero value otherwise.
+func (o *DataStore) GetId() string {
+	if o == nil || o.Id == nil {
+		var ret string
+		return ret
+	}
+	return *o.Id
+}
+
+// GetIdOk returns a tuple with the Id field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *DataStore) GetIdOk() (*string, bool) {
+	if o == nil || o.Id == nil {
+		return nil, false
+	}
+	return o.Id, true
+}
+
+// HasId returns a boolean if a field has been set.
+func (o *DataStore) HasId() bool {
+	if o != nil && o.Id != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetId gets a reference to the given string and assigns it to the Id field.
+func (o *DataStore) SetId(v string) {
+	o.Id = &v
+}
+
+// GetName returns the Name field value if set, zero value otherwise.
+func (o *DataStore) GetName() string {
+	if o == nil || o.Name == nil {
+		var ret string
+		return ret
+	}
+	return *o.Name
+}
+
+// GetNameOk returns a tuple with the Name field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *DataStore) GetNameOk() (*string, bool) {
+	if o == nil || o.Name == nil {
+		return nil, false
+	}
+	return o.Name, true
+}
+
+// HasName returns a boolean if a field has been set.
+func (o *DataStore) HasName() bool {
+	if o != nil && o.Name != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetName gets a reference to the given string and assigns it to the Name field.
+func (o *DataStore) SetName(v string) {
+	o.Name = &v
 }
 
 // GetType returns the Type field value if set, zero value otherwise.
@@ -73,36 +141,36 @@ func (o *DataStore) SetType(v SupportedDataStores) {
 	o.Type = &v
 }
 
-// GetName returns the Name field value if set, zero value otherwise.
-func (o *DataStore) GetName() string {
-	if o == nil || o.Name == nil {
-		var ret string
+// GetIsDefault returns the IsDefault field value if set, zero value otherwise.
+func (o *DataStore) GetIsDefault() bool {
+	if o == nil || o.IsDefault == nil {
+		var ret bool
 		return ret
 	}
-	return *o.Name
+	return *o.IsDefault
 }
 
-// GetNameOk returns a tuple with the Name field value if set, nil otherwise
+// GetIsDefaultOk returns a tuple with the IsDefault field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *DataStore) GetNameOk() (*string, bool) {
-	if o == nil || o.Name == nil {
+func (o *DataStore) GetIsDefaultOk() (*bool, bool) {
+	if o == nil || o.IsDefault == nil {
 		return nil, false
 	}
-	return o.Name, true
+	return o.IsDefault, true
 }
 
-// HasName returns a boolean if a field has been set.
-func (o *DataStore) HasName() bool {
-	if o != nil && o.Name != nil {
+// HasIsDefault returns a boolean if a field has been set.
+func (o *DataStore) HasIsDefault() bool {
+	if o != nil && o.IsDefault != nil {
 		return true
 	}
 
 	return false
 }
 
-// SetName gets a reference to the given string and assigns it to the Name field.
-func (o *DataStore) SetName(v string) {
-	o.Name = &v
+// SetIsDefault gets a reference to the given bool and assigns it to the IsDefault field.
+func (o *DataStore) SetIsDefault(v bool) {
+	o.IsDefault = &v
 }
 
 // GetJaeger returns the Jaeger field value if set, zero value otherwise.
@@ -233,13 +301,51 @@ func (o *DataStore) SetSignalFx(v SignalFX) {
 	o.SignalFx = &v
 }
 
+// GetCreatedAt returns the CreatedAt field value if set, zero value otherwise.
+func (o *DataStore) GetCreatedAt() time.Time {
+	if o == nil || o.CreatedAt == nil {
+		var ret time.Time
+		return ret
+	}
+	return *o.CreatedAt
+}
+
+// GetCreatedAtOk returns a tuple with the CreatedAt field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *DataStore) GetCreatedAtOk() (*time.Time, bool) {
+	if o == nil || o.CreatedAt == nil {
+		return nil, false
+	}
+	return o.CreatedAt, true
+}
+
+// HasCreatedAt returns a boolean if a field has been set.
+func (o *DataStore) HasCreatedAt() bool {
+	if o != nil && o.CreatedAt != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetCreatedAt gets a reference to the given time.Time and assigns it to the CreatedAt field.
+func (o *DataStore) SetCreatedAt(v time.Time) {
+	o.CreatedAt = &v
+}
+
 func (o DataStore) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if o.Type != nil {
-		toSerialize["type"] = o.Type
+	if o.Id != nil {
+		toSerialize["id"] = o.Id
 	}
 	if o.Name != nil {
 		toSerialize["name"] = o.Name
+	}
+	if o.Type != nil {
+		toSerialize["type"] = o.Type
+	}
+	if o.IsDefault != nil {
+		toSerialize["isDefault"] = o.IsDefault
 	}
 	if o.Jaeger != nil {
 		toSerialize["jaeger"] = o.Jaeger
@@ -252,6 +358,9 @@ func (o DataStore) MarshalJSON() ([]byte, error) {
 	}
 	if o.SignalFx != nil {
 		toSerialize["signalFx"] = o.SignalFx
+	}
+	if o.CreatedAt != nil {
+		toSerialize["createdAt"] = o.CreatedAt
 	}
 	return json.Marshal(toSerialize)
 }

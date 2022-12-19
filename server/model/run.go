@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/server/id"
-	"github.com/kubeshop/tracetest/server/traces"
 )
 
 var (
@@ -94,7 +93,7 @@ func (r Run) SuccessfullyTriggered() Run {
 	return r
 }
 
-func (r Run) SuccessfullyPolledTraces(t *traces.Trace) Run {
+func (r Run) SuccessfullyPolledTraces(t *Trace) Run {
 	r.State = RunStateAwaitingTestResults
 	r.Trace = t
 	r.ObtainedTraceAt = time.Now()

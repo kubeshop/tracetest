@@ -2,17 +2,16 @@ package executor
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
 	"math"
+	"strconv"
 	"time"
 
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/tracedb"
-	"github.com/kubeshop/tracetest/server/traces"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 )
 
@@ -40,18 +39,20 @@ func NewTracePoller(
 	retryDelay time.Duration,
 	maxWaitTimeForTrace time.Duration,
 	subscriptionManager *subscription.Manager,
+	isDataStoreConfigured bool,
 ) PersistentTracePoller {
 	maxTracePollRetry := int(math.Ceil(float64(maxWaitTimeForTrace) / float64(retryDelay)))
 	return tracePoller{
-		updater:             updater,
-		pollerExecutor:      pe,
-		maxWaitTimeForTrace: maxWaitTimeForTrace,
-		maxTracePollRetry:   maxTracePollRetry,
-		retryDelay:          retryDelay,
-		executeQueue:        make(chan PollingRequest, 5),
-		exit:                make(chan bool, 1),
-		assertionRunner:     assertionRunner,
-		subscriptionManager: subscriptionManager,
+		updater:               updater,
+		pollerExecutor:        pe,
+		maxWaitTimeForTrace:   maxWaitTimeForTrace,
+		maxTracePollRetry:     maxTracePollRetry,
+		retryDelay:            retryDelay,
+		executeQueue:          make(chan PollingRequest, 5),
+		exit:                  make(chan bool, 1),
+		assertionRunner:       assertionRunner,
+		subscriptionManager:   subscriptionManager,
+		isDataStoreConfigured: isDataStoreConfigured,
 	}
 }
 
@@ -68,6 +69,8 @@ type tracePoller struct {
 
 	executeQueue chan PollingRequest
 	exit         chan bool
+
+	isDataStoreConfigured bool
 }
 
 type PollingRequest struct {
@@ -108,11 +111,36 @@ func (tp tracePoller) Stop() {
 
 func (tp tracePoller) Poll(ctx context.Context, test model.Test, run model.Run) {
 	log.Printf("[TracePoller] Test %s Run %d: Poll\n", test.ID, run.ID)
-	tp.enqueueJob(PollingRequest{
+
+	job := PollingRequest{
 		ctx:  ctx,
 		test: test,
 		run:  run,
-	})
+	}
+
+	log.Printf("[PollerExecutor] Test %s Run %d: Is Data Store Configured? %s \n", job.test.ID, run.ID, strconv.FormatBool(tp.isDataStoreConfigured))
+
+	if tp.isDataStoreConfigured {
+		tp.enqueueJob(job)
+	} else {
+		tp.syncProcessJob(job)
+	}
+}
+
+func (tp tracePoller) syncProcessJob(job PollingRequest) {
+	log.Printf("[PollerExecutor] Test %s Run %d: No Data Store Configured, running sync execution\n", job.test.ID, job.run.ID)
+	rootSpan := model.NewTracetestRootSpan(&job.run)
+	trace := model.Trace{
+		ID: model.IDGen.TraceID(),
+	}
+
+	job.run.Trace = trace.InsertRootSpan(&rootSpan)
+	job.run = job.run.SuccessfullyPolledTraces(job.run.Trace)
+
+	log.Printf("[PollerExecutor] Test %s Run %d: Start updating\n", job.test.ID, job.run.ID)
+	tp.updater.Update(job.ctx, job.run)
+
+	tp.runAssertions(job)
 }
 
 func (tp tracePoller) enqueueJob(job PollingRequest) {
@@ -136,6 +164,8 @@ func (tp tracePoller) processJob(job PollingRequest) {
 	log.Printf("[TracePoller] Test %s Run %d: Done polling. completed polling after %d times, number of spans %d\n", job.test.ID, job.run.ID, job.count, len(run.Trace.Flat))
 
 	tp.handleDBError(tp.updater.Update(job.ctx, run))
+
+	job.run = run
 	tp.runAssertions(job)
 }
 
@@ -146,29 +176,6 @@ func (tp tracePoller) runAssertions(job PollingRequest) {
 	}
 
 	tp.assertionRunner.RunAssertions(job.ctx, assertionRequest)
-}
-
-func augmentData(trace *traces.Trace, result model.TriggerResult) *traces.Trace {
-	if trace == nil {
-		return trace
-	}
-
-	switch result.Type {
-	case model.TriggerTypeHTTP:
-		resp := result.HTTP
-		jsonheaders, _ := json.Marshal(resp.Headers)
-		trace.RootSpan.Attributes["tracetest.response.status"] = fmt.Sprintf("%d", resp.StatusCode)
-		trace.RootSpan.Attributes["tracetest.response.body"] = resp.Body
-		trace.RootSpan.Attributes["tracetest.response.headers"] = string(jsonheaders)
-	case model.TriggerTypeGRPC:
-		resp := result.GRPC
-		jsonheaders, _ := json.Marshal(resp.Metadata)
-		trace.RootSpan.Attributes["tracetest.response.status"] = fmt.Sprintf("%d", resp.StatusCode)
-		trace.RootSpan.Attributes["tracetest.response.body"] = resp.Body
-		trace.RootSpan.Attributes["tracetest.response.headers"] = string(jsonheaders)
-	}
-
-	return trace
 }
 
 func (tp tracePoller) handleTraceDBError(job PollingRequest, err error) {

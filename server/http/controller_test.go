@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
-	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/http"
 	"github.com/kubeshop/tracetest/server/http/mappings"
 	"github.com/kubeshop/tracetest/server/id"
@@ -23,12 +22,12 @@ var (
 		ID:      1,
 		TestID:  id.ID("abc123"),
 		TraceID: http.IDGen.TraceID(),
-		Trace: &traces.Trace{
+		Trace: &model.Trace{
 			ID: http.IDGen.TraceID(),
-			RootSpan: traces.Span{
+			RootSpan: model.Span{
 				ID:   http.IDGen.SpanID(),
 				Name: "POST /pokemon/import",
-				Attributes: traces.Attributes{
+				Attributes: model.Attributes{
 					"tracetest.span.type": "http",
 					"service.name":        "pokeshop",
 					"http.response.body":  `{"id":52}`,
@@ -115,7 +114,7 @@ func setupController(t *testing.T) controllerFixture {
 	mdb.Test(t)
 	return controllerFixture{
 		db: mdb,
-		c:  http.NewController(config.Config{}, mdb, nil, nil, nil, mappings.New(traces.NewConversionConfig(), comparator.DefaultRegistry(), mdb)),
+		c:  http.NewController(mdb, nil, mappings.New(traces.NewConversionConfig(), comparator.DefaultRegistry(), mdb)),
 	}
 }
 

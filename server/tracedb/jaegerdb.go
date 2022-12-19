@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	pb "github.com/kubeshop/tracetest/server/internal/proto-gen-go/api_v3"
+	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/pkg/errors"
 	"go.opentelemetry.io/collector/component/componenttest"
@@ -113,12 +114,12 @@ func (jtd *jaegerTraceDB) TestConnection(ctx context.Context) ConnectionTestResu
 	}
 }
 
-func (jtd *jaegerTraceDB) GetTraceByID(ctx context.Context, traceID string) (traces.Trace, error) {
+func (jtd *jaegerTraceDB) GetTraceByID(ctx context.Context, traceID string) (model.Trace, error) {
 	stream, err := jtd.query.GetTrace(ctx, &pb.GetTraceRequest{
 		TraceId: traceID,
 	})
 	if err != nil {
-		return traces.Trace{}, fmt.Errorf("jaeger get trace: %w", err)
+		return model.Trace{}, fmt.Errorf("jaeger get trace: %w", err)
 	}
 
 	// jaeger-query v3 API returns otel spans
@@ -132,12 +133,12 @@ func (jtd *jaegerTraceDB) GetTraceByID(ctx context.Context, traceID string) (tra
 		if err != nil {
 			st, ok := status.FromError(err)
 			if !ok {
-				return traces.Trace{}, fmt.Errorf("jaeger stream recv: %w", err)
+				return model.Trace{}, fmt.Errorf("jaeger stream recv: %w", err)
 			}
 			if st.Message() == "trace not found" {
-				return traces.Trace{}, ErrTraceNotFound
+				return model.Trace{}, ErrTraceNotFound
 			}
-			return traces.Trace{}, fmt.Errorf("jaeger stream recv err: %w", err)
+			return model.Trace{}, fmt.Errorf("jaeger stream recv err: %w", err)
 		}
 
 		spans = append(spans, in.ResourceSpans...)

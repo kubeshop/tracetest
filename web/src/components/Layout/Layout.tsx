@@ -1,5 +1,7 @@
 import {ClusterOutlined, GlobalOutlined, SettingOutlined} from '@ant-design/icons';
 import {Menu} from 'antd';
+import React from 'react';
+import {Link, useLocation} from 'react-router-dom';
 
 import logoAsset from 'assets/logo-white.svg';
 import FileViewerModalProvider from 'components/FileViewerModal/FileViewerModal.provider';
@@ -7,8 +9,8 @@ import Header from 'components/Header';
 import useRouterSync from 'hooks/useRouterSync';
 import ConfirmationModalProvider from 'providers/ConfirmationModal';
 import EnvironmentProvider from 'providers/Environment';
-import React from 'react';
-import {Link, useLocation} from 'react-router-dom';
+import {useDataStoreConfig} from 'providers/DataStoreConfig/DataStoreConfig.provider';
+import {ConfigMode} from 'types/Config.types';
 import * as S from './Layout.styled';
 
 interface IProps {
@@ -42,8 +44,10 @@ const footerMenuItems = [
 
 const Layout = ({children, hasMenu = false}: IProps) => {
   useRouterSync();
-
+  const {dataStoreConfig, isLoading} = useDataStoreConfig();
   const pathname = useLocation().pathname;
+  const isNoTracingMode = dataStoreConfig.mode === ConfigMode.NO_TRACING_MODE;
+
   return (
     <FileViewerModalProvider>
       <ConfirmationModalProvider>
@@ -82,7 +86,7 @@ const Layout = ({children, hasMenu = false}: IProps) => {
             )}
 
             <S.Layout>
-              <Header hasEnvironments hasLogo={!hasMenu} />
+              <Header hasEnvironments hasLogo={!hasMenu} isNoTracingMode={isNoTracingMode && !isLoading} />
               <S.Content $hasMenu={hasMenu}>{children}</S.Content>
             </S.Layout>
           </S.Layout>

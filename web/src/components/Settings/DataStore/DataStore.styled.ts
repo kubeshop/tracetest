@@ -18,7 +18,7 @@ export const Description = styled(Typography.Text)`
 export const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-  margin-top: 24px;
+  margin-bottom: 24px;
   background: ${({theme}) => theme.color.white};
 `;
 
@@ -32,9 +32,14 @@ export const FormContainer = styled.div`
 
 export const ButtonsContainer = styled.div`
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: 8px;
   margin-top: 23px;
   padding-top: 16px;
   border-top: 1px solid ${({theme}) => theme.color.borderLight};
+`;
+
+export const SaveContainer = styled.div`
+  display: flex;
+  gap: 8px;
 `;

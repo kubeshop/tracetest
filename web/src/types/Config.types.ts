@@ -1,5 +1,5 @@
 import {FormInstance} from 'antd';
-import {Model, TConfigSchemas} from 'types/Common.types';
+import {Model, TDataStoreSchemas, TConfigSchemas} from 'types/Common.types';
 
 export enum ConfigMode {
   NO_TRACING_MODE = 'NO_TRACING',
@@ -11,20 +11,28 @@ export enum SupportedDataStores {
   TEMPO = 'tempo',
   OpenSearch = 'openSearch',
   SignalFX = 'signalFx',
+  OtelCollector = 'otlp',
 }
 
-export type TSupportedDataStores = TConfigSchemas['SupportedDataStores'];
+export type TRawDataStore = TDataStoreSchemas['DataStore'];
+export type TDataStore = Model<
+  TRawDataStore,
+  {
+    otlp?: {};
+  }
+>;
+
+export type TSupportedDataStores = TDataStoreSchemas['SupportedDataStores'];
 export type TRawDataStoreConfig = TConfigSchemas['DataStoreConfig'];
 export type TDataStoreConfig = Model<
   TRawDataStoreConfig,
   {
     mode: ConfigMode;
+    dataStores: TDataStore[];
   }
 >;
 
-export type TRawDataStore = TConfigSchemas['DataStore'];
-export type TDataStore = Model<TRawDataStore, {}>;
-export type TRawGRPCClientSettings = TConfigSchemas['GRPCClientSettings'];
+export type TRawGRPCClientSettings = TDataStoreSchemas['GRPCClientSettings'];
 
 export type TTestConnectionRequest = TRawDataStore;
 export type TRawConnectionResult = TConfigSchemas['ConnectionResult'];
@@ -40,9 +48,22 @@ export type TConnectionResult = Model<
 
 export type TRawConnectionTestStep = TConfigSchemas['ConnectionTestStep'];
 export type TConnectionTestStep = Model<TRawConnectionTestStep, {}>;
+export type TTestConnectionResponse = TConfigSchemas['ConnectionResult'];
+
+export interface IGRPCClientSettings extends TRawGRPCClientSettings {
+  fileCA: File;
+  fileCert: File;
+  fileKey: File;
+}
+
+interface IDataStore extends TRawDataStore {
+  jaeger?: IGRPCClientSettings;
+  tempo?: IGRPCClientSettings;
+  otlp?: {};
+}
 
 export type TDraftDataStore = {
-  dataStore?: TRawDataStore;
+  dataStore?: IDataStore;
   dataStoreType?: SupportedDataStores;
 };
 

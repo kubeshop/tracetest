@@ -57,9 +57,19 @@ func TestCreateClient(t *testing.T) {
 			expectedType: "*tracedb.tempoTraceDB",
 		},
 		{
-			name:          "InvalidConfig",
-			config:        config.Config{},
-			expectedError: tracedb.ErrInvalidTraceDBProvider,
+			name:   "EmptyConfig",
+			config: config.Config{},
+		},
+		{
+			name: "InvalidConfig",
+			config: config.Config{
+				Server: config.ServerConfig{
+					Telemetry: config.ServerTelemetryConfig{
+						DataStore: "invalid",
+					},
+				},
+			},
+			expectedError: config.ErrInvalidTraceDBProvider,
 		},
 	}
 
@@ -75,6 +85,9 @@ func TestCreateClient(t *testing.T) {
 				assert.Equal(t, cl.expectedType, fmt.Sprintf("%T", actual))
 			} else if cl.expectedError != nil {
 				assert.ErrorIs(t, err, cl.expectedError)
+			} else {
+				require.NoError(t, err)
+				assert.Equal(t, "*tracedb.noopTraceDB", fmt.Sprintf("%T", actual))
 			}
 		})
 	}

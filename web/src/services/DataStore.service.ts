@@ -1,10 +1,12 @@
 import {SupportedDataStores, TDataStoreConfig, TDraftDataStore, TRawDataStoreConfig} from 'types/Config.types';
 import GrpcClientService from './DataStores/GrpcClient.service';
 import OpenSearchService from './DataStores/OpenSearch.service';
+import OtelCollectorService from './DataStores/OtelCollector.service';
 import SignalFxService from './DataStores/SignalFx.service';
 
 interface IDataStoreService {
   getRequest(draft: TDraftDataStore): Promise<TRawDataStoreConfig>;
+  getDeleteRequest(): TRawDataStoreConfig;
   getInitialValues(config: TDataStoreConfig): TDraftDataStore;
   validateDraft(config: TDraftDataStore): Promise<boolean>;
 }
@@ -14,6 +16,7 @@ const dataStoreServiceMap = {
   [SupportedDataStores.TEMPO]: GrpcClientService,
   [SupportedDataStores.OpenSearch]: OpenSearchService,
   [SupportedDataStores.SignalFX]: SignalFxService,
+  [SupportedDataStores.OtelCollector]: OtelCollectorService,
 } as const;
 
 const DataStoreService = (): IDataStoreService => ({
@@ -42,6 +45,15 @@ const DataStoreService = (): IDataStoreService => ({
     const dataStore = dataStoreServiceMap[dataStoreType];
 
     return dataStore.validateDraft(draft);
+  },
+
+  getDeleteRequest() {
+    const config: TRawDataStoreConfig = {
+      dataStores: [],
+      defaultDataStore: '',
+    };
+
+    return config;
   },
 });
 

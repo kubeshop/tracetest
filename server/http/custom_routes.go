@@ -45,6 +45,7 @@ func (c *customController) Routes() openapi.Routes {
 	routes[c.getRouteIndex("GetEnvironments")].HandlerFunc = paginatedEndpoint[openapi.Environment](c.service.GetEnvironments, c.errorHandler)
 	routes[c.getRouteIndex("GetTransactions")].HandlerFunc = paginatedEndpoint[openapi.Transaction](c.service.GetTransactions, c.errorHandler)
 	routes[c.getRouteIndex("GetResources")].HandlerFunc = paginatedEndpoint[openapi.Resource](c.service.GetResources, c.errorHandler)
+	routes[c.getRouteIndex("GetDataStores")].HandlerFunc = paginatedEndpoint[openapi.DataStore](c.service.GetDataStores, c.errorHandler)
 
 	for index, route := range routes {
 		routeName := fmt.Sprintf("%s %s", route.Method, route.Pattern)

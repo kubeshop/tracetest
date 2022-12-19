@@ -5,7 +5,6 @@ import (
 	"strconv"
 
 	"github.com/kubeshop/tracetest/server/model"
-	"github.com/kubeshop/tracetest/server/traces"
 )
 
 func FromSpanQuery(sq model.SpanQuery) Selector {
@@ -17,13 +16,13 @@ type Selector struct {
 	SpanSelectors []SpanSelector
 }
 
-func (s Selector) Filter(trace traces.Trace) traces.Spans {
+func (s Selector) Filter(trace model.Trace) model.Spans {
 	if len(s.SpanSelectors) == 0 {
 		// empty selector should select everything
 		return getAllSpans(trace)
 	}
 
-	allFilteredSpans := make([]traces.Span, 0)
+	allFilteredSpans := make([]model.Span, 0)
 	for _, spanSelector := range s.SpanSelectors {
 		spans := filterSpans(trace.RootSpan, spanSelector)
 		allFilteredSpans = append(allFilteredSpans, spans...)
@@ -32,9 +31,9 @@ func (s Selector) Filter(trace traces.Trace) traces.Spans {
 	return allFilteredSpans
 }
 
-func getAllSpans(trace traces.Trace) traces.Spans {
-	var allSpans = make(traces.Spans, 0)
-	traverseTree(trace.RootSpan, func(span traces.Span) {
+func getAllSpans(trace model.Trace) model.Spans {
+	var allSpans = make(model.Spans, 0)
+	traverseTree(trace.RootSpan, func(span model.Span) {
 		allSpans = append(allSpans, span)
 	})
 
@@ -47,7 +46,7 @@ type SpanSelector struct {
 	ChildSelector *SpanSelector
 }
 
-func (ss SpanSelector) MatchesFilters(span traces.Span) bool {
+func (ss SpanSelector) MatchesFilters(span model.Span) bool {
 	for _, filter := range ss.Filters {
 		if err := filter.Filter(span); err != nil {
 			return false
@@ -58,7 +57,7 @@ func (ss SpanSelector) MatchesFilters(span traces.Span) bool {
 }
 
 type FilterFunction struct {
-	Filter func(traces.Span, string, Value) error
+	Filter func(model.Span, string, Value) error
 	Name   string
 }
 
@@ -68,7 +67,7 @@ type filter struct {
 	Value     Value
 }
 
-func (f filter) Filter(span traces.Span) error {
+func (f filter) Filter(span model.Span) error {
 	return f.Operation.Filter(span, f.Property, f.Value)
 }
 

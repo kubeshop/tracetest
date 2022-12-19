@@ -10,6 +10,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+var ErrInvalidTraceDBProvider = fmt.Errorf("invalid traceDB provider")
+
 type (
 	Config struct {
 		Server               ServerConfig    `yaml:",omitempty" mapstructure:"server"`
@@ -118,12 +120,22 @@ func (c Config) MaxWaitTimeForTraceDuration() time.Duration {
 func (c Config) DataStore() (*TracingBackendDataStoreConfig, error) {
 	selectedStore := c.Server.Telemetry.DataStore
 	dataStoreConfig, found := c.Telemetry.DataStores[selectedStore]
+
+	if selectedStore != "" && !found {
+		return nil, ErrInvalidTraceDBProvider
+	}
+
 	if !found {
-		availableOptions := mapKeys(c.Telemetry.DataStores)
-		return nil, fmt.Errorf(`invalid data store option: "%s". Available options: %v`, selectedStore, availableOptions)
+		return nil, nil
 	}
 
 	return &dataStoreConfig, nil
+}
+
+func (c Config) IsDataStoreConfigured() bool {
+	dataStore, _ := c.DataStore()
+
+	return dataStore != nil
 }
 
 func (c Config) Exporter() (*TelemetryExporterOption, error) {

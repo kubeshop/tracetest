@@ -28,6 +28,7 @@ export const Header = styled(Layout.Header)`
 
 export const Logo = styled.img`
   height: 24px;
+  margin-right: 24px;
 `;
 
 export const NavMenu = styled(Menu).attrs({

@@ -4,13 +4,15 @@ import Logo from 'assets/Logo.svg';
 import * as S from './Header.styled';
 import HeaderMenu from './HeaderMenu';
 import EnvironmentSelector from '../EnvironmentSelector';
+import NoTracingPopover from '../NoTracingPopover/NoTracingPopover';
 
 interface IProps {
   hasEnvironments?: boolean;
   hasLogo?: boolean;
+  isNoTracingMode: boolean;
 }
 
-const Header = ({hasEnvironments = false, hasLogo = false}: IProps) => (
+const Header = ({hasEnvironments = false, hasLogo = false, isNoTracingMode}: IProps) => (
   <S.Header>
     <div>
       {hasLogo && (
@@ -21,6 +23,7 @@ const Header = ({hasEnvironments = false, hasLogo = false}: IProps) => (
     </div>
 
     <Space>
+      {isNoTracingMode && <NoTracingPopover />}
       {hasEnvironments && <EnvironmentSelector />}
 
       <HeaderMenu />
