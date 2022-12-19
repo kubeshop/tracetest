@@ -1,6 +1,7 @@
 package executor
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"math"
@@ -15,7 +16,7 @@ import (
 type DefaultPollerExecutor struct {
 	config            config.Config
 	updater           RunUpdater
-	traceDB           tracedb.TraceDB
+	dsRepo            model.DataStoreRepository
 	maxTracePollRetry int
 }
 
@@ -56,7 +57,7 @@ func NewPollerExecutor(
 	config config.Config,
 	tracer trace.Tracer,
 	updater RunUpdater,
-	traceDB tracedb.TraceDB,
+	dsRepo model.DataStoreRepository,
 ) PollerExecutor {
 	retryDelay := config.PoolingRetryDelay()
 	maxWaitTimeForTrace := config.MaxWaitTimeForTraceDuration()
@@ -65,7 +66,7 @@ func NewPollerExecutor(
 	pollerExecutor := &DefaultPollerExecutor{
 		config:            config,
 		updater:           updater,
-		traceDB:           traceDB,
+		dsRepo:            dsRepo,
 		maxTracePollRetry: maxTracePollRetry,
 	}
 
@@ -75,18 +76,32 @@ func NewPollerExecutor(
 	}
 }
 
+func (pe DefaultPollerExecutor) dataStore(ctx context.Context) (tracedb.TraceDB, error) {
+	ds, err := pe.dsRepo.DefaultDataStore(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("cannot get default datastore: %w", err)
+	}
+
+	tdb, err := tracedb.New(pe.config, nil)
+	if err != nil {
+		return nil, fmt.Errorf(`cannot get tracedb from DataStore config with ID "%s": %w`, ds.ID, err)
+	}
+
+	return tdb, nil
+}
+
 func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, model.Run, error) {
 	log.Printf("[PollerExecutor] Test %s Run %d: ExecuteRequest\n", request.test.ID, request.run.ID)
 	run := request.run
-	traceID := run.TraceID.String()
 
-	err := pe.traceDB.Connect(request.ctx)
+	ds, err := pe.dataStore(request.ctx)
 	if err != nil {
-		log.Printf("[PollerExecutor] Test %s Run %d: Data Store Connect error: %s\n", request.test.ID, request.run.ID, err.Error())
+		log.Printf("[PollerExecutor] Test %s Run %d: GetDataStore error: %s\n", request.test.ID, request.run.ID, err.Error())
 		return false, model.Run{}, err
 	}
 
-	trace, err := pe.traceDB.GetTraceByID(request.ctx, traceID)
+	traceID := run.TraceID.String()
+	trace, err := ds.GetTraceByID(request.ctx, traceID)
 	if err != nil {
 		log.Printf("[PollerExecutor] Test %s Run %d: GetTraceByID (traceID %s) error: %s\n", request.test.ID, request.run.ID, traceID, err.Error())
 		return false, model.Run{}, err

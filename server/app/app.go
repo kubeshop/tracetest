@@ -21,7 +21,6 @@ import (
 	"github.com/kubeshop/tracetest/server/otlp"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/testdb"
-	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/kubeshop/tracetest/server/tracing"
 	"go.opentelemetry.io/otel/trace"
@@ -83,15 +82,6 @@ func (a *App) Start() error {
 		log.Fatal(err)
 	}
 
-	traceDB, err := tracedb.New(a.config.Config, testDB)
-	if err != nil {
-		log.Fatal(err)
-	}
-	a.registerStopFn(func() {
-		fmt.Println("stopping traceDB")
-		traceDB.Close()
-	})
-
 	tracer, err := tracing.NewTracer(ctx, a.config.Config)
 	if err != nil {
 		log.Fatal(err)
@@ -128,7 +118,6 @@ func (a *App) Start() error {
 	rf := newRunnerFacades(
 		a.config.Config,
 		testDB,
-		traceDB,
 		applicationTracer,
 		tracer,
 		subscriptionManager,
@@ -192,7 +181,6 @@ func (a *App) Start() error {
 func newRunnerFacades(
 	conf config.Config,
 	testDB model.Repository,
-	traceDB tracedb.TraceDB,
 	appTracer trace.Tracer,
 	tracer trace.Tracer,
 	subscriptionManager *subscription.Manager,
@@ -209,7 +197,7 @@ func newRunnerFacades(
 		subscriptionManager,
 	)
 
-	pollerExecutor := executor.NewPollerExecutor(conf, tracer, execTestUpdater, traceDB)
+	pollerExecutor := executor.NewPollerExecutor(conf, tracer, execTestUpdater, testDB)
 
 	tracePoller := executor.NewTracePoller(
 		pollerExecutor,
