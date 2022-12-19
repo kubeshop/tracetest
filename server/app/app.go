@@ -218,6 +218,7 @@ func newRunnerFacades(
 		conf.PoolingRetryDelay(),
 		conf.MaxWaitTimeForTraceDuration(),
 		subscriptionManager,
+		conf.IsDataStoreConfigured(),
 	)
 
 	runner := executor.NewPersistentRunner(

@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
-	"github.com/kubeshop/tracetest/server/traces"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -95,7 +94,7 @@ type encodedRun struct {
 	ObtainedTraceAt           time.Time
 	CompletedAt               time.Time
 	TriggerResult             TriggerResult
-	Trace                     *traces.Trace
+	Trace                     *Trace
 	Results                   *RunResults
 	TestVersion               int
 	Metadata                  map[string]string

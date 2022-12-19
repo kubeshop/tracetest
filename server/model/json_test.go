@@ -10,7 +10,6 @@ import (
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/model/modeltest"
-	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/otel/trace"
@@ -60,20 +59,20 @@ func TestRunEncoding(t *testing.T) {
 	t3 := time.Date(2022, 06, 07, 13, 03, 27, 100, time.UTC)
 	t4 := time.Date(2022, 06, 07, 13, 03, 28, 100, time.UTC)
 
-	rootSpan := traces.Span{
+	rootSpan := model.Span{
 		ID:        sid,
 		Name:      "Root Span",
 		StartTime: t1,
 		EndTime:   t2,
-		Attributes: traces.Attributes{
+		Attributes: model.Attributes{
 			"tracetest.span.duration": "200",
 			"tracetest.span.type":     "http",
 		},
 	}
-	exampleTrace := &traces.Trace{
+	exampleTrace := &model.Trace{
 		ID:       tid,
 		RootSpan: rootSpan,
-		Flat: map[trace.SpanID]*traces.Span{
+		Flat: map[trace.SpanID]*model.Span{
 			sid: &rootSpan,
 		},
 	}

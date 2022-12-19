@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/kubeshop/tracetest/server/expression"
-	"github.com/kubeshop/tracetest/server/traces"
+	"github.com/kubeshop/tracetest/server/model"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -91,8 +91,8 @@ func TestAttributeExecution(t *testing.T) {
 			ShouldPass: true,
 
 			AttributeDataStore: expression.AttributeDataStore{
-				Span: traces.Span{
-					Attributes: traces.Attributes{
+				Span: model.Span{
+					Attributes: model.Attributes{
 						"my_attribute": "42",
 					},
 				},
@@ -127,8 +127,8 @@ func TestStringInterpolationExecution(t *testing.T) {
 			Query:      `attr:text = 'this run took ${"25ms"}'`,
 			ShouldPass: true,
 			AttributeDataStore: expression.AttributeDataStore{
-				Span: traces.Span{
-					Attributes: traces.Attributes{
+				Span: model.Span{
+					Attributes: model.Attributes{
 						"text": "this run took 25ms",
 					},
 				},
@@ -151,8 +151,8 @@ func TestFilterExecution(t *testing.T) {
 			Query:      `attr:tracetest.response.body | json_path '.id' = 8`,
 			ShouldPass: true,
 			AttributeDataStore: expression.AttributeDataStore{
-				Span: traces.Span{
-					Attributes: traces.Attributes{
+				Span: model.Span{
+					Attributes: model.Attributes{
 						"tracetest.response.body": `{"id": 8, "name": "john doe"}`,
 					},
 				},
@@ -191,7 +191,7 @@ func TestMetaAttributesExecution(t *testing.T) {
 			ShouldPass:         true,
 			AttributeDataStore: expression.AttributeDataStore{},
 			MetaAttributesDataStore: expression.MetaAttributesDataStore{
-				SelectedSpans: []traces.Span{
+				SelectedSpans: []model.Span{
 					// We don't have to fill the spans details to make the meta attribute work
 					{},
 					{},
@@ -205,7 +205,7 @@ func TestMetaAttributesExecution(t *testing.T) {
 			ShouldPass:         true,
 			AttributeDataStore: expression.AttributeDataStore{},
 			MetaAttributesDataStore: expression.MetaAttributesDataStore{
-				SelectedSpans: []traces.Span{
+				SelectedSpans: []model.Span{
 					{},
 					{},
 				},
@@ -344,8 +344,8 @@ func TestResolveStatementAttributeExecution(t *testing.T) {
 			ShouldPass: true,
 
 			AttributeDataStore: expression.AttributeDataStore{
-				Span: traces.Span{
-					Attributes: traces.Attributes{
+				Span: model.Span{
+					Attributes: model.Attributes{
 						"my_attribute": "42",
 					},
 				},
@@ -380,8 +380,8 @@ func TestResolveStatementStringInterpolationExecution(t *testing.T) {
 			Query:      `'this run took ${"25ms"}'`,
 			ShouldPass: true,
 			AttributeDataStore: expression.AttributeDataStore{
-				Span: traces.Span{
-					Attributes: traces.Attributes{
+				Span: model.Span{
+					Attributes: model.Attributes{
 						"text": "this run took 25ms",
 					},
 				},
@@ -404,8 +404,8 @@ func TestResolveStatementFilterExecution(t *testing.T) {
 			Query:      `attr:tracetest.response.body`,
 			ShouldPass: true,
 			AttributeDataStore: expression.AttributeDataStore{
-				Span: traces.Span{
-					Attributes: traces.Attributes{
+				Span: model.Span{
+					Attributes: model.Attributes{
 						"tracetest.response.body": `{"id": 8, "name": "john doe"}`,
 					},
 				},

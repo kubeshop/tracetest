@@ -7,7 +7,6 @@ import (
 
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/model"
-	"github.com/kubeshop/tracetest/server/traces"
 )
 
 var ErrTraceNotFound = errors.New("trace not found")
@@ -21,19 +20,29 @@ const (
 )
 
 type TraceDB interface {
-	GetTraceByID(ctx context.Context, traceID string) (traces.Trace, error)
+	GetTraceByID(ctx context.Context, traceID string) (model.Trace, error)
 	Close() error
 }
+
+type noopTraceDB struct{}
+
+func (db *noopTraceDB) GetTraceByID(ctx context.Context, traceID string) (t model.Trace, err error) {
+	return model.Trace{}, nil
+}
+func (db *noopTraceDB) Close() error { return nil }
 
 var ErrInvalidTraceDBProvider = fmt.Errorf("invalid traceDB provider: available options are (jaeger, tempo)")
 
 func New(c config.Config, repository model.RunRepository) (db TraceDB, err error) {
 	selectedDataStore, err := c.DataStore()
-	if err != nil {
-		return nil, ErrInvalidTraceDBProvider
+
+	if selectedDataStore == nil && err == nil {
+		return &noopTraceDB{}, nil
 	}
 
-	err = ErrInvalidTraceDBProvider
+	if err != nil {
+		return &noopTraceDB{}, ErrInvalidTraceDBProvider
+	}
 
 	switch {
 	case selectedDataStore.Type == JAEGER_BACKEND:

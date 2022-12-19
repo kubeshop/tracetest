@@ -8,7 +8,6 @@ import (
 	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
-	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -19,7 +18,7 @@ func TestAssertion(t *testing.T) {
 	cases := []struct {
 		name              string
 		testDef           model.OrderedMap[model.SpanQuery, model.NamedAssertions]
-		trace             traces.Trace
+		trace             model.Trace
 		expectedResult    model.OrderedMap[model.SpanQuery, []model.AssertionResult]
 		expectedAllPassed bool
 	}{
@@ -30,10 +29,10 @@ func TestAssertion(t *testing.T) {
 					`attr:tracetest.span.duration = 2000ns`,
 				},
 			}),
-			trace: traces.Trace{
-				RootSpan: traces.Span{
+			trace: model.Trace{
+				RootSpan: model.Span{
 					ID: spanID,
-					Attributes: traces.Attributes{
+					Attributes: model.Attributes{
 						"service.name":            "Pokeshop",
 						"tracetest.span.duration": "2000",
 					},
@@ -63,10 +62,10 @@ func TestAssertion(t *testing.T) {
 				Assertions: []model.Assertion{
 					`attr:tracetest.selected_spans.count = 0`,
 				}}),
-			trace: traces.Trace{
-				RootSpan: traces.Span{
+			trace: model.Trace{
+				RootSpan: model.Span{
 					ID: spanID,
-					Attributes: traces.Attributes{
+					Attributes: model.Attributes{
 						"service.name":            "Pokeshop",
 						"tracetest.span.duration": "2000",
 					},
@@ -105,10 +104,10 @@ func TestAssertion(t *testing.T) {
 					`attr:http.response.body contains 52`,
 					`attr:tracetest.span.duration <= 21ms`,
 				}}),
-			trace: traces.Trace{
-				RootSpan: traces.Span{
+			trace: model.Trace{
+				RootSpan: model.Span{
 					ID: spanID,
-					Attributes: traces.Attributes{
+					Attributes: model.Attributes{
 						"service.name":            "Pokeshop",
 						"http.response.body":      `{"id":52}`,
 						"tracetest.span.duration": "21000000",
@@ -146,10 +145,10 @@ func TestAssertion(t *testing.T) {
 				Assertions: []model.Assertion{
 					`attr:tracetest.span.duration <= 25ms`,
 				}}),
-			trace: traces.Trace{
-				RootSpan: traces.Span{
+			trace: model.Trace{
+				RootSpan: model.Span{
 					ID: spanID,
-					Attributes: traces.Attributes{
+					Attributes: model.Attributes{
 						"service.name":            "Pokeshop",
 						"http.response.body":      `{"id":52}`,
 						"tracetest.span.duration": "25187564", // 25ms
@@ -177,10 +176,10 @@ func TestAssertion(t *testing.T) {
 				Assertions: []model.Assertion{
 					`attr:tracetest.span.duration <= 25ms`,
 				}}),
-			trace: traces.Trace{
-				RootSpan: traces.Span{
+			trace: model.Trace{
+				RootSpan: model.Span{
 					ID: spanID,
-					Attributes: traces.Attributes{
+					Attributes: model.Attributes{
 						"service.name":            "Pokeshop",
 						"http.response.body":      `{"id":52}`,
 						"tracetest.span.duration": "35000000", // 35ms

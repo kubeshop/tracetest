@@ -6,16 +6,17 @@ import (
 	"math"
 	"time"
 
+	"github.com/kubeshop/tracetest/server/model"
 	"go.opentelemetry.io/otel/trace"
 	v11 "go.opentelemetry.io/proto/otlp/common/v1"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 )
 
-func FromOtel(input *v1.TracesData) Trace {
+func FromOtel(input *v1.TracesData) model.Trace {
 	return fromOtelResourceSpans(input.ResourceSpans)
 }
 
-func fromOtelResourceSpans(resourceSpans []*v1.ResourceSpans) Trace {
+func fromOtelResourceSpans(resourceSpans []*v1.ResourceSpans) model.Trace {
 	flattenSpans := make([]*v1.Span, 0)
 	for _, resource := range resourceSpans {
 		for _, scopeSpans := range resource.ScopeSpans {
@@ -24,18 +25,18 @@ func fromOtelResourceSpans(resourceSpans []*v1.ResourceSpans) Trace {
 	}
 
 	traceID := ""
-	spans := make([]Span, 0)
+	spans := make([]model.Span, 0)
 	for _, span := range flattenSpans {
 		newSpan := ConvertOtelSpanIntoSpan(span)
 		traceID = hex.EncodeToString(span.TraceId)
 		spans = append(spans, *newSpan)
 	}
 
-	return New(traceID, spans)
+	return model.NewTrace(traceID, spans)
 }
 
-func ConvertOtelSpanIntoSpan(span *v1.Span) *Span {
-	attributes := make(Attributes, 0)
+func ConvertOtelSpanIntoSpan(span *v1.Span) *model.Span {
+	attributes := make(model.Attributes, 0)
 	for _, attribute := range span.Attributes {
 		attributes[attribute.Key] = getAttributeValue(attribute.Value)
 	}
@@ -52,13 +53,13 @@ func ConvertOtelSpanIntoSpan(span *v1.Span) *Span {
 
 	spanID := createSpanID(span.SpanId)
 	attributes["parent_id"] = createSpanID(span.ParentSpanId).String()
-	return &Span{
+	return &model.Span{
 		ID:         spanID,
 		Name:       span.Name,
 		StartTime:  startTime,
 		EndTime:    endTime,
 		Parent:     nil,
-		Children:   make([]*Span, 0),
+		Children:   make([]*model.Span, 0),
 		Attributes: attributes,
 	}
 }

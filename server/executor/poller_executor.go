@@ -8,7 +8,6 @@ import (
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/tracedb"
-	"github.com/kubeshop/tracetest/server/traces"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -102,7 +101,9 @@ func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, m
 	run.Trace = &trace
 	request.run = run
 
-	run = run.SuccessfullyPolledTraces(augmentData(&trace, run.TriggerResult))
+	rootSpan := model.NewTracetestRootSpan(&run)
+	run.Trace = trace.InsertRootSpan(&rootSpan)
+	run = run.SuccessfullyPolledTraces(run.Trace)
 
 	fmt.Printf("completed polling result %d after %d times, number of spans: %d \n", run.ID, request.count, len(run.Trace.Flat))
 
@@ -116,7 +117,7 @@ func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, m
 	return true, run, nil
 }
 
-func (pe DefaultPollerExecutor) donePollingTraces(job *PollingRequest, trace traces.Trace) bool {
+func (pe DefaultPollerExecutor) donePollingTraces(job *PollingRequest, trace model.Trace) bool {
 	// we're done if we have the same amount of spans after polling or `maxTracePollRetry` times
 	if job.count == pe.maxTracePollRetry {
 		log.Printf("[PollerExecutor] Test %s Run %d: Done polling. Hit MaxRetry of %d\n", job.test.ID, job.run.ID, pe.maxTracePollRetry)

@@ -22,12 +22,12 @@ var (
 		ID:      1,
 		TestID:  id.ID("abc123"),
 		TraceID: http.IDGen.TraceID(),
-		Trace: &traces.Trace{
+		Trace: &model.Trace{
 			ID: http.IDGen.TraceID(),
-			RootSpan: traces.Span{
+			RootSpan: model.Span{
 				ID:   http.IDGen.SpanID(),
 				Name: "POST /pokemon/import",
-				Attributes: traces.Attributes{
+				Attributes: model.Attributes{
 					"tracetest.span.type": "http",
 					"service.name":        "pokeshop",
 					"http.response.body":  `{"id":52}`,

@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/server/id"
-	"github.com/kubeshop/tracetest/server/traces"
+	"github.com/kubeshop/tracetest/server/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/otel/trace"
@@ -24,7 +24,7 @@ func TestJSONEncoding(t *testing.T) {
 	subSpan2.Parent = rootSpan
 	subSubSpan1.Parent = subSpan1
 
-	flat := map[trace.SpanID]*traces.Span{
+	flat := map[trace.SpanID]*model.Span{
 		// We copy those spans so they don't have children injected into them
 		// the flat structure shouldn't have children.
 		rootSpan.ID:    copySpan(rootSpan),
@@ -33,11 +33,11 @@ func TestJSONEncoding(t *testing.T) {
 		subSpan2.ID:    copySpan(subSpan2),
 	}
 
-	rootSpan.Children = []*traces.Span{subSpan1, subSpan2}
-	subSpan1.Children = []*traces.Span{subSubSpan1}
+	rootSpan.Children = []*model.Span{subSpan1, subSpan2}
+	subSpan1.Children = []*model.Span{subSubSpan1}
 
 	tid := id.NewRandGenerator().TraceID()
-	trace := traces.Trace{
+	trace := model.Trace{
 		ID:       tid,
 		RootSpan: *rootSpan,
 		Flat:     flat,
@@ -115,7 +115,7 @@ func TestJSONEncoding(t *testing.T) {
 	})
 
 	t.Run("decode", func(t *testing.T) {
-		var actual traces.Trace
+		var actual model.Trace
 		err := json.Unmarshal([]byte(jsonEncoded), &actual)
 		require.NoError(t, err)
 
@@ -130,18 +130,18 @@ func TestJSONEncoding(t *testing.T) {
 	})
 }
 
-func copySpan(span *traces.Span) *traces.Span {
+func copySpan(span *model.Span) *model.Span {
 	newSpan := *span
 	return &newSpan
 }
 
-func createSpan(name string) *traces.Span {
-	return &traces.Span{
+func createSpan(name string) *model.Span {
+	return &model.Span{
 		ID:        id.NewRandGenerator().SpanID(),
 		Name:      name,
 		StartTime: time.Date(2021, 11, 24, 14, 05, 12, 0, time.UTC),
 		EndTime:   time.Date(2021, 11, 24, 14, 05, 17, 0, time.UTC),
-		Attributes: traces.Attributes{
+		Attributes: model.Attributes{
 			"service.name": name,
 		},
 		Children: nil,
@@ -156,13 +156,13 @@ func getTime(n int) time.Time {
 
 func TestSort(t *testing.T) {
 	randGenerator := id.NewRandGenerator()
-	trace := traces.Trace{
+	trace := model.Trace{
 		ID: randGenerator.TraceID(),
-		RootSpan: traces.Span{
+		RootSpan: model.Span{
 			Name:       "root",
 			StartTime:  getTime(0),
-			Attributes: traces.Attributes{},
-			Children: []*traces.Span{
+			Attributes: model.Attributes{},
+			Children: []*model.Span{
 				{
 					Name:      "child 2",
 					StartTime: getTime(2),
@@ -174,7 +174,7 @@ func TestSort(t *testing.T) {
 				{
 					Name:      "child 1",
 					StartTime: getTime(1),
-					Children: []*traces.Span{
+					Children: []*model.Span{
 						{
 							Name:      "grandchild 1",
 							StartTime: getTime(2),
@@ -191,40 +191,40 @@ func TestSort(t *testing.T) {
 
 	sortedTrace := trace.Sort()
 
-	expectedTrace := traces.Trace{
+	expectedTrace := model.Trace{
 		ID: randGenerator.TraceID(),
-		RootSpan: traces.Span{
+		RootSpan: model.Span{
 			Name:       "root",
 			StartTime:  getTime(0),
-			Attributes: traces.Attributes{},
-			Children: []*traces.Span{
+			Attributes: model.Attributes{},
+			Children: []*model.Span{
 				{
 					Name:      "child 1",
 					StartTime: getTime(1),
-					Children: []*traces.Span{
+					Children: []*model.Span{
 						{
 
 							Name:      "grandchild 1",
 							StartTime: getTime(2),
-							Children:  make([]*traces.Span, 0),
+							Children:  make([]*model.Span, 0),
 						},
 						{
 
 							Name:      "grandchild 2",
 							StartTime: getTime(3),
-							Children:  make([]*traces.Span, 0),
+							Children:  make([]*model.Span, 0),
 						},
 					},
 				},
 				{
 					Name:      "child 2",
 					StartTime: getTime(2),
-					Children:  make([]*traces.Span, 0),
+					Children:  make([]*model.Span, 0),
 				},
 				{
 					Name:      "child 3",
 					StartTime: getTime(3),
-					Children:  make([]*traces.Span, 0),
+					Children:  make([]*model.Span, 0),
 				},
 			},
 		},

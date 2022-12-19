@@ -4,10 +4,9 @@ import (
 	"github.com/kubeshop/tracetest/server/assertions/selectors"
 	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/model"
-	"github.com/kubeshop/tracetest/server/traces"
 )
 
-func Assert(defs model.OrderedMap[model.SpanQuery, model.NamedAssertions], trace traces.Trace, ds []expression.DataStore) (model.OrderedMap[model.SpanQuery, []model.AssertionResult], bool) {
+func Assert(defs model.OrderedMap[model.SpanQuery, model.NamedAssertions], trace model.Trace, ds []expression.DataStore) (model.OrderedMap[model.SpanQuery, []model.AssertionResult], bool) {
 	testResult := model.OrderedMap[model.SpanQuery, []model.AssertionResult]{}
 	allPassed := true
 	defs.ForEach(func(spanQuery model.SpanQuery, asserts model.NamedAssertions) error {
@@ -27,7 +26,7 @@ func Assert(defs model.OrderedMap[model.SpanQuery, model.NamedAssertions], trace
 	return testResult, allPassed
 }
 
-func assert(assertion model.Assertion, spans traces.Spans, ds []expression.DataStore) model.AssertionResult {
+func assert(assertion model.Assertion, spans model.Spans, ds []expression.DataStore) model.AssertionResult {
 	ds = append([]expression.DataStore{
 		expression.MetaAttributesDataStore{SelectedSpans: spans},
 		expression.VariableDataStore{},
@@ -36,7 +35,7 @@ func assert(assertion model.Assertion, spans traces.Spans, ds []expression.DataS
 	allPassed := true
 	spanResults := make([]model.SpanAssertionResult, 0, len(spans))
 	spans.
-		ForEach(func(_ int, span traces.Span) bool {
+		ForEach(func(_ int, span model.Span) bool {
 			res := assertSpan(span, ds, string(assertion))
 			spanResults = append(spanResults, res)
 
@@ -47,7 +46,7 @@ func assert(assertion model.Assertion, spans traces.Spans, ds []expression.DataS
 			return true
 		}).
 		OrEmpty(func() {
-			res := assertSpan(traces.Span{}, ds, string(assertion))
+			res := assertSpan(model.Span{}, ds, string(assertion))
 			spanResults = append(spanResults, res)
 			allPassed = res.CompareErr == nil
 		})
@@ -59,7 +58,7 @@ func assert(assertion model.Assertion, spans traces.Spans, ds []expression.DataS
 	}
 }
 
-func assertSpan(span traces.Span, ds []expression.DataStore, assertion string) model.SpanAssertionResult {
+func assertSpan(span model.Span, ds []expression.DataStore, assertion string) model.SpanAssertionResult {
 	ds = append([]expression.DataStore{expression.AttributeDataStore{Span: span}}, ds...)
 	expressionExecutor := expression.NewExecutor(ds...)
 

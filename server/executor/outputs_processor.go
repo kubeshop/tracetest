@@ -8,13 +8,12 @@ import (
 	"github.com/kubeshop/tracetest/server/assertions/selectors"
 	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/model"
-	"github.com/kubeshop/tracetest/server/traces"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
 )
 
-type OutputsProcessorFn func(context.Context, model.OrderedMap[string, model.Output], traces.Trace, []expression.DataStore) (model.OrderedMap[string, string], error)
+type OutputsProcessorFn func(context.Context, model.OrderedMap[string, model.Output], model.Trace, []expression.DataStore) (model.OrderedMap[string, string], error)
 
 func InstrumentedOutputProcessor(tracer trace.Tracer) OutputsProcessorFn {
 	op := instrumentedOutputProcessor{tracer}
@@ -25,7 +24,7 @@ type instrumentedOutputProcessor struct {
 	tracer trace.Tracer
 }
 
-func (op instrumentedOutputProcessor) process(ctx context.Context, outputs model.OrderedMap[string, model.Output], t traces.Trace, ds []expression.DataStore) (model.OrderedMap[string, string], error) {
+func (op instrumentedOutputProcessor) process(ctx context.Context, outputs model.OrderedMap[string, model.Output], t model.Trace, ds []expression.DataStore) (model.OrderedMap[string, string], error) {
 	ctx, span := op.tracer.Start(ctx, "Process outputs")
 	defer span.End()
 
@@ -50,7 +49,7 @@ func (op instrumentedOutputProcessor) process(ctx context.Context, outputs model
 	return result, err
 }
 
-func outputProcessor(ctx context.Context, outputs model.OrderedMap[string, model.Output], tr traces.Trace, ds []expression.DataStore) (model.OrderedMap[string, string], error) {
+func outputProcessor(ctx context.Context, outputs model.OrderedMap[string, model.Output], tr model.Trace, ds []expression.DataStore) (model.OrderedMap[string, string], error) {
 	res := model.OrderedMap[string, string]{}
 
 	parsed, err := parseOutputs(outputs)
@@ -65,13 +64,13 @@ func outputProcessor(ctx context.Context, outputs model.OrderedMap[string, model
 
 		value := ""
 		spans.
-			ForEach(func(_ int, span traces.Span) bool {
+			ForEach(func(_ int, span model.Span) bool {
 				value = extractAttr(span, stores, out.expr)
 				// take only the first value
 				return false
 			}).
 			OrEmpty(func() {
-				value = extractAttr(traces.Span{}, stores, out.expr)
+				value = extractAttr(model.Span{}, stores, out.expr)
 			})
 
 		res, err = res.Add(key, value)
@@ -90,7 +89,7 @@ func outputProcessor(ctx context.Context, outputs model.OrderedMap[string, model
 
 }
 
-func extractAttr(span traces.Span, ds []expression.DataStore, expr expression.Expr) string {
+func extractAttr(span model.Span, ds []expression.DataStore, expr expression.Expr) string {
 	ds = append([]expression.DataStore{expression.AttributeDataStore{Span: span}}, ds...)
 
 	expressionExecutor := expression.NewExecutor(ds...)
