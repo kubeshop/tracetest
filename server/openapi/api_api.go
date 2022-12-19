@@ -147,12 +147,6 @@ func (c *ApiApiController) Routes() Routes {
 			c.GetDataStores,
 		},
 		{
-			"GetDataStoresConfig",
-			strings.ToUpper("Get"),
-			"/api/config/datastores",
-			c.GetDataStoresConfig,
-		},
-		{
 			"GetEnvironment",
 			strings.ToUpper("Get"),
 			"/api/environments/{environmentId}",
@@ -301,12 +295,6 @@ func (c *ApiApiController) Routes() Routes {
 			strings.ToUpper("Put"),
 			"/api/datastores/{dataStoreId}",
 			c.UpdateDataStore,
-		},
-		{
-			"UpdateDataStoresConfig",
-			strings.ToUpper("Put"),
-			"/api/config/datastores",
-			c.UpdateDataStoresConfig,
 		},
 		{
 			"UpdateEnvironment",
@@ -663,19 +651,6 @@ func (c *ApiApiController) GetDataStores(w http.ResponseWriter, r *http.Request)
 	sortByParam := query.Get("sortBy")
 	sortDirectionParam := query.Get("sortDirection")
 	result, err := c.service.GetDataStores(r.Context(), takeParam, skipParam, queryParam, sortByParam, sortDirectionParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
-// GetDataStoresConfig - Get the Server Side Data Stores Config
-func (c *ApiApiController) GetDataStoresConfig(w http.ResponseWriter, r *http.Request) {
-	result, err := c.service.GetDataStoresConfig(r.Context())
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -1231,30 +1206,6 @@ func (c *ApiApiController) UpdateDataStore(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	result, err := c.service.UpdateDataStore(r.Context(), dataStoreIdParam, dataStoreParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
-// UpdateDataStoresConfig - Updates the Server Side Data Store config
-func (c *ApiApiController) UpdateDataStoresConfig(w http.ResponseWriter, r *http.Request) {
-	dataStoreConfigParam := DataStoreConfig{}
-	d := json.NewDecoder(r.Body)
-	d.DisallowUnknownFields()
-	if err := d.Decode(&dataStoreConfigParam); err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-	if err := AssertDataStoreConfigRequired(dataStoreConfigParam); err != nil {
-		c.errorHandler(w, r, err, nil)
-		return
-	}
-	result, err := c.service.UpdateDataStoresConfig(r.Context(), dataStoreConfigParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
