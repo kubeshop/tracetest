@@ -1,18 +1,12 @@
-import {ConfigMode, TDataStoreConfig, TRawDataStoreConfig} from 'types/Config.types';
+import {ConfigMode, TDataStoreConfig, TRawDataStore} from 'types/Config.types';
 import DataStore from './DataStore.model';
 
-const DataStoreConfig = ({dataStores = [], defaultDataStore = ''}: TRawDataStoreConfig): TDataStoreConfig => {
+const DataStoreConfig = (dataStores: TRawDataStore[] = []): TDataStoreConfig => {
   const dataStoreList = dataStores.map(rawDataStore => DataStore(rawDataStore));
+  const defaultDataStore = dataStoreList.find(({isDefault}) => isDefault);
+  const mode = (!!defaultDataStore && ConfigMode.READY) || ConfigMode.NO_TRACING_MODE;
 
-  const mode =
-    (Boolean(defaultDataStore && dataStoreList.find(({name}) => name === defaultDataStore)) && ConfigMode.READY) ||
-    ConfigMode.NO_TRACING_MODE;
-
-  return {
-    dataStores: dataStoreList,
-    defaultDataStore,
-    mode,
-  };
+  return {defaultDataStore: defaultDataStore ?? DataStore({}), mode};
 };
 
 export default DataStoreConfig;

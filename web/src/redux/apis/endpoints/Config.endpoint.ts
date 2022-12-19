@@ -1,36 +1,39 @@
 import {HTTP_METHOD} from 'constants/Common.constants';
 import {TracetestApiTags} from 'constants/Test.constants';
+import DataStoreConfig from 'models/DataStoreConfig.model';
+import {TDataStoreConfig, TRawDataStore, TTestConnectionResponse} from 'types/Config.types';
 import {TTestApiEndpointBuilder} from 'types/Test.types';
-import {
-  SupportedDataStores,
-  TDataStoreConfig,
-  TRawDataStoreConfig,
-  TTestConnectionRequest,
-  TTestConnectionResponse,
-} from 'types/Config.types';
-// import Config from 'models/Config.model';
-import DataStoreConfigMock from 'models/__mocks__/DataStoreConfig.mock';
 
 const ConfigEndpoint = (builder: TTestApiEndpointBuilder) => ({
-  getDataStoreConfig: builder.query<TDataStoreConfig, unknown>({
-    // query: () => '/config',
-    query: () => '/tests',
+  getDataStores: builder.query<TDataStoreConfig, unknown>({
+    query: () => '/datastores',
     providesTags: () => [{type: TracetestApiTags.CONFIG, id: 'datastore'}],
-    transformResponse: () =>
-      DataStoreConfigMock.model({
-        dataStores: [{name: 'jaeger', type: SupportedDataStores.JAEGER}],
-        defaultDataStore: 'jaeger',
-      }),
+    transformResponse: (rawDataStores: TRawDataStore[]) => DataStoreConfig(rawDataStores),
   }),
-  updateDatastoreConfig: builder.mutation<undefined, TRawDataStoreConfig>({
-    query: config => ({
-      url: '/config/datastores',
-      method: HTTP_METHOD.PUT,
-      body: config,
+  createDataStore: builder.mutation<undefined, TRawDataStore>({
+    query: dataStore => ({
+      url: '/datastores',
+      method: HTTP_METHOD.POST,
+      body: dataStore,
     }),
     invalidatesTags: [{type: TracetestApiTags.CONFIG, id: 'datastore'}],
   }),
-  testConnection: builder.mutation<TTestConnectionResponse, TTestConnectionRequest>({
+  updateDataStore: builder.mutation<undefined, {dataStore: TRawDataStore; dataStoreId: string}>({
+    query: ({dataStore, dataStoreId}) => ({
+      url: `/datastores/${dataStoreId}`,
+      method: HTTP_METHOD.PUT,
+      body: dataStore,
+    }),
+    invalidatesTags: [{type: TracetestApiTags.CONFIG, id: 'datastore'}],
+  }),
+  deleteDataStore: builder.mutation<undefined, {dataStoreId: string}>({
+    query: ({dataStoreId}) => ({
+      url: `/datastores/${dataStoreId}`,
+      method: HTTP_METHOD.DELETE,
+    }),
+    invalidatesTags: [{type: TracetestApiTags.CONFIG, id: 'datastore'}],
+  }),
+  testConnection: builder.mutation<TTestConnectionResponse, TRawDataStore>({
     // remove comments once the real service is ready
     query: connectionTest => ({
       url: `/tests`,

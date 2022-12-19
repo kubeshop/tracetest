@@ -1,17 +1,18 @@
 import {IMockFactory} from 'types/Common.types';
-import {TDataStoreConfig, TRawDataStoreConfig} from 'types/Config.types';
+import {TDataStoreConfig, TRawDataStore} from 'types/Config.types';
 import Config from '../DataStoreConfig.model';
 
-const DataStoreConfigMock: IMockFactory<TDataStoreConfig, TRawDataStoreConfig> = () => ({
-  raw(data = {}) {
-    return {
-      dataStores: [],
-      defaultDataStore: '',
-      ...data,
-    };
+const DataStoreConfigMock: IMockFactory<
+  TDataStoreConfig,
+  {
+    dataStores: TRawDataStore[];
+  }
+> = () => ({
+  raw({dataStores = []} = {}) {
+    return {dataStores};
   },
-  model(data = {}) {
-    return Config(this.raw(data));
+  model({dataStores = []} = {}) {
+    return Config(this.raw({dataStores}).dataStores);
   },
 });
 

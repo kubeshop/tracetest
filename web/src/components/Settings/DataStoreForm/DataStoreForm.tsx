@@ -1,5 +1,5 @@
 import {Form} from 'antd';
-import {useCallback, useMemo} from 'react';
+import {useCallback, useEffect, useMemo} from 'react';
 import SetupConfigService from 'services/DataStore.service';
 import {TDraftDataStore, TDataStoreForm, TDataStoreConfig} from 'types/Config.types';
 import {SupportedDataStoresToExplanation} from 'constants/DataStore.constants';
@@ -20,6 +20,10 @@ interface IProps {
 const DataStoreForm = ({form, onSubmit, dataStoreConfig, onIsFormValid}: IProps) => {
   const initialValues = useMemo(() => SetupConfigService.getInitialValues(dataStoreConfig), [dataStoreConfig]);
   const dataStoreType = Form.useWatch('dataStoreType', form);
+
+  useEffect(() => {
+    form.setFieldsValue({dataStore: {...initialValues.dataStore}});
+  }, [dataStoreType, form, initialValues.dataStore]);
 
   const onValidation = useCallback(
     async (_: any, draft: TDraftDataStore) => {

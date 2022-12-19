@@ -22,19 +22,13 @@ export type TDataStore = Model<
   }
 >;
 
-export type TSupportedDataStores = TDataStoreSchemas['SupportedDataStores'];
-export type TRawDataStoreConfig = TConfigSchemas['DataStoreConfig'];
-export type TDataStoreConfig = Model<
-  TRawDataStoreConfig,
-  {
-    mode: ConfigMode;
-    dataStores: TDataStore[];
-  }
->;
+export type TDataStoreConfig = {
+  defaultDataStore: TDataStore;
+  mode: ConfigMode;
+};
 
 export type TRawGRPCClientSettings = TDataStoreSchemas['GRPCClientSettings'];
 
-export type TTestConnectionRequest = TConfigSchemas['TestConnectionRequest'];
 export type TTestConnectionResponse = TConfigSchemas['TestConnectionResponse'];
 
 export interface IGRPCClientSettings extends TRawGRPCClientSettings {

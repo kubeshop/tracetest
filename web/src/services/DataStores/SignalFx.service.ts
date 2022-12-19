@@ -15,7 +15,7 @@ const SignalFxService = (): TDataStoreService => ({
 
     return Promise.resolve(true);
   },
-  getInitialValues({dataStores: [{signalFx = {}}] = []}) {
+  getInitialValues({defaultDataStore: {signalFx = {}} = {}}) {
     const {realm = '', token = ''} = signalFx;
 
     return {

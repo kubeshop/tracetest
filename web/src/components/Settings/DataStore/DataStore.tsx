@@ -24,15 +24,15 @@ const DataStore = ({dataStoreConfig}: IProps) => {
 
   const handleOnSubmit = useCallback(
     async (values: TDraftDataStore) => {
-      onSaveConfig(values);
+      onSaveConfig(values, dataStoreConfig.defaultDataStore);
     },
-    [onSaveConfig]
+    [onSaveConfig, dataStoreConfig.defaultDataStore]
   );
 
   const handleTestConnection = useCallback(async () => {
     const draft = form.getFieldsValue();
-    onTestConnection(draft);
-  }, [form, onTestConnection]);
+    onTestConnection(draft, dataStoreConfig.defaultDataStore);
+  }, [form, onTestConnection, dataStoreConfig.defaultDataStore]);
 
   return (
     <S.Wrapper data-cy="config-datastore-form">
@@ -57,7 +57,7 @@ const DataStore = ({dataStoreConfig}: IProps) => {
               disabled={isLoading}
               type="primary"
               ghost
-              onClick={onDeleteConfig}
+              onClick={() => onDeleteConfig(dataStoreConfig.defaultDataStore)}
               danger
             >
               Delete
