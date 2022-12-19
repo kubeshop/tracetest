@@ -3,6 +3,7 @@ package tracedb
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	tempopb "github.com/kubeshop/tracetest/server/internal/proto-gen-go/tempo-idl"
 	"github.com/kubeshop/tracetest/server/traces"
@@ -44,8 +45,67 @@ func (tdb *tempoTraceDB) Connect(ctx context.Context) error {
 	return nil
 }
 
-func (jtd *tempoTraceDB) TestConnection(ctx context.Context) ConnectionTestResult {
-	return ConnectionTestResult{}
+func (ttd *tempoTraceDB) TestConnection(ctx context.Context) ConnectionTestResult {
+	reachable, err := isReachable(ttd.config.Endpoint)
+	if !reachable {
+		return ConnectionTestResult{
+			ConnectivityTestResult: ConnectionTestStepResult{
+				OperationDescription: fmt.Sprintf(`Tracetest tried to connect to "%s" and failed`, ttd.config.Endpoint),
+				Error:                err,
+			},
+		}
+	}
+
+	err = ttd.Connect(ctx)
+	wrappedErr := errors.Unwrap(err)
+	if errors.Is(wrappedErr, ErrConnectionFailed) {
+		return ConnectionTestResult{
+			ConnectivityTestResult: ConnectionTestStepResult{
+				OperationDescription: fmt.Sprintf(`Tracetest tried to open a gRPC connection against "%s" and failed`, ttd.config.Endpoint),
+				Error:                err,
+			},
+		}
+	}
+
+	_, err = ttd.GetTraceByID(ctx, trace.TraceID{}.String())
+	if strings.Contains(err.Error(), "authentication handshake failed") {
+		return ConnectionTestResult{
+			AuthenticationTestResult: ConnectionTestStepResult{
+				OperationDescription: `Tracetest tried to execue a gRPC request but it failed due to authentication issues`,
+				Error:                err,
+			},
+		}
+	}
+
+	if strings.Contains(err.Error(), "connection error") {
+		return ConnectionTestResult{
+			ConnectivityTestResult: ConnectionTestStepResult{
+				OperationDescription: fmt.Sprintf(`Tracetest tried to open a gRPC connection against "%s" and failed`, ttd.config.Endpoint),
+				Error:                err,
+			},
+		}
+	}
+
+	if !errors.Is(err, ErrTraceNotFound) {
+		return ConnectionTestResult{
+			TraceRetrivalTestResult: ConnectionTestStepResult{
+				OperationDescription: fmt.Sprintf(`Tracetest tried to fetch a trace from Tempo endpoint "%s" and got an error`, ttd.config.Endpoint),
+				Error:                err,
+			},
+		}
+	}
+
+	return ConnectionTestResult{
+		ConnectivityTestResult: ConnectionTestStepResult{
+			OperationDescription: fmt.Sprintf(`Tracetest connected to "%s"`, ttd.config.Endpoint),
+		},
+		AuthenticationTestResult: ConnectionTestStepResult{
+			OperationDescription: `Tracetest managed to authenticate with Tempo`,
+		},
+		TraceRetrivalTestResult: ConnectionTestStepResult{
+			OperationDescription: `Tracetest was able to search for a trace using Tempo API`,
+		},
+	}
 }
 
 func (ttd *tempoTraceDB) GetTraceByID(ctx context.Context, traceID string) (traces.Trace, error) {
