@@ -87,7 +87,7 @@ func (db signalfxDB) TestConnection(ctx context.Context) ConnectionTestResult {
 	}
 }
 
-func (db signalfxDB) GetTraceByID(ctx context.Context, traceID string) (traces.Trace, error) {
+func (db signalfxDB) GetTraceByID(ctx context.Context, traceID string) (model.Trace, error) {
 	timestamps, err := db.getSegmentsTimestamps(ctx, traceID)
 	if err != nil {
 		return model.Trace{}, fmt.Errorf("coult not get trace segment timestamps: %w", err)

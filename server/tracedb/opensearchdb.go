@@ -78,7 +78,7 @@ func (db opensearchDb) TestConnection(ctx context.Context) ConnectionTestResult 
 	}
 }
 
-func (db opensearchDb) GetTraceByID(ctx context.Context, traceID string) (traces.Trace, error) {
+func (db opensearchDb) GetTraceByID(ctx context.Context, traceID string) (model.Trace, error) {
 	content := strings.NewReader(fmt.Sprintf(`{
 		"query": { "match": { "traceId": "%s" } }
 	}`, traceID))
