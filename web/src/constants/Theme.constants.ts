@@ -34,12 +34,14 @@ export const theme: DefaultTheme = {
       style: {
         border: '1px solid #52C41A',
         background: '#F6FFED',
+        minWidth: '450px',
       },
     },
     error: {
       style: {
         border: '1px solid #F5222D',
         background: '#FFF1F0',
+        minWidth: '450px',
       },
     },
   },

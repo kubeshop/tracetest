@@ -6,14 +6,14 @@ import {
   TDataStoreConfig,
   TRawDataStoreConfig,
   TTestConnectionRequest,
-  TTestConnectionResponse,
+  TConnectionResult,
+  TRawConnectionResult,
 } from 'types/Config.types';
-// import Config from 'models/Config.model';
 import DataStoreConfigMock from 'models/__mocks__/DataStoreConfig.mock';
+import ConnectionResult from 'models/ConnectionResult.model';
 
 const ConfigEndpoint = (builder: TTestApiEndpointBuilder) => ({
   getDataStoreConfig: builder.query<TDataStoreConfig, unknown>({
-    // query: () => '/config',
     query: () => '/tests',
     providesTags: () => [{type: TracetestApiTags.CONFIG, id: 'datastore'}],
     transformResponse: () =>
@@ -30,28 +30,14 @@ const ConfigEndpoint = (builder: TTestApiEndpointBuilder) => ({
     }),
     invalidatesTags: [{type: TracetestApiTags.CONFIG, id: 'datastore'}],
   }),
-  testConnection: builder.mutation<TTestConnectionResponse, TTestConnectionRequest>({
-    // remove comments once the real service is ready
+  testConnection: builder.mutation<TConnectionResult, TTestConnectionRequest>({
     query: connectionTest => ({
-      url: `/tests`,
-      // url: `/config/connection`,
-      method: HTTP_METHOD.GET,
-      // body: connectionTest,
+      url: `/config/connection`,
+      method: HTTP_METHOD.POST,
+      body: connectionTest,
     }),
-    transformResponse: () => ({
-      authentication: {
-        passed: true,
-        message: 'Authentication passed',
-      },
-      connectivity: {
-        passed: true,
-        message: 'Connectivity passed',
-      },
-      fetchTraces: {
-        passed: true,
-        message: 'Fetch traces passed',
-      },
-    }),
+    transformResponse: (result: TRawConnectionResult) => ConnectionResult(result),
+    transformErrorResponse: ({data: result}) => ConnectionResult(result as TRawConnectionResult),
   }),
 });
 
