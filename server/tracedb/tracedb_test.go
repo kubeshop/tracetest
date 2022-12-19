@@ -69,7 +69,7 @@ func TestCreateClient(t *testing.T) {
 					},
 				},
 			},
-			expectedError: tracedb.ErrInvalidTraceDBProvider,
+			expectedError: config.ErrInvalidTraceDBProvider,
 		},
 	}
 
