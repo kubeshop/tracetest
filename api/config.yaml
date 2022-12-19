@@ -1,112 +1,18 @@
 openapi: 3.0.0
 components:
   schemas:
-    DataStore:
-      type: object
-      properties:
-        type:
-          $ref: "#/components/schemas/SupportedDataStores"
-        name:
-          type: string
-        jaeger:
-          $ref: "#/components/schemas/GRPCClientSettings"
-        tempo:
-          $ref: "#/components/schemas/GRPCClientSettings"
-        openSearch:
-          $ref: "#/components/schemas/OpenSearch"
-        signalFx:
-          $ref: "#/components/schemas/SignalFX"
     DataStoreConfig:
       type: object
       properties:
         dataStores:
           type: array
           items:
-            $ref: "#/components/schemas/DataStore"
+            $ref: "./dataStores.yaml#/components/schemas/DataStore"
         defaultDataStore:
           type: string
-    CollectorConfig:
-      type: object
-      properties:
-        endpoint:
-          type: string
-    OpenSearch:
-      type: object
-      properties:
-        addresses:
-          type: array
-          items:
-            type: string
-        username:
-          type: string
-        password:
-          type: string
-        index:
-          type: string
-    SignalFX:
-      type: object
-      properties:
-        realm:
-          type: string
-        token:
-          type: string
-    GRPCClientSettings:
-      type: object
-      properties:
-        endpoint:
-          type: string
-        readBufferSize:
-          type: number
-        writeBufferSize:
-          type: number
-        waitForReady:
-          type: boolean
-        headers:
-          type: array
-          items:
-            $ref: "./http.yaml#/components/schemas/HTTPHeader"
-        balancerName:
-          type: string
-        compression:
-          type: string
-          enum:
-            - "gzip"
-            - "zlib"
-            - "deflate"
-            - "snappy"
-            - "zstd"
-            - "none"
-            - ""
-        tls:
-          $ref: "#/components/schemas/TLS"
-        auth:
-          $ref: "./http.yaml#/components/schemas/HTTPAuth"
-    TLS:
-      type: object
-      properties:
-        insecure:
-          type: boolean
-        insecureSkipVerify:
-          type: boolean
-        serverName:
-          type: string
-        settings:
-          $ref: "#/components/schemas/TLSSetting"
-    TLSSetting:
-      type: object
-      properties:
-        cAFile:
-          type: string
-        certFile:
-          type: string
-        keyFile:
-          type: string
-        minVersion:
-          type: string
-        maxVersion:
-          type: string
+
     TestConnectionRequest:
-      $ref: "#/components/schemas/DataStore"
+      $ref: "./dataStores.yaml#/components/schemas/DataStore"
     TestConnectionResponse:
       type: object
       properties:
@@ -114,6 +20,3 @@ components:
           type: boolean
         errorMessage:
           type: string
-    SupportedDataStores:
-      type: string
-      enum: [jaeger, openSearch, tempo, signalFx, otlp]

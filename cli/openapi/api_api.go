@@ -27,6 +27,113 @@ var (
 // ApiApiService ApiApi service
 type ApiApiService service
 
+type ApiCreateDataStoreRequest struct {
+	ctx        context.Context
+	ApiService *ApiApiService
+	dataStore  *DataStore
+}
+
+func (r ApiCreateDataStoreRequest) DataStore(dataStore DataStore) ApiCreateDataStoreRequest {
+	r.dataStore = &dataStore
+	return r
+}
+
+func (r ApiCreateDataStoreRequest) Execute() (*DataStore, *http.Response, error) {
+	return r.ApiService.CreateDataStoreExecute(r)
+}
+
+/*
+CreateDataStore Create a new Data Store
+
+Create a new Data Store
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiCreateDataStoreRequest
+*/
+func (a *ApiApiService) CreateDataStore(ctx context.Context) ApiCreateDataStoreRequest {
+	return ApiCreateDataStoreRequest{
+		ApiService: a,
+		ctx:        ctx,
+	}
+}
+
+// Execute executes the request
+//  @return DataStore
+func (a *ApiApiService) CreateDataStoreExecute(r ApiCreateDataStoreRequest) (*DataStore, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodPost
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *DataStore
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.CreateDataStore")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/datastores"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.dataStore
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
 type ApiCreateEnvironmentRequest struct {
 	ctx         context.Context
 	ApiService  *ApiApiService
@@ -346,6 +453,98 @@ func (a *ApiApiService) CreateTransactionExecute(r ApiCreateTransactionRequest) 
 	}
 
 	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiDeleteDataStoreRequest struct {
+	ctx         context.Context
+	ApiService  *ApiApiService
+	dataStoreId string
+}
+
+func (r ApiDeleteDataStoreRequest) Execute() (*http.Response, error) {
+	return r.ApiService.DeleteDataStoreExecute(r)
+}
+
+/*
+DeleteDataStore Delete a Data Store
+
+Delete a Data Store
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param dataStoreId
+ @return ApiDeleteDataStoreRequest
+*/
+func (a *ApiApiService) DeleteDataStore(ctx context.Context, dataStoreId string) ApiDeleteDataStoreRequest {
+	return ApiDeleteDataStoreRequest{
+		ApiService:  a,
+		ctx:         ctx,
+		dataStoreId: dataStoreId,
+	}
+}
+
+// Execute executes the request
+func (a *ApiApiService) DeleteDataStoreExecute(r ApiDeleteDataStoreRequest) (*http.Response, error) {
+	var (
+		localVarHTTPMethod = http.MethodDelete
+		localVarPostBody   interface{}
+		formFiles          []formFile
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.DeleteDataStore")
+	if err != nil {
+		return nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/datastores/{dataStoreId}"
+	localVarPath = strings.Replace(localVarPath, "{"+"dataStoreId"+"}", url.PathEscape(parameterToString(r.dataStoreId, "")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarHTTPResponse, newErr
+	}
+
+	return localVarHTTPResponse, nil
 }
 
 type ApiDeleteEnvironmentRequest struct {
@@ -1215,6 +1414,258 @@ func (a *ApiApiService) ExpressionResolveExecute(r ApiExpressionResolveRequest) 
 	}
 	// body params
 	localVarPostBody = r.resolveRequestInfo
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiGetDataStoreRequest struct {
+	ctx         context.Context
+	ApiService  *ApiApiService
+	dataStoreId string
+}
+
+func (r ApiGetDataStoreRequest) Execute() (*DataStore, *http.Response, error) {
+	return r.ApiService.GetDataStoreExecute(r)
+}
+
+/*
+GetDataStore Get a Data Store
+
+Get a Data Store
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param dataStoreId
+ @return ApiGetDataStoreRequest
+*/
+func (a *ApiApiService) GetDataStore(ctx context.Context, dataStoreId string) ApiGetDataStoreRequest {
+	return ApiGetDataStoreRequest{
+		ApiService:  a,
+		ctx:         ctx,
+		dataStoreId: dataStoreId,
+	}
+}
+
+// Execute executes the request
+//  @return DataStore
+func (a *ApiApiService) GetDataStoreExecute(r ApiGetDataStoreRequest) (*DataStore, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *DataStore
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.GetDataStore")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/datastores/{dataStoreId}"
+	localVarPath = strings.Replace(localVarPath, "{"+"dataStoreId"+"}", url.PathEscape(parameterToString(r.dataStoreId, "")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiGetDataStoresRequest struct {
+	ctx           context.Context
+	ApiService    *ApiApiService
+	take          *int32
+	skip          *int32
+	query         *string
+	sortBy        *string
+	sortDirection *string
+}
+
+// indicates how many data stores can be returned by each page
+func (r ApiGetDataStoresRequest) Take(take int32) ApiGetDataStoresRequest {
+	r.take = &take
+	return r
+}
+
+// indicates how many data stores will be skipped when paginating
+func (r ApiGetDataStoresRequest) Skip(skip int32) ApiGetDataStoresRequest {
+	r.skip = &skip
+	return r
+}
+
+// query to search data stores, based on data store name
+func (r ApiGetDataStoresRequest) Query(query string) ApiGetDataStoresRequest {
+	r.query = &query
+	return r
+}
+
+// indicates the sort field for the data stores
+func (r ApiGetDataStoresRequest) SortBy(sortBy string) ApiGetDataStoresRequest {
+	r.sortBy = &sortBy
+	return r
+}
+
+// indicates the sort direction for the data stores
+func (r ApiGetDataStoresRequest) SortDirection(sortDirection string) ApiGetDataStoresRequest {
+	r.sortDirection = &sortDirection
+	return r
+}
+
+func (r ApiGetDataStoresRequest) Execute() ([]DataStore, *http.Response, error) {
+	return r.ApiService.GetDataStoresExecute(r)
+}
+
+/*
+GetDataStores Get all Data Stores
+
+Get all Data Stores
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiGetDataStoresRequest
+*/
+func (a *ApiApiService) GetDataStores(ctx context.Context) ApiGetDataStoresRequest {
+	return ApiGetDataStoresRequest{
+		ApiService: a,
+		ctx:        ctx,
+	}
+}
+
+// Execute executes the request
+//  @return []DataStore
+func (a *ApiApiService) GetDataStoresExecute(r ApiGetDataStoresRequest) ([]DataStore, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue []DataStore
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.GetDataStores")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/datastores"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if r.take != nil {
+		localVarQueryParams.Add("take", parameterToString(*r.take, ""))
+	}
+	if r.skip != nil {
+		localVarQueryParams.Add("skip", parameterToString(*r.skip, ""))
+	}
+	if r.query != nil {
+		localVarQueryParams.Add("query", parameterToString(*r.query, ""))
+	}
+	if r.sortBy != nil {
+		localVarQueryParams.Add("sortBy", parameterToString(*r.sortBy, ""))
+	}
+	if r.sortDirection != nil {
+		localVarQueryParams.Add("sortDirection", parameterToString(*r.sortDirection, ""))
+	}
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -3908,6 +4359,106 @@ func (a *ApiApiService) RunTransactionExecute(r ApiRunTransactionRequest) (*Tran
 	}
 
 	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiUpdateDataStoreRequest struct {
+	ctx         context.Context
+	ApiService  *ApiApiService
+	dataStoreId string
+	dataStore   *DataStore
+}
+
+func (r ApiUpdateDataStoreRequest) DataStore(dataStore DataStore) ApiUpdateDataStoreRequest {
+	r.dataStore = &dataStore
+	return r
+}
+
+func (r ApiUpdateDataStoreRequest) Execute() (*http.Response, error) {
+	return r.ApiService.UpdateDataStoreExecute(r)
+}
+
+/*
+UpdateDataStore Update a Data Store
+
+Update a Data Store
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param dataStoreId
+ @return ApiUpdateDataStoreRequest
+*/
+func (a *ApiApiService) UpdateDataStore(ctx context.Context, dataStoreId string) ApiUpdateDataStoreRequest {
+	return ApiUpdateDataStoreRequest{
+		ApiService:  a,
+		ctx:         ctx,
+		dataStoreId: dataStoreId,
+	}
+}
+
+// Execute executes the request
+func (a *ApiApiService) UpdateDataStoreExecute(r ApiUpdateDataStoreRequest) (*http.Response, error) {
+	var (
+		localVarHTTPMethod = http.MethodPut
+		localVarPostBody   interface{}
+		formFiles          []formFile
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.UpdateDataStore")
+	if err != nil {
+		return nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/datastores/{dataStoreId}"
+	localVarPath = strings.Replace(localVarPath, "{"+"dataStoreId"+"}", url.PathEscape(parameterToString(r.dataStoreId, "")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.dataStore
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarHTTPResponse, newErr
+	}
+
+	return localVarHTTPResponse, nil
 }
 
 type ApiUpdateEnvironmentRequest struct {

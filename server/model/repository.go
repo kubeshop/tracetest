@@ -58,6 +58,15 @@ type TransactionRunRepository interface {
 	GetTransactionsRuns(context.Context, id.ID, int32, int32) ([]TransactionRun, error)
 }
 
+type DataStoreRepository interface {
+	CreateDataStore(context.Context, DataStore) (DataStore, error)
+	UpdateDataStore(context.Context, DataStore) (DataStore, error)
+	DeleteDataStore(context.Context, DataStore) error
+	GetDataStore(_ context.Context, id string) (DataStore, error)
+	GetDataStores(_ context.Context, take, skip int32, query, sortBy, sortDirection string) (List[DataStore], error)
+	DataStoreIDExists(context.Context, string) (bool, error)
+}
+
 type Repository interface {
 	TestRepository
 	RunRepository
@@ -66,6 +75,9 @@ type Repository interface {
 	TransactionRepository
 	TransactionRunRepository
 
+	DataStoreRepository
+
 	ServerID() (id string, isNew bool, _ error)
+	Close() error
 	Drop() error
 }

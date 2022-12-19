@@ -115,6 +115,7 @@ func (td *postgresDB) Drop() error {
 		"test_runs",
 		"tests",
 		"environments",
+		"data_stores",
 		"server",
 		"schema_migrations",
 	)
@@ -129,4 +130,8 @@ func dropTables(td *postgresDB, tables ...string) error {
 	}
 
 	return nil
+}
+
+func (td *postgresDB) Close() error {
+	return td.db.Close()
 }
