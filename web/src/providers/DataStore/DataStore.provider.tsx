@@ -1,10 +1,9 @@
 import {noop} from 'lodash';
 import {createContext, useCallback, useContext, useMemo, useState} from 'react';
 import {useTestConnectionMutation, useUpdateDatastoreConfigMutation} from 'redux/apis/TraceTest.api';
-import {TDraftDataStore} from 'types/Config.types';
+import {TConnectionResult, TDraftDataStore} from 'types/Config.types';
 import DataStoreService from 'services/DataStore.service';
-import {notification} from 'antd';
-import {useTheme} from 'styled-components';
+import useTestConnectionNotification from './hooks/useTestConnectionNotification';
 
 interface IContext {
   isFormValid: boolean;
@@ -34,10 +33,7 @@ const DataStoreProvider = ({children}: IProps) => {
   const [updateConfig, {isLoading}] = useUpdateDatastoreConfigMutation();
   const [testConnection, {isLoading: isTestConnectionLoading}] = useTestConnectionMutation();
   const [isFormValid, setIsFormValid] = useState(false);
-  const [api, contextHolder] = notification.useNotification();
-  const {
-    notification: {success, error},
-  } = useTheme();
+  const {showNotification, contextHolder} = useTestConnectionNotification();
 
   const onSaveConfig = useCallback(async (draft: TDraftDataStore) => {
     const configRequest = await DataStoreService.getRequest(draft);
@@ -52,23 +48,15 @@ const DataStoreProvider = ({children}: IProps) => {
   const onTestConnection = useCallback(
     async (draft: TDraftDataStore) => {
       const {dataStores: [dataStore] = []} = await DataStoreService.getRequest(draft);
-      const {authentication = {}, connectivity = {}, fetchTraces = {}} = await testConnection(dataStore!).unwrap();
 
-      if (authentication.passed && connectivity.passed && fetchTraces.passed) {
-        return api.success({
-          message: 'Connection is setup',
-          description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor',
-          ...success,
-        });
+      try {
+        const result = await testConnection(dataStore!).unwrap();
+        showNotification(result);
+      } catch (err) {
+        showNotification(err as TConnectionResult);
       }
-
-      api.error({
-        message: 'Connection is not setup',
-        description: authentication.error || connectivity.error || fetchTraces.error,
-        ...error,
-      });
     },
-    [api, error, success, testConnection]
+    [showNotification, testConnection]
   );
 
   const value = useMemo<IContext>(

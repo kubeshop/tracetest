@@ -22,15 +22,10 @@ const DataStoreForm = ({form, onSubmit, dataStoreConfig, onIsFormValid}: IProps)
 
   const onValidation = useCallback(
     async (_: any, draft: TDraftDataStore) => {
-      try {
-        const isValid = await SetupConfigService.validateDraft(draft);
-        form.validateFields();
-        onIsFormValid(isValid);
-      } catch (error) {
-        onIsFormValid(false);
-      }
+      const isValid = await SetupConfigService.validateDraft(draft);
+      onIsFormValid(isValid);
     },
-    [form, onIsFormValid]
+    [onIsFormValid]
   );
 
   return (
