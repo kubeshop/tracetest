@@ -4,6 +4,7 @@ import {useTestConnectionMutation, useUpdateDatastoreConfigMutation} from 'redux
 import {TConnectionResult, TDraftDataStore} from 'types/Config.types';
 import DataStoreService from 'services/DataStore.service';
 import useTestConnectionNotification from './hooks/useTestConnectionNotification';
+import {useConfirmationModal} from '../ConfirmationModal/ConfirmationModal.provider';
 
 interface IContext {
   isFormValid: boolean;
@@ -36,6 +37,7 @@ const DataStoreProvider = ({children}: IProps) => {
   const [testConnection, {isLoading: isTestConnectionLoading}] = useTestConnectionMutation();
   const [isFormValid, setIsFormValid] = useState(false);
   const {showNotification, contextHolder} = useTestConnectionNotification();
+  const {onOpen} = useConfirmationModal();
 
   const onSaveConfig = useCallback(
     async (draft: TDraftDataStore) => {
