@@ -26,26 +26,26 @@ import (
 var IDGen = id.NewRandGenerator()
 
 type controller struct {
-	testDB            model.Repository
-	runner            executor.Runner
-	transactionRunner executor.TransactionRunner
-	assertionRunner   executor.AssertionRunner
-	mappers           mappings.Mappings
+	testDB  model.Repository
+	runner  runner
+	mappers mappings.Mappings
+}
+
+type runner interface {
+	RunTest(ctx context.Context, test model.Test, rm model.RunMetadata, env model.Environment) model.Run
+	RunTransaction(ctx context.Context, tr model.Transaction, rm model.RunMetadata, env model.Environment) model.TransactionRun
+	RunAssertions(ctx context.Context, request executor.AssertionRequest)
 }
 
 func NewController(
 	testDB model.Repository,
-	runner executor.Runner,
-	transactionRunner executor.TransactionRunner,
-	assertionRunner executor.AssertionRunner,
+	runner runner,
 	mappers mappings.Mappings,
 ) openapi.ApiApiServicer {
 	return &controller{
-		testDB:            testDB,
-		runner:            runner,
-		assertionRunner:   assertionRunner,
-		transactionRunner: transactionRunner,
-		mappers:           mappers,
+		testDB:  testDB,
+		runner:  runner,
+		mappers: mappers,
 	}
 }
 
@@ -266,7 +266,7 @@ func (c *controller) RerunTestRun(ctx context.Context, testID, runID string) (op
 		Run:  newTestRun,
 	}
 
-	c.assertionRunner.RunAssertions(ctx, assertionRequest)
+	c.runner.RunAssertions(ctx, assertionRequest)
 
 	return openapi.Response(http.StatusOK, c.mappers.Out.Run(&newTestRun)), nil
 }
@@ -284,7 +284,7 @@ func (c *controller) RunTest(ctx context.Context, testID string, runInformation 
 		return handleDBError(err), err
 	}
 
-	run := c.runner.Run(ctx, test, metadata, environment)
+	run := c.runner.RunTest(ctx, test, metadata, environment)
 
 	return openapi.Response(200, c.mappers.Out.Run(&run)), nil
 }
@@ -922,7 +922,7 @@ func (c *controller) RunTransaction(ctx context.Context, transactionID string, r
 		return handleDBError(err), err
 	}
 
-	run := c.transactionRunner.Run(ctx, transaction, metadata, environment)
+	run := c.runner.RunTransaction(ctx, transaction, metadata, environment)
 
 	return openapi.Response(http.StatusOK, c.mappers.Out.TransactionRun(run)), nil
 }
@@ -1109,4 +1109,89 @@ func takeResources(transactions []openapi.Transaction, tests []openapi.Test, tak
 	}
 
 	return items[skip:upperLimit]
+}
+
+// DataStores
+
+func (c *controller) CreateDataStore(ctx context.Context, in openapi.DataStore) (openapi.ImplResponse, error) {
+	dataStore := c.mappers.In.DataStore(in)
+
+	if dataStore.ID != "" {
+		exists, err := c.testDB.DataStoreIDExists(ctx, dataStore.ID)
+		if err != nil {
+			return handleDBError(err), err
+		}
+
+		if exists {
+			err := fmt.Errorf(`cannot create data store with ID "%s: %w`, dataStore.ID, errTestExists)
+			r := map[string]string{
+				"error": err.Error(),
+			}
+			return openapi.Response(http.StatusBadRequest, r), err
+		}
+	}
+
+	dataStore, err := c.testDB.CreateDataStore(ctx, dataStore)
+	if err != nil {
+		return openapi.Response(http.StatusInternalServerError, err.Error()), err
+	}
+
+	return openapi.Response(200, c.mappers.Out.DataStore(dataStore)), nil
+}
+
+func (c *controller) DeleteDataStore(ctx context.Context, dataStoreId string) (openapi.ImplResponse, error) {
+	dataStore, err := c.testDB.GetDataStore(ctx, dataStoreId)
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	err = c.testDB.DeleteDataStore(ctx, dataStore)
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	return openapi.Response(204, nil), nil
+}
+
+func (c *controller) GetDataStore(ctx context.Context, dataStoreId string) (openapi.ImplResponse, error) {
+	dataStore, err := c.testDB.GetDataStore(ctx, dataStoreId)
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	return openapi.Response(200, c.mappers.Out.DataStore(dataStore)), nil
+}
+
+func (c *controller) GetDataStores(ctx context.Context, take, skip int32, query string, sortBy string, sortDirection string) (openapi.ImplResponse, error) {
+	if take == 0 {
+		take = 20
+	}
+
+	dataStores, err := c.testDB.GetDataStores(ctx, take, skip, query, sortBy, sortDirection)
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	return openapi.Response(200, paginated[openapi.DataStore]{
+		items: c.mappers.Out.DataStores(dataStores.Items),
+		count: dataStores.TotalCount,
+	}), nil
+}
+
+func (c *controller) UpdateDataStore(ctx context.Context, dataStoreId string, in openapi.DataStore) (openapi.ImplResponse, error) {
+	updated := c.mappers.In.DataStore(in)
+
+	dataStore, err := c.testDB.GetDataStore(ctx, dataStoreId)
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	updated.ID = dataStore.ID
+
+	_, err = c.testDB.UpdateDataStore(ctx, updated)
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	return openapi.Response(204, nil), nil
 }

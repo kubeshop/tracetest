@@ -1,12 +1,8 @@
 package testmock
 
 import (
-	"context"
-
 	"github.com/kubeshop/tracetest/server/app"
 	"github.com/kubeshop/tracetest/server/config"
-	"github.com/kubeshop/tracetest/server/tracedb"
-	"github.com/kubeshop/tracetest/server/tracing"
 	"go.opentelemetry.io/collector/config/configgrpc"
 	"go.opentelemetry.io/collector/config/configtls"
 )
@@ -26,8 +22,7 @@ func WithHttpPort(port int) TestingAppOption {
 }
 
 func GetTestingApp(options ...TestingAppOption) (*app.App, error) {
-	ctx := context.Background()
-	db, err := GetTestingDatabase("file://../migrations")
+	db, err := GetRawTestingDatabase()
 
 	if err != nil {
 		return nil, err
@@ -59,15 +54,8 @@ func GetTestingApp(options ...TestingAppOption) (*app.App, error) {
 		option(&config)
 	}
 
-	tracedb, err := tracedb.New(config, db)
-	if err != nil {
-		return nil, err
-	}
-
-	tracer, err := tracing.NewTracer(ctx, config)
-	if err != nil {
-		return nil, err
-	}
-
-	return app.New(config, db, tracedb, tracer)
+	return app.New(app.Config{
+		Config:     config,
+		Migrations: "file://../migrations",
+	}, db)
 }

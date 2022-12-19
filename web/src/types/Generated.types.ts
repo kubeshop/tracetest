@@ -142,6 +142,20 @@ export interface paths {
     /** Tests the config data store/exporter connection */
     post: operations["testConnection"];
   };
+  "/datastores": {
+    /** Get all Data Stores */
+    get: operations["getDataStores"];
+    /** Create a new Data Store */
+    post: operations["createDataStore"];
+  };
+  "/datastores/{dataStoreId}": {
+    /** Get a Data Store */
+    get: operations["getDataStore"];
+    /** Update a Data Store */
+    put: operations["updateDataStore"];
+    /** Delete a Data Store */
+    delete: operations["deleteDataStore"];
+  };
 }
 
 export interface components {}
@@ -938,6 +952,104 @@ export interface operations {
       };
     };
   };
+  /** Get all Data Stores */
+  getDataStores: {
+    parameters: {
+      query: {
+        /** indicates how many data stores can be returned by each page */
+        take?: number;
+        /** indicates how many data stores will be skipped when paginating */
+        skip?: number;
+        /** query to search data stores, based on data store name */
+        query?: string;
+        /** indicates the sort field for the data stores */
+        sortBy?: "created" | "name";
+        /** indicates the sort direction for the data stores */
+        sortDirection?: "asc" | "desc";
+      };
+    };
+    responses: {
+      /** successful operation */
+      200: {
+        headers: {
+          /** Total records count */
+          "X-Total-Count"?: number;
+        };
+        content: {
+          "application/json": external["dataStores.yaml"]["components"]["schemas"]["DataStore"][];
+        };
+      };
+      /** problem with getting data stores */
+      500: unknown;
+    };
+  };
+  /** Create a new Data Store */
+  createDataStore: {
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["dataStores.yaml"]["components"]["schemas"]["DataStore"];
+        };
+      };
+      /** trying to create a data store with an already existing ID */
+      400: unknown;
+    };
+    requestBody: {
+      content: {
+        "application/json": external["dataStores.yaml"]["components"]["schemas"]["DataStore"];
+      };
+    };
+  };
+  /** Get a Data Store */
+  getDataStore: {
+    parameters: {
+      path: {
+        dataStoreId: string;
+      };
+    };
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["dataStores.yaml"]["components"]["schemas"]["DataStore"];
+        };
+      };
+      /** problem with getting a data store */
+      500: unknown;
+    };
+  };
+  /** Update a Data Store */
+  updateDataStore: {
+    parameters: {
+      path: {
+        dataStoreId: string;
+      };
+    };
+    responses: {
+      /** successful operation */
+      204: never;
+      /** problem with updating data store */
+      500: unknown;
+    };
+    requestBody: {
+      content: {
+        "application/json": external["dataStores.yaml"]["components"]["schemas"]["DataStore"];
+      };
+    };
+  };
+  /** Delete a Data Store */
+  deleteDataStore: {
+    parameters: {
+      path: {
+        dataStoreId: string;
+      };
+    };
+    responses: {
+      /** OK */
+      204: never;
+    };
+  };
 }
 
 export interface external {
@@ -945,20 +1057,34 @@ export interface external {
     paths: {};
     components: {
       schemas: {
-        DataStore: {
-          type?: external["config.yaml"]["components"]["schemas"]["SupportedDataStores"];
-          name?: string;
-          jaeger?: external["config.yaml"]["components"]["schemas"]["GRPCClientSettings"];
-          tempo?: external["config.yaml"]["components"]["schemas"]["GRPCClientSettings"];
-          openSearch?: external["config.yaml"]["components"]["schemas"]["OpenSearch"];
-          signalFx?: external["config.yaml"]["components"]["schemas"]["SignalFX"];
-        };
         DataStoreConfig: {
-          dataStores?: external["config.yaml"]["components"]["schemas"]["DataStore"][];
+          dataStores?: external["dataStores.yaml"]["components"]["schemas"]["DataStore"][];
           defaultDataStore?: string;
         };
-        CollectorConfig: {
-          endpoint?: string;
+        TestConnectionRequest: external["dataStores.yaml"]["components"]["schemas"]["DataStore"];
+        TestConnectionResponse: {
+          successful?: boolean;
+          errorMessage?: string;
+        };
+      };
+    };
+    operations: {};
+  };
+  "dataStores.yaml": {
+    paths: {};
+    components: {
+      schemas: {
+        DataStore: {
+          id?: string;
+          name?: string;
+          type?: external["dataStores.yaml"]["components"]["schemas"]["SupportedDataStores"];
+          isDefault?: boolean;
+          jaeger?: external["dataStores.yaml"]["components"]["schemas"]["GRPCClientSettings"];
+          tempo?: external["dataStores.yaml"]["components"]["schemas"]["GRPCClientSettings"];
+          openSearch?: external["dataStores.yaml"]["components"]["schemas"]["OpenSearch"];
+          signalFx?: external["dataStores.yaml"]["components"]["schemas"]["SignalFX"];
+          /** Format: date-time */
+          createdAt?: string;
         };
         OpenSearch: {
           addresses?: string[];
@@ -986,14 +1112,14 @@ export interface external {
             | "zstd"
             | "none"
             | "";
-          tls?: external["config.yaml"]["components"]["schemas"]["TLS"];
+          tls?: external["dataStores.yaml"]["components"]["schemas"]["TLS"];
           auth?: external["http.yaml"]["components"]["schemas"]["HTTPAuth"];
         };
         TLS: {
           insecure?: boolean;
           insecureSkipVerify?: boolean;
           serverName?: string;
-          settings?: external["config.yaml"]["components"]["schemas"]["TLSSetting"];
+          settings?: external["dataStores.yaml"]["components"]["schemas"]["TLSSetting"];
         };
         TLSSetting: {
           cAFile?: string;
@@ -1001,11 +1127,6 @@ export interface external {
           keyFile?: string;
           minVersion?: string;
           maxVersion?: string;
-        };
-        TestConnectionRequest: external["config.yaml"]["components"]["schemas"]["DataStore"];
-        TestConnectionResponse: {
-          successful?: boolean;
-          errorMessage?: string;
         };
         /** @enum {string} */
         SupportedDataStores:

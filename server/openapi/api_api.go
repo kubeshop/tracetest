@@ -51,6 +51,12 @@ func NewApiApiController(s ApiApiServicer, opts ...ApiApiOption) Router {
 func (c *ApiApiController) Routes() Routes {
 	return Routes{
 		{
+			"CreateDataStore",
+			strings.ToUpper("Post"),
+			"/api/datastores",
+			c.CreateDataStore,
+		},
+		{
 			"CreateEnvironment",
 			strings.ToUpper("Post"),
 			"/api/environments",
@@ -67,6 +73,12 @@ func (c *ApiApiController) Routes() Routes {
 			strings.ToUpper("Post"),
 			"/api/transactions",
 			c.CreateTransaction,
+		},
+		{
+			"DeleteDataStore",
+			strings.ToUpper("Delete"),
+			"/api/datastores/{dataStoreId}",
+			c.DeleteDataStore,
 		},
 		{
 			"DeleteEnvironment",
@@ -121,6 +133,18 @@ func (c *ApiApiController) Routes() Routes {
 			strings.ToUpper("Post"),
 			"/api/expressions/resolve",
 			c.ExpressionResolve,
+		},
+		{
+			"GetDataStore",
+			strings.ToUpper("Get"),
+			"/api/datastores/{dataStoreId}",
+			c.GetDataStore,
+		},
+		{
+			"GetDataStores",
+			strings.ToUpper("Get"),
+			"/api/datastores",
+			c.GetDataStores,
 		},
 		{
 			"GetEnvironment",
@@ -261,6 +285,12 @@ func (c *ApiApiController) Routes() Routes {
 			c.RunTransaction,
 		},
 		{
+			"UpdateDataStore",
+			strings.ToUpper("Put"),
+			"/api/datastores/{dataStoreId}",
+			c.UpdateDataStore,
+		},
+		{
 			"UpdateEnvironment",
 			strings.ToUpper("Put"),
 			"/api/environments/{environmentId}",
@@ -285,6 +315,30 @@ func (c *ApiApiController) Routes() Routes {
 			c.UpsertDefinition,
 		},
 	}
+}
+
+// CreateDataStore - Create a new Data Store
+func (c *ApiApiController) CreateDataStore(w http.ResponseWriter, r *http.Request) {
+	dataStoreParam := DataStore{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&dataStoreParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertDataStoreRequired(dataStoreParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.CreateDataStore(r.Context(), dataStoreParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
 }
 
 // CreateEnvironment - Create new environment
@@ -349,6 +403,22 @@ func (c *ApiApiController) CreateTransaction(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	result, err := c.service.CreateTransaction(r.Context(), transactionParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// DeleteDataStore - Delete a Data Store
+func (c *ApiApiController) DeleteDataStore(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	dataStoreIdParam := params["dataStoreId"]
+
+	result, err := c.service.DeleteDataStore(r.Context(), dataStoreIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -532,6 +602,49 @@ func (c *ApiApiController) ExpressionResolve(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	result, err := c.service.ExpressionResolve(r.Context(), resolveRequestInfoParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// GetDataStore - Get a Data Store
+func (c *ApiApiController) GetDataStore(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	dataStoreIdParam := params["dataStoreId"]
+
+	result, err := c.service.GetDataStore(r.Context(), dataStoreIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// GetDataStores - Get all Data Stores
+func (c *ApiApiController) GetDataStores(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+	takeParam, err := parseInt32Parameter(query.Get("take"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	skipParam, err := parseInt32Parameter(query.Get("skip"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	queryParam := query.Get("query")
+	sortByParam := query.Get("sortBy")
+	sortDirectionParam := query.Get("sortDirection")
+	result, err := c.service.GetDataStores(r.Context(), takeParam, skipParam, queryParam, sortByParam, sortDirectionParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -1036,6 +1149,33 @@ func (c *ApiApiController) RunTransaction(w http.ResponseWriter, r *http.Request
 		return
 	}
 	result, err := c.service.RunTransaction(r.Context(), transactionIdParam, runInformationParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// UpdateDataStore - Update a Data Store
+func (c *ApiApiController) UpdateDataStore(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	dataStoreIdParam := params["dataStoreId"]
+
+	dataStoreParam := DataStore{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&dataStoreParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertDataStoreRequired(dataStoreParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.UpdateDataStore(r.Context(), dataStoreIdParam, dataStoreParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

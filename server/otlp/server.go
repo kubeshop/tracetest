@@ -16,26 +16,32 @@ import (
 
 type Server struct {
 	pb.UnimplementedTraceServiceServer
-	db model.Repository
+
+	addr string
+	db   model.RunRepository
+
+	gServer *grpc.Server
 }
 
-func StartServer(port int, db model.Repository) error {
-	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
+func NewServer(addr string, db model.RunRepository) *Server {
+	return &Server{
+		addr: addr,
+		db:   db,
+	}
+}
+
+func (s *Server) Start() error {
+	s.gServer = grpc.NewServer()
+	listener, err := net.Listen("tcp", s.addr)
 	if err != nil {
-		panic(err)
+		return fmt.Errorf("cannot listen on address %s: %w", s.addr, err)
 	}
+	pb.RegisterTraceServiceServer(s.gServer, s)
+	return s.gServer.Serve(listener)
+}
 
-	server := Server{
-		db: db,
-	}
-
-	s := grpc.NewServer()
-	pb.RegisterTraceServiceServer(s, &server)
-	if err := s.Serve(listener); err != nil {
-		return fmt.Errorf("could not serve: %w", err)
-	}
-
-	return nil
+func (s *Server) Stop() {
+	s.gServer.Stop()
 }
 
 func (s Server) Export(ctx context.Context, request *pb.ExportTraceServiceRequest) (*pb.ExportTraceServiceResponse, error) {

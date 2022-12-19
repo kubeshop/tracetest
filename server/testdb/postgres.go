@@ -10,7 +10,6 @@ import (
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/kubeshop/tracetest/server/id"
-	"github.com/kubeshop/tracetest/server/model"
 )
 
 type postgresDB struct {
@@ -27,7 +26,7 @@ type scanner interface {
 	Scan(dest ...interface{}) error
 }
 
-func Postgres(options ...PostgresOption) (model.Repository, error) {
+func Postgres(options ...PostgresOption) (*postgresDB, error) {
 	ps := &postgresDB{
 		migrationsFolder: "file://./migrations",
 	}
@@ -116,6 +115,7 @@ func (td *postgresDB) Drop() error {
 		"test_runs",
 		"tests",
 		"environments",
+		"data_stores",
 		"server",
 		"schema_migrations",
 	)
@@ -130,4 +130,8 @@ func dropTables(td *postgresDB, tables ...string) error {
 	}
 
 	return nil
+}
+
+func (td *postgresDB) Close() error {
+	return td.db.Close()
 }
