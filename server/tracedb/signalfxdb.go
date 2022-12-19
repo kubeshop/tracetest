@@ -59,7 +59,7 @@ func (db signalfxDB) TestConnection(ctx context.Context) ConnectionTestResult {
 	if strings.Contains(strings.ToLower(err.Error()), "401") {
 		return ConnectionTestResult{
 			AuthenticationTestResult: ConnectionTestStepResult{
-				OperationDescription: `Tracetest tried to execute an OpenSearch API request but it failed due to authentication issues`,
+				OperationDescription: `Tracetest tried to execute an signalFX API request but it failed due to authentication issues`,
 				Error:                err,
 			},
 		}
@@ -68,7 +68,7 @@ func (db signalfxDB) TestConnection(ctx context.Context) ConnectionTestResult {
 	if !errors.Is(err, ErrTraceNotFound) {
 		return ConnectionTestResult{
 			TraceRetrivalTestResult: ConnectionTestStepResult{
-				OperationDescription: fmt.Sprintf(`Tracetest tried to fetch a trace from the OpenSearch endpoint "%s" and got an error`, url),
+				OperationDescription: fmt.Sprintf(`Tracetest tried to fetch a trace from the signalFX endpoint "%s" and got an error`, url),
 				Error:                err,
 			},
 		}
@@ -79,10 +79,10 @@ func (db signalfxDB) TestConnection(ctx context.Context) ConnectionTestResult {
 			OperationDescription: fmt.Sprintf(`Tracetest connected to "%s"`, url),
 		},
 		AuthenticationTestResult: ConnectionTestStepResult{
-			OperationDescription: `Tracetest managed to authenticate with OpenSearch`,
+			OperationDescription: `Tracetest managed to authenticate with signalFX`,
 		},
 		TraceRetrivalTestResult: ConnectionTestStepResult{
-			OperationDescription: `Tracetest was able to search for a trace using the OpenSearch API`,
+			OperationDescription: `Tracetest was able to search for a trace using the signalFX API`,
 		},
 	}
 }
