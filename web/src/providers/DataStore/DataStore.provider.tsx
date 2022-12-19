@@ -1,10 +1,11 @@
 import {noop} from 'lodash';
 import {createContext, useCallback, useContext, useMemo, useState} from 'react';
 import {useTestConnectionMutation, useUpdateDatastoreConfigMutation} from 'redux/apis/TraceTest.api';
-import {TConnectionResult, TDraftDataStore} from 'types/Config.types';
+import {SupportedDataStores, TConnectionResult, TDraftDataStore} from 'types/Config.types';
 import DataStoreService from 'services/DataStore.service';
 import useTestConnectionNotification from './hooks/useTestConnectionNotification';
 import {useConfirmationModal} from '../ConfirmationModal/ConfirmationModal.provider';
+import ConnectionResult from '../../models/ConnectionResult.model';
 
 interface IContext {
   isFormValid: boolean;
@@ -76,11 +77,15 @@ const DataStoreProvider = ({children}: IProps) => {
     async (draft: TDraftDataStore) => {
       const {dataStores: [dataStore] = []} = await DataStoreService.getRequest(draft);
 
+      if (draft.dataStoreType === SupportedDataStores.OtelCollector) {
+        return showNotification(ConnectionResult({}), draft.dataStoreType);
+      }
+
       try {
         const result = await testConnection(dataStore!).unwrap();
-        showNotification(result);
+        showNotification(result, draft.dataStoreType!);
       } catch (err) {
-        showNotification(err as TConnectionResult);
+        showNotification(err as TConnectionResult, draft.dataStoreType!);
       }
     },
     [showNotification, testConnection]
