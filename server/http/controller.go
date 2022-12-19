@@ -20,6 +20,7 @@ import (
 	"github.com/kubeshop/tracetest/server/model/yaml/yamlconvert"
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/testdb"
+	"github.com/kubeshop/tracetest/server/tracedb"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -1194,4 +1195,26 @@ func (c *controller) UpdateDataStore(ctx context.Context, dataStoreId string, in
 	}
 
 	return openapi.Response(204, nil), nil
+}
+
+// TestConnection implements openapi.ApiApiServicer
+func (c *controller) TestConnection(ctx context.Context, dataStore openapi.DataStore) (openapi.ImplResponse, error) {
+	dataStoreModel := c.mappers.In.DataStore(dataStore)
+	dataStoreConfig, err := dataStoreModel.Config()
+	if err != nil {
+		return openapi.Response(http.StatusBadRequest, err.Error()), err
+	}
+
+	selectedTraceDB, err := tracedb.NewFromDataStoreConfig(&dataStoreConfig, c.testDB)
+	if err != nil {
+		return openapi.Response(http.StatusBadRequest, err.Error()), err
+	}
+
+	testResult := selectedTraceDB.TestConnection(ctx)
+	statusCode := http.StatusOK
+	if !testResult.HasSucceed() {
+		statusCode = http.StatusUnprocessableEntity
+	}
+
+	return openapi.Response(statusCode, c.mappers.Out.ConnectionTestResult(testResult)), nil
 }

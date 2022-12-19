@@ -10,8 +10,6 @@ components:
             $ref: "./dataStores.yaml#/components/schemas/DataStore"
         defaultDataStore:
           type: string
-    TestConnectionRequest:
-      $ref: "./dataStores.yaml#/components/schemas/DataStore"
     TestConnectionResponse:
       type: object
       properties:
