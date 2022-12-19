@@ -28,8 +28,12 @@ type (
 	}
 )
 
-func (e DataStore) Slug() string {
-	return strings.ToLower(strings.ReplaceAll(strings.TrimSpace(e.Name), " ", "-"))
+func (ds DataStore) IsZero() bool {
+	return ds.Type == ""
+}
+
+func (ds DataStore) Slug() string {
+	return strings.ToLower(strings.ReplaceAll(strings.TrimSpace(ds.Name), " ", "-"))
 }
 
 func (e DataStore) Config() (config.TracingBackendDataStoreConfig, error) {

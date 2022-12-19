@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 
-	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/openapi"
 )
 
 var (
@@ -41,37 +41,38 @@ func (db *noopTraceDB) Connect(ctx context.Context) error {
 
 func (db *noopTraceDB) Close() error { return nil }
 
-func New(c config.Config, repository model.RunRepository) (db TraceDB, err error) {
-	selectedDataStore, err := c.DataStore()
-	if err != nil {
-		return nil, err
-	}
-
-	if selectedDataStore == nil {
-		return &noopTraceDB{}, nil
-	}
-
-	return NewFromDataStoreConfig(selectedDataStore, repository)
-}
-
 func (db *noopTraceDB) TestConnection(ctx context.Context) ConnectionTestResult {
 	return ConnectionTestResult{}
 }
 
-func NewFromDataStoreConfig(c *config.TracingBackendDataStoreConfig, repository model.RunRepository) (db TraceDB, err error) {
-	err = config.ErrInvalidTraceDBProvider
+type traceDBFactory struct {
+	repo model.Repository
+}
 
-	switch {
-	case c.Type == JAEGER_BACKEND:
-		db, err = newJaegerDB(&c.Jaeger)
-	case c.Type == TEMPO_BACKEND:
-		db, err = newTempoDB(&c.Tempo)
-	case c.Type == OPENSEARCH_BACKEND:
-		db, err = newOpenSearchDB(c.OpenSearch)
-	case c.Type == SIGNALFX:
-		db, err = newSignalFXDB(c.SignalFX)
-	case c.Type == OTLP:
-		db, err = newCollectorDB(repository)
+func Factory(repo model.Repository) func(ds model.DataStore) (db TraceDB, err error) {
+	f := traceDBFactory{
+		repo: repo,
+	}
+
+	return f.New
+}
+
+func (f *traceDBFactory) New(ds model.DataStore) (db TraceDB, err error) {
+	if ds.IsZero() {
+		return &noopTraceDB{}, nil
+	}
+
+	switch ds.Type {
+	case openapi.JAEGER:
+		return newJaegerDB(ds.Values.Jaeger)
+	case openapi.TEMPO:
+		return newTempoDB(ds.Values.Tempo)
+	case openapi.OPEN_SEARCH:
+		return newOpenSearchDB(ds.Values.OpenSearch)
+	case openapi.SIGNAL_FX:
+		return newSignalFXDB(ds.Values.SignalFx)
+	case openapi.OTLP:
+		return newCollectorDB(f.repo)
 	}
 
 	return

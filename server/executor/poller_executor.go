@@ -13,9 +13,12 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
+type traceDBFactoryFn func(ds model.DataStore) (db tracedb.TraceDB, err error)
+
 type DefaultPollerExecutor struct {
 	config            config.Config
 	updater           RunUpdater
+	newTraceDBFn      traceDBFactoryFn
 	dsRepo            model.DataStoreRepository
 	maxTracePollRetry int
 }
@@ -57,6 +60,7 @@ func NewPollerExecutor(
 	config config.Config,
 	tracer trace.Tracer,
 	updater RunUpdater,
+	newTraceDBFn traceDBFactoryFn,
 	dsRepo model.DataStoreRepository,
 ) PollerExecutor {
 	retryDelay := config.PoolingRetryDelay()
@@ -66,6 +70,7 @@ func NewPollerExecutor(
 	pollerExecutor := &DefaultPollerExecutor{
 		config:            config,
 		updater:           updater,
+		newTraceDBFn:      newTraceDBFn,
 		dsRepo:            dsRepo,
 		maxTracePollRetry: maxTracePollRetry,
 	}
@@ -82,7 +87,7 @@ func (pe DefaultPollerExecutor) dataStore(ctx context.Context) (tracedb.TraceDB,
 		return nil, fmt.Errorf("cannot get default datastore: %w", err)
 	}
 
-	tdb, err := tracedb.New(pe.config, nil)
+	tdb, err := pe.newTraceDBFn(ds)
 	if err != nil {
 		return nil, fmt.Errorf(`cannot get tracedb from DataStore config with ID "%s": %w`, ds.ID, err)
 	}

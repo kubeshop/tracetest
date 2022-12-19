@@ -213,7 +213,7 @@ func convertSignalFXSpan(in signalFXSpan) model.Span {
 	}
 }
 
-func newSignalFXDB(cfg config.SignalFXDataStoreConfig) (TraceDB, error) {
+func newSignalFXDB(cfg *config.SignalFXDataStoreConfig) (TraceDB, error) {
 	return signalfxDB{
 		Realm:      cfg.Realm,
 		Token:      cfg.Token,

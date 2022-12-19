@@ -111,7 +111,8 @@ func (td *postgresDB) DefaultDataStore(ctx context.Context) (model.DataStore, er
 	defer stmt.Close()
 
 	dataStore, err := td.readDataStoreRow(ctx, stmt.QueryRowContext(ctx))
-	if err != nil {
+	// if no default is found, assume nothing is configured, return empty DS without error
+	if err != nil && err != ErrNotFound {
 		return model.DataStore{}, err
 	}
 

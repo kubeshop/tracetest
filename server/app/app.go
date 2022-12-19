@@ -21,6 +21,7 @@ import (
 	"github.com/kubeshop/tracetest/server/otlp"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/testdb"
+	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/kubeshop/tracetest/server/tracing"
 	"go.opentelemetry.io/otel/trace"
@@ -197,7 +198,13 @@ func newRunnerFacades(
 		subscriptionManager,
 	)
 
-	pollerExecutor := executor.NewPollerExecutor(conf, tracer, execTestUpdater, testDB)
+	pollerExecutor := executor.NewPollerExecutor(
+		conf,
+		tracer,
+		execTestUpdater,
+		tracedb.Factory(testDB),
+		testDB,
+	)
 
 	tracePoller := executor.NewTracePoller(
 		pollerExecutor,
