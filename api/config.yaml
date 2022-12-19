@@ -13,12 +13,12 @@ components:
     TestConnectionResponse:
       type: object
       properties:
-        connectivity:
-          $ref: "#/components/schemas/ConnectionTestStep"
-        authentication:
-          $ref: "#/components/schemas/ConnectionTestStep"
-        fetchTraces:
-          $ref: "#/components/schemas/ConnectionTestStep"
+        successful:
+          type: boolean
+        steps:
+          type: array
+          items:
+            $ref: "#/components/schemas/ConnectionResult"
     ConnectionResult:
       type: object
       properties:

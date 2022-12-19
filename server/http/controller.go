@@ -10,7 +10,6 @@ import (
 
 	"github.com/kubeshop/tracetest/server/assertions"
 	"github.com/kubeshop/tracetest/server/assertions/selectors"
-	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/http/mappings"
@@ -40,7 +39,6 @@ type runner interface {
 }
 
 func NewController(
-	config config.Config,
 	testDB model.Repository,
 	runner runner,
 	mappers mappings.Mappings,
