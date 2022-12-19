@@ -16,6 +16,12 @@ type MockRepository struct {
 	T mock.TestingT
 }
 
+// Close implements model.Repository
+func (m *MockRepository) Close() error {
+	args := m.Called()
+	return args.Error(0)
+}
+
 // CreateTransactionRun implements model.Repository
 func (*MockRepository) CreateTransactionRun(context.Context, model.TransactionRun) (model.TransactionRun, error) {
 	panic("unimplemented")

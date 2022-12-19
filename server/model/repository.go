@@ -78,5 +78,6 @@ type Repository interface {
 	DataStoreRepository
 
 	ServerID() (id string, isNew bool, _ error)
+	Close() error
 	Drop() error
 }

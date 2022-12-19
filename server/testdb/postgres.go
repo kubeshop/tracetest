@@ -131,3 +131,7 @@ func dropTables(td *postgresDB, tables ...string) error {
 
 	return nil
 }
+
+func (td *postgresDB) Close() error {
+	return td.db.Close()
+}

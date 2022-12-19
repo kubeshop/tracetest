@@ -17,6 +17,7 @@ func getDB() (model.Repository, func()) {
 	}
 
 	clean := func() {
+		defer db.Close()
 		err = db.Drop()
 		if err != nil {
 			panic(err)
