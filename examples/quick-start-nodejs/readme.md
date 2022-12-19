@@ -248,6 +248,70 @@ docker-compose -f docker-compose.yaml -f tracetest/docker-compose.yaml up # add 
 
 This will start your Tracetest instance on `http://localhost:11633/`. Go ahead and open it up.
 
-Start creating tests! Make sure to use the `http://app:8080/` url in your test creation, because your Node.js app and Tracetest are in the same network.
+[Start creating tests in the Web UI](https://docs.tracetest.io/web-ui/creating-tests)! Make sure to use the `http://app:8080/` url in your test creation, because your Node.js app and Tracetest are in the same network.
+
+Here's a sample of a failed test run, which happens if you add this assertion:
+
+```
+attr:tracetest.span.duration < 500ms
+```
+
+![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1671453477/Blogposts/test-driven-vs-observability-driven-development/screely-1671453473127_rzrcbh.png)
+
+It fails because of the `setTimeout` function in the `app.js` file.
+
+## Run Tracetest tests with the Tracetest CLI
+
+First, [install the CLI](https://docs.tracetest.io/getting-started/installation#install-the-tracetest-cli).
+Then, configure the CLI:
+
+```bash
+tracetest configure --endpoint http://localhost:11633 --analytics
+```
+
+Once configure, you can run a test against the Tracetest instance via the terminal.
+
+Check out the `test-api.yaml` file.
+
+```yaml
+type: Test
+spec:
+  id: W656Q0c4g
+  name: test-api
+  description: run a test against the api
+  trigger:
+    type: http
+    httpRequest:
+      url: http://app:8080
+      method: GET
+      headers:
+      - key: Content-Type
+        value: application/json
+  specs:
+  - selector: span[tracetest.span.type="http" name="GET /" http.target="/" http.method="GET"]
+    assertions:
+    - attr:http.status_code  =  200
+    - attr:tracetest.span.duration  <  500ms
+```
+
+This file defines the a test the same way you would through the Web UI.
+
+To run the test, run this command in the terminal:
+
+```bash
+tracetest test run -d ./test-api.yaml -w
+```
+
+This test will fail just like the sample above due to the `attr:tracetest.span.duration  <  500ms` assertion.
+
+```
+✘ http://app:8080 (http://localhost:11633/test/W656Q0c4g/run/9/test)
+	✘ span[tracetest.span.type="http" name="GET /" http.target="/" http.method="GET"]
+		✘ #c3cc65fdc5734be2
+			✔ attr:http.status_code  =  200 (200)
+			✘ attr:tracetest.span.duration  <  500ms (1.2s) (http://localhost:11633/test/W656Q0c4g/run/9/test?selectedAssertion=0&selectedSpan=c3cc65fdc5734be2)
+```
+
+If you remove the `setTimeout` function in the `app.js` file. The tests will pass!
 
 Feel free to check out our [docs](https://docs.tracetest.io/), and join our [Discord Community](https://discord.gg/8MtcMrQNbX) for more info!
