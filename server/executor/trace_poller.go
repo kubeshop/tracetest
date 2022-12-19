@@ -128,19 +128,17 @@ func (tp tracePoller) Poll(ctx context.Context, test model.Test, run model.Run) 
 }
 
 func (tp tracePoller) syncProcessJob(job PollingRequest) {
-	run := job.run
-	log.Printf("[PollerExecutor] Test %s Run %d: No Data Store Configured, running sync execution\n", job.test.ID, run.ID)
-	rootSpan := model.NewTracetestRootSpan(&run)
+	log.Printf("[PollerExecutor] Test %s Run %d: No Data Store Configured, running sync execution\n", job.test.ID, job.run.ID)
+	rootSpan := model.NewTracetestRootSpan(&job.run)
 	trace := model.Trace{
 		ID: model.IDGen.TraceID(),
 	}
 
-	run.Trace = trace.InsertRootSpan(&rootSpan)
-	run = job.run.SuccessfullyPolledTraces(run.Trace)
+	job.run.Trace = trace.InsertRootSpan(&rootSpan)
+	job.run = job.run.SuccessfullyPolledTraces(job.run.Trace)
 
-	log.Printf("[PollerExecutor] Test %s Run %d: Start updating\n", job.test.ID, run.ID)
-	tp.updater.Update(job.ctx, run)
-	job.run = run
+	log.Printf("[PollerExecutor] Test %s Run %d: Start updating\n", job.test.ID, job.run.ID)
+	tp.updater.Update(job.ctx, job.run)
 
 	tp.runAssertions(job)
 }

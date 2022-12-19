@@ -161,15 +161,17 @@ func decodeChildren(parent *Span, children []encodedSpan) ([]*Span, error) {
 	return res, nil
 }
 
-func (span *Span) setMetadataAttributes() {
+func (span Span) setMetadataAttributes() Span {
 	span.Attributes["name"] = span.Name
 	span.Attributes["tracetest.span.type"] = spanType(span.Attributes)
-	span.Attributes["tracetest.span.duration"] = spanDuration(*span)
+	span.Attributes["tracetest.span.duration"] = spanDuration(span)
 	span.Attributes["tracetest.span.startTime"] = fmt.Sprintf("%d", span.StartTime.UnixNano())
 	span.Attributes["tracetest.span.endTime"] = fmt.Sprintf("%d", span.EndTime.UnixNano())
+
+	return span
 }
 
-func (span *Span) setTriggerResultAttributes(run *Run) {
+func (span Span) setTriggerResultAttributes(run *Run) Span {
 	result := run.TriggerResult
 
 	switch result.Type {
@@ -186,6 +188,8 @@ func (span *Span) setTriggerResultAttributes(run *Run) {
 		span.Attributes["tracetest.response.body"] = resp.Body
 		span.Attributes["tracetest.response.headers"] = string(jsonheaders)
 	}
+
+	return span
 }
 
 func NewTracetestRootSpan(run *Run) Span {
@@ -198,8 +202,7 @@ func NewTracetestRootSpan(run *Run) Span {
 		Children:   []*Span{},
 	}
 
-	span.setMetadataAttributes()
-	span.setTriggerResultAttributes(run)
+	span = span.setMetadataAttributes()
 
-	return span
+	return span.setTriggerResultAttributes(run)
 }

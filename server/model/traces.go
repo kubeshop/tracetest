@@ -18,9 +18,8 @@ type Trace struct {
 func NewTrace(traceID string, spans []Span) Trace {
 	spanMap := make(map[string]*Span, 0)
 	for _, span := range spans {
-		spanCopy := span
+		spanCopy := span.setMetadataAttributes()
 		spanID := span.ID.String()
-		spanCopy.setMetadataAttributes()
 		spanMap[spanID] = &spanCopy
 	}
 

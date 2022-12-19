@@ -87,7 +87,7 @@ func TestCreateClient(t *testing.T) {
 				assert.ErrorIs(t, err, cl.expectedError)
 			} else {
 				require.NoError(t, err)
-				assert.Equal(t, actual, nil)
+				assert.Equal(t, "*tracedb.noopTraceDB", fmt.Sprintf("%T", actual))
 			}
 		})
 	}

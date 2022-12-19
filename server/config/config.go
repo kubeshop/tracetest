@@ -132,10 +132,9 @@ func (c Config) DataStore() (*TracingBackendDataStoreConfig, error) {
 }
 
 func (c Config) IsDataStoreConfigured() bool {
-	selectedStore := c.Server.Telemetry.DataStore
-	_, found := c.Telemetry.DataStores[selectedStore]
+	dataStore, _ := c.DataStore()
 
-	return found
+	return dataStore != nil
 }
 
 func (c Config) Exporter() (*TelemetryExporterOption, error) {
