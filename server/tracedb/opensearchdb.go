@@ -3,6 +3,7 @@ package tracedb
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"strings"
@@ -20,9 +21,61 @@ type opensearchDb struct {
 	client *opensearch.Client
 }
 
+func (db opensearchDb) Connect(ctx context.Context) error {
+	return nil
+}
+
 func (db opensearchDb) Close() error {
 	// No need to close this db
 	return nil
+}
+
+func (db opensearchDb) TestConnection(ctx context.Context) ConnectionTestResult {
+	for _, address := range db.config.Addresses {
+		reachable, err := isReachable(address)
+
+		if !reachable {
+			return ConnectionTestResult{
+				ConnectivityTestResult: ConnectionTestStepResult{
+					OperationDescription: fmt.Sprintf(`Tracetest tried to connect to "%s" and failed`, address),
+					Error:                err,
+				},
+			}
+		}
+	}
+
+	addressesString := strings.Join(db.config.Addresses, ",")
+	_, err := db.GetTraceByID(ctx, trace.TraceID{}.String())
+
+	if strings.Contains(strings.ToLower(err.Error()), "unauthorized") {
+		return ConnectionTestResult{
+			AuthenticationTestResult: ConnectionTestStepResult{
+				OperationDescription: `Tracetest tried to execute an OpenSearch API request but it failed due to authentication issues`,
+				Error:                err,
+			},
+		}
+	}
+
+	if !errors.Is(err, ErrTraceNotFound) {
+		return ConnectionTestResult{
+			TraceRetrivalTestResult: ConnectionTestStepResult{
+				OperationDescription: fmt.Sprintf(`Tracetest tried to fetch a trace from the OpenSearch endpoint "%s" and got an error`, addressesString),
+				Error:                err,
+			},
+		}
+	}
+
+	return ConnectionTestResult{
+		ConnectivityTestResult: ConnectionTestStepResult{
+			OperationDescription: fmt.Sprintf(`Tracetest connected to "%s"`, addressesString),
+		},
+		AuthenticationTestResult: ConnectionTestStepResult{
+			OperationDescription: `Tracetest managed to authenticate with OpenSearch`,
+		},
+		TraceRetrivalTestResult: ConnectionTestStepResult{
+			OperationDescription: `Tracetest was able to search for a trace using the OpenSearch API`,
+		},
+	}
 }
 
 func (db opensearchDb) GetTraceByID(ctx context.Context, traceID string) (model.Trace, error) {
@@ -64,6 +117,7 @@ func newOpenSearchDB(cfg config.OpensearchDataStoreConfig) (TraceDB, error) {
 		Username:  cfg.Username,
 		Password:  cfg.Password,
 	})
+
 	if err != nil {
 		return nil, fmt.Errorf("could not create opensearch client: %w", err)
 	}

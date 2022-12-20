@@ -1028,7 +1028,17 @@ export interface external {
       schemas: {
         TestConnectionResponse: {
           successful?: boolean;
-          errorMessage?: string;
+          steps?: external["config.yaml"]["components"]["schemas"]["ConnectionResult"][];
+        };
+        ConnectionResult: {
+          connectivity?: external["config.yaml"]["components"]["schemas"]["ConnectionTestStep"];
+          authentication?: external["config.yaml"]["components"]["schemas"]["ConnectionTestStep"];
+          fetchTraces?: external["config.yaml"]["components"]["schemas"]["ConnectionTestStep"];
+        };
+        ConnectionTestStep: {
+          passed?: boolean;
+          message?: string;
+          error?: string;
         };
       };
     };

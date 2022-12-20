@@ -3,13 +3,16 @@ package tracedb
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/model"
 )
 
-var ErrTraceNotFound = errors.New("trace not found")
+var (
+	ErrTraceNotFound        = errors.New("trace not found")
+	ErrInvalidConfiguration = errors.New("invalid data store configuration")
+	ErrConnectionFailed     = errors.New("could not connect to data store")
+)
 
 const (
 	JAEGER_BACKEND     string = "jaeger"
@@ -20,7 +23,9 @@ const (
 )
 
 type TraceDB interface {
+	Connect(ctx context.Context) error
 	GetTraceByID(ctx context.Context, traceID string) (model.Trace, error)
+	TestConnection(ctx context.Context) ConnectionTestResult
 	Close() error
 }
 
@@ -29,31 +34,43 @@ type noopTraceDB struct{}
 func (db *noopTraceDB) GetTraceByID(ctx context.Context, traceID string) (t model.Trace, err error) {
 	return model.Trace{}, nil
 }
-func (db *noopTraceDB) Close() error { return nil }
 
-var ErrInvalidTraceDBProvider = fmt.Errorf("invalid traceDB provider: available options are (jaeger, tempo)")
+func (db *noopTraceDB) Connect(ctx context.Context) error {
+	return nil
+}
+
+func (db *noopTraceDB) Close() error { return nil }
 
 func New(c config.Config, repository model.RunRepository) (db TraceDB, err error) {
 	selectedDataStore, err := c.DataStore()
+	if err != nil {
+		return nil, err
+	}
 
-	if selectedDataStore == nil && err == nil {
+	if selectedDataStore == nil {
 		return &noopTraceDB{}, nil
 	}
 
-	if err != nil {
-		return &noopTraceDB{}, ErrInvalidTraceDBProvider
-	}
+	return NewFromDataStoreConfig(selectedDataStore, repository)
+}
+
+func (db *noopTraceDB) TestConnection(ctx context.Context) ConnectionTestResult {
+	return ConnectionTestResult{}
+}
+
+func NewFromDataStoreConfig(c *config.TracingBackendDataStoreConfig, repository model.RunRepository) (db TraceDB, err error) {
+	err = config.ErrInvalidTraceDBProvider
 
 	switch {
-	case selectedDataStore.Type == JAEGER_BACKEND:
-		db, err = newJaegerDB(&selectedDataStore.Jaeger)
-	case selectedDataStore.Type == TEMPO_BACKEND:
-		db, err = newTempoDB(&selectedDataStore.Tempo)
-	case selectedDataStore.Type == OPENSEARCH_BACKEND:
-		db, err = newOpenSearchDB(selectedDataStore.OpenSearch)
-	case selectedDataStore.Type == SIGNALFX:
-		db, err = newSignalFXDB(selectedDataStore.SignalFX)
-	case selectedDataStore.Type == OTLP:
+	case c.Type == JAEGER_BACKEND:
+		db, err = newJaegerDB(&c.Jaeger)
+	case c.Type == TEMPO_BACKEND:
+		db, err = newTempoDB(&c.Tempo)
+	case c.Type == OPENSEARCH_BACKEND:
+		db, err = newOpenSearchDB(c.OpenSearch)
+	case c.Type == SIGNALFX:
+		db, err = newSignalFXDB(c.SignalFX)
+	case c.Type == OTLP:
 		db, err = newCollectorDB(repository)
 	}
 

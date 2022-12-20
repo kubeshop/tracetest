@@ -92,18 +92,19 @@ const DataStoreProvider = ({children}: IProps) => {
   const onTestConnection = useCallback(
     async (draft: TDraftDataStore, defaultDataStore: TDataStore) => {
       const dataStore = await DataStoreService.getRequest(draft, defaultDataStore);
-      const {successful, errorMessage = ''} = await testConnection(dataStore!).unwrap();
+      const {authentication = {}, connectivity = {}, fetchTraces = {}} = await testConnection(dataStore!).unwrap();
 
-      if (successful)
+      if (authentication.passed && connectivity.passed && fetchTraces.passed) {
         return api.success({
           message: 'Connection is setup',
           description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor',
           ...success,
         });
+      }
 
       api.error({
         message: 'Connection is not setup',
-        description: errorMessage,
+        description: authentication.error || connectivity.error || fetchTraces.error,
         ...error,
       });
     },
