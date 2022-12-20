@@ -31,4 +31,3 @@ server:
   telemetry:
     dataStore: otlp
     exporter: collector
-    applicationExporter: collector
