@@ -34,4 +34,3 @@ server:
   telemetry:
     dataStore: tempo
     exporter: collector
-    applicationExporter: collector

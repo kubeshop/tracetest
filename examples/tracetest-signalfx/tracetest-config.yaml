@@ -33,4 +33,3 @@ server:
   telemetry:
     dataStore: signalfx
     exporter: collector
-    applicationExporter: collector

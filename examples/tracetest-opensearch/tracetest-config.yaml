@@ -34,4 +34,3 @@ server:
   telemetry:
     dataStore: opensearch
     exporter: collector
-    applicationExporter: collector
