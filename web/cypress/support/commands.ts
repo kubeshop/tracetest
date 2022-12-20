@@ -230,6 +230,7 @@ Cypress.Commands.add('selectRunDetailMode', (index: number) => {
 });
 
 Cypress.Commands.add('openTransactionCreationModal', () => {
+  cy.get('[data-cy=dataStores-skip-cta]').click();
   cy.get('[data-cy=create-button]').click();
   cy.get('.ant-dropdown-menu-item').last().click();
   cy.get('[data-cy=create-test-steps-CreateTransactionFactory]').should('be.visible');
