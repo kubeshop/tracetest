@@ -1093,6 +1093,9 @@ export interface external {
           insecure?: boolean;
           insecureSkipVerify?: boolean;
           serverName?: string;
+          settings?: external["dataStores.yaml"]["components"]["schemas"]["TLSSetting"];
+        };
+        TLSSetting: {
           cAFile?: string;
           certFile?: string;
           keyFile?: string;

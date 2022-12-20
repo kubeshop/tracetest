@@ -21,8 +21,10 @@ func (m OpenAPI) DataStore(in model.DataStore) openapi.DataStore {
 
 	deepcopy.DeepCopy(in.Values.Jaeger, &dataStore.Jaeger)
 	deepcopy.DeepCopy(in.Values.Jaeger.TLSSetting, &dataStore.Jaeger.Tls)
+	deepcopy.DeepCopy(in.Values.Jaeger.TLSSetting.TLSSetting, &dataStore.Jaeger.Tls.Settings)
 	deepcopy.DeepCopy(in.Values.Tempo, &dataStore.Tempo)
 	deepcopy.DeepCopy(in.Values.Tempo.TLSSetting, &dataStore.Tempo.Tls)
+	deepcopy.DeepCopy(in.Values.Tempo.TLSSetting.TLSSetting, &dataStore.Tempo.Tls.Settings)
 	deepcopy.DeepCopy(in.Values.OpenSearch, &dataStore.OpenSearch)
 	deepcopy.DeepCopy(in.Values.SignalFx, &dataStore.SignalFx)
 
@@ -49,8 +51,10 @@ func (m Model) DataStore(in openapi.DataStore) model.DataStore {
 
 	deepcopy.DeepCopy(in.Jaeger, &dataStore.Values.Jaeger)
 	deepcopy.DeepCopy(in.Jaeger.Tls, &dataStore.Values.Jaeger.TLSSetting)
+	deepcopy.DeepCopy(in.Jaeger.Tls.Settings, &dataStore.Values.Jaeger.TLSSetting.TLSSetting)
 	deepcopy.DeepCopy(in.Tempo, &dataStore.Values.Tempo)
 	deepcopy.DeepCopy(in.Tempo.Tls, &dataStore.Values.Tempo.TLSSetting)
+	deepcopy.DeepCopy(in.Tempo.Tls.Settings, &dataStore.Values.Tempo.TLSSetting.TLSSetting)
 	deepcopy.DeepCopy(in.OpenSearch, &dataStore.Values.OpenSearch)
 	deepcopy.DeepCopy(in.SignalFx, &dataStore.Values.SignalFx)
 

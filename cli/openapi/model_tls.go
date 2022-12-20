@@ -16,14 +16,10 @@ import (
 
 // TLS struct for TLS
 type TLS struct {
-	Insecure           *bool   `json:"insecure,omitempty"`
-	InsecureSkipVerify *bool   `json:"insecureSkipVerify,omitempty"`
-	ServerName         *string `json:"serverName,omitempty"`
-	CAFile             *string `json:"cAFile,omitempty"`
-	CertFile           *string `json:"certFile,omitempty"`
-	KeyFile            *string `json:"keyFile,omitempty"`
-	MinVersion         *string `json:"minVersion,omitempty"`
-	MaxVersion         *string `json:"maxVersion,omitempty"`
+	Insecure           *bool       `json:"insecure,omitempty"`
+	InsecureSkipVerify *bool       `json:"insecureSkipVerify,omitempty"`
+	ServerName         *string     `json:"serverName,omitempty"`
+	Settings           *TLSSetting `json:"settings,omitempty"`
 }
 
 // NewTLS instantiates a new TLS object
@@ -139,164 +135,36 @@ func (o *TLS) SetServerName(v string) {
 	o.ServerName = &v
 }
 
-// GetCAFile returns the CAFile field value if set, zero value otherwise.
-func (o *TLS) GetCAFile() string {
-	if o == nil || o.CAFile == nil {
-		var ret string
+// GetSettings returns the Settings field value if set, zero value otherwise.
+func (o *TLS) GetSettings() TLSSetting {
+	if o == nil || o.Settings == nil {
+		var ret TLSSetting
 		return ret
 	}
-	return *o.CAFile
+	return *o.Settings
 }
 
-// GetCAFileOk returns a tuple with the CAFile field value if set, nil otherwise
+// GetSettingsOk returns a tuple with the Settings field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *TLS) GetCAFileOk() (*string, bool) {
-	if o == nil || o.CAFile == nil {
+func (o *TLS) GetSettingsOk() (*TLSSetting, bool) {
+	if o == nil || o.Settings == nil {
 		return nil, false
 	}
-	return o.CAFile, true
+	return o.Settings, true
 }
 
-// HasCAFile returns a boolean if a field has been set.
-func (o *TLS) HasCAFile() bool {
-	if o != nil && o.CAFile != nil {
+// HasSettings returns a boolean if a field has been set.
+func (o *TLS) HasSettings() bool {
+	if o != nil && o.Settings != nil {
 		return true
 	}
 
 	return false
 }
 
-// SetCAFile gets a reference to the given string and assigns it to the CAFile field.
-func (o *TLS) SetCAFile(v string) {
-	o.CAFile = &v
-}
-
-// GetCertFile returns the CertFile field value if set, zero value otherwise.
-func (o *TLS) GetCertFile() string {
-	if o == nil || o.CertFile == nil {
-		var ret string
-		return ret
-	}
-	return *o.CertFile
-}
-
-// GetCertFileOk returns a tuple with the CertFile field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *TLS) GetCertFileOk() (*string, bool) {
-	if o == nil || o.CertFile == nil {
-		return nil, false
-	}
-	return o.CertFile, true
-}
-
-// HasCertFile returns a boolean if a field has been set.
-func (o *TLS) HasCertFile() bool {
-	if o != nil && o.CertFile != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetCertFile gets a reference to the given string and assigns it to the CertFile field.
-func (o *TLS) SetCertFile(v string) {
-	o.CertFile = &v
-}
-
-// GetKeyFile returns the KeyFile field value if set, zero value otherwise.
-func (o *TLS) GetKeyFile() string {
-	if o == nil || o.KeyFile == nil {
-		var ret string
-		return ret
-	}
-	return *o.KeyFile
-}
-
-// GetKeyFileOk returns a tuple with the KeyFile field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *TLS) GetKeyFileOk() (*string, bool) {
-	if o == nil || o.KeyFile == nil {
-		return nil, false
-	}
-	return o.KeyFile, true
-}
-
-// HasKeyFile returns a boolean if a field has been set.
-func (o *TLS) HasKeyFile() bool {
-	if o != nil && o.KeyFile != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetKeyFile gets a reference to the given string and assigns it to the KeyFile field.
-func (o *TLS) SetKeyFile(v string) {
-	o.KeyFile = &v
-}
-
-// GetMinVersion returns the MinVersion field value if set, zero value otherwise.
-func (o *TLS) GetMinVersion() string {
-	if o == nil || o.MinVersion == nil {
-		var ret string
-		return ret
-	}
-	return *o.MinVersion
-}
-
-// GetMinVersionOk returns a tuple with the MinVersion field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *TLS) GetMinVersionOk() (*string, bool) {
-	if o == nil || o.MinVersion == nil {
-		return nil, false
-	}
-	return o.MinVersion, true
-}
-
-// HasMinVersion returns a boolean if a field has been set.
-func (o *TLS) HasMinVersion() bool {
-	if o != nil && o.MinVersion != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetMinVersion gets a reference to the given string and assigns it to the MinVersion field.
-func (o *TLS) SetMinVersion(v string) {
-	o.MinVersion = &v
-}
-
-// GetMaxVersion returns the MaxVersion field value if set, zero value otherwise.
-func (o *TLS) GetMaxVersion() string {
-	if o == nil || o.MaxVersion == nil {
-		var ret string
-		return ret
-	}
-	return *o.MaxVersion
-}
-
-// GetMaxVersionOk returns a tuple with the MaxVersion field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *TLS) GetMaxVersionOk() (*string, bool) {
-	if o == nil || o.MaxVersion == nil {
-		return nil, false
-	}
-	return o.MaxVersion, true
-}
-
-// HasMaxVersion returns a boolean if a field has been set.
-func (o *TLS) HasMaxVersion() bool {
-	if o != nil && o.MaxVersion != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetMaxVersion gets a reference to the given string and assigns it to the MaxVersion field.
-func (o *TLS) SetMaxVersion(v string) {
-	o.MaxVersion = &v
+// SetSettings gets a reference to the given TLSSetting and assigns it to the Settings field.
+func (o *TLS) SetSettings(v TLSSetting) {
+	o.Settings = &v
 }
 
 func (o TLS) MarshalJSON() ([]byte, error) {
@@ -310,20 +178,8 @@ func (o TLS) MarshalJSON() ([]byte, error) {
 	if o.ServerName != nil {
 		toSerialize["serverName"] = o.ServerName
 	}
-	if o.CAFile != nil {
-		toSerialize["cAFile"] = o.CAFile
-	}
-	if o.CertFile != nil {
-		toSerialize["certFile"] = o.CertFile
-	}
-	if o.KeyFile != nil {
-		toSerialize["keyFile"] = o.KeyFile
-	}
-	if o.MinVersion != nil {
-		toSerialize["minVersion"] = o.MinVersion
-	}
-	if o.MaxVersion != nil {
-		toSerialize["maxVersion"] = o.MaxVersion
+	if o.Settings != nil {
+		toSerialize["settings"] = o.Settings
 	}
 	return json.Marshal(toSerialize)
 }

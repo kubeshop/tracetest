@@ -84,6 +84,11 @@ components:
           type: boolean
         serverName:
           type: string
+        settings:
+          $ref: "#/components/schemas/TLSSetting"
+    TLSSetting:
+      type: object
+      properties:
         cAFile:
           type: string
         certFile:
