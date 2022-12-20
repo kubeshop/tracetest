@@ -195,7 +195,7 @@ func (span Span) setTriggerResultAttributes(run *Run) Span {
 func NewTracetestRootSpan(run *Run) Span {
 	span := Span{
 		ID:         IDGen.SpanID(),
-		Name:       "Tracetest Trigger",
+		Name:       "Tracetest trigger",
 		StartTime:  run.CreatedAt,
 		EndTime:    run.ServiceTriggerCompletedAt,
 		Attributes: Attributes{},
