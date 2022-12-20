@@ -26,8 +26,6 @@ services:
     environment:
       POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
-    ports:
-      - 5432:5432
     healthcheck:
       test: pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
       interval: 1s
@@ -59,15 +57,13 @@ services:
         condition: service_healthy
 
   opensearch:
-    image: opensearchproject/opensearch:2.4.1
+    image: opensearchproject/opensearch:2.3.0
     environment:
       - discovery.type=single-node
       - bootstrap.memory_lock=true # along with the memlock settings below, disables swapping
       - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m" # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
     volumes:
       - ./opensearch/opensearch.yaml:/usr/share/opensearch/config/opensearch.yml
-    ports:
-      - "9200:9200"
     ulimits:
       memlock:
         soft: -1
