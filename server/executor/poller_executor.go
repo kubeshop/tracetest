@@ -125,12 +125,11 @@ func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, m
 	request.run = run
 
 	if !trace.HasRootSpan() {
-		rootSpan := model.NewTracetestRootSpan(run)
-		run.Trace = trace.InsertRootSpan(&rootSpan)
-		run = run.SuccessfullyPolledTraces(run.Trace)
+		run.Trace.RootSpan = model.NewTracetestRootSpan(run)
 	} else {
 		run.Trace.RootSpan = model.AugmentRootSpan(run.Trace.RootSpan, run.TriggerResult)
 	}
+	run = run.SuccessfullyPolledTraces(run.Trace)
 
 	fmt.Printf("completed polling result %d after %d times, number of spans: %d \n", run.ID, request.count, len(run.Trace.Flat))
 
