@@ -39,9 +39,9 @@ func (ds DataStore) Slug() string {
 
 var validTypes = []openapi.SupportedDataStores{
 	openapi.JAEGER,
-	openapi.OPEN_SEARCH,
+	openapi.OPENSEARCH,
 	openapi.TEMPO,
-	openapi.SIGNAL_FX,
+	openapi.SIGNALFX,
 	openapi.OTLP,
 }
 

@@ -75,9 +75,9 @@ func (f *traceDBFactory) New(ds model.DataStore) (tdb TraceDB, err error) {
 		tdb, err = newJaegerDB(ds.Values.Jaeger)
 	case openapi.TEMPO:
 		tdb, err = newTempoDB(ds.Values.Tempo)
-	case openapi.OPEN_SEARCH:
+	case openapi.OPENSEARCH:
 		tdb, err = newOpenSearchDB(ds.Values.OpenSearch)
-	case openapi.SIGNAL_FX:
+	case openapi.SIGNALFX:
 		tdb, err = newSignalFXDB(ds.Values.SignalFx)
 	case openapi.OTLP:
 		tdb, err = newCollectorDB(f.repo)
