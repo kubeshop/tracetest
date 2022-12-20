@@ -111,7 +111,15 @@ func (ttd *tempoTraceDB) TestConnection(ctx context.Context) ConnectionTestResul
 	}
 }
 
+func (ttd *tempoTraceDB) Ready() bool {
+	return ttd.query != nil
+}
+
 func (ttd *tempoTraceDB) GetTraceByID(ctx context.Context, traceID string) (model.Trace, error) {
+	if !ttd.Ready() {
+		return model.Trace{}, fmt.Errorf("Tempo dataStore not ready")
+	}
+
 	trID, err := trace.TraceIDFromHex(traceID)
 	if err != nil {
 		return model.Trace{}, err

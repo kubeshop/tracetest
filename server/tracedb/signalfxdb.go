@@ -38,6 +38,10 @@ func (tdb signalfxDB) Connect(ctx context.Context) error {
 	return nil
 }
 
+func (tdb signalfxDB) Ready() bool {
+	return true
+}
+
 func (db signalfxDB) Close() error {
 	// Doesn't need to be closed
 	return nil

@@ -79,7 +79,14 @@ func (db opensearchDB) TestConnection(ctx context.Context) ConnectionTestResult 
 	}
 }
 
+func (db opensearchDB) Ready() bool {
+	return db.client != nil
+}
+
 func (db opensearchDB) GetTraceByID(ctx context.Context, traceID string) (model.Trace, error) {
+	if !db.Ready() {
+		return model.Trace{}, fmt.Errorf("OpenSearch dataStore not ready")
+	}
 	content := strings.NewReader(fmt.Sprintf(`{
 		"query": { "match": { "traceId": "%s" } }
 	}`, traceID))

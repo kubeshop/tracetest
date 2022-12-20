@@ -19,6 +19,10 @@ func newCollectorDB(repository model.RunRepository) (TraceDB, error) {
 	}, nil
 }
 
+func (tdb *OTLPTraceDB) Ready() bool {
+	return true
+}
+
 func (tdb *OTLPTraceDB) Connect(ctx context.Context) error {
 	return nil
 }
