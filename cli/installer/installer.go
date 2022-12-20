@@ -57,6 +57,9 @@ func (i installer) PreCheck(ui cliUI.UI) {
 func (i installer) Configure(ui cliUI.UI) configuration {
 	config := newConfiguration(ui)
 	config.set("installer", i.name)
+
+	setInstallationType(ui, config)
+
 	for _, confFn := range i.configs {
 		config = confFn(config, ui)
 	}
@@ -78,60 +81,23 @@ func (i installer) Install(ui cliUI.UI) {
 
 type preChecker func(ui cliUI.UI)
 
-type configuration struct {
-	db map[string]interface{}
-	ui cliUI.UI
+func setInstallationType(ui cliUI.UI, config configuration) {
+	option := ui.Select("Do you have OpenTelemetry based tracing already set up, or would you like us to install a demo tracing environment and app?", []cliUI.Option{
+		{"I have a tracing environment already. Just install Tracetest", func(ui cliUI.UI) {
+			config.set("installer.only_tracetest", true)
+		}},
+		{"Just learning tracing! Install Tracetest, Jaeger, OpenTelemetry Collector and the sample app.", func(ui cliUI.UI) {
+			config.set("installer.only_tracetest", false)
+		}},
+	}, 0)
+
+	option.Fn(ui)
 }
-
-func newConfiguration(ui cliUI.UI) configuration {
-	return configuration{
-		db: map[string]interface{}{},
-		ui: ui,
-	}
-}
-
-func (c configuration) set(key string, value interface{}) {
-	if _, exists := c.db[key]; exists {
-		c.ui.Panic(fmt.Errorf("config key %s already exists", key))
-	}
-
-	c.db[key] = value
-}
-
-func (c configuration) get(key string) interface{} {
-	v, exists := c.db[key]
-	if !exists {
-		c.ui.Panic(fmt.Errorf("config key %s not exists", key))
-	}
-
-	return v
-}
-
-func (c configuration) Bool(key string) bool {
-	b, ok := c.get(key).(bool)
-	if !ok {
-		c.ui.Panic(fmt.Errorf("config key %s is not a bool", key))
-	}
-
-	return b
-}
-
-func (c configuration) String(key string) string {
-	s, ok := c.get(key).(string)
-	if !ok {
-		c.ui.Panic(fmt.Errorf("config key %s is not a string", key))
-	}
-
-	return s
-}
-
-type configurator func(config configuration, ui cliUI.UI) configuration
 
 func trackInstall(name string, config configuration, extra map[string]string) {
 	props := map[string]string{
 		"type":                    name,
 		"install_backend":         fmt.Sprintf("%t", config.Bool("tracetest.backend.install")),
-		"install_collector":       fmt.Sprintf("%t", config.Bool("tracetest.collector.install")),
 		"install_demo_pokeshop":   fmt.Sprintf("%t", config.Bool("demo.enable.pokeshop")),
 		"install_demo_otel":       fmt.Sprintf("%t", config.Bool("demo.enable.otel")),
 		"enable_server_analytics": fmt.Sprintf("%t", config.Bool("tracetest.analytics")),
