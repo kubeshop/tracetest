@@ -1109,9 +1109,9 @@ export interface external {
         /** @enum {string} */
         SupportedDataStores:
           | "jaeger"
-          | "openSearch"
+          | "opensearch"
           | "tempo"
-          | "signalFx"
+          | "signalfx"
           | "otlp";
       };
     };

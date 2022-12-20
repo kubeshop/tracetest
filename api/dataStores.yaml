@@ -101,4 +101,4 @@ components:
           type: string
     SupportedDataStores:
       type: string
-      enum: [ jaeger, openSearch, tempo, signalFx, otlp ]
+      enum: [ jaeger, opensearch, tempo, signalfx, otlp ]

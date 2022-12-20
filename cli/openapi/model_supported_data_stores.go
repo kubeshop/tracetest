@@ -20,19 +20,19 @@ type SupportedDataStores string
 
 // List of SupportedDataStores
 const (
-	JAEGER      SupportedDataStores = "jaeger"
-	OPEN_SEARCH SupportedDataStores = "openSearch"
-	TEMPO       SupportedDataStores = "tempo"
-	SIGNAL_FX   SupportedDataStores = "signalFx"
-	OTLP        SupportedDataStores = "otlp"
+	JAEGER     SupportedDataStores = "jaeger"
+	OPENSEARCH SupportedDataStores = "opensearch"
+	TEMPO      SupportedDataStores = "tempo"
+	SIGNALFX   SupportedDataStores = "signalfx"
+	OTLP       SupportedDataStores = "otlp"
 )
 
 // All allowed values of SupportedDataStores enum
 var AllowedSupportedDataStoresEnumValues = []SupportedDataStores{
 	"jaeger",
-	"openSearch",
+	"opensearch",
 	"tempo",
-	"signalFx",
+	"signalfx",
 	"otlp",
 }
 

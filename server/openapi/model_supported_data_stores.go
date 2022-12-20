@@ -13,11 +13,11 @@ type SupportedDataStores string
 
 // List of SupportedDataStores
 const (
-	JAEGER      SupportedDataStores = "jaeger"
-	OPEN_SEARCH SupportedDataStores = "openSearch"
-	TEMPO       SupportedDataStores = "tempo"
-	SIGNAL_FX   SupportedDataStores = "signalFx"
-	OTLP        SupportedDataStores = "otlp"
+	JAEGER     SupportedDataStores = "jaeger"
+	OPENSEARCH SupportedDataStores = "opensearch"
+	TEMPO      SupportedDataStores = "tempo"
+	SIGNALFX   SupportedDataStores = "signalfx"
+	OTLP       SupportedDataStores = "otlp"
 )
 
 // AssertSupportedDataStoresRequired checks if the required fields are not zero-ed
