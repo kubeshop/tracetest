@@ -202,6 +202,9 @@ func newRunnerFacades(
 	dsc, err := conf.DataStore()
 	if err == nil && dsc != nil {
 		fallbackDS = model.DataStoreFromConfig(*dsc)
+		if err := fallbackDS.Validate(); err != nil {
+			panic(err)
+		}
 	}
 
 	pollerExecutor := executor.NewPollerExecutor(
