@@ -5,9 +5,11 @@ import (
 
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/tracedb"
 )
 
 type runnerFacade struct {
+	newTraceDB        func(ds model.DataStore) (tracedb.TraceDB, error)
 	runner            executor.PersistentRunner
 	transactionRunner executor.PersistentTransactionRunner
 	assertionRunner   executor.AssertionRunner
@@ -24,4 +26,8 @@ func (rf runnerFacade) RunTransaction(ctx context.Context, tr model.Transaction,
 
 func (rf runnerFacade) RunAssertions(ctx context.Context, request executor.AssertionRequest) {
 	rf.assertionRunner.RunAssertions(ctx, request)
+}
+
+func (rf runnerFacade) NewTraceDB(ds model.DataStore) (tracedb.TraceDB, error) {
+	return rf.newTraceDB(ds)
 }

@@ -7,17 +7,15 @@ import (
 	"math"
 	"time"
 
-	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 )
 
-type traceDBFactoryFn func(ds model.DataStore) (db tracedb.TraceDB, err error)
+type traceDBFactoryFn func(ds model.DataStore) (tracedb.TraceDB, error)
 
 type DefaultPollerExecutor struct {
-	config            config.Config
 	updater           RunUpdater
 	newTraceDBFn      traceDBFactoryFn
 	dsRepo            model.DataStoreRepository

@@ -45,30 +45,28 @@ func (db *noopTraceDB) TestConnection(ctx context.Context) ConnectionTestResult 
 	return ConnectionTestResult{}
 }
 
-type traceDBFactory struct {
-	repo       model.Repository
-	fallbackDS model.DataStore
+func WithFallback(fn func(ds model.DataStore) (TraceDB, error), fallbackDS model.DataStore) func(ds model.DataStore) (TraceDB, error) {
+	return func(ds model.DataStore) (TraceDB, error) {
+		if ds.IsZero() {
+			ds = fallbackDS
+		}
+		return fn(ds)
+	}
 }
 
-func Factory(repo model.Repository, fallbackDS model.DataStore) func(ds model.DataStore) (db TraceDB, err error) {
+type traceDBFactory struct {
+	repo model.Repository
+}
+
+func Factory(repo model.Repository) func(ds model.DataStore) (TraceDB, error) {
 	f := traceDBFactory{
-		repo:       repo,
-		fallbackDS: fallbackDS,
+		repo: repo,
 	}
 
 	return f.New
 }
 
-type realTraceDB struct{}
-
-func (db *realTraceDB) ShouldRetry() bool { return true }
-func (db *realTraceDB) MinSpanCount() int { return 1 }
-
 func (f *traceDBFactory) New(ds model.DataStore) (TraceDB, error) {
-	if ds.IsZero() {
-		ds = f.fallbackDS
-	}
-
 	switch ds.Type {
 	case openapi.JAEGER:
 		return newJaegerDB(ds.Values.Jaeger)
@@ -84,3 +82,8 @@ func (f *traceDBFactory) New(ds model.DataStore) (TraceDB, error) {
 
 	return &noopTraceDB{}, nil
 }
+
+type realTraceDB struct{}
+
+func (db *realTraceDB) ShouldRetry() bool { return true }
+func (db *realTraceDB) MinSpanCount() int { return 1 }

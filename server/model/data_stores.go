@@ -1,12 +1,14 @@
 package model
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/openapi"
 	"go.opentelemetry.io/collector/config/configgrpc"
+	"golang.org/x/exp/slices"
 )
 
 type (
@@ -33,6 +35,22 @@ func (ds DataStore) IsZero() bool {
 
 func (ds DataStore) Slug() string {
 	return strings.ToLower(strings.ReplaceAll(strings.TrimSpace(ds.Name), " ", "-"))
+}
+
+var validTypes = []openapi.SupportedDataStores{
+	openapi.JAEGER,
+	openapi.OPEN_SEARCH,
+	openapi.TEMPO,
+	openapi.SIGNAL_FX,
+	openapi.OTLP,
+}
+
+func (ds DataStore) Validate() error {
+	if !slices.Contains(validTypes, ds.Type) {
+		return fmt.Errorf("unsupported data store")
+	}
+
+	return nil
 }
 
 func DataStoreFromConfig(dsc config.TracingBackendDataStoreConfig) DataStore {

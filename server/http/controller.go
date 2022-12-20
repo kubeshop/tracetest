@@ -36,6 +36,7 @@ type runner interface {
 	RunTest(ctx context.Context, test model.Test, rm model.RunMetadata, env model.Environment) model.Run
 	RunTransaction(ctx context.Context, tr model.Transaction, rm model.RunMetadata, env model.Environment) model.TransactionRun
 	RunAssertions(ctx context.Context, request executor.AssertionRequest)
+	NewTraceDB(ds model.DataStore) (tracedb.TraceDB, error)
 }
 
 func NewController(
@@ -1199,18 +1200,18 @@ func (c *controller) UpdateDataStore(ctx context.Context, dataStoreId string, in
 
 // TestConnection implements openapi.ApiApiServicer
 func (c *controller) TestConnection(ctx context.Context, dataStore openapi.DataStore) (openapi.ImplResponse, error) {
-	dataStoreModel := c.mappers.In.DataStore(dataStore)
-	dataStoreConfig, err := dataStoreModel.Config()
+	ds := c.mappers.In.DataStore(dataStore)
+
+	if err := ds.Validate(); err != nil {
+		return openapi.Response(http.StatusBadRequest, err.Error()), err
+	}
+
+	tdb, err := c.runner.NewTraceDB(ds)
 	if err != nil {
 		return openapi.Response(http.StatusBadRequest, err.Error()), err
 	}
 
-	selectedTraceDB, err := tracedb.NewFromDataStoreConfig(&dataStoreConfig, c.testDB)
-	if err != nil {
-		return openapi.Response(http.StatusBadRequest, err.Error()), err
-	}
-
-	testResult := selectedTraceDB.TestConnection(ctx)
+	testResult := tdb.TestConnection(ctx)
 	statusCode := http.StatusOK
 	if !testResult.HasSucceed() {
 		statusCode = http.StatusUnprocessableEntity
