@@ -47,6 +47,7 @@ Cypress.Commands.add('deleteTest', (shouldIntercept = false) => {
 });
 
 Cypress.Commands.add('openTestCreationModal', () => {
+  cy.get('[data-cy=dataStores-skip-cta]').click();
   cy.get('[data-cy=create-button]').click();
   cy.get('.test-create-selector-items ul li').first().click();
   cy.get('[data-cy=create-test-steps-CreateTestFactory]').should('be.visible');

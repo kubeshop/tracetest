@@ -26,7 +26,7 @@ const ConfigCTA = ({onSkip}: IProps) => {
               <Button onClick={() => navigate('/settings')} type="primary">
                 Setup
               </Button>
-              <Button ghost onClick={onSkip} type="primary">
+              <Button data-cy="dataStores-skip-cta" ghost onClick={onSkip} type="primary">
                 Skip
               </Button>
             </Space>
