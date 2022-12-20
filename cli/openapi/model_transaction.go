@@ -17,14 +17,14 @@ import (
 
 // Transaction struct for Transaction
 type Transaction struct {
-	Id          *string `json:"id,omitempty"`
-	Name        *string `json:"name,omitempty"`
+	Id *string `json:"id,omitempty"`
+	Name *string `json:"name,omitempty"`
 	Description *string `json:"description,omitempty"`
 	// version number of the test
-	Version   *int32       `json:"version,omitempty"`
-	Steps     []Test       `json:"steps,omitempty"`
-	CreatedAt *time.Time   `json:"createdAt,omitempty"`
-	Summary   *TestSummary `json:"summary,omitempty"`
+	Version *int32 `json:"version,omitempty"`
+	Steps []Test `json:"steps,omitempty"`
+	CreatedAt *time.Time `json:"createdAt,omitempty"`
+	Summary *TestSummary `json:"summary,omitempty"`
 }
 
 // NewTransaction instantiates a new Transaction object
@@ -329,3 +329,5 @@ func (v *NullableTransaction) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
+
+

@@ -16,7 +16,7 @@ import (
 
 // TriggerResult struct for TriggerResult
 type TriggerResult struct {
-	TriggerType   *string                     `json:"triggerType,omitempty"`
+	TriggerType *string `json:"triggerType,omitempty"`
 	TriggerResult *TriggerResultTriggerResult `json:"triggerResult,omitempty"`
 }
 
@@ -147,3 +147,5 @@ func (v *NullableTriggerResult) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
+
+

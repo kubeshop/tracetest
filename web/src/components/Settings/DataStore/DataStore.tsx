@@ -1,4 +1,5 @@
 import {Button, Form} from 'antd';
+import {SupportedDataStoresToName} from 'constants/DataStore.constants';
 import {useSetupConfig} from 'providers/DataStore/DataStore.provider';
 import {useCallback} from 'react';
 import {TDraftDataStore, TDataStoreConfig, ConfigMode} from 'types/Config.types';
@@ -60,7 +61,7 @@ const DataStore = ({dataStoreConfig}: IProps) => {
               onClick={() => onDeleteConfig(dataStoreConfig.defaultDataStore)}
               danger
             >
-              Delete
+              {`Delete ${SupportedDataStoresToName[dataStoreConfig.defaultDataStore.type]} data store`}
             </Button>
           ) : (
             <div />

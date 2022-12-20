@@ -16,9 +16,9 @@ import (
 
 // TestSpecsSpecs struct for TestSpecsSpecs
 type TestSpecsSpecs struct {
-	Name       NullableString `json:"name,omitempty"`
-	Selector   *Selector      `json:"selector,omitempty"`
-	Assertions []string       `json:"assertions,omitempty"`
+	Name NullableString `json:"name,omitempty"`
+	Selector *Selector `json:"selector,omitempty"`
+	Assertions []string `json:"assertions,omitempty"`
 }
 
 // NewTestSpecsSpecs instantiates a new TestSpecsSpecs object
@@ -51,7 +51,7 @@ func (o *TestSpecsSpecs) GetName() string {
 // and a boolean to check if the value has been set.
 // NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *TestSpecsSpecs) GetNameOk() (*string, bool) {
-	if o == nil {
+	if o == nil  {
 		return nil, false
 	}
 	return o.Name.Get(), o.Name.IsSet()
@@ -70,7 +70,6 @@ func (o *TestSpecsSpecs) HasName() bool {
 func (o *TestSpecsSpecs) SetName(v string) {
 	o.Name.Set(&v)
 }
-
 // SetNameNil sets the value for Name to be an explicit nil
 func (o *TestSpecsSpecs) SetNameNil() {
 	o.Name.Set(nil)
@@ -194,3 +193,5 @@ func (v *NullableTestSpecsSpecs) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
+
+

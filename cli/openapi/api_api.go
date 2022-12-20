@@ -28,9 +28,9 @@ var (
 type ApiApiService service
 
 type ApiCreateDataStoreRequest struct {
-	ctx        context.Context
+	ctx context.Context
 	ApiService *ApiApiService
-	dataStore  *DataStore
+	dataStore *DataStore
 }
 
 func (r ApiCreateDataStoreRequest) DataStore(dataStore DataStore) ApiCreateDataStoreRequest {
@@ -53,7 +53,7 @@ Create a new Data Store
 func (a *ApiApiService) CreateDataStore(ctx context.Context) ApiCreateDataStoreRequest {
 	return ApiCreateDataStoreRequest{
 		ApiService: a,
-		ctx:        ctx,
+		ctx: ctx,
 	}
 }
 
@@ -61,10 +61,10 @@ func (a *ApiApiService) CreateDataStore(ctx context.Context) ApiCreateDataStoreR
 //  @return DataStore
 func (a *ApiApiService) CreateDataStoreExecute(r ApiCreateDataStoreRequest) (*DataStore, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodPost
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *DataStore
+		localVarHTTPMethod   = http.MethodPost
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *DataStore
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.CreateDataStore")
@@ -135,8 +135,8 @@ func (a *ApiApiService) CreateDataStoreExecute(r ApiCreateDataStoreRequest) (*Da
 }
 
 type ApiCreateEnvironmentRequest struct {
-	ctx         context.Context
-	ApiService  *ApiApiService
+	ctx context.Context
+	ApiService *ApiApiService
 	environment *Environment
 }
 
@@ -160,7 +160,7 @@ Create new environment action
 func (a *ApiApiService) CreateEnvironment(ctx context.Context) ApiCreateEnvironmentRequest {
 	return ApiCreateEnvironmentRequest{
 		ApiService: a,
-		ctx:        ctx,
+		ctx: ctx,
 	}
 }
 
@@ -168,10 +168,10 @@ func (a *ApiApiService) CreateEnvironment(ctx context.Context) ApiCreateEnvironm
 //  @return Environment
 func (a *ApiApiService) CreateEnvironmentExecute(r ApiCreateEnvironmentRequest) (*Environment, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodPost
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *Environment
+		localVarHTTPMethod   = http.MethodPost
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *Environment
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.CreateEnvironment")
@@ -242,9 +242,9 @@ func (a *ApiApiService) CreateEnvironmentExecute(r ApiCreateEnvironmentRequest) 
 }
 
 type ApiCreateTestRequest struct {
-	ctx        context.Context
+	ctx context.Context
 	ApiService *ApiApiService
-	test       *Test
+	test *Test
 }
 
 func (r ApiCreateTestRequest) Test(test Test) ApiCreateTestRequest {
@@ -267,7 +267,7 @@ Create new test action
 func (a *ApiApiService) CreateTest(ctx context.Context) ApiCreateTestRequest {
 	return ApiCreateTestRequest{
 		ApiService: a,
-		ctx:        ctx,
+		ctx: ctx,
 	}
 }
 
@@ -275,10 +275,10 @@ func (a *ApiApiService) CreateTest(ctx context.Context) ApiCreateTestRequest {
 //  @return Test
 func (a *ApiApiService) CreateTestExecute(r ApiCreateTestRequest) (*Test, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodPost
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *Test
+		localVarHTTPMethod   = http.MethodPost
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *Test
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.CreateTest")
@@ -349,8 +349,8 @@ func (a *ApiApiService) CreateTestExecute(r ApiCreateTestRequest) (*Test, *http.
 }
 
 type ApiCreateTransactionRequest struct {
-	ctx         context.Context
-	ApiService  *ApiApiService
+	ctx context.Context
+	ApiService *ApiApiService
 	transaction *Transaction
 }
 
@@ -374,7 +374,7 @@ Create new transaction
 func (a *ApiApiService) CreateTransaction(ctx context.Context) ApiCreateTransactionRequest {
 	return ApiCreateTransactionRequest{
 		ApiService: a,
-		ctx:        ctx,
+		ctx: ctx,
 	}
 }
 
@@ -382,10 +382,10 @@ func (a *ApiApiService) CreateTransaction(ctx context.Context) ApiCreateTransact
 //  @return Transaction
 func (a *ApiApiService) CreateTransactionExecute(r ApiCreateTransactionRequest) (*Transaction, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodPost
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *Transaction
+		localVarHTTPMethod   = http.MethodPost
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *Transaction
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.CreateTransaction")
@@ -456,10 +456,11 @@ func (a *ApiApiService) CreateTransactionExecute(r ApiCreateTransactionRequest) 
 }
 
 type ApiDeleteDataStoreRequest struct {
-	ctx         context.Context
-	ApiService  *ApiApiService
+	ctx context.Context
+	ApiService *ApiApiService
 	dataStoreId string
 }
+
 
 func (r ApiDeleteDataStoreRequest) Execute() (*http.Response, error) {
 	return r.ApiService.DeleteDataStoreExecute(r)
@@ -476,8 +477,8 @@ Delete a Data Store
 */
 func (a *ApiApiService) DeleteDataStore(ctx context.Context, dataStoreId string) ApiDeleteDataStoreRequest {
 	return ApiDeleteDataStoreRequest{
-		ApiService:  a,
-		ctx:         ctx,
+		ApiService: a,
+		ctx: ctx,
 		dataStoreId: dataStoreId,
 	}
 }
@@ -485,9 +486,9 @@ func (a *ApiApiService) DeleteDataStore(ctx context.Context, dataStoreId string)
 // Execute executes the request
 func (a *ApiApiService) DeleteDataStoreExecute(r ApiDeleteDataStoreRequest) (*http.Response, error) {
 	var (
-		localVarHTTPMethod = http.MethodDelete
-		localVarPostBody   interface{}
-		formFiles          []formFile
+		localVarHTTPMethod   = http.MethodDelete
+		localVarPostBody     interface{}
+		formFiles            []formFile
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.DeleteDataStore")
@@ -548,10 +549,11 @@ func (a *ApiApiService) DeleteDataStoreExecute(r ApiDeleteDataStoreRequest) (*ht
 }
 
 type ApiDeleteEnvironmentRequest struct {
-	ctx           context.Context
-	ApiService    *ApiApiService
+	ctx context.Context
+	ApiService *ApiApiService
 	environmentId string
 }
+
 
 func (r ApiDeleteEnvironmentRequest) Execute() (*http.Response, error) {
 	return r.ApiService.DeleteEnvironmentExecute(r)
@@ -568,8 +570,8 @@ delete a environment
 */
 func (a *ApiApiService) DeleteEnvironment(ctx context.Context, environmentId string) ApiDeleteEnvironmentRequest {
 	return ApiDeleteEnvironmentRequest{
-		ApiService:    a,
-		ctx:           ctx,
+		ApiService: a,
+		ctx: ctx,
 		environmentId: environmentId,
 	}
 }
@@ -577,9 +579,9 @@ func (a *ApiApiService) DeleteEnvironment(ctx context.Context, environmentId str
 // Execute executes the request
 func (a *ApiApiService) DeleteEnvironmentExecute(r ApiDeleteEnvironmentRequest) (*http.Response, error) {
 	var (
-		localVarHTTPMethod = http.MethodDelete
-		localVarPostBody   interface{}
-		formFiles          []formFile
+		localVarHTTPMethod   = http.MethodDelete
+		localVarPostBody     interface{}
+		formFiles            []formFile
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.DeleteEnvironment")
@@ -640,10 +642,11 @@ func (a *ApiApiService) DeleteEnvironmentExecute(r ApiDeleteEnvironmentRequest) 
 }
 
 type ApiDeleteTestRequest struct {
-	ctx        context.Context
+	ctx context.Context
 	ApiService *ApiApiService
-	testId     string
+	testId string
 }
+
 
 func (r ApiDeleteTestRequest) Execute() (*http.Response, error) {
 	return r.ApiService.DeleteTestExecute(r)
@@ -661,17 +664,17 @@ delete a test
 func (a *ApiApiService) DeleteTest(ctx context.Context, testId string) ApiDeleteTestRequest {
 	return ApiDeleteTestRequest{
 		ApiService: a,
-		ctx:        ctx,
-		testId:     testId,
+		ctx: ctx,
+		testId: testId,
 	}
 }
 
 // Execute executes the request
 func (a *ApiApiService) DeleteTestExecute(r ApiDeleteTestRequest) (*http.Response, error) {
 	var (
-		localVarHTTPMethod = http.MethodDelete
-		localVarPostBody   interface{}
-		formFiles          []formFile
+		localVarHTTPMethod   = http.MethodDelete
+		localVarPostBody     interface{}
+		formFiles            []formFile
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.DeleteTest")
@@ -732,11 +735,12 @@ func (a *ApiApiService) DeleteTestExecute(r ApiDeleteTestRequest) (*http.Respons
 }
 
 type ApiDeleteTestRunRequest struct {
-	ctx        context.Context
+	ctx context.Context
 	ApiService *ApiApiService
-	testId     string
-	runId      string
+	testId string
+	runId string
 }
+
 
 func (r ApiDeleteTestRunRequest) Execute() (*http.Response, error) {
 	return r.ApiService.DeleteTestRunExecute(r)
@@ -755,18 +759,18 @@ delete a test run
 func (a *ApiApiService) DeleteTestRun(ctx context.Context, testId string, runId string) ApiDeleteTestRunRequest {
 	return ApiDeleteTestRunRequest{
 		ApiService: a,
-		ctx:        ctx,
-		testId:     testId,
-		runId:      runId,
+		ctx: ctx,
+		testId: testId,
+		runId: runId,
 	}
 }
 
 // Execute executes the request
 func (a *ApiApiService) DeleteTestRunExecute(r ApiDeleteTestRunRequest) (*http.Response, error) {
 	var (
-		localVarHTTPMethod = http.MethodDelete
-		localVarPostBody   interface{}
-		formFiles          []formFile
+		localVarHTTPMethod   = http.MethodDelete
+		localVarPostBody     interface{}
+		formFiles            []formFile
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.DeleteTestRun")
@@ -828,10 +832,11 @@ func (a *ApiApiService) DeleteTestRunExecute(r ApiDeleteTestRunRequest) (*http.R
 }
 
 type ApiDeleteTransactionRequest struct {
-	ctx           context.Context
-	ApiService    *ApiApiService
+	ctx context.Context
+	ApiService *ApiApiService
 	transactionId string
 }
+
 
 func (r ApiDeleteTransactionRequest) Execute() (*http.Response, error) {
 	return r.ApiService.DeleteTransactionExecute(r)
@@ -848,8 +853,8 @@ delete a transaction
 */
 func (a *ApiApiService) DeleteTransaction(ctx context.Context, transactionId string) ApiDeleteTransactionRequest {
 	return ApiDeleteTransactionRequest{
-		ApiService:    a,
-		ctx:           ctx,
+		ApiService: a,
+		ctx: ctx,
 		transactionId: transactionId,
 	}
 }
@@ -857,9 +862,9 @@ func (a *ApiApiService) DeleteTransaction(ctx context.Context, transactionId str
 // Execute executes the request
 func (a *ApiApiService) DeleteTransactionExecute(r ApiDeleteTransactionRequest) (*http.Response, error) {
 	var (
-		localVarHTTPMethod = http.MethodDelete
-		localVarPostBody   interface{}
-		formFiles          []formFile
+		localVarHTTPMethod   = http.MethodDelete
+		localVarPostBody     interface{}
+		formFiles            []formFile
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.DeleteTransaction")
@@ -920,11 +925,12 @@ func (a *ApiApiService) DeleteTransactionExecute(r ApiDeleteTransactionRequest) 
 }
 
 type ApiDeleteTransactionRunRequest struct {
-	ctx           context.Context
-	ApiService    *ApiApiService
+	ctx context.Context
+	ApiService *ApiApiService
 	transactionId string
-	runId         int32
+	runId int32
 }
+
 
 func (r ApiDeleteTransactionRunRequest) Execute() (*http.Response, error) {
 	return r.ApiService.DeleteTransactionRunExecute(r)
@@ -942,19 +948,19 @@ Delete a specific run from a particular transaction
 */
 func (a *ApiApiService) DeleteTransactionRun(ctx context.Context, transactionId string, runId int32) ApiDeleteTransactionRunRequest {
 	return ApiDeleteTransactionRunRequest{
-		ApiService:    a,
-		ctx:           ctx,
+		ApiService: a,
+		ctx: ctx,
 		transactionId: transactionId,
-		runId:         runId,
+		runId: runId,
 	}
 }
 
 // Execute executes the request
 func (a *ApiApiService) DeleteTransactionRunExecute(r ApiDeleteTransactionRunRequest) (*http.Response, error) {
 	var (
-		localVarHTTPMethod = http.MethodDelete
-		localVarPostBody   interface{}
-		formFiles          []formFile
+		localVarHTTPMethod   = http.MethodDelete
+		localVarPostBody     interface{}
+		formFiles            []formFile
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.DeleteTransactionRun")
@@ -1016,11 +1022,11 @@ func (a *ApiApiService) DeleteTransactionRunExecute(r ApiDeleteTransactionRunReq
 }
 
 type ApiDryRunAssertionRequest struct {
-	ctx        context.Context
+	ctx context.Context
 	ApiService *ApiApiService
-	testId     string
-	runId      string
-	testSpecs  *TestSpecs
+	testId string
+	runId string
+	testSpecs *TestSpecs
 }
 
 func (r ApiDryRunAssertionRequest) TestSpecs(testSpecs TestSpecs) ApiDryRunAssertionRequest {
@@ -1045,9 +1051,9 @@ use this method to test a definition against an actual trace without creating a 
 func (a *ApiApiService) DryRunAssertion(ctx context.Context, testId string, runId string) ApiDryRunAssertionRequest {
 	return ApiDryRunAssertionRequest{
 		ApiService: a,
-		ctx:        ctx,
-		testId:     testId,
-		runId:      runId,
+		ctx: ctx,
+		testId: testId,
+		runId: runId,
 	}
 }
 
@@ -1055,10 +1061,10 @@ func (a *ApiApiService) DryRunAssertion(ctx context.Context, testId string, runI
 //  @return AssertionResults
 func (a *ApiApiService) DryRunAssertionExecute(r ApiDryRunAssertionRequest) (*AssertionResults, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodPut
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *AssertionResults
+		localVarHTTPMethod   = http.MethodPut
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *AssertionResults
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.DryRunAssertion")
@@ -1131,8 +1137,8 @@ func (a *ApiApiService) DryRunAssertionExecute(r ApiDryRunAssertionRequest) (*As
 }
 
 type ApiExecuteDefinitionRequest struct {
-	ctx            context.Context
-	ApiService     *ApiApiService
+	ctx context.Context
+	ApiService *ApiApiService
 	textDefinition *TextDefinition
 }
 
@@ -1156,7 +1162,7 @@ Execute a definition
 func (a *ApiApiService) ExecuteDefinition(ctx context.Context) ApiExecuteDefinitionRequest {
 	return ApiExecuteDefinitionRequest{
 		ApiService: a,
-		ctx:        ctx,
+		ctx: ctx,
 	}
 }
 
@@ -1164,10 +1170,10 @@ func (a *ApiApiService) ExecuteDefinition(ctx context.Context) ApiExecuteDefinit
 //  @return ExecuteDefinitionResponse
 func (a *ApiApiService) ExecuteDefinitionExecute(r ApiExecuteDefinitionRequest) (*ExecuteDefinitionResponse, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodPost
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *ExecuteDefinitionResponse
+		localVarHTTPMethod   = http.MethodPost
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *ExecuteDefinitionResponse
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.ExecuteDefinition")
@@ -1238,11 +1244,12 @@ func (a *ApiApiService) ExecuteDefinitionExecute(r ApiExecuteDefinitionRequest) 
 }
 
 type ApiExportTestRunRequest struct {
-	ctx        context.Context
+	ctx context.Context
 	ApiService *ApiApiService
-	testId     string
-	runId      string
+	testId string
+	runId string
 }
+
 
 func (r ApiExportTestRunRequest) Execute() (*ExportedTestInformation, *http.Response, error) {
 	return r.ApiService.ExportTestRunExecute(r)
@@ -1261,9 +1268,9 @@ export test and test run information for debugging
 func (a *ApiApiService) ExportTestRun(ctx context.Context, testId string, runId string) ApiExportTestRunRequest {
 	return ApiExportTestRunRequest{
 		ApiService: a,
-		ctx:        ctx,
-		testId:     testId,
-		runId:      runId,
+		ctx: ctx,
+		testId: testId,
+		runId: runId,
 	}
 }
 
@@ -1271,10 +1278,10 @@ func (a *ApiApiService) ExportTestRun(ctx context.Context, testId string, runId 
 //  @return ExportedTestInformation
 func (a *ApiApiService) ExportTestRunExecute(r ApiExportTestRunRequest) (*ExportedTestInformation, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodGet
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *ExportedTestInformation
+		localVarHTTPMethod   = http.MethodGet
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *ExportedTestInformation
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.ExportTestRun")
@@ -1345,8 +1352,8 @@ func (a *ApiApiService) ExportTestRunExecute(r ApiExportTestRunRequest) (*Export
 }
 
 type ApiExpressionResolveRequest struct {
-	ctx                context.Context
-	ApiService         *ApiApiService
+	ctx context.Context
+	ApiService *ApiApiService
 	resolveRequestInfo *ResolveRequestInfo
 }
 
@@ -1370,7 +1377,7 @@ resolves an expression and returns the result string
 func (a *ApiApiService) ExpressionResolve(ctx context.Context) ApiExpressionResolveRequest {
 	return ApiExpressionResolveRequest{
 		ApiService: a,
-		ctx:        ctx,
+		ctx: ctx,
 	}
 }
 
@@ -1378,10 +1385,10 @@ func (a *ApiApiService) ExpressionResolve(ctx context.Context) ApiExpressionReso
 //  @return ResolveResponseInfo
 func (a *ApiApiService) ExpressionResolveExecute(r ApiExpressionResolveRequest) (*ResolveResponseInfo, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodPost
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *ResolveResponseInfo
+		localVarHTTPMethod   = http.MethodPost
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *ResolveResponseInfo
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.ExpressionResolve")
@@ -1452,10 +1459,11 @@ func (a *ApiApiService) ExpressionResolveExecute(r ApiExpressionResolveRequest) 
 }
 
 type ApiGetDataStoreRequest struct {
-	ctx         context.Context
-	ApiService  *ApiApiService
+	ctx context.Context
+	ApiService *ApiApiService
 	dataStoreId string
 }
+
 
 func (r ApiGetDataStoreRequest) Execute() (*DataStore, *http.Response, error) {
 	return r.ApiService.GetDataStoreExecute(r)
@@ -1472,8 +1480,8 @@ Get a Data Store
 */
 func (a *ApiApiService) GetDataStore(ctx context.Context, dataStoreId string) ApiGetDataStoreRequest {
 	return ApiGetDataStoreRequest{
-		ApiService:  a,
-		ctx:         ctx,
+		ApiService: a,
+		ctx: ctx,
 		dataStoreId: dataStoreId,
 	}
 }
@@ -1482,10 +1490,10 @@ func (a *ApiApiService) GetDataStore(ctx context.Context, dataStoreId string) Ap
 //  @return DataStore
 func (a *ApiApiService) GetDataStoreExecute(r ApiGetDataStoreRequest) (*DataStore, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodGet
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *DataStore
+		localVarHTTPMethod   = http.MethodGet
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *DataStore
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.GetDataStore")
@@ -1555,12 +1563,12 @@ func (a *ApiApiService) GetDataStoreExecute(r ApiGetDataStoreRequest) (*DataStor
 }
 
 type ApiGetDataStoresRequest struct {
-	ctx           context.Context
-	ApiService    *ApiApiService
-	take          *int32
-	skip          *int32
-	query         *string
-	sortBy        *string
+	ctx context.Context
+	ApiService *ApiApiService
+	take *int32
+	skip *int32
+	query *string
+	sortBy *string
 	sortDirection *string
 }
 
@@ -1569,25 +1577,21 @@ func (r ApiGetDataStoresRequest) Take(take int32) ApiGetDataStoresRequest {
 	r.take = &take
 	return r
 }
-
 // indicates how many data stores will be skipped when paginating
 func (r ApiGetDataStoresRequest) Skip(skip int32) ApiGetDataStoresRequest {
 	r.skip = &skip
 	return r
 }
-
 // query to search data stores, based on data store name
 func (r ApiGetDataStoresRequest) Query(query string) ApiGetDataStoresRequest {
 	r.query = &query
 	return r
 }
-
 // indicates the sort field for the data stores
 func (r ApiGetDataStoresRequest) SortBy(sortBy string) ApiGetDataStoresRequest {
 	r.sortBy = &sortBy
 	return r
 }
-
 // indicates the sort direction for the data stores
 func (r ApiGetDataStoresRequest) SortDirection(sortDirection string) ApiGetDataStoresRequest {
 	r.sortDirection = &sortDirection
@@ -1609,7 +1613,7 @@ Get all Data Stores
 func (a *ApiApiService) GetDataStores(ctx context.Context) ApiGetDataStoresRequest {
 	return ApiGetDataStoresRequest{
 		ApiService: a,
-		ctx:        ctx,
+		ctx: ctx,
 	}
 }
 
@@ -1617,10 +1621,10 @@ func (a *ApiApiService) GetDataStores(ctx context.Context) ApiGetDataStoresReque
 //  @return []DataStore
 func (a *ApiApiService) GetDataStoresExecute(r ApiGetDataStoresRequest) ([]DataStore, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodGet
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue []DataStore
+		localVarHTTPMethod   = http.MethodGet
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  []DataStore
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.GetDataStores")
@@ -1704,10 +1708,11 @@ func (a *ApiApiService) GetDataStoresExecute(r ApiGetDataStoresRequest) ([]DataS
 }
 
 type ApiGetEnvironmentRequest struct {
-	ctx           context.Context
-	ApiService    *ApiApiService
+	ctx context.Context
+	ApiService *ApiApiService
 	environmentId string
 }
+
 
 func (r ApiGetEnvironmentRequest) Execute() (*Environment, *http.Response, error) {
 	return r.ApiService.GetEnvironmentExecute(r)
@@ -1724,8 +1729,8 @@ get environment
 */
 func (a *ApiApiService) GetEnvironment(ctx context.Context, environmentId string) ApiGetEnvironmentRequest {
 	return ApiGetEnvironmentRequest{
-		ApiService:    a,
-		ctx:           ctx,
+		ApiService: a,
+		ctx: ctx,
 		environmentId: environmentId,
 	}
 }
@@ -1734,10 +1739,10 @@ func (a *ApiApiService) GetEnvironment(ctx context.Context, environmentId string
 //  @return Environment
 func (a *ApiApiService) GetEnvironmentExecute(r ApiGetEnvironmentRequest) (*Environment, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodGet
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *Environment
+		localVarHTTPMethod   = http.MethodGet
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *Environment
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.GetEnvironment")
@@ -1807,10 +1812,11 @@ func (a *ApiApiService) GetEnvironmentExecute(r ApiGetEnvironmentRequest) (*Envi
 }
 
 type ApiGetEnvironmentDefinitionFileRequest struct {
-	ctx           context.Context
-	ApiService    *ApiApiService
+	ctx context.Context
+	ApiService *ApiApiService
 	environmentId string
 }
+
 
 func (r ApiGetEnvironmentDefinitionFileRequest) Execute() (string, *http.Response, error) {
 	return r.ApiService.GetEnvironmentDefinitionFileExecute(r)
@@ -1827,8 +1833,8 @@ Get the environment as an YAML file
 */
 func (a *ApiApiService) GetEnvironmentDefinitionFile(ctx context.Context, environmentId string) ApiGetEnvironmentDefinitionFileRequest {
 	return ApiGetEnvironmentDefinitionFileRequest{
-		ApiService:    a,
-		ctx:           ctx,
+		ApiService: a,
+		ctx: ctx,
 		environmentId: environmentId,
 	}
 }
@@ -1837,10 +1843,10 @@ func (a *ApiApiService) GetEnvironmentDefinitionFile(ctx context.Context, enviro
 //  @return string
 func (a *ApiApiService) GetEnvironmentDefinitionFileExecute(r ApiGetEnvironmentDefinitionFileRequest) (string, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodGet
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue string
+		localVarHTTPMethod   = http.MethodGet
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  string
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.GetEnvironmentDefinitionFile")
@@ -1910,12 +1916,12 @@ func (a *ApiApiService) GetEnvironmentDefinitionFileExecute(r ApiGetEnvironmentD
 }
 
 type ApiGetEnvironmentsRequest struct {
-	ctx           context.Context
-	ApiService    *ApiApiService
-	take          *int32
-	skip          *int32
-	query         *string
-	sortBy        *string
+	ctx context.Context
+	ApiService *ApiApiService
+	take *int32
+	skip *int32
+	query *string
+	sortBy *string
 	sortDirection *string
 }
 
@@ -1924,25 +1930,21 @@ func (r ApiGetEnvironmentsRequest) Take(take int32) ApiGetEnvironmentsRequest {
 	r.take = &take
 	return r
 }
-
 // indicates how many environments will be skipped when paginating
 func (r ApiGetEnvironmentsRequest) Skip(skip int32) ApiGetEnvironmentsRequest {
 	r.skip = &skip
 	return r
 }
-
 // query to search environments, based on environments name and description
 func (r ApiGetEnvironmentsRequest) Query(query string) ApiGetEnvironmentsRequest {
 	r.query = &query
 	return r
 }
-
 // indicates the sort field for the environments
 func (r ApiGetEnvironmentsRequest) SortBy(sortBy string) ApiGetEnvironmentsRequest {
 	r.sortBy = &sortBy
 	return r
 }
-
 // indicates the sort direction for the environments
 func (r ApiGetEnvironmentsRequest) SortDirection(sortDirection string) ApiGetEnvironmentsRequest {
 	r.sortDirection = &sortDirection
@@ -1964,7 +1966,7 @@ Get Environments
 func (a *ApiApiService) GetEnvironments(ctx context.Context) ApiGetEnvironmentsRequest {
 	return ApiGetEnvironmentsRequest{
 		ApiService: a,
-		ctx:        ctx,
+		ctx: ctx,
 	}
 }
 
@@ -1972,10 +1974,10 @@ func (a *ApiApiService) GetEnvironments(ctx context.Context) ApiGetEnvironmentsR
 //  @return []Environment
 func (a *ApiApiService) GetEnvironmentsExecute(r ApiGetEnvironmentsRequest) ([]Environment, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodGet
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue []Environment
+		localVarHTTPMethod   = http.MethodGet
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  []Environment
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.GetEnvironments")
@@ -2059,12 +2061,12 @@ func (a *ApiApiService) GetEnvironmentsExecute(r ApiGetEnvironmentsRequest) ([]E
 }
 
 type ApiGetResourcesRequest struct {
-	ctx           context.Context
-	ApiService    *ApiApiService
-	take          *int32
-	skip          *int32
-	query         *string
-	sortBy        *string
+	ctx context.Context
+	ApiService *ApiApiService
+	take *int32
+	skip *int32
+	query *string
+	sortBy *string
 	sortDirection *string
 }
 
@@ -2073,25 +2075,21 @@ func (r ApiGetResourcesRequest) Take(take int32) ApiGetResourcesRequest {
 	r.take = &take
 	return r
 }
-
 // indicates how many transactions will be skipped when paginating
 func (r ApiGetResourcesRequest) Skip(skip int32) ApiGetResourcesRequest {
 	r.skip = &skip
 	return r
 }
-
 // query to search transactions, based on transaction name and description
 func (r ApiGetResourcesRequest) Query(query string) ApiGetResourcesRequest {
 	r.query = &query
 	return r
 }
-
 // indicates the sort field for the transactions
 func (r ApiGetResourcesRequest) SortBy(sortBy string) ApiGetResourcesRequest {
 	r.sortBy = &sortBy
 	return r
 }
-
 // indicates the sort direction for the transactions
 func (r ApiGetResourcesRequest) SortDirection(sortDirection string) ApiGetResourcesRequest {
 	r.sortDirection = &sortDirection
@@ -2113,7 +2111,7 @@ get resources
 func (a *ApiApiService) GetResources(ctx context.Context) ApiGetResourcesRequest {
 	return ApiGetResourcesRequest{
 		ApiService: a,
-		ctx:        ctx,
+		ctx: ctx,
 	}
 }
 
@@ -2121,10 +2119,10 @@ func (a *ApiApiService) GetResources(ctx context.Context) ApiGetResourcesRequest
 //  @return []Resource
 func (a *ApiApiService) GetResourcesExecute(r ApiGetResourcesRequest) ([]Resource, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodGet
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue []Resource
+		localVarHTTPMethod   = http.MethodGet
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  []Resource
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.GetResources")
@@ -2208,11 +2206,12 @@ func (a *ApiApiService) GetResourcesExecute(r ApiGetResourcesRequest) ([]Resourc
 }
 
 type ApiGetRunResultJUnitRequest struct {
-	ctx        context.Context
+	ctx context.Context
 	ApiService *ApiApiService
-	testId     string
-	runId      string
+	testId string
+	runId string
 }
+
 
 func (r ApiGetRunResultJUnitRequest) Execute() (string, *http.Response, error) {
 	return r.ApiService.GetRunResultJUnitExecute(r)
@@ -2231,9 +2230,9 @@ get test run results in JUnit xml format
 func (a *ApiApiService) GetRunResultJUnit(ctx context.Context, testId string, runId string) ApiGetRunResultJUnitRequest {
 	return ApiGetRunResultJUnitRequest{
 		ApiService: a,
-		ctx:        ctx,
-		testId:     testId,
-		runId:      runId,
+		ctx: ctx,
+		testId: testId,
+		runId: runId,
 	}
 }
 
@@ -2241,10 +2240,10 @@ func (a *ApiApiService) GetRunResultJUnit(ctx context.Context, testId string, ru
 //  @return string
 func (a *ApiApiService) GetRunResultJUnitExecute(r ApiGetRunResultJUnitRequest) (string, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodGet
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue string
+		localVarHTTPMethod   = http.MethodGet
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  string
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.GetRunResultJUnit")
@@ -2315,10 +2314,11 @@ func (a *ApiApiService) GetRunResultJUnitExecute(r ApiGetRunResultJUnitRequest) 
 }
 
 type ApiGetTestRequest struct {
-	ctx        context.Context
+	ctx context.Context
 	ApiService *ApiApiService
-	testId     string
+	testId string
 }
+
 
 func (r ApiGetTestRequest) Execute() (*Test, *http.Response, error) {
 	return r.ApiService.GetTestExecute(r)
@@ -2336,8 +2336,8 @@ get test
 func (a *ApiApiService) GetTest(ctx context.Context, testId string) ApiGetTestRequest {
 	return ApiGetTestRequest{
 		ApiService: a,
-		ctx:        ctx,
-		testId:     testId,
+		ctx: ctx,
+		testId: testId,
 	}
 }
 
@@ -2345,10 +2345,10 @@ func (a *ApiApiService) GetTest(ctx context.Context, testId string) ApiGetTestRe
 //  @return Test
 func (a *ApiApiService) GetTestExecute(r ApiGetTestRequest) (*Test, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodGet
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *Test
+		localVarHTTPMethod   = http.MethodGet
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *Test
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.GetTest")
@@ -2418,11 +2418,11 @@ func (a *ApiApiService) GetTestExecute(r ApiGetTestRequest) (*Test, *http.Respon
 }
 
 type ApiGetTestResultSelectedSpansRequest struct {
-	ctx        context.Context
+	ctx context.Context
 	ApiService *ApiApiService
-	testId     string
-	runId      string
-	query      *string
+	testId string
+	runId string
+	query *string
 }
 
 func (r ApiGetTestResultSelectedSpansRequest) Query(query string) ApiGetTestResultSelectedSpansRequest {
@@ -2447,9 +2447,9 @@ get the spans ids that would be selected by a specific selector query
 func (a *ApiApiService) GetTestResultSelectedSpans(ctx context.Context, testId string, runId string) ApiGetTestResultSelectedSpansRequest {
 	return ApiGetTestResultSelectedSpansRequest{
 		ApiService: a,
-		ctx:        ctx,
-		testId:     testId,
-		runId:      runId,
+		ctx: ctx,
+		testId: testId,
+		runId: runId,
 	}
 }
 
@@ -2457,10 +2457,10 @@ func (a *ApiApiService) GetTestResultSelectedSpans(ctx context.Context, testId s
 //  @return SelectedSpansResult
 func (a *ApiApiService) GetTestResultSelectedSpansExecute(r ApiGetTestResultSelectedSpansRequest) (*SelectedSpansResult, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodGet
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *SelectedSpansResult
+		localVarHTTPMethod   = http.MethodGet
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *SelectedSpansResult
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.GetTestResultSelectedSpans")
@@ -2534,11 +2534,12 @@ func (a *ApiApiService) GetTestResultSelectedSpansExecute(r ApiGetTestResultSele
 }
 
 type ApiGetTestRunRequest struct {
-	ctx        context.Context
+	ctx context.Context
 	ApiService *ApiApiService
-	testId     string
-	runId      string
+	testId string
+	runId string
 }
+
 
 func (r ApiGetTestRunRequest) Execute() (*TestRun, *http.Response, error) {
 	return r.ApiService.GetTestRunExecute(r)
@@ -2557,9 +2558,9 @@ get a particular test Run
 func (a *ApiApiService) GetTestRun(ctx context.Context, testId string, runId string) ApiGetTestRunRequest {
 	return ApiGetTestRunRequest{
 		ApiService: a,
-		ctx:        ctx,
-		testId:     testId,
-		runId:      runId,
+		ctx: ctx,
+		testId: testId,
+		runId: runId,
 	}
 }
 
@@ -2567,10 +2568,10 @@ func (a *ApiApiService) GetTestRun(ctx context.Context, testId string, runId str
 //  @return TestRun
 func (a *ApiApiService) GetTestRunExecute(r ApiGetTestRunRequest) (*TestRun, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodGet
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *TestRun
+		localVarHTTPMethod   = http.MethodGet
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *TestRun
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.GetTestRun")
@@ -2641,11 +2642,11 @@ func (a *ApiApiService) GetTestRunExecute(r ApiGetTestRunRequest) (*TestRun, *ht
 }
 
 type ApiGetTestRunsRequest struct {
-	ctx        context.Context
+	ctx context.Context
 	ApiService *ApiApiService
-	testId     string
-	take       *int32
-	skip       *int32
+	testId string
+	take *int32
+	skip *int32
 }
 
 // indicates how many results can be returned by each page
@@ -2653,7 +2654,6 @@ func (r ApiGetTestRunsRequest) Take(take int32) ApiGetTestRunsRequest {
 	r.take = &take
 	return r
 }
-
 // indicates how many results will be skipped when paginating
 func (r ApiGetTestRunsRequest) Skip(skip int32) ApiGetTestRunsRequest {
 	r.skip = &skip
@@ -2676,8 +2676,8 @@ get the runs from a particular test
 func (a *ApiApiService) GetTestRuns(ctx context.Context, testId string) ApiGetTestRunsRequest {
 	return ApiGetTestRunsRequest{
 		ApiService: a,
-		ctx:        ctx,
-		testId:     testId,
+		ctx: ctx,
+		testId: testId,
 	}
 }
 
@@ -2685,10 +2685,10 @@ func (a *ApiApiService) GetTestRuns(ctx context.Context, testId string) ApiGetTe
 //  @return []TestRun
 func (a *ApiApiService) GetTestRunsExecute(r ApiGetTestRunsRequest) ([]TestRun, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodGet
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue []TestRun
+		localVarHTTPMethod   = http.MethodGet
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  []TestRun
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.GetTestRuns")
@@ -2764,10 +2764,11 @@ func (a *ApiApiService) GetTestRunsExecute(r ApiGetTestRunsRequest) ([]TestRun, 
 }
 
 type ApiGetTestSpecsRequest struct {
-	ctx        context.Context
+	ctx context.Context
 	ApiService *ApiApiService
-	testId     string
+	testId string
 }
+
 
 func (r ApiGetTestSpecsRequest) Execute() ([]TestSpecs, *http.Response, error) {
 	return r.ApiService.GetTestSpecsExecute(r)
@@ -2785,8 +2786,8 @@ Gets definition for a test
 func (a *ApiApiService) GetTestSpecs(ctx context.Context, testId string) ApiGetTestSpecsRequest {
 	return ApiGetTestSpecsRequest{
 		ApiService: a,
-		ctx:        ctx,
-		testId:     testId,
+		ctx: ctx,
+		testId: testId,
 	}
 }
 
@@ -2794,10 +2795,10 @@ func (a *ApiApiService) GetTestSpecs(ctx context.Context, testId string) ApiGetT
 //  @return []TestSpecs
 func (a *ApiApiService) GetTestSpecsExecute(r ApiGetTestSpecsRequest) ([]TestSpecs, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodGet
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue []TestSpecs
+		localVarHTTPMethod   = http.MethodGet
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  []TestSpecs
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.GetTestSpecs")
@@ -2867,11 +2868,12 @@ func (a *ApiApiService) GetTestSpecsExecute(r ApiGetTestSpecsRequest) ([]TestSpe
 }
 
 type ApiGetTestVersionRequest struct {
-	ctx        context.Context
+	ctx context.Context
 	ApiService *ApiApiService
-	testId     string
-	version    int32
+	testId string
+	version int32
 }
+
 
 func (r ApiGetTestVersionRequest) Execute() (*Test, *http.Response, error) {
 	return r.ApiService.GetTestVersionExecute(r)
@@ -2890,9 +2892,9 @@ get a test specific version
 func (a *ApiApiService) GetTestVersion(ctx context.Context, testId string, version int32) ApiGetTestVersionRequest {
 	return ApiGetTestVersionRequest{
 		ApiService: a,
-		ctx:        ctx,
-		testId:     testId,
-		version:    version,
+		ctx: ctx,
+		testId: testId,
+		version: version,
 	}
 }
 
@@ -2900,10 +2902,10 @@ func (a *ApiApiService) GetTestVersion(ctx context.Context, testId string, versi
 //  @return Test
 func (a *ApiApiService) GetTestVersionExecute(r ApiGetTestVersionRequest) (*Test, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodGet
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *Test
+		localVarHTTPMethod   = http.MethodGet
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *Test
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.GetTestVersion")
@@ -2974,11 +2976,12 @@ func (a *ApiApiService) GetTestVersionExecute(r ApiGetTestVersionRequest) (*Test
 }
 
 type ApiGetTestVersionDefinitionFileRequest struct {
-	ctx        context.Context
+	ctx context.Context
 	ApiService *ApiApiService
-	testId     string
-	version    int32
+	testId string
+	version int32
 }
+
 
 func (r ApiGetTestVersionDefinitionFileRequest) Execute() (string, *http.Response, error) {
 	return r.ApiService.GetTestVersionDefinitionFileExecute(r)
@@ -2997,9 +3000,9 @@ Get the test definition as an YAML file
 func (a *ApiApiService) GetTestVersionDefinitionFile(ctx context.Context, testId string, version int32) ApiGetTestVersionDefinitionFileRequest {
 	return ApiGetTestVersionDefinitionFileRequest{
 		ApiService: a,
-		ctx:        ctx,
-		testId:     testId,
-		version:    version,
+		ctx: ctx,
+		testId: testId,
+		version: version,
 	}
 }
 
@@ -3007,10 +3010,10 @@ func (a *ApiApiService) GetTestVersionDefinitionFile(ctx context.Context, testId
 //  @return string
 func (a *ApiApiService) GetTestVersionDefinitionFileExecute(r ApiGetTestVersionDefinitionFileRequest) (string, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodGet
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue string
+		localVarHTTPMethod   = http.MethodGet
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  string
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.GetTestVersionDefinitionFile")
@@ -3081,12 +3084,12 @@ func (a *ApiApiService) GetTestVersionDefinitionFileExecute(r ApiGetTestVersionD
 }
 
 type ApiGetTestsRequest struct {
-	ctx           context.Context
-	ApiService    *ApiApiService
-	take          *int32
-	skip          *int32
-	query         *string
-	sortBy        *string
+	ctx context.Context
+	ApiService *ApiApiService
+	take *int32
+	skip *int32
+	query *string
+	sortBy *string
 	sortDirection *string
 }
 
@@ -3095,25 +3098,21 @@ func (r ApiGetTestsRequest) Take(take int32) ApiGetTestsRequest {
 	r.take = &take
 	return r
 }
-
 // indicates how many tests will be skipped when paginating
 func (r ApiGetTestsRequest) Skip(skip int32) ApiGetTestsRequest {
 	r.skip = &skip
 	return r
 }
-
 // query to search tests, based on test name and description
 func (r ApiGetTestsRequest) Query(query string) ApiGetTestsRequest {
 	r.query = &query
 	return r
 }
-
 // indicates the sort field for the tests
 func (r ApiGetTestsRequest) SortBy(sortBy string) ApiGetTestsRequest {
 	r.sortBy = &sortBy
 	return r
 }
-
 // indicates the sort direction for the tests
 func (r ApiGetTestsRequest) SortDirection(sortDirection string) ApiGetTestsRequest {
 	r.sortDirection = &sortDirection
@@ -3135,7 +3134,7 @@ get tests
 func (a *ApiApiService) GetTests(ctx context.Context) ApiGetTestsRequest {
 	return ApiGetTestsRequest{
 		ApiService: a,
-		ctx:        ctx,
+		ctx: ctx,
 	}
 }
 
@@ -3143,10 +3142,10 @@ func (a *ApiApiService) GetTests(ctx context.Context) ApiGetTestsRequest {
 //  @return []Test
 func (a *ApiApiService) GetTestsExecute(r ApiGetTestsRequest) ([]Test, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodGet
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue []Test
+		localVarHTTPMethod   = http.MethodGet
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  []Test
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.GetTests")
@@ -3230,10 +3229,11 @@ func (a *ApiApiService) GetTestsExecute(r ApiGetTestsRequest) ([]Test, *http.Res
 }
 
 type ApiGetTransactionRequest struct {
-	ctx           context.Context
-	ApiService    *ApiApiService
+	ctx context.Context
+	ApiService *ApiApiService
 	transactionId string
 }
+
 
 func (r ApiGetTransactionRequest) Execute() (*Transaction, *http.Response, error) {
 	return r.ApiService.GetTransactionExecute(r)
@@ -3250,8 +3250,8 @@ get transaction
 */
 func (a *ApiApiService) GetTransaction(ctx context.Context, transactionId string) ApiGetTransactionRequest {
 	return ApiGetTransactionRequest{
-		ApiService:    a,
-		ctx:           ctx,
+		ApiService: a,
+		ctx: ctx,
 		transactionId: transactionId,
 	}
 }
@@ -3260,10 +3260,10 @@ func (a *ApiApiService) GetTransaction(ctx context.Context, transactionId string
 //  @return Transaction
 func (a *ApiApiService) GetTransactionExecute(r ApiGetTransactionRequest) (*Transaction, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodGet
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *Transaction
+		localVarHTTPMethod   = http.MethodGet
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *Transaction
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.GetTransaction")
@@ -3333,11 +3333,12 @@ func (a *ApiApiService) GetTransactionExecute(r ApiGetTransactionRequest) (*Tran
 }
 
 type ApiGetTransactionRunRequest struct {
-	ctx           context.Context
-	ApiService    *ApiApiService
+	ctx context.Context
+	ApiService *ApiApiService
 	transactionId string
-	runId         int32
+	runId int32
 }
+
 
 func (r ApiGetTransactionRunRequest) Execute() (*TransactionRun, *http.Response, error) {
 	return r.ApiService.GetTransactionRunExecute(r)
@@ -3355,10 +3356,10 @@ Get a specific run from a particular transaction
 */
 func (a *ApiApiService) GetTransactionRun(ctx context.Context, transactionId string, runId int32) ApiGetTransactionRunRequest {
 	return ApiGetTransactionRunRequest{
-		ApiService:    a,
-		ctx:           ctx,
+		ApiService: a,
+		ctx: ctx,
 		transactionId: transactionId,
-		runId:         runId,
+		runId: runId,
 	}
 }
 
@@ -3366,10 +3367,10 @@ func (a *ApiApiService) GetTransactionRun(ctx context.Context, transactionId str
 //  @return TransactionRun
 func (a *ApiApiService) GetTransactionRunExecute(r ApiGetTransactionRunRequest) (*TransactionRun, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodGet
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *TransactionRun
+		localVarHTTPMethod   = http.MethodGet
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *TransactionRun
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.GetTransactionRun")
@@ -3440,11 +3441,11 @@ func (a *ApiApiService) GetTransactionRunExecute(r ApiGetTransactionRunRequest) 
 }
 
 type ApiGetTransactionRunsRequest struct {
-	ctx           context.Context
-	ApiService    *ApiApiService
+	ctx context.Context
+	ApiService *ApiApiService
 	transactionId string
-	take          *int32
-	skip          *int32
+	take *int32
+	skip *int32
 }
 
 // indicates how many results can be returned by each page
@@ -3452,7 +3453,6 @@ func (r ApiGetTransactionRunsRequest) Take(take int32) ApiGetTransactionRunsRequ
 	r.take = &take
 	return r
 }
-
 // indicates how many results will be skipped when paginating
 func (r ApiGetTransactionRunsRequest) Skip(skip int32) ApiGetTransactionRunsRequest {
 	r.skip = &skip
@@ -3474,8 +3474,8 @@ Get all runs from a particular transaction
 */
 func (a *ApiApiService) GetTransactionRuns(ctx context.Context, transactionId string) ApiGetTransactionRunsRequest {
 	return ApiGetTransactionRunsRequest{
-		ApiService:    a,
-		ctx:           ctx,
+		ApiService: a,
+		ctx: ctx,
 		transactionId: transactionId,
 	}
 }
@@ -3484,10 +3484,10 @@ func (a *ApiApiService) GetTransactionRuns(ctx context.Context, transactionId st
 //  @return []TransactionRun
 func (a *ApiApiService) GetTransactionRunsExecute(r ApiGetTransactionRunsRequest) ([]TransactionRun, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodGet
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue []TransactionRun
+		localVarHTTPMethod   = http.MethodGet
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  []TransactionRun
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.GetTransactionRuns")
@@ -3563,11 +3563,12 @@ func (a *ApiApiService) GetTransactionRunsExecute(r ApiGetTransactionRunsRequest
 }
 
 type ApiGetTransactionVersionRequest struct {
-	ctx           context.Context
-	ApiService    *ApiApiService
+	ctx context.Context
+	ApiService *ApiApiService
 	transactionId string
-	version       int32
+	version int32
 }
+
 
 func (r ApiGetTransactionVersionRequest) Execute() (*Transaction, *http.Response, error) {
 	return r.ApiService.GetTransactionVersionExecute(r)
@@ -3585,10 +3586,10 @@ get a transaction specific version
 */
 func (a *ApiApiService) GetTransactionVersion(ctx context.Context, transactionId string, version int32) ApiGetTransactionVersionRequest {
 	return ApiGetTransactionVersionRequest{
-		ApiService:    a,
-		ctx:           ctx,
+		ApiService: a,
+		ctx: ctx,
 		transactionId: transactionId,
-		version:       version,
+		version: version,
 	}
 }
 
@@ -3596,10 +3597,10 @@ func (a *ApiApiService) GetTransactionVersion(ctx context.Context, transactionId
 //  @return Transaction
 func (a *ApiApiService) GetTransactionVersionExecute(r ApiGetTransactionVersionRequest) (*Transaction, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodGet
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *Transaction
+		localVarHTTPMethod   = http.MethodGet
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *Transaction
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.GetTransactionVersion")
@@ -3670,11 +3671,12 @@ func (a *ApiApiService) GetTransactionVersionExecute(r ApiGetTransactionVersionR
 }
 
 type ApiGetTransactionVersionDefinitionFileRequest struct {
-	ctx           context.Context
-	ApiService    *ApiApiService
+	ctx context.Context
+	ApiService *ApiApiService
 	transactionId string
-	version       int32
+	version int32
 }
+
 
 func (r ApiGetTransactionVersionDefinitionFileRequest) Execute() (string, *http.Response, error) {
 	return r.ApiService.GetTransactionVersionDefinitionFileExecute(r)
@@ -3692,10 +3694,10 @@ Get the transaction as an YAML file
 */
 func (a *ApiApiService) GetTransactionVersionDefinitionFile(ctx context.Context, transactionId string, version int32) ApiGetTransactionVersionDefinitionFileRequest {
 	return ApiGetTransactionVersionDefinitionFileRequest{
-		ApiService:    a,
-		ctx:           ctx,
+		ApiService: a,
+		ctx: ctx,
 		transactionId: transactionId,
-		version:       version,
+		version: version,
 	}
 }
 
@@ -3703,10 +3705,10 @@ func (a *ApiApiService) GetTransactionVersionDefinitionFile(ctx context.Context,
 //  @return string
 func (a *ApiApiService) GetTransactionVersionDefinitionFileExecute(r ApiGetTransactionVersionDefinitionFileRequest) (string, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodGet
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue string
+		localVarHTTPMethod   = http.MethodGet
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  string
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.GetTransactionVersionDefinitionFile")
@@ -3777,12 +3779,12 @@ func (a *ApiApiService) GetTransactionVersionDefinitionFileExecute(r ApiGetTrans
 }
 
 type ApiGetTransactionsRequest struct {
-	ctx           context.Context
-	ApiService    *ApiApiService
-	take          *int32
-	skip          *int32
-	query         *string
-	sortBy        *string
+	ctx context.Context
+	ApiService *ApiApiService
+	take *int32
+	skip *int32
+	query *string
+	sortBy *string
 	sortDirection *string
 }
 
@@ -3791,25 +3793,21 @@ func (r ApiGetTransactionsRequest) Take(take int32) ApiGetTransactionsRequest {
 	r.take = &take
 	return r
 }
-
 // indicates how many transactions will be skipped when paginating
 func (r ApiGetTransactionsRequest) Skip(skip int32) ApiGetTransactionsRequest {
 	r.skip = &skip
 	return r
 }
-
 // query to search transactions, based on transaction name and description
 func (r ApiGetTransactionsRequest) Query(query string) ApiGetTransactionsRequest {
 	r.query = &query
 	return r
 }
-
 // indicates the sort field for the transactions
 func (r ApiGetTransactionsRequest) SortBy(sortBy string) ApiGetTransactionsRequest {
 	r.sortBy = &sortBy
 	return r
 }
-
 // indicates the sort direction for the transactions
 func (r ApiGetTransactionsRequest) SortDirection(sortDirection string) ApiGetTransactionsRequest {
 	r.sortDirection = &sortDirection
@@ -3831,7 +3829,7 @@ get transactions
 func (a *ApiApiService) GetTransactions(ctx context.Context) ApiGetTransactionsRequest {
 	return ApiGetTransactionsRequest{
 		ApiService: a,
-		ctx:        ctx,
+		ctx: ctx,
 	}
 }
 
@@ -3839,10 +3837,10 @@ func (a *ApiApiService) GetTransactions(ctx context.Context) ApiGetTransactionsR
 //  @return []Transaction
 func (a *ApiApiService) GetTransactionsExecute(r ApiGetTransactionsRequest) ([]Transaction, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodGet
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue []Transaction
+		localVarHTTPMethod   = http.MethodGet
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  []Transaction
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.GetTransactions")
@@ -3926,8 +3924,8 @@ func (a *ApiApiService) GetTransactionsExecute(r ApiGetTransactionsRequest) ([]T
 }
 
 type ApiImportTestRunRequest struct {
-	ctx                     context.Context
-	ApiService              *ApiApiService
+	ctx context.Context
+	ApiService *ApiApiService
 	exportedTestInformation *ExportedTestInformation
 }
 
@@ -3951,7 +3949,7 @@ import test and test run information for debugging
 func (a *ApiApiService) ImportTestRun(ctx context.Context) ApiImportTestRunRequest {
 	return ApiImportTestRunRequest{
 		ApiService: a,
-		ctx:        ctx,
+		ctx: ctx,
 	}
 }
 
@@ -3959,10 +3957,10 @@ func (a *ApiApiService) ImportTestRun(ctx context.Context) ApiImportTestRunReque
 //  @return ExportedTestInformation
 func (a *ApiApiService) ImportTestRunExecute(r ApiImportTestRunRequest) (*ExportedTestInformation, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodPost
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *ExportedTestInformation
+		localVarHTTPMethod   = http.MethodPost
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *ExportedTestInformation
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.ImportTestRun")
@@ -4033,11 +4031,12 @@ func (a *ApiApiService) ImportTestRunExecute(r ApiImportTestRunRequest) (*Export
 }
 
 type ApiRerunTestRunRequest struct {
-	ctx        context.Context
+	ctx context.Context
 	ApiService *ApiApiService
-	testId     string
-	runId      string
+	testId string
+	runId string
 }
+
 
 func (r ApiRerunTestRunRequest) Execute() (*TestRun, *http.Response, error) {
 	return r.ApiService.RerunTestRunExecute(r)
@@ -4056,9 +4055,9 @@ rerun a test run
 func (a *ApiApiService) RerunTestRun(ctx context.Context, testId string, runId string) ApiRerunTestRunRequest {
 	return ApiRerunTestRunRequest{
 		ApiService: a,
-		ctx:        ctx,
-		testId:     testId,
-		runId:      runId,
+		ctx: ctx,
+		testId: testId,
+		runId: runId,
 	}
 }
 
@@ -4066,10 +4065,10 @@ func (a *ApiApiService) RerunTestRun(ctx context.Context, testId string, runId s
 //  @return TestRun
 func (a *ApiApiService) RerunTestRunExecute(r ApiRerunTestRunRequest) (*TestRun, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodPost
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *TestRun
+		localVarHTTPMethod   = http.MethodPost
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *TestRun
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.RerunTestRun")
@@ -4140,9 +4139,9 @@ func (a *ApiApiService) RerunTestRunExecute(r ApiRerunTestRunRequest) (*TestRun,
 }
 
 type ApiRunTestRequest struct {
-	ctx            context.Context
-	ApiService     *ApiApiService
-	testId         string
+	ctx context.Context
+	ApiService *ApiApiService
+	testId string
 	runInformation *RunInformation
 }
 
@@ -4167,8 +4166,8 @@ run a particular test
 func (a *ApiApiService) RunTest(ctx context.Context, testId string) ApiRunTestRequest {
 	return ApiRunTestRequest{
 		ApiService: a,
-		ctx:        ctx,
-		testId:     testId,
+		ctx: ctx,
+		testId: testId,
 	}
 }
 
@@ -4176,10 +4175,10 @@ func (a *ApiApiService) RunTest(ctx context.Context, testId string) ApiRunTestRe
 //  @return TestRun
 func (a *ApiApiService) RunTestExecute(r ApiRunTestRequest) (*TestRun, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodPost
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *TestRun
+		localVarHTTPMethod   = http.MethodPost
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *TestRun
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.RunTest")
@@ -4251,9 +4250,9 @@ func (a *ApiApiService) RunTestExecute(r ApiRunTestRequest) (*TestRun, *http.Res
 }
 
 type ApiRunTransactionRequest struct {
-	ctx            context.Context
-	ApiService     *ApiApiService
-	transactionId  string
+	ctx context.Context
+	ApiService *ApiApiService
+	transactionId string
 	runInformation *RunInformation
 }
 
@@ -4277,8 +4276,8 @@ run a particular transaction
 */
 func (a *ApiApiService) RunTransaction(ctx context.Context, transactionId string) ApiRunTransactionRequest {
 	return ApiRunTransactionRequest{
-		ApiService:    a,
-		ctx:           ctx,
+		ApiService: a,
+		ctx: ctx,
 		transactionId: transactionId,
 	}
 }
@@ -4287,10 +4286,10 @@ func (a *ApiApiService) RunTransaction(ctx context.Context, transactionId string
 //  @return TransactionRun
 func (a *ApiApiService) RunTransactionExecute(r ApiRunTransactionRequest) (*TransactionRun, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodPost
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *TransactionRun
+		localVarHTTPMethod   = http.MethodPost
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *TransactionRun
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.RunTransaction")
@@ -4362,10 +4361,10 @@ func (a *ApiApiService) RunTransactionExecute(r ApiRunTransactionRequest) (*Tran
 }
 
 type ApiUpdateDataStoreRequest struct {
-	ctx         context.Context
-	ApiService  *ApiApiService
+	ctx context.Context
+	ApiService *ApiApiService
 	dataStoreId string
-	dataStore   *DataStore
+	dataStore *DataStore
 }
 
 func (r ApiUpdateDataStoreRequest) DataStore(dataStore DataStore) ApiUpdateDataStoreRequest {
@@ -4388,8 +4387,8 @@ Update a Data Store
 */
 func (a *ApiApiService) UpdateDataStore(ctx context.Context, dataStoreId string) ApiUpdateDataStoreRequest {
 	return ApiUpdateDataStoreRequest{
-		ApiService:  a,
-		ctx:         ctx,
+		ApiService: a,
+		ctx: ctx,
 		dataStoreId: dataStoreId,
 	}
 }
@@ -4397,9 +4396,9 @@ func (a *ApiApiService) UpdateDataStore(ctx context.Context, dataStoreId string)
 // Execute executes the request
 func (a *ApiApiService) UpdateDataStoreExecute(r ApiUpdateDataStoreRequest) (*http.Response, error) {
 	var (
-		localVarHTTPMethod = http.MethodPut
-		localVarPostBody   interface{}
-		formFiles          []formFile
+		localVarHTTPMethod   = http.MethodPut
+		localVarPostBody     interface{}
+		formFiles            []formFile
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.UpdateDataStore")
@@ -4462,10 +4461,10 @@ func (a *ApiApiService) UpdateDataStoreExecute(r ApiUpdateDataStoreRequest) (*ht
 }
 
 type ApiUpdateEnvironmentRequest struct {
-	ctx           context.Context
-	ApiService    *ApiApiService
+	ctx context.Context
+	ApiService *ApiApiService
 	environmentId string
-	environment   *Environment
+	environment *Environment
 }
 
 func (r ApiUpdateEnvironmentRequest) Environment(environment Environment) ApiUpdateEnvironmentRequest {
@@ -4488,8 +4487,8 @@ update environment action
 */
 func (a *ApiApiService) UpdateEnvironment(ctx context.Context, environmentId string) ApiUpdateEnvironmentRequest {
 	return ApiUpdateEnvironmentRequest{
-		ApiService:    a,
-		ctx:           ctx,
+		ApiService: a,
+		ctx: ctx,
 		environmentId: environmentId,
 	}
 }
@@ -4497,9 +4496,9 @@ func (a *ApiApiService) UpdateEnvironment(ctx context.Context, environmentId str
 // Execute executes the request
 func (a *ApiApiService) UpdateEnvironmentExecute(r ApiUpdateEnvironmentRequest) (*http.Response, error) {
 	var (
-		localVarHTTPMethod = http.MethodPut
-		localVarPostBody   interface{}
-		formFiles          []formFile
+		localVarHTTPMethod   = http.MethodPut
+		localVarPostBody     interface{}
+		formFiles            []formFile
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.UpdateEnvironment")
@@ -4562,10 +4561,10 @@ func (a *ApiApiService) UpdateEnvironmentExecute(r ApiUpdateEnvironmentRequest) 
 }
 
 type ApiUpdateTestRequest struct {
-	ctx        context.Context
+	ctx context.Context
 	ApiService *ApiApiService
-	testId     string
-	test       *Test
+	testId string
+	test *Test
 }
 
 func (r ApiUpdateTestRequest) Test(test Test) ApiUpdateTestRequest {
@@ -4589,17 +4588,17 @@ update test action
 func (a *ApiApiService) UpdateTest(ctx context.Context, testId string) ApiUpdateTestRequest {
 	return ApiUpdateTestRequest{
 		ApiService: a,
-		ctx:        ctx,
-		testId:     testId,
+		ctx: ctx,
+		testId: testId,
 	}
 }
 
 // Execute executes the request
 func (a *ApiApiService) UpdateTestExecute(r ApiUpdateTestRequest) (*http.Response, error) {
 	var (
-		localVarHTTPMethod = http.MethodPut
-		localVarPostBody   interface{}
-		formFiles          []formFile
+		localVarHTTPMethod   = http.MethodPut
+		localVarPostBody     interface{}
+		formFiles            []formFile
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.UpdateTest")
@@ -4662,10 +4661,10 @@ func (a *ApiApiService) UpdateTestExecute(r ApiUpdateTestRequest) (*http.Respons
 }
 
 type ApiUpdateTransactionRequest struct {
-	ctx           context.Context
-	ApiService    *ApiApiService
+	ctx context.Context
+	ApiService *ApiApiService
 	transactionId string
-	transaction   *Transaction
+	transaction *Transaction
 }
 
 func (r ApiUpdateTransactionRequest) Transaction(transaction Transaction) ApiUpdateTransactionRequest {
@@ -4688,8 +4687,8 @@ update transaction action
 */
 func (a *ApiApiService) UpdateTransaction(ctx context.Context, transactionId string) ApiUpdateTransactionRequest {
 	return ApiUpdateTransactionRequest{
-		ApiService:    a,
-		ctx:           ctx,
+		ApiService: a,
+		ctx: ctx,
 		transactionId: transactionId,
 	}
 }
@@ -4697,9 +4696,9 @@ func (a *ApiApiService) UpdateTransaction(ctx context.Context, transactionId str
 // Execute executes the request
 func (a *ApiApiService) UpdateTransactionExecute(r ApiUpdateTransactionRequest) (*http.Response, error) {
 	var (
-		localVarHTTPMethod = http.MethodPut
-		localVarPostBody   interface{}
-		formFiles          []formFile
+		localVarHTTPMethod   = http.MethodPut
+		localVarPostBody     interface{}
+		formFiles            []formFile
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.UpdateTransaction")
@@ -4762,8 +4761,8 @@ func (a *ApiApiService) UpdateTransactionExecute(r ApiUpdateTransactionRequest) 
 }
 
 type ApiUpsertDefinitionRequest struct {
-	ctx            context.Context
-	ApiService     *ApiApiService
+	ctx context.Context
+	ApiService *ApiApiService
 	textDefinition *TextDefinition
 }
 
@@ -4787,7 +4786,7 @@ Upsert a definition
 func (a *ApiApiService) UpsertDefinition(ctx context.Context) ApiUpsertDefinitionRequest {
 	return ApiUpsertDefinitionRequest{
 		ApiService: a,
-		ctx:        ctx,
+		ctx: ctx,
 	}
 }
 
@@ -4795,10 +4794,10 @@ func (a *ApiApiService) UpsertDefinition(ctx context.Context) ApiUpsertDefinitio
 //  @return UpsertDefinitionResponse
 func (a *ApiApiService) UpsertDefinitionExecute(r ApiUpsertDefinitionRequest) (*UpsertDefinitionResponse, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodPut
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *UpsertDefinitionResponse
+		localVarHTTPMethod   = http.MethodPut
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *UpsertDefinitionResponse
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.UpsertDefinition")

@@ -17,7 +17,7 @@ import (
 // Trace struct for Trace
 type Trace struct {
 	TraceId *string `json:"traceId,omitempty"`
-	Tree    *Span   `json:"tree,omitempty"`
+	Tree *Span `json:"tree,omitempty"`
 	// falttened version, mapped as spanId -> span{}
 	Flat *map[string]Span `json:"flat,omitempty"`
 }
@@ -184,3 +184,5 @@ func (v *NullableTrace) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
+
+

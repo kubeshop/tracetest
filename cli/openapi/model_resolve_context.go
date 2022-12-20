@@ -16,10 +16,10 @@ import (
 
 // ResolveContext struct for ResolveContext
 type ResolveContext struct {
-	TestId        *string `json:"testId,omitempty"`
-	RunId         *string `json:"runId,omitempty"`
-	SpanId        *string `json:"spanId,omitempty"`
-	Selector      *string `json:"selector,omitempty"`
+	TestId *string `json:"testId,omitempty"`
+	RunId *string `json:"runId,omitempty"`
+	SpanId *string `json:"spanId,omitempty"`
+	Selector *string `json:"selector,omitempty"`
 	EnvironmentId *string `json:"environmentId,omitempty"`
 }
 
@@ -255,3 +255,5 @@ func (v *NullableResolveContext) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
+
+

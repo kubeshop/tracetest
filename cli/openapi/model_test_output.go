@@ -16,9 +16,9 @@ import (
 
 // TestOutput struct for TestOutput
 type TestOutput struct {
-	Name     *string   `json:"name,omitempty"`
+	Name *string `json:"name,omitempty"`
 	Selector *Selector `json:"selector,omitempty"`
-	Value    *string   `json:"value,omitempty"`
+	Value *string `json:"value,omitempty"`
 }
 
 // NewTestOutput instantiates a new TestOutput object
@@ -183,3 +183,5 @@ func (v *NullableTestOutput) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
+
+

@@ -16,7 +16,7 @@ import (
 
 // TestSummary struct for TestSummary
 type TestSummary struct {
-	Runs    *int32              `json:"runs,omitempty"`
+	Runs *int32 `json:"runs,omitempty"`
 	LastRun *TestSummaryLastRun `json:"lastRun,omitempty"`
 }
 
@@ -147,3 +147,5 @@ func (v *NullableTestSummary) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
+
+

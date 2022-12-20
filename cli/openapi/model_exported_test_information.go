@@ -16,8 +16,8 @@ import (
 
 // ExportedTestInformation struct for ExportedTestInformation
 type ExportedTestInformation struct {
-	Test Test    `json:"test"`
-	Run  TestRun `json:"run"`
+	Test Test `json:"test"`
+	Run TestRun `json:"run"`
 }
 
 // NewExportedTestInformation instantiates a new ExportedTestInformation object
@@ -52,7 +52,7 @@ func (o *ExportedTestInformation) GetTest() Test {
 // GetTestOk returns a tuple with the Test field value
 // and a boolean to check if the value has been set.
 func (o *ExportedTestInformation) GetTestOk() (*Test, bool) {
-	if o == nil {
+	if o == nil  {
 		return nil, false
 	}
 	return &o.Test, true
@@ -76,7 +76,7 @@ func (o *ExportedTestInformation) GetRun() TestRun {
 // GetRunOk returns a tuple with the Run field value
 // and a boolean to check if the value has been set.
 func (o *ExportedTestInformation) GetRunOk() (*TestRun, bool) {
-	if o == nil {
+	if o == nil  {
 		return nil, false
 	}
 	return &o.Run, true
@@ -133,3 +133,5 @@ func (v *NullableExportedTestInformation) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
+
+

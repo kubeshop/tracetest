@@ -16,8 +16,8 @@ import (
 
 // RunInformation struct for RunInformation
 type RunInformation struct {
-	Metadata      map[string]string `json:"metadata,omitempty"`
-	EnvironmentId *string           `json:"environmentId,omitempty"`
+	Metadata map[string]string `json:"metadata,omitempty"`
+	EnvironmentId *string `json:"environmentId,omitempty"`
 }
 
 // NewRunInformation instantiates a new RunInformation object
@@ -39,7 +39,7 @@ func NewRunInformationWithDefaults() *RunInformation {
 
 // GetMetadata returns the Metadata field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *RunInformation) GetMetadata() map[string]string {
-	if o == nil {
+	if o == nil  {
 		var ret map[string]string
 		return ret
 	}
@@ -148,3 +148,5 @@ func (v *NullableRunInformation) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
+
+

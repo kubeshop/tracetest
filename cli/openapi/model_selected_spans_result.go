@@ -17,7 +17,7 @@ import (
 // SelectedSpansResult struct for SelectedSpansResult
 type SelectedSpansResult struct {
 	Selector *Selector `json:"selector,omitempty"`
-	SpanIds  []string  `json:"spanIds,omitempty"`
+	SpanIds []string `json:"spanIds,omitempty"`
 }
 
 // NewSelectedSpansResult instantiates a new SelectedSpansResult object
@@ -147,3 +147,5 @@ func (v *NullableSelectedSpansResult) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
+
+

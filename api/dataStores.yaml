@@ -56,9 +56,9 @@ components:
         waitForReady:
           type: boolean
         headers:
-          type: array
-          items:
-            $ref: "./http.yaml#/components/schemas/HTTPHeader"
+          type: object
+          additionalProperties:
+            type: string
         balancerName:
           type: string
         compression:

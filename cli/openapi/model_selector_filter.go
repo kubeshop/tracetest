@@ -18,7 +18,7 @@ import (
 type SelectorFilter struct {
 	Property string `json:"property"`
 	Operator string `json:"operator"`
-	Value    string `json:"value"`
+	Value string `json:"value"`
 }
 
 // NewSelectorFilter instantiates a new SelectorFilter object
@@ -54,7 +54,7 @@ func (o *SelectorFilter) GetProperty() string {
 // GetPropertyOk returns a tuple with the Property field value
 // and a boolean to check if the value has been set.
 func (o *SelectorFilter) GetPropertyOk() (*string, bool) {
-	if o == nil {
+	if o == nil  {
 		return nil, false
 	}
 	return &o.Property, true
@@ -78,7 +78,7 @@ func (o *SelectorFilter) GetOperator() string {
 // GetOperatorOk returns a tuple with the Operator field value
 // and a boolean to check if the value has been set.
 func (o *SelectorFilter) GetOperatorOk() (*string, bool) {
-	if o == nil {
+	if o == nil  {
 		return nil, false
 	}
 	return &o.Operator, true
@@ -102,7 +102,7 @@ func (o *SelectorFilter) GetValue() string {
 // GetValueOk returns a tuple with the Value field value
 // and a boolean to check if the value has been set.
 func (o *SelectorFilter) GetValueOk() (*string, bool) {
-	if o == nil {
+	if o == nil  {
 		return nil, false
 	}
 	return &o.Value, true
@@ -162,3 +162,5 @@ func (v *NullableSelectorFilter) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
+
+

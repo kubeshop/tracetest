@@ -1065,7 +1065,7 @@ export interface external {
           readBufferSize?: number;
           writeBufferSize?: number;
           waitForReady?: boolean;
-          headers?: external["http.yaml"]["components"]["schemas"]["HTTPHeader"][];
+          headers?: { [key: string]: string };
           balancerName?: string;
           /** @enum {string} */
           compression?:

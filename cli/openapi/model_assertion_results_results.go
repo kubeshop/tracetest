@@ -16,8 +16,8 @@ import (
 
 // AssertionResultsResults struct for AssertionResultsResults
 type AssertionResultsResults struct {
-	Selector *Selector         `json:"selector,omitempty"`
-	Results  []AssertionResult `json:"results,omitempty"`
+	Selector *Selector `json:"selector,omitempty"`
+	Results []AssertionResult `json:"results,omitempty"`
 }
 
 // NewAssertionResultsResults instantiates a new AssertionResultsResults object
@@ -147,3 +147,5 @@ func (v *NullableAssertionResultsResults) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
+
+

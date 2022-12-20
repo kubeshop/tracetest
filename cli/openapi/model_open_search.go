@@ -17,9 +17,9 @@ import (
 // OpenSearch struct for OpenSearch
 type OpenSearch struct {
 	Addresses []string `json:"addresses,omitempty"`
-	Username  *string  `json:"username,omitempty"`
-	Password  *string  `json:"password,omitempty"`
-	Index     *string  `json:"index,omitempty"`
+	Username *string `json:"username,omitempty"`
+	Password *string `json:"password,omitempty"`
+	Index *string `json:"index,omitempty"`
 }
 
 // NewOpenSearch instantiates a new OpenSearch object
@@ -219,3 +219,5 @@ func (v *NullableOpenSearch) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
+
+

@@ -1,5 +1,6 @@
 import {FormInstance} from 'antd';
 import {Model, TDataStoreSchemas, TConfigSchemas} from 'types/Common.types';
+import {THeader} from './Test.types';
 
 export enum ConfigMode {
   NO_TRACING_MODE = 'NO_TRACING',
@@ -35,6 +36,7 @@ export interface IGRPCClientSettings extends TRawGRPCClientSettings {
   fileCA: File;
   fileCert: File;
   fileKey: File;
+  rawHeaders?: THeader[];
 }
 
 interface IDataStore extends TRawDataStore {

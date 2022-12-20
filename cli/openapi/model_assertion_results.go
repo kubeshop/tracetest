@@ -16,8 +16,8 @@ import (
 
 // AssertionResults struct for AssertionResults
 type AssertionResults struct {
-	AllPassed *bool                     `json:"allPassed,omitempty"`
-	Results   []AssertionResultsResults `json:"results,omitempty"`
+	AllPassed *bool `json:"allPassed,omitempty"`
+	Results []AssertionResultsResults `json:"results,omitempty"`
 }
 
 // NewAssertionResults instantiates a new AssertionResults object
@@ -147,3 +147,5 @@ func (v *NullableAssertionResults) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
+
+

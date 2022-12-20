@@ -20,11 +20,11 @@ type SupportedDataStores string
 
 // List of SupportedDataStores
 const (
-	JAEGER      SupportedDataStores = "jaeger"
+	JAEGER SupportedDataStores = "jaeger"
 	OPEN_SEARCH SupportedDataStores = "openSearch"
-	TEMPO       SupportedDataStores = "tempo"
-	SIGNAL_FX   SupportedDataStores = "signalFx"
-	OTLP        SupportedDataStores = "otlp"
+	TEMPO SupportedDataStores = "tempo"
+	SIGNAL_FX SupportedDataStores = "signalFx"
+	OTLP SupportedDataStores = "otlp"
 )
 
 // All allowed values of SupportedDataStores enum
@@ -114,3 +114,4 @@ func (v *NullableSupportedDataStores) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
+

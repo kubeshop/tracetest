@@ -6,7 +6,7 @@ import {TTestApiEndpointBuilder} from 'types/Test.types';
 
 const ConfigEndpoint = (builder: TTestApiEndpointBuilder) => ({
   getDataStores: builder.query<TDataStoreConfig, unknown>({
-    query: () => '/datastores',
+    query: () => '/datastores?take=50',
     providesTags: () => [{type: TracetestApiTags.CONFIG, id: 'datastore'}],
     transformResponse: (rawDataStores: TRawDataStore[]) => DataStoreConfig(rawDataStores),
   }),

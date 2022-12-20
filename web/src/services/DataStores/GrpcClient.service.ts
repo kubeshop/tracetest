@@ -8,7 +8,7 @@ const GrpcClientService = (): TDataStoreService => ({
       readBufferSize,
       writeBufferSize,
       waitForReady = false,
-      headers = [],
+      rawHeaders = [],
       balancerName = '',
       compression = '',
       tls: {
@@ -25,6 +25,7 @@ const GrpcClientService = (): TDataStoreService => ({
 
     const filesToText = [fileCA, fileCert, fileKey].map(file => (file ? file.text() : Promise.resolve(undefined)));
     const [cAFile, certFile, keyFile] = await Promise.all(filesToText);
+    const headers = rawHeaders.reduce((acc, curr) => ({...acc, [curr.key]: curr.value}), {});
 
     return Promise.resolve({
       type: dataStoreType,
@@ -66,7 +67,7 @@ const GrpcClientService = (): TDataStoreService => ({
       readBufferSize,
       writeBufferSize,
       waitForReady = false,
-      headers = [],
+      headers = {},
       balancerName = '',
       compression = '',
       tls: {
@@ -78,6 +79,8 @@ const GrpcClientService = (): TDataStoreService => ({
       auth = {},
     } = values;
 
+    const rawHeaders = Object.entries(headers).map(([key, value]) => ({key, value}));
+
     return {
       dataStore: {
         [dataStoreType]: {
@@ -86,6 +89,7 @@ const GrpcClientService = (): TDataStoreService => ({
           writeBufferSize,
           waitForReady,
           headers,
+          rawHeaders,
           balancerName,
           compression,
           tls: {

@@ -17,9 +17,9 @@ import (
 
 // TestRun struct for TestRun
 type TestRun struct {
-	Id      *string `json:"id,omitempty"`
+	Id *string `json:"id,omitempty"`
 	TraceId *string `json:"traceId,omitempty"`
-	SpanId  *string `json:"spanId,omitempty"`
+	SpanId *string `json:"spanId,omitempty"`
 	// Test version used when running this test run
 	TestVersion *int32 `json:"testVersion,omitempty"`
 	// Current execution state
@@ -29,18 +29,18 @@ type TestRun struct {
 	// time in seconds it took for the test to complete, either success or fail. If the test is still running, it will show the time up to the time of the request
 	ExecutionTime *int32 `json:"executionTime,omitempty"`
 	// time in milliseconds it took for the triggering transaction to complete, either success or fail. If the test is still running, it will show the time up to the time of the request
-	TriggerTime               *int32             `json:"triggerTime,omitempty"`
-	CreatedAt                 *time.Time         `json:"createdAt,omitempty"`
-	ServiceTriggeredAt        *time.Time         `json:"serviceTriggeredAt,omitempty"`
-	ServiceTriggerCompletedAt *time.Time         `json:"serviceTriggerCompletedAt,omitempty"`
-	ObtainedTraceAt           *time.Time         `json:"obtainedTraceAt,omitempty"`
-	CompletedAt               *time.Time         `json:"completedAt,omitempty"`
-	Environment               *Environment       `json:"environment,omitempty"`
-	TriggerResult             *TriggerResult     `json:"triggerResult,omitempty"`
-	Trace                     *Trace             `json:"trace,omitempty"`
-	Result                    *AssertionResults  `json:"result,omitempty"`
-	Outputs                   []TestRunOutputs   `json:"outputs,omitempty"`
-	Metadata                  *map[string]string `json:"metadata,omitempty"`
+	TriggerTime *int32 `json:"triggerTime,omitempty"`
+	CreatedAt *time.Time `json:"createdAt,omitempty"`
+	ServiceTriggeredAt *time.Time `json:"serviceTriggeredAt,omitempty"`
+	ServiceTriggerCompletedAt *time.Time `json:"serviceTriggerCompletedAt,omitempty"`
+	ObtainedTraceAt *time.Time `json:"obtainedTraceAt,omitempty"`
+	CompletedAt *time.Time `json:"completedAt,omitempty"`
+	Environment *Environment `json:"environment,omitempty"`
+	TriggerResult *TriggerResult `json:"triggerResult,omitempty"`
+	Trace *Trace `json:"trace,omitempty"`
+	Result *AssertionResults `json:"result,omitempty"`
+	Outputs []TestRunOutputs `json:"outputs,omitempty"`
+	Metadata *map[string]string `json:"metadata,omitempty"`
 }
 
 // NewTestRun instantiates a new TestRun object
@@ -765,3 +765,5 @@ func (v *NullableTestRun) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
+
+

@@ -16,11 +16,11 @@ import (
 
 // HTTPRequest struct for HTTPRequest
 type HTTPRequest struct {
-	Url     *string      `json:"url,omitempty"`
-	Method  *string      `json:"method,omitempty"`
+	Url *string `json:"url,omitempty"`
+	Method *string `json:"method,omitempty"`
 	Headers []HTTPHeader `json:"headers,omitempty"`
-	Body    *string      `json:"body,omitempty"`
-	Auth    *HTTPAuth    `json:"auth,omitempty"`
+	Body *string `json:"body,omitempty"`
+	Auth *HTTPAuth `json:"auth,omitempty"`
 }
 
 // NewHTTPRequest instantiates a new HTTPRequest object
@@ -255,3 +255,5 @@ func (v *NullableHTTPRequest) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
+
+

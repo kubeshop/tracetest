@@ -82,7 +82,7 @@ const GrpcClient = () => {
           <RequestDetailsAuthInput hasBaseApikeyFields name={[...baseName, 'auth']} />
         </Col>
         <Col span={12}>
-          <RequestDetailsHeadersInput initialValue={HEADER_DEFAULT_VALUES} name={[...baseName, 'headers']} />
+          <RequestDetailsHeadersInput initialValue={HEADER_DEFAULT_VALUES} name={[...baseName, 'rawHeaders']} />
         </Col>
       </Row>
 
