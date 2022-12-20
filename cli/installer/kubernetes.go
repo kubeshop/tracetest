@@ -343,19 +343,25 @@ func configureKubernetes(conf configuration, ui cliUI.UI) configuration {
 		)
 	}
 
-	options := []cliUI.Option{}
-	defaultIndex := 0
-	for i, c := range contexts {
-		if c.selected {
-			defaultIndex = i
-		}
-		options = append(options, cliUI.Option{Text: c.name, Fn: func(ui cliUI.UI) {}})
+	if len(contexts) == 1 {
+		conf.set("k8s.context", contexts[0].name)
 	}
 
-	selected := ui.Select("Kubectl context", options, defaultIndex)
-	conf.set("k8s.context", selected.Text)
-	conf.set("k8s.namespace", "tracetest")
+	if len(contexts) > 1 {
+		options := []cliUI.Option{}
+		defaultIndex := 0
+		for i, c := range contexts {
+			if c.selected {
+				defaultIndex = i
+			}
+			options = append(options, cliUI.Option{Text: c.name, Fn: func(ui cliUI.UI) {}})
+		}
 
+		selected := ui.Select("Kubectl context", options, defaultIndex)
+		conf.set("k8s.context", selected.Text)
+	}
+
+	conf.set("k8s.namespace", "tracetest")
 	return conf
 }
 
