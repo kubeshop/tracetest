@@ -20,9 +20,10 @@ const HEADER_DEFAULT_VALUES = [{key: '', value: ''}];
 
 const GrpcClient = () => {
   const form = Form.useFormInstance<TDraftDataStore>();
-  const [isSecure, setIsSecure] = useState(false);
   const dataStoreType = form.getFieldValue('dataStoreType');
   const baseName = ['dataStore', dataStoreType];
+  const insecureValue = form.getFieldValue([...baseName, 'tls', 'insecure']);
+  const [isSecure, setIsSecure] = useState(!insecureValue);
 
   return (
     <>
@@ -92,6 +93,7 @@ const GrpcClient = () => {
             form.setFieldsValue({dataStore: {[dataStoreType]: {tls: {insecure: !checked}}}});
             setIsSecure(checked);
           }}
+          checked={isSecure}
         />{' '}
         Secure options
         <Form.Item hidden initialValue name={[...baseName, 'tls', 'insecure']} valuePropName="checked">

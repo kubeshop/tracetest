@@ -16,14 +16,19 @@ type Tls struct {
 
 	ServerName string `json:"serverName,omitempty"`
 
-	Settings TlsSetting `json:"settings,omitempty"`
+	CAFile string `json:"cAFile,omitempty"`
+
+	CertFile string `json:"certFile,omitempty"`
+
+	KeyFile string `json:"keyFile,omitempty"`
+
+	MinVersion string `json:"minVersion,omitempty"`
+
+	MaxVersion string `json:"maxVersion,omitempty"`
 }
 
 // AssertTlsRequired checks if the required fields are not zero-ed
 func AssertTlsRequired(obj Tls) error {
-	if err := AssertTlsSettingRequired(obj.Settings); err != nil {
-		return err
-	}
 	return nil
 }
 

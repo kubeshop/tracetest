@@ -43,12 +43,12 @@ const GrpcClientSecure = ({baseName}: IProps) => (
 
     <Row gutter={[16, 16]}>
       <Col span={12}>
-        <Form.Item label="TLS Min version" name={[...baseName, 'tls', 'settings', 'minVersion']}>
+        <Form.Item label="TLS Min version" name={[...baseName, 'tls', 'minVersion']}>
           <Input placeholder="Enter a min version" />
         </Form.Item>
       </Col>
       <Col span={12}>
-        <Form.Item label="TLS Max version" name={[...baseName, 'tls', 'settings', 'maxVersion']}>
+        <Form.Item label="TLS Max version" name={[...baseName, 'tls', 'maxVersion']}>
           <Input placeholder="Enter a max version" />
         </Form.Item>
       </Col>
