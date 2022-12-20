@@ -285,12 +285,6 @@ func (c *ApiApiController) Routes() Routes {
 			c.RunTransaction,
 		},
 		{
-			"TestConnection",
-			strings.ToUpper("Post"),
-			"/api/config/connection",
-			c.TestConnection,
-		},
-		{
 			"UpdateDataStore",
 			strings.ToUpper("Put"),
 			"/api/datastores/{dataStoreId}",
@@ -1155,30 +1149,6 @@ func (c *ApiApiController) RunTransaction(w http.ResponseWriter, r *http.Request
 		return
 	}
 	result, err := c.service.RunTransaction(r.Context(), transactionIdParam, runInformationParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
-// TestConnection - Tests the config data store/exporter connection
-func (c *ApiApiController) TestConnection(w http.ResponseWriter, r *http.Request) {
-	dataStoreParam := DataStore{}
-	d := json.NewDecoder(r.Body)
-	d.DisallowUnknownFields()
-	if err := d.Decode(&dataStoreParam); err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-	if err := AssertDataStoreRequired(dataStoreParam); err != nil {
-		c.errorHandler(w, r, err, nil)
-		return
-	}
-	result, err := c.service.TestConnection(r.Context(), dataStoreParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
