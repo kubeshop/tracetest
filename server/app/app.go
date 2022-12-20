@@ -198,11 +198,18 @@ func newRunnerFacades(
 		subscriptionManager,
 	)
 
+	fallbackDS := model.DataStore{}
+	dsc, err := conf.DataStore()
+	if err == nil && dsc != nil {
+		fallbackDS = model.DataStoreFromConfig(*dsc)
+	}
+	newTraceDB := tracedb.Factory(testDB, fallbackDS)
+
 	pollerExecutor := executor.NewPollerExecutor(
 		conf,
 		tracer,
 		execTestUpdater,
-		tracedb.Factory(testDB),
+		newTraceDB,
 		testDB,
 	)
 

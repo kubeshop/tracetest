@@ -51,7 +51,7 @@ func TestCreateClient(t *testing.T) {
 			cl := c
 			t.Parallel()
 
-			newFn := tracedb.Factory(nil)
+			newFn := tracedb.Factory(nil, model.DataStore{})
 
 			actual, err := newFn(cl.ds)
 

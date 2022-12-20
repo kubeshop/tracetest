@@ -1,7 +1,6 @@
 package model
 
 import (
-	"fmt"
 	"strings"
 	"time"
 
@@ -36,38 +35,14 @@ func (ds DataStore) Slug() string {
 	return strings.ToLower(strings.ReplaceAll(strings.TrimSpace(ds.Name), " ", "-"))
 }
 
-func (e DataStore) Config() (config.TracingBackendDataStoreConfig, error) {
-	switch e.Type {
-	case openapi.JAEGER:
-		return config.TracingBackendDataStoreConfig{
-			Type:   "jaeger",
-			Jaeger: *e.Values.Jaeger,
-		}, nil
-
-	case openapi.OPEN_SEARCH:
-		return config.TracingBackendDataStoreConfig{
-			Type:       "opensearch",
-			OpenSearch: *e.Values.OpenSearch,
-		}, nil
-
-	case openapi.OTLP:
-		return config.TracingBackendDataStoreConfig{
-			Type: "otlp",
-		}, nil
-
-	case openapi.SIGNAL_FX:
-		return config.TracingBackendDataStoreConfig{
-			Type:     "signalfx",
-			SignalFX: *e.Values.SignalFx,
-		}, nil
-
-	case openapi.TEMPO:
-		return config.TracingBackendDataStoreConfig{
-			Type:  "tempo",
-			Tempo: *e.Values.Tempo,
-		}, nil
-
-	default:
-		return config.TracingBackendDataStoreConfig{}, fmt.Errorf("unsupported data store")
+func DataStoreFromConfig(dsc config.TracingBackendDataStoreConfig) DataStore {
+	return DataStore{
+		Type: openapi.SupportedDataStores(dsc.Type),
+		Values: DataStoreValues{
+			Jaeger:     &dsc.Jaeger,
+			Tempo:      &dsc.Tempo,
+			OpenSearch: &dsc.OpenSearch,
+			SignalFx:   &dsc.SignalFX,
+		},
 	}
 }

@@ -46,20 +46,22 @@ func (db *noopTraceDB) TestConnection(ctx context.Context) ConnectionTestResult 
 }
 
 type traceDBFactory struct {
-	repo model.Repository
+	repo       model.Repository
+	fallbackDS model.DataStore
 }
 
-func Factory(repo model.Repository) func(ds model.DataStore) (db TraceDB, err error) {
+func Factory(repo model.Repository, fallbackDS model.DataStore) func(ds model.DataStore) (db TraceDB, err error) {
 	f := traceDBFactory{
-		repo: repo,
+		repo:       repo,
+		fallbackDS: fallbackDS,
 	}
 
 	return f.New
 }
 
-func (f *traceDBFactory) New(ds model.DataStore) (db TraceDB, err error) {
+func (f *traceDBFactory) New(ds model.DataStore) (TraceDB, error) {
 	if ds.IsZero() {
-		return &noopTraceDB{}, nil
+		ds = f.fallbackDS
 	}
 
 	switch ds.Type {
@@ -75,5 +77,5 @@ func (f *traceDBFactory) New(ds model.DataStore) (db TraceDB, err error) {
 		return newCollectorDB(f.repo)
 	}
 
-	return
+	return &noopTraceDB{}, nil
 }
