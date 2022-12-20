@@ -80,6 +80,12 @@ func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, m
 	run := request.run
 	traceID := run.TraceID.String()
 
+	err := pe.traceDB.Connect(request.ctx)
+	if err != nil {
+		log.Printf("[PollerExecutor] Test %s Run %d: Data Store Connect error: %s\n", request.test.ID, request.run.ID, err.Error())
+		return false, model.Run{}, err
+	}
+
 	trace, err := pe.traceDB.GetTraceByID(request.ctx, traceID)
 	if err != nil {
 		log.Printf("[PollerExecutor] Test %s Run %d: GetTraceByID (traceID %s) error: %s\n", request.test.ID, request.run.ID, traceID, err.Error())

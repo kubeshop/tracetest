@@ -3,10 +3,12 @@ package tracedb
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	tempopb "github.com/kubeshop/tracetest/server/internal/proto-gen-go/tempo-idl"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/traces"
+	"github.com/pkg/errors"
 	"go.opentelemetry.io/collector/component/componenttest"
 	"go.opentelemetry.io/collector/config/configgrpc"
 	"go.opentelemetry.io/otel/trace"
@@ -16,25 +18,95 @@ import (
 )
 
 type tempoTraceDB struct {
-	conn  *grpc.ClientConn
-	query tempopb.QuerierClient
+	config *configgrpc.GRPCClientSettings
+	conn   *grpc.ClientConn
+	query  tempopb.QuerierClient
 }
 
 func newTempoDB(config *configgrpc.GRPCClientSettings) (TraceDB, error) {
-	opts, err := config.ToDialOptions(nil, componenttest.NewNopTelemetrySettings())
-	if err != nil {
-		return nil, fmt.Errorf("tempodb grpc config: %w", err)
-	}
-
-	conn, err := grpc.Dial(config.Endpoint, opts...)
-	if err != nil {
-		return nil, fmt.Errorf("tempodb grpc dial: %w", err)
-	}
-
 	return &tempoTraceDB{
-		conn:  conn,
-		query: tempopb.NewQuerierClient(conn),
+		config: config,
 	}, nil
+}
+
+func (tdb *tempoTraceDB) Connect(ctx context.Context) error {
+	opts, err := tdb.config.ToDialOptions(nil, componenttest.NewNopTelemetrySettings())
+	if err != nil {
+		return errors.Wrap(ErrInvalidConfiguration, err.Error())
+	}
+
+	conn, err := grpc.DialContext(ctx, tdb.config.Endpoint, opts...)
+	if err != nil {
+		return errors.Wrap(ErrConnectionFailed, err.Error())
+	}
+
+	tdb.conn = conn
+	tdb.query = tempopb.NewQuerierClient(conn)
+
+	return nil
+}
+
+func (ttd *tempoTraceDB) TestConnection(ctx context.Context) ConnectionTestResult {
+	reachable, err := isReachable(ttd.config.Endpoint)
+	if !reachable {
+		return ConnectionTestResult{
+			ConnectivityTestResult: ConnectionTestStepResult{
+				OperationDescription: fmt.Sprintf(`Tracetest tried to connect to "%s" and failed`, ttd.config.Endpoint),
+				Error:                err,
+			},
+		}
+	}
+
+	err = ttd.Connect(ctx)
+	wrappedErr := errors.Unwrap(err)
+	if errors.Is(wrappedErr, ErrConnectionFailed) {
+		return ConnectionTestResult{
+			ConnectivityTestResult: ConnectionTestStepResult{
+				OperationDescription: fmt.Sprintf(`Tracetest tried to open a gRPC connection against "%s" and failed`, ttd.config.Endpoint),
+				Error:                err,
+			},
+		}
+	}
+
+	_, err = ttd.GetTraceByID(ctx, trace.TraceID{}.String())
+	if strings.Contains(err.Error(), "authentication handshake failed") {
+		return ConnectionTestResult{
+			AuthenticationTestResult: ConnectionTestStepResult{
+				OperationDescription: `Tracetest tried to execue a gRPC request but it failed due to authentication issues`,
+				Error:                err,
+			},
+		}
+	}
+
+	if strings.Contains(err.Error(), "connection error") {
+		return ConnectionTestResult{
+			ConnectivityTestResult: ConnectionTestStepResult{
+				OperationDescription: fmt.Sprintf(`Tracetest tried to open a gRPC connection against "%s" and failed`, ttd.config.Endpoint),
+				Error:                err,
+			},
+		}
+	}
+
+	if !errors.Is(err, ErrTraceNotFound) {
+		return ConnectionTestResult{
+			TraceRetrivalTestResult: ConnectionTestStepResult{
+				OperationDescription: fmt.Sprintf(`Tracetest tried to fetch a trace from Tempo endpoint "%s" and got an error`, ttd.config.Endpoint),
+				Error:                err,
+			},
+		}
+	}
+
+	return ConnectionTestResult{
+		ConnectivityTestResult: ConnectionTestStepResult{
+			OperationDescription: fmt.Sprintf(`Tracetest connected to "%s"`, ttd.config.Endpoint),
+		},
+		AuthenticationTestResult: ConnectionTestStepResult{
+			OperationDescription: `Tracetest managed to authenticate with Tempo`,
+		},
+		TraceRetrivalTestResult: ConnectionTestStepResult{
+			OperationDescription: `Tracetest was able to search for a trace using Tempo API`,
+		},
+	}
 }
 
 func (ttd *tempoTraceDB) GetTraceByID(ctx context.Context, traceID string) (model.Trace, error) {

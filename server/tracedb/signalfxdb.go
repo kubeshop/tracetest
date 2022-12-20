@@ -3,9 +3,12 @@ package tracedb
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/kubeshop/tracetest/server/config"
@@ -29,9 +32,59 @@ func (db signalfxDB) getURL() string {
 	return fmt.Sprintf("https://api.%s.signalfx.com", db.Realm)
 }
 
+func (tdb signalfxDB) Connect(ctx context.Context) error {
+	return nil
+}
+
 func (db signalfxDB) Close() error {
 	// Doesn't need to be closed
 	return nil
+}
+
+func (db signalfxDB) TestConnection(ctx context.Context) ConnectionTestResult {
+	url := fmt.Sprintf("%s:%s", db.getURL(), "443")
+	reachable, err := isReachable(url)
+
+	if !reachable {
+		return ConnectionTestResult{
+			ConnectivityTestResult: ConnectionTestStepResult{
+				OperationDescription: fmt.Sprintf(`Tracetest tried to connect to "%s" and failed`, url),
+				Error:                err,
+			},
+		}
+	}
+
+	_, err = db.GetTraceByID(ctx, trace.TraceID{}.String())
+
+	if strings.Contains(strings.ToLower(err.Error()), "401") {
+		return ConnectionTestResult{
+			AuthenticationTestResult: ConnectionTestStepResult{
+				OperationDescription: `Tracetest tried to execute an signalFX API request but it failed due to authentication issues`,
+				Error:                err,
+			},
+		}
+	}
+
+	if !errors.Is(err, ErrTraceNotFound) {
+		return ConnectionTestResult{
+			TraceRetrivalTestResult: ConnectionTestStepResult{
+				OperationDescription: fmt.Sprintf(`Tracetest tried to fetch a trace from the signalFX endpoint "%s" and got an error`, url),
+				Error:                err,
+			},
+		}
+	}
+
+	return ConnectionTestResult{
+		ConnectivityTestResult: ConnectionTestStepResult{
+			OperationDescription: fmt.Sprintf(`Tracetest connected to "%s"`, url),
+		},
+		AuthenticationTestResult: ConnectionTestStepResult{
+			OperationDescription: `Tracetest managed to authenticate with signalFX`,
+		},
+		TraceRetrivalTestResult: ConnectionTestStepResult{
+			OperationDescription: `Tracetest was able to search for a trace using the signalFX API`,
+		},
+	}
 }
 
 func (db signalfxDB) GetTraceByID(ctx context.Context, traceID string) (model.Trace, error) {
@@ -77,6 +130,10 @@ func (db signalfxDB) getSegmentsTimestamps(ctx context.Context, traceID string) 
 	response, err := db.httpClient.Do(request)
 	if err != nil {
 		return []int64{}, fmt.Errorf("could not execute request: %w", err)
+	}
+
+	if response.StatusCode != http.StatusOK {
+		return []int64{}, fmt.Errorf("service responded with a non ok status code: %s", strconv.Itoa(response.StatusCode))
 	}
 
 	defer response.Body.Close()

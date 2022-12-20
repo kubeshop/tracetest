@@ -39,8 +39,18 @@ const ConfigEndpoint = (builder: TTestApiEndpointBuilder) => ({
       // body: connectionTest,
     }),
     transformResponse: () => ({
-      successful: true,
-      // errorMessage: 'Error connecting to Data Store',
+      authentication: {
+        passed: true,
+        message: 'Authentication passed',
+      },
+      connectivity: {
+        passed: true,
+        message: 'Connectivity passed',
+      },
+      fetchTraces: {
+        passed: true,
+        message: 'Fetch traces passed',
+      },
     }),
   }),
 });

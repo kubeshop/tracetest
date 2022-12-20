@@ -132,12 +132,6 @@ export interface paths {
     /** get resources */
     get: operations["getResources"];
   };
-  "/config/datastores": {
-    /** Get the Server Side Data Stores Config */
-    get: operations["getDataStoresConfig"];
-    /** Updates the Server Side Data Store config */
-    put: operations["updateDataStoresConfig"];
-  };
   "/config/connection": {
     /** Tests the config data store/exporter connection */
     post: operations["testConnection"];
@@ -911,31 +905,6 @@ export interface operations {
       };
     };
   };
-  /** Get the Server Side Data Stores Config */
-  getDataStoresConfig: {
-    responses: {
-      /** Server Side Config */
-      200: {
-        content: {
-          "application/json": external["config.yaml"]["components"]["schemas"]["DataStoreConfig"];
-        };
-      };
-    };
-  };
-  /** Updates the Server Side Data Store config */
-  updateDataStoresConfig: {
-    responses: {
-      /** successful operation */
-      204: never;
-      /** problem with updating environment */
-      500: unknown;
-    };
-    requestBody: {
-      content: {
-        "text/json": external["config.yaml"]["components"]["schemas"]["DataStoreConfig"];
-      };
-    };
-  };
   /** Tests the config data store/exporter connection */
   testConnection: {
     responses: {
@@ -948,7 +917,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "text/json": external["config.yaml"]["components"]["schemas"]["TestConnectionRequest"];
+        "text/json": external["dataStores.yaml"]["components"]["schemas"]["DataStore"];
       };
     };
   };
@@ -1061,10 +1030,19 @@ export interface external {
           dataStores?: external["dataStores.yaml"]["components"]["schemas"]["DataStore"][];
           defaultDataStore?: string;
         };
-        TestConnectionRequest: external["dataStores.yaml"]["components"]["schemas"]["DataStore"];
         TestConnectionResponse: {
           successful?: boolean;
-          errorMessage?: string;
+          steps?: external["config.yaml"]["components"]["schemas"]["ConnectionResult"][];
+        };
+        ConnectionResult: {
+          connectivity?: external["config.yaml"]["components"]["schemas"]["ConnectionTestStep"];
+          authentication?: external["config.yaml"]["components"]["schemas"]["ConnectionTestStep"];
+          fetchTraces?: external["config.yaml"]["components"]["schemas"]["ConnectionTestStep"];
+        };
+        ConnectionTestStep: {
+          passed?: boolean;
+          message?: string;
+          error?: string;
         };
       };
     };
