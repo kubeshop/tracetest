@@ -25,6 +25,7 @@ require (
 	github.com/ohler55/ojg v1.14.4
 	github.com/opensearch-project/opensearch-go v1.1.0
 	github.com/orlangure/gnomock v0.20.0
+	github.com/pkg/errors v0.9.1
 	github.com/prometheus/prometheus v1.8.2-0.20211217191541-41f1a8125e66
 	github.com/segmentio/analytics-go/v3 v3.2.1
 	github.com/stretchr/testify v1.8.0
@@ -41,6 +42,7 @@ require (
 	go.opentelemetry.io/otel/sdk v1.10.0
 	go.opentelemetry.io/otel/trace v1.10.0
 	go.opentelemetry.io/proto/otlp v0.19.0
+	golang.org/x/exp v0.0.0-20221217163422-3c43f8badb15
 	google.golang.org/grpc v1.47.0
 	gopkg.in/yaml.v2 v2.4.0
 	gopkg.in/yaml.v3 v3.0.1
@@ -70,7 +72,6 @@ require (
 	github.com/mostynb/go-grpc-compression v1.1.16 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.0.3-0.20211202183452-c5a74bcca799 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/segmentio/backo-go v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
@@ -86,7 +87,7 @@ require (
 	go.uber.org/zap v1.21.0 // indirect
 	golang.org/x/net v0.0.0-20220615171555-694bf12d69de // indirect
 	golang.org/x/sync v0.0.0-20220601150217-0de741cfad7f // indirect
-	golang.org/x/sys v0.0.0-20220908164124-27713097b956 // indirect
+	golang.org/x/sys v0.1.0 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/genproto v0.0.0-20220615141314-f1464d18c36b // indirect
 	google.golang.org/protobuf v1.28.1 // indirect

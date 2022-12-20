@@ -235,7 +235,6 @@ func newRunnerFacades(
 	transactionRunner := executor.NewTransactionRunner(runner, testDB, subscriptionManager)
 
 	return &runnerFacade{
-		newTraceDB:        newTraceDB,
 		runner:            runner,
 		transactionRunner: transactionRunner,
 		assertionRunner:   assertionRunner,
@@ -300,7 +299,7 @@ func httpRouter(
 	rf *runnerFacade,
 	mappers mappings.Mappings,
 ) openapi.Router {
-	controller := httpServer.NewController(testDB, rf, mappers)
+	controller := httpServer.NewController(testDB, tracedb.Factory(testDB), rf, mappers)
 	apiApiController := openapi.NewApiApiController(controller)
 	customController := httpServer.NewCustomController(controller, apiApiController, openapi.DefaultErrorHandler, tracer)
 	httpRouter := customController

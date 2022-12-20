@@ -27,27 +27,29 @@ import (
 var IDGen = id.NewRandGenerator()
 
 type controller struct {
-	testDB  model.Repository
-	runner  runner
-	mappers mappings.Mappings
+	testDB       model.Repository
+	runner       runner
+	newTraceDBFn func(ds model.DataStore) (tracedb.TraceDB, error)
+	mappers      mappings.Mappings
 }
 
 type runner interface {
 	RunTest(ctx context.Context, test model.Test, rm model.RunMetadata, env model.Environment) model.Run
 	RunTransaction(ctx context.Context, tr model.Transaction, rm model.RunMetadata, env model.Environment) model.TransactionRun
 	RunAssertions(ctx context.Context, request executor.AssertionRequest)
-	NewTraceDB(ds model.DataStore) (tracedb.TraceDB, error)
 }
 
 func NewController(
 	testDB model.Repository,
+	newTraceDBFn func(ds model.DataStore) (tracedb.TraceDB, error),
 	runner runner,
 	mappers mappings.Mappings,
 ) openapi.ApiApiServicer {
 	return &controller{
-		testDB:  testDB,
-		runner:  runner,
-		mappers: mappers,
+		testDB:       testDB,
+		runner:       runner,
+		newTraceDBFn: newTraceDBFn,
+		mappers:      mappers,
 	}
 }
 
@@ -1206,7 +1208,7 @@ func (c *controller) TestConnection(ctx context.Context, dataStore openapi.DataS
 		return openapi.Response(http.StatusBadRequest, err.Error()), err
 	}
 
-	tdb, err := c.runner.NewTraceDB(ds)
+	tdb, err := c.newTraceDBFn(ds)
 	if err != nil {
 		return openapi.Response(http.StatusBadRequest, err.Error()), err
 	}
