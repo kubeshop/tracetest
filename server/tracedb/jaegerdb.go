@@ -19,6 +19,7 @@ import (
 )
 
 type jaegerTraceDB struct {
+	realTraceDB
 	config *configgrpc.GRPCClientSettings
 	conn   *grpc.ClientConn
 	query  pb.QueryServiceClient

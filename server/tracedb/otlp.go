@@ -9,6 +9,7 @@ import (
 )
 
 type OTLPTraceDB struct {
+	realTraceDB
 	db model.RunRepository
 }
 

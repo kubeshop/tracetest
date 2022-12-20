@@ -206,7 +206,8 @@ func newRunnerFacades(
 	newTraceDB := tracedb.Factory(testDB, fallbackDS)
 
 	pollerExecutor := executor.NewPollerExecutor(
-		conf,
+		conf.PoolingRetryDelay(),
+		conf.MaxWaitTimeForTraceDuration(),
 		tracer,
 		execTestUpdater,
 		newTraceDB,
@@ -220,7 +221,6 @@ func newRunnerFacades(
 		conf.PoolingRetryDelay(),
 		conf.MaxWaitTimeForTraceDuration(),
 		subscriptionManager,
-		conf.IsDataStoreConfigured(),
 	)
 
 	runner := executor.NewPersistentRunner(

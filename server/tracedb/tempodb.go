@@ -18,6 +18,8 @@ import (
 )
 
 type tempoTraceDB struct {
+	realTraceDB
+
 	config *configgrpc.GRPCClientSettings
 	conn   *grpc.ClientConn
 	query  tempopb.QuerierClient

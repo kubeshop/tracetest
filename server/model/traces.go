@@ -88,6 +88,12 @@ func (t *Trace) Sort() Trace {
 	return trace
 }
 
+const TriggerSpanName = "Tracetest trigger"
+
+func (t *Trace) HasRootSpan() bool {
+	return t.RootSpan.Name == TriggerSpanName
+}
+
 func (t *Trace) InsertRootSpan(span *Span) *Trace {
 	if len(t.Flat) > 0 {
 		span.Children = append(span.Children, &t.RootSpan)

@@ -16,21 +16,22 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-type opensearchDb struct {
+type opensearchDB struct {
+	realTraceDB
 	config *config.OpensearchDataStoreConfig
 	client *opensearch.Client
 }
 
-func (db opensearchDb) Connect(ctx context.Context) error {
+func (db opensearchDB) Connect(ctx context.Context) error {
 	return nil
 }
 
-func (db opensearchDb) Close() error {
+func (db opensearchDB) Close() error {
 	// No need to close this db
 	return nil
 }
 
-func (db opensearchDb) TestConnection(ctx context.Context) ConnectionTestResult {
+func (db opensearchDB) TestConnection(ctx context.Context) ConnectionTestResult {
 	for _, address := range db.config.Addresses {
 		reachable, err := isReachable(address)
 
@@ -78,7 +79,7 @@ func (db opensearchDb) TestConnection(ctx context.Context) ConnectionTestResult 
 	}
 }
 
-func (db opensearchDb) GetTraceByID(ctx context.Context, traceID string) (model.Trace, error) {
+func (db opensearchDB) GetTraceByID(ctx context.Context, traceID string) (model.Trace, error) {
 	content := strings.NewReader(fmt.Sprintf(`{
 		"query": { "match": { "traceId": "%s" } }
 	}`, traceID))
@@ -122,7 +123,7 @@ func newOpenSearchDB(cfg *config.OpensearchDataStoreConfig) (TraceDB, error) {
 		return nil, fmt.Errorf("could not create opensearch client: %w", err)
 	}
 
-	return opensearchDb{
+	return &opensearchDB{
 		config: cfg,
 		client: client,
 	}, nil
