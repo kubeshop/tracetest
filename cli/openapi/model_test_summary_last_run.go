@@ -17,9 +17,9 @@ import (
 
 // TestSummaryLastRun struct for TestSummaryLastRun
 type TestSummaryLastRun struct {
-	Time NullableTime `json:"time,omitempty"`
-	Passes *int32 `json:"passes,omitempty"`
-	Fails *int32 `json:"fails,omitempty"`
+	Time   NullableTime `json:"time,omitempty"`
+	Passes *int32       `json:"passes,omitempty"`
+	Fails  *int32       `json:"fails,omitempty"`
 }
 
 // NewTestSummaryLastRun instantiates a new TestSummaryLastRun object
@@ -52,7 +52,7 @@ func (o *TestSummaryLastRun) GetTime() time.Time {
 // and a boolean to check if the value has been set.
 // NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *TestSummaryLastRun) GetTimeOk() (*time.Time, bool) {
-	if o == nil  {
+	if o == nil {
 		return nil, false
 	}
 	return o.Time.Get(), o.Time.IsSet()
@@ -71,6 +71,7 @@ func (o *TestSummaryLastRun) HasTime() bool {
 func (o *TestSummaryLastRun) SetTime(v time.Time) {
 	o.Time.Set(&v)
 }
+
 // SetTimeNil sets the value for Time to be an explicit nil
 func (o *TestSummaryLastRun) SetTimeNil() {
 	o.Time.Set(nil)
@@ -194,5 +195,3 @@ func (v *NullableTestSummaryLastRun) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

@@ -17,14 +17,14 @@ import (
 
 // TransactionRun struct for TransactionRun
 type TransactionRun struct {
-	Id *string `json:"id,omitempty"`
-	Version *int32 `json:"version,omitempty"`
-	CreatedAt *time.Time `json:"createdAt,omitempty"`
-	CompletedAt *time.Time `json:"completedAt,omitempty"`
-	State *string `json:"state,omitempty"`
-	Steps []TestRun `json:"steps,omitempty"`
-	Environment *Environment `json:"environment,omitempty"`
-	Metadata *map[string]string `json:"metadata,omitempty"`
+	Id          *string            `json:"id,omitempty"`
+	Version     *int32             `json:"version,omitempty"`
+	CreatedAt   *time.Time         `json:"createdAt,omitempty"`
+	CompletedAt *time.Time         `json:"completedAt,omitempty"`
+	State       *string            `json:"state,omitempty"`
+	Steps       []TestRun          `json:"steps,omitempty"`
+	Environment *Environment       `json:"environment,omitempty"`
+	Metadata    *map[string]string `json:"metadata,omitempty"`
 }
 
 // NewTransactionRun instantiates a new TransactionRun object
@@ -364,5 +364,3 @@ func (v *NullableTransactionRun) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

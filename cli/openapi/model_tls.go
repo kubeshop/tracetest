@@ -16,10 +16,10 @@ import (
 
 // TLS struct for TLS
 type TLS struct {
-	Insecure *bool `json:"insecure,omitempty"`
-	InsecureSkipVerify *bool `json:"insecureSkipVerify,omitempty"`
-	ServerName *string `json:"serverName,omitempty"`
-	Settings *TLSSetting `json:"settings,omitempty"`
+	Insecure           *bool       `json:"insecure,omitempty"`
+	InsecureSkipVerify *bool       `json:"insecureSkipVerify,omitempty"`
+	ServerName         *string     `json:"serverName,omitempty"`
+	Settings           *TLSSetting `json:"settings,omitempty"`
 }
 
 // NewTLS instantiates a new TLS object
@@ -219,5 +219,3 @@ func (v *NullableTLS) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

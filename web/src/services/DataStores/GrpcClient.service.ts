@@ -31,8 +31,8 @@ const GrpcClientService = (): TDataStoreService => ({
       type: dataStoreType,
       [dataStoreType]: {
         endpoint,
-        readBufferSize,
-        writeBufferSize,
+        readBufferSize: parseInt(String(readBufferSize), 10),
+        writeBufferSize: parseInt(String(writeBufferSize), 10),
         waitForReady,
         headers,
         balancerName,

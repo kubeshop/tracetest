@@ -16,7 +16,7 @@ import (
 
 // HTTPHeader struct for HTTPHeader
 type HTTPHeader struct {
-	Key *string `json:"key,omitempty"`
+	Key   *string `json:"key,omitempty"`
 	Value *string `json:"value,omitempty"`
 }
 
@@ -147,5 +147,3 @@ func (v *NullableHTTPHeader) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

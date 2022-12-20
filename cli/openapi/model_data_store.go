@@ -17,15 +17,15 @@ import (
 
 // DataStore struct for DataStore
 type DataStore struct {
-	Id *string `json:"id,omitempty"`
-	Name *string `json:"name,omitempty"`
-	Type *SupportedDataStores `json:"type,omitempty"`
-	IsDefault *bool `json:"isDefault,omitempty"`
-	Jaeger *GRPCClientSettings `json:"jaeger,omitempty"`
-	Tempo *GRPCClientSettings `json:"tempo,omitempty"`
-	OpenSearch *OpenSearch `json:"openSearch,omitempty"`
-	SignalFx *SignalFX `json:"signalFx,omitempty"`
-	CreatedAt *time.Time `json:"createdAt,omitempty"`
+	Id         *string              `json:"id,omitempty"`
+	Name       *string              `json:"name,omitempty"`
+	Type       *SupportedDataStores `json:"type,omitempty"`
+	IsDefault  *bool                `json:"isDefault,omitempty"`
+	Jaeger     *GRPCClientSettings  `json:"jaeger,omitempty"`
+	Tempo      *GRPCClientSettings  `json:"tempo,omitempty"`
+	OpenSearch *OpenSearch          `json:"openSearch,omitempty"`
+	SignalFx   *SignalFX            `json:"signalFx,omitempty"`
+	CreatedAt  *time.Time           `json:"createdAt,omitempty"`
 }
 
 // NewDataStore instantiates a new DataStore object
@@ -400,5 +400,3 @@ func (v *NullableDataStore) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

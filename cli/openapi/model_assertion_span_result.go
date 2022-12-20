@@ -16,10 +16,10 @@ import (
 
 // AssertionSpanResult struct for AssertionSpanResult
 type AssertionSpanResult struct {
-	SpanId *string `json:"spanId,omitempty"`
+	SpanId        *string `json:"spanId,omitempty"`
 	ObservedValue *string `json:"observedValue,omitempty"`
-	Passed *bool `json:"passed,omitempty"`
-	Error *string `json:"error,omitempty"`
+	Passed        *bool   `json:"passed,omitempty"`
+	Error         *string `json:"error,omitempty"`
 }
 
 // NewAssertionSpanResult instantiates a new AssertionSpanResult object
@@ -219,5 +219,3 @@ func (v *NullableAssertionSpanResult) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

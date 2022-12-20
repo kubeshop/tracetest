@@ -16,13 +16,13 @@ import (
 
 // GRPCRequest struct for GRPCRequest
 type GRPCRequest struct {
-	ProtobufFile *string `json:"protobufFile,omitempty"`
-	Address *string `json:"address,omitempty"`
-	Service *string `json:"service,omitempty"`
-	Method *string `json:"method,omitempty"`
-	Metadata []GRPCHeader `json:"metadata,omitempty"`
-	Auth *HTTPAuth `json:"auth,omitempty"`
-	Request *string `json:"request,omitempty"`
+	ProtobufFile *string      `json:"protobufFile,omitempty"`
+	Address      *string      `json:"address,omitempty"`
+	Service      *string      `json:"service,omitempty"`
+	Method       *string      `json:"method,omitempty"`
+	Metadata     []GRPCHeader `json:"metadata,omitempty"`
+	Auth         *HTTPAuth    `json:"auth,omitempty"`
+	Request      *string      `json:"request,omitempty"`
 }
 
 // NewGRPCRequest instantiates a new GRPCRequest object
@@ -327,5 +327,3 @@ func (v *NullableGRPCRequest) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

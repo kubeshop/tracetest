@@ -16,9 +16,9 @@ import (
 
 // GRPCResponse struct for GRPCResponse
 type GRPCResponse struct {
-	StatusCode *int32 `json:"statusCode,omitempty"`
-	Metadata []GRPCHeader `json:"metadata,omitempty"`
-	Body *string `json:"body,omitempty"`
+	StatusCode *int32       `json:"statusCode,omitempty"`
+	Metadata   []GRPCHeader `json:"metadata,omitempty"`
+	Body       *string      `json:"body,omitempty"`
 }
 
 // NewGRPCResponse instantiates a new GRPCResponse object
@@ -183,5 +183,3 @@ func (v *NullableGRPCResponse) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

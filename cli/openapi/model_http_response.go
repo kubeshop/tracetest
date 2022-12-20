@@ -16,10 +16,10 @@ import (
 
 // HTTPResponse struct for HTTPResponse
 type HTTPResponse struct {
-	Status *string `json:"status,omitempty"`
-	StatusCode *int32 `json:"statusCode,omitempty"`
-	Headers []HTTPHeader `json:"headers,omitempty"`
-	Body *string `json:"body,omitempty"`
+	Status     *string      `json:"status,omitempty"`
+	StatusCode *int32       `json:"statusCode,omitempty"`
+	Headers    []HTTPHeader `json:"headers,omitempty"`
+	Body       *string      `json:"body,omitempty"`
 }
 
 // NewHTTPResponse instantiates a new HTTPResponse object
@@ -219,5 +219,3 @@ func (v *NullableHTTPResponse) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

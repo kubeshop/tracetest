@@ -61,7 +61,7 @@ const DataStore = ({dataStoreConfig}: IProps) => {
               onClick={() => onDeleteConfig(dataStoreConfig.defaultDataStore)}
               danger
             >
-              {`Delete ${SupportedDataStoresToName[dataStoreConfig.defaultDataStore.type]} data store`}
+              {`Delete ${SupportedDataStoresToName[dataStoreConfig.defaultDataStore.type]} Data Store`}
             </Button>
           ) : (
             <div />

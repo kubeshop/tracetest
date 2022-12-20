@@ -16,9 +16,9 @@ import (
 
 // HTTPAuth struct for HTTPAuth
 type HTTPAuth struct {
-	Type *string `json:"type,omitempty"`
+	Type   *string         `json:"type,omitempty"`
 	ApiKey *HTTPAuthApiKey `json:"apiKey,omitempty"`
-	Basic *HTTPAuthBasic `json:"basic,omitempty"`
+	Basic  *HTTPAuthBasic  `json:"basic,omitempty"`
 	Bearer *HTTPAuthBearer `json:"bearer,omitempty"`
 }
 
@@ -219,5 +219,3 @@ func (v *NullableHTTPAuth) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

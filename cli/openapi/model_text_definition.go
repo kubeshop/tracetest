@@ -17,7 +17,7 @@ import (
 // TextDefinition struct for TextDefinition
 type TextDefinition struct {
 	RunInformation *RunInformation `json:"runInformation,omitempty"`
-	Content *string `json:"content,omitempty"`
+	Content        *string         `json:"content,omitempty"`
 }
 
 // NewTextDefinition instantiates a new TextDefinition object
@@ -147,5 +147,3 @@ func (v *NullableTextDefinition) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

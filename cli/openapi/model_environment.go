@@ -16,10 +16,10 @@ import (
 
 // Environment struct for Environment
 type Environment struct {
-	Id *string `json:"id,omitempty"`
-	Name *string `json:"name,omitempty"`
-	Description *string `json:"description,omitempty"`
-	Values []EnvironmentValue `json:"values,omitempty"`
+	Id          *string            `json:"id,omitempty"`
+	Name        *string            `json:"name,omitempty"`
+	Description *string            `json:"description,omitempty"`
+	Values      []EnvironmentValue `json:"values,omitempty"`
 }
 
 // NewEnvironment instantiates a new Environment object
@@ -219,5 +219,3 @@ func (v *NullableEnvironment) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

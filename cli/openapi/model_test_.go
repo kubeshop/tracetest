@@ -17,14 +17,14 @@ import (
 
 // Test struct for Test
 type Test struct {
-	Id *string `json:"id,omitempty"`
-	Name *string `json:"name,omitempty"`
+	Id          *string `json:"id,omitempty"`
+	Name        *string `json:"name,omitempty"`
 	Description *string `json:"description,omitempty"`
 	// version number of the test
-	Version *int32 `json:"version,omitempty"`
-	CreatedAt *time.Time `json:"createdAt,omitempty"`
-	ServiceUnderTest *Trigger `json:"serviceUnderTest,omitempty"`
-	Specs *TestSpecs `json:"specs,omitempty"`
+	Version          *int32     `json:"version,omitempty"`
+	CreatedAt        *time.Time `json:"createdAt,omitempty"`
+	ServiceUnderTest *Trigger   `json:"serviceUnderTest,omitempty"`
+	Specs            *TestSpecs `json:"specs,omitempty"`
 	// define test outputs, in a key/value format. The value is processed as an expression
 	Outputs []TestOutput `json:"outputs,omitempty"`
 	Summary *TestSummary `json:"summary,omitempty"`
@@ -402,5 +402,3 @@ func (v *NullableTest) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

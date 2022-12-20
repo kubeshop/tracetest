@@ -16,15 +16,15 @@ import (
 
 // GRPCClientSettings struct for GRPCClientSettings
 type GRPCClientSettings struct {
-	Endpoint *string `json:"endpoint,omitempty"`
-	ReadBufferSize *float32 `json:"readBufferSize,omitempty"`
-	WriteBufferSize *float32 `json:"writeBufferSize,omitempty"`
-	WaitForReady *bool `json:"waitForReady,omitempty"`
-	Headers *map[string]string `json:"headers,omitempty"`
-	BalancerName *string `json:"balancerName,omitempty"`
-	Compression *string `json:"compression,omitempty"`
-	Tls *TLS `json:"tls,omitempty"`
-	Auth *HTTPAuth `json:"auth,omitempty"`
+	Endpoint        *string            `json:"endpoint,omitempty"`
+	ReadBufferSize  *float32           `json:"readBufferSize,omitempty"`
+	WriteBufferSize *float32           `json:"writeBufferSize,omitempty"`
+	WaitForReady    *bool              `json:"waitForReady,omitempty"`
+	Headers         *map[string]string `json:"headers,omitempty"`
+	BalancerName    *string            `json:"balancerName,omitempty"`
+	Compression     *string            `json:"compression,omitempty"`
+	Tls             *TLS               `json:"tls,omitempty"`
+	Auth            *HTTPAuth          `json:"auth,omitempty"`
 }
 
 // NewGRPCClientSettings instantiates a new GRPCClientSettings object
@@ -399,5 +399,3 @@ func (v *NullableGRPCClientSettings) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

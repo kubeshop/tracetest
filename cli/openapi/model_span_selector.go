@@ -16,9 +16,9 @@ import (
 
 // SpanSelector struct for SpanSelector
 type SpanSelector struct {
-	Filters []SelectorFilter `json:"filters"`
-	PseudoClass NullableSelectorPseudoClass `json:"pseudoClass,omitempty"`
-	ChildSelector NullableSpanSelector `json:"childSelector,omitempty"`
+	Filters       []SelectorFilter            `json:"filters"`
+	PseudoClass   NullableSelectorPseudoClass `json:"pseudoClass,omitempty"`
+	ChildSelector NullableSpanSelector        `json:"childSelector,omitempty"`
 }
 
 // NewSpanSelector instantiates a new SpanSelector object
@@ -52,7 +52,7 @@ func (o *SpanSelector) GetFilters() []SelectorFilter {
 // GetFiltersOk returns a tuple with the Filters field value
 // and a boolean to check if the value has been set.
 func (o *SpanSelector) GetFiltersOk() ([]SelectorFilter, bool) {
-	if o == nil  {
+	if o == nil {
 		return nil, false
 	}
 	return o.Filters, true
@@ -76,7 +76,7 @@ func (o *SpanSelector) GetPseudoClass() SelectorPseudoClass {
 // and a boolean to check if the value has been set.
 // NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *SpanSelector) GetPseudoClassOk() (*SelectorPseudoClass, bool) {
-	if o == nil  {
+	if o == nil {
 		return nil, false
 	}
 	return o.PseudoClass.Get(), o.PseudoClass.IsSet()
@@ -95,6 +95,7 @@ func (o *SpanSelector) HasPseudoClass() bool {
 func (o *SpanSelector) SetPseudoClass(v SelectorPseudoClass) {
 	o.PseudoClass.Set(&v)
 }
+
 // SetPseudoClassNil sets the value for PseudoClass to be an explicit nil
 func (o *SpanSelector) SetPseudoClassNil() {
 	o.PseudoClass.Set(nil)
@@ -118,7 +119,7 @@ func (o *SpanSelector) GetChildSelector() SpanSelector {
 // and a boolean to check if the value has been set.
 // NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *SpanSelector) GetChildSelectorOk() (*SpanSelector, bool) {
-	if o == nil  {
+	if o == nil {
 		return nil, false
 	}
 	return o.ChildSelector.Get(), o.ChildSelector.IsSet()
@@ -137,6 +138,7 @@ func (o *SpanSelector) HasChildSelector() bool {
 func (o *SpanSelector) SetChildSelector(v SpanSelector) {
 	o.ChildSelector.Set(&v)
 }
+
 // SetChildSelectorNil sets the value for ChildSelector to be an explicit nil
 func (o *SpanSelector) SetChildSelectorNil() {
 	o.ChildSelector.Set(nil)
@@ -196,5 +198,3 @@ func (v *NullableSpanSelector) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

@@ -16,8 +16,8 @@ import (
 
 // ResolveRequestInfo struct for ResolveRequestInfo
 type ResolveRequestInfo struct {
-	Expression *string `json:"expression,omitempty"`
-	Context *ResolveContext `json:"context,omitempty"`
+	Expression *string         `json:"expression,omitempty"`
+	Context    *ResolveContext `json:"context,omitempty"`
 }
 
 // NewResolveRequestInfo instantiates a new ResolveRequestInfo object
@@ -147,5 +147,3 @@ func (v *NullableResolveRequestInfo) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

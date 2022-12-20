@@ -16,9 +16,9 @@ import (
 
 // TLSSetting struct for TLSSetting
 type TLSSetting struct {
-	CAFile *string `json:"cAFile,omitempty"`
-	CertFile *string `json:"certFile,omitempty"`
-	KeyFile *string `json:"keyFile,omitempty"`
+	CAFile     *string `json:"cAFile,omitempty"`
+	CertFile   *string `json:"certFile,omitempty"`
+	KeyFile    *string `json:"keyFile,omitempty"`
 	MinVersion *string `json:"minVersion,omitempty"`
 	MaxVersion *string `json:"maxVersion,omitempty"`
 }
@@ -255,5 +255,3 @@ func (v *NullableTLSSetting) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

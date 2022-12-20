@@ -16,16 +16,16 @@ import (
 
 // Span struct for Span
 type Span struct {
-	Id *string `json:"id,omitempty"`
+	Id       *string `json:"id,omitempty"`
 	ParentId *string `json:"parentId,omitempty"`
-	Name *string `json:"name,omitempty"`
+	Name     *string `json:"name,omitempty"`
 	// span start time in unix milli format
 	StartTime *int64 `json:"startTime,omitempty"`
 	// span end time in unix milli format
 	EndTime *int64 `json:"endTime,omitempty"`
 	// Key-Value of span attributes
 	Attributes *map[string]string `json:"attributes,omitempty"`
-	Children []Span `json:"children,omitempty"`
+	Children   []Span             `json:"children,omitempty"`
 }
 
 // NewSpan instantiates a new Span object
@@ -330,5 +330,3 @@ func (v *NullableSpan) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-
