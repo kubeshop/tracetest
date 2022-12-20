@@ -203,14 +203,13 @@ func newRunnerFacades(
 	if err == nil && dsc != nil {
 		fallbackDS = model.DataStoreFromConfig(*dsc)
 	}
-	newTraceDB := tracedb.Factory(testDB)
 
 	pollerExecutor := executor.NewPollerExecutor(
 		conf.PoolingRetryDelay(),
 		conf.MaxWaitTimeForTraceDuration(),
 		tracer,
 		execTestUpdater,
-		tracedb.WithFallback(newTraceDB, fallbackDS),
+		tracedb.WithFallback(tracedb.Factory(testDB), fallbackDS),
 		testDB,
 	)
 

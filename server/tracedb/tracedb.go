@@ -3,6 +3,7 @@ package tracedb
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
@@ -66,21 +67,33 @@ func Factory(repo model.Repository) func(ds model.DataStore) (TraceDB, error) {
 	return f.New
 }
 
-func (f *traceDBFactory) New(ds model.DataStore) (TraceDB, error) {
+func (f *traceDBFactory) New(ds model.DataStore) (tdb TraceDB, err error) {
 	switch ds.Type {
 	case openapi.JAEGER:
-		return newJaegerDB(ds.Values.Jaeger)
+		tdb, err = newJaegerDB(ds.Values.Jaeger)
 	case openapi.TEMPO:
-		return newTempoDB(ds.Values.Tempo)
+		tdb, err = newTempoDB(ds.Values.Tempo)
 	case openapi.OPEN_SEARCH:
-		return newOpenSearchDB(ds.Values.OpenSearch)
+		tdb, err = newOpenSearchDB(ds.Values.OpenSearch)
 	case openapi.SIGNAL_FX:
-		return newSignalFXDB(ds.Values.SignalFx)
+		tdb, err = newSignalFXDB(ds.Values.SignalFx)
 	case openapi.OTLP:
-		return newCollectorDB(f.repo)
+		tdb, err = newCollectorDB(f.repo)
+	default:
+		return &noopTraceDB{}, nil
 	}
 
-	return &noopTraceDB{}, nil
+	if err != nil {
+		return nil, err
+	}
+
+	err = tdb.Connect(context.Background())
+	if err != nil {
+		return nil, fmt.Errorf("cannot connect to datasource: %w", err)
+	}
+
+	return tdb, nil
+
 }
 
 type realTraceDB struct{}
