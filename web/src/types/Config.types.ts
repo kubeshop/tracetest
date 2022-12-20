@@ -9,8 +9,8 @@ export enum ConfigMode {
 export enum SupportedDataStores {
   JAEGER = 'jaeger',
   TEMPO = 'tempo',
-  OpenSearch = 'opensearch',
-  SignalFX = 'signalfx',
+  OpenSearch = 'openSearch',
+  SignalFX = 'signalFx',
   OtelCollector = 'otlp',
 }
 

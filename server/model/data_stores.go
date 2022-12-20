@@ -39,9 +39,9 @@ func (ds DataStore) Slug() string {
 
 var validTypes = []openapi.SupportedDataStores{
 	openapi.JAEGER,
-	openapi.OPENSEARCH,
+	openapi.OPEN_SEARCH,
 	openapi.TEMPO,
-	openapi.SIGNALFX,
+	openapi.SIGNAL_FX,
 	openapi.OTLP,
 }
 
@@ -53,9 +53,31 @@ func (ds DataStore) Validate() error {
 	return nil
 }
 
+const (
+	jaeger     string = "jaeger"
+	tempo      string = "tempo"
+	opensearch string = "opensearch"
+	signalfx   string = "signalfx"
+	otlp       string = "otlp"
+)
+
 func DataStoreFromConfig(dsc config.TracingBackendDataStoreConfig) DataStore {
+	var cType openapi.SupportedDataStores
+	switch dsc.Type {
+	case jaeger:
+		cType = openapi.JAEGER
+	case tempo:
+		cType = openapi.TEMPO
+	case opensearch:
+		cType = openapi.OPEN_SEARCH
+	case signalfx:
+		cType = openapi.SIGNAL_FX
+	case otlp:
+		cType = openapi.OTLP
+	}
+
 	return DataStore{
-		Type: openapi.SupportedDataStores(dsc.Type),
+		Type: cType,
 		Values: DataStoreValues{
 			Jaeger:     &dsc.Jaeger,
 			Tempo:      &dsc.Tempo,

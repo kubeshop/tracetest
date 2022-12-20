@@ -15,14 +15,6 @@ var (
 	ErrConnectionFailed     = errors.New("could not connect to data store")
 )
 
-const (
-	JAEGER_BACKEND     string = "jaeger"
-	TEMPO_BACKEND      string = "tempo"
-	OPENSEARCH_BACKEND string = "opensearch"
-	SIGNALFX           string = "signalfx"
-	OTLP               string = "otlp"
-)
-
 type TraceDB interface {
 	Connect(ctx context.Context) error
 	Ready() bool
@@ -75,9 +67,9 @@ func (f *traceDBFactory) New(ds model.DataStore) (tdb TraceDB, err error) {
 		tdb, err = newJaegerDB(ds.Values.Jaeger)
 	case openapi.TEMPO:
 		tdb, err = newTempoDB(ds.Values.Tempo)
-	case openapi.OPENSEARCH:
+	case openapi.OPEN_SEARCH:
 		tdb, err = newOpenSearchDB(ds.Values.OpenSearch)
-	case openapi.SIGNALFX:
+	case openapi.SIGNAL_FX:
 		tdb, err = newSignalFXDB(ds.Values.SignalFx)
 	case openapi.OTLP:
 		tdb, err = newCollectorDB(f.repo)
