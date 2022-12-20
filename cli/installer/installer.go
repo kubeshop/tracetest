@@ -86,7 +86,7 @@ func setInstallationType(ui cliUI.UI, config configuration) {
 		{"I have a tracing environment already. Just install Tracetest", func(ui cliUI.UI) {
 			config.set("installer.only_tracetest", true)
 		}},
-		{"Just learning tracing! Install Tracetest, Jaeger, OpenTelemetry Collector and the sample app.", func(ui cliUI.UI) {
+		{"Just learning tracing! Install Tracetest, OpenTelemetry Collector and the sample app.", func(ui cliUI.UI) {
 			config.set("installer.only_tracetest", false)
 		}},
 	}, 0)

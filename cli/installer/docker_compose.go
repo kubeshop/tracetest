@@ -57,29 +57,11 @@ const (
 
 func dockerComposeInstaller(config configuration, ui cliUI.UI) {
 	trackInstall("docker-compose", config, nil)
-
 	dir := config.String("output.dir")
-	force := Force
-	if fileExists(dir) && !force {
-		ui.Warning(fmt.Sprintf(`Directory "%s" already exists.`, dir))
-		force = ui.Confirm("Do you want to overwrite it?", true)
 
-		if !force {
-			ui.Exit(fmt.Sprintf(`
-Output directory "%s" already exists. Choose a diferent output dir or manually remove it.
-
-You can run this command again with the -f option to overwrite it.
-
-%s`, dir, createIssueMsg),
-			)
-		}
-	}
-
-	if force {
-		err := os.RemoveAll(dir)
-		if err != nil {
-			ui.Exit(err.Error())
-		}
+	err := os.RemoveAll(dir)
+	if err != nil {
+		ui.Exit(err.Error())
 	}
 
 	psql := "host=postgres user=postgres password=postgres port=5432 sslmode=disable"
