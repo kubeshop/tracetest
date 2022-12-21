@@ -17,7 +17,7 @@ on:
       - k8s/**
 
 jobs:
-  unit-test-cli:
+  test-cli:
     name: Run CLI unit tests
     runs-on: ubuntu-latest
 
@@ -33,7 +33,7 @@ jobs:
       - name: Run unit tests
         run: cd cli; make test
 
-  unit-test-backend:
+  test-server:
     name: Run backend unit tests
     runs-on: ubuntu-latest
 
@@ -49,7 +49,7 @@ jobs:
       - name: Run unit tests
         run: cd server; make test
 
-  unit-test-frontend:
+  test-web:
     name: Run frontend unit tests
     runs-on: ubuntu-latest
 
@@ -67,6 +67,7 @@ jobs:
       - run: cd web; npm test
 
   build-go:
+    needs: [test-cli, test-server]
     name: build go binaries
     runs-on: ubuntu-latest
     steps:
@@ -89,6 +90,7 @@ jobs:
         path: dist/*
 
   build-web:
+    needs: [test-web]
     name: build web
     runs-on: ubuntu-latest
     steps:
