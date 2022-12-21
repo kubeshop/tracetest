@@ -49,12 +49,13 @@ jobs:
       run: |
         cd cli
         make build
-    - name: Archive CLI binary``
+    - name: Archive CLI binary
       uses: actions/upload-artifact@v3
       with:
         retention-days: 1
         name: cli-binary
-        path: ./dist/tracetest
+        path: ./cli/dist/tracetest
+        if-no-files-found: error
 
   unit-test-backend:
     name: Run backend unit tests
