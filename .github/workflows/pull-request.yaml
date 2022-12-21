@@ -5,16 +5,16 @@ on:
       - opened
       - reopened
       - synchronize
-    paths:
-      - .github/workflows/pull-request.yaml
-      - api/**
-      - cli/**
-      - examples/**
-      - server/**
-      - tracetesting/**
-      - web/**
-      - Dockerfile
-      - k8s/**
+    # paths:
+    #   - .github/workflows/pull-request.yaml
+    #   - api/**
+    #   - cli/**
+    #   - examples/**
+    #   - server/**
+    #   - tracetesting/**
+    #   - web/**
+    #   - Dockerfile
+    #   - k8s/**
 
 jobs:
   test-cli:
