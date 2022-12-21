@@ -62,6 +62,14 @@ jobs:
           node-version: 16
           cache: npm
           cache-dependency-path: web/package-lock.json
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            web/node_modules
+            /home/runner/.cache/Cypress
+          key: npm--${{ hashFiles('web/package-lock.json') }}
+          restore-keys: npm-
       - run: cd web; npm ci
       - run: cd web; npm run lint
       - run: cd web; npm test
@@ -102,8 +110,16 @@ jobs:
           node-version: 16
           cache: npm
           cache-dependency-path: web/package-lock.json
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            web/node_modules
+            /home/runner/.cache/Cypress
+          key: npm--${{ hashFiles('web/package-lock.json') }}
+          restore-keys: npm-
       - run: cd web; npm ci
-      - run: cd web; npm run build
+      - run: cd web; CI= npm run build
       - name: Upload assets
         uses: actions/upload-artifact@v3
         with:
