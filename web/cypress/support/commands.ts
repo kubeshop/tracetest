@@ -201,6 +201,7 @@ Cypress.Commands.add('createTest', () => {
 
 Cypress.Commands.add('createAssertion', () => {
   cy.selectRunDetailMode(3);
+  cy.get('[data-cy=dataStores-test-skip-cta]').click();
 
   cy.get(`[data-cy=trace-node-database]`, {timeout: 25000}).first().click({force: true});
   cy.get('[data-cy=add-test-spec-button]').click({force: true});
