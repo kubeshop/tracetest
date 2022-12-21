@@ -85,7 +85,7 @@ jobs:
       with:
         distribution: goreleaser-pro
         version: latest
-        args: release --skip-announce  --skip-publish --snapshot --rm-dist
+        args: build --single-target --rm-dist --snapshot
       env:
         ANALYTICS_BE_KEY: ${{ secrets.ANALYTICS_BE_KEY }}
         VERSION: ${{ github.ref_name}}
