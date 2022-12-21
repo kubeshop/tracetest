@@ -150,6 +150,7 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: tracetest-go
+          path: dist/
       # - uses: actions/download-artifact@v3
       #   with:
       #     name: tracetest-web
