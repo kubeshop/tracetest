@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/mitchellh/mapstructure"
 	"gopkg.in/yaml.v2"
 )
@@ -42,6 +43,13 @@ func Decode(contents []byte) (File, error) {
 			return File{}, fmt.Errorf("cannot decode environment: %w", err)
 		}
 		f.Spec = environment
+	case FileTypeDataStore:
+		var dataStore openapi.DataStore
+		err := mapstructure.Decode(f.Spec, &dataStore)
+		if err != nil {
+			return File{}, fmt.Errorf("cannot decode datastore: %w", err)
+		}
+		f.Spec = dataStore
 	default:
 		return File{}, fmt.Errorf("invalid file type %s", f.Type)
 	}
