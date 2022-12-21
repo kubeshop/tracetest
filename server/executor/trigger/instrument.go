@@ -57,7 +57,7 @@ func (t *instrumentedTriggerer) Trigger(ctx context.Context, test model.Test, op
 
 	triggerCtx := trace.ContextWithSpanContext(context.Background(), spanContext)
 
-	triggerSpanCtx, triggerSpan := t.triggerSpanTracer.Start(triggerCtx, "Tracetest trigger")
+	triggerSpanCtx, triggerSpan := t.triggerSpanTracer.Start(triggerCtx, model.TriggerSpanName)
 	defer triggerSpan.End()
 
 	triggerSpan.SpanContext().TraceState().Insert("tracetest", "true")

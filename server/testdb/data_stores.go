@@ -5,9 +5,10 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"github.com/kubeshop/tracetest/server/model"
 	"strings"
 	"time"
+
+	"github.com/kubeshop/tracetest/server/model"
 )
 
 var _ model.DataStoreRepository = &postgresDB{}
@@ -99,6 +100,23 @@ func (td *postgresDB) DeleteDataStore(ctx context.Context, dataStore model.DataS
 	}
 
 	return nil
+}
+
+func (td *postgresDB) DefaultDataStore(ctx context.Context) (model.DataStore, error) {
+	stmt, err := td.db.Prepare(getFromDataStoresQuery + " WHERE d.is_default = true ORDER BY created_at DESC LIMIT 1")
+
+	if err != nil {
+		return model.DataStore{}, fmt.Errorf("prepare: %w", err)
+	}
+	defer stmt.Close()
+
+	dataStore, err := td.readDataStoreRow(ctx, stmt.QueryRowContext(ctx))
+	// if no default is found, assume nothing is configured, return empty DS without error
+	if err != nil && err != ErrNotFound {
+		return model.DataStore{}, err
+	}
+
+	return dataStore, nil
 }
 
 func (td *postgresDB) GetDataStore(ctx context.Context, id string) (model.DataStore, error) {

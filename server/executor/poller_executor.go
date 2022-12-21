@@ -1,21 +1,24 @@
 package executor
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"math"
+	"time"
 
-	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 )
 
+type traceDBFactoryFn func(ds model.DataStore) (tracedb.TraceDB, error)
+
 type DefaultPollerExecutor struct {
-	config            config.Config
 	updater           RunUpdater
-	traceDB           tracedb.TraceDB
+	newTraceDBFn      traceDBFactoryFn
+	dsRepo            model.DataStoreRepository
 	maxTracePollRetry int
 }
 
@@ -53,19 +56,19 @@ func (pe InstrumentedPollerExecutor) ExecuteRequest(request *PollingRequest) (bo
 }
 
 func NewPollerExecutor(
-	config config.Config,
+	retryDelay time.Duration,
+	maxWaitTimeForTrace time.Duration,
 	tracer trace.Tracer,
 	updater RunUpdater,
-	traceDB tracedb.TraceDB,
+	newTraceDBFn traceDBFactoryFn,
+	dsRepo model.DataStoreRepository,
 ) PollerExecutor {
-	retryDelay := config.PoolingRetryDelay()
-	maxWaitTimeForTrace := config.MaxWaitTimeForTraceDuration()
 
 	maxTracePollRetry := int(math.Ceil(float64(maxWaitTimeForTrace) / float64(retryDelay)))
 	pollerExecutor := &DefaultPollerExecutor{
-		config:            config,
 		updater:           updater,
-		traceDB:           traceDB,
+		newTraceDBFn:      newTraceDBFn,
+		dsRepo:            dsRepo,
 		maxTracePollRetry: maxTracePollRetry,
 	}
 
@@ -75,18 +78,32 @@ func NewPollerExecutor(
 	}
 }
 
+func (pe DefaultPollerExecutor) traceDB(ctx context.Context) (tracedb.TraceDB, error) {
+	ds, err := pe.dsRepo.DefaultDataStore(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("cannot get default datastore: %w", err)
+	}
+
+	tdb, err := pe.newTraceDBFn(ds)
+	if err != nil {
+		return nil, fmt.Errorf(`cannot get tracedb from DataStore config with ID "%s": %w`, ds.ID, err)
+	}
+
+	return tdb, nil
+}
+
 func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, model.Run, error) {
 	log.Printf("[PollerExecutor] Test %s Run %d: ExecuteRequest\n", request.test.ID, request.run.ID)
 	run := request.run
-	traceID := run.TraceID.String()
 
-	err := pe.traceDB.Connect(request.ctx)
+	traceDB, err := pe.traceDB(request.ctx)
 	if err != nil {
-		log.Printf("[PollerExecutor] Test %s Run %d: Data Store Connect error: %s\n", request.test.ID, request.run.ID, err.Error())
+		log.Printf("[PollerExecutor] Test %s Run %d: GetDataStore error: %s\n", request.test.ID, request.run.ID, err.Error())
 		return false, model.Run{}, err
 	}
 
-	trace, err := pe.traceDB.GetTraceByID(request.ctx, traceID)
+	traceID := run.TraceID.String()
+	trace, err := traceDB.GetTraceByID(request.ctx, traceID)
 	if err != nil {
 		log.Printf("[PollerExecutor] Test %s Run %d: GetTraceByID (traceID %s) error: %s\n", request.test.ID, request.run.ID, traceID, err.Error())
 		return false, model.Run{}, err
@@ -94,7 +111,7 @@ func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, m
 
 	trace.ID = run.TraceID
 
-	if !pe.donePollingTraces(request, trace) {
+	if !pe.donePollingTraces(request, traceDB, trace) {
 		log.Printf("[PollerExecutor] Test %s Run %d: Not done polling\n", request.test.ID, request.run.ID)
 		run.Trace = &trace
 		request.run = run
@@ -107,8 +124,12 @@ func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, m
 	run.Trace = &trace
 	request.run = run
 
-	rootSpan := model.NewTracetestRootSpan(&run)
-	run.Trace = trace.InsertRootSpan(&rootSpan)
+	if !trace.HasRootSpan() {
+		newRoot := model.NewTracetestRootSpan(run)
+		run.Trace = run.Trace.InsertRootSpan(newRoot)
+	} else {
+		run.Trace.RootSpan = model.AugmentRootSpan(run.Trace.RootSpan, run.TriggerResult)
+	}
 	run = run.SuccessfullyPolledTraces(run.Trace)
 
 	fmt.Printf("completed polling result %d after %d times, number of spans: %d \n", run.ID, request.count, len(run.Trace.Flat))
@@ -123,7 +144,11 @@ func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, m
 	return true, run, nil
 }
 
-func (pe DefaultPollerExecutor) donePollingTraces(job *PollingRequest, trace model.Trace) bool {
+func (pe DefaultPollerExecutor) donePollingTraces(job *PollingRequest, traceDB tracedb.TraceDB, trace model.Trace) bool {
+	if !traceDB.ShouldRetry() {
+		log.Printf("[PollerExecutor] Test %s Run %d: Done polling. TraceDB is not retryable\n", job.test.ID, job.run.ID)
+		return true
+	}
 	// we're done if we have the same amount of spans after polling or `maxTracePollRetry` times
 	if job.count == pe.maxTracePollRetry {
 		log.Printf("[PollerExecutor] Test %s Run %d: Done polling. Hit MaxRetry of %d\n", job.test.ID, job.run.ID, pe.maxTracePollRetry)
@@ -134,15 +159,7 @@ func (pe DefaultPollerExecutor) donePollingTraces(job *PollingRequest, trace mod
 		return false
 	}
 
-	minimalNumberOfSpans := 0
-	applicationExporter, _ := pe.config.ApplicationExporter()
-	if applicationExporter != nil {
-		// The triggering span will be sent to the application data storage, so we need to
-		// expect at least 1 span in the trace.
-		minimalNumberOfSpans = 1
-	}
-
-	if len(trace.Flat) > minimalNumberOfSpans && len(trace.Flat) == len(job.run.Trace.Flat) {
+	if len(trace.Flat) > traceDB.MinSpanCount() && len(trace.Flat) == len(job.run.Trace.Flat) {
 		log.Printf("[PollerExecutor] Test %s Run %d: Done polling. Condition met\n", job.test.ID, job.run.ID)
 		return true
 	}

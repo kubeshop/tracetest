@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/kubeshop/tracetest/server/config"
+	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -14,62 +15,34 @@ import (
 func TestCreateClient(t *testing.T) {
 	cases := []struct {
 		name          string
-		config        config.Config
+		ds            model.DataStore
 		expectedType  string
 		expectedError error
 	}{
 		{
 			name: "Jaeger",
-			config: config.Config{
-				Telemetry: config.Telemetry{
-					DataStores: map[string]config.TracingBackendDataStoreConfig{
-						"jaeger": {
-							Type:   tracedb.JAEGER_BACKEND,
-							Jaeger: configgrpc.GRPCClientSettings{},
-						},
-					},
-				},
-				Server: config.ServerConfig{
-					Telemetry: config.ServerTelemetryConfig{
-						DataStore: "jaeger",
-					},
+			ds: model.DataStore{
+				Type: openapi.JAEGER,
+				Values: model.DataStoreValues{
+					Jaeger: &configgrpc.GRPCClientSettings{},
 				},
 			},
 			expectedType: "*tracedb.jaegerTraceDB",
 		},
 		{
 			name: "Tempo",
-			config: config.Config{
-				Telemetry: config.Telemetry{
-					DataStores: map[string]config.TracingBackendDataStoreConfig{
-						"tempo": {
-							Type:   tracedb.TEMPO_BACKEND,
-							Jaeger: configgrpc.GRPCClientSettings{},
-						},
-					},
-				},
-				Server: config.ServerConfig{
-					Telemetry: config.ServerTelemetryConfig{
-						DataStore: "tempo",
-					},
+			ds: model.DataStore{
+				Type: openapi.TEMPO,
+				Values: model.DataStoreValues{
+					Tempo: &configgrpc.GRPCClientSettings{},
 				},
 			},
 			expectedType: "*tracedb.tempoTraceDB",
 		},
 		{
-			name:   "EmptyConfig",
-			config: config.Config{},
-		},
-		{
-			name: "InvalidConfig",
-			config: config.Config{
-				Server: config.ServerConfig{
-					Telemetry: config.ServerTelemetryConfig{
-						DataStore: "invalid",
-					},
-				},
-			},
-			expectedError: config.ErrInvalidTraceDBProvider,
+			name:         "EmptyConfig",
+			ds:           model.DataStore{},
+			expectedType: "*tracedb.noopTraceDB",
 		},
 	}
 
@@ -78,17 +51,12 @@ func TestCreateClient(t *testing.T) {
 			cl := c
 			t.Parallel()
 
-			actual, err := tracedb.New(cl.config, nil)
+			newFn := tracedb.Factory(nil)
 
-			if cl.expectedType != "" {
-				require.NoError(t, err)
-				assert.Equal(t, cl.expectedType, fmt.Sprintf("%T", actual))
-			} else if cl.expectedError != nil {
-				assert.ErrorIs(t, err, cl.expectedError)
-			} else {
-				require.NoError(t, err)
-				assert.Equal(t, "*tracedb.noopTraceDB", fmt.Sprintf("%T", actual))
-			}
+			actual, err := newFn(cl.ds)
+
+			require.NoError(t, err)
+			assert.Equal(t, cl.expectedType, fmt.Sprintf("%T", actual))
 		})
 	}
 
