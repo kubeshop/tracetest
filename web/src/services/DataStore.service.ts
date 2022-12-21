@@ -25,7 +25,7 @@ const DataStoreService = (): IDataStoreService => ({
     const dataStore = await dataStoreServiceMap[dataStoreType].getRequest(draft, dataStoreType);
 
     const config: TRawDataStoreConfig = {
-      dataStores: [{...dataStore, name: dataStoreType, type: dataStoreType}],
+      dataStores: [{...dataStore, name: dataStoreType, type: dataStoreType as SupportedDataStores}],
       defaultDataStore: dataStoreType,
     };
 
