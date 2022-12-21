@@ -1,4 +1,5 @@
 import {Button, Form} from 'antd';
+import {SupportedDataStoresToName} from 'constants/DataStore.constants';
 import {useSetupConfig} from 'providers/DataStore/DataStore.provider';
 import {useCallback} from 'react';
 import {TDraftDataStore, TDataStoreConfig, ConfigMode} from 'types/Config.types';
@@ -24,15 +25,15 @@ const DataStore = ({dataStoreConfig}: IProps) => {
 
   const handleOnSubmit = useCallback(
     async (values: TDraftDataStore) => {
-      onSaveConfig(values);
+      onSaveConfig(values, dataStoreConfig.defaultDataStore);
     },
-    [onSaveConfig]
+    [onSaveConfig, dataStoreConfig.defaultDataStore]
   );
 
   const handleTestConnection = useCallback(async () => {
     const draft = form.getFieldsValue();
-    onTestConnection(draft);
-  }, [form, onTestConnection]);
+    onTestConnection(draft, dataStoreConfig.defaultDataStore);
+  }, [form, onTestConnection, dataStoreConfig.defaultDataStore]);
 
   return (
     <S.Wrapper data-cy="config-datastore-form">
@@ -57,10 +58,10 @@ const DataStore = ({dataStoreConfig}: IProps) => {
               disabled={isLoading}
               type="primary"
               ghost
-              onClick={onDeleteConfig}
+              onClick={() => onDeleteConfig(dataStoreConfig.defaultDataStore)}
               danger
             >
-              Delete
+              {`Delete ${SupportedDataStoresToName[dataStoreConfig.defaultDataStore.type]} Data Store`}
             </Button>
           ) : (
             <div />

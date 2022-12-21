@@ -3,7 +3,7 @@ import {createContext, useCallback, useContext, useMemo} from 'react';
 
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import {setUserPreference} from 'redux/slices/User.slice';
-import {useGetDataStoreConfigQuery} from 'redux/apis/TraceTest.api';
+import {useGetDataStoresQuery} from 'redux/apis/TraceTest.api';
 import {ConfigMode, TDataStoreConfig} from 'types/Config.types';
 import UserSelectors from 'selectors/User.selectors';
 import DataStoreConfig from 'models/DataStoreConfig.model';
@@ -11,6 +11,7 @@ import DataStoreConfig from 'models/DataStoreConfig.model';
 interface IContext {
   dataStoreConfig: TDataStoreConfig;
   isLoading: boolean;
+  isFetching: boolean;
   isError: boolean;
   skipConfigSetup(): void;
   skipConfigSetupFromTest(): void;
@@ -19,10 +20,11 @@ interface IContext {
 }
 
 const Context = createContext<IContext>({
-  dataStoreConfig: DataStoreConfig({}),
+  dataStoreConfig: DataStoreConfig([]),
   skipConfigSetup: noop,
   skipConfigSetupFromTest: noop,
   isLoading: false,
+  isFetching: false,
   isError: false,
   shouldDisplayConfigSetup: false,
   shouldDisplayConfigSetupFromTest: false,
@@ -36,7 +38,7 @@ export const useDataStoreConfig = () => useContext(Context);
 
 const DataStoreConfigProvider = ({children}: IProps) => {
   const dispatch = useAppDispatch();
-  const {data: dataStoreConfig = DataStoreConfig({}), isLoading, isError} = useGetDataStoreConfigQuery({});
+  const {data: dataStoreConfig = DataStoreConfig([]), isLoading, isError, isFetching} = useGetDataStoresQuery({});
   const initConfigSetup = useAppSelector(state => UserSelectors.selectUserPreference(state, 'initConfigSetup'));
   const initConfigSetupFromTest = useAppSelector(state =>
     UserSelectors.selectUserPreference(state, 'initConfigSetupFromTest')
@@ -68,6 +70,7 @@ const DataStoreConfigProvider = ({children}: IProps) => {
     () => ({
       dataStoreConfig,
       isLoading,
+      isFetching,
       isError,
       skipConfigSetup,
       skipConfigSetupFromTest,
@@ -78,6 +81,7 @@ const DataStoreConfigProvider = ({children}: IProps) => {
       dataStoreConfig,
       isError,
       isLoading,
+      isFetching,
       shouldDisplayConfigSetup,
       shouldDisplayConfigSetupFromTest,
       skipConfigSetup,

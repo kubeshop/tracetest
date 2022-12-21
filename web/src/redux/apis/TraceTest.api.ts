@@ -68,8 +68,10 @@ export const {
   useGetTransactionVersionByIdQuery,
   useGetResourceDefinitionQuery,
   useLazyGetResourceDefinitionQuery,
-  useGetDataStoreConfigQuery,
-  useUpdateDatastoreConfigMutation,
+  useGetDataStoresQuery,
+  useCreateDataStoreMutation,
+  useUpdateDataStoreMutation,
+  useDeleteDataStoreMutation,
   useTestConnectionMutation,
 } = TraceTestAPI;
 export const {endpoints} = TraceTestAPI;

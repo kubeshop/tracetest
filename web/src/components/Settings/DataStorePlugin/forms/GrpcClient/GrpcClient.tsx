@@ -20,9 +20,10 @@ const HEADER_DEFAULT_VALUES = [{key: '', value: ''}];
 
 const GrpcClient = () => {
   const form = Form.useFormInstance<TDraftDataStore>();
-  const [isSecure, setIsSecure] = useState(false);
   const dataStoreType = form.getFieldValue('dataStoreType');
   const baseName = ['dataStore', dataStoreType];
+  const insecureValue = form.getFieldValue([...baseName, 'tls', 'insecure']);
+  const [isSecure, setIsSecure] = useState(!insecureValue);
 
   return (
     <>
@@ -52,12 +53,12 @@ const GrpcClient = () => {
       <Row gutter={[16, 16]}>
         <Col span={12}>
           <Form.Item label="Read Buffer Size" name={[...baseName, 'readBufferSize']}>
-            <Input placeholder="Enter a read buffer size" />
+            <Input placeholder="Enter a read buffer size" type="number" />
           </Form.Item>
         </Col>
         <Col span={12}>
           <Form.Item label="Write Buffer Size" name={[...baseName, 'writeBufferSize']}>
-            <Input placeholder="Enter a write buffer size" />
+            <Input placeholder="Enter a write buffer size" type="number" />
           </Form.Item>
         </Col>
       </Row>
@@ -82,7 +83,7 @@ const GrpcClient = () => {
           <RequestDetailsAuthInput hasBaseApikeyFields name={[...baseName, 'auth']} />
         </Col>
         <Col span={12}>
-          <RequestDetailsHeadersInput initialValue={HEADER_DEFAULT_VALUES} name={[...baseName, 'headers']} />
+          <RequestDetailsHeadersInput initialValue={HEADER_DEFAULT_VALUES} name={[...baseName, 'rawHeaders']} />
         </Col>
       </Row>
 
@@ -92,6 +93,7 @@ const GrpcClient = () => {
             form.setFieldsValue({dataStore: {[dataStoreType]: {tls: {insecure: !checked}}}});
             setIsSecure(checked);
           }}
+          checked={isSecure}
         />{' '}
         Secure options
         <Form.Item hidden initialValue name={[...baseName, 'tls', 'insecure']} valuePropName="checked">

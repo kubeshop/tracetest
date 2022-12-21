@@ -65,7 +65,9 @@ const dataStoreIconMap = {
 
 export const DataStoreIcon = styled.img.attrs<{$dataStore: SupportedDataStores}>(({$dataStore}) => ({
   src: dataStoreIconMap[$dataStore],
-}))<{$dataStore: SupportedDataStores}>``;
+}))<{$dataStore: SupportedDataStores}>`
+  max-height: 24px;
+`;
 
 export const DataStoreName = styled(Typography.Text)`
   && {

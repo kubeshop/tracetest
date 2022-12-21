@@ -4,10 +4,13 @@ describe('Create Assertion', () => {
   beforeEach(() => cy.createTest());
   afterEach(() => cy.deleteTest());
 
-  it('should create a basic assertion', () => cy.createAssertion());
+  it('should create a basic assertion', () => {
+    cy.createAssertion();
+  });
 
   it('should create an assertion with multiple checks', () => {
     cy.selectRunDetailMode(3);
+    cy.get('[data-cy=dataStores-test-skip-cta]').click();
 
     cy.get(`[data-cy=trace-node-http]`, {timeout: 20000}).first().click();
 
@@ -26,7 +29,9 @@ describe('Create Assertion', () => {
 
     cy.get('[data-cy=add-assertion-form-add-check]').click();
 
-    cy.get('[data-cy=assertion-check-attribute] [contenteditable="true"]').last().type('tracetest.span.ty', {delay: 100});
+    cy.get('[data-cy=assertion-check-attribute] [contenteditable="true"]')
+      .last()
+      .type('tracetest.span.ty', {delay: 100});
     cy.get(getAttributeListId(0)).click();
     cy.get('[data-cy=assertion-check-value] .cm-content').last().click();
     cy.get(getValueFromList(1)).last().click();
@@ -50,6 +55,7 @@ describe('Create Assertion', () => {
 
   it('should create a basic assertion using the advanced mode', () => {
     cy.selectRunDetailMode(3);
+    cy.get('[data-cy=dataStores-test-skip-cta]').click();
 
     cy.get(`[data-cy=trace-node-database]`, {timeout: 20000}).last().click();
     cy.get('[data-cy=add-test-spec-button]').click();

@@ -1026,10 +1026,6 @@ export interface external {
     paths: {};
     components: {
       schemas: {
-        DataStoreConfig: {
-          dataStores?: external["dataStores.yaml"]["components"]["schemas"]["DataStore"][];
-          defaultDataStore?: string;
-        };
         TestConnectionResponse: {
           successful?: boolean;
           steps?: external["config.yaml"]["components"]["schemas"]["ConnectionResult"][];
@@ -1079,7 +1075,7 @@ export interface external {
           readBufferSize?: number;
           writeBufferSize?: number;
           waitForReady?: boolean;
-          headers?: external["http.yaml"]["components"]["schemas"]["HTTPHeader"][];
+          headers?: { [key: string]: string };
           balancerName?: string;
           /** @enum {string} */
           compression?:

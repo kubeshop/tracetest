@@ -19,7 +19,7 @@ const OpenSearchService = (): TDataStoreService => ({
 
     return Promise.resolve(true);
   },
-  getInitialValues({dataStores: [{openSearch = {}} = {}] = []}) {
+  getInitialValues({defaultDataStore: {openSearch = {}} = {}}) {
     const {index = '', username = '', password = '', addresses = ['']} = openSearch;
 
     return {
