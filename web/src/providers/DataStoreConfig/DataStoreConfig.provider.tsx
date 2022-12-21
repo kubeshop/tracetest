@@ -14,16 +14,20 @@ interface IContext {
   isFetching: boolean;
   isError: boolean;
   skipConfigSetup(): void;
+  skipConfigSetupFromTest(): void;
   shouldDisplayConfigSetup: boolean;
+  shouldDisplayConfigSetupFromTest: boolean;
 }
 
 const Context = createContext<IContext>({
   dataStoreConfig: DataStoreConfig([]),
   skipConfigSetup: noop,
+  skipConfigSetupFromTest: noop,
   isLoading: false,
   isFetching: false,
   isError: false,
   shouldDisplayConfigSetup: false,
+  shouldDisplayConfigSetupFromTest: false,
 });
 
 interface IProps {
@@ -36,13 +40,27 @@ const DataStoreConfigProvider = ({children}: IProps) => {
   const dispatch = useAppDispatch();
   const {data: dataStoreConfig = DataStoreConfig([]), isLoading, isError, isFetching} = useGetDataStoresQuery({});
   const initConfigSetup = useAppSelector(state => UserSelectors.selectUserPreference(state, 'initConfigSetup'));
+  const initConfigSetupFromTest = useAppSelector(state =>
+    UserSelectors.selectUserPreference(state, 'initConfigSetupFromTest')
+  );
 
-  const shouldDisplayConfigSetup = Boolean(initConfigSetup) && dataStoreConfig.mode === ConfigMode.NO_TRACING_MODE;
+  const shouldDisplayConfigSetup = !!initConfigSetup && dataStoreConfig.mode === ConfigMode.NO_TRACING_MODE;
+  const shouldDisplayConfigSetupFromTest =
+    !!initConfigSetupFromTest && dataStoreConfig.mode === ConfigMode.NO_TRACING_MODE;
 
   const skipConfigSetup = useCallback(() => {
     dispatch(
       setUserPreference({
         key: 'initConfigSetup',
+        value: false,
+      })
+    );
+  }, [dispatch]);
+
+  const skipConfigSetupFromTest = useCallback(() => {
+    dispatch(
+      setUserPreference({
+        key: 'initConfigSetupFromTest',
         value: false,
       })
     );
@@ -55,9 +73,20 @@ const DataStoreConfigProvider = ({children}: IProps) => {
       isFetching,
       isError,
       skipConfigSetup,
+      skipConfigSetupFromTest,
       shouldDisplayConfigSetup,
+      shouldDisplayConfigSetupFromTest,
     }),
-    [dataStoreConfig, isError, isLoading, isFetching, shouldDisplayConfigSetup, skipConfigSetup]
+    [
+      dataStoreConfig,
+      isError,
+      isLoading,
+      isFetching,
+      shouldDisplayConfigSetup,
+      shouldDisplayConfigSetupFromTest,
+      skipConfigSetup,
+      skipConfigSetupFromTest,
+    ]
   );
 
   return <Context.Provider value={value}>{children}</Context.Provider>;

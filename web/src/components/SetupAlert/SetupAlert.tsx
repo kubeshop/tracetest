@@ -1,17 +1,12 @@
 import {Button} from 'antd';
 import {useDataStoreConfig} from 'providers/DataStoreConfig/DataStoreConfig.provider';
 import {Link} from 'react-router-dom';
-import {ConfigMode} from 'types/Config.types';
-import {useAppSelector} from '../../redux/hooks';
-import UserSelectors from '../../selectors/User.selectors';
 import * as S from './SetupAlert.styled';
 
 const SetupAlert = () => {
-  const {dataStoreConfig, skipConfigSetup} = useDataStoreConfig();
-  const initConfigSetup = useAppSelector(state => UserSelectors.selectUserPreference(state, 'initConfigSetup'));
-  const shouldDisplay = Boolean(initConfigSetup) && dataStoreConfig.mode === ConfigMode.NO_TRACING_MODE;
+  const {shouldDisplayConfigSetupFromTest, skipConfigSetupFromTest} = useDataStoreConfig();
 
-  return shouldDisplay ? (
+  return shouldDisplayConfigSetupFromTest ? (
     <S.Container
       message={
         <S.Message>
@@ -20,7 +15,7 @@ const SetupAlert = () => {
           <Link to="/settings">
             <S.WarningButton>Setup</S.WarningButton>
           </Link>
-          <Button color="primary" onClick={skipConfigSetup}>
+          <Button color="primary" onClick={skipConfigSetupFromTest}>
             Later
           </Button>
         </S.Message>

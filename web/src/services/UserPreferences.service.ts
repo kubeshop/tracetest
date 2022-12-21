@@ -9,6 +9,7 @@ const initialUserPreferences: IUserPreferences = {
   lang: 'en',
   environmentId: '',
   initConfigSetup: true,
+  initConfigSetupFromTest: true,
   isOnboardingComplete: false,
 };
 
