@@ -22,6 +22,7 @@ generate-cli:
 		-o $(BASE)/tmp \
 		--generate-alias-as-model
 	cp $(BASE)/tmp/*.go $(BASE)/$(OPENAPI_TARGET_DIR)
+	chmod 644 $(BASE)/$(OPENAPI_TARGET_DIR)/*.go
 	rm -rf $(BASE)/tmp
 
 	cd $(BASE); go fmt ./...
@@ -38,6 +39,7 @@ generate-server:
 		-o $(BASE)/tmp \
 		--generate-alias-as-model
 	cp $(BASE)/tmp/go/*.go $(BASE)/$(OPENAPI_TARGET_DIR)
+	chmod 644 $(BASE)/$(OPENAPI_TARGET_DIR)/*.go
 	rm -f $(BASE)/$(OPENAPI_TARGET_DIR)/api_api_service.go
 	rm -rf $(BASE)/tmp
 

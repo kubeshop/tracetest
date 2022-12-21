@@ -16,21 +16,22 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-type opensearchDb struct {
-	config config.OpensearchDataStoreConfig
+type opensearchDB struct {
+	realTraceDB
+	config *config.OpensearchDataStoreConfig
 	client *opensearch.Client
 }
 
-func (db opensearchDb) Connect(ctx context.Context) error {
+func (db opensearchDB) Connect(ctx context.Context) error {
 	return nil
 }
 
-func (db opensearchDb) Close() error {
+func (db opensearchDB) Close() error {
 	// No need to close this db
 	return nil
 }
 
-func (db opensearchDb) TestConnection(ctx context.Context) ConnectionTestResult {
+func (db opensearchDB) TestConnection(ctx context.Context) ConnectionTestResult {
 	for _, address := range db.config.Addresses {
 		reachable, err := isReachable(address)
 
@@ -78,7 +79,14 @@ func (db opensearchDb) TestConnection(ctx context.Context) ConnectionTestResult 
 	}
 }
 
-func (db opensearchDb) GetTraceByID(ctx context.Context, traceID string) (model.Trace, error) {
+func (db opensearchDB) Ready() bool {
+	return db.client != nil
+}
+
+func (db opensearchDB) GetTraceByID(ctx context.Context, traceID string) (model.Trace, error) {
+	if !db.Ready() {
+		return model.Trace{}, fmt.Errorf("OpenSearch dataStore not ready")
+	}
 	content := strings.NewReader(fmt.Sprintf(`{
 		"query": { "match": { "traceId": "%s" } }
 	}`, traceID))
@@ -111,7 +119,7 @@ func (db opensearchDb) GetTraceByID(ctx context.Context, traceID string) (model.
 	return convertOpensearchFormatIntoTrace(traceID, searchResponse), nil
 }
 
-func newOpenSearchDB(cfg config.OpensearchDataStoreConfig) (TraceDB, error) {
+func newOpenSearchDB(cfg *config.OpensearchDataStoreConfig) (TraceDB, error) {
 	client, err := opensearch.NewClient(opensearch.Config{
 		Addresses: cfg.Addresses,
 		Username:  cfg.Username,
@@ -122,7 +130,7 @@ func newOpenSearchDB(cfg config.OpensearchDataStoreConfig) (TraceDB, error) {
 		return nil, fmt.Errorf("could not create opensearch client: %w", err)
 	}
 
-	return opensearchDb{
+	return &opensearchDB{
 		config: cfg,
 		client: client,
 	}, nil

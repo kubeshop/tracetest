@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"math"
-	"strconv"
 	"time"
 
 	"github.com/kubeshop/tracetest/server/model"
@@ -39,20 +38,18 @@ func NewTracePoller(
 	retryDelay time.Duration,
 	maxWaitTimeForTrace time.Duration,
 	subscriptionManager *subscription.Manager,
-	isDataStoreConfigured bool,
 ) PersistentTracePoller {
 	maxTracePollRetry := int(math.Ceil(float64(maxWaitTimeForTrace) / float64(retryDelay)))
 	return tracePoller{
-		updater:               updater,
-		pollerExecutor:        pe,
-		maxWaitTimeForTrace:   maxWaitTimeForTrace,
-		maxTracePollRetry:     maxTracePollRetry,
-		retryDelay:            retryDelay,
-		executeQueue:          make(chan PollingRequest, 5),
-		exit:                  make(chan bool, 1),
-		assertionRunner:       assertionRunner,
-		subscriptionManager:   subscriptionManager,
-		isDataStoreConfigured: isDataStoreConfigured,
+		updater:             updater,
+		pollerExecutor:      pe,
+		maxWaitTimeForTrace: maxWaitTimeForTrace,
+		maxTracePollRetry:   maxTracePollRetry,
+		retryDelay:          retryDelay,
+		executeQueue:        make(chan PollingRequest, 5),
+		exit:                make(chan bool, 1),
+		assertionRunner:     assertionRunner,
+		subscriptionManager: subscriptionManager,
 	}
 }
 
@@ -69,8 +66,6 @@ type tracePoller struct {
 
 	executeQueue chan PollingRequest
 	exit         chan bool
-
-	isDataStoreConfigured bool
 }
 
 type PollingRequest struct {
@@ -118,29 +113,7 @@ func (tp tracePoller) Poll(ctx context.Context, test model.Test, run model.Run) 
 		run:  run,
 	}
 
-	log.Printf("[PollerExecutor] Test %s Run %d: Is Data Store Configured? %s \n", job.test.ID, run.ID, strconv.FormatBool(tp.isDataStoreConfigured))
-
-	if tp.isDataStoreConfigured {
-		tp.enqueueJob(job)
-	} else {
-		tp.syncProcessJob(job)
-	}
-}
-
-func (tp tracePoller) syncProcessJob(job PollingRequest) {
-	log.Printf("[PollerExecutor] Test %s Run %d: No Data Store Configured, running sync execution\n", job.test.ID, job.run.ID)
-	rootSpan := model.NewTracetestRootSpan(&job.run)
-	trace := model.Trace{
-		ID: model.IDGen.TraceID(),
-	}
-
-	job.run.Trace = trace.InsertRootSpan(&rootSpan)
-	job.run = job.run.SuccessfullyPolledTraces(job.run.Trace)
-
-	log.Printf("[PollerExecutor] Test %s Run %d: Start updating\n", job.test.ID, job.run.ID)
-	tp.updater.Update(job.ctx, job.run)
-
-	tp.runAssertions(job)
+	tp.enqueueJob(job)
 }
 
 func (tp tracePoller) enqueueJob(job PollingRequest) {
