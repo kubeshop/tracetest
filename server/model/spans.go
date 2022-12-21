@@ -58,6 +58,10 @@ type encodedSpan struct {
 	Children   []encodedSpan
 }
 
+func (s Span) IsZero() bool {
+	return !s.ID.IsValid()
+}
+
 func (s Span) MarshalJSON() ([]byte, error) {
 	enc := encodeSpan(s)
 	return json.Marshal(&enc)

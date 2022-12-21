@@ -125,7 +125,8 @@ func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, m
 	request.run = run
 
 	if !trace.HasRootSpan() {
-		run.Trace.RootSpan = model.NewTracetestRootSpan(run)
+		newRoot := model.NewTracetestRootSpan(run)
+		run.Trace = run.Trace.InsertRootSpan(newRoot)
 	} else {
 		run.Trace.RootSpan = model.AugmentRootSpan(run.Trace.RootSpan, run.TriggerResult)
 	}
