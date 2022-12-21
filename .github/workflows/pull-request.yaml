@@ -29,7 +29,7 @@ jobs:
         with:
           go-version-file: 'go.work'
           cache: true
-          cache-dependency-path: cli/go.sum
+          cache-dependency-path: go.work
       - name: Run unit tests
         run: cd cli; make test
 
@@ -45,7 +45,7 @@ jobs:
         with:
           go-version-file: 'go.work'
           cache: true
-          cache-dependency-path: server/go.sum
+          cache-dependency-path: go.work
       - name: Run unit tests
         run: cd server; make test
 
@@ -80,6 +80,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+    - name: Setup go
+      uses: actions/setup-go@v3
+      with:
+        go-version-file: 'go.work'
+        cache: true
+        cache-dependency-path: go.work
     - name: Run GoReleaser
       uses: goreleaser/goreleaser-action@v4
       with:
@@ -90,13 +96,13 @@ jobs:
         ANALYTICS_BE_KEY: ${{ secrets.ANALYTICS_BE_KEY }}
         VERSION: ${{ github.ref_name}}
         TRACETEST_ENV: main
-    - run: find . -not -path '*/\.*' | grep -v "node_modules"
-    - run: find dist/ -not -path '*/\.*'
     - name: Upload assets
       uses: actions/upload-artifact@v3
       with:
         name: tracetest-go
-        path: dist/
+        path: |
+          dist/linux_amd64/cli_linux_amd64_v1/tracetest
+          dist/linux_amd64/server_linux_amd64_v1/tracetest-server
 
   build-web:
     needs: [test-web]
