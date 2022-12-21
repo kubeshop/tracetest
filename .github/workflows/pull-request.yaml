@@ -223,8 +223,6 @@ jobs:
             --namespace tracetest-pr-${{ github.event.pull_request.number }} \
             svc/tracetest-pr-${{ github.event.pull_request.number }} 3000:11633 &
 
-          ./scripts/wait-for-port.sh 3000
-
       - name: Cache dependencies
         id: cache-nodemodules
         uses: actions/cache@v2
@@ -244,6 +242,7 @@ jobs:
       - name: Run integration tests
         run: |
           cd web/
+          ./scripts/wait-for-port.sh 3000
           npm run cy:ci
         env:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
