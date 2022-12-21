@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"strings"
 
+	cliConfig "github.com/kubeshop/tracetest/cli/config"
 	cliUI "github.com/kubeshop/tracetest/cli/ui"
 )
 
@@ -159,6 +160,10 @@ func installTracetestChart(conf configuration, ui cliUI.UI) {
 	cmd := []string{
 		"upgrade --install tracetest kubeshop/tracetest",
 		"--namespace " + conf.String("k8s.namespace") + " --create-namespace",
+	}
+
+	if cliConfig.Version == "dev" {
+		cmd = append(cmd, "--set image.tag=latest")
 	}
 
 	execCmd(helmCmd(conf, cmd...), ui)
