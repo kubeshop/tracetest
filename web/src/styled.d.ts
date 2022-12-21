@@ -41,12 +41,14 @@ declare module 'styled-components' {
         style: {
           border: string;
           background: string;
+          minWidth: string;
         };
       };
       error: {
         style: {
           border: string;
           background: string;
+          minWidth: string;
         };
       };
     };

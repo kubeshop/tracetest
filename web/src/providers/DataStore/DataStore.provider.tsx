@@ -1,15 +1,16 @@
 import {noop} from 'lodash';
 import {createContext, useCallback, useContext, useMemo, useState} from 'react';
-import {notification} from 'antd';
-import {useTheme} from 'styled-components';
+
 import {
   useTestConnectionMutation,
   useCreateDataStoreMutation,
   useUpdateDataStoreMutation,
   useDeleteDataStoreMutation,
 } from 'redux/apis/TraceTest.api';
-import {TDataStore, TDraftDataStore} from 'types/Config.types';
+import {SupportedDataStores, TConnectionResult, TDataStore, TDraftDataStore} from 'types/Config.types';
 import DataStoreService from 'services/DataStore.service';
+import ConnectionResult from 'models/ConnectionResult.model';
+import useTestConnectionNotification from './hooks/useTestConnectionNotification';
 import {useConfirmationModal} from '../ConfirmationModal/ConfirmationModal.provider';
 import {useDataStoreConfig} from '../DataStoreConfig/DataStoreConfig.provider';
 
@@ -46,11 +47,8 @@ const DataStoreProvider = ({children}: IProps) => {
   const [deleteDataStore] = useDeleteDataStoreMutation();
   const [testConnection, {isLoading: isTestConnectionLoading}] = useTestConnectionMutation();
   const [isFormValid, setIsFormValid] = useState(false);
+  const {showNotification, contextHolder} = useTestConnectionNotification();
   const {onOpen} = useConfirmationModal();
-  const [api, contextHolder] = notification.useNotification();
-  const {
-    notification: {success, error},
-  } = useTheme();
 
   const onSaveConfig = useCallback(
     async (draft: TDraftDataStore, defaultDataStore: TDataStore) => {
@@ -92,23 +90,19 @@ const DataStoreProvider = ({children}: IProps) => {
   const onTestConnection = useCallback(
     async (draft: TDraftDataStore, defaultDataStore: TDataStore) => {
       const dataStore = await DataStoreService.getRequest(draft, defaultDataStore);
-      const {authentication = {}, connectivity = {}, fetchTraces = {}} = await testConnection(dataStore!).unwrap();
 
-      if (authentication.passed && connectivity.passed && fetchTraces.passed) {
-        return api.success({
-          message: 'Connection is setup',
-          description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor',
-          ...success,
-        });
+      if (draft.dataStoreType === SupportedDataStores.OtelCollector) {
+        return showNotification(ConnectionResult({}), draft.dataStoreType);
       }
 
-      api.error({
-        message: 'Connection is not setup',
-        description: authentication.error || connectivity.error || fetchTraces.error,
-        ...error,
-      });
+      try {
+        const result = await testConnection(dataStore!).unwrap();
+        showNotification(result, draft.dataStoreType!);
+      } catch (err) {
+        showNotification(err as TConnectionResult, draft.dataStoreType!);
+      }
     },
-    [api, error, success, testConnection]
+    [showNotification, testConnection]
   );
 
   const value = useMemo<IContext>(

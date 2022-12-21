@@ -29,7 +29,7 @@ const DataStoreService = (): IDataStoreService => ({
       : {
           ...dataStoreValues,
           name: dataStoreType,
-          type: dataStoreType,
+          type: dataStoreType as SupportedDataStores,
           isDefault: true,
         };
 
