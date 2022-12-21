@@ -5,10 +5,12 @@ RUN apk add dbus
 ARG OS=linux
 ARG ARCH=amd64_v1
 
-COPY ./dist/${OS}/server_${OS}_${ARCH}/tracetest-server /app/
-COPY ./dist/${OS}/cli_${OS}_${ARCH}/tracetest /app/
+WORKDIR /app
 
-COPY ./web/build /app/html
+COPY ./dist/${OS}/server_${OS}_${ARCH}/tracetest-server ./
+COPY ./dist/${OS}/cli_${OS}_${ARCH}/tracetest ./
+
+COPY ./web/build ./html
 
 COPY ./server/migrations/ /app/migrations/
 
