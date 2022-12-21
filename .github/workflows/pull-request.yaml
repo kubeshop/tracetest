@@ -27,11 +27,11 @@ jobs:
       - name: Setup go
         uses: actions/setup-go@v3
         with:
-          go-version: '^1.18'
+          go-version-file: 'go.work'
+          cache: true
+          cache-dependency-path: cli/go.sum
       - name: Run unit tests
-        run: |
-          cd cli/
-          make test
+        run: cd cli; make test
 
   unit-test-backend:
     name: Run backend unit tests
@@ -43,11 +43,11 @@ jobs:
       - name: Setup go
         uses: actions/setup-go@v3
         with:
-          go-version: '^1.18'
+          go-version-file: 'go.work'
+          cache: true
+          cache-dependency-path: server/go.sum
       - name: Run unit tests
-        run: |
-          cd server/
-          make test
+        run: cd server; make test
 
   unit-test-frontend:
     name: Run frontend unit tests
@@ -56,48 +56,21 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-
       - name: Setup node
         uses: actions/setup-node@v3
         with:
-          node-version: 16.13.x
+          node-version: 16
           cache: npm
           cache-dependency-path: web/package-lock.json
-
-      - name: Cache dependencies
-        id: cache-nodemodules
-        uses: actions/cache@v2
-        with:
-          path: |
-            web/node_modules
-            /home/runner/.cache/Cypress
-          key: npm--${{ hashFiles('web/package-lock.json') }}
-          restore-keys: npm-
-
-      - name: Install test dependencies
-        if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-        run: |
-          cd web/
-          npm ci
-
-      - name: Run eslint and types
-        run: |
-          cd web/
-          npm run lint
-
-      - name: Run unit tests
-        run: |
-          cd web/
-          npm test
+      - run: cd web; npm ci
+      - run: cd web; npm run lint
+      - run: cd web; npm test
 
   build-go:
     name: build go binaries
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
+    - uses: actions/checkout@v3
     - name: Run GoReleaser
       uses: goreleaser/goreleaser-action@v4
       with:
@@ -119,18 +92,21 @@ jobs:
     name: build web
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-node@v3
-      with:
-        node-version: 16
-        cache: 'npm'
-    - run: cd web; npm ci
-    - run: cd web; npm run build
-    - name: Upload assets
-      uses: actions/upload-artifact@v3
-      with:
-        name: tracetest-web
-        path: web/build/*
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: cd web; npm ci
+      - run: cd web; npm run build
+      - name: Upload assets
+        uses: actions/upload-artifact@v3
+        with:
+          name: tracetest-web
+          path: web/build/*
 
   # build-docker:
   #   name: "Build Image"
