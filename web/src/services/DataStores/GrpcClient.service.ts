@@ -54,7 +54,7 @@ const GrpcClientService = (): TDataStoreService => ({
     });
   },
   validateDraft({dataStore = {}, dataStoreType}) {
-    const values = dataStore[dataStoreType || SupportedDataStores.JAEGER] as IGRPCClientSettings;
+    const values = (dataStore[dataStoreType || SupportedDataStores.JAEGER] as IGRPCClientSettings) ?? {};
     const {endpoint = ''} = values;
     if (!endpoint) return Promise.resolve(false);
 
