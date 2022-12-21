@@ -76,7 +76,7 @@ func (td *postgresDB) UpdateDataStore(ctx context.Context, dataStore model.DataS
 
 	// keep the same creation date to keep sort order
 	dataStore.CreatedAt = oldDataStore.CreatedAt
-	dataStore.ID = dataStore.Slug()
+	dataStore.ID = oldDataStore.ID
 
 	return td.updateIntoDataStores(ctx, dataStore, oldDataStore.ID)
 }
@@ -314,7 +314,7 @@ func (td *postgresDB) updateIntoDataStores(ctx context.Context, dataStore model.
 
 	_, err = tx.ExecContext(ctx, updateIntoDataStoresQuery,
 		oldId,
-		dataStore.Slug(),
+		dataStore.ID,
 		dataStore.Name,
 		dataStore.Type,
 		dataStore.IsDefault,
