@@ -148,9 +148,10 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - uses: actions/download-artifact@v3
         with:
-          name: |
-            tracetest-go
-            tracetest-web
+          name: tracetest-go
+      - uses: actions/download-artifact@v3
+        with:
+          name: tracetest-web
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
