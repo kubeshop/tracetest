@@ -85,12 +85,13 @@ jobs:
       with:
         distribution: goreleaser-pro
         version: latest
-        workdir: ./cli/
         args: release --skip-announce  --skip-publish --snapshot --rm-dist
       env:
         ANALYTICS_BE_KEY: ${{ secrets.ANALYTICS_BE_KEY }}
         VERSION: ${{ github.ref_name}}
         TRACETEST_ENV: main
+    - run: find . -not -path '*/\.*' | grep -v "node_modules"
+    - run: find dist/ -not -path '*/\.*'
     - name: Upload assets
       uses: actions/upload-artifact@v3
       with:
