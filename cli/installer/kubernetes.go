@@ -8,7 +8,6 @@ import (
 	"path"
 	"regexp"
 	"strings"
-	"time"
 
 	cliUI "github.com/kubeshop/tracetest/cli/ui"
 )
@@ -69,11 +68,21 @@ func installSed(ui cliUI.UI) {
 func kubernetesInstaller(config configuration, ui cliUI.UI) {
 	trackInstall("kubernetes", config, nil)
 
-	installCertManager(config, ui)
-
 	execCmdIgnoreErrors(kubectlCmd(config, "create namespace "+config.String("k8s.namespace")))
 
+	if !config.Bool("installer.only_tracetest") {
+		installCollector(config, ui)
+	}
 	installTracetest(config, ui)
+}
+
+func installCollector(config configuration, ui cliUI.UI) {
+	execCmd(
+		kubectlNamespaceCmd(config, "create -f "+collectorYaml),
+		ui,
+	)
+
+	ui.Println(ui.Green("✔ collector ready"))
 }
 
 func installTracetest(conf configuration, ui cliUI.UI) {
@@ -108,10 +117,6 @@ Happy TraceTesting =)
 }
 
 func installDemo(conf configuration, ui cliUI.UI) {
-	if !conf.Bool("demo.enable.pokeshop") {
-		return
-	}
-
 	helm := helmCmd(conf, "")
 	script := strings.ReplaceAll(demoScript, "#helm#", helm)
 	script = fmt.Sprintf(script, conf.String("tracetest.backend.endpoint.collector"))
@@ -122,6 +127,8 @@ func installDemo(conf configuration, ui cliUI.UI) {
 func installOtelCollector(conf configuration, ui cliUI.UI) {
 	cc := createTmpFile("collector-config", string(getCollectorConfigFileContents(ui, conf)), ui)
 	defer os.Remove(cc.Name())
+
+	log.Println(">>>>content", string(getCollectorConfigFileContents(ui, conf)))
 
 	cmdString := kubectlNamespaceCmd(conf,
 		"create configmap collector-config --from-file="+cc.Name()+" -o yaml --dry-run=client",
@@ -159,14 +166,6 @@ func installTracetestChart(conf configuration, ui cliUI.UI) {
 		"--namespace " + conf.String("k8s.namespace") + " --create-namespace",
 	}
 
-	if conf.Bool("k8s.expose") {
-		cmd = append(cmd, []string{
-			"--set ingress.enabled=true",
-			"--set 'ingress.hosts[0].host=" + conf.String("k8s.ingress-host") +
-				",ingress.hosts[0].paths[0].path=/,ingress.hosts[0].paths[0].pathType=Prefix'",
-		}...)
-	}
-
 	execCmd(helmCmd(conf, cmd...), ui)
 }
 
@@ -191,15 +190,6 @@ func helmCmd(config configuration, cmd ...string) string {
 }
 
 const (
-	certManagerYaml          = "https://github.com/cert-manager/cert-manager/releases/download/v1.8.0/cert-manager.yaml"
-	certManagerClusterIssuer = `
-apiVersion: cert-manager.io/v1
-kind: ClusterIssuer
-metadata:
-  name: selfsigned
-spec:
-  selfSigned: {}
-`
 	collectorYaml = "https://raw.githubusercontent.com/kubeshop/tracetest/main/k8s/collector.yml"
 
 	demoScript = `
@@ -218,34 +208,6 @@ cd $tmpdir/helm-chart
   --set 'env[4].value=%s'
 `
 )
-
-func installCertManager(config configuration, ui cliUI.UI) {
-	if crdExists(config, "certificaterequests.cert-manager.io") {
-		return
-	}
-
-	execCmd(
-		kubectlCmd(config, "create -f "+certManagerYaml),
-		ui,
-	)
-
-	execCmd(
-		kubectlCmd(config, "--namespace cert-manager wait --for=condition=ready pod -l app=webhook --timeout 5m"),
-		ui,
-	)
-	// give it a sec just in case
-	time.Sleep(time.Second)
-
-	f := createTmpFile("cert-manager", certManagerClusterIssuer, ui)
-	defer os.Remove(f.Name())
-
-	execCmd(
-		kubectlCmd(config, "apply -f "+f.Name()),
-		ui,
-	)
-
-	ui.Println(ui.Green("✔ cert-manager ready"))
-}
 
 func createTmpFile(name, contents string, ui cliUI.UI) *os.File {
 	f, err := os.CreateTemp("", name)
@@ -367,7 +329,6 @@ func configureKubernetes(conf configuration, ui cliUI.UI) configuration {
 
 func configureIngress(conf configuration, ui cliUI.UI) configuration {
 	conf.set("k8s.ingress-host", "tracetest")
-	conf.set("k8s.expose", true)
 	return conf
 }
 
@@ -399,11 +360,6 @@ func localEnvironmentChecker(ui cliUI.UI) {
 }
 
 func minikubeChecker(ui cliUI.UI) {
-	// before procceding, we must start minikube
-	// starting in insecure mode to prevent certificate problems
-	// TODO: configure the certificate instead to prevent the x509 error
-	defer execCmd(`minikube start --insecure-registry="registry-1.docker.io"`, ui)
-
 	if commandExists("minikube") {
 		ui.Println(ui.Green("✔ minikube already installed"))
 		return
