@@ -190,7 +190,7 @@ func helmCmd(config configuration, cmd ...string) string {
 }
 
 const (
-	collectorYaml = "https://raw.githubusercontent.com/kubeshop/tracetest/1630-in-app-config-installer-changes/k8s/collector.yml"
+	collectorYaml = "https://raw.githubusercontent.com/kubeshop/tracetest/main/k8s/collector.yml"
 
 	demoScript = `
 tmpdir=$(mktemp -d)

@@ -252,7 +252,7 @@ func replaceService(project *types.Project, service string, sc types.ServiceConf
 
 func getFileContentsForVersion(path, version string) ([]byte, error) {
 	if version == "dev" {
-		version = "1630-in-app-config-installer-changes"
+		version = "main"
 	}
 	url := fmt.Sprintf("https://raw.githubusercontent.com/kubeshop/tracetest/%s/%s", version, path)
 	resp, err := http.Get(url)
