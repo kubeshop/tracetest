@@ -1,5 +1,4 @@
 name: Pull Request
-
 on:
   pull_request:
     types:
@@ -19,7 +18,7 @@ on:
 
 jobs:
   test-cli:
-    name: Run CLI unit tests
+    name: Run CLI unit tests 2
     runs-on: ubuntu-latest
 
     steps:
