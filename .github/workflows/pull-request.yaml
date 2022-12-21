@@ -152,6 +152,7 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: tracetest-web
+      - run: find . -not -path '*/\.*' | grep -v "node_modules"
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
