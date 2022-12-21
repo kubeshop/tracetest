@@ -175,6 +175,7 @@ jobs:
       - name: Run example test
         run: |
           ./scripts/wait-for-port.sh 11633
+          chmod +x ./tracetest
           ./tracetest configure -g --endpoint http://localhost:11633 --analytics=false
           ./tracetest test run -d examples/${{ matrix.example_dir }}/tests/list-tests.yaml --wait-for-result
 
@@ -308,6 +309,7 @@ jobs:
 
       - name: Run integration tests
         run: |
+          chmod +x ./tracetest
           cd tracetesting
           TRACETEST_CLI="/tmp/tracetest-main/cli/dist/tracetest" \
           TARGET_URL="http://tracetest-pr-${{ github.event.pull_request.number }}.tracetest-pr-${{ github.event.pull_request.number }}:11633" \
