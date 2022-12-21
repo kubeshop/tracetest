@@ -150,9 +150,9 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: tracetest-go
-      - uses: actions/download-artifact@v3
-        with:
-          name: tracetest-web
+      # - uses: actions/download-artifact@v3
+      #   with:
+      #     name: tracetest-web
       - name: Display structure of downloaded files
         run: ls -R
       - run: find . -not -path '*/\.*' | grep -v "node_modules"
