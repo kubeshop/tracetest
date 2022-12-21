@@ -5,20 +5,20 @@ on:
       - opened
       - reopened
       - synchronize
-    # paths:
-    #   - .github/workflows/pull-request.yaml
-    #   - api/**
-    #   - cli/**
-    #   - examples/**
-    #   - server/**
-    #   - tracetesting/**
-    #   - web/**
-    #   - Dockerfile
-    #   - k8s/**
+    paths:
+      - .github/workflows/pull-request.yaml
+      - api/**
+      - cli/**
+      - examples/**
+      - server/**
+      - tracetesting/**
+      - web/**
+      - Dockerfile
+      - k8s/**
 
 jobs:
   test-cli:
-    name: Run CLI unit tests 2
+    name: Run CLI unit tests
     runs-on: ubuntu-latest
 
     steps:
@@ -49,30 +49,30 @@ jobs:
       - name: Run unit tests
         run: cd server; make test
 
-  # test-web:
-  #   name: Run frontend unit tests
-  #   runs-on: ubuntu-latest
+  test-web:
+    name: Run frontend unit tests
+    runs-on: ubuntu-latest
 
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v3
-  #     - name: Setup node
-  #       uses: actions/setup-node@v3
-  #       with:
-  #         node-version: 16
-  #         cache: npm
-  #         cache-dependency-path: web/package-lock.json
-  #     - name: Cache dependencies
-  #       uses: actions/cache@v3
-  #       with:
-  #         path: |
-  #           web/node_modules
-  #           /home/runner/.cache/Cypress
-  #         key: npm--${{ hashFiles('web/package-lock.json') }}
-  #         restore-keys: npm-
-  #     - run: cd web; npm ci
-  #     - run: cd web; npm run lint
-  #     - run: cd web; npm test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            web/node_modules
+            /home/runner/.cache/Cypress
+          key: npm--${{ hashFiles('web/package-lock.json') }}
+          restore-keys: npm-
+      - run: cd web; npm ci
+      - run: cd web; npm run lint
+      - run: cd web; npm test
 
   build-go:
     needs: [test-cli, test-server]
