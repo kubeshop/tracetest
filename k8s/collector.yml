@@ -32,7 +32,7 @@ data:
         traces:
           receivers: [otlp]
           processors: [probabilistic_sampler, batch]
-          exporters: [jaeger, otlphttp]
+          exporters: [jaeger]
 ---
 
 apiVersion: apps/v1
