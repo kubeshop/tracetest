@@ -2,6 +2,7 @@ export interface IUserPreferences {
   lang: string;
   environmentId: string;
   initConfigSetup: boolean;
+  initConfigSetupFromTest: boolean;
   isOnboardingComplete: boolean;
 }
 
