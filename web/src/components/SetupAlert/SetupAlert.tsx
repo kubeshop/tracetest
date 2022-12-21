@@ -15,7 +15,7 @@ const SetupAlert = () => {
           <Link to="/settings">
             <S.WarningButton>Setup</S.WarningButton>
           </Link>
-          <Button color="primary" onClick={skipConfigSetupFromTest}>
+          <Button data-cy="dataStores-test-skip-cta" color="primary" onClick={skipConfigSetupFromTest}>
             Later
           </Button>
         </S.Message>
