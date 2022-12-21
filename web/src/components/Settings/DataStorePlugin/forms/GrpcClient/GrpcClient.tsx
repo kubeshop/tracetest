@@ -1,7 +1,6 @@
 import {Checkbox, Col, Form, Input, Row, Select, Space, Switch} from 'antd';
 import {useState} from 'react';
 
-import RequestDetailsAuthInput from 'components/CreateTestPlugins/Rest/steps/RequestDetails/RequestDetailsAuthInput/RequestDetailsAuthInput';
 import RequestDetailsHeadersInput from 'components/CreateTestPlugins/Rest/steps/RequestDetails/RequestDetailsHeadersInput';
 import {TDraftDataStore} from 'types/Config.types';
 import * as S from './GrcpClient.styled';
@@ -79,9 +78,6 @@ const GrpcClient = () => {
       </Row>
 
       <Row gutter={[16, 16]}>
-        <Col span={12}>
-          <RequestDetailsAuthInput hasBaseApikeyFields name={[...baseName, 'auth']} />
-        </Col>
         <Col span={12}>
           <RequestDetailsHeadersInput initialValue={HEADER_DEFAULT_VALUES} name={[...baseName, 'rawHeaders']} />
         </Col>
