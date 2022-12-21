@@ -14,8 +14,6 @@ services:
         depends_on:
             postgres:
                 condition: service_healthy
-            otel-collector:
-                condition: service_started
         healthcheck:
             test: ["CMD", "wget", "--spider", "localhost:11633"]
             interval: 1s
