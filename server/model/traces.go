@@ -88,23 +88,35 @@ func (t *Trace) Sort() Trace {
 	return trace
 }
 
-func (t *Trace) InsertRootSpan(span *Span) *Trace {
-	if len(t.Flat) > 0 {
-		span.Children = append(span.Children, &t.RootSpan)
-	}
+const TriggerSpanName = "Tracetest trigger"
 
-	t.RootSpan.Parent = span
-	sortedRoot := sortSpanChildren(*span)
+func (t *Trace) HasRootSpan() bool {
+	return t.RootSpan.Name == TriggerSpanName
+}
+
+func (t *Trace) InsertRootSpan(newRoot Span) *Trace {
+	if !t.RootSpan.IsZero() {
+		newRoot = replaceRoot(t.RootSpan, newRoot)
+	}
 
 	trace := Trace{
 		ID:       t.ID,
-		RootSpan: sortedRoot,
-		Flat:     make(map[trace.SpanID]*Span, 0),
+		RootSpan: newRoot,
 	}
 
-	flattenSpans(trace.Flat, sortedRoot)
+	sorted := trace.Sort()
 
-	return &trace
+	return &sorted
+}
+
+func replaceRoot(oldRoot, newRoot Span) Span {
+	if oldRoot.Attributes == nil {
+		oldRoot.Attributes = make(Attributes)
+	}
+	oldRoot.Attributes["parent_id"] = newRoot.ID.String()
+	newRoot.Children = append(newRoot.Children, &oldRoot)
+
+	return newRoot
 }
 
 func (t *Trace) Spans() []Span {

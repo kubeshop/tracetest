@@ -8,6 +8,7 @@ import (
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/openapi"
 	"go.opentelemetry.io/collector/config/configgrpc"
+	"golang.org/x/exp/slices"
 )
 
 type (
@@ -28,42 +29,60 @@ type (
 	}
 )
 
-func (e DataStore) Slug() string {
-	return strings.ToLower(strings.ReplaceAll(strings.TrimSpace(e.Name), " ", "-"))
+func (ds DataStore) IsZero() bool {
+	return ds.Type == ""
 }
 
-func (e DataStore) Config() (config.TracingBackendDataStoreConfig, error) {
-	switch e.Type {
-	case openapi.JAEGER:
-		return config.TracingBackendDataStoreConfig{
-			Type:   "jaeger",
-			Jaeger: *e.Values.Jaeger,
-		}, nil
+func (ds DataStore) Slug() string {
+	return strings.ToLower(strings.ReplaceAll(strings.TrimSpace(ds.Name), " ", "-"))
+}
 
-	case openapi.OPEN_SEARCH:
-		return config.TracingBackendDataStoreConfig{
-			Type:       "opensearch",
-			OpenSearch: *e.Values.OpenSearch,
-		}, nil
+var validTypes = []openapi.SupportedDataStores{
+	openapi.JAEGER,
+	openapi.OPEN_SEARCH,
+	openapi.TEMPO,
+	openapi.SIGNAL_FX,
+	openapi.OTLP,
+}
 
-	case openapi.OTLP:
-		return config.TracingBackendDataStoreConfig{
-			Type: "otlp",
-		}, nil
+func (ds DataStore) Validate() error {
+	if !slices.Contains(validTypes, ds.Type) {
+		return fmt.Errorf("unsupported data store")
+	}
 
-	case openapi.SIGNAL_FX:
-		return config.TracingBackendDataStoreConfig{
-			Type:     "signalfx",
-			SignalFX: *e.Values.SignalFx,
-		}, nil
+	return nil
+}
 
-	case openapi.TEMPO:
-		return config.TracingBackendDataStoreConfig{
-			Type:  "tempo",
-			Tempo: *e.Values.Tempo,
-		}, nil
+const (
+	jaeger     string = "jaeger"
+	tempo      string = "tempo"
+	opensearch string = "opensearch"
+	signalfx   string = "signalfx"
+	otlp       string = "otlp"
+)
 
-	default:
-		return config.TracingBackendDataStoreConfig{}, fmt.Errorf("unsupported data store")
+func DataStoreFromConfig(dsc config.TracingBackendDataStoreConfig) DataStore {
+	var cType openapi.SupportedDataStores
+	switch dsc.Type {
+	case jaeger:
+		cType = openapi.JAEGER
+	case tempo:
+		cType = openapi.TEMPO
+	case opensearch:
+		cType = openapi.OPEN_SEARCH
+	case signalfx:
+		cType = openapi.SIGNAL_FX
+	case otlp:
+		cType = openapi.OTLP
+	}
+
+	return DataStore{
+		Type: cType,
+		Values: DataStoreValues{
+			Jaeger:     &dsc.Jaeger,
+			Tempo:      &dsc.Tempo,
+			OpenSearch: &dsc.OpenSearch,
+			SignalFx:   &dsc.SignalFX,
+		},
 	}
 }

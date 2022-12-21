@@ -9,6 +9,7 @@ import (
 )
 
 type OTLPTraceDB struct {
+	realTraceDB
 	db model.RunRepository
 }
 
@@ -16,6 +17,10 @@ func newCollectorDB(repository model.RunRepository) (TraceDB, error) {
 	return &OTLPTraceDB{
 		db: repository,
 	}, nil
+}
+
+func (tdb *OTLPTraceDB) Ready() bool {
+	return true
 }
 
 func (tdb *OTLPTraceDB) Connect(ctx context.Context) error {

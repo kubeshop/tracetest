@@ -27,9 +27,10 @@ import (
 var IDGen = id.NewRandGenerator()
 
 type controller struct {
-	testDB  model.Repository
-	runner  runner
-	mappers mappings.Mappings
+	testDB       model.Repository
+	runner       runner
+	newTraceDBFn func(ds model.DataStore) (tracedb.TraceDB, error)
+	mappers      mappings.Mappings
 }
 
 type runner interface {
@@ -40,13 +41,15 @@ type runner interface {
 
 func NewController(
 	testDB model.Repository,
+	newTraceDBFn func(ds model.DataStore) (tracedb.TraceDB, error),
 	runner runner,
 	mappers mappings.Mappings,
 ) openapi.ApiApiServicer {
 	return &controller{
-		testDB:  testDB,
-		runner:  runner,
-		mappers: mappers,
+		testDB:       testDB,
+		runner:       runner,
+		newTraceDBFn: newTraceDBFn,
+		mappers:      mappers,
 	}
 }
 
@@ -1199,18 +1202,18 @@ func (c *controller) UpdateDataStore(ctx context.Context, dataStoreId string, in
 
 // TestConnection implements openapi.ApiApiServicer
 func (c *controller) TestConnection(ctx context.Context, dataStore openapi.DataStore) (openapi.ImplResponse, error) {
-	dataStoreModel := c.mappers.In.DataStore(dataStore)
-	dataStoreConfig, err := dataStoreModel.Config()
+	ds := c.mappers.In.DataStore(dataStore)
+
+	if err := ds.Validate(); err != nil {
+		return openapi.Response(http.StatusBadRequest, err.Error()), err
+	}
+
+	tdb, err := c.newTraceDBFn(ds)
 	if err != nil {
 		return openapi.Response(http.StatusBadRequest, err.Error()), err
 	}
 
-	selectedTraceDB, err := tracedb.NewFromDataStoreConfig(&dataStoreConfig, c.testDB)
-	if err != nil {
-		return openapi.Response(http.StatusBadRequest, err.Error()), err
-	}
-
-	testResult := selectedTraceDB.TestConnection(ctx)
+	testResult := tdb.TestConnection(ctx)
 	statusCode := http.StatusOK
 	if !testResult.HasSucceed() {
 		statusCode = http.StatusUnprocessableEntity

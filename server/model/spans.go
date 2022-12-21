@@ -58,6 +58,10 @@ type encodedSpan struct {
 	Children   []encodedSpan
 }
 
+func (s Span) IsZero() bool {
+	return !s.ID.IsValid()
+}
+
 func (s Span) MarshalJSON() ([]byte, error) {
 	enc := encodeSpan(s)
 	return json.Marshal(&enc)
@@ -171,9 +175,7 @@ func (span Span) setMetadataAttributes() Span {
 	return span
 }
 
-func (span Span) setTriggerResultAttributes(run *Run) Span {
-	result := run.TriggerResult
-
+func (span Span) setTriggerResultAttributes(result TriggerResult) Span {
 	switch result.Type {
 	case TriggerTypeHTTP:
 		resp := result.HTTP
@@ -192,17 +194,19 @@ func (span Span) setTriggerResultAttributes(run *Run) Span {
 	return span
 }
 
-func NewTracetestRootSpan(run *Run) Span {
-	span := Span{
+func AugmentRootSpan(span Span, result TriggerResult) Span {
+	return span.
+		setMetadataAttributes().
+		setTriggerResultAttributes(result)
+}
+
+func NewTracetestRootSpan(run Run) Span {
+	return AugmentRootSpan(Span{
 		ID:         IDGen.SpanID(),
-		Name:       "Tracetest trigger",
+		Name:       TriggerSpanName,
 		StartTime:  run.CreatedAt,
 		EndTime:    run.ServiceTriggerCompletedAt,
 		Attributes: Attributes{},
 		Children:   []*Span{},
-	}
-
-	span = span.setMetadataAttributes()
-
-	return span.setTriggerResultAttributes(run)
+	}, run.TriggerResult)
 }

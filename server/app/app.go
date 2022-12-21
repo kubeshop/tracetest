@@ -83,15 +83,6 @@ func (a *App) Start() error {
 		log.Fatal(err)
 	}
 
-	traceDB, err := tracedb.New(a.config.Config, testDB)
-	if err != nil {
-		log.Fatal(err)
-	}
-	a.registerStopFn(func() {
-		fmt.Println("stopping traceDB")
-		traceDB.Close()
-	})
-
 	tracer, err := tracing.NewTracer(ctx, a.config.Config)
 	if err != nil {
 		log.Fatal(err)
@@ -128,7 +119,6 @@ func (a *App) Start() error {
 	rf := newRunnerFacades(
 		a.config.Config,
 		testDB,
-		traceDB,
 		applicationTracer,
 		tracer,
 		subscriptionManager,
@@ -192,7 +182,6 @@ func (a *App) Start() error {
 func newRunnerFacades(
 	conf config.Config,
 	testDB model.Repository,
-	traceDB tracedb.TraceDB,
 	appTracer trace.Tracer,
 	tracer trace.Tracer,
 	subscriptionManager *subscription.Manager,
@@ -209,7 +198,23 @@ func newRunnerFacades(
 		subscriptionManager,
 	)
 
-	pollerExecutor := executor.NewPollerExecutor(conf, tracer, execTestUpdater, traceDB)
+	fallbackDS := model.DataStore{}
+	dsc, err := conf.DataStore()
+	if err == nil && dsc != nil {
+		fallbackDS = model.DataStoreFromConfig(*dsc)
+		if err := fallbackDS.Validate(); err != nil {
+			panic(err)
+		}
+	}
+
+	pollerExecutor := executor.NewPollerExecutor(
+		conf.PoolingRetryDelay(),
+		conf.MaxWaitTimeForTraceDuration(),
+		tracer,
+		execTestUpdater,
+		tracedb.WithFallback(tracedb.Factory(testDB), fallbackDS),
+		testDB,
+	)
 
 	tracePoller := executor.NewTracePoller(
 		pollerExecutor,
@@ -218,7 +223,6 @@ func newRunnerFacades(
 		conf.PoolingRetryDelay(),
 		conf.MaxWaitTimeForTraceDuration(),
 		subscriptionManager,
-		conf.IsDataStoreConfigured(),
 	)
 
 	runner := executor.NewPersistentRunner(
@@ -297,7 +301,7 @@ func httpRouter(
 	rf *runnerFacade,
 	mappers mappings.Mappings,
 ) openapi.Router {
-	controller := httpServer.NewController(testDB, rf, mappers)
+	controller := httpServer.NewController(testDB, tracedb.Factory(testDB), rf, mappers)
 	apiApiController := openapi.NewApiApiController(controller)
 	customController := httpServer.NewCustomController(controller, apiApiController, openapi.DefaultErrorHandler, tracer)
 	httpRouter := customController

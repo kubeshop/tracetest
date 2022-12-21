@@ -19,6 +19,7 @@ import (
 )
 
 type jaegerTraceDB struct {
+	realTraceDB
 	config *configgrpc.GRPCClientSettings
 	conn   *grpc.ClientConn
 	query  pb.QueryServiceClient
@@ -114,7 +115,15 @@ func (jtd *jaegerTraceDB) TestConnection(ctx context.Context) ConnectionTestResu
 	}
 }
 
+func (jtd *jaegerTraceDB) Ready() bool {
+	return jtd.query != nil
+}
+
 func (jtd *jaegerTraceDB) GetTraceByID(ctx context.Context, traceID string) (model.Trace, error) {
+	if !jtd.Ready() {
+		return model.Trace{}, fmt.Errorf("Jaeger dataStore not ready")
+	}
+
 	stream, err := jtd.query.GetTrace(ctx, &pb.GetTraceRequest{
 		TraceId: traceID,
 	})
