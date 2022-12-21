@@ -53,11 +53,13 @@ func configureBackend(conf configuration, ui cliUI.UI) configuration {
 		case "docker-compose":
 			conf.set("tracetest.backend.type", "otlp")
 			conf.set("tracetest.backend.tls.insecure", true)
-			conf.set("tracetest.backend.endpoint.collector", "tracetest:21321")
+			conf.set("tracetest.backend.endpoint.collector", "otel-collector:21321")
+			conf.set("tracetest.backend.endpoint", "tracetest:21321")
 		case "kubernetes":
 			conf.set("tracetest.backend.type", "otlp")
 			conf.set("tracetest.backend.tls.insecure", true)
-			conf.set("tracetest.backend.endpoint.collector", "tracetest:21321")
+			conf.set("tracetest.backend.endpoint.collector", "otel-collector.tracetest:4317")
+			conf.set("tracetest.backend.endpoint", "tracetest:21321")
 
 		default:
 			conf.set("tracetest.backend.type", "")

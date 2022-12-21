@@ -3,7 +3,6 @@ package installer
 import (
 	"encoding/csv"
 	"fmt"
-	"log"
 	"os"
 	"path"
 	"regexp"
@@ -128,15 +127,11 @@ func installOtelCollector(conf configuration, ui cliUI.UI) {
 	cc := createTmpFile("collector-config", string(getCollectorConfigFileContents(ui, conf)), ui)
 	defer os.Remove(cc.Name())
 
-	log.Println(">>>>content", string(getCollectorConfigFileContents(ui, conf)))
-
 	cmdString := kubectlNamespaceCmd(conf,
 		"create configmap collector-config --from-file="+cc.Name()+" -o yaml --dry-run=client",
 		"| sed 's#"+path.Base(cc.Name())+"#collector.yaml#' |",
 		kubectlNamespaceCmd(conf, "replace -f -"),
 	)
-
-	log.Println("cmdString", cmdString)
 
 	execCmd(
 		cmdString,
@@ -224,17 +219,6 @@ func createTmpFile(name, contents string, ui cliUI.UI) *os.File {
 	}
 
 	return f
-}
-
-func crdExists(config configuration, crd string) bool {
-	cmd := fmt.Sprintf(
-		"%s > /dev/null 2>&1; echo $?",
-		kubectlCmd(config, "get crd "+crd),
-	)
-	out := getCmdOutputClean(cmd)
-
-	// if output is 0, it means the CRD exists
-	return out == "0"
 }
 
 func kubectlNamespaceCmd(config configuration, cmd ...string) string {

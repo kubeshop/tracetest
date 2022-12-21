@@ -176,7 +176,7 @@ func getCollectorConfigFileContents(ui cliUI.UI, config configuration) []byte {
 	exporter := "otlp/1"
 	exporters := msa{
 		"otlp/1": msa{
-			"endpoint": config.String("tracetest.backend.endpoint.collector"),
+			"endpoint": config.String("tracetest.backend.endpoint"),
 			"tls": msa{
 				"insecure": config.Bool("tracetest.backend.tls.insecure"),
 			},
@@ -252,7 +252,7 @@ func replaceService(project *types.Project, service string, sc types.ServiceConf
 
 func getFileContentsForVersion(path, version string) ([]byte, error) {
 	if version == "dev" {
-		version = "main"
+		version = "1630-in-app-config-installer-changes"
 	}
 	url := fmt.Sprintf("https://raw.githubusercontent.com/kubeshop/tracetest/%s/%s", version, path)
 	resp, err := http.Get(url)
