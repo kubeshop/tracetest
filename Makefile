@@ -1,15 +1,24 @@
-PROJECT_ROOT=${PWD}
+build: build-docker
 
-OPENAPI_GENERATOR_VER=v5.4.0
-OPENAPI_GENERATOR_IMAGE=openapitools/openapi-generator-cli:$(OPENAPI_GENERATOR_VER)
-OPENAPI_GENERATOR_CLI=docker run --rm -u ${shell id -u}  -v "$(PROJECT_ROOT):/local" -w "/local" ${OPENAPI_GENERATOR_IMAGE}
-OPENAPI_TARGET_DIR=openapi/
+build-web:
+	cd web; npm ci; npm run build
+
+build-go:
+	goreleaser build --single-target --rm-dist --snapshot
+
+build-docker: build-web build-go
+	docker build . -t kubeshop/tracetest
 
 generate: generate-server generate-cli generate-web
 
 generate-web:
 	cd web; npm run types:generate
 
+PROJECT_ROOT=${PWD}
+OPENAPI_GENERATOR_VER=v5.4.0
+OPENAPI_GENERATOR_IMAGE=openapitools/openapi-generator-cli:$(OPENAPI_GENERATOR_VER)
+OPENAPI_GENERATOR_CLI=docker run --rm -u ${shell id -u}  -v "$(PROJECT_ROOT):/local" -w "/local" ${OPENAPI_GENERATOR_IMAGE}
+OPENAPI_TARGET_DIR=openapi/
 generate-cli:
 	$(eval BASE := ./cli)
 	mkdir -p $(BASE)/tmp

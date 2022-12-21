@@ -1,6 +1,5 @@
 .github/
 .vscode/
-cli/dist/
 cypress-videos/
 demo/
 docs/
@@ -21,4 +20,4 @@ LICENCE
 Makefile
 openapitools.json
 README.md
-run.sh
+run.shdist
