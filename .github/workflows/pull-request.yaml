@@ -241,8 +241,8 @@ jobs:
 
       - name: Run integration tests
         run: |
-          cd web/
           ./scripts/wait-for-port.sh 3000
+          cd web/
           npm run cy:ci
         env:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
