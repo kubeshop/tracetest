@@ -87,7 +87,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: tracetest-go
-        path: dist/*
+        path: dist/
 
   build-web:
     needs: [test-web]
@@ -108,7 +108,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: tracetest-web
-          path: web/build/*
+          path: web/build/
 
   # build-docker:
   #   name: "Build Image"
