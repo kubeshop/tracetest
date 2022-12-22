@@ -89,6 +89,10 @@ jobs:
           args: release --rm-dist --split --nightly
         env:
           GOOS: ${{ matrix.GOOS }}
+          VERSION: ${{ env.sha_short }}
+          TRACETEST_ENV: main
+          ANALYTICS_FE_KEY: ${{ secrets.ANALYTICS_FE_KEY }}
+          ANALYTICS_BE_KEY: ${{ secrets.ANALYTICS_BE_KEY }}
 
   release:
     runs-on: ubuntu-latest
@@ -145,6 +149,11 @@ jobs:
           distribution: goreleaser-pro
           version: latest
           args: continue --merge
+        env:
+          VERSION: ${{ env.sha_short }}
+          TRACETEST_ENV: main
+          ANALYTICS_FE_KEY: ${{ secrets.ANALYTICS_FE_KEY }}
+          ANALYTICS_BE_KEY: ${{ secrets.ANALYTICS_BE_KEY }}
 
   deploy-beta:
     if: github.event_name == 'push'
