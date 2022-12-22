@@ -146,7 +146,7 @@ jobs:
 
   build-docker:
     runs-on: ubuntu-latest
-    needs: [build-web]
+    needs: [build-web, build-go]
     env:
       DOCKER_CLI_EXPERIMENTAL: "enabled"
       GORELEASER_KEY: ${{ secrets.GORELEASER_LICENSE }}
