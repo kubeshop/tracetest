@@ -148,7 +148,7 @@ jobs:
         with:
           distribution: goreleaser-pro
           version: latest
-          args: release --rm-dist --skip-announce -f .goreleaser.dev.yaml
+          args: release --rm-dist --skip-announce --snapshot -f .goreleaser.dev.yaml
         env:
           VERSION: pr-${{ github.event.pull_request.number }}
           TRACETEST_ENV: pr
