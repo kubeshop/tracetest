@@ -101,7 +101,17 @@ func (a applyDataStoreAction) createDataStore(ctx context.Context, file file.Fil
 func (a applyDataStoreAction) updateDataStore(ctx context.Context, file file.File, dataStore openapi.DataStore) error {
 	req := a.client.ApiApi.UpdateDataStore(ctx, *dataStore.Id)
 	req = req.DataStore(dataStore)
-	_, err := a.client.ApiApi.UpdateDataStoreExecute(req)
+	resp, err := a.client.ApiApi.UpdateDataStoreExecute(req)
+	if resp.StatusCode == http.StatusUnprocessableEntity {
+		// validation error
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return err
+		}
+
+		validationError := string(body)
+		return fmt.Errorf("invalid data store: %s", validationError)
+	}
 	if err != nil {
 		return fmt.Errorf("could not update data store: %w", err)
 	}
