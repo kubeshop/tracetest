@@ -1,4 +1,4 @@
-name: Deploy main
+name: Deploy main 2
 
 concurrency:
   group: "deploy-main"
