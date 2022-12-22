@@ -162,7 +162,7 @@ jobs:
 
   helm_chart_version_bump:
       name: "Trigger Helm chart appVersion update"
-      needs: "release-server"
+      needs: "release"
       runs-on: ubuntu-latest
       steps:
       - name: Checkout
