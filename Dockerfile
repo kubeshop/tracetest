@@ -4,6 +4,8 @@ RUN apk add dbus
 
 WORKDIR /app
 
+RUN ls -la
+
 COPY ./tracetest-server /app/tracetest-server
 COPY ./tracetest /app/tracetest
 
