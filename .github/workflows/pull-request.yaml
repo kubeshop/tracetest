@@ -164,60 +164,125 @@ jobs:
           tags: kubeshop/tracetest:pr-${{ github.event.pull_request.number }}
           push: true
 
-  # test-examples:
-  #   needs:  [build-docker]
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       example_dir: [collector, tracetest-jaeger, tracetest-opensearch, tracetest-tempo, tracetest-no-tracing]
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v3
-  #     - name: Setup go
-  #       uses: actions/setup-go@v3
-  #       with:
-  #         go-version: '^1.18'
-  #     - name: Build example
-  #       run: |
-  #         cd examples/${{ matrix.example_dir }}
-  #         TAG=pr-${{ github.event.pull_request.number }} docker-compose up -d
-  #     - name: Build CLI
-  #       run: |
-  #         cd cli
-  #         make build
-  #         ./dist/tracetest configure -g --endpoint http://localhost:11633 --analytics=false
-  #     - name: Run example test
-  #       run: |
-  #         ./scripts/wait-for-port.sh 11633
-  #         ./cli/dist/tracetest test run -d examples/${{ matrix.example_dir }}/tests/list-tests.yaml --wait-for-result
+  test-examples:
+    needs:  [build-docker]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        example_dir:
+          - collector
+          - tracetest-jaeger
+          - tracetest-opensearch
+          - tracetest-tempo
+          - tracetest-no-tracing
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: tracetest-go
+          path: dist/
+      - name: Build example
+        run: |
+          cd examples/${{ matrix.example_dir }}
+          TAG=pr-${{ github.event.pull_request.number }} docker-compose up -d
+      - name: Run example test
+        run: |
+          mv ./dist/$(uname | tr '[:upper:]' '[:lower:]')_$(uname -m)/tracetest ./dist/tracetest
+          chmod +x ./dist/tracetest
 
-  # deploy:
-  #   needs:  [unit-test-frontend, unit-test-backend, unit-test-cli, build-docker]
-  #   name: Deploy
-  #   runs-on: ubuntu-latest
+          ./scripts/wait-for-port.sh 11633
 
-  #   steps:
-  #   - name: Checkout
-  #     uses: actions/checkout@v3
+          ./dist/tracetest configure -g --endpoint http://localhost:11633 --analytics=false
+          ./dist/tracetest test run -d examples/${{ matrix.example_dir }}/tests/list-tests.yaml --wait-for-result
 
-  #   - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
-  #     with:
-  #       service_account_key: ${{ secrets.GKE_SA_KEY }}
-  #       project_id: ${{ secrets.GKE_PROJECT }}
+  deploy:
+    name: Deploy
+    needs:  [build-docker]
+    runs-on: ubuntu-latest
 
-  #   - uses: google-github-actions/get-gke-credentials@fb08709ba27618c31c09e014e1d8364b02e5042e
-  #     with:
-  #       cluster_name: ${{ secrets.GKE_CLUSTER }}
-  #       location: ${{ secrets.GKE_ZONE }}
-  #       credentials: ${{ secrets.GKE_SA_KEY }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
 
-  #   - name: Deploy
-  #     run: |
-  #       TAG=pr-${{ github.event.pull_request.number }} \
-  #       NAME=tracetest-$TAG \
-  #       CONFIG_FILE=./k8s/tracetest.beta.yaml \
-  #       ./k8s/deploy.sh
+    - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
+      with:
+        service_account_key: ${{ secrets.GKE_SA_KEY }}
+        project_id: ${{ secrets.GKE_PROJECT }}
+
+    - uses: google-github-actions/get-gke-credentials@fb08709ba27618c31c09e014e1d8364b02e5042e
+      with:
+        cluster_name: ${{ secrets.GKE_CLUSTER }}
+        location: ${{ secrets.GKE_ZONE }}
+        credentials: ${{ secrets.GKE_SA_KEY }}
+
+    - name: Deploy
+      run: |
+        TAG=pr-${{ github.event.pull_request.number }} \
+        NAME=tracetest-$TAG \
+        CONFIG_FILE=./k8s/tracetest.beta.yaml \
+        ./k8s/deploy.sh
+
+  trace-testing:
+    needs: [deploy]
+    name: Run trace testing using tracetest
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: tracetest-go
+          path: dist/
+      # - name: Setup go
+      #   uses: actions/setup-go@v3
+      #   with:
+      #     go-version: '^1.18'
+      - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
+        with:
+          service_account_key: ${{ secrets.GKE_SA_KEY }}
+          project_id: ${{ secrets.GKE_PROJECT }}
+
+      - uses: google-github-actions/get-gke-credentials@fb08709ba27618c31c09e014e1d8364b02e5042e
+        with:
+          cluster_name: ${{ secrets.GKE_CLUSTER }}
+          location: ${{ secrets.GKE_ZONE }}
+          credentials: ${{ secrets.GKE_SA_KEY }}
+
+      - name: Setup Current CLI
+        run: |
+          mv ./dist/$(uname | tr '[:upper:]' '[:lower:]')_$(uname -m)/tracetest ./dist/tracetest
+          chmod +x ./dist/tracetest
+
+      - name: Install CLI intergation version (latest main)
+        run: |
+          git clone --depth 1 https://github.com/kubeshop/tracetest /tmp/tracetest-main
+          cd /tmp/tracetest-main/cli
+          make build-go
+          mv ./dist/$(uname | tr '[:upper:]' '[:lower:]')_$(uname -m)/tracetest ./dist/tracetest
+          chmod +x ./dist/tracetest
+      - name: Forward port
+        run: |
+          kubectl port-forward \
+            --namespace tracetest-integration \
+            svc/tracetest-integration 11633 &
+          kubectl port-forward \
+            --namespace tracetest-pr-${{ github.event.pull_request.number }} \
+            svc/tracetest-pr-${{ github.event.pull_request.number }} 11634:11633 &
+
+          ./scripts/wait-for-port.sh 11633
+          ./scripts/wait-for-port.sh 11634
+
+
+      - name: Run integration tests
+        run: |
+          cd tracetesting
+          TRACETEST_CLI_MAIN="/tmp/tracetest-main/dist/tracetest" \
+          TRACETEST_CLI_TARGET="../dist/tracetest" \
+          TARGET_URL="http://tracetest-pr-${{ github.event.pull_request.number }}.tracetest-pr-${{ github.event.pull_request.number }}:11633" \
+          ./run.bash
 
   # e2e:
   #   needs: [deploy, trace-testing]
@@ -280,60 +345,6 @@ jobs:
   #         npm run cy:ci
   #       env:
   #         CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
-
-  # trace-testing:
-  #   needs: deploy
-  #   name: Run trace testing using tracetest
-  #   runs-on: ubuntu-latest
-
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v3
-  #     - name: Setup go
-  #       uses: actions/setup-go@v3
-  #       with:
-  #         go-version: '^1.18'
-  #     - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
-  #       with:
-  #         service_account_key: ${{ secrets.GKE_SA_KEY }}
-  #         project_id: ${{ secrets.GKE_PROJECT }}
-
-  #     - uses: google-github-actions/get-gke-credentials@fb08709ba27618c31c09e014e1d8364b02e5042e
-  #       with:
-  #         cluster_name: ${{ secrets.GKE_CLUSTER }}
-  #         location: ${{ secrets.GKE_ZONE }}
-  #         credentials: ${{ secrets.GKE_SA_KEY }}
-
-  #     - name: Build Current CLI
-  #       run: |
-  #         cd cli
-  #         go build -o ./tracetest main.go
-
-  #     - name: Install CLI intergation version (latest main)
-  #       run: |
-  #         git clone --depth 1 https://github.com/kubeshop/tracetest /tmp/tracetest-main
-  #         cd /tmp/tracetest-main/cli
-  #         make build
-  #     - name: Forward port
-  #       run: |
-  #         kubectl port-forward \
-  #           --namespace tracetest-integration \
-  #           svc/tracetest-integration 11633 &
-  #         kubectl port-forward \
-  #           --namespace tracetest-pr-${{ github.event.pull_request.number }} \
-  #           svc/tracetest-pr-${{ github.event.pull_request.number }} 11634:11633 &
-
-  #         ./scripts/wait-for-port.sh 11633
-  #         ./scripts/wait-for-port.sh 11634
-
-
-  #     - name: Run integration tests
-  #       run: |
-  #         cd tracetesting
-  #         TRACETEST_CLI_MAIN="/tmp/tracetest-main/cli/dist/tracetest" \
-  #         TRACETEST_CLI_TARGET="../cli/tracetest" \
-  #         TARGET_URL="http://tracetest-pr-${{ github.event.pull_request.number }}.tracetest-pr-${{ github.event.pull_request.number }}:11633" \
-  #         ./run.bash
 
   # cleanup:
   #   runs-on: ubuntu-latest
