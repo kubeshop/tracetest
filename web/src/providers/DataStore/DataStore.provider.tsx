@@ -10,7 +10,7 @@ import {
 import {SupportedDataStores, TConnectionResult, TDataStore, TDraftDataStore} from 'types/Config.types';
 import DataStoreService from 'services/DataStore.service';
 import ConnectionResult from 'models/ConnectionResult.model';
-import useTestConnectionNotification from './hooks/useTestConnectionNotification';
+import useDataStoreNotification from './hooks/useDataStoreNotification';
 import {useConfirmationModal} from '../ConfirmationModal/ConfirmationModal.provider';
 import {useDataStoreConfig} from '../DataStoreConfig/DataStoreConfig.provider';
 
@@ -47,15 +47,15 @@ const DataStoreProvider = ({children}: IProps) => {
   const [deleteDataStore] = useDeleteDataStoreMutation();
   const [testConnection, {isLoading: isTestConnectionLoading}] = useTestConnectionMutation();
   const [isFormValid, setIsFormValid] = useState(false);
-  const {showNotification, contextHolder} = useTestConnectionNotification();
+  const {contextHolder, showSuccessNotification, showTestConnectionNotification} = useDataStoreNotification();
   const {onOpen} = useConfirmationModal();
 
   const onSaveConfig = useCallback(
     async (draft: TDraftDataStore, defaultDataStore: TDataStore) => {
       onOpen({
-        title: 'Tracetest needs to do a quick restart to use this new configuration.',
+        title: 'Are you sure you want to save this Data Store configuration?',
         heading: 'Save Confirmation',
-        okText: 'Save & Restart',
+        okText: 'Save',
         onConfirm: async () => {
           const dataStore = await DataStoreService.getRequest(draft, defaultDataStore);
           if (dataStore.id) {
@@ -63,10 +63,11 @@ const DataStoreProvider = ({children}: IProps) => {
           } else {
             await createDataStore(dataStore).unwrap();
           }
+          showSuccessNotification();
         },
       });
     },
-    [createDataStore, onOpen, updateDataStore]
+    [createDataStore, onOpen, showSuccessNotification, updateDataStore]
   );
 
   const onDeleteConfig = useCallback(
@@ -92,17 +93,17 @@ const DataStoreProvider = ({children}: IProps) => {
       const dataStore = await DataStoreService.getRequest(draft, defaultDataStore);
 
       if (draft.dataStoreType === SupportedDataStores.OtelCollector) {
-        return showNotification(ConnectionResult({}), draft.dataStoreType);
+        return showTestConnectionNotification(ConnectionResult({}), draft.dataStoreType);
       }
 
       try {
         const result = await testConnection(dataStore!).unwrap();
-        showNotification(result, draft.dataStoreType!);
+        showTestConnectionNotification(result, draft.dataStoreType!);
       } catch (err) {
-        showNotification(err as TConnectionResult, draft.dataStoreType!);
+        showTestConnectionNotification(err as TConnectionResult, draft.dataStoreType!);
       }
     },
-    [showNotification, testConnection]
+    [showTestConnectionNotification, testConnection]
   );
 
   const value = useMemo<IContext>(

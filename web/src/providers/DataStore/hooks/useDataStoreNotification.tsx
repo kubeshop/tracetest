@@ -4,13 +4,13 @@ import {useTheme} from 'styled-components';
 import {SupportedDataStores, TConnectionResult} from 'types/Config.types';
 import TestConnectionNotification from 'components/TestConnectionNotification/TestConnectionNotification';
 
-const useTestConnectionNotification = () => {
+const useDataStoreNotification = () => {
   const [api, contextHolder] = notification.useNotification();
   const {
     notification: {success, error},
   } = useTheme();
 
-  const showNotification = useCallback(
+  const showTestConnectionNotification = useCallback(
     (result: TConnectionResult, dataStoreType: SupportedDataStores) => {
       if (dataStoreType === SupportedDataStores.OtelCollector) {
         return api.info({
@@ -40,7 +40,15 @@ const useTestConnectionNotification = () => {
     [api, error, success]
   );
 
-  return {showNotification, contextHolder};
+  const showSuccessNotification = useCallback(() => {
+    return api.success({
+      message: 'Data Store saved',
+      description: 'Your configuration was added',
+      ...success,
+    });
+  }, [api, success]);
+
+  return {contextHolder, showSuccessNotification, showTestConnectionNotification};
 };
 
-export default useTestConnectionNotification;
+export default useDataStoreNotification;
