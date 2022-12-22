@@ -23,8 +23,9 @@ env:
   - ANALYTICS_FE_KEY={{ if index .Env "ANALYTICS_FE_KEY"  }}{{ .Env.ANALYTICS_FE_KEY }}{{ else }}{{ end }}
 builds:
   - id: server
-    main: ./server/main.go
     binary: tracetest-server
+    no_unique_dist_dir: true
+    main: ./server/main.go
     ldflags:
     - -X github.com/kubeshop/tracetest/server/app.Version={{ .Env.VERSION }}
     - -X github.com/kubeshop/tracetest/server/app.Env={{ .Env.TRACETEST_ENV }}
@@ -44,8 +45,9 @@ builds:
     goarm:
     - "7"
   - id: cli
-    main: ./cli/main.go
+    no_unique_dist_dir: true
     binary: tracetest
+    main: ./cli/main.go
     ldflags:
     - -X github.com/kubeshop/tracetest/cli/config.Version={{ .Env.VERSION }}
     - -X github.com/kubeshop/tracetest/cli/config.Env={{ .Env.TRACETEST_ENV }}
