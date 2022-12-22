@@ -188,7 +188,6 @@ jobs:
       - name: Build example
         run: |
           cd examples/${{ matrix.example_dir }}
-          docker pull kubeshop/tracetest:pr-${{ github.event.pull_request.number }}
           TAG=pr-${{ github.event.pull_request.number }} docker-compose up > /tmp/docker-log &
       - name: Run example test
         run: |
