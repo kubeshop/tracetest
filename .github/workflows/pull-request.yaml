@@ -119,7 +119,7 @@ jobs:
     needs: [build-web]
     env:
       DOCKER_CLI_EXPERIMENTAL: "enabled"
-      GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
+      GORELEASER_KEY: ${{ secrets.GORELEASER_LICENSE }}
     steps:
       - uses: actions/checkout@v3
         with:
