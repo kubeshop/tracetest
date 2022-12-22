@@ -196,6 +196,7 @@ jobs:
         run: |
           cd examples/${{ matrix.example_dir }}
           TAG=pr-${{ github.event.pull_request.number }} docker-compose up -d
+          docker compose logs -f > /tmp/docker-log &
       - name: Run example test
         run: |
           mv ./dist/$(cat dist/arch.txt)/tracetest ./dist/tracetest
@@ -204,7 +205,7 @@ jobs:
           ./scripts/wait-for-port.sh 11633
 
           ./dist/tracetest configure -g --endpoint http://localhost:11633 --analytics=false
-          ./dist/tracetest test run -d examples/${{ matrix.example_dir }}/tests/list-tests.yaml --wait-for-result
+          ./dist/tracetest test run -d examples/${{ matrix.example_dir }}/tests/list-tests.yaml --wait-for-result || cat /tmp/docker-log
 
   deploy:
     name: Deploy
@@ -265,6 +266,8 @@ jobs:
       - name: Setup GoReleaser
         uses: goreleaser/goreleaser-action@v4
         with:
+          # uncomment this once this pr is merged
+          # distribution: goreleaser-pro
           version: latest
           install-only: true
       - name: Install CLI intergation version (latest main)
