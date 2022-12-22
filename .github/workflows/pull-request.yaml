@@ -86,6 +86,36 @@ jobs:
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
       - run: cd web; ${{ matrix.cmd }}
 
+  build-go:
+    needs: [test-cli, test-server]
+    name: build go binaries
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup go
+      uses: actions/setup-go@v3
+      with:
+        go-version-file: 'go.work'
+        cache: true
+        cache-dependency-path: go.work
+    - name: Run GoReleaser
+      uses: goreleaser/goreleaser-action@v4
+      with:
+        distribution: goreleaser-pro
+        version: latest
+        args: build --single-target --rm-dist --snapshot
+      env:
+        VERSION: pr-${{ github.event.pull_request.number }}
+        TRACETEST_ENV: pr
+        ANALYTICS_FE_KEY: ${{ secrets.ANALYTICS_FE_KEY }}
+        ANALYTICS_BE_KEY: ${{ secrets.ANALYTICS_BE_KEY }}
+    - run: echo $(go env GOOS)_$(go env GOARCH) > dist/arch.txt
+    - name: Upload assets
+      uses: actions/upload-artifact@v3
+      with:
+        name: tracetest-go
+        path: dist/
+
   build-web:
     name: build web
     runs-on: ubuntu-latest
