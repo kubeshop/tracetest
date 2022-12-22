@@ -6,7 +6,6 @@ describe('Home', () => {
   });
 
   it('should render the list of tests', () => {
-    cy.get('[data-cy=dataStores-skip-cta]').click();
     cy.get('[data-cy=create-button]').should('be.visible');
     cy.get('[data-cy=test-list]').should('exist');
   });
