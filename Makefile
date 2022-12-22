@@ -6,11 +6,11 @@ build-web:
 build-go:
 	goreleaser build --single-target --rm-dist --snapshot
 
-build-docker: build-web
-	GOOS=linux GOARCH=${shell uname -m} build --single-target --rm-dist --snapshot
+build-docker:
+	GOOS=linux goreleaser build --single-target --rm-dist --snapshot
 
 	docker build . -t kubeshop/tracetest \
-		--build-arg OS_ARCH=${shell uname | tr '[:upper:]' '[:lower:]'}_${shell uname -m}
+		--build-arg OS_ARCH=linux_${shell uname -m}
 
 generate: generate-server generate-cli generate-web
 

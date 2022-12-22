@@ -71,6 +71,7 @@ jobs:
           key: npm--${{ hashFiles('web/package-lock.json') }}
           restore-keys: npm-
       - run: cd web; npm ci
+        if: steps.cache-nodemodules.outputs.cache-hit != 'true'
       - run: cd web; npm run lint
       - run: cd web; npm test
 
@@ -97,6 +98,7 @@ jobs:
         TRACETEST_ENV: pr
         ANALYTICS_FE_KEY: ${{ secrets.ANALYTICS_FE_KEY }}
         ANALYTICS_BE_KEY: ${{ secrets.ANALYTICS_BE_KEY }}
+    - run: echo $(go env GOOS)_$(go env GOARCH) > dist/arch.txt
     - name: Upload assets
       uses: actions/upload-artifact@v3
       with:
@@ -189,7 +191,7 @@ jobs:
           TAG=pr-${{ github.event.pull_request.number }} docker-compose up -d
       - name: Run example test
         run: |
-          mv ./dist/$(uname | tr '[:upper:]' '[:lower:]')_$(uname -m)/tracetest ./dist/tracetest
+          mv ./dist/$(cat dist/arch.txt)/tracetest ./dist/tracetest
           chmod +x ./dist/tracetest
 
           ./scripts/wait-for-port.sh 11633
@@ -253,7 +255,7 @@ jobs:
 
       - name: Setup Current CLI
         run: |
-          mv ./dist/$(uname | tr '[:upper:]' '[:lower:]')_$(uname -m)/tracetest ./dist/tracetest
+          mv ./dist/$(cat dist/arch.txt)/tracetest ./dist/tracetest
           chmod +x ./dist/tracetest
 
       - name: Install CLI intergation version (latest main)
@@ -261,7 +263,7 @@ jobs:
           git clone --depth 1 https://github.com/kubeshop/tracetest /tmp/tracetest-main
           cd /tmp/tracetest-main/cli
           make build-go
-          mv ./dist/$(uname | tr '[:upper:]' '[:lower:]')_$(uname -m)/tracetest ./dist/tracetest
+          mv ./dist/$(cat dist/arch.txt)/tracetest ./dist/tracetest
           chmod +x ./dist/tracetest
       - name: Forward port
         run: |
@@ -301,7 +303,7 @@ jobs:
   #     - name: Setup node
   #       uses: actions/setup-node@v3
   #       with:
-  #         node-version: 16.13.x
+  #         node-version: 16
   #         cache: npm
   #         cache-dependency-path: web/package-lock.json
 
@@ -324,7 +326,7 @@ jobs:
 
   #     - name: Cache dependencies
   #       id: cache-nodemodules
-  #       uses: actions/cache@v2
+  #       uses: actions/cache@v3
   #       with:
   #         path: |
   #           web/node_modules
@@ -332,11 +334,9 @@ jobs:
   #         key: npm--${{ hashFiles('web/package-lock.json') }}
   #         restore-keys: npm-
 
-  #     - name: Install test dependencies
+  #     - name: Install dependencies
   #       if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-  #       run: |
-  #         cd web/
-  #         npm ci
+  #       run: cd web/; npm ci
 
   #     - name: Run integration tests
   #       run: |
