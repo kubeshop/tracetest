@@ -258,6 +258,12 @@ jobs:
           mv ./dist/$(cat dist/arch.txt)/tracetest ./dist/tracetest
           chmod +x ./dist/tracetest
 
+      - name: Setup GoReleaser
+        uses: goreleaser/goreleaser-action@v4
+        with:
+          distribution: goreleaser-pro
+          version: latest
+          install-only: true
       - name: Install CLI intergation version (latest main)
         run: |
           git clone --depth 1 https://github.com/kubeshop/tracetest /tmp/tracetest-main
