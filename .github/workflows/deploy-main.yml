@@ -148,7 +148,7 @@ jobs:
         with:
           distribution: goreleaser-pro
           version: latest
-          args: continue --merge
+          args: continue --merge --nightly
         env:
           VERSION: ${{ env.sha_short }}
           TRACETEST_ENV: main

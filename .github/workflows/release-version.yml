@@ -124,11 +124,6 @@ jobs:
           go-version-file: 'go.work'
           cache: true
           cache-dependency-path: go.work
-        env:
-          VERSION: ${{ github.ref_name}}
-          TRACETEST_ENV: main
-          ANALYTICS_FE_KEY: ${{ secrets.ANALYTICS_FE_KEY }}
-          ANALYTICS_BE_KEY: ${{ secrets.ANALYTICS_BE_KEY }}
 
       # copy the cashes from prepare
       - shell: bash
@@ -158,6 +153,11 @@ jobs:
           distribution: goreleaser-pro
           version: latest
           args: continue --merge
+        env:
+          VERSION: ${{ github.ref_name}}
+          TRACETEST_ENV: main
+          ANALYTICS_FE_KEY: ${{ secrets.ANALYTICS_FE_KEY }}
+          ANALYTICS_BE_KEY: ${{ secrets.ANALYTICS_BE_KEY }}
 
 
   helm_chart_version_bump:
