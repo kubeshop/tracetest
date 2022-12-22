@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-if $DISABLED == 'true'; then exit 0; fi
+if "$DISABLED" == 'true'; then exit 0; fi
 
 if [ "${1: -4}" == ".deb" ] || [ "${1: -4}" == ".rpm" ]; then
 	cd dist
