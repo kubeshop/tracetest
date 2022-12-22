@@ -1,4 +1,3 @@
-
 name: Pull Request
 on:
   pull_request:
@@ -19,7 +18,7 @@ on:
 
 jobs:
   test-cli:
-    name: Run CLI unit tests
+    name: CLI unit tests
     runs-on: ubuntu-latest
 
     steps:
@@ -35,7 +34,7 @@ jobs:
         run: cd cli; make test
 
   test-server:
-    name: Run backend unit tests
+    name: server unit tests
     runs-on: ubuntu-latest
 
     steps:
@@ -51,7 +50,7 @@ jobs:
         run: cd server; make test
 
   test-web:
-    name: Run frontend unit tests
+    name: web unit tests
     runs-on: ubuntu-latest
 
     strategy:
@@ -197,7 +196,6 @@ jobs:
         run: |
           cd examples/${{ matrix.example_dir }}
           TAG=pr-${{ github.event.pull_request.number }} docker-compose up -d
-          docker compose logs -f > /tmp/docker-log &
       - name: Run example test
         run: |
           mv ./dist/$(cat dist/arch.txt)/tracetest ./dist/tracetest
@@ -206,7 +204,7 @@ jobs:
           ./scripts/wait-for-port.sh 11633
 
           ./dist/tracetest configure -g --endpoint http://localhost:11633 --analytics=false
-          ./dist/tracetest test run -d examples/${{ matrix.example_dir }}/tests/list-tests.yaml --wait-for-result || cat /tmp/docker-log
+          ./dist/tracetest test run -d examples/${{ matrix.example_dir }}/tests/list-tests.yaml --wait-for-result
 
   deploy:
     name: Deploy
@@ -304,84 +302,84 @@ jobs:
           TARGET_URL="http://tracetest-pr-${{ github.event.pull_request.number }}.tracetest-pr-${{ github.event.pull_request.number }}:11633" \
           ./run.bash
 
-  # e2e:
-  #   needs: [deploy, trace-testing]
-  #   name: Run e2e tests
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       # run copies of the current job in parallel
-  #       containers: [1, 2, 3, 4, 5, 6, 7, 8]
+  e2e:
+    needs: [deploy, trace-testing]
+    name: Run e2e tests
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # run copies of the current job in parallel
+        containers: [1, 2, 3, 4, 5, 6, 7, 8]
 
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v3
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
 
-  #     - name: Setup node
-  #       uses: actions/setup-node@v3
-  #       with:
-  #         node-version: 16
-  #         cache: npm
-  #         cache-dependency-path: web/package-lock.json
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: npm
+          cache-dependency-path: web/package-lock.json
 
-  #     - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
-  #       with:
-  #         service_account_key: ${{ secrets.GKE_SA_KEY }}
-  #         project_id: ${{ secrets.GKE_PROJECT }}
+      - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
+        with:
+          service_account_key: ${{ secrets.GKE_SA_KEY }}
+          project_id: ${{ secrets.GKE_PROJECT }}
 
-  #     - uses: google-github-actions/get-gke-credentials@fb08709ba27618c31c09e014e1d8364b02e5042e
-  #       with:
-  #         cluster_name: ${{ secrets.GKE_CLUSTER }}
-  #         location: ${{ secrets.GKE_ZONE }}
-  #         credentials: ${{ secrets.GKE_SA_KEY }}
+      - uses: google-github-actions/get-gke-credentials@fb08709ba27618c31c09e014e1d8364b02e5042e
+        with:
+          cluster_name: ${{ secrets.GKE_CLUSTER }}
+          location: ${{ secrets.GKE_ZONE }}
+          credentials: ${{ secrets.GKE_SA_KEY }}
 
-  #     - name: Forward port
-  #       run: |
-  #         kubectl port-forward \
-  #           --namespace tracetest-pr-${{ github.event.pull_request.number }} \
-  #           svc/tracetest-pr-${{ github.event.pull_request.number }} 3000:11633 &
+      - name: Forward port
+        run: |
+          kubectl port-forward \
+            --namespace tracetest-pr-${{ github.event.pull_request.number }} \
+            svc/tracetest-pr-${{ github.event.pull_request.number }} 3000:11633 &
 
-  #     - name: Cache dependencies
-  #       id: cache-nodemodules
-  #       uses: actions/cache@v3
-  #       with:
-  #         path: |
-  #           web/node_modules
-  #           /home/runner/.cache/Cypress
-  #         key: npm--${{ hashFiles('web/package-lock.json') }}
-  #         restore-keys: npm-
+      - name: Cache dependencies
+        id: cache-nodemodules
+        uses: actions/cache@v3
+        with:
+          path: |
+            web/node_modules
+            /home/runner/.cache/Cypress
+          key: npm--${{ hashFiles('web/package-lock.json') }}
+          restore-keys: npm-
 
-  #     - name: Install dependencies
-  #       if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-  #       run: cd web/; npm ci
+      - name: Install dependencies
+        if: steps.cache-nodemodules.outputs.cache-hit != 'true'
+        run: cd web/; npm ci
 
-  #     - name: Run integration tests
-  #       run: |
-  #         ./scripts/wait-for-port.sh 3000
-  #         cd web/
-  #         npm run cy:ci
-  #       env:
-  #         CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+      - name: Run integration tests
+        run: |
+          ./scripts/wait-for-port.sh 3000
+          cd web/
+          npm run cy:ci
+        env:
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
 
-  # cleanup:
-  #   runs-on: ubuntu-latest
-  #   needs: [trace-testing, e2e]
-  #   if: always()
-  #   steps:
-  #     - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
-  #       with:
-  #         service_account_key: ${{ secrets.GKE_SA_KEY }}
-  #         project_id: ${{ secrets.GKE_PROJECT }}
+  cleanup:
+    runs-on: ubuntu-latest
+    needs: [trace-testing, e2e]
+    if: always()
+    steps:
+      - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
+        with:
+          service_account_key: ${{ secrets.GKE_SA_KEY }}
+          project_id: ${{ secrets.GKE_PROJECT }}
 
-  #     - uses: google-github-actions/get-gke-credentials@fb08709ba27618c31c09e014e1d8364b02e5042e
-  #       with:
-  #         cluster_name: ${{ secrets.GKE_CLUSTER }}
-  #         location: ${{ secrets.GKE_ZONE }}
-  #         credentials: ${{ secrets.GKE_SA_KEY }}
+      - uses: google-github-actions/get-gke-credentials@fb08709ba27618c31c09e014e1d8364b02e5042e
+        with:
+          cluster_name: ${{ secrets.GKE_CLUSTER }}
+          location: ${{ secrets.GKE_ZONE }}
+          credentials: ${{ secrets.GKE_SA_KEY }}
 
-  #     - name: Uninstall tracetest
-  #       run: |
-  #         helm delete tracetest-pr-${{ github.event.pull_request.number }} \
-  #         --namespace tracetest-pr-${{ github.event.pull_request.number }}
-  #         kubectl delete ns tracetest-pr-${{ github.event.pull_request.number }}
+      - name: Uninstall tracetest
+        run: |
+          helm delete tracetest-pr-${{ github.event.pull_request.number }} \
+          --namespace tracetest-pr-${{ github.event.pull_request.number }}
+          kubectl delete ns tracetest-pr-${{ github.event.pull_request``.number }}
