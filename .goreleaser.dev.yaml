@@ -52,7 +52,7 @@ builds:
 
 dockers:
 - image_templates:
-  - 'kubeshop/tracetest:{{ .Env.VERSION }}-demo'
+  - 'kubeshop/tracetest:{{ .Env.VERSION }}'
   extra_files:
     - web/build
     - server/migrations
