@@ -116,14 +116,6 @@ jobs:
           node-version: 16
           cache: npm
           cache-dependency-path: web/package-lock.json
-      - name: Cache dependencies
-        uses: actions/cache@v3
-        with:
-          path: |
-            web/node_modules
-            /home/runner/.cache/Cypress
-          key: npm--${{ hashFiles('web/package-lock.json') }}
-          restore-keys: npm-
       - name: Cache Build
         id: cache-build
         uses: actions/cache@v3
