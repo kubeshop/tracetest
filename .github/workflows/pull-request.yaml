@@ -70,6 +70,7 @@ jobs:
           cache: npm
           cache-dependency-path: web/package-lock.json
       - name: Cache dependencies
+        id: cache-nodemodules
         uses: actions/cache@v3
         with:
           path: |
