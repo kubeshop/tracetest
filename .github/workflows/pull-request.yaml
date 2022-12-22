@@ -124,8 +124,16 @@ jobs:
             /home/runner/.cache/Cypress
           key: npm--${{ hashFiles('web/package-lock.json') }}
           restore-keys: npm-
+      - name: Cache Build
+        id: cache-build
+        uses: actions/cache@v3
+        with:
+          path: web/build/
+          key: web-build-$(git rev-list -1 HEAD web/)
       - run: cd web; npm ci
+        if: steps.cache-build.outputs.cache-hit != 'true'
       - run: cd web; CI= npm run build
+        if: steps.cache-build.outputs.cache-hit != 'true'
       - name: Upload assets
         uses: actions/upload-artifact@v3
         with:
