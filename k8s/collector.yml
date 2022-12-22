@@ -34,7 +34,6 @@ data:
           processors: [probabilistic_sampler, batch]
           exporters: [jaeger]
 ---
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -50,32 +49,31 @@ spec:
         app.kubernetes.io/name: otel-collector
     spec:
       containers:
-      - name: otelcol
-        args:
-        - --config=/conf/collector.yaml
-        image: otel/opentelemetry-collector:0.54.0
-        volumeMounts:
-        - mountPath: /conf
-          name: collector-config
+        - name: otelcol
+          args:
+            - --config=/conf/collector.yaml
+          image: otel/opentelemetry-collector-contrib:0.67.0
+          volumeMounts:
+            - mountPath: /conf
+              name: collector-config
       volumes:
-      - configMap:
-          items:
-          - key: collector.yaml
-            path: collector.yaml
+        - configMap:
+            items:
+              - key: collector.yaml
+                path: collector.yaml
+            name: collector-config
           name: collector-config
-        name: collector-config
 ---
-
 apiVersion: v1
 kind: Service
 metadata:
   name: otel-collector
 spec:
   ports:
-  - name: grpc-otlp
-    port: 4317
-    protocol: TCP
-    targetPort: 4317
+    - name: grpc-otlp
+      port: 4317
+      protocol: TCP
+      targetPort: 4317
   selector:
     app.kubernetes.io/name: otel-collector
   type: ClusterIP

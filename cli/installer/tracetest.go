@@ -12,17 +12,8 @@ import (
 )
 
 func configureDemoApp(conf configuration, ui cliUI.UI) configuration {
-	conf.set(
-		"demo.enable.pokeshop",
-		ui.Confirm("Do you want to enable the PokeShop demo app? (https://github.com/kubeshop/pokeshop/)", true),
-	)
-
+	conf.set("demo.enable.pokeshop", !conf.Bool("installer.only_tracetest"))
 	conf.set("demo.enable.otel", false)
-	// TODO: enable this
-	// conf.set(
-	// 	"demo.enable.otel",
-	// 	ui.Confirm("Do you want to enable the OpenTelemetry Community Demo app? (https://github.com/open-telemetry/opentelemetry-demo)", true),
-	// )
 
 	switch conf.String("installer") {
 	case "docker-compose":
@@ -46,107 +37,38 @@ func configureDemoApp(conf configuration, ui cliUI.UI) configuration {
 
 func configureTracetest(conf configuration, ui cliUI.UI) configuration {
 	conf = configureBackend(conf, ui)
-	conf = configureCollector(conf, ui)
+	conf.set("tracetest.analytics", true)
 
-	conf.set(
-		"tracetest.analytics",
-		ui.Confirm("Do you want to help improve tracetest by providing anonymous analytics information?", true),
-	)
-
-	return conf
-}
-func configureCollector(conf configuration, ui cliUI.UI) configuration {
-	installCollector := false
-
-	hasCollector := ui.Confirm("Do you have an OpenTelemetry Collector?", false)
-	if hasCollector {
-		conf.set("tracetest.collector.endpoint", ui.TextInput("Endpoint", "otel-collector:4317"))
-	} else {
-		if !ui.Confirm("Do you want me to set up one?", true) {
-			ui.Exit(`
-TraceTest requires OpenTelemetry Collector to work. You can rerun this installer and let me set it up for you,
-or you can set one up manually. See https://opentelemetry.io/docs/collector/
-`)
-		}
-		installCollector = true
-
-		// default values
-		conf.set("tracetest.collector.endpoint", "otel-collector:4317")
-	}
-
-	conf.set("tracetest.collector.install", installCollector)
 	return conf
 }
 
 func configureBackend(conf configuration, ui cliUI.UI) configuration {
-	installBackend := false
+	installBackend := !conf.Bool("installer.only_tracetest")
+	conf.set("tracetest.backend.install", installBackend)
 
-	hasBackend := ui.Confirm("Do you have a supported tracing backend you want to use? (Jaeger, Tempo, OpenSearch, SignalFX)", false)
-	if hasBackend {
-		conf = configureBackendOptions(conf, ui)
-	} else {
-		if !ui.Confirm("Do you want me to set up Jaeger?", true) {
-			ui.Exit(`
-TraceTest requires a supported tracing backend to work. I only know how to install Jaeger.
-If you want to use other option, check the supported backends and manually install one.
-See https://kubeshop.github.io/tracetest/supported-backends/
-			`)
-		}
-		installBackend = true
+	if installBackend {
 
 		// default values
 		switch conf.String("installer") {
 		case "docker-compose":
-			conf.set("tracetest.backend.type", "jaeger")
-			conf.set("tracetest.backend.endpoint.query", "jaeger:16685")
-			conf.set("tracetest.backend.endpoint.collector", "jaeger:14250")
-			conf.set("tracetest.backend.endpoint.agent", "jaeger")
+			conf.set("tracetest.backend.type", "otlp")
 			conf.set("tracetest.backend.tls.insecure", true)
+			conf.set("tracetest.backend.endpoint.collector", "http://otel-collector:4317")
+			conf.set("tracetest.backend.endpoint", "tracetest:21321")
 		case "kubernetes":
-			conf.set("tracetest.backend.type", "jaeger")
-			conf.set("tracetest.backend.endpoint.query", "jaeger-query:16685")
-			conf.set("tracetest.backend.endpoint.collector", "jaeger-collector:14250")
+			conf.set("tracetest.backend.type", "otlp")
 			conf.set("tracetest.backend.tls.insecure", true)
-			conf.set("tracetest.backend.endpoint.agent", "jaeger-agent."+conf.String("k8s.namespace"))
+			conf.set("tracetest.backend.endpoint.collector", "http://otel-collector.tracetest:4317")
+			conf.set("tracetest.backend.endpoint", "tracetest:21321")
+
+		default:
+			conf.set("tracetest.backend.type", "")
 		}
 
+		return conf
 	}
 
-	conf.set("tracetest.backend.install", installBackend)
-
-	return conf
-}
-
-func configureBackendOptions(conf configuration, ui cliUI.UI) configuration {
-	option := ui.Select("Which tracing backend do you want to use?", []cliUI.Option{
-		{"Jaeger", func(ui cliUI.UI) {
-			conf.set("tracetest.backend.type", "jaeger")
-			conf.set("tracetest.backend.endpoint.query", ui.TextInput("Query Endpoint", "jaeger:16685"))
-			conf.set("tracetest.backend.endpoint.collector", ui.TextInput("Collector Endpoint", "jaeger:14250"))
-			conf.set("tracetest.backend.endpoint.exporter", "")
-			conf.set("tracetest.backend.tls.insecure", ui.Confirm("TLS/Insecure", true))
-		}},
-		{"Tempo", func(ui cliUI.UI) {
-			conf.set("tracetest.backend.type", "tempo")
-			conf.set("tracetest.backend.endpoint", ui.TextInput("Endpoint", "tempo:9095"))
-			conf.set("tracetest.backend.tls.insecure", ui.Confirm("Insecure", true))
-		}},
-		{"OpenSearch", func(ui cliUI.UI) {
-			conf.set("tracetest.backend.type", "opensearch")
-			conf.set("tracetest.backend.addresses", ui.TextInput("Addresses (comma separated list)", "http://opensearch:9200"))
-			conf.set("tracetest.backend.index", ui.TextInput("Index", "traces"))
-			conf.set("tracetest.backend.data-prepper.endpoint", ui.TextInput("Data Prepper Endpont", "data-prepper:21890"))
-			conf.set("tracetest.backend.data-prepper.insecure", ui.Confirm("Insecure", true))
-		}},
-		{"SignalFX", func(ui cliUI.UI) {
-			conf.set("tracetest.backend.type", "signalfx")
-			conf.set("tracetest.backend.token", ui.TextInput("Token", ""))
-			conf.set("tracetest.backend.realm", ui.TextInput("Realm", "us1"))
-		}},
-	}, 0)
-
-	option.Fn(ui)
-
+	conf.set("tracetest.backend.type", "")
 	return conf
 }
 
@@ -163,12 +85,13 @@ func getTracetestConfigFileContents(psql string, ui cliUI.UI, config configurati
 	}
 
 	sc.Telemetry = telemetryConfig(ui, config)
-	sc.Server = serverConfig.ServerConfig{
-		Telemetry: serverConfig.ServerTelemetryConfig{
-			Exporter:            "collector",
-			ApplicationExporter: "collector",
-			DataStore:           config.String("tracetest.backend.type"),
-		},
+
+	if config.Bool("tracetest.backend.install") {
+		sc.Server = serverConfig.ServerConfig{
+			Telemetry: serverConfig.ServerTelemetryConfig{
+				DataStore: config.String("tracetest.backend.type"),
+			},
+		}
 	}
 
 	enabledDemos := []string{}
@@ -196,9 +119,11 @@ func getTracetestConfigFileContents(psql string, ui cliUI.UI, config configurati
 		ui.Exit(fmt.Errorf("cannot marshal tracetest config file: %w", err).Error())
 	}
 
-	out, err = fixConfigs(out)
-	if err != nil {
-		ui.Exit(fmt.Errorf("cannot fix tracertest config: %w", err).Error())
+	if config.Bool("tracetest.backend.install") {
+		out, err = fixConfigs(out)
+		if err != nil {
+			ui.Exit(fmt.Errorf("cannot fix tracertest config: %w", err).Error())
+		}
 	}
 
 	return out
@@ -239,27 +164,19 @@ func fixConfigs(conf []byte) ([]byte, error) {
 }
 
 func telemetryConfig(ui cliUI.UI, conf configuration) serverConfig.Telemetry {
+	if conf.Bool("tracetest.backend.install") {
+		return serverConfig.Telemetry{
+			DataStores: dataStoreConfig(ui, conf),
+			Exporters:  map[string]serverConfig.TelemetryExporterOption{},
+		}
+	}
+
 	return serverConfig.Telemetry{
-		DataStores: dataStoreConfig(ui, conf),
-		Exporters:  exportersConfig(ui, conf),
+		DataStores: map[string]serverConfig.TracingBackendDataStoreConfig{},
+		Exporters:  map[string]serverConfig.TelemetryExporterOption{},
 	}
 }
 
-func exportersConfig(ui cliUI.UI, conf configuration) map[string]serverConfig.TelemetryExporterOption {
-	return map[string]serverConfig.TelemetryExporterOption{
-		"collector": {
-			ServiceName: "tracetest",
-			Sampling:    100,
-			Exporter: serverConfig.ExporterConfig{
-				Type: "collector",
-				CollectorConfiguration: serverConfig.OTELCollectorConfig{
-					Endpoint: conf.String("tracetest.collector.endpoint"),
-				},
-			},
-		},
-	}
-
-}
 func dataStoreConfig(ui cliUI.UI, conf configuration) map[string]serverConfig.TracingBackendDataStoreConfig {
 	dstype := conf.String("tracetest.backend.type")
 	var c serverConfig.TracingBackendDataStoreConfig
@@ -299,6 +216,10 @@ func dataStoreConfig(ui cliUI.UI, conf configuration) map[string]serverConfig.Tr
 				Token: conf.String("tracetest.backend.token"),
 				Realm: conf.String("tracetest.backend.realm"),
 			},
+		}
+	case "otlp":
+		c = serverConfig.TracingBackendDataStoreConfig{
+			Type: dstype,
 		}
 	default:
 		ui.Panic(fmt.Errorf("unsupported dataStore type %s", dstype))
