@@ -262,9 +262,14 @@ jobs:
         run: |
           git clone --depth 1 https://github.com/kubeshop/tracetest /tmp/tracetest-main
           cd /tmp/tracetest-main/cli
-          make build-go
-          mv ./dist/$(cat dist/arch.txt)/tracetest ./dist/tracetest
-          chmod +x ./dist/tracetest
+          make build
+          mv dist ..
+
+          # change to this once this pr is merged
+          # cd /tmp/tracetest-main/
+          # make build-go
+          # mv ./dist/$(cat dist/arch.txt)/tracetest ./dist/tracetest
+          # chmod +x ./dist/tracetest
       - name: Forward port
         run: |
           kubectl port-forward \
