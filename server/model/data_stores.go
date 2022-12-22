@@ -2,7 +2,6 @@ package model
 
 import (
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/kubeshop/tracetest/server/config"
@@ -31,10 +30,6 @@ type (
 
 func (ds DataStore) IsZero() bool {
 	return ds.Type == ""
-}
-
-func (ds DataStore) Slug() string {
-	return strings.ToLower(strings.ReplaceAll(strings.TrimSpace(ds.Name), " ", "-"))
 }
 
 var validTypes = []openapi.SupportedDataStores{

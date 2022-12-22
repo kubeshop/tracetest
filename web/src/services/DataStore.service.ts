@@ -22,10 +22,10 @@ const DataStoreService = (): IDataStoreService => ({
   async getRequest(draft, defaultDataStore) {
     const dataStoreType = draft.dataStoreType || SupportedDataStores.JAEGER;
     const dataStoreValues = await dataStoreServiceMap[dataStoreType].getRequest(draft, dataStoreType);
-    const isUpdate = !!defaultDataStore.id && defaultDataStore.type === dataStoreType;
+    const isUpdate = !!defaultDataStore.id;
 
     const dataStore: TRawDataStore = isUpdate
-      ? {...defaultDataStore, ...dataStoreValues, isDefault: true}
+      ? {id: defaultDataStore.id, name: defaultDataStore.name, ...dataStoreValues, isDefault: true}
       : {
           ...dataStoreValues,
           name: dataStoreType,

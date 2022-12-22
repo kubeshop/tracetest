@@ -62,7 +62,7 @@ const (
 )
 
 func (td *postgresDB) CreateDataStore(ctx context.Context, dataStore model.DataStore) (model.DataStore, error) {
-	dataStore.ID = dataStore.Slug()
+	dataStore.ID = IDGen.ID().String()
 	dataStore.CreatedAt = time.Now()
 
 	return td.insertIntoDataStores(ctx, dataStore)
