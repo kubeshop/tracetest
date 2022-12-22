@@ -235,7 +235,7 @@ jobs:
 
   trace-testing:
     needs: [deploy]
-    name: Run trace testing using tracetest
+    name: tracetesting server
     runs-on: ubuntu-latest
 
     steps:
@@ -245,10 +245,7 @@ jobs:
         with:
           name: tracetest-go
           path: dist/
-      # - name: Setup go
-      #   uses: actions/setup-go@v3
-      #   with:
-      #     go-version: '^1.18'
+
       - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
         with:
           service_account_key: ${{ secrets.GKE_SA_KEY }}
@@ -304,7 +301,7 @@ jobs:
 
   e2e:
     needs: [deploy, trace-testing]
-    name: Run e2e tests
+    name: e2e test web
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
