@@ -256,6 +256,11 @@ func (m *MockRepository) GetDataStore(_ context.Context, id string) (model.DataS
 	return args.Get(0).(model.DataStore), args.Error(1)
 }
 
+func (m *MockRepository) DefaultDataStore(_ context.Context) (model.DataStore, error) {
+	args := m.Called()
+	return args.Get(0).(model.DataStore), args.Error(1)
+}
+
 func (m *MockRepository) GetDataStores(_ context.Context, take, skip int32, query, sortBy, sortDirection string) (model.List[model.DataStore], error) {
 	args := m.Called(take, skip, query, sortBy, sortDirection)
 	dataStores := args.Get(0).([]model.DataStore)

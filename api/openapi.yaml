@@ -1059,6 +1059,7 @@ paths:
                 type: array
                 items:
                   $ref: "./resources.yaml#/components/schemas/Resource"
+
   /config/connection:
     post:
       tags:

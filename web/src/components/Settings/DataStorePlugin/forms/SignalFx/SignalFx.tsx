@@ -14,7 +14,7 @@ const SignalFx = () => {
       </S.FormColumn>
       <S.FormColumn>
         <Form.Item label="Token" name={[...baseName, 'token']} rules={[{required: true, message: 'Token is required'}]}>
-          <Input placeholder="Token" />
+          <Input placeholder="Token" type="password" />
         </Form.Item>
       </S.FormColumn>
     </S.FormContainer>

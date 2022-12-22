@@ -16,15 +16,15 @@ import (
 
 // GRPCClientSettings struct for GRPCClientSettings
 type GRPCClientSettings struct {
-	Endpoint        *string      `json:"endpoint,omitempty"`
-	ReadBufferSize  *float32     `json:"readBufferSize,omitempty"`
-	WriteBufferSize *float32     `json:"writeBufferSize,omitempty"`
-	WaitForReady    *bool        `json:"waitForReady,omitempty"`
-	Headers         []HTTPHeader `json:"headers,omitempty"`
-	BalancerName    *string      `json:"balancerName,omitempty"`
-	Compression     *string      `json:"compression,omitempty"`
-	Tls             *TLS         `json:"tls,omitempty"`
-	Auth            *HTTPAuth    `json:"auth,omitempty"`
+	Endpoint        *string            `json:"endpoint,omitempty"`
+	ReadBufferSize  *float32           `json:"readBufferSize,omitempty"`
+	WriteBufferSize *float32           `json:"writeBufferSize,omitempty"`
+	WaitForReady    *bool              `json:"waitForReady,omitempty"`
+	Headers         *map[string]string `json:"headers,omitempty"`
+	BalancerName    *string            `json:"balancerName,omitempty"`
+	Compression     *string            `json:"compression,omitempty"`
+	Tls             *TLS               `json:"tls,omitempty"`
+	Auth            *HTTPAuth          `json:"auth,omitempty"`
 }
 
 // NewGRPCClientSettings instantiates a new GRPCClientSettings object
@@ -173,17 +173,17 @@ func (o *GRPCClientSettings) SetWaitForReady(v bool) {
 }
 
 // GetHeaders returns the Headers field value if set, zero value otherwise.
-func (o *GRPCClientSettings) GetHeaders() []HTTPHeader {
+func (o *GRPCClientSettings) GetHeaders() map[string]string {
 	if o == nil || o.Headers == nil {
-		var ret []HTTPHeader
+		var ret map[string]string
 		return ret
 	}
-	return o.Headers
+	return *o.Headers
 }
 
 // GetHeadersOk returns a tuple with the Headers field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *GRPCClientSettings) GetHeadersOk() ([]HTTPHeader, bool) {
+func (o *GRPCClientSettings) GetHeadersOk() (*map[string]string, bool) {
 	if o == nil || o.Headers == nil {
 		return nil, false
 	}
@@ -199,9 +199,9 @@ func (o *GRPCClientSettings) HasHeaders() bool {
 	return false
 }
 
-// SetHeaders gets a reference to the given []HTTPHeader and assigns it to the Headers field.
-func (o *GRPCClientSettings) SetHeaders(v []HTTPHeader) {
-	o.Headers = v
+// SetHeaders gets a reference to the given map[string]string and assigns it to the Headers field.
+func (o *GRPCClientSettings) SetHeaders(v map[string]string) {
+	o.Headers = &v
 }
 
 // GetBalancerName returns the BalancerName field value if set, zero value otherwise.

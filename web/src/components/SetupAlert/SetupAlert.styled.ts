@@ -31,13 +31,10 @@ export const Message = styled.div`
 
 export const WarningButton = styled(Button)`
   background: ${({theme}) => theme.color.warningYellow};
-  width: 57px;
-  height: 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 0 !important;
   border: none;
   font-weight: 600;
 

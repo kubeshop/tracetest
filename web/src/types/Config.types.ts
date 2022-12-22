@@ -1,5 +1,6 @@
 import {FormInstance} from 'antd';
 import {Model, TDataStoreSchemas, TConfigSchemas} from 'types/Common.types';
+import {THeader} from './Test.types';
 
 export enum ConfigMode {
   NO_TRACING_MODE = 'NO_TRACING',
@@ -22,25 +23,34 @@ export type TDataStore = Model<
   }
 >;
 
-export type TSupportedDataStores = TDataStoreSchemas['SupportedDataStores'];
-export type TRawDataStoreConfig = TConfigSchemas['DataStoreConfig'];
-export type TDataStoreConfig = Model<
-  TRawDataStoreConfig,
-  {
-    mode: ConfigMode;
-    dataStores: TDataStore[];
-  }
->;
+export type TDataStoreConfig = {
+  defaultDataStore: TDataStore;
+  mode: ConfigMode;
+};
 
 export type TRawGRPCClientSettings = TDataStoreSchemas['GRPCClientSettings'];
 
 export type TTestConnectionRequest = TRawDataStore;
+export type TRawConnectionResult = TConfigSchemas['ConnectionResult'];
+export type TConnectionResult = Model<
+  TRawConnectionResult,
+  {
+    allPassed: boolean;
+    authentication: TConnectionTestStep;
+    connectivity: TConnectionTestStep;
+    fetchTraces: TConnectionTestStep;
+  }
+>;
+
+export type TRawConnectionTestStep = TConfigSchemas['ConnectionTestStep'];
+export type TConnectionTestStep = Model<TRawConnectionTestStep, {}>;
 export type TTestConnectionResponse = TConfigSchemas['ConnectionResult'];
 
 export interface IGRPCClientSettings extends TRawGRPCClientSettings {
   fileCA: File;
   fileCert: File;
   fileKey: File;
+  rawHeaders?: THeader[];
 }
 
 interface IDataStore extends TRawDataStore {

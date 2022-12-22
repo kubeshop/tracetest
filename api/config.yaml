@@ -1,15 +1,6 @@
 openapi: 3.0.0
 components:
   schemas:
-    DataStoreConfig:
-      type: object
-      properties:
-        dataStores:
-          type: array
-          items:
-            $ref: "./dataStores.yaml#/components/schemas/DataStore"
-        defaultDataStore:
-          type: string
     TestConnectionResponse:
       type: object
       properties:

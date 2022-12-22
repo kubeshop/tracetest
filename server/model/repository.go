@@ -62,6 +62,7 @@ type DataStoreRepository interface {
 	CreateDataStore(context.Context, DataStore) (DataStore, error)
 	UpdateDataStore(context.Context, DataStore) (DataStore, error)
 	DeleteDataStore(context.Context, DataStore) error
+	DefaultDataStore(_ context.Context) (DataStore, error)
 	GetDataStore(_ context.Context, id string) (DataStore, error)
 	GetDataStores(_ context.Context, take, skip int32, query, sortBy, sortDirection string) (List[DataStore], error)
 	DataStoreIDExists(context.Context, string) (bool, error)

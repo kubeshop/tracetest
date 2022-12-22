@@ -17,6 +17,8 @@ import (
 )
 
 type signalfxDB struct {
+	realTraceDB
+
 	Token string
 	Realm string
 	URL   string
@@ -34,6 +36,10 @@ func (db signalfxDB) getURL() string {
 
 func (tdb signalfxDB) Connect(ctx context.Context) error {
 	return nil
+}
+
+func (tdb signalfxDB) Ready() bool {
+	return true
 }
 
 func (db signalfxDB) Close() error {
@@ -213,8 +219,8 @@ func convertSignalFXSpan(in signalFXSpan) model.Span {
 	}
 }
 
-func newSignalFXDB(cfg config.SignalFXDataStoreConfig) (TraceDB, error) {
-	return signalfxDB{
+func newSignalFXDB(cfg *config.SignalFXDataStoreConfig) (TraceDB, error) {
+	return &signalfxDB{
 		Realm:      cfg.Realm,
 		Token:      cfg.Token,
 		httpClient: http.DefaultClient,

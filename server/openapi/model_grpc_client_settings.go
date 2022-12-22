@@ -18,7 +18,7 @@ type GrpcClientSettings struct {
 
 	WaitForReady bool `json:"waitForReady,omitempty"`
 
-	Headers []HttpHeader `json:"headers,omitempty"`
+	Headers map[string]string `json:"headers,omitempty"`
 
 	BalancerName string `json:"balancerName,omitempty"`
 
@@ -31,11 +31,6 @@ type GrpcClientSettings struct {
 
 // AssertGrpcClientSettingsRequired checks if the required fields are not zero-ed
 func AssertGrpcClientSettingsRequired(obj GrpcClientSettings) error {
-	for _, el := range obj.Headers {
-		if err := AssertHttpHeaderRequired(el); err != nil {
-			return err
-		}
-	}
 	if err := AssertTlsRequired(obj.Tls); err != nil {
 		return err
 	}

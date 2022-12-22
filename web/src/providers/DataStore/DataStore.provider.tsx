@@ -1,19 +1,26 @@
 import {noop} from 'lodash';
 import {createContext, useCallback, useContext, useMemo, useState} from 'react';
-import {notification} from 'antd';
-import {useTheme} from 'styled-components';
-import {useTestConnectionMutation, useUpdateDatastoreConfigMutation} from 'redux/apis/TraceTest.api';
-import {TDraftDataStore} from 'types/Config.types';
+
+import {
+  useTestConnectionMutation,
+  useCreateDataStoreMutation,
+  useUpdateDataStoreMutation,
+  useDeleteDataStoreMutation,
+} from 'redux/apis/TraceTest.api';
+import {SupportedDataStores, TConnectionResult, TDataStore, TDraftDataStore} from 'types/Config.types';
 import DataStoreService from 'services/DataStore.service';
+import ConnectionResult from 'models/ConnectionResult.model';
+import useDataStoreNotification from './hooks/useDataStoreNotification';
 import {useConfirmationModal} from '../ConfirmationModal/ConfirmationModal.provider';
+import {useDataStoreConfig} from '../DataStoreConfig/DataStoreConfig.provider';
 
 interface IContext {
   isFormValid: boolean;
   isLoading: boolean;
   isTestConnectionLoading: boolean;
-  onDeleteConfig(): void;
-  onSaveConfig(draft: TDraftDataStore): void;
-  onTestConnection(draft: TDraftDataStore): void;
+  onDeleteConfig(defaultDataStore: TDataStore): void;
+  onSaveConfig(draft: TDraftDataStore, defaultDataStore: TDataStore): void;
+  onTestConnection(draft: TDraftDataStore, defaultDataStore: TDataStore): void;
   onIsFormValid(isValid: boolean): void;
 }
 
@@ -34,73 +41,74 @@ interface IProps {
 export const useSetupConfig = () => useContext(Context);
 
 const DataStoreProvider = ({children}: IProps) => {
-  const [updateConfig, {isLoading}] = useUpdateDatastoreConfigMutation();
+  const {isFetching} = useDataStoreConfig();
+  const [createDataStore, {isLoading: isLoadingCreate}] = useCreateDataStoreMutation();
+  const [updateDataStore, {isLoading: isLoadingUpdate}] = useUpdateDataStoreMutation();
+  const [deleteDataStore] = useDeleteDataStoreMutation();
   const [testConnection, {isLoading: isTestConnectionLoading}] = useTestConnectionMutation();
   const [isFormValid, setIsFormValid] = useState(false);
+  const {contextHolder, showSuccessNotification, showTestConnectionNotification} = useDataStoreNotification();
   const {onOpen} = useConfirmationModal();
-  const [api, contextHolder] = notification.useNotification();
-  const {
-    notification: {success, error},
-  } = useTheme();
 
   const onSaveConfig = useCallback(
-    async (draft: TDraftDataStore) => {
+    async (draft: TDraftDataStore, defaultDataStore: TDataStore) => {
+      onOpen({
+        title: 'Are you sure you want to save this Data Store configuration?',
+        heading: 'Save Confirmation',
+        okText: 'Save',
+        onConfirm: async () => {
+          const dataStore = await DataStoreService.getRequest(draft, defaultDataStore);
+          if (dataStore.id) {
+            await updateDataStore({dataStore, dataStoreId: dataStore.id}).unwrap();
+          } else {
+            await createDataStore(dataStore).unwrap();
+          }
+          showSuccessNotification();
+        },
+      });
+    },
+    [createDataStore, onOpen, showSuccessNotification, updateDataStore]
+  );
+
+  const onDeleteConfig = useCallback(
+    async (defaultDataStore: TDataStore) => {
       onOpen({
         title: 'Tracetest needs to do a quick restart to use this new configuration.',
         heading: 'Save Confirmation',
         okText: 'Save & Restart',
         onConfirm: async () => {
-          const update = await DataStoreService.getRequest(draft);
-          console.log('@@saving draft', draft, update);
-          // const config = await updateConfig(update).unwrap();
+          await deleteDataStore({dataStoreId: defaultDataStore.id}).unwrap();
         },
       });
     },
-    [onOpen]
+    [deleteDataStore, onOpen]
   );
-
-  const onDeleteConfig = useCallback(async () => {
-    onOpen({
-      title: 'Tracetest needs to do a quick restart to use this new configuration.',
-      heading: 'Save Confirmation',
-      okText: 'Save & Restart',
-      onConfirm: async () => {
-        const deleteRequest = await DataStoreService.getDeleteRequest();
-        console.log('@@deleting', deleteRequest);
-        // const config = await updateConfig(configRequest).unwrap();
-      },
-    });
-  }, [onOpen]);
 
   const onIsFormValid = useCallback((isValid: boolean) => {
     setIsFormValid(isValid);
   }, []);
 
   const onTestConnection = useCallback(
-    async (draft: TDraftDataStore) => {
-      const {dataStores: [dataStore] = []} = await DataStoreService.getRequest(draft);
-      const {authentication = {}, connectivity = {}, fetchTraces = {}} = await testConnection(dataStore!).unwrap();
+    async (draft: TDraftDataStore, defaultDataStore: TDataStore) => {
+      const dataStore = await DataStoreService.getRequest(draft, defaultDataStore);
 
-      if (authentication.passed && connectivity.passed && fetchTraces.passed) {
-        return api.success({
-          message: 'Connection is setup',
-          description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor',
-          ...success,
-        });
+      if (draft.dataStoreType === SupportedDataStores.OtelCollector) {
+        return showTestConnectionNotification(ConnectionResult({}), draft.dataStoreType);
       }
 
-      api.error({
-        message: 'Connection is not setup',
-        description: authentication.error || connectivity.error || fetchTraces.error,
-        ...error,
-      });
+      try {
+        const result = await testConnection(dataStore!).unwrap();
+        showTestConnectionNotification(result, draft.dataStoreType!);
+      } catch (err) {
+        showTestConnectionNotification(err as TConnectionResult, draft.dataStoreType!);
+      }
     },
-    [api, error, success, testConnection]
+    [showTestConnectionNotification, testConnection]
   );
 
   const value = useMemo<IContext>(
     () => ({
-      isLoading,
+      isLoading: isLoadingCreate || isLoadingUpdate,
       isFormValid,
       isTestConnectionLoading,
       onSaveConfig,
@@ -108,13 +116,22 @@ const DataStoreProvider = ({children}: IProps) => {
       onTestConnection,
       onDeleteConfig,
     }),
-    [isLoading, isFormValid, isTestConnectionLoading, onSaveConfig, onIsFormValid, onTestConnection, onDeleteConfig]
+    [
+      isLoadingCreate,
+      isLoadingUpdate,
+      isFormValid,
+      isTestConnectionLoading,
+      onSaveConfig,
+      onIsFormValid,
+      onTestConnection,
+      onDeleteConfig,
+    ]
   );
 
   return (
     <>
       {contextHolder}
-      <Context.Provider value={value}>{children}</Context.Provider>
+      <Context.Provider value={value}>{isFetching ? null : children}</Context.Provider>
     </>
   );
 };

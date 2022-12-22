@@ -2,11 +2,12 @@ package testdb_test
 
 import (
 	"context"
+	"testing"
+
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestCreateDataStore(t *testing.T) {
@@ -82,7 +83,7 @@ func TestUpdateDataStore(t *testing.T) {
 	_, err := db.UpdateDataStore(context.TODO(), dataStore)
 	require.NoError(t, err)
 
-	latestDataStore, err := db.GetDataStore(context.TODO(), dataStore.Slug())
+	latestDataStore, err := db.GetDataStore(context.TODO(), dataStore.ID)
 	assert.NoError(t, err)
 	assert.Equal(t, "1 v2", latestDataStore.Name)
 	assert.Equal(t, "openSearch", string(latestDataStore.Type))
