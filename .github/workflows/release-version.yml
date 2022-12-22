@@ -216,7 +216,7 @@ jobs:
 
   demo-release:
     runs-on: ubuntu-latest
-    needs: [demo-prepare-go, build-web]
+    needs: [build-web]
     env:
       DOCKER_CLI_EXPERIMENTAL: "enabled"
       GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
