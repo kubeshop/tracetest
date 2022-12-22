@@ -75,7 +75,7 @@ nightly:
 
 dockers:
 - image_templates:
-  - 'kubeshop/tracetest:{{ .Version }}-amd64'
+  - 'kubeshop/tracetest:{{ .Env.VERSION }}-amd64'
   extra_files:
     - web/build
     - server/migrations
@@ -91,7 +91,7 @@ dockers:
   goarch: amd64
   use: buildx
 - image_templates:
-  - 'kubeshop/tracetest:{{ .Version }}-arm64'
+  - 'kubeshop/tracetest:{{ .Env.VERSION }}-arm64'
   extra_files:
     - web/build
     - server/migrations
@@ -108,14 +108,14 @@ dockers:
   use: buildx
 
 docker_manifests:
-- name_template: 'kubeshop/tracetest:{{ .Version }}'
+- name_template: 'kubeshop/tracetest:{{ .Env.VERSION }}'
   image_templates:
-  - 'kubeshop/tracetest:{{ .Version }}-amd64'
-  - 'kubeshop/tracetest:{{ .Version }}-arm64'
+  - 'kubeshop/tracetest:{{ .Env.VERSION }}-amd64'
+  - 'kubeshop/tracetest:{{ .Env.VERSION }}-arm64'
 - name_template: '{{ if not .IsNightly }}kubeshop/tracetest:latest{{ end }}'
   image_templates:
-  - 'kubeshop/tracetest:{{ .Version }}-amd64'
-  - 'kubeshop/tracetest:{{ .Version }}-arm64'
+  - 'kubeshop/tracetest:{{ .Env.VERSION }}-amd64'
+  - 'kubeshop/tracetest:{{ .Env.VERSION }}-arm64'
 
 archives:
 - replacements:
