@@ -210,7 +210,7 @@ jobs:
           docker compose logs -f > /tmp/docker-log &
       - name: Run example test
         run: |
-          mv ./dist/cli_$(cat dist/arch.txt)/tracetest ./dist/tracetest
+          find ./dist -name 'tracetest' -exec cp {} ./dist \;
           chmod +x ./dist/tracetest
 
           ./scripts/wait-for-port.sh 11633
@@ -219,7 +219,6 @@ jobs:
           ./dist/tracetest test run -d examples/${{ matrix.example_dir }}/tests/list-tests.yaml --wait-for-result || cat /tmp/docker-log
 
   deploy:
-    name: Deploy
     needs: [build-docker, test-cli, test-server, test-web]
     runs-on: ubuntu-latest
 
@@ -227,12 +226,12 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
 
-    - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
+    - uses: google-github-actions/setup-gcloud@v1
       with:
         service_account_key: ${{ secrets.GKE_SA_KEY }}
         project_id: ${{ secrets.GKE_PROJECT }}
 
-    - uses: google-github-actions/get-gke-credentials@fb08709ba27618c31c09e014e1d8364b02e5042e
+    - uses: google-github-actions/get-gke-credentials@v1
       with:
         cluster_name: ${{ secrets.GKE_CLUSTER }}
         location: ${{ secrets.GKE_ZONE }}
@@ -258,12 +257,12 @@ jobs:
           name: tracetest-go
           path: dist/
 
-      - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
+      - uses: google-github-actions/setup-gcloud@v1
         with:
           service_account_key: ${{ secrets.GKE_SA_KEY }}
           project_id: ${{ secrets.GKE_PROJECT }}
 
-      - uses: google-github-actions/get-gke-credentials@fb08709ba27618c31c09e014e1d8364b02e5042e
+      - uses: google-github-actions/get-gke-credentials@v1
         with:
           cluster_name: ${{ secrets.GKE_CLUSTER }}
           location: ${{ secrets.GKE_ZONE }}
@@ -271,7 +270,7 @@ jobs:
 
       - name: Setup Current CLI
         run: |
-          mv ./dist/cli_$(cat dist/arch.txt)/tracetest ./dist/tracetest
+          find ./dist -name 'tracetest' -exec cp {} ./dist \;
           chmod +x ./dist/tracetest
 
       - name: Setup GoReleaser
@@ -291,7 +290,7 @@ jobs:
           # change to this once this pr is merged
           # cd /tmp/tracetest-main/
           # make build-go
-          # mv ./dist/cli_$(cat dist/arch.txt)/tracetest ./dist/tracetest
+          # find ./dist -name 'tracetest' -exec cp {} ./dist \;
           # chmod +x ./dist/tracetest
       - name: Forward port
         run: |
@@ -334,12 +333,12 @@ jobs:
           cache: npm
           cache-dependency-path: web/package-lock.json
 
-      - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
+      - uses: google-github-actions/setup-gcloud@v1
         with:
           service_account_key: ${{ secrets.GKE_SA_KEY }}
           project_id: ${{ secrets.GKE_PROJECT }}
 
-      - uses: google-github-actions/get-gke-credentials@fb08709ba27618c31c09e014e1d8364b02e5042e
+      - uses: google-github-actions/get-gke-credentials@v1
         with:
           cluster_name: ${{ secrets.GKE_CLUSTER }}
           location: ${{ secrets.GKE_ZONE }}
@@ -378,12 +377,12 @@ jobs:
     needs: [trace-testing, e2e]
     if: always()
     steps:
-      - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
+      - uses: google-github-actions/setup-gcloud@v1
         with:
           service_account_key: ${{ secrets.GKE_SA_KEY }}
           project_id: ${{ secrets.GKE_PROJECT }}
 
-      - uses: google-github-actions/get-gke-credentials@fb08709ba27618c31c09e014e1d8364b02e5042e
+      - uses: google-github-actions/get-gke-credentials@v1
         with:
           cluster_name: ${{ secrets.GKE_CLUSTER }}
           location: ${{ secrets.GKE_ZONE }}
