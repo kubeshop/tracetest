@@ -48,6 +48,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DOCKER_CLI_EXPERIMENTAL: "enabled"
+      GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
     steps:
       - uses: actions/checkout@v3
       - uses: docker/setup-buildx-action@v2
@@ -83,6 +84,8 @@ jobs:
   build-go:
     name: build go binaries
     runs-on: ubuntu-latest
+    env:
+      GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
     steps:
     - uses: actions/checkout@v3
     - name: Setup go
