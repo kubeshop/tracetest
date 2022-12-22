@@ -36,6 +36,19 @@ builds:
       - linux
     goarch:
     - amd64
+  - id: cli
+    binary: tracetest
+    main: ./cli/main.go
+    ldflags:
+    - -X github.com/kubeshop/tracetest/cli/config.Version={{ .Env.VERSION }}
+    - -X github.com/kubeshop/tracetest/cli/config.Env={{ .Env.TRACETEST_ENV }}
+    - -X github.com/kubeshop/tracetest/cli/analytics.SecretKey={{ .Env.ANALYTICS_BE_KEY }}
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+    goarch:
+    - amd64
 
 dockers:
 - image_templates:
