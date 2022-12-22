@@ -158,13 +158,14 @@ jobs:
         with:
           name: tracetest-go
           path: dist/
+      - name: Fix permission
+        run: chmod +x ./dist/**/tracetest*
       - uses: actions/download-artifact@v3
         with:
           name: tracetest-web
           path: web/build/
-      - run: ls -R
       - name: Build and push
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           context: .
           file: Dockerfile
