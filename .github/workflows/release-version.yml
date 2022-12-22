@@ -255,8 +255,7 @@ jobs:
 
   demo-deploy:
     if: github.event_name == 'push'
-    needs: [demo-release]
-    name: Deploy
+    needs: [release, demo-release]
     runs-on: ubuntu-latest
 
     steps:
