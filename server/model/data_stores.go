@@ -70,19 +70,19 @@ func DataStoreFromConfig(dsc config.TracingBackendDataStoreConfig) DataStore {
 	switch dsc.Type {
 	case jaeger:
 		ds.Type = openapi.JAEGER
-		ds.Values.Jaeger = &dsc.Jaeger
 	case tempo:
 		ds.Type = openapi.TEMPO
-		ds.Values.Tempo = &dsc.Tempo
 	case opensearch:
 		ds.Type = openapi.OPEN_SEARCH
-		ds.Values.OpenSearch = &dsc.OpenSearch
 	case signalfx:
 		ds.Type = openapi.SIGNAL_FX
-		ds.Values.SignalFx = &dsc.SignalFX
 	case otlp:
 		ds.Type = openapi.OTLP
 	}
+	ds.Values.Jaeger = &dsc.Jaeger
+	ds.Values.Tempo = &dsc.Tempo
+	ds.Values.OpenSearch = &dsc.OpenSearch
+	ds.Values.SignalFx = &dsc.SignalFX
 
 	return ds
 }
