@@ -194,7 +194,8 @@ jobs:
       - name: Build example
         run: |
           cd examples/${{ matrix.example_dir }}
-          TAG=pr-${{ github.event.pull_request.number }} docker-compose up > /tmp/docker-log &
+          TAG=pr-${{ github.event.pull_request.number }} docker-compose up -d
+          docker compose logs -f > /tmp/docker-log &
       - name: Run example test
         run: |
           mv ./dist/$(cat dist/arch.txt)/tracetest ./dist/tracetest
