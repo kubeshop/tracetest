@@ -166,7 +166,7 @@ jobs:
           name: tracetest-go
           path: dist/
       - name: Fix permission
-        run: chmod +x ./dist/**/tracetest*
+        run: find ./dist -name 'tracetest*' -exec chmod +x {} \;
       - uses: actions/download-artifact@v3
         with:
           name: tracetest-web
