@@ -1,7 +1,7 @@
 type: Test
 spec:
   id: IotK1g44g
-  name: gRPC Test Run
+  name: gRPC Test Run with invalid metadata
   description: ""
   trigger:
     type: http
