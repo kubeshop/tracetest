@@ -57,7 +57,7 @@ func (f dataStoreList) pretty(dataStores []openapi.DataStore) string {
 	for _, t := range dataStores {
 		table.Body.Cells = append(table.Body.Cells, []*simpletable.Cell{
 			{Text: *t.Id},
-			{Text: *t.Name},
+			{Text: t.Name},
 			{Text: f.getDefaultMark(t)},
 		})
 	}

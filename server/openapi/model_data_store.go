@@ -16,9 +16,9 @@ import (
 type DataStore struct {
 	Id string `json:"id,omitempty"`
 
-	Name string `json:"name,omitempty"`
+	Name string `json:"name"`
 
-	Type SupportedDataStores `json:"type,omitempty"`
+	Type SupportedDataStores `json:"type"`
 
 	IsDefault bool `json:"isDefault,omitempty"`
 
@@ -35,6 +35,16 @@ type DataStore struct {
 
 // AssertDataStoreRequired checks if the required fields are not zero-ed
 func AssertDataStoreRequired(obj DataStore) error {
+	elements := map[string]interface{}{
+		"name": obj.Name,
+		"type": obj.Type,
+	}
+	for name, el := range elements {
+		if isZero := IsZeroValue(el); isZero {
+			return &RequiredError{Field: name}
+		}
+	}
+
 	if err := AssertGrpcClientSettingsRequired(obj.Jaeger); err != nil {
 		return err
 	}
