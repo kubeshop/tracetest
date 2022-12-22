@@ -250,7 +250,7 @@ jobs:
         with:
           distribution: goreleaser-pro
           version: latest
-          args: release --rm-dist --skip-announce
+          args: release --rm-dist --skip-announce -f .goreleaser.demo.yaml
         env:
           VERSION: ${{ github.ref_name}}-demo
           TRACETEST_ENV: demo
