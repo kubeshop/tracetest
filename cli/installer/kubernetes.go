@@ -18,7 +18,6 @@ var kubernetes = installer{
 		windowsGnuToolsChecker,
 		kubectlChecker,
 		helmChecker,
-		localEnvironmentChecker,
 	},
 	configs: []configurator{
 		configureKubernetes,
@@ -337,22 +336,4 @@ func kubectlChecker(ui cliUI.UI) {
 	}
 
 	ui.Exit("I didn't find kubectl in your system")
-}
-
-func localEnvironmentChecker(ui cliUI.UI) {
-	option := ui.Select("Are you going to run it locally or in a remote cluster?", []cliUI.Option{
-		{"Locally", minikubeChecker},
-		{"Remote cluster", func(ui cliUI.UI) {}},
-	}, 0)
-
-	option.Fn(ui)
-}
-
-func minikubeChecker(ui cliUI.UI) {
-	if commandExists("minikube") {
-		ui.Println(ui.Green("✔ minikube already installed"))
-		return
-	}
-
-	ui.Exit(ui.Red("✘ minikube could not be installed. Check output for errors. " + createIssueMsg))
 }
