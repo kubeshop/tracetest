@@ -156,8 +156,7 @@ jobs:
         with:
           fetch-depth: 0
       - uses: docker/setup-buildx-action@v2
-      - name: Login to DockerHub
-        uses: docker/login-action@v2
+      - uses: docker/login-action@v2
         if: github.event_name != 'pull_request'
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -226,16 +225,16 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
 
-    - uses: google-github-actions/setup-gcloud@v1
+    - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
       with:
         service_account_key: ${{ secrets.GKE_SA_KEY }}
         project_id: ${{ secrets.GKE_PROJECT }}
 
-    - uses: google-github-actions/get-gke-credentials@v1
+    - uses: google-github-actions/get-gke-credentials@fb08709ba27618c31c09e014e1d8364b02e5042e
       with:
         cluster_name: ${{ secrets.GKE_CLUSTER }}
         location: ${{ secrets.GKE_ZONE }}
-        project_id: ${{ secrets.GKE_PROJECT }}
+        credentials: ${{ secrets.GKE_SA_KEY }}
 
     - name: Deploy
       run: |
@@ -257,16 +256,15 @@ jobs:
           name: tracetest-go
           path: dist/
 
-      - uses: google-github-actions/setup-gcloud@v1
+      - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
         with:
           service_account_key: ${{ secrets.GKE_SA_KEY }}
           project_id: ${{ secrets.GKE_PROJECT }}
-
-      - uses: google-github-actions/get-gke-credentials@v1
+      - uses: google-github-actions/get-gke-credentials@fb08709ba27618c31c09e014e1d8364b02e5042e
         with:
           cluster_name: ${{ secrets.GKE_CLUSTER }}
           location: ${{ secrets.GKE_ZONE }}
-          project_id: ${{ secrets.GKE_PROJECT }}
+          credentials: ${{ secrets.GKE_SA_KEY }}
 
       - name: Setup Current CLI
         run: |
@@ -333,16 +331,15 @@ jobs:
           cache: npm
           cache-dependency-path: web/package-lock.json
 
-      - uses: google-github-actions/setup-gcloud@v1
+      - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
         with:
           service_account_key: ${{ secrets.GKE_SA_KEY }}
           project_id: ${{ secrets.GKE_PROJECT }}
-
-      - uses: google-github-actions/get-gke-credentials@v1
+      - uses: google-github-actions/get-gke-credentials@fb08709ba27618c31c09e014e1d8364b02e5042e
         with:
           cluster_name: ${{ secrets.GKE_CLUSTER }}
           location: ${{ secrets.GKE_ZONE }}
-          project_id: ${{ secrets.GKE_PROJECT }}
+          credentials: ${{ secrets.GKE_SA_KEY }}
 
       - name: Forward port
         run: |
@@ -377,16 +374,16 @@ jobs:
     needs: [trace-testing, e2e]
     if: always()
     steps:
-      - uses: google-github-actions/setup-gcloud@v1
+      - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
         with:
           service_account_key: ${{ secrets.GKE_SA_KEY }}
           project_id: ${{ secrets.GKE_PROJECT }}
 
-      - uses: google-github-actions/get-gke-credentials@v1
+      - uses: google-github-actions/get-gke-credentials@fb08709ba27618c31c09e014e1d8364b02e5042e
         with:
           cluster_name: ${{ secrets.GKE_CLUSTER }}
           location: ${{ secrets.GKE_ZONE }}
-          project_id: ${{ secrets.GKE_PROJECT }}
+          credentials: ${{ secrets.GKE_SA_KEY }}
 
       - name: Uninstall tracetest
         run: |
