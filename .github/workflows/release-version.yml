@@ -278,6 +278,7 @@ jobs:
         cluster_name: ${{ secrets.GKE_CLUSTER }}
         location: ${{ secrets.GKE_ZONE }}
         credentials: ${{ secrets.GKE_SA_KEY }}
+        project_id: ${{ secrets.GKE_PROJECT }}
 
     - name: Deploy
       run: |
