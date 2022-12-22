@@ -10,7 +10,7 @@ services:
       retries: 60
 
   queue:
-    image: rabbitmq:3.9
+    image: rabbitmq:3.8-management
     restart: unless-stopped
     healthcheck:
       test: rabbitmq-diagnostics -q check_running
