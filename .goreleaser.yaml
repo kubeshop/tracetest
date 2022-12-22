@@ -124,7 +124,10 @@ checksum:
   name_template: 'checksums.txt'
 
 universal_binaries:
-- replace: true
+- id: cli
+  replace: true
+- id: server
+  replace: true
 
 nfpms:
 - vendor: Kubeshop
@@ -147,12 +150,14 @@ publishers:
     - DISABLED={{ if .IsNightly }}true{{ end }}
     cmd: ./scripts/fury-upload.sh {{ .ArtifactName }}
 
-# brews:
-# - tap:
-#     owner: kubeshop
-#     name: homebrew-tracetest
-#   commit_author:
-#     name: Brew Bot
-#     email: brewbot@kubeshop.io
-#   homepage: https://tracetest.kubeshop.io/
-#   license: "MIT"
+brews:
+- ids:
+    - cli
+  tap:
+    owner: kubeshop
+    name: homebrew-tracetest
+  commit_author:
+    name: Brew Bot
+    email: brewbot@kubeshop.io
+  homepage: https://tracetest.kubeshop.io/
+  license: "MIT"

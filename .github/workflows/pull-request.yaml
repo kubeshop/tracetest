@@ -87,7 +87,6 @@ jobs:
       - run: cd web; ${{ matrix.cmd }}
 
   build-go:
-    needs: [test-cli, test-server]
     name: build go binaries
     runs-on: ubuntu-latest
     steps:
@@ -119,7 +118,6 @@ jobs:
           path: dist/
 
   build-web:
-    needs: [test-web]
     name: build web
     runs-on: ubuntu-latest
     steps:
@@ -215,7 +213,7 @@ jobs:
 
   deploy:
     name: Deploy
-    needs:  [build-docker]
+    needs: [build-docker, test-cli, test-server, test-web]
     runs-on: ubuntu-latest
 
     steps:

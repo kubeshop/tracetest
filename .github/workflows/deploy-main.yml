@@ -49,7 +49,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DOCKER_CLI_EXPERIMENTAL: "enabled"
-      GORELEASER_KEY: ${{ secrets.GORELEASER_LICENSE }}
+      GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -99,7 +99,7 @@ jobs:
     needs: [prepare-go, build-web]
     env:
       DOCKER_CLI_EXPERIMENTAL: "enabled"
-      GORELEASER_KEY: ${{ secrets.GORELEASER_LICENSE }}
+      GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       FURY_TOKEN: ${{ secrets.FURY_TOKEN }}
     steps:
