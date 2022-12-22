@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/gorilla/handlers"
 	"github.com/kubeshop/tracetest/server/analytics"
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
@@ -204,7 +205,8 @@ func ensureFirstTimeDataSources(conf config.Config, repo model.DataStoreReposito
 		panic(fmt.Errorf("cannot persist DataStore from config file: %w", err))
 	}
 
-	fmt.Printf("persisted initial DataStore from config file with values: %+v\n", ds)
+	fmt.Println("persisted initial DataStore from config file:")
+	spew.Dump(ds)
 
 }
 
