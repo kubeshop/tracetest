@@ -199,7 +199,7 @@ jobs:
           docker compose logs -f > /tmp/docker-log &
       - name: Run example test
         run: |
-          mv ./dist/$(cat dist/arch.txt)/tracetest ./dist/tracetest
+          mv ./dist/cli_$(cat dist/arch.txt)/tracetest ./dist/tracetest
           chmod +x ./dist/tracetest
 
           ./scripts/wait-for-port.sh 11633
@@ -260,7 +260,7 @@ jobs:
 
       - name: Setup Current CLI
         run: |
-          mv ./dist/$(cat dist/arch.txt)/tracetest ./dist/tracetest
+          mv ./dist/cli_$(cat dist/arch.txt)/tracetest ./dist/tracetest
           chmod +x ./dist/tracetest
 
       - name: Setup GoReleaser
@@ -280,7 +280,7 @@ jobs:
           # change to this once this pr is merged
           # cd /tmp/tracetest-main/
           # make build-go
-          # mv ./dist/$(cat dist/arch.txt)/tracetest ./dist/tracetest
+          # mv ./dist/cli_$(cat dist/arch.txt)/tracetest ./dist/tracetest
           # chmod +x ./dist/tracetest
       - name: Forward port
         run: |
