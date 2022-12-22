@@ -145,7 +145,7 @@ publishers:
     env:
     - 'FURY_TOKEN={{ .Env.FURY_TOKEN }}'
     # relative to cli/, where goreleaser runs from
-    cmd: ../scripts/fury-upload.sh {{ .ArtifactName }}
+    cmd: ./scripts/fury-upload.sh {{ .ArtifactName }}
 
 brews:
 - tap:
