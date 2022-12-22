@@ -7,7 +7,8 @@ build-go:
 	goreleaser build --single-target --rm-dist --snapshot
 
 build-docker: build-web build-go
-	docker build . -t kubeshop/tracetest
+	docker build . -t kubeshop/tracetest \
+		--build-arg OS_ARCH=${shell uname | tr '[:upper:]' '[:lower:]'}_${shell uname -m}
 
 generate: generate-server generate-cli generate-web
 
