@@ -53,6 +53,13 @@ jobs:
     name: Run frontend unit tests
     runs-on: ubuntu-latest
 
+    strategy:
+      fail-fast: false
+      matrix:
+        cmd:
+          - npm run lint
+          - npm test
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -72,8 +79,7 @@ jobs:
           restore-keys: npm-
       - run: cd web; npm ci
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-      - run: cd web; npm run lint
-      - run: cd web; npm test
+      - run: cd web; ${{ matrix.cmd }}
 
   build-go:
     needs: [test-cli, test-server]
