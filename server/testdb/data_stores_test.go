@@ -26,7 +26,6 @@ func TestCreateDataStore(t *testing.T) {
 
 	actual, err := db.GetDataStore(context.TODO(), created.ID)
 	require.NoError(t, err)
-	assert.Equal(t, actual.ID, "datastore")
 	assert.Equal(t, dataStore.Name, actual.Name)
 	assert.Equal(t, dataStore.Type, actual.Type)
 	assert.Equal(t, dataStore.IsDefault, actual.IsDefault)
