@@ -47,7 +47,6 @@ Cypress.Commands.add('deleteTest', (shouldIntercept = false) => {
 });
 
 Cypress.Commands.add('openTestCreationModal', () => {
-  cy.get('[data-cy=dataStores-skip-cta]').click();
   cy.get('[data-cy=create-button]').click();
   cy.get('.test-create-selector-items ul li').first().click();
   cy.get('[data-cy=create-test-steps-CreateTestFactory]').should('be.visible');
@@ -201,7 +200,6 @@ Cypress.Commands.add('createTest', () => {
 
 Cypress.Commands.add('createAssertion', () => {
   cy.selectRunDetailMode(3);
-  cy.get('[data-cy=dataStores-test-skip-cta]').click();
 
   cy.get(`[data-cy=trace-node-database]`, {timeout: 25000}).first().click({force: true});
   cy.get('[data-cy=add-test-spec-button]').click({force: true});
@@ -231,7 +229,6 @@ Cypress.Commands.add('selectRunDetailMode', (index: number) => {
 });
 
 Cypress.Commands.add('openTransactionCreationModal', () => {
-  cy.get('[data-cy=dataStores-skip-cta]').click();
   cy.get('[data-cy=create-button]').click();
   cy.get('.ant-dropdown-menu-item').last().click();
   cy.get('[data-cy=create-test-steps-CreateTransactionFactory]').should('be.visible');

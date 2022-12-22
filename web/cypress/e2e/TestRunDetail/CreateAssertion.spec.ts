@@ -10,7 +10,6 @@ describe('Create Assertion', () => {
 
   it('should create an assertion with multiple checks', () => {
     cy.selectRunDetailMode(3);
-    cy.get('[data-cy=dataStores-test-skip-cta]').click();
 
     cy.get(`[data-cy=trace-node-http]`, {timeout: 20000}).first().click();
 
@@ -55,7 +54,6 @@ describe('Create Assertion', () => {
 
   it('should create a basic assertion using the advanced mode', () => {
     cy.selectRunDetailMode(3);
-    cy.get('[data-cy=dataStores-test-skip-cta]').click();
 
     cy.get(`[data-cy=trace-node-database]`, {timeout: 20000}).last().click();
     cy.get('[data-cy=add-test-spec-button]').click();
