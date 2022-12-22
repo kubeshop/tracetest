@@ -1,0 +1,68 @@
+# yaml-language-server: $schema=https://goreleaser.com/static/schema-pro.json
+project_name: tracetest
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+release:
+  # discussion_category_name: General
+  draft: false
+  prerelease: auto
+before:
+  hooks:
+    - dir: ./server
+      cmd: go mod tidy
+    - dir: ./cli
+      cmd: go mod tidy
+env:
+  - VERSION={{ if index .Env "VERSION"  }}{{ .Env.VERSION }}{{ else }}dev{{ end }}
+  - TRACETEST_ENV={{ if index .Env "TRACETEST_ENV"  }}{{ .Env.TRACETEST_ENV }}{{ else }}dev{{ end }}
+  - ANALYTICS_BE_KEY={{ if index .Env "ANALYTICS_BE_KEY"  }}{{ .Env.ANALYTICS_BE_KEY }}{{ else }}{{ end }}
+  - ANALYTICS_FE_KEY={{ if index .Env "ANALYTICS_FE_KEY"  }}{{ .Env.ANALYTICS_FE_KEY }}{{ else }}{{ end }}
+builds:
+  - id: server
+    binary: tracetest-server
+    main: ./server/main.go
+    ldflags:
+    - -X github.com/kubeshop/tracetest/server/app.Version={{ .Env.VERSION }}
+    - -X github.com/kubeshop/tracetest/server/app.Env={{ .Env.TRACETEST_ENV }}
+    - -X github.com/kubeshop/tracetest/server/analytics.SecretKey={{ .Env.ANALYTICS_BE_KEY }}
+    - -X github.com/kubeshop/tracetest/server/analytics.FrontendKey={{ .Env.ANALYTICS_FE_KEY }}
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+    goarch:
+    - amd64
+  - id: cli
+    binary: tracetest
+    main: ./cli/main.go
+    ldflags:
+    - -X github.com/kubeshop/tracetest/cli/config.Version={{ .Env.VERSION }}
+    - -X github.com/kubeshop/tracetest/cli/config.Env={{ .Env.TRACETEST_ENV }}
+    - -X github.com/kubeshop/tracetest/cli/analytics.SecretKey={{ .Env.ANALYTICS_BE_KEY }}
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+    goarch:
+    - amd64
+
+dockers:
+- image_templates:
+  - 'kubeshop/tracetest:{{ .Env.VERSION }}-demo'
+  extra_files:
+    - web/build
+    - server/migrations
+  build_flag_templates:
+  - "--pull"
+  - "--label=org.opencontainers.image.created={{.Date}}"
+  - "--label=org.opencontainers.image.name={{.ProjectName}}"
+  - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+  - "--label=org.opencontainers.image.version={{.Version}}"
+  - "--label=org.opencontainers.image.source={{.GitURL}}"
+  - "--platform=linux/amd64"
+  goos: linux
+  goarch: amd64
