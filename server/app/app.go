@@ -102,11 +102,14 @@ func (a *App) Start() error {
 		return err
 	}
 
+	fmt.Println("New install?", isNewInstall)
 	if isNewInstall {
 		err = analytics.SendEvent("Install", "beacon", "")
 		if err != nil {
 			return err
 		}
+
+		ensureFirstTimeDataSources(a.config.Config, testDB)
 	}
 
 	applicationTracer, err := tracing.GetApplicationTracer(ctx, a.config.Config)
@@ -179,6 +182,32 @@ func (a *App) Start() error {
 	return nil
 }
 
+func ensureFirstTimeDataSources(conf config.Config, repo model.DataStoreRepository) {
+	dsc, err := conf.DataStore()
+	if err != nil {
+		panic(fmt.Errorf("cannot parse DataStore from config file: %w", err))
+	}
+
+	if dsc == nil {
+		return
+	}
+
+	ds := model.DataStoreFromConfig(*dsc)
+	ds.IsDefault = true
+
+	if err := ds.Validate(); err != nil {
+		panic(fmt.Errorf("invalid DataStore config from config file: %w", err))
+	}
+
+	ds, err = repo.CreateDataStore(context.Background(), ds)
+	if err != nil {
+		panic(fmt.Errorf("cannot persist DataStore from config file: %w", err))
+	}
+
+	fmt.Printf("persisted initial DataStore from config file with values: %+v\n", ds)
+
+}
+
 func newRunnerFacades(
 	conf config.Config,
 	testDB model.Repository,
@@ -198,21 +227,12 @@ func newRunnerFacades(
 		subscriptionManager,
 	)
 
-	fallbackDS := model.DataStore{}
-	dsc, err := conf.DataStore()
-	if err == nil && dsc != nil {
-		fallbackDS = model.DataStoreFromConfig(*dsc)
-		if err := fallbackDS.Validate(); err != nil {
-			panic(err)
-		}
-	}
-
 	pollerExecutor := executor.NewPollerExecutor(
 		conf.PoolingRetryDelay(),
 		conf.MaxWaitTimeForTraceDuration(),
 		tracer,
 		execTestUpdater,
-		tracedb.WithFallback(tracedb.Factory(testDB), fallbackDS),
+		tracedb.Factory(testDB),
 		testDB,
 	)
 
