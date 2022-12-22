@@ -120,6 +120,8 @@ jobs:
     env:
       DOCKER_CLI_EXPERIMENTAL: "enabled"
       GORELEASER_KEY: ${{ secrets.GORELEASER_LICENSE }}
+      GITHUB_TOKEN: ${{ secrets.CI_BOT_TOKEN }}
+      FURY_TOKEN: ${{ secrets.FURY_TOKEN }}
     steps:
       - uses: actions/checkout@v3
         with:
