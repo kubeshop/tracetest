@@ -89,7 +89,7 @@ jobs:
           args: release --rm-dist --split --nightly
         env:
           GOOS: ${{ matrix.GOOS }}
-          VERSION: ${{ env.sha_short }}
+          VERSION: sha-${{ env.sha_short }}
           TRACETEST_ENV: main
           ANALYTICS_FE_KEY: ${{ secrets.ANALYTICS_FE_KEY }}
           ANALYTICS_BE_KEY: ${{ secrets.ANALYTICS_BE_KEY }}
@@ -150,7 +150,7 @@ jobs:
           version: latest
           args: continue --merge
         env:
-          VERSION: ${{ env.sha_short }}
+          VERSION: sha-${{ env.sha_short }}
           TRACETEST_ENV: main
           ANALYTICS_FE_KEY: ${{ secrets.ANALYTICS_FE_KEY }}
           ANALYTICS_BE_KEY: ${{ secrets.ANALYTICS_BE_KEY }}
