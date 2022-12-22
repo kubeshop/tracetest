@@ -53,6 +53,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
+      - uses: docker/setup-qemu-action@v2
       - uses: docker/setup-buildx-action@v2
       - name: Login to DockerHub
         uses: docker/login-action@v2
@@ -82,41 +83,6 @@ jobs:
           args: release --rm-dist --split --nightly
         env:
           GOOS: ${{ matrix.GOOS }}
-
-  build-go:
-    name: build go binaries
-    runs-on: ubuntu-latest
-    env:
-      GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Setup go
-        uses: actions/setup-go@v3
-        with:
-          go-version-file: 'go.work'
-          cache: true
-          cache-dependency-path: go.work
-      - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v4
-        with:
-          distribution: goreleaser-pro
-          version: latest
-          install-only: true
-      - name: build base bin
-        run: goreleaser release --skip-announce  --skip-publish --snapshot --rm-dist --split
-        env:
-          VERSION: sha-${{ steps.vars.outputs.sha_short }}
-          TRACETEST_ENV: main
-          ANALYTICS_FE_KEY: ${{ secrets.ANALYTICS_FE_KEY }}
-          ANALYTICS_BE_KEY: ${{ secrets.ANALYTICS_BE_KEY }}
-      - run: echo $(go env GOOS)_$(go env GOARCH) > dist/arch.txt
-      - name: Upload assets
-        uses: actions/upload-artifact@v3
-        with:
-          name: tracetest-go
-          pat`h: dist/
 
   release:
     runs-on: ubuntu-latest
