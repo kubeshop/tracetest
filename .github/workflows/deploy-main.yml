@@ -42,6 +42,7 @@ jobs:
           path: web/build/
 
   prepare-go:
+    needs: [build-web]
     strategy:
       matrix:
         GOOS: [linux, windows, darwin]
@@ -75,8 +76,13 @@ jobs:
         with:
           path: dist/${{ matrix.GOOS }}
           key: ${{ matrix.GOOS }}-${{ env.sha_short }}
+      - uses: actions/download-artifact@v3
+        if: steps.cache.outputs.cache-hit != 'true'
+        with:
+          name: tracetest-web
+          path: web/build/
       - uses: goreleaser/goreleaser-action@v4
-        if: steps.cache.outputs.cache-hit != 'true' # do not run if cache hit
+        if: steps.cache.outputs.cache-hit != 'true'
         with:
           distribution: goreleaser-pro
           version: latest
@@ -131,7 +137,7 @@ jobs:
 
       # release
       - uses: goreleaser/goreleaser-action@v4
-        if: steps.cache.outputs.cache-hit != 'true' # do not run if cache hit
+        if: steps.cache.outputs.cache-hit != 'true'
         with:
           distribution: goreleaser-pro
           version: latest
