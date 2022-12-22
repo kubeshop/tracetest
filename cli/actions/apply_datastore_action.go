@@ -3,6 +3,8 @@ package actions
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 
 	"github.com/fluidtruck/deepcopy"
 	"github.com/kubeshop/tracetest/cli/file"
@@ -68,7 +70,17 @@ func (a applyDataStoreAction) Run(ctx context.Context, args ApplyDataStoreConfig
 func (a applyDataStoreAction) createDataStore(ctx context.Context, file file.File, dataStore openapi.DataStore) error {
 	req := a.client.ApiApi.CreateDataStore(ctx)
 	req = req.DataStore(dataStore)
-	createdDataStore, _, err := a.client.ApiApi.CreateDataStoreExecute(req)
+	createdDataStore, resp, err := a.client.ApiApi.CreateDataStoreExecute(req)
+	if resp.StatusCode == http.StatusUnprocessableEntity {
+		// validation error
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return err
+		}
+
+		validationError := string(body)
+		return fmt.Errorf("invalid data store: %s", validationError)
+	}
 	if err != nil {
 		return fmt.Errorf("could not create data store: %w", err)
 	}
@@ -89,7 +101,17 @@ func (a applyDataStoreAction) createDataStore(ctx context.Context, file file.Fil
 func (a applyDataStoreAction) updateDataStore(ctx context.Context, file file.File, dataStore openapi.DataStore) error {
 	req := a.client.ApiApi.UpdateDataStore(ctx, *dataStore.Id)
 	req = req.DataStore(dataStore)
-	_, err := a.client.ApiApi.UpdateDataStoreExecute(req)
+	resp, err := a.client.ApiApi.UpdateDataStoreExecute(req)
+	if resp.StatusCode == http.StatusUnprocessableEntity {
+		// validation error
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return err
+		}
+
+		validationError := string(body)
+		return fmt.Errorf("invalid data store: %s", validationError)
+	}
 	if err != nil {
 		return fmt.Errorf("could not update data store: %w", err)
 	}

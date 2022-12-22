@@ -17,23 +17,25 @@ import (
 
 // DataStore struct for DataStore
 type DataStore struct {
-	Id         *string              `json:"id,omitempty"`
-	Name       *string              `json:"name,omitempty"`
-	Type       *SupportedDataStores `json:"type,omitempty"`
-	IsDefault  *bool                `json:"isDefault,omitempty"`
-	Jaeger     *GRPCClientSettings  `json:"jaeger,omitempty"`
-	Tempo      *GRPCClientSettings  `json:"tempo,omitempty"`
-	OpenSearch *OpenSearch          `json:"openSearch,omitempty"`
-	SignalFx   *SignalFX            `json:"signalFx,omitempty"`
-	CreatedAt  *time.Time           `json:"createdAt,omitempty"`
+	Id         *string             `json:"id,omitempty"`
+	Name       string              `json:"name"`
+	Type       SupportedDataStores `json:"type"`
+	IsDefault  *bool               `json:"isDefault,omitempty"`
+	Jaeger     *GRPCClientSettings `json:"jaeger,omitempty"`
+	Tempo      *GRPCClientSettings `json:"tempo,omitempty"`
+	OpenSearch *OpenSearch         `json:"openSearch,omitempty"`
+	SignalFx   *SignalFX           `json:"signalFx,omitempty"`
+	CreatedAt  *time.Time          `json:"createdAt,omitempty"`
 }
 
 // NewDataStore instantiates a new DataStore object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewDataStore() *DataStore {
+func NewDataStore(name string, type_ SupportedDataStores) *DataStore {
 	this := DataStore{}
+	this.Name = name
+	this.Type = type_
 	return &this
 }
 
@@ -77,68 +79,52 @@ func (o *DataStore) SetId(v string) {
 	o.Id = &v
 }
 
-// GetName returns the Name field value if set, zero value otherwise.
+// GetName returns the Name field value
 func (o *DataStore) GetName() string {
-	if o == nil || o.Name == nil {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Name
+
+	return o.Name
 }
 
-// GetNameOk returns a tuple with the Name field value if set, nil otherwise
+// GetNameOk returns a tuple with the Name field value
 // and a boolean to check if the value has been set.
 func (o *DataStore) GetNameOk() (*string, bool) {
-	if o == nil || o.Name == nil {
+	if o == nil {
 		return nil, false
 	}
-	return o.Name, true
+	return &o.Name, true
 }
 
-// HasName returns a boolean if a field has been set.
-func (o *DataStore) HasName() bool {
-	if o != nil && o.Name != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetName gets a reference to the given string and assigns it to the Name field.
+// SetName sets field value
 func (o *DataStore) SetName(v string) {
-	o.Name = &v
+	o.Name = v
 }
 
-// GetType returns the Type field value if set, zero value otherwise.
+// GetType returns the Type field value
 func (o *DataStore) GetType() SupportedDataStores {
-	if o == nil || o.Type == nil {
+	if o == nil {
 		var ret SupportedDataStores
 		return ret
 	}
-	return *o.Type
+
+	return o.Type
 }
 
-// GetTypeOk returns a tuple with the Type field value if set, nil otherwise
+// GetTypeOk returns a tuple with the Type field value
 // and a boolean to check if the value has been set.
 func (o *DataStore) GetTypeOk() (*SupportedDataStores, bool) {
-	if o == nil || o.Type == nil {
+	if o == nil {
 		return nil, false
 	}
-	return o.Type, true
+	return &o.Type, true
 }
 
-// HasType returns a boolean if a field has been set.
-func (o *DataStore) HasType() bool {
-	if o != nil && o.Type != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetType gets a reference to the given SupportedDataStores and assigns it to the Type field.
+// SetType sets field value
 func (o *DataStore) SetType(v SupportedDataStores) {
-	o.Type = &v
+	o.Type = v
 }
 
 // GetIsDefault returns the IsDefault field value if set, zero value otherwise.
@@ -338,10 +324,10 @@ func (o DataStore) MarshalJSON() ([]byte, error) {
 	if o.Id != nil {
 		toSerialize["id"] = o.Id
 	}
-	if o.Name != nil {
+	if true {
 		toSerialize["name"] = o.Name
 	}
-	if o.Type != nil {
+	if true {
 		toSerialize["type"] = o.Type
 	}
 	if o.IsDefault != nil {
