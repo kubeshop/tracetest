@@ -1,16 +1,3 @@
-build: build-docker
-
-build-web:
-	cd web; npm ci; npm run build
-
-build-go:
-	goreleaser build --single-target --rm-dist --snapshot
-
-build-docker:
-	GOOS=linux goreleaser build --single-target --rm-dist --snapshot
-
-	docker build . -t kubeshop/tracetest \
-		--build-arg OS_ARCH=linux_${shell uname -m}
 
 generate: generate-server generate-cli generate-web
 

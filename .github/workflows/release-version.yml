@@ -53,7 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DOCKER_CLI_EXPERIMENTAL: "enabled"
-      GORELEASER_KEY: ${{ secrets.GORELEASER_LICENSE }}
+      GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -103,7 +103,7 @@ jobs:
     needs: [prepare-go, build-web]
     env:
       DOCKER_CLI_EXPERIMENTAL: "enabled"
-      GORELEASER_KEY: ${{ secrets.GORELEASER_LICENSE }}
+      GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
       GITHUB_TOKEN: ${{ secrets.CI_BOT_TOKEN }}
       FURY_TOKEN: ${{ secrets.FURY_TOKEN }}
     steps:
@@ -219,7 +219,7 @@ jobs:
     needs: [build-web]
     env:
       DOCKER_CLI_EXPERIMENTAL: "enabled"
-      GORELEASER_KEY: ${{ secrets.GORELEASER_LICENSE }}
+      GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
       GITHUB_TOKEN: ${{ secrets.CI_BOT_TOKEN }}
       FURY_TOKEN: ${{ secrets.FURY_TOKEN }}
     steps:
@@ -250,7 +250,7 @@ jobs:
         with:
           distribution: goreleaser-pro
           version: latest
-          args: release --rm-dist --skip-announce -f .goreleaser.demo.yaml
+          args: release --rm-dist --skip-announce -f .goreleaser.dev.yaml
         env:
           VERSION: ${{ github.ref_name}}-demo
           TRACETEST_ENV: demo

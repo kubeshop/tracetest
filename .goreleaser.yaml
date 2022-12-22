@@ -43,6 +43,7 @@ builds:
     - arm64
     goarm:
     - "7"
+
   - id: cli
     binary: tracetest
     main: ./cli/main.go
@@ -90,6 +91,7 @@ dockers:
   goos: linux
   goarch: amd64
   use: buildx
+
 - image_templates:
   - 'kubeshop/tracetest:{{ .Env.VERSION }}-arm64'
   extra_files:
@@ -124,10 +126,7 @@ checksum:
   name_template: 'checksums.txt'
 
 universal_binaries:
-- id: cli
-  replace: true
-- id: server
-  replace: true
+- replace: true
 
 nfpms:
 - vendor: Kubeshop
@@ -150,14 +149,12 @@ publishers:
     - DISABLED={{ if .IsNightly }}true{{ end }}
     cmd: ./scripts/fury-upload.sh {{ .ArtifactName }}
 
-brews:
-- ids:
-    - cli
-  tap:
-    owner: kubeshop
-    name: homebrew-tracetest
-  commit_author:
-    name: Brew Bot
-    email: brewbot@kubeshop.io
-  homepage: https://tracetest.kubeshop.io/
-  license: "MIT"
+# brews:
+# - tap:
+#     owner: kubeshop
+#     name: homebrew-tracetest
+#   commit_author:
+#     name: Brew Bot
+#     email: brewbot@kubeshop.io
+#   homepage: https://tracetest.kubeshop.io/
+#   license: "MIT"
