@@ -189,7 +189,7 @@ jobs:
         run: |
           cd examples/${{ matrix.example_dir }}
           docker pull kubeshop/tracetest:pr-${{ github.event.pull_request.number }}
-          TAG=pr-${{ github.event.pull_request.number }} docker-compose up -d
+          TAG=pr-${{ github.event.pull_request.number }} docker-compose up > /tmp/docker-log
       - name: Run example test
         run: |
           mv ./dist/$(cat dist/arch.txt)/tracetest ./dist/tracetest
@@ -198,7 +198,7 @@ jobs:
           ./scripts/wait-for-port.sh 11633
 
           ./dist/tracetest configure -g --endpoint http://localhost:11633 --analytics=false
-          ./dist/tracetest test run -d examples/${{ matrix.example_dir }}/tests/list-tests.yaml --wait-for-result
+          ./dist/tracetest test run -d examples/${{ matrix.example_dir }}/tests/list-tests.yaml --wait-for-result || cat /tmp/docker-log
 
   deploy:
     name: Deploy
