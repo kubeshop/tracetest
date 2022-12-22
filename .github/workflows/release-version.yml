@@ -246,7 +246,6 @@ jobs:
           path: web/build/
       # release
       - uses: goreleaser/goreleaser-action@v4
-        if: steps.cache.outputs.cache-hit != 'true'
         with:
           distribution: goreleaser-pro
           version: latest
