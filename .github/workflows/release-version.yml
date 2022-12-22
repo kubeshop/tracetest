@@ -240,6 +240,10 @@ jobs:
           go-version-file: 'go.work'
           cache: true
           cache-dependency-path: go.work
+      - uses: actions/download-artifact@v3
+        with:
+          name: tracetest-web
+          path: web/build/
       # release
       - uses: goreleaser/goreleaser-action@v4
         if: steps.cache.outputs.cache-hit != 'true'
