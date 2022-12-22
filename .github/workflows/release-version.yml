@@ -53,7 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DOCKER_CLI_EXPERIMENTAL: "enabled"
-      GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
+      GORELEASER_KEY: ${{ secrets.GORELEASER_LICENSE }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -103,7 +103,7 @@ jobs:
     needs: [prepare-go, build-web]
     env:
       DOCKER_CLI_EXPERIMENTAL: "enabled"
-      GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
+      GORELEASER_KEY: ${{ secrets.GORELEASER_LICENSE }}
       GITHUB_TOKEN: ${{ secrets.CI_BOT_TOKEN }}
       FURY_TOKEN: ${{ secrets.FURY_TOKEN }}
     steps:
@@ -219,7 +219,7 @@ jobs:
     needs: [build-web]
     env:
       DOCKER_CLI_EXPERIMENTAL: "enabled"
-      GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
+      GORELEASER_KEY: ${{ secrets.GORELEASER_LICENSE }}
       GITHUB_TOKEN: ${{ secrets.CI_BOT_TOKEN }}
       FURY_TOKEN: ${{ secrets.FURY_TOKEN }}
     steps:
