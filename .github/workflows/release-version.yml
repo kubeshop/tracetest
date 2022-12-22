@@ -293,6 +293,13 @@ jobs:
           go-version-file: 'go.work'
           cache: true
           cache-dependency-path: go.work
+      # release
+      - uses: goreleaser/goreleaser-action@v4
+        if: steps.cache.outputs.cache-hit != 'true'
+        with:
+          distribution: goreleaser-pro
+          version: latest
+          args: continue --merge
         env:
           VERSION: ${{ github.ref_name}}-demo
           TRACETEST_ENV: demo
@@ -301,7 +308,7 @@ jobs:
 
   demo-deploy:
     if: github.event_name == 'push'
-    needs: demo-release
+    needs: [demo-release]
     name: Deploy
     runs-on: ubuntu-latest
 
