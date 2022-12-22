@@ -144,7 +144,7 @@ publishers:
   - name: fury.io
     env:
     - 'FURY_TOKEN={{ .Env.FURY_TOKEN }}'
-    # relative to cli/, where goreleaser runs from
+    - DISABLED={{ if .IsNightly }}true{{ end }}
     cmd: ./scripts/fury-upload.sh {{ .ArtifactName }}
 
 brews:
