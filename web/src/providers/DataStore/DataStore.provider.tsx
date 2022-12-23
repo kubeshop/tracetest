@@ -73,7 +73,8 @@ const DataStoreProvider = ({children}: IProps) => {
   const onDeleteConfig = useCallback(
     async (defaultDataStore: TDataStore) => {
       onOpen({
-        title: 'Tracetest needs to do a quick restart to use this new configuration.',
+        title:
+          "Tracetest will remove the trace data store configuration information and enter the 'No-Tracing Mode'. You can still run tests against the responses until you configure a new trace data store.",
         heading: 'Save Confirmation',
         okText: 'Save & Restart',
         onConfirm: async () => {
