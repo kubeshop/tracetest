@@ -8,6 +8,24 @@ With this, users can get familiar with the Tracetest tool by focusing on creatin
 
 The PMA is only accessible from within the Kubernetes cluster network as the Tracetest needs to be able to reach it.
 
-## **System architecture**
+## System architecture
 
-![System Architecture](../img/516718595/517537795.png)
+### Kubernetes Cluster
+
+```mermaid
+flowchart TD
+    A[(Redis)]
+    B[(Postgres)]
+    C(Node.js API)
+    D(RabbitMQ)
+    E(Worker)
+    F(Jaeger)
+
+    C --> |IORedis| A
+    C --> |Sequelize| B
+    C --> |ampqlib| D
+    D --> |ampqlib| E
+    E --> |Sequelize| B
+    C --> |OpenTelemetry Node.js SDK| F
+    E --> |OpenTelemetry Node.js SDK| F
+```
