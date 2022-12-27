@@ -58,26 +58,26 @@ const (
 
 func DataStoreFromConfig(dsc config.TracingBackendDataStoreConfig) DataStore {
 	var cType openapi.SupportedDataStores
-	ds := DataStore{
-		Type:   cType,
-		Values: DataStoreValues{},
-	}
 	switch dsc.Type {
 	case jaeger:
-		ds.Type = openapi.JAEGER
+		cType = openapi.JAEGER
 	case tempo:
-		ds.Type = openapi.TEMPO
+		cType = openapi.TEMPO
 	case opensearch:
-		ds.Type = openapi.OPEN_SEARCH
+		cType = openapi.OPEN_SEARCH
 	case signalfx:
-		ds.Type = openapi.SIGNAL_FX
+		cType = openapi.SIGNAL_FX
 	case otlp:
-		ds.Type = openapi.OTLP
+		cType = openapi.OTLP
 	}
-	ds.Values.Jaeger = &dsc.Jaeger
-	ds.Values.Tempo = &dsc.Tempo
-	ds.Values.OpenSearch = &dsc.OpenSearch
-	ds.Values.SignalFx = &dsc.SignalFX
 
-	return ds
+	return DataStore{
+		Type: cType,
+		Values: DataStoreValues{
+			Jaeger:     &dsc.Jaeger,
+			Tempo:      &dsc.Tempo,
+			OpenSearch: &dsc.OpenSearch,
+			SignalFx:   &dsc.SignalFX,
+		},
+	}
 }
