@@ -9,9 +9,9 @@ interface IProps {
 const TestConnectionNotification = ({result: {authentication, connectivity, fetchTraces}}: IProps) => {
   return (
     <S.Container>
-      <TestConnectionStep step={connectivity} />
-      <TestConnectionStep step={authentication} />
-      <TestConnectionStep step={fetchTraces} />
+      <TestConnectionStep step={connectivity} title="Connectivity" />
+      <TestConnectionStep step={authentication} title="Authentication" />
+      <TestConnectionStep step={fetchTraces} title="Fetch traces" />
     </S.Container>
   );
 };

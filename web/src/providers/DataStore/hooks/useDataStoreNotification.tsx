@@ -1,4 +1,4 @@
-import {notification} from 'antd';
+import {notification, Typography} from 'antd';
 import {useCallback} from 'react';
 import {useTheme} from 'styled-components';
 import {SupportedDataStores, TConnectionResult} from 'types/Config.types';
@@ -14,7 +14,7 @@ const useDataStoreNotification = () => {
     (result: TConnectionResult, dataStoreType: SupportedDataStores) => {
       if (dataStoreType === SupportedDataStores.OtelCollector) {
         return api.info({
-          message: 'No Automated Test',
+          message: <Typography.Title level={2}>No Automated Test</Typography.Title>,
           description:
             'Since the OpenTelemetry Collector sends traces to Tracetest, there is no automated test. Once you have configured your OpenTelemetry Collector to send Tracetest spans to Tracetest, try running a Tracetest test against your application under test.',
           style: {
@@ -25,14 +25,14 @@ const useDataStoreNotification = () => {
 
       if (result.allPassed) {
         return api.success({
-          message: 'All tests successful - configuration is valid',
+          message: <Typography.Title level={2}>All tests successful - configuration is valid</Typography.Title>,
           description: <TestConnectionNotification result={result} />,
           ...success,
         });
       }
 
       api.error({
-        message: 'Test failed - configuration is not valid',
+        message: <Typography.Title level={2}>Test failed - configuration is not valid</Typography.Title>,
         description: <TestConnectionNotification result={result} />,
         ...error,
       });
