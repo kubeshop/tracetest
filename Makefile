@@ -5,12 +5,17 @@ OPENAPI_GENERATOR_IMAGE=openapitools/openapi-generator-cli:$(OPENAPI_GENERATOR_V
 OPENAPI_GENERATOR_CLI=docker run --rm -u ${shell id -u}  -v "$(PROJECT_ROOT):/local" -w "/local" ${OPENAPI_GENERATOR_IMAGE}
 OPENAPI_TARGET_DIR=openapi/
 
+help: Makefile ## show list of commands
+	@echo "Choose a command run:"
+	@echo ""
+	@awk 'BEGIN {FS = ":.*?## "} /[a-zA-Z_-]+:.*?## / {sub("\\\\n",sprintf("\n%22c"," "), $$2);printf "\033[36m%-40s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST) | sort
+
 generate: generate-server generate-cli generate-web
 
-generate-web:
+generate-web: ## generates OpenAPI types for WebUI
 	cd web; npm run types:generate
 
-generate-cli:
+generate-cli: ## generates OpenAPI types for CLI
 	$(eval BASE := ./cli)
 	mkdir -p $(BASE)/tmp
 	rm -rf $(BASE)/$(OPENAPI_TARGET_DIR)
@@ -27,7 +32,7 @@ generate-cli:
 
 	cd $(BASE); go fmt ./...
 
-generate-server:
+generate-server: ## generates OpenAPI types for server
 	$(eval BASE := ./server)
 	mkdir -p $(BASE)/tmp
 	rm -rf $(BASE)/$(OPENAPI_TARGET_DIR)
@@ -45,7 +50,7 @@ generate-server:
 
 	cd $(BASE); go fmt ./...
 
-serve-docs:
+serve-docs: ## serve documentation for Tracetest
 	docker build -t tracetest-docs -f docs-Dockerfile .
 	docker run --network host tracetest-docs
 	sleep 1

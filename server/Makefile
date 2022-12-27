@@ -9,22 +9,27 @@ GO_LDFLAGS := $(shell echo \
 		-X "'github.com/kubeshop/tracetest/server/analytics.FrontendKey=$(ANALYTICS_FE_KEY)'" \
 	| sed 's/ / /g')
 
+help: Makefile ## show list of commands
+	@echo "Choose a command run:"
+	@echo ""
+	@awk 'BEGIN {FS = ":.*?## "} /[a-zA-Z_-]+:.*?## / {sub("\\\\n",sprintf("\n%22c"," "), $$2);printf "\033[36m%-40s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST) | sort
+
 all: init-submodule proto generate
 
 init-submodule:
 	git submodule init
 	git submodule update
 
-test:
+test: # run go tests for this application
 	go test -timeout 90s -coverprofile=coverage.out ./...
 
-vet:
+vet: ## run vet tool to analyze the code for suspicious, abnormal, or useless code
 	go vet -structtag=false ./...
 
-run:
+run: ## run server locally
 	go run -ldflags="$(GO_LDFLAGS)" main.go
 
-build:
+build: ## build tracetest-server binary
 	go build -o tracetest-server -ldflags="$(GO_LDFLAGS)" .
 
 PROTOC_VER=0.3.1
@@ -69,7 +74,7 @@ PROTOC_WITH_GRPC := $(PROTOC) \
 PROTOC_INTERNAL := $(PROTOC) \
 		$(PROTO_INCLUDES)
 
-proto:
+proto: ## generate code client from protobuf definitions
 	rm -rf ./$(PROTO_GEN_GO_DIR)
 	mkdir -p ${PROTO_GEN_GO_DIR}
 
