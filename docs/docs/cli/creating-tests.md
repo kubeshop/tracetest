@@ -242,7 +242,7 @@ A `selector` is needed only if the provided expression refers to a/some span/s a
 It can be defined using the following YAML definition:
 
 ```yaml
-outpus:
+outputs:
   - name: USER_ID
     selector: span[name = "user creation"]
     value: attr:myapp.users.created_id
@@ -257,7 +257,7 @@ The `value` attribute is an `expression`, and is a very powerful tool.
 You can output basic expressions
 
 ```yaml
-outpus:
+outputs:
 
 - name: ARITHMETIC_RESULT
   value: 1 + 1
@@ -274,7 +274,7 @@ outpus:
 Imagine an hypotetical `/users/create` endpoint that returns the full `user` object, including the new ID, when the operation is successful.
 
 ```yaml
-outpus:
+outputs:
 - name: USER_ID
   selector: span[name = "POST /user/create"]
   value: attr:http.response.body | json_path '.id'
@@ -292,7 +292,7 @@ In this case, the service is instrumented so that each query generates a span of
 You can get a list of sql operations:
 
 ```yaml
-outpus:
+outputs:
 - name: SQL_OPS
   selector: span[tracetest.span.type = "database"]
   value: attr:sql.operation
@@ -302,7 +302,7 @@ outpus:
 Since the value is an array, you can also apply filters to it:
 
 ```yaml
-outpus:
+outputs:
 - name: LAST_SQL_OP
   selector: span[tracetest.span.type = "database"]
   value: attr:sql.operation | get_index 'last'
