@@ -1,8 +1,8 @@
 postgresConnString: "host=${NAME}-postgresql user=tracetest password=not-secure-database-password  port=5432 sslmode=disable"
 
 poolingConfig:
-  maxWaitTimeForTrace: 1m
-  retryDelay: 1s
+  maxWaitTimeForTrace: 10s
+  retryDelay: 500ms
 
 googleAnalytics:
   enabled: false
