@@ -59,6 +59,7 @@ const (
 func DataStoreFromConfig(dsc config.TracingBackendDataStoreConfig) DataStore {
 	var cType openapi.SupportedDataStores
 	ds := DataStore{
+		Name:   string(cType),
 		Type:   cType,
 		Values: DataStoreValues{},
 	}
