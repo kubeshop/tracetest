@@ -3,8 +3,8 @@ module github.com/kubeshop/tracetest/examples/observability-driven-development-g
 go 1.19
 
 require (
-	github.com/kubeshop/tracetest/examples/observability-driven-development-go-tracetest/bookstore/part3.2/lib
 	github.com/gorilla/mux v1.8.0
+	github.com/kubeshop/tracetest/examples/observability-driven-development-go-tracetest/bookstore/part3.2/lib v0.0.0-20221228141154-dffde3a8659b
 	go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux v0.37.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.37.0
 	go.opentelemetry.io/otel v1.11.2
