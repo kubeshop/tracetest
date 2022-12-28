@@ -34,7 +34,6 @@ echo "TRACETEST_MAIN_ENDPOINT: $TRACETEST_MAIN_ENDPOINT"
 echo "TRACETEST_TARGET_ENDPOINT: $TRACETEST_TARGET_ENDPOINT"
 echo "DEMO_APP_URL: $DEMO_APP_URL"
 echo "DEMO_APP_GRPC_URL: $DEMO_APP_GRPC_URL"
-echo "Hello there!"
 
 cat << EOF > config.main.yml
 scheme: http
@@ -55,6 +54,7 @@ EXIT_STATUS=0
 # bash ./grpc.bash || EXIT_STATUS=$?
 # bash ./environments.bash || EXIT_STATUS=$?
 # bash ./transactions.bash || EXIT_STATUS=$?
+source ./funcs.bash
 test "transaction_test_suite" ./features/transaction_test_suite.yml || EXIT_STATUS=$?
 
 exit $EXIT_STATUS
