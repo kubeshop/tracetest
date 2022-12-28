@@ -1,4 +1,4 @@
-#/bin/bash
+#!/bin/bash
 
 set -e
 
@@ -50,9 +50,13 @@ EOF
 mkdir -p results/responses
 
 EXIT_STATUS=0
+
 # bash ./tests.bash || EXIT_STATUS=$?
 # bash ./grpc.bash || EXIT_STATUS=$?
 # bash ./environments.bash || EXIT_STATUS=$?
-bash ./transactions.bash || EXIT_STATUS=$?
+# bash ./transactions.bash || EXIT_STATUS=$?
+
+source ./funcs.bash
+test "transaction_test_suite" ./features/transaction/_test_suite.yml || EXIT_STATUS=$?
 
 exit $EXIT_STATUS

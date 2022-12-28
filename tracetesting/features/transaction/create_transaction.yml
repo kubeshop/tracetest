@@ -14,19 +14,24 @@ spec:
         {
             "name": "test-transaction",
             "description": "a transaction",
-            "steps": [ {"id": "${TEST_ID}"} ]
+            "steps": [ {"id": "${TRANSACTION_STEP_ID}"} ]
         }
   specs:
-    - selector: span[name = "Tracetest trigger"]
-      assertions:
-        - attr:tracetest.selected_spans.count = 1
-        - attr:tracetest.response.status = 200
-    - selector: span[name="POST /api/transactions" tracetest.span.type="http"]
-      assertions:
-        - attr:tracetest.selected_spans.count = 1
-    - selector: span[name = "exec INSERT"]
-      assertions:
-        - attr:tracetest.selected_spans.count = 2
-    - selector: span[name = "exec INSERT"]:first
-      assertions:
-        - attr:sql.query contains "INSERT INTO transactions"
+  - selector: span[name = "Tracetest trigger"]
+    assertions:
+      - attr:tracetest.selected_spans.count = 1
+      - attr:tracetest.response.status = 200
+  - selector: span[name="POST /api/transactions" tracetest.span.type="http"]
+    assertions:
+      - attr:tracetest.selected_spans.count = 1
+  - selector: span[name = "exec INSERT"]
+    assertions:
+      - attr:tracetest.selected_spans.count = 2
+  - selector: span[name = "exec INSERT"]:first
+    assertions:
+      - attr:sql.query contains "INSERT INTO transactions"
+
+  outputs:
+  - name: TRANSACTION_ID
+    selector: span[name = "Tracetest trigger"]
+    value: attr:tracetest.response.body | json_path '$.id'

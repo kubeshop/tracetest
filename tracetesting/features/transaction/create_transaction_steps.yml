@@ -70,6 +70,6 @@ spec:
     - attr:tracetest.response.body | json_path '$.id' = env:TEST_ID
 
   outputs:
-  - name: TEST_ID
+  - name: TRANSACTION_STEP_ID
     selector: span[name = "Tracetest trigger"]
     value: attr:tracetest.response.body | json_path '$.id'

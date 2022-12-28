@@ -18,4 +18,4 @@ spec:
     - selector: span[name="GET /api/transactions" tracetest.span.type="http"]
       assertions:
         - attr:tracetest.selected_spans.count = 1
-        # TODO: add transaction id here to check
+        - attr:http.response.body contains '"id":${env:TRANSACTION_ID}'
