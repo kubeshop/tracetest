@@ -21,6 +21,6 @@ EXIT_STATUS=0
 # test "resource_list" ./definitions/resource_list.yml || EXIT_STATUS=$?
 # test "transaction_delete" ./definitions/transaction_delete.yml || EXIT_STATUS=$?
 
-test "transaction_test_suite" ./features/transaction_test_suite.yml || EXIT_STATUS=$?
+test "transaction_test_suite" ./features/transaction/_test_suite.yml || EXIT_STATUS=$?
 
 exit $EXIT_STATUS

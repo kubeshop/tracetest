@@ -5,9 +5,9 @@ spec:
   description: Sequence of tests to validate if our Transaction feature is working as expected
   steps:
     # create tests that  will be added to a transaction
-    - ./transaction/create_transaction_steps.yml
+    - ./features/transaction/create_transaction_steps.yml
     # create transaction that will group these steps
-    - ./transaction/create_transaction.yml
+    - ./features/transaction/create_transaction.yml
     # check if this transaction is listed on API
     # - ./list_transaction.yml
     # delete transaction
