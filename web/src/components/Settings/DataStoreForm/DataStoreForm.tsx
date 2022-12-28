@@ -49,8 +49,8 @@ const DataStoreForm = ({form, onSubmit, dataStoreConfig, onIsFormValid}: IProps)
           <DataStoreSelectionInput />
         </Form.Item>
         <DataStoreDocsBanner dataStoreType={dataStoreType!} />
-        {explanation ? <S.Explanation>{explanation}</S.Explanation> : <S.Title>Provide connection info</S.Title>}
-        <DataStoreComponentFactory dataStoreType={dataStoreType} />
+        {explanation ? <S.Explanation>{explanation}</S.Explanation> : <S.Title>Provide the connection info</S.Title>}
+        {dataStoreType && <DataStoreComponentFactory dataStoreType={dataStoreType} />}
       </S.FormContainer>
     </Form>
   );

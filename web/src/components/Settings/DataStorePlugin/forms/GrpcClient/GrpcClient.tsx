@@ -1,5 +1,4 @@
 import {Checkbox, Col, Form, Input, Row, Select, Space, Switch} from 'antd';
-import {useState} from 'react';
 
 import RequestDetailsHeadersInput from 'components/CreateTestPlugins/Rest/steps/RequestDetails/RequestDetailsHeadersInput';
 import {TDraftDataStore} from 'types/Config.types';
@@ -21,8 +20,7 @@ const GrpcClient = () => {
   const form = Form.useFormInstance<TDraftDataStore>();
   const dataStoreType = form.getFieldValue('dataStoreType');
   const baseName = ['dataStore', dataStoreType];
-  const insecureValue = form.getFieldValue([...baseName, 'tls', 'insecure']);
-  const [isSecure, setIsSecure] = useState(!insecureValue);
+  const insecureValue = Form.useWatch([...baseName, 'tls', 'insecure'], form) ?? true;
 
   return (
     <>
@@ -87,9 +85,8 @@ const GrpcClient = () => {
         <Switch
           onChange={checked => {
             form.setFieldsValue({dataStore: {[dataStoreType]: {tls: {insecure: !checked}}}});
-            setIsSecure(checked);
           }}
-          checked={isSecure}
+          checked={!insecureValue}
         />{' '}
         Secure options
         <Form.Item hidden initialValue name={[...baseName, 'tls', 'insecure']} valuePropName="checked">
@@ -97,7 +94,7 @@ const GrpcClient = () => {
         </Form.Item>
       </Space>
 
-      {isSecure && <GrpcClientSecure baseName={baseName} />}
+      {!insecureValue && <GrpcClientSecure baseName={baseName} />}
     </>
   );
 };

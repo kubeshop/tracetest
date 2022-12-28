@@ -13,9 +13,9 @@ const OpenSearchService = (): TDataStoreService => ({
       },
     });
   },
-  validateDraft({dataStore: {openSearch: {index = '', username = '', password = '', addresses = []} = {}} = {}}) {
+  validateDraft({dataStore: {openSearch: {index = '', addresses = []} = {}} = {}}) {
     const [address] = addresses;
-    if (!index || !username || !password || !Validator.url(address)) return Promise.resolve(false);
+    if (!index || !Validator.url(address)) return Promise.resolve(false);
 
     return Promise.resolve(true);
   },
