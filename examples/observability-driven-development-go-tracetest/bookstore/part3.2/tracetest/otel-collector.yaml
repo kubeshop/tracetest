@@ -1,0 +1,26 @@
+exporters:
+    jaeger:
+        endpoint: jaeger:14250
+        tls:
+            insecure: true
+processors:
+    batch:
+        timeout: 100ms
+    probabilistic_sampler:
+        hash_seed: 22
+        sampling_percentage: 100
+receivers:
+    otlp:
+        protocols:
+            grpc: null
+            http: null
+service:
+    pipelines:
+        traces:
+            exporters:
+                - jaeger
+            processors:
+                - probabilistic_sampler
+                - batch
+            receivers:
+                - otlp
