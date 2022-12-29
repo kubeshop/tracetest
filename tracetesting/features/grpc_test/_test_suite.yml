@@ -11,3 +11,7 @@ spec:
     - ./03_run_grpc_test.yml
     # delete test
     - ./04_delete_grpc_test.yml
+    # create a gRPC Test with invalid metadata
+    - ./05_create_grpc_test_with_invalid_metadata.yml
+    # run test with invalid metadata
+    - ./06_run_grpc_test_with_invalid_metadata.yml
