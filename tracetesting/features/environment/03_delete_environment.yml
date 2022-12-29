@@ -1,13 +1,12 @@
 ---
 type: Test
 spec:
-  id: dIo51gV4R
-  name: Environment Delete
+  name: Delete Environment
   description: ""
   trigger:
     type: http
     httpRequest:
-      url: ${TARGET_URL}/api/environments/${ENV_ID}
+      url: ${env:TARGET_URL}/api/environments/${env:ENVIRONMENT_ID}
       method: DELETE
       headers:
         - key: Content-Type

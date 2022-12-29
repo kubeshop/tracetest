@@ -1,13 +1,12 @@
 ---
 type: Test
 spec:
-  id: VZvc1g44g
-  name: Environment Create
+  name: Create Environment
   description: ""
   trigger:
     type: http
     httpRequest:
-      url: ${TARGET_URL}/api/environments
+      url: ${env:TARGET_URL}/api/environments
       method: POST
       headers:
         - key: Content-Type
@@ -32,6 +31,8 @@ spec:
       assertions:
         - attr:tracetest.selected_spans.count = 1
         - attr:tracetest.response.status = 200
+        # ensure we can reference outputs declared in the same test
+        - attr:tracetest.response.body | json_path '$.id' = env:ENVIRONMENT_ID
     - selector: span[name="POST /api/environments" tracetest.span.type="http"]
       assertions:
         - attr:tracetest.selected_spans.count = 1
@@ -41,3 +42,7 @@ spec:
     - selector: span[name = "exec INSERT"]:first
       assertions:
         - attr:sql.query contains "INSERT INTO environments"
+  outputs:
+  - name: ENVIRONMENT_ID
+    selector: span[name = "Tracetest trigger"]
+    value: attr:tracetest.response.body | json_path '$.id'

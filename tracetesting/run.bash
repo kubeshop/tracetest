@@ -69,6 +69,7 @@ echo "Starting tests..."
 EXIT_STATUS=0
 
 # add more test suites here
+run_test_suite_for_feature 'environment' || EXIT_STATUS=$?
 run_test_suite_for_feature 'transaction' || EXIT_STATUS=$?
 
 echo ""
