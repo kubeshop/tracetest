@@ -38,7 +38,7 @@ interface IProps {
   children: React.ReactNode;
 }
 
-export const useSetupConfig = () => useContext(Context);
+export const useDataStore = () => useContext(Context);
 
 const DataStoreProvider = ({children}: IProps) => {
   const {isFetching} = useDataStoreConfig();

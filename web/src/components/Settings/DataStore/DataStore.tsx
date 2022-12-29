@@ -1,16 +1,14 @@
 import {Button, Form} from 'antd';
 import {SupportedDataStoresToName} from 'constants/DataStore.constants';
-import {useSetupConfig} from 'providers/DataStore/DataStore.provider';
+import {useDataStore} from 'providers/DataStore/DataStore.provider';
+import {useDataStoreConfig} from 'providers/DataStoreConfig/DataStoreConfig.provider';
 import {useCallback} from 'react';
-import {TDraftDataStore, TDataStoreConfig, ConfigMode} from 'types/Config.types';
+import {TDraftDataStore, ConfigMode} from 'types/Config.types';
 import DataStoreForm from '../DataStoreForm';
 import * as S from './DataStore.styled';
 
-interface IProps {
-  dataStoreConfig: TDataStoreConfig;
-}
-
-const DataStore = ({dataStoreConfig}: IProps) => {
+const DataStore = () => {
+  const {dataStoreConfig} = useDataStoreConfig();
   const {
     isLoading,
     isFormValid,
@@ -19,7 +17,7 @@ const DataStore = ({dataStoreConfig}: IProps) => {
     isTestConnectionLoading,
     onTestConnection,
     onDeleteConfig,
-  } = useSetupConfig();
+  } = useDataStore();
   const isConfigReady = dataStoreConfig.mode === ConfigMode.READY;
   const [form] = Form.useForm<TDraftDataStore>();
 
@@ -36,14 +34,14 @@ const DataStore = ({dataStoreConfig}: IProps) => {
   }, [form, onTestConnection, dataStoreConfig.defaultDataStore]);
 
   return (
-    <S.Wrapper data-cy="config-datastore-form">
+    <S.Wrapper>
       <S.FormContainer>
         <div>
           <S.Description>
             Tracetest needs configuration information to be able to retrieve your trace from your distributed tracing
             solution. Select your tracing data store and enter the configuration info.
           </S.Description>
-          <S.Title>Choose OpenTelemetry data store</S.Title>
+          <S.Title>Choose your OpenTelemetry data store</S.Title>
           <DataStoreForm
             form={form}
             dataStoreConfig={dataStoreConfig}
@@ -54,7 +52,6 @@ const DataStore = ({dataStoreConfig}: IProps) => {
         <S.ButtonsContainer>
           {isConfigReady ? (
             <Button
-              data-cy="config-datastore-delete"
               disabled={isLoading}
               type="primary"
               ghost
@@ -68,7 +65,6 @@ const DataStore = ({dataStoreConfig}: IProps) => {
           )}
           <S.SaveContainer>
             <Button
-              data-cy="config-datastore-submit"
               loading={isTestConnectionLoading}
               disabled={!isFormValid}
               type="primary"
@@ -77,13 +73,7 @@ const DataStore = ({dataStoreConfig}: IProps) => {
             >
               Test Connection
             </Button>
-            <Button
-              data-cy="config-datastore-submit"
-              disabled={!isFormValid}
-              loading={isLoading}
-              type="primary"
-              onClick={() => form.submit()}
-            >
+            <Button disabled={!isFormValid} loading={isLoading} type="primary" onClick={() => form.submit()}>
               Save
             </Button>
           </S.SaveContainer>
