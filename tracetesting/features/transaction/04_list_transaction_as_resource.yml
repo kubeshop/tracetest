@@ -1,12 +1,12 @@
 ---
 type: Test
 spec:
-  name: List Transaction
+  name: List Transaction as Resource
   description: Test step of 'Transaction Feature - Test Suite'
   trigger:
     type: http
     httpRequest:
-      url: ${env:TARGET_URL}/api/transactions
+      url: ${env:TARGET_URL}/api/resources
       method: GET
       headers:
         - key: Content-Type
@@ -17,6 +17,6 @@ spec:
         - attr:tracetest.selected_spans.count = 1
         - attr:tracetest.response.status = 200
         - attr:tracetest.response.body contains '"id":"${env:TRANSACTION_ID}"' # check if the transaction is listed
-    - selector: span[name="GET /api/transactions" tracetest.span.type="http"]
+    - selector: span[name="GET /api/resources" tracetest.span.type="http"]
       assertions:
         - attr:tracetest.selected_spans.count = 1

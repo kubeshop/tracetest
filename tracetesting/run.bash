@@ -64,7 +64,7 @@ run_test_suite_for_feature() {
 echo "Test helpers set."
 echo ""
 
-echo "Starting battery of tests..."
+echo "Starting tests..."
 
 EXIT_STATUS=0
 
