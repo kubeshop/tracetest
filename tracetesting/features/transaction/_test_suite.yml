@@ -1,12 +1,12 @@
 type: Transaction
 spec:
-  name: Transaction Feature - Test Suite
+  name: Transaction Feature
   description: Sequence of tests to validate if our Transaction feature is working as expected
   steps:
-    # create tests that will be added to a transaction
-    - ./create_transaction_steps.yml
+    # create test that will be added to a transaction
+    - ./01_create_transaction_step.yml
     # create transaction that will group these steps
-    # - ./create_transaction.yml
+    - ./02_create_transaction.yml
     # check if this transaction is listed on API
     # - ./list_transaction.yml
     # delete transaction

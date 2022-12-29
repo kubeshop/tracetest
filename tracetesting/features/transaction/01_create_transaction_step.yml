@@ -1,6 +1,6 @@
 type: Test
 spec:
-  name: Transaction Feature - Create transaction steps
+  name: Create transaction step
   description: Step 1 of 'Transaction Feature - Test Suite'
   trigger:
     type: http
@@ -65,9 +65,9 @@ spec:
     - attr:sql.query contains "INSERT INTO tests"
 
   # ensure we can reference outputs declared in the same test
-  - selector: span[name = "Tracetest trigger"]
-    assertions:
-    - attr:tracetest.response.body | json_path '$.id' = env:TEST_ID
+  # - selector: span[name = "Tracetest trigger"]
+  #   assertions:
+  #   - attr:tracetest.response.body | json_path '$.id' = env:TEST_ID
 
   outputs:
   - name: TRANSACTION_STEP_ID

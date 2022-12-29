@@ -1,11 +1,12 @@
 ---
 type: Test
 spec:
-  name: Transaction Feature - Create Transaction
+  name: Create transaction
+  description: Step 2 of 'Transaction Feature - Test Suite'
   trigger:
     type: http
     httpRequest:
-      url: ${TARGET_URL}/api/transactions
+      url: ${env:TARGET_URL}/api/transactions
       method: POST
       headers:
         - key: Content-Type
@@ -14,7 +15,7 @@ spec:
         {
             "name": "test-transaction",
             "description": "a transaction",
-            "steps": [ {"id": "${TRANSACTION_STEP_ID}"} ]
+            "steps": [ {"id": "${env:TRANSACTION_STEP_ID}"} ]
         }
   specs:
   - selector: span[name = "Tracetest trigger"]
