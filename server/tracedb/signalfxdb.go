@@ -49,6 +49,18 @@ func (db signalfxDB) Close() error {
 
 func (db signalfxDB) TestConnection(ctx context.Context) ConnectionTestResult {
 	url := fmt.Sprintf("%s:%s", db.getURL(), "443")
+	connectionTestResult := ConnectionTestResult{
+		ConnectivityTestResult: ConnectionTestStepResult{
+			OperationDescription: fmt.Sprintf(`Tracetest connected to "%s"`, url),
+		},
+		AuthenticationTestResult: ConnectionTestStepResult{
+			OperationDescription: `Tracetest managed to authenticate with signalFX`,
+		},
+		TraceRetrivalTestResult: ConnectionTestStepResult{
+			OperationDescription: `Tracetest was able to search for a trace using the signalFX API`,
+		},
+	}
+
 	reachable, err := isReachable(url)
 
 	if !reachable {
@@ -64,6 +76,7 @@ func (db signalfxDB) TestConnection(ctx context.Context) ConnectionTestResult {
 
 	if strings.Contains(strings.ToLower(err.Error()), "401") {
 		return ConnectionTestResult{
+			ConnectivityTestResult: connectionTestResult.ConnectivityTestResult,
 			AuthenticationTestResult: ConnectionTestStepResult{
 				OperationDescription: `Tracetest tried to execute an signalFX API request but it failed due to authentication issues`,
 				Error:                err,
@@ -73,6 +86,8 @@ func (db signalfxDB) TestConnection(ctx context.Context) ConnectionTestResult {
 
 	if !errors.Is(err, ErrTraceNotFound) {
 		return ConnectionTestResult{
+			ConnectivityTestResult:   connectionTestResult.ConnectivityTestResult,
+			AuthenticationTestResult: connectionTestResult.AuthenticationTestResult,
 			TraceRetrivalTestResult: ConnectionTestStepResult{
 				OperationDescription: fmt.Sprintf(`Tracetest tried to fetch a trace from the signalFX endpoint "%s" and got an error`, url),
 				Error:                err,
@@ -80,17 +95,7 @@ func (db signalfxDB) TestConnection(ctx context.Context) ConnectionTestResult {
 		}
 	}
 
-	return ConnectionTestResult{
-		ConnectivityTestResult: ConnectionTestStepResult{
-			OperationDescription: fmt.Sprintf(`Tracetest connected to "%s"`, url),
-		},
-		AuthenticationTestResult: ConnectionTestStepResult{
-			OperationDescription: `Tracetest managed to authenticate with signalFX`,
-		},
-		TraceRetrivalTestResult: ConnectionTestStepResult{
-			OperationDescription: `Tracetest was able to search for a trace using the signalFX API`,
-		},
-	}
+	return connectionTestResult
 }
 
 func (db signalfxDB) GetTraceByID(ctx context.Context, traceID string) (model.Trace, error) {

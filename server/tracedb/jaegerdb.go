@@ -49,9 +49,17 @@ func (jtd *jaegerTraceDB) Connect(ctx context.Context) error {
 }
 
 func (jtd *jaegerTraceDB) TestConnection(ctx context.Context) ConnectionTestResult {
-	// TODO: when the test fails, we should still keep all messages.
-	// Current implementation makes only errors to show, so if everything worked but the last
-	// step, there's no feedback that tracetest was able to ping the service and authenticate to it.
+	connectionTestResult := ConnectionTestResult{
+		ConnectivityTestResult: ConnectionTestStepResult{
+			OperationDescription: fmt.Sprintf(`Tracetest connected to "%s"`, jtd.config.Endpoint),
+		},
+		AuthenticationTestResult: ConnectionTestStepResult{
+			OperationDescription: `Tracetest managed to authenticate with Jaeger`,
+		},
+		TraceRetrivalTestResult: ConnectionTestStepResult{
+			OperationDescription: `Tracetest was able to search for a trace using Jaeger API`,
+		},
+	}
 
 	reachable, err := isReachable(jtd.config.Endpoint)
 	if !reachable {
@@ -75,16 +83,7 @@ func (jtd *jaegerTraceDB) TestConnection(ctx context.Context) ConnectionTestResu
 	}
 
 	_, err = jtd.GetTraceByID(ctx, trace.TraceID{}.String())
-	if strings.Contains(err.Error(), "authentication handshake failed") {
-		return ConnectionTestResult{
-			AuthenticationTestResult: ConnectionTestStepResult{
-				OperationDescription: `Tracetest tried to execue a gRPC request but it failed due to authentication issues`,
-				Error:                err,
-			},
-		}
-	}
-
-	if strings.Contains(err.Error(), "connection error") {
+	if strings.Contains(err.Error(), "connection error") && !strings.Contains(err.Error(), "authentication handshake failed") {
 		return ConnectionTestResult{
 			ConnectivityTestResult: ConnectionTestStepResult{
 				OperationDescription: fmt.Sprintf(`Tracetest tried to open a gRPC connection against "%s" and failed`, jtd.config.Endpoint),
@@ -93,8 +92,20 @@ func (jtd *jaegerTraceDB) TestConnection(ctx context.Context) ConnectionTestResu
 		}
 	}
 
+	if strings.Contains(err.Error(), "authentication handshake failed") {
+		return ConnectionTestResult{
+			ConnectivityTestResult: connectionTestResult.ConnectivityTestResult,
+			AuthenticationTestResult: ConnectionTestStepResult{
+				OperationDescription: `Tracetest tried to execute a gRPC request but it failed due to authentication issues`,
+				Error:                err,
+			},
+		}
+	}
+
 	if !errors.Is(err, ErrTraceNotFound) {
 		return ConnectionTestResult{
+			ConnectivityTestResult:   connectionTestResult.ConnectivityTestResult,
+			AuthenticationTestResult: connectionTestResult.AuthenticationTestResult,
 			TraceRetrivalTestResult: ConnectionTestStepResult{
 				OperationDescription: fmt.Sprintf(`Tracetest tried to fetch a trace from Jaeger endpoint "%s" and got an error`, jtd.config.Endpoint),
 				Error:                err,
@@ -102,17 +113,7 @@ func (jtd *jaegerTraceDB) TestConnection(ctx context.Context) ConnectionTestResu
 		}
 	}
 
-	return ConnectionTestResult{
-		ConnectivityTestResult: ConnectionTestStepResult{
-			OperationDescription: fmt.Sprintf(`Tracetest connected to "%s"`, jtd.config.Endpoint),
-		},
-		AuthenticationTestResult: ConnectionTestStepResult{
-			OperationDescription: `Tracetest managed to authenticate with Jaeger`,
-		},
-		TraceRetrivalTestResult: ConnectionTestStepResult{
-			OperationDescription: `Tracetest was able to search for a trace using Jaeger API`,
-		},
-	}
+	return connectionTestResult
 }
 
 func (jtd *jaegerTraceDB) Ready() bool {
