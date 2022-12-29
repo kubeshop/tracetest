@@ -8,10 +8,10 @@ spec:
     # create transaction that will group these steps
     - ./02_create_transaction.yml
     # check if this transaction is listed on API
-    # - ./list_transaction.yml
+    - ./03_list_transaction.yml
     # delete transaction
-    # - ./delete_transaction.yml
+    - ./04_delete_transaction.yml
     # delete transaction steps
-    # - ./delete_transaction_steps.yml
+    - ./05_delete_transaction_steps.yml
 
 # things to think: resource_list step is really needed?

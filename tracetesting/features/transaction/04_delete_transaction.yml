@@ -1,11 +1,12 @@
 ---
 type: Test
 spec:
-  name: Transaction Feature - Delete Transaction
+  name: Delete Transaction
+  description: Step 4 of 'Transaction Feature - Test Suite'
   trigger:
     type: http
     httpRequest:
-      url: ${TARGET_URL}/api/transactions/${TRANSACTION_ID}
+      url: ${env:TARGET_URL}/api/transactions/${env:TRANSACTION_ID}
       method: DELETE
       headers:
         - key: Content-Type
