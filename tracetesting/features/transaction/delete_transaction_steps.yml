@@ -1,7 +1,7 @@
 ---
 type: Test
 spec:
-  name: Delete Transaction Step
+  name: Transaction Feature - Delete Transaction Steps
   trigger:
     type: http
     httpRequest:

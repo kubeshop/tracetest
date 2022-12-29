@@ -1,13 +1,12 @@
 type: Transaction
 spec:
-  id: Sy7QPLVj
   name: Transaction Feature - Test Suite
   description: Sequence of tests to validate if our Transaction feature is working as expected
   steps:
-    # create tests that  will be added to a transaction
+    # create tests that will be added to a transaction
     - ./create_transaction_steps.yml
     # create transaction that will group these steps
-    - ./create_transaction.yml
+    # - ./create_transaction.yml
     # check if this transaction is listed on API
     # - ./list_transaction.yml
     # delete transaction

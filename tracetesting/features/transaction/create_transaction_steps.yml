@@ -1,11 +1,11 @@
 type: Test
 spec:
   name: Transaction Feature - Create transaction steps
-  description: ""
+  description: Step 1 of 'Transaction Feature - Test Suite'
   trigger:
     type: http
     httpRequest:
-      url: ${TARGET_URL}/api/tests
+      url: "${env:TARGET_URL}/api/tests"
       method: POST
       headers:
       - key: Content-Type
@@ -17,7 +17,7 @@ spec:
             "triggerType": "http",
             "triggerSettings": {
               "http": {
-                "url": "${DEMO_APP_URL}/pokemon?take=20&skip=0",
+                "url": "${env:DEMO_APP_URL}/pokemon?take=20&skip=0",
                 "method": "GET",
                 "headers": [
                   {
