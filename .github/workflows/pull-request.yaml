@@ -283,7 +283,7 @@ jobs:
 
       - name: Connect with integration environment
         run: |
-          kubectl port-forward --namespace tracetest-integration svc/tracetest-integration 11633
+          kubectl port-forward --namespace tracetest-integration svc/tracetest-integration 11633 &
           ./scripts/wait-for-port.sh 11633
 
       - name: Run integration tests
