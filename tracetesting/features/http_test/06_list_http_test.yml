@@ -1,13 +1,12 @@
 type: Test
 spec:
-  id: 9empJgVVR
-  name: Test Run Delete
-  description: ""
+  name: List HTTP Test
+  description: Test step of 'HTTP Test Feature - Test Suite'
   trigger:
     type: http
     httpRequest:
-      url: ${TARGET_URL}/api/tests/${TEST_ID}/run/${RUN_ID}
-      method: DELETE
+      url: ${env:TARGET_URL}/api/tests
+      method: GET
       headers:
       - key: Content-Type
         value: application/json
@@ -15,10 +14,11 @@ spec:
   - selector: span[name = "Tracetest trigger"]
     assertions:
     - attr:tracetest.selected_spans.count = 1
-    - attr:tracetest.response.status = 204
-  - selector: span[name="DELETE /api/tests/{testId}/run/{runId}" tracetest.span.type="http"]
+    - attr:tracetest.response.status = 200
+    - attr:tracetest.response.body contains "${env:HTTP_TEST_ID}"
+  - selector: span[name="GET /api/tests" tracetest.span.type="http"]
     assertions:
     - attr:tracetest.selected_spans.count = 1
-  - selector: span[name = "exec DELETE"]
+  - selector: span[name = "query SELECT"]
     assertions:
     - attr:tracetest.selected_spans.count = 2

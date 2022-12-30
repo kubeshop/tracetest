@@ -1,12 +1,11 @@
 type: Test
 spec:
-  id: 3G3cJRVVg
-  name: Test Rerun
-  description: ""
+  name: Re-Run HTTP Test
+  description: Test step of 'HTTP Test Feature - Test Suite'
   trigger:
     type: http
     httpRequest:
-      url: ${TARGET_URL}/api/tests/${TEST_ID}/run/${RUN_ID}/rerun
+      url: ${env:TARGET_URL}/api/tests/${env:HTTP_TEST_ID}/run/${env:HTTP_TEST_RUN_ID}/rerun
       method: POST
       headers:
       - key: Content-Type

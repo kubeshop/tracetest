@@ -18,6 +18,9 @@ export TRACETEST_MAIN_ENDPOINT=${TRACETEST_MAIN_ENDPOINT:-"localhost:11633"}
 export DEMO_APP_URL=${DEMO_APP_URL-"http://demo-pokemon-api.demo"}
 export DEMO_APP_GRPC_URL=${DEMO_APP_GRPC_URL-"demo-pokemon-api.demo:8082"}
 
+# TODO: think how to move this id generation to HTTP Test suite
+export EXAMPLE_TEST_ID="w2ON-RVVg"
+
 echo "Preparing to run tests on API..."
 echo ""
 
@@ -34,6 +37,7 @@ TARGET_URL=$TARGET_URL
 TRACETEST_MAIN_ENDPOINT=$TRACETEST_MAIN_ENDPOINT
 DEMO_APP_URL=$DEMO_APP_URL
 DEMO_APP_GRPC_URL=$DEMO_APP_GRPC_URL
+EXAMPLE_TEST_ID=$EXAMPLE_TEST_ID
 EOF
 
 echo ""
@@ -69,6 +73,7 @@ echo "Starting tests..."
 EXIT_STATUS=0
 
 # add more test suites here
+run_test_suite_for_feature 'http_test' || EXIT_STATUS=$?
 run_test_suite_for_feature 'grpc_test' || EXIT_STATUS=$?
 run_test_suite_for_feature 'environment' || EXIT_STATUS=$?
 run_test_suite_for_feature 'transaction' || EXIT_STATUS=$?
