@@ -22,7 +22,7 @@ export const InputContainer = styled.div`
 
 export const Footer = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 8px;
 `;
 
