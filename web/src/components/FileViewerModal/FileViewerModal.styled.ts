@@ -35,5 +35,5 @@ export const CopyIconContainer = styled.div`
   border-radius: 2px;
   cursor: pointer;
   background-color: ${({theme}) => theme.color.textHighlight};
-  z-index: 99999;
+  z-index: 101;
 `;
