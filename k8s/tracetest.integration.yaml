@@ -2,7 +2,7 @@ postgresConnString: "host=${NAME}-postgresql user=tracetest password=not-secure-
 
 poolingConfig:
   maxWaitTimeForTrace: 1m
-  retryDelay: 500ms
+  retryDelay: 2s
 
 googleAnalytics:
   enabled: false
