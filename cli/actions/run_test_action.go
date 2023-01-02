@@ -2,12 +2,12 @@ package actions
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strconv"
-	"strings"
 	"sync"
 	"time"
 
@@ -87,7 +87,18 @@ func (a runTestAction) Run(ctx context.Context, args RunTestConfig) error {
 }
 
 func stringReferencesFile(path string) bool {
-	return strings.HasPrefix(path, "./")
+	// check if a file exists
+	_, err := os.Stat(path)
+
+	if err != nil {
+		return true
+	}
+
+	if !errors.Is(err, os.ErrNotExist) {
+		return true
+	}
+
+	return false
 }
 
 func (a runTestAction) processEnv(ctx context.Context, envID string) (string, error) {
