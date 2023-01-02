@@ -8,6 +8,7 @@ import RequestDetailsAuthInput from '../../../Rest/steps/RequestDetails/RequestD
 import RequestDetailsUrlInput from '../../../Rest/steps/RequestDetails/RequestDetailsUrlInput';
 import RequestDetailsFileInput from './RequestDetailsFileInput';
 import RequestDetailsMetadataInput from './RequestDetailsMetadataInput';
+import * as S from './RequestDetails.styled';
 
 interface IProps {
   form: TDraftTestForm<IRpcValues>;
@@ -33,7 +34,7 @@ const RequestDetailsForm = ({form}: IProps) => {
   }, [getMethodList]);
 
   return (
-    <>
+    <S.FieldsContainer>
       <Row gutter={12}>
         <Col span={18}>
           <span>
@@ -83,7 +84,7 @@ const RequestDetailsForm = ({form}: IProps) => {
           </Form.Item>
         </Col>
       </Row>
-    </>
+    </S.FieldsContainer>
   );
 };
 

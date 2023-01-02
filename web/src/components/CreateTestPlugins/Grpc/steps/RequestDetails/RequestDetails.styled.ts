@@ -29,3 +29,9 @@ export const DeleteIcon = styled(DeleteOutlined)`
   color: ${({theme}) => theme.color.textSecondary};
   font-size: ${({theme}) => theme.size.md};
 `;
+
+export const FieldsContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+`;
