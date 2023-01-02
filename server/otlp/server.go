@@ -18,12 +18,12 @@ type Server struct {
 	pb.UnimplementedTraceServiceServer
 
 	addr string
-	db   model.RunRepository
+	db   model.Repository
 
 	gServer *grpc.Server
 }
 
-func NewServer(addr string, db model.RunRepository) *Server {
+func NewServer(addr string, db model.Repository) *Server {
 	return &Server{
 		addr: addr,
 		db:   db,
@@ -45,6 +45,13 @@ func (s *Server) Stop() {
 }
 
 func (s Server) Export(ctx context.Context, request *pb.ExportTraceServiceRequest) (*pb.ExportTraceServiceResponse, error) {
+	ds, err := s.db.DefaultDataStore(ctx)
+
+	if err != nil || ds.Type != "otlp" {
+		fmt.Println("OTLP server is not enabled. Ignoring request")
+		return &pb.ExportTraceServiceResponse{}, nil
+	}
+
 	if len(request.ResourceSpans) == 0 {
 		return &pb.ExportTraceServiceResponse{}, nil
 	}

@@ -33,5 +33,5 @@ service:
   pipelines:
     traces/1:
       receivers: [otlp]
-      processors: [tail_sampling, batch]
+      processors: [batch]
       exporters: [otlp/1]
