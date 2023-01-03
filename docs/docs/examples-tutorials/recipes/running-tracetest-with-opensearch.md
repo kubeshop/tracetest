@@ -131,7 +131,7 @@ version: '3'
 services:
 
   tracetest:
-    image: kubeshop/tracetest:v0.8.0
+    image: kubeshop/tracetest:latest
     platform: linux/amd64
     volumes:
       - ./tracetest/tracetest.config.yaml:/app/config.yaml
