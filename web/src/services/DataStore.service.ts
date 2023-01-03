@@ -25,7 +25,7 @@ const DataStoreService = (): IDataStoreService => ({
     const isUpdate = !!defaultDataStore.id;
 
     const dataStore: TRawDataStore = isUpdate
-      ? {id: defaultDataStore.id, name: dataStoreType, ...dataStoreValues, isDefault: true}
+      ? {id: defaultDataStore.id, ...dataStoreValues, isDefault: true}
       : {
           ...dataStoreValues,
           name: dataStoreType,

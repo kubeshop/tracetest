@@ -84,7 +84,9 @@ const GrpcClient = () => {
       <Space>
         <Switch
           onChange={checked => {
-            form.setFieldsValue({dataStore: {[dataStoreType]: {tls: {insecure: !checked}}}});
+            form.setFieldsValue({
+              dataStore: {name: dataStoreType, type: dataStoreType, [dataStoreType]: {tls: {insecure: !checked}}},
+            });
           }}
           checked={!insecureValue}
         />{' '}

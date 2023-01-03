@@ -1,4 +1,10 @@
-import {IGRPCClientSettings, SupportedDataStores, TDataStoreService, TRawGRPCClientSettings} from 'types/Config.types';
+import {
+  IGRPCClientSettings,
+  SupportedDataStores,
+  TDataStore,
+  TDataStoreService,
+  TRawGRPCClientSettings,
+} from 'types/Config.types';
 
 const GrpcClientService = (): TDataStoreService => ({
   async getRequest({dataStore = {}}, dataStoreType = SupportedDataStores.JAEGER) {
@@ -29,6 +35,7 @@ const GrpcClientService = (): TDataStoreService => ({
 
     return Promise.resolve({
       type: dataStoreType,
+      name: dataStoreType,
       [dataStoreType]: {
         endpoint,
         readBufferSize: parseInt(String(readBufferSize), 10),
@@ -53,14 +60,17 @@ const GrpcClientService = (): TDataStoreService => ({
       },
     });
   },
-  validateDraft({dataStore = {}, dataStoreType}) {
+  validateDraft({dataStore = {name: '', type: SupportedDataStores.JAEGER}, dataStoreType}) {
     const values = (dataStore[dataStoreType || SupportedDataStores.JAEGER] as IGRPCClientSettings) ?? {};
     const {endpoint = ''} = values;
     if (!endpoint) return Promise.resolve(false);
 
     return Promise.resolve(true);
   },
-  getInitialValues({defaultDataStore = {}}, dataStoreType = SupportedDataStores.JAEGER) {
+  getInitialValues(
+    {defaultDataStore = {name: '', type: SupportedDataStores.JAEGER} as TDataStore},
+    dataStoreType = SupportedDataStores.JAEGER
+  ) {
     const values = (defaultDataStore[dataStoreType] as TRawGRPCClientSettings) ?? {};
     const {
       endpoint = '',
@@ -109,6 +119,8 @@ const GrpcClientService = (): TDataStoreService => ({
           fileCert: certFile ? new File([certFile], 'fileCert') : undefined,
           fileKey: keyFile ? new File([keyFile], 'fileKey') : undefined,
         },
+        name: dataStoreType,
+        type: dataStoreType,
       },
       dataStoreType,
     };
