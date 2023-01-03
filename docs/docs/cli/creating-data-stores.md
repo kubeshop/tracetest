@@ -1,5 +1,5 @@
 # Defining Data Stores as Text Files
-You might have multiple tracetest instances that need to be connected to the same data stores. An easy way of sharing the configuration is by using a configuration file that can be applied to your tracetest instance.
+You might have multiple Tracetest instances that need to be connected to the same data stores. An easy way of sharing the configuration is by using a configuration file that can be applied to your Tracetest instance.
 
 ### Jaeger
 ```yaml
@@ -24,7 +24,7 @@ spec:
   tempo:
     endpoint: tempo:9095
     tls:
-      insecure: trues
+      insecure: true
 ```
 
 ### OpenSearch
@@ -61,9 +61,9 @@ spec:
   isDefault: true
 ```
 
-> Consider reading about [how to use the OTEL collector](../configuration/connecting-to-data-stores/opentelemetry-collector.md) to send traces to your tracetest instance.
+> Consider reading about [how to use the OTEL collector](../configuration/connecting-to-data-stores/opentelemetry-collector.md) to send traces to your Tracetest instance.
 
-## Apply configuration
+## Apply Configuration
 
 To apply the configuration, you need a [configured CLI](./configuring-your-cli.md) pointed to the instance you want to apply the data store. Then you just have to enter:
 
@@ -71,5 +71,5 @@ To apply the configuration, you need a [configured CLI](./configuring-your-cli.m
 tracetest data-store apply -f my/data-store/file/location.yaml
 ```
 
-## Additional information
+## Additional Information
 In the current version, you can only have one active data store at any given time. The flag `isDefault` defines which data store should be used by your tests. So, if you want to add a new data store and make sure it will be used in future test runs, make sure to define `isDefault` as `true` in the data store configuration file.
