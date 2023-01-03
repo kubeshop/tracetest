@@ -7,7 +7,6 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
-	"strings"
 	"sync"
 	"time"
 
@@ -87,10 +86,6 @@ func (a runTestAction) Run(ctx context.Context, args RunTestConfig) error {
 }
 
 func stringReferencesFile(path string) bool {
-	if strings.HasPrefix(path, "./") {
-		return true // kept for backward compatibility
-	}
-
 	// for the current working dir, check if the file exists
 	// by finding its absolute path and executing a stat command
 
@@ -99,8 +94,14 @@ func stringReferencesFile(path string) bool {
 		return false
 	}
 
-	_, err = os.Stat(absolutePath)
-	return err == nil // if got file stats, this means that this file exists
+	info, err := os.Stat(absolutePath)
+	if err != nil {
+		return false
+	}
+
+	// if the string is empty the absolute path will the entire dir
+	// otherwise the user also could send a directory by mistake
+	return info != nil && !info.IsDir()
 }
 
 func (a runTestAction) processEnv(ctx context.Context, envID string) (string, error) {
