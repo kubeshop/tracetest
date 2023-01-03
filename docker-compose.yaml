@@ -3,6 +3,14 @@ services:
   tracetest:
     restart: unless-stopped
     image: kubeshop/tracetest:latest
+    platform: linux/amd64
+    platform: linux/amd64
+    platform: linux/amd64
+    platform: linux/amd64
+    platform: linux/amd64
+    platform: linux/amd64
+    platform: linux/amd64
+    platform: linux/amd64
     extra_hosts:
       - "host.docker.internal:host-gateway"
     build:
