@@ -27,7 +27,7 @@ All `services` in the `docker-compose.yaml` are on the same network and will be 
 
 The Node.js app is a simple Express app, contained in the `app.js` file.
 
-The OpenTelemetry tracing is contained in the `tracing.otel.grpc.js` or `tracing.otel.http.js` files, respectively. 
+The OpenTelemetry tracing is contained in the `tracing.otel.grpc.js` or `tracing.otel.http.js` files, respectively.
 Traces will be sent to the OpenTelemetry Collector.
 
 Here's the content of the `tracing.otel.grpc.js` file:
@@ -124,6 +124,7 @@ services:
 
   tracetest:
     image: kubeshop/tracetest
+    platform: linux/amd64
     volumes:
       - ./tracetest/tracetest.config.yaml:/app/config.yaml
     ports:
@@ -161,7 +162,7 @@ services:
       - ./tracetest/collector.config.yaml:/otel-local-config.yaml
     depends_on:
       - tempo
-    
+
   tempo:
     image: grafana/tempo:1.5.0
     command: ["-config.file=/etc/tempo.yaml"]

@@ -3,6 +3,7 @@ services:
   tracetest:
     restart: unless-stopped
     image: kubeshop/tracetest:${TAG:-latest}
+    platform: linux/amd64
     ports:
       - 11633:11633
     extra_hosts:
