@@ -7,6 +7,7 @@ import RequestDetailsUrlInput from '../../../Rest/steps/RequestDetails/RequestDe
 import {CollectionFileField} from './fields/CollectionFileField';
 import {EnvFileField} from './fields/EnvFileField';
 import {SelectTestFromCollection} from './fields/SelectTestFromCollection';
+import * as S from './UploadCollection.styled';
 
 interface IProps {
   form: TDraftTestForm<IPostmanValues>;
@@ -14,7 +15,7 @@ interface IProps {
 
 const UploadCollectionForm = ({form}: IProps) => {
   return (
-    <>
+    <S.FieldsContainer>
       <Row gutter={12}>
         <Col span={18}>
           <Form.Item name="requests" hidden>
@@ -24,18 +25,21 @@ const UploadCollectionForm = ({form}: IProps) => {
             <Input type="hidden" />
           </Form.Item>
           <CollectionFileField form={form} />
-          <EnvFileField form={form} />
-          <SelectTestFromCollection form={form} />
-        </Col>
-      </Row>
-      <Row gutter={12} style={{marginTop: 16}}>
-        <Col span={18}>
-          <RequestDetailsUrlInput />
         </Col>
       </Row>
       <Row gutter={12}>
         <Col span={18}>
-          <BodyField body={Form.useWatch('body', form)} setBody={body => form.setFieldsValue({body})} />
+          <EnvFileField form={form} />
+        </Col>
+      </Row>
+      <Row gutter={12}>
+        <Col span={18}>
+          <SelectTestFromCollection form={form} />
+        </Col>
+      </Row>
+      <Row gutter={12}>
+        <Col span={18}>
+          <RequestDetailsUrlInput />
         </Col>
       </Row>
       <Row gutter={12}>
@@ -48,7 +52,12 @@ const UploadCollectionForm = ({form}: IProps) => {
           <RequestDetailsAuthInput />
         </Col>
       </Row>
-    </>
+      <Row gutter={12}>
+        <Col span={18}>
+          <BodyField body={Form.useWatch('body', form)} setBody={body => form.setFieldsValue({body})} />
+        </Col>
+      </Row>
+    </S.FieldsContainer>
   );
 };
 
