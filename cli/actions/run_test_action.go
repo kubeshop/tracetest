@@ -87,10 +87,15 @@ func (a runTestAction) Run(ctx context.Context, args RunTestConfig) error {
 }
 
 func stringReferencesFile(path string) bool {
-	// check if a file exists
-	_, err := os.Stat(path)
-
+	absolutePath, err := filepath.Abs(path)
 	if err != nil {
+		return false
+	}
+
+	// check if file exists from absolute path
+	_, err = os.Stat(absolutePath)
+
+	if err == nil {
 		return true
 	}
 
