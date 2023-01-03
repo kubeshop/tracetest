@@ -2,9 +2,9 @@
 
 set -e
 
-export TRACETEST_CLI_MAIN=${TRACETEST_CLI_MAIN:-"tracetest"}
-if ! command -v "$TRACETEST_CLI_MAIN" &> /dev/null; then
-  echo "\$TRACETEST_CLI_MAIN not set to executable. set to $TRACETEST_CLI_MAIN";
+export TRACETEST_CLI=${TRACETEST_CLI:-"tracetest"}
+if ! command -v "$TRACETEST_CLI" &> /dev/null; then
+  echo "\$TRACETEST_CLI not set to executable. set to $TRACETEST_CLI";
   exit 2
 fi
 
@@ -25,14 +25,14 @@ echo "Preparing to run tests on API..."
 echo ""
 
 echo "Environment variables considered on this run:"
-echo "TRACETEST_CLI_MAIN:      $TRACETEST_CLI_MAIN"
+echo "TRACETEST_CLI:           $TRACETEST_CLI"
 echo "TARGET_URL:              $TARGET_URL"
 echo "TRACETEST_MAIN_ENDPOINT: $TRACETEST_MAIN_ENDPOINT"
 echo "DEMO_APP_URL:            $DEMO_APP_URL"
 echo "DEMO_APP_GRPC_URL:       $DEMO_APP_GRPC_URL"
 
 cat << EOF > .main.env
-TRACETEST_CLI_MAIN=$TRACETEST_CLI_MAIN
+TRACETEST_CLI=$TRACETEST_CLI
 TARGET_URL=$TARGET_URL
 TRACETEST_MAIN_ENDPOINT=$TRACETEST_MAIN_ENDPOINT
 DEMO_APP_URL=$DEMO_APP_URL
@@ -61,7 +61,7 @@ run_test_suite_for_feature() {
   junit_output='results/'$feature'_test_suite.xml'
   definition='./features/'$feature'/_test_suite.yml'
 
-  $TRACETEST_CLI_MAIN --config ./config.main.yml test run --definition $definition --environment ./.main.env --wait-for-result --junit $junit_output
+  $TRACETEST_CLI --config ./config.main.yml test run --definition $definition --environment ./.main.env --wait-for-result --junit $junit_output
   return $?
 }
 

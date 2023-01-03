@@ -275,12 +275,6 @@ jobs:
           cd cli
           go build -o ./tracetest main.go
 
-      - name: Install CLI integration version (latest main)
-        run: |
-          git clone --depth 1 https://github.com/kubeshop/tracetest /tmp/tracetest-main
-          cd /tmp/tracetest-main/cli
-          make build
-
       - name: Connect with integration environment
         run: |
           kubectl port-forward --namespace tracetest-integration svc/tracetest-integration 11633 &
@@ -289,8 +283,7 @@ jobs:
       - name: Run integration tests
         run: |
           cd tracetesting
-          TRACETEST_CLI_MAIN="/tmp/tracetest-main/cli/dist/tracetest" \
-          TRACETEST_CLI_TARGET="../cli/tracetest" \
+          TRACETEST_CLI="../cli/tracetest" \
           TARGET_URL="http://tracetest-pr-${{ github.event.pull_request.number }}.tracetest-pr-${{ github.event.pull_request.number }}:11633" \
           ./run.bash
 
