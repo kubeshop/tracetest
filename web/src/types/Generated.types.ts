@@ -44,10 +44,6 @@ export interface paths {
     /** Delete a specific run from a particular transaction */
     delete: operations["deleteTransactionRun"];
   };
-  "/transactions/{transactionId}/variables": {
-    /** get transaction variables */
-    get: operations["getTransactionVariables"];
-  };
   "/tests": {
     /** get tests */
     get: operations["getTests"];
@@ -109,10 +105,6 @@ export interface paths {
   "/tests/{testId}/version/{version}/definition.yaml": {
     /** Get the test definition as an YAML file */
     get: operations["getTestVersionDefinitionFile"];
-  };
-  "/tests/{testId}/variables": {
-    /** get test variables */
-    get: operations["getTestVariables"];
   };
   "/environments": {
     /** Get Environments */
@@ -416,27 +408,6 @@ export interface operations {
       204: never;
       /** transaction run not found */
       404: unknown;
-    };
-  };
-  /** get transaction variables */
-  getTransactionVariables: {
-    parameters: {
-      path: {
-        transactionId: string;
-      };
-      query: {
-        environmentId?: string;
-      };
-    };
-    responses: {
-      /** successful operation */
-      200: {
-        content: {
-          "application/json": external["variables.yaml"]["components"]["schemas"]["TransactionVariables"];
-        };
-      };
-      /** problem with getting the transaction variables */
-      500: unknown;
     };
   };
   /** get tests */
@@ -773,27 +744,6 @@ export interface operations {
           "application/yaml": string;
         };
       };
-    };
-  };
-  /** get test variables */
-  getTestVariables: {
-    parameters: {
-      path: {
-        testId: string;
-      };
-      query: {
-        environmentId?: string;
-      };
-    };
-    responses: {
-      /** successful operation */
-      200: {
-        content: {
-          "application/json": external["variables.yaml"]["components"]["schemas"]["TestVariables"];
-        };
-      };
-      /** problem with getting the test variables */
-      500: unknown;
     };
   };
   /** Get Environments */
@@ -1565,24 +1515,6 @@ export interface external {
             grpc?: external["grpc.yaml"]["components"]["schemas"]["GRPCResponse"];
           };
         };
-      };
-    };
-    operations: {};
-  };
-  "variables.yaml": {
-    paths: {};
-    components: {
-      schemas: {
-        Variables: {
-          environment?: external["environments.yaml"]["components"]["schemas"]["EnvironmentValue"][];
-          variables?: string[];
-          missing?: string[];
-        };
-        TestVariables: {
-          testId?: string;
-          variables?: external["variables.yaml"]["components"]["schemas"]["Variables"];
-        };
-        TransactionVariables: external["variables.yaml"]["components"]["schemas"]["TestVariables"][];
       };
     };
     operations: {};

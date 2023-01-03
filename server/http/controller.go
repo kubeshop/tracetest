@@ -1221,11 +1221,3 @@ func (c *controller) TestConnection(ctx context.Context, dataStore openapi.DataS
 
 	return openapi.Response(statusCode, c.mappers.Out.ConnectionTestResult(testResult)), nil
 }
-
-func (c *controller) GetTestVariables(ctx context.Context, testId, environmentId string) (openapi.ImplResponse, error) {
-	return openapi.Response(200, openapi.TestVariables{}), nil
-}
-
-func (c *controller) GetTransactionVariables(ctx context.Context, testId, environmentId string) (openapi.ImplResponse, error) {
-	return openapi.Response(200, openapi.TransactionVariables{}), nil
-}
