@@ -28,3 +28,9 @@ export const SwitchContainer = styled.div`
   position: absolute;
   z-index: 9;
 `;
+
+export const TabsContainer = styled.div`
+  height: 100%;
+  padding: 24px;
+  position: relative;
+`;
