@@ -2,12 +2,12 @@ package actions
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -87,23 +87,20 @@ func (a runTestAction) Run(ctx context.Context, args RunTestConfig) error {
 }
 
 func stringReferencesFile(path string) bool {
+	if strings.HasPrefix(path, "./") {
+		return true // kept for backward compatibility
+	}
+
+	// for the current working dir, check if the file exists
+	// by finding its absolute path and executing a stat command
+
 	absolutePath, err := filepath.Abs(path)
 	if err != nil {
 		return false
 	}
 
-	// check if file exists from absolute path
 	_, err = os.Stat(absolutePath)
-
-	if err == nil {
-		return true
-	}
-
-	if !errors.Is(err, os.ErrNotExist) {
-		return true
-	}
-
-	return false
+	return err == nil // if got file stats, this means that this file exists
 }
 
 func (a runTestAction) processEnv(ctx context.Context, envID string) (string, error) {
