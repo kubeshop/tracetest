@@ -355,6 +355,33 @@ paths:
         404:
           description: transaction run not found
 
+  /transactions/{transactionId}/variables:
+    get:
+      tags:
+        - api
+      parameters:
+        - in: path
+          name: transactionId
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: environmentId
+          schema:
+            type: string
+      summary: "get transaction variables"
+      description: "get transaction variables"
+      operationId: getTransactionVariables
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "./variables.yaml#/components/schemas/TransactionVariables"
+        500:
+          description: "problem with getting the transaction variables"
+
   /tests:
     get:
       tags:
@@ -831,6 +858,33 @@ paths:
               schema:
                 type: string
 
+  /tests/{testId}/variables:
+    get:
+      tags:
+        - api
+      parameters:
+        - in: path
+          name: testId
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: environmentId
+          schema:
+            type: string
+      summary: "get test variables"
+      description: "get test variables"
+      operationId: getTestVariables
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "./variables.yaml#/components/schemas/TestVariables"
+        500:
+          description: "problem with getting the test variables"
+
   # Environments
   /environments:
     get:
@@ -1111,13 +1165,13 @@ paths:
           description: "indicates the sort field for the data stores"
           schema:
             type: string
-            enum: [ created, name ]
+            enum: [created, name]
         - in: query
           name: sortDirection
           description: "indicates the sort direction for the data stores"
           schema:
             type: string
-            enum: [ asc, desc ]
+            enum: [asc, desc]
       responses:
         200:
           description: successful operation
