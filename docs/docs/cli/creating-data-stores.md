@@ -52,6 +52,17 @@ spec:
     token: mytoken
 ```
 
+### Using the OpenTelemetry Collector
+```yaml
+type: DataStore
+spec:
+  name: Opentelemetry Collector pipeline
+  type: otlp
+  isDefault: true
+```
+
+> Consider reading about [how to use the OTEL collector](../configuration/connecting-to-data-stores/opentelemetry-collector.md) to send traces to your tracetest instance.
+
 ## Apply configuration
 
 To apply the configuration, you need a [configured CLI](./configuring-your-cli.md) pointed to the instance you want to apply the data store. Then you just have to enter:
