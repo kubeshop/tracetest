@@ -63,7 +63,7 @@ services:
             interval: 1s
             retries: 60
         image: kubeshop/tracetest:v0.8.2
-    platform: linux/amd64
+        platform: linux/amd64
         networks:
             default: null
         ports:

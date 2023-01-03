@@ -2,6 +2,7 @@ version: "3.2"
 services:
   dogfood:
     image: kubeshop/tracetest-dogfood-testrunner
+    platform: linux/amd64
     build:
       context: .
       dockerfile: ./local-config/dogfood.Dockerfile
@@ -22,6 +23,7 @@ services:
 
   cypress:
     image: kubeshop/tracetest-cypress-testrunner
+    platform: linux/amd64
     build:
       context: .
       dockerfile: ./local-config/cypress.Dockerfile

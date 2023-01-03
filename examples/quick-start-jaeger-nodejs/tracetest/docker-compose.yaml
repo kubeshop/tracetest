@@ -3,6 +3,7 @@ services:
 
   tracetest:
     image: kubeshop/tracetest
+    platform: linux/amd64
     volumes:
       - ./tracetest/tracetest.config.yaml:/app/config.yaml
     ports:

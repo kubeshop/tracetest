@@ -3,6 +3,7 @@ services:
 
   tracetest:
     image: kubeshop/tracetest
+    platform: linux/amd64
     volumes:
       - ./tracetest/tracetest.config.yaml:/app/config.yaml
     ports:
@@ -40,7 +41,7 @@ services:
       - ./tracetest/collector.config.yaml:/otel-local-config.yaml
     depends_on:
       - tempo
-    
+
   tempo:
     image: grafana/tempo:1.5.0
     command: ["-config.file=/etc/tempo.yaml"]
