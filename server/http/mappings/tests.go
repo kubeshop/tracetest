@@ -8,6 +8,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/assertions/selectors"
+	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
@@ -331,6 +332,27 @@ func (m OpenAPI) Runs(in []model.Run) []openapi.TestRun {
 	}
 
 	return runs
+}
+
+func (m OpenAPI) TestVariables(in expression.TestVariables) openapi.TestVariables {
+	return openapi.TestVariables{
+		TestId: in.TestId,
+		Variables: openapi.Variables{
+			Environment: in.Environment,
+			Variables:   in.Variables,
+			Missing:     in.Missing,
+		},
+	}
+}
+
+func (m OpenAPI) TransactionVariables(in []expression.TestVariables) []openapi.TestVariables {
+	transactionVariables := make([]openapi.TestVariables, len(in))
+
+	for i, testVariables := range in {
+		transactionVariables[i] = m.TestVariables(testVariables)
+	}
+
+	return transactionVariables
 }
 
 // in

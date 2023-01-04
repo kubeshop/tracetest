@@ -8,7 +8,7 @@ components:
         environment:
           type: array
           items:
-            $ref: "./environments.yaml#/components/schemas/EnvironmentValue"
+            type: string
         variables:
           type: array
           items:

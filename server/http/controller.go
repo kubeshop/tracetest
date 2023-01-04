@@ -11,6 +11,7 @@ import (
 	"github.com/kubeshop/tracetest/server/assertions"
 	"github.com/kubeshop/tracetest/server/assertions/selectors"
 	"github.com/kubeshop/tracetest/server/executor"
+	"github.com/kubeshop/tracetest/server/executor/trigger"
 	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/http/mappings"
 	"github.com/kubeshop/tracetest/server/id"
@@ -27,10 +28,11 @@ import (
 var IDGen = id.NewRandGenerator()
 
 type controller struct {
-	testDB       model.Repository
-	runner       runner
-	newTraceDBFn func(ds model.DataStore) (tracedb.TraceDB, error)
-	mappers      mappings.Mappings
+	testDB          model.Repository
+	runner          runner
+	newTraceDBFn    func(ds model.DataStore) (tracedb.TraceDB, error)
+	mappers         mappings.Mappings
+	triggerRegistry *trigger.Registry
 }
 
 type runner interface {
@@ -44,12 +46,14 @@ func NewController(
 	newTraceDBFn func(ds model.DataStore) (tracedb.TraceDB, error),
 	runner runner,
 	mappers mappings.Mappings,
+	triggerRegistry *trigger.Registry,
 ) openapi.ApiApiServicer {
 	return &controller{
-		testDB:       testDB,
-		runner:       runner,
-		newTraceDBFn: newTraceDBFn,
-		mappers:      mappers,
+		testDB:          testDB,
+		runner:          runner,
+		newTraceDBFn:    newTraceDBFn,
+		mappers:         mappers,
+		triggerRegistry: triggerRegistry,
 	}
 }
 
@@ -1220,4 +1224,93 @@ func (c *controller) TestConnection(ctx context.Context, dataStore openapi.DataS
 	}
 
 	return openapi.Response(statusCode, c.mappers.Out.ConnectionTestResult(testResult)), nil
+}
+
+func (c *controller) GetTestVariables(ctx context.Context, testId, environmentId string) (openapi.ImplResponse, error) {
+	test, err := c.testDB.GetLatestTestVersion(ctx, id.ID(testId))
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	environment := model.Environment{
+		Values: []model.EnvironmentValue{},
+	}
+
+	if environmentId != "" {
+		environment, err = c.testDB.GetEnvironment(ctx, environmentId)
+
+		if err != nil {
+			return handleDBError(err), err
+		}
+	}
+
+	executor := expression.NewExecutor()
+	variables := expression.NewVariables(environment, executor)
+
+	testVariables, err := processTestVariables(ctx, test, variables, c.triggerRegistry)
+
+	if err != nil {
+		return openapi.Response(http.StatusInternalServerError, err.Error()), err
+	}
+
+	return openapi.Response(200, c.mappers.Out.TestVariables(testVariables)), nil
+}
+
+func processTestVariables(ctx context.Context, test model.Test, variables expression.Variables, triggerRegistry *trigger.Registry) (expression.TestVariables, error) {
+	environmentVariables := variables.GetEnvironmentVariables(test)
+	specVariables, err := variables.GetSpecsVariables(test)
+	if err != nil {
+		return expression.TestVariables{}, err
+	}
+
+	triggerer, err := triggerRegistry.Get(test.ServiceUnderTest.Type)
+	if err != nil {
+		return expression.TestVariables{}, err
+	}
+
+	triggerVariables, err := triggerer.Variables(ctx, test, variables.Executor)
+	if err != nil {
+		return expression.TestVariables{}, err
+	}
+
+	testVariables := variables.GetTestVariables(string(test.ID), environmentVariables, append(specVariables, triggerVariables...))
+
+	return testVariables, nil
+}
+
+func (c *controller) GetTransactionVariables(ctx context.Context, transactionId, environmentId string) (openapi.ImplResponse, error) {
+	transaction, err := c.testDB.GetLatestTransactionVersion(ctx, id.ID(transactionId))
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	environment := model.Environment{
+		Values: []model.EnvironmentValue{},
+	}
+
+	if environmentId != "" {
+		environment, err = c.testDB.GetEnvironment(ctx, environmentId)
+
+		if err != nil {
+			return handleDBError(err), err
+		}
+	}
+
+	executor := expression.NewExecutor()
+	variables := expression.NewVariables(environment, executor)
+
+	transactionVariables := make([]expression.TestVariables, len(transaction.Steps))
+
+	for i, test := range transaction.Steps {
+		testVariables, err := processTestVariables(ctx, test, variables, c.triggerRegistry)
+		variables = variables.UpdateEnvironmentVariables(test)
+
+		if err != nil {
+			return openapi.Response(http.StatusInternalServerError, err.Error()), err
+		}
+
+		transactionVariables[i] = testVariables
+	}
+
+	return openapi.Response(200, c.mappers.Out.TransactionVariables(transactionVariables)), nil
 }
