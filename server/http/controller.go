@@ -1200,6 +1200,20 @@ func (c *controller) UpdateDataStore(ctx context.Context, dataStoreId string, in
 	return openapi.Response(204, nil), nil
 }
 
+func (c *controller) GetDataStoreDefinitionFile(ctx context.Context, dataStoreID string) (openapi.ImplResponse, error) {
+	dataStore, err := c.testDB.GetDataStore(ctx, dataStoreID)
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	enc, err := yaml.Encode(yamlconvert.DataStore(dataStore))
+	if err != nil {
+		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
+	}
+
+	return openapi.Response(200, enc), nil
+}
+
 // TestConnection implements openapi.ApiApiServicer
 func (c *controller) TestConnection(ctx context.Context, dataStore openapi.DataStore) (openapi.ImplResponse, error) {
 	ds := c.mappers.In.DataStore(dataStore)

@@ -141,6 +141,12 @@ func (c *ApiApiController) Routes() Routes {
 			c.GetDataStore,
 		},
 		{
+			"GetDataStoreDefinitionFile",
+			strings.ToUpper("Get"),
+			"/api/datastores/{dataStoreId}/definition.yaml",
+			c.GetDataStoreDefinitionFile,
+		},
+		{
 			"GetDataStores",
 			strings.ToUpper("Get"),
 			"/api/datastores",
@@ -624,6 +630,22 @@ func (c *ApiApiController) GetDataStore(w http.ResponseWriter, r *http.Request) 
 	dataStoreIdParam := params["dataStoreId"]
 
 	result, err := c.service.GetDataStore(r.Context(), dataStoreIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// GetDataStoreDefinitionFile - Get the data store definition as an YAML file
+func (c *ApiApiController) GetDataStoreDefinitionFile(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	dataStoreIdParam := params["dataStoreId"]
+
+	result, err := c.service.GetDataStoreDefinitionFile(r.Context(), dataStoreIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
