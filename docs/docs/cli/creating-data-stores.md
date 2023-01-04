@@ -68,8 +68,14 @@ spec:
 To apply the configuration, you need a [configured CLI](./configuring-your-cli.md) pointed to the instance you want to apply the data store. Then you just have to enter:
 
 ```
-tracetest data-store apply -f my/data-store/file/location.yaml
+tracetest datastore apply -f my/data-store/file/location.yaml
 ```
 
 ## Additional Information
 In the current version, you can only have one active data store at any given time. The flag `isDefault` defines which data store should be used by your tests. So, if you want to add a new data store and make sure it will be used in future test runs, make sure to define `isDefault` as `true` in the data store configuration file.
+
+After a configuration is applied, you can export it using the CLI by using the following command:
+
+```
+tracetest datastore export --output my/file/location.yaml --id my-data-store-id
+```
