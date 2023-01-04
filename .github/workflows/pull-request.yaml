@@ -270,10 +270,11 @@ jobs:
           location: ${{ secrets.GKE_ZONE }}
           credentials: ${{ secrets.GKE_SA_KEY }}
 
-      - name: Build Current CLI
+      - name: Install CLI integration version (latest main)
         run: |
-          cd cli
-          go build -o ./tracetest main.go
+          git clone --depth 1 https://github.com/kubeshop/tracetest /tmp/tracetest-main
+          cd /tmp/tracetest-main/cli
+          make build
 
       - name: Connect with integration environment
         run: |
@@ -283,7 +284,7 @@ jobs:
       - name: Run integration tests
         run: |
           cd tracetesting
-          TRACETEST_CLI="../cli/tracetest" \
+          TRACETEST_CLI="/tmp/tracetest-main/cli" \
           TARGET_URL="http://tracetest-pr-${{ github.event.pull_request.number }}.tracetest-pr-${{ github.event.pull_request.number }}:11633" \
           ./run.bash
 
