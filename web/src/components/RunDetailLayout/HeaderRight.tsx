@@ -9,6 +9,8 @@ import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
 import GuidedTourService, {GuidedTours} from '../../services/GuidedTour.service';
 import * as S from './RunDetailLayout.styled';
+import {useAppSelector} from '../../redux/hooks';
+import {selectIsPending} from '../../redux/testOutputs/selectors';
 
 interface IProps {
   testId: string;
@@ -16,14 +18,16 @@ interface IProps {
 }
 
 const HeaderRight = ({testId, testVersion}: IProps) => {
-  const {isDraftMode} = useTestSpecs();
+  const {isDraftMode: isTestSpecsPending} = useTestSpecs();
+  const isTestOutputsPending = useAppSelector(selectIsPending);
+  const isDraftMode = isTestSpecsPending || isTestOutputsPending;
   const {run} = useTestRun();
   const {onRun} = useTest();
   const state = run.state;
 
   return (
     <S.Section $justifyContent="flex-end">
-      {isDraftMode && <TestActions />}
+      {isDraftMode && <TestActions runId={run.id} testId={testId} />}
       {!isDraftMode && state && state !== TestStateEnum.FINISHED && (
         <S.StateContainer data-cy="test-run-result-status">
           <S.StateText>Test status:</S.StateText>

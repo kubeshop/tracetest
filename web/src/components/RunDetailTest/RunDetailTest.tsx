@@ -1,26 +1,35 @@
 import {Tabs} from 'antd';
 import {useCallback, useState} from 'react';
+import {useSearchParams} from 'react-router-dom';
 import {useMount} from 'react-use';
+
 import Drawer from 'components/Drawer';
 import {VisualizationType} from 'components/RunDetailTrace/RunDetailTrace';
 import SetupAlert from 'components/SetupAlert';
 import SpanDetail from 'components/SpanDetail';
 import TestOutputs from 'components/TestOutputs';
+import TestOutputForm from 'components/TestOutputForm/TestOutputForm';
 import TestResults from 'components/TestResults';
 import TestSpecDetail from 'components/TestSpecDetail';
 import TestSpecForm from 'components/TestSpecForm';
 import {useTestSpecForm} from 'components/TestSpecForm/TestSpecForm.provider';
 import Switch from 'components/Visualization/components/Switch';
+import {useGuidedTour} from 'providers/GuidedTour/GuidedTour.provider';
 import {useSpan} from 'providers/Span/Span.provider';
+import {useTestOutput} from 'providers/TestOutput/TestOutput.provider';
 import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
 import AssertionAnalyticsService from 'services/Analytics/AssertionAnalytics.service';
 import TestRunAnalytics from 'services/Analytics/TestRunAnalytics.service';
 import AssertionService from 'services/Assertion.service';
 import {TAssertionResultEntry} from 'types/Assertion.types';
 import {TTestRun} from 'types/TestRun.types';
-import {useGuidedTour} from 'providers/GuidedTour/GuidedTour.provider';
 import * as S from './RunDetailTest.styled';
 import Visualization from './Visualization';
+
+const TABS = {
+  SPECS: 'specs',
+  OUTPUTS: 'outputs',
+} as const;
 
 interface IProps {
   run: TTestRun;
@@ -31,6 +40,7 @@ const RunDetailTest = ({run, testId}: IProps) => {
   const {selectedSpan, onSetFocusedSpan, onSelectSpan} = useSpan();
   const {remove, revert, selectedTestSpec, setSelectedSpec, setSelectorSuggestions, setPrevSelector} = useTestSpecs();
   const {isOpen: isTestSpecFormOpen, formProps, onSubmit, open, close} = useTestSpecForm();
+  const {isEditing, isOpen: isTestOutputFormOpen, onClose, onSubmit: onSubmitTestOutput, output} = useTestOutput();
   const [visualizationType, setVisualizationType] = useState(VisualizationType.Dag);
   const {
     state: {tourActive},
@@ -39,6 +49,7 @@ const RunDetailTest = ({run, testId}: IProps) => {
   useMount(() => {
     if (tourActive) setState(st => ({...st, run: true, stepIndex: 3}));
   });
+  const [query, updateQuery] = useSearchParams();
 
   const handleClose = useCallback(() => {
     onSetFocusedSpan('');
@@ -107,7 +118,7 @@ const RunDetailTest = ({run, testId}: IProps) => {
             </S.SectionLeft>
 
             <S.SectionRight $shouldScroll={!selectedTestSpec}>
-              {isTestSpecFormOpen ? (
+              {isTestSpecFormOpen && (
                 <TestSpecForm
                   onSubmit={values => {
                     setSelectorSuggestions([]);
@@ -129,13 +140,39 @@ const RunDetailTest = ({run, testId}: IProps) => {
                     setPrevSelector(prevSelector);
                   }}
                 />
-              ) : (
+              )}
+
+              {isTestOutputFormOpen && (
+                <TestOutputForm
+                  isEditing={isEditing}
+                  onCancel={onClose}
+                  onSubmit={onSubmitTestOutput}
+                  output={output}
+                  runId={run.id}
+                  testId={testId}
+                />
+              )}
+
+              {!isTestSpecFormOpen && !isTestOutputFormOpen && (
                 <S.TabsContainer>
-                  <Tabs defaultActiveKey="testSpecs" size="small">
-                    <Tabs.TabPane key="testSpecs" tab="Test Specs">
+                  <Tabs
+                    defaultActiveKey={query.get('tab') || TABS.SPECS}
+                    onChange={tab =>
+                      updateQuery(
+                        selectedSpan
+                          ? [
+                              ['selectedSpan', selectedSpan.id],
+                              ['tab', tab],
+                            ]
+                          : [['tab', tab]]
+                      )
+                    }
+                    size="small"
+                  >
+                    <Tabs.TabPane key={TABS.SPECS} tab="Test Specs">
                       <TestResults onDelete={handleDelete} onEdit={handleEdit} onRevert={handleRevert} />
                     </Tabs.TabPane>
-                    <Tabs.TabPane key="testOutputs" tab="Test Outputs">
+                    <Tabs.TabPane key={TABS.OUTPUTS} tab="Test Outputs">
                       <TestOutputs />
                     </Tabs.TabPane>
                   </Tabs>

@@ -1,13 +1,25 @@
 import {Button} from 'antd';
 
+import {useTestOutput} from 'providers/TestOutput/TestOutput.provider';
 import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
+import {useAppSelector} from 'redux/hooks';
+import {selectTestOutputs} from 'redux/testOutputs/selectors';
 import TraceAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
 import {singularOrPlural} from 'utils/Common';
 import * as S from './TestActions.styled';
 
-const TestActions = () => {
-  const {specs, publish, cancel} = useTestSpecs();
-  const pendingCount = specs.filter(({isDraft}) => isDraft).length;
+interface IProps {
+  runId: string;
+  testId: string;
+}
+
+const TestActions = ({runId, testId}: IProps) => {
+  const {specs, publish, cancel: onCancelTestSpecs} = useTestSpecs();
+  const {onCancel: onCancelTestOutputs} = useTestOutput();
+  const outputs = useAppSelector(state => selectTestOutputs(state, testId, runId));
+  const pendingSpecs = specs.filter(({isDraft}) => isDraft).length;
+  const pendingOutputs = outputs.filter(({isDraft}) => isDraft).length;
+  const pendingCount = pendingSpecs + pendingOutputs;
 
   return (
     <S.Container>
@@ -19,7 +31,8 @@ const TestActions = () => {
         data-cy="trace-actions-revert-all"
         onClick={() => {
           TraceAnalyticsService.onRevertAllClick();
-          cancel();
+          onCancelTestSpecs();
+          onCancelTestOutputs();
         }}
       >
         Revert All

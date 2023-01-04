@@ -4,6 +4,7 @@ import {PatchCollection} from '@reduxjs/toolkit/dist/query/core/buildThunks';
 import TestGateway from 'gateways/Test.gateway';
 import TestRunGateway from 'gateways/TestRun.gateway';
 import TestSpecsSelectors from 'selectors/TestSpecs.selectors';
+import {selectTestOutputs} from 'redux/testOutputs/selectors';
 import TestDefinitionService from 'services/TestDefinition.service';
 import {TAssertionResults} from 'types/Assertion.types';
 import {TTest} from 'types/Test.types';
@@ -23,7 +24,8 @@ const TestSpecsActions = () => ({
     'testDefinition/publish',
     async ({test, testId, runId}, {dispatch, getState}) => {
       const specs = TestSpecsSelectors.selectSpecs(getState() as RootState).filter(def => !def.isDeleted);
-      const rawTest = await TestService.getUpdatedRawTest(test, {definition: {specs}});
+      const outputs = selectTestOutputs(getState() as RootState, testId, runId);
+      const rawTest = await TestService.getUpdatedRawTest(test, {definition: {specs}, outputs});
       await dispatch(TestGateway.edit(rawTest, testId));
       return dispatch(TestRunGateway.reRun(testId, runId)).unwrap();
     }

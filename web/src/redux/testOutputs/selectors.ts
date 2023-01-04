@@ -27,15 +27,6 @@ export const selectTestOutputs = createSelector(
   }
 );
 
-export const selectTestOutputByIndex = createSelector(
-  testOutputsStateSelector,
-  (state: RootState, index: number) => index,
-  ({outputs}, index) => {
-    if (index === -1) return;
-    return outputs[index];
-  }
-);
-
 export const selectIsPending = createSelector(testOutputsStateSelector, ({outputs}) =>
   outputs.some(output => output.isDraft)
 );

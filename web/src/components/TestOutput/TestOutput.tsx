@@ -1,18 +1,18 @@
 import {Tag} from 'antd';
 
+import AttributeValue from 'components/AttributeValue';
 import {TTestOutput} from 'types/TestOutput.types';
-import * as S from './OutputRow.styled';
-import OutputRowActions from './OutputRowActions';
-import OutputValue from './OutputValue';
+import * as S from './TestOutput.styled';
+import Actions from './Actions';
 
 interface IProps {
   index: number;
   output: TTestOutput;
   onDelete(index: number): void;
-  onEdit(index: number): void;
+  onEdit(values: TTestOutput): void;
 }
 
-const OutputRow = ({index, output, onEdit, onDelete}: IProps) => (
+const TestOutput = ({index, output, onEdit, onDelete}: IProps) => (
   <S.Container $isDeleted={output.isDeleted} data-cy="output-item-container">
     {output.isDraft && (
       <S.Row $justifyContent="flex-end">
@@ -33,18 +33,20 @@ const OutputRow = ({index, output, onEdit, onDelete}: IProps) => (
           <S.Key>Value</S.Key>
           <S.Value>{output.value}</S.Value>
         </S.Entry>
-        <S.Entry>
-          {!output.isDraft && Boolean(output.valueRun) && (
-            <>
-              <S.Key>Run value</S.Key>
-              <OutputValue value={output.valueRun} />
-            </>
-          )}
-        </S.Entry>
       </S.OutputDetails>
-      <OutputRowActions name={output.name} onDelete={() => onDelete(index)} onEdit={() => onEdit(index)} />
+      <Actions isDeleted={output.isDeleted} onDelete={() => onDelete(index)} onEdit={() => onEdit(output)} />
+    </S.Row>
+    <S.Row>
+      <S.Entry>
+        {!output.isDraft && Boolean(output.valueRun) && (
+          <>
+            <S.Key>Run value</S.Key>
+            <AttributeValue value={output.valueRun} />
+          </>
+        )}
+      </S.Entry>
     </S.Row>
   </S.Container>
 );
 
-export default OutputRow;
+export default TestOutput;

@@ -11,9 +11,9 @@ import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import RouterActions from 'redux/actions/Router.actions';
 import TestSpecsSelectors from 'selectors/TestSpecs.selectors';
 import CreateAssertionModalAnalyticsService from 'services/Analytics/CreateAssertionModalAnalytics.service';
+import AssertionService from 'services/Assertion.service';
 import {TTestSpecEntry} from 'types/TestSpecs.types';
 import {IValues} from './TestSpecForm';
-import AssertionService from '../../services/Assertion.service';
 
 interface IFormProps {
   defaultValues?: IValues;

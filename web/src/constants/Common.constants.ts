@@ -16,6 +16,7 @@ export const TRACE_DOCUMENTATION_URL =
   'https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/api.md';
 
 export const ADD_TEST_SPECS_DOCUMENTATION_URL = 'https://docs.tracetest.io/using-tracetest/adding-assertions/';
+export const ADD_TEST_OUTPUTS_DOCUMENTATION_URL = 'https://docs.tracetest.io/using-tracetest/adding-assertions/'; // TODO: create docs for adding outputs using the UI
 
 export const SELECTOR_LANGUAGE_CHEAT_SHEET_URL = `${process.env.PUBLIC_URL}/SL_cheat_sheet.pdf`;
 
