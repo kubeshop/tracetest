@@ -1259,6 +1259,12 @@ func (c *controller) GetTestVariables(ctx context.Context, testId, environmentId
 func processTestVariables(ctx context.Context, test model.Test, variables expression.Variables, triggerRegistry *trigger.Registry) (expression.TestVariables, error) {
 	environmentVariables := variables.GetEnvironmentVariables(test)
 	specVariables, err := variables.GetSpecsVariables(test)
+
+	if err != nil {
+		return expression.TestVariables{}, err
+	}
+
+	outputVariables, err := variables.GetOutputVariables(test)
 	if err != nil {
 		return expression.TestVariables{}, err
 	}
@@ -1273,7 +1279,7 @@ func processTestVariables(ctx context.Context, test model.Test, variables expres
 		return expression.TestVariables{}, err
 	}
 
-	testVariables := variables.GetTestVariables(string(test.ID), environmentVariables, append(specVariables, triggerVariables...))
+	testVariables := variables.GetTestVariables(string(test.ID), environmentVariables, append(specVariables, append(triggerVariables, outputVariables...)...))
 
 	return testVariables, nil
 }

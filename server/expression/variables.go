@@ -70,6 +70,26 @@ func (v Variables) GetSpecsVariables(test model.Test) ([]string, error) {
 	return specVariables, nil
 }
 
+func (v Variables) GetOutputVariables(test model.Test) ([]string, error) {
+	specVariables := []string{}
+	err := test.Outputs.ForEach(func(_ string, output model.Output) error {
+		variables, err := v.Executor.StatementTermsByType(string(output.Value), EnvironmentType)
+		if err != nil {
+			return err
+		}
+
+		specVariables = append(specVariables, variables...)
+
+		return nil
+	})
+
+	if err != nil {
+		return []string{}, err
+	}
+
+	return specVariables, nil
+}
+
 func contains(slice []string, value string) bool {
 	for _, a := range slice {
 		if a == value {
