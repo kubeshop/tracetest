@@ -26,7 +26,7 @@ var dataStoreListCmd = &cobra.Command{
 
 		err := applyDataStoreAction.Run(ctx, actionArgs)
 		if err != nil {
-			cliLogger.Error("failed to run test", zap.Error(err))
+			cliLogger.Error("failed to list data stores", zap.Error(err))
 			os.Exit(1)
 			return
 		}
