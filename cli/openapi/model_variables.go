@@ -16,9 +16,9 @@ import (
 
 // Variables struct for Variables
 type Variables struct {
-	Environment []EnvironmentValue `json:"environment,omitempty"`
-	Variables   []string           `json:"variables,omitempty"`
-	Missing     []string           `json:"missing,omitempty"`
+	Environment []string `json:"environment,omitempty"`
+	Variables   []string `json:"variables,omitempty"`
+	Missing     []string `json:"missing,omitempty"`
 }
 
 // NewVariables instantiates a new Variables object
@@ -39,9 +39,9 @@ func NewVariablesWithDefaults() *Variables {
 }
 
 // GetEnvironment returns the Environment field value if set, zero value otherwise.
-func (o *Variables) GetEnvironment() []EnvironmentValue {
+func (o *Variables) GetEnvironment() []string {
 	if o == nil || o.Environment == nil {
-		var ret []EnvironmentValue
+		var ret []string
 		return ret
 	}
 	return o.Environment
@@ -49,7 +49,7 @@ func (o *Variables) GetEnvironment() []EnvironmentValue {
 
 // GetEnvironmentOk returns a tuple with the Environment field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Variables) GetEnvironmentOk() ([]EnvironmentValue, bool) {
+func (o *Variables) GetEnvironmentOk() ([]string, bool) {
 	if o == nil || o.Environment == nil {
 		return nil, false
 	}
@@ -65,8 +65,8 @@ func (o *Variables) HasEnvironment() bool {
 	return false
 }
 
-// SetEnvironment gets a reference to the given []EnvironmentValue and assigns it to the Environment field.
-func (o *Variables) SetEnvironment(v []EnvironmentValue) {
+// SetEnvironment gets a reference to the given []string and assigns it to the Environment field.
+func (o *Variables) SetEnvironment(v []string) {
 	o.Environment = v
 }
 

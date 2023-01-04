@@ -1574,7 +1574,7 @@ export interface external {
     components: {
       schemas: {
         Variables: {
-          environment?: external["environments.yaml"]["components"]["schemas"]["EnvironmentValue"][];
+          environment?: string[];
           variables?: string[];
           missing?: string[];
         };
