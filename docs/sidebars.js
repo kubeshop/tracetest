@@ -219,6 +219,11 @@ const sidebars = {
           id: "cli/configuring-your-cli",
           label: "Configuring your CLI",
         },
+        {
+          type: "doc",
+          id: "cli/creating-data-stores",
+          label: "Creating Data Stores",
+        },
         // {
         //   type: "doc",
         //   id: "cli/creating-environments",
