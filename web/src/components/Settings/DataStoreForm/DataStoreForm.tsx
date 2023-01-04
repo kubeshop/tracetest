@@ -1,7 +1,7 @@
 import {Form} from 'antd';
 import {useCallback, useEffect, useMemo} from 'react';
 import SetupConfigService from 'services/DataStore.service';
-import {TDraftDataStore, TDataStoreForm, TDataStoreConfig} from 'types/Config.types';
+import {TDraftDataStore, TDataStoreForm, TDataStoreConfig, SupportedDataStores} from 'types/Config.types';
 import {SupportedDataStoresToExplanation} from 'constants/DataStore.constants';
 import DataStoreDocsBanner from '../DataStoreDocsBanner/DataStoreDocsBanner';
 import DataStoreComponentFactory from '../DataStorePlugin/DataStoreComponentFactory';
@@ -22,7 +22,7 @@ const DataStoreForm = ({form, onSubmit, dataStoreConfig, onIsFormValid}: IProps)
   const dataStoreType = Form.useWatch('dataStoreType', form);
 
   useEffect(() => {
-    form.setFieldsValue({dataStore: {...initialValues.dataStore}});
+    form.setFieldsValue({dataStore: {name: '', type: SupportedDataStores.JAEGER, ...initialValues.dataStore}});
   }, [dataStoreType, form, initialValues.dataStore]);
 
   const onValidation = useCallback(

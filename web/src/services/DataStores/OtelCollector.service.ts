@@ -4,6 +4,7 @@ const OtelCollectorService = (): TDataStoreService => ({
   getRequest() {
     return Promise.resolve({
       type: SupportedDataStores.OtelCollector,
+      name: SupportedDataStores.OtelCollector,
     });
   },
   validateDraft() {
@@ -11,7 +12,10 @@ const OtelCollectorService = (): TDataStoreService => ({
   },
   getInitialValues() {
     return {
-      dataStore: {},
+      dataStore: {
+        name: SupportedDataStores.OtelCollector,
+        type: SupportedDataStores.OtelCollector,
+      },
       dataStoreType: SupportedDataStores.OtelCollector,
     };
   },

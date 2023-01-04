@@ -4,6 +4,7 @@ const SignalFxService = (): TDataStoreService => ({
   getRequest({dataStore: {signalFx: {realm = '', token = ''} = {}} = {}}) {
     return Promise.resolve({
       type: SupportedDataStores.SignalFX,
+      name: SupportedDataStores.SignalFX,
       signalFx: {
         realm,
         token,
@@ -19,7 +20,7 @@ const SignalFxService = (): TDataStoreService => ({
     const {realm = '', token = ''} = signalFx;
 
     return {
-      dataStore: {signalFx: {realm, token}},
+      dataStore: {name: SupportedDataStores.SignalFX, type: SupportedDataStores.SignalFX, signalFx: {realm, token}},
       dataStoreType: SupportedDataStores.SignalFX,
     };
   },

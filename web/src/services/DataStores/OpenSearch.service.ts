@@ -4,6 +4,7 @@ import Validator from 'utils/Validator';
 const OpenSearchService = (): TDataStoreService => ({
   getRequest({dataStore: {openSearch: {index = '', username = '', password = '', addresses = []} = {}} = {}}) {
     return Promise.resolve({
+      name: SupportedDataStores.OpenSearch,
       type: SupportedDataStores.OpenSearch,
       openSearch: {
         index,
@@ -30,6 +31,8 @@ const OpenSearchService = (): TDataStoreService => ({
           password,
           addresses,
         },
+        name: SupportedDataStores.OpenSearch,
+        type: SupportedDataStores.OpenSearch,
       },
       dataStoreType: SupportedDataStores.OpenSearch,
     };

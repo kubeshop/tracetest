@@ -1,0 +1,30 @@
+openapi: 3.0.0
+
+components:
+  schemas:
+    Variables:
+      type: object
+      properties:
+        environment:
+          type: array
+          items:
+            $ref: "./environments.yaml#/components/schemas/EnvironmentValue"
+        variables:
+          type: array
+          items:
+            type: string
+        missing:
+          type: array
+          items:
+            type: string
+    TestVariables:
+      type: object
+      properties:
+        testId:
+          type: string
+        variables:
+          $ref: "#/components/schemas/Variables"
+    TransactionVariables:
+      type: array
+      items:
+        $ref: "#/components/schemas/TestVariables"
