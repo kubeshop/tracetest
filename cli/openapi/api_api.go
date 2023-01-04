@@ -3713,7 +3713,7 @@ func (r ApiGetTransactionVariablesRequest) EnvironmentId(environmentId string) A
 	return r
 }
 
-func (r ApiGetTransactionVariablesRequest) Execute() (*TransactionVariables, *http.Response, error) {
+func (r ApiGetTransactionVariablesRequest) Execute() ([]TestVariables, *http.Response, error) {
 	return r.ApiService.GetTransactionVariablesExecute(r)
 }
 
@@ -3736,13 +3736,13 @@ func (a *ApiApiService) GetTransactionVariables(ctx context.Context, transaction
 
 // Execute executes the request
 //
-//	@return TransactionVariables
-func (a *ApiApiService) GetTransactionVariablesExecute(r ApiGetTransactionVariablesRequest) (*TransactionVariables, *http.Response, error) {
+//	@return []TestVariables
+func (a *ApiApiService) GetTransactionVariablesExecute(r ApiGetTransactionVariablesRequest) ([]TestVariables, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
 		formFiles           []formFile
-		localVarReturnValue *TransactionVariables
+		localVarReturnValue []TestVariables
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.GetTransactionVariables")

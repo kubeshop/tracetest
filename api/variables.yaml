@@ -24,7 +24,3 @@ components:
           type: string
         variables:
           $ref: "#/components/schemas/Variables"
-    TransactionVariables:
-      type: array
-      items:
-        $ref: "#/components/schemas/TestVariables"

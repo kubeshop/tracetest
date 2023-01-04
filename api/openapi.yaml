@@ -378,7 +378,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "./variables.yaml#/components/schemas/TransactionVariables"
+                type: array
+                items:
+                  $ref: "./variables.yaml#/components/schemas/TestVariables"
         500:
           description: "problem with getting the transaction variables"
 

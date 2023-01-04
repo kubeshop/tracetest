@@ -432,7 +432,7 @@ export interface operations {
       /** successful operation */
       200: {
         content: {
-          "application/json": external["variables.yaml"]["components"]["schemas"]["TransactionVariables"];
+          "application/json": external["variables.yaml"]["components"]["schemas"]["TestVariables"][];
         };
       };
       /** problem with getting the transaction variables */
@@ -1582,7 +1582,6 @@ export interface external {
           testId?: string;
           variables?: external["variables.yaml"]["components"]["schemas"]["Variables"];
         };
-        TransactionVariables: external["variables.yaml"]["components"]["schemas"]["TestVariables"][];
       };
     };
     operations: {};
