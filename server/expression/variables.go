@@ -99,6 +99,18 @@ func contains(slice []string, value string) bool {
 	return false
 }
 
+func unique(strSlice []string) []string {
+	keys := make(map[string]bool)
+	list := []string{}
+	for _, entry := range strSlice {
+		if _, value := keys[entry]; !value {
+			keys[entry] = true
+			list = append(list, entry)
+		}
+	}
+	return list
+}
+
 func (v Variables) getMissingVariables(testVariables, environmentVariables []string) []string {
 	missingVariables := []string{}
 
@@ -114,9 +126,9 @@ func (v Variables) getMissingVariables(testVariables, environmentVariables []str
 func (v Variables) GetTestVariables(testId string, environmentVariables, testVariables []string) TestVariables {
 	variablesResult := TestVariables{
 		TestId:      testId,
-		Environment: environmentVariables,
-		Variables:   testVariables,
-		Missing:     v.getMissingVariables(testVariables, environmentVariables),
+		Environment: unique(environmentVariables),
+		Variables:   unique(testVariables),
+		Missing:     unique(v.getMissingVariables(testVariables, environmentVariables)),
 	}
 
 	return variablesResult
