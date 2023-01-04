@@ -1,0 +1,56 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+
+
+processors:
+  batch:
+    timeout: 100ms
+
+  # Data sources: traces
+  probabilistic_sampler:
+    hash_seed: 22
+    sampling_percentage: 100
+
+  # Funnel Tracetest trigger spans to Tracetest OTLP endpoint
+  tail_sampling:
+    decision_wait: 5s
+    policies:
+      - name: tracetest-spans
+        type: trace_state
+        trace_state: { key: tracetest, values: ["true"] }
+
+exporters:
+  logging:
+    logLevel: debug
+
+  # OTLP for Tracetest
+  otlp/1:
+    endpoint: tracetest:21321 # Send traces to Tracetest. Read more in docs here. (TODO ADD LINK)
+    tls:
+      insecure: true
+
+  # OTLP for Lightstep
+  otlphttp/2:
+    traces_endpoint: https://ingest.lightstep.com:443/traces/otlp/v0.6
+    metrics_endpoint: https://ingest.lightstep.com:443/metrics/otlp/v0.9
+    headers: {"lightstep-access-token": "${LIGHTSTEP_TOKEN}"}
+    compression: gzip
+  # Remove Jaeger when we get Lightstep acc
+  jaeger/2:
+    endpoint: ${JAEGER_ENDPOINT}
+    tls:
+      insecure: true
+
+service:
+  pipelines:
+    traces/1:
+      receivers: [otlp]
+      processors: [tail_sampling, batch]
+      exporters: [otlp/1]
+    traces/2:
+      receivers: [otlp]
+      processors: [probabilistic_sampler, batch]
+      exporters: [logging, jaeger/2, otlphttp/2]
