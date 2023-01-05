@@ -186,17 +186,17 @@ const sidebars = {
         {
           type: "doc",
           id: "web-ui/creating-tests",
-          label: "Creating tests",
+          label: "Creating Tests",
         },
         {
           type: "doc",
           id: "web-ui/creating-test-specifications",
-          label: "Creating test specifications",
+          label: "Creating Test Specifications",
         },
         {
           type: "doc",
           id: "web-ui/test-results",
-          label: "Test results",
+          label: "Test Results",
         },
         // {
         //   type: "doc",
@@ -206,7 +206,7 @@ const sidebars = {
         {
           type: "doc",
           id: "web-ui/exporting-tests",
-          label: "Exporting tests",
+          label: "Exporting Tests",
         },
       ],
     },
@@ -232,7 +232,7 @@ const sidebars = {
         {
           type: "doc",
           id: "cli/creating-tests",
-          label: "Creating tests",
+          label: "Creating Tests",
         },
         // {
         //   type: "doc",

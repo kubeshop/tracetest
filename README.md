@@ -91,36 +91,38 @@ The Tracetest [test definition files](https://docs.tracetest.io/cli/test-definit
 - verifies all database calls execute in less than 50ms.
 
 ```yaml
-id: 5dd03dda-fad2-49f0-b9d9-5143b746c1d0
-name: DEMO Pokemon - Import - Import a Pokemon
-description: "Import a pokemon"
+type: Test
+spec:
+  id: 5dd03dda-fad2-49f0-b9d9-5143b746c1d0
+  name: DEMO Pokemon - Import - Import a Pokemon
+  description: "Import a pokemon"
 
-# Configure how tracetest triggers the operation on your application
-# triggers can be http, grpc, etc
-trigger:
-    type: http
-    httpRequest:
-        method: POST
-        url: http://demo-pokemon-api.demo.svc.cluster.local/pokemon/import
-        headers:
-            - key: Content-Type
-              value: application/json
-        body: '{"id":52}'
+  # Configure how tracetest triggers the operation on your application
+  # triggers can be http, grpc, etc
+  trigger:
+      type: http
+      httpRequest:
+          method: POST
+          url: http://demo-pokemon-api.demo.svc.cluster.local/pokemon/import
+          headers:
+              - key: Content-Type
+                value: application/json
+          body: '{"id":52}'
 
-# Definition of the test specs which is a combination of a selector
-# and an assertion
-specs:
-    # the selector defines which spans will be targeted by the assertions
-    selector: span[tracetest.span.type = "http"]
-    # the assertions define the checks to be run. In this case, all
-    # http spans will be checked for a status code = 200
-    - assertions:
-        - http.status_code = 200
-    # this next test ensures all the database spans execute in less
-    # than 50 ms
-    selector: span[tracetest.span.type = "database"]
-    - assertions:
-        - tracetest.span.duration < "50ms"
+  # Definition of the test specs which is a combination of a selector
+  # and an assertion
+  specs:
+      # the selector defines which spans will be targeted by the assertions
+      selector: span[tracetest.span.type = "http"]
+      # the assertions define the checks to be run. In this case, all
+      # http spans will be checked for a status code = 200
+      - assertions:
+          - http.status_code = 200
+      # this next test ensures all the database spans execute in less
+      # than 50 ms
+      selector: span[tracetest.span.type = "database"]
+      - assertions:
+          - tracetest.span.duration < "50ms"
 ```
 
 # Feedback
