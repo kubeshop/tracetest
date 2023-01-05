@@ -60,7 +60,7 @@ const CreateTransactionProvider = ({children}: IProps) => {
   const onCreateTransaction = useCallback(
     async (draft: TDraftTransaction) => {
       const transaction = await createTransaction(draft).unwrap();
-      runTransaction(transaction.id);
+      runTransaction(transaction);
     },
     [createTransaction, runTransaction]
   );

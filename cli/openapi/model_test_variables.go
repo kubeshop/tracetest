@@ -16,7 +16,7 @@ import (
 
 // TestVariables struct for TestVariables
 type TestVariables struct {
-	TestId    *string    `json:"testId,omitempty"`
+	Test      *Test      `json:"test,omitempty"`
 	Variables *Variables `json:"variables,omitempty"`
 }
 
@@ -37,36 +37,36 @@ func NewTestVariablesWithDefaults() *TestVariables {
 	return &this
 }
 
-// GetTestId returns the TestId field value if set, zero value otherwise.
-func (o *TestVariables) GetTestId() string {
-	if o == nil || o.TestId == nil {
-		var ret string
+// GetTest returns the Test field value if set, zero value otherwise.
+func (o *TestVariables) GetTest() Test {
+	if o == nil || o.Test == nil {
+		var ret Test
 		return ret
 	}
-	return *o.TestId
+	return *o.Test
 }
 
-// GetTestIdOk returns a tuple with the TestId field value if set, nil otherwise
+// GetTestOk returns a tuple with the Test field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *TestVariables) GetTestIdOk() (*string, bool) {
-	if o == nil || o.TestId == nil {
+func (o *TestVariables) GetTestOk() (*Test, bool) {
+	if o == nil || o.Test == nil {
 		return nil, false
 	}
-	return o.TestId, true
+	return o.Test, true
 }
 
-// HasTestId returns a boolean if a field has been set.
-func (o *TestVariables) HasTestId() bool {
-	if o != nil && o.TestId != nil {
+// HasTest returns a boolean if a field has been set.
+func (o *TestVariables) HasTest() bool {
+	if o != nil && o.Test != nil {
 		return true
 	}
 
 	return false
 }
 
-// SetTestId gets a reference to the given string and assigns it to the TestId field.
-func (o *TestVariables) SetTestId(v string) {
-	o.TestId = &v
+// SetTest gets a reference to the given Test and assigns it to the Test field.
+func (o *TestVariables) SetTest(v Test) {
+	o.Test = &v
 }
 
 // GetVariables returns the Variables field value if set, zero value otherwise.
@@ -103,8 +103,8 @@ func (o *TestVariables) SetVariables(v Variables) {
 
 func (o TestVariables) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if o.TestId != nil {
-		toSerialize["testId"] = o.TestId
+	if o.Test != nil {
+		toSerialize["test"] = o.Test
 	}
 	if o.Variables != nil {
 		toSerialize["variables"] = o.Variables

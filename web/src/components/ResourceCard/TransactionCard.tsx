@@ -14,7 +14,7 @@ import useRuns from './useRuns';
 
 interface IProps {
   onDelete(id: string, name: string, type: ResourceType): void;
-  onRun(id: string, type: ResourceType): void;
+  onRun(transaction: TTransaction, type: ResourceType): void;
   onViewAll(id: string, type: ResourceType): void;
   transaction: TTransaction;
 }
@@ -24,6 +24,7 @@ const TransactionCard = ({
   onRun,
   onViewAll,
   transaction: {id: transactionId, summary, name, description},
+  transaction,
 }: IProps) => {
   const queryParams = useMemo(() => ({take: 5, transactionId}), [transactionId]);
   const {isCollapsed, isLoading, list, onClick} = useRuns<TTransactionRun, {transactionId: string}>(
@@ -52,7 +53,7 @@ const TransactionCard = ({
             data-cy={`transaction-run-button-${transactionId}`}
             onClick={event => {
               event.stopPropagation();
-              onRun(transactionId, ResourceType.Transaction);
+              onRun(transaction, ResourceType.Transaction);
             }}
           >
             Run

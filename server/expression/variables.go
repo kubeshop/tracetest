@@ -5,7 +5,7 @@ import (
 )
 
 type TestVariables struct {
-	TestId      string
+	Test        model.Test
 	Environment []string
 	Variables   []string
 	Missing     []MissingVariables
@@ -131,9 +131,9 @@ func (v Variables) getMissingVariables(testVariables, environmentVariables Varia
 	return missingVariables
 }
 
-func (v Variables) GetTestVariables(testId string, environmentVariables, testVariables VariablesMap, environment model.Environment) TestVariables {
+func (v Variables) GetTestVariables(test model.Test, environmentVariables, testVariables VariablesMap, environment model.Environment) TestVariables {
 	variablesResult := TestVariables{
-		TestId:      testId,
+		Test:        test,
 		Environment: environmentVariables.ToArray(),
 		Variables:   testVariables.ToArray(),
 		Missing:     v.getMissingVariables(testVariables, environmentVariables, environment),

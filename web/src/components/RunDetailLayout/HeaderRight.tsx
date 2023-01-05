@@ -35,7 +35,7 @@ const HeaderRight = ({testId, testVersion}: IProps) => {
           data-tour={GuidedTourService.getStep(GuidedTours.Trace, Steps.RunButton)}
           data-cy="run-test-button"
           ghost
-          onClick={onRun}
+          onClick={() => onRun(run.id)}
           type="primary"
         >
           Run Test

@@ -1422,6 +1422,7 @@ export interface external {
         RunInformation: {
           metadata?: { [key: string]: string } | null;
           environmentId?: string;
+          variables?: external["environments.yaml"]["components"]["schemas"]["EnvironmentValue"][];
         };
         /** @example [object Object] */
         AssertionResults: {
@@ -1583,7 +1584,7 @@ export interface external {
           missing?: external["variables.yaml"]["components"]["schemas"]["MissingVariables"][];
         };
         TestVariables: {
-          testId?: string;
+          test?: external["tests.yaml"]["components"]["schemas"]["Test"];
           variables?: external["variables.yaml"]["components"]["schemas"]["Variables"];
         };
         MissingVariables: {

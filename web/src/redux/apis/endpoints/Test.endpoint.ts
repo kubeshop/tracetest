@@ -3,6 +3,8 @@ import {SortBy, SortDirection, TracetestApiTags} from 'constants/Test.constants'
 import Test from 'models/Test.model';
 import {PaginationResponse} from 'hooks/usePagination';
 import {TRawTest, TTest, TTestApiEndpointBuilder} from 'types/Test.types';
+import {TRawTestVariables, TTestVariables} from 'types/Variables.types';
+import TestVariables from 'models/TestVariables.model';
 import {getTotalCountFromHeaders} from 'utils/Common';
 
 const TestEndpoint = (builder: TTestApiEndpointBuilder) => ({
@@ -61,6 +63,15 @@ const TestEndpoint = (builder: TTestApiEndpointBuilder) => ({
       {type: TracetestApiTags.TEST, id: 'LIST'},
       {type: TracetestApiTags.RESOURCE, id: 'LIST'},
     ],
+  }),
+  getTestVariables: builder.query<
+    TTestVariables,
+    {testId: string; version: number; environmentId?: string; runId?: string}
+  >({
+    query: ({testId, environmentId = '', version, runId = '0'}) =>
+      `/tests/${testId}/version/${version}/variables?environmentId=${environmentId}&runId=${runId}`,
+    providesTags: (result, error, {testId}) => [{type: TracetestApiTags.TEST, id: `${testId}-variables`}],
+    transformResponse: (rawTestVariables: TRawTestVariables) => TestVariables(rawTestVariables),
   }),
 });
 

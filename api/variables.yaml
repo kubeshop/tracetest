@@ -20,8 +20,8 @@ components:
     TestVariables:
       type: object
       properties:
-        testId:
-          type: string
+        test:
+          $ref: "./tests.yaml#/components/schemas/Test"
         variables:
           $ref: "#/components/schemas/Variables"
     MissingVariables:

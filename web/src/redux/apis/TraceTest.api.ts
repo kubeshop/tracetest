@@ -73,6 +73,8 @@ export const {
   useUpdateDataStoreMutation,
   useDeleteDataStoreMutation,
   useTestConnectionMutation,
+  useLazyGetTestVariablesQuery,
+  useLazyGetTransactionVariablesQuery,
 } = TraceTestAPI;
 export const {endpoints} = TraceTestAPI;
 

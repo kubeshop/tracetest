@@ -10,13 +10,16 @@
 package openapi
 
 type TestVariables struct {
-	TestId string `json:"testId,omitempty"`
+	Test Test `json:"test,omitempty"`
 
 	Variables Variables `json:"variables,omitempty"`
 }
 
 // AssertTestVariablesRequired checks if the required fields are not zero-ed
 func AssertTestVariablesRequired(obj TestVariables) error {
+	if err := AssertTestRequired(obj.Test); err != nil {
+		return err
+	}
 	if err := AssertVariablesRequired(obj.Variables); err != nil {
 		return err
 	}
