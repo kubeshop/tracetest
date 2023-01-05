@@ -1,66 +1,8 @@
+# OpenTelemetry Demo 
+# https://github.com/open-telemetry/opentelemetry-demo
+
 version: "3.2"
 services:
-  tracetest:
-    restart: unless-stopped
-    image: kubeshop/tracetest:${TAG:-latest}
-    platform: linux/amd64
-    ports:
-      - 11633:11633
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    volumes:
-      - type: bind
-        source: ./tracetest-config.yaml
-        target: /app/config.yaml
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "localhost:11633"]
-      interval: 1s
-      timeout: 3s
-      retries: 60
-    depends_on:
-      postgres:
-        condition: service_healthy
-      jaeger:
-        condition: service_healthy
-      otel-collector:
-        condition: service_started
-
-  postgres:
-    image: postgres
-    environment:
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_USER: postgres
-    healthcheck:
-      test: pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
-      interval: 1s
-      timeout: 5s
-      retries: 60
-
-  otel-collector:
-    image: otel/opentelemetry-collector-contrib:0.68.0
-    restart: unless-stopped
-    command:
-      - "--config"
-      - "/otel-local-config.yaml"
-    volumes:
-      - ./collector.config.yaml:/otel-local-config.yaml
-    environment:
-      - JAEGER_ENDPOINT=jaeger:14250
-    depends_on:
-      jaeger:
-        condition: service_healthy
-
-  jaeger:
-    image: jaegertracing/all-in-one:latest
-    restart: unless-stopped
-    ports:
-      - 16686:16686
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "localhost:16686"]
-      interval: 1s
-      timeout: 3s
-      retries: 60
-
   cache:
     image: redis:6
     restart: unless-stopped
@@ -70,7 +12,6 @@ services:
       timeout: 3s
       retries: 60
 
-  # Otel demo
   otel-adservice:
     image: otel/demo:v0.3.4-alpha-adservice
     environment:
