@@ -355,7 +355,7 @@ paths:
         404:
           description: transaction run not found
 
-  /transactions/{transactionId}/variables:
+  /transactions/{transactionId}/version/{version}/variables:
     get:
       tags:
         - api
@@ -365,10 +365,19 @@ paths:
           schema:
             type: string
           required: true
+        - in: path
+          name: version
+          schema:
+            type: integer
+          required: true
         - in: query
           name: environmentId
           schema:
             type: string
+        - in: query
+          name: runId
+          schema:
+            type: integer
       summary: "get transaction variables"
       description: "get transaction variables"
       operationId: getTransactionVariables
@@ -860,7 +869,7 @@ paths:
               schema:
                 type: string
 
-  /tests/{testId}/variables:
+  /tests/{testId}/version/{version}/variables:
     get:
       tags:
         - api
@@ -870,10 +879,19 @@ paths:
           schema:
             type: string
           required: true
+        - in: path
+          name: version
+          schema:
+            type: integer
+          required: true
         - in: query
           name: environmentId
           schema:
             type: string
+        - in: query
+          name: runId
+          schema:
+            type: integer
       summary: "get test variables"
       description: "get test variables"
       operationId: getTestVariables

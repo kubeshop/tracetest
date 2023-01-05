@@ -8,12 +8,45 @@ type TestVariables struct {
 	TestId      string
 	Environment []string
 	Variables   []string
-	Missing     []string
+	Missing     []MissingVariables
 }
 
 type Variables struct {
 	Environment model.Environment
 	Executor    Executor
+}
+
+type MissingVariables struct {
+	Key          string
+	DefaultValue string
+}
+
+type VariablesMap map[string]bool
+
+func (vm VariablesMap) Merge(other VariablesMap) VariablesMap {
+	for key := range other {
+		vm[key] = true
+	}
+
+	return vm
+}
+
+func (vm VariablesMap) MergeStringArray(strArray []string) VariablesMap {
+	for _, value := range strArray {
+		vm[value] = true
+	}
+
+	return vm
+}
+
+func (vm VariablesMap) ToArray() []string {
+	array := []string{}
+
+	for key := range vm {
+		array = append(array, key)
+	}
+
+	return array
 }
 
 func NewVariables(environment model.Environment, executor Executor) Variables {
@@ -32,15 +65,15 @@ func (v Variables) UpdateEnvironmentVariables(test model.Test) Variables {
 	}
 }
 
-func (v Variables) GetEnvironmentVariables(test model.Test) []string {
-	envVariables := []string{}
+func (v Variables) GetEnvironmentVariables(test model.Test) VariablesMap {
+	envVariables := VariablesMap{}
 
 	for _, envVar := range v.Environment.Values {
-		envVariables = append(envVariables, envVar.Key)
+		envVariables[envVar.Key] = true
 	}
 
 	test.Outputs.ForEach(func(key string, _ model.Output) error {
-		envVariables = append(envVariables, key)
+		envVariables[key] = true
 
 		return nil
 	})
@@ -48,8 +81,8 @@ func (v Variables) GetEnvironmentVariables(test model.Test) []string {
 	return envVariables
 }
 
-func (v Variables) GetSpecsVariables(test model.Test) ([]string, error) {
-	specVariables := []string{}
+func (v Variables) GetSpecsVariables(test model.Test) (VariablesMap, error) {
+	specVariables := VariablesMap{}
 	err := test.Specs.ForEach(func(_ model.SpanQuery, namedAssertions model.NamedAssertions) error {
 		for _, assertion := range namedAssertions.Assertions {
 			variables, err := v.Executor.StatementTermsByType(string(assertion), EnvironmentType)
@@ -57,78 +90,53 @@ func (v Variables) GetSpecsVariables(test model.Test) ([]string, error) {
 				return err
 			}
 
-			specVariables = append(specVariables, variables...)
+			specVariables = specVariables.MergeStringArray(variables)
 		}
 
 		return nil
 	})
 
-	if err != nil {
-		return []string{}, err
-	}
-
-	return specVariables, nil
+	return specVariables, err
 }
 
-func (v Variables) GetOutputVariables(test model.Test) ([]string, error) {
-	specVariables := []string{}
+func (v Variables) GetOutputVariables(test model.Test) (VariablesMap, error) {
+	specVariables := VariablesMap{}
 	err := test.Outputs.ForEach(func(_ string, output model.Output) error {
 		variables, err := v.Executor.StatementTermsByType(string(output.Value), EnvironmentType)
 		if err != nil {
 			return err
 		}
 
-		specVariables = append(specVariables, variables...)
+		specVariables = specVariables.MergeStringArray(variables)
 
 		return nil
 	})
 
-	if err != nil {
-		return []string{}, err
-	}
-
-	return specVariables, nil
+	return specVariables, err
 }
 
-func contains(slice []string, value string) bool {
-	for _, a := range slice {
-		if a == value {
-			return true
-		}
-	}
-	return false
-}
+func (v Variables) getMissingVariables(testVariables, environmentVariables VariablesMap, environment model.Environment) []MissingVariables {
+	missingVariables := []MissingVariables{}
 
-func unique(strSlice []string) []string {
-	keys := make(map[string]bool)
-	list := []string{}
-	for _, entry := range strSlice {
-		if _, value := keys[entry]; !value {
-			keys[entry] = true
-			list = append(list, entry)
-		}
-	}
-	return list
-}
-
-func (v Variables) getMissingVariables(testVariables, environmentVariables []string) []string {
-	missingVariables := []string{}
-
-	for _, envVar := range testVariables {
-		if !contains(environmentVariables, envVar) {
-			missingVariables = append(missingVariables, envVar)
+	for testVariableKey := range testVariables {
+		exists := environmentVariables[testVariableKey]
+		if !exists {
+			missingVariables = append(missingVariables, MissingVariables{
+				Key:          testVariableKey,
+				DefaultValue: environment.Get(testVariableKey),
+			})
 		}
 	}
 
 	return missingVariables
 }
 
-func (v Variables) GetTestVariables(testId string, environmentVariables, testVariables []string) TestVariables {
+func (v Variables) GetTestVariables(testId string, environmentVariables, testVariables VariablesMap, environment model.Environment) TestVariables {
 	variablesResult := TestVariables{
 		TestId:      testId,
-		Environment: unique(environmentVariables),
-		Variables:   unique(testVariables),
-		Missing:     unique(v.getMissingVariables(testVariables, environmentVariables)),
+		Environment: environmentVariables.ToArray(),
+		Variables:   testVariables.ToArray(),
+		Missing:     v.getMissingVariables(testVariables, environmentVariables, environment),
 	}
 
 	return variablesResult

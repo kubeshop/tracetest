@@ -340,9 +340,21 @@ func (m OpenAPI) TestVariables(in expression.TestVariables) openapi.TestVariable
 		Variables: openapi.Variables{
 			Environment: in.Environment,
 			Variables:   in.Variables,
-			Missing:     in.Missing,
+			Missing:     m.MissingVariables(in.Missing),
 		},
 	}
+}
+
+func (m OpenAPI) MissingVariables(in []expression.MissingVariables) []openapi.MissingVariables {
+	missingVariables := make([]openapi.MissingVariables, len(in))
+	for i, missingVariable := range in {
+		missingVariables[i] = openapi.MissingVariables{
+			Key:          missingVariable.Key,
+			DefaultValue: missingVariable.DefaultValue,
+		}
+	}
+
+	return missingVariables
 }
 
 func (m OpenAPI) TransactionVariables(in []expression.TestVariables) []openapi.TestVariables {

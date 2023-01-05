@@ -44,7 +44,7 @@ export interface paths {
     /** Delete a specific run from a particular transaction */
     delete: operations["deleteTransactionRun"];
   };
-  "/transactions/{transactionId}/variables": {
+  "/transactions/{transactionId}/version/{version}/variables": {
     /** get transaction variables */
     get: operations["getTransactionVariables"];
   };
@@ -110,7 +110,7 @@ export interface paths {
     /** Get the test definition as an YAML file */
     get: operations["getTestVersionDefinitionFile"];
   };
-  "/tests/{testId}/variables": {
+  "/tests/{testId}/version/{version}/variables": {
     /** get test variables */
     get: operations["getTestVariables"];
   };
@@ -423,9 +423,11 @@ export interface operations {
     parameters: {
       path: {
         transactionId: string;
+        version: number;
       };
       query: {
         environmentId?: string;
+        runId?: number;
       };
     };
     responses: {
@@ -780,9 +782,11 @@ export interface operations {
     parameters: {
       path: {
         testId: string;
+        version: number;
       };
       query: {
         environmentId?: string;
+        runId?: number;
       };
     };
     responses: {
@@ -1576,11 +1580,15 @@ export interface external {
         Variables: {
           environment?: string[];
           variables?: string[];
-          missing?: string[];
+          missing?: external["variables.yaml"]["components"]["schemas"]["MissingVariables"][];
         };
         TestVariables: {
           testId?: string;
           variables?: external["variables.yaml"]["components"]["schemas"]["Variables"];
+        };
+        MissingVariables: {
+          key?: string;
+          defaultValue?: string;
         };
       };
     };

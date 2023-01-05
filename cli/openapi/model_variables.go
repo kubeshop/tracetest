@@ -16,9 +16,9 @@ import (
 
 // Variables struct for Variables
 type Variables struct {
-	Environment []string `json:"environment,omitempty"`
-	Variables   []string `json:"variables,omitempty"`
-	Missing     []string `json:"missing,omitempty"`
+	Environment []string           `json:"environment,omitempty"`
+	Variables   []string           `json:"variables,omitempty"`
+	Missing     []MissingVariables `json:"missing,omitempty"`
 }
 
 // NewVariables instantiates a new Variables object
@@ -103,9 +103,9 @@ func (o *Variables) SetVariables(v []string) {
 }
 
 // GetMissing returns the Missing field value if set, zero value otherwise.
-func (o *Variables) GetMissing() []string {
+func (o *Variables) GetMissing() []MissingVariables {
 	if o == nil || o.Missing == nil {
-		var ret []string
+		var ret []MissingVariables
 		return ret
 	}
 	return o.Missing
@@ -113,7 +113,7 @@ func (o *Variables) GetMissing() []string {
 
 // GetMissingOk returns a tuple with the Missing field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Variables) GetMissingOk() ([]string, bool) {
+func (o *Variables) GetMissingOk() ([]MissingVariables, bool) {
 	if o == nil || o.Missing == nil {
 		return nil, false
 	}
@@ -129,8 +129,8 @@ func (o *Variables) HasMissing() bool {
 	return false
 }
 
-// SetMissing gets a reference to the given []string and assigns it to the Missing field.
-func (o *Variables) SetMissing(v []string) {
+// SetMissing gets a reference to the given []MissingVariables and assigns it to the Missing field.
+func (o *Variables) SetMissing(v []MissingVariables) {
 	o.Missing = v
 }
 

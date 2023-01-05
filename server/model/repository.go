@@ -29,6 +29,7 @@ type RunRepository interface {
 	GetRun(_ context.Context, testID id.ID, runID int) (Run, error)
 	GetTestRuns(_ context.Context, _ Test, take, skip int32) (List[Run], error)
 	GetRunByTraceID(context.Context, trace.TraceID) (Run, error)
+	GetLatestRunByTestVersion(context.Context, id.ID, int) (Run, error)
 }
 
 type EnvironmentRepository interface {
@@ -56,6 +57,7 @@ type TransactionRunRepository interface {
 	DeleteTransactionRun(context.Context, TransactionRun) error
 	GetTransactionRun(context.Context, id.ID, int) (TransactionRun, error)
 	GetTransactionsRuns(context.Context, id.ID, int32, int32) ([]TransactionRun, error)
+	GetLatestRunByTransactionVersion(context.Context, id.ID, int) (TransactionRun, error)
 }
 
 type DataStoreRepository interface {

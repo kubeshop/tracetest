@@ -14,11 +14,16 @@ type Variables struct {
 
 	Variables []string `json:"variables,omitempty"`
 
-	Missing []string `json:"missing,omitempty"`
+	Missing []MissingVariables `json:"missing,omitempty"`
 }
 
 // AssertVariablesRequired checks if the required fields are not zero-ed
 func AssertVariablesRequired(obj Variables) error {
+	for _, el := range obj.Missing {
+		if err := AssertMissingVariablesRequired(el); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 

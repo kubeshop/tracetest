@@ -282,6 +282,23 @@ func (td *postgresDB) GetTransactionRun(ctx context.Context, transactionID id.ID
 	return run, nil
 }
 
+func (td *postgresDB) GetLatestRunByTransactionVersion(ctx context.Context, transactionID id.ID, version int) (model.TransactionRun, error) {
+	stmt, err := td.db.Prepare(selectTransactionRunQuery + " WHERE transaction_id = $1 AND transaction_version = $2 ORDER BY created_at DESC LIMIT 1")
+	if err != nil {
+		return model.TransactionRun{}, fmt.Errorf("prepare: %w", err)
+	}
+
+	run, err := readTransactionRow(stmt.QueryRowContext(ctx, transactionID, version))
+	if err != nil {
+		return model.TransactionRun{}, err
+	}
+	run.Steps, err = td.getTransactionRunSteps(ctx, run)
+	if err != nil {
+		return model.TransactionRun{}, err
+	}
+	return run, nil
+}
+
 func (td *postgresDB) GetTransactionsRuns(ctx context.Context, transactionID id.ID, take, skip int32) ([]model.TransactionRun, error) {
 	stmt, err := td.db.Prepare(selectTransactionRunQuery + " WHERE transaction_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3")
 	if err != nil {

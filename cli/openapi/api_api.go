@@ -2890,11 +2890,17 @@ type ApiGetTestVariablesRequest struct {
 	ctx           context.Context
 	ApiService    *ApiApiService
 	testId        string
+	version       int32
 	environmentId *string
+	runId         *int32
 }
 
 func (r ApiGetTestVariablesRequest) EnvironmentId(environmentId string) ApiGetTestVariablesRequest {
 	r.environmentId = &environmentId
+	return r
+}
+func (r ApiGetTestVariablesRequest) RunId(runId int32) ApiGetTestVariablesRequest {
+	r.runId = &runId
 	return r
 }
 
@@ -2909,13 +2915,15 @@ get test variables
 
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
 	@param testId
+	@param version
 	@return ApiGetTestVariablesRequest
 */
-func (a *ApiApiService) GetTestVariables(ctx context.Context, testId string) ApiGetTestVariablesRequest {
+func (a *ApiApiService) GetTestVariables(ctx context.Context, testId string, version int32) ApiGetTestVariablesRequest {
 	return ApiGetTestVariablesRequest{
 		ApiService: a,
 		ctx:        ctx,
 		testId:     testId,
+		version:    version,
 	}
 }
 
@@ -2935,8 +2943,9 @@ func (a *ApiApiService) GetTestVariablesExecute(r ApiGetTestVariablesRequest) (*
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/tests/{testId}/variables"
+	localVarPath := localBasePath + "/tests/{testId}/version/{version}/variables"
 	localVarPath = strings.Replace(localVarPath, "{"+"testId"+"}", url.PathEscape(parameterToString(r.testId, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"version"+"}", url.PathEscape(parameterToString(r.version, "")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -2944,6 +2953,9 @@ func (a *ApiApiService) GetTestVariablesExecute(r ApiGetTestVariablesRequest) (*
 
 	if r.environmentId != nil {
 		localVarQueryParams.Add("environmentId", parameterToString(*r.environmentId, ""))
+	}
+	if r.runId != nil {
+		localVarQueryParams.Add("runId", parameterToString(*r.runId, ""))
 	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
@@ -3705,11 +3717,17 @@ type ApiGetTransactionVariablesRequest struct {
 	ctx           context.Context
 	ApiService    *ApiApiService
 	transactionId string
+	version       int32
 	environmentId *string
+	runId         *int32
 }
 
 func (r ApiGetTransactionVariablesRequest) EnvironmentId(environmentId string) ApiGetTransactionVariablesRequest {
 	r.environmentId = &environmentId
+	return r
+}
+func (r ApiGetTransactionVariablesRequest) RunId(runId int32) ApiGetTransactionVariablesRequest {
+	r.runId = &runId
 	return r
 }
 
@@ -3724,13 +3742,15 @@ get transaction variables
 
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
 	@param transactionId
+	@param version
 	@return ApiGetTransactionVariablesRequest
 */
-func (a *ApiApiService) GetTransactionVariables(ctx context.Context, transactionId string) ApiGetTransactionVariablesRequest {
+func (a *ApiApiService) GetTransactionVariables(ctx context.Context, transactionId string, version int32) ApiGetTransactionVariablesRequest {
 	return ApiGetTransactionVariablesRequest{
 		ApiService:    a,
 		ctx:           ctx,
 		transactionId: transactionId,
+		version:       version,
 	}
 }
 
@@ -3750,8 +3770,9 @@ func (a *ApiApiService) GetTransactionVariablesExecute(r ApiGetTransactionVariab
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/transactions/{transactionId}/variables"
+	localVarPath := localBasePath + "/transactions/{transactionId}/version/{version}/variables"
 	localVarPath = strings.Replace(localVarPath, "{"+"transactionId"+"}", url.PathEscape(parameterToString(r.transactionId, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"version"+"}", url.PathEscape(parameterToString(r.version, "")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -3759,6 +3780,9 @@ func (a *ApiApiService) GetTransactionVariablesExecute(r ApiGetTransactionVariab
 
 	if r.environmentId != nil {
 		localVarQueryParams.Add("environmentId", parameterToString(*r.environmentId, ""))
+	}
+	if r.runId != nil {
+		localVarQueryParams.Add("runId", parameterToString(*r.runId, ""))
 	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}

@@ -200,9 +200,9 @@ func (m *mockTriggerer) Resolve(_ context.Context, test model.Test, opts *trigge
 	return args.Get(0).(model.Test), args.Error(1)
 }
 
-func (m *mockTriggerer) Variables(_ context.Context, test model.Test, executor expression.Executor) ([]string, error) {
+func (m *mockTriggerer) Variables(_ context.Context, test model.Test, executor expression.Executor) (expression.VariablesMap, error) {
 	args := m.Called(test.ID)
-	return []string{}, args.Error(1)
+	return expression.VariablesMap{}, args.Error(1)
 }
 
 func (m *mockTriggerer) expectTriggerTest(test model.Test) *mock.Call {

@@ -209,7 +209,7 @@ func (c *ApiApiController) Routes() Routes {
 		{
 			"GetTestVariables",
 			strings.ToUpper("Get"),
-			"/api/tests/{testId}/variables",
+			"/api/tests/{testId}/version/{version}/variables",
 			c.GetTestVariables,
 		},
 		{
@@ -251,7 +251,7 @@ func (c *ApiApiController) Routes() Routes {
 		{
 			"GetTransactionVariables",
 			strings.ToUpper("Get"),
-			"/api/transactions/{transactionId}/variables",
+			"/api/transactions/{transactionId}/version/{version}/variables",
 			c.GetTransactionVariables,
 		},
 		{
@@ -880,8 +880,19 @@ func (c *ApiApiController) GetTestVariables(w http.ResponseWriter, r *http.Reque
 	query := r.URL.Query()
 	testIdParam := params["testId"]
 
+	versionParam, err := parseInt32Parameter(params["version"], true)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+
 	environmentIdParam := query.Get("environmentId")
-	result, err := c.service.GetTestVariables(r.Context(), testIdParam, environmentIdParam)
+	runIdParam, err := parseInt32Parameter(query.Get("runId"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	result, err := c.service.GetTestVariables(r.Context(), testIdParam, versionParam, environmentIdParam, runIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -1034,8 +1045,19 @@ func (c *ApiApiController) GetTransactionVariables(w http.ResponseWriter, r *htt
 	query := r.URL.Query()
 	transactionIdParam := params["transactionId"]
 
+	versionParam, err := parseInt32Parameter(params["version"], true)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+
 	environmentIdParam := query.Get("environmentId")
-	result, err := c.service.GetTransactionVariables(r.Context(), transactionIdParam, environmentIdParam)
+	runIdParam, err := parseInt32Parameter(query.Get("runId"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	result, err := c.service.GetTransactionVariables(r.Context(), transactionIdParam, versionParam, environmentIdParam, runIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

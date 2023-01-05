@@ -1226,8 +1226,8 @@ func (c *controller) TestConnection(ctx context.Context, dataStore openapi.DataS
 	return openapi.Response(statusCode, c.mappers.Out.ConnectionTestResult(testResult)), nil
 }
 
-func (c *controller) GetTestVariables(ctx context.Context, testId, environmentId string) (openapi.ImplResponse, error) {
-	test, err := c.testDB.GetLatestTestVersion(ctx, id.ID(testId))
+func (c *controller) GetTestVariables(ctx context.Context, testId string, version int32, environmentId string, runId int32) (openapi.ImplResponse, error) {
+	test, err := c.testDB.GetTestVersion(ctx, id.ID(testId), int(version))
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -1246,8 +1246,20 @@ func (c *controller) GetTestVariables(ctx context.Context, testId, environmentId
 
 	executor := expression.NewExecutor()
 	variables := expression.NewVariables(environment, executor)
+	run := model.Run{}
+	if runId > 0 {
+		run, err = c.testDB.GetRun(ctx, test.ID, int(runId))
+		if err != nil {
+			return handleDBError(err), err
+		}
+	} else {
+		run, err = c.testDB.GetLatestRunByTestVersion(ctx, test.ID, test.Version)
+		if err != nil {
+			return handleDBError(err), err
+		}
+	}
 
-	testVariables, err := processTestVariables(ctx, test, variables, c.triggerRegistry)
+	testVariables, err := c.processTestVariables(ctx, test, run.Environment, variables)
 
 	if err != nil {
 		return openapi.Response(http.StatusInternalServerError, err.Error()), err
@@ -1256,36 +1268,8 @@ func (c *controller) GetTestVariables(ctx context.Context, testId, environmentId
 	return openapi.Response(200, c.mappers.Out.TestVariables(testVariables)), nil
 }
 
-func processTestVariables(ctx context.Context, test model.Test, variables expression.Variables, triggerRegistry *trigger.Registry) (expression.TestVariables, error) {
-	environmentVariables := variables.GetEnvironmentVariables(test)
-	specVariables, err := variables.GetSpecsVariables(test)
-
-	if err != nil {
-		return expression.TestVariables{}, err
-	}
-
-	outputVariables, err := variables.GetOutputVariables(test)
-	if err != nil {
-		return expression.TestVariables{}, err
-	}
-
-	triggerer, err := triggerRegistry.Get(test.ServiceUnderTest.Type)
-	if err != nil {
-		return expression.TestVariables{}, err
-	}
-
-	triggerVariables, err := triggerer.Variables(ctx, test, variables.Executor)
-	if err != nil {
-		return expression.TestVariables{}, err
-	}
-
-	testVariables := variables.GetTestVariables(string(test.ID), environmentVariables, append(specVariables, append(triggerVariables, outputVariables...)...))
-
-	return testVariables, nil
-}
-
-func (c *controller) GetTransactionVariables(ctx context.Context, transactionId, environmentId string) (openapi.ImplResponse, error) {
-	transaction, err := c.testDB.GetLatestTransactionVersion(ctx, id.ID(transactionId))
+func (c *controller) GetTransactionVariables(ctx context.Context, transactionId string, version int32, environmentId string, runId int32) (openapi.ImplResponse, error) {
+	transaction, err := c.testDB.GetTransactionVersion(ctx, id.ID(transactionId), int(version))
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -1306,9 +1290,21 @@ func (c *controller) GetTransactionVariables(ctx context.Context, transactionId,
 	variables := expression.NewVariables(environment, executor)
 
 	transactionVariables := make([]expression.TestVariables, len(transaction.Steps))
+	run := model.TransactionRun{}
+	if runId > 0 {
+		run, err = c.testDB.GetTransactionRun(ctx, transaction.ID, int(runId))
+		if err != nil {
+			return handleDBError(err), err
+		}
+	} else {
+		run, err = c.testDB.GetLatestRunByTransactionVersion(ctx, transaction.ID, transaction.Version)
+		if err != nil {
+			return handleDBError(err), err
+		}
+	}
 
 	for i, test := range transaction.Steps {
-		testVariables, err := processTestVariables(ctx, test, variables, c.triggerRegistry)
+		testVariables, err := c.processTestVariables(ctx, test, run.Environment, variables)
 		variables = variables.UpdateEnvironmentVariables(test)
 
 		if err != nil {
@@ -1319,4 +1315,32 @@ func (c *controller) GetTransactionVariables(ctx context.Context, transactionId,
 	}
 
 	return openapi.Response(200, c.mappers.Out.TransactionVariables(transactionVariables)), nil
+}
+
+func (c *controller) processTestVariables(ctx context.Context, test model.Test, environment model.Environment, variables expression.Variables) (expression.TestVariables, error) {
+	environmentVariables := variables.GetEnvironmentVariables(test)
+	specVariables, err := variables.GetSpecsVariables(test)
+
+	if err != nil {
+		return expression.TestVariables{}, err
+	}
+
+	outputVariables, err := variables.GetOutputVariables(test)
+	if err != nil {
+		return expression.TestVariables{}, err
+	}
+
+	triggerer, err := c.triggerRegistry.Get(test.ServiceUnderTest.Type)
+	if err != nil {
+		return expression.TestVariables{}, err
+	}
+
+	triggerVariables, err := triggerer.Variables(ctx, test, variables.Executor)
+	if err != nil {
+		return expression.TestVariables{}, err
+	}
+
+	testVariables := variables.GetTestVariables(string(test.ID), environmentVariables, specVariables.Merge(triggerVariables).Merge(outputVariables), environment)
+
+	return testVariables, nil
 }

@@ -145,8 +145,8 @@ func (t *grpcTriggerer) Resolve(ctx context.Context, test model.Test, opts *Trig
 	return test, nil
 }
 
-func (t *grpcTriggerer) Variables(ctx context.Context, test model.Test, executor expression.Executor) ([]string, error) {
-	triggerVariables := []string{}
+func (t *grpcTriggerer) Variables(ctx context.Context, test model.Test, executor expression.Executor) (expression.VariablesMap, error) {
+	triggerVariables := expression.VariablesMap{}
 	grpc := test.ServiceUnderTest.GRPC
 
 	if grpc == nil {
@@ -156,7 +156,7 @@ func (t *grpcTriggerer) Variables(ctx context.Context, test model.Test, executor
 	if err != nil {
 		return triggerVariables, err
 	}
-	triggerVariables = append(triggerVariables, address...)
+	triggerVariables = triggerVariables.MergeStringArray(address)
 
 	for _, h := range grpc.Metadata {
 		headerVariables, err := executor.StatementTermsByType(WrapInQuotes(h.Key, "\""), expression.EnvironmentType)
@@ -169,8 +169,8 @@ func (t *grpcTriggerer) Variables(ctx context.Context, test model.Test, executor
 			return triggerVariables, err
 		}
 
-		triggerVariables = append(triggerVariables, headerVariables...)
-		triggerVariables = append(triggerVariables, valueVariables...)
+		triggerVariables = triggerVariables.MergeStringArray(headerVariables)
+		triggerVariables = triggerVariables.MergeStringArray(valueVariables)
 	}
 
 	if grpc.Request != "" {
@@ -179,14 +179,14 @@ func (t *grpcTriggerer) Variables(ctx context.Context, test model.Test, executor
 			return triggerVariables, err
 		}
 
-		triggerVariables = append(triggerVariables, requestVariables...)
+		triggerVariables = triggerVariables.MergeStringArray(requestVariables)
 	}
 
 	methodVariables, err := executor.StatementTermsByType(WrapInQuotes(grpc.Method, "'"), expression.EnvironmentType)
 	if err != nil {
 		return triggerVariables, err
 	}
-	triggerVariables = append(triggerVariables, methodVariables...)
+	triggerVariables = triggerVariables.MergeStringArray(methodVariables)
 
 	return triggerVariables, nil
 }

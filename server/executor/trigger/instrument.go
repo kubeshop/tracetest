@@ -37,7 +37,7 @@ func (t *instrumentedTriggerer) Resolve(ctx context.Context, test model.Test, op
 	return t.triggerer.Resolve(ctx, test, opts)
 }
 
-func (t *instrumentedTriggerer) Variables(ctx context.Context, test model.Test, executor expression.Executor) ([]string, error) {
+func (t *instrumentedTriggerer) Variables(ctx context.Context, test model.Test, executor expression.Executor) (expression.VariablesMap, error) {
 	return t.triggerer.Variables(ctx, test, executor)
 }
 

@@ -16,7 +16,7 @@ components:
         missing:
           type: array
           items:
-            type: string
+            $ref: "#/components/schemas/MissingVariables"
     TestVariables:
       type: object
       properties:
@@ -24,3 +24,10 @@ components:
           type: string
         variables:
           $ref: "#/components/schemas/Variables"
+    MissingVariables:
+      type: object
+      properties:
+        key:
+          type: string
+        defaultValue:
+          type: string

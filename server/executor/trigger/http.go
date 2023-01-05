@@ -200,8 +200,8 @@ func mapResp(resp *http.Response) model.HTTPResponse {
 	}
 }
 
-func (t *httpTriggerer) Variables(ctx context.Context, test model.Test, executor expression.Executor) ([]string, error) {
-	triggerVariables := []string{}
+func (t *httpTriggerer) Variables(ctx context.Context, test model.Test, executor expression.Executor) (expression.VariablesMap, error) {
+	triggerVariables := expression.VariablesMap{}
 	http := test.ServiceUnderTest.HTTP
 
 	if http == nil {
@@ -213,7 +213,7 @@ func (t *httpTriggerer) Variables(ctx context.Context, test model.Test, executor
 	if err != nil {
 		return triggerVariables, err
 	}
-	triggerVariables = append(triggerVariables, urlVariables...)
+	triggerVariables = triggerVariables.MergeStringArray(urlVariables)
 	for _, h := range http.Headers {
 		keyVariables, err := executor.StatementTermsByType(WrapInQuotes(h.Key, "\""), expression.EnvironmentType)
 		if err != nil {
@@ -225,8 +225,8 @@ func (t *httpTriggerer) Variables(ctx context.Context, test model.Test, executor
 			return triggerVariables, err
 		}
 
-		triggerVariables = append(triggerVariables, keyVariables...)
-		triggerVariables = append(triggerVariables, valueVariables...)
+		triggerVariables = triggerVariables.MergeStringArray(keyVariables)
+		triggerVariables = triggerVariables.MergeStringArray(valueVariables)
 	}
 
 	if http.Body != "" {
@@ -235,14 +235,14 @@ func (t *httpTriggerer) Variables(ctx context.Context, test model.Test, executor
 			return triggerVariables, err
 		}
 
-		triggerVariables = append(triggerVariables, bodyVariables...)
+		triggerVariables = triggerVariables.MergeStringArray(bodyVariables)
 	}
 
 	authVariables, err := authVariables(http.Auth, executor)
 	if err != nil {
 		return triggerVariables, err
 	}
-	triggerVariables = append(triggerVariables, authVariables...)
+	triggerVariables = triggerVariables.MergeStringArray(authVariables)
 
 	return triggerVariables, nil
 }
