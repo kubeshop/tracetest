@@ -2,9 +2,9 @@
 
 set -e
 
-export TRACETEST_CLI_MAIN=${TRACETEST_CLI_MAIN:-"tracetest"}
-if ! command -v "$TRACETEST_CLI_MAIN" &> /dev/null; then
-  echo "\$TRACETEST_CLI_MAIN not set to executable. set to $TRACETEST_CLI_MAIN";
+export TRACETEST_CLI=${TRACETEST_CLI:-"tracetest"}
+if ! command -v "$TRACETEST_CLI" &> /dev/null; then
+  echo "\$TRACETEST_CLI not set to executable. set to $TRACETEST_CLI";
   exit 2
 fi
 
@@ -14,7 +14,7 @@ if [  "$TARGET_URL" = "" ]; then
   exit 2
 fi
 
-export TRACETEST_MAIN_ENDPOINT=${TRACETEST_MAIN_ENDPOINT:-"localhost:11633"}
+export TRACETEST_ENDPOINT=${TRACETEST_ENDPOINT:-"localhost:11633"}
 export DEMO_APP_URL=${DEMO_APP_URL-"http://demo-pokemon-api.demo"}
 export DEMO_APP_GRPC_URL=${DEMO_APP_GRPC_URL-"demo-pokemon-api.demo:8082"}
 
@@ -25,16 +25,14 @@ echo "Preparing to run tests on API..."
 echo ""
 
 echo "Environment variables considered on this run:"
-echo "TRACETEST_CLI_MAIN:      $TRACETEST_CLI_MAIN"
-echo "TARGET_URL:              $TARGET_URL"
-echo "TRACETEST_MAIN_ENDPOINT: $TRACETEST_MAIN_ENDPOINT"
-echo "DEMO_APP_URL:            $DEMO_APP_URL"
-echo "DEMO_APP_GRPC_URL:       $DEMO_APP_GRPC_URL"
+echo "TRACETEST_CLI:      $TRACETEST_CLI"
+echo "TARGET_URL:         $TARGET_URL"
+echo "TRACETEST_ENDPOINT: $TRACETEST_ENDPOINT"
+echo "DEMO_APP_URL:       $DEMO_APP_URL"
+echo "DEMO_APP_GRPC_URL:  $DEMO_APP_GRPC_URL"
 
-cat << EOF > .main.env
-TRACETEST_CLI_MAIN=$TRACETEST_CLI_MAIN
+cat << EOF > .env
 TARGET_URL=$TARGET_URL
-TRACETEST_MAIN_ENDPOINT=$TRACETEST_MAIN_ENDPOINT
 DEMO_APP_URL=$DEMO_APP_URL
 DEMO_APP_GRPC_URL=$DEMO_APP_GRPC_URL
 EXAMPLE_TEST_ID=$EXAMPLE_TEST_ID
@@ -43,9 +41,9 @@ EOF
 echo ""
 
 echo "Setting up tracetest CLI configuration..."
-cat << EOF > config.main.yml
+cat << EOF > config.yml
 scheme: http
-endpoint: $TRACETEST_MAIN_ENDPOINT
+endpoint: $TRACETEST_ENDPOINT
 analyticsEnabled: false
 EOF
 echo "tracetest CLI set up."
@@ -61,7 +59,7 @@ run_test_suite_for_feature() {
   junit_output='results/'$feature'_test_suite.xml'
   definition='./features/'$feature'/_test_suite.yml'
 
-  $TRACETEST_CLI_MAIN --config ./config.main.yml test run --definition $definition --environment ./.main.env --wait-for-result --junit $junit_output
+  $TRACETEST_CLI --config ./config.yml test run --definition $definition --environment ./.env --wait-for-result --junit $junit_output
   return $?
 }
 
