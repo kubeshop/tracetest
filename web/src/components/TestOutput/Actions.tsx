@@ -28,6 +28,7 @@ const Actions = ({isDeleted, onEdit, onDelete}: IProps) => {
       {!isDeleted && (
         <Tooltip title="Delete output">
           <Button
+            data-cy="output-item-actions-delete"
             icon={<DeleteOutlined />}
             onClick={event => {
               event.stopPropagation();

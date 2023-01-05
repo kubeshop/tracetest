@@ -28,7 +28,7 @@ describe('Outputs', () => {
     cy.get('[data-cy=output-pending-tag]').should('have.length', 2);
 
     // Publish and run
-    cy.get('[data-cy=output-publish-button]').click();
+    cy.get('[data-cy=trace-actions-publish]').click();
     cy.wait('@testRuns', {timeout: 30000});
     cy.get('[data-cy=output-item-container]').should('have.length', 2);
 
@@ -64,12 +64,11 @@ describe('Outputs', () => {
     cy.get('[data-cy=output-pending-tag]').should('have.length', 2);
 
     // Delete output
-    cy.get('[data-cy="output-actions-button-db.name"]').click();
-    cy.get('[data-cy=output-item-actions-delete]').click();
+    cy.get('[data-cy=output-item-actions-delete]').first().click();
     cy.get('[data-cy=confirmation-modal] .ant-btn-primary').click();
 
     // Publish and run
-    cy.get('[data-cy=output-publish-button]').click();
+    cy.get('[data-cy=trace-actions-publish]').click();
     cy.wait('@testRuns', {timeout: 30000});
     cy.get('[data-cy=output-item-container]').should('have.length', 1);
 
@@ -94,7 +93,7 @@ describe('Outputs', () => {
     cy.get('[data-cy=output-pending-tag]').should('have.length', 1);
 
     // Revert
-    cy.get('[data-cy=output-reset-button]').click();
+    cy.get('[data-cy=trace-actions-revert-all]').click();
     cy.get('[data-cy=output-item-container]').should('have.length', 0);
 
     cy.deleteTest(true);
