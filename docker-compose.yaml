@@ -8,6 +8,8 @@ services:
       - "host.docker.internal:host-gateway"
     build:
       context: .
+      platforms:
+        - linux/amd64
       args:
         VERSION: dev
         TRACETEST_ENV: docker-compose
