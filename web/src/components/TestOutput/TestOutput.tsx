@@ -44,6 +44,12 @@ const TestOutput = ({index, output, onEdit, onDelete}: IProps) => (
             <AttributeValue value={output.valueRun} />
           </>
         )}
+        {output.isDraft && Boolean(output.valueRunDraft) && (
+          <>
+            <S.Key>Run value</S.Key>
+            <AttributeValue value={output.valueRunDraft} />
+          </>
+        )}
       </S.Entry>
     </S.Row>
   </S.Container>

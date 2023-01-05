@@ -14,14 +14,15 @@ import * as S from './TestOutputForm.styled';
 
 interface IProps {
   isEditing?: boolean;
+  isLoading?: boolean;
   onCancel(): void;
-  onSubmit(values: TTestOutput): void;
+  onSubmit(values: TTestOutput, spanId?: string): void;
   output?: TTestOutput;
   runId: string;
   testId: string;
 }
 
-const TestOutputForm = ({isEditing = false, onCancel, onSubmit, output, runId, testId}: IProps) => {
+const TestOutputForm = ({isEditing = false, isLoading = false, onCancel, onSubmit, output, runId, testId}: IProps) => {
   const [form] = Form.useForm<TTestOutput>();
   const spanIdList = useAppSelector(SpanSelectors.selectMatchedSpans);
   const {isValid, onValidate} = useValidateOutput({spanIdList});
@@ -44,7 +45,7 @@ const TestOutputForm = ({isEditing = false, onCancel, onSubmit, output, runId, t
         initialValues={output}
         layout="vertical"
         name="testOutput"
-        onFinish={onSubmit}
+        onFinish={values => onSubmit(values, spanIdList[0])}
         onValuesChange={onValidate}
       >
         <S.FormSection>
@@ -96,13 +97,7 @@ const TestOutputForm = ({isEditing = false, onCancel, onSubmit, output, runId, t
           <Button data-cy="output-modal-cancel-button" onClick={onCancel}>
             Cancel
           </Button>
-          <Button
-            data-cy="output-save-button"
-            disabled={!isValid}
-            htmlType="submit"
-            onClick={form.submit}
-            type="primary"
-          >
+          <Button data-cy="output-save-button" disabled={!isValid} htmlType="submit" loading={isLoading} type="primary">
             Save Test Output
           </Button>
         </S.Footer>

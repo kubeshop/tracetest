@@ -40,7 +40,14 @@ const RunDetailTest = ({run, testId}: IProps) => {
   const {selectedSpan, onSetFocusedSpan, onSelectSpan} = useSpan();
   const {remove, revert, selectedTestSpec, setSelectedSpec, setSelectorSuggestions, setPrevSelector} = useTestSpecs();
   const {isOpen: isTestSpecFormOpen, formProps, onSubmit, open, close} = useTestSpecForm();
-  const {isEditing, isOpen: isTestOutputFormOpen, onClose, onSubmit: onSubmitTestOutput, output} = useTestOutput();
+  const {
+    isEditing,
+    isLoading,
+    isOpen: isTestOutputFormOpen,
+    onClose,
+    onSubmit: onSubmitTestOutput,
+    output,
+  } = useTestOutput();
   const [visualizationType, setVisualizationType] = useState(VisualizationType.Dag);
   const {
     state: {tourActive},
@@ -145,6 +152,7 @@ const RunDetailTest = ({run, testId}: IProps) => {
               {isTestOutputFormOpen && (
                 <TestOutputForm
                   isEditing={isEditing}
+                  isLoading={isLoading}
                   onCancel={onClose}
                   onSubmit={onSubmitTestOutput}
                   output={output}

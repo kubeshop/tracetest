@@ -2,14 +2,17 @@ import {noop} from 'lodash';
 import {createContext, useCallback, useContext, useEffect, useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 
+import {useParseExpressionMutation} from 'redux/apis/TraceTest.api';
 import {useAppDispatch} from 'redux/hooks';
 import {outputAdded, outputDeleted, outputsInitiated, outputsReverted, outputUpdated} from 'redux/testOutputs/slice';
 import {TTestOutput} from 'types/TestOutput.types';
 import {useConfirmationModal} from '../ConfirmationModal/ConfirmationModal.provider';
+import {useEnvironment} from '../Environment/Environment.provider';
 import {useTest} from '../Test/Test.provider';
 
 interface IContext {
   isEditing: boolean;
+  isLoading: boolean;
   isOpen: boolean;
   onCancel(): void;
   onClose(): void;
@@ -22,6 +25,7 @@ interface IContext {
 
 export const Context = createContext<IContext>({
   isEditing: false,
+  isLoading: false,
   isOpen: false,
   onCancel: noop,
   onClose: noop,
@@ -42,14 +46,16 @@ export const useTestOutput = () => useContext(Context);
 
 const TestOutputProvider = ({children, runId, testId}: IProps) => {
   const dispatch = useAppDispatch();
+  const [parseExpressionMutation, {isLoading}] = useParseExpressionMutation();
   const [draft, setDraft] = useState<TTestOutput>();
   const [isEditing, setIsEditing] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const {onOpen: onOpenConfirmationModal} = useConfirmationModal();
+  const navigate = useNavigate();
+  const {selectedEnvironment} = useEnvironment();
   const {
     test: {outputs: testOutputs = []},
   } = useTest();
-  const {onOpen: onOpenConfirmationModal} = useConfirmationModal();
-  const navigate = useNavigate();
 
   useEffect(() => {
     dispatch(outputsInitiated(testOutputs));
@@ -58,8 +64,8 @@ const TestOutputProvider = ({children, runId, testId}: IProps) => {
   const onOpen = useCallback((values?: TTestOutput) => {
     setDraft(values);
     setIsOpen(true);
-    const id = values?.id;
-    setIsEditing(!!id && id !== -1);
+    const id = values?.id ?? -1;
+    setIsEditing(id !== -1);
   }, []);
 
   const onClose = useCallback(() => {
@@ -84,16 +90,29 @@ const TestOutputProvider = ({children, runId, testId}: IProps) => {
   );
 
   const onSubmit = useCallback(
-    (values: TTestOutput) => {
+    async (values: TTestOutput, spanId?: string) => {
+      const props = {
+        expression: values.value,
+        context: {
+          testId,
+          runId,
+          spanId: spanId ?? '',
+          selector: values.selector,
+          environmentId: selectedEnvironment?.id,
+        },
+      };
+      const parsedExpression = await parseExpressionMutation(props).unwrap();
+      const valueRunDraft = parsedExpression?.[0] ?? '';
+
       setIsOpen(false);
       if (isEditing) {
         setIsEditing(false);
-        dispatch(outputUpdated({output: {...values, id: draft?.id ?? -1}}));
+        dispatch(outputUpdated({output: {...values, valueRunDraft, id: draft?.id ?? -1}}));
         return;
       }
-      dispatch(outputAdded(values));
+      dispatch(outputAdded({...values, valueRunDraft}));
     },
-    [dispatch, draft?.id, isEditing]
+    [dispatch, draft?.id, isEditing, parseExpressionMutation, runId, selectedEnvironment?.id, testId]
   );
 
   const onNavigateAndOpen = useCallback(
@@ -107,6 +126,7 @@ const TestOutputProvider = ({children, runId, testId}: IProps) => {
   const value = useMemo<IContext>(
     () => ({
       isEditing,
+      isLoading,
       isOpen,
       onCancel,
       onClose,
@@ -116,7 +136,7 @@ const TestOutputProvider = ({children, runId, testId}: IProps) => {
       onSubmit,
       output: draft,
     }),
-    [draft, isEditing, isOpen, onCancel, onClose, onDelete, onNavigateAndOpen, onOpen, onSubmit]
+    [draft, isEditing, isLoading, isOpen, onCancel, onClose, onDelete, onNavigateAndOpen, onOpen, onSubmit]
   );
 
   return <Context.Provider value={value}>{children}</Context.Provider>;

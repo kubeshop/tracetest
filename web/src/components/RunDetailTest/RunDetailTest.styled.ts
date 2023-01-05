@@ -33,4 +33,8 @@ export const TabsContainer = styled.div`
   height: 100%;
   padding: 24px;
   position: relative;
+
+  .ant-tabs-small > .ant-tabs-nav .ant-tabs-tab {
+    padding: 0 0 8px;
+  }
 `;

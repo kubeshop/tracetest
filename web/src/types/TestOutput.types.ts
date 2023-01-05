@@ -9,6 +9,7 @@ export type TTestOutput = {
   selector: string;
   value: string;
   valueRun: string;
+  valueRunDraft: string;
   id: number;
 };
 

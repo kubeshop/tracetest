@@ -25,7 +25,7 @@ interface IContext {
   isOpen: boolean;
   open(props?: IFormProps): void;
   close(): void;
-  onSubmit(values: IValues): void;
+  onSubmit(values: IValues, spanId?: string): void;
   formProps: IFormProps;
 }
 
