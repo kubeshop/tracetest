@@ -284,7 +284,7 @@ jobs:
       - name: Run integration tests
         run: |
           cd tracetesting
-          TRACETEST_CLI="/tmp/tracetest-main/cli" \
+          TRACETEST_CLI="/tmp/tracetest-main/cli/dist/tracetest" \
           TARGET_URL="http://tracetest-pr-${{ github.event.pull_request.number }}.tracetest-pr-${{ github.event.pull_request.number }}:11633" \
           ./run.bash
 
