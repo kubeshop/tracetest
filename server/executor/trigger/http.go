@@ -202,17 +202,17 @@ func mapResp(resp *http.Response) model.HTTPResponse {
 
 func (t *httpTriggerer) Variables(ctx context.Context, test model.Test, executor expression.Executor) (expression.VariablesMap, error) {
 	triggerVariables := expression.VariablesMap{}
-	http := test.ServiceUnderTest.HTTP
 
+	http := test.ServiceUnderTest.HTTP
 	if http == nil {
 		return triggerVariables, fmt.Errorf("no settings provided for HTTP triggerer")
 	}
 
 	urlVariables, err := executor.StatementTermsByType(WrapInQuotes(http.URL, "\""), expression.EnvironmentType)
-
 	if err != nil {
 		return triggerVariables, err
 	}
+
 	triggerVariables = triggerVariables.MergeStringArray(urlVariables)
 	for _, h := range http.Headers {
 		keyVariables, err := executor.StatementTermsByType(WrapInQuotes(h.Key, "\""), expression.EnvironmentType)
@@ -242,6 +242,7 @@ func (t *httpTriggerer) Variables(ctx context.Context, test model.Test, executor
 	if err != nil {
 		return triggerVariables, err
 	}
+
 	triggerVariables = triggerVariables.MergeStringArray(authVariables)
 
 	return triggerVariables, nil

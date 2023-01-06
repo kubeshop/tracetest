@@ -147,15 +147,17 @@ func (t *grpcTriggerer) Resolve(ctx context.Context, test model.Test, opts *Trig
 
 func (t *grpcTriggerer) Variables(ctx context.Context, test model.Test, executor expression.Executor) (expression.VariablesMap, error) {
 	triggerVariables := expression.VariablesMap{}
-	grpc := test.ServiceUnderTest.GRPC
 
+	grpc := test.ServiceUnderTest.GRPC
 	if grpc == nil {
 		return triggerVariables, fmt.Errorf("no settings provided for GRPC triggerer")
 	}
+
 	address, err := executor.StatementTermsByType(WrapInQuotes(grpc.Address, "\""), expression.EnvironmentType)
 	if err != nil {
 		return triggerVariables, err
 	}
+
 	triggerVariables = triggerVariables.MergeStringArray(address)
 
 	for _, h := range grpc.Metadata {
@@ -186,6 +188,7 @@ func (t *grpcTriggerer) Variables(ctx context.Context, test model.Test, executor
 	if err != nil {
 		return triggerVariables, err
 	}
+
 	triggerVariables = triggerVariables.MergeStringArray(methodVariables)
 
 	return triggerVariables, nil
