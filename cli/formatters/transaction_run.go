@@ -54,7 +54,16 @@ func (f transactionRun) json(output TransactionRunOutput) string {
 
 func (f transactionRun) pretty(output TransactionRunOutput) string {
 	if output.Run.GetState() == "FAILED" {
-		return f.getColoredText(false, "Failed to execute transaction")
+		errorMessage := ""
+		if len(output.Run.Steps) > 0 {
+			lastStep := output.Run.Steps[len(output.Run.Steps)-1]
+			lastError := lastStep.LastErrorState
+			if lastError != nil {
+				errorMessage = *lastError
+			}
+		}
+
+		return f.getColoredText(false, fmt.Sprintf("Failed to execute transaction: %s\n", errorMessage))
 	}
 
 	if !output.HasResults {
