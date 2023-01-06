@@ -27,10 +27,9 @@ exporters:
   otlp/nr:
     endpoint: otlp.nr-data.net:443
     headers:
-      # "api-key": "<new_relic_ingest_licence_key>" # Send traces to New Relic.
+      api-key: <new_relic_ingest_licence_key> # Send traces to New Relic.
       # Read more in docs here: https://docs.newrelic.com/docs/more-integrations/open-source-telemetry-integrations/opentelemetry/opentelemetry-setup/#collector-export
       # And here: https://docs.newrelic.com/docs/more-integrations/open-source-telemetry-integrations/opentelemetry/collector/opentelemetry-collector-basic/
-      api-key: 8489ea897b6f0147862d24bbe2c1d5ae2822NRAL
 
 service:
   pipelines:
