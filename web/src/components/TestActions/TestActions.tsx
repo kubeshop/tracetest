@@ -2,21 +2,13 @@ import {Button} from 'antd';
 
 import {useTestOutput} from 'providers/TestOutput/TestOutput.provider';
 import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
-import {useAppSelector} from 'redux/hooks';
-import {selectTestOutputs} from 'redux/testOutputs/selectors';
 import TraceAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
 import {singularOrPlural} from 'utils/Common';
 import * as S from './TestActions.styled';
 
-interface IProps {
-  runId: string;
-  testId: string;
-}
-
-const TestActions = ({runId, testId}: IProps) => {
+const TestActions = () => {
   const {specs, publish, cancel: onCancelTestSpecs} = useTestSpecs();
-  const {onCancel: onCancelTestOutputs} = useTestOutput();
-  const outputs = useAppSelector(state => selectTestOutputs(state, testId, runId));
+  const {onCancel: onCancelTestOutputs, outputs} = useTestOutput();
   const pendingSpecs = specs.filter(({isDraft}) => isDraft).length;
   const pendingOutputs = outputs.filter(({isDraft}) => isDraft).length;
   const pendingCount = pendingSpecs + pendingOutputs;

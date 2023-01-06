@@ -18,8 +18,6 @@ import {useGuidedTour} from 'providers/GuidedTour/GuidedTour.provider';
 import {useSpan} from 'providers/Span/Span.provider';
 import {useTestOutput} from 'providers/TestOutput/TestOutput.provider';
 import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
-import {useAppSelector} from 'redux/hooks';
-import {selectTestOutputs} from 'redux/testOutputs/selectors';
 import AssertionAnalyticsService from 'services/Analytics/AssertionAnalytics.service';
 import TestRunAnalytics from 'services/Analytics/TestRunAnalytics.service';
 import AssertionService from 'services/Assertion.service';
@@ -50,8 +48,8 @@ const RunDetailTest = ({run, testId}: IProps) => {
     onClose,
     onSubmit: onSubmitTestOutput,
     output,
+    outputs,
   } = useTestOutput();
-  const outputs = useAppSelector(state => selectTestOutputs(state, testId, run.id));
   const [visualizationType, setVisualizationType] = useState(VisualizationType.Dag);
   const {
     state: {tourActive},

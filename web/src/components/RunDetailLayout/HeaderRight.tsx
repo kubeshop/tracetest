@@ -7,10 +7,9 @@ import {TestState as TestStateEnum} from 'constants/TestRun.constants';
 import {useTest} from 'providers/Test/Test.provider';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
+import {useTestOutput} from 'providers/TestOutput/TestOutput.provider';
 import GuidedTourService, {GuidedTours} from '../../services/GuidedTour.service';
 import * as S from './RunDetailLayout.styled';
-import {useAppSelector} from '../../redux/hooks';
-import {selectIsPending} from '../../redux/testOutputs/selectors';
 
 interface IProps {
   testId: string;
@@ -18,16 +17,16 @@ interface IProps {
 }
 
 const HeaderRight = ({testId, testVersion}: IProps) => {
-  const {isDraftMode: isTestSpecsPending} = useTestSpecs();
-  const isTestOutputsPending = useAppSelector(selectIsPending);
-  const isDraftMode = isTestSpecsPending || isTestOutputsPending;
+  const {isDraftMode: isTestSpecsDraftMode} = useTestSpecs();
+  const {isDraftMode: isTestOutputsDraftMode} = useTestOutput();
+  const isDraftMode = isTestSpecsDraftMode || isTestOutputsDraftMode;
   const {run} = useTestRun();
   const {onRun} = useTest();
   const state = run.state;
 
   return (
     <S.Section $justifyContent="flex-end">
-      {isDraftMode && <TestActions runId={run.id} testId={testId} />}
+      {isDraftMode && <TestActions />}
       {!isDraftMode && state && state !== TestStateEnum.FINISHED && (
         <S.StateContainer data-cy="test-run-result-status">
           <S.StateText>Test status:</S.StateText>

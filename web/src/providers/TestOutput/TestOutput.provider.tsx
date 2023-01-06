@@ -3,7 +3,8 @@ import {createContext, useCallback, useContext, useEffect, useMemo, useState} fr
 import {useNavigate} from 'react-router-dom';
 
 import {useParseExpressionMutation} from 'redux/apis/TraceTest.api';
-import {useAppDispatch} from 'redux/hooks';
+import {useAppDispatch, useAppSelector} from 'redux/hooks';
+import {selectIsPending, selectTestOutputs} from 'redux/testOutputs/selectors';
 import {outputAdded, outputDeleted, outputsInitiated, outputsReverted, outputUpdated} from 'redux/testOutputs/slice';
 import {TTestOutput} from 'types/TestOutput.types';
 import {useConfirmationModal} from '../ConfirmationModal/ConfirmationModal.provider';
@@ -11,6 +12,7 @@ import {useEnvironment} from '../Environment/Environment.provider';
 import {useTest} from '../Test/Test.provider';
 
 interface IContext {
+  isDraftMode: boolean;
   isEditing: boolean;
   isLoading: boolean;
   isOpen: boolean;
@@ -21,9 +23,11 @@ interface IContext {
   onOpen(draft?: TTestOutput): void;
   onSubmit(values: TTestOutput): void;
   output?: TTestOutput;
+  outputs: TTestOutput[];
 }
 
 export const Context = createContext<IContext>({
+  isDraftMode: false,
   isEditing: false,
   isLoading: false,
   isOpen: false,
@@ -34,6 +38,7 @@ export const Context = createContext<IContext>({
   onOpen: noop,
   onSubmit: noop,
   output: undefined,
+  outputs: [],
 });
 
 interface IProps {
@@ -56,6 +61,8 @@ const TestOutputProvider = ({children, runId, testId}: IProps) => {
   const {
     test: {outputs: testOutputs = []},
   } = useTest();
+  const outputs = useAppSelector(state => selectTestOutputs(state, testId, runId));
+  const isDraftMode = useAppSelector(selectIsPending);
 
   useEffect(() => {
     dispatch(outputsInitiated(testOutputs));
@@ -125,6 +132,7 @@ const TestOutputProvider = ({children, runId, testId}: IProps) => {
 
   const value = useMemo<IContext>(
     () => ({
+      isDraftMode,
       isEditing,
       isLoading,
       isOpen,
@@ -135,8 +143,22 @@ const TestOutputProvider = ({children, runId, testId}: IProps) => {
       onOpen,
       onSubmit,
       output: draft,
+      outputs,
     }),
-    [draft, isEditing, isLoading, isOpen, onCancel, onClose, onDelete, onNavigateAndOpen, onOpen, onSubmit]
+    [
+      draft,
+      isDraftMode,
+      isEditing,
+      isLoading,
+      isOpen,
+      onCancel,
+      onClose,
+      onDelete,
+      onNavigateAndOpen,
+      onOpen,
+      onSubmit,
+      outputs,
+    ]
   );
 
   return <Context.Provider value={value}>{children}</Context.Provider>;
