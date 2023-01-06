@@ -12,6 +12,7 @@ services:
       timeout: 3s
       retries: 60
 
+  # AdService
   otel-adservice:
     image: otel/demo:v0.3.4-alpha-adservice
     environment:
