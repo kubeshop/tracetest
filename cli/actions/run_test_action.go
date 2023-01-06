@@ -7,7 +7,6 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
-	"strings"
 	"sync"
 	"time"
 
@@ -87,7 +86,22 @@ func (a runTestAction) Run(ctx context.Context, args RunTestConfig) error {
 }
 
 func stringReferencesFile(path string) bool {
-	return strings.HasPrefix(path, "./")
+	// for the current working dir, check if the file exists
+	// by finding its absolute path and executing a stat command
+
+	absolutePath, err := filepath.Abs(path)
+	if err != nil {
+		return false
+	}
+
+	info, err := os.Stat(absolutePath)
+	if err != nil {
+		return false
+	}
+
+	// if the string is empty the absolute path will the entire dir
+	// otherwise the user also could send a directory by mistake
+	return info != nil && !info.IsDir()
 }
 
 func (a runTestAction) processEnv(ctx context.Context, envID string) (string, error) {
@@ -190,7 +204,11 @@ func (a runTestAction) runDefinitionFile(ctx context.Context, f file.File, param
 
 	if t, err := f.Definition().Transaction(); err == nil {
 		for i, step := range t.Steps {
-			if !stringReferencesFile(step) {
+			// since step could be a relative path in relation of the definition file,
+			// to check it properly we need to convert it to an absolute path
+			stepPath := filepath.Join(f.AbsDir(), step)
+
+			if !stringReferencesFile(stepPath) {
 				// not referencing a file, keep the value
 				continue
 			}
@@ -198,7 +216,7 @@ func (a runTestAction) runDefinitionFile(ctx context.Context, f file.File, param
 			// references a file, resolve to its ID
 			id, err := a.testFileToID(ctx, f.AbsDir(), step)
 			if err != nil {
-				return fmt.Errorf(`cannot transalte path "%s" to an ID: %w`, step, err)
+				return fmt.Errorf(`cannot translate path "%s" to an ID: %w`, step, err)
 			}
 
 			t.Steps[i] = id
