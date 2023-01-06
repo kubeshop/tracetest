@@ -38,7 +38,7 @@ docker compose up
 
 This will start the OpenTelemetry Demo. Open up `http://localhost:8084` to make sure it's working. But, you're not sending the traces anywhere.
 
-Let's fix this by configuring Tracetest and OpenTelemetry Collector.
+Let's fix this by configuring Tracetest and OpenTelemetry Collector to forward trace data to both Lightstep and Tracetest.
 
 ## Tracetest
 
@@ -150,9 +150,11 @@ server:
     applicationExporter: collector
 ```
 
-**How are traces sent to Tracetest and Lightstep?**
+**How to send traces to Tracetest and Lightstep?**
 
-The `collector.config.yaml` explains that. It receives traces via either `grpc` or `http`. Then, exports them to Tracetest's OTLP endpoint `tracetest:21321` in one pipeline, and to Lightstep in another. Make sure to add your Lightstep access token in the headers of the `otlp/ls` exporter.
+The `collector.config.yaml` explains that. It receives traces via either `grpc` or `http`. Then, exports them to Tracetest's OTLP endpoint `tracetest:21321` in one pipeline, and to Lightstep in another.
+
+Make sure to add your Lightstep access token in the headers of the `otlp/ls` exporter.
 
 ```yaml
 receivers:
@@ -209,7 +211,11 @@ docker-compose -f docker-compose.yaml -f tracetest/docker-compose.yaml up # add 
 
 This will start your Tracetest instance on `http://localhost:11633/`. Go ahead and open it up.
 
-[Start creating tests in the Web UI](https://docs.tracetest.io/web-ui/creating-tests)! Make sure to use the endpoints within your Docker network like `http://otel-frontend:8084/` when creating tests. This is because your OpenTelemetry Demo and Tracetest are in the same network.
+[Start creating tests in the Web UI](https://docs.tracetest.io/web-ui/creating-tests)! Make sure to use the endpoints within your Docker network like `http://otel-frontend:8084/` when creating tests.
+
+This is because your OpenTelemetry Demo and Tracetest are in the same network.
+
+> Note: View the `demo` section in the `tracetest.config.yaml` to see which endpoints from the OpenTelemetry Demo are available for running tests.
 
 Here's a sample of a failed test run, which happens if you add this assertion:
 
@@ -219,7 +225,7 @@ attr:tracetest.span.duration  < 50ms
 
 ![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1672998179/Blogposts/tracetest-lightstep-partnership/screely-1672998159326_depw45.png)
 
-Increasing the duration to a more reasonable 500ms will make the test pass.
+Increasing the duration to a more reasonable `500ms` will make the test pass.
 
 ![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1672998252/Blogposts/tracetest-lightstep-partnership/screely-1672998249450_mngghb.png)
 
