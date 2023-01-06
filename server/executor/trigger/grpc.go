@@ -12,6 +12,7 @@ import (
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
 	"github.com/jhump/protoreflect/desc"
+	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/model"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"google.golang.org/grpc"
@@ -142,6 +143,55 @@ func (t *grpcTriggerer) Resolve(ctx context.Context, test model.Test, opts *Trig
 	}
 
 	return test, nil
+}
+
+func (t *grpcTriggerer) Variables(ctx context.Context, test model.Test, executor expression.Executor) (expression.VariablesMap, error) {
+	triggerVariables := expression.VariablesMap{}
+
+	grpc := test.ServiceUnderTest.GRPC
+	if grpc == nil {
+		return triggerVariables, fmt.Errorf("no settings provided for GRPC triggerer")
+	}
+
+	address, err := executor.StatementTermsByType(WrapInQuotes(grpc.Address, "\""), expression.EnvironmentType)
+	if err != nil {
+		return triggerVariables, err
+	}
+
+	triggerVariables = triggerVariables.MergeStringArray(address)
+
+	for _, h := range grpc.Metadata {
+		headerVariables, err := executor.StatementTermsByType(WrapInQuotes(h.Key, "\""), expression.EnvironmentType)
+		if err != nil {
+			return triggerVariables, err
+		}
+
+		valueVariables, err := executor.StatementTermsByType(WrapInQuotes(h.Value, "\""), expression.EnvironmentType)
+		if err != nil {
+			return triggerVariables, err
+		}
+
+		triggerVariables = triggerVariables.MergeStringArray(headerVariables)
+		triggerVariables = triggerVariables.MergeStringArray(valueVariables)
+	}
+
+	if grpc.Request != "" {
+		requestVariables, err := executor.StatementTermsByType(WrapInQuotes(grpc.Request, "'"), expression.EnvironmentType)
+		if err != nil {
+			return triggerVariables, err
+		}
+
+		triggerVariables = triggerVariables.MergeStringArray(requestVariables)
+	}
+
+	methodVariables, err := executor.StatementTermsByType(WrapInQuotes(grpc.Method, "'"), expression.EnvironmentType)
+	if err != nil {
+		return triggerVariables, err
+	}
+
+	triggerVariables = triggerVariables.MergeStringArray(methodVariables)
+
+	return triggerVariables, nil
 }
 
 func mdToHeaders(md *metadata.MD) []string {

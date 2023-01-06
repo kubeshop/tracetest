@@ -1,6 +1,8 @@
 package expression
 
-import "github.com/alecthomas/participle/v2/lexer"
+import (
+	"github.com/alecthomas/participle/v2/lexer"
+)
 
 type Statement struct {
 	Left       *Expr  `@@`
@@ -63,3 +65,74 @@ var languageLexer = lexer.MustStateful(lexer.Rules{
 		{Name: "Ident", Pattern: `[a-zA-Z][a-zA-Z0-9_]*`, Action: nil},
 	},
 })
+
+type TermType = string
+
+const (
+	FunctionCallType TermType = "FunctionCall"
+	ArrayType        TermType = "Array"
+	DurationType     TermType = "Duration"
+	NumberType       TermType = "Number"
+	AttributeType    TermType = "Attribute"
+	EnvironmentType  TermType = "Environment"
+	VariableType     TermType = "Variable"
+	StrType          TermType = "Str"
+)
+
+func (term *Term) Type() TermType {
+	if term.Attribute != nil {
+		return AttributeType
+	}
+
+	if term.Environment != nil {
+		return EnvironmentType
+	}
+
+	if term.Variable != nil {
+		return VariableType
+	}
+
+	if term.FunctionCall != nil {
+		return FunctionCallType
+	}
+
+	if term.Array != nil {
+		return ArrayType
+	}
+
+	if term.Duration != nil {
+		return DurationType
+	}
+
+	if term.Number != nil {
+		return NumberType
+	}
+
+	if term.Str != nil {
+		return StrType
+	}
+
+	return ""
+}
+
+func (expr *Expr) GetTermsByType(termType TermType) []*Term {
+	terms := []*Term{}
+
+	if expr.Left.Type() == StrType {
+		for _, arg := range expr.Left.Str.Args {
+			terms = append(terms, arg.GetTermsByType(termType)...)
+		}
+	}
+
+	if expr.Left.Type() == termType {
+		terms = append(terms, expr.Left)
+	}
+
+	for _, optTerm := range expr.Right {
+		if optTerm.Term.Type() == termType {
+			terms = append(terms, optTerm.Term)
+		}
+	}
+
+	return terms
+}

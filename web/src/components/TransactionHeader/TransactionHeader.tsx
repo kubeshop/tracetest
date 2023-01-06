@@ -40,7 +40,7 @@ const TransactionHeader = ({
           </S.StateContainer>
         )}
         {state && state === TestStateEnum.FINISHED && (
-          <Button ghost onClick={onRun} type="primary" data-cy="transaction-run-button">
+          <Button ghost onClick={() => onRun(runId)} type="primary" data-cy="transaction-run-button">
             Run Transaction
           </Button>
         )}

@@ -199,3 +199,71 @@ func mapResp(resp *http.Response) model.HTTPResponse {
 		Body:       body,
 	}
 }
+
+func (t *httpTriggerer) Variables(ctx context.Context, test model.Test, executor expression.Executor) (expression.VariablesMap, error) {
+	triggerVariables := expression.VariablesMap{}
+
+	http := test.ServiceUnderTest.HTTP
+	if http == nil {
+		return triggerVariables, fmt.Errorf("no settings provided for HTTP triggerer")
+	}
+
+	urlVariables, err := executor.StatementTermsByType(WrapInQuotes(http.URL, "\""), expression.EnvironmentType)
+	if err != nil {
+		return triggerVariables, err
+	}
+
+	triggerVariables = triggerVariables.MergeStringArray(urlVariables)
+	for _, h := range http.Headers {
+		keyVariables, err := executor.StatementTermsByType(WrapInQuotes(h.Key, "\""), expression.EnvironmentType)
+		if err != nil {
+			return triggerVariables, err
+		}
+
+		valueVariables, err := executor.StatementTermsByType(WrapInQuotes(h.Value, "\""), expression.EnvironmentType)
+		if err != nil {
+			return triggerVariables, err
+		}
+
+		triggerVariables = triggerVariables.MergeStringArray(keyVariables)
+		triggerVariables = triggerVariables.MergeStringArray(valueVariables)
+	}
+
+	if http.Body != "" {
+		bodyVariables, err := executor.StatementTermsByType(WrapInQuotes(http.Body, "'"), expression.EnvironmentType)
+		if err != nil {
+			return triggerVariables, err
+		}
+
+		triggerVariables = triggerVariables.MergeStringArray(bodyVariables)
+	}
+
+	authVariables, err := authVariables(http.Auth, executor)
+	if err != nil {
+		return triggerVariables, err
+	}
+
+	triggerVariables = triggerVariables.MergeStringArray(authVariables)
+
+	return triggerVariables, nil
+}
+
+func authVariables(auth *model.HTTPAuthenticator, executor expression.Executor) ([]string, error) {
+	if auth == nil {
+		return []string{}, nil
+	}
+
+	authVariables := []string{}
+
+	_, err := auth.Map(func(v string) (string, error) {
+		variables, err := executor.StatementTermsByType(WrapInQuotes(v, "\""), expression.EnvironmentType)
+		if err != nil {
+			return "", err
+		}
+
+		authVariables = append(authVariables, variables...)
+		return "", nil
+	})
+
+	return authVariables, err
+}

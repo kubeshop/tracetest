@@ -107,6 +107,11 @@ func (m *MockRepository) GetRun(_ context.Context, testID id.ID, id int) (model.
 	return args.Get(0).(model.Run), args.Error(1)
 }
 
+func (m *MockRepository) GetLatestRunByTestVersion(_ context.Context, testID id.ID, version int) (model.Run, error) {
+	args := m.Called(testID, version)
+	return args.Get(0).(model.Run), args.Error(1)
+}
+
 func (m *MockRepository) GetTestRuns(_ context.Context, test model.Test, take int32, skip int32) (model.List[model.Run], error) {
 	args := m.Called(test, take, skip)
 	runs := args.Get(0).([]model.Run)
@@ -214,6 +219,11 @@ func (m *MockRepository) DeleteTransactionRun(ctx context.Context, run model.Tra
 // GetTransactionRun implements model.Repository
 func (m *MockRepository) GetTransactionRun(ctx context.Context, transactionID id.ID, runID int) (model.TransactionRun, error) {
 	args := m.Called(ctx, transactionID, runID)
+	return args.Get(0).(model.TransactionRun), args.Error(1)
+}
+
+func (m *MockRepository) GetLatestRunByTransactionVersion(_ context.Context, transactionID id.ID, version int) (model.TransactionRun, error) {
+	args := m.Called(transactionID, version)
 	return args.Get(0).(model.TransactionRun), args.Error(1)
 }
 

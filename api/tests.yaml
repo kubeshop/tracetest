@@ -188,6 +188,10 @@ components:
             type: string
         environmentId:
           type: string
+        variables:
+          type: array
+          items:
+            $ref: "./environments.yaml#/components/schemas/EnvironmentValue"
 
     AssertionResults:
       type: object

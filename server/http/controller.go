@@ -11,6 +11,7 @@ import (
 	"github.com/kubeshop/tracetest/server/assertions"
 	"github.com/kubeshop/tracetest/server/assertions/selectors"
 	"github.com/kubeshop/tracetest/server/executor"
+	"github.com/kubeshop/tracetest/server/executor/trigger"
 	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/http/mappings"
 	"github.com/kubeshop/tracetest/server/id"
@@ -27,10 +28,11 @@ import (
 var IDGen = id.NewRandGenerator()
 
 type controller struct {
-	testDB       model.Repository
-	runner       runner
-	newTraceDBFn func(ds model.DataStore) (tracedb.TraceDB, error)
-	mappers      mappings.Mappings
+	testDB          model.Repository
+	runner          runner
+	newTraceDBFn    func(ds model.DataStore) (tracedb.TraceDB, error)
+	mappers         mappings.Mappings
+	triggerRegistry *trigger.Registry
 }
 
 type runner interface {
@@ -44,12 +46,14 @@ func NewController(
 	newTraceDBFn func(ds model.DataStore) (tracedb.TraceDB, error),
 	runner runner,
 	mappers mappings.Mappings,
+	triggerRegistry *trigger.Registry,
 ) openapi.ApiApiServicer {
 	return &controller{
-		testDB:       testDB,
-		runner:       runner,
-		newTraceDBFn: newTraceDBFn,
-		mappers:      mappers,
+		testDB:          testDB,
+		runner:          runner,
+		newTraceDBFn:    newTraceDBFn,
+		mappers:         mappers,
+		triggerRegistry: triggerRegistry,
 	}
 }
 
@@ -282,7 +286,11 @@ func (c *controller) RunTest(ctx context.Context, testID string, runInformation 
 	}
 
 	metadata := metadata(runInformation.Metadata)
-	environment, err := environment(ctx, c.testDB, runInformation.EnvironmentId)
+	variablesEnv := c.mappers.In.Environment(openapi.Environment{
+		Values: runInformation.Variables,
+	})
+
+	environment, err := environment(ctx, c.testDB, runInformation.EnvironmentId, variablesEnv)
 
 	if err != nil {
 		return handleDBError(err), err
@@ -530,18 +538,18 @@ func metadata(in *map[string]string) model.RunMetadata {
 	return model.RunMetadata(*in)
 }
 
-func environment(ctx context.Context, testDB model.Repository, environmentId string) (model.Environment, error) {
+func environment(ctx context.Context, testDB model.Repository, environmentId string, variablesEnv model.Environment) (model.Environment, error) {
 	if environmentId != "" {
 		environment, err := testDB.GetEnvironment(ctx, environmentId)
 
 		if err != nil {
-			return model.Environment{}, err
+			return variablesEnv, err
 		}
 
-		return environment, nil
+		return environment.Merge(variablesEnv), nil
 	}
 
-	return model.Environment{}, nil
+	return variablesEnv, nil
 }
 
 func (c *controller) executeTest(ctx context.Context, test model.Test, runInfo openapi.RunInformation) (openapi.ImplResponse, error) {
@@ -920,7 +928,10 @@ func (c *controller) RunTransaction(ctx context.Context, transactionID string, r
 	}
 
 	metadata := metadata(runInformation.Metadata)
-	environment, err := environment(ctx, c.testDB, runInformation.EnvironmentId)
+	variablesEnv := c.mappers.In.Environment(openapi.Environment{
+		Values: runInformation.Variables,
+	})
+	environment, err := environment(ctx, c.testDB, runInformation.EnvironmentId, variablesEnv)
 
 	if err != nil {
 		return handleDBError(err), err
@@ -1234,4 +1245,126 @@ func (c *controller) TestConnection(ctx context.Context, dataStore openapi.DataS
 	}
 
 	return openapi.Response(statusCode, c.mappers.Out.ConnectionTestResult(testResult)), nil
+}
+
+func (c *controller) GetTestVariables(ctx context.Context, testId string, version int32, environmentId string, runId int32) (openapi.ImplResponse, error) {
+	test, err := c.testDB.GetTestVersion(ctx, id.ID(testId), int(version))
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	environment := model.Environment{
+		Values: []model.EnvironmentValue{},
+	}
+
+	if environmentId != "" {
+		environment, err = c.testDB.GetEnvironment(ctx, environmentId)
+
+		if err != nil {
+			return handleDBError(err), err
+		}
+	}
+
+	executor := expression.NewExecutor()
+	variables := expression.NewVariables(environment, executor)
+	initialEnvironment := model.Environment{}
+	if runId > 0 {
+		run, err := c.testDB.GetRun(ctx, test.ID, int(runId))
+		if err != nil {
+			return handleDBError(err), err
+		}
+		initialEnvironment = run.Environment
+	} else {
+		run, err := c.testDB.GetLatestRunByTestVersion(ctx, test.ID, test.Version)
+		if err == nil {
+			initialEnvironment = run.Environment
+		}
+	}
+
+	testVariables, err := c.processTestVariables(ctx, test, initialEnvironment, variables)
+
+	if err != nil {
+		return openapi.Response(http.StatusInternalServerError, err.Error()), err
+	}
+
+	return openapi.Response(200, c.mappers.Out.TestVariables(testVariables)), nil
+}
+
+func (c *controller) GetTransactionVariables(ctx context.Context, transactionId string, version int32, environmentId string, runId int32) (openapi.ImplResponse, error) {
+	transaction, err := c.testDB.GetTransactionVersion(ctx, id.ID(transactionId), int(version))
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	environment := model.Environment{
+		Values: []model.EnvironmentValue{},
+	}
+
+	if environmentId != "" {
+		environment, err = c.testDB.GetEnvironment(ctx, environmentId)
+
+		if err != nil {
+			return handleDBError(err), err
+		}
+	}
+
+	executor := expression.NewExecutor()
+	variables := expression.NewVariables(environment, executor)
+
+	transactionVariables := make([]expression.TestVariables, len(transaction.Steps))
+	initialEnvironment := model.Environment{}
+	if runId > 0 {
+		run, err := c.testDB.GetTransactionRun(ctx, transaction.ID, int(runId))
+		if err != nil {
+			return handleDBError(err), err
+		}
+
+		initialEnvironment = run.Environment
+	} else {
+		run, err := c.testDB.GetLatestRunByTransactionVersion(ctx, transaction.ID, transaction.Version)
+		if err == nil {
+			initialEnvironment = run.Environment
+		}
+	}
+
+	for i, test := range transaction.Steps {
+		testVariables, err := c.processTestVariables(ctx, test, initialEnvironment, variables)
+		variables = variables.UpdateEnvironmentVariables(test)
+
+		if err != nil {
+			return openapi.Response(http.StatusInternalServerError, err.Error()), err
+		}
+
+		transactionVariables[i] = testVariables
+	}
+
+	return openapi.Response(200, c.mappers.Out.TransactionVariables(transactionVariables)), nil
+}
+
+func (c *controller) processTestVariables(ctx context.Context, test model.Test, environment model.Environment, variables expression.Variables) (expression.TestVariables, error) {
+	environmentVariables := variables.GetEnvironmentVariables(test)
+	specVariables, err := variables.GetSpecsVariables(test)
+
+	if err != nil {
+		return expression.TestVariables{}, err
+	}
+
+	outputVariables, err := variables.GetOutputVariables(test)
+	if err != nil {
+		return expression.TestVariables{}, err
+	}
+
+	triggerer, err := c.triggerRegistry.Get(test.ServiceUnderTest.Type)
+	if err != nil {
+		return expression.TestVariables{}, err
+	}
+
+	triggerVariables, err := triggerer.Variables(ctx, test, variables.Executor)
+	if err != nil {
+		return expression.TestVariables{}, err
+	}
+
+	testVariables := variables.GetTestVariables(test, environmentVariables, specVariables.Merge(triggerVariables).Merge(outputVariables), environment)
+
+	return testVariables, nil
 }

@@ -36,7 +36,7 @@ const Content = () => {
             data-tour={GuidedTourService.getStep(GuidedTours.TestDetails, Steps.RunTest)}
             ghost
             loading={isLoadingRunTest}
-            onClick={() => runTest(test.id)}
+            onClick={() => runTest(test)}
             type="primary"
           >
             Run Test

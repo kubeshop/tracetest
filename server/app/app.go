@@ -119,6 +119,7 @@ func (a *App) Start() error {
 	}
 
 	subscriptionManager := subscription.NewManager()
+	triggerRegistry := getTriggerRegistry(tracer, applicationTracer)
 
 	rf := newRunnerFacades(
 		a.config.Config,
@@ -126,6 +127,7 @@ func (a *App) Start() error {
 		applicationTracer,
 		tracer,
 		subscriptionManager,
+		triggerRegistry,
 	)
 
 	// worker count. should be configurable
@@ -171,6 +173,7 @@ func (a *App) Start() error {
 		tracer,
 		subscriptionManager,
 		rf,
+		triggerRegistry,
 	)
 	a.registerStopFn(func() {
 		fmt.Println("stopping http server")
@@ -216,6 +219,7 @@ func newRunnerFacades(
 	appTracer trace.Tracer,
 	tracer trace.Tracer,
 	subscriptionManager *subscription.Manager,
+	triggerRegistry *trigger.Registry,
 ) *runnerFacade {
 
 	execTestUpdater := (executor.CompositeUpdater{}).
@@ -248,7 +252,7 @@ func newRunnerFacades(
 	)
 
 	runner := executor.NewPersistentRunner(
-		triggerRegistry(tracer, appTracer),
+		triggerRegistry,
 		testDB,
 		execTestUpdater,
 		tracePoller,
@@ -266,7 +270,7 @@ func newRunnerFacades(
 	}
 }
 
-func triggerRegistry(tracer, appTracer trace.Tracer) *trigger.Registry {
+func getTriggerRegistry(tracer, appTracer trace.Tracer) *trigger.Registry {
 	triggerReg := trigger.NewRegsitry(tracer, appTracer)
 	triggerReg.Add(trigger.HTTP())
 	triggerReg.Add(trigger.GRPC())
@@ -281,10 +285,11 @@ func newHttpServer(
 	tracer trace.Tracer,
 	subscriptionManager *subscription.Manager,
 	rf *runnerFacade,
+	triggerRegistry *trigger.Registry,
 ) *http.Server {
 	mappers := mappings.New(tracesConversionConfig(), comparator.DefaultRegistry(), testDB)
 
-	router := openapi.NewRouter(httpRouter(conf, testDB, tracer, rf, mappers))
+	router := openapi.NewRouter(httpRouter(conf, testDB, tracer, rf, mappers, triggerRegistry))
 
 	wsRouter := websocket.NewRouter()
 	wsRouter.Add("subscribe", websocket.NewSubscribeCommandExecutor(subscriptionManager, mappers))
@@ -322,8 +327,9 @@ func httpRouter(
 	tracer trace.Tracer,
 	rf *runnerFacade,
 	mappers mappings.Mappings,
+	triggerRegistry *trigger.Registry,
 ) openapi.Router {
-	controller := httpServer.NewController(testDB, tracedb.Factory(testDB), rf, mappers)
+	controller := httpServer.NewController(testDB, tracedb.Factory(testDB), rf, mappers, triggerRegistry)
 	apiApiController := openapi.NewApiApiController(controller)
 	customController := httpServer.NewCustomController(controller, apiApiController, openapi.DefaultErrorHandler, tracer)
 	httpRouter := customController

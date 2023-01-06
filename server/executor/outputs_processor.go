@@ -86,7 +86,6 @@ func outputProcessor(ctx context.Context, outputs model.OrderedMap[string, model
 	}
 
 	return res, nil
-
 }
 
 func extractAttr(span model.Span, ds []expression.DataStore, expr expression.Expr) string {

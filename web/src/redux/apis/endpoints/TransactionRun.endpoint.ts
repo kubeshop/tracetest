@@ -4,16 +4,20 @@ import {PaginationResponse} from 'hooks/usePagination';
 import TransactionRun from 'models/TransactionRun.model';
 import {TTestApiEndpointBuilder} from 'types/Test.types';
 import {TRawTransactionRun, TTransactionRun} from 'types/TransactionRun.types';
-import {IListenerFunction} from '../../../gateways/WebSocket.gateway';
-import WebSocketService from '../../../services/WebSocket.service';
-import {getTotalCountFromHeaders} from '../../../utils/Common';
+import {IListenerFunction} from 'gateways/WebSocket.gateway';
+import WebSocketService from 'services/WebSocket.service';
+import {TEnvironmentValue} from 'types/Environment.types';
+import {getTotalCountFromHeaders} from 'utils/Common';
 
 const TransactionRunEndpoint = (builder: TTestApiEndpointBuilder) => ({
-  runTransaction: builder.mutation<TTransactionRun, {transactionId: string; environmentId?: string}>({
-    query: ({transactionId, environmentId}) => ({
+  runTransaction: builder.mutation<
+    TTransactionRun,
+    {transactionId: string; environmentId?: string; variables?: TEnvironmentValue[]}
+  >({
+    query: ({transactionId, environmentId, variables = []}) => ({
       url: `/transactions/${transactionId}/run`,
       method: HTTP_METHOD.POST,
-      body: {environmentId},
+      body: {environmentId, variables},
     }),
     invalidatesTags: (result, error, {transactionId}) => [
       {type: TracetestApiTags.TRANSACTION_RUN, id: `${transactionId}-LIST`},

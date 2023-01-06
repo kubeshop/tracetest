@@ -8,7 +8,7 @@ components:
         environment:
           type: array
           items:
-            $ref: "./environments.yaml#/components/schemas/EnvironmentValue"
+            type: string
         variables:
           type: array
           items:
@@ -16,15 +16,18 @@ components:
         missing:
           type: array
           items:
-            type: string
+            $ref: "#/components/schemas/MissingVariables"
     TestVariables:
       type: object
       properties:
-        testId:
-          type: string
+        test:
+          $ref: "./tests.yaml#/components/schemas/Test"
         variables:
           $ref: "#/components/schemas/Variables"
-    TransactionVariables:
-      type: array
-      items:
-        $ref: "#/components/schemas/TestVariables"
+    MissingVariables:
+      type: object
+      properties:
+        key:
+          type: string
+        defaultValue:
+          type: string
