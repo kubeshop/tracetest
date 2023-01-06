@@ -10,12 +10,13 @@ import useValidateVariablesDraft from './hooks/useValidateVariablesDraft';
 
 interface IProps {
   isOpen: boolean;
+  name: string;
   onClose(): void;
   onSubmit(values: TEnvironmentValue[]): void;
   variables: TTestVariablesMap;
 }
 
-const MissingVariablesModal = ({isOpen, onClose, onSubmit, variables}: IProps) => {
+const MissingVariablesModal = ({isOpen, onClose, onSubmit, variables, name}: IProps) => {
   const [form] = Form.useForm<TDraftVariables>();
   const {isValid, onValidate} = useValidateVariablesDraft();
 
@@ -31,7 +32,7 @@ const MissingVariablesModal = ({isOpen, onClose, onSubmit, variables}: IProps) =
     <S.Modal
       footer={<MissingVariablesModalFooter isValid={isValid} onCancel={onClose} onSave={() => form.submit()} />}
       onCancel={onClose}
-      title={<S.Title>Undefined Variables</S.Title>}
+      title={<S.Title>{name} - Undefined Variables</S.Title>}
       visible={isOpen}
       width={520}
     >

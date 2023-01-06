@@ -1,5 +1,7 @@
+import {uniqBy} from 'lodash';
 import {TTestVariables, TDraftVariables, TTestVariablesMap} from 'types/Variables.types';
 import {TEnvironmentValue} from '../types/Environment.types';
+import {TTest} from '../types/Test.types';
 
 const VariablesService = () => ({
   getVariableEntries(testsVariables: TTestVariables[]): TTestVariablesMap {
@@ -33,6 +35,16 @@ const VariablesService = () => ({
 
   getFlatVariablesFromDraft({variables}: TDraftVariables): TEnvironmentValue[] {
     return Object.entries(variables).flatMap(([key, value]) => [{key, value}]);
+  },
+
+  getMatchingTests(variables: TTestVariablesMap, key: string): TTest[] {
+    const list = Object.values(variables).reduce<TTest[]>(
+      (acc, {test, variables: {missing}}) =>
+        missing.find(missingVariable => missingVariable.key === key) ? acc.concat(test) : acc,
+      []
+    );
+
+    return uniqBy(list, 'id');
   },
 });
 

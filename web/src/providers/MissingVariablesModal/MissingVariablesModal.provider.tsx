@@ -7,6 +7,7 @@ import {TEnvironmentValue} from 'types/Environment.types';
 
 type TOnOPenProps = {
   testsVariables: TTestVariables[];
+  name: string;
   onSubmit(draft: TEnvironmentValue[]): void;
 };
 
@@ -25,9 +26,10 @@ interface IProps {
 export const useMissingVariablesModal = () => useContext(Context);
 
 const MissingVariablesModalProvider = ({children}: IProps) => {
-  const [{testsVariables = [], onSubmit}, setProps] = useState<TOnOPenProps>({
+  const [{testsVariables = [], onSubmit, name}, setProps] = useState<TOnOPenProps>({
     testsVariables: [],
     onSubmit: noop,
+    name: '',
   });
   const [isOpen, setIsOpen] = useState(false);
 
@@ -55,6 +57,7 @@ const MissingVariablesModalProvider = ({children}: IProps) => {
         onClose={() => setIsOpen(false)}
         onSubmit={handleSubmit}
         isOpen={isOpen}
+        name={name}
       />
     </Context.Provider>
   );

@@ -39,6 +39,7 @@ const useTransactionCrud = () => {
       if (!transactionVariables.hasMissingVariables) run();
       else
         onOpen({
+          name: transaction.name,
           testsVariables: transactionVariables.variables,
           onSubmit(variables) {
             run(variables);

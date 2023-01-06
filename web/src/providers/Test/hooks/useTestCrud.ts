@@ -46,6 +46,7 @@ const useTestCrud = () => {
       if (!testVariables.variables.missing.length) run();
       else
         onOpen({
+          name: test.name,
           testsVariables: [testVariables],
           onSubmit(variables) {
             run(variables);
