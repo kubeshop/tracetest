@@ -10,18 +10,20 @@ import {TRawSelectedSpans, TSelectedSpans} from 'types/SelectedSpans.types';
 import {TTest, TTestApiEndpointBuilder} from 'types/Test.types';
 import {TRawTestRun, TTestRun} from 'types/TestRun.types';
 import {TRawTestSpecs} from 'types/TestSpecs.types';
+import {TEnvironmentValue} from 'types/Environment.types';
 
 function getTotalCountFromHeaders(meta: any) {
   return Number(meta?.response?.headers.get('x-total-count') || 0);
 }
 
 const TestRunEndpoint = (builder: TTestApiEndpointBuilder) => ({
-  runTest: builder.mutation<TTestRun, {testId: string; environmentId?: string}>({
-    query: ({testId, environmentId}) => ({
+  runTest: builder.mutation<TTestRun, {testId: string; environmentId?: string; variables?: TEnvironmentValue[]}>({
+    query: ({testId, environmentId, variables = []}) => ({
       url: `/tests/${testId}/run`,
       method: HTTP_METHOD.POST,
       body: {
         environmentId,
+        variables,
       },
     }),
     invalidatesTags: (response, error, {testId}) => [

@@ -286,7 +286,11 @@ func (c *controller) RunTest(ctx context.Context, testID string, runInformation 
 	}
 
 	metadata := metadata(runInformation.Metadata)
-	environment, err := environment(ctx, c.testDB, runInformation.EnvironmentId)
+	variablesEnv := c.mappers.In.Environment(openapi.Environment{
+		Values: runInformation.Variables,
+	})
+
+	environment, err := environment(ctx, c.testDB, runInformation.EnvironmentId, variablesEnv)
 
 	if err != nil {
 		return handleDBError(err), err
@@ -534,18 +538,18 @@ func metadata(in *map[string]string) model.RunMetadata {
 	return model.RunMetadata(*in)
 }
 
-func environment(ctx context.Context, testDB model.Repository, environmentId string) (model.Environment, error) {
+func environment(ctx context.Context, testDB model.Repository, environmentId string, variablesEnv model.Environment) (model.Environment, error) {
 	if environmentId != "" {
 		environment, err := testDB.GetEnvironment(ctx, environmentId)
 
 		if err != nil {
-			return model.Environment{}, err
+			return variablesEnv, err
 		}
 
-		return environment, nil
+		return environment.Merge(variablesEnv), nil
 	}
 
-	return model.Environment{}, nil
+	return variablesEnv, nil
 }
 
 func (c *controller) executeTest(ctx context.Context, test model.Test, runInfo openapi.RunInformation) (openapi.ImplResponse, error) {
@@ -924,7 +928,10 @@ func (c *controller) RunTransaction(ctx context.Context, transactionID string, r
 	}
 
 	metadata := metadata(runInformation.Metadata)
-	environment, err := environment(ctx, c.testDB, runInformation.EnvironmentId)
+	variablesEnv := c.mappers.In.Environment(openapi.Environment{
+		Values: runInformation.Variables,
+	})
+	environment, err := environment(ctx, c.testDB, runInformation.EnvironmentId, variablesEnv)
 
 	if err != nil {
 		return handleDBError(err), err
@@ -1246,20 +1253,21 @@ func (c *controller) GetTestVariables(ctx context.Context, testId string, versio
 
 	executor := expression.NewExecutor()
 	variables := expression.NewVariables(environment, executor)
-	run := model.Run{}
+	initialEnvironment := model.Environment{}
 	if runId > 0 {
-		run, err = c.testDB.GetRun(ctx, test.ID, int(runId))
+		run, err := c.testDB.GetRun(ctx, test.ID, int(runId))
 		if err != nil {
 			return handleDBError(err), err
 		}
+		initialEnvironment = run.Environment
 	} else {
-		run, err = c.testDB.GetLatestRunByTestVersion(ctx, test.ID, test.Version)
-		if err != nil {
-			return handleDBError(err), err
+		run, err := c.testDB.GetLatestRunByTestVersion(ctx, test.ID, test.Version)
+		if err == nil {
+			initialEnvironment = run.Environment
 		}
 	}
 
-	testVariables, err := c.processTestVariables(ctx, test, run.Environment, variables)
+	testVariables, err := c.processTestVariables(ctx, test, initialEnvironment, variables)
 
 	if err != nil {
 		return openapi.Response(http.StatusInternalServerError, err.Error()), err
@@ -1290,21 +1298,23 @@ func (c *controller) GetTransactionVariables(ctx context.Context, transactionId 
 	variables := expression.NewVariables(environment, executor)
 
 	transactionVariables := make([]expression.TestVariables, len(transaction.Steps))
-	run := model.TransactionRun{}
+	initialEnvironment := model.Environment{}
 	if runId > 0 {
-		run, err = c.testDB.GetTransactionRun(ctx, transaction.ID, int(runId))
+		run, err := c.testDB.GetTransactionRun(ctx, transaction.ID, int(runId))
 		if err != nil {
 			return handleDBError(err), err
 		}
+
+		initialEnvironment = run.Environment
 	} else {
-		run, err = c.testDB.GetLatestRunByTransactionVersion(ctx, transaction.ID, transaction.Version)
-		if err != nil {
-			return handleDBError(err), err
+		run, err := c.testDB.GetLatestRunByTransactionVersion(ctx, transaction.ID, transaction.Version)
+		if err == nil {
+			initialEnvironment = run.Environment
 		}
 	}
 
 	for i, test := range transaction.Steps {
-		testVariables, err := c.processTestVariables(ctx, test, run.Environment, variables)
+		testVariables, err := c.processTestVariables(ctx, test, initialEnvironment, variables)
 		variables = variables.UpdateEnvironmentVariables(test)
 
 		if err != nil {
@@ -1340,7 +1350,7 @@ func (c *controller) processTestVariables(ctx context.Context, test model.Test, 
 		return expression.TestVariables{}, err
 	}
 
-	testVariables := variables.GetTestVariables(string(test.ID), environmentVariables, specVariables.Merge(triggerVariables).Merge(outputVariables), environment)
+	testVariables := variables.GetTestVariables(test, environmentVariables, specVariables.Merge(triggerVariables).Merge(outputVariables), environment)
 
 	return testVariables, nil
 }

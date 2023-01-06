@@ -5,8 +5,11 @@ import {TDraftTransaction, TTransaction} from 'types/Transaction.types';
 import {
   useDeleteTransactionByIdMutation,
   useEditTransactionMutation,
+  useLazyGetTransactionVariablesQuery,
   useRunTransactionMutation,
 } from 'redux/apis/TraceTest.api';
+import {TEnvironmentValue} from 'types/Environment.types';
+import {useMissingVariablesModal} from '../../MissingVariablesModal/MissingVariablesModal.provider';
 
 const useTransactionCrud = () => {
   const navigate = useNavigate();
@@ -14,24 +17,43 @@ const useTransactionCrud = () => {
   const [runTransactionAction, {isLoading: isLoadingRunTransaction}] = useRunTransactionMutation();
   const [deleteTransactionAction] = useDeleteTransactionByIdMutation();
   const isEditLoading = isTransactionEditLoading || isLoadingRunTransaction;
+  const [getTransactionVariables, {isLoading: isGetVariablesLoading}] = useLazyGetTransactionVariablesQuery();
   const {selectedEnvironment} = useEnvironment();
+  const {onOpen} = useMissingVariablesModal();
 
   const runTransaction = useCallback(
-    async (transactionId: string, environmentId = selectedEnvironment?.id) => {
-      const run = await runTransactionAction({transactionId, environmentId}).unwrap();
+    async (transaction: TTransaction, runId?: string, environmentId = selectedEnvironment?.id) => {
+      const transactionVariables = await getTransactionVariables({
+        transactionId: transaction.id,
+        version: transaction.version,
+        environmentId,
+        runId,
+      }).unwrap();
 
-      navigate(`/transaction/${transactionId}/run/${run.id}`);
+      const run = async (variables: TEnvironmentValue[] = []) => {
+        const {id} = await runTransactionAction({transactionId: transaction.id, environmentId, variables}).unwrap();
+
+        navigate(`/transaction/${transaction.id}/run/${id}`);
+      };
+
+      if (!transactionVariables.hasMissingVariables) run();
+      else
+        onOpen({
+          name: transaction.name,
+          testsVariables: transactionVariables.variables,
+          onSubmit(variables) {
+            run(variables);
+          },
+        });
     },
-    [navigate, runTransactionAction, selectedEnvironment?.id]
+    [getTransactionVariables, navigate, onOpen, runTransactionAction, selectedEnvironment?.id]
   );
 
   const edit = useCallback(
     async (transaction: TTransaction, draft: TDraftTransaction) => {
-      const {id: transactionId} = transaction;
+      await editTransaction({transactionId: transaction.id, transaction: draft}).unwrap();
 
-      await editTransaction({transactionId, transaction: draft}).unwrap();
-
-      runTransaction(transactionId);
+      runTransaction(transaction);
     },
     [editTransaction, runTransaction]
   );
@@ -50,6 +72,7 @@ const useTransactionCrud = () => {
     runTransaction,
     deleteTransaction,
     isEditLoading,
+    isGetVariablesLoading,
   };
 };
 

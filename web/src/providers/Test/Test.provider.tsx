@@ -8,7 +8,7 @@ import TestService from '../../services/Test.service';
 
 interface IContext {
   onEdit(values: TDraftTest): void;
-  onRun(): void;
+  onRun(runId?: string): void;
   isLoading: boolean;
   isError: boolean;
   test: TTest;
@@ -68,13 +68,16 @@ const TestProvider = ({children, testId, version = 0}: IProps) => {
     [edit, isLatestVersion, test]
   );
 
-  const onRun = useCallback(() => {
-    if (isLatestVersion) runTest(testId);
-    else {
-      setAction('run');
-      setIsVersionModalOpen(true);
-    }
-  }, [isLatestVersion, runTest, testId]);
+  const onRun = useCallback(
+    (runId?: string) => {
+      if (isLatestVersion) runTest(test!, runId);
+      else {
+        setAction('run');
+        setIsVersionModalOpen(true);
+      }
+    },
+    [isLatestVersion, runTest, test]
+  );
 
   const onConfirm = useCallback(() => {
     if (action === 'edit') edit(test!, draft);

@@ -416,7 +416,7 @@ func (td *postgresDB) GetRunByTraceID(ctx context.Context, traceID trace.TraceID
 }
 
 func (td *postgresDB) GetLatestRunByTestVersion(ctx context.Context, testID id.ID, version int) (model.Run, error) {
-	stmt, err := td.db.Prepare(selectRunQuery + " WHERE test_id = $1 AND test_version = $2 ORDER BY created_at LIMIT 1")
+	stmt, err := td.db.Prepare(selectRunQuery + " WHERE test_id = $1 AND test_version = $2 ORDER BY created_at DESC LIMIT 1")
 
 	if err != nil {
 		return model.Run{}, err

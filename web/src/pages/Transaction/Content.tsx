@@ -19,8 +19,8 @@ const Content = () => {
   useDocumentTitle(`${transaction.name}`);
 
   const handleRunTest = useCallback(async () => {
-    if (transaction.id) runTransaction(transaction.id);
-  }, [runTransaction, transaction.id]);
+    if (transaction.id) runTransaction(transaction);
+  }, [runTransaction, transaction]);
 
   return (
     <S.Container $isWhite>

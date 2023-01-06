@@ -336,7 +336,7 @@ func (m OpenAPI) Runs(in []model.Run) []openapi.TestRun {
 
 func (m OpenAPI) TestVariables(in expression.TestVariables) openapi.TestVariables {
 	return openapi.TestVariables{
-		TestId: in.TestId,
+		Test: m.Test(in.Test),
 		Variables: openapi.Variables{
 			Environment: in.Environment,
 			Variables:   in.Variables,

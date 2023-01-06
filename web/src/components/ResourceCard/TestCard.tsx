@@ -14,7 +14,7 @@ import useRuns from './useRuns';
 
 interface IProps {
   onDelete(id: string, name: string, type: ResourceType): void;
-  onRun(id: string, type: ResourceType): void;
+  onRun(test: TTest, type: ResourceType): void;
   onViewAll(id: string, type: ResourceType): void;
   test: TTest;
 }
@@ -49,7 +49,7 @@ const TestCard = ({onDelete, onRun, onViewAll, test}: IProps) => {
             data-cy={`test-run-button-${test.id}`}
             onClick={event => {
               event.stopPropagation();
-              onRun(test.id, ResourceType.Test);
+              onRun(test, ResourceType.Test);
             }}
           >
             Run

@@ -35,9 +35,9 @@ const Resources = () => {
   const {runTransaction} = useTransactionCrud();
 
   const handleOnRun = useCallback(
-    (id: string, type: ResourceType) => {
-      if (type === ResourceType.Test) runTest(id);
-      else if (type === ResourceType.Transaction) runTransaction(id);
+    (resource: TTransaction | TTest, type: ResourceType) => {
+      if (type === ResourceType.Test) runTest(resource as TTest);
+      else if (type === ResourceType.Transaction) runTransaction(resource as TTransaction);
     },
     [runTest, runTransaction]
   );

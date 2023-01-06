@@ -13,10 +13,17 @@ type RunInformation struct {
 	Metadata *map[string]string `json:"metadata,omitempty"`
 
 	EnvironmentId string `json:"environmentId,omitempty"`
+
+	Variables []EnvironmentValue `json:"variables,omitempty"`
 }
 
 // AssertRunInformationRequired checks if the required fields are not zero-ed
 func AssertRunInformationRequired(obj RunInformation) error {
+	for _, el := range obj.Variables {
+		if err := AssertEnvironmentValueRequired(el); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 

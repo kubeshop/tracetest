@@ -4,7 +4,7 @@ import Logo from 'assets/Logo.svg';
 import * as S from './Header.styled';
 import HeaderMenu from './HeaderMenu';
 import EnvironmentSelector from '../EnvironmentSelector';
-import NoTracingPopover from '../NoTracingPopover/NoTracingPopover';
+import NoTracingPopover from '../NoTracingPopover';
 
 interface IProps {
   hasEnvironments?: boolean;

@@ -16,7 +16,7 @@ interface IContext {
   isEditLoading: boolean;
   onDelete(id: string, name: string): void;
   onEdit(draft: TDraftTransaction): void;
-  onRun(): void;
+  onRun(runId?: string): void;
   transaction: TTransaction;
   latestTransaction: TTransaction;
 }
@@ -68,13 +68,13 @@ const TransactionProvider = ({children, transactionId, version = 0}: IProps) => 
   const {onOpen} = useConfirmationModal();
   const navigate = useNavigate();
 
-  const onRun = useCallback(() => {
-    if (isLatestVersion) runTransaction(transactionId);
+  const onRun = useCallback((runId?: string) => {
+    if (isLatestVersion) runTransaction(transaction!, runId);
     else {
       setAction('run');
       setIsVersionModalOpen(true);
     }
-  }, [isLatestVersion, runTransaction, transactionId]);
+  }, [isLatestVersion, runTransaction, transaction]);
 
   const onDelete = useCallback(
     (id: string, name: string) => {
