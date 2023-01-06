@@ -18,6 +18,8 @@ import {useGuidedTour} from 'providers/GuidedTour/GuidedTour.provider';
 import {useSpan} from 'providers/Span/Span.provider';
 import {useTestOutput} from 'providers/TestOutput/TestOutput.provider';
 import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
+import {useAppSelector} from 'redux/hooks';
+import {selectTestOutputs} from 'redux/testOutputs/selectors';
 import AssertionAnalyticsService from 'services/Analytics/AssertionAnalytics.service';
 import TestRunAnalytics from 'services/Analytics/TestRunAnalytics.service';
 import AssertionService from 'services/Assertion.service';
@@ -38,7 +40,8 @@ interface IProps {
 
 const RunDetailTest = ({run, testId}: IProps) => {
   const {selectedSpan, onSetFocusedSpan, onSelectSpan} = useSpan();
-  const {remove, revert, selectedTestSpec, setSelectedSpec, setSelectorSuggestions, setPrevSelector} = useTestSpecs();
+  const {remove, revert, selectedTestSpec, setSelectedSpec, setSelectorSuggestions, setPrevSelector, specs} =
+    useTestSpecs();
   const {isOpen: isTestSpecFormOpen, formProps, onSubmit, open, close} = useTestSpecForm();
   const {
     isEditing,
@@ -48,6 +51,7 @@ const RunDetailTest = ({run, testId}: IProps) => {
     onSubmit: onSubmitTestOutput,
     output,
   } = useTestOutput();
+  const outputs = useAppSelector(state => selectTestOutputs(state, testId, run.id));
   const [visualizationType, setVisualizationType] = useState(VisualizationType.Dag);
   const {
     state: {tourActive},
@@ -177,11 +181,25 @@ const RunDetailTest = ({run, testId}: IProps) => {
                     }
                     size="small"
                   >
-                    <Tabs.TabPane key={TABS.SPECS} tab="Test Specs">
+                    <Tabs.TabPane
+                      key={TABS.SPECS}
+                      tab={
+                        <>
+                          Test Specs <S.CountBadge count={specs.length} />
+                        </>
+                      }
+                    >
                       <TestResults onDelete={handleDelete} onEdit={handleEdit} onRevert={handleRevert} />
                     </Tabs.TabPane>
-                    <Tabs.TabPane key={TABS.OUTPUTS} tab="Test Outputs">
-                      <TestOutputs />
+                    <Tabs.TabPane
+                      key={TABS.OUTPUTS}
+                      tab={
+                        <>
+                          Test Outputs <S.CountBadge count={outputs.length} />
+                        </>
+                      }
+                    >
+                      <TestOutputs outputs={outputs} />
                     </Tabs.TabPane>
                   </Tabs>
 
