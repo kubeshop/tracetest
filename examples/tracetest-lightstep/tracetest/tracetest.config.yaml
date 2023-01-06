@@ -16,7 +16,7 @@ demo:
 experimentalFeatures: []
 
 googleAnalytics:
-  enabled: false
+  enabled: true
 
 telemetry:
   dataStores:
