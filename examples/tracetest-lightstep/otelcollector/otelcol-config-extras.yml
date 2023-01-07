@@ -1,12 +1,7 @@
-receivers:
-  otlp:
-    protocols:
-      grpc:
-      http:
+# extra settings to be merged into OpenTelemetry Collector configuration
+# do not delete this file
 
 processors:
-  batch:
-    timeout: 100ms
   # Funnel Tracetest trigger spans to Tracetest OTLP endpoint
   tail_sampling:
     decision_wait: 5s
@@ -16,8 +11,6 @@ processors:
         trace_state: { key: tracetest, values: ["true"] }
 
 exporters:
-  logging:
-    logLevel: debug
   # OTLP for Tracetest
   otlp/tt:
     endpoint: tracetest:21321 # Send traces to Tracetest. Read more in docs here:  https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
