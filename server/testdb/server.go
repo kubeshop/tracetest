@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/denisbrodbeck/machineid"
+	"github.com/teris-io/shortid"
 )
 
 func (td *postgresDB) ServerID() (string, bool, error) {
@@ -25,9 +25,9 @@ func (td *postgresDB) ServerID() (string, bool, error) {
 	// there is no ID, let's create a new one and register on database
 	isNew = true
 
-	id, err = generateUniqueServerID()
+	id, err = shortid.Generate()
 	if err != nil {
-		return id, isNew, fmt.Errorf("could not generate serverID: %w", err)
+		return id, isNew, fmt.Errorf("could not generate id: %w", err)
 	}
 
 	stmt, err := td.db.Prepare(`INSERT INTO "server" (id) VALUES ($1)`)
@@ -42,17 +42,4 @@ func (td *postgresDB) ServerID() (string, bool, error) {
 	}
 
 	return id, isNew, nil
-
-}
-
-func generateUniqueServerID() (string, error) {
-	id, err := machineid.ProtectedID("tracetest")
-
-	if err != nil {
-		return "", fmt.Errorf("could not get machineID: %w", err)
-	}
-
-	id = id[:10] // limit lenght to avoid issues with GA
-
-	return id, nil
 }
