@@ -99,6 +99,12 @@ func (a *App) Start() error {
 		return err
 	}
 
+	if os.Getenv("TRACETEST_DEV") != "" {
+		// non-empty TRACETEST_DEV variable means it's running by a dev
+		// and we should totally ignore analytics
+		a.config.GA.Enabled = false
+	}
+
 	err = analytics.Init(a.config.GA.Enabled, serverID, Version, Env)
 	if err != nil {
 		return err
