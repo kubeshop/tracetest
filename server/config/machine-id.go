@@ -10,7 +10,7 @@ import (
 
 func GetMachineID() string {
 	id := getMachineID()
-	if len(id) > 10 {
+	if len(id) >= 10 {
 		return id[:10] // limit lenght to avoid issues with GA
 	}
 

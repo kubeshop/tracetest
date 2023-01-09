@@ -11,7 +11,7 @@ func TestGetServerIDForFirstTime(t *testing.T) {
 	defer clean()
 
 	id, isNew, err := db.ServerID()
-	assert.Len(t, id, 9)
+	assert.Len(t, id, 10)
 	assert.True(t, isNew)
 	assert.NoError(t, err)
 }
@@ -21,12 +21,12 @@ func TestGetServerIDForSecondTime(t *testing.T) {
 	defer clean()
 
 	firstId, isNew, err := db.ServerID()
-	assert.Len(t, firstId, 9)
+	assert.Len(t, firstId, 10)
 	assert.True(t, isNew)
 	assert.NoError(t, err)
 
 	secondId, isNew, err := db.ServerID()
-	assert.Len(t, secondId, 9)
+	assert.Len(t, secondId, 10)
 	assert.False(t, isNew)
 	assert.NoError(t, err)
 
