@@ -45,8 +45,7 @@ COPY .goreleaser.yaml .
 RUN cd cli && make build
 
 FROM alpine AS release
-# Enable machine-id on alpine-linux (https://gitlab.alpinelinux.org/alpine/aports/-/issues/8761)
-RUN apk add dbus
+
 WORKDIR /app
 COPY --from=build-server /go/src/tracetest-server ./
 COPY --from=build-server /go/src/migrations/ ./migrations/
