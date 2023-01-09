@@ -26,7 +26,7 @@ interface IProps {
 
 const SpanDetail = ({onCreateTestSpec = noop, searchText, span}: IProps) => {
   const {open} = useTestSpecForm();
-  const {onNavigateAndOpenModal} = useTestOutput();
+  const {onNavigateAndOpen} = useTestOutput();
   const assertions = useAppSelector(state => TestSpecsSelectors.selectAssertionResultsBySpan(state, span?.id || ''));
   const [search, setSearch] = useState('');
   const semanticConventions = useGetOTELSemanticConventionAttributesInfo();
@@ -67,9 +67,9 @@ const SpanDetail = ({onCreateTestSpec = noop, searchText, span}: IProps) => {
         value: `attr:${key}`,
       });
 
-      onNavigateAndOpenModal(output);
+      onNavigateAndOpen(output);
     },
-    [onNavigateAndOpenModal, span]
+    [onNavigateAndOpen, span]
   );
 
   const handleOnSearch = useCallback((value: string) => {

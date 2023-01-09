@@ -7,6 +7,7 @@ import {TestState as TestStateEnum} from 'constants/TestRun.constants';
 import {useTest} from 'providers/Test/Test.provider';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
+import {useTestOutput} from 'providers/TestOutput/TestOutput.provider';
 import GuidedTourService, {GuidedTours} from '../../services/GuidedTour.service';
 import * as S from './RunDetailLayout.styled';
 
@@ -16,7 +17,9 @@ interface IProps {
 }
 
 const HeaderRight = ({testId, testVersion}: IProps) => {
-  const {isDraftMode} = useTestSpecs();
+  const {isDraftMode: isTestSpecsDraftMode} = useTestSpecs();
+  const {isDraftMode: isTestOutputsDraftMode} = useTestOutput();
+  const isDraftMode = isTestSpecsDraftMode || isTestOutputsDraftMode;
   const {run} = useTestRun();
   const {onRun} = useTest();
   const state = run.state;
