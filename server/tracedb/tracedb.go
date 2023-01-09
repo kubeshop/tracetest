@@ -68,7 +68,7 @@ func (f *traceDBFactory) New(ds model.DataStore) (tdb TraceDB, err error) {
 	case openapi.TEMPO:
 		tdb, err = newTempoDB(ds.Values.Tempo)
 	case openapi.OPEN_SEARCH:
-		tdb, err = newOpenSearchDB(ds.Values.OpenSearch)
+		tdb, err = newElasticSearchDB(ds.Values.OpenSearch)
 	case openapi.SIGNAL_FX:
 		tdb, err = newSignalFXDB(ds.Values.SignalFx)
 	case openapi.OTLP:

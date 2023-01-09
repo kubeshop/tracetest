@@ -64,11 +64,12 @@ type (
 	}
 
 	TracingBackendDataStoreConfig struct {
-		Type       string                        `yaml:",omitempty" mapstructure:"type"`
-		Jaeger     configgrpc.GRPCClientSettings `yaml:",omitempty" mapstructure:"jaeger"`
-		Tempo      configgrpc.GRPCClientSettings `yaml:",omitempty" mapstructure:"tempo"`
-		OpenSearch OpensearchDataStoreConfig     `yaml:",omitempty" mapstructure:"opensearch"`
-		SignalFX   SignalFXDataStoreConfig       `yaml:",omitempty" mapstructure:"signalfx"`
+		Type          string                        `yaml:",omitempty" mapstructure:"type"`
+		Jaeger        configgrpc.GRPCClientSettings `yaml:",omitempty" mapstructure:"jaeger"`
+		Tempo         configgrpc.GRPCClientSettings `yaml:",omitempty" mapstructure:"tempo"`
+		OpenSearch    OpensearchDataStoreConfig     `yaml:",omitempty" mapstructure:"opensearch"`
+		ElasticSearch OpensearchDataStoreConfig     `yaml:",omitempty" mapstructure:"elasticsearch"`
+		SignalFX      SignalFXDataStoreConfig       `yaml:",omitempty" mapstructure:"signalfx"`
 	}
 
 	TelemetryExporterOption struct {
