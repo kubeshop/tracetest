@@ -5,10 +5,10 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/denisbrodbeck/machineid"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/id"
 )
 
@@ -81,11 +81,7 @@ func (td *postgresDB) ServerID() (id string, isNew bool, err error) {
 
 	// no id, let's creat it
 	isNew = true
-	id, err = machineid.ProtectedID("tracetest")
-	if err != nil {
-		err = fmt.Errorf("could not get machineID: %w", err)
-		return
-	}
+	id = config.GetMachineID()
 	id = id[:10] // limit lenght to avoid issues with GA
 
 	stmt, err := td.db.Prepare(`INSERT INTO "server" (id) VALUES ($1)`)
