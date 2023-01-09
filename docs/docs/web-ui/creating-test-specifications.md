@@ -12,7 +12,7 @@ The **Add Test Spec** dialog opens.
 
 ![Create Test Spec](../img/create-test-spec-0.6.png)
 
-The span that the new test spec will apply to is hightlighted in the graph view on the left:
+The span that the new test spec will apply to is highlighted in the graph view on the left:
 
 ![Selected Span](../img/selected-span-0.6.png)
 

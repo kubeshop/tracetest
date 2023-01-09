@@ -195,6 +195,11 @@ const sidebars = {
         },
         {
           type: "doc",
+          id: "web-ui/creating-test-outputs",
+          label: "Creating Test Outputs",
+        },
+        {
+          type: "doc",
           id: "web-ui/test-results",
           label: "Test Results",
         },
