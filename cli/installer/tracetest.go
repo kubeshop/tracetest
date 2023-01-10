@@ -204,7 +204,7 @@ func dataStoreConfig(ui cliUI.UI, conf configuration) map[string]serverConfig.Tr
 	case "opensearch":
 		c = serverConfig.TracingBackendDataStoreConfig{
 			Type: dstype,
-			OpenSearch: serverConfig.OpensearchDataStoreConfig{
+			OpenSearch: serverConfig.ElasticSearchDataStoreConfig{
 				Addresses: strings.Split(conf.String("tracetest.backend.addresses"), ","),
 				Index:     conf.String("tracetest.backend.index"),
 			},
