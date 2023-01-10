@@ -1,6 +1,8 @@
-# OpenTelemetry Demo with Tracetest and New Relic
+# OpenTelemetry Demo with Tracetest and Lightstep
 
-This is a simple sample app on how to configure the [OpenTelemetry Demo](https://github.com/open-telemetry/opentelemetry-demo) to use [Tracetest](https://tracetest.io/) for enhancing your E2E and integration tests with trace-based testing, and [New Relic](https://newrelic.com/) as a trace data store.
+This examples uses OpenTelemetry Demo `v1.2.1`.
+
+This is a production-ready sample app on how to configure the [OpenTelemetry Demo](https://github.com/open-telemetry/opentelemetry-demo) to use [Tracetest](https://tracetest.io/) for enhancing your E2E and integration tests with trace-based testing, and [New Relic](https://newrelic.com/) as a trace data store.
 
 ## Prerequisites
 
@@ -8,18 +10,18 @@ You will need [Docker](https://docs.docker.com/get-docker/) and [Docker Compose]
 
 ## Project structure
 
-The project is built with Docker Compose. It contains two distinct `docker-compose.yaml` files.
+The project is built with Docker Compose. It contains a `docker-compose.yaml` file with 25 services.
 
 ### 1. OpenTelemetry Demo
 The `docker-compose.yaml` file and `.env` file in the root directory are for the OpenTelemetry Demo.
 
 ### 2. Tracetest & New Relic
-The `docker-compose.yaml` file, `collector.config.yaml`, and `tracetest.config.yaml` in the `tracetest` directory are for the setting up Tracetest and the OpenTelemetry Collector.
+At the bottom of the `docker-compose.yaml` file you'll see the Tracetest service. In the `./otelcollector/otelcol-config-extras.yml` you'll see the config for forwarding traces to both Tracetest and New Relic. The `./tracetest/tracetest.config.yaml` is for the setting up Tracetest and the OpenTelemetry Collector.
 
-The `tracetest` directory is self-contained and will run all the prerequisites for enabling OpenTelemetry traces and trace-based testing with Tracetest, as well as routing all traces the OpenTelemetry Demo generates to New Relic.
+The `tracetest` directory also contains an `e2e` directory with a `http-test.yaml` file which is a Tracetest test definition for running a test via the Tracetest CLI.
 
 ### Docker Compose Network
-All `services` in the `docker-compose.yaml` are on the same network and will be reachable by hostname from within other services. E.g. `tracetest:21321` in the `collector.config.yaml` will map to the `tracetest` service, where the port `21321` is the port where Tracetest accepts traces.
+All `services` in the `docker-compose.yaml` are on the same network and will be reachable by hostname from within other services. E.g. `tracetest:21321` in the `otelcol-config-extras.yml` will map to the `tracetest` service, where the port `21321` is the port where Tracetest accepts traces.
 
 ## OpenTelemetry Demo
 
@@ -27,54 +29,52 @@ The [OpenDelemetry Demo](https://github.com/open-telemetry/opentelemetry-demo) i
 
 Read more about the OpenTelemetry Demo [here](https://opentelemetry.io/blog/2022/announcing-opentelemetry-demo-release/).
 
-The `docker-compose.yaml` contains 12 services. View the file in its entirety [here](./docker-compose.yaml).
+The `docker-compose.yaml` contains 25 services. View the file in its entirety [here](./docker-compose.yaml).
 
 To start the OpenTelemetry Demo by itself, run this command:
 
 ```bash
-docker compose build # optional if you haven't already built the image
 docker compose up
 ```
 
-This will start the OpenTelemetry Demo. Open up `http://localhost:8084` to make sure it's working. But, you're not sending the traces anywhere.
+> Note: Building the images locally is currently not supported in this example app.
+
+This will start the OpenTelemetry Demo. Open up `http://localhost:8080` to make sure it's working. But, you're not sending the traces anywhere.
 
 Let's fix this by configuring Tracetest and OpenTelemetry Collector to forward trace data to both New Relic and Tracetest.
 
 ## Tracetest
 
-The `docker-compose.yaml` in the `tracetest` directory is configured with three services.
+At the bottom of the `docker-compose.yaml` you'll see a `# Tracetest` comment. There you'll see two configured services.
 
 - **Postgres** - Postgres is a prerequisite for Tracetest to work. It stores trace data when running the trace-based tests.
-- [**OpenTelemetry Collector**](https://opentelemetry.io/docs/collector/) - A vendor-agnostic implementation of how to receive, process and export telemetry data.
 - [**Tracetest**](https://tracetest.io/) - Trace-based testing that generates end-to-end tests automatically from traces.
 
+The `TRACETEST_SERVICE_PORT` is configured in the `.env` file
+
 ```yaml
-version: "3.2"
-services:
+# ...
+
   tracetest:
-    restart: unless-stopped
     image: kubeshop/tracetest:${TAG:-latest}
-    platform: linux/amd64
     ports:
-      - 11633:11633
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - "${TRACETEST_SERVICE_PORT}:${TRACETEST_SERVICE_PORT}"
     volumes:
-      - type: bind
-        source: ./tracetest/tracetest.config.yaml
-        target: /app/config.yaml
+      - ./tracetest/tracetest.config.yaml:/app/config.yaml
     healthcheck:
       test: ["CMD", "wget", "--spider", "localhost:11633"]
       interval: 1s
       timeout: 3s
       retries: 60
     depends_on:
-      postgres:
+      tt_postgres:
         condition: service_healthy
-      otel-collector:
+      otelcol:
         condition: service_started
+    logging: *logging
 
-  postgres:
+  # Postgres used by the Tracetest instance
+  tt_postgres:
     image: postgres
     environment:
       POSTGRES_PASSWORD: postgres
@@ -84,24 +84,10 @@ services:
       interval: 1s
       timeout: 5s
       retries: 60
-
-  otel-collector:
-    image: otel/opentelemetry-collector-contrib:0.68.0
-    restart: unless-stopped
-    command:
-      - "--config"
-      - "/otel-local-config.yaml"
-    volumes:
-      - ./tracetest/collector.config.yaml:/otel-local-config.yaml
+    logging: *logging
 ```
 
-Tracetest depends on both Postgres and the OpenTelemetry Collector. Both Tracetest and the OpenTelemetry Collector require config files to be loaded via a volume. The volumes are mapped from the root directory into the `tracetest` directory and the respective config files.
-
-**Why?** To start both the OpenTelemetry Demo and Tracetest we will run this command:
-
-```bash
-docker-compose -f docker-compose.yaml -f tracetest/docker-compose.yaml up # add --build if the images are not built already
-```
+Tracetest depends on both Postgres and the OpenTelemetry Collector. Tracetest requires a config file to be loaded via a volume. The volume is mapped from the root directory into the `tracetest` directory and the respective config file.
 
 The `tracetest.config.yaml` file contains the basic setup of connecting Tracetest to the Postgres instance, and defining the trace data store and exporter. The data store is set to OTLP meaning the traces will be stored in Tracetest itself. The exporter is set to the OpenTelemetry Collector.
 
@@ -109,25 +95,25 @@ The `tracetest.config.yaml` file contains the basic setup of connecting Tracetes
 # tracetest.config.yaml
 
 ---
-postgresConnString: "host=postgres user=postgres password=postgres port=5432 sslmode=disable"
+postgresConnString: "host=tt_postgres user=postgres password=postgres port=5432 sslmode=disable"
 
 poolingConfig:
   maxWaitTimeForTrace: 30s
   retryDelay: 500ms
 
-# This will populate sample tests in the Tracetest Web UI you can run to try out Tracetest.
+# This section will populate the Tracetest Web UI with sample tests for you to try out
 demo:
   enabled: [otel]
   endpoints:
-    otelFrontend: http://otel-frontend:8084
-    otelProductCatalog: otel-productcatalogservice:3550
-    otelCart: otel-cartservice:7070
-    otelCheckout: otel-checkoutservice:5050
+    otelFrontend: http://frontend:8080
+    otelProductCatalog: productcatalogservice:3550
+    otelCart: cartservice:7070
+    otelCheckout: checkoutservice:5050
 
 experimentalFeatures: []
 
 googleAnalytics:
-  enabled: false
+  enabled: true
 
 telemetry:
   dataStores:
@@ -141,7 +127,7 @@ telemetry:
       exporter:
         type: collector
         collector:
-          endpoint: otel-collector:4317
+          endpoint: otelcol:4317
 
 server:
   telemetry:
@@ -152,31 +138,17 @@ server:
 
 **How to send traces to Tracetest and New Relic?**
 
-The `collector.config.yaml` explains that. It receives traces via either `grpc` or `http`. Then, exports them to Tracetest's OTLP endpoint `tracetest:21321` in one pipeline, and to New Relic in another.
+The `otelcol-config-extras.yml` explains that. But first, check the `otelcol-config.yml`. It receives traces via either `grpc` or `http`. Then, in the `otelcol-config-extras.yml` you see a `exporters` that exports traces to Tracetest's OTLP endpoint `tracetest:21321` in one pipeline, and to New Relic in another.
 
-Make sure to add your New Relic ingest licence key in the headers of the `otlp/nr` exporter.
-You access the licence key in your New Relic account settings.
-
-![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1673009509/Blogposts/tracetest-new-relic-partnerships/screely-1673009504630_gko3up.png)
-
-You can find which ingest endpoint to use in the New Relic docs, [here](https://docs.newrelic.com/docs/more-integrations/open-source-telemetry-integrations/opentelemetry/opentelemetry-setup/#review-settings).
-
-![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1673009509/Blogposts/tracetest-new-relic-partnerships/screely-1673009504630_gko3up.png)
-
-Here's how to configure the OpenTelemetry Collector.
+Make sure to add your New Relic access token in the headers of the `otlp/nr` exporter.
 
 ```yaml
-# collector.config.yaml
+# otelcol-config-extras.yml
 
-receivers:
-  otlp:
-    protocols:
-      grpc:
-      http:
+# extra settings to be merged into OpenTelemetry Collector configuration
+# do not delete this file
 
 processors:
-  batch:
-    timeout: 100ms
   # Funnel Tracetest trigger spans to Tracetest OTLP endpoint
   tail_sampling:
     decision_wait: 5s
@@ -186,18 +158,15 @@ processors:
         trace_state: { key: tracetest, values: ["true"] }
 
 exporters:
-  logging:
-    logLevel: debug
   # OTLP for Tracetest
   otlp/tt:
-    endpoint: tracetest:21321 # Send traces to Tracetest. Read more in docs here: https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
+    endpoint: tracetest:21321 # Send traces to Tracetest. Read more in docs here:  https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
     tls:
       insecure: true
-  # OTLP for New Relic
   otlp/nr:
     endpoint: otlp.nr-data.net:443
     headers:
-      "api-key": "<new_relic_ingest_licence_key>" # Send traces to New Relic.
+      api-key: <new_relic_ingest_licence_key> # Send traces to New Relic.
       # Read more in docs here: https://docs.newrelic.com/docs/more-integrations/open-source-telemetry-integrations/opentelemetry/opentelemetry-setup/#collector-export
       # And here: https://docs.newrelic.com/docs/more-integrations/open-source-telemetry-integrations/opentelemetry/collector/opentelemetry-collector-basic/
 
@@ -207,25 +176,25 @@ service:
       receivers: [otlp]
       processors: [tail_sampling, batch]
       exporters: [otlp/tt]
-    traces/ls:
+    traces/nr:
       receivers: [otlp]
       processors: [batch]
       exporters: [logging, otlp/nr]
 ```
 
-**Important!** Take a closer look at the sampling configs in both the `collector.config.yaml` and `tracetest.config.yaml`. They both set sampling to 100%. This is crucial when running trace-based e2e and integration tests. Also, to use the `tail_sampling` processor, make sure to use the `contrib` version of the OpenTelemetry Collector.
+**Important!** To use the `tail_sampling` processor, make sure to use the `contrib` version of the OpenTelemetry Collector.
 
 ## Run the OpenTelemetry Demo with Tracetest and New Relic
 
 To start both the OpenTelemetry Demo and Tracetest we will run this command:
 
 ```bash
-docker-compose -f docker-compose.yaml -f tracetest/docker-compose.yaml up # add --build if the images are not built already
+docker-compose up
 ```
 
 This will start your Tracetest instance on `http://localhost:11633/`. Go ahead and open it up.
 
-[Start creating tests in the Web UI](https://docs.tracetest.io/web-ui/creating-tests)! Make sure to use the endpoints within your Docker network like `http://otel-frontend:8084/` when creating tests.
+[Start creating tests in the Web UI](https://docs.tracetest.io/web-ui/creating-tests)! Make sure to use the endpoints within your Docker network like `http://otel-frontend:8080/` when creating tests.
 
 This is because your OpenTelemetry Demo and Tracetest are in the same network.
 
@@ -254,7 +223,7 @@ tracetest configure --endpoint http://localhost:11633 --analytics
 
 Once configure, you can run a test against the Tracetest instance via the terminal.
 
-Check out the `http-test.yaml` file.
+Check out the `./tracetest/e2e/http-test.yaml` file.
 
 ```yaml
 # http-test.yaml
@@ -292,7 +261,7 @@ This file defines the a test the same way you would through the Web UI.
 To run the test, run this command in the terminal:
 
 ```bash
-tracetest test run -d ./http-test.yaml -w
+tracetest test run -d ./tracetest/e2e/http-test.yaml -w
 ```
 
 This test will fail just like the sample above due to the `attr:tracetest.span.duration  <  50ms` assertion.
