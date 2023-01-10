@@ -213,6 +213,11 @@ const sidebars = {
           id: "web-ui/exporting-tests",
           label: "Exporting Tests",
         },
+        {
+          type: "doc",
+          id: "web-ui/undefined-variables",
+          label: "Using Undefined Variables",
+        },
       ],
     },
     {
