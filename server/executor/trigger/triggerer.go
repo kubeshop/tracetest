@@ -20,6 +20,7 @@ type Triggerer interface {
 	Trigger(context.Context, model.Test, *TriggerOptions) (Response, error)
 	Type() model.TriggerType
 	Resolve(context.Context, model.Test, *TriggerOptions) (model.Test, error)
+	Variables(context.Context, model.Test, expression.Executor) (expression.VariablesMap, error)
 }
 
 type Response struct {

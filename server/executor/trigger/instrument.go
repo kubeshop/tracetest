@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/model"
 	"go.opentelemetry.io/contrib/propagators/aws/xray"
 	"go.opentelemetry.io/contrib/propagators/b3"
@@ -34,6 +35,10 @@ func (t *instrumentedTriggerer) Type() model.TriggerType {
 
 func (t *instrumentedTriggerer) Resolve(ctx context.Context, test model.Test, opts *TriggerOptions) (model.Test, error) {
 	return t.triggerer.Resolve(ctx, test, opts)
+}
+
+func (t *instrumentedTriggerer) Variables(ctx context.Context, test model.Test, executor expression.Executor) (expression.VariablesMap, error) {
+	return t.triggerer.Variables(ctx, test, executor)
 }
 
 func (t *instrumentedTriggerer) Trigger(ctx context.Context, test model.Test, opts *TriggerOptions) (Response, error) {

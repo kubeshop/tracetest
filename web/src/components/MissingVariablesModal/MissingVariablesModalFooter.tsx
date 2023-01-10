@@ -1,15 +1,13 @@
 import {Button} from 'antd';
-
-import * as S from './OutputModal.styled';
+import * as S from './MissingVariablesModal.styled';
 
 interface IProps {
-  isEditing: boolean;
   isValid: boolean;
   onCancel(): void;
   onSave(): void;
 }
 
-const OutputModalFooter = ({isEditing, isValid, onCancel, onSave}: IProps) => (
+const MissingVariablesModalFooter = ({isValid, onCancel, onSave}: IProps) => (
   <S.Footer>
     <span>
       <Button data-cy="output-modal-cancel-button" type="primary" ghost onClick={onCancel}>
@@ -18,10 +16,10 @@ const OutputModalFooter = ({isEditing, isValid, onCancel, onSave}: IProps) => (
     </span>
     <span>
       <Button htmlType="submit" data-cy="output-save-button" disabled={!isValid} type="primary" onClick={onSave}>
-        {isEditing ? 'Update' : 'Add'}
+        Run
       </Button>
     </span>
   </S.Footer>
 );
 
-export default OutputModalFooter;
+export default MissingVariablesModalFooter;

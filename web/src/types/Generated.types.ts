@@ -44,7 +44,7 @@ export interface paths {
     /** Delete a specific run from a particular transaction */
     delete: operations["deleteTransactionRun"];
   };
-  "/transactions/{transactionId}/variables": {
+  "/transactions/{transactionId}/version/{version}/variables": {
     /** get transaction variables */
     get: operations["getTransactionVariables"];
   };
@@ -110,7 +110,7 @@ export interface paths {
     /** Get the test definition as an YAML file */
     get: operations["getTestVersionDefinitionFile"];
   };
-  "/tests/{testId}/variables": {
+  "/tests/{testId}/version/{version}/variables": {
     /** get test variables */
     get: operations["getTestVariables"];
   };
@@ -423,16 +423,18 @@ export interface operations {
     parameters: {
       path: {
         transactionId: string;
+        version: number;
       };
       query: {
         environmentId?: string;
+        runId?: number;
       };
     };
     responses: {
       /** successful operation */
       200: {
         content: {
-          "application/json": external["variables.yaml"]["components"]["schemas"]["TransactionVariables"];
+          "application/json": external["variables.yaml"]["components"]["schemas"]["TestVariables"][];
         };
       };
       /** problem with getting the transaction variables */
@@ -780,9 +782,11 @@ export interface operations {
     parameters: {
       path: {
         testId: string;
+        version: number;
       };
       query: {
         environmentId?: string;
+        runId?: number;
       };
     };
     responses: {
@@ -1418,6 +1422,7 @@ export interface external {
         RunInformation: {
           metadata?: { [key: string]: string } | null;
           environmentId?: string;
+          variables?: external["environments.yaml"]["components"]["schemas"]["EnvironmentValue"][];
         };
         /** @example [object Object] */
         AssertionResults: {
@@ -1574,15 +1579,18 @@ export interface external {
     components: {
       schemas: {
         Variables: {
-          environment?: external["environments.yaml"]["components"]["schemas"]["EnvironmentValue"][];
+          environment?: string[];
           variables?: string[];
-          missing?: string[];
+          missing?: external["variables.yaml"]["components"]["schemas"]["MissingVariables"][];
         };
         TestVariables: {
-          testId?: string;
+          test?: external["tests.yaml"]["components"]["schemas"]["Test"];
           variables?: external["variables.yaml"]["components"]["schemas"]["Variables"];
         };
-        TransactionVariables: external["variables.yaml"]["components"]["schemas"]["TestVariables"][];
+        MissingVariables: {
+          key?: string;
+          defaultValue?: string;
+        };
       };
     };
     operations: {};

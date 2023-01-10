@@ -415,6 +415,21 @@ func (td *postgresDB) GetRunByTraceID(ctx context.Context, traceID trace.TraceID
 	return run, nil
 }
 
+func (td *postgresDB) GetLatestRunByTestVersion(ctx context.Context, testID id.ID, version int) (model.Run, error) {
+	stmt, err := td.db.Prepare(selectRunQuery + " WHERE test_id = $1 AND test_version = $2 ORDER BY created_at DESC LIMIT 1")
+
+	if err != nil {
+		return model.Run{}, err
+	}
+	defer stmt.Close()
+
+	run, err := readRunRow(stmt.QueryRowContext(ctx, testID.String(), version))
+	if err != nil {
+		return model.Run{}, fmt.Errorf("cannot read row: %w", err)
+	}
+	return run, nil
+}
+
 func (td *postgresDB) readRunRows(ctx context.Context, rows *sql.Rows) ([]model.Run, error) {
 	var runs []model.Run
 

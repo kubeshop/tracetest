@@ -3,8 +3,8 @@ import {Typography} from 'antd';
 import styled from 'styled-components';
 
 export const Container = styled.div<{$isDeleted: boolean}>`
-  background: ${({theme}) => theme.color.background};
-  border: 1px solid ${({theme}) => theme.color.borderLight};
+  background: ${({theme}) => theme.color.white};
+  border: ${({theme}) => `1px solid ${theme.color.border}`};
   display: flex;
   flex-direction: column;
   padding: 7px 16px;
@@ -27,7 +27,8 @@ export const OutputDetails = styled.div`
   align-items: center;
   display: grid;
   flex: 1;
-  grid-template-columns: 1fr 2fr 1fr 1fr;
+  grid-template-columns: 1fr 2fr 1fr;
+  margin-bottom: 8px;
 `;
 
 export const Value = styled(Typography.Text)`
@@ -51,17 +52,8 @@ export const ActionButton = styled(MoreOutlined)`
   font-size: ${({theme}) => theme.size.lg};
 `;
 
-export const ValueJson = styled(Typography.Text)`
-  cursor: pointer;
-
-  pre {
-    margin: 0;
-    background: ${({theme}) => theme.color.white};
-    border: ${({theme}) => `1px solid ${theme.color.borderLight}`};
-    font-size: ${({theme}) => theme.size.sm};
-  }
-`;
-
-export const ValueText = styled(Typography.Text)`
-  margin: 0;
+export const ActionsContainer = styled.div`
+  align-items: center;
+  display: flex;
+  justify-content: flex-end;
 `;

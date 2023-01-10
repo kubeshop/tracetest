@@ -10,6 +10,7 @@ import useRouterSync from 'hooks/useRouterSync';
 import ConfirmationModalProvider from 'providers/ConfirmationModal';
 import EnvironmentProvider from 'providers/Environment';
 import {useDataStoreConfig} from 'providers/DataStoreConfig/DataStoreConfig.provider';
+import MissingVariablesModalProvider from 'providers/MissingVariablesModal/MissingVariablesModal.provider';
 import {ConfigMode} from 'types/Config.types';
 import * as S from './Layout.styled';
 
@@ -49,50 +50,52 @@ const Layout = ({children, hasMenu = false}: IProps) => {
   const isNoTracingMode = dataStoreConfig.mode === ConfigMode.NO_TRACING_MODE;
 
   return (
-    <FileViewerModalProvider>
-      <ConfirmationModalProvider>
-        <EnvironmentProvider>
-          <S.Layout hasSider>
-            {hasMenu && (
-              <S.Sider width={256}>
-                <S.LogoContainer>
-                  <Link to="/">
-                    <img alt="Tracetest logo" src={logoAsset} />
-                  </Link>
-                </S.LogoContainer>
+    <MissingVariablesModalProvider>
+      <FileViewerModalProvider>
+        <ConfirmationModalProvider>
+          <EnvironmentProvider>
+            <S.Layout hasSider>
+              {hasMenu && (
+                <S.Sider width={256}>
+                  <S.LogoContainer>
+                    <Link to="/">
+                      <img alt="Tracetest logo" src={logoAsset} />
+                    </Link>
+                  </S.LogoContainer>
 
-                <S.SiderContent>
-                  <S.MenuContainer>
-                    <Menu
-                      defaultSelectedKeys={[menuItems.findIndex(value => value.path === pathname).toString() || '0']}
-                      items={menuItems}
-                      mode="inline"
-                      theme="dark"
-                    />
-                  </S.MenuContainer>
+                  <S.SiderContent>
+                    <S.MenuContainer>
+                      <Menu
+                        defaultSelectedKeys={[menuItems.findIndex(value => value.path === pathname).toString() || '0']}
+                        items={menuItems}
+                        mode="inline"
+                        theme="dark"
+                      />
+                    </S.MenuContainer>
 
-                  <S.MenuContainer>
-                    <Menu
-                      defaultSelectedKeys={[
-                        footerMenuItems.findIndex(value => value.path === pathname).toString() || '0',
-                      ]}
-                      items={footerMenuItems}
-                      mode="inline"
-                      theme="dark"
-                    />
-                  </S.MenuContainer>
-                </S.SiderContent>
-              </S.Sider>
-            )}
+                    <S.MenuContainer>
+                      <Menu
+                        defaultSelectedKeys={[
+                          footerMenuItems.findIndex(value => value.path === pathname).toString() || '0',
+                        ]}
+                        items={footerMenuItems}
+                        mode="inline"
+                        theme="dark"
+                      />
+                    </S.MenuContainer>
+                  </S.SiderContent>
+                </S.Sider>
+              )}
 
-            <S.Layout>
-              <Header hasEnvironments hasLogo={!hasMenu} isNoTracingMode={isNoTracingMode && !isLoading} />
-              <S.Content $hasMenu={hasMenu}>{children}</S.Content>
+              <S.Layout>
+                <Header hasEnvironments hasLogo={!hasMenu} isNoTracingMode={isNoTracingMode && !isLoading} />
+                <S.Content $hasMenu={hasMenu}>{children}</S.Content>
+              </S.Layout>
             </S.Layout>
-          </S.Layout>
-        </EnvironmentProvider>
-      </ConfirmationModalProvider>
-    </FileViewerModalProvider>
+          </EnvironmentProvider>
+        </ConfirmationModalProvider>
+      </FileViewerModalProvider>
+    </MissingVariablesModalProvider>
   );
 };
 

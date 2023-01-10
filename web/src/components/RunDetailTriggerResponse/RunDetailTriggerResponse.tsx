@@ -10,7 +10,6 @@ import {Steps} from '../GuidedTour/traceStepList';
 import ResponseBody from './ResponseBody';
 import ResponseEnvironment from './ResponseEnvironment';
 import ResponseHeaders from './ResponseHeaders';
-import ResponseOutputs from './ResponseOutputs';
 import * as S from './RunDetailTriggerResponse.styled';
 
 interface IProps {
@@ -22,7 +21,7 @@ interface IProps {
 const TabsKeys = {
   Body: 'body',
   Headers: 'headers',
-  Outputs: 'outputs',
+  Environment: 'environment',
 };
 
 const RunDetailTriggerResponse = ({
@@ -69,10 +68,7 @@ const RunDetailTriggerResponse = ({
           <Tabs.TabPane key={TabsKeys.Headers} tab="Headers">
             <ResponseHeaders headers={headers} />
           </Tabs.TabPane>
-          <Tabs.TabPane key={TabsKeys.Outputs} tab="Outputs">
-            <ResponseOutputs />
-          </Tabs.TabPane>
-          <Tabs.TabPane key="4" tab="Environment">
+          <Tabs.TabPane key={TabsKeys.Environment} tab="Environment">
             <ResponseEnvironment />
           </Tabs.TabPane>
         </Tabs>

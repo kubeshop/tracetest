@@ -2,78 +2,83 @@ import {noop} from 'lodash';
 import {createContext, useCallback, useContext, useEffect, useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 
-import OutputModal from 'components/OutputModal/OutputModal';
-import {useEditTestMutation, useReRunMutation} from 'redux/apis/TraceTest.api';
-import {useAppDispatch, useAppStore} from 'redux/hooks';
-import {selectTestOutputByIndex} from 'redux/testOutputs/selectors';
+import {useParseExpressionMutation} from 'redux/apis/TraceTest.api';
+import {useAppDispatch, useAppSelector} from 'redux/hooks';
+import {selectIsPending, selectTestOutputs} from 'redux/testOutputs/selectors';
 import {outputAdded, outputDeleted, outputsInitiated, outputsReverted, outputUpdated} from 'redux/testOutputs/slice';
-import TestService from 'services/Test.service';
 import {TTestOutput} from 'types/TestOutput.types';
 import {useConfirmationModal} from '../ConfirmationModal/ConfirmationModal.provider';
+import {useEnvironment} from '../Environment/Environment.provider';
 import {useTest} from '../Test/Test.provider';
 
 interface IContext {
-  onModalOpen(draft?: TTestOutput): void;
-  onModalOpenFromIndex(index: number): void;
-  onNavigateAndOpenModal(draft?: TTestOutput): void;
-  onCancel(): void;
-  onSave(outputs: TTestOutput[]): void;
-  onDelete(id: number): void;
+  isDraftMode: boolean;
+  isEditing: boolean;
   isLoading: boolean;
+  isOpen: boolean;
+  onCancel(): void;
+  onClose(): void;
+  onDelete(id: number): void;
+  onNavigateAndOpen(draft?: TTestOutput): void;
+  onOpen(draft?: TTestOutput): void;
+  onSubmit(values: TTestOutput): void;
+  output?: TTestOutput;
+  outputs: TTestOutput[];
 }
 
 export const Context = createContext<IContext>({
-  onModalOpen: noop,
-  onModalOpenFromIndex: noop,
-  onSave: noop,
-  onDelete: noop,
-  onCancel: noop,
-  onNavigateAndOpenModal: noop,
+  isDraftMode: false,
+  isEditing: false,
   isLoading: false,
+  isOpen: false,
+  onCancel: noop,
+  onClose: noop,
+  onDelete: noop,
+  onNavigateAndOpen: noop,
+  onOpen: noop,
+  onSubmit: noop,
+  output: undefined,
+  outputs: [],
 });
 
 interface IProps {
   children: React.ReactNode;
-  testId: string;
   runId: string;
+  testId: string;
 }
 
 export const useTestOutput = () => useContext(Context);
 
-const TestOutputProvider = ({children, testId, runId}: IProps) => {
-  const [draft, setDraft] = useState<TTestOutput>();
-  const [isOpen, setIsOpen] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
+const TestOutputProvider = ({children, runId, testId}: IProps) => {
   const dispatch = useAppDispatch();
-  const {getState} = useAppStore();
+  const [parseExpressionMutation, {isLoading}] = useParseExpressionMutation();
+  const [draft, setDraft] = useState<TTestOutput>();
+  const [isEditing, setIsEditing] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const {onOpen: onOpenConfirmationModal} = useConfirmationModal();
+  const navigate = useNavigate();
+  const {selectedEnvironment} = useEnvironment();
   const {
-    test,
     test: {outputs: testOutputs = []},
   } = useTest();
-  const [editTest, {isLoading}] = useEditTestMutation();
-  const [reRunTest, {isLoading: isLoadingReRun}] = useReRunMutation();
-  const {onOpen} = useConfirmationModal();
-  const navigate = useNavigate();
+  const outputs = useAppSelector(state => selectTestOutputs(state, testId, runId));
+  const isDraftMode = useAppSelector(selectIsPending);
 
   useEffect(() => {
     dispatch(outputsInitiated(testOutputs));
   }, [dispatch, testOutputs]);
 
-  const onModalOpen = useCallback((values?: TTestOutput) => {
+  const onOpen = useCallback((values?: TTestOutput) => {
     setDraft(values);
     setIsOpen(true);
+    const id = values?.id ?? -1;
+    setIsEditing(id !== -1);
   }, []);
 
-  const onModalOpenFromIndex = useCallback(
-    (index: number) => {
-      const values = selectTestOutputByIndex(getState(), index);
-
-      setDraft(values!);
-      setIsOpen(true);
-      setIsEditing(true);
-    },
-    [getState]
-  );
+  const onClose = useCallback(() => {
+    setDraft(undefined);
+    setIsOpen(false);
+  }, []);
 
   const onCancel = useCallback(() => {
     dispatch(outputsReverted());
@@ -81,75 +86,82 @@ const TestOutputProvider = ({children, testId, runId}: IProps) => {
 
   const onDelete = useCallback(
     (index: number) => {
-      onOpen({
+      onOpenConfirmationModal({
         title: `Are you sure you want to delete the output?`,
         onConfirm: () => {
           dispatch(outputDeleted(index));
         },
       });
     },
-    [dispatch, onOpen]
+    [dispatch, onOpenConfirmationModal]
   );
 
   const onSubmit = useCallback(
-    (values: TTestOutput) => {
+    async (values: TTestOutput, spanId?: string) => {
+      const props = {
+        expression: values.value,
+        context: {
+          testId,
+          runId,
+          spanId: spanId ?? '',
+          selector: values.selector,
+          environmentId: selectedEnvironment?.id,
+        },
+      };
+      const parsedExpression = await parseExpressionMutation(props).unwrap();
+      const valueRunDraft = parsedExpression?.[0] ?? '';
+
       setIsOpen(false);
       if (isEditing) {
         setIsEditing(false);
-        dispatch(outputUpdated({output: {...values, id: draft?.id ?? -1}}));
+        dispatch(outputUpdated({output: {...values, valueRunDraft, id: draft?.id ?? -1}}));
         return;
       }
-      dispatch(outputAdded(values));
+      dispatch(outputAdded({...values, valueRunDraft}));
     },
-    [dispatch, draft?.id, isEditing]
+    [dispatch, draft?.id, isEditing, parseExpressionMutation, runId, selectedEnvironment?.id, testId]
   );
 
-  const onSave = useCallback(
-    async (outputs: TTestOutput[]) => {
-      const rawTest = await TestService.getUpdatedRawTest(test, {outputs});
-      await editTest({test: rawTest, testId}).unwrap();
-      const run = await reRunTest({runId, testId}).unwrap();
-      navigate(`/test/${testId}/run/${run.id}/trigger`);
-    },
-    [editTest, navigate, reRunTest, runId, test, testId]
-  );
-
-  const onNavigateAndOpenModal = useCallback(
+  const onNavigateAndOpen = useCallback(
     async (values?: TTestOutput) => {
-      await navigate(`/test/${testId}/run/${runId}/trigger/?tab=outputs`);
-
-      onModalOpen(values);
+      await navigate(`/test/${testId}/run/${runId}/test/?tab=outputs`);
+      onOpen(values);
     },
-    [navigate, onModalOpen, runId, testId]
+    [navigate, onOpen, runId, testId]
   );
 
   const value = useMemo<IContext>(
     () => ({
-      onModalOpen,
-      onModalOpenFromIndex,
-      onDelete,
-      onSave,
+      isDraftMode,
+      isEditing,
+      isLoading,
+      isOpen,
       onCancel,
-      isLoading: isLoading || isLoadingReRun,
-      onNavigateAndOpenModal,
+      onClose,
+      onDelete,
+      onNavigateAndOpen,
+      onOpen,
+      onSubmit,
+      output: draft,
+      outputs,
     }),
-    [isLoading, isLoadingReRun, onCancel, onDelete, onModalOpen, onModalOpenFromIndex, onNavigateAndOpenModal, onSave]
+    [
+      draft,
+      isDraftMode,
+      isEditing,
+      isLoading,
+      isOpen,
+      onCancel,
+      onClose,
+      onDelete,
+      onNavigateAndOpen,
+      onOpen,
+      onSubmit,
+      outputs,
+    ]
   );
 
-  return (
-    <Context.Provider value={value}>
-      {children}
-      <OutputModal
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-        onSubmit={onSubmit}
-        runId={runId}
-        testId={testId}
-        output={draft}
-        isEditing={isEditing}
-      />
-    </Context.Provider>
-  );
+  return <Context.Provider value={value}>{children}</Context.Provider>;
 };
 
 export default TestOutputProvider;

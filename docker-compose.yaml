@@ -3,7 +3,6 @@ services:
   tracetest:
     restart: unless-stopped
     image: kubeshop/tracetest:latest
-    platform: linux/amd64
     extra_hosts:
       - "host.docker.internal:host-gateway"
     build:
@@ -27,6 +26,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    environment:
+      TRACETEST_DEV: ${TRACETEST_DEV}
 
   postgres:
     image: postgres

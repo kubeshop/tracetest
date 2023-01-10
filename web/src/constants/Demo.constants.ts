@@ -225,7 +225,7 @@ export const OtelDemo = {
           state: 'CA',
           country: 'United States',
           city: 'Mountain View',
-          zip_code: 94043,
+          zip_code: '94043',
         },
         email: 'someone@example.com',
         credit_card: {

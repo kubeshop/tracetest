@@ -9,6 +9,7 @@ function TestOutput({name = '', selector = {}, value = ''}: TRawTestOutput, id =
     selector: selector.query || '',
     value,
     valueRun: '',
+    valueRunDraft: '',
   };
 }
 

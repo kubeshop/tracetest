@@ -29,7 +29,6 @@ const Header = ({selectedSpan, totalFailedSpecs, totalPassedSpecs}: IProps) => {
   return (
     <S.HeaderContainer>
       <S.Row>
-        <S.HeaderText>Test Results</S.HeaderText>
         <div>
           {Boolean(totalPassedSpecs) && (
             <S.HeaderDetail>

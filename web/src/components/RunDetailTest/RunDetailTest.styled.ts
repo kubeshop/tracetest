@@ -1,3 +1,4 @@
+import {Badge} from 'antd';
 import styled from 'styled-components';
 
 export const Container = styled.div`
@@ -27,4 +28,21 @@ export const SwitchContainer = styled.div`
   left: 16px;
   position: absolute;
   z-index: 9;
+`;
+
+export const TabsContainer = styled.div`
+  height: 100%;
+  padding: 24px;
+  position: relative;
+
+  .ant-tabs-small > .ant-tabs-nav .ant-tabs-tab {
+    padding: 0 0 8px;
+  }
+`;
+
+export const CountBadge = styled(Badge)`
+  .ant-badge-count {
+    background-color: ${({theme}) => theme.color.backgroundDark};
+    color: ${({theme}) => theme.color.text};
+  }
 `;

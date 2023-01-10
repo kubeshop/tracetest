@@ -16,8 +16,9 @@ import (
 
 // RunInformation struct for RunInformation
 type RunInformation struct {
-	Metadata      map[string]string `json:"metadata,omitempty"`
-	EnvironmentId *string           `json:"environmentId,omitempty"`
+	Metadata      map[string]string  `json:"metadata,omitempty"`
+	EnvironmentId *string            `json:"environmentId,omitempty"`
+	Variables     []EnvironmentValue `json:"variables,omitempty"`
 }
 
 // NewRunInformation instantiates a new RunInformation object
@@ -102,6 +103,38 @@ func (o *RunInformation) SetEnvironmentId(v string) {
 	o.EnvironmentId = &v
 }
 
+// GetVariables returns the Variables field value if set, zero value otherwise.
+func (o *RunInformation) GetVariables() []EnvironmentValue {
+	if o == nil || o.Variables == nil {
+		var ret []EnvironmentValue
+		return ret
+	}
+	return o.Variables
+}
+
+// GetVariablesOk returns a tuple with the Variables field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *RunInformation) GetVariablesOk() ([]EnvironmentValue, bool) {
+	if o == nil || o.Variables == nil {
+		return nil, false
+	}
+	return o.Variables, true
+}
+
+// HasVariables returns a boolean if a field has been set.
+func (o *RunInformation) HasVariables() bool {
+	if o != nil && o.Variables != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetVariables gets a reference to the given []EnvironmentValue and assigns it to the Variables field.
+func (o *RunInformation) SetVariables(v []EnvironmentValue) {
+	o.Variables = v
+}
+
 func (o RunInformation) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.Metadata != nil {
@@ -109,6 +142,9 @@ func (o RunInformation) MarshalJSON() ([]byte, error) {
 	}
 	if o.EnvironmentId != nil {
 		toSerialize["environmentId"] = o.EnvironmentId
+	}
+	if o.Variables != nil {
+		toSerialize["variables"] = o.Variables
 	}
 	return json.Marshal(toSerialize)
 }
