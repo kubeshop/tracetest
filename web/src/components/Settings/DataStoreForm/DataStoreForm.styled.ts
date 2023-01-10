@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import {SupportedDataStores} from 'types/Config.types';
 import Jaeger from 'assets/jaeger.svg';
 import OpenSearch from 'assets/openSearch.svg';
+import ElasticSearch from 'assets/elastic.svg';
 import SignalFx from 'assets/signalFx.svg';
 import Tempo from 'assets/tempo.svg';
 import OtelCollector from 'assets/otlp.svg';
@@ -61,8 +62,7 @@ const dataStoreIconMap = {
   [SupportedDataStores.SignalFX]: SignalFx,
   [SupportedDataStores.TEMPO]: Tempo,
   [SupportedDataStores.OtelCollector]: OtelCollector,
-  // todo: change this for the elastic apm logo
-  [SupportedDataStores.ElasticApm]: OpenSearch,
+  [SupportedDataStores.ElasticApm]: ElasticSearch,
 };
 
 export const DataStoreIcon = styled.img.attrs<{$dataStore: SupportedDataStores}>(({$dataStore}) => ({
