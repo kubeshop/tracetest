@@ -1,0 +1,29 @@
+type: Test
+spec:
+  id: YJmFC7hVg
+  name: OpenTelemetry Demo - List Products
+  description: OpenTelemetry Demo - List Products
+  trigger:
+    type: http
+    httpRequest:
+      url: http://frontend:8080/api/products
+      method: GET
+      headers:
+      - key: Content-Type
+        value: application/json
+  specs:
+  - selector: span[tracetest.span.type="rpc" name="grpc.hipstershop.ProductCatalogService/ListProducts"]
+    assertions:
+    - attr:rpc.grpc.status_code = 0
+  - selector: span[tracetest.span.type="rpc" name="hipstershop.ProductCatalogService/ListProducts"
+      rpc.system="grpc" rpc.method="ListProducts" rpc.service="hipstershop.ProductCatalogService"]
+    assertions:
+    - attr:rpc.grpc.status_code = 0
+  - selector: span[tracetest.span.type="general" name="Tracetest trigger"]
+    assertions:
+    - attr:tracetest.response.status  =  200
+    - attr:tracetest.span.duration < 50ms
+  - selector: span[tracetest.span.type="http" name="HTTP GET" http.target="/api/products"
+      http.method="GET"]
+    assertions:
+    - attr:tracetest.span.duration < 50ms

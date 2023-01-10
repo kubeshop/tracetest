@@ -13,7 +13,7 @@ The project is built with Docker Compose. It contains two distinct `docker-compo
 ### 1. OpenTelemetry Demo
 The `docker-compose.yaml` file and `.env` file in the root directory are for the OpenTelemetry Demo.
 
-### 2. Tracetest
+### 2. Tracetest & New Relic
 The `docker-compose.yaml` file, `collector.config.yaml`, and `tracetest.config.yaml` in the `tracetest` directory are for the setting up Tracetest and the OpenTelemetry Collector.
 
 The `tracetest` directory is self-contained and will run all the prerequisites for enabling OpenTelemetry traces and trace-based testing with Tracetest, as well as routing all traces the OpenTelemetry Demo generates to New Relic.
@@ -215,9 +215,9 @@ service:
 
 **Important!** Take a closer look at the sampling configs in both the `collector.config.yaml` and `tracetest.config.yaml`. They both set sampling to 100%. This is crucial when running trace-based e2e and integration tests. Also, to use the `tail_sampling` processor, make sure to use the `contrib` version of the OpenTelemetry Collector.
 
-## Run both the OpenTelemetry Demo app and Tracetest
+## Run the OpenTelemetry Demo with Tracetest and New Relic
 
-To start both the OpenTelemetry and Tracetest we will run this command:
+To start both the OpenTelemetry Demo and Tracetest we will run this command:
 
 ```bash
 docker-compose -f docker-compose.yaml -f tracetest/docker-compose.yaml up # add --build if the images are not built already

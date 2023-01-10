@@ -23,7 +23,8 @@ type DataStore struct {
 	IsDefault  *bool               `json:"isDefault,omitempty"`
 	Jaeger     *GRPCClientSettings `json:"jaeger,omitempty"`
 	Tempo      *GRPCClientSettings `json:"tempo,omitempty"`
-	OpenSearch *OpenSearch         `json:"openSearch,omitempty"`
+	OpenSearch *ElasticSearch      `json:"openSearch,omitempty"`
+	ElasticApm *ElasticSearch      `json:"elasticApm,omitempty"`
 	SignalFx   *SignalFX           `json:"signalFx,omitempty"`
 	CreatedAt  *time.Time          `json:"createdAt,omitempty"`
 }
@@ -224,9 +225,9 @@ func (o *DataStore) SetTempo(v GRPCClientSettings) {
 }
 
 // GetOpenSearch returns the OpenSearch field value if set, zero value otherwise.
-func (o *DataStore) GetOpenSearch() OpenSearch {
+func (o *DataStore) GetOpenSearch() ElasticSearch {
 	if o == nil || o.OpenSearch == nil {
-		var ret OpenSearch
+		var ret ElasticSearch
 		return ret
 	}
 	return *o.OpenSearch
@@ -234,7 +235,7 @@ func (o *DataStore) GetOpenSearch() OpenSearch {
 
 // GetOpenSearchOk returns a tuple with the OpenSearch field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *DataStore) GetOpenSearchOk() (*OpenSearch, bool) {
+func (o *DataStore) GetOpenSearchOk() (*ElasticSearch, bool) {
 	if o == nil || o.OpenSearch == nil {
 		return nil, false
 	}
@@ -250,9 +251,41 @@ func (o *DataStore) HasOpenSearch() bool {
 	return false
 }
 
-// SetOpenSearch gets a reference to the given OpenSearch and assigns it to the OpenSearch field.
-func (o *DataStore) SetOpenSearch(v OpenSearch) {
+// SetOpenSearch gets a reference to the given ElasticSearch and assigns it to the OpenSearch field.
+func (o *DataStore) SetOpenSearch(v ElasticSearch) {
 	o.OpenSearch = &v
+}
+
+// GetElasticApm returns the ElasticApm field value if set, zero value otherwise.
+func (o *DataStore) GetElasticApm() ElasticSearch {
+	if o == nil || o.ElasticApm == nil {
+		var ret ElasticSearch
+		return ret
+	}
+	return *o.ElasticApm
+}
+
+// GetElasticApmOk returns a tuple with the ElasticApm field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *DataStore) GetElasticApmOk() (*ElasticSearch, bool) {
+	if o == nil || o.ElasticApm == nil {
+		return nil, false
+	}
+	return o.ElasticApm, true
+}
+
+// HasElasticApm returns a boolean if a field has been set.
+func (o *DataStore) HasElasticApm() bool {
+	if o != nil && o.ElasticApm != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetElasticApm gets a reference to the given ElasticSearch and assigns it to the ElasticApm field.
+func (o *DataStore) SetElasticApm(v ElasticSearch) {
+	o.ElasticApm = &v
 }
 
 // GetSignalFx returns the SignalFx field value if set, zero value otherwise.
@@ -341,6 +374,9 @@ func (o DataStore) MarshalJSON() ([]byte, error) {
 	}
 	if o.OpenSearch != nil {
 		toSerialize["openSearch"] = o.OpenSearch
+	}
+	if o.ElasticApm != nil {
+		toSerialize["elasticApm"] = o.ElasticApm
 	}
 	if o.SignalFx != nil {
 		toSerialize["signalFx"] = o.SignalFx

@@ -1,5 +1,7 @@
 # OpenTelemetry Demo with Tracetest and Lightstep
 
+This examples uses OpenTelemetry Demo `v0.3.4-alpha`.
+
 This is a simple sample app on how to configure the [OpenTelemetry Demo](https://github.com/open-telemetry/opentelemetry-demo) to use [Tracetest](https://tracetest.io/) for enhancing your E2E and integration tests with trace-based testing, and [Lightstep](https://lightstep.com/) as a trace data store.
 
 ## Prerequisites

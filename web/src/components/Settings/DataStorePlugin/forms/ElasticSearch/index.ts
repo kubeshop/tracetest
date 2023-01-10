@@ -1,2 +1,2 @@
 // eslint-disable-next-line no-restricted-exports
-export {default} from './OpenSearch';
+export {default} from './ElasticSearch';

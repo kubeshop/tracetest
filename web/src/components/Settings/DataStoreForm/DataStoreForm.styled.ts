@@ -61,6 +61,8 @@ const dataStoreIconMap = {
   [SupportedDataStores.SignalFX]: SignalFx,
   [SupportedDataStores.TEMPO]: Tempo,
   [SupportedDataStores.OtelCollector]: OtelCollector,
+  // todo: change this for the elastic apm logo
+  [SupportedDataStores.ElasticApm]: OpenSearch,
 };
 
 export const DataStoreIcon = styled.img.attrs<{$dataStore: SupportedDataStores}>(({$dataStore}) => ({

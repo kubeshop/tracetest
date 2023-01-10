@@ -1,6 +1,6 @@
 import {SupportedDataStores, TDataStore, TDataStoreConfig, TDraftDataStore, TRawDataStore} from 'types/Config.types';
 import GrpcClientService from './DataStores/GrpcClient.service';
-import OpenSearchService from './DataStores/OpenSearch.service';
+import ElasticSearchService from './DataStores/ElasticSearch.service';
 import OtelCollectorService from './DataStores/OtelCollector.service';
 import SignalFxService from './DataStores/SignalFx.service';
 
@@ -13,7 +13,8 @@ interface IDataStoreService {
 const dataStoreServiceMap = {
   [SupportedDataStores.JAEGER]: GrpcClientService,
   [SupportedDataStores.TEMPO]: GrpcClientService,
-  [SupportedDataStores.OpenSearch]: OpenSearchService,
+  [SupportedDataStores.OpenSearch]: ElasticSearchService,
+  [SupportedDataStores.ElasticApm]: ElasticSearchService,
   [SupportedDataStores.SignalFX]: SignalFxService,
   [SupportedDataStores.OtelCollector]: OtelCollectorService,
 } as const;

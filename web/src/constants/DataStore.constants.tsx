@@ -6,11 +6,13 @@ export const SupportedDataStoresToName = {
   [SupportedDataStores.SignalFX]: 'SignalFX',
   [SupportedDataStores.TEMPO]: 'Tempo',
   [SupportedDataStores.OtelCollector]: 'OpenTelemetry',
+  [SupportedDataStores.ElasticApm]: 'Elastic APM',
 } as const;
 
 export const SupportedDataStoresToDocsLink = {
   [SupportedDataStores.JAEGER]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/jaeger',
   [SupportedDataStores.OpenSearch]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/opensearch',
+  [SupportedDataStores.ElasticApm]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/elasticapm',
   [SupportedDataStores.SignalFX]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/signalfx',
   [SupportedDataStores.TEMPO]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/tempo',
   [SupportedDataStores.OtelCollector]:

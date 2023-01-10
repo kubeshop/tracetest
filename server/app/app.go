@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/gorilla/handlers"
@@ -96,6 +97,12 @@ func (a *App) Start() error {
 	serverID, isNewInstall, err := testDB.ServerID()
 	if err != nil {
 		return err
+	}
+
+	if os.Getenv("TRACETEST_DEV") != "" {
+		// non-empty TRACETEST_DEV variable means it's running by a dev
+		// and we should totally ignore analytics
+		a.config.GA.Enabled = false
 	}
 
 	err = analytics.Init(a.config.GA.Enabled, serverID, Version, Env)
