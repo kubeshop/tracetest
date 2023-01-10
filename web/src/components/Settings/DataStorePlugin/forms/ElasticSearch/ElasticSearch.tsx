@@ -1,11 +1,13 @@
 import {Col, Form, Input, Row} from 'antd';
-import {SupportedDataStores} from 'types/Config.types';
+import {SupportedDataStores, TDraftDataStore} from 'types/Config.types';
 import RequestDetailsFileInput from '../../../../CreateTestPlugins/Grpc/steps/RequestDetails/RequestDetailsFileInput';
 import * as S from '../../DataStorePluginForm.styled';
 import AddressesList from './AddressesList';
 
 const OpenSearch = () => {
-  const baseName = ['dataStore', SupportedDataStores.OpenSearch];
+  const form = Form.useFormInstance<TDraftDataStore>();
+  const dataStoreType = Form.useWatch('dataStoreType', form) || SupportedDataStores.OpenSearch;
+  const baseName = ['dataStore', dataStoreType];
 
   return (
     <>
@@ -42,7 +44,7 @@ const OpenSearch = () => {
 
       <Row gutter={[16, 16]}>
         <Col span={12}>
-          <Form.Item label="Upload CA file" name="certificateFile" required={false}>
+          <Form.Item label="Upload CA file" name={[...baseName, 'certificateFile']}>
             <RequestDetailsFileInput accept="" />
           </Form.Item>
         </Col>
