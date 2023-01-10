@@ -149,13 +149,8 @@ Make sure to add your New Relic access token in the headers of the `otlp/nr` exp
 # do not delete this file
 
 processors:
-  # Funnel Tracetest trigger spans to Tracetest OTLP endpoint
-  tail_sampling:
-    decision_wait: 5s
-    policies:
-      - name: tracetest-spans
-        type: trace_state
-        trace_state: { key: tracetest, values: ["true"] }
+  batch:
+    timeout: 100ms
 
 exporters:
   # OTLP for Tracetest
@@ -174,15 +169,13 @@ service:
   pipelines:
     traces/tt:
       receivers: [otlp]
-      processors: [tail_sampling, batch]
+      processors: [batch]
       exporters: [otlp/tt]
     traces/nr:
       receivers: [otlp]
       processors: [batch]
       exporters: [logging, otlp/nr]
 ```
-
-**Important!** To use the `tail_sampling` processor, make sure to use the `contrib` version of the OpenTelemetry Collector.
 
 ## Run the OpenTelemetry Demo with Tracetest and New Relic
 
