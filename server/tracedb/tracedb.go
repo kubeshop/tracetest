@@ -67,10 +67,10 @@ func (f *traceDBFactory) New(ds model.DataStore) (tdb TraceDB, err error) {
 		tdb, err = newJaegerDB(ds.Values.Jaeger)
 	case openapi.TEMPO:
 		tdb, err = newTempoDB(ds.Values.Tempo)
-	// change this to return the specific elastic apm client
 	case openapi.ELASTIC_APM:
+		tdb, err = newElasticSearchDB(ds.Values.ElasticApm)
 	case openapi.OPEN_SEARCH:
-		tdb, err = newElasticSearchDB(ds.Values.OpenSearch)
+		tdb, err = newOpenSearchDB(ds.Values.OpenSearch)
 	case openapi.SIGNAL_FX:
 		tdb, err = newSignalFXDB(ds.Values.SignalFx)
 	case openapi.OTLP:

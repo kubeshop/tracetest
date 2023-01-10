@@ -19,7 +19,7 @@ import (
 
 type elasticsearchDB struct {
 	realTraceDB
-	config *config.OpensearchDataStoreConfig
+	config *config.ElasticSearchDataStoreConfig
 	client *elasticsearch.Client
 }
 
@@ -126,14 +126,14 @@ func (db elasticsearchDB) GetTraceByID(ctx context.Context, traceID string) (mod
 	return convertElasticSearchFormatIntoTrace(traceID, searchResponse), nil
 }
 
-func newElasticSearchDB(cfg *config.OpensearchDataStoreConfig) (TraceDB, error) {
-	cert := []byte("-----BEGIN CERTIFICATE-----\nMIIDSTCCAjGgAwIBAgIUKQkpbNBMH8ksjT5bX3Nc1bacRN4wDQYJKoZIhvcNAQEL\nBQAwNDEyMDAGA1UEAxMpRWxhc3RpYyBDZXJ0aWZpY2F0ZSBUb29sIEF1dG9nZW5l\ncmF0ZWQgQ0EwHhcNMjMwMTA5MTYzNjIwWhcNMjYwMTA4MTYzNjIwWjA0MTIwMAYD\nVQQDEylFbGFzdGljIENlcnRpZmljYXRlIFRvb2wgQXV0b2dlbmVyYXRlZCBDQTCC\nASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALh+5UdAvvNLBCETcSRRLUxV\nDtzkGEwZC1D5srK0yhyZLAO3+3uVYTazmrRAyBPtJ4IJ+WEmThp0DRuAcml3VtRC\nUvAmH0nRcpPd1D+X129xrn/pBZ2BNp3KDkY2+nKPXLHMaiTna+30jqSjShskLz6U\nrGzxJAJ9SCOAUPFajGearD3jSVYUxTshQ/k9Vvdb/2+968DqYBAFQIQlKYoajrn6\nun7ukUbGDcG3fvY+QijA3SGbAf+UIrTGV+BrYNVl6+ox9oVzNe0NM7iApqpFV1xC\niFf2APA0w0NM7uRR+rC6lhdhyBA7sY0PbN5GQdiLu31ZBMa9qXu8N22WMa9tiucC\nAwEAAaNTMFEwHQYDVR0OBBYEFFyiZYCC/d2ea7AnIk7F2NjUwVYKMB8GA1UdIwQY\nMBaAFFyiZYCC/d2ea7AnIk7F2NjUwVYKMA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZI\nhvcNAQELBQADggEBAH3yYfb3SHzKig8KsWFEPifNQbqIHQHsEZOkScgdEErAuR/T\nrOkdKVju/O2ieh7ruwXYNOMttH9q735lFURJ0QuxNFqXf2L/05mWO5t3D9QCPv+2\nT1IhSX2+8sNAea5XAUPCWq7jq8IHbqIVgw6hABhXZe9hAjHgJIF1C2WNXiiYxrKr\nAYGjfPz575VDl6RyV/iISuBKr2trNM6V/mDqF4VwMyN00nNWWZMfhmhYR3HBBWhr\nhO7HLs5Tii5TnMjwGdl/zXmz7ASOpx0Nu0CrjxgBANhZQS1PkPd7t5zAntyjjvns\ndtnhPPVibWotnW47bJocEcW4Y62/TdBDW1ozhkY=\n-----END CERTIFICATE-----")
+func newElasticSearchDB(cfg *config.ElasticSearchDataStoreConfig) (TraceDB, error) {
+	// cert := []byte("-----BEGIN CERTIFICATE-----\nMIIDSTCCAjGgAwIBAgIUKQkpbNBMH8ksjT5bX3Nc1bacRN4wDQYJKoZIhvcNAQEL\nBQAwNDEyMDAGA1UEAxMpRWxhc3RpYyBDZXJ0aWZpY2F0ZSBUb29sIEF1dG9nZW5l\ncmF0ZWQgQ0EwHhcNMjMwMTA5MTYzNjIwWhcNMjYwMTA4MTYzNjIwWjA0MTIwMAYD\nVQQDEylFbGFzdGljIENlcnRpZmljYXRlIFRvb2wgQXV0b2dlbmVyYXRlZCBDQTCC\nASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALh+5UdAvvNLBCETcSRRLUxV\nDtzkGEwZC1D5srK0yhyZLAO3+3uVYTazmrRAyBPtJ4IJ+WEmThp0DRuAcml3VtRC\nUvAmH0nRcpPd1D+X129xrn/pBZ2BNp3KDkY2+nKPXLHMaiTna+30jqSjShskLz6U\nrGzxJAJ9SCOAUPFajGearD3jSVYUxTshQ/k9Vvdb/2+968DqYBAFQIQlKYoajrn6\nun7ukUbGDcG3fvY+QijA3SGbAf+UIrTGV+BrYNVl6+ox9oVzNe0NM7iApqpFV1xC\niFf2APA0w0NM7uRR+rC6lhdhyBA7sY0PbN5GQdiLu31ZBMa9qXu8N22WMa9tiucC\nAwEAAaNTMFEwHQYDVR0OBBYEFFyiZYCC/d2ea7AnIk7F2NjUwVYKMB8GA1UdIwQY\nMBaAFFyiZYCC/d2ea7AnIk7F2NjUwVYKMA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZI\nhvcNAQELBQADggEBAH3yYfb3SHzKig8KsWFEPifNQbqIHQHsEZOkScgdEErAuR/T\nrOkdKVju/O2ieh7ruwXYNOMttH9q735lFURJ0QuxNFqXf2L/05mWO5t3D9QCPv+2\nT1IhSX2+8sNAea5XAUPCWq7jq8IHbqIVgw6hABhXZe9hAjHgJIF1C2WNXiiYxrKr\nAYGjfPz575VDl6RyV/iISuBKr2trNM6V/mDqF4VwMyN00nNWWZMfhmhYR3HBBWhr\nhO7HLs5Tii5TnMjwGdl/zXmz7ASOpx0Nu0CrjxgBANhZQS1PkPd7t5zAntyjjvns\ndtnhPPVibWotnW47bJocEcW4Y62/TdBDW1ozhkY=\n-----END CERTIFICATE-----")
 
 	client, err := elasticsearch.NewClient(elasticsearch.Config{
 		Addresses: cfg.Addresses,
 		Username:  cfg.Username,
 		Password:  cfg.Password,
-		CACert:    cert,
+		CACert:    []byte(cfg.Certificate),
 	})
 	if err != nil {
 		return nil, fmt.Errorf("could not create elasticsearch client: %w", err)

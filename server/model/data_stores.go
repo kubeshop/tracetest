@@ -39,6 +39,7 @@ var validTypes = []openapi.SupportedDataStores{
 	openapi.TEMPO,
 	openapi.SIGNAL_FX,
 	openapi.OTLP,
+	openapi.ELASTIC_APM,
 }
 
 func (ds DataStore) Validate() error {
@@ -70,8 +71,8 @@ func DataStoreFromConfig(dsc config.TracingBackendDataStoreConfig) DataStore {
 		ds.Type = openapi.JAEGER
 	case tempo:
 		ds.Type = openapi.TEMPO
-	// change this to return the specific elastic apm client
 	case elasticapm:
+		ds.Type = openapi.ELASTIC_APM
 	case opensearch:
 		ds.Type = openapi.OPEN_SEARCH
 	case signalfx:
