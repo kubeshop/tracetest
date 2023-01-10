@@ -27,7 +27,7 @@ The [OpenDelemetry Demo](https://github.com/open-telemetry/opentelemetry-demo) i
 
 Read more about the OpenTelemetry Demo [here](https://opentelemetry.io/blog/2022/announcing-opentelemetry-demo-release/).
 
-The `docker-compose.yaml` contains 12 services. View the file in its entirety [here](./docker-compose.yaml).
+The `docker-compose.yaml` contains 12 services.
 
 To start the OpenTelemetry Demo by itself, run this command:
 
