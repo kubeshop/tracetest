@@ -667,6 +667,8 @@ services:
       otelcol:
         condition: service_started
     logging: *logging
+    environment:
+      TRACETEST_DEV: ${TRACETEST_DEV}
 
   # Postgres used by the Tracetest instance
   tt_postgres:
