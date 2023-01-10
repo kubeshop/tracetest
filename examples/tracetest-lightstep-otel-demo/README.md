@@ -185,7 +185,7 @@ service:
 
 ## Run the OpenTelemetry Demo with Tracetest
 
-To start both the OpenTelemetry and Tracetest we will run this command:
+To start both the OpenTelemetry Demo and Tracetest we will run this command:
 
 ```bash
 docker-compose up
@@ -220,7 +220,7 @@ Then, configure the CLI:
 tracetest configure --endpoint http://localhost:11633 --analytics
 ```
 
-Once configure, you can run a test against the Tracetest instance via the terminal.
+Once configured, you can run a test against the Tracetest instance via the terminal.
 
 Check out the `./tracetest/e2e/http-test.yaml` file.
 
