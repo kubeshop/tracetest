@@ -59,7 +59,18 @@ func (db elasticsearchDB) TestConnection(ctx context.Context) ConnectionTestResu
 		}
 	}
 
-	_, err := db.GetTraceByID(ctx, trace.TraceID{}.String())
+	_, err := getClusterInfo(db.client)
+	if err != nil {
+		return ConnectionTestResult{
+			ConnectivityTestResult: connectionTestResult.ConnectivityTestResult,
+			AuthenticationTestResult: ConnectionTestStepResult{
+				OperationDescription: `Tracetest tried to execute an ElasticSearch API request but it failed due to authentication issues`,
+				Error:                err,
+			},
+		}
+	}
+
+	_, err = db.GetTraceByID(ctx, trace.TraceID{}.String())
 	if err != nil && strings.Contains(strings.ToLower(err.Error()), "unauthorized") {
 		return ConnectionTestResult{
 			ConnectivityTestResult: connectionTestResult.ConnectivityTestResult,
@@ -147,6 +158,28 @@ func newElasticSearchDB(cfg *config.ElasticSearchDataStoreConfig) (TraceDB, erro
 		config: cfg,
 		client: client,
 	}, nil
+}
+
+func getClusterInfo(client *elasticsearch.Client) (string, error) {
+	var r map[string]interface{}
+	res, err := client.Info()
+	if err != nil {
+		return "", fmt.Errorf("error getting cluster info response: %s", err)
+	}
+	defer res.Body.Close()
+
+	// Check response status
+	if res.IsError() {
+		return "", fmt.Errorf("error getting cluster info response status: %s", res.String())
+	}
+	// Deserialize the response into a map
+	if err := json.NewDecoder(res.Body).Decode(&r); err != nil {
+		return "", fmt.Errorf("error parsing cluster info response: %s", err)
+	}
+
+	// Return client version number
+	info := fmt.Sprintf("Server: %s", r["version"].(map[string]interface{})["number"])
+	return info, nil
 }
 
 func convertElasticSearchFormatIntoTrace(traceID string, searchResponse searchResponse) model.Trace {
