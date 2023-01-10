@@ -5,13 +5,6 @@ receivers:
       http:
 
 processors:
-  tail_sampling:
-    decision_wait: 1s
-    policies:
-      - name: tracetest-spans
-        type: trace_state
-        trace_state: { key: tracetest, values: ["true"] }
-
   batch:
     timeout: 100ms
 
