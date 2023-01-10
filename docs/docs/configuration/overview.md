@@ -4,7 +4,7 @@ There is one way you can set configuration options in Tracetest. By using a conf
 
 When using Docker, ensure that the configuration file is mounted to `/app/config.yaml` within the Tracetest Docker container.
 
-To view all the configuration options see the [config file reference page](./config-file-reference).
+<!-- To view all the configuration options see the [config file reference page](./config-file-reference). -->
 
 ## Supported Trace Data Stores
 
@@ -16,6 +16,8 @@ Currently, Tracetest supports the following data stores. Click on the respective
 - [Grafana Tempo](./connecting-to-data-stores/tempo)
 - [OpenSearch](./connecting-to-data-stores/opensearch)
 - [SignalFX](./connecting-to-data-stores/signalfx)
+- [Lightstep](./connecting-to-data-stores/lightstep)
+- [New Relic](./connecting-to-data-stores/new-relic)
 
 ## Using Tracetest without a Trace Data Store
 

@@ -83,6 +83,16 @@ const sidebars = {
               id: "configuration/connecting-to-data-stores/tempo",
               label: "Tempo",
             },
+            {
+              type: "doc",
+              id: "configuration/connecting-to-data-stores/lightstep",
+              label: "Lightstep",
+            },
+            {
+              type: "doc",
+              id: "configuration/connecting-to-data-stores/new-relic",
+              label: "New Relic",
+            },
           ],
         },
       ],
@@ -299,6 +309,16 @@ const sidebars = {
               type: "doc",
               id: "examples-tutorials/recipes/running-tracetest-with-tempo",
               label: "Running Tracetest With Tempo",
+            },
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/running-tracetest-with-lightstep",
+              label: "Running Tracetest With Lightstep",
+            },
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/running-tracetest-with-new-relic",
+              label: "Running Tracetest With New Relic",
             },
           ],
         },
