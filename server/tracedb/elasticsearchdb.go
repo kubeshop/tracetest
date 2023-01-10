@@ -11,8 +11,10 @@ import (
 	"github.com/kubeshop/tracetest/server/model"
 	"go.opentelemetry.io/otel/trace"
 	"io/ioutil"
-	"log"
+	"reflect"
+	"strconv"
 	"strings"
+	"time"
 )
 
 type elasticsearchDB struct {
@@ -58,7 +60,7 @@ func (db elasticsearchDB) TestConnection(ctx context.Context) ConnectionTestResu
 	}
 
 	_, err := db.GetTraceByID(ctx, trace.TraceID{}.String())
-	if strings.Contains(strings.ToLower(err.Error()), "unauthorized") {
+	if err != nil && strings.Contains(strings.ToLower(err.Error()), "unauthorized") {
 		return ConnectionTestResult{
 			ConnectivityTestResult: connectionTestResult.ConnectivityTestResult,
 			AuthenticationTestResult: ConnectionTestStepResult{
@@ -95,8 +97,9 @@ func (db elasticsearchDB) GetTraceByID(ctx context.Context, traceID string) (mod
 	}`, traceID))
 
 	searchRequest := esapi.SearchRequest{
-		Index: []string{db.config.Index},
-		Body:  content,
+		Index:  []string{db.config.Index},
+		Body:   content,
+		Pretty: true,
 	}
 
 	response, err := searchRequest.Do(ctx, db.client)
@@ -105,24 +108,10 @@ func (db elasticsearchDB) GetTraceByID(ctx context.Context, traceID string) (mod
 	}
 	defer response.Body.Close()
 
-	/*var r map[string]interface{}
-	if err := json.NewDecoder(response.Body).Decode(&r); err != nil {
-		log.Fatalf("Error parsing the response body: %s", err)
-	}
-	// Print the response status, number of results, and request duration.
-	log.Printf(
-		"[%s] %d hits; took: %dms",
-		response.Status(),
-		int(r["hits"].(map[string]interface{})["total"].(map[string]interface{})["value"].(float64)),
-		int(r["took"].(float64)),
-	)*/
-
 	responseBody, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		return model.Trace{}, fmt.Errorf("could not read response body")
 	}
-
-	// log.Print(string(responseBody))
 
 	var searchResponse searchResponse
 	err = json.Unmarshal(responseBody, &searchResponse)
@@ -150,27 +139,6 @@ func newElasticSearchDB(cfg *config.OpensearchDataStoreConfig) (TraceDB, error) 
 		return nil, fmt.Errorf("could not create elasticsearch client: %w", err)
 	}
 
-	// Test: Get cluster info
-	//
-	var r map[string]interface{}
-	res, err := client.Info()
-	if err != nil {
-		log.Fatalf("Error getting response: %s", err)
-	}
-	defer res.Body.Close()
-	// Check response status
-	if res.IsError() {
-		log.Fatalf("Error: %s", res.String())
-	}
-	// Deserialize the response into a map.
-	if err := json.NewDecoder(res.Body).Decode(&r); err != nil {
-		log.Fatalf("Error parsing the response body: %s", err)
-	}
-	// Print client and server version numbers.
-	log.Printf("Client: %s", elasticsearch.Version)
-	log.Printf("Server: %s", r["version"].(map[string]interface{})["number"])
-	log.Println(strings.Repeat("~", 37))
-
 	return &elasticsearchDB{
 		config: cfg,
 		client: client,
@@ -188,40 +156,135 @@ func convertElasticSearchFormatIntoTrace(traceID string, searchResponse searchRe
 }
 
 func convertElasticSearchSpanIntoSpan(input map[string]interface{}) model.Span {
-	spanId, _ := trace.SpanIDFromHex("1234567891234567")
-	// spanId, _ := trace.SpanIDFromHex(input["spanId"].(string))
+	opts := &FlattenOptions{Delimiter: "."}
+	flatInput, _ := flatten(opts.Prefix, 0, input, opts)
 
-	// startTime, _ := time.Parse(time.RFC3339, input["startTime"].(string))
-	// endTime, _ := time.Parse(time.RFC3339, input["endTime"].(string))
+	// SpanId
+	transactionId := flatInput["transaction.id"]
+	spanId := flatInput["span.id"]
+	var id trace.SpanID
+	if transactionId != nil {
+		id, _ = trace.SpanIDFromHex((transactionId).(string))
+	}
+	if spanId != nil {
+		id, _ = trace.SpanIDFromHex((spanId).(string))
+	}
 
+	// SpanName
+	transactionName := flatInput["transaction.name"]
+	spanName := flatInput["span.name"]
+	var name string
+	if transactionName != nil {
+		name = transactionName.(string)
+	}
+	if spanName != nil {
+		name = spanName.(string)
+	}
+
+	// Duration
+	transactionDuration := flatInput["transaction.duration.us"]
+	spanDuration := flatInput["span.duration.us"]
+	var duration float64
+	if transactionDuration != nil {
+		duration = transactionDuration.(float64)
+	}
+	if spanDuration != nil {
+		duration = spanDuration.(float64)
+	}
+
+	// Timestamps
+	startTime, _ := time.Parse(time.RFC3339, flatInput["@timestamp"].(string))
+	endTime := startTime.Add(time.Microsecond * time.Duration(duration))
+
+	// Attributes
 	attributes := make(model.Attributes, 0)
 
-	/*for attrName, attrValue := range input {
-		if !strings.HasPrefix(attrName, "span.attributes.") && !strings.HasPrefix(attrName, "resource.attributes.") {
-			// Not an attribute we care about
-			continue
-		}
-
+	for attrName, attrValue := range flatInput {
 		name := attrName
-		name = strings.ReplaceAll(name, "span.attributes.", "")
-		name = strings.ReplaceAll(name, "resource.attributes.", "")
-		// Opensearch's data-prepper replaces "." with "@". We have to revert it. Example:
-		// "service.name" becomes "service@name"
-		name = strings.ReplaceAll(name, "@", ".")
+		name = strings.ReplaceAll(name, "transaction.", "")
+		name = strings.ReplaceAll(name, "span.", "")
 		attributes[name] = fmt.Sprintf("%v", attrValue)
 	}
 
-	attributes["kind"] = input["kind"].(string)
-	attributes["parent_id"] = input["parentSpanId"].(string)*/
+	// ParentId
+	parentId := flatInput["parent.id"]
+	if parentId != nil {
+		attributes["parent_id"] = flatInput["parent.id"].(string)
+	}
 
 	return model.Span{
-		ID: spanId,
-		// Name: input["name"].(string),
-		Name: "test",
-		// StartTime:  startTime,
-		// EndTime:    endTime,
+		ID:         id,
+		Name:       name,
+		StartTime:  startTime,
+		EndTime:    endTime,
 		Attributes: attributes,
 		Parent:     nil,
 		Children:   []*model.Span{},
+	}
+}
+
+type FlattenOptions struct {
+	Prefix    string
+	Delimiter string
+	Safe      bool
+	MaxDepth  int
+}
+
+func flatten(prefix string, depth int, nested interface{}, opts *FlattenOptions) (flatmap map[string]interface{}, err error) {
+	flatmap = make(map[string]interface{})
+
+	switch nested := nested.(type) {
+	case map[string]interface{}:
+		if opts.MaxDepth != 0 && depth >= opts.MaxDepth {
+			flatmap[prefix] = nested
+			return
+		}
+		if reflect.DeepEqual(nested, map[string]interface{}{}) {
+			flatmap[prefix] = nested
+			return
+		}
+		for k, v := range nested {
+			// create new key
+			newKey := k
+			if prefix != "" {
+				newKey = prefix + opts.Delimiter + newKey
+			}
+			fm1, fe := flatten(newKey, depth+1, v, opts)
+			if fe != nil {
+				err = fe
+				return
+			}
+			update(flatmap, fm1)
+		}
+	case []interface{}:
+		if opts.Safe {
+			flatmap[prefix] = nested
+			return
+		}
+		if reflect.DeepEqual(nested, []interface{}{}) {
+			flatmap[prefix] = nested
+			return
+		}
+		for i, v := range nested {
+			newKey := strconv.Itoa(i)
+			if prefix != "" {
+				newKey = prefix + opts.Delimiter + newKey
+			}
+			fm1, fe := flatten(newKey, depth+1, v, opts)
+			if fe != nil {
+				err = fe
+				return
+			}
+			update(flatmap, fm1)
+		}
+	default:
+		flatmap[prefix] = nested
+	}
+	return
+}
+
+func update(to map[string]interface{}, from map[string]interface{}) {
+	for kt, vt := range from {
+		to[kt] = vt
 	}
 }
