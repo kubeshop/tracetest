@@ -26,7 +26,9 @@ type DataStore struct {
 
 	Tempo GrpcClientSettings `json:"tempo,omitempty"`
 
-	OpenSearch OpenSearch `json:"openSearch,omitempty"`
+	OpenSearch ElasticSearch `json:"openSearch,omitempty"`
+
+	ElasticApm ElasticSearch `json:"elasticApm,omitempty"`
 
 	SignalFx SignalFx `json:"signalFx,omitempty"`
 
@@ -51,7 +53,10 @@ func AssertDataStoreRequired(obj DataStore) error {
 	if err := AssertGrpcClientSettingsRequired(obj.Tempo); err != nil {
 		return err
 	}
-	if err := AssertOpenSearchRequired(obj.OpenSearch); err != nil {
+	if err := AssertElasticSearchRequired(obj.OpenSearch); err != nil {
+		return err
+	}
+	if err := AssertElasticSearchRequired(obj.ElasticApm); err != nil {
 		return err
 	}
 	if err := AssertSignalFxRequired(obj.SignalFx); err != nil {

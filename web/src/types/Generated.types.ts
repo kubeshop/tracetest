@@ -158,6 +158,10 @@ export interface paths {
     /** Delete a Data Store */
     delete: operations["deleteDataStore"];
   };
+  "/datastores/{dataStoreId}/definition.yaml": {
+    /** Get the data store as an YAML file */
+    get: operations["getDataStoreDefinitionFile"];
+  };
 }
 
 export interface components {}
@@ -1073,6 +1077,22 @@ export interface operations {
       204: never;
     };
   };
+  /** Get the data store as an YAML file */
+  getDataStoreDefinitionFile: {
+    parameters: {
+      path: {
+        dataStoreId: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/yaml": string;
+        };
+      };
+    };
+  };
 }
 
 export interface external {
@@ -1109,16 +1129,18 @@ export interface external {
           isDefault?: boolean;
           jaeger?: external["dataStores.yaml"]["components"]["schemas"]["GRPCClientSettings"];
           tempo?: external["dataStores.yaml"]["components"]["schemas"]["GRPCClientSettings"];
-          openSearch?: external["dataStores.yaml"]["components"]["schemas"]["OpenSearch"];
+          openSearch?: external["dataStores.yaml"]["components"]["schemas"]["ElasticSearch"];
+          elasticApm?: external["dataStores.yaml"]["components"]["schemas"]["ElasticSearch"];
           signalFx?: external["dataStores.yaml"]["components"]["schemas"]["SignalFX"];
           /** Format: date-time */
           createdAt?: string;
         };
-        OpenSearch: {
+        ElasticSearch: {
           addresses?: string[];
           username?: string;
           password?: string;
           index?: string;
+          certificate?: string;
         };
         SignalFX: {
           realm?: string;
@@ -1162,7 +1184,8 @@ export interface external {
           | "openSearch"
           | "tempo"
           | "signalFx"
-          | "otlp";
+          | "otlp"
+          | "elasticApm";
       };
     };
     operations: {};

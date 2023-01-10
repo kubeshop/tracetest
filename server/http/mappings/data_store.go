@@ -14,7 +14,8 @@ func (m OpenAPI) DataStore(in model.DataStore) openapi.DataStore {
 		IsDefault:  in.IsDefault,
 		Jaeger:     openapi.GrpcClientSettings{},
 		Tempo:      openapi.GrpcClientSettings{},
-		OpenSearch: openapi.OpenSearch{},
+		OpenSearch: openapi.ElasticSearch{},
+		ElasticApm: openapi.ElasticSearch{},
 		SignalFx:   openapi.SignalFx{},
 		CreatedAt:  in.CreatedAt,
 	}
@@ -26,6 +27,7 @@ func (m OpenAPI) DataStore(in model.DataStore) openapi.DataStore {
 	deepcopy.DeepCopy(in.Values.Tempo.TLSSetting, &dataStore.Tempo.Tls)
 	deepcopy.DeepCopy(in.Values.Tempo.TLSSetting.TLSSetting, &dataStore.Tempo.Tls.Settings)
 	deepcopy.DeepCopy(in.Values.OpenSearch, &dataStore.OpenSearch)
+	deepcopy.DeepCopy(in.Values.ElasticApm, &dataStore.ElasticApm)
 	deepcopy.DeepCopy(in.Values.SignalFx, &dataStore.SignalFx)
 
 	return dataStore
@@ -56,6 +58,7 @@ func (m Model) DataStore(in openapi.DataStore) model.DataStore {
 	deepcopy.DeepCopy(in.Tempo.Tls, &dataStore.Values.Tempo.TLSSetting)
 	deepcopy.DeepCopy(in.Tempo.Tls.Settings, &dataStore.Values.Tempo.TLSSetting.TLSSetting)
 	deepcopy.DeepCopy(in.OpenSearch, &dataStore.Values.OpenSearch)
+	deepcopy.DeepCopy(in.ElasticApm, &dataStore.Values.ElasticApm)
 	deepcopy.DeepCopy(in.SignalFx, &dataStore.Values.SignalFx)
 
 	return dataStore

@@ -21,13 +21,15 @@ components:
         tempo:
           $ref: "#/components/schemas/GRPCClientSettings"
         openSearch:
-          $ref: "#/components/schemas/OpenSearch"
+          $ref: "#/components/schemas/ElasticSearch"
+        elasticApm:
+          $ref: "#/components/schemas/ElasticSearch"
         signalFx:
           $ref: "#/components/schemas/SignalFX"
         createdAt:
           type: string
           format: date-time
-    OpenSearch:
+    ElasticSearch:
       type: object
       properties:
         addresses:
@@ -39,6 +41,8 @@ components:
         password:
           type: string
         index:
+          type: string
+        certificate:
           type: string
     SignalFX:
       type: object
@@ -104,4 +108,4 @@ components:
           type: string
     SupportedDataStores:
       type: string
-      enum: [ jaeger, openSearch, tempo, signalFx, otlp ]
+      enum: [jaeger, openSearch, tempo, signalFx, otlp, elasticApm]

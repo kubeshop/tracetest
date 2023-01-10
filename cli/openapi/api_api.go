@@ -1578,9 +1578,9 @@ GetDataStoreDefinitionFile Get the data store definition as an YAML file
 
 Get the data store as an YAML file
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param dataStoreId
- @return ApiGetDataStoreDefinitionFileRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param dataStoreId
+	@return ApiGetDataStoreDefinitionFileRequest
 */
 func (a *ApiApiService) GetDataStoreDefinitionFile(ctx context.Context, dataStoreId string) ApiGetDataStoreDefinitionFileRequest {
 	return ApiGetDataStoreDefinitionFileRequest{
@@ -1591,7 +1591,8 @@ func (a *ApiApiService) GetDataStoreDefinitionFile(ctx context.Context, dataStor
 }
 
 // Execute executes the request
-//  @return string
+//
+//	@return string
 func (a *ApiApiService) GetDataStoreDefinitionFileExecute(r ApiGetDataStoreDefinitionFileRequest) (string, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
