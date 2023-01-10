@@ -3,7 +3,7 @@ const { getNodeAutoInstrumentations } = require('@opentelemetry/auto-instrumenta
 const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-grpc');
 
 const sdk = new opentelemetry.NodeSDK({
-  traceExporter: new OTLPTraceExporter({ url: 'http://host.docker.internal:4317' }),
+  traceExporter: new OTLPTraceExporter({ url: 'http://otel-collector:4317' }),
   instrumentations: [getNodeAutoInstrumentations()],
   serviceName: 'quick-start-nodejs'
 })

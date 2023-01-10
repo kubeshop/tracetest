@@ -6,4 +6,4 @@ services:
       - "host.docker.internal:host-gateway"
     build: .
     ports:
-      - "8084:8084"
+      - "8080:8080"
