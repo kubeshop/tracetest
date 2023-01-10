@@ -28,6 +28,7 @@ const ElasticSearchService = (): TDataStoreService => ({
     {defaultDataStore = {name: '', type: SupportedDataStores.OpenSearch} as TDataStore},
     dataStoreType = SupportedDataStores.OpenSearch
   ) {
+    console.log('@@@>>>', defaultDataStore.elasticApm);
     const {
       index = '',
       username = '',
