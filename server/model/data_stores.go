@@ -80,7 +80,9 @@ func DataStoreFromConfig(dsc config.TracingBackendDataStoreConfig) DataStore {
 	case signalfx:
 		ds.Type = openapi.SIGNAL_FX
 	case newrelic:
+		ds.Type = openapi.NEW_RELIC
 	case lighstep:
+		ds.Type = openapi.LIGHTSTEP
 	case otlp:
 		ds.Type = openapi.OTLP
 	}
