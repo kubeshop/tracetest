@@ -10,17 +10,26 @@ export enum ConfigMode {
 export enum SupportedDataStores {
   JAEGER = 'jaeger',
   TEMPO = 'tempo',
+  OtelCollector = 'otlp',
+  NewRelic = 'newRelic',
+  Lightstep = 'lightstep',
   OpenSearch = 'openSearch',
   ElasticApm = 'elasticApm',
   SignalFX = 'signalFx',
-  OtelCollector = 'otlp',
 }
+
+export type TCollectorDataStores =
+  | SupportedDataStores.NewRelic
+  | SupportedDataStores.OtelCollector
+  | SupportedDataStores.Lightstep;
 
 export type TRawDataStore = TDataStoreSchemas['DataStore'];
 export type TDataStore = Model<
   TRawDataStore,
   {
     otlp?: {};
+    newRelic?: {};
+    lightstep?: {};
   }
 >;
 
@@ -65,6 +74,8 @@ interface IDataStore extends TRawDataStore {
   openSearch?: IElasticSearch;
   elasticApm?: IElasticSearch;
   otlp?: {};
+  lightstep?: {};
+  newRelic?: {};
 }
 
 export type TDraftDataStore = {

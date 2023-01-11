@@ -19,6 +19,8 @@ const (
 	SIGNAL_FX   SupportedDataStores = "signalFx"
 	OTLP        SupportedDataStores = "otlp"
 	ELASTIC_APM SupportedDataStores = "elasticApm"
+	NEW_RELIC   SupportedDataStores = "newRelic"
+	LIGHTSTEP   SupportedDataStores = "lightstep"
 )
 
 // AssertSupportedDataStoresRequired checks if the required fields are not zero-ed

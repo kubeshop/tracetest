@@ -26,6 +26,8 @@ const (
 	SIGNAL_FX   SupportedDataStores = "signalFx"
 	OTLP        SupportedDataStores = "otlp"
 	ELASTIC_APM SupportedDataStores = "elasticApm"
+	NEW_RELIC   SupportedDataStores = "newRelic"
+	LIGHTSTEP   SupportedDataStores = "lightstep"
 )
 
 // All allowed values of SupportedDataStores enum
@@ -36,6 +38,8 @@ var AllowedSupportedDataStoresEnumValues = []SupportedDataStores{
 	"signalFx",
 	"otlp",
 	"elasticApm",
+	"newRelic",
+	"lightstep",
 }
 
 func (v *SupportedDataStores) UnmarshalJSON(src []byte) error {

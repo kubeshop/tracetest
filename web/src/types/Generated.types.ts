@@ -1185,7 +1185,9 @@ export interface external {
           | "tempo"
           | "signalFx"
           | "otlp"
-          | "elasticApm";
+          | "elasticApm"
+          | "newRelic"
+          | "lightstep";
       };
     };
     operations: {};

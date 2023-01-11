@@ -9,12 +9,6 @@ export const Title = styled(Typography.Title)`
   }
 `;
 
-export const Description = styled(Typography.Text)`
-  && {
-    color: ${({theme}) => theme.color.textSecondary};
-  }
-`;
-
 export const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -23,23 +17,6 @@ export const Wrapper = styled.div`
 `;
 
 export const FormContainer = styled.div`
-  padding: 16px;
-  min-height: 663px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-`;
-
-export const ButtonsContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  margin-top: 23px;
-  padding-top: 16px;
-  border-top: 1px solid ${({theme}) => theme.color.borderLight};
-`;
-
-export const SaveContainer = styled.div`
-  display: flex;
-  gap: 8px;
 `;

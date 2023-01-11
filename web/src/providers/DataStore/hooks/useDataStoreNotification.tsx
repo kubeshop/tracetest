@@ -3,6 +3,7 @@ import {useCallback} from 'react';
 import {useTheme} from 'styled-components';
 import {SupportedDataStores, TConnectionResult} from 'types/Config.types';
 import TestConnectionNotification from 'components/TestConnectionNotification/TestConnectionNotification';
+import {NoTestConnectionDataStoreList} from '../../../constants/DataStore.constants';
 
 const useDataStoreNotification = () => {
   const [api, contextHolder] = notification.useNotification();
@@ -12,7 +13,7 @@ const useDataStoreNotification = () => {
 
   const showTestConnectionNotification = useCallback(
     (result: TConnectionResult, dataStoreType: SupportedDataStores) => {
-      if (dataStoreType === SupportedDataStores.OtelCollector) {
+      if (NoTestConnectionDataStoreList.includes(dataStoreType)) {
         return api.info({
           message: <Typography.Title level={2}>No Automated Test</Typography.Title>,
           description:

@@ -1,5 +1,4 @@
-import {Button, Form} from 'antd';
-import {SupportedDataStoresToName} from 'constants/DataStore.constants';
+import {Form} from 'antd';
 import {useDataStore} from 'providers/DataStore/DataStore.provider';
 import {useDataStoreConfig} from 'providers/DataStoreConfig/DataStoreConfig.provider';
 import {useCallback} from 'react';
@@ -36,48 +35,18 @@ const DataStore = () => {
   return (
     <S.Wrapper>
       <S.FormContainer>
-        <div>
-          <S.Description>
-            Tracetest needs configuration information to be able to retrieve your trace from your distributed tracing
-            solution. Select your tracing data store and enter the configuration info.
-          </S.Description>
-          <S.Title>Choose your OpenTelemetry data store</S.Title>
-          <DataStoreForm
-            form={form}
-            dataStoreConfig={dataStoreConfig}
-            onSubmit={handleOnSubmit}
-            onIsFormValid={onIsFormValid}
-          />
-        </div>
-        <S.ButtonsContainer>
-          {isConfigReady ? (
-            <Button
-              disabled={isLoading}
-              type="primary"
-              ghost
-              onClick={() => onDeleteConfig(dataStoreConfig.defaultDataStore)}
-              danger
-            >
-              {`Delete ${SupportedDataStoresToName[dataStoreConfig.defaultDataStore.type]} Data Store`}
-            </Button>
-          ) : (
-            <div />
-          )}
-          <S.SaveContainer>
-            <Button
-              loading={isTestConnectionLoading}
-              disabled={!isFormValid}
-              type="primary"
-              ghost
-              onClick={handleTestConnection}
-            >
-              Test Connection
-            </Button>
-            <Button disabled={!isFormValid} loading={isLoading} type="primary" onClick={() => form.submit()}>
-              Save
-            </Button>
-          </S.SaveContainer>
-        </S.ButtonsContainer>
+        <DataStoreForm
+          form={form}
+          dataStoreConfig={dataStoreConfig}
+          onSubmit={handleOnSubmit}
+          onTestConnection={handleTestConnection}
+          isConfigReady={isConfigReady}
+          isTestConnectionLoading={isTestConnectionLoading}
+          onDeleteConfig={onDeleteConfig}
+          isLoading={isLoading}
+          isFormValid={isFormValid}
+          onIsFormValid={onIsFormValid}
+        />
       </S.FormContainer>
     </S.Wrapper>
   );

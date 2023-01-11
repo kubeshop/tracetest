@@ -1,14 +1,19 @@
-import {message} from 'antd';
+import {Form, message} from 'antd';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import {arduinoLight} from 'react-syntax-highlighter/dist/cjs/styles/hljs';
-import {OtelCollectorConfigSample} from 'constants/DataStore.constants';
+import {TCollectorDataStores, TDraftDataStore} from 'types/Config.types';
+import {CollectorConfigMap} from 'constants/CollectorConfig.constants';
 import * as S from '../../DataStorePluginForm.styled';
 import * as OtelCollectorStyles from './OpenTelemetryCollector.styled';
 
 const OpenTelemetryCollector = () => {
+  const form = Form.useFormInstance<TDraftDataStore>();
+  const dataStoreType = Form.useWatch('dataStoreType', form) as TCollectorDataStores;
+  const example = CollectorConfigMap[dataStoreType!];
+
   const onCopy = () => {
     message.success('Content copied to the clipboard');
-    navigator.clipboard.writeText(OtelCollectorConfigSample);
+    navigator.clipboard.writeText(example);
   };
 
   return (
@@ -22,7 +27,7 @@ const OpenTelemetryCollector = () => {
             <OtelCollectorStyles.CopyIcon />
           </OtelCollectorStyles.CopyIconContainer>
           <SyntaxHighlighter language="yaml" style={arduinoLight}>
-            {OtelCollectorConfigSample}
+            {example}
           </SyntaxHighlighter>
         </OtelCollectorStyles.CodeContainer>
       </S.FormColumn>

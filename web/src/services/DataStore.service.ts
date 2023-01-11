@@ -17,6 +17,8 @@ const dataStoreServiceMap = {
   [SupportedDataStores.ElasticApm]: ElasticSearchService,
   [SupportedDataStores.SignalFX]: SignalFxService,
   [SupportedDataStores.OtelCollector]: OtelCollectorService,
+  [SupportedDataStores.NewRelic]: OtelCollectorService,
+  [SupportedDataStores.Lightstep]: OtelCollectorService,
 } as const;
 
 const DataStoreService = (): IDataStoreService => ({
