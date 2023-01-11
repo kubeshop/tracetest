@@ -1,7 +1,7 @@
 import {Popover} from 'antd';
 import {noop} from 'lodash';
 import {useTheme} from 'styled-components';
-import {SupportedDataStores} from 'types/Config.types';
+import {ConfigMode, SupportedDataStores} from 'types/Config.types';
 import {SupportedDataStoresToName} from 'constants/DataStore.constants';
 import {useDataStoreConfig} from 'providers/DataStoreConfig/DataStoreConfig.provider';
 
@@ -26,7 +26,7 @@ const DataStoreSelectionInput = ({onChange = noop, value = SupportedDataStores.J
     <S.DataStoreListContainer>
       {supportedDataStoreList.map(dataStore => {
         const isSelected = value === dataStore;
-        const isConfigured = configuredDataStoreType === dataStore;
+        const isConfigured = configuredDataStoreType === dataStore && dataStoreConfig.mode === ConfigMode.READY;
         return (
           <S.DataStoreItemContainer $isSelected={isSelected} key={dataStore} onClick={() => onChange(dataStore)}>
             <DataStoreIcon dataStoreType={dataStore} color={isSelected ? primary : text} width="22" height="22" />
