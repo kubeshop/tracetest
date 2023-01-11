@@ -31,7 +31,7 @@ const ElasticSearchService = (): TDataStoreService => ({
     });
   },
   validateDraft({dataStore = {}, dataStoreType}) {
-    const values = dataStore[dataStoreType || SupportedDataStores.OpenSearch] as IElasticSearch;
+    const values = (dataStore[dataStoreType || SupportedDataStores.OpenSearch] as IElasticSearch) ?? {};
     const {addresses = [], index = ''} = values;
     const [address] = addresses;
     if (!index || !Validator.url(address)) return Promise.resolve(false);
