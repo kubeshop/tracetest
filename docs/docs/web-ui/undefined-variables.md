@@ -20,3 +20,28 @@ A user wants to define 3 tests as part of a transaction. The first test has an o
 
 In Tracetest, undefined variables can be used in both the UI and CLI. 
 
+## **Undefined Variables Transaction with Multiple Tests Example**
+
+1. Create an HTTP Pokemon list test that uses environment variables for hostname and the SKIP query parameter:
+
+![Create Pokemon List](../img/pokeshop-list.png)
+
+2. Within the test, create test spec assertions that use environment variables for comparators, something like: http.status_code = "${env:STATUS_CODE}":
+
+![Create Test Spec Assertionsl](../img/create-test-spec-assertions.png)
+
+3. Create a GRPC pokemon add test that uses environment variables for hostname and pokemon name:
+
+![Create GRPC](../img/create-grpc.png)
+
+4. Create an output from this test for the SKIP variable that could come from anywhere in the trace:
+
+![Test Output](../img/test-output.png)
+
+5. Now, you can create a transaction with the two tests - first, add the list test, then the add test, and then the list test again:
+
+![Create Transaction](../img/create-transaction.png)
+
+6. From here you can input the values for the undefined variables and complete your trace:
+
+![Input Values](../img/input-values.png)
