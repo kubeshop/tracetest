@@ -6,6 +6,7 @@ export const CodeContainer = styled.div`
   position: relative;
   border: ${({theme}) => `1px solid ${theme.color.border}`};
   max-height: 370px;
+  width: 600px;
   overflow-y: scroll;
 
   pre {

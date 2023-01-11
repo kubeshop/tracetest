@@ -73,6 +73,8 @@ func (f *traceDBFactory) New(ds model.DataStore) (tdb TraceDB, err error) {
 		tdb, err = newOpenSearchDB(ds.Values.OpenSearch)
 	case openapi.SIGNAL_FX:
 		tdb, err = newSignalFXDB(ds.Values.SignalFx)
+	case openapi.NEW_RELIC:
+	case openapi.LIGHTSTEP:
 	case openapi.OTLP:
 		tdb, err = newCollectorDB(f.repo)
 	default:

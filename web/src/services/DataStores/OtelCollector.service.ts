@@ -1,22 +1,22 @@
 import {SupportedDataStores, TDataStoreService} from 'types/Config.types';
 
 const OtelCollectorService = (): TDataStoreService => ({
-  getRequest() {
+  getRequest(draft, dataStoreType = SupportedDataStores.OtelCollector) {
     return Promise.resolve({
-      type: SupportedDataStores.OtelCollector,
-      name: SupportedDataStores.OtelCollector,
+      type: dataStoreType,
+      name: dataStoreType,
     });
   },
   validateDraft() {
     return Promise.resolve(true);
   },
-  getInitialValues() {
+  getInitialValues(draft, dataStoreType = SupportedDataStores.OtelCollector) {
     return {
       dataStore: {
-        name: SupportedDataStores.OtelCollector,
-        type: SupportedDataStores.OtelCollector,
+        name: dataStoreType,
+        type: dataStoreType,
       },
-      dataStoreType: SupportedDataStores.OtelCollector,
+      dataStoreType,
     };
   },
 });

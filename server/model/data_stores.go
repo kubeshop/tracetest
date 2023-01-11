@@ -56,6 +56,8 @@ const (
 	opensearch string = "opensearch"
 	signalfx   string = "signalfx"
 	otlp       string = "otlp"
+	newrelic   string = "newrelic"
+	lighstep   string = "lighstep"
 	elasticapm string = "elasticapm"
 )
 
@@ -77,6 +79,8 @@ func DataStoreFromConfig(dsc config.TracingBackendDataStoreConfig) DataStore {
 		ds.Type = openapi.OPEN_SEARCH
 	case signalfx:
 		ds.Type = openapi.SIGNAL_FX
+	case newrelic:
+	case lighstep:
 	case otlp:
 		ds.Type = openapi.OTLP
 	}

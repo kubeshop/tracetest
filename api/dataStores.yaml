@@ -108,4 +108,14 @@ components:
           type: string
     SupportedDataStores:
       type: string
-      enum: [jaeger, openSearch, tempo, signalFx, otlp, elasticApm]
+      enum:
+        [
+          jaeger,
+          openSearch,
+          tempo,
+          signalFx,
+          otlp,
+          elasticApm,
+          newRelic,
+          lightstep,
+        ]

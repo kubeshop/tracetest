@@ -1,8 +1,8 @@
-import {Form} from 'antd';
+import {Button, Form} from 'antd';
 import {useCallback, useEffect, useMemo} from 'react';
 import SetupConfigService from 'services/DataStore.service';
-import {TDraftDataStore, TDataStoreForm, TDataStoreConfig, SupportedDataStores} from 'types/Config.types';
-import {SupportedDataStoresToExplanation} from 'constants/DataStore.constants';
+import {TDraftDataStore, TDataStoreForm, TDataStoreConfig, SupportedDataStores, TDataStore} from 'types/Config.types';
+import {SupportedDataStoresToExplanation, SupportedDataStoresToName} from 'constants/DataStore.constants';
 import DataStoreDocsBanner from '../DataStoreDocsBanner/DataStoreDocsBanner';
 import DataStoreComponentFactory from '../DataStorePlugin/DataStoreComponentFactory';
 import * as S from './DataStoreForm.styled';
@@ -15,9 +15,26 @@ interface IProps {
   dataStoreConfig: TDataStoreConfig;
   onSubmit(values: TDraftDataStore): Promise<void>;
   onIsFormValid(isValid: boolean): void;
+  onTestConnection(): void;
+  isConfigReady: boolean;
+  isTestConnectionLoading: boolean;
+  onDeleteConfig(dataStore: TDataStore): void;
+  isLoading: boolean;
+  isFormValid: boolean;
 }
 
-const DataStoreForm = ({form, onSubmit, dataStoreConfig, onIsFormValid}: IProps) => {
+const DataStoreForm = ({
+  form,
+  onSubmit,
+  dataStoreConfig,
+  onIsFormValid,
+  onTestConnection,
+  isConfigReady,
+  isTestConnectionLoading,
+  onDeleteConfig,
+  isLoading,
+  isFormValid,
+}: IProps) => {
   const initialValues = useMemo(() => SetupConfigService.getInitialValues(dataStoreConfig), [dataStoreConfig]);
   const dataStoreType = Form.useWatch('dataStoreType', form);
 
@@ -48,9 +65,50 @@ const DataStoreForm = ({form, onSubmit, dataStoreConfig, onIsFormValid}: IProps)
         <Form.Item name="dataStoreType">
           <DataStoreSelectionInput />
         </Form.Item>
-        <DataStoreDocsBanner dataStoreType={dataStoreType!} />
-        {explanation ? <S.Explanation>{explanation}</S.Explanation> : <S.Title>Provide the connection info</S.Title>}
-        {dataStoreType && <DataStoreComponentFactory dataStoreType={dataStoreType} />}
+        <S.FactoryContainer>
+          <S.TopContainer>
+            <S.Description>
+              Tracetest needs configuration information to be able to retrieve your trace from your distributed tracing
+              solution. Select your tracing data store and enter the configuration info.
+            </S.Description>
+            {explanation ? (
+              <S.Explanation>{explanation}</S.Explanation>
+            ) : (
+              <S.Title>Provide the connection info for {SupportedDataStoresToName[dataStoreType!]}</S.Title>
+            )}
+            <DataStoreDocsBanner dataStoreType={dataStoreType!} />
+            {dataStoreType && <DataStoreComponentFactory dataStoreType={dataStoreType} />}
+          </S.TopContainer>
+          <S.ButtonsContainer>
+            {isConfigReady ? (
+              <Button
+                disabled={isLoading}
+                type="primary"
+                ghost
+                onClick={() => onDeleteConfig(dataStoreConfig.defaultDataStore)}
+                danger
+              >
+                {`Delete ${SupportedDataStoresToName[dataStoreConfig.defaultDataStore.type]} Data Store`}
+              </Button>
+            ) : (
+              <div />
+            )}
+            <S.SaveContainer>
+              <Button
+                loading={isTestConnectionLoading}
+                disabled={!isFormValid}
+                type="primary"
+                ghost
+                onClick={onTestConnection}
+              >
+                Test Connection
+              </Button>
+              <Button disabled={!isFormValid} loading={isLoading} type="primary" onClick={() => form.submit()}>
+                Save
+              </Button>
+            </S.SaveContainer>
+          </S.ButtonsContainer>
+        </S.FactoryContainer>
       </S.FormContainer>
     </Form>
   );
