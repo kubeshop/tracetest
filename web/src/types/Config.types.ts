@@ -9,13 +9,13 @@ export enum ConfigMode {
 
 export enum SupportedDataStores {
   JAEGER = 'jaeger',
-  OpenSearch = 'openSearch',
-  SignalFX = 'signalFx',
   TEMPO = 'tempo',
   OtelCollector = 'otlp',
   NewRelic = 'newRelic',
   Lightstep = 'lightstep',
+  OpenSearch = 'openSearch',
   ElasticApm = 'elasticApm',
+  SignalFX = 'signalFx',
 }
 
 export type TCollectorDataStores =
