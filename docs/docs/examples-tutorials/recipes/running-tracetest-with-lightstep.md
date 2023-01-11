@@ -166,13 +166,6 @@ receivers:
 processors:
   batch:
     timeout: 100ms
-  # Funnel Tracetest trigger spans to Tracetest OTLP endpoint
-  tail_sampling:
-    decision_wait: 5s
-    policies:
-      - name: tracetest-spans
-        type: trace_state
-        trace_state: { key: tracetest, values: ["true"] }
 
 exporters:
   logging:
@@ -191,7 +184,7 @@ service:
   pipelines:
     traces/tt:
       receivers: [otlp]
-      processors: [tail_sampling, batch]
+      processors: [batch]
       exporters: [otlp/tt]
     traces/ls:
       receivers: [otlp]
@@ -199,7 +192,7 @@ service:
       exporters: [logging, otlp/ls]
 ```
 
-**Important!** Take a closer look at the sampling configs in both the `collector.config.yaml` and `tracetest.config.yaml`. They both set sampling to 100%. This is crucial when running trace-based e2e and integration tests. Also, to use the `tail_sampling` processor, make sure to use the `contrib` version of the OpenTelemetry Collector.
+**Important!** Take a closer look at the sampling configs in both the `collector.config.yaml` and `tracetest.config.yaml`. They both set sampling to 100%. This is crucial when running trace-based e2e and integration tests.
 
 ## Run both the OpenTelemetry Demo app and Tracetest
 
