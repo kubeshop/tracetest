@@ -18,6 +18,7 @@ const (
 	TEMPO       SupportedDataStores = "tempo"
 	SIGNAL_FX   SupportedDataStores = "signalFx"
 	OTLP        SupportedDataStores = "otlp"
+	ELASTIC_APM SupportedDataStores = "elasticApm"
 )
 
 // AssertSupportedDataStoresRequired checks if the required fields are not zero-ed

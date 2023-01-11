@@ -18,7 +18,7 @@ import (
 
 type opensearchDB struct {
 	realTraceDB
-	config *config.OpensearchDataStoreConfig
+	config *config.ElasticSearchDataStoreConfig
 	client *opensearch.Client
 }
 
@@ -123,7 +123,7 @@ func (db opensearchDB) GetTraceByID(ctx context.Context, traceID string) (model.
 	return convertOpensearchFormatIntoTrace(traceID, searchResponse), nil
 }
 
-func newOpenSearchDB(cfg *config.OpensearchDataStoreConfig) (TraceDB, error) {
+func newOpenSearchDB(cfg *config.ElasticSearchDataStoreConfig) (TraceDB, error) {
 	client, err := opensearch.NewClient(opensearch.Config{
 		Addresses: cfg.Addresses,
 		Username:  cfg.Username,

@@ -11,6 +11,7 @@ export enum SupportedDataStores {
   JAEGER = 'jaeger',
   TEMPO = 'tempo',
   OpenSearch = 'openSearch',
+  ElasticApm = 'elasticApm',
   SignalFX = 'signalFx',
   OtelCollector = 'otlp',
 }
@@ -29,6 +30,7 @@ export type TDataStoreConfig = {
 };
 
 export type TRawGRPCClientSettings = TDataStoreSchemas['GRPCClientSettings'];
+export type TRawElasticSearch = TDataStoreSchemas['ElasticSearch'];
 
 export type TTestConnectionRequest = TRawDataStore;
 export type TRawConnectionResult = TConfigSchemas['ConnectionResult'];
@@ -53,9 +55,15 @@ export interface IGRPCClientSettings extends TRawGRPCClientSettings {
   rawHeaders?: THeader[];
 }
 
+export interface IElasticSearch extends TRawElasticSearch {
+  certificateFile?: File;
+}
+
 interface IDataStore extends TRawDataStore {
   jaeger?: IGRPCClientSettings;
   tempo?: IGRPCClientSettings;
+  openSearch?: IElasticSearch;
+  elasticApm?: IElasticSearch;
   otlp?: {};
 }
 

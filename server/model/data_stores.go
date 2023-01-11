@@ -23,7 +23,8 @@ type (
 	DataStoreValues struct {
 		Jaeger     *configgrpc.GRPCClientSettings
 		Tempo      *configgrpc.GRPCClientSettings
-		OpenSearch *config.OpensearchDataStoreConfig
+		OpenSearch *config.ElasticSearchDataStoreConfig
+		ElasticApm *config.ElasticSearchDataStoreConfig
 		SignalFx   *config.SignalFXDataStoreConfig
 	}
 )
@@ -38,6 +39,7 @@ var validTypes = []openapi.SupportedDataStores{
 	openapi.TEMPO,
 	openapi.SIGNAL_FX,
 	openapi.OTLP,
+	openapi.ELASTIC_APM,
 }
 
 func (ds DataStore) Validate() error {
@@ -54,6 +56,7 @@ const (
 	opensearch string = "opensearch"
 	signalfx   string = "signalfx"
 	otlp       string = "otlp"
+	elasticapm string = "elasticapm"
 )
 
 func DataStoreFromConfig(dsc config.TracingBackendDataStoreConfig) DataStore {
@@ -68,6 +71,8 @@ func DataStoreFromConfig(dsc config.TracingBackendDataStoreConfig) DataStore {
 		ds.Type = openapi.JAEGER
 	case tempo:
 		ds.Type = openapi.TEMPO
+	case elasticapm:
+		ds.Type = openapi.ELASTIC_APM
 	case opensearch:
 		ds.Type = openapi.OPEN_SEARCH
 	case signalfx:
@@ -79,6 +84,7 @@ func DataStoreFromConfig(dsc config.TracingBackendDataStoreConfig) DataStore {
 	ds.Values.Tempo = &dsc.Tempo
 	ds.Values.OpenSearch = &dsc.OpenSearch
 	ds.Values.SignalFx = &dsc.SignalFX
+	ds.Values.ElasticApm = &dsc.ElasticApm
 
 	return ds
 }

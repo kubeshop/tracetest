@@ -67,6 +67,8 @@ func (f *traceDBFactory) New(ds model.DataStore) (tdb TraceDB, err error) {
 		tdb, err = newJaegerDB(ds.Values.Jaeger)
 	case openapi.TEMPO:
 		tdb, err = newTempoDB(ds.Values.Tempo)
+	case openapi.ELASTIC_APM:
+		tdb, err = newElasticSearchDB(ds.Values.ElasticApm)
 	case openapi.OPEN_SEARCH:
 		tdb, err = newOpenSearchDB(ds.Values.OpenSearch)
 	case openapi.SIGNAL_FX:
