@@ -211,12 +211,6 @@ receivers:
       http:
 
 processors:
-  tail_sampling:
-    decision_wait: 5s
-    policies:
-      - name: tracetest-spans
-        type: trace_state
-        trace_state: { key: tracetest, values: ["true"] }
   batch:
     timeout: 100ms
 
@@ -232,7 +226,7 @@ service:
   pipelines:
     traces/1:
       receivers: [otlp]
-      processors: [tail_sampling, batch]
+      processors: [batch]
       exporters: [otlp/1]
 
 ```
