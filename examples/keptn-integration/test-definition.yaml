@@ -1,0 +1,17 @@
+type: Test
+spec:
+  id: apdCx-h4g
+  name: Pokeshop - List Pokemons
+  description: Get a Pokemon
+  trigger:
+    type: http
+    httpRequest:
+      url: http://demo-pokemon-api.demo/pokemon?take=20&skip=0
+      method: GET
+      headers:
+      - key: Content-Type
+        value: application/json
+  specs:
+  - selector: span[name = “Tracetest trigger”]
+    assertions:
+    - attr:tracetest.span.duration < 500ms
