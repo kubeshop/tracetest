@@ -5,11 +5,14 @@ import {useGuidedTour} from 'providers/GuidedTour/GuidedTour.provider';
 import {useCallback, useMemo} from 'react';
 import {useLocation, useParams} from 'react-router-dom';
 import HomeAnalyticsService from 'services/Analytics/HomeAnalytics.service';
+import Env from 'utils/Env';
 import {switchTraceMode} from '../GuidedTour/traceStepList';
 import * as S from './Header.styled';
 import {ShowOnboardingContent} from './ShowOnboardingContent';
 
 const {onGuidedTourClick} = HomeAnalyticsService;
+
+const appVersion = Env.get('appVersion');
 
 const HeaderMenu = () => {
   const {pathname} = useLocation();
@@ -69,6 +72,15 @@ const HeaderMenu = () => {
                   <a key="guidedTour" onClick={onStartOnboarding}>
                     Show Onboarding
                   </a>
+                ),
+              },
+              {
+                key: 'App version',
+                disabled: true,
+                label: (
+                  <S.AppVersionContainer>
+                    <S.AppVersion>App version: {appVersion}</S.AppVersion>
+                  </S.AppVersionContainer>
                 ),
               },
             ],
