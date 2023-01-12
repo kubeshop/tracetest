@@ -51,5 +51,9 @@ COPY --from=build-server /go/src/tracetest-server ./
 COPY --from=build-server /go/src/migrations/ ./migrations/
 COPY --from=build-cli /go/src/cli/dist/tracetest ./
 COPY --from=build-js /app/build /app/html
+
+ENV PATH="$PATH:/app"
+
 EXPOSE 11633/tcp
+
 ENTRYPOINT ["/app/tracetest-server"]
