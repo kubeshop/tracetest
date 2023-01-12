@@ -1,18 +1,18 @@
-# How to contribute
+# How to Contribute
 
 Thank you for looking at this. We, at Tracetest, are really excited to have you contribute on the project with us.
 
-The main lines of communication with our team is through [Github issues](https://github.com/kubeshop/tracetest/issues/new/choose) or [Discord](https://discord.gg/eBvEQRVyKX). Feel free to ask any questions!
+The main lines of communication with our team are through [Github issues](https://github.com/kubeshop/tracetest/issues/new/choose) or [Discord](https://discord.gg/eBvEQRVyKX). Feel free to ask any questions!
 
 ## Developing 
 
 Development can be conducted using any GoLang and Typescript compatible IDE/editor (e.g., Jetbrains GoLand, VSCode).
 
-There are four places where you develop new thing on Tracetest: on the CLI, on the API Server, on the Web UI and on the Documentation website.
+There are four places where you develop new things on Tracetest: on the CLI, on the API Server, on the Web UI and on the Documentation website.
 
 ### CLI 
 
-Written in Golang, can be seen on the folder `./cli`. You can see what options do you have to test and build the application by typing `make help` inside the folder.
+Written in Golang, the CLI code is stored in the folder `./cli`. You can see what options you have to test and build the application by typing `make help` inside the folder.
 
 To test its integration with our API, you can run a local API server on your machine by running one of our [examples](./examples/) with `docker compose`. For instance:
 ```sh
@@ -20,7 +20,7 @@ cd ./examples/tracetest-jaeger
 docker compose up -d
 ```
 
-Remember that you need file pointing to that server by configuring the CLI using `tracetest configure` command or using the flag `-c` with a valid config file location, like `config.yaml`) with the following content:
+Remember that you need a file pointing to that server by configuring the CLI using the `tracetest configure` command or using the flag `-c` with a valid config file location, like `config.yaml` with the following content:
 ```yaml
 scheme: http
 endpoint: localhost:11633
@@ -29,7 +29,7 @@ analyticsEnabled: false
 
 ### API Server
 
-Written in Golang, can be seen on the folder `./server`. You can see what options do you have to test and build the application by typing `make help` inside the folder.
+Written in Golang, the API Server code is stored in `./server`. You can see what options you have to test and build the application by typing `make help` inside the folder.
 
 To run the server along the database and the Open Telemetry collector, you can run `docker compose` at the root folder of Tracetest, by executing:
 ```sh
@@ -38,7 +38,7 @@ docker compose up postgres otel-collector
 
 ### Web UI
 
-Written in Typescript and using Node.js tools, can be seen on the folder `./web`. You can see what options do you have to test and build the application by seeing the `package.json` scripts [here](./web/package.json).
+Written in Typescript and using Node.js tools, the Web UI code is stored in the folder `./web`. You can see what options you have to test and build the application by seeing the `package.json` scripts [here](./web/package.json).
 
 Like the CLI, to connect to the API, you can run a local API server on your machine by running one of our [examples](./examples/) with `docker compose`. For instance:
 ```sh
@@ -46,17 +46,17 @@ cd ./examples/tracetest-jaeger
 docker compose up -d
 ```
 
-### Documentation website
+### Documentation Website
 
-Written in Typescript and using Node.js tools using `docusaurus`, can be seen on the folder `./docs`. You can see what options do you have to test and build the application by seeing the `package.json` scripts [here](./docs/package.json).
+Written in Typescript and using Node.js tools using `docusaurus`, the documentation is stored in the folder `./docs`. You can see what options you have to test and build the application by seeing the `package.json` scripts [here](./docs/package.json).
 
 ## Testing
 
-We have a great ambition to have tests verify every important corner of our code-base. It will be greatly appreciated, if your PR's include tests for the changes you propose.
+We strive to have tests verify every important corner of our code-base. It will be greatly appreciated if your PR's include tests for the changes you propose.
 
-## Submitting changes
+## Submitting Changes
 
-Please send a Github Pull-Request with a clear list of what you've done (read more about [pull requests](http://help.github.com/pull-requests/)). When you send a pull request, we will love if you include examples. Please follow our coding conventions (below) and make sure all of your commits are atomic (one feature per commit).
+Please create a Github Pull-Request with a clear list of what you've done (read more about [pull requests](http://help.github.com/pull-requests/)). When you send a pull request, we would appreciate included use-case examples. Please follow our coding conventions (below) and make sure all of your commits are atomic (one feature per commit).
 
 Always write a clear log message for your commits. One-line messages are fine for small changes, but bigger changes should look like this:
 
@@ -64,7 +64,7 @@ Always write a clear log message for your commits. One-line messages are fine fo
     > 
     > A paragraph describing what changed and its impact."
 
-## Coding conventions
+## Coding Conventions
 
 Start reading our code and you'll get the hang of it. We use code formatting tools like [eslint](https://eslint.org/) and [go vet](https://pkg.go.dev/cmd/vet) to help maintain peace in the galaxy.
 
