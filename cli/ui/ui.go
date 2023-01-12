@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/pterm/pterm"
 	"github.com/pterm/pterm/putils"
 )
@@ -45,6 +46,8 @@ func (ui ptermUI) Banner() {
 	pterm.DefaultBigText.
 		WithLetters(putils.LettersFromString("TraceTest")).
 		Render()
+
+	pterm.Print(fmt.Sprintf("Version: %s", config.Version))
 
 	pterm.Print("\n\n")
 
