@@ -1,0 +1,29 @@
+server.host: 0.0.0.0
+
+xpack.fleet.packages:
+  - name: fleet_server
+    version: latest
+  - name: apm
+    version: latest
+xpack.fleet.agentPolicies:
+  - name: Fleet Server policy
+    id: fleet-server-policy
+    namespace: default
+    is_default_fleet_server: true
+    data_output_id: es01
+    monitoring_output_id: es01    
+    package_policies:
+      - name: fleet_server-1
+        package:
+          name: fleet_server
+
+xpack.fleet.outputs:
+  - id: es01
+    name: ES01
+    type: elasticsearch
+    hosts:
+      - ${ES_URL}
+    config:
+      ssl.verification_mode: none
+    is_default: true
+    is_default_monitoring: true
