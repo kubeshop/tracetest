@@ -8,10 +8,21 @@ docker compose up -d
 ```
 
 ## Open Tracetest UI
-Open http://localhost:11633/ and create a new test:
+Open http://localhost:11633/ to configure the connection to Elasticsearch:
+1. In Settings, configure Elastic APM as the Data Store.
+2. Set `apm-*` as the Index name.
+3. Add the Address and set it to `https://es01:9200`.
+4. Set the Username to `elastic` and password to `changeme`.
+5. You will need to download the CA certificate from the docker image and upload it to the config under "Upload CA file".
+    * The command to download the `ca.crt` file is:
+    `docker cp tracetest-elasticapm-with-otel-es01-1:/usr/share/elasticsearch/config/certs/ca/ca.crt .`
+6. Test the commection and Save it, if all is successful.
+
+Create a new test:
 1. Use the "HTTP Request" option. Hit Next.
 2. Name your test and add a description. Hit Next.
 3. Configure the GET url to be `http://app:8080` since the tests will be running in docker compose network. Hit Create.
+4. Running the test should succeed.
 
 
 ## Open Kibana

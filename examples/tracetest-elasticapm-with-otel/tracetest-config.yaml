@@ -5,7 +5,7 @@ poolingConfig:
   retryDelay: 5s
 
 googleAnalytics:
-  enabled: false
+  enabled: true
 
 demo:
   enabled: []
@@ -16,9 +16,11 @@ telemetry:
   dataStores:
     opensearch:
       type: opensearch
-      opensearch:
+      elasticsearch:
         addresses:
-          - http://es01:9200
+          - https://es01:9200
+        username: elastic
+        password: changeme
         index: apm-*
 
   exporters:

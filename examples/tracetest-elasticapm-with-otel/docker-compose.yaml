@@ -168,6 +168,8 @@ services:
   tracetest:
     image: kubeshop/tracetest:${TAG:-latest}
     # platform: linux/amd64
+    environment:
+      - ELASTICSEARCH_SSL_VERIFICATION_MODE=none
     volumes:
       - type: bind
         source: ./tracetest-config.yaml
