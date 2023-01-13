@@ -78,7 +78,7 @@ func (c *controller) CreateTest(ctx context.Context, in openapi.Test) (openapi.I
 var errTestExists = errors.New("test already exists")
 
 func (c *controller) doCreateTest(ctx context.Context, test model.Test) (openapi.ImplResponse, error) {
-	// if they try to create a test with preset ID, we need to make sure that ID doesn't exists already
+	// if they try to create a test with preset ID, we need to make sure that ID doesn't exist already
 	if test.HasID() {
 		exists, err := c.testDB.TestIDExists(ctx, test.ID)
 
