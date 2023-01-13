@@ -190,19 +190,6 @@ services:
       timeout: 30s
       retries: 120
 
-  postgres:
-    image: postgres:14
-    environment:
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_USER: postgres
-    ports:
-      - 5432:5432
-    healthcheck:
-      test: pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
-      interval: 10s
-      timeout: 10s
-      retries: 120
-
   otel-collector:
     image: otel/opentelemetry-collector:0.54.0
     ports:
@@ -218,12 +205,29 @@ services:
       apm-server:
         condition: service_started
 
+  postgres:
+    image: postgres:14
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+    ports:
+      - 5432:5432
+    healthcheck:
+      test: pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
+      interval: 10s
+      timeout: 10s
+      retries: 120
+
   app:
     image: quick-start-nodejs
     hostname: app
     build: .
     ports:
       - "8080:8080"
+    depends_on:
+      apm-server:
+        condition: service_started
+
 
 volumes:
   certs:
