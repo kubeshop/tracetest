@@ -64,7 +64,7 @@ func (td *postgresDB) CreateEnvironment(ctx context.Context, environment model.E
 func (td *postgresDB) UpdateEnvironment(ctx context.Context, environment model.Environment) (model.Environment, error) {
 	oldEnvironment, err := td.GetEnvironment(ctx, environment.ID)
 	if err != nil {
-		return model.Environment{}, fmt.Errorf("could not get the environment while updating: %w", err)
+		return model.Environment{}, err
 	}
 
 	// keep the same creation date to keep sort order
