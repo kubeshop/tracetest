@@ -1,6 +1,6 @@
 # Tracetest + Elastic APM + OTel
 
-This repository objective is to show how you can configure your tracetest instance to connect to Elastic stack instance and use it as its tracing backend.
+This repository objective is to show how you can configure your Tracetest instance to connect to Elastic stack instance and use it as its tracing backend.
 
 ## Steps to start the environment
 ```bash
@@ -16,7 +16,7 @@ Open http://localhost:11633/ to configure the connection to Elasticsearch:
 5. You will need to download the CA certificate from the docker image and upload it to the config under "Upload CA file".
     * The command to download the `ca.crt` file is:
     `docker cp tracetest-elasticapm-with-otel-es01-1:/usr/share/elasticsearch/config/certs/ca/ca.crt .`
-6. Test the commection and Save it, if all is successful.
+6. Test the connection and Save it, if all is successful.
 
 Create a new test:
 1. Use the "HTTP Request" option. Hit Next.
@@ -38,7 +38,7 @@ docker rmi quick-start-nodejs:latest
 
 ## Project structure
 * `docker-compose.yml` - docker compose file that starts the whole environment
-    * Elastic stack single node cluster with Elasticsearch, Kibana and the APM Server.
+    * Elastic stack single node cluster with Elasticsearch, Kibana, and the APM Server.
     * OTel collector sending the OTel trace data to Elastic stack.
     * Tracetest instance configured to send the trace data to OTel collector.
 * `collector-config.yml` - OTel collector configuration file
