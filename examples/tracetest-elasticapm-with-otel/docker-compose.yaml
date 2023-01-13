@@ -124,7 +124,7 @@ services:
       - SERVER_SSL_KEY=config/certs/kib01/kib01.key
       - SERVER_SSL_CERTIFICATE=config/certs/kib01/kib01.crt
       - XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY=abc45678901234567890123456789012
-      - XPACK_ACTIONS_PRECONFIGUREDALERTHISTORYESINDEX=true     
+      - XPACK_ACTIONS_PRECONFIGUREDALERTHISTORYESINDEX=true
 
       - ES_URL=https://es01:9200
     mem_limit: ${MEM_LIMIT}
@@ -143,10 +143,10 @@ services:
       es01:
         condition: service_healthy
       kib01:
-        condition: service_healthy  
+        condition: service_healthy
     image: docker.elastic.co/apm/apm-server:${STACK_VERSION}
     volumes:
-      - certs:/usr/share/apm-server/config/certs    
+      - certs:/usr/share/apm-server/config/certs
     ports:
       - 8200:8200
     command: >
@@ -170,6 +170,7 @@ services:
     # platform: linux/amd64
     environment:
       - ELASTICSEARCH_SSL_VERIFICATION_MODE=none
+      - TRACETEST_DEV=${TRACETEST_DEV}
     volumes:
       - type: bind
         source: ./tracetest-config.yaml
