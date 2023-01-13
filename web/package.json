@@ -28,7 +28,7 @@
     "@uiw/codemirror-extensions-langs": "4.12.4",
     "@uiw/codemirror-themes": "4.12.4",
     "@uiw/react-codemirror": "4.12.4",
-    "@visx/axis": "2.11.1",
+    "@visx/axis": "2.17.0",
     "@visx/group": "2.10.0",
     "@visx/hierarchy": "2.10.0",
     "@visx/responsive": "2.10.0",
