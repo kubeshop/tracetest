@@ -1,0 +1,38 @@
+postgresConnString: "host=postgres user=postgres password=postgres port=5432 sslmode=disable"
+
+poolingConfig:
+  maxWaitTimeForTrace: 10m
+  retryDelay: 5s
+
+googleAnalytics:
+  enabled: false
+
+demo:
+  enabled: []
+
+experimentalFeatures: []
+
+telemetry:
+  dataStores:
+    elasticapm:
+      type: elasticapm
+      elasticapm:
+        addresses:
+          - https://es01:9200
+        username: elastic
+        password: changeme
+        index: apm-*
+
+  exporters:
+    collector:
+      serviceName: tracetest
+      sampling: 100 # 100%
+      exporter:
+        type: collector
+        collector:
+          endpoint: otel-collector:4317
+
+server:
+  telemetry:
+    dataStore: elasticapm
+    exporter: collector
