@@ -1,5 +1,5 @@
 import {QuestionCircleOutlined} from '@ant-design/icons';
-import {Layout, Menu} from 'antd';
+import {Layout, Menu, Typography} from 'antd';
 import styled from 'styled-components';
 
 export const Header = styled(Layout.Header)`
@@ -51,4 +51,15 @@ export const NavMenu = styled(Menu).attrs({
 export const QuestionIcon = styled(QuestionCircleOutlined)`
   color: ${({theme}) => theme.color.primary};
   font-size: ${({theme}) => theme.size.lg};
+`;
+
+export const AppVersionContainer = styled.div`
+  border-top: ${({theme}) => `1px solid ${theme.color.borderLight}`};
+`;
+
+export const AppVersion = styled(Typography.Text)`
+  && {
+    color: ${({theme}) => theme.color.textLight};
+    font-size: ${({theme}) => theme.size.sm};
+  }
 `;
