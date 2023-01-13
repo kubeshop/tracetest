@@ -13,6 +13,8 @@ type TriggerResultTriggerResult struct {
 	Http HttpResponse `json:"http,omitempty"`
 
 	Grpc GrpcResponse `json:"grpc,omitempty"`
+
+	Traceid TraceidResponse `json:"traceid,omitempty"`
 }
 
 // AssertTriggerResultTriggerResultRequired checks if the required fields are not zero-ed
@@ -21,6 +23,9 @@ func AssertTriggerResultTriggerResultRequired(obj TriggerResultTriggerResult) er
 		return err
 	}
 	if err := AssertGrpcResponseRequired(obj.Grpc); err != nil {
+		return err
+	}
+	if err := AssertTraceidResponseRequired(obj.Traceid); err != nil {
 		return err
 	}
 	return nil

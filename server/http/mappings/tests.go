@@ -142,8 +142,9 @@ func (m OpenAPI) TriggerResult(in model.TriggerResult) openapi.TriggerResult {
 	return openapi.TriggerResult{
 		TriggerType: string(in.Type),
 		TriggerResult: openapi.TriggerResultTriggerResult{
-			Http: m.HTTPResponse(in.HTTP),
-			Grpc: m.GRPCResponse(in.GRPC),
+			Http:    m.HTTPResponse(in.HTTP),
+			Grpc:    m.GRPCResponse(in.GRPC),
+			Traceid: m.TRACEIDResponse(in.TRACEID),
 		},
 	}
 }
@@ -537,9 +538,10 @@ func (m Model) Trigger(in openapi.Trigger) model.Trigger {
 func (m Model) TriggerResult(in openapi.TriggerResult) model.TriggerResult {
 
 	return model.TriggerResult{
-		Type: model.TriggerType(in.TriggerType),
-		HTTP: m.HTTPResponse(in.TriggerResult.Http),
-		GRPC: m.GRPCResponse(in.TriggerResult.Grpc),
+		Type:    model.TriggerType(in.TriggerType),
+		HTTP:    m.HTTPResponse(in.TriggerResult.Http),
+		GRPC:    m.GRPCResponse(in.TriggerResult.Grpc),
+		TRACEID: m.TRACEIDResponse(in.TriggerResult.Traceid),
 	}
 }
 

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/model"
-	"log"
 )
 
 func TRACEID() Triggerer {
@@ -15,7 +14,6 @@ func TRACEID() Triggerer {
 type traceidTriggerer struct{}
 
 func (t *traceidTriggerer) Trigger(ctx context.Context, test model.Test, opts *TriggerOptions) (Response, error) {
-	log.Print("SKIP: Trigger")
 	response := Response{
 		Result: model.TriggerResult{
 			Type: t.Type(),
@@ -30,7 +28,6 @@ func (t *traceidTriggerer) Type() model.TriggerType {
 }
 
 func (t *traceidTriggerer) Resolve(ctx context.Context, test model.Test, opts *TriggerOptions) (model.Test, error) {
-	log.Print("SKIP: Resolve")
 	traceid := test.ServiceUnderTest.TRACEID
 
 	if traceid == nil {
@@ -51,7 +48,6 @@ func (t *traceidTriggerer) Resolve(ctx context.Context, test model.Test, opts *T
 }
 
 func (t *traceidTriggerer) Variables(ctx context.Context, test model.Test, executor expression.Executor) (expression.VariablesMap, error) {
-	log.Print("SKIP: Variables")
 	triggerVariables := expression.VariablesMap{}
 
 	traceid := test.ServiceUnderTest.TRACEID

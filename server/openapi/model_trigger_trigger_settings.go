@@ -14,7 +14,7 @@ type TriggerTriggerSettings struct {
 
 	Grpc GrpcRequest `json:"grpc,omitempty"`
 
-	Traceid TriggerTriggerSettingsTraceid `json:"traceid,omitempty"`
+	Traceid TraceidRequest `json:"traceid,omitempty"`
 }
 
 // AssertTriggerTriggerSettingsRequired checks if the required fields are not zero-ed
@@ -25,7 +25,7 @@ func AssertTriggerTriggerSettingsRequired(obj TriggerTriggerSettings) error {
 	if err := AssertGrpcRequestRequired(obj.Grpc); err != nil {
 		return err
 	}
-	if err := AssertTriggerTriggerSettingsTraceidRequired(obj.Traceid); err != nil {
+	if err := AssertTraceidRequestRequired(obj.Traceid); err != nil {
 		return err
 	}
 	return nil
