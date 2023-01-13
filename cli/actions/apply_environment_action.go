@@ -43,7 +43,7 @@ func (a applyEnvironmentAction) Run(ctx context.Context, args ApplyEnvironmentCo
 	}
 
 	if fileContent.Definition().Type != "Environment" {
-		return fmt.Errorf(`file must be of type "DataStore"`)
+		return fmt.Errorf(`file must be of type "Environment"`)
 	}
 
 	fileContentString := fileContent.Contents()
