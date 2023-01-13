@@ -10,7 +10,7 @@ docker compose up -d
 ## Open Tracetest UI
 Open http://localhost:11633/ to configure the connection to Elasticsearch:
 1. In Settings, configure Elastic APM as the Data Store.
-2. Set `apm-*` as the Index name.
+2. Set `traces-apm-default` as the Index name.
 3. Add the Address and set it to `https://es01:9200`.
 4. Set the Username to `elastic` and password to `changeme`.
 5. You will need to download the CA certificate from the docker image and upload it to the config under "Upload CA file".
@@ -31,6 +31,9 @@ Open https://localhost:5601 and login using `elastic:changeme` credentials. The 
 ## Steps to stop the environment
 ```bash
 docker compose down -v
+
+# Remove the built app docker image
+docker rmi quick-start-nodejs:latest
 ```
 
 ## Project structure
