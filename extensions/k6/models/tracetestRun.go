@@ -17,9 +17,13 @@ type TracetestRun struct {
 	TestRun TestRun
 }
 
-func NewRun(cliResponse string) *TracetestRun {
+func NewRun(cliResponse string) (*TracetestRun, error) {
 	var tracetestRun TracetestRun
-	json.Unmarshal([]byte(cliResponse), &tracetestRun)
+	err := json.Unmarshal([]byte(cliResponse), &tracetestRun)
 
-	return &tracetestRun
+	if err != nil {
+		return nil, err
+	}
+
+	return &tracetestRun, nil
 }

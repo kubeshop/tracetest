@@ -30,7 +30,11 @@ func (t *Tracetest) runTest(fileName, traceId string) (*models.TracetestRun, err
 		return nil, err
 	}
 
-	testRun := models.NewRun(res)
+	testRun, err := models.NewRun(res)
+	if err != nil {
+		return nil, err
+	}
+
 	err = utils.RemoveFile(fileName)
 
 	// add link to the tracetest instance

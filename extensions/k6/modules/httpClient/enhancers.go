@@ -11,10 +11,18 @@ import (
 	"go.k6.io/k6/metrics"
 )
 
+type Tags string
+
+const (
+	TraceID        Tags = "trace_id"
+	TestID         Tags = "test_id"
+	TestDefinition Tags = "test_definition"
+)
+
 func (c *HttpClient) WithTrace(fn HttpFunc, url goja.Value, args ...goja.Value) (*HTTPResponse, error) {
 	state := c.vu.State()
 	if state == nil {
-		return nil, fmt.Errorf("HTTP requests can only be made in the VU context")
+		return nil, fmt.Errorf("HTTP requests can only be made in the VU (virtual user) context")
 	}
 
 	traceID, _, err := (&models.TraceID{
@@ -68,26 +76,26 @@ func (c *HttpClient) WithTrace(fn HttpFunc, url goja.Value, args ...goja.Value) 
 func (c *HttpClient) setTags(rt *goja.Runtime, state *lib.State, traceID string, params *goja.Object) {
 	tracetestOptions := parseTracetestOptions(rt, params)
 	state.Tags.Modify(func(tagsAndMeta *metrics.TagsAndMeta) {
-		tagsAndMeta.SetMetadata("trace_id", traceID)
+		tagsAndMeta.SetMetadata(string(TraceID), traceID)
 
 		if tracetestOptions.testID != "" {
-			tagsAndMeta.SetMetadata("test_id", tracetestOptions.testID)
+			tagsAndMeta.SetMetadata(string(TestID), tracetestOptions.testID)
 		} else if c.options.Tracetest.testID != "" {
-			tagsAndMeta.SetMetadata("test_id", c.options.Tracetest.testID)
+			tagsAndMeta.SetMetadata(string(TestID), c.options.Tracetest.testID)
 		}
 
 		if tracetestOptions.testDefinition != "" {
-			tagsAndMeta.SetMetadata("test_definition", tracetestOptions.testDefinition)
+			tagsAndMeta.SetMetadata(string(TestDefinition), tracetestOptions.testDefinition)
 		} else if c.options.Tracetest.testDefinition != "" {
-			tagsAndMeta.SetMetadata("test_definition", c.options.Tracetest.testDefinition)
+			tagsAndMeta.SetMetadata(string(TestDefinition), c.options.Tracetest.testDefinition)
 		}
 	})
 }
 
 func (c *HttpClient) deleteTags(state *lib.State) {
 	state.Tags.Modify(func(tagsAndMeta *metrics.TagsAndMeta) {
-		tagsAndMeta.DeleteMetadata("trace_id")
-		tagsAndMeta.DeleteMetadata("test_id")
-		tagsAndMeta.DeleteMetadata("test_definition")
+		tagsAndMeta.DeleteMetadata(string(TraceID))
+		tagsAndMeta.DeleteMetadata(string(TestID))
+		tagsAndMeta.DeleteMetadata(string(TestDefinition))
 	})
 }
