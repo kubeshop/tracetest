@@ -29,7 +29,7 @@ func (t *traceidTriggerer) Type() model.TriggerType {
 
 func (t *traceidTriggerer) Resolve(ctx context.Context, test model.Test, opts *TriggerOptions) (model.Test, error) {
 	traceid := test.ServiceUnderTest.TRACEID
-	if traceid == nil || traceid.ID == "" {
+	if traceid == nil {
 		return test, fmt.Errorf("no settings provided for TRACEID triggerer")
 	}
 
