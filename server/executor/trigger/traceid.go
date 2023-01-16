@@ -29,19 +29,16 @@ func (t *traceidTriggerer) Type() model.TriggerType {
 
 func (t *traceidTriggerer) Resolve(ctx context.Context, test model.Test, opts *TriggerOptions) (model.Test, error) {
 	traceid := test.ServiceUnderTest.TRACEID
-
-	if traceid == nil {
+	if traceid == nil || traceid.ID == "" {
 		return test, fmt.Errorf("no settings provided for TRACEID triggerer")
 	}
 
 	id, err := opts.Executor.ResolveStatement(WrapInQuotes(traceid.ID, "\""))
-
 	if err != nil {
 		return test, err
 	}
 
 	traceid.ID = id
-
 	test.ServiceUnderTest.TRACEID = traceid
 
 	return test, nil
