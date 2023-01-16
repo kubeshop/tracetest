@@ -1,0 +1,20 @@
+type: Test
+spec:
+  id: W656Q0c4g
+  name: http://app:8080
+  description: akadlkasjdf
+  trigger:
+    type: http
+    httpRequest:
+      url: http://app:8080/books
+      method: GET
+      headers:
+      - key: Content-Type
+        value: application/json
+  specs:
+  - selector: span[tracetest.span.type="http" name="GET /books" http.target="/books" http.method="GET"]
+    assertions:
+    - attr:http.status_code = 200
+  - selector: span[tracetest.span.type="general" name="Books List"]
+    assertions:
+    - attr:books.list.count = 4
