@@ -3,8 +3,8 @@ package tracetest
 import (
 	"fmt"
 
-	"github.com/kubeshop/tracetest/k6-extension/models"
-	"github.com/kubeshop/tracetest/k6-extension/utils"
+	"github.com/kubeshop/tracetest/extensions/k6/models"
+	"github.com/kubeshop/tracetest/extensions/k6/utils"
 )
 
 func (t *Tracetest) getIsCliInstalled() bool {

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	utils "github.com/kubeshop/tracetest/k6-extension/utils"
+	utils "github.com/kubeshop/tracetest/extensions/k6/utils"
 )
 
 type PropagatorName string
