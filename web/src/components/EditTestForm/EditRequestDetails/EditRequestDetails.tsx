@@ -2,10 +2,12 @@ import {TriggerTypes} from 'constants/Test.constants';
 import {TDraftTestForm, TTriggerRequest} from 'types/Test.types';
 import EditRequestDetailsHttp from './Http';
 import EditRequestDetailsGrpc from './Grpc';
+import EditDetailsTraceID from './TraceID';
 
 const EditRequestDetailsMap = {
   [TriggerTypes.http]: EditRequestDetailsHttp,
   [TriggerTypes.grpc]: EditRequestDetailsGrpc,
+  [TriggerTypes.traceid]: EditDetailsTraceID,
 };
 
 export interface IFormProps {

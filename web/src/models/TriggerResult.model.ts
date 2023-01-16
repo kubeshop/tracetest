@@ -5,16 +5,19 @@ import {THeader, TRawTriggerResult, TTriggerResult} from 'types/Test.types';
 const entryBodyMap = {
   [TriggerTypes.http]: 'body',
   [TriggerTypes.grpc]: 'body',
+  [TriggerTypes.traceid]: 'id',
 } as const;
 
 const entryHeadersMap = {
   [TriggerTypes.http]: 'headers',
   [TriggerTypes.grpc]: 'metadata',
+  [TriggerTypes.traceid]: 'id',
 } as const;
 
 const entryStatusCodeMap = {
   [TriggerTypes.http]: 'statusCode',
   [TriggerTypes.grpc]: 'statusCode',
+  [TriggerTypes.traceid]: 'id',
 } as const;
 
 const getResponseData = (type: TriggerTypes, response: object) => {
