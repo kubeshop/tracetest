@@ -3,8 +3,8 @@ package tracetest
 import (
 	"fmt"
 
-	"github.com/xoscar/xk6-tracetest-tracing/models"
-	"github.com/xoscar/xk6-tracetest-tracing/utils"
+	"github.com/kubeshop/tracetest/k6-extension/models"
+	"github.com/kubeshop/tracetest/k6-extension/utils"
 )
 
 func (t *Tracetest) getIsCliInstalled() bool {

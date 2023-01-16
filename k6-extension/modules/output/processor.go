@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/xoscar/xk6-tracetest-tracing/modules/tracetest"
+	"github.com/kubeshop/tracetest/k6-extension/modules/tracetest"
 	"go.k6.io/k6/lib/netext/httpext"
 	"go.k6.io/k6/metrics"
 )

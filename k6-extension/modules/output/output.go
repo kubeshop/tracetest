@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"math/rand"
 
+	"github.com/kubeshop/tracetest/k6-extension/modules/tracetest"
 	"github.com/sirupsen/logrus"
-	"github.com/xoscar/xk6-tracetest-tracing/modules/tracetest"
 
 	"go.k6.io/k6/metrics"
 	"go.k6.io/k6/output"
@@ -34,7 +34,7 @@ func New(params output.Params, tracetest *tracetest.Tracetest) (*Output, error) 
 }
 
 func (o *Output) Description() string {
-	return fmt.Sprintf("xk6-crocospans (TestRunID: %d)", o.testRunID)
+	return fmt.Sprintf("xk6-tracetest-output (TestRunID: %d)", o.testRunID)
 }
 
 func (o *Output) AddMetricSamples(samples []metrics.SampleContainer) {

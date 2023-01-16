@@ -1,9 +1,9 @@
 package tracetest
 
 import (
-	"github.com/xoscar/xk6-tracetest-tracing/modules/instance"
-	tracetestOutput "github.com/xoscar/xk6-tracetest-tracing/modules/output"
-	"github.com/xoscar/xk6-tracetest-tracing/modules/tracetest"
+	"github.com/kubeshop/tracetest/k6-extension/modules/instance"
+	tracetestOutput "github.com/kubeshop/tracetest/k6-extension/modules/output"
+	"github.com/kubeshop/tracetest/k6-extension/modules/tracetest"
 	"go.k6.io/k6/js/modules"
 	"go.k6.io/k6/output"
 )

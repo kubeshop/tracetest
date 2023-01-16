@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/dop251/goja"
-	"github.com/xoscar/xk6-tracetest-tracing/models"
-	"github.com/xoscar/xk6-tracetest-tracing/utils"
+	"github.com/kubeshop/tracetest/k6-extension/models"
+	"github.com/kubeshop/tracetest/k6-extension/utils"
 	"go.k6.io/k6/js/modules"
 	k6HTTP "go.k6.io/k6/js/modules/k6/http"
 )

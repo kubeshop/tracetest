@@ -26,38 +26,39 @@ $ go install go.k6.io/xk6/cmd/xk6@latest
 2. Build the binary:
 
 ```bash
-$ xk6 build --with github.com/grafana/xk6-distributed-tracing@latest
+$ xk6 build --with github.com/kubeshop/tracetest/k6-extension@latest
 ```
 
 ## Example
 
 ```javascript
-import tracing, { Http } from 'k6/x/tracing';
-import { sleep } from 'k6';
+import { Http } from "k6/x/tracetest";
+import { sleep } from "k6";
 
-export let options = {
+export const options = {
   vus: 1,
-  iterations: 10,
+  duration: "10s",
 };
 
-export function setup() {
-  console.log(`Running xk6-distributed-tracing v${tracing.version}`, tracing);
-}
+const http = new Http({ propagator: ["w3c", "b3"] });
 
-export default function() {
-  const http = new Http({
-    propagator: "w3c",
+export default function () {
+  http.get("https://test-api.k6.io", {
+    tracetest: {
+      // your tracetest test id
+      testId: "<tracetest-test-id>",
+    },
   });
-  const r = http.get('https://test-api.k6.io');
-  console.log(`trace_id=${r.trace_id}`);
+
   sleep(1);
 }
+
 ```
 
 Result output:
 
 ```bash
-$ ./k6 run script.js
+$ ./k6 run examples/async/test-from-id.js -o xk6-tracetest
 
           /\      |‾‾| /‾‾/   /‾‾/
      /\  /  \     |  |/  /   /  /

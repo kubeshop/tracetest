@@ -20,7 +20,7 @@ func NewConfig(params output.Params) (Config, error) {
 		var err error
 		cfg.PushInterval, err = time.ParseDuration(val)
 		if err != nil {
-			return cfg, fmt.Errorf("error parsing environment variable 'XK6_CROCOSPANS_PUSH_INTERVAL': %w", err)
+			return cfg, fmt.Errorf("error parsing environment variable 'XK6_TRACETEST_PUSH_INTERVAL': %w", err)
 		}
 	}
 

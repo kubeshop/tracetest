@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	utils "github.com/xoscar/xk6-tracetest-tracing/utils"
+	utils "github.com/kubeshop/tracetest/k6-extension/utils"
 )
 
 type PropagatorName string

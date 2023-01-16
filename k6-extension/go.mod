@@ -1,9 +1,10 @@
-module github.com/xoscar/xk6-tracetest-tracing
+module github.com/kubeshop/tracetest/k6-extension
 
 go 1.17
 
 require (
 	github.com/dop251/goja v0.0.0-20221003171542-5ea1285e6c91
+	github.com/sirupsen/logrus v1.9.0
 	go.k6.io/k6 v0.40.1-0.20221020144551-8a74171c8b43
 )
 
@@ -27,7 +28,6 @@ require (
 	github.com/onsi/gomega v1.20.2 // indirect
 	github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c // indirect
 	github.com/serenize/snaker v0.0.0-20201027110005-a7ad2135616e // indirect
-	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/spf13/afero v1.1.2 // indirect
 	github.com/tidwall/gjson v1.14.3 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
