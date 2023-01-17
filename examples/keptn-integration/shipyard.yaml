@@ -6,7 +6,6 @@ spec:
  stages:
    - name: "production"
      sequences:
-       - name: "deployment"
+       - name: "test-sequence"
          tasks:
-           - name: "update-services"
            - name: "test-services"
