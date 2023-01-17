@@ -7,20 +7,26 @@ By using the Keptn [Job Executor Service](https://github.com/keptn-contrib/job-e
 ```yaml
 apiVersion: v2
 actions:
- - name: "Run tracetest on your service"
-   events:
-     - name: "sh.keptn.event.test.triggered"
-   tasks:
-     - name: "Run tracetest"
-       files:
-         - data/test-definition.yaml
-         - data/tracetest-cli-config.yaml
-       image: "kubeshop/tracetest:latest"
-       cmd:
-         - sh
-       args:
-         - -c
-         - "./tracetest --config /keptn/data/tracetest-cli-config.yaml test run --definition /keptn/data/test-definition.yaml --wait-for-result"
+- name: "Run tracetest on your service"
+  events:
+    - name: "sh.keptn.event.test.triggered"
+  tasks:
+    - name: "Run tracetest"
+      files:
+        - data/test-definition.yaml
+        - data/tracetest-cli-config.yaml
+      image: "kubeshop/tracetest:latest"
+      cmd:
+        - tracetest
+      args:
+        - --config
+        - /keptn/data/tracetest-cli-config.yaml
+        - test
+        - run
+        - --definition
+        - /keptn/data/test-def.yaml
+        - --wait-for-result
+
 ```
 
 ## Quickstart
@@ -53,9 +59,8 @@ spec:
  stages:
    - name: "production"
      sequences:
-       - name: "deployment"
+       - name: "test-sequence"
          tasks:
-           - name: "update-services"
            - name: "test-services"
 ```
  
@@ -113,20 +118,26 @@ These files will be located in the folder `data` and will be injected into our K
 ```yaml
 apiVersion: v2
 actions:
- - name: "Run tracetest on your service"
-   events:
-     - name: "sh.keptn.event.test-services.triggered"
-   tasks:
-     - name: "Run tracetest"
-       files:
-         - data/test-definition.yaml
-         - data/tracetest-cli-config.yaml
-       image: "kubeshop/tracetest:latest"
-       cmd:
-         - sh
-       args:
-         - -c
-         - "./tracetest --config /keptn/data/tracetest-cli-config.yaml test run --definition /keptn/data/test-definition.yaml --wait-for-result"
+- name: "Run tracetest on your service"
+  events:
+    - name: "sh.keptn.event.test-services.triggered"
+  tasks:
+    - name: "Run tracetest"
+      files:
+        - data/test-definition.yaml
+        - data/tracetest-cli-config.yaml
+      image: "kubeshop/tracetest:latest"
+      cmd:
+        - tracetest
+      args:
+        - --config
+        - /keptn/data/tracetest-cli-config.yaml
+        - test
+        - run
+        - --definition
+        - /keptn/data/test-definition.yaml
+        - --wait-for-result
+
 ```
  
 Finally, we will add this job as a resource on Keptn:
@@ -144,7 +155,7 @@ Choose the `job-executor-service` integration, and add a subscription to the eve
  
 Finally, to see the integration running, we only need to execute the following command:
 ```sh
-keptn trigger sequence deployment --project keptn-tracetest-integration --service pokeshop --stage production
+keptn trigger sequence test-sequence --project keptn-tracetest-integration --service pokeshop --stage production
 ```
 
 Now you should be able to see the sequence running for `keptn-tracetest-integration` project on Keptn Bridge.
