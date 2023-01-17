@@ -24,7 +24,7 @@ actions:
         - test
         - run
         - --definition
-        - /keptn/data/test-def.yaml
+        - /keptn/data/test-definition.yaml
         - --wait-for-result
 
 ```
