@@ -5,26 +5,25 @@ import GrpcRequest from './GrpcRequest.model';
 import HttpRequest from './HttpRequest.model';
 import TraceIDRequest from './TraceIDRequest.model';
 
-const entryPointMap = {
-  [TriggerTypes.http]: 'url',
-  [TriggerTypes.grpc]: 'address',
-  [TriggerTypes.traceid]: 'id',
-} as const;
-
-const entryMethodMap = {
-  [TriggerTypes.http]: 'method',
-  [TriggerTypes.grpc]: 'method',
-  [TriggerTypes.traceid]: 'id',
-} as const;
-
-const getEntryData = (type: TriggerTypes, request: object) => {
-  const entryPointField = entryPointMap[type];
-  const entryMethodField = entryMethodMap[type];
-
-  return {
-    entryPoint: get(request, entryPointField, ''),
-    method: get(request, entryMethodField, ''),
-  };
+const EntryData = {
+  [TriggerTypes.http](request: object) {
+    return {
+      entryPoint: get(request, 'url', ''),
+      method: get(request, 'method', ''),
+    };
+  },
+  [TriggerTypes.grpc](request: object) {
+    return {
+      entryPoint: get(request, 'address', ''),
+      method: get(request, 'method', ''),
+    };
+  },
+  [TriggerTypes.traceid](request: object) {
+    return {
+      entryPoint: get(request, 'id', ''),
+      method: 'TraceID',
+    };
+  },
 };
 
 const Trigger = ({
@@ -42,7 +41,7 @@ const Trigger = ({
     request = TraceIDRequest(traceid);
   }
 
-  const {entryPoint, method} = getEntryData(type, request);
+  const {entryPoint, method} = EntryData[type](request);
 
   return {
     type,

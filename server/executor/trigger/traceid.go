@@ -16,7 +16,8 @@ type traceidTriggerer struct{}
 func (t *traceidTriggerer) Trigger(ctx context.Context, test model.Test, opts *TriggerOptions) (Response, error) {
 	response := Response{
 		Result: model.TriggerResult{
-			Type: t.Type(),
+			Type:    t.Type(),
+			TRACEID: &model.TRACEIDResponse{ID: test.ServiceUnderTest.TRACEID.ID},
 		},
 	}
 

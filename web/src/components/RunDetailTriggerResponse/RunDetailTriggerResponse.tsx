@@ -27,7 +27,7 @@ const TabsKeys = {
 const RunDetailTriggerResponse = ({
   state,
   triggerTime = 0,
-  triggerResult: {headers, body = '', statusCode = 200, bodyMimeType} = {
+  triggerResult: {headers, body = '', statusCode = 200, bodyMimeType, type} = {
     body: '',
     type: TriggerTypes.http,
     statusCode: 200,
@@ -39,11 +39,13 @@ const RunDetailTriggerResponse = ({
   return (
     <S.Container data-tour={GuidedTourService.getStep(GuidedTours.Trace, Steps.Graph)}>
       <S.TitleContainer>
-        <S.Title>Response Data</S.Title>
+        <S.Title>{type === TriggerTypes.traceid ? 'Trigger Data' : 'Response Data'}</S.Title>
         <div>
-          <S.StatusText>
-            Status: <S.StatusSpan $isError={statusCode >= 400}>{statusCode}</S.StatusSpan>
-          </S.StatusText>
+          {type !== TriggerTypes.traceid && (
+            <S.StatusText>
+              Status: <S.StatusSpan $isError={statusCode >= 400}>{statusCode}</S.StatusSpan>
+            </S.StatusText>
+          )}
           <S.StatusText>
             Time:{' '}
             <S.StatusSpan $isError={triggerTime > 1000}>
@@ -62,12 +64,16 @@ const RunDetailTriggerResponse = ({
             updateQuery([['tab', newTab]]);
           }}
         >
-          <Tabs.TabPane key={TabsKeys.Body} tab="Body">
-            <ResponseBody body={body} bodyMimeType={bodyMimeType} />
-          </Tabs.TabPane>
-          <Tabs.TabPane key={TabsKeys.Headers} tab="Headers">
-            <ResponseHeaders headers={headers} />
-          </Tabs.TabPane>
+          {type !== TriggerTypes.traceid && (
+            <>
+              <Tabs.TabPane key={TabsKeys.Body} tab="Body">
+                <ResponseBody body={body} bodyMimeType={bodyMimeType} />
+              </Tabs.TabPane>
+              <Tabs.TabPane key={TabsKeys.Headers} tab="Headers">
+                <ResponseHeaders headers={headers} />
+              </Tabs.TabPane>
+            </>
+          )}
           <Tabs.TabPane key={TabsKeys.Environment} tab="Environment">
             <ResponseEnvironment />
           </Tabs.TabPane>
