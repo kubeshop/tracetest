@@ -2,29 +2,14 @@ openapi: 3.0.0
 
 components:
   schemas:
-    Variables:
+    MissingVariablesError:
       type: object
       properties:
-        environment:
+        missingVariables:
           type: array
           items:
-            type: string
-        variables:
-          type: array
-          items:
-            type: string
-        missing:
-          type: array
-          items:
-            $ref: "#/components/schemas/MissingVariables"
-    TestVariables:
-      type: object
-      properties:
-        test:
-          $ref: "./tests.yaml#/components/schemas/Test"
-        variables:
-          $ref: "#/components/schemas/Variables"
-    MissingVariables:
+            $ref: "#/components/schemas/MissingVariable"
+    MissingVariable:
       type: object
       properties:
         key:

@@ -14,6 +14,7 @@ import (
 	"github.com/kubeshop/tracetest/server/executor/trigger"
 	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/http/mappings"
+	"github.com/kubeshop/tracetest/server/http/validation"
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/junit"
 	"github.com/kubeshop/tracetest/server/model"
@@ -294,6 +295,11 @@ func (c *controller) RunTest(ctx context.Context, testID string, runInformation 
 
 	if err != nil {
 		return handleDBError(err), err
+	}
+
+	missingVariablesError, err := validation.ValidateMissingValidations(test, environment)
+	if err != nil {
+		return openapi.Response(http.StatusUnprocessableEntity, missingVariablesError), err
 	}
 
 	run := c.runner.RunTest(ctx, test, metadata, environment)
