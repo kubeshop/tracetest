@@ -194,10 +194,6 @@ func (e Executor) resolveTerm(term *Term) (value.Value, error) {
 		return e.resolveEnvironment(term.Environment)
 	}
 
-	if term.Variable != nil {
-		return e.resolveVariable(term.Variable)
-	}
-
 	if term.FunctionCall != nil {
 		return e.resolveFunctionCall(term.FunctionCall)
 	}
@@ -271,16 +267,6 @@ func (e Executor) resolveAttribute(attribute *Attribute) (value.Value, error) {
 	}
 
 	return value.NewFromString(attributeValue), nil
-}
-
-func (e Executor) resolveVariable(variable *Variable) (value.Value, error) {
-	variableDataStore := e.Stores["var"]
-	variableValue, err := variableDataStore.Get(variable.Name())
-	if err != nil {
-		return value.Nil, fmt.Errorf("could not resolve variable %s: %w", variable.Name(), err)
-	}
-
-	return value.NewFromString(variableValue), nil
 }
 
 func (e Executor) resolveEnvironment(environment *Environment) (value.Value, error) {
