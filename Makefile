@@ -10,13 +10,30 @@ help: Makefile ## show list of commands
 	@echo ""
 	@awk 'BEGIN {FS = ":.*?## "} /[a-zA-Z_-]+:.*?## / {sub("\\\\n",sprintf("\n%22c"," "), $$2);printf "\033[36m%-40s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST) | sort
 
-generate: generate-server generate-cli generate-web
+generate: generate-server generate-cli generate-k6 generate-web
 
 generate-web: ## generates OpenAPI types for WebUI
 	cd web; npm run types:generate
 
 generate-cli: ## generates OpenAPI types for CLI
 	$(eval BASE := ./cli)
+	mkdir -p $(BASE)/tmp
+	rm -rf $(BASE)/$(OPENAPI_TARGET_DIR)
+	mkdir -p $(BASE)/$(OPENAPI_TARGET_DIR)
+
+	$(OPENAPI_GENERATOR_CLI) generate \
+		-i api/openapi.yaml \
+		-g go \
+		-o $(BASE)/tmp \
+		--generate-alias-as-model
+	cp $(BASE)/tmp/*.go $(BASE)/$(OPENAPI_TARGET_DIR)
+	chmod 644 $(BASE)/$(OPENAPI_TARGET_DIR)/*.go
+	rm -rf $(BASE)/tmp
+
+	cd $(BASE); go fmt ./...
+
+generate-k6: ## generates OpenAPI types for CLI
+	$(eval BASE := ./extensions/k6)
 	mkdir -p $(BASE)/tmp
 	rm -rf $(BASE)/$(OPENAPI_TARGET_DIR)
 	mkdir -p $(BASE)/$(OPENAPI_TARGET_DIR)
