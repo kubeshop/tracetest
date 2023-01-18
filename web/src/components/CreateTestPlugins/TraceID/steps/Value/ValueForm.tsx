@@ -10,9 +10,9 @@ const ValueForm = () => {
       <Form.Item
         label="Trace ID"
         name="id"
-        rules={[{required: true, message: 'Please enter a trace id or an expression'}]}
+        rules={[{required: true, message: 'Please enter a Trace ID or an Expression'}]}
       >
-        <Editor type={SupportedEditors.Interpolation} placeholder="Trace id or expression" />
+        <Editor type={SupportedEditors.Interpolation} placeholder="Trace ID or Expression" />
       </Form.Item>
     </S.InputContainer>
   );

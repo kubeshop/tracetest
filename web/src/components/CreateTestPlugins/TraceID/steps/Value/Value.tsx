@@ -37,7 +37,7 @@ const Value = () => {
   return (
     <Step.Step>
       <Step.FormContainer>
-        <Step.Title>Enter a trace id or an expression</Step.Title>
+        <Step.Title>Enter a Trace ID or an Expression</Step.Title>
         <Form<ITraceIDValues>
           id={ComponentNames.TraceIDValue}
           autoComplete="off"
