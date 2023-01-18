@@ -55,14 +55,12 @@ const RunDetailTriggerResponse = ({
             updateQuery([['tab', newTab]]);
           }}
         >
-          <>
-            <Tabs.TabPane key={TabsKeys.Body} tab="Body">
-              <ResponseBody body={body} bodyMimeType={bodyMimeType} />
-            </Tabs.TabPane>
-            <Tabs.TabPane key={TabsKeys.Headers} tab="Headers">
-              <ResponseHeaders headers={headers} />
-            </Tabs.TabPane>
-          </>
+          <Tabs.TabPane key={TabsKeys.Body} tab="Body">
+            <ResponseBody body={body} bodyMimeType={bodyMimeType} />
+          </Tabs.TabPane>
+          <Tabs.TabPane key={TabsKeys.Headers} tab="Headers">
+            <ResponseHeaders headers={headers} />
+          </Tabs.TabPane>
           <Tabs.TabPane key={TabsKeys.Environment} tab="Environment">
             <ResponseEnvironment />
           </Tabs.TabPane>

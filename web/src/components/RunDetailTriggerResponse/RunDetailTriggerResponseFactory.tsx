@@ -1,6 +1,6 @@
-import {TriggerTypes} from '../../constants/Test.constants';
-import {TTestRunState} from '../../types/TestRun.types';
-import {TTriggerResult} from '../../types/Test.types';
+import {TriggerTypes} from 'constants/Test.constants';
+import {TTriggerResult} from 'types/Test.types';
+import {TTestRunState} from 'types/TestRun.types';
 import RunDetailTriggerData from './RunDetailTriggerData';
 import RunDetailTriggerResponse from './RunDetailTriggerResponse';
 
