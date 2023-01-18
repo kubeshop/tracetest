@@ -1,22 +1,15 @@
 import {Tabs} from 'antd';
 import {useSearchParams} from 'react-router-dom';
+import {Steps} from 'components/GuidedTour/traceStepList';
 import {TriggerTypes} from 'constants/Test.constants';
 import {TestState} from 'constants/TestRun.constants';
 import TestRunAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
 import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
-import {TTriggerResult} from 'types/Test.types';
-import {TTestRunState} from 'types/TestRun.types';
-import {Steps} from '../GuidedTour/traceStepList';
 import ResponseBody from './ResponseBody';
 import ResponseEnvironment from './ResponseEnvironment';
 import ResponseHeaders from './ResponseHeaders';
 import * as S from './RunDetailTriggerResponse.styled';
-
-interface IProps {
-  state: TTestRunState;
-  triggerResult?: TTriggerResult;
-  triggerTime?: number;
-}
+import {IPropsComponent} from './RunDetailTriggerResponseFactory';
 
 const TabsKeys = {
   Body: 'body',
@@ -33,7 +26,7 @@ const RunDetailTriggerResponse = ({
     statusCode: 200,
     bodyMimeType: '',
   },
-}: IProps) => {
+}: IPropsComponent) => {
   const [query, updateQuery] = useSearchParams();
 
   return (

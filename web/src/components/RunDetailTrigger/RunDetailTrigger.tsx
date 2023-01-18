@@ -1,9 +1,10 @@
 import EditTest from 'components/EditTest';
-import {TestState} from '../../constants/TestRun.constants';
-import {TTest} from '../../types/Test.types';
-import {TTestRun} from '../../types/TestRun.types';
-import FailedTrace from '../FailedTrace';
-import RunDetailTriggerResponse from '../RunDetailTriggerResponse';
+import FailedTrace from 'components/FailedTrace';
+import RunDetailTriggerResponseFactory from 'components/RunDetailTriggerResponse/RunDetailTriggerResponseFactory';
+import {TriggerTypes} from 'constants/Test.constants';
+import {TestState} from 'constants/TestRun.constants';
+import {TTest} from 'types/Test.types';
+import {TTestRun} from 'types/TestRun.types';
 import * as S from './RunDetailTrigger.styled';
 
 interface IProps {
@@ -24,7 +25,12 @@ const RunDetailTrigger = ({test, run: {state, triggerResult, triggerTime}, run, 
         {shouldDisplayError ? (
           <FailedTrace isDisplayingError={shouldDisplayError} run={run} />
         ) : (
-          <RunDetailTriggerResponse state={state} triggerResult={triggerResult} triggerTime={triggerTime} />
+          <RunDetailTriggerResponseFactory
+            state={state}
+            triggerResult={triggerResult}
+            triggerTime={triggerTime}
+            type={triggerResult?.type ?? TriggerTypes.http}
+          />
         )}
       </S.SectionRight>
     </S.Container>

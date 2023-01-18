@@ -3,7 +3,6 @@ package executor
 import (
 	"context"
 	"fmt"
-
 	"github.com/kubeshop/tracetest/server/executor/trigger"
 	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/model"
@@ -157,6 +156,13 @@ func (r persistentRunner) processExecQueue(job execReq) {
 	resolvedTest, err := triggerer.Resolve(job.ctx, job.test, triggerOptions)
 	if err != nil {
 		panic(err)
+	}
+
+	if job.test.ServiceUnderTest.Type == model.TriggerTypeTRACEID {
+		traceIDFromParam, err := trace.TraceIDFromHex(job.test.ServiceUnderTest.TRACEID.ID)
+		if err == nil {
+			run.TraceID = traceIDFromParam
+		}
 	}
 
 	response, err := triggerer.Trigger(job.ctx, resolvedTest, triggerOptions)

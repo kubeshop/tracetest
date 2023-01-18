@@ -8,6 +8,7 @@ export const DEFAULT_HEADERS: IKeyValue[] = [{key: 'Content-Type', value: 'appli
 export enum TriggerTypes {
   http = 'http',
   grpc = 'grpc',
+  traceid = 'traceid',
 }
 
 export enum SortBy {

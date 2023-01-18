@@ -60,9 +60,10 @@ func (t Test) Validate() error {
 }
 
 type TestTrigger struct {
-	Type        string      `mapstructure:"type"`
-	HTTPRequest HTTPRequest `mapstructure:"httpRequest" yaml:"httpRequest,omitempty" dc:"http"`
-	GRPC        GRPC        `mapstructure:"grpc" yaml:"grpc,omitempty"`
+	Type        string         `mapstructure:"type"`
+	HTTPRequest HTTPRequest    `mapstructure:"httpRequest" yaml:"httpRequest,omitempty" dc:"http"`
+	GRPC        GRPC           `mapstructure:"grpc" yaml:"grpc,omitempty"`
+	TRACEID     TRACEIDRequest `mapstructure:"traceid" yaml:"traceid,omitempty"`
 }
 
 func (t TestTrigger) Validate() error {
