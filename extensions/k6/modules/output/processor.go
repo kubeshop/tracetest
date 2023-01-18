@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/kubeshop/tracetest/extensions/k6/modules/tracetest"
+	"github.com/kubeshop/tracetest/extensions/k6/models"
+	"github.com/kubeshop/tracetest/extensions/k6/utils"
 	"go.k6.io/k6/lib/netext/httpext"
 	"go.k6.io/k6/metrics"
 )
@@ -18,9 +19,9 @@ func (o *Output) handleSample(sample metrics.SampleContainer) {
 func (o *Output) handleHttpSample(trail *httpext.Trail) {
 	traceID, hasTrace := trail.Metadata["trace_id"]
 	testID, hasTestID := trail.Metadata["test_id"]
-	testDefinition, hasTestDefinition := trail.Metadata["test_definition"]
+	_, hasShouldWait := trail.Metadata["should_wait"]
 
-	if !hasTrace || (!hasTestID && !hasTestDefinition) {
+	if !hasTrace || !hasTestID {
 		return
 	}
 
@@ -39,7 +40,7 @@ func (o *Output) handleHttpSample(trail *httpext.Trail) {
 		return
 	}
 
-	metadata := tracetest.Metadata{
+	metadata := models.Metadata{
 		"StartTimeUnixNano": fmt.Sprint(startTime.UnixNano()),
 		"EndTimeUnixNano":   fmt.Sprint(trail.EndTime.UnixNano()),
 		"Group":             getTag("group"),
@@ -50,12 +51,14 @@ func (o *Output) handleHttpSample(trail *httpext.Trail) {
 		"HTTPStatus":        fmt.Sprint(status),
 	}
 
-	// do something with the metadata
-	o.logger.Println("METADATA: ", metadata)
+	request := models.Request{
+		Method:   getTag("method"),
+		URL:      getTag("url"),
+		ID:       utils.RandHexStringRunes(8),
+		Metadata: metadata,
+	}
 
 	if hasTestID {
-		o.tracetest.RunTest(testID, traceID)
-	} else {
-		o.tracetest.RunFromDefinition(testDefinition, traceID)
+		o.tracetest.RunTest(testID, traceID, hasShouldWait, request)
 	}
 }

@@ -5,3 +5,4 @@ k6-distributed-tracing
 vendor
 gen
 .DS_Store
+tracetest.json

@@ -14,6 +14,10 @@ import (
 
 var defaultPropagatorList = []models.PropagatorName{
 	models.PropagatorW3C,
+	models.HeaderNameW3C,
+	models.PropagatorB3,
+	models.PropagatorJaeger,
+	models.HeaderNameJaeger,
 }
 
 type Options struct {
@@ -22,14 +26,17 @@ type Options struct {
 }
 
 type TracetestOptions struct {
-	testID         string
-	testDefinition string
+	testID     string
+	shouldWait bool
 }
 
 func getOptions(vu modules.VU, val goja.Value) (Options, error) {
 	rawOptions := utils.ParseOptions(vu, val)
 	options := Options{
 		Propagator: models.NewPropagator(defaultPropagatorList),
+		Tracetest: TracetestOptions{
+			shouldWait: true,
+		},
 	}
 
 	if len(rawOptions) == 0 {
@@ -64,20 +71,21 @@ func requestToHttpFunc(method string, request HttpRequestFunc) HttpFunc {
 
 func parseTracetestOptions(runTime *goja.Runtime, params *goja.Object) TracetestOptions {
 	rawOptions := params.Get("tracetest")
-
-	if rawOptions == nil {
-		return TracetestOptions{}
+	options := TracetestOptions{
+		shouldWait: true,
 	}
 
-	options := TracetestOptions{}
-	optionsObject := rawOptions.ToObject(runTime)
+	if rawOptions == nil {
+		return options
+	}
 
+	optionsObject := rawOptions.ToObject(runTime)
 	for _, key := range optionsObject.Keys() {
 		switch key {
 		case "testId":
 			options.testID = optionsObject.Get(key).String()
-		case "testDefinition":
-			options.testDefinition = optionsObject.Get(key).String()
+		case "shouldWait":
+			options.shouldWait = optionsObject.Get(key).ToBoolean()
 		}
 	}
 

@@ -1,29 +1,36 @@
 package models
 
-import "encoding/json"
+import (
+	"fmt"
+
+	"github.com/kubeshop/tracetest/extensions/k6/openapi"
+)
 
 type Test struct {
 	ID   string
 	Name string
 }
 
-type TestRun struct {
-	ID      string
-	TraceID string
-}
-
 type TracetestRun struct {
-	Test    Test
-	TestRun TestRun
+	TestId  string
+	TestRun *openapi.TestRun
 }
 
-func NewRun(cliResponse string) (*TracetestRun, error) {
-	var tracetestRun TracetestRun
-	err := json.Unmarshal([]byte(cliResponse), &tracetestRun)
+func (tr *TracetestRun) Summary(baseUrl string) string {
+	runUrl := fmt.Sprintf("%s/test/%s/run/%s", baseUrl, tr.TestId, *tr.TestRun.Id)
 
-	if err != nil {
-		return nil, err
+	failingSpecs := false
+	if tr.TestRun != nil && tr.TestRun.Result != nil && tr.TestRun.Result.AllPassed != nil {
+		failingSpecs = !*tr.TestRun.Result.AllPassed
 	}
 
-	return &tracetestRun, nil
+	return fmt.Sprintf("RunState=%s FailingSpecs=%t, TracetestURL= %s", *tr.TestRun.State, failingSpecs, runUrl)
+}
+
+func (tr *TracetestRun) IsSuccessful() bool {
+	if tr.TestRun != nil && tr.TestRun.Result != nil && tr.TestRun.Result.AllPassed != nil {
+		return *tr.TestRun.Result.AllPassed
+	}
+
+	return false
 }

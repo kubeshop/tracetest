@@ -12,7 +12,17 @@ const tracetest = new Tracetest();
 
 export default function () {
   const response = http.get("https://test-api.k6.io");
-  tracetest.runTest(testId, response.trace_id)
+  tracetest.runTest(testId, response.trace_id, {
+    id: "123",
+    url: "https://test-api.k6.io",
+    method: "GET",
+  });
 
   sleep(1);
+}
+
+export function handleSummary() {
+  return {
+    stdout: tracetest.summary(),
+  };
 }

@@ -1,10 +1,9 @@
 module github.com/kubeshop/tracetest/extensions/k6
 
-go 1.17
+go 1.18
 
 require (
 	github.com/dop251/goja v0.0.0-20221003171542-5ea1285e6c91
-	github.com/sirupsen/logrus v1.9.0
 	go.k6.io/k6 v0.40.1-0.20221020144551-8a74171c8b43
 )
 
@@ -16,6 +15,8 @@ require (
 	github.com/andybalholm/cascadia v1.3.1 // indirect
 	github.com/dlclark/regexp2 v1.7.0 // indirect
 	github.com/fatih/color v1.13.0 // indirect
+	github.com/go-logr/logr v1.2.3 // indirect
+	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-sourcemap/sourcemap v2.1.4-0.20211119122758-180fcef48034+incompatible // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/klauspost/compress v1.15.11 // indirect
@@ -28,10 +29,20 @@ require (
 	github.com/onsi/gomega v1.20.2 // indirect
 	github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c // indirect
 	github.com/serenize/snaker v0.0.0-20201027110005-a7ad2135616e // indirect
+	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/spf13/afero v1.1.2 // indirect
 	github.com/tidwall/gjson v1.14.3 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
+	go.opentelemetry.io/contrib/propagators/aws v1.12.0 // indirect
+	go.opentelemetry.io/contrib/propagators/b3 v1.12.0 // indirect
+	go.opentelemetry.io/contrib/propagators/jaeger v1.12.0 // indirect
+	go.opentelemetry.io/contrib/propagators/ot v1.12.0 // indirect
+	go.opentelemetry.io/otel v1.11.2 // indirect
+	go.opentelemetry.io/otel/sdk v1.11.2 // indirect
+	go.opentelemetry.io/otel/trace v1.11.2 // indirect
+	go.uber.org/atomic v1.7.0 // indirect
+	go.uber.org/multierr v1.8.0 // indirect
 	golang.org/x/crypto v0.0.0-20220926161630-eccd6366d1be // indirect
 	golang.org/x/net v0.0.0-20221002022538-bcab6841153b // indirect
 	golang.org/x/sys v0.0.0-20220928140112-f11e5e49a4ec // indirect
