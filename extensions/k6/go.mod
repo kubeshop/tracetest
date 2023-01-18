@@ -4,7 +4,15 @@ go 1.18
 
 require (
 	github.com/dop251/goja v0.0.0-20221003171542-5ea1285e6c91
+	github.com/sirupsen/logrus v1.9.0
 	go.k6.io/k6 v0.40.1-0.20221020144551-8a74171c8b43
+	go.opentelemetry.io/contrib/propagators/aws v1.12.0
+	go.opentelemetry.io/contrib/propagators/b3 v1.12.0
+	go.opentelemetry.io/contrib/propagators/jaeger v1.12.0
+	go.opentelemetry.io/contrib/propagators/ot v1.12.0
+	go.opentelemetry.io/otel v1.11.2
+	go.opentelemetry.io/otel/trace v1.11.2
+	golang.org/x/oauth2 v0.4.0
 )
 
 require (
@@ -18,6 +26,7 @@ require (
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-sourcemap/sourcemap v2.1.4-0.20211119122758-180fcef48034+incompatible // indirect
+	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/klauspost/compress v1.15.11 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
@@ -29,24 +38,19 @@ require (
 	github.com/onsi/gomega v1.20.2 // indirect
 	github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c // indirect
 	github.com/serenize/snaker v0.0.0-20201027110005-a7ad2135616e // indirect
-	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/spf13/afero v1.1.2 // indirect
 	github.com/tidwall/gjson v1.14.3 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
-	go.opentelemetry.io/contrib/propagators/aws v1.12.0 // indirect
-	go.opentelemetry.io/contrib/propagators/b3 v1.12.0 // indirect
-	go.opentelemetry.io/contrib/propagators/jaeger v1.12.0 // indirect
-	go.opentelemetry.io/contrib/propagators/ot v1.12.0 // indirect
-	go.opentelemetry.io/otel v1.11.2 // indirect
 	go.opentelemetry.io/otel/sdk v1.11.2 // indirect
-	go.opentelemetry.io/otel/trace v1.11.2 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	golang.org/x/crypto v0.0.0-20220926161630-eccd6366d1be // indirect
-	golang.org/x/net v0.0.0-20221002022538-bcab6841153b // indirect
-	golang.org/x/sys v0.0.0-20220928140112-f11e5e49a4ec // indirect
-	golang.org/x/text v0.3.7 // indirect
+	golang.org/x/net v0.5.0 // indirect
+	golang.org/x/sys v0.4.0 // indirect
+	golang.org/x/text v0.6.0 // indirect
 	golang.org/x/time v0.0.0-20220922220347-f3bd1da661af // indirect
+	google.golang.org/appengine v1.6.7 // indirect
+	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/guregu/null.v3 v3.3.0 // indirect
 )

@@ -3,5 +3,4 @@ go 1.19
 use (
 	./cli
 	./server
-	./extensions/k6
 )
