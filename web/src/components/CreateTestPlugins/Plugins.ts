@@ -4,6 +4,7 @@ import Postman from './Postman';
 import Rest from './Rest';
 import Grpc from './Grpc';
 import Curl from './Curl';
+import TraceID from './TraceID';
 
 export const PluginsComponentMap: Record<SupportedPlugins, IPluginComponentMap> = {
   [SupportedPlugins.REST]: Rest,
@@ -12,6 +13,7 @@ export const PluginsComponentMap: Record<SupportedPlugins, IPluginComponentMap> 
   [SupportedPlugins.CURL]: Curl,
   [SupportedPlugins.Messaging]: {},
   [SupportedPlugins.OpenAPI]: {},
+  [SupportedPlugins.TraceID]: TraceID,
 };
 
 export default PluginsComponentMap;

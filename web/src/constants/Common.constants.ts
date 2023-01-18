@@ -52,4 +52,5 @@ export enum SupportedPlugins {
   GRPC = 'GRPC',
   Postman = 'Postman',
   OpenAPI = 'OpenAPI',
+  TraceID = 'TraceID',
 }

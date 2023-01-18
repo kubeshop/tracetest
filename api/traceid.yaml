@@ -1,0 +1,14 @@
+openapi: 3.0.0
+components:
+  schemas:
+    TRACEIDRequest:
+      type: object
+      properties:
+        id:
+          type: string
+
+    TRACEIDResponse:
+      type: object
+      properties:
+        id:
+          type: string

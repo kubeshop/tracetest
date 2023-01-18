@@ -130,8 +130,9 @@ func (m OpenAPI) Trigger(in model.Trigger) openapi.Trigger {
 	return openapi.Trigger{
 		TriggerType: string(in.Type),
 		TriggerSettings: openapi.TriggerTriggerSettings{
-			Http: m.HTTPRequest(in.HTTP),
-			Grpc: m.GRPCRequest(in.GRPC),
+			Http:    m.HTTPRequest(in.HTTP),
+			Grpc:    m.GRPCRequest(in.GRPC),
+			Traceid: m.TRACEIDRequest(in.TRACEID),
 		},
 	}
 }
@@ -141,8 +142,9 @@ func (m OpenAPI) TriggerResult(in model.TriggerResult) openapi.TriggerResult {
 	return openapi.TriggerResult{
 		TriggerType: string(in.Type),
 		TriggerResult: openapi.TriggerResultTriggerResult{
-			Http: m.HTTPResponse(in.HTTP),
-			Grpc: m.GRPCResponse(in.GRPC),
+			Http:    m.HTTPResponse(in.HTTP),
+			Grpc:    m.GRPCResponse(in.GRPC),
+			Traceid: m.TRACEIDResponse(in.TRACEID),
 		},
 	}
 }
@@ -526,18 +528,20 @@ func (m Model) RunOutputs(in []openapi.TestRunOutputs) model.OrderedMap[string, 
 
 func (m Model) Trigger(in openapi.Trigger) model.Trigger {
 	return model.Trigger{
-		Type: model.TriggerType(in.TriggerType),
-		HTTP: m.HTTPRequest(in.TriggerSettings.Http),
-		GRPC: m.GRPCRequest(in.TriggerSettings.Grpc),
+		Type:    model.TriggerType(in.TriggerType),
+		HTTP:    m.HTTPRequest(in.TriggerSettings.Http),
+		GRPC:    m.GRPCRequest(in.TriggerSettings.Grpc),
+		TRACEID: m.TRACEIDRequest(in.TriggerSettings.Traceid),
 	}
 }
 
 func (m Model) TriggerResult(in openapi.TriggerResult) model.TriggerResult {
 
 	return model.TriggerResult{
-		Type: model.TriggerType(in.TriggerType),
-		HTTP: m.HTTPResponse(in.TriggerResult.Http),
-		GRPC: m.GRPCResponse(in.TriggerResult.Grpc),
+		Type:    model.TriggerType(in.TriggerType),
+		HTTP:    m.HTTPResponse(in.TriggerResult.Http),
+		GRPC:    m.GRPCResponse(in.TriggerResult.Grpc),
+		TRACEID: m.TRACEIDResponse(in.TriggerResult.Traceid),
 	}
 }
 

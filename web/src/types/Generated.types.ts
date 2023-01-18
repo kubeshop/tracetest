@@ -1542,6 +1542,20 @@ export interface external {
     };
     operations: {};
   };
+  "traceid.yaml": {
+    paths: {};
+    components: {
+      schemas: {
+        TRACEIDRequest: {
+          id?: string;
+        };
+        TRACEIDResponse: {
+          id?: string;
+        };
+      };
+    };
+    operations: {};
+  };
   "transactions.yaml": {
     paths: {};
     components: {
@@ -1581,18 +1595,20 @@ export interface external {
       schemas: {
         Trigger: {
           /** @enum {string} */
-          triggerType?: "http" | "grpc";
+          triggerType?: "http" | "grpc" | "traceid";
           triggerSettings?: {
             http?: external["http.yaml"]["components"]["schemas"]["HTTPRequest"];
             grpc?: external["grpc.yaml"]["components"]["schemas"]["GRPCRequest"];
+            traceid?: external["traceid.yaml"]["components"]["schemas"]["TRACEIDRequest"];
           };
         };
         TriggerResult: {
           /** @enum {string} */
-          triggerType?: "http" | "grpc";
+          triggerType?: "http" | "grpc" | "traceid";
           triggerResult?: {
             http?: external["http.yaml"]["components"]["schemas"]["HTTPResponse"];
             grpc?: external["grpc.yaml"]["components"]["schemas"]["GRPCResponse"];
+            traceid?: external["traceid.yaml"]["components"]["schemas"]["TRACEIDResponse"];
           };
         };
       };

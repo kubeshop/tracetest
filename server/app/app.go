@@ -281,6 +281,7 @@ func getTriggerRegistry(tracer, appTracer trace.Tracer) *trigger.Registry {
 	triggerReg := trigger.NewRegsitry(tracer, appTracer)
 	triggerReg.Add(trigger.HTTP())
 	triggerReg.Add(trigger.GRPC())
+	triggerReg.Add(trigger.TRACEID())
 
 	return triggerReg
 }

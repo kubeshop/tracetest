@@ -45,15 +45,17 @@ type (
 	TriggerType string
 
 	Trigger struct {
-		Type TriggerType
-		HTTP *HTTPRequest
-		GRPC *GRPCRequest
+		Type    TriggerType
+		HTTP    *HTTPRequest
+		GRPC    *GRPCRequest
+		TRACEID *TRACEIDRequest
 	}
 
 	TriggerResult struct {
-		Type TriggerType
-		HTTP *HTTPResponse
-		GRPC *GRPCResponse
+		Type    TriggerType
+		HTTP    *HTTPResponse
+		GRPC    *GRPCResponse
+		TRACEID *TRACEIDResponse
 	}
 
 	SpanQuery string
