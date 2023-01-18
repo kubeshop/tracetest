@@ -28,6 +28,15 @@ func GetTokens(statement string) ([]ReflectionToken, error) {
 	return allTokens, nil
 }
 
+func GetTokensFromExpression(expression string) ([]ReflectionToken, error) {
+	parsedExpression, err := Parse(expression)
+	if err != nil {
+		return []ReflectionToken{}, fmt.Errorf("could not parse statement: %w", err)
+	}
+
+	return extractTokensFromExpression(&parsedExpression), nil
+}
+
 func extractTokensFromExpression(expr *Expr) []ReflectionToken {
 	tokens := make([]ReflectionToken, 0)
 	tokens = append(tokens, extractTokenFromTerm(expr.Left)...)

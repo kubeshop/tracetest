@@ -3,6 +3,7 @@ package expression
 import (
 	"errors"
 	"fmt"
+	"reflect"
 	"strconv"
 
 	"github.com/kubeshop/tracetest/server/expression/functions"
@@ -84,34 +85,6 @@ func (e Executor) GetParsedStatement(statement string) (Statement, error) {
 	}
 
 	return parsedStatement, nil
-}
-
-func (e Executor) StatementTermsByType(statement string, termType TermType) ([]string, error) {
-	variables := []string{}
-
-	parsedStatement, err := e.GetParsedStatement(statement)
-	if err != nil {
-		return variables, err
-	}
-
-	variables = append(variables, e.ExpressionTermsByType(parsedStatement.Left, termType)...)
-
-	if parsedStatement.Right != nil {
-		variables = append(variables, e.ExpressionTermsByType(parsedStatement.Right, EnvironmentType)...)
-	}
-
-	return variables, nil
-}
-
-func (e Executor) ExpressionTermsByType(expr *Expr, termType TermType) []string {
-	terms := expr.GetTermsByType(termType)
-	termNames := []string{}
-
-	for _, term := range terms {
-		termNames = append(termNames, term.Environment.Name())
-	}
-
-	return termNames
 }
 
 func (e Executor) ResolveStatement(statement string) (string, error) {
@@ -371,6 +344,40 @@ func (e Executor) executeFilter(input value.Value, filter *Filter) (value.Value,
 	}
 
 	return newValue, nil
+}
+
+func (e Executor) InjectStatementValueIntoStruct(input interface{}) error {
+	t := reflect.TypeOf(input)
+	v := reflect.ValueOf(input)
+	for i := 0; i < t.NumField(); i++ {
+		field := t.Field(i)
+		value := v.Field(i)
+		if field.Type.Kind() == reflect.Struct {
+			err := e.InjectStatementValueIntoStruct(input)
+			if err != nil {
+				return err
+			}
+
+			continue
+		}
+
+		if !value.CanSet() {
+			continue
+		}
+
+		enabledTagValue := field.Tag.Get("expr_enabled")
+		if enabledTagValue == "true" {
+			fieldValue := value.String()
+			exprValue, err := e.Expression(fieldValue)
+			if err != nil {
+				return fmt.Errorf(`"%s" is not an expression`, fieldValue)
+			}
+
+			value.SetString(exprValue.String())
+		}
+	}
+
+	return nil
 }
 
 func getRoundedDurationValue(value string) string {
