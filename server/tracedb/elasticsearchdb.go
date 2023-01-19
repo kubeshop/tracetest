@@ -2,6 +2,7 @@ package tracedb
 
 import (
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -11,6 +12,7 @@ import (
 	"github.com/kubeshop/tracetest/server/model"
 	"go.opentelemetry.io/otel/trace"
 	"io/ioutil"
+	"net/http"
 	"reflect"
 	"strconv"
 	"strings"
@@ -148,6 +150,11 @@ func newElasticSearchDB(cfg *config.ElasticSearchDataStoreConfig) (TraceDB, erro
 		Username:  cfg.Username,
 		Password:  cfg.Password,
 		CACert:    caCert,
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: cfg.InsecureSkipVerify,
+			},
+		},
 	})
 	if err != nil {
 		return nil, fmt.Errorf("could not create elasticsearch client: %w", err)

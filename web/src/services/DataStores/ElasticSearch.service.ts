@@ -16,6 +16,7 @@ const ElasticSearchService = (): TDataStoreService => ({
       index = '',
       username = '',
       password = '',
+      insecureSkipVerify = false,
     } = values;
     const certificate = await certificateFile.text();
     return Promise.resolve({
@@ -27,6 +28,7 @@ const ElasticSearchService = (): TDataStoreService => ({
         password,
         addresses,
         certificate,
+        insecureSkipVerify,
       },
     });
   },
@@ -48,6 +50,7 @@ const ElasticSearchService = (): TDataStoreService => ({
       password = '',
       addresses = [''],
       certificate = '',
+      insecureSkipVerify = false,
     } = (defaultDataStore[dataStoreType] as TRawElasticSearch) ?? {};
 
     const draftDataStore: IElasticSearch = {
@@ -56,6 +59,7 @@ const ElasticSearchService = (): TDataStoreService => ({
       password,
       addresses,
       certificateFile: certificate ? new File([certificate], 'certificate') : undefined,
+      insecureSkipVerify,
     };
 
     return {

@@ -1141,6 +1141,7 @@ export interface external {
           password?: string;
           index?: string;
           certificate?: string;
+          insecureSkipVerify?: boolean;
         };
         SignalFX: {
           realm?: string;

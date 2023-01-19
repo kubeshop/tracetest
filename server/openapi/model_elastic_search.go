@@ -19,6 +19,8 @@ type ElasticSearch struct {
 	Index string `json:"index,omitempty"`
 
 	Certificate string `json:"certificate,omitempty"`
+
+	InsecureSkipVerify bool `json:"insecureSkipVerify,omitempty"`
 }
 
 // AssertElasticSearchRequired checks if the required fields are not zero-ed
