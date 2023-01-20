@@ -219,7 +219,7 @@ services:
         condition: service_started
 
   app:
-    image: quick-start-nodejs
+    image: quick-start-nodejs-otel
     hostname: app
     build: .
     ports:
