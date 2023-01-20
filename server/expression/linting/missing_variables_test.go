@@ -30,66 +30,66 @@ func TestMissingVariableDetection(t *testing.T) {
 		object                   interface{}
 		expectedMissingVariables []string
 	}{
-		// {
-		// 	name:               "no_missing_variables_if_no_variables",
-		// 	availableVariables: []string{"SERVER_URL", "PORT"},
-		// 	object: HTTPRequest{
-		// 		URL:    "http://localhost",
-		// 		Method: "GET",
-		// 		Auth: HTTPAuth{
-		// 			Token: "abc",
-		// 		},
-		// 	},
-		// 	expectedMissingVariables: []string{},
-		// },
-		// {
-		// 	name:               "no_missing_variables_if_variable_exists",
-		// 	availableVariables: []string{"SERVER_URL", "PORT", "TOKEN"},
-		// 	object: HTTPRequest{
-		// 		URL:    `"${env:SERVER_URL}:${PORT}"`,
-		// 		Method: "GET",
-		// 		Auth: HTTPAuth{
-		// 			Token: "abc",
-		// 		},
-		// 	},
-		// 	expectedMissingVariables: []string{},
-		// },
-		// {
-		// 	name:               "missing_variables_if_variable_doesnt_exists",
-		// 	availableVariables: []string{"SERVER_URL"},
-		// 	object: HTTPRequest{
-		// 		URL:    `"${env:SERVER_URL}:${env:PORT}"`,
-		// 		Method: "GET",
-		// 		Auth: HTTPAuth{
-		// 			Token: "abc",
-		// 		},
-		// 	},
-		// 	expectedMissingVariables: []string{"PORT"},
-		// },
-		// {
-		// 	name:               "missing_variables_if_inner_variable_doesnt_exists",
-		// 	availableVariables: []string{"SERVER_URL", "PORT"},
-		// 	object: HTTPRequest{
-		// 		URL:    `"${env:SERVER_URL}:${env:PORT}"`,
-		// 		Method: "GET",
-		// 		Auth: HTTPAuth{
-		// 			Token: "env:TOKEN",
-		// 		},
-		// 	},
-		// 	expectedMissingVariables: []string{"TOKEN"},
-		// },
-		// {
-		// 	name:               "missing_variables_in_inner_struct",
-		// 	availableVariables: []string{"SERVER_URL", "PORT"},
-		// 	object: HTTPRequest{
-		// 		URL:    `"${env:SERVER_URL}:${env:PORT}"`,
-		// 		Method: "GET",
-		// 		Auth: HTTPAuth{
-		// 			Token: "env:TOKEN",
-		// 		},
-		// 	},
-		// 	expectedMissingVariables: []string{"TOKEN"},
-		// },
+		{
+			name:               "no_missing_variables_if_no_variables",
+			availableVariables: []string{"SERVER_URL", "PORT"},
+			object: HTTPRequest{
+				URL:    "http://localhost",
+				Method: "GET",
+				Auth: HTTPAuth{
+					Token: "abc",
+				},
+			},
+			expectedMissingVariables: []string{},
+		},
+		{
+			name:               "no_missing_variables_if_variable_exists",
+			availableVariables: []string{"SERVER_URL", "PORT", "TOKEN"},
+			object: HTTPRequest{
+				URL:    `"${env:SERVER_URL}:${PORT}"`,
+				Method: "GET",
+				Auth: HTTPAuth{
+					Token: "abc",
+				},
+			},
+			expectedMissingVariables: []string{},
+		},
+		{
+			name:               "missing_variables_if_variable_doesnt_exists",
+			availableVariables: []string{"SERVER_URL"},
+			object: HTTPRequest{
+				URL:    `"${env:SERVER_URL}:${env:PORT}"`,
+				Method: "GET",
+				Auth: HTTPAuth{
+					Token: "abc",
+				},
+			},
+			expectedMissingVariables: []string{"PORT"},
+		},
+		{
+			name:               "missing_variables_if_inner_variable_doesnt_exists",
+			availableVariables: []string{"SERVER_URL", "PORT"},
+			object: HTTPRequest{
+				URL:    `"${env:SERVER_URL}:${env:PORT}"`,
+				Method: "GET",
+				Auth: HTTPAuth{
+					Token: "env:TOKEN",
+				},
+			},
+			expectedMissingVariables: []string{"TOKEN"},
+		},
+		{
+			name:               "missing_variables_in_inner_struct",
+			availableVariables: []string{"SERVER_URL", "PORT"},
+			object: HTTPRequest{
+				URL:    `"${env:SERVER_URL}:${env:PORT}"`,
+				Method: "GET",
+				Auth: HTTPAuth{
+					Token: "env:TOKEN",
+				},
+			},
+			expectedMissingVariables: []string{"TOKEN"},
+		},
 		{
 			name:               "missing_variable_in_statements",
 			availableVariables: []string{"SERVER_URL", "PORT"},
