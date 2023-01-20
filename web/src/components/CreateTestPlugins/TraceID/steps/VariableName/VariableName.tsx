@@ -5,9 +5,9 @@ import * as Step from 'components/CreateTestPlugins/Step.styled';
 import {ComponentNames} from 'constants/Plugins.constants';
 import {useCreateTest} from 'providers/CreateTest/CreateTest.provider';
 import {ITraceIDValues} from 'types/Test.types';
-import ValueForm from './ValueForm';
+import VariableNameForm from './VariableNameForm';
 
-const Value = () => {
+const VariableName = () => {
   const {onNext, draftTest, onIsFormValid} = useCreateTest();
   const [form] = Form.useForm<ITraceIDValues>();
 
@@ -37,19 +37,20 @@ const Value = () => {
   return (
     <Step.Step>
       <Step.FormContainer>
-        <Step.Title>Enter a Trace ID or an Expression</Step.Title>
+        <Step.Title>Enter the variable name to use for the Trace ID</Step.Title>
+        <Step.Subtitle>Please enter a variable name for the Trace ID or accept the default &apos;traceId&apos; name</Step.Subtitle>
         <Form<ITraceIDValues>
-          id={ComponentNames.TraceIDValue}
+          id={ComponentNames.TraceIdVariableName}
           autoComplete="off"
           form={form}
           layout="vertical"
           onFinish={handleSubmit}
         >
-          <ValueForm />
+          <VariableNameForm />
         </Form>
       </Step.FormContainer>
     </Step.Step>
   );
 };
 
-export default Value;
+export default VariableName;

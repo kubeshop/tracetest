@@ -5,7 +5,7 @@ const TraceIDTriggerService = (): ITriggerService => ({
   async getRequest(values): Promise<TRawTRACEIDRequest> {
     const {id} = values as ITraceIDValues;
 
-    return {id};
+    return {id: id.includes('env:') ? id : `\${env:${id}}`};
   },
 
   async validateDraft(draft): Promise<boolean> {

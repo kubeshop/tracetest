@@ -10,7 +10,7 @@ export enum ComponentNames {
   UploadCollection = 'UploadCollection',
   TestsSelection = 'TestsSelection',
   ImportCommand = 'ImportCommand',
-  TraceIDValue = 'TraceIDValue',
+  TraceIdVariableName = 'TraceIdVariableName',
 }
 
 const Default: IPlugin = {
@@ -145,9 +145,9 @@ const TraceID: IPlugin = {
     ...Default.stepList,
     {
       id: 'trace-id-value',
-      name: 'Trace ID',
-      title: 'Add a Trace ID',
-      component: ComponentNames.TraceIDValue,
+      name: 'Variable Name',
+      title: 'Add a Variable Name',
+      component: ComponentNames.TraceIdVariableName,
     },
   ],
   demoList: [],

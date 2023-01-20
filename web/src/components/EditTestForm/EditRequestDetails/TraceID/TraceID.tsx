@@ -1,4 +1,4 @@
-import ValueForm from 'components/CreateTestPlugins/TraceID/steps/Value/ValueForm';
+import ValueForm from 'components/CreateTestPlugins/TraceID/steps/VariableName/VariableNameForm';
 
 const EditDetailsTraceId = () => <ValueForm />;
 
