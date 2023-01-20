@@ -3,7 +3,6 @@ package expression
 import (
 	"errors"
 	"fmt"
-	"reflect"
 	"strconv"
 
 	"github.com/kubeshop/tracetest/server/expression/functions"
@@ -344,40 +343,6 @@ func (e Executor) executeFilter(input value.Value, filter *Filter) (value.Value,
 	}
 
 	return newValue, nil
-}
-
-func (e Executor) InjectStatementValueIntoStruct(input interface{}) error {
-	t := reflect.TypeOf(input)
-	v := reflect.ValueOf(input)
-	for i := 0; i < t.NumField(); i++ {
-		field := t.Field(i)
-		value := v.Field(i)
-		if field.Type.Kind() == reflect.Struct {
-			err := e.InjectStatementValueIntoStruct(input)
-			if err != nil {
-				return err
-			}
-
-			continue
-		}
-
-		if !value.CanSet() {
-			continue
-		}
-
-		enabledTagValue := field.Tag.Get("expr_enabled")
-		if enabledTagValue == "true" {
-			fieldValue := value.String()
-			exprValue, err := e.Expression(fieldValue)
-			if err != nil {
-				return fmt.Errorf(`"%s" is not an expression`, fieldValue)
-			}
-
-			value.SetString(exprValue.String())
-		}
-	}
-
-	return nil
 }
 
 func getRoundedDurationValue(value string) string {
