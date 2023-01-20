@@ -9,6 +9,7 @@ import useDeleteResource from 'hooks/useDeleteResource';
 import usePagination from 'hooks/usePagination';
 import useTestCrud from 'providers/Test/hooks/useTestCrud';
 import {useCallback, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 import {useGetResourcesQuery} from 'redux/apis/TraceTest.api';
 import HomeAnalyticsService from 'services/Analytics/HomeAnalytics.service';
 import {ResourceType, TResource} from 'types/Resource.type';
@@ -33,6 +34,7 @@ const Resources = () => {
   const onDeleteResource = useDeleteResource();
   const {runTest} = useTestCrud();
   const {runTransaction} = useTransactionCrud();
+  const navigate = useNavigate();
 
   const handleOnRun = useCallback(
     (resource: TTransaction | TTest, type: ResourceType) => {
@@ -45,6 +47,11 @@ const Resources = () => {
   const handleOnViewAll = useCallback((id: string) => {
     onTestClick(id);
   }, []);
+
+  const handleOnEdit = (id: string, lastRunId: string, type: ResourceType) => {
+    if (type === ResourceType.Test) navigate(`/test/${id}/run/${lastRunId}`);
+    else if (type === ResourceType.Transaction) navigate(`/transaction/${id}/run/${lastRunId}`);
+  };
 
   return (
     <>
@@ -76,6 +83,7 @@ const Resources = () => {
               resource.type === ResourceType.Test ? (
                 <TestCard
                   key={resource.item.id}
+                  onEdit={handleOnEdit}
                   onDelete={onDeleteResource}
                   onRun={handleOnRun}
                   onViewAll={handleOnViewAll}
@@ -84,6 +92,7 @@ const Resources = () => {
               ) : (
                 <TransactionCard
                   key={resource.item.id}
+                  onEdit={handleOnEdit}
                   onDelete={onDeleteResource}
                   onRun={handleOnRun}
                   onViewAll={handleOnViewAll}

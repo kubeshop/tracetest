@@ -5,11 +5,13 @@ import * as S from './ResourceCard.styled';
 
 interface IProps {
   id: string;
+  canEdit: boolean;
   onDelete(): void;
+  onEdit(): void;
 }
 
-const ResourceCardActions = ({id, onDelete}: IProps) => {
-  const onClick = useCallback(
+const ResourceCardActions = ({id, canEdit = true, onDelete, onEdit}: IProps) => {
+  const onDeleteClick = useCallback(
     ({domEvent}) => {
       domEvent?.stopPropagation();
       onDelete();
@@ -17,9 +19,23 @@ const ResourceCardActions = ({id, onDelete}: IProps) => {
     [onDelete]
   );
 
+  const onEditClick = useCallback(
+    ({domEvent}) => {
+      domEvent?.stopPropagation();
+      onEdit();
+    },
+    [onEdit]
+  );
+
+  const menuItems = [];
+  if (canEdit) {
+    menuItems.push({key: 'edit', label: <span data-cy="test-card-edit">Edit</span>, onClick: onEditClick});
+  }
+  menuItems.push({key: 'delete', label: <span data-cy="test-card-delete">Delete</span>, onClick: onDeleteClick});
+
   return (
     <Dropdown
-      overlay={<Menu items={[{key: 'delete', label: <span data-cy="test-card-delete">Delete</span>, onClick}]} />}
+      overlay={<Menu items={menuItems} />}
       placement="bottomLeft"
       trigger={['click']}
     >
