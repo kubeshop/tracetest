@@ -2,6 +2,7 @@ package linting_test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/kubeshop/tracetest/server/expression/linting"
 	"github.com/kubeshop/tracetest/server/model"
@@ -25,7 +26,6 @@ type HTTPRequest struct {
 }
 
 func TestMissingVariableDetection(t *testing.T) {
-
 	testCases := []struct {
 		name                     string
 		availableVariables       []string
@@ -96,6 +96,28 @@ func TestMissingVariableDetection(t *testing.T) {
 			name:               "missing_variable_in_statements",
 			availableVariables: []string{"SERVER_URL", "PORT"},
 			object: HTTPRequest{
+				URL:    `"${env:SERVER_URL}:${env:PORT}"`,
+				Method: "GET",
+				Auth: HTTPAuth{
+					Token: "abc",
+				},
+				Assertions: []Assertion{
+					{Name: "test", Queries: []string{"env:ABC = env:ABC2"}},
+					{Name: "test2", Queries: []string{"env:CDE = env:CDE"}},
+				},
+			},
+			expectedMissingVariables: []string{"ABC", "ABC2", "CDE"},
+		},
+		{
+			name:                     "should_work_with_time_objects",
+			availableVariables:       []string{},
+			object:                   time.Now(),
+			expectedMissingVariables: []string{},
+		},
+		{
+			name:               "should_work_with_pointers",
+			availableVariables: []string{"SERVER_URL", "PORT"},
+			object: &HTTPRequest{
 				URL:    `"${env:SERVER_URL}:${env:PORT}"`,
 				Method: "GET",
 				Auth: HTTPAuth{

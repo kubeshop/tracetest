@@ -946,14 +946,14 @@ func (c *controller) RunTransaction(ctx context.Context, transactionID string, r
 		return handleDBError(err), err
 	}
 
-	// missingVariablesError, err := validation.ValidateMissingVariablesFromTransaction(ctx, c.testDB, transaction, environment)
-	// if err != nil {
-	// 	if err == validation.ErrMissingVariables {
-	// 		return openapi.Response(http.StatusUnprocessableEntity, missingVariablesError), fmt.Errorf("missing variables")
-	// 	}
+	missingVariablesError, err := validation.ValidateMissingVariablesFromTransaction(ctx, c.testDB, transaction, environment)
+	if err != nil {
+		if err == validation.ErrMissingVariables {
+			return openapi.Response(http.StatusUnprocessableEntity, missingVariablesError), fmt.Errorf("missing variables")
+		}
 
-	// 	return handleDBError(err), err
-	// }
+		return handleDBError(err), err
+	}
 
 	run := c.runner.RunTransaction(ctx, transaction, metadata, environment)
 

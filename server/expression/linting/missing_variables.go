@@ -2,6 +2,7 @@ package linting
 
 import (
 	"reflect"
+	"time"
 
 	"github.com/kubeshop/tracetest/server/expression"
 )
@@ -68,12 +69,19 @@ func traverse(target interface{}, f func(reflect.StructField, string)) {
 func traverseValue(value reflect.Value, typ reflect.Type, parentField reflect.StructField, f func(reflect.StructField, string)) {
 	switch value.Kind() {
 	case reflect.Pointer:
-		realValue := value.Elem()
+		if value.IsZero() {
+			return
+		}
+
+		realValue := value.Elem().Interface()
 		typ := reflect.TypeOf(realValue)
 		value := reflect.ValueOf(realValue)
 		traverseValue(value, typ, parentField, f)
 	case reflect.Struct:
-		traverseStruct(value, typ, f)
+		// ignore time fields
+		if !typ.AssignableTo(reflect.TypeOf(time.Now())) {
+			traverseStruct(value, typ, f)
+		}
 	case reflect.Slice:
 		for i := 0; i < value.Len(); i++ {
 			item := value.Index(i)
