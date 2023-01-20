@@ -4,25 +4,27 @@ import (
 	"testing"
 
 	"github.com/kubeshop/tracetest/server/expression/linting"
+	"github.com/kubeshop/tracetest/server/model"
 	"github.com/stretchr/testify/assert"
 )
 
+type HTTPAuth struct {
+	Token string `expr_enabled:"true"`
+}
+
+type Assertion struct {
+	Name    string
+	Queries []string `stmt_enabled:"true"`
+}
+
+type HTTPRequest struct {
+	URL        string `expr_enabled:"true"`
+	Method     string `expr_enabled:"true"`
+	Auth       HTTPAuth
+	Assertions []Assertion `stmt_enabled:"true"`
+}
+
 func TestMissingVariableDetection(t *testing.T) {
-	type HTTPAuth struct {
-		Token string `expr_enabled:"true"`
-	}
-
-	type Assertion struct {
-		Name    string
-		Queries []string `stmt_enabled:"true"`
-	}
-
-	type HTTPRequest struct {
-		URL        string `expr_enabled:"true"`
-		Method     string `expr_enabled:"true"`
-		Auth       HTTPAuth
-		Assertions []Assertion `stmt_enabled:"true"`
-	}
 
 	testCases := []struct {
 		name                     string
@@ -111,6 +113,38 @@ func TestMissingVariableDetection(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
 			missingVariables := linting.DetectMissingVariables(testCase.object, testCase.availableVariables)
+			assert.Equal(t, testCase.expectedMissingVariables, missingVariables)
+		})
+	}
+}
+
+func TestMissingVariableDetectionInOrderedMap(t *testing.T) {
+	testCases := []struct {
+		name                     string
+		availableVariables       []string
+		input                    model.OrderedMap[string, HTTPRequest]
+		expectedMissingVariables []string
+	}{
+		{
+			name: "should_be_able_to_scan_ordered_map",
+			input: model.OrderedMap[string, HTTPRequest]{}.MustAdd("abc", HTTPRequest{
+				URL:    "env:URL",
+				Method: "GET",
+				Auth: HTTPAuth{
+					Token: "env:TOKEN",
+				},
+				Assertions: []Assertion{
+					{Name: "abc", Queries: []string{"env:ABC = env:ABC"}},
+				},
+			}),
+			availableVariables:       []string{},
+			expectedMissingVariables: []string{"URL", "TOKEN", "ABC"},
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			missingVariables := linting.DetectMissingVariables(testCase.input, testCase.availableVariables)
 			assert.Equal(t, testCase.expectedMissingVariables, missingVariables)
 		})
 	}

@@ -9,7 +9,7 @@ import (
 func DetectMissingVariables(target interface{}, availableVariables []string) []string {
 	missingVariables := []string{}
 
-	traverseObject(target, func(f reflect.StructField, value string) {
+	traverse(target, func(f reflect.StructField, value string) {
 		tokens := getTokens(f, value)
 		variables := make([]string, 0)
 		for _, token := range tokens {
@@ -58,67 +58,38 @@ func getTokens(fieldInfo reflect.StructField, value string) []expression.Reflect
 	return []expression.ReflectionToken{}
 }
 
-func traverseObject(target interface{}, f func(reflect.StructField, string)) {
-	t := reflect.TypeOf(target)
-	v := reflect.ValueOf(target)
+func traverse(target interface{}, f func(reflect.StructField, string)) {
+	typ := reflect.TypeOf(target)
+	value := reflect.ValueOf(target)
 
-	switch v.Kind() {
+	traverseValue(value, typ, reflect.StructField{}, f)
+}
+
+func traverseValue(value reflect.Value, typ reflect.Type, parentField reflect.StructField, f func(reflect.StructField, string)) {
+	switch value.Kind() {
 	case reflect.Pointer:
-		traverseObject(v.Elem(), f)
+		realValue := value.Elem()
+		typ := reflect.TypeOf(realValue)
+		value := reflect.ValueOf(realValue)
+		traverseValue(value, typ, parentField, f)
 	case reflect.Struct:
-		traverseStruct(v, t, f)
-	case reflect.Array:
-		for i := 0; i < v.Len(); i++ {
-			item := v.Index(i)
-			traverseObject(item, f)
-		}
-	}
-}
-
-func traverseStruct(v reflect.Value, t reflect.Type, f func(reflect.StructField, string)) {
-	for i := 0; i < v.NumField(); i++ {
-		field := t.Field(i)
-		value := v.Field(i)
-
-		if value.Kind() == reflect.Struct {
-			traverseObject(value.Interface(), f)
-			continue
-		}
-
-		if value.Kind() == reflect.Pointer {
-			if !value.IsNil() && value.CanInterface() {
-				traverseObject(value.Elem().Interface(), f)
-			}
-			continue
-		}
-
-		if value.Kind() == reflect.Slice {
-			traverseArrayField(field, value.Interface(), f)
-		}
-
-		if !value.CanInterface() {
-			continue
-		}
-
-		f(field, value.String())
-	}
-}
-
-func traverseArrayField(field reflect.StructField, value interface{}, f func(reflect.StructField, string)) {
-	t := reflect.TypeOf(value)
-	v := reflect.ValueOf(value)
-	switch t.Kind() {
+		traverseStruct(value, typ, f)
 	case reflect.Slice:
-		for i := 0; i < v.Len(); i++ {
-			item := v.Index(i)
-			if item.Kind() == reflect.String {
-				f(field, item.String())
-			} else {
-				traverseArrayField(field, item.Interface(), f)
-			}
+		for i := 0; i < value.Len(); i++ {
+			item := value.Index(i)
+			traverseValue(item, item.Type(), parentField, f)
 		}
 	default:
-		traverseObject(value, f)
+		f(parentField, value.String())
+	}
+}
+
+func traverseStruct(value reflect.Value, typ reflect.Type, f func(reflect.StructField, string)) {
+	for i := 0; i < value.NumField(); i++ {
+		fieldType := typ.Field(i)
+		field := value.Field(i)
+		typ := field.Type()
+		traverseValue(field, typ, fieldType, f)
 	}
 }
 
