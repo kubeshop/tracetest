@@ -6,7 +6,7 @@ import (
 )
 
 type OrderedMap[K comparable, V any] struct {
-	list        []V
+	List        []V
 	keyPosition map[K]int
 	positionKey map[int]K
 }
@@ -70,8 +70,8 @@ func (om OrderedMap[K, V]) Add(key K, asserts V) (OrderedMap[K, V], error) {
 		return OrderedMap[K, V]{}, errors.New("selector already exists")
 	}
 
-	om.list = append(om.list, asserts)
-	ix := len(om.list) - 1
+	om.List = append(om.List, asserts)
+	ix := len(om.List) - 1
 	om.keyPosition[key] = ix
 	om.positionKey[ix] = key
 
@@ -79,7 +79,7 @@ func (om OrderedMap[K, V]) Add(key K, asserts V) (OrderedMap[K, V], error) {
 }
 
 func (om OrderedMap[K, V]) Len() int {
-	return len(om.list)
+	return len(om.List)
 }
 
 func (om OrderedMap[K, V]) Get(key K) V {
@@ -89,11 +89,11 @@ func (om OrderedMap[K, V]) Get(key K) V {
 		return result
 	}
 
-	return om.list[ix]
+	return om.List[ix]
 }
 
 func (om *OrderedMap[K, V]) ForEach(fn func(key K, val V) error) error {
-	for ix, asserts := range om.list {
+	for ix, asserts := range om.List {
 		K := om.positionKey[ix]
 		err := fn(K, asserts)
 		if err != nil {
