@@ -91,7 +91,6 @@ Now, we will set up a job associated with the `pokeshop` service, listening to t
 ```yaml
 scheme: http
 endpoint: tracetest.tracetest.svc.cluster.local:11633
-analyticsEnabled: false
 ```
 
 2. Create the [`test-definition.yaml`](./test-definition.yaml) Tracetest test definition in your current directory:

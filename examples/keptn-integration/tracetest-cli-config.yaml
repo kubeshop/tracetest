@@ -1,3 +1,2 @@
 scheme: http
 endpoint: tracetest.tracetest.svc.cluster.local:11633
-analyticsEnabled: false
