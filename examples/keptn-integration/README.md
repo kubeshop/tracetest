@@ -48,7 +48,7 @@ On your machine you should have:
 
 With everything set up, we will start configuring Keptn and Tracetest.
 
-### 1. Setup a project and a service
+### 1. Setup a project and a service.
  
 Keptn works with [concepts](https://keptn.sh/docs/concepts/glossary/) of a Project (element to maintain multiple services forming an application in stages) and a Service (smallest deployable unit and is deployed in all project stages according to the order).
 
@@ -83,7 +83,7 @@ keptn create project keptn-tracetest-integration -y -s shipyard.yaml
 keptn create service pokeshop --project keptn-tracetest-integration -y
 ```
  
-### 2. Add Tracetest files and job files as resources of a service
+### 2. Add Tracetest files and job files as resources of a service.
  
 Now, we will set up a job associated with the `pokeshop` service, listening to the task event `test-services`:
  
@@ -155,7 +155,7 @@ This job will run Tracetest every time an event of `test-services` happens, list
 keptn add-resource --project keptn-tracetest-integration --service pokeshop --stage production --resource job-config.yaml --resourceUri job/config.yaml
 ```
  
-### 3. Setup Job Executor Service to see events emitted by the test step
+### 3. Setup Job Executor Service to see events emitted by the test step.
  
 To guarantee that our job will be called by Keptn when we execute the `deployment` sequence, we need to configure the integration `Job Executor Service` on `keptn-tracetest-integration` project to listen to `sh.keptn.event.test-services.triggered` events. We can do that only through the Keptn Bridge (their Web UI), by going to our project, choosing the `Settings` option, and later `Integrations`.
  
