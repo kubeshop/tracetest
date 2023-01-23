@@ -78,9 +78,13 @@ func traverseValue(value reflect.Value, typ reflect.Type, parentField reflect.St
 		value := reflect.ValueOf(realValue)
 		traverseValue(value, typ, parentField, f)
 	case reflect.Struct:
-		// ignore time fields
+		// Don't traverse time fields. Time fields are structs with internal information,
+		// we don't have to go thought its internals to find missing variables. So,
+		// just call the callback on them directly instead.
 		if !typ.AssignableTo(reflect.TypeOf(time.Now())) {
 			traverseStruct(value, typ, f)
+		} else {
+			f(parentField, value.String())
 		}
 	case reflect.Slice:
 		for i := 0; i < value.Len(); i++ {
