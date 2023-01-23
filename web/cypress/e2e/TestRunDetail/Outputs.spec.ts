@@ -20,7 +20,9 @@ describe('Outputs', () => {
     cy.get('[data-cy=output-add-button]').click();
     cy.get('form#testOutput').within(() => {
       cy.get('#testOutput_name').type('status_code');
-      cy.get('[data-cy=selector-editor] [contenteditable=true]').type('span[tracetest.span.type = "http"]:first');
+      cy.get('[data-cy=selector-editor] [contenteditable=true]')
+        .clear()
+        .type('span[tracetest.span.type = "http"]:first');
       cy.get('[data-cy=expression-editor] [contenteditable=true]').type('attr:http.status_code');
     });
     cy.wait('@getSelect');
@@ -56,7 +58,9 @@ describe('Outputs', () => {
     cy.get('[data-cy=output-add-button]').click();
     cy.get('form#testOutput').within(() => {
       cy.get('#testOutput_name').type('status_code');
-      cy.get('[data-cy=selector-editor] [contenteditable=true]').type('span[tracetest.span.type = "http"]:first');
+      cy.get('[data-cy=selector-editor] [contenteditable=true]')
+        .clear()
+        .type('span[tracetest.span.type = "http"]:first');
       cy.get('[data-cy=expression-editor] [contenteditable=true]').type('attr:http.status_code');
     });
     cy.wait('@getSelect');
