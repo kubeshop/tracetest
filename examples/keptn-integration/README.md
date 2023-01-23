@@ -31,7 +31,7 @@ actions:
 
 ## Quickstart
 
-Here we will show how to use Tracetest to do these tests and help in your delivery and testing workflows using the [Pokeshop](https://docs.tracetest.io/pokeshop/) example, available at address `http://demo-pokemon-api.demo`` at Kubernetes.
+Here we will show how to use Tracetest to do these tests and help in your delivery and testing workflows using the [Pokeshop](https://docs.tracetest.io/pokeshop/) example, available at address `http://demo-pokemon-api.demo` at Kubernetes.
 
 ### Prerequisites
 
