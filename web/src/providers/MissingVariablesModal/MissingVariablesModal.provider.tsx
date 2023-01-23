@@ -1,12 +1,11 @@
 import {noop} from 'lodash';
 import {createContext, useCallback, useContext, useMemo, useState} from 'react';
-import {TTestVariables} from 'types/Variables.types';
-import VariablesService from 'services/Variables.service';
 import MissingVariablesModal from 'components/MissingVariablesModal';
 import {TEnvironmentValue} from 'types/Environment.types';
+import {TMissingVariable} from 'types/Variables.types';
 
 type TOnOPenProps = {
-  testsVariables: TTestVariables[];
+  missingVariables: TMissingVariable[];
   name: string;
   onSubmit(draft: TEnvironmentValue[]): void;
 };
@@ -26,8 +25,8 @@ interface IProps {
 export const useMissingVariablesModal = () => useContext(Context);
 
 const MissingVariablesModalProvider = ({children}: IProps) => {
-  const [{testsVariables = [], onSubmit, name}, setProps] = useState<TOnOPenProps>({
-    testsVariables: [],
+  const [{missingVariables = [], onSubmit, name}, setProps] = useState<TOnOPenProps>({
+    missingVariables: [],
     onSubmit: noop,
     name: '',
   });
@@ -46,14 +45,13 @@ const MissingVariablesModalProvider = ({children}: IProps) => {
     [onSubmit]
   );
 
-  const variables = useMemo(() => VariablesService.getVariableEntries(testsVariables), [testsVariables]);
   const value = useMemo<IContext>(() => ({onOpen}), [onOpen]);
 
   return (
     <Context.Provider value={value}>
       {children}
       <MissingVariablesModal
-        variables={variables}
+        missingVariables={missingVariables}
         onClose={() => setIsOpen(false)}
         onSubmit={handleSubmit}
         isOpen={isOpen}

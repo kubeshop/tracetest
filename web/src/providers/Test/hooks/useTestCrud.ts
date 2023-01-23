@@ -9,9 +9,10 @@ import {TriggerTypeToPlugin} from 'constants/Plugins.constants';
 import {TriggerTypes} from 'constants/Test.constants';
 import TestService from 'services/Test.service';
 import {TEnvironmentValue} from 'types/Environment.types';
-import {useEditTestMutation, useLazyGetTestVariablesQuery, useRunTestMutation} from 'redux/apis/TraceTest.api';
-import {useEnvironment} from '../../Environment/Environment.provider';
-import {useMissingVariablesModal} from '../../MissingVariablesModal/MissingVariablesModal.provider';
+import {useEditTestMutation, useRunTestMutation} from 'redux/apis/TraceTest.api';
+import {useEnvironment} from 'providers/Environment/Environment.provider';
+import {useMissingVariablesModal} from 'providers/MissingVariablesModal/MissingVariablesModal.provider';
+import {RunErrorTypes, TRunError} from 'types/TestRun.types';
 
 const useTestCrud = () => {
   const dispatch = useAppDispatch();
@@ -19,7 +20,6 @@ const useTestCrud = () => {
   const {updateIsInitialized} = useTestSpecs();
   const [editTest, {isLoading: isLoadingEditTest}] = useEditTestMutation();
   const [runTestAction, {isLoading: isLoadingRunTest}] = useRunTestMutation();
-  const [getTestVariables, {isLoading: isGetVariablesLoading}] = useLazyGetTestVariablesQuery();
   const isEditLoading = isLoadingEditTest || isLoadingRunTest;
   const match = useMatch('/test/:testId/run/:runId/:mode');
   const {selectedEnvironment} = useEnvironment();
@@ -27,33 +27,31 @@ const useTestCrud = () => {
 
   const runTest = useCallback(
     async (test: TTest, runId?: string, environmentId = selectedEnvironment?.id) => {
-      const testVariables = await getTestVariables({
-        testId: test.id,
-        version: test.version,
-        environmentId,
-        runId,
-      }).unwrap();
-
       const run = async (variables: TEnvironmentValue[] = []) => {
-        TestAnalyticsService.onRunTest();
-        const {id} = await runTestAction({testId: test.id, environmentId, variables}).unwrap();
-        dispatch(reset());
+        try {
+          TestAnalyticsService.onRunTest();
+          const {id} = await runTestAction({testId: test.id, environmentId, variables}).unwrap();
+          dispatch(reset());
 
-        const mode = match?.params.mode || 'trigger';
-        navigate(`/test/${test.id}/run/${id}/${mode}`);
+          const mode = match?.params.mode || 'trigger';
+          navigate(`/test/${test.id}/run/${id}/${mode}`);
+        } catch (error) {
+          const {type, missingVariables} = error as TRunError;
+          if (type === RunErrorTypes.MissingVariables)
+            onOpen({
+              name: test.name,
+              missingVariables,
+              onSubmit(missing) {
+                run(missing);
+              },
+            });
+          else throw error;
+        }
       };
 
-      if (!testVariables.variables.missing.length) run();
-      else
-        onOpen({
-          name: test.name,
-          testsVariables: [testVariables],
-          onSubmit(variables) {
-            run(variables);
-          },
-        });
+      run();
     },
-    [dispatch, getTestVariables, match?.params.mode, navigate, onOpen, runTestAction, selectedEnvironment?.id]
+    [dispatch, match?.params.mode, navigate, onOpen, runTestAction, selectedEnvironment?.id]
   );
 
   const edit = useCallback(
@@ -78,7 +76,6 @@ const useTestCrud = () => {
     runTest,
     isEditLoading,
     isLoadingRunTest,
-    isGetVariablesLoading,
   };
 };
 

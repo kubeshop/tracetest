@@ -13,6 +13,10 @@ const TestRun = () => ({
 
     return attributeList;
   },
+
+  getIsMissingVariablesError(data: any) {
+    return !!data && data['missingVariables'];
+  },
 });
 
 export default TestRun();

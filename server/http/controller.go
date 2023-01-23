@@ -299,7 +299,7 @@ func (c *controller) RunTest(ctx context.Context, testID string, runInformation 
 	missingVariablesError, err := validation.ValidateMissingVariables(ctx, c.testDB, test, environment)
 	if err != nil {
 		if err == validation.ErrMissingVariables {
-			return openapi.Response(http.StatusUnprocessableEntity, missingVariablesError), fmt.Errorf("missing variables")
+			return openapi.Response(http.StatusUnprocessableEntity, missingVariablesError), nil
 		}
 
 		return handleDBError(err), err

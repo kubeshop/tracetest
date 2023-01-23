@@ -14,31 +14,31 @@ import (
 	"encoding/json"
 )
 
-// MissingVariables struct for MissingVariables
-type MissingVariables struct {
+// MissingVariable struct for MissingVariable
+type MissingVariable struct {
 	Key          *string `json:"key,omitempty"`
 	DefaultValue *string `json:"defaultValue,omitempty"`
 }
 
-// NewMissingVariables instantiates a new MissingVariables object
+// NewMissingVariable instantiates a new MissingVariable object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewMissingVariables() *MissingVariables {
-	this := MissingVariables{}
+func NewMissingVariable() *MissingVariable {
+	this := MissingVariable{}
 	return &this
 }
 
-// NewMissingVariablesWithDefaults instantiates a new MissingVariables object
+// NewMissingVariableWithDefaults instantiates a new MissingVariable object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewMissingVariablesWithDefaults() *MissingVariables {
-	this := MissingVariables{}
+func NewMissingVariableWithDefaults() *MissingVariable {
+	this := MissingVariable{}
 	return &this
 }
 
 // GetKey returns the Key field value if set, zero value otherwise.
-func (o *MissingVariables) GetKey() string {
+func (o *MissingVariable) GetKey() string {
 	if o == nil || o.Key == nil {
 		var ret string
 		return ret
@@ -48,7 +48,7 @@ func (o *MissingVariables) GetKey() string {
 
 // GetKeyOk returns a tuple with the Key field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *MissingVariables) GetKeyOk() (*string, bool) {
+func (o *MissingVariable) GetKeyOk() (*string, bool) {
 	if o == nil || o.Key == nil {
 		return nil, false
 	}
@@ -56,7 +56,7 @@ func (o *MissingVariables) GetKeyOk() (*string, bool) {
 }
 
 // HasKey returns a boolean if a field has been set.
-func (o *MissingVariables) HasKey() bool {
+func (o *MissingVariable) HasKey() bool {
 	if o != nil && o.Key != nil {
 		return true
 	}
@@ -65,12 +65,12 @@ func (o *MissingVariables) HasKey() bool {
 }
 
 // SetKey gets a reference to the given string and assigns it to the Key field.
-func (o *MissingVariables) SetKey(v string) {
+func (o *MissingVariable) SetKey(v string) {
 	o.Key = &v
 }
 
 // GetDefaultValue returns the DefaultValue field value if set, zero value otherwise.
-func (o *MissingVariables) GetDefaultValue() string {
+func (o *MissingVariable) GetDefaultValue() string {
 	if o == nil || o.DefaultValue == nil {
 		var ret string
 		return ret
@@ -80,7 +80,7 @@ func (o *MissingVariables) GetDefaultValue() string {
 
 // GetDefaultValueOk returns a tuple with the DefaultValue field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *MissingVariables) GetDefaultValueOk() (*string, bool) {
+func (o *MissingVariable) GetDefaultValueOk() (*string, bool) {
 	if o == nil || o.DefaultValue == nil {
 		return nil, false
 	}
@@ -88,7 +88,7 @@ func (o *MissingVariables) GetDefaultValueOk() (*string, bool) {
 }
 
 // HasDefaultValue returns a boolean if a field has been set.
-func (o *MissingVariables) HasDefaultValue() bool {
+func (o *MissingVariable) HasDefaultValue() bool {
 	if o != nil && o.DefaultValue != nil {
 		return true
 	}
@@ -97,11 +97,11 @@ func (o *MissingVariables) HasDefaultValue() bool {
 }
 
 // SetDefaultValue gets a reference to the given string and assigns it to the DefaultValue field.
-func (o *MissingVariables) SetDefaultValue(v string) {
+func (o *MissingVariable) SetDefaultValue(v string) {
 	o.DefaultValue = &v
 }
 
-func (o MissingVariables) MarshalJSON() ([]byte, error) {
+func (o MissingVariable) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.Key != nil {
 		toSerialize["key"] = o.Key
@@ -112,38 +112,38 @@ func (o MissingVariables) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-type NullableMissingVariables struct {
-	value *MissingVariables
+type NullableMissingVariable struct {
+	value *MissingVariable
 	isSet bool
 }
 
-func (v NullableMissingVariables) Get() *MissingVariables {
+func (v NullableMissingVariable) Get() *MissingVariable {
 	return v.value
 }
 
-func (v *NullableMissingVariables) Set(val *MissingVariables) {
+func (v *NullableMissingVariable) Set(val *MissingVariable) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableMissingVariables) IsSet() bool {
+func (v NullableMissingVariable) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableMissingVariables) Unset() {
+func (v *NullableMissingVariable) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableMissingVariables(val *MissingVariables) *NullableMissingVariables {
-	return &NullableMissingVariables{value: val, isSet: true}
+func NewNullableMissingVariable(val *MissingVariable) *NullableMissingVariable {
+	return &NullableMissingVariable{value: val, isSet: true}
 }
 
-func (v NullableMissingVariables) MarshalJSON() ([]byte, error) {
+func (v NullableMissingVariable) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableMissingVariables) UnmarshalJSON(src []byte) error {
+func (v *NullableMissingVariable) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

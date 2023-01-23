@@ -5,11 +5,11 @@ import {TDraftTransaction, TTransaction} from 'types/Transaction.types';
 import {
   useDeleteTransactionByIdMutation,
   useEditTransactionMutation,
-  useLazyGetTransactionVariablesQuery,
   useRunTransactionMutation,
 } from 'redux/apis/TraceTest.api';
 import {TEnvironmentValue} from 'types/Environment.types';
-import {useMissingVariablesModal} from '../../MissingVariablesModal/MissingVariablesModal.provider';
+import {useMissingVariablesModal} from 'providers/MissingVariablesModal/MissingVariablesModal.provider';
+import {RunErrorTypes, TRunError} from 'types/TestRun.types';
 
 const useTransactionCrud = () => {
   const navigate = useNavigate();
@@ -17,36 +17,33 @@ const useTransactionCrud = () => {
   const [runTransactionAction, {isLoading: isLoadingRunTransaction}] = useRunTransactionMutation();
   const [deleteTransactionAction] = useDeleteTransactionByIdMutation();
   const isEditLoading = isTransactionEditLoading || isLoadingRunTransaction;
-  const [getTransactionVariables, {isLoading: isGetVariablesLoading}] = useLazyGetTransactionVariablesQuery();
   const {selectedEnvironment} = useEnvironment();
   const {onOpen} = useMissingVariablesModal();
 
   const runTransaction = useCallback(
     async (transaction: TTransaction, runId?: string, environmentId = selectedEnvironment?.id) => {
-      const transactionVariables = await getTransactionVariables({
-        transactionId: transaction.id,
-        version: transaction.version,
-        environmentId,
-        runId,
-      }).unwrap();
-
       const run = async (variables: TEnvironmentValue[] = []) => {
-        const {id} = await runTransactionAction({transactionId: transaction.id, environmentId, variables}).unwrap();
+        try {
+          const {id} = await runTransactionAction({transactionId: transaction.id, environmentId, variables}).unwrap();
 
-        navigate(`/transaction/${transaction.id}/run/${id}`);
+          navigate(`/transaction/${transaction.id}/run/${id}`);
+        } catch (error) {
+          const {type, missingVariables} = error as TRunError;
+          if (type === RunErrorTypes.MissingVariables)
+            onOpen({
+              name: transaction.name,
+              missingVariables,
+              onSubmit(missing) {
+                run(missing);
+              },
+            });
+          else throw error;
+        }
       };
 
-      if (!transactionVariables.hasMissingVariables) run();
-      else
-        onOpen({
-          name: transaction.name,
-          testsVariables: transactionVariables.variables,
-          onSubmit(variables) {
-            run(variables);
-          },
-        });
+      run();
     },
-    [getTransactionVariables, navigate, onOpen, runTransactionAction, selectedEnvironment?.id]
+    [navigate, onOpen, runTransactionAction, selectedEnvironment?.id]
   );
 
   const edit = useCallback(
@@ -72,7 +69,6 @@ const useTransactionCrud = () => {
     runTransaction,
     deleteTransaction,
     isEditLoading,
-    isGetVariablesLoading,
   };
 };
 

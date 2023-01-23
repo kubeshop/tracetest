@@ -8,6 +8,7 @@ import {IListenerFunction} from 'gateways/WebSocket.gateway';
 import WebSocketService from 'services/WebSocket.service';
 import {TEnvironmentValue} from 'types/Environment.types';
 import {getTotalCountFromHeaders} from 'utils/Common';
+import RunError from 'models/RunError.model';
 
 const TransactionRunEndpoint = (builder: TTestApiEndpointBuilder) => ({
   runTransaction: builder.mutation<
@@ -23,6 +24,7 @@ const TransactionRunEndpoint = (builder: TTestApiEndpointBuilder) => ({
       {type: TracetestApiTags.TRANSACTION_RUN, id: `${transactionId}-LIST`},
     ],
     transformResponse: (rawTransactionRun: TRawTransactionRun) => TransactionRun(rawTransactionRun),
+    transformErrorResponse: ({data: result}) => RunError(result),
   }),
 
   getTransactionRuns: builder.query<

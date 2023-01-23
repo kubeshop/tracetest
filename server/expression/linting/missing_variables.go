@@ -1,6 +1,7 @@
 package linting
 
 import (
+	"fmt"
 	"reflect"
 	"time"
 
@@ -37,7 +38,7 @@ func DetectMissingVariables(target interface{}, availableVariables []string) []s
 
 func getTokens(fieldInfo reflect.StructField, value string) []expression.Token {
 	if fieldInfo.Tag.Get("expr_enabled") == "true" {
-		exprTokens, err := expression.GetTokensFromExpression(value)
+		exprTokens, err := expression.GetTokensFromExpression(fmt.Sprintf("\"%s\"", value))
 		if err != nil {
 			// probably not an expression, just skip it
 			return []expression.Token{}

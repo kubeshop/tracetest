@@ -48,7 +48,7 @@ func TestMissingVariableDetection(t *testing.T) {
 			name:               "no_missing_variables_if_variable_exists",
 			availableVariables: []string{"SERVER_URL", "PORT", "TOKEN"},
 			object: HTTPRequest{
-				URL:    `"${env:SERVER_URL}:${PORT}"`,
+				URL:    `${env:SERVER_URL}:${PORT}`,
 				Method: "GET",
 				Auth: HTTPAuth{
 					Token: "abc",
@@ -60,7 +60,7 @@ func TestMissingVariableDetection(t *testing.T) {
 			name:               "missing_variables_if_variable_doesnt_exists",
 			availableVariables: []string{"SERVER_URL"},
 			object: HTTPRequest{
-				URL:    `"${env:SERVER_URL}:${env:PORT}"`,
+				URL:    `${env:SERVER_URL}:${env:PORT}`,
 				Method: "GET",
 				Auth: HTTPAuth{
 					Token: "abc",
@@ -72,10 +72,10 @@ func TestMissingVariableDetection(t *testing.T) {
 			name:               "missing_variables_if_inner_variable_doesnt_exists",
 			availableVariables: []string{"SERVER_URL", "PORT"},
 			object: HTTPRequest{
-				URL:    `"${env:SERVER_URL}:${env:PORT}"`,
+				URL:    `${env:SERVER_URL}:${env:PORT}`,
 				Method: "GET",
 				Auth: HTTPAuth{
-					Token: "env:TOKEN",
+					Token: "${env:TOKEN}",
 				},
 			},
 			expectedMissingVariables: []string{"TOKEN"},
@@ -84,10 +84,10 @@ func TestMissingVariableDetection(t *testing.T) {
 			name:               "missing_variables_in_inner_struct",
 			availableVariables: []string{"SERVER_URL", "PORT"},
 			object: HTTPRequest{
-				URL:    `"${env:SERVER_URL}:${env:PORT}"`,
+				URL:    `${env:SERVER_URL}:${env:PORT}`,
 				Method: "GET",
 				Auth: HTTPAuth{
-					Token: "env:TOKEN",
+					Token: "${env:TOKEN}",
 				},
 			},
 			expectedMissingVariables: []string{"TOKEN"},
@@ -96,7 +96,7 @@ func TestMissingVariableDetection(t *testing.T) {
 			name:               "missing_variable_in_statements",
 			availableVariables: []string{"SERVER_URL", "PORT"},
 			object: HTTPRequest{
-				URL:    `"${env:SERVER_URL}:${env:PORT}"`,
+				URL:    `${env:SERVER_URL}:${env:PORT}`,
 				Method: "GET",
 				Auth: HTTPAuth{
 					Token: "abc",
@@ -150,10 +150,10 @@ func TestMissingVariableDetectionInOrderedMap(t *testing.T) {
 		{
 			name: "should_be_able_to_scan_ordered_map",
 			input: model.OrderedMap[string, HTTPRequest]{}.MustAdd("abc", HTTPRequest{
-				URL:    "env:URL",
+				URL:    "${env:URL}",
 				Method: "GET",
 				Auth: HTTPAuth{
-					Token: "env:TOKEN",
+					Token: "${env:TOKEN}",
 				},
 				Assertions: []Assertion{
 					{Name: "abc", Queries: []string{"env:ABC = env:ABC"}},
