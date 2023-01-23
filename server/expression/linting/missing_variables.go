@@ -35,12 +35,12 @@ func DetectMissingVariables(target interface{}, availableVariables []string) []s
 	return uniqueMissingVariables
 }
 
-func getTokens(fieldInfo reflect.StructField, value string) []expression.ReflectionToken {
+func getTokens(fieldInfo reflect.StructField, value string) []expression.Token {
 	if fieldInfo.Tag.Get("expr_enabled") == "true" {
 		exprTokens, err := expression.GetTokensFromExpression(value)
 		if err != nil {
 			// probably not an expression, just skip it
-			return []expression.ReflectionToken{}
+			return []expression.Token{}
 		}
 
 		return exprTokens
@@ -50,13 +50,13 @@ func getTokens(fieldInfo reflect.StructField, value string) []expression.Reflect
 		stmtTokens, err := expression.GetTokens(value)
 		if err != nil {
 			// probably not a statement, just skip it
-			return []expression.ReflectionToken{}
+			return []expression.Token{}
 		}
 
 		return stmtTokens
 	}
 
-	return []expression.ReflectionToken{}
+	return []expression.Token{}
 }
 
 func traverse(target interface{}, f func(reflect.StructField, string)) {

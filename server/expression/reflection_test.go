@@ -8,42 +8,42 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestReflectionGetTokens(t *testing.T) {
+func TestGetTokens(t *testing.T) {
 	testCases := []struct {
 		Statement      string
-		ExpectedTokens []expression.ReflectionToken
+		ExpectedTokens []expression.Token
 	}{
 		{
 			Statement: `"abc" = "abc"`,
-			ExpectedTokens: []expression.ReflectionToken{
+			ExpectedTokens: []expression.Token{
 				{Type: expression.StrType},
 				{Type: expression.StrType},
 			},
 		},
 		{
 			Statement: `"abc" = 8`,
-			ExpectedTokens: []expression.ReflectionToken{
+			ExpectedTokens: []expression.Token{
 				{Type: expression.StrType},
 				{Type: expression.NumberType},
 			},
 		},
 		{
 			Statement: `3 = [1, 2, 3]`,
-			ExpectedTokens: []expression.ReflectionToken{
+			ExpectedTokens: []expression.Token{
 				{Type: expression.NumberType},
 				{Type: expression.ArrayType},
 			},
 		},
 		{
 			Statement: `env:url = "http://localhost"`,
-			ExpectedTokens: []expression.ReflectionToken{
+			ExpectedTokens: []expression.Token{
 				{Identifier: "url", Type: expression.EnvironmentType},
 				{Type: expression.StrType},
 			},
 		},
 		{
 			Statement: `"the server is ${env:url}" = "http://localhost"`,
-			ExpectedTokens: []expression.ReflectionToken{
+			ExpectedTokens: []expression.Token{
 				{Type: expression.StrType},
 				{Identifier: "url", Type: expression.EnvironmentType},
 				{Type: expression.StrType},
@@ -51,7 +51,7 @@ func TestReflectionGetTokens(t *testing.T) {
 		},
 		{
 			Statement: `"the url has ${env:url | count} characters" = "the url has 22 characters"`,
-			ExpectedTokens: []expression.ReflectionToken{
+			ExpectedTokens: []expression.Token{
 				{Type: expression.StrType},
 				{Identifier: "url", Type: expression.EnvironmentType},
 				{Identifier: "count", Type: expression.FunctionCallType},
@@ -60,7 +60,7 @@ func TestReflectionGetTokens(t *testing.T) {
 		},
 		{
 			Statement: `"test ${env:names | get_index env:name_index}" = "John Doe"`,
-			ExpectedTokens: []expression.ReflectionToken{
+			ExpectedTokens: []expression.Token{
 				{Type: expression.StrType},
 				{Identifier: "names", Type: expression.EnvironmentType},
 				{Identifier: "get_index", Type: expression.FunctionCallType},
