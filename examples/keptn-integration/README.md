@@ -1,5 +1,7 @@
 # Running Tracetest with Keptn
  
+[Tracetest](https://tracetest.io/) is a testing tool based on OpenTelemetry that permits you to test your distributed application. It allows you to use your trace data generated on your OpenTelemetry tools to check and assert if your application has the desired behavior defined by your test definitions.
+
 [Keptn](https://keptn.sh/) is a powerful tool to automate the lifecycle of your application running on Kubernetes. One of the tasks that we can do on `keptn` is to test an application and see if it is healthy and ready to be used by your users.
 
 By using the Keptn [Job Executor Service](https://github.com/keptn-contrib/job-executor-service) plugin, we can upload a Tracetest test definition and a CLI configuration to a service and run a test using the following job:
