@@ -29,7 +29,7 @@ const TestOutputForm = ({isEditing = false, isLoading = false, onCancel, onSubmi
   const selector = Form.useWatch('selector', form) || '';
 
   useEffect(() => {
-    if (form.getFieldValue('selector')) {
+    if (form.getFieldValue('selector') && form.getFieldValue('value') && form.getFieldValue('name')) {
       onValidate(null, form.getFieldsValue());
       form.validateFields();
     }
