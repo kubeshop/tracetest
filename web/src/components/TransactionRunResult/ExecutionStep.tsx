@@ -45,7 +45,7 @@ const ExecutionStep = ({
           <S.ExecutionStepName>{`${name} v${testVersion}`}</S.ExecutionStepName>
           <S.TagContainer>
             <S.TextTag>{trigger.method}</S.TextTag>
-            <S.TextTag $isLight>{trigger.entryPoint}</S.TextTag>
+            <S.EntryPointTag $isLight>{trigger.entryPoint}</S.EntryPointTag>
             {!stateIsFinished && <S.TextTag>{capitalize(state)}</S.TextTag>}
           </S.TagContainer>
         </S.Info>

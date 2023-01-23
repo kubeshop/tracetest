@@ -21,14 +21,7 @@ const VariableName = () => {
   const onRefreshData = useCallback(async () => {
     const {id} = draftTest as ITraceIDValues;
     form.setFieldsValue({id});
-
-    try {
-      form.validateFields();
-      onIsFormValid(true);
-    } catch (err) {
-      onIsFormValid(false);
-    }
-  }, [draftTest, form, onIsFormValid]);
+  }, [draftTest, form]);
 
   useEffect(() => {
     onRefreshData();
@@ -38,13 +31,16 @@ const VariableName = () => {
     <Step.Step>
       <Step.FormContainer>
         <Step.Title>Enter the variable name to use for the Trace ID</Step.Title>
-        <Step.Subtitle>Please enter a variable name for the Trace ID or accept the default &apos;traceId&apos; name</Step.Subtitle>
+        <Step.Subtitle>
+          Please enter a variable name for the Trace ID or accept the default &apos;traceId&apos; name
+        </Step.Subtitle>
         <Form<ITraceIDValues>
           id={ComponentNames.TraceIdVariableName}
           autoComplete="off"
           form={form}
           layout="vertical"
           onFinish={handleSubmit}
+          onValuesChange={(_, {id}) => onIsFormValid(!!id)}
         >
           <VariableNameForm />
         </Form>

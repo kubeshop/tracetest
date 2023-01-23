@@ -1,5 +1,5 @@
 import {Button, Form, Tag} from 'antd';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 
 import {SELECTOR_LANGUAGE_CHEAT_SHEET_URL} from 'constants/Common.constants';
 import {CompareOperator} from 'constants/Operator.constants';
@@ -12,6 +12,7 @@ import {TStructuredAssertion} from 'types/Assertion.types';
 import {singularOrPlural} from 'utils/Common';
 import AssertionCheckList from './AssertionCheckList';
 import useOnFieldsChange from './hooks/useOnFieldsChange';
+import useOnValuesChange from './hooks/useOnValuesChange';
 import SelectorInput from './SelectorInput';
 import SelectorSuggestions from './SelectorSuggestions';
 import * as S from './TestSpecForm.styled';
@@ -59,7 +60,12 @@ const TestSpecForm = ({
     AssertionSelectors.selectAttributeList(state, testId, runId, spanIdList)
   );
 
+  const onValuesChange = useOnValuesChange({setIsValid});
   const onFieldsChange = useOnFieldsChange();
+
+  useEffect(() => {
+    onValuesChange(null, {assertions, selector});
+  }, []);
 
   const selectorSuggestions = useAppSelector(TestSpecsSelectors.selectSelectorSuggestions);
   const prevSelector = useAppSelector(TestSpecsSelectors.selectPrevSelector);
@@ -83,6 +89,7 @@ const TestSpecForm = ({
         layout="vertical"
         data-cy="assertion-form"
         onFieldsChange={onFieldsChange}
+        onValuesChange={onValuesChange}
       >
         <S.FormSection>
           <S.FormSectionHeaderSelector>
