@@ -2,7 +2,7 @@ import {Button, Form, Input, Tag} from 'antd';
 import {useEffect} from 'react';
 
 import Editor from 'components/Editor';
-import {SELECTOR_LANGUAGE_CHEAT_SHEET_URL} from 'constants/Common.constants';
+import {EXPRESSIONS_DOCUMENTATION_URL, SELECTOR_LANGUAGE_CHEAT_SHEET_URL} from 'constants/Common.constants';
 import {SupportedEditors} from 'constants/Editor.constants';
 import {useAppSelector} from 'redux/hooks';
 import SpanSelectors from 'selectors/Span.selectors';
@@ -67,7 +67,10 @@ const TestOutputForm = ({isEditing = false, isLoading = false, onCancel, onSubmi
         <S.FormSection>
           <S.FormSectionTitle>2. Select the attribute</S.FormSectionTitle>
           <S.FormSectionRow>
-            <S.FormSectionText>Choose one attribute from the selected span or use an expression</S.FormSectionText>
+            <S.FormSectionText>Choose one attribute from the selected span or use an </S.FormSectionText>
+            <a href={EXPRESSIONS_DOCUMENTATION_URL} target="_blank">
+              expression
+            </a>
           </S.FormSectionRow>
           <Form.Item name="value" rules={[{required: true, message: 'Please enter an attribute or expression'}]}>
             <Editor

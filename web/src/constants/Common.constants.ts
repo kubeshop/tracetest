@@ -17,6 +17,7 @@ export const TRACE_DOCUMENTATION_URL =
 
 export const ADD_TEST_SPECS_DOCUMENTATION_URL = 'https://docs.tracetest.io/web-ui/creating-test-specifications';
 export const ADD_TEST_OUTPUTS_DOCUMENTATION_URL = 'https://docs.tracetest.io/web-ui/creating-test-outputs';
+export const EXPRESSIONS_DOCUMENTATION_URL = 'https://docs.tracetest.io/concepts/expressions';
 
 export const SELECTOR_LANGUAGE_CHEAT_SHEET_URL = `${process.env.PUBLIC_URL}/SL_cheat_sheet.pdf`;
 
