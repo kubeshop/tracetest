@@ -1,19 +1,19 @@
 import {noop} from 'lodash';
 import {createContext, useCallback, useContext, useMemo, useState} from 'react';
 
+import {NoTestConnectionDataStoreList, SupportedDataStoresToName} from 'constants/DataStore.constants';
+import ConnectionResult from 'models/ConnectionResult.model';
 import {
   useTestConnectionMutation,
   useCreateDataStoreMutation,
   useUpdateDataStoreMutation,
   useDeleteDataStoreMutation,
 } from 'redux/apis/TraceTest.api';
-import {TConnectionResult, TDataStore, TDraftDataStore} from 'types/Config.types';
 import DataStoreService from 'services/DataStore.service';
-import ConnectionResult from 'models/ConnectionResult.model';
+import {SupportedDataStores, TConnectionResult, TDataStore, TDraftDataStore} from 'types/Config.types';
 import useDataStoreNotification from './hooks/useDataStoreNotification';
 import {useConfirmationModal} from '../ConfirmationModal/ConfirmationModal.provider';
 import {useDataStoreConfig} from '../DataStoreConfig/DataStoreConfig.provider';
-import {NoTestConnectionDataStoreList} from '../../constants/DataStore.constants';
 
 interface IContext {
   isFormValid: boolean;
@@ -53,8 +53,20 @@ const DataStoreProvider = ({children}: IProps) => {
 
   const onSaveConfig = useCallback(
     async (draft: TDraftDataStore, defaultDataStore: TDataStore) => {
+      const warningMessage =
+        !!defaultDataStore.id && draft.dataStoreType !== defaultDataStore.type
+          ? `Saving will delete your previous configuration of the ${
+              SupportedDataStoresToName[defaultDataStore.type || SupportedDataStores.JAEGER]
+            } data store`
+          : '';
+
       onOpen({
-        title: 'Are you sure you want to save this Data Store configuration?',
+        title: (
+          <>
+            <p>Are you sure you want to save this Data Store configuration?</p>
+            <p>{warningMessage}</p>
+          </>
+        ),
         heading: 'Save Confirmation',
         okText: 'Save',
         onConfirm: async () => {
