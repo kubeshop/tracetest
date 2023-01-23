@@ -10,13 +10,18 @@
 package openapi
 
 type MissingVariable struct {
-	Key string `json:"key,omitempty"`
+	TestId string `json:"testId,omitempty"`
 
-	DefaultValue string `json:"defaultValue,omitempty"`
+	Variables []Variable `json:"variables,omitempty"`
 }
 
 // AssertMissingVariableRequired checks if the required fields are not zero-ed
 func AssertMissingVariableRequired(obj MissingVariable) error {
+	for _, el := range obj.Variables {
+		if err := AssertVariableRequired(el); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 

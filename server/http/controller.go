@@ -949,7 +949,7 @@ func (c *controller) RunTransaction(ctx context.Context, transactionID string, r
 	missingVariablesError, err := validation.ValidateMissingVariablesFromTransaction(ctx, c.testDB, transaction, environment)
 	if err != nil {
 		if err == validation.ErrMissingVariables {
-			return openapi.Response(http.StatusUnprocessableEntity, missingVariablesError), fmt.Errorf("missing variables")
+			return openapi.Response(http.StatusUnprocessableEntity, missingVariablesError), nil
 		}
 
 		return handleDBError(err), err

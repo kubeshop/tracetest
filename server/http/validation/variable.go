@@ -22,7 +22,7 @@ func ValidateMissingVariables(ctx context.Context, db model.Repository, test mod
 			return openapi.MissingVariablesError{}, err
 		}
 	}
-	return buildErrorObject(missingVariables, previousValues)
+	return buildErrorObject(test, missingVariables, previousValues)
 }
 
 func getMissingVariables(test model.Test, environment model.Environment) []string {
@@ -85,7 +85,6 @@ func getPreviousEnvironmentValues(ctx context.Context, db model.Repository, test
 }
 
 func ValidateMissingVariablesFromTransaction(ctx context.Context, db model.Repository, transaction model.Transaction, environment model.Environment) (openapi.MissingVariablesError, error) {
-	missingVariablesMap := make(map[string]bool, 0)
 	missingVariables := make([]openapi.MissingVariable, 0)
 	for _, step := range transaction.Steps {
 		stepValidationResult, err := ValidateMissingVariables(ctx, db, step, environment)
@@ -93,12 +92,7 @@ func ValidateMissingVariablesFromTransaction(ctx context.Context, db model.Repos
 			return openapi.MissingVariablesError{}, err
 		}
 
-		for _, missingVariable := range stepValidationResult.MissingVariables {
-			if _, found := missingVariablesMap[missingVariable.Key]; !found {
-				missingVariables = append(missingVariables, missingVariable)
-				missingVariablesMap[missingVariable.Key] = true
-			}
-		}
+		missingVariables = append(missingVariables, stepValidationResult.MissingVariables...)
 
 		// update env with this test outputs
 		outputs := make([]model.EnvironmentValue, 0)
@@ -117,22 +111,28 @@ func ValidateMissingVariablesFromTransaction(ctx context.Context, db model.Repos
 	return openapi.MissingVariablesError{}, nil
 }
 
-func buildErrorObject(missingVariables []string, previousValues map[string]model.EnvironmentValue) (openapi.MissingVariablesError, error) {
+func buildErrorObject(test model.Test, missingVariables []string, previousValues map[string]model.EnvironmentValue) (openapi.MissingVariablesError, error) {
 	if len(missingVariables) > 0 {
-		missingVariablesError := openapi.MissingVariablesError{
-			MissingVariables: make([]openapi.MissingVariable, 0, len(missingVariables)),
-		}
-
+		missingVariableObjects := make([]openapi.Variable, 0, len(missingVariables))
 		for _, variable := range missingVariables {
-			missingVariablesError.MissingVariables = append(missingVariablesError.MissingVariables, openapi.MissingVariable{
+
+			missingVariableObjects = append(missingVariableObjects, openapi.Variable{
 				Key:          variable,
 				DefaultValue: "",
 			})
 		}
 
-		for i, missingVariable := range missingVariablesError.MissingVariables {
-			if envVar, found := previousValues[missingVariable.Key]; found {
-				missingVariablesError.MissingVariables[i].DefaultValue = envVar.Value
+		missingVariablesError := openapi.MissingVariablesError{
+			MissingVariables: []openapi.MissingVariable{
+				{TestId: string(test.ID), Variables: missingVariableObjects},
+			},
+		}
+
+		for i, missingVariables := range missingVariablesError.MissingVariables {
+			for j, missingVariable := range missingVariables.Variables {
+				if envVar, found := previousValues[missingVariable.Key]; found {
+					missingVariablesError.MissingVariables[i].Variables[j].DefaultValue = envVar.Value
+				}
 			}
 		}
 

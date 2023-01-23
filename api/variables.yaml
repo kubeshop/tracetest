@@ -12,6 +12,16 @@ components:
     MissingVariable:
       type: object
       properties:
+        testId:
+          type: string
+        variables:
+          type: array
+          items:
+            $ref: "#/components/schemas/Variable"
+
+    Variable:
+      type: object
+      properties:
         key:
           type: string
         defaultValue:
