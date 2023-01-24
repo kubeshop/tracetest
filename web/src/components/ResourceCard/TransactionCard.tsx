@@ -44,7 +44,7 @@ const TransactionCard = ({
           <S.Text>{description}</S.Text>
         </S.TitleContainer>
 
-        <ResourceCardSummary summary={summary} shouldShowResult={false} />
+        <ResourceCardSummary summary={summary} />
 
         <S.Row>
           <S.RunButton

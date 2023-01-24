@@ -25,6 +25,8 @@ type TransactionRun struct {
 	Steps       []TestRun          `json:"steps,omitempty"`
 	Environment *Environment       `json:"environment,omitempty"`
 	Metadata    *map[string]string `json:"metadata,omitempty"`
+	Pass        *int32             `json:"pass,omitempty"`
+	Fail        *int32             `json:"fail,omitempty"`
 }
 
 // NewTransactionRun instantiates a new TransactionRun object
@@ -300,6 +302,70 @@ func (o *TransactionRun) SetMetadata(v map[string]string) {
 	o.Metadata = &v
 }
 
+// GetPass returns the Pass field value if set, zero value otherwise.
+func (o *TransactionRun) GetPass() int32 {
+	if o == nil || o.Pass == nil {
+		var ret int32
+		return ret
+	}
+	return *o.Pass
+}
+
+// GetPassOk returns a tuple with the Pass field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *TransactionRun) GetPassOk() (*int32, bool) {
+	if o == nil || o.Pass == nil {
+		return nil, false
+	}
+	return o.Pass, true
+}
+
+// HasPass returns a boolean if a field has been set.
+func (o *TransactionRun) HasPass() bool {
+	if o != nil && o.Pass != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetPass gets a reference to the given int32 and assigns it to the Pass field.
+func (o *TransactionRun) SetPass(v int32) {
+	o.Pass = &v
+}
+
+// GetFail returns the Fail field value if set, zero value otherwise.
+func (o *TransactionRun) GetFail() int32 {
+	if o == nil || o.Fail == nil {
+		var ret int32
+		return ret
+	}
+	return *o.Fail
+}
+
+// GetFailOk returns a tuple with the Fail field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *TransactionRun) GetFailOk() (*int32, bool) {
+	if o == nil || o.Fail == nil {
+		return nil, false
+	}
+	return o.Fail, true
+}
+
+// HasFail returns a boolean if a field has been set.
+func (o *TransactionRun) HasFail() bool {
+	if o != nil && o.Fail != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetFail gets a reference to the given int32 and assigns it to the Fail field.
+func (o *TransactionRun) SetFail(v int32) {
+	o.Fail = &v
+}
+
 func (o TransactionRun) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.Id != nil {
@@ -325,6 +391,12 @@ func (o TransactionRun) MarshalJSON() ([]byte, error) {
 	}
 	if o.Metadata != nil {
 		toSerialize["metadata"] = o.Metadata
+	}
+	if o.Pass != nil {
+		toSerialize["pass"] = o.Pass
+	}
+	if o.Fail != nil {
+		toSerialize["fail"] = o.Fail
 	}
 	return json.Marshal(toSerialize)
 }

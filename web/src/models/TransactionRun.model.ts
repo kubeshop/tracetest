@@ -11,6 +11,8 @@ const TransactionRunModel = ({
   environment = {},
   metadata = {},
   version = 1,
+  pass = 0,
+  fail = 0,
 }: TRawTransactionRun): TTransactionRun => {
   return {
     id,
@@ -21,6 +23,8 @@ const TransactionRunModel = ({
     environment: Environment(environment),
     metadata,
     version,
+    pass,
+    fail,
   };
 };
 
