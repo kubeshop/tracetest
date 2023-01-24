@@ -55,7 +55,7 @@ export function handleSummary(data) {
   `;
 
   return {
-    stderr: summary,
+    stdout: summary,
     "tracetest.json": tracetest.json(),
   };
 }
