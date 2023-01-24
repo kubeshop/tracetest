@@ -24,7 +24,7 @@ const Content = () => {
 
   const navigate = useNavigate();
 
-  const canEdit = test.summary.runs > 0;
+  const shouldEdit = test.summary.hasRuns;
   const onEdit = () => navigate(`/test/${test.id}/run/${test.summary.runs}`);
 
   return (
@@ -36,7 +36,7 @@ const Content = () => {
         id={test.id}
         onDelete={() => onDeleteResource(test.id, test.name, ResourceType.Test)}
         onEdit={onEdit}
-        canEdit={canEdit}
+        shouldEdit={shouldEdit}
         title={`${test.name} (v${test.version})`}
         runButton={
           <Button

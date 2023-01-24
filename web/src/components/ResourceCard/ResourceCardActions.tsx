@@ -1,16 +1,16 @@
 import {Dropdown, Menu} from 'antd';
-import {useCallback} from 'react';
+import {useCallback, useMemo} from 'react';
 
 import * as S from './ResourceCard.styled';
 
 interface IProps {
   id: string;
-  canEdit: boolean;
+  shouldEdit: boolean;
   onDelete(): void;
   onEdit(): void;
 }
 
-const ResourceCardActions = ({id, canEdit = true, onDelete, onEdit}: IProps) => {
+const ResourceCardActions = ({id, shouldEdit = true, onDelete, onEdit}: IProps) => {
   const onDeleteClick = useCallback(
     ({domEvent}) => {
       domEvent?.stopPropagation();
@@ -27,11 +27,11 @@ const ResourceCardActions = ({id, canEdit = true, onDelete, onEdit}: IProps) => 
     [onEdit]
   );
 
-  const menuItems = [];
-  if (canEdit) {
-    menuItems.push({key: 'edit', label: <span data-cy="test-card-edit">Edit</span>, onClick: onEditClick});
-  }
-  menuItems.push({key: 'delete', label: <span data-cy="test-card-delete">Delete</span>, onClick: onDeleteClick});
+  const menuItems = useMemo(() => {
+    const defaultItems = [{key: 'delete', label: <span data-cy="test-card-delete">Delete</span>, onClick: onDeleteClick}];
+
+    return shouldEdit ? [{key: 'edit', label: <span data-cy="test-card-edit">Edit</span>, onClick: onEditClick}, ...defaultItems] : defaultItems;
+  }, [onDeleteClick, onEditClick, shouldEdit]);
 
   return (
     <Dropdown

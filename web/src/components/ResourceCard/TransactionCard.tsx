@@ -34,7 +34,7 @@ const TransactionCard = ({
     queryParams
   );
 
-  const canEdit = summary.runs > 0;
+  const shouldEdit = summary.hasRuns;
   const lastRunId = summary.runs; // assume the total of runs as the last run
 
   return (
@@ -65,7 +65,7 @@ const TransactionCard = ({
           </S.RunButton>
           <ResourceCardActions
             id={transactionId}
-            canEdit={canEdit}
+            shouldEdit={shouldEdit}
             onDelete={() => onDelete(transactionId, name, ResourceType.Transaction)}
             onEdit={() => onEdit(transactionId, lastRunId, ResourceType.Transaction)}
           />

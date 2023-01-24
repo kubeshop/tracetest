@@ -27,7 +27,7 @@ const TestCard = ({onEdit, onDelete, onRun, onViewAll, test}: IProps) => {
     queryParams
   );
 
-  const canEdit = test.summary.runs > 0;
+  const shouldEdit = test.summary.hasRuns;
   const lastRunId = test.summary.runs; // assume the total of runs as the last run
 
   return (
@@ -60,7 +60,7 @@ const TestCard = ({onEdit, onDelete, onRun, onViewAll, test}: IProps) => {
           </S.RunButton>
           <ResourceCardActions
             id={test.id}
-            canEdit={canEdit}
+            shouldEdit={shouldEdit}
             onDelete={() => onDelete(test.id, test.name, ResourceType.Test)}
             onEdit={() => onEdit(test.id, lastRunId, ResourceType.Test)}
            />

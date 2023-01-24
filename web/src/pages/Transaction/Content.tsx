@@ -25,7 +25,7 @@ const Content = () => {
 
   const navigate = useNavigate();
 
-  const canEdit = transaction.summary.runs > 0;
+  const shouldEdit = transaction.summary.hasRuns;
   const onEdit = () => navigate(`/transaction/${transaction.id}/run/${transaction.summary.runs}`);
 
   return (
@@ -35,7 +35,7 @@ const Content = () => {
         id={transaction.id}
         onDelete={() => onDelete(transaction.id, transaction.name)}
         onEdit={onEdit}
-        canEdit={canEdit}
+        shouldEdit={shouldEdit}
         title={`${transaction.name} (v${transaction.version})`}
         runButton={
           <Button onClick={handleRunTest} loading={isEditLoading} type="primary" ghost>
