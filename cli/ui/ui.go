@@ -114,9 +114,13 @@ func (ui ptermUI) Confirm(msg string, defaultValue bool) bool {
 }
 
 func (ui ptermUI) TextInput(msg, defaultValue string) string {
+	text := msg
+	if defaultValue != "" {
+		text = fmt.Sprintf("%s (default: %s)", msg, defaultValue)
+	}
 	text, err := (&pterm.InteractiveTextInputPrinter{
 		TextStyle:   &pterm.ThemeDefault.DefaultText,
-		DefaultText: fmt.Sprintf("%s [%s]", msg, defaultValue),
+		DefaultText: text,
 		MultiLine:   false,
 	}).
 		Show()
