@@ -25,8 +25,8 @@ const authValidation = ({auth}: TDraftTest): boolean => {
   }
 };
 
-const basicDetailsValidation = ({name, description}: TDraftTest): boolean => {
-  return Validator.required(name) && Validator.required(description);
+const basicDetailsValidation = ({name}: TDraftTest): boolean => {
+  return Validator.required(name);
 };
 
 const TriggerServiceMap = {

@@ -1,10 +1,13 @@
 import {Button} from 'antd';
 
 import TestOutput from 'components/TestOutput';
+import TestOutputModel from 'models/TestOutput.model';
+import {useSpan} from 'providers/Span/Span.provider';
 import {useTestOutput} from 'providers/TestOutput/TestOutput.provider';
+import SpanService from 'services/Span.service';
+import {TTestOutput} from 'types/TestOutput.types';
 import Empty from './Empty';
 import * as S from './TestOutputs.styled';
-import {TTestOutput} from '../../types/TestOutput.types';
 
 interface IProps {
   outputs: TTestOutput[];
@@ -12,11 +15,17 @@ interface IProps {
 
 const TestOutputs = ({outputs}: IProps) => {
   const {onDelete, onOpen} = useTestOutput();
+  const {selectedSpan} = useSpan();
+
+  const handleOnAddTestOutput = () => {
+    const query = selectedSpan ? SpanService.getSelectorInformation(selectedSpan) : '';
+    onOpen(TestOutputModel({selector: {query}}));
+  };
 
   return (
     <S.Container>
       <S.HeaderContainer>
-        <Button data-cy="output-add-button" onClick={() => onOpen()} type="primary">
+        <Button data-cy="output-add-button" onClick={handleOnAddTestOutput} type="primary">
           Add Test Output
         </Button>
       </S.HeaderContainer>

@@ -24,7 +24,8 @@ export const Row = styled.div<{$justifyContent?: string}>`
 export const Entry = styled.div``;
 
 export const OutputDetails = styled.div`
-  align-items: center;
+  align-items: flex-start;
+  column-gap: 8px;
   display: grid;
   flex: 1;
   grid-template-columns: 1fr 2fr 1fr;

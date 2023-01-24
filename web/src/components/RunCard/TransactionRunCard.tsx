@@ -1,10 +1,9 @@
-import {Dropdown, Menu, Tooltip} from 'antd';
+import {Tooltip} from 'antd';
 import {Link} from 'react-router-dom';
 
 import TestState from 'components/TestState';
+import TransactionRunActionsMenu from 'components/TransactionRunActionsMenu';
 import {TestState as TestStateEnum} from 'constants/TestRun.constants';
-import useDeleteResourceRun from 'hooks/useDeleteResourceRun';
-import {ResourceType} from 'types/Resource.type';
 import {TTestRun} from 'types/TestRun.types';
 import {TTransactionRun} from 'types/TransactionRun.types';
 import Date from 'utils/Date';
@@ -27,7 +26,6 @@ function getIcon(state: TTestRun['state']) {
 }
 
 const TransactionRunCard = ({run: {id: runId, createdAt, state, metadata, version}, transactionId, linkTo}: IProps) => {
-  const onDelete = useDeleteResourceRun({id: transactionId, type: ResourceType.Transaction});
   const metadataName = metadata?.name;
   const metadataBuildNumber = metadata?.buildNumber;
   const metadataBranch = metadata?.branch;
@@ -65,27 +63,7 @@ const TransactionRunCard = ({run: {id: runId, createdAt, state, metadata, versio
         )}
 
         <div>
-          <span className="ant-dropdown-link" onClick={e => e.stopPropagation()} style={{textAlign: 'right'}}>
-            <Dropdown
-              overlay={
-                <Menu>
-                  <Menu.Item
-                    onClick={({domEvent}) => {
-                      domEvent.stopPropagation();
-                      onDelete(runId);
-                    }}
-                    key="delete"
-                  >
-                    Delete
-                  </Menu.Item>
-                </Menu>
-              }
-              placement="bottomLeft"
-              trigger={['click']}
-            >
-              <S.ActionButton />
-            </Dropdown>
-          </span>
+          <TransactionRunActionsMenu runId={runId} transactionId={transactionId} transactionVersion={version} />
         </div>
       </S.Container>
     </Link>
