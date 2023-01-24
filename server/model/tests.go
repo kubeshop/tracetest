@@ -23,12 +23,12 @@ type (
 
 	Output struct {
 		Selector SpanQuery
-		Value    string
+		Value    string `expr_enabled:"true"`
 	}
 
 	NamedAssertions struct {
-		Name       string
-		Assertions []Assertion
+		Name       string      `expr_enabled:"true"`
+		Assertions []Assertion `stmt_enabled:"true"`
 	}
 
 	Summary struct {

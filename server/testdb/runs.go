@@ -404,7 +404,7 @@ func (td *postgresDB) GetLatestRunByTestVersion(ctx context.Context, testID id.I
 
 	run, err := readRunRow(stmt.QueryRowContext(ctx, testID.String(), version))
 	if err != nil {
-		return model.Run{}, fmt.Errorf("cannot read row: %w", err)
+		return model.Run{}, err
 	}
 	return run, nil
 }

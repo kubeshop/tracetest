@@ -1,15 +1,15 @@
 import {Form} from 'antd';
-import {TTestVariablesMap} from 'types/Variables.types';
+import { TTestVariablesMap } from 'types/Variables.types';
 import TestListVariablesInput from './TestVariablesInput/TestListVariablesInput';
 
 interface IProps {
-  variables: TTestVariablesMap;
+  testVariables: TTestVariablesMap;
 }
 
-const MissingVariablesModalForm = ({variables}: IProps) => {
+const MissingVariablesModalForm = ({testVariables}: IProps) => {
   return (
     <Form.Item name="variables">
-      <TestListVariablesInput variables={variables} />
+      <TestListVariablesInput testVariables={testVariables} />
     </Form.Item>
   );
 };

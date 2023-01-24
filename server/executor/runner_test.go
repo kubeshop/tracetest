@@ -9,7 +9,6 @@ import (
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/executor/trigger"
-	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/subscription"
@@ -198,11 +197,6 @@ func (m *mockTriggerer) Trigger(_ context.Context, test model.Test, opts *trigge
 func (m *mockTriggerer) Resolve(_ context.Context, test model.Test, opts *trigger.TriggerOptions) (model.Test, error) {
 	args := m.Called(test.ID)
 	return args.Get(0).(model.Test), args.Error(1)
-}
-
-func (m *mockTriggerer) Variables(_ context.Context, test model.Test, executor expression.Executor) (expression.VariablesMap, error) {
-	args := m.Called(test.ID)
-	return expression.VariablesMap{}, args.Error(1)
 }
 
 func (m *mockTriggerer) expectTriggerTest(test model.Test) *mock.Call {

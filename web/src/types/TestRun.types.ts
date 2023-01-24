@@ -4,6 +4,12 @@ import {TEnvironment} from './Environment.types';
 import {TTriggerResult} from './Test.types';
 import {TTestRunOutput} from './TestOutput.types';
 import {TTrace} from './Trace.types';
+import {TMissingVariable} from './Variables.types';
+
+export enum RunErrorTypes {
+  MissingVariables = 'missingVariables',
+  Unknown = 'unknown',
+}
 
 export type TTestRunState = NonNullable<TTestSchemas['TestRun']['state'] | 'WAITING' | 'SKIPPED'>;
 
@@ -32,3 +38,10 @@ export type TTestRun = Model<
     state: TTestRunState;
   }
 >;
+
+export type TRunError = {
+  type: RunErrorTypes;
+  missingVariables: TMissingVariable[];
+};
+
+export type TRawRunError = any;

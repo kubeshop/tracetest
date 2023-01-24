@@ -5,17 +5,18 @@ import "google.golang.org/grpc/metadata"
 const TriggerTypeGRPC TriggerType = "grpc"
 
 type GRPCHeader struct {
-	Key, Value string
+	Key   string `expr_enabled:"true"`
+	Value string `expr_enabled:"true"`
 }
 
 type GRPCRequest struct {
-	ProtobufFile string
-	Address      string
-	Service      string
-	Method       string
+	ProtobufFile string `expr_enabled:"true"`
+	Address      string `expr_enabled:"true"`
+	Service      string `expr_enabled:"true"`
+	Method       string `expr_enabled:"true"`
+	Request      string `expr_enabled:"true"`
 	Metadata     []GRPCHeader
 	Auth         *HTTPAuthenticator
-	Request      string
 }
 
 func (a GRPCRequest) Headers() []string {

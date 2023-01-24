@@ -6,16 +6,16 @@ import VariablesService from 'services/Variables.service';
 import * as S from '../MissingVariablesModal.styled';
 
 interface IProps {
-  variables: TTestVariablesMap;
   keyName: string;
   value: string;
   onChange(key: string, newValue: string): void;
+  testVariables: TTestVariablesMap;
 }
 
-const TestVariableEntry = ({value, keyName, onChange, variables}: IProps) => {
+const TestVariableEntry = ({value, keyName, onChange, testVariables}: IProps) => {
   const toolTip = useMemo(() => {
-    const isMoreThanOneTest = Object.values(variables).length > 1;
-    const testList = VariablesService.getMatchingTests(variables, keyName);
+    const isMoreThanOneTest = Object.values(testVariables).length > 1;
+    const testList = VariablesService.getMatchingTests(testVariables, keyName);
 
     const content = (
       <S.DetailContainer>
@@ -39,7 +39,7 @@ const TestVariableEntry = ({value, keyName, onChange, variables}: IProps) => {
       );
 
     return null;
-  }, [keyName, variables]);
+  }, [keyName, testVariables]);
 
   return (
     <S.InputContainer>

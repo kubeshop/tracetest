@@ -4,8 +4,6 @@ import Transaction from 'models/Transaction.model';
 import TransactionService from 'services/Transaction.service';
 import {TTestApiEndpointBuilder} from 'types/Test.types';
 import {TDraftTransaction, TRawTransaction, TTransaction} from 'types/Transaction.types';
-import {TRawTestVariables, TTransactionVariables} from 'types/Variables.types';
-import TransactionVariables from 'models/TransactionVariables.model';
 
 const TransactionEndpoint = (builder: TTestApiEndpointBuilder) => ({
   createTransaction: builder.mutation<TTransaction, TDraftTransaction>({
@@ -45,17 +43,6 @@ const TransactionEndpoint = (builder: TTestApiEndpointBuilder) => ({
     providesTags: result => [{type: TracetestApiTags.TRANSACTION, id: `${result?.id}-${result?.version}`}],
     transformResponse: (rawTest: TRawTransaction) => Transaction(rawTest),
     keepUnusedDataFor: 10,
-  }),
-  getTransactionVariables: builder.query<
-    TTransactionVariables,
-    {transactionId: string; version: number; environmentId?: string; runId?: string}
-  >({
-    query: ({transactionId, environmentId = '', version, runId = '0'}) =>
-      `/transactions/${transactionId}/version/${version}/variables?environmentId=${environmentId}&runId=${runId}`,
-    providesTags: (result, error, {transactionId}) => [
-      {type: TracetestApiTags.TRANSACTION, id: `${transactionId}-variables`},
-    ],
-    transformResponse: (rawTestsVariables: TRawTestVariables[]) => TransactionVariables(rawTestsVariables),
   }),
 });
 
