@@ -76,6 +76,10 @@ func (t TestTrigger) Validate() error {
 		if err := t.GRPC.Validate(); err != nil {
 			return fmt.Errorf("grpc request must be valid: %w", err)
 		}
+	case "traceid":
+		if err := t.TRACEID.Validate(); err != nil {
+			return fmt.Errorf("traceid request must be valid: %w", err)
+		}
 	case "":
 		return fmt.Errorf("type cannot be empty")
 	default:
