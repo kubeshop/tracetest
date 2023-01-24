@@ -8,9 +8,11 @@ export const options = {
   duration: "6s",
 };
 
-const tracetest = Tracetest();
+const tracetest = Tracetest({
+  serverUrl: "http://localhost:11633",
+});
 const testId = "kc_MgKoVR";
-let pokemonId = 6;
+let pokemonId = 6; // charizad
 const http = new Http();
 const url = "http://localhost:8081/pokemon/import";
 
