@@ -27,6 +27,8 @@ INSERT INTO transaction_runs (
 
 	-- result info
 	"last_error",
+	"pass",
+	"fail",
 
 	"metadata",
 
@@ -47,6 +49,8 @@ INSERT INTO transaction_runs (
 
 	-- result info
 	NULL, -- last_error
+	0,    -- pass
+	0,    -- fail
 
 	$6, -- metadata
 	$7 -- environment
@@ -123,13 +127,15 @@ UPDATE transaction_runs SET
 
 	-- result info
 	"last_error" = $4,
+	"pass" = $5,
+	"fail" = $6,
 
-	"metadata" = $5,
+	"metadata" = $7,
 
 	-- environment
-	"environment" = $6
+	"environment" = $8
 
-WHERE id = $7 AND transaction_id = $8
+WHERE id = $9 AND transaction_id = $10
 `
 
 func (td *postgresDB) UpdateTransactionRun(ctx context.Context, tr model.TransactionRun) error {
@@ -159,12 +165,16 @@ func (td *postgresDB) UpdateTransactionRun(ctx context.Context, tr model.Transac
 		lastError = &e
 	}
 
+	pass, fail := tr.ResultsCount()
+
 	_, err = stmt.ExecContext(
 		ctx,
 		tr.CompletedAt,
 		tr.State,
 		tr.CurrentTest,
 		lastError,
+		pass,
+		fail,
 		jsonMetadata,
 		jsonEnvironment,
 		tr.ID,
@@ -258,6 +268,8 @@ SELECT
 	"current_test",
 
 	"last_error",
+	"pass",
+	"fail",
 
 	"metadata",
 
@@ -330,6 +342,8 @@ func readTransactionRow(row scanner) (model.TransactionRun, error) {
 		jsonMetadata []byte
 
 		lastError *string
+		pass      sql.NullInt32
+		fail      sql.NullInt32
 	)
 
 	err := row.Scan(
@@ -341,6 +355,8 @@ func readTransactionRow(row scanner) (model.TransactionRun, error) {
 		&r.State,
 		&r.CurrentTest,
 		&lastError,
+		&pass,
+		&fail,
 		&jsonMetadata,
 		&jsonEnvironment,
 	)
@@ -361,6 +377,14 @@ func readTransactionRow(row scanner) (model.TransactionRun, error) {
 
 		if lastError != nil && *lastError != "" {
 			r.LastError = fmt.Errorf(*lastError)
+		}
+
+		if pass.Valid {
+			r.Pass = int(pass.Int32)
+		}
+
+		if fail.Valid {
+			r.Fail = int(fail.Int32)
 		}
 
 		return r, nil

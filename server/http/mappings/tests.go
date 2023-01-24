@@ -47,8 +47,8 @@ func (m OpenAPI) Transaction(in model.Transaction) openapi.Transaction {
 			Runs: int32(in.Summary.Runs),
 			LastRun: openapi.TestSummaryLastRun{
 				Time:   optionalTime(in.Summary.LastRun.Time),
-				Passes: 0,
-				Fails:  0,
+				Passes: int32(in.Summary.LastRun.Fails),
+				Fails:  int32(in.Summary.LastRun.Passes),
 			},
 		},
 	}
@@ -70,6 +70,8 @@ func (m OpenAPI) TransactionRun(in model.TransactionRun) openapi.TransactionRun 
 		Steps:       steps,
 		Metadata:    in.Metadata,
 		Environment: m.Environment(in.Environment),
+		Pass:        int32(in.Pass),
+		Fail:        int32(in.Fail),
 	}
 }
 

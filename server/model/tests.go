@@ -176,3 +176,24 @@ const (
 func (rs RunState) IsFinal() bool {
 	return rs == RunStateFailed || rs == RunStateFinished
 }
+
+func (r Run) ResultsCount() (pass, fail int) {
+	if r.Results == nil {
+		return
+	}
+
+	r.Results.Results.ForEach(func(_ SpanQuery, ars []AssertionResult) error {
+		for _, ar := range ars {
+			for _, rs := range ar.Results {
+				if rs.CompareErr == nil {
+					pass++
+				} else {
+					fail++
+				}
+			}
+		}
+		return nil
+	})
+
+	return
+}

@@ -1585,6 +1585,8 @@ export interface external {
           steps?: external["tests.yaml"]["components"]["schemas"]["TestRun"][];
           environment?: external["environments.yaml"]["components"]["schemas"]["Environment"];
           metadata?: { [key: string]: string };
+          pass?: number;
+          fail?: number;
         };
       };
     };

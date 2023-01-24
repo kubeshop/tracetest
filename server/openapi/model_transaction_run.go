@@ -29,6 +29,10 @@ type TransactionRun struct {
 	Environment Environment `json:"environment,omitempty"`
 
 	Metadata map[string]string `json:"metadata,omitempty"`
+
+	Pass int32 `json:"pass,omitempty"`
+
+	Fail int32 `json:"fail,omitempty"`
 }
 
 // AssertTransactionRunRequired checks if the required fields are not zero-ed

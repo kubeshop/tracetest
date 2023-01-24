@@ -247,7 +247,7 @@ func (td *postgresDB) UpdateRun(ctx context.Context, r model.Run) error {
 		lastError = &e
 	}
 
-	pass, fail := count(r)
+	pass, fail := r.ResultsCount()
 
 	_, err = stmt.ExecContext(
 		ctx,
@@ -275,27 +275,6 @@ func (td *postgresDB) UpdateRun(ctx context.Context, r model.Run) error {
 	}
 
 	return nil
-}
-
-func count(r model.Run) (pass, fail int) {
-	if r.Results == nil {
-		return
-	}
-
-	r.Results.Results.ForEach(func(_ model.SpanQuery, ars []model.AssertionResult) error {
-		for _, ar := range ars {
-			for _, rs := range ar.Results {
-				if rs.CompareErr == nil {
-					pass++
-				} else {
-					fail++
-				}
-			}
-		}
-		return nil
-	})
-
-	return
 }
 
 func (td *postgresDB) DeleteRun(ctx context.Context, r model.Run) error {
