@@ -4,7 +4,7 @@ interface IProps {
   isOpen: boolean;
   onClose(): void;
   onConfirm(): void;
-  title: string;
+  title: React.ReactNode;
   heading?: string;
   okText?: string;
   cancelText?: string;
@@ -29,7 +29,7 @@ const ConfirmationModal = ({
       visible={isOpen}
       data-cy="confirmation-modal"
     >
-      <p>{title}</p>
+      {typeof title === 'string' ? <p>{title}</p> : title}
     </Modal>
   );
 };
