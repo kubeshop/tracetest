@@ -8,7 +8,7 @@ interface IProps {
 const useOnValuesChange = ({setIsValid}: IProps) => {
   return useCallback(
     (_: any, {assertions = []}: IValues) => {
-      const isValid = !assertions.find(({left, right}) => !left || !right);
+      const isValid = !assertions.find(assertion => !assertion?.left || !assertion?.right);
       setIsValid(!!assertions.length && isValid);
     },
     [setIsValid]
