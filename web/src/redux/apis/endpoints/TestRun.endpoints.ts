@@ -29,6 +29,7 @@ const TestRunEndpoint = (builder: TTestApiEndpointBuilder) => ({
     invalidatesTags: (response, error, {testId}) => [
       {type: TracetestApiTags.TEST_RUN, id: `${testId}-LIST`},
       {type: TracetestApiTags.TEST, id: 'LIST'},
+      {type: TracetestApiTags.RESOURCE, id: 'LIST'},
     ],
     transformResponse: (rawTestRun: TRawTestRun) => TestRun(rawTestRun),
   }),
@@ -64,6 +65,7 @@ const TestRunEndpoint = (builder: TTestApiEndpointBuilder) => ({
     invalidatesTags: (response, error, {testId, runId}) => [
       {type: TracetestApiTags.TEST_RUN, id: `${testId}-LIST`},
       {type: TracetestApiTags.TEST_RUN, id: runId},
+      {type: TracetestApiTags.RESOURCE, id: 'LIST'},
     ],
     transformResponse: (rawTestRun: TRawTestRun) => TestRun(rawTestRun),
   }),
@@ -80,6 +82,7 @@ const TestRunEndpoint = (builder: TTestApiEndpointBuilder) => ({
     invalidatesTags: (result, error, {testId}) => [
       {type: TracetestApiTags.TEST_RUN},
       {type: TracetestApiTags.TEST, id: `${testId}-LIST`},
+      {type: TracetestApiTags.RESOURCE, id: 'LIST'},
     ],
   }),
   getJUnitByRunId: builder.query<string, {testId: string; runId: string}>({
