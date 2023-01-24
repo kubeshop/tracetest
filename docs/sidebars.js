@@ -75,6 +75,11 @@ const sidebars = {
             },
             {
               type: "doc",
+              id: "configuration/connecting-to-data-stores/elasticapm",
+              label: "Elastic APM",
+            },
+            {
+              type: "doc",
               id: "configuration/connecting-to-data-stores/signalfx",
               label: "SignalFX",
             },
@@ -324,6 +329,11 @@ const sidebars = {
               type: "doc",
               id: "examples-tutorials/recipes/running-tracetest-with-new-relic",
               label: "Running Tracetest With New Relic",
+            },
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/running-tracetest-with-elasticapm",
+              label: "Running Tracetest With Elastic APM",
             },
           ],
         },
