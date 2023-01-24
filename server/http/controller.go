@@ -569,7 +569,7 @@ func (c *controller) executeTest(ctx context.Context, test model.Test, runInfo o
 	testID := id.ID(resp.Body.(openapi.UpsertDefinitionResponse).Id)
 	// test ready, execute it
 	resp, err = c.RunTest(ctx, testID.String(), runInfo)
-	if resp.Code != http.StatusOK {
+	if resp.Code != http.StatusOK || err != nil {
 		return resp, err
 	}
 
@@ -1006,7 +1006,7 @@ func (c *controller) executeTransaction(ctx context.Context, transaction model.T
 
 	// transaction ready, execute it
 	resp, err = c.RunTransaction(ctx, transactionID.String(), runInfo)
-	if resp.Code != http.StatusOK {
+	if resp.Code != http.StatusOK || err != nil {
 		return resp, err
 	}
 
