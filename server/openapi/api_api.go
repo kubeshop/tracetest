@@ -213,12 +213,6 @@ func (c *ApiApiController) Routes() Routes {
 			c.GetTestSpecs,
 		},
 		{
-			"GetTestVariables",
-			strings.ToUpper("Get"),
-			"/api/tests/{testId}/version/{version}/variables",
-			c.GetTestVariables,
-		},
-		{
 			"GetTestVersion",
 			strings.ToUpper("Get"),
 			"/api/tests/{testId}/version/{version}",
@@ -253,12 +247,6 @@ func (c *ApiApiController) Routes() Routes {
 			strings.ToUpper("Get"),
 			"/api/transactions/{transactionId}/run",
 			c.GetTransactionRuns,
-		},
-		{
-			"GetTransactionVariables",
-			strings.ToUpper("Get"),
-			"/api/transactions/{transactionId}/version/{version}/variables",
-			c.GetTransactionVariables,
 		},
 		{
 			"GetTransactionVersion",
@@ -896,35 +884,6 @@ func (c *ApiApiController) GetTestSpecs(w http.ResponseWriter, r *http.Request) 
 
 }
 
-// GetTestVariables - get test variables
-func (c *ApiApiController) GetTestVariables(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	query := r.URL.Query()
-	testIdParam := params["testId"]
-
-	versionParam, err := parseInt32Parameter(params["version"], true)
-	if err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-
-	environmentIdParam := query.Get("environmentId")
-	runIdParam, err := parseInt32Parameter(query.Get("runId"), false)
-	if err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-	result, err := c.service.GetTestVariables(r.Context(), testIdParam, versionParam, environmentIdParam, runIdParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
 // GetTestVersion - get a test specific version
 func (c *ApiApiController) GetTestVersion(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
@@ -1051,35 +1010,6 @@ func (c *ApiApiController) GetTransactionRuns(w http.ResponseWriter, r *http.Req
 		return
 	}
 	result, err := c.service.GetTransactionRuns(r.Context(), transactionIdParam, takeParam, skipParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
-// GetTransactionVariables - get transaction variables
-func (c *ApiApiController) GetTransactionVariables(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	query := r.URL.Query()
-	transactionIdParam := params["transactionId"]
-
-	versionParam, err := parseInt32Parameter(params["version"], true)
-	if err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-
-	environmentIdParam := query.Get("environmentId")
-	runIdParam, err := parseInt32Parameter(query.Get("runId"), false)
-	if err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-	result, err := c.service.GetTransactionVariables(r.Context(), transactionIdParam, versionParam, environmentIdParam, runIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

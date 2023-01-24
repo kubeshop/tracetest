@@ -3,7 +3,7 @@ package trigger
 import (
 	"context"
 	"fmt"
-	"github.com/kubeshop/tracetest/server/expression"
+
 	"github.com/kubeshop/tracetest/server/model"
 )
 
@@ -43,22 +43,4 @@ func (t *traceidTriggerer) Resolve(ctx context.Context, test model.Test, opts *T
 	test.ServiceUnderTest.TRACEID = traceid
 
 	return test, nil
-}
-
-func (t *traceidTriggerer) Variables(ctx context.Context, test model.Test, executor expression.Executor) (expression.VariablesMap, error) {
-	triggerVariables := expression.VariablesMap{}
-
-	traceid := test.ServiceUnderTest.TRACEID
-	if traceid == nil {
-		return triggerVariables, fmt.Errorf("no settings provided for TRACEID triggerer")
-	}
-
-	idVariables, err := executor.StatementTermsByType(WrapInQuotes(traceid.ID, "\""), expression.EnvironmentType)
-	if err != nil {
-		return triggerVariables, err
-	}
-
-	triggerVariables = triggerVariables.MergeStringArray(idVariables)
-
-	return triggerVariables, nil
 }

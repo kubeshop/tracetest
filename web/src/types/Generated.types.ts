@@ -44,10 +44,6 @@ export interface paths {
     /** Delete a specific run from a particular transaction */
     delete: operations["deleteTransactionRun"];
   };
-  "/transactions/{transactionId}/version/{version}/variables": {
-    /** get transaction variables */
-    get: operations["getTransactionVariables"];
-  };
   "/tests": {
     /** get tests */
     get: operations["getTests"];
@@ -109,10 +105,6 @@ export interface paths {
   "/tests/{testId}/version/{version}/definition.yaml": {
     /** Get the test definition as an YAML file */
     get: operations["getTestVersionDefinitionFile"];
-  };
-  "/tests/{testId}/version/{version}/variables": {
-    /** get test variables */
-    get: operations["getTestVariables"];
   };
   "/environments": {
     /** Get Environments */
@@ -422,29 +414,6 @@ export interface operations {
       404: unknown;
     };
   };
-  /** get transaction variables */
-  getTransactionVariables: {
-    parameters: {
-      path: {
-        transactionId: string;
-        version: number;
-      };
-      query: {
-        environmentId?: string;
-        runId?: number;
-      };
-    };
-    responses: {
-      /** successful operation */
-      200: {
-        content: {
-          "application/json": external["variables.yaml"]["components"]["schemas"]["TestVariables"][];
-        };
-      };
-      /** problem with getting the transaction variables */
-      500: unknown;
-    };
-  };
   /** get tests */
   getTests: {
     parameters: {
@@ -581,6 +550,12 @@ export interface operations {
       200: {
         content: {
           "application/json": external["tests.yaml"]["components"]["schemas"]["TestRun"];
+        };
+      };
+      /** some variables are missing */
+      422: {
+        content: {
+          "application/json": external["variables.yaml"]["components"]["schemas"]["MissingVariablesError"];
         };
       };
     };
@@ -779,29 +754,6 @@ export interface operations {
           "application/yaml": string;
         };
       };
-    };
-  };
-  /** get test variables */
-  getTestVariables: {
-    parameters: {
-      path: {
-        testId: string;
-        version: number;
-      };
-      query: {
-        environmentId?: string;
-        runId?: number;
-      };
-    };
-    responses: {
-      /** successful operation */
-      200: {
-        content: {
-          "application/json": external["variables.yaml"]["components"]["schemas"]["TestVariables"];
-        };
-      };
-      /** problem with getting the test variables */
-      500: unknown;
     };
   };
   /** Get Environments */
@@ -1620,16 +1572,14 @@ export interface external {
     paths: {};
     components: {
       schemas: {
-        Variables: {
-          environment?: string[];
-          variables?: string[];
-          missing?: external["variables.yaml"]["components"]["schemas"]["MissingVariables"][];
+        MissingVariablesError: {
+          missingVariables?: external["variables.yaml"]["components"]["schemas"]["MissingVariable"][];
         };
-        TestVariables: {
-          test?: external["tests.yaml"]["components"]["schemas"]["Test"];
-          variables?: external["variables.yaml"]["components"]["schemas"]["Variables"];
+        MissingVariable: {
+          testId?: string;
+          variables?: external["variables.yaml"]["components"]["schemas"]["Variable"][];
         };
-        MissingVariables: {
+        Variable: {
           key?: string;
           defaultValue?: string;
         };

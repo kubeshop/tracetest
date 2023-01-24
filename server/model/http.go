@@ -27,14 +27,15 @@ var (
 )
 
 type HTTPHeader struct {
-	Key, Value string
+	Key   string `expr_enabled:"true"`
+	Value string `expr_enabled:"true"`
 }
 
 type HTTPRequest struct {
-	Method  HTTPMethod
-	URL     string
+	Method  HTTPMethod `expr_enabled:"true"`
+	URL     string     `expr_enabled:"true"`
+	Body    string     `expr_enabled:"true"`
 	Headers []HTTPHeader
-	Body    string
 	Auth    *HTTPAuthenticator
 }
 
@@ -54,7 +55,7 @@ type HTTPResponse struct {
 }
 
 type HTTPAuthenticator struct {
-	Type   string
+	Type   string `expr_enabled:"true"`
 	APIKey APIKeyAuthenticator
 	Basic  BasicAuthenticator
 	Bearer BearerAuthenticator
@@ -126,9 +127,9 @@ type authenticator interface {
 }
 
 type APIKeyAuthenticator struct {
-	Key   string
-	Value string
-	In    APIKeyPosition
+	Key   string         `expr_enabled:"true"`
+	Value string         `expr_enabled:"true"`
+	In    APIKeyPosition `expr_enabled:"true"`
 }
 
 func (a APIKeyAuthenticator) AuthenticateGRPC() {}
@@ -144,8 +145,8 @@ func (a APIKeyAuthenticator) AuthenticateHTTP(req *http.Request) {
 }
 
 type BasicAuthenticator struct {
-	Username string
-	Password string
+	Username string `expr_enabled:"true"`
+	Password string `expr_enabled:"true"`
 }
 
 func (a BasicAuthenticator) AuthenticateGRPC() {}
@@ -154,7 +155,7 @@ func (a BasicAuthenticator) AuthenticateHTTP(req *http.Request) {
 }
 
 type BearerAuthenticator struct {
-	Bearer string
+	Bearer string `expr_enabled:"true"`
 }
 
 func (a BearerAuthenticator) AuthenticateGRPC() {}
