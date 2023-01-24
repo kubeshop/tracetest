@@ -21,6 +21,7 @@ const TransactionRunEndpoint = (builder: TTestApiEndpointBuilder) => ({
     }),
     invalidatesTags: (result, error, {transactionId}) => [
       {type: TracetestApiTags.TRANSACTION_RUN, id: `${transactionId}-LIST`},
+      {type: TracetestApiTags.RESOURCE, id: 'LIST'},
     ],
     transformResponse: (rawTransactionRun: TRawTransactionRun) => TransactionRun(rawTransactionRun),
   }),
@@ -32,6 +33,7 @@ const TransactionRunEndpoint = (builder: TTestApiEndpointBuilder) => ({
     query: ({transactionId, take = 25, skip = 0}) => `/transactions/${transactionId}/run?take=${take}&skip=${skip}`,
     providesTags: (result, error, {transactionId}) => [
       {type: TracetestApiTags.TRANSACTION_RUN, id: `${transactionId}-LIST`},
+      {type: TracetestApiTags.RESOURCE, id: 'LIST'},
     ],
     transformResponse: (rawTransactionRuns: TRawTransactionRun[], meta) => ({
       total: getTotalCountFromHeaders(meta),
@@ -64,6 +66,7 @@ const TransactionRunEndpoint = (builder: TTestApiEndpointBuilder) => ({
     }),
     invalidatesTags: (result, error, {transactionId}) => [
       {type: TracetestApiTags.TRANSACTION_RUN, id: `${transactionId}-LIST`},
+      {type: TracetestApiTags.RESOURCE, id: 'LIST'},
     ],
   }),
 });

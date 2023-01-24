@@ -19,7 +19,7 @@ const BasicDetails = () => {
 
   const onValidate = useCallback(
     async (changedValues, draft: TDraftTransaction) => {
-      onIsFormValid(Boolean(draft.name && draft.description));
+      onIsFormValid(!!draft.name);
     },
     [onIsFormValid]
   );
