@@ -16,15 +16,16 @@ import {Steps} from 'components/GuidedTour/testDetailsStepList';
 import * as S from './Test.styled';
 
 const Content = () => {
-  const {test, testLastRun} = useTest();
+  const {test} = useTest();
   const onDeleteResource = useDeleteResource();
   const {runTest, isLoadingRunTest} = useTestCrud();
   const params = useMemo(() => ({testId: test.id}), [test.id]);
   useDocumentTitle(`${test.name}`);
 
   const navigate = useNavigate();
-  const canEdit = test != null;
-  const onEdit = () => navigate(`/test/${test.id}/run/${testLastRun.id}`);
+
+  const canEdit = test.summary.runs > 0;
+  const onEdit = () => navigate(`/test/${test.id}/run/${test.summary.runs}`);
 
   return (
     <S.Container $isWhite>

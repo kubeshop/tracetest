@@ -13,7 +13,7 @@ import ResourceCardSummary from './ResourceCardSummary';
 import useRuns from './useRuns';
 
 interface IProps {
-  onEdit(id: string, lastRunId: string, type: ResourceType): void;
+  onEdit(id: string, lastRunId: number, type: ResourceType): void;
   onDelete(id: string, name: string, type: ResourceType): void;
   onRun(transaction: TTransaction, type: ResourceType): void;
   onViewAll(id: string, type: ResourceType): void;
@@ -34,8 +34,8 @@ const TransactionCard = ({
     queryParams
   );
 
-  const canEdit = list.length > 0;
-  const lastRunId = list[0]?.id; // TODO: can we assume that the first item on the list is the last run?
+  const canEdit = summary.runs > 0;
+  const lastRunId = summary.runs; // assume the total of runs as the last run
 
   return (
     <S.Container $type={ResourceType.Transaction}>

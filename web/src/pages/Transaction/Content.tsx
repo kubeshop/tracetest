@@ -24,8 +24,9 @@ const Content = () => {
   }, [runTransaction, transaction]);
 
   const navigate = useNavigate();
-  const canEdit = test != null;
-  const onEdit = () => navigate(`/transaction/${transaction.id}/run/${transaction.version}`);
+
+  const canEdit = transaction.summary.runs > 0;
+  const onEdit = () => navigate(`/transaction/${transaction.id}/run/${transaction.summary.runs}`);
 
   return (
     <S.Container $isWhite>

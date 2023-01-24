@@ -48,7 +48,7 @@ const Resources = () => {
     onTestClick(id);
   }, []);
 
-  const handleOnEdit = (id: string, lastRunId: string, type: ResourceType) => {
+  const handleOnEdit = (id: string, lastRunId: number, type: ResourceType) => {
     if (type === ResourceType.Test) navigate(`/test/${id}/run/${lastRunId}`);
     else if (type === ResourceType.Transaction) navigate(`/transaction/${id}/run/${lastRunId}`);
   };
