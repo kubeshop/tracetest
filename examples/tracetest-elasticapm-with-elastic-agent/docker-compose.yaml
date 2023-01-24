@@ -219,7 +219,7 @@ services:
       retries: 120
 
   app:
-    image: quick-start-nodejs
+    image: quick-start-nodejs-elastic-apm
     hostname: app
     build: .
     ports:

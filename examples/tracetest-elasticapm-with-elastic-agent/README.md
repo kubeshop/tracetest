@@ -16,6 +16,7 @@ Open http://localhost:11633/ to configure the connection to Elasticsearch:
 5. You will need to download the CA certificate from the docker image and upload it to the config under "Upload CA file".
     * The command to download the `ca.crt` file is:
     `docker cp tracetest-elasticapm-with-elastic-agent-es01-1:/usr/share/elasticsearch/config/certs/ca/ca.crt .`
+    * Alternatively, you can skip CA certificate validation by setting the `Enable TLS but don't verify the certificate` option.
 6. Test the connection and Save it, if all is successful.
 
 Create a new test:

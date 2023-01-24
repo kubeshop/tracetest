@@ -4,7 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "with-elastic-apm-tracer":"node -r ./app.js"
+    "with-elastic-apm-tracer":"node -r ./elastic-apm-agent.js app.js"
   },
   "keywords": [],
   "author": "",
