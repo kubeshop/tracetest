@@ -46,7 +46,7 @@ export const IconFail = styled(CloseCircleFilled)`
 
 export const TagContainer = styled.div`
   display: grid;
-  grid-template-columns: fit-content(8ch) fit-content(8ch) fit-content(8ch);
+  grid-template-columns: fit-content(20%) fit-content(100%) fit-content(20%);
 
   > span:nth-child(1) {
     border-radius: 2px 0px 0px 2px;
@@ -63,6 +63,13 @@ export const TextTag = styled(Tag)<{$isLight?: boolean}>`
     border-radius: 0px;
     border: none;
     background: ${({theme, $isLight}) => ($isLight ? 'rgba(3, 24, 73, 0.05)' : theme.color.borderLight)};
+  }
+`;
+
+export const EntryPointTag = styled(TextTag)`
+  && {
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 `;
 

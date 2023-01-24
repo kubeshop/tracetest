@@ -4,7 +4,7 @@ import ConfirmationModal from 'components/ConfirmationModal';
 
 type TOnConfirm = typeof noop;
 type TOnOPenProps = {
-  title: string;
+  title: React.ReactNode;
   heading?: string;
   okText?: string;
   cancelText?: string;

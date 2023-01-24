@@ -8,7 +8,7 @@ export const Container = styled.div`
   border-radius: 2px;
   display: grid;
   gap: 16px;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 80%;
   margin-bottom: 8px;
   min-height: 58px;
   padding: 7px 16px;
