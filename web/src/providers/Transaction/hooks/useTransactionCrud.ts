@@ -5,6 +5,7 @@ import {TDraftTransaction, TTransaction} from 'types/Transaction.types';
 import {
   useDeleteTransactionByIdMutation,
   useEditTransactionMutation,
+  useLazyGetTransactionVersionByIdQuery,
   useRunTransactionMutation,
 } from 'redux/apis/TraceTest.api';
 import {TEnvironmentValue} from 'types/Environment.types';
@@ -15,6 +16,7 @@ const useTransactionCrud = () => {
   const navigate = useNavigate();
   const [editTransaction, {isLoading: isTransactionEditLoading}] = useEditTransactionMutation();
   const [runTransactionAction, {isLoading: isLoadingRunTransaction}] = useRunTransactionMutation();
+  const [getTransaction] = useLazyGetTransactionVersionByIdQuery();
   const [deleteTransactionAction] = useDeleteTransactionByIdMutation();
   const isEditLoading = isTransactionEditLoading || isLoadingRunTransaction;
   const {selectedEnvironment} = useEnvironment();
@@ -22,6 +24,11 @@ const useTransactionCrud = () => {
 
   const runTransaction = useCallback(
     async (transaction: TTransaction, runId?: string, environmentId = selectedEnvironment?.id) => {
+      const {steps: testList} = await getTransaction({
+        transactionId: transaction.id,
+        version: transaction.version,
+      }).unwrap();
+
       const run = async (variables: TEnvironmentValue[] = []) => {
         try {
           const {id} = await runTransactionAction({transactionId: transaction.id, environmentId, variables}).unwrap();
@@ -33,6 +40,7 @@ const useTransactionCrud = () => {
             onOpen({
               name: transaction.name,
               missingVariables,
+              testList,
               onSubmit(missing) {
                 run(missing);
               },

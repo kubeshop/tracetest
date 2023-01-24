@@ -1,7 +1,7 @@
 import {useEffect} from 'react';
 import {Form} from 'antd';
 import VariablesService from 'services/Variables.service';
-import {TDraftVariables, TMissingVariable} from 'types/Variables.types';
+import {TDraftVariables, TTestVariablesMap} from 'types/Variables.types';
 import {TEnvironmentValue} from 'types/Environment.types';
 import * as S from './MissingVariablesModal.styled';
 import MissingVariablesModalFooter from './MissingVariablesModalFooter';
@@ -13,20 +13,20 @@ interface IProps {
   name: string;
   onClose(): void;
   onSubmit(values: TEnvironmentValue[]): void;
-  missingVariables: TMissingVariable[];
+  testVariables: TTestVariablesMap;
 }
 
-const MissingVariablesModal = ({isOpen, onClose, onSubmit, missingVariables, name}: IProps) => {
+const MissingVariablesModal = ({isOpen, onClose, onSubmit, testVariables, name}: IProps) => {
   const [form] = Form.useForm<TDraftVariables>();
   const {isValid, onValidate} = useValidateVariablesDraft();
 
   useEffect(() => {
     if (isOpen) {
-      const draft = VariablesService.getDraftVariables(missingVariables);
+      const draft = VariablesService.getDraftVariables(testVariables);
       onValidate({}, draft);
       form.setFieldsValue(draft);
     } else form.resetFields();
-  }, [form, isOpen, missingVariables, onValidate]);
+  }, [form, isOpen, testVariables, onValidate]);
 
   return (
     <S.Modal
@@ -48,7 +48,7 @@ const MissingVariablesModal = ({isOpen, onClose, onSubmit, missingVariables, nam
           The following variables are referenced in this test but are not defined. Please provide a value to use for
           each of these missing variables.
         </S.Description>
-        <MissingVariablesModalForm />
+        <MissingVariablesModalForm testVariables={testVariables} />
       </Form>
     </S.Modal>
   );

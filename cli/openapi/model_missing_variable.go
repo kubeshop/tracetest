@@ -16,8 +16,8 @@ import (
 
 // MissingVariable struct for MissingVariable
 type MissingVariable struct {
-	Key          *string `json:"key,omitempty"`
-	DefaultValue *string `json:"defaultValue,omitempty"`
+	TestId    *string    `json:"testId,omitempty"`
+	Variables []Variable `json:"variables,omitempty"`
 }
 
 // NewMissingVariable instantiates a new MissingVariable object
@@ -37,77 +37,77 @@ func NewMissingVariableWithDefaults() *MissingVariable {
 	return &this
 }
 
-// GetKey returns the Key field value if set, zero value otherwise.
-func (o *MissingVariable) GetKey() string {
-	if o == nil || o.Key == nil {
+// GetTestId returns the TestId field value if set, zero value otherwise.
+func (o *MissingVariable) GetTestId() string {
+	if o == nil || o.TestId == nil {
 		var ret string
 		return ret
 	}
-	return *o.Key
+	return *o.TestId
 }
 
-// GetKeyOk returns a tuple with the Key field value if set, nil otherwise
+// GetTestIdOk returns a tuple with the TestId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *MissingVariable) GetKeyOk() (*string, bool) {
-	if o == nil || o.Key == nil {
+func (o *MissingVariable) GetTestIdOk() (*string, bool) {
+	if o == nil || o.TestId == nil {
 		return nil, false
 	}
-	return o.Key, true
+	return o.TestId, true
 }
 
-// HasKey returns a boolean if a field has been set.
-func (o *MissingVariable) HasKey() bool {
-	if o != nil && o.Key != nil {
+// HasTestId returns a boolean if a field has been set.
+func (o *MissingVariable) HasTestId() bool {
+	if o != nil && o.TestId != nil {
 		return true
 	}
 
 	return false
 }
 
-// SetKey gets a reference to the given string and assigns it to the Key field.
-func (o *MissingVariable) SetKey(v string) {
-	o.Key = &v
+// SetTestId gets a reference to the given string and assigns it to the TestId field.
+func (o *MissingVariable) SetTestId(v string) {
+	o.TestId = &v
 }
 
-// GetDefaultValue returns the DefaultValue field value if set, zero value otherwise.
-func (o *MissingVariable) GetDefaultValue() string {
-	if o == nil || o.DefaultValue == nil {
-		var ret string
+// GetVariables returns the Variables field value if set, zero value otherwise.
+func (o *MissingVariable) GetVariables() []Variable {
+	if o == nil || o.Variables == nil {
+		var ret []Variable
 		return ret
 	}
-	return *o.DefaultValue
+	return o.Variables
 }
 
-// GetDefaultValueOk returns a tuple with the DefaultValue field value if set, nil otherwise
+// GetVariablesOk returns a tuple with the Variables field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *MissingVariable) GetDefaultValueOk() (*string, bool) {
-	if o == nil || o.DefaultValue == nil {
+func (o *MissingVariable) GetVariablesOk() ([]Variable, bool) {
+	if o == nil || o.Variables == nil {
 		return nil, false
 	}
-	return o.DefaultValue, true
+	return o.Variables, true
 }
 
-// HasDefaultValue returns a boolean if a field has been set.
-func (o *MissingVariable) HasDefaultValue() bool {
-	if o != nil && o.DefaultValue != nil {
+// HasVariables returns a boolean if a field has been set.
+func (o *MissingVariable) HasVariables() bool {
+	if o != nil && o.Variables != nil {
 		return true
 	}
 
 	return false
 }
 
-// SetDefaultValue gets a reference to the given string and assigns it to the DefaultValue field.
-func (o *MissingVariable) SetDefaultValue(v string) {
-	o.DefaultValue = &v
+// SetVariables gets a reference to the given []Variable and assigns it to the Variables field.
+func (o *MissingVariable) SetVariables(v []Variable) {
+	o.Variables = v
 }
 
 func (o MissingVariable) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if o.Key != nil {
-		toSerialize["key"] = o.Key
+	if o.TestId != nil {
+		toSerialize["testId"] = o.TestId
 	}
-	if o.DefaultValue != nil {
-		toSerialize["defaultValue"] = o.DefaultValue
+	if o.Variables != nil {
+		toSerialize["variables"] = o.Variables
 	}
 	return json.Marshal(toSerialize)
 }

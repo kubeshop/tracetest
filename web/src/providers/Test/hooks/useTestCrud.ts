@@ -41,6 +41,7 @@ const useTestCrud = () => {
             onOpen({
               name: test.name,
               missingVariables,
+              testList: [test],
               onSubmit(missing) {
                 run(missing);
               },

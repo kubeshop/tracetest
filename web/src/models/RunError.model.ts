@@ -2,9 +2,9 @@ import {RunErrorTypes, TRawRunError, TRunError} from 'types/TestRun.types';
 import {TMissingVariable, TRawMissingVariables} from 'types/Variables.types';
 
 export const MissingVariables = ({missingVariables = []}: TRawMissingVariables = {}): TMissingVariable[] => {
-  return missingVariables.map(({key = '', defaultValue = ''}) => ({
-    key,
-    defaultValue,
+  return missingVariables.map(({testId = '', variables = []}) => ({
+    testId,
+    variables: variables.map(({key = '', defaultValue = ''}) => ({key, defaultValue})),
   }));
 };
 

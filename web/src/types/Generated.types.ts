@@ -1576,6 +1576,10 @@ export interface external {
           missingVariables?: external["variables.yaml"]["components"]["schemas"]["MissingVariable"][];
         };
         MissingVariable: {
+          testId?: string;
+          variables?: external["variables.yaml"]["components"]["schemas"]["Variable"][];
+        };
+        Variable: {
           key?: string;
           defaultValue?: string;
         };
