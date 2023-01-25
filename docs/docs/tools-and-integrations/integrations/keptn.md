@@ -2,7 +2,7 @@
  
 [Tracetest](https://tracetest.io/) is a testing tool based on OpenTelemetry that permits you to test your distributed application. It allows you to use your trace data generated on your OpenTelemetry tools to check and assert if your application has the desired behavior defined by your test definitions.
 
-[Keptn](https://keptn.sh/) is a powerful tool to automate the lifecycle of your application running on Kubernetes. One of the tasks that we can do on `keptn` is to test an application and see if it is healthy and ready to be used by your users.
+[Keptn](https://keptn.sh/) is a powerful tool to automate the lifecycle of your application running on Kubernetes. One of the tasks that we can do with `keptn` is to test an application and see if it is healthy and ready to be used by your users.
 
 By using the Keptn [Job Executor Service](https://github.com/keptn-contrib/job-executor-service) plugin, we can upload a Tracetest test definition and a CLI configuration to a service and run a test using the following job:
 
@@ -33,11 +33,11 @@ actions:
 
 ## Quickstart
 
-Here we will show how to use Tracetest to do these tests and help in your delivery and testing workflows using the [Pokeshop](https://docs.tracetest.io/pokeshop/) example, available at address `http://demo-pokemon-api.demo` at Kubernetes.
+Here we will show how to use Tracetest to run these tests and help in your delivery and testing workflows using the [Pokeshop](https://docs.tracetest.io/pokeshop/) example, available at `http://demo-pokemon-api.demo` in a Kubernetes cluster.
 
 ### Prerequisites
 
-On your Kubernetes cluster you should have:
+In your Kubernetes cluster you should have:
 
 1. `Keptn 1.0.x` [installed](https://keptn.sh/docs/1.0.x/install/)
 2. `Job Executor Service 0.3.x` [installed](https://github.com/keptn-contrib/job-executor-service/blob/main/docs/INSTALL.md)
@@ -162,7 +162,7 @@ To guarantee that our job will be called by Keptn when we execute the `deploymen
  
 Choose the `job-executor-service` integration, and add a subscription to the event `sh.keptn.event.test-services.triggered` and the project `keptn-tracetest-integration`.
  
-### 4. Run sequence when needed
+### 4. Run sequence when needed.
  
 Finally, to see the integration running, we only need to execute the following command:
 ```sh
